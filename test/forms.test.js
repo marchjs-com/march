@@ -497,3 +497,12 @@ test("inputFor / registerInput map schema types to controls", () => {
   assert.equal(el.querySelector("[role=switch]").getAttribute("aria-checked"), "true");
   void reactive;
 });
+
+test("TextInput autofocus and CodeInput masked boxes", async () => {
+  const { TextInput, CodeInput } = await import("../src/forms/index.ts");
+  const { h, render } = await import("../src/index.ts");
+  const el = document.createElement("div");
+  render(() => [h(TextInput, { autofocus: true }), h(CodeInput, { length: 4, masked: true })], el);
+  assert.equal(el.querySelector("input").hasAttribute("autofocus"), true);
+  assert.equal(el.querySelectorAll(".hm-code-box").every((b) => b.getAttribute("type") === "password"), true);
+});

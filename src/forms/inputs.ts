@@ -28,6 +28,8 @@ export interface TextAttrProps {
   minLength?: number | undefined;
   minlength?: number | undefined;
   spellcheck?: string | boolean | undefined;
+  /** Focus this field when it appears. */
+  autofocus?: boolean | undefined;
 }
 
 const textAttrs = (props: TextAttrProps) => ({
@@ -35,6 +37,7 @@ const textAttrs = (props: TextAttrProps) => ({
   readonly: () => !!props.readonly,
   autocomplete: props.autocomplete,
   inputmode: props.inputmode,
+  autofocus: props.autofocus ? true : null,
   maxlength: props.maxLength ?? props.maxlength,
   minlength: props.minLength ?? props.minlength,
   spellcheck: props.spellcheck,
@@ -386,6 +389,9 @@ export function ColorInput(props: ColorInputProps): unknown {
 }
 
 export interface CodeInputProps extends ControlProps<string> {
+  /** Hide the characters (PINs): boxes render as password inputs. */
+  masked?: boolean | (() => boolean) | undefined;
+
   /** Number of boxes (6). */
   length?: number | undefined;
   /** Digits only (default true); `false` allows letters (upper-cased). */
@@ -396,7 +402,7 @@ export interface CodeInputProps extends ControlProps<string> {
 
 /**
  * One-time code: N boxes, paste fills them, typing advances, Backspace goes back. Value is the code string.
- * Props: length (6), numeric (true), onComplete(code), autofocus.
+ * Props: length (6), numeric (true), onComplete(code), autofocus, masked (PIN).
  */
 export function CodeInput(props: CodeInputProps): unknown {
   const n = props.length ?? 6;
@@ -431,7 +437,7 @@ export function CodeInput(props: CodeInputProps): unknown {
   });
   for (let i = 0; i < n; i++) {
     const el = h("input", {
-      type: "text", class: "hm-code-box", id: i ? `${baseId}-${i}` : baseId, inputmode: numeric ? "numeric" : "text", pattern: numeric ? "[0-9]*" : null,
+      type: () => ((typeof props.masked === "function" ? props.masked() : props.masked) ? "password" : "text"), class: "hm-code-box", id: i ? `${baseId}-${i}` : baseId, inputmode: numeric ? "numeric" : "text", pattern: numeric ? "[0-9]*" : null,
       autocomplete: i === 0 ? "one-time-code" : "off", "aria-label": t`Character ${i + 1} of ${n}`, "aria-invalid": c["aria-invalid"],
       disabled: () => !!props.disabled, readonly: () => !!props.readonly, onBlur: props.onBlur, autofocus: i === 0 && props.autofocus ? true : null,
       onFocus: (e: FocusEvent) => inputOf(e).select?.(),
