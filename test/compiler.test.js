@@ -172,3 +172,10 @@ test("esbuild plugin bundles .jsx with css and resolves hadi-march", async () =>
     await assert.rejects(esbuild.build({ stdin: { contents: "const a = <div>", loader: "jsx" }, entryPoints: [], write: false, logLevel: "silent" }).catch(() => { throw new Error("x"); }));
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("trailing comments after a $ declaration or assignment stay comments", () => {
+  const out = body("let $a = null   // { x, y }\nlet $b = 1 /* note */\n$a = 2 // set\nconst z = 1");
+  assert.match(out, /const \$a = _\$signal\(null\)   \/\/ \{ x, y \}/);
+  assert.match(out, /const \$b = _\$signal\(1\) \/\* note \*\//);
+  assert.match(out, /\$a\.set\(2\) \/\/ set/);
+});

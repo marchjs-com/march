@@ -302,21 +302,22 @@ class Transformer {
   /** Walk from `start`, calling `stop(i, ch, depth)`; returns index where it returned true or limit. Skips literals/JSX. */
   walk(start, stop, limit = this.src.length) {
     const src = this.src;
-    let depth = 0, i = start, prev = { t: "start" };
+    let depth = 0, i = start, prev = { t: "start" }, lastEnd = start; // lastEnd: just after the last code character
     while (i < limit) {
       const c = src[i];
       if (c === "/" && (src[i + 1] === "/" || src[i + 1] === "*")) { i = skipComment(src, i); continue; }
-      if (depth === 0 && stop(i, c, prev)) return i;
+      if (depth === 0 && stop(i, c, prev, lastEnd)) return i;
       if (c === " " || c === "\t" || c === "\r" || c === "\n") { i++; continue; }
-      if (c === '"' || c === "'" || c === "`") { i = c === "`" ? this.skipTemplate(i) : skipString(src, i); prev = { t: "str" }; continue; }
-      if (c === "/" && exprAllowed(prev)) { i = skipRegex(src, i); prev = { t: "str" }; continue; }
-      if (c === "<" && exprAllowed(prev) && /[A-Za-z_$>]/.test(src[i + 1] ?? "")) { const save = this.pos; this.pos = i; this.jsx(true); i = this.pos; this.pos = save; prev = { t: "jsx" }; continue; }
-      if (isIdStart(c)) { let j = i + 1; while (isIdPart(src[j] ?? "")) j++; const w = src.slice(i, j); prev = { t: identKind(w), v: w }; i = j; continue; }
-      if (/[0-9]/.test(c)) { while (/[\w.]/.test(src[i] ?? "")) i++; prev = { t: "num" }; continue; }
+      if (c === '"' || c === "'" || c === "`") { i = c === "`" ? this.skipTemplate(i) : skipString(src, i); prev = { t: "str" }; lastEnd = i; continue; }
+      if (c === "/" && exprAllowed(prev)) { i = skipRegex(src, i); prev = { t: "str" }; lastEnd = i; continue; }
+      if (c === "<" && exprAllowed(prev) && /[A-Za-z_$>]/.test(src[i + 1] ?? "")) { const save = this.pos; this.pos = i; this.jsx(true); i = this.pos; this.pos = save; prev = { t: "jsx" }; lastEnd = i; continue; }
+      if (isIdStart(c)) { let j = i + 1; while (isIdPart(src[j] ?? "")) j++; const w = src.slice(i, j); prev = { t: identKind(w), v: w }; i = j; lastEnd = i; continue; }
+      if (/[0-9]/.test(c)) { while (/[\w.]/.test(src[i] ?? "")) i++; prev = { t: "num" }; lastEnd = i; continue; }
       if (c === "(" || c === "[" || c === "{") depth++;
       else if (c === ")" || c === "]" || c === "}") { if (depth === 0) return i; depth--; }
       prev = { t: "punct", v: c };
       i++;
+      lastEnd = i;
     }
     return limit;
   }
@@ -334,20 +335,23 @@ class Transformer {
   /** End of an assignment expression (stops at depth-0 `,` `;` closers, or a newline where ASI applies). */
   exprEnd(start) {
     const src = this.src;
-    return this.walk(start, (i, c, prev) => {
+    let cut = null; // at a newline that ends the statement: stop after the last code character (not after a // comment)
+    const end = this.walk(start, (i, c, prev, lastEnd) => {
       if (c === "," || c === ";") return true;
       if (c === "\n") {
-        const before = src.slice(start, i).trimEnd();
+        const before = src.slice(start, lastEnd).trimEnd();
         if (!before) return false;
         const last = before[before.length - 1];
         if (/[+\-*/%&|^!~<>=?:,.([{]/.test(last)) return false;
         const next = /^\s*(\S)/.exec(src.slice(i, i + 200))?.[1] ?? "";
         if (/[.?+\-*/%&|^=<>:,)\]}]/.test(next)) return false;
         void prev;
+        cut = lastEnd;
         return true;
       }
       return false;
     });
+    return cut ?? end;
   }
 
   /** End of a unary operand (for `await x`): prefix ops, primary, then member/call/template chain. */

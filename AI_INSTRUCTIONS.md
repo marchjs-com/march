@@ -132,6 +132,7 @@ shown; the server must enforce permissions.
 | Row shows old data in `<For>` | Use `item()` (accessor), give a stable `key`. |
 | Listener runs after the view closed | Register with `on:`/`onClick` or call `onCleanup`. |
 | Query refetches too often | Give it a `key` with only the inputs that matter; set `staleTime`. |
+| `{a | b}` inside a template literal does bitwise OR | Pipes work only directly in JSX `{…}` containers; in JS use `applyPipe("date", x)`. |
 | Unknown sx value | sx accepts token ranges only (see `src/core/sx.js`); use classes for anything else. |
 
 ## 10. Testing pattern
