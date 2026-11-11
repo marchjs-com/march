@@ -215,7 +215,7 @@ Props: `nav`, `top` (optional strip above main), `mainId` (default "main"), `cla
 
 ## Media
 
-`<Media src kind alt poster controls autoplay loop muted fallback />` shows an image, video or audio that fits its
+`<Media src kind alt poster controls autoplay loop muted size fallback />` (`size`: `"sm"` thumbnail, `"md"`) shows an image, video or audio that fits its
 container (`kind`: `"image"` default, `"video"`, `"audio"`, `"auto"` = by file extension via `mediaKind(src)`). URLs go
 through `safeUrl` (http(s), relative, `blob:`); a load error shows `fallback` ("Could not load media"). Video/audio have
 controls unless `controls={false}`. `openMedia(src, { title, kind, alt, poster, size, autoplay })` opens it in a dialog.
