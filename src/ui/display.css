@@ -1,12 +1,12 @@
 /* HADI March — display components (Card, Badge, Empty, Skeleton, Alert, Kbd, Avatar, CodeView, JsonView, KeyValue, Timeline) and layout helpers. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- display */
-.hm-card { position: relative; background: var(--hm-surface); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-1); min-width: 0; }
+.hm-card { position: relative; display: flex; flex-direction: column; background: var(--hm-surface); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-1); min-width: 0; }
 .hm-card-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--hm-space-3); padding: var(--hm-space-4) var(--hm-space-5) 0; }
 .hm-card-titles { flex: 1; min-width: min(12rem, 100%); }
 .hm-card-title { margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); letter-spacing: var(--hm-tracking-tight); }
 .hm-card-sub { margin: .1875rem 0 0; color: var(--hm-muted); font-size: var(--hm-text-sm); }
 .hm-card-actions, .hm-page-actions, .hm-section-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
-.hm-card-body { padding: var(--hm-space-4) var(--hm-space-5) var(--hm-space-5); }
+.hm-card-body { flex: 1 1 auto; min-width: 0; padding: var(--hm-space-4) var(--hm-space-5) var(--hm-space-5); }
 .hm-card-flush .hm-card-body { padding: 0; }
 .hm-card-flush .hm-card-head { padding-bottom: var(--hm-space-4); border-bottom: 1px solid var(--hm-border-subtle); }
 .hm-card-foot { padding: var(--hm-space-3) var(--hm-space-5); border-top: 1px solid var(--hm-border-subtle); background: var(--hm-bg-subtle); border-radius: 0 0 var(--hm-radius-3) var(--hm-radius-3); }
@@ -86,7 +86,7 @@
 .hm-kv-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hm-kv-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .hm-kv-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .hm-kv-row { min-width: 0; display: flex; flex-direction: column; gap: .1875rem; }
 .hm-kv dt { color: var(--hm-muted); font-size: var(--hm-text-xs); font-weight: var(--hm-weight-medium); }
-.hm-kv dd { margin: 0; overflow-wrap: anywhere; font-size: var(--hm-text-md); font-weight: var(--hm-weight-medium); color: var(--hm-text); font-variant-numeric: tabular-nums; }
+.hm-kv dd { margin: 0; overflow-wrap: break-word; font-size: var(--hm-text-md); font-weight: var(--hm-weight-medium); color: var(--hm-text); font-variant-numeric: tabular-nums; }
 .hm-kv-hint { display: block; margin-top: .125rem; color: var(--hm-muted); font-size: var(--hm-text-xs); font-weight: 400; }
 .hm-timeline { list-style: none; margin: 0; padding: 0; }
 .hm-tl-item { position: relative; display: flex; gap: var(--hm-space-3); padding-bottom: var(--hm-space-5); }
@@ -107,11 +107,15 @@
 .hm-align-start { align-items: flex-start; } .hm-align-center { align-items: center; } .hm-align-end { align-items: flex-end; } .hm-align-stretch { align-items: stretch; } .hm-align-baseline { align-items: baseline; }
 .hm-justify-start { justify-content: flex-start; } .hm-justify-center { justify-content: center; } .hm-justify-end { justify-content: flex-end; } .hm-justify-between { justify-content: space-between; }
 .hm-grid { display: grid; }
-.hm-grid-1 { grid-template-columns: minmax(0, 1fr); } .hm-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hm-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.hm-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } .hm-grid-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } .hm-grid-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+/* fixed columns: up to --hm-cols, never narrower than --hm-grid-col-min (fewer columns instead of crushed ones) */
+.hm-grid-1 { --hm-cols: 1; } .hm-grid-2 { --hm-cols: 2; } .hm-grid-3 { --hm-cols: 3; } .hm-grid-4 { --hm-cols: 4; } .hm-grid-5 { --hm-cols: 5; } .hm-grid-6 { --hm-cols: 6; }
+:is(.hm-grid-1, .hm-grid-2, .hm-grid-3, .hm-grid-4, .hm-grid-5, .hm-grid-6) {
+  --hm-cols-fx: min(var(--hm-cols), var(--hm-cols-md, 99), var(--hm-cols-sm, 99));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, max(var(--hm-grid-col-min, 9rem), (100% - (var(--hm-cols-fx) - 1) * var(--hm-grid-gap, var(--hm-space-4))) / var(--hm-cols-fx) - .1px)), 1fr)); }
 .hm-grid-auto { grid-template-columns: repeat(auto-fill, minmax(min(var(--hm-grid-min, 16rem), 100%), 1fr)); }
-@media (max-width: 1024px) { .hm-grid-4, .hm-grid-5, .hm-grid-6 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hm-kv-cols-3, .hm-kv-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 640px) { .hm-grid-2, .hm-grid-3, .hm-grid-4, .hm-grid-5, .hm-grid-6, .hm-kv[class*="hm-kv-cols-"] { grid-template-columns: minmax(0, 1fr); } }
+.hm-grid-equal { grid-auto-rows: 1fr; }
+@media (max-width: 1024px) { .hm-grid-4, .hm-grid-5, .hm-grid-6 { --hm-cols-md: 2; } .hm-kv-cols-3, .hm-kv-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .hm-grid-2, .hm-grid-3, .hm-grid-4, .hm-grid-5, .hm-grid-6 { --hm-cols-sm: 1; } .hm-kv[class*="hm-kv-cols-"] { grid-template-columns: minmax(0, 1fr); } }
 .hm-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
 .hm-toolbar-start { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); flex: 1; min-width: 0; }
 .hm-toolbar-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }

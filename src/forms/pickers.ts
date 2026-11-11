@@ -7,6 +7,7 @@ import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { floating } from "../ui/popover.ts";
 import { model, ctl, cx, uid, debounce, listNav, fold, same, normOptions, extend, type ControlProps, type Option, type OptionsProp } from "./util.ts";
+import { OverflowText } from "../ui/marquee.ts";
 
 export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]> {
   /** Static options: [value] or [{ value, label, hint, disabled }]. */
@@ -147,7 +148,7 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
   wrap = h("div", { class: cx("hm-combo", multi && "hm-multi", props.class), "class:hm-disabled": () => !!props.disabled, onClick: (e: MouseEvent) => { if (e.target === wrap) input.focus(); } },
     multi ? () => (getList() ?? []).map((v) => {
       const label = labelOf(v);
-      return h("span", { class: "hm-chip" }, h("span", { class: "hm-chip-label" }, label),
+      return h("span", { class: "hm-chip" }, h(OverflowText, { class: "hm-chip-label" }, label),
         props.readonly || props.disabled ? null : h("button", { type: "button", class: "hm-chip-x", "aria-label": t`Remove ${label}`, onClick: () => { removeAt(v); input.focus(); } }, "×"));
     }) : null,
     input,

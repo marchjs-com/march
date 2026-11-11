@@ -157,8 +157,8 @@ export function NavSidebar(props: NavSidebarProps): Element {
     const body = [
       icon(iconOf, "hm-icon hm-sb-icon"),
       h("span", { class: "hm-sb-text" },
-        h(OverflowText, { class: "hm-sb-label", text: () => text(x.label) }),
-        () => { const s = sub ? sub() : text(x.sub); return s ? h("span", { class: "hm-sb-sub" }, s) : null; }),
+        h(OverflowText, { class: "hm-sb-label", text: () => text(x.label), play: () => active() === x.id }),
+        () => { const s = sub ? sub() : text(x.sub); return s ? h(OverflowText, { class: "hm-sb-sub", play: () => active() === x.id }, s) : null; }),
       badge(x),
     ];
     const common = {
@@ -198,7 +198,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
             h("button", { type: "button", class: "hm-sb-row hm-sb-gbtn", "data-group": g.name, "aria-expanded": () => String(isOpen()), "aria-controls": gid, onClick: () => toggle(g.name) },
               h("span", { class: "hm-sb-chev", "aria-hidden": "true" }, glyph(chevronRight)),
               icon(props.groupIcons?.[g.name], "hm-icon hm-sb-gicon"),
-              h("span", { class: "hm-sb-gname" }, g.name),
+              h(OverflowText, { class: "hm-sb-gname" }, g.name),
               h("span", { class: "hm-sb-count" }, String(g.items.length))),
             h("div", { class: "hm-sb-gpanel", id: gid, inert: () => !isOpen() },
               h("ul", { class: "hm-sb-list hm-sb-gitems" }, g.items.map((x) => row(x, "group")))));

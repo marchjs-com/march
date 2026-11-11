@@ -1,6 +1,8 @@
 /* HADI March — Grid: fixed or automatic columns; fill (last row) and balance modes in pure CSS (flex-wrap + :has()). */
 .hm-grid { gap: var(--hm-grid-gap, var(--hm-space-4)); }
 .hm-grid > * { min-width: 0; }
+/* a card wrapped in a grid cell (e.g. for an animation) still fills the cell: equal heights in a row */
+.hm-grid > * > :only-child:is(.hm-card, .hm-link-card) { height: 100%; }
 .hm-grid-gap-0 { --hm-grid-gap: var(--hm-space-0); }
 .hm-grid-gap-1 { --hm-grid-gap: var(--hm-space-1); }
 .hm-grid-gap-2 { --hm-grid-gap: var(--hm-space-2); }
@@ -11,8 +13,15 @@
 .hm-grid-gap-7 { --hm-grid-gap: var(--hm-space-7); }
 .hm-grid-gap-8 { --hm-grid-gap: var(--hm-space-8); }
 /* flex modes: columns are flex-basis fractions; --hm-cols is the declared (or balanced) count, capped on small screens */
-.hm-grid-flex { display: flex; flex-wrap: wrap; --hm-cols-eff: min(var(--hm-cols, 2), var(--hm-cols-md, 99), var(--hm-cols-sm, 99)); }
-.hm-grid-flex > * { flex: 0 1 calc((100% - (var(--hm-cols-eff) - 1) * var(--hm-grid-gap, var(--hm-space-4))) / var(--hm-cols-eff)); max-width: 100%; }
+.hm-grid-flex { display: flex; flex-wrap: wrap; container: hm-grid / inline-size; }
+.hm-grid-flex > * { --hm-cols-cq: 99; --hm-cols-eff: min(var(--hm-cols, 2), var(--hm-cols-md, 99), var(--hm-cols-sm, 99), var(--hm-cols-cq));
+  flex: 0 1 max(min(var(--hm-grid-col-min, 9rem), 100%), (100% - (var(--hm-cols-eff) - 1) * var(--hm-grid-gap, var(--hm-space-4))) / var(--hm-cols-eff) - .1px); max-width: 100%; }
+/* the container's own width caps the columns (9rem minimum + 1rem gap each): a narrow box gets fewer, readable columns */
+@container hm-grid (width < 59rem) { .hm-grid-flex > * { --hm-cols-cq: 5; } }
+@container hm-grid (width < 49rem) { .hm-grid-flex > * { --hm-cols-cq: 4; } }
+@container hm-grid (width < 39rem) { .hm-grid-flex > * { --hm-cols-cq: 3; } }
+@container hm-grid (width < 29rem) { .hm-grid-flex > * { --hm-cols-cq: 2; } }
+@container hm-grid (width < 19rem) { .hm-grid-flex > * { --hm-cols-cq: 1; } }
 .hm-grid-flex-min > * { flex: 1 1 min(var(--hm-grid-min, 16rem), 100%); }
 .hm-grid-fill-stretch > * { flex-grow: 1; }
 .hm-grid-fill-last > :last-child { flex-grow: 1; }

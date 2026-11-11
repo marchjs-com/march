@@ -225,7 +225,7 @@ test("zoom: drag selects an x range, double click resets", () => {
 
 test("hidden data table mirrors the data; formats via pipes", () => {
   const { el } = mount(() => h(C.LineChart, { data: sales(), x: "day", y: ["income", "expense"], series: { income: "Income", expense: "Expense" }, format: ["money", "USD"], xFormat: "date", title: "Sales", width: 400, height: 200 }));
-  const table = el.querySelector("table.hm-sr-only");
+  const table = el.querySelector(".hm-sr-only table");
   assert.ok(table);
   assert.equal(table.querySelector("caption").textContent, "Sales");
   assert.deepEqual(table.querySelectorAll("thead th").map((t) => t.textContent), ["day", "Income", "Expense"]);

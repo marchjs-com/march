@@ -16,6 +16,7 @@ import { rank } from "./fold.ts";
 import { pages, commands, type Command } from "./registry.ts";
 import { val, cx, uid, icon, glyph, debounce, type MaybeFn } from "./util.ts";
 import { sparkles, search as searchIcon } from "../icons/set.ts";
+import { OverflowText } from "./marquee.ts";
 
 export { registerCommands, registerPages } from "./registry.ts";
 export type { Command, CommandEntry, PageEntry } from "./registry.ts";
@@ -177,8 +178,8 @@ export function CommandPalette(props: CommandPaletteProps): unknown {
       },
       r.kind === "ask"
         ? [h("span", { class: "hm-icon hm-pal-icon", "aria-hidden": "true" }, glyph(sparkles)), h("span", { class: "hm-pal-title" }, () => (r.status === "loading" ? t`Asking…` : r.status === "error" ? t`Ask failed — press Enter to retry` : t`Ask: “${q()}”`))]
-        : [icon(r.item.icon), h("span", { class: "hm-pal-title" }, r.item.title),
-          r.reason && h("span", { class: "hm-pal-reason" }, r.reason),
+        : [icon(r.item.icon), h(OverflowText, { class: "hm-pal-title" }, r.item.title),
+          r.reason && h(OverflowText, { class: "hm-pal-reason" }, r.reason),
           r.item.sub && h("span", { class: "hm-pal-sub" }, r.item.sub),
           r.item.shortcut && h("kbd", { class: "hm-kbd" }, formatKey(r.item.shortcut))]),
     ];
@@ -205,6 +206,6 @@ export interface PaletteButtonProps { label?: MaybeFn<string | undefined>; short
 export function PaletteButton(props: PaletteButtonProps = {}): Element {
   return h("button", { type: "button", class: cx("hm-pal-trigger", props.class), onClick: openPalette, "aria-keyshortcuts": "Control+K Meta+K" },
     glyph(searchIcon, "hm-svg hm-pal-trigger-icon"),
-    h("span", { class: "hm-pal-trigger-label" }, () => val(props.label) ?? t`Search…`),
+    h(OverflowText, { class: "hm-pal-trigger-label" }, () => val(props.label) ?? t`Search…`),
     h("kbd", { class: "hm-kbd hm-pal-trigger-kbd", "aria-hidden": "true" }, formatKey(props.shortcut ?? "mod+k")));
 }

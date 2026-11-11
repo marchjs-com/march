@@ -18,7 +18,9 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
     if (reducedMotion() || !doc) { apply(); return; }
     root?.setAttribute("data-hm-nav", pop ? "back" : "forward");
     if (typeof doc.startViewTransition === "function") {
-      const vt = doc.startViewTransition(() => apply());
+      const vt = doc.startViewTransition(() => apply()) as ReturnType<StartVT> & { ready?: Promise<unknown>; finished?: Promise<unknown> };
+      // an aborted transition (resize, a second navigation) is not an error: the DOM update still happened
+      vt.ready?.catch(() => undefined); vt.finished?.catch(() => undefined);
       await vt.updateCallbackDone.catch(() => undefined);
       return;
     }

@@ -12,7 +12,7 @@
 .hm-md-editor { display: flex; flex-direction: column; gap: var(--hm-space-2); }
 .hm-md-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 @media (max-width: 40rem) { .hm-md-split { grid-template-columns: minmax(0, 1fr); } }
-.hm-md-preview { min-height: 6rem; padding: var(--hm-space-3); border: 1px solid var(--hm-border); border-radius: var(--hm-radius); background: var(--hm-surface); overflow-wrap: anywhere; }
+.hm-md-preview { min-height: 6rem; padding: var(--hm-space-3); border: 1px solid var(--hm-border); border-radius: var(--hm-radius); background: var(--hm-surface); overflow-wrap: break-word; }
 .hm-markdown > :first-child { margin-top: 0; }
 .hm-markdown > :last-child { margin-bottom: 0; }
 .hm-markdown code { font-family: var(--hm-font-mono); font-size: .9em; background: var(--hm-surface-2); padding: .1em .3em; border-radius: var(--hm-radius-1); }

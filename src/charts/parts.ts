@@ -92,10 +92,11 @@ export function Legend({ items, hidden, position, colors }: { items: () => reado
 /** Visually hidden table with the chart data (screen readers, copy/paste). */
 export function DataTable<R>({ caption, columns, rows, limit = 1000 }: DataTableOptions<R>): Element {
   const shown = (): readonly R[] => { const r = rows(); return r.length > limit ? r.slice(0, limit) : r; };
-  return h("table", { class: "hm-sr-only" },
+  // a table ignores width:1px, so the hiding box is a wrapper (otherwise the table widens the page on phones)
+  return h("div", { class: "hm-sr-only" }, h("table", {},
     h("caption", {}, () => { const n = rows().length; return `${caption() ?? "Chart data"}${n > limit ? ` (first ${limit} of ${n} rows)` : ""}`; }),
     h("thead", {}, h("tr", {}, () => columns().map((c) => h("th", { scope: "col" }, String(c.label))))),
-    h("tbody", {}, each<R>({ each: shown, children: (d, i) => h("tr", {}, () => columns().map((c, j) => h(j ? "td" : "th", j ? {} : { scope: "row" }, String(c.value(d(), i()) ?? "")))) })));
+    h("tbody", {}, each<R>({ each: shown, children: (d, i) => h("tr", {}, () => columns().map((c, j) => h(j ? "td" : "th", j ? {} : { scope: "row" }, String(c.value(d(), i()) ?? "")))) }))));
 }
 
 /** Axis. `ticks()` → [{key, pos, label}]; `box()` → {x, y, w, h} plot area. */

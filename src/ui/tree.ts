@@ -5,6 +5,7 @@ import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { chevronRight } from "../icons/set.ts";
+import { OverflowText } from "./marquee.ts";
 
 export interface TreeNode { id: string; label: unknown; icon?: unknown; meta?: unknown; children?: readonly TreeNode[] }
 export interface TreeProps { nodes: readonly TreeNode[]; selected?: MaybeFn<string | null | undefined>; onSelect?: (node: TreeNode) => void; expanded?: readonly string[]; label?: string; class?: ClassProp }
@@ -30,7 +31,7 @@ export function Tree(props: TreeProps): Element {
         },
       },
       h("span", { class: () => cx("hm-tree-chev", !has && "is-leaf", isOpen() && "is-open"), "aria-hidden": "true" }, has ? glyph(chevronRight) : null),
-      icon(node.icon, "hm-tree-icon"), h("span", { class: "hm-tree-label" }, node.label), node.meta != null && h("span", { class: "hm-tree-meta" }, node.meta)),
+      icon(node.icon, "hm-tree-icon"), h(OverflowText, { class: "hm-tree-label" }, node.label), node.meta != null && h("span", { class: "hm-tree-meta" }, node.meta)),
       has && h("ul", { role: "group", class: "hm-tree-group", hidden: () => !isOpen() }, node.children?.map((c) => row(c, level + 1))));
   };
   const root = h("ul", { role: "tree", class: () => cx("hm-tree", val(props.class)), "aria-label": props.label ?? t`Tree` }, props.nodes.map((n) => row(n, 1)));

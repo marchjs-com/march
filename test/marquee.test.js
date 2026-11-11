@@ -31,3 +31,12 @@ test("marquee.css: logical fade (RTL flips), reduced motion falls back", () => {
   assert.match(css, /prefers-reduced-motion: reduce/);
   assert.doesNotMatch(css, /(^|[;{\s])(left|right|margin-left|margin-right|padding-left|padding-right)\s*:/, "logical properties only");
 });
+
+test("one-line labels scroll instead of ending in an ellipsis", () => {
+  const read = (f) => readFileSync(new URL(`../src/${f}`, import.meta.url), "utf8");
+  const uses = { "ui/sidebar.ts": ["hm-sb-label", "hm-sb-sub", "hm-sb-gname"], "ui/nav.ts": ["hm-nav-label"], "ui/app.ts": ["hm-link-card-title", "hm-user-name"],
+    "ui/chip.ts": ["hm-chip2-label"], "ui/palette.ts": ["hm-pal-title"], "ui/tree.ts": ["hm-tree-label"], "forms/pickers.ts": ["hm-chip-label"], "forms/file.ts": ["hm-file-name"] };
+  for (const [f, list] of Object.entries(uses)) for (const c of list) assert.ok(read(f).includes(`h(OverflowText, { class: "${c}"`), `${f} ${c}`);
+  assert.match(read("ui/sidebar.ts"), /class: "hm-sb-sub", play: \(\) => active\(\) === x\.id/, "the selected item keeps scrolling");
+  assert.doesNotMatch(read("ui/app.css"), /line-clamp/, "LinkCard description is not clamped");
+});

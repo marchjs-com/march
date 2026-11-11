@@ -29,6 +29,8 @@ export interface OverflowTextProps {
   separator?: string;
   /** Fade the clipped edges (default true); false shows an ellipsis instead. */
   fade?: boolean;
+  /** Extra condition that keeps it scrolling (e.g. the selected item of a menu): `play={() => isActive()}`. */
+  play?: MaybeFn<boolean | undefined>;
   /** Element whose hover/focus starts it (default: closest a, button, li, label, [tabindex] — or itself). */
   host?: Element | (() => Element | null);
   class?: ClassProp;
@@ -52,7 +54,7 @@ export function OverflowText(props: OverflowTextProps): Element {
 
   const item = h("span", { class: "hm-marquee-item" }, props.text != null ? () => val(props.text) ?? "" : props.children) as HTMLElement;
   const track = h("span", { class: "hm-marquee-track" }, item) as HTMLElement;
-  const { text: _t, children: _c, trigger: _tr, mode: _m, speed: _s, pause: _p, delay: _d, separator: _sep, fade: _f, host: _h, class: _cl, ...attrs } = props;
+  const { text: _t, children: _c, trigger: _tr, mode: _m, speed: _s, pause: _p, delay: _d, separator: _sep, fade: _f, host: _h, play: _pl, class: _cl, ...attrs } = props;
   const root = h("span", {
     dir: "auto", ...attrs,
     class: () => cx("hm-marquee", props.fade === false ? "hm-marquee-ellipsis" : "hm-marquee-fade", dist() > 0 && "is-overflow", running() && "is-running", val(props.class)),
@@ -67,7 +69,7 @@ export function OverflowText(props: OverflowTextProps): Element {
     label.set(item.textContent ?? "");
   };
 
-  const engaged = computed(() => (triggers.has("always") || triggers.has("visible") || (triggers.has("hover") && hovered()) || (triggers.has("focus") && focused())) && visible());
+  const engaged = computed(() => (!!val(props.play) || triggers.has("always") || triggers.has("visible") || (triggers.has("hover") && hovered()) || (triggers.has("focus") && focused())) && visible());
   const wanted = computed(() => dist() > 0 && engaged() && !reducedMotion());
 
   let anim: Anim | null = null, timer: ReturnType<typeof setTimeout> | null = null, copies: Element[] = [];

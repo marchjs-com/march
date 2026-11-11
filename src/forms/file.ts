@@ -8,6 +8,7 @@ import { For } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
 import { applyPipe } from "../core/pipes.ts";
 import { model, ctl, cx, uid, type ControlProps } from "./util.ts";
+import { OverflowText } from "../ui/marquee.ts";
 
 /** Does `file` match an accept list like "image/*,.pdf,application/json"? */
 export function accepts(file: { name?: string; type?: string }, accept: string | null | undefined): boolean {
@@ -123,7 +124,7 @@ export function FileUpload<R = unknown>(props: FileUploadProps<R>): unknown {
     return h("li", { class: "hm-file", "class:hm-file-error": () => it.status() === "error" },
       it.url && it.file.type.startsWith("image/") ? h("img", { class: "hm-file-thumb", src: it.url, alt: "" }) : null,
       it.url && it.file.type.startsWith("audio/") ? h("audio", { class: "hm-file-audio", src: it.url, controls: true }) : null,
-      h("span", { class: "hm-file-name" }, it.file.name), h("small", { class: "hm-hint" }, bytes(it.file.size)),
+      h(OverflowText, { class: "hm-file-name" }, it.file.name), h("small", { class: "hm-hint" }, bytes(it.file.size)),
       () => (it.status() === "uploading" ? h("div", { class: "hm-progress", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": () => String(pct()), "aria-label": t`Uploading ${it.file.name}` },
         h("div", { class: "hm-progress-bar", style: () => ({ width: `${pct()}%` }) })) : null),
       () => (it.status() === "error" ? h("span", { class: "hm-field-error", role: "alert" }, it.error()) : null),
@@ -136,7 +137,7 @@ export function FileUpload<R = unknown>(props: FileUploadProps<R>): unknown {
     if (untrack(items).length || v == null || (Array.isArray(v) && !v.length)) return null;
     const list: unknown[] = Array.isArray(v) ? v : [v];
     return h("ul", { class: "hm-files" }, list.map((x) => h("li", { class: "hm-file" },
-      h("span", { class: "hm-file-name" }, typeof x === "string" ? x : (x as { name?: string } | null)?.name ?? (x as { url?: string } | null)?.url ?? String(x)),
+      h(OverflowText, { class: "hm-file-name" }, typeof x === "string" ? x : (x as { name?: string } | null)?.name ?? (x as { url?: string } | null)?.url ?? String(x)),
       props.readonly ? null : h("button", { type: "button", class: "hm-icon-btn", "aria-label": t`Remove`, onClick: () => set(multi ? (untrack(get) as unknown[]).filter((y) => y !== x) : null) }, "×"))));
   };
   return h("div", { class: cx("hm-upload", props.class) }, input, zone,

@@ -14,6 +14,7 @@ import { compareText } from "../core/text.ts";
 import { registerPages } from "./registry.ts";
 import { val, cx, uid, icon, glyph, load, save, on, type MaybeFn, type ClassProp } from "./util.ts";
 import { menu, star, starFilled, chevronRight, search, panelLeft } from "../icons/set.ts";
+import { OverflowText } from "./marquee.ts";
 
 /** A NavMenu entry. */
 export interface NavItem {
@@ -134,7 +135,7 @@ export function NavMenu(props: NavMenuProps): Element {
       href: x.href, "data-id": x.id, "data-where": where,
       class: () => cx("hm-nav-item", active() === x.id && "is-active"), title: () => (rail() ? titleOf(x) : null),
       "aria-current": () => (active() === x.id ? "page" : null),
-      children: [icon(x.icon ?? (x.group ? props.groupIcons?.[x.group] : undefined), "hm-icon hm-nav-icon"), h("span", { class: "hm-nav-label" }, () => titleOf(x)),
+      children: [icon(x.icon ?? (x.group ? props.groupIcons?.[x.group] : undefined), "hm-icon hm-nav-icon"), h(OverflowText, { class: "hm-nav-label" }, () => titleOf(x)),
         x.badge !== undefined && h(Badge, { count: () => val(x.badge), max: 99 })],
     }),
     h("button", {
@@ -169,7 +170,7 @@ export function NavMenu(props: NavMenuProps): Element {
         const isOpen = (): boolean => rail() || (collapsed().has(g.name) === startClosed);
         return h("div", { class: "hm-nav-group" },
           h("button", { type: "button", class: "hm-nav-gbtn", "data-group": g.name, "aria-expanded": () => String(isOpen()), "aria-controls": gid, onClick: () => toggleGroup(g.name) },
-            icon(props.groupIcons?.[g.name], "hm-icon hm-nav-gicon"), h("span", { class: "hm-nav-gname" }, g.name),
+            icon(props.groupIcons?.[g.name], "hm-icon hm-nav-gicon"), h(OverflowText, { class: "hm-nav-gname" }, g.name),
             h("span", { class: "hm-nav-chev", "aria-hidden": "true" }, glyph(chevronRight))),
           h("ul", { class: "hm-nav-list", id: gid, hidden: () => !isOpen() }, g.items.map((x) => item(x, "main"))));
       }),

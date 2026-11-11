@@ -9,6 +9,7 @@ import { Menu, type MenuItem } from "./menu.ts";
 import { Avatar } from "./display.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { chevronsUpDown, arrowUpRight } from "../icons/set.ts";
+import { OverflowText } from "./marquee.ts";
 
 export interface BrandProps {
   /** The mark: an icon (hadi-march/icons, e.g. one made with defineIcon), text or a node. */
@@ -89,8 +90,8 @@ export function UserMenu(props: UserMenuProps): unknown {
     trigger: [
       h(Avatar, { name: () => val(props.name) ?? "", src: props.avatar, size: "sm" }),
       !props.compact && h("span", { class: "hm-user-text hm-rail-hide" },
-        h("span", { class: "hm-user-name" }, () => val(props.name) ?? ""),
-        props.detail != null && h("span", { class: "hm-user-detail" }, () => val(props.detail) ?? "")),
+        h(OverflowText, { class: "hm-user-name" }, () => val(props.name) ?? ""),
+        props.detail != null && h(OverflowText, { class: "hm-user-detail" }, () => val(props.detail) ?? "")),
       !props.compact && h("span", { class: "hm-user-chev hm-rail-hide", "aria-hidden": "true" }, glyph(chevronsUpDown)),
     ],
   });
@@ -120,7 +121,7 @@ export function LinkCard(props: LinkCardProps): Element {
     children: [
       props.icon != null && h(IconTile, { icon: props.icon, tone: props.tone }),
       h("span", { class: "hm-link-card-text" },
-        h("span", { class: "hm-link-card-title" }, () => val(props.title)),
+        h(OverflowText, { class: "hm-link-card-title" }, () => val(props.title)),
         props.description != null && h("span", { class: "hm-link-card-desc" }, () => val(props.description))),
       props.meta != null && h("span", { class: "hm-link-card-meta" }, () => val(props.meta)),
       h("span", { class: "hm-link-card-arrow", "aria-hidden": "true" }, glyph(arrowUpRight)),

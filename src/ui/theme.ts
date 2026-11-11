@@ -11,6 +11,7 @@ import { val, cx, on, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { monitor, sun, moon, x as xIcon, check, palette as paletteIcon } from "../icons/set.ts";
 import { THEME_NAMES, DEFAULT_THEME } from "../theme/names.ts";
 import { Dropdown } from "./menu.ts";
+import { OverflowText } from "./marquee.ts";
 
 export type ThemeMode = "system" | "light" | "dark";
 const THEME_KEY = "hm.theme";
@@ -128,7 +129,7 @@ export function ThemePicker(props: ThemePickerProps = {}): unknown {
           type: "button", role: "radio", class: () => cx("hm-theme-opt", themeName() === x.id && "is-active"), "aria-checked": () => String(themeName() === x.id),
           onClick: () => setColorTheme(x.id),
         }, h(ThemeSwatch, { id: x.id }), h("span", { class: "hm-theme-opt-text" }, h("span", { class: "hm-theme-opt-name" }, x.name),
-          x.description ? h("span", { class: "hm-theme-opt-desc" }, x.description) : null),
+          x.description ? h(OverflowText, { class: "hm-theme-opt-desc" }, x.description) : null),
           h("span", { class: "hm-theme-opt-check", "aria-hidden": "true" }, glyph(check)))))),
     ],
   });

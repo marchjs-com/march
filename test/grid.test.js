@@ -31,3 +31,14 @@ test("grid.css: no horizontal overflow, balance table, small-screen caps", () =>
   assert.match(css, /@media \(max-width: 640px\) \{ \.hm-grid-flex \{ --hm-cols-sm: 1; \}/);
   assert.doesNotMatch(css, /\b(left|right)\s*:/, "logical only");
 });
+
+test("Grid: minCol and equal; cards fill their cell; fixed grids never crush columns", () => {
+  const g = h(U.Grid, { cols: 4, minCol: "12rem", equal: true }, "a");
+  assert.ok(cls(g).includes("hm-grid-equal"));
+  assert.equal(g.style.getPropertyValue("--hm-grid-col-min"), "12rem");
+  assert.match(css, /\.hm-grid > \* > :only-child:is\(\.hm-card, \.hm-link-card\) \{ height: 100%; \}/);
+  assert.match(css, /@container hm-grid \(width < 19rem\)/);
+  const display = readFileSync(new URL("../src/ui/display.css", import.meta.url), "utf8");
+  assert.match(display, /repeat\(auto-fill, minmax\(min\(100%, max\(var\(--hm-grid-col-min, 9rem\)/);
+  assert.match(display, /\.hm-card \{ position: relative; display: flex; flex-direction: column;/);
+});

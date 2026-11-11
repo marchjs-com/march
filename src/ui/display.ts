@@ -289,6 +289,10 @@ export interface GridProps {
   fill?: "stretch" | "last";
   /** Pick the column count that spreads items evenly over the rows (5 in 4 columns → 3 + 2, not 4 + 1). CSS only. */
   balance?: boolean;
+  /** Narrowest column (default "9rem"): when the box is too narrow for `cols` of this width, fewer columns are used. */
+  minCol?: string;
+  /** Every row as tall as the tallest (fixed-column grids). Cards in a row are always equal height. */
+  equal?: boolean;
   class?: ClassProp;
   children?: unknown;
   [attr: string]: unknown;
@@ -300,12 +304,12 @@ export interface GridProps {
 export function Grid(props: GridProps): Element {
   const flex = !!props.fill || !!props.balance;
   const cols = Math.max(1, Math.min(props.cols ?? 2, 6));
-  return h("div", { ...rest(props, ["cols", "gap", "min", "fill", "balance"]),
+  return h("div", { ...rest(props, ["cols", "gap", "min", "fill", "balance", "minCol", "equal"]),
     class: () => cx("hm-grid", `hm-grid-gap-${props.gap ?? 4}`,
       flex ? ["hm-grid-flex", props.min ? "hm-grid-flex-min" : `hm-grid-c${cols}`, props.fill && `hm-grid-fill-${props.fill}`, props.balance && "hm-grid-balance"]
-        : props.min ? "hm-grid-auto" : `hm-grid-${cols}`,
+        : props.min ? "hm-grid-auto" : `hm-grid-${cols}`, props.equal && "hm-grid-equal",
       val(props.class)),
-    style: props.min ? { "--hm-grid-min": props.min } : undefined }, props.children);
+    style: props.min || props.minCol ? { ...(props.min ? { "--hm-grid-min": props.min } : {}), ...(props.minCol ? { "--hm-grid-col-min": props.minCol } : {}) } : undefined }, props.children);
 }
 export interface ToolbarProps { label?: MaybeFn<string>; end?: unknown; class?: ClassProp; children?: unknown }
 /** Horizontal bar of controls: `<Toolbar label="Filters" end={<Button>…</Button>}>…</Toolbar>` */

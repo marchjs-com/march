@@ -4,6 +4,7 @@ import { h } from "../dom/h.ts";
 import { lttb } from "./lttb.ts";
 import { svgIcon, isIconDef } from "../icons/svg.ts";
 import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, attr, each, type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps } from "./util.ts";
+import { OverflowText } from "../ui/marquee.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -175,7 +176,7 @@ export function BarList<D>(props: BarListProps<D>): Element {
         h(sel ? "button" : "div", { class: "hm-barlist-row", ...(sel ? { type: "button", onClick: () => sel({ ...it(), rank: idx() + 1 }) } : {}) },
           h("svg", { class: "hm-barlist-bar", "aria-hidden": "true", width: "100%", height: "100%", preserveAspectRatio: "none" },
             h("rect", { class: () => `hm-barlist-fill ${seriesClass(num(read(props.color)) ?? 0)}`, style: () => colorStyle(props.colors, 0), x: 0, y: 0, height: "100%", width: pct })),
-          h("span", { class: "hm-barlist-label" }, () => it().label),
+          h(OverflowText, { class: "hm-barlist-label" }, () => it().label),
           h("span", { class: "hm-barlist-value" }, () => fmt()(it().value))));
     } }));
 }
