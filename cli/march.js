@@ -56,7 +56,9 @@ function buildOptions(cfg, esbuild, { dev }) {
 function writeHtml(cfg, meta, { dev }) {
   const out = resolve(cwd, cfg.outdir);
   const src = existsSync(join(cwd, cfg.html)) ? readFileSync(join(cwd, cfg.html), "utf8") : templates.indexHtml();
-  const entry = Object.entries(meta.outputs).find(([, o]) => o.entryPoint);
+  // the app entry (lazy pages are entry points of their own chunks too, so match the configured entry file)
+  const want = resolve(cwd, cfg.entry);
+  const entry = Object.entries(meta.outputs).find(([, o]) => o.entryPoint && resolve(cwd, o.entryPoint) === want) ?? Object.entries(meta.outputs).find(([, o]) => o.entryPoint);
   const js = `/${relative(out, resolve(cwd, entry[0])).split(sep).join("/")}`;
   const css = entry[1].cssBundle ? `/${relative(out, resolve(cwd, entry[1].cssBundle)).split(sep).join("/")}` : null;
   const tags = `${css ? `<link rel="stylesheet" href="${css}">` : ""}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : ""}`;

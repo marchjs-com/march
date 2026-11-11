@@ -71,6 +71,8 @@ test("march build bundles a tiny app with routes and public files", () => {
     mkdirSync(join(dir, "public"));
     writeFileSync(join(dir, "public/robots.txt"), "User-agent: *\n");
     writeFileSync(join(dir, "src/pages/index.jsx"), "export default function Home() { let $n = 0\n return <button on:click={() => $n++}>{$n}</button> }\n");
+    // a second (lazy) page: its chunk is an esbuild entry point too and must not end up in index.html
+    writeFileSync(join(dir, "src/pages/about.jsx"), "export default function About() { return <p>about</p> }\n");
     writeFileSync(join(dir, "src/main.jsx"), "import routes from './routes.gen.js'\ncreateRouter({ routes })\nrender(() => <Router />, document.getElementById('app'))\n");
     writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
     execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
