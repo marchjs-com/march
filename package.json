@@ -1,0 +1,33 @@
+{
+  "name": "hadi-march",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HADI March: a tiny, fine-grained reactive UI library. Signals instead of a virtual DOM, JSX compiled by an esbuild plugin, zero runtime dependencies, CSP and Trusted Types friendly.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./router": "./src/router/index.js",
+    "./data": "./src/data/index.js",
+    "./schema": "./src/schema/index.js",
+    "./ui": "./src/ui/index.js",
+    "./table": "./src/table/index.js",
+    "./charts": "./src/charts/index.js",
+    "./testing": "./src/testing/index.js",
+    "./compiler": "./compiler/index.js",
+    "./esbuild": "./compiler/esbuild.js",
+    "./css/*": "./src/css/*"
+  },
+  "bin": { "march": "./cli/march.js" },
+  "files": ["src", "compiler", "cli", "index.d.ts", "README.md", "LICENSE"],
+  "types": "./index.d.ts",
+  "scripts": {
+    "test": "node --test",
+    "bench": "node bench/run.js",
+    "size": "node bench/size.js"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}
