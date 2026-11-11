@@ -20,7 +20,8 @@
     "./charts/charts.css": "./src/charts/charts.css",
     "./crud": "./src/crud/index.js",
     "./forms": "./src/forms/index.js",
-    "./register": "./compiler/register.js"
+    "./register": "./compiler/register.js",
+    "./i18n/*": "./src/i18n/*.js"
   },
   "bin": {
     "march": "./cli/march.js"
