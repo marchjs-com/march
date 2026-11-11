@@ -17,7 +17,9 @@
     "./compiler": "./compiler/index.js",
     "./esbuild": "./compiler/esbuild.js",
     "./css/*": "./src/css/*",
-    "./charts/charts.css": "./src/charts/charts.css"
+    "./charts/charts.css": "./src/charts/charts.css",
+    "./crud": "./src/crud/index.js",
+    "./forms": "./src/forms/index.js"
   },
   "bin": {
     "march": "./cli/march.js"
