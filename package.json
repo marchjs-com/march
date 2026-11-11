@@ -16,18 +16,33 @@
     "./testing": "./src/testing/index.js",
     "./compiler": "./compiler/index.js",
     "./esbuild": "./compiler/esbuild.js",
-    "./css/*": "./src/css/*"
+    "./css/*": "./src/css/*",
+    "./charts/charts.css": "./src/charts/charts.css"
   },
-  "bin": { "march": "./cli/march.js" },
-  "files": ["src", "compiler", "cli", "index.d.ts", "README.md", "LICENSE"],
+  "bin": {
+    "march": "./cli/march.js"
+  },
+  "files": [
+    "src",
+    "compiler",
+    "cli",
+    "index.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
   "types": "./index.d.ts",
   "scripts": {
     "test": "node --test",
     "bench": "node bench/run.js",
     "size": "node bench/size.js"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "esbuild": "0.28.2"
-  }
+  },
+  "sideEffects": [
+    "*.css"
+  ]
 }

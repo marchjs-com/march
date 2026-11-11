@@ -1,0 +1,8 @@
+# HADI March
+> Tiny fine-grained reactive UI library: components run once, signals bind directly to DOM nodes, no virtual DOM, zero runtime dependencies, JSX compiled by an esbuild plugin, CSP/Trusted Types safe.
+
+- [AI instructions](AI_INSTRUCTIONS.md): concepts, syntax, data, actions, schema/forms/tables, routing, do/don't, mistakes
+- [README](README.md): overview, language table, modules
+- [Core](docs/core.md): signals, store, h(), control flow, pipes, i18n
+- [UI](docs/ui.md), [Forms](docs/forms.md), [Table](docs/table.md), [Charts](docs/charts.md)
+- [Examples](examples/): counter, form, crud, router, async, table, charts
