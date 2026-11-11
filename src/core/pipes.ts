@@ -11,7 +11,11 @@ export function pipe(name: string, fn: PipeFn): void {
   if (!/^[a-zA-Z_]\w*$/.test(name)) throw new Error(`March: invalid pipe name "${name}".`);
   registry.set(name, fn);
 }
-/** Apply a registered pipe (compiler output). */
+/** Built-in pipes that always produce text. */
+export type TextPipe = "date" | "time" | "datetime" | "relative" | "number" | "money" | "percent" | "compact" | "bytes" | "upper" | "lower" | "title" | "truncate" | "json" | "list";
+/** Apply a registered pipe (compiler output). Built-in text pipes return `string`; custom pipes return `unknown`. */
+export function applyPipe(name: TextPipe, value: unknown, ...args: unknown[]): string;
+export function applyPipe(name: string, value: unknown, ...args: unknown[]): unknown;
 export function applyPipe(name: string, value: unknown, ...args: unknown[]): unknown {
   const fn = registry.get(name) as ((value: unknown, ...args: unknown[]) => unknown) | undefined;
   if (!fn) throw new Error(`March: unknown pipe "${name}". Register it with pipe("${name}", fn).`);
