@@ -7,6 +7,7 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 ### Fixed (later in 0.1.0)
 - CSS class collisions: the markdown editor mode switch now uses `.hm-editor-tabs`/`.hm-editor-tab` and `CodeInput` uses
   `.hm-otp`/`.hm-otp-box`, so they no longer restyle `Tabs` (`.hm-tabs`) and `CodeBlock` (`.hm-code`). Regression test added.
+- `Tabs` bar no longer shows a stray vertical scrollbar (the active tab underline overlapped the bar border).
 
 ### Added (later in 0.1.0)
 - TypeScript: the whole library source is strict TypeScript (no `any`); `build:lib` emits ESM + declarations; JSX types

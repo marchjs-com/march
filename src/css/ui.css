@@ -106,7 +106,7 @@ html.hm-scroll-lock { overflow: hidden; }
 @media (max-width: 640px) { .hm-toasts { inset-inline: var(--hm-space-3); width: auto; } }
 
 /* ---------- tabs */
-.hm-tabs-bar { display: flex; gap: var(--hm-space-1); border-bottom: 1px solid var(--hm-border); overflow-x: auto; scrollbar-width: thin; }
+.hm-tabs-bar { display: flex; gap: var(--hm-space-1); border-bottom: 1px solid var(--hm-border); overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
 .hm-tab { display: inline-flex; align-items: center; gap: var(--hm-space-2); padding: var(--hm-space-2) var(--hm-space-3); border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
   background: none; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-sm); font-weight: 500; white-space: nowrap; cursor: pointer; }
 .hm-tab:hover { color: var(--hm-text); }
