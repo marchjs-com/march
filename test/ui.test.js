@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, serialize, Event } from "../src/testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
-const { signal, h, render } = await import("../src/index.js");
+const { signal, h, render } = await import("../src/index.ts");
 const R = await import("../src/router/index.ts");
 const A = await import("../src/access/index.ts");
 const U = await import("../src/ui/index.ts");
@@ -433,7 +433,7 @@ test("bootLoader.done removes #hm-boot", async () => {
 
 test("AppShell places the nav and the main area", async () => {
   const { AppShell } = await import("../src/ui/layout.ts");
-  const { h, render } = await import("../src/index.js");
+  const { h, render } = await import("../src/index.ts");
   const el = document.createElement("div");
   render(() => h(AppShell, { nav: h("nav", {}, "menu"), top: "banner" }, h("p", {}, "page")), el);
   assert.equal(el.querySelector(".hm-shell-nav").textContent, "menu");
@@ -443,7 +443,7 @@ test("AppShell places the nav and the main area", async () => {
 
 test("Disclosure renders details/summary and reports toggles", async () => {
   const { Disclosure } = await import("../src/ui/disclosure.ts");
-  const { h, render } = await import("../src/index.js");
+  const { h, render } = await import("../src/index.ts");
   const el = document.createElement("div");
   let last;
   render(() => h(Disclosure, { title: "More", onToggle: (o) => { last = o; } }, "body"), el);

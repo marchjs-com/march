@@ -8,7 +8,7 @@ import { installDom } from "../src/testing/dom.ts";
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
 const sizes = String(arg("--rows", "1000,10000")).split(",").map(Number);
 installDom();
-const { signal, h, render, For, lazy, batch } = await import("../src/index.js");
+const { signal, h, render, For, lazy, batch } = await import("../src/index.ts");
 
 const ms = (fn) => { const t = performance.now(); fn(); return performance.now() - t; };
 const row = (i, v = 0) => ({ id: i, label: `row ${i}`, v });

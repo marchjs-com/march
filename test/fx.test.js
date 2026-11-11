@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../src/testing/dom.ts";
 installDom();
-const { h, render } = await import("../src/index.js");
+const { h, render } = await import("../src/index.ts");
 const fx = await import("../src/fx/index.ts");
 
 test("fx components render without canvas support and without style attribute strings", async () => {

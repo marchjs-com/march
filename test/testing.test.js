@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, renderTest } from "../src/testing/index.ts";
 installDom();
-const { h, signal } = await import("../src/index.js");
+const { h, signal } = await import("../src/index.ts");
 const { query } = await import("../src/data/index.ts");
 
 test("renderTest drives a component: click, type, sees, mock fetch", async () => {

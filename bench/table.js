@@ -9,7 +9,7 @@ const COLUMNS = [{ key: "name", label: "Name" }, { key: "qty", label: "Qty", ali
 export async function run({ installDom }) {
   const { document, cleanup } = installDom();
   try {
-    const { signal, h, render } = await import("../src/index.js");
+    const { signal, h, render } = await import("../src/index.ts");
     const { Table, createTable } = await import("../src/table/index.ts");
     const out = [];
     for (const n of [1_000, 10_000]) {

@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../src/testing/dom.ts";
 const { document } = installDom();
-const { h, render, signal, setLocale } = await import("../src/index.js");
+const { h, render, signal, setLocale } = await import("../src/index.ts");
 setLocale("en");
 const { Media, openMedia, mediaKind, closeAll } = await import("../src/ui/index.ts");
 const tick = () => new Promise((r) => setTimeout(r, 0));

@@ -1,5 +1,5 @@
 // Turkish locale pack for HADI March's built-in texts. Usage: import tr from "hadi-march/i18n/tr"; messages("tr", tr);
-export default {
+const tr: Record<string, string> = {
   "0 rows": "0 satır",
   "A new version is available": "Yeni sürüm hazır",
   "Actions": "Eylemler",
@@ -205,3 +205,4 @@ export default {
   "…": "…",
   "↑↓ to move · Enter to open · Esc to close": "↑↓ gez · Enter aç · Esc kapat",
 };
+export default tr;

@@ -7,7 +7,7 @@ import { pathToFileURL, fileURLToPath } from "node:url";
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 /** Module specifier → file (relative to the March root). Order = priority when two modules export the same name. */
 export const MODULES = [
-  ["hadi-march", "src/index.js"],
+  ["hadi-march", "src/index.ts"],
   ["hadi-march/store", "src/store/index.ts"],
   ["hadi-march/i18n", "src/i18n/index.ts"],
   ["hadi-march/ui", "src/ui/index.ts"],

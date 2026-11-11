@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../src/testing/dom.ts";
 installDom();
-const { signal, h, render, For, lazy, createRoot } = await import("../src/index.js");
+const { signal, h, render, For, lazy, createRoot } = await import("../src/index.ts");
 const M = await import("../src/motion/index.ts");
 const { createRouter, navigate, Router, _resetRouter } = await import("../src/router/index.ts");
 

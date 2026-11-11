@@ -8,7 +8,7 @@ import { compile, isStaticCode } from "../compiler/index.js";
 import { loadAutoImports } from "../compiler/autoimports.js";
 import { installDom } from "../src/testing/dom.ts";
 
-const RT = new URL("../src/index.js", import.meta.url).href;
+const RT = new URL("../src/index.ts", import.meta.url).href;
 const c = (src, o = {}) => compile(src, { runtime: RT, ...o }).code;
 const body = (src, o) => c(src, o).replace(/^import[^\n]*?;\s*(import[^\n]*?;\s*)*/, "");
 

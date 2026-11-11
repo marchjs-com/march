@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../src/testing/dom.ts";
 installDom({ url: "http://localhost/" });
-const { signal, h, render, effect, createRoot } = await import("../src/index.js");
+const { signal, h, render, effect, createRoot } = await import("../src/index.ts");
 const R = await import("../src/router/index.ts");
 const D = await import("../src/data/index.ts");
 const { schema } = await import("../src/schema/index.ts");

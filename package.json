@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.js",
+    ".": "./src/index.ts",
     "./router": "./src/router/index.ts",
     "./data": "./src/data/index.ts",
     "./schema": "./src/schema/index.ts",
@@ -21,13 +21,13 @@
     "./crud": "./src/crud/index.ts",
     "./forms": "./src/forms/index.ts",
     "./register": "./compiler/register.js",
-    "./i18n/*": "./src/i18n/*.js",
     "./motion": "./src/motion/index.ts",
     "./motion/motion.css": "./src/motion/motion.css",
     "./fx": "./src/fx/index.ts",
     "./fx/fx.css": "./src/fx/fx.css",
     "./store": "./src/store/index.ts",
-    "./i18n": "./src/i18n/index.ts"
+    "./i18n": "./src/i18n/index.ts",
+    "./i18n/tr": "./src/i18n/tr.ts"
   },
   "bin": {
     "march": "./cli/march.js"
@@ -40,12 +40,13 @@
     "README.md",
     "LICENSE"
   ],
-  "types": "./index.d.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "test": "node --test",
     "bench": "node bench/run.js",
     "size": "node bench/size.js",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "build:lib": "node tools/build-lib.js"
   },
   "engines": {
     "node": ">=20"

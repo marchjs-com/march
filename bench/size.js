@@ -7,7 +7,7 @@ import { resolve } from "node:path";
 
 export const BUDGET = { core: 10.5 * 1024, minimal: 5 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
-export const ENTRIES = { core: "src/index.js", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
+export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 
 export async function sizes(names = Object.keys(ENTRIES)) {
   const esbuild = await import("esbuild");
@@ -20,7 +20,7 @@ export async function sizes(names = Object.keys(ENTRIES)) {
     } catch { /* module missing */ }
   }
   // minimal app: what a counter needs (signals + h + render), after tree shaking
-  const r = await esbuild.build({ stdin: { contents: 'export { signal, computed, effect, h, render } from "./src/index.js";', resolveDir: ROOT }, bundle: true, minify: true, format: "esm", write: false, logLevel: "silent" });
+  const r = await esbuild.build({ stdin: { contents: 'export { signal, computed, effect, h, render } from "./src/index.ts";', resolveDir: ROOT }, bundle: true, minify: true, format: "esm", write: false, logLevel: "silent" });
   const code = r.outputFiles[0].contents;
   out.minimal = { min: code.length, gzip: gzipSync(code, { level: 9 }).length };
   return out;

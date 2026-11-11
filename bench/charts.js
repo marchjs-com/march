@@ -8,7 +8,7 @@ const series = (n, phase = 0) => Array.from({ length: n }, (_, i) => ({ t: i, a:
 export async function run({ installDom }) {
   const { document, cleanup } = installDom();
   try {
-    const { signal, h, render } = await import("../src/index.js");
+    const { signal, h, render } = await import("../src/index.ts");
     const { LineChart } = await import("../src/charts/index.ts");
     const out = [];
     for (const n of [10_000, 100_000]) {

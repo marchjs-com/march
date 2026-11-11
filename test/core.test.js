@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, serialize } from "../src/testing/dom.ts";
 const { document } = installDom();
-const M = await import("../src/index.js");
+const M = await import("../src/index.ts");
 const { signal, computed, effect, batch, untrack, onCleanup, createRoot, store, patch, h, render, If, For, Switch, Match, Try, Await, context, useContext, provide, reactive, pipe, applyPipe, t, messages, setLocale, locale, sx } = M;
 
 const tick = () => new Promise((r) => setTimeout(r, 0));

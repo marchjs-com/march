@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../src/testing/dom.ts";
 const { document } = installDom();
-const { render, signal, h } = await import("../src/index.js");
+const { render, signal, h } = await import("../src/index.ts");
 const { schema } = await import("../src/schema/index.ts");
 const F = await import("../src/forms/index.ts");
 
