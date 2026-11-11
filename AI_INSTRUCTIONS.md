@@ -84,7 +84,7 @@ const Product = schema({
 crud(source, { schema: Product, title: "Products" })   // list + search + sort + paging + create/edit/delete
 ```
 Field types: text, textarea, password, email, url, phone, number, int, money, percent, bool, date, datetime, time, pick,
-multi, list, json, color, file, hidden. Validation messages are translatable (t``).
+multi, list, records, json, color, file, hidden. Validation messages are translatable (t``).
 
 ## 6. Routing
 

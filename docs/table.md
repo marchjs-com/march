@@ -79,7 +79,7 @@ You can override any field: `Person.columns({ name: { editable: true, pin: "left
 | `empty` | Node or function shown when there are no rows. When filters are active, the table shows "No matching rows" with a Clear filters button. |
 | `layout` | `"auto"` (default), `"table"` or `"cards"`. In auto mode the cards layout is used below `cardBreakpoint` (640px, through matchMedia). |
 | `caption` / `label` | Accessible name of the grid. |
-| `toolbar`, `search`, `exportable` | Set to `false` to hide the toolbar, the search box or the export menu. `toolbarEnd` adds your own node to the toolbar. |
+| `toolbar`, `search`, `exportable` | Set to `false` to hide the toolbar, the search box or the export menu (`search={false}` never becomes the initial search text). `toolbarEnd` adds your own node to the toolbar. |
 | `searchDelay` | Debounce for the search box (ms). Defaults: 120 in client mode, 300 in server mode. |
 | `storageKey` | Saved views and column layout in localStorage. |
 | `urlKey`, `urlDelay` | URL sync, with a 250ms debounce. |

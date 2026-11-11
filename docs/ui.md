@@ -212,3 +212,15 @@ Application frame: sidebar + main. Desktop: sticky sidebar column; narrow screen
 ```
 
 Props: `nav`, `top` (optional strip above main), `mainId` (default "main"), `class`.
+
+## Media
+
+`<Media src kind alt poster controls autoplay loop muted fallback />` shows an image, video or audio that fits its
+container (`kind`: `"image"` default, `"video"`, `"audio"`, `"auto"` = by file extension via `mediaKind(src)`). URLs go
+through `safeUrl` (http(s), relative, `blob:`); a load error shows `fallback` ("Could not load media"). Video/audio have
+controls unless `controls={false}`. `openMedia(src, { title, kind, alt, poster, size, autoplay })` opens it in a dialog.
+
+```jsx
+<Media src={tpl.previewUrl} kind="video" poster={tpl.thumb} />
+<Button onClick={() => openMedia(shotUrl, { title: "Screenshot" })}>Open</Button>
+```

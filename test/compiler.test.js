@@ -179,3 +179,11 @@ test("trailing comments after a $ declaration or assignment stay comments", () =
   assert.match(out, /const \$b = _\$signal\(1\) \/\* note \*\//);
   assert.match(out, /\$a\.set\(2\) \/\/ set/);
 });
+
+test("$ variable as a call argument after a comma is a read, not an object shorthand", () => {
+  const out = body("let $a = 1\nf(x, $a); g($a, y); const o = { $a, b }; const arr = [1, $a]");
+  assert.match(out, /f\(x, \$a\(\)\)/);
+  assert.match(out, /g\(\$a\(\), y\)/);
+  assert.match(out, /\{ a: \$a\(\), b \}/);
+  assert.match(out, /\[1, \$a\(\)\]/);
+});

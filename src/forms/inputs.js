@@ -2,7 +2,7 @@
 // a <Field>/<Form>, where id, aria-invalid and aria-describedby come from the field context.
 import { signal, computed, effect, untrack, onCleanup } from "../core/reactive.js";
 import { h } from "../dom/h.js";
-import { t, locale } from "../core/i18n.js";
+import { t, locale } from "../core/i18n.ts";
 import { roving } from "../ui/focus.js";
 import { model, ctl, cx, uid, extend, syncValue, parseNumber, formatNumber, normOptions, same, labelledBy, useField } from "./util.js";
 
@@ -195,7 +195,7 @@ export function Checkbox(props) {
 }
 
 /** On / off switch (role="switch"). */
-export function Switch(props) {
+export function Toggle(props) {
   const [get, set] = model(props, false);
   const btn = h("button", {
     ...ctl(props), type: "button", role: "switch", class: "hm-switch", "aria-checked": () => String(!!get()),

@@ -130,11 +130,11 @@ Standalone: `<Field label="City" help="Where you live" error={$err}><TextInput b
 |---|---|
 | text, textarea, password, email, url, phone | TextInput, Textarea, PasswordInput, EmailInput, UrlInput, PhoneInput |
 | number, int, money, percent | NumberInput, IntInput, MoneyInput, PercentInput |
-| bool / `switch` | Checkbox / Switch |
+| bool / `switch` | Checkbox / Toggle |
 | date, datetime, time, `daterange` | DatePicker, DateTimeInput, TimeInput, DateRangePicker |
 | pick / `radio`, `segmented`, `combobox` | Select / RadioGroup, Segmented, Combobox |
 | multi / `checkboxes` | MultiSelect / CheckboxGroup |
-| list, `keyvalue`, json, `markdown` | ListEditor, KeyValueEditor, JsonEditor, MarkdownEditor |
+| list, `keyvalue`, records, json, `markdown` | ListEditor, KeyValueEditor, RecordListEditor, JsonEditor, MarkdownEditor |
 | color, file, `code`, `slider` | ColorInput, FileUpload, CodeInput, Slider |
 
 Other field keys (`placeholder`, `min`, `max`, `step`, `currency`, `rows`, `accept`, `maxSize`, `upload`, `search`, …) are
@@ -179,7 +179,7 @@ is accepted (`1.234,56` in German, `1,234.56` in English; an ambiguous `1.234` f
 |---|---|
 | `Select` | `options` (`[v]` or `[{ value, label, disabled }]`, may be live), `placeholder`. Values keep their type (numbers stay numbers) |
 | `Checkbox` | `label` or children, `indeterminate` |
-| `Switch` | `role="switch"` button, `label` |
+| `Toggle` | `role="switch"` button, `label` (named Toggle so it never clashes with the `<Switch>` control-flow component) |
 | `CheckboxGroup` | `options`, `inline`; value is an array |
 | `RadioGroup` | `options`, `inline` |
 | `Segmented` | compact single choice, arrow keys move and select |
@@ -273,6 +273,19 @@ object URLs, revoked when removed or unmounted. An existing value (e.g. a URL st
 blocks, links, lists (incl. `[ ]` tasks), blockquotes, rules. HTML in the source is shown as text. Links are only created
 for `http(s)`, `mailto`, `tel` and relative URLs (`isSafeLink(url)`); everything else (`javascript:`, `data:`, obfuscated
 schemes) renders as plain text. Links get `rel="noopener noreferrer nofollow"`. `markdownNodes(source)` returns the nodes.
+
+### `RecordListEditor` (type `records`)
+
+An array of records (objects) edited with a sub-schema: each row shows one compact labelled control per field, with
+move up/down and remove buttons and an Add button. Extra keys of a row (e.g. an `id`) are kept. Props / field keys:
+`fields` (schema spec or schema), `blank` (new row values, object or function), `max`, `addLabel`, `cols`, `sortable`
+(true), `removable` (true). The `records` schema type validates every row and reports the first problem as
+"Row N: Label: message" (`validateRecords(list, fields)` does the same).
+
+```jsx
+carriers: { type: "records", label: "Carriers", addLabel: "Add carrier",
+  fields: { name: { type: "text", required: true }, url: { type: "url", label: "Tracking link" } } }
+```
 
 ## `<Wizard>`
 

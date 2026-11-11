@@ -1,6 +1,6 @@
 // Schema field type → input component. `inputFor(field)` picks `field.control` (a component or a registered name) or
 // the component registered for `field.type`. Add your own with `registerInput("iban", IbanInput)`.
-import { TextInput, Textarea, PasswordInput, EmailInput, UrlInput, PhoneInput, NumberInput, MoneyInput, PercentInput, Select, Checkbox, Switch,
+import { TextInput, Textarea, PasswordInput, EmailInput, UrlInput, PhoneInput, NumberInput, MoneyInput, PercentInput, Select, Checkbox, Toggle,
   CheckboxGroup, RadioGroup, Segmented, Slider, ColorInput, CodeInput } from "./inputs.js";
 import { Combobox, MultiSelect } from "./pickers.js";
 import { DatePicker, TimeInput, DateTimeInput, DateRangePicker } from "./date.js";
@@ -13,7 +13,7 @@ export const IntInput = (props) => NumberInput(extend(props, { decimals: () => p
 
 const registry = new Map(Object.entries({
   text: TextInput, textarea: Textarea, password: PasswordInput, email: EmailInput, url: UrlInput, phone: PhoneInput,
-  number: NumberInput, int: IntInput, money: MoneyInput, percent: PercentInput, bool: Checkbox, switch: Switch,
+  number: NumberInput, int: IntInput, money: MoneyInput, percent: PercentInput, bool: Checkbox, switch: Toggle,
   date: DatePicker, datetime: DateTimeInput, time: TimeInput, daterange: DateRangePicker,
   pick: Select, select: Select, radio: RadioGroup, segmented: Segmented, combobox: Combobox,
   multi: MultiSelect, checkboxes: CheckboxGroup, list: ListEditor, keyvalue: KeyValueEditor, json: JsonEditor, markdown: MarkdownEditor,
@@ -23,7 +23,7 @@ const registry = new Map(Object.entries({
 /** Controls that render several focusable parts: their <Field> label is not a <label for>. */
 export const GROUP_CONTROLS = new Set([CheckboxGroup, RadioGroup, Segmented, CodeInput, ListEditor, KeyValueEditor, DateRangePicker]);
 /** Controls that render their own label next to the box. */
-export const INLINE_LABEL = new Set([Checkbox, Switch]);
+export const INLINE_LABEL = new Set([Checkbox, Toggle]);
 
 /** Register (or replace) the input used for a field type or `control` name. */
 export function registerInput(type, Component) { registry.set(type, Component); }

@@ -16,4 +16,5 @@ export { key, shortcuts, formatKey, parseKey, isMac } from "./keys.js";
 export { theme, setTheme, resolvedTheme, ThemeToggle, LocaleSelect, UpdateBanner } from "./theme.js";
 export { fold, score, rank, distance } from "./fold.js";
 export { place } from "./popover.js";
+export { Media, openMedia, mediaKind } from "./media.js";
 export * from "../forms/index.js";

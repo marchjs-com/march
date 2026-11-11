@@ -1,6 +1,6 @@
 // Formatting pipes, used in JSX as `{value | date}` or `{price | money("EUR")}` (the compiler turns them into calls).
 // All pipes are Intl based and follow the active locale. Register your own with `pipe("name", (value, ...args) => …)`.
-import { locale } from "./i18n.js";
+import { locale } from "./i18n.ts";
 
 const registry = new Map();
 /** Register a pipe. */

@@ -8,7 +8,7 @@
 //   })
 //   Product.validate(values) → { ok, errors: { price: "Must be at least 0" }, values }
 //   Product.columns()  Product.defaults()  Product.pick("title", "price")
-import { t } from "../core/i18n.js";
+import { t } from "../core/i18n.ts";
 
 /** Field types and their base behaviour. Extend with `fieldType(name, def)`. */
 export const TYPES = {

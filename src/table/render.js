@@ -2,7 +2,7 @@
 import { signal, computed, effect, untrack, onCleanup } from "../core/reactive.js";
 import { h } from "../dom/h.js";
 import { For } from "../dom/flow.js";
-import { t } from "../core/i18n.js";
+import { t } from "../core/i18n.ts";
 import { createTable } from "./state.js";
 import { createVirtual } from "./virtual.js";
 

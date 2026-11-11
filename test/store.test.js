@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../src/testing/dom.js";
 installDom();
-const { store, patch, subscribe, on, derive, snapshot, readonly, persist, history, storeLog, batch, effect, h, render } = await import("../src/index.js");
+const { batch, effect, h, render } = await import("../src/index.js");
+const { store, patch, subscribe, on, derive, snapshot, readonly, persist, history, storeLog } = await import("../src/store/index.ts");
 
 test("plain writes, fine-grained tracking, array methods", () => {
   const app = store({ user: { name: "Ada", age: 36 }, cart: { items: [] } });

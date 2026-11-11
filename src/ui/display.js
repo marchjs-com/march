@@ -2,7 +2,7 @@
 // Timeline, layout helpers (Stack, Grid, Toolbar, Divider) and the boot Loader. Text is always inserted as text nodes.
 import { signal, untrack } from "../core/reactive.js";
 import { h } from "../dom/h.js";
-import { t, locale } from "../core/i18n.js";
+import { t, locale } from "../core/i18n.ts";
 import { applyPipe, toDate } from "../core/pipes.js";
 import { isAction } from "./action.js";
 import { ActionButton, CopyButton } from "./button.js";

@@ -2,7 +2,7 @@
 // focus stays in the input, the active option is announced with aria-activedescendant.
 import { signal, computed, effect, untrack, onCleanup } from "../core/reactive.js";
 import { h } from "../dom/h.js";
-import { t } from "../core/i18n.js";
+import { t } from "../core/i18n.ts";
 import { floating } from "../ui/popover.js";
 import { model, ctl, cx, uid, debounce, listNav, fold, same, normOptions, extend } from "./util.js";
 

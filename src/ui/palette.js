@@ -3,7 +3,7 @@
 // itself after 600 ms when local results are weak. Keyboard: ↑ ↓ PageUp PageDown Enter Esc.
 import { signal, computed, effect, untrack, onCleanup, createRoot } from "../core/reactive.js";
 import { h } from "../dom/h.js";
-import { t } from "../core/i18n.js";
+import { t } from "../core/i18n.ts";
 import { navigate } from "../router/index.js";
 import { can } from "../access/index.js";
 import { isAction } from "./action.js";

@@ -2,7 +2,7 @@
 // the router path, and a drawer with a hamburger button on small screens. UI state persists in localStorage.
 import { signal, computed, effect, untrack } from "../core/reactive.js";
 import { h } from "../dom/h.js";
-import { t, locale } from "../core/i18n.js";
+import { t, locale } from "../core/i18n.ts";
 import { Link, path, navigate } from "../router/index.js";
 import { can } from "../access/index.js";
 import { Badge } from "./display.js";

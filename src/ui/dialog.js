@@ -4,7 +4,7 @@
 import { signal, createRoot, onCleanup, untrack } from "../core/reactive.js";
 import { h } from "../dom/h.js";
 import { Portal } from "../dom/flow.js";
-import { t } from "../core/i18n.js";
+import { t } from "../core/i18n.ts";
 import { val, cx, uid } from "./util.js";
 import { trapTab, focusables } from "./focus.js";
 

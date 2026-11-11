@@ -3,7 +3,7 @@
 import { signal, computed, effect, batch, untrack, onCleanup, useContext, provide, reactive } from "../core/reactive.js";
 import { store, unwrap } from "../core/store.ts";
 import { h } from "../dom/h.js";
-import { t } from "../core/i18n.js";
+import { t } from "../core/i18n.ts";
 import { schema as makeSchema, options as schemaOptions } from "../schema/index.js";
 import { askReason } from "../ui/dialog.js";
 import { toast } from "../ui/toast.js";

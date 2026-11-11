@@ -1,0 +1,1 @@
+- forms: `RecordListEditor` and the `records` field type (array of objects edited with a sub-schema; row validation, add/move/remove).

@@ -332,3 +332,8 @@ html.hm-scroll-lock { overflow: hidden; }
   .hm-shell-nav { height: auto; z-index: var(--hm-z-dropdown); background: var(--hm-surface); border-bottom: 1px solid var(--hm-border); padding: var(--hm-space-1) var(--hm-space-2); }
   .hm-nav-wrap .hm-nav-burger { display: inline-flex; }
 }
+/* Media (src/ui/media.js) */
+.hm-media-wrap { display: flex; justify-content: center; }
+.hm-media { display: block; max-width: 100%; max-height: 75vh; height: auto; border-radius: var(--hm-radius-2); }
+.hm-media-audio { width: 100%; }
+.hm-media-fallback { color: var(--hm-muted); text-align: center; padding: var(--hm-space-4); }

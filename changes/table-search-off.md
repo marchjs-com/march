@@ -1,0 +1,1 @@
+- Table: `search={false}` (hide the search box) is no longer taken as the initial search text (createTable crashed on `false.trim`).

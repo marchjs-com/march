@@ -137,7 +137,7 @@ class Transformer {
           if ((word === "let" || word === "const" || word === "var") && this.nextIsSignal()) { out.push(this.declaration(word)); prev = { t: "punct", v: ";" }; continue; }
           if (word === "async") asyncPending = stack.length;
           if (word === "await" && this.asyncFrames > 0) { out.push(this.awaitExpr()); prev = { t: "id" }; continue; }
-          if (this.signals.has(word)) { out.push(this.signalRef(word, prev)); prev = { t: "id" }; continue; }
+          if (this.signals.has(word)) { out.push(this.signalRef(word, prev, stack[stack.length - 1]?.ch)); prev = { t: "id" }; continue; }
           if (!this.isObjectKey(prev)) this.used.add(word);
         }
         out.push(word);
@@ -216,12 +216,13 @@ class Transformer {
   }
 
   /** A `$signal` identifier in code position. */
-  signalRef(name, prev) {
+  signalRef(name, prev, enclosing) {
     const src = this.src;
     const ahead = src.slice(this.pos, this.pos + 8);
     if (/^\.(set|update|peek|signal)\b/.test(ahead)) return name; // explicit signal API
     if (this.isObjectKey(prev)) return name;
-    if (prev.t === "punct" && (prev.v === "{" || prev.v === ",") && /^\s*[,}]/.test(ahead)) return `${name.slice(1)}: ${name}()`;
+    // object shorthand `{ $x }` → `{ x: $x() }` — only directly inside braces (not call arguments like f(a, $x))
+    if (enclosing === "{" && prev.t === "punct" && (prev.v === "{" || prev.v === ",") && /^\s*[,}]/.test(ahead)) return `${name.slice(1)}: ${name}()`;
     const ws = /^\s*/.exec(ahead)[0].length;
     const at = this.pos + ws;
     if (src.startsWith("++", at) || src.startsWith("--", at)) {

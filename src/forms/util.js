@@ -1,6 +1,6 @@
 // Shared helpers for the form controls: value model, field context, ids, number parsing, list keyboard navigation.
 import { signal, computed, effect, untrack, useContext, provide, getOwner } from "../core/reactive.js";
-import { locale } from "../core/i18n.js";
+import { locale } from "../core/i18n.ts";
 import { cx, uid, on, debounce } from "../ui/util.js";
 
 export { cx, uid, on, debounce };

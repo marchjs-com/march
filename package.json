@@ -25,7 +25,9 @@
     "./motion": "./src/motion/index.ts",
     "./motion/motion.css": "./src/motion/motion.css",
     "./fx": "./src/fx/index.ts",
-    "./fx/fx.css": "./src/fx/fx.css"
+    "./fx/fx.css": "./src/fx/fx.css",
+    "./store": "./src/store/index.ts",
+    "./i18n": "./src/i18n/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"

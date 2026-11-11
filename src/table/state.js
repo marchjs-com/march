@@ -2,7 +2,7 @@
 // selection, expansion, inline edit, column layout, saved views, URL sync and export. <Table> renders it; you can too.
 import { signal, computed, effect, untrack, batch, onCleanup, createRoot } from "../core/reactive.js";
 import { applyPipe } from "../core/pipes.js";
-import { t, locale } from "../core/i18n.js";
+import { t, locale } from "../core/i18n.ts";
 import { query as dataQuery } from "../data/index.js";
 import { setQuery } from "../router/index.js";
 import { fold, valueOf, optionsOf, isEmptyFilter, matchFilter, describeFilter, sortRows, encodeFilter, decodeFilter } from "./filters.js";
@@ -94,7 +94,7 @@ export function createTable(o = {}) {
   // ------------------------------------------------------------------ view state
   const sort = signal([...(val(o.sort) ?? [])]);
   const filters = signal({ ...(val(o.filters) ?? {}) });
-  const search = signal(val(o.search) ?? "");
+  const search = signal(typeof val(o.search) === "string" ? val(o.search) : ""); // `search={false}` hides the box (render), not a query
   const page = signal(1);
   const size = signal(defaultSize);
   const cursor = signal(null);

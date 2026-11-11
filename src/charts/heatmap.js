@@ -4,7 +4,7 @@ import { signal, computed, read } from "../core/reactive.js";
 import { h } from "../dom/h.js";
 import { For } from "../dom/flow.js";
 import { applyPipe, toDate } from "../core/pipes.js";
-import { locale } from "../core/i18n.js";
+import { locale } from "../core/i18n.ts";
 import { rowsOf, accessor, formatter, num, useSize, attr, textWidth } from "./util.js";
 import { Frame, tooltipState, showTip, tipBody, thin } from "./parts.js";
 

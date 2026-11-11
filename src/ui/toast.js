@@ -3,7 +3,7 @@
 import { signal, createRoot, onCleanup } from "../core/reactive.js";
 import { h } from "../dom/h.js";
 import { For, Portal } from "../dom/flow.js";
-import { t } from "../core/i18n.js";
+import { t } from "../core/i18n.ts";
 import { val } from "./util.js";
 
 const list = signal([], { name: "toasts" });

@@ -2,7 +2,7 @@
 import { signal, computed, effect, untrack, reactive } from "../core/reactive.js";
 import { h } from "../dom/h.js";
 import { For } from "../dom/flow.js";
-import { t } from "../core/i18n.js";
+import { t } from "../core/i18n.ts";
 import { model, ctl, cx, uid, useField, syncValue, labelledBy } from "./util.js";
 import { Textarea } from "./inputs.js";
 

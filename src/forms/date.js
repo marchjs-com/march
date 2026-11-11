@@ -2,7 +2,7 @@
 // Calendar (month grid, full keyboard), DatePicker (input + popover), TimeInput, DateTimeInput, DateRangePicker (presets).
 import { signal, computed, effect, untrack, onCleanup, reactive } from "../core/reactive.js";
 import { h } from "../dom/h.js";
-import { t, locale } from "../core/i18n.js";
+import { t, locale } from "../core/i18n.ts";
 import { toDate } from "../core/pipes.js";
 import { floating } from "../ui/popover.js";
 import { model, ctl, cx, uid, useField, syncValue } from "./util.js";

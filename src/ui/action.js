@@ -9,7 +9,7 @@
 //   <ActionButton action={remove} args={[row]} />   or   await remove.run(row)
 import { signal, untrack } from "../core/reactive.js";
 import { can as canAccess } from "../access/index.js";
-import { t } from "../core/i18n.js";
+import { t } from "../core/i18n.ts";
 import { confirm, askReason } from "./dialog.js";
 import { toast } from "./toast.js";
 

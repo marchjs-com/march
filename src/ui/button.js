@@ -1,7 +1,7 @@
 // Buttons, menus, tooltips and the copy button.
 import { signal, untrack } from "../core/reactive.js";
 import { h } from "../dom/h.js";
-import { t } from "../core/i18n.js";
+import { t } from "../core/i18n.ts";
 import { Link } from "../router/index.js";
 import { can } from "../access/index.js";
 import { isAction } from "./action.js";
