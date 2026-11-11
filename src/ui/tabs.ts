@@ -1,5 +1,6 @@
 // Tabs: `<Tabs tabs={[{ id, label, badge, content: () => node }]} query="tab" />` or `<Tabs><Tab id label>…</Tab></Tabs>`.
 // Roving focus with ← → Home End (automatic activation). With `query="tab"` the active tab is kept in the URL (?tab=id).
+import "./tabs.css";
 import { signal, computed, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { query as routeQuery, setQuery } from "../router/index.ts";

@@ -1,0 +1,21 @@
+/* HADI March — Form, EditForm, FormActions. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+.hm-form, .hm-wizard, .hm-edit-form { display: flex; flex-direction: column; gap: var(--hm-space-4); }
+.hm-form-stack { display: flex; flex-direction: column; gap: var(--hm-space-4); }
+.hm-form-grid { display: grid; gap: var(--hm-space-4) var(--hm-space-5); align-items: start; }
+@media (max-width: 40rem) { .hm-form-grid.hm-form-grid { grid-template-columns: minmax(0, 1fr); } .hm-form-grid > .hm-field { grid-column: auto; } }
+fieldset.hm-section, .hm-form .hm-section { border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); padding: var(--hm-space-4) var(--hm-space-5) var(--hm-space-5); margin: 0; min-width: 0; background: var(--hm-surface); box-shadow: var(--hm-shadow-1); }
+fieldset > .hm-section-title, legend.hm-section-title { font-weight: 600; font-size: var(--hm-text-lg); padding: 0 var(--hm-space-2); letter-spacing: var(--hm-tracking-tight); }
+.hm-section-desc { color: var(--hm-muted); font-size: var(--hm-text-sm); margin: 0 0 var(--hm-space-3); }
+
+.hm-form-actions { display: flex; flex-direction: column; gap: var(--hm-space-2); padding-top: var(--hm-space-2); }
+.hm-form-buttons { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: var(--hm-space-2); }
+.hm-loading-sm { width: .9rem; height: .9rem; border-width: 2px; }
+.hm-edit-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--hm-space-3); flex-wrap: wrap; }
+.hm-edit-title { margin: 0; font-size: var(--hm-text-xl); }
+.hm-edit-tools { display: flex; align-items: center; gap: var(--hm-space-2); }
+.hm-dirty { font-size: var(--hm-text-xs); color: var(--hm-warn); background: var(--hm-warn-soft); padding: 2px var(--hm-space-2); border-radius: 1rem; }
+.hm-form-skeleton { display: flex; flex-direction: column; gap: var(--hm-space-4); }
+.hm-skeleton-field { display: flex; flex-direction: column; gap: var(--hm-space-2); }
+.hm-skeleton { border-radius: var(--hm-radius); background: linear-gradient(90deg, var(--hm-surface-2), var(--hm-surface-3), var(--hm-surface-2)); background-size: 200% 100%; animation: hm-skel 1.6s ease-in-out infinite; }
+.hm-skeleton-label { height: .8rem; width: 8rem; }
+.hm-skeleton-input { height: var(--hm-control-h); }

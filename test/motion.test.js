@@ -4,6 +4,7 @@ import { installDom } from "../src/testing/dom.ts";
 installDom();
 const { signal, h, render, For, lazy, createRoot } = await import("../src/index.ts");
 const M = await import("../src/motion/index.ts");
+await import("../src/motion/install.ts"); // transition: names and <For animate> are opt-in now
 const { createRouter, navigate, Router, _resetRouter } = await import("../src/router/index.ts");
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));

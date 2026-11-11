@@ -1,0 +1,6 @@
+/* HADI March — AvatarGroup. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* ---------- avatar group */
+.hm-avatars { display: inline-flex; align-items: center; }
+.hm-avatars > .hm-avatar { box-shadow: 0 0 0 2px var(--hm-surface); }
+.hm-avatars > .hm-avatar + .hm-avatar { margin-inline-start: -.5rem; }
+.hm-avatar-more { background: var(--hm-surface-3); color: var(--hm-text-2); text-shadow: none; font-size: .6875rem; }

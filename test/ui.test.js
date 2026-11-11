@@ -457,9 +457,10 @@ test("Disclosure renders details/summary and reports toggles", async () => {
 });
 
 test("component class names do not collide across stylesheets (tabs vs editor tabs, code block vs OTP input)", async () => {
-  const { readFileSync } = await import("node:fs");
-  const css = (f) => readFileSync(new URL(`../src/css/${f}`, import.meta.url), "utf8");
-  const forms = css("forms.css"), ui = css("ui.css");
+  const { readFileSync, readdirSync } = await import("node:fs");
+  // every component has its own stylesheet now: compare the ui/ and forms/ sets
+  const all = (dir) => readdirSync(new URL(`../src/${dir}/`, import.meta.url)).filter((f) => f.endsWith(".css")).map((f) => readFileSync(new URL(`../src/${dir}/${f}`, import.meta.url), "utf8")).join(String.fromCharCode(10));
+  const forms = all("forms"), ui = all("ui");
   // ui.css owns Tabs (.hm-tabs/.hm-tab) and CodeBlock (.hm-code); forms.css must not restyle them
   for (const cls of ["hm-tabs", "hm-tab", "hm-code"]) {
     if (cls !== "hm-tabs") assert.match(ui, new RegExp(`^\.${cls} \{`, "m"));

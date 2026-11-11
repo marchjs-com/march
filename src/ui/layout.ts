@@ -1,4 +1,7 @@
 // Page scaffolding: Page, Section, ListDetail, Pager, SearchBox.
+import "./layout.css";
+import "./field.css";
+import "./button.css";
 import { signal, computed, untrack, effect, onCleanup, type Signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";

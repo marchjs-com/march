@@ -1,0 +1,8 @@
+/* HADI March — Splitter. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* ---------- splitter */
+.hm-splitter { --hm-split: 50%; display: grid; grid-template-columns: var(--hm-split) auto minmax(0, 1fr); min-height: 12rem; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); overflow: hidden; background: var(--hm-surface); }
+.hm-split-pane { min-width: 0; overflow: auto; }
+.hm-split-handle { position: relative; width: 9px; margin: 0 -4px; z-index: 1; cursor: col-resize; touch-action: none; }
+.hm-split-handle::before { content: ""; position: absolute; inset: 0 4px; background: var(--hm-border); transition: background-color var(--hm-dur) var(--hm-ease); }
+.hm-split-handle:hover::before, .hm-split-handle:focus-visible::before { background: var(--hm-primary); inset-inline: 3px; }
+.hm-split-handle:focus-visible { outline: none; }

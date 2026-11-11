@@ -12,6 +12,8 @@ let auto;
 const dirs = (process.env.MARCH_COMPONENTS ?? "src/components").split(",").filter(Boolean).map((d) => resolve(process.cwd(), d));
 
 export async function load(url, context, next) {
+  // component modules import their CSS (bundled by the esbuild plugin); in node it is a no-op
+  if (url.startsWith("file:") && /\.css(\?.*)?$/.test(url)) return { format: "module", source: "", shortCircuit: true };
   // .ts under node_modules (an installed March): node refuses to strip types there, so strip them here
   if (isNodeModulesTs(url)) {
     const file = fileURLToPath(url);

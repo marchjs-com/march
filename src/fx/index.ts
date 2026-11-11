@@ -1,6 +1,8 @@
+/// <reference path="../css.d.ts" />
 // hadi-march/fx — decorative visuals for showcase pages: canvas particles, aurora background, confetti, spotlight.
 // Separate, lazily loaded module. Canvas drawing and CSS custom properties only (CSP safe). Pauses when hidden or
 // off screen; prefers-reduced-motion draws a single still frame.
+import "./fx.css";
 import { h } from "../dom/h.ts";
 import { onCleanup } from "../core/reactive.ts";
 import { reducedMotion, setStyle, frame } from "../motion/env.ts";

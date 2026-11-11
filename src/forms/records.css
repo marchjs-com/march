@@ -1,0 +1,8 @@
+/* HADI March — RecordListEditor. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+.hm-records { display: flex; flex-direction: column; gap: var(--hm-space-2); }
+.hm-records-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--hm-space-2); }
+.hm-records-items:empty { display: none; }
+.hm-records-row { display: flex; gap: var(--hm-space-2); align-items: flex-start; padding: var(--hm-space-2); border: 1px solid var(--hm-border); border-radius: var(--hm-radius); }
+.hm-records-row > .hm-form-grid { flex: 1; min-width: 0; }
+.hm-records-tools { display: flex; gap: var(--hm-space-1); }
+.hm-records-add { align-self: flex-start; }

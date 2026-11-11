@@ -1,4 +1,6 @@
+/// <reference path="../css.d.ts" />
 // Shared helpers for chart components: reading props, accessors, formatting, series, sizing, ids.
+import "./charts.css";
 import { signal, computed, read, onCleanup, untrack, type Accessor, type Signal } from "../core/reactive.ts";
 import { applyPipe, toDate } from "../core/pipes.ts";
 import { h } from "../dom/h.ts";

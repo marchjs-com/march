@@ -1,5 +1,8 @@
 // Basic inputs. Every control works standalone (`bind:value={$x}`, `value` + `onChange(v)`, or uncontrolled) and inside
 // a <Field>/<Form>, where id, aria-invalid and aria-describedby come from the field context.
+import "./inputs.css";
+import "../ui/field.css";
+import "../ui/button.css";
 import { signal, computed, effect, untrack, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t, locale } from "../core/i18n.ts";

@@ -1,0 +1,34 @@
+/* HADI March — Checkbox, Toggle, RadioGroup, Segmented, Slider, ColorInput, CodeInput. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* checkbox / radio / switch */
+.hm-check { display: inline-flex; align-items: flex-start; gap: var(--hm-space-2); cursor: pointer; line-height: 1.4; }
+.hm-check-input { width: 1rem; height: 1rem; margin: .1875rem 0 0; accent-color: var(--hm-primary-solid); flex: none; cursor: pointer; }
+.hm-check-input:disabled + .hm-check-label { color: var(--hm-muted); }
+.hm-choices { display: flex; flex-direction: column; gap: var(--hm-space-2); }
+.hm-choices-inline { flex-direction: row; flex-wrap: wrap; gap: var(--hm-space-2) var(--hm-space-4); }
+.hm-switch-wrap { display: inline-flex; align-items: center; gap: var(--hm-space-2); cursor: pointer; }
+.hm-switch { position: relative; width: 2.25rem; height: 1.25rem; padding: 0; border: 0; border-radius: 1rem; background: var(--hm-border-strong); cursor: pointer; transition: background-color var(--hm-dur-slow) var(--hm-ease); flex: none; box-shadow: var(--hm-shadow-inset); }
+.hm-switch[aria-checked="true"] { background: var(--hm-primary-solid); }
+.hm-switch-thumb { position: absolute; top: .125rem; left: .125rem; width: 1rem; height: 1rem; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / .25); transition: transform var(--hm-dur-slow) var(--hm-ease-spring); }
+.hm-switch[aria-checked="true"] .hm-switch-thumb { transform: translateX(1rem); }
+.hm-switch:disabled { opacity: .5; cursor: not-allowed; }
+
+/* segmented */
+.hm-segmented { display: inline-flex; align-self: flex-start; flex-wrap: nowrap; max-width: 100%; overflow-x: auto; scrollbar-width: none; padding: 3px; gap: 2px; background: var(--hm-surface-2); border: 1px solid var(--hm-border); border-radius: calc(var(--hm-radius) + 2px); }
+.hm-segment { flex: none; white-space: nowrap; border: 0; background: transparent; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-md); font-weight: 500; min-height: 1.75rem; padding: 0 .75rem; border-radius: calc(var(--hm-radius) - 1px); cursor: pointer; transition: color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-segment:hover { color: var(--hm-text); }
+.hm-segment[aria-checked="true"] { background: var(--hm-surface); color: var(--hm-text); box-shadow: 0 1px 2px rgb(var(--hm-shadow-rgb) / .1), 0 0 0 1px var(--hm-border); }
+.hm-segment:disabled { opacity: .5; cursor: not-allowed; }
+
+/* slider, color */
+.hm-slider-wrap { display: flex; align-items: center; gap: var(--hm-space-3); }
+.hm-slider { flex: 1; accent-color: var(--hm-primary); }
+.hm-slider-value { min-width: 3ch; text-align: end; font-variant-numeric: tabular-nums; color: var(--hm-muted); }
+.hm-color { display: flex; gap: var(--hm-space-2); align-items: center; }
+.hm-color-swatch { width: var(--hm-control-h); height: var(--hm-control-h); padding: 2px; border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); background: var(--hm-surface); cursor: pointer; }
+.hm-color-text { max-width: 9rem; font-family: var(--hm-font-mono); }
+
+/* one-time code */
+.hm-otp { display: flex; gap: var(--hm-space-2); }
+.hm-otp-box { width: 2.75rem; height: 3.25rem; text-align: center; font: 600 var(--hm-text-xl)/1 var(--hm-font); font-variant-numeric: tabular-nums; color: var(--hm-text); background: var(--hm-surface); border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius-2); box-shadow: var(--hm-shadow-inset); caret-color: var(--hm-primary); transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-otp-box:focus { outline: none; border-color: var(--hm-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-focus) 22%, transparent); }
+.hm-otp-box[aria-invalid="true"] { border-color: var(--hm-danger); }

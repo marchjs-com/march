@@ -23,9 +23,16 @@ test("defineTheme validates; themeCss scopes light, dark and the default", () =>
   assert.equal(T.THEMES[0].id, T.DEFAULT_THEME);
 });
 
-test("setColorTheme sets data-hm-theme (the default removes it) and persists", () => {
+test("setColorTheme loads the theme's stylesheet on demand, then sets data-hm-theme (the default removes it)", async () => {
   U.setColorTheme("neon");
+  const link = document.head.querySelector('link[data-hm-theme-css="neon"]');
+  assert.ok(link, "a <link rel=stylesheet> for the theme");
+  assert.match(link.getAttribute("href") ?? link.href, /themes\/neon\.css$/);
+  assert.equal(document.documentElement.getAttribute("data-hm-theme"), null, "not applied before the CSS is in");
+  link.onload(); await tick();
   assert.equal(document.documentElement.getAttribute("data-hm-theme"), "neon");
+  U.setColorTheme("neon");
+  assert.equal(document.head.querySelectorAll('link[data-hm-theme-css="neon"]').length, 1, "loaded once");
   assert.equal(U.colorTheme(), "neon");
   U.setColorTheme("hadi");
   assert.equal(document.documentElement.getAttribute("data-hm-theme"), null);

@@ -2,6 +2,7 @@
 //   <Media src={url} kind="video" poster={thumb} />      kind: "image" (default) | "video" | "audio" | "auto"
 //   await openMedia(url, { title: "Preview", kind: "auto" })   → dialog with the media
 // URLs go through safeUrl (http(s), relative, blob: for media). Built with h() only; no inline style strings.
+import "./media.css";
 import { signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";

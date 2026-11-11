@@ -1,0 +1,19 @@
+/* HADI March — toast. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* ---------- toasts */
+.hm-toasts { position: fixed; z-index: var(--hm-z-toast); inset-block-end: var(--hm-space-4); inset-inline-end: var(--hm-space-4); display: flex; flex-direction: column; gap: var(--hm-space-2);
+  width: min(24rem, calc(100vw - 2rem)); pointer-events: none; }
+.hm-toast { display: flex; align-items: flex-start; gap: var(--hm-space-3); padding: .75rem .625rem .75rem .875rem; pointer-events: auto;
+  background: var(--hm-surface-raised); color: var(--hm-text); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3);
+  box-shadow: var(--hm-shadow-3); animation: hm-toast-in var(--hm-dur-slow) var(--hm-ease-spring); }
+@keyframes hm-toast-in { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+.hm-toast-icon { display: inline-flex; margin-top: .125rem; color: var(--hm-info); }
+.hm-toast-icon .hm-svg { width: 1.0625rem; height: 1.0625rem; }
+.hm-toast-success .hm-toast-icon { color: var(--hm-success); }
+.hm-toast-warn .hm-toast-icon { color: var(--hm-warn); }
+.hm-toast-danger .hm-toast-icon { color: var(--hm-danger); }
+.hm-toast-msg { flex: 1; font-size: var(--hm-text-md); line-height: 1.45; padding-top: .0625rem; }
+.hm-toast-action { margin-block: -.25rem; }
+.hm-toast-close { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; flex: none; border: 0; border-radius: var(--hm-radius-1);
+  background: none; color: var(--hm-muted); cursor: pointer; padding: 0; }
+.hm-toast-close:hover { background: var(--hm-surface-2); color: var(--hm-text); }
+@media (max-width: 640px) { .hm-toasts { inset-inline: var(--hm-space-3); width: auto; } }

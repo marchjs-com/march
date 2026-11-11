@@ -1,4 +1,6 @@
 // Wizard: one form split into steps. Each step validates its own fields (and an optional validate fn) before Next.
+import "./wizard.css";
+import "../ui/button.css";
 import { signal, computed, untrack, provide } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";

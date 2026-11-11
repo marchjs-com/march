@@ -1,6 +1,9 @@
 // Modal dialogs and side sheets: focus trap, Escape, overlay click (when dismissable), focus restore, aria-modal, stacking.
 // Imperative helpers return promises: confirm() → boolean, prompt() → string|null, askReason() → string|{category,text}|null,
 // openDialog((close) => content) → whatever close(value) received (undefined when dismissed).
+import "./dialog.css";
+import "./button.css";
+import "./field.css";
 import { signal, createRoot, onCleanup, untrack, type Signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { Portal } from "../dom/flow.ts";

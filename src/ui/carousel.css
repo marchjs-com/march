@@ -1,0 +1,17 @@
+/* HADI March — Carousel. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* ---------- carousel */
+.hm-carousel { position: relative; --hm-per: 1; }
+.hm-carousel-2 { --hm-per: 2; } .hm-carousel-3 { --hm-per: 3; } .hm-carousel-4 { --hm-per: 4; }
+.hm-carousel-track { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - (var(--hm-per) - 1) * 1rem) / var(--hm-per)); gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory;
+  scroll-behavior: smooth; scrollbar-width: none; overscroll-behavior-x: contain; border-radius: var(--hm-radius-3); }
+.hm-carousel-track::-webkit-scrollbar { display: none; }
+.hm-carousel-track > * { scroll-snap-align: start; min-width: 0; }
+@media (max-width: 640px) { .hm-carousel { --hm-per: 1.15; } }
+.hm-carousel-btn { position: absolute; top: calc(50% - 1.5rem); display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border: 1px solid var(--hm-border); border-radius: 50%;
+  background: color-mix(in srgb, var(--hm-surface) 88%, transparent); backdrop-filter: blur(8px); color: var(--hm-text); box-shadow: var(--hm-shadow-2); cursor: pointer; transition: opacity var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease); }
+.hm-carousel-btn:disabled { opacity: 0; pointer-events: none; }
+.hm-carousel-btn:hover { transform: scale(1.06); }
+.hm-carousel-prev { inset-inline-start: -.75rem; } .hm-carousel-next { inset-inline-end: -.75rem; }
+.hm-carousel-dots { display: flex; justify-content: center; gap: 6px; margin-top: var(--hm-space-3); }
+.hm-carousel-dot { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 999px; background: var(--hm-border-strong); cursor: pointer; transition: width var(--hm-dur-slow) var(--hm-ease-out), background-color var(--hm-dur) var(--hm-ease); }
+.hm-carousel-dot.is-active { width: 20px; background: var(--hm-primary); }

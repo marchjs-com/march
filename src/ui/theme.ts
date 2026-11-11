@@ -1,12 +1,16 @@
 // Theme ("system" | "light" | "dark", persisted under localStorage "hm.theme", applied as data-theme on <html>),
 // ThemeToggle, LocaleSelect and UpdateBanner (new deploy detection).
+import "./theme.css";
+import "./theme-swatches.css";
+import "./button.css";
+import "./field.css";
 import { signal, computed, untrack, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t, locale, setLocale } from "../core/i18n.ts";
 import { val, cx, on, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { monitor, sun, moon, x as xIcon, check, palette as paletteIcon } from "../icons/set.ts";
-import { THEMES, DEFAULT_THEME } from "../theme/presets.ts";
-import { Dropdown } from "./button.ts";
+import { THEME_NAMES, DEFAULT_THEME } from "../theme/names.ts";
+import { Dropdown } from "./menu.ts";
 
 export type ThemeMode = "system" | "light" | "dark";
 const THEME_KEY = "hm.theme";
@@ -49,20 +53,48 @@ export const resolvedTheme = (): "light" | "dark" => {
 
 // ---------------------------------------------------------------- color themes (hadi, krem, gece, neon, indigo, minimal, kontrast…)
 /** A theme a picker can offer (built-in ones are listed already; add your own after loading its CSS). */
-export interface ThemeInfo { id: string; name: string; description?: string }
+export interface ThemeInfo {
+  id: string;
+  name: string;
+  description?: string;
+  /** Stylesheet URL of the theme (default: `themes/<id>.css` next to the page; see setThemeBase). */
+  href?: string;
+}
 const THEME_NAME_KEY = "hm.colorTheme";
-const infos = signal<readonly ThemeInfo[]>(THEMES.map(({ id, name, description }) => ({ id, name, ...(description ? { description } : {}) })));
+const infos = signal<readonly ThemeInfo[]>(THEME_NAMES.map((x) => ({ ...x })));
 const readName = (): string => { try { return globalThis.localStorage?.getItem(THEME_NAME_KEY) || DEFAULT_THEME; } catch { return DEFAULT_THEME; } };
 const themeName = signal<string>(readName(), { name: "colorTheme" });
+let themeBase: string | null = null;
+/** Where the built-in theme stylesheets live (default "themes/" relative to the page; `march build` copies them there). */
+export function setThemeBase(url: string): void { themeBase = url.endsWith("/") ? url : `${url}/`; }
+const hrefOf = (id: string): string => {
+  const custom = infos.peek().find((x) => x.id === id)?.href;
+  const d = globalThis.document;
+  return new URL(custom ?? `${themeBase ?? "themes/"}${id}.css`, d?.baseURI ?? "http://localhost/").href;
+};
+/** Load a theme's stylesheet once (<link rel="stylesheet">, CSP style-src 'self'); resolves when it is ready (or failed). */
+export function loadTheme(id: string): Promise<boolean> {
+  const d = globalThis.document;
+  if (!d || id === DEFAULT_THEME) return Promise.resolve(true);
+  const existing = d.querySelector<HTMLLinkElement>(`link[data-hm-theme-css="${id}"]`);
+  if (existing) return (existing as HTMLLinkElement & { _hmReady?: Promise<boolean> })._hmReady ?? Promise.resolve(true);
+  const l = d.createElement("link") as HTMLLinkElement & { _hmReady?: Promise<boolean> };
+  l.rel = "stylesheet"; l.href = hrefOf(id); l.setAttribute("data-hm-theme-css", id);
+  l._hmReady = new Promise<boolean>((r) => { l.onload = () => r(true); l.onerror = () => r(false); });
+  d.head.appendChild(l);
+  return l._hmReady;
+}
 function applyName(id: string): void {
   const root = globalThis.document?.documentElement;
   if (!root) return;
-  if (id === DEFAULT_THEME) root.removeAttribute("data-hm-theme"); else root.setAttribute("data-hm-theme", id);
+  if (id === DEFAULT_THEME) { root.removeAttribute("data-hm-theme"); return; }
+  // switch only once the stylesheet is in: no flash of half-themed UI
+  void loadTheme(id).then((ok) => { if (themeName.peek() !== id) return; if (ok) root.setAttribute("data-hm-theme", id); else console.warn(`March: theme "${id}" could not be loaded (${hrefOf(id)})`); });
 }
 applyName(themeName.peek());
 /** The active color theme id (reactive). */
 export const colorTheme = (): string => themeName();
-/** Switch the color theme (persisted under localStorage "hm.colorTheme"). Its CSS must be loaded (built-ins are in tokens.css). */
+/** Switch the color theme (persisted under localStorage "hm.colorTheme"); its stylesheet is loaded on demand. */
 export function setColorTheme(id: string): string {
   themeName.set(id);
   try { globalThis.localStorage?.setItem(THEME_NAME_KEY, id); } catch { /* storage blocked */ }
@@ -71,7 +103,7 @@ export function setColorTheme(id: string): string {
 }
 /** Themes offered by <ThemePicker> (reactive). */
 export const colorThemes = (): readonly ThemeInfo[] => infos();
-/** Offer extra themes in pickers: `registerThemes([{ id: "acme", name: "Acme" }])` (load acme.css made with themeCss()). */
+/** Offer extra themes: `registerThemes([{ id: "acme", name: "Acme", href: "/themes/acme.css" }])` (CSS made with themeCss()). */
 export function registerThemes(list: readonly ThemeInfo[]): void { infos.update((l) => [...l.filter((x) => !list.some((y) => y.id === x.id)), ...list]); }
 
 /** Small preview of a theme drawn by the theme itself (data-hm-theme scope; no inline styles). */

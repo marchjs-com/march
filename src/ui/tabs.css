@@ -1,0 +1,15 @@
+/* HADI March — Tabs. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* ---------- tabs */
+.hm-tabs-bar { position: relative; display: flex; gap: var(--hm-space-1); border-bottom: 1px solid var(--hm-border); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.hm-tabs-bar::-webkit-scrollbar { display: none; }
+.hm-tab { position: relative; display: inline-flex; align-items: center; gap: var(--hm-space-2); padding: .625rem .75rem; border: 0; margin-bottom: -1px;
+  background: none; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-md); font-weight: var(--hm-weight-medium); white-space: nowrap; cursor: pointer;
+  border-radius: var(--hm-radius-1) var(--hm-radius-1) 0 0; transition: color var(--hm-dur) var(--hm-ease); }
+.hm-tab::after { content: ""; position: absolute; inset-inline: .5rem; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--hm-text); transform: scaleX(0); transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
+.hm-tab:hover { color: var(--hm-text); }
+.hm-tab.is-active { color: var(--hm-text); }
+.hm-tab.is-active::after { transform: scaleX(1); }
+.hm-tab:focus-visible { outline-offset: -2px; }
+.hm-tab:disabled { opacity: .5; cursor: not-allowed; }
+.hm-tab .hm-badge { font-weight: 600; }
+.hm-tabs-panel { padding-top: var(--hm-space-5); outline: none; animation: hm-rise-in var(--hm-dur-slow) var(--hm-ease-out); }

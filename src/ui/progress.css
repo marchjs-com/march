@@ -1,0 +1,14 @@
+/* HADI March — Progress. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* ---------- progress */
+.hm-progress2 { display: flex; flex-direction: column; gap: .375rem; min-width: 0; }
+.hm-progress2-head { display: flex; justify-content: space-between; gap: var(--hm-space-2); font-size: var(--hm-text-sm); }
+.hm-progress2-label { color: var(--hm-text-2); font-weight: 500; }
+.hm-progress2-value { color: var(--hm-muted); font-variant-numeric: tabular-nums; }
+.hm-progress2-track { position: relative; display: block; height: .5rem; border-radius: var(--hm-radius-full); background: var(--hm-surface-3); overflow: hidden; }
+.hm-progress2-sm .hm-progress2-track { height: .3125rem; } .hm-progress2-lg .hm-progress2-track { height: .75rem; }
+.hm-progress2-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--hm-progress-c, var(--hm-primary-solid)); transform-origin: left center; transform: scaleX(var(--hm-progress, 0));
+  transition: transform .45s var(--hm-ease-out); }
+.hm-progress2-success { --hm-progress-c: var(--hm-success-solid); } .hm-progress2-warn { --hm-progress-c: var(--hm-warn-solid); }
+.hm-progress2-danger { --hm-progress-c: var(--hm-danger-solid); } .hm-progress2-info { --hm-progress-c: var(--hm-info-solid); }
+.hm-progress2.is-indeterminate .hm-progress2-fill { width: 40%; transform: none; animation: hm-indet 1.3s var(--hm-ease) infinite; }
+@keyframes hm-indet { from { left: -40%; } to { left: 100%; } }

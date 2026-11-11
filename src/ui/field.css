@@ -1,0 +1,53 @@
+/* HADI March — Field, labels and text controls (shared by forms, dialogs, search boxes). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* field */
+.hm-field { display: flex; flex-direction: column; gap: var(--hm-space-1); min-width: 0; }
+.hm-field-inline { flex-direction: row; align-items: baseline; gap: var(--hm-space-3); }
+.hm-field-inline > .hm-label { flex: 0 0 12rem; text-align: end; }
+.hm-field-inline > .hm-field-control { flex: 1; min-width: 0; }
+@media (max-width: 40rem) { .hm-field-inline { flex-direction: column; } .hm-field-inline > .hm-label { flex: none; text-align: start; } }
+.hm-field-compact { gap: 0; }
+.hm-field-compact .hm-help { display: none; }
+.hm-field-control { display: flex; flex-direction: column; gap: var(--hm-space-1); min-width: 0; }
+.hm-label { font-weight: 500; font-size: var(--hm-text-sm); color: var(--hm-text-2); }
+.hm-req { color: var(--hm-danger); }
+.hm-help, .hm-hint { color: var(--hm-muted); font-size: var(--hm-text-xs); }
+.hm-hint { margin-inline-start: var(--hm-space-2); }
+.hm-field-error { color: var(--hm-danger); font-size: var(--hm-text-xs); }
+.hm-form-error { color: var(--hm-danger); background: var(--hm-danger-soft); border: 1px solid color-mix(in srgb, var(--hm-danger) 22%, transparent); border-radius: var(--hm-radius); padding: var(--hm-space-2) var(--hm-space-3); font-size: var(--hm-text-sm); }
+
+/* text controls */
+.hm-input, .hm-select {
+  width: 100%; min-height: var(--hm-control-h); padding: var(--hm-space-2) var(--hm-space-3); font: inherit; color: var(--hm-text);
+  font-size: var(--hm-text-md); background: var(--hm-surface); border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); box-shadow: var(--hm-shadow-inset);
+  transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease);
+}
+.hm-input:hover:not(:focus):not(:disabled), .hm-select:hover:not(:focus):not(:disabled) { border-color: color-mix(in srgb, var(--hm-border-strong) 65%, var(--hm-text)); }
+.hm-input::placeholder, .hm-textarea::placeholder { color: var(--hm-faint); opacity: 1; }
+.hm-input:focus, .hm-select:focus { outline: none; border-color: var(--hm-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-focus) 22%, transparent); }
+.hm-input[aria-invalid="true"], .hm-select[aria-invalid="true"], .hm-field-invalid .hm-input, .hm-field-invalid .hm-select { border-color: var(--hm-danger); }
+.hm-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-danger) 20%, transparent); }
+.hm-input:disabled, .hm-select:disabled { background: var(--hm-surface-2); color: var(--hm-muted); cursor: not-allowed; }
+.hm-input[readonly] { background: var(--hm-surface-2); }
+.hm-textarea { resize: vertical; min-height: calc(var(--hm-control-h) * 2); line-height: 1.45; }
+.hm-mono, .hm-json { font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); }
+.hm-number { font-variant-numeric: tabular-nums; }
+.hm-select { appearance: none; -webkit-appearance: none; padding-inline-end: 2rem; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2371717b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 15 5 5 5-5M7 9l5-5 5 5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right .5rem center; background-size: .9rem; }
+[dir="rtl"] .hm-select { background-position: left .5rem center; }
+.hm-select[multiple] { background-image: none; padding-inline-end: var(--hm-space-3); }
+
+/* prefix / suffix / inline buttons */
+.hm-affix { display: flex; align-items: stretch; width: 100%; border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); background: var(--hm-surface); position: relative; box-shadow: var(--hm-shadow-inset); transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-affix:focus-within { border-color: var(--hm-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-focus) 22%, transparent); }
+.hm-affix > .hm-input { border: 0; box-shadow: none; flex: 1; min-width: 0; background: transparent; }
+.hm-affix:has(.hm-input[aria-invalid="true"]) { border-color: var(--hm-danger); }
+.hm-affix-text { display: flex; align-items: center; padding: 0 var(--hm-space-3); color: var(--hm-muted); background: var(--hm-bg-subtle); font-size: var(--hm-text-sm); white-space: nowrap; }
+.hm-affix-text:has(> .hm-svg) { background: transparent; border: 0; padding-inline: .75rem 0; color: var(--hm-faint); }
+.hm-affix-prefix { border-inline-end: 1px solid var(--hm-border); border-radius: var(--hm-radius) 0 0 var(--hm-radius); }
+.hm-affix-suffix { border-inline-start: 1px solid var(--hm-border); border-radius: 0 var(--hm-radius) var(--hm-radius) 0; }
+.hm-affix-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--hm-space-1); min-width: 2.25rem; padding: 0 var(--hm-space-2); border: 0; background: transparent; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-sm); cursor: pointer; border-radius: var(--hm-radius); }
+.hm-affix-btn:hover { color: var(--hm-text); background: var(--hm-surface-2); }
+.hm-affix-btn .hm-svg { width: 1rem; height: 1rem; }
+.hm-icon-btn:disabled, .hm-affix-btn:disabled { opacity: .45; cursor: not-allowed; }
+.hm-icon { flex: none; }

@@ -1,0 +1,27 @@
+/* HADI March — ListEditor, KeyValueEditor, JsonEditor, MarkdownEditor. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* list / key-value / json / markdown */
+.hm-list-editor, .hm-kv-editor { display: flex; flex-direction: column; gap: var(--hm-space-2); }
+.hm-list-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--hm-space-1); }
+.hm-list-items:empty { display: none; }
+.hm-list-row, .hm-list-add { display: flex; gap: var(--hm-space-1); align-items: center; }
+.hm-kv-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto; gap: var(--hm-space-1); align-items: center; }
+.hm-kv-row > .hm-field-error { grid-column: 1 / -1; }
+.hm-kv-add { align-self: flex-start; }
+.hm-json-editor { display: flex; flex-direction: column; gap: var(--hm-space-1); }
+.hm-json-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--hm-space-2); min-height: 1.75rem; }
+.hm-md-editor { display: flex; flex-direction: column; gap: var(--hm-space-2); }
+.hm-md-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 40rem) { .hm-md-split { grid-template-columns: minmax(0, 1fr); } }
+.hm-md-preview { min-height: 6rem; padding: var(--hm-space-3); border: 1px solid var(--hm-border); border-radius: var(--hm-radius); background: var(--hm-surface); overflow-wrap: anywhere; }
+.hm-markdown > :first-child { margin-top: 0; }
+.hm-markdown > :last-child { margin-bottom: 0; }
+.hm-markdown code { font-family: var(--hm-font-mono); font-size: .9em; background: var(--hm-surface-2); padding: .1em .3em; border-radius: var(--hm-radius-1); }
+.hm-markdown pre { background: var(--hm-surface-2); padding: var(--hm-space-3); border-radius: var(--hm-radius); overflow-x: auto; }
+.hm-markdown pre code { background: none; padding: 0; }
+.hm-markdown blockquote { margin: 0; padding-inline-start: var(--hm-space-3); border-inline-start: 3px solid var(--hm-border-strong); color: var(--hm-muted); }
+.hm-markdown img { max-width: 100%; height: auto; }
+.hm-markdown a { color: var(--hm-primary); }
+.hm-task { list-style: none; }
+.hm-editor-tabs { display: flex; gap: var(--hm-space-1); border-bottom: 1px solid var(--hm-border); }
+.hm-editor-tab { border: 0; background: transparent; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-sm); padding: var(--hm-space-2) var(--hm-space-3); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+.hm-editor-tab[aria-selected="true"] { color: var(--hm-text); border-bottom-color: var(--hm-primary); font-weight: 500; }

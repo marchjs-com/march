@@ -3,7 +3,9 @@
 // Budget for the core lives in BUDGET; test/size.test.js fails when it is exceeded.
 import { gzipSync } from "node:zlib";
 import { fileURLToPath } from "node:url";
-import { resolve } from "node:path";
+import { resolve, join } from "node:path";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 
 export const BUDGET = { core: 10.5 * 1024, minimal: 5 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -25,6 +27,31 @@ export async function sizes(names = Object.keys(ENTRIES)) {
   out.minimal = { min: code.length, gzip: gzipSync(code, { level: 9 }).length };
   return out;
 }
+
+/**
+ * Build a small app the way `march build` does (March esbuild plugin: component CSS follows the code that uses it) and
+ * return its JS and CSS. `source` is the app's main.tsx.
+ */
+export async function buildApp(source) {
+  const esbuild = await import("esbuild");
+  const { march } = await import("../compiler/esbuild.js");
+  const dir = mkdtempSync(join(tmpdir(), "hm-size-"));
+  try {
+    writeFileSync(join(dir, "main.tsx"), source);
+    const r = await esbuild.build({ entryPoints: [join(dir, "main.tsx")], absWorkingDir: dir, bundle: true, minify: true, format: "esm", write: false,
+      outdir: join(dir, "out"), logLevel: "silent", plugins: [march({ components: join(dir, "components") })] });
+    const pick = (ext) => r.outputFiles.filter((f) => f.path.endsWith(ext)).map((f) => f.text).join(String.fromCharCode(10));
+    const js = pick(".js"), css = pick(".css");
+    const gz = (t) => gzipSync(Buffer.from(t), { level: 9 }).length;
+    return { js, css, jsGzip: gz(js), cssGzip: gz(css) };
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+}
+export const BUTTON_APP = `import "hadi-march/css/tokens.css";
+import { render, h } from "hadi-march";
+import { Button } from "hadi-march/ui";
+render(() => h(Button, { variant: "primary" }, "Merhaba"), document.body);
+`;
+export const APP_BUDGET = { buttonJs: 6.5 * 1024, buttonCss: 4.5 * 1024 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const s = await sizes();

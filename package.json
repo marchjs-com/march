@@ -29,7 +29,9 @@
     "./i18n": "./src/i18n/index.ts",
     "./i18n/tr": "./src/i18n/tr.ts",
     "./icons": "./src/icons/index.ts",
-    "./theme": "./src/theme/index.ts"
+    "./theme": "./src/theme/index.ts",
+    "./motion/install": "./src/motion/install.ts",
+    "./css/themes/*": "./src/css/themes/*"
   },
   "bin": {
     "march": "./cli/march.js"
@@ -45,7 +47,7 @@
   ],
   "types": "./src/index.ts",
   "scripts": {
-    "test": "node --test",
+    "test": "node --import ./compiler/register.js --test",
     "bench": "node bench/run.js",
     "size": "node bench/size.js",
     "typecheck": "tsc -p tsconfig.json",
@@ -60,6 +62,6 @@
   },
   "sideEffects": [
     "*.css",
-    "./src/motion/index.ts"
+    "./src/motion/install.ts"
   ]
 }

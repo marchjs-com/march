@@ -66,6 +66,17 @@ function writeHtml(cfg, meta, { dev }) {
   writeFileSync(join(out, "index.html"), html);
 }
 
+/** Theme stylesheets for setColorTheme(): copied to <outdir>/themes/<id>.css (the default theme is already in the bundle). */
+async function copyThemes(out, esbuild, { dev }) {
+  const dir = join(MARCH_ROOT, "src", "css", "themes");
+  if (!existsSync(dir)) return;
+  mkdirSync(join(out, "themes"), { recursive: true });
+  for (const f of readdirSync(dir).filter((n) => n.endsWith(".css"))) {
+    const css = readFileSync(join(dir, f), "utf8");
+    writeFileSync(join(out, "themes", f), dev ? css : (await esbuild.transform(css, { loader: "css", minify: true, legalComments: "none" })).code);
+  }
+}
+
 async function build({ dev = false } = {}) {
   const cfg = await loadConfig();
   const esbuild = await loadEsbuild();
@@ -78,6 +89,7 @@ async function build({ dev = false } = {}) {
   try {
     const r = await esbuild.build(buildOptions(cfg, esbuild, { dev }));
     writeHtml(cfg, r.metafile, { dev });
+    if (cfg.themes !== false) await copyThemes(out, esbuild, { dev });
     const bytes = Object.values(r.metafile.outputs).reduce((s, o) => s + o.bytes, 0);
     console.log(`\x1b[32m✔\x1b[0m built ${relative(cwd, out)} in ${Date.now() - t0} ms (${(bytes / 1024).toFixed(1)} KB)`);
     return r;
@@ -117,6 +129,7 @@ async function dev() {
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
   if (existsSync(resolve(cwd, cfg.publicDir))) cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true });
+  if (cfg.themes !== false) await copyThemes(out, esbuild, { dev: true });
   const ctx = await esbuild.context(opts);
   await ctx.watch();
 

@@ -111,6 +111,34 @@ write `themeCss(def)` to a .css file at build time, load it, and `registerThemes
 Icons: `hadi-march/icons` (132 original SVG icons, each a separate export, rendered with createElementNS).
 Live gallery of everything: `node examples/showcase/build.mjs --serve`.
 
+## Only what you use is bundled
+
+Every component lives in its own module with its own stylesheet (`src/ui/button.ts` + `src/ui/button.css`, …). Apps
+import `hadi-march/css/tokens.css` (variables, base styles and the default HADİ theme) and the components they use; the
+March esbuild plugin (`march build` / `march dev`) does the rest:
+
+- **JS:** modules are side-effect free (`sideEffects` lists only CSS and `hadi-march/motion/install`), so unused code is
+  tree-shaken. A `<Button href>` binds to the router only when the app has one.
+- **CSS follows code:** a component's stylesheet goes into the output chunk where the component's code landed. The initial
+  entry's CSS is linked from `index.html`; lazy pages and shared chunks get their own `.css`, loaded by the chunk before it
+  runs (no flash of unstyled content, CSP `style-src 'self'`). Unused components' CSS is never shipped.
+- **Themes on demand:** only the default theme is in the bundle; `setColorTheme("neon")` loads `themes/neon.css`
+  (`march build` copies the built-in themes to `dist/themes/`; `setThemeBase()` or `registerThemes([{ id, href }])`
+  for other locations).
+- **Motion:** `hadi-march/motion` has no side effects; `import "hadi-march/motion/install"` (or call
+  `installTransitions()` / `installFlip()`) for the extra `transition:` names and `<For animate>`.
+
+Without the plugin, `hadi-march/css/ui.css` and `hadi-march/css/forms.css` still bundle every component's CSS.
+
+| What                                         | before (one stylesheet, router always) | now            |
+| -------------------------------------------- | -------------------------------------- | -------------- |
+| App with one `<Button>` — JS, min / gzip     | 20.4 KB / 8.1 KB                       | 14.6 KB / 5.9 KB |
+| App with one `<Button>` — CSS, min / gzip    | 109.5 KB / 17.2 KB (+ forms 19.1 KB)   | 15.7 KB / 3.9 KB |
+| Themes in the bundle                         | 7                                      | 1 (others lazy) |
+
+`test/size.test.js` builds the one-Button app and fails if another component's class or code, another theme or the
+router gets in, or if it grows past its budget (`node bench/size.js` prints the entry sizes).
+
 ## Performance
 
 `npm run bench` creates/updates keyed lists of 1,000 and 10,000 rows and runs table, chart (10k–100k points with LTTB)

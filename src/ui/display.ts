@@ -1,5 +1,7 @@
 // Display components: Card, Badge, Empty, Spinner, ErrorBox, Skeleton, Alert, Kbd, Avatar, CodeView, JsonView, KeyValue,
 // Timeline, layout helpers (Stack, Grid, Toolbar, Divider) and the boot Loader. Text is always inserted as text nodes.
+import "./display.css";
+import "./button.css";
 import { signal, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t, locale } from "../core/i18n.ts";

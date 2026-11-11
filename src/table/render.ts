@@ -1,4 +1,7 @@
+/// <reference path="../css.d.ts" />
 // <Table>: renders createTable() state as an accessible grid (or cards on small screens).
+import "../css/table.css";
+import "../ui/button.css";
 import { signal, computed, effect, untrack, onCleanup, type Accessor } from "../core/reactive.ts";
 import { svgIcon } from "../icons/svg.ts";
 import { arrowUp, arrowDown, x as xIcon, moreVertical, chevronRight, star, starFilled } from "../icons/set.ts";

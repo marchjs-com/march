@@ -3,7 +3,8 @@ import { h } from "../src/dom/h.ts";
 import { action, isAction, type Action } from "../src/ui/action.ts";
 import { askReason, confirm, prompt, openDialog, type ReasonWithPurpose } from "../src/ui/dialog.ts";
 import { toast } from "../src/ui/toast.ts";
-import { ActionButton, Menu, type MenuItem } from "../src/ui/button.ts";
+import { ActionButton } from "../src/ui/button.ts";
+import { Menu, type MenuItem } from "../src/ui/menu.ts";
 
 interface User { id: number; name: string }
 const ada: User = { id: 1, name: "Ada" };

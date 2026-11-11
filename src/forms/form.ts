@@ -1,5 +1,8 @@
 // useForm (state, validation, submit), <Form> (auto-rendered from a schema or custom children), <Field> (label, control,
 // help, error with the right aria wiring) and <EditForm> (load → edit → save with reason, toast and reload).
+import "./form.css";
+import "../ui/field.css";
+import "../ui/button.css";
 import { signal, computed, effect, batch, untrack, onCleanup, useContext, provide, type Accessor } from "../core/reactive.ts";
 import { store, unwrap } from "../core/store.ts";
 import { h } from "../dom/h.ts";

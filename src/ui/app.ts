@@ -1,9 +1,11 @@
 // Application chrome: Brand, AuthLayout (sign-in screens), UserMenu, IconTile, LinkCard, Spacer.
 // Purely presentational; every style lives in ui.css (no inline styles).
+import "./app.css";
+import "./button.css";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { Link, type Href } from "../router/index.ts";
-import { Menu, type MenuItem } from "./button.ts";
+import { Menu, type MenuItem } from "./menu.ts";
 import { Avatar } from "./display.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { chevronsUpDown, arrowUpRight } from "../icons/set.ts";

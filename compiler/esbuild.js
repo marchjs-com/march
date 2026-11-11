@@ -6,9 +6,11 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join, resolve, dirname } from "node:path";
 import { compile } from "./index.js";
 import { loadAutoImports, MARCH_ROOT, MODULES } from "./autoimports.js";
+import { setupCssSplit } from "./css-split.js";
 
 /**
- * @param {{ components?: string|string[], i18nOut?: string, dev?: boolean, filter?: RegExp, onKeys?: (keys: string[]) => void }} [opts]
+ * @param {{ components?: string|string[], i18nOut?: string, dev?: boolean, filter?: RegExp, onKeys?: (keys: string[]) => void, cssSplit?: boolean }} [opts]
+ * cssSplit (default true): component CSS follows the component's code into the output chunk that uses it (css-split.js).
  */
 export function march(opts = {}) {
   return {
@@ -18,6 +20,7 @@ export function march(opts = {}) {
       const auto = await loadAutoImports({ components: [].concat(opts.components ?? []).map((d) => resolve(d)) });
       const keys = new Set();
       const css = new Map();
+      if (opts.cssSplit !== false) setupCssSplit(build);
 
       // hadi-march/* → files of this March copy
       const files = Object.fromEntries(MODULES.map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));

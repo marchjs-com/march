@@ -1,3 +1,4 @@
+/// <reference path="../css.d.ts" />
 // Shared helpers for the form controls: value model, field context, ids, number parsing, list keyboard navigation.
 import { signal, computed, effect, untrack, useContext, provide, getOwner, reactive, type Signal } from "../core/reactive.ts";
 import { locale } from "../core/i18n.ts";

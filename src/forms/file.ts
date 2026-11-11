@@ -1,5 +1,7 @@
 // FileUpload: drag & drop or click, accept / maxSize checks, image and audio previews (object URLs revoked on cleanup),
 // progress and cancel when an `upload(file, { onProgress, signal })` function is given.
+import "./file.css";
+import "../ui/button.css";
 import { signal, untrack, onCleanup, type Accessor, type Signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { For } from "../dom/flow.ts";

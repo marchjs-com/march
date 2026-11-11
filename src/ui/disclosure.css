@@ -1,0 +1,11 @@
+/* HADI March — Disclosure. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* ---------- disclosure */
+.hm-disclosure { border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
+.hm-disclosure-summary { cursor: pointer; padding: var(--hm-space-3) var(--hm-space-4); font-weight: var(--hm-weight-medium); list-style: none; display: flex; align-items: center; gap: var(--hm-space-2);
+  border-radius: inherit; transition: background-color var(--hm-dur) var(--hm-ease); }
+.hm-disclosure-summary:hover { background: var(--hm-surface-2); }
+.hm-disclosure-summary::-webkit-details-marker { display: none; }
+.hm-disclosure-summary::before { content: ""; width: .4375rem; height: .4375rem; margin-inline: .125rem .25rem; border-right: 1.75px solid var(--hm-muted); border-bottom: 1.75px solid var(--hm-muted);
+  transform: rotate(-45deg); transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
+.hm-disclosure[open] > .hm-disclosure-summary::before { transform: rotate(45deg); }
+.hm-disclosure-body { padding: 0 var(--hm-space-4) var(--hm-space-4); }

@@ -2,6 +2,10 @@
 // recently visited items, and collapsible categories with counts ("expand / collapse all"). Keyboard: ↑ ↓ Home End move
 // between rows, → opens and ← closes a category (← on an item goes to its category), Enter activates, typing filters.
 // Remembers open categories and recent visits (localStorage); icon rail mode; drawer with a menu button on small screens.
+import "./sidebar.css";
+import "./nav.css";
+import "./button.css";
+import "./display.css";
 import { signal, computed, effect, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";

@@ -5,6 +5,7 @@
 //
 //   createRouter({ routes, redirects: { "/old": "/new" } });  render(() => <Router />, app)
 //   navigate("/users/42")   params().id   query().tab   setQuery({ tab: "x" })   beforeLeave(() => !dirty() || confirm…)
+import { provideLink } from "../dom/link.ts";
 import { signal, computed, untrack, batch, effect, onCleanup, read, getOwner } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { Try } from "../dom/flow.ts";
@@ -363,6 +364,7 @@ export function Link(props: { href: Href | (() => Href); exact?: boolean; replac
   }
   return a;
 }
+provideLink(Link as (props: Record<string, unknown>) => unknown);
 
 /** Run `fn` whenever the route changes (cleanup with the owner). */
 export function onRouteChange(fn: (m: Match | null) => void): void {

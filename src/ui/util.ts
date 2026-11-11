@@ -1,3 +1,4 @@
+/// <reference path="../css.d.ts" />
 // Small helpers shared by the ui components.
 import { onCleanup, getOwner } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";

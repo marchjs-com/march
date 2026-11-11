@@ -7,6 +7,8 @@
 // disabled, removable (default true), sortable (default true), cols (fields per line, default = number of fields, max 6).
 // Validation (schema type `records`): every row is validated with the sub-schema; the first problem is reported as
 // "Row N: <field label>: <message>".
+import "./records.css";
+import "../ui/button.css";
 import { computed, untrack, type Accessor } from "../core/reactive.ts";
 import { svgIcon, type IconDef } from "../icons/svg.ts";
 import { arrowUp, arrowDown, x as xIcon } from "../icons/set.ts";

@@ -1,0 +1,22 @@
+/* HADI March — Calendar, DatePicker, TimeInput, DateRangePicker. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* calendar */
+.hm-date { max-width: 14rem; }
+.hm-cal-pop { position: fixed; z-index: var(--hm-z-dropdown); padding: var(--hm-space-3); background: var(--hm-surface-raised); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-3); animation: hm-scale-in var(--hm-dur) var(--hm-ease-out); }
+.hm-cal { display: inline-flex; flex-direction: column; gap: var(--hm-space-2); user-select: none; }
+.hm-cal-header { display: flex; align-items: center; justify-content: space-between; gap: var(--hm-space-2); }
+.hm-cal-title { font-weight: 600; text-transform: capitalize; }
+.hm-cal-nav { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border: 0; border-radius: var(--hm-radius); background: transparent; color: var(--hm-muted); cursor: pointer; }
+.hm-cal-nav:hover { background: var(--hm-surface-2); }
+.hm-cal-row { display: grid; grid-template-columns: repeat(7, 2.25rem); gap: 2px; }
+.hm-cal-wd { text-align: center; font-size: var(--hm-text-xs); color: var(--hm-muted); padding-block: var(--hm-space-1); }
+.hm-cal-day { height: 2.25rem; border: 0; border-radius: var(--hm-radius); background: transparent; color: var(--hm-text); font: inherit; font-size: var(--hm-text-sm); font-variant-numeric: tabular-nums; cursor: pointer; }
+.hm-cal-day:hover { background: var(--hm-surface-2); }
+.hm-cal-out { color: var(--hm-muted); opacity: .6; }
+.hm-cal-day[aria-current="date"] { box-shadow: inset 0 0 0 1px var(--hm-primary); }
+.hm-cal-range { background: var(--hm-primary-soft); border-radius: 0; }
+.hm-cal-day[aria-selected="true"] { background: var(--hm-primary-solid); color: var(--hm-on-primary); font-weight: 600; }
+.hm-cal-day[aria-disabled="true"] { opacity: .35; cursor: not-allowed; background: transparent; text-decoration: line-through; }
+.hm-time { max-width: 9rem; }
+.hm-datetime, .hm-daterange-custom { display: flex; gap: var(--hm-space-2); align-items: center; flex-wrap: wrap; }
+.hm-daterange { display: flex; flex-direction: column; gap: var(--hm-space-2); }
+.hm-daterange-sep { color: var(--hm-muted); }

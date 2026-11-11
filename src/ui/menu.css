@@ -1,0 +1,21 @@
+/* HADI March — Menu, Dropdown, Tooltip (popovers). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* ---------- popovers, menus, tooltips */
+.hm-pop { position: fixed; z-index: var(--hm-z-dropdown); background: var(--hm-surface-raised); color: var(--hm-text); border: 1px solid var(--hm-border);
+  border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-3); animation: hm-scale-in var(--hm-dur) var(--hm-ease-out); transform-origin: top; }
+.hm-menu { --hm-pop-pad: .3125rem; min-width: 12rem; max-width: min(22rem, calc(100vw - 16px)); max-height: 60vh; overflow: auto; padding: var(--hm-pop-pad); }
+.hm-dropdown { padding: var(--hm-space-3); max-width: calc(100vw - 16px); }
+.hm-menu-item { display: flex; align-items: center; gap: var(--hm-space-2); width: 100%; min-height: 2rem; padding: 0 .625rem; border: 0;
+  border-radius: max(.25rem, calc(var(--hm-radius-3) - var(--hm-pop-pad, .3125rem)));
+  background: none; color: inherit; font: inherit; font-size: var(--hm-text-md); text-align: start; text-decoration: none; cursor: pointer; }
+.hm-menu-item .hm-icon { color: var(--hm-muted); }
+.hm-menu-item:hover, .hm-menu-item:focus { background: var(--hm-surface-2); outline: none; }
+.hm-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--hm-focus); outline: none; }
+.hm-menu-item:disabled { opacity: .5; cursor: not-allowed; }
+.hm-menu-item.is-danger, .hm-menu-item.is-danger .hm-icon { color: var(--hm-danger); }
+.hm-menu-label { flex: 1; }
+.hm-menu-kbd { margin-inline-start: auto; }
+.hm-menu-sep { height: 1px; margin: var(--hm-space-1) calc(-1 * var(--hm-space-1)); background: var(--hm-border); }
+.hm-tip-anchor { display: inline-flex; }
+.hm-tooltip { pointer-events: none; padding: .3rem .5rem; max-width: 18rem; font-size: var(--hm-text-xs); font-weight: 500; background: var(--hm-inverse-bg); color: var(--hm-inverse-text);
+  border: 0; border-radius: var(--hm-radius-1); box-shadow: var(--hm-shadow-2); }
+.hm-pop::-webkit-scrollbar-track { margin-block: var(--hm-radius-2); }

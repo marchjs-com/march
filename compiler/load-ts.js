@@ -13,6 +13,15 @@ import * as nodeModule from "node:module";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
+// March components import their own CSS (`import "./button.css"`; the esbuild plugin bundles it). When node itself loads
+// March's sources (the compiler reads the auto-import table from src/*/index.ts) those imports are no-ops. In-thread sync
+// hooks; inside a module.register() hooks thread they are unavailable, and there node-loader.js stubs .css instead.
+try {
+  nodeModule.registerHooks?.({
+    load(url, context, next) { return url.startsWith("file:") && /\.css(\?.*)?$/.test(url) ? { format: "module", source: "", shortCircuit: true } : next(url, context); },
+  });
+} catch { /* hooks thread */ }
+
 /** True for file URLs/paths inside a node_modules folder (node refuses to strip types there). */
 export const inNodeModules = (fileOrUrl) => /[\\/]node_modules[\\/]/.test(fileOrUrl.startsWith("file:") ? fileURLToPath(fileOrUrl) : fileOrUrl);
 /** A .ts module (not .d.ts) under node_modules. */
