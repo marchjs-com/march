@@ -13,6 +13,7 @@ export const MODULES = [
   ["hadi-march/router", "src/router/index.js"],
   ["hadi-march/schema", "src/schema/index.js"],
   ["hadi-march/table", "src/table/index.js"],
+  ["hadi-march/crud", "src/crud/index.js"],
   ["hadi-march/charts", "src/charts/index.js"],
 ];
 
