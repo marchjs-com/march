@@ -158,7 +158,7 @@
 .hm-flex-between{display:flex;align-items:center;justify-content:space-between}
 .hm-flex-end{display:flex;justify-content:flex-end}
 .hm-flex-grow{flex:1 1 auto;min-width:0}
-.hm-grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr))}
+.hm-grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(var(--hm-grid-min,14rem),100%),1fr))}
 .hm-grid-fit{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr))}
 @media (max-width:40rem){.hm-hide-sm{display:none!important}}
 @media (max-width:48rem){.hm-hide-md{display:none!important}}

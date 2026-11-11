@@ -111,8 +111,7 @@
 .hm-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } .hm-grid-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } .hm-grid-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 .hm-grid-auto { grid-template-columns: repeat(auto-fill, minmax(min(var(--hm-grid-min, 16rem), 100%), 1fr)); }
 @media (max-width: 1024px) { .hm-grid-4, .hm-grid-5, .hm-grid-6 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hm-kv-cols-3, .hm-kv-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 640px) { .hm-grid-2, .hm-grid-3, .hm-grid-5, .hm-grid-6, .hm-kv[class*="hm-kv-cols-"] { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 340px) { .hm-grid-4 { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) { .hm-grid-2, .hm-grid-3, .hm-grid-4, .hm-grid-5, .hm-grid-6, .hm-kv[class*="hm-kv-cols-"] { grid-template-columns: minmax(0, 1fr); } }
 .hm-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
 .hm-toolbar-start { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); flex: 1; min-width: 0; }
 .hm-toolbar-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }

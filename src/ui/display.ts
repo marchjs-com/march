@@ -1,6 +1,7 @@
 // Display components: Card, Badge, Empty, Spinner, ErrorBox, Skeleton, Alert, Kbd, Avatar, CodeView, JsonView, KeyValue,
 // Timeline, layout helpers (Stack, Grid, Toolbar, Divider) and the boot Loader. Text is always inserted as text nodes.
 import "./display.css";
+import "./grid.css";
 import "./button.css";
 import { signal, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
@@ -276,19 +277,34 @@ export function Stack(props: StackProps): Element {
       ALIGN[props.align ?? ""] && `hm-align-${props.align}`, ALIGN[props.justify ?? ""] && `hm-justify-${props.justify}`, val(props.class)) }, props.children);
 }
 export interface GridProps {
-  /** Columns 1–6 (default 2); collapses on small screens. */
+  /** Columns 1–6 (default 2); collapses to 2 on tablets (4+ columns) and 1 on phones. */
   cols?: number;
   gap?: number;
-  /** Auto-fill columns of at least this width ("16rem"). */
+  /** Auto columns of at least this width ("16rem") instead of a fixed count. */
   min?: string;
+  /**
+   * Last row: "stretch" — its items share the row's remaining space equally; "last" — only the last item grows into it
+   * (with `cols`). Default: aligned columns with a gap at the end.
+   */
+  fill?: "stretch" | "last";
+  /** Pick the column count that spreads items evenly over the rows (5 in 4 columns → 3 + 2, not 4 + 1). CSS only. */
+  balance?: boolean;
   class?: ClassProp;
   children?: unknown;
   [attr: string]: unknown;
 }
-/** `<Grid cols={3} gap={4}>` (collapses on small screens) or `<Grid min="16rem">` (auto-fill columns). */
+/**
+ * `<Grid cols={3} gap={4}>`, `<Grid min="16rem">` (auto columns), `<Grid cols={4} fill="stretch" balance>`.
+ * Pure CSS (grid / flex-wrap, :has() for balance); items never overflow horizontally.
+ */
 export function Grid(props: GridProps): Element {
-  return h("div", { ...rest(props, ["cols", "gap", "min"]),
-    class: () => cx("hm-grid", props.min ? "hm-grid-auto" : `hm-grid-${Math.min(props.cols ?? 2, 6)}`, `hm-gap-${props.gap ?? 4}`, val(props.class)),
+  const flex = !!props.fill || !!props.balance;
+  const cols = Math.max(1, Math.min(props.cols ?? 2, 6));
+  return h("div", { ...rest(props, ["cols", "gap", "min", "fill", "balance"]),
+    class: () => cx("hm-grid", `hm-grid-gap-${props.gap ?? 4}`,
+      flex ? ["hm-grid-flex", props.min ? "hm-grid-flex-min" : `hm-grid-c${cols}`, props.fill && `hm-grid-fill-${props.fill}`, props.balance && "hm-grid-balance"]
+        : props.min ? "hm-grid-auto" : `hm-grid-${cols}`,
+      val(props.class)),
     style: props.min ? { "--hm-grid-min": props.min } : undefined }, props.children);
 }
 export interface ToolbarProps { label?: MaybeFn<string>; end?: unknown; class?: ClassProp; children?: unknown }

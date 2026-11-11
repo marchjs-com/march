@@ -14,7 +14,7 @@ import { MARCH_ROOT } from "./autoimports.js";
 const SRC = join(MARCH_ROOT, "src");
 /** Cascade order of component stylesheets (later wins on equal specificity). Others follow alphabetically. */
 export const ORDER = [
-  "ui/field.css", "ui/button.css", "ui/menu.css", "ui/dialog.css", "ui/toast.css", "ui/tabs.css", "ui/display.css", "ui/layout.css", "ui/nav.css",
+  "ui/field.css", "ui/button.css", "ui/menu.css", "ui/dialog.css", "ui/toast.css", "ui/tabs.css", "ui/display.css", "ui/grid.css", "ui/layout.css", "ui/nav.css",
   "ui/sidebar.css", "ui/palette.css", "ui/theme.css", "ui/theme-swatches.css", "ui/media.css", "ui/disclosure.css", "ui/app.css", "ui/chip.css", "ui/avatar-group.css",
   "ui/progress.css", "ui/rating.css", "ui/accordion.css", "ui/steps.css", "ui/pagination.css", "ui/carousel.css", "ui/tree.css", "ui/kanban.css",
   "ui/splitter.css", "forms/form.css", "forms/inputs.css", "forms/pickers.css", "forms/date.css", "forms/file.css", "forms/editors.css",
