@@ -198,7 +198,21 @@ class Transformer {
       if (!m || !this.signals.has(m[2])) throw fail(src, this.pos, "declare $signals in their own let/const statement (do not mix with normal variables)");
       const name = m[2];
       this.pos += m[0].length;
-      let init = "undefined", reactive = false;
+      let init = "undefined", reactive = false, type = "";
+      if (src[this.pos] === ":") {
+        // TypeScript annotation: `let $n: number = 0` → signal<number>(0). The type ends at a depth-0 `=` (not `=>`),
+        // `,`, `;` or newline.
+        let i = this.pos + 1, depth = 0;
+        for (; i < src.length; i++) {
+          const c = src[i];
+          if (c === "(" || c === "[" || c === "{" || c === "<") depth++;
+          else if (c === ")" || c === "]" || c === "}" || (c === ">" && src[i - 1] !== "=")) depth--;
+          else if (depth === 0 && ((c === "=" && src[i + 1] !== ">" && src[i + 1] !== "=") || c === "," || c === ";" || c === "\n")) break;
+        }
+        type = src.slice(this.pos + 1, i).trim();
+        this.pos = i;
+        while (src[this.pos] === " " || src[this.pos] === "\t") this.pos++;
+      }
       if (src[this.pos] === "=" && src[this.pos + 1] !== "=") {
         this.pos++;
         const end = this.exprEnd(this.pos);
@@ -207,7 +221,8 @@ class Transformer {
         init = this.parse(end, true).trim();
         this.pos = end;
       }
-      parts.push(kw === "const" && reactive ? `${name} = ${this.helper("computed")}(() => (${init}))` : `${name} = ${this.helper("signal")}(${init})`);
+      const g = type ? `<${type}>` : "";
+      parts.push(kw === "const" && reactive ? `${name} = ${this.helper("computed")}${g}(() => (${init}))` : `${name} = ${this.helper("signal")}${g}(${init})`);
       const rest = /^\s*,/.exec(src.slice(this.pos, this.pos + 40));
       if (!rest) break;
       this.pos += rest[0].length;

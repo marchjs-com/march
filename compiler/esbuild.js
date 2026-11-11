@@ -14,7 +14,7 @@ export function march(opts = {}) {
   return {
     name: "march",
     async setup(build) {
-      const filter = opts.filter ?? /\.jsx$/;
+      const filter = opts.filter ?? /\.(jsx|tsx)$/;
       const auto = await loadAutoImports({ components: [].concat(opts.components ?? []).map((d) => resolve(d)) });
       const keys = new Set();
       const css = new Map();
@@ -31,7 +31,7 @@ export function march(opts = {}) {
           for (const k of r.keys) keys.add(k);
           let contents = r.code;
           if (r.css) { css.set(a.path, r.css); contents += `\nimport ${JSON.stringify(`march-css:${a.path}`)};`; }
-          return { contents, loader: "js", resolveDir: dirname(a.path), warnings: r.warnings.map((text) => ({ text })) };
+          return { contents, loader: a.path.endsWith(".tsx") ? "ts" : "js", resolveDir: dirname(a.path), warnings: r.warnings.map((text) => ({ text })) };
         } catch (e) {
           if (!e.marchCompile) throw e;
           return { errors: [{ text: e.message.replace(/^March compile error in [^:]+(:\d+:\d+)?: /, ""), location: { file: a.path, line: e.line ?? 1, column: Math.max(0, (e.column ?? 1) - 1), lineText: source.split("\n")[(e.line ?? 1) - 1] ?? "" }, detail: e.frame }] };

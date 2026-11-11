@@ -1,4 +1,4 @@
-// Node module hooks: import March `.jsx` files directly in node (tests, scripts). Registered by compiler/register.js:
+// Node module hooks: import March `.jsx` / `.tsx` files directly in node (tests, scripts). Registered by compiler/register.js:
 //   node --import hadi-march/register --test
 // Project components are auto-imported from ./src/components (override: MARCH_COMPONENTS=dir1,dir2).
 import { readFile } from "node:fs/promises";
@@ -11,7 +11,8 @@ let auto;
 const dirs = (process.env.MARCH_COMPONENTS ?? "src/components").split(",").filter(Boolean).map((d) => resolve(process.cwd(), d));
 
 export async function load(url, context, next) {
-  if (!url.startsWith("file:") || !url.endsWith(".jsx")) return next(url, context);
+  const tsx = url.endsWith(".tsx");
+  if (!url.startsWith("file:") || !(url.endsWith(".jsx") || tsx)) return next(url, context);
   if (!auto) {
     const map = await loadAutoImports({ components: dirs });
     // component entries are absolute file paths: node needs file URLs
@@ -19,5 +20,6 @@ export async function load(url, context, next) {
   }
   const file = fileURLToPath(url);
   const r = compile(await readFile(file, "utf8"), { filename: file, autoImports: auto });
-  return { format: "module", source: r.code, shortCircuit: true };
+  // .tsx: node strips the remaining TypeScript syntax (erasable types only)
+  return { format: tsx ? "module-typescript" : "module", source: r.code, shortCircuit: true };
 }
