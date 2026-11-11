@@ -191,9 +191,18 @@ function bindProp(el, what, sig) {
 
 // ------------------------------------------------------------------ transitions
 const TRANSITIONS = { fade: "hm-t-fade", slide: "hm-t-slide", scale: "hm-t-scale" };
+/** JS transitions registered by modules (hadi-march/motion): name → (el, opts, direction "in"|"out") → Promise<void>. */
+const JS_TRANSITIONS = new Map();
+export function registerTransition(name, fn) { JS_TRANSITIONS.set(name, fn); }
 function transition(el, name, opts) {
+  const js = JS_TRANSITIONS.get(name);
+  if (js) {
+    queueMicrotask(() => js(el, opts, "in"));
+    el[LEAVE] = () => Promise.resolve(js(el, opts, "out")).catch(() => {});
+    return;
+  }
   const cls = TRANSITIONS[name];
-  if (!cls) throw new Error(`March: unknown transition "${name}" (fade, slide, scale).`);
+  if (!cls) throw new Error(`March: unknown transition "${name}" (built in: fade, slide, scale; import hadi-march/motion for blur, fly and more).`);
   el.classList.add(`${cls}-in`);
   el[LEAVE] = () => new Promise((resolve) => {
     el.classList.remove(`${cls}-in`);

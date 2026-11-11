@@ -25,8 +25,13 @@ function childOf(props) {
 /**
  * Keyed list. `<For each={items} key="id">{(item, index) => …}</For>`; `item` and `index` are accessors.
  * Rows are reused by key; when an item with the same key changes, only that row's bindings update.
- * @param {{each: any, key?: string|((x:any)=>any), children: Function, fallback?: any}} props
+ * `animate` (with hadi-march/motion loaded): FLIP-animate moves, enter and leave.
+ * @param {{each: any, key?: string|((x:any)=>any), children: Function, fallback?: any, animate?: boolean|object}} props
  */
+let flipHook = null;
+/** Installed by hadi-march/motion: (elements, mutate, opts) → void. Measures, runs `mutate`, animates the deltas. */
+export function setFlipHook(fn) { flipHook = fn; }
+
 export function For(props) {
   const doc = globalThis.document;
   const start = doc.createComment("for"), end = doc.createComment("/for");
@@ -75,16 +80,20 @@ export function For(props) {
       for (const r of rows.values()) dropRow(r);
       rows = next;
       // place rows in order, moving only what is out of place
-      let ref = end;
-      for (let i = order.length - 1; i >= 0; i--) {
-        const r = order[i];
-        const last = r.nodes[r.nodes.length - 1];
-        if (!last) continue;
-        if (last.nextSibling !== ref || last.parentNode !== host) {
-          for (const n of r.nodes) host.insertBefore(n, ref);
+      const place = () => {
+        let ref = end;
+        for (let i = order.length - 1; i >= 0; i--) {
+          const r = order[i];
+          const last = r.nodes[r.nodes.length - 1];
+          if (!last) continue;
+          if (last.nextSibling !== ref || last.parentNode !== host) {
+            for (const n of r.nodes) host.insertBefore(n, ref);
+          }
+          ref = r.nodes[0];
         }
-        ref = r.nodes[0];
-      }
+      };
+      if (props.animate && flipHook) flipHook(order.flatMap((r) => r.nodes).filter((n) => n.nodeType === 1), place, props.animate);
+      else place();
     });
   });
   onCleanup(() => { for (const r of rows.values()) dropRow(r); fallback?.d(); });

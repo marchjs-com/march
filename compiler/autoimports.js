@@ -15,6 +15,8 @@ export const MODULES = [
   ["hadi-march/table", "src/table/index.js"],
   ["hadi-march/crud", "src/crud/index.js"],
   ["hadi-march/charts", "src/charts/index.js"],
+  ["hadi-march/motion", "src/motion/index.ts"],
+  ["hadi-march/fx", "src/fx/index.ts"],
 ];
 
 /**

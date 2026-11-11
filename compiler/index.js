@@ -588,6 +588,14 @@ class Transformer {
     for (const a of attrs) {
       if (a.spread) { props.push(`...${a.spread}`); continue; }
       const key = /^[A-Za-z_$][\w$]*$/.test(a.name) ? a.name : JSON.stringify(a.name);
+      if (a.name.startsWith("use:")) {
+        // use:action={arg} → [action, arg]; the action is a function in scope (or auto-imported, e.g. from hadi-march/motion)
+        const fn = a.name.slice(4);
+        if (!/^[A-Za-z_$][\w$.]*$/.test(fn)) throw fail(this.src, this.pos, `invalid action name in ${a.name}`);
+        this.used.add(fn.split(".")[0]);
+        props.push(`${key}: [${fn}, ${a.code === "true" && !a.raw ? "undefined" : a.code}]`);
+        continue;
+      }
       props.push(`${key}: ${a.dynamic ? `${this.helper("r")}(() => (${a.code}))` : a.code}`);
     }
     if (elseKids) props.push(`else: () => [${elseKids}]`);

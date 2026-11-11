@@ -20,6 +20,10 @@ const S = {
   pending: signal(false),
 };
 
+let navWrapper = null;
+/** Wrap every page swap (used by hadi-march/motion for View Transitions). `fn(apply, { pop }) → void | Promise`. */
+export function setNavigationWrapper(fn) { navWrapper = fn; }
+
 /** Current path (reactive). */
 export const path = () => S.path();
 /** Route params of the current match (reactive). */
@@ -125,11 +129,13 @@ async function sync({ pop = false, initial = false } = {}) {
       const title = r.opts.title?.(to) ?? mod?.title ?? m.route.title;
       if (title && globalThis.document) globalThis.document.title = typeof title === "function" ? title(to) : title;
     }
-    batch(() => {
+    const apply = () => batch(() => {
       S.path.set(p); S.search.set(search); S.hash.set(hash);
       S.match.set(m ? { route: m.route, params: m.params, path: p, meta: { ...(m.route.meta ?? {}), ...(mod?.meta ?? {}) } } : null);
       r.view.set(page ?? { notFound: true });
     });
+    // page transitions (hadi-march/motion › pageTransitions): wrap the DOM swap, e.g. in document.startViewTransition
+    if (navWrapper && !initial) await navWrapper(apply, { pop }); else apply();
     if (r.opts.scroll !== false) restoreScroll(pop);
   } catch (e) {
     if (seq === r.seq) r.view.set({ error: e });

@@ -62,7 +62,7 @@ test("directives, shorthand attributes, bind needs a $variable", () => {
   assert.match(out, /"bind:value": \$v[,}]/);
   assert.match(out, /"on:input\|stop": h/);
   assert.match(out, /"class:on": _\$r\(\(\) => \(\$v\(\)\)\)/);
-  assert.match(out, /"use:focus": 1/);
+  assert.match(out, /"use:focus": \[focus, 1\]/);
   assert.match(out, /"transition:fade": true/);
   assert.match(out, /_\$h\(Row, \{user: user, v: _\$r\(\(\) => \(\$v\(\)\)\)\}\)/);
   assert.throws(() => c("const e = <input bind:value={x} />"), /needs a \$variable/);
