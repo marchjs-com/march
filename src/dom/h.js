@@ -3,6 +3,7 @@
 // attribute position becomes a live binding: only that text node / attribute / region updates when its signals change.
 // Security: no HTML strings ever (no innerHTML), URL attributes are sanitized, <script> cannot be created, Trusted Types safe.
 import { effect, untrack, batch, getOwner, runWithOwner, reportError, isReactive, onCleanup, signal, DEV, useContext } from "../core/reactive.js";
+import { sx as resolveSx } from "../core/sx.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const SVG_TAGS = new Set(["svg", "g", "path", "circle", "ellipse", "rect", "line", "polyline", "polygon", "text", "tspan", "defs",
@@ -121,6 +122,7 @@ function setProp(el, tag, key, value) {
   }
   if (key.startsWith("transition:")) return transition(el, key.slice(11), value);
   if (key === "class" || key === "className") return bindValue(value, (v) => setClass(el, v));
+  if (key === "sx") return bindValue(value, (v) => { el.__hmClass = typeof v === "string" ? v : resolveSx(v); setClass(el, el.__hmUser ?? ""); });
   if (key === "style") {
     if (typeof value === "string") throw new Error("March: string styles are not allowed (CSP). Use classes, sx, or a style object.");
     return bindValue(value, (v) => { for (const k in v ?? {}) el.style.setProperty(k.startsWith("--") ? k : k.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`), v[k] == null ? "" : String(v[k])); });
@@ -139,6 +141,7 @@ function bindValue(value, apply) {
 }
 
 function setClass(el, v) {
+  el.__hmUser = v;
   let s = v;
   if (Array.isArray(v)) s = v.filter(Boolean).join(" ");
   else if (v && typeof v === "object") s = Object.keys(v).filter((k) => v[k]).join(" ");
