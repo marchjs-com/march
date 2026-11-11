@@ -2,7 +2,7 @@
 // Geometry is computed in `layout`; each series path binds `d` through a computed string, so only paths whose shape
 // really changed touch the DOM. Long series are downsampled with LTTB above `maxPoints` (default 2 × plot width).
 import { signal, computed, read, untrack } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { For } from "../dom/flow.js";
 import { applyPipe } from "../core/pipes.js";
 import { scaleLinear, niceTicks, timeTicks } from "./scale.js";

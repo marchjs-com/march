@@ -1,7 +1,7 @@
 // NavMenu: sidebar navigation for big apps — groups (collapsible), pinned and recently used items, filter, active item from
 // the router path, and a drawer with a hamburger button on small screens. UI state persists in localStorage.
 import { signal, computed, effect, untrack } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { t, locale } from "../core/i18n.ts";
 import { Link, path, navigate } from "../router/index.ts";
 import { can } from "../access/index.js";

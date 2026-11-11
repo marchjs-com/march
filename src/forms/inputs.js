@@ -1,7 +1,7 @@
 // Basic inputs. Every control works standalone (`bind:value={$x}`, `value` + `onChange(v)`, or uncontrolled) and inside
 // a <Field>/<Form>, where id, aria-invalid and aria-describedby come from the field context.
 import { signal, computed, effect, untrack, onCleanup } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { t, locale } from "../core/i18n.ts";
 import { roving } from "../ui/focus.js";
 import { model, ctl, cx, uid, extend, syncValue, parseNumber, formatNumber, normOptions, same, labelledBy, useField } from "./util.js";

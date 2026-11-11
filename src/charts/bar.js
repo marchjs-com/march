@@ -2,7 +2,7 @@
 // Bars are a keyed list ("category|series"); each rect binds x/y/width/height through computeds, so a data change only
 // writes the attributes of bars whose geometry changed.
 import { signal, computed, read, untrack } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { For } from "../dom/flow.js";
 import { scaleLinear, scaleBand, niceTicks } from "./scale.js";
 import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, useSize, attr, textWidth, navIndex, sameBox } from "./util.js";

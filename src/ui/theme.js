@@ -1,7 +1,7 @@
 // Theme ("system" | "light" | "dark", persisted under localStorage "hm.theme", applied as data-theme on <html>),
 // ThemeToggle, LocaleSelect and UpdateBanner (new deploy detection).
 import { signal, computed, untrack, onCleanup } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { t, locale, setLocale } from "../core/i18n.ts";
 import { val, cx, on } from "./util.js";
 

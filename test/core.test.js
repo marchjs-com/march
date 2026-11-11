@@ -227,3 +227,12 @@ test("sx resolves tokens to classes and rejects unknown ones", () => {
   assert.throws(() => sx({ p: 99 }), /out of range/);
   assert.throws(() => sx({ zz: 1 }), /unknown sx key/);
 });
+
+test("components created outside an owner still get context and cleanups", () => {
+  const Ctx = context("d");
+  let seen;
+  const Inner = () => { seen = useContext(Ctx); return null; };
+  const Outer = () => { provide(Ctx, "x"); onCleanup(() => {}); return h(Inner, {}); };
+  h(Outer, {}); // no render() root around it
+  assert.equal(seen, "x");
+});

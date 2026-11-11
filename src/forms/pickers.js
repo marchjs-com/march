@@ -1,7 +1,7 @@
 // Combobox (typeahead over static options or an async `search`) and MultiSelect (chips). WAI-ARIA combobox pattern:
 // focus stays in the input, the active option is announced with aria-activedescendant.
 import { signal, computed, effect, untrack, onCleanup } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { floating } from "../ui/popover.js";
 import { model, ctl, cx, uid, debounce, listNav, fold, same, normOptions, extend } from "./util.js";

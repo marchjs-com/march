@@ -1,6 +1,6 @@
 // <Table>: renders createTable() state as an accessible grid (or cards on small screens).
 import { signal, computed, effect, untrack, onCleanup } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { For } from "../dom/flow.js";
 import { t } from "../core/i18n.ts";
 import { createTable } from "./state.js";

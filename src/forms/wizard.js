@@ -1,6 +1,6 @@
 // Wizard: one form split into steps. Each step validates its own fields (and an optional validate fn) before Next.
 import { signal, computed, untrack, provide } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { schema as makeSchema } from "../schema/index.js";
 import { scoped, cx, uid } from "./util.js";

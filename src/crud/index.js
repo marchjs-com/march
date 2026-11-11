@@ -2,7 +2,7 @@
 //   {crud({ list, create, update, remove }, { schema: Product, title: "Products" })}
 // list(params) → { items, total? , nextCursor? } (server mode, params from the table: page, size, sort, filters, search…)
 //   or an array (client mode: sorting/filtering/paging in the browser). Built from Table, Form, Dialog and action().
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { query } from "../data/index.js";
 import { createTable, Table } from "../table/index.js";

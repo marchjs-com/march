@@ -1,6 +1,6 @@
 // Page scaffolding: Page, Section, ListDetail, Pager, SearchBox.
 import { signal, computed, untrack, effect, onCleanup } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { Link, back as historyBack } from "../router/index.ts";
 import { actionsOf } from "./display.js";

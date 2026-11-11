@@ -2,7 +2,7 @@
 // help, error with the right aria wiring) and <EditForm> (load → edit → save with reason, toast and reload).
 import { signal, computed, effect, batch, untrack, onCleanup, useContext, provide, reactive } from "../core/reactive.ts";
 import { store, unwrap } from "../core/store.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { schema as makeSchema, options as schemaOptions } from "../schema/index.js";
 import { askReason } from "../ui/dialog.js";

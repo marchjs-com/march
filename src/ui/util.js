@@ -69,7 +69,7 @@ export function debounce(fn, ms) {
 
 export const doc = () => globalThis.document;
 
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 /** Render an icon prop: a string (emoji, ligature, short text) becomes an aria-hidden span; nodes pass through. */
 export function icon(x, cls = "hm-icon") {
   if (x == null || x === false) return null;

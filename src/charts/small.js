@@ -1,6 +1,6 @@
 // Small charts: Sparkline, Stat (KPI box), ProgressRing (0–100 score) and BarList (ranked horizontal bars).
 import { computed, read, reactive } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { For } from "../dom/flow.js";
 import { lttb } from "./lttb.js";
 import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, attr } from "./util.js";

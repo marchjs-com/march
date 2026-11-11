@@ -2,7 +2,7 @@
 // Imperative helpers return promises: confirm() → boolean, prompt() → string|null, askReason() → string|{category,text}|null,
 // openDialog((close) => content) → whatever close(value) received (undefined when dismissed).
 import { signal, createRoot, onCleanup, untrack } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { Portal } from "../dom/flow.js";
 import { t } from "../core/i18n.ts";
 import { val, cx, uid } from "./util.js";

@@ -8,7 +8,7 @@
 // Validation (schema type `records`): every row is validated with the sub-schema; the first problem is reported as
 // "Row N: <field label>: <message>".
 import { computed, untrack, reactive } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { For } from "../dom/flow.js";
 import { t } from "../core/i18n.ts";
 import { schema as makeSchema, fieldType, options as schemaOptions } from "../schema/index.js";

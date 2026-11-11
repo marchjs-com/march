@@ -3,7 +3,7 @@
 //   await openMedia(url, { title: "Preview", kind: "auto" })   → dialog with the media
 // URLs go through safeUrl (http(s), relative, blob: for media). Built with h() only; no inline style strings.
 import { signal } from "../core/reactive.ts";
-import { h } from "../dom/h.js";
+import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { openDialog } from "./dialog.js";
 import { val, cx } from "./util.js";
