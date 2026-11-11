@@ -9,7 +9,7 @@ export {
   Card, Badge, countLabel, Empty, Spinner, ErrorBox, Skeleton, Alert, Notice, Kbd, Avatar, initials, CodeView, JsonView, KeyValue, Timeline,
   Stack, Grid, Toolbar, Divider, Loader, bootLoader,
 } from "./display.js";
-export { Page, Section, ListDetail, Pager, SearchBox } from "./layout.js";
+export { Page, Section, ListDetail, Pager, SearchBox, AppShell } from "./layout.js";
 export { NavMenu } from "./nav.js";
 export { CommandPalette, openPalette, closePalette, paletteOpen, registerCommands, registerPages } from "./palette.js";
 export { key, shortcuts, formatKey, parseKey, isMac } from "./keys.js";

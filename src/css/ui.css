@@ -319,3 +319,16 @@ html.hm-scroll-lock { overflow: hidden; }
   padding: var(--hm-space-2) var(--hm-space-2) var(--hm-space-2) var(--hm-space-4); max-width: calc(100vw - 2rem); background: var(--hm-text); color: var(--hm-surface);
   border-radius: 999px; box-shadow: var(--hm-shadow-3); font-size: var(--hm-text-sm); }
 .hm-update .hm-icon-btn { color: inherit; width: 2rem; height: 2rem; }
+
+/* ---------- app shell (sidebar + main) */
+.hm-shell { display: grid; grid-template-columns: auto minmax(0, 1fr); min-height: 100vh; min-height: 100dvh; }
+.hm-shell-nav { position: sticky; top: 0; height: 100vh; height: 100dvh; display: flex; }
+.hm-shell-body { min-width: 0; display: flex; flex-direction: column; }
+.hm-shell-main { flex: 1 1 auto; min-width: 0; outline: none; }
+.hm-shell-top:empty { display: none; }
+.hm-nav-wrap .hm-nav-burger { display: none; }
+@media (max-width: 900px) {
+  .hm-shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .hm-shell-nav { height: auto; z-index: var(--hm-z-dropdown); background: var(--hm-surface); border-bottom: 1px solid var(--hm-border); padding: var(--hm-space-1) var(--hm-space-2); }
+  .hm-nav-wrap .hm-nav-burger { display: inline-flex; }
+}

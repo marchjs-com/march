@@ -200,3 +200,15 @@ render(() => <App />, document.getElementById("app")); bootLoader.done()
 <Toolbar end={[<LocaleSelect options={["en", "tr"]} />, <ThemeToggle />]} />
 <UpdateBanner />
 ```
+
+## AppShell
+
+Application frame: sidebar + main. Desktop: sticky sidebar column; narrow screens: slim top bar with the NavMenu button (the menu becomes a drawer).
+
+```jsx
+<AppShell nav={<NavMenu items={items} />} top={<UpdateBanner url="/build.txt" />}>
+  <Router />
+</AppShell>
+```
+
+Props: `nav`, `top` (optional strip above main), `mainId` (default "main"), `class`.

@@ -430,3 +430,13 @@ test("bootLoader.done removes #hm-boot", async () => {
   await tick(10);
   assert.equal(el.isConnected, false);
 });
+
+test("AppShell places the nav and the main area", async () => {
+  const { AppShell } = await import("../src/ui/layout.js");
+  const { h, render } = await import("../src/index.js");
+  const el = document.createElement("div");
+  render(() => h(AppShell, { nav: h("nav", {}, "menu"), top: "banner" }, h("p", {}, "page")), el);
+  assert.equal(el.querySelector(".hm-shell-nav").textContent, "menu");
+  assert.equal(el.querySelector(".hm-shell-top").textContent, "banner");
+  assert.equal(el.querySelector("main.hm-shell-main").textContent, "page");
+});

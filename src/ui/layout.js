@@ -115,3 +115,16 @@ export function SearchBox(props) {
     () => filled() && h("button", { type: "button", class: "hm-icon-btn hm-search-clear", "aria-label": () => t`Clear search`, onClick: clear }, "×"),
     props.shortcut && h("kbd", { class: "hm-kbd hm-search-kbd", "aria-hidden": "true" }, props.shortcut === true ? "/" : props.shortcut));
 }
+
+/**
+ * Application frame: a sidebar (usually <NavMenu/>) and the main area. Desktop: sticky sidebar column + scrolling main.
+ * Narrow screens: a slim top bar with the menu button (the NavMenu becomes a drawer) and full-width main.
+ * `<AppShell nav={<NavMenu items={…} />} top={<UpdateBanner/>}>…pages…</AppShell>`
+ */
+export function AppShell(props) {
+  return h("div", { class: () => cx("hm-shell", val(props.class)) },
+    h("aside", { class: "hm-shell-nav" }, () => props.nav),
+    h("div", { class: "hm-shell-body" },
+      props.top != null ? h("div", { class: "hm-shell-top" }, () => props.top) : null,
+      h("main", { class: "hm-shell-main", id: props.mainId ?? "main", tabindex: "-1" }, () => props.children)));
+}
