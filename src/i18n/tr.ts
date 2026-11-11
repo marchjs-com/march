@@ -212,5 +212,10 @@ const tr: Record<string, string> = {
   "Light": "Açık",
   "Dark": "Koyu",
   "System": "Sistem",
+  "Categories": "Kategoriler",
+  "Expand all": "Tümünü aç",
+  "Collapse all": "Tümünü kapat",
+  "Search or ask…": "Ara ya da sor…",
+  "Search the menu": "Menüde ara",
 };
 export default tr;

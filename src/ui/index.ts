@@ -48,3 +48,5 @@ export { Brand, AuthLayout, UserMenu, IconTile, LinkCard, Spacer } from "./app.t
 export type { BrandProps, AuthLayoutProps, UserMenuProps, IconTileProps, IconTone, LinkCardProps } from "./app.ts";
 export { Chip, AvatarGroup, Progress, Rating, Accordion, Steps, Pagination, Carousel, Tree, Kanban, Splitter } from "./extras.ts";
 export type { ChipProps, AvatarGroupProps, ProgressProps, RatingProps, AccordionProps, AccordionItem, StepsProps, StepItem, PaginationProps, CarouselProps, TreeProps, TreeNode, KanbanProps, KanbanColumn, SplitterProps } from "./extras.ts";
+export { NavSidebar } from "./sidebar.ts";
+export type { NavSidebarProps, NavSidebarItem } from "./sidebar.ts";
