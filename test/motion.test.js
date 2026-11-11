@@ -109,3 +109,66 @@ test("drag moves with the pointer and the keyboard; swipe detects direction", ()
   s.dispatchEvent(ev("pointerup", 20, 5, 100));
   assert.equal(dir, "left");
 });
+
+// Regression: release animations must not keep a filled transform, or the gesture works only once (WAAPI fill emulated).
+function fakeWaapi(el) {
+  const anims = [];
+  el.animate = (frames, opts) => {
+    const a = { frames, opts, cancelled: false, finished: Promise.resolve(), cancel() { this.cancelled = true; }, play() {}, pause() {}, reverse() {} };
+    anims.push(a);
+    return a;
+  };
+  // what the user sees once every animation has ended: the newest filled, uncancelled animation wins over the inline style
+  return () => {
+    const held = anims.filter((a) => !a.cancelled && (a.opts.fill === "both" || a.opts.fill === "forwards")).pop();
+    return held ? held.frames[held.frames.length - 1].transform : el.style.getPropertyValue("transform") || "none";
+  };
+}
+const pe = (type, x, y, t) => Object.assign(new Event(type, { bubbles: true }), { clientX: x, clientY: y, timeStamp: t, pointerId: 1 });
+
+test("drag with snapBack works on every drag (3 in a row) and with the keyboard afterwards", () => {
+  const el = document.createElement("div");
+  const seen = fakeWaapi(el);
+  M.drag(el, { snapBack: true });
+  for (let i = 1; i <= 3; i++) {
+    el.dispatchEvent(pe("pointerdown", 0, 0, i * 100));
+    el.dispatchEvent(pe("pointermove", 30 * i, 10, i * 100 + 16));
+    assert.equal(seen(), `translate3d(${30 * i}px, 10px, 0)`, `drag ${i} moves the element`);
+    el.dispatchEvent(pe("pointerup", 30 * i, 10, i * 100 + 32));
+    assert.equal(seen(), "none", `drag ${i} springs back`);
+  }
+  el.dispatchEvent(Object.assign(new Event("keydown"), { key: "ArrowRight" }));
+  assert.equal(seen(), "translate3d(10px, 0px, 0)");
+  el.dispatchEvent(Object.assign(new Event("keydown"), { key: "ArrowDown" }));
+  assert.equal(seen(), "translate3d(10px, 10px, 0)");
+});
+
+test("magnet, tilt and press keep working after repeated use", async () => {
+  const rect = () => ({ left: 0, top: 0, width: 100, height: 100 });
+  const m = document.createElement("div"); m.getBoundingClientRect = rect;
+  const seenM = fakeWaapi(m);
+  M.magnet(m, { strength: 0.5 });
+  const t = document.createElement("div"); t.getBoundingClientRect = rect;
+  const seenT = fakeWaapi(t);
+  M.tilt(t, { max: 10 });
+  for (let i = 0; i < 3; i++) {
+    m.dispatchEvent(pe("pointermove", 100, 50, 0));
+    t.dispatchEvent(pe("pointermove", 100, 50, 0));
+    await new Promise((r) => setTimeout(r, 40)); // magnet writes on the next frame
+    assert.equal(seenM(), "translate3d(25px, 0px, 0)", `magnet ${i} follows the pointer`);
+    assert.match(seenT(), /rotateY\(5\.00deg\)/, `tilt ${i}`);
+    m.dispatchEvent(pe("pointerleave", 0, 0, 0));
+    t.dispatchEvent(pe("pointerleave", 0, 0, 0));
+    assert.equal(seenM(), "none");
+    assert.equal(seenT(), "none");
+  }
+  const b = document.createElement("button");
+  const seenB = fakeWaapi(b);
+  M.press(b);
+  for (let i = 0; i < 3; i++) {
+    b.dispatchEvent(pe("pointerdown", 0, 0, 0));
+    assert.equal(seenB(), "scale(0.97)", `press ${i} scales down`);
+    b.dispatchEvent(pe("pointerup", 0, 0, 0));
+    assert.equal(seenB(), "none", `press ${i} releases`);
+  }
+});

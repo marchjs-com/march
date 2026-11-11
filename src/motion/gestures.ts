@@ -1,11 +1,24 @@
 // Gestures and micro-interactions as `use:` actions (transform only, pointer events, CSP safe):
 //   use:drag={{ axis: "x", bounds: { left: -100, right: 100 }, onEnd }}   use:swipe={{ onSwipe: (dir) => … }}
 //   use:press   use:magnet={{ strength: 0.3 }}   use:tilt={{ max: 8 }}
-import { animate } from "./animate.ts";
+import { animate, type Controls, type AnimateOptions } from "./animate.ts";
 import { setStyle, reducedMotion, frame } from "./env.ts";
 
 type Opts<T> = T | undefined;
 const obj = <T extends object>(raw: unknown): Partial<T> => (raw && typeof raw === "object" ? (raw as Partial<T>) : {});
+
+/**
+ * Gestures write the live transform inline and play their release animations WITHOUT fill: a filled animation keeps
+ * overriding the inline transform after it ends, so the gesture would work only once. `settle` cancels the previous
+ * release animation of the same gesture, sets the final transform inline, then animates from the current one.
+ */
+interface Slot { a: Controls | null }
+function settle(el: Element, slot: Slot, from: string, to: string | null, opts: AnimateOptions): void {
+  slot.a?.cancel();
+  setStyle(el, { transform: to });
+  slot.a = animate(el, [{ transform: from }, { transform: to ?? "none" }], { ...opts, fill: "none" });
+}
+const stop = (slot: Slot): void => { slot.a?.cancel(); slot.a = null; };
 
 export interface DragOptions {
   axis: "x" | "y" | "both";
@@ -22,9 +35,11 @@ export function drag(el: Element, raw?: unknown): () => void {
   const o = obj<DragOptions>(raw);
   const h = el as HTMLElement;
   let x = 0, y = 0, sx = 0, sy = 0, px = 0, py = 0, vx = 0, vy = 0, t = 0, active = false;
+  const release: Slot = { a: null };
   const clamp = (v: number, lo?: number, hi?: number): number => Math.min(hi ?? Infinity, Math.max(lo ?? -Infinity, v));
   const apply = (): void => setStyle(el, { transform: `translate3d(${x}px, ${y}px, 0)` });
   const down = (e: PointerEvent): void => {
+    stop(release);
     active = true; sx = e.clientX - x; sy = e.clientY - y; px = e.clientX; py = e.clientY; t = e.timeStamp;
     h.setPointerCapture?.(e.pointerId);
     el.classList.add("is-dragging");
@@ -45,7 +60,7 @@ export function drag(el: Element, raw?: unknown): () => void {
     active = false;
     el.classList.remove("is-dragging");
     o.onEnd?.({ x, y, vx, vy });
-    if (o.snapBack) { animate(el, [{ transform: `translate3d(${x}px, ${y}px, 0)` }, { transform: "none" }], { duration: 300, easing: "easeOutBack" }); x = 0; y = 0; }
+    if (o.snapBack) { const from = `translate3d(${x}px, ${y}px, 0)`; x = 0; y = 0; settle(el, release, from, null, { duration: 300, easing: "easeOutBack" }); }
   };
   const key = (e: KeyboardEvent): void => {
     const step = e.shiftKey ? 50 : 10;
@@ -53,6 +68,7 @@ export function drag(el: Element, raw?: unknown): () => void {
     const m = d[e.key];
     if (!m) return;
     e.preventDefault();
+    stop(release);
     if (o.axis !== "y") x = clamp(x + m[0], o.bounds?.left, o.bounds?.right);
     if (o.axis !== "x") y = clamp(y + m[1], o.bounds?.top, o.bounds?.bottom);
     apply();
@@ -64,7 +80,7 @@ export function drag(el: Element, raw?: unknown): () => void {
   h.addEventListener("pointercancel", up);
   h.addEventListener("keydown", key);
   setStyle(el, { touchAction: o.axis === "x" ? "pan-y" : o.axis === "y" ? "pan-x" : "none" });
-  return () => { h.removeEventListener("pointerdown", down); h.removeEventListener("pointermove", move); h.removeEventListener("pointerup", up); h.removeEventListener("pointercancel", up); h.removeEventListener("keydown", key); };
+  return () => { stop(release); h.removeEventListener("pointerdown", down); h.removeEventListener("pointermove", move); h.removeEventListener("pointerup", up); h.removeEventListener("pointercancel", up); h.removeEventListener("keydown", key); };
 }
 
 /** Action: detect a swipe (left/right/up/down) with distance and velocity thresholds. */
@@ -88,12 +104,24 @@ export function swipe(el: Element, raw?: unknown): () => void {
 export function press(el: Element, raw?: Opts<number>): () => void {
   const scale = typeof raw === "number" ? raw : 0.97;
   const h = el as HTMLElement;
-  const down = (): void => { if (!reducedMotion()) animate(el, [{ transform: "none" }, { transform: `scale(${scale})` }], { duration: 90, fill: "forwards" }); };
-  const up = (): void => { animate(el, [{ transform: `scale(${scale})` }, { transform: "none" }], { duration: 160, easing: "easeOutBack" }); };
+  // the pressed scale is a filled animation held only while pressed; release plays unfilled, so nothing outlives the press
+  const held: Slot = { a: null }, release: Slot = { a: null };
+  let pressed = false;
+  const down = (): void => {
+    if (reducedMotion()) return;
+    stop(release); stop(held); pressed = true;
+    held.a = animate(el, [{ transform: "none" }, { transform: `scale(${scale})` }], { duration: 90, fill: "forwards" });
+  };
+  const up = (): void => {
+    if (!pressed) return;
+    pressed = false; stop(held);
+    release.a = animate(el, [{ transform: `scale(${scale})` }, { transform: "none" }], { duration: 160, easing: "easeOutBack", fill: "none" });
+  };
   h.addEventListener("pointerdown", down);
   h.addEventListener("pointerup", up);
   h.addEventListener("pointerleave", up);
-  return () => { h.removeEventListener("pointerdown", down); h.removeEventListener("pointerup", up); h.removeEventListener("pointerleave", up); };
+  h.addEventListener("pointercancel", up);
+  return () => { stop(held); stop(release); h.removeEventListener("pointerdown", down); h.removeEventListener("pointerup", up); h.removeEventListener("pointerleave", up); h.removeEventListener("pointercancel", up); };
 }
 
 /** Action: the element is pulled toward the pointer while hovered. */
@@ -101,19 +129,26 @@ export function magnet(el: Element, raw?: unknown): () => void {
   const o = obj<{ strength: number }>(raw);
   const k = o.strength ?? 0.25;
   const h = el as HTMLElement;
-  let pending = false, mx = 0, my = 0;
-  const update = (): void => { pending = false; setStyle(el, { transform: `translate3d(${mx}px, ${my}px, 0)` }); };
+  let pending = false, inside = false, mx = 0, my = 0;
+  const release: Slot = { a: null };
+  const update = (): void => { pending = false; if (inside) setStyle(el, { transform: `translate3d(${mx}px, ${my}px, 0)` }); };
   const move = (e: PointerEvent): void => {
     if (reducedMotion()) return;
+    if (!inside) { inside = true; stop(release); }
     const r = el.getBoundingClientRect();
     mx = (e.clientX - (r.left + r.width / 2)) * k;
     my = (e.clientY - (r.top + r.height / 2)) * k;
     if (!pending) { pending = true; frame(update); }
   };
-  const leave = (): void => { animate(el, [{ transform: `translate3d(${mx}px, ${my}px, 0)` }, { transform: "none" }], { duration: 400, easing: "easeOutElastic" }); mx = 0; my = 0; setStyle(el, { transform: null }); };
+  const leave = (): void => {
+    if (!inside) return;
+    inside = false;
+    const from = `translate3d(${mx}px, ${my}px, 0)`; mx = 0; my = 0;
+    settle(el, release, from, null, { duration: 400, easing: "easeOutElastic" });
+  };
   h.addEventListener("pointermove", move);
   h.addEventListener("pointerleave", leave);
-  return () => { h.removeEventListener("pointermove", move); h.removeEventListener("pointerleave", leave); };
+  return () => { stop(release); h.removeEventListener("pointermove", move); h.removeEventListener("pointerleave", leave); };
 }
 
 /** Action: 3D tilt toward the pointer (max degrees), with an optional glare via --hm-tilt-x/--hm-tilt-y custom properties. */
@@ -121,16 +156,23 @@ export function tilt(el: Element, raw?: unknown): () => void {
   const o = obj<{ max: number; perspective: number }>(raw);
   const max = o.max ?? 8, persp = o.perspective ?? 800;
   const h = el as HTMLElement;
+  const release: Slot = { a: null };
+  let inside = false;
   const move = (e: PointerEvent): void => {
     if (reducedMotion()) return;
+    if (!inside) { inside = true; stop(release); }
     const r = el.getBoundingClientRect();
     const px = (e.clientX - r.left) / (r.width || 1) - 0.5, py = (e.clientY - r.top) / (r.height || 1) - 0.5;
     setStyle(el, { transform: `perspective(${persp}px) rotateX(${(-py * max).toFixed(2)}deg) rotateY(${(px * max).toFixed(2)}deg)`, "--hm-tilt-x": `${((px + 0.5) * 100).toFixed(1)}%`, "--hm-tilt-y": `${((py + 0.5) * 100).toFixed(1)}%` });
   };
-  const leave = (): void => { animate(el, [{ transform: getComputedTransform(el) }, { transform: "none" }], { duration: 300 }); setStyle(el, { transform: null }); };
+  const leave = (): void => {
+    if (!inside) return;
+    inside = false;
+    settle(el, release, getComputedTransform(el), null, { duration: 300 });
+  };
   h.addEventListener("pointermove", move);
   h.addEventListener("pointerleave", leave);
-  return () => { h.removeEventListener("pointermove", move); h.removeEventListener("pointerleave", leave); };
+  return () => { stop(release); h.removeEventListener("pointermove", move); h.removeEventListener("pointerleave", leave); };
 }
 function getComputedTransform(el: Element): string {
   return (el as HTMLElement).style?.getPropertyValue?.("transform") || "none";
