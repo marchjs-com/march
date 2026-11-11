@@ -172,3 +172,22 @@ test("magnet, tilt and press keep working after repeated use", async () => {
     assert.equal(seenB(), "none", `press ${i} releases`);
   }
 });
+
+test("drag lifts the element above everything until the spring-back ends, on every drag", async () => {
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  let finish;
+  el.animate = (frames, opts) => ({ frames, opts, finished: new Promise((r) => { finish = r; }), cancel() {}, play() {}, pause() {}, reverse() {} });
+  M.drag(el, { snapBack: true });
+  for (let i = 0; i < 3; i++) {
+    assert.equal(el.classList.contains("hm-dragging"), false, `drag ${i}: not lifted at rest`);
+    el.dispatchEvent(pe("pointerdown", 0, 0, i * 100));
+    el.dispatchEvent(pe("pointermove", 40, 0, i * 100 + 16));
+    assert.ok(el.classList.contains("hm-dragging"), `drag ${i}: lifted while dragging`);
+    el.dispatchEvent(pe("pointerup", 40, 0, i * 100 + 32));
+    assert.ok(el.classList.contains("hm-dragging"), `drag ${i}: still on top while springing back`);
+    finish(); await new Promise((r) => setTimeout(r, 0));
+    assert.equal(el.classList.contains("hm-dragging"), false, `drag ${i}: back to normal after the spring-back`);
+  }
+  el.remove();
+});

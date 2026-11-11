@@ -44,6 +44,10 @@
 .hm-tilt-glare { position: relative; overflow: hidden; }
 .hm-tilt-glare::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at var(--hm-tilt-x, 50%) var(--hm-tilt-y, 50%), rgb(255 255 255 / .25), transparent 60%); }
 .is-dragging { cursor: grabbing; user-select: none; }
+/* drag lift (use:drag): the dragged element and its ancestors rise to --hm-z-drag while dragging and springing back */
+.hm-dragging { z-index: var(--hm-z-drag, 250) !important; will-change: transform; }
+.hm-dragging-rel { position: relative; }
+.hm-drag-lift { z-index: var(--hm-z-drag, 250) !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .hm-shimmer, .hm-float { animation: none; }

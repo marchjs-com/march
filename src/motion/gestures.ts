@@ -30,16 +30,42 @@ export interface DragOptions {
   snapBack: boolean;
 }
 
+/**
+ * While dragging (and until the release animation ends) the element is lifted above everything: it gets `hm-dragging`
+ * (+ `hm-dragging-rel` when it is statically positioned), and ancestors that create a stacking context get `hm-drag-lift`,
+ * so z-index `--hm-z-drag` wins over sibling cards, sticky bars and dialogs (motion.css). Overflow clipping by an
+ * ancestor is not undone: give drag areas room (no overflow: hidden on the way up).
+ */
+function lift(el: Element): () => void {
+  const css = (e: Element): CSSStyleDeclaration | null => globalThis.getComputedStyle?.(e) ?? null;
+  // z-index only competes inside the nearest stacking context, so lift the ancestors that create one
+  const isContext = (c: CSSStyleDeclaration): boolean => c.zIndex !== "auto" && c.zIndex !== "" || (c.transform && c.transform !== "none") || c.isolation === "isolate"
+    || Number(c.opacity) < 1 || (c.filter && c.filter !== "none") || /transform|opacity|filter/.test(c.willChange ?? "") || /paint|layout|strict|content/.test(c.contain ?? "")
+    || c.position === "fixed" || c.position === "sticky" || !!(c.backdropFilter && c.backdropFilter !== "none");
+  const done: [Element, string[]][] = [];
+  const add = (e: Element, cls: string[]): void => { e.classList.add(...cls); done.push([e, cls]); };
+  const own = css(el);
+  add(el, own?.position === "static" ? ["hm-dragging", "hm-dragging-rel"] : ["hm-dragging"]);
+  for (let p = el.parentElement; p && p !== el.ownerDocument?.body && p !== el.ownerDocument?.documentElement; p = p.parentElement) {
+    const c = css(p);
+    if (c && isContext(c)) add(p, c.position === "static" ? ["hm-drag-lift", "hm-dragging-rel"] : ["hm-drag-lift"]);
+  }
+  return () => { for (const [e, cls] of done) e.classList.remove(...cls); };
+}
+
 /** Action: drag the element with the pointer (keyboard: arrow keys move by 10px when focused). */
 export function drag(el: Element, raw?: unknown): () => void {
   const o = obj<DragOptions>(raw);
   const h = el as HTMLElement;
   let x = 0, y = 0, sx = 0, sy = 0, px = 0, py = 0, vx = 0, vy = 0, t = 0, active = false;
   const release: Slot = { a: null };
+  let drop: (() => void) | null = null;
+  const unlift = (): void => { drop?.(); drop = null; };
   const clamp = (v: number, lo?: number, hi?: number): number => Math.min(hi ?? Infinity, Math.max(lo ?? -Infinity, v));
   const apply = (): void => setStyle(el, { transform: `translate3d(${x}px, ${y}px, 0)` });
   const down = (e: PointerEvent): void => {
     stop(release);
+    if (!drop) drop = lift(el);
     active = true; sx = e.clientX - x; sy = e.clientY - y; px = e.clientX; py = e.clientY; t = e.timeStamp;
     h.setPointerCapture?.(e.pointerId);
     el.classList.add("is-dragging");
@@ -60,7 +86,13 @@ export function drag(el: Element, raw?: unknown): () => void {
     active = false;
     el.classList.remove("is-dragging");
     o.onEnd?.({ x, y, vx, vy });
-    if (o.snapBack) { const from = `translate3d(${x}px, ${y}px, 0)`; x = 0; y = 0; settle(el, release, from, null, { duration: 300, easing: "easeOutBack" }); }
+    if (o.snapBack) {
+      const from = `translate3d(${x}px, ${y}px, 0)`; x = 0; y = 0;
+      settle(el, release, from, null, { duration: 300, easing: "easeOutBack" });
+      const mine = release.a;
+      // stay on top until the spring-back ends (a new drag cancels it and keeps the lift)
+      void mine?.finished.then(() => { if (release.a === mine && !active) unlift(); });
+    } else unlift();
   };
   const key = (e: KeyboardEvent): void => {
     const step = e.shiftKey ? 50 : 10;
@@ -80,7 +112,7 @@ export function drag(el: Element, raw?: unknown): () => void {
   h.addEventListener("pointercancel", up);
   h.addEventListener("keydown", key);
   setStyle(el, { touchAction: o.axis === "x" ? "pan-y" : o.axis === "y" ? "pan-x" : "none" });
-  return () => { stop(release); h.removeEventListener("pointerdown", down); h.removeEventListener("pointermove", move); h.removeEventListener("pointerup", up); h.removeEventListener("pointercancel", up); h.removeEventListener("keydown", key); };
+  return () => { stop(release); unlift(); h.removeEventListener("pointerdown", down); h.removeEventListener("pointermove", move); h.removeEventListener("pointerup", up); h.removeEventListener("pointercancel", up); h.removeEventListener("keydown", key); };
 }
 
 /** Action: detect a swipe (left/right/up/down) with distance and velocity thresholds. */
