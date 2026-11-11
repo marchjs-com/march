@@ -1,12 +1,15 @@
 // Structured editors: ListEditor (array of strings), KeyValueEditor (object), JsonEditor, Markdown renderer and editor.
 import { signal, computed, effect, untrack, type Accessor } from "../core/reactive.ts";
+import { svgIcon, type IconDef } from "../icons/svg.ts";
+import { arrowUp, arrowDown, x as xIcon } from "../icons/set.ts";
 import { h } from "../dom/h.ts";
 import { For } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
 import { model, ctl, cx, uid, useField, syncValue, labelledBy, live, type ControlProps, type ClassProp } from "./util.ts";
 import { Textarea, type TextareaProps } from "./inputs.ts";
 
-const iconBtn = (label: string, text: string, onClick: () => void, disabled?: () => boolean) => h("button", { type: "button", class: "hm-icon-btn", "aria-label": label, title: label, onClick, disabled }, text);
+const GLYPH: Record<string, IconDef> = { "↑": arrowUp, "↓": arrowDown, "×": xIcon };
+const iconBtn = (label: string, text: string, onClick: () => void, disabled?: () => boolean) => h("button", { type: "button", class: "hm-icon-btn", "aria-label": label, title: label, onClick, disabled }, GLYPH[text] ? svgIcon(GLYPH[text] as IconDef) : text);
 const splitLines = (s: unknown) => String(s ?? "").split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
 const sameLength = (a: number[] | undefined, b: number[]) => a?.length === b.length;
 

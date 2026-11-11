@@ -8,6 +8,8 @@
 // Validation (schema type `records`): every row is validated with the sub-schema; the first problem is reported as
 // "Row N: <field label>: <message>".
 import { computed, untrack, type Accessor } from "../core/reactive.ts";
+import { svgIcon, type IconDef } from "../icons/svg.ts";
+import { arrowUp, arrowDown, x as xIcon } from "../icons/set.ts";
 import { h } from "../dom/h.ts";
 import { For } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
@@ -52,7 +54,8 @@ fieldType("records", {
   check: (v: Values[], f) => validateRecords(v, schemaOf(f)),
 });
 
-const iconBtn = (label: string, text: string, onClick: () => void, disabled?: () => boolean) => h("button", { type: "button", class: "hm-icon-btn", "aria-label": label, title: label, onClick, disabled }, text);
+const GLYPH: Record<string, IconDef> = { "↑": arrowUp, "↓": arrowDown, "×": xIcon };
+const iconBtn = (label: string, text: string, onClick: () => void, disabled?: () => boolean) => h("button", { type: "button", class: "hm-icon-btn", "aria-label": label, title: label, onClick, disabled }, GLYPH[text] ? svgIcon(GLYPH[text] as IconDef) : text);
 
 export interface RecordListEditorProps extends ControlProps<Values[]> {
   /** Sub-schema: a spec object or a schema. */

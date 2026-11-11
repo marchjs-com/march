@@ -1,5 +1,7 @@
 // <Table>: renders createTable() state as an accessible grid (or cards on small screens).
 import { signal, computed, effect, untrack, onCleanup, type Accessor } from "../core/reactive.ts";
+import { svgIcon } from "../icons/svg.ts";
+import { arrowUp, arrowDown, x as xIcon, moreVertical, chevronRight, star, starFilled } from "../icons/set.ts";
 import { h } from "../dom/h.ts";
 import { For, type ForProps } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
@@ -75,6 +77,8 @@ function ActionButton<A extends unknown[]>(a: TableAction<A>, args: () => A, onR
 function useLayout<R>(props: TableProps<R>): () => "cards" | "table" {
   const forced = props.layout;
   if (forced === "cards" || forced === "table") return () => forced;
+  // virtual scrolling only exists in the grid: a card list would render every row on phones
+  if (props.virtual) return () => "table";
   const mm = globalThis.matchMedia?.(`(max-width: ${(props.cardBreakpoint ?? 640) - 0.02}px)`);
   const small = signal(!!mm?.matches);
   if (mm?.addEventListener) {
@@ -214,8 +218,8 @@ function ColumnsPanel<R>(ctx: Ctx<R>): Element {
     const c = col(), key = c.key as string;
     return h("li", { class: "hm-table-colitem", "data-col": c.key },
       h("label", {}, h("input", { type: "checkbox", checked: () => !table.isHidden(key), onChange: () => table.toggleColumn(key) }), c.label),
-      h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Move ${c.label} up`, onClick: () => table.moveColumn(key, -1) }, "↑"),
-      h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Move ${c.label} down`, onClick: () => table.moveColumn(key, 1) }, "↓"),
+      h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Move ${c.label} up`, onClick: () => table.moveColumn(key, -1) }, svgIcon(arrowUp)),
+      h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Move ${c.label} down`, onClick: () => table.moveColumn(key, 1) }, svgIcon(arrowDown)),
       (() => {
         const sel = h("select", { class: "hm-table-input hm-table-pin", "aria-label": t`Pin ${c.label}`, onChange: (e: Event) => table.pin(key, (e.target as HTMLSelectElement).value || null) },
           h("option", { value: "" }, t`Not pinned`), h("option", { value: "left" }, t`Pin start`), h("option", { value: "right" }, t`Pin end`)) as HTMLSelectElement;
@@ -234,8 +238,8 @@ function ViewsPanel<R>(ctx: Ctx<R>): unknown[] {
       const n = v().name;
       return h("li", { class: () => ["hm-table-view", table.activeView() === n && "is-active"] },
         h("button", { type: "button", class: "hm-table-linkbtn", "aria-pressed": () => String(table.activeView() === n), onClick: () => table.applyView(n) }, n),
-        h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Make ${n} the default view`, "aria-pressed": () => String(table.defaultView() === n), onClick: () => table.setDefaultView(untrack(table.defaultView) === n ? null : n) }, "★"),
-        h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Delete view ${n}`, onClick: () => table.deleteView(n) }, "×"));
+        h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Make ${n} the default view`, "aria-pressed": () => String(table.defaultView() === n), onClick: () => table.setDefaultView(untrack(table.defaultView) === n ? null : n) }, svgIcon(table.defaultView() === n ? starFilled : star)),
+        h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Delete view ${n}`, onClick: () => table.deleteView(n) }, svgIcon(xIcon)));
     } })),
     h("div", { class: "hm-table-viewsave" }, name, h("button", { type: "button", class: "hm-btn", onClick: save }, t`Save view`)),
   ];
@@ -251,7 +255,7 @@ function Chips<R>(ctx: Ctx<R>): () => unknown {
 }
 function Chip(label: string, text: unknown, clear: () => void): Element {
   return h("span", { class: "hm-table-chip" }, h("span", {}, label, ": ", text),
-    h("button", { type: "button", class: "hm-table-chip-x", "aria-label": t`Remove filter ${label}`, onClick: clear }, "×"));
+    h("button", { type: "button", class: "hm-table-chip-x", "aria-label": t`Remove filter ${label}`, onClick: clear }, svgIcon(xIcon)));
 }
 
 function BulkBar<R>(ctx: Ctx<R>): () => unknown {
@@ -370,7 +374,7 @@ function HeaderCell<R>(ctx: Ctx<R>, col: TableColumn<R>, i: number, first: boole
   col.sortable
     ? h("button", { type: "button", class: "hm-table-sort", title: t`Sort (Shift: add to sort)`, onClick: (e: MouseEvent) => table.toggleSort(key, !!e.shiftKey) },
       label,
-      h("span", { class: "hm-table-sort-icon", "aria-hidden": "true" }, () => (dir() === "asc" ? "▲" : dir() === "desc" ? "▼" : "")),
+      h("span", { class: "hm-table-sort-icon", "aria-hidden": "true" }, () => (dir() === "asc" ? svgIcon(arrowUp) : dir() === "desc" ? svgIcon(arrowDown) : "")),
       () => (multi() && dir() ? untrack(() => h("span", { class: "hm-table-sort-n", "aria-hidden": "true" }, () => String(table.sortIndex(key) + 1))) : null))
     : h("span", { class: "hm-table-thlabel" }, label),
   props.resizable !== false && col.resizable !== false ? ResizeHandle(table, col) : null);
@@ -415,7 +419,7 @@ function Row<R>(ctx: GridCtx<R>, item: Accessor<R>, index: Accessor<number>): un
   if (ctx.selectable) lead.push(h("td", { class: "hm-table-lead hm-table-select", "data-cell": "", tabindex: "-1" },
     h("input", { type: "checkbox", class: "hm-table-check", "aria-label": t`Select row`, checked: sel, onClick: (e: MouseEvent) => table.toggle(item(), { range: !!e.shiftKey }) })));
   if (expand) lead.push(h("td", { class: "hm-table-lead hm-table-expand", "data-cell": "", tabindex: "-1" },
-    h("button", { type: "button", class: "hm-table-icon hm-table-expander", "aria-expanded": () => String(open?.()), "aria-label": t`Show details`, onClick: () => table.toggleExpand(item()) }, "▸")));
+    h("button", { type: "button", class: "hm-table-icon hm-table-expander", "aria-expanded": () => String(open?.()), "aria-label": t`Show details`, onClick: () => table.toggleExpand(item()) }, svgIcon(chevronRight))));
   const tr = h("tr", {
     class: () => ["hm-table-row", sel?.() && "is-selected", open?.() && "is-expanded", props.rowClass?.(item()), props.onRowClick && "is-clickable"],
     "data-row": "", "aria-selected": sel ? () => String(sel()) : null,
@@ -496,7 +500,7 @@ function RowActions<R>(ctx: Ctx<R>, acts: readonly RowAction<R>[], item: Accesso
   const inline = props.rowActionsInline ?? acts.length <= 2;
   if (inline) return h("span", { class: "hm-table-rowactions" }, acts.map((a) => ActionButton(a, args, () => runAction(a, untrack(args)))));
   return h("details", { class: "hm-table-menu hm-table-kebab" },
-    h("summary", { class: "hm-table-icon", "aria-label": t`Row actions`, "aria-haspopup": "menu" }, "⋮"),
+    h("summary", { class: "hm-table-icon", "aria-label": t`Row actions`, "aria-haspopup": "menu" }, svgIcon(moreVertical)),
     h("div", { class: "hm-table-menu-panel", role: "menu" }, acts.map((a) => ActionButton(a, args, () => runAction(a, untrack(args)), { role: "menuitem" }))));
 }
 

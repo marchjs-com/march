@@ -11,7 +11,8 @@ import { Dialog } from "./dialog.ts";
 import { key, formatKey } from "./keys.ts";
 import { rank } from "./fold.ts";
 import { pages, commands, type Command } from "./registry.ts";
-import { val, cx, uid, icon, debounce, type MaybeFn } from "./util.ts";
+import { val, cx, uid, icon, glyph, debounce, type MaybeFn } from "./util.ts";
+import { sparkles, search as searchIcon } from "../icons/set.ts";
 
 export { registerCommands, registerPages } from "./registry.ts";
 export type { Command, CommandEntry, PageEntry } from "./registry.ts";
@@ -172,7 +173,7 @@ export function CommandPalette(props: CommandPaletteProps): unknown {
         "data-id": r.item?.id ?? null, onClick: () => activate(r), onMousemove: () => { if (!on()) sel.set(i); },
       },
       r.kind === "ask"
-        ? [h("span", { class: "hm-icon", "aria-hidden": "true" }, "✦"), h("span", { class: "hm-pal-title" }, () => (r.status === "loading" ? t`Asking…` : r.status === "error" ? t`Ask failed — press Enter to retry` : t`Ask: “${q()}”`))]
+        ? [h("span", { class: "hm-icon hm-pal-icon", "aria-hidden": "true" }, glyph(sparkles)), h("span", { class: "hm-pal-title" }, () => (r.status === "loading" ? t`Asking…` : r.status === "error" ? t`Ask failed — press Enter to retry` : t`Ask: “${q()}”`))]
         : [icon(r.item.icon), h("span", { class: "hm-pal-title" }, r.item.title),
           r.reason && h("span", { class: "hm-pal-reason" }, r.reason),
           r.item.sub && h("span", { class: "hm-pal-sub" }, r.item.sub),
@@ -194,4 +195,13 @@ export function CommandPalette(props: CommandPaletteProps): unknown {
       h("div", { class: "hm-pal-hint", "aria-hidden": "true" }, () => t`↑↓ to move · Enter to open · Esc to close`),
     ],
   });
+}
+
+export interface PaletteButtonProps { label?: MaybeFn<string | undefined>; shortcut?: string; class?: string }
+/** A search-field-looking button that opens the command palette: `<PaletteButton label="Search…" />` (shows Ctrl+K / ⌘K). */
+export function PaletteButton(props: PaletteButtonProps = {}): Element {
+  return h("button", { type: "button", class: cx("hm-pal-trigger", props.class), onClick: openPalette, "aria-keyshortcuts": "Control+K Meta+K" },
+    glyph(searchIcon, "hm-svg hm-pal-trigger-icon"),
+    h("span", { class: "hm-pal-trigger-label" }, () => val(props.label) ?? t`Search…`),
+    h("kbd", { class: "hm-kbd hm-pal-trigger-kbd", "aria-hidden": "true" }, formatKey(props.shortcut ?? "mod+k")));
 }

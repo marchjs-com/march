@@ -2,6 +2,7 @@
 import { computed, read, reactive } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { lttb } from "./lttb.ts";
+import { svgIcon, isIconDef } from "../icons/svg.ts";
 import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, attr, each, type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps } from "./util.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
@@ -33,6 +34,8 @@ export interface StatProps<D = unknown> {
   class?: Opt<string>;
   spark?: DataProp<D>;
   sparkY?: Field<D> | undefined;
+  /** An icon (hadi-march/icons) shown next to the label. */
+  icon?: unknown;
 }
 export interface ProgressRingProps {
   value?: Opt<number>;
@@ -100,7 +103,7 @@ export function Sparkline<D>(props: SparklineProps<D>): Element {
 }
 
 type Dir = "up" | "down" | "flat";
-const ARROWS: Record<Dir, string> = { up: "▲", down: "▼", flat: "–" };
+const ARROWS: Record<Dir, string> = { up: "↑", down: "↓", flat: "–" };
 const SAY: Record<Dir, string> = { up: "Up ", down: "Down ", flat: "No change " };
 
 /**
@@ -123,14 +126,16 @@ export function Stat<D>(props: StatProps<D>): Element {
   const hasSpark = computed(() => !!read(props.spark as MaybeReactive<unknown>));
   const tone = (): string => { const d = dir(); if (!d || d === "flat") return "hm-stat-neutral"; return (d === "up") !== !!read(props.invert) ? "hm-stat-good" : "hm-stat-bad"; };
   return h("div", { class: () => ["hm-stat", read(props.class)].filter(Boolean).join(" ") },
-    h("div", { class: "hm-stat-label" }, () => read(props.label) ?? ""),
+    h("div", { class: "hm-stat-label" },
+      isIconDef(props.icon) ? h("span", { class: "hm-stat-icon", "aria-hidden": "true" }, svgIcon(props.icon)) : null,
+      h("span", {}, () => read(props.label) ?? "")),
     h("div", { class: "hm-stat-value" }, () => { const v = read(props.value); return v == null ? (read(props.empty) ?? "—") : fmt()(v); }),
     () => (dir() ? h("div", { class: () => `hm-stat-delta hm-stat-${dir()} ${tone()}` },
       h("span", { class: "hm-stat-arrow", "aria-hidden": "true" }, () => ARROWS[dir() as Dir]),
       h("span", { class: "hm-sr-only" }, () => SAY[dir() as Dir]),
       h("span", { class: "hm-stat-delta-value" }, deltaText),
       () => (read(props.hint) ? h("span", { class: "hm-stat-hint" }, ` ${read(props.hint)}`) : null)) : null),
-    () => (hasSpark() ? h(Sparkline, { data: reactive(() => read(props.spark as MaybeReactive<Iterable<D> | null | undefined>)), y: props.sparkY, width: 120, height: 32, area: true, title: reactive(() => read(props.label) as string | null | undefined) }) : null));
+    () => (hasSpark() ? h(Sparkline, { data: reactive(() => read(props.spark as MaybeReactive<Iterable<D> | null | undefined>)), y: props.sparkY, width: 240, height: 40, area: true, title: reactive(() => read(props.label) as string | null | undefined) }) : null));
 }
 
 /** Score ring 0–100 (or 0–`max`). Level class `hm-ring-low|mid|high` from `thresholds` (default [50, 80]). */

@@ -337,7 +337,7 @@ test("columns: hide, reorder, resize (keyboard), pin; header aria-sort; only one
   assert.deepEqual(heads(), ["team", "name", "city", "age", "active"]);
   el.querySelector('[data-col="city"] .hm-table-colitem input, li[data-col="city"] input').dispatchEvent(new Event("change", { bubbles: true }));
   assert.deepEqual(heads(), ["team", "name", "age", "active"]);
-  [...el.querySelectorAll('li[data-col="age"] button')].find((b) => b.textContent === "↑").click();
+  [...el.querySelectorAll('li[data-col="age"] button')].find((b) => / up$/.test(b.getAttribute("aria-label"))).click();
   assert.deepEqual(heads(), ["team", "age", "name", "active"]);
   const handle = el.querySelector('th[data-col="name"] .hm-table-resize');
   key(handle, "ArrowRight");

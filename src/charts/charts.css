@@ -1,93 +1,38 @@
 /* HADI March charts. Colors are CSS custom properties; override them on :root or on any wrapper. */
+/* Chart colors follow the March tokens (tokens.css), so light / dark themes come for free. Override on :root or a wrapper. */
 :root {
-  /* series palette, Okabe–Ito based (colorblind friendly) */
-  --hm-chart-1: #0072b2;
-  --hm-chart-2: #e69f00;
-  --hm-chart-3: #009e73;
-  --hm-chart-4: #d55e00;
-  --hm-chart-5: #56b4e9;
-  --hm-chart-6: #cc79a7;
-  --hm-chart-7: #b8a400;
-  --hm-chart-8: #6b7280;
-  --hm-chart-text: #374151;
-  --hm-chart-muted: #6b7280;
-  --hm-chart-axis: #9ca3af;
-  --hm-chart-grid: #e5e7eb;
-  --hm-chart-bg: #ffffff;
-  --hm-chart-tooltip-bg: #111827;
-  --hm-chart-tooltip-text: #f9fafb;
-  --hm-chart-focus: #111827;
-  --hm-chart-brush: rgba(0, 114, 178, 0.12);
-  --hm-chart-good: #00845a;
-  --hm-chart-bad: #c2410c;
+  /* series palette: the theme's categorical colors */
+  --hm-chart-1: var(--hm-cat-1);
+  --hm-chart-2: var(--hm-cat-2);
+  --hm-chart-3: var(--hm-cat-3);
+  --hm-chart-4: var(--hm-cat-4);
+  --hm-chart-5: var(--hm-cat-5);
+  --hm-chart-6: var(--hm-cat-6);
+  --hm-chart-7: var(--hm-cat-7);
+  --hm-chart-8: var(--hm-cat-8);
+  --hm-chart-text: var(--hm-text, #17171a);
+  --hm-chart-muted: var(--hm-muted, #696973);
+  --hm-chart-axis: var(--hm-border-strong, #d3d3d9);
+  --hm-chart-grid: var(--hm-border-subtle, #efeff2);
+  --hm-chart-bg: var(--hm-surface, #fff);
+  --hm-chart-tooltip-bg: var(--hm-surface-raised, #fff);
+  --hm-chart-tooltip-text: var(--hm-text, #17171a);
+  --hm-chart-focus: var(--hm-text, #17171a);
+  --hm-chart-brush: color-mix(in srgb, var(--hm-chart-1) 14%, transparent);
+  --hm-chart-good: var(--hm-success, #15803d);
+  --hm-chart-bad: var(--hm-danger, #d42a2f);
   --hm-chart-font: inherit;
   --hm-chart-font-size: 11px;
-  /* heatmap levels (sequential) */
-  --hm-heat-0: #eef1f5;
-  --hm-heat-1: #c6dbef;
-  --hm-heat-2: #85bce0;
-  --hm-heat-3: #3a8ac4;
-  --hm-heat-4: #08519c;
+  /* heatmap levels (sequential, accent based) */
+  --hm-heat-0: var(--hm-surface-2, #f5f5f7);
+  --hm-heat-1: color-mix(in srgb, var(--hm-chart-1) 25%, var(--hm-surface, #fff));
+  --hm-heat-2: color-mix(in srgb, var(--hm-chart-1) 50%, var(--hm-surface, #fff));
+  --hm-heat-3: color-mix(in srgb, var(--hm-chart-1) 75%, var(--hm-surface, #fff));
+  --hm-heat-4: var(--hm-chart-1);
   /* progress ring levels */
   --hm-ring-low: var(--hm-chart-bad);
-  --hm-ring-mid: var(--hm-chart-2);
+  --hm-ring-mid: var(--hm-chart-3);
   --hm-ring-high: var(--hm-chart-good);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --hm-chart-1: #4aa3df;
-    --hm-chart-2: #f0b33a;
-    --hm-chart-3: #2ec4a0;
-    --hm-chart-4: #ff7a3d;
-    --hm-chart-5: #8fd1f5;
-    --hm-chart-6: #e59bc4;
-    --hm-chart-7: #f0e442;
-    --hm-chart-8: #a3a9b5;
-    --hm-chart-text: #e5e7eb;
-    --hm-chart-muted: #9ca3af;
-    --hm-chart-axis: #6b7280;
-    --hm-chart-grid: #2b313b;
-    --hm-chart-bg: #111827;
-    --hm-chart-tooltip-bg: #f9fafb;
-    --hm-chart-tooltip-text: #111827;
-    --hm-chart-focus: #f9fafb;
-    --hm-chart-brush: rgba(74, 163, 223, 0.18);
-    --hm-chart-good: #34d399;
-    --hm-chart-bad: #fb923c;
-    --hm-heat-0: #1f2630;
-    --hm-heat-1: #12385c;
-    --hm-heat-2: #1b5e95;
-    --hm-heat-3: #3d8fd1;
-    --hm-heat-4: #8cc4f2;
-  }
-}
-
-:root[data-theme="dark"] {
-  --hm-chart-1: #4aa3df;
-  --hm-chart-2: #f0b33a;
-  --hm-chart-3: #2ec4a0;
-  --hm-chart-4: #ff7a3d;
-  --hm-chart-5: #8fd1f5;
-  --hm-chart-6: #e59bc4;
-  --hm-chart-7: #f0e442;
-  --hm-chart-8: #a3a9b5;
-  --hm-chart-text: #e5e7eb;
-  --hm-chart-muted: #9ca3af;
-  --hm-chart-axis: #6b7280;
-  --hm-chart-grid: #2b313b;
-  --hm-chart-bg: #111827;
-  --hm-chart-tooltip-bg: #f9fafb;
-  --hm-chart-tooltip-text: #111827;
-  --hm-chart-focus: #f9fafb;
-  --hm-chart-brush: rgba(74, 163, 223, 0.18);
-  --hm-chart-good: #34d399;
-  --hm-chart-bad: #fb923c;
-  --hm-heat-0: #1f2630;
-  --hm-heat-1: #12385c;
-  --hm-heat-2: #1b5e95;
-  --hm-heat-3: #3d8fd1;
-  --hm-heat-4: #8cc4f2;
 }
 
 /* series colors: every mark reads --hm-c (a `colors` prop sets it through CSSOM) */
@@ -123,7 +68,7 @@
 .hm-chart-grid line { stroke: var(--hm-chart-grid); stroke-width: 1; shape-rendering: crispEdges; }
 
 .hm-chart-line { fill: none; stroke: var(--hm-c); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-.hm-chart-area { fill: var(--hm-c); fill-opacity: 0.18; stroke: none; }
+.hm-chart-area { fill: var(--hm-c); fill-opacity: 0.12; stroke: none; }
 .hm-chart-bar, .hm-chart-slice { fill: var(--hm-c); transition: opacity 0.15s; }
 .hm-chart-slice { stroke: var(--hm-chart-bg); stroke-width: 1; }
 .hm-chart-plot:hover .hm-chart-bar:not(.hm-chart-active), .hm-chart-plot:hover .hm-chart-slice:not(.hm-chart-active) { opacity: 0.6; }
@@ -144,13 +89,14 @@
   pointer-events: none;
   transform: translate(12px, -50%);
   max-width: 280px;
-  padding: 6px 8px;
-  border-radius: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--hm-border, #e7e7eb);
   background: var(--hm-chart-tooltip-bg);
   color: var(--hm-chart-tooltip-text);
   font-size: 12px;
-  line-height: 1.4;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  line-height: 1.5;
+  box-shadow: var(--hm-shadow-3, 0 4px 16px rgba(0, 0, 0, 0.2));
   white-space: nowrap;
 }
 .hm-chart-tooltip[hidden] { display: none; }
@@ -158,7 +104,7 @@
 .hm-chart-tip-title { font-weight: 600; margin-bottom: 2px; }
 .hm-chart-tip-row { display: flex; align-items: center; gap: 6px; }
 .hm-chart-tip-value { margin-left: auto; padding-left: 12px; font-variant-numeric: tabular-nums; font-weight: 600; }
-.hm-chart-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--hm-c, var(--hm-chart-1)); flex: none; }
+.hm-chart-swatch { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--hm-c, var(--hm-chart-1)); flex: none; }
 
 .hm-chart-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; }
 .hm-chart-legend[hidden] { display: none; }
@@ -184,10 +130,22 @@
 .hm-sparkline .hm-chart-line { stroke-width: 1.5; }
 
 /* stat */
-.hm-stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; color: var(--hm-chart-text); }
-.hm-stat-label { color: var(--hm-chart-muted); font-size: 13px; }
-.hm-stat-value { font-size: 28px; font-weight: 650; line-height: 1.15; font-variant-numeric: tabular-nums; }
-.hm-stat-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.hm-stat { display: flex; flex-direction: column; gap: 6px; min-width: 0; color: var(--hm-chart-text); }
+.hm-stat-label { display: flex; align-items: center; gap: 8px; color: var(--hm-chart-muted); font-size: var(--hm-text-sm, 13px); font-weight: 500; }
+.hm-stat-icon { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; color: var(--hm-primary, #4f46e5);
+  background: var(--hm-primary-soft, #eef0ff); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-primary, #4f46e5) 14%, transparent); }
+.hm-stat-icon .hm-svg { width: 14px; height: 14px; }
+.hm-stat-value { font-family: var(--hm-font-display, inherit); font-size: 28px; font-weight: var(--hm-display-weight, 650); line-height: 1.1; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
+.hm-stat-delta { display: inline-flex; align-self: flex-start; align-items: center; gap: 3px; padding: 1px 7px; border-radius: 999px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.hm-stat-good.hm-stat-delta { background: var(--hm-success-soft, #ecfbf1); }
+.hm-stat-bad.hm-stat-delta { background: var(--hm-danger-soft, #fdf0f0); }
+.hm-stat-neutral.hm-stat-delta { background: var(--hm-surface-2, #f5f5f7); }
+.hm-stat .hm-sparkline { width: 100%; height: 40px; margin-top: 4px; }
+@media (max-width: 640px) {
+  .hm-stat-value { font-size: 22px; }
+  .hm-stat-hint { display: none; }
+  .hm-stat .hm-sparkline { height: 32px; }
+}
 .hm-stat-good { color: var(--hm-chart-good); }
 .hm-stat-bad { color: var(--hm-chart-bad); }
 .hm-stat-neutral { color: var(--hm-chart-muted); }
@@ -202,15 +160,15 @@
 .hm-ring-text { fill: var(--hm-chart-text); font-size: 16px; font-weight: 650; }
 
 /* bar list */
-.hm-barlist { display: flex; flex-direction: column; gap: 4px; color: var(--hm-chart-text); font-size: 13px; }
+.hm-barlist { display: flex; flex-direction: column; gap: 4px; color: var(--hm-chart-text); font-size: var(--hm-text-md, 14px); }
 .hm-barlist-row {
-  position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 28px; padding: 0 8px;
+  position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 30px; padding: 0 10px; border-radius: 6px; overflow: hidden;
   border: 0; background: none; color: inherit; font: inherit; text-align: left;
 }
 button.hm-barlist-row { cursor: pointer; }
 button.hm-barlist-row:focus-visible { outline: 2px solid var(--hm-chart-1); border-radius: 4px; }
 .hm-barlist-bar { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hm-barlist-fill { fill: var(--hm-c); fill-opacity: 0.22; }
+.hm-barlist-fill { fill: var(--hm-c); fill-opacity: 0.16; }
 .hm-barlist-label { position: relative; flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hm-barlist-value { position: relative; flex: none; font-variant-numeric: tabular-nums; font-weight: 600; }
 

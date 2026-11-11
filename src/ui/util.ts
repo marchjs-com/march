@@ -1,6 +1,7 @@
 // Small helpers shared by the ui components.
 import { onCleanup, getOwner } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
+import { svgIcon, isIconDef } from "../icons/svg.ts";
 
 /** A value or an accessor for it (signal, getter thunk, zero-arg function). */
 export type MaybeFn<T> = T | (() => T);
@@ -81,8 +82,12 @@ export function debounce<A extends unknown[]>(fn: (...a: A) => unknown, ms: numb
 
 export const doc = (): Document => globalThis.document;
 
-/** Render an icon prop: a string (emoji, ligature, short text) becomes an aria-hidden span; nodes pass through. */
+/** Render an icon prop: an IconDef (hadi-march/icons) becomes an SVG, a string (emoji, short text) an aria-hidden span; nodes pass through. */
 export function icon(x: unknown, cls = "hm-icon"): unknown {
   if (x == null || x === false) return null;
+  if (isIconDef(x)) return h("span", { class: cls, "aria-hidden": "true" }, svgIcon(x));
   return typeof x === "string" ? h("span", { class: cls, "aria-hidden": "true" }, x) : x;
 }
+
+/** Inline SVG glyph for built-in components (decorative). */
+export const glyph = (def: Parameters<typeof svgIcon>[0], cls = "hm-svg"): SVGSVGElement => svgIcon(def, cls);

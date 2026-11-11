@@ -1,6 +1,8 @@
 // Dates are plain ISO strings ("2026-03-14"); arithmetic runs in UTC so DST never shifts a day.
 // Calendar (month grid, full keyboard), DatePicker (input + popover), TimeInput, DateTimeInput, DateRangePicker (presets).
 import { signal, computed, effect, untrack, onCleanup } from "../core/reactive.ts";
+import { svgIcon } from "../icons/svg.ts";
+import { chevronLeft, chevronRight } from "../icons/set.ts";
 import { h } from "../dom/h.ts";
 import { t, locale } from "../core/i18n.ts";
 import { toDate } from "../core/pipes.ts";
@@ -155,7 +157,7 @@ export function Calendar(props: CalendarProps): unknown {
     });
   });
   if (props.autoFocus) { const id = setTimeout(() => body.querySelector<HTMLElement>(`[data-date="${focus.peek()}"]`)?.focus(), 0); onCleanup(() => clearTimeout(id)); }
-  const nav = (n: number, label: string) => h("button", { type: "button", class: "hm-cal-nav", "aria-label": label, onClick: () => go(addMonths(focus.peek(), n), false) }, n < 0 ? "‹" : "›");
+  const nav = (n: number, label: string) => h("button", { type: "button", class: "hm-cal-nav", "aria-label": label, onClick: () => go(addMonths(focus.peek(), n), false) }, svgIcon(n < 0 ? chevronLeft : chevronRight));
   return h("div", { class: cx("hm-cal", props.class) },
     h("div", { class: "hm-cal-header" }, nav(-1, t`Previous month`), title, nav(1, t`Next month`)), grid);
 }

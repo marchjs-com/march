@@ -3,7 +3,10 @@
 import { signal, computed, untrack, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t, locale, setLocale } from "../core/i18n.ts";
-import { val, cx, on, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, on, glyph, type MaybeFn, type ClassProp } from "./util.ts";
+import { monitor, sun, moon, x as xIcon, check, palette as paletteIcon } from "../icons/set.ts";
+import { THEMES, DEFAULT_THEME } from "../theme/presets.ts";
+import { Dropdown } from "./button.ts";
 
 export type ThemeMode = "system" | "light" | "dark";
 const THEME_KEY = "hm.theme";
@@ -44,16 +47,71 @@ export const resolvedTheme = (): "light" | "dark" => {
   return m !== "system" ? m : globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 };
 
+// ---------------------------------------------------------------- color themes (hadi, krem, gece, neon, indigo, minimal, kontrast…)
+/** A theme a picker can offer (built-in ones are listed already; add your own after loading its CSS). */
+export interface ThemeInfo { id: string; name: string; description?: string }
+const THEME_NAME_KEY = "hm.colorTheme";
+const infos = signal<readonly ThemeInfo[]>(THEMES.map(({ id, name, description }) => ({ id, name, ...(description ? { description } : {}) })));
+const readName = (): string => { try { return globalThis.localStorage?.getItem(THEME_NAME_KEY) || DEFAULT_THEME; } catch { return DEFAULT_THEME; } };
+const themeName = signal<string>(readName(), { name: "colorTheme" });
+function applyName(id: string): void {
+  const root = globalThis.document?.documentElement;
+  if (!root) return;
+  if (id === DEFAULT_THEME) root.removeAttribute("data-hm-theme"); else root.setAttribute("data-hm-theme", id);
+}
+applyName(themeName.peek());
+/** The active color theme id (reactive). */
+export const colorTheme = (): string => themeName();
+/** Switch the color theme (persisted under localStorage "hm.colorTheme"). Its CSS must be loaded (built-ins are in tokens.css). */
+export function setColorTheme(id: string): string {
+  themeName.set(id);
+  try { globalThis.localStorage?.setItem(THEME_NAME_KEY, id); } catch { /* storage blocked */ }
+  applyName(id);
+  return id;
+}
+/** Themes offered by <ThemePicker> (reactive). */
+export const colorThemes = (): readonly ThemeInfo[] => infos();
+/** Offer extra themes in pickers: `registerThemes([{ id: "acme", name: "Acme" }])` (load acme.css made with themeCss()). */
+export function registerThemes(list: readonly ThemeInfo[]): void { infos.update((l) => [...l.filter((x) => !list.some((y) => y.id === x.id)), ...list]); }
+
+/** Small preview of a theme drawn by the theme itself (data-hm-theme scope; no inline styles). */
+export function ThemeSwatch(props: { id: string; class?: ClassProp }): Element {
+  return h("span", { class: () => cx("hm-swatch", val(props.class)), "data-hm-theme": props.id, "aria-hidden": "true" },
+    h("span", { class: "hm-swatch-a" }), h("span", { class: "hm-swatch-b" }), h("span", { class: "hm-swatch-c" }), h("span", { class: "hm-swatch-d" }));
+}
+
+export interface ThemePickerProps { label?: MaybeFn<string | undefined>; class?: ClassProp; placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end" }
+/** Theme menu: color themes (with live swatches) and light / dark / system. `<ThemePicker />` */
+export function ThemePicker(props: ThemePickerProps = {}): unknown {
+  const modeBtn = (m: ThemeMode, icon: typeof sun, label: () => string): Element => h("button", {
+    type: "button", class: () => cx("hm-theme-mode", mode() === m && "is-active"), "aria-pressed": () => String(mode() === m), onClick: () => theme.set(m),
+  }, glyph(icon), h("span", {}, label));
+  return h(Dropdown, {
+    icon: paletteIcon, label: () => val(props.label) ?? t`Theme`, placement: props.placement ?? "bottom-end", class: props.class, panelClass: "hm-theme-panel",
+    children: [
+      h("div", { class: "hm-theme-modes", role: "group", "aria-label": () => t`Appearance` },
+        modeBtn("light", sun, () => t`Light`), modeBtn("dark", moon, () => t`Dark`), modeBtn("system", monitor, () => t`System`)),
+      h("div", { class: "hm-theme-list", role: "radiogroup", "aria-label": () => t`Theme` },
+        () => infos().map((x) => untrack(() => h("button", {
+          type: "button", role: "radio", class: () => cx("hm-theme-opt", themeName() === x.id && "is-active"), "aria-checked": () => String(themeName() === x.id),
+          onClick: () => setColorTheme(x.id),
+        }, h(ThemeSwatch, { id: x.id }), h("span", { class: "hm-theme-opt-text" }, h("span", { class: "hm-theme-opt-name" }, x.name),
+          x.description ? h("span", { class: "hm-theme-opt-desc" }, x.description) : null),
+          h("span", { class: "hm-theme-opt-check", "aria-hidden": "true" }, glyph(check)))))),
+    ],
+  });
+}
+
 export interface ThemeToggleProps { class?: ClassProp }
 /** Cycles system → light → dark. `<ThemeToggle />` */
 export function ThemeToggle(props: ThemeToggleProps = {}): Element {
   const labels: Record<ThemeMode, () => string> = { system: () => t`System theme`, light: () => t`Light theme`, dark: () => t`Dark theme` };
-  const icons: Record<ThemeMode, string> = { system: "◐", light: "☀", dark: "☾" };
+  const icons = { system: monitor, light: sun, dark: moon } as const;
   return h("button", {
     type: "button", class: () => cx("hm-icon-btn", "hm-theme-toggle", val(props.class)),
     "aria-label": () => `${labels[mode()]()} — ${t`change theme`}`, title: () => labels[mode()](),
     onClick: () => theme.set(MODES[(MODES.indexOf(mode.peek()) + 1) % MODES.length] as ThemeMode),
-  }, () => icons[mode()]);
+  }, () => glyph(icons[mode()]));
 }
 
 export interface LocaleOption { value: string; label: string }
@@ -110,5 +168,5 @@ export function UpdateBanner(props: UpdateBannerProps = {}): () => unknown {
   return () => show() && untrack(() => h("div", { class: () => cx("hm-update", val(props.class)), role: "status", "aria-live": "polite" },
     h("span", {}, () => val(props.text) ?? t`A new version is available`),
     h("button", { type: "button", class: "hm-btn hm-btn-primary hm-btn-sm", onClick: () => (props.onReload ?? (() => globalThis.location.reload()))() }, () => val(props.reloadText) ?? t`Reload`),
-    h("button", { type: "button", class: "hm-icon-btn", "aria-label": () => t`Dismiss`, onClick: () => hidden.set(true) }, "×")));
+    h("button", { type: "button", class: "hm-icon-btn", "aria-label": () => t`Dismiss`, onClick: () => hidden.set(true) }, glyph(xIcon))));
 }

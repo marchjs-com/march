@@ -204,5 +204,13 @@ const tr: Record<string, string> = {
   "{0}–{1} of {2}": "{0}–{1} / {2}",
   "…": "…",
   "↑↓ to move · Enter to open · Esc to close": "↑↓ gez · Enter aç · Esc kapat",
+  "Expand sidebar": "Kenar çubuğunu genişlet",
+  "Collapse sidebar": "Kenar çubuğunu daralt",
+  "Skip to content": "İçeriğe geç",
+  "Theme": "Tema",
+  "Appearance": "Görünüm",
+  "Light": "Açık",
+  "Dark": "Koyu",
+  "System": "Sistem",
 };
 export default tr;

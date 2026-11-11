@@ -130,7 +130,7 @@ test("Stat: delta sign, arrow and classes", () => {
   assert.equal(el.querySelector(".hm-stat-value").textContent, "$120.00");
   assert.ok(delta().classList.contains("hm-stat-up") && delta().classList.contains("hm-stat-good"));
   assert.equal(el.querySelector(".hm-stat-delta-value").textContent, "+20%");
-  assert.equal(el.querySelector(".hm-stat-arrow").textContent, "▲");
+  assert.equal(el.querySelector(".hm-stat-arrow").textContent, "↑");
   val.set(80);
   assert.ok(delta().classList.contains("hm-stat-down") && delta().classList.contains("hm-stat-bad"));
   assert.equal(el.querySelector(".hm-stat-delta-value").textContent, "−20%");

@@ -232,7 +232,10 @@ test("NavMenu: groups sort, collapse, pins and recent persist; filter folds and 
   m.el.querySelector('[data-pin="reports"]').click();
   R.navigate("/users/7");
   await tick();
-  assert.ok(m.el.querySelector('[data-id="users"][data-where="recent"]').classList.contains("is-active"));
+  assert.equal(m.el.querySelector('[data-id="users"][data-where="recent"]'), null, "the current page is not repeated under Recent");
+  R.navigate("/");
+  await tick();
+  assert.ok(m.el.querySelector('[data-id="users"][data-where="recent"]'), "visited pages show under Recent");
   assert.ok(m.el.querySelector('[data-id="reports"][data-where="pinned"]'));
   const saved = JSON.parse(localStorage.getItem("t.nav"));
   assert.deepEqual(saved, { collapsed: ["People"], pins: ["reports"], recent: ["users"] });

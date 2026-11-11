@@ -6,7 +6,7 @@
   --hm-ease-in-out: cubic-bezier(.65, 0, .35, 1); --hm-ease-back: cubic-bezier(.34, 1.56, .64, 1);
   --hm-ease-expo: cubic-bezier(.16, 1, .3, 1);
   --hm-glow: 0 0 24px color-mix(in srgb, var(--hm-primary) 55%, transparent);
-  --hm-gradient: linear-gradient(120deg, #6d5dfc, #3b82f6 35%, #22d3ee 70%, #a3e635);
+  --hm-gradient: var(--hm-brand-gradient, linear-gradient(120deg, #6d5dfc, #3b82f6 35%, #22d3ee 70%, #a3e635));
 }
 
 /* View Transitions (router pageTransitions) */
@@ -30,7 +30,7 @@
 
 /* Effects */
 .hm-gradient-text { background: var(--hm-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.hm-gradient-bg { background: var(--hm-gradient); color: #fff; }
+.hm-gradient-bg { background: var(--hm-gradient); color: var(--hm-on-mark, #fff); }
 .hm-glass { background: color-mix(in srgb, var(--hm-surface) 55%, transparent); backdrop-filter: blur(14px) saturate(140%); border: 1px solid color-mix(in srgb, var(--hm-text) 10%, transparent); }
 .hm-glow { box-shadow: var(--hm-glow); }
 .hm-glow-text { text-shadow: 0 0 18px color-mix(in srgb, var(--hm-primary) 60%, transparent); }

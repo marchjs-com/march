@@ -4,7 +4,9 @@ import { signal, createRoot, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { For, Portal } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
-import { val, type MaybeFn } from "./util.ts";
+import { val, glyph, type MaybeFn } from "./util.ts";
+import { x as xIcon, info, checkCircle, alertTriangle, alertCircle } from "../icons/set.ts";
+const KIND_ICON = { info, success: checkCircle, warn: alertTriangle, danger: alertCircle } as const;
 
 export type ToastKind = "info" | "success" | "warn" | "danger";
 export interface ToastAction { label: MaybeFn<string>; run: () => unknown }
@@ -61,10 +63,11 @@ export function ToastHost(_props?: Record<string, never>): Element {
       const x = item.peek();
       const act = x.action;
       return h("div", { class: `hm-toast hm-toast-${x.kind}`, role: x.kind === "danger" ? "alert" : "status" },
+        h("span", { class: "hm-toast-icon", "aria-hidden": "true" }, glyph(KIND_ICON[x.kind as keyof typeof KIND_ICON] ?? info)),
         h("div", { class: "hm-toast-msg" }, () => val(x.message)),
         act && h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm hm-toast-action",
           onClick: async () => { toast.dismiss(x.id); try { await act.run(); } catch (e) { toast((e as { message?: string } | null)?.message || t`Something went wrong.`, { kind: "danger" }); } } },
           () => val(act.label)),
-        h("button", { type: "button", class: "hm-toast-close", "aria-label": () => t`Dismiss`, onClick: () => toast.dismiss(x.id) }, "×"));
+        h("button", { type: "button", class: "hm-toast-close", "aria-label": () => t`Dismiss`, onClick: () => toast.dismiss(x.id) }, glyph(xIcon)));
     } }));
 }

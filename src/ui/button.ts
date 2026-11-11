@@ -9,7 +9,8 @@ import { toast } from "./toast.ts";
 import { floating, type Placement } from "./popover.ts";
 import { roving } from "./focus.ts";
 import { formatKey } from "./keys.ts";
-import { val, cx, rest, uid, icon, later, debounce, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, rest, uid, icon, glyph, later, debounce, type MaybeFn, type ClassProp } from "./util.ts";
+import { check, copy as copyIcon } from "../icons/set.ts";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -276,5 +277,5 @@ export function CopyButton(props: CopyButtonProps): Element {
     type: "button", class: () => cx(props.iconOnly ? "hm-icon-btn" : "hm-btn hm-btn-ghost hm-btn-sm", "hm-copy", copied() && "is-copied", val(props.class)),
     onClick: copy, "aria-live": "polite",
     "aria-label": () => (props.iconOnly ? (copied() ? t`Copied` : val(props.label) ?? t`Copy`) : null),
-  }, () => (props.iconOnly ? (copied() ? "✓" : "⧉") : copied() ? t`Copied` : val(props.label) ?? t`Copy`));
+  }, () => (props.iconOnly ? glyph(copied() ? check : copyIcon) : copied() ? t`Copied` : val(props.label) ?? t`Copy`));
 }

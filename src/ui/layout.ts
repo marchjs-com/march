@@ -6,7 +6,8 @@ import { Link, back as historyBack, type Href } from "../router/index.ts";
 import { actionsOf, type ActionsProp } from "./display.ts";
 import { Tabs, type TabSpec } from "./tabs.ts";
 import { key } from "./keys.ts";
-import { val, cx, rest, debounce, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, rest, debounce, glyph, type MaybeFn, type ClassProp } from "./util.ts";
+import { arrowLeft, search as searchIcon, x as xIcon, chevronLeft, chevronRight } from "../icons/set.ts";
 
 /** A breadcrumb; the last one is the current page. */
 export interface Breadcrumb { label: MaybeFn<string>; href?: Href }
@@ -39,8 +40,8 @@ export function Page(props: PageProps): Element {
         h("ol", {}, crumbs().map((c, i, a) => h("li", {}, c.href && i < a.length - 1 ? h(Link, { href: c.href, children: () => val(c.label) }) : h("span", { "aria-current": i === a.length - 1 ? "page" : null }, () => val(c.label)))))),
       h("div", { class: "hm-page-titlebar" },
         props.back != null && (typeof props.back === "string"
-          ? h(Link, { href: props.back, class: "hm-icon-btn hm-page-back", "aria-label": t`Back`, children: "←" })
-          : h("button", { type: "button", class: "hm-icon-btn hm-page-back", "aria-label": () => t`Back`, onClick: () => (typeof props.back === "function" ? props.back() : historyBack()) }, "←")),
+          ? h(Link, { href: props.back, class: "hm-icon-btn hm-page-back", "aria-label": t`Back`, children: glyph(arrowLeft) })
+          : h("button", { type: "button", class: "hm-icon-btn hm-page-back", "aria-label": () => t`Back`, onClick: () => (typeof props.back === "function" ? props.back() : historyBack()) }, glyph(arrowLeft))),
         h("div", { class: "hm-page-titles" },
           h("h1", { class: "hm-page-title" }, () => val(props.title)),
           props.subtitle != null && h("p", { class: "hm-page-sub" }, () => val(props.subtitle))),
@@ -84,7 +85,7 @@ export function ListDetail(props: ListDetailProps): Element {
     h("div", { class: "hm-ld-list", "aria-label": () => val(props.listLabel) ?? null }, props.list),
     h("div", { class: "hm-ld-detail", role: "region", "aria-label": () => val(props.detailLabel) ?? t`Details` },
       () => (has()
-        ? [props.onBack && h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm hm-ld-back", onClick: () => props.onBack?.() }, () => `← ${t`Back`}`),
+        ? [props.onBack && h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm hm-ld-back", onClick: () => props.onBack?.() }, glyph(arrowLeft), () => t`Back`),
           untrack(() => (typeof props.detail === "function" && !props.detail.length ? (props.detail as () => unknown)() : props.detail))]
         : props.empty ?? h("p", { class: "hm-empty" }, () => t`Select an item to see its details.`))));
 }
@@ -127,9 +128,9 @@ export function Pager(props: PagerProps): Element {
     props.sizes && !cursor && h("select", { class: "hm-select hm-select-sm", "aria-label": () => t`Rows per page`, onChange: (e: Event) => props.onSize?.(Number((e.target as HTMLSelectElement).value)) },
       props.sizes.map((s) => h("option", { value: String(s), selected: () => size() === s }, String(s)))),
     h("div", { class: "hm-pager-btns" },
-      h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", "data-prev": "", disabled: () => !prevOk(), onClick: () => (cursor ? props.onPrev?.() : go(page() - 1)) }, () => `‹ ${t`Previous`}`),
+      h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", "data-prev": "", disabled: () => !prevOk(), onClick: () => (cursor ? props.onPrev?.() : go(page() - 1)) }, glyph(chevronLeft), () => t`Previous`),
       !cursor && h("span", { class: "hm-pager-page" }, () => t`Page ${page()} of ${pages()}`),
-      h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", "data-next": "", disabled: () => !nextOk(), onClick: () => (cursor ? props.onNext?.() : go(page() + 1)) }, () => `${t`Next`} ›`)));
+      h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", "data-next": "", disabled: () => !nextOk(), onClick: () => (cursor ? props.onNext?.() : go(page() + 1)) }, () => t`Next`, glyph(chevronRight))));
 }
 
 export interface SearchBoxProps {
@@ -165,7 +166,7 @@ export function SearchBox(props: SearchBoxProps): Element {
   const filled = computed(() => current() !== "");
   const clear = (): void => { current.set(""); if (input) input.value = ""; emit.cancel(); write(""); props.onSearch?.(""); input?.focus(); };
   return h("div", { class: () => cx("hm-search", val(props.class)), role: "search" },
-    h("span", { class: "hm-search-icon", "aria-hidden": "true" }, "⌕"),
+    h("span", { class: "hm-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
     h("input", {
       type: "search", class: "hm-input hm-search-input", ref: (x: HTMLInputElement) => { input = x; }, value: current.peek(),
       placeholder: () => val(props.placeholder) ?? t`Search…`, "aria-label": () => val(props.label) ?? val(props.placeholder) ?? t`Search`,
@@ -176,20 +177,31 @@ export function SearchBox(props: SearchBoxProps): Element {
         else if (e.key === "Enter") { emit.cancel(); write(current.peek()); props.onSearch?.(current.peek()); props.onEnter?.(current.peek()); }
       },
     }),
-    () => filled() && h("button", { type: "button", class: "hm-icon-btn hm-search-clear", "aria-label": () => t`Clear search`, onClick: clear }, "×"),
+    () => filled() && h("button", { type: "button", class: "hm-icon-btn hm-search-clear", "aria-label": () => t`Clear search`, onClick: clear }, glyph(xIcon)),
     props.shortcut && h("kbd", { class: "hm-kbd hm-search-kbd", "aria-hidden": "true" }, props.shortcut === true ? "/" : props.shortcut));
 }
 
-export interface AppShellProps { nav?: unknown; top?: unknown; mainId?: string; class?: ClassProp; children?: unknown }
+export interface AppShellProps {
+  nav?: unknown;
+  /** Above everything in the main column (banners). */
+  top?: unknown;
+  /** Sticky top bar of the main column (title, search, user menu). On narrow screens the menu button sits in it. */
+  header?: unknown;
+  mainId?: string;
+  class?: ClassProp;
+  children?: unknown;
+}
 /**
  * Application frame: a sidebar (usually <NavMenu/>) and the main area. Desktop: sticky sidebar column + scrolling main.
  * Narrow screens: a slim top bar with the menu button (the NavMenu becomes a drawer) and full-width main.
  * `<AppShell nav={<NavMenu items={…} />} top={<UpdateBanner/>}>…pages…</AppShell>`
  */
 export function AppShell(props: AppShellProps): Element {
-  return h("div", { class: () => cx("hm-shell", val(props.class)) },
+  return h("div", { class: () => cx("hm-shell", props.header != null && "hm-shell-has-header", val(props.class)) },
+    h("a", { class: "hm-skip", href: `#${props.mainId ?? "main"}` }, () => t`Skip to content`),
     h("aside", { class: "hm-shell-nav" }, () => props.nav),
     h("div", { class: "hm-shell-body" },
       props.top != null ? h("div", { class: "hm-shell-top" }, () => props.top) : null,
+      props.header != null ? h("header", { class: "hm-shell-header" }, () => props.header) : null,
       h("main", { class: "hm-shell-main", id: props.mainId ?? "main", tabindex: "-1" }, () => props.children)));
 }

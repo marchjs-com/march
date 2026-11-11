@@ -7,7 +7,8 @@ import { applyPipe, toDate } from "../core/pipes.ts";
 import { isAction } from "./action.ts";
 import { ActionButton, CopyButton } from "./button.ts";
 import { formatKey } from "./keys.ts";
-import { val, cx, rest, icon, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, rest, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
+import { x as xIcon, info, checkCircle, alertTriangle, alertCircle } from "../icons/set.ts";
 
 /** Tones of badges, alerts and timeline items. */
 export type Tone = "neutral" | "info" | "success" | "warn" | "danger" | (string & {});
@@ -133,14 +134,15 @@ export function Alert(props: AlertProps): () => unknown {
   return () => shown() && untrack(() => {
     const tone = val(props.tone) ?? "info";
     return h("div", { class: () => cx("hm-alert", `hm-alert-${val(props.tone) ?? "info"}`, val(props.class)), role: tone === "danger" || tone === "warn" ? "alert" : "status" },
-      icon(props.icon, "hm-alert-icon"),
+      icon(props.icon === undefined ? TONE_ICON[tone] ?? info : props.icon, "hm-alert-icon"),
       h("div", { class: "hm-alert-main" },
         props.title != null && h("strong", { class: "hm-alert-title" }, () => val(props.title)),
         h("div", { class: "hm-alert-body" }, props.body ?? props.children)),
-      props.dismissable && h("button", { type: "button", class: "hm-icon-btn hm-alert-x", "aria-label": () => t`Dismiss`, onClick: () => { shown.set(false); props.onDismiss?.(); } }, "×"));
+      props.dismissable && h("button", { type: "button", class: "hm-icon-btn hm-alert-x", "aria-label": () => t`Dismiss`, onClick: () => { shown.set(false); props.onDismiss?.(); } }, glyph(xIcon)));
   });
 }
 export const Notice = Alert;
+const TONE_ICON: Record<string, typeof info> = { info, success: checkCircle, warn: alertTriangle, danger: alertCircle, neutral: info };
 
 export interface KbdProps { keys?: MaybeFn<string>; children?: unknown }
 /** Keyboard key(s): `<Kbd>Esc</Kbd>`, `<Kbd keys="mod+k" />` → Ctrl+K / ⌘K. */

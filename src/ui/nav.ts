@@ -9,7 +9,8 @@ import { Badge } from "./display.ts";
 import { rank } from "./fold.ts";
 import { compareText } from "../core/text.ts";
 import { registerPages } from "./registry.ts";
-import { val, cx, uid, icon, load, save, on, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, uid, icon, glyph, load, save, on, type MaybeFn, type ClassProp } from "./util.ts";
+import { menu, star, starFilled, chevronRight, search, panelLeft } from "../icons/set.ts";
 
 /** A NavMenu entry. */
 export interface NavItem {
@@ -40,6 +41,12 @@ export interface NavMenuProps {
   filter?: boolean;
   /** false: do not register the pages with the command palette. */
   palette?: boolean;
+  /** Show a button that collapses the sidebar to an icon rail (state persists). */
+  collapsible?: boolean;
+  /** Groups start collapsed; the group of the active page opens itself. */
+  groupsCollapsed?: boolean;
+  /** Icons for group headings (also the default icon of the group's items): `{ "Billing": wallet }`. */
+  groupIcons?: Readonly<Record<string, unknown>>;
   class?: ClassProp;
 }
 
@@ -53,17 +60,20 @@ export function sorter(sort: NavSort | undefined, loc?: string): ((a: { title: M
   return (a, b) => compareText(titleOf(a), titleOf(b), loc);
 }
 
-interface SavedNav { collapsed?: unknown; pins?: unknown; recent?: unknown }
+interface SavedNav { collapsed?: unknown; opened?: unknown; pins?: unknown; recent?: unknown; rail?: unknown }
 
 /** items: [{ id, title, href, icon?, group?, badge?: () => number, keywords?, can?, hidden? }] */
 export function NavMenu(props: NavMenuProps): Element {
   const storeKey = props.storageKey ?? "hm.nav";
   const maxPinned = props.maxPinned ?? 8, maxRecent = props.maxRecent ?? 5;
   const saved = load<SavedNav | null>(storeKey, {}) ?? {};
-  const collapsed = signal(new Set(arr<string>(saved.collapsed)));
+  const startClosed = !!props.groupsCollapsed;
+  // groupsCollapsed: the set holds the groups the user opened; otherwise the ones they closed
+  const collapsed = signal(new Set(arr<string>(startClosed ? saved.opened : saved.collapsed)));
+  const rail = signal(!!props.collapsible && saved.rail === true);
   const pins = signal(arr<string>(saved.pins));
   const recent = signal(arr<string>(saved.recent));
-  const persist = (): void => save(storeKey, { collapsed: [...collapsed.peek()], pins: pins.peek(), recent: recent.peek() });
+  const persist = (): void => save(storeKey, { [startClosed ? "opened" : "collapsed"]: [...collapsed.peek()], pins: pins.peek(), recent: recent.peek(), ...(props.collapsible ? { rail: rail.peek() } : {}) });
   const q = signal("");
   const open = signal(false);
   const navId = uid("hm-nav");
@@ -94,6 +104,10 @@ export function NavMenu(props: NavMenuProps): Element {
     const id = active();
     untrack(() => {
       open.set(false);
+      if (id != null && startClosed) {
+        const g = byId.peek().get(id)?.group;
+        if (g && !collapsed.peek().has(g)) collapsed.update((s) => new Set(s).add(g));
+      }
       if (id == null || maxRecent <= 0) return;
       const next = [id, ...recent.peek().filter((x) => x !== id)].slice(0, maxRecent);
       if (next.join("\n") !== recent.peek().join("\n")) { recent.set(next); persist(); }
@@ -115,15 +129,16 @@ export function NavMenu(props: NavMenuProps): Element {
   const item = (x: NavItem, where: string): Element => h("li", { class: "hm-nav-li" },
     h(Link, {
       href: x.href, "data-id": x.id, "data-where": where,
-      class: () => cx("hm-nav-item", active() === x.id && "is-active"),
-      children: [icon(x.icon, "hm-icon hm-nav-icon"), h("span", { class: "hm-nav-label" }, () => titleOf(x)),
+      class: () => cx("hm-nav-item", active() === x.id && "is-active"), title: () => (rail() ? titleOf(x) : null),
+      "aria-current": () => (active() === x.id ? "page" : null),
+      children: [icon(x.icon ?? (x.group ? props.groupIcons?.[x.group] : undefined), "hm-icon hm-nav-icon"), h("span", { class: "hm-nav-label" }, () => titleOf(x)),
         x.badge !== undefined && h(Badge, { count: () => val(x.badge), max: 99 })],
     }),
     h("button", {
       type: "button", class: () => cx("hm-nav-pin", isPinned(x.id) && "is-pinned"), "data-pin": x.id,
       "aria-pressed": () => String(isPinned(x.id)), "aria-label": () => (isPinned(x.id) ? t`Unpin ${titleOf(x)}` : t`Pin ${titleOf(x)}`),
       onClick: () => togglePin(x.id),
-    }, () => (isPinned(x.id) ? "★" : "☆")));
+    }, () => glyph(isPinned(x.id) ? starFilled : star)));
 
   const block = (label: () => string, list: NavItem[], where: string, cls: string): Element => h("div", { class: cx("hm-nav-group", cls) },
     h("div", { class: "hm-nav-heading" }, label),
@@ -138,7 +153,9 @@ export function NavMenu(props: NavMenuProps): Element {
     }
     const m = byId();
     const pinned = pins().map((id) => m.get(id)).filter((x): x is NavItem => !!x);
-    const rec = recent().map((id) => m.get(id)).filter((x): x is NavItem => !!x);
+    // recents: grouped items other than the current page (top-level items are always visible anyway)
+    const cur = active();
+    const rec = recent().map((id) => m.get(id)).filter((x): x is NavItem => !!x && !!x.group && x.id !== cur);
     const gs = groups();
     return untrack(() => [
       pinned.length > 0 && block(() => t`Pinned`, pinned, "pinned", "hm-nav-pinned"),
@@ -146,23 +163,29 @@ export function NavMenu(props: NavMenuProps): Element {
       gs.map((g) => {
         if (g.name === "") return h("ul", { class: "hm-nav-list" }, g.items.map((x) => item(x, "main")));
         const gid = uid("hm-navg");
-        const isOpen = (): boolean => !collapsed().has(g.name);
+        const isOpen = (): boolean => rail() || (collapsed().has(g.name) === startClosed);
         return h("div", { class: "hm-nav-group" },
           h("button", { type: "button", class: "hm-nav-gbtn", "data-group": g.name, "aria-expanded": () => String(isOpen()), "aria-controls": gid, onClick: () => toggleGroup(g.name) },
-            h("span", { class: "hm-nav-chev", "aria-hidden": "true" }, () => (isOpen() ? "▾" : "▸")), g.name),
+            icon(props.groupIcons?.[g.name], "hm-icon hm-nav-gicon"), h("span", { class: "hm-nav-gname" }, g.name),
+            h("span", { class: "hm-nav-chev", "aria-hidden": "true" }, glyph(chevronRight))),
           h("ul", { class: "hm-nav-list", id: gid, hidden: () => !isOpen() }, g.items.map((x) => item(x, "main"))));
       }),
     ]);
   };
 
-  return h("div", { class: () => cx("hm-nav-wrap", open() && "is-open", val(props.class)) },
-    h("button", { type: "button", class: "hm-icon-btn hm-nav-burger", "aria-controls": navId, "aria-expanded": () => String(open()), "aria-label": () => t`Menu`, onClick: () => open.update((x) => !x) }, "☰"),
+  const toggleRail = (): void => { rail.update((x) => !x); persist(); };
+  return h("div", { class: () => cx("hm-nav-wrap", open() && "is-open", rail() && "is-rail", val(props.class)) },
+    h("button", { type: "button", class: "hm-icon-btn hm-nav-burger", "aria-controls": navId, "aria-expanded": () => String(open()), "aria-label": () => t`Menu`, onClick: () => open.update((x) => !x) }, glyph(menu)),
     h("div", { class: "hm-nav-scrim", "aria-hidden": "true", onClick: () => open.set(false) }),
     h("nav", { class: "hm-nav", id: navId, "aria-label": () => val(props.label) ?? t`Main` },
-      props.brand != null && h("div", { class: "hm-nav-brand" }, props.brand),
+      (props.brand != null || props.collapsible) && h("div", { class: "hm-nav-brand" },
+        props.brand != null && h("div", { class: "hm-nav-brand-main" }, props.brand),
+        props.collapsible && h("button", { type: "button", class: "hm-icon-btn hm-btn-sm hm-nav-rail-btn", "aria-pressed": () => String(rail()),
+          "aria-label": () => (rail() ? t`Expand sidebar` : t`Collapse sidebar`), title: () => (rail() ? t`Expand sidebar` : t`Collapse sidebar`), onClick: toggleRail }, glyph(panelLeft))),
       props.filter !== false && h("div", { class: "hm-nav-filter" },
+        h("span", { class: "hm-nav-filter-icon", "aria-hidden": "true" }, glyph(search)),
         h("input", {
-          type: "search", class: "hm-input hm-input-sm", placeholder: () => t`Filter…`, "aria-label": () => t`Filter menu`,
+          type: "search", class: "hm-input hm-input-sm hm-nav-filter-input", placeholder: () => t`Filter…`, "aria-label": () => t`Filter menu`,
           onInput: (e: Event) => q.set((e.target as HTMLInputElement).value),
           onKeydown: (e: KeyboardEvent) => {
             const el = e.target as HTMLInputElement;

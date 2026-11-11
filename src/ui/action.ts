@@ -35,7 +35,7 @@ export interface ActionOptions<A extends unknown[] = unknown[], R = unknown, F e
   can?: PermCheck;
   /** Shortcut shown in menus and on buttons (e.g. "mod+backspace"). */
   key?: string;
-  icon?: string;
+  icon?: unknown;
   /** Success toast text (false = none). */
   success?: string | false | Fn<[result: R], string>;
   hidden?: Fn<A, boolean>;

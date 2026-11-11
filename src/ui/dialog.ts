@@ -5,7 +5,8 @@ import { signal, createRoot, onCleanup, untrack, type Signal } from "../core/rea
 import { h } from "../dom/h.ts";
 import { Portal } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
-import { val, cx, uid, type MaybeFn } from "./util.ts";
+import { val, cx, uid, glyph, type MaybeFn } from "./util.ts";
+import { x as xIcon } from "../icons/set.ts";
 import { trapTab, focusables } from "./focus.ts";
 
 export type DialogSize = "sm" | "md" | "lg" | "full";
@@ -72,7 +73,7 @@ export function frame(o: FrameOptions): HTMLElement {
   },
   o.title != null && h("div", { class: "hm-dialog-head" },
     h("h2", { id: titleId, class: "hm-dialog-title" }, () => val(o.title)),
-    () => dismissable() && h("button", { type: "button", class: "hm-icon-btn hm-dialog-x", "aria-label": () => t`Close`, onClick: () => o.onClose() }, "×")),
+    () => dismissable() && h("button", { type: "button", class: "hm-icon-btn hm-dialog-x", "aria-label": () => t`Close`, onClick: () => o.onClose() }, glyph(xIcon))),
   h("div", { class: "hm-dialog-body", ref: (x: HTMLElement) => { body = x; } }, o.children),
   o.footer != null && h("div", { class: "hm-dialog-foot" }, o.footer))) as HTMLElement;
   queueMicrotask(() => {

@@ -88,6 +88,29 @@ Runtime names and your `src/components/*` are auto-imported. Without the compile
 Docs: [`docs/`](docs) · Examples: [`examples/`](examples) (counter, form, router, async, table, charts, **showcase**) ·
 Türkçe: [`README.tr.md`](README.tr.md) · Changes: [`CHANGELOG.md`](CHANGELOG.md)
 
+## Themes
+
+Every component reads design tokens (CSS custom properties). A theme is ~25 colors per mode (light and dark), a body and a
+display font and a base radius; surfaces, hover and soft tints, borders, radii and shadows are derived with `color-mix()`.
+Built-in themes (`src/theme/presets.ts` → `src/css/themes.css`): **hadi** (default, the HADİ Sosyal brand: Figtree +
+Bricolage Grotesque), krem, gece, neon, indigo, minimal, kontrast. Switching is one attribute, no inline styles:
+
+```js
+import "hadi-march/css/font.css";      // self-hosted Inter, Figtree, Bricolage Grotesque (OFL), font-src 'self'
+import "hadi-march/css/tokens.css";     // tokens + every built-in theme
+import { setColorTheme, setTheme, ThemePicker } from "hadi-march/ui";
+
+setColorTheme("neon");                 // <html data-hm-theme="neon">, remembered in localStorage
+setTheme("dark");                      // light | dark | system
+<ThemePicker />                        // theme list with live swatches + appearance switch
+<section data-hm-theme="gece">…</section>   // scope a theme to part of the page
+```
+
+Write your own: `defineTheme({ id, name, font, display, radius, light: {...}, dark: {...} })` from `hadi-march/theme`,
+write `themeCss(def)` to a .css file at build time, load it, and `registerThemes([{ id, name }])` to offer it in pickers.
+Icons: `hadi-march/icons` (132 original SVG icons, each a separate export, rendered with createElementNS).
+Live gallery of everything: `node examples/showcase/build.mjs --serve`.
+
 ## Performance
 
 `npm run bench` creates/updates keyed lists of 1,000 and 10,000 rows and runs table, chart (10k–100k points with LTTB)

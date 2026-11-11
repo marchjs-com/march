@@ -163,3 +163,6 @@
 @media (max-width:40rem){.hm-hide-sm{display:none!important}}
 @media (max-width:48rem){.hm-hide-md{display:none!important}}
 @media (max-width:64rem){.hm-hide-lg{display:none!important}}
+/* responsive grids: sx cols collapse on tablets and phones */
+@media (max-width:64rem){.hm-cols-3,.hm-cols-4,.hm-cols-5,.hm-cols-6{grid-template-columns:repeat(2,minmax(0,1fr))}.hm-span-3,.hm-span-4,.hm-span-5,.hm-span-6,.hm-span-7,.hm-span-8,.hm-span-9,.hm-span-10,.hm-span-11,.hm-span-12{grid-column:1/-1}}
+@media (max-width:40rem){[class*="hm-cols-"]{grid-template-columns:minmax(0,1fr)}[class*="hm-span-"]{grid-column:auto}}
