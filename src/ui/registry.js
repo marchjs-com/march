@@ -1,5 +1,5 @@
 // Shared registries: pages (from NavMenu) and commands, searched by the command palette.
-import { signal, getOwner, onCleanup } from "../core/reactive.js";
+import { signal, getOwner, onCleanup } from "../core/reactive.ts";
 import { val } from "./util.js";
 
 const pageLists = signal([], { name: "palette.pages" });

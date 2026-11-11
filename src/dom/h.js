@@ -2,7 +2,7 @@
 // `h(tag, props, ...children)` creates real nodes once. A function (signal, computed, compiler thunk) placed in a child or
 // attribute position becomes a live binding: only that text node / attribute / region updates when its signals change.
 // Security: no HTML strings ever (no innerHTML), URL attributes are sanitized, <script> cannot be created, Trusted Types safe.
-import { effect, untrack, batch, getOwner, runWithOwner, reportError, isReactive, onCleanup, signal, DEV, useContext } from "../core/reactive.js";
+import { effect, untrack, batch, getOwner, runWithOwner, reportError, isReactive, onCleanup, signal, DEV, useContext } from "../core/reactive.ts";
 import { sx as resolveSx } from "../core/sx.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";

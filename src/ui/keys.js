@@ -1,6 +1,6 @@
 // Global keyboard shortcuts. `key("mod+k", fn, { when, description, inInputs })` — mod = ⌘ on macOS, Ctrl elsewhere.
 // Shortcuts registered inside a component are removed with it. `shortcuts()` lists described shortcuts for a help dialog.
-import { signal, getOwner, onCleanup, untrack } from "../core/reactive.js";
+import { signal, getOwner, onCleanup, untrack } from "../core/reactive.ts";
 
 const registry = signal([], { name: "shortcuts" });
 let installed = false;

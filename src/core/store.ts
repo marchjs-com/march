@@ -5,7 +5,7 @@
 //   subscribe(app.cart, (c) => …)   on(app, "cart.items", fn)   on(app, "users.*.name", fn)   // change events
 //   batch(() => { … })  → listeners get ONE { op: "batch", changes } event
 //   persist(app.prefs, "prefs")  history(app.form)  readonly(app)  snapshot(app)  derive(() => app.cart.items.length)
-import { signal, batch, untrack, computed, afterBatch, isBatching, DEV } from "./reactive.js";
+import { signal, batch, untrack, computed, afterBatch, isBatching, DEV } from "./reactive.ts";
 
 // ------------------------------------------------------------------ types
 type Primitive = string | number | boolean | bigint | symbol | null | undefined | Date | RegExp | ((...a: never[]) => unknown);

@@ -1,5 +1,5 @@
 // Small helpers shared by the ui components.
-import { onCleanup, getOwner } from "../core/reactive.js";
+import { onCleanup, getOwner } from "../core/reactive.ts";
 
 /** Read a value-like prop that may be an accessor (signal, getter thunk, zero-arg function). */
 export const val = (v) => (typeof v === "function" && !v.length ? v() : v);

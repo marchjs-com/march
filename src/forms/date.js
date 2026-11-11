@@ -1,6 +1,6 @@
 // Dates are plain ISO strings ("2026-03-14"); arithmetic runs in UTC so DST never shifts a day.
 // Calendar (month grid, full keyboard), DatePicker (input + popover), TimeInput, DateTimeInput, DateRangePicker (presets).
-import { signal, computed, effect, untrack, onCleanup, reactive } from "../core/reactive.js";
+import { signal, computed, effect, untrack, onCleanup, reactive } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { t, locale } from "../core/i18n.ts";
 import { toDate } from "../core/pipes.js";

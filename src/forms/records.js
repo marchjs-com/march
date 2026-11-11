@@ -7,7 +7,7 @@
 // disabled, removable (default true), sortable (default true), cols (fields per line, default = number of fields, max 6).
 // Validation (schema type `records`): every row is validated with the sub-schema; the first problem is reported as
 // "Row N: <field label>: <message>".
-import { computed, untrack, reactive } from "../core/reactive.js";
+import { computed, untrack, reactive } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { For } from "../dom/flow.js";
 import { t } from "../core/i18n.ts";

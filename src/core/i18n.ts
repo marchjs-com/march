@@ -5,7 +5,7 @@
 //   t("greet", { g: "female", name })                  "{g, select, female {Welcome, {name}} other {Hi {name}}}"
 //   loadLocale("de", () => import("./de.js"));  await setLocale("de")
 //   const tt = typed<typeof en>();  tt("cart.items", { n: 1 })   // keys and variables type-checked
-import { signal, computed, untrack } from "./reactive.js";
+import { signal, computed, untrack } from "./reactive.ts";
 
 type Dict = Record<string, string>;
 interface Sig<T> { (): T; peek(): T; set(v: T): T }

@@ -3,7 +3,7 @@
 //     .add(".title", [{ opacity: 0, transform: "translateY(20px)" }, { opacity: 1, transform: "none" }])
 //     .add(".card", fadeUp, { stagger: 60, at: "-=200" })
 //   tl.play()
-import { signal } from "../core/reactive.js";
+import { signal } from "../core/reactive.ts";
 import { animate, stagger as staggerFn, type AnimateOptions, type Controls, type Frames } from "./animate.ts";
 import { frame } from "./env.ts";
 

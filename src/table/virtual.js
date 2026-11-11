@@ -1,5 +1,5 @@
 // Virtual scrolling for fixed-height rows: only the visible window (+ overscan) is rendered, spacers keep the scroll size.
-import { signal, computed } from "../core/reactive.js";
+import { signal, computed } from "../core/reactive.ts";
 
 /** Rows [start, end) to render and the spacer heights above/below them. */
 export function windowRange({ count, scrollTop = 0, height, rowHeight, overscan = 6 }) {

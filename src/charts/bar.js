@@ -1,7 +1,7 @@
 // BarChart: categories × series, grouped (default) or `stacked`, vertical (default) or `horizontal`.
 // Bars are a keyed list ("category|series"); each rect binds x/y/width/height through computeds, so a data change only
 // writes the attributes of bars whose geometry changed.
-import { signal, computed, read, untrack } from "../core/reactive.js";
+import { signal, computed, read, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { For } from "../dom/flow.js";
 import { scaleLinear, scaleBand, niceTicks } from "./scale.js";

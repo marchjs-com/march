@@ -5,7 +5,7 @@
 //   users()            → data (reactive)          users.loading() / users.error() / users.refreshing()
 //   users.refetch()    users.mutate(v)            invalidate("users")   (refetches every active query whose key starts with "users")
 //   const save = mutation((u) => api.save(u), { invalidates: ["users"] });  await save(u); save.pending()
-import { signal, computed, effect, untrack, onCleanup, batch, getOwner } from "../core/reactive.js";
+import { signal, computed, effect, untrack, onCleanup, batch, getOwner } from "../core/reactive.ts";
 
 const defaults = { retry: 2, retryDelay: 300, staleTime: 0, cacheTime: 5 * 60_000, refetchOnFocus: true, isRetryable: null, onError: null };
 /** Change global defaults: `configure({ retry: 1, onError: (e) => toast.error(e.message) })`. */

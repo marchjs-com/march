@@ -4,7 +4,7 @@
 //   setAccess({ user: { id, name }, roles: ["admin"], perms: ["users.edit"], methods: ["password"] })
 //   can("users.edit")   hasRole("admin")   role()   <Can perm="users.edit" fallback={…}>…</Can>
 //   <Gate method="phone" fallback={(why) => <p>Sign in with phone</p>}>…</Gate>   (sign-in method gate)
-import { signal } from "../core/reactive.js";
+import { signal } from "../core/reactive.ts";
 
 const EMPTY = Object.freeze({ user: null, roles: [], perms: [], methods: [], meta: {} });
 const state = signal(EMPTY, { name: "access" });

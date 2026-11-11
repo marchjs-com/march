@@ -1,7 +1,7 @@
 // Command palette (Ctrl/⌘+K): searches registered commands, NavMenu pages and actions with typo-tolerant ranking.
 // Optional `ask(query)` hook (e.g. an AI intent search provided by the app) adds an "Ask" row; it runs on Enter, or by
 // itself after 600 ms when local results are weak. Keyboard: ↑ ↓ PageUp PageDown Enter Esc.
-import { signal, computed, effect, untrack, onCleanup, createRoot } from "../core/reactive.js";
+import { signal, computed, effect, untrack, onCleanup, createRoot } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { t } from "../core/i18n.ts";
 import { navigate } from "../router/index.ts";

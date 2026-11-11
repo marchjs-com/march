@@ -1,5 +1,5 @@
 // Mount a component tree into a container. Returns a disposer that removes the nodes and runs every cleanup.
-import { createRoot } from "../core/reactive.js";
+import { createRoot } from "../core/reactive.ts";
 import { insert, clearBetween, removeNode } from "./h.js";
 
 /** `render(() => <App />, document.getElementById("app"))` */

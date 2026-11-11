@@ -1,6 +1,6 @@
 // FileUpload: drag & drop or click, accept / maxSize checks, image and audio previews (object URLs revoked on cleanup),
 // progress and cancel when an `upload(file, { onProgress, signal })` function is given.
-import { signal, untrack, onCleanup } from "../core/reactive.js";
+import { signal, untrack, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { For } from "../dom/flow.js";
 import { t } from "../core/i18n.ts";

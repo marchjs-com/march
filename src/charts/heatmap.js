@@ -1,6 +1,6 @@
 // Heatmap: x × y grid of cells colored by value level (`hm-heat-0..4`), e.g. weekday × hour.
 // `calendar` mode lays out daily values as weeks (columns) × weekdays (rows), e.g. the last 12 weeks.
-import { signal, computed, read } from "../core/reactive.js";
+import { signal, computed, read } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { For } from "../dom/flow.js";
 import { applyPipe, toDate } from "../core/pipes.js";

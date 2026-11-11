@@ -5,7 +5,7 @@
 //
 //   createRouter({ routes, redirects: { "/old": "/new" } });  render(() => <Router />, app)
 //   navigate("/users/42")   params().id   query().tab   setQuery({ tab: "x" })   beforeLeave(() => !dirty() || confirm…)
-import { signal, computed, untrack, batch, effect, onCleanup, read, getOwner } from "../core/reactive.js";
+import { signal, computed, untrack, batch, effect, onCleanup, read, getOwner } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { Try } from "../dom/flow.js";
 

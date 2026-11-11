@@ -1,6 +1,6 @@
 // Optional Web Components: `define("hm-counter", Counter, { props: ["start"] })` turns a component into a custom element.
 // Attributes listed in `props` become live props (strings). Light DOM by default; `{ shadow: true }` attaches an open shadow root.
-import { signal, createRoot } from "../core/reactive.js";
+import { signal, createRoot } from "../core/reactive.ts";
 import { h } from "./h.js";
 import { render } from "./render.js";
 

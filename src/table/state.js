@@ -1,6 +1,6 @@
 // createTable(): headless table state — data (client rows or server source), sorting, filtering, search, paging,
 // selection, expansion, inline edit, column layout, saved views, URL sync and export. <Table> renders it; you can too.
-import { signal, computed, effect, untrack, batch, onCleanup, createRoot } from "../core/reactive.js";
+import { signal, computed, effect, untrack, batch, onCleanup, createRoot } from "../core/reactive.ts";
 import { applyPipe } from "../core/pipes.js";
 import { t, locale } from "../core/i18n.ts";
 import { query as dataQuery } from "../data/index.js";

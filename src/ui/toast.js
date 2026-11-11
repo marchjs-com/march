@@ -1,6 +1,6 @@
 // Toasts: short, non-blocking messages. `toast(msg, { kind, action, timeout })` returns an id; `toast.dismiss(id)`.
 // A <ToastHost/> is mounted automatically into document.body on first use when the app did not render one.
-import { signal, createRoot, onCleanup } from "../core/reactive.js";
+import { signal, createRoot, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { For, Portal } from "../dom/flow.js";
 import { t } from "../core/i18n.ts";

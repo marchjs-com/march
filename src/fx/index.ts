@@ -2,7 +2,7 @@
 // Separate, lazily loaded module. Canvas drawing and CSS custom properties only (CSP safe). Pauses when hidden or
 // off screen; prefers-reduced-motion draws a single still frame.
 import { h } from "../dom/h.js";
-import { onCleanup } from "../core/reactive.js";
+import { onCleanup } from "../core/reactive.ts";
 import { reducedMotion, setStyle, frame } from "../motion/env.ts";
 
 type Props = Record<string, unknown>;

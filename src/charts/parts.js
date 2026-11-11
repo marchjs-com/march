@@ -1,5 +1,5 @@
 // Chart parts: frame (wrapper + accessible svg), axes, grid, legend with series toggle, tooltip, hidden data table.
-import { signal, read, untrack } from "../core/reactive.js";
+import { signal, read, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { For } from "../dom/flow.js";
 import { nextId, seriesClass, colorStyle, toggleIn, attr } from "./util.js";

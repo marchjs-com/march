@@ -1,6 +1,6 @@
 // Scroll-driven motion: reveal when visible (IntersectionObserver), scroll progress signal, parallax.
 // Actions for `use:`:  <section use:inView={{ once: true }} />   <img use:parallax={0.3} />   <h2 use:reveal />
-import { signal, onCleanup } from "../core/reactive.js";
+import { signal, onCleanup } from "../core/reactive.ts";
 import { animate, type Frames } from "./animate.ts";
 import { frame, setStyle, reducedMotion } from "./env.ts";
 

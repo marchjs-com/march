@@ -1,5 +1,5 @@
 // Structured editors: ListEditor (array of strings), KeyValueEditor (object), JsonEditor, Markdown renderer and editor.
-import { signal, computed, effect, untrack, reactive } from "../core/reactive.js";
+import { signal, computed, effect, untrack, reactive } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { For } from "../dom/flow.js";
 import { t } from "../core/i18n.ts";

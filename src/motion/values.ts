@@ -1,6 +1,6 @@
 // Animated values: tween() and spring() follow a source signal smoothly and are signals themselves (bind them in JSX).
 //   const $x = spring(() => $target, { stiffness: 170, damping: 26 });   <div style={{ transform: `translateX(${$x}px)` }} />
-import { signal, effect, untrack, onCleanup } from "../core/reactive.js";
+import { signal, effect, untrack, onCleanup } from "../core/reactive.ts";
 import { frame, now, reducedMotion } from "./env.ts";
 import { resolveEasing, type Easing } from "./easing.ts";
 

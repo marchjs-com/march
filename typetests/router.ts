@@ -1,7 +1,7 @@
 // Type tests: registered routes make navigate()/Link reject unknown paths.
-import { navigate, fillPath, type ParamsOf } from "../../src/router/index.ts";
+import { navigate, fillPath, type ParamsOf } from "../src/router/index.ts";
 
-declare module "../../src/router/index.ts" {
+declare module "../src/router/index.ts" {
   interface Register { routes: "/" | "/users/:id" | "/docs/*slug" }
 }
 

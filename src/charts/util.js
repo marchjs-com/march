@@ -1,5 +1,5 @@
 // Shared helpers for chart components: reading props, accessors, formatting, series, sizing, ids.
-import { signal, computed, read, onCleanup, untrack } from "../core/reactive.js";
+import { signal, computed, read, onCleanup, untrack } from "../core/reactive.ts";
 import { applyPipe, toDate } from "../core/pipes.js";
 
 let uid = 0;

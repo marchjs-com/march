@@ -1,6 +1,6 @@
 // Control flow components: If/Else, For, Switch/Match, Try, Await, Portal, Dynamic.
 // Each returns a live region; only the active branch exists in the DOM and it is disposed (with its listeners) on switch.
-import { computed, signal, createRoot, getOwner, runWithOwner, untrack, onCleanup, catchError, effect, read, provide, reportError, isReactive } from "../core/reactive.js";
+import { computed, signal, createRoot, getOwner, runWithOwner, untrack, onCleanup, catchError, effect, read, provide, reportError, isReactive } from "../core/reactive.ts";
 import { h, insert, clearBetween, removeNode, LoadingContext } from "./h.js";
 
 // Call user render functions; keep reactive accessors (compiler thunks, signals) as live regions.

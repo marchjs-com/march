@@ -1,5 +1,5 @@
 // PieChart (and donut): one slice per row, `x` = label key, `y` = value key. Slices are keyed by label.
-import { signal, computed, read } from "../core/reactive.js";
+import { signal, computed, read } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { For } from "../dom/flow.js";
 import { applyPipe } from "../core/pipes.js";

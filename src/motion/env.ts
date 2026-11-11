@@ -1,5 +1,5 @@
 // Motion environment: reduced-motion preference (live), frame scheduling, element style helpers (CSSOM only — CSP safe).
-import { signal } from "../core/reactive.js";
+import { signal } from "../core/reactive.ts";
 
 type Accessor<T> = (() => T) & { peek(): T };
 

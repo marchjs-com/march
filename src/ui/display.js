@@ -1,6 +1,6 @@
 // Display components: Card, Badge, Empty, Spinner, ErrorBox, Skeleton, Alert, Kbd, Avatar, CodeView, JsonView, KeyValue,
 // Timeline, layout helpers (Stack, Grid, Toolbar, Divider) and the boot Loader. Text is always inserted as text nodes.
-import { signal, untrack } from "../core/reactive.js";
+import { signal, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { t, locale } from "../core/i18n.ts";
 import { applyPipe, toDate } from "../core/pipes.js";

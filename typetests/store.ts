@@ -1,5 +1,5 @@
 // Type tests (tsc --noEmit): valid paths compile; invalid ones must fail.
-import { store, on, type Path, type PathValue } from "../../src/core/store.ts";
+import { store, on, type Path, type PathValue } from "../src/core/store.ts";
 
 interface Item { id: number; qty: number }
 const app = store({ user: { name: "Ada", age: 36 }, cart: { items: [] as Item[] }, users: [] as { name: string }[] });

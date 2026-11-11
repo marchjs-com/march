@@ -1,6 +1,6 @@
 // Floating panels (menus, dropdowns, tooltips): positioned next to an anchor with a style OBJECT (CSSOM; CSP safe),
 // flipped when they would leave the viewport, closed on outside pointer, Escape, scroll and resize.
-import { signal, onCleanup } from "../core/reactive.js";
+import { signal, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.js";
 import { Portal } from "../dom/flow.js";
 import { on, cx } from "./util.js";
