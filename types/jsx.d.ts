@@ -35,7 +35,13 @@ declare global {
   namespace JSX {
     type Element = unknown;
     interface ElementChildrenAttribute { children: unknown }
-    interface IntrinsicAttributes { key?: unknown }
+    // directives are accepted on components too (bind:x gives the component x + setX; use:/class:/on: as on elements)
+    interface IntrinsicAttributes {
+      key?: unknown;
+      [key: `bind:${string}`]: unknown;
+      [key: `use:${string}`]: unknown;
+      [key: `transition:${string}`]: unknown;
+    }
     type IntrinsicElements = { [K in keyof HTMLElementTagNameMap]: MarchDomAttributes } & { [K in keyof SVGElementTagNameMap]: MarchDomAttributes };
   }
 }
