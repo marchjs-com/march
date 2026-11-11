@@ -3,7 +3,7 @@ import { createRoot } from "../core/reactive.ts";
 import { insert, clearBetween, removeNode } from "./h.ts";
 
 /** `render(() => <App />, document.getElementById("app"))` */
-export function render(fn, container) {
+export function render(fn: () => unknown, container: Element | DocumentFragment | ShadowRoot | null | undefined): () => void {
   if (!container || typeof container.insertBefore !== "function") throw new TypeError("March: render() needs a DOM container.");
   if (typeof fn !== "function") throw new TypeError("March: render() needs a function: render(() => <App />, el).");
   const doc = container.ownerDocument ?? globalThis.document;

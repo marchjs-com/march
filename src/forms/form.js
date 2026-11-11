@@ -4,7 +4,7 @@ import { signal, computed, effect, batch, untrack, onCleanup, useContext, provid
 import { store, unwrap } from "../core/store.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
-import { schema as makeSchema, options as schemaOptions } from "../schema/index.js";
+import { schema as makeSchema, options as schemaOptions } from "../schema/index.ts";
 import { askReason } from "../ui/dialog.js";
 import { toast } from "../ui/toast.js";
 import { FieldContext, scoped, cx, uid } from "./util.js";

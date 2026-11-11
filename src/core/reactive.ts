@@ -263,7 +263,9 @@ export function runWithOwner<T>(owner: Owner | null, fn: () => T): T {
 
 // Async components: the compiler rewrites `await x` to `_enter(owner, await _leave(x))` so code after an await runs with
 // the component's owner again. The owner is reset when the continuation ends.
-export function _leave<T>(value: T): T { Owner = null; Listener = null; return value; }
+// _leave does not touch the owner: when an async function is called without being awaited, the caller keeps running
+// synchronously after the inner `await` and must keep its own owner. The continuation restores its owner via _enter.
+export function _leave<T>(value: T): T { return value; }
 export function _enter<T>(owner: Owner | null, value: T): T {
   Owner = owner; Listener = null;
   queueMicrotask(() => { if (Owner === owner) Owner = null; });

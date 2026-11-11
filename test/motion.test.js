@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom } from "../src/testing/dom.js";
+import { installDom } from "../src/testing/dom.ts";
 installDom();
 const { signal, h, render, For, lazy, createRoot } = await import("../src/index.js");
 const M = await import("../src/motion/index.ts");

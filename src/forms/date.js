@@ -3,7 +3,7 @@
 import { signal, computed, effect, untrack, onCleanup, reactive } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t, locale } from "../core/i18n.ts";
-import { toDate } from "../core/pipes.js";
+import { toDate } from "../core/pipes.ts";
 import { floating } from "../ui/popover.js";
 import { model, ctl, cx, uid, useField, syncValue } from "./util.js";
 import { Segmented } from "./inputs.js";

@@ -339,3 +339,11 @@ html.hm-scroll-lock { overflow: hidden; }
 .hm-media-fallback { color: var(--hm-muted); text-align: center; padding: var(--hm-space-4); }
 .hm-media-sm { max-height: 4rem; max-width: 4rem; object-fit: cover; }
 .hm-media-md { max-height: 12rem; }
+
+/* ---------- disclosure */
+.hm-disclosure { border: 1px solid var(--hm-border); border-radius: var(--hm-radius); background: var(--hm-surface); }
+.hm-disclosure-summary { cursor: pointer; padding: var(--hm-space-3) var(--hm-space-4); font-weight: 600; list-style: none; display: flex; align-items: center; gap: var(--hm-space-2); }
+.hm-disclosure-summary::-webkit-details-marker { display: none; }
+.hm-disclosure-summary::before { content: "▸"; transition: transform var(--hm-dur) var(--hm-ease); }
+.hm-disclosure[open] > .hm-disclosure-summary::before { transform: rotate(90deg); }
+.hm-disclosure-body { padding: 0 var(--hm-space-4) var(--hm-space-4); }

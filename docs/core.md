@@ -47,3 +47,21 @@ Token utilities: `p px py pt pb m mx my mt mb gap` (0–8), `cols span` (1–12)
 ## Styles
 Import `hadi-march/css/tokens.css` and `hadi-march/css/sx.css` (plus module CSS: `ui.css`, `forms.css`, `table.css`,
 `charts/charts.css`). Theme with `--hm-*` custom properties; dark mode follows the system unless `data-theme` is set.
+
+## TypeScript
+March is written in TypeScript (erasable syntax only, so Node and esbuild run the sources directly) and its public types
+carry your data through the app:
+- **Signals:** `signal<T>(v)` → `Signal<T>` (`set` / `update` checked), `computed(() => …)` → `Accessor<T>`; `<For each>`
+  rows get `item: Accessor<T>` and `index: Accessor<number>`.
+- **Schemas:** `schema({...})` infers the record type; `type Product = Infer<typeof Product>`. text-like fields → `string`,
+  number/int/money/percent → `number | null`, bool → `boolean`, date/datetime → `string | null`, pick → union of the
+  options when declared `as const` (else `string`), multi/list → `string[]`, file → `File | null`, json/hidden → `unknown`;
+  `required: true` drops `| null`. `pick` / `omit` / `extend` keep the type; `defaults()` returns it.
+- **Data:** `query<T>(fn)` → `Query<T>` (`users()` is `T | undefined`), `mutation((vars: V) => …)` → `Mutation<V, R>`.
+- **Access:** `can()` takes a permission, a list or `(access) => boolean`; augment `AccessRegister` (`perms`, `roles`,
+  `methods`) to restrict the names.
+- **Routes:** augment the router's `Register` interface with `routes: "/" | "/users/:id"`; `navigate()` and `<Link>`
+  then reject unknown paths and `ParamsOf<"/users/:id">` gives `{ id: string }`.
+- **i18n:** `const tt = typed<typeof en>()` checks catalog keys and requires every ICU variable (`tt("cart", { n })`).
+- **Stores:** `on(store, "user.name", e => …)` checks the path (`Path<T>`) and types `e.value` (`PathValue<T, P>`).
+Type tests live in `typetests/` and run with `npm run typecheck`.

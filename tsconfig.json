@@ -20,5 +20,5 @@
     "jsx": "preserve",
     "types": []
   },
-  "include": ["src/**/*.ts", "types/**/*.d.ts", "typetests/**/*.ts"]
+  "include": ["src/**/*.ts", "types/**/*.d.ts", "typetests/**/*.ts", "typetests/**/*.tsx"]
 }

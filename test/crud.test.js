@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom, renderTest } from "../src/testing/index.js";
+import { installDom, renderTest } from "../src/testing/index.ts";
 installDom();
 const { h } = await import("../src/index.js");
-const { schema } = await import("../src/schema/index.js");
-const { crud } = await import("../src/crud/index.js");
+const { schema } = await import("../src/schema/index.ts");
+const { crud } = await import("../src/crud/index.ts");
 
 test("crud: lists, creates, edits and deletes through the source", async () => {
   let rows = [{ id: 1, name: "Ada", status: "live" }, { id: 2, name: "Grace", status: "draft" }];

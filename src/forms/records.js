@@ -9,9 +9,9 @@
 // "Row N: <field label>: <message>".
 import { computed, untrack, reactive } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
-import { For } from "../dom/flow.js";
+import { For } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
-import { schema as makeSchema, fieldType, options as schemaOptions } from "../schema/index.js";
+import { schema as makeSchema, fieldType, options as schemaOptions } from "../schema/index.ts";
 import { model, cx, labelledBy, extend } from "./util.js";
 import { inputFor, registerInput, INLINE_LABEL } from "./registry.js";
 import { Field } from "./form.js";

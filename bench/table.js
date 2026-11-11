@@ -36,7 +36,7 @@ export async function run({ installDom }) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  const { installDom } = await import("../src/testing/dom.js");
+  const { installDom } = await import("../src/testing/dom.ts");
   const rows = await run({ installDom });
   console.log("Table (3 columns, client mode, no paging, tiny DOM)");
   console.table(rows.map((r) => ({ rows: r.rows.toLocaleString("en"), "create ms": r.create, "update 1 row ms": r.updateOne, "replace all ms": r.replaceAll, "sort ms": r.sort })));

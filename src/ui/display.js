@@ -3,7 +3,7 @@
 import { signal, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t, locale } from "../core/i18n.ts";
-import { applyPipe, toDate } from "../core/pipes.js";
+import { applyPipe, toDate } from "../core/pipes.ts";
 import { isAction } from "./action.js";
 import { ActionButton, CopyButton } from "./button.js";
 import { formatKey } from "./keys.js";

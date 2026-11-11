@@ -1,0 +1,1 @@
+- UI: `Disclosure` collapsible section (native details/summary).

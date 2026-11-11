@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom, serialize } from "../src/testing/dom.js";
+import { installDom, serialize } from "../src/testing/dom.ts";
 const { document } = installDom();
 const M = await import("../src/index.js");
 const { signal, computed, effect, batch, untrack, onCleanup, createRoot, store, patch, h, render, If, For, Switch, Match, Try, Await, context, useContext, provide, reactive, pipe, applyPipe, t, messages, setLocale, locale, sx } = M;
@@ -235,4 +235,18 @@ test("components created outside an owner still get context and cleanups", () =>
   const Outer = () => { provide(Ctx, "x"); onCleanup(() => {}); return h(Inner, {}); };
   h(Outer, {}); // no render() root around it
   assert.equal(seen, "x");
+});
+
+test("calling an async helper without awaiting it keeps the component's owner", async () => {
+  const { _enter, _leave, getOwner } = await import("../src/core/reactive.ts");
+  let afterCall, inContinuation;
+  createRoot(() => {
+    const o = getOwner();
+    async function helper() { const _$o = getOwner(); _enter(_$o, await _leave(Promise.resolve(1))); inContinuation = getOwner() === o; }
+    helper();
+    afterCall = getOwner() === o;
+  });
+  await tick();
+  assert.equal(afterCall, true);
+  assert.equal(inContinuation, true);
 });

@@ -4,10 +4,10 @@ import { signal, computed, effect, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t, locale } from "../core/i18n.ts";
 import { Link, path, navigate } from "../router/index.ts";
-import { can } from "../access/index.js";
+import { can } from "../access/index.ts";
 import { Badge } from "./display.js";
 import { rank } from "./fold.js";
-import { compareText } from "../core/text.js";
+import { compareText } from "../core/text.ts";
 import { registerPages } from "./registry.js";
 import { val, cx, uid, icon, load, save, on } from "./util.js";
 

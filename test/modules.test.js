@@ -1,12 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom } from "../src/testing/dom.js";
+import { installDom } from "../src/testing/dom.ts";
 installDom({ url: "http://localhost/" });
 const { signal, h, render, effect, createRoot } = await import("../src/index.js");
 const R = await import("../src/router/index.ts");
-const D = await import("../src/data/index.js");
-const { schema } = await import("../src/schema/index.js");
-const A = await import("../src/access/index.js");
+const D = await import("../src/data/index.ts");
+const { schema } = await import("../src/schema/index.ts");
+const A = await import("../src/access/index.ts");
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 

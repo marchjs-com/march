@@ -1,7 +1,7 @@
 // Table filtering and sorting primitives: locale folding, per-type filter predicates, chip text, value comparison.
-import { toDate } from "../core/pipes.js";
+import { toDate } from "../core/pipes.ts";
 import { t } from "../core/i18n.ts";
-import { fold, compareText } from "../core/text.js";
+import { fold, compareText } from "../core/text.ts";
 
 export { fold };
 

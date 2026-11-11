@@ -1,9 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom, Event } from "../src/testing/dom.js";
+import { installDom, Event } from "../src/testing/dom.ts";
 const { document } = installDom();
 const { render, signal, h } = await import("../src/index.js");
-const { schema } = await import("../src/schema/index.js");
+const { schema } = await import("../src/schema/index.ts");
 const F = await import("../src/forms/index.js");
 
 const tick = () => new Promise((r) => setTimeout(r, 0));

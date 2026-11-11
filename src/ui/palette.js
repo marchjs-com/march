@@ -5,7 +5,7 @@ import { signal, computed, effect, untrack, onCleanup, createRoot } from "../cor
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { navigate } from "../router/index.ts";
-import { can } from "../access/index.js";
+import { can } from "../access/index.ts";
 import { isAction } from "./action.js";
 import { Dialog } from "./dialog.js";
 import { key, formatKey } from "./keys.js";

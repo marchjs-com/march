@@ -2,7 +2,7 @@
 // flipped when they would leave the viewport, closed on outside pointer, Escape, scroll and resize.
 import { signal, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
-import { Portal } from "../dom/flow.js";
+import { Portal } from "../dom/flow.ts";
 import { on, cx } from "./util.js";
 
 /**

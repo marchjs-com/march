@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom, serialize, Event } from "../src/testing/dom.js";
+import { installDom, serialize, Event } from "../src/testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { signal, h, render } = await import("../src/index.js");
 const R = await import("../src/router/index.ts");
-const A = await import("../src/access/index.js");
+const A = await import("../src/access/index.ts");
 const U = await import("../src/ui/index.js");
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
@@ -439,4 +439,16 @@ test("AppShell places the nav and the main area", async () => {
   assert.equal(el.querySelector(".hm-shell-nav").textContent, "menu");
   assert.equal(el.querySelector(".hm-shell-top").textContent, "banner");
   assert.equal(el.querySelector("main.hm-shell-main").textContent, "page");
+});
+
+test("Disclosure renders details/summary and reports toggles", async () => {
+  const { Disclosure } = await import("../src/ui/disclosure.ts");
+  const { h, render } = await import("../src/index.js");
+  const el = document.createElement("div");
+  let last;
+  render(() => h(Disclosure, { title: "More", onToggle: (o) => { last = o; } }, "body"), el);
+  const d = el.querySelector("details");
+  assert.equal(el.querySelector("summary").textContent, "More");
+  d.open = true; d.dispatchEvent(new Event("toggle"));
+  assert.equal(last, true);
 });

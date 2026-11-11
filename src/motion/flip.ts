@@ -1,6 +1,6 @@
 // FLIP for keyed lists: `<For each={$items} key="id" animate>` — rows that move glide to their new place, new rows
 // fade/scale in. Measure (First), apply DOM change, measure (Last), Invert with a transform, Play to none.
-import { setFlipHook } from "../dom/flow.js";
+import { setFlipHook } from "../dom/flow.ts";
 import { animate } from "./animate.ts";
 import { reducedMotion } from "./env.ts";
 

@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
 import { compile, isStaticCode } from "../compiler/index.js";
 import { loadAutoImports } from "../compiler/autoimports.js";
-import { installDom } from "../src/testing/dom.js";
+import { installDom } from "../src/testing/dom.ts";
 
 const RT = new URL("../src/index.js", import.meta.url).href;
 const c = (src, o = {}) => compile(src, { runtime: RT, ...o }).code;

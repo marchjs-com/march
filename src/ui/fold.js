@@ -1,5 +1,5 @@
-// Typo-tolerant ranking for search boxes, NavMenu filter and the command palette (folding lives in core/text.js).
-import { fold, distance } from "../core/text.js";
+// Typo-tolerant ranking for search boxes, NavMenu filter and the command palette (folding lives in core/text.ts).
+import { fold, distance } from "../core/text.ts";
 export { fold, distance };
 
 const words = (s) => s.split(/[^\p{L}\p{N}]+/u).filter(Boolean);

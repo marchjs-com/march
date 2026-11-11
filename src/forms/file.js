@@ -2,9 +2,9 @@
 // progress and cancel when an `upload(file, { onProgress, signal })` function is given.
 import { signal, untrack, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
-import { For } from "../dom/flow.js";
+import { For } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
-import { applyPipe } from "../core/pipes.js";
+import { applyPipe } from "../core/pipes.ts";
 import { model, ctl, cx, uid } from "./util.js";
 
 /** Does `file` match an accept list like "image/*,.pdf,application/json"? */

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom } from "../src/testing/dom.js";
+import { installDom } from "../src/testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/list" });
 const { h, render, createRoot } = await import("../src/index.js");
 const T = await import("../src/table/index.js");

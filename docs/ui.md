@@ -224,3 +224,7 @@ controls unless `controls={false}`. `openMedia(src, { title, kind, alt, poster, 
 <Media src={tpl.previewUrl} kind="video" poster={tpl.thumb} />
 <Button onClick={() => openMedia(shotUrl, { title: "Screenshot" })}>Open</Button>
 ```
+
+## Disclosure
+
+Collapsible section on native `<details>`: `<Disclosure title="Advanced" open={false} onToggle={(o) => …}>…</Disclosure>`.

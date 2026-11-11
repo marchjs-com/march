@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom } from "../src/testing/dom.js";
+import { installDom } from "../src/testing/dom.ts";
 const { document } = installDom();
 const { h, render, signal, setLocale } = await import("../src/index.js");
 setLocale("en");

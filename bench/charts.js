@@ -9,7 +9,7 @@ export async function run({ installDom }) {
   const { document, cleanup } = installDom();
   try {
     const { signal, h, render } = await import("../src/index.js");
-    const { LineChart } = await import("../src/charts/index.js");
+    const { LineChart } = await import("../src/charts/index.ts");
     const out = [];
     for (const n of [10_000, 100_000]) {
       const data = signal(series(n));
@@ -34,7 +34,7 @@ export async function run({ installDom }) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  const { installDom } = await import("../src/testing/dom.js");
+  const { installDom } = await import("../src/testing/dom.ts");
   const rows = await run({ installDom });
   console.log("LineChart (2 series, LTTB, tiny DOM)");
   console.table(rows.map((r) => ({ points: r.points.toLocaleString("en"), "render ms": r.render, "update ms": r.update, "points drawn / series": r.drawn })));

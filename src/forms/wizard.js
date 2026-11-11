@@ -2,7 +2,7 @@
 import { signal, computed, untrack, provide } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
-import { schema as makeSchema } from "../schema/index.js";
+import { schema as makeSchema } from "../schema/index.ts";
 import { scoped, cx, uid } from "./util.js";
 import { useForm, renderFields, FormContext } from "./form.js";
 

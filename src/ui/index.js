@@ -18,3 +18,4 @@ export { fold, score, rank, distance } from "./fold.js";
 export { place } from "./popover.js";
 export { Media, openMedia, mediaKind } from "./media.js";
 export * from "../forms/index.js";
+export { Disclosure } from "./disclosure.ts";

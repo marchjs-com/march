@@ -2,50 +2,79 @@
 // `calendar` mode lays out daily values as weeks (columns) × weekdays (rows), e.g. the last 12 weeks.
 import { signal, computed, read } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
-import { For } from "../dom/flow.js";
-import { applyPipe, toDate } from "../core/pipes.js";
+import { applyPipe, toDate } from "../core/pipes.ts";
 import { locale } from "../core/i18n.ts";
-import { rowsOf, accessor, formatter, num, useSize, attr, textWidth } from "./util.js";
-import { Frame, tooltipState, showTip, tipBody, thin } from "./parts.js";
+import { rowsOf, accessor, formatter, num, useSize, attr, textWidth, each,
+  type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type Getter, type TooltipProp } from "./util.ts";
+import { Frame, tooltipState, showTip, tipBody, thin } from "./parts.ts";
+
+type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
+
+/** One heatmap cell (also the `datum` of a heatmap point). */
+export interface HeatCell { key: string; xi: number; yi: number; value: number | null; label: unknown; future?: boolean }
+/** Point passed to `tooltip(point)` and `onSelect(point)` of a heatmap. */
+export interface HeatPoint { index: number; x: unknown; y: unknown; value: number | null; label: unknown; datum: HeatCell }
+export interface HeatmapProps<D = unknown> extends ChartBaseProps {
+  data?: DataProp<D>;
+  x?: Field<D> | undefined;
+  y?: Field<D> | undefined;
+  value?: Field<D> | undefined;
+  calendar?: Opt<boolean | { weeks?: number }>;
+  end?: Opt<unknown>;
+  xFormat?: Opt<FormatSpec>;
+  yFormat?: Opt<FormatSpec>;
+  xDomain?: Opt<readonly unknown[]>;
+  yDomain?: Opt<readonly unknown[]>;
+  format?: Opt<FormatSpec>;
+  levels?: Opt<number>;
+  max?: Opt<number>;
+  cell?: Opt<number>;
+  valueLabel?: Opt<string>;
+  tooltip?: TooltipProp<HeatPoint>;
+  onSelect?: ((p: HeatPoint) => void) | undefined;
+}
+interface Label { key: string; label: unknown }
+interface HeatGrid { xs: Label[]; ys: Label[]; cells: HeatCell[] }
+interface PosLabel { key: string; label: unknown; pos: number }
 
 const DAY = 864e5;
-const f1 = (v) => Math.round(v * 10) / 10;
-const dayKey = (d) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+const f1 = (v: number): number => Math.round(v * 10) / 10;
+const dayKey = (d: Date): string => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 /** Short weekday names, Monday first, in the active locale. */
-const weekdays = () => { const f = new Intl.DateTimeFormat(locale(), { weekday: "short" }); return [...Array(7)].map((_, i) => f.format(new Date(2024, 0, 1 + i))); };
+const weekdays = (): string[] => { const f = new Intl.DateTimeFormat(locale(), { weekday: "short" }); return [...Array(7)].map((_, i) => f.format(new Date(2024, 0, 1 + i))); };
 
 /** Level 0 (empty / ≤ 0) … levels-1 for a value relative to `max`. */
-export function heatLevel(v, max, levels = 5) {
+export function heatLevel(v: number | null | undefined, max: number, levels = 5): number {
   if (v == null || !(v > 0) || !(max > 0)) return 0;
   return Math.max(1, Math.min(levels - 1, Math.ceil((v / max) * (levels - 1))));
 }
 
 /** Heatmap. See docs/charts.md for props. */
-export function Heatmap(props) {
+export function Heatmap<D>(props: HeatmapProps<D>): Element {
   const size = useSize(props, 640, 0);
   const active = signal(-1);
   const tip = tooltipState();
-  let svg = null;
+  let svg: Element | null = null;
 
-  const fmt = computed(() => formatter(read(props.format)));
+  const fmt = computed(() => formatter(read<FormatSpec | null | undefined>(props.format)));
   const levels = computed(() => num(read(props.levels)) ?? 5);
   // grid: { xs: [{key,label}], ys: [{key,label}], cells: [{key, xi, yi, value, label}] }
-  const grid = computed(() => {
-    const rows = rowsOf(props.data), gx = accessor(props.x ?? "x"), gy = accessor(props.y ?? "y"), gv = accessor(props.value ?? "value");
+  const grid = computed((): HeatGrid => {
+    const rows = rowsOf(props.data), gx = accessor<D>(props.x ?? "x"), gy = accessor<D>(props.y ?? "y"), gv = accessor<D>(props.value ?? "value");
     const cal = read(props.calendar);
     if (cal) return calendarGrid(rows, gx, gv, cal === true ? {} : cal, read(props.end));
-    const xf = formatter(read(props.xFormat), String), yf = formatter(read(props.yFormat), String);
+    const xf = formatter(read<FormatSpec | null | undefined>(props.xFormat), String), yf = formatter(read<FormatSpec | null | undefined>(props.yFormat), String);
     const xd = read(props.xDomain) ?? [...new Set(rows.map((d, i) => gx(d, i)))];
     const yd = read(props.yDomain) ?? [...new Set(rows.map((d, i) => gy(d, i)))];
     const xi = new Map(xd.map((v, i) => [v, i])), yi = new Map(yd.map((v, i) => [v, i]));
-    const sums = new Map();
+    const sums = new Map<number, number>();
     rows.forEach((d, i) => {
       const a = xi.get(gx(d, i)), b = yi.get(gy(d, i));
       if (a == null || b == null) return;
       const k = b * xd.length + a, v = num(gv(d, i));
       if (v != null) sums.set(k, (sums.get(k) ?? 0) + v);
     });
-    const cells = [];
+    const cells: HeatCell[] = [];
     for (let b = 0; b < yd.length; b++) for (let a = 0; a < xd.length; a++) {
       const k = b * xd.length + a;
       cells.push({ key: `${String(xd[a])}|${String(yd[b])}`, xi: a, yi: b, value: sums.get(k) ?? null, label: `${yf(yd[b])} ${xf(xd[a])}` });
@@ -63,58 +92,58 @@ export function Heatmap(props) {
   const box = computed(() => ({ x: ml(), y: 22, w: cell() * grid().xs.length, h: cell() * grid().ys.length }));
   const gap = computed(() => (cell() > 8 ? 2 : 1));
 
-  const xLabels = computed(() => { const g = grid(), c = cell(); return thin(g.xs.map((x, i) => ({ ...x, i })), Math.max(2, Math.floor(box().w / 36))).map((x) => ({ key: x.key, label: x.label, pos: f1(box().x + x.i * c + c / 2) })); });
-  const yLabels = computed(() => { const c = cell(); return grid().ys.map((y, i) => ({ key: y.key, label: y.label, pos: f1(box().y + i * c + c / 2) })); });
+  const xLabels = computed((): PosLabel[] => { const g = grid(), c = cell(); return thin(g.xs.map((x, i) => ({ ...x, i })), Math.max(2, Math.floor(box().w / 36))).map((x) => ({ key: x.key, label: x.label, pos: f1(box().x + x.i * c + c / 2) })); });
+  const yLabels = computed((): PosLabel[] => { const c = cell(); return grid().ys.map((y, i) => ({ key: y.key, label: y.label, pos: f1(box().y + i * c + c / 2) })); });
 
-  const pointAt = (k) => { const c = grid().cells[k]; return c && { index: k, x: grid().xs[c.xi].label, y: grid().ys[c.yi].label, value: c.value, label: c.label, datum: c }; };
-  const show = (k) => {
+  const pointAt = (k: number): HeatPoint | undefined => { const c = grid().cells[k]; return c && { index: k, x: (grid().xs[c.xi] as Label).label, y: (grid().ys[c.yi] as Label).label, value: c.value, label: c.label, datum: c }; };
+  const show = (k: number): void => {
     active.set(k);
     const opt = read(props.tooltip), c = grid().cells[k];
-    if (!c || opt === false) return tip.at.set(null);
-    const content = typeof opt === "function" ? () => opt(pointAt(k)) : () => tipBody(c.label, [{ label: read(props.valueLabel) ?? "Value", value: c.value == null ? "—" : fmt()(c.value), index: 0 }]);
+    if (!c || opt === false) return void tip.at.set(null);
+    const content = typeof opt === "function" ? () => opt(pointAt(k) as HeatPoint) : () => tipBody(c.label, [{ label: read(props.valueLabel) ?? "Value", value: c.value == null ? "—" : fmt()(c.value), index: 0 }]);
     showTip(tip, svg, size.width(), box().x + (c.xi + 0.5) * cell(), box().y + c.yi * cell(), content);
   };
-  const hide = () => { active.set(-1); tip.at.set(null); };
-  const select = (k = active.peek()) => { const p = pointAt(k); if (p) props.onSelect?.(p); };
-  const onKeyDown = (e) => {
+  const hide = (): void => { active.set(-1); tip.at.set(null); };
+  const select = (k = active.peek()): void => { const p = pointAt(k); if (p) props.onSelect?.(p); };
+  const onKeyDown = (e: KeyboardEvent): void => {
     const g = grid(), nx = g.xs.length, n = g.cells.length;
     if (!n) return;
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); return select(); }
     if (e.key === "Escape") return hide();
     const i = Math.max(0, active.peek());
-    const moves = { ArrowRight: i + 1, ArrowLeft: i - 1, ArrowDown: i + nx, ArrowUp: i - nx, Home: 0, End: n - 1 };
+    const moves: Record<string, number> = { ArrowRight: i + 1, ArrowLeft: i - 1, ArrowDown: i + nx, ArrowUp: i - nx, Home: 0, End: n - 1 };
     if (!(e.key in moves)) return;
     e.preventDefault();
-    show(active.peek() < 0 ? 0 : Math.max(0, Math.min(n - 1, moves[e.key])));
+    show(active.peek() < 0 ? 0 : Math.max(0, Math.min(n - 1, moves[e.key] as number)));
   };
 
   const body = [
     h("g", { class: "hm-chart-axis hm-chart-axis-x", "aria-hidden": "true" },
-      h(For, { each: xLabels, key: (t) => t.key }, (t) => h("text", { x: attr(() => t().pos), y: 14, "text-anchor": "middle" }, attr(() => t().label)))),
+      each<PosLabel>({ each: xLabels, key: (t) => t.key, children: (t) => h("text", { x: attr(() => t().pos), y: 14, "text-anchor": "middle" }, attr(() => t().label)) })),
     h("g", { class: "hm-chart-axis hm-chart-axis-y", "aria-hidden": "true" },
-      h(For, { each: yLabels, key: (t) => t.key }, (t) => h("text", { x: () => f1(ml() - 6), y: attr(() => t().pos), dy: "0.32em", "text-anchor": "end" }, attr(() => t().label)))),
+      each<PosLabel>({ each: yLabels, key: (t) => t.key, children: (t) => h("text", { x: () => f1(ml() - 6), y: attr(() => t().pos), dy: "0.32em", "text-anchor": "end" }, attr(() => t().label)) })),
     h("g", { class: "hm-chart-plot", transform: attr(() => `translate(${f1(box().x)},${box().y})`), onPointerLeave: hide },
-      h(For, { each: () => grid().cells, key: (c) => c.key }, (c, i) => h("rect", {
+      each<HeatCell>({ each: () => grid().cells, key: (c) => c.key, children: (c, i) => h("rect", {
         class: attr(() => `hm-heat-cell hm-heat-${heatLevel(c().value, max(), levels())}`), "class:hm-chart-active": () => active() === i(),
         x: attr(() => f1(c().xi * cell())), y: attr(() => f1(c().yi * cell())), width: attr(() => f1(Math.max(1, cell() - gap()))), height: attr(() => f1(Math.max(1, cell() - gap()))), rx: 2,
         onPointerEnter: () => show(i()), onClick: () => select(i()),
-      }))),
+      }) })),
   ];
 
-  return Frame(props, {
+  return Frame<Label>(props, {
     kind: "heatmap", size: { ...size, height }, body, onKeyDown, svgRef: (el) => { svg = el; },
     empty: () => grid().cells.length === 0, tip,
     table: {
       caption: () => read(props.title), rows: () => grid().ys,
-      columns: () => { const g = grid(); return [{ label: "", value: (y) => y.label }, ...g.xs.map((x, a) => ({ label: x.label, value: (y, b) => { const c = g.cells[b * g.xs.length + a]; return c?.value == null ? "" : fmt()(c.value); } }))]; },
+      columns: () => { const g = grid(); return [{ label: "", value: (y: Label) => y.label }, ...g.xs.map((x, a) => ({ label: x.label, value: (_y: Label, b: number) => { const c = g.cells[b * g.xs.length + a]; return c?.value == null ? "" : fmt()(c.value); } }))]; },
     },
   });
 }
 
 /** Weeks (columns, oldest first) × weekdays (rows, Monday first) ending at `end` (default: latest date in the data). */
-function calendarGrid(rows, gx, gv, { weeks = 12 }, endProp) {
-  const byDay = new Map();
-  let last = null;
+function calendarGrid<D>(rows: readonly D[], gx: Getter<D>, gv: Getter<D>, { weeks = 12 }: { weeks?: number }, endProp: unknown): HeatGrid {
+  const byDay = new Map<string, number>();
+  let last: Date | null = null;
   rows.forEach((d, i) => {
     const t = toDate(gx(d, i));
     if (!t) return;
@@ -122,11 +151,11 @@ function calendarGrid(rows, gx, gv, { weeks = 12 }, endProp) {
     byDay.set(dayKey(t), (byDay.get(dayKey(t)) ?? 0) + (v ?? 0));
     if (!last || t > last) last = t;
   });
-  const end = toDate(endProp) ?? last ?? new Date();
+  const end = toDate(endProp) ?? (last as Date | null) ?? new Date();
   const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
   const start = new Date(endDay);
   start.setDate(start.getDate() - ((start.getDay() + 6) % 7) - (weeks - 1) * 7);
-  const xs = [], cells = [], names = weekdays();
+  const xs: Label[] = [], cells: HeatCell[] = [], names = weekdays();
   for (let w = 0; w < weeks; w++) { const d = new Date(start); d.setDate(d.getDate() + w * 7); xs.push({ key: dayKey(d), label: applyPipe("date", d, { month: "short", day: "numeric" }) }); }
   for (let wd = 0; wd < 7; wd++) for (let w = 0; w < weeks; w++) {
     const d = new Date(start);

@@ -7,7 +7,7 @@
 //   navigate("/users/42")   params().id   query().tab   setQuery({ tab: "x" })   beforeLeave(() => !dirty() || confirm…)
 import { signal, computed, untrack, batch, effect, onCleanup, read, getOwner } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
-import { Try } from "../dom/flow.js";
+import { Try } from "../dom/flow.ts";
 
 // ------------------------------------------------------------------ types
 type Component = (props: Record<string, unknown>) => unknown;

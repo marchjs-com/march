@@ -3,7 +3,7 @@ import { signal, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { Link } from "../router/index.ts";
-import { can } from "../access/index.js";
+import { can } from "../access/index.ts";
 import { isAction } from "./action.js";
 import { toast } from "./toast.js";
 import { floating } from "./popover.js";

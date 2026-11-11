@@ -6,7 +6,7 @@
 //   - auto imports for runtime names and project components; `css`…`` extraction; t`…` key collection
 // It is a careful scanner, not a full parser: write normal, semicolon-or-newline separated JavaScript.
 import { isIdStart, isIdPart, exprAllowed, identKind, skipString, skipComment, skipRegex, syntax, jsxText, lineCol } from "./lexer.js";
-import { sx as resolveSx } from "../src/core/sx.js";
+import { sx as resolveSx } from "../src/core/sx.ts";
 
 const H = { h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave" };
 const HELPER_SOURCE = { h: "h", lazy: "lazy", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave" };

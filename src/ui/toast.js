@@ -2,7 +2,7 @@
 // A <ToastHost/> is mounted automatically into document.body on first use when the app did not render one.
 import { signal, createRoot, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
-import { For, Portal } from "../dom/flow.js";
+import { For, Portal } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
 import { val } from "./util.js";
 

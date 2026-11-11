@@ -3,7 +3,7 @@
 //   list: create 1k/10k keyed rows, update every 10th row, swap two rows, replace all, clear
 //   + table and charts scenarios when those modules are present.
 // Usage: node bench/run.js [--rows 1000,10000]
-import { installDom } from "../src/testing/dom.js";
+import { installDom } from "../src/testing/dom.ts";
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
 const sizes = String(arg("--rows", "1000,10000")).split(",").map(Number);

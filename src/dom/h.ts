@@ -3,7 +3,7 @@
 // attribute position becomes a live binding: only that text node / attribute / region updates when its signals change.
 // Security: no HTML strings ever (no innerHTML), URL attributes are sanitized, <script> cannot be created, Trusted Types safe.
 import { effect, untrack, batch, getOwner, runWithOwner, reportError, isReactive, onCleanup, signal, DEV, useContext, createRoot, type Signal } from "../core/reactive.ts";
-import { sx as resolveSx } from "../core/sx.js";
+import { sx as resolveSx } from "../core/sx.ts";
 
 /** Anything h() can render. Functions are live regions. */
 export type Child = Node | string | number | bigint | boolean | null | undefined | readonly Child[] | (() => unknown);

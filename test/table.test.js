@@ -1,13 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom } from "../src/testing/dom.js";
+import { installDom } from "../src/testing/dom.ts";
 const { document, window } = installDom({ url: "http://localhost/list" });
 const { signal, h, render, createRoot, store, setLocale } = await import("../src/index.js");
 setLocale("en");
 const T = await import("../src/table/index.js");
 const R = await import("../src/router/index.ts");
-const { schema } = await import("../src/schema/index.js");
-const { Event } = await import("../src/testing/dom.js");
+const { schema } = await import("../src/schema/index.ts");
+const { Event } = await import("../src/testing/dom.ts");
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
