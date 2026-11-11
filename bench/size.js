@@ -7,7 +7,7 @@ import { resolve } from "node:path";
 
 export const BUDGET = { core: 10.5 * 1024, minimal: 5 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
-export const ENTRIES = { core: "src/index.js", router: "src/router/index.js", data: "src/data/index.js", schema: "src/schema/index.js", ui: "src/ui/index.js", table: "src/table/index.js", charts: "src/charts/index.js" };
+export const ENTRIES = { core: "src/index.js", router: "src/router/index.ts", data: "src/data/index.js", schema: "src/schema/index.js", ui: "src/ui/index.js", table: "src/table/index.js", charts: "src/charts/index.js" };
 
 export async function sizes(names = Object.keys(ENTRIES)) {
   const esbuild = await import("esbuild");

@@ -2,7 +2,7 @@
 import { signal, untrack } from "../core/reactive.js";
 import { h } from "../dom/h.js";
 import { t } from "../core/i18n.ts";
-import { Link } from "../router/index.js";
+import { Link } from "../router/index.ts";
 import { can } from "../access/index.js";
 import { isAction } from "./action.js";
 import { toast } from "./toast.js";

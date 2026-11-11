@@ -4,7 +4,7 @@ import { installDom } from "../src/testing/dom.js";
 installDom();
 const { signal, h, render, For, lazy, createRoot } = await import("../src/index.js");
 const M = await import("../src/motion/index.ts");
-const { createRouter, navigate, Router, _resetRouter } = await import("../src/router/index.js");
+const { createRouter, navigate, Router, _resetRouter } = await import("../src/router/index.ts");
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 

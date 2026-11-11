@@ -2,7 +2,7 @@
 // Roving focus with ← → Home End (automatic activation). With `query="tab"` the active tab is kept in the URL (?tab=id).
 import { signal, computed, untrack } from "../core/reactive.js";
 import { h } from "../dom/h.js";
-import { query as routeQuery, setQuery } from "../router/index.js";
+import { query as routeQuery, setQuery } from "../router/index.ts";
 import { Badge } from "./display.js";
 import { roving } from "./focus.js";
 import { val, cx, uid } from "./util.js";

@@ -18,7 +18,7 @@ export function mediaKind(src) {
 }
 
 /**
- * `<Media src kind alt poster controls autoplay loop muted class />`. Video and audio show controls unless
+ * `<Media src kind alt poster controls autoplay loop muted size class />` (size: "sm" thumbnail, "md"). Video and audio show controls unless
  * `controls={false}`. When the element fails to load, `fallback` (default "Could not load media") is shown instead.
  */
 export function Media(props) {
@@ -28,7 +28,7 @@ export function Media(props) {
     failed.set(false);
     const kind = (val(props.kind) ?? "image") === "auto" ? mediaKind(src) : (val(props.kind) ?? "image");
     if (!src) return h("p", { class: "hm-media-fallback" }, () => val(props.fallback) ?? t`No media`);
-    const common = { class: cx("hm-media", `hm-media-${kind}`, val(props.class)), src, onError: () => failed.set(true) };
+    const common = { class: cx("hm-media", `hm-media-${kind}`, val(props.size) && `hm-media-${val(props.size)}`, val(props.class)), src, onError: () => failed.set(true) };
     const el = kind === "video"
       ? h("video", { ...common, controls: props.controls !== false, autoplay: !!props.autoplay, loop: !!props.loop, muted: !!props.muted, playsinline: true, poster: val(props.poster) ?? null, preload: "metadata" })
       : kind === "audio"

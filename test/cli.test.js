@@ -23,11 +23,15 @@ test("file based routes", () => {
     writeFileSync(join(dir, "pages/index.jsx"), "");
     writeFileSync(join(dir, "pages/users/[id].jsx"), "");
     writeFileSync(join(dir, "pages/_hidden.jsx"), "");
+    writeFileSync(join(dir, "pages/_layout.jsx"), "");
+    writeFileSync(join(dir, "pages/users/_layout.tsx"), "");
     genRoutes(join(dir, "pages"), join(dir, "routes.gen.js"));
     const code = readFileSync(join(dir, "routes.gen.js"), "utf8");
-    assert.match(code, /"\/users\/:id": \(\) => import\("\.\/pages\/users\/\[id\]\.jsx"\)/);
+    assert.ok(code.includes(`"/users/:id": { load: () => import("./pages/users/[id].jsx"), layouts: [() => import("./pages/_layout.jsx"), () => import("./pages/users/_layout.tsx")] }`));
     assert.doesNotMatch(code, /_hidden/);
-    assert.match(readFileSync(join(dir, "pages.d.ts"), "utf8"), /"\/users\/:id": \{ id: string \}/);
+    const dts = readFileSync(join(dir, "pages.d.ts"), "utf8");
+    assert.ok(dts.includes(`"/users/:id": { id: string };`));
+    assert.ok(dts.includes(`interface Register { routes: "/" | "/users/:id" }`));
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 

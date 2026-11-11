@@ -4,7 +4,7 @@ import { signal, computed, effect, untrack, batch, onCleanup, createRoot } from 
 import { applyPipe } from "../core/pipes.js";
 import { t, locale } from "../core/i18n.ts";
 import { query as dataQuery } from "../data/index.js";
-import { setQuery } from "../router/index.js";
+import { setQuery } from "../router/index.ts";
 import { fold, valueOf, optionsOf, isEmptyFilter, matchFilter, describeFilter, sortRows, encodeFilter, decodeFilter } from "./filters.js";
 import { toCSV, toJSON, download } from "./export.js";
 

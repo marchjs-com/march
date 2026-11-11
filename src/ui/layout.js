@@ -2,7 +2,7 @@
 import { signal, computed, untrack, effect, onCleanup } from "../core/reactive.js";
 import { h } from "../dom/h.js";
 import { t } from "../core/i18n.ts";
-import { Link, back as historyBack } from "../router/index.js";
+import { Link, back as historyBack } from "../router/index.ts";
 import { actionsOf } from "./display.js";
 import { Tabs } from "./tabs.js";
 import { key } from "./keys.js";

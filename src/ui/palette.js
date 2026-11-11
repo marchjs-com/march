@@ -4,7 +4,7 @@
 import { signal, computed, effect, untrack, onCleanup, createRoot } from "../core/reactive.js";
 import { h } from "../dom/h.js";
 import { t } from "../core/i18n.ts";
-import { navigate } from "../router/index.js";
+import { navigate } from "../router/index.ts";
 import { can } from "../access/index.js";
 import { isAction } from "./action.js";
 import { Dialog } from "./dialog.js";

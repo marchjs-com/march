@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { installDom } from "../src/testing/dom.js";
 installDom({ url: "http://localhost/" });
 const { signal, h, render, effect, createRoot } = await import("../src/index.js");
-const R = await import("../src/router/index.js");
+const R = await import("../src/router/index.ts");
 const D = await import("../src/data/index.js");
 const { schema } = await import("../src/schema/index.js");
 const A = await import("../src/access/index.js");
@@ -38,7 +38,40 @@ test("router: matching, params, query, lazy pages, guards, Link, setQuery", asyn
   assert.equal(location.pathname, "/", "guard redirected");
   await R.navigate("/nope");
   assert.equal(el.textContent.includes("Not found"), true);
-  assert.throws(() => R.navigate("https://evil.example/"), /same-origin/);
+  await assert.rejects(R.navigate("https://evil.example/"), /same-origin/);
+  R._resetRouter();
+});
+
+test("router: nested layouts, redirects, leave guard, preload, meta", async () => {
+  const Shell = (p) => h("section", { class: "shell" }, p.children);
+  const Inner = (p) => h("div", { class: "inner" }, p.children);
+  let loads = 0;
+  const Page = () => h("h2", {}, "page");
+  R.createRouter({
+    routes: { "/": { component: () => h("h2", {}, "home") }, "/a/b": { load: async () => { loads++; return { default: Page, meta: { description: "B page" }, title: "B" }; }, layouts: [async () => ({ default: Shell }), async () => ({ default: Inner })] } },
+    redirects: { "/old/:x": "/a/:x" },
+  });
+  const el = document.createElement("div");
+  render(() => h(R.Router, {}), el);
+  await tick();
+  await R.preload("/a/b");
+  assert.equal(loads, 1);
+  await R.navigate("/old/b");
+  await tick();
+  assert.equal(location.pathname, "/a/b");
+  assert.equal(el.querySelector("section.shell div.inner h2").textContent, "page");
+  assert.equal(loads, 1, "preloaded module reused");
+  assert.equal(document.title, "B");
+  assert.equal(document.head.querySelector('meta[name="description"]').getAttribute("content"), "B page");
+  let allow = false;
+  const off = R.beforeLeave(() => allow);
+  await R.navigate("/");
+  assert.equal(location.pathname, "/a/b", "leave guard kept the page");
+  allow = true;
+  await R.navigate("/");
+  assert.equal(location.pathname, "/");
+  off();
+  assert.equal(R.fillPath("/u/:id/*rest", { id: 7, rest: "x/y" }), "/u/7/x/y");
   R._resetRouter();
 });
 

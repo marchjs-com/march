@@ -1,7 +1,7 @@
 // Page transitions for the router: View Transitions API where supported (cross-fade / slide of the old and new page),
 // a short fade-in of the new page elsewhere. Reduced motion: instant.
 //   pageTransitions({ type: "slide" })   — call once at startup, after createRouter()
-import { setNavigationWrapper } from "../router/index.js";
+import { setNavigationWrapper } from "../router/index.ts";
 import { animate } from "./animate.ts";
 import { reducedMotion } from "./env.ts";
 

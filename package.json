@@ -7,7 +7,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.js",
-    "./router": "./src/router/index.js",
+    "./router": "./src/router/index.ts",
     "./data": "./src/data/index.js",
     "./schema": "./src/schema/index.js",
     "./ui": "./src/ui/index.js",

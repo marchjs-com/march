@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { installDom, serialize, Event } from "../src/testing/dom.js";
 const { document } = installDom({ url: "http://localhost/" });
 const { signal, h, render } = await import("../src/index.js");
-const R = await import("../src/router/index.js");
+const R = await import("../src/router/index.ts");
 const A = await import("../src/access/index.js");
 const U = await import("../src/ui/index.js");
 
