@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { installDom } from "../src/testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/list" });
 const { h, render, createRoot } = await import("../src/index.js");
-const T = await import("../src/table/index.js");
+const T = await import("../src/table/index.ts");
 
 test("search={false} hides the search box and is not used as a query", () => {
   const rows = [{ id: 1, name: "Ada" }, { id: 2, name: "Bo" }];

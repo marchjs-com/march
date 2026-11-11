@@ -4,7 +4,7 @@ import { installDom } from "../src/testing/dom.ts";
 const { document } = installDom();
 const { h, render, signal, setLocale } = await import("../src/index.js");
 setLocale("en");
-const { Media, openMedia, mediaKind, closeAll } = await import("../src/ui/index.js");
+const { Media, openMedia, mediaKind, closeAll } = await import("../src/ui/index.ts");
 const tick = () => new Promise((r) => setTimeout(r, 0));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); return { el, dispose: render(fn, el) }; };
 

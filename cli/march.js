@@ -6,6 +6,7 @@
 //   march gen page users/[id] | gen component Name | gen crud products
 //   march gen api openapi.json [--out src/api.gen.js] typed client + schemas from an OpenAPI 3 document
 //   march i18n [--messages src/i18n]                 report keys missing from translation files
+//   march check [--src src]                          type-check .tsx/.ts including March syntax (pipes, modifiers…)
 // Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html }.
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, cpSync, rmSync, watch } from "node:fs";
@@ -182,10 +183,17 @@ async function i18n() {
   if (missing) process.exitCode = 1;
 }
 
+async function typecheck() {
+  const { check } = await import("./check.js");
+  const cfg = await loadConfig();
+  const n = await check({ components: cfg.components, srcDir: flag("--src", "src") });
+  if (n) process.exitCode = 1;
+}
+
 const cmd = argv[0];
-const run = { dev, build: () => build(), gen, i18n }[cmd];
+const run = { dev, build: () => build(), gen, i18n, check: typecheck }[cmd];
 if (!run) {
-  console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]");
+  console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)");
   process.exit(cmd ? 1 : 0);
 }
 await run();

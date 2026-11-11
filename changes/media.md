@@ -1,1 +1,1 @@
-- UI: `Media` (image / video / audio that fits its box, safe URLs, error fallback), `openMedia(src, opts)` dialog and `mediaKind(src)` (src/ui/media.js).
+- UI: `Media` (image / video / audio that fits its box, safe URLs, error fallback), `openMedia(src, opts)` dialog and `mediaKind(src)` (src/ui/media.ts).

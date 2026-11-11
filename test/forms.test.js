@@ -4,7 +4,7 @@ import { installDom, serialize, Event } from "../src/testing/dom.ts";
 const { document } = installDom();
 const { h, render, createRoot, signal, reactive, lazy } = await import("../src/index.js");
 const { schema } = await import("../src/schema/index.ts");
-const F = await import("../src/forms/index.js");
+const F = await import("../src/forms/index.ts");
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose, html: () => serialize(el) }; };

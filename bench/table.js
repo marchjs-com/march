@@ -10,7 +10,7 @@ export async function run({ installDom }) {
   const { document, cleanup } = installDom();
   try {
     const { signal, h, render } = await import("../src/index.js");
-    const { Table, createTable } = await import("../src/table/index.js");
+    const { Table, createTable } = await import("../src/table/index.ts");
     const out = [];
     for (const n of [1_000, 10_000]) {
       const rows = signal(make(n));

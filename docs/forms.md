@@ -1,7 +1,7 @@
 # Forms (`hadi-march/ui` → `src/forms`)
 
 Schema-driven forms, a field wrapper with correct ARIA wiring, and a complete set of inputs. Everything is exported by
-`hadi-march/ui` (which re-exports `src/forms/index.js`). Load the styles once:
+`hadi-march/ui` (which re-exports `src/forms/index.ts`). Load the styles once:
 
 ```js
 import "hadi-march/css/tokens.css"

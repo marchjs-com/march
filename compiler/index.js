@@ -125,6 +125,8 @@ class Transformer {
       if (c === '"' || c === "'") { const e = skipString(src, i); out.push(src.slice(i, e)); this.pos = e; prev = { t: "str" }; continue; }
       if (c === "`") { out.push(this.template(prev, out)); prev = { t: "tpl" }; continue; }
       if (c === "/" && exprAllowed(prev)) { const e = skipRegex(src, i); out.push(src.slice(i, e)); this.pos = e; prev = { t: "str" }; continue; }
+      // `<T,>(x: T) => …` / `<T extends U>(…) =>` in .tsx is a generic arrow function, not JSX
+      if (c === "<" && /^<\s*[A-Za-z_$][\w$]*\s*(,|extends\b)/.test(src.slice(i, i + 60))) { const e = src.indexOf(">", i); out.push(src.slice(i, e + 1)); this.pos = e + 1; prev = { t: "punct", v: ">" }; continue; }
       if (c === "<" && exprAllowed(prev) && /[A-Za-z_$>]/.test(src[i + 1] ?? "")) { out.push(this.jsx()); prev = { t: "jsx" }; continue; }
       if (/[0-9]/.test(c) || (c === "." && /[0-9]/.test(src[i + 1] ?? ""))) {
         let j = i + 1;
@@ -151,7 +153,10 @@ class Transformer {
       // punctuation
       if (c === "(" || c === "[" || c === "{") {
         let frame = false;
-        if (c === "{" && asyncPending !== null && stack.length === asyncPending) {
+        // the body brace follows ")" / "=>" / a return type (`): Promise<T> {`), never "<", ":", "|", "&", "," or "(" —
+        // those open a TypeScript object type (`Promise<{ a: T }>`), not the body
+        const typeBrace = prev.t === "punct" && ["<", ":", "|", "&", ",", "(", "="].includes(prev.v);
+        if (c === "{" && asyncPending !== null && stack.length === asyncPending && !typeBrace) {
           frame = true; asyncPending = null; this.asyncFrames++;
           out.push(`{const _$o=${this.helper("getOwner")}();`);
         } else out.push(c);
@@ -616,7 +621,14 @@ class Transformer {
         props.push(`${key}: [${fn}, ${a.code === "true" && !a.raw ? "undefined" : a.code}]`);
         continue;
       }
-      props.push(`${key}: ${a.dynamic ? `${this.helper("r")}(() => (${a.code}))` : a.code}`);
+      if (this.opts.typecheck && isComp && a.name.startsWith("bind:")) {
+        // type-check view: a bound component prop is the value plus its setter (what the component receives)
+        const prop = a.name.slice(5);
+        props.push(`${prop}: ${a.code}(), set${prop.charAt(0).toUpperCase()}${prop.slice(1)}: ${a.code}.set`);
+        continue;
+      }
+      // typecheck mode keeps values unwrapped so prop types are checked against the component's parameter type
+      props.push(`${key}: ${a.dynamic && !this.opts.typecheck ? `${this.helper("r")}(() => (${a.code}))` : a.code}`);
     }
     if (elseKids) props.push(`else: () => [${elseKids}]`);
     const tagCode = isComp ? tag : JSON.stringify(tag);

@@ -5,7 +5,7 @@ const { document } = installDom({ url: "http://localhost/" });
 const { signal, h, render } = await import("../src/index.js");
 const R = await import("../src/router/index.ts");
 const A = await import("../src/access/index.ts");
-const U = await import("../src/ui/index.js");
+const U = await import("../src/ui/index.ts");
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose, html: () => serialize(el) }; };
@@ -432,7 +432,7 @@ test("bootLoader.done removes #hm-boot", async () => {
 });
 
 test("AppShell places the nav and the main area", async () => {
-  const { AppShell } = await import("../src/ui/layout.js");
+  const { AppShell } = await import("../src/ui/layout.ts");
   const { h, render } = await import("../src/index.js");
   const el = document.createElement("div");
   render(() => h(AppShell, { nav: h("nav", {}, "menu"), top: "banner" }, h("p", {}, "page")), el);

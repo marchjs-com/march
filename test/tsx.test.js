@@ -19,3 +19,11 @@ test(".tsx components run in node through hadi-march/register", () => {
   const out = execFileSync(process.execPath, ["--import", "hadi-march/register", "--input-type=module", "-e", script], { cwd: fileURLToPath(new URL("..", import.meta.url)), encoding: "utf8" });
   assert.equal(out.trim(), "3");
 });
+
+test("TSX: async functions with inline object return types and generic arrows", () => {
+  const src = "async function load(): Promise<{ a: number; b: { c: string } }> { const r = await get(); return r }\nconst id = <T,>(x: T): T => x\nconst k = async <R extends object>(x: R): Promise<R> => { await y; return x }";
+  const out = compile(src, { runtime: "hadi-march" }).code;
+  assert.match(out, /Promise<\{ a: number; b: \{ c: string \} \}> \{const _\$o=/);
+  assert.match(out, /const id = <T,>\(x: T\): T => x/);
+  assert.match(out, /Promise<R> => \{const _\$o=/);
+});

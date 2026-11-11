@@ -4,7 +4,7 @@ import { installDom, Event } from "../src/testing/dom.ts";
 const { document } = installDom();
 const { render, signal, h } = await import("../src/index.js");
 const { schema } = await import("../src/schema/index.ts");
-const F = await import("../src/forms/index.js");
+const F = await import("../src/forms/index.ts");
 
 const tick = () => new Promise((r) => setTimeout(r, 0));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
