@@ -1,47 +1,52 @@
 # HADI March
 
-**Run once, then march.** A tiny UI library where components run a single time and only the DOM that depends on a
-changed value updates — no virtual DOM, no re-renders, no dependencies.
+**Run once, then march.** A small, fast UI library for TypeScript and JavaScript where components run a single time and
+only the DOM that depends on a changed value updates — no virtual DOM, no re-renders, no runtime dependencies.
 
-```jsx
-let $count = 0
-const $double = $count * 2
+```tsx
+let $count = 0;
+const $double = $count * 2;
 
-export function Counter() {
+export function Counter(props: { label: string }) {
   return <button on:click={() => $count++}>
-    {$count} × 2 = {$double | number}
-  </button>
+    {props.label}: {$count} × 2 = {$double | number}
+  </button>;
 }
 ```
 
-- **Fine-grained signals.** `$` variables are signals; `const $x = …` that reads them is computed. A text node or attribute
-  that reads a signal is bound directly to it. Updates touch exactly those nodes.
-- **Small.** Zero runtime dependencies. Core entry ≈ 8.5 KB gzip, a minimal counter app ≈ 4.8 KB (`npm run size`, enforced
-  by a test: 9 KB / 5 KB budgets).
-- **Secure by default.** No `innerHTML` anywhere, URL attributes sanitized, no `<script>` creation, no inline styles —
-  works under `script-src 'self'`, `style-src 'self'` and `require-trusted-types-for 'script'` with `trusted-types 'none'`.
-- **Batteries included, loaded separately:** router (file based), data (`query`/`mutation`), schema (validation → forms →
-  table columns), access control, UI components, forms, data table (100k rows), charts (SVG), test helpers, CLI.
-- **Friendly to humans and AIs:** few concepts, consistent names, clear compile errors with code frames, dev warnings,
-  `index.d.ts`, and [`AI_INSTRUCTIONS.md`](AI_INSTRUCTIONS.md).
+- **Fine-grained signals.** `$` variables are signals; a `const $x = …` that reads them is computed. A text node or attribute
+  that reads a signal is bound to it directly; updates touch exactly those nodes.
+- **TypeScript throughout.** Written in strict TypeScript (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, no
+  `any`). Types flow end to end: `Infer<typeof Schema>` into forms and tables, typed store paths, typed routes
+  (`navigate("/nope")` is a compile error), typed i18n catalogs, typed actions. `march check` type-checks the full JSX syntax.
+- **Small.** Core entry ≈ 10.2 KB gzip, a minimal counter app ≈ 5 KB (enforced by a test). Everything else is a separate,
+  lazily loaded module.
+- **Secure by default.** No `innerHTML` anywhere, URL attributes sanitized, no `<script>`, no inline styles; runs under
+  `script-src 'self'`, `style-src 'self'`, `require-trusted-types-for 'script'; trusted-types 'none'`.
+- **Batteries included:** router (file based, nested layouts, typed hrefs), data (`query`/`mutation`), store (path events,
+  persist, undo/redo), schema → forms → tables, access control, UI kit, data table (100k rows), charts, motion
+  (springs, FLIP, timelines, gestures, View Transitions), fx (particles, aurora), i18n (ICU plural/select, RTL), testing.
+- **Friendly to humans and AIs:** few concepts, clear compile errors with code frames, dev warnings,
+  [`AI_INSTRUCTIONS.md`](AI_INSTRUCTIONS.md), [`llms.txt`](llms.txt).
 
-## Install
+## Getting started
 
-March has no runtime dependencies. The only build tool is [esbuild](https://esbuild.github.io/).
+The only build tool is [esbuild](https://esbuild.github.io/) (TypeScript is optional, for `march check`).
 
 ```bash
-npm i -D esbuild
-# then copy or vendor this repository (or install from git) and use the CLI:
-node node_modules/hadi-march/cli/march.js dev
+npm i -D esbuild typescript
+node node_modules/hadi-march/cli/march.js dev      # index.html + src/main.tsx, live reload, error overlay
+node node_modules/hadi-march/cli/march.js build    # dist/
+node node_modules/hadi-march/cli/march.js check    # type-check, including March syntax
 ```
 
-`march dev` serves `index.html` + `src/main.jsx` with live reload and an error overlay; `march build` writes `dist/`.
+Node runs `.ts`/`.tsx` sources directly: `node --import hadi-march/register --test` for component tests.
 
 ## The language (compiled by the esbuild plugin)
 
 | Write | Means |
 |---|---|
-| `let $n = 0` | `const $n = signal(0)` |
+| `let $n = 0` / `let $n: number = 0` | `const $n = signal<number>(0)` |
 | `$n++`, `$n = 5`, `$n += 2` | `$n.set(…)` |
 | `const $d = $n * 2` | `computed(() => $n() * 2)` |
 | `{$n}` in JSX | live text node |
@@ -49,53 +54,47 @@ node node_modules/hadi-march/cli/march.js dev
 | `on:click\|prevent={fn}` | listener with modifiers (`prevent stop once self capture passive`) |
 | `bind:value={$name}` | two-way binding (`value`, `checked`, `group`, `this`) |
 | `class:active={$on}` | toggle a class |
-| `use:tooltip={text}` | action `tooltip(node, text)` (may return cleanup) |
-| `transition:fade` | enter/leave animation (`fade`, `slide`, `scale`) |
+| `use:tilt={{ max: 8 }}` | action `tilt(node, arg)` (may return cleanup) |
+| `transition:blur` | enter/leave animation (`fade slide scale` built in; `blur fly …` with motion) |
 | `{price \| money("EUR")}` | formatting pipe (Intl, follows the locale) |
 | `<Row {user} {onSave} />` | shorthand attributes |
-| `sx={{ p: 2, gap: 1, cols: 3 }}` | design-token utility classes resolved at build time |
-| `async function Page() { const u = await load() … }` | async component; loading/error handled by the nearest `<Try>` |
-| `` t`Hello ${name}` `` | translated text (keys collected at build) |
-| `` css`.card { … }` `` | extracted to the CSS bundle |
+| `sx={{ p: 2, gap: 1, cols: 3 }}` | design-token classes resolved at build time |
+| `async function Page() { … await … }` | async component; loading/error handled by the nearest `<Try>` |
+| `` t`Hello ${name}` `` / `t("cart", { n })` | translated text (ICU plural/select) |
 
-Runtime names (`signal`, `If`, `For`, `query`, `Page`, …) and your `src/components/*` are **auto-imported**.
-
-Without the compiler, use `h(tag, props, ...children)` directly — the same runtime (see `docs/core.md`).
-
-## Control flow
-
-```jsx
-<If when={$user}>{(u) => <p>Hi {u.name}</p>}<Else>Sign in</Else></If>
-<For each={$items} key="id">{(item, i) => <li>{i() + 1}. {item().title}</li>}</For>
-<Switch fallback="?"><Match when={$tab === "a"}>A</Match><Match when={$tab === "b"}>B</Match></Switch>
-<Try fallback={(err, retry) => <ErrorBox error={err} onRetry={retry} />} loading={<Spinner />}>…</Try>
-```
+Runtime names and your `src/components/*` are auto-imported. Without the compiler, use `h(tag, props, ...children)`.
 
 ## Modules
 
 | Import | What |
 |---|---|
-| `hadi-march` | signals, store, JSX runtime, control flow, pipes, i18n, `define()` web components |
-| `hadi-march/router` | file-based routes, lazy pages, guards, `params()`, `query()`, `setQuery`, `<Link>` |
-| `hadi-march/data` | `query`, `mutation`, `invalidate`, `fetchJson`; access control `setAccess`, `can`, `<Can>`, `<Gate>` |
-| `hadi-march/schema` | `schema({...})` → validation, coercion, defaults, form fields, table columns |
-| `hadi-march/ui` | Page, Button, Dialog (`confirm`, `prompt`, `askReason`), Toast, Tabs, NavMenu, CommandPalette, forms… |
-| `hadi-march/table` | data table: sort, filters, saved views, server paging, virtual scroll, selection, inline edit, CSV |
+| `hadi-march` | signals, store basics, JSX runtime, control flow, pipes, `t`, `define()` |
+| `hadi-march/store` | `subscribe`, `on(store, "users.*.name")`, `persist`, `history`, `readonly`, `snapshot`, `derive` |
+| `hadi-march/i18n` | ICU `format`, `loadLocale`, `dir`, `typed<Catalog>()`; `hadi-march/i18n/tr` Turkish pack |
+| `hadi-march/router` | file routes, `_layout` files, redirects, guards, `beforeLeave`, preload, `setMeta`, typed `Href` |
+| `hadi-march/data` | `query`, `mutation`, `invalidate`, `fetchJson`; `setAccess`, `can`, `<Can>`, `<Gate>` |
+| `hadi-march/schema` | `schema({...})`, `Infer<>`, validation, coercion, columns |
+| `hadi-march/ui` | Page, AppShell, NavMenu, CommandPalette, Dialog (`confirm`/`prompt`/`askReason`), Toast, Tabs, forms… |
+| `hadi-march/table` | sort, filters, saved views, server paging, virtual scroll, selection, inline edit, CSV, URL sync |
+| `hadi-march/crud` | `crud(source, { schema })` list/create/edit/delete |
 | `hadi-march/charts` | Line, Area, Bar, Pie, Sparkline, Stat, Heatmap, ProgressRing, BarList |
-| `hadi-march/testing` | tiny DOM for `node --test`, `renderTest()` with `click/type/confirm/sees`, `mockFetch` |
+| `hadi-march/motion` | `animate`, `spring`, `tween`, `timeline`, FLIP `<For animate>`, `inView`/`reveal`/`parallax`, page transitions, `drag`/`swipe`/`magnet`/`tilt` |
+| `hadi-march/fx` | `Particles`, `Aurora`, `Noise`, `spotlight`, `confetti` |
+| `hadi-march/testing` | tiny DOM for `node --test`, `renderTest()`, `mockFetch` |
 
-Docs: [`docs/`](docs) · Examples: [`examples/`](examples) · Türkçe: [`README.tr.md`](README.tr.md)
+Docs: [`docs/`](docs) · Examples: [`examples/`](examples) (counter, form, router, async, table, charts, **showcase**) ·
+Türkçe: [`README.tr.md`](README.tr.md) · Changes: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Performance
 
-`npm run bench` renders and updates keyed lists of 1,000 and 10,000 rows and runs table/chart scenarios in the test DOM.
-Only changed bindings update; keyed rows are reused and moved, never re-created.
+`npm run bench` creates/updates keyed lists of 1,000 and 10,000 rows and runs table, chart (10k–100k points with LTTB)
+and animation scenarios. Only changed bindings update; keyed rows are reused and moved, never re-created.
 
-## Security notes
+## Security
 
-The library never parses HTML. Text is always `textContent`; `href`/`src` with `javascript:` and other unsafe schemes are
-replaced by `about:blank`; `<script>`, `<iframe>`, `innerHTML` and string `style` throw. Access helpers (`can`, `<Gate>`)
-only decide what to show — your server must enforce permissions.
+The library never parses HTML. Text is always `textContent`; `href`/`src` with unsafe schemes become `about:blank`;
+`<script>`, `<iframe>`, `innerHTML` and string `style` throw. Motion uses WAAPI/CSSOM (no style attributes). Access
+helpers only decide what to show — your server must enforce permissions.
 
 ## License
 

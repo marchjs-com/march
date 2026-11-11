@@ -147,3 +147,69 @@ assert.ok(!s.sees("Ada"));
 ```
 
 Module references: `docs/core.md`, `docs/ui.md`, `docs/forms.md`, `docs/table.md`, `docs/charts.md`.
+
+## 11. TypeScript
+
+March is written in strict TypeScript; write apps in `.tsx`/`.ts` too.
+```tsx
+interface User { id: number; name: string }
+let $users: User[] = [];                 // → signal<User[]>([])
+const $count: number = $users.length;    // → computed<number>
+function UserRow(props: { user: User; onOpen: (id: number) => void }) { … }   // props are checked at every use
+const Product = schema({ title: { type: "text", required: true }, price: "money" });
+type Product = Infer<typeof Product>;    // { title: string; price: number | null }
+```
+- `tsc` understands the TSX-compatible subset (namespaced `on:`/`class:`/`use:`/`bind:`/`transition:`, `$` variables).
+  `on:click|prevent`, `{x | pipe}` and `<Row {user} />` are March-only syntax: `march check` type-checks them by compiling
+  first. In `.tsx` meant for plain `tsc`, write `on:click={(e) => { e.preventDefault(); … }}`, `applyPipe("date", x)`,
+  `user={user}`.
+- In `.tsx`, generic arrows need a comma: `<T,>(x: T) => x` (or use `function f<T>()`).
+- Register routes for typed hrefs (generated `pages.d.ts` does it): `navigate("/users/42")` ok, `navigate("/nope")` error.
+- Typed i18n catalog: `const tt = typed<typeof en>(); tt("cart.items", { n })` — missing variables are errors.
+- Restrict permission names by augmenting `AccessRegister`.
+
+## 12. Store (hadi-march/store)
+
+```ts
+const app = store({ user: { name: "Ada" }, cart: { items: [] as Item[] } });
+app.cart.items.push(item);                    // plain writes; only read paths re-render
+on(app, "cart.items", (e) => …);               // typed path; e = { path, op: "push", value, old }
+on(app, "users.*.name", fn); subscribe(app.cart, fn);
+batch(() => { … });                           // one { op: "batch", changes } event
+persist(app.prefs, "prefs"); const h = history(app.form); h.undo();
+readonly(app); snapshot(app); derive(() => app.cart.items.length);
+```
+Do not keep references to plain objects you put into a store and mutate them — mutate through the store.
+
+## 13. i18n (hadi-march/i18n)
+
+ICU messages: `"{n, plural, =0 {No items} one {# item} other {# items}}"`, `"{g, select, female {…} other {…}}"`,
+`"{d, date, short}"`, `"{x, number, percent}"`. `loadLocale("de", () => import("./de.js"))` + `await setLocale("de")`
+(lazy). `dir()` gives "rtl" for Arabic/Hebrew/Persian…; `<html lang dir>` follow the locale. Apostrophes are literal.
+
+## 14. Routing extras
+
+`_layout.tsx` wraps every page in its folder (receives `children`; may export `guard`). `createRouter({ redirects })`,
+`<Link preload="hover|visible|none">`, `beforeLeave(() => !dirty() || confirm(…))` (links, navigate, back/forward, tab close),
+`setMeta({ title, description })`, `queryParam("tab")` signal. `navigate()` is async.
+
+## 15. Motion and fx
+
+```tsx
+import "hadi-march/motion";                    // registers blur/fly transitions and <For animate> FLIP
+const $x = spring(() => $target, { stiffness: 200, damping: 20 });
+<div style={{ transform: `translateX(${$x}px)` }} use:drag={{ axis: "x" }} transition:blur />
+<For each={$items} key="id" animate>{(it) => <li use:reveal>{it().name}</li>}</For>
+timeline({ root }).add(".card", fadeUp, { stagger: 60 }).play();
+pageTransitions({ type: "slide" });           // View Transitions with fallback
+```
+Rules: animate only `transform`/`opacity` (WAAPI or the `style` object); everything honors `prefers-reduced-motion`
+(`reducedMotion()`); never use string styles. fx (`Particles`, `Aurora`, `confetti`) is decorative — keep it off admin
+screens.
+
+## 16. Names to remember
+
+- `<Switch>/<Match>` is control flow; the on/off input is `<Toggle>`.
+- Project components are auto-imported by file name (named or default export).
+- Components created outside `render()` (e.g. in an event handler) get their own root — prefer `openDialog()` for UI
+  created on demand so it is disposed when closed.
