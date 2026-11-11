@@ -103,8 +103,8 @@ fieldset > .hm-section-title, legend.hm-section-title { font-weight: 600; font-s
 .hm-chip-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hm-chip-x { display: inline-flex; align-items: center; border: 0; background: transparent; color: var(--hm-muted); cursor: pointer; padding: 0 var(--hm-space-1); font: inherit; line-height: 1; border-radius: var(--hm-radius-1); }
 .hm-chip-x:hover { color: var(--hm-danger); }
-.hm-listbox { position: fixed; z-index: var(--hm-z-dropdown); max-height: 18rem; overflow-y: auto; padding: var(--hm-space-1); background: var(--hm-surface-raised); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-3); animation: hm-scale-in var(--hm-dur) var(--hm-ease-out); }
-.hm-option { display: flex; align-items: baseline; justify-content: space-between; gap: var(--hm-space-2); padding: .4375rem var(--hm-space-2); border-radius: var(--hm-radius-1); cursor: pointer; font-size: var(--hm-text-md); }
+.hm-listbox { --hm-pop-pad: .3125rem; position: fixed; z-index: var(--hm-z-dropdown); max-height: 18rem; overflow-y: auto; padding: var(--hm-pop-pad); background: var(--hm-surface-raised); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-3); animation: hm-scale-in var(--hm-dur) var(--hm-ease-out); }
+.hm-option { display: flex; align-items: baseline; justify-content: space-between; gap: var(--hm-space-2); padding: .4375rem .625rem; border-radius: max(.25rem, calc(var(--hm-radius-3) - var(--hm-pop-pad, .3125rem))); cursor: pointer; font-size: var(--hm-text-md); }
 .hm-option .hm-hint { margin-inline-start: auto; }
 .hm-option.hm-active { background: var(--hm-surface-2); }
 .hm-option[aria-selected="true"] { font-weight: 500; color: var(--hm-primary); }
