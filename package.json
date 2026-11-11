@@ -24,7 +24,8 @@
     "./i18n/*": "./src/i18n/*.js",
     "./motion": "./src/motion/index.ts",
     "./motion/motion.css": "./src/motion/motion.css",
-    "./fx": "./src/fx/index.ts"
+    "./fx": "./src/fx/index.ts",
+    "./fx/fx.css": "./src/fx/fx.css"
   },
   "bin": {
     "march": "./cli/march.js"
