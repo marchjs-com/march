@@ -213,8 +213,18 @@ export function effect(fn) {
 /** Group writes; effects run once at the end. Returns `fn()`'s value. */
 export function batch(fn) {
   batchDepth++;
-  try { return fn(); } finally { if (--batchDepth === 0) flush(); }
+  try { return fn(); } finally {
+    if (--batchDepth === 0) {
+      if (batchEnd.length) { const cbs = batchEnd; batchEnd = []; for (const cb of cbs) cb(); }
+      flush();
+    }
+  }
 }
+let batchEnd = [];
+/** True inside batch(). */
+export const isBatching = () => batchDepth > 0;
+/** Run `fn` when the outermost batch ends (immediately when not batching). Used by store change groups. */
+export function afterBatch(fn) { if (batchDepth > 0) batchEnd.push(fn); else fn(); }
 
 /** Read signals without subscribing. */
 export function untrack(fn) {
