@@ -316,7 +316,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
   const id = uid("hm-md");
   const split = props.preview === "split";
   const tabBtn = (name: string, label: string) => h("button", {
-    type: "button", role: "tab", class: "hm-tab", id: `${id}-${name}`, "aria-selected": () => String(tab() === name), "aria-controls": `${id}-${name}-panel`,
+    type: "button", role: "tab", class: "hm-editor-tab", id: `${id}-${name}`, "aria-selected": () => String(tab() === name), "aria-controls": `${id}-${name}-panel`,
     tabindex: () => (tab() === name ? "0" : "-1"), onClick: () => tab.set(name),
     onKeyDown: (e: KeyboardEvent) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); const n = tab.peek() === "write" ? "preview" : "write"; tab.set(n); globalThis.document?.getElementById(`${id}-${n}`)?.focus(); } },
   }, label);
@@ -327,7 +327,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
   const preview = h(Markdown, { source: live(() => get()) });
   if (split) return h("div", { class: cx("hm-md-editor hm-md-split", props.class) }, editor, h("div", { class: "hm-md-preview" }, preview));
   return h("div", { class: cx("hm-md-editor", props.class) },
-    h("div", { role: "tablist", class: "hm-tabs", "aria-label": t`Editor mode` }, tabBtn("write", t`Write`), tabBtn("preview", t`Preview`)),
+    h("div", { role: "tablist", class: "hm-editor-tabs", "aria-label": t`Editor mode` }, tabBtn("write", t`Write`), tabBtn("preview", t`Preview`)),
     h("div", { role: "tabpanel", id: `${id}-write-panel`, "aria-labelledby": `${id}-write`, hidden: () => tab() !== "write" }, editor),
     h("div", { role: "tabpanel", id: `${id}-preview-panel`, class: "hm-md-preview", "aria-labelledby": `${id}-preview`, hidden: () => tab() !== "preview" }, () => (tab() === "preview" ? preview : null)));
 }

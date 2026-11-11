@@ -437,7 +437,7 @@ export function CodeInput(props: CodeInputProps): unknown {
   });
   for (let i = 0; i < n; i++) {
     const el = h("input", {
-      type: () => ((typeof props.masked === "function" ? props.masked() : props.masked) ? "password" : "text"), class: "hm-code-box", id: i ? `${baseId}-${i}` : baseId, inputmode: numeric ? "numeric" : "text", pattern: numeric ? "[0-9]*" : null,
+      type: () => ((typeof props.masked === "function" ? props.masked() : props.masked) ? "password" : "text"), class: "hm-otp-box", id: i ? `${baseId}-${i}` : baseId, inputmode: numeric ? "numeric" : "text", pattern: numeric ? "[0-9]*" : null,
       autocomplete: i === 0 ? "one-time-code" : "off", "aria-label": t`Character ${i + 1} of ${n}`, "aria-invalid": c["aria-invalid"],
       disabled: () => !!props.disabled, readonly: () => !!props.readonly, onBlur: props.onBlur, autofocus: i === 0 && props.autofocus ? true : null,
       onFocus: (e: FocusEvent) => inputOf(e).select?.(),
@@ -463,5 +463,5 @@ export function CodeInput(props: CodeInputProps): unknown {
     boxes.push(el);
   }
   onCleanup(() => { boxes.length = 0; });
-  return h("div", { role: "group", class: cx("hm-code", props.class), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"] }, boxes);
+  return h("div", { role: "group", class: cx("hm-otp", props.class), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"] }, boxes);
 }

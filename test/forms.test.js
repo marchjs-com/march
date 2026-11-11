@@ -504,5 +504,5 @@ test("TextInput autofocus and CodeInput masked boxes", async () => {
   const el = document.createElement("div");
   render(() => [h(TextInput, { autofocus: true }), h(CodeInput, { length: 4, masked: true })], el);
   assert.equal(el.querySelector("input").hasAttribute("autofocus"), true);
-  assert.equal(el.querySelectorAll(".hm-code-box").every((b) => b.getAttribute("type") === "password"), true);
+  assert.equal(el.querySelectorAll(".hm-otp-box").every((b) => b.getAttribute("type") === "password"), true);
 });

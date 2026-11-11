@@ -452,3 +452,16 @@ test("Disclosure renders details/summary and reports toggles", async () => {
   d.open = true; d.dispatchEvent(new Event("toggle"));
   assert.equal(last, true);
 });
+
+test("component class names do not collide across stylesheets (tabs vs editor tabs, code block vs OTP input)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const css = (f) => readFileSync(new URL(`../src/css/${f}`, import.meta.url), "utf8");
+  const forms = css("forms.css"), ui = css("ui.css");
+  // ui.css owns Tabs (.hm-tabs/.hm-tab) and CodeBlock (.hm-code); forms.css must not restyle them
+  for (const cls of ["hm-tabs", "hm-tab", "hm-code"]) {
+    if (cls !== "hm-tabs") assert.match(ui, new RegExp(`^\.${cls} \{`, "m"));
+    assert.doesNotMatch(forms, new RegExp(`^\.${cls}[ \[{]`, "m"), `.${cls} is defined in forms.css too`);
+  }
+  assert.match(forms, /^\.hm-editor-tabs \{/m);
+  assert.match(forms, /^\.hm-otp \{/m);
+});
