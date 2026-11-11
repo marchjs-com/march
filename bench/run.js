@@ -37,6 +37,6 @@ for (const n of sizes) {
   console.log(`${String(n).padEnd(8)}${f(r.create)}${f(r.update)}  ${f(r.swap)}${f(r.replace)}${f(r.clear)}${r.ok ? "" : "  (!)"}`);
 }
 
-for (const mod of ["./table.js", "./charts.js"]) {
+for (const mod of ["./table.js", "./charts.js", "./motion.js"]) {
   try { const m = await import(mod); if (m.run) { console.log(""); await m.run({ installDom }); } } catch (e) { if (e.code !== "ERR_MODULE_NOT_FOUND") throw e; }
 }
