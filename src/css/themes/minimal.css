@@ -11,6 +11,7 @@
   --hm-mark: #111111; --hm-on-mark: #FFFFFF; --hm-stage: #0A0A0A;
   --hm-glow-1: rgb(255 255 255 / .18); --hm-glow-2: rgb(255 255 255 / .1); --hm-glow-3: rgb(255 255 255 / .12); --hm-glow-4: rgb(255 255 255 / .06);
   --hm-shadow-rgb: 16 24 40; --hm-overlay: rgb(10 14 24 / .42);
+  --hm-special: #2563EB;
 }
 @media (prefers-color-scheme: dark) {
   :root[data-hm-theme="minimal"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-hm-theme="minimal"] {
@@ -23,6 +24,7 @@
   --hm-mark: #F2F2F2; --hm-on-mark: #111111; --hm-stage: #000000;
   --hm-glow-1: rgb(255 255 255 / .18); --hm-glow-2: rgb(255 255 255 / .1); --hm-glow-3: rgb(255 255 255 / .12); --hm-glow-4: rgb(255 255 255 / .06);
   --hm-shadow-rgb: 0 0 0; --hm-overlay: rgb(0 0 0 / .62);
+  --hm-special: #60A5FA;
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;
@@ -38,6 +40,7 @@
   --hm-mark: #F2F2F2; --hm-on-mark: #111111; --hm-stage: #000000;
   --hm-glow-1: rgb(255 255 255 / .18); --hm-glow-2: rgb(255 255 255 / .1); --hm-glow-3: rgb(255 255 255 / .12); --hm-glow-4: rgb(255 255 255 / .06);
   --hm-shadow-rgb: 0 0 0; --hm-overlay: rgb(0 0 0 / .62);
+  --hm-special: #60A5FA;
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;

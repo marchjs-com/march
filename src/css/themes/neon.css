@@ -11,6 +11,7 @@
   --hm-mark: linear-gradient(135deg, #F048C8, #9D7BFF 50%, #00D0E8); --hm-on-mark: #FFFFFF; --hm-stage: #07061A;
   --hm-glow-1: rgb(240 72 200 / .7); --hm-glow-2: rgb(157 123 255 / .6); --hm-glow-3: rgb(0 208 232 / .55); --hm-glow-4: rgb(255 216 74 / .3);
   --hm-shadow-rgb: 0 0 0; --hm-overlay: rgb(0 0 0 / .62);
+  --hm-special: #FFD84A;
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;
@@ -26,6 +27,7 @@
   --hm-mark: linear-gradient(135deg, #F048C8, #9D7BFF 50%, #00D0E8); --hm-on-mark: #FFFFFF; --hm-stage: #07061A;
   --hm-glow-1: rgb(240 72 200 / .7); --hm-glow-2: rgb(157 123 255 / .6); --hm-glow-3: rgb(0 208 232 / .55); --hm-glow-4: rgb(255 216 74 / .3);
   --hm-shadow-rgb: 0 0 0; --hm-overlay: rgb(0 0 0 / .62);
+  --hm-special: #FFD84A;
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;
@@ -41,6 +43,7 @@
   --hm-mark: linear-gradient(135deg, #F048C8, #9D7BFF 50%, #00D0E8); --hm-on-mark: #FFFFFF; --hm-stage: #07061A;
   --hm-glow-1: rgb(240 72 200 / .7); --hm-glow-2: rgb(157 123 255 / .6); --hm-glow-3: rgb(0 208 232 / .55); --hm-glow-4: rgb(255 216 74 / .3);
   --hm-shadow-rgb: 0 0 0; --hm-overlay: rgb(0 0 0 / .62);
+  --hm-special: #FFD84A;
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;

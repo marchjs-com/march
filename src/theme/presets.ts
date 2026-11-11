@@ -19,6 +19,13 @@ export interface ThemeColors {
   /** Brand mark fill (any CSS background). */ mark: string;
   /** Glyph color on the mark (default white). */ onMark?: string;
   /** Sign-in showcase backdrop and its 4 glow colors. */ stage: string; glow: readonly string[];
+  /** Highlight / special accent (default: the 4th categorical color). */ special?: string;
+  /**
+   * Named brand colors → `--hm-<name>`, `--hm-<name>-soft`, `--hm-on-<name>` (text on a fill of it: white when white
+   * reaches the brand minimum, else the better of white / near-black) and `--hm-<name>-text` (the color darkened or
+   * lightened until it reads as text on the surface, WCAG AA 4.5:1).
+   */
+  brand?: Readonly<Record<string, { color: string; soft?: string }>>;
 }
 
 export interface ThemeDef {
@@ -45,6 +52,23 @@ export function defineTheme(def: ThemeDef): ThemeDef {
   return Object.freeze({ ...def, swatches: def.swatches ?? [def.light.solid, def.light.primary, ...def.light.cat.slice(0, 3)] });
 }
 
+// ---- contrast helpers (WCAG relative luminance), as in HADİ's palette_math.dart
+const rgb = (hex: string): [number, number, number] => { const h = hex.replace("#", ""); const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h.slice(0, 6), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+const hex = (c: readonly number[]): string => `#${c.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, "0")).join("").toUpperCase()}`;
+const lum = (h: string): number => { const [r, g, b] = rgb(h).map((v) => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * (r as number) + 0.7152 * (g as number) + 0.0722 * (b as number); };
+/** WCAG contrast ratio of two hex colors. */
+export const contrast = (a: string, b: string): number => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+const mix = (a: string, b: string, t: number): string => { const x = rgb(a), y = rgb(b); return hex(x.map((v, i) => v + ((y[i] as number) - v) * t)); };
+/** `fg` moved toward black or white (whichever the background needs) until it reaches `min` contrast on `bg`. */
+export function ensureContrast(fg: string, bg: string, min = 4.5): string {
+  if (contrast(fg, bg) >= min) return fg;
+  const toward = lum(bg) > 0.4 ? "#000000" : "#FFFFFF";
+  for (let t = 0.05; t <= 1; t += 0.05) { const c = mix(fg, toward, t); if (contrast(c, bg) >= min + 0.02) return c; }
+  return toward;
+}
+/** HADİ's brand rule (kBrandWhiteMinRatio 2.6): white text on a brand fill when white reaches 2.6:1, else the better of white / near-black. */
+export const onBrandFill = (bg: string): string => (contrast("#FFFFFF", bg) >= 2.6 ? "#FFFFFF" : contrast("#FFFFFF", bg) >= contrast("#14181F", bg) ? "#FFFFFF" : "#14181F");
+
 const SANS = `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
 const DIM = { light: { shadow: "16 24 40", overlay: "rgb(10 14 24 / .42)" }, dark: { shadow: "0 0 0", overlay: "rgb(0 0 0 / .62)" } } as const;
 
@@ -60,6 +84,8 @@ function modeVars(c: ThemeColors, mode: "light" | "dark"): string {
     `--hm-mark: ${c.mark}; --hm-on-mark: ${c.onMark ?? "#FFFFFF"}; --hm-stage: ${c.stage};`,
     c.glow.map((x, i) => `--hm-glow-${i + 1}: ${x};`).join(" "),
     `--hm-shadow-rgb: ${d.shadow}; --hm-overlay: ${d.overlay};`,
+    `--hm-special: ${c.special ?? c.cat[3]};`,
+    ...Object.entries(c.brand ?? {}).map(([n, b]) => `--hm-${n}: ${b.color}; --hm-${n}-soft: ${b.soft ?? `color-mix(in srgb, ${b.color} 16%, ${c.surface})`}; --hm-on-${n}: ${onBrandFill(b.color)}; --hm-${n}-text: ${ensureContrast(b.color, c.surface)};`),
   ];
   if (mode === "dark") lines.push(
     "--hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);",
@@ -96,29 +122,48 @@ ${darkSet} {
 
 // ------------------------------------------------------------------ built-in themes
 const FIGTREE = `"Figtree Variable", "Figtree"`, BRICOLAGE = `"Bricolage Grotesque Variable", "Bricolage Grotesque"`, INTER = `"InterVariable", "Inter"`;
-const HADI_RIBBON = ["#F2801F", "#1D9AD6", "#78BE3A", "#A3338C"] as const;
+/** HADİ Sosyal's official colors (hadimobile lib/theme/hadi_colors.dart › HadiColors, HadiLight; night tones). */
+export const HADI = {
+  heyecan: "#F2801F", aktivite: "#1D9AD6", dostluk: "#78BE3A", iletisim: "#A3338C", pink: "#D33C73", gold: "#D9A93A", error: "#D24444",
+  ink: "#17344F", ink2: "#3E5770", ink3: "#6B7F92", mist: "#F2F6F9", line: "#DCE4EB",
+  night: "#0D2033", nightCard: "#152D45", nightLine: "#244460", nightText: "#E8EFF5", nightMuted: "#9DB0C2",
+} as const;
+/** The four-color ribbon in its official order: Heyecan, Aktivite, Dostluk, İletişim. */
+const HADI_RIBBON_GRADIENT = `linear-gradient(135deg, ${HADI.heyecan} 0%, ${HADI.aktivite} 36%, ${HADI.dostluk} 66%, ${HADI.iletisim} 100%)`;
+const HADI_GLOW = ["rgb(242 128 31 / .7)", "rgb(29 154 214 / .6)", "rgb(120 190 58 / .45)", "rgb(163 51 140 / .55)"] as const;
 
 /** HADİ — the HADİ Sosyal brand (default): navy ink, the four-color ribbon, Figtree + Bricolage Grotesque. */
 export const hadi = defineTheme({
-  id: "hadi", name: "HADİ", description: "HADİ Sosyal: lacivert mürekkep, dört renkli kurdele",
+  id: "hadi", name: "HADİ", description: "HADİ Sosyal: lacivert mürekkep, dört resmi renk (Heyecan, Aktivite, Dostluk, İletişim)",
   font: FIGTREE, display: BRICOLAGE, displayWeight: 700, radius: 12,
   light: {
-    bg: "#F2F6F9", surface: "#FFFFFF", text: "#17344F", muted: "#566B7F", border: "#DCE4EB",
-    primary: "#C2570C", solid: "#17344F", onSolid: "#FFFFFF",
-    danger: "#C23030", success: "#3B7D16", warn: "#A35A00", info: "#0F72A6",
-    cat: ["#F2801F", "#1D9AD6", "#78BE3A", "#A3338C", "#D33C73", "#D9A93A", "#17344F", "#0E9F8E"],
-    mark: "linear-gradient(135deg, #F2801F 0%, #D33C73 38%, #A3338C 62%, #1D9AD6 100%)",
-    stage: "#0D2033", glow: ["rgb(242 128 31 / .7)", "rgb(29 154 214 / .6)", "rgb(120 190 58 / .45)", "rgb(163 51 140 / .55)"],
+    bg: HADI.mist, surface: "#FFFFFF", text: HADI.ink, muted: ensureContrast(HADI.ink3, "#FFFFFF"), border: HADI.line,
+    // accent = Heyecan; as text it is shaded until it reads on white (AA), like HadiColors.readableOn
+    primary: ensureContrast(HADI.heyecan, "#FFFFFF"), solid: HADI.ink, onSolid: onBrandFill(HADI.ink),
+    danger: ensureContrast(HADI.error, "#FFFFFF"), success: ensureContrast(HADI.dostluk, "#FFFFFF"), warn: ensureContrast(HADI.gold, "#FFFFFF"),
+    info: ensureContrast(HADI.aktivite, "#FFFFFF"), special: ensureContrast(HADI.iletisim, "#FFFFFF"),
+    cat: [HADI.heyecan, HADI.aktivite, HADI.dostluk, HADI.iletisim, HADI.pink, HADI.gold, HADI.ink, "#0E9F8E"],
+    mark: HADI_RIBBON_GRADIENT, stage: HADI.night, glow: HADI_GLOW,
+    brand: {
+      heyecan: { color: HADI.heyecan, soft: "#FEF0E3" }, aktivite: { color: HADI.aktivite, soft: "#E5F4FB" },
+      dostluk: { color: HADI.dostluk, soft: "#EEF7E5" }, iletisim: { color: HADI.iletisim, soft: "#F6E8F3" },
+      gold: { color: HADI.gold, soft: "#FBF3DD" }, pink: { color: HADI.pink }, navy: { color: HADI.ink },
+    },
   },
   dark: {
-    bg: "#0B1B2B", surface: "#122A40", raised: "#173350", text: "#E8EFF5", muted: "#9DB0C2", border: "#244460",
-    primary: "#F59A4A", solid: "#F2801F", onSolid: "#1B0E02",
-    danger: "#FF8A8D", success: "#9BD86A", warn: "#FBC25A", info: "#5CB8EC",
-    cat: ["#F59A4A", "#4FB4E6", "#93CF5C", "#C95BB5", "#E9658F", "#E5BE5C", "#9DB0C2", "#2EC4B2"],
-    mark: "linear-gradient(135deg, #F2801F 0%, #D33C73 38%, #A3338C 62%, #1D9AD6 100%)",
-    stage: "#0D2033", glow: ["rgb(242 128 31 / .7)", "rgb(29 154 214 / .6)", "rgb(120 190 58 / .45)", "rgb(163 51 140 / .55)"],
+    // HadiPreset klasik › night tones
+    bg: "#0B1B2B", surface: HADI.night, raised: HADI.nightCard, text: HADI.nightText, muted: HADI.nightMuted, border: HADI.nightLine,
+    primary: ensureContrast(HADI.heyecan, HADI.night), solid: HADI.heyecan, onSolid: onBrandFill(HADI.heyecan),
+    danger: ensureContrast(HADI.error, HADI.night), success: ensureContrast(HADI.dostluk, HADI.night), warn: ensureContrast(HADI.gold, HADI.night),
+    info: ensureContrast(HADI.aktivite, HADI.night), special: ensureContrast("#C95BB5", HADI.night),
+    cat: [HADI.heyecan, HADI.aktivite, HADI.dostluk, "#C95BB5", "#E9658F", HADI.gold, HADI.nightMuted, "#2EC4B2"],
+    mark: HADI_RIBBON_GRADIENT, stage: HADI.night, glow: HADI_GLOW,
+    brand: {
+      heyecan: { color: HADI.heyecan }, aktivite: { color: HADI.aktivite }, dostluk: { color: HADI.dostluk }, iletisim: { color: "#C95BB5" },
+      gold: { color: HADI.gold }, pink: { color: HADI.pink }, navy: { color: HADI.nightCard },
+    },
   },
-  swatches: ["#17344F", ...HADI_RIBBON],
+  swatches: [HADI.ink, HADI.heyecan, HADI.aktivite, HADI.dostluk, HADI.iletisim],
 });
 
 /** Klasik Krem — HADİ on a warm off-white; espresso in the dark. */

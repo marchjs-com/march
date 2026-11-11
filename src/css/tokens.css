@@ -65,7 +65,8 @@
   --hm-info-soft: color-mix(in srgb, var(--hm-info) 10%, var(--hm-surface));
   --hm-inverse-bg: var(--hm-text); --hm-inverse-text: var(--hm-surface);
   --hm-scrollbar: var(--hm-border-strong);
-  --hm-brand-gradient: linear-gradient(120deg, var(--hm-cat-1), var(--hm-cat-5) 35%, var(--hm-cat-4) 65%, var(--hm-cat-2));
+  --hm-brand-gradient: linear-gradient(120deg, var(--hm-cat-1), var(--hm-cat-2) 35%, var(--hm-cat-3) 65%, var(--hm-cat-4));
+  --hm-special-soft: color-mix(in srgb, var(--hm-special, var(--hm-cat-4)) 11%, var(--hm-surface));
 }
 
 

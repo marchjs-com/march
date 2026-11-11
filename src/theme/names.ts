@@ -4,7 +4,7 @@ export const THEME_NAMES: readonly { id: string; name: string; description?: str
   {
     "id": "hadi",
     "name": "HADİ",
-    "description": "HADİ Sosyal: lacivert mürekkep, dört renkli kurdele"
+    "description": "HADİ Sosyal: lacivert mürekkep, dört resmi renk (Heyecan, Aktivite, Dostluk, İletişim)"
   },
   {
     "id": "krem",

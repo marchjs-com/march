@@ -60,3 +60,20 @@ test("Rating: radio group, click and arrow keys", async () => {
   assert.equal(v(), 4);
   m.dispose();
 });
+
+test("HADİ theme: the four official colors as tokens, legible semantic mapping, chart and ribbon order", async () => {
+  const { readFileSync } = await import("node:fs");
+  const css = readFileSync(new URL("../src/css/themes/hadi.css", import.meta.url), "utf8");
+  for (const [name, hex, soft] of [["heyecan", "#F2801F", "#FEF0E3"], ["aktivite", "#1D9AD6", "#E5F4FB"], ["dostluk", "#78BE3A", "#EEF7E5"], ["iletisim", "#A3338C", "#F6E8F3"]]) {
+    assert.match(css, new RegExp(`--hm-${name}: ${hex};`));
+    assert.match(css, new RegExp(`--hm-${name}-soft: ${soft};`));
+    assert.match(css, new RegExp(`--hm-on-${name}: #`));
+  }
+  assert.match(css, /--hm-cat-1: #F2801F; --hm-cat-2: #1D9AD6; --hm-cat-3: #78BE3A; --hm-cat-4: #A3338C;/);
+  assert.match(css, /--hm-mark: linear-gradient\(135deg, #F2801F 0%, #1D9AD6 36%, #78BE3A 66%, #A3338C 100%\)/);
+  const L = T.hadi.light, D = T.hadi.dark;
+  for (const k of ["primary", "info", "success", "danger", "warn", "muted"]) assert.ok(T.contrast(L[k], L.surface) >= 4.5, `light ${k} ${L[k]} reads on ${L.surface}`);
+  for (const k of ["primary", "info", "success", "danger", "warn"]) assert.ok(T.contrast(D[k], D.surface) >= 4.5, `dark ${k} reads`);
+  assert.equal(T.onBrandFill("#78BE3A"), "#14181F", "white on Dostluk is under 2.6:1, so dark text");
+  assert.equal(T.onBrandFill("#1D9AD6"), "#FFFFFF");
+});
