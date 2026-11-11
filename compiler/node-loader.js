@@ -6,11 +6,17 @@ import { resolve, isAbsolute } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { compile } from "./index.js";
 import { loadAutoImports } from "./autoimports.js";
+import { inNodeModules, isNodeModulesTs, stripTypes } from "./load-ts.js";
 
 let auto;
 const dirs = (process.env.MARCH_COMPONENTS ?? "src/components").split(",").filter(Boolean).map((d) => resolve(process.cwd(), d));
 
 export async function load(url, context, next) {
+  // .ts under node_modules (an installed March): node refuses to strip types there, so strip them here
+  if (isNodeModulesTs(url)) {
+    const file = fileURLToPath(url);
+    return { format: "module", source: stripTypes(await readFile(file, "utf8"), file), shortCircuit: true };
+  }
   const tsx = url.endsWith(".tsx");
   if (!url.startsWith("file:") || !(url.endsWith(".jsx") || tsx)) return next(url, context);
   if (!auto) {
@@ -21,5 +27,6 @@ export async function load(url, context, next) {
   const file = fileURLToPath(url);
   const r = compile(await readFile(file, "utf8"), { filename: file, autoImports: auto });
   // .tsx: node strips the remaining TypeScript syntax (erasable types only)
+  if (tsx && inNodeModules(url)) return { format: "module", source: stripTypes(r.code, file), shortCircuit: true };
   return { format: tsx ? "module-typescript" : "module", source: r.code, shortCircuit: true };
 }

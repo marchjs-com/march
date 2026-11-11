@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, readdirSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, readdirSync, cpSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
@@ -82,5 +82,32 @@ test("march build bundles a tiny app with routes and public files", () => {
     assert.match(html, /<script type="module" src="\/assets\/main-[\w-]+\.js"><\/script>/);
     assert.doesNotMatch(html, /__march\/client/);
     assert.ok(readdirSync(join(dir, "dist/assets")).some((f) => f.endsWith(".js")));
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("installed under node_modules: register runs .tsx/.ts, march build bundles (node does not strip types there itself)", () => {
+  const dir = mkdtempSync(join(tmpdir(), "march-installed-"));
+  try {
+    const pkg = join(dir, "node_modules", "hadi-march");
+    const root = fileURLToPath(new URL("..", import.meta.url));
+    const files = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).files;
+    for (const f of [...files, "package.json"]) if (existsSync(join(root, f))) cpSync(join(root, f), join(pkg, f), { recursive: true });
+    // esbuild is the app's own dev dependency: link the one March was tested with
+    cpSync(join(root, "node_modules", "esbuild"), join(dir, "node_modules", "esbuild"), { recursive: true, dereference: true });
+    if (existsSync(join(root, "node_modules", "@esbuild"))) cpSync(join(root, "node_modules", "@esbuild"), join(dir, "node_modules", "@esbuild"), { recursive: true, dereference: true });
+    mkdirSync(join(dir, "src/pages"), { recursive: true });
+    writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
+    writeFileSync(join(dir, "src/pages/index.tsx"), "export default function Home() { let $n: number = 0\n return <button on:click={() => $n++} sx={{ p: 2 }}>{$n}</button> }\n");
+    writeFileSync(join(dir, "src/main.tsx"), "import routes from './routes.gen.js'\ncreateRouter({ routes })\nrender(() => <Router />, document.getElementById('app'))\n");
+    writeFileSync(join(dir, "check.test.mjs"), [
+      "import { test } from 'node:test'; import assert from 'node:assert/strict';",
+      "import { installDom } from 'hadi-march/testing'; installDom();",
+      "const { signal } = await import('hadi-march'); const { default: Home } = await import('./src/pages/index.tsx');",
+      "test('works', () => { assert.equal(signal(2)(), 2); assert.equal(typeof Home, 'function'); });",
+    ].join("\n"));
+    execFileSync(process.execPath, ["--import", "hadi-march/register", "--test", "check.test.mjs"], { cwd: dir, stdio: "pipe" });
+    try { execFileSync(process.execPath, [join(pkg, "cli", "march.js"), "build"], { cwd: dir, stdio: "pipe" }); } catch (e) { assert.fail(String(e.stderr) + String(e.stdout)); }
+    assert.match(readFileSync(join(dir, "dist/index.html"), "utf8"), /assets\/main-[\w-]+\.js/);
+    assert.ok(existsSync(join(pkg, "types", "jsx.d.ts")), "types/ is part of the package files");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

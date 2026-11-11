@@ -3,6 +3,7 @@
 import { readdirSync, statSync, existsSync, readFileSync } from "node:fs";
 import { join, basename, extname, resolve } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
+import { importTs } from "./load-ts.js";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 /** Module specifier → file (relative to the March root). Order = priority when two modules export the same name. */
@@ -31,7 +32,7 @@ export async function loadAutoImports(o = {}) {
   for (const [spec, rel] of MODULES) {
     const file = join(ROOT, rel);
     if (!existsSync(file)) continue;
-    const mod = await import(pathToFileURL(file).href);
+    const mod = await importTs(pathToFileURL(file));
     for (const name of Object.keys(mod)) {
       if (name.startsWith("_") || name === "default" || name in map) continue;
       map[name] = o.specifier ? o.specifier(spec, file) : spec;

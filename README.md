@@ -34,13 +34,16 @@ export function Counter(props: { label: string }) {
 The only build tool is [esbuild](https://esbuild.github.io/) (TypeScript is optional, for `march check`).
 
 ```bash
+npm i github:tlghn/hadimarch#<commit-sha>   # pin a commit; not on the npm registry yet
 npm i -D esbuild typescript
 node node_modules/hadi-march/cli/march.js dev      # index.html + src/main.tsx, live reload, error overlay
 node node_modules/hadi-march/cli/march.js build    # dist/
 node node_modules/hadi-march/cli/march.js check    # type-check, including March syntax
 ```
 
-Node runs `.ts`/`.tsx` sources directly: `node --import hadi-march/register --test` for component tests.
+Node runs `.ts`/`.tsx` sources directly: `node --import hadi-march/register --test` for component tests. March ships its
+TypeScript sources; node refuses to strip types under `node_modules`, so the CLI, the compiler and `hadi-march/register`
+strip March's own files themselves (node >= 22.15). Importing `hadi-march` from plain node needs `--import hadi-march/register`.
 
 ## The language (compiled by the esbuild plugin)
 

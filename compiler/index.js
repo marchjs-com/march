@@ -6,7 +6,10 @@
 //   - auto imports for runtime names and project components; `css`…`` extraction; t`…` key collection
 // It is a careful scanner, not a full parser: write normal, semicolon-or-newline separated JavaScript.
 import { isIdStart, isIdPart, exprAllowed, identKind, skipString, skipComment, skipRegex, syntax, jsxText, lineCol } from "./lexer.js";
-import { sx as resolveSx } from "../src/core/sx.ts";
+import { importTs } from "./load-ts.js";
+
+// sx is shared with the runtime; importTs also works when March is installed under node_modules
+const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.meta.url));
 
 const H = { h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave" };
 const HELPER_SOURCE = { h: "h", lazy: "lazy", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave" };
