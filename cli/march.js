@@ -1,0 +1,191 @@
+#!/usr/bin/env node
+// HADI March CLI
+//   march dev [--port 5173] [--mock openapi.json]   dev server: rebuild on change, live reload, error overlay, optional mock API
+//   march build [--outdir dist] [--no-minify]        production bundle (code splitting, hashed chunks, public/ copied)
+//   march gen routes                                 src/pages/** → src/routes.gen.js (+ pages.d.ts param types)
+//   march gen page users/[id] | gen component Name | gen crud products
+//   march gen api openapi.json [--out src/api.gen.js] typed client + schemas from an OpenAPI 3 document
+//   march i18n [--messages src/i18n]                 report keys missing from translation files
+// Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html }.
+import { createServer } from "node:http";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, cpSync, rmSync, watch } from "node:fs";
+import { join, resolve, relative, dirname, extname, basename, sep } from "node:path";
+import { pathToFileURL, fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
+import { march } from "../compiler/esbuild.js";
+import { genRoutes } from "./routes.js";
+import { genApi, mockHandler } from "./openapi.js";
+import { templates } from "./templates.js";
+
+const cwd = process.cwd();
+const argv = process.argv.slice(2);
+const flag = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? (argv[i + 1] && !argv[i + 1].startsWith("--") ? argv[i + 1] : true) : d; };
+const MARCH_ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
+
+async function loadConfig() {
+  const f = join(cwd, "march.config.js");
+  const user = existsSync(f) ? (await import(pathToFileURL(f).href)).default ?? {} : {};
+  return { entry: "src/main.jsx", outdir: "dist", publicDir: "public", pagesDir: "src/pages", components: "src/components", html: "index.html", port: 5173, alias: {}, define: {}, ...user };
+}
+
+async function loadEsbuild() {
+  for (const base of [join(cwd, "package.json"), join(MARCH_ROOT, "package.json")]) {
+    try { const req = createRequire(base); return await import(pathToFileURL(req.resolve("esbuild")).href).then((m) => m.default ?? m); } catch { /* next */ }
+  }
+  fail("esbuild is required: npm i -D esbuild (it is March's only build dependency).");
+}
+function fail(msg) { console.error(`\x1b[31m✖\x1b[0m ${msg}`); process.exit(1); }
+
+function buildOptions(cfg, esbuild, { dev }) {
+  return {
+    entryPoints: [resolve(cwd, cfg.entry)],
+    bundle: true, format: "esm", splitting: true, target: "es2022",
+    outdir: resolve(cwd, cfg.outdir, "assets"),
+    entryNames: dev ? "[name]" : "[name]-[hash]", chunkNames: "chunks/[name]-[hash]", assetNames: "[name]-[hash]",
+    minify: !dev && flag("--no-minify") !== true, sourcemap: dev ? "linked" : false,
+    metafile: true, write: true, logLevel: "silent", legalComments: "none", charset: "utf8",
+    define: { "process.env.NODE_ENV": JSON.stringify(dev ? "development" : "production"), ...cfg.define },
+    alias: cfg.alias,
+    loader: { ".svg": "file", ".png": "file", ".woff2": "file", ".jpg": "file", ".webp": "file" },
+    plugins: [march({ components: resolve(cwd, cfg.components), dev, i18nOut: resolve(cwd, cfg.outdir, "i18n-keys.json") })],
+  };
+}
+
+/** Write index.html with the hashed entry script/style tags (no inline scripts). */
+function writeHtml(cfg, meta, { dev }) {
+  const out = resolve(cwd, cfg.outdir);
+  const src = existsSync(join(cwd, cfg.html)) ? readFileSync(join(cwd, cfg.html), "utf8") : templates.indexHtml();
+  const entry = Object.entries(meta.outputs).find(([, o]) => o.entryPoint);
+  const js = `/${relative(out, resolve(cwd, entry[0])).split(sep).join("/")}`;
+  const css = entry[1].cssBundle ? `/${relative(out, resolve(cwd, entry[1].cssBundle)).split(sep).join("/")}` : null;
+  const tags = `${css ? `<link rel="stylesheet" href="${css}">` : ""}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : ""}`;
+  const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
+  writeFileSync(join(out, "index.html"), html);
+}
+
+async function build({ dev = false } = {}) {
+  const cfg = await loadConfig();
+  const esbuild = await loadEsbuild();
+  if (existsSync(resolve(cwd, cfg.pagesDir))) genRoutes(resolve(cwd, cfg.pagesDir), resolve(cwd, "src/routes.gen.js"));
+  const out = resolve(cwd, cfg.outdir);
+  rmSync(out, { recursive: true, force: true });
+  mkdirSync(out, { recursive: true });
+  if (existsSync(resolve(cwd, cfg.publicDir))) cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true });
+  const t0 = Date.now();
+  try {
+    const r = await esbuild.build(buildOptions(cfg, esbuild, { dev }));
+    writeHtml(cfg, r.metafile, { dev });
+    const bytes = Object.values(r.metafile.outputs).reduce((s, o) => s + o.bytes, 0);
+    console.log(`\x1b[32m✔\x1b[0m built ${relative(cwd, out)} in ${Date.now() - t0} ms (${(bytes / 1024).toFixed(1)} KB)`);
+    return r;
+  } catch (e) {
+    for (const er of e.errors ?? [e]) console.error(formatError(er));
+    process.exitCode = 1;
+  }
+}
+
+function formatError(er) {
+  const loc = er.location ? `${er.location.file}:${er.location.line}:${er.location.column + 1}\n  ${er.location.lineText}\n` : "";
+  return `\x1b[31m✖ ${er.text ?? er.message}\x1b[0m\n${loc}${er.detail && typeof er.detail === "string" ? er.detail : ""}`;
+}
+
+async function dev() {
+  const cfg = await loadConfig();
+  const esbuild = await loadEsbuild();
+  const port = Number(flag("--port", cfg.port));
+  const out = resolve(cwd, cfg.outdir);
+  const mockSpec = flag("--mock");
+  const mock = typeof mockSpec === "string" ? mockHandler(JSON.parse(readFileSync(resolve(cwd, mockSpec), "utf8"))) : null;
+  const clients = new Set();
+  let lastErrors = [];
+  const send = (ev, data) => { for (const c of clients) c.write(`event: ${ev}\ndata: ${JSON.stringify(data)}\n\n`); };
+
+  const opts = buildOptions(cfg, esbuild, { dev: true });
+  opts.plugins.push({ name: "march-dev", setup(b) {
+    b.onStart(() => { if (existsSync(resolve(cwd, cfg.pagesDir))) genRoutes(resolve(cwd, cfg.pagesDir), resolve(cwd, "src/routes.gen.js")); });
+    b.onEnd((r) => {
+      lastErrors = r.errors.map((e) => ({ text: e.text, file: e.location?.file, line: e.location?.line, column: e.location?.column, lineText: e.location?.lineText, detail: typeof e.detail === "string" ? e.detail : "" }));
+      if (r.errors.length) { r.errors.forEach((e) => console.error(formatError(e))); send("build-error", lastErrors); return; }
+      try { writeHtml(cfg, r.metafile, { dev: true }); } catch { /* first build */ }
+      console.log(`\x1b[32m✔\x1b[0m rebuilt`);
+      send("reload", {});
+    });
+  } });
+  rmSync(out, { recursive: true, force: true });
+  mkdirSync(out, { recursive: true });
+  if (existsSync(resolve(cwd, cfg.publicDir))) cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true });
+  const ctx = await esbuild.context(opts);
+  await ctx.watch();
+
+  const client = readFileSync(join(MARCH_ROOT, "cli", "dev-client.js"), "utf8");
+  createServer(async (req, res) => {
+    const url = new URL(req.url, "http://x");
+    if (url.pathname === "/__march/events") {
+      res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache", connection: "keep-alive" });
+      clients.add(res);
+      if (lastErrors.length) res.write(`event: build-error\ndata: ${JSON.stringify(lastErrors)}\n\n`);
+      req.on("close", () => clients.delete(res));
+      return;
+    }
+    if (url.pathname === "/__march/client.js") { res.writeHead(200, { "content-type": "text/javascript" }); res.end(client); return; }
+    if (mock && url.pathname.startsWith(mock.base)) return mock.handle(req, res, url);
+    let file = join(out, decodeURIComponent(url.pathname));
+    if (!file.startsWith(out)) { res.writeHead(400).end(); return; }
+    if (!existsSync(file) || statSync(file).isDirectory()) file = join(out, "index.html");
+    const type = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".map": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2" }[extname(file)] ?? "application/octet-stream";
+    res.writeHead(200, { "content-type": type, "cache-control": "no-store" });
+    res.end(readFileSync(file));
+  }).listen(port, "127.0.0.1", () => console.log(`March dev server: http://127.0.0.1:${port}/${mock ? `  (mock API at ${mock.base})` : ""}`));
+  if (existsSync(resolve(cwd, cfg.publicDir))) watch(resolve(cwd, cfg.publicDir), { recursive: true }, () => { cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true }); send("reload", {}); });
+}
+
+async function gen() {
+  const [what, name] = argv.slice(1);
+  const cfg = await loadConfig();
+  const put = (file, content) => {
+    const p = resolve(cwd, file);
+    if (existsSync(p)) fail(`${file} already exists`);
+    mkdirSync(dirname(p), { recursive: true });
+    writeFileSync(p, content);
+    console.log(`\x1b[32m+\x1b[0m ${file}`);
+  };
+  if (what === "routes") { genRoutes(resolve(cwd, cfg.pagesDir), resolve(cwd, "src/routes.gen.js")); console.log("routes generated"); return; }
+  if (!name && what !== "api") fail(`usage: march gen ${what ?? "page|component|crud|routes|api"} <name>`);
+  if (what === "page") return put(join(cfg.pagesDir, `${name}.jsx`), templates.page(name));
+  if (what === "component") return put(join(cfg.components, `${name}.jsx`), templates.component(name));
+  if (what === "crud") return put(join(cfg.pagesDir, `${name}.jsx`), templates.crud(name));
+  if (what === "api") {
+    const spec = argv[2] ?? fail("usage: march gen api openapi.json");
+    const outFile = flag("--out", "src/api.gen.js");
+    writeFileSync(resolve(cwd, outFile), genApi(JSON.parse(readFileSync(resolve(cwd, spec), "utf8"))));
+    console.log(`\x1b[32m✔\x1b[0m ${outFile}`);
+    return;
+  }
+  fail(`unknown generator "${what}"`);
+}
+
+async function i18n() {
+  const r = await build({ dev: true });
+  if (!r) return;
+  const cfg = await loadConfig();
+  const keys = JSON.parse(readFileSync(resolve(cwd, cfg.outdir, "i18n-keys.json"), "utf8"));
+  const dir = resolve(cwd, flag("--messages", "src/i18n"));
+  if (!existsSync(dir)) { console.log(`${keys.length} keys; no messages dir (${relative(cwd, dir)})`); return; }
+  let missing = 0;
+  for (const f of readdirSync(dir).filter((x) => /\.(json|js)$/.test(x))) {
+    const dict = f.endsWith(".json") ? JSON.parse(readFileSync(join(dir, f), "utf8")) : (await import(pathToFileURL(join(dir, f)).href)).default;
+    const miss = keys.filter((k) => !(k in dict));
+    missing += miss.length;
+    console.log(`${basename(f)}: ${miss.length ? `\x1b[33m${miss.length} missing\x1b[0m` : "\x1b[32mcomplete\x1b[0m"}`);
+    for (const k of miss.slice(0, 50)) console.log(`  - ${k}`);
+  }
+  if (missing) process.exitCode = 1;
+}
+
+const cmd = argv[0];
+const run = { dev, build: () => build(), gen, i18n }[cmd];
+if (!run) {
+  console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]");
+  process.exit(cmd ? 1 : 0);
+}
+await run();
