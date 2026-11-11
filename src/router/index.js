@@ -183,7 +183,10 @@ export function setQuery(values, { replace = true } = {}) {
   return navigate(`${untrack(() => S.path())}${qs ? `?${qs}` : ""}`, { replace });
 }
 
-/** Renders the current page. Props: `loading`, `fallback(error)`, `notFound`, `forbidden`. */
+/**
+ * Renders the current page. Props: `loading`, `fallback(error)`, `notFound`, `forbidden`,
+ * `wrap(page, to)` — render every page inside a common wrapper (layout, permission or sign-in gate based on `to.meta`).
+ */
 export function Router(props) {
   const r = S.router;
   if (!r) throw new Error("March: <Router/> needs createRouter() first.");
@@ -194,7 +197,9 @@ export function Router(props) {
     if (v.notFound) return untrack(() => call(props.notFound ?? r.opts.notFound ?? (() => h("p", { class: "hm-empty" }, "Not found"))));
     if (v.forbidden) return untrack(() => call(props.forbidden ?? (() => h("p", { class: "hm-empty", role: "alert" }, "Not allowed"))));
     const C = v.component;
-    return C ? untrack(() => h(C, { params: v.to.params, query: v.to.query, meta: v.to.meta })) : null;
+    if (!C) return null;
+    const page = () => h(C, { params: v.to.params, query: v.to.query, meta: v.to.meta });
+    return untrack(() => (props.wrap ? props.wrap(page, v.to) : page()));
   });
 }
 const call = (c) => (typeof c === "function" ? c() : c);

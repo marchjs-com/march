@@ -17,13 +17,14 @@ test("router: matching, params, query, lazy pages, guards, Link, setQuery", asyn
   const User = (p) => h("h1", {}, `user ${p.params.id}`);
   R.createRouter({ routes: { "/": { component: Home }, "/users/:id": () => Promise.resolve({ default: User }), "/secret": { component: Home, meta: {} }, "/admin": () => Promise.resolve({ default: Home, guard: () => "/" }) } });
   const el = document.createElement("div");
-  render(() => [h(R.Link, { href: "/users/7" }, "go"), h(R.Router, {})], el);
+  render(() => [h(R.Link, { href: "/users/7" }, "go"), h(R.Router, { wrap: (page, to) => h("section", { "data-path": to.path }, page()) })], el);
   await tick();
   assert.equal(el.querySelector("h1").textContent, "home");
   el.querySelector("a").click();
   await tick(); await tick();
   assert.equal(location.pathname, "/users/7");
   assert.equal(el.querySelector("h1").textContent, "user 7");
+  assert.equal(el.querySelector("section").getAttribute("data-path"), "/users/7", "wrap gets the route");
   assert.equal(el.querySelector("a").getAttribute("aria-current"), "page");
   assert.equal(R.params().id, "7");
   await R.setQuery({ tab: "info", empty: "" });
