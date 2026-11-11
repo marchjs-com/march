@@ -27,9 +27,12 @@ test("router: matching, params, query, lazy pages, guards, Link, setQuery", asyn
   assert.equal(el.querySelector("section").getAttribute("data-path"), "/users/7", "wrap gets the route");
   assert.equal(el.querySelector("a").getAttribute("aria-current"), "page");
   assert.equal(R.params().id, "7");
-  await R.setQuery({ tab: "info", empty: "" });
+  const h1 = el.querySelector("h1");
+  const p = R.setQuery({ tab: "info", empty: "" });
+  assert.equal(R.query().tab, "info", "query updates synchronously");
+  await p;
   assert.equal(location.search, "?tab=info");
-  assert.equal(R.query().tab, "info");
+  assert.equal(el.querySelector("h1"), h1, "page is not re-mounted on a query-only change");
   await R.navigate("/admin");
   await tick();
   assert.equal(location.pathname, "/", "guard redirected");

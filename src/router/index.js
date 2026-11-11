@@ -98,8 +98,15 @@ function currentLocation() {
 async function sync({ pop = false, initial = false } = {}) {
   const r = S.router;
   const { p, search, hash } = currentLocation();
-  const seq = ++r.seq;
   const m = matchRoute(r.routes, p);
+  // Same page, only the query/hash changed: update the signals synchronously and keep the mounted page.
+  const cur = S.match.peek();
+  const view = r.view.peek();
+  if (!initial && m && cur && view?.component && cur.route === m.route && JSON.stringify(cur.params) === JSON.stringify(m.params)) {
+    batch(() => { S.path.set(p); S.search.set(search); S.hash.set(hash); });
+    return;
+  }
+  const seq = ++r.seq;
   S.pending.set(true);
   try {
     let page = null, mod = null;
