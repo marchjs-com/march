@@ -43,7 +43,7 @@
 .hm-sb-icon { flex: none; width: 1.125rem; color: var(--hm-muted); transition: color var(--hm-dur) var(--hm-ease); }
 .hm-sb-icon .hm-svg { width: 1.0625rem; height: 1.0625rem; }
 .hm-sb-text { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.25; }
-.hm-sb-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-sb-label { overflow: hidden; white-space: nowrap; }
 .hm-sb-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--hm-muted); font-size: var(--hm-text-xs); margin-top: 1px; }
 .hm-sb-item.is-active { background: var(--hm-primary-soft); color: var(--hm-primary); font-weight: 600; }
 .hm-sb-item.is-active .hm-sb-icon, .hm-sb-item.is-active .hm-sb-sub { color: var(--hm-primary); }

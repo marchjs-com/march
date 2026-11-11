@@ -1,0 +1,15 @@
+/* HADI March — OverflowText / Marquee. The track moves with WAAPI (transform only); edges fade with a logical mask. */
+.hm-marquee { display: block; min-width: 0; max-width: 100%; overflow: hidden; white-space: nowrap; }
+.hm-marquee-track { display: flex; max-width: 100%; }
+.hm-marquee-item { flex: 0 1 auto; min-width: 0; overflow: hidden; }
+.hm-marquee-ellipsis .hm-marquee-item { text-overflow: ellipsis; }
+.hm-marquee.is-running .hm-marquee-track { max-width: none; width: max-content; will-change: transform; }
+.hm-marquee.is-running .hm-marquee-item { flex: none; overflow: visible; }
+.hm-marquee-sep { flex: none; padding-inline: 1em; opacity: .6; }
+
+/* fade the clipped end edge; both edges while scrolling (direction-aware: :dir(rtl) flips) */
+.hm-marquee-fade.is-overflow { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.5em), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 1.5em), transparent); }
+.hm-marquee-fade.is-overflow:dir(rtl) { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent); }
+.hm-marquee-fade.is-running { -webkit-mask-image: linear-gradient(to right, transparent, #000 1.5em, #000 calc(100% - 1.5em), transparent); mask-image: linear-gradient(to right, transparent, #000 1.5em, #000 calc(100% - 1.5em), transparent); }
+.hm-marquee-fade.is-running:dir(rtl) { -webkit-mask-image: linear-gradient(to left, transparent, #000 1.5em, #000 calc(100% - 1.5em), transparent); mask-image: linear-gradient(to left, transparent, #000 1.5em, #000 calc(100% - 1.5em), transparent); }
+@media (prefers-reduced-motion: reduce) { .hm-marquee-fade.is-overflow .hm-marquee-item { text-overflow: ellipsis; } }

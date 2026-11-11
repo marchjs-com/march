@@ -12,6 +12,7 @@ import { t } from "../core/i18n.ts";
 import { Link, path, navigate, type Href } from "../router/index.ts";
 import { can, type PermCheck } from "../access/index.ts";
 import { rank } from "./fold.ts";
+import { OverflowText } from "./marquee.ts";
 import { compareText } from "../core/text.ts";
 import { registerPages } from "./registry.ts";
 import { key as hotkey, formatKey } from "./keys.ts";
@@ -156,7 +157,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
     const body = [
       icon(iconOf, "hm-icon hm-sb-icon"),
       h("span", { class: "hm-sb-text" },
-        h("span", { class: "hm-sb-label" }, () => text(x.label)),
+        h(OverflowText, { class: "hm-sb-label", text: () => text(x.label) }),
         () => { const s = sub ? sub() : text(x.sub); return s ? h("span", { class: "hm-sb-sub" }, s) : null; }),
       badge(x),
     ];
