@@ -100,7 +100,11 @@ class Transformer {
       if (!bySpec.has(spec)) bySpec.set(spec, []);
       bySpec.get(spec).push(name);
     }
-    for (const [spec, names] of bySpec) lines.push(`import { ${names.sort().join(", ")} } from ${JSON.stringify(spec)};`);
+    for (const [spec, names] of bySpec) {
+      // "path#default": the component is the module's default export
+      if (spec.endsWith("#default")) { for (const n of names) lines.push(`import ${n} from ${JSON.stringify(spec.slice(0, -8))};`); continue; }
+      lines.push(`import { ${names.sort().join(", ")} } from ${JSON.stringify(spec)};`);
+    }
     return lines.join(" ");
   }
 

@@ -100,7 +100,7 @@ export function renderTest(fn, opts = {}) {
     async submit(sel = "form") { root().querySelector(sel).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })); await s.flush(); },
     /** Click the primary button of the open dialog. */
     async confirm() { const d = [...all("[role=dialog],[role=alertdialog],dialog")].pop(); if (!d) throw new Error("March testing: no open dialog"); const b = d.querySelector("[data-hm-ok],.hm-btn-primary,.hm-btn-danger,button[type=submit]"); b.click(); await s.flush(); },
-    async cancel() { const d = [...all("[role=dialog],[role=alertdialog],dialog")].pop(); if (!d) throw new Error("March testing: no open dialog"); const b = d.querySelector("[data-hm-cancel]") ?? d.querySelectorAll("button").find((x) => /cancel/i.test(x.textContent)); b.click(); await s.flush(); },
+    async cancel() { const d = [...all("[role=dialog],[role=alertdialog],dialog")].pop(); if (!d) throw new Error("March testing: no open dialog"); const b = d.querySelector("[data-hm-cancel]") ?? d.querySelectorAll("button").find((x) => /cancel|vazgeç|iptal|abbrechen|annuler/i.test(x.textContent)); b.click(); await s.flush(); },
     fetchCalls: () => fetchMock?.calls ?? [],
     dispose() { dispose(); fetchMock?.restore(); container.remove(); },
   };

@@ -1,6 +1,6 @@
 // Auto-import table: every export of March's modules (core first) plus project components.
 // `loadAutoImports()` reads the real module exports, so the table never drifts from the runtime.
-import { readdirSync, statSync, existsSync } from "node:fs";
+import { readdirSync, statSync, existsSync, readFileSync } from "node:fs";
 import { join, basename, extname, resolve } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 
@@ -41,7 +41,11 @@ export async function loadAutoImports(o = {}) {
     if (!existsSync(dir)) continue;
     for (const f of walk(dir)) {
       const name = basename(f, extname(f));
-      if (/^[A-Z][\w]*$/.test(name) && /\.(jsx|js)$/.test(f) && !(name in map)) map[name] = f;
+      if (!/^[A-Z][\w]*$/.test(name) || !/\.(jsx|tsx|js|ts)$/.test(f) || f.endsWith(".d.ts") || name in map) continue;
+      // `export function Name` → named import; otherwise (export default) → default import ("#default" marker)
+      const src = readFileSync(f, "utf8");
+      const named = new RegExp(`export\\s+(async\\s+)?(function|const|let|class)\\s+${name}\\b|export\\s*\\{[^}]*\\b${name}\\b`).test(src);
+      map[name] = named ? f : `${f}#default`;
     }
   }
   return map;

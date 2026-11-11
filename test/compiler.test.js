@@ -187,3 +187,9 @@ test("$ variable as a call argument after a comma is a read, not an object short
   assert.match(out, /\{ a: \$a\(\), b \}/);
   assert.match(out, /\[1, \$a\(\)\]/);
 });
+
+test("auto import of project components: named or default export", () => {
+  const out = compile("const a = <Named/>; const b = <Def/>", { autoImports: { Named: "./Named.jsx", Def: "./Def.jsx#default" } }).code;
+  assert.match(out, /import \{ Named \} from "\.\/Named\.jsx";/);
+  assert.match(out, /import Def from "\.\/Def\.jsx";/);
+});

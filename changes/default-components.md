@@ -1,0 +1,2 @@
+- compiler: project components exported only as default are auto-imported (`import X from …`).
+- testing: `cancel()` also finds localized cancel buttons.

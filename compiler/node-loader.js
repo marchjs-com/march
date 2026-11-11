@@ -16,7 +16,7 @@ export async function load(url, context, next) {
   if (!auto) {
     const map = await loadAutoImports({ components: dirs });
     // component entries are absolute file paths: node needs file URLs
-    auto = Object.fromEntries(Object.entries(map).map(([k, v]) => [k, isAbsolute(v) ? pathToFileURL(v).href : v]));
+    auto = Object.fromEntries(Object.entries(map).map(([k, v]) => [k, isAbsolute(v) ? pathToFileURL(v.replace(/#default$/, "")).href + (v.endsWith("#default") ? "#default" : "") : v]));
   }
   const file = fileURLToPath(url);
   const r = compile(await readFile(file, "utf8"), { filename: file, autoImports: auto });
