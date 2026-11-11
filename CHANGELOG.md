@@ -6,8 +6,9 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ### Fixed (later in 0.1.0)
 - Works when installed under `node_modules` (e.g. `npm i github:tlghn/hadimarch#sha`): node refuses to strip types there, so
-  the CLI, compiler (auto-import table, `sx`) and `hadi-march/register` strip March's own `.ts` files with
-  `module.stripTypeScriptTypes` via an in-thread hook. `types/` (JSX types) is now part of the package files. Node >= 22.15.
+  the compiler (auto-import table, `sx`) imports March's sources from a mirror in the OS temp folder, and
+  `hadi-march/register` strips March's own `.ts` files with `module.stripTypeScriptTypes`. `types/` (JSX types) is now part of
+  the package files. Node >= 22.18.
 - CSS class collisions: the markdown editor mode switch now uses `.hm-editor-tabs`/`.hm-editor-tab` and `CodeInput` uses
   `.hm-otp`/`.hm-otp-box`, so they no longer restyle `Tabs` (`.hm-tabs`) and `CodeBlock` (`.hm-code`). Regression test added.
 - `Tabs` bar no longer shows a stray vertical scrollbar (the active tab underline overlapped the bar border).

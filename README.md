@@ -43,7 +43,7 @@ node node_modules/hadi-march/cli/march.js check    # type-check, including March
 
 Node runs `.ts`/`.tsx` sources directly: `node --import hadi-march/register --test` for component tests. March ships its
 TypeScript sources; node refuses to strip types under `node_modules`, so the CLI, the compiler and `hadi-march/register`
-strip March's own files themselves (node >= 22.15). Importing `hadi-march` from plain node needs `--import hadi-march/register`.
+strip or relocate March's own files themselves (node >= 22.18). Importing `hadi-march` from plain node needs `--import hadi-march/register`.
 
 ## The language (compiled by the esbuild plugin)
 

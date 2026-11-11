@@ -1,42 +1,57 @@
 // Load March's own TypeScript sources from node, also when the package is installed under node_modules.
 // Node strips types natively, except for files under node_modules (ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING), which is
-// exactly where an installed March lives. There we strip the (erasable) types ourselves with node's stripTypeScriptTypes,
-// through an in-thread module hook that is registered once, and only when March itself is under node_modules.
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+// exactly where an installed March lives. Two ways around it, both without module hooks inside hooks threads:
+//  - importTs (compiler: sx, auto-import table): imports from a mirror of March's src/ in the OS temp folder (outside
+//    node_modules, so node strips types itself). The mirror is keyed by the sources' sizes and mtimes and built once.
+//  - stripTypes (hadi-march/register's load hook): strips the types of a single file with module.stripTypeScriptTypes.
+import { readdirSync, statSync, existsSync, cpSync, mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { join, relative, resolve, sep } from "node:path";
+import { tmpdir } from "node:os";
+import { createHash } from "node:crypto";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import * as nodeModule from "node:module";
+
+const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
 /** True for file URLs/paths inside a node_modules folder (node refuses to strip types there). */
 export const inNodeModules = (fileOrUrl) => /[\\/]node_modules[\\/]/.test(fileOrUrl.startsWith("file:") ? fileURLToPath(fileOrUrl) : fileOrUrl);
+/** A .ts module (not .d.ts) under node_modules. */
+export const isNodeModulesTs = (url) => url.startsWith("file:") && url.endsWith(".ts") && !url.endsWith(".d.ts") && inNodeModules(url);
 
 /** Strip TypeScript types from source code (erasable syntax only), using node's built-in stripper. */
 export function stripTypes(source, filename) {
   const strip = nodeModule.stripTypeScriptTypes;
-  if (typeof strip !== "function") throw new Error(`March: node ${process.versions.node} cannot strip TypeScript types (${filename}); use node >= 22.15.`);
+  if (typeof strip !== "function") throw new Error(`March: node ${process.versions.node} cannot strip TypeScript types (${filename}); use node >= 22.18.`);
   return strip(source, { mode: "strip" });
 }
 
-const isNodeModulesTs = (url) => url.startsWith("file:") && url.endsWith(".ts") && !url.endsWith(".d.ts") && inNodeModules(url);
-
-let hooked = false;
-/** Make `import()` of .ts files under node_modules work in this thread (no-op when March is not installed there). */
-export function ensureTsHook() {
-  if (hooked || !inNodeModules(import.meta.url)) return;
-  hooked = true;
-  if (typeof nodeModule.registerHooks !== "function") throw new Error(`March: node ${process.versions.node} has no module.registerHooks; use node >= 22.15.`);
-  nodeModule.registerHooks({
-    load(url, context, next) {
-      if (!isNodeModulesTs(url)) return next(url, context);
-      const file = fileURLToPath(url);
-      return { format: "module", source: stripTypes(readFileSync(file, "utf8"), file), shortCircuit: true };
-    },
-  });
+const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? walk(p) : [p]; });
+let mirrorDir = null;
+/** March's src/ copied to the OS temp folder (once per source state); returns the mirror's root. */
+function mirror() {
+  if (mirrorDir) return mirrorDir;
+  const src = join(ROOT, "src");
+  const h = createHash("sha256").update(ROOT);
+  for (const f of walk(src)) { const s = statSync(f); h.update(`${relative(src, f)}|${s.size}|${s.mtimeMs}\n`); }
+  const dir = join(tmpdir(), `hadi-march-src-${h.digest("hex").slice(0, 16)}`);
+  if (!existsSync(join(dir, ".complete"))) {
+    // build in a private folder, then rename: parallel processes (node --test) never see a half-copied mirror
+    const tmp = `${dir}.${process.pid}.${Date.now()}`;
+    mkdirSync(tmp, { recursive: true });
+    cpSync(src, join(tmp, "src"), { recursive: true });
+    writeFileSync(join(tmp, "package.json"), "{\"type\":\"module\"}\n");
+    writeFileSync(join(tmp, ".complete"), "");
+    try { renameSync(tmp, dir); } catch { rmSync(tmp, { recursive: true, force: true }); }
+    if (!existsSync(join(dir, ".complete"))) throw new Error(`March: could not prepare ${dir}`);
+  }
+  return (mirrorDir = dir);
 }
 
-/** Import a March .ts module given its URL. */
+/** Import one of March's own .ts modules (a URL inside March's src/), also when March is under node_modules. */
 export function importTs(url) {
-  ensureTsHook();
-  return import(url.href);
+  const file = fileURLToPath(url);
+  if (!inNodeModules(file)) return import(url.href);
+  const rel = relative(ROOT, file);
+  if (rel.startsWith("..") || !rel.startsWith(`src${sep}`)) throw new Error(`March: importTs only loads March's src/ (${file})`);
+  return import(pathToFileURL(join(mirror(), rel)).href);
 }
-
-export { isNodeModulesTs };

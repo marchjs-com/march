@@ -105,7 +105,9 @@ test("installed under node_modules: register runs .tsx/.ts, march build bundles 
       "const { signal } = await import('hadi-march'); const { default: Home } = await import('./src/pages/index.tsx');",
       "test('works', () => { assert.equal(signal(2)(), 2); assert.equal(typeof Home, 'function'); });",
     ].join("\n"));
-    execFileSync(process.execPath, ["--import", "hadi-march/register", "--test", "check.test.mjs"], { cwd: dir, stdio: "pipe" });
+    const run = (args) => { try { execFileSync(process.execPath, args, { cwd: dir, stdio: "pipe" }); } catch (e) { assert.fail(String(e.stderr) + String(e.stdout)); } };
+    run(["--import", "hadi-march/register", "--test", "check.test.mjs"]);
+    run(["--import", "hadi-march/register", "--input-type=module", "-e", "await import('hadi-march/compiler')"]);
     try { execFileSync(process.execPath, [join(pkg, "cli", "march.js"), "build"], { cwd: dir, stdio: "pipe" }); } catch (e) { assert.fail(String(e.stderr) + String(e.stdout)); }
     assert.match(readFileSync(join(dir, "dist/index.html"), "utf8"), /assets\/main-[\w-]+\.js/);
     assert.ok(existsSync(join(pkg, "types", "jsx.d.ts")), "types/ is part of the package files");

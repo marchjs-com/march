@@ -147,7 +147,7 @@ assert.ok(!s.sees("Ada"));
 ```
 
 Run tests with `node --import hadi-march/register --test` (needed for .jsx/.tsx, and for any `hadi-march` import when
-March is installed under node_modules, where node will not strip types itself; node >= 22.15).
+March is installed under node_modules, where node will not strip types itself; node >= 22.18).
 
 Module references: `docs/core.md`, `docs/ui.md`, `docs/forms.md`, `docs/table.md`, `docs/charts.md`.
 
