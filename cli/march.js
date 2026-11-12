@@ -12,7 +12,9 @@
 // Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html,
 //   base: "/" | "./" (asset URLs in index.html; "./" = works from any sub-folder), stableNames: true (or --stable-names:
 //   main.js, chunks/home.js… with ?v=<version> in every reference; deploys overwrite the same paths), packChunks: false,
-//   budget: { entry, route, part, css, routes: { "/x": bytes }, fail } (gzip bytes; false = off), sw: true (offline service worker), headers: false (no _headers) }.
+//   budget: { entry, route, part, css, routes: { "/x": bytes }, fail } (gzip bytes; false = off), sw: true (offline service worker), headers: false (no _headers),
+//   credit: true (adds <!-- Built with HADI March --> to the built index.html and prints the one-line console banner in production too; off by default),
+//   banner: false (no console banner in `march dev`; production never prints one unless credit is on) }.
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, cpSync, rmSync, watch } from "node:fs";
 import { join, resolve, relative, dirname, extname, basename, sep } from "node:path";
@@ -22,6 +24,7 @@ import { createRequire } from "node:module";
 import { march } from "../compiler/esbuild.js";
 import { genRoutes } from "./routes.js";
 import { genApi, genApiClasses, mockHandler } from "./openapi.js";
+import { bannerSource } from "./banner.js";
 import { templates } from "./templates.js";
 import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
 import { packChunks } from "../compiler/pack-chunks.js";
@@ -32,6 +35,7 @@ const cwd = process.cwd();
 const argv = process.argv.slice(2);
 const flag = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? (argv[i + 1] && !argv[i + 1].startsWith("--") ? argv[i + 1] : true) : d; };
 const MARCH_ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
+const marchVersion = () => JSON.parse(readFileSync(join(MARCH_ROOT, "package.json"), "utf8")).version;
 
 async function loadConfig() {
   const f = join(cwd, "march.config.js");
@@ -82,9 +86,10 @@ function writeHtml(cfg, meta, { dev }, manifest = null, entryFiles = null) {
   const data = manifest && Object.keys(manifest).length ? `<script type="application/json" id="march-manifest">${JSON.stringify(manifest).replace(/</g, "\\u003c")}</script>` : "";
   // the entry's own chunks are announced up front: fetched in parallel with the entry instead of after it is parsed
   const pre = (entryFiles ?? []).filter((f) => /\.js(\?|$)/.test(f) && `${base}${f}` !== js).map((f) => `<link rel="modulepreload" href="${base}${f}">`).join("");
-  const tags = `${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : ""}`;
+  const tags = `${cfg.credit === true ? "<!-- Built with HADI March -->" : ""}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
   const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
   writeFileSync(join(out, "index.html"), html);
+  if (!dev && cfg.credit === true) writeFileSync(join(out, "credit.js"), bannerSource(marchVersion()));
 }
 
 /** Theme stylesheets for setColorTheme(): copied to <outdir>/themes/<id>.css (the default theme is already in the bundle). */
@@ -204,7 +209,7 @@ async function dev() {
   const ctx = await esbuild.context(opts);
   await ctx.watch();
 
-  const client = readFileSync(join(MARCH_ROOT, "cli", "dev-client.js"), "utf8");
+  const client = (cfg.banner === false ? "" : bannerSource(marchVersion(), "Dev server: live reload on; errors show as an overlay. Turn this line off with banner: false in march.config.js.")) + readFileSync(join(MARCH_ROOT, "cli", "dev-client.js"), "utf8");
   createServer(async (req, res) => {
     const url = new URL(req.url, "http://x");
     if (url.pathname === "/__march/events") {

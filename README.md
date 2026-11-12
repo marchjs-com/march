@@ -185,4 +185,17 @@ helpers only decide what to show — your server must enforce permissions.
 
 ## License
 
-MIT
+MIT. The licence is unchanged and nothing below is required.
+
+### A small request
+
+If you made something with March, we would be glad if you added this line to your project or used the component:
+
+```tsx
+import { MadeWithMarch } from "hadi-march/ui";
+
+<MadeWithMarch />                      // Developed with HADI March and 💗
+<MadeWithMarch variant="badge" />      // or "small"
+```
+
+Prefer no visible text? `credit: true` in `march.config.js` only adds the comment `<!-- Built with HADI March -->` to the built `index.html`. The comment is off by default; with it on, production also prints one console line. `march dev` prints a banner once per page (`banner: false` turns it off); production bundles never contain it.
