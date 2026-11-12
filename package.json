@@ -46,7 +46,15 @@
     "./managers/consent": "./src/managers/consent/index.ts",
     "./managers/consent/ui": "./src/managers/consent/ui.ts",
     "./managers/command": "./src/managers/command/index.ts",
-    "./managers/command/ui": "./src/managers/command/ui.ts"
+    "./managers/command/ui": "./src/managers/command/ui.ts",
+    "./managers/layer": "./src/managers/layer/index.ts",
+    "./managers/focus": "./src/managers/focus/index.ts",
+    "./managers/hotkey": "./src/managers/hotkey/index.ts",
+    "./managers/announcer": "./src/managers/announcer/index.ts",
+    "./managers/accessibility": "./src/managers/accessibility/index.ts",
+    "./managers/accessibility/ui": "./src/managers/accessibility/ui.ts",
+    "./managers/shortcut-hint": "./src/managers/shortcut-hint/index.ts",
+    "./managers/shortcut-hint/ui": "./src/managers/shortcut-hint/ui.ts"
   },
   "bin": {
     "march": "./cli/march.js"
