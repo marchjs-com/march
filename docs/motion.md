@@ -67,3 +67,40 @@ slow motion and reduced motion reach all of it:
 Not animations (left as they are): popover positioning after mount, scroll restoration after a page swap, polling and
 heartbeat timers. `test/motion-rule.test.js` keeps it this way: a new `requestAnimationFrame` loop, raw `el.animate()`
 or a `setInterval` that moves something fails the tests.
+
+## Ready-made animations
+
+Each is a separate export of `hadi-march/motion` built on `animate()` / `animateValue()`, so tree shaking keeps only
+what a page imports and global speed, "Stop all" and reduced motion reach every one. Showcase: Hareket › SVG,
+Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
+
+### SVG (src/motion/svg.ts, path.ts, clip.ts, svg-filter.ts)
+- `drawPath(targets, { from, to, stagger })` — `pathLength="1"` and a dash offset (native WAAPI); erase with `from: 1, to: 0`.
+- `morphPath(path, d, { points })` — same command lists tween number by number (curves stay curves); otherwise both
+  paths are resampled to `points` evenly spaced points and a closed outline is rotated so the points travel least.
+- `followPath(el, d, { rotate, angle, trail })` — position (and tangent) per frame; SVG targets get a `transform`
+  attribute in user units, HTML targets a CSS transform in px. `trail` draws a stroke up to the element in the same frame.
+- `clipReveal(el, { shape, origin, from, count, vertical, hide })` and the pure `clipAt(p, o)` / `clipFrames(o)`; the
+  wipe's `start` / `end` follow the text direction.
+- `filterBlur`, `displace` (feTurbulence + feDisplacementMap), `goo` (blur + alpha contrast): one `<filter>` per call in a
+  hidden `<svg>`, removed when the value settles at 0 (or by the returned cleanup for `goo`).
+
+### Morph (src/motion/morph.ts)
+- `morph(from, to, { mode, hideSource, fadeContent })` — container transform: `to` (laid out where it ends) starts
+  clipped to `from`'s box (`clip-path: inset(… round r)`) and moved onto it, then opens; background colour and corner
+  radius blend; the content fades in, it is never stretched. `mode: "scale"` is a FLIP with a scale (shared element:
+  the same picture in two places). Unfilled: nothing stays on the target afterwards.
+- `morphBack(from, to)` — the reverse; `to` is shown again when it ends (close / remove `from` after `finished`).
+- `morphIcon(path, name)` with `MORPH_ICONS` (play, pause, menu, close, plus, check, minus): every icon is three 4-point
+  bars with the same commands, so any two tween number by number.
+- `shapeMorph(el, shape)` / `shapePolygon(shape, n)` — radial outlines sampled at the same angles (circle, square,
+  triangle, diamond, hexagon, star, blob, flower): clip-path polygons the browser interpolates.
+
+### Page transition variants (src/motion/page-fx.ts)
+`definePageTransition(name, (side, dir, rtl, distance) => keyframes)` adds a `meta.transition` name to
+`pageTransitions()`. Ready variants, each its own export: `circle` (from the last pressed point), `wipe`, `stack`,
+`cube`, `flipPage` ("flip"), `zoomThrough` ("zoom-through"), `curtain`, `blinds`, `pixelDissolve` ("pixel": stepped
+clip-path cells, one polygon), `morphPage` ("morph": grows out of the pressed link's box). Register with
+`usePageTransitions(circle, cube)`; `PAGE_VARIANTS` lists all. Going back, the old page plays the reverse on top
+(`zIndex`); wipe, stack, cube and flip mirror in RTL. With View Transitions the engine animates the pseudo-elements,
+otherwise the page elements themselves.
