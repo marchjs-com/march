@@ -352,9 +352,11 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
       S.pendingDepth.set(-1);
     });
     vtDepth = depth;
-    if (navWrapper && !initial) await navWrapper(apply, { pop }); else apply();
+    // a kept page (keep: true, only its params changed) is not swapped: no page transition, the scroll stays
+    const kept = m != null && depth >= nextKeys.length;
+    if (navWrapper && !initial && !kept) await navWrapper(apply, { pop }); else apply();
     lastUrl = globalThis.location?.href ?? "";
-    if (r.opts.scroll !== false) restoreScroll(pop);
+    if (r.opts.scroll !== false && !kept) restoreScroll(pop);
     // after the first page: the routes linked from it, and the shared "common" chunk most pages import (march build)
     if (initial && r.opts.prefetch !== "none") whenIdle(() => { void import("./extras.ts").then((m) => m.prefetchLinks()); prefetchCommon(); }, 3000);
   } catch (e) {

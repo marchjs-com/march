@@ -3,7 +3,7 @@
 .hm-tm-card { margin: 0; display: flex; break-inside: avoid; }
 .hm-tm-card > .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-4); width: 100%; }
 .hm-tm-quote { margin: 0; flex: 1 1 auto; }
-.hm-tm-quote p { margin: 0; font-size: var(--hm-text-md); line-height: 1.65; text-wrap: pretty; overflow-wrap: anywhere; }
+.hm-tm-quote p { margin: 0; font-size: var(--hm-text-md); line-height: 1.65; text-wrap: pretty; overflow-wrap: break-word; hyphens: auto; }
 .hm-tm-quote p::before { content: open-quote; } .hm-tm-quote p::after { content: close-quote; }
 .hm-tm-who { display: flex; align-items: center; gap: var(--hm-space-3); min-width: 0; }
 .hm-tm-id { display: flex; flex-direction: column; min-width: 0; }
@@ -12,7 +12,9 @@
 .hm-tm-list { display: grid; gap: var(--hm-space-4); }
 .hm-tm-cols-1 { grid-template-columns: minmax(0, 1fr); } .hm-tm-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hm-tm-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 900px) { .hm-tm-cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container hm-site (max-width: 900px) { .hm-tm-cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .hm-tm-cols-2, .hm-tm-cols-3 { grid-template-columns: minmax(0, 1fr); } }
+@container hm-site (max-width: 600px) { .hm-tm-cols-2, .hm-tm-cols-3 { grid-template-columns: minmax(0, 1fr); } }
 /* wall */
 .hm-tm-wall .hm-tm-list { display: block; columns: 3 17rem; column-gap: var(--hm-space-4); }
 .hm-tm-wall .hm-tm-card { margin-block-end: var(--hm-space-4); }
@@ -24,7 +26,7 @@
 .hm-tm-row { display: block; width: 100%; }
 .hm-tm-row .hm-marquee-sep { display: none; }
 .hm-tm-strip { display: inline-flex; gap: var(--hm-space-4); padding-inline-end: var(--hm-space-4); align-items: stretch; white-space: normal; }
-.hm-tm-marquee .hm-tm-card { width: min(22rem, 78vw); flex: none; }
+.hm-tm-marquee .hm-tm-card { width: min(22rem, 78cqi); flex: none; }
 /* slider */
 .hm-tm-slide { min-width: 0; height: 100%; display: flex; }
 .hm-tm-slide .hm-tm-card { width: 100%; }

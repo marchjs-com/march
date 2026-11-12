@@ -4,7 +4,9 @@
 .hm-pg-grid { display: grid; gap: var(--hm-space-4); }
 .hm-pg-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .hm-pg-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 960px) { .hm-pg-cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container hm-site (max-width: 960px) { .hm-pg-cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .hm-pg-cols-3, .hm-pg-cols-2 { grid-template-columns: minmax(0, 1fr); } }
+@container hm-site (max-width: 600px) { .hm-pg-cols-3, .hm-pg-cols-2 { grid-template-columns: minmax(0, 1fr); } }
 .hm-pg-card { position: relative; overflow: hidden; transition: box-shadow var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease); }
 .hm-pg-card[hidden] { display: none; }
 .hm-pg-card:hover { box-shadow: var(--hm-shadow-3); transform: translateY(-3px); }

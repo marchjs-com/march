@@ -4,7 +4,7 @@
 .hm-snav.is-sticky { position: sticky; inset-block-start: var(--hm-site-nav-top, 0); }
 .hm-snav-shrinks.is-scrolled { --hm-snav-h: 3.5rem; }
 .hm-snav.is-hidden { transform: translateY(-110%); }
-.hm-snav-bar { display: flex; align-items: center; gap: var(--hm-space-4); height: var(--hm-snav-h); max-width: 76rem; margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2.5rem);
+.hm-snav-bar { display: flex; align-items: center; gap: var(--hm-space-4); height: var(--hm-snav-h); max-width: 76rem; margin-inline: auto; padding-inline: clamp(1rem, 4cqi, 2.5rem);
   transition: height var(--hm-dur-slow) var(--hm-ease-out); min-width: 0; }
 .hm-snav-brand { flex: none; min-width: 0; }
 .hm-snav-nav { flex: 1 1 auto; display: flex; justify-content: center; min-width: 0; }
@@ -43,5 +43,11 @@
   .hm-snav-menu { display: inline-flex; }
   .hm-snav-actions { margin-inline-start: auto; }
 }
+@container hm-site (max-width: 860px) {
+  .hm-snav-nav { display: none; }
+  .hm-snav-menu { display: inline-flex; }
+  .hm-snav-actions { margin-inline-start: auto; }
+}
 @media (max-width: 520px) { .hm-snav-actions > :not(:last-child) { display: none; } }
+@container hm-site (max-width: 520px) { .hm-snav-actions > :not(:last-child) { display: none; } }
 @media (prefers-reduced-motion: reduce) { .hm-snav, .hm-snav-bar { transition: none; } }

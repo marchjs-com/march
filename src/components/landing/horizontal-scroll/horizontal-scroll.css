@@ -1,10 +1,10 @@
 /* HorizontalScroll. Section height = one screen + the track overflow (from JS); the pin is sticky; native mode scrolls itself. */
-.hm-hs { --hm-hs-panel: min(80vw, 32rem); position: relative; height: calc(100vh - var(--hm-site-nav-top, 0px) + var(--hm-hs-extra, 0px)); }
+.hm-hs { --hm-hs-panel: min(80cqi, 32rem); position: relative; height: calc(100vh - var(--hm-site-nav-top, 0px) + var(--hm-hs-extra, 0px)); }
 .hm-hs-pin { position: sticky; inset-block-start: var(--hm-site-nav-top, 0); height: calc(100vh - var(--hm-site-nav-top, 0px)); display: flex; flex-direction: column; justify-content: center; gap: var(--hm-space-4); overflow: hidden; }
 .hm-hs-view { overflow: hidden; padding-block: var(--hm-space-3); }
-.hm-hs-track { display: flex; gap: var(--hm-space-4); width: max-content; padding-inline: clamp(1rem, 6vw, 5rem); will-change: transform; }
+.hm-hs-track { display: flex; gap: var(--hm-space-4); width: max-content; padding-inline: clamp(1rem, 6cqi, 5rem); will-change: transform; }
 .hm-hs-track > * { flex: none; width: var(--hm-hs-panel); min-width: 0; }
-.hm-hs-bar { display: block; height: 3px; margin-inline: clamp(1rem, 6vw, 5rem); border-radius: 3px; background: var(--hm-border); overflow: hidden; }
+.hm-hs-bar { display: block; height: 3px; margin-inline: clamp(1rem, 6cqi, 5rem); border-radius: 3px; background: var(--hm-border); overflow: hidden; }
 .hm-hs-bar-fill { display: block; height: 100%; background: var(--hm-brand-gradient); transform: scaleX(0); transform-origin: 0 50%; }
 :dir(rtl) .hm-hs-bar-fill { transform-origin: 100% 50%; }
 /* native: a normal horizontal scroller with snap points */

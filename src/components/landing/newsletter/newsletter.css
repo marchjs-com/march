@@ -14,3 +14,4 @@
 .hm-nl-check { display: inline-grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--hm-success); color: var(--hm-on-success-fill, var(--hm-inverse-text)); flex: none; }
 .hm-nl-check .hm-svg { width: 1rem; height: 1rem; }
 @media (max-width: 420px) { .hm-nl-inline .hm-nl-form { flex-direction: column; } .hm-nl-inline .hm-nl-field { flex-basis: auto; } }
+@container hm-site (max-width: 420px) { .hm-nl-inline .hm-nl-form { flex-direction: column; } .hm-nl-inline .hm-nl-field { flex-basis: auto; } }

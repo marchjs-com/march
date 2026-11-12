@@ -126,3 +126,21 @@ test("route keep: the page stays while only its params change (pageKey without p
   assert.notEqual(_router.pageKey(fresh, { id: "1" }), _router.pageKey(fresh, { id: "2" }));
   assert.ok(R);
 });
+
+test("route keep: moving between params of a kept page skips the page transition", async () => {
+  const dom = installDom({ url: "http://h.test/" });
+  B._resetAppBase();
+  const R = await import("../src/router/index.ts");
+  R._resetRouter();
+  let wraps = 0;
+  R.createRouter({ routes: [{ path: "/", load: page("home") }, { path: "/api/*", load: page("api"), keep: true }, { path: "/other", load: page("o") }] });
+  await tick();
+  R.setNavigationWrapper((apply) => { wraps++; apply(); });
+  await R.navigate("/api/core/batch"); await tick();
+  const first = wraps;
+  await R.navigate("/api/core/computed"); await tick();
+  assert.equal(wraps, first, "same kept page: no transition");
+  await R.navigate("/other"); await tick();
+  assert.equal(wraps, first + 1, "another page: transition");
+  R._resetRouter(); dom.cleanup();
+});
