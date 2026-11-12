@@ -225,7 +225,8 @@ const DELEGATED = new Set(["click", "dblclick", "input", "keydown", "keyup"]);
 /** The document a render() tree delegates its events to (null: direct listeners). */
 export const DelegateRoot: { id: symbol; defaultValue: Document | null } = { id: Symbol("hm.delegate"), defaultValue: null };
 function dispatch(e: Event): void {
-  const key = `$$${e.type}`;
+  // a March-only key: other libraries on the same page (Solid) keep their own delegated handlers under `$$click`
+  const key = `$hm${e.type}`;
   let n = (e.composedPath?.()[0] ?? e.target) as (Node & Record<string, unknown> & { host?: Node }) | null;
   try {
     while (n && n.nodeType !== 9) {
@@ -252,7 +253,7 @@ function listen(el: Element, key: string, handler: unknown): void {
   if (key[2] !== ":" && DELEGATED.has(name)) {
     const d = useContext(DelegateRoot);
     if (d) {
-      (el as unknown as Record<string, unknown>)[`$$${name}`] = handler;
+      (el as unknown as Record<string, unknown>)[`$hm${name}`] = handler;
       const on = ((d as unknown as { $hm?: Set<string> }).$hm ??= new Set());
       if (!on.has(name)) { on.add(name); d.addEventListener(name, dispatch); }
       return;

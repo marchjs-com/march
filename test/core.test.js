@@ -297,7 +297,7 @@ test("event delegation: onClick inside render() runs from one document listener,
     h("button", { class: "b", onClick: (e) => { seen.push(["b"]); e.stopPropagation(); } }),
     h("button", { class: "c", "on:click": () => direct++ })));
   const a = el.querySelector(".a");
-  assert.equal(a.$$click !== undefined, true, "handler kept on the element");
+  assert.equal(a.$hmclick !== undefined && a.$$click === undefined, true, "handler kept on the element under a March-only key (Solid uses $$click)");
   a.click();
   assert.deepEqual(seen, [["a", "BUTTON"], ["outer", "DIV"]]);
   seen.length = 0;
