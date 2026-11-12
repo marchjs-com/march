@@ -6,7 +6,7 @@ import { users } from "../../../icons/glyphs/users.ts";
 import { wallet } from "../../../icons/glyphs/wallet.ts";
 import { barChart } from "../../../icons/glyphs/barChart.ts";
 import { settings } from "../../../icons/glyphs/settings.ts";
-import type { Href } from "../../../router/index.ts";
+import type { Href } from "../../../router/router.ts";
 
 export const code = `<NavMenu brand="Acme" filter collapsible items={[
   { id: "inbox", title: "Gelen kutusu", href: "/inbox", icon: inbox, badge: () => $unread },

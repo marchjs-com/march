@@ -6,7 +6,7 @@ import "../icon-button/icon-button.css";
 import "../../typography/kbd/kbd.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { Link, type Href } from "../../../router/index.ts";
+import { Link, type Href } from "../../../router/router.ts";
 import { can, type PermCheck } from "../../../access/index.ts";
 import { isAction, type Action } from "../../../ui/action.ts";
 import { floating, type Placement } from "../../../ui/popover.ts";

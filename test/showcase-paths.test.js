@@ -35,6 +35,6 @@ test("showcase: no root-absolute link or file path; public files through appUrl(
   assert.deepEqual(hits(/\s(src|poster)=["'`](\.\/)?(media|demo-api)\//), [], "a relative public file: appUrl(\"media/…\")");
   assert.deepEqual(hits(/\bfetch\(\s*["'`](?![a-z]+:)/), [], "fetch of a public file: fetch(appUrl(\"…\"))");
   // the net examples talk to a mock server (mockNet): its paths are not files of the app
-  assert.deepEqual(hits(/\bbase\s*=\s*["'`](?![a-z]+:)[^"'`]/).filter((h) => !h.startsWith("examples/showcase/src/api-examples/net.tsx")), [],"an Api base under the app's root: appUrl(\"…\")");
+  assert.deepEqual(hits(/\bbase\s*=\s*["'`](?![a-z]+:)[^"'`]/).filter((h) => !/^examples\/showcase\/src\/api-examples\/(gen\/net\/|net\.tsx)/.test(h)), [], "an Api base under the app's root: appUrl(\"…\")");
   assert.deepEqual(hits(/location\.hash\b/).filter((h) => !h.startsWith("examples/showcase/src/perflog.ts")), [], "routes come from the router, not location.hash");
 });

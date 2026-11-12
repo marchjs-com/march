@@ -3,7 +3,7 @@
 import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { navigate, type Href } from "../../../router/index.ts";
+import { navigate, type Href } from "../../../router/router.ts";
 import { can } from "../../../access/index.ts";
 import { isAction } from "../../../ui/action.ts";
 import { Dialog } from "../../../ui/dialog.ts";

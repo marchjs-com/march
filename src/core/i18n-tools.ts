@@ -1,7 +1,10 @@
-// i18n tools apps call rarely (diagnostics and set-up): their own module, so the start-up chunk carries only t, locale,
-// setLocale and messages (core/i18n.ts).
+// i18n tools apps call rarely (diagnostics, set-up, typed catalogs): their own module, so the start-up chunk carries
+// only t, locale, dir, setLocale, loadLocale and messages (core/i18n.ts).
 import { untrack } from "./reactive.ts";
-import { dicts, missingKeys, fallback } from "./i18n.ts";
+import { dicts, missingKeys, fallback, t } from "./i18n.ts";
+
+/** Key a tagged template produces (compiler and tests). */
+export const tKey = (strings: readonly string[]): string => strings.reduce((acc, s, i) => acc + s + (i < strings.length - 1 ? `{${i}}` : ""), "");
 
 /** Locale whose messages are used when a key is missing in the active one (default "en"). */
 export function setFallbackLocale(loc: string): void { fallback.loc = loc; }
@@ -11,4 +14,18 @@ export const missing = (): Record<string, string[]> => untrack(() => Object.from
 export function unused(loc: string, used: Iterable<string>): string[] {
   const u = new Set(used);
   return Object.keys(dicts.get(loc) ?? {}).filter((k) => !u.has(k));
+}
+
+// ------------------------------------------------------------------ typed catalogs
+type Trim<S extends string> = S extends ` ${infer R}` ? Trim<R> : S extends `${infer R} ` ? Trim<R> : S;
+/** Variable names used in an ICU message: "{n, plural, one {# {thing}} other {…}}" → "n" | "thing". */
+export type VarsOf<S extends string> =
+  S extends `${string}{${infer Inner}}${infer Rest}`
+    ? (Inner extends `${infer Name},${string}` ? Trim<Name> : Inner extends `${infer N}{${string}` ? Trim<N> : Trim<Inner>) | VarsOf<Rest>
+    : never;
+type Args<S extends string> = [VarsOf<S>] extends [never] ? [] : [vars: { [K in VarsOf<S>]: unknown }];
+
+/** Typed translator for a catalog: keys must exist and every variable must be passed. */
+export function typed<M extends Record<string, string>>(): <K extends keyof M & string>(key: K, ...args: Args<M[K]>) => string {
+  return (key, ...args) => t(key, (args[0] ?? {}) as Record<string, unknown>);
 }

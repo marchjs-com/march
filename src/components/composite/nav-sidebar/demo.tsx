@@ -4,7 +4,7 @@ import { dashboard } from "../../../icons/glyphs/dashboard.ts";
 import { users } from "../../../icons/glyphs/users.ts";
 import { settings } from "../../../icons/glyphs/settings.ts";
 import { barChart } from "../../../icons/glyphs/barChart.ts";
-import type { Href } from "../../../router/index.ts";
+import type { Href } from "../../../router/router.ts";
 
 export const code = `<NavSidebar title="Acme" items={items} groupOrder="none" defaultOpen="all" collapsible recent={3} />`
 

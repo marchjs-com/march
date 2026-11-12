@@ -7,7 +7,8 @@
 // engine animates the old page out and the new one in. Back reverses the animation; "slide" follows the text
 // direction (RTL mirrors it). Reduced motion or a paused engine: the swap is instant. Named outlets and the modal
 // outlet get the same transitions (the modal's own dialog opens and closes it).
-import { setNavigationWrapper, transitionOutlet, _router as I } from "../router/index.ts";
+import { setNavigationWrapper, _router as I } from "../router/router.ts";
+import { transitionOutlet } from "../router/extras.ts";
 import type { OutletWrapper } from "../router/outlets.ts";
 // the outlets module is the router's own lazy part: loaded here only to hand it the outlet transition
 const outlets = (fn: OutletWrapper | null): Promise<void> => import("../router/outlets.ts").then((m) => m.setOutletWrapper(fn), () => undefined);

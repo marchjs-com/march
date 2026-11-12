@@ -7,7 +7,7 @@ import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Menu, type MenuItemSpec } from "../../../ui/menu.ts";
-import { Link, type Href } from "../../../router/index.ts";
+import { Link, type Href } from "../../../router/router.ts";
 import { fitItems, observeWidth } from "../../../ui/fit.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 

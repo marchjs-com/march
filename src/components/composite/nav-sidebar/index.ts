@@ -9,7 +9,7 @@ import "../../../ui/display.css";
 import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { Link, path, navigate, type Href } from "../../../router/index.ts";
+import { Link, path, navigate, type Href } from "../../../router/router.ts";
 import { can, type PermCheck } from "../../../access/index.ts";
 import { rank } from "../../../ui/fold.ts";
 import { OverflowText } from "../../../ui/marquee.ts";

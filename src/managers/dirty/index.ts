@@ -10,7 +10,7 @@
 import { signal, computed, effect, untrack, createRoot, getOwner, onCleanup, type Accessor } from "../../core/reactive.ts";
 import { t, messages } from "../../core/i18n.ts";
 import { on } from "../../core/util.ts";
-import { beforeLeave } from "../../router/index.ts";
+import { beforeLeave } from "../../router/extras.ts";
 import { confirm } from "../../ui/dialog.ts";
 import { defineManager } from "../manager.ts";
 import { publisher } from "../publish.ts";

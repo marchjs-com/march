@@ -3,7 +3,7 @@
 import "./tabs.css";
 import { signal, computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { query as routeQuery, setQuery } from "../../../router/index.ts";
+import { query as routeQuery, setQuery } from "../../../router/router.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { roving } from "../../../ui/focus.ts";
 import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";

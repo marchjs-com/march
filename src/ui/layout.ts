@@ -5,7 +5,7 @@ import "./button.css";
 import { signal, computed, untrack, effect, onCleanup, type Signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
-import { Link, back as historyBack, type Href } from "../router/index.ts";
+import { Link, back as historyBack, type Href } from "../router/router.ts";
 import { actionsOf } from "./display-base.ts";
 import { type ActionsProp } from "./display.ts";
 import { Tabs, type TabSpec } from "./tabs.ts";

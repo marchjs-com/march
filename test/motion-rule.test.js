@@ -16,7 +16,7 @@ const ALLOWED = {
   "src/motion/engine/native.ts": "native bridge (adopted by the global control)",
   "src/motion/page.ts": "View Transition pseudo-element driver",
   "src/testing/dom.ts": "test DOM shim",
-  "src/router/index.ts": "scroll restoration after a page swap, not an animation",
+  "src/router/router.ts": "scroll restoration after a page swap, not an animation",
   "src/ui/popover.ts": "positions a popover once after mount, not an animation",
   "examples/showcase/src/bench/paint.ts": "benchmark: time to the next paint, a measurement (global speed or stop-all must not change it)",
 };

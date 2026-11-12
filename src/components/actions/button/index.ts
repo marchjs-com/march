@@ -2,7 +2,7 @@
 import "./button.css";
 import { untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import type { Href } from "../../../router/index.ts";
+import type { Href } from "../../../router/router.ts";
 import { routerLink } from "../../../dom/link.ts";
 import { isAction, type Action } from "../../../ui/action.ts";
 import { formatKey } from "../../../ui/keys.ts";

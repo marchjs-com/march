@@ -6,7 +6,7 @@ import "../../../ui/button.css";
 import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale } from "../../../core/i18n.ts";
-import { Link, path, navigate, type Href } from "../../../router/index.ts";
+import { Link, path, navigate, type Href } from "../../../router/router.ts";
 import { can, type PermCheck } from "../../../access/index.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { rank } from "../../../ui/fold.ts";

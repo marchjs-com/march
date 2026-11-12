@@ -13,7 +13,7 @@ import { installDom } from "../src/testing/dom.ts";
 installDom();
 const { h, render } = await import("../src/index.ts");
 const L = await import("../src/lazy/index.ts");
-const { chunkManifest, sizeReport, headersFile, swSource } = await import("../cli/perf.js");
+const { chunkManifest, htmlManifest, sizeReport, headersFile, swSource } = await import("../cli/perf.js");
 
 async function buildApp(files) {
   const esbuild = await import("esbuild");
@@ -444,4 +444,19 @@ test("packChunks last step: random pages and shared code, added and removed — 
     const left = await pack(app(step + 1, pages));
     assert.deepEqual(left, [], `step ${step} (${pages.join(", ")}): shared chunks under 10 KB left`);
   }
+});
+
+test("index.html lists only the manifest keys some code can look up (tagged loaders), the size report all of them", async () => {
+  const app = await buildApp({
+    "main.tsx": `import { render } from "hadi-march"\nimport { lazy } from "hadi-march/lazy"\nconst Tagged = lazy(() => import("./tagged.tsx"))\nconst plain: Record<string, () => Promise<unknown>> = { p: (): Promise<unknown> => import("./plain.tsx") }\nrender(() => <div><Tagged />{String(!!plain)}</div>, document.body)\n`,
+    "tagged.tsx": `export default () => <p>tagged</p>\n`,
+    "plain.tsx": `export default () => <p>plain</p>\n`,
+  });
+  try {
+    const m = chunkManifest(app.meta, { cwd: app.dir, outdir: app.outdir, entry: "main.tsx" });
+    assert.ok(m.manifest["tagged.tsx"] && m.manifest["plain.tsx"], "the full manifest has both (size report)");
+    const html = htmlManifest(m.manifest, app.meta, app.dir);
+    assert.ok(html["tagged.tsx"], "a tagged loader's key stays");
+    assert.equal(html["plain.tsx"], undefined, "a key no code mentions is left out of index.html");
+  } finally { app.cleanup(); }
 });
