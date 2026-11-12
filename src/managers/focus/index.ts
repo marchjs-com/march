@@ -9,10 +9,12 @@
 //   <div focus:trap>…</div>   <div focus:roving="horizontal">…</div>
 //
 // The low-level pieces (focusables, trapTab, focusFirst, roving) come from ui/focus.ts and are reused, not copied.
-// Trap and roving here are minimal; they move to the behaviors layer once it exists (marked "behavior:" below).
+// Roving lives in the behaviors layer (src/behaviors/roving-focus); the trap stack stays here (only the newest trap is
+// active, which needs one app-wide owner).
 import { signal, untrack, getOwner, runWithOwner, onCleanup } from "../../core/reactive.ts";
 import { registerNamespace } from "../../dom/h.ts";
-import { focusables, trapTab, focusFirst, roving as rovingKey } from "../../ui/focus.ts";
+import { focusables, trapTab, focusFirst } from "../../ui/focus.ts";
+import { rovingFocus, type RovingOptions } from "../../behaviors/roving-focus/index.ts";
 import { defineManager, emit } from "../manager.ts";
 
 export type Modality = "keyboard" | "pointer";
@@ -26,14 +28,7 @@ export interface TrapOptions {
   contain?: boolean;
 }
 
-export interface RovingOptions {
-  orientation?: "horizontal" | "vertical" | "both";
-  wrap?: boolean;
-  /** Which children take part (default: the container's focusables). */
-  selector?: string;
-  /** Called with the newly active item. */
-  onMove?: (el: HTMLElement) => void;
-}
+export type { RovingOptions };
 
 export interface FocusConfig {
   /** Write data-hm-focus-visible on <html> while the keyboard is in use (default true). */
@@ -58,8 +53,6 @@ export interface Focus {
   active(): Element | null;
   dispose(): void;
 }
-
-const ITEMS = "button,input,select,textarea,a[href],[tabindex],[data-roving]";
 
 interface Trap { el: HTMLElement; opts: TrapOptions; restore: () => void; onKey: (e: KeyboardEvent) => void }
 
@@ -120,36 +113,9 @@ function create(cfg: FocusConfig): Focus {
     return release;
   };
 
+  // behavior: roving tabindex (src/behaviors/roving-focus), released with the current owner
   const roving = (container: HTMLElement, opts: RovingOptions = {}): (() => void) => {
-    // behavior: roving tabindex — one Tab stop; arrows / Home / End move (ui/focus.ts roving)
-    // tabindex="-1" items still take part (that is how roving parks them), disabled and hidden ones do not
-    const items = (): HTMLElement[] => Array.from(container.querySelectorAll<HTMLElement>(opts.selector ?? ITEMS))
-      .filter((x) => !(x as HTMLButtonElement).disabled && !x.closest("[hidden]"));
-    const mark = (current: HTMLElement | undefined): void => { for (const it of items()) it.setAttribute("tabindex", it === current ? "0" : "-1"); };
-    const list0 = items();
-    mark(list0.find((x) => x.getAttribute("tabindex") === "0") ?? list0[0]);
-    const o = opts.orientation ?? "vertical";
-    const onKey = (e: Event): void => {
-      const k = e as KeyboardEvent;
-      const list = items();
-      const moved = o === "both"
-        ? rovingKey(k, list, { horizontal: k.key === "ArrowLeft" || k.key === "ArrowRight", wrap: opts.wrap ?? true })
-        : rovingKey(k, list, { horizontal: o === "horizontal", wrap: opts.wrap ?? true });
-      if (moved) { mark(moved); opts.onMove?.(moved); }
-    };
-    // RTL: in a right-to-left container ArrowLeft means "next"
-    const onKeyDir = (e: Event): void => {
-      const k = e as KeyboardEvent;
-      const rtl = o !== "vertical" && (k.key === "ArrowLeft" || k.key === "ArrowRight") && globalThis.getComputedStyle?.(container).direction === "rtl";
-      if (!rtl) return onKey(e);
-      const flipped = { key: k.key === "ArrowLeft" ? "ArrowRight" : "ArrowLeft", target: k.target, preventDefault: () => k.preventDefault() } as unknown as KeyboardEvent;
-      const moved = rovingKey(flipped, items(), { horizontal: true, wrap: opts.wrap ?? true });
-      if (moved) { mark(moved); opts.onMove?.(moved); }
-    };
-    const onFocus = (e: Event): void => { const t = e.target as HTMLElement; if (items().includes(t)) mark(t); };
-    container.addEventListener("keydown", onKeyDir);
-    container.addEventListener("focusin", onFocus);
-    const stop = (): void => { container.removeEventListener("keydown", onKeyDir); container.removeEventListener("focusin", onFocus); };
+    const stop = rovingFocus(container, opts);
     if (getOwner()) onCleanup(stop);
     return stop;
   };

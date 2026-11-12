@@ -381,6 +381,15 @@ replay(), stop() }`. Never split text by hand or animate letters with your own l
 - Catalog: `TEXT_ANIMATIONS` in `hadi-march/motion/text/meta`. Reference: src/motion/text/docs.md. Showcase: Hareket ›
   Metin animasyonları (/text-motion).
 
+### 15a3. Behaviors (hadi-march/behaviors/*)
+One interaction, written once, attached to any element; each behavior is its own subpath (docs/behaviors.md).
+- **drag** — `draggable(el, { handle, scroll, onMove, onEnd })` or `pointerDrag(downEvent, opts)`: threshold (click stays
+  a click), pointer capture, Escape cancels, edge auto-scroll on the motion clock, `p.di` along the writing direction
+  (RTL mirrored). As an action: `<div use:draggable={[draggable, opts]}>`. NEVER write your own pointermove /
+  pointerup / setPointerCapture loop in a component.
+- **roving-focus** — `rovingFocus(container, { orientation, wrap, selector, onMove })`: one Tab stop, arrows / Home / End
+  inside (RTL swaps left and right); the FocusManager's focus.roving() is this. Never hand-roll arrow-key focus moves.
+
 ### 15c. Ready-made animations (all on the engine, each its own export)
 
 ```ts

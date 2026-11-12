@@ -12,7 +12,7 @@ import { fold } from "../../../core/text.ts";
 import { createAxis, createViewport } from "../../../core/virtual.ts";
 import { createSelection, moveCursor, type SelectionMode } from "../../../core/selection.ts";
 import { animate, stagger } from "../../../motion/animate.ts";
-import { pointerDrag } from "../../../motion/pointer.ts";
+import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { markText } from "../../../ui/mark.ts";
 import { Spinner } from "../../../ui/feedback.ts";
 import { icon, glyph } from "../../../ui/util.ts";
