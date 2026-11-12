@@ -66,6 +66,8 @@ const displays: Record<Exclude<DisplayName, "silent">, (e: AppError) => void> = 
 const DEFAULTS: Rule[] = [
   { match: (e) => isAbort(e) || e.severity === "info", show: "silent" },
   { match: { source: "ws", severity: "warning" }, show: "silent" },
+  // a boundary that caught the error already shows its fallback
+  { match: (e) => e.source === "boundary" && e.context["handled"] === true, show: "silent" },
   { match: (e) => e.type === "validation" && !!e.context["target"], show: "inline" },
   { match: { severity: "fatal" }, show: "page" },
   { match: () => true, show: "toast" },
@@ -159,7 +161,7 @@ export const errors = {
     if (o.dedupe != null) dedupeMs = o.dedupe;
     if (o.dev) errors.dev(true);
     setErrorSink((e) => { errors.capture(e); });
-    if (o.boundaries !== false) setErrorHook((e) => { if (!isAbort(e)) errors.capture(e, { source: "boundary" }); });
+    if (o.boundaries !== false) setErrorHook((e, handled) => { if (!isAbort(e)) errors.capture(e, { source: "boundary", context: { handled } }); });
     const g = globalThis as unknown as { addEventListener?: (n: string, f: (e: never) => void) => void };
     if (o.window !== false && g.addEventListener && !installed) {
       installed = true;
@@ -199,8 +201,8 @@ export function ErrorInline(props: { target: string }): unknown {
     const fields = e.context["fields"] as Record<string, unknown> | undefined;
     return h("div", { class: "hm-error hm-error-inline", role: "alert" },
       h("span", {}, errors.message(e)),
-      fields && typeof fields === "object" ? h("ul", { class: "hm-error-fields" }, Object.entries(fields).map(([k, v]) => h("li", {}, `${k}: ${String(v)}`))) : null,
-      h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", "aria-label": () => t`Close`, onClick: () => s.set(null) }, "×"));
+      h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", "aria-label": () => t`Close`, onClick: () => s.set(null) }, "×"),
+      fields && typeof fields === "object" ? h("ul", { class: "hm-error-fields" }, Object.entries(fields).map(([k, v]) => h("li", {}, `${k}: ${String(v)}`))) : null);
   };
 }
 

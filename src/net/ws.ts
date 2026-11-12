@@ -148,7 +148,7 @@ export class ManagedSocket<In = unknown, Out = unknown> {
       this.ws = null;
       clearInterval(this.beat);
       if (this.closed) { this.state.set("closed"); this.relayState(); return; }
-      if (e?.code !== 1000) this.fail(new AppError(`WebSocket closed (${e?.code ?? "?"})`, { type: "network", source: "ws", context: { url: this.url, code: e?.code } }));
+      if (e?.code !== 1000) this.fail(new AppError(`WebSocket closed (${e?.code ?? "?"})`, { type: "network", source: "ws", severity: "warning", context: { url: this.url, code: e?.code } }));
       this.schedule();
     };
   }

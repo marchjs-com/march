@@ -13,7 +13,7 @@ Read this before writing code with March. It is the contract; when in doubt, pre
 4. **Ownership cleans up.** Listeners, effects, timers registered with `onCleanup`, queries and child components are
    disposed when their branch disappears (`<If>`, `<For>` row removed, route change).
 5. **Control flow is components:** `If/Else`, `For` (keyed), `Switch/Match`, `Try` (errors + async loading), `Await`.
-6. **Modules are separate:** core, router, data (+access), schema, ui (+forms), table, charts, channel, testing.
+6. **Modules are separate:** core, router, data (+access), net, errors, schema, ui (+forms), table, charts, channel, testing.
 
 ## 2. Syntax cheat sheet (March JSX, `.jsx` files)
 
@@ -321,6 +321,52 @@ Coming (core order step 10, docs/parallel.md): ONE motion engine for every anima
 with drivers (dom / cssVar / canvas2d / webgl / object), one clock, global speed / pause / reduced motion, compositor-only
 properties, off-screen animations stop, frame drops measured on a 200-item stagger. New animation code must be ready to
 move onto it: no private rAF loops or timers.
+
+## 15b. Network and errors (hadi-march/net, hadi-march/errors)
+
+**Never call `fetch()`, `new WebSocket()` or `new EventSource()` in app code. All traffic goes through `net` or an
+`Api` class** (one place for priority, retry, auth, cache, mock, logging and error handling).
+
+```ts
+import { net, Api, api, auth, cache, acceptLanguage, idempotencyKey, normalizeErrors, socket } from "hadi-march/net";
+net.use(auth({ token: () => session.token, refresh: renew }), acceptLanguage(), idempotencyKey(), cache(), normalizeErrors());
+
+class UsersApi extends Api {
+  base = "/api/users";
+  list = this.get<User[]>("/", { cache: "5m" });                       // category "users" (from base)
+  byId = this.get<User, { id: string }>("/:id");                       // users.byId({ id })
+  search = this.get<User[], { q: string }>("/", { category: "search", policy: "latest" });
+  update = this.patch<User, Partial<User> & { id: string }>("/:id", { invalidates: ["users"] });
+  live = this.stream<UserEvent>("ws:/api/users/events#users");
+}
+const users = api(UsersApi);
+const list = users.list.query();          // hadi-march/data query, key ["users", "/", null]
+const save = users.update.mutation();     // after success: net cache + data queries of "users" refetch
+```
+- Policies: `dedupe` (default for GET: same key in flight → one shared request), `latest` (search: the older request of
+  the category is aborted), `queue` (one after another per category), `parallel` (default for writes).
+- Priority: `route` > `data` > `prefetch`; prefetch waits while a page loads. Page and `lazy()` chunk loads already go
+  through net once `hadi-march/net` is imported.
+- Retry (backoff + jitter, Retry-After) only for idempotent requests; writes are retried only with `idempotencyKey()`.
+  `timeout` per attempt; offline requests wait in the offline queue (`offline: "fail"` to fail fast).
+- Middleware is `(ctx, next)`: code before `await next()` sees `ctx.req`, after it `ctx.res` or the thrown AppError.
+- `net.pending("users")` is a reactive count; `net.on("net:error", …)` for events.
+- WebSocket: `socket(url, opts)` (reconnect, heartbeat, `subscribe(topic)`, `request(msg)` by correlation id, offline
+  send queue, `shared: true` for one connection across tabs). SSE: `this.stream("sse:/path")`.
+- Mock: `import "hadi-march/net/mock"; net.mock({ ...crud("/api/users", seed), "GET /api/me": me }, { delay, errorRate })`,
+  `net.mock(openapiDoc)`, `net.mock(false)`. `march dev --mock` → `mockRequested()` is true. Tests use the same mock.
+- `march gen api openapi.json --classes` writes Api classes + interfaces.
+
+Errors: `errors.install()` once at start. Everything (window errors, unhandled rejections, `<Try>`/`<Outlet>`
+boundaries, net and WebSocket failures) becomes an `AppError` (`type`, `code`, `status`, `severity`, `source`,
+`retryable`, `cause`, `context`), de-duplicated, shown by rule:
+```ts
+errors.rule({ type: "auth" }, "page");          // <ErrorPage> where the page content goes
+users.update(v, { meta: { target: "profile" } }) // 422 → <ErrorInline target="profile" />
+errors.report((e) => logger.send(e));           // opt-in; nothing is reported by default
+```
+Throw `new AppError(msg, { type, code })` for domain errors; never show `e.message` of unknown errors to users — use
+`errors.message(e)` (translated). Don't toast an error yourself when a rule already shows it.
 
 ## 16. Names to remember
 

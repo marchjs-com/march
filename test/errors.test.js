@@ -86,3 +86,17 @@ test("errors: ErrorPage and ErrorInline render and close", async () => {
   assert.ok(el.querySelector(".hm-error-inline li").textContent.includes("email"));
   errors.clear();
 });
+
+test("errors: a boundary that caught the error stays silent; WebSocket drops are silent warnings", async () => {
+  errors.install({ window: false });
+  errors.clear();
+  const el = document.createElement("div");
+  const Bad = () => { throw new Error("caught by Try"); };
+  render(() => h(Try, { fallback: () => "fallback", log: false }, lazyChildren(() => [h(Bad, {})])), el);
+  await tick();
+  const c = errors.list().find((x) => x.error.message === "caught by Try");
+  assert.equal(c?.shown, "silent");
+  errors.capture(new AppError("WebSocket closed (4001)", { type: "network", source: "ws", severity: "warning" }));
+  assert.equal(errors.list()[0].shown, "silent");
+  errors.clear();
+});

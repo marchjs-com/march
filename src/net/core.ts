@@ -211,7 +211,7 @@ const timeoutStep = named("timeout", async (ctx: Ctx, next: () => Promise<void>)
   finally { clearTimeout(t); ctx.signal = outer; outer.removeEventListener("abort", stop); }
 });
 
-interface Flight { promise: Promise<NetResponse>; ctl: AbortController; refs: number; ctx: Ctx | null }
+interface Flight { promise: Promise<NetResponse>; ctl: AbortController; refs: number; ctx: Ctx | null; cat: string }
 interface Waiter { rank: number; seq: number; go: () => void; signal: AbortSignal | null }
 
 let ids = 0;
@@ -322,7 +322,7 @@ export class Net {
       if (f) return this.join(f, o.signal) as Promise<NetResponse<T>>;
     }
     const ctl = new AbortController();
-    const flight: Flight = { promise: null as unknown as Promise<NetResponse>, ctl, refs: 0, ctx: null };
+    const flight: Flight = { promise: null as unknown as Promise<NetResponse>, ctl, refs: 0, ctx: null, cat: req.category };
     if (req.policy === "latest") {
       this.latest.get(req.category)?.ctl.abort();
       this.latest.set(req.category, flight);
@@ -427,7 +427,7 @@ export class Net {
       return ctx.res;
     } catch (e) {
       const err = signal.aborted ? abortError(req.policy === "latest" ? "Replaced by a newer request" : "Aborted") : AppError.from(e, { source: "net" });
-      err.context = { url: req.url, method: req.method, category: req.category, ...err.context };
+      err.context = { url: req.url, method: req.method, category: req.category, ...(req.meta["target"] ? { target: req.meta["target"] } : {}), ...err.context };
       ctx.error = err;
       if (isAbort(err)) this.emit("net:abort", { ctx, error: err });
       else {
@@ -466,6 +466,9 @@ export class Net {
     }
     for (const fn of invalidators) fn(prefix);
   }
+
+  /** Abort the requests of a category that are in flight or waiting. */
+  cancel(category: string): void { for (const f of [...this.all]) if (f.ctx?.req.category === category || (!f.ctx && f.cat === category)) f.ctl.abort(); }
 
   /** Abort every request in flight (sign-out, tests). */
   abortAll(): void {

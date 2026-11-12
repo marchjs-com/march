@@ -3,7 +3,7 @@
 //   import "hadi-march/net/mock";
 //   const m = net.mock({
 //     ...crud("/users", (f) => f.list(20, (i) => ({ id: String(i + 1), name: f.name(), email: f.email() }))),
-//     "GET /me": { id: "1", name: "Ada" },
+//     "GET /me": { id: "1", name: "Alex" },
 //     "POST /login": (r) => (r.body.password ? { token: "t" } : reply(401, { message: "Wrong password" })),
 //   }, { delay: [80, 250], errorRate: 0.05, seed: 7 });
 //   m.ws("/users/events", (client) => client.send({ type: "hello" }));    m.publish("/users/events", "users", {…})
@@ -19,8 +19,8 @@ export function rng(seed = 1): () => number {
   let a = seed >>> 0;
   return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
-const FIRST = ["Ada", "Alan", "Grace", "Linus", "Margaret", "Dennis", "Barbara", "Ken", "Frances", "Tim", "Radia", "Edsger", "Hedy", "John", "Katherine", "Niklaus"];
-const LAST = ["Lovelace", "Turing", "Hopper", "Torvalds", "Hamilton", "Ritchie", "Liskov", "Thompson", "Allen", "Berners-Lee", "Perlman", "Dijkstra", "Lamarr", "Backus", "Johnson", "Wirth"];
+const FIRST = ["Alex", "Sam", "Jordan", "Taylor", "Robin", "Casey", "Jamie", "Morgan", "Riley", "Avery", "Quinn", "Drew", "Rowan", "Sky", "Kai", "Noa"];
+const LAST = ["Stone", "Rivers", "Brooks", "Lane", "Hale", "Frost", "Reed", "Wells", "Park", "Gray", "North", "Vale", "Shore", "Fields", "Marsh", "Hart"];
 const WORDS = ["alpha", "bravo", "cedar", "delta", "ember", "falcon", "garnet", "harbor", "indigo", "juniper", "kestrel", "lumen", "meadow", "nova", "orbit", "prism"];
 
 /** Seeded fake data helpers. */
@@ -96,7 +96,7 @@ export function crud<T extends Record<string, unknown>>(path: string, seed: T[] 
     [`PATCH ${p}/:id`]: (r: MockRequest) => { const i = find(r); if (i < 0) return reply(404, { message: "Not found" }); const l = all(r.fake); l[i] = { ...l[i], ...(r.body as object), [idKey]: l[i]?.[idKey] } as T; return l[i]; },
     [`DELETE ${p}/:id`]: (r: MockRequest) => { const i = find(r); if (i < 0) return reply(404, { message: "Not found" }); all(r.fake).splice(i, 1); return reply(204); },
   };
-  return Object.assign(handlers, { rows: () => rows ?? [] }) as MockHandlers & { rows(): T[] };
+  return Object.assign(handlers, { rows: () => all(fakeFor(o.seed ?? 1)) }) as MockHandlers & { rows(): T[] };
 }
 const fakeFor = (seed: number): Fake => fake(seed);
 
@@ -266,12 +266,9 @@ class MockSocket implements SocketLike {
 }
 
 // ---------------------------------------------------------------- net.mock()
-export interface MockController {
-  readonly transport: MockTransport;
-  /** Change latency / error rate at run time. */
-  set(o: MockOptions): void;
-  /** Add handlers. */
-  add(h: MockHandlers): void;
+/** In-memory WebSocket servers by path. `factory` creates client sockets for ManagedSocket ({ factory }). */
+export interface MockSocketServer {
+  readonly factory: (url: string) => SocketLike;
   /** Mock a WebSocket path: `onConnect` per connection; `onMessage` answers requests (its return value is the reply). */
   ws(path: string, onConnect?: (c: MockClient) => void, onMessage?: (msg: any, c: MockClient) => unknown): void;
   /** Send to every client on a path (only those subscribed to `topic` when given, as `{ topic, data }`). */
@@ -280,30 +277,28 @@ export interface MockController {
   drop(path: string): void;
   /** Connected mock clients on a path. */
   clients(path: string): number;
+}
+export interface MockController extends MockSocketServer {
+  readonly transport: MockTransport;
+  /** Change latency / error rate at run time. */
+  set(o: MockOptions): void;
+  /** Add handlers. */
+  add(h: MockHandlers): void;
   /** Back to the real transport. */
   restore(): void;
 }
 
 const pathOf = (url: string): string => { try { return new URL(url).pathname; } catch { return url.replace(/^(wss?|sse):/, ""); } };
 
-/** Install the mock provider on a Net instance (replaces its `http` transport until restore()). */
-export function mock(net: Net, handlers: MockHandlers | OpenApi = {}, o: MockOptions = {}): MockController {
-  const real = net.transports.get("http") ?? null;
-  const prev = net.store.get("mock:real") as Transport | undefined;
-  const t = new MockTransport(isOpenApi(handlers) ? fromOpenApi(handlers) : handlers, o, prev ?? real);
-  if (!prev && real) net.store.set("mock:real", real);
-  net.transport(t, "http");
+/** WebSocket servers in memory, independent of net.mock() (pass `factory` to a ManagedSocket). */
+export function mockSocketServer(delay: () => number = () => 20): MockSocketServer {
   const servers = new Map<string, WsServer>();
-  setSocketFactory((url) => {
-    const s = servers.get(pathOf(url));
-    if (!s) throw new Error(`Mock: no WebSocket at ${pathOf(url)}`);
-    const d = t.options.peek().delay;
-    return new MockSocket(s, pathOf(url), Array.isArray(d) ? d[0] : d);
-  });
-  const ctl: MockController = {
-    transport: t,
-    set: (x) => t.set(x),
-    add: (h) => t.add(h),
+  return {
+    factory: (url) => {
+      const s = servers.get(pathOf(url));
+      if (!s) throw new Error(`Mock: no WebSocket at ${pathOf(url)}`);
+      return new MockSocket(s, pathOf(url), delay());
+    },
     ws: (path, onConnect, onMessage) => { servers.set(path, { onConnect, onMessage, clients: servers.get(path)?.clients ?? new Set() }); },
     publish: (path, topicOrMsg, data) => {
       let n = 0;
@@ -315,14 +310,32 @@ export function mock(net: Net, handlers: MockHandlers | OpenApi = {}, o: MockOpt
     },
     drop: (path) => { for (const c of [...(servers.get(path)?.clients ?? [])]) c.close(4001); },
     clients: (path) => servers.get(path)?.clients.size ?? 0,
+  };
+}
+
+/** Install the mock provider on a Net instance (replaces its `http` transport until restore()). */
+export function mock(net: Net, handlers: MockHandlers | OpenApi = {}, o: MockOptions = {}): MockController {
+  const real = net.transports.get("http") ?? null;
+  const prev = net.store.get("mock:real") as Transport | undefined;
+  const t = new MockTransport(isOpenApi(handlers) ? fromOpenApi(handlers) : handlers, o, prev ?? real);
+  if (!prev && real) net.store.set("mock:real", real);
+  net.transport(t, "http");
+  const server = mockSocketServer(() => { const d = t.options.peek().delay; return Array.isArray(d) ? d[0] : d; });
+  setSocketFactory(server.factory);
+  const ctl: MockController = {
+    ...server,
+    transport: t,
+    set: (x) => t.set(x),
+    add: (h) => t.add(h),
     restore: () => { const r = net.store.get("mock:real") as Transport | undefined; if (r) net.transport(r, "http"); net.store.delete("mock:real"); setSocketFactory(null); },
   };
   net.store.set("mock:ctl", ctl);
   return ctl;
 }
 
-/** True when the app runs under `march dev --mock` (the build defines globalThis.MARCH_MOCK). */
-export const mockRequested = (): boolean => !!(globalThis as { MARCH_MOCK?: unknown }).MARCH_MOCK;
+/** True under `march dev --mock` (the build defines globalThis.MARCH_MOCK) or with `?mock` in the page url. */
+export const mockRequested = (): boolean => !!(globalThis as { MARCH_MOCK?: unknown }).MARCH_MOCK
+  || /[?&]mock(=1|=true)?(&|$)/.test((globalThis as { location?: { search: string } }).location?.search ?? "");
 
 declare module "./core.ts" {
   interface Net {

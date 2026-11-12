@@ -274,15 +274,15 @@ export function _enter<T>(owner: Owner | null, value: T): T {
 
 // ------------------------------------------------------------------ errors
 const ERROR = Symbol("hm.error");
-let errorHook: ((e: unknown) => void) | null = null;
-/** Observe every error a boundary handles or that escapes (hadi-march/errors installs itself here). */
-export function setErrorHook(fn: ((e: unknown) => void) | null): void { errorHook = fn; }
+let errorHook: ((e: unknown, handled: boolean) => void) | null = null;
+/** Observe every error a boundary handles (handled) or that escapes (hadi-march/errors installs itself here). */
+export function setErrorHook(fn: ((e: unknown, handled: boolean) => void) | null): void { errorHook = fn; }
 function handleError(err: unknown, owner: OwnerNode | null): void {
-  errorHook?.(err);
   for (let o = owner; o; o = o.parent) {
     const h = o.context?.get(ERROR) as ((e: unknown) => void) | undefined;
-    if (h) { h(err); return; }
+    if (h) { errorHook?.(err, true); h(err); return; }
   }
+  errorHook?.(err, false);
   queueMicrotask(() => { throw err; });
 }
 /** Catch errors thrown by computations created inside `fn`. */
