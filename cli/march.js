@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 // HADI March CLI
-//   march dev [--port 5173] [--mock openapi.json]   dev server: rebuild on change, live reload, error overlay, optional mock API
+//   march dev [--port 5173] [--mock [openapi.json]]  dev server: rebuild on change, live reload, error overlay, optional mock API
+//                                                    (--mock also sets globalThis.MARCH_MOCK for net.mock in the app)
 //   march build [--outdir dist] [--no-minify]        production bundle (code splitting, hashed chunks, public/ copied)
 //   march gen routes                                 src/pages/** → src/routes.gen.js (+ pages.d.ts param types)
 //   march gen page users/[id] | gen component Name | gen crud products
 //   march gen api openapi.json [--out src/api.gen.js] typed client + schemas from an OpenAPI 3 document
+//                 [--classes]                       hadi-march/net Api classes + interfaces instead (src/api.gen.ts)
 //   march i18n [--messages src/i18n]                 report keys missing from translation files
 //   march check [--src src]                          type-check .tsx/.ts including March syntax (pipes, modifiers…)
 // Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html,
@@ -18,7 +20,7 @@ import { pathToFileURL, fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import { march } from "../compiler/esbuild.js";
 import { genRoutes } from "./routes.js";
-import { genApi, mockHandler } from "./openapi.js";
+import { genApi, genApiClasses, mockHandler } from "./openapi.js";
 import { templates } from "./templates.js";
 import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
 import { packChunks } from "../compiler/pack-chunks.js";
@@ -158,6 +160,8 @@ async function dev() {
   const send = (ev, data) => { for (const c of clients) c.write(`event: ${ev}\ndata: ${JSON.stringify(data)}\n\n`); };
 
   const opts = buildOptions(cfg, esbuild, { dev: true });
+  // --mock: the app may switch to hadi-march/net's in-browser mock (`if (mockRequested()) net.mock(handlers)`)
+  if (mockSpec) opts.define = { ...opts.define, "globalThis.MARCH_MOCK": "true" };
   opts.plugins.push({ name: "march-dev", setup(b) {
     b.onStart(() => { if (existsSync(resolve(cwd, cfg.pagesDir))) genRoutes(resolve(cwd, cfg.pagesDir), resolve(cwd, "src/routes.gen.js")); });
     b.onEnd((r) => {
@@ -214,8 +218,10 @@ async function gen() {
   if (what === "crud") return put(join(cfg.pagesDir, `${name}.jsx`), templates.crud(name));
   if (what === "api") {
     const spec = argv[2] ?? fail("usage: march gen api openapi.json");
-    const outFile = flag("--out", "src/api.gen.js");
-    writeFileSync(resolve(cwd, outFile), genApi(JSON.parse(readFileSync(resolve(cwd, spec), "utf8"))));
+    const classes = !!flag("--classes");
+    const outFile = flag("--out", classes ? "src/api.gen.ts" : "src/api.gen.js");
+    const doc = JSON.parse(readFileSync(resolve(cwd, spec), "utf8"));
+    writeFileSync(resolve(cwd, outFile), classes ? genApiClasses(doc) : genApi(doc));
     console.log(`\x1b[32m✔\x1b[0m ${outFile}`);
     return;
   }
