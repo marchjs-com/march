@@ -24,7 +24,8 @@ export interface ScrollToTopProps {
   order?: number | undefined;
   /** Render in place instead of in the page corner. */
   inline?: boolean | undefined;
-  /** What to scroll; default: whatever the user last scrolled (the window or a scrolling container). */
+  /** What to follow and scroll; default: the page — the window, or the app's main area when that is what scrolls.
+   *  Boxes that scroll inside the page (a demo, a list, a code block) are never taken over. */
   target?: Element | Window | undefined;
   label?: string | undefined;
 }
@@ -40,10 +41,15 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
   const win = globalThis.window as Window | undefined;
   let scroller: Scroller | undefined = props.target ?? win;
 
-  // scroll does not bubble, but it can be caught on the way down: one listener follows the window and any container
+  // scroll does not bubble, but it can be caught on the way down: one listener sees the window and the page's own
+  // scrolling main area (an app shell); a box scrolling inside the page is not the page and is left alone
+  const doc = globalThis.document;
+  const isPage = (tg: EventTarget | null | undefined): boolean =>
+    tg === doc || tg === doc?.documentElement || tg === doc?.body || (tg instanceof Element && tg.matches("main, .hm-shell-main, [data-hm-scroll-root]"));
   const read = (e?: Event): void => {
     const tg = e?.target;
-    if (!props.target && tg) scroller = tg === globalThis.document || tg === globalThis.document?.documentElement ? win : (tg as Element);
+    if (props.target) { if (tg && tg !== props.target && !(props.target === win && isPage(tg))) return; }
+    else if (tg) { if (!isPage(tg)) return; scroller = tg === doc || tg === doc?.documentElement || tg === doc?.body ? win : (tg as Element); }
     if (scroller) shown.set(topOf(scroller) > threshold);
   };
   onCleanup(listen(globalThis.document, { scroll: read }, { capture: true, passive: true }));

@@ -67,10 +67,11 @@ test("Layout API: corners, slot content swapped while a part is shown, features 
   const aside = m.host.querySelector(".hm-layout-aside");
   assert.equal(aside.textContent, "FILTERS");
   assert.equal(cornerControls("top-end").textContent, "S");
-  assert.equal(cornerControls("bottom-start").textContent, "c");
+  assert.ok(cornerControls("bottom-start").querySelector("i"), "the part's corner control");
+  assert.ok(cornerControls("bottom-start").querySelector(".hm-layout-aside-btn"), "an aside brings its narrow-screen sheet button");
   show.set(false);
   assert.equal(aside.textContent, "TOC", "restored when the part goes away");
-  assert.equal(cornerControls("bottom-start").textContent, "");
+  assert.equal(cornerControls("bottom-start").querySelector("i"), null);
   const f = Object.assign(() => () => {}, { featureName: "demo" });
   api.use(f);
   assert.ok(api.features().includes("demo"));
@@ -105,4 +106,29 @@ test("Layout: a nested Layout does not start the page-wide features its outer La
   const m = mount(() => h(Outer, {}, h(Outer, {}, "inner")));
   assert.equal(n, 1);
   m.dispose();
+});
+
+test("Layout features: connection badge while offline, aside sheet toggles, dev overlay on Alt+Shift+L, feedback button", () => {
+  const { connection, devOverlay, feedback } = L;
+  const nav = globalThis.navigator;
+  const desc = Object.getOwnPropertyDescriptor(nav, "onLine");
+  Object.defineProperty(nav, "onLine", { configurable: true, get: () => false });
+  const m = mount(() => h(Layout, { features: [connection(), devOverlay(), feedback({ label: "Görüş" })], aside: "TOC" }, "x"));
+  const badge = cornerControls("top-end").querySelector(".hm-offline");
+  assert.ok(badge && !badge.hasAttribute("hidden"), "offline badge shown");
+  assert.equal(badge.getAttribute("role"), "status");
+  const btn = cornerControls("bottom-start").querySelector(".hm-layout-aside-btn");
+  const aside = m.host.querySelector(".hm-layout-aside");
+  btn.click();
+  assert.ok(aside.hasAttribute("data-open"));
+  assert.equal(btn.getAttribute("aria-expanded"), "true");
+  globalThis.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+  assert.ok(!aside.hasAttribute("data-open"), "Esc closes the sheet");
+  globalThis.dispatchEvent(new KeyboardEvent("keydown", { key: "L", altKey: true, shiftKey: true }));
+  assert.ok(document.documentElement.hasAttribute("data-hm-layout-debug"));
+  assert.match(document.querySelector(".hm-layout-dev").textContent, /connection/);
+  assert.ok([...cornerControls("bottom-end").querySelectorAll(".hm-layout-feedback")].some((b) => b.textContent === "Görüş"));
+  m.dispose();
+  assert.ok(!document.documentElement.hasAttribute("data-hm-layout-debug"));
+  if (desc) Object.defineProperty(nav, "onLine", desc); else delete nav.onLine;
 });

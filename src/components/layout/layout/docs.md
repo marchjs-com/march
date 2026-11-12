@@ -4,10 +4,12 @@ The frame the screens of an app share, with changeable behavior. What every page
 repeat it, and later page-wide features land in one place.
 
 - **Regions**: `top`, `header`, `nav`, `aside`, `footer` around the content (the AppShell frame: sticky sidebar that
-  becomes a drawer on narrow screens, sticky header, skip link; the aside drops under the content below 1100 px) and the
+  becomes a drawer on narrow screens, sticky header, skip link; below 1100 px the aside becomes a bottom sheet opened from a corner button) and the
   four page corners (`top-start`, `top-end`, `bottom-start`, `bottom-end`, mirrored in RTL).
 - **Features**: page-wide behaviors as plug-ins, `(api) => cleanup`. Built in, by name: `scrollToTop`,
-  `readingProgress`, `routeFocus`, `autoHideHeader`; `defineLayoutFeature(name, make)` adds your own. They load in their
+  `readingProgress`, `routeFocus`, `autoHideHeader`, `shortcuts` ("?" opens the shortcut list), `consent` (cookie
+  banner), `toasts` (a layout-owned toast host), `credit` ("Developed with March and 💗"), `connection` (offline badge),
+  `feedback` (a button that asks for a message → `onSubmit`), `devOverlay` (Alt+Shift+L outlines the regions); `defineLayoutFeature(name, make)` adds your own. They load in their
   own chunks after the first paint.
 - **Variants**: `defineLayout(defaults)`; `Layout.extend({ … })` derives one (regions override, features merge by name).
   AppShell is `Layout.extend({ framed: true })`.

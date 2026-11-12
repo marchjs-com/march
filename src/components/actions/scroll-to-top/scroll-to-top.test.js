@@ -30,3 +30,18 @@ test("ScrollToTop: by default it goes into the bottom-end corner and leaves with
   dispose();
   assert.equal(cornerControls("bottom-end").querySelector(".hm-to-top"), null);
 });
+
+test("ScrollToTop: the page button follows the page (window or an app's scrolling main), not a box scrolling inside it", () => {
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const dispose = render(() => h(ScrollToTop, { threshold: 100 }), host);
+  const btn = cornerControls("bottom-end").querySelector(".hm-to-top");
+  const inner = document.createElement("div"); document.body.appendChild(inner);
+  inner.scrollTop = 500;
+  inner.dispatchEvent(new Event("scroll"));
+  assert.equal(btn.getAttribute("data-shown"), "false", "a demo box scrolling inside the page is left alone");
+  const main = document.createElement("main"); document.body.appendChild(main);
+  main.scrollTop = 500;
+  main.dispatchEvent(new Event("scroll"));
+  assert.equal(btn.getAttribute("data-shown"), "true", "an app shell's scrolling main is the page");
+  dispose(); inner.remove(); main.remove();
+});

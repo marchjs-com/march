@@ -211,6 +211,19 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
         slot("footer", "footer", "hm-layout-footer")))
     : h("div", { class: () => cx("hm-layout", val(props.class ?? defaults.class)) }, props.children);
 
+  // narrow screens: the aside becomes a bottom sheet, opened from a corner button (Esc or the button closes it)
+  const asideEl = els.get("aside");
+  if (asideEl) {
+    asideEl.id ||= `${mainId}-aside`;
+    const set = (open: boolean): void => { asideEl.toggleAttribute("data-open", open); btn.setAttribute("aria-expanded", String(open)); };
+    const btn = h("button", { type: "button", class: "hm-btn hm-btn-sm hm-layout-aside-btn", "aria-controls": asideEl.id, "aria-expanded": "false",
+      onClick: () => set(!asideEl.hasAttribute("data-open")) }, () => t`Panel`) as HTMLElement;
+    api.add("bottom-start", btn, -10);
+    const esc = (e: KeyboardEvent): void => { if (e.key === "Escape" && asideEl.hasAttribute("data-open")) { set(false); btn.focus(); } };
+    globalThis.addEventListener?.("keydown", esc);
+    onCleanup(() => globalThis.removeEventListener?.("keydown", esc));
+  }
+
   const corners = { ...defaults.corners, ...props.corners };
   for (const c of CORNERS) addControls(api, c, corners[c]);
   const outerRuns = new Set(outer?.features() ?? []);
@@ -279,6 +292,85 @@ export const autoHideHeader = defineLayoutFeature("autoHideHeader", (opts: { aft
   };
   globalThis.document.addEventListener("scroll", onScroll, { capture: true, passive: true });
   return () => { globalThis.document.removeEventListener("scroll", onScroll, { capture: true }); header.removeAttribute("data-hidden"); };
+});
+
+/** Draw a lazily loaded component into a region (or the end of <body>); stops cleanly if the layout goes first. */
+function lazyMount(api: LayoutApi, where: LayoutRegion | "body", order: number, load: () => Promise<() => unknown>): () => void {
+  const wrap = h("span", { class: "hm-layout-ctl" }) as HTMLElement;
+  const off = where === "body" ? (globalThis.document?.body?.appendChild(wrap), () => wrap.remove()) : api.add(where, wrap, order);
+  let gone = false;
+  let dispose: (() => void) | undefined;
+  void Promise.all([load(), import("../../../dom/render.ts")]).then(([draw, r]) => { if (!gone) dispose = r.render(draw, wrap); });
+  return () => { gone = true; dispose?.(); off(); };
+}
+
+/** "?" opens the list of every described shortcut; holding Alt shows shortcut badges on the page. */
+export const shortcuts = defineLayoutFeature("shortcuts", () => (api) =>
+  lazyMount(api, "body", 0, async () => { const m = await import("../../../managers/shortcut-hint/ui.ts"); return () => m.ShortcutHints(); }));
+
+/** The cookie / storage consent banner (texts can be given; the decision is the consent manager's). */
+export const consent = defineLayoutFeature("consent", (texts: Record<string, unknown> = {}) => (api) =>
+  lazyMount(api, "body", 0, async () => { const m = await import("../../composite/consent-banner/index.ts"); return () => m.ConsentBanner(texts as never); }));
+
+/** A toast host owned by the layout (toasts also work without it: the first toast() makes one). */
+export const toasts = defineLayoutFeature("toasts", () => (api) =>
+  lazyMount(api, "body", 0, async () => {
+    const [T, P] = await Promise.all([import("../../overlays/toast/index.ts"), import("../../../dom/portal.ts")]);
+    return () => h(P.Portal, { layer: "toast", children: h(T.ToastHost, {}) });
+  }));
+
+/** "Developed with March and 💗" — in the footer when there is one, else a small line in a corner. */
+export const credit = defineLayoutFeature("credit", (opts: { variant?: "text" | "badge" | "small"; corner?: Corner } = {}) => (api) =>
+  lazyMount(api, api.region("footer") && !opts.corner ? "footer" : opts.corner ?? "bottom-start", 100, async () => {
+    const m = await import("../../actions/made-with-march/index.ts");
+    return () => m.MadeWithMarch({ variant: opts.variant ?? "small" });
+  }));
+
+/** A badge in a corner while the browser is offline (announced politely). */
+export const connection = defineLayoutFeature("connection", (opts: { corner?: Corner } = {}) => (api) => {
+  const nav = globalThis.navigator as Navigator | undefined;
+  const badge = h("span", { class: "hm-offline", role: "status", "aria-live": "polite" }) as HTMLElement;
+  const update = (): void => { const off = nav?.onLine === false; badge.toggleAttribute("hidden", !off); badge.textContent = off ? t`You are offline` : ""; };
+  update();
+  const out = api.add(opts.corner ?? "top-end", badge, -10);
+  globalThis.addEventListener?.("online", update);
+  globalThis.addEventListener?.("offline", update);
+  return () => { globalThis.removeEventListener?.("online", update); globalThis.removeEventListener?.("offline", update); out(); };
+});
+
+/** A "Feedback" button in a corner: asks for a message and hands it to `onSubmit`, then thanks with a toast. */
+export const feedback = defineLayoutFeature("feedback", (opts: { onSubmit?: (text: string) => unknown; corner?: Corner; label?: string } = {}) => (api) => {
+  const open = async (): Promise<void> => {
+    const { prompt } = await import("../../overlays/dialog/index.ts");
+    const text = await prompt({ title: t`Feedback`, label: t`Your message`, multiline: true });
+    if (!text) return;
+    await opts.onSubmit?.(text);
+    const { toast } = await import("../../overlays/toast/index.ts");
+    toast(t`Thanks for your feedback!`, { kind: "success" });
+  };
+  const btn = h("button", { type: "button", class: "hm-btn hm-btn-sm hm-layout-feedback", onClick: () => void open() }, () => opts.label ?? t`Feedback`) as Node;
+  return api.add(opts.corner ?? "bottom-end", btn, 10);
+});
+
+/** Development aid: Alt+Shift+L outlines the regions and lists the running features. */
+export const devOverlay = defineLayoutFeature("devOverlay", () => (api) => {
+  const root = globalThis.document?.documentElement;
+  if (!root) return;
+  const panel = h("div", { class: "hm-layout-dev", role: "note", "aria-label": () => t`Layout regions`, hidden: true }) as HTMLElement;
+  globalThis.document.body.appendChild(panel);
+  const draw = (): void => {
+    const regions = (["top", "header", "nav", "main", "aside", "footer"] as const).filter((r) => api.region(r));
+    panel.textContent = `Layout · ${t`Regions`}: ${regions.join(", ")} · ${t`Features`}: ${api.features().join(", ")}`;
+  };
+  const toggle = (e: KeyboardEvent): void => {
+    if (!(e.altKey && e.shiftKey && e.key.toLowerCase() === "l")) return;
+    const on = !root.hasAttribute("data-hm-layout-debug");
+    root.toggleAttribute("data-hm-layout-debug", on);
+    panel.hidden = !on;
+    if (on) draw();
+  };
+  globalThis.addEventListener("keydown", toggle);
+  return () => { globalThis.removeEventListener("keydown", toggle); root.removeAttribute("data-hm-layout-debug"); panel.remove(); };
 });
 
 /** The default Layout: back-to-top and route focus on. `features={{ scrollToTop: false }}` turns one off. */
