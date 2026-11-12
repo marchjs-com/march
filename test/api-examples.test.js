@@ -98,12 +98,17 @@ export default examples({
   assert.match(files["gen/g/_ready.tsx"], /^export \{ ready, ensure \};$/m);
 });
 
-// one lazy module per example made 1,274 files (the published showcase may hold 512): examples load per group instead
-test("API examples: at most 150 generated example modules (examples/showcase/src/api-examples/gen)", { todo: "examples grouped per file: on the API branch" }, async () => {
-  const { readdirSync, statSync } = await import("node:fs");
-  const count = (d) => readdirSync(d).reduce((n, f) => { const p = `${d}/${f}`; return n + (statSync(p).isDirectory() ? count(p) : /\.tsx?$/.test(f) ? 1 : 0); }, 0);
-  const dir = new URL("../examples/showcase/src/api-examples/gen", import.meta.url);
-  let n = 0;
-  try { n = count(dir.pathname.replace(/^\/([A-Za-z]:)/, "$1")); } catch { /* no gen folder: grouped */ }
-  assert.ok(n <= 150, `${n} generated example modules`);
+// one lazy module per example made 1,274 published files (the host keeps 512 per version): the examples load in a few
+// lazy parts. Every distinct dynamic import under the examples is a file of its own in the build: at most 150.
+test("API examples: at most 150 lazy parts (distinct dynamic imports under api-examples)", async () => {
+  const { readdirSync, statSync, readFileSync } = await import("node:fs");
+  const { join, resolve, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const src = fileURLToPath(new URL("../examples/showcase/src/", import.meta.url));
+  const walk = (d) => readdirSync(d).flatMap((f) => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : /\.tsx?$/.test(f) ? [p] : []; });
+  const targets = new Set();
+  for (const f of [join(src, "api-examples.gen.ts"), ...walk(join(src, "api-examples"))]) {
+    for (const m of readFileSync(f, "utf8").matchAll(/import\(\s*["'`]([^"'`]+)["'`]\s*\)/g)) targets.add(m[1].startsWith(".") ? resolve(dirname(f), m[1]) : m[1]);
+  }
+  assert.ok(targets.size <= 150, `${targets.size} lazy example parts`);
 });
