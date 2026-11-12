@@ -3,10 +3,10 @@
 //   sizeReport     gzip size of the entry and of each lazy route, checked against march.config.js › budget
 //   headersFile    a Netlify / Cloudflare Pages `_headers` file: hashed assets immutable, the page always revalidated
 //   swSource       the optional service worker (march.config.js › sw: true)
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { createHash } from "node:crypto";
-import { dirname, relative, resolve, sep } from "node:path";
+import { dirname, relative, resolve, sep, join } from "node:path";
 
 const posix = (p) => p.split(sep).join("/");
 
@@ -197,4 +197,26 @@ export function topInputs(meta, cwd, outdir, files, n = 12) {
     for (const [inp, v] of Object.entries(o.inputs)) by.set(inp, (by.get(inp) ?? 0) + v.bytesInOutput);
   }
   return [...by].sort((a, b) => b[1] - a[1]).slice(0, n).map(([file, bytes]) => ({ file, bytes }));
+}
+
+/**
+ * Every served JS / CSS / font file under `outdir` with its raw and gzip size, keyed by its path relative to `outdir`
+ * (no `?v=`). Written to march-report.json › files: the Speed page falls back to it when the browser cannot measure a
+ * response (cross-origin without Timing-Allow-Origin: transferSize is only the headers, body sizes are 0).
+ * @param {string} outdir
+ * @returns {Record<string, { raw: number, gzip: number }>}
+ */
+export function fileSizes(outdir) {
+  const out = {};
+  const walk = (dir) => {
+    for (const name of readdirSync(dir)) {
+      const p = join(dir, name);
+      if (statSync(p).isDirectory()) { walk(p); continue; }
+      if (!/\.(js|css|woff2?)$/.test(name)) continue;
+      const buf = readFileSync(p);
+      out[relative(outdir, p).split(sep).join("/")] = { raw: buf.length, gzip: /\.woff2?$/.test(name) ? buf.length : gzipSync(buf).length };
+    }
+  };
+  if (existsSync(outdir)) walk(outdir);
+  return out;
 }
