@@ -132,8 +132,17 @@
     "node": ">=22.18"
   },
   "devDependencies": {
+    "@babel/core": "7.29.13",
+    "babel-preset-solid": "1.9.19",
     "esbuild": "0.28.2",
-    "typescript": "6.0.3"
+    "lit": "3.3.3",
+    "preact": "10.29.8",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "solid-js": "1.9.19",
+    "svelte": "5.57.3",
+    "typescript": "6.0.3",
+    "vue": "3.5.45"
   },
   "sideEffects": [
     "*.css",
