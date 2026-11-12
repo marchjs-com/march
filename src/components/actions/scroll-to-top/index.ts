@@ -1,5 +1,5 @@
 // ScrollToTop (hadi-march/ui): a "back to top" button that shows once the page is scrolled down and, when pressed,
-// scrolls back to the top on the motion engine (global speed, "stop all" and reduced motion apply). By default it puts
+// scrolls back to the top smoothly (at once with reduced motion). By default it puts
 // itself into the page corner (BottomRightControls), so it never overlaps other corner controls; `inline` renders it
 // where it is written instead. It follows whatever scrolls — the window or an app shell's scrolling main area.
 //
@@ -14,7 +14,7 @@ import { IconButton } from "../../../ui/button.ts";
 import { glyph } from "../../../ui/util.ts";
 import { arrowUp } from "../../../icons/glyphs/arrowUp.ts";
 import { animate } from "../../../motion/animate.ts";
-import { animateValue } from "../../../motion/engine/value.ts";
+import { reducedMotion } from "../../../motion/env.ts";
 import { addBottomRightControl } from "../../layout/bottom-right-controls/index.ts";
 
 export interface ScrollToTopProps {
@@ -48,16 +48,14 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
   };
   onCleanup(listen(globalThis.document, { scroll: read }, { capture: true, passive: true }));
 
-  let run: { cancel(): void } | null = null;
+  // the browser's own smooth scroll: it keeps its aim while content above loads and changes height (scroll anchoring),
+  // and gives way when the user scrolls; reduced motion jumps at once
   const toTop = (): void => {
     const s = scroller;
     if (!s) return;
-    run?.cancel();
-    const from = topOf(s);
-    run = animateValue(from, 0, { duration: Math.min(900, 300 + from / 6), easing: "easeOutCubic", onUpdate: (y: number) => setTop(s, y) });
+    if (reducedMotion() || typeof s.scrollTo !== "function") return setTop(s, 0);
+    s.scrollTo({ top: 0, behavior: "smooth" });
   };
-  // the user taking over (wheel, touch, keys) stops the ride
-  onCleanup(listen(globalThis.document, { wheel: () => run?.cancel(), touchstart: () => run?.cancel(), keydown: () => run?.cancel() }, { passive: true }));
 
   const btn = h(IconButton, { class: "hm-to-top", variant: "secondary", label: () => props.label ?? t`Back to top`, onClick: toTop }, glyph(arrowUp)) as HTMLElement;
   btn.setAttribute("data-shown", "false");

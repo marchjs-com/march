@@ -1,7 +1,7 @@
 # ScrollToTop
 
-A "back to top" button that appears once the page is scrolled down and scrolls back to the top on the motion engine
-(global speed, "stop all" and reduced motion apply); the user taking over (wheel, touch, keys) stops it. It follows
+A "back to top" button that appears once the page is scrolled down and scrolls back to the top smoothly
+(at once with reduced motion; it keeps its aim while content above loads). It follows
 whatever scrolls: the window or a scrolling container. By default it puts itself into the bottom-end page corner; in a
 Layout it is the `scrollToTop` feature (on by default).
 
