@@ -82,11 +82,18 @@ export function collect(root = ROOT) {
     const d = m.valueDeclaration ?? m.declarations?.[0];
     if (!d) return null;
     const mods = ts.getCombinedModifierFlags(d);
+    // members declared by the platform (Error.message …) belong to its own docs
+    if (d.getSourceFile().isDeclarationFile && /node_modules/.test(d.getSourceFile().fileName)) return null;
     if (mods & (ts.ModifierFlags.Private | ts.ModifierFlags.Protected) || m.getName().startsWith("#") || m.getName().startsWith("_")) return null;
     const t = checker.getTypeOfSymbolAtLocation(m, at);
     const sigs = (ts.isMethodDeclaration(d) || ts.isMethodSignature(d)) ? t.getCallSignatures() : [];
     const kind = sigs.length ? "method" : (ts.isGetAccessor(d) || ts.isSetAccessor(d)) ? "accessor" : "property";
-    const doc = docText(m.getDocumentationComment(checker));
+    let doc = docText(m.getDocumentationComment(checker));
+    const cls = d.parent;
+    if (!doc && cls && (ts.isClassDeclaration(cls) || ts.isClassExpression(cls))) for (const h of cls.heritageClauses ?? []) for (const t of h.types) {
+      const p = checker.getTypeAtLocation(t).getProperty(m.getName());
+      if (p && !doc) doc = docText(p.getDocumentationComment(checker));
+    }
     return { name: m.getName(), kind, static: isStatic, readonly: !!(mods & ts.ModifierFlags.Readonly) || (ts.isGetAccessor(d) && !m.declarations?.some(ts.isSetAccessor)),
       signature: sigs.length ? sigs.map((s) => sigOf(m.getName(), s, at).text).join("\n") : `${m.getName()}: ${str(t, at)}`, summary: doc.split(/(?<=\.)\s/)[0] ?? "" };
   };

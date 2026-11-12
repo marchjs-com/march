@@ -69,19 +69,38 @@ const finite = (n: number): number => (Number.isFinite(n) ? n : 0);
 
 /** One target × its tracks with timing: the unit both paths play. */
 export class Effect {
+  /** The driver that reads and writes the animated target. */
   readonly driver: Driver;
+  /** The normalized keyframe tracks before they are compiled. */
   readonly raw: RawTrack[];
+  /** The names of the properties this effect animates. */
   readonly props: string[];
-  readonly delay: number; readonly duration: number; readonly iterations: number; readonly endDelay: number;
-  readonly direction: PlaybackDirection; readonly fill: FillMode; readonly ease: Ease;
+  /** Milliseconds to wait before the effect starts. */
+  readonly delay: number;
+  /** Milliseconds one iteration takes. */
+  readonly duration: number;
+  /** How many times the effect repeats (Infinity for endless). */
+  readonly iterations: number;
+  /** Milliseconds to hold after the last iteration before the effect ends. */
+  readonly endDelay: number;
+  /** Whether iterations play forward, backward or alternate. */
+  readonly direction: PlaybackDirection;
+  /** Which values the effect keeps applying before it starts and after it ends. */
+  readonly fill: FillMode;
+  /** The easing applied to each iteration's progress. */
+  readonly ease: Ease;
   /** Absolute start inside the root playback (set when the root collects its effects). */
   start = 0;
+  /** The native browser animation, once created. */
   native: Animation | null = null;
+  /** The compiled JS tracks, once created. */
   tracks: Track[] | null = null;
+  /** True when the effect runs as a native animation instead of the JS path. */
   readonly useNative: boolean;
   #nativeFrames: Keyframe[] | null = null;
   #wasVisible = true;
   #unwatch: (() => void) | null = null;
+  /** The object being animated (an element, canvas, or other driver target). */
   readonly target: unknown;
   constructor(target: unknown, frames: Frames, t: Timing, forceJs: boolean) {
     this.target = target;
@@ -116,6 +135,7 @@ export class Effect {
     }
     return a;
   }
+  /** The running root playback this effect belongs to, if any. */
   liveRoot: Playback | null = null;
 
   /** Compile the JS tracks (reads implicit start / end values from the target). */
@@ -160,13 +180,16 @@ export class Effect {
     for (const tr of tracks) { tr.sample(p); this.driver.apply(this.target, tr); }
     if (this.driver.flush) { if (!dirty.size) nextFrame(flushDirty, "render"); dirty.set(this.target, this.driver); }
   }
+  /** Puts the animated properties back to their original values. */
   restore(): void { if (this.driver.restore && this.tracks) for (const p of this.props) this.driver.restore(this.target, p); }
+  /** Starts or stops pausing the effect while its target is off screen. */
   watch(on: boolean): void {
     const el = this.useNative ? null : this.driver.element?.(this.target);
     if (!el) return;
     if (on && !this.#unwatch) this.#unwatch = watchVisibility(el);
     else if (!on && this.#unwatch && !this.native) { this.#unwatch(); this.#unwatch = null; }
   }
+  /** Cancels the native animation and stops watching the target. */
   dispose(): void { this.native?.cancel(); this.native = null; this.#unwatch?.(); this.#unwatch = null; }
 }
 
@@ -194,13 +217,20 @@ type Label = number;
 
 /** A timeline of animations with labels, play, pause, seek, reverse and speed. */
 export class Playback {
+  /** The effects and nested playbacks with their start positions. */
   readonly items: Item[] = [];
+  /** Named time positions added with label(). */
   readonly labels = new Map<string, Label>();
   #calls: { at: number; fn: () => void }[] = [];
+  /** The playback this one is nested in, or null for a root. */
   parent: Playback | null = null;
+  /** Whether the playback is idle, running, paused or finished. */
   state: "idle" | "running" | "paused" | "finished" = "idle";
+  /** True when the playback keeps running under reduced motion instead of jumping to its end state. */
   essential = false;
+  /** Called on every update with the progress (0..1) and the current time in ms. */
   onUpdate: ((progress: number, time: number) => void) | undefined;
+  /** Called once when the playback finishes. */
   onComplete: (() => void) | undefined;
   #t = 0;
   #rate = 1;
@@ -214,6 +244,7 @@ export class Playback {
   #hinted = false;
   #gen = 0;
 
+  /** The options applied to every animation added to this playback. */
   readonly defaults: AnimateOptions;
   constructor(defaults: AnimateOptions = {}) {
     this.defaults = defaults;
@@ -277,8 +308,10 @@ export class Playback {
     for (const c of this.#calls) m = Math.max(m, c.at);
     return m;
   }
+  /** The current position in ms; setting it seeks. */
   get currentTime(): number { return this.#t; }
   set currentTime(ms: number) { this.seek(ms); }
+  /** The playback speed multiplier; setting it changes the speed immediately. */
   get playbackRate(): number { return this.#rate; }
   set playbackRate(r: number) { this.#rate = r; this.syncRate(); }
   /** Resolves when it finishes (or is cancelled). */
@@ -305,6 +338,7 @@ export class Playback {
   }
 
   // ---- controls
+  /** Starts or resumes the playback from the current position. */
   play(): this {
     if (this.parent) { this.#root().play(); return this; }
     const dur = this.duration;
@@ -336,6 +370,7 @@ export class Playback {
     }
     return this;
   }
+  /** Pauses the playback at the current position. */
   pause(): this {
     if (this.parent) { this.#root().pause(); return this; }
     if (this.state === "idle") { this.seek(this.#t); }

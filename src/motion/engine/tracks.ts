@@ -56,6 +56,7 @@ const fmt = (x: number): string => `${Math.round(x * 1000) / 1000}`;
 
 /** A compiled property track. Drivers read `out` (numbers) or `text()` (CSS string). */
 export class Track {
+  /** The name of the animated property. */
   readonly prop: string;
   /** 0 numbers, 1 color, 2 discrete. */
   readonly kind: number;

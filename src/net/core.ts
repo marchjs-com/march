@@ -110,7 +110,9 @@ export interface Ctx {
 export type Middleware = ((ctx: Ctx, next: () => Promise<void>) => unknown) & { mwName?: string };
 
 export interface Transport {
+  /** The transport's name, used to register and select it. */
   readonly name: string;
+  /** Sends one request and resolves with its response. */
   send(ctx: Ctx): Promise<NetResponse>;
   /** Long-lived stream (WebSocket topic, server-sent events). Returns a stop function. */
   stream?(url: string, onMessage: (msg: unknown) => void, opts: { signal?: AbortSignal | undefined; onError?: ((e: AppError) => void) | undefined }): () => void;
@@ -218,9 +220,11 @@ let ids = 0;
 
 /** The request client: base URL, timeout, retry with backoff, concurrency limit, middleware, transports. */
 export class Net {
+  /** The client settings: base URL, timeout, retry, concurrency limit and default headers. */
   readonly config: NetConfig = { baseUrl: "", timeout: 30_000, retry: { count: 2, delay: 300, max: 10_000, factor: 2 }, maxConcurrent: 6, headers: {} };
   /** Global middleware, in order. */
   readonly middleware: Middleware[] = [];
+  /** The registered transports by name. */
   readonly transports = new Map<string, Transport>();
   /** Shared store for middleware (cache entries, recordings). */
   readonly store = new Map<string, unknown>();
@@ -250,6 +254,7 @@ export class Net {
     g.addEventListener?.("offline", () => this.setOnline(false));
   }
 
+  /** Merges the given settings into the client config. */
   configure(c: Partial<NetConfig>): this {
     Object.assign(this.config, c, c.retry ? { retry: { ...this.config.retry, ...c.retry } } : {});
     return this;
@@ -268,6 +273,7 @@ export class Net {
     s.add(fn);
     return () => s.delete(fn);
   }
+  /** Notifies the listeners of a net event. */
   emit(name: NetEventName, e: NetEvent): void { for (const fn of this.listeners.get(name) ?? []) { try { fn(e); } catch (err) { queueMicrotask(() => { throw err; }); } } }
 
   /** Requests in flight (reactive): all of them, or one category. */
@@ -309,10 +315,15 @@ export class Net {
 
   /** Send a request; resolves with the response data. */
   request<T = unknown>(o: RequestOptions): Promise<T> { return this.send<T>(o).then((r) => r.data); }
+  /** Sends a GET request and resolves with the response data. */
   get<T = unknown>(url: string, o: RequestOptions = {}): Promise<T> { return this.request<T>({ ...o, url, method: "GET" }); }
+  /** Sends a POST request with an optional body and resolves with the response data. */
   post<T = unknown>(url: string, body?: unknown, o: RequestOptions = {}): Promise<T> { return this.request<T>({ ...o, url, body, method: "POST" }); }
+  /** Sends a PUT request with an optional body and resolves with the response data. */
   put<T = unknown>(url: string, body?: unknown, o: RequestOptions = {}): Promise<T> { return this.request<T>({ ...o, url, body, method: "PUT" }); }
+  /** Sends a PATCH request with an optional body and resolves with the response data. */
   patch<T = unknown>(url: string, body?: unknown, o: RequestOptions = {}): Promise<T> { return this.request<T>({ ...o, url, body, method: "PATCH" }); }
+  /** Sends a DELETE request and resolves with the response data. */
   delete<T = unknown>(url: string, o: RequestOptions = {}): Promise<T> { return this.request<T>({ ...o, url, method: "DELETE" }); }
 
   /** Send a request; resolves with the whole response (status, headers, data). */

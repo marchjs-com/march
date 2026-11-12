@@ -32,9 +32,7 @@ const DIR = "examples/showcase/src/api-examples";
 const INDEX = "examples/showcase/src/api-examples.gen.ts";
 /** Subpaths whose examples are still being written (in groups). Each finished group leaves this list; the test fails
  *  when a listed subpath is already complete, and for every export of an unlisted subpath that has no example. */
-export const PENDING = new Set([
-  "hadi-march/ui", "hadi-march/motion", "hadi-march/managers",
-]);
+export const PENDING = new Set([]);
 
 /** Example files: group → { subs: { subpath → Set<name> }, plays: Set<"subpath#name"> (with a Playground) }, read by
  *  layout: subpaths two spaces in, names four, an example's own fields six. */
