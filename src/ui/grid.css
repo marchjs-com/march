@@ -15,7 +15,8 @@
 .hm-grid-gap-8 { --hm-grid-gap: var(--hm-space-8); }
 .hm-grid-equal { grid-auto-rows: 1fr; }
 /* flex modes: columns are flex-basis fractions; --hm-cols is the declared (or balanced) count, capped on small screens */
-.hm-grid-flex { display: flex; flex-wrap: wrap; container: hm-grid / inline-size; }
+/* .hm-grid.hm-grid-flex: wins over display.css .hm-grid { display: grid } whatever order the CSS loads in */
+.hm-grid.hm-grid-flex { display: flex; flex-wrap: wrap; container: hm-grid / inline-size; }
 .hm-grid-flex > * { --hm-cols-cq: 99; --hm-cols-eff: min(var(--hm-cols, 2), var(--hm-cols-md, 99), var(--hm-cols-sm, 99), var(--hm-cols-cq));
   flex: 0 1 max(min(var(--hm-grid-col-min, 9rem), 100%), (100% - (var(--hm-cols-eff) - 1) * var(--hm-grid-gap, var(--hm-space-4))) / var(--hm-cols-eff) - .1px); max-width: 100%; }
 /* the container's own width caps the columns (9rem minimum + 1rem gap each): a narrow box gets fewer, readable columns */

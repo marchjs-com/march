@@ -78,7 +78,7 @@ export async function mergeEntry(meta, { cwd, entryKey, esbuild, minify = true }
  *
  * - default: the version is in the name (`home-K3QX7WPA.js`)
  * - `stable: true`: names never change between builds (`main.js`, `chunks/home.js`, `chunks/shared-3.js`) and every
- *   reference carries the version as a query (`./chunks/home.js?v=K3QX7WPA`): a deploy overwrites the same paths, no
+ *   reference carries the version as a query (`./chunks/home.js?v=K3QX7W`): a deploy overwrites the same paths, no
  *   old files pile up, and a changed file still gets a new URL. Output is deterministic: unchanged code, same bytes.
  * No output name starts with "_" or "." (some hosts refuse those): `_layout` becomes `layout`.
  * Updates the files, the references between them and the metafile (outputs[k].version).
@@ -108,7 +108,8 @@ export function rehashOutputs(meta, { cwd, stable = false }) {
     // own name first (files of one import cycle share their closure), then everything it reaches
     const h = createHash("sha256").update(`${k}\n`);
     for (const r of [...closure(k)].sort()) h.update(`${stem(r)}:${iso.get(r) ?? outs[r]?.bytes ?? ""}\n`);
-    version.set(k, Array.from(h.digest().subarray(0, 8), (b) => B32[b & 31]).join(""));
+    // 8 characters in a file name; 6 (30 bits) in a ?v= query, which only has to change with the bytes (entry bytes)
+    version.set(k, Array.from(h.digest().subarray(0, stable ? 6 : 8), (b) => B32[b & 31]).join(""));
   }
   // new names: hashed (default) or stable; never starting with "_" / "."
   const clean = (n) => n.replace(/^[_.]+/, "") || "file";

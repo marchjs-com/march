@@ -173,7 +173,7 @@ test("march build --stable-names: hash-free names, ?v= versions everywhere, dete
     for (const p of one.keys()) for (const seg of p.split(/[\/]/).filter(Boolean)) assert.doesNotMatch(seg, /^[_.]/, `${p}: no name starts with _ or .`);
     for (const p of one.keys()) if (/\.(js|css)$/.test(p)) assert.doesNotMatch(p, /-[A-Z0-9]{8}\.(js|css)$/, `${p} has no hash in its name`);
     const html = one.get([...one.keys()].find((p) => p.endsWith("index.html")));
-    assert.match(html, /src="\.\/assets\/main\.js\?v=[A-Z0-9]{8}"/);
+    assert.match(html, /src="\.\/assets\/main\.js\?v=[A-Z0-9]{6}"/);
     for (const [p, code] of one) if (p.endsWith(".js")) for (const m of code.matchAll(/["'](\.{1,2}\/[^"']+\.(?:js|css))(\?v=[A-Z0-9]+)?["']/g)) assert.ok(m[2], `${p}: ${m[1]} carries ?v=`);
     execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
     const two = files();
