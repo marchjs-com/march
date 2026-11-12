@@ -10,8 +10,8 @@
 import { signal, untrack } from "../core/reactive.ts";
 import { can as canAccess, type PermCheck } from "../access/index.ts";
 import { t } from "../core/i18n.ts";
-import { confirm, askReason } from "./dialog.ts";
-import { toast } from "./toast.ts";
+import { confirm, askReason } from "../components/overlays/dialog/index.ts";
+import { toast } from "../components/overlays/toast/index.ts";
 import type { MaybeFn } from "./util.ts";
 
 /** Callback type checked bivariantly, so actions with specific argument types fit into `Action[]` lists. */

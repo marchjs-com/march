@@ -1,0 +1,3 @@
+/* HADI March — Spinner. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+.hm-spin-sm { width: .875rem; height: .875rem; } .hm-spin-lg { width: 2rem; height: 2rem; border-width: 2.5px; }
+.hm-spin-single { --hm-spinner-paint: none; --hm-spinner-track: color-mix(in srgb, currentColor 18%, transparent); --hm-spinner-head: var(--hm-accent, var(--hm-primary)); }

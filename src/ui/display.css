@@ -21,34 +21,6 @@
 .hm-badge-count { min-width: 1.25rem; justify-content: center; padding: 0 .3125rem; font-weight: 600; }
 .hm-badge-count.hm-badge-danger { background: var(--hm-danger-solid); color: var(--hm-on-status, #fff); border-color: transparent; }
 .hm-badge-dot::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: currentColor; }
-.hm-empty { display: flex; flex-direction: column; align-items: center; }
-.hm-empty-icon { display: grid; place-items: center; width: 3rem; height: 3rem; margin-bottom: var(--hm-space-4); border-radius: var(--hm-radius-3); font-size: 1.5rem;
-  color: var(--hm-muted); background: var(--hm-surface); border: 1px solid var(--hm-border); box-shadow: var(--hm-shadow-2), var(--hm-highlight); }
-.hm-empty-icon .hm-svg { width: 1.375rem; height: 1.375rem; }
-.hm-empty-title { margin: 0; font-family: var(--hm-font-display); font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); color: var(--hm-text); letter-spacing: var(--hm-tracking-tight); }
-.hm-empty-text { margin-top: var(--hm-space-1); max-width: 28rem; font-size: var(--hm-text-md); line-height: 1.55; }
-.hm-empty-action { margin-top: var(--hm-space-5); display: flex; justify-content: center; flex-wrap: wrap; gap: var(--hm-space-2); }
-.hm-spin-sm { width: .875rem; height: .875rem; } .hm-spin-lg { width: 2rem; height: 2rem; border-width: 2.5px; }
-.hm-errorbox { display: flex; flex-direction: column; align-items: flex-start; gap: var(--hm-space-2); border: 1px solid color-mix(in srgb, var(--hm-danger) 22%, transparent); }
-.hm-errorbox p { margin: 0; }
-.hm-skel { display: block; background: var(--hm-skel-paint, linear-gradient(90deg, var(--hm-surface-2) 0%, var(--hm-surface-3) 50%, var(--hm-surface-2) 100%)); background-size: 200% 100%;
-  border-radius: var(--hm-radius-1); animation: hm-skel 1.6s ease-in-out infinite; }
-.hm-skel-lines { display: flex; flex-direction: column; gap: .625rem; }
-.hm-skel-line { height: .75rem; } .hm-skel-short { width: 60%; }
-.hm-skel-sm { height: 3rem; } .hm-skel-md { height: 7rem; } .hm-skel-lg { height: 14rem; }
-@keyframes hm-skel { from { background-position: 100% 0; } to { background-position: -100% 0; } }
-.hm-alert { display: flex; align-items: flex-start; gap: var(--hm-space-3); padding: .75rem var(--hm-space-4); border-radius: var(--hm-radius-3); border: 1px solid transparent;
-  font-size: var(--hm-text-md); line-height: 1.55; color: var(--hm-text-2); }
-.hm-alert-icon { display: inline-flex; margin-top: .1875rem; }
-.hm-alert-icon .hm-svg { width: 1rem; height: 1rem; }
-.hm-alert-info { background: var(--hm-info-soft); border-color: color-mix(in srgb, var(--hm-info) 22%, transparent); } .hm-alert-info .hm-alert-icon { color: var(--hm-info-text); }
-.hm-alert-success { background: var(--hm-success-soft); border-color: color-mix(in srgb, var(--hm-success) 22%, transparent); } .hm-alert-success .hm-alert-icon { color: var(--hm-success-text); }
-.hm-alert-warn { background: var(--hm-warn-soft); border-color: color-mix(in srgb, var(--hm-warn) 25%, transparent); } .hm-alert-warn .hm-alert-icon { color: var(--hm-warn-text); }
-.hm-alert-danger { background: var(--hm-danger-soft); border-color: color-mix(in srgb, var(--hm-danger) 22%, transparent); } .hm-alert-danger .hm-alert-icon { color: var(--hm-danger-text); }
-.hm-alert-neutral { background: var(--hm-surface-2); border-color: var(--hm-border); } .hm-alert-neutral .hm-alert-icon { color: var(--hm-muted); }
-.hm-alert-main { flex: 1; min-width: 0; }
-.hm-alert-title { display: block; margin-bottom: .125rem; color: var(--hm-text); font-weight: var(--hm-weight-semibold); }
-.hm-alert-x { width: 1.75rem; height: 1.75rem; margin: -.25rem -.375rem -.25rem 0; }
 .hm-kbd { display: inline-flex; align-items: center; justify-content: center; padding: 0 .3125rem; min-width: 1.25rem; height: 1.25rem; border: 1px solid var(--hm-border);
   border-radius: .3125rem; background: var(--hm-surface); color: var(--hm-muted); box-shadow: 0 1px 0 var(--hm-border); font: 500 var(--hm-text-2xs)/1 var(--hm-font); letter-spacing: .02em; }
 .hm-avatar { display: inline-flex; align-items: center; justify-content: center; flex: none; overflow: hidden; border-radius: 50%; font-weight: 600; color: #fff; background: var(--hm-primary-solid);
@@ -116,16 +88,6 @@
 .hm-grid-equal { grid-auto-rows: 1fr; }
 @media (max-width: 1024px) { .hm-grid-4, .hm-grid-5, .hm-grid-6 { --hm-cols-md: 2; } .hm-kv-cols-3, .hm-kv-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .hm-grid-2, .hm-grid-3, .hm-grid-4, .hm-grid-5, .hm-grid-6 { --hm-cols-sm: 1; } .hm-kv[class*="hm-kv-cols-"] { grid-template-columns: minmax(0, 1fr); } }
-.hm-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--hm-space-3); min-height: 14rem; width: 100%; color: var(--hm-muted); font-size: var(--hm-text-sm);
-  animation: hm-fade-in .4s var(--hm-ease) .12s both; }
-.hm-loader-overlay { position: absolute; inset: 0; z-index: 1; background: color-mix(in srgb, var(--hm-surface) 70%, transparent); min-height: 0; }
-#hm-boot { transition: opacity 250ms var(--hm-ease); }
-#hm-boot.hm-boot-done { opacity: 0; pointer-events: none; }
-.hm-spin-single { --hm-spinner-paint: none; --hm-spinner-track: color-mix(in srgb, currentColor 18%, transparent); --hm-spinner-head: var(--hm-accent, var(--hm-primary)); }
-.hm-skel-single .hm-skel, .hm-skel.hm-skel-single { --hm-skel-paint: linear-gradient(90deg, var(--hm-surface-2) 0%, var(--hm-surface-3) 50%, var(--hm-surface-2) 100%); }
-.hm-skel { --hm-skel-brand: linear-gradient(90deg, var(--hm-surface-2) 0%, color-mix(in srgb, var(--hm-cat-1) 10%, var(--hm-surface-2)) 30%, color-mix(in srgb, var(--hm-cat-2) 10%, var(--hm-surface-2)) 45%, color-mix(in srgb, var(--hm-cat-3) 10%, var(--hm-surface-2)) 60%, color-mix(in srgb, var(--hm-cat-4) 10%, var(--hm-surface-2)) 75%, var(--hm-surface-2) 100%); }
-.hm-skel-brand .hm-skel, .hm-skel.hm-skel-brand { --hm-skel-paint: var(--hm-skel-brand); }
-@media (prefers-reduced-motion: reduce) { .hm-skel { animation: none; } }
 /* Syntax colours (CodeView highlight): text-safe theme colours, so every theme and accent stays readable. */
 .hm-tok-com { color: var(--hm-faint); font-style: italic; }
 .hm-tok-str { color: var(--hm-success-text); }

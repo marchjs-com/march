@@ -158,7 +158,7 @@ async function build({ dev = false } = {}) {
       if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: aim || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan) });
       // chunks.commonRoom (gzip bytes): page groups stay this far under the route budget, so the shared "common" chunk
       // (pack-chunks.js) still fits on every route that loads it
-      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route - (cfg.chunks?.commonRoom ?? 0) : undefined, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
+      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined, room: cfg.chunks?.commonRoom ?? 0, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
       if (!next) break;
       plan = next;
     }

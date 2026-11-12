@@ -7,7 +7,7 @@ import { installDom } from "../src/testing/dom.ts";
 installDom();
 const { h, render } = await import("../src/index.ts");
 const U = await import("../src/ui/index.ts");
-const css = readFileSync(new URL("../src/ui/overlay.css", import.meta.url), "utf8");
+const css = readFileSync(new URL("../src/components/media/overlay/overlay.css", import.meta.url), "utf8");
 
 test("Overlay: order, front/behind, inset and fit as CSS variables, decorative and inert", async () => {
   const el = document.createElement("div");
@@ -42,7 +42,7 @@ test("Overlay CSS: never takes pointer input (unless interactive), logical inset
   assert.match(css, /\.hm-ov\.is-interactive, \.hm-ov\.is-interactive \* \{ pointer-events: auto !important; \}/);
   assert.match(css, /\.hm-ov-host \{ position: relative; isolation: isolate; \}/);
   assert.match(css, /inset-inline-start: var\(--hm-ov-start, 0\)/);
-  const media = readFileSync(new URL("../src/ui/overlay-media.ts", import.meta.url), "utf8");
+  const media = readFileSync(new URL("../src/components/media/overlay/media.ts", import.meta.url), "utf8");
   for (const a of ["muted", "loop", "playsinline", "disablepictureinpicture"]) assert.ok(media.includes(`"${a}"`), a);
   assert.match(media, /else v\.pause\(\)/, "video pauses when not visible");
   assert.match(media, /devicePixelRatio/, "canvas is DPR aware");

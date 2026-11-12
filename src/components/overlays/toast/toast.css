@@ -2,10 +2,9 @@
 /* ---------- toasts */
 .hm-toasts { position: fixed; z-index: var(--hm-z-toast); inset-block-end: var(--hm-space-4); inset-inline-end: var(--hm-space-4); display: flex; flex-direction: column; gap: var(--hm-space-2);
   width: min(24rem, calc(100vw - 2rem)); pointer-events: none; }
-.hm-toast { display: flex; align-items: flex-start; gap: var(--hm-space-3); padding: .75rem .625rem .75rem .875rem; pointer-events: auto;
+.hm-toast { display: flex; align-items: flex-start; gap: var(--hm-space-3); padding-block: .75rem; padding-inline: .875rem .625rem; pointer-events: auto;
   background: var(--hm-surface-raised); color: var(--hm-text); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3);
   box-shadow: var(--hm-shadow-3); animation: hm-toast-in var(--hm-dur-slow) var(--hm-ease-spring); }
-@keyframes hm-toast-in { from { opacity: 0; transform: translateY(10px) scale(.97); } }
 .hm-toast-icon { display: inline-flex; margin-top: .125rem; color: var(--hm-info); }
 .hm-toast-icon .hm-svg { width: 1.0625rem; height: 1.0625rem; }
 .hm-toast-success .hm-toast-icon { color: var(--hm-success); }

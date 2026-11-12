@@ -291,24 +291,26 @@ ${css}`);
     // members with the same users stay together when the chunk has to split
     const sig = (k) => [...g.reach.get(k)].sort().join("|");
     cand.sort((a, b) => g.reach.get(b).size - g.reach.get(a).size || sig(a).localeCompare(sig(b)) || (a < b ? -1 : 1));
-    // every route / part that loads a member now loads the whole group (and its imports): none may pass its budget
-    const fitsAll = (group) => {
+    // every route / part that loads a member of a group now loads the whole group (and its imports), and every other
+    // group it touches: none may pass its budget
+    const groups = [];
+    const fitsAll = (gs) => {
       if (!budgetOf) return true;
-      const users = new Set(group.flatMap((t) => [...g.reach.get(t)]));
-      const both = new Set(group.flatMap((t) => [...g.closure(t)]));
+      const users = new Set(gs.flat().flatMap((t) => [...g.reach.get(t)]));
       for (const e of users) {
         const lim = budgetOf(e)?.limit;
         if (lim == null) continue;
+        const ce = g.closure(e), got = new Set(ce);
+        for (const grp of gs) if (grp.some((t) => ce.has(t))) for (const t of grp) for (const x of g.closure(t)) got.add(x);
         let n = 0;
-        for (const x of new Set([...g.closure(e), ...both])) if (!have.has(x)) n += gz(x);
-        if (n > lim) { if (process.env.MARCH_DEBUG_COMMON) console.log(`[common] ${group.map(base).join("+")}: ${outs[e].entryPoint} would be ${n} > ${lim}`); return false; }
+        for (const x of got) if (!have.has(x)) n += gz(x);
+        if (n > lim) { if (process.env.MARCH_DEBUG_COMMON) console.log(`[common] ${outs[e].entryPoint} would be ${n} > ${lim}`); return false; }
       }
       return true;
     };
-    const groups = [];
     for (const t of cand) {
-      const grp = groups.find((x) => x.reduce((s, y) => s + gz(y), 0) + gz(t) <= partLimit && fitsAll([...x, t]));
-      if (grp) grp.push(t); else groups.push([t]);
+      const i = groups.findIndex((x) => x.reduce((s, y) => s + gz(y), 0) + gz(t) <= partLimit && fitsAll(groups.map((y) => (y === x ? [...y, t] : y))));
+      if (i >= 0) groups[i].push(t); else groups.push([t]);
     }
     if (DBG) console.log("[common] groups:", groups.map((x) => x.map(base).join("+")).join(" | "));
     let made = 0;

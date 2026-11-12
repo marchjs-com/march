@@ -125,6 +125,15 @@ a { color: var(--hm-primary-text); text-underline-offset: .2em; text-decoration-
 @keyframes hm-slide-in { from { opacity: 0; transform: translateY(-6px); } }
 @keyframes hm-rise-in { from { opacity: 0; transform: translateY(6px); } }
 @keyframes hm-scale-in { from { opacity: 0; transform: scale(.97) translateY(4px); } }
+/* component keyframes (feedback and overlays): one place, component stylesheets only name them */
+@keyframes hm-skel { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@keyframes hm-cycle { to { transform: translateX(-50%); } }
+@keyframes hm-indet { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+@keyframes hm-indet-rtl { from { transform: translateX(100%); } to { transform: translateX(-250%); } }
+@keyframes hm-toast-in { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+@keyframes hm-drawer-in { from { transform: translateX(100%); } }
+@keyframes hm-drawer-in-left { from { transform: translateX(-100%); } }
+@keyframes hm-drawer-in-bottom { from { transform: translateY(100%); } }
 
 /* ---- dev error overlay (march dev only) */
 .hm-dev-overlay { position: fixed; inset: 0; z-index: 2147483647; background: var(--hm-overlay); display: grid; place-items: center; padding: var(--hm-space-4); }
