@@ -4,6 +4,7 @@ import { signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { val, cx, uid, icon, glyph, type ClassProp } from "./util.ts";
 import { chevronDown } from "../icons/glyphs/chevronDown.ts";
+import { roving } from "./focus.ts";
 
 export interface AccordionItem { id?: string; title: unknown; subtitle?: unknown; icon?: unknown; content: unknown; disabled?: boolean }
 export interface AccordionProps { items: readonly AccordionItem[]; multiple?: boolean; open?: readonly (string | number)[]; variant?: "separated" | "contained"; class?: ClassProp }
@@ -15,10 +16,7 @@ export function Accordion(props: AccordionProps): Element {
   const toggle = (k: string | number): void => { open.update((s) => { const n = props.multiple ? new Set(s) : new Set<string | number>(); if (s.has(k)) n.delete(k); else n.add(k); return n; }); };
   const nav = (e: KeyboardEvent): void => {
     const btns = [...((e.currentTarget as HTMLElement).closest(".hm-accordion")?.querySelectorAll<HTMLButtonElement>(".hm-acc-btn:not(:disabled)") ?? [])];
-    const i = btns.indexOf(e.target as HTMLButtonElement);
-    const j = e.key === "ArrowDown" ? i + 1 : e.key === "ArrowUp" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? btns.length - 1 : null;
-    if (j == null || i < 0) return;
-    e.preventDefault(); btns[(j + btns.length) % btns.length]?.focus();
+    if (btns.includes(e.target as HTMLButtonElement)) roving(e, btns); // ↑ ↓ Home End, wrapping (each header stays a Tab stop)
   };
   return h("div", { class: () => cx("hm-accordion", `hm-accordion-${props.variant ?? "separated"}`, val(props.class)), onKeydown: nav },
     props.items.map((it, i) => {

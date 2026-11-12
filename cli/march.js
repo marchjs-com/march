@@ -20,7 +20,6 @@
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, cpSync, rmSync, watch } from "node:fs";
 import { join, resolve, relative, dirname, extname, basename, sep } from "node:path";
-const posix = (p) => p.split(sep).join("/");
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import { march } from "../compiler/esbuild.js";
@@ -32,6 +31,7 @@ import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
 import { packChunks } from "../compiler/pack-chunks.js";
 import { planSmallLazy, smallFiles, aliasGroups } from "../compiler/min-chunks.js";
 import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText, fileSizes } from "./perf.js";
+import { posix } from "../compiler/fs-util.js";
 
 const cwd = process.cwd();
 const argv = process.argv.slice(2);

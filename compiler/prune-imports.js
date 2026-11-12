@@ -7,8 +7,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve, relative, dirname, sep, join } from "node:path";
+import { posix } from "./fs-util.js";
 
-const posix = (p) => p.split(sep).join("/");
 
 /**
  * @param {import("esbuild").BuildResult} result

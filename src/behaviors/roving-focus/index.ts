@@ -26,26 +26,16 @@ export function rovingFocus(container: HTMLElement, opts: RovingOptions = {}): (
   const list0 = items();
   mark(list0.find((x) => x.getAttribute("tabindex") === "0") ?? list0[0]);
   const o = opts.orientation ?? "vertical";
+  // arrows / Home / End (ui/focus roving); in a right-to-left container ArrowLeft means "next"
   const onKey = (e: Event): void => {
     const k = e as KeyboardEvent;
-    const list = items();
-    const moved = o === "both"
-      ? rovingKey(k, list, { horizontal: k.key === "ArrowLeft" || k.key === "ArrowRight", wrap: opts.wrap ?? true })
-      : rovingKey(k, list, { horizontal: o === "horizontal", wrap: opts.wrap ?? true });
-    if (moved) { mark(moved); opts.onMove?.(moved); }
-  };
-  // RTL: in a right-to-left container ArrowLeft means "next"
-  const onKeyDir = (e: Event): void => {
-    const k = e as KeyboardEvent;
-    const rtl = o !== "vertical" && (k.key === "ArrowLeft" || k.key === "ArrowRight") && isRtl(container);
-    if (!rtl) return onKey(e);
-    const flipped = { key: k.key === "ArrowLeft" ? "ArrowRight" : "ArrowLeft", target: k.target, preventDefault: () => k.preventDefault() } as unknown as KeyboardEvent;
-    const moved = rovingKey(flipped, items(), { horizontal: true, wrap: opts.wrap ?? true });
+    const horizontal = o === "horizontal" || (o === "both" && (k.key === "ArrowLeft" || k.key === "ArrowRight"));
+    const moved = rovingKey(k, items(), { horizontal, wrap: opts.wrap ?? true, rtl: horizontal && isRtl(container) });
     if (moved) { mark(moved); opts.onMove?.(moved); }
   };
   const onFocus = (e: Event): void => { const t = e.target as HTMLElement; if (items().includes(t)) mark(t); };
-  container.addEventListener("keydown", onKeyDir);
+  container.addEventListener("keydown", onKey);
   container.addEventListener("focusin", onFocus);
-  const stop = (): void => { container.removeEventListener("keydown", onKeyDir); container.removeEventListener("focusin", onFocus); };
+  const stop = (): void => { container.removeEventListener("keydown", onKey); container.removeEventListener("focusin", onFocus); };
   return stop;
 }

@@ -7,7 +7,8 @@ import { val, cx, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { star } from "../icons/glyphs/star.ts";
 import { starFilled } from "../icons/glyphs/starFilled.ts";
 import { colorAttr, type ColorToken } from "../theme/colors.ts";
-import { clamp } from "../core/util.ts";
+import { roving } from "./focus.ts";
+import { isRtl } from "../core/util.ts";
 
 export interface RatingProps {
   /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
@@ -35,18 +36,17 @@ export function Rating(props: RatingProps): Element {
       "aria-checked": () => String(Math.round(Number(val(props.value) ?? 0)) === n), "aria-label": () => t`${n} of ${max}`,
       tabindex: () => (Math.max(1, Math.round(Number(val(props.value) ?? 0))) === n ? "0" : "-1"), disabled: props.readonly,
       onClick: () => set(n), onMouseenter: () => !props.readonly && hover.set(n),
-      onKeydown: (e: KeyboardEvent) => {
-        const d = e.key === "ArrowRight" || e.key === "ArrowUp" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowDown" ? -1 : 0;
-        if (!d) return;
-        e.preventDefault();
-        const next = clamp(n + d, 1, max);
-        set(next);
-        ((e.currentTarget as HTMLElement).parentElement?.children[next - 1] as HTMLElement | undefined)?.focus();
-      },
     }, h("span", { class: "hm-rating-off" }, glyph(star)), h("span", { class: "hm-rating-on" }, glyph(starFilled)));
   });
   return h("span", { "data-hm-color": colorAttr(props.color),
     class: () => cx("hm-rating", `hm-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", hover() != null && "is-hovering", val(props.class)), role: "radiogroup",
     "aria-label": () => val(props.label) ?? t`Rating`, onMouseleave: () => hover.set(null),
+    // radio group keys: arrows (RTL mirrored), Home / End, no wrap; the value follows focus
+    onKeydown: (e: KeyboardEvent) => {
+      if (props.readonly) return;
+      const g = e.currentTarget as HTMLElement, stars = [...g.querySelectorAll<HTMLElement>(".hm-rating-star")];
+      const to = roving(e, stars, { horizontal: e.key === "ArrowLeft" || e.key === "ArrowRight", wrap: false, rtl: isRtl(g) });
+      if (to) set(stars.indexOf(to) + 1);
+    },
   }, stars);
 }

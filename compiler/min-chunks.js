@@ -5,11 +5,11 @@
 //     loaded from a lazy chunk → it becomes a static import of that parent (it joins the parent's chunk);
 //     loaded from the entry    → it joins a group chunk with the entry's other small lazy modules (one file);
 //   - whatever is still under the limit fails the build, unless chunks.allow names it with a reason.
-import { relative, resolve, sep } from "node:path";
+import { relative, resolve } from "node:path";
 import { readFileSync, existsSync } from "node:fs";
 import { gzipSync } from "node:zlib";
+import { posix } from "./fs-util.js";
 
-const posix = (p) => p.split(sep).join("/");
 /** Route tables found by default: `march gen routes` output and a hand-written src/routes.* file. */
 export const ROUTE_TABLES = ["src/routes.gen.js", "src/routes.gen.ts", "src/routes.ts", "src/routes.tsx", "src/routes.js", "src/routes.jsx"];
 

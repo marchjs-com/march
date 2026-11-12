@@ -18,9 +18,9 @@ function stripCssLoader(code, css) {
   const re = new RegExp(String.raw`await new Promise\(\(?\w+\)?=>\{if\(typeof document[^{}]*?new URL\("\./${esc(css)}(?:\?v=\w+)?",import\.meta\.url\)\.href;[\s\S]*?document\.head\.appendChild\(\w+\)\}\);?\n?`);
   return re.test(code) ? code.replace(re, "") : null;
 }
-import { dirname, relative, resolve, sep } from "node:path";
+import { dirname, relative, resolve } from "node:path";
+import { posix } from "./fs-util.js";
 
-const posix = (p) => p.split(sep).join("/");
 const rel = (fromFile, toFile) => { const r = posix(relative(dirname(fromFile), toFile)); return r.startsWith(".") ? r : `./${r}`; };
 const base = (k) => k.split("/").pop();
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

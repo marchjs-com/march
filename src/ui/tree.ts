@@ -6,6 +6,7 @@ import { t } from "../core/i18n.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 import { OverflowText } from "./marquee.ts";
+import { roving } from "./focus.ts";
 
 export interface TreeNode { id: string; label: unknown; icon?: unknown; meta?: unknown; children?: readonly TreeNode[] }
 export interface TreeProps { nodes: readonly TreeNode[]; selected?: MaybeFn<string | null | undefined>; onSelect?: (node: TreeNode) => void; expanded?: readonly string[]; label?: string; class?: ClassProp }
@@ -22,10 +23,8 @@ export function Tree(props: TreeProps): Element {
         onClick: () => { if (has) toggle(node.id); props.onSelect?.(node); },
         onKeydown: (e: KeyboardEvent) => {
           const rows = [...((e.currentTarget as HTMLElement).closest(".hm-tree")?.querySelectorAll<HTMLElement>(".hm-tree-row") ?? [])].filter((r) => r.offsetParent !== null || !r.closest("[hidden]"));
-          const i = rows.indexOf(e.currentTarget as HTMLElement);
-          if (e.key === "ArrowDown") { e.preventDefault(); rows[i + 1]?.focus(); }
-          else if (e.key === "ArrowUp") { e.preventDefault(); rows[i - 1]?.focus(); }
-          else if (e.key === "ArrowRight" && has) { e.preventDefault(); toggle(node.id, true); }
+          if (roving(e, rows, { wrap: false })) return; // ↑ ↓ Home End among the visible rows
+          if (e.key === "ArrowRight" && has) { e.preventDefault(); toggle(node.id, true); }
           else if (e.key === "ArrowLeft" && has) { e.preventDefault(); toggle(node.id, false); }
           else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (has) toggle(node.id); props.onSelect?.(node); }
         },

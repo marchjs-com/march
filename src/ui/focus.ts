@@ -31,11 +31,11 @@ export function focusFirst(root: HTMLElement): void {
   el.focus?.();
 }
 
-export interface RovingOptions { horizontal?: boolean; wrap?: boolean }
+export interface RovingOptions { horizontal?: boolean; wrap?: boolean; /** Right to left: ArrowLeft is "next" (horizontal only). */ rtl?: boolean }
 
 /** Move focus among `items` with arrow keys / Home / End. Returns the focused item when the key was handled, else false. */
-export function roving<T extends HTMLElement>(e: KeyboardEvent, items: readonly T[], { horizontal = false, wrap = true }: RovingOptions = {}): T | false {
-  const prev = horizontal ? "ArrowLeft" : "ArrowUp", next = horizontal ? "ArrowRight" : "ArrowDown";
+export function roving<T extends HTMLElement>(e: KeyboardEvent, items: readonly T[], { horizontal = false, wrap = true, rtl = false }: RovingOptions = {}): T | false {
+  const prev = horizontal ? (rtl ? "ArrowRight" : "ArrowLeft") : "ArrowUp", next = horizontal ? (rtl ? "ArrowLeft" : "ArrowRight") : "ArrowDown";
   if (![prev, next, "Home", "End"].includes(e.key) || !items.length) return false;
   const i = items.indexOf((e.target as Node).ownerDocument?.activeElement as T);
   let j = e.key === "Home" ? 0 : e.key === "End" ? items.length - 1 : i + (e.key === next ? 1 : -1);

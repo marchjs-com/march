@@ -6,9 +6,9 @@
 // and get the very same module instances (one copy of the runtime). Dynamic imports stay external, paths rewritten.
 import { readFileSync, writeFileSync, rmSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { dirname, relative, resolve, sep } from "node:path";
+import { dirname, relative, resolve } from "node:path";
+import { posix } from "./fs-util.js";
 
-const posix = (p) => p.split(sep).join("/");
 const rel = (fromFile, toFile) => { const r = posix(relative(dirname(fromFile), toFile)); return r.startsWith(".") ? r : `./${r}`; };
 
 /**

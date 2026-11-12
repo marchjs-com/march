@@ -58,6 +58,12 @@ test("Rating: radio group, click and arrow keys", async () => {
   assert.equal(stars.length, 5);
   stars[3].click();
   assert.equal(v(), 4);
+  const key = (el, k) => { el.focus(); const e = new Event("keydown", { bubbles: true, cancelable: true }); e.key = k; el.dispatchEvent(e); };
+  key(stars[3], "ArrowRight"); assert.equal(v(), 5, "the value follows focus");
+  key(stars[4], "ArrowRight"); assert.equal(v(), 5, "no wrap");
+  key(stars[4], "Home"); assert.equal(v(), 1);
+  m.el.setAttribute("dir", "rtl");
+  key(stars[0], "ArrowLeft"); assert.equal(v(), 2, "RTL: left is next");
   m.dispose();
 });
 

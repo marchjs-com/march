@@ -7,8 +7,8 @@ import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { createHash } from "node:crypto";
 import { dirname, relative, resolve, sep, join } from "node:path";
+import { posix } from "../compiler/fs-util.js";
 
-const posix = (p) => p.split(sep).join("/");
 
 /**
  * @param {import("esbuild").Metafile} meta
