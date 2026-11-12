@@ -2,12 +2,16 @@
 export { signal, computed, effect, batch, untrack, onCleanup, createRoot, getOwner, runWithOwner, catchError, context, provide, useContext, reactive, isReactive, read, DEV, _enter, _leave } from "./core/reactive.ts";
 export { store, patch, unwrap } from "./core/store.ts";
 export { h, Fragment, insert, lazyChildren, safeUrl, registerTransition } from "./dom/h.ts";
-export { If, Else, For, Switch, Match, Try, Await, Dynamic, setFlipHook } from "./dom/flow.ts";
+export { If, Else, For, Try, setFlipHook } from "./dom/flow.ts";
+export { Switch, Match } from "./dom/switch.ts";
+export { Await } from "./dom/await.ts";
+export { Dynamic } from "./dom/dynamic.ts";
 export { Portal, PortalTarget, portalTarget, openLayer, layers, type LayerKind, type PortalProps, type PortalTargetProps } from "./dom/portal.ts";
 export { render } from "./dom/render.ts";
 export { define } from "./dom/define.ts";
 export { pipe, applyPipe, toDate } from "./core/pipes.ts";
-export { t, locale, setLocale, messages, missing, setFallbackLocale } from "./core/i18n.ts";
+export { t, locale, setLocale, messages } from "./core/i18n.ts";
+export { missing, setFallbackLocale } from "./core/i18n-tools.ts";
 export { sx, sxValue } from "./core/sx.ts";
 /** The library version. */
 export const version = "0.1.0";

@@ -1,15 +1,16 @@
-// Control flow components: If/Else, For, Switch/Match, Try, Await, Dynamic (Portal: dom/portal.ts).
+// Control flow components: If/Else, For, Try (Switch/Match: dom/switch.ts, Await: dom/await.ts, Dynamic: dom/dynamic.ts,
+// Portal: dom/portal.ts — each in its own module, so a page that uses one does not put the others into a shared chunk).
 // Each returns a live region; only the active branch exists in the DOM and it is disposed (with its listeners) on switch.
-import { computed, signal, createRoot, getOwner, runWithOwner, untrack, onCleanup, catchError, effect, read, provide, reportError, isReactive, type Accessor, type Signal, type Cleanup } from "../core/reactive.ts";
-import { h, insert, clearBetween, removeNode, LoadingContext, type Component } from "./h.ts";
+import { computed, signal, createRoot, getOwner, untrack, onCleanup, catchError, effect, provide, isReactive, type Accessor, type Signal, type Cleanup } from "../core/reactive.ts";
+import { h, insert, removeNode, LoadingContext } from "./h.ts";
 
 /** A value, a signal or any function returning the value. */
-type MaybeFn<T> = T | (() => T);
+export type MaybeFn<T> = T | (() => T);
 
 // Call user render functions; keep reactive accessors (compiler thunks, signals) as live regions.
 // Flow props (when, each, for) accept a value, a signal or any function returning the value.
-const val = <T>(v: MaybeFn<T>): T => (typeof v === "function" ? (v as () => T)() : v);
-const call = (c: unknown, ...a: unknown[]): unknown => (typeof c === "function" && !isReactive(c) ? (c as (...x: unknown[]) => unknown)(...a) : c);
+export const val = <T>(v: MaybeFn<T>): T => (typeof v === "function" ? (v as () => T)() : v);
+export const call = (c: unknown, ...a: unknown[]): unknown => (typeof c === "function" && !isReactive(c) ? (c as (...x: unknown[]) => unknown)(...a) : c);
 
 export interface IfProps<T = unknown> {
   when: MaybeFn<T>;
@@ -129,35 +130,6 @@ function collect(fn: () => unknown): Node[] {
   return [...frag.childNodes];
 }
 
-/** Descriptor produced by `<Match>`. */
-export interface MatchDescriptor { readonly __match: true; readonly when: unknown; readonly children: () => unknown }
-export interface SwitchProps { fallback?: unknown; children?: unknown }
-/** `<Switch fallback={…}><Match when={a}>…</Match>…</Switch>` — first truthy Match wins. */
-export function Switch(props: SwitchProps): () => unknown {
-  const matches = computed(() => {
-    const kids = ([] as unknown[]).concat(props.children ?? []).flat();
-    return kids.filter((m): m is MatchDescriptor => !!m && !!(m as Partial<MatchDescriptor>).__match);
-  });
-  const active = computed((): { i: number; v: unknown } | null => {
-    const ms = matches();
-    for (let i = 0; i < ms.length; i++) { const v = val((ms[i] as MatchDescriptor).when); if (v) return { i, v }; }
-    return null;
-  }, { equals: (a, b) => a?.i === b?.i });
-  return () => {
-    const a = active();
-    if (!a) return call(props.fallback);
-    const m = matches.peek()[a.i] as MatchDescriptor;
-    return untrack(() => call(m.children, val(m.when)));
-  };
-}
-export interface MatchProps<T = unknown> { when: MaybeFn<T>; children?: unknown }
-/** Descriptor used by `<Switch>`; its children stay lazy. */
-export function Match<T>(props: MatchProps<T>): MatchDescriptor {
-  const d = { __match: true };
-  Object.defineProperty(d, "when", { get: () => props.when });
-  Object.defineProperty(d, "children", { get: () => () => props.children });
-  return d as MatchDescriptor;
-}
 
 export interface TryProps {
   /** Rendered on error: content or `(error, reset) => content`. */
@@ -188,47 +160,4 @@ function defaultError(e: unknown, reset: () => unknown): Element {
   return h("div", { class: "hm-error", role: "alert" },
     h("p", {}, String((e as { message?: unknown } | null)?.message ?? e)),
     h("button", { type: "button", class: "hm-btn", onClick: reset }, "Retry"));
-}
-
-export interface AwaitProps<T> {
-  for: MaybeFn<T | PromiseLike<T>>;
-  loading?: unknown;
-  catch?: unknown;
-  /** Content, or `(value) => content`. */
-  children?: unknown;
-}
-type AwaitState<T> = { s: "pending" } | { s: "ok"; v: T } | { s: "err"; e: unknown };
-/** `<Await for={promise} loading={…} catch={(e) => …}>{(value) => …}</Await>` */
-export function Await<T>(props: AwaitProps<T>): () => unknown {
-  const state = signal<AwaitState<T>>({ s: "pending" });
-  const owner = getOwner();
-  effect(() => {
-    const p = val(props.for);
-    let alive = true;
-    onCleanup(() => { alive = false; });
-    state.set({ s: "pending" });
-    Promise.resolve(p).then((v) => alive && state.set({ s: "ok", v }), (e: unknown) => alive && state.set({ s: "err", e }));
-  });
-  return () => {
-    const st = state();
-    if (st.s === "ok") return untrack(() => call(props.children, st.v));
-    if (st.s === "err") {
-      if (props.catch) return untrack(() => call(props.catch, st.e));
-      runWithOwner(owner, () => reportError(st.e, owner));
-      return null;
-    }
-    return call(props.loading ?? null);
-  };
-}
-
-export type DynamicProps = { component: MaybeFn<string | Component<never> | null | undefined | false> } & Record<string, unknown>;
-/** Render a component chosen at runtime: `<Dynamic component={X} {...props} />`. */
-export function Dynamic(props: DynamicProps): () => unknown {
-  return () => {
-    const C = read(props.component);
-    if (!C) return null;
-    const rest: Record<string, unknown> = { ...props };
-    delete rest["component"];
-    return untrack(() => (typeof C === "string" ? h(C, rest) : h(C as Component<Record<string, unknown>>, rest)));
-  };
 }

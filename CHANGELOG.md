@@ -14,6 +14,13 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 - `march icons list | add <pack> | gallery <dir>`: converts a set from its official npm package (sha512 checked,
   nothing in it is run); licenses outside MIT, ISC, Apache-2.0, CC0-1.0, CC-BY-4.0, OFL-1.1 are refused.
 - `<Icon>` follows live props (`size={$size}`); `deepImports` leaves `import` lines inside strings (code samples) alone.
+### API reference (later in 0.1.0)
+- The showcase API reference shows the active language: one-line Turkish summaries for every export
+  (`docs/api.tr.json`), English for every other language; only that language's data parts download.
+- A card opens into the export's signature, example code and live result (Playground when it has options); examples load
+  lazily per group of subpaths.
+- `<Switch>/<Match>`, `<Await>`, `<Dynamic>` and `missing` / `unused` / `setFallbackLocale` moved to their own modules
+  (same import paths): an app that uses them on a lazy page no longer carries them in its start-up chunk.
 
 ### Credit (later in 0.1.0)
 - `<MadeWithMarch />` (`src/components/actions/made-with-march`): optional "Developed with HADI March and 💗" line, variants text / badge / small, link in one constant (`MARCH_URL`). The licence stays MIT; using it is a request.
