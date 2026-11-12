@@ -41,12 +41,12 @@
 @media (max-width: 860px) {
   .hm-snav-nav { display: none; }
   .hm-snav-menu { display: inline-flex; }
-  .hm-snav-actions { margin-inline-start: auto; }
+  .hm-snav-bar .hm-snav-actions { margin-inline-start: auto; }
 }
 @container hm-site (max-width: 860px) {
   .hm-snav-nav { display: none; }
   .hm-snav-menu { display: inline-flex; }
-  .hm-snav-actions { margin-inline-start: auto; }
+  .hm-snav-bar .hm-snav-actions { margin-inline-start: auto; }
 }
 @media (max-width: 520px) { .hm-snav-actions > :not(:last-child) { display: none; } }
 @container hm-site (max-width: 520px) { .hm-snav-actions > :not(:last-child) { display: none; } }
