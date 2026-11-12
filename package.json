@@ -25,6 +25,8 @@
     "./sw": "./src/sw/index.ts",
     "./motion": "./src/motion/index.ts",
     "./motion/motion.css": "./src/motion/motion.css",
+    "./motion/text": "./src/motion/text/index.ts",
+    "./motion/text/meta": "./src/motion/text/meta.ts",
     "./fx": "./src/fx/index.ts",
     "./fx/fx.css": "./src/fx/fx.css",
     "./store": "./src/store/index.ts",
