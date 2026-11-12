@@ -43,6 +43,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
+| CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, OverflowText |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
 | NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
@@ -72,6 +73,20 @@ Composed of: OverflowText
 ```
 
 Full page: src/components/actions/chip/docs.md
+
+## CommandPalette
+
+Ctrl/⌘+K opens a search over every registered command, every NavMenu page and every action, ranked with typo tolerance. An optional `ask(query)` hook (an intent search the app provides) adds an "Ask" row: it runs on Enter, or by itself when local results are weak. Only a small shell ships with the page; the dialog loads on first open, and hovering or focusing a `PaletteButton` fetches it ahead of time.
+
+Composed of: Dialog, OverflowText
+
+```tsx
+<CommandPalette ask={(q) => api.intent(q)} placeholder="Search pages or actions…" />
+<PaletteButton label="Search…" />
+registerCommands([{ id: "doc.new", title: "New document", group: "Document", shortcut: "mod+alt+n", run: create }])
+```
+
+Full page: src/components/composite/command-palette/docs.md
 
 ## CountRoll
 

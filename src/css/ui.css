@@ -11,7 +11,7 @@
 @import "../ui/layout.css";
 @import "../ui/nav.css";
 @import "../components/composite/nav-sidebar/nav-sidebar.css";
-@import "../ui/palette.css";
+@import "../components/composite/command-palette/command-palette.css";
 @import "../ui/theme.css";
 @import "../ui/accent.css";
 @import "../ui/overlay.css";

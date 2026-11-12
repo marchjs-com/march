@@ -1,9 +1,9 @@
 /* HADI March — CommandPalette, PaletteButton. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- command palette */
-.hm-overlay:has(> .hm-palette) { align-items: flex-start; padding-top: 14vh; }
+.hm-overlay:has(> .hm-palette) { align-items: flex-start; padding-block-start: 14vh; }
 .hm-palette { overflow: hidden; }
 .hm-palette .hm-dialog-body { padding: 0; display: flex; flex-direction: column; min-height: 0; }
-.hm-palette .hm-pal-input { border: 0; border-bottom: 1px solid var(--hm-border); border-radius: 0; min-height: 3.5rem; padding: 0 var(--hm-space-5); font-size: var(--hm-text-lg); background: transparent; box-shadow: none; }
+.hm-palette .hm-pal-input { border: 0; border-block-end: 1px solid var(--hm-border); border-radius: 0; min-height: 3.5rem; padding: 0 var(--hm-space-5); font-size: var(--hm-text-lg); background: transparent; box-shadow: none; }
 /* the field is the panel's header: focus shows as a tinted underline inside the panel, never a ring over its rounded corners */
 .hm-palette .hm-pal-input:focus, .hm-palette .hm-pal-input:hover { outline: none; box-shadow: inset 0 -2px 0 var(--hm-focus); border-color: var(--hm-border); background: transparent; }
 .hm-pal-list { --hm-pal-pad: .5rem; list-style: none; margin: 0; padding: var(--hm-pal-pad); overflow: auto; max-height: min(60vh, 26rem); scroll-padding-block: var(--hm-pal-pad); }
@@ -12,7 +12,7 @@
   border-radius: max(var(--hm-radius-1), calc(var(--hm-radius-4) - var(--hm-pal-pad, .5rem))); cursor: pointer; font-size: var(--hm-text-md); color: var(--hm-text-2); }
 .hm-pal-row .hm-icon { color: var(--hm-muted); }
 .hm-pal-row.is-active { background: var(--hm-primary-soft); color: var(--hm-text); }
-.hm-pal-row.is-active::before { content: ""; position: absolute; inset-inline-start: .3125rem; top: .625rem; bottom: .625rem; width: 3px; border-radius: 3px; background: var(--hm-primary); }
+.hm-pal-row.is-active::before { content: ""; position: absolute; inset-inline-start: .3125rem; inset-block: .625rem; width: 3px; border-radius: 3px; background: var(--hm-primary); }
 .hm-pal-row.is-active .hm-icon { color: var(--hm-primary); }
 .hm-pal-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hm-pal-sub, .hm-pal-reason { color: var(--hm-muted); font-size: var(--hm-text-xs); }
@@ -20,8 +20,8 @@
 .hm-pal-ask { color: var(--hm-primary-text); }
 .hm-pal-icon { color: var(--hm-primary); }
 .hm-pal-empty { padding: var(--hm-space-6); text-align: center; color: var(--hm-muted); font-size: var(--hm-text-sm); }
-.hm-pal-hint { padding: var(--hm-space-2) var(--hm-space-4); border-top: 1px solid var(--hm-border); background: var(--hm-bg-subtle); color: var(--hm-muted); font-size: var(--hm-text-xs); }
-@media (max-width: 640px) { .hm-overlay:has(> .hm-palette) { padding-top: 0; } .hm-pal-hint { display: none; } }
+.hm-pal-hint { padding: var(--hm-space-2) var(--hm-space-4); border-block-start: 1px solid var(--hm-border); background: var(--hm-bg-subtle); color: var(--hm-muted); font-size: var(--hm-text-xs); }
+@media (max-width: 640px) { .hm-overlay:has(> .hm-palette) { padding-block-start: 0; } .hm-pal-hint { display: none; } }
 .hm-pal-trigger { display: inline-flex; align-items: center; gap: var(--hm-space-2); width: min(100%, 22rem); height: 2.125rem; padding: 0 .375rem 0 .75rem; border: 1px solid var(--hm-border);
   border-radius: var(--hm-radius); background: var(--hm-surface); color: var(--hm-faint); font: inherit; font-size: var(--hm-text-md); cursor: pointer; box-shadow: var(--hm-shadow-1);
   transition: border-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }

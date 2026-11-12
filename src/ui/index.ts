@@ -28,8 +28,6 @@ export { Page, Section, ListDetail, Pager, SearchBox, AppShell } from "./layout.
 export type { PageProps, Breadcrumb, SectionProps, ListDetailProps, PagerProps, SearchBoxProps, AppShellProps } from "./layout.ts";
 export { NavMenu } from "./nav.ts";
 export type { NavMenuProps, NavItem, NavSort } from "./nav.ts";
-export { CommandPalette, PaletteButton, openPalette, closePalette, paletteOpen, preloadPalette, registerCommands, registerPages } from "./palette.ts";
-export type { PaletteButtonProps, CommandPaletteProps, PaletteEntry, AskResult, Command, CommandEntry, PageEntry } from "./palette.ts";
 export { key, shortcuts, formatKey, parseKey, isMac } from "./keys.ts";
 export type { KeyOptions, ParsedKey, ShortcutInfo } from "./keys.ts";
 export { Overlay, quietMedia } from "./overlay.ts";
