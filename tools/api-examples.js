@@ -34,8 +34,8 @@ const INDEX = "examples/showcase/src/api-examples.gen.ts";
  *  when a listed subpath is already complete, and for every export of an unlisted subpath that has no example. */
 export const PENDING = new Set([
   "hadi-march/store", "hadi-march/i18n", "hadi-march/lazy", "hadi-march/errors",
-  "hadi-march/router", "hadi-march/data", "hadi-march/schema", "hadi-march/ui", "hadi-march/components/registry.gen.ts",
-  "hadi-march/table", "hadi-march/charts", "hadi-march/crud", "hadi-march/sw", "hadi-march/motion", "hadi-march/motion/text",
+  "hadi-march/router", "hadi-march/ui",
+  "hadi-march/sw", "hadi-march/motion", "hadi-march/motion/text",
   "hadi-march/motion/text/meta", "hadi-march/fx", "hadi-march/channel", "hadi-march/behaviors/drag",
   "hadi-march/behaviors/roving-focus", "hadi-march/behaviors/resize-handle", "hadi-march/behaviors/list-nav",
   "hadi-march/behaviors/dropzone", "hadi-march/behaviors/swipe", "hadi-march/behaviors/dismiss", "hadi-march/icons",
