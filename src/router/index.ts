@@ -159,14 +159,19 @@ export function compilePath(pattern: string): { pattern: string; keys: string[];
 
 /** Find the route that matches a path and its params (best score first). */
 export function matchRoute(routes: CompiledRoute[], p: string): { route: CompiledRoute; params: Record<string, string>; path: string } | null {
+  // a wildcard that matched nothing ("/motion/*" on "/motion") is only a fallback: a route naming the path wins
+  let fallback: { route: CompiledRoute; params: Record<string, string>; path: string } | null = null;
   for (const r of routes) {
     const m = r.re.exec(p);
     if (!m) continue;
     const params: Record<string, string> = {};
+    let emptyWild = false;
     r.keys.forEach((k, i) => { const v = m[i + 1]; if (v !== undefined) params[k] = decodeURIComponent(v); });
-    return { route: r, params, path: p };
+    if (r.pattern.includes("*")) { const last = m[r.keys.length]; emptyWild = last === undefined || last === ""; }
+    if (!emptyWild) return { route: r, params, path: p };
+    fallback ??= { route: r, params, path: p };
   }
-  return null;
+  return fallback;
 }
 /** Fill ":param" placeholders: fillPath("/users/:id", { id: 7 }) → "/users/7". */
 export function fillPath(pattern: string, values: Record<string, string | number>): string {
