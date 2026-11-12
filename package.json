@@ -35,6 +35,7 @@
     "./theme": "./src/theme/index.ts",
     "./motion/install": "./src/motion/install.ts",
     "./css/themes/*": "./src/css/themes/*",
+    "./widget": "./src/widget/index.ts",
     "./net": "./src/net/index.ts",
     "./net/mock": "./src/net/mock.ts",
     "./errors": "./src/errors/index.ts",

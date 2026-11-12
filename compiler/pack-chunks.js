@@ -10,7 +10,13 @@
 // Entry stubs (`export { x as a } from "../main.js"`, left by mergeEntry) are removed: their importers import from the
 // entry directly. The extra bytes a fold costs (pages that load B but did not need T) are kept small by choosing the B
 // with the fewest such pages. Names are fixed afterwards by rehashOutputs.
-import { readFileSync, writeFileSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, rmSync, existsSync } from "node:fs";
+
+/** Remove the CSS loader of `css` (css-split.js form, plain or minified) from a chunk's code; null when not found. */
+function stripCssLoader(code, css) {
+  const re = new RegExp(String.raw`await new Promise\(\(?\w+\)?=>\{if\(typeof document[^{}]*?new URL\("\./${esc(css)}(?:\?v=\w+)?",import\.meta\.url\)\.href;[\s\S]*?document\.head\.appendChild\(\w+\)\}\);?\n?`);
+  return re.test(code) ? code.replace(re, "") : null;
+}
 import { dirname, relative, resolve, sep } from "node:path";
 
 const posix = (p) => p.split(sep).join("/");
@@ -63,7 +69,7 @@ function graph(outs) {
 /**
  * @param {import("esbuild").Metafile} meta
  * @param {{ cwd: string, entryKey: string, esbuild: typeof import("esbuild"), minify?: boolean, minSize?: number }} o
- * @returns {Promise<{ stubs: number, folded: number }>}
+ * @returns {Promise<{ stubs: number, folded: number, cssMoved: number }>}
  */
 export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048 }) {
   const outs = meta.outputs;
@@ -90,7 +96,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
   const skip = new Set();
   for (let round = 0; round < 500; round++) {
     const g = graph(outs);
-    const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && (outs[k].bytes ?? 0) < minSize && !/new URL\(/.test(text(k)))
+    const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && (outs[k].bytes ?? 0) < minSize)
       .sort((a, b) => (outs[a].bytes ?? 0) - (outs[b].bytes ?? 0));
     let done = false;
     for (const t of small) {
@@ -104,15 +110,121 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
         const c = (rb.size - rt.size) * 1e6 + (outs[b].bytes ?? 0);
         if (c < cost) { cost = c; best = b; }
       }
+      // no free host: the chunk (often another small one) that costs the fewest extra bytes: pages that load B now
+      // also get T, pages that load T now also get B. Never the entry; never a merge that would close an import cycle.
+      if (!best) {
+        const bytes = (k) => outs[k].bytes ?? 0;
+        for (const b of g.js) {
+          if (b === t || b === entryKey || outs[b].entryPoint) continue; // a page or lazy part never becomes a static dependency
+          const rb = g.reach.get(b), cb = g.closure(b), ct = g.closure(t);
+          if (cb.has(t) && !users.includes(b)) continue; // B → X → T
+          if ([...ct].some((x) => x !== t && x !== b && g.closure(x).has(b))) continue; // T → X → B
+          if (users.some((u) => u !== b && cb.has(u))) continue;
+          const c = [...rt].filter((e) => !rb.has(e)).length * bytes(b) + [...rb].filter((e) => !rt.has(e)).length * bytes(t);
+          if (c < cost) { cost = c; best = b; }
+        }
+      }
       if (!best || !(await fold(t, best, g.importers.get(t) ?? []))) { skip.add(t); continue; }
       folded++; done = true; break;
     }
     if (!done) break;
   }
-  return { stubs, folded };
+
+  // 3. a small CSS file joins the CSS of a chunk that is always loaded with its own (else main.css): its loader goes
+  let cssMoved = 0;
+  {
+    const g = graph(outs);
+    const cssOf = (k) => outs[k]?.cssBundle;
+    const size = (c) => (existsSync(resolve(cwd, c)) ? readFileSync(resolve(cwd, c)).length : Infinity);
+    for (const x of g.js) {
+      const c = cssOf(x);
+      if (!c || x === entryKey || size(c) >= minSize) continue;
+      const rx = g.reach.get(x);
+      let host = null, cost = Infinity;
+      for (const y of g.js) {
+        if (y === x || y === entryKey || !cssOf(y)) continue;
+        const ry = g.reach.get(y);
+        if (![...rx].every((e) => ry.has(e))) continue;
+        const k = ry.size - rx.size;
+        if (k < cost) { cost = k; host = y; }
+      }
+      host ??= cssOf(entryKey) ? entryKey : null;
+      if (!host) continue;
+      const stripped = stripCssLoader(text(x), base(c));
+      if (stripped == null) continue;
+      const hc = cssOf(host), css = readFileSync(resolve(cwd, c), "utf8"), hcss = readFileSync(resolve(cwd, hc), "utf8");
+      // X before its importer (it loads first); otherwise after the host's own rules
+      const first = g.closure(host).has(x);
+      writeFileSync(resolve(cwd, hc), first ? `${css}
+${hcss}` : `${hcss}
+${css}`);
+      writeFileSync(resolve(cwd, x), stripped);
+      outs[x].bytes = Buffer.byteLength(stripped);
+      rmSync(resolve(cwd, c), { force: true });
+      outs[hc] = { ...outs[hc], bytes: Buffer.byteLength(readFileSync(resolve(cwd, hc))), inputs: { ...(outs[hc]?.inputs ?? {}), ...(outs[c]?.inputs ?? {}) } };
+      delete outs[c];
+      delete outs[x].cssBundle;
+      cssMoved++;
+    }
+  }
+  // 4. CSS the entry loads at run time joins main.css (after its rules: the same order, and no wait in main.js)
+  let code = outs[entryKey] ? text(entryKey) : "";
+  // an entry without CSS of its own: the first CSS it loads becomes its stylesheet (a link in index.html)
+  if (outs[entryKey] && !outs[entryKey].cssBundle) {
+    const m = /new URL\("\.\/([^"?]+\.css)(?:\?v=\w+)?",import\.meta\.url\)/.exec(code);
+    const file = m && posix(relative(cwd, resolve(dirname(resolve(cwd, entryKey)), m[1])));
+    const stripped = m && stripCssLoader(code, m[1]);
+    if (file && stripped != null && outs[file]) { code = stripped; outs[entryKey].cssBundle = file; writeFileSync(resolve(cwd, entryKey), code); outs[entryKey].bytes = Buffer.byteLength(code); cssMoved++; }
+  }
+  const mainCss = outs[entryKey]?.cssBundle;
+  if (mainCss && existsSync(resolve(cwd, mainCss))) {
+    for (const m of [...code.matchAll(/new URL\("\.\/([^"?]+\.css)(?:\?v=\w+)?",import\.meta\.url\)/g)]) {
+      const file = posix(relative(cwd, resolve(dirname(resolve(cwd, entryKey)), m[1])));
+      const key = Object.keys(outs).find((k) => posix(k) === file);
+      const stripped = stripCssLoader(code, m[1]);
+      if (!key || stripped == null || !existsSync(resolve(cwd, key))) continue;
+      const css = readFileSync(resolve(cwd, key), "utf8");
+      fs_append(resolve(cwd, mainCss), css);
+      code = stripped;
+      rmSync(resolve(cwd, key), { force: true });
+      outs[mainCss] = { ...outs[mainCss], bytes: readFileSync(resolve(cwd, mainCss)).length, inputs: { ...(outs[mainCss]?.inputs ?? {}), ...(outs[key]?.inputs ?? {}) } };
+      delete outs[key];
+      cssMoved++;
+    }
+    writeFileSync(resolve(cwd, entryKey), code);
+    outs[entryKey].bytes = Buffer.byteLength(code);
+  }
+  return { stubs, folded, cssMoved };
+
+  /**
+   * T's CSS moves in front of B's (T loads first): one file, one loader. Returns an undo (the fold may still fail), or
+   * null when there is nothing to merge or a loader cannot be found.
+   */
+  function mergeCss(t, b) {
+    const tc = outs[t].cssBundle, bc = outs[b].cssBundle;
+    if (!tc || !bc) return null;
+    const tText = text(t), stripped = stripCssLoader(tText, base(tc));
+    if (stripped == null || !existsSync(resolve(cwd, tc)) || !existsSync(resolve(cwd, bc))) return null;
+    const tCss = readFileSync(resolve(cwd, tc), "utf8"), bCss = readFileSync(resolve(cwd, bc), "utf8");
+    const saved = { tc: outs[tc], bc: outs[bc] };
+    writeFileSync(resolve(cwd, bc), `${tCss}
+${bCss}`);
+    writeFileSync(resolve(cwd, t), stripped);
+    rmSync(resolve(cwd, tc), { force: true });
+    outs[bc] = { ...outs[bc], bytes: Buffer.byteLength(`${tCss}
+${bCss}`), inputs: { ...(outs[bc]?.inputs ?? {}), ...(outs[tc]?.inputs ?? {}) } };
+    delete outs[tc];
+    delete outs[t].cssBundle;
+    return () => {
+      writeFileSync(resolve(cwd, bc), bCss); writeFileSync(resolve(cwd, tc), tCss); writeFileSync(resolve(cwd, t), tText);
+      outs[bc] = saved.bc; outs[tc] = saved.tc; outs[t].cssBundle = tc;
+    };
+  }
 
   async function fold(t, b, users) {
     const bAbs = resolve(cwd, b), tAbs = resolve(cwd, t);
+    const undoCss = mergeCss(t, b);
+    const fail = () => { undoCss?.(); return false; };
     const bExp = outs[b].exports ?? [], tExp = outs[t].exports ?? [];
     const alias = new Map(tExp.map((e, i) => [e, `__pk${(folded * 97 + i).toString(36)}`]));
     const lines = [bExp.length ? `export { ${bExp.map((e) => (e === "default" ? "default" : e)).join(", ")} } from ${JSON.stringify(rel(bAbs, bAbs))};` : `import ${JSON.stringify(rel(bAbs, bAbs))};`,
@@ -132,11 +244,11 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
           x.onLoad({ filter: /\.js$/ }, (a) => ({ contents: readFileSync(a.path, "utf8").replace(/new URL\("(\.\/[^"]+\.css)",import\.meta\.url\)/g, (_m, css) => `new URL(${JSON.stringify(rel(bAbs, resolve(dirname(a.path), css)))},import.meta.url)`), loader: "js", resolveDir: dirname(a.path) }));
         } }],
       });
-    } catch { return false; }
+    } catch { return fail(); }
     // importers of T (other than B) now import the same bindings from B
     const others = users.filter((u) => u !== b);
     const before = new Map(others.map((u) => [u, text(u)]));
-    if (!others.every((u) => retarget(cwd, u, t, b, alias))) { for (const [u, x] of before) writeFileSync(resolve(cwd, u), x); return false; }
+    if (!others.every((u) => retarget(cwd, u, t, b, alias))) { for (const [u, x] of before) writeFileSync(resolve(cwd, u), x); return fail(); }
     writeFileSync(bAbs, res.outputFiles[0].text);
     rmSync(tAbs, { force: true });
     for (const u of others) outs[u].imports = dedupe((outs[u].imports ?? []).map((im) => (im.path === t ? { ...im, path: b } : im)));
@@ -144,9 +256,12 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     outs[b].exports = [...bExp, ...alias.values()];
     outs[b].bytes = Buffer.byteLength(res.outputFiles[0].text);
     outs[b].inputs = { ...(outs[b].inputs ?? {}), ...(outs[t].inputs ?? {}) }; // size reports still see what was folded in
+    if (outs[t].cssBundle && !outs[b].cssBundle) outs[b].cssBundle = outs[t].cssBundle; // B now runs T's CSS loader
     delete outs[t];
     return true;
   }
 }
 
+function fs_append(file, css) { writeFileSync(file, `${readFileSync(file, "utf8")}
+${css}`); }
 function dedupe(list) { const seen = new Set(); return list.filter((im) => { const k = `${im.kind}:${im.path}`; if (seen.has(k)) return false; seen.add(k); return true; }); }

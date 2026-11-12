@@ -122,7 +122,7 @@ test("march build: per-route size report by path; a route over its budget fails 
     writeFileSync(join(dir, "src/pages/big.jsx"), `const rows = ${JSON.stringify(Array.from({ length: 3000 }, (_, i) => `row ${i} ${Math.random().toString(36)}`))}\nexport default function Big() { return <ul>{rows.map((r) => <li>{r}</li>)}</ul> }\n`);
     writeFileSync(join(dir, "src/main.jsx"), "import routes from './routes.gen.js'\ncreateRouter({ routes })\nrender(() => <Router />, document.getElementById('app'))\n");
     writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
-    writeFileSync(join(dir, "march.config.js"), "export default { budget: { entry: 64 * 1024, route: 64 * 1024, routes: { \"/big\": 8 * 1024 }, fail: true } }\n");
+    writeFileSync(join(dir, "march.config.js"), "export default { budget: { entry: 64 * 1024, route: 64 * 1024, routes: { \"/big\": 8 * 1024 }, fail: true }, chunks: false }\n");
     let err = null;
     try { execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" }); } catch (e) { err = e; }
     assert.ok(err && err.status === 1, "the build exits with 1");

@@ -28,6 +28,24 @@ export function tagLoaders(code, file, cwd) {
   });
 }
 
+const escRe = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+/**
+ * Small lazy chunks (march build, second pass): `import("spec")` in `code` becomes a static import (the module joins
+ * its parent's chunk) or an import of a group module that holds several small lazy modules in one chunk.
+ * @param {string} code
+ * @param {{ spec: string, mode: "static" | "group", group?: string, name?: string }[]} list
+ */
+export function rewriteDynamic(code, list) {
+  let head = "";
+  list.forEach((x, i) => {
+    const re = new RegExp(String.raw`import\(\s*(["'])${escRe(x.spec)}\1\s*\)`, "g");
+    if (!re.test(code)) return;
+    if (x.mode === "static") { head += `import * as __hmIn${i} from ${JSON.stringify(x.spec)};\n`; code = code.replace(re, `Promise.resolve(__hmIn${i})`); }
+    else code = code.replace(re, `import(${JSON.stringify(`march-group:${x.group}`)}).then((m) => m.${x.name})`);
+  });
+  return head + code;
+}
+
 export function march(opts = {}) {
   return {
     name: "march",
@@ -44,6 +62,15 @@ export function march(opts = {}) {
       const deep = opts.deepImports === false ? (c) => c : (c) => (c.includes("hadi-march") ? deepImports(c, files) : c);
       const cwd = build.initialOptions.absWorkingDir ?? process.cwd();
       build.onResolve({ filter: /^hadi-march(\/[\w-]+){1,2}$|^hadi-march$/ }, (a) => (files[a.path] ? { path: files[a.path] } : undefined));
+      // second pass of march build: small lazy chunks join their parent (static) or a group chunk (see rewriteDynamic)
+      const inline = opts.inline ?? {};
+      const fixDyn = (code, file) => (inline[file] ? rewriteDynamic(code, inline[file]) : code);
+      build.onResolve({ filter: /^march-group:/ }, (a) => ({ path: a.path.slice(12), namespace: "march-group" }));
+      build.onLoad({ filter: /.*/, namespace: "march-group" }, (a) => ({ contents: (opts.groups?.[a.path] ?? []).map((m) => `export * as ${m.name} from ${JSON.stringify(m.abs)};`).join("\n"), loader: "js", resolveDir: cwd }));
+      // March's own modules that lazy-load a small module (router outlets, overlay media)
+      if (Object.keys(inline).some((f) => f.startsWith(join(MARCH_ROOT, "src")))) {
+        build.onLoad({ filter: /\.(ts|js)$/, namespace: "file" }, async (a) => (inline[a.path] && a.path.startsWith(join(MARCH_ROOT, "src")) ? { contents: rewriteDynamic(await readFile(a.path, "utf8"), inline[a.path]), loader: a.path.endsWith(".ts") ? "ts" : "js", resolveDir: dirname(a.path) } : undefined));
+      }
       build.onResolve({ filter: /^hadi-march\/css\// }, (a) => ({ path: join(MARCH_ROOT, "src", a.path.slice("hadi-march/".length)) }));
 
       build.onLoad({ filter, namespace: "file" }, async (a) => {
@@ -51,7 +78,7 @@ export function march(opts = {}) {
         try {
           const r = compile(source, { filename: a.path, autoImports: auto, dev: opts.dev });
           for (const k of r.keys) keys.add(k);
-          let contents = deep(tagLoaders(r.code, a.path, cwd));
+          let contents = fixDyn(deep(tagLoaders(r.code, a.path, cwd)), a.path);
           if (r.css) { css.set(a.path, r.css); contents += `\nimport ${JSON.stringify(`march-css:${a.path}`)};`; }
           return { contents, loader: a.path.endsWith(".tsx") ? "ts" : "js", resolveDir: dirname(a.path), warnings: r.warnings.map((text) => ({ text })) };
         } catch (e) {
@@ -60,13 +87,13 @@ export function march(opts = {}) {
         }
       });
       // generated route tables (plain .js) get the same loader tags
-      build.onLoad({ filter: /routes\.gen\.js$/, namespace: "file" }, async (a) => ({ contents: deep(tagLoaders(await readFile(a.path, "utf8"), a.path, cwd)), loader: "js", resolveDir: dirname(a.path) }));
+      build.onLoad({ filter: /routes\.gen\.js$/, namespace: "file" }, async (a) => ({ contents: fixDyn(deep(tagLoaders(await readFile(a.path, "utf8"), a.path, cwd)), a.path), loader: "js", resolveDir: dirname(a.path) }));
       // the app's own .ts/.js modules (not March, not node_modules): same rewrites
       build.onLoad({ filter: /\.(ts|js|mjs)$/, namespace: "file" }, async (a) => {
         if (a.path.endsWith(".d.ts") || a.path.includes(sep + "node_modules" + sep) || a.path.startsWith(join(MARCH_ROOT, "src")) || a.path.startsWith(join(MARCH_ROOT, "compiler")) || !a.path.startsWith(cwd)) return undefined;
         const code = await readFile(a.path, "utf8");
         if (!code.includes("hadi-march") && !code.includes("import(")) return undefined;
-        return { contents: deep(tagLoaders(code, a.path, cwd)), loader: a.path.endsWith(".ts") ? "ts" : "js", resolveDir: dirname(a.path) };
+        return { contents: fixDyn(deep(tagLoaders(code, a.path, cwd)), a.path), loader: a.path.endsWith(".ts") ? "ts" : "js", resolveDir: dirname(a.path) };
       });
       build.onResolve({ filter: /^march-css:/ }, (a) => ({ path: a.path.slice(10), namespace: "march-css" }));
       build.onLoad({ filter: /.*/, namespace: "march-css" }, (a) => ({ contents: css.get(a.path) ?? "", loader: "css" }));

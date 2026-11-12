@@ -16,6 +16,7 @@
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, cpSync, rmSync, watch } from "node:fs";
 import { join, resolve, relative, dirname, extname, basename, sep } from "node:path";
+const posix = (p) => p.split(sep).join("/");
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import { march } from "../compiler/esbuild.js";
@@ -24,7 +25,8 @@ import { genApi, genApiClasses, mockHandler } from "./openapi.js";
 import { templates } from "./templates.js";
 import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
 import { packChunks } from "../compiler/pack-chunks.js";
-import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText } from "./perf.js";
+import { planSmallLazy, smallFiles, aliasGroups } from "../compiler/min-chunks.js";
+import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText, fileSizes } from "./perf.js";
 
 const cwd = process.cwd();
 const argv = process.argv.slice(2);
@@ -34,7 +36,10 @@ const MARCH_ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 async function loadConfig() {
   const f = join(cwd, "march.config.js");
   const user = existsSync(f) ? (await import(pathToFileURL(f).href)).default ?? {} : {};
-  return { entry: "src/main.jsx", outdir: "dist", publicDir: "public", pagesDir: "src/pages", components: "src/components", html: "index.html", port: 5173, alias: {}, define: {}, ...user };
+  const cfg = { entry: "src/main.jsx", outdir: "dist", publicDir: "public", pagesDir: "src/pages", components: "src/components", html: "index.html", port: 5173, alias: {}, define: {}, ...user };
+  // the file that exists (esbuild would quietly take main.tsx for main.jsx, and the entry would not be recognised)
+  if (!existsSync(resolve(cwd, cfg.entry))) cfg.entry = [".tsx", ".ts", ".jsx", ".js"].map((x) => cfg.entry.replace(/\.[jt]sx?$/, x)).find((p) => existsSync(resolve(cwd, p))) ?? cfg.entry;
+  return cfg;
 }
 
 async function loadEsbuild() {
@@ -45,7 +50,7 @@ async function loadEsbuild() {
 }
 function fail(msg) { console.error(`\x1b[31m✖\x1b[0m ${msg}`); process.exit(1); }
 
-function buildOptions(cfg, esbuild, { dev }) {
+function buildOptions(cfg, esbuild, { dev, plan = null }) {
   return {
     entryPoints: [resolve(cwd, cfg.entry)],
     bundle: true, format: "esm", splitting: true, target: "es2022",
@@ -56,7 +61,7 @@ function buildOptions(cfg, esbuild, { dev }) {
     define: { "process.env.NODE_ENV": JSON.stringify(dev ? "development" : "production"), ...cfg.define },
     alias: cfg.alias,
     loader: { ".svg": "file", ".png": "file", ".woff2": "file", ".jpg": "file", ".webp": "file" },
-    plugins: [march({ components: resolve(cwd, cfg.components), dev, i18nOut: resolve(cwd, cfg.outdir, "i18n-keys.json") })],
+    plugins: [march({ components: resolve(cwd, cfg.components), dev, i18nOut: resolve(cwd, cfg.outdir, "i18n-keys.json"), ...(plan ? { inline: plan.inline, groups: plan.groups } : {}) })],
   };
 }
 
@@ -103,22 +108,31 @@ async function build({ dev = false } = {}) {
   if (existsSync(resolve(cwd, cfg.publicDir))) cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true });
   const t0 = Date.now();
   try {
-    const r = await esbuild.build(buildOptions(cfg, esbuild, { dev }));
-    // production: the entry and its static chunks become one file (fewer requests, better compression)
-    if (!dev && cfg.mergeEntry !== false) {
+    // chunks.minSize: no output file under it (default 10 KB before gzip); small lazy modules need a second pass
+    const minSize = cfg.chunks === false ? 0 : cfg.chunks?.minSize ?? cfg.packChunks?.minSize ?? 10240;
+    const allow = (cfg.chunks && cfg.chunks.allow) || {};
+    let plan = null, r;
+    for (let pass = 0; pass < 4; pass++) {
+      if (pass) rmSync(resolve(out, "assets"), { recursive: true, force: true });
+      r = await esbuild.build(buildOptions(cfg, esbuild, { dev, plan }));
+      // production: the entry and its static chunks become one file (fewer requests, better compression)
+      if (dev || cfg.mergeEntry === false) break;
       const want = resolve(cwd, cfg.entry);
       const entryKey = Object.keys(r.metafile.outputs).find((k) => r.metafile.outputs[k].entryPoint && resolve(cwd, r.metafile.outputs[k].entryPoint) === want);
-      if (entryKey) {
-        const minify = flag("--no-minify") !== true;
-        await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
-        // tiny shared chunks fold into a chunk always loaded with them (fewer requests and files); off with packChunks: false
-        if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: cfg.packChunks?.minSize ?? 2048 });
-      }
+      if (!entryKey) break;
+      const minify = flag("--no-minify") !== true;
+      await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
+      // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
+      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: minSize || 2048 });
+      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, prev: plan }) : null;
+      if (!next) break;
+      plan = next;
     }
     // final names: every rewritten file gets a new content version (a cached file must never point at another build),
     // no name starts with _ or . (some hosts refuse those); stable names on request
     if (!dev) rehashOutputs(r.metafile, { cwd, stable: !!cfg.stableNames || flag("--stable-names") === true });
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
+    aliasGroups(chunks.manifest, plan);
     writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);
     if (cfg.themes !== false) await copyThemes(out, esbuild, { dev });
     if (!dev) {
@@ -126,8 +140,19 @@ async function build({ dev = false } = {}) {
       if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
       const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));
       printReport(rep);
-      writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ entry: rep.rows[0], routes: rep.rows.filter((x) => x.kind === "route").map(({ name, key, js, css, limit, over, files }) => ({ name, key, js, css, limit, over, files })), parts: rep.rows.filter((x) => x.kind === "part" || x.kind === "layout").map(({ name, kind, js, css, limit, over, files }) => ({ name, kind, js, css, limit, over, files })), budget: rep.budget }, null, 2)}\n`);
+      const small = minSize ? smallFiles(r.metafile, { cwd, minSize, allow, entryKey: chunks.entryKey }) : [];
+      const files = Object.keys(r.metafile.outputs).filter((k) => /.(js|css)$/.test(k) && existsSync(resolve(cwd, k)));
+      const sizes = files.map((k) => readFileSync(resolve(cwd, k)).length);
+      const smallest = files.map((k, i) => ({ file: posix(relative(out, resolve(cwd, k))), bytes: sizes[i] })).sort((a, b) => a.bytes - b.bytes)[0] ?? null;
+      const chunkStats = { minSize, files: files.length, bytes: sizes.reduce((a, b) => a + b, 0), smallest, under: small.length, allow };
+      console.log(`  files: ${chunkStats.files} JS/CSS, ${(chunkStats.bytes / 1024).toFixed(1)} KB; smallest ${smallest ? `${smallest.file} ${(smallest.bytes / 1024).toFixed(1)} KB` : "-"}; under ${(minSize / 1024).toFixed(0)} KB: ${small.length}`);
+      writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ chunks: chunkStats, files: fileSizes(out), entry: rep.rows[0], routes: rep.rows.filter((x) => x.kind === "route").map(({ name, key, js, css, limit, over, files }) => ({ name, key, js, css, limit, over, files })), parts: rep.rows.filter((x) => x.kind === "part" || x.kind === "layout").map(({ name, kind, js, css, limit, over, files }) => ({ name, kind, js, css, limit, over, files })), budget: rep.budget }, null, 2)}\n`);
       if (flag("--analyze") === true) { console.log("  largest modules in the entry (minified, before gzip):"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, 40)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
+      if (small.length) {
+        // chunks.allow: { "chunks/x.js": "why it must stay small" } — a reason is required
+        console.error(`[31m✖[0m ${small.length} file(s) under chunks.minSize (${minSize} B): ${small.map((x) => `${x.file} ${x.bytes} B`).join(", ")}`);
+        process.exitCode = 1;
+      }
       if (rep.over.length) {
         const msg = `over budget: ${rep.over.map(overText).join("; ")}`;
         if (rep.over.some((x) => x.entry) && flag("--analyze") !== true) { console.log("  largest modules in the entry (minified, before gzip) — move heavy ones behind import()/lazy():"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, flag("--analyze") === true ? 40 : 12)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }

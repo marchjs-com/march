@@ -5,23 +5,30 @@ import { signal, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { CopyButton } from "./button.ts";
+import { tokenLines, type Token } from "./highlight.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "./util.ts";
 
-export interface CodeViewProps { code: MaybeFn<string | null | undefined>; lang?: string; wrap?: boolean; copy?: boolean; lineNumbers?: boolean; label?: MaybeFn<string>; class?: ClassProp }
+export interface CodeViewProps {
+  code: MaybeFn<string | null | undefined>; lang?: string; wrap?: boolean; copy?: boolean; lineNumbers?: boolean; label?: MaybeFn<string>; class?: ClassProp;
+  /** Colour tokens (default: on when `lang` is known: js/ts/jsx/tsx, css, html, json, sh). */
+  highlight?: boolean;
+  /** Extra toolbar controls (widget actions), placed after Wrap. */
+  tools?: unknown;
+}
 /** Read-only code block with line numbers: `<CodeView code={src} lang="js" wrap={false} copy />` */
 export function CodeView(props: CodeViewProps): Element {
   const wrap = signal(!!props.wrap);
-  const lines = (): string[] => String(val(props.code) ?? "").replace(/\r\n?/g, "\n").split("\n");
+  const lines = (): Token[][] => tokenLines(String(val(props.code) ?? ""), props.highlight === false ? "" : props.lang ?? "");
   const numbers = props.lineNumbers !== false;
   return h("div", { class: () => cx("hm-code", wrap() && "is-wrapped", val(props.class)) },
     h("div", { class: "hm-code-bar" },
       props.lang && h("span", { class: "hm-code-lang" }, props.lang),
       h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", "aria-pressed": () => String(wrap()), onClick: () => wrap.update((x) => !x) }, () => t`Wrap`),
-      props.copy !== false && h(CopyButton, { text: () => val(props.code) })),
+      props.copy !== false && h(CopyButton, { text: () => val(props.code) }), props.tools),
     h("pre", { class: "hm-code-pre", tabindex: "0", "aria-label": () => val(props.label) ?? t`Code` },
       h("code", {}, () => lines().map((line, i) => h("span", { class: "hm-code-line" },
         numbers && h("span", { class: "hm-code-ln", "aria-hidden": "true" }, String(i + 1)),
-        h("span", { class: "hm-code-text" }, line), "\n")))));
+        h("span", { class: "hm-code-text" }, line.map(([k, x]) => (k ? h("span", { class: `hm-tok-${k}` }, x) : x))), "\n")))));
 }
 
 // ------------------------------------------------------------------ JsonView

@@ -3,10 +3,10 @@
 //   sizeReport     gzip size of the entry and of each lazy route, checked against march.config.js › budget
 //   headersFile    a Netlify / Cloudflare Pages `_headers` file: hashed assets immutable, the page always revalidated
 //   swSource       the optional service worker (march.config.js › sw: true)
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { createHash } from "node:crypto";
-import { dirname, relative, resolve, sep } from "node:path";
+import { dirname, relative, resolve, sep, join } from "node:path";
 
 const posix = (p) => p.split(sep).join("/");
 
@@ -84,8 +84,14 @@ export function sizeReport(m, outdir, budget, routes = {}) {
     for (const f of files) { const n = gz(resolve(outdir, f)); if (/\.css(\?|$)/.test(f)) css += n; else js += n; }
     return { js, css };
   };
+  // budget.boot: lazy parts the app loads at start-up (shell pieces); a route row then counts only what ITS navigation
+  // downloads (their files are already there). The boot row shows what start-up costs beyond the entry.
+  const bootKeys = (budget && budget.boot) || [];
+  const bootFiles = new Set(bootKeys.flatMap((k) => m.manifest[k] ?? []));
   const rows = [{ name: "(entry)", key: null, kind: "entry", files: m.entryFiles, ...size(m.entryFiles), entry: true }];
-  const rest = Object.entries(m.manifest).map(([k, files]) => ({ name: routes[k] ?? k, key: k, kind: routes[k] ? "route" : LAYOUT.test(k) ? "layout" : "part", files, ...size(files), entry: false }));
+  if (bootFiles.size) rows.push({ name: "(boot)", key: null, kind: "boot", files: [...bootFiles], ...size([...bootFiles]), entry: false });
+  // a group chunk shows as its members (each route row)
+  const rest = Object.entries(m.manifest).filter(([k]) => !bootKeys.includes(k) && !k.startsWith("march-group:")).map(([k, all]) => ({ files: all.filter((f) => !bootFiles.has(f)), k })).map(({ k, files }) => ({ name: routes[k] ?? k, key: k, kind: routes[k] ? "route" : LAYOUT.test(k) ? "layout" : "part", files, ...size(files), entry: false }));
   // routes by path, then the lazy parts by name
   const RANK = { route: 0, layout: 1, part: 2 };
   rest.sort((a, b) => (a.kind === b.kind ? a.name.localeCompare(b.name) : RANK[a.kind] - RANK[b.kind]));
@@ -93,7 +99,7 @@ export function sizeReport(m, outdir, budget, routes = {}) {
   const b = budget === false ? null : { entry: 15 * 1024, route: 60 * 1024, fail: false, ...(budget ?? {}) };
   const over = [];
   for (const r of rows) {
-    r.limit = !b ? Infinity : r.kind === "entry" ? b.entry : r.kind === "route" ? b.routes?.[r.name] ?? b.route : r.kind === "layout" ? b.route : b.part ?? b.route;
+    r.limit = !b ? Infinity : r.kind === "entry" ? b.entry : r.kind === "boot" ? b.bootLimit ?? b.route : r.kind === "route" ? b.routes?.[r.name] ?? b.route : r.kind === "layout" ? b.route : b.part ?? b.route;
     r.cssLimit = b?.css ?? Infinity;
     r.over = r.js > r.limit || r.css > r.cssLimit;
     if (r.over) over.push(r);
@@ -191,4 +197,26 @@ export function topInputs(meta, cwd, outdir, files, n = 12) {
     for (const [inp, v] of Object.entries(o.inputs)) by.set(inp, (by.get(inp) ?? 0) + v.bytesInOutput);
   }
   return [...by].sort((a, b) => b[1] - a[1]).slice(0, n).map(([file, bytes]) => ({ file, bytes }));
+}
+
+/**
+ * Every served JS / CSS / font file under `outdir` with its raw and gzip size, keyed by its path relative to `outdir`
+ * (no `?v=`). Written to march-report.json › files: the Speed page falls back to it when the browser cannot measure a
+ * response (cross-origin without Timing-Allow-Origin: transferSize is only the headers, body sizes are 0).
+ * @param {string} outdir
+ * @returns {Record<string, { raw: number, gzip: number }>}
+ */
+export function fileSizes(outdir) {
+  const out = {};
+  const walk = (dir) => {
+    for (const name of readdirSync(dir)) {
+      const p = join(dir, name);
+      if (statSync(p).isDirectory()) { walk(p); continue; }
+      if (!/\.(js|css|woff2?)$/.test(name)) continue;
+      const buf = readFileSync(p);
+      out[relative(outdir, p).split(sep).join("/")] = { raw: buf.length, gzip: /\.woff2?$/.test(name) ? buf.length : gzipSync(buf).length };
+    }
+  };
+  if (existsSync(outdir)) walk(outdir);
+  return out;
 }

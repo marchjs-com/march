@@ -143,6 +143,10 @@ Overlays never take input; put content after them. `front` only for foreground e
   `hadi-march/icons/catalog` for icon galleries.
 - Leave `<Link>` prefetch on (default hover). Do not prefetch everything by hand.
 - Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, fail: true }`); turn on `sw: true` when offline use matters.
+- `chunks: { minSize: 10240, allow: { "chunks/x.js": "reason" } }` (default 10 KB before gzip): no JS/CSS file under it. Small shared code
+  folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
+  parent, or joins a group chunk with the entry's other small lazy modules that share the most code (second build pass).
+  A file still under the limit fails the build; `allow` needs a reason. `chunks: false` turns it off.
 
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.
@@ -251,6 +255,16 @@ the one layer stack: `<Portal layer="dialog|drawer|popover|menu|tooltip|palette|
 the layers under it `inert`, toasts and effects stay above. Shell places: `<PortalTarget name="toolbar" />` in the shell,
 `<Portal to="toolbar" order={10}>…</Portal>` in a page — sorted by `order`, removed when the page goes, waits (and moves
 in) when the target is a lazy part not loaded yet. Context, theme, i18n and cleanup stay with the source component.
+
+## 14c. Widget points (hadi-march/widget, re-exported by ui)
+
+A widget point is a named place other code fills: `widgetPoint<Input>(id, { defaults })`, `point.provide({ id, slot,
+order, when, render(input, ctx) })` (returns remove; removed with the owner), `<Widget sources={[point]} input={…} />`.
+One "main" provider draws (highest `order`, the latest wins a tie); "action" providers are controls the main provider
+places with `ctx.actions()`. Every Code tab is `<Widget sources={[codeView]} input={{ source, lang, files?, apply?,
+reset?, readOnly? }} />`; defaults: `CodeViewer` (read-only, coloured via `tokenize`), Copy and Fullscreen. A live
+editor is added with `codeView.provide({ id: "editor", render })` and replaces the viewer everywhere. Never build a
+second code block: use the point.
 
 ## 15. Motion and fx
 
