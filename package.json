@@ -46,7 +46,18 @@
     "./managers/consent": "./src/managers/consent/index.ts",
     "./managers/consent/ui": "./src/managers/consent/ui.ts",
     "./managers/command": "./src/managers/command/index.ts",
-    "./managers/command/ui": "./src/managers/command/ui.ts"
+    "./managers/command/ui": "./src/managers/command/ui.ts",
+    "./managers/channels": "./src/managers/channels/index.ts",
+    "./managers/idle": "./src/managers/idle/index.ts",
+    "./managers/sync": "./src/managers/sync/index.ts",
+    "./managers/device": "./src/managers/device/index.ts",
+    "./managers/location": "./src/managers/location/index.ts",
+    "./managers/notification": "./src/managers/notification/index.ts",
+    "./managers/permission": "./src/managers/permission/index.ts",
+    "./managers/window": "./src/managers/window/index.ts",
+    "./managers/scroll": "./src/managers/scroll/index.ts",
+    "./managers/session": "./src/managers/session/index.ts",
+    "./managers/presence": "./src/managers/presence/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"
