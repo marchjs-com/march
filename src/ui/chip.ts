@@ -1,2 +1,2 @@
-// Moved to src/components/chip/ (modular structure); this path stays for imports from parallel branches.
+// Moved to src/components/chip/ (modular structure); this path keeps working for existing imports.
 export * from "../components/chip/index.ts";

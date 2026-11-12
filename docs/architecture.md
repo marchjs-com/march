@@ -44,12 +44,11 @@ waits (detached, alive) when it goes. The showcase shell has `title`, `toolbar` 
 
 `src/widget/index.ts` (`hadi-march/widget`, re-exported by `hadi-march/ui`): `widgetPoint`, `Widget`, `pickMain`.
 First consumer: `src/ui/code-widget.ts` (`codeView` point, `CodeViewer`, Copy, Fullscreen) with `src/ui/highlight.ts`
-(`tokenize`, `tokenLines`). The showcase Demo card's Code tab draws `<Widget sources={[codeView]} />`. The messaging
-branch extends this module (contribution points); it does not add a second registry.
+(`tokenize`, `tokenLines`). The showcase Demo card's Code tab draws `<Widget sources={[codeView]} />`. Contribution points extend this module; there is one registry.
 
-## Folders (modular structure; branches merge into this pattern)
+## Folders (modular structure)
 
-Every unit lives in its own folder with the same shape, so parallel branches add folders instead of editing shared files:
+Every unit lives in its own folder with the same shape, so new units add folders instead of editing shared files:
 
 ```
 src/components/<name>/   index.ts <name>.css <name>.test.js docs.md demo.tsx playground.ts meta.ts   (UI: draws only)
@@ -57,13 +56,13 @@ src/behaviors/<name>/    <name>.ts  index.ts                          (use:<name
 src/managers/<name>/     <name>.ts  index.ts                          (app-wide services: Command, Layer, Focus, …)
 src/hubs/<name>/         <name>.ts  index.ts                          (shared engines: position, collection, field,
                                                                        variants, virtual, mask, intl, textfit, media)
-src/net/  src/errors/    (feat/net branch)      src/motion/ + new engine files (feat/motion branch)
+src/net/  src/errors/  src/channel/  src/motion/   (modules)
 ```
 
 - `tools/gen-registry.js` writes `src/components/index.ts` (re-exported by `hadi-march/ui`), `src/components/registry.gen.ts`
   (showcase `ComponentDemo`), `docs/components.md` and the AI_INSTRUCTIONS catalogue from these folders; nobody edits
-  them by hand, so two branches that add folders do not conflict. `--check` runs in `npm test` (test/registry.test.js).
-- Moved so far (old path kept as a one-line re-export for other branches): `src/ui/chip.ts` → `src/components/chip/`.
+  them by hand, so two changes that add folders do not conflict. `--check` runs in `npm test` (test/registry.test.js).
+- Moved so far (old path kept as a one-line re-export): `src/ui/chip.ts` → `src/components/chip/`.
   Checklist: docs/component-checklist.md.
 - A folder imports other units only through their `index.ts`; core (`src/core`, `src/dom`) never imports a unit.
 - CSS stays next to its component (css-split follows the code); names keep the `hm-` prefix.

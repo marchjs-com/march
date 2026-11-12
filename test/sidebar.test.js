@@ -22,7 +22,7 @@ test("NavSidebar: categories with counts, auto-open active category, recent list
   localStorage.clear();
   R.createRouter({ routes: Object.fromEntries(["/", "/members", "/roles", "/payments", "/refunds", "/diamonds", "/support"].map((p) => [p, { component: () => null }])) });
   const awaiting = signal(3);
-  const props = { items: ITEMS, title: "HADİ Kurucu", storageKey: "t.sb", hotkey: false,
+  const props = { items: ITEMS, title: "Acme Yönetim", storageKey: "t.sb", hotkey: false,
     featured: [{ id: "support", label: "Destek talepleri", sub: () => (awaiting() ? `${awaiting()} yanıt bekliyor` : "Yanıt bekleyen talep yok"), href: "/support", badge: awaiting }] };
   let m = mount(() => h(U.NavSidebar, props));
   await tick();

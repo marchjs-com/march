@@ -3,7 +3,7 @@
 export function libComponent(folder, Name) {
   const cls = `hm-${folder}`;
   return {
-    "index.ts": `// ${Name} (hadi-march/ui). Draws only: state comes from hubs and behaviors (docs/parallel.md › Shared hubs).
+    "index.ts": `// ${Name} (hadi-march/ui). Draws only: state comes from shared engines and behaviors.
 import "./${folder}.css";
 import { h } from "../../dom/h.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../ui/util.ts";

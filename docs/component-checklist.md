@@ -16,7 +16,7 @@ march check component <name>
 
 | File | What |
 |---|---|
-| `index.ts` | the component; draws only — state from hubs (docs/parallel.md › Shared hubs) and behaviors (`src/behaviors`) |
+| `index.ts` | the component; draws only — state from shared engines (positioning, collection, field, variants …) and behaviors (`src/behaviors`) |
 | `<name>.css` | `hm-` classes, theme tokens, logical properties, durations from `--hm-dur*`, no `@keyframes` (motion core) |
 | `<name>.test.js` | behaviour, ARIA, keyboard |
 | `docs.md` | first paragraph + first code block feed the catalogues; `## Props`, `## Accessibility`, `## Composed of` |

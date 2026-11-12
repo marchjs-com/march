@@ -1,7 +1,7 @@
 // Component metadata (each folder's meta.ts) and playground specs (playground.ts). Read by tools/gen-registry.js
 // (registry, barrel, AI catalogue), `march check component` and the showcase (Playground options).
 
-/** API stability (docs/parallel.md › Infrastructure w). */
+/** API stability. */
 export type Stability = "stable" | "experimental" | "deprecated";
 
 export interface ComponentMeta {
@@ -14,7 +14,7 @@ export interface ComponentMeta {
   summary: string;
   /** March components it is built from: a complex component reuses these instead of copying their work. */
   composedOf: readonly string[];
-  /** Behaviors (src/behaviors) and hubs (docs/parallel.md › Shared hubs) it uses. */
+  /** Behaviors (src/behaviors) and shared engines (positioning, collection, field, variants …) it uses. */
   behaviors?: readonly string[];
   hubs?: readonly string[];
   /** Showcase page path that shows it. */
