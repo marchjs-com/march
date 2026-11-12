@@ -4,78 +4,93 @@ import m0 from "./layout/accordion/meta.ts";
 import m1 from "./navigation/activity-bar/meta.ts";
 import m2 from "./feedback/alert/meta.ts";
 import m3 from "./layout/app-shell/meta.ts";
-import m4 from "./composite/bottom-nav/meta.ts";
-import m5 from "./navigation/breadcrumbs/meta.ts";
-import m6 from "./media/carousel/meta.ts";
-import m7 from "./social/chat-bubble/meta.ts";
-import m8 from "./composite/chat-composer/meta.ts";
-import m9 from "./composite/chat-thread/meta.ts";
-import m10 from "./actions/chip/meta.ts";
-import m11 from "./composite/color-picker/meta.ts";
-import m12 from "./composite/command-palette/meta.ts";
-import m13 from "./composite/consent-banner/meta.ts";
-import m14 from "./overlays/context-menu/meta.ts";
-import m15 from "./social/count-roll/meta.ts";
-import m16 from "./data/data-grid/meta.ts";
-import m17 from "./overlays/dialog/meta.ts";
-import m18 from "./layout/disclosure/meta.ts";
-import m19 from "./composite/dock-layout/meta.ts";
-import m20 from "./overlays/drawer/meta.ts";
-import m21 from "./motion/easing-curve-editor/meta.ts";
-import m22 from "./feedback/empty/meta.ts";
-import m23 from "./feedback/error-box/meta.ts";
-import m24 from "./composite/feed/meta.ts";
-import m25 from "./composite/flow-canvas/meta.ts";
-import m26 from "./composite/flow-controls/meta.ts";
-import m27 from "./composite/flow-palette/meta.ts";
-import m28 from "./social/follow-button/meta.ts";
-import m29 from "./data/gantt/meta.ts";
-import m30 from "./composite/gradient-editor/meta.ts";
-import m31 from "./layout/grid/meta.ts";
-import m32 from "./composite/image-cropper/meta.ts";
-import m33 from "./composite/json-editor/meta.ts";
-import m34 from "./composite/keyframe-timeline/meta.ts";
-import m35 from "./social/like-button/meta.ts";
-import m36 from "./feedback/loader/meta.ts";
-import m37 from "./actions/made-with-march/meta.ts";
-import m38 from "./composite/markdown-editor/meta.ts";
-import m39 from "./media/media/meta.ts";
-import m40 from "./social/media-grid/meta.ts";
-import m41 from "./navigation/nav-menu/meta.ts";
-import m42 from "./composite/nav-sidebar/meta.ts";
-import m43 from "./typography/overflow-text/meta.ts";
-import m44 from "./actions/overflow-toolbar/meta.ts";
-import m45 from "./media/overlay/meta.ts";
-import m46 from "./navigation/pagination/meta.ts";
-import m47 from "./composite/post-card/meta.ts";
-import m48 from "./composite/profile-header/meta.ts";
-import m49 from "./feedback/progress/meta.ts";
-import m50 from "./composite/property-grid/meta.ts";
-import m51 from "./feedback/pull-to-refresh/meta.ts";
-import m52 from "./forms/rating/meta.ts";
-import m53 from "./social/reaction-picker/meta.ts";
-import m54 from "./composite/rich-text-editor/meta.ts";
-import m55 from "./data/scheduler/meta.ts";
-import m56 from "./feedback/skeleton/meta.ts";
-import m57 from "./layout/spacer/meta.ts";
-import m58 from "./feedback/spinner/meta.ts";
-import m59 from "./layout/splitter/meta.ts";
-import m60 from "./layout/stack/meta.ts";
-import m61 from "./layout/status-bar/meta.ts";
-import m62 from "./navigation/stepper/meta.ts";
-import m63 from "./navigation/steps/meta.ts";
-import m64 from "./social/story-progress/meta.ts";
-import m65 from "./social/story-ring/meta.ts";
-import m66 from "./composite/story-viewer/meta.ts";
-import m67 from "./navigation/tabs/meta.ts";
-import m68 from "./composite/theme-editor/meta.ts";
-import m69 from "./composite/theme-menu/meta.ts";
-import m70 from "./overlays/toast/meta.ts";
-import m71 from "./composite/tree-editor/meta.ts";
-import m72 from "./data/tree-view/meta.ts";
-import m73 from "./social/typing-indicator/meta.ts";
-import m74 from "./data/virtual-list/meta.ts";
-import m75 from "./composite/wizard/meta.ts";
+import m4 from "./data/badge/meta.ts";
+import m5 from "./composite/bottom-nav/meta.ts";
+import m6 from "./navigation/breadcrumbs/meta.ts";
+import m7 from "./actions/button/meta.ts";
+import m8 from "./actions/button-group/meta.ts";
+import m9 from "./data/card/meta.ts";
+import m10 from "./media/carousel/meta.ts";
+import m11 from "./social/chat-bubble/meta.ts";
+import m12 from "./composite/chat-composer/meta.ts";
+import m13 from "./composite/chat-thread/meta.ts";
+import m14 from "./actions/chip/meta.ts";
+import m15 from "./typography/code-view/meta.ts";
+import m16 from "./composite/color-picker/meta.ts";
+import m17 from "./composite/command-palette/meta.ts";
+import m18 from "./composite/consent-banner/meta.ts";
+import m19 from "./overlays/context-menu/meta.ts";
+import m20 from "./actions/copy-button/meta.ts";
+import m21 from "./social/count-roll/meta.ts";
+import m22 from "./data/data-grid/meta.ts";
+import m23 from "./overlays/dialog/meta.ts";
+import m24 from "./layout/disclosure/meta.ts";
+import m25 from "./composite/dock-layout/meta.ts";
+import m26 from "./overlays/drawer/meta.ts";
+import m27 from "./motion/easing-curve-editor/meta.ts";
+import m28 from "./feedback/empty/meta.ts";
+import m29 from "./feedback/error-box/meta.ts";
+import m30 from "./composite/feed/meta.ts";
+import m31 from "./composite/flow-canvas/meta.ts";
+import m32 from "./composite/flow-controls/meta.ts";
+import m33 from "./composite/flow-palette/meta.ts";
+import m34 from "./social/follow-button/meta.ts";
+import m35 from "./data/gantt/meta.ts";
+import m36 from "./composite/gradient-editor/meta.ts";
+import m37 from "./layout/grid/meta.ts";
+import m38 from "./actions/icon-button/meta.ts";
+import m39 from "./composite/image-cropper/meta.ts";
+import m40 from "./composite/json-editor/meta.ts";
+import m41 from "./data/json-view/meta.ts";
+import m42 from "./data/kanban/meta.ts";
+import m43 from "./typography/kbd/meta.ts";
+import m44 from "./data/key-value/meta.ts";
+import m45 from "./composite/keyframe-timeline/meta.ts";
+import m46 from "./social/like-button/meta.ts";
+import m47 from "./feedback/loader/meta.ts";
+import m48 from "./actions/made-with-march/meta.ts";
+import m49 from "./composite/markdown-editor/meta.ts";
+import m50 from "./media/media/meta.ts";
+import m51 from "./social/media-grid/meta.ts";
+import m52 from "./actions/menu/meta.ts";
+import m53 from "./navigation/nav-menu/meta.ts";
+import m54 from "./composite/nav-sidebar/meta.ts";
+import m55 from "./typography/overflow-text/meta.ts";
+import m56 from "./actions/overflow-toolbar/meta.ts";
+import m57 from "./media/overlay/meta.ts";
+import m58 from "./navigation/pagination/meta.ts";
+import m59 from "./composite/post-card/meta.ts";
+import m60 from "./composite/profile-header/meta.ts";
+import m61 from "./feedback/progress/meta.ts";
+import m62 from "./composite/property-grid/meta.ts";
+import m63 from "./feedback/pull-to-refresh/meta.ts";
+import m64 from "./forms/rating/meta.ts";
+import m65 from "./social/reaction-picker/meta.ts";
+import m66 from "./composite/rich-text-editor/meta.ts";
+import m67 from "./data/scheduler/meta.ts";
+import m68 from "./feedback/skeleton/meta.ts";
+import m69 from "./layout/spacer/meta.ts";
+import m70 from "./feedback/spinner/meta.ts";
+import m71 from "./layout/splitter/meta.ts";
+import m72 from "./layout/stack/meta.ts";
+import m73 from "./layout/status-bar/meta.ts";
+import m74 from "./navigation/stepper/meta.ts";
+import m75 from "./navigation/steps/meta.ts";
+import m76 from "./social/story-progress/meta.ts";
+import m77 from "./social/story-ring/meta.ts";
+import m78 from "./composite/story-viewer/meta.ts";
+import m79 from "./navigation/tabs/meta.ts";
+import m80 from "./composite/theme-editor/meta.ts";
+import m81 from "./composite/theme-menu/meta.ts";
+import m82 from "./data/timeline/meta.ts";
+import m83 from "./overlays/toast/meta.ts";
+import m84 from "./overlays/tooltip/meta.ts";
+import m85 from "./data/tree/meta.ts";
+import m86 from "./composite/tree-editor/meta.ts";
+import m87 from "./data/tree-view/meta.ts";
+import m88 from "./social/typing-indicator/meta.ts";
+import m89 from "./data/virtual-list/meta.ts";
+import m90 from "./composite/wizard/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 const ownPage = (name: string): Promise<never> => Promise.reject(new Error(`${name} has its own entry: its page imports the demo`));
@@ -85,76 +100,91 @@ export const registry: readonly RegistryEntry[] = [
   { folder: "navigation/activity-bar", meta: m1, code: "<ActivityBar value={$view} onChange={(v) => $view = v} controls=\"side-view\" items={[\n  { id: \"files\", label: \"Files\", icon: files, shortcut: \"mod+shift+e\" },\n  { id: \"search\", label: \"Search\", icon: search, badge: () => $hits },\n  { id: \"settings\", label: \"Settings\", icon: settings, position: \"end\", onSelect: openSettings },\n]} />", demo: () => import("./ide-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./ide-1.demos.gen.ts").then((m) => m.p0) },
   { folder: "feedback/alert", meta: m2, code: "<Alert tone=\"warn\" title=\"Quota\" dismissable onDismiss={() => track(\"quota\")}>90% of the storage is used this month.</Alert>", demo: () => import("./feedback-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./feedback-1.demos.gen.ts").then((m) => m.p0) },
   { folder: "layout/app-shell", meta: m3, code: "<AppShell nav={<NavMenu items={items} />} top={<UpdateBanner />} header={<PageTitle />}>\n  <Outlet />\n</AppShell>", demo: () => import("./layout-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./layout-1.demos.gen.ts").then((m) => m.p1) },
-  { folder: "composite/bottom-nav", meta: m4, code: "<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />", demo: () => import("./navigation-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./navigation-1.demos.gen.ts").then((m) => m.p0) },
-  { folder: "navigation/breadcrumbs", meta: m5, code: "<Breadcrumbs label=\"File path\" items={[\n  { id: \"acme\", label: \"acme\", icon: folder, onSelect: () => openFolder(\"acme\") },\n  { id: \"src\", label: \"src\", icon: folder, siblings: () => folders(\"acme\") },\n  { id: \"file\", label: \"app.ts\", icon: fileText },\n]} />", demo: () => import("./ide-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./ide-1.demos.gen.ts").then((m) => m.p1) },
-  { folder: "media/carousel", meta: m6, code: "<Carousel perView={3} label=\"Features\">{items.map((x) => <FeatureCard {...x} />)}</Carousel>", demo: () => import("./overlay.demos.gen.ts").then((m) => m.d0), playground: () => import("./overlay.demos.gen.ts").then((m) => m.p0) },
-  { folder: "social/chat-bubble", meta: m7, code: "<ChatBubble mine text=\"See you at 7\" time={m.at} status=\"read\" position=\"last\" reactions={m.reactions} onReact={toggle} onReply={() => reply(m)} />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p0) },
-  { folder: "composite/chat-composer", meta: m8, code: "<ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p0) },
-  { folder: "composite/chat-thread", meta: m9, code: "<ChatThread messages={$messages} typing={$typing} group onReact={toggleReaction} onReply={(m) => $replyTo = m} />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p1) },
-  { folder: "actions/chip", meta: m10, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./buttons.demos.gen.ts").then((m) => m.d0), playground: () => import("./buttons.demos.gen.ts").then((m) => m.p0) },
-  { folder: "composite/color-picker", meta: m11, code: "<ColorPicker bind:value={$color} />\n<ColorPicker value={brand} format=\"hsl\" alpha={false} palettes={[{ label: \"Acme\", colors: [\"#0b5\", \"brand-blue\"] }]} />", demo: () => import("./editors-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./editors-1.demos.gen.ts").then((m) => m.p0) },
-  { folder: "composite/command-palette", meta: m12, code: "<CommandPalette ask={(q) => api.intent(q)} placeholder=\"Search pages or actions…\" />\n<PaletteButton label=\"Search…\" />\nregisterCommands([{ id: \"doc.new\", title: \"New document\", group: \"Document\", shortcut: \"mod+alt+n\", run: create }])", demo: () => import("./overlays-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./overlays-1.demos.gen.ts").then((m) => m.p0) },
-  { folder: "composite/consent-banner", meta: m13, code: "<ConsentBanner title=\"Cookies\" text=\"We use analytics to measure visits.\" />\n<ConsentGate category=\"thirdParty\">{() => <iframe src={videoUrl} title=\"Video\" />}</ConsentGate>", demo: () => import("./composite/consent-banner/demo.tsx"), playground: () => import("./composite/consent-banner/playground.ts") },
-  { folder: "overlays/context-menu", meta: m14, code: "<ContextMenu items={(target) => [{ label: \"Copy\", shortcut: \"mod+c\", onSelect: copy }, \"-\", { label: \"Delete\", danger: true, onSelect: remove }]}>\n  <ul class=\"files\">…</ul>\n</ContextMenu>", demo: () => ownPage("ContextMenu"), playground: () => ownPage("ContextMenu") },
-  { folder: "social/count-roll", meta: m15, code: "<CountRoll value={$likes} />\n<CountRoll value={$followers} format=\"full\" />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p0) },
-  { folder: "data/data-grid", meta: m16, code: "import { DataGrid } from \"hadi-march/components/data/data-grid\";\n\n<DataGrid rows={$orders} rowKey=\"id\" selectable groupBy={[\"region\"]}\n  columns={[\n    { key: \"customer\", label: \"Customer\", pin: \"left\", editable: true },\n    { key: \"region\", label: \"Region\", filter: \"select\" },\n    { key: \"amount\", label: \"Amount\", format: [\"money\", \"USD\"], aggregate: \"sum\" },\n  ]}\n  onEdit={(row, key, value) => save(row.id, key, value)} />", demo: () => import("./data/data-grid/demo.tsx"), playground: () => import("./data/data-grid/playground.ts") },
-  { folder: "overlays/dialog", meta: m17, code: "<Dialog open={$open} onClose={() => $open = false} title=\"Invite\" footer={<Button variant=\"primary\">Send</Button>}>…</Dialog>", demo: () => import("./overlays-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./overlays-1.demos.gen.ts").then((m) => m.p1) },
-  { folder: "layout/disclosure", meta: m18, code: "<Disclosure title=\"Advanced settings\" open={false} onToggle={(open) => save({ advanced: open })}>\n  <AdvancedForm />\n</Disclosure>", demo: () => import("./layout-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./layout-1.demos.gen.ts").then((m) => m.p2) },
-  { folder: "composite/dock-layout", meta: m19, code: "<DockLayout panels={[\n  { id: \"files\", title: \"Files\", icon: folder, content: () => <FileTree /> },\n  { id: \"editor\", title: \"main.ts\", icon: fileText, content: () => <Editor />, dirty: () => $dirty },\n  { id: \"console\", title: \"Console\", icon: terminal, content: () => <Console /> },\n]} layout={{ row: [[\"files\"], { column: [[\"editor\"], [\"console\"]], share: .68 }], share: .26 }}\n   persist=\"ide.layout\" storage={storage().local} api={(a) => dock = a} />", demo: () => import("./ide-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./ide-1.demos.gen.ts").then((m) => m.p2) },
-  { folder: "overlays/drawer", meta: m20, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./overlays-2.demos.gen.ts").then((m) => m.p0) },
-  { folder: "motion/easing-curve-editor", meta: m21, code: "<EasingCurveEditor bind:value={$easing} name=\"acme-pop\" />\nanimate(card, frames, { duration: 600, easing: \"acme-pop\" })", demo: () => import("./editors-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./editors-2.demos.gen.ts").then((m) => m.p0) },
-  { folder: "feedback/empty", meta: m22, code: "<Empty icon={inbox} title=\"No messages yet\" action={[<Button variant=\"primary\" icon={plus}>New message</Button>]}>Start a conversation or invite a teammate.</Empty>", demo: () => import("./feedback-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./feedback-1.demos.gen.ts").then((m) => m.p1) },
-  { folder: "feedback/error-box", meta: m23, code: "<ErrorBox title=\"Could not load\" error={err} retry={() => refetch()} />", demo: () => import("./feedback-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./feedback-1.demos.gen.ts").then((m) => m.p2) },
-  { folder: "composite/feed", meta: m24, code: "<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p0) },
-  { folder: "composite/flow-canvas", meta: m25, code: "const flow = createFlow({ types, doc })          // types: [{ type, label, icon, color, inputs, outputs, fields, run }]\n<FlowCanvas flow={flow} snap={16} minimap />\nflow.toJSON()                                     // { schema: \"march.flow/v1\", nodes, edges: [{ from: \"hook.out\", to: \"check.in\" }], groups }\nflow.load(JSON.parse(text), \"Import\")             // validated (validateFlow); one undo step", demo: () => ownPage("FlowCanvas"), playground: () => ownPage("FlowCanvas") },
-  { folder: "composite/flow-controls", meta: m26, code: "const runner = createFlowRunner(flow, { nodeMs: 650, travelMs: 560 })\n<FlowControls runner={runner} flow={flow} timeline />\nawait runner.run()        // \"done\" | \"error\"; runner.pause() / resume() / step() / reset()", demo: () => ownPage("FlowControls"), playground: () => ownPage("FlowControls") },
-  { folder: "composite/flow-palette", meta: m27, code: "const flow = createFlow({ types })\n<FlowPalette flow={flow} />\n<FlowCanvas flow={flow} />", demo: () => ownPage("FlowPalette"), playground: () => ownPage("FlowPalette") },
-  { folder: "social/follow-button", meta: m28, code: "<FollowButton state={$state} name={user.name} onChange={(s) => $state = s} />", demo: () => import("./social-5.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-5.demos.gen.ts").then((m) => m.p0) },
-  { folder: "data/gantt", meta: m29, code: "import { Gantt } from \"hadi-march/components/data/gantt\";\n\n<Gantt tasks={$tasks} scale=\"day\" cascade\n  onChange={(task) => api.save(task)}\n  onSelect={(task) => open(task)} />", demo: () => import("./data/gantt/demo.tsx"), playground: () => import("./data/gantt/playground.ts") },
-  { folder: "composite/gradient-editor", meta: m30, code: "<GradientEditor bind:value={$background} />\n<GradientEditor value=\"radial-gradient(circle, #ffd27a 0%, #f2801f 100%)\" types={[\"radial\"]} presets={false} />", demo: () => import("./editors-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./editors-1.demos.gen.ts").then((m) => m.p1) },
-  { folder: "layout/grid", meta: m31, code: "<Grid cols={4} gap={3} fill=\"stretch\" balance>{cards}</Grid>\n<Grid min=\"16rem\">{cards}</Grid>", demo: () => import("./layout-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./layout-2.demos.gen.ts").then((m) => m.p0) },
-  { folder: "composite/image-cropper", meta: m32, code: "<ImageCropper src={url} bind:value={$crop} aspect={1} api={(c) => cropper = c} />\nconst blob = await cropper.toBlob(\"image/webp\", 0.9, 512)", demo: () => import("./editors-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./editors-2.demos.gen.ts").then((m) => m.p2) },
-  { folder: "composite/json-editor", meta: m33, code: "<JsonEditor bind:value={$settings} mode=\"tree\" schema={schema} />\n<JsonEditor bind:value={$raw} modes={[\"text\"]} validate={(v) => (v.version ? null : \"version is required\")} />", demo: () => import("./editors-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./editors-3.demos.gen.ts").then((m) => m.p0) },
-  { folder: "composite/keyframe-timeline", meta: m34, code: "<KeyframeTimeline bind:value={$scene} />\n<KeyframeTimeline value={model} snap={100} loop={false} renderTarget={(name) => <img src={`/${name}.svg`} alt=\"\" />} />", demo: () => import("./editors-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./editors-2.demos.gen.ts").then((m) => m.p1) },
-  { folder: "social/like-button", meta: m35, code: "<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p1) },
-  { folder: "feedback/loader", meta: m36, code: "<Loader text=\"Preparing dashboards…\" />", demo: () => import("./feedback-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./feedback-2.demos.gen.ts").then((m) => m.p0) },
-  { folder: "actions/made-with-march", meta: m37, code: "<MadeWithMarch />\n<MadeWithMarch variant=\"badge\" />\n<MadeWithMarch variant=\"small\" />", demo: () => import("./buttons.demos.gen.ts").then((m) => m.d1), playground: () => import("./buttons.demos.gen.ts").then((m) => m.p1) },
-  { folder: "composite/markdown-editor", meta: m38, code: "<MarkdownEditor bind:value={$doc} view=\"split\" />\n<MarkdownEditor value={md} views={[\"write\", \"preview\"]} toolbar={false} />\n<MarkdownEditor bind:value={$doc} view=\"rich\" stats={false} />", demo: () => import("./editors-4.demos.gen.ts").then((m) => m.d0), playground: () => import("./editors-4.demos.gen.ts").then((m) => m.p0) },
-  { folder: "media/media", meta: m39, code: "<Media src={url} kind=\"auto\" alt=\"Hills at dusk\" poster={thumb} />", demo: () => import("./overlay.demos.gen.ts").then((m) => m.d1), playground: () => import("./overlay.demos.gen.ts").then((m) => m.p1) },
-  { folder: "social/media-grid", meta: m40, code: "<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />", demo: () => import("./social-6.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-6.demos.gen.ts").then((m) => m.p0) },
-  { folder: "navigation/nav-menu", meta: m41, code: "<NavMenu brand={<Brand />} items={[\n  { id: \"inbox\", title: \"Inbox\", href: \"/inbox\", icon: inbox, badge: () => $unread },\n  { id: \"users\", title: \"Users\", href: \"/users\", icon: users, group: \"Admin\" },\n]} />", demo: () => import("./navigation-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./navigation-1.demos.gen.ts").then((m) => m.p1) },
-  { folder: "composite/nav-sidebar", meta: m42, code: "<NavSidebar title=\"Acme\" items={[\n  { id: \"/orders\", label: \"Orders\", href: \"/orders\", group: \"Sales\", icon: cart, badge: () => $open },\n  { id: \"/users\", label: \"Users\", href: \"/users\", group: \"Admin\", can: \"users.read\" },\n]} collapsible resizable groupOrder={[\"Sales\", \"Admin\"]} />", demo: () => import("./navigation-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./navigation-2.demos.gen.ts").then((m) => m.p0) },
-  { folder: "typography/overflow-text", meta: m43, code: "<OverflowText text={title} />\n<Marquee text=\"New: dark theme · faster search · RTL\" separator=\"✦\" />", demo: () => import("./navigation-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./navigation-1.demos.gen.ts").then((m) => m.p2) },
-  { folder: "actions/overflow-toolbar", meta: m44, code: "<OverflowToolbar label=\"Document\" items={[\n  { id: \"new\", label: \"New\", icon: plus, onSelect: create, priority: 10 },\n  { id: \"save\", command: \"doc.save\", priority: 9 },\n  { id: \"s1\", separator: true },\n  { id: \"split\", label: \"Split\", icon: columns, pressed: () => $split, onSelect: () => $split = !$split },\n  { id: \"delete\", label: \"Delete\", icon: trash, danger: true },\n]} />", demo: () => import("./ide-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./ide-2.demos.gen.ts").then((m) => m.p0) },
-  { folder: "media/overlay", meta: m45, code: "<section class=\"hero\"><Overlay src=\"media/waves.webm\" poster=\"media/waves.jpg\" /><Overlay effect=\"vignette\" /><h1>Title</h1></section>", demo: () => import("./overlay.demos.gen.ts").then((m) => m.d2), playground: () => import("./overlay.demos.gen.ts").then((m) => m.p2) },
-  { folder: "navigation/pagination", meta: m46, code: "<Pagination bind:page={$page} pages={20} />", demo: () => import("./navigation-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./navigation-2.demos.gen.ts").then((m) => m.p1) },
-  { folder: "composite/post-card", meta: m47, code: "<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p1) },
-  { folder: "composite/profile-header", meta: m48, code: "<ProfileHeader user={u} follow={$f} onFollow={(s) => $f = s} onMessage={openChat} onStat={openList} />", demo: () => import("./social-5.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-5.demos.gen.ts").then((m) => m.p1) },
-  { folder: "feedback/progress", meta: m49, code: "<Progress value={$p} label=\"Uploading\" showValue />", demo: () => import("./feedback-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./feedback-2.demos.gen.ts").then((m) => m.p1) },
-  { folder: "composite/property-grid", meta: m50, code: "<PropertyGrid label=\"Card\" bind:value={$card} onSave={(v) => api.save(v)} properties={[\n  { key: \"title\", label: \"Title\", group: \"Content\" },\n  { key: \"width\", label: \"Width\", type: \"number\", unit: \"px\", group: \"Layout\", validate: (v) => v > 420 ? \"At most 420\" : null },\n  { key: \"elevated\", label: \"Shadow\", type: \"switch\", group: \"Look\" },\n  { key: \"radius\", label: \"Radius\", type: \"slider\", min: 0, max: 24, group: \"Look\", hidden: (v) => !v.elevated },\n]} />", demo: () => import("./ide-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./ide-2.demos.gen.ts").then((m) => m.p1) },
-  { folder: "feedback/pull-to-refresh", meta: m51, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./navigation-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./navigation-2.demos.gen.ts").then((m) => m.p2) },
-  { folder: "forms/rating", meta: m52, code: "<Rating bind:value={$stars} />", demo: () => import("./forms/rating/demo.tsx"), playground: () => import("./forms/rating/playground.ts") },
-  { folder: "social/reaction-picker", meta: m53, code: "<ReactionPicker selected={msg.myReaction} onPick={(e) => react(msg, e)} />\n<ReactionPicker layout=\"grid\" onPick={insertAtCaret} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p1) },
-  { folder: "composite/rich-text-editor", meta: m54, code: "<RichTextEditor bind:value={$notes} mentions={team} placeholder=\"Write…\" />\n<RichTextEditor value={md} toolbar={[\"bold\", \"italic\", \"link\", \"|\", \"ul\", \"ol\"]} emoji={false} />\n<RichTextEditor api={(e) => editor = e} />   // editor.insert(\"**Hi**\"), editor.exec(\"h2\"), editor.undo()", demo: () => import("./editors-4.demos.gen.ts").then((m) => m.d1), playground: () => import("./editors-4.demos.gen.ts").then((m) => m.p1) },
-  { folder: "data/scheduler", meta: m55, code: "import { Scheduler } from \"hadi-march/components/data/scheduler\";\n\n<Scheduler events={$events} view=\"week\" step={15}\n  onChange={(event, range) => api.update(event.id, range)}\n  onCreate={(range) => $events = [...$events, { id: uid(), title: \"New\", ...range }]}\n  onSelect={(event) => open(event)} />", demo: () => import("./data/scheduler/demo.tsx"), playground: () => import("./data/scheduler/playground.ts") },
-  { folder: "feedback/skeleton", meta: m56, code: "{() => (loading() ? <Skeleton lines={3} /> : <Profile user={user()} />)}", demo: () => import("./feedback-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./feedback-2.demos.gen.ts").then((m) => m.p2) },
-  { folder: "layout/spacer", meta: m57, code: "<Stack direction=\"row\" align=\"center\"><Brand /><Spacer /><UserMenu /></Stack>", demo: () => import("./layout-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./layout-2.demos.gen.ts").then((m) => m.p1) },
-  { folder: "feedback/spinner", meta: m58, code: "<Spinner size=\"lg\" colors=\"brand\" label=\"Loading users\" />", demo: () => import("./feedback-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./feedback-3.demos.gen.ts").then((m) => m.p0) },
-  { folder: "layout/splitter", meta: m59, code: "<Splitter start={<FileList />} end={<Preview />} initial={0.35} min={0.2} label=\"Resize the file list\" />", demo: () => import("./layout-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./layout-2.demos.gen.ts").then((m) => m.p2) },
-  { folder: "layout/stack", meta: m60, code: "<Stack direction=\"row\" gap={2} align=\"center\" justify=\"between\" wrap>…</Stack>\n<Toolbar label=\"Filters\" end={<Button>Export</Button>}>…</Toolbar>\n<Divider label=\"or\" />", demo: () => import("./layout-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./layout-3.demos.gen.ts").then((m) => m.p0) },
-  { folder: "layout/status-bar", meta: m61, code: "<StatusBar items={[\n  { id: \"branch\", icon: gitBranch, text: \"main\", onSelect: pickBranch, priority: 5 },\n  { id: \"pos\", side: \"end\", text: () => \"Ln \" + $line, priority: 4 },\n  { id: \"save\", side: \"end\", text: () => $state, tone: () => $busy ? \"busy\" : \"success\", live: true, priority: 9 },\n  { id: \"format\", side: \"end\", command: \"editor.format\" },\n]} />", demo: () => import("./ide-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./ide-2.demos.gen.ts").then((m) => m.p2) },
-  { folder: "navigation/stepper", meta: m62, code: "<Stepper steps={[{ title: \"Cart\" }, { title: \"Address\" }, { title: \"Payment\" }]} current={$step} onSelect={(i) => $step = i}\n  panels={[<Cart />, <Address />, <Payment />]} onFinish={submit} />", demo: () => import("./navigation-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./navigation-3.demos.gen.ts").then((m) => m.p0) },
-  { folder: "navigation/steps", meta: m63, code: "<Steps steps={[{ title: \"Account\" }, { title: \"Profile\" }, { title: \"Done\" }]} current={$step} onSelect={(i) => $step = i} />", demo: () => import("./navigation-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./navigation-3.demos.gen.ts").then((m) => m.p1) },
-  { folder: "social/story-progress", meta: m64, code: "<StoryProgress count={items.length} index={$i} run={item.id} paused={$hold} onDone={next} />", demo: () => import("./social-6.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-6.demos.gen.ts").then((m) => m.p1) },
-  { folder: "social/story-ring", meta: m65, code: "<StoryRing name={u.name} src={u.avatar} state={u.seen ? \"seen\" : \"new\"} label={u.handle} onClick={() => open(u)} />", demo: () => import("./social-5.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-5.demos.gen.ts").then((m) => m.p2) },
-  { folder: "composite/story-viewer", meta: m66, code: "<StoryViewer open={$open} onClose={() => $open = false} groups={stories} start={tappedId} onSeen={markSeen} onReply={send} />", demo: () => import("./social-6.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-6.demos.gen.ts").then((m) => m.p2) },
-  { folder: "navigation/tabs", meta: m67, code: "<Tabs value={$tab} onChange={(id) => $tab = id} tabs={[\n  { id: \"general\", label: \"General\", content: () => <General /> },\n  { id: \"members\", label: \"Members\", badge: () => $pending, content: () => <Members /> },\n]} />", demo: () => import("./navigation-3.demos.gen.ts").then((m) => m.d2), playground: () => import("./navigation-3.demos.gen.ts").then((m) => m.p2) },
-  { folder: "composite/theme-editor", meta: m68, code: "<ThemeEditor />\n<ThemeEditor bind:value={$draft} base=\"night\" />", demo: () => import("./composite/theme-editor/demo.tsx"), playground: () => import("./composite/theme-editor/playground.ts") },
-  { folder: "composite/theme-menu", meta: m69, code: "<ThemeMenu />\n<ThemeMenu themes={false} accents={[\"primary\", \"brand-orange\", \"brand-blue\"]} />", demo: () => import("./composite/theme-menu/demo.tsx"), playground: () => import("./composite/theme-menu/playground.ts") },
-  { folder: "overlays/toast", meta: m70, code: "toast(\"File archived\", { kind: \"success\", action: { label: \"Undo\", run: () => restore() } });", demo: () => import("./overlays-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./overlays-2.demos.gen.ts").then((m) => m.p1) },
-  { folder: "composite/tree-editor", meta: m71, code: "<TreeEditor bind:value={$config} schema={schema} />\n<TreeEditor value={data} readonly search={false} expand={1} />", demo: () => import("./editors-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./editors-3.demos.gen.ts").then((m) => m.p1) },
-  { folder: "data/tree-view", meta: m72, code: "import { TreeView } from \"hadi-march/components/data/tree-view\";\n\n<TreeView nodes={files} selection=\"multiple\" draggable search={$q}\n  load={(node) => api.children(node.id)}\n  onSelect={(ids) => $selected = ids}\n  onMove={(ids, target, position) => api.move(ids, target, position)} />", demo: () => import("./data/tree-view/demo.tsx"), playground: () => import("./data/tree-view/playground.ts") },
-  { folder: "social/typing-indicator", meta: m73, code: "<TypingIndicator names={$typing} />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p2) },
-  { folder: "data/virtual-list", meta: m74, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p2) },
-  { folder: "composite/wizard", meta: m75, code: "<Wizard submitLabel=\"Finish\" onSubmit={save} steps={[\n  { title: \"Account\", schema: schema({ email: { type: \"email\", required: true } }) },\n  { title: \"Profile\", schema: schema({ name: { type: \"text\", required: true } }), validate: (v) => (v.name === \"admin\" ? \"Pick another name\" : null) },\n]} />", demo: () => import("./composite/wizard/demo.tsx"), playground: () => import("./composite/wizard/playground.ts") },
+  { folder: "data/badge", meta: m4, code: "<Badge tone=\"success\">Active</Badge>\n<Badge tone=\"warn\" dot>Pending</Badge>\n<Badge count={unread} label=\"unread\" />", demo: () => import("./data-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./data-1.demos.gen.ts").then((m) => m.p0) },
+  { folder: "composite/bottom-nav", meta: m5, code: "<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />", demo: () => import("./navigation-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./navigation-1.demos.gen.ts").then((m) => m.p0) },
+  { folder: "navigation/breadcrumbs", meta: m6, code: "<Breadcrumbs label=\"File path\" items={[\n  { id: \"acme\", label: \"acme\", icon: folder, onSelect: () => openFolder(\"acme\") },\n  { id: \"src\", label: \"src\", icon: folder, siblings: () => folders(\"acme\") },\n  { id: \"file\", label: \"app.ts\", icon: fileText },\n]} />", demo: () => import("./ide-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./ide-1.demos.gen.ts").then((m) => m.p1) },
+  { folder: "actions/button", meta: m7, code: "<Button variant=\"primary\" icon={plus}>New project</Button>\n<Button loading={$saving} on:click={save}>Save</Button>\n<Button href=\"/docs\" iconEnd={arrowRight}>Docs</Button>\n<ActionButton action={remove} args={[row]} />", demo: () => import("./buttons-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./buttons-1.demos.gen.ts").then((m) => m.p0) },
+  { folder: "actions/button-group", meta: m8, code: "<ButtonGroup attached label=\"Alignment\">\n  <Button>Start</Button><Button>Center</Button><Button>End</Button>\n</ButtonGroup>", demo: () => import("./buttons-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./buttons-1.demos.gen.ts").then((m) => m.p1) },
+  { folder: "data/card", meta: m9, code: "<Card title=\"Acme Ltd.\" subtitle=\"Business plan\" actions={[edit]} footer={<span>Updated today</span>}>…</Card>\n<Card flush>…</Card>", demo: () => import("./data-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./data-1.demos.gen.ts").then((m) => m.p1) },
+  { folder: "media/carousel", meta: m10, code: "<Carousel perView={3} label=\"Features\">{items.map((x) => <FeatureCard {...x} />)}</Carousel>", demo: () => import("./overlay.demos.gen.ts").then((m) => m.d0), playground: () => import("./overlay.demos.gen.ts").then((m) => m.p0) },
+  { folder: "social/chat-bubble", meta: m11, code: "<ChatBubble mine text=\"See you at 7\" time={m.at} status=\"read\" position=\"last\" reactions={m.reactions} onReact={toggle} onReply={() => reply(m)} />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p0) },
+  { folder: "composite/chat-composer", meta: m12, code: "<ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "composite/chat-thread", meta: m13, code: "<ChatThread messages={$messages} typing={$typing} group onReact={toggleReaction} onReply={(m) => $replyTo = m} />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p1) },
+  { folder: "actions/chip", meta: m14, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./buttons-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./buttons-1.demos.gen.ts").then((m) => m.p2) },
+  { folder: "typography/code-view", meta: m15, code: "<CodeView code={source} lang=\"tsx\" copy />\n<CodeView code={css} lang=\"css\" lineNumbers={false} wrap />", demo: () => import("./data-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./data-1.demos.gen.ts").then((m) => m.p2) },
+  { folder: "composite/color-picker", meta: m16, code: "<ColorPicker bind:value={$color} />\n<ColorPicker value={brand} format=\"hsl\" alpha={false} palettes={[{ label: \"Acme\", colors: [\"#0b5\", \"brand-blue\"] }]} />", demo: () => import("./editors-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./editors-1.demos.gen.ts").then((m) => m.p0) },
+  { folder: "composite/command-palette", meta: m17, code: "<CommandPalette ask={(q) => api.intent(q)} placeholder=\"Search pages or actions…\" />\n<PaletteButton label=\"Search…\" />\nregisterCommands([{ id: \"doc.new\", title: \"New document\", group: \"Document\", shortcut: \"mod+alt+n\", run: create }])", demo: () => import("./overlays-1.demos.gen.ts").then((m) => m.d0), playground: () => import("./overlays-1.demos.gen.ts").then((m) => m.p0) },
+  { folder: "composite/consent-banner", meta: m18, code: "<ConsentBanner title=\"Cookies\" text=\"We use analytics to measure visits.\" />\n<ConsentGate category=\"thirdParty\">{() => <iframe src={videoUrl} title=\"Video\" />}</ConsentGate>", demo: () => import("./composite/consent-banner/demo.tsx"), playground: () => import("./composite/consent-banner/playground.ts") },
+  { folder: "overlays/context-menu", meta: m19, code: "<ContextMenu items={(target) => [{ label: \"Copy\", shortcut: \"mod+c\", onSelect: copy }, \"-\", { label: \"Delete\", danger: true, onSelect: remove }]}>\n  <ul class=\"files\">…</ul>\n</ContextMenu>", demo: () => ownPage("ContextMenu"), playground: () => ownPage("ContextMenu") },
+  { folder: "actions/copy-button", meta: m20, code: "<CopyButton text=\"npm i hadi-march\" />\n<CopyButton text={() => token} iconOnly label=\"Copy key\" />", demo: () => import("./buttons-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./buttons-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "social/count-roll", meta: m21, code: "<CountRoll value={$likes} />\n<CountRoll value={$followers} format=\"full\" />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p0) },
+  { folder: "data/data-grid", meta: m22, code: "import { DataGrid } from \"hadi-march/components/data/data-grid\";\n\n<DataGrid rows={$orders} rowKey=\"id\" selectable groupBy={[\"region\"]}\n  columns={[\n    { key: \"customer\", label: \"Customer\", pin: \"left\", editable: true },\n    { key: \"region\", label: \"Region\", filter: \"select\" },\n    { key: \"amount\", label: \"Amount\", format: [\"money\", \"USD\"], aggregate: \"sum\" },\n  ]}\n  onEdit={(row, key, value) => save(row.id, key, value)} />", demo: () => import("./data/data-grid/demo.tsx"), playground: () => import("./data/data-grid/playground.ts") },
+  { folder: "overlays/dialog", meta: m23, code: "<Dialog open={$open} onClose={() => $open = false} title=\"Invite\" footer={<Button variant=\"primary\">Send</Button>}>…</Dialog>", demo: () => import("./overlays-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./overlays-1.demos.gen.ts").then((m) => m.p1) },
+  { folder: "layout/disclosure", meta: m24, code: "<Disclosure title=\"Advanced settings\" open={false} onToggle={(open) => save({ advanced: open })}>\n  <AdvancedForm />\n</Disclosure>", demo: () => import("./layout-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./layout-1.demos.gen.ts").then((m) => m.p2) },
+  { folder: "composite/dock-layout", meta: m25, code: "<DockLayout panels={[\n  { id: \"files\", title: \"Files\", icon: folder, content: () => <FileTree /> },\n  { id: \"editor\", title: \"main.ts\", icon: fileText, content: () => <Editor />, dirty: () => $dirty },\n  { id: \"console\", title: \"Console\", icon: terminal, content: () => <Console /> },\n]} layout={{ row: [[\"files\"], { column: [[\"editor\"], [\"console\"]], share: .68 }], share: .26 }}\n   persist=\"ide.layout\" storage={storage().local} api={(a) => dock = a} />", demo: () => import("./ide-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./ide-1.demos.gen.ts").then((m) => m.p2) },
+  { folder: "overlays/drawer", meta: m26, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./overlays-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "motion/easing-curve-editor", meta: m27, code: "<EasingCurveEditor bind:value={$easing} name=\"acme-pop\" />\nanimate(card, frames, { duration: 600, easing: \"acme-pop\" })", demo: () => import("./editors-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./editors-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "feedback/empty", meta: m28, code: "<Empty icon={inbox} title=\"No messages yet\" action={[<Button variant=\"primary\" icon={plus}>New message</Button>]}>Start a conversation or invite a teammate.</Empty>", demo: () => import("./feedback-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./feedback-1.demos.gen.ts").then((m) => m.p1) },
+  { folder: "feedback/error-box", meta: m29, code: "<ErrorBox title=\"Could not load\" error={err} retry={() => refetch()} />", demo: () => import("./feedback-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./feedback-1.demos.gen.ts").then((m) => m.p2) },
+  { folder: "composite/feed", meta: m30, code: "<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p0) },
+  { folder: "composite/flow-canvas", meta: m31, code: "const flow = createFlow({ types, doc })          // types: [{ type, label, icon, color, inputs, outputs, fields, run }]\n<FlowCanvas flow={flow} snap={16} minimap />\nflow.toJSON()                                     // { schema: \"march.flow/v1\", nodes, edges: [{ from: \"hook.out\", to: \"check.in\" }], groups }\nflow.load(JSON.parse(text), \"Import\")             // validated (validateFlow); one undo step", demo: () => ownPage("FlowCanvas"), playground: () => ownPage("FlowCanvas") },
+  { folder: "composite/flow-controls", meta: m32, code: "const runner = createFlowRunner(flow, { nodeMs: 650, travelMs: 560 })\n<FlowControls runner={runner} flow={flow} timeline />\nawait runner.run()        // \"done\" | \"error\"; runner.pause() / resume() / step() / reset()", demo: () => ownPage("FlowControls"), playground: () => ownPage("FlowControls") },
+  { folder: "composite/flow-palette", meta: m33, code: "const flow = createFlow({ types })\n<FlowPalette flow={flow} />\n<FlowCanvas flow={flow} />", demo: () => ownPage("FlowPalette"), playground: () => ownPage("FlowPalette") },
+  { folder: "social/follow-button", meta: m34, code: "<FollowButton state={$state} name={user.name} onChange={(s) => $state = s} />", demo: () => import("./social-5.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-5.demos.gen.ts").then((m) => m.p0) },
+  { folder: "data/gantt", meta: m35, code: "import { Gantt } from \"hadi-march/components/data/gantt\";\n\n<Gantt tasks={$tasks} scale=\"day\" cascade\n  onChange={(task) => api.save(task)}\n  onSelect={(task) => open(task)} />", demo: () => import("./data/gantt/demo.tsx"), playground: () => import("./data/gantt/playground.ts") },
+  { folder: "composite/gradient-editor", meta: m36, code: "<GradientEditor bind:value={$background} />\n<GradientEditor value=\"radial-gradient(circle, #ffd27a 0%, #f2801f 100%)\" types={[\"radial\"]} presets={false} />", demo: () => import("./editors-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./editors-1.demos.gen.ts").then((m) => m.p1) },
+  { folder: "layout/grid", meta: m37, code: "<Grid cols={4} gap={3} fill=\"stretch\" balance>{cards}</Grid>\n<Grid min=\"16rem\">{cards}</Grid>", demo: () => import("./layout-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./layout-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "actions/icon-button", meta: m38, code: "<IconButton icon={heart} label=\"Like\" on:click={like} />\n<IconButton icon={trash} label=\"Delete\" variant=\"danger\" size=\"sm\" />", demo: () => import("./buttons-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./buttons-2.demos.gen.ts").then((m) => m.p1) },
+  { folder: "composite/image-cropper", meta: m39, code: "<ImageCropper src={url} bind:value={$crop} aspect={1} api={(c) => cropper = c} />\nconst blob = await cropper.toBlob(\"image/webp\", 0.9, 512)", demo: () => import("./editors-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./editors-2.demos.gen.ts").then((m) => m.p2) },
+  { folder: "composite/json-editor", meta: m40, code: "<JsonEditor bind:value={$settings} mode=\"tree\" schema={schema} />\n<JsonEditor bind:value={$raw} modes={[\"text\"]} validate={(v) => (v.version ? null : \"version is required\")} />", demo: () => import("./editors-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./editors-3.demos.gen.ts").then((m) => m.p0) },
+  { folder: "data/json-view", meta: m41, code: "<JsonView value={response} open={1} />", demo: () => import("./data-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./data-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "data/kanban", meta: m42, code: "<Kanban columns={$board} itemKey={(x) => x.id} card={(x) => <strong>{x.title}</strong>}\n  onMove={(item, from, to) => { $board = move($board, item, from, to) }} />", demo: () => import("./data-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./data-2.demos.gen.ts").then((m) => m.p1) },
+  { folder: "typography/kbd", meta: m43, code: "<Kbd keys=\"mod+k\" />\n<Kbd keys=\"shift+enter\" />\n<Kbd>Esc</Kbd>", demo: () => import("./buttons-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./buttons-2.demos.gen.ts").then((m) => m.p2) },
+  { folder: "data/key-value", meta: m44, code: "<KeyValue columns={2} items={[{ label: \"Email\", value: user.email }, { label: \"Total\", value: total, hint: \"incl. VAT\" }]} />\n<KeyValue items={{ Plan: \"Business\", Seats: 48 }} />", demo: () => import("./data-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./data-2.demos.gen.ts").then((m) => m.p2) },
+  { folder: "composite/keyframe-timeline", meta: m45, code: "<KeyframeTimeline bind:value={$scene} />\n<KeyframeTimeline value={model} snap={100} loop={false} renderTarget={(name) => <img src={`/${name}.svg`} alt=\"\" />} />", demo: () => import("./editors-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./editors-2.demos.gen.ts").then((m) => m.p1) },
+  { folder: "social/like-button", meta: m46, code: "<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p1) },
+  { folder: "feedback/loader", meta: m47, code: "<Loader text=\"Preparing dashboards…\" />", demo: () => import("./feedback-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./feedback-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "actions/made-with-march", meta: m48, code: "<MadeWithMarch />\n<MadeWithMarch variant=\"badge\" />\n<MadeWithMarch variant=\"small\" />", demo: () => import("./buttons-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./buttons-3.demos.gen.ts").then((m) => m.p0) },
+  { folder: "composite/markdown-editor", meta: m49, code: "<MarkdownEditor bind:value={$doc} view=\"split\" />\n<MarkdownEditor value={md} views={[\"write\", \"preview\"]} toolbar={false} />\n<MarkdownEditor bind:value={$doc} view=\"rich\" stats={false} />", demo: () => import("./editors-4.demos.gen.ts").then((m) => m.d0), playground: () => import("./editors-4.demos.gen.ts").then((m) => m.p0) },
+  { folder: "media/media", meta: m50, code: "<Media src={url} kind=\"auto\" alt=\"Hills at dusk\" poster={thumb} />", demo: () => import("./overlay.demos.gen.ts").then((m) => m.d1), playground: () => import("./overlay.demos.gen.ts").then((m) => m.p1) },
+  { folder: "social/media-grid", meta: m51, code: "<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />", demo: () => import("./social-6.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-6.demos.gen.ts").then((m) => m.p0) },
+  { folder: "actions/menu", meta: m52, code: "<Menu label=\"Actions\" icon={more} items={[{ label: \"Edit\", icon: edit, shortcut: \"E\", onSelect: edit }, \"-\", remove]} args={[row]} />\n<Dropdown label=\"Filters\">{(close) => <FilterForm onDone={close} />}</Dropdown>", demo: () => import("./buttons-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./buttons-3.demos.gen.ts").then((m) => m.p1) },
+  { folder: "navigation/nav-menu", meta: m53, code: "<NavMenu brand={<Brand />} items={[\n  { id: \"inbox\", title: \"Inbox\", href: \"/inbox\", icon: inbox, badge: () => $unread },\n  { id: \"users\", title: \"Users\", href: \"/users\", icon: users, group: \"Admin\" },\n]} />", demo: () => import("./navigation-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./navigation-1.demos.gen.ts").then((m) => m.p1) },
+  { folder: "composite/nav-sidebar", meta: m54, code: "<NavSidebar title=\"Acme\" items={[\n  { id: \"/orders\", label: \"Orders\", href: \"/orders\", group: \"Sales\", icon: cart, badge: () => $open },\n  { id: \"/users\", label: \"Users\", href: \"/users\", group: \"Admin\", can: \"users.read\" },\n]} collapsible resizable groupOrder={[\"Sales\", \"Admin\"]} />", demo: () => import("./navigation-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./navigation-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "typography/overflow-text", meta: m55, code: "<OverflowText text={title} />\n<Marquee text=\"New: dark theme · faster search · RTL\" separator=\"✦\" />", demo: () => import("./navigation-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./navigation-1.demos.gen.ts").then((m) => m.p2) },
+  { folder: "actions/overflow-toolbar", meta: m56, code: "<OverflowToolbar label=\"Document\" items={[\n  { id: \"new\", label: \"New\", icon: plus, onSelect: create, priority: 10 },\n  { id: \"save\", command: \"doc.save\", priority: 9 },\n  { id: \"s1\", separator: true },\n  { id: \"split\", label: \"Split\", icon: columns, pressed: () => $split, onSelect: () => $split = !$split },\n  { id: \"delete\", label: \"Delete\", icon: trash, danger: true },\n]} />", demo: () => import("./ide-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./ide-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "media/overlay", meta: m57, code: "<section class=\"hero\"><Overlay src=\"media/waves.webm\" poster=\"media/waves.jpg\" /><Overlay effect=\"vignette\" /><h1>Title</h1></section>", demo: () => import("./overlay.demos.gen.ts").then((m) => m.d2), playground: () => import("./overlay.demos.gen.ts").then((m) => m.p2) },
+  { folder: "navigation/pagination", meta: m58, code: "<Pagination bind:page={$page} pages={20} />", demo: () => import("./navigation-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./navigation-2.demos.gen.ts").then((m) => m.p1) },
+  { folder: "composite/post-card", meta: m59, code: "<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p1) },
+  { folder: "composite/profile-header", meta: m60, code: "<ProfileHeader user={u} follow={$f} onFollow={(s) => $f = s} onMessage={openChat} onStat={openList} />", demo: () => import("./social-5.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-5.demos.gen.ts").then((m) => m.p1) },
+  { folder: "feedback/progress", meta: m61, code: "<Progress value={$p} label=\"Uploading\" showValue />", demo: () => import("./feedback-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./feedback-2.demos.gen.ts").then((m) => m.p1) },
+  { folder: "composite/property-grid", meta: m62, code: "<PropertyGrid label=\"Card\" bind:value={$card} onSave={(v) => api.save(v)} properties={[\n  { key: \"title\", label: \"Title\", group: \"Content\" },\n  { key: \"width\", label: \"Width\", type: \"number\", unit: \"px\", group: \"Layout\", validate: (v) => v > 420 ? \"At most 420\" : null },\n  { key: \"elevated\", label: \"Shadow\", type: \"switch\", group: \"Look\" },\n  { key: \"radius\", label: \"Radius\", type: \"slider\", min: 0, max: 24, group: \"Look\", hidden: (v) => !v.elevated },\n]} />", demo: () => import("./ide-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./ide-2.demos.gen.ts").then((m) => m.p1) },
+  { folder: "feedback/pull-to-refresh", meta: m63, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./navigation-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./navigation-2.demos.gen.ts").then((m) => m.p2) },
+  { folder: "forms/rating", meta: m64, code: "<Rating bind:value={$stars} />", demo: () => import("./forms/rating/demo.tsx"), playground: () => import("./forms/rating/playground.ts") },
+  { folder: "social/reaction-picker", meta: m65, code: "<ReactionPicker selected={msg.myReaction} onPick={(e) => react(msg, e)} />\n<ReactionPicker layout=\"grid\" onPick={insertAtCaret} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p1) },
+  { folder: "composite/rich-text-editor", meta: m66, code: "<RichTextEditor bind:value={$notes} mentions={team} placeholder=\"Write…\" />\n<RichTextEditor value={md} toolbar={[\"bold\", \"italic\", \"link\", \"|\", \"ul\", \"ol\"]} emoji={false} />\n<RichTextEditor api={(e) => editor = e} />   // editor.insert(\"**Hi**\"), editor.exec(\"h2\"), editor.undo()", demo: () => import("./editors-4.demos.gen.ts").then((m) => m.d1), playground: () => import("./editors-4.demos.gen.ts").then((m) => m.p1) },
+  { folder: "data/scheduler", meta: m67, code: "import { Scheduler } from \"hadi-march/components/data/scheduler\";\n\n<Scheduler events={$events} view=\"week\" step={15}\n  onChange={(event, range) => api.update(event.id, range)}\n  onCreate={(range) => $events = [...$events, { id: uid(), title: \"New\", ...range }]}\n  onSelect={(event) => open(event)} />", demo: () => import("./data/scheduler/demo.tsx"), playground: () => import("./data/scheduler/playground.ts") },
+  { folder: "feedback/skeleton", meta: m68, code: "{() => (loading() ? <Skeleton lines={3} /> : <Profile user={user()} />)}", demo: () => import("./feedback-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./feedback-2.demos.gen.ts").then((m) => m.p2) },
+  { folder: "layout/spacer", meta: m69, code: "<Stack direction=\"row\" align=\"center\"><Brand /><Spacer /><UserMenu /></Stack>", demo: () => import("./layout-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./layout-2.demos.gen.ts").then((m) => m.p1) },
+  { folder: "feedback/spinner", meta: m70, code: "<Spinner size=\"lg\" colors=\"brand\" label=\"Loading users\" />", demo: () => import("./feedback-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./feedback-3.demos.gen.ts").then((m) => m.p0) },
+  { folder: "layout/splitter", meta: m71, code: "<Splitter start={<FileList />} end={<Preview />} initial={0.35} min={0.2} label=\"Resize the file list\" />", demo: () => import("./layout-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./layout-2.demos.gen.ts").then((m) => m.p2) },
+  { folder: "layout/stack", meta: m72, code: "<Stack direction=\"row\" gap={2} align=\"center\" justify=\"between\" wrap>…</Stack>\n<Toolbar label=\"Filters\" end={<Button>Export</Button>}>…</Toolbar>\n<Divider label=\"or\" />", demo: () => import("./layout-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./layout-3.demos.gen.ts").then((m) => m.p0) },
+  { folder: "layout/status-bar", meta: m73, code: "<StatusBar items={[\n  { id: \"branch\", icon: gitBranch, text: \"main\", onSelect: pickBranch, priority: 5 },\n  { id: \"pos\", side: \"end\", text: () => \"Ln \" + $line, priority: 4 },\n  { id: \"save\", side: \"end\", text: () => $state, tone: () => $busy ? \"busy\" : \"success\", live: true, priority: 9 },\n  { id: \"format\", side: \"end\", command: \"editor.format\" },\n]} />", demo: () => import("./ide-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./ide-2.demos.gen.ts").then((m) => m.p2) },
+  { folder: "navigation/stepper", meta: m74, code: "<Stepper steps={[{ title: \"Cart\" }, { title: \"Address\" }, { title: \"Payment\" }]} current={$step} onSelect={(i) => $step = i}\n  panels={[<Cart />, <Address />, <Payment />]} onFinish={submit} />", demo: () => import("./navigation-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./navigation-3.demos.gen.ts").then((m) => m.p0) },
+  { folder: "navigation/steps", meta: m75, code: "<Steps steps={[{ title: \"Account\" }, { title: \"Profile\" }, { title: \"Done\" }]} current={$step} onSelect={(i) => $step = i} />", demo: () => import("./navigation-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./navigation-3.demos.gen.ts").then((m) => m.p1) },
+  { folder: "social/story-progress", meta: m76, code: "<StoryProgress count={items.length} index={$i} run={item.id} paused={$hold} onDone={next} />", demo: () => import("./social-6.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-6.demos.gen.ts").then((m) => m.p1) },
+  { folder: "social/story-ring", meta: m77, code: "<StoryRing name={u.name} src={u.avatar} state={u.seen ? \"seen\" : \"new\"} label={u.handle} onClick={() => open(u)} />", demo: () => import("./social-5.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-5.demos.gen.ts").then((m) => m.p2) },
+  { folder: "composite/story-viewer", meta: m78, code: "<StoryViewer open={$open} onClose={() => $open = false} groups={stories} start={tappedId} onSeen={markSeen} onReply={send} />", demo: () => import("./social-6.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-6.demos.gen.ts").then((m) => m.p2) },
+  { folder: "navigation/tabs", meta: m79, code: "<Tabs value={$tab} onChange={(id) => $tab = id} tabs={[\n  { id: \"general\", label: \"General\", content: () => <General /> },\n  { id: \"members\", label: \"Members\", badge: () => $pending, content: () => <Members /> },\n]} />", demo: () => import("./navigation-3.demos.gen.ts").then((m) => m.d2), playground: () => import("./navigation-3.demos.gen.ts").then((m) => m.p2) },
+  { folder: "composite/theme-editor", meta: m80, code: "<ThemeEditor />\n<ThemeEditor bind:value={$draft} base=\"night\" />", demo: () => import("./composite/theme-editor/demo.tsx"), playground: () => import("./composite/theme-editor/playground.ts") },
+  { folder: "composite/theme-menu", meta: m81, code: "<ThemeMenu />\n<ThemeMenu themes={false} accents={[\"primary\", \"brand-orange\", \"brand-blue\"]} />", demo: () => import("./composite/theme-menu/demo.tsx"), playground: () => import("./composite/theme-menu/playground.ts") },
+  { folder: "data/timeline", meta: m82, code: "<Timeline items={[\n  { time: \"Today 09:12\", title: \"Order placed\", body: \"#48210 · 3 items\", tone: \"info\" },\n  { time: paidAt, title: \"Payment received\", tone: \"success\", icon: check },\n]} />", demo: () => import("./data-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./data-3.demos.gen.ts").then((m) => m.p0) },
+  { folder: "overlays/toast", meta: m83, code: "toast(\"File archived\", { kind: \"success\", action: { label: \"Undo\", run: () => restore() } });", demo: () => import("./overlays-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./overlays-2.demos.gen.ts").then((m) => m.p1) },
+  { folder: "overlays/tooltip", meta: m84, code: "<Tooltip text=\"Copy link\" placement=\"top\"><Button icon={link}>Share</Button></Tooltip>", demo: () => import("./buttons-3.demos.gen.ts").then((m) => m.d2), playground: () => import("./buttons-3.demos.gen.ts").then((m) => m.p2) },
+  { folder: "data/tree", meta: m85, code: "<Tree label=\"Files\" nodes={files} expanded={[\"src\"]} selected={() => $file} onSelect={(n) => { $file = n.id }} />", demo: () => import("./data-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./data-3.demos.gen.ts").then((m) => m.p1) },
+  { folder: "composite/tree-editor", meta: m86, code: "<TreeEditor bind:value={$config} schema={schema} />\n<TreeEditor value={data} readonly search={false} expand={1} />", demo: () => import("./editors-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./editors-3.demos.gen.ts").then((m) => m.p1) },
+  { folder: "data/tree-view", meta: m87, code: "import { TreeView } from \"hadi-march/components/data/tree-view\";\n\n<TreeView nodes={files} selection=\"multiple\" draggable search={$q}\n  load={(node) => api.children(node.id)}\n  onSelect={(ids) => $selected = ids}\n  onMove={(ids, target, position) => api.move(ids, target, position)} />", demo: () => import("./data/tree-view/demo.tsx"), playground: () => import("./data/tree-view/playground.ts") },
+  { folder: "social/typing-indicator", meta: m88, code: "<TypingIndicator names={$typing} />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p2) },
+  { folder: "data/virtual-list", meta: m89, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p2) },
+  { folder: "composite/wizard", meta: m90, code: "<Wizard submitLabel=\"Finish\" onSubmit={save} steps={[\n  { title: \"Account\", schema: schema({ email: { type: \"email\", required: true } }) },\n  { title: \"Profile\", schema: schema({ name: { type: \"text\", required: true } }), validate: (v) => (v.name === \"admin\" ? \"Pick another name\" : null) },\n]} />", demo: () => import("./composite/wizard/demo.tsx"), playground: () => import("./composite/wizard/playground.ts") },
 ];

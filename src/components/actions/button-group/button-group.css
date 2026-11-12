@@ -1,0 +1,7 @@
+/* HADI March — ButtonGroup. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+.hm-btn-group { display: inline-flex; flex-wrap: wrap; gap: var(--hm-space-2); }
+.hm-btn-group-attached { gap: 0; }
+.hm-btn-group-attached > .hm-btn { border-radius: 0; }
+.hm-btn-group-attached > .hm-btn:first-child { border-start-start-radius: var(--hm-radius); border-end-start-radius: var(--hm-radius); }
+.hm-btn-group-attached > .hm-btn:last-child { border-start-end-radius: var(--hm-radius); border-end-end-radius: var(--hm-radius); }
+.hm-btn-group-attached > .hm-btn + .hm-btn { margin-inline-start: -1px; }

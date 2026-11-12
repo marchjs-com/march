@@ -1,0 +1,4 @@
+/* HADI March — Tooltip. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+.hm-tip-anchor { display: inline-flex; }
+.hm-tooltip { pointer-events: none; padding: .3rem .5rem; max-width: 18rem; font-size: var(--hm-text-xs); font-weight: 500; background: var(--hm-inverse-bg); color: var(--hm-inverse-text);
+  border: 0; border-radius: var(--hm-radius-1); box-shadow: var(--hm-shadow-2); }

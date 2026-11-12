@@ -4,7 +4,7 @@
 //   or an array (client mode: sorting/filtering/paging in the browser). Built from Table, Form, Dialog and action().
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
-import { query } from "../data/index.ts";
+import { query } from "../data/query.ts";
 import type { Schema } from "../schema/index.ts";
 import type { PermCheck } from "../access/index.ts";
 import { createTable, Table, type TableProps, type ColumnInput, type RowAction, type BulkAction } from "../table/index.ts";

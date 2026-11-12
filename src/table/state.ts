@@ -3,7 +3,7 @@
 import { signal, computed, effect, untrack, batch, onCleanup, createRoot, type Accessor, type Signal } from "../core/reactive.ts";
 import { applyPipe } from "../core/pipes.ts";
 import { t, locale } from "../core/i18n.ts";
-import { query as dataQuery, type QueryOptions } from "../data/index.ts";
+import { query as dataQuery, type QueryOptions } from "../data/query.ts";
 import { setQuery } from "../router/index.ts";
 import type { Schema } from "../schema/index.ts";
 import { fold, prop, valueOf, optionsOf, isEmptyFilter, matchFilter, describeFilter, sortRows, encodeFilter, decodeFilter } from "./filters.ts";

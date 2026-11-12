@@ -3,3 +3,4 @@
 export * from "./dialog/index.ts";
 export * from "./drawer/index.ts";
 export * from "./toast/index.ts";
+export * from "./tooltip/index.ts";

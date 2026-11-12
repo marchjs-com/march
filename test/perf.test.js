@@ -151,8 +151,8 @@ test("barrel imports compile to the defining module; the entry does not load pag
   const { deepImports } = await import("../compiler/deep-imports.js");
   const ui = resolve("src/ui/index.ts");
   const out = deepImports(`import { Card, Badge as B, type CardProps } from "hadi-march/ui";`, { "hadi-march/ui": ui });
-  assert.match(out, /import \{ Card \} from "[^"]*src\/ui\/card\.ts";/);
-  assert.match(out, /import \{ Badge as B \} from "[^"]*src\/ui\/badge\.ts";/);
+  assert.match(out, /import \{ Card \} from "[^"]*src\/components\/data\/card\/index\.ts";/);
+  assert.match(out, /import \{ Badge as B \} from "[^"]*src\/components\/data\/badge\/index\.ts";/);
   assert.match(out, /import \{ type CardProps \} from "hadi-march\/ui";/, "type-only names stay on the barrel");
   const app = await buildApp({
     "main.tsx": `import { render } from "hadi-march"\nimport { Badge, Avatar } from "hadi-march/ui"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx") } })\nrender(() => <div><Badge>1</Badge><Router /></div>, document.body)\nexport const keep = Avatar\n`,

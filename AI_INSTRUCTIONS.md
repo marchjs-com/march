@@ -141,28 +141,13 @@ Overlays never take input; put content after them. `front` only for foreground e
   the entry is over budget, move the listed modules behind `import()`/`lazy()`.
 - Import named exports (`import { Card } from "hadi-march/ui"`), never `import * as` from a March module. Use
   `hadi-march/icons/catalog` for icon galleries.
-- Icons: the HADI March set first (`import { Icon, users } from "hadi-march/icons"`, `<Icon of={users} size="lg" />`).
-  Other open-source sets are optional subpaths with one export per icon: `import { rocket } from
-  "hadi-march/icons/lucide"` (also tabler, heroicons, phosphor, feather, material-symbols, remix, bootstrap,
-  simple-icons). Import single icons. By name: `registerIconPack(lucide)` (`import lucide from
-  "hadi-march/icons/lucide/pack"`), then `<Icon name="lucide:rocket" />` with `Icon` from `hadi-march/icons/packs`, or
-  `icon("lucide:rocket")` in any icon prop; the whole set loads lazily on first use.
-  Never add an icon library as an npm dependency: `march icons add <pack>` converts a set (license kept). Direction
-  icons mirror in RTL by themselves. See docs/icons.md.
 - Leave `<Link>` prefetch on (default hover). Do not prefetch everything by hand.
 - Credit is optional and never required (the licence stays MIT): `<MadeWithMarch />` (`variant` text / badge / small, link constant `MARCH_URL`) or `credit: true` in `march.config.js` (adds `<!-- Built with HADI March -->` to the built `index.html` and prints the one-line console banner in production too, from a separate tiny `credit.js`; off by default). `march dev` prints the banner once per page; `banner: false` turns it off. Production never prints it otherwise and the app bundle never contains it (size effect 0). The link comes from one constant, `MARCH_URL` in `src/brand.js`. Add it to a footer when the user wants it; never add it unasked.
 - Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, fail: true }`); turn on `sw: true` when offline use matters.
 - `chunks: { minSize: 10240, allow: { "chunks/x.js": "reason" } }` (default 10 KB before gzip): no JS/CSS file under it. Small shared code
-  folds into a chunk always loaded with it; a small lazy module becomes a static import of its lazy parent, or joins a
-  group chunk with the entry's other small lazy modules that share the most code (second build pass). Small shared code
-  with no free host goes into shared `common` chunks outside start-up (more than one when one would pass `budget.part`,
-  split by users; one stylesheet each): routes import them, and the router prefetches them when idle after the first page
-  (`prefetchCommon()`, manifest key `march:common`, never with Save-Data). Last step: a shared chunk still under the
-  limit joins the host that costs the fewest bytes and keeps every route (`budget.route`) and part (`budget.part`)
-  within budget — a common chunk, another shared chunk, or a route / lazy part that imports it itself; on the final plan
-  the build retries with other fold orders (`STRATEGIES`, compiler/pack-chunks.js). `chunks.commonRoom` (gzip bytes)
-  keeps page groups that far under `budget.route`. A file still under the limit fails the build; `allow` needs a reason
-  and is not a way around a packing problem. `chunks: false` turns it off.
+  folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
+  parent, or joins a group chunk with the entry's other small lazy modules that share the most code (second build pass).
+  A file still under the limit fails the build; `allow` needs a reason. `chunks: false` turns it off.
 
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.
@@ -347,7 +332,6 @@ timeline({ root }).add(".card", fadeUp, { stagger: 60 }).play();
 pageTransitions({ type: "slide" });           // View Transitions with an engine fallback; back reverses, RTL mirrors
 // per route: { path: "/photos/:id", meta: { transition: "scale" } } ("fade" | "slide" | "scale" | "none" | { type, duration });
 // shared element: the same data-hm-shared="photo-3" on the old and the new page moves between them. Named and modal outlets too.
-// only a part animates: <div data-hm-transition> inside the page (a stage); the layers stay clipped to that box
 ```
 Rules: animate only `transform`/`opacity` (WAAPI or the `style` object); everything honors `prefers-reduced-motion`
 (`reducedMotion()`); never use string styles. fx (`Particles`, `Aurora`, `confetti`) is decorative — keep it off admin
@@ -414,11 +398,6 @@ One interaction, written once, attached to any element; each behavior is its own
   (aria-activedescendant keys for a field with options). Never write your own ArrowUp / ArrowDown option loop.
 - **dropzone** — `dropzone(zone, { onFiles, onOver, accept, paste })`: counted enter / leave, files only, paste;
   `accepts(file, accept)`. Never write dragenter / dragover / drop handlers for files yourself.
-- **swipe** — `swipeable(el, { axis, accept, onMove, onEnd, onTap, holdMs, onHold })` + `rubberBand`, `fling`, `nearest`:
-  axis lock, veto, release velocity, tap / hold, click after a swipe swallowed (Drawer, PullToRefresh, ChatBubble,
-  StoryViewer). Never write your own follow-the-finger pointer loop.
-- **dismiss** — `dismiss(panel, { inside, onDismiss(why), on, escape })`: outside press + Escape (capture phase) for
-  popovers, menus and pickers. Never add document pointerdown / click / Escape listeners for that yourself.
 
 ### 15c. Ready-made animations (all on the engine, each its own export)
 
@@ -511,23 +490,6 @@ value (all outputs), `emit({ port: value })` (chosen outputs) or throws (fails; 
 `<Field label="…">{control}</Field>` (hadi-march/forms, src/forms/field.ts) labels a control without the form engine.
 A heavy feature like this marks `entry` in its meta.ts: it stays out of the ui barrel and its page imports its demo.
 
-## 16c. Themes (hadi-march/theme) and ThemeEditor
-
-A theme is `defineTheme({ id, name, font, display, radius, light, dark, tokens? })`; `themeCss(def)` writes its
-stylesheet at build time and `registerThemes([{ id, name }])` offers it in ThemePicker / ThemeMenu. `tokens` adds
-`--hm-*` tokens for both modes (`{ "text-md": ".9375rem", "space-4": "1.125rem", "radius-3": "14px", "dur": "180ms",
-"border-w": "1.5px" }`); `--hm-border-w` sets the border of buttons, inputs and cards. A theme made at run time has
-`ThemeInfo.load` instead of a stylesheet. To make one, use the ThemeEditor (large: not in the ui barrel):
-```tsx
-import { ThemeEditor, draftFromColor, draftToTheme, draftCss, contrastAudit, registerDraft } from "hadi-march/components/composite/theme-editor"
-<ThemeEditor bind:value={$draft} base="night" storageKey="acme.theme" />  // colors (light + dark), type, shape, motion, export
-const d = draftFromColor("#0e7490", "Acme"); contrastAudit(d.light)          // WCAG pairs with fixes
-fs.writeFileSync("themes/acme.css", draftCss(d))                            // or draftToTheme(d) → themeCss
-registerDraft(d)                                                             // runtime theme in ThemePicker / ThemeMenu
-```
-Preview a draft in one element only: `data-hm-theme` on it plus `draftVars(d, mode)` set with setStyle (never a style
-attribute). Undo / redo, unsaved-change warning and saving come from undoHistory, DirtyState and StorageManager.
-
 ## 17. Managers (hadi-march/managers/*)
 
 One instance each, started on first use, `configureX()` for global options, `disposeX()` to shut down. Import each
@@ -579,14 +541,21 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| CodeView | stable | Read-only code block: line numbers, syntax colours (js/ts/jsx/tsx, css, html, json, sh), wrap toggle and a copy button. | CopyButton |
+| Kbd | stable | Keyboard key: text, or a shortcut string (mod+k) written for the platform (Ctrl+K, ⌘K). | — |
 | OverflowText | stable | Text that scrolls only when it does not fit: hover, focus, always or while visible; bounce, loop or once; RTL-aware fade; Marquee is the endless ticker. | — |
 
 ### Actions — `hadi-march/actions`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Button | stable | Button in five variants and three sizes with icons, loading (locks and spins), router links (href) and block width; ActionButton draws an action() with its guard, confirm and toasts. | — |
+| ButtonGroup | stable | Groups related buttons (role=group with a label), spaced or attached into one segmented strip; RTL keeps the rounded ends outside. | — |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| CopyButton | stable | Copies text to the clipboard: a text or icon-only button that confirms (Copied) for a moment and reports failure with a toast. | — |
+| IconButton | stable | Icon-only button: the label is required and becomes its accessible name and title; sizes and a danger tone. | — |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
+| Menu | stable | Trigger button with a floating menu of items, links and action()s (separators, shortcuts, danger, permissions) and the full menu keyboard model; Dropdown floats any content. | — |
 | OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Menu, Tooltip |
 
 ### Forms — `hadi-march/forms`
@@ -599,9 +568,16 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Badge | stable | Small status label in a tone, a dot badge, or a count badge (hidden at 0, 120 → 99+) with an accessible label. | — |
+| Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | — |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | Chip, Menu, FilterControl, CellEditor |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | — |
+| JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | — |
+| Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | — |
+| KeyValue | stable | Definition list for detail views: label / value rows in 1–4 columns, hints, hidden rows and a placeholder for empty values. | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | Button, IconButton, ButtonGroup, Segmented |
+| Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | — |
+| Tree | stable | Expandable tree (role=tree) with icons, trailing meta, selection and the full keyboard model; long labels scroll with OverflowText. | OverflowText |
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
@@ -626,6 +602,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Dialog | stable | Modal dialog: declarative <Dialog open> or openDialog() / openDrawer() returning a promise, plus confirm, prompt and askReason; focus trap, Escape, stacking. | Portal |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
 | Toast | stable | Short, non-blocking messages: toast(message, { kind, action, timeout }) returns an id; undo actions, up to five stacked, a host mounts itself. | Portal |
+| Tooltip | stable | Short hint on hover (after a delay) and on keyboard focus, positioned by the popover engine and linked with aria-describedby; Esc hides it. | — |
 
 ### Navigation — `hadi-march/navigation`
 

@@ -1,0 +1,9 @@
+/* HADI March — KeyValue. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+.hm-kv { display: grid; gap: var(--hm-space-4) var(--hm-space-5); margin: 0; }
+.hm-kv-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hm-kv-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .hm-kv-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.hm-kv-row { min-width: 0; display: flex; flex-direction: column; gap: .1875rem; }
+.hm-kv dt { color: var(--hm-muted); font-size: var(--hm-text-xs); font-weight: var(--hm-weight-medium); }
+.hm-kv dd { margin: 0; overflow-wrap: break-word; font-size: var(--hm-text-md); font-weight: var(--hm-weight-medium); color: var(--hm-text); font-variant-numeric: tabular-nums; }
+.hm-kv-hint { display: block; margin-top: .125rem; color: var(--hm-muted); font-size: var(--hm-text-xs); font-weight: 400; }
+@media (max-width: 1024px) { .hm-kv-cols-3, .hm-kv-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .hm-kv[class*="hm-kv-cols-"] { grid-template-columns: minmax(0, 1fr); } }
