@@ -46,7 +46,9 @@
     "./managers/consent": "./src/managers/consent/index.ts",
     "./managers/consent/ui": "./src/managers/consent/ui.ts",
     "./managers/command": "./src/managers/command/index.ts",
-    "./managers/command/ui": "./src/managers/command/ui.ts"
+    "./managers/command/ui": "./src/managers/command/ui.ts",
+    "./seo": "./src/seo/index.ts",
+    "./seo/hydrate": "./src/seo/hydrate.ts"
   },
   "bin": {
     "march": "./cli/march.js"

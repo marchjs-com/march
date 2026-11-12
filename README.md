@@ -75,6 +75,7 @@ Runtime names and your `src/components/*` are auto-imported. Without the compile
 | `hadi-march/store` | `subscribe`, `on(store, "users.*.name")`, `persist`, `history`, `readonly`, `snapshot`, `derive` |
 | `hadi-march/i18n` | ICU `format`, `loadLocale`, `dir`, `typed<Catalog>()`; `hadi-march/i18n/tr` Turkish pack |
 | `hadi-march/router` | file routes, `_layout` files, redirects, guards, `beforeLeave`, preload, `setMeta`, typed `Href` |
+| `hadi-march/seo` | route `head`, `useHead`, Open Graph / Twitter, JSON-LD (`ld.*`), prerender + `hydrate`, sitemap/robots, `march seo check` |
 | `hadi-march/data` | `query`, `mutation`, `invalidate`, `fetchJson`; `setAccess`, `can`, `<Can>`, `<Gate>` |
 | `hadi-march/schema` | `schema({...})`, `Infer<>`, validation, coercion, columns |
 | `hadi-march/ui` | Page, AppShell, NavMenu, CommandPalette, Dialog (`confirm`/`prompt`/`askReason`), Toast, Tabs, forms… |

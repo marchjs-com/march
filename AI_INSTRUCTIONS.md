@@ -13,7 +13,7 @@ Read this before writing code with March. It is the contract; when in doubt, pre
 4. **Ownership cleans up.** Listeners, effects, timers registered with `onCleanup`, queries and child components are
    disposed when their branch disappears (`<If>`, `<For>` row removed, route change).
 5. **Control flow is components:** `If/Else`, `For` (keyed), `Switch/Match`, `Try` (errors + async loading), `Await`.
-6. **Modules are separate:** core, router, data (+access), net, errors, schema, ui (+forms), table, charts, channel, testing.
+6. **Modules are separate:** core, router, seo, data (+access), net, errors, schema, ui (+forms), table, charts, channel, testing.
 
 ## 2. Syntax cheat sheet (March JSX, `.jsx` files)
 
@@ -272,11 +272,27 @@ has its own error boundary (message + retry); the levels above stay interactive 
 `navigate(to, { modal: true })` opens the page over the current one in `<Outlet name="modal">{(page, close) => <Dialog open onClose={close}>{page()}</Dialog>}</Outlet>`;
 back closes it, a direct visit or reload shows the full page. Page transitions animate only the outlet that changed. `createRouter({ redirects })`,
 `<Link preload="hover|visible|none">`, `beforeLeave(() => !dirty() || confirm(…))` (links, navigate, back/forward, tab close),
-`setMeta({ title, description })`, `queryParam("tab")` signal. `navigate()` is async.
+`setMeta({ title, description })` (for full head control use `hadi-march/seo`, §14a), `queryParam("tab")` signal. `navigate()` is async.
 Instant navigation: the path (active links, breadcrumb) changes on the click; a page not here in 100 ms is replaced by
 its skeleton (route `skeleton`, else `<Router skeleton>`, else `loading`); after 150 ms a thin top bar (`.hm-nav-bar`)
 and a spinner on the clicked link show. A newer click aborts the older navigation: pass `navigationSignal()` to fetches
 a page starts. Give every app a `<Router skeleton>` shaped like its pages (no layout jump).
+
+## 14a. SEO (hadi-march/seo)
+
+Head tags go through the SEO module, never through `document.title =` or hand-made `<meta>` elements:
+```tsx
+installSeo({ site: "https://shop.example", titleTemplate: "%s · Shop", defaults: { og: { siteName: "Shop" } } }) // once
+createRouter({ routes: { "/about": { load, head: { title: "About", description: "…" } } } })  // or `export const head = (to) => ({…})`
+useHead(() => ({ title: $product.name, og: { image: $product.photo }, jsonLd: ld.product({ name: $product.name, price: $product.price }) }))
+```
+Order: defaults → route head → `useHead` (later wins; a component's head leaves with it). `march.config.js`
+`seo: { site, prerender: true, sitemap: true, robots: true }` writes each param-less route's HTML at build time plus
+`sitemap.xml` / `robots.txt`; then mount with `hydrate(() => <Router />, el)` from `hadi-march/seo/hydrate` instead of
+`render`. Hash routing prerenders only the start page and gets no automatic canonical. Check pages with
+`march seo check` (title, description, canonical, img alt). Every `<img>` needs `alt` (`alt=""` when decorative).
+Under a Trusted Types CSP use `installSeo({ jsonLd: false })` (run-time script text is blocked) and ship JSON-LD at build time.
+Full reference: `docs/seo.md`.
 
 ## 14b. Layers and portals
 
