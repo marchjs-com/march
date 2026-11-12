@@ -20,8 +20,8 @@
 .hm-segment:disabled { opacity: .5; cursor: not-allowed; }
 
 /* slider, color */
-.hm-slider-wrap { display: flex; align-items: center; gap: var(--hm-space-3); }
-.hm-slider { flex: 1; accent-color: var(--hm-accent, var(--hm-primary)); }
+.hm-slider-wrap { display: flex; min-width: 0; align-items: center; gap: var(--hm-space-3); }
+.hm-slider { flex: 1; min-width: 0; accent-color: var(--hm-accent, var(--hm-primary)); }
 .hm-slider-value { min-width: 3ch; text-align: end; font-variant-numeric: tabular-nums; color: var(--hm-muted); }
 .hm-color { display: flex; gap: var(--hm-space-2); align-items: center; }
 .hm-color-swatch { width: var(--hm-control-h); height: var(--hm-control-h); padding: 2px; border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); background: var(--hm-surface); cursor: pointer; }

@@ -6,6 +6,7 @@ const tr: Record<string, string> = {
   "changed": "değişti",
   "Changed": "Değişti",
   "General": "Genel",
+  "No changes": "Değişiklik yok",
   "No properties": "Özellik yok",
   "No property matches “{0}”": "“{0}” ile eşleşen özellik yok",
   "Properties": "Özellikler",

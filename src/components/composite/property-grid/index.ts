@@ -206,8 +206,9 @@ export function PropertyGrid(props: PropertyGridProps): Element {
         btn(() => (nextRedo() ? t`Redo: ${nextRedo()}` : t`Redo`), redoIcon, () => void history.redo(), () => !history.canRedo()))),
     h("div", { class: "hm-pg-body" }, body,
       () => (matches().size ? null : h("p", { class: "hm-pg-empty", role: "status" }, () => (query() ? t`No property matches “${query()}”` : t`No properties`)))),
-    () => (changes().length ? untrack(() => h("div", { class: "hm-pg-foot", role: "status" },
-      h("span", { class: "hm-pg-changes" }, () => t`${changes().length} unsaved changes`),
-      h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", onClick: revert }, t`Revert`),
-      props.onSave && h("button", { type: "button", class: "hm-btn hm-btn-primary hm-btn-sm", onClick: () => void save() }, t`Save`))) : null));
+    // the footer: while something changed, or always when there is a Save (disabled with nothing to save)
+    () => (changes().length || props.onSave ? untrack(() => h("div", { class: () => cx("hm-pg-foot", changes().length > 0 && "is-dirty"), role: "status" },
+      h("span", { class: "hm-pg-changes" }, () => (changes().length ? t`${changes().length} unsaved changes` : t`No changes`)),
+      () => (changes().length ? h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", onClick: revert }, t`Revert`) : null),
+      props.onSave && h("button", { type: "button", class: "hm-btn hm-btn-primary hm-btn-sm", disabled: () => !changes().length, onClick: () => void save() }, t`Save`))) : null));
 }

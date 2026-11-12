@@ -34,7 +34,9 @@
 .hm-pg-reset { opacity: 0; scale: .8; pointer-events: none; }
 .hm-pg-row.is-changed .hm-pg-reset { opacity: 1; scale: 1; pointer-events: auto; }
 .hm-pg-empty { margin: 0; padding: 1.5rem 1rem; color: var(--hm-muted); text-align: center; }
-.hm-pg-foot { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; padding: .5rem .75rem; border-block-start: 1px solid var(--hm-border); background: var(--hm-primary-soft); }
+.hm-pg-foot { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; padding: .5rem .75rem; border-block-start: 1px solid var(--hm-border); background: var(--hm-surface-2); transition: background-color var(--hm-dur) var(--hm-ease); }
+.hm-pg-foot.is-dirty { background: var(--hm-primary-soft); }
+.hm-pg-foot:not(.is-dirty) .hm-pg-changes { color: var(--hm-muted); font-weight: 400; }
 .hm-pg-changes { flex: 1; min-width: 8rem; color: var(--hm-primary-text, var(--hm-text)); font-weight: 500; }
 /* stacked: label above the editor (narrow panels, or layout="stacked") */
 .hm-pg-stacked .hm-pg-row { grid-template-columns: minmax(0, 1fr) 1.75rem; }
