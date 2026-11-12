@@ -7,7 +7,7 @@ import { t } from "../core/i18n.ts";
 import { widgetPoint, Widget, type WidgetContext, type WidgetProvider } from "../widget/index.ts";
 import { CodeView } from "./code-view.ts";
 import { CopyButton } from "./button.ts";
-import { openDialog } from "./dialog.ts";
+import { openDialog } from "../components/overlays/dialog/index.ts";
 
 /** One file of a multi-file example. */
 export interface CodeFile { name: string; source: string; lang?: string }

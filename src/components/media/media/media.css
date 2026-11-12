@@ -1,5 +1,5 @@
 /* HADI March — Media. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-/* Media (src/ui/media.ts) */
+/* Media (index.ts) */
 .hm-media-wrap { display: flex; justify-content: center; }
 .hm-media { display: block; max-width: 100%; max-height: 75vh; height: auto; border-radius: var(--hm-radius-2); }
 .hm-media-audio { width: 100%; }

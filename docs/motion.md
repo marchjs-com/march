@@ -60,7 +60,7 @@ slow motion and reduced motion reach all of it:
 | Engine playbacks (`animate`, `timeline`, springs, tweens, canvas / WebGL) | `src/motion`, `src/fx`, showcase pages | the engine's own clock and WAAPI playbacks |
 | CSS `@keyframes` and transitions (spinners, skeleton shimmer, dialog / drawer / toast entry, nav bar, `transition:` classes, charts) | `src/css/tokens.css`, `src/ui/*.css`, `src/dom/lazy.css`, `src/router/router.css`, showcase CSS | `installCssControl()`: `getAnimations()` adopts each one as it starts (pseudo-elements included) |
 | Raw WAAPI in components (marquee, the OTP cell pop) | `src/components/typography/overflow-text/index.ts`, `src/forms/inputs.ts` | `animateEl()` (engine/native.ts): global speed at start and on change, paused / resumed with the rest |
-| Canvas drawing loops (overlay media) | `src/ui/overlay-media.ts` | `frameLoop()` on the one clock: stops while paused, scaled by the speed |
+| Canvas drawing loops (overlay media) | `src/components/media/overlay/media.ts` | `frameLoop()` on the one clock: stops while paused, scaled by the speed |
 | Page transitions (View Transitions or fallback), named and modal outlets | `src/motion/page.ts` | engine playbacks; the browser's shared-element morph is retimed and adopted |
 | Demo tickers in the showcase | `pages/feedback.tsx` | `onFrame()` instead of `setInterval` |
 

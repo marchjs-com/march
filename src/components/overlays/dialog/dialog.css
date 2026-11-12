@@ -7,7 +7,7 @@ html.hm-scroll-lock { overflow: hidden; }
   border: 1px solid var(--hm-border); border-radius: var(--hm-radius-4); box-shadow: var(--hm-shadow-4); outline: none; animation: hm-scale-in var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-dialog-sm { max-width: 26rem; } .hm-dialog-md { max-width: 36rem; } .hm-dialog-lg { max-width: 56rem; }
 .hm-dialog-full { max-width: none; height: 100%; max-height: none; }
-.hm-dialog-head { display: flex; align-items: center; gap: var(--hm-space-2); padding: var(--hm-space-4) var(--hm-space-4) 0 var(--hm-space-5); min-height: 3.25rem; }
+.hm-dialog-head { display: flex; align-items: center; gap: var(--hm-space-2); padding-block: var(--hm-space-4) 0; padding-inline: var(--hm-space-5) var(--hm-space-4); min-height: 3.25rem; }
 .hm-dialog-title { flex: 1; margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); letter-spacing: var(--hm-tracking-tight); }
 .hm-dialog-x { margin-inline-end: calc(-1 * var(--hm-space-1)); width: 2rem; height: 2rem; }
 .hm-dialog-body { padding: var(--hm-space-4) var(--hm-space-5); overflow: auto; overscroll-behavior: contain; }
@@ -21,9 +21,9 @@ html.hm-scroll-lock { overflow: hidden; }
 .hm-drawer-bottom { width: 100%; height: auto; max-height: 85vh; margin-top: auto; border-radius: var(--hm-radius-4) var(--hm-radius-4) 0 0; animation-name: hm-drawer-in-bottom; }
 .hm-drawer .hm-dialog-body { flex: 1; }
 .hm-drawer .hm-dialog-foot { border-radius: 0; }
-@keyframes hm-drawer-in { from { transform: translateX(100%); } }
-@keyframes hm-drawer-in-left { from { transform: translateX(-100%); } }
-@keyframes hm-drawer-in-bottom { from { transform: translateY(100%); } }
+/* the end edge is on the left in right-to-left layouts */
+.hm-drawer:dir(rtl) { animation-name: hm-drawer-in-left; }
+.hm-drawer-left:dir(rtl) { animation-name: hm-drawer-in; }
 @media (max-width: 640px) {
   .hm-overlay:not(.hm-overlay-drawer) { align-items: flex-end; padding: 0; }
   .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog:not(.hm-dialog-full) { max-width: none; border-radius: var(--hm-radius-4) var(--hm-radius-4) 0 0; max-height: 92vh; animation-name: hm-drawer-in-bottom; }

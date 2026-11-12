@@ -392,7 +392,8 @@
   "validateRecords": "Kayıt listesindeki ilk sorunu döndürür, yoksa null.",
   "Widget": "Bir widget noktası çizer: `<Widget sources={[codeView]} input={{ source, lang: \"tsx\" }} />`.",
   "widgetPoint": "Bir widget noktası oluşturur (veya kimliğiyle getirir). `defaults` her zaman bulunur ve sonraki sağlayıcılarla eşitlikte kaybeder.",
-  "Wizard": "Prop'lar: steps [{ title, description, fields?: [names], schema?: schema(), validate?(values) → {name: msg} | string | null, render?(form) → node }], schema (her adımın kendi şeması varsa isteğe bağlı), initial ve diğerleri."
+  "Wizard": "Prop'lar: steps [{ title, description, fields?: [names], schema?: schema(), validate?(values) → {name: msg} | string | null, render?(form) → node }], schema (her adımın kendi şeması varsa isteğe bağlı), initial ve diğerleri.",
+  "frame": "Kipli bir çerçeve kurar (örtü + panel). Bir sahip içinde çalışmalı; temizlikte çerçeve kaydını siler ve odağı geri verir."
  },
  "hadi-march/components/registry.gen.ts": {
   "registry": "Her bileşen klasörü: meta, Kod sekmesi parçası ve tembel demo / oyun alanı yükleyicileri."

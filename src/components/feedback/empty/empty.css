@@ -1,0 +1,8 @@
+/* HADI March — Empty. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+.hm-empty { display: flex; flex-direction: column; align-items: center; }
+.hm-empty-icon { display: grid; place-items: center; width: 3rem; height: 3rem; margin-bottom: var(--hm-space-4); border-radius: var(--hm-radius-3); font-size: 1.5rem;
+  color: var(--hm-muted); background: var(--hm-surface); border: 1px solid var(--hm-border); box-shadow: var(--hm-shadow-2), var(--hm-highlight); }
+.hm-empty-icon .hm-svg { width: 1.375rem; height: 1.375rem; }
+.hm-empty-title { margin: 0; font-family: var(--hm-font-display); font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); color: var(--hm-text); letter-spacing: var(--hm-tracking-tight); }
+.hm-empty-text { margin-top: var(--hm-space-1); max-width: 28rem; font-size: var(--hm-text-md); line-height: 1.55; }
+.hm-empty-action { margin-top: var(--hm-space-5); display: flex; justify-content: center; flex-wrap: wrap; gap: var(--hm-space-2); }

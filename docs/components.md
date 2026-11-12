@@ -30,6 +30,12 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 | OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Menu, Tooltip |
 
+### Forms — `hadi-march/forms`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Rating | stable | Star rating as a radio group: arrow keys (RTL mirrored), hover preview, half stars when read-only, any colour token. | — |
+
 ### Data display — `hadi-march/data`
 
 | Component | Status | What | Composed of |
@@ -37,21 +43,30 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [Chip](#chip), Menu, FilterControl, CellEditor |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | Button, IconButton, ButtonGroup, Segmented |
-| TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
+| TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | [Spinner](#spinner) |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
 ### Feedback — `hadi-march/feedback`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Alert | stable | A message in one of five tones (info, success, warn, danger, neutral) with an optional title, icon and dismiss button; Notice is an alias. | — |
+| Empty | stable | Empty state: an icon, a title, a line of text and the next step (actions), so an empty screen says what to do. | — |
+| ErrorBox | stable | What went wrong, in words (an Error, a message or any value), with an optional title and a retry button. | — |
+| Loader | stable | A full-area loading state (a large spinner and a line of text), inline or over its container; bootLoader hides the static boot screen. | — |
+| Progress | stable | A progress bar: a value or indeterminate, tones, three sizes, a label with the percentage; brand colours as a gradient, segments or a flowing cycle. | — |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+| Skeleton | stable | Placeholder lines or a block in the shape of the content on its way, so nothing jumps when it arrives; brand or single-colour shimmer. | — |
+| Spinner | stable | A turning ring while something loads: three sizes, one colour or the theme's several (brand), an accessible label. | — |
 
 ### Overlays — `hadi-march/overlays`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | ContextMenu | experimental | Right-click / Shift+F10 menu anchored to the pointer: the same items, actions and keyboard as Menu, chosen per target. | — |
-| Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| Dialog | stable | Modal dialog: declarative <Dialog open> or openDialog() / openDrawer() returning a promise, plus confirm, prompt and askReason; focus trap, Escape, stacking. | Portal |
+| Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, [Dialog](#dialog) |
+| Toast | stable | Short, non-blocking messages: toast(message, { kind, action, timeout }) returns an id; undo actions, up to five stacked, a host mounts itself. | Portal |
 
 ### Navigation — `hadi-march/navigation`
 
@@ -64,6 +79,14 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | [Steps](#steps), Button |
 | Steps | stable | Progress through stages: done, current and upcoming steps with titles and descriptions; clickable when onSelect is given; horizontal or vertical. | — |
 | Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), badges, disabled and hidden tabs, the active tab optionally kept in the URL. | — |
+
+### Media — `hadi-march/media`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Carousel | stable | Scroll-snap carousel: one to four slides per view, previous / next buttons and dots, swipe on touch, one slide on phones. | — |
+| Media | stable | An image, video or audio element that fits its container (kind from the extension), a text fallback when loading fails; openMedia() shows it in a dialog. | [Dialog](#dialog) |
+| Overlay | stable | A decorative layer inside its container: an image, a muted looping video, an SVG, a canvas drawing or a CSS effect (glass, mesh, noise …); never takes input. | — |
 
 ### Motion — `hadi-march/motion`
 
@@ -79,7 +102,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | CountRoll | experimental | Odometer number: only the changed digits roll (up when it grows, down when it shrinks), compact in the active locale. | — |
 | FollowButton | experimental | Follow → Following / Requested with a morph: the pill's width springs, fill turns into outline, + turns into a tick, a four-color burst on follow; red hover before unfollow. | — |
 | LikeButton | experimental | Heart toggle: spring pop, ring and a four-color HADİ particle burst on the motion engine; rolling count; heartBurst() for any element. | [CountRoll](#countroll) |
-| MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton |
+| MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | [Skeleton](#skeleton) |
 | ReactionPicker | experimental | Emoji row (reactions) or grid (emoji panel): pop-in with staggered emoji, picked one on a soft circle, arrow keys (RTL mirrored), optional +. | — |
 | StoryProgress | experimental | Segmented story bars: done, current filling over its duration on the motion engine (pause holds it), onDone when full; RTL fills from the right. | — |
 | StoryRing | experimental | Avatar in a story ring: new (four HADİ colors), seen, close friends, none; + badge, turning ring while loading, label for story trays. | Avatar |
@@ -93,10 +116,10 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, [ReactionPicker](#reactionpicker) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), Avatar |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
-| CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, [OverflowText](#overflowtext) |
-| ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, Dialog, Toggle |
+| CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | [Dialog](#dialog), [OverflowText](#overflowtext) |
+| ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, [Dialog](#dialog), Toggle |
 | DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | [Splitter](#splitter), [Tabs](#tabs), Portal |
-| Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
+| Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), [Skeleton](#skeleton) |
 | FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), IconButton, [OverflowText](#overflowtext), Field, TextInput, NumberInput, Select, Toggle |
 | FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, [Chip](#chip), [OverflowText](#overflowtext) |
 | FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, [OverflowText](#overflowtext) |
@@ -110,11 +133,11 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll](#countroll), Button, Menu |
 | PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | [Disclosure](#disclosure), TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
-| StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
+| StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | [Dialog](#dialog), Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
 | ThemeEditor | experimental | Theme builder: color tokens for light and dark with a WCAG audit, type, shape and motion, a live scoped preview, code / CSS / JSON out. | [ColorPicker](#colorpicker), [EasingCurveEditor](#easingcurveeditor), [Tabs](#tabs), Segmented, Slider, Select, TextInput, Textarea, Toggle, Button, IconButton, CopyButton, Badge, ThemeSwatch, CodeView |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, [OverflowText](#overflowtext) |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
-| Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | [Steps](#steps), Progress |
+| Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | [Steps](#steps), [Progress](#progress) |
 
 ## Accordion
 
@@ -144,6 +167,16 @@ Composed of: Badge, Tooltip
 ```
 
 Full page: src/components/navigation/activity-bar/docs.md
+
+## Alert
+
+A message that stays on the page: a tone (`info`, `success`, `warn`, `danger`, `neutral`), an optional bold title, the tone's icon (or your own) and an optional dismiss button. `Notice` is the same component.
+
+```tsx
+<Alert tone="warn" title="Quota" dismissable onDismiss={() => track("quota")}>90% of the storage is used this month.</Alert>
+```
+
+Full page: src/components/feedback/alert/docs.md
 
 ## AppShell
 
@@ -184,6 +217,16 @@ Composed of: Menu
 ```
 
 Full page: src/components/navigation/breadcrumbs/docs.md
+
+## Carousel
+
+A row of slides that scrolls and snaps: one to four per view on wide screens (a slide and a peek of the next on phones), previous / next buttons that hide at the ends, and a dot per position. Touch users swipe; the track is keyboard scrollable.
+
+```tsx
+<Carousel perView={3} label="Features">{items.map((x) => <FeatureCard {...x} />)}</Carousel>
+```
+
+Full page: src/components/media/carousel/docs.md
 
 ## ChatBubble
 
@@ -250,7 +293,7 @@ Full page: src/components/composite/color-picker/docs.md
 
 Ctrl/⌘+K opens a search over every registered command, every NavMenu page and every action, ranked with typo tolerance. An optional `ask(query)` hook (an intent search the app provides) adds an "Ask" row: it runs on Enter, or by itself when local results are weak. Only a small shell ships with the page; the dialog loads on first open, and hovering or focusing a `PaletteButton` fetches it ahead of time.
 
-Composed of: Dialog, [OverflowText](#overflowtext)
+Composed of: [Dialog](#dialog), [OverflowText](#overflowtext)
 
 ```tsx
 <CommandPalette ask={(q) => api.intent(q)} placeholder="Search pages or actions…" />
@@ -264,7 +307,7 @@ Full page: src/components/composite/command-palette/docs.md
 
 The consent manager's UI. A bottom banner asks until there is a valid decision for the current policy version (Reject all sits next to Accept all, with the same weight); the preferences panel lists every category as a Card with a Toggle (a Dialog on wide screens, a bottom sheet on phones); `ConsentGate` keeps third-party content behind a placeholder that can allow it in place. The module is lazy on purpose: load it with `lazy(() => import("hadi-march/managers/consent/ui"), { pick: "ConsentBanner" })`.
 
-Composed of: Button, Card, Dialog, Toggle
+Composed of: Button, Card, [Dialog](#dialog), Toggle
 
 ```tsx
 <ConsentBanner title="Cookies" text="We use analytics to measure visits." />
@@ -316,6 +359,18 @@ import { DataGrid } from "hadi-march/components/data/data-grid";
 
 Full page: src/components/data/data-grid/docs.md
 
+## Dialog
+
+A modal window over the page. Declarative: `<Dialog open={…} onClose={…}>`; imperative: `openDialog(render)` and `openDrawer(render)` return a promise that resolves with the value passed to `close(value)`. `confirm`, `prompt` and `askReason` are ready-made dialogs; `closeAll()` and `openDialogs()` manage the stack.
+
+Composed of: Portal
+
+```tsx
+<Dialog open={$open} onClose={() => $open = false} title="Invite" footer={<Button variant="primary">Send</Button>}>…</Dialog>
+```
+
+Full page: src/components/overlays/dialog/docs.md
+
 ## Disclosure
 
 A collapsible section built on the native `<details>` / `<summary>` elements, so keyboard and screen reader support come for free and the browser's find-in-page opens it. The summary line has a turning chevron and the body opens with an animation. `open` can be a signal; `onToggle` reports the new state.
@@ -349,7 +404,7 @@ Full page: src/components/composite/dock-layout/docs.md
 
 A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
 
-Composed of: Portal, Dialog
+Composed of: Portal, [Dialog](#dialog)
 
 ```tsx
 <Drawer open={$open} onClose={() => $open = false} side="bottom" snapPoints={[0.4, 0.9]} title="Filters">…</Drawer>
@@ -368,11 +423,31 @@ animate(card, frames, { duration: 600, easing: "acme-pop" })
 
 Full page: src/components/motion/easing-curve-editor/docs.md
 
+## Empty
+
+What a list, table or page shows when it has nothing yet: an icon in a raised tile, a title, a line of text and the next step as buttons. An empty screen that says what to do next.
+
+```tsx
+<Empty icon={inbox} title="No messages yet" action={[<Button variant="primary" icon={plus}>New message</Button>]}>Start a conversation or invite a teammate.</Empty>
+```
+
+Full page: src/components/feedback/empty/docs.md
+
+## ErrorBox
+
+An error shown in place of the content that failed: the message of an `Error` (or any value, as text), an optional title and a "Retry" button.
+
+```tsx
+<ErrorBox title="Could not load" error={err} retry={() => refetch()} />
+```
+
+Full page: src/components/feedback/error-box/docs.md
+
 ## Feed
 
 A social feed. PostCards sit in a VirtualList, so only the posts near the viewport are in the DOM, inside a PullToRefresh (the feed is the scroll area; keyboard users get a Refresh button). The first page shows skeleton posts; reaching the end loads the next page with a skeleton at the bottom (infinite scroll) and an end mark once there is nothing more. New posts waiting above show a "N new posts" pill that merges them and scrolls to the top.
 
-Composed of: [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton
+Composed of: [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), [Skeleton](#skeleton)
 
 ```tsx
 <Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />
@@ -522,6 +597,16 @@ Composed of: [CountRoll](#countroll)
 
 Full page: src/components/social/like-button/docs.md
 
+## Loader
+
+A loading state that fills an area: a large spinner with a line of text under it (or only for screen readers). Inline it takes the place of the content; with `overlay` it covers its positioned container with a translucent scrim. `bootLoader.done()` fades out the static `#hm-boot` screen of `index.html` once the app has rendered.
+
+```tsx
+<Loader text="Preparing dashboards…" />
+```
+
+Full page: src/components/feedback/loader/docs.md
+
 ## MadeWithMarch
 
 An optional credit line: "Developed with HADI March and 💗", with "HADI March" as a link. Using it is a request, not a requirement: the licence stays MIT and nothing here is needed to use March.
@@ -548,11 +633,23 @@ Composed of: [Splitter](#splitter), Toolbar, IconButton, [RichTextEditor](#richt
 
 Full page: src/components/composite/markdown-editor/docs.md
 
+## Media
+
+One element for images, video and audio: it fits its container, guesses the kind from the extension (`kind="auto"`), shows controls for video and audio, and swaps in a text fallback when the file fails to load. `openMedia(url)` shows it in a dialog.
+
+Composed of: [Dialog](#dialog)
+
+```tsx
+<Media src={url} kind="auto" alt="Hills at dusk" poster={thumb} />
+```
+
+Full page: src/components/media/media/docs.md
+
 ## MediaGrid
 
 The photos of a post in one frame: one photo keeps its own shape (between 4:5 and 1.91:1), two sit side by side, three are one large and two stacked, four are a 2×2 grid, and more show "+N" on the last tile. Each tile is a button that opens the photo; a Skeleton shimmers until the image arrives and it then fades in. With `onDoubleTap` a single tap waits 230 ms, so a double tap (like) never also opens the photo.
 
-Composed of: Skeleton
+Composed of: [Skeleton](#skeleton)
 
 ```tsx
 <MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />
@@ -619,6 +716,16 @@ Composed of: Menu, Tooltip
 
 Full page: src/components/actions/overflow-toolbar/docs.md
 
+## Overlay
+
+A decorative layer that lives inside its container: an image, a muted looping video that plays only while visible, an inline SVG, a canvas drawn by a function every frame, or a CSS effect (`glass`, `gradient`, `mesh`, `noise`, `vignette`, `spotlight`, `grid`, `dots`). Layers stack in the order they are added; `front` puts one above the content. They never take pointer input.
+
+```tsx
+<section class="hero"><Overlay src="media/waves.webm" poster="media/waves.jpg" /><Overlay effect="vignette" /><h1>Title</h1></section>
+```
+
+Full page: src/components/media/overlay/docs.md
+
 ## Pagination
 
 Numbered pages with ellipses: the first and last pages, the current page and `siblings` pages on each side stay visible, the rest collapse into a gap. Previous / Next buttons are disabled at the ends. Pages are 1-based.
@@ -653,6 +760,16 @@ Composed of: [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll]
 
 Full page: src/components/composite/profile-header/docs.md
 
+## Progress
+
+A progress bar with a label and the percentage, or an indeterminate one while the amount is unknown. Tones for meaning, three sizes, and several colours laid out as a gradient, equal segments or a flowing cycle (HADİ: the four brand colours by default).
+
+```tsx
+<Progress value={$p} label="Uploading" showValue />
+```
+
+Full page: src/components/feedback/progress/docs.md
+
 ## PropertyGrid
 
 An inspector: property rows in collapsible groups, a search field, and for each property the form control of its type. Every change is an **undo step** in the app's Undo history (typing in one field merges into one step), unsaved changes are registered with **DirtyState** (leave warning, `saveAll()`), and changed rows are marked and can be reset one by one. The footer counts the changes and offers Revert and Save.
@@ -679,6 +796,16 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 ```
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
+
+## Rating
+
+Stars to give or show a score. Editable it is a radio group: click or use the arrow keys (mirrored in right-to-left layouts), Home / End; hovering previews the score in a lighter tone. Read-only it can show half stars (`4.5`).
+
+```tsx
+<Rating bind:value={$stars} />
+```
+
+Full page: src/components/forms/rating/docs.md
 
 ## ReactionPicker
 
@@ -722,6 +849,16 @@ import { Scheduler } from "hadi-march/components/data/scheduler";
 
 Full page: src/components/data/scheduler/docs.md
 
+## Skeleton
+
+Grey (or brand-tinted) shapes standing in for content that is loading: a few text lines or a block of a set height. Drawn in the shape of what comes, the page does not jump when the data arrives.
+
+```tsx
+{() => (loading() ? <Skeleton lines={3} /> : <Profile user={user()} />)}
+```
+
+Full page: src/components/feedback/skeleton/docs.md
+
 ## Spacer
 
 A flexible gap in a row: everything after it moves to the end of the row (the logical end, so it mirrors in RTL). The usual way to put a title on one side of a top bar and its actions on the other.
@@ -731,6 +868,16 @@ A flexible gap in a row: everything after it moves to the end of the row (the lo
 ```
 
 Full page: src/components/layout/spacer/docs.md
+
+## Spinner
+
+A ring that turns while something loads. Three sizes; in a multicolour theme (HADİ) it carries the brand colours, `colors` picks them (a list of colour tokens) or keeps it to one.
+
+```tsx
+<Spinner size="lg" colors="brand" label="Loading users" />
+```
+
+Full page: src/components/feedback/spinner/docs.md
 
 ## Splitter
 
@@ -820,7 +967,7 @@ Full page: src/components/social/story-ring/docs.md
 
 Full-screen stories on a dark stage. StoryProgress bars fill on top; a tap on the start third goes back and anywhere else forward (mirrored in RTL); pressing and holding pauses; a horizontal swipe moves to the next or previous person with a slide; dragging down shrinks the story and closes it past 120 px (or a quick flick). The bottom bar has a reply field (typing pauses) and a LikeButton. The next picture is preloaded. It is a Dialog: focus stays inside, Esc closes and focus returns to the ring that opened it.
 
-Composed of: Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton)
+Composed of: [Dialog](#dialog), Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton)
 
 ```tsx
 <StoryViewer open={$open} onClose={() => $open = false} groups={stories} start={tappedId} onSeen={markSeen} onReply={send} />
@@ -867,6 +1014,18 @@ Composed of: Dropdown, ThemeSwatch, [OverflowText](#overflowtext)
 
 Full page: src/components/composite/theme-menu/docs.md
 
+## Toast
+
+Short messages that do not block: `toast(message, { kind, action, timeout })` shows one at the inline end of the bottom edge and returns its id. An action (Undo) is a button inside it; a failing action shows its own error toast. At most five stay on screen. A `<ToastHost />` is mounted on first use when the app has none.
+
+Composed of: Portal
+
+```tsx
+toast("File archived", { kind: "success", action: { label: "Undo", run: () => restore() } });
+```
+
+Full page: src/components/overlays/toast/docs.md
+
 ## TreeEditor
 
 Edit any JSON value as a tree. Each row shows its key, a **type badge** in a HADİ color (objects and lists Heyecan, numbers Aktivite, text Dostluk, true / false İletişim) that converts the value to another type, and the value: a text or number you edit in place, a switch for true / false, a count for objects and lists. Rows add, duplicate and delete; a search box keeps the matches and their parents; a JSON Schema subset marks invalid rows with their message. Every change is one step of the editor's own undo history.
@@ -884,7 +1043,7 @@ Full page: src/components/composite/tree-editor/docs.md
 
 A tree for large hierarchies. Only the rows in view are in the DOM (shared virtual window), so thousands of open nodes stay smooth. Children can load lazily the first time a folder opens, selection is single or multiple, nodes move by drag and drop (before / after / inside, with edge auto-scroll and auto-open of a folder you hover), and search keeps the path to every hit open and highlights the matching text. For a short static tree, `<Tree>` is enough.
 
-Composed of: Spinner
+Composed of: [Spinner](#spinner)
 
 ```tsx
 import { TreeView } from "hadi-march/components/data/tree-view";
@@ -921,7 +1080,7 @@ Full page: src/components/data/virtual-list/docs.md
 
 One form split into steps. Each step shows and validates its own fields (plus an optional `validate` check) before Next; Back keeps what was typed; Finish submits the whole form. The stage list on top is the Steps component: a later stage can be picked once every stage before it passes.
 
-Composed of: [Steps](#steps), Progress
+Composed of: [Steps](#steps), [Progress](#progress)
 
 ```tsx
 <Wizard submitLabel="Finish" onSubmit={save} steps={[

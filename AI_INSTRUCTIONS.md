@@ -589,6 +589,12 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 | OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Menu, Tooltip |
 
+### Forms — `hadi-march/forms`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Rating | stable | Star rating as a radio group: arrow keys (RTL mirrored), hover preview, half stars when read-only, any colour token. | — |
+
 ### Data display — `hadi-march/data`
 
 | Component | Status | What | Composed of |
@@ -603,14 +609,23 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Alert | stable | A message in one of five tones (info, success, warn, danger, neutral) with an optional title, icon and dismiss button; Notice is an alias. | — |
+| Empty | stable | Empty state: an icon, a title, a line of text and the next step (actions), so an empty screen says what to do. | — |
+| ErrorBox | stable | What went wrong, in words (an Error, a message or any value), with an optional title and a retry button. | — |
+| Loader | stable | A full-area loading state (a large spinner and a line of text), inline or over its container; bootLoader hides the static boot screen. | — |
+| Progress | stable | A progress bar: a value or indeterminate, tones, three sizes, a label with the percentage; brand colours as a gradient, segments or a flowing cycle. | — |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+| Skeleton | stable | Placeholder lines or a block in the shape of the content on its way, so nothing jumps when it arrives; brand or single-colour shimmer. | — |
+| Spinner | stable | A turning ring while something loads: three sizes, one colour or the theme's several (brand), an accessible label. | — |
 
 ### Overlays — `hadi-march/overlays`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | ContextMenu | experimental | Right-click / Shift+F10 menu anchored to the pointer: the same items, actions and keyboard as Menu, chosen per target. | — |
+| Dialog | stable | Modal dialog: declarative <Dialog open> or openDialog() / openDrawer() returning a promise, plus confirm, prompt and askReason; focus trap, Escape, stacking. | Portal |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| Toast | stable | Short, non-blocking messages: toast(message, { kind, action, timeout }) returns an id; undo actions, up to five stacked, a host mounts itself. | Portal |
 
 ### Navigation — `hadi-march/navigation`
 
@@ -623,6 +638,14 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
 | Steps | stable | Progress through stages: done, current and upcoming steps with titles and descriptions; clickable when onSelect is given; horizontal or vertical. | — |
 | Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), badges, disabled and hidden tabs, the active tab optionally kept in the URL. | — |
+
+### Media — `hadi-march/media`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Carousel | stable | Scroll-snap carousel: one to four slides per view, previous / next buttons and dots, swipe on touch, one slide on phones. | — |
+| Media | stable | An image, video or audio element that fits its container (kind from the extension), a text fallback when loading fails; openMedia() shows it in a dialog. | Dialog |
+| Overlay | stable | A decorative layer inside its container: an image, a muted looping video, an SVG, a canvas drawing or a CSS effect (glass, mesh, noise …); never takes input. | — |
 
 ### Motion — `hadi-march/motion`
 

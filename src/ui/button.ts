@@ -7,7 +7,7 @@ import type { Href } from "../router/index.ts";
 import { routerLink } from "../dom/link.ts";
 import { can, type PermCheck } from "../access/index.ts";
 import { isAction, type Action } from "./action.ts";
-import { toast } from "./toast.ts";
+import { toast } from "../components/overlays/toast/index.ts";
 import { floating, type Placement } from "./popover.ts";
 import { roving } from "./focus.ts";
 import { formatKey } from "./keys.ts";

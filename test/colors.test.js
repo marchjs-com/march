@@ -119,7 +119,7 @@ test("CodeInput: length 3–12, pattern, groups, brand colors per box, paste tri
 });
 
 test("Rating follows the accent (gold on request); multicolor components are marked", () => {
-  const css = read("ui/rating.css");
+  const css = read("components/forms/rating/rating.css");
   assert.match(css, /\.hm-rating-on \{ color: var\(--hm-accent, var\(--hm-primary\)\);/);
   assert.match(css, /\.hm-rating\.is-hovering \.hm-rating-on \{ color: color-mix\(/, "hover preview in a lighter tone");
   assert.ok(COLOR_TOKENS.includes("gold"));
