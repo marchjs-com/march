@@ -5,7 +5,9 @@
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | ColorPicker, Segmented, IconButton |
 | JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | TreeEditor |
 | MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, RichTextEditor |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
@@ -34,6 +36,17 @@ A label pill. Three uses: a static label, a **filter** you can switch on and off
 
 Full page: src/components/chip/docs.md
 
+## ColorPicker
+
+An advanced color picker: a saturation / brightness area, hue and alpha sliders, an eyedropper (where the browser has one), an old / new preview (click the old half to go back), the value as hex, rgb() or hsl() text (any CSS color can be typed or pasted), WCAG contrast on white and black, and palettes: the four HADİ colors, the theme's palette and the recent picks. Theme colors are read from the tokens at the moment they are picked, so they follow the active theme.
+
+```tsx
+<ColorPicker bind:value={$color} />
+<ColorPicker value={brand} format="hsl" alpha={false} palettes={[{ label: "Acme", colors: ["#0b5", "brand-blue"] }]} />
+```
+
+Full page: src/components/composite/color-picker/docs.md
+
 ## Drawer
 
 A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
@@ -43,6 +56,17 @@ A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left 
 ```
 
 Full page: src/components/overlays/drawer/docs.md
+
+## GradientEditor
+
+Build a CSS gradient by hand. Pick the type (linear, radial, conic), turn the angle dial or press a quick angle, click the stop bar to add a color stop (its color is the gradient's color at that point), drag stops to move them, drag one down (or press Delete) to remove it, and edit the selected stop's color with a full ColorPicker. Presets start from the HADİ colors and the theme palette; the CSS is ready to copy.
+
+```tsx
+<GradientEditor bind:value={$background} />
+<GradientEditor value="radial-gradient(circle, #ffd27a 0%, #f2801f 100%)" types={["radial"]} presets={false} />
+```
+
+Full page: src/components/composite/gradient-editor/docs.md
 
 ## JsonEditor
 

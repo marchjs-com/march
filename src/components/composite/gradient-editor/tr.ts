@@ -1,0 +1,26 @@
+// Turkish texts of GradientEditor. English source → Turkish.
+const tr: Record<string, string> = {
+  "Gradient editor": "Gradyan düzenleyici",
+  "Gradient preview: {0}": "Gradyan önizlemesi: {0}",
+  "Gradient type": "Gradyan türü",
+  "Linear": "Doğrusal",
+  "Radial": "Dairesel",
+  "Conic": "Konik",
+  "Angle": "Açı",
+  "{0} degrees": "{0} derece",
+  "Quick angles": "Hazır açılar",
+  "Color stops": "Renk durakları",
+  "Stop {0}: {1}": "Durak {0}: {1}",
+  "Stop {0}": "Durak {0}",
+  "Position": "Konum",
+  "Click the bar to add a stop; drag a stop down or press Delete to remove it.": "Durak eklemek için çubuğa tıklayın; silmek için durağı aşağı sürükleyin ya da Delete'e basın.",
+  "Presets": "Hazır gradyanlar",
+  "Preset: {0}": "Hazır: {0}",
+  "HADİ": "HADİ",
+  "Excitement": "Heyecan",
+  "Activity": "Aktivite",
+  "Theme palette": "Tema paleti",
+  "Copy CSS": "CSS'i kopyala",
+  "Copied": "Kopyalandı",
+};
+export default tr;

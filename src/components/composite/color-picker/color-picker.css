@@ -1,0 +1,66 @@
+/* HADI March — ColorPicker. Imported by its component module; tokens.css provides the variables.
+   The saturation / brightness area and the hue track are color math, not theme colors: they need pure white, black and
+   the full hue circle (keywords and hsl() below), whatever the theme. */
+.hm-cp { --hm-cp-accent: var(--hm-accent, var(--hm-primary)); --hm-cp-check: var(--hm-surface-3);
+  display: flex; flex-direction: column; gap: var(--hm-space-3); inline-size: min(100%, 20rem); padding: var(--hm-space-3);
+  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
+.hm-cp.is-disabled { opacity: .6; }
+
+/* the 2D area: hue underneath, white to the side, black down */
+.hm-cp-area { position: relative; aspect-ratio: 4 / 3; border-radius: var(--hm-radius-2); cursor: crosshair; touch-action: none;
+  background: linear-gradient(to top, black, transparent), linear-gradient(to var(--hm-cp-end, right), white, transparent), var(--hm-cp-hue, hsl(24 100% 50%));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 10%, transparent); }
+:dir(rtl) .hm-cp-area { --hm-cp-end: left; }
+.hm-cp-thumb { position: absolute; inline-size: 1.125rem; block-size: 1.125rem; border-radius: 50%; translate: -50% -50%; outline: none;
+  border: 3px solid var(--hm-surface); background: var(--hm-cp-solid); box-shadow: 0 0 0 1px color-mix(in srgb, var(--hm-text) 25%, transparent), var(--hm-shadow-2);
+  transition: scale var(--hm-dur-fast) var(--hm-ease-spring), box-shadow var(--hm-dur-fast) var(--hm-ease); }
+:dir(rtl) .hm-cp-thumb { translate: 50% -50%; }
+.hm-cp-thumb:hover { scale: 1.12; }
+.hm-cp-thumb:focus-visible { scale: 1.18; box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-focus), var(--hm-shadow-2); }
+.hm-cp-area-thumb { inset-inline-start: var(--hm-cp-x, 87%); inset-block-start: var(--hm-cp-y, 5%); }
+
+/* hue and alpha tracks */
+.hm-cp-row { display: flex; align-items: center; gap: var(--hm-space-3); min-width: 0; }
+.hm-cp-sliders { display: flex; flex-direction: column; gap: var(--hm-space-2); flex: 1; min-width: 0; }
+.hm-cp-track { position: relative; block-size: .75rem; border-radius: var(--hm-radius-full); cursor: pointer; touch-action: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 10%, transparent); }
+.hm-cp-hue { background: linear-gradient(to var(--hm-cp-end, right), hsl(0 100% 50%), hsl(60 100% 50%), hsl(120 100% 50%), hsl(180 100% 50%), hsl(240 100% 50%), hsl(300 100% 50%), hsl(360 100% 50%)); }
+:dir(rtl) .hm-cp-hue, :dir(rtl) .hm-cp-alpha { --hm-cp-end: left; }
+.hm-cp-alpha { background: linear-gradient(to var(--hm-cp-end, right), transparent, var(--hm-cp-solid)), repeating-conic-gradient(var(--hm-cp-check) 0 25%, var(--hm-surface) 0 50%) 0 0 / .5rem .5rem; }
+.hm-cp-track-thumb { inset-block-start: 50%; block-size: 1rem; inline-size: 1rem; }
+.hm-cp-hue .hm-cp-track-thumb { inset-inline-start: var(--hm-cp-h, 6%); background: var(--hm-cp-hue); }
+.hm-cp-alpha .hm-cp-track-thumb { inset-inline-start: var(--hm-cp-a, 100%); background: var(--hm-cp-color); }
+
+/* old / new preview: two halves of a circle over a checkerboard; the old half restores the starting color */
+.hm-cp-preview { position: relative; flex: none; display: grid; grid-template-columns: 1fr 1fr; inline-size: 2.75rem; block-size: 2.75rem; overflow: hidden; border-radius: 50%;
+  background: repeating-conic-gradient(var(--hm-cp-check) 0 25%, var(--hm-surface) 0 50%) 0 0 / .5rem .5rem; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 12%, transparent); }
+.hm-cp-preview-old { border: 0; padding: 0; background: var(--hm-cp-old, var(--hm-cp-color)); cursor: pointer; }
+.hm-cp-preview-new { background: var(--hm-cp-color); transition: background-color var(--hm-dur-fast) var(--hm-ease); }
+.hm-cp-dropper { flex: none; }
+
+/* text and formats */
+.hm-cp-input-row { gap: var(--hm-space-2); }
+.hm-cp-formats { flex: none; }
+.hm-cp-text { flex: 1; min-width: 0; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); }
+
+/* contrast */
+.hm-cp-contrasts { display: flex; flex-wrap: wrap; gap: var(--hm-space-2); }
+.hm-cp-contrast { display: inline-flex; align-items: center; gap: .375rem; padding: .125rem .5rem .125rem .1875rem; border-radius: var(--hm-radius-full);
+  background: var(--hm-surface-2); color: var(--hm-text-2); font-size: var(--hm-text-xs); font-variant-numeric: tabular-nums; }
+.hm-cp-contrast b { font-weight: var(--hm-weight-bold); }
+.hm-cp-contrast.is-pass b { color: var(--hm-success-text, var(--hm-success)); }
+.hm-cp-contrast.is-large b { color: var(--hm-warn-text, var(--hm-warn)); }
+.hm-cp-contrast.is-fail b { color: var(--hm-danger-text, var(--hm-danger)); }
+.hm-cp-contrast-chip { display: inline-grid; place-items: center; inline-size: 1.375rem; block-size: 1.375rem; border-radius: 50%; color: var(--hm-cp-solid); font-weight: 800; font-size: .6875rem; }
+.hm-cp-contrast-chip.is-light { background: white; box-shadow: inset 0 0 0 1px color-mix(in srgb, black 12%, transparent); }
+.hm-cp-contrast-chip.is-dark { background: black; }
+
+/* palettes */
+.hm-cp-palette { display: flex; flex-direction: column; gap: var(--hm-space-1); }
+.hm-cp-palette-label { color: var(--hm-faint); font-size: var(--hm-text-xs); font-weight: var(--hm-weight-semibold); letter-spacing: var(--hm-tracking-caps); text-transform: uppercase; }
+.hm-cp-swatches { display: flex; flex-wrap: wrap; gap: .375rem; }
+.hm-cp-swatch { position: relative; inline-size: 1.75rem; block-size: 1.75rem; padding: 0; border: 0; border-radius: var(--hm-radius-2); cursor: pointer;
+  background: var(--hm-cp-sw, var(--hm-accent)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 12%, transparent);
+  transition: transform var(--hm-dur-fast) var(--hm-ease-spring), box-shadow var(--hm-dur-fast) var(--hm-ease); }
+.hm-cp-swatch:hover:not(:disabled) { transform: translateY(-2px) scale(1.08); }
+.hm-cp-swatch:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-focus); }
+.hm-cp-swatch.is-selected { box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-cp-sw, var(--hm-accent)); transform: scale(1.04); }
