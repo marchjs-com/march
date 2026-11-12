@@ -19,3 +19,6 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run size
+      - name: every showcase menu page opens (headless Chrome)
+        if: matrix.node == 22
+        run: node examples/showcase/build.mjs && node tools/menu-audit.mjs
