@@ -33,3 +33,22 @@ change; `di` is `dx` along the writing direction (positive toward the inline end
 
 `hadi-march/motion`'s `pointerDrag` is the same function (re-exported). Gesture effects (`drag`, `swipe`, `tilt` in
 `hadi-march/motion`) are animations of an element following the pointer; they stay in the motion module.
+
+## roving-focus — `hadi-march/behaviors/roving-focus`
+
+Roving tabindex: a toolbar, list or grid is one Tab stop; arrow keys, Home and End move inside it, and ArrowLeft /
+ArrowRight swap in a right-to-left container. `focus.roving()` and `focus:roving` of the FocusManager are this behavior.
+
+```ts
+import { rovingFocus } from "hadi-march/behaviors/roving-focus";
+const stop = rovingFocus(toolbar, { orientation: "horizontal", onMove: (el) => select(el.dataset.id) });
+```
+
+| Option | | |
+|---|---|---|
+| `orientation` | `"vertical"` (default), `"horizontal"`, `"both"` | which arrows move |
+| `wrap` | boolean (true) | past the last item comes the first |
+| `selector` | CSS selector | the items (default: focusables, `[tabindex]`, `[data-roving]`); disabled and hidden ones are skipped |
+| `onMove(el)` | | the newly active item |
+
+The focus trap stays in the FocusManager: traps stack app-wide (only the newest is active), which needs one owner.

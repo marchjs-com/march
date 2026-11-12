@@ -387,6 +387,8 @@ One interaction, written once, attached to any element; each behavior is its own
   a click), pointer capture, Escape cancels, edge auto-scroll on the motion clock, `p.di` along the writing direction
   (RTL mirrored). As an action: `<div use:draggable={[draggable, opts]}>`. NEVER write your own pointermove /
   pointerup / setPointerCapture loop in a component.
+- **roving-focus** — `rovingFocus(container, { orientation, wrap, selector, onMove })`: one Tab stop, arrows / Home / End
+  inside (RTL swaps left and right); the FocusManager's focus.roving() is this. Never hand-roll arrow-key focus moves.
 
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 
