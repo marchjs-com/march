@@ -19,7 +19,7 @@ export default function VirtualListDemo(props: { values: { count: number; height
   const rows = () => Array.from({ length: props.values.count }, (_, i) => ({ id: i, title: `${WORDS[i % WORDS.length]} buluşması #${i + 1}`, long: props.values.heights === "mixed" && i % 3 === 1 }))
   return <div class="sc-social-vlist-wrap">
     <p class="sc-strip-label" aria-live="off">{() => `${props.values.count.toLocaleString("tr-TR")} satır · DOM'da ${$inDom}`}</p>
-    <div class="sc-social-vlist" ref={(x: HTMLElement) => { box = x }}>
+    <div class="sc-social-vlist" ref={(x: Element) => { box = x as HTMLElement }}>
       {() => <VirtualList items={rows()} key={(r) => r.id} estimate={56} gap={props.values.gap} overscan={props.values.overscan} label="Buluşmalar"
         render={(r) => <div class={() => `sc-social-vrow sc-social-vrow-c${(r().id % 4) + 1}`}><b>{() => r().title}</b>{() => (r().long ? <span>{LONG}</span> : null)}</div>} />}
     </div>

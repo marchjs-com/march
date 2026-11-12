@@ -14,9 +14,9 @@ export default function LikeButtonDemo(props: { values: { size: string; burst: b
     {() => <LikeButton liked={() => $liked} count={props.values.count ? () => $likes : undefined} size={props.values.size as "md"}
       burst={props.values.burst} colors={props.values.colors as "brand"} color={props.values.color as ColorToken}
       onToggle={(on) => { $liked = on; $likes = $likes + (on ? 1 : -1) }} />}
-    <button type="button" class="sc-social-burst-tile" ref={(x: HTMLElement) => { tile = x }}
+    <button type="button" class="sc-social-burst-tile" ref={(x: Element) => { tile = x as HTMLElement }}
       onClick={() => { heartPop(mark, true); if (props.values.burst) heartBurst(tile, { radius: 46, count: 14, colors: props.values.colors as "brand" }) }}>
-      <span class="sc-social-burst-mark" aria-hidden="true" ref={(x: HTMLElement) => { mark = x }}>♥</span>
+      <span class="sc-social-burst-mark" aria-hidden="true" ref={(x: Element) => { mark = x as HTMLElement }}>♥</span>
       <code>heartBurst()</code>
     </button>
   </div>
