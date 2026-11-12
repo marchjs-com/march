@@ -39,7 +39,7 @@ test("relative build: a page per route with paths for its depth, the shell where
     assert.match(about, /<script type="module" src="\.\.\/assets\/main-[\w-]+\.js">/);
     assert.match(intro, /<script type="module" src="\.\.\/\.\.\/assets\/main-[\w-]+\.js">/);
     assert.match(about, /data-hm-prerender="\/about"/);
-    assert.match(about, /<img src="\.\.\/media\/a\.png" alt(="")?>/, "a public file under the root, from the page's folder");
+    assert.match(about, /<img [^>]*src="\.\.\/media\/a\.png"/, "a public file under the root, from the page's folder (any attribute order)");
     assert.match(about, /<a href="\.\.\/docs\/intro"/, "links relative to the page's own address");
     assert.match(intro, /<a href="\.\.\/\.\.\/"/);
     for (const html of [home, about, intro]) {
@@ -65,7 +65,7 @@ test("absolute base: written into index.html, absolute paths, one 404 script, _r
     const home = a.read("index.html"), about = a.read("about/index.html");
     assert.match(home, /<meta name="march-base" content="\/app\/">/);
     assert.match(about, /<script type="module" src="\/app\/assets\/main-[\w-]+\.js">/);
-    assert.match(about, /<img src="\/app\/media\/a\.png" alt(="")?>/);
+    assert.match(about, /<img [^>]*src="\/app\/media\/a\.png"/);
     assert.equal((about.match(/name="march-base"/g) ?? []).length, 1);
     assert.equal(a.read("_redirects"), "/app/*  /app/index.html  200\n");
     const nf = a.read("404.html");

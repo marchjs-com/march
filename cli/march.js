@@ -53,9 +53,10 @@ async function loadConfig() {
   return cfg;
 }
 
+let esbuildLoaded = null;
 async function loadEsbuild() {
   for (const base of [join(cwd, "package.json"), join(MARCH_ROOT, "package.json")]) {
-    try { const req = createRequire(base); return await import(pathToFileURL(req.resolve("esbuild")).href).then((m) => m.default ?? m); } catch { /* next */ }
+    try { const req = createRequire(base); return (esbuildLoaded = await import(pathToFileURL(req.resolve("esbuild")).href).then((m) => m.default ?? m)); } catch { /* next */ }
   }
   fail("esbuild is required: npm i -D esbuild (it is March's only build dependency).");
 }
@@ -545,3 +546,10 @@ if (!run) {
   process.exit(cmd ? 1 : 0);
 }
 await run();
+// one-shot commands end here: stop esbuild's service and leave, so no handle (the esbuild child, a prerender server, a
+// timer) keeps the process open after the work is done. `dev` and `build --watch` keep running.
+if (cmd !== "dev" && !(cmd === "build" && flag("--watch") === true)) {
+  // only when a command loaded it (loadEsbuild would fail a command that never needed esbuild)
+  if (esbuildLoaded) esbuildLoaded.stop?.();
+  process.exit(process.exitCode ?? 0);
+}
