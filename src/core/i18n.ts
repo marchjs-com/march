@@ -10,13 +10,15 @@ import { signal, computed, untrack } from "./reactive.ts";
 type Dict = Record<string, string>;
 interface Sig<T> { (): T; peek(): T; set(v: T): T }
 
-const dicts = new Map<string, Dict>();
+// dicts, missingKeys and fallback are shared with core/i18n-tools.ts (missing, unused, setFallbackLocale live there, so an
+// app that never calls them does not carry them in its start-up chunk); not part of the package API.
+export const dicts = new Map<string, Dict>();
 const loaders = new Map<string, () => Promise<{ default: Dict } | Dict>>();
-const missingKeys = new Map<string, Set<string>>();
+export const missingKeys = new Map<string, Set<string>>();
 const version = signal(0) as unknown as Sig<number>;
+export const fallback = { loc: "en" };
 /** The active locale as a signal ("tr", "en" …); change it with setLocale(). */
 export const locale = signal(globalThis.navigator?.language?.slice(0, 2) ?? "en", { name: "locale" }) as unknown as Sig<string>;
-let fallbackLocale = "en";
 
 const RTL = new Set(["ar", "he", "fa", "ur", "ps", "yi", "dv", "ku", "sd", "ug"]);
 /** Text direction of the active locale (signal). */
@@ -44,8 +46,6 @@ export async function setLocale(loc: string): Promise<void> {
     html?.setAttribute("dir", untrack(dir));
   } catch { /* no DOM */ }
 }
-/** Locale whose messages are used when a key is missing in the active one (default "en"). */
-export function setFallbackLocale(loc: string): void { fallbackLocale = loc; }
 
 function lookup(key: string): string {
   const loc = locale();
@@ -60,7 +60,7 @@ function lookup(key: string): string {
   const base = loc.split("-")[0] ?? loc;
   const b = base !== loc ? dicts.get(base) : undefined;
   if (b && key in b) return b[key] as string;
-  const f = dicts.get(fallbackLocale);
+  const f = dicts.get(fallback.loc);
   return f && key in f ? (f[key] as string) : key;
 }
 
@@ -148,13 +148,6 @@ export function t(strings: TemplateStringsArray | string, ...vals: unknown[]): s
 /** Key a tagged template produces (compiler and tests). */
 export const tKey = (strings: readonly string[]): string => strings.reduce((acc, s, i) => acc + s + (i < strings.length - 1 ? `{${i}}` : ""), "");
 
-/** Keys looked up but missing, per locale. */
-export const missing = (): Record<string, string[]> => untrack(() => Object.fromEntries([...missingKeys].map(([l, s]) => [l, [...s]])));
-/** Keys present in `loc` that no code looked up during this session (stale translations). */
-export function unused(loc: string, used: Iterable<string>): string[] {
-  const u = new Set(used);
-  return Object.keys(dicts.get(loc) ?? {}).filter((k) => !u.has(k));
-}
 
 // ------------------------------------------------------------------ typed catalogs
 type Trim<S extends string> = S extends ` ${infer R}` ? Trim<R> : S extends `${infer R} ` ? Trim<R> : S;
