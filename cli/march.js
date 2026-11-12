@@ -330,6 +330,14 @@ async function buildDev({ watch: watching = false } = {}) {
       if (cfg.budget && flag("--no-budget") !== true && (first || flag("--budget") === true)) {
         const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));
         if (rep.over.length) console.warn(`[33m![0m over budget (dev build, unplanned chunks — the release build decides): ${rep.over.length} row(s); first: ${overText(rep.over[0])}`);
+        // --analyze: the whole table and the entry's largest modules (relative before/after checks without a release build)
+        // (--analyze /data: that route's modules instead of the entry's)
+        const an = flag("--analyze");
+        if (an) {
+          printReport(rep);
+          const row = typeof an === "string" ? rep.rows.find((x) => x.name === an) : rep.rows[0];
+          if (row) for (const t of topInputs(r.metafile, cwd, out, row.files, 40)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`);
+        }
       }
       const bytes = Object.values(r.metafile.outputs).reduce((s, o) => s + o.bytes, 0);
       console.log(`[32m✔[0m ${first ? "built" : "rebuilt"} ${relative(cwd, out)} (dev) in ${Math.round(performance.now() - started)} ms (${Object.keys(r.metafile.outputs).length} files, ${(bytes / 1024).toFixed(1)} KB)`);

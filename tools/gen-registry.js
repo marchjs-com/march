@@ -127,6 +127,29 @@ export async function generate(root = ROOT) {
     (list.some((c) => c.meta?.entry) ? `const ownPage = (name: string): Promise<never> => Promise.reject(new Error(\`\${name} has its own entry: its page imports the demo\`));\n` : "") +
     `/** Every component folder: meta, Code-tab snippet and lazy demo / playground loaders. */\nexport const registry: readonly RegistryEntry[] = [\n` +
     list.map((c, i) => `  { folder: "${c.folder}", meta: m${i}, code: ${JSON.stringify(firstCode(c.docs))}, demo: ${loader(c, "d", "demo.tsx")}, playground: ${loader(c, "p", "playground.ts")} },\n`).join("") + `];\n`;
+  // the showcase card's catalogue: only what a card draws (name, summary, parts, the page of each part, the Code tab) and
+  // the lazy loaders. No meta.ts imports: every page with a component card loads this file, the full metas weigh ~40 KB
+  // (minified) that no card reads
+  // The Code-tab snippets are their own lazy module (cards-code.gen.ts), loaded on the first click on a Code tab. A grouped
+  // demo module is one loader shared by its cards (L(group, index)); a folder of its own keeps its two imports.
+  const groups = [...new Set([...groupOf.values()].map((g) => g.file))];
+  const pick = (c) => ({ f: c.folder, n: nameOf(c), s: c.meta?.summary ?? "", ...(c.meta?.composedOf?.length ? { p: c.meta.composedOf } : {}), ...(c.meta?.showcase ? { w: c.meta.showcase } : {}) });
+  const load = (c) => {
+    if (c.meta?.entry) return `...E`;
+    const g = groupOf.get(c.folder);
+    return g ? `...L(${groups.indexOf(g.file)}, ${g.j})` : `demo: () => import("./${c.folder}/demo.tsx"), playground: () => import("./${c.folder}/playground.ts")`;
+  };
+  files["src/components/cards.gen.ts"] = HEAD + `import type { PlaygroundSpec } from "./meta.ts";\n` +
+    `\n/** f: folder, n: name, s: summary, p: composedOf, w: showcase page (the Code tab: cardCode(folder)). */\n` +
+    `export interface CardEntry { f: string; n: string; s: string; p?: readonly string[]; w?: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }\n` +
+    `type Mod = Record<string, { default: never }>;\nconst G: (() => Promise<Mod>)[] = [${groups.map((f) => `() => import("./${f}") as Promise<never>`).join(", ")}];\n` +
+    `const L = (i: number, j: number) => ({ demo: () => G[i]!().then((m) => m[\`d\${j}\`]!), playground: () => G[i]!().then((m) => m[\`p\${j}\`]!) });\n` +
+    (list.some((c) => c.meta?.entry) ? `const own = (): Promise<never> => Promise.reject(new Error("this component has its own entry: its page imports the demo"));\nconst E = { demo: own, playground: own };\n` : "") +
+    `/** Every component folder as a showcase card needs it (registry.gen.ts has the full meta). */\nexport const cards: readonly CardEntry[] = [\n` +
+    list.map((c) => `  { ${JSON.stringify(pick(c)).slice(1, -1)}, ${load(c)} },\n`).join("") + `];\n` +
+    `/** The Code-tab snippet of a folder (one lazy module for every card). */\nexport const cardCode = (folder: string): Promise<string> => import("./cards-code.gen.ts").then((m) => m.code[folder] ?? "");\n`;
+  files["src/components/cards-code.gen.ts"] = HEAD + `export const code: Record<string, string> = {\n` +
+    list.map((c) => `  ${JSON.stringify(c.folder)}: ${JSON.stringify(firstCode(c.docs))},\n`).join("") + `};\n`;
 
   // catalogue by category (menu order), "composed of" links to the parts
   const byName = new Map(list.map((c) => [nameOf(c), c]));
