@@ -37,7 +37,7 @@ a.hm-hero-eyebrow:hover .hm-hero-eyebrow-arrow { transform: translateX(3px); }
 .hm-hero-v-aurora .hm-aurora { opacity: .5; }
 
 /* product frame: browser-like chrome, glass edge, perspective tilt from JS */
-.hm-hero-product { position: relative; width: 100%; max-width: 64rem; margin-inline: auto; perspective: 1400px; }
+.hm-hero-product { position: relative; width: 100%; max-width: 64rem; margin-inline: auto; perspective: 1400px; overflow: clip; overflow-clip-margin: 3rem; }
 .hm-hero-product::before { content: ""; position: absolute; inset: 10% 6% -6%; z-index: -1; border-radius: 50%; filter: blur(60px); opacity: .45; background: var(--hm-brand-gradient); }
 .hm-hero-frame { position: relative; border-radius: var(--hm-radius-4); overflow: hidden; background: var(--hm-surface); border: 1px solid var(--hm-border); box-shadow: var(--hm-shadow-4);
   transform-origin: 50% 0; will-change: transform; }
