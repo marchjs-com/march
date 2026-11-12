@@ -63,6 +63,8 @@ export { Carousel } from "./carousel.ts";
 export { Tree } from "./tree.ts";
 export { Kanban } from "./kanban.ts";
 export { Splitter } from "./splitter.ts";
+// Portal is part of the core (hadi-march); listed here too so composite components can name it in composedOf
+export { Portal, PortalTarget } from "../dom/portal.ts";
 export type { OverflowTextProps, MarqueeTrigger, MarqueeMode } from "./marquee.ts";
 export type { AvatarGroupProps } from "./avatar-group.ts";
 export type { ProgressProps } from "./progress.ts";

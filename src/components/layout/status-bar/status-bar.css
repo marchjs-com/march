@@ -1,0 +1,21 @@
+/* HADI March — StatusBar. Imported by its component module; tokens.css provides the variables. */
+.hm-sbar { display: flex; align-items: center; gap: 2px; min-width: 0; min-height: 1.625rem; padding-inline: .25rem; background: var(--hm-surface-2); border-block-start: 1px solid var(--hm-border);
+  color: var(--hm-text-2); font-size: var(--hm-text-xs); overflow: hidden; }
+.hm-sbar-side { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.hm-sbar-end { margin-inline-start: auto; }
+.hm-sbar-more { display: flex; flex: none; } .hm-sbar-more[hidden] { display: none; }
+.hm-sbar-more .hm-icon-btn { width: 1.5rem; height: 1.375rem; }
+.hm-sbar-item { display: inline-flex; flex: none; align-items: center; gap: .3125rem; height: 1.375rem; padding: 0 .5rem; border: 0; border-radius: var(--hm-radius-1); background: none; color: inherit;
+  font: inherit; white-space: nowrap; transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }
+.hm-sbar-item[hidden] { display: none; }
+.hm-sbar-item.is-button { cursor: pointer; }
+.hm-sbar-item.is-button:hover:not(:disabled) { background: color-mix(in srgb, var(--hm-text) 9%, transparent); color: var(--hm-text); }
+.hm-sbar-item.is-button:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: -2px; }
+.hm-sbar-icon { display: inline-flex; } .hm-sbar-icon .hm-svg { width: .8125rem; height: .8125rem; }
+.hm-sbar-dot { display: none; width: .4375rem; height: .4375rem; border-radius: 50%; background: currentColor; }
+.hm-sbar-item.is-info, .hm-sbar-item.is-success, .hm-sbar-item.is-warn, .hm-sbar-item.is-danger, .hm-sbar-item.is-busy { --hm-sbar-c: var(--hm-info); }
+.hm-sbar-item.is-success { --hm-sbar-c: var(--hm-success); } .hm-sbar-item.is-warn { --hm-sbar-c: var(--hm-warn); }
+.hm-sbar-item.is-danger { --hm-sbar-c: var(--hm-danger); } .hm-sbar-item.is-busy { --hm-sbar-c: var(--hm-primary); }
+.hm-sbar-item:is(.is-info, .is-success, .is-warn, .is-danger, .is-busy) .hm-sbar-dot { display: inline-block; background: var(--hm-sbar-c); }
+.hm-sbar-item:is(.is-info, .is-success, .is-warn, .is-danger, .is-busy) .hm-sbar-icon { color: var(--hm-sbar-c); }
+.hm-sbar-item.is-danger { color: var(--hm-danger-text, var(--hm-danger)); }
