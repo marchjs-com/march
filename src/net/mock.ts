@@ -3,7 +3,7 @@
 //   import "hadi-march/net/mock";
 //   const m = net.mock({
 //     ...crud("/users", (f) => f.list(20, (i) => ({ id: String(i + 1), name: f.name(), email: f.email() }))),
-//     "GET /me": { id: "1", name: "Ada" },
+//     "GET /me": { id: "1", name: "Alex" },
 //     "POST /login": (r) => (r.body.password ? { token: "t" } : reply(401, { message: "Wrong password" })),
 //   }, { delay: [80, 250], errorRate: 0.05, seed: 7 });
 //   m.ws("/users/events", (client) => client.send({ type: "hello" }));    m.publish("/users/events", "users", {…})
@@ -19,8 +19,8 @@ export function rng(seed = 1): () => number {
   let a = seed >>> 0;
   return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
-const FIRST = ["Ada", "Alan", "Grace", "Linus", "Margaret", "Dennis", "Barbara", "Ken", "Frances", "Tim", "Radia", "Edsger", "Hedy", "John", "Katherine", "Niklaus"];
-const LAST = ["Lovelace", "Turing", "Hopper", "Torvalds", "Hamilton", "Ritchie", "Liskov", "Thompson", "Allen", "Berners-Lee", "Perlman", "Dijkstra", "Lamarr", "Backus", "Johnson", "Wirth"];
+const FIRST = ["Alex", "Sam", "Jordan", "Taylor", "Robin", "Casey", "Jamie", "Morgan", "Riley", "Avery", "Quinn", "Drew", "Rowan", "Sky", "Kai", "Noa"];
+const LAST = ["Stone", "Rivers", "Brooks", "Lane", "Hale", "Frost", "Reed", "Wells", "Park", "Gray", "North", "Vale", "Shore", "Fields", "Marsh", "Hart"];
 const WORDS = ["alpha", "bravo", "cedar", "delta", "ember", "falcon", "garnet", "harbor", "indigo", "juniper", "kestrel", "lumen", "meadow", "nova", "orbit", "prism"];
 
 /** Seeded fake data helpers. */

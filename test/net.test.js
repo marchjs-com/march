@@ -176,7 +176,7 @@ test("net: router / lazy() chunk loads run through net (route priority, events)"
 
 test("api classes: typed endpoints, params split, schema validation, query / mutation, invalidation", async () => {
   const n = N.createNet();
-  const m = n.mock({ ...M.crud("/users", [{ id: "1", name: "Ada" }, { id: "2", name: "Alan" }]) }, { delay: 0 });
+  const m = n.mock({ ...M.crud("/users", [{ id: "1", name: "Alex" }, { id: "2", name: "Sam" }]) }, { delay: 0 });
   class UsersApi extends N.Api {
     base = "/users";
     list = this.get("/", { category: "users" });
@@ -185,7 +185,7 @@ test("api classes: typed endpoints, params split, schema validation, query / mut
   }
   const users = N.api(UsersApi, { net: n });
   assert.equal((await users.list()).length, 2);
-  assert.deepEqual(await users.byId({ id: "2" }), { id: "2", name: "Alan" });
+  assert.deepEqual(await users.byId({ id: "2" }), { id: "2", name: "Sam" });
   assert.equal(users.byId.url({ id: "7" }), "/users/7");
   assert.deepEqual(users.list.key(), ["users", "/", null]);
   let q;
@@ -193,9 +193,9 @@ test("api classes: typed endpoints, params split, schema validation, query / mut
   for (let i = 0; i < 40 && !q(); i++) await tick(5);
   assert.equal(q().length, 2);
   const save = users.update.mutation();
-  await save({ id: "1", name: "Ada L." });
-  for (let i = 0; i < 40 && q()[0].name !== "Ada L."; i++) await tick(5);
-  assert.equal(q()[0].name, "Ada L.", "the list query refetched after the update");
+  await save({ id: "1", name: "Alex S." });
+  for (let i = 0; i < 40 && q()[0].name !== "Alex S."; i++) await tick(5);
+  assert.equal(q()[0].name, "Alex S.", "the list query refetched after the update");
   m.add({ "GET /users/:id": () => ({ id: "9" }) });
   await assert.rejects(users.byId({ id: "9" }), (e) => e.type === "validation" && e.context.fields.name === "required");
   n.mock(false);
