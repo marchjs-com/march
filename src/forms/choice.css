@@ -5,6 +5,10 @@
   --hm-ch-text: var(--hm-accent-text, var(--hm-primary-text)); --hm-ch-ease: cubic-bezier(.34, 1.56, .64, 1);
   /* size scale */ --hm-ch-size: 1.25rem; --hm-ch-font: var(--hm-text-md); --hm-ch-pad-y: .4375rem; --hm-ch-pad-x: .875rem; --hm-ch-card-pad: 1rem; --hm-ch-icon: 2.5rem;
   /* shape scale */ --hm-ch-radius: .375rem; --hm-ch-item-radius: .625rem; --hm-ch-card-radius: var(--hm-radius-3, 12px); }
+/* per-option colors (colors="brand" / a list): the option's data-hm-color sets --hm-accent there, so the derived colors
+   are worked out again on the option (a custom property inherits its value, not its formula) */
+.hm-choice [data-hm-color] { --hm-ch-c: var(--hm-accent, var(--hm-primary)); --hm-ch-on: var(--hm-on-accent, var(--hm-on-primary-fill));
+  --hm-ch-soft: var(--hm-accent-soft, var(--hm-primary-soft)); --hm-ch-text: var(--hm-accent-text, var(--hm-primary-text)); }
 .hm-choice-sm { --hm-ch-size: 1rem; --hm-ch-font: var(--hm-text-sm); --hm-ch-pad-y: .25rem; --hm-ch-pad-x: .625rem; --hm-ch-card-pad: .75rem; --hm-ch-icon: 2rem; }
 .hm-choice-lg { --hm-ch-size: 1.5rem; --hm-ch-font: var(--hm-text-lg); --hm-ch-pad-y: .625rem; --hm-ch-pad-x: 1.125rem; --hm-ch-card-pad: 1.25rem; --hm-ch-icon: 3rem; }
 .hm-choice.hm-shape-square { --hm-ch-radius: .1875rem; --hm-ch-item-radius: .25rem; --hm-ch-card-radius: var(--hm-radius-1, 6px); }

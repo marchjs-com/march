@@ -41,3 +41,10 @@ test("4: form controls take the same class prop as ui components (array, object,
   assert.ok(t.classList.contains("d"));
   m.dispose();
 });
+
+test("per-option colors (colors=\"brand\") reach the drawn box: the derived --hm-ch-* colors are worked out again on the option", () => {
+  const css = readFileSync(new URL("../src/forms/choice.css", import.meta.url), "utf8");
+  const rule = css.match(/\.hm-choice \[data-hm-color\] \{([^}]*)\}/);
+  assert.ok(rule, "a rule on the option");
+  for (const v of ["--hm-ch-c", "--hm-ch-on", "--hm-ch-soft", "--hm-ch-text"]) assert.match(rule[1], new RegExp(v + ":"));
+});
