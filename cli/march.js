@@ -158,6 +158,7 @@ async function build({ dev = false } = {}) {
     // final names: every rewritten file gets a new content version (a cached file must never point at another build),
     // no name starts with _ or . (some hosts refuse those); stable names on request
     if (!dev) rehashOutputs(r.metafile, { cwd, stable: !!cfg.stableNames || flag("--stable-names") === true });
+    if (process.env.MARCH_DEBUG_META) writeFileSync(process.env.MARCH_DEBUG_META, JSON.stringify({ meta: r.metafile, plan }));
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
     aliasGroups(chunks.manifest, plan);
     writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);

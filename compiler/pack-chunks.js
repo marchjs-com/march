@@ -102,7 +102,9 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
   for (let round = 0; round < 500; round++) {
     const g = graph(outs);
     const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && (outs[k].bytes ?? 0) < minSize)
-      .sort((a, b) => (outs[a].bytes ?? 0) - (outs[b].bytes ?? 0));
+      // widely shared code first (it competes for the start-up budget with narrow code), then the smallest; the name
+      // breaks ties so the same input always folds the same way
+      .sort((a, b) => g.reach.get(b).size - g.reach.get(a).size || (outs[a].bytes ?? 0) - (outs[b].bytes ?? 0) || (a < b ? -1 : 1));
     let done = false;
     // start-up pieces (budget.boot) and what they reach: a fold into one of them adds T to start-up for everyone
     const bootEntries = g.js.filter((e) => outs[e].entryPoint && budgetOf?.(e)?.boot);
