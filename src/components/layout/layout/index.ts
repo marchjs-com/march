@@ -184,6 +184,8 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
     features: () => runningNames(),
     titleTemplate: pick("titleTemplate") ?? "%s",
   };
+  // a Layout inside another (a demo, an embedded app) does not start the page-wide features the outer one runs
+  const outer = useContext(LayoutContext);
   provide(LayoutContext, api);
 
   const has = (s: SlotName): boolean => pick(s) != null;
@@ -211,7 +213,8 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
 
   const corners = { ...defaults.corners, ...props.corners };
   for (const c of CORNERS) addControls(api, c, corners[c]);
-  for (const f of resolveFeatures(defaults.features, props.features)) api.use(f);
+  const outerRuns = new Set(outer?.features() ?? []);
+  for (const f of resolveFeatures(defaults.features, props.features)) if (!f.featureName || !outerRuns.has(f.featureName)) api.use(f);
   return out;
 }
 

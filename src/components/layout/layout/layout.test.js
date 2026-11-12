@@ -97,3 +97,12 @@ test("Layout: the default has back-to-top and route focus; Page under it writes 
   assert.ok(solo.host.querySelector(".hm-layout"), "a Page on its own brings a Layout");
   solo.dispose();
 });
+
+test("Layout: a nested Layout does not start the page-wide features its outer Layout already runs", () => {
+  let n = 0;
+  defineLayoutFeature("once", () => () => { n++; });
+  const Outer = defineLayout({ features: { once: true } });
+  const m = mount(() => h(Outer, {}, h(Outer, {}, "inner")));
+  assert.equal(n, 1);
+  m.dispose();
+});
