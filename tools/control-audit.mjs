@@ -42,7 +42,9 @@ const SETUP = `(() => {
   // the control's own box (its label, the segmented group) is left out: it always changes when used
   const own = (c) => c.closest("label, .hm-toggle, .hm-switch, .hm-segmented, [role=radiogroup], [role=tablist], [role=listbox], .hm-choice, .hm-chip") ?? c;
   const snap = (c) => {
-    const box = own(c); const parts = [];
+    // the whole options panel is left out (a label that shows the value, "Son kullanılanlar: 33", is not an effect);
+    // in an options row or a "Seçenekler" card, the control's own box
+    const box = c.closest(".sc-play-panel") ?? own(c); const parts = [];
     const walk = (el) => {
       if (el === box || el.nodeType !== 1 || el.matches(".hm-spinner, [data-audit-volatile]")) return;
       // only what can be seen counts: a class or aria attribute that changes no style is not an effect
