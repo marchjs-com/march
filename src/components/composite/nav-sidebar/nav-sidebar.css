@@ -121,3 +121,6 @@ html.hm-sb-resizing .hm-nav { transition: none; }
 .hm-sb-sublist .hm-sb-sub { display: none; }
 .hm-sb-wrap.is-rail .hm-sb-kids, .hm-sb-wrap.is-rail .hm-sb-kids-btn { display: none; }
 @media (prefers-reduced-motion: reduce) { .hm-sb-kids, .hm-sb-kids-btn { transition: none; } }
+/* the parent of the current page: marked too, a step quieter than the page itself */
+.hm-sb-item.is-active-parent { color: var(--hm-primary-text); font-weight: 600; background: color-mix(in srgb, var(--hm-primary-soft) 55%, transparent); }
+.hm-sb-item.is-active-parent .hm-sb-icon { color: var(--hm-primary); }

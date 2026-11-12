@@ -235,7 +235,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
       badge(x),
     ];
     const common = {
-      class: () => cx("hm-sb-row", "hm-sb-item", active() === x.id && "is-active"), "data-id": x.id, "data-where": where,
+      class: () => cx("hm-sb-row", "hm-sb-item", active() === x.id && "is-active", active() !== x.id && (kidsOf().get(x.id) ?? []).some((k) => k.id === active()) && "is-active-parent"), "data-id": x.id, "data-where": where,
       title: () => (rail() ? text(x.label) : null), "aria-current": () => (active() === x.id ? "page" : null),
     };
     const el = x.href && !x.onSelect

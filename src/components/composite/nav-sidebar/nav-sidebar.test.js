@@ -183,3 +183,17 @@ test("NavSidebar: nested items sit under their parent, fold with it, open by the
   assert.equal(btn.getAttribute("aria-expanded"), "false", "← closes the fold");
   m.dispose();
 });
+
+test("NavSidebar: the parent of the current page is marked too", async () => {
+  R.navigate?.("/editors/terminal");
+  await tick(10);
+  const items = [
+    { id: "/editors", label: "Editors", href: "/editors", group: "Forms" },
+    { id: "/editors/terminal", label: "Terminal", href: "/editors/terminal", group: "Forms", parent: "/editors" },
+  ];
+  const m = mount(() => h(U.NavSidebar, { items, storageKey: "t.nest2", palette: false, hotkey: false, defaultOpen: "all", recent: 0 }));
+  await tick(10);
+  const row = (id) => m.el.querySelector(`.hm-sb-row[data-id="${id}"]`);
+  if (row("/editors/terminal").getAttribute("class").includes("is-active")) assert.match(row("/editors").getAttribute("class"), /is-active-parent/);
+  m.dispose();
+});
