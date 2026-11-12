@@ -17,7 +17,7 @@ export type DrawerSide = "left" | "right" | "bottom";
 /** Text shown in a dialog: a string or an accessor. */
 export type Label = MaybeFn<string>;
 
-interface StackEntry { dismissable: () => boolean; close: () => void }
+interface StackEntry { dismissable: () => boolean; close: () => void; modal: boolean }
 const stack: StackEntry[] = [];
 let keysOn = false;
 function installKeys(): void {
@@ -48,6 +48,8 @@ export interface FrameOptions {
   footer?: unknown;
   children: unknown;
   label?: string | undefined;
+  /** false: a non-modal panel (no scroll lock, no aria-modal, no focus trap; the page stays usable). Default true. */
+  modal?: boolean | undefined;
 }
 
 /** Build a modal frame (overlay + panel). Must run inside an owner; the frame unregisters and restores focus on cleanup. */
@@ -57,22 +59,23 @@ export function frame(o: FrameOptions): HTMLElement {
   const titleId = uid("hm-dlg");
   const restore = d.activeElement as HTMLElement | null;
   const dismissable = (): boolean => val(o.dismissable) !== false;
-  const entry: StackEntry = { dismissable, close: () => o.onClose() };
+  const modal = o.modal !== false;
+  const entry: StackEntry = { dismissable, close: () => o.onClose(), modal };
   stack.push(entry);
-  d.documentElement.classList.add("hm-scroll-lock");
+  if (modal) d.documentElement.classList.add("hm-scroll-lock");
   let panel: HTMLElement | undefined, body: HTMLElement | undefined, down: boolean | null = null;
   const drawer = o.kind === "drawer";
   const overlay = h("div", {
-    class: cx("hm-overlay", drawer && "hm-overlay-drawer"),
+    class: cx("hm-overlay", drawer && "hm-overlay-drawer", !modal && "is-modeless"),
     onPointerdown: (e: Event) => { down = e.target === overlay; },
     onClick: (e: Event) => { if (e.target === overlay && down !== false && dismissable()) o.onClose(); down = null; },
   },
   h("div", {
     ref: (x: HTMLElement) => { panel = x; },
     class: cx(drawer ? `hm-drawer hm-drawer-${o.side ?? "right"}` : `hm-dialog hm-dialog-${val(o.size) ?? "md"}`, o.class),
-    role: o.role ?? "dialog", "aria-modal": "true", tabindex: "-1",
+    role: o.role ?? "dialog", "aria-modal": modal ? "true" : null, tabindex: "-1",
     "aria-labelledby": o.title != null ? titleId : null, "aria-label": o.title == null ? o.label ?? null : null,
-    onKeydown: (e: KeyboardEvent) => { if (panel) trapTab(panel)(e); },
+    onKeydown: (e: KeyboardEvent) => { if (panel && modal) trapTab(panel)(e); },
   },
   o.title != null && h("div", { class: "hm-dialog-head" },
     h("h2", { id: titleId, class: "hm-dialog-title" }, () => val(o.title)),
@@ -86,7 +89,7 @@ export function frame(o: FrameOptions): HTMLElement {
   onCleanup(() => {
     const i = stack.indexOf(entry);
     if (i >= 0) stack.splice(i, 1);
-    if (!stack.length) d.documentElement.classList.remove("hm-scroll-lock");
+    if (!stack.some((s) => s.modal)) d.documentElement.classList.remove("hm-scroll-lock");
     if (restore && restore !== d.body && restore.isConnected) restore.focus?.();
   });
   return overlay;
@@ -272,5 +275,4 @@ function sheet(kind: "dialog" | "drawer"): (props: DialogProps) => () => unknown
 }
 /** Declarative dialog: `<Dialog open={$open} onClose={() => $open = false} title="…" size="md" footer={…}>…</Dialog>` */
 export const Dialog: (props: DialogProps) => () => unknown = sheet("dialog");
-/** Declarative side sheet: `<Drawer open={$open} onClose={…} side="right" title="…">…</Drawer>` */
-export const Drawer: (props: DialogProps) => () => unknown = sheet("drawer");
+// <Drawer> lives in src/components/drawer/ (4 sides, drag to close, snap points, non-modal); it reuses frame().

@@ -4,6 +4,7 @@
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
 
 ## Chip
 
@@ -16,3 +17,13 @@ A label pill. Three uses: a static label, a **filter** you can switch on and off
 ```
 
 Full page: src/components/chip/docs.md
+
+## Drawer
+
+
+
+```tsx
+
+```
+
+Full page: src/components/drawer/docs.md

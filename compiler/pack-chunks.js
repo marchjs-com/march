@@ -120,7 +120,10 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
           if (cb.has(t) && !users.includes(b)) continue; // B → X → T
           if ([...ct].some((x) => x !== t && x !== b && g.closure(x).has(b))) continue; // T → X → B
           if (users.some((u) => u !== b && cb.has(u))) continue;
-          const c = [...rt].filter((e) => !rb.has(e)).length * bytes(b) + [...rb].filter((e) => !rt.has(e)).length * bytes(t);
+          // what each side newly downloads is the other's whole static closure, not just its own file: a small chunk with
+          // heavy imports must not ride along with a start-up chunk
+          const extra = (from, have) => [...from].reduce((s, x) => s + (have.has(x) ? 0 : bytes(x)), 0);
+          const c = [...rt].filter((e) => !rb.has(e)).length * extra(cb, ct) + [...rb].filter((e) => !rt.has(e)).length * extra(ct, cb);
           if (c < cost) { cost = c; best = b; }
         }
       }
