@@ -12,7 +12,7 @@ export default function CodeInputDemo(props: { values: V }) {
   return <div>{() => {
     // length, pattern, colors and groups shape the boxes: the preview is rebuilt when they change
     const v = props.values, n = v.length
-    const sample = (v.pattern === "numeric" ? "482915730264" : v.pattern === "alpha" ? "HADIMARCHKOD" : "H4D1M4RCHK0D").slice(0, n)
+    const sample = (v.pattern === "numeric" ? "482915730264" : v.pattern === "alpha" ? "MARCHDEMOKOD" : "M4RCHD3M0K0D").slice(0, n)
     let $code = sample
     return <CodeInput bind:value={$code} length={n} pattern={v.pattern as "numeric"} colors={v.colors as "brand"} font={v.font as "display"} size={v.size as "md"} variant={v.variant as "outline"}
       groups={v.groups && n >= 4 ? [Math.ceil(n / 2), Math.floor(n / 2)] : undefined} mask={v.mask} aria-label="Doğrulama kodu" onComplete={(c: string) => toast(`Kod: ${c}`, { kind: "success" })} />

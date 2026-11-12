@@ -1,4 +1,4 @@
-/* HADI March — Tree. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Tree. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- tree */
 .hm-tree, .hm-tree-group { list-style: none; margin: 0; padding: 0; }
 .hm-tree-group { padding-inline-start: 1rem; margin-inline-start: .5rem; border-inline-start: 1px solid var(--hm-border-subtle); }

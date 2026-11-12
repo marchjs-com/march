@@ -1,4 +1,4 @@
-/* HADI March — Dialog, Drawer, confirm, prompt. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Dialog, Drawer, confirm, prompt. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- dialogs and drawers */
 html.hm-scroll-lock { overflow: hidden; }
 .hm-overlay { position: fixed; inset: 0; z-index: var(--hm-z-dialog); display: flex; align-items: center; justify-content: center; padding: var(--hm-space-4);

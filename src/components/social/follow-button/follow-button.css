@@ -1,4 +1,4 @@
-/* HADI March — FollowButton. 42px pill: filled Aktivite (follow), outline (following / requested). */
+/* March — FollowButton. 42px pill: filled Aktivite (follow), outline (following / requested). */
 .hm-follow { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: .375rem; min-height: 2.625rem; padding: 0 1.125rem; border-radius: var(--hm-radius-full);
   border: 1.5px solid var(--hm-brand-blue, var(--hm-primary)); background: var(--hm-brand-blue, var(--hm-primary)); color: var(--hm-on-brand-blue, var(--hm-on-primary-fill));
   font: inherit; font-size: var(--hm-text-md); font-weight: 800; white-space: nowrap; cursor: pointer; overflow: visible; -webkit-tap-highlight-color: transparent;

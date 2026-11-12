@@ -1,4 +1,4 @@
-// HADI March data: queries with cache, de-duplication, retry, refresh on focus and polling; mutations with invalidation
+// March data: queries with cache, de-duplication, retry, refresh on focus and polling; mutations with invalidation
 // and optimistic updates. Works with any async function — fetch, RPC, Firebase callables, …
 //
 //   const users = query(() => api.list({ page: $page }), { key: () => ["users", $page] })

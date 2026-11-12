@@ -1,4 +1,4 @@
-// HADI March — fine-grained reactive core (TypeScript).
+// March — fine-grained reactive core (TypeScript).
 // Push-pull graph (dirty / check marking, lazy pull), glitch free, synchronous by default; `batch` defers effects.
 // Ownership tree: every computation created while another one runs is owned by it and disposed when the owner re-runs or
 // is disposed, together with its `onCleanup` callbacks. That is how listeners, timers and requests clean up automatically.

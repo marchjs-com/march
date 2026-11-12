@@ -1,4 +1,4 @@
-/* HADI March — design tokens and base styles.
+/* March — design tokens and base styles.
    Layers: a THEME (themes.css, generated from src/theme/presets.ts) sets ~25 base colors per mode, fonts and a radius;
    this file derives everything else (surfaces, hover and soft tints, borders, shadows, radii) with color-mix(), so a theme
    switch is one attribute: <html data-hm-theme="hadi|cream|night|neon|indigo|minimal|contrast">. Light / dark: automatic

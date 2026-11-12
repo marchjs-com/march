@@ -17,8 +17,8 @@ const SLIDES = 5
 
 export function DemoSlides() {
   return [
-    <Slide layout="title" tone="brand" notes="Herkese merhaba. Bu sunum tamamen tarayıcıda, HADI March ile.">
-      <p class="sc-deck-kicker">HADI March</p>
+    <Slide layout="title" tone="brand" notes="Herkese merhaba. Bu sunum tamamen tarayıcıda, March ile.">
+      <p class="sc-deck-kicker">March</p>
       <h2 class="sc-deck-title">Web sitelerini yeniden düşünmek</h2>
       <p>Ok tuşları, kaydırma ya da dokunma ile ilerle</p>
     </Slide>,

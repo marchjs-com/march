@@ -1,4 +1,4 @@
-/* HADI March — GradientEditor. Imported by its component module; tokens.css provides the variables. */
+/* March — GradientEditor. Imported by its component module; tokens.css provides the variables. */
 .hm-ge { --hm-ge-check: var(--hm-surface-3); display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%; padding: var(--hm-space-3);
   border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
 .hm-ge-preview { block-size: 7.5rem; border-radius: var(--hm-radius-3); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 10%, transparent);

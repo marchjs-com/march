@@ -1,4 +1,4 @@
-/* HADI March — JsonView. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — JsonView. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-json { font: var(--hm-text-sm)/1.6 var(--hm-font-mono); overflow: auto; }
 .hm-json-list { list-style: none; margin: 0; padding-inline-start: 1.25rem; }
 .hm-json-root { padding: 0; }

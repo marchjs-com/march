@@ -1,4 +1,4 @@
-/* HADI March — CodeInput. Imported by its component module; tokens.css provides the variables. */
+/* March — CodeInput. Imported by its component module; tokens.css provides the variables. */
 /* CodeInput: boxes shrink to fit (never overflow); per-box color --hm-box-c: own color token > theme multicolor (HADİ) > accent */
 .hm-otp { --hm-otp-w: 3rem; --hm-otp-h: 3.75rem; --hm-otp-r: .875rem; --hm-otp-fs: var(--hm-text-2xl); display: flex; align-items: center; gap: var(--hm-space-2); max-width: 100%; }
 .hm-otp-sm { --hm-otp-w: 2.25rem; --hm-otp-h: 2.75rem; --hm-otp-r: .625rem; --hm-otp-fs: var(--hm-text-lg); gap: .375rem; }

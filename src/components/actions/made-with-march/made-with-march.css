@@ -1,4 +1,4 @@
-/* HADI March — MadeWithMarch. Theme tokens only, logical properties (RTL follows the page direction). */
+/* March — MadeWithMarch. Theme tokens only, logical properties (RTL follows the page direction). */
 .hm-madewith { margin: 0; color: var(--hm-text-2); font-size: var(--hm-text-sm); line-height: 1.4; }
 .hm-madewith-link { color: var(--hm-primary-text, var(--hm-primary)); font-weight: 600; text-decoration: none; border-radius: var(--hm-radius-1, 2px); }
 .hm-madewith-link:hover { text-decoration: underline; }

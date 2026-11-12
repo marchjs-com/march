@@ -4,7 +4,7 @@ import { clamp } from "../core/util.ts";
 import { rgb, lum, contrast } from "./contrast.ts";
 
 export { contrast };
-// HADI March themes. A theme is a small set of colors (light + dark), fonts and a base radius; everything else (hover,
+// March themes. A theme is a small set of colors (light + dark), fonts and a base radius; everything else (hover,
 // soft tints, borders, surfaces) is derived in tokens.css with color-mix(). Built-in themes are compiled to
 // src/css/themes.css by tools/gen-themes.js (CSS only: switching a theme just sets data-hm-theme on <html>; CSP safe).
 // Your own theme: `defineTheme({...})`, then `themeCss(def)` → write it to a .css file at build time (see README › Themes).

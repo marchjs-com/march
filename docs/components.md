@@ -33,7 +33,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | [OverflowText](#overflowtext) |
 | CopyButton | stable | Copies text to the clipboard: a text or icon-only button that confirms (Copied) for a moment and reports failure with a toast. | — |
 | IconButton | stable | Icon-only button: the label is required and becomes its accessible name and title; sizes and a danger tone. | — |
-| MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
+| MadeWithMarch | stable | Optional credit line "Developed with March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 | Menu | stable | Trigger button with a floating menu of items, links and action()s (separators, shortcuts, danger, permissions) and the full menu keyboard model; Dropdown floats any content. | — |
 | OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | [Menu](#menu), [Tooltip](#tooltip) |
 
@@ -1055,7 +1055,7 @@ Full page: src/components/landing/logo-cloud/docs.md
 
 ## MadeWithMarch
 
-An optional credit line: "Developed with HADI March and 💗", with "HADI March" as a link. Using it is a request, not a requirement: the licence stays MIT and nothing here is needed to use March.
+An optional credit line: "Developed with March and 💗", with "March" as a link. Using it is a request, not a requirement: the licence stays MIT and nothing here is needed to use March.
 
 ```tsx
 <MadeWithMarch />

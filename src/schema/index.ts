@@ -1,4 +1,4 @@
-// HADI March schema: describe a record once; get validation, coercion, defaults, form fields and table columns.
+// March schema: describe a record once; get validation, coercion, defaults, form fields and table columns.
 //
 //   const Product = schema({
 //     title: { type: "text", required: true, max: 80 },

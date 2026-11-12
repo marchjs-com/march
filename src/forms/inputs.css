@@ -1,4 +1,4 @@
-/* HADI March — shared by every text-like control (imported by forms/util.ts): caret and selection follow the color token.
+/* March — shared by every text-like control (imported by forms/util.ts): caret and selection follow the color token.
    Each control's own CSS is in its component folder (src/components/forms/<name>/). */
 .hm-input, .hm-textarea { caret-color: var(--hm-accent, var(--hm-primary)); }
 .hm-input::selection, .hm-textarea::selection { background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 28%, transparent); }

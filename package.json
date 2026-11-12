@@ -2,7 +2,7 @@
   "name": "hadi-march",
   "version": "0.1.0",
   "private": true,
-  "description": "HADI March: a tiny, fine-grained reactive TypeScript framework. Signals instead of a virtual DOM, JSX compiled by an esbuild plugin, zero runtime dependencies, CSP and Trusted Types friendly.",
+  "description": "March: a tiny, fine-grained reactive TypeScript framework. Signals instead of a virtual DOM, JSX compiled by an esbuild plugin, zero runtime dependencies, CSP and Trusted Types friendly.",
   "license": "MIT",
   "type": "module",
   "exports": {

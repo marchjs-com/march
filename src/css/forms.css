@@ -1,4 +1,4 @@
-/* HADI March — every form control's CSS in one file (back compat; the esbuild plugin adds each control's CSS with it). */
+/* March — every form control's CSS in one file (back compat; the esbuild plugin adds each control's CSS with it). */
 @import "../ui/field.css";
 @import "../forms/form.css";
 @import "../forms/inputs.css";

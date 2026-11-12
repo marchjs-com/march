@@ -1,4 +1,4 @@
-/* HADI March — MediaGrid. Equal tiles from CSS grid areas; the single photo uses --hm-mgrid-ratio. */
+/* March — MediaGrid. Equal tiles from CSS grid areas; the single photo uses --hm-mgrid-ratio. */
 .hm-mgrid { position: relative; border-radius: var(--hm-radius-3); overflow: hidden; background: var(--hm-surface-2); isolation: isolate; }
 .hm-mgrid-in { display: grid; width: 100%; aspect-ratio: 1; }
 .hm-mgrid-gap-thin .hm-mgrid-in { gap: 2px; } .hm-mgrid-gap-gap .hm-mgrid-in { gap: var(--hm-space-1); } .hm-mgrid-gap-gap { background: none; }

@@ -1,4 +1,4 @@
-// HADI March icon set — original drawings on a 24×24 grid, 1.75px rounded stroke (MIT, part of HADI March).
+// March icon set — original drawings on a 24×24 grid, 1.75px rounded stroke (MIT, part of March).
 // Each icon is a separate export marked /* @__PURE__ */, so unused ones are tree-shaken. Shapes: see ./svg.ts.
 import { defineIcon as i } from "./svg.ts";
 

@@ -1,9 +1,9 @@
 # Icons
 
-HADI March draws icons as SVG built with `createElementNS` (no `innerHTML`, Trusted Types safe). An icon is plain data
+March draws icons as SVG built with `createElementNS` (no `innerHTML`, Trusted Types safe). An icon is plain data
 — a name and its shapes — and every icon is its own export, so a bundle holds only the icons it imports.
 
-## The HADI March set
+## The March set
 
 ```tsx
 import { Icon, users, search } from "hadi-march/icons";
@@ -63,7 +63,7 @@ import lucide from "hadi-march/icons/lucide/pack";
 registerIconPack(lucide);
 
 <Icon name="lucide:rocket" size="xl" />           // "pack:name"; the pack's icons load on first use
-<Icon name="user" />                              // no prefix: the HADI March set
+<Icon name="user" />                              // no prefix: the March set
 <Button icon={icon("tabler:chart-bar")}>Report</Button>  // icon(): any icon prop
 await loadIcon("lucide:rocket");                  // IconDef | undefined once the pack has loaded
 ```
@@ -107,4 +107,4 @@ CC0-1.0, CC-BY-4.0 or OFL-1.1 is refused. Output, per pack, in `src/icons/packs/
 - `pack.js`: the pack for `registerIconPack`
 - `LICENSE`, `pack.json` (name, version, license, count)
 
-In the HADI March repository, `node tools/icon-packs.js …` does the same.
+In the March repository, `node tools/icon-packs.js …` does the same.

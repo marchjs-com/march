@@ -1,4 +1,4 @@
-// HADI March charts: SVG, reactive, accessible, CSP safe. No runtime dependencies.
+// March charts: SVG, reactive, accessible, CSP safe. No runtime dependencies.
 // Load src/charts/charts.css once. This module is never imported by the core.
 export { LineChart, AreaChart } from "./xy.ts";
 export { BarChart } from "./bar.ts";

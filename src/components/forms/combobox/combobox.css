@@ -1,4 +1,4 @@
-/* HADI March — Combobox (and MultiSelect, which is a Combobox): input, chips, listbox. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Combobox (and MultiSelect, which is a Combobox): input, chips, listbox. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* combobox, multiselect, listbox */
 .hm-combo { position: relative; width: 100%; }
 .hm-multi { display: flex; flex-wrap: wrap; gap: var(--hm-space-1); align-items: center; padding: 3px; border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); background: var(--hm-surface); }

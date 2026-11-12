@@ -1,4 +1,4 @@
-// HADI March net core: every request of an app goes through one Net instance.
+// March net core: every request of an app goes through one Net instance.
 //   category + key + policy (latest | dedupe | queue | parallel), priority (route > data > prefetch; prefetch waits
 //   while a route loads), timeout, retry with backoff (idempotent requests only), an offline queue, events
 //   (net:start / progress / retry / done / error / abort), a global pending(category?) signal and a Koa-style

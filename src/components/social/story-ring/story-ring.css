@@ -1,4 +1,4 @@
-/* HADI March — StoryRing. The ring is a conic sweep of the four HADİ colors (+ pink) cut to a 3px band by a mask. */
+/* March — StoryRing. The ring is a conic sweep of the four HADİ colors (+ pink) cut to a 3px band by a mask. */
 .hm-sring { --hm-sring-size: 3.625rem; --hm-sring-band: 3px; --hm-sring-gap: 2.5px;
   display: inline-flex; flex-direction: column; align-items: center; gap: .375rem; padding: 0; margin: 0; border: 0; background: none; color: inherit; font: inherit; min-width: 0; }
 button.hm-sring { cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: var(--hm-radius-2); }

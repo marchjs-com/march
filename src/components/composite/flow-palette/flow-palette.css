@@ -1,4 +1,4 @@
-/* HADI March — FlowPalette. Cards carry their node type's colour (data-hm-color → --hm-accent). */
+/* March — FlowPalette. Cards carry their node type's colour (data-hm-color → --hm-accent). */
 .hm-flowpal { display: grid; align-content: start; gap: .75rem; min-inline-size: 0; }
 .hm-flowpal-cat { display: grid; gap: .375rem; min-inline-size: 0; }
 .hm-flowpal-cattitle { margin: 0; font-size: var(--hm-text-xs); font-weight: 600; letter-spacing: var(--hm-tracking-caps); text-transform: uppercase; color: var(--hm-text-2); }

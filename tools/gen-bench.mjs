@@ -146,7 +146,7 @@ const gen = await compiled();
 // the Code section: every source file of an app, one after another
 const sources = Object.fromEntries(Object.entries(APPS).map(([id, a]) => [id, a.src.map((f) => (a.src.length > 1 ? `// ── ${f.split("/").pop()}\n` : "") + readFileSync(join(SC, f), "utf8").replace(/\r\n/g, "\n").trim()).join("\n\n") + "\n"]));
 const march = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
-const licenses = [{ name: "HADI March", version: march.version, license: march.license, text: readFileSync(join(ROOT, "LICENSE"), "utf8").replace(/\r\n/g, "\n").trim() }];
+const licenses = [{ name: "March", version: march.version, license: march.license, text: readFileSync(join(ROOT, "LICENSE"), "utf8").replace(/\r\n/g, "\n").trim() }];
 for (const pkg of [...new Set(Object.values(APPS).flatMap((a) => a.pkgs))]) {
   const p = JSON.parse(readFileSync(join(ROOT, "node_modules", pkg, "package.json"), "utf8"));
   licenses.push({ name: pkg, version: p.version, license: p.license, text: licenseText(pkg) });

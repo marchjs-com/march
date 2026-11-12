@@ -1,4 +1,4 @@
-// JSX types for HADI March (.tsx). Component props are checked against the component's parameter type; `$` variables
+// JSX types for March (.tsx). Component props are checked against the component's parameter type; `$` variables
 // are ordinary TypeScript variables to the checker (`let $n = 0` is a number), so their types flow naturally.
 // The TypeScript-compatible subset of March JSX: on:/class:/use:/bind:/transition: namespaced attributes (TS 5.1+).
 // Not valid TSX syntax (use the alternatives): `on:click|prevent` → `on:click={prevent(fn)}`; `{x | date}` →

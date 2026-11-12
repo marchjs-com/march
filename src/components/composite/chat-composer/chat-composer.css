@@ -1,4 +1,4 @@
-/* HADI March — ChatComposer. Mist field (radius 24), round action: mic in Heyecan, send in Aktivite. */
+/* March — ChatComposer. Mist field (radius 24), round action: mic in Heyecan, send in Aktivite. */
 .hm-compose { display: flex; flex-direction: column; gap: .375rem; padding: .375rem .375rem .5rem; background: var(--hm-surface); border-block-start: 1px solid var(--hm-border-subtle, var(--hm-border)); min-width: 0; }
 .hm-compose-row { display: flex; align-items: flex-end; gap: .25rem; min-width: 0; }
 .hm-compose-field { position: relative; display: flex; align-items: flex-end; flex: 1; min-width: 0; border-radius: 1.5rem; background: var(--hm-surface-2); border: 1.5px solid transparent;

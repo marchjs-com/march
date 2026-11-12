@@ -1,4 +1,4 @@
-# Contributing to HADI March
+# Contributing to March
 
 - Zero runtime dependencies. The only dev dependency is esbuild.
 - Every feature ships with tests (`npm test` runs `node --test` with the tiny DOM in `src/testing/dom.js`), docs in

@@ -1,4 +1,4 @@
-/* HADI March — Splitter. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Splitter. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- splitter */
 .hm-splitter { --hm-split: 50%; display: grid; grid-template-columns: var(--hm-split) auto minmax(0, 1fr); min-height: 12rem; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); overflow: hidden; background: var(--hm-surface); }
 .hm-splitter-v { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--hm-split) auto minmax(0, 1fr); }

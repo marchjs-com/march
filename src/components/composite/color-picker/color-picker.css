@@ -1,4 +1,4 @@
-/* HADI March — ColorPicker. Imported by its component module; tokens.css provides the variables.
+/* March — ColorPicker. Imported by its component module; tokens.css provides the variables.
    The saturation / brightness area and the hue track are color math, not theme colors: they need pure white, black and
    the full hue circle (keywords and hsl() below), whatever the theme. */
 .hm-cp { --hm-cp-accent: var(--hm-accent, var(--hm-primary)); --hm-cp-check: var(--hm-surface-3);

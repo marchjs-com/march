@@ -1,4 +1,4 @@
-/* HADI March — KeyValue. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — KeyValue. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-kv { display: grid; gap: var(--hm-space-4) var(--hm-space-5); margin: 0; }
 .hm-kv-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hm-kv-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .hm-kv-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .hm-kv-row { min-width: 0; display: flex; flex-direction: column; gap: .1875rem; }

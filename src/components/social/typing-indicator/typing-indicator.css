@@ -1,4 +1,4 @@
-/* HADI March — TypingIndicator. 5px dots in the local accent (brand-blue by default). */
+/* March — TypingIndicator. 5px dots in the local accent (brand-blue by default). */
 .hm-typing { display: inline-flex; align-items: center; gap: .5rem; min-width: 0; }
 .hm-typing.is-off { display: none; }
 .hm-typing-dots { display: inline-flex; align-items: center; gap: 4px; }

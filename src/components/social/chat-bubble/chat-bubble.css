@@ -1,4 +1,4 @@
-/* HADI March — ChatBubble. Radius 20 with a 6px tail corner on the last bubble of a run; mine is an Aktivite gradient. */
+/* March — ChatBubble. Radius 20 with a 6px tail corner on the last bubble of a run; mine is an Aktivite gradient. */
 .hm-msg { --hm-msg-r: 1.25rem; --hm-msg-tail: .375rem; --hm-msg-blue: var(--hm-brand-blue, var(--hm-info));
   position: relative; display: flex; align-items: flex-end; gap: .25rem; min-width: 0; touch-action: pan-y; }
 .hm-msg-mine { flex-direction: row-reverse; }

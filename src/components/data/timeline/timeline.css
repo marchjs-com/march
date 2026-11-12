@@ -1,4 +1,4 @@
-/* HADI March — Timeline. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Timeline. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-timeline { list-style: none; margin: 0; padding: 0; }
 .hm-tl-item { position: relative; display: flex; gap: var(--hm-space-3); padding-bottom: var(--hm-space-5); }
 .hm-tl-item:not(:last-child)::before { content: ""; position: absolute; inset-inline-start: .5rem; top: 1.375rem; bottom: .25rem; width: 1px; background: var(--hm-border); }

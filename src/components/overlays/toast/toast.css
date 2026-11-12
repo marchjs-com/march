@@ -1,4 +1,4 @@
-/* HADI March — toast. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — toast. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- toasts */
 .hm-toasts { position: fixed; z-index: var(--hm-z-toast); inset-block-end: var(--hm-space-4); inset-inline-end: var(--hm-space-4); display: flex; flex-direction: column; gap: var(--hm-space-2);
   width: min(24rem, calc(100vw - 2rem)); pointer-events: none; }

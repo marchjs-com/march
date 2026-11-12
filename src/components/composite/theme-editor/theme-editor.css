@@ -1,4 +1,4 @@
-/* HADI March — ThemeEditor. Imported by its component module; tokens.css provides the variables. Colors shown as
+/* March — ThemeEditor. Imported by its component module; tokens.css provides the variables. Colors shown as
    swatches come in through --hm-te-c / --hm-te-fg / --hm-te-bg (set with CSSOM, never a style attribute). */
 .hm-te { container-type: inline-size; display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%; }
 .hm-te-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--hm-space-3); }

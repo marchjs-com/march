@@ -12,11 +12,11 @@ const mount = (fn) => { const el = document.createElement("div"); document.body.
 test("MadeWithMarch: sentence, link from the constant, accessible heart, variants", () => {
   const m = mount(() => [h(MadeWithMarch, {}), h(MadeWithMarch, { variant: "badge" }), h(MadeWithMarch, { variant: "small" })]);
   const [a, b, c] = m.el.querySelectorAll(".hm-madewith");
-  assert.equal(a.textContent, "Developed with HADI March and 💗");
+  assert.equal(a.textContent, "Developed with March and 💗");
   assert.ok(a.className.includes("hm-madewith-text") && b.className.includes("hm-madewith-badge") && c.className.includes("hm-madewith-small"));
   const link = a.querySelector("a");
   assert.equal(link.getAttribute("href"), MARCH_URL);
-  assert.equal(link.textContent, "HADI March");
+  assert.equal(link.textContent, "March");
   assert.ok(link.getAttribute("rel").includes("noopener"));
   const heart = a.querySelector("[role=img]");
   assert.equal(heart.textContent, "💗");
@@ -28,7 +28,7 @@ test("MadeWithMarch: Turkish word order", async () => {
   messages("tr", tr);
   await setLocale("tr");
   const m = mount(() => h(MadeWithMarch, {}));
-  assert.equal(m.el.querySelector(".hm-madewith").textContent, "HADI March ve 💗 ile geliştirildi");
+  assert.equal(m.el.querySelector(".hm-madewith").textContent, "March ve 💗 ile geliştirildi");
   assert.equal(m.el.querySelector("[role=img]").getAttribute("aria-label"), "Sevgi");
   m.dispose();
   await setLocale("en");

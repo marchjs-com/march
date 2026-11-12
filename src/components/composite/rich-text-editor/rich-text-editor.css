@@ -1,4 +1,4 @@
-/* HADI March — RichTextEditor. Imported by its component module; tokens.css provides the variables. */
+/* March — RichTextEditor. Imported by its component module; tokens.css provides the variables. */
 .hm-rte { --hm-rte-accent: var(--hm-accent, var(--hm-primary)); display: flex; flex-direction: column; min-width: 0; max-width: 100%;
   border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); color: var(--hm-text);
   transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }

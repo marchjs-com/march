@@ -1,4 +1,4 @@
-/* HADI March — IconButton. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — IconButton. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-icon-btn { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--hm-control-h); height: var(--hm-control-h); padding: 0; border: 0;
   border-radius: var(--hm-radius); background: transparent; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-lg); cursor: pointer; text-decoration: none;
   transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }

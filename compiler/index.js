@@ -1,4 +1,4 @@
-// HADI March compiler: turns March JSX (+ language features) into plain JavaScript that calls the runtime.
+// March compiler: turns March JSX (+ language features) into plain JavaScript that calls the runtime.
 //   - JSX → h() calls; component children become lazy; dynamic expressions become live bindings
 //   - `$` variables → signals (`let $n = 0`, `$n++`, `const $double = $n * 2` → computed)
 //   - directives on:/bind:/class:/use:/transition:, shorthand attributes `<Row {user} />`, `{x | date}` pipes, `sx={{…}}`

@@ -1,4 +1,4 @@
-// HADI March store — plain objects that are reactive and observable, no reducers, no actions.
+// March store — plain objects that are reactive and observable, no reducers, no actions.
 //   const app = store({ user: { name: "Ada" }, cart: { items: [] as Item[] } })
 //   app.user.name = "Ece"; app.cart.items.push(x); delete app.flags.beta      // just write
 //   <p>{app.user.name}</p>                                                      // fine-grained: only that path is tracked

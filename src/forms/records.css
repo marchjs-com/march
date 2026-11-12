@@ -1,4 +1,4 @@
-/* HADI March — RecordListEditor. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — RecordListEditor. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-records { display: flex; flex-direction: column; gap: var(--hm-space-2); }
 .hm-records-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--hm-space-2); }
 .hm-records-items:empty { display: none; }

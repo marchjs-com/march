@@ -1,4 +1,4 @@
-/* HADI March — NavSidebar. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — NavSidebar. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- NavSidebar (src/ui/sidebar.ts); container, drawer and rail come from .hm-nav */
 .hm-sb { position: relative; width: var(--hm-sb-w, 17.5rem); background: var(--hm-surface); }
 /* resize grip on the inner (logical end) edge; the width is the --hm-sb-w variable on the wrapper */

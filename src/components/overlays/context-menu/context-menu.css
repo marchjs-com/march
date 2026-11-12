@@ -1,3 +1,3 @@
-/* HADI March — ContextMenu. The host does not change layout; the point is a zero-size fixed anchor. */
+/* March — ContextMenu. The host does not change layout; the point is a zero-size fixed anchor. */
 .hm-ctxmenu { display: contents; }
 .hm-ctxmenu-point { position: fixed; inline-size: 0; block-size: 0; pointer-events: none; }

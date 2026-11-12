@@ -1,3 +1,3 @@
-/* HADI March — ErrorBox. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — ErrorBox. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-errorbox { display: flex; flex-direction: column; align-items: flex-start; gap: var(--hm-space-2); border: 1px solid color-mix(in srgb, var(--hm-danger) 22%, transparent); }
 .hm-errorbox p { margin: 0; }

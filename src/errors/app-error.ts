@@ -1,4 +1,4 @@
-// AppError: the one error shape of HADI March (net, WebSocket, boundaries, window errors). Small on purpose: net
+// AppError: the one error shape of March (net, WebSocket, boundaries, window errors). Small on purpose: net
 // imports it without pulling the whole errors module; hadi-march/errors installs the sink that collects them.
 
 export type ErrorType =

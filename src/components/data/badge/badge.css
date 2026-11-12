@@ -1,4 +1,4 @@
-/* HADI March — Badge. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Badge. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-badge { display: inline-flex; align-items: center; gap: .3125rem; padding: 0 .4375rem; min-height: 1.25rem; border-radius: var(--hm-radius-full); font-size: var(--hm-text-xs);
   font-weight: var(--hm-weight-medium); line-height: 1.6; white-space: nowrap; border: 1px solid transparent; font-variant-numeric: tabular-nums; }
 .hm-badge-neutral { background: var(--hm-surface-2); color: var(--hm-text-2); border-color: var(--hm-border); }

@@ -1,3 +1,3 @@
-/* HADI March — TextInput. Imported by its component module; tokens.css provides the variables (shared text-control rules: ui/field.css). */
+/* March — TextInput. Imported by its component module; tokens.css provides the variables (shared text-control rules: ui/field.css). */
 .hm-affix-text > .hm-svg { inline-size: 1rem; block-size: 1rem; }
 .hm-input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }

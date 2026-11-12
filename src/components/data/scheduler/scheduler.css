@@ -1,4 +1,4 @@
-/* HADI March — Scheduler. Imported by its component module; tokens.css provides the variables. Logical properties only (RTL). */
+/* March — Scheduler. Imported by its component module; tokens.css provides the variables. Logical properties only (RTL). */
 .hm-sch { display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%; }
 .hm-sch-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2) var(--hm-space-3); min-width: 0; }
 .hm-sch-title { flex: 1 1 10rem; min-width: 0; margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); letter-spacing: var(--hm-tracking-tight);

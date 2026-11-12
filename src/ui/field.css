@@ -1,4 +1,4 @@
-/* HADI March — Field, labels and text controls (shared by forms, dialogs, search boxes). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Field, labels and text controls (shared by forms, dialogs, search boxes). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* field */
 .hm-field { display: flex; flex-direction: column; gap: var(--hm-space-1); min-width: 0; }
 .hm-field-inline { flex-direction: row; align-items: baseline; gap: var(--hm-space-3); }

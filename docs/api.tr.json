@@ -260,7 +260,7 @@
   "loadTheme": "Bir temanın stil sayfasını bir kez yükler (<link rel=\"stylesheet\">, CSP style-src 'self'); hazır olunca (ya da başarısız olunca) çözülür.",
   "LocaleSelect": "`<LocaleSelect options={[{ value: \"en\", label: \"English\" }, { value: \"tr\", label: \"Türkçe\" }]} />` — dil seçici (dizeler de kabul edilir).",
   "MadeWithMarch": "`<MadeWithMarch />`, `<MadeWithMarch variant=\"badge\" />`. Cümle tek bir i18n iletisidir; sözcük sırası dile göre değişir.",
-  "MARCH_URL": "\"HADI March\" bağlantılarının işaret ettiği adres (MadeWithMarch rozeti ve konsol afişi). Değiştirilecek tek yer. Not: hedef https://devs.hadisosyal.com/march olacaktır, ancak bu sayfa henüz yayımlanmadı.",
+  "MARCH_URL": "\"March\" bağlantılarının işaret ettiği adres (MadeWithMarch rozeti ve konsol afişi). Değiştirilecek tek yer. Not: hedef https://devs.hadisosyal.com/march olacaktır, ancak bu sayfa henüz yayımlanmadı.",
   "Markdown": "Markdown'ı güvenle çizer. Prop'lar: source (ya da dize alt öğe), images (varsayılan true, yalnızca https), newTab (varsayılan true).",
   "MarkdownEditor": "Markdown düzenleyicisi: `<MarkdownEditor bind:value={$md} view=\"split\" />`.",
   "markdownNodes": "Markdown'ı DOM düğümlerine ayrıştırır (asla HTML dizesi değil). Kaynaktaki HTML metin olarak gösterilir.",
@@ -1059,13 +1059,13 @@
  },
  "hadi-march/icons/packs": {
   "Icon": "Ad ile ikon bileşeni (\"lucide:user\" gibi paket önekiyle); paket tembel yükleniyorsa geldiğinde çizilir.",
-  "icon": "Ad ile ikon (\"lucide:user\" gibi paket önekiyle); önek yoksa HADI March seti.",
+  "icon": "Ad ile ikon (\"lucide:user\" gibi paket önekiyle); önek yoksa March seti.",
   "iconPack": "Bu kimlikle kayıtlı paket, varsa.",
-  "iconPacks": "Kayıtlı ikon paketleri (önce HADI March seti).",
+  "iconPacks": "Kayıtlı ikon paketleri (önce March seti).",
   "loadIcon": "Ad ile ikon; tembel yüklenen paketi bekler. Paket ya da ad yoksa undefined.",
   "packIcon": "Paket ikonu oluşturur (dondurulmuş): packIcon(\"arrow-left\", [\"M19 12H5\", …], { sw: 2, rtl: true }).",
   "packPaint": "Her paket ikonunun paint kancası: ızgara, çizgi kalınlığı, RTL aynalama, çift-tek dolgu.",
-  "parseIconRef": "\"lucide:user\" → [\"lucide\", \"user\"] olarak böler; önek yoksa HADI March seti.",
+  "parseIconRef": "\"lucide:user\" → [\"lucide\", \"user\"] olarak böler; önek yoksa March seti.",
   "registerIconPack": "İkon seti ekler; icon(\"id:…\") ve <Icon name=\"id:…\"> onu kullanır. Geri kaldıran bir işlev döndürür."
  },
  "hadi-march/landing": {

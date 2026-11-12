@@ -1,4 +1,4 @@
-/* HADI March — Progress. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Progress. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- progress */
 .hm-progress2 { --hm-progress-cycle-dur: 2.4s; --hm-progress-indet-dur: 1.3s; display: flex; flex-direction: column; gap: .375rem; min-width: 0; }
 .hm-progress2-head { display: flex; justify-content: space-between; gap: var(--hm-space-2); font-size: var(--hm-text-sm); }

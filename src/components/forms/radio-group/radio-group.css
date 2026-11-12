@@ -1,4 +1,4 @@
-/* HADI March — RadioGroup. Imported by its component module; tokens.css provides the variables (shared text-control rules: ui/field.css). */
+/* March — RadioGroup. Imported by its component module; tokens.css provides the variables (shared text-control rules: ui/field.css). */
 /* segmented look (radio only): the chosen option is raised */
 .hm-choice-segmented .hm-check:has(.hm-check-input:checked) { background: var(--hm-surface); color: var(--hm-ch-text); box-shadow: var(--hm-shadow-1), 0 0 0 1px var(--hm-border); }
 

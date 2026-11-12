@@ -1,4 +1,4 @@
-// Open-source product language: the showcase, the docs and every file that ships in the package speak about HADI March,
+// Open-source product language: the showcase, the docs and every file that ships in the package speak about March,
 // never about the people or the internal process behind it (no names, no "the founder asked", no session or branch
 // talk, no roadmap chatter). Internal planning lives in docs/internal/ (not packaged, not published).
 import { test } from "node:test";

@@ -39,7 +39,7 @@ test("deep imports rewrite the import header only, never an import written insid
   assert.ok(out.endsWith('const code = `import { Icon, users } from "hadi-march/icons"`;\n'), "the code sample is untouched");
 });
 
-test("icon packs: icon() and <Icon name> resolve 'pack:name' and plain names (HADI March) through registerIconPack, lazily", async () => {
+test("icon packs: icon() and <Icon name> resolve 'pack:name' and plain names (March) through registerIconPack, lazily", async () => {
   const P = await import("../src/icons/packs.ts");
   const acme = { name: "acme-star", d: ["M12 2 2 22h20z"], fill: true, vb: "0 0 24 24" };
   const off = P.registerIconPack({ id: "acme", name: "Acme", license: "MIT", resolve: (n) => Promise.resolve(n === "star" ? acme : undefined) });
@@ -75,7 +75,7 @@ test("pack icons carry their grid, stroke width, fill, even-odd shapes and RTL m
   assert.match(svg.getAttribute("class"), /hm-svg-rtl/);
   assert.equal(svg.querySelectorAll("path")[0].getAttribute("fill-rule"), null);
   assert.equal(svg.querySelectorAll("path")[1].getAttribute("fill-rule"), "evenodd");
-  // repainting with a HADI March icon leaves nothing of the pack behind
+  // repainting with a March icon leaves nothing of the pack behind
   I.paintIcon(svg, I.users);
   assert.equal(svg.getAttribute("viewBox"), "0 0 24 24");
   assert.doesNotMatch(svg.getAttribute("class"), /rtl/);

@@ -1,4 +1,4 @@
-/* HADI March — every ui component's CSS in one file (back compat). Apps built with the March esbuild plugin get each
+/* March — every ui component's CSS in one file (back compat). Apps built with the March esbuild plugin get each
    component's CSS automatically with the component, split per lazy chunk; import this only without the plugin. */
 @import "../ui/field.css";
 @import "../ui/button.css";
