@@ -227,6 +227,23 @@ export function topInputs(meta, cwd, outdir, files, n = 12) {
  * @param {string} outdir
  * @returns {Record<string, { raw: number, gzip: number }>}
  */
+/**
+ * Every file under a built folder (pages, chunks, public files…): what a host stores per version. `budget.maxFiles`
+ * (march.config.js) caps it: some hosts take only so many files per deploy.
+ */
+export function countFiles(dir) {
+  let n = 0;
+  for (const name of readdirSync(dir)) { const p = join(dir, name); n += statSync(p).isDirectory() ? countFiles(p) : 1; }
+  return n;
+}
+
+/** Over `maxFiles`: a message, else null. */
+export function filesOver(dir, maxFiles) {
+  if (!maxFiles) return null;
+  const n = countFiles(dir);
+  return n > maxFiles ? `${n} files in ${dir.split(sep).pop()} (budget.maxFiles ${maxFiles}): fewer lazy modules (group examples, demos)` : null;
+}
+
 export function fileSizes(outdir) {
   const out = {};
   const walk = (dir) => {

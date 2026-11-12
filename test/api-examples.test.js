@@ -92,3 +92,13 @@ export default examples({
   assert.match(files["gen/g/_ready.tsx"], /^let ready = false$/m);
   assert.match(files["gen/g/_ready.tsx"], /^export \{ ready, ensure \};$/m);
 });
+
+// one lazy module per example made 1,274 files (the published showcase may hold 512): examples load per group instead
+test("API examples: at most 150 generated example modules (examples/showcase/src/api-examples/gen)", { todo: "examples grouped per file: on the API branch" }, async () => {
+  const { readdirSync, statSync } = await import("node:fs");
+  const count = (d) => readdirSync(d).reduce((n, f) => { const p = `${d}/${f}`; return n + (statSync(p).isDirectory() ? count(p) : /\.tsx?$/.test(f) ? 1 : 0); }, 0);
+  const dir = new URL("../examples/showcase/src/api-examples/gen", import.meta.url);
+  let n = 0;
+  try { n = count(dir.pathname.replace(/^\/([A-Za-z]:)/, "$1")); } catch { /* no gen folder: grouped */ }
+  assert.ok(n <= 150, `${n} generated example modules`);
+});

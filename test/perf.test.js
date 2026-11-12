@@ -460,3 +460,22 @@ test("index.html lists only the manifest keys some code can look up (tagged load
     assert.equal(html["plain.tsx"], undefined, "a key no code mentions is left out of index.html");
   } finally { app.cleanup(); }
 });
+
+test("budget.maxFiles: every file of the output counts (pages, chunks, public files); over the cap is reported", async () => {
+  const { countFiles, filesOver } = await import("../cli/perf.js");
+  const { mkdirSync } = await import("node:fs");
+  const dir = mkdtempSync(join(tmpdir(), "hm-files-"));
+  try {
+    mkdirSync(join(dir, "assets/chunks"), { recursive: true });
+    for (const f of ["index.html", "404.html", "assets/main.js", "assets/chunks/a.js", "assets/chunks/b.css"]) writeFileSync(join(dir, f), "x");
+    assert.equal(countFiles(dir), 5);
+    assert.equal(filesOver(dir, 5), null);
+    assert.match(filesOver(dir, 4), /5 files .*budget\.maxFiles 4/);
+    assert.equal(filesOver(dir, undefined), null, "no cap without budget.maxFiles");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("showcase: the published file budget is set under the host's 512 files per version", async () => {
+  const cfg = (await import("../examples/showcase/march.config.js")).default;
+  assert.ok(cfg.budget.maxFiles && cfg.budget.maxFiles <= 480, "budget.maxFiles leaves room under 512");
+});

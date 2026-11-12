@@ -36,7 +36,7 @@ import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
 import { packChunks, STRATEGIES } from "../compiler/pack-chunks.js";
 import { packLoop, PACK_BUDGET } from "../compiler/pack-loop.js";
 import { planSmallLazy, smallFiles, aliasGroups } from "../compiler/min-chunks.js";
-import { chunkManifest, htmlManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText, fileSizes } from "./perf.js";
+import { filesOver, chunkManifest, htmlManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText, fileSizes } from "./perf.js";
 import { posix } from "../compiler/fs-util.js";
 
 const cwd = process.cwd();
@@ -255,6 +255,9 @@ async function build({ dev = false } = {}) {
         console.error(`[31m✖[0m ${small.length} file(s) under chunks.minSize (${minSize} B): ${small.map((x) => `${x.file} ${x.bytes} B`).join(", ")}`);
         process.exitCode = 1;
       }
+      // budget.maxFiles: every file of the output (a host may cap files per deploy)
+      const tooMany = filesOver(out, cfg.budget?.maxFiles);
+      if (tooMany) { console.error(`[31m✖[0m ${tooMany}`); process.exitCode = 1; }
       if (rep.over.length) {
         const msg = `over budget: ${rep.over.map(overText).join("; ")}`;
         if (rep.over.some((x) => x.entry) && flag("--analyze") !== true) { console.log("  largest modules in the entry (minified, before gzip) — move heavy ones behind import()/lazy():"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, flag("--analyze") === true ? 40 : 12)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
