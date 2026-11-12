@@ -606,4 +606,5 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, StoryProgress, LikeButton |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
+| Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress |
 <!-- components:end -->

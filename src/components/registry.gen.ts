@@ -43,6 +43,7 @@ import m39 from "./composite/tree-editor/meta.ts";
 import m40 from "./data/tree-view/meta.ts";
 import m41 from "./social/typing-indicator/meta.ts";
 import m42 from "./data/virtual-list/meta.ts";
+import m43 from "./composite/wizard/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 const ownPage = (name: string): Promise<never> => Promise.reject(new Error(`${name} has its own entry: its page imports the demo`));
@@ -91,4 +92,5 @@ export const registry: readonly RegistryEntry[] = [
   { folder: "data/tree-view", meta: m40, code: "import { TreeView } from \"hadi-march/components/data/tree-view\";\n\n<TreeView nodes={files} selection=\"multiple\" draggable search={$q}\n  load={(node) => api.children(node.id)}\n  onSelect={(ids) => $selected = ids}\n  onMove={(ids, target, position) => api.move(ids, target, position)} />", demo: () => import("./data/tree-view/demo.tsx"), playground: () => import("./data/tree-view/playground.ts") },
   { folder: "social/typing-indicator", meta: m41, code: "<TypingIndicator names={$typing} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p2) },
   { folder: "data/virtual-list", meta: m42, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d3), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p3) },
+  { folder: "composite/wizard", meta: m43, code: "<Wizard submitLabel=\"Finish\" onSubmit={save} steps={[\n  { title: \"Account\", schema: schema({ email: { type: \"email\", required: true } }) },\n  { title: \"Profile\", schema: schema({ name: { type: \"text\", required: true } }), validate: (v) => (v.name === \"admin\" ? \"Pick another name\" : null) },\n]} />", demo: () => import("./composite/wizard/demo.tsx"), playground: () => import("./composite/wizard/playground.ts") },
 ];

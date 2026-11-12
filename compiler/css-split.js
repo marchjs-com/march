@@ -18,7 +18,7 @@ export const ORDER = [
   "components/composite/nav-sidebar/nav-sidebar.css", "components/composite/command-palette/command-palette.css", "ui/theme.css", "ui/accent.css", "components/composite/theme-menu/theme-menu.css", "dom/lazy.css", "ui/overlay.css", "ui/theme-swatches.css", "ui/media.css", "ui/disclosure.css", "ui/app.css", "components/actions/chip/chip.css", "ui/marquee.css", "ui/avatar-group.css",
   "ui/progress.css", "ui/rating.css", "ui/accordion.css", "ui/steps.css", "ui/pagination.css", "ui/carousel.css", "ui/tree.css", "ui/kanban.css",
   "ui/splitter.css", "forms/form.css", "forms/inputs.css", "forms/choice.css", "forms/pickers.css", "forms/date.css", "forms/file.css", "forms/editors.css",
-  "forms/wizard.css", "forms/records.css", "css/table.css", "charts/charts.css", "fx/fx.css",
+  "components/composite/wizard/wizard.css", "forms/records.css", "css/table.css", "charts/charts.css", "fx/fx.css",
 ];
 const rank = (abs) => { const r = relative(SRC, abs).split(sep).join("/"); const i = ORDER.indexOf(r); return i < 0 ? ORDER.length : i; };
 const isMarchModule = (p) => !!p && p.startsWith(SRC + sep) && /\.(ts|tsx|js|jsx)$/.test(p);

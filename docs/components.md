@@ -85,6 +85,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
+| Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress |
 
 ## BottomNav
 
@@ -633,3 +634,18 @@ A long list that keeps only the rows near the viewport in the DOM, so 100,000 ro
 ```
 
 Full page: src/components/data/virtual-list/docs.md
+
+## Wizard
+
+One form split into steps. Each step shows and validates its own fields (plus an optional `validate` check) before Next; Back keeps what was typed; Finish submits the whole form. The stage list on top is the Steps component: a later stage can be picked once every stage before it passes.
+
+Composed of: Steps, Progress
+
+```tsx
+<Wizard submitLabel="Finish" onSubmit={save} steps={[
+  { title: "Account", schema: schema({ email: { type: "email", required: true } }) },
+  { title: "Profile", schema: schema({ name: { type: "text", required: true } }), validate: (v) => (v.name === "admin" ? "Pick another name" : null) },
+]} />
+```
+
+Full page: src/components/composite/wizard/docs.md

@@ -7,5 +7,5 @@
 @import "../forms/date.css";
 @import "../forms/file.css";
 @import "../forms/editors.css";
-@import "../forms/wizard.css";
+@import "../components/composite/wizard/wizard.css";
 @import "../forms/records.css";

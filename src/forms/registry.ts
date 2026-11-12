@@ -3,10 +3,8 @@
 import { TextInput, Textarea, PasswordInput, EmailInput, UrlInput, PhoneInput, NumberInput, MoneyInput, PercentInput, Select, Checkbox, Toggle,
   CheckboxGroup, RadioGroup, Segmented, Slider, ColorInput, CodeInput, type NumberInputProps } from "./inputs.ts";
 import { Combobox, MultiSelect } from "./pickers.ts";
-import { DatePicker, TimeInput, DateTimeInput, DateRangePicker } from "./date.ts";
-import { ListEditor, KeyValueEditor, JsonEditor, MarkdownEditor } from "./editors.ts";
-import { FileUpload } from "./file.ts";
 import { extend } from "./util.ts";
+import { lazy, skeleton } from "../dom/lazy.ts";
 import type { FieldSpec } from "../schema/index.ts";
 
 /**
@@ -14,6 +12,15 @@ import type { FieldSpec } from "../schema/index.ts";
  * plus the field's options). Any component taking an object of props fits.
  */
 export type InputComponent = { bivarianceHack(props: Record<string, unknown>): unknown }["bivarianceHack"];
+
+// the larger inputs (dates, editors, file upload) load the first time a form shows one: a form of text fields does not
+// download them; an input-sized skeleton holds the place meanwhile
+const later = (load: () => Promise<unknown>, pick: string): InputComponent =>
+  lazy(load as () => Promise<Record<string, InputComponent>>, { pick, placeholder: () => skeleton("text") }) as unknown as InputComponent;
+const dates = () => import("./date.ts"), editors = () => import("./editors.ts");
+const DatePicker = later(dates, "DatePicker"), TimeInput = later(dates, "TimeInput"), DateTimeInput = later(dates, "DateTimeInput"), DateRangePicker = later(dates, "DateRangePicker");
+const ListEditor = later(editors, "ListEditor"), KeyValueEditor = later(editors, "KeyValueEditor"), JsonEditor = later(editors, "JsonEditor"), MarkdownEditor = later(editors, "MarkdownEditor");
+const FileUpload = later(() => import("./file.ts"), "FileUpload");
 
 /** Whole numbers: NumberInput with 0 decimals. */
 export const IntInput = (props: NumberInputProps): unknown => NumberInput(extend(props, { decimals: () => props.decimals ?? 0 }));
