@@ -64,7 +64,7 @@ function graph(outs) {
   const entries = js.filter((k) => outs[k].entryPoint);
   const reach = new Map(js.map((k) => [k, new Set()]));
   for (const e of entries) for (const k of closure(e)) reach.get(k)?.add(e);
-  return { js, imports, importers, closure, reach };
+  return { js, imports, importers, closure, reach, outs };
 }
 
 /**
@@ -92,7 +92,7 @@ function explain(g, t, users, fits, bootFits) {
   for (const [r, list] of why) console.log(`  ${r}: ${list.length} — ${list.slice(0, 6).join(", ")}`);
 }
 
-export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048, budgetOf, fallback = true }) {
+export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048, budgetOf, fallback = true, strategy = 0 }) {
   const outs = meta.outputs;
   const gzCache = new Map();
   const gz = (k) => { if (!gzCache.has(k)) { const f = resolve(cwd, k); gzCache.set(k, existsSync(f) ? gzipSync(readFileSync(f)).length : 0); } return gzCache.get(k); };
@@ -115,7 +115,26 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     stubs++;
   }
 
-  // 2. small shared chunks fold into a chunk that is always loaded with them
+  // 2. small shared chunks fold into a chunk that is always loaded with them (free hosts only: nobody downloads more)
+  // 2b. what is still small goes into shared "common" chunks (below), before any paid fold: the budget room of routes
+  // and parts is spent on leftovers first, not on cheapest-partner folds that would leave no room for the last ones
+  // 2c. last step: every shared chunk still under the floor (a lone leftover, a common group that stayed small) joins
+  // the host that costs the fewest extra bytes and keeps every route / part within its budget — another common group,
+  // a shared chunk or a new group. Greedy folds depend on their order (an early fold can spend the room the last leftover
+  // needed): `strategy` picks the order (STRATEGIES); march build tries the next one on the final plan while small chunks
+  // are left, and fails when none leaves zero.
+  const { commonFirst, order, entryHost = false } = STRATEGIES[strategy] ?? STRATEGIES[0];
+  let common = 0;
+  if (commonFirst) {
+    await foldSmall(false, order);
+    common = await commonChunks();
+    if (fallback) await foldSmall(true, order);
+  } else {
+    await foldSmall(fallback, order);
+    common = await commonChunks();
+  }
+
+  async function foldSmall(fallback, order = 0) {
   const skip = new Set();
   for (let round = 0; round < 5000; round++) {
     const g = graph(outs);
@@ -127,7 +146,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
       // a lazy module's own code first (once something else joined it, it may no longer count as small); then widely
       // shared code (it competes for the start-up budget with narrow code), then the smallest; the name breaks ties so
       // the same input always folds the same way
-      .sort((a, b) => (own(a) ? 0 : 1) - (own(b) ? 0 : 1) || g.reach.get(b).size - g.reach.get(a).size || (outs[a].bytes ?? 0) - (outs[b].bytes ?? 0) || (a < b ? -1 : 1));
+      .sort((a, b) => (own(a) ? 0 : 1) - (own(b) ? 0 : 1) || ORDERS[order](g, a, b) || (a < b ? -1 : 1));
     let done = false;
     // start-up pieces (budget.boot) and what they reach: a fold into one of them adds T to start-up for everyone
     const bootEntries = g.js.filter((e) => outs[e].entryPoint && budgetOf?.(e)?.boot);
@@ -179,7 +198,10 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
       if (!best && fallback) {
         const bytes = (k) => outs[k].bytes ?? 0;
         for (const b of g.js) {
-          if (b === t || b === entryKey || outs[b].entryPoint) continue; // a page or lazy part never becomes a static dependency
+          if (b === t || b === entryKey) continue;
+          // a route / lazy part is a host only for code it imports itself (its other users then load it statically: their
+          // budgets decide), never a start-up piece, never one with a stylesheet (its rules would apply on other pages)
+          if (outs[b].entryPoint && (!entryHost || !users.includes(b) || budgetOf?.(b)?.boot || outs[b].cssBundle)) continue;
           const rb = g.reach.get(b), cb = g.closure(b), ct = g.closure(t);
           if (cb.has(t) && !users.includes(b)) continue; // B → X → T
           if ([...ct].some((x) => x !== t && x !== b && g.closure(x).has(b))) continue; // T → X → B
@@ -197,12 +219,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     }
     if (!done) break;
   }
-
-  // 2b. what is still small has no free host (start-up is at its limit, every other host would push a route or part past
-  // its budget): it goes into one shared "common" chunk outside start-up (two or more when one would pass the part
-  // budget, split by who uses it). Routes import it statically; the router prefetches it when idle after start-up
-  // (manifest key "march:common", never with Save-Data). Its size is a row of its own in the report: counted honestly.
-  const common = await commonChunks();
+  }
 
   // 3. a small CSS file joins the CSS of a chunk that is always loaded with its own (else main.css): its loader goes
   let cssMoved = 0;
@@ -270,6 +287,10 @@ ${css}`);
   }
   return { stubs, folded, cssMoved, common };
 
+  // 2b. small code with no free host (start-up is at its limit, every other host would push a route or part past its
+  // budget) goes into shared "common" chunks outside start-up (more than one when one would pass the part budget, split
+  // by who uses it). Routes import them statically; the router prefetches them when idle after start-up (manifest key
+  // "march:common", never with Save-Data). Their size is a row of its own in the report: counted honestly.
   async function commonChunks() {
     const g = graph(outs);
     const bootEntries = g.js.filter((e) => outs[e].entryPoint && budgetOf?.(e)?.boot);
@@ -291,24 +312,26 @@ ${css}`);
     // members with the same users stay together when the chunk has to split
     const sig = (k) => [...g.reach.get(k)].sort().join("|");
     cand.sort((a, b) => g.reach.get(b).size - g.reach.get(a).size || sig(a).localeCompare(sig(b)) || (a < b ? -1 : 1));
-    // every route / part that loads a member now loads the whole group (and its imports): none may pass its budget
-    const fitsAll = (group) => {
+    // every route / part that loads a member of a group now loads the whole group (and its imports), and every other
+    // group it touches: none may pass its budget
+    const groups = [];
+    const fitsAll = (gs) => {
       if (!budgetOf) return true;
-      const users = new Set(group.flatMap((t) => [...g.reach.get(t)]));
-      const both = new Set(group.flatMap((t) => [...g.closure(t)]));
+      const users = new Set(gs.flat().flatMap((t) => [...g.reach.get(t)]));
       for (const e of users) {
         const lim = budgetOf(e)?.limit;
         if (lim == null) continue;
+        const ce = g.closure(e), got = new Set(ce);
+        for (const grp of gs) if (grp.some((t) => ce.has(t))) for (const t of grp) for (const x of g.closure(t)) got.add(x);
         let n = 0;
-        for (const x of new Set([...g.closure(e), ...both])) if (!have.has(x)) n += gz(x);
-        if (n > lim) { if (process.env.MARCH_DEBUG_COMMON) console.log(`[common] ${group.map(base).join("+")}: ${outs[e].entryPoint} would be ${n} > ${lim}`); return false; }
+        for (const x of got) if (!have.has(x)) n += gz(x);
+        if (n > lim) { if (process.env.MARCH_DEBUG_COMMON) console.log(`[common] ${outs[e].entryPoint} would be ${n} > ${lim}`); return false; }
       }
       return true;
     };
-    const groups = [];
     for (const t of cand) {
-      const grp = groups.find((x) => x.reduce((s, y) => s + gz(y), 0) + gz(t) <= partLimit && fitsAll([...x, t]));
-      if (grp) grp.push(t); else groups.push([t]);
+      const i = groups.findIndex((x) => x.reduce((s, y) => s + gz(y), 0) + gz(t) <= partLimit && fitsAll(groups.map((y) => (y === x ? [...y, t] : y))));
+      if (i >= 0) groups[i].push(t); else groups.push([t]);
     }
     if (DBG) console.log("[common] groups:", groups.map((x) => x.map(base).join("+")).join(" | "));
     let made = 0;
@@ -318,7 +341,7 @@ ${css}`);
 
   /** One file from several small chunks: their importers import from it instead. */
   async function mergeGroup(grp, n) {
-    const key = `${dirname(grp[0])}/common-${"ABCDEFGHIJ"[n] ?? "Z"}AAAAAAA.js`;
+    const key = `${dirname(grp[0])}/common-${n.toString(36).toUpperCase().padStart(8, "A")}.js`; // unique: one per group
     const cAbs = resolve(cwd, key);
     const inside = new Set(grp.map((t) => resolve(cwd, t)));
     const aliases = new Map();
@@ -351,9 +374,27 @@ ${css}`);
       const us = (g.importers.get(t) ?? []).filter((u) => !grp.includes(u));
       if (!us.every((u) => retarget(cwd, u, t, key, aliases.get(t)))) { for (const [u, x] of before) writeFileSync(resolve(cwd, u), x); return false; }
     }
-    const code = res.outputFiles[0].text;
+    let code = res.outputFiles[0].text;
+    let css = grp.map((t) => outs[t].cssBundle).filter(Boolean);
+    // one stylesheet per common chunk: the members' CSS joins the first one in load order (one loader, no small CSS files)
+    if (css.length > 1) {
+      const keep = [css[0]];
+      let joined = readFileSync(resolve(cwd, css[0]), "utf8");
+      for (const c of css.slice(1)) {
+        const stripped = stripCssLoader(code, base(c));
+        if (stripped == null || !existsSync(resolve(cwd, c))) { keep.push(c); continue; }
+        code = stripped;
+        joined += `
+${readFileSync(resolve(cwd, c), "utf8")}`;
+        outs[css[0]] = { ...outs[css[0]], inputs: { ...(outs[css[0]]?.inputs ?? {}), ...(outs[c]?.inputs ?? {}) } };
+        rmSync(resolve(cwd, c), { force: true });
+        delete outs[c];
+      }
+      writeFileSync(resolve(cwd, css[0]), joined);
+      outs[css[0]].bytes = Buffer.byteLength(joined);
+      css = keep;
+    }
     writeFileSync(cAbs, code);
-    const css = grp.map((t) => outs[t].cssBundle).filter(Boolean);
     outs[key] = {
       bytes: Buffer.byteLength(code), common: true, entryPoint: undefined,
       imports: dedupe(grp.flatMap((t) => outs[t].imports ?? []).filter((im) => !grp.includes(im.path))),
@@ -432,6 +473,21 @@ ${bCss}`), inputs: { ...(outs[bc]?.inputs ?? {}), ...(outs[tc]?.inputs ?? {}) } 
     return true;
   }
 }
+
+// packing strategies, the first is what every planning pass uses; the others run only on the final plan (march build)
+// while small chunks are left. order: the order of the paid folds (2c) — widely shared code first (it competes for the
+// start-up budget with narrow code), narrow code first, the largest first. entryHost: a route / lazy part may host small
+// code it imports itself (its other users then load it statically; their budgets decide)
+const ORDERS = [
+  (g, a, b) => g.reach.get(b).size - g.reach.get(a).size || (g.outs[a].bytes ?? 0) - (g.outs[b].bytes ?? 0),
+  (g, a, b) => g.reach.get(a).size - g.reach.get(b).size || (g.outs[a].bytes ?? 0) - (g.outs[b].bytes ?? 0),
+  (g, a, b) => (g.outs[b].bytes ?? 0) - (g.outs[a].bytes ?? 0) || g.reach.get(b).size - g.reach.get(a).size,
+];
+export const STRATEGIES = [
+  { commonFirst: true, order: 0 }, { commonFirst: true, order: 0, entryHost: true },
+  { commonFirst: false, order: 0 }, { commonFirst: false, order: 0, entryHost: true },
+  { commonFirst: true, order: 1, entryHost: true }, { commonFirst: true, order: 2, entryHost: true },
+];
 
 function fs_append(file, css) { writeFileSync(file, `${readFileSync(file, "utf8")}
 ${css}`); }

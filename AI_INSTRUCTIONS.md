@@ -145,13 +145,16 @@ Overlays never take input; put content after them. `front` only for foreground e
 - Credit is optional and never required (the licence stays MIT): `<MadeWithMarch />` (`variant` text / badge / small, link constant `MARCH_URL`) or `credit: true` in `march.config.js` (adds `<!-- Built with HADI March -->` to the built `index.html` and prints the one-line console banner in production too, from a separate tiny `credit.js`; off by default). `march dev` prints the banner once per page; `banner: false` turns it off. Production never prints it otherwise and the app bundle never contains it (size effect 0). The link comes from one constant, `MARCH_URL` in `src/brand.js`. Add it to a footer when the user wants it; never add it unasked.
 - Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, fail: true }`); turn on `sw: true` when offline use matters.
 - `chunks: { minSize: 10240, allow: { "chunks/x.js": "reason" } }` (default 10 KB before gzip): no JS/CSS file under it. Small shared code
-  folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
-  parent, or joins a group chunk with the entry's other small lazy modules that share the most code (second build pass).
-  Small shared code with no host at all (start-up at `budget.bootLimit`, every partner over a budget) goes into a shared
-  `common` chunk outside start-up (split by users when it would pass `budget.part`): routes import it, and the router
-  prefetches it when idle after the first page (`prefetchCommon()`, manifest key `march:common`, never with Save-Data).
-  `chunks.commonRoom` (gzip bytes) keeps page groups that far under `budget.route`, so it still fits.
-  A file still under the limit fails the build; `allow` needs a reason. `chunks: false` turns it off.
+  folds into a chunk always loaded with it; a small lazy module becomes a static import of its lazy parent, or joins a
+  group chunk with the entry's other small lazy modules that share the most code (second build pass). Small shared code
+  with no free host goes into shared `common` chunks outside start-up (more than one when one would pass `budget.part`,
+  split by users; one stylesheet each): routes import them, and the router prefetches them when idle after the first page
+  (`prefetchCommon()`, manifest key `march:common`, never with Save-Data). Last step: a shared chunk still under the
+  limit joins the host that costs the fewest bytes and keeps every route (`budget.route`) and part (`budget.part`)
+  within budget — a common chunk, another shared chunk, or a route / lazy part that imports it itself; on the final plan
+  the build retries with other fold orders (`STRATEGIES`, compiler/pack-chunks.js). `chunks.commonRoom` (gzip bytes)
+  keeps page groups that far under `budget.route`. A file still under the limit fails the build; `allow` needs a reason
+  and is not a way around a packing problem. `chunks: false` turns it off.
 
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.
