@@ -19,6 +19,8 @@ export interface ComponentMeta {
   hubs?: readonly string[];
   /** Category folder (src/components/<category>/<name>/): overlays, feedback, navigation, composite … */
   category?: string;
+  /** Own package entry instead of the hadi-march/ui barrel (heavy features used on few pages), e.g. "hadi-march/flow". */
+  entry?: string;
   /** Showcase page path that shows it. */
   showcase?: string;
   /** Deprecated: what to use instead. */

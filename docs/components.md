@@ -5,8 +5,13 @@
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| ContextMenu | experimental | Right-click / Shift+F10 menu anchored to the pointer: the same items, actions and keyboard as Menu, chosen per target. | — |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | ContextMenu, IconButton, OverflowText, FieldFrame, TextInput, NumberInput, Select, Toggle |
+| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, Chip, OverflowText |
+| FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, OverflowText |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+| Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
 
 ## BottomNav
 
@@ -30,7 +35,29 @@ A label pill. Three uses: a static label, a **filter** you can switch on and off
 
 Full page: src/components/chip/docs.md
 
+## ContextMenu
+
+The menu that opens where you right-click, or with Shift+F10 / the Menu key on the focused element. It draws the same items as `Menu` — plain items, actions, separators, shortcuts — with the same roving keyboard; `items` receives the element that was clicked, so one menu can offer different entries for different targets.
+
+```tsx
+<ContextMenu items={(target) => [{ label: "Copy", shortcut: "mod+c", onSelect: copy }, "-", { label: "Delete", danger: true, onSelect: remove }]}>
+  <ul class="files">…</ul>
+</ContextMenu>
+```
+
+Full page: src/components/overlays/context-menu/docs.md
+
 ## Drawer
+
+A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
+
+```tsx
+<Drawer open={$open} onClose={() => $open = false} side="bottom" snapPoints={[0.4, 0.9]} title="Filters">…</Drawer>
+```
+
+Full page: src/components/overlays/drawer/docs.md
+
+## FlowCanvas
 
 
 
@@ -38,7 +65,31 @@ Full page: src/components/chip/docs.md
 
 ```
 
-Full page: src/components/overlays/drawer/docs.md
+Full page: src/components/composite/flow-canvas/docs.md
+
+## FlowControls
+
+Run, pause, step and reset a flow; choose the speed; see the state, the clock and how many nodes finished. `createFlowRunner(flow)` executes the flow node by node and writes the state FlowCanvas draws: the running node glows, a failing node shakes and shows its error, values travel along the edges as dots and every edge counts what passed. `FlowTimeline` is the run record: one bar per executed node on a time axis with a playhead.
+
+```tsx
+const runner = createFlowRunner(flow, { nodeMs: 650, travelMs: 560 })
+<FlowControls runner={runner} flow={flow} timeline />
+await runner.run()        // "done" | "error"; runner.pause() / resume() / step() / reset()
+```
+
+Full page: src/components/composite/flow-controls/docs.md
+
+## FlowPalette
+
+The node types of a flow, grouped by category, with a search box (accent and Turkish-letter insensitive). Drag a card onto a FlowCanvas to place the node where you drop it, snapped to the grid; a click or Enter adds it in the middle of the view. The dragged card floats in the drag layer, tilts while it is held and melts into the canvas (or flies back when dropped outside) on the motion engine.
+
+```tsx
+const flow = createFlow({ types })
+<FlowPalette flow={flow} />
+<FlowCanvas flow={flow} />
+```
+
+Full page: src/components/composite/flow-palette/docs.md
 
 ## PullToRefresh
 
@@ -49,3 +100,14 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 ```
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
+
+## Stepper
+
+Progress through stages, with motion that shows where you are going. Stepper draws Steps and adds a liquid highlight that stretches from the old step to the new one and settles there, and step panels that morph into each other: the old panel blurs and slides toward the past, the new one arrives from the future (mirrored in RTL) while the frame's height follows. Back / Next buttons and a step counter come with it.
+
+```tsx
+<Stepper steps={[{ title: "Cart" }, { title: "Address" }, { title: "Payment" }]} current={$step} onSelect={(i) => $step = i}
+  panels={[<Cart />, <Address />, <Payment />]} onFinish={submit} />
+```
+
+Full page: src/components/navigation/stepper/docs.md

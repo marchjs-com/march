@@ -12,6 +12,8 @@ import { model, ctl, cx, uid, extend, syncValue, parseNumber, formatNumber, norm
 import { colorAttr, type ColorToken } from "../theme/colors.ts";
 import { choiceBox, choiceText, itemColor, lookClass, type ChoiceLook } from "./choice.ts";
 import { clamp } from "../core/util.ts";
+// the field frame travels with the inputs (same chunk): a labelled control never pulls the form engine
+export { FieldFrame, fieldFrame, type FieldFrameProps, type FrameOptions, type FrameControl } from "./field-frame.ts";
 
 /** prefix / suffix text around a control. */
 export interface AffixProps { prefix?: unknown; suffix?: unknown; class?: ClassProp }

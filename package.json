@@ -49,6 +49,8 @@
     "./managers/command/ui": "./src/managers/command/ui.ts",
     "./managers/clipboard": "./src/managers/clipboard/index.ts",
     "./managers/undo": "./src/managers/undo/index.ts",
+    "./flow": "./src/flow/index.ts",
+    "./context-menu": "./src/components/overlays/context-menu/index.ts",
     "./managers/dirty": "./src/managers/dirty/index.ts",
     "./managers/storage": "./src/managers/storage/index.ts",
     "./managers/cache": "./src/managers/cache/index.ts",

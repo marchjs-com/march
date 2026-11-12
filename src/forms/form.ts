@@ -12,6 +12,7 @@ import { askReason } from "../ui/dialog.ts";
 import { toast } from "../ui/toast.ts";
 import { FieldContext, scoped, cx, uid, live, type FieldCtx, type ClassProp } from "./util.ts";
 import { inputFor, GROUP_CONTROLS, INLINE_LABEL, type InputComponent } from "./registry.ts";
+import { fieldFrame } from "./field-frame.ts";
 import { colorAttr, type ColorToken } from "../theme/colors.ts";
 
 /** When fields validate: on blur (default), on every change, or only on submit. */
@@ -297,29 +298,14 @@ export function Field(props: FieldProps): unknown {
     const f = form && name ? form.schema.field(name) : null;
     if (form && name && !f) throw new Error(`March forms: field "${name}" is not in the schema.`);
     const id = props.id ?? (form && name ? form.idOf(name) : uid("hm-f"));
-    const labelId = `${id}-label`, helpId = `${id}-help`, errId = `${id}-error`;
     const error = () => props.error ?? (form && name ? form.errors[name] : null) ?? null;
     const help = () => props.help ?? f?.help ?? null;
     const label = () => props.label ?? f?.label ?? null;
     const required = () => !!(props.required ?? f?.required);
-    const ctx: FieldCtx = { id, labelId, invalid: () => !!error(), describedby: () => [help() ? helpId : null, error() ? errId : null].filter(Boolean).join(" ") };
-    provide(FieldContext, ctx);
-    const built = f && form ? controlFor(form, f, props, ctx) : null;
-    const control = built ? built.el : props.children;
-    const group = props.group ?? (built ? GROUP_CONTROLS.has(built.Comp) : false);
-    const inlineLabel = built ? INLINE_LABEL.has(built.Comp) : false;
-    const labelKids = [() => label(), () => (required() ? h("span", { class: "hm-req", "aria-hidden": "true" }, " *") : null)];
-    const labelEl = inlineLabel ? null : group
-      ? h("div", { class: "hm-label", id: labelId }, labelKids)
-      : h("label", { class: "hm-label", id: labelId, for: id }, labelKids);
-    return h("div", { "data-hm-color": colorAttr(props.color),
-      class: cx("hm-field", props.inline && "hm-field-inline", props.compact && "hm-field-compact", f?.["span"] ? `hm-span-${f["span"]}` : false, props.class),
-      "class:hm-field-invalid": () => !!error(), "data-field": name ?? null,
-    },
-    () => (label() != null && labelEl ? labelEl : null),
-    h("div", { class: "hm-field-control" }, control,
-      () => (help() ? h("div", { class: "hm-help", id: helpId }, help()) : null),
-      h("div", { class: "hm-field-error", id: errId, "aria-live": "polite", hidden: () => !error() }, () => error() ?? "")));
+    return fieldFrame({ id, label, help, error, required, color: props.color, inline: props.inline, compact: props.compact, class: props.class, name: name ?? null, span: f?.["span"] }, (ctx) => {
+      const built = f && form ? controlFor(form, f, props, ctx) : null;
+      return { el: built ? built.el : props.children, group: props.group ?? (built ? GROUP_CONTROLS.has(built.Comp) : false), inlineLabel: built ? INLINE_LABEL.has(built.Comp) : false };
+    });
   });
 }
 

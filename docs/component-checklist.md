@@ -22,7 +22,7 @@ march check component <name>
 | `docs.md` | first paragraph + first code block feed the catalogues; `## Props`, `## Accessibility`, `## Composed of` |
 | `demo.tsx` | showcase stage: `default (props: { values })` draws it for the Playground values |
 | `playground.ts` | options with an effect only (`visibleWhen` while they have none); choices go through ChoicePicker |
-| `meta.ts` | `name`, `status` (stable / experimental / deprecated), `since`, `summary`, `composedOf`, `behaviors`, `hubs` |
+| `meta.ts` | `name`, `status` (stable / experimental / deprecated), `since`, `summary`, `composedOf`, `behaviors`, `hubs`; `entry` for a heavy feature with its own package entry (e.g. `hadi-march/flow`): it stays out of the `hadi-march/ui` barrel and the registry, and its page imports `demo.tsx` + `playground.ts` (type-only meta import) itself |
 
 ## Rules
 

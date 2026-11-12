@@ -2,13 +2,24 @@
 import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";
 import m0 from "./composite/bottom-nav/meta.ts";
 import m1 from "./chip/meta.ts";
-import m2 from "./overlays/drawer/meta.ts";
-import m3 from "./feedback/pull-to-refresh/meta.ts";
+import m2 from "./overlays/context-menu/meta.ts";
+import m3 from "./overlays/drawer/meta.ts";
+import m4 from "./composite/flow-canvas/meta.ts";
+import m5 from "./composite/flow-controls/meta.ts";
+import m6 from "./composite/flow-palette/meta.ts";
+import m7 from "./feedback/pull-to-refresh/meta.ts";
+import m8 from "./navigation/stepper/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
+const ownPage = (name: string): Promise<never> => Promise.reject(new Error(`${name} has its own entry: its page imports the demo`));
 export const registry: readonly RegistryEntry[] = [
   { folder: "composite/bottom-nav", meta: m0, code: "<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />", demo: () => import("./composite/bottom-nav/demo.tsx"), playground: () => import("./composite/bottom-nav/playground.ts") },
   { folder: "chip", meta: m1, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./chip/demo.tsx"), playground: () => import("./chip/playground.ts") },
-  { folder: "overlays/drawer", meta: m2, code: "", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
-  { folder: "feedback/pull-to-refresh", meta: m3, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
+  { folder: "overlays/context-menu", meta: m2, code: "<ContextMenu items={(target) => [{ label: \"Copy\", shortcut: \"mod+c\", onSelect: copy }, \"-\", { label: \"Delete\", danger: true, onSelect: remove }]}>\n  <ul class=\"files\">…</ul>\n</ContextMenu>", demo: () => ownPage("ContextMenu"), playground: () => ownPage("ContextMenu") },
+  { folder: "overlays/drawer", meta: m3, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
+  { folder: "composite/flow-canvas", meta: m4, code: "", demo: () => ownPage("FlowCanvas"), playground: () => ownPage("FlowCanvas") },
+  { folder: "composite/flow-controls", meta: m5, code: "const runner = createFlowRunner(flow, { nodeMs: 650, travelMs: 560 })\n<FlowControls runner={runner} flow={flow} timeline />\nawait runner.run()        // \"done\" | \"error\"; runner.pause() / resume() / step() / reset()", demo: () => ownPage("FlowControls"), playground: () => ownPage("FlowControls") },
+  { folder: "composite/flow-palette", meta: m6, code: "const flow = createFlow({ types })\n<FlowPalette flow={flow} />\n<FlowCanvas flow={flow} />", demo: () => ownPage("FlowPalette"), playground: () => ownPage("FlowPalette") },
+  { folder: "feedback/pull-to-refresh", meta: m7, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
+  { folder: "navigation/stepper", meta: m8, code: "<Stepper steps={[{ title: \"Cart\" }, { title: \"Address\" }, { title: \"Payment\" }]} current={$step} onSelect={(i) => $step = i}\n  panels={[<Cart />, <Address />, <Payment />]} onFinish={submit} />", demo: () => import("./navigation/stepper/demo.tsx"), playground: () => import("./navigation/stepper/playground.ts") },
 ];
