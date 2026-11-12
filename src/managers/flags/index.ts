@@ -131,8 +131,11 @@ const manager = defineManager<Flags, FlagsConfig>("flags", create, { flags: {}, 
 
 /** The feature flags (created on first call). */
 export const flags = (): Flags => manager.get();
+/** Set the feature flag manager's options (merged into the current config). */
 export const configureFlags = (config: Partial<FlagsConfig>): void => manager.configure(config);
+/** Stop the feature flag manager and remove its listeners; the next call starts it again. */
 export const disposeFlags = (): void => manager.dispose();
+/** The feature flag manager (get, configure, dispose). */
 export const flagsManager = manager;
 
 // feature:name — show the element only while the flag is on; feature:name={false} only while it is off;

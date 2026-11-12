@@ -18,6 +18,7 @@ files.set("src/icons/catalog.ts", `${HEAD}// Every icon as data, keyed by its ex
 //   import { ICONS } from "hadi-march/icons/catalog"   (an icon gallery; apps import single icons from "hadi-march/icons")
 import type { IconDef } from "./svg.ts";
 
+/** Every built-in icon by name (for icon pickers and search; import single icons to keep bundles small). */
 export const ICONS: Readonly<Record<string, IconDef>> = {
 ${rows.map((r) => `  ${r.id}: { name: ${r.name}, d: ${r.d}${r.fill ? ", fill: true" : ""} },`).join("\n")}
 };

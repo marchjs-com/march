@@ -5,7 +5,7 @@ import { t, messages } from "../../core/i18n.ts";
 import { Button } from "../../ui/button.ts";
 import { openDialog } from "../../ui/dialog.ts";
 import { Toggle, Segmented, Slider } from "../../forms/inputs.ts";
-import { Field } from "../../forms/form.ts";
+import { Field } from "../../forms/field.ts";
 import { a11y, type A11yPrefs, type MotionPref } from "./index.ts";
 import tr from "./tr.ts";
 

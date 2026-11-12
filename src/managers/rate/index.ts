@@ -168,5 +168,7 @@ const manager = defineManager<RateLimiter, RateConfig>("rate", create, {});
 
 /** The rate limiter (created on first call). */
 export const rateLimit = (): RateLimiter => manager.get();
+/** Stop the rate limit manager and remove its listeners; the next call starts it again. */
 export const disposeRateLimit = (): void => manager.dispose();
+/** The rate limit manager (get, configure, dispose). */
 export const rateManager = manager;

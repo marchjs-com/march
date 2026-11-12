@@ -20,6 +20,7 @@ export interface Measure { name: string; duration: number; start: number; ok?: b
 export const THRESHOLDS: Record<VitalName, [number, number]> = {
   lcp: [2500, 4000], cls: [0.1, 0.25], inp: [200, 500], fcp: [1800, 3000], ttfb: [800, 1800],
 };
+/** Rate a Web Vitals value as good, needs improvement or poor (Google thresholds). */
 export const rateVital = (name: VitalName, v: number): Rating => {
   const [good, poor] = THRESHOLDS[name];
   return v <= good ? "good" : v <= poor ? "needs-improvement" : "poor";

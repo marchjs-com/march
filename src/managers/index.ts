@@ -30,9 +30,8 @@ export { session, configureSession, disposeSession, sessionManager } from "./ses
 export type { Session, SessionConfig } from "./session/index.ts";
 export { presence, configurePresence, disposePresence, presenceManager } from "./presence/index.ts";
 export type { Presence, PresenceConfig, PresenceState, Peer } from "./presence/index.ts";
-// per-manager topic channels ("managers.<name>"); the names above (managerChannel, ManagerMessage) are the shared stream
-export { managerChannel as managerTopic, publisher } from "./publish.ts";
-export type { ManagerMessage as ManagerTopicMessage } from "./publish.ts";
+export { managerChannelOf, publisher } from "./publish.ts";
+export type { ManagerChannelMessage } from "./publish.ts";
 export { clipboard, configureClipboard, disposeClipboard, clipboardManager } from "./clipboard/index.ts";
 export type { Clipboard, ClipboardConfig, ClipContent, ClipEntry, PasteData } from "./clipboard/index.ts";
 export { undoStack, undoCommands, configureUndo, disposeUndo, undoManager } from "./undo/index.ts";

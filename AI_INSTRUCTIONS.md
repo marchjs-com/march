@@ -13,7 +13,7 @@ Read this before writing code with March. It is the contract; when in doubt, pre
 4. **Ownership cleans up.** Listeners, effects, timers registered with `onCleanup`, queries and child components are
    disposed when their branch disappears (`<If>`, `<For>` row removed, route change).
 5. **Control flow is components:** `If/Else`, `For` (keyed), `Switch/Match`, `Try` (errors + async loading), `Await`.
-6. **Modules are separate:** core, router, data (+access), net, errors, schema, ui (+forms), table, charts, channel, testing.
+6. **Modules are separate:** core, router, seo, data (+access), net, errors, schema, ui (+forms), table, charts, channel, testing.
 
 ## 2. Syntax cheat sheet (March JSX, `.jsx` files)
 
@@ -142,11 +142,18 @@ Overlays never take input; put content after them. `front` only for foreground e
 - Import named exports (`import { Card } from "hadi-march/ui"`), never `import * as` from a March module. Use
   `hadi-march/icons/catalog` for icon galleries.
 - Leave `<Link>` prefetch on (default hover). Do not prefetch everything by hand.
+- Credit is optional and never required (the licence stays MIT): `<MadeWithMarch />` (`variant` text / badge / small, link constant `MARCH_URL`) or `credit: true` in `march.config.js` (adds `<!-- Built with HADI March -->` to the built `index.html` and prints the one-line console banner in production too, from a separate tiny `credit.js`; off by default). `march dev` prints the banner once per page; `banner: false` turns it off. Production never prints it otherwise and the app bundle never contains it (size effect 0). The link comes from one constant, `MARCH_URL` in `src/brand.js`. Add it to a footer when the user wants it; never add it unasked.
 - Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, fail: true }`); turn on `sw: true` when offline use matters.
 - `chunks: { minSize: 10240, allow: { "chunks/x.js": "reason" } }` (default 10 KB before gzip): no JS/CSS file under it. Small shared code
   folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
   parent, or joins a group chunk with the entry's other small lazy modules that share the most code (second build pass).
   A file still under the limit fails the build; `allow` needs a reason. `chunks: false` turns it off.
+  A group never pushes a route past `budget.route`: groups are measured after each pass and one over budget is taken
+  apart and planned again.
+- Many pages: keep the route table (paths, titles, loaders) OUT of the entry, or the entry grows with every page. Put it
+  in `src/routes.ts` (or the generated `src/routes.gen.js`), load it with `import()` from `main` and list it in
+  `budget.boot`; its pages are grouped like the entry's own lazy imports and never folded into the table
+  (`chunks.routeTables` names other table files). The shell reads titles from the table, not from a page list in the entry.
 
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.
@@ -272,11 +279,27 @@ has its own error boundary (message + retry); the levels above stay interactive 
 `navigate(to, { modal: true })` opens the page over the current one in `<Outlet name="modal">{(page, close) => <Dialog open onClose={close}>{page()}</Dialog>}</Outlet>`;
 back closes it, a direct visit or reload shows the full page. Page transitions animate only the outlet that changed. `createRouter({ redirects })`,
 `<Link preload="hover|visible|none">`, `beforeLeave(() => !dirty() || confirm(…))` (links, navigate, back/forward, tab close),
-`setMeta({ title, description })`, `queryParam("tab")` signal. `navigate()` is async.
+`setMeta({ title, description })` (for full head control use `hadi-march/seo`, §14a), `queryParam("tab")` signal. `navigate()` is async.
 Instant navigation: the path (active links, breadcrumb) changes on the click; a page not here in 100 ms is replaced by
 its skeleton (route `skeleton`, else `<Router skeleton>`, else `loading`); after 150 ms a thin top bar (`.hm-nav-bar`)
 and a spinner on the clicked link show. A newer click aborts the older navigation: pass `navigationSignal()` to fetches
 a page starts. Give every app a `<Router skeleton>` shaped like its pages (no layout jump).
+
+## 14a. SEO (hadi-march/seo)
+
+Head tags go through the SEO module, never through `document.title =` or hand-made `<meta>` elements:
+```tsx
+installSeo({ site: "https://shop.example", titleTemplate: "%s · Shop", defaults: { og: { siteName: "Shop" } } }) // once
+createRouter({ routes: { "/about": { load, head: { title: "About", description: "…" } } } })  // or `export const head = (to) => ({…})`
+useHead(() => ({ title: $product.name, og: { image: $product.photo }, jsonLd: ld.product({ name: $product.name, price: $product.price }) }))
+```
+Order: defaults → route head → `useHead` (later wins; a component's head leaves with it). `march.config.js`
+`seo: { site, prerender: true, sitemap: true, robots: true }` writes each param-less route's HTML at build time plus
+`sitemap.xml` / `robots.txt`; then mount with `hydrate(() => <Router />, el)` from `hadi-march/seo/hydrate` instead of
+`render`. Hash routing prerenders only the start page and gets no automatic canonical. Check pages with
+`march seo check` (title, description, canonical, img alt). Every `<img>` needs `alt` (`alt=""` when decorative).
+Under a Trusted Types CSP use `installSeo({ jsonLd: false })` (run-time script text is blocked) and ship JSON-LD at build time.
+Full reference: `docs/seo.md`.
 
 ## 14b. Layers and portals
 
@@ -312,7 +335,9 @@ const $x = spring(() => $target, { stiffness: 200, damping: 20 });
 <div style={{ transform: `translateX(${$x}px)` }} use:drag={{ axis: "x" }} transition:blur />
 <For each={$items} key="id" animate>{(it) => <li use:reveal>{it().name}</li>}</For>
 timeline({ root }).add(".card", fadeUp, { stagger: 60 }).play();
-pageTransitions({ type: "slide" });           // View Transitions with fallback
+pageTransitions({ type: "slide" });           // View Transitions with an engine fallback; back reverses, RTL mirrors
+// per route: { path: "/photos/:id", meta: { transition: "scale" } } ("fade" | "slide" | "scale" | "none" | { type, duration });
+// shared element: the same data-hm-shared="photo-3" on the old and the new page moves between them. Named and modal outlets too.
 ```
 Rules: animate only `transform`/`opacity` (WAAPI or the `style` object); everything honors `prefers-reduced-motion`
 (`reducedMotion()`); never use string styles. fx (`Particles`, `Aurora`, `confetti`) is decorative — keep it off admin
@@ -349,6 +374,37 @@ Rules:
 - New targets (Three.js, SVG paths…): `defineDriver(name, { supports, apply, read?, flush? })`, not a custom loop.
 - Check: `node tools/motion-audit.mjs` (headless Edge: Stop all, speed, 200-item stagger: no long task).
 Reference: docs/motion.md. The showcase page "Animasyon motoru" (/animation) shows every piece.
+
+### 15a2. Text animations (hadi-march/motion/text)
+
+56 text animations, one export each (tree-shaken): `import { rise, wave, typewriter, counter } from "hadi-march/motion/text"`.
+Call `name(el, { by, duration, stagger, easing, delay, from, out, iterations })`; it returns `{ playback, finished,
+replay(), stop() }`. Never split text by hand or animate letters with your own loop: `splitText(el, "char" | "word" |
+"line")` keeps an accessible copy, grapheme clusters (Turkish letters, emoji), RTL and joining scripts safe.
+- Entrances put the plain text back when done; `out: true` plays any of them as an exit. Loops run until `stop()`.
+- Content effects (typewriter, scramble, counter, wordCycle…) change what is shown; readers keep the real text.
+- `typeLoop`, `wordCycle`, `morph` take `words` (or the text split at `|`); `counter` reads the number in the text.
+- Catalog: `TEXT_ANIMATIONS` in `hadi-march/motion/text/meta`. Reference: src/motion/text/docs.md. Showcase: Hareket ›
+  Metin animasyonları (/text-motion).
+### 15c. Ready-made animations (all on the engine, each its own export)
+
+```ts
+import { drawPath, morphPath, followPath, clipReveal, filterBlur, displace, goo } from "hadi-march/motion";
+drawPath(svg.querySelectorAll("path"), { stagger: 80 });       // stroke draws in (pathLength=1, no measuring)
+morphPath(pathEl, starD, { easing: "spring" });                // any two paths: different point counts are resampled
+followPath(dot, roadD, { rotate: true, trail: roadEl });       // along a path, the trail drawn in the same frame
+clipReveal(card, { shape: "circle", origin: { x: 20, y: 80 } }); // circle | wipe (RTL mirrored) | diamond | curtain | blinds | inset
+filterBlur(title, { from: 16, axis: "x" }); displace(card, { from: 60 }); const off = goo(container);
+```
+Pure path tools (no DOM): `parsePath`, `flatten`, `pathSampler`, `resample`, `interpolatePath`, `toD`.
+```ts
+morph(button, dialog); await morphBack(dialog, button).finished;   // container transform (clip + move, no stretching)
+morph(thumb, big, { mode: "scale", hideSource: false });            // shared element FLIP
+morphIcon(pathEl, playing ? "pause" : "play");                      // MORPH_ICONS: play pause menu close plus check minus
+shapeMorph(el, "star");                                             // circle square triangle diamond hexagon star blob flower
+usePageTransitions(circle, cube, wipe);                             // then meta: { transition: "cube" } per route
+// variants: circle wipe stack cube flipPage zoomThrough curtain blinds pixelDissolve morphPage (PAGE_VARIANTS = all)
+```
 
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 
@@ -451,6 +507,26 @@ separate button handler. Manager events go through `setManagerEmit`.
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 | OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Menu, Tooltip |
 
+### Data display — `hadi-march/data`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | Chip, Menu, FilterControl, CellEditor |
+| TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
+| VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
+
+### Feedback — `hadi-march/feedback`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+
+### Overlays — `hadi-march/overlays`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+
 ### Navigation — `hadi-march/navigation`
 
 | Component | Status | What | Composed of |
@@ -458,10 +534,21 @@ separate button handler. Manager events go through `setManagerEmit`.
 | ActivityBar | experimental | Editor icon bar that switches the side view: a tablist with a gliding indicator, count badges, end items, collapse by choosing the active view again; vertical or horizontal, RTL aware. | Badge, Tooltip |
 | Breadcrumbs | experimental | Path bar: links, buttons or sibling menus per crumb; the middle collapses into a … menu when narrow; separators mirrored in RTL. | Menu |
 
+### Social — `hadi-march/social`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| CountRoll | experimental | Odometer number: only the changed digits roll (up when it grows, down when it shrinks), compact in the active locale. | — |
+| LikeButton | experimental | Heart toggle: spring pop, ring and a four-color HADİ particle burst on the motion engine; rolling count; heartBurst() for any element. | CountRoll |
+| MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton |
+
 ### Composite — `hadi-march/composite`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, Portal |
+| Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | PullToRefresh, VirtualList, PostCard, Skeleton |
+| PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, MediaGrid, LikeButton, CountRoll |
 | PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
 <!-- components:end -->

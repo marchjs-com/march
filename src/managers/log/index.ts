@@ -12,6 +12,7 @@ import { defineManager } from "../manager.ts";
 import { publisher } from "../publish.ts";
 
 export type Level = "debug" | "info" | "warn" | "error";
+/** Log levels from the most to the least verbose: debug, info, warn, error. */
 export const LEVELS: readonly Level[] = ["debug", "info", "warn", "error"];
 const rank = (l: Level): number => LEVELS.indexOf(l);
 

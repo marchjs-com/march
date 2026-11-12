@@ -30,6 +30,7 @@ export function Else(props: { children?: unknown }): unknown { return props.chil
 /** Installed by hadi-march/motion: (elements, mutate, opts) → void. Measures, runs `mutate`, animates the deltas. */
 export type FlipHook = (elements: Element[], mutate: () => void, opts: unknown) => void;
 let flipHook: FlipHook | null = null;
+/** Hook `<For animate>` uses to animate reordering (installFlip() sets the motion FLIP here). */
 export function setFlipHook(fn: FlipHook | null): void { flipHook = fn; }
 
 export interface ForProps<T> {

@@ -149,8 +149,11 @@ const manager = defineManager<UndoStack, UndoConfig>("undo", (cfg) => {
 
 /** The app's undo history (created on first call). */
 export const undoStack = (): UndoStack => manager.get();
+/** Set the undo manager's options (merged into the current config). */
 export const configureUndo = (config: Partial<UndoConfig>): void => manager.configure(config);
+/** Stop the undo manager and remove its listeners; the next call starts it again. */
 export const disposeUndo = (): void => manager.dispose();
+/** The undo manager (get, configure, dispose). */
 export const undoManager = manager;
 
 /** Register "edit.undo" (mod+z) and "edit.redo" (mod+shift+z); removed with the current owner. */

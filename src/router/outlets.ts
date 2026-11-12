@@ -21,6 +21,20 @@ async function resolve(table: CompiledRoute[], to: string): Promise<Slot | null>
   return { key: I.pageKey(m.route, m.params), comp: mod?.default ?? mod?.component ?? m.route.component ?? (() => null), to: target };
 }
 
+/** Wrap every named / modal outlet swap: `apply` puts the new page in; `from` / `to` are null when the outlet fills / empties. */
+export type OutletWrapper = (name: string, apply: () => void, o: { to: RouteTarget | null; from: RouteTarget | null }) => void | Promise<void>;
+let wrap: OutletWrapper | null = null;
+/** Set by hadi-march/motion pageTransitions() (this module loads only where a named outlet is used). */
+export function setOutletWrapper(fn: OutletWrapper | null): void { wrap = fn; }
+
+/** Put a page into a slot, through the outlet transition when one is set. */
+function swap(name: string, v: Slot | null): void {
+  const sl = I.slot(name), to = v?.to ?? null, from = sl.peek()?.to ?? null;
+  const apply = (): void => { sl.set(v); };
+  if (!wrap || to?.path === from?.path) { apply(); return; }
+  void Promise.resolve(wrap(name, apply, { to, from })).catch(apply);
+}
+
 /** Keep every slot in step with the URL (once per router). */
 let installed: { r: RouterState; dispose: () => void } | null = null;
 function install(): void {
@@ -32,7 +46,7 @@ function install(): void {
     effect(() => {
       const to = target();
       const my = ++seq;
-      untrack(() => { void resolve(table, to).then((v) => { if (my === seq) I.slot(name).set(v); }, (e: unknown) => { if (my === seq) I.slot(name).set(errorSlot(e, to)); }); });
+      untrack(() => { void resolve(table, to).then((v) => { if (my === seq) swap(name, v); }, (e: unknown) => { if (my === seq) I.slot(name).set(errorSlot(e, to)); }); });
     });
   };
   installed = { r, dispose: createRoot((dispose) => {
@@ -53,7 +67,8 @@ export function NamedOutlet(props: { name: string; empty?: unknown; children?: u
     return untrack(() => {
       const sl = cur.peek();
       if (!sl) return null;
-      const page = (): unknown => h(Try, { fallback: (e: unknown) => I.routeError(e, close) }, () => h(sl.comp, { params: sl.to.params, query: sl.to.query, meta: sl.to.meta, close }));
+      // the page sits in its own box so a transition can move it (hm-outlet-page)
+      const page = (): unknown => h("div", { class: "hm-outlet-page", "data-outlet-page": name }, () => h(Try, { fallback: (e: unknown) => I.routeError(e, close) }, () => h(sl.comp, { params: sl.to.params, query: sl.to.query, meta: sl.to.meta, close })));
       return typeof props.children === "function" ? (props.children as (page: () => unknown, close: () => void, to: RouteTarget) => unknown)(page, close, sl.to) : page();
     });
   }) as Element;

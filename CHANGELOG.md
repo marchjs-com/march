@@ -5,7 +5,7 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 ## 0.1.0 — unreleased
 
 ### Credit (later in 0.1.0)
-- `<MadeWithMarch />` (`src/components/actions/made-with-march`, category actions): optional "Developed with HADI March and 💗" line, variants text / badge / small, link in one constant (`MARCH_URL`). The licence stays MIT; using it is a request.
+- `<MadeWithMarch />` (`src/components/actions/made-with-march`): optional "Developed with HADI March and 💗" line, variants text / badge / small, link in one constant (`MARCH_URL`). The licence stays MIT; using it is a request.
 - `credit: true` in `march.config.js` adds `<!-- Built with HADI March -->` to the built `index.html` (off by default).
 - Console banner: `march dev` prints one styled line ("🧡 HADI March v0.1 · link") once per page; `banner: false` removes it. Production prints nothing and the bundle is byte-identical; `credit: true` prints the same line in production from a separate `credit.js`. The link constant moved to `src/brand.js`.
 ### Text animations (later in 0.1.0)

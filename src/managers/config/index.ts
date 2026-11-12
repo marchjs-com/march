@@ -107,5 +107,7 @@ const manager = defineManager<AppConfig, AppConfigOptions>("config", create, { d
 export const appConfig = (): AppConfig => manager.get();
 /** Set defaults, the environment source or the check. The remote and override layers start empty again. */
 export const configureAppConfig = (config: Partial<AppConfigOptions>): void => manager.configure(config);
+/** Stop the config manager and remove its listeners; the next call starts it again. */
 export const disposeAppConfig = (): void => manager.dispose();
+/** The config manager (get, configure, dispose). */
 export const configManager = manager;

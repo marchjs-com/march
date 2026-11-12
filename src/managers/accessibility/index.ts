@@ -57,6 +57,7 @@ export interface A11y {
   dispose(): void;
 }
 
+/** Default accessibility preferences: system motion, normal contrast and size, no extra underline, spacing or focus ring. */
 export const DEFAULT_PREFS: A11yPrefs = { motion: "system", contrast: false, fontScale: 1, underlineLinks: false, textSpacing: false, strongFocus: false };
 
 const clampScale = (n: unknown): number => { const v = Number(n); return Number.isFinite(v) ? Math.min(2, Math.max(0.85, Math.round(v * 100) / 100)) : 1; };

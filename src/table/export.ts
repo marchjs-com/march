@@ -27,6 +27,7 @@ function cell<R>(row: R, c: Column<R>, formatted: boolean, format: CellFormatter
   return formatted ? format(row, c) : rawValue(valueOf(row, c));
 }
 
+/** Rows to CSV text with the table's columns (formula-safe, optional BOM, formatted or raw values). */
 export function toCSV<R>(rows: readonly R[], columns: readonly Column<R>[], opts: CSVOptions<R> = {}): string {
   const { bom = false, formatted = false, separator = ",", eol = "\r\n", header = true, safe = true, format = (r: R, c: Column<R>) => rawValue(valueOf(r, c)) } = opts;
   const cols = exportable(columns);

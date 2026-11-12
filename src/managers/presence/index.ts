@@ -121,6 +121,9 @@ function create(cfg: PresenceConfig): Presence {
 const manager = defineManager<Presence, PresenceConfig>("presence", create, DEFAULTS);
 /** The presence manager (created on first call; starts Idle and Window). */
 export const presence = (): Presence => manager.get();
+/** Set the presence manager's options (merged into the current config). */
 export const configurePresence = (config: Partial<PresenceConfig>): void => manager.configure(config);
+/** Stop the presence manager and remove its listeners; the next call starts it again. */
 export const disposePresence = (): void => manager.dispose();
+/** The presence manager (get, configure, dispose). */
 export const presenceManager = manager;

@@ -181,6 +181,9 @@ function create(cfg: DeviceConfig): Device {
 const manager = defineManager<Device, DeviceConfig>("device", create, DEFAULTS);
 /** The device manager (created on first call). */
 export const device = (): Device => manager.get();
+/** Set the device manager's options (merged into the current config). */
 export const configureDevice = (config: Partial<DeviceConfig>): void => manager.configure(config);
+/** Stop the device manager and remove its listeners; the next call starts it again. */
 export const disposeDevice = (): void => manager.dispose();
+/** The device manager (get, configure, dispose). */
 export const deviceManager = manager;

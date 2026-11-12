@@ -86,7 +86,7 @@ export function ActivityBar(props: ActivityBarProps): Element {
       onClick: () => choose(it),
     }, icon(it.icon, "hm-ab-icon"),
     it.badge !== undefined && h("span", { class: "hm-ab-badge" }, h(Badge, { count: () => val(it.badge), tone: "primary" })));
-    return h(Tooltip, { text: name, placement: horizontal ? "top" : "right", children: btn });
+    return h(Tooltip, { text: name, placement: horizontal ? "top" : "bottom-start", children: btn });
   };
   const onKeydown = (e: KeyboardEvent): void => { roving(e, tabs(), { horizontal }); };
 

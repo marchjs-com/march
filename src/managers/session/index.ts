@@ -151,6 +151,9 @@ function create(cfg: SessionConfig): Session {
 const manager = defineManager<Session, SessionConfig>("session", create, DEFAULTS);
 /** The session manager (created on first call; nothing runs until start()). */
 export const session = (): Session => manager.get();
+/** Set the session manager's options (merged into the current config). */
 export const configureSession = (config: Partial<SessionConfig>): void => manager.configure(config);
+/** Stop the session manager and remove its listeners; the next call starts it again. */
 export const disposeSession = (): void => manager.dispose();
+/** The session manager (get, configure, dispose). */
 export const sessionManager = manager;

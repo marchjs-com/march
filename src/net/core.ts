@@ -216,6 +216,7 @@ interface Waiter { rank: number; seq: number; go: () => void; signal: AbortSigna
 
 let ids = 0;
 
+/** The request client: base URL, timeout, retry with backoff, concurrency limit, middleware, transports. */
 export class Net {
   readonly config: NetConfig = { baseUrl: "", timeout: 30_000, retry: { count: 2, delay: 300, max: 10_000, factor: 2 }, maxConcurrent: 6, headers: {} };
   /** Global middleware, in order. */

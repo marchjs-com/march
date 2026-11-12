@@ -49,10 +49,13 @@ export function setAccess(v: AccessInput | null | undefined): void {
 }
 /** Reactive access object. */
 export const access = (): AccessState => state();
+/** Is a user signed in? */
 export const signedIn = (): boolean => !!state().user;
 /** First (primary) role or null. */
 export const role = (): string | null => state().roles[0] ?? null;
+/** Does the user hold one of these roles? */
 export const hasRole = (r: RoleName | readonly RoleName[]): boolean => ([] as string[]).concat(r).some((x) => state().roles.includes(x));
+/** Does the user hold one of these sign-in methods (password, otp, passkey …)? */
 export const hasMethod = (m: Method | readonly Method[]): boolean => ([] as string[]).concat(m).some((x) => state().methods.includes(x));
 
 /**

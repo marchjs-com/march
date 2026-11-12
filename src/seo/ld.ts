@@ -10,6 +10,7 @@ export interface OrgInput { name: string; url?: string; logo?: string; sameAs?: 
 export interface ArticleInput { headline: string; description?: string; image?: string | string[]; datePublished?: string; dateModified?: string; author?: string | { name: string; url?: string }; url?: string }
 export interface ProductInput { name: string; description?: string; image?: string | string[]; sku?: string; brand?: string; price?: number | string; currency?: string; availability?: "InStock" | "OutOfStock" | "PreOrder"; rating?: { value: number; count: number } }
 
+/** JSON-LD builders: WebSite, Organization, Article, Product, Breadcrumb, FAQ. */
 export const ld = {
   /** WebSite (optionally with a site search action: `search: "https://x.com/search?q={q}"`). */
   website: (o: { name: string; url: string; search?: string }): JsonLd => clean({

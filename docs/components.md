@@ -17,6 +17,26 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 | OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Menu, Tooltip |
 
+### Data display — `hadi-march/data`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [Chip](#chip), Menu, FilterControl, CellEditor |
+| TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
+| VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
+
+### Feedback — `hadi-march/feedback`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+
+### Overlays — `hadi-march/overlays`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+
 ### Navigation — `hadi-march/navigation`
 
 | Component | Status | What | Composed of |
@@ -24,11 +44,22 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | ActivityBar | experimental | Editor icon bar that switches the side view: a tablist with a gliding indicator, count badges, end items, collapse by choosing the active view again; vertical or horizontal, RTL aware. | Badge, Tooltip |
 | Breadcrumbs | experimental | Path bar: links, buttons or sibling menus per crumb; the middle collapses into a … menu when narrow; separators mirrored in RTL. | Menu |
 
+### Social — `hadi-march/social`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| CountRoll | experimental | Odometer number: only the changed digits roll (up when it grows, down when it shrinks), compact in the active locale. | — |
+| LikeButton | experimental | Heart toggle: spring pop, ring and a four-color HADİ particle burst on the motion engine; rolling count; heartBurst() for any element. | [CountRoll](#countroll) |
+| MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton |
+
 ### Composite — `hadi-march/composite`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, Portal |
+| Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
+| PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
 | PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
 
 ## ActivityBar
@@ -46,6 +77,18 @@ Composed of: Badge, Tooltip
 ```
 
 Full page: src/components/navigation/activity-bar/docs.md
+
+## BottomNav
+
+The mobile tab bar: a colored bubble slides to the active tab, tabs carry count or dot badges, and an optional raised Create button in the middle wears a slowly turning ring of the four HADİ colors (Heyecan, Aktivite, Dostluk, İletişim).
+
+Composed of: Badge, OverflowText
+
+```tsx
+<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />
+```
+
+Full page: src/components/composite/bottom-nav/docs.md
 
 ## Breadcrumbs
 
@@ -77,6 +120,37 @@ Composed of: OverflowText
 
 Full page: src/components/actions/chip/docs.md
 
+## CountRoll
+
+An odometer number for likes, comments and followers. When the value changes only the digits that changed roll: upward when it grows, downward when it shrinks, on the motion engine (global speed, pause and reduced motion apply). The text is compact in the active locale (`1,2 B`, `12K`); `format="full"` groups it instead.
+
+```tsx
+<CountRoll value={$likes} />
+<CountRoll value={$followers} format="full" />
+```
+
+Full page: src/components/social/count-roll/docs.md
+
+## DataGrid
+
+A spreadsheet-like grid for large data. It runs on the table engine (`createTable`: sorting, filters, search, column layout, selection, inline edit, CSV) and the shared virtual window, which windows **rows and columns**: only the cells in view are in the DOM, so 100 000 rows × many columns scroll smoothly. On top it adds grouping with aggregates, a totals footer, pinned columns, drag to reorder and resize columns, and a keyboard cell cursor.
+
+Composed of: [Chip](#chip), Menu, FilterControl, CellEditor
+
+```tsx
+import { DataGrid } from "hadi-march/components/data/data-grid";
+
+<DataGrid rows={$orders} rowKey="id" selectable groupBy={["region"]}
+  columns={[
+    { key: "customer", label: "Customer", pin: "left", editable: true },
+    { key: "region", label: "Region", filter: "select" },
+    { key: "amount", label: "Amount", format: ["money", "USD"], aggregate: "sum" },
+  ]}
+  onEdit={(row, key, value) => save(row.id, key, value)} />
+```
+
+Full page: src/components/data/data-grid/docs.md
+
 ## DockLayout
 
 An IDE workspace: split areas holding tab groups. Drag a tab to a **side** of a group (a new split), onto its **centre** or **between two tabs** (a tab there), to an **edge** of the whole layout, or **out** of it (a floating window). An animated preview shows where it will land. Groups maximize, panels minimize to a tray, and the layout is saved and loaded as plain JSON. Each panel's content is rendered once and moves between groups without being rebuilt.
@@ -94,6 +168,42 @@ Composed of: Splitter, Tabs, Portal
 
 Full page: src/components/composite/dock-layout/docs.md
 
+## Drawer
+
+A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
+
+Composed of: Portal, Dialog
+
+```tsx
+<Drawer open={$open} onClose={() => $open = false} side="bottom" snapPoints={[0.4, 0.9]} title="Filters">…</Drawer>
+```
+
+Full page: src/components/overlays/drawer/docs.md
+
+## Feed
+
+A social feed. PostCards sit in a VirtualList, so only the posts near the viewport are in the DOM, inside a PullToRefresh (the feed is the scroll area; keyboard users get a Refresh button). The first page shows skeleton posts; reaching the end loads the next page with a skeleton at the bottom (infinite scroll) and an end mark once there is nothing more. New posts waiting above show a "N new posts" pill that merges them and scrolls to the top.
+
+Composed of: [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton
+
+```tsx
+<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />
+```
+
+Full page: src/components/composite/feed/docs.md
+
+## LikeButton
+
+A heart toggle with a rolling count. Liking squashes and overshoots the heart on a spring, grows a ring and throws a burst of particles in the four HADİ colors; unliking is a small press. Everything runs on the motion engine, so the global speed, "pause all" and reduced motion apply (reduced motion keeps only the fill change).
+
+Composed of: [CountRoll](#countroll)
+
+```tsx
+<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />
+```
+
+Full page: src/components/social/like-button/docs.md
+
 ## MadeWithMarch
 
 An optional credit line: "Developed with HADI March and 💗", with "HADI March" as a link. Using it is a request, not a requirement: the licence stays MIT and nothing here is needed to use March.
@@ -105,6 +215,18 @@ An optional credit line: "Developed with HADI March and 💗", with "HADI March"
 ```
 
 Full page: src/components/actions/made-with-march/docs.md
+
+## MediaGrid
+
+The photos of a post in one frame: one photo keeps its own shape (between 4:5 and 1.91:1), two sit side by side, three are one large and two stacked, four are a 2×2 grid, and more show "+N" on the last tile. Each tile is a button that opens the photo; a Skeleton shimmers until the image arrives and it then fades in. With `onDoubleTap` a single tap waits 230 ms, so a double tap (like) never also opens the photo.
+
+Composed of: Skeleton
+
+```tsx
+<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />
+```
+
+Full page: src/components/social/media-grid/docs.md
 
 ## OverflowToolbar
 
@@ -124,6 +246,18 @@ Composed of: Menu, Tooltip
 
 Full page: src/components/actions/overflow-toolbar/docs.md
 
+## PostCard
+
+One post of a social feed. The header shows the author (Avatar, name with a verified mark), the relative time and the place, with an optional ⋯ Menu. Photos sit in a MediaGrid; a double tap on them likes the post with a large heart that pops over the photo and bursts in the four HADİ colors. The action row has a LikeButton and rolling counts for comments and shares; the caption folds to three lines with a "more" button.
+
+Composed of: Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll)
+
+```tsx
+<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />
+```
+
+Full page: src/components/composite/post-card/docs.md
+
 ## PropertyGrid
 
 An inspector: property rows in collapsible groups, a search field, and for each property the form control of its type. Every change is an **undo step** in the app's Undo history (typing in one field merges into one step), unsaved changes are registered with **DirtyState** (leave warning, `saveAll()`), and changed rows are marked and can be reset one by one. The footer counts the changes and offers Revert and Save.
@@ -141,6 +275,16 @@ Composed of: Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segment
 
 Full page: src/components/composite/property-grid/docs.md
 
+## PullToRefresh
+
+A scroll area that refreshes when its top is pulled down past a threshold, by touch, pen or mouse. A spinning indicator follows the pull and keeps turning until the async `onRefresh` settles.
+
+```tsx
+<PullToRefresh onRefresh={() => api.get("/feed").then((x) => $items = x)}>…</PullToRefresh>
+```
+
+Full page: src/components/feedback/pull-to-refresh/docs.md
+
 ## StatusBar
 
 The strip at the bottom of an editor or app. Items sit at the **start** or the **end** (writing direction), are plain text or buttons (an action or a **command id** from the Command manager), and carry a tone: info, success, warn, danger, or busy (a breathing dot on the motion engine). When the bar is too narrow, the lowest `priority` items move to a "…" menu. Items marked `live` are announced when their text changes ("Saving…", "Saved").
@@ -157,3 +301,30 @@ Composed of: Menu, Tooltip
 ```
 
 Full page: src/components/layout/status-bar/docs.md
+
+## TreeView
+
+A tree for large hierarchies. Only the rows in view are in the DOM (shared virtual window), so thousands of open nodes stay smooth. Children can load lazily the first time a folder opens, selection is single or multiple, nodes move by drag and drop (before / after / inside, with edge auto-scroll and auto-open of a folder you hover), and search keeps the path to every hit open and highlights the matching text. For a short static tree, `<Tree>` is enough.
+
+Composed of: Spinner
+
+```tsx
+import { TreeView } from "hadi-march/components/data/tree-view";
+
+<TreeView nodes={files} selection="multiple" draggable search={$q}
+  load={(node) => api.children(node.id)}
+  onSelect={(ids) => $selected = ids}
+  onMove={(ids, target, position) => api.move(ids, target, position)} />
+```
+
+Full page: src/components/data/tree-view/docs.md
+
+## VirtualList
+
+A long list that keeps only the rows near the viewport in the DOM, so 100,000 rows scroll like 20. Rows can have any height: each is measured when it renders and an estimate stands in until then; when a row above the viewport changes height the content stays still (scroll anchoring). Rows keep their DOM while they stay in range and receive an accessor to their item, so an updated item (a like, an edit) updates its row instead of rebuilding it.
+
+```tsx
+<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />
+```
+
+Full page: src/components/data/virtual-list/docs.md

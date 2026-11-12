@@ -144,6 +144,9 @@ function create(cfg: LocationConfig): Locator {
 const manager = defineManager<Locator, LocationConfig>("location", create, DEFAULTS);
 /** The location manager (created on first call; asks nothing until locate() / watch()). */
 export const locator = (): Locator => manager.get();
+/** Set the location manager's options (merged into the current config). */
 export const configureLocation = (config: Partial<LocationConfig>): void => manager.configure(config);
+/** Stop the location manager and remove its listeners; the next call starts it again. */
 export const disposeLocation = (): void => manager.dispose();
+/** The location manager (get, configure, dispose). */
 export const locationManager = manager;

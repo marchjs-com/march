@@ -2,8 +2,8 @@
 // its own, and pages loaded from it are grouped like the entry's own lazy imports, never folded into the table.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync, existsSync } from "node:fs";
+import { join, dirname, resolve, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -11,6 +11,7 @@ import { gzipSync } from "node:zlib";
 
 const CLI = fileURLToPath(new URL("../cli/march.js", import.meta.url));
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
+const SHOWCASE = join(ROOT, "examples/showcase/src");
 
 /** Build an app with `n` pages (each over chunks.minSize) and a lazy route table; returns the entry's gzip size and the table chunk's. */
 function build(n) {
@@ -67,3 +68,25 @@ test("showcase: the entry imports no page list, route table or page module", () 
   }
   assert.match(src("main.tsx"), /import\("\.\/routes\.ts"\)/);
 });
+
+/** Showcase files the entry loads statically (relative imports only; import() is a separate chunk). */
+function staticClosure(file) {
+  const seen = new Set();
+  const walk = (f) => {
+    if (seen.has(f) || !existsSync(f)) return;
+    seen.add(f);
+    const code = readFileSync(f, "utf8").replace(/\/\/.*$/gm, "");
+    for (const [, spec] of code.matchAll(/(?:^|[;\n])\s*(?:import|export)\s+(?!type\b)(?:[^"'();]*?\sfrom\s*)?["'](\.{1,2}\/[^"']+)["']/g)) walk(resolve(dirname(f), spec));
+  };
+  walk(file);
+  return [...seen].map((f) => relative(SHOWCASE, f).replace(/\\/g, "/"));
+}
+
+test("showcase entry: nothing that grows with the pages anywhere in its static import graph", () => {
+  const closure = staticClosure(join(SHOWCASE, "main.tsx"));
+  const grows = closure.filter((f) => /^pages\/|^router-demo\/|^(nav|nav-meta|routes|routes\.gen)\.[jt]sx?$/.test(f));
+  assert.deepEqual(grows, [], `the entry would grow with every page:\n${grows.join("\n")}`);
+  const cfg = readFileSync(join(SHOWCASE, "../march.config.js"), "utf8");
+  assert.match(cfg, /boot:\s*\[[^\]]*"src\/routes\.ts"/, "the route table is a start-up piece (budget.boot)");
+});
+

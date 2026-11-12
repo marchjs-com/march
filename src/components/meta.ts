@@ -24,6 +24,11 @@ export interface ComponentMeta {
   hubs?: readonly string[];
   /** Showcase page path that shows it. */
   showcase?: string;
+  /**
+   * `false`: a large component kept out of the `hadi-march/ui` barrel (a barrel re-export puts a module into the static
+   * graph of every page that imports the barrel). Import it from `hadi-march/components/<folder>`.
+   */
+  barrel?: boolean;
   /** Deprecated: what to use instead. */
   replacedBy?: string;
 }
@@ -45,5 +50,7 @@ export interface PlaygroundOption<V = Record<string, unknown>> {
 }
 export interface PlaygroundSpec<V = Record<string, unknown>> { options: readonly PlaygroundOption<V>[] }
 
+/** Typed helper for a component folder's meta.ts (name, status, category, composedOf …). */
 export const defineMeta = (m: ComponentMeta): ComponentMeta => m;
+/** Typed helper for a component folder's playground.ts (the showcase options). */
 export const definePlayground = <V = Record<string, unknown>>(p: PlaygroundSpec<V>): PlaygroundSpec<V> => p;

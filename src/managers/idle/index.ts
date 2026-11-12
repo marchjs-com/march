@@ -118,6 +118,9 @@ function create(cfg: IdleConfig): Idle {
 const manager = defineManager<Idle, IdleConfig>("idle", create, DEFAULTS);
 /** The idle manager (created on first call). */
 export const idle = (): Idle => manager.get();
+/** Set the idle manager's options (merged into the current config). */
 export const configureIdle = (config: Partial<IdleConfig>): void => manager.configure(config);
+/** Stop the idle manager and remove its listeners; the next call starts it again. */
 export const disposeIdle = (): void => manager.dispose();
+/** The idle manager (get, configure, dispose). */
 export const idleManager = manager;

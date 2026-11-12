@@ -229,12 +229,16 @@ export const commands = {
 };
 /** History hook: called after every successful run (undo / redo, audit log). Returns off. */
 export const onCommandRun = (fn: (run: CommandRun) => void): (() => void) => manager.get().onRun(fn);
+/** Global options of the command manager. */
 export const configureCommands = (config: Partial<CommandConfig>): void => manager.configure(config);
+/** Shut the command manager down; the next use starts it again. */
 export const disposeCommands = (): void => manager.dispose();
+/** The command manager (get, configure, dispose). */
 export const commandManager = manager;
 
 /** Commands picked by ids, a group, or a filter (reactive: only permitted ones). */
 export type CommandPick = readonly string[] | { group: string } | ((c: Command) => boolean);
+/** Commands picked by ids, a group or a filter (reactive: only the permitted ones). */
 export function pickCommands(pick: CommandPick): Accessor<Command[]> {
   const f = (): Command[] => {
     const list = commands.list().filter((c) => c.visible());

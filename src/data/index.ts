@@ -251,3 +251,7 @@ export { access, can, role, hasRole, hasMethod, denied, signedIn, Can, Gate, set
 export type { AccessRegister, AccessState, AccessInput, Perm, PermCheck, Requirement, Denial } from "../access/index.ts";
 // components of the "data" category (src/components/data, generated barrel)
 export * from "../components/data/index.ts";
+
+// grouping and aggregation (pure): DataGrid group rows / footers, reports, charts
+export { aggregate, aggregates, groupRows } from "./group.ts";
+export type { AggregateKind, Aggregate, GroupLevel, GroupAggregate, GroupHeader, GroupRow, GroupItem, GroupOptions } from "./group.ts";
