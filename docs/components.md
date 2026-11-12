@@ -10,9 +10,11 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Accordion | stable | Stacked sections that open one at a time or several together: animated height, ↑ ↓ Home End between headers, separated or contained look. | — |
 | AppShell | stable | The application frame: a sidebar column and the main area with optional banner and sticky header; a skip link; full width on narrow screens. | [Layout](#layout) |
 | BottomRightControls | stable | One fixed page corner (bottom, end side; mirrors in RTL) that page-wide controls put themselves into, in order, instead of overlapping. | — |
+| DevicePreview | experimental | Content as on a real phone or tablet: device body, notch, status bar, home indicator, real screen size, rotation; the mouse acts as a finger (drag to scroll, fling, long press). | [OverlayScope](#overlayscope) |
 | Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | — |
 | Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
 | Layout | stable | The frame all pages of an app share: content plus the page corner (BottomRightControls) with its back-to-top button; Page builds on it. | — |
+| OverlayScope | stable | A box that keeps the layers opened inside it (drawers, dialogs, menus, toasts) inside it: previews, device frames, panels, demos. | — |
 | Spacer | stable | A flexible gap in a row that pushes the following items to the end. | — |
 | Splitter | stable | Two resizable panes: drag the handle or use the arrow keys (mirrored in RTL), Home / End, Enter resets. | — |
 | Stack | stable | Layout primitives: Stack (a row or column with token gaps and alignment), Toolbar (a labelled bar of controls), Divider (a rule, labelled or vertical). | — |
@@ -664,6 +666,22 @@ Composed of: [DatePicker](#datepicker), [TimeInput](#timeinput)
 
 Full page: src/components/forms/date-time-input/docs.md
 
+## DevicePreview
+
+Shows content as on a real phone or tablet: the device body with its camera (island, punch hole or notch), the status bar (time, signal, battery), the home indicator, the real screen size in CSS pixels, portrait or landscape. The mouse acts like a finger: the cursor becomes a touch dot, dragging scrolls whatever is under it (with a fling that slows down), a long press opens the context menu, a drag never also clicks.
+
+Composed of: [OverlayScope](#overlayscope)
+
+```tsx
+import { DevicePreview, DEVICES } from "hadi-march/layout";
+
+<DevicePreview device="iphone-15"><MySite /></DevicePreview>
+<DevicePreview device="ipad" landscape touch={false}>…</DevicePreview>
+<DevicePreview device={{ name: "Kiosk", width: 1080, height: 1920, radius: 0, kind: "screen" }}>…</DevicePreview>
+```
+
+Full page: src/components/layout/device-preview/docs.md
+
 ## Dialog
 
 A modal window over the page. Declarative: `<Dialog open={…} onClose={…}>`; imperative: `openDialog(render)` and `openDrawer(render)` return a promise that resolves with the value passed to `close(value)`. `confirm`, `prompt` and `askReason` are ready-made dialogs; `closeAll()` and `openDialogs()` manage the stack.
@@ -1262,6 +1280,22 @@ A decorative layer that lives inside its container: an image, a muted looping vi
 ```
 
 Full page: src/components/media/overlay/docs.md
+
+## OverlayScope
+
+A box that layers opened inside it open in. A drawer, a dialog, a menu or a toast of a site preview, a device frame, a dashboard panel or a component demo stays in it instead of covering the whole page.
+
+```tsx
+import { OverlayScope } from "hadi-march/layout";
+
+<OverlayScope class="preview"><MySite /></OverlayScope>      // its SiteNav drawer opens inside the preview
+
+openDrawer(render)                         // inside a scope: in the scope (found from the component or the focus)
+openDrawer(render, { target: "page" })     // the whole page anyway
+<Portal layer="popover" target={el}>…</Portal>
+```
+
+Full page: src/components/layout/overlay-scope/docs.md
 
 ## Pagination
 

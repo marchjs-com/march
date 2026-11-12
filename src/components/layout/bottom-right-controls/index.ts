@@ -9,6 +9,7 @@ import "./bottom-right-controls.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { onCleanup, getOwner } from "../../../core/reactive.ts";
+import { openLayer } from "../../../dom/portal.ts";
 
 export type Corner = "top-start" | "top-end" | "bottom-start" | "bottom-end";
 export const CORNERS: readonly Corner[] = ["top-start", "top-end", "bottom-start", "bottom-end"];
@@ -25,7 +26,8 @@ export function cornerControls(corner: Corner = "bottom-end"): HTMLElement {
   const el = hosts.get(corner);
   if (el && el.isConnected) return el;
   const made = make(corner);
-  globalThis.document?.body?.appendChild(made);
+  // a layer of the page (under dialogs, which make it inert while open), never body.append
+  openLayer("popover", made);
   hosts.set(corner, made);
   return made;
 }

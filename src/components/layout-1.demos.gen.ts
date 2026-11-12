@@ -4,6 +4,4 @@ import * as d0 from "./layout/accordion/demo.tsx";
 import * as p0 from "./layout/accordion/playground.ts";
 import * as d1 from "./layout/app-shell/demo.tsx";
 import * as p1 from "./layout/app-shell/playground.ts";
-import * as d2 from "./layout/bottom-right-controls/demo.tsx";
-import * as p2 from "./layout/bottom-right-controls/playground.ts";
-export { d0, p0, d1, p1, d2, p2 };
+export { d0, p0, d1, p1 };

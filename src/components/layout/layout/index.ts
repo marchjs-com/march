@@ -18,6 +18,7 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { context, provide, useContext, onCleanup, signal, type Signal } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { openLayer } from "../../../dom/portal.ts";
 import { addCornerControl, cornerControls, CORNERS, type Corner } from "../bottom-right-controls/index.ts";
 
 export type SlotName = "top" | "header" | "nav" | "aside" | "footer";
@@ -249,17 +250,17 @@ export const scrollToTop = defineLayoutFeature("scrollToTop", (opts: { threshold
 /** A thin bar at the top that fills as the page is read (keeps working with reduced motion: it is information). */
 export const readingProgress = defineLayoutFeature("readingProgress", (opts: { color?: string; height?: number } = {}) => () => {
   const bar = h("div", { class: "hm-reading-progress", role: "progressbar", "aria-label": () => t`Reading progress`, style: { "--hm-rp-h": `${opts.height ?? 3}px`, ...(opts.color ? { "--hm-rp-c": opts.color } : {}) } }) as HTMLElement;
-  globalThis.document?.body?.appendChild(bar);
+  const closeBar = openLayer("fx", bar);
   let stop: (() => void) | undefined;
   let gone = false;
   void import("../../../motion/scroll-fx.ts").then((m) => { if (!gone) stop = m.scrollIndicator(bar); });
-  return () => { gone = true; stop?.(); bar.remove(); };
+  return () => { gone = true; stop?.(); closeBar(); };
 });
 
 /** After a route change: focus moves to the page (main) and the new title is read out; nothing moves on first load. */
 export const routeFocus = defineLayoutFeature("routeFocus", () => (api) => {
   const live = h("div", { class: "hm-sr-only", "aria-live": "polite", "aria-atomic": "true" }) as HTMLElement;
-  globalThis.document?.body?.appendChild(live);
+  const closeLive = openLayer("fx", live);
   let stop: (() => void) | undefined;
   let gone = false;
   void Promise.all([import("../../../router/router.ts"), import("../../../core/reactive.ts")]).then(([R, C]) => {
@@ -275,7 +276,7 @@ export const routeFocus = defineLayoutFeature("routeFocus", () => (api) => {
       });
     }); return dispose; });
   });
-  return () => { gone = true; stop?.(); live.remove(); };
+  return () => { gone = true; stop?.(); closeLive(); };
 });
 
 /** The header slides away while scrolling down and comes back on the way up (more room on small screens). */
@@ -297,7 +298,7 @@ export const autoHideHeader = defineLayoutFeature("autoHideHeader", (opts: { aft
 /** Draw a lazily loaded component into a region (or the end of <body>); stops cleanly if the layout goes first. */
 function lazyMount(api: LayoutApi, where: LayoutRegion | "body", order: number, load: () => Promise<() => unknown>): () => void {
   const wrap = h("span", { class: "hm-layout-ctl" }) as HTMLElement;
-  const off = where === "body" ? (globalThis.document?.body?.appendChild(wrap), () => wrap.remove()) : api.add(where, wrap, order);
+  const off = where === "body" ? openLayer("fx", wrap) : api.add(where, wrap, order);
   let gone = false;
   let dispose: (() => void) | undefined;
   void Promise.all([load(), import("../../../dom/render.ts")]).then(([draw, r]) => { if (!gone) dispose = r.render(draw, wrap); });
@@ -357,7 +358,7 @@ export const devOverlay = defineLayoutFeature("devOverlay", () => (api) => {
   const root = globalThis.document?.documentElement;
   if (!root) return;
   const panel = h("div", { class: "hm-layout-dev", role: "note", "aria-label": () => t`Layout regions`, hidden: true }) as HTMLElement;
-  globalThis.document.body.appendChild(panel);
+  const closePanel = openLayer("fx", panel);
   const draw = (): void => {
     const regions = (["top", "header", "nav", "main", "aside", "footer"] as const).filter((r) => api.region(r));
     panel.textContent = `Layout · ${t`Regions`}: ${regions.join(", ")} · ${t`Features`}: ${api.features().join(", ")}`;
@@ -370,7 +371,7 @@ export const devOverlay = defineLayoutFeature("devOverlay", () => (api) => {
     if (on) draw();
   };
   globalThis.addEventListener("keydown", toggle);
-  return () => { globalThis.removeEventListener("keydown", toggle); root.removeAttribute("data-hm-layout-debug"); panel.remove(); };
+  return () => { globalThis.removeEventListener("keydown", toggle); root.removeAttribute("data-hm-layout-debug"); closePanel(); };
 });
 
 /** The default Layout: back-to-top and route focus on. `features={{ scrollToTop: false }}` turns one off. */

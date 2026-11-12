@@ -13,9 +13,14 @@ export interface PlacedStyle { top: string; left: string; "min-width"?: string |
 
 /** Compute a fixed position for `panel` next to `anchor`. */
 export function place(anchor: Element, panel: Element | null | undefined, placement: Placement = "bottom-start", gap = 6): PlacedStyle {
-  const a = anchor.getBoundingClientRect();
   const p = panel?.getBoundingClientRect?.() ?? { width: 0, height: 0 };
-  const vw = globalThis.innerWidth ?? 1024, vh = globalThis.innerHeight ?? 768;
+  // inside an <OverlayScope> (a preview, a panel) the panel is placed by the scope's box: its fixed position is
+  // relative to the scope, and it stays inside it
+  const scope = (panel ?? anchor).closest?.(".hm-overlay-scope")?.getBoundingClientRect();
+  const ox = scope?.left ?? 0, oy = scope?.top ?? 0;
+  const vw = scope?.width ?? globalThis.innerWidth ?? 1024, vh = scope?.height ?? globalThis.innerHeight ?? 768;
+  const r = anchor.getBoundingClientRect();
+  const a = { top: r.top - oy, bottom: r.bottom - oy, left: r.left - ox, right: r.right - ox, width: r.width };
   const parts = placement.split("-");
   let side = parts[0];
   const align = parts[1] ?? "center";

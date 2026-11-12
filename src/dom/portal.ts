@@ -18,9 +18,14 @@ const MODAL = new Set<LayerKind>(["dialog", "drawer", "palette", "lightbox"]);
 /** Bands: most layers stack in the order they open; toasts and effects stay above them. */
 const BAND: Partial<Record<LayerKind, string>> = { toast: "var(--hm-z-toast, 200)", fx: "var(--hm-z-drag, 250)", drag: "var(--hm-z-drag, 250)" };
 
-interface Layer { el: HTMLElement; kind: LayerKind }
+interface Layer { el: HTMLElement; kind: LayerKind; host: HTMLElement }
 const stack: Layer[] = [];
-let root: HTMLElement | null = null;
+// the layer root of each host: <body> (the page) or an <OverlayScope>
+const roots = new WeakMap<HTMLElement, HTMLElement>();
+// where a layer opened from here belongs: set by the OverlayScope module when an app uses it (the core stays small)
+let scopeOf: () => HTMLElement | null = () => null;
+/** @internal Install the overlay-scope lookup (hadi-march/layout OverlayScope). */
+export const _setScopeOf = (f: () => HTMLElement | null): void => { scopeOf = f; };
 const inerted = new Set<Element>();
 /** Bumped on every open / close, so layers() is reactive (the Layer manager and devtools follow the stack). */
 const stackRev = signal(0, { name: "layers" });
@@ -28,10 +33,10 @@ const stackRev = signal(0, { name: "layers" });
 // the few styles a portal needs are set here (CSSOM: CSP safe), so the core needs no stylesheet: a box adds no layout
 // box; a layer covers the viewport without taking pointer events, its content takes them again (inherited)
 const contents = (el: HTMLElement, pointer?: "auto"): HTMLElement => { el.style.setProperty("display", "contents"); if (pointer) el.style.setProperty("pointer-events", pointer); return el; };
-function layerRoot(): HTMLElement {
-  const d = globalThis.document;
-  if (!root || !root.isConnected) { root = contents(h("div", { class: "hm-layers" }) as HTMLElement); d.body.appendChild(root); }
-  return root;
+function layerRoot(host: HTMLElement): HTMLElement {
+  let r = roots.get(host);
+  if (r?.parentNode != host) roots.set(host, (r = host.appendChild(contents(h("div", { class: "hm-layers" }) as HTMLElement))));
+  return r!;
 }
 
 /** Recompute order (z-index) and inertness after a layer opens or closes. */
@@ -44,12 +49,14 @@ function restack(): void {
   stack.forEach((l, i) => { if (MODAL.has(l.kind)) top = i; });
   if (top < 0) return;
   const set = (el: Element): void => { if (!el.hasAttribute("inert")) { el.setAttribute("inert", ""); inerted.add(el); } };
-  for (const el of globalThis.document.body.children) if (el !== root && el.tagName !== "SCRIPT") set(el);
+  // a modal takes away only its own scope: the page, or the inside of its <OverlayScope> (a preview, a panel)
+  const host = stack[top]!.host;
+  for (const el of host.children) if (el !== roots.get(host) && el.tagName !== "SCRIPT") set(el);
   stack.forEach((l, i) => { if (i < top && BAND[l.kind] === undefined) set(l.el); });
 }
 
-/** Put a node into a new layer of the stack; returns close (removes it and restacks). */
-export function openLayer(kind: LayerKind, node: Node): () => void {
+/** Put a node into a new layer of the stack (in `scope`, an <OverlayScope> element, else the page); returns close. */
+export function openLayer(kind: LayerKind, node: Node, scope?: HTMLElement | null): () => void {
   const el = h("div", { class: "hm-layer", "data-layer": kind }) as HTMLElement;
   for (const [k, v] of [["position", "fixed"], ["inset", "0"], ["pointer-events", "none"]] as const) el.style.setProperty(k, v);
   // the content sits in a box that gives pointer events back (a Portal's own box, or a new one around a plain node)
@@ -57,9 +64,9 @@ export function openLayer(kind: LayerKind, node: Node): () => void {
   const box = isBox ? (node as HTMLElement) : contents(h("div", { class: "hm-portal" }) as HTMLElement, "auto");
   if (!isBox) box.appendChild(node);
   el.appendChild(box);
-  const entry: Layer = { el, kind };
+  const entry: Layer = { el, kind, host: scope || document.body };
   stack.push(entry);
-  layerRoot().appendChild(el);
+  layerRoot(entry.host).appendChild(el);
   restack();
   let open = true;
   return () => {
@@ -106,8 +113,12 @@ export interface PortalProps {
   layer?: LayerKind;
   /** A specific element. */
   mount?: Element | DocumentFragment;
+  /** Where a layer opens: the nearest <OverlayScope> (default), the whole page ("page") or a scope element. */
+  target?: "nearest" | "page" | HTMLElement;
   children?: unknown;
 }
+
+
 
 /** Render children somewhere else: a layer, a named target or an element. Returns nothing in place. */
 export function Portal(props: PortalProps): null {
@@ -126,6 +137,9 @@ export function Portal(props: PortalProps): null {
   } else if (props.mount) {
     props.mount.appendChild(box);
     onCleanup(() => box.remove());
-  } else onCleanup(openLayer(props.layer ?? "popover", box));
+  } else {
+    const t = props.target;
+    onCleanup(openLayer(props.layer ?? "popover", box, t === "page" ? null : typeof t == "object" ? t : scopeOf()));
+  }
   return null;
 }

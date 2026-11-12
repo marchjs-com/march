@@ -7,6 +7,7 @@ import "../../../ui/field.css";
 import { signal, createRoot, onCleanup, untrack, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { Portal, openLayer } from "../../../dom/portal.ts";
+import { overlayScopeFor } from "../../layout/overlay-scope/index.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, uid, glyph, type MaybeFn } from "../../../ui/util.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
@@ -107,6 +108,8 @@ export interface DialogOptions<T = unknown> {
   role?: string;
   /** Resolved when the dialog is dismissed (Escape, overlay, ×). Default undefined. */
   dismissValue?: T;
+  /** Where it opens: the nearest <OverlayScope> (default), the whole page ("page") or a scope element. */
+  target?: "nearest" | "page" | HTMLElement;
 }
 
 /**
@@ -116,12 +119,14 @@ export interface DialogOptions<T = unknown> {
 export function openDialog<T>(render: (close: (value: T) => void) => unknown, opts: DialogOptions<T> & { dismissValue: T }): Promise<T>;
 export function openDialog<T = unknown>(render: (close: (value?: T) => void) => unknown, opts?: DialogOptions<T | undefined>): Promise<T | undefined>;
 export function openDialog(render: (close: (value?: unknown) => void) => unknown, opts: DialogOptions = {}): Promise<unknown> {
+  // where it opens: the caller's <OverlayScope> (a preview, a panel), else the page; target overrides
+  const t = opts.target, scope = t === "page" ? null : t instanceof HTMLElement ? t : overlayScopeFor();
   return new Promise((resolve) => {
     createRoot((dispose) => {
       let done = false;
       const close = (v?: unknown): void => { if (done) return; done = true; dispose(); resolve(v); };
       const node = untrack(() => frame({ ...opts, onClose: () => close(opts.dismissValue), children: render(close), footer: opts.footer?.(close) }));
-      onCleanup(openLayer(opts.kind === "drawer" ? "drawer" : "dialog", node));
+      onCleanup(openLayer(opts.kind === "drawer" ? "drawer" : "dialog", node, scope));
     }, null);
   });
 }

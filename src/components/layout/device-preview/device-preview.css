@@ -1,0 +1,52 @@
+/* DevicePreview: a phone or tablet body around a real-size screen. --hm-dev-w / -h / -r come from the device spec;
+   --hm-dev-scale fits it into its place (CSS zoom keeps layout and hit-testing in step). */
+.hm-device-stage { display: flex; justify-content: center; padding: var(--hm-space-4); min-inline-size: 0; }
+.hm-device {
+  --hm-dev-bezel: 12px;
+  position: relative; flex: none; zoom: var(--hm-dev-scale, 1);
+  inline-size: calc(var(--hm-dev-w) + 2 * var(--hm-dev-bezel)); block-size: calc(var(--hm-dev-h) + 2 * var(--hm-dev-bezel));
+  padding: var(--hm-dev-bezel); box-sizing: border-box;
+  border-radius: calc(var(--hm-dev-r) + var(--hm-dev-bezel));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--hm-text) 92%, var(--hm-bg)), var(--hm-text));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--hm-text) 60%, transparent), var(--hm-shadow-3), inset 0 0 0 2px color-mix(in srgb, var(--hm-bg) 18%, transparent);
+}
+.hm-device-tablet { --hm-dev-bezel: 18px; }
+.hm-device-screen {
+  inline-size: 100%; block-size: 100%; overflow: hidden; border-radius: var(--hm-dev-r);
+  background: var(--hm-bg); color: var(--hm-text); display: flex; flex-direction: column;
+}
+.hm-device-viewport { position: relative; flex: 1 1 auto; overflow: auto; overscroll-behavior: contain; scrollbar-width: none; container: hm-site / inline-size; }
+.hm-device-viewport::-webkit-scrollbar { display: none; }
+/* status bar */
+.hm-device-status { flex: none; display: flex; align-items: center; justify-content: space-between; block-size: 2.75rem; padding-inline: 1.75rem 1.4rem;
+  font: 600 var(--hm-text-sm) / 1 var(--hm-font-sans, system-ui); color: var(--hm-text); background: var(--hm-bg); z-index: 1; }
+.hm-device-tablet .hm-device-status { block-size: 1.6rem; padding-inline: 1.25rem; font-size: var(--hm-text-xs); }
+.hm-device-icons { display: inline-flex; align-items: center; gap: .3rem; }
+.hm-device-icons i { display: inline-block; background: currentColor; }
+.hm-device-signal { inline-size: .9rem; block-size: .55rem; clip-path: polygon(0 100%, 100% 0, 100% 100%); }
+.hm-device-wifi { inline-size: .8rem; block-size: .6rem; border-radius: .8rem .8rem 0 0; clip-path: polygon(50% 100%, 0 0, 100% 0); }
+.hm-device-battery { inline-size: 1.3rem; block-size: .6rem; border-radius: .2rem; box-shadow: inset 0 0 0 1.5px currentColor; background: linear-gradient(90deg, currentColor 70%, transparent 70%) !important; }
+/* camera */
+.hm-device-camera { position: absolute; z-index: 3; inset-block-start: calc(var(--hm-dev-bezel) + .55rem); inset-inline: 0; margin-inline: auto; background: var(--hm-text); pointer-events: none; }
+.hm-device-cam-island .hm-device-camera { inline-size: 7.2rem; block-size: 2.1rem; border-radius: 1.2rem; }
+.hm-device-cam-punch .hm-device-camera { inline-size: .8rem; block-size: .8rem; border-radius: 50%; inset-block-start: calc(var(--hm-dev-bezel) + .8rem); }
+.hm-device-cam-notch .hm-device-camera { inline-size: 9.5rem; block-size: 1.9rem; inset-block-start: var(--hm-dev-bezel); border-radius: 0 0 1.1rem 1.1rem; }
+.hm-device-cam-none .hm-device-camera { display: none; }
+/* home indicator */
+.hm-device-home { position: absolute; z-index: 3; inset-block-end: calc(var(--hm-dev-bezel) + .5rem); inset-inline: 0; margin-inline: auto; inline-size: 8.5rem; block-size: .3rem; border-radius: 1rem;
+  background: color-mix(in srgb, var(--hm-text) 75%, transparent); pointer-events: none; }
+.hm-device-tablet .hm-device-home { inline-size: 12rem; }
+/* landscape: the camera moves to the side, the status bar stays thin */
+.hm-device.is-landscape .hm-device-camera { inset-block: 0; margin-block: auto; inset-inline: calc(var(--hm-dev-bezel) + .55rem) auto; margin-inline: 0; inline-size: 2.1rem; block-size: 7.2rem; }
+.hm-device.is-landscape.hm-device-cam-punch .hm-device-camera { inline-size: .8rem; block-size: .8rem; }
+.hm-device.is-landscape.hm-device-cam-notch .hm-device-camera { inline-size: 1.9rem; block-size: 9.5rem; inset-inline-start: var(--hm-dev-bezel); }
+.hm-device.is-landscape .hm-device-status { block-size: 1.5rem; }
+/* touch: no cursor, a finger dot that grows while pressed */
+.hm-device.is-touch .hm-device-screen, .hm-device.is-touch .hm-device-screen * { cursor: none !important; }
+.hm-device-touch { position: absolute; z-index: 4; inset-block-start: 0; inset-inline-start: 0; inline-size: 2.2rem; block-size: 2.2rem; margin-block-start: -1.1rem; margin-inline-start: -1.1rem; border-radius: 50%;
+  background: color-mix(in srgb, var(--hm-text) 18%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--hm-bg) 60%, transparent); pointer-events: none; opacity: 0;
+  transition: opacity var(--hm-dur-fast) var(--hm-ease), scale var(--hm-dur-fast) var(--hm-ease); }
+.hm-device.is-touch .hm-device-screen:hover .hm-device-touch { opacity: 1; }
+.hm-device-screen.is-pressed .hm-device-touch { scale: .8; background: color-mix(in srgb, var(--hm-primary) 35%, transparent); }
+.hm-device:not(.is-touch) .hm-device-touch { display: none; }
+@media (prefers-reduced-motion: reduce) { .hm-device-touch { transition: none; } }
