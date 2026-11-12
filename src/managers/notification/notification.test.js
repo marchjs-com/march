@@ -14,7 +14,7 @@ class FakeNotification {
 globalThis.Notification = FakeNotification;
 Object.defineProperty(globalThis, "navigator", { configurable: true, value: {} });
 const { notifications, configureNotifications, disposeNotifications } = await import("./index.ts");
-const { setManagerEmit } = await import("../manager.ts");
+const { onManager } = await import("../manager.ts");
 
 test("visible tab or no permission: the toast bridge; the inbox counts unread", () => {
   const toasts = [];
@@ -39,7 +39,7 @@ test("visible tab or no permission: the toast bridge; the inbox counts unread", 
 
 test("hidden tab with permission: a system notification; click focuses and runs onClick", async () => {
   const events = [];
-  const prev = setManagerEmit((e) => events.push(`${e.manager}:${e.type}`));
+  const prev = onManager("*", (e) => events.push(`${e.manager}:${e.type}`));
   const toasts = [];
   configureNotifications({ toast: (n) => toasts.push(n), native: "hidden" });
   const n = notifications();
@@ -62,6 +62,6 @@ test("hidden tab with permission: a system notification; click focuses and runs 
   document.visibilityState = "visible";
   assert.equal(notifications().notify({ title: "e" }).via, "none", "no bridge, visible tab");
   assert.ok(events.includes("notification:show") && events.includes("notification:click"));
-  setManagerEmit(prev);
+  prev();
   disposeNotifications();
 });

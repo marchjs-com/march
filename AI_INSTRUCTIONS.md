@@ -463,7 +463,7 @@ command({ id: "doc.save", title: () => t`Save`, shortcut: "mod+s", group: "File"
 <button command:doc.save>Save</button>   <Menu items={commandItems({ group: "File" })} />   <CommandButton command="doc.save" />
 ```
 `can` hides, `when` disables, `busy()` follows a running call, `cancel()` aborts it. Do not duplicate a command as a
-separate button handler. Manager events go through `setManagerEmit`.
+separate button handler. Manager events are on channels: `onManager("command:*", fn)` (topic `<manager>:<type>`).
 
 ## Component catalogue (folders in src/components)
 

@@ -6,7 +6,7 @@ import { installDom } from "../../testing/dom.ts";
 installDom();
 const { h, render, effect } = await import("../../index.ts");
 const { consent, configureConsent, disposeConsent, DEFAULT_CATEGORIES } = await import("./index.ts");
-const { setManagerEmit } = await import("../manager.ts");
+const { onManager } = await import("../manager.ts");
 const tick = (ms = 5) => new Promise((r) => setTimeout(r, ms));
 const fresh = (cfg = {}) => { localStorage.clear(); configureConsent({ version: "1", maxAgeDays: 365, storage: undefined, ...cfg }); };
 
@@ -48,7 +48,7 @@ test("the record survives a restart; a new policy version or an old record asks 
 test("has() is reactive; on(category) fires only on a change; gate() blocks; events", () => {
   fresh();
   const events = [];
-  const prev = setManagerEmit((e) => events.push(e));
+  const prev = onManager("*", (e) => events.push(e));
   const seen = [];
   const stop = effect(() => seen.push(consent.has("analytics")));
   const changes = [];
@@ -71,7 +71,7 @@ test("has() is reactive; on(category) fires only on a change; gate() blocks; eve
   assert.equal(localStorage.getItem("hm.consent"), null, "withdrawal removes the record");
   assert.ok(events.some((e) => e.manager === "consent" && e.type === "withdraw"));
   assert.ok(events.some((e) => e.type === "change" && e.detail.choices.analytics === true));
-  off(); stop(); setManagerEmit(prev);
+  off(); stop(); prev();
 });
 
 test("whenGranted(): third-party hooks start on consent and stop on withdrawal; granted() resolves", async () => {
