@@ -15,7 +15,7 @@ import { val, cx, rest, uid, icon, glyph, later, debounce, type MaybeFn, type Cl
 import { check } from "../icons/glyphs/check.ts";
 import { copy as copyIcon } from "../icons/glyphs/copy.ts";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "dark";
 export type ButtonSize = "sm" | "md" | "lg";
 const SIZES: Record<string, string | undefined> = { sm: "hm-btn-sm", lg: "hm-btn-lg" };
 const sizeClass = (s: ButtonSize | null | undefined): string | undefined => (s ? SIZES[s] : undefined);
@@ -39,7 +39,7 @@ export interface ButtonProps {
 
 /**
  * `<Button variant="primary" size="sm" loading={$saving} icon="+" href="/x" block>Save</Button>`
- * variant: primary | secondary (default) | ghost | danger. size: sm | md | lg. `href` renders a router Link.
+ * variant: primary | secondary (default) | ghost | danger | dark (ink fill: the text color, e.g. HADİ navy). size: sm | md | lg. `href` renders a router Link.
  */
 export function Button(props: ButtonProps): unknown {
   const loading = (): boolean => !!val(props.loading);

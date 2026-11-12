@@ -148,7 +148,7 @@ export const hadi = defineTheme({
   light: {
     bg: HADI.mist, surface: "#FFFFFF", text: HADI.ink, muted: ensureContrast(HADI.ink3, "#FFFFFF"), border: HADI.line,
     // accent = orange (Heyecan), pure for fills, lines and icons; --hm-primary-text is the shade that reads as text
-    primary: HADI.orange, solid: HADI.ink, onSolid: onBrandFill(HADI.ink),
+    primary: HADI.orange, solid: HADI.orange, onSolid: onBrandFill(HADI.orange),
     danger: HADI.error, success: HADI.green, warn: HADI.gold,
     info: HADI.blue, special: HADI.purple,
     cat: [HADI.orange, HADI.blue, HADI.green, HADI.purple, HADI.pink, HADI.gold, HADI.ink, "#0E9F8E"],
