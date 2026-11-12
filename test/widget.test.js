@@ -22,6 +22,24 @@ test("code-view point: CodeViewer is the default, with Copy and Fullscreen as se
   m.dispose();
 });
 
+test("the input is live: a changed input draws the provider again (a library picker over one Code card)", async () => {
+  const { signal, reactive } = await import("../src/index.ts");
+  const lib = signal("march");
+  const SOURCES = { march: "const march = 1", vanilla: "let vanilla = 2", svelte: "<p>{svelte}</p>" };
+  const m = mount(() => h(U.Widget, { sources: [U.codeView], input: reactive(() => ({ source: SOURCES[lib()], lang: lib() === "svelte" ? "html" : "tsx" })) }));
+  // (what the compiler writes for input={{ source: SOURCES[$lib], … }})
+  assert.match(m.el.querySelector(".hm-code").textContent, /const march = 1/);
+  lib.set("vanilla");
+  await tick();
+  assert.match(m.el.querySelector(".hm-code").textContent, /let vanilla = 2/, "the code follows the input");
+  assert.equal(m.el.querySelectorAll(".hm-widget").length, 1, "same widget, its content redrawn");
+  lib.set("svelte");
+  await tick();
+  assert.match(m.el.querySelector(".hm-code").textContent, /<p>\{svelte\}<\/p>/);
+  assert.equal(m.el.querySelectorAll(".hm-copy").length, 1, "one Copy action for the current input");
+  m.dispose();
+});
+
 test("a second provider registered later replaces CodeViewer in every Code tab; removing it brings the viewer back", async () => {
   const a = mount(() => h(U.Widget, { sources: [U.codeView], input }));
   const b = mount(() => h(U.Widget, { sources: [U.codeView], input: { ...input, lang: "css", source: "a { color: red; }" } }));

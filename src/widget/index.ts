@@ -71,12 +71,19 @@ function actionsOf<P>(sources: readonly WidgetPoint<P>[], input: P): WidgetProvi
 }
 
 export interface WidgetProps<P> { sources: readonly WidgetPoint<P>[]; input: P; class?: string }
-/** Draw a widget point: `<Widget sources={[codeView]} input={{ source, lang: "tsx" }} />`. */
+/**
+ * Draw a widget point: `<Widget sources={[codeView]} input={{ source, lang: "tsx" }} />`. The input is live: when it
+ * changes (`input={{ source: $code }}`), the provider draws again for the new input.
+ */
 export function Widget<P>(props: WidgetProps<P>): Element {
-  const input = props.input;
-  const main: Accessor<WidgetProvider<P> | undefined> = computed(() => pickMain(props.sources, input));
-  const actions = computed(() => actionsOf(props.sources, input));
-  const ctx: WidgetContext<P> = { input, actions: () => actions().map((a) => untrack(() => a.render(input, ctx))) };
+  const input = computed(() => props.input);
+  const main: Accessor<WidgetProvider<P> | undefined> = computed(() => pickMain(props.sources, input()));
+  const actions = computed(() => actionsOf(props.sources, input()));
   return h("div", { class: props.class ? `hm-widget ${props.class}` : "hm-widget", "data-widget": () => main()?.id ?? "" },
-    () => { const m = main(); return m ? untrack(() => m.render(input, ctx)) : null; });
+    () => {
+      const m = main(), now = input();
+      if (!m) return null;
+      const ctx: WidgetContext<P> = { input: now, actions: () => actions().map((a) => untrack(() => a.render(now, ctx))) };
+      return untrack(() => m.render(now, ctx));
+    });
 }
