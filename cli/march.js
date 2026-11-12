@@ -239,6 +239,7 @@ async function gen() {
   if (what === "routes") { genRoutes(resolve(cwd, cfg.pagesDir), resolve(cwd, "src/routes.gen.js")); console.log("routes generated"); return; }
   if (!name && what !== "api") fail(`usage: march gen ${what ?? "page|component|crud|routes|api"} <name>`);
   if (what === "page") return put(join(cfg.pagesDir, `${name}.jsx`), templates.page(name));
+  if (what === "component" && isLibrary()) return libComponent(name, put);
   if (what === "component") return put(join(cfg.components, `${name}.jsx`), templates.component(name));
   if (what === "crud") return put(join(cfg.pagesDir, `${name}.jsx`), templates.crud(name));
   if (what === "api") {
@@ -271,7 +272,29 @@ async function i18n() {
   if (missing) process.exitCode = 1;
 }
 
+/** Inside the hadi-march repository: `march gen component` makes a component folder, `march check component` checks one. */
+function isLibrary() {
+  try { return JSON.parse(readFileSync(resolve(cwd, "package.json"), "utf8")).name === "hadi-march" && existsSync(resolve(cwd, "src/components")); } catch { return false; }
+}
+async function libComponent(name, put) {
+  const folder = name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+  const Name = folder.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join("");
+  const { libComponent: files } = await import("./lib-templates.js");
+  for (const [f, text] of Object.entries(files(folder, Name))) put(join("src/components", folder, f), text);
+  const { spawnSync } = await import("node:child_process");
+  spawnSync(process.execPath, [resolve(cwd, "tools/gen-registry.js")], { cwd, stdio: "inherit" });
+  console.log(`next: march check component ${folder}  (checklist: docs/component-checklist.md)`);
+}
+
 async function typecheck() {
+  if (argv[1] === "component") {
+    const name = argv[2] ?? fail("usage: march check component <name>");
+    const { checkComponent, printCheck } = await import("./check-component.js");
+    const r = await checkComponent(cwd, name);
+    printCheck(name, r);
+    if (!r.ok) process.exitCode = 1;
+    return;
+  }
   const { check } = await import("./check.js");
   const cfg = await loadConfig();
   const n = await check({ components: cfg.components, srcDir: flag("--src", "src") });
@@ -281,7 +304,7 @@ async function typecheck() {
 const cmd = argv[0];
 const run = { dev, build: () => build(), gen, i18n, check: typecheck }[cmd];
 if (!run) {
-  console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)");
+  console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)\n  march check component <name>   (in the hadi-march repo: the component checklist)");
   process.exit(cmd ? 1 : 0);
 }
 await run();
