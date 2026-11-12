@@ -13,7 +13,7 @@ fieldset > .hm-section-title, legend.hm-section-title { font-weight: 600; font-s
 .hm-edit-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--hm-space-3); flex-wrap: wrap; }
 .hm-edit-title { margin: 0; font-size: var(--hm-text-xl); }
 .hm-edit-tools { display: flex; align-items: center; gap: var(--hm-space-2); }
-.hm-dirty { font-size: var(--hm-text-xs); color: var(--hm-warn); background: var(--hm-warn-soft); padding: 2px var(--hm-space-2); border-radius: 1rem; }
+.hm-dirty { font-size: var(--hm-text-xs); color: var(--hm-warn-text); background: var(--hm-warn-soft); padding: 2px var(--hm-space-2); border-radius: 1rem; }
 .hm-form-skeleton { display: flex; flex-direction: column; gap: var(--hm-space-4); }
 .hm-skeleton-field { display: flex; flex-direction: column; gap: var(--hm-space-2); }
 .hm-skeleton { border-radius: var(--hm-radius); background: linear-gradient(90deg, var(--hm-surface-2), var(--hm-surface-3), var(--hm-surface-2)); background-size: 200% 100%; animation: hm-skel 1.6s ease-in-out infinite; }

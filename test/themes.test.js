@@ -72,8 +72,18 @@ test("HADİ theme: the four official colors as tokens, legible semantic mapping,
   assert.match(css, /--hm-cat-1: #F2801F; --hm-cat-2: #1D9AD6; --hm-cat-3: #78BE3A; --hm-cat-4: #A3338C;/);
   assert.match(css, /--hm-mark: linear-gradient\(135deg, #F2801F 0%, #1D9AD6 36%, #78BE3A 66%, #A3338C 100%\)/);
   const L = T.hadi.light, D = T.hadi.dark;
-  for (const k of ["primary", "info", "success", "danger", "warn", "muted"]) assert.ok(T.contrast(L[k], L.surface) >= 4.5, `light ${k} ${L[k]} reads on ${L.surface}`);
-  for (const k of ["primary", "info", "success", "danger", "warn"]) assert.ok(T.contrast(D[k], D.surface) >= 4.5, `dark ${k} reads`);
+  // fills, lines and icons use the pure brand colors; only text uses the --hm-X-text shade (AA on the surface)
+  assert.equal(L.primary, "#F2801F"); assert.equal(D.primary, "#F2801F");
+  assert.equal(L.info, "#1D9AD6"); assert.equal(L.success, "#78BE3A"); assert.equal(L.special, "#A3338C");
+  assert.match(css, /--hm-primary: #F2801F;/);
+  assert.ok(T.contrast(L.muted, L.surface) >= 4.5, "muted text reads");
+  for (const [scheme, block] of [["light", css.split("@media")[0]], ["dark", css.split("@media")[1]]]) {
+    const surface = block.match(/--hm-surface: (#[0-9A-F]{6});/i)[1];
+    for (const k of ["primary", "info", "success", "danger", "warn", "special"]) {
+      const text = block.match(new RegExp(`--hm-${k}-text: (#[0-9A-F]{6});`, "i"))[1];
+      assert.ok(T.contrast(text, surface) >= 4.5, `${scheme} --hm-${k}-text ${text} reads on ${surface}`);
+    }
+  }
   assert.equal(T.onBrandFill("#78BE3A"), "#14181F", "white on the brand green is under 2.6:1, so dark text");
   assert.equal(T.onBrandFill("#1D9AD6"), "#FFFFFF");
 });

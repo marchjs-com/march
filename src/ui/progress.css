@@ -6,7 +6,7 @@
 .hm-progress2-value { color: var(--hm-muted); font-variant-numeric: tabular-nums; }
 .hm-progress2-track { position: relative; display: block; height: .5rem; border-radius: var(--hm-radius-full); background: var(--hm-surface-3); overflow: hidden; }
 .hm-progress2-sm .hm-progress2-track { height: .3125rem; } .hm-progress2-lg .hm-progress2-track { height: .75rem; }
-.hm-progress2-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--hm-progress-c, var(--hm-primary-solid)); transform-origin: left center; transform: scaleX(var(--hm-progress, 0));
+.hm-progress2-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--hm-progress-c, var(--hm-primary)); transform-origin: left center; transform: scaleX(var(--hm-progress, 0));
   transition: transform .45s var(--hm-ease-out); }
 .hm-progress2-success { --hm-progress-c: var(--hm-success-solid); } .hm-progress2-warn { --hm-progress-c: var(--hm-warn-solid); }
 .hm-progress2-danger { --hm-progress-c: var(--hm-danger-solid); } .hm-progress2-info { --hm-progress-c: var(--hm-info-solid); }

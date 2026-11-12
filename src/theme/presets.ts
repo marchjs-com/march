@@ -85,6 +85,12 @@ function modeVars(c: ThemeColors, mode: "light" | "dark"): string {
     c.glow.map((x, i) => `--hm-glow-${i + 1}: ${x};`).join(" "),
     `--hm-shadow-rgb: ${d.shadow}; --hm-overlay: ${d.overlay};`,
     `--hm-special: ${c.special ?? c.cat[3]};`,
+    // text tones: the color shaded until it reads as text on the surface (AA). Fills, lines, icons and indicators use the
+    // pure color above; only text uses these.
+    (["primary", "info", "success", "warn", "danger"] as const).map((k) => `--hm-${k}-text: ${ensureContrast(c[k], c.surface)};`).join(" "),
+    `--hm-special-text: ${ensureContrast(c.special ?? c.cat[3] ?? c.primary, c.surface)};`,
+    // text on a fill of the pure primary color (selected day, step number…): white when it reaches the brand minimum
+    `--hm-on-primary-fill: ${onBrandFill(c.primary)};`,
     ...Object.entries(c.brand ?? {}).map(([n, b]) => `--hm-${n}: ${b.color}; --hm-${n}-soft: ${b.soft ?? `color-mix(in srgb, ${b.color} 16%, ${c.surface})`}; --hm-on-${n}: ${onBrandFill(b.color)}; --hm-${n}-text: ${ensureContrast(b.color, c.surface)};`),
   ];
   if (mode === "dark") lines.push(
@@ -141,10 +147,10 @@ export const hadi = defineTheme({
   font: FIGTREE, display: BRICOLAGE, displayWeight: 700, radius: 12,
   light: {
     bg: HADI.mist, surface: "#FFFFFF", text: HADI.ink, muted: ensureContrast(HADI.ink3, "#FFFFFF"), border: HADI.line,
-    // accent = Heyecan; as text it is shaded until it reads on white (AA), like HadiColors.readableOn
-    primary: ensureContrast(HADI.orange, "#FFFFFF"), solid: HADI.ink, onSolid: onBrandFill(HADI.ink),
-    danger: ensureContrast(HADI.error, "#FFFFFF"), success: ensureContrast(HADI.green, "#FFFFFF"), warn: ensureContrast(HADI.gold, "#FFFFFF"),
-    info: ensureContrast(HADI.blue, "#FFFFFF"), special: ensureContrast(HADI.purple, "#FFFFFF"),
+    // accent = orange (Heyecan), pure for fills, lines and icons; --hm-primary-text is the shade that reads as text
+    primary: HADI.orange, solid: HADI.ink, onSolid: onBrandFill(HADI.ink),
+    danger: HADI.error, success: HADI.green, warn: HADI.gold,
+    info: HADI.blue, special: HADI.purple,
     cat: [HADI.orange, HADI.blue, HADI.green, HADI.purple, HADI.pink, HADI.gold, HADI.ink, "#0E9F8E"],
     mark: HADI_RIBBON_GRADIENT, stage: HADI.night, glow: HADI_GLOW,
     brand: {
@@ -156,9 +162,9 @@ export const hadi = defineTheme({
   dark: {
     // HadiPreset klasik › night tones
     bg: "#0B1B2B", surface: HADI.night, raised: HADI.nightCard, text: HADI.nightText, muted: HADI.nightMuted, border: HADI.nightLine,
-    primary: ensureContrast(HADI.orange, HADI.night), solid: HADI.orange, onSolid: onBrandFill(HADI.orange),
-    danger: ensureContrast(HADI.error, HADI.night), success: ensureContrast(HADI.green, HADI.night), warn: ensureContrast(HADI.gold, HADI.night),
-    info: ensureContrast(HADI.blue, HADI.night), special: ensureContrast("#C95BB5", HADI.night),
+    primary: HADI.orange, solid: HADI.orange, onSolid: onBrandFill(HADI.orange),
+    danger: HADI.error, success: HADI.green, warn: HADI.gold,
+    info: HADI.blue, special: "#C95BB5",
     cat: [HADI.orange, HADI.blue, HADI.green, "#C95BB5", "#E9658F", HADI.gold, HADI.nightMuted, "#2EC4B2"],
     mark: HADI_RIBBON_GRADIENT, stage: HADI.night, glow: HADI_GLOW,
     brand: {

@@ -57,7 +57,6 @@
   --hm-primary-soft: color-mix(in srgb, var(--hm-primary) 11%, var(--hm-surface));
   --hm-primary-soft-2: color-mix(in srgb, var(--hm-primary) 19%, var(--hm-surface));
   --hm-primary-solid-hover: color-mix(in srgb, var(--hm-primary-solid) 86%, var(--hm-text));
-  --hm-primary-text: var(--hm-on-primary);
   --hm-focus: var(--hm-primary);
   --hm-danger-soft: color-mix(in srgb, var(--hm-danger) 10%, var(--hm-surface));
   --hm-success-soft: color-mix(in srgb, var(--hm-success) 10%, var(--hm-surface));
@@ -76,7 +75,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highl
 body { margin: 0; background: var(--hm-bg); color: var(--hm-text); font: 400 var(--hm-text-md)/var(--hm-leading) var(--hm-font);
   font-feature-settings: var(--hm-font-features); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 h1, h2, h3, h4 { letter-spacing: var(--hm-tracking-tight); line-height: var(--hm-leading-tight); }
-a { color: var(--hm-primary); text-underline-offset: .2em; text-decoration-thickness: 1px; }
+a { color: var(--hm-primary-text); text-underline-offset: .2em; text-decoration-thickness: 1px; }
 ::selection { background: color-mix(in srgb, var(--hm-primary) 26%, transparent); }
 :focus-visible { outline: 2px solid var(--hm-focus); outline-offset: 2px; }
 /* scrollbars: thin, themed and inset from the edges (rounded containers never show a thumb in their corners).
@@ -107,7 +106,7 @@ a { color: var(--hm-primary); text-underline-offset: .2em; text-decoration-thick
   border-top-color: var(--hm-primary); border-radius: 50%; animation: hm-spin .7s linear infinite; vertical-align: middle; }
 @keyframes hm-spin { to { transform: rotate(360deg); } }
 .hm-empty { color: var(--hm-muted); text-align: center; padding: var(--hm-space-7) var(--hm-space-4); }
-.hm-error { color: var(--hm-danger); background: var(--hm-danger-soft); border-radius: var(--hm-radius); padding: var(--hm-space-3) var(--hm-space-4); }
+.hm-error { color: var(--hm-danger-text); background: var(--hm-danger-soft); border-radius: var(--hm-radius); padding: var(--hm-space-3) var(--hm-space-4); }
 
 /* ---- transitions used by transition:fade|slide|scale */
 .hm-t-fade-in { animation: hm-fade-in var(--hm-dur) var(--hm-ease) both; }

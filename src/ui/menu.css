@@ -11,7 +11,7 @@
 .hm-menu-item:hover, .hm-menu-item:focus { background: var(--hm-surface-2); outline: none; }
 .hm-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--hm-focus); outline: none; }
 .hm-menu-item:disabled { opacity: .5; cursor: not-allowed; }
-.hm-menu-item.is-danger, .hm-menu-item.is-danger .hm-icon { color: var(--hm-danger); }
+.hm-menu-item.is-danger, .hm-menu-item.is-danger .hm-icon { color: var(--hm-danger-text); }
 .hm-menu-label { flex: 1; }
 .hm-menu-kbd { margin-inline-start: auto; }
 .hm-menu-sep { height: 1px; margin: var(--hm-space-1) calc(-1 * var(--hm-space-1)); background: var(--hm-border); }

@@ -20,7 +20,7 @@
 .hm-markdown pre code { background: none; padding: 0; }
 .hm-markdown blockquote { margin: 0; padding-inline-start: var(--hm-space-3); border-inline-start: 3px solid var(--hm-border-strong); color: var(--hm-muted); }
 .hm-markdown img { max-width: 100%; height: auto; }
-.hm-markdown a { color: var(--hm-primary); }
+.hm-markdown a { color: var(--hm-primary-text); }
 .hm-task { list-style: none; }
 .hm-editor-tabs { display: flex; gap: var(--hm-space-1); border-bottom: 1px solid var(--hm-border); }
 .hm-editor-tab { border: 0; background: transparent; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-sm); padding: var(--hm-space-2) var(--hm-space-3); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }

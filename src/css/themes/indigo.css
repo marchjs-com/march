@@ -12,6 +12,9 @@
   --hm-glow-1: rgb(99 102 241 / .75); --hm-glow-2: rgb(168 85 247 / .55); --hm-glow-3: rgb(14 165 233 / .45); --hm-glow-4: rgb(236 72 153 / .35);
   --hm-shadow-rgb: 16 24 40; --hm-overlay: rgb(10 14 24 / .42);
   --hm-special: #EC4899;
+  --hm-primary-text: #4F46E5; --hm-info-text: #0369A1; --hm-success-text: #15803D; --hm-warn-text: #B45309; --hm-danger-text: #D42A2F;
+  --hm-special-text: #C93D82;
+  --hm-on-primary-fill: #FFFFFF;
 }
 @media (prefers-color-scheme: dark) {
   :root[data-hm-theme="indigo"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-hm-theme="indigo"] {
@@ -25,6 +28,9 @@
   --hm-glow-1: rgb(99 102 241 / .75); --hm-glow-2: rgb(168 85 247 / .55); --hm-glow-3: rgb(14 165 233 / .45); --hm-glow-4: rgb(236 72 153 / .35);
   --hm-shadow-rgb: 0 0 0; --hm-overlay: rgb(0 0 0 / .62);
   --hm-special: #F472B6;
+  --hm-primary-text: #8F93FB; --hm-info-text: #6FCBF5; --hm-success-text: #5EE08F; --hm-warn-text: #FBC25A; --hm-danger-text: #FF8A8D;
+  --hm-special-text: #F472B6;
+  --hm-on-primary-fill: #FFFFFF;
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;
@@ -41,6 +47,9 @@
   --hm-glow-1: rgb(99 102 241 / .75); --hm-glow-2: rgb(168 85 247 / .55); --hm-glow-3: rgb(14 165 233 / .45); --hm-glow-4: rgb(236 72 153 / .35);
   --hm-shadow-rgb: 0 0 0; --hm-overlay: rgb(0 0 0 / .62);
   --hm-special: #F472B6;
+  --hm-primary-text: #8F93FB; --hm-info-text: #6FCBF5; --hm-success-text: #5EE08F; --hm-warn-text: #FBC25A; --hm-danger-text: #FF8A8D;
+  --hm-special-text: #F472B6;
+  --hm-on-primary-fill: #FFFFFF;
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;

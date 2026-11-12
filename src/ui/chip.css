@@ -12,7 +12,7 @@
 .hm-chip2-btn { padding: 0; }
 .hm-chip2-hit { display: inline-flex; align-items: center; gap: .3125rem; min-height: inherit; padding: 0 .625rem; border: 0; border-radius: inherit; background: none; color: inherit; font: inherit; cursor: pointer; }
 .hm-chip2-btn:hover { border-color: var(--hm-border-strong); background: var(--hm-surface-2); }
-.hm-chip2-btn.is-selected { background: var(--hm-primary-soft); border-color: color-mix(in srgb, var(--hm-primary) 40%, transparent); color: var(--hm-primary); }
+.hm-chip2-btn.is-selected { background: var(--hm-primary-soft); border-color: color-mix(in srgb, var(--hm-primary) 40%, transparent); color: var(--hm-primary-text); }
 .hm-chip2-btn:has(.hm-chip2-x) .hm-chip2-hit { padding-inline-end: .25rem; }
 .hm-chip2-x { display: inline-grid; place-items: center; width: 1.125rem; height: 1.125rem; margin-inline: -.125rem -.25rem; border: 0; border-radius: 50%; background: none; color: inherit; opacity: .7; cursor: pointer; }
 .hm-chip2-x:hover { opacity: 1; background: color-mix(in srgb, currentColor 14%, transparent); }

@@ -17,7 +17,7 @@
 .hm-pal-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hm-pal-sub, .hm-pal-reason { color: var(--hm-muted); font-size: var(--hm-text-xs); }
 .hm-pal-reason { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hm-pal-ask { color: var(--hm-primary); }
+.hm-pal-ask { color: var(--hm-primary-text); }
 .hm-pal-icon { color: var(--hm-primary); }
 .hm-pal-empty { padding: var(--hm-space-6); text-align: center; color: var(--hm-muted); font-size: var(--hm-text-sm); }
 .hm-pal-hint { padding: var(--hm-space-2) var(--hm-space-4); border-top: 1px solid var(--hm-border); background: var(--hm-bg-subtle); color: var(--hm-muted); font-size: var(--hm-text-xs); }

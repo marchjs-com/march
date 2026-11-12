@@ -42,4 +42,4 @@
 .hm-btn-group-attached > .hm-btn:first-child { border-radius: var(--hm-radius) 0 0 var(--hm-radius); }
 .hm-btn-group-attached > .hm-btn:last-child { border-radius: 0 var(--hm-radius) var(--hm-radius) 0; }
 .hm-btn-group-attached > .hm-btn + .hm-btn { margin-left: -1px; }
-.hm-copy.is-copied { color: var(--hm-success); }
+.hm-copy.is-copied { color: var(--hm-success-text); }
