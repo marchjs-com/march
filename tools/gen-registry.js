@@ -83,6 +83,9 @@ export async function generate(root = ROOT) {
   // component card keeps its direct import. meta.demoGroup names a family that loads together; the page's building
   // blocks share one kit (<page>.kit.gen.ts).
   const GROUP = 3;
+  // pages whose demos are heavier than the usual card: fewer per module (/forms: three input demos with their editors
+  // passed the 25 KB part budget)
+  const GROUP_OF = { "/forms": 2 };
   const pages = new Map();
   // a large component (barrel: false) keeps its own demo module: its code alone is over the chunk floor, and grouping
   // it would make every card of the page download it
@@ -94,7 +97,7 @@ export async function generate(root = ROOT) {
     const named = new Map(), rest = [];
     for (const c of all) if (c.meta?.demoGroup) named.set(c.meta.demoGroup, [...(named.get(c.meta.demoGroup) ?? []), c]); else rest.push(c);
     const parts = [...named].map(([g, members]) => ({ name: `${base}-${g}`, members }));
-    const slices = Math.ceil(rest.length / GROUP);
+    const slices = Math.ceil(rest.length / (GROUP_OF[page] ?? GROUP));
     for (let s = 0; s < slices; s++) parts.push({ name: `${base}${slices > 1 || parts.length ? `-${s + 1}` : ""}`, members: rest.slice(Math.floor((s * rest.length) / slices), Math.floor(((s + 1) * rest.length) / slices)) });
     // landing blocks are many and large: only the ones other blocks are built from (composedOf) go in the kit, the rest
     // stay in their family module; the category's demo data (<category>/demo-kit.tsx) rides in the kit too

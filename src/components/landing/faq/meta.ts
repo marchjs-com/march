@@ -9,5 +9,5 @@ export default defineMeta({
   composedOf: ["Accordion", "SearchBox", "Reveal"],
   behaviors: ["fold / rank"],
   showcase: "/web",
-  demoGroup: "sell",
+  demoGroup: "proof",
 });

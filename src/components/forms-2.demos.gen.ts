@@ -4,6 +4,4 @@ import * as d0 from "./forms/checkbox-group/demo.tsx";
 import * as p0 from "./forms/checkbox-group/playground.ts";
 import * as d1 from "./forms/choice-picker/demo.tsx";
 import * as p1 from "./forms/choice-picker/playground.ts";
-import * as d2 from "./forms/code-input/demo.tsx";
-import * as p2 from "./forms/code-input/playground.ts";
-export { d0, p0, d1, p1, d2, p2 };
+export { d0, p0, d1, p1 };
