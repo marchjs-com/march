@@ -198,40 +198,8 @@ export function formatNumber(n: number | null | undefined, loc?: string, { decim
   } catch { return String(n); }
 }
 
-// ------------------------------------------------------------------ list navigation
-export interface ListNavOptions {
-  count: () => number;
-  active: Signal<number>;
-  onPick: (i: number) => void;
-  onOpen?: () => void;
-  isOpen?: () => boolean;
-  loop?: boolean;
-}
-
-/**
- * Keyboard navigation over a virtual list (aria-activedescendant pattern).
- * `count()` items, `active` signal (index, -1 = none). Returns a keydown handler that returns true when it handled the key.
- */
-export function listNav({ count, active, onPick, onOpen, isOpen = () => true, loop = true }: ListNavOptions): (e: KeyboardEvent) => boolean {
-  return (e) => {
-    const n = count();
-    const k = e.key;
-    if ((k === "ArrowDown" || k === "ArrowUp") && !isOpen()) { e.preventDefault(); onOpen?.(); return true; }
-    if (!isOpen()) return false;
-    let i = active.peek();
-    if (k === "ArrowDown") i = i + 1 >= n ? (loop ? 0 : n - 1) : i + 1;
-    else if (k === "ArrowUp") i = i <= 0 ? (loop ? n - 1 : 0) : i - 1;
-    else if (k === "Home" && e.ctrlKey) i = 0;
-    else if (k === "End" && e.ctrlKey) i = n - 1;
-    else if (k === "PageDown") i = Math.min(n - 1, i + 10);
-    else if (k === "PageUp") i = Math.max(0, i - 10);
-    else if (k === "Enter" && i >= 0 && i < n) { e.preventDefault(); onPick(i); return true; }
-    else return false;
-    e.preventDefault();
-    active.set(n ? i : -1);
-    return true;
-  };
-}
+// list navigation: the list-nav behavior (aria-activedescendant keys); re-exported for the form pickers
+export { listNav, type ListNavOptions } from "../behaviors/list-nav/index.ts";
 
 /** Normalize text for matching: the one fold (core/text) — Turkish İ/ı, accents, ß/æ — same as Table, Nav, Palette. */
 export { fold } from "../core/text.ts";

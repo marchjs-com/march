@@ -81,3 +81,24 @@ resizeHandle(grip, { value: () => width, set: (w, done) => { setWidth(w); if (do
 It sets `role="separator"`, the orientation, `aria-valuenow` (kept current) and `tabindex="0"` unless the element
 already has one. Dragging is the drag behavior (`di`, so RTL is mirrored; Escape puts the size back), and arrows swap in
 RTL. Clicks on the handle do not reach a header behind it (no accidental sort).
+
+## list-nav — `hadi-march/behaviors/list-nav`
+
+Keyboard movement through options, written once. `moveCursor({ key, index, count, columns, page, ctrl, rtl })` is the
+pure step (arrows, Home / End, Page Up / Down; a wrapped grid with `columns`; ArrowLeft / Right swap in RTL): DataGrid
+and TreeView use it. `listNav({ count, active, onPick, onOpen, isOpen, loop, page, onMove })` is the keydown handler of
+the aria-activedescendant pattern, where focus stays in a field and `active` is the highlighted option: Combobox /
+Select pickers and CommandPalette use it. Home / End need Ctrl / ⌘ there (alone they move the caret). To move real
+focus among buttons, use roving-focus.
+
+```ts
+const onKey = listNav({ count: () => rows().length, active, onPick: (i) => run(rows()[i]), onMove: (i) => scrollToOption(i) });
+input.addEventListener("keydown", onKey);
+```
+
+## dropzone — `hadi-march/behaviors/dropzone`
+
+An element that takes dropped (and, with `paste: true`, pasted) files: `dropzone(zone, { onFiles, onOver, accept,
+onReject, single, paste, disabled })`. Enter / leave are counted, so passing over the zone's children does not flicker;
+only drags that carry files count; the zone has `is-drop-over` while one is over it. `accepts(file, "image/*,.pdf")` is
+the `<input accept>` check (FileUpload validates with it). Keep a click / keyboard way to choose files next to it.

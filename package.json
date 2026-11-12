@@ -37,6 +37,8 @@
     "./behaviors/drag": "./src/behaviors/drag/index.ts",
     "./behaviors/roving-focus": "./src/behaviors/roving-focus/index.ts",
     "./behaviors/resize-handle": "./src/behaviors/resize-handle/index.ts",
+    "./behaviors/list-nav": "./src/behaviors/list-nav/index.ts",
+    "./behaviors/dropzone": "./src/behaviors/dropzone/index.ts",
     "./i18n": "./src/i18n/index.ts",
     "./i18n/tr": "./src/i18n/tr.ts",
     "./icons": "./src/icons/index.ts",

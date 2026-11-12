@@ -4,7 +4,7 @@
 //                       convention (click = only this, Ctrl/⌘ = toggle, Shift = range from the anchor).
 //   moveCursor()      — next index for a navigation key in a list or a wrapped grid (arrows, Home/End, PageUp/Down).
 import { signal, batch, untrack, type Signal } from "./reactive.ts";
-import { val, clamp, type MaybeFn } from "./util.ts";
+import { val, type MaybeFn } from "./util.ts";
 
 export type SelectionMode = "none" | "single" | "multiple";
 
@@ -117,34 +117,5 @@ export function createSelection<K, T = K>(o: SelectionOptions<K, T>): Selection<
 
 // ------------------------------------------------------------------ keyboard cursor
 
-export interface CursorInput {
-  key: string;
-  index: number;
-  count: number;
-  /** Items per row in a wrapped grid (1 = a vertical list). */
-  columns?: number | undefined;
-  /** Items per PageUp / PageDown (default 10). */
-  page?: number | undefined;
-  /** Ctrl / ⌘ held: Home / End go to the first / last item of the whole collection. */
-  ctrl?: boolean | undefined;
-  /** Right-to-left: ArrowLeft / ArrowRight swap in a grid. */
-  rtl?: boolean | undefined;
-}
-
-/** Next cursor index for a navigation key, or null when the key is not a navigation key. Clamped, never wraps. */
-export function moveCursor({ key, index, count, columns = 1, page = 10, ctrl = false, rtl = false }: CursorInput): number | null {
-  if (count <= 0) return null;
-  const i = clamp(index, 0, count - 1), cols = Math.max(1, columns), fwd = rtl ? -1 : 1;
-  const rowStart = i - (i % cols);
-  switch (key) {
-    case "ArrowDown": return Math.min(count - 1, i + cols);
-    case "ArrowUp": return Math.max(0, i - cols);
-    case "ArrowRight": return cols > 1 ? clamp(i + fwd, 0, count - 1) : null;
-    case "ArrowLeft": return cols > 1 ? clamp(i - fwd, 0, count - 1) : null;
-    case "Home": return ctrl || cols === 1 ? 0 : rowStart;
-    case "End": return ctrl || cols === 1 ? count - 1 : Math.min(count - 1, rowStart + cols - 1);
-    case "PageDown": return Math.min(count - 1, i + page * cols);
-    case "PageUp": return Math.max(0, i - page * cols);
-    default: return null;
-  }
-}
+// moved to the list-nav behavior (one source for list and grid keys); this path keeps working
+export { moveCursor, type CursorInput } from "../behaviors/list-nav/index.ts";

@@ -394,6 +394,10 @@ One interaction, written once, attached to any element; each behavior is its own
   Table and DataGrid columns use it; never write your own resize grip.
 - **drag › track** — `track(area, { onMove, rtl, … })` + `arrowStep(e, rtl)`: 0–1 positions inside an area for editor
   controls (color area, curve handles, crop frame, timeline head).
+- **list-nav** — `moveCursor({ key, index, count, columns, rtl })` (pure next index) and `listNav({ count, active, onPick })`
+  (aria-activedescendant keys for a field with options). Never write your own ArrowUp / ArrowDown option loop.
+- **dropzone** — `dropzone(zone, { onFiles, onOver, accept, paste })`: counted enter / leave, files only, paste;
+  `accepts(file, accept)`. Never write dragenter / dragover / drop handlers for files yourself.
 
 ### 15c. Ready-made animations (all on the engine, each its own export)
 

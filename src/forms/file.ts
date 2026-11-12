@@ -11,13 +11,9 @@ import { model, ctl, cx, uid, type ControlProps } from "./util.ts";
 import { OverflowText } from "../ui/marquee.ts";
 import { clamp } from "../core/util.ts";
 
-/** Does `file` match an accept list like "image/*,.pdf,application/json"? */
-export function accepts(file: { name?: string; type?: string }, accept: string | null | undefined): boolean {
-  if (!accept) return true;
-  const name = (file.name ?? "").toLowerCase(), type = (file.type ?? "").toLowerCase();
-  return accept.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean).some((a) =>
-    a.startsWith(".") ? name.endsWith(a) : a.endsWith("/*") ? type.startsWith(a.slice(0, -1)) : type === a);
-}
+import { dropzone, accepts } from "../behaviors/dropzone/index.ts";
+// the accept check lives with the dropzone behavior; forms keeps exporting it
+export { accepts };
 
 const bytes = (n: number) => applyPipe("bytes", n);
 
@@ -113,10 +109,8 @@ export function FileUpload<R = unknown>(props: FileUploadProps<R>): unknown {
     ...c, role: "button", tabindex: () => (props.disabled ? "-1" : "0"), class: "hm-drop", "class:hm-drop-over": over, "aria-disabled": () => (props.disabled ? "true" : null),
     onClick: open,
     onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } },
-    onDragEnter: (e: DragEvent) => { e.preventDefault(); over.set(true); },
-    onDragOver: (e: DragEvent) => { e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = "copy"; over.set(true); },
-    onDragLeave: () => over.set(false),
-    onDrop: (e: DragEvent) => { e.preventDefault(); over.set(false); if (!props.disabled && !props.readonly) add([...(e.dataTransfer?.files ?? [])]); },
+    // drops (counted enter / leave, files only) and pasted files: the dropzone behavior; add() checks accept and size
+    ref: (x: HTMLElement) => dropzone(x, { onFiles: add, onOver: (on) => over.set(on), paste: true, disabled: () => !!(props.disabled || props.readonly) }),
   }, h("span", { class: "hm-drop-text" }, () => props.label ?? (multi ? t`Drop files here or click to choose` : t`Drop a file here or click to choose`)),
     () => (props.accept || props.maxSize ? h("small", { class: "hm-hint" }, [props.accept, props.maxSize != null ? t`max ${bytes(props.maxSize)}` : null].filter(Boolean).join(" · ")) : null));
   const row = (itAcc: Accessor<Item>) => {

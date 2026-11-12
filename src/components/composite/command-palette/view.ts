@@ -15,7 +15,7 @@ import { sparkles } from "../../../icons/glyphs/sparkles.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
 import { isOpen } from "./state.ts";
 import type { PaletteEntry, CommandPaletteProps } from "./index.ts";
-import { clamp } from "../../../core/util.ts";
+import { listNav } from "../../../behaviors/list-nav/index.ts";
 
 type Row =
   | { kind: "item"; item: PaletteEntry; score: number; reason?: undefined }
@@ -96,22 +96,12 @@ export function PaletteView(props: CommandPaletteProps): unknown {
     row.item.run?.();
     props.onRun?.(row.item);
   };
-  const move = (d: number, e: KeyboardEvent): void => {
-    e.preventDefault();
-    const n = untrack(rows).length;
-    if (!n) return;
-    const cur = untrack(sel);
-    const next = Math.abs(d) > 1 ? clamp(cur + d, 0, n - 1) : (cur + d + n) % n;
-    sel.set(next);
-    globalThis.document.getElementById(`${base}-o-${next}`)?.scrollIntoView?.({ block: "nearest" });
-  };
-  const onKey = (e: KeyboardEvent): void => {
-    if (e.key === "ArrowDown") move(1, e);
-    else if (e.key === "ArrowUp") move(-1, e);
-    else if (e.key === "PageDown") move(8, e);
-    else if (e.key === "PageUp") move(-8, e);
-    else if (e.key === "Enter") { e.preventDefault(); activate(untrack(rows)[untrack(sel)]); }
-  };
+  // arrows (looping), Page Up / Down by 8, Ctrl+Home / End, Enter: the list-nav behavior
+  const onKey = listNav({
+    count: () => untrack(rows).length, active: sel, page: 8,
+    onPick: (i) => activate(untrack(rows)[i]),
+    onMove: (i) => globalThis.document.getElementById(`${base}-o-${i}`)?.scrollIntoView?.({ block: "nearest" }),
+  });
   // reset the query each time it opens
   let input: HTMLInputElement | undefined;
   effect(() => { if (isOpen()) untrack(() => { q.set(""); sel.set(0); if (input) input.value = ""; }); });
