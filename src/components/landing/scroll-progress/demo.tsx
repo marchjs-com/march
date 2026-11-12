@@ -7,6 +7,6 @@ export const code = `<ScrollProgress />                                        /
 export default function ScrollProgressDemo(props: { values: { paint: string; size: number } }) {
   return <div class="sc-web-col">
     <p class="hm-muted">Sayfayı kaydır: çubuk bu sayfanın ne kadarının okunduğunu gösterir.</p>
-    {() => <ScrollProgress position="inline" paint={props.values.paint as "gradient"} size={props.values.size} class="sc-sprog-demo" />}
+    {() => { const v = { ...props.values }; return <ScrollProgress position="inline" paint={v.paint as "gradient"} size={v.size} class="sc-sprog-demo" /> }}
   </div>
 }

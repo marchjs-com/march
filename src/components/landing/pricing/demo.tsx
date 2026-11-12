@@ -18,7 +18,7 @@ export const PLANS: PricingPlan[] = [
 export default function PricingDemo(props: { values: { plans: number; currency: string; saving: boolean } }) {
   return <div>
     {() => {
-      const v = props.values
+      const v = { ...props.values }
       const plans = v.plans === 2 ? [PLANS[0]!, PLANS[1]!] : v.plans === 3 ? PLANS.slice(0, 3) : PLANS
       return <Pricing plans={plans} currency={v.currency} saving={v.saving ? "2 ay bedava" : undefined} />
     }}

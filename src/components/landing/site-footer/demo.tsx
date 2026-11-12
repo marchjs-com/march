@@ -20,7 +20,7 @@ export const FOOTER_COLUMNS = [
 export default function SiteFooterDemo(props: { values: { newsletter: boolean; wordmark: boolean; social: boolean } }) {
   return <div class="sc-site-frame">
     {() => {
-      const v = props.values
+      const v = { ...props.values }
       return <SiteFooter brand={{ name: "Acme", mark: sparkles }} about="Web sitelerini hızlı, erişilebilir ve güzel yapan bloklar." columns={FOOTER_COLUMNS}
         social={v.social ? [{ label: "Web", href: "#", icon: globe }, { label: "Topluluk", href: "#", icon: message }, { label: "E-posta", href: "#", icon: mail }] : undefined}
         newsletter={v.newsletter ? { title: "Bülten", lead: "Ayda bir, yalnız yenilikler.", onSubmit: () => new Promise((r) => setTimeout(r, 700)) } : undefined}

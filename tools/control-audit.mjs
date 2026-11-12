@@ -152,6 +152,8 @@ let total = 0;
 for (const route of ROUTES) {
   await load(route, WIDTH);
   await ev(SETUP);
+  // a page that did not open (a host without the page's file) has no controls: that must not pass as "0 controls"
+  if (!(await ev(`!!document.querySelector("main")`))) { findings.push({ route, kind: "page", at: "", detail: "the page did not open (no <main>)" }); process.stdout.write("✖"); continue; }
   if (!(await ev("__ca.settle()"))) findings.push({ route, kind: "lazy", at: "", detail: "a lazy card was still loading after 6 s" });
   for (const t of (await ev("__ca.turned()")) ?? []) findings.push({ route, kind: "orientation", at: "", detail: t });
   let n = 0;

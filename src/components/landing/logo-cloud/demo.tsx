@@ -11,7 +11,7 @@ export default function LogoCloudDemo(props: { values: { variant: string; mono: 
   const logos = LOGO_NAMES.map((name) => ({ name, node: <Wordmark name={name} /> }))
   return <div>
     {() => {
-      const v = props.values
+      const v = { ...props.values }
       return <LogoCloud title="Bu ekipler bize güveniyor" variant={v.variant as "grid"} mono={v.mono} speed={v.speed} logos={logos} />
     }}
   </div>

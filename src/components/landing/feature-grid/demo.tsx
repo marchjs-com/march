@@ -28,7 +28,7 @@ export const FEATURES: FeatureItem[] = [
 export default function FeatureGridDemo(props: { values: { variant: string; cols: number; spotlight: boolean } }) {
   return <div>
     {() => {
-      const v = props.values
+      const v = { ...props.values }
       const items = v.variant === "bento"
         ? FEATURES.map((f, i) => ({ ...f, span: (["big", "normal", "normal", "wide", "normal", "normal"] as const)[i], media: i === 0 ? <MockApp class="sc-mock-sm" /> : i === 3 ? <div class="sc-bento-stat"><Counter value={98.6} decimals={1} suffix="%" /><span>çalışma süresi</span></div> : undefined }))
         : FEATURES

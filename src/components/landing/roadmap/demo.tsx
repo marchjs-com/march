@@ -17,6 +17,6 @@ export const ROADMAP: RoadmapItem[] = [
 
 export default function RoadmapDemo(props: { values: { badges: boolean; scroll: boolean } }) {
   return <div class="sc-rm-demo">
-    {() => <Roadmap items={ROADMAP} badges={props.values.badges} scroll={props.values.scroll} />}
+    {() => { const v = { ...props.values }; return <Roadmap items={ROADMAP} badges={v.badges} scroll={v.scroll} /> }}
   </div>
 }

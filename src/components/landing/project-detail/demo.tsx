@@ -3,6 +3,7 @@ import { ProjectDetail, type ProjectDetails } from "./index.ts";
 import { ProjectGrid, type Project } from "../project-grid/index.ts";
 import { PROJECTS, Cover } from "../project-grid/demo.tsx";
 import { sharedTransition } from "../../../motion/shared-element.ts";
+import { effect, untrack } from "../../../core/reactive.ts";
 
 export const code = `let $open: Project | null = null
 const open = (p, cover) => sharedTransition(\`project-\${p.id}\`, cover, () => { $open = p })
@@ -20,9 +21,16 @@ export default function ProjectDetailDemo(props: { values: { gallery: boolean; n
   // the cover morphs both ways: the card cover and the detail cover share the name project-<id>
   const open = (p: Project, cover: Element) => { void sharedTransition(`project-${p.id}`, cover, () => { $open = p }) }
   const back = (p: Project) => { void sharedTransition(`project-${p.id}`, document.querySelector(".hm-pd-cover"), () => { $open = null }) }
+  // both options shape the detail page: changing one while the grid shows opens the first project, so it is seen at once
+  let first = true
+  effect(() => {
+    void { ...props.values }
+    if (first) { first = false; return }
+    untrack(() => { if (!$open) $open = PROJECTS[0]! })
+  })
   return <div class="sc-pd-stage">
     {() => {
-      const p = $open, v = props.values
+      const p = $open, v = { ...props.values }
       if (!p) return <ProjectGrid projects={PROJECTS} onOpen={open} allLabel="Tümü" />
       const d = details(p), n = PROJECTS[(PROJECTS.indexOf(p) + 1) % PROJECTS.length]!
       return <ProjectDetail project={v.gallery ? d : { ...d, gallery: undefined }} onBack={() => back(p)}

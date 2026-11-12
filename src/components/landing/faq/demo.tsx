@@ -17,7 +17,7 @@ export const FAQ: FaqItem[] = [
 export default function FaqDemo(props: { values: { layout: string; search: boolean; multiple: boolean } }) {
   return <div>
     {() => {
-      const v = props.values
+      const v = { ...props.values }
       return <Faq layout={v.layout as "split"} search={v.search} multiple={v.multiple} items={FAQ} title="Sık sorulanlar" lead="Aradığını bulamadın mı? Ekibimiz bir gün içinde yanıt verir." contact={<Button variant="secondary">Bize yaz</Button>} />
     }}
   </div>

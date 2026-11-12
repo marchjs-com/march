@@ -66,6 +66,9 @@ export function serveDist(dist, { mode = "static", prefix = "", policy = null } 
     }
     const nf = join(dist, "404.html");
     if (existsSync(nf)) return send(res, mode === "rewrite" ? 200 : 404, nf);
+    // the dev build (build.mjs --dev) writes no page folders and no 404.html: the app's index.html routes every page
+    const app = join(dist, "index.html");
+    if (!extname(path) && existsSync(app)) return send(res, 200, app);
     res.writeHead(404, { "content-type": "text/plain" }); res.end("not found");
   });
 }

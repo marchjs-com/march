@@ -15,6 +15,6 @@ export const STATS: StatItem[] = [
 
 export default function StatsBandDemo(props: { values: { variant: string; mode: string } }) {
   return <div>
-    {() => <StatsBand variant={props.values.variant as "plain"} mode={props.values.mode as "count"} items={STATS} />}
+    {() => { const v = { ...props.values }; return <StatsBand variant={v.variant as "plain"} mode={v.mode as "count"} items={STATS} /> }}
   </div>
 }
