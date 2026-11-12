@@ -252,5 +252,11 @@ const tr: Record<string, string> = {
   "Sharp, modern dashboard look": "Keskin, modern panel görünümü",
   "High Contrast": "Yüksek Kontrast",
   "Accessibility: black, white, yellow": "Erişilebilirlik: siyah, beyaz, sarı",
+  "Resize panel": "Paneli boyutlandır",
+  "Pull to refresh": "Yenilemek için çekin",
+  "Release to refresh": "Yenilemek için bırakın",
+  "Refreshing…": "Yenileniyor…",
+  "Refresh": "Yenile",
+  "Create": "Oluştur",
 };
 export default tr;

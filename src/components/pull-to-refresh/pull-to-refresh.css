@@ -1,0 +1,18 @@
+/* HADI March — PullToRefresh (src/components/pull-to-refresh). The element is the scroll area; the indicator sits above
+   the content and follows the pull. Movement comes from the motion engine (no keyframes here). */
+.hm-ptr { position: relative; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+.hm-ptr.is-pulling { user-select: none; cursor: grabbing; }
+.hm-ptr-content { position: relative; will-change: transform; }
+.hm-ptr-ind { position: absolute; z-index: 1; inset-block-start: -2.75rem; inset-inline-start: 50%; margin-inline-start: -1.25rem; width: 2.5rem; height: 2.5rem;
+  display: grid; place-items: center; border-radius: var(--hm-radius-full); background: var(--hm-surface-raised); color: var(--hm-text-2);
+  border: 1px solid var(--hm-border); box-shadow: var(--hm-shadow-2); opacity: 0; pointer-events: none;
+  transition: color var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease); }
+.hm-ptr-spin { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; }
+.hm-ptr-spin .hm-svg { width: 100%; height: 100%; }
+.hm-ptr.is-ready .hm-ptr-ind, .hm-ptr.is-refreshing .hm-ptr-ind { color: var(--hm-primary); border-color: var(--hm-primary); }
+/* keyboard: a Refresh button that appears only while focused */
+.hm-ptr-kbd { position: absolute; z-index: 2; inset-block-start: var(--hm-space-2); inset-inline-start: 50%; translate: -50% 0; padding: var(--hm-space-1) var(--hm-space-3);
+  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-full); background: var(--hm-surface-raised); color: var(--hm-text); font: inherit;
+  font-size: var(--hm-text-sm); cursor: pointer; opacity: 0; pointer-events: none; }
+.hm-ptr-kbd:focus-visible { opacity: 1; pointer-events: auto; outline: 2px solid var(--hm-focus); outline-offset: 2px; }
+[dir="rtl"] .hm-ptr-kbd { translate: 50% 0; }

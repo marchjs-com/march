@@ -7,7 +7,7 @@ export { Button, IconButton, ActionButton, ButtonGroup, CopyButton } from "./but
 export { Menu, Dropdown, Tooltip } from "./menu.ts";
 export type { ButtonProps, ButtonVariant, ButtonSize, IconButtonProps, ButtonGroupProps, ActionButtonProps, CopyButtonProps } from "./button.ts";
 export type { MenuItem, MenuItemSpec, MenuProps, PopoverButtonProps, DropdownProps, TooltipProps } from "./menu.ts";
-export { Dialog, Drawer, openDialog, openDrawer, confirm, prompt, askReason, closeAll, openDialogs } from "./dialog.ts";
+export { Dialog, openDialog, openDrawer, confirm, prompt, askReason, closeAll, openDialogs } from "./dialog.ts";
 export type {
   DialogProps, DialogOptions, DialogSize, DrawerSide, Label, ConfirmOptions, PromptOptions, AskReasonOptions, Purpose, ReasonWithPurpose,
 } from "./dialog.ts";
