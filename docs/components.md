@@ -4,6 +4,7 @@
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | Chip, Menu, FilterControl, CellEditor |
 
 ## Chip
 
@@ -16,3 +17,13 @@ A label pill. Three uses: a static label, a **filter** you can switch on and off
 ```
 
 Full page: src/components/chip/docs.md
+
+## DataGrid
+
+
+
+```tsx
+
+```
+
+Full page: src/components/data/data-grid/docs.md

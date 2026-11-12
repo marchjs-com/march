@@ -14,34 +14,11 @@ import { floating } from "../ui/popover.ts";
 import { model, ctl, cx, uid, useField, syncValue, live, type ControlProps, type CommonProps } from "./util.ts";
 import { Segmented } from "./inputs.ts";
 
-/** An ISO date "YYYY-MM-DD". */
-export type IsoDate = string;
+// calendar math and Intl formatting live in core/date.ts (shared with Scheduler and Gantt)
+import { isoOf, ymd, utcDate as utc, fromUtc, isIso, todayIso, addDays, addMonths, dayOfWeek as dow, firstDayOf, dateFormat as dtf, pad2 as pad, type IsoDate } from "../core/date.ts";
+export { isoOf, todayIso, addDays, addMonths, firstDayOf, type IsoDate };
 
-const pad = (n: number) => String(n).padStart(2, "0");
-export const isoOf = (y: number, m: number, d: number): IsoDate => `${String(y).padStart(4, "0")}-${pad(m)}-${pad(d)}`;
-const ymd = (iso: string) => iso.split("-").map(Number) as [number, number, number];
-const utc = (iso: string) => { const [y, m, d] = ymd(iso); return new Date(Date.UTC(y, m - 1, d)); };
-const fromUtc = (dt: Date) => isoOf(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate());
-/** Today as an ISO date in local time. */
-export const todayIso = (): IsoDate => { const d = new Date(); return isoOf(d.getFullYear(), d.getMonth() + 1, d.getDate()); };
-export const addDays = (iso: IsoDate, n: number): IsoDate => { const d = utc(iso); d.setUTCDate(d.getUTCDate() + n); return fromUtc(d); };
-export function addMonths(iso: IsoDate, n: number): IsoDate {
-  const [y, m, d] = ymd(iso);
-  const first = new Date(Date.UTC(y, m - 1 + n, 1));
-  const last = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate();
-  return isoOf(first.getUTCFullYear(), first.getUTCMonth() + 1, Math.min(d, last));
-}
-const dow = (iso: string) => utc(iso).getUTCDay();
-const isIso = (v: unknown): v is string => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
 const clampIso = (iso: string, min: string | null | undefined, max: string | null | undefined) => (min && iso < min ? min : max && iso > max ? max : iso);
-
-type WeekInfoLocale = Intl.Locale & { getWeekInfo?: () => { firstDay?: number }; weekInfo?: { firstDay?: number } };
-/** First day of week for a locale (0 = Sunday … 6 = Saturday); Monday when Intl has no week info. */
-export function firstDayOf(loc: string): number {
-  try { const l = new Intl.Locale(loc) as WeekInfoLocale; const w = l.getWeekInfo?.() ?? l.weekInfo; if (w?.firstDay) return w.firstDay % 7; } catch { /* old engine */ }
-  return 1;
-}
-const dtf = (loc: string | undefined, o: Intl.DateTimeFormatOptions) => { try { return new Intl.DateTimeFormat(loc, { timeZone: "UTC", ...o }); } catch { return new Intl.DateTimeFormat("en", { timeZone: "UTC", ...o }); } };
 const NUMERIC: Intl.DateTimeFormatOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
 
 /** Format an ISO date for typing (numeric, locale order). */

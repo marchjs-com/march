@@ -249,3 +249,7 @@ export function clearCache(): void { cache.clear(); }
 
 export { access, can, role, hasRole, hasMethod, denied, signedIn, Can, Gate, setAccess } from "../access/index.ts";
 export type { AccessRegister, AccessState, AccessInput, Perm, PermCheck, Requirement, Denial } from "../access/index.ts";
+
+// grouping and aggregation (pure): DataGrid group rows / footers, reports, charts
+export { aggregate, aggregates, groupRows } from "./group.ts";
+export type { AggregateKind, Aggregate, GroupLevel, GroupAggregate, GroupHeader, GroupRow, GroupItem, GroupOptions } from "./group.ts";

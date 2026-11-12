@@ -440,4 +440,5 @@ separate button handler. Manager events go through `setManagerEmit`.
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | Chip, Menu, FilterControl, CellEditor |
 <!-- components:end -->
