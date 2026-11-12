@@ -24,7 +24,9 @@ const utc = (iso: string) => { const [y, m, d] = ymd(iso); return new Date(Date.
 const fromUtc = (dt: Date) => isoOf(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate());
 /** Today as an ISO date in local time. */
 export const todayIso = (): IsoDate => { const d = new Date(); return isoOf(d.getFullYear(), d.getMonth() + 1, d.getDate()); };
+/** An ISO date n days later (negative: earlier). */
 export const addDays = (iso: IsoDate, n: number): IsoDate => { const d = utc(iso); d.setUTCDate(d.getUTCDate() + n); return fromUtc(d); };
+/** An ISO date n months later; the day is clamped to the month's length. */
 export function addMonths(iso: IsoDate, n: number): IsoDate {
   const [y, m, d] = ymd(iso);
   const first = new Date(Date.UTC(y, m - 1 + n, 1));

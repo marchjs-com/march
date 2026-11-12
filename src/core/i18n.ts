@@ -14,6 +14,7 @@ const dicts = new Map<string, Dict>();
 const loaders = new Map<string, () => Promise<{ default: Dict } | Dict>>();
 const missingKeys = new Map<string, Set<string>>();
 const version = signal(0) as unknown as Sig<number>;
+/** The active locale as a signal ("tr", "en" …); change it with setLocale(). */
 export const locale = signal(globalThis.navigator?.language?.slice(0, 2) ?? "en", { name: "locale" }) as unknown as Sig<string>;
 let fallbackLocale = "en";
 
@@ -43,6 +44,7 @@ export async function setLocale(loc: string): Promise<void> {
     html?.setAttribute("dir", untrack(dir));
   } catch { /* no DOM */ }
 }
+/** Locale whose messages are used when a key is missing in the active one (default "en"). */
 export function setFallbackLocale(loc: string): void { fallbackLocale = loc; }
 
 function lookup(key: string): string {

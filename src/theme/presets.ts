@@ -311,4 +311,5 @@ export const contrastTheme = defineTheme({
 
 /** Built-in themes, default first. */
 export const THEMES: readonly ThemeDef[] = [hadi, cream, night, neon, indigo, minimal, contrastTheme];
+/** Name of the default theme ("hadi"). */
 export const DEFAULT_THEME = "hadi";

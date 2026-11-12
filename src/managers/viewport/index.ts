@@ -236,6 +236,7 @@ export const viewport = (): Viewport => manager.get();
 export const configureViewport = (config: Partial<ViewportConfig>): void => manager.configure(config);
 /** Remove every listener; the next viewport() starts again. */
 export const disposeViewport = (): void => manager.dispose();
+/** The viewport manager (get, configure, dispose). */
 export const viewportManager = manager;
 
 // when:flag — show the element only while the flag is on; `when:flag={false}` shows it only while the flag is off.

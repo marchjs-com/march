@@ -71,7 +71,9 @@ export function TextInput(props: TextInputProps): unknown {
   return affix(props, el);
 }
 
+/** Text input for an e-mail address (email keyboard, trimmed, lower-cased). */
 export const EmailInput = (props: TextInputProps): unknown => TextInput(extend(props, { type: () => "email", autocomplete: () => props.autocomplete ?? "email", inputmode: () => "email", transform: () => (v) => v.trim() }));
+/** Text input for a web address (url keyboard, https:// placeholder). */
 export const UrlInput = (props: TextInputProps): unknown => TextInput(extend(props, { type: () => "url", inputmode: () => "url", placeholder: () => props.placeholder ?? "https://", transform: () => (v) => v.trim() }));
 
 export interface TextareaProps extends ControlProps<string>, TextAttrProps {

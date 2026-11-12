@@ -11,6 +11,7 @@ import type { Frames } from "./tracks.ts";
 
 installCssControl();
 
+/** Global motion control: speed, pause all, reduced motion, defaults, settings saved per user. */
 export const motion = {
   /** Read (no argument) or change the global settings; changes are saved. */
   config: (patch?: Partial<MotionSettings>, o?: { persist?: boolean }): MotionSettings => (patch ? configure(patch, o) : settingsNow()),

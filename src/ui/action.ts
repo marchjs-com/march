@@ -113,4 +113,5 @@ export function action(label: MaybeFn<string>, run: (...args: never[]) => unknow
   };
   return a;
 }
+/** Is the value an action() object? */
 export const isAction = (v: unknown): v is Action => (v as { kind?: unknown } | null | undefined)?.kind === "march.action";

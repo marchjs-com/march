@@ -144,6 +144,7 @@ export function compilePath(pattern: string): { pattern: string; keys: string[];
   return { pattern, keys, re: new RegExp(re), score };
 }
 
+/** Find the route that matches a path and its params (best score first). */
 export function matchRoute(routes: CompiledRoute[], p: string): { route: CompiledRoute; params: Record<string, string>; path: string } | null {
   for (const r of routes) {
     const m = r.re.exec(p);
@@ -161,6 +162,7 @@ export function fillPath(pattern: string, values: Record<string, string | number
 
 const compile = (r: RouteDef): CompiledRoute => ({ ...r, ...compilePath(r.path) });
 
+/** Create the app router: routes (path → loader or { component, layouts, meta }), hash or history mode, outlets, title, guards. */
 export function createRouter(opts: RouterOptions): { navigate: typeof navigate; back: typeof back; routes: CompiledRoute[]; dispose: () => void } {
   // Object form: a function value is a LOADER (`() => import("./page.jsx")`); use { component } for a direct component.
   // one router per page: a second createRouter() (HMR, tests) replaces the first and drops its listeners
@@ -297,6 +299,7 @@ let vtDepth = 0;
 const passThrough: Component = (p) => p["children"];
 const notFoundComp: Component = () => untrack(() => call(S.router?.opts.notFound ?? (() => h("p", { class: "hm-empty" }, () => t`Not found`))));
 const forbiddenComp: Component = () => h("p", { class: "hm-empty", role: "alert" }, () => t`Not allowed`);
+/** The default error view of a page that failed to load, with a retry button. */
 export function routeError(e: unknown, retry: () => void): Element {
   return h("div", { class: "hm-error hm-route-error", role: "alert" },
     h("p", {}, () => t`This page could not be loaded.`), h("p", { class: "hm-muted" }, String((e as { message?: unknown } | null)?.message ?? e)),
@@ -430,6 +433,7 @@ export async function navigate(to: Href, { replace = false, state = null, force 
   if (replace) globalThis.history.replaceState(st, "", url); else globalThis.history.pushState(st, "", url);
   return sync();
 }
+/** Go back one entry in history. */
 export const back = (): void => globalThis.history.back();
 
 /** Close the modal route: back in history when the modal was pushed, else go to the page behind it. */

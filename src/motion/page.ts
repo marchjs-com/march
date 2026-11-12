@@ -10,6 +10,7 @@ export interface PageTransitionOptions { type?: "fade" | "slide"; duration?: num
 interface ViewTransitionLike { updateCallbackDone: Promise<void>; finished: Promise<void> }
 type StartVT = (cb: () => void) => ViewTransitionLike;
 
+/** Animate route changes (fade, slide, scale) with View Transitions on the motion engine; returns off. */
 export function pageTransitions(o: PageTransitionOptions = {}): () => void {
   const root = globalThis.document?.documentElement;
   root?.setAttribute("data-hm-page-transition", o.type ?? "fade");
