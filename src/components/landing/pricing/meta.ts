@@ -9,4 +9,5 @@ export default defineMeta({
   composedOf: ["Card", "Badge", "Segmented", "Counter", "Reveal"],
   behaviors: ["motion engine"],
   showcase: "/web",
+  demoGroup: "sell",
 });

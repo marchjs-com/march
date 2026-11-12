@@ -9,4 +9,5 @@ export default defineMeta({
   composedOf: ["Reveal", "Overlay", "Button", "Badge", "VideoBackground", "Parallax"],
   behaviors: ["scrollScene"],
   showcase: "/web",
+  demoGroup: "hero",
 });

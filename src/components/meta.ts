@@ -24,6 +24,8 @@ export interface ComponentMeta {
   hubs?: readonly string[];
   /** Showcase page path that shows it. */
   showcase?: string;
+  /** Showcase demo family: folders with the same name load in one lazy demo module (tools/gen-registry.js). */
+  demoGroup?: string;
   /**
    * `false`: a large component kept out of the `hadi-march/ui` barrel (a barrel re-export puts a module into the static
    * graph of every page that imports the barrel). Import it from `hadi-march/components/<folder>`.

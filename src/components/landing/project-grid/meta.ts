@@ -9,4 +9,5 @@ export default defineMeta({
   composedOf: ["Card", "Chip", "openMedia", "Reveal"],
   behaviors: ["flip", "motion engine"],
   showcase: "/web",
+  demoGroup: "work",
 });

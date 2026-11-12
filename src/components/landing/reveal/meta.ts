@@ -9,4 +9,5 @@ export default defineMeta({
   composedOf: [],
   behaviors: ["motion engine", "scrollScene", "onVisible"],
   showcase: "/web",
+  demoGroup: "hero",
 });

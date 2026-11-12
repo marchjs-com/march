@@ -9,4 +9,5 @@ export default defineMeta({
   composedOf: ["Button", "KeyValue", "Chip", "openMedia", "Reveal"],
   behaviors: ["sharedTransition"],
   showcase: "/web",
+  demoGroup: "work",
 });

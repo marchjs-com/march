@@ -9,4 +9,5 @@ export default defineMeta({
   composedOf: ["Overlay"],
   behaviors: ["scrollScene", "motion engine clock"],
   showcase: "/web",
+  demoGroup: "hero",
 });

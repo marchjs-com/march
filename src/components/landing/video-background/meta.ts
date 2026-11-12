@@ -8,4 +8,5 @@ export default defineMeta({
   summary: "Muted looping video behind content: poster first (and on save-data / reduced motion), plays only while visible, readable tint, pause button.",
   composedOf: ["Overlay", "IconButton"],
   showcase: "/web",
+  demoGroup: "frame",
 });

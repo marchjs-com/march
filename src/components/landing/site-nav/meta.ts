@@ -9,4 +9,5 @@ export default defineMeta({
   composedOf: ["Brand", "IconButton", "openDrawer"],
   behaviors: ["scrollScene", "motion engine"],
   showcase: "/web",
+  demoGroup: "frame",
 });

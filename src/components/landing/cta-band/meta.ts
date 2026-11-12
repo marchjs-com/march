@@ -8,4 +8,5 @@ export default defineMeta({
   summary: "Call-to-action panel: title, lead, actions over gradient, mesh, glass, plain or video; pointer light; scales in.",
   composedOf: ["SiteSection", "Overlay", "Reveal", "VideoBackground"],
   showcase: "/web",
+  demoGroup: "frame",
 });

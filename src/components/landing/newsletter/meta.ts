@@ -9,4 +9,5 @@ export default defineMeta({
   composedOf: ["TextInput", "Button"],
   behaviors: ["motion engine"],
   showcase: "/web",
+  demoGroup: "frame",
 });

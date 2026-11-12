@@ -8,4 +8,5 @@ export default defineMeta({
   summary: "Frame of every website block: width, rhythm, tone (plain, muted, inverse, brand) and an eyebrow / title / lead heading that reveals.",
   composedOf: ["Reveal"],
   showcase: "/web",
+  demoGroup: "frame",
 });

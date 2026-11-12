@@ -9,4 +9,5 @@ export default defineMeta({
   composedOf: [],
   behaviors: ["motion engine", "onVisible", "Intl.NumberFormat"],
   showcase: "/web",
+  demoGroup: "hero",
 });

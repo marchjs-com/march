@@ -8,4 +8,5 @@ export default defineMeta({
   summary: "Product features as cards (pointer light), plain, a two-column list or a bento grid of mixed tile sizes; staggered entrance.",
   composedOf: ["Grid", "Card", "IconTile", "Reveal"],
   showcase: "/web",
+  demoGroup: "sell",
 });

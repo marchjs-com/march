@@ -39,13 +39,24 @@ export interface SiteNavProps {
 
 const brandNode = (b: BrandProps | Node): unknown => ((b as Node).nodeType ? b : h(Brand, b as BrandProps));
 
-/** An in-page link (`#pricing`) scrolls to its section itself, so it also works under a hash router; true when handled. */
+/**
+ * An in-page link (`#pricing`) scrolls to its section itself, so it also works under a hash router. A section that is
+ * not in the document yet (a lazy part below the fold) is reached by scrolling down until it arrives. True when handled.
+ */
 function toSection(e: Event, href: string): boolean {
   if (!href.startsWith("#") || href.length < 2) return false;
-  const target = globalThis.document?.getElementById(decodeURIComponent(href.slice(1)));
-  if (!target) return false;
   e.preventDefault();
-  target.scrollIntoView?.({ behavior: globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  const id = decodeURIComponent(href.slice(1));
+  const smooth = !globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  let tries = 0;
+  const go = (): void => {
+    const target = globalThis.document?.getElementById(id);
+    if (target) { target.scrollIntoView?.({ behavior: smooth ? "smooth" : "auto", block: "start" }); return; }
+    if (++tries > 12) return;
+    globalThis.scrollBy?.({ top: (globalThis.innerHeight || 800) * 0.9 });
+    setTimeout(go, 160);
+  };
+  go();
   return true;
 }
 

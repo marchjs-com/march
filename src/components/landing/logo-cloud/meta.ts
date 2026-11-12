@@ -8,4 +8,5 @@ export default defineMeta({
   summary: "Trusted-by logos as an equal grid or an endless Marquee ticker; one muted tone, full colour on hover.",
   composedOf: ["Marquee", "Grid", "Reveal"],
   showcase: "/web",
+  demoGroup: "sell",
 });

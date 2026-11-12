@@ -8,4 +8,5 @@ export default defineMeta({
   summary: "Website footer: brand and about line, link columns, social links, optional Newsletter, legal row, back-to-top, big wordmark.",
   composedOf: ["Brand", "Newsletter", "IconButton"],
   showcase: "/web",
+  demoGroup: "frame",
 });

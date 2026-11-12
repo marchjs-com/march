@@ -9,4 +9,5 @@ export default defineMeta({
   composedOf: ["Timeline", "Badge", "Reveal"],
   behaviors: ["scrollScene"],
   showcase: "/web",
+  demoGroup: "scroll",
 });

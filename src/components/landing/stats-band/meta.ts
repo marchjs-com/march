@@ -8,4 +8,5 @@ export default defineMeta({
   summary: "Row of big numbers that count up (or roll) when visible, with labels and notes; plain, divided or cards.",
   composedOf: ["Counter", "Reveal"],
   showcase: "/web",
+  demoGroup: "hero",
 });
