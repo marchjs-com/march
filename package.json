@@ -40,7 +40,13 @@
     "./net": "./src/net/index.ts",
     "./net/mock": "./src/net/mock.ts",
     "./errors": "./src/errors/index.ts",
-    "./errors/errors.css": "./src/errors/errors.css"
+    "./errors/errors.css": "./src/errors/errors.css",
+    "./managers": "./src/managers/index.ts",
+    "./managers/viewport": "./src/managers/viewport/index.ts",
+    "./managers/consent": "./src/managers/consent/index.ts",
+    "./managers/consent/ui": "./src/managers/consent/ui.ts",
+    "./managers/command": "./src/managers/command/index.ts",
+    "./managers/command/ui": "./src/managers/command/ui.ts"
   },
   "bin": {
     "march": "./cli/march.js"
@@ -74,6 +80,8 @@
     "./src/motion/install.ts",
     "./src/net/index.ts",
     "./src/net/mock.ts",
-    "./src/errors/index.ts"
+    "./src/errors/index.ts",
+    "./src/managers/*/index.ts",
+    "./src/managers/*/ui.ts"
   ]
 }

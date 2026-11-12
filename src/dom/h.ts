@@ -125,6 +125,11 @@ function asyncRegion(promise: Promise<unknown>, Comp: Component<Props>): () => u
 // ------------------------------------------------------------------ props
 const MODS = new Set(["prevent", "stop", "once", "self", "capture", "passive", "trusted"]);
 type Action = (el: Element, arg: unknown) => unknown;
+/** A namespaced element prop handler (`when:mobile`, `consent:analytics`, `command:save`), added by the managers. */
+export type NamespaceFn = (el: Element, name: string, value: unknown) => void;
+const NS = new Map<string, NamespaceFn>();
+/** Handle `<ns>:<name>` props on elements (managers register theirs when they load). */
+export const registerNamespace = (ns: string, fn: NamespaceFn): void => { NS.set(ns, fn); };
 
 function setProp(el: MarchEl, tag: string, key: string, value: unknown): void {
   if (FORBIDDEN_PROPS.has(key)) throw new Error(`March: "${key}" is not supported (security). Build nodes with h()/JSX.`);
@@ -144,6 +149,8 @@ function setProp(el: MarchEl, tag: string, key: string, value: unknown): void {
     return;
   }
   if (key.startsWith("transition:")) return transition(el, key.slice(11), value);
+  const ns = NS.get(key.slice(0, key.indexOf(":")));
+  if (ns) return ns(el, key.slice(key.indexOf(":") + 1), value);
   if (key === "class" || key === "className") return bindValue(value, (v) => setClass(el, v));
   // sx: the compiler turns it into classes (a literal at build time, anything else through sxValue()); h() by hand: sx(obj)
   if (key === "sx") return bindValue(value, (v) => { if (v != null && typeof v !== "string") throw new TypeError("March: sx needs the compiler or sx({...}) from hadi-march"); el.__hmClass = v ?? ""; setClass(el, el.__hmUser ?? ""); });
