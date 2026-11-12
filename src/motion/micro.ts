@@ -19,10 +19,12 @@ export interface RippleOptions { duration: number; /** Ink opacity at the start.
 export function ripple(el: Element, raw?: unknown): () => void {
   const o = obj<RippleOptions>(raw);
   const h = el as HTMLElement;
-  if (globalThis.getComputedStyle?.(h).position === "static") setStyle(h, { position: "relative" });
   setStyle(h, { overflow: "hidden", isolation: "isolate" });
   const spawn = (x: number, y: number): void => {
     if (reducedNow()) return;
+    // read at press time: an action runs before its element is in the document, where no position is computed yet
+    // (a static card would place the ink on an ancestor, clipped away)
+    if (globalThis.getComputedStyle?.(h).position === "static") setStyle(h, { position: "relative" });
     const r = h.getBoundingClientRect();
     const cx = o.center ? r.width / 2 : x - r.left, cy = o.center ? r.height / 2 : y - r.top;
     const size = Math.hypot(Math.max(cx, r.width - cx), Math.max(cy, r.height - cy)) * 2;
