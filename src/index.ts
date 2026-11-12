@@ -1,8 +1,9 @@
 // HADI March — core entry. Everything else (router, data, schema, ui, table, charts, testing) is a separate module.
 export { signal, computed, effect, batch, untrack, selector, onCleanup, createRoot, getOwner, runWithOwner, catchError, context, provide, useContext, reactive, isReactive, read, DEV, _enter, _leave } from "./core/reactive.ts";
 export { store, patch, unwrap } from "./core/store.ts";
-export { h, Fragment, insert, lazyChildren, safeUrl, registerTransition } from "./dom/h.ts";
-export { If, Else, For, Try, setFlipHook } from "./dom/flow.ts";
+export { h, Fragment, insert, lazyChildren, safeUrl, registerTransition, _tpl, _prop } from "./dom/h.ts";
+export { If, Else, Try } from "./dom/flow.ts";
+export { For, setFlipHook } from "./dom/for.ts";
 export { Switch, Match } from "./dom/switch.ts";
 export { Await } from "./dom/await.ts";
 export { Dynamic } from "./dom/dynamic.ts";

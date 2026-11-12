@@ -252,9 +252,9 @@ test("calling an async helper without awaiting it keeps the component's owner", 
 });
 
 test("For: a swap moves two rows, not the rows between; clearing the whole list empties the parent at once", async () => {
-  const { lis } = await import("../src/dom/flow.ts");
-  assert.deepEqual(lis([2, 0, -1, 1, 3]), [1, 3, 4]);
-  assert.deepEqual(lis([]), []);
+  const { lis } = await import("../src/dom/for.ts");
+  assert.deepEqual([...lis([2, 0, -1, 1, 3])], [0, 1, 0, 1, 1]);
+  assert.equal(lis([]).length, 0);
   const mk = (n) => Array.from({ length: n }, (_, i) => ({ id: i + 1 }));
   const items = signal(mk(20));
   const { el } = mount(() => h("ul", {}, h(For, { each: items, key: "id" }, M.lazyChildren(() => [(it) => h("li", {}, String(it().id))]))));

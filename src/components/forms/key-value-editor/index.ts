@@ -4,7 +4,7 @@ import "../../../ui/field.css";
 import "../../../ui/button.css";
 import { signal, computed, effect, untrack, type Accessor } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { For } from "../../../dom/flow.ts";
+import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
 import { model, cx, useField, syncValue, labelledBy, type ControlProps } from "../../../forms/util.ts";
 import { iconBtn, sameLength } from "../../../forms/rows.ts";

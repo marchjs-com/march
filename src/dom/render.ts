@@ -5,7 +5,7 @@ import { insert, clearBetween, removeNode } from "./h.ts";
 /** `render(() => <App />, document.getElementById("app"))` */
 export function render(fn: () => unknown, container: Element | DocumentFragment | ShadowRoot | null | undefined): () => void {
   if (!container || typeof container.insertBefore !== "function") throw new TypeError("March: render() needs a DOM container.");
-  if (typeof fn !== "function") throw new TypeError("March: render() needs a function: render(() => <App />, el).");
+  if (typeof fn !== "function") throw new TypeError("March: render() needs a function.");
   const doc = container.ownerDocument ?? globalThis.document;
   const start = doc.createComment("march"), end = doc.createComment("/march");
   container.append(start, end);

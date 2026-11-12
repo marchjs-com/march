@@ -12,7 +12,7 @@ import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 import { star } from "../icons/glyphs/star.ts";
 import { starFilled } from "../icons/glyphs/starFilled.ts";
 import { h } from "../dom/h.ts";
-import { For, type ForProps } from "../dom/flow.ts";
+import { For, type ForProps } from "../dom/for.ts";
 import { t } from "../core/i18n.ts";
 import { createTable, type TableOptions, type TableState, type TableAction, type RowAction, type BulkAction } from "./state.ts";
 import type { Row as DefaultRow, TableColumn } from "./filters.ts";

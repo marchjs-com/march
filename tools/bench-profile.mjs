@@ -16,6 +16,7 @@ const out = resolve(process.env.TMP ?? join(ROOT, ".tmp"), "march-bench-profile"
 const libs = flag(process.argv, "--libs", "vanilla,march");
 const reps = Number(flag(process.argv, "--reps", "15"));
 const ops = flag(process.argv, "--ops", "all");
+const cpu = process.argv.includes("--cpu"); // + a CPU profile: self time per function (unminified build)
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 const entry = `
@@ -57,7 +58,7 @@ const settle = async () => { gc(); await new Promise((r) => setTimeout(r, 20)); 
 `;
 await build({
   stdin: { contents: entry, resolveDir: SC, sourcefile: "bench-profile.ts", loader: "ts" },
-  bundle: true, splitting: true, format: "esm", outdir: out, minify: true, absWorkingDir: SC,
+  bundle: true, splitting: true, format: "esm", outdir: out, minify: !cpu, absWorkingDir: SC,
   alias: { "hadi-march": join(ROOT, "src") },
   define: { "process.env.NODE_ENV": '"production"', __VUE_OPTIONS_API__: "true", __VUE_PROD_DEVTOOLS__: "false", __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false" },
   plugins: [march({ components: join(SC, "src/components"), cssSplit: false })],
@@ -75,9 +76,19 @@ await new Promise((r) => server.listen(0, "127.0.0.1", r));
 const b = await openHeadless({ base: `http://127.0.0.1:${server.address().port}`, args: ["--js-flags=--expose-gc", "--enable-precise-memory-info"] });
 let res;
 try {
+  if (cpu) { await b.send("Profiler.enable"); await b.send("Profiler.setSamplingInterval", { interval: 100 }); await b.send("Profiler.start"); }
   await b.send("Page.navigate", { url: `${b.base}/` });
   const t0 = Date.now();
   while (!res && Date.now() - t0 < 15 * 60e3) { await new Promise((r) => setTimeout(r, 1000)); res = await b.ev("window.__prof"); }
+  if (cpu && res) {
+    const { profile } = (await b.send("Profiler.stop")).result;
+    const self = new Map(), dt = new Map();
+    profile.samples.forEach((id, i) => dt.set(id, (dt.get(id) ?? 0) + (profile.timeDeltas[i] ?? 0)));
+    for (const n of profile.nodes) { const f = n.callFrame; const k = `${f.functionName || "(anon)"} ${f.url.split("/").pop()}:${f.lineNumber + 1}`; self.set(k, (self.get(k) ?? 0) + (dt.get(n.id) ?? 0)); }
+    const total = [...self.values()].reduce((a, b) => a + b, 0);
+    console.log("self time (top 30):");
+    for (const [k, v] of [...self].sort((a, b) => b[1] - a[1]).slice(0, 30)) console.log(`  ${(v / 1000).toFixed(1).padStart(8)} ms ${(100 * v / total).toFixed(1).padStart(5)}%  ${k}`);
+  }
 } finally { await b.close(); server.close(); }
 if (!res || res.fatal) { console.error(res?.fatal ?? "did not finish"); process.exit(1); }
 const keys = Object.keys(Object.values(res)[0]);

@@ -10,7 +10,7 @@ import "./errors.css";
 import { signal, batch, createRoot, setErrorHook, type Signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { Portal } from "../dom/portal.ts";
-import { For } from "../dom/flow.ts";
+import { For } from "../dom/for.ts";
 import { t } from "../core/i18n.ts";
 import { AppError, setErrorSink, isAbort, type AppErrorInit, type ErrorType, type Severity, type ErrorSource } from "./app-error.ts";
 

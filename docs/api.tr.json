@@ -1,6 +1,8 @@
 {
  "hadi-march": {
   "_enter": "Eşzamansız bileşenler için derleyici kancası: `await` sonrasında sahibi geri yükler (doğrudan kullanım için değil).",
+  "_prop": "Derleyici yardımcısı (doğrudan kullanım için değil): şablon kopyasındaki bir öğeye tek bir JSX özelliğini h() gibi uygular (bağlı öznitelik, olay, ref, yönerge).",
+  "_tpl": "Derleyici yardımcısı (doğrudan kullanım için değil): yerel öğe ağacını bir kez DOM çağrılarıyla kurar (HTML dizgesi yok), her kullanımda kopyalar; yalnız dinamik kısımlar bağlanır.",
   "_leave": "Eşzamansız bileşenler: derleyici `await x` ifadesini `_enter(owner, await _leave(x))` biçimine çevirir; böylece await sonrasındaki kod yeniden bileşenin sahibiyle çalışır. Devam sona erince sahip sıfırlanır.",
   "applyPipe": "Kayıtlı bir boru (pipe) uygular (derleyici çıktısı). Yerleşik metin boruları `string`, özel borular `unknown` döndürür.",
   "Await": "`<Await for={promise} loading={…} catch={(e) => …}>{(value) => …}</Await>` — bir sözü (promise) bekler, yüklenirken, hatada ve sonuçta farklı içerik gösterir.",

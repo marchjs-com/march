@@ -4,7 +4,7 @@ import "./toast.css";
 import "../../../ui/button.css";
 import { signal, createRoot, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { For } from "../../../dom/flow.ts";
+import { For } from "../../../dom/for.ts";
 import { Portal } from "../../../dom/portal.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, glyph, type MaybeFn } from "../../../ui/util.ts";

@@ -160,7 +160,7 @@ function flush(): void {
     for (let i = 0; i < queue.length; i++) {
       const e = queue[i] as Computation;
       if (e.state !== CLEAN && !e.disposed) update(e);
-      if (i > 100_000) throw new Error("March: effect loop did not settle (an effect keeps writing a signal it reads).");
+      if (i > 100_000) throw new Error("March: effect loop did not settle (an effect writes a signal it reads).");
     }
   } finally {
     queue = [];
@@ -298,7 +298,7 @@ export function untrack<T>(fn: () => T): T {
 /** Register a callback that runs when the current owner is disposed or re-runs. */
 export function onCleanup(fn: Cleanup): Cleanup {
   if (Owner) (Owner.cleanups ??= []).push(fn);
-  else if (DEV.enabled) DEV.warn("onCleanup() called outside a component or effect; it will never run.");
+  else if (DEV.enabled) DEV.warn("onCleanup() outside a component or effect never runs.");
   return fn;
 }
 

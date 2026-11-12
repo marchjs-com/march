@@ -2,7 +2,7 @@
 // drag on it to move the view; arrow keys pan when it has focus. Mirrors in RTL with the canvas.
 import { computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { For } from "../../../dom/flow.ts";
+import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { colorAttr } from "../../../theme/colors.ts";

@@ -49,14 +49,39 @@ export function h(type: string, props?: Props | null, ...children: unknown[]): E
 export function h(type: string | Component<never>, props?: Props | null, ...children: unknown[]): unknown {
   const p: Props = props ?? {};
   if (typeof type === "function") return createComponent(type as Component<Props>, p, children);
-  if (typeof type !== "string") throw new TypeError("March: h() type must be a tag name or a component function.");
-  if (FORBIDDEN_TAGS.has(type)) throw new Error(`March: <${type}> cannot be created (security). Use a module import or a dedicated component.`);
+  if (typeof type !== "string") throw new TypeError("March: h() needs a tag name or a component.");
+  if (FORBIDDEN_TAGS.has(type)) throw new Error(`March: <${type}> cannot be created (security).`);
   const el = (SVG_TAGS.has(type) ? doc().createElementNS(SVG_NS, type) : doc().createElement(type)) as MarchEl;
   for (const key in p) if (key !== "children") setProp(el, type, key, p[key]);
   const kids = children.length ? children : p["children"];
   if (kids != null) insert(el, kids);
   return el;
 }
+
+/** Template spec the compiler emits: [tag, [[attr, value]…], ...children] where a child is text or a nested spec. */
+export type TemplateSpec = [string, [string, string][], ...(string | TemplateSpec)[]];
+function buildSpec(d: Document, s: TemplateSpec): Element {
+  const el = d.createElement(s[0]);
+  for (const [k, v] of s[1]) el.setAttribute(k, v);
+  for (let i = 2; i < s.length; i++) { const c = s[i] as string | TemplateSpec; el.appendChild(typeof c === "string" ? d.createTextNode(c) : buildSpec(d, c)); }
+  return el;
+}
+/**
+ * Compiler helper (not for direct use): a native element subtree built once with DOM calls (no HTML strings) and
+ * cloned per use. `tpl(wire)` returns a clone after `wire(clone)` has bound its dynamic parts.
+ */
+export function _tpl(spec: TemplateSpec): (wire?: (root: Element) => void) => Element {
+  let node: Element | null = null;
+  return (wire) => {
+    const d = doc();
+    if (!node || node.ownerDocument !== d) node = buildSpec(d, spec);
+    const r = node.cloneNode(true) as Element;
+    if (wire) wire(r);
+    return r;
+  };
+}
+/** Compiler helper (not for direct use): apply one JSX prop to an element of a template clone, as h() does. */
+export function _prop(el: Element, tag: string, key: string, value: unknown): void { setProp(el as MarchEl, tag, key, value); }
 
 /** Mark a thunk as lazily evaluated children (compiler output for component children). */
 export function lazyChildren<F extends () => unknown>(fn: F): F { (fn as unknown as Record<symbol, boolean>)[CHILDREN] = true; return fn; }
@@ -137,7 +162,7 @@ const NS = new Map<string, NamespaceFn>();
 export const registerNamespace = (ns: string, fn: NamespaceFn): void => { NS.set(ns, fn); };
 
 function setProp(el: MarchEl, tag: string, key: string, value: unknown): void {
-  if (FORBIDDEN_PROPS.has(key)) throw new Error(`March: "${key}" is not supported (security). Build nodes with h()/JSX.`);
+  if (FORBIDDEN_PROPS.has(key)) throw new Error(`March: "${key}" is not supported (security).`);
   if (key === "ref") {
     if (typeof value === "function") { const s = value as Partial<Signal<Element>> & ((el: Element) => void); if (s.signal && s.set) s.set(el); else s(el); }
     return;
@@ -158,9 +183,9 @@ function setProp(el: MarchEl, tag: string, key: string, value: unknown): void {
   if (ns) return ns(el, key.slice(key.indexOf(":") + 1), value);
   if (key === "class" || key === "className") return bindValue(value, (v) => setClass(el, v));
   // sx: the compiler turns it into classes (a literal at build time, anything else through sxValue()); h() by hand: sx(obj)
-  if (key === "sx") return bindValue(value, (v) => { if (v != null && typeof v !== "string") throw new TypeError("March: sx needs the compiler or sx({...}) from hadi-march"); el.__hmClass = v ?? ""; setClass(el, el.__hmUser ?? ""); });
+  if (key === "sx") return bindValue(value, (v) => { if (v != null && typeof v !== "string") throw new TypeError("March: sx needs the compiler or sx({...})"); const user = el.__hmClass === undefined ? el.getAttribute("class") ?? "" : el.__hmUser ?? ""; el.__hmClass = v ?? ""; setClass(el, user); });
   if (key === "style") {
-    if (typeof value === "string") throw new Error("March: string styles are not allowed (CSP). Use classes, sx, or a style object.");
+    if (typeof value === "string") throw new Error("March: string styles are not supported (CSP); use classes, sx or an object.");
     return bindValue(value, (v) => {
       const obj = (v ?? {}) as Record<string, unknown>;
       for (const k in obj) el.style?.setProperty(k.startsWith("--") ? k : k.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`), obj[k] == null ? "" : String(obj[k]));
@@ -180,6 +205,11 @@ function bindValue(value: unknown, apply: (v: unknown) => void): void {
 }
 
 function setClass(el: MarchEl, v: unknown): void {
+  // fast path: a class string on an element without sx (no expando, no joining)
+  if (typeof v === "string" && el.__hmClass === undefined) {
+    if (typeof (el as HTMLElement).className === "string") (el as HTMLElement).className = v; else el.setAttribute("class", v);
+    return;
+  }
   el.__hmUser = v;
   let s: unknown = v;
   if (Array.isArray(v)) s = v.filter(Boolean).join(" ");
@@ -226,7 +256,7 @@ function bindProp(el: Element, what: string, value: unknown): void {
       else if (f.checked) sig.set(f.value);
     });
   } else if (what === "this") sig.set(el);
-  else throw new Error(`March: unknown binding bind:${what} (value, checked, group, this).`);
+  else throw new Error(`March: unknown binding bind:${what}.`);
 }
 
 // ------------------------------------------------------------------ transitions
@@ -243,7 +273,7 @@ function transition(el: MarchEl, name: string, opts: unknown): void {
     return;
   }
   const cls = TRANSITIONS[name];
-  if (!cls) throw new Error(`March: unknown transition "${name}" (built in: fade, slide, scale; import hadi-march/motion for blur, fly and more).`);
+  if (!cls) throw new Error(`March: unknown transition "${name}" (fade, slide, scale; more in hadi-march/motion).`);
   el.classList.add(`${cls}-in`);
   el[LEAVE] = () => new Promise<void>((resolve) => {
     el.classList.remove(`${cls}-in`);
@@ -273,30 +303,22 @@ function toNode(v: unknown): Node | null {
 }
 
 function region(parent: Node, fn: () => unknown, before: Node | null): void {
-  const start = doc().createComment(""), end = doc().createComment("");
+  // A text node marks the start and, while the value is text (the usual case), is the region itself; an end marker
+  // is added the first time the value is something else (nodes, a list, nothing). Placed now: an effect created
+  // inside batch() runs later, and the region must keep its place among its siblings.
+  const start = doc().createTextNode("");
+  let end: Comment | null = null;
   parent.insertBefore(start, before);
-  parent.insertBefore(end, before);
-  let text: Text | null = null; // fast path: a single text node
   effect(() => {
     const v = fn();
-    const host = end.parentNode;
+    if (!end && (typeof v === "string" || typeof v === "number")) { const s = "" + v; if (start.data !== s) start.data = s; return; }
+    const host = start.parentNode;
     if (!host) return;
-    if (typeof v === "string" || typeof v === "number") {
-      const s = String(v);
-      if (text && text.parentNode === host && text.previousSibling === start && text.nextSibling === end) {
-        if (text.data !== s) text.data = s;
-        return;
-      }
-      clearBetween(start, end);
-      text = doc().createTextNode(s);
-      host.insertBefore(text, end);
-      return;
-    }
+    if (!end) { start.data = ""; host.insertBefore((end = doc().createComment("")), start.nextSibling); }
     clearBetween(start, end);
-    text = null;
     insert(host, v, end);
   });
-  onCleanup(() => { if (detaching) return; clearBetween(start, end); removeNode(start); removeNode(end); });
+  onCleanup(() => { if (!detaching) { if (end) { clearBetween(start, end); removeNode(end); } removeNode(start); } });
 }
 
 /** Remove every node between two markers (leave transitions finish first). */
