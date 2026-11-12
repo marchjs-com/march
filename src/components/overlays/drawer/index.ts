@@ -1,14 +1,14 @@
 // Drawer (hadi-march/ui): a sheet from any edge — start / end (logical: mirrored in RTL), top, bottom. Drag to close,
 // snap points, modal or non-modal. Reuses the Dialog frame (focus, Escape, stacking, aria) inside a Portal layer;
 // every movement runs on the motion engine (transform only), the gesture only feeds it offsets.
-import { signal, effect, untrack, onCleanup } from "../../core/reactive.ts";
-import { h } from "../../dom/h.ts";
-import { Portal } from "../../dom/portal.ts";
-import { t } from "../../core/i18n.ts";
-import { frame, type DialogProps } from "../../ui/dialog.ts";
-import { val, cx, type MaybeFn } from "../../ui/util.ts";
-import { animate } from "../../motion/animate.ts";
-import { setStyle } from "../../motion/env.ts";
+import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
+import { h } from "../../../dom/h.ts";
+import { Portal } from "../../../dom/portal.ts";
+import { t } from "../../../core/i18n.ts";
+import { frame, type DialogProps } from "../../../ui/dialog.ts";
+import { val, cx, type MaybeFn } from "../../../ui/util.ts";
+import { animate } from "../../../motion/animate.ts";
+import { setStyle } from "../../../motion/env.ts";
 import "./drawer.css";
 
 /** Edge the drawer comes from. `start` / `end` follow the writing direction; `left` / `right` are aliases of them. */

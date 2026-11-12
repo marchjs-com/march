@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom } from "../../testing/dom.ts";
+import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
-const { h, render, signal } = await import("../../index.ts");
+const { h, render, signal } = await import("../../../index.ts");
 const { BottomNav, HADI_RING } = await import("./index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
 const ITEMS = [{ id: "home", label: "Home" }, { id: "explore", label: "Explore" }, { id: "chat", label: "Chat" }, { id: "me", label: "Me" }];

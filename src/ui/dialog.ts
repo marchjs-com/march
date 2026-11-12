@@ -275,4 +275,4 @@ function sheet(kind: "dialog" | "drawer"): (props: DialogProps) => () => unknown
 }
 /** Declarative dialog: `<Dialog open={$open} onClose={() => $open = false} title="…" size="md" footer={…}>…</Dialog>` */
 export const Dialog: (props: DialogProps) => () => unknown = sheet("dialog");
-// <Drawer> lives in src/components/drawer/ (4 sides, drag to close, snap points, non-modal); it reuses frame().
+// <Drawer> lives in src/components/overlays/drawer/ (4 sides, drag to close, snap points, non-modal); it reuses frame().

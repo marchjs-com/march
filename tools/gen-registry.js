@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Writes the shared files from the component folders (src/components/<name>/), so nobody edits them by hand and
+// Writes the shared files from the component folders (src/components/<name>/ or <category>/<name>/), so nobody edits them by hand and
 // parallel branches that add folders do not conflict:
 //   src/components/index.ts       barrel (re-exported by hadi-march/ui)
 //   src/components/registry.gen.ts  catalogue: name, folder, meta, lazy demo / playground loaders (showcase, tools)
@@ -20,9 +20,15 @@ export async function components(root = ROOT) {
   const dir = join(root, "src/components");
   if (!existsSync(dir)) return [];
   const out = [];
-  for (const folder of readdirSync(dir).sort()) {
+  // a folder without meta.ts is a category (src/components/<category>/<name>/): its subfolders are components
+  const folders = readdirSync(dir).sort().flatMap((f) => {
+    const p = join(dir, f);
+    if (!statSync(p).isDirectory()) return [];
+    if (existsSync(join(p, "meta.ts"))) return [f];
+    return readdirSync(p).sort().filter((s) => statSync(join(p, s)).isDirectory()).map((s) => `${f}/${s}`);
+  }).sort((a, b) => a.split("/").pop().localeCompare(b.split("/").pop()));
+  for (const folder of folders) {
     const p = join(dir, folder);
-    if (!statSync(p).isDirectory()) continue;
     const meta = existsSync(join(p, "meta.ts")) ? (await import(pathToFileURL(join(p, "meta.ts")).href)).default : null;
     out.push({ folder, meta, files: readdirSync(p), docs: existsSync(join(p, "docs.md")) ? readFileSync(join(p, "docs.md"), "utf8") : "" });
   }
@@ -58,7 +64,7 @@ export function shapeProblems(list) {
   const out = [];
   for (const c of list) {
     for (const f of REQUIRED) if (!c.files.includes(f)) out.push(`${c.folder}: missing ${f}`);
-    if (!c.files.some((f) => f.endsWith(".test.js"))) out.push(`${c.folder}: missing ${c.folder}.test.js`);
+    if (!c.files.some((f) => f.endsWith(".test.js"))) out.push(`${c.folder}: missing ${c.folder.split("/").pop()}.test.js`);
     if (c.meta && !Array.isArray(c.meta.composedOf)) out.push(`${c.folder}: meta.composedOf must be an array`);
   }
   return out;

@@ -1,16 +1,16 @@
 // BottomNav (hadi-march/ui): the mobile tab bar. A colored bubble slides to the active tab (motion engine, FLIP), the
 // active icon pops, tabs carry count / dot badges, and an optional raised Create button in the middle wears a slowly
 // turning ring of the four HADİ colors (decorative: it stays still with reduced motion).
-import { effect, untrack, onCleanup } from "../../core/reactive.ts";
-import { h } from "../../dom/h.ts";
-import { t } from "../../core/i18n.ts";
-import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../ui/util.ts";
-import { Badge } from "../../ui/badge.ts";
-import { OverflowText } from "../../ui/marquee.ts";
-import { colorAttr, type ColorToken } from "../../theme/colors.ts";
-import { plus } from "../../icons/glyphs/plus.ts";
-import { animate } from "../../motion/animate.ts";
-import { setStyle } from "../../motion/env.ts";
+import { effect, untrack, onCleanup } from "../../../core/reactive.ts";
+import { h } from "../../../dom/h.ts";
+import { t } from "../../../core/i18n.ts";
+import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { Badge } from "../../../ui/badge.ts";
+import { OverflowText } from "../../../ui/marquee.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { plus } from "../../../icons/glyphs/plus.ts";
+import { animate } from "../../../motion/animate.ts";
+import { setStyle } from "../../../motion/env.ts";
 import "./bottom-nav.css";
 
 export interface BottomNavItem {
