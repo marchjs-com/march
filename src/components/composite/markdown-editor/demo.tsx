@@ -1,5 +1,6 @@
 // Showcase stage for MarkdownEditor, for the Playground values (playground.ts). The editor is re-created when an
 // option changes; the text is kept.
+import { untrack } from "../../../core/reactive.ts";
 import { MarkdownEditor, type MarkdownView } from "./index.ts";
 
 const START = [
@@ -28,7 +29,7 @@ export default function MarkdownEditorDemo(props: { values: { view: string; tool
   return <div class="sc-ed-one">
     {() => {
       const views: MarkdownView[] = props.values.rich || props.values.view === "rich" ? ["write", "preview", "split", "rich"] : ["write", "preview", "split"]
-      return <MarkdownEditor value={$md.peek()} onChange={(v: string) => { $md = v }} view={props.values.view as MarkdownView} views={views} toolbar={props.values.toolbar}
+      return <MarkdownEditor value={untrack(() => $md)} onChange={(v: string) => { $md = v }} view={props.values.view as MarkdownView} views={views} toolbar={props.values.toolbar}
         syncScroll={props.values.sync} stats={props.values.stats} readonly={props.values.readonly} rows={14} />
     }}
   </div>
