@@ -20,6 +20,7 @@ import { genRoutes } from "./routes.js";
 import { genApi, mockHandler } from "./openapi.js";
 import { templates } from "./templates.js";
 import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
+import { packChunks } from "../compiler/pack-chunks.js";
 import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText } from "./perf.js";
 
 const cwd = process.cwd();
@@ -104,7 +105,13 @@ async function build({ dev = false } = {}) {
       const want = resolve(cwd, cfg.entry);
       const entryKey = Object.keys(r.metafile.outputs).find((k) => r.metafile.outputs[k].entryPoint && resolve(cwd, r.metafile.outputs[k].entryPoint) === want);
       // merged files get new content hashes (a cached stub must never point at another build's entry)
-      if (entryKey && (await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify: flag("--no-minify") !== true })).length) rehashOutputs(r.metafile, { cwd });
+      if (entryKey) {
+        const minify = flag("--no-minify") !== true;
+        const merged = (await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify })).length;
+        // tiny shared chunks fold into a chunk always loaded with them (fewer requests and files); off with packChunks: false
+        const packed = cfg.packChunks === false ? { stubs: 0, folded: 0 } : await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: cfg.packChunks?.minSize ?? 2048 });
+        if (merged || packed.stubs || packed.folded) rehashOutputs(r.metafile, { cwd });
+      }
     }
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
     writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);
@@ -114,7 +121,7 @@ async function build({ dev = false } = {}) {
       if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
       const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));
       printReport(rep);
-      writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ entry: rep.rows[0], routes: rep.rows.filter((x) => x.kind === "route").map(({ name, key, js, css, limit, over, files }) => ({ name, key, js, css, limit, over, files })), parts: rep.rows.filter((x) => x.kind === "part").map(({ name, js, css, limit, over, files }) => ({ name, js, css, limit, over, files })), budget: rep.budget }, null, 2)}\n`);
+      writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ entry: rep.rows[0], routes: rep.rows.filter((x) => x.kind === "route").map(({ name, key, js, css, limit, over, files }) => ({ name, key, js, css, limit, over, files })), parts: rep.rows.filter((x) => x.kind === "part" || x.kind === "layout").map(({ name, kind, js, css, limit, over, files }) => ({ name, kind, js, css, limit, over, files })), budget: rep.budget }, null, 2)}\n`);
       if (rep.over.length) {
         const msg = `over budget: ${rep.over.map(overText).join("; ")}`;
         if (rep.over.some((x) => x.entry) || flag("--analyze") === true) { console.log("  largest modules in the entry (minified, before gzip) — move heavy ones behind import()/lazy():"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, flag("--analyze") === true ? 40 : 12)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }

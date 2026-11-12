@@ -287,3 +287,29 @@ test("router: route changes, back/forward, rapid clicks, preloaded or not, with 
   }
   R.setNavigationWrapper(null);
 });
+
+test("packChunks: entry stubs and tiny shared chunks fold away; every import still resolves; fewer files", async () => {
+  const { mergeEntry, rehashOutputs } = await import("../compiler/merge-entry.js");
+  const { packChunks } = await import("../compiler/pack-chunks.js");
+  const esbuild = await import("esbuild");
+  const app = await buildApp({
+    "main.tsx": `import { render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx"), "/c": () => import("./c.tsx") } })\nrender(() => h(Router, {}), document.body)\n`,
+    "s1.ts": `export const one = (x: number) => x + 1\n`,
+    "s2.ts": `export const two = (x: number) => x * 2\n`,
+    "a.tsx": `import { one } from "./s1.ts"\nimport { two } from "./s2.ts"\nimport { Card } from "hadi-march/ui"\nexport default () => <Card title={String(one(two(1)))}>a</Card>\n`,
+    "b.tsx": `import { one } from "./s1.ts"\nimport { Badge } from "hadi-march/ui"\nexport default () => <Badge>{one(1)}</Badge>\n`,
+    "c.tsx": `import { two } from "./s2.ts"\nimport { Card, Badge } from "hadi-march/ui"\nexport default () => <Card title="c"><Badge>{two(2)}</Badge></Card>\n`,
+  });
+  try {
+    const entryKey = Object.keys(app.meta.outputs).find((k) => app.meta.outputs[k].entryPoint === "main.tsx");
+    await mergeEntry(app.meta, { cwd: app.dir, entryKey, esbuild });
+    const before = Object.keys(app.meta.outputs).filter((k) => k.endsWith(".js")).length;
+    const r = await packChunks(app.meta, { cwd: app.dir, entryKey, esbuild });
+    rehashOutputs(app.meta, { cwd: app.dir });
+    const keys = Object.keys(app.meta.outputs).filter((k) => k.endsWith(".js"));
+    assert.ok(r.stubs + r.folded > 0 && keys.length < before, `${before} → ${keys.length} files (${r.stubs} stubs, ${r.folded} folded)`);
+    const names = new Set(keys.map((k) => k.split("/").pop()));
+    for (const k of keys) for (const m of readFileSync(resolve(app.dir, k), "utf8").matchAll(/["'](\.{1,2}\/[^"']+\.js)["']/g)) assert.ok(names.has(m[1].split("/").pop()), `${k} → ${m[1]} exists`);
+    for (const k of keys) for (const im of app.meta.outputs[k].imports ?? []) if (im.path.endsWith(".js")) assert.ok(app.meta.outputs[im.path], `metafile: ${im.path} exists`);
+  } finally { app.cleanup(); }
+});
