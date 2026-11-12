@@ -58,6 +58,8 @@ export { appWindow } from "./glyphs/appWindow.ts";
 export { columns } from "./glyphs/columns.ts";
 export { rows } from "./glyphs/rows.ts";
 export { gitBranch } from "./glyphs/gitBranch.ts";
+export { undo } from "./glyphs/undo.ts";
+export { redo } from "./glyphs/redo.ts";
 export { files } from "./glyphs/files.ts";
 export { info } from "./glyphs/info.ts";
 export { alertTriangle } from "./glyphs/alertTriangle.ts";

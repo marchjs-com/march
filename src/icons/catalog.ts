@@ -62,6 +62,8 @@ export const ICONS: Readonly<Record<string, IconDef>> = {
   columns: { name: "columns", d: ["b:3,3,18,18,2", "M12 3v18"] },
   rows: { name: "rows", d: ["b:3,3,18,18,2", "M3 12h18"] },
   gitBranch: { name: "git-branch", d: ["o:6,5,2", "o:6,19,2", "o:18,7,2", "M6 7v10", "M18 9a6 6 0 0 1-6 6H8"] },
+  undo: { name: "undo", d: ["M9 14 4 9l5-5", "M4 9h10.5a5.5 5.5 0 0 1 0 11H11"] },
+  redo: { name: "redo", d: ["m15 14 5-5-5-5", "M20 9H9.5a5.5 5.5 0 0 0 0 11H13"] },
   files: { name: "files", d: ["M15 3H9a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z", "M15 3v5h5", "M4 7v12a2 2 0 0 0 2 2h9"] },
   info: { name: "info", d: ["o:12,12,9", "M12 16v-4", "M12 8h.01"] },
   alertTriangle: { name: "alert-triangle", d: ["M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z", "M12 9v4", "M12 17h.01"] },

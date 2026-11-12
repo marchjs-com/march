@@ -62,6 +62,8 @@ export const appWindow = /* @__PURE__ */ i("app-window", ["b:3,4,18,16,2", "M3 9
 export const columns = /* @__PURE__ */ i("columns", ["b:3,3,18,18,2", "M12 3v18"]);
 export const rows = /* @__PURE__ */ i("rows", ["b:3,3,18,18,2", "M3 12h18"]);
 export const gitBranch = /* @__PURE__ */ i("git-branch", ["o:6,5,2", "o:6,19,2", "o:18,7,2", "M6 7v10", "M18 9a6 6 0 0 1-6 6H8"]);
+export const undo = /* @__PURE__ */ i("undo", ["M9 14 4 9l5-5", "M4 9h10.5a5.5 5.5 0 0 1 0 11H11"]);
+export const redo = /* @__PURE__ */ i("redo", ["m15 14 5-5-5-5", "M20 9H9.5a5.5 5.5 0 0 0 0 11H13"]);
 export const files = /* @__PURE__ */ i("files", ["M15 3H9a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z", "M15 3v5h5", "M4 7v12a2 2 0 0 0 2 2h9"]);
 
 // ---- status
