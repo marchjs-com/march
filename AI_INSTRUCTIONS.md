@@ -29,7 +29,7 @@ $items.peek()                            // read without tracking (explicit API 
 <input bind:value={$name} />            // bind:value | bind:checked | bind:group | bind:this
 <p>{$price | money("EUR")} · {$when | relative}</p>
 <Row {user} {onSave} />                 // = user={user} onSave={onSave}
-<div sx={{ p: 2, gap: 1, cols: 3 }} />  // token classes; literal objects only for build-time resolution
+<div sx={{ p: 2, gap: 1, cols: 3 }} />  // token classes; a literal resolves at build time, anything else via sxValue()
 ```
 
 - Event props: `onClick={fn}` or `on:click|prevent|stop={fn}`. Handlers are never wrapped; pass functions.
@@ -238,6 +238,10 @@ has its own error boundary (message + retry); the levels above stay interactive 
 back closes it, a direct visit or reload shows the full page. Page transitions animate only the outlet that changed. `createRouter({ redirects })`,
 `<Link preload="hover|visible|none">`, `beforeLeave(() => !dirty() || confirm(…))` (links, navigate, back/forward, tab close),
 `setMeta({ title, description })`, `queryParam("tab")` signal. `navigate()` is async.
+Instant navigation: the path (active links, breadcrumb) changes on the click; a page not here in 100 ms is replaced by
+its skeleton (route `skeleton`, else `<Router skeleton>`, else `loading`); after 150 ms a thin top bar (`.hm-nav-bar`)
+and a spinner on the clicked link show. A newer click aborts the older navigation: pass `navigationSignal()` to fetches
+a page starts. Give every app a `<Router skeleton>` shaped like its pages (no layout jump).
 
 ## 14b. Layers and portals
 

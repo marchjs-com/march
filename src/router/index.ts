@@ -28,7 +28,8 @@ export interface PageModule { default?: Component; component?: Component; guard?
 export interface RouteTarget { path: string; params: Record<string, string>; query: Record<string, string>; meta: Record<string, unknown>; route: CompiledRoute }
 export type GuardResult = boolean | string | void | undefined;
 export type Guard = (to: RouteTarget) => GuardResult | Promise<GuardResult>;
-export interface RouteDef { path: string; component?: Component; load?: Loader; layouts?: Loader[]; meta?: Record<string, unknown>; title?: string; preload?: boolean }
+export interface RouteDef { path: string; component?: Component; load?: Loader; layouts?: Loader[]; meta?: Record<string, unknown>; title?: string; preload?: boolean;
+  /** Shown at once (after 100 ms) while this page loads; else the Router's `skeleton`, else its `loading`. */ skeleton?: unknown }
 export type RouteTable = Record<string, Loader | Omit<RouteDef, "path">>;
 export interface CompiledRoute extends RouteDef { pattern: string; keys: string[]; re: RegExp; score: number }
 export interface Match { route: CompiledRoute; params: Record<string, string>; path: string; meta: Record<string, unknown> }
@@ -72,7 +73,7 @@ interface Level { key: string; comp: Component; to?: RouteTarget; page?: boolean
 interface View { to?: RouteTarget; levels: Level[]; error?: unknown }
 /** What a named outlet (or the modal outlet) shows. */
 export interface Slot { key: string; comp: Component; to: RouteTarget }
-export interface RouterState { loading?: Renderable; routes: CompiledRoute[]; mode: "history" | "hash"; base: string; opts: RouterOptions; cache: Map<string, Promise<PageModule | null>>; seq: number; view: Sig<View | null>; redirects: CompiledRoute[]; outlets: Map<string, CompiledRoute[]>; dispose: () => void }
+export interface RouterState { loading?: Renderable; skeleton?: Renderable; routes: CompiledRoute[]; mode: "history" | "hash"; base: string; opts: RouterOptions; cache: Map<string, Promise<PageModule | null>>; seq: number; view: Sig<View | null>; redirects: CompiledRoute[]; outlets: Map<string, CompiledRoute[]>; dispose: () => void }
 
 const S = {
   router: null as RouterState | null,
@@ -83,6 +84,10 @@ const S = {
   pending: sig(false),
   /** Depth of the outlet that is loading new content (-1: none). */
   pendingDepth: sig(-1),
+  /** A navigation has been loading for 150 ms: the progress bar and the clicked link's spinner show. */
+  slow: sig(false),
+  /** Aborted when a newer navigation starts (navigationSignal()). */
+  ctl: null as AbortController | null,
   /** Named outlets ("modal" included): name → what it shows. */
   slots: new Map<string, Sig<Slot | null>>(),
   /** The path the modal outlet shows (from history state), or null. */
@@ -121,6 +126,8 @@ export function queryParam(name: string, fallback = ""): (() => string) & { set(
 export const route = (): Match | null => S.match();
 /** True while a lazy page or guard is resolving. */
 export const navigating = (): boolean => S.pending();
+/** The current navigation's signal: aborted as soon as another navigation starts (pass it to fetches a page starts). */
+export const navigationSignal = (): AbortSignal | undefined => S.ctl?.signal;
 
 /** Compile "/users/:id/*rest" to a matcher. */
 export function compilePath(pattern: string): { pattern: string; keys: string[]; re: RegExp; score: number } {
@@ -215,12 +222,25 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
     return;
   }
   const seq = ++r.seq;
+  S.ctl?.abort();
+  S.ctl = new AbortController();
+  const prev = [S.path.peek(), S.search.peek(), S.hash.peek()] as const;
   // the first level that will change: everything above it stays mounted (and interactive) while this one loads
   const nextKeys = m ? [...(m.route.layouts ?? []).map((l) => `layout:${idOf(l)}`), pageKey(m.route, m.params)] : ["notfound"];
   const curLevels = view?.levels ?? [];
   let depth = 0;
   while (depth < nextKeys.length && curLevels[depth]?.key === nextKeys[depth]) depth++;
-  batch(() => { S.pending.set(true); S.pendingDepth.set(Math.min(depth, Math.max(curLevels.length - 1, 0))); });
+  batch(() => {
+    S.pending.set(true); S.pendingDepth.set(Math.min(depth, Math.max(curLevels.length - 1, 0)));
+    // instant: the URL state (active links, breadcrumb) changes on the click; if the page is not here in 100 ms its
+    // skeleton replaces the changing level (the layouts above stay); after 150 ms the progress bar shows
+    if (view) { S.path.set(p); S.search.set(search); S.hash.set(hash); }
+  });
+  const later = (ms: number, fn: () => void): void => { setTimeout(() => { if (seq === r.seq && S.pending.peek()) fn(); }, ms); };
+  if (view && m) {
+    later(100, () => r.view.set({ ...view, levels: [...curLevels.slice(0, depth), { key: "loading", comp: () => read(m.route.skeleton ?? r.skeleton ?? r.loading), page: true }] }));
+    later(150, () => S.slow.set(true));
+  }
   try {
     let page: View | null = null, mod: PageModule | null = null;
     const layoutLevels = (mods: (PageModule | null)[], to: RouteTarget): Level[] => (m?.route.layouts ?? []).map((l, i) => ({ key: `layout:${idOf(l)}`, comp: mods[i]?.default ?? mods[i]?.component ?? passThrough, to }));
@@ -244,7 +264,7 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
         if (typeof g !== "function") continue;
         const res = await g(to);
         if (seq !== r.seq) return;
-        if (res === false) { if (!initial && !pop) { batch(() => { S.pending.set(false); S.pendingDepth.set(-1); }); return; } page = { to, levels: [...layoutLevels(layouts, to), { key: "forbidden", comp: forbiddenComp, page: true, to }] }; break; }
+        if (res === false) { if (!initial && !pop) { batch(() => { S.pending.set(false); S.pendingDepth.set(-1); S.path.set(prev[0]); S.search.set(prev[1]); S.hash.set(prev[2]); r.view.set(view); }); return; } page = { to, levels: [...layoutLevels(layouts, to), { key: "forbidden", comp: forbiddenComp, page: true, to }] }; break; }
         if (typeof res === "string" && res !== p) { await navigate(res as Href, { replace: true }); return; }
       }
       const comp = mod?.default ?? mod?.component ?? m.route.component;
@@ -267,7 +287,7 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
     // the error shows at the level that failed; the layouts above it stay
     if (seq === r.seq) batch(() => { r.view.set({ error: e, levels: [...curLevels.slice(0, depth), { key: `error:${seq}`, comp: () => routeError(e, () => { void sync({ initial: true }); }), page: true }] }); S.pendingDepth.set(-1); });
   } finally {
-    if (seq === r.seq) S.pending.set(false);
+    if (seq === r.seq) batch(() => { S.pending.set(false); S.slow.set(false); });
   }
 }
 
@@ -477,13 +497,17 @@ function level(r: RouterState, ctx: OutletCtx, loading?: Renderable): Element {
 
 /**
  * Renders the outlet tree: the layouts of the current route (kept alive across navigations) and the page.
- * Props: `loading` (first load), `notFound`, `forbidden`, `wrap(page, to)` — a wrapper around every page.
+ * Props: `loading` (first load), `skeleton` (a page that is not here 100 ms after a click; a route's own `skeleton`
+ * wins), `notFound`, `forbidden`, `wrap(page, to)` — a wrapper around every page.
  */
-export function Router(props: { loading?: Renderable; fallback?: unknown; notFound?: Renderable; forbidden?: Renderable; wrap?: (page: () => unknown, to: RouteTarget) => unknown }): unknown {
+export function Router(props: { loading?: Renderable; skeleton?: Renderable; fallback?: unknown; notFound?: Renderable; forbidden?: Renderable; wrap?: (page: () => unknown, to: RouteTarget) => unknown }): unknown {
   const r = S.router;
   if (!r) throw new Error(NO_ROUTER);
   r.loading = props.loading;
-  return level(r, { depth: 0, wrap: props.wrap, notFound: props.notFound, forbidden: props.forbidden }, props.loading);
+  r.skeleton = props.skeleton;
+  // the thin progress bar of a navigation slower than 150 ms (router.css)
+  return [h("div", { class: "hm-nav-bar", "aria-hidden": "true", hidden: () => !S.slow() }),
+    level(r, { depth: 0, wrap: props.wrap, notFound: props.notFound, forbidden: props.forbidden }, props.loading)];
 }
 
 /**
@@ -529,6 +553,8 @@ export function Link(props: { href: Href | (() => Href); exact?: boolean; replac
     ...rest,
     href: () => (S.router?.mode === "hash" ? `#${href()}` : `${S.router?.base ?? ""}${href()}`),
     "aria-current": () => (active() ? "page" : null),
+    // the link being opened shows a spinner while the navigation is slow (router.css)
+    "aria-busy": () => (S.slow() && S.path() === href().split("?")[0] ? "true" : null),
     "class:active": active,
     ...(mode === "hover" ? { onPointerenter: pre, onFocus: pre } : {}),
     onClick: (e: MouseEvent) => {
@@ -560,5 +586,5 @@ export function _resetRouter(): void {
   S.router = null;
   leaveGuards.clear();
   moduleCache.clear();
-  batch(() => { S.path.set("/"); S.search.set(""); S.match.set(null); });
+  batch(() => { S.path.set("/"); S.search.set(""); S.match.set(null); S.slow.set(false); });
 }

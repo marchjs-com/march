@@ -143,6 +143,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     outs[b].imports = dedupe([...(outs[b].imports ?? []), ...(outs[t].imports ?? [])].filter((im) => im.path !== t && im.path !== b));
     outs[b].exports = [...bExp, ...alias.values()];
     outs[b].bytes = Buffer.byteLength(res.outputFiles[0].text);
+    outs[b].inputs = { ...(outs[b].inputs ?? {}), ...(outs[t].inputs ?? {}) }; // size reports still see what was folded in
     delete outs[t];
     return true;
   }

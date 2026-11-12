@@ -31,3 +31,7 @@ export function sx(obj: Sx | Record<string, unknown> | null | undefined): string
   }
   return out.join(" ");
 }
+/** What the compiler puts around a non-literal `sx={…}` (h() itself takes class strings only, so the resolver stays out
+ *  of apps that never use a dynamic sx): an object → classes, a function → its value's classes (the compiler already
+ *  wraps the prop reactively), a string as is. */
+export const sxValue = (v: unknown): string => (typeof v === "function" ? sxValue((v as () => unknown)()) : typeof v === "string" ? v : sx(v as Sx | null));

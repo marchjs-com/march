@@ -3,7 +3,6 @@
 // attribute position becomes a live binding: only that text node / attribute / region updates when its signals change.
 // Security: no HTML strings ever (no innerHTML), URL attributes are sanitized, <script> cannot be created, Trusted Types safe.
 import { effect, untrack, batch, getOwner, runWithOwner, reportError, isReactive, onCleanup, signal, DEV, useContext, createRoot, type Signal } from "../core/reactive.ts";
-import { sx as resolveSx } from "../core/sx.ts";
 
 /** Anything h() can render. Functions are live regions. */
 export type Child = Node | string | number | bigint | boolean | null | undefined | readonly Child[] | (() => unknown);
@@ -146,7 +145,8 @@ function setProp(el: MarchEl, tag: string, key: string, value: unknown): void {
   }
   if (key.startsWith("transition:")) return transition(el, key.slice(11), value);
   if (key === "class" || key === "className") return bindValue(value, (v) => setClass(el, v));
-  if (key === "sx") return bindValue(value, (v) => { el.__hmClass = typeof v === "string" ? v : resolveSx(v as Record<string, unknown>); setClass(el, el.__hmUser ?? ""); });
+  // sx: the compiler turns it into classes (a literal at build time, anything else through sxValue()); h() by hand: sx(obj)
+  if (key === "sx") return bindValue(value, (v) => { if (v != null && typeof v !== "string") throw new TypeError("March: sx needs the compiler or sx({...}) from hadi-march"); el.__hmClass = v ?? ""; setClass(el, el.__hmUser ?? ""); });
   if (key === "style") {
     if (typeof value === "string") throw new Error("March: string styles are not allowed (CSP). Use classes, sx, or a style object.");
     return bindValue(value, (v) => {

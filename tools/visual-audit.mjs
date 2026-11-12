@@ -140,7 +140,7 @@ for (const route of ROUTES) for (const w of WIDTHS) for (const [label, script] o
 {
   await send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
   await send("Page.navigate", { url: base + "/#/" }); await sleep(250); await send("Page.reload"); await sleep(1800);
-  const COUNT = "(() => ({ shells: document.querySelectorAll('.hm-app-shell, .hm-shell').length, h1: document.querySelectorAll('h1').length, roots: document.getElementById('app')?.children.length ?? 0 }))()";
+  const COUNT = "(() => ({ shells: document.querySelectorAll('.hm-app-shell, .hm-shell').length, h1: document.querySelectorAll('h1').length, roots: document.querySelectorAll('#app > :not(.hm-nav-bar)').length }))()";
   const verify = async (step) => {
     const c = await ev(COUNT);
     if (!c || c.shells !== 1 || c.h1 !== 1 || c.roots !== 1) findings.push({ route: step, w: 1440, state: "navigation", kind: "double-mount", at: "#app", detail: JSON.stringify(c) });

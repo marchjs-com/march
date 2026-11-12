@@ -11,8 +11,8 @@ import { importTs } from "./load-ts.js";
 // sx is shared with the runtime; importTs also works when March is installed under node_modules
 const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.meta.url));
 
-const H = { h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave" };
-const HELPER_SOURCE = { h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave" };
+const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave" };
+const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave" };
 const NO_WRAP = /^(on[A-Z]|on:|ref$|use:|bind:|key$)/;
 const ASSIGN_OPS = ["**=", "??=", "||=", "&&=", "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "|=", "^="];
 
@@ -537,7 +537,7 @@ class Transformer {
     } catch (e) {
       if (/sx /.test(e.message)) throw fail(this.src, at, e.message.replace(/^March: /, ""));
       this.pos = at;
-      return this.containerExpr(this.walk(at, () => false));
+      return `${this.helper("sx")}(${this.containerExpr(this.walk(at, () => false))})`;
     }
   }
 

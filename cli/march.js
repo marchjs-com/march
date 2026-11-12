@@ -125,9 +125,10 @@ async function build({ dev = false } = {}) {
       const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));
       printReport(rep);
       writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ entry: rep.rows[0], routes: rep.rows.filter((x) => x.kind === "route").map(({ name, key, js, css, limit, over, files }) => ({ name, key, js, css, limit, over, files })), parts: rep.rows.filter((x) => x.kind === "part" || x.kind === "layout").map(({ name, kind, js, css, limit, over, files }) => ({ name, kind, js, css, limit, over, files })), budget: rep.budget }, null, 2)}\n`);
+      if (flag("--analyze") === true) { console.log("  largest modules in the entry (minified, before gzip):"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, 40)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
       if (rep.over.length) {
         const msg = `over budget: ${rep.over.map(overText).join("; ")}`;
-        if (rep.over.some((x) => x.entry) || flag("--analyze") === true) { console.log("  largest modules in the entry (minified, before gzip) — move heavy ones behind import()/lazy():"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, flag("--analyze") === true ? 40 : 12)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
+        if (rep.over.some((x) => x.entry) && flag("--analyze") !== true) { console.log("  largest modules in the entry (minified, before gzip) — move heavy ones behind import()/lazy():"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, flag("--analyze") === true ? 40 : 12)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
         if (rep.budget?.fail) { console.error(`\x1b[31m✖\x1b[0m ${msg}`); process.exitCode = 1; } else console.warn(`\x1b[33m!\x1b[0m ${msg}`);
       }
     }

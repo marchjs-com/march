@@ -66,6 +66,8 @@ export async function mergeEntry(meta, { cwd, entryKey, esbuild, minify = true }
   }
   // the metafile now says: the entry imports nothing statically, the stubs import the entry
   outs[entryKey].imports = (outs[entryKey].imports ?? []).filter((im) => im.kind !== "import-statement");
+  // the entry now holds the chunks' modules (size reports attribute them to the entry; the stubs hold none)
+  for (const c of chunks) { outs[entryKey].inputs = { ...(outs[entryKey].inputs ?? {}), ...(outs[c].inputs ?? {}) }; outs[c].inputs = {}; }
   for (const c of chunks) outs[c].imports = [{ path: entryKey, kind: "import-statement" }];
   return chunks;
 }
