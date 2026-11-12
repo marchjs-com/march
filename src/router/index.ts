@@ -179,20 +179,23 @@ export function fillPath(pattern: string, values: Record<string, string | number
 }
 
 const compile = (r: RouteDef): CompiledRoute => ({ ...r, ...compilePath(r.path) });
+/** A route table (path → loader or definition, or a list) compiled, best score first. */
+const table = (t: RouteTable | RouteDef[]): CompiledRoute[] => (Array.isArray(t) ? t : Object.entries(t).map(([p, v]) => (typeof v === "function" ? { path: p, load: v } : { ...v, path: p }))).map(compile).sort((a, b) => b.score - a.score);
+/** The route matching a link's path (its query and hash dropped). */
+const matchTo = (r: RouterState, to: string): ReturnType<typeof matchRoute> => matchRoute(r.routes, String(to).split(/[?#]/)[0] ?? "/");
 
 /** Create the app router: routes (path → loader or { component, layouts, meta }), hash or history mode, outlets, title, guards. */
 export function createRouter(opts: RouterOptions): { navigate: typeof navigate; back: typeof back; routes: CompiledRoute[]; dispose: () => void } {
   // Object form: a function value is a LOADER (`() => import("./page.jsx")`); use { component } for a direct component.
   // one router per page: a second createRouter() (HMR, tests) replaces the first and drops its listeners
   S.router?.dispose();
-  const list: RouteDef[] = Array.isArray(opts.routes) ? opts.routes : Object.entries(opts.routes).map(([p, v]) => (typeof v === "function" ? { path: p, load: v } : { ...v, path: p }));
-  const routes = list.map(compile).sort((a, b) => b.score - a.score);
+  const routes = table(opts.routes);
   const redirects = Object.entries(opts.redirects ?? {}).map(([from, to]) => compile({ path: from, meta: { to } }));
   const base = resolveBase(opts.base);
   // history mode where the address cannot change (file://, a sandboxed iframe): hash addresses, same routes
   const fallback = (opts.mode ?? "history") === "history" && !historyUsable();
   const mode = fallback ? "hash" : opts.mode ?? "history";
-  const outlets = new Map(Object.entries(opts.outlets ?? {}).map(([name, tbl]) => [name, (Array.isArray(tbl) ? tbl : Object.entries(tbl).map(([p, v]) => (typeof v === "function" ? { path: p, load: v } : { ...v, path: p }))).map(compile).sort((a, b) => b.score - a.score)]));
+  const outlets = new Map(Object.entries(opts.outlets ?? {}).map(([name, tbl]) => [name, table(tbl)]));
   const r: RouterState = { routes, mode, base, fallback, opts, cache: new Map(), seq: 0, view: sig<View | null>(null), redirects, outlets, dispose: () => {} };
   S.router = r;
   if (mode === "history") restoreAddress(base);
@@ -264,6 +267,8 @@ export function hrefOf(to: string): string {
 }
 
 let lastUrl = "";
+/** The URL state (path, query, hash) in one batch. */
+const setLoc = (p: string, search: string, hash: string): void => batch(() => { S.path.set(p); S.search.set(search); S.hash.set(hash); });
 async function sync({ pop = false, initial = false }: { pop?: boolean; initial?: boolean } = {}): Promise<void> {
   const r = S.router;
   if (!r) return;
@@ -285,7 +290,7 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
   const cur = S.match.peek();
   const view = r.view.peek();
   if (!initial && m && cur && view?.levels.length && !view.error && cur.route === m.route && JSON.stringify(cur.params) === JSON.stringify(m.params)) {
-    batch(() => { S.path.set(p); S.search.set(search); S.hash.set(hash); });
+    setLoc(p, search, hash);
     lastUrl = globalThis.location?.href ?? "";
     return;
   }
@@ -302,7 +307,7 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
     S.pending.set(true); S.pendingDepth.set(Math.min(depth, Math.max(curLevels.length - 1, 0)));
     // instant: the URL state (active links, breadcrumb) changes on the click; if the page is not here in 100 ms its
     // skeleton replaces the changing level (the layouts above stay); after 150 ms the progress bar shows
-    if (view) { S.path.set(p); S.search.set(search); S.hash.set(hash); }
+    if (view) setLoc(p, search, hash);
   });
   const later = (ms: number, fn: () => void): void => { setTimeout(() => { if (seq === r.seq && S.pending.peek()) fn(); }, ms); };
   if (view && m) {
@@ -332,7 +337,7 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
         if (typeof g !== "function") continue;
         const res = await g(to);
         if (seq !== r.seq) return;
-        if (res === false) { if (!initial && !pop) { batch(() => { S.pending.set(false); S.pendingDepth.set(-1); S.path.set(prev[0]); S.search.set(prev[1]); S.hash.set(prev[2]); r.view.set(view); }); return; } page = { to, levels: [...layoutLevels(layouts, to), { key: "forbidden", comp: forbiddenComp, page: true, to }] }; break; }
+        if (res === false) { if (!initial && !pop) { batch(() => { S.pending.set(false); S.pendingDepth.set(-1); setLoc(...prev); r.view.set(view); }); return; } page = { to, levels: [...layoutLevels(layouts, to), { key: "forbidden", comp: forbiddenComp, page: true, to }] }; break; }
         if (typeof res === "string" && res !== p) { await navigate(res as Href, { replace: true }); return; }
       }
       const comp = mod?.default ?? mod?.component ?? m.route.component;
@@ -342,7 +347,7 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
       headHandler?.(to, mod?.head ?? m.route.head, title ?? undefined);
     } else headHandler?.(null, null, undefined);
     const apply = (): void => batch(() => {
-      S.path.set(p); S.search.set(search); S.hash.set(hash);
+      setLoc(p, search, hash);
       S.match.set(m ? { route: m.route, params: m.params, path: p, meta } : null);
       r.view.set(page ?? { levels: [{ key: "notfound", comp: notFoundComp, page: true }] });
       S.pendingDepth.set(-1);
@@ -395,7 +400,7 @@ function loadRoute(rt: CompiledRoute): Promise<PageModule | null> {
 export function prefetch(to: string): void {
   const r = S.router;
   if (!r || saveData()) return;
-  const m = matchRoute(r.routes, String(to).split(/[?#]/)[0] ?? "/");
+  const m = matchTo(r, to);
   if (!m || m.route.component) return;
   const loaders = [m.route.load, ...(m.route.layouts ?? [])].filter((l): l is Loader => !!l);
   const known = loaders.map((l) => preloadChunks(loaderKey(l)));
@@ -420,7 +425,7 @@ export function prefetchLinks(max = 6): void {
     const to = raw[0] === "#" ? (raw[1] === "/" ? raw.slice(1) : null) : raw && stripBase(new URL(raw, globalThis.location.href).pathname, r.base);
     if (!to || seen.has(to)) continue;
     seen.add(to);
-    const m = matchRoute(r.routes, to.split(/[?#]/)[0] ?? "/");
+    const m = matchTo(r, to);
     if (m && !m.route.component && m.path !== S.path.peek()) for (const l of [m.route.load, ...(m.route.layouts ?? [])]) if (l) preloadChunks(loaderKey(l), true);
   }
 }
@@ -429,7 +434,7 @@ export function prefetchLinks(max = 6): void {
 export function preload(to: string): Promise<void> {
   const r = S.router;
   if (!r) return Promise.resolve();
-  const m = matchRoute(r.routes, String(to).split(/[?#]/)[0] ?? "/");
+  const m = matchTo(r, to);
   if (!m) return Promise.resolve();
   return Promise.all([loadRoute(m.route), ...(m.route.layouts ?? []).map(loadModule)]).then(() => undefined, () => undefined);
 }
