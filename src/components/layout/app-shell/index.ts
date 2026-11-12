@@ -1,5 +1,6 @@
 // AppShell (hadi-march/ui): the application frame. Its own module so an app's entry does not pull in Page, tabs or
 // search (layout.ts) just to draw the frame.
+import "../../../ui/crumbs.css";
 import "./app-shell.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
