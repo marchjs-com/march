@@ -7,9 +7,15 @@
 .hm-marquee.is-running .hm-marquee-item { flex: none; overflow: visible; }
 .hm-marquee-sep { flex: none; padding-inline: 1em; opacity: .6; }
 
-/* fade the clipped end edge; both edges while scrolling (direction-aware: :dir(rtl) flips) */
-.hm-marquee-fade.is-overflow { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.5em), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 1.5em), transparent); }
-.hm-marquee-fade.is-overflow:dir(rtl) { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent); }
-.hm-marquee-fade.is-running { -webkit-mask-image: linear-gradient(to right, transparent, #000 1.5em, #000 calc(100% - 1.5em), transparent); mask-image: linear-gradient(to right, transparent, #000 1.5em, #000 calc(100% - 1.5em), transparent); }
-.hm-marquee-fade.is-running:dir(rtl) { -webkit-mask-image: linear-gradient(to left, transparent, #000 1.5em, #000 calc(100% - 1.5em), transparent); mask-image: linear-gradient(to left, transparent, #000 1.5em, #000 calc(100% - 1.5em), transparent); }
+/* Fade only where text is hidden. --hm-mq-fs / --hm-mq-fe are the start / end fade widths (logical: :dir(rtl) flips the
+   gradient). At rest an overflowing text fades at its end only; while it scrolls marquee.ts animates both properties with
+   the same timing as the text (registered below so they interpolate). Text that fits never fades. */
+@property --hm-mq-fs { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --hm-mq-fe { syntax: "<length>"; inherits: false; initial-value: 0px; }
+.hm-marquee-fade.is-overflow { --hm-mq-fe: var(--hm-marquee-fade, 14px);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--hm-mq-fs), #000 calc(100% - var(--hm-mq-fe)), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--hm-mq-fs), #000 calc(100% - var(--hm-mq-fe)), transparent 100%); }
+.hm-marquee-fade.is-overflow:dir(rtl) {
+  -webkit-mask-image: linear-gradient(to left, transparent 0, #000 var(--hm-mq-fs), #000 calc(100% - var(--hm-mq-fe)), transparent 100%);
+  mask-image: linear-gradient(to left, transparent 0, #000 var(--hm-mq-fs), #000 calc(100% - var(--hm-mq-fe)), transparent 100%); }
 @media (prefers-reduced-motion: reduce) { .hm-marquee-fade.is-overflow .hm-marquee-item { text-overflow: ellipsis; } }

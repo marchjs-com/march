@@ -72,10 +72,11 @@ export function OverflowText(props: OverflowTextProps): Element {
   const engaged = computed(() => (!!val(props.play) || triggers.has("always") || triggers.has("visible") || (triggers.has("hover") && hovered()) || (triggers.has("focus") && focused())) && visible());
   const wanted = computed(() => dist() > 0 && engaged() && !reducedMotion());
 
-  let anim: Anim | null = null, timer: ReturnType<typeof setTimeout> | null = null, copies: Element[] = [];
+  let anim: Anim | null = null, fadeAnim: Anim | null = null, timer: ReturnType<typeof setTimeout> | null = null, copies: Element[] = [];
   const stop = (): void => {
     if (timer) { clearTimeout(timer); timer = null; }
     anim?.cancel(); anim = null;
+    fadeAnim?.cancel(); fadeAnim = null;
     for (const c of copies) c.remove();
     copies = [];
     running.set(false);
@@ -87,6 +88,15 @@ export function OverflowText(props: OverflowTextProps): Element {
     const sign = rtl ? 1 : -1;
     const speed = Math.max(5, props.speed ?? 40), pause = Math.max(0, props.pause ?? 1000);
     running.set(true);
+    // The fade follows the text: only the side that hides text fades. Before moving only the end fades (the first letter is
+    // whole), while moving both, at the end of a bounce only the start (the last letter is whole). Two registered custom
+    // properties (marquee.css @property) carry the widths; this animation runs on the root with the same timing.
+    const F = "var(--hm-marquee-fade, 14px)";
+    const fadeFrames = (stops: Array<[number, boolean, boolean]>): Keyframe[] => stops.map(([offset, s, e]) => ({ offset, "--hm-mq-fs": s ? F : "0px", "--hm-mq-fe": e ? F : "0px" } as Keyframe));
+    const fade = (frames: Keyframe[], o: KeyframeAnimationOptions): void => {
+      const r = root as HTMLElement & { animate?: (k: Keyframe[], o: KeyframeAnimationOptions) => Anim };
+      if (props.fade !== false && typeof r.animate === "function") { try { fadeAnim = r.animate(frames, o); } catch { fadeAnim = null; } }
+    };
     if (mode === "loop") {
       const sep = h("span", { class: "hm-marquee-sep", "aria-hidden": "true" }, props.separator ?? "•");
       const copy = item.cloneNode(true) as HTMLElement;
@@ -101,6 +111,8 @@ export function OverflowText(props: OverflowTextProps): Element {
         { transform: "translateX(0)", offset: pause / total },
         { transform: `translateX(${sign * Math.abs(span)}px)`, offset: 1 },
       ], { duration: total, iterations: Infinity, easing: "linear" });
+      const p = pause / total, e = Math.min(0.03, (1 - p) / 4);
+      fade(fadeFrames([[0, false, true], [p, false, true], [Math.min(1, p + e), true, true], [1, true, true]]), { duration: total, iterations: Infinity });
       return;
     }
     const d = dist.peek(), travel = (d / speed) * 1000, total = 2 * travel + 2 * pause;
@@ -112,6 +124,9 @@ export function OverflowText(props: OverflowTextProps): Element {
       { transform: end, offset: (2 * pause + travel) / total, easing: "ease-in-out" },
       { transform: "translateX(0)", offset: 1 },
     ], { duration: total, iterations: mode === "once" ? 1 : Infinity, fill: "none" });
+    const a = pause / total, b = (pause + travel) / total, c = (2 * pause + travel) / total, e = Math.min(0.03, travel / total / 4);
+    fade(fadeFrames([[0, false, true], [a, false, true], [a + e, true, true], [b - e, true, true], [b, true, false], [c, true, false], [c + e, true, true], [1 - e, true, true], [1, false, true]]),
+      { duration: total, iterations: mode === "once" ? 1 : Infinity, fill: "none" });
     if (mode === "once") (anim as Anim & { onfinish?: () => void }).onfinish = () => { anim = null; running.set(false); };
   };
 
