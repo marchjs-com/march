@@ -48,6 +48,7 @@ export interface CrudOptions<R extends Row = Row> {
 /** `can` option of action(): left out when no permission check is given. */
 const canOpt = (can: PermCheck | undefined): { can?: PermCheck } => (can === undefined ? {} : { can });
 
+/** A full list + form screen from a schema and a data source: table, search, create, edit, delete, permissions. */
 export function crud<R extends Row = Row>(source: CrudSource<R>, opts: CrudOptions<R>): unknown {
   const key = opts.rowKey ?? "id";
   const base = opts.schema as Schema<Row>;

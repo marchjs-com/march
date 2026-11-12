@@ -11,6 +11,8 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const FORBIDDEN = [
   /kurucu/i, /\bfounders?\b/i, /tolgahan/i, /\bclaude\b/i, /\bdevs (oturum|session)/i, /isteğiyle/i, /\bfeat\/[a-z]/i,
   /ileride .{0,40}eklenecek/i, /will be added later/i, /\bparallel branch/i, /\bour team\b/i, /iç ekip/i,
+  // the product is a framework, not "a UI library"
+  /arayüz kitaplığı/i, /\bUI library\b/i,
 ];
 const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? (n === "node_modules" || n === "dist" || n === "internal" ? [] : walk(p)) : [p]; });
 const TEXT = /\.(ts|tsx|js|mjs|jsx|css|md|json|txt|html)$/;

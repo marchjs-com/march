@@ -63,6 +63,7 @@ export interface Channel<T> {
 
 /** A channel declaration for defineChannels(): `of<Payload>(options)`. */
 export interface Spec<T> { readonly options: ChannelOptions; readonly payload?: (x: T) => T }
+/** Declare one channel for defineChannels(): `of<Payload>(options)`. */
 export function of<T = void>(options: ChannelOptions = {}): Spec<T> { return { options }; }
 
 type PayloadOf<S> = S extends Spec<infer T> ? T : never;

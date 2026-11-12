@@ -17,6 +17,7 @@ export interface FrameMonitor {
   stop(): void;
 }
 
+/** Frame rate monitor: fps, dropped frames and long tasks as signals. */
 export function frameMonitor({ interval = 1000 / 60 }: { interval?: number } = {}): FrameMonitor {
   const fps = signal(0), drops = signal(0), longTasks = signal(0), longest = signal(0);
   let frames = 0, windowStart = -1, windowFrames = 0, last = -1, dropped = 0;

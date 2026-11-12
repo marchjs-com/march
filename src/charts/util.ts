@@ -40,6 +40,8 @@ export interface ChartBaseProps {
   height?: MaybeReactive<number | string | null | undefined> | undefined;
 }
 
+/** One decimal place (SVG coordinates). */
+export const f1 = (v: number): number => Math.round(v * 10) / 10;
 export const nextId = (p = "hm-chart"): string => uid(p);
 
 /** Data prop: array, signal, getter or any function returning an array. */

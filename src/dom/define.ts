@@ -8,6 +8,7 @@ import { render } from "./render.ts";
 export type DefineProps<K extends string> = { readonly [P in K]: string | null } & { host: HTMLElement };
 export interface DefineOptions<K extends string> { props?: readonly K[]; shadow?: boolean }
 
+/** Register a March component as a custom element (`<my-tag>`), with observed props and optional shadow DOM. */
 export function define<K extends string = never>(tag: string, Comp: Component<DefineProps<K>>, { props = [], shadow = false }: DefineOptions<K> = {}): CustomElementConstructor {
   if (!/^[a-z][a-z0-9]*-[a-z0-9-]+$/.test(tag)) throw new Error(`March: "${tag}" is not a valid custom element name.`);
   const existing = globalThis.customElements?.get(tag);

@@ -14,8 +14,8 @@ import { normalize, nativeFrames, Track, type Frames, type RawTrack } from "./tr
 import { driverFor, type Driver } from "./drivers.ts";
 import { getKeyframes, type KeyframesDef, type Timing } from "./keyframes.ts";
 import { isVisible, watchVisibility } from "./visibility.ts";
-import { clamp } from "../../core/util.ts";
 import { ours } from "./native.ts";
+import { clamp } from "../../core/util.ts";
 
 export type { Timing };
 export type Target = unknown;
@@ -192,6 +192,7 @@ onConfig((why) => {
 interface Item { at: number; node: Effect | Playback }
 type Label = number;
 
+/** A timeline of animations with labels, play, pause, seek, reverse and speed. */
 export class Playback {
   readonly items: Item[] = [];
   readonly labels = new Map<string, Label>();

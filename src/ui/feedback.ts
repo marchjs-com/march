@@ -88,5 +88,6 @@ export function Alert(props: AlertProps): () => unknown {
       props.dismissable && h("button", { type: "button", class: "hm-icon-btn hm-alert-x", "aria-label": () => t`Dismiss`, onClick: () => { shown.set(false); props.onDismiss?.(); } }, glyph(xIcon)));
   });
 }
+/** Alias of Alert. */
 export const Notice = Alert;
 const TONE_ICON: Record<string, typeof info> = { info, success: checkCircle, warn: alertTriangle, danger: alertCircle, neutral: info };

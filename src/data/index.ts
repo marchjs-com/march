@@ -249,3 +249,5 @@ export function clearCache(): void { cache.clear(); }
 
 export { access, can, role, hasRole, hasMethod, denied, signedIn, Can, Gate, setAccess } from "../access/index.ts";
 export type { AccessRegister, AccessState, AccessInput, Perm, PermCheck, Requirement, Denial } from "../access/index.ts";
+// components of the "data" category (src/components/data, generated barrel)
+export * from "../components/data/index.ts";

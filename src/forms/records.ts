@@ -76,6 +76,7 @@ export interface RecordListEditorProps extends ControlProps<Values[]> {
   cols?: number | undefined;
 }
 
+/** Edit a list of records with a schema: add, remove, reorder, validate each row. */
 export function RecordListEditor(props: RecordListEditorProps): unknown {
   const [get, set] = model<Values[]>(props, []);
   const list = () => get() ?? [];

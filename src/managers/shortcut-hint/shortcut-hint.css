@@ -1,0 +1,12 @@
+/* Shortcut hints (managers/shortcut-hint/ui.ts): badges over elements while the hold key is down, and the help list. */
+.hm-shortcut-badge {
+  position: fixed; pointer-events: none; transform: translateY(-50%);
+  padding-block: 1px; padding-inline: 6px; border-radius: var(--hm-radius-full, 999px);
+  background: var(--hm-inverse-bg, #111); color: var(--hm-inverse-text, #fff);
+  font: 600 var(--hm-text-2xs, .6875rem)/1.6 var(--hm-font-mono, monospace); white-space: nowrap;
+  box-shadow: 0 2px 6px rgb(0 0 0 / .25);
+}
+.hm-shortcut-help { display: grid; gap: var(--hm-space-4, 1rem); }
+.hm-shortcut-group h3 { margin: 0 0 var(--hm-space-2, .5rem); font-size: var(--hm-text-sm, .8125rem); color: var(--hm-muted); }
+.hm-shortcut-row { display: flex; align-items: center; justify-content: space-between; gap: var(--hm-space-3, .75rem); padding-block: 4px; border-block-end: 1px solid var(--hm-border-subtle); }
+.hm-shortcut-row[data-inactive] { opacity: .55; }

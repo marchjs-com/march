@@ -76,6 +76,7 @@ function hook(net: Net): void {
 }
 onInvalidate((prefix) => invalidateQueries(prefix));
 
+/** Base class for a typed API: one method per endpoint, cached queries and invalidation through net. */
 export class Api {
   /** Path prefix of every endpoint. */
   base = "";

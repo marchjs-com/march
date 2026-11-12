@@ -25,11 +25,12 @@ import { onVisible } from "../core/util.ts";
 // ------------------------------------------------------------------ types
 export type Component = (props: Record<string, unknown>) => unknown;
 type Loader = () => Promise<unknown>;
-export interface PageModule { default?: Component; component?: Component; guard?: Guard; title?: string | ((to: RouteTarget) => string); meta?: Record<string, unknown> }
+export interface PageModule { default?: Component; component?: Component; guard?: Guard; title?: string | ((to: RouteTarget) => string); meta?: Record<string, unknown>; head?: unknown }
 export interface RouteTarget { path: string; params: Record<string, string>; query: Record<string, string>; meta: Record<string, unknown>; route: CompiledRoute }
 export type GuardResult = boolean | string | void | undefined;
 export type Guard = (to: RouteTarget) => GuardResult | Promise<GuardResult>;
 export interface RouteDef { path: string; component?: Component; load?: Loader; layouts?: Loader[]; meta?: Record<string, unknown>; title?: string; preload?: boolean;
+  /** Head tags of this route (hadi-march/seo: title, description, og, jsonLd…); a page module's `head` export wins. */ head?: unknown;
   /** Shown at once (after 100 ms) while this page loads; else the Router's `skeleton`, else its `loading`. */ skeleton?: unknown }
 export type RouteTable = Record<string, Loader | Omit<RouteDef, "path">>;
 export interface CompiledRoute extends RouteDef { pattern: string; keys: string[]; re: RegExp; score: number }
@@ -104,6 +105,9 @@ const NO_ROUTER = "March: call createRouter() first";
 const leaveGuards = new Set<() => boolean | Promise<boolean>>();
 
 let navWrapper: ((apply: () => void, o: { pop: boolean }) => void | Promise<void>) | null = null;
+let headHandler: ((to: RouteTarget | null, head: unknown, title: string | undefined) => void) | null = null;
+/** Receive each route's head (hadi-march/seo installs it); `to` is null on "not found". */
+export function setHeadHandler(fn: typeof headHandler): void { headHandler = fn; }
 /** Wrap every page swap (hadi-march/motion uses it for View Transitions). */
 export function setNavigationWrapper(fn: typeof navWrapper): void { navWrapper = fn; }
 
@@ -144,6 +148,7 @@ export function compilePath(pattern: string): { pattern: string; keys: string[];
   return { pattern, keys, re: new RegExp(re), score };
 }
 
+/** Find the route that matches a path and its params (best score first). */
 export function matchRoute(routes: CompiledRoute[], p: string): { route: CompiledRoute; params: Record<string, string>; path: string } | null {
   for (const r of routes) {
     const m = r.re.exec(p);
@@ -161,6 +166,7 @@ export function fillPath(pattern: string, values: Record<string, string | number
 
 const compile = (r: RouteDef): CompiledRoute => ({ ...r, ...compilePath(r.path) });
 
+/** Create the app router: routes (path → loader or { component, layouts, meta }), hash or history mode, outlets, title, guards. */
 export function createRouter(opts: RouterOptions): { navigate: typeof navigate; back: typeof back; routes: CompiledRoute[]; dispose: () => void } {
   // Object form: a function value is a LOADER (`() => import("./page.jsx")`); use { component } for a direct component.
   // one router per page: a second createRouter() (HMR, tests) replaces the first and drops its listeners
@@ -272,7 +278,8 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
       page ??= { to, levels: [...layoutLevels(layouts, to), { key: pageKey(m.route, m.params), comp: comp ?? (() => null), page: true, to }] };
       const title = r.opts.title?.(to) ?? (typeof mod?.title === "function" ? mod.title(to) : mod?.title) ?? m.route.title;
       setMeta({ ...(title ? { title } : {}), ...(typeof meta["description"] === "string" ? { description: meta["description"] } : {}) });
-    }
+      headHandler?.(to, mod?.head ?? m.route.head, title ?? undefined);
+    } else headHandler?.(null, null, undefined);
     const apply = (): void => batch(() => {
       S.path.set(p); S.search.set(search); S.hash.set(hash);
       S.match.set(m ? { route: m.route, params: m.params, path: p, meta } : null);
@@ -297,6 +304,7 @@ let vtDepth = 0;
 const passThrough: Component = (p) => p["children"];
 const notFoundComp: Component = () => untrack(() => call(S.router?.opts.notFound ?? (() => h("p", { class: "hm-empty" }, () => t`Not found`))));
 const forbiddenComp: Component = () => h("p", { class: "hm-empty", role: "alert" }, () => t`Not allowed`);
+/** The default error view of a page that failed to load, with a retry button. */
 export function routeError(e: unknown, retry: () => void): Element {
   return h("div", { class: "hm-error hm-route-error", role: "alert" },
     h("p", {}, () => t`This page could not be loaded.`), h("p", { class: "hm-muted" }, String((e as { message?: unknown } | null)?.message ?? e)),
@@ -430,6 +438,7 @@ export async function navigate(to: Href, { replace = false, state = null, force 
   if (replace) globalThis.history.replaceState(st, "", url); else globalThis.history.pushState(st, "", url);
   return sync();
 }
+/** Go back one entry in history. */
 export const back = (): void => globalThis.history.back();
 
 /** Close the modal route: back in history when the modal was pushed, else go to the page behind it. */

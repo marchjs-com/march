@@ -143,6 +143,7 @@ export const cssVarDriver: Driver<CssVarTarget> = {
   native: (t, frames, timing) => (typeof t.el.animate === "function" ? (() => { const a = t.el.animate(frames, timing); a.pause(); return a; })() : null),
   element: (t) => t.el,
 };
+/** Animate CSS custom properties of an element (registered with @property so they interpolate). */
 export function cssVars(el: HTMLElement, vars: Record<string, string | { syntax: string; initial: string }> = {}): CssVarTarget {
   for (const [name, v] of Object.entries(vars)) {
     const syntax = typeof v === "string" ? v : v.syntax;

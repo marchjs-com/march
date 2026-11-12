@@ -55,6 +55,7 @@ export interface ConsentConfig {
   policyHref: string | null;
 }
 
+/** The default consent categories: necessary, preferences, analytics, marketing. */
 export const DEFAULT_CATEGORIES: CategoryInfo[] = [
   { id: "necessary", title: "Strictly necessary", description: "Needed for the site to work: sign-in, security, your consent choice. Always on.", required: true },
   { id: "preferences", title: "Preferences", description: "Remember settings such as language, theme and layout." },
@@ -235,7 +236,9 @@ export const consent: Consent = {
 };
 /** Global options: policy version, categories, storage, max age, policy link. */
 export const configureConsent = (config: Partial<ConsentConfig>): void => manager.configure(config);
+/** Shut the consent manager down; the next use starts it again. */
 export const disposeConsent = (): void => manager.dispose();
+/** The consent manager (get, configure, dispose). */
 export const consentManager = manager;
 
 // consent:category — show the element only while granted; consent:category={false} shows it only while refused.

@@ -1,6 +1,6 @@
 # HADI March
 
-**Run once, then march.** A small, fast UI library for TypeScript and JavaScript where components run a single time and
+**Run once, then march.** A small, fast framework for TypeScript and JavaScript where components run a single time and
 only the DOM that depends on a changed value updates — no virtual DOM, no re-renders, no runtime dependencies.
 
 ```tsx
@@ -75,6 +75,7 @@ Runtime names and your `src/components/*` are auto-imported. Without the compile
 | `hadi-march/store` | `subscribe`, `on(store, "users.*.name")`, `persist`, `history`, `readonly`, `snapshot`, `derive` |
 | `hadi-march/i18n` | ICU `format`, `loadLocale`, `dir`, `typed<Catalog>()`; `hadi-march/i18n/tr` Turkish pack |
 | `hadi-march/router` | file routes, `_layout` files, redirects, guards, `beforeLeave`, preload, `setMeta`, typed `Href` |
+| `hadi-march/seo` | route `head`, `useHead`, Open Graph / Twitter, JSON-LD (`ld.*`), prerender + `hydrate`, sitemap/robots, `march seo check` |
 | `hadi-march/data` | `query`, `mutation`, `invalidate`, `fetchJson`; `setAccess`, `can`, `<Can>`, `<Gate>` |
 | `hadi-march/schema` | `schema({...})`, `Infer<>`, validation, coercion, columns |
 | `hadi-march/ui` | Page, AppShell, NavMenu, CommandPalette, Dialog (`confirm`/`prompt`/`askReason`), Toast, Tabs, forms… |
@@ -185,4 +186,17 @@ helpers only decide what to show — your server must enforce permissions.
 
 ## License
 
-MIT
+MIT. The licence is unchanged and nothing below is required.
+
+### A small request
+
+If you made something with March, we would be glad if you added this line to your project or used the component:
+
+```tsx
+import { MadeWithMarch } from "hadi-march/ui";
+
+<MadeWithMarch />                      // Developed with HADI March and 💗
+<MadeWithMarch variant="badge" />      // or "small"
+```
+
+Prefer no visible text? `credit: true` in `march.config.js` only adds the comment `<!-- Built with HADI March -->` to the built `index.html`. The comment is off by default; with it on, production also prints one console line. `march dev` prints a banner once per page (`banner: false` turns it off); production bundles never contain it.

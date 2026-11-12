@@ -26,6 +26,7 @@ export function defineTransition(name: string, make: Maker): void {
   });
 }
 
+/** Register the extra `transition:` names (blur, fly and the WAAPI fade/slide/scale). */
 export function installTransitions(): void {
   for (const [name, make] of Object.entries(MAKERS)) defineTransition(name, make);
 }

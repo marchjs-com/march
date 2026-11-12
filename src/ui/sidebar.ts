@@ -16,7 +16,7 @@ import { OverflowText } from "./marquee.ts";
 import { compareText } from "../core/text.ts";
 import { registerPages } from "./registry.ts";
 import { key as hotkey, formatKey } from "./keys.ts";
-import { val, cx, uid, icon, glyph, load, save, on, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, uid, icon, glyph, load, save, on, arr, type MaybeFn, type ClassProp } from "./util.ts";
 import { menu } from "../icons/glyphs/menu.ts";
 import { search as searchIcon } from "../icons/glyphs/search.ts";
 import { chevronRight } from "../icons/glyphs/chevronRight.ts";
@@ -90,9 +90,9 @@ export interface NavSidebarProps {
 }
 
 interface Saved { open?: unknown; recent?: unknown; rail?: unknown; width?: unknown }
-const arr = <T>(x: unknown): T[] => (Array.isArray(x) ? x as T[] : []);
 const text = (x: MaybeFn<string | null | undefined> | undefined): string => String(val(x as MaybeFn<string>) ?? "");
 
+/** Side menu: groups, search, recent and featured items, collapsible rail, resizable width, remembered state. */
 export function NavSidebar(props: NavSidebarProps): Element {
   const storeKey = props.storageKey ?? "hm.sidebar";
   const saved = load<Saved | null>(storeKey, {}) ?? {};

@@ -68,7 +68,7 @@ test("min-chunks: start-up pieces (budget.boot) group only with each other, neve
       "dist/shell-a.js": out("src/shell-a.tsx", 3000, ["dist/shared.js"]),
       "dist/shell-b.js": out("src/shell-b.tsx", 2500, ["dist/shared.js"]),
       "dist/home.js": out("src/pages/home.tsx", 4000, ["dist/shared.js"]),
-      "dist/about.js": out("src/pages/about.tsx", 7000, ["dist/shared.js"]),
+      "dist/about.js": out("src/pages/about.tsx", 8000, ["dist/shared.js"]), // with home: over the limit plus the merge margin
       "dist/shared.js": { bytes: 30000, imports: [], inputs: {} },
     },
     inputs: { "src/main.tsx": { imports: ["src/shell-a.tsx", "src/shell-b.tsx", "src/pages/home.tsx", "src/pages/about.tsx"].map((p) => ({ path: p, kind: "dynamic-import", original: `./${p}` })) } },

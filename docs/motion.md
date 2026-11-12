@@ -46,6 +46,10 @@ and reduced-motion rules.
 - `test/motion-engine.test.js` measures a 200-item stagger (start < 50 ms, JS frame for 200 targets < 8 ms);
   `tools/motion-audit.mjs` checks the showcase in headless Edge (Stop all, global speed, 200-item stagger without long tasks).
 
+## Text animations
+
+`hadi-march/motion/text` adds 56 text animations on this engine (one export each, a shared split core of about
+1.5 KB gzip). See [src/motion/text/docs.md](../src/motion/text/docs.md).
 ## One engine for everything (inventory)
 
 Every moving thing in the library and the showcase is under the engine's control, so the global speed, "Stop all",
