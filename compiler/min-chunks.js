@@ -10,6 +10,8 @@ import { readFileSync, existsSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 
 const posix = (p) => p.split(sep).join("/");
+/** Route tables found by default: `march gen routes` output and a hand-written src/routes.* file. */
+export const ROUTE_TABLES = ["src/routes.gen.js", "src/routes.gen.ts", "src/routes.ts", "src/routes.tsx", "src/routes.js", "src/routes.jsx"];
 
 /**
  * The second-pass plan, merged into `prev` (plans accumulate over passes). Returns null when nothing new is planned.
@@ -18,15 +20,18 @@ const posix = (p) => p.split(sep).join("/");
  * each other — a page must never ride along at start-up — and their group is exempt from the minimum size.
  * `maxLoad` (march.config.js › budget.route, gzip bytes): two pages never share a group whose download (the group and
  * every chunk it reaches) would be over it — grouping must not push a route past its budget.
- * @param {{ cwd: string, entryKey: string, minSize: number, allow?: Record<string, string>, boot?: string[], prev?: Plan | null, maxLoad?: number }} o
+ * `tables` (march.config.js › chunks.routeTables): source files whose lazy imports are pages (the route table). Like the
+ * entry's, those pages join page groups; they are never folded into the table (a start-up chunk would grow per page).
+ * @param {{ cwd: string, entryKey: string, minSize: number, allow?: Record<string, string>, boot?: string[], prev?: Plan | null, maxLoad?: number, tables?: string[] }} o
  * @typedef {{ inline: Record<string, { spec: string, mode: "static" | "group", group?: string, name?: string }[]>, groups: Record<string, { abs: string, name: string, key: string }[]>, boot?: string[] }} Plan
  */
-export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot = [], prev = null, maxLoad }) {
+export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot = [], prev = null, maxLoad, tables = ROUTE_TABLES }) {
   const outs = meta.outputs;
   const plan = prev ? { inline: structuredClone(prev.inline), groups: structuredClone(prev.groups), boot: [...(prev.boot ?? [])] } : { inline: {}, groups: {}, boot: [] };
   const bootSet = new Set(boot.map(posix));
   const isBoot = (c) => c.keys.some((k) => bootSet.has(k));
   const bootOut = (k) => { const ep = posix(outs[k]?.entryPoint ?? ""); return bootSet.has(ep) || (ep.startsWith("march-group:") && plan.boot.includes(ep.slice(12))); };
+  const routeTables = new Set(tables.map(posix));
   const outOf = (input) => Object.keys(outs).find((k) => k.endsWith(".js") && outs[k].inputs?.[input]);
   let added = 0;
   const pending = [];
@@ -37,41 +42,56 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
         if (im.kind !== "dynamic-import" || im.path !== o.entryPoint) continue;
         const from = outOf(inp);
         if (!from) continue;
-        // a start-up piece (the route table, the shell) loads pages the way the entry does: never fold them into it
-        if (process.env.MARCH_PLAN_DEBUG) console.log("PEND", inp, "->", o.entryPoint, "from", from, outs[from]?.entryPoint, bootOut(from));
-        pending.push({ importer: resolve(cwd, inp), spec: im.original ?? im.path, target: o.entryPoint, toEntry: from === entryKey || bootOut(from) });
+        // a route table (its lazy imports are pages) loads them the way the entry does: pages group, never fold into it
+        const table = routeTables.has(posix(inp));
+        pending.push({ importer: resolve(cwd, inp), spec: im.original ?? im.path, target: o.entryPoint, toEntry: from === entryKey || table, table });
       }
     }
+  }
+  const imports = new Map(Object.entries(outs).map(([k, o]) => [k, (o.imports ?? []).filter((im) => im.kind === "import-statement" && outs[im.path]).map((im) => im.path)]));
+  const closure = (k) => { const c = new Set([k]); const st = [k]; while (st.length) for (const d of imports.get(st.pop()) ?? []) if (!c.has(d)) { c.add(d); st.push(d); } c.delete(entryKey); return c; };
+  const outByEntry = new Map(Object.entries(outs).filter(([, o]) => o.entryPoint).map(([k, o]) => [posix(o.entryPoint), k]));
+  const bytes = (k) => outs[k]?.bytes ?? 0;
+  // gzip size of each output on disk (what the route budget counts)
+  const gzCache = new Map();
+  const gz = (k) => { if (!gzCache.has(k)) { const f = resolve(cwd, k); gzCache.set(k, existsSync(f) ? gzipSync(readFileSync(f)).length : 0); } return gzCache.get(k); };
+  // what start-up already downloaded (the boot pieces and what they reach) is not part of a route's cost
+  const bootReach = new Set(Object.keys(outs).filter((k) => k.endsWith(".js") && bootOut(k)).flatMap((k) => [...closure(k)]));
+  const cost = (reach) => { let n = 0; for (const k of reach) if (k.endsWith(".js") && !bootReach.has(k)) n += gz(k); return n; };
+  const load = (x, y) => cost(new Set([...x.reach, ...y.reach]));
+  // estimates come from the previous layout; a group built from them may still cost more once built: such a group is
+  // taken apart (its members are planned again next pass) and its members' estimates are scaled by what it really cost
+  plan.tight = { ...(prev?.tight ?? {}) };
+  const tightOf = (x, y) => Math.max(1, ...[...x.keys, ...y.keys].map((k) => plan.tight[k] ?? 1));
+  const fits = (x, y) => !maxLoad || load(x, y) * tightOf(x, y) <= maxLoad;
+  if (maxLoad) for (const [name, ms] of Object.entries(plan.groups)) {
+    const k = outByEntry.get(`march-group:${name}`);
+    if (plan.boot.includes(name) || !k) continue;
+    const real = cost(closure(k));
+    if (real <= maxLoad) continue;
+    delete plan.groups[name];
+    for (const [imp, list] of Object.entries(plan.inline)) plan.inline[imp] = list.filter((x) => x.group !== name);
+    for (const m of ms) plan.tight[m.key] = Math.max(plan.tight[m.key] ?? 1, (real / maxLoad) * 1.05);
+    added++;
   }
   // the entry's small lazy modules join group chunks: clusters of the modules that share the most code, merged pairwise
   // only until each is over the limit (and never past maxGroup), so related pages and shell pieces load together
   const toEntry = pending.filter((p) => p.toEntry);
   const known = new Map(Object.values(plan.groups).flat().map((m) => [m.key, m]));
   const fresh = [...new Map(toEntry.filter((p) => !known.has(posix(p.target))).map((p) => [posix(p.target), p])).values()];
+  let g = Math.max(-1, ...Object.keys(plan.groups).map((n) => Number(n.slice(1)) || 0)) + 1;
   if (fresh.length) {
-    const imports = new Map(Object.entries(outs).map(([k, o]) => [k, (o.imports ?? []).filter((im) => im.kind === "import-statement" && outs[im.path]).map((im) => im.path)]));
-    const closure = (k) => { const c = new Set([k]); const st = [k]; while (st.length) for (const d of imports.get(st.pop()) ?? []) if (!c.has(d)) { c.add(d); st.push(d); } c.delete(entryKey); return c; };
-    const outByEntry = new Map(Object.entries(outs).filter(([, o]) => o.entryPoint).map(([k, o]) => [posix(o.entryPoint), k]));
-    const bytes = (k) => outs[k]?.bytes ?? 0;
     let clusters = fresh.map((p) => { const k = outByEntry.get(posix(p.target)); return { keys: [posix(p.target)], size: bytes(k), reach: closure(k) }; });
     // shared share of the merged reach, and the merged reach in bytes (what loading any member of the group costs)
     const affinity = (x, y) => { let both = 0, any = 0; for (const k of new Set([...x.reach, ...y.reach])) { const w = bytes(k); any += w; if (x.reach.has(k) && y.reach.has(k)) both += w; } return [any ? both / any : 0, any]; };
     const maxGroup = minSize * 4;
-    // a merged group comes out smaller than the sum of its members (each chunk's own import / export glue goes), so a
-    // group counts as big enough only with a margin; a single module is measured as it is
-    const big = (c) => c.size >= (c.keys.length > 1 ? minSize * 1.15 : minSize);
-    // gzip size of each output on disk (what the route budget counts); a group costs at most the sum of its parts
-    const gzCache = new Map();
-    const gz = (k) => { if (!gzCache.has(k)) { const f = resolve(cwd, k); gzCache.set(k, existsSync(f) ? gzipSync(readFileSync(f)).length : 0); } return gzCache.get(k); };
-    // what start-up already downloaded (the boot pieces and what they reach) is not part of a route's cost
-    const bootReach = new Set(Object.keys(outs).filter((k) => k.endsWith(".js") && bootOut(k)).flatMap((k) => [...closure(k)]));
-    const load = (x, y) => { let n = 0; for (const k of new Set([...x.reach, ...y.reach])) if (k.endsWith(".js") && !bootReach.has(k)) n += gz(k); return n; };
     for (;;) {
       let best = null, score = -Infinity;
       for (let i = 0; i < clusters.length; i++) for (let j = i + 1; j < clusters.length; j++) {
         const x = clusters[i], y = clusters[j];
-        if ((big(x) && big(y)) || x.size + y.size > maxGroup || isBoot(x) !== isBoot(y)) continue;
-        if (maxLoad && !isBoot(x) && load(x, y) > maxLoad) continue;
+        if ((x.size >= minSize && y.size >= minSize) || x.size + y.size > maxGroup || isBoot(x) !== isBoot(y)) continue;
+        // a group never pushes a route past its budget (start-up pieces have their own row)
+        if (!isBoot(x) && !fits(x, y)) continue;
         // penalise the load cost, not only the group's own size: a dependency-free module (translations) must not
         // join a page that pulls 30 KB of shared code when a lighter partner exists
         const [aff, union] = affinity(x, y);
@@ -82,7 +102,29 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
       const [i, j] = best, x = clusters[i], y = clusters[j];
       clusters = clusters.filter((_, n) => n !== i && n !== j).concat({ keys: [...x.keys, ...y.keys], size: x.size + y.size, reach: new Set([...x.reach, ...y.reach]) });
     }
-    let g = Object.keys(plan.groups).length;
+    // a page of a route table still alone and small joins, within the route budget, the cluster or the existing group it
+    // costs least to load with; with none it stays a file of its own (reported under chunks.minSize), never in the table
+    const tableKeys = new Set(fresh.filter((p) => p.table).map((p) => posix(p.target)));
+    const built = Object.entries(plan.groups).filter(([name]) => !plan.boot.includes(name) && outByEntry.has(`march-group:${name}`))
+      .map(([name, ms]) => { const k = outByEntry.get(`march-group:${name}`); return { name, keys: ms.map((m) => m.key), size: bytes(k), reach: closure(k) }; });
+    for (let i = 0; i < clusters.length; i++) {
+      const x = clusters[i];
+      if (x.size >= minSize || isBoot(x) || !x.keys.some((k) => tableKeys.has(k))) continue;
+      const all = [...clusters.filter((y, j) => j !== i && !isBoot(y)), ...built];
+      const y = all.filter((c) => fits(x, c)).sort((a, b) => load(x, a) - load(x, b))[0];
+      // nothing to join at all (a small app): the usual rule below; partners only over budget: a file of its own
+      if (!y) { x.lone = all.length > 0; continue; }
+      clusters.splice(i, 1);
+      i = -1;
+      if (y.name) {
+        // into a group that is already built: it gains a member
+        for (const key of x.keys) { const m = { abs: resolve(cwd, key), name: `n${plan.groups[y.name].length}`, key, group: y.name }; plan.groups[y.name].push(m); known.set(key, m); }
+        y.keys.push(...x.keys); y.size += x.size; for (const r of x.reach) y.reach.add(r);
+      } else {
+        const j = clusters.indexOf(y);
+        clusters[j] = { keys: [...y.keys, ...x.keys], size: x.size + y.size, reach: new Set([...x.reach, ...y.reach]) };
+      }
+    }
     for (const c of clusters) {
       // start-up pieces: one group of their own whatever its size (a lone piece stays as it is)
       if (isBoot(c)) {
@@ -94,7 +136,8 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
         continue;
       }
       // still under the limit with everything it could join (a small app): into the entry; alone: a group gains nothing
-      if (!big(c)) { for (const key of c.keys) known.set(key, { key, static: true }); continue; }
+      if (c.lone) continue;
+      if (c.size < minSize) { for (const key of c.keys) known.set(key, { key, static: true }); continue; }
       if (c.keys.length < 2) continue;
       const name = `g${g++}`;
       plan.groups[name] = c.keys.map((key, n) => ({ abs: resolve(cwd, key), name: `n${n}`, key, group: name }));

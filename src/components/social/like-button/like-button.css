@@ -1,0 +1,23 @@
+/* HADI March — LikeButton + heartBurst. The liked color is the local accent (data-hm-color, default brand-pink). */
+.hm-like { display: inline-flex; align-items: center; gap: .375rem; min-height: 2.25rem; padding: 0 .5rem; margin: 0; border: 0; border-radius: var(--hm-radius-full);
+  background: none; color: var(--hm-text-2); font: inherit; font-size: var(--hm-text-sm); font-weight: 800; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease); }
+.hm-like:hover { background: color-mix(in srgb, var(--hm-accent) 9%, transparent); color: var(--hm-text); }
+.hm-like:focus-visible { outline: 2px solid var(--hm-accent); outline-offset: 2px; }
+.hm-like.is-liked, .hm-like.is-liked:hover { color: var(--hm-accent-text); }
+.hm-like-hit { position: relative; display: inline-grid; place-items: center; }
+.hm-like-heart { display: inline-grid; place-items: center; transform-origin: 50% 60%; }
+.hm-like-heart .hm-svg { width: 1.5rem; height: 1.5rem; fill: transparent; transition: fill var(--hm-dur) var(--hm-ease), stroke var(--hm-dur) var(--hm-ease); }
+.hm-like.is-liked .hm-like-heart .hm-svg { fill: var(--hm-accent); stroke: var(--hm-accent); }
+.hm-like-sm { min-height: 1.75rem; padding: 0 .375rem; font-size: var(--hm-text-xs); gap: .25rem; }
+.hm-like-sm .hm-like-heart .hm-svg { width: 1.0625rem; height: 1.0625rem; }
+.hm-like-lg { min-height: 2.75rem; padding: 0 .75rem; font-size: var(--hm-text-lg); }
+.hm-like-lg .hm-like-heart .hm-svg { width: 1.875rem; height: 1.875rem; }
+.hm-like-count { min-width: 1ch; }
+/* burst: a zero-size layer at the host's center; dots and a ring fly out (motion engine) */
+.hm-burst { position: absolute; inset-inline-start: 50%; inset-block-start: 50%; width: 0; height: 0; pointer-events: none; z-index: 1; }
+.hm-burst-ring { position: absolute; inset-inline-start: -1.1em; inset-block-start: -1.1em; width: 2.2em; height: 2.2em; box-sizing: border-box; border-radius: 50%; border: 3px solid var(--hm-accent); opacity: 0; }
+.hm-burst-dot { position: absolute; inset-inline-start: -3.5px; inset-block-start: -3.5px; width: 7px; height: 7px; border-radius: 50%; background: var(--hm-accent); opacity: 0; }
+.hm-burst-sm { width: 5px; height: 5px; inset-inline-start: -2.5px; inset-block-start: -2.5px; }
+.hm-burst-c1 { background: var(--hm-brand-orange, var(--hm-cat-1)); } .hm-burst-c2 { background: var(--hm-brand-blue, var(--hm-cat-2)); }
+.hm-burst-c3 { background: var(--hm-brand-green, var(--hm-cat-3)); } .hm-burst-c4 { background: var(--hm-brand-purple, var(--hm-cat-4)); }

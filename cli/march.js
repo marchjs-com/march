@@ -139,7 +139,7 @@ async function build({ dev = false } = {}) {
     const minSize = cfg.chunks === false ? 0 : cfg.chunks?.minSize ?? cfg.packChunks?.minSize ?? 10240;
     const allow = (cfg.chunks && cfg.chunks.allow) || {};
     let plan = null, r;
-    for (let pass = 0; pass < 4; pass++) {
+    for (let pass = 0; pass < 6; pass++) {
       if (pass) rmSync(resolve(out, "assets"), { recursive: true, force: true });
       r = await esbuild.build(buildOptions(cfg, esbuild, { dev, plan }));
       // production: the entry and its static chunks become one file (fewer requests, better compression)
@@ -151,7 +151,7 @@ async function build({ dev = false } = {}) {
       await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
       // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
       if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: minSize || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan) });
-      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined }) : null;
+      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
       if (process.env.MARCH_PLAN_DEBUG) console.log("PLAN", JSON.stringify(next && { groups: Object.fromEntries(Object.entries(next.groups).map(([g, ms]) => [g, ms.map((m) => m.key)])), boot: next.boot, inline: Object.fromEntries(Object.entries(next.inline).map(([k, v]) => [k.slice(-40), v.map((x) => x.spec + ":" + x.mode + (x.group ?? ""))])) }));
       if (!next) break;
       plan = next;

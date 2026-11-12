@@ -1,5 +1,5 @@
 // Barrel → direct imports. `import { NavSidebar, toast } from "hadi-march/ui"` becomes
-//   import { NavSidebar } from "<march>/src/ui/sidebar.ts"; import { toast } from "<march>/src/ui/toast.ts";
+//   import { NavSidebar } from "<march>/src/components/composite/nav-sidebar/index.ts"; import { toast } from "<march>/src/ui/toast.ts";
 // Tree shaking drops unused exports either way, but code splitting decides chunks by which FILES an entry reaches:
 // through a barrel the entry "reaches" every module (forms, editors, date pickers…) and esbuild puts the ones pages
 // share with it into a chunk the entry must load. Direct imports keep the entry to what it really uses.

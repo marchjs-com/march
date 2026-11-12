@@ -184,6 +184,9 @@ function create(cfg: PermissionConfig): Permissions {
 const manager = defineManager<Permissions, PermissionConfig>("permission", create, DEFAULTS);
 /** The permission manager (created on first call). */
 export const permissions = (): Permissions => manager.get();
+/** Set the permission manager's options (merged into the current config). */
 export const configurePermissions = (config: Partial<PermissionConfig>): void => manager.configure(config);
+/** Stop the permission manager and remove its listeners; the next call starts it again. */
 export const disposePermissions = (): void => manager.dispose();
+/** The permission manager (get, configure, dispose). */
 export const permissionManager = manager;

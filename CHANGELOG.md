@@ -14,6 +14,13 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
   (accessible hidden copy + aria-hidden parts, grapheme clusters, RTL, joining scripts by word) and a stagger runner.
 - Everything plays on the motion engine (global speed, pause all, reduced motion). The core is about 1.5 KB gzip, each
   animation 25–520 B more (`bench/text-size.js`, budget test). Catalog: `hadi-march/motion/text/meta`.
+### Chunks and budgets (later in 0.1.0)
+- Route tables (`src/routes.ts`, `src/routes.gen.js`, `chunks.routeTables`): their lazy imports are pages; they group
+  like the entry's own and are never folded into the table, so a start-up route table does not grow with pages.
+- Page groups respect `budget.route`: a merge whose download would be over it is not made, and a built group that is
+  over it is taken apart and planned again; a small page left alone joins the cheapest group within budget.
+- Showcase: the route table and the page list left the entry (start-up chunk with the shell pieces); entry 15.3 → 14.3 KB.
+
 ### SEO (later in 0.1.0)
 - `hadi-march/seo`: `installSeo({ site, titleTemplate, defaults })`, route / page `head`, reactive `useHead()`, Open
   Graph and Twitter cards, automatic canonical (history routing), `noindex` on not-found, JSON-LD builders (`ld.*`).

@@ -16,7 +16,12 @@ import { DRIVER, type Driver } from "./engine/drivers.ts";
 import { defaultTiming, pausedNow, rateScale } from "./engine/config.ts";
 import { reducedNow } from "./engine/prefs.ts";
 
-export type PageTransitionType = "fade" | "slide" | "scale" | "none";
+export type PageTransitionType = "fade" | "slide" | "scale" | "none" | (string & {});
+/** Keyframes of one side of a named transition (see definePageTransition). */
+export type PageTransitionFrames = (side: "in" | "out", dir: Dir, rtl: boolean, distance: number) => Keyframe[];
+const EXTRA = new Map<string, PageTransitionFrames>();
+/** Add a transition type usable as `meta.transition` (e.g. the variants in hadi-march/motion page-fx). */
+export function definePageTransition(name: string, frames: PageTransitionFrames): void { EXTRA.set(name, frames); }
 /** A route's `meta.transition`: a type, or a type with its own timing. */
 export interface PageTransitionSpec { type?: PageTransitionType; duration?: number; easing?: string; distance?: number }
 export interface PageTransitionOptions extends PageTransitionSpec {
@@ -31,6 +36,8 @@ type Dir = "forward" | "back";
 export function transitionFrames(type: PageTransitionType, side: "in" | "out", dir: Dir, rtl = false, distance = 32): Keyframe[] {
   const back = dir === "back";
   if (type === "none") return [];
+  const extra = EXTRA.get(type);
+  if (extra) return extra(side, dir, rtl, distance);
   if (type === "fade") return side === "in" ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 1 }, { opacity: 0 }];
   if (type === "scale") {
     const s = side === "in" ? (back ? 0.96 : 1.04) : (back ? 1.04 : 0.96);
@@ -53,7 +60,7 @@ export function resolveTransition(base: PageTransitionSpec, to: TransitionSide |
   const pick = (side: TransitionSide | null | undefined): PageTransitionSpec | null => {
     let v = side?.meta?.["transition"];
     if (typeof v === "function") v = (v as (p: Record<string, string>) => unknown)(side?.params ?? {});
-    if (typeof v === "string" && TYPES.has(v)) return { type: v as PageTransitionType };
+    if (typeof v === "string" && (TYPES.has(v) || EXTRA.has(v))) return { type: v as PageTransitionType };
     if (v === false) return { type: "none" };
     return v && typeof v === "object" ? (v as PageTransitionSpec) : null;
   };

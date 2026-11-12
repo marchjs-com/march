@@ -10,7 +10,7 @@
 @import "../ui/grid.css";
 @import "../ui/layout.css";
 @import "../ui/nav.css";
-@import "../ui/sidebar.css";
+@import "../components/composite/nav-sidebar/nav-sidebar.css";
 @import "../ui/palette.css";
 @import "../ui/theme.css";
 @import "../ui/accent.css";

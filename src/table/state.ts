@@ -10,6 +10,7 @@ import { fold, prop, valueOf, optionsOf, isEmptyFilter, matchFilter, describeFil
 import type { Column, ColumnInput, TableColumn, FilterOption, Pin, Row, SortDir, SortSpec } from "./filters.ts";
 import { toCSV, toJSON, download, type CSVOptions, type JSONOptions } from "./export.ts";
 import { clamp, uid, load, save, debounce } from "../core/util.ts";
+import { createSelection } from "../core/selection.ts";
 
 type MaybeFn<T> = T | (() => T);
 const val = <T>(v: MaybeFn<T>): T => (typeof v === "function" ? (v as () => T)() : v);
@@ -334,8 +335,9 @@ export function createTable<R = Row>(o: TableOptions<R> = {}): TableState<R> {
 
   // ------------------------------------------------------------------ selection / expansion / edit
   const selected = signal(new Map<unknown, R>());
+  // the shared collection model (core/selection.ts) works on this table's own `selected` store
+  const picker = createSelection<unknown, R>({ items: () => rows(), keyOf: idOf, store: selected });
   const allMatching = signal(false);
-  let anchor: unknown;
   const expanded = signal(new Set<unknown>());
   const editing = signal<EditState<R> | null>(null);
   const loadingProp = (): boolean => !!val(o.loading);
@@ -428,14 +430,8 @@ export function createTable<R = Row>(o: TableOptions<R> = {}): TableState<R> {
     selectedRows: () => [...selected().values()],
     selectedCount: () => (allMatching() && server ? total() ?? selected().size : selected().size),
     toggle(row, { range = false, on } = {}) {
-      const rid = idOf(row), cur = untrack(selected), next = new Map(cur);
-      const want = on ?? !cur.has(rid);
-      const list = untrack(rows);
-      const a = range && anchor !== undefined ? list.findIndex((r) => idOf(r) === anchor) : -1, b = list.findIndex((r) => idOf(r) === rid);
-      const span = a >= 0 && b >= 0 ? list.slice(Math.min(a, b), Math.max(a, b) + 1) : [row];
-      for (const r of span) want ? next.set(idOf(r), r) : next.delete(idOf(r));
-      anchor = rid;
-      batch(() => { selected.set(next); if (!want) allMatching.set(false); });
+      const want = on ?? !untrack(selected).has(idOf(row));
+      batch(() => { if (range) picker.range(row, true, want, true); else picker.toggle(row, want); if (!want) allMatching.set(false); });
     },
     pageSelection: () => { const rs = rows(), sel = selected(); const n = rs.filter((r) => sel.has(idOf(r))).length; return n === 0 ? "none" : n === rs.length ? "all" : "some"; },
     selectPage(on = true) {
@@ -448,7 +444,7 @@ export function createTable<R = Row>(o: TableOptions<R> = {}): TableState<R> {
       for (const r of untrack(table.filteredRows)) next.set(idOf(r), r);
       batch(() => { selected.set(next); allMatching.set(true); });
     },
-    clearSelection: () => batch(() => { selected.set(new Map()); allMatching.set(false); anchor = undefined; }),
+    clearSelection: () => batch(() => { picker.clear(); allMatching.set(false); }),
     async runBulk(a) {
       const list = untrack(table.selectedRows);
       let ran = typeof a.busy !== "function";

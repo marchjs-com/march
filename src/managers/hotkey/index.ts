@@ -197,8 +197,11 @@ export const hotkeys: Hotkeys = {
   trigger: (c) => untrack(() => manager.get()).trigger(c),
   dispose: () => manager.dispose(),
 };
+/** Set the hotkey manager's options (merged into the current config). */
 export const configureHotkeys = (config: Partial<HotkeyConfig>): void => manager.configure(config);
+/** Stop the hotkey manager and remove its listeners; the next call starts it again. */
 export const disposeHotkeys = (): void => manager.dispose();
+/** The hotkey manager (get, configure, dispose). */
 export const hotkeyManager = manager;
 /** "g h" / "mod+k" → "G H" / "Ctrl+K" (or ⌘K). */
 export const hotkeyLabel = label;

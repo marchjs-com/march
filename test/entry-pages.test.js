@@ -1,17 +1,73 @@
-// Adding a page must not grow the entry: the route table and the page list are a start-up chunk (budget.boot), never
-// part of main.js. Checked twice: on the showcase's own import graph, and by building a small app with 3 and with 12
-// pages of their own chunk each (the entry must come out the same size).
+// The entry must not grow with the number of pages: the route table (paths, titles, loaders) is a start-up chunk of
+// its own, and pages loaded from it are grouped like the entry's own lazy imports, never folded into the table.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, readdirSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync, existsSync } from "node:fs";
 import { join, dirname, resolve, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { gzipSync } from "node:zlib";
 
+const CLI = fileURLToPath(new URL("../cli/march.js", import.meta.url));
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
-const CLI = join(ROOT, "cli/march.js");
 const SHOWCASE = join(ROOT, "examples/showcase/src");
+
+/** Build an app with `n` pages (each over chunks.minSize) and a lazy route table; returns the entry's gzip size and the table chunk's. */
+function build(n) {
+  const dir = mkdtempSync(join(tmpdir(), "march-pages-"));
+  try {
+    mkdirSync(join(dir, "src/pages"), { recursive: true });
+    writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
+    const names = Array.from({ length: n }, (_, i) => `page${i}`);
+    for (const p of names) {
+      // ~12 KB of unique text: every page is a chunk of its own (no grouping needed)
+      const filler = Array.from({ length: 900 }, (_, i) => `${p}-${i}-${(i * 7919 + p.length * 31) % 10007}`).join(" ");
+      writeFileSync(join(dir, `src/pages/${p}.jsx`), `const TEXT = ${JSON.stringify(filler)}\nexport default function P() { return <main><h1>${p}</h1><p>{TEXT}</p></main> }\n`);
+    }
+    writeFileSync(join(dir, "src/routes.ts"), [
+      "export const ROUTES = {",
+      ...names.map((p, i) => `  "/${i ? p : ""}": { load: () => import("./pages/${p}.jsx"), title: "Title of ${p}" },`),
+      "};",
+    ].join("\n"));
+    writeFileSync(join(dir, "src/main.jsx"), [
+      "const TABLE = () => import('./routes.ts')",
+      "void TABLE().then(({ ROUTES }) => { createRouter({ routes: ROUTES }); render(() => <Router />, document.getElementById('app')) })",
+    ].join("\n"));
+    writeFileSync(join(dir, "march.config.js"), "export default { budget: { boot: ['src/routes.ts'] } }\n");
+    execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe", timeout: 120000 });
+    const assets = join(dir, "dist/assets");
+    const main = readdirSync(assets).find((f) => /^main-.*\.js$/.test(f));
+    const chunks = readdirSync(join(assets, "chunks"));
+    const table = chunks.find((f) => f.startsWith("routes-"));
+    return {
+      entry: gzipSync(readFileSync(join(assets, main))).length,
+      table: readFileSync(join(assets, "chunks", table), "utf8"),
+      pages: chunks.filter((f) => /^page\d+-.*\.js$/.test(f)).length,
+    };
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+}
+
+test("adding pages adds route-table lines and page chunks, never entry bytes", () => {
+  const few = build(3), many = build(12);
+  assert.equal(few.pages, 3);
+  assert.equal(many.pages, 12);
+  assert.ok(Math.abs(many.entry - few.entry) <= 8, `entry grew with pages: ${few.entry} → ${many.entry} B gzip`);
+  // the table holds loaders and titles only: no page code was folded into it
+  assert.doesNotMatch(many.table, /page5-123-/);
+  assert.match(many.table, /Title of page11/);
+});
+
+test("showcase: the entry imports no page list, route table or page module", () => {
+  const src = (f) => readFileSync(join(ROOT, "examples/showcase/src", f), "utf8");
+  const staticImports = (code) => [...code.matchAll(/^import\s[^;]*?from\s+["']([^"']+)["']/gm)].map((m) => m[1]);
+  for (const f of ["main.tsx", "app.tsx"]) {
+    const imps = staticImports(src(f));
+    for (const bad of ["./nav.ts", "./nav-meta.ts", "./routes.ts", "./routes.gen.js"]) assert.ok(!imps.includes(bad), `${f} imports ${bad} statically`);
+    assert.ok(!imps.some((i) => i.startsWith("./pages/")), `${f} imports a page statically`);
+  }
+  assert.match(src("main.tsx"), /import\("\.\/routes\.ts"\)/);
+});
 
 /** Showcase files the entry loads statically (relative imports only; import() is a separate chunk). */
 function staticClosure(file) {
@@ -26,7 +82,7 @@ function staticClosure(file) {
   return [...seen].map((f) => relative(SHOWCASE, f).replace(/\\/g, "/"));
 }
 
-test("showcase entry: no page, route table or page list in its static imports", () => {
+test("showcase entry: nothing that grows with the pages anywhere in its static import graph", () => {
   const closure = staticClosure(join(SHOWCASE, "main.tsx"));
   const grows = closure.filter((f) => /^pages\/|^router-demo\/|^(nav|nav-meta|routes|routes\.gen)\.[jt]sx?$/.test(f));
   assert.deepEqual(grows, [], `the entry would grow with every page:\n${grows.join("\n")}`);
@@ -34,21 +90,3 @@ test("showcase entry: no page, route table or page list in its static imports", 
   assert.match(cfg, /boot:\s*\[[^\]]*"src\/routes\.ts"/, "the route table is a start-up piece (budget.boot)");
 });
 
-test("an app with 12 pages has the same entry as one with 3 (route table in a start-up chunk)", () => {
-  const entrySize = (n) => {
-    const dir = mkdtempSync(join(tmpdir(), "march-pages-"));
-    try {
-      mkdirSync(join(dir, "src/pages"), { recursive: true });
-      for (let i = 0; i < n; i++) writeFileSync(join(dir, `src/pages/p${i}.jsx`), `export default function P${i}() { return <section><h1>Page ${i}</h1><p>${"text ".repeat(2200 + i)}</p></section> }\n`);
-      writeFileSync(join(dir, "src/routes.js"), `export const ROUTES = {\n${Array.from({ length: n }, (_, i) => `  "/p${i}": () => import("./pages/p${i}.jsx"),`).join("\n")}\n};\n`);
-      writeFileSync(join(dir, "src/main.jsx"), "import(\"./routes.js\").then(({ ROUTES }) => { createRouter({ routes: ROUTES }); render(() => <Router />, document.getElementById('app')) })\n");
-      writeFileSync(join(dir, "march.config.js"), "export default { budget: { boot: [\"src/routes.js\"] } }\n");
-      writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
-      execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
-      const main = readdirSync(join(dir, "dist/assets")).find((f) => /^main[-.].*js$/.test(f));
-      assert.ok(main, "main.js written");
-      return readFileSync(join(dir, "dist/assets", main), "utf8").replace(/\?v=\w+|-[\w]{8}\.js/g, "").length;
-    } finally { rmSync(dir, { recursive: true, force: true }); }
-  };
-  assert.equal(entrySize(12), entrySize(3));
-});

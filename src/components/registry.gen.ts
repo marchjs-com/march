@@ -2,61 +2,80 @@
 import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";
 import m0 from "./composite/bottom-nav/meta.ts";
 import m1 from "./actions/chip/meta.ts";
-import m2 from "./landing/counter/meta.ts";
-import m3 from "./landing/cta-band/meta.ts";
-import m4 from "./overlays/drawer/meta.ts";
-import m5 from "./landing/faq/meta.ts";
-import m6 from "./landing/feature-grid/meta.ts";
-import m7 from "./landing/hero/meta.ts";
-import m8 from "./landing/horizontal-scroll/meta.ts";
-import m9 from "./landing/logo-cloud/meta.ts";
-import m10 from "./actions/made-with-march/meta.ts";
-import m11 from "./landing/newsletter/meta.ts";
-import m12 from "./landing/parallax/meta.ts";
-import m13 from "./landing/presentation/meta.ts";
-import m14 from "./landing/pricing/meta.ts";
-import m15 from "./landing/project-detail/meta.ts";
-import m16 from "./landing/project-grid/meta.ts";
-import m17 from "./feedback/pull-to-refresh/meta.ts";
-import m18 from "./landing/reveal/meta.ts";
-import m19 from "./landing/roadmap/meta.ts";
-import m20 from "./landing/scroll-progress/meta.ts";
-import m21 from "./landing/scroll-story/meta.ts";
-import m22 from "./landing/site-footer/meta.ts";
-import m23 from "./landing/site-nav/meta.ts";
-import m24 from "./landing/site-section/meta.ts";
-import m25 from "./landing/stats-band/meta.ts";
-import m26 from "./landing/testimonials/meta.ts";
-import m27 from "./landing/video-background/meta.ts";
+import m2 from "./social/count-roll/meta.ts";
+import m3 from "./landing/counter/meta.ts";
+import m4 from "./landing/cta-band/meta.ts";
+import m5 from "./data/data-grid/meta.ts";
+import m6 from "./overlays/drawer/meta.ts";
+import m7 from "./landing/faq/meta.ts";
+import m8 from "./landing/feature-grid/meta.ts";
+import m9 from "./composite/feed/meta.ts";
+import m10 from "./landing/hero/meta.ts";
+import m11 from "./landing/horizontal-scroll/meta.ts";
+import m12 from "./social/like-button/meta.ts";
+import m13 from "./landing/logo-cloud/meta.ts";
+import m14 from "./actions/made-with-march/meta.ts";
+import m15 from "./social/media-grid/meta.ts";
+import m16 from "./composite/nav-sidebar/meta.ts";
+import m17 from "./landing/newsletter/meta.ts";
+import m18 from "./landing/parallax/meta.ts";
+import m19 from "./composite/post-card/meta.ts";
+import m20 from "./landing/presentation/meta.ts";
+import m21 from "./landing/pricing/meta.ts";
+import m22 from "./landing/project-detail/meta.ts";
+import m23 from "./landing/project-grid/meta.ts";
+import m24 from "./feedback/pull-to-refresh/meta.ts";
+import m25 from "./landing/reveal/meta.ts";
+import m26 from "./landing/roadmap/meta.ts";
+import m27 from "./landing/scroll-progress/meta.ts";
+import m28 from "./landing/scroll-story/meta.ts";
+import m29 from "./landing/site-footer/meta.ts";
+import m30 from "./landing/site-nav/meta.ts";
+import m31 from "./landing/site-section/meta.ts";
+import m32 from "./landing/stats-band/meta.ts";
+import m33 from "./landing/testimonials/meta.ts";
+import m34 from "./data/tree-view/meta.ts";
+import m35 from "./landing/video-background/meta.ts";
+import m36 from "./data/virtual-list/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
+/** Every component folder: meta, Code-tab snippet and lazy demo / playground loaders. */
 export const registry: readonly RegistryEntry[] = [
   { folder: "composite/bottom-nav", meta: m0, code: "<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />", demo: () => import("./composite/bottom-nav/demo.tsx"), playground: () => import("./composite/bottom-nav/playground.ts") },
   { folder: "actions/chip", meta: m1, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./actions/chip/demo.tsx"), playground: () => import("./actions/chip/playground.ts") },
-  { folder: "landing/counter", meta: m2, code: "<Counter value={12840} />\n<Counter value={$price} mode=\"roll\" format={{ style: \"currency\", currency: \"EUR\" }} />\n<Counter value={0.98} format={{ style: \"percent\" }} />", demo: () => import("./landing/counter/demo.tsx"), playground: () => import("./landing/counter/playground.ts") },
-  { folder: "landing/cta-band", meta: m3, code: "<CtaBand variant=\"gradient\" title=\"Start today\" lead=\"…\"\n  actions={[{ label: \"Try free\", href: \"/start\", iconEnd: arrowRight }, { label: \"Talk to sales\" }]} note=\"14 days free\" />", demo: () => import("./landing/cta-band/demo.tsx"), playground: () => import("./landing/cta-band/playground.ts") },
-  { folder: "overlays/drawer", meta: m4, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
-  { folder: "landing/faq", meta: m5, code: "<Faq layout=\"split\" search title=\"Questions\" lead=\"…\" contact={<Button variant=\"secondary\">Write to us</Button>}\n  items={[{ q: \"Is it free?\", a: \"Yes, MIT licensed.\" }, …]} />", demo: () => import("./landing/faq/demo.tsx"), playground: () => import("./landing/faq/playground.ts") },
-  { folder: "landing/feature-grid", meta: m6, code: "<FeatureGrid variant=\"bento\" items={[\n  { icon: zap, title: \"Fast\", body: \"…\", span: \"big\", media: <Screenshot /> },\n  { icon: shieldCheck, title: \"Secure\", body: \"…\" },\n  { icon: globe, title: \"Every language\", body: \"…\", span: \"wide\" },\n]} />\n<FeatureGrid variant=\"cards\" cols={3} items={features} />", demo: () => import("./landing/feature-grid/demo.tsx"), playground: () => import("./landing/feature-grid/playground.ts") },
-  { folder: "landing/hero", meta: m7, code: "", demo: () => import("./landing/hero/demo.tsx"), playground: () => import("./landing/hero/playground.ts") },
-  { folder: "landing/horizontal-scroll", meta: m8, code: "<HorizontalScroll label=\"Case studies\" panel=\"26rem\">\n  {cases.map((c) => <Card>…</Card>)}\n</HorizontalScroll>", demo: () => import("./landing/horizontal-scroll/demo.tsx"), playground: () => import("./landing/horizontal-scroll/playground.ts") },
-  { folder: "landing/logo-cloud", meta: m9, code: "<LogoCloud title=\"Trusted by teams at\" variant=\"marquee\" logos={[\n  { name: \"Acme\", src: \"/logos/acme.svg\", width: 120, height: 32 },\n  { name: \"Northwind\", node: <NorthwindLogo /> },\n]} />", demo: () => import("./landing/logo-cloud/demo.tsx"), playground: () => import("./landing/logo-cloud/playground.ts") },
-  { folder: "actions/made-with-march", meta: m10, code: "<MadeWithMarch />\n<MadeWithMarch variant=\"badge\" />\n<MadeWithMarch variant=\"small\" />", demo: () => import("./actions/made-with-march/demo.tsx"), playground: () => import("./actions/made-with-march/playground.ts") },
-  { folder: "landing/newsletter", meta: m11, code: "<Newsletter title=\"Stay in the loop\" lead=\"One email a month.\"\n  onSubmit={(email) => api.subscribe(email)} note=\"Unsubscribe any time.\" />", demo: () => import("./landing/newsletter/demo.tsx"), playground: () => import("./landing/newsletter/playground.ts") },
-  { folder: "landing/parallax", meta: m12, code: "<Parallax pointer={1} layers={[\n  { src: \"/sky.jpg\", speed: 0.5 },\n  { src: \"/hills.png\", speed: 0.25 },\n  { content: <Shapes />, speed: -0.15 },\n]}>\n  <h2>Depth</h2>\n</Parallax>", demo: () => import("./landing/parallax/demo.tsx"), playground: () => import("./landing/parallax/playground.ts") },
-  { folder: "landing/presentation", meta: m13, code: "let $slide = Number(queryParam(\"slide\")() ?? 0)\n<Presentation bind:index={$slide} transition=\"slide\" presenterUrl=\"#/talk?presenter=1\">\n  <Slide layout=\"title\" tone=\"brand\" notes=\"Welcome everyone\">…</Slide>\n  <Slide notes=\"Three points, one by one\"><h2>Why?</h2><Appear><li>Fast</li><li>Accessible</li><li>Beautiful</li></Appear></Slide>\n</Presentation>", demo: () => import("./landing/presentation/demo.tsx"), playground: () => import("./landing/presentation/playground.ts") },
-  { folder: "landing/pricing", meta: m14, code: "let $period = \"monthly\"\n<Pricing bind:period={$period} saving=\"2 months free\" currency=\"EUR\" plans={[\n  { name: \"Starter\", price: 0, features: [\"1 project\", \"Community support\"], cta: { label: \"Start free\" } },\n  { name: \"Pro\", price: { monthly: 29, yearly: 24 }, featured: true, badge: \"Most popular\", features: […], cta: { label: \"Go Pro\" } },\n  { name: \"Enterprise\", price: null, features: […], cta: { label: \"Talk to sales\" } },\n]} />", demo: () => import("./landing/pricing/demo.tsx"), playground: () => import("./landing/pricing/playground.ts") },
-  { folder: "landing/project-detail", meta: m15, code: "", demo: () => import("./landing/project-detail/demo.tsx"), playground: () => import("./landing/project-detail/playground.ts") },
-  { folder: "landing/project-grid", meta: m16, code: "", demo: () => import("./landing/project-grid/demo.tsx"), playground: () => import("./landing/project-grid/playground.ts") },
-  { folder: "feedback/pull-to-refresh", meta: m17, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
-  { folder: "landing/reveal", meta: m18, code: "<Reveal effect=\"up\" stagger={80}>\n  <Card>…</Card><Card>…</Card><Card>…</Card>\n</Reveal>\n<ul use:revealOnScroll={{ effect: \"start\" }}>…</ul>\n<Reveal effect=\"blur\" scrub>…</Reveal>", demo: () => import("./landing/reveal/demo.tsx"), playground: () => import("./landing/reveal/playground.ts") },
-  { folder: "landing/roadmap", meta: m19, code: "<Roadmap items={[\n  { time: \"2025 Q1\", title: \"First release\", body: \"…\", status: \"done\" },\n  { time: \"2026 Q3\", title: \"Teams\", body: \"…\", status: \"now\" },\n  { time: \"2027\", title: \"Plugins\", body: \"…\", status: \"next\" },\n]} />", demo: () => import("./landing/roadmap/demo.tsx"), playground: () => import("./landing/roadmap/playground.ts") },
-  { folder: "landing/scroll-progress", meta: m20, code: "<ScrollProgress />\n<ScrollProgress target={() => article} position=\"inline\" paint=\"accent\" />", demo: () => import("./landing/scroll-progress/demo.tsx"), playground: () => import("./landing/scroll-progress/playground.ts") },
-  { folder: "landing/scroll-story", meta: m21, code: "<ScrollStory steps={[\n  { title: \"Design\", body: \"…\", media: <Mock />, color: \"brand-orange\" },\n  { title: \"Build\", body: \"…\", media: <Chart />, color: \"brand-blue\" },\n]} />", demo: () => import("./landing/scroll-story/demo.tsx"), playground: () => import("./landing/scroll-story/playground.ts") },
-  { folder: "landing/site-footer", meta: m22, code: "<SiteFooter brand={{ name: \"Acme\", mark: logo }} about=\"…\" wordmark=\"Acme\"\n  columns={[{ title: \"Product\", links: [{ label: \"Pricing\", href: \"/pricing\" }] }]}\n  social={[{ label: \"Blog\", href: \"/blog\", icon: globe }]}\n  newsletter={{ title: \"Newsletter\", onSubmit: (e) => api.subscribe(e) }}\n  legal={[{ label: \"Privacy\", href: \"/privacy\" }]} />", demo: () => import("./landing/site-footer/demo.tsx"), playground: () => import("./landing/site-footer/playground.ts") },
-  { folder: "landing/site-nav", meta: m23, code: "", demo: () => import("./landing/site-nav/demo.tsx"), playground: () => import("./landing/site-nav/playground.ts") },
-  { folder: "landing/site-section", meta: m24, code: "<SiteSection eyebrow=\"Features\" title=\"Everything you need\" lead=\"…\" tone=\"muted\">\n  <FeatureGrid items={features} />\n</SiteSection>", demo: () => import("./landing/site-section/demo.tsx"), playground: () => import("./landing/site-section/playground.ts") },
-  { folder: "landing/stats-band", meta: m25, code: "<StatsBand items={[\n  { value: 12000, label: \"teams\", format: { notation: \"compact\" }, suffix: \"+\" },\n  { value: 99.98, decimals: 2, suffix: \"%\", label: \"uptime\" },\n]} />", demo: () => import("./landing/stats-band/demo.tsx"), playground: () => import("./landing/stats-band/playground.ts") },
-  { folder: "landing/testimonials", meta: m26, code: "<Testimonials variant=\"wall\" items={[\n  { quote: \"Our new site was live in a week.\", name: \"Dana Ray\", role: \"Head of product, Acme\", rating: 5 },\n  …\n]} />", demo: () => import("./landing/testimonials/demo.tsx"), playground: () => import("./landing/testimonials/playground.ts") },
-  { folder: "landing/video-background", meta: m27, code: "<VideoBackground src=\"/media/clip.webm\" poster=\"/media/clip.jpg\" tint=\"dark\">\n  <h1>…</h1>\n</VideoBackground>", demo: () => import("./landing/video-background/demo.tsx"), playground: () => import("./landing/video-background/playground.ts") },
+  { folder: "social/count-roll", meta: m2, code: "<CountRoll value={$likes} />\n<CountRoll value={$followers} format=\"full\" />", demo: () => import("./social/count-roll/demo.tsx"), playground: () => import("./social/count-roll/playground.ts") },
+  { folder: "landing/counter", meta: m3, code: "<Counter value={12840} />\n<Counter value={$price} mode=\"roll\" format={{ style: \"currency\", currency: \"EUR\" }} />\n<Counter value={0.98} format={{ style: \"percent\" }} />", demo: () => import("./landing/counter/demo.tsx"), playground: () => import("./landing/counter/playground.ts") },
+  { folder: "landing/cta-band", meta: m4, code: "<CtaBand variant=\"gradient\" title=\"Start today\" lead=\"…\"\n  actions={[{ label: \"Try free\", href: \"/start\", iconEnd: arrowRight }, { label: \"Talk to sales\" }]} note=\"14 days free\" />", demo: () => import("./landing/cta-band/demo.tsx"), playground: () => import("./landing/cta-band/playground.ts") },
+  { folder: "data/data-grid", meta: m5, code: "import { DataGrid } from \"hadi-march/components/data/data-grid\";\n\n<DataGrid rows={$orders} rowKey=\"id\" selectable groupBy={[\"region\"]}\n  columns={[\n    { key: \"customer\", label: \"Customer\", pin: \"left\", editable: true },\n    { key: \"region\", label: \"Region\", filter: \"select\" },\n    { key: \"amount\", label: \"Amount\", format: [\"money\", \"USD\"], aggregate: \"sum\" },\n  ]}\n  onEdit={(row, key, value) => save(row.id, key, value)} />", demo: () => import("./data/data-grid/demo.tsx"), playground: () => import("./data/data-grid/playground.ts") },
+  { folder: "overlays/drawer", meta: m6, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
+  { folder: "landing/faq", meta: m7, code: "<Faq layout=\"split\" search title=\"Questions\" lead=\"…\" contact={<Button variant=\"secondary\">Write to us</Button>}\n  items={[{ q: \"Is it free?\", a: \"Yes, MIT licensed.\" }, …]} />", demo: () => import("./landing/faq/demo.tsx"), playground: () => import("./landing/faq/playground.ts") },
+  { folder: "landing/feature-grid", meta: m8, code: "<FeatureGrid variant=\"bento\" items={[\n  { icon: zap, title: \"Fast\", body: \"…\", span: \"big\", media: <Screenshot /> },\n  { icon: shieldCheck, title: \"Secure\", body: \"…\" },\n  { icon: globe, title: \"Every language\", body: \"…\", span: \"wide\" },\n]} />\n<FeatureGrid variant=\"cards\" cols={3} items={features} />", demo: () => import("./landing/feature-grid/demo.tsx"), playground: () => import("./landing/feature-grid/playground.ts") },
+  { folder: "composite/feed", meta: m9, code: "<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />", demo: () => import("./composite/feed/demo.tsx"), playground: () => import("./composite/feed/playground.ts") },
+  { folder: "landing/hero", meta: m10, code: "", demo: () => import("./landing/hero/demo.tsx"), playground: () => import("./landing/hero/playground.ts") },
+  { folder: "landing/horizontal-scroll", meta: m11, code: "<HorizontalScroll label=\"Case studies\" panel=\"26rem\">\n  {cases.map((c) => <Card>…</Card>)}\n</HorizontalScroll>", demo: () => import("./landing/horizontal-scroll/demo.tsx"), playground: () => import("./landing/horizontal-scroll/playground.ts") },
+  { folder: "social/like-button", meta: m12, code: "<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />", demo: () => import("./social/like-button/demo.tsx"), playground: () => import("./social/like-button/playground.ts") },
+  { folder: "landing/logo-cloud", meta: m13, code: "<LogoCloud title=\"Trusted by teams at\" variant=\"marquee\" logos={[\n  { name: \"Acme\", src: \"/logos/acme.svg\", width: 120, height: 32 },\n  { name: \"Northwind\", node: <NorthwindLogo /> },\n]} />", demo: () => import("./landing/logo-cloud/demo.tsx"), playground: () => import("./landing/logo-cloud/playground.ts") },
+  { folder: "actions/made-with-march", meta: m14, code: "<MadeWithMarch />\n<MadeWithMarch variant=\"badge\" />\n<MadeWithMarch variant=\"small\" />", demo: () => import("./actions/made-with-march/demo.tsx"), playground: () => import("./actions/made-with-march/playground.ts") },
+  { folder: "social/media-grid", meta: m15, code: "<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />", demo: () => import("./social/media-grid/demo.tsx"), playground: () => import("./social/media-grid/playground.ts") },
+  { folder: "composite/nav-sidebar", meta: m16, code: "<NavSidebar title=\"Acme\" items={[\n  { id: \"/orders\", label: \"Orders\", href: \"/orders\", group: \"Sales\", icon: cart, badge: () => $open },\n  { id: \"/users\", label: \"Users\", href: \"/users\", group: \"Admin\", can: \"users.read\" },\n]} collapsible resizable groupOrder={[\"Sales\", \"Admin\"]} />", demo: () => import("./composite/nav-sidebar/demo.tsx"), playground: () => import("./composite/nav-sidebar/playground.ts") },
+  { folder: "landing/newsletter", meta: m17, code: "<Newsletter title=\"Stay in the loop\" lead=\"One email a month.\"\n  onSubmit={(email) => api.subscribe(email)} note=\"Unsubscribe any time.\" />", demo: () => import("./landing/newsletter/demo.tsx"), playground: () => import("./landing/newsletter/playground.ts") },
+  { folder: "landing/parallax", meta: m18, code: "<Parallax pointer={1} layers={[\n  { src: \"/sky.jpg\", speed: 0.5 },\n  { src: \"/hills.png\", speed: 0.25 },\n  { content: <Shapes />, speed: -0.15 },\n]}>\n  <h2>Depth</h2>\n</Parallax>", demo: () => import("./landing/parallax/demo.tsx"), playground: () => import("./landing/parallax/playground.ts") },
+  { folder: "composite/post-card", meta: m19, code: "<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />", demo: () => import("./composite/post-card/demo.tsx"), playground: () => import("./composite/post-card/playground.ts") },
+  { folder: "landing/presentation", meta: m20, code: "let $slide = Number(queryParam(\"slide\")() ?? 0)\n<Presentation bind:index={$slide} transition=\"slide\" presenterUrl=\"#/talk?presenter=1\">\n  <Slide layout=\"title\" tone=\"brand\" notes=\"Welcome everyone\">…</Slide>\n  <Slide notes=\"Three points, one by one\"><h2>Why?</h2><Appear><li>Fast</li><li>Accessible</li><li>Beautiful</li></Appear></Slide>\n</Presentation>", demo: () => import("./landing/presentation/demo.tsx"), playground: () => import("./landing/presentation/playground.ts") },
+  { folder: "landing/pricing", meta: m21, code: "let $period = \"monthly\"\n<Pricing bind:period={$period} saving=\"2 months free\" currency=\"EUR\" plans={[\n  { name: \"Starter\", price: 0, features: [\"1 project\", \"Community support\"], cta: { label: \"Start free\" } },\n  { name: \"Pro\", price: { monthly: 29, yearly: 24 }, featured: true, badge: \"Most popular\", features: […], cta: { label: \"Go Pro\" } },\n  { name: \"Enterprise\", price: null, features: […], cta: { label: \"Talk to sales\" } },\n]} />", demo: () => import("./landing/pricing/demo.tsx"), playground: () => import("./landing/pricing/playground.ts") },
+  { folder: "landing/project-detail", meta: m22, code: "", demo: () => import("./landing/project-detail/demo.tsx"), playground: () => import("./landing/project-detail/playground.ts") },
+  { folder: "landing/project-grid", meta: m23, code: "", demo: () => import("./landing/project-grid/demo.tsx"), playground: () => import("./landing/project-grid/playground.ts") },
+  { folder: "feedback/pull-to-refresh", meta: m24, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
+  { folder: "landing/reveal", meta: m25, code: "<Reveal effect=\"up\" stagger={80}>\n  <Card>…</Card><Card>…</Card><Card>…</Card>\n</Reveal>\n<ul use:revealOnScroll={{ effect: \"start\" }}>…</ul>\n<Reveal effect=\"blur\" scrub>…</Reveal>", demo: () => import("./landing/reveal/demo.tsx"), playground: () => import("./landing/reveal/playground.ts") },
+  { folder: "landing/roadmap", meta: m26, code: "<Roadmap items={[\n  { time: \"2025 Q1\", title: \"First release\", body: \"…\", status: \"done\" },\n  { time: \"2026 Q3\", title: \"Teams\", body: \"…\", status: \"now\" },\n  { time: \"2027\", title: \"Plugins\", body: \"…\", status: \"next\" },\n]} />", demo: () => import("./landing/roadmap/demo.tsx"), playground: () => import("./landing/roadmap/playground.ts") },
+  { folder: "landing/scroll-progress", meta: m27, code: "<ScrollProgress />\n<ScrollProgress target={() => article} position=\"inline\" paint=\"accent\" />", demo: () => import("./landing/scroll-progress/demo.tsx"), playground: () => import("./landing/scroll-progress/playground.ts") },
+  { folder: "landing/scroll-story", meta: m28, code: "<ScrollStory steps={[\n  { title: \"Design\", body: \"…\", media: <Mock />, color: \"brand-orange\" },\n  { title: \"Build\", body: \"…\", media: <Chart />, color: \"brand-blue\" },\n]} />", demo: () => import("./landing/scroll-story/demo.tsx"), playground: () => import("./landing/scroll-story/playground.ts") },
+  { folder: "landing/site-footer", meta: m29, code: "<SiteFooter brand={{ name: \"Acme\", mark: logo }} about=\"…\" wordmark=\"Acme\"\n  columns={[{ title: \"Product\", links: [{ label: \"Pricing\", href: \"/pricing\" }] }]}\n  social={[{ label: \"Blog\", href: \"/blog\", icon: globe }]}\n  newsletter={{ title: \"Newsletter\", onSubmit: (e) => api.subscribe(e) }}\n  legal={[{ label: \"Privacy\", href: \"/privacy\" }]} />", demo: () => import("./landing/site-footer/demo.tsx"), playground: () => import("./landing/site-footer/playground.ts") },
+  { folder: "landing/site-nav", meta: m30, code: "", demo: () => import("./landing/site-nav/demo.tsx"), playground: () => import("./landing/site-nav/playground.ts") },
+  { folder: "landing/site-section", meta: m31, code: "<SiteSection eyebrow=\"Features\" title=\"Everything you need\" lead=\"…\" tone=\"muted\">\n  <FeatureGrid items={features} />\n</SiteSection>", demo: () => import("./landing/site-section/demo.tsx"), playground: () => import("./landing/site-section/playground.ts") },
+  { folder: "landing/stats-band", meta: m32, code: "<StatsBand items={[\n  { value: 12000, label: \"teams\", format: { notation: \"compact\" }, suffix: \"+\" },\n  { value: 99.98, decimals: 2, suffix: \"%\", label: \"uptime\" },\n]} />", demo: () => import("./landing/stats-band/demo.tsx"), playground: () => import("./landing/stats-band/playground.ts") },
+  { folder: "landing/testimonials", meta: m33, code: "<Testimonials variant=\"wall\" items={[\n  { quote: \"Our new site was live in a week.\", name: \"Dana Ray\", role: \"Head of product, Acme\", rating: 5 },\n  …\n]} />", demo: () => import("./landing/testimonials/demo.tsx"), playground: () => import("./landing/testimonials/playground.ts") },
+  { folder: "data/tree-view", meta: m34, code: "import { TreeView } from \"hadi-march/components/data/tree-view\";\n\n<TreeView nodes={files} selection=\"multiple\" draggable search={$q}\n  load={(node) => api.children(node.id)}\n  onSelect={(ids) => $selected = ids}\n  onMove={(ids, target, position) => api.move(ids, target, position)} />", demo: () => import("./data/tree-view/demo.tsx"), playground: () => import("./data/tree-view/playground.ts") },
+  { folder: "landing/video-background", meta: m35, code: "<VideoBackground src=\"/media/clip.webm\" poster=\"/media/clip.jpg\" tint=\"dark\">\n  <h1>…</h1>\n</VideoBackground>", demo: () => import("./landing/video-background/demo.tsx"), playground: () => import("./landing/video-background/playground.ts") },
+  { folder: "data/virtual-list", meta: m36, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./data/virtual-list/demo.tsx"), playground: () => import("./data/virtual-list/playground.ts") },
 ];
