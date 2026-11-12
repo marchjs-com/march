@@ -271,9 +271,8 @@ test("api: stream over ws (mock)", async () => {
   const u = N.api(UsersApi, { net: n });
   const got = [];
   const off = u.live.subscribe((e) => got.push(e));
-  await tick(10);
-  m.publish("/users/events", "users", { kind: "joined" });
-  await tick(5);
+  for (let i = 0; i < 100 && m.publish("/users/events", "users", { kind: "joined" }) === 0; i++) await tick(5);
+  for (let i = 0; i < 100 && !got.length; i++) await tick(5);
   assert.deepEqual(got.map((x) => x.data.kind), ["joined"]);
   off();
   N.closeSockets();
