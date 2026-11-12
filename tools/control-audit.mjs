@@ -5,7 +5,9 @@
 // must change something that can be seen when it is used: the text, or the computed style of an element outside the
 // control itself. One that changes nothing is reported as `dead-control`. The control is focused and used (a slider is
 // moved in several steps, as a drag does): it must stay the same DOM node and keep the focus, else `rebuilt-control`
-// (a control rebuilt on every change breaks a drag: pointer and focus stay with the old node).
+// (a control rebuilt on every change breaks a drag: pointer and focus stay with the old node). Layout counts by the boxes
+// (getBoundingClientRect), not by style: a class change that moves nothing is no effect. An element whose aria-orientation
+// does not match how its items are laid out is reported as `orientation`.
 // (Controls that are the demo's subject, such as a day picker in a form demo, are not options and are not checked.)
 //
 // Every page is covered: the top-level pages and the ones under a wildcard route (/motion/svg…). Cards that load
@@ -29,12 +31,14 @@ const MAX_PER_PAGE = 400;
 
 // in the page: helpers kept on window.__ca so each step is one short evaluate
 const SETUP = `(() => {
-  const PROPS = ["display", "visibility", "opacity", "transform", "color", "background-color", "background-image", "border-top-color",
-    "border-top-width", "box-shadow", "outline-style", "filter", "width", "height", "padding-top", "padding-left", "gap", "font-size",
-    "font-weight", "grid-template-columns", "flex-direction", "justify-content", "align-items", "border-top-left-radius", "translate", "scale",
-    "animation-name", "text-decoration-line", "cursor", "font-family", "letter-spacing", "line-height", "object-fit", "object-position",
-    "mix-blend-mode", "background-size", "background-position", "background-blend-mode", "border-top-style", "text-align", "inset", "z-index",
+  // paint: a change in one of these is seen as it is
+  const PROPS = ["visibility", "opacity", "transform", "color", "background-color", "background-image", "border-top-color",
+    "box-shadow", "outline-style", "filter", "font-size", "font-weight", "border-top-left-radius", "translate", "scale",
+    "animation-name", "text-decoration-line", "cursor", "font-family", "letter-spacing", "object-fit", "object-position",
+    "mix-blend-mode", "background-size", "background-position", "background-blend-mode", "border-top-style", "text-align", "z-index",
     "fill", "stroke"];
+  // layout (display, width, flex-direction, grid-template…) is not compared as style: it counts only when a box really
+  // moves or resizes (getBoundingClientRect). A class that says "horizontal" while the bar stays vertical is no effect.
   const SEL = '[role=switch], input[type=checkbox], input[type=radio], input[type=range], [role=radio], [role=tab], [role=option], .hm-chip[aria-pressed], button[aria-pressed]';
   const skip = (el) => !!el.closest("[data-audit-skip], .hm-layer, .hm-shell-nav, .hm-app-nav, header.hm-topbar, .sc-code, pre");
   const shown = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden" && !el.closest("[hidden], [inert]"); };
@@ -52,7 +56,11 @@ const SETUP = `(() => {
       // only what can be seen counts: a class or aria attribute that changes no style is not an effect
       if (el.namespaceURI === "http://www.w3.org/2000/svg") { parts.push(el.outerHTML); return; }
       const cs = getComputedStyle(el);
-      parts.push(el.tagName + "|" + (el.value ?? "") + "|" + PROPS.map((p) => cs.getPropertyValue(p)).join(";"));
+      const r = el.getBoundingClientRect(), o = root().getBoundingClientRect(), q = (n) => Math.round(n);
+      parts.push(el.tagName + "|" + (el.value ?? "") + "|" + PROPS.map((p) => cs.getPropertyValue(p)).join(";") + "|" + [q(r.left - o.left), q(r.top - o.top), q(r.width), q(r.height)].join(",")
+        // a running animation (every animation goes through the motion engine: WAAPI) counts by its timing — speed, easing,
+        // repeat — not by the frame it happens to be on
+        + "|" + (el.getAnimations?.() ?? []).map((x) => { const t = x.effect?.getTiming?.() ?? {}; return [t.duration, t.iterations, t.direction, t.easing, t.delay, x.playbackRate].join("/"); }).join(";"));
       for (const n of el.childNodes) if (n.nodeType === 3) { const t = n.textContent.trim(); if (t) parts.push("#" + t); } else walk(n);
     };
     walk(root());
@@ -95,7 +103,17 @@ const SETUP = `(() => {
     scrollTo(0, 0); await wait(100);
     return !busy();
   };
-  window.__ca = { pending, snap, use, name, where, key, settle, tried: new Set() };
+  // aria-orientation must match the layout: the items of a "horizontal" tablist / toolbar / radiogroup sit side by
+  // side, those of a "vertical" one stacked (a class or attribute saying "horizontal" on a bar that stays vertical)
+  const turned = () => [...root().querySelectorAll("[aria-orientation]")].filter((g) => !skip(g) && shown(g) && !g.matches("[role=slider], [role=separator], [role=scrollbar], input")).flatMap((g) => {
+    const items = [...g.querySelectorAll("[role=tab], [role=radio], [role=option], [role=menuitem], button")].filter((x) => shown(x) && x.closest("[aria-orientation]") === g);
+    if (items.length < 2) return [];
+    const rs = items.map((x) => x.getBoundingClientRect());
+    const dx = Math.max(...rs.map((r) => r.left)) - Math.min(...rs.map((r) => r.left)), dy = Math.max(...rs.map((r) => r.top)) - Math.min(...rs.map((r) => r.top));
+    const hz = g.getAttribute("aria-orientation") === "horizontal";
+    return (hz ? dy > dx : dx > dy) ? [(g.getAttribute("aria-label") || g.className || g.tagName) + " says " + (hz ? "horizontal" : "vertical") + " but its items are laid out " + (hz ? "vertically" : "horizontally")] : [];
+  });
+  window.__ca = { pending, snap, use, name, where, key, settle, turned, tried: new Set() };
   return true;
 })()`;
 
@@ -106,6 +124,7 @@ for (const route of ROUTES) {
   await load(route, WIDTH);
   await ev(SETUP);
   if (!(await ev("__ca.settle()"))) findings.push({ route, kind: "lazy", at: "", detail: "a lazy card was still loading after 6 s" });
+  for (const t of (await ev("__ca.turned()")) ?? []) findings.push({ route, kind: "orientation", at: "", detail: t });
   let n = 0;
   for (; n < MAX_PER_PAGE; n++) {
     // the next control not tried yet: picked again each time, so controls that appear later are found too
@@ -118,11 +137,12 @@ for (const route of ROUTES) {
     const res = await ev(`(async () => { const c = [...document.querySelectorAll("[data-ca-done]")].find((x) => __ca.key(x) === ${JSON.stringify(info.key)}); if (!c) return { changed: true, kept: true };
       const before = __ca.snap(c); c.focus({ preventScroll: true }); const focused = document.activeElement === c;
       const undo = __ca.use(c); await new Promise((r) => setTimeout(r, 450)); const after = __ca.snap(c);
-      const kept = c.isConnected && (!focused || document.activeElement === c);
-      undo(); await new Promise((r) => setTimeout(r, 250)); return { changed: before !== after, kept }; })()`);
+      const kept = c.isConnected && (!focused || document.activeElement === c); const turned = __ca.turned();
+      undo(); await new Promise((r) => setTimeout(r, 250)); return { changed: before !== after, kept, turned }; })()`);
     const changed = res?.changed;
     if (VERBOSE) console.log(`  ${changed === false || res?.kept === false ? "✖" : "✓"} ${route} [${info.where}] ${info.name}`);
     if (changed === false) findings.push({ route, kind: "dead-control", at: info.where, detail: info.name });
+    for (const t of res?.turned ?? []) findings.push({ route, kind: "orientation", at: info.where, detail: `${info.name}: ${t}` });
     if (res?.kept === false) findings.push({ route, kind: "rebuilt-control", at: info.where, detail: `${info.name}: the control was rebuilt (or lost the focus) when used` });
   }
   total += n;
