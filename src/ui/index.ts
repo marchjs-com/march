@@ -78,8 +78,6 @@ export type { CarouselProps } from "./carousel.ts";
 export type { TreeProps, TreeNode } from "./tree.ts";
 export type { KanbanProps, KanbanColumn } from "./kanban.ts";
 export type { SplitterProps } from "./splitter.ts";
-export { NavSidebar } from "./sidebar.ts";
-export type { NavSidebarProps, NavSidebarItem } from "./sidebar.ts";
 export { Widget, widgetPoint, pickMain } from "../widget/index.ts";
 export type { WidgetPoint, WidgetProvider, WidgetContext, WidgetProps } from "../widget/index.ts";
 export { codeView, CodeViewer } from "./code-widget.ts";

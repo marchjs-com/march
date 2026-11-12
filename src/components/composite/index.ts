@@ -3,5 +3,6 @@
 export * from "./bottom-nav/index.ts";
 export * from "./dock-layout/index.ts";
 export * from "./feed/index.ts";
+export * from "./nav-sidebar/index.ts";
 export * from "./post-card/index.ts";
 export * from "./property-grid/index.ts";

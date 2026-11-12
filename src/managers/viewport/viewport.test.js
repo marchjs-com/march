@@ -18,7 +18,7 @@ const width = (w) => batch(() => { for (const [px, ] of [[640], [768], [1024], [
 
 const { h, render, effect, batch } = await import("../../index.ts");
 const { viewport, configureViewport, disposeViewport, viewportManager } = await import("./index.ts");
-const { setManagerEmit } = await import("../manager.ts");
+const { onManager } = await import("../manager.ts");
 const tick = (ms = 5) => new Promise((r) => setTimeout(r, ms));
 
 test("lazy: nothing listens until a signal is read; one matchMedia per query", () => {
@@ -112,7 +112,7 @@ test("when: props hide and show elements; a typo throws", async () => {
 test("configure: custom breakpoints and dark source; bindings follow the new instance; events", () => {
   disposeViewport();
   const events = [];
-  const prev = setManagerEmit((e) => events.push(`${e.manager}:${e.type}`));
+  const prev = onManager("*", (e) => events.push(`${e.manager}:${e.type}`));
   let appDark = false;
   setMq("(prefers-color-scheme: dark)", false);
   const seen = [];
@@ -126,7 +126,7 @@ test("configure: custom breakpoints and dark source; bindings follow the new ins
   assert.ok(viewport().desktop());
   assert.ok(events.includes("viewport:change") && events.includes("viewport:dispose") && events.includes("viewport:start"));
   stop();
-  setManagerEmit(prev);
+  prev();
   configureViewport({ dark: null, breakpoints: viewportManager.config().breakpoints, mobile: "md", desktop: "lg" });
   configureViewport({ breakpoints: { xs: 0, sm: 640, md: 768, lg: 1024, xl: 1280, xxl: 1536 } });
 });

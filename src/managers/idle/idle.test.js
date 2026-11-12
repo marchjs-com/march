@@ -5,12 +5,12 @@ import { installDom } from "../../testing/dom.ts";
 
 installDom();
 const { idle, configureIdle, disposeIdle } = await import("./index.ts");
-const { setManagerEmit } = await import("../manager.ts");
+const { onManager } = await import("../manager.ts");
 const tick = (ms = 5) => new Promise((r) => setTimeout(r, ms));
 
 test("goes idle after the timeout; activity wakes it and calls onActive", async () => {
   const events = [];
-  const prev = setManagerEmit((e) => events.push(`${e.manager}:${e.type}`));
+  const prev = onManager("*", (e) => events.push(`${e.manager}:${e.type}`));
   configureIdle({ timeout: 40, throttle: 0 });
   const i = idle();
   let idles = 0, actives = 0, acts = 0;
@@ -24,7 +24,7 @@ test("goes idle after the timeout; activity wakes it and calls onActive", async 
   assert.equal(i.idle(), false);
   assert.deepEqual([idles, actives, acts], [1, 1, 1]);
   assert.deepEqual(events.filter((e) => e.startsWith("idle:")), ["idle:start", "idle:idle", "idle:active"]);
-  setManagerEmit(prev);
+  prev();
   disposeIdle();
 });
 

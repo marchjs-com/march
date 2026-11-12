@@ -7,7 +7,7 @@ installDom();
 const { createNet } = await import("../../net/index.ts");
 const { reply } = await import("../../net/mock.ts");
 const { sync, configureSync, disposeSync } = await import("./index.ts");
-const { setManagerEmit } = await import("../manager.ts");
+const { onManager } = await import("../manager.ts");
 const tick = (ms = 10) => new Promise((r) => setTimeout(r, ms));
 const until = async (fn, ms = 2000) => { const end = Date.now() + ms; while (!fn()) { if (Date.now() > end) throw new Error("timeout"); await tick(5); } };
 
@@ -19,7 +19,7 @@ n.mock({ "POST /notes": (r) => { if (fail > 0) { fail--; return reply(status, { 
 test("offline: queued and persisted; back online: sent in order with an Idempotency-Key", async () => {
   localStorage.clear();
   const events = [];
-  const prev = setManagerEmit((e) => e.manager === "sync" && events.push(e.type));
+  const prev = onManager("*", (e) => e.manager === "sync" && events.push(e.type));
   n.setOnline(false);
   configureSync({ net: n, storageKey: "t.sync", retry: { delay: 10, factor: 2, max: 100, count: 4 } });
   const s = sync();
@@ -35,7 +35,7 @@ test("offline: queued and persisted; back online: sent in order with an Idempote
   assert.equal(s.status(), "idle");
   assert.ok(s.lastSync() > 0);
   assert.ok(events.includes("queued") && events.includes("sent") && events.includes("synced"));
-  setManagerEmit(prev);
+  prev();
 });
 
 test("5xx: retried with backoff; 4xx: failed, kept until retried or removed", async () => {

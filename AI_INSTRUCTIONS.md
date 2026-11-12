@@ -148,12 +148,6 @@ Overlays never take input; put content after them. `front` only for foreground e
   folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
   parent, or joins a group chunk with the entry's other small lazy modules that share the most code (second build pass).
   A file still under the limit fails the build; `allow` needs a reason. `chunks: false` turns it off.
-  A group never pushes a route past `budget.route`: groups are measured after each pass and one over budget is taken
-  apart and planned again.
-- Many pages: keep the route table (paths, titles, loaders) OUT of the entry, or the entry grows with every page. Put it
-  in `src/routes.ts` (or the generated `src/routes.gen.js`), load it with `import()` from `main` and list it in
-  `budget.boot`; its pages are grouped like the entry's own lazy imports and never folded into the table
-  (`chunks.routeTables` names other table files). The shell reads titles from the table, not from a page list in the entry.
 
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.
@@ -386,25 +380,6 @@ replay(), stop() }`. Never split text by hand or animate letters with your own l
 - `typeLoop`, `wordCycle`, `morph` take `words` (or the text split at `|`); `counter` reads the number in the text.
 - Catalog: `TEXT_ANIMATIONS` in `hadi-march/motion/text/meta`. Reference: src/motion/text/docs.md. Showcase: Hareket ›
   Metin animasyonları (/text-motion).
-### 15c. Ready-made animations (all on the engine, each its own export)
-
-```ts
-import { drawPath, morphPath, followPath, clipReveal, filterBlur, displace, goo } from "hadi-march/motion";
-drawPath(svg.querySelectorAll("path"), { stagger: 80 });       // stroke draws in (pathLength=1, no measuring)
-morphPath(pathEl, starD, { easing: "spring" });                // any two paths: different point counts are resampled
-followPath(dot, roadD, { rotate: true, trail: roadEl });       // along a path, the trail drawn in the same frame
-clipReveal(card, { shape: "circle", origin: { x: 20, y: 80 } }); // circle | wipe (RTL mirrored) | diamond | curtain | blinds | inset
-filterBlur(title, { from: 16, axis: "x" }); displace(card, { from: 60 }); const off = goo(container);
-```
-Pure path tools (no DOM): `parsePath`, `flatten`, `pathSampler`, `resample`, `interpolatePath`, `toD`.
-```ts
-morph(button, dialog); await morphBack(dialog, button).finished;   // container transform (clip + move, no stretching)
-morph(thumb, big, { mode: "scale", hideSource: false });            // shared element FLIP
-morphIcon(pathEl, playing ? "pause" : "play");                      // MORPH_ICONS: play pause menu close plus check minus
-shapeMorph(el, "star");                                             // circle square triangle diamond hexagon star blob flower
-usePageTransitions(circle, cube, wipe);                             // then meta: { transition: "cube" } per route
-// variants: circle wipe stack cube flipPage zoomThrough curtain blinds pixelDissolve morphPage (PAGE_VARIANTS = all)
-```
 
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 
@@ -488,7 +463,7 @@ command({ id: "doc.save", title: () => t`Save`, shortcut: "mod+s", group: "File"
 <button command:doc.save>Save</button>   <Menu items={commandItems({ group: "File" })} />   <CommandButton command="doc.save" />
 ```
 `can` hides, `when` disables, `busy()` follows a running call, `cancel()` aborts it. Do not duplicate a command as a
-separate button handler. Manager events go through `setManagerEmit`.
+separate button handler. Manager events are on channels: `onManager("command:*", fn)` (topic `<manager>:<type>`).
 
 ## Component catalogue (folders in src/components)
 
@@ -549,6 +524,7 @@ separate button handler. Manager events go through `setManagerEmit`.
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, Portal |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | PullToRefresh, VirtualList, PostCard, Skeleton |
+| NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, MediaGrid, LikeButton, CountRoll |
 | PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
 <!-- components:end -->

@@ -40,7 +40,7 @@ export interface PlaygroundOption<V = Record<string, unknown>> {
   label: string;
   default: unknown;
   /** Choices (ChoicePicker picks the look); omit for a boolean (switch) or give min / max (slider). */
-  options?: readonly (string | { value: unknown; label: string })[];
+  options?: readonly (string | number | { value: unknown; label: string })[];
   kind?: "segmented" | "chips" | "cards" | "grid" | "combobox";
   min?: number;
   max?: number;

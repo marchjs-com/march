@@ -107,10 +107,13 @@ export async function generate(root = ROOT) {
   return { files, list };
 }
 
-/** Exported names of hadi-march, hadi-march/ui and hadi-march/table (a part named in composedOf may still live there while folders move). */
+/** Exported names of hadi-march, hadi-march/ui, hadi-march/router and hadi-march/table (a part named in composedOf may still live there while folders move). */
 function uiExports(root) {
-  const text = ["src/index.ts", "src/ui/index.ts", "src/forms/index.ts", "src/table/index.ts"].map((f) => readFileSync(join(root, f), "utf8")).join("\n");
-  return new Set([...text.matchAll(/^export\s*\{([^}]*)\}/gm)].flatMap((m) => m[1].split(",").map((s) => s.trim().split(/\s+as\s+/).pop()).filter(Boolean)));
+  const text = ["src/index.ts", "src/ui/index.ts", "src/forms/index.ts", "src/router/index.ts", "src/table/index.ts"].map((f) => readFileSync(join(root, f), "utf8")).join("\n");
+  return new Set([
+    ...[...text.matchAll(/^export\s*\{([^}]*)\}/gm)].flatMap((m) => m[1].split(",").map((s) => s.trim().split(/\s+as\s+/).pop()).filter(Boolean)),
+    ...[...text.matchAll(/^export\s+(?:function|const|class)\s+([A-Z][\w$]*)/gm)].map((m) => m[1]),
+  ]);
 }
 
 /** Folder problems: missing files, a missing or wrong category, composedOf rules (a composite names its parts, and

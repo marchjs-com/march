@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom, Event } from "../src/testing/dom.ts";
+import { installDom, Event } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
-const { signal, h, render } = await import("../src/index.ts");
-const R = await import("../src/router/index.ts");
-const U = await import("../src/ui/index.ts");
+const { signal, h, render } = await import("../../../index.ts");
+const R = await import("../../../router/index.ts");
+const U = await import("../../../ui/index.ts");
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
@@ -35,7 +35,7 @@ test("NavSidebar: categories with counts, auto-open active category, recent list
 
   R.navigate("/refunds"); await tick();
   assert.deepEqual(groups()[0], ["Ekonomi", "3", "true"], "the category of the current page opens");
-  assert.ok(m.el.querySelector('.hm-sb-group.has-active [data-id="refunds"]').classList.contains("is-active"));
+  assert.ok(m.el.querySelector('.hm-sb-group.is-active-group [data-id="refunds"]').classList.contains("is-active"));
   R.navigate("/members"); await tick();
   const recent = [...m.el.querySelectorAll('[data-where="recent"]')].map((a) => [a.dataset.id, a.querySelector(".hm-sb-sub").textContent]);
   assert.deepEqual(recent, [["members", "Üyeler ve roller"], ["refunds", "Ekonomi"]]);
