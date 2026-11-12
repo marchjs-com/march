@@ -8,7 +8,10 @@
 //   grid-cell       an item of a CSS grid (one column, stretching) is narrower than its track: a margin or width
 //                   rule meant for something else, such as a class name used by two features
 //   overlap         neighbouring items of a flex row draw on top of each other
-//   double-mount    after in-app navigation (menu clicks, back / forward) more than one app shell or page heading
+//   double-mount    after in-app navigation (menu clicks, back / forward) more than one app shell or page heading; on
+//                   a reload of the start page, more than one mount of its heading or an entrance animation the
+//                   prerender takeover (hydrate) replays on screen
+//   layout-shift    the start page shifts while it loads (CLS over 0.01)
 //   console         a script error
 //
 //   node tools/visual-audit.mjs                      builds nothing; serves examples/showcase/dist itself
@@ -128,6 +131,43 @@ for (const route of ROUTES) for (const w of WIDTHS) for (const [label, script] o
     await sleep(900); await verify(route);
   }
   for (const dir of ["back", "back", "forward"]) { await ev("history." + dir + "()"); await sleep(700); await verify(dir); }
+  process.stdout.write("·");
+}
+// reload: the start page loads once. index.html carries it prerendered and hydrate() takes it over in one step that
+// must not show: at most one mount of the page heading after parsing, no layout shift, and no entrance animation
+// (opacity from 0) replayed on screen by the takeover.
+{
+  const PROBE = `(() => {
+    const p = window.__hmReload = { mounts: 0, cls: 0, replays: [], pre: false, settled: false };
+    document.addEventListener("DOMContentLoaded", () => { p.pre = !!document.querySelector("#app[data-hm-prerender]"); });
+    new MutationObserver((ms) => { if (document.readyState === "loading") return; for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 && (n.matches("h1") || n.querySelector("h1"))) { p.mounts++; p.at = performance.now(); (p.what = p.what || []).push(Math.round(p.at) + ":" + (n.className || n.tagName).toString().slice(0, 30) + "<" + (m.target.className || m.target.id || m.target.tagName).toString().slice(0, 20)); } }).observe(document, { childList: true, subtree: true });
+    new PerformanceObserver((l) => { for (const e of l.getEntries()) if (!e.hadRecentInput) p.cls += e.value; }).observe({ type: "layout-shift", buffered: true });
+    const seen = new WeakSet(), t0 = performance.now();
+    const iv = setInterval(() => {
+      const app = document.getElementById("app");
+      if (p.at && app && !app.hasAttribute("data-hm-prerender") && !document.documentElement.hasAttribute("data-hm-hydrating") && performance.now() - p.at > 1200) { p.settled = true; clearInterval(iv); }
+      if (performance.now() - t0 > 15000) { p.settled = true; clearInterval(iv); }
+      if (!p.pre || !p.at || performance.now() - p.at > 1200) return;
+      for (const a of document.getAnimations()) {
+        const t = a.effect && a.effect.target; if (!t || seen.has(a) || t.closest(".hm-roll")) continue; seen.add(a);
+        const k = a.effect.getKeyframes()[0] || {}, r = t.getBoundingClientRect();
+        if (String(k.opacity) === "0" && r.bottom > 0 && r.top < innerHeight && r.width > 0) p.replays.push((t.className || t.tagName).toString().slice(0, 40));
+      }
+    }, 50);
+  })()`;
+  const reg = await send("Page.addScriptToEvaluateOnNewDocument", { source: PROBE });
+  const start = ROUTES.includes("/") ? "/" : ROUTES[0];
+  await load(start, 1440);
+  for (let i = 0; i < 40 && !(await ev("!!(window.__hmReload && window.__hmReload.settled)")); i++) await sleep(400);
+  const r = await ev("window.__hmReload ? JSON.parse(JSON.stringify(window.__hmReload)) : null");
+  await send("Page.removeScriptToEvaluateOnNewDocument", { identifier: reg.result?.identifier });
+  if (!r) findings.push({ route: start, w: 1440, state: "reload", kind: "double-mount", at: "#app", detail: "probe did not run" });
+  else {
+    if (r.mounts > 1) findings.push({ route: start, w: 1440, state: "reload", kind: "double-mount", at: "#app", detail: `page heading mounted ${r.mounts} times after parsing` });
+    if (r.cls > 0.01) findings.push({ route: start, w: 1440, state: "reload", kind: "layout-shift", at: "#app", detail: `CLS ${r.cls.toFixed(3)}` });
+    if (r.replays.length) findings.push({ route: start, w: 1440, state: "reload", kind: "double-mount", at: "#app", detail: `takeover replayed ${r.replays.length} entrance animation(s): ${[...new Set(r.replays)].slice(0, 4).join(", ")}` });
+  }
+  if (process.env.MARCH_AUDIT_DEBUG) console.log("\nreload:", JSON.stringify(r));
   process.stdout.write("·");
 }
 await close();

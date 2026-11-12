@@ -63,8 +63,10 @@ export function lazy<P = Record<string, unknown>>(load: () => Promise<Loaded<P>>
     onCleanup(() => { alive = false; });
     const ph = opts.placeholder ?? (opts.fallback ? opts.fallback : "block");
     const fb = typeof ph === "function" ? untrack(() => (ph as (p: P) => unknown)(props)) : ph === "none" ? null : skeleton(ph);
+    // built while hydrate() takes over a prerendered page (hadi-march/seo): its content is already on screen, no fade-in
+    const still = !!globalThis.document?.documentElement.hasAttribute("data-hm-hydrating");
     const slot = h("div", {
-      class: () => `hm-lazy-slot is-${state()}${opts.height || opts.aspect ? " hm-lazy-sized" : ""}`, "aria-busy": () => (state() === "wait" ? "true" : null),
+      class: () => `hm-lazy-slot is-${state()}${opts.height || opts.aspect ? " hm-lazy-sized" : ""}${still ? " hm-lazy-still" : ""}`, "aria-busy": () => (state() === "wait" ? "true" : null),
     }, () => (state() === "ready" ? view() : state() === "error" ? h("div", { class: "hm-lazy-error", role: "alert" },
       h("span", {}, () => t`Could not load this part.`), h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", onClick: () => { state.set("wait"); start(); } }, () => t`Try again`)) : fb)) as HTMLElement;
     if (opts.height) slot.style.setProperty("--hm-lazy-h", opts.height);

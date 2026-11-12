@@ -13,6 +13,7 @@
 /* arrival: crossfade with a slight lift; direct children stagger in */
 .hm-lazy-slot.is-ready > * { animation: hm-lazy-in .24s var(--hm-ease-out, ease-out) both; }
 .hm-lazy-slot.is-ready > :nth-child(2) { animation-delay: 40ms; } .hm-lazy-slot.is-ready > :nth-child(3) { animation-delay: 80ms; }
+.hm-lazy-slot.hm-lazy-still.is-ready > * { animation: none; }
 .hm-lazy-slot.is-ready > :nth-child(4) { animation-delay: 120ms; } .hm-lazy-slot.is-ready > :nth-child(n+5) { animation-delay: 160ms; }
 @keyframes hm-lazy-show { to { opacity: 1; } }
 @keyframes hm-lazy-grow { to { transform: scaleX(.9); } }

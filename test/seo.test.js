@@ -204,3 +204,30 @@ test("march build with seo.prerender: a page per route, head, sitemap, robots; m
     assert.match(out, /2 page\(s\): 0 error\(s\)/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("hydrate: <html data-hm-hydrating> while the app builds off-screen; reveal skips what is already on screen", async () => {
+  const { document, cleanup } = installDom({ url: "http://localhost/#/" });
+  try {
+    const { reveal } = await import("../src/motion/scroll.ts");
+    // an observer that never fires: a revealed element stays hidden until it would scroll into view
+    const IO = globalThis.IntersectionObserver;
+    globalThis.IntersectionObserver = class { observe() {} disconnect() {} };
+    const el = document.createElement("div");
+    document.body.appendChild(el);
+    el.setAttribute("data-hm-prerender", "#/");
+    el.appendChild(document.createTextNode("pre"));
+    let ok = false, seen = false, card;
+    hydrate(() => { seen = document.documentElement.hasAttribute("data-hm-hydrating"); card = document.createElement("p"); reveal(card); return card; }, el, { ready: () => ok });
+    assert.equal(seen, true, "set while rendering");
+    const hidden = (x) => /opacity/.test(x.getAttribute("style") ?? "") || x.style.getPropertyValue?.("opacity") === "0";
+    assert.equal(hidden(card), false, "a revealed element is not hidden during the takeover");
+    ok = true;
+    await tick(40);
+    assert.equal(document.documentElement.hasAttribute("data-hm-hydrating"), false, "cleared after the swap");
+    const later = document.createElement("p");
+    document.body.appendChild(later);
+    reveal(later);
+    assert.equal(hidden(later), true, "after the takeover reveal hides until visible again");
+    globalThis.IntersectionObserver = IO;
+  } finally { cleanup(); }
+});
