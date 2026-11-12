@@ -228,7 +228,14 @@ ICU messages: `"{n, plural, =0 {No items} one {# item} other {# items}}"`, `"{g,
 
 ## 14. Routing extras
 
-`_layout.tsx` wraps every page in its folder (receives `children`; may export `guard`). `createRouter({ redirects })`,
+`_layout.tsx` wraps every page in its folder and renders `<Outlet />` where the page goes (`children` still works; may
+export `guard`). Layouts are mounted ONCE and stay alive while routes change below them: never re-create the app shell
+per page, put it in a layout (route `layouts: [shell]`) so its scroll, open menus, inputs and signals survive. Each level
+has its own error boundary (message + retry); the levels above stay interactive while a page loads. Named outlets:
+`createRouter({ outlets: { aside: { "/user/:id": () => import(…) } } })` + `<Outlet name="aside" />`, opened with
+`openOutlet("aside", "/user/7")` or `<Link outlet="aside">` (URL `?~aside=/user/7`). Modal routes: `<Link modal>` /
+`navigate(to, { modal: true })` opens the page over the current one in `<Outlet name="modal">{(page, close) => <Dialog open onClose={close}>{page()}</Dialog>}</Outlet>`;
+back closes it, a direct visit or reload shows the full page. Page transitions animate only the outlet that changed. `createRouter({ redirects })`,
 `<Link preload="hover|visible|none">`, `beforeLeave(() => !dirty() || confirm(…))` (links, navigate, back/forward, tab close),
 `setMeta({ title, description })`, `queryParam("tab")` signal. `navigate()` is async.
 

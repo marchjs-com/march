@@ -4,6 +4,14 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Router outlets (later in 0.1.0)
+- Persistent layouts: `<Outlet />`; a layout mounts once and survives navigation below it, only the deepest changed
+  level is rebuilt. Per-level error boundary (retry) and busy state; the shell paints before the page on first load.
+- Named outlets (`outlets` option, `?~name=/path`, `openOutlet`, `<Link outlet>`) and modal routes (`<Link modal>`,
+  `navigate(to, { modal: true })`, `<Outlet name="modal">`, `closeModal()`); a lazy `router/outlets` part.
+- View Transitions name only the changed outlet (the shell stays still). A second `createRouter()` disposes the first.
+- `core/util.ts`: `val`, `cx`, `rest`, `uid`, `on`, `later`, `debounce`… (ui/util re-exports them and adds icons).
+
 ### Progressive loading (later in 0.1.0)
 - `lazy(() => import("./X.tsx"))` (`hadi-march/lazy`, auto-imported): component chunks with a skeleton, `.preload()`.
   Options: `when` (immediate | idle | visible | interaction), `placeholder` skeletons (CSS only, after 100 ms),

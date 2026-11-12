@@ -1,0 +1,7 @@
+/* HADI March router: an outlet adds no box (its page sits in the layout as if it were not wrapped). While the level it
+   holds loads, the old content stays (interactive above it) and dims slightly after 300 ms. */
+.hm-outlet { display: contents; }
+.hm-outlet[aria-busy="true"] > * { opacity: .72; transition: opacity var(--hm-dur-2, .2s) var(--hm-ease-out, ease-out) .3s; }
+.hm-route-error { display: grid; gap: var(--hm-space-2, 8px); justify-items: start; margin: var(--hm-space-4, 16px) 0; }
+.hm-route-error p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .hm-outlet[aria-busy="true"] > * { transition: none; } }

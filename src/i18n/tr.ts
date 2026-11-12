@@ -1,5 +1,10 @@
 // Turkish locale pack for HADI March's built-in texts. Usage: import tr from "hadi-march/i18n/tr"; messages("tr", tr);
 const tr: Record<string, string> = {
+  "Try again": "Tekrar dene",
+  "This page could not be loaded.": "Bu sayfa yüklenemedi.",
+  "Not found": "Bulunamadı",
+  "Not allowed": "İzin yok",
+  "Could not load this part.": "Bu bölüm yüklenemedi.",
   "0 rows": "0 satır",
   "A new version is available": "Yeni sürüm hazır",
   "Actions": "Eylemler",

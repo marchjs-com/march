@@ -5,14 +5,24 @@
 //
 //   createRouter({ routes, redirects: { "/old": "/new" } });  render(() => <Router />, app)
 //   navigate("/users/42")   params().id   query().tab   setQuery({ tab: "x" })   beforeLeave(() => !dirty() || confirm…)
+//
+// Outlets: layouts are mounted once and stay alive while the route changes below them; only the deepest level that
+// differs is rebuilt (a layout renders <Outlet /> — or props.children — where the next level goes). Every level has its
+// own error boundary (message + retry) and busy state, so the shell stays interactive while a page loads.
+//   <Outlet name="aside" />          a named outlet, routed by the URL (?~aside=/users/7) — openOutlet("aside", "/users/7")
+//   navigate("/photos/3", { modal: true }) / <Link modal>   the page opens over the current one (<Outlet name="modal">);
+//                                    back closes it; a direct visit or a reload shows it as a full page
 import { provideLink } from "../dom/link.ts";
-import { signal, computed, untrack, batch, effect, onCleanup, read, getOwner } from "../core/reactive.ts";
-import { h } from "../dom/h.ts";
+import "./router.css";
+import { signal, computed, untrack, batch, effect, onCleanup, read, getOwner, context, provide, useContext } from "../core/reactive.ts";
+import { t } from "../core/i18n.ts";
+import { h, lazyChildren } from "../dom/h.ts";
 import { Try } from "../dom/flow.ts";
+import { lazy } from "../dom/lazy.ts";
 import { preloadChunks, loaderKey, saveData, whenIdle, loadDelay } from "../dom/preload.ts";
 
 // ------------------------------------------------------------------ types
-type Component = (props: Record<string, unknown>) => unknown;
+export type Component = (props: Record<string, unknown>) => unknown;
 type Loader = () => Promise<unknown>;
 export interface PageModule { default?: Component; component?: Component; guard?: Guard; title?: string | ((to: RouteTarget) => string); meta?: Record<string, unknown> }
 export interface RouteTarget { path: string; params: Record<string, string>; query: Record<string, string>; meta: Record<string, unknown>; route: CompiledRoute }
@@ -37,6 +47,8 @@ export interface RouterOptions {
    * always off when the user saves data or is on a 2G-class connection.
    */
   prefetch?: "idle" | "none";
+  /** Route tables of named outlets: `outlets: { aside: { "/users/:id": () => import("./user-card.tsx") } }`. */
+  outlets?: Record<string, RouteTable | RouteDef[]>;
 }
 
 /** Augmented by the generated pages.d.ts: `declare module "hadi-march/router" { interface Register { routes: "/" | "/users/:id" } }`. */
@@ -55,8 +67,12 @@ type Clean<N extends string> = N extends `${infer X}?` ? X : N;
 interface Sig<T> { (): T; peek(): T; set(v: T): T }
 const sig = <T>(v: T, name?: string): Sig<T> => signal(v, name ? { name } : undefined) as unknown as Sig<T>;
 
-interface View { component?: Component; to?: RouteTarget; layouts?: Component[]; notFound?: boolean; forbidden?: boolean; error?: unknown }
-interface RouterState { routes: CompiledRoute[]; mode: "history" | "hash"; base: string; opts: RouterOptions; cache: Map<string, Promise<PageModule | null>>; seq: number; view: Sig<View | null>; redirects: CompiledRoute[]; dispose: () => void }
+/** One level of the outlet tree: a layout or the page. The key decides whether it is kept (same key) or rebuilt. */
+interface Level { key: string; comp: Component; to?: RouteTarget; page?: boolean }
+interface View { to?: RouteTarget; levels: Level[]; error?: unknown }
+/** What a named outlet (or the modal outlet) shows. */
+export interface Slot { key: string; comp: Component; to: RouteTarget }
+export interface RouterState { loading?: Renderable; routes: CompiledRoute[]; mode: "history" | "hash"; base: string; opts: RouterOptions; cache: Map<string, Promise<PageModule | null>>; seq: number; view: Sig<View | null>; redirects: CompiledRoute[]; outlets: Map<string, CompiledRoute[]>; dispose: () => void }
 
 const S = {
   router: null as RouterState | null,
@@ -65,7 +81,19 @@ const S = {
   hash: sig(""),
   match: sig<Match | null>(null, "router.match"),
   pending: sig(false),
+  /** Depth of the outlet that is loading new content (-1: none). */
+  pendingDepth: sig(-1),
+  /** Named outlets ("modal" included): name → what it shows. */
+  slots: new Map<string, Sig<Slot | null>>(),
+  /** The path the modal outlet shows (from history state), or null. */
+  modalTo: sig<string | null>(null),
 };
+const slot = (name: string): Sig<Slot | null> => { let x = S.slots.get(name); if (!x) S.slots.set(name, (x = sig<Slot | null>(null))); return x; };
+/** A stable id per layout loader / component (the level key of a layout). */
+const ids = new WeakMap<object, string>();
+let nextId = 0;
+const idOf = (o: object): string => { let v = ids.get(o); if (!v) ids.set(o, (v = String(++nextId))); return v; };
+const pageKey = (route: CompiledRoute, prm: Record<string, string>): string => `page:${route.pattern}:${JSON.stringify(prm)}`;
 const leaveGuards = new Set<() => boolean | Promise<boolean>>();
 
 let navWrapper: ((apply: () => void, o: { pop: boolean }) => void | Promise<void>) | null = null;
@@ -126,12 +154,15 @@ const compile = (r: RouteDef): CompiledRoute => ({ ...r, ...compilePath(r.path) 
 
 export function createRouter(opts: RouterOptions): { navigate: typeof navigate; back: typeof back; routes: CompiledRoute[]; dispose: () => void } {
   // Object form: a function value is a LOADER (`() => import("./page.jsx")`); use { component } for a direct component.
+  // one router per page: a second createRouter() (HMR, tests) replaces the first and drops its listeners
+  S.router?.dispose();
   const list: RouteDef[] = Array.isArray(opts.routes) ? opts.routes : Object.entries(opts.routes).map(([p, v]) => (typeof v === "function" ? { path: p, load: v } : { ...v, path: p }));
   const routes = list.map(compile).sort((a, b) => b.score - a.score);
   const redirects = Object.entries(opts.redirects ?? {}).map(([from, to]) => compile({ path: from, meta: { to } }));
   const mode = opts.mode ?? "history";
   const base = (opts.base ?? "").replace(/\/$/, "");
-  const r: RouterState = { routes, mode, base, opts, cache: new Map(), seq: 0, view: sig<View | null>(null), redirects, dispose: () => {} };
+  const outlets = new Map(Object.entries(opts.outlets ?? {}).map(([name, tbl]) => [name, (Array.isArray(tbl) ? tbl : Object.entries(tbl).map(([p, v]) => (typeof v === "function" ? { path: p, load: v } : { ...v, path: p }))).map(compile).sort((a, b) => b.score - a.score)]));
+  const r: RouterState = { routes, mode, base, opts, cache: new Map(), seq: 0, view: sig<View | null>(null), redirects, outlets, dispose: () => {} };
   S.router = r;
   const onPop = (): void => { void sync({ pop: true }); };
   const onUnload = (e: BeforeUnloadEvent): void => { if ([...leaveGuards].some((g) => g() === false)) { e.preventDefault(); e.returnValue = ""; } };
@@ -160,7 +191,16 @@ let lastUrl = "";
 async function sync({ pop = false, initial = false }: { pop?: boolean; initial?: boolean } = {}): Promise<void> {
   const r = S.router;
   if (!r) return;
-  const { p, search, hash } = currentLocation();
+  let { p, search, hash } = currentLocation();
+  // modal route: the URL is the modal's, the page behind stays the one it was opened from (history state hmBg)
+  const st = globalThis.history?.state as { hmModal?: boolean; hmBg?: string } | null;
+  let modalTo: string | null = null;
+  if (st?.hmModal && st.hmBg) {
+    // a direct visit / reload of a modal URL shows the page in full (and forgets the modal state)
+    if (initial) globalThis.history.replaceState({ ...st, hmModal: undefined, hmBg: undefined }, "");
+    else { modalTo = `${p}${search}`; const u = new URL(st.hmBg, "http://x"); p = u.pathname; search = u.search; }
+  }
+  S.modalTo.set(modalTo);
   // leave confirmation on back/forward: restore the URL when a guard says no
   if (pop && leaveGuards.size && !(await allowLeave())) { if (lastUrl) globalThis.history.pushState(globalThis.history.state, "", lastUrl); return; }
   const redirect = matchRoute(r.redirects, p);
@@ -168,19 +208,33 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
   const m = matchRoute(r.routes, p);
   const cur = S.match.peek();
   const view = r.view.peek();
-  if (!initial && m && cur && view?.component && cur.route === m.route && JSON.stringify(cur.params) === JSON.stringify(m.params)) {
+  if (!initial && m && cur && view?.levels.length && !view.error && cur.route === m.route && JSON.stringify(cur.params) === JSON.stringify(m.params)) {
     batch(() => { S.path.set(p); S.search.set(search); S.hash.set(hash); });
     lastUrl = globalThis.location?.href ?? "";
     return;
   }
   const seq = ++r.seq;
-  S.pending.set(true);
+  // the first level that will change: everything above it stays mounted (and interactive) while this one loads
+  const nextKeys = m ? [...(m.route.layouts ?? []).map((l) => `layout:${idOf(l)}`), pageKey(m.route, m.params)] : ["notfound"];
+  const curLevels = view?.levels ?? [];
+  let depth = 0;
+  while (depth < nextKeys.length && curLevels[depth]?.key === nextKeys[depth]) depth++;
+  batch(() => { S.pending.set(true); S.pendingDepth.set(Math.min(depth, Math.max(curLevels.length - 1, 0))); });
   try {
     let page: View | null = null, mod: PageModule | null = null;
+    const layoutLevels = (mods: (PageModule | null)[], to: RouteTarget): Level[] => (m?.route.layouts ?? []).map((l, i) => ({ key: `layout:${idOf(l)}`, comp: mods[i]?.default ?? mods[i]?.component ?? passThrough, to }));
     let meta: Record<string, unknown> = {};
     if (m) {
       // page and layouts in parallel (each preloads all of its chunks at once: no import waterfall)
-      const [pageMod, ...layouts] = await Promise.all([loadRoute(m.route), ...(m.route.layouts ?? []).map((l) => loadModule(l))]);
+      const pageP = loadRoute(m.route);
+      const layoutsP = Promise.all((m.route.layouts ?? []).map((l) => loadModule(l)));
+      // first paint: the layouts (the app shell) show as soon as they are here, with a loading placeholder for the page
+      if (!view && m.route.layouts?.length) void layoutsP.then((mods) => {
+        if (seq !== r.seq || r.view.peek()) return;
+        const to0: RouteTarget = { path: p, params: m.params, query: Object.fromEntries(new URLSearchParams(search)), meta: { ...(m.route.meta ?? {}) }, route: m.route };
+        r.view.set({ to: to0, levels: [...layoutLevels(mods, to0), { key: "loading", comp: () => (r.loading !== undefined ? read(r.loading) : null), page: true }] });
+      }, () => undefined);
+      const [pageMod, layouts] = await Promise.all([pageP, layoutsP]);
       mod = pageMod ?? null;
       if (seq !== r.seq) return;
       meta = { ...(m.route.meta ?? {}), ...(mod?.meta ?? {}) };
@@ -189,28 +243,42 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
         if (typeof g !== "function") continue;
         const res = await g(to);
         if (seq !== r.seq) return;
-        if (res === false) { if (!initial && !pop) { S.pending.set(false); return; } page = { forbidden: true }; break; }
+        if (res === false) { if (!initial && !pop) { batch(() => { S.pending.set(false); S.pendingDepth.set(-1); }); return; } page = { to, levels: [...layoutLevels(layouts, to), { key: "forbidden", comp: forbiddenComp, page: true, to }] }; break; }
         if (typeof res === "string" && res !== p) { await navigate(res as Href, { replace: true }); return; }
       }
       const comp = mod?.default ?? mod?.component ?? m.route.component;
-      page ??= { ...(comp ? { component: comp } : {}), to, layouts: layouts.map((l) => l?.default).filter((c): c is Component => !!c) };
+      page ??= { to, levels: [...layoutLevels(layouts, to), { key: pageKey(m.route, m.params), comp: comp ?? (() => null), page: true, to }] };
       const title = r.opts.title?.(to) ?? (typeof mod?.title === "function" ? mod.title(to) : mod?.title) ?? m.route.title;
       setMeta({ ...(title ? { title } : {}), ...(typeof meta["description"] === "string" ? { description: meta["description"] } : {}) });
     }
     const apply = (): void => batch(() => {
       S.path.set(p); S.search.set(search); S.hash.set(hash);
       S.match.set(m ? { route: m.route, params: m.params, path: p, meta } : null);
-      r.view.set(page ?? { notFound: true });
+      r.view.set(page ?? { levels: [{ key: "notfound", comp: notFoundComp, page: true }] });
+      S.pendingDepth.set(-1);
     });
+    vtDepth = depth;
     if (navWrapper && !initial) await navWrapper(apply, { pop }); else apply();
     lastUrl = globalThis.location?.href ?? "";
     if (r.opts.scroll !== false) restoreScroll(pop);
     if (initial && r.opts.prefetch !== "none") whenIdle(prefetchLinks, 3000);
   } catch (e) {
-    if (seq === r.seq) r.view.set({ error: e });
+    // the error shows at the level that failed; the layouts above it stay
+    if (seq === r.seq) batch(() => { r.view.set({ error: e, levels: [...curLevels.slice(0, depth), { key: `error:${seq}`, comp: () => routeError(e, () => { void sync({ initial: true }); }), page: true }] }); S.pendingDepth.set(-1); });
   } finally {
     if (seq === r.seq) S.pending.set(false);
   }
+}
+
+/** The depth whose content the last navigation replaced (page transitions name only that outlet). */
+let vtDepth = 0;
+const passThrough: Component = (p) => p["children"];
+const notFoundComp: Component = () => untrack(() => call(S.router?.opts.notFound ?? (() => h("p", { class: "hm-empty" }, () => t`Not found`))));
+const forbiddenComp: Component = () => h("p", { class: "hm-empty", role: "alert" }, () => t`Not allowed`);
+export function routeError(e: unknown, retry: () => void): Element {
+  return h("div", { class: "hm-error hm-route-error", role: "alert" },
+    h("p", {}, () => t`This page could not be loaded.`), h("p", { class: "hm-muted" }, String((e as { message?: unknown } | null)?.message ?? e)),
+    h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", onClick: retry }, () => t`Try again`));
 }
 
 const moduleCache = new Map<Loader, Promise<PageModule | null>>();
@@ -326,7 +394,7 @@ function restoreScroll(pop: boolean): void {
 
 // ------------------------------------------------------------------ navigation
 /** Go to a path (same origin only). Leave guards may cancel. */
-export async function navigate(to: Href, { replace = false, state = null, force = false }: { replace?: boolean; state?: Record<string, unknown> | null; force?: boolean } = {}): Promise<void> {
+export async function navigate(to: Href, { replace = false, state = null, force = false, modal = false }: { replace?: boolean; state?: Record<string, unknown> | null; force?: boolean; modal?: boolean } = {}): Promise<void> {
   const r = S.router;
   if (!r) throw new Error("March: navigate() before createRouter().");
   const s = String(to);
@@ -335,11 +403,26 @@ export async function navigate(to: Href, { replace = false, state = null, force 
   if (!force && !samePage && leaveGuards.size && !(await allowLeave())) return;
   saveScroll();
   const url = r.mode === "hash" ? `#${s}` : `${r.base}${s}`;
-  const st = { ...(state ?? {}), hmKey: Math.random().toString(36).slice(2) };
+  // a modal keeps the page it was opened from (or that page's own background, when one modal opens another)
+  const curState = globalThis.history?.state as { hmModal?: boolean; hmBg?: string } | null;
+  const bg = curState?.hmModal && curState.hmBg ? curState.hmBg : `${untrack(() => S.path())}${untrack(() => S.search())}`;
+  const st = { ...(state ?? {}), hmKey: Math.random().toString(36).slice(2), ...(modal ? { hmModal: true, hmBg: bg } : {}) };
   if (replace) globalThis.history.replaceState(st, "", url); else globalThis.history.pushState(st, "", url);
   return sync();
 }
 export const back = (): void => globalThis.history.back();
+
+/** Close the modal route: back in history when the modal was pushed, else go to the page behind it. */
+export function closeModal(): void {
+  const st = globalThis.history?.state as { hmModal?: boolean; hmBg?: string } | null;
+  if (st?.hmModal) globalThis.history.back(); else if (st?.hmBg) void navigate(st.hmBg as Href, { replace: true });
+}
+/** Show a path in a named outlet (it becomes part of the URL: ?~name=/path). null closes it. */
+export function openOutlet(name: string, to: string | null, { replace = false }: { replace?: boolean } = {}): Promise<void> {
+  return setQuery({ [`~${name}`]: to }, { replace });
+}
+/** What a named outlet shows (reactive): its target, or null. */
+export const outletRoute = (name: string): RouteTarget | null => slot(name)()?.to ?? null;
 
 /** Merge values into the query string (null/undefined/"" removes a key). Replaces history by default. */
 export function setQuery(values: Record<string, unknown>, { replace = true }: { replace?: boolean } = {}): Promise<void> {
@@ -357,39 +440,86 @@ export function setQuery(values: Record<string, unknown>, { replace = true }: { 
 type Renderable = unknown;
 const call = (c: unknown): unknown => (typeof c === "function" ? (c as () => unknown)() : c);
 
+interface OutletCtx { depth: number; take?: (() => Element) | undefined; wrap?: ((page: () => unknown, to: RouteTarget) => unknown) | undefined; notFound?: Renderable | undefined; forbidden?: Renderable | undefined }
+const OutletContext = context<OutletCtx | null>(null);
+
+/** One level of the tree: rebuilt only when its key changes; its own error boundary and busy state. */
+function level(r: RouterState, ctx: OutletCtx, loading?: Renderable): Element {
+  const { depth } = ctx;
+  const key = computed(() => r.view()?.levels[depth]?.key ?? null);
+  return h("div", {
+    class: "hm-outlet", "data-depth": String(depth), "aria-busy": () => (S.pendingDepth() === depth && S.pending() ? "true" : null),
+  }, () => {
+    const k = key();
+    if (k == null) return depth === 0 && !r.view() && loading !== undefined ? read(loading) : null;
+    return untrack(() => {
+      const lv = r.view.peek()?.levels[depth];
+      if (!lv) return null;
+      return h(Try, { fallback: (e: unknown, reset: () => unknown) => routeError(e, () => { reset(); void sync({ initial: true }); }) }, () => {
+        // the next level is created once, where the layout first asks for it (<Outlet /> or props.children)
+        let next: Element | null = null;
+        const take = (): Element => (next ??= level(r, { ...ctx, depth: depth + 1, take: undefined }));
+        provide(OutletContext, { ...ctx, depth: depth + 1, take });
+        const to = lv.to;
+        const props: Record<string, unknown> = { params: to?.params ?? {}, query: to?.query ?? {}, meta: to?.meta ?? {} };
+        if (lv.page) {
+          const C = lv.key === "notfound" && ctx.notFound !== undefined ? (() => call(ctx.notFound)) as Component : lv.key === "forbidden" && ctx.forbidden !== undefined ? (() => call(ctx.forbidden)) as Component : lv.comp;
+          const node = (): unknown => h(C, props);
+          return ctx.wrap && to ? ctx.wrap(node, to) : node();
+        }
+        // a layout: props.children is the next level (same as <Outlet />), kept for layouts written before Outlet
+        return h(lv.comp, props, lazyChildren(take));
+      });
+    });
+  });
+}
+
 /**
- * Renders the current page inside its layouts. Props: `loading`, `fallback(error)`, `notFound`, `forbidden`,
- * `wrap(page, to)` — a common wrapper for every page (gates driven by `to.meta`).
+ * Renders the outlet tree: the layouts of the current route (kept alive across navigations) and the page.
+ * Props: `loading` (first load), `notFound`, `forbidden`, `wrap(page, to)` — a wrapper around every page.
  */
 export function Router(props: { loading?: Renderable; fallback?: unknown; notFound?: Renderable; forbidden?: Renderable; wrap?: (page: () => unknown, to: RouteTarget) => unknown }): unknown {
   const r = S.router;
   if (!r) throw new Error("March: <Router/> needs createRouter() first.");
-  return h(Try, { loading: props.loading, fallback: props.fallback }, () => {
-    const v = r.view();
-    if (!v) return props.loading ? read(props.loading) : null;
-    if (v.error) throw v.error;
-    if (v.notFound) return untrack(() => call(props.notFound ?? r.opts.notFound ?? (() => h("p", { class: "hm-empty" }, "Not found"))));
-    if (v.forbidden) return untrack(() => call(props.forbidden ?? (() => h("p", { class: "hm-empty", role: "alert" }, "Not allowed"))));
-    const C = v.component, to = v.to;
-    if (!C || !to) return null;
-    const page = (): unknown => {
-      let node: unknown = h(C, { params: to.params, query: to.query, meta: to.meta });
-      for (const L of [...(v.layouts ?? [])].reverse()) { const inner = node; node = h(L, { params: to.params, meta: to.meta, children: inner }); }
-      return node;
-    };
-    return untrack(() => (props.wrap ? props.wrap(page, to) : page()));
-  });
+  r.loading = props.loading;
+  return level(r, { depth: 0, wrap: props.wrap, notFound: props.notFound, forbidden: props.forbidden }, props.loading);
+}
+
+/**
+ * Where the next level goes inside a layout: `<Outlet />`. With a name it shows a named outlet (`outlets` option,
+ * URL ?~name=/path) or the modal route (`name="modal"`); `children` can wrap it: `{(page, close) => <Dialog …>{page()}</Dialog>}`.
+ * `empty` renders when a named outlet shows nothing.
+ */
+export function Outlet(props: { name?: string; empty?: Renderable; children?: unknown }): unknown {
+  const r = S.router;
+  if (!r) throw new Error("March: <Outlet/> needs createRouter() first.");
+  if (!props.name) {
+    const ctx = useContext(OutletContext);
+    if (!ctx) throw new Error("March: <Outlet/> without a name must be inside a layout rendered by <Router/>.");
+    return ctx.take ? ctx.take() : level(r, ctx);
+  }
+  // named outlets and the modal outlet: their own (small, lazy) module, loaded where one is used
+  return h(NamedOutlet, props);
+}
+const NamedOutlet = lazy(() => import("./outlets.ts"), { pick: "NamedOutlet", placeholder: "none" });
+
+/** Internals for the outlets module (not public API). */
+export const _router = { S, slot, matchRoute, loadRoute, pageKey, notFoundComp, forbiddenComp, routeError };
+
+/** Mark the outlet whose content changes, so a View Transition animates only that part (the shell stays put). */
+export function transitionOutlet(): Element | null {
+  return globalThis.document?.querySelector(`.hm-outlet[data-depth="${vtDepth}"]`) ?? null;
 }
 
 /** `<Link href="/users" exact prefetch="hover">Users</Link>` — client-side navigation, aria-current, preloading. */
-export function Link(props: { href: Href | (() => Href); exact?: boolean; replace?: boolean; preload?: "hover" | "visible" | "idle" | "none"; prefetch?: "hover" | "visible" | "idle" | "none"; target?: string; children?: unknown; [k: string]: unknown }): unknown {
+export function Link(props: { href: Href | (() => Href); exact?: boolean; replace?: boolean; modal?: boolean; outlet?: string; preload?: "hover" | "visible" | "idle" | "none"; prefetch?: "hover" | "visible" | "idle" | "none"; target?: string; children?: unknown; [k: string]: unknown }): unknown {
   const href = (): string => String(read(props.href));
   const active = (): boolean => {
     const p = S.path(), to = href().split("?")[0] ?? "";
     return props.exact ? p === to : p === to || (to !== "/" && p.startsWith(`${to}/`));
   };
   const rest: Record<string, unknown> = { ...props };
-  for (const k of ["href", "exact", "activeClass", "children", "replace", "preload", "prefetch"]) delete rest[k];
+  for (const k of ["href", "exact", "activeClass", "children", "replace", "preload", "prefetch", "modal", "outlet"]) delete rest[k];
   // prefetch (download only, via the manifest) on hover/focus by default; "visible" when it scrolls into view; "idle"
   // when the browser is idle after it renders. All of them are skipped with Save-Data / 2G (prefetch() checks).
   const mode = props.prefetch ?? props.preload ?? "hover";
@@ -403,7 +533,8 @@ export function Link(props: { href: Href | (() => Href); exact?: boolean; replac
     onClick: (e: MouseEvent) => {
       if (e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || props.target === "_blank") return;
       e.preventDefault();
-      void navigate(href() as Href, { replace: !!props.replace });
+      if (props.outlet) void openOutlet(props.outlet, href(), { replace: !!props.replace });
+      else void navigate(href() as Href, { replace: !!props.replace, modal: !!props.modal });
     },
   }, () => props.children) as Element;
   if (mode === "idle") { const cancel = whenIdle(pre, 3000); if (getOwner()) onCleanup(cancel); }

@@ -11,10 +11,12 @@
 
 /* View Transitions (router pageTransitions) */
 @view-transition { navigation: auto; }
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--hm-dur-2); animation-timing-function: var(--hm-ease-out); }
-:root[data-hm-page-transition="slide"]::view-transition-old(root) { animation-name: hm-vt-out; }
-:root[data-hm-page-transition="slide"]::view-transition-new(root) { animation-name: hm-vt-in; }
-:root[data-hm-page-transition="slide"][data-hm-nav="back"]::view-transition-new(root) { animation-name: hm-vt-in-back; }
+/* the router names only the outlet that changes (hm-page); the rest of the page (shell, layouts) is not captured */
+:root[data-hm-vt-scope="outlet"] { view-transition-name: none; }
+::view-transition-old(root), ::view-transition-new(root), ::view-transition-old(hm-page), ::view-transition-new(hm-page) { animation-duration: var(--hm-dur-2); animation-timing-function: var(--hm-ease-out); }
+:root[data-hm-page-transition="slide"]::view-transition-old(root), :root[data-hm-page-transition="slide"]::view-transition-old(hm-page) { animation-name: hm-vt-out; }
+:root[data-hm-page-transition="slide"]::view-transition-new(root), :root[data-hm-page-transition="slide"]::view-transition-new(hm-page) { animation-name: hm-vt-in; }
+:root[data-hm-page-transition="slide"][data-hm-nav="back"]::view-transition-new(root), :root[data-hm-page-transition="slide"][data-hm-nav="back"]::view-transition-new(hm-page) { animation-name: hm-vt-in-back; }
 @keyframes hm-vt-out { to { opacity: 0; transform: translateX(-12px); } }
 @keyframes hm-vt-in { from { opacity: 0; transform: translateX(12px); } }
 @keyframes hm-vt-in-back { from { opacity: 0; transform: translateX(-12px); } }
@@ -51,5 +53,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .hm-shimmer, .hm-float { animation: none; }
-  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  ::view-transition-old(root), ::view-transition-new(root), ::view-transition-old(hm-page), ::view-transition-new(hm-page) { animation: none; }
 }

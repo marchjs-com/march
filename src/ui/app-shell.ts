@@ -3,7 +3,7 @@
 import "./layout.css";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
-import { val, cx, type ClassProp } from "./util.ts";
+import { val, cx, type ClassProp } from "../core/util.ts";
 
 export interface AppShellProps {
   nav?: unknown;

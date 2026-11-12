@@ -377,7 +377,9 @@ export function installDom({ url = "http://localhost/" }: { url?: string } = {})
   const globals: Record<string, unknown> = { document, window, location, history, localStorage: window.localStorage, sessionStorage: window.sessionStorage,
     Node: Node_, Element: Element_, HTMLElement: Element_, Text: Text_, Comment: Comment_, DocumentFragment: Fragment_, Event: Event_,
     CustomEvent: Event_, KeyboardEvent: Event_, MouseEvent: Event_, InputEvent: Event_, FocusEvent: Event_, matchMedia: window.matchMedia,
-    requestAnimationFrame: window.requestAnimationFrame, cancelAnimationFrame: window.cancelAnimationFrame, innerWidth: 1024 };
+    requestAnimationFrame: window.requestAnimationFrame, cancelAnimationFrame: window.cancelAnimationFrame, innerWidth: 1024,
+    // window events (popstate, hashchange, resize…) on the global object, as in a browser
+    addEventListener: window.addEventListener.bind(window), removeEventListener: window.removeEventListener.bind(window), dispatchEvent: window.dispatchEvent.bind(window) };
   for (const k of Object.keys(globals)) { prev[k] = Object.getOwnPropertyDescriptor(globalThis, k); Object.defineProperty(globalThis, k, { value: globals[k], configurable: true, writable: true }); }
   const cleanup = (): void => { for (const k of Object.keys(globals)) { const d = prev[k]; d ? Object.defineProperty(globalThis, k, d) : delete (globalThis as Record<string, unknown>)[k]; } };
   return { document, window, cleanup };
