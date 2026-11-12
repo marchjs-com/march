@@ -3,7 +3,7 @@
 //   createSelection() — single / multiple selection over an ordered key list: pick() follows the platform
 //                       convention (click = only this, Ctrl/⌘ = toggle, Shift = range from the anchor).
 //   moveCursor()      — next index for a navigation key in a list or a wrapped grid (arrows, Home/End, PageUp/Down).
-import { signal, batch, untrack, type Signal } from "./reactive.ts";
+import { signal, batch, untrack, effect, type Signal } from "./reactive.ts";
 import { val, type MaybeFn } from "./util.ts";
 
 export type SelectionMode = "none" | "single" | "multiple";
@@ -58,7 +58,20 @@ export function createSelection<K, T = K>(o: SelectionOptions<K, T>): Selection<
   const anchor = signal<K | undefined>(undefined);
   const mode = (): SelectionMode => val(o.mode) ?? "multiple";
   const commit = (next: Map<K, T>): void => { selected.set(next); o.onChange?.([...next.keys()]); };
-  if (o.initial) { const m = new Map<K, T>(); for (const it of o.initial) m.set(keyOf(it), it); selected.set(m); }
+  if (o.initial) { const m = new Map<K, T>(), md = untrack(mode); if (md !== "none") for (const it of o.initial) { m.set(keyOf(it), it); if (md === "single") break; } selected.set(m); }
+  // the mode is live: a narrower mode trims the selection at once ("none" clears it, "single" keeps the anchor — the
+  // last item picked — or the last selected)
+  let was = untrack(mode);
+  effect(() => {
+    const m = mode();
+    if (m === was) return;
+    was = m;
+    untrack(() => {
+      const cur = selected();
+      if (m === "none" && cur.size) commit(new Map());
+      else if (m === "single" && cur.size > 1) { const a = anchor(), k = a !== undefined && cur.has(a) ? a : [...cur.keys()].pop()!; commit(new Map([[k, cur.get(k)!]])); }
+    });
+  });
   const sel: Selection<K, T> = {
     selected, anchor, mode,
     has: (k) => selected().has(k),

@@ -97,3 +97,12 @@ test("TreeView: Alt+arrow moves a node among its siblings (keyboard drag and dro
   assert.deepEqual(labels(m.el), ["src", "readme", "docs"]);
   m.dispose();
 });
+
+test("TreeView: a lazy folder that starts open loads its children at once", async () => {
+  let calls = 0;
+  const m = mount(() => h(TreeView, { nodes: [{ id: "a", label: "a", lazy: true }], expanded: ["a"], load: async () => { calls++; return [{ id: "a/x", label: "x.ts" }]; } }));
+  await tick(); await tick();
+  assert.equal(calls, 1);
+  assert.ok([...m.el.querySelectorAll('[role="treeitem"]')].some((r) => r.textContent.includes("x.ts")));
+  m.dispose();
+});

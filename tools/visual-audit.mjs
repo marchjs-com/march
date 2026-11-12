@@ -8,6 +8,8 @@
 //   grid-cell       an item of a CSS grid (one column, stretching) is narrower than its track: a margin or width
 //                   rule meant for something else, such as a class name used by two features
 //   overlap         neighbouring items of a flex row draw on top of each other
+//   badge           a choice card's tick badge leaves the card, touches its edge, covers the label or (a one-line
+//                   card) is not centred on the block axis
 //   double-mount    after in-app navigation (menu clicks, back / forward) more than one app shell or page heading
 //   console         a script error
 //
@@ -96,6 +98,22 @@ const SCAN = `(() => {
       const w = k.offsetWidth;
       if (w < tracks[i] - 2) { out.push(["grid-cell", where(k), w + " in a " + Math.round(tracks[i]) + " px track"]); break; }
     }
+  }
+  // choice cards (RadioGroup / CheckboxGroup card variant, ChoicePicker cards and tiles): the tick badge sits inside the
+  // card, at the line end, clear of the label; a card that is one line high centres it on the block axis
+  for (const c of document.querySelectorAll(".hm-choice-card .hm-check, .hm-picker-cards .hm-check, .hm-picker-grid .hm-check")) {
+    const b = c.querySelector(".hm-check-box");
+    if (!b || skip(c) || !shown(c)) continue;
+    const cr = c.getBoundingClientRect(), br = b.getBoundingClientRect();
+    if (!br.width) continue;
+    const inset = Math.min(br.left - cr.left, cr.right - br.right, br.top - cr.top, cr.bottom - br.bottom);
+    if (inset < 2) { out.push(["badge", where(c), "the badge is " + Math.round(inset) + " px from the card edge"]); continue; }
+    const rtl = getComputedStyle(c).direction === "rtl";
+    if (rtl ? br.left - cr.left > cr.right - br.right : cr.right - br.right > br.left - cr.left) { out.push(["badge", where(c), "the badge is not at the line end"]); continue; }
+    const label = c.querySelector(".hm-choice-card-title, .hm-choice-card-text, .hm-check-label");
+    const text = label && [...label.querySelectorAll("*"), label].map((e) => { const r = document.createRange(); r.selectNodeContents(e); return r.getBoundingClientRect(); }).find((r) => r.width);
+    if (text && text.right > br.left + 1 && text.left < br.right - 1 && text.bottom > br.top + 1 && text.top < br.bottom - 1) { out.push(["badge", where(c), "the badge covers the label"]); continue; }
+    if (!c.querySelector(".hm-choice-card-icon, .hm-choice-card-desc, .hm-choice-card-meta") && Math.abs((br.top + br.bottom) / 2 - (cr.top + cr.bottom) / 2) > 2) out.push(["badge", where(c), "a one-line card: the badge is not centred on the block axis"]);
   }
   return out;
 })()`;

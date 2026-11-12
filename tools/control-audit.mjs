@@ -64,6 +64,8 @@ const SETUP = `(() => {
       for (const n of el.childNodes) if (n.nodeType === 3) { const t = n.textContent.trim(); if (t) parts.push("#" + t); } else walk(n);
     };
     walk(root());
+    // open layers (menus, popovers, drawers, dialogs) are drawn outside the page body
+    for (const l of document.querySelectorAll(".hm-layer")) if (!root().contains(l)) walk(l);
     return parts.join("\\n");
   };
   const picked = (x) => x.getAttribute("aria-checked") === "true" || x.getAttribute("aria-selected") === "true" || x.checked === true;
@@ -113,7 +115,34 @@ const SETUP = `(() => {
     const hz = g.getAttribute("aria-orientation") === "horizontal";
     return (hz ? dy > dx : dx > dy) ? [(g.getAttribute("aria-label") || g.className || g.tagName) + " says " + (hz ? "horizontal" : "vertical") + " but its items are laid out " + (hz ? "vertically" : "horizontally")] : [];
   });
-  window.__ca = { pending, snap, use, name, where, key, settle, turned, tried: new Set() };
+  // an option whose effect shows on the next interaction (a menu opened, a drawer opened, a message sent): the stage of
+  // the demo is used — its popup triggers and the elements it marks with data-audit-try are pressed — and what that
+  // shows is compared, after the option was changed and after it was put back. data-audit-try="toggle" is pressed
+  // again to close, "contextmenu" is right-clicked; anything else is closed with Escape.
+  const tryNext = async (c) => {
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const stage = c.closest(".sc-play")?.querySelector(".sc-play-stage") ?? c.closest(".sc-demo");
+    if (!stage) return null;
+    const triggers = [...stage.querySelectorAll("[data-audit-try], [aria-haspopup]:not([aria-haspopup=false])")].filter((x) => shown(x) && !x.disabled).slice(0, 3);
+    // resize handles (a splitter, a resizable sidebar): Home and End take them to their limits
+    const handles = [...stage.querySelectorAll("[role=separator][tabindex]")].filter(shown).slice(0, 2);
+    if (!triggers.length && !handles.length) return null;
+    const out = [];
+    const key = (el, k) => el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+    for (const hd of handles) { hd.focus(); for (const k of ["Home", "End"]) { key(hd, k); await wait(350); out.push(snap(c)); } }
+    for (const t of triggers) {
+      // data-audit-try="contextmenu": a right click (a context menu); else a click
+      if (t.getAttribute("data-audit-try") === "contextmenu") { const r = t.getBoundingClientRect(); t.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true, button: 2, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 })); }
+      else t.click();
+      await wait(500);
+      out.push(snap(c));
+      if (t.getAttribute("data-audit-try") === "toggle") t.click();
+      else (document.activeElement ?? document.body).dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      await wait(450);
+    }
+    return out.join(" ~~ ");
+  };
+  window.__ca = { pending, snap, use, name, where, key, settle, turned, tryNext, tried: new Set() };
   return true;
 })()`;
 
@@ -137,8 +166,11 @@ for (const route of ROUTES) {
     const res = await ev(`(async () => { const c = [...document.querySelectorAll("[data-ca-done]")].find((x) => __ca.key(x) === ${JSON.stringify(info.key)}); if (!c) return { changed: true, kept: true };
       const before = __ca.snap(c); c.focus({ preventScroll: true }); const focused = document.activeElement === c;
       const undo = __ca.use(c); await new Promise((r) => setTimeout(r, 450)); const after = __ca.snap(c);
-      const kept = c.isConnected && (!focused || document.activeElement === c); const turned = __ca.turned();
-      undo(); await new Promise((r) => setTimeout(r, 250)); return { changed: before !== after, kept, turned }; })()`);
+      const kept = c.isConnected && (!focused || document.activeElement === c || (document.activeElement !== document.body && document.activeElement !== null)); const turned = __ca.turned();
+      let changed = before !== after;
+      if (!changed) { const b = await __ca.tryNext(c); undo(); await new Promise((r) => setTimeout(r, 250)); const a = b === null ? null : await __ca.tryNext(c); changed = a !== b; }
+      else { undo(); await new Promise((r) => setTimeout(r, 250)); }
+      return { changed, kept, turned }; })()`, 60000);
     const changed = res?.changed;
     if (VERBOSE) console.log(`  ${changed === false || res?.kept === false ? "✖" : "✓"} ${route} [${info.where}] ${info.name}`);
     if (changed === false) findings.push({ route, kind: "dead-control", at: info.where, detail: info.name });

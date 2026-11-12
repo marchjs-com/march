@@ -327,7 +327,9 @@ export function Scheduler(props: SchedulerProps): Element {
     const allday = h("div", { class: "hm-sch-allday", role: "row" }, h("div", { class: "hm-sch-corner hm-sch-allday-label" }, t`All day`), alldayGrid);
 
     // body: hour gutter + day columns
-    const hours = h("div", { class: "hm-sch-hours", "aria-hidden": "true" }, Array.from({ length: 24 }, (_, hr) => h("div", { class: "hm-sch-hour" }, hr ? h("span", {}, formatMinutes(hr * 60, loc(), { hour: "numeric" })) : null)));
+    const hours = h("div", { class: cx("hm-sch-hours", editable() && "is-editable"), "aria-hidden": "true" }, Array.from({ length: 24 }, (_, hr) => h("div", { class: "hm-sch-hour" }, hr ? h("span", {}, formatMinutes(hr * 60, loc(), { hour: "numeric" })) : null)));
+    // editable: the gutter shows the snap step as ruler ticks (a drag or resize lands on them)
+    setStyle(hours, { "--hm-sch-step": `${(H * st) / 60}px` });
     const cols = h("div", { class: "hm-sch-cols" }) as HTMLElement;
     setStyle(cols, { "--hm-sch-cols": String(n), height: `${24 * H}px`, "--hm-sch-hour": `${H}px` });
     ds.forEach((d, ci) => {

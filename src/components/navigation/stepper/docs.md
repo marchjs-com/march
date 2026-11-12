@@ -21,7 +21,8 @@ height follows. Back / Next buttons and a step counter come with it.
 | `nav` | boolean | with panels and onSelect | Back / Next buttons |
 | `finishLabel` | string | "Finish" | the last step's button |
 | `onFinish` | `() => void` | — | the last step's button |
-| `vertical` | boolean | `false` | vertical steps |
+| `vertical` | boolean / accessor | `false` | steps in a column beside the panel (live; stacked when narrow) |
+| `morph` | boolean / accessor | `true` | morph between steps; `false`: the highlight and the panel change at once |
 | `color` | ColorToken | theme primary | accent of the steps and the highlight |
 
 ## Accessibility

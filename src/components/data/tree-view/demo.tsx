@@ -1,5 +1,5 @@
 // Showcase stage for TreeView: a project tree of ~3 000 nodes; folders marked "lazy" load their children on open.
-import { signal } from "hadi-march";
+import { signal, untrack } from "hadi-march";
 import { TextInput } from "hadi-march/forms";
 import { TreeView, type TreeViewNode } from "./index.ts";
 
@@ -33,14 +33,24 @@ export default function TreeViewDemo(props: { values: { selection: string; dragg
   const moved = signal("")
   const load = (node: TreeViewNode) => new Promise<TreeViewNode[]>((ok, fail) => {
     const mode = props.values.load
-    setTimeout(() => (mode === "fail" ? fail(new Error("Ağ hatası")) : ok(files(node.id, 12, node.id.length * 17))), mode === "fast" ? 60 : 900)
+    // a failing request fails quickly (the retry row shows at once); a slow one shows the loading row for a while
+    setTimeout(() => (mode === "fail" ? fail(new Error("Ağ hatası")) : ok(files(node.id, 12, node.id.length * 17))), mode === "fast" ? 60 : mode === "fail" ? 250 : 900)
   })
   return <div class="sc-stage">
     <TextInput bind:value={$q} type="search" placeholder="Ağaçta ara (ör. menü, ödeme)" aria-label="Ağaçta ara" />
-    {() => <TreeView nodes={build()} expanded={["web", "web/bileşenler"]} height={380} label="Proje dosyaları"
-      selection={props.values.selection as "multiple"} draggable={() => props.values.draggable} icons={() => props.values.icons}
+    {() => {
+      // the open lazy folder "web/bileşenler/eski" shows the load mode at once: the tree is drawn again when it changes
+      void props.values.load
+      return untrack(() => {
+        // two rows at the top start selected ("web", "web/bileşenler"): the selection mode shows at once
+        const nodes = build(), first = [nodes[0]!, nodes[0]!.children![0]!]
+        picked.set(props.values.selection === "none" ? [] : props.values.selection === "single" ? [first[0]!.id] : [first[0]!.id, first[1]!.id])
+        return <TreeView nodes={nodes} expanded={["web", "web/bileşenler", "web/bileşenler/eski"]} height={380} label="Proje dosyaları"
+      selected={[first[0]!.id, first[1]!.id]} selection={props.values.selection as "multiple"} draggable={() => props.values.draggable} icons={() => props.values.icons}
       search={() => $q} load={load} onSelect={(ids: string[]) => picked.set(ids)}
-      onMove={(ids: string[], target: string, pos: string) => moved.set(`${ids.length} öğe → ${target} (${pos === "inside" ? "içine" : pos === "before" ? "önüne" : "arkasına"})`)} />}
+      onMove={(ids: string[], target: string, pos: string) => moved.set(`${ids.length} öğe → ${target} (${pos === "inside" ? "içine" : pos === "before" ? "önüne" : "arkasına"})`)} />
+      })
+    }}
     <p role="status">{() => `${picked().length} seçili${moved() ? ` · son taşıma: ${moved()}` : ""}`}</p>
   </div>
 }

@@ -177,6 +177,8 @@ export function TreeView(props: TreeViewProps): Element {
       loading.update((s) => { const n = new Set(s); n.delete(node.id); return n; });
     }
   };
+  // lazy folders that start open (expanded) load at once, as if opened by hand
+  queueMicrotask(() => { const byId = untrack(index).byId; for (const id of props.expanded ?? []) { const n = byId.get(id); if (n) fetchKids(n); } });
 
   // ------------------------------------------------------------------ moving nodes
   const isInside = (nid: string, ancestor: string): boolean => { const par = untrack(index).parent; for (let p: string | null | undefined = nid; p; p = par.get(p)) if (p === ancestor) return true; return false; };
@@ -229,7 +231,7 @@ export function TreeView(props: TreeViewProps): Element {
   const dropLine = h("div", { class: "hm-tv-drop", "aria-hidden": "true" }) as HTMLElement;
   const empty = h("div", { class: "hm-tv-empty", hidden: () => flat().length > 0 }, () => (query() ? t`Nothing matches "${query()}"` : t`Empty`)) as HTMLElement;
   const scroller = h("div", {
-    role: "tree", class: () => cx("hm-tv", val(props.class)), tabindex: "0", "aria-label": () => val(props.label) ?? t`Tree`,
+    role: "tree", class: () => cx("hm-tv", canDrag() && "is-draggable", val(props.class)), tabindex: "0", "aria-label": () => val(props.label) ?? t`Tree`,
     "aria-multiselectable": () => (sel.mode() === "multiple" ? "true" : null),
   }, canvas, dropLine, empty) as HTMLElement;
   setStyle(scroller, { height: `${props.height ?? 360}px` });

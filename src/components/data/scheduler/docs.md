@@ -26,7 +26,7 @@ import { Scheduler } from "hadi-march/components/data/scheduler";
 | `onChange` | `(event, { start, end, allDay }) => void` | — | after a drag or keyboard move; the calendar already shows it |
 | `onCreate` | `(range) => void` | — | drag on an empty slot, click a free slot, double-click a month day |
 | `onSelect` | `(event) => void` | — | click / Enter on an event |
-| `step` | minutes | `15` | snap for moves and resizes |
+| `step` | minutes | `15` | snap for moves and resizes; while editable the hour gutter shows it as ruler ticks |
 | `hourHeight` | px | `48` | |
 | `startHour` | hour | `8` | scrolled into view first (the current time when today is in view) |
 | `weekends` | boolean | `true` | Saturday and Sunday in week view |

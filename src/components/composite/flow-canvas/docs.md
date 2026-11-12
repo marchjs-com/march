@@ -17,7 +17,7 @@ flow.load(JSON.parse(text), "Import")             // validated (validateFlow); o
 | Prop | Type | Default | |
 |---|---|---|---|
 | `flow` | `FlowStore` | — | from `createFlow({ types, doc?, undo? })` |
-| `snap` | number | `16` | grid step (world px) for snapping and the dotted background; `0` turns snapping off |
+| `snap` | number | `16` | grid step (world px) for snapping and the dotted background; `0` turns snapping off (the dots fade: a free canvas) |
 | `minimap` | boolean | `true` | minimap in the inline-end corner (hidden on narrow canvases) |
 | `tool` | `select` `pan` | `select` | dragging the empty canvas draws a selection box or moves the view |
 | `fields` | boolean | `true` | form controls inside the nodes |

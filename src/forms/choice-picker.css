@@ -10,3 +10,8 @@
 .hm-picker.hm-picker-cards .hm-choice-card-icon > *, .hm-picker.hm-picker-grid .hm-choice-card-icon > * { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hm-picker.hm-picker-cards .hm-choice-card-title, .hm-picker.hm-picker-grid .hm-choice-card-title { padding-inline: var(--hm-space-1); font-size: var(--hm-text-xs); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hm-picker.hm-picker-cards .hm-check-box, .hm-picker.hm-picker-grid .hm-check-box { inset-block-start: .375rem; inset-inline-end: .375rem; width: 1.125rem; height: 1.125rem; }
+/* a card without a preview (a label only): the badge sits at the line end, centred on the block axis, and the label keeps
+   room for it on both sides, so it stays centred and is never covered */
+.hm-picker:is(.hm-picker-cards, .hm-picker-grid) .hm-check:not(:has(.hm-choice-card-icon)) { align-items: center; min-block-size: 2rem; }
+.hm-picker:is(.hm-picker-cards, .hm-picker-grid) .hm-check:not(:has(.hm-choice-card-icon)) .hm-check-box { inset-block: 0; margin-block: auto; }
+.hm-picker:is(.hm-picker-cards, .hm-picker-grid) .hm-check:not(:has(.hm-choice-card-icon)) .hm-choice-card-body { padding-inline: calc(1.125rem + var(--hm-space-2)); justify-content: center; text-align: center; }

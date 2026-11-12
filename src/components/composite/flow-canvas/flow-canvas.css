@@ -6,6 +6,8 @@
   background-image: radial-gradient(circle at center, color-mix(in srgb, var(--hm-text) 22%, transparent) 1px, transparent 1.6px);
   background-size: var(--hm-flow-gs, 16px) var(--hm-flow-gs, 16px); background-position: var(--hm-flow-gx, 0) var(--hm-flow-gy, 0); }
 .hm-flow:dir(rtl) { background-position: right var(--hm-flow-gx, 0) top var(--hm-flow-gy, 0); }
+/* snapping off: a free canvas, the grid dots fade (nodes no longer land on them) */
+.hm-flow.is-free { background-image: radial-gradient(circle at center, color-mix(in srgb, var(--hm-text) 9%, transparent) 1px, transparent 1.6px); }
 .hm-flow:focus-visible { box-shadow: 0 0 0 3px var(--hm-focus); }
 .hm-flow.is-hand, .hm-flow.is-panning { cursor: grab; }
 .hm-flow.is-connecting .hm-flow-port { box-shadow: 0 0 0 4px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 22%, transparent); }

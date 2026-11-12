@@ -3,7 +3,7 @@
 // the old one blurs and slides out, the new one slides in from the direction of travel (mirrored in RTL) while the
 // frame's height follows. Everything runs on the motion engine; reduced motion switches instantly.
 import "./stepper.css";
-import { effect, untrack, onCleanup } from "../../../core/reactive.ts";
+import { effect, untrack, onCleanup, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, uid, clamp, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -28,7 +28,10 @@ export interface StepperProps {
   /** Label of the last step's button. Default "Finish". */
   finishLabel?: MaybeFn<string | undefined>;
   onFinish?: (() => void) | undefined;
-  vertical?: boolean | undefined;
+  /** Steps in a column beside the panel (live: the same stepper turns). */
+  vertical?: MaybeFn<boolean | undefined>;
+  /** Morph between steps (default true): the highlight stretches and the panels blur into each other; false = at once. */
+  morph?: MaybeFn<boolean | undefined>;
   /** Theme color token. */
   color?: ColorToken | undefined;
   class?: ClassProp;
@@ -37,6 +40,8 @@ export interface StepperProps {
 /** `<Stepper steps={[{ title: "Cart" }, …]} current={$i} onSelect={(i) => $i = i} panels={[<Cart/>, <Address/>, <Pay/>]} />` */
 export function Stepper(props: StepperProps): Element {
   const cur = (): number => val(props.current);
+  const vertical = (): boolean => !!val(props.vertical);
+  const morph = (): boolean => val(props.morph) !== false;
   const n = props.steps.length;
   const panelId = uid("hm-stepper-panel");
   let root!: HTMLElement, blob!: HTMLElement, frame: HTMLElement | null = null;
@@ -56,12 +61,13 @@ export function Stepper(props: StepperProps): Element {
   let last = -1;
   effect(() => {
     const i = cur();
+    vertical(); // a turned stepper: the highlight moves to the dot's new place
     untrack(() => nextFrame(() => {
       const to = dotBox(i);
       if (!to) return;
       const from = last >= 0 && last !== i ? dotBox(last) : null;
       last = i;
-      if (!from || reducedMotion()) { place(to); return; }
+      if (!from || reducedMotion() || !morph()) { place(to); return; }
       const x0 = Math.min(from.x, to.x), y0 = Math.min(from.y, to.y);
       const span = { x: x0, y: y0, w: Math.max(from.x + from.w, to.x + to.w) - x0, h: Math.max(from.y + from.h, to.y + to.h) - y0 };
       const k = (b: typeof to) => ({ translate: `${b.x}px ${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
@@ -76,7 +82,7 @@ export function Stepper(props: StepperProps): Element {
     if (!frame) return;
     const old = frame.firstElementChild as HTMLElement | null;
     const next = h("div", { class: "hm-stepper-pane" }, panelOf(i)) as HTMLElement;
-    if (!old || reducedMotion() || prev < 0) { frame.replaceChildren(next); return; }
+    if (!old || reducedMotion() || prev < 0 || !morph()) { frame.replaceChildren(next); return; }
     const h0 = frame.offsetHeight;
     setStyle(old, { position: "absolute", "inset-inline": "0", "inset-block-start": "0" });
     old.setAttribute("aria-hidden", "true");
@@ -91,9 +97,9 @@ export function Stepper(props: StepperProps): Element {
 
   const withNav = props.nav ?? (!!props.panels && !!props.onSelect);
   const go = (i: number): void => props.onSelect?.(clamp(i, 0, n - 1));
-  const el = h("div", { ref: (x: HTMLElement) => { root = x; }, class: () => cx("hm-stepper", props.vertical && "hm-stepper-v", val(props.class)), "data-hm-color": () => colorAttr(props.color) },
+  const el = h("div", { ref: (x: HTMLElement) => { root = x; }, class: () => cx("hm-stepper", vertical() && "hm-stepper-v", val(props.class)), "data-hm-color": () => colorAttr(props.color) },
     h("span", { class: "hm-stepper-blob", "aria-hidden": "true", ref: (x: HTMLElement) => { blob = x; } }),
-    h(Steps, { steps: props.steps, current: cur, ...(props.onSelect ? { onSelect: props.onSelect } : {}), ...(props.vertical ? { vertical: true } : {}) }),
+    h(Steps, { steps: props.steps, current: cur, ...(props.onSelect ? { onSelect: props.onSelect } : {}), vertical: reactive(vertical) }),
     props.panels && h("div", { class: "hm-stepper-frame", id: panelId, role: "region", "aria-live": "polite", "aria-label": () => t`Step ${cur() + 1} of ${n}`, ref: (x: HTMLElement) => { frame = x; } }),
     withNav && h("div", { class: "hm-stepper-nav" },
       h(Button, { variant: "secondary", disabled: () => cur() === 0, onClick: () => go(cur() - 1), "aria-controls": panelId }, () => t`Back`),
