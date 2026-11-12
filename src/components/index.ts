@@ -3,3 +3,4 @@ export * from "./composite/bottom-nav/index.ts";
 export * from "./chip/index.ts";
 export * from "./overlays/drawer/index.ts";
 export * from "./feedback/pull-to-refresh/index.ts";
+export * from "./composite/rich-text-editor/index.ts";

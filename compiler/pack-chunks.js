@@ -96,13 +96,16 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
   const skip = new Set();
   for (let round = 0; round < 500; round++) {
     const g = graph(outs);
-    const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && (outs[k].bytes ?? 0) < minSize)
+    // a chunk only one small lazy module imports (code esbuild split out because tree-shaken barrels also reach it) is
+    // that module's own code: it joins it, so the lazy module is judged by its real size and never inlined into its parent
+    const own = (k) => { const u = g.importers.get(k) ?? []; return u.length === 1 && !!outs[u[0]].entryPoint && u[0] !== entryKey && (outs[u[0]].bytes ?? 0) < minSize ? u[0] : null; };
+    const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && ((outs[k].bytes ?? 0) < minSize || own(k)))
       .sort((a, b) => (outs[a].bytes ?? 0) - (outs[b].bytes ?? 0));
     let done = false;
     for (const t of small) {
       const rt = g.reach.get(t), deps = [...g.closure(t)].filter((d) => d !== t), users = g.importers.get(t) ?? [];
-      let best = null, cost = Infinity;
-      for (const b of g.js) {
+      let best = own(t), cost = best ? 0 : Infinity;
+      for (const b of best ? [] : g.js) {
         if (b === t || b === entryKey) continue;
         const rb = g.reach.get(b), cb = g.closure(b);
         if (cb.has(t) && !users.includes(b)) continue; // B reaches T through another module: that one would cycle

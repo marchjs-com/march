@@ -7,6 +7,7 @@
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+| RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 
 ## BottomNav
 
@@ -32,10 +33,10 @@ Full page: src/components/chip/docs.md
 
 ## Drawer
 
-
+A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
 
 ```tsx
-
+<Drawer open={$open} onClose={() => $open = false} side="bottom" snapPoints={[0.4, 0.9]} title="Filters">…</Drawer>
 ```
 
 Full page: src/components/overlays/drawer/docs.md
@@ -49,3 +50,15 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 ```
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
+
+## RichTextEditor
+
+A rich text field whose value is **Markdown**. Write with the toolbar, keyboard shortcuts or Markdown shortcuts (`# `, `## `, `- `, `1. `, `> `, ```` ``` ````); mention people with `@`, insert emoji with `:`; pasted HTML from any site or office suite is cleaned through the safe content core (allowlist, no HTML parser — Trusted Types safe). Undo / redo use an UndoManager history of the editor's own (typing merges into one step).
+
+```tsx
+<RichTextEditor bind:value={$notes} mentions={team} placeholder="Write…" />
+<RichTextEditor value={md} toolbar={["bold", "italic", "link", "|", "ul", "ol"]} emoji={false} />
+<RichTextEditor api={(e) => editor = e} />   // editor.insert("**Hi**"), editor.exec("h2"), editor.undo()
+```
+
+Full page: src/components/composite/rich-text-editor/docs.md

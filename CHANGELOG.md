@@ -4,6 +4,19 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Editors (later in 0.1.0)
+- `RichTextEditor` (composite): contenteditable rich text whose value is Markdown — toolbar (paragraph, headings, bold,
+  italic, strike, code, link, lists, quote, code block, undo / redo), Markdown shortcuts while typing, @mentions and
+  :emoji suggestions, clean paste, its own undo history. Showcase page Editors.
+- Safe content core: `dom/safe.ts` (`isSafeLink`, `RICH_SCHEMA`), `dom/sanitize.ts` (`parseHtml` — HTML → allowlisted
+  nodes with a small tokenizer, no HTML parser, Trusted Types safe; `sanitizeNode`, `normalizeBlocks`),
+  `dom/markdown.ts` (`markdownNodes`, moved out of forms; mention links) and `dom/to-markdown.ts` (`toMarkdown`).
+- `managers/undo/history.ts`: the undo engine on its own; `undoHistory()` gives an editor a separate history.
+- New icons: bold, italic, strikethrough, heading, pilcrow, quote, list-ordered, undo, redo, braces, play, pause,
+  skip-back, repeat, rotate-cw, rotate-ccw, flip-horizontal, crop, pipette.
+- Build: a chunk that only one small lazy module imports joins that module (a heavy lazy demo is no longer judged by
+  its 3 KB entry file and inlined into every page that lists it).
+
 ### Build output (later in 0.1.0)
 - `stableNames: true` / `--stable-names`: `main.js`, `chunks/home.js`, `chunks/shared-N.js` with `?v=<version>` in every
   reference (imports, CSS loaders, index.html, manifest): deploys overwrite the same paths; deterministic output.
