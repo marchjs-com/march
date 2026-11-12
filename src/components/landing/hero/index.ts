@@ -50,6 +50,8 @@ export interface HeroProps {
   align?: "center" | "start" | undefined;
   /** md · lg (default) · screen (fills the viewport). */
   size?: "md" | "lg" | "screen" | undefined;
+  /** Heading level of the title (default 1: the page title; 2 when the hero is not the top of the page). */
+  level?: 1 | 2 | undefined;
   class?: ClassProp | undefined;
   children?: unknown | undefined;
 }
@@ -85,13 +87,13 @@ export function Hero(props: HeroProps): Element {
     props.eyebrow != null && (props.eyebrowHref
       ? h("a", { class: "hm-hero-eyebrow", href: props.eyebrowHref }, h(Badge, { tone: "primary" }, () => val(props.eyebrow)), h("span", { class: "hm-hero-eyebrow-arrow", "aria-hidden": "true" }, "→"))
       : h("p", { class: "hm-hero-eyebrow" }, h(Badge, { tone: "primary" }, () => val(props.eyebrow)))),
-    h("h1", { class: "hm-hero-title" }, () => titleNode(val(props.title), props.highlight)),
+    h(`h${props.level ?? 1}`, { class: "hm-hero-title" }, () => titleNode(val(props.title), props.highlight)),
     props.lead != null && h("p", { class: "hm-hero-lead" }, () => val(props.lead)),
     props.actions?.length ? h("div", { class: "hm-hero-actions" }, actionButtons(props.actions)) : null,
     props.note != null && h("p", { class: "hm-hero-note" }, () => val(props.note)),
     props.children ?? null);
 
-  const cls = cx("hm-hero", `hm-hero-${variant}`, `hm-hero-size-${props.size ?? "lg"}`, val(props.class));
+  const cls = cx("hm-hero", `hm-hero-v-${variant}`, `hm-hero-size-${props.size ?? "lg"}`, val(props.class));
   if (variant === "video" && props.video) return h("section", { class: cls }, h(VideoBackground, { src: props.video.src, poster: props.video.poster, tint: "dark", class: "hm-hero-stage" }, h("div", { class: "hm-hero-inner" }, copy)));
   if (variant === "parallax") return h("section", { class: cls }, h(Parallax, { layers: props.layers ?? [], pointer: 1, class: "hm-hero-stage", height: "100%" }, h("div", { class: "hm-hero-inner" }, copy)));
 

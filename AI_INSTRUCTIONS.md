@@ -381,6 +381,40 @@ replay(), stop() }`. Never split text by hand or animate letters with your own l
 - Catalog: `TEXT_ANIMATIONS` in `hadi-march/motion/text/meta`. Reference: src/motion/text/docs.md. Showcase: Hareket ›
   Metin animasyonları (/text-motion).
 
+## 15a. Websites (hadi-march/landing)
+
+Blocks for product pages, home pages, portfolios and talks. Each is a folder in src/components/landing/ built from
+existing components, animated on the motion engine, themed, RTL and i18n ready. Import only from `hadi-march/landing`
+(it is not in the ui barrel, so other pages never download it); load a marketing page as its own lazy route.
+
+- Frame: `SiteNav` (solid | transparent | floating, shrink, hide, Drawer menu; `#id` links scroll to sections),
+  `SiteSection` (eyebrow / title / lead, tone plain | muted | inverse | brand, width), `SiteFooter` (+ `Newsletter`).
+- Story: `Hero` (centered | split | video | mesh | aurora | product | parallax; `highlight` = gradient words),
+  `FeatureGrid` (cards | plain | list | bento), `LogoCloud` (grid | marquee), `StatsBand` + `Counter`, `ScrollStory`
+  (pinned media, colour per step), `HorizontalScroll`, `Roadmap` (fills with the scroll), `CtaBand`.
+- Sell: `Pricing` (monthly / yearly, prices roll), `Testimonials` (grid | marquee | wall | slider), `Faq` (search).
+- Portfolio: `ProjectGrid` (filters, FLIP) + `ProjectDetail`; `sharedTransition("project-" + id, cover, update)`
+  (hadi-march/motion) grows the card cover into the detail cover and back.
+- Talks: `Presentation` + `Slide` + `Appear` (fragments); `bind:index` to a query parameter; `presenterUrl` opens the
+  speaker window (same deck name stays in step across windows); print = one slide per page.
+- Effects: `Reveal` / `use:revealOnScroll` (fade, up, start, end, scale, blur, flip; stagger; `scrub`), `Parallax`
+  (layers by speed, pointer depth), `ScrollProgress`, `VideoBackground` (poster first, quiet on save-data).
+- Scroll-linked code goes through `scrollScene(el, fn)` (hadi-march/motion): one listener, reads before writes, off-screen
+  scenes skipped. Never add your own scroll listener or rAF loop.
+
+Recipes:
+- "Write a product landing page": `SiteNav mode="floating"` → `Hero variant="product" media={screenshot}` →
+  `LogoCloud variant="marquee"` → `SiteSection` + `FeatureGrid variant="bento"` → `ScrollStory` → `StatsBand` →
+  `Pricing` → `Testimonials variant="wall"` → `Faq layout="split" search` → `CtaBand` → `SiteFooter newsletter`.
+  Images: give width / height (no layout shift); the hero image loads eagerly, everything else lazily.
+- "Make a portfolio": `SiteNav mode="transparent"` → `Hero variant="split"` → `ProjectGrid onOpen` (state `$open`,
+  `sharedTransition`) ⇄ `ProjectDetail onBack next` → about (`StatsBand variant="plain"`) → skills
+  (`FeatureGrid variant="list"`) → `Roadmap` (work history, `badges={false}`) → contact `<Form schema>` → `SiteFooter`.
+- "Prepare a presentation": one `<Presentation bind:index={$slide} presenterUrl="…?presenter=1">` with a `<Slide>` per
+  slide (`layout`, `tone`, `notes`, `background={<Overlay …/>}`), lists in `<Appear>`; render the same deck with
+  `presenter` on the speaker URL.
+Full samples: showcase › Landing › Web siteleri (`#/web?view=product|portfolio|slides`).
+
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 
 **Never call `fetch()`, `new WebSocket()` or `new EventSource()` in app code. All traffic goes through `net` or an

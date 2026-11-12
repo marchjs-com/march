@@ -58,7 +58,7 @@ export function FeatureGrid(props: FeatureGridProps): Element {
   const grid = variant === "bento"
     ? h("div", { class: "hm-fg-bento" }, props.items.map(tile))
     : h(Grid, { cols: variant === "list" ? 2 : props.cols ?? 3, gap: variant === "plain" ? 6 : 4, equal: variant === "cards" }, props.items.map(tile));
-  const root = h("div", { class: cx("hm-fg", `hm-fg-${variant}`, props.spotlight !== false && (variant === "cards" || variant === "bento") && "is-spotlight", val(props.class)) }, grid) as HTMLElement;
+  const root = h("div", { class: cx("hm-fg", `hm-fg-v-${variant}`, props.spotlight !== false && (variant === "cards" || variant === "bento") && "is-spotlight", val(props.class)) }, grid) as HTMLElement;
 
   if (props.reveal !== "none") { const stop = revealOnScroll(root, { effect: props.reveal ?? "up", select: ".hm-fg-item", stagger: 70 }); if (getOwner()) onCleanup(stop); }
   if (props.spotlight !== false && (variant === "cards" || variant === "bento")) {

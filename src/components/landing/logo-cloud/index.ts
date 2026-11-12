@@ -45,8 +45,8 @@ export function LogoCloud(props: LogoCloudProps): Element {
     // two copies in the item so the strip is wider than the screen; Marquee adds the seamless loop copy
     ? h(Marquee, { class: "hm-logos-marquee", speed: props.speed ?? 40, pause: 0, separator: "" },
       h("span", { class: "hm-logos-row" }, props.logos.map(logoNode), h("span", { class: "hm-logos-row-copy", "aria-hidden": "true", inert: "" }, props.logos.map(logoNode))))
-    : h(Grid, { min: "9rem", gap: 3, class: "hm-logos-grid" }, props.logos.map((l) => h("div", { class: "hm-logos-cell" }, logoNode(l))));
-  const root = h("div", { class: cx("hm-logos", `hm-logos-${variant}`, props.mono !== false && "is-mono", val(props.class)) },
+    : h(Grid, { min: "9rem", gap: 3, class: "hm-logos-cells" }, props.logos.map((l) => h("div", { class: "hm-logos-cell" }, logoNode(l))));
+  const root = h("div", { class: cx("hm-logos", `hm-logos-v-${variant}`, props.mono !== false && "is-mono", val(props.class)) },
     props.title != null && h("p", { class: "hm-logos-title" }, () => val(props.title)),
     body) as HTMLElement;
   if (variant === "grid") { const stop = revealOnScroll(root, { effect: "fade", select: ".hm-logos-cell", stagger: 50 }); if (getOwner()) onCleanup(stop); }

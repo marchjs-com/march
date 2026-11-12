@@ -28,6 +28,7 @@ and spotlight), `split` (media at the end), `video` (VideoBackground), `mesh` (g
 | `colors` | string[] | HADİ colours | aurora variant |
 | `align` | `center` `start` | by variant | |
 | `size` | `md` `lg` `screen` | `lg` | minimum height |
+| `level` | 1 2 | 1 | heading level of the title (2 when the hero is not the page's top) |
 
 ## Accessibility
 

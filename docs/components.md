@@ -151,15 +151,12 @@ Full page: src/components/landing/feature-grid/docs.md
 
 ## Hero
 
-The first screen of a website in seven looks that share one structure: an eyebrow pill, a large title whose `highlight` gets the brand gradient, a lead, actions and a note. The stage changes by variant: `centered` (soft grid and spotlight), `split` (media at the end), `video` (VideoBackground), `mesh` (gradient mesh, spotlight, grain), `aurora` (drifting colour), `product` (a product frame that tilts in 3D and flattens as you scroll) and `parallax` (layered depth).
+
 
 Composed of: [Reveal](#reveal), Overlay, Button, Badge, [VideoBackground](#videobackground), [Parallax](#parallax)
 
 ```tsx
-<Hero variant="mesh" eyebrow="New: 2.0" title="The fastest way to build a website" highlight="fastest"
-  lead="…" note="No card needed" actions={[{ label: "Start free", href: "/start", iconEnd: arrowRight }, { label: "Watch demo" }]} />
-<Hero variant="product" media={{ src: "/screen.png", alt: "Dashboard", width: 1600, height: 1000 }} … />
-<Hero variant="video" video={{ src: "/clip.webm", poster: "/clip.jpg" }} … />
+
 ```
 
 Full page: src/components/landing/hero/docs.md

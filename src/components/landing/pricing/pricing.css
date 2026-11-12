@@ -11,9 +11,9 @@
 .hm-price-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16.5rem), 1fr)); gap: var(--hm-space-4); width: 100%; align-items: stretch; }
 .hm-price-card { position: relative; display: flex; }
 .hm-price-card > .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-4); width: 100%; padding: clamp(1.25rem, 3vw, 1.75rem); }
-.hm-price-card.is-featured { border-color: transparent; box-shadow: var(--hm-shadow-4); transform: translateY(-6px); isolation: isolate;
+.hm-price-card.is-featured { border-color: transparent; transform: translateY(-6px);
+  box-shadow: var(--hm-shadow-4), 0 24px 60px -24px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 45%, transparent);
   background: linear-gradient(var(--hm-surface), var(--hm-surface)) padding-box, var(--hm-brand-gradient) border-box; border-width: 2px; border-style: solid; }
-.hm-price-card.is-featured::before { content: ""; position: absolute; inset: 12% 8% -8%; z-index: -1; border-radius: inherit; background: var(--hm-brand-gradient); filter: blur(40px); opacity: .28; }
 .hm-price-head { display: flex; align-items: center; justify-content: space-between; gap: var(--hm-space-2); }
 .hm-price-name { margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); }
 .hm-price-desc { margin: 0; color: var(--hm-muted); line-height: 1.55; min-height: 3.1em; }

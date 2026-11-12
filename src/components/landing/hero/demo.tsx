@@ -12,7 +12,7 @@ export default function HeroDemo(props: { values: { variant: string; size: strin
   return <div class="sc-site-frame sc-hero-frame">
     {() => {
       const v = props.values, variant = v.variant as HeroVariant
-      return <Hero variant={variant} size={v.size as "md"} eyebrow={v.eyebrow ? "Yeni: sürüm 2.0" : undefined} eyebrowHref={v.eyebrow ? "#" : undefined}
+      return <Hero level={2} variant={variant} size={v.size as "md"} eyebrow={v.eyebrow ? "Yeni: sürüm 2.0" : undefined} eyebrowHref={v.eyebrow ? "#" : undefined}
         title="Web sitesi kurmanın en hızlı yolu" highlight="en hızlı"
         lead="Hazır bloklar, akıcı hareket ve sıfır bağımlılık. Tanıtım sayfan dakikalar içinde yayında."
         note={v.note ? "Kredi kartı gerekmez · 2 dakikada kurulum" : undefined}

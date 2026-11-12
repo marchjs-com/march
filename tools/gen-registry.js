@@ -22,6 +22,12 @@ export async function categories(root = ROOT) {
   return (await import(pathToFileURL(join(root, "src/components/categories.ts")).href)).CATEGORIES;
 }
 
+/**
+ * Categories reachable only through their own subpath (hadi-march/landing), not through the ui barrel: with code
+ * splitting, a barrel that re-exports them puts their code in a chunk shared with every page importing hadi-march/ui.
+ */
+const OUTSIDE_UI = new Set(["landing"]);
+
 /** Subpaths that existed before the categories: their module index re-exports the category barrel instead. */
 const OWN_MODULE = { forms: "src/forms/index.ts", data: "src/data/index.ts", motion: "src/motion/index.ts" };
 
@@ -58,7 +64,7 @@ export async function generate(root = ROOT) {
   const list = await components(root);
   const cats = await categories(root);
   const files = {};
-  files["src/components/index.ts"] = HEAD + list.map((c) => `export * from "./${c.folder}/index.ts";\n`).join("");
+  files["src/components/index.ts"] = HEAD + list.filter((c) => !OUTSIDE_UI.has(c.category)).map((c) => `export * from "./${c.folder}/index.ts";\n`).join("");
   for (const cat of cats) {
     const own = list.filter((c) => c.category === cat.id);
     files[`src/components/${cat.id}/index.ts`] = HEAD + `// ${cat.title}: ${cat.desc} Import: hadi-march/${cat.id}\n` +
