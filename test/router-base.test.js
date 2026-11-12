@@ -104,3 +104,16 @@ test("a sandbox that refuses pushState: the first navigation falls back to hash,
   history.back(); await tick();
   R._resetRouter(); dom.cleanup();
 });
+
+test("Link: a plain getter href (Button href=…) is called, not turned into text", async () => {
+  const a = await boot("http://h.test/");
+  const { h } = await import("../src/dom/h.ts");
+  const el = h(a.R.Link, { href: () => "/motion", children: "go" });
+  document.body.appendChild(el);
+  await tick();
+  assert.equal(el.getAttribute("href"), "motion", "the getter's value, relative to the current folder");
+  el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 }));
+  await tick();
+  assert.equal(a.R.path(), "/motion");
+  a.done();
+});

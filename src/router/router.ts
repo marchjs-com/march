@@ -575,7 +575,8 @@ export function Link(props: { href: Href | (() => Href); exact?: boolean; replac
   // a fixed href is read and split once; a live one once per change (not once per binding)
   const live = typeof props.href === "function";
   const fixed = live ? "" : String(props.href);
-  const href = live ? computed(() => String(read(props.href))) : (): string => fixed;
+  // a live href may be a plain getter (Button passes `() => val(props.href)`), not only a signal: call any function
+  const href = live ? computed(() => String((props.href as () => Href)())) : (): string => fixed;
   const pathOf = (s: string): string => { const q = s.indexOf("?"); return q < 0 ? s : s.slice(0, q); };
   const fixedTo = pathOf(fixed);
   const target = live ? computed(() => pathOf(href())) : (): string => fixedTo;
