@@ -7,7 +7,8 @@
 // In each: every page of nav.ts opened directly by its address and reloaded (same page, same address); every page
 // reached by a click on its side menu link, then back and forward through them; an address with params
 // (/navigation/router/item/3, served by 404.html) and the page transition variants (/motion/pages/<variant>); an old
-// hash link (#/motion) becomes /motion. No "not found" view, no empty page, no console error.
+// hash link (#/motion) becomes /motion. No "not found" view, no empty page, no console error. In the first mode the
+// side menu is kept across navigations (same node, same scroll position) and reveals an active row out of view.
 // Usage: node examples/showcase/build.mjs && node tools/menu-audit.mjs [--modes rewrite,static,subdir,files] [--verbose]
 import { openHeadless, showcaseRoutes, sleep, flag } from "./lib/headless.mjs";
 
@@ -97,6 +98,34 @@ for (const mode of MODES) {
     await b.ev("history.forward()");
     const s = await settle(visited[i]);
     check(ok(s, visited[i]), `${tag} forward to ${visited[i]}`, why(s, visited[i]));
+  }
+  // 5. the menu is kept across navigations (first mode only): after a click on a link of a scrolled menu it is the same
+  // DOM node and keeps its scroll position; an active row below the visible area comes into view
+  if (mode === MODES[0]) {
+    await b.load("/start");
+    let ready = false;
+    for (let i = 0; i < 40 && !ready; i++) { await sleep(250); ready = await b.ev(`!!document.querySelector("nav .hm-sb-scroll .hm-sb-gitems a[href]")`); }
+    const mark = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"); window.__menuNav = sc.closest("nav"); window.__menuScroller = sc;
+      sc.scrollTop = Math.min(400, sc.scrollHeight - sc.clientHeight); const top = sc.scrollTop, c = sc.getBoundingClientRect();
+      const a = [...sc.querySelectorAll(".hm-sb-gitems a[href]")].find((a) => { const r = a.getBoundingClientRect(); return r.height && r.top >= c.top && r.bottom <= c.bottom && a.getAttribute("aria-current") !== "page" });
+      if (!a) return { top, path: null }; const path = new URL(a.getAttribute("href"), location.href).pathname; a.click(); return { top, path } })()`);
+    if (!mark.path) check(false, `${tag} menu kept on navigation`, "no link in view");
+    else {
+      let s;
+      for (let i = 0; i < 40; i++) { await sleep(250); s = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"); return { path: location.pathname, same: sc === window.__menuScroller && sc.closest("nav") === window.__menuNav, top: sc.scrollTop,
+        active: !!sc.querySelector('.hm-sb-gitems a[aria-current="page"]') } })()`); if (s.path === mark.path && s.active) break; }
+      check(s.same, `${tag} menu kept on navigation: same DOM node`, s.same ? "" : "the menu was rebuilt");
+      check(Math.abs(s.top - mark.top) <= 1, `${tag} menu kept on navigation: scroll position`, `${mark.top} → ${s.top}`);
+      check(s.active, `${tag} menu kept on navigation: the clicked row is active`);
+    }
+    const far = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"); sc.scrollTop = 0; const c = sc.getBoundingClientRect();
+      const a = [...sc.querySelectorAll(".hm-sb-gitems a[href]")].reverse().find((a) => { const r = a.getBoundingClientRect(); return r.height && r.top > c.bottom }); if (!a) return null; a.click(); return a.getAttribute("href") })()`);
+    if (far) {
+      let seen = false;
+      for (let i = 0; i < 20 && !seen; i++) { await sleep(250); seen = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"), a = sc.querySelector('.hm-sb-gitems a[aria-current="page"]'); if (!a) return false;
+        const r = a.getBoundingClientRect(), c = sc.getBoundingClientRect(); return r.top >= c.top - 1 && r.bottom <= c.bottom + 1 })()`); }
+      check(seen, `${tag} menu reveals the active row (${far})`);
+    }
   }
   await b.close();
 }

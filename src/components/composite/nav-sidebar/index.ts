@@ -25,6 +25,7 @@ import { panelLeft } from "../../../icons/glyphs/panelLeft.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { clamp } from "../../../core/util.ts";
 import { resizeHandle } from "../../../behaviors/resize-handle/index.ts";
+import { reducedMotion } from "../../../motion/env.ts";
 
 /** One NavSidebar entry. `href` navigates (router Link); `onSelect` runs instead. */
 export interface NavSidebarItem {
@@ -164,6 +165,25 @@ export function NavSidebar(props: NavSidebarProps): Element {
       persist();
     });
   });
+  // the active row comes into view when it is outside the menu's scroll area (like scrollIntoView block "nearest", but
+  // only the menu scrolls: never the page, nor an off-canvas drawer). The menu otherwise keeps its scroll position.
+  let revealed = false;
+  effect(() => {
+    const id = active();
+    if (id == null) return;
+    const smooth = revealed && !reducedMotion();
+    revealed = true;
+    queueMicrotask(() => {
+      const all = [...(navEl?.querySelectorAll<HTMLElement>(".hm-sb-scroll .hm-sb-item") ?? [])].filter((r) => r.dataset["id"] === id && !r.closest("[inert]"));
+      const el = all.find((r) => r.dataset["where"] !== "recent") ?? all[0];
+      const sc = el?.closest<HTMLElement>(".hm-sb-scroll");
+      if (!el || !sc) return;
+      const r = el.getBoundingClientRect(), c = sc.getBoundingClientRect();
+      if (!c.height) return;
+      const d = r.top < c.top ? r.top - c.top : r.bottom > c.bottom ? Math.min(r.bottom - c.bottom, r.top - c.top) : 0;
+      if (d) sc.scrollTo?.({ top: sc.scrollTop + d, behavior: smooth ? "smooth" : "auto" });
+    });
+  });
   if (props.palette !== false) registerPages(() => items().filter((x) => x.href).map((x) => ({ id: x.id, title: text(x.label), href: x.href as Href, group: x.group, keywords: x.keywords, icon: x.icon })));
   const hk = props.hotkey ?? "focus";
   // "focus": the shortcut focuses this search box. "palette": the <CommandPalette> owns the shortcut; the box only shows the hint
@@ -205,23 +225,28 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const sectionHead = (label: () => string, ic: unknown, extra?: unknown): Element =>
     h("div", { class: "hm-sb-section" }, icon(ic, "hm-icon hm-sb-section-icon"), h("span", { class: "hm-sb-section-label" }, label), extra ?? null);
 
+  const queryText = computed(() => q().trim()); // spaces alone do not rebuild the menu
   const body = (): unknown => {
-    const query = q().trim();
+    const query = queryText();
     if (query) {
       const hits = untrack(() => rank(query, items(), (x) => ({ title: text(x.label), keywords: [x.keywords, x.group, text(x.sub)].filter(Boolean).join(" ") })));
       if (!hits.length) return h("p", { class: "hm-sb-none" }, () => t`No matches`);
       return untrack(() => h("ul", { class: "hm-sb-list", "aria-label": t`Results` }, hits.map((r) => row(r.item, "search", () => r.item.group ?? text(r.item.sub)))));
     }
-    const f = featured(), m = byId();
-    const rec = recent().map((id) => m.get(id)).filter((x): x is NavSidebarItem => !!x && !f.some((y) => y.id === x.id)).slice(0, maxRecent);
-    const gs = groups(), ls = loose();
-    return untrack(() => [
-      f.length > 0 && h("ul", { class: "hm-sb-list hm-sb-featured" }, f.map((x) => row(x, "featured"))),
-      ls.length > 0 && h("ul", { class: "hm-sb-list hm-sb-loose" }, ls.map((x) => row(x, "main"))),
-      maxRecent > 0 && rec.length > 0 && h("div", { class: "hm-sb-block hm-sb-recent" },
+    // Each block is its own reactive region: a navigation changes `recent` (and `active`), which rebuilds only the
+    // recent block, never the categories (a rebuilt menu loses its scroll position and looks reloaded).
+    const recentBlock = (): unknown => {
+      const f = featured(), m = byId();
+      const rec = recent().map((id) => m.get(id)).filter((x): x is NavSidebarItem => !!x && !f.some((y) => y.id === x.id)).slice(0, maxRecent);
+      return untrack(() => rec.length > 0 && h("div", { class: "hm-sb-block hm-sb-recent" },
         sectionHead(() => t`Recent`, clock),
-        h("ul", { class: "hm-sb-list" }, rec.map((x) => row(x, "recent", () => x.group ?? text(x.sub))))),
-      gs.length > 0 && h("div", { class: "hm-sb-block hm-sb-cats" },
+        h("ul", { class: "hm-sb-list" }, rec.map((x) => row(x, "recent", () => x.group ?? text(x.sub))))));
+    };
+    return [
+      () => { const f = featured(); return untrack(() => f.length > 0 && h("ul", { class: "hm-sb-list hm-sb-featured" }, f.map((x) => row(x, "featured")))); },
+      () => { const ls = loose(); return untrack(() => ls.length > 0 && h("ul", { class: "hm-sb-list hm-sb-loose" }, ls.map((x) => row(x, "main")))); },
+      maxRecent > 0 && recentBlock,
+      () => { const gs = groups(); return untrack(() => gs.length > 0 && h("div", { class: "hm-sb-block hm-sb-cats" },
         sectionHead(() => t`Categories`, null, h("button", { type: "button", class: "hm-sb-all", onClick: () => setAll(!allOpen()) }, () => (allOpen() ? t`Collapse all` : t`Expand all`))),
         h("ul", { class: "hm-sb-list hm-sb-groups" }, gs.map((g) => {
           const gid = uid("hm-sbg");
@@ -234,8 +259,8 @@ export function NavSidebar(props: NavSidebarProps): Element {
               h("span", { class: "hm-sb-count" }, String(g.items.length))),
             h("div", { class: "hm-sb-gpanel", id: gid, inert: () => !isOpen() },
               h("ul", { class: "hm-sb-list hm-sb-gitems" }, g.items.map((x) => row(x, "group")))));
-        }))),
-    ]);
+        })))); },
+    ];
   };
 
   // ---- keyboard: roving focus over visible rows
