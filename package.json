@@ -59,7 +59,17 @@
     "./managers/window": "./src/managers/window/index.ts",
     "./managers/scroll": "./src/managers/scroll/index.ts",
     "./managers/session": "./src/managers/session/index.ts",
-    "./managers/presence": "./src/managers/presence/index.ts"
+    "./managers/presence": "./src/managers/presence/index.ts",
+    "./managers/clipboard": "./src/managers/clipboard/index.ts",
+    "./managers/undo": "./src/managers/undo/index.ts",
+    "./managers/dirty": "./src/managers/dirty/index.ts",
+    "./managers/storage": "./src/managers/storage/index.ts",
+    "./managers/cache": "./src/managers/cache/index.ts",
+    "./managers/config": "./src/managers/config/index.ts",
+    "./managers/flags": "./src/managers/flags/index.ts",
+    "./managers/log": "./src/managers/log/index.ts",
+    "./managers/perf": "./src/managers/perf/index.ts",
+    "./managers/rate": "./src/managers/rate/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"
