@@ -3,12 +3,26 @@
 
 Grouped by category (src/components/categories.ts). Each category is a subpath: `import { Chip } from "hadi-march/actions"`; `hadi-march/ui` re-exports every component.
 
+### Layout — `hadi-march/layout`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| StatusBar | experimental | Bottom strip of an editor or app: start / end items, text or buttons (actions or command ids), tones with a breathing busy dot, live announcements, low-priority items to a … menu when narrow. | Menu, Tooltip |
+
 ### Actions — `hadi-march/actions`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
+| OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Menu, Tooltip |
+
+### Navigation — `hadi-march/navigation`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| ActivityBar | experimental | Editor icon bar that switches the side view: a tablist with a gliding indicator, count badges, end items, collapse by choosing the active view again; vertical or horizontal, RTL aware. | Badge, Tooltip |
+| Breadcrumbs | experimental | Path bar: links, buttons or sibling menus per crumb; the middle collapses into a … menu when narrow; separators mirrored in RTL. | Menu |
 
 ### Composite — `hadi-march/composite`
 
@@ -16,6 +30,38 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 |---|---|---|---|
 | DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, Portal |
 | PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
+
+## ActivityBar
+
+The narrow icon bar at the edge of an editor that switches the side view (files, search, source control…). An indicator glides to the active view; choosing the active view again collapses the side view (`value` becomes `null`). Items can carry count badges, sit at the far end (settings, account) or be plain actions. Vertical or horizontal (a bottom bar on phones), and mirrored in RTL.
+
+Composed of: Badge, Tooltip
+
+```tsx
+<ActivityBar value={$view} onChange={(v) => $view = v} controls="side-view" items={[
+  { id: "files", label: "Files", icon: files, shortcut: "mod+shift+e" },
+  { id: "search", label: "Search", icon: search, badge: () => $hits },
+  { id: "settings", label: "Settings", icon: settings, position: "end", onSelect: openSettings },
+]} />
+```
+
+Full page: src/components/navigation/activity-bar/docs.md
+
+## Breadcrumbs
+
+A path bar (folder › file › symbol). A crumb is a link (`href`), a button (`onSelect`) or, with `siblings`, a menu of the items beside it — jump to another file of the same folder. When the path does not fit, the middle crumbs collapse into a "…" menu; the first and the last always stay. Separators follow the reading direction.
+
+Composed of: Menu
+
+```tsx
+<Breadcrumbs label="File path" items={[
+  { id: "acme", label: "acme", icon: folder, onSelect: () => openFolder("acme") },
+  { id: "src", label: "src", icon: folder, siblings: () => folders("acme") },
+  { id: "file", label: "app.ts", icon: fileText },
+]} />
+```
+
+Full page: src/components/navigation/breadcrumbs/docs.md
 
 ## Chip
 
@@ -60,6 +106,24 @@ An optional credit line: "Developed with HADI March and 💗", with "HADI March"
 
 Full page: src/components/actions/made-with-march/docs.md
 
+## OverflowToolbar
+
+A toolbar that never wraps or squeezes: items that do not fit move to a **More** menu, lowest `priority` first, and come back (with a short slide-in) when there is room again. An item is a plain action or a **command id**: the Command manager then supplies its label, icon, shortcut, availability and busy state, so the palette, menus and this toolbar always agree.
+
+Composed of: Menu, Tooltip
+
+```tsx
+<OverflowToolbar label="Document" items={[
+  { id: "new", label: "New", icon: plus, onSelect: create, priority: 10 },
+  { id: "save", command: "doc.save", priority: 9 },
+  { id: "s1", separator: true },
+  { id: "split", label: "Split", icon: columns, pressed: () => $split, onSelect: () => $split = !$split },
+  { id: "delete", label: "Delete", icon: trash, danger: true },
+]} />
+```
+
+Full page: src/components/actions/overflow-toolbar/docs.md
+
 ## PropertyGrid
 
 An inspector: property rows in collapsible groups, a search field, and for each property the form control of its type. Every change is an **undo step** in the app's Undo history (typing in one field merges into one step), unsaved changes are registered with **DirtyState** (leave warning, `saveAll()`), and changed rows are marked and can be reset one by one. The footer counts the changes and offers Revert and Save.
@@ -76,3 +140,20 @@ Composed of: Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segment
 ```
 
 Full page: src/components/composite/property-grid/docs.md
+
+## StatusBar
+
+The strip at the bottom of an editor or app. Items sit at the **start** or the **end** (writing direction), are plain text or buttons (an action or a **command id** from the Command manager), and carry a tone: info, success, warn, danger, or busy (a breathing dot on the motion engine). When the bar is too narrow, the lowest `priority` items move to a "…" menu. Items marked `live` are announced when their text changes ("Saving…", "Saved").
+
+Composed of: Menu, Tooltip
+
+```tsx
+<StatusBar items={[
+  { id: "branch", icon: gitBranch, text: "main", onSelect: pickBranch, priority: 5 },
+  { id: "pos", side: "end", text: () => "Ln " + $line, priority: 4 },
+  { id: "save", side: "end", text: () => $state, tone: () => $busy ? "busy" : "success", live: true, priority: 9 },
+  { id: "format", side: "end", command: "editor.format" },
+]} />
+```
+
+Full page: src/components/layout/status-bar/docs.md
