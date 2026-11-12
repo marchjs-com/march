@@ -4,7 +4,8 @@ import m0 from "./composite/bottom-nav/meta.ts";
 import m1 from "./actions/chip/meta.ts";
 import m2 from "./overlays/drawer/meta.ts";
 import m3 from "./actions/made-with-march/meta.ts";
-import m4 from "./feedback/pull-to-refresh/meta.ts";
+import m4 from "./composite/nav-sidebar/meta.ts";
+import m5 from "./feedback/pull-to-refresh/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 export const registry: readonly RegistryEntry[] = [
@@ -12,5 +13,6 @@ export const registry: readonly RegistryEntry[] = [
   { folder: "actions/chip", meta: m1, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./actions/chip/demo.tsx"), playground: () => import("./actions/chip/playground.ts") },
   { folder: "overlays/drawer", meta: m2, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
   { folder: "actions/made-with-march", meta: m3, code: "<MadeWithMarch />\n<MadeWithMarch variant=\"badge\" />\n<MadeWithMarch variant=\"small\" />", demo: () => import("./actions/made-with-march/demo.tsx"), playground: () => import("./actions/made-with-march/playground.ts") },
-  { folder: "feedback/pull-to-refresh", meta: m4, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
+  { folder: "composite/nav-sidebar", meta: m4, code: "<NavSidebar title=\"Acme\" items={[\n  { id: \"/orders\", label: \"Orders\", href: \"/orders\", group: \"Sales\", icon: cart, badge: () => $open },\n  { id: \"/users\", label: \"Users\", href: \"/users\", group: \"Admin\", can: \"users.read\" },\n]} collapsible resizable groupOrder={[\"Sales\", \"Admin\"]} />", demo: () => import("./composite/nav-sidebar/demo.tsx"), playground: () => import("./composite/nav-sidebar/playground.ts") },
+  { folder: "feedback/pull-to-refresh", meta: m5, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
 ];

@@ -3,4 +3,5 @@ export * from "./composite/bottom-nav/index.ts";
 export * from "./actions/chip/index.ts";
 export * from "./overlays/drawer/index.ts";
 export * from "./actions/made-with-march/index.ts";
+export * from "./composite/nav-sidebar/index.ts";
 export * from "./feedback/pull-to-refresh/index.ts";

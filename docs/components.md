@@ -27,6 +27,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
+| NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 
 ## BottomNav
 
@@ -77,6 +78,21 @@ An optional credit line: "Developed with HADI March and 💗", with "HADI March"
 ```
 
 Full page: src/components/actions/made-with-march/docs.md
+
+## NavSidebar
+
+The app's side menu: categories that open and close, a typo-tolerant search over every item, recent visits and featured items at the top, a collapsible icon rail and a resizable width, all remembered per user. Items are links (router `Link`), so the current page is marked and the menu follows navigation.
+
+Composed of: OverflowText, Link
+
+```tsx
+<NavSidebar title="Acme" items={[
+  { id: "/orders", label: "Orders", href: "/orders", group: "Sales", icon: cart, badge: () => $open },
+  { id: "/users", label: "Users", href: "/users", group: "Admin", can: "users.read" },
+]} collapsible resizable groupOrder={["Sales", "Admin"]} />
+```
+
+Full page: src/components/composite/nav-sidebar/docs.md
 
 ## PullToRefresh
 

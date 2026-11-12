@@ -492,4 +492,5 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
+| NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 <!-- components:end -->
