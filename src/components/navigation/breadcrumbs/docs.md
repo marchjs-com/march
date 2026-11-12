@@ -6,8 +6,8 @@ into a "…" menu; the first and the last always stay. Separators follow the rea
 
 ```tsx
 <Breadcrumbs label="File path" items={[
-  { id: "acme", label: "acme", icon: folder, onSelect: () => openFolder("acme") },
-  { id: "src", label: "src", icon: folder, siblings: () => folders("acme") },
+  { id: "hadi", label: "hadi", icon: folder, onSelect: () => openFolder("hadi") },
+  { id: "src", label: "src", icon: folder, siblings: () => folders("hadi") },
   { id: "file", label: "app.ts", icon: fileText },
 ]} />
 ```

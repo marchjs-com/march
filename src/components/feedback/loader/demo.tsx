@@ -15,7 +15,7 @@ export default function LoaderDemo(props: { values: { text: boolean; overlay: bo
       const text = v.text ? "Panolar hazırlanıyor…" : undefined
       if (!v.overlay) return $busy ? <Loader text={text} /> : <p class="sc-loader-done">Panolar hazır.</p>
       return <div class="sc-loader-box">
-        <strong>Acme satış panosu</strong>
+        <strong>HADİ satış panosu</strong>
         <p class="hm-muted">Bu çeyrekte 1.284 sipariş, ortalama sepet 412 ₺.</p>
         {$busy ? <Loader overlay text={text} /> : null}
       </div>

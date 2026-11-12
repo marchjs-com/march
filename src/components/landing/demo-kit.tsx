@@ -21,7 +21,7 @@ export function MockApp(props: { class?: string }) {
 }
 
 const MARKS: Record<string, string> = {
-  Acme: "M4 20 L12 4 L20 20 Z",
+  HADİ: "M4 20 L12 4 L20 20 Z",
   Northwind: "M4 12 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0 M12 4 v16",
   Lumen: "M12 3 v4 M12 17 v4 M3 12 h4 M17 12 h4 M12 8 a4 4 0 1 0 0.01 0",
   Orbit: "M3 12 a9 4 0 1 0 18 0 a9 4 0 1 0 -18 0 M12 9 a3 3 0 1 0 0.01 0",
@@ -33,7 +33,7 @@ const MARKS: Record<string, string> = {
 /** Neutral wordmark logo (SVG mark + name). */
 export function Wordmark(props: { name: string }) {
   return <span class="sc-wordmark" role="img" aria-label={props.name}>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d={MARKS[props.name] ?? MARKS["Acme"]} /></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d={MARKS[props.name] ?? MARKS["HADİ"]} /></svg>
     <span aria-hidden="true">{props.name}</span>
   </span>
 }

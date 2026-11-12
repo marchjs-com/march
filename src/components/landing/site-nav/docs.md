@@ -6,7 +6,7 @@ down and back when scrolling up. A pill slides under the hovered link (mirrored 
 Below 860 px the links move into a Drawer.
 
 ```tsx
-<SiteNav mode="transparent" brand={{ name: "Acme", mark: logo, href: "/" }}
+<SiteNav mode="transparent" brand={{ name: "HADİ", mark: logo, href: "/" }}
   links={[{ label: "Features", href: "#features" }, { label: "Pricing", href: "#pricing", active: () => $section === "pricing" }]}
   actions={<><Button variant="ghost">Sign in</Button><Button>Start</Button></>} />
 ```

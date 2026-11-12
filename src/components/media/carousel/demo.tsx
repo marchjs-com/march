@@ -11,7 +11,7 @@ export default function CarouselDemo(props: { values: { perView: number; slides:
   return <div class="sc-col">
     {() => {
       const v = props.values
-      return <Carousel perView={v.perView as 1} label="Acme koleksiyonu">
+      return <Carousel perView={v.perView as 1} label="HADİ koleksiyonu">
         {Array.from({ length: v.slides }, (_, i) => <article class={`sc-car-slide sc-car-${i % 4}`}><strong>{i + 1}</strong><span>{NAMES[i % 4]}</span></article>)}
       </Carousel>
     }}

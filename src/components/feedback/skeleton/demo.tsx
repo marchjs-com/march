@@ -13,7 +13,7 @@ export default function SkeletonDemo(props: { values: { mode: string; lines: num
     {() => {
       const v = props.values
       const colors = v.colors === "theme" ? undefined : (v.colors as "brand")
-      if (!$loading) return <div class="sc-skel-real"><strong>Acme Ltd.</strong><p class="hm-muted">Veri geldi; iskelet aynı düzenin yerini aldı ve hiçbir şey zıplamadı.</p></div>
+      if (!$loading) return <div class="sc-skel-real"><strong>HADİ</strong><p class="hm-muted">Veri geldi; iskelet aynı düzenin yerini aldı ve hiçbir şey zıplamadı.</p></div>
       if (v.mode === "lines") return <Skeleton lines={v.lines} colors={colors} />
       if (v.mode === "block") return <Skeleton block height={v.height as "md"} colors={colors} />
       return <div class="sc-skel-card"><Skeleton block height={v.height as "md"} colors={colors} /><Skeleton lines={v.lines} colors={colors} /></div>

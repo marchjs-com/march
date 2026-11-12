@@ -20,7 +20,7 @@ export interface FollowButtonProps {
   onChange: (next: FollowState) => void;
   /** A private account: following asks first. */
   private?: MaybeFn<boolean | undefined>;
-  /** Whom (accessible name: "Follow Acme"). */
+  /** Whom (accessible name: "Follow HADİ"). */
   name?: MaybeFn<string | undefined>;
   size?: MaybeFn<"sm" | "md" | undefined>;
   /** Stretch to the container. */

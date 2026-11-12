@@ -7,7 +7,7 @@ export const code = `<FollowButton state={$state} name={user.name} private={user
 export default function FollowButtonDemo(props: { values: { private: boolean; size: string; block: boolean } }) {
   let $state: FollowState = "follow"
   return <div class="sc-social-follow">
-    {() => <FollowButton state={() => $state} name="Acme Koşu Kulübü" private={props.values.private} size={props.values.size as "md"} block={props.values.block} onChange={(s) => { $state = s }} />}
+    {() => <FollowButton state={() => $state} name="HADİ Koşu Kulübü" private={props.values.private} size={props.values.size as "md"} block={props.values.block} onChange={(s) => { $state = s }} />}
     <p class="sc-strip-label" aria-live="polite">{() => ({ follow: "Takip etmiyorsunuz", following: "Takip ediyorsunuz", requested: "İstek bekliyor" })[$state]}</p>
   </div>
 }

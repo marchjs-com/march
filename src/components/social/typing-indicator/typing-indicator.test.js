@@ -8,14 +8,14 @@ const wait = (ms = 30) => new Promise((r) => setTimeout(r, ms));
 const { TypingIndicator, typingText } = await import("./index.ts");
 
 test("TypingIndicator: polite status, sentence, hides when nobody types", () => {
-  const names = signal(["Acme"]);
+  const names = signal(["HADİ"]);
   const m = mount(() => h(TypingIndicator, { names }));
   const el = m.el.querySelector(".hm-typing");
   assert.equal(el.getAttribute("role"), "status");
-  assert.equal(el.querySelector(".hm-typing-text").textContent, "Acme is typing…");
+  assert.equal(el.querySelector(".hm-typing-text").textContent, "HADİ is typing…");
   assert.ok(el.querySelector(".hm-typing-text").classList.contains("hm-sr-only"), "bubble: the sentence is for screen readers");
-  names.set(["Acme", "Beta"]);
-  assert.equal(el.querySelector(".hm-typing-text").textContent, "Acme and Beta are typing…");
+  names.set(["HADİ", "Beta"]);
+  assert.equal(el.querySelector(".hm-typing-text").textContent, "HADİ and Beta are typing…");
   names.set([]);
   assert.ok(el.classList.contains("is-off"));
   assert.equal(typingText(["a", "b", "c"]), "3 people are typing…");

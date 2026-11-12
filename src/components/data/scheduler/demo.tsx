@@ -10,7 +10,7 @@ export const code = `<Scheduler events={$events} view="week" step={15}
 
 const SEED: [day: number, from: string, to: string, title: string, color: string, loc?: string][] = [
   [0, "09:00", "09:30", "Günlük toplantı", "brand-blue", "Oda 2"],
-  [0, "10:00", "11:30", "Acme ile ürün demosu", "brand-orange", "Çevrim içi"],
+  [0, "10:00", "11:30", "HADİ ile ürün demosu", "brand-orange", "Çevrim içi"],
   [0, "10:30", "11:00", "Kod incelemesi", "brand-purple"],
   [1, "09:00", "09:30", "Günlük toplantı", "brand-blue", "Oda 2"],
   [1, "13:00", "15:00", "Tasarım atölyesi", "brand-green", "Stüdyo"],

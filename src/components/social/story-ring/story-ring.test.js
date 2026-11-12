@@ -9,13 +9,13 @@ const mount = (fn) => { const el = document.createElement("div"); document.body.
 test("StoryRing: button named with its state, label, add badge, loading", () => {
   const state = signal("new"), loading = signal(false);
   let clicks = 0;
-  const m = mount(() => h(StoryRing, { name: "Acme", state, loading, label: "acme", add: true, onClick: () => clicks++ }));
+  const m = mount(() => h(StoryRing, { name: "HADİ", state, loading, label: "hadi", add: true, onClick: () => clicks++ }));
   const b = m.el.querySelector("button.hm-sring");
-  assert.equal(b.getAttribute("aria-label"), "Acme, new story");
-  assert.equal(b.querySelector(".hm-sring-label").textContent, "acme");
+  assert.equal(b.getAttribute("aria-label"), "HADİ, new story");
+  assert.equal(b.querySelector(".hm-sring-label").textContent, "hadi");
   assert.ok(b.querySelector(".hm-sring-add"));
   state.set("seen");
-  assert.equal(b.getAttribute("aria-label"), "Acme, story seen");
+  assert.equal(b.getAttribute("aria-label"), "HADİ, story seen");
   assert.ok(b.classList.contains("is-seen"));
   loading.set(true);
   assert.equal(b.getAttribute("aria-busy"), "true");
@@ -25,10 +25,10 @@ test("StoryRing: button named with its state, label, add badge, loading", () => 
 });
 
 test("StoryRing: without onClick it is an image", () => {
-  const m = mount(() => h(StoryRing, { name: "Acme", state: "none" }));
+  const m = mount(() => h(StoryRing, { name: "HADİ", state: "none" }));
   const r = m.el.querySelector(".hm-sring");
   assert.equal(r.tagName, "SPAN");
   assert.equal(r.getAttribute("role"), "img");
-  assert.equal(r.getAttribute("aria-label"), "Acme");
+  assert.equal(r.getAttribute("aria-label"), "HADİ");
   m.dispose();
 });

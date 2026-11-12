@@ -4,8 +4,8 @@ import { KeyframeTimeline, type TimelineModel } from "./index.ts";
 
 const SCENES: Record<string, TimelineModel> = {
   intro: { duration: 2400, tracks: [
-    { id: "l-y", target: "Acme", prop: "y", keys: [{ at: 0, value: -60 }, { at: 700, value: 0, easing: "back" }] },
-    { id: "l-o", target: "Acme", prop: "opacity", keys: [{ at: 0, value: 0 }, { at: 500, value: 1, easing: "out" }] },
+    { id: "l-y", target: "HADİ", prop: "y", keys: [{ at: 0, value: -60 }, { at: 700, value: 0, easing: "back" }] },
+    { id: "l-o", target: "HADİ", prop: "opacity", keys: [{ at: 0, value: 0 }, { at: 500, value: 1, easing: "out" }] },
     { id: "t-x", target: "Başlık", prop: "x", keys: [{ at: 300, value: -120 }, { at: 1100, value: 0, easing: "expo" }] },
     { id: "t-o", target: "Başlık", prop: "opacity", keys: [{ at: 300, value: 0 }, { at: 900, value: 1 }] },
     { id: "b-s", target: "Başla", prop: "scale", keys: [{ at: 1100, value: 0 }, { at: 1600, value: 1.15, easing: "out" }, { at: 1900, value: 1, easing: "in-out" }] },

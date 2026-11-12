@@ -22,7 +22,7 @@ const pane = (title: string, lines: string[]) => <div class="sc-dock-pane"><stro
 
 export default function DockLayoutDemo(props: { values: { preset: string; dir: string; tray: boolean } }) {
   const panels = [
-    { id: "files", title: "Dosyalar", icon: folder, content: () => pane("Acme", ["src/", "  app.ts", "  theme.css", "README.md"]) },
+    { id: "files", title: "Dosyalar", icon: folder, content: () => pane("HADİ", ["src/", "  app.ts", "  theme.css", "README.md"]) },
     { id: "editor", title: "app.ts", icon: fileText, content: () => pane("app.ts", ["Sekmeyi bir grubun kenarına sürükle: yeni bölme.", "Ortasına ya da sekmelerin arasına: sekme.", "Alanın dışına: yüzen pencere."]) },
     { id: "notes", title: "Notlar", icon: fileText, content: () => pane("Notlar", ["Alt+Shift+oklar: odaktaki sekmeyi o yana yerleştirir.", "F6: gruplar arasında gezinir."]) },
     { id: "console", title: "Konsol", icon: terminal, content: () => pane("Konsol", ["> derleme tamam (412 ms)"]) },

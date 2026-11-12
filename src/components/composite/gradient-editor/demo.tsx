@@ -11,7 +11,7 @@ const START: Record<string, string> = {
 
 export default function GradientEditorDemo(props: { values: { start: string; presets: boolean; output: boolean; readonly: boolean } }) {
   let $g: string = START.hadi ?? ""
-  const banner = (<div class="sc-ge-banner"><b>Acme</b><span>Yeni sezon</span></div>) as HTMLElement
+  const banner = (<div class="sc-ge-banner"><b>HADİ</b><span>Yeni sezon</span></div>) as HTMLElement
   effect(() => setStyle(banner, { "--sc-ge": $g }))
   return <div class="sc-ed-split">
     {() => { $g = START[props.values.start] ?? START.hadi ?? ""; return <GradientEditor value={untrack(() => $g)} onChange={(v: string) => { $g = v }} presets={props.values.presets ? undefined : false} output={props.values.output} readonly={props.values.readonly} /> }}

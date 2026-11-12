@@ -290,8 +290,8 @@ Composed of: [Menu](#menu)
 
 ```tsx
 <Breadcrumbs label="File path" items={[
-  { id: "acme", label: "acme", icon: folder, onSelect: () => openFolder("acme") },
-  { id: "src", label: "src", icon: folder, siblings: () => folders("acme") },
+  { id: "hadi", label: "hadi", icon: folder, onSelect: () => openFolder("hadi") },
+  { id: "src", label: "src", icon: folder, siblings: () => folders("hadi") },
   { id: "file", label: "app.ts", icon: fileText },
 ]} />
 ```
@@ -339,7 +339,7 @@ Full page: src/components/forms/calendar/docs.md
 A surface for one piece of content: an optional header with a title, a subtitle and actions, the body, and an optional footer. `action()` objects in `actions` render as buttons that run, confirm and report the action.
 
 ```tsx
-<Card title="Acme Ltd." subtitle="Business plan" actions={[edit]} footer={<span>Updated today</span>}>…</Card>
+<Card title="HADİ" subtitle="Business plan" actions={[edit]} footer={<span>Updated today</span>}>…</Card>
 <Card flush>…</Card>
 ```
 
@@ -482,7 +482,7 @@ Composed of: [IconButton](#iconbutton), [Segmented](#segmented)
 
 ```tsx
 <ColorPicker bind:value={$color} />
-<ColorPicker value={brand} format="hsl" alpha={false} palettes={[{ label: "Acme", colors: ["#0b5", "brand-blue"] }]} />
+<ColorPicker value={brand} format="hsl" alpha={false} palettes={[{ label: "HADİ", colors: ["#0b5", "brand-blue"] }]} />
 ```
 
 Full page: src/components/composite/color-picker/docs.md
@@ -702,8 +702,8 @@ Full page: src/components/overlays/drawer/docs.md
 Edit a `cubic-bezier()` easing by its two handles and watch it run. The preview runs on the motion engine's clock, so the global speed, "Stop all" and reduced motion apply to it; a faint dot moves linearly beside the eased one, and a marker rides the curve. The presets are the engine's named curves. With `name`, every change registers the curve in the engine (`defineEasing`), so any animation can use it by name.
 
 ```tsx
-<EasingCurveEditor bind:value={$easing} name="acme-pop" />
-animate(card, frames, { duration: 600, easing: "acme-pop" })
+<EasingCurveEditor bind:value={$easing} name="hadi-pop" />
+animate(card, frames, { duration: 600, easing: "hadi-pop" })
 ```
 
 Full page: src/components/motion/easing-curve-editor/docs.md
@@ -1046,7 +1046,7 @@ Composed of: Marquee, [Grid](#grid), [Reveal](#reveal)
 
 ```tsx
 <LogoCloud title="Trusted by teams at" variant="marquee" logos={[
-  { name: "Acme", src: "/logos/acme.svg", width: 120, height: 32 },
+  { name: "HADİ", src: "/logos/hadi.svg", width: 120, height: 32 },
   { name: "Northwind", node: <NorthwindLogo /> },
 ]} />
 ```
@@ -1148,7 +1148,7 @@ The app's side menu: categories that open and close, a typo-tolerant search over
 Composed of: [OverflowText](#overflowtext), Link
 
 ```tsx
-<NavSidebar title="Acme" items={[
+<NavSidebar title="HADİ" items={[
   { id: "/orders", label: "Orders", href: "/orders", group: "Sales", icon: cart, badge: () => $open },
   { id: "/users", label: "Users", href: "/users", group: "Admin", can: "users.read" },
 ]} collapsible resizable groupOrder={["Sales", "Admin"]} />
@@ -1535,7 +1535,7 @@ The end of a website: brand and a short line about the product, link columns, so
 Composed of: Brand, [Newsletter](#newsletter), [IconButton](#iconbutton)
 
 ```tsx
-<SiteFooter brand={{ name: "Acme", mark: logo }} about="…" wordmark="Acme"
+<SiteFooter brand={{ name: "HADİ", mark: logo }} about="…" wordmark="HADİ"
   columns={[{ title: "Product", links: [{ label: "Pricing", href: "/pricing" }] }]}
   social={[{ label: "Blog", href: "/blog", icon: globe }]}
   newsletter={{ title: "Newsletter", onSubmit: (e) => api.subscribe(e) }}
@@ -1551,7 +1551,7 @@ The top bar of a website. Sticky; `transparent` starts see-through over a hero a
 Composed of: Brand, [IconButton](#iconbutton), openDrawer
 
 ```tsx
-<SiteNav mode="transparent" brand={{ name: "Acme", mark: logo, href: "/" }}
+<SiteNav mode="transparent" brand={{ name: "HADİ", mark: logo, href: "/" }}
   links={[{ label: "Features", href: "#features" }, { label: "Pricing", href: "#pricing", active: () => $section === "pricing" }]}
   actions={<><Button variant="ghost">Sign in</Button><Button>Start</Button></>} />
 ```
@@ -1744,7 +1744,7 @@ Composed of: [Card](#card), Avatar, [Rating](#rating), Marquee, [Carousel](#caro
 
 ```tsx
 <Testimonials variant="wall" items={[
-  { quote: "Our new site was live in a week.", name: "Dana Ray", role: "Head of product, Acme", rating: 5 },
+  { quote: "Our new site was live in a week.", name: "Dana Ray", role: "Head of product, HADİ", rating: 5 },
   …
 ]} />
 ```
@@ -1898,7 +1898,7 @@ Full page: src/components/data/tree-view/docs.md
 
 ## TypingIndicator
 
-Three dots that lift in turn on the motion engine (a staggered loop; still with reduced motion) and an optional sentence: "Acme is typing…", "Acme and Beta are typing…", "3 people are typing…". It is a polite status, so screen readers hear the sentence once even when it is not shown. With no names it hides.
+Three dots that lift in turn on the motion engine (a staggered loop; still with reduced motion) and an optional sentence: "HADİ is typing…", "HADİ and Beta are typing…", "3 people are typing…". It is a polite status, so screen readers hear the sentence once even when it is not shown. With no names it hides.
 
 ```tsx
 <TypingIndicator names={$typing} />

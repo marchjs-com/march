@@ -3,7 +3,7 @@ import { LogoCloud } from "./index.ts";
 import { Wordmark, LOGO_NAMES } from "../demo-kit.tsx";
 
 export const code = `<LogoCloud title="Bu ekipler bize güveniyor" variant="marquee" logos={[
-  { name: "Acme", src: "/logos/acme.svg", width: 120, height: 32 },
+  { name: "HADİ", src: "/logos/hadi.svg", width: 120, height: 32 },
   { name: "Northwind", node: <NorthwindLogo /> },
 ]} />`
 

@@ -9,13 +9,13 @@ const mount = (fn) => { const el = document.createElement("div"); document.body.
 
 test("Card: header, actions, body, footer and flush", () => {
   const m = mount(() => [
-    h(Card, { title: "Acme", subtitle: "Plan", actions: [action("Edit", () => {})], footer: "Updated", "data-x": "1" }, "Body"),
+    h(Card, { title: "HADİ", subtitle: "Plan", actions: [action("Edit", () => {})], footer: "Updated", "data-x": "1" }, "Body"),
     h(Card, { flush: true, as: "article" }, "Bare"),
   ]);
   const [a, b] = m.el.children;
   assert.equal(a.tagName, "SECTION");
   assert.equal(a.getAttribute("data-x"), "1");
-  assert.equal(a.querySelector(".hm-card-title").textContent, "Acme");
+  assert.equal(a.querySelector(".hm-card-title").textContent, "HADİ");
   assert.equal(a.querySelector(".hm-card-sub").textContent, "Plan");
   assert.ok(a.querySelector(".hm-card-actions button"), "action() renders as a button");
   assert.equal(a.querySelector(".hm-card-foot").textContent, "Updated");

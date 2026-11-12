@@ -80,8 +80,8 @@ set is any object with `{ id, name, license, resolve(name) }` (`resolve` may ret
 ```ts
 import { registerIconPack, packIcon } from "hadi-march/icons/packs";
 
-const acme = { star: packIcon("star", ["M12 2 15 9h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"], { fill: true }) };
-registerIconPack({ id: "acme", name: "Acme", license: "MIT", resolve: (n) => acme[n] });
+const hadi = { star: packIcon("star", ["M12 2 15 9h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"], { fill: true }) };
+registerIconPack({ id: "hadi", name: "HADİ", license: "MIT", resolve: (n) => hadi[n] });
 ```
 
 `iconPacks()` lists the registered packs, `iconPack(id)` returns one, `parseIconRef("lucide:user")` splits a name.

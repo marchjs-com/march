@@ -65,7 +65,7 @@ export function FlowEditorStage() {
           </div>) },
         ]} />
       </aside>
-      <div class="sc-flow-stage sc-flow-stage-lg"><FlowCanvas flow={flow} snap={16} label="Acme sipariş akışı" /></div>
+      <div class="sc-flow-stage sc-flow-stage-lg"><FlowCanvas flow={flow} snap={16} label="HADİ sipariş akışı" /></div>
     </div>
     <FlowTimeline runner={runner} flow={flow} />
   </div>

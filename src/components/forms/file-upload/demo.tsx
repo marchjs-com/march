@@ -7,7 +7,7 @@ export const code = `<FileUpload multiple accept="image/*" maxSize={5_000_000} l
 // a pretend upload: progress in steps, cancellable through the signal
 const fake: UploadFn<string> = (file, { onProgress, signal }) => new Promise((resolve, reject) => {
   let p = 0
-  const id = setInterval(() => { p += 0.1; onProgress(Math.min(p, 1)); if (p >= 1) { clearInterval(id); resolve(`https://cdn.acme.com/${file.name}`) } }, 250)
+  const id = setInterval(() => { p += 0.1; onProgress(Math.min(p, 1)); if (p >= 1) { clearInterval(id); resolve(`https://cdn.hadisosyal.com/${file.name}`) } }, 250)
   signal.addEventListener("abort", () => { clearInterval(id); reject(new Error("aborted")) })
 })
 

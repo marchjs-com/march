@@ -16,14 +16,14 @@ Hovering "Following" turns it red before you unfollow.
 | `state` | `follow` `following` `requested` | `follow` | |
 | `onChange` | `(next) => void` | — | follow → following (or requested), back to follow |
 | `private` | boolean | false | following sends a request |
-| `name` | string | — | accessible name: "Follow Acme" |
+| `name` | string | — | accessible name: "Follow HADİ" |
 | `size` | `sm` `md` | `md` | 32 / 42 px |
 | `block` | boolean | false | full width (no width morph) |
 
 ## Accessibility
 
-A toggle button (`aria-pressed`) whose name says what pressing does: "Follow Acme", "Following Acme, press to
-unfollow", "Follow request sent to Acme, press to cancel".
+A toggle button (`aria-pressed`) whose name says what pressing does: "Follow HADİ", "Following HADİ, press to
+unfollow", "Follow request sent to HADİ, press to cancel".
 
 ## Composed of
 

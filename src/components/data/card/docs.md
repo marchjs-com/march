@@ -4,7 +4,7 @@ A surface for one piece of content: an optional header with a title, a subtitle 
 footer. `action()` objects in `actions` render as buttons that run, confirm and report the action.
 
 ```tsx
-<Card title="Acme Ltd." subtitle="Business plan" actions={[edit]} footer={<span>Updated today</span>}>…</Card>
+<Card title="HADİ" subtitle="Business plan" actions={[edit]} footer={<span>Updated today</span>}>…</Card>
 <Card flush>…</Card>
 ```
 

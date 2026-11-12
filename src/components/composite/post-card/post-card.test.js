@@ -5,14 +5,14 @@ const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { PostCard } = await import("./index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
-const base = { id: "p", author: { name: "Acme Club", handle: "acme", verified: true }, time: new Date(Date.now() - 5 * 60_000), text: "Hello", likes: 9, liked: false, comments: 3, shares: 0, media: [{ src: "a.svg", alt: "a" }, { src: "b.svg", alt: "b" }] };
+const base = { id: "p", author: { name: "HADİ Club", handle: "hadisosyal", verified: true }, time: new Date(Date.now() - 5 * 60_000), text: "Hello", likes: 9, liked: false, comments: 3, shares: 0, media: [{ src: "a.svg", alt: "a" }, { src: "b.svg", alt: "b" }] };
 
 test("PostCard: article, author, media, like toggles through onLike, counts are named buttons", () => {
   const post = signal(base);
   const comments = [];
   const m = mount(() => h(PostCard, { post, onLike: (on) => post.set({ ...post(), liked: on, likes: post().likes + (on ? 1 : -1) }), onComment: (p) => comments.push(p.id) }));
   const art = m.el.querySelector("article.hm-post");
-  assert.equal(art.getAttribute("aria-label"), "Post by Acme Club");
+  assert.equal(art.getAttribute("aria-label"), "Post by HADİ Club");
   assert.ok(art.querySelector(".hm-post-verified"));
   assert.equal(art.querySelectorAll(".hm-mgrid-tile").length, 2);
   const like = art.querySelector("button.hm-like");

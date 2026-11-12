@@ -1,5 +1,5 @@
 // EasingCurveEditor (hadi-march/ui): edit a cubic-bezier easing and see it move. Folder: src/components/composite/easing-curve-editor/.
-//   <EasingCurveEditor bind:value={$ease} name="acme-pop" />   value: "cubic-bezier(.34, 1.56, .64, 1)"
+//   <EasingCurveEditor bind:value={$ease} name="hadi-pop" />   value: "cubic-bezier(.34, 1.56, .64, 1)"
 // Two handles on the curve (drag, or arrows on a focused handle), the motion engine's named curves as presets, a live
 // preview on the engine clock (global speed, Stop all and reduced motion apply) and, with `name`, the curve registered
 // in the engine (defineEasing) so any animation can use it by that name.

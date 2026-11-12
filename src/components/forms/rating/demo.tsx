@@ -11,7 +11,7 @@ export default function RatingDemo(props: { values: { max: number; size: string;
     {() => {
       const v = props.values
       return <Rating value={v.readonly ? 3.5 : () => $v} setValue={(n: number) => { $v = n }} max={v.max} size={v.size as "lg"} readonly={v.readonly}
-        color={v.color === "primary" ? undefined : (v.color as "brand-blue")} label="Acme hizmet puanı" />
+        color={v.color === "primary" ? undefined : (v.color as "brand-blue")} label="HADİ hizmet puanı" />
     }}
     <span class="sc-strip-label" aria-live="polite">{() => (props.values.readonly ? "3,5 / " + props.values.max : `${$v} / ${props.values.max}`)}</span>
   </div>

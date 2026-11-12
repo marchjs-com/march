@@ -148,7 +148,7 @@ export function draftFromColor(seed: string, name = "My theme"): ThemeDraft {
   };
 }
 
-/** A kebab-case theme id from a name ("Acme Gece" → "acme-gece"). */
+/** A kebab-case theme id from a name ("HADİ Gece" → "hadi-gece"). */
 export function slug(name: string): string {
   // accents come off after NFKD; the dotless i (U+0131) has no decomposition of its own
   const s = name.toLocaleLowerCase("tr").replace(/ı/g, "i")

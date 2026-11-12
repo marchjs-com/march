@@ -23,7 +23,7 @@ ring turns on the motion engine. A `+` badge marks your own ring (add a story); 
 
 ## Accessibility
 
-A button (or an image) named with the state: "Acme, new story" / "Acme, story seen". `aria-busy` while loading. The
+A button (or an image) named with the state: "HADİ, new story" / "HADİ, story seen". `aria-busy` while loading. The
 ring and the badge are decorative.
 
 ## Composed of

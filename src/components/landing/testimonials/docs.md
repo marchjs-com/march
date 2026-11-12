@@ -6,7 +6,7 @@ the quote, an optional star rating, an Avatar, the name and the role.
 
 ```tsx
 <Testimonials variant="wall" items={[
-  { quote: "Our new site was live in a week.", name: "Dana Ray", role: "Head of product, Acme", rating: 5 },
+  { quote: "Our new site was live in a week.", name: "Dana Ray", role: "Head of product, HADİ", rating: 5 },
   …
 ]} />
 ```

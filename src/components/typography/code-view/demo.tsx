@@ -16,7 +16,7 @@ export function Counter(props: { start?: number }) {
 .card { display: flex; flex-direction: column; min-width: 0; padding: var(--hm-space-4); border-radius: var(--hm-radius-3); }
 .card-title { margin: 0; font-size: var(--hm-text-lg); }`,
   json: `{
-  "name": "acme-panel",
+  "name": "hadi-panel",
   "private": true,
   "dependencies": { "hadi-march": "^0.2.0" },
   "seats": 48

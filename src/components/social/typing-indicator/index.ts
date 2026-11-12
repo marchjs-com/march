@@ -20,7 +20,7 @@ export interface TypingIndicatorProps {
   class?: ClassProp;
 }
 
-/** The sentence: "Acme is typing…", "Acme and Beta are typing…", "3 people are typing…". */
+/** The sentence: "HADİ is typing…", "HADİ and Beta are typing…", "3 people are typing…". */
 export function typingText(names: readonly string[]): string {
   if (!names.length) return "";
   if (names.length === 1) return t`${names[0]} is typing…`;

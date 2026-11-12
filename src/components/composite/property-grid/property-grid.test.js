@@ -18,7 +18,7 @@ const PROPS = [
 ];
 
 test("PropertyGrid: groups, search, hidden rows, changes with undo and DirtyState, reset, revert, save", async () => {
-  const value = signal({ name: "Acme", width: 320, visible: true, radius: 8 });
+  const value = signal({ name: "HADİ", width: 320, visible: true, radius: 8 });
   const saves = [];
   let api;
   const u = undoStack();
@@ -72,10 +72,10 @@ test("PropertyGrid: groups, search, hidden rows, changes with undo and DirtyStat
   // revert all, then save
   api.revert();
   assert.equal(value().visible, true);
-  value.set({ ...value(), name: "Acme 2" });
+  value.set({ ...value(), name: "HADİ 2" });
   await api.save();
   assert.equal(saves.length, 1);
-  assert.equal(saves[0].name, "Acme 2");
+  assert.equal(saves[0].name, "HADİ 2");
   assert.deepEqual(api.changes(), []);
   assert.ok(!dirtyState().is("pg1"));
   m.dispose();
@@ -97,7 +97,7 @@ test("PropertyGrid: history and dirty can be switched off; any control works", a
 });
 
 test("PropertyGrid: a slider being dragged stays the same node in the same group box (focus and pointer kept)", async () => {
-  const value = signal({ name: "Acme", width: 320, visible: true, radius: 8 });
+  const value = signal({ name: "HADİ", width: 320, visible: true, radius: 8 });
   const m = mount(() => h(PropertyGrid, { properties: PROPS, value, id: "pg-drag", history: false, dirty: false }));
   await tick();
   const slider = m.el.querySelector("#pg-drag-radius");

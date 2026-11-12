@@ -5,7 +5,7 @@ featured items at the top, a collapsible icon rail and a resizable width, all re
 (router `Link`), so the current page is marked and the menu follows navigation.
 
 ```tsx
-<NavSidebar title="Acme" items={[
+<NavSidebar title="HADİ" items={[
   { id: "/orders", label: "Orders", href: "/orders", group: "Sales", icon: cart, badge: () => $open },
   { id: "/users", label: "Users", href: "/users", group: "Admin", can: "users.read" },
 ]} collapsible resizable groupOrder={["Sales", "Admin"]} />

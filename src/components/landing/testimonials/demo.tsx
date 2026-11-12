@@ -2,12 +2,12 @@
 import { Testimonials, type Testimonial } from "./index.ts";
 
 export const code = `<Testimonials variant="wall" items={[
-  { quote: "Bir hafta sonunda yeni sitemiz yayındaydı.", name: "Deniz Arı", role: "Ürün lideri, Acme", rating: 5 },
+  { quote: "Bir hafta sonunda yeni sitemiz yayındaydı.", name: "Deniz Arı", role: "Ürün lideri, HADİ", rating: 5 },
   …
 ]} />`
 
 export const QUOTES: Testimonial[] = [
-  { quote: "Bir hafta sonunda yeni sitemiz yayındaydı ve ilk boyama yarıya indi.", name: "Deniz Arı", role: "Ürün lideri, Acme", rating: 5 },
+  { quote: "Bir hafta sonunda yeni sitemiz yayındaydı ve ilk boyama yarıya indi.", name: "Deniz Arı", role: "Ürün lideri, HADİ", rating: 5 },
   { quote: "Hareketler akıcı ama asla abartılı değil. Müşterilerimiz farkı hemen gördü.", name: "Mert Kaya", role: "Tasarım, Northwind", rating: 5 },
   { quote: "RTL ve çok dil desteği kutudan çıktığı gibi çalıştı; Arapça sürüm bir günde hazırdı.", name: "Leyla Demir", role: "Mühendislik, Orbit", rating: 5 },
   { quote: "Bloklar birbirine çok iyi uyuyor. Tema rengini değiştirdik, her şey takip etti.", name: "Can Yıldız", role: "Ortak, Kite", rating: 4 },

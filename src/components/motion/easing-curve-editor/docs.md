@@ -6,8 +6,8 @@ marker rides the curve. The presets are the engine's named curves. With `name`, 
 the engine (`defineEasing`), so any animation can use it by name.
 
 ```tsx
-<EasingCurveEditor bind:value={$easing} name="acme-pop" />
-animate(card, frames, { duration: 600, easing: "acme-pop" })
+<EasingCurveEditor bind:value={$easing} name="hadi-pop" />
+animate(card, frames, { duration: 600, easing: "hadi-pop" })
 ```
 
 ## Props

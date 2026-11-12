@@ -7,7 +7,7 @@ export const code = `<Field label="Hakkında" help={() => \`\${$about.length}/28
 </Field>`
 
 export default function TextareaDemo(props: { values: { rows: number; counter: boolean } }) {
-  let $about = "Acme ekibinde ürün tasarımı yapıyorum."
+  let $about = "HADİ ekibinde ürün tasarımı yapıyorum."
   return <div>{() => <Field label="Hakkında" help={props.values.counter ? () => `${$about.length}/280` : undefined}>
     <Textarea value={$about} onChange={(v: string) => { $about = v }} rows={props.values.rows} maxLength={280} placeholder="Kendinden kısaca bahset" />
   </Field>}</div>

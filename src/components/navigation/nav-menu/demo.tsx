@@ -8,7 +8,7 @@ import { barChart } from "../../../icons/glyphs/barChart.ts";
 import { settings } from "../../../icons/glyphs/settings.ts";
 import type { Href } from "../../../router/router.ts";
 
-export const code = `<NavMenu brand="Acme" filter collapsible items={[
+export const code = `<NavMenu brand="HADİ" filter collapsible items={[
   { id: "inbox", title: "Gelen kutusu", href: "/inbox", icon: inbox, badge: () => $unread },
   { id: "members", title: "Üyeler", href: "/members", group: "Yönetim" },
   { id: "payments", title: "Ödemeler", href: "/payments", group: "Finans" },
@@ -32,7 +32,7 @@ export default function NavMenuDemo(props: { values: { filter: boolean; groupsCo
     {() => {
       // read here so the menu is drawn again when an option changes (it reads its props once)
       const { filter, groupsCollapsed, collapsible } = { filter: props.values.filter, groupsCollapsed: props.values.groupsCollapsed, collapsible: props.values.collapsible }
-      return <NavMenu items={ITEMS} brand={<strong>Acme</strong>} label="Örnek menü" palette={false} storageKey={`sc.navmenu.${groupsCollapsed}`}
+      return <NavMenu items={ITEMS} brand={<strong>HADİ</strong>} label="Örnek menü" palette={false} storageKey={`sc.navmenu.${groupsCollapsed}`}
         filter={filter} groupsCollapsed={groupsCollapsed} collapsible={collapsible} groupIcons={{ "Yönetim": users, "Finans": wallet }} />
     }}
     <div class="sc-navmenu-main hm-muted">Sayfa içeriği</div>

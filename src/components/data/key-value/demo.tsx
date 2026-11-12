@@ -2,7 +2,7 @@
 import { KeyValue } from "./index.ts";
 
 export const code = `<KeyValue columns={2} items={[
-  { label: "Müşteri", value: "Acme Ltd." },
+  { label: "Müşteri", value: "HADİ" },
   { label: "Tutar", value: "1.499,90 ₺", hint: "KDV dahil" },
   { label: "Not", value: "" },                          // shows "—"
 ]} />
@@ -13,7 +13,7 @@ export default function KeyValueDemo(props: { values: { columns: number; hint: b
     {() => {
       const v = props.values
       return <KeyValue columns={v.columns} items={[
-        { label: "Müşteri", value: "Acme Ltd." },
+        { label: "Müşteri", value: "HADİ" },
         { label: "Tutar", value: "1.499,90 ₺", hint: v.hint ? "KDV dahil" : undefined },
         { label: "Durum", value: "Kargoda", hint: v.hint ? "2 gün içinde teslim" : undefined },
         { label: "Kanal", value: "Mobil uygulama" },

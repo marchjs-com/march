@@ -14,7 +14,7 @@ export default function TextInputDemo(props: { values: { kind: string; prefix: s
       const v = props.values
       const prefix = v.prefix === "icon" ? <Icon of={v.kind === "url" ? globe : search} /> : v.prefix === "text" ? (v.kind === "url" ? "www" : "@") : undefined
       const common = { value: $text, onChange: (x: string) => { $text = x }, prefix, disabled: v.disabled }
-      if (v.kind === "email") return <Field label="E-posta"><EmailInput {...common} placeholder="ad@acme.com" /></Field>
+      if (v.kind === "email") return <Field label="E-posta"><EmailInput {...common} placeholder="ad@hadisosyal.com" /></Field>
       if (v.kind === "url") return <Field label="Web adresi"><UrlInput {...common} /></Field>
       return <Field label="Ara"><TextInput {...common} placeholder="Üye, sipariş, etiket…" /></Field>
     }}

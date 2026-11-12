@@ -9,7 +9,7 @@ test("SiteNav: brand, labelled nav, aria-current follows active, menu button, mo
   const on = signal("#a");
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => h(SiteNav, {
-    mode: "transparent", brand: { name: "Acme" },
+    mode: "transparent", brand: { name: "HADİ" },
     links: [{ label: "A", href: "#a", active: () => on() === "#a" }, { label: "B", href: "#b", active: () => on() === "#b" }],
     actions: h("button", {}, "Go"),
   }), el);

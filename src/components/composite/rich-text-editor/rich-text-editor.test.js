@@ -15,8 +15,8 @@ const html = (n) => serialize(n).replace(/<\/(br|hr)>/g, "");
 const div = (...kids) => { const d = document.createElement("div"); for (const k of kids) d.appendChild(k); return d; };
 
 test("safe core: parseHtml keeps the allowlist and drops everything else", () => {
-  const f = parseHtml(`<p onclick="x()">Hi <b>there</b> <i>you</i><script>alert(1)</script></p><a href="javascript:alert(1)">bad</a><a href="https://acme.example">ok</a><style>p{}</style><iframe src="x"></iframe>`);
-  assert.equal(html(f), `<p>Hi <strong>there</strong> <em>you</em></p>bad<a href="https://acme.example">ok</a>`);
+  const f = parseHtml(`<p onclick="x()">Hi <b>there</b> <i>you</i><script>alert(1)</script></p><a href="javascript:alert(1)">bad</a><a href="https://hadisosyal.com">ok</a><style>p{}</style><iframe src="x"></iframe>`);
+  assert.equal(html(f), `<p>Hi <strong>there</strong> <em>you</em></p>bad<a href="https://hadisosyal.com">ok</a>`);
   // office suites: bold as a style, Google Docs' outer <b style="font-weight:normal">
   const g = parseHtml(`<b style="font-weight:normal" id="docs-internal-guid-1"><span style="font-weight:700">Bold</span> and <span style="font-style:italic">slanted</span></b>`);
   assert.equal(html(g), "<strong>Bold</strong> and <em>slanted</em>");
@@ -25,7 +25,7 @@ test("safe core: parseHtml keeps the allowlist and drops everything else", () =>
   assert.equal(html(parseHtml("<pre>a\n  b</pre><p>x\n   y</p>")), "<pre>a\n  b</pre><p>x y</p>");
   assert.equal(html(parseHtml(`<span data-mention="u1" onmouseover="x">@Ada</span><span class="c">plain</span>`)), `<span data-mention="u1">@Ada</span>plain`);
   assert.equal(isSafeLink("JaVaScRiPt:alert(1)"), false);
-  assert.equal(isSafeLink("mailto:info@acme.example"), true);
+  assert.equal(isSafeLink("mailto:info@hadisosyal.com"), true);
 });
 
 test("safe core: sanitizeNode and normalizeBlocks give a clean block list", () => {
@@ -38,7 +38,7 @@ test("safe core: sanitizeNode and normalizeBlocks give a clean block list", () =
 test("markdown: DOM → Markdown round-trips the editor subset", () => {
   const md = [
     "## Release notes",
-    "Plain text with **bold**, *italic*, ~~old~~, `code` and a [link](https://acme.example/docs).",
+    "Plain text with **bold**, *italic*, ~~old~~, `code` and a [link](https://hadisosyal.com/docs).",
     "> A quote with **emphasis**",
     "- first\n- second",
     "1. one\n2. two",
@@ -117,5 +117,5 @@ test("suggestions open after a space or a line start, never inside a word", () =
   assert.deepEqual(ops.suggestTrigger("Merhaba\u00a0:sm"), { kind: ":", query: "sm" }, "a no-break space counts as a space");
   assert.deepEqual(ops.suggestTrigger("(:gül"), { kind: ":", query: "gül" });
   assert.deepEqual(ops.suggestTrigger("selam @De"), { kind: "@", query: "De" });
-  for (const s of ["saat 10:30", "http:", "https://acme.example", "Not:", "a@b", "e-posta: x@y", "Merhaba :sm "]) assert.equal(ops.suggestTrigger(s), null, s);
+  for (const s of ["saat 10:30", "http:", "https://hadisosyal.com", "Not:", "a@b", "e-posta: x@y", "Merhaba :sm "]) assert.equal(ops.suggestTrigger(s), null, s);
 });

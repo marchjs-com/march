@@ -34,7 +34,7 @@ test("EmailInput / UrlInput: keyboard, autocomplete, trimming", () => {
   assert.equal(mail.getAttribute("autocomplete"), "email");
   assert.equal(url.getAttribute("inputmode"), "url");
   assert.equal(url.getAttribute("placeholder"), "https://");
-  type(mail, "  a@b.co "); type(url, " https://acme.com ");
+  type(mail, "  a@b.co "); type(url, " https://hadisosyal.com ");
   assert.equal(m(), "a@b.co");
-  assert.equal(u(), "https://acme.com");
+  assert.equal(u(), "https://hadisosyal.com");
 });

@@ -12,7 +12,7 @@ export default function BadgeDemo(props: { values: { mode: string; tone: string;
     {() => {
       const v = props.values
       if (v.mode === "count") return [<span class="hm-muted">Gelen kutusu</span>, <Badge count={v.count} tone={v.tone} showZero={v.showZero} label="okunmamış" />]
-      return ["Acme", "Globex", "Initech"].map((n) => <span class="sc-row">{n}<Badge tone={v.tone} dot={v.mode === "dot"}>{LABEL[v.tone]}</Badge></span>)
+      return ["HADİ", "Globex", "Initech"].map((n) => <span class="sc-row">{n}<Badge tone={v.tone} dot={v.mode === "dot"}>{LABEL[v.tone]}</Badge></span>)
     }}
   </div>
 }

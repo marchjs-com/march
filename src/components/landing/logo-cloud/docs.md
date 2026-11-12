@@ -6,7 +6,7 @@ default and show their colour on hover.
 
 ```tsx
 <LogoCloud title="Trusted by teams at" variant="marquee" logos={[
-  { name: "Acme", src: "/logos/acme.svg", width: 120, height: 32 },
+  { name: "HADİ", src: "/logos/hadi.svg", width: 120, height: 32 },
   { name: "Northwind", node: <NorthwindLogo /> },
 ]} />
 ```

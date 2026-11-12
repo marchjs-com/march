@@ -23,7 +23,7 @@ export function ThemePreview({ ctx }: { ctx: ThemeEditorContext }): Element {
   return h("div", { class: "hm-te-screen" },
     h("header", { class: "hm-te-appbar" },
       h("span", { class: "hm-te-mark", "aria-hidden": "true" }),
-      h("strong", { class: "hm-te-appname" }, "Acme"),
+      h("strong", { class: "hm-te-appname" }, "HADİ"),
       h(Tabs, { panel: false, label: t`Sample tabs`, get value() { return tab(); }, onChange: (v: string) => tab.set(v), tabs: [{ id: "overview", label: t`Overview` }, { id: "team", label: t`Team`, badge: 3 }, { id: "settings", label: t`Settings` }] }),
       h(Avatar, { name: "Elif Yılmaz", size: "sm" })),
     h("div", { class: "hm-te-screen-body" },

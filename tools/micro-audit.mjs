@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Motion › Micro-interactions in headless Edge / Chrome, driven with real pointer and key input:
-//   - ripple: on the "Acme" card and the Kaydet / Paylaş buttons the ink starts at the pressed point, inside the
+//   - ripple: on the "HADİ" card and the Kaydet / Paylaş buttons the ink starts at the pressed point, inside the
 //     element, in its text colour; Enter starts it in the centre; the card is focusable (tabindex, role); ink goes away
 //   - magnet, hover parallax (layers by depth) and spring press move, then settle back with nothing left inline or held
 //   - state morph: 3 success and 3 error rounds, the Playground result switched in between; after each round the
