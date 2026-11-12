@@ -13,6 +13,9 @@ import { openHeadless, ROOT, flag } from "./lib/headless.mjs";
 const SC = join(ROOT, "examples/showcase");
 const out = resolve(process.env.TMP ?? join(ROOT, ".tmp"), "march-bench-quick");
 const ops = flag(process.argv, "--ops", "create1k"); // CI short mode; --ops update,select,swap,remove,clear… for more
+// measuring (not CI): --reps 20 --libs vanilla,march; "--ops all" runs every operation
+const reps = Number(flag(process.argv, "--reps", "2"));
+const libs = flag(process.argv, "--libs", "");
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 const entry = `
@@ -20,9 +23,10 @@ import { OPS, stats } from "./src/bench/core.ts";
 import { LIBS } from "./src/bench/libs.ts";
 import { runBench } from "./src/bench/runner.ts";
 const stage = document.getElementById("stage");
-const ops = ${JSON.stringify(ops.split(","))}.map((id) => OPS.find((o) => o.id === id));
-runBench({ libs: LIBS, ops, reps: 2, warm: 1, stage }).then((r) => {
-  window.__bench = { errors: r.errors, medians: Object.fromEntries(Object.entries(r.samples).map(([l, o]) => [l, Object.fromEntries(Object.entries(o).map(([k, xs]) => [k, stats(xs).median]))])) };
+const ops = ${JSON.stringify(ops)} === "all" ? OPS : ${JSON.stringify(ops.split(","))}.map((id) => OPS.find((o) => o.id === id));
+const want = ${JSON.stringify(libs)};
+runBench({ libs: want ? LIBS.filter((l) => want.split(",").includes(l.id)) : LIBS, ops, reps: ${reps}, warm: ${reps > 2 ? "undefined" : 1}, stage }).then((r) => {
+  window.__bench = { errors: r.errors, memory: r.memory, first: r.firstPaint, medians: Object.fromEntries(Object.entries(r.samples).map(([l, o]) => [l, Object.fromEntries(Object.entries(o).map(([k, xs]) => [k, stats(xs).median]))])) };
 }, (e) => { window.__bench = { fatal: String(e) }; });
 `;
 await build({
@@ -44,7 +48,7 @@ const server = createServer((req, res) => {
   res.end(readFileSync(p));
 });
 await new Promise((r) => server.listen(0, "127.0.0.1", r));
-const b = await openHeadless({ base: `http://127.0.0.1:${server.address().port}`, args: ["--js-flags=--expose-gc"] });
+const b = await openHeadless({ base: `http://127.0.0.1:${server.address().port}`, args: ["--js-flags=--expose-gc", "--enable-precise-memory-info"] });
 const fail = [];
 let res;
 try {
@@ -54,9 +58,9 @@ try {
   if (!res) fail.push("did not finish");
   else if (res.fatal) fail.push(res.fatal);
   else {
-    for (const [lib, ms] of Object.entries(res.medians)) console.log(`${lib.padEnd(8)} ${Object.entries(ms).map(([o, x]) => `${o} ${x == null ? "—" : x.toFixed(1)}`).join("  ")}`);
+    for (const [lib, ms] of Object.entries(res.medians)) console.log(`${lib.padEnd(8)} ${Object.entries(ms).map(([o, x]) => `${o} ${x == null ? "—" : x.toFixed(1)}`).join("  ")}  mem ${res.memory[lib]?.toFixed(2) ?? "—"} MB  first ${res.first[lib]?.toFixed(1)}`);
     for (const [lib, e] of Object.entries(res.errors)) fail.push(`${lib}: ${JSON.stringify(e)}`);
-    if (Object.keys(res.medians).length !== 8) fail.push(`${Object.keys(res.medians).length}/8 libraries`);
+    if (!libs && Object.keys(res.medians).length !== 8) fail.push(`${Object.keys(res.medians).length}/8 libraries`);
   }
   fail.push(...b.errs.filter(Boolean).map((e) => `page error: ${e}`));
 } finally { await b.close(); server.close(); }
