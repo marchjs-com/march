@@ -19,7 +19,7 @@ import { t } from "../core/i18n.ts";
 import { h, lazyChildren } from "../dom/h.ts";
 import { Try } from "../dom/flow.ts";
 import { lazy } from "../dom/lazy.ts";
-import { preloadChunks, loaderKey, saveData, whenIdle, runLoad } from "../dom/preload.ts";
+import { preloadChunks, loaderKey, saveData, whenIdle, runLoad, prefetchCommon } from "../dom/preload.ts";
 import { onVisible } from "../core/util.ts";
 
 // ------------------------------------------------------------------ types
@@ -290,7 +290,8 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
     if (navWrapper && !initial) await navWrapper(apply, { pop }); else apply();
     lastUrl = globalThis.location?.href ?? "";
     if (r.opts.scroll !== false) restoreScroll(pop);
-    if (initial && r.opts.prefetch !== "none") whenIdle(prefetchLinks, 3000);
+    // after the first page: the routes linked from it, and the shared "common" chunk most pages import (march build)
+    if (initial && r.opts.prefetch !== "none") whenIdle(() => { prefetchLinks(); prefetchCommon(); }, 3000);
   } catch (e) {
     // the error shows at the level that failed; the layouts above it stay
     if (seq === r.seq) batch(() => { r.view.set({ error: e, levels: [...curLevels.slice(0, depth), { key: `error:${seq}`, comp: () => routeError(e, () => { void sync({ initial: true }); }), page: true }] }); S.pendingDepth.set(-1); });

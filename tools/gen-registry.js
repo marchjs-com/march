@@ -74,7 +74,7 @@ export async function generate(root = ROOT) {
   // page with a component card loads; one module for a page with many cards would pass the lazy part budget. Members
   // are in folder-name order, so related folders (chat-…, story-…) usually share a module. A page with a single
   // component card keeps its direct import.
-  const GROUP = 4;
+  const GROUP = 3;
   const pages = new Map();
   // a large component (barrel: false) keeps its own demo module: its code alone is over the chunk floor, and grouping
   // it would make every card of the page download it
