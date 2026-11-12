@@ -4,6 +4,18 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Normal addresses on every host (later in 0.1.0)
+- The router uses normal addresses under any base path: `createRouter({ mode: "history", base: "auto" })` (the
+  defaults). The base comes from a `<base href>`, the base `march build` writes into `index.html`, or the entry
+  script's folder. Where the address cannot change (`file://`, a sandboxed iframe) it falls back to `#/` addresses with
+  the same routes; old `#/x` links become `/x`. `<Link>` writes hrefs relative to the current address.
+- `hadi-march/base`: `appBase()`, `appUrl("media/a.jpg")` (public files under the root on every route), `setAppBase()`.
+- `march build` writes `<route>/index.html` for every route without params (`seo.routes` for pages under a wildcard),
+  the app shell where a page could not be prerendered, and `404.html` + `march-404.js` for every other address;
+  `redirects: true` writes `_redirects`. Hosting guide: `docs/hosting.md`. `tools/menu-audit.mjs` opens every showcase
+  page directly, on reload, from the menu and with back/forward on a rewrite host, a static host, a sub-folder and
+  from files.
+- The showcase moved from `#/motion` to `/motion`.
 ### Icon packs (later in 0.1.0)
 - Open-source icon sets as optional subpaths, one export per icon: `hadi-march/icons/lucide`, `/tabler`, `/heroicons`,
   `/phosphor`, `/feather`, `/material-symbols`, `/remix`, `/bootstrap`, `/simple-icons` (about 22,000 icons; each pack

@@ -39,3 +39,7 @@ jobs:
       - run: npm run check:editor-suggest
         env:
           BROWSER_PATH: /usr/bin/google-chrome
+      # every showcase menu page opens (headless Chrome)
+      - run: node tools/menu-audit.mjs
+        env:
+          BROWSER_PATH: /usr/bin/google-chrome

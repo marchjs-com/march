@@ -1,8 +1,10 @@
 // Neutral demo data shared by the social component demos (showcase only): communities and handles, never real people.
 // Images are the abstract SVG scenes in examples/showcase/public/media/social/.
 import type { MediaItem } from "./media-grid/index.ts";
+import { appUrl } from "../../base/index.ts";
 
-export const PHOTO = (name: string): string => `media/social/${name}.svg`;
+/** A scene under the app's root, on every route (appUrl: a relative path would resolve against the route). */
+export const PHOTO = (name: string): string => appUrl(`media/social/${name}.svg`);
 
 export const PHOTOS: readonly MediaItem[] = [
   { src: PHOTO("sunset"), alt: "Tepelerin üstünde gün batımı", width: 1200, height: 1500 },

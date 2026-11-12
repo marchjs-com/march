@@ -12,7 +12,8 @@
 //   march seo check [--dir dist] [--no-canonical]    built pages: missing title / description / canonical / img alt…
 //   march icons list | add lucide … | gallery <dir>  open-source icon sets → hadi-march/icons/<pack> (see cli/icons.js)
 // Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html,
-//   base: "/" | "./" (asset URLs in index.html; "./" = works from any sub-folder), stableNames: true (or --stable-names:
+//   base: "/" | "/app/" | "./" (asset URLs in index.html; "./" = works from any sub-folder), redirects: true (_redirects for
+//   Cloudflare Pages / Netlify, absolute base only), fallback404: false (no 404.html), stableNames: true (or --stable-names:
 //   main.js, chunks/home.js… with ?v=<version> in every reference; deploys overwrite the same paths), packChunks: false,
 //   budget: { entry, route, part, css, routes: { "/x": bytes }, fail } (gzip bytes; false = off), sw: true (offline service worker), headers: false (no _headers),
 //   credit: true (adds <!-- Built with HADI March --> to the built index.html and prints the one-line console banner in production too; off by default),
@@ -89,7 +90,10 @@ function writeHtml(cfg, meta, { dev }, manifest = null, entryFiles = null) {
   const data = manifest && Object.keys(manifest).length ? `<script type="application/json" id="march-manifest">${JSON.stringify(manifest).replace(/</g, "\\u003c")}</script>` : "";
   // the entry's own chunks are announced up front: fetched in parallel with the entry instead of after it is parsed
   const pre = (entryFiles ?? []).filter((f) => /\.js(\?|$)/.test(f) && `${base}${f}` !== js).map((f) => `<link rel="modulepreload" href="${base}${f}">`).join("");
-  const tags = `${cfg.credit === true ? "<!-- Built with HADI March -->" : ""}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
+  // an absolute base ("/app/") is written down for the router and appUrl() (hadi-march/base); a relative build ("./")
+  // finds its root from the entry script instead
+  const baseTag = base.startsWith("/") ? `<meta name="march-base" content="${base.replace(/\/?$/, "/")}">` : "";
+  const tags = `${cfg.credit === true ? "<!-- Built with HADI March -->" : ""}${baseTag}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
   const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
   writeFileSync(join(out, "index.html"), html);
   if (!dev && cfg.credit === true) writeFileSync(join(out, "credit.js"), bannerSource(marchVersion()));
@@ -211,6 +215,13 @@ async function build({ dev = false } = {}) {
     }
     if (!dev) {
       if (cfg.headers !== false && !existsSync(join(out, "_headers"))) writeFileSync(join(out, "_headers"), headersFile({ stable: !!cfg.stableNames || flag("--stable-names") === true }));
+      // redirects: true → _redirects (Cloudflare Pages, Netlify; files win over it): every address without a file opens the
+      // app. An absolute base rewrites to index.html; a relative build's index.html cannot load its files from a deeper
+      // address, so it rewrites to 404.html, which hands the address to the app's root (dist/ deployed at the site root)
+      if (cfg.redirects && !existsSync(join(out, "_redirects"))) {
+        const b = cfg.base ?? "/";
+        writeFileSync(join(out, "_redirects"), b.startsWith("/") ? `${b.replace(/\/?$/, "/")}*  ${b.replace(/\/?$/, "/")}index.html  200\n` : "/*  /404.html  200\n");
+      }
       if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
       const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));
       printReport(rep);
@@ -396,7 +407,8 @@ async function seo() {
   const { checkHtml, formatIssues } = await importTs(new URL("../src/seo/check.ts", import.meta.url));
   const walkHtml = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? walkHtml(p) : n.endsWith(".html") ? [p] : []; });
   let errors = 0, warns = 0;
-  const files = walkHtml(dir);
+  // pages that ask not to be indexed (404.html, the not-found fallback) are not search results: nothing to check
+  const files = walkHtml(dir).filter((f) => !/<meta[^>]*name="robots"[^>]*content="[^"]*noindex/i.test(readFileSync(f, "utf8")));
   for (const f of files) {
     const html = readFileSync(f, "utf8");
     // hash routing: every route is the same document, a canonical link is optional

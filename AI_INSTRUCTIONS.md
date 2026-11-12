@@ -92,6 +92,15 @@ File based: `src/pages/index.jsx` → `/`, `src/pages/users/[id].jsx` → `/user
 (component), optional `title`, `meta`, `guard(to)` (true | false | "/redirect" | Promise).
 `navigate("/x")`, `params().id`, `query().tab`, `setQuery({ tab: "x" })`, `<Link href="/x">`. Same-origin paths only.
 
+Addresses are normal paths under the app's base (`createRouter({ routes })` = `mode: "history", base: "auto"`): the
+base comes from `<base href>`, the base `march build` writes, or the entry script's folder. Route paths start with "/"
+and mean "under the base"; never write the base yourself, never a `#/` link, never a root-absolute file path. Public
+files (`public/media/a.jpg`): `appUrl("media/a.jpg")` from `hadi-march/base` (a bare relative path resolves against
+the route's address). Where the address cannot change (`file://`, a sandboxed iframe) the router uses `#/x` by
+itself. `march build` with `seo: { prerender: true }` writes `<route>/index.html` per page and `404.html` for routes
+with params, so the same `dist/` works on Cloudflare Pages, Netlify, GitHub Pages, S3, in a sub-folder and from files.
+Per host: `docs/hosting.md`.
+
 ## 7. Access control
 
 `setAccess({ user, roles, perms, methods })` after sign-in. `can("perm")`, `hasRole("admin")`, `<Can perm>`,

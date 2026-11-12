@@ -97,18 +97,27 @@ nodes replace the old ones in one step (`ready`, `timeout` options). The contain
 such as `#/charts` on a page prerendered for `#/`) the stale content is dropped at once, so it never flashes.
 `hydrate()` without prerendered content is `render()`.
 
-With a tight entry budget, keep `hydrate` out of the entry: compare the marker yourself (one line) and load it only on
-the prerendered route; every other URL renders at once, as before.
+With a tight entry budget, keep `hydrate` out of the entry: ask `prerenderedFor(el)` from the tiny
+`hadi-march/seo/prerendered` (no router) and load `hydrate` only on the prerendered route; every other URL renders at
+once, as before.
 
 ```tsx
+import { prerenderedFor } from "hadi-march/seo/prerendered";
 const app = () => <Router />;
-if (el.getAttribute("data-hm-prerender") === `#${location.hash.slice(1) || "/"}`) void import("hadi-march/seo/hydrate").then((m) => m.hydrate(app, el));
+if (prerenderedFor(el)) void import("hadi-march/seo/hydrate").then((m) => m.hydrate(app, el));
 else { el.replaceChildren(); render(app, el); }
 ```
 (`hadi-march/seo/hydrate` is about 1 KB; under a `chunks.minSize` add it to `chunks.allow`.)
 
-**Hash routing** (static hosting, artifacts): only the start page is prerendered into `index.html`; other routes load
-as before. No sitemap entries for hash routes and no automatic canonical.
+Every route without params gets its own `<route>/index.html` (`seo.routes` adds the pages under a wildcard route);
+asset paths follow each page's depth, so a static host without rewrites opens every page directly. Routes with params
+go through `404.html` (see `docs/hosting.md`). `site` is the origin plus the base; an origin alone is completed with an
+absolute `base` from `march.config.js`.
+
+**Hash routing** (`mode: "hash"`): only the start page is prerendered into `index.html`; other routes load as before.
+No sitemap entries for hash routes and no automatic canonical. History routing works on static hosts, in sub-folders,
+from files and in iframes too (it falls back to `#/` addresses by itself where the address cannot change), so hash
+mode is rarely needed.
 
 `sitemap.xml` and `robots.txt` need `site`; a file of the same name in `public/` wins.
 
