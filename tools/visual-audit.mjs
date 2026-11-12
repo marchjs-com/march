@@ -6,6 +6,7 @@
 //   broken-word     a word is split across lines (letter-by-letter wrapping, overflow-wrap: anywhere in a narrow box)
 //   uneven-row      cards in the same Grid row have different heights
 //   overlap         neighbouring items of a flex row draw on top of each other
+//   double-mount    after in-app navigation (menu clicks, back / forward) more than one app shell or page heading
 //   console         a script error
 //
 //   node tools/visual-audit.mjs                      builds nothing; serves examples/showcase/dist itself
@@ -134,8 +135,27 @@ for (const route of ROUTES) for (const w of WIDTHS) for (const [label, script] o
   errs.length = 0;
   process.stdout.write(found.length ? "✖" : "·");
 }
+// double mount: navigate through every page inside the app (menu clicks, then back / forward), without reloading.
+// After each step there must be exactly one app shell and one page heading (a second copy of the app would add both).
+{
+  await send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+  await send("Page.navigate", { url: base + "/#/" }); await sleep(250); await send("Page.reload"); await sleep(1800);
+  const COUNT = "(() => ({ shells: document.querySelectorAll('.hm-app-shell, .hm-shell').length, h1: document.querySelectorAll('h1').length, roots: document.getElementById('app')?.children.length ?? 0 }))()";
+  const verify = async (step) => {
+    const c = await ev(COUNT);
+    if (!c || c.shells !== 1 || c.h1 !== 1 || c.roots !== 1) findings.push({ route: step, w: 1440, state: "navigation", kind: "double-mount", at: "#app", detail: JSON.stringify(c) });
+    for (const e of new Set(errs)) findings.push({ route: step, w: 1440, state: "navigation", kind: "console", at: "", detail: e });
+    errs.length = 0;
+  };
+  for (const route of [...ROUTES.slice(1), ROUTES[0]]) {
+    await ev("(() => { const a = [...document.querySelectorAll('a[href]')].find((x) => x.getAttribute('href') === '#" + route + "' || x.getAttribute('href').endsWith('#" + route + "')); if (a) a.click(); else location.hash = '" + route + "'; return 1; })()");
+    await sleep(900); await verify(route);
+  }
+  for (const dir of ["back", "back", "forward"]) { await ev("history." + dir + "()"); await sleep(700); await verify(dir); }
+  process.stdout.write("·");
+}
 ws.close(); browser.kill(); server?.close(); await sleep(300); try { rmSync(profile, { recursive: true, force: true }); } catch {}
 console.log("");
 for (const f of findings) console.log(`✖ ${f.route} @${f.w}${f.state ? ` (${f.state})` : ""}  ${f.kind}  ${f.at}  ${f.detail}`);
-console.log(findings.length ? `${findings.length} problems` : `✔ ${ROUTES.length} pages × ${WIDTHS.length} widths: no overflow, broken words, uneven cards or overlap`);
+console.log(findings.length ? `${findings.length} problems` : `✔ ${ROUTES.length} pages × ${WIDTHS.length} widths: no overflow, broken words, uneven cards, overlap or double mount`);
 process.exit(findings.length ? 1 : 0);

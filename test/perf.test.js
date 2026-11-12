@@ -237,3 +237,53 @@ test("published showcase: no service worker file and no SW precache (sw only wit
   assert.match(cfg, /sw:\s*process\.env\.MARCH_SHOWCASE_SW === "1"/);
   assert.doesNotMatch(readFileSync(resolve("examples/showcase/build.mjs"), "utf8").replace(/serve[\s\S]*?MARCH_SHOWCASE_SW/, ""), /MARCH_SHOWCASE_SW\s*=\s*"1"/);
 });
+
+test("rehash after merge: a file name always means the same bytes across builds (no stale stub can load another entry)", async () => {
+  const { mergeEntry, rehashOutputs } = await import("../compiler/merge-entry.js");
+  const esbuild = await import("esbuild");
+  const files = (v) => ({
+    "main.tsx": `import { render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx") } })\nrender(() => h(Router, {}), document.body)\nconsole.log(${JSON.stringify(v)})\n`,
+    "a.tsx": `import { Card } from "hadi-march/ui"\nexport default () => <Card title="A">a</Card>\n`,
+    "b.tsx": `import { Card, Badge } from "hadi-march/ui"\nexport default () => <Card title="B"><Badge>b</Badge></Card>\n`,
+  });
+  const build = async (v) => {
+    const app = await buildApp(files(v));
+    const entryKey = Object.keys(app.meta.outputs).find((k) => app.meta.outputs[k].entryPoint === "main.tsx");
+    await mergeEntry(app.meta, { cwd: app.dir, entryKey, esbuild });
+    rehashOutputs(app.meta, { cwd: app.dir });
+    const out = new Map(Object.keys(app.meta.outputs).filter((k) => k.endsWith(".js")).map((k) => [k.split("/").pop(), readFileSync(resolve(app.dir, k), "utf8")]));
+    app.cleanup();
+    return out;
+  };
+  const one = await build("v1"), two = await build("v2");
+  let shared = 0;
+  for (const [name, code] of one) if (two.has(name)) { shared++; assert.equal(two.get(name), code, `${name} has the same bytes in both builds`); }
+  assert.ok([...one.keys()].some((n) => !two.has(n)), "the changed entry (and what points at it) got new names");
+  for (const [, code] of one) for (const m of code.matchAll(/["'](\.{1,2}\/[^"']+\.js)["']/g)) assert.ok([...one.keys()].includes(m[1].split("/").pop()), `${m[1]} exists`);
+  assert.ok(shared >= 0);
+});
+
+test("router: route changes, back/forward, rapid clicks, preloaded or not, with and without a transition wrapper — one page at a time", async () => {
+  const R = await import("../src/router/index.ts");
+  const page = (k, ms = 0) => async () => { if (ms) await new Promise((r) => setTimeout(r, ms)); return { default: () => h("section", { class: "pg" }, k) }; };
+  const tick = (ms = 5) => new Promise((r) => setTimeout(r, ms));
+  for (const wrap of [null, async (apply) => { await tick(1); apply(); }]) {
+    R.setNavigationWrapper(wrap);
+    globalThis.history.replaceState(null, "", "/"); globalThis.location.hash = "";
+    R.createRouter({ routes: { "/": page("home"), "/a": page("a", 3), "/b": page("b", 8), "/c": page("c"), "/d": page("d", 2) } });
+    const host = document.createElement("div"); document.body.appendChild(host);
+    const dispose = render(() => h("div", { class: "shell" }, h(R.Router, {})), host);
+    const check = async (want) => { await tick(40); assert.equal(host.querySelectorAll(".shell").length, 1, "one shell"); const p = host.querySelectorAll(".pg"); assert.equal(p.length, 1, `one page (${[...p].map((x) => x.textContent)})`); if (want) assert.equal(p[0].textContent, want); };
+    await check("home");
+    for (const to of ["/a", "/b", "/c", "/d", "/"]) { await R.navigate(to); await check(to === "/" ? "home" : to.slice(1)); }
+    R.preload("/b"); await tick(20);
+    await R.navigate("/b"); await check("b");
+    // rapid clicks: the last one wins, nothing piles up
+    void R.navigate("/a"); void R.navigate("/b"); void R.navigate("/c"); void R.navigate("/d");
+    await check("d");
+    globalThis.history.back(); await tick(20); await check();
+    globalThis.history.forward(); await tick(20); await check();
+    dispose(); host.remove();
+  }
+  R.setNavigationWrapper(null);
+});

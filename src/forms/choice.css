@@ -93,6 +93,9 @@
 .hm-choice-card-title { font-weight: 650; line-height: 1.3; overflow-wrap: break-word; }
 .hm-choice-card-desc { color: var(--hm-muted); font-size: .875em; line-height: 1.45; overflow-wrap: break-word; }
 .hm-choice-card-meta { align-self: start; padding: .125rem .5rem; border-radius: 999px; background: var(--hm-surface-2); color: var(--hm-text-2); font-size: .8125em; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* narrow cards (phones): the meta badge moves under the text instead of squeezing it */
+.hm-choice-card .hm-check { container-type: inline-size; }
+@container (max-width: 15rem) { .hm-choice-card-body, .hm-choice-card-body:not(:has(.hm-choice-card-icon)) { grid-template-columns: auto minmax(0, 1fr); } .hm-choice-card-body:not(:has(.hm-choice-card-icon)) { grid-template-columns: minmax(0, 1fr); } .hm-choice-card-meta { grid-column: -2; justify-self: start; } }
 
 /* toggle / segmented: joined buttons, the selected one filled (shape → corners, size → padding / type) */
 .hm-choice-toggle.hm-choices, .hm-choice-segmented.hm-choices { flex-direction: row; flex-wrap: wrap; gap: 0; width: fit-content; max-width: 100%; padding: 3px; border: 1px solid var(--hm-border); border-radius: calc(var(--hm-ch-item-radius) + 3px); background: var(--hm-surface-2); }

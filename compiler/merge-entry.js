@@ -4,7 +4,8 @@
 // re-bundles the entry's static closure into the entry file (esbuild resolves name clashes) and turns each of those
 // chunk files into a stub that re-exports the same bindings from the merged entry — lazy pages keep importing the stubs
 // and get the very same module instances (one copy of the runtime). Dynamic imports stay external, paths rewritten.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, rmSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, relative, resolve, sep } from "node:path";
 
 const posix = (p) => p.split(sep).join("/");
@@ -67,4 +68,54 @@ export async function mergeEntry(meta, { cwd, entryKey, esbuild, minify = true }
   outs[entryKey].imports = (outs[entryKey].imports ?? []).filter((im) => im.kind !== "import-statement");
   for (const c of chunks) outs[c].imports = [{ path: entryKey, kind: "import-statement" }];
   return chunks;
+}
+
+/**
+ * Re-name every JS output after it was rewritten, so a hashed name always means the same bytes (assets are cached as
+ * immutable: a stub that kept its old name could be served from a browser cache and import an older entry, which would
+ * then run a second copy of the app). Each file's hash covers its own code (other output names masked) and the code
+ * of every file it reaches (static or dynamic, cycles included), the way esbuild hashes. Updates the files, the
+ * references between them and the metafile.
+ * @returns {Record<string, string>} old key → new key
+ */
+export function rehashOutputs(meta, { cwd }) {
+  const outs = meta.outputs;
+  const keys = Object.keys(outs).filter((k) => k.endsWith(".js") && /-[A-Z0-9]{8}\.js$/.test(k));
+  if (!keys.length) return {};
+  const base = (k) => k.split("/").pop();
+  const names = Object.keys(outs).map(base).sort((a, b) => b.length - a.length);
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const anyName = new RegExp(names.map(esc).join("|"), "g");
+  const byBase = new Map(Object.keys(outs).map((k) => [base(k), k]));
+  const text = new Map(keys.map((k) => [k, readFileSync(resolve(cwd, k), "utf8")]));
+  const iso = new Map(), refs = new Map();
+  for (const [k, t] of text) {
+    refs.set(k, [...new Set([...t.matchAll(anyName)].map((m) => byBase.get(m[0])).filter((r) => r && r !== k))]);
+    iso.set(k, createHash("sha256").update(t.replace(anyName, "\0")).digest("hex"));
+  }
+  const closure = (k) => { const seen = new Set([k]); const st = [k]; while (st.length) for (const r of refs.get(st.pop()) ?? []) if (!seen.has(r)) { seen.add(r); st.push(r); } return seen; };
+  const B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  const rename = {};
+  for (const k of keys) {
+    // own name first (files of one import cycle share their closure), then everything it reaches
+    const h = createHash("sha256").update(`${k}\n`);
+    for (const r of [...closure(k)].sort()) h.update(`${r.replace(/-[A-Z0-9]{8}(\.\w+)$/, "$1")}:${iso.get(r) ?? outs[r]?.bytes ?? ""}\n`);
+    const d = h.digest();
+    const tag = Array.from(d.subarray(0, 8), (b) => B32[b & 31]).join("");
+    rename[k] = k.replace(/-[A-Z0-9]{8}\.js$/, `-${tag}.js`);
+  }
+  const map = new Map(Object.entries(rename).map(([a, b]) => [base(a), base(b)]));
+  for (const [k, t] of text) {
+    const next = t.replace(anyName, (m) => map.get(m) ?? m);
+    rmSync(resolve(cwd, k), { force: true });
+    writeFileSync(resolve(cwd, rename[k]), next);
+  }
+  const fixed = {};
+  for (const [k, o] of Object.entries(outs)) {
+    const nk = rename[k] ?? k;
+    fixed[nk] = { ...o, imports: (o.imports ?? []).map((im) => ({ ...im, path: rename[im.path] ?? im.path })) };
+  }
+  for (const k of Object.keys(outs)) delete outs[k];
+  Object.assign(outs, fixed);
+  return rename;
 }

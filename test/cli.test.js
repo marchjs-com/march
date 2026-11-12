@@ -132,3 +132,24 @@ test("march build: per-route size report by path; a route over its budget fails 
     assert.equal(rep.routes.find((r) => r.name === "/big").limit, 8 * 1024);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("march build: base \"./\" writes only relative asset URLs (the app works from a sub-folder)", () => {
+  const dir = mkdtempSync(join(tmpdir(), "march-base-"));
+  try {
+    mkdirSync(join(dir, "src/pages"), { recursive: true });
+    writeFileSync(join(dir, "src/pages/index.jsx"), "export default function Home() { return <p>home</p> }\n");
+    writeFileSync(join(dir, "src/pages/about.jsx"), "export default function About() { return <p>about</p> }\n");
+    writeFileSync(join(dir, "src/main.jsx"), "import routes from './routes.gen.js'\ncreateRouter({ routes })\nrender(() => <Router />, document.getElementById('app'))\n");
+    writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
+    writeFileSync(join(dir, "march.config.js"), "export default { base: \"./\" }\n");
+    execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
+    const html = readFileSync(join(dir, "dist/index.html"), "utf8");
+    assert.doesNotMatch(html, /"\/assets\//, "no absolute /assets/ URL");
+    assert.match(html, /src="\.\/assets\/main-[\w-]+\.js"/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+const ROOT_DIR = fileURLToPath(new URL("..", import.meta.url));
+test("showcase dist: no absolute /assets/ URL anywhere in index.html", { skip: !existsSync(join(ROOT_DIR, "examples/showcase/dist/index.html")) }, () => {
+  assert.doesNotMatch(readFileSync(join(ROOT_DIR, "examples/showcase/dist/index.html"), "utf8"), /"\/assets\//);
+});

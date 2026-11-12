@@ -8,6 +8,7 @@
 //   march i18n [--messages src/i18n]                 report keys missing from translation files
 //   march check [--src src]                          type-check .tsx/.ts including March syntax (pipes, modifiers…)
 // Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html,
+//   base: "/" | "./" (asset URLs in index.html; "./" = works from any sub-folder),
 //   budget: { entry, route, part, css, routes: { "/x": bytes }, fail } (gzip bytes; false = off), sw: true (offline service worker), headers: false (no _headers) }.
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, cpSync, rmSync, watch } from "node:fs";
@@ -18,7 +19,7 @@ import { march } from "../compiler/esbuild.js";
 import { genRoutes } from "./routes.js";
 import { genApi, mockHandler } from "./openapi.js";
 import { templates } from "./templates.js";
-import { mergeEntry } from "../compiler/merge-entry.js";
+import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
 import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText } from "./perf.js";
 
 const cwd = process.cwd();
@@ -62,13 +63,15 @@ function writeHtml(cfg, meta, { dev }, manifest = null, entryFiles = null) {
   // the app entry (lazy pages are entry points of their own chunks too, so match the configured entry file)
   const want = resolve(cwd, cfg.entry);
   const entry = Object.entries(meta.outputs).find(([, o]) => o.entryPoint && resolve(cwd, o.entryPoint) === want) ?? Object.entries(meta.outputs).find(([, o]) => o.entryPoint);
-  const js = `/${relative(out, resolve(cwd, entry[0])).split(sep).join("/")}`;
-  const css = entry[1].cssBundle ? `/${relative(out, resolve(cwd, entry[1].cssBundle)).split(sep).join("/")}` : null;
+  // base: "/" (default, history routing on any path) or "./" (relative: the app works from any sub-folder)
+  const base = dev ? "/" : cfg.base ?? "/";
+  const js = `${base}${relative(out, resolve(cwd, entry[0])).split(sep).join("/")}`;
+  const css = entry[1].cssBundle ? `${base}${relative(out, resolve(cwd, entry[1].cssBundle)).split(sep).join("/")}` : null;
   // the chunk manifest is a JSON data block (never executed, so CSP script-src does not apply); the router and lazy()
   // read it to preload all of a route's files at once
   const data = manifest && Object.keys(manifest).length ? `<script type="application/json" id="march-manifest">${JSON.stringify(manifest).replace(/</g, "\\u003c")}</script>` : "";
   // the entry's own chunks are announced up front: fetched in parallel with the entry instead of after it is parsed
-  const pre = (entryFiles ?? []).filter((f) => f.endsWith(".js") && `/${f}` !== js).map((f) => `<link rel="modulepreload" href="/${f}">`).join("");
+  const pre = (entryFiles ?? []).filter((f) => f.endsWith(".js") && `${base}${f}` !== js).map((f) => `<link rel="modulepreload" href="${base}${f}">`).join("");
   const tags = `${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : ""}`;
   const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
   writeFileSync(join(out, "index.html"), html);
@@ -100,7 +103,8 @@ async function build({ dev = false } = {}) {
     if (!dev && cfg.mergeEntry !== false) {
       const want = resolve(cwd, cfg.entry);
       const entryKey = Object.keys(r.metafile.outputs).find((k) => r.metafile.outputs[k].entryPoint && resolve(cwd, r.metafile.outputs[k].entryPoint) === want);
-      if (entryKey) await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify: flag("--no-minify") !== true });
+      // merged files get new content hashes (a cached stub must never point at another build's entry)
+      if (entryKey && (await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify: flag("--no-minify") !== true })).length) rehashOutputs(r.metafile, { cwd });
     }
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
     writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);
