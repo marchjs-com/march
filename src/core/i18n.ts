@@ -19,9 +19,7 @@ let fallbackLocale = "en";
 
 const RTL = new Set(["ar", "he", "fa", "ur", "ps", "yi", "dv", "ku", "sd", "ug"]);
 /** Text direction of the active locale (signal). */
-/** Text direction of a locale ("ar-EG" → "rtl"). */
-export const dirOf = (loc: string): "ltr" | "rtl" => (RTL.has(loc.split("-")[0] ?? "") ? "rtl" : "ltr");
-export const dir = computed(() => dirOf(locale())) as unknown as () => "ltr" | "rtl";
+export const dir = computed(() => (RTL.has(locale().split("-")[0] ?? "") ? "rtl" : "ltr")) as unknown as () => "ltr" | "rtl";
 
 /** Register (merge) messages for a locale. */
 export function messages(loc: string, dict: Dict): void {

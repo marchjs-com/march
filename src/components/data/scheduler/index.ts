@@ -5,11 +5,11 @@
 import "./scheduler.css";
 import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { t, locale, dir, dirOf } from "../../../core/i18n.ts";
+import { t, locale, dir } from "../../../core/i18n.ts";
 import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp } from "../../../core/util.ts";
 import {
   todayIso, addDays, addMonths, diffDays, startOfWeek, daysFrom, monthGrid, firstDayOf, dateFormat, utcDate, formatMinutes, weekdayNames,
-  splitDateTime, joinDateTime, snapMinutes, isWeekend, type IsoDate,
+  splitDateTime, joinDateTime, snapMinutes, isWeekend, localeDir, type IsoDate,
 } from "../../../core/date.ts";
 import { animate } from "../../../motion/animate.ts";
 import { pointerDrag } from "../../../motion/pointer.ts";
@@ -85,7 +85,7 @@ export function Scheduler(props: SchedulerProps): Element {
   const editable = (): boolean => val(props.editable) ?? true;
   const loc = (): string => val(props.locale) ?? locale();
   const fd = (): number => firstDayOf(loc());
-  const rtl = (): boolean => (val(props.locale) ? dirOf(loc()) : dir()) === "rtl";
+  const rtl = (): boolean => (val(props.locale) ? localeDir(loc()) : dir()) === "rtl";
   const today = signal(todayIso());
   const nowMin = signal(0);
   // the "now" line moves once a minute (a plain timer, cleared with the component)

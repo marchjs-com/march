@@ -5,6 +5,7 @@
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | Chip, Menu, FilterControl, CellEditor |
+| Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | Button, IconButton, ButtonGroup, Segmented |
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
 
@@ -29,6 +30,20 @@ Full page: src/components/chip/docs.md
 ```
 
 Full page: src/components/data/data-grid/docs.md
+
+## Gantt
+
+A project timeline. Each task is a bar on a day / week / month scale with its progress filled in; dependency arrows link a predecessor's end to its successor's start (red and dashed while they overlap). Drag a bar to move it, drag its ends to resize it, drag the knob under it to set progress. With `cascade`, successors that would start before their predecessor ends are pushed later, keeping their length. A today line marks the current day; the task names stay pinned while the timeline scrolls.
+
+```tsx
+import { Gantt } from "hadi-march/components/data/gantt";
+
+<Gantt tasks={$tasks} scale="day" cascade
+  onChange={(task) => api.save(task)}
+  onSelect={(task) => open(task)} />
+```
+
+Full page: src/components/data/gantt/docs.md
 
 ## Scheduler
 

@@ -78,3 +78,10 @@ export function joinDateTime(date: IsoDate, minutes: number): string {
 }
 /** Is the day a Saturday or Sunday. */
 export const isWeekend = (iso: IsoDate): boolean => { const d = dayOfWeek(iso); return d === 0 || d === 6; };
+
+type TextInfoLocale = Intl.Locale & { getTextInfo?: () => { direction?: string }; textInfo?: { direction?: string } };
+/** Reading direction of a locale from Intl ("ar-EG" → "rtl"); "ltr" when Intl has no text info. */
+export function localeDir(loc: string): "ltr" | "rtl" {
+  try { const l = new Intl.Locale(loc) as TextInfoLocale; const d = (l.getTextInfo?.() ?? l.textInfo)?.direction; if (d === "rtl") return "rtl"; } catch { /* old engine */ }
+  return /^(ar|he|fa|ur|ps|yi|dv|ku|sd|ug)/.test(loc) ? "rtl" : "ltr";
+}
