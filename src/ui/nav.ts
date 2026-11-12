@@ -12,7 +12,7 @@ import { Badge } from "./badge.ts";
 import { rank } from "./fold.ts";
 import { compareText } from "../core/text.ts";
 import { registerPages } from "./registry.ts";
-import { val, cx, uid, icon, glyph, load, save, on, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, uid, icon, glyph, load, save, on, arr, type MaybeFn, type ClassProp } from "./util.ts";
 import { menu } from "../icons/glyphs/menu.ts";
 import { star } from "../icons/glyphs/star.ts";
 import { starFilled } from "../icons/glyphs/starFilled.ts";
@@ -59,7 +59,6 @@ export interface NavMenuProps {
   class?: ClassProp;
 }
 
-const arr = <T>(x: unknown): T[] => (Array.isArray(x) ? x as T[] : []);
 const titleOf = (x: { title?: MaybeFn<string | null | undefined> }): string => String(val(x.title) ?? "");
 
 /** Order helper shared with the palette: "alpha" (default, Intl.Collator of the active locale), "none", or a compare fn. */

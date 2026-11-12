@@ -36,6 +36,7 @@ export interface Fake {
   id(): string;
   list<T>(n: number, make: (i: number) => T): T[];
 }
+/** Seeded fake data: names, e-mails, words, dates, numbers and lists that repeat for the same seed. */
 export function fake(seed = 1): Fake {
   const r = rng(seed);
   let n = 0;
@@ -68,6 +69,7 @@ export interface MockRequest {
 export type MockHandler = (req: MockRequest) => unknown;
 export type MockHandlers = Record<string, MockHandler | unknown>;
 
+/** A mock response with status, body and headers (return it from a mock handler). */
 export class MockReply {
   readonly status: number; readonly body: unknown; readonly headers: Record<string, string>;
   constructor(status: number, body?: unknown, headers: Record<string, string> = {}) { this.status = status; this.body = body; this.headers = headers; }
@@ -160,6 +162,7 @@ const compile = (spec: string, handler: unknown): Route => {
   return { method: method.toUpperCase(), re, keys, handler };
 };
 
+/** Transport that answers from handlers or an OpenAPI document, with delay, error rate and passthrough. */
 export class MockTransport implements Transport {
   readonly name = "mock";
   readonly options = signal<Required<Omit<MockOptions, "seed">>>({ delay: [40, 160], errorRate: 0, passthrough: false });

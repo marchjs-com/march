@@ -13,6 +13,7 @@ export interface Accessor<T> { (): T; peek(): T }
 export interface Signal<T> extends Accessor<T> { set(v: T): T; update(fn: (v: T) => T): T; readonly signal: true; displayName?: string }
 export type Cleanup = () => void;
 
+/** Development switches: `enabled` turns on dev warnings, `warn` is where they go. */
 export const DEV: { enabled: boolean; warn: (...a: unknown[]) => void } = { warn: (...a) => console.warn("[march]", ...a), enabled: true };
 
 class OwnerNode {
@@ -253,6 +254,7 @@ export function createRoot<T>(fn: (dispose: Cleanup) => T, parent: Owner | null 
   try { return batch(() => fn(() => disposeOwner(root))); } finally { Owner = prevO; Listener = prevL; }
 }
 
+/** The current reactive owner (capture it before an await, resume with runWithOwner). */
 export const getOwner = (): Owner | null => Owner;
 /** Run `fn` with a previously captured owner (async continuations). */
 export function runWithOwner<T>(owner: Owner | null, fn: () => T): T {
@@ -266,6 +268,7 @@ export function runWithOwner<T>(owner: Owner | null, fn: () => T): T {
 // _leave does not touch the owner: when an async function is called without being awaited, the caller keeps running
 // synchronously after the inner `await` and must keep its own owner. The continuation restores its owner via _enter.
 export function _leave<T>(value: T): T { return value; }
+/** Compiler hook for async components: restores the owner after an `await` (not for direct use). */
 export function _enter<T>(owner: Owner | null, value: T): T {
   Owner = owner; Listener = null;
   queueMicrotask(() => { if (Owner === owner) Owner = null; });
@@ -298,6 +301,7 @@ export { handleError as reportError };
 
 // ------------------------------------------------------------------ context
 export interface Context<T> { id: symbol; defaultValue: T; Provider: (props: { value: T; children?: unknown }) => unknown }
+/** Create a context: provide a value with `<Ctx.Provider value>` and read it below with useContext(Ctx). */
 export function context<T>(defaultValue?: T): Context<T> {
   const id = Symbol("hm.context");
   const ctx: Context<T> = {

@@ -1,6 +1,6 @@
 # Component checklist
 
-Every component lives in `src/components/<name>/` and is done only when all of this holds. `march check component
+Every component lives in `src/components/<category>/<name>/` and is done only when all of this holds. `march check component
 <name>` checks the source items (✔ / ✖) and lists the browser items (·), which the showcase, `tools/visual-audit.mjs` and
 `tools/control-audit.mjs` (every option control changes something visible) cover. `node tools/gen-registry.js` writes
 the barrel, the registry and the catalogues; `--check` (and `npm test`) fails when they drift.
@@ -8,8 +8,8 @@ the barrel, the registry and the catalogues; `--check` (and `npm test`) fails wh
 ## Start
 
 ```
-march gen component <name>      # in the hadi-march repo: the folder below, then gen-registry
-march check component <name>
+march gen component <Name> --category <id> [--parts A,B]   # in the hadi-march repo: the folder below, then gen-registry
+march check component <category>/<name>
 ```
 
 ## Folder
@@ -22,7 +22,17 @@ march check component <name>
 | `docs.md` | first paragraph + first code block feed the catalogues; `## Props`, `## Accessibility`, `## Composed of` |
 | `demo.tsx` | showcase stage: `default (props: { values })` draws it for the Playground values |
 | `playground.ts` | options with an effect only (`visibleWhen` while they have none); choices go through ChoicePicker |
-| `meta.ts` | `name`, `status` (stable / experimental / deprecated), `since`, `summary`, `composedOf`, `behaviors`, `hubs` |
+| `meta.ts` | `name`, `status` (stable / experimental / deprecated), `since`, `summary`, `category`, `composedOf`, `behaviors`, `hubs` |
+
+## Category
+
+`src/components/categories.ts` is the one list: layout, typography, actions, forms, data, feedback, overlays,
+navigation, media, motion, social, composite, landing. `meta.category` names it and must match the folder; the
+category is the subpath (`import { Chip } from "hadi-march/actions"`), the showcase menu group, and the section in
+docs/components.md and the AI catalogue. A component built from other components (NavSidebar, Wizard, ThemeMenu,
+CommandPalette, ConsentBanner …) is **composite**: `meta.composedOf` must name its parts, each a registered component,
+and the showcase card shows "Şunlardan oluşur" with links to them. Missing parts are written as their own components
+first.
 
 ## Rules
 

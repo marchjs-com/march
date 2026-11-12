@@ -34,6 +34,7 @@ export function getKeyframes(name: string): KeyframesDef | null {
   const base = getKeyframes(d.use);
   return base ? { name, frames: base.frames, defaults: { ...base.defaults, ...d.defaults } } : null;
 }
+/** Names of every registered keyframe preset. */
 export const keyframeNames = (): string[] => [...REG.keys()];
 
 const kebab = (p: string): string => (p.startsWith("--") ? p : p.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`));

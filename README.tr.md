@@ -1,6 +1,6 @@
 # HADI March (Türkçe)
 
-**Bir kez çalış, sonra yürü.** TypeScript ve JavaScript için küçük, hızlı bir arayüz kitaplığı: bileşenler bir kez çalışır,
+**Bir kez çalış, sonra yürü.** TypeScript ve JavaScript için küçük, hızlı bir çatı: bileşenler bir kez çalışır,
 bir değer değişince yalnız ona bağlı DOM güncellenir. Sanal DOM yok, yeniden render yok, çalışma zamanı bağımlılığı yok.
 
 ```tsx
@@ -25,4 +25,6 @@ export function Sayac(props: { etiket: string }) {
 Tek derleme aracı esbuild'dir. `march dev` geliştirme sunucusu, `march build` `dist/`, `march check` tür denetimi.
 Ayrıntılar için İngilizce [README](README.md) ve [`AI_INSTRUCTIONS.md`](AI_INSTRUCTIONS.md).
 
-Lisans: MIT.
+Lisans: MIT. Lisans değişmedi; aşağıdaki yalnızca bir rica.
+
+March ile bir şey yaptıysanız bu satırı ya da `<MadeWithMarch />` bileşenini eklerseniz seviniriz: "HADI March ve 💗 ile geliştirildi". Görünür bir metin istemezseniz `march.config.js` içinde `credit: true` yalnızca derlenen `index.html`'ye `<!-- Built with HADI March -->` yorumunu ekler (varsayılan kapalı).

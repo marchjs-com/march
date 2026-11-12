@@ -8,7 +8,7 @@ import { signal } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
 import { cx, val, glyph, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Card } from "../../../ui/card.ts";
-import { Chip } from "../../chip/index.ts";
+import { Chip } from "../../actions/chip/index.ts";
 import { openMedia } from "../../../ui/media.ts";
 import { arrowUpRight } from "../../../icons/glyphs/arrowUpRight.ts";
 import { flip } from "../../../motion/flip.ts";

@@ -5,7 +5,7 @@ import { h } from "../dom/h.ts";
 import { applyPipe, toDate } from "../core/pipes.ts";
 import { locale } from "../core/i18n.ts";
 import { rowsOf, accessor, formatter, num, useSize, attr, textWidth, each,
-  type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type Getter, type TooltipProp } from "./util.ts";
+  type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type Getter, type TooltipProp, f1 } from "./util.ts";
 import { Frame, tooltipState, showTip, tipBody, thin } from "./parts.ts";
 import { clamp } from "../core/util.ts";
 
@@ -39,7 +39,6 @@ interface HeatGrid { xs: Label[]; ys: Label[]; cells: HeatCell[] }
 interface PosLabel { key: string; label: unknown; pos: number }
 
 const DAY = 864e5;
-const f1 = (v: number): number => Math.round(v * 10) / 10;
 const dayKey = (d: Date): string => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 /** Short weekday names, Monday first, in the active locale. */
 const weekdays = (): string[] => { const f = new Intl.DateTimeFormat(locale(), { weekday: "short" }); return [...Array(7)].map((_, i) => f.format(new Date(2024, 0, 1 + i))); };

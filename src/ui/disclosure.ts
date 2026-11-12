@@ -6,6 +6,7 @@ import { read } from "../core/reactive.ts";
 
 export interface DisclosureProps { title: unknown; open?: boolean | (() => boolean); onToggle?: (open: boolean) => void; class?: string; children?: unknown }
 
+/** A native <details> section with an animated open/close and a summary line. */
 export function Disclosure(props: DisclosureProps): Element {
   const el = h("details", { class: ["hm-disclosure", props.class], open: () => !!read(props.open ?? false) },
     h("summary", { class: "hm-disclosure-summary" }, () => props.title),

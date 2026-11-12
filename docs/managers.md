@@ -11,7 +11,7 @@ Each manager: `src/managers/<name>/index.ts` (+ `ui.ts` when it has UI), a test 
 | `viewport()` / `consent` / `command()`, `commands` | the instance (created on first use) |
 | `configureViewport(cfg)`, `configureConsent(cfg)`, `configureCommands(cfg)` | global options; bindings follow the new instance |
 | `disposeViewport()`, `disposeConsent()`, `disposeCommands()` | remove listeners; the next use starts again |
-| `setManagerEmit(fn)` | every manager event `{ manager, type, detail }` (one sink; see docs/architecture.md) |
+| `onManager(pattern, fn)` | manager events on the `managers` channel, topic `<manager>:<type>` (`"session:*"`, `"*"`); also `managerChannelOf(name)` and `onChannels("managers.*")` |
 
 Configure a manager at app start, before components subscribe: listeners added with `on()` belong to the instance and
 end with it.
@@ -74,3 +74,31 @@ bindCommandKeys()                                         // bind every shortcut
 - Shortcut conflicts are detected at registration (`commands.conflicts()`, dev warning); scoped key handling is not part of this manager.
 - Commands appear in `<CommandPalette>` through its existing registry (`palette: false` to opt out).
 - `commandItems()` returns `MenuItemSpec`s: the same list fills `<Menu>` and context menus.
+
+## Environment managers
+
+Each lives in `src/managers/<name>/` (import `hadi-march/managers/<name>`), follows the same pattern (lazy, one
+instance, `configureX()` / `disposeX()`) and reports through `emit()`. Showcase: Temel › Ortam yöneticileri.
+
+```ts
+onManager("session:*", (m) => …)   // every event is on the `managers` channel (topic <manager>:<type>); nothing to connect
+idle().idle()  idle().onIdle(fn)  idle().pause()                                  // configureIdle({ timeout })
+sync().enqueue({ url, method: "POST", body })  sync().pending()  sync().status()  // offline queue over net, backoff, Idempotency-Key
+device().network()  device().lowEnd()  device().supports("share")  device().battery()  await device().storage()
+permissions().state("camera")  await permissions().request("camera", { rationale })  // configurePermissions({ consent: { geolocation: "preferences" } })
+locator().locate()  locator().watch()  locator().position()  locator().distanceTo(point)
+notifications().notify({ title, body, onClick })  notifications().request()  notifications().unread()   // system notification or toast
+appWindow().visible()  appWindow().focused()  appWindow().count()  appWindow().leader()  appWindow().broadcast(type, data)
+scroll().y()  scroll().lock()  scroll().save(key)  scroll().restore(key)  scroll().spy(ids).active()
+session().start()  session().remaining()  session().warning()  session().extend()  session().end()   // shared by the tabs
+presence().state()  presence().overall()  presence().setPeer(id, state)          // active | idle | away | offline
+```
+
+- Nothing asks the user for anything on its own: `permissions().request`, `locator().locate/watch` and
+  `notifications().request` belong in click handlers. A permission tied to a consent category resolves `"blocked"`
+  without a browser prompt until that category is granted.
+- `notify()` goes to the in-app toast while the tab is visible (or without permission) and to a system notification
+  while it is hidden; `configureNotifications({ native: "always" | "never", toast: fn })`.
+- Sync sends in order; a 5xx / network error waits with backoff and holds the items behind it; a 4xx is marked failed
+  and kept until `retry(id)` or `remove(id)`.
+- Session: activity extends (at most once per `extendEvery`) except inside the warning window, which needs `extend()`.

@@ -40,6 +40,7 @@ export interface SocketProtocol {
   typeOf(msg: unknown): string | undefined;
 }
 type Rec = Record<string, unknown>;
+/** WebSocket message protocol: JSON encode/decode (non-JSON frames pass through). */
 export const jsonProtocol: SocketProtocol = {
   encode: (m) => JSON.stringify(m),
   decode: (raw) => { try { return JSON.parse(String(raw)) as unknown; } catch { return raw; } },

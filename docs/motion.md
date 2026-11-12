@@ -45,3 +45,25 @@ and reduced-motion rules.
 - No allocation per frame for JS targets (typed arrays, cached segment index); one clock callback per root playback.
 - `test/motion-engine.test.js` measures a 200-item stagger (start < 50 ms, JS frame for 200 targets < 8 ms);
   `tools/motion-audit.mjs` checks the showcase in headless Edge (Stop all, global speed, 200-item stagger without long tasks).
+
+## Text animations
+
+`hadi-march/motion/text` adds 56 text animations on this engine (one export each, a shared split core of about
+1.5 KB gzip). See [src/motion/text/docs.md](../src/motion/text/docs.md).
+## One engine for everything (inventory)
+
+Every moving thing in the library and the showcase is under the engine's control, so the global speed, "Stop all",
+slow motion and reduced motion reach all of it:
+
+| Kind | Where | How it is controlled |
+| --- | --- | --- |
+| Engine playbacks (`animate`, `timeline`, springs, tweens, canvas / WebGL) | `src/motion`, `src/fx`, showcase pages | the engine's own clock and WAAPI playbacks |
+| CSS `@keyframes` and transitions (spinners, skeleton shimmer, dialog / drawer / toast entry, nav bar, `transition:` classes, charts) | `src/css/tokens.css`, `src/ui/*.css`, `src/dom/lazy.css`, `src/router/router.css`, showcase CSS | `installCssControl()`: `getAnimations()` adopts each one as it starts (pseudo-elements included) |
+| Raw WAAPI in components (marquee, the OTP cell pop) | `src/ui/marquee.ts`, `src/forms/inputs.ts` | `animateEl()` (engine/native.ts): global speed at start and on change, paused / resumed with the rest |
+| Canvas drawing loops (overlay media) | `src/ui/overlay-media.ts` | `frameLoop()` on the one clock: stops while paused, scaled by the speed |
+| Page transitions (View Transitions or fallback), named and modal outlets | `src/motion/page.ts` | engine playbacks; the browser's shared-element morph is retimed and adopted |
+| Demo tickers in the showcase | `pages/feedback.tsx` | `onFrame()` instead of `setInterval` |
+
+Not animations (left as they are): popover positioning after mount, scroll restoration after a page swap, polling and
+heartbeat timers. `test/motion-rule.test.js` keeps it this way: a new `requestAnimationFrame` loop, raw `el.animate()`
+or a `setInterval` that moves something fails the tests.

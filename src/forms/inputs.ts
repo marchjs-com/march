@@ -5,6 +5,7 @@ import "../ui/field.css";
 import "../ui/button.css";
 import { signal, computed, effect, untrack, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
+import { animateEl, reducedMotion } from "../motion/env.ts";
 import { t, locale } from "../core/i18n.ts";
 import { roving } from "../ui/focus.ts";
 import { model, ctl, cx, uid, extend, syncValue, parseNumber, formatNumber, normOptions, same, labelledBy, useField,
@@ -71,7 +72,9 @@ export function TextInput(props: TextInputProps): unknown {
   return affix(props, el);
 }
 
+/** Text input for an e-mail address (email keyboard, trimmed, lower-cased). */
 export const EmailInput = (props: TextInputProps): unknown => TextInput(extend(props, { type: () => "email", autocomplete: () => props.autocomplete ?? "email", inputmode: () => "email", transform: () => (v) => v.trim() }));
+/** Text input for a web address (url keyboard, https:// placeholder). */
 export const UrlInput = (props: TextInputProps): unknown => TextInput(extend(props, { type: () => "url", inputmode: () => "url", placeholder: () => props.placeholder ?? "https://", transform: () => (v) => v.trim() }));
 
 export interface TextareaProps extends ControlProps<string>, TextAttrProps {
@@ -474,8 +477,8 @@ export function CodeInput(props: CodeInputProps): unknown {
     if (arr.every(Boolean)) { if (completed !== code) { completed = code; props.onComplete?.(code); } } else completed = null;
   };
   const pop = (el: HTMLElement): void => {
-    if (props.animate === false || !el.animate || globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    el.animate([{ transform: "scale(.82)" }, { transform: "scale(1)" }], { duration: 180, easing: "cubic-bezier(.34, 1.56, .64, 1)" });
+    if (props.animate === false || reducedMotion()) return;
+    animateEl(el, [{ transform: "scale(.82)" }, { transform: "scale(1)" }], { duration: 180, easing: "cubic-bezier(.34, 1.56, .64, 1)" });
   };
   const fill = (i: number, text: string) => {
     const chars = [...clean(text)];

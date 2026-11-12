@@ -7,7 +7,7 @@ import { t } from "../../../core/i18n.ts";
 import { cx, val, glyph, type ClassProp } from "../../../ui/util.ts";
 import { Button } from "../../../ui/button.ts";
 import { KeyValue } from "../../../ui/key-value.ts";
-import { Chip } from "../../chip/index.ts";
+import { Chip } from "../../actions/chip/index.ts";
 import { openMedia } from "../../../ui/media.ts";
 import { arrowLeft } from "../../../icons/glyphs/arrowLeft.ts";
 import { arrowRight } from "../../../icons/glyphs/arrowRight.ts";

@@ -22,6 +22,7 @@ const byStatus = (s: number): ErrorType =>
   s === 401 ? "auth" : s === 403 ? "forbidden" : s === 404 ? "notFound" : s === 409 ? "conflict" : s === 422 || s === 400 ? "validation"
     : s === 429 ? "rateLimit" : s === 408 ? "timeout" : s >= 500 ? "server" : "http";
 
+/** An error with a type (network, auth, validation, server …), a code, the HTTP status and field errors. */
 export class AppError extends Error {
   type: ErrorType;
   code: string;

@@ -60,6 +60,7 @@ const minBucket = (v: string | undefined): number => {
   const rem = !v ? 9 : v.endsWith("px") ? parseFloat(v) / 16 : parseFloat(v);
   return MIN_COLS.reduce((a, b) => (Math.abs(b - rem) < Math.abs(a - rem) ? b : a), 9);
 };
+/** Responsive grid that never overflows: fixed or auto columns, fill and balance the last row, equal row heights. */
 export function Grid(props: GridProps): Element {
   const cols = clamp(6, 1, props.cols ?? 2);
   // span mode: fixed columns that must fill the last row and/or keep all rows equal (pure CSS, see grid.css)

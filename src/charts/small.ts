@@ -3,7 +3,7 @@ import { computed, read, reactive, effect } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { lttb } from "./lttb.ts";
 import { svgIcon, isIconDef } from "../icons/svg.ts";
-import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, attr, each, type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps } from "./util.ts";
+import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, attr, each, type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, f1 } from "./util.ts";
 import { OverflowText } from "../ui/marquee.ts";
 import { colorAttr, colorList, paintOf, type ColorToken, type MultiColors } from "../theme/colors.ts";
 import { cx } from "../ui/util.ts";
@@ -77,7 +77,6 @@ export interface BarListProps<D = unknown> {
   onSelect?: ((item: BarListItem<D> & { rank: number }) => void) | undefined;
 }
 
-const f1 = (v: number): number => Math.round(v * 10) / 10;
 
 /** Tiny trend line without axes. `data` = numbers or objects (`y` key/fn). */
 export function Sparkline<D>(props: SparklineProps<D>): Element {

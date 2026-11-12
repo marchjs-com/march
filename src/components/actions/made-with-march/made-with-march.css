@@ -1,0 +1,8 @@
+/* HADI March — MadeWithMarch. Theme tokens only, logical properties (RTL follows the page direction). */
+.hm-madewith { margin: 0; color: var(--hm-text-2); font-size: var(--hm-text-sm); line-height: 1.4; }
+.hm-madewith-link { color: var(--hm-primary-text, var(--hm-primary)); font-weight: 600; text-decoration: none; border-radius: var(--hm-radius-1, 2px); }
+.hm-madewith-link:hover { text-decoration: underline; }
+.hm-madewith-link:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: 2px; }
+.hm-madewith-badge { display: inline-flex; align-items: center; gap: .25rem; padding: .25rem .75rem; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-full); background: var(--hm-surface); }
+.hm-madewith-small { color: var(--hm-faint); font-size: var(--hm-text-xs); }
+.hm-madewith-small .hm-madewith-link { font-weight: 500; color: inherit; text-decoration: underline; }

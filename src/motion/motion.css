@@ -9,17 +9,13 @@
   --hm-gradient: var(--hm-brand-gradient, linear-gradient(120deg, #6d5dfc, #3b82f6 35%, #22d3ee 70%, #a3e635));
 }
 
-/* View Transitions (router pageTransitions) */
+/* View Transitions (router pageTransitions): the motion engine animates the old and new page (WAAPI on the
+   ::view-transition-old/new pseudo-elements), so the browser's own cross-fade is off while a page transition runs */
 @view-transition { navigation: auto; }
 /* the router names only the outlet that changes (hm-page); the rest of the page (shell, layouts) is not captured */
-:root[data-hm-vt-scope="outlet"] { view-transition-name: none; }
-::view-transition-old(root), ::view-transition-new(root), ::view-transition-old(hm-page), ::view-transition-new(hm-page) { animation-duration: var(--hm-dur-2); animation-timing-function: var(--hm-ease-out); }
-:root[data-hm-page-transition="slide"]::view-transition-old(root), :root[data-hm-page-transition="slide"]::view-transition-old(hm-page) { animation-name: hm-vt-out; }
-:root[data-hm-page-transition="slide"]::view-transition-new(root), :root[data-hm-page-transition="slide"]::view-transition-new(hm-page) { animation-name: hm-vt-in; }
-:root[data-hm-page-transition="slide"][data-hm-nav="back"]::view-transition-new(root), :root[data-hm-page-transition="slide"][data-hm-nav="back"]::view-transition-new(hm-page) { animation-name: hm-vt-in-back; }
-@keyframes hm-vt-out { to { opacity: 0; transform: translateX(-12px); } }
-@keyframes hm-vt-in { from { opacity: 0; transform: translateX(12px); } }
-@keyframes hm-vt-in-back { from { opacity: 0; transform: translateX(-12px); } }
+:root[data-hm-vt="hm-page"] { view-transition-name: none; }
+:root[data-hm-vt]::view-transition-old(root), :root[data-hm-vt]::view-transition-new(root),
+:root[data-hm-vt]::view-transition-old(hm-page), :root[data-hm-vt]::view-transition-new(hm-page) { animation: none; mix-blend-mode: normal; }
 
 /* Scroll-driven reveal without JS where supported: class="hm-scroll-reveal" */
 @supports (animation-timeline: view()) {
@@ -53,8 +49,8 @@
 
 /* reduced motion: the system preference, or the user setting (motion.config({ reduce: "reduce" }) sets data-hm-reduced) */
 :root[data-hm-reduced] :is(.hm-shimmer, .hm-float) { animation: none; }
-:root[data-hm-reduced]::view-transition-old(root), :root[data-hm-reduced]::view-transition-new(root), :root[data-hm-reduced]::view-transition-old(hm-page), :root[data-hm-reduced]::view-transition-new(hm-page) { animation: none; }
+:root[data-hm-reduced]::view-transition-group(*), :root[data-hm-reduced]::view-transition-old(*), :root[data-hm-reduced]::view-transition-new(*) { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .hm-shimmer, .hm-float { animation: none; }
-  ::view-transition-old(root), ::view-transition-new(root), ::view-transition-old(hm-page), ::view-transition-new(hm-page) { animation: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
 }

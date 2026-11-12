@@ -22,6 +22,7 @@ export interface MotionSettings {
 /** A motion character scales durations and picks the default easing ("calm" is slower and softer, "lively" springier). */
 export interface Character { durationScale?: number; easing?: string }
 
+/** Default motion settings (speed 1, reduced motion from the system, 240 ms, "out" easing). */
 export const DEFAULTS: MotionSettings = { speed: 1, reduce: "system", duration: 240, easing: "out", slowMo: 1, character: "default" };
 export const CHARACTERS: Record<string, Character> = {
   default: {},

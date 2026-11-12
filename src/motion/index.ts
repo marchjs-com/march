@@ -12,9 +12,9 @@ export { timeline, type Timeline, type StepOptions, type Target } from "./timeli
 export { inView, reveal, scrollProgress, parallax, type InViewOptions } from "./scroll.ts";
 export { scrollScene, refreshScenes, type SceneState, type SceneFn } from "./scroll-scene.ts";
 export { sharedTransition } from "./shared-element.ts";
-export { pageTransitions, type PageTransitionOptions } from "./page.ts";
+export { pageTransitions, transitionFrames, resolveTransition, navDirection, type PageTransitionOptions, type PageTransitionSpec, type PageTransitionType } from "./page.ts";
 export { drag, swipe, press, magnet, tilt, type DragOptions } from "./gestures.ts";
-export { reducedMotion, setReducedMotion, frame } from "./env.ts";
+export { reducedMotion, setReducedMotion, frame, frameLoop, animateEl } from "./env.ts";
 export * as easing from "./easing.ts";
 
 // the engine (new API)
@@ -29,3 +29,5 @@ export {
   type MotionSettings, type MotionExtension, type CssControls, type FrameMonitor, type Canvas2DTarget, type WebGLTarget,
   type StaggerFn, type KeyframesInput, type Phase, type PresetName,
 } from "./engine/index.ts";
+// components of the "motion" category (src/components/motion, generated barrel)
+export * from "../components/motion/index.ts";

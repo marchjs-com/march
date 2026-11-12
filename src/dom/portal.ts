@@ -22,6 +22,8 @@ interface Layer { el: HTMLElement; kind: LayerKind }
 const stack: Layer[] = [];
 let root: HTMLElement | null = null;
 const inerted = new Set<Element>();
+/** Bumped on every open / close, so layers() is reactive (the Layer manager and devtools follow the stack). */
+const stackRev = signal(0, { name: "layers" });
 
 // the few styles a portal needs are set here (CSSOM: CSP safe), so the core needs no stylesheet: a box adds no layout
 // box; a layer covers the viewport without taking pointer events, its content takes them again (inherited)
@@ -34,6 +36,7 @@ function layerRoot(): HTMLElement {
 
 /** Recompute order (z-index) and inertness after a layer opens or closes. */
 function restack(): void {
+  stackRev.update((n) => n + 1);
   stack.forEach((l, i) => l.el.style.setProperty("z-index", `calc(${BAND[l.kind] ?? "var(--hm-z-dialog, 100)"} + ${i})`));
   for (const el of inerted) el.removeAttribute("inert");
   inerted.clear();
@@ -70,7 +73,9 @@ export function openLayer(kind: LayerKind, node: Node): () => void {
 }
 
 /** Open layers, bottom to top (for tests and devtools). */
-export const layers = (): readonly { kind: LayerKind; el: HTMLElement }[] => stack.slice();
+export const layers = (): readonly { kind: LayerKind; el: HTMLElement }[] => { stackRev(); return stack.slice(); };
+/** Layer kinds that make everything below them inert. */
+export const isModalLayer = (kind: LayerKind): boolean => MODAL.has(kind);
 
 // ------------------------------------------------------------------ named targets
 const targets = new Map<string, Signal<Element | null>>();

@@ -14,6 +14,7 @@ import { normalize, nativeFrames, Track, type Frames, type RawTrack } from "./tr
 import { driverFor, type Driver } from "./drivers.ts";
 import { getKeyframes, type KeyframesDef, type Timing } from "./keyframes.ts";
 import { isVisible, watchVisibility } from "./visibility.ts";
+import { ours } from "./native.ts";
 import { clamp } from "../../core/util.ts";
 
 export type { Timing };
@@ -178,7 +179,7 @@ function flushDirty(): void {
 }
 
 /** Native animations made by the engine (CSS control leaves them to their playback). */
-export const ours = new WeakSet<Animation>();
+export { ours };
 /** Running and globally paused root playbacks. */
 const live = new Set<Playback>();
 onConfig((why) => {
@@ -191,6 +192,7 @@ onConfig((why) => {
 interface Item { at: number; node: Effect | Playback }
 type Label = number;
 
+/** A timeline of animations with labels, play, pause, seek, reverse and speed. */
 export class Playback {
   readonly items: Item[] = [];
   readonly labels = new Map<string, Label>();

@@ -1,12 +1,12 @@
 // `march gen component <name>` inside the hadi-march repository: one folder with every file the checklist asks for.
 /** @returns {Record<string, string>} file name → content */
-export function libComponent(folder, Name) {
+export function libComponent(folder, Name, category = "layout", composedOf = []) {
   const cls = `hm-${folder}`;
   return {
     "index.ts": `// ${Name} (hadi-march/ui). Draws only: state comes from shared engines and behaviors.
 import "./${folder}.css";
-import { h } from "../../dom/h.ts";
-import { cx, val, type ClassProp, type MaybeFn } from "../../ui/util.ts";
+import { h } from "../../../dom/h.ts";
+import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 
 export interface ${Name}Props {
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
@@ -26,9 +26,9 @@ export function ${Name}(props: ${Name}Props): Element {
 `,
     [`${folder}.test.js`]: `import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom } from "../../testing/dom.ts";
+import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
-const { h, render } = await import("../../index.ts");
+const { h, render } = await import("../../../index.ts");
 const { ${Name} } = await import("./index.ts");
 
 test("${Name} renders its children with the size class", () => {
@@ -58,7 +58,7 @@ Roles, keyboard, announcements.
 
 ## Composed of
 
-—
+${composedOf.length ? composedOf.join(", ") : "—"}
 `,
     "demo.tsx": `// Showcase stage for ${Name}: draws it for the Playground values (playground.ts).
 import { ${Name} } from "./index.ts";
@@ -69,7 +69,7 @@ export default function ${Name}Demo(props: { values: { size: string } }) {
   return <div>{() => <${Name} size={props.values.size as "md"}>${Name}</${Name}>}</div>
 }
 `,
-    "playground.ts": `import { definePlayground } from "../meta.ts";
+    "playground.ts": `import { definePlayground } from "../../meta.ts";
 
 export default definePlayground<{ size: string }>({
   options: [
@@ -77,14 +77,15 @@ export default definePlayground<{ size: string }>({
   ],
 });
 `,
-    "meta.ts": `import { defineMeta } from "../meta.ts";
+    "meta.ts": `import { defineMeta } from "../../meta.ts";
 
 export default defineMeta({
   name: "${Name}",
   status: "experimental",
   since: "0.1.0",
   summary: "One line for catalogues.",
-  composedOf: [],
+  category: "${category}",
+  composedOf: ${JSON.stringify(composedOf)},
   behaviors: [],
   hubs: ["d"],
 });

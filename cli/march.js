@@ -9,10 +9,14 @@
 //                 [--classes]                       hadi-march/net Api classes + interfaces instead (src/api.gen.ts)
 //   march i18n [--messages src/i18n]                 report keys missing from translation files
 //   march check [--src src]                          type-check .tsx/.ts including March syntax (pipes, modifiers…)
+//   march seo check [--dir dist] [--no-canonical]    built pages: missing title / description / canonical / img alt…
 // Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html,
 //   base: "/" | "./" (asset URLs in index.html; "./" = works from any sub-folder), stableNames: true (or --stable-names:
 //   main.js, chunks/home.js… with ?v=<version> in every reference; deploys overwrite the same paths), packChunks: false,
-//   budget: { entry, route, part, css, routes: { "/x": bytes }, fail } (gzip bytes; false = off), sw: true (offline service worker), headers: false (no _headers) }.
+//   budget: { entry, route, part, css, routes: { "/x": bytes }, fail } (gzip bytes; false = off), sw: true (offline service worker), headers: false (no _headers),
+//   credit: true (adds <!-- Built with HADI March --> to the built index.html and prints the one-line console banner in production too; off by default),
+//   banner: false (no console banner in `march dev`; production never prints one unless credit is on) }.
+//   seo: { site, prerender: true | ["/a"], sitemap, robots, head } (compiler/prerender.js: static HTML per route + sitemap.xml/robots.txt) }.
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, cpSync, rmSync, watch } from "node:fs";
 import { join, resolve, relative, dirname, extname, basename, sep } from "node:path";
@@ -22,6 +26,7 @@ import { createRequire } from "node:module";
 import { march } from "../compiler/esbuild.js";
 import { genRoutes } from "./routes.js";
 import { genApi, genApiClasses, mockHandler } from "./openapi.js";
+import { bannerSource } from "./banner.js";
 import { templates } from "./templates.js";
 import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
 import { packChunks } from "../compiler/pack-chunks.js";
@@ -32,6 +37,7 @@ const cwd = process.cwd();
 const argv = process.argv.slice(2);
 const flag = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? (argv[i + 1] && !argv[i + 1].startsWith("--") ? argv[i + 1] : true) : d; };
 const MARCH_ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
+const marchVersion = () => JSON.parse(readFileSync(join(MARCH_ROOT, "package.json"), "utf8")).version;
 
 async function loadConfig() {
   const f = join(cwd, "march.config.js");
@@ -82,9 +88,10 @@ function writeHtml(cfg, meta, { dev }, manifest = null, entryFiles = null) {
   const data = manifest && Object.keys(manifest).length ? `<script type="application/json" id="march-manifest">${JSON.stringify(manifest).replace(/</g, "\\u003c")}</script>` : "";
   // the entry's own chunks are announced up front: fetched in parallel with the entry instead of after it is parsed
   const pre = (entryFiles ?? []).filter((f) => /\.js(\?|$)/.test(f) && `${base}${f}` !== js).map((f) => `<link rel="modulepreload" href="${base}${f}">`).join("");
-  const tags = `${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : ""}`;
+  const tags = `${cfg.credit === true ? "<!-- Built with HADI March -->" : ""}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
   const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
   writeFileSync(join(out, "index.html"), html);
+  if (!dev && cfg.credit === true) writeFileSync(join(out, "credit.js"), bannerSource(marchVersion()));
 }
 
 /** Theme stylesheets for setColorTheme(): copied to <outdir>/themes/<id>.css (the default theme is already in the bundle). */
@@ -96,6 +103,26 @@ async function copyThemes(out, esbuild, { dev }) {
     const css = readFileSync(join(dir, f), "utf8");
     writeFileSync(join(out, "themes", f), dev ? css : (await esbuild.transform(css, { loader: "css", minify: true, legalComments: "none" })).code);
   }
+}
+
+/** Budget of a lazy output (gzip bytes): a start-up piece, a route (its page module) or a lazy part; undefined without a budget. */
+function budgetOf(budget, meta, plan) {
+  if (!budget) return undefined;
+  const boot = new Set((budget.boot ?? []).map((k) => k.split(sep).join("/")));
+  const outs = meta.outputs;
+  const routes = routePaths(meta, cwd, Object.values(outs).map((o) => o.entryPoint).filter(Boolean).map((k) => k.split(sep).join("/")));
+  const of = (k) => {
+    const ep = (outs[k]?.entryPoint ?? "").split(sep).join("/");
+    if (!ep) return undefined;
+    // a group of small pages / parts (min-chunks): each member's download includes the whole group
+    if (ep.startsWith("march-group:")) return plan?.boot?.includes(ep.slice(12)) ? { boot: true } : { limit: budget.route ?? 60 * 1024 };
+    if (boot.has(ep)) return { boot: true };
+    const path = routes[ep];
+    return { limit: path ? budget.routes?.[path] ?? budget.route ?? 60 * 1024 : budget.part ?? budget.route ?? 60 * 1024 };
+  };
+  // start-up beyond the entry (the "(boot)" row of the size report)
+  of.bootLimit = budget.bootLimit ?? budget.route ?? 60 * 1024;
+  return of;
 }
 
 async function build({ dev = false } = {}) {
@@ -123,18 +150,25 @@ async function build({ dev = false } = {}) {
       const minify = flag("--no-minify") !== true;
       await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
       // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
-      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: minSize || 2048 });
-      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, boot: cfg.budget?.boot ?? [], prev: plan }) : null;
+      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: minSize || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan) });
+      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined }) : null;
+      if (process.env.MARCH_PLAN_DEBUG) console.log("PLAN", JSON.stringify(next && { groups: Object.fromEntries(Object.entries(next.groups).map(([g, ms]) => [g, ms.map((m) => m.key)])), boot: next.boot, inline: Object.fromEntries(Object.entries(next.inline).map(([k, v]) => [k.slice(-40), v.map((x) => x.spec + ":" + x.mode + (x.group ?? ""))])) }));
       if (!next) break;
       plan = next;
     }
     // final names: every rewritten file gets a new content version (a cached file must never point at another build),
     // no name starts with _ or . (some hosts refuse those); stable names on request
     if (!dev) rehashOutputs(r.metafile, { cwd, stable: !!cfg.stableNames || flag("--stable-names") === true });
+    if (process.env.MARCH_PLAN_DEBUG) writeFileSync(join(cwd, ".march-meta.json"), JSON.stringify(r.metafile));
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
     aliasGroups(chunks.manifest, plan);
     writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);
     if (cfg.themes !== false) await copyThemes(out, esbuild, { dev });
+    if (!dev && cfg.seo && cfg.seo.prerender !== false) {
+      const { prerender } = await import("../compiler/prerender.js");
+      const res = await prerender({ cwd, cfg, esbuild, out, importSeo: seoModule });
+      console.log(`  prerender: ${res.routes.length} page(s)${res.mode === "hash" ? " (hash routing: the start page)" : ""}${res.failed.length ? `, ${res.failed.length} left to the browser` : ""}`);
+    }
     if (!dev) {
       if (cfg.headers !== false && !existsSync(join(out, "_headers"))) writeFileSync(join(out, "_headers"), headersFile({ stable: !!cfg.stableNames || flag("--stable-names") === true }));
       if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
@@ -204,7 +238,7 @@ async function dev() {
   const ctx = await esbuild.context(opts);
   await ctx.watch();
 
-  const client = readFileSync(join(MARCH_ROOT, "cli", "dev-client.js"), "utf8");
+  const client = (cfg.banner === false ? "" : bannerSource(marchVersion(), "Dev server: live reload on; errors show as an overlay. Turn this line off with banner: false in march.config.js.")) + readFileSync(join(MARCH_ROOT, "cli", "dev-client.js"), "utf8");
   createServer(async (req, res) => {
     const url = new URL(req.url, "http://x");
     if (url.pathname === "/__march/events") {
@@ -279,11 +313,17 @@ function isLibrary() {
 async function libComponent(name, put) {
   const folder = name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
   const Name = folder.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join("");
+  const { CATEGORIES } = await import(pathToFileURL(resolve(cwd, "src/components/categories.ts")).href);
+  const ids = CATEGORIES.map((c) => c.id);
+  const category = flag("--category");
+  if (typeof category !== "string" || !ids.includes(category)) fail(`usage: march gen component ${Name} --category <${ids.join("|")}> [--parts A,B]`);
+  const parts = typeof flag("--parts") === "string" ? flag("--parts").split(",").map((s) => s.trim()).filter(Boolean) : [];
+  if (category === "composite" && !parts.length) fail("a composite component is built from others: --parts Button,Menu …");
   const { libComponent: files } = await import("./lib-templates.js");
-  for (const [f, text] of Object.entries(files(folder, Name))) put(join("src/components", folder, f), text);
+  for (const [f, text] of Object.entries(files(folder, Name, category, parts))) put(join("src/components", category, folder, f), text);
   const { spawnSync } = await import("node:child_process");
-  spawnSync(process.execPath, [resolve(cwd, "tools/gen-registry.js")], { cwd, stdio: "inherit" });
-  console.log(`next: march check component ${folder}  (checklist: docs/component-checklist.md)`);
+  spawnSync(process.execPath, ["--import", pathToFileURL(resolve(cwd, "compiler/register.js")).href, resolve(cwd, "tools/gen-registry.js")], { cwd, stdio: "inherit" });
+  console.log(`next: march check component ${category}/${folder}  (checklist: docs/component-checklist.md)`);
 }
 
 async function typecheck() {
@@ -301,10 +341,39 @@ async function typecheck() {
   if (n) process.exitCode = 1;
 }
 
+/** hadi-march/seo (TypeScript; also when March is installed under node_modules). */
+async function seoModule() {
+  const { importTs } = await import("../compiler/load-ts.js");
+  return importTs(new URL("../src/seo/index.ts", import.meta.url));
+}
+
+async function seo() {
+  if (argv[1] !== "check") fail("usage: march seo check [--dir dist] [--no-canonical]");
+  const cfg = await loadConfig();
+  const dir = resolve(cwd, flag("--dir", cfg.outdir));
+  if (!existsSync(dir)) fail(`${relative(cwd, dir) || dir} does not exist: run march build first`);
+  const { importTs } = await import("../compiler/load-ts.js");
+  const { checkHtml, formatIssues } = await importTs(new URL("../src/seo/check.ts", import.meta.url));
+  const walkHtml = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? walkHtml(p) : n.endsWith(".html") ? [p] : []; });
+  let errors = 0, warns = 0;
+  const files = walkHtml(dir);
+  for (const f of files) {
+    const html = readFileSync(f, "utf8");
+    // hash routing: every route is the same document, a canonical link is optional
+    const canonical = flag("--no-canonical") === true ? false : !/data-hm-prerender="#/.test(html) && !!cfg.seo?.site;
+    const issues = checkHtml(html, { canonical });
+    errors += issues.filter((i) => i.level === "error").length;
+    warns += issues.filter((i) => i.level === "warn").length;
+    if (issues.length) console.log(formatIssues(posix(relative(cwd, f)), issues));
+  }
+  console.log(`${errors ? "\x1b[31m✖\x1b[0m" : "\x1b[32m✔\x1b[0m"} ${files.length} page(s): ${errors} error(s), ${warns} warning(s)`);
+  if (errors) process.exitCode = 1;
+}
+
 const cmd = argv[0];
-const run = { dev, build: () => build(), gen, i18n, check: typecheck }[cmd];
+const run = { dev, build: () => build(), gen, i18n, check: typecheck, seo }[cmd];
 if (!run) {
-  console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)\n  march check component <name>   (in the hadi-march repo: the component checklist)");
+  console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)\n  march check component <name>   (in the hadi-march repo: the component checklist)\n  march seo check [--dir dist]   (titles, descriptions, canonical, img alt)");
   process.exit(cmd ? 1 : 0);
 }
 await run();
