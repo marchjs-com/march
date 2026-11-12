@@ -6,7 +6,7 @@ import "./sidebar.css";
 import "./nav.css";
 import "./button.css";
 import "./display.css";
-import { signal, computed, effect, untrack } from "../core/reactive.ts";
+import { signal, computed, effect, untrack, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { Link, path, navigate, type Href } from "../router/index.ts";
@@ -69,13 +69,26 @@ export interface NavSidebarProps {
   footer?: unknown;
   /** localStorage key (default "hm.sidebar"). */
   storageKey?: string;
+  /** Starting width: px (number) or a CSS length ("18rem"). Default 17.5rem. */
+  width?: number | string;
+  /** A grip on the inner edge changes the width (drag, touch, ← → Home End on the focused grip, double click resets). */
+  resizable?: boolean;
+  /** Narrowest / widest width the grip allows, px (default 200 / 480). */
+  minWidth?: number;
+  maxWidth?: number;
+  /** Called with the new width in px while resizing (and once it ends). */
+  onResize?: (width: number) => void;
+  /** Remember the width (default true when resizable): in the sidebar's storage, or under this localStorage key. */
+  persist?: boolean | string;
+  /** Dragging narrower than this (px) switches to the icon rail; dragging wider again restores the labels. */
+  collapseBelow?: number;
   /** false: do not register the items with the command palette. */
   palette?: boolean;
   label?: MaybeFn<string | undefined>;
   class?: ClassProp;
 }
 
-interface Saved { open?: unknown; recent?: unknown; rail?: unknown }
+interface Saved { open?: unknown; recent?: unknown; rail?: unknown; width?: unknown }
 const arr = <T>(x: unknown): T[] => (Array.isArray(x) ? x as T[] : []);
 const text = (x: MaybeFn<string | null | undefined> | undefined): string => String(val(x as MaybeFn<string>) ?? "");
 
@@ -89,11 +102,23 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const firstVisit = !Array.isArray(saved.open);
   const open = signal(new Set(arr<string>(saved.open)));
   const recent = signal(arr<string>(saved.recent));
-  const rail = signal(!!props.collapsible && saved.rail === true);
+  const canRail = !!props.collapsible || props.collapseBelow != null;
+  const rail = signal(canRail && saved.rail === true);
+  // width (resizable): px; null = the CSS default / the `width` prop
+  const minW = props.minWidth ?? 200, maxW = Math.max(props.maxWidth ?? 480, minW);
+  const widthKey = typeof props.persist === "string" ? props.persist : null;
+  const keepWidth = !!props.resizable && props.persist !== false;
+  const savedW = keepWidth ? Number(widthKey ? load<unknown>(widthKey, null) : saved.width) : NaN;
+  const width = signal<number | null>(Number.isFinite(savedW) && savedW > 0 ? Math.max(minW, Math.min(maxW, savedW)) : null);
+  const resizing = signal(false);
+  const shownWidth = signal(0); // rendered width (aria-valuenow when no width was set)
   const drawer = signal(false);
   const q = signal("");
   const chosen = signal<string | null>(null); // last onSelect item (items without href): active and remembered as a visit
-  const persist = (): void => save(storeKey, { open: [...open.peek()], recent: recent.peek(), ...(props.collapsible ? { rail: rail.peek() } : {}) });
+  const persist = (): void => {
+    save(storeKey, { open: [...open.peek()], recent: recent.peek(), ...(canRail ? { rail: rail.peek() } : {}), ...(keepWidth && !widthKey && width.peek() != null ? { width: width.peek() } : {}) });
+    if (keepWidth && widthKey) save(widthKey, width.peek());
+  };
   const navId = uid("hm-sb");
   let searchEl: HTMLInputElement | undefined, navEl: HTMLElement | undefined;
 
@@ -239,7 +264,58 @@ export function NavSidebar(props: NavSidebarProps): Element {
   };
 
   const kbd = props.shortcut ?? "mod+k";
-  return h("div", { class: () => cx("hm-nav-wrap", "hm-sb-wrap", drawer() && "is-open", rail() && "is-rail", val(props.class)) },
+
+  // ---- width: a CSS variable on the wrapper (CSSOM, no inline style attribute)
+  let wrapEl: HTMLElement | undefined;
+  const cssWidth = (): string | null => { const w = width(); return w != null ? `${w}px` : props.width == null ? null : typeof props.width === "number" ? `${props.width}px` : props.width; };
+  effect(() => { const w = cssWidth(); if (wrapEl) { if (w) wrapEl.style.setProperty("--hm-sb-w", w); else wrapEl.style.removeProperty("--hm-sb-w"); } });
+  const currentPx = (): number => width.peek() ?? Math.round(navEl?.getBoundingClientRect().width || 280);
+  const setWidth = (px: number, done = false): void => {
+    if (props.collapseBelow != null) {
+      if (px < props.collapseBelow) { if (!rail.peek()) { rail.set(true); persist(); } return; }
+      if (rail.peek()) rail.set(false);
+    }
+    const w = Math.round(Math.max(minW, Math.min(maxW, px)));
+    width.set(w);
+    props.onResize?.(w);
+    if (done) persist();
+  };
+  const rtl = (): boolean => (navEl ? globalThis.getComputedStyle?.(navEl).direction === "rtl" : false);
+  if (props.resizable && typeof globalThis.ResizeObserver === "function") {
+    const ro = new ResizeObserver(() => { if (navEl) shownWidth.set(Math.round(navEl.getBoundingClientRect().width)); });
+    queueMicrotask(() => { if (navEl) ro.observe(navEl); });
+    onCleanup(() => ro.disconnect());
+  }
+  const grip = (): unknown => !props.resizable ? null : h("div", {
+    class: () => cx("hm-sb-resize", resizing() && "is-dragging"), role: "separator", tabindex: "0", "aria-orientation": "vertical", "aria-controls": navId,
+    "aria-label": () => t`Resize sidebar`, "aria-valuemin": String(minW), "aria-valuemax": String(maxW), "aria-valuenow": () => String(width() ?? shownWidth()),
+    onPointerdown: (e: PointerEvent) => {
+      if (e.button > 0) return;
+      e.preventDefault();
+      const handle = e.currentTarget as HTMLElement;
+      handle.setPointerCapture?.(e.pointerId);
+      const doc = globalThis.document.documentElement;
+      doc.classList.add("hm-sb-resizing");
+      resizing.set(true);
+      const edge = navEl?.getBoundingClientRect();
+      const move = (ev: PointerEvent): void => { if (edge) setWidth(rtl() ? edge.right - ev.clientX : ev.clientX - edge.left); };
+      const up = (): void => {
+        handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up); handle.removeEventListener("pointercancel", up);
+        doc.classList.remove("hm-sb-resizing"); resizing.set(false); persist(); if (width.peek() != null) props.onResize?.(width.peek() as number);
+      };
+      handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up); handle.addEventListener("pointercancel", up);
+    },
+    onDblclick: () => { width.set(null); if (rail.peek() && props.collapseBelow != null) rail.set(false); persist(); props.onResize?.(currentPx()); },
+    onKeydown: (e: KeyboardEvent) => {
+      const step = e.shiftKey ? 64 : 16, grow = rtl() ? "ArrowLeft" : "ArrowRight", shrink = rtl() ? "ArrowRight" : "ArrowLeft";
+      const to = e.key === grow ? currentPx() + step : e.key === shrink ? currentPx() - step : e.key === "Home" ? minW : e.key === "End" ? maxW : null;
+      if (to == null) return;
+      e.preventDefault();
+      if (rail.peek() && to > currentPx()) rail.set(false);
+      setWidth(to, true);
+    },
+  });
+  return h("div", { class: () => cx("hm-nav-wrap", "hm-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--hm-sb-w", w); } },
     h("button", { type: "button", class: "hm-icon-btn hm-nav-burger", "aria-controls": navId, "aria-expanded": () => String(drawer()), "aria-label": () => t`Menu`, onClick: () => drawer.update((x) => !x) }, glyph(menu)),
     h("div", { class: "hm-nav-scrim", "aria-hidden": "true", onClick: () => drawer.set(false) }),
     h("nav", { class: "hm-nav hm-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },
@@ -259,5 +335,6 @@ export function NavSidebar(props: NavSidebarProps): Element {
           () => (q() ? h("button", { type: "button", class: "hm-sb-clear", "aria-label": () => t`Clear search`, onClick: () => { q.set(""); if (searchEl) { searchEl.value = ""; searchEl.focus(); } } }, glyph(xIcon))
             : hk ? h("kbd", { class: "hm-kbd hm-sb-kbd", "aria-hidden": "true" }, formatKey(kbd)) : null))),
       h("div", { class: "hm-sb-scroll" }, body),
-      props.footer != null && h("div", { class: "hm-nav-foot hm-sb-foot" }, props.footer)));
+      props.footer != null && h("div", { class: "hm-nav-foot hm-sb-foot" }, props.footer),
+      grip()));
 }

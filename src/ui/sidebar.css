@@ -1,6 +1,13 @@
 /* HADI March — NavSidebar. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- NavSidebar (src/ui/sidebar.ts); container, drawer and rail come from .hm-nav */
-.hm-sb { width: 17.5rem; background: var(--hm-surface); }
+.hm-sb { position: relative; width: var(--hm-sb-w, 17.5rem); background: var(--hm-surface); }
+/* resize grip on the inner (logical end) edge; the width is the --hm-sb-w variable on the wrapper */
+.hm-sb-resize { position: absolute; z-index: 2; inset-block: 0; inset-inline-end: -4px; width: 8px; cursor: col-resize; touch-action: none; outline: none; }
+.hm-sb-resize::after { content: ""; position: absolute; inset-block: 0; inset-inline-start: 3px; width: 2px; border-radius: 2px; background: transparent; transition: background-color var(--hm-dur) var(--hm-ease); }
+.hm-sb-resize:hover::after, .hm-sb-resize.is-dragging::after { background: var(--hm-primary); }
+.hm-sb-resize:focus-visible::after { background: var(--hm-focus, var(--hm-primary)); width: 3px; }
+html.hm-sb-resizing, html.hm-sb-resizing * { cursor: col-resize !important; user-select: none !important; -webkit-user-select: none !important; }
+html.hm-sb-resizing .hm-nav { transition: none; }
 .hm-sb-head { position: sticky; top: 0; z-index: 1; display: flex; flex-direction: column; gap: var(--hm-space-3); padding: var(--hm-space-4) var(--hm-space-3) var(--hm-space-3);
   background: inherit; border-bottom: 1px solid var(--hm-border-subtle); }
 .hm-sb-titlebar { display: flex; align-items: center; gap: var(--hm-space-2); min-height: 1.75rem; padding-inline-start: var(--hm-space-1); }
@@ -94,4 +101,4 @@
   .hm-sb-wrap.is-rail .hm-sb-group + .hm-sb-group { border-top: 1px solid var(--hm-border-subtle); padding-top: 2px; }
   .hm-sb-wrap.is-rail .hm-sb-item.is-active::before { inset-inline-start: -.5rem; }
 }
-@media (max-width: 900px) { .hm-sb { width: min(21rem, 88vw); } .hm-sb-input { font-size: 1rem; } }
+@media (max-width: 900px) { .hm-sb { width: min(21rem, 88vw); } .hm-sb-input { font-size: 1rem; } .hm-sb-resize { display: none; } }

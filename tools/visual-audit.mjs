@@ -93,7 +93,7 @@ const SCAN = `(() => {
       if (text || kids.some((k) => { const kr = k.getBoundingClientRect(); return kr.right > r.right + 2 || kr.left < r.left - 2; })) out.push(["overflow", where(el), el.scrollWidth + " > " + el.clientWidth]);
     }
     if (/flex/.test(cs.display) && cs.flexDirection.startsWith("row")) {
-      const kids = [...el.children].filter((k) => shown(k) && !skip(k) && getComputedStyle(k).position === "static" && parseFloat(getComputedStyle(k).marginInlineStart) >= 0);
+      const kids = [...el.children].filter((k) => shown(k) && !skip(k) && getComputedStyle(k).position === "static" && parseFloat(getComputedStyle(k).marginInlineStart) >= 0 && getComputedStyle(k).animationName === "none"); // spinning boxes change size
       for (let i = 1; i < kids.length; i++) {
         const a = kids[i - 1].getBoundingClientRect(), b = kids[i].getBoundingClientRect();
         const w = Math.min(a.right, b.right) - Math.max(a.left, b.left), h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);

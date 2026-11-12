@@ -113,6 +113,9 @@ shown; the server must enforce permissions.
 - Text the user reads may be any language, through `t`…`` (`t("Night Blue")` for data such as theme names).
 - `node tools/lint-identifiers.mjs` lists violations; the test suite runs it.
 
+**Sidebars**: big apps use `<NavSidebar>`; add `resizable` (+ `minWidth`, `maxWidth`, `collapseBelow`) when users
+should set its width. Never size it with inline styles.
+
 **Performance, always** (page speed comes first)
 - Every route is a lazy chunk: `routes: { "/x": () => import("./pages/x.tsx") }`. Never import a page statically.
 - Heavy components (charts, tables, DatePicker, editors, maps, fx/landing) go behind `lazy(() => import("./X.tsx"))`

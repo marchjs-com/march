@@ -157,6 +157,31 @@ the hamburger button; it closes after navigation, on Esc and on the scrim.
 <NavMenu brand="Admin" storageKey="admin.nav" items={[{ id: "users", title: "Users", href: "/users", group: "People", badge: () => $pending }]} />
 ```
 
+
+## NavSidebar
+
+The larger sidebar: title, a search box (Ctrl K), a featured item, recent visits, collapsible categories with counts,
+keyboard navigation, icon rail (`collapsible`) and a drawer on small screens.
+
+Resizing (optional): `resizable` adds a grip on the inner edge (logical inline-end, so it is on the left in RTL).
+Drag it (mouse, pen or touch), double click it to go back to the starting width, or focus it and use ← → (16 px,
+Shift 64 px), Home (narrowest) and End (widest). `role="separator"` with `aria-valuenow/min/max`.
+
+| Prop | Default | |
+| --- | --- | --- |
+| `width` | `17.5rem` | starting width: px or a CSS length |
+| `resizable` | `false` | show the grip |
+| `minWidth` / `maxWidth` | `200` / `480` | limits in px |
+| `onResize` | | `(px) => …` while resizing |
+| `persist` | `true` | remember the width (in `storageKey`), or pass a localStorage key; `false` = forget |
+| `collapseBelow` | | px: dragging narrower switches to the icon rail, wider restores the labels |
+
+The width is the `--hm-sb-w` CSS variable on the wrapper (set through CSSOM: no inline style attribute, CSP safe).
+
+```jsx
+<NavSidebar items={items} resizable width="18rem" minWidth={220} maxWidth={420} collapseBelow={150} />
+```
+
 ## Command palette
 
 `<CommandPalette ask={…} placeholder shortcut="mod+k" limit={50} commands={[…]} onRun />` — Ctrl/⌘+K toggles it,
