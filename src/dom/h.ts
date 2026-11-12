@@ -21,6 +21,11 @@ const PROPS = new Set(["value", "checked", "selected", "indeterminate", "muted"]
 const FORBIDDEN_TAGS = new Set(["script", "iframe", "object", "embed", "base", "meta"]);
 const FORBIDDEN_PROPS = new Set(["innerHTML", "outerHTML", "dangerouslySetInnerHTML", "srcdoc"]);
 export const LEAVE: unique symbol = Symbol("hm.leave");
+/** >0 while a detached subtree is disposed (a <For> row whose top nodes are removed whole): cleanups skip DOM work
+ * on nodes that go away with it. */
+let detaching = 0;
+/** Dispose `fn` while its DOM leaves as a whole (no per-node removal inside). */
+export function disposeDetached(fn: () => void): void { detaching++; try { fn(); } finally { detaching--; } }
 const CHILDREN = Symbol("hm.children");
 
 /** Allow only safe URL schemes (relative URLs are fine). */
@@ -198,7 +203,7 @@ function listen(el: Element, key: string, handler: unknown): void {
   };
   const opts = { capture: mods.includes("capture"), once: mods.includes("once"), passive: mods.includes("passive") };
   el.addEventListener(name, fn, opts);
-  onCleanup(() => el.removeEventListener(name, fn, opts));
+  onCleanup(() => { if (!detaching) el.removeEventListener(name, fn, opts); });
 }
 
 type FormEl = Element & { type?: string; value: string; checked: boolean };
@@ -291,7 +296,7 @@ function region(parent: Node, fn: () => unknown, before: Node | null): void {
     text = null;
     insert(host, v, end);
   });
-  onCleanup(() => { clearBetween(start, end); removeNode(start); removeNode(end); });
+  onCleanup(() => { if (detaching) return; clearBetween(start, end); removeNode(start); removeNode(end); });
 }
 
 /** Remove every node between two markers (leave transitions finish first). */
