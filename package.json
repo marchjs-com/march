@@ -36,6 +36,7 @@
     "./channel": "./src/channel/index.ts",
     "./behaviors/drag": "./src/behaviors/drag/index.ts",
     "./behaviors/roving-focus": "./src/behaviors/roving-focus/index.ts",
+    "./behaviors/resize-handle": "./src/behaviors/resize-handle/index.ts",
     "./i18n": "./src/i18n/index.ts",
     "./i18n/tr": "./src/i18n/tr.ts",
     "./icons": "./src/icons/index.ts",

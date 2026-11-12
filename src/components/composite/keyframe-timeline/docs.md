@@ -36,4 +36,4 @@ right in every writing direction, as in any timeline.
 ## Composed of
 
 EasingCurveEditor (the selected keyframe's easing), IconButton and Segmented (transport); the motion engine's timeline,
-easings and clock; `dom/track`.
+easings and clock; the drag behavior (`hadi-march/behaviors/drag`).

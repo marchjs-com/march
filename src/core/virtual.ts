@@ -5,7 +5,7 @@
 //   createVirtual() — reactive rows window (kept for Table).
 //   createViewport() — reactive 2-D window over a row axis and an optional column axis, bound to a scroll element.
 import { signal, computed, onCleanup, getOwner, type Accessor, type Signal } from "./reactive.ts";
-import { on } from "./util.ts";
+import { on, isRtl } from "./util.ts";
 
 export interface WindowRange { start: number; end: number; top: number; bottom: number }
 export interface WindowInput { count: number; scrollTop?: number; height: number; rowHeight: number; overscan?: number | undefined }
@@ -158,7 +158,7 @@ export function createViewport(o: ViewportOptions): Viewport {
       }
       if (o.cols && col != null && col >= 0) {
         const start = o.cols.offsetOf(col), end = start + o.cols.sizeOf(col), view = el.clientWidth - i.start - i.end;
-        const cur = Math.abs(el.scrollLeft), sign = el.scrollLeft < 0 || globalThis.getComputedStyle?.(el).direction === "rtl" ? -1 : 1;
+        const cur = Math.abs(el.scrollLeft), sign = el.scrollLeft < 0 || isRtl(el) ? -1 : 1;
         if (start < cur) { el.scrollLeft = sign * start; moved = true; }
         else if (end > cur + view) { el.scrollLeft = sign * (end - view); moved = true; }
       }

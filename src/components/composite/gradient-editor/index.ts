@@ -5,7 +5,7 @@
 import "./gradient-editor.css";
 import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { track, arrowStep } from "../../../dom/track.ts";
+import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, uid, val, clamp, setStyle, type ClassProp } from "../../../core/util.ts";
 import { glyph } from "../../../ui/util.ts";

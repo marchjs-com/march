@@ -4,9 +4,10 @@ import { computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/flow.ts";
 import { t } from "../../../core/i18n.ts";
-import { listen } from "../../../ui/util.ts";
+import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 import { NODE_W, boundsOf, type FlowStore, type NodeState } from "./model.ts";
+import { isRtl } from "../../../core/util.ts";
 
 export interface MinimapProps {
   flow: FlowStore;
@@ -31,7 +32,7 @@ export function Minimap(props: MinimapProps): Element {
   });
   const moveTo = (svg: SVGSVGElement, cx: number, cy: number): void => {
     const r = svg.getBoundingClientRect();
-    const rtl = globalThis.getComputedStyle?.(svg)?.direction === "rtl";
+    const rtl = isRtl(svg);
     const { x0, y0, k, vis } = box.peek();
     const wx = x0 + (rtl ? r.right - cx : cx - r.left) / k, wy = y0 + (cy - r.top) / k;
     const v = flow.viewport.peek();
@@ -48,9 +49,8 @@ export function Minimap(props: MinimapProps): Element {
     onPointerdown: (e: PointerEvent) => {
       e.stopPropagation();
       const svg = e.currentTarget as SVGSVGElement;
-      svg.setPointerCapture?.(e.pointerId);
       moveTo(svg, e.clientX, e.clientY);
-      const off = listen(svg, { pointermove: (ev: PointerEvent) => moveTo(svg, ev.clientX, ev.clientY), pointerup: () => off(), pointercancel: () => off() });
+      pointerDrag(e, { threshold: 0, onMove: (q) => moveTo(svg, q.clientX, q.clientY) });
     },
     onWheel: (e: WheelEvent) => e.stopPropagation(),
   },

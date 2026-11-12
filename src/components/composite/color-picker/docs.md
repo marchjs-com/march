@@ -33,5 +33,5 @@ The text field has `aria-invalid` while it does not parse. The preview names the
 
 ## Composed of
 
-IconButton (eyedropper), Segmented (format); `dom/track` for dragging, the motion engine's color parser, the theme's
+IconButton (eyedropper), Segmented (format); the drag behavior (`hadi-march/behaviors/drag`) for dragging, the motion engine's color parser, the theme's
 contrast helper.

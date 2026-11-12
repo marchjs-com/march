@@ -17,6 +17,7 @@ import { valueOf, type Column, type TableColumn, type Row } from "../../../table
 import { groupRows, aggregates, type Aggregate, type GroupItem, type GroupHeader, type GroupRow, type GroupAggregate } from "../../../data/group.ts";
 import { animate, stagger } from "../../../motion/animate.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
+import { resizeHandle } from "../../../behaviors/resize-handle/index.ts";
 import { Menu, type MenuItem } from "../../../ui/menu.ts";
 import { Chip } from "../../actions/chip/index.ts";
 import { glyph } from "../../../ui/util.ts";
@@ -202,19 +203,12 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     h("span", { class: "hm-dg-th-label", title: col.label }, col.label), sortMark(key),
     h("span", { class: "hm-dg-th-menu", "data-no-drag": "" }, h(Menu, { label: () => t`Column ${col.label}`, icon: moreVertical, size: "sm", variant: "ghost", items })),
     col.resizable === false ? null : h("span", {
-      role: "separator", class: "hm-dg-resize", tabindex: "-1", "aria-orientation": "vertical", "aria-label": t`Resize ${col.label}`,
-      "aria-valuenow": String(widthOf(col)), "aria-valuemin": String(col.minWidth), "data-no-drag": "",
-      onPointerdown: (e: PointerEvent) => {
-        e.preventDefault(); e.stopPropagation();
-        const w0 = widthOf(col), sign = rtl() ? -1 : 1;
-        el.classList.add("is-resizing");
-        pointerDrag(e, { threshold: 0, onMove: (p) => table.setWidth(key, w0 + p.dx * sign), onEnd: () => el.classList.remove("is-resizing") });
-      },
-      onDblclick: (e: Event) => { e.stopPropagation(); autosize(col); },
-      onKeydown: (e: KeyboardEvent) => {
-        const d = e.key === "ArrowRight" ? 16 : e.key === "ArrowLeft" ? -16 : 0;
-        if (d) { e.preventDefault(); e.stopPropagation(); table.setWidth(key, widthOf(col) + d * (rtl() ? -1 : 1)); }
-      },
+      class: "hm-dg-resize", tabindex: "-1", "aria-label": t`Resize ${col.label}`, "data-no-drag": "",
+      // drag / arrows (RTL mirrored) / double click autosizes: the resize-handle behavior
+      ref: (x: HTMLElement) => resizeHandle(x, {
+        value: () => widthOf(col), set: (w) => table.setWidth(key, w), min: col.minWidth, reset: () => autosize(col),
+        onStart: () => el.classList.add("is-resizing"), onEnd: () => el.classList.remove("is-resizing"),
+      }),
     })) as HTMLElement;
     setStyle(el, { width: `${widthOf(col)}px` });
     el.addEventListener("pointerdown", (e) => headerDown(e, col, el));

@@ -7,7 +7,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe.",
   composedOf: ["EasingCurveEditor", "IconButton", "Segmented"],
-  behaviors: ["motion engine (timeline / Playback, easings)", "dom/track (pointer drag)"],
+  behaviors: ["motion engine (timeline / Playback, easings)", "drag"],
   hubs: [],
   showcase: "/editors",
 });

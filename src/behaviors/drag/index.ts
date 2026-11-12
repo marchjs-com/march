@@ -8,6 +8,7 @@ import { pointerDrag, type PointerDragOptions, type DragPoint } from "./drag.ts"
 
 export { pointerDrag };
 export type { PointerDragOptions, DragPoint };
+export { track, arrowStep, type TrackPoint, type TrackOptions } from "./track.ts";
 
 /** Options of draggable(): a pointerDrag session per press, plus which presses start one. */
 export interface DraggableOptions extends PointerDragOptions {

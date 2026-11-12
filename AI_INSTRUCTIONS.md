@@ -389,6 +389,11 @@ One interaction, written once, attached to any element; each behavior is its own
   pointerup / setPointerCapture loop in a component.
 - **roving-focus** — `rovingFocus(container, { orientation, wrap, selector, onMove })`: one Tab stop, arrows / Home / End
   inside (RTL swaps left and right); the FocusManager's focus.roving() is this. Never hand-roll arrow-key focus moves.
+- **resize-handle** — `resizeHandle(grip, { value, set(v, done), min, max, step, scale, axis, reset })`: separator ARIA,
+  drag (RTL mirrored, Escape restores), arrows / Shift / Home / End / Enter, double click reset. Splitter, NavSidebar,
+  Table and DataGrid columns use it; never write your own resize grip.
+- **drag › track** — `track(area, { onMove, rtl, … })` + `arrowStep(e, rtl)`: 0–1 positions inside an area for editor
+  controls (color area, curve handles, crop frame, timeline head).
 
 ### 15c. Ready-made animations (all on the engine, each its own export)
 

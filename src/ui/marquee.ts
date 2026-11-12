@@ -7,6 +7,7 @@ import { signal, computed, effect, getOwner, onCleanup } from "../core/reactive.
 import { h } from "../dom/h.ts";
 import { reducedMotion, frame, animateEl } from "../motion/env.ts";
 import { val, cx, on, type MaybeFn, type ClassProp } from "./util.ts";
+import { isRtl } from "../core/util.ts";
 
 export type MarqueeTrigger = "hover" | "focus" | "always" | "visible";
 export type MarqueeMode = "bounce" | "loop" | "once";
@@ -84,7 +85,7 @@ export function OverflowText(props: OverflowTextProps): Element {
   const start = (): void => {
     const el = track as HTMLElement & { animate?: (k: Keyframe[], o: KeyframeAnimationOptions) => Anim };
     if (typeof el.animate !== "function") return;
-    const rtl = globalThis.getComputedStyle?.(root).direction === "rtl";
+    const rtl = isRtl(root);
     const sign = rtl ? 1 : -1;
     const speed = Math.max(5, props.speed ?? 40), pause = Math.max(0, props.pause ?? 1000);
     running.set(true);

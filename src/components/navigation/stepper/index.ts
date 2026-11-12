@@ -13,6 +13,7 @@ import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { nextFrame } from "../../../motion/engine/index.ts";
+import { isRtl } from "../../../core/util.ts";
 
 export interface StepperProps {
   steps: readonly StepItem[];
@@ -39,7 +40,7 @@ export function Stepper(props: StepperProps): Element {
   const n = props.steps.length;
   const panelId = uid("hm-stepper-panel");
   let root!: HTMLElement, blob!: HTMLElement, frame: HTMLElement | null = null;
-  const rtl = (): boolean => globalThis.getComputedStyle?.(root)?.direction === "rtl";
+  const rtl = (): boolean => isRtl(root);
   /** The dot of step i, in px relative to the root (physical: measured). */
   const dotBox = (i: number): { x: number; y: number; w: number; h: number } | null => {
     const dot = root?.querySelectorAll<HTMLElement>(".hm-step2-dot")[i];

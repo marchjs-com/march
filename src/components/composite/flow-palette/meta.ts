@@ -8,7 +8,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add.",
   composedOf: ["SearchBox", "OverflowText"],
-  behaviors: ["motion engine", "drag layer", "fold search"],
+  behaviors: ["motion engine", "drag", "drag layer", "fold search"],
   hubs: ["h"],
   showcase: "/flow",
 });

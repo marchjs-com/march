@@ -17,6 +17,7 @@ import { ReactionPicker } from "../../social/reaction-picker/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import { measure } from "../../../motion/engine/clock.ts";
 import "./chat-thread.css";
+import { isRtl } from "../../../core/util.ts";
 
 export interface ChatMessage {
   id: string;
@@ -88,7 +89,7 @@ export function ChatThread(props: ChatThreadProps): Element {
   const enter = (el: HTMLElement, mine: boolean): void => {
     if (mine) animate(el, [{ transform: "translateY(28px) scale(.9)", opacity: 0 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { duration: 340, easing: "easeOutBack" });
     else {
-      const rtl = typeof getComputedStyle === "function" && getComputedStyle(el).direction === "rtl";
+      const rtl = isRtl(el);
       animate(el, [{ transform: `translateX(${rtl ? 16 : -16}px) scale(.96)`, opacity: 0 }, { transform: "translateX(0) scale(1)", opacity: 1 }], { duration: 280, easing: "easeOutCubic" });
     }
   };

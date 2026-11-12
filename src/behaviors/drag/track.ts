@@ -1,7 +1,8 @@
-// Pointer tracking inside an area: the shared drag of editors (color areas, sliders, curve handles, timeline heads,
-// crop frames). Positions come as 0–1 fractions of the area (x mirrored in RTL when asked) and as pixels; the pointer
-// is captured, so the drag continues outside the area. Listeners go with the owner (core/util › listen).
-import { listen, clamp } from "../core/util.ts";
+// track(): pointer drags measured inside an area, for editors (color areas, sliders, curve handles, timeline heads,
+// crop frames). Built on pointerDrag (capture, Escape, one session per press): positions come as 0–1 fractions of the
+// area (x mirrored in RTL when asked) and as pixels, and onMove runs on the press itself (a click on a track jumps).
+import { clamp, listen } from "../../core/util.ts";
+import { pointerDrag } from "./drag.ts";
 
 export interface TrackPoint {
   /** 0–1 across the area (from the inline start when `rtl` mirrors it). */
@@ -32,38 +33,33 @@ export interface TrackOptions {
   buttons?: number;
 }
 
-/** Track pointer drags that start on `el`. Returns a stop function (also run with the current owner). */
+/** Track pointer drags that start on `el`. Returns the cleanup (also run with the current owner). */
 export function track(el: Element, o: TrackOptions): () => void {
-  let start: { x: number; y: number } | null = null;
-  const point = (e: PointerEvent): TrackPoint => {
+  const point = (e: PointerEvent, x0: number, y0: number): TrackPoint => {
     const rect = (o.area?.() ?? el).getBoundingClientRect();
     const px = e.clientX - rect.left, py = e.clientY - rect.top;
     let x = rect.width ? px / rect.width : 0, y = rect.height ? py / rect.height : 0;
     if (o.rtl?.()) x = 1 - x;
     if (o.clamp !== false) { x = clamp(x, 0, 1); y = clamp(y, 0, 1); }
-    return { x, y, px, py, dx: e.clientX - (start?.x ?? e.clientX), dy: e.clientY - (start?.y ?? e.clientY), rect, event: e };
+    return { x, y, px, py, dx: e.clientX - x0, dy: e.clientY - y0, rect, event: e };
   };
-  let offMove: (() => void) | null = null;
-  const end = (e: PointerEvent): void => {
-    if (!start) return;
-    const p = point(e);
-    start = null;
-    offMove?.();
-    offMove = null;
-    o.onEnd?.(p);
+  const down = (e: PointerEvent): void => {
+    if (e.pointerType === "mouse" && !((o.buttons ?? 1) & (1 << e.button))) return;
+    const x0 = e.clientX, y0 = e.clientY;
+    const p = point(e, x0, y0);
+    if (o.onStart?.(p) === false) return;
+    e.preventDefault();
+    o.onMove(p);
+    let last = e;
+    const at = (q: { event: PointerEvent | null }): PointerEvent => (last = q.event ?? last);
+    pointerDrag(e, {
+      threshold: 0,
+      onMove: (q) => o.onMove(point(at(q), x0, y0)),
+      onEnd: (q) => o.onEnd?.(point(at(q), x0, y0)),
+      onClick: (u) => o.onEnd?.(point(u, x0, y0)),
+    });
   };
-  return listen(el, {
-    pointerdown: (e: PointerEvent) => {
-      if (e.pointerType === "mouse" && !((o.buttons ?? 1) & (1 << e.button))) return;
-      start = { x: e.clientX, y: e.clientY };
-      const p = point(e);
-      if (o.onStart?.(p) === false) { start = null; return; }
-      (el as HTMLElement).setPointerCapture?.(e.pointerId);
-      e.preventDefault();
-      o.onMove(p);
-      offMove = listen(el, { pointermove: (ev: PointerEvent) => { if (start) o.onMove(point(ev)); }, pointerup: end, pointercancel: end, lostpointercapture: end });
-    },
-  });
+  return listen(el, { pointerdown: down });
 }
 
 /** Arrow / Home / End / Page keys → a step (−1 … 1 per press, ×10 with Shift or Page keys); null for other keys. */

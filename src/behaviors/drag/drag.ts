@@ -3,7 +3,7 @@
 // capture, Escape cancels, and edge auto-scroll of a scroll container driven by the motion clock (onFrame), so global
 // pause and speed apply. Deltas include the container's scroll change: positions stay right while it scrolls.
 import { onFrame } from "../../motion/engine/clock.ts";
-import { listen } from "../../core/util.ts";
+import { listen, isRtl } from "../../core/util.ts";
 
 export interface DragPoint {
   /** Pointer movement since the start, plus the scroll container's scroll change (content coordinates). */
@@ -38,7 +38,7 @@ export function pointerDrag(down: PointerEvent, o: PointerDragOptions = {}): () 
   let started = false, done = false, cx = x0, cy = y0, last: PointerEvent | null = down;
   const target = down.target as Element | null;
   try { (target as HTMLElement | null)?.setPointerCapture?.(down.pointerId); } catch { /* synthetic event */ }
-  const rtl = !!target && globalThis.getComputedStyle?.(target)?.direction === "rtl";
+  const rtl = !!target && isRtl(target);
   const point = (): DragPoint => {
     const dx = cx - x0 + (sc ? Math.abs(sc.scrollLeft) - sl0 : 0) * (sc && sc.scrollLeft < 0 ? -1 : 1);
     return { dx, dy: cy - y0 + (sc ? sc.scrollTop - st0 : 0), di: rtl ? -dx : dx, clientX: cx, clientY: cy, event: last };

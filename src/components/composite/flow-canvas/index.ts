@@ -34,6 +34,8 @@ import {
   type FlowStore, type NodeState, type FlowEdge, type FlowGroup, type FlowField, type FlowView,
 } from "./model.ts";
 import { Minimap } from "./minimap.ts";
+import { pointerDrag } from "../../../behaviors/drag/index.ts";
+import { isRtl } from "../../../core/util.ts";
 export * from "./model.ts";
 export { Minimap } from "./minimap.ts";
 
@@ -73,7 +75,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   const paths = new Map<string, SVGPathElement>();
 
   // ---------------------------------------------------------------- coordinates
-  const rtl = (): boolean => globalThis.getComputedStyle?.(root)?.direction === "rtl";
+  const rtl = (): boolean => isRtl(root);
   /** Client point → logical screen point inside the canvas (x from the inline start). */
   const local = (cx0: number, cy0: number): { x: number; y: number; r: DOMRect } => {
     const r = root.getBoundingClientRect();
@@ -176,31 +178,27 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     const start = toWorld(e.clientX, e.clientY);
     const lead = flow.node(ids[0]!);
     const origin = new Map(ids.map((id) => { const n = flow.node(id)!; return [id, { x: n.x.peek(), y: n.y.peek() }]; }));
-    let moved = false;
-    const el = e.currentTarget as HTMLElement;
-    el.setPointerCapture?.(e.pointerId);
-    const off = listen(el, {
-      pointermove: (ev: PointerEvent) => {
-        const p = toWorld(ev.clientX, ev.clientY);
+    const restore = (): void => batch(() => { for (const [id, p] of origin) { const n = flow.node(id)!; n.x.set(p.x); n.y.set(p.y); } });
+    pointerDrag(e, {
+      threshold: 3,
+      onMove: (q) => {
+        const p = toWorld(q.clientX, q.clientY);
         let dx = p.x - start.x, dy = p.y - start.y;
-        if (!moved && Math.hypot(dx, dy) < 3) return;
-        moved = true;
         // snap the lead node; the others keep their offsets
         if (lead) { const o = origin.get(lead.id)!; dx = snapTo(o.x + dx) - o.x; dy = snapTo(o.y + dy) - o.y; }
         batch(() => { for (const [id, o] of origin) { const n = flow.node(id)!; n.x.set(o.x + dx); n.y.set(o.y + dy); } });
       },
-      pointerup: () => {
-        off();
-        if (!moved || !lead) return;
+      onEnd: (_q, cancelled) => {
+        if (!lead) return;
         const o = origin.get(lead.id)!, dx = lead.x.peek() - o.x, dy = lead.y.peek() - o.y;
-        batch(() => { for (const [id, p] of origin) { const n = flow.node(id)!; n.x.set(p.x); n.y.set(p.y); } });
-        flow.moveBy(ids, dx, dy);
+        restore();
+        if (!cancelled) flow.moveBy(ids, dx, dy); // one undo step; Escape puts the nodes back
       },
-      pointercancel: () => { off(); batch(() => { for (const [id, p] of origin) { const n = flow.node(id)!; n.x.set(p.x); n.y.set(p.y); } }); },
     });
   }
 
   // ---------------------------------------------------------------- pan, marquee, pinch
+  // (two pointers at once for pinch: the one multi-pointer gesture, so it keeps its own pointer map)
   const pointers = new Map<number, { x: number; y: number }>();
   function onBackgroundDown(e: PointerEvent): void {
     if (e.button === 2) return;
@@ -254,19 +252,18 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     e.stopPropagation();
     const a = untrack(() => portPoint(flow, ref, side));
     if (!a) return;
-    const el = e.currentTarget as HTMLElement;
-    el.setPointerCapture?.(e.pointerId);
     draft.set({ from: a, to: a, ref, side });
-    const off = listen(el, {
-      pointermove: (ev: PointerEvent) => { const p = toWorld(ev.clientX, ev.clientY); draft.set({ from: a, to: p, ref, side }); },
-      pointerup: (ev: PointerEvent) => {
-        off();
-        draft.set(null);
-        const hit = globalThis.document.elementFromPoint?.(ev.clientX, ev.clientY)?.closest?.<HTMLElement>(".hm-flow-port");
-        if (hit?.dataset.ref === ref) portActivate(ref, side); // a click: connect by choosing the other port next
-        else if (hit && hit.dataset.side !== side) { pending.set(null); finishConnect(ref, side, hit.dataset.ref!); }
-      },
-      pointercancel: () => { off(); draft.set(null); },
+    const drop = (x: number, y: number): void => {
+      draft.set(null);
+      const hit = globalThis.document.elementFromPoint?.(x, y)?.closest?.<HTMLElement>(".hm-flow-port");
+      if (hit?.dataset.ref === ref) portActivate(ref, side); // a click: connect by choosing the other port next
+      else if (hit && hit.dataset.side !== side) { pending.set(null); finishConnect(ref, side, hit.dataset.ref!); }
+    };
+    pointerDrag(e, {
+      threshold: 0,
+      onMove: (q) => draft.set({ from: a, to: toWorld(q.clientX, q.clientY), ref, side }),
+      onEnd: (q, cancelled) => (cancelled ? draft.set(null) : drop(q.clientX, q.clientY)),
+      onClick: (u) => drop(u.clientX, u.clientY),
     });
   }
   const pending = signal<{ ref: string; side: "in" | "out" } | null>(null);

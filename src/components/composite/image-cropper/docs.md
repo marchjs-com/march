@@ -35,4 +35,4 @@ the mirror button has `aria-pressed`; the result canvas is an image labelled "Cr
 
 ## Composed of
 
-Segmented (aspect), Slider (zoom, angle), IconButton (rotate, mirror, reset); `dom/track` for dragging.
+Segmented (aspect), Slider (zoom, angle), IconButton (rotate, mirror, reset); the drag behavior (`hadi-march/behaviors/drag`) for dragging.

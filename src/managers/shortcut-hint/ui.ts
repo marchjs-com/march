@@ -10,6 +10,7 @@ import { Kbd } from "../../ui/kbd.ts";
 import { openDialog } from "../../ui/dialog.ts";
 import { shortcutHints, comboOf, type ShortcutEntry } from "./index.ts";
 import tr from "./tr.ts";
+import { isRtl } from "../../core/util.ts";
 
 messages("tr", tr);
 
@@ -21,7 +22,7 @@ function badges(): HTMLElement {
     const combo = comboOf(el);
     const r = el.getBoundingClientRect();
     if (!combo || (!r.width && !r.height) || r.bottom < 0 || r.top > (globalThis.innerHeight ?? 0)) continue;
-    const rtl = globalThis.getComputedStyle?.(el).direction === "rtl";
+    const rtl = isRtl(el);
     const b = h("span", { class: "hm-shortcut-badge" }, combo.split(/\s+/).map(formatKey).join(" ")) as HTMLElement;
     b.style.setProperty("top", `${r.top}px`);
     b.style.setProperty("inset-inline-start", `${Math.max(0, rtl ? w - r.right : r.left)}px`);

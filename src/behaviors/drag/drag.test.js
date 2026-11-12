@@ -49,3 +49,32 @@ test("draggable: Escape cancels; right button and disabled do not start", () => 
   assert.deepEqual(log, []);
   el.remove();
 });
+
+test("track: fractions of the area from the press on, RTL mirror, clamped, ends on release or Escape", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  el.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100, right: 200, bottom: 100, x: 0, y: 0 });
+  const log = [];
+  let rtl = false;
+  const off = D.track(el, { rtl: () => rtl, onMove: (p) => log.push(`m ${p.x.toFixed(2)},${p.y.toFixed(2)} ${p.dx}`), onEnd: (p) => log.push(`e ${p.x.toFixed(2)}`) });
+  el.dispatchEvent(ptr("pointerdown", 50, 50)); document.dispatchEvent(ptr("pointermove", 300, 50)); document.dispatchEvent(ptr("pointerup", 300, 50));
+  assert.deepEqual(log, ["m 0.25,0.50 0", "m 1.00,0.50 250", "e 1.00"]);
+  log.length = 0; rtl = true;
+  el.dispatchEvent(ptr("pointerdown", 50, 0)); document.dispatchEvent(ptr("pointerup", 50, 0));
+  assert.deepEqual(log, ["m 0.75,0.00 0", "e 0.75"], "a click jumps and ends");
+  log.length = 0;
+  el.dispatchEvent(ptr("pointerdown", 0, 0)); document.dispatchEvent(ptr("pointermove", 100, 0));
+  document.dispatchEvent(Object.assign(new Event("keydown", { bubbles: true, cancelable: true }), { key: "Escape" }));
+  document.dispatchEvent(ptr("pointermove", 150, 0));
+  assert.equal(log.length, 3, "press, move, end; nothing after Escape");
+  off();
+  el.dispatchEvent(ptr("pointerdown", 0, 0));
+  assert.equal(log.length, 3);
+});
+
+test("arrowStep: arrows, Shift ×10, RTL swaps left and right", () => {
+  const k = (key, shiftKey = false) => ({ key, shiftKey });
+  assert.deepEqual(D.arrowStep(k("ArrowRight")), { dx: 1, dy: 0 });
+  assert.deepEqual(D.arrowStep(k("ArrowRight"), true), { dx: -1, dy: 0 });
+  assert.deepEqual(D.arrowStep(k("ArrowUp", true)), { dx: 0, dy: -10 });
+  assert.equal(D.arrowStep(k("a")), null);
+});

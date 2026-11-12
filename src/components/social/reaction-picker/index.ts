@@ -8,6 +8,7 @@ import { plus } from "../../../icons/glyphs/plus.ts";
 import { roving } from "../../../ui/focus.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./reaction-picker.css";
+import { isRtl } from "../../../core/util.ts";
 
 /** Default quick-reaction row: the six emoji shown under a message. */
 export const QUICK_REACTIONS: readonly string[] = ["❤️", "😂", "😮", "😢", "🙏", "👍"];
@@ -34,7 +35,7 @@ export function ReactionPicker(props: ReactionPickerProps): Element {
   let root!: HTMLElement;
   const items = (): HTMLButtonElement[] => [...root.querySelectorAll<HTMLButtonElement>("button")];
   const key = (e: KeyboardEvent): void => {
-    const rtl = typeof getComputedStyle === "function" && getComputedStyle(root).direction === "rtl";
+    const rtl = isRtl(root);
     const grid = val(props.layout) === "grid";
     let k = e.key;
     if (rtl && (k === "ArrowLeft" || k === "ArrowRight")) k = k === "ArrowLeft" ? "ArrowRight" : "ArrowLeft";

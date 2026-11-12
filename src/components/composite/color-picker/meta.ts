@@ -7,7 +7,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast.",
   composedOf: ["IconButton", "Segmented"],
-  behaviors: ["dom/track (pointer drag)", "motion engine color parser", "theme contrast"],
+  behaviors: ["drag", "motion engine color parser", "theme contrast"],
   hubs: [],
   showcase: "/editors",
 });

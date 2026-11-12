@@ -2,6 +2,7 @@
 // move inside it (ArrowLeft / ArrowRight swap in RTL). The FocusManager's focus.roving() and focus:roving are this.
 //   const stop = rovingFocus(toolbar, { orientation: "horizontal" })     <div use:rovingFocus={[rovingFocus, { … }]}>
 import { roving as rovingKey } from "../../ui/focus.ts";
+import { isRtl } from "../../core/util.ts";
 
 /** Options of rovingFocus(). */
 export interface RovingOptions {
@@ -36,7 +37,7 @@ export function rovingFocus(container: HTMLElement, opts: RovingOptions = {}): (
   // RTL: in a right-to-left container ArrowLeft means "next"
   const onKeyDir = (e: Event): void => {
     const k = e as KeyboardEvent;
-    const rtl = o !== "vertical" && (k.key === "ArrowLeft" || k.key === "ArrowRight") && globalThis.getComputedStyle?.(container).direction === "rtl";
+    const rtl = o !== "vertical" && (k.key === "ArrowLeft" || k.key === "ArrowRight") && isRtl(container);
     if (!rtl) return onKey(e);
     const flipped = { key: k.key === "ArrowLeft" ? "ArrowRight" : "ArrowLeft", target: k.target, preventDefault: () => k.preventDefault() } as unknown as KeyboardEvent;
     const moved = rovingKey(flipped, items(), { horizontal: true, wrap: opts.wrap ?? true });

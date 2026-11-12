@@ -6,13 +6,14 @@ import { signal, computed } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { openLayer } from "../../../dom/portal.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, uid, icon, listen, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, uid, icon, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 import { SearchBox } from "../../../ui/layout.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
 import { score } from "../../../ui/fold.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
+import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { NODE_W, type FlowStore, type FlowNodeType } from "../flow-canvas/model.ts";
 export interface FlowPaletteProps {
   flow: FlowStore;
@@ -57,12 +58,13 @@ export function FlowPalette(props: FlowPaletteProps): Element {
     const dx = e.clientX - r.left, dy = e.clientY - r.top;
     let ghost: HTMLElement | null = null, close: (() => void) | null = null;
     const x0 = e.clientX, y0 = e.clientY;
-    card.setPointerCapture?.(e.pointerId);
     const place = (x: number, y: number): void => setStyle(ghost, { left: `${x - dx}px`, top: `${y - dy}px` });
-    const off = listen(card, {
-      pointermove: (ev: PointerEvent) => {
+    pointerDrag(e, {
+      threshold: 5,
+      onClick: () => add(ty),
+      onMove: (q) => {
+        const ev = { clientX: q.clientX, clientY: q.clientY };
         if (!ghost) {
-          if (Math.hypot(ev.clientX - x0, ev.clientY - y0) < 5) return;
           ghost = card.cloneNode(true) as HTMLElement;
           ghost.classList.add("hm-flowpal-ghost");
           ghost.removeAttribute("id");
@@ -75,10 +77,10 @@ export function FlowPalette(props: FlowPaletteProps): Element {
         const over = !!flow.view.peek()?.toWorld(ev.clientX, ev.clientY);
         ghost.classList.toggle("is-over", over);
       },
-      pointerup: (ev: PointerEvent) => {
-        off();
+      onEnd: (q, cancelled) => {
         card.classList.remove("is-dragging");
-        if (!ghost) { add(ty); return; } // a click
+        if (cancelled || !ghost) { close?.(); return; }
+        const ev = { clientX: q.clientX, clientY: q.clientY };
         const p = flow.view.peek()?.toWorld(ev.clientX - dx, ev.clientY - dy);
         const inside = !!flow.view.peek()?.toWorld(ev.clientX, ev.clientY);
         const g = ghost, done = close;
@@ -88,7 +90,6 @@ export function FlowPalette(props: FlowPaletteProps): Element {
         const back = inside ? [{ opacity: 1, transform: "scale(1.04)" }, { opacity: 0, transform: "scale(.9)" }] : [{ opacity: 1, translate: "0 0" }, { opacity: .2, translate: `${x0 - ev.clientX}px ${y0 - ev.clientY}px` }];
         animate(g, back, { duration: inside ? 180 : 280, easing: "out", fill: "forwards" }).finished.then(() => done?.());
       },
-      pointercancel: () => { off(); card.classList.remove("is-dragging"); close?.(); },
     });
   }
 

@@ -19,6 +19,7 @@ import type { Row as DefaultRow, TableColumn } from "./filters.ts";
 import { createVirtual, type Virtual } from "./virtual.ts";
 import { clamp, uid, debounce } from "../core/util.ts";
 import { FilterControl, CellEditor } from "./controls.ts";
+import { resizeHandle } from "../behaviors/resize-handle/index.ts";
 export { FilterControl, CellEditor };
 
 const INTERACTIVE = "button,input,select,textarea,a,label,summary,details,[data-no-row-click]";
@@ -343,28 +344,10 @@ function ResizeHandle<R>(table: TableState<R>, col: TableColumn<R>): Element {
   const key = col.key as string;
   const cur = (): number | null => table.widthOf(key);
   const startW = (el: Element): number => untrack(cur) ?? (el.closest("th")?.getBoundingClientRect().width || 160);
-  const rtl = (el: Element): boolean => el.closest?.("[dir=rtl]") != null;
+  // drag / arrows (RTL mirrored, Shift ×5) / Home: the resize-handle behavior
   return h("span", {
-    role: "separator", class: "hm-table-resize", tabindex: "0", "aria-orientation": "vertical",
-    "aria-label": t`Resize ${col.label}`, "aria-valuemin": col.minWidth, "aria-valuenow": () => cur() ?? null,
-    onClick: (e: Event) => e.stopPropagation(),
-    onKeyDown: (e: KeyboardEvent) => {
-      const el = e.target as Element;
-      const step = e.shiftKey ? 50 : 10, sign = rtl(el) ? -1 : 1;
-      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-        e.preventDefault(); e.stopPropagation();
-        table.setWidth(key, startW(el) + (e.key === "ArrowRight" ? step : -step) * sign);
-      } else if (e.key === "Home") { e.preventDefault(); e.stopPropagation(); table.setWidth(key, col.minWidth); }
-    },
-    onPointerDown: (e: PointerEvent) => {
-      e.preventDefault(); e.stopPropagation();
-      const el = e.target as Element;
-      const x0 = e.clientX, w0 = startW(el), sign = rtl(el) ? -1 : 1, win = globalThis;
-      const move = (m: PointerEvent): void => table.setWidth(key, w0 + (m.clientX - x0) * sign);
-      const up = (): void => { win.removeEventListener("pointermove", move); win.removeEventListener("pointerup", up); };
-      win.addEventListener("pointermove", move);
-      win.addEventListener("pointerup", up);
-    },
+    class: "hm-table-resize", "aria-label": t`Resize ${col.label}`,
+    ref: (el: HTMLElement) => resizeHandle(el, { value: () => startW(el), set: (w) => table.setWidth(key, w), min: col.minWidth, step: 10, bigStep: 50 }),
   });
 }
 

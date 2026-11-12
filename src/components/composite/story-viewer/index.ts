@@ -17,6 +17,7 @@ import { StoryProgress } from "../../social/story-progress/index.ts";
 import { LikeButton } from "../../social/like-button/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./story-viewer.css";
+import { isRtl } from "../../../core/util.ts";
 
 export interface StoryItem { id: string; src: string; alt?: string | undefined; time?: Date | string | number | undefined; caption?: string | undefined; /** ms. */ duration?: number | undefined }
 export interface StoryGroup { id: string; name: string; avatar?: string | undefined; items: readonly StoryItem[] }
@@ -55,7 +56,7 @@ function body(props: StoryViewerProps): Element {
   const paused = (): boolean => hold() || manual() || typing();
   let root!: HTMLElement, stage!: HTMLElement, input!: HTMLInputElement;
 
-  const rtl = (): boolean => typeof getComputedStyle === "function" && !!root && getComputedStyle(root).direction === "rtl";
+  const rtl = (): boolean => isRtl(root);
   const slide = (dir: 1 | -1): void => {
     const s = (rtl() ? -dir : dir) * 28;
     animate(stage, [{ transform: `translateX(${s}%) scale(.94)`, opacity: 0.3 }, { transform: "translateX(0) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutCubic" });

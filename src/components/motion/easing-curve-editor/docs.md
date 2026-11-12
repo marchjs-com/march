@@ -32,4 +32,4 @@ as a label. Time runs left to right in every writing direction.
 
 ## Composed of
 
-Built on the motion engine (`ease`, `defineEasing`, `onFrame`) and `dom/track`.
+Built on the motion engine (`ease`, `defineEasing`, `onFrame`) and the drag behavior (`hadi-march/behaviors/drag`).

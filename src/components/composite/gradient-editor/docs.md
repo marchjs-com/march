@@ -30,4 +30,4 @@ label. The stop bar keeps the gradient's own left-to-right axis in every writing
 
 ## Composed of
 
-ColorPicker (selected stop), Segmented (type), IconButton (copy); `dom/track` for dragging.
+ColorPicker (selected stop), Segmented (type), IconButton (copy); the drag behavior (`hadi-march/behaviors/drag`) for dragging.

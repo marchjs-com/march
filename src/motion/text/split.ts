@@ -49,14 +49,7 @@ const span = (doc: Document, cls: string): HTMLElement => {
 };
 const HIDDEN = { position: "absolute", width: "1px", height: "1px", margin: "-1px", padding: "0", overflow: "hidden", "clip-path": "inset(50%)", "white-space": "nowrap", border: "0" };
 
-/** True when the element's text runs right to left. */
-export function isRtl(el: Element): boolean {
-  try {
-    const d = globalThis.getComputedStyle?.(el)?.direction;
-    if (d) return d === "rtl";
-  } catch { /* detached */ }
-  return el.closest?.("[dir]")?.getAttribute("dir") === "rtl";
-}
+export { isRtl } from "../../core/util.ts";
 
 /** Split `el` into characters, words or lines (see the module comment). Splitting again reverts the earlier split. */
 export function splitText(el: HTMLElement, by: SplitBy = "char"): SplitText {

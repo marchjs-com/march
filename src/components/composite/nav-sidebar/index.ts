@@ -23,7 +23,8 @@ import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { clock } from "../../../icons/glyphs/clock.ts";
 import { panelLeft } from "../../../icons/glyphs/panelLeft.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
-import { clamp, listen } from "../../../core/util.ts";
+import { clamp } from "../../../core/util.ts";
+import { resizeHandle } from "../../../behaviors/resize-handle/index.ts";
 
 /** One NavSidebar entry. `href` navigates (router Link); `onSelect` runs instead. */
 export interface NavSidebarItem {
@@ -281,40 +282,22 @@ export function NavSidebar(props: NavSidebarProps): Element {
     props.onResize?.(w);
     if (done) persist();
   };
-  const rtl = (): boolean => (navEl ? globalThis.getComputedStyle?.(navEl).direction === "rtl" : false);
   if (props.resizable && typeof globalThis.ResizeObserver === "function") {
     const ro = new ResizeObserver(() => { if (navEl) shownWidth.set(Math.round(navEl.getBoundingClientRect().width)); });
     queueMicrotask(() => { if (navEl) ro.observe(navEl); });
     onCleanup(() => ro.disconnect());
   }
   const grip = (): unknown => !props.resizable ? null : h("div", {
-    class: () => cx("hm-sb-resize", resizing() && "is-dragging"), role: "separator", tabindex: "0", "aria-orientation": "vertical", "aria-controls": navId,
-    "aria-label": () => t`Resize sidebar`, "aria-valuemin": String(minW), "aria-valuemax": String(maxW), "aria-valuenow": () => String(width() ?? shownWidth()),
-    onPointerdown: (e: PointerEvent) => {
-      if (e.button > 0) return;
-      e.preventDefault();
-      const handle = e.currentTarget as HTMLElement;
-      handle.setPointerCapture?.(e.pointerId);
-      const doc = globalThis.document.documentElement;
-      doc.classList.add("hm-sb-resizing");
-      resizing.set(true);
-      const edge = navEl?.getBoundingClientRect();
-      const move = (ev: PointerEvent): void => { if (edge) setWidth(rtl() ? edge.right - ev.clientX : ev.clientX - edge.left); };
-      const up = (): void => {
-        off();
-        doc.classList.remove("hm-sb-resizing"); resizing.set(false); persist(); if (width.peek() != null) props.onResize?.(width.peek() as number);
-      };
-      const off = listen(handle, { pointermove: move, pointerup: up, pointercancel: up });
-    },
-    onDblclick: () => { width.set(null); if (rail.peek() && props.collapseBelow != null) rail.set(false); persist(); props.onResize?.(currentPx()); },
-    onKeydown: (e: KeyboardEvent) => {
-      const step = e.shiftKey ? 64 : 16, grow = rtl() ? "ArrowLeft" : "ArrowRight", shrink = rtl() ? "ArrowRight" : "ArrowLeft";
-      const to = e.key === grow ? currentPx() + step : e.key === shrink ? currentPx() - step : e.key === "Home" ? minW : e.key === "End" ? maxW : null;
-      if (to == null) return;
-      e.preventDefault();
-      if (rail.peek() && to > currentPx()) rail.set(false);
-      setWidth(to, true);
-    },
+    class: () => cx("hm-sb-resize", resizing() && "is-dragging"), "aria-controls": navId, "aria-label": () => t`Resize sidebar`,
+    // drag / arrows (RTL mirrored) / Home / End / Enter or double click resets: the resize-handle behavior. The range
+    // goes below minW when the sidebar can fold to its rail (setWidth folds it under collapseBelow).
+    ref: (x: HTMLElement) => resizeHandle(x, {
+      value: currentPx, min: props.collapseBelow != null ? 0 : minW, max: maxW, step: 16,
+      set: (to, done) => { if (rail.peek() && to > currentPx()) rail.set(false); setWidth(to, done); },
+      reset: () => { width.set(null); if (rail.peek() && props.collapseBelow != null) rail.set(false); persist(); props.onResize?.(currentPx()); },
+      onStart: () => { globalThis.document.documentElement.classList.add("hm-sb-resizing"); resizing.set(true); },
+      onEnd: () => { globalThis.document.documentElement.classList.remove("hm-sb-resizing"); resizing.set(false); },
+    }),
   });
   return h("div", { class: () => cx("hm-nav-wrap", "hm-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--hm-sb-w", w); } },
     h("button", { type: "button", class: "hm-icon-btn hm-nav-burger", "aria-controls": navId, "aria-expanded": () => String(drawer()), "aria-label": () => t`Menu`, onClick: () => drawer.update((x) => !x) }, glyph(menu)),

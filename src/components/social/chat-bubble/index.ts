@@ -15,6 +15,7 @@ import { smile } from "../../../icons/glyphs/smile.ts";
 import { arrowLeft } from "../../../icons/glyphs/arrowLeft.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./chat-bubble.css";
+import { isRtl } from "../../../core/util.ts";
 
 export type MessageStatus = "sending" | "sent" | "delivered" | "read" | "failed";
 export interface Reaction { emoji: string; count: number; mine?: boolean | undefined }
@@ -55,7 +56,7 @@ export function ChatBubble(props: ChatBubbleProps): Element {
   const mine = (): boolean => !!val(props.mine);
   // drag to reply: toward the inline end for theirs, toward the start for mine (away from the edge it hugs)
   let sx = 0, sy = 0, d = 0, on = false, side = false;
-  const dirSign = (): number => { const rtl = typeof getComputedStyle === "function" && getComputedStyle(row).direction === "rtl"; return (mine() ? -1 : 1) * (rtl ? -1 : 1); };
+  const dirSign = (): number => { const rtl = isRtl(row); return (mine() ? -1 : 1) * (rtl ? -1 : 1); };
   const down = (e: PointerEvent): void => { if (!props.onReply || e.button > 0 || (e.target as Element).closest("button, a")) return; sx = e.clientX; sy = e.clientY; on = true; side = false; d = 0; };
   const move = (e: PointerEvent): void => {
     if (!on) return;

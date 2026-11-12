@@ -5,9 +5,9 @@
 import "./image-cropper.css";
 import { signal, computed, effect, untrack, batch, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { track } from "../../../dom/track.ts";
+import { track } from "../../../behaviors/drag/index.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { cx, uid, val, clamp, setStyle, on, debounce, type ClassProp } from "../../../core/util.ts";
+import { cx, uid, val, clamp, setStyle, on, debounce, type ClassProp, isRtl } from "../../../core/util.ts";
 import { glyph } from "../../../ui/util.ts";
 import { model, ctl, type ControlProps } from "../../../forms/util.ts";
 import { IconButton } from "../../../ui/button.ts";
@@ -103,7 +103,7 @@ export function ImageCropper(props: ImageCropperProps): unknown {
       onStart: () => { if (ro()) return false; start = { ...st.peek() }; busy.set(true); },
       onMove: (p) => {
         if (!start) return;
-        const rtl = globalThis.getComputedStyle?.(viewport).direction === "rtl";
+        const rtl = isRtl(viewport);
         const dx = (p.dx * 2 * (rtl ? -cxn : cxn)) / p.rect.width, dy = (p.dy * 2 * cyn) / p.rect.height;
         if (start.aspect) { const d = Math.abs(dx) > Math.abs(dy) ? dx : dy; change({ w: start.w + d, h: start.h + d }); }
         else change({ w: start.w + dx, h: start.h + dy });

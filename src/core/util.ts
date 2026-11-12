@@ -86,6 +86,16 @@ export const doc = (): Document => globalThis.document;
 export const arr = <T>(x: unknown): T[] => (Array.isArray(x) ? (x as T[]) : []);
 
 /** `v` kept between `lo` and `hi` (`lo` wins when they cross): `Math.max(lo, Math.min(hi, v))`. */
+/** True when the element's text runs right to left (computed `direction`, else the nearest `dir` attribute). */
+export function isRtl(el: Element | null | undefined): boolean {
+  if (!el) return false;
+  try {
+    const d = globalThis.getComputedStyle?.(el)?.direction;
+    if (d) return d === "rtl";
+  } catch { /* detached */ }
+  return el.closest?.("[dir]")?.getAttribute("dir") === "rtl";
+}
+
 export const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v));
 /** Linear blend from `a` (t = 0) to `b` (t = 1). */
 export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
