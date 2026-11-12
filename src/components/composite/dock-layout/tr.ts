@@ -4,7 +4,6 @@ const tr: Record<string, string> = {
   "{0} minimized": "{0} küçültüldü",
   "{0} moved: {1}": "{0} taşındı: {1}",
   "start": "başa", "end": "sona", "top": "üste", "bottom": "alta", "tab": "sekme", "floating": "yüzen pencere",
-  "Close": "Kapat",
   "Close panel": "Paneli kapat",
   "Dock": "Yerleştir",
   "Float": "Yüzdür",

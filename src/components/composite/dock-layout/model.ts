@@ -1,5 +1,6 @@
 // DockLayout state: a binary tree of splits whose leaves are tab groups, plus floating groups and minimized panels.
 // Plain JSON (save / load it as is). Every operation takes a state and returns a new one; nothing here touches the DOM.
+import { clamp } from "../../../core/util.ts";
 
 /** A tab group: panel ids in tab order and the active one. */
 export interface DockGroupNode { type: "group"; id: string; panels: string[]; active: string | null }
@@ -92,7 +93,7 @@ export function insertPanel(state: DockState, panel: string, target: string, zon
   const t = findGroup(s, target);
   if (!t) return insertPanel(s, panel, "@root", zone === "center" ? "end" : zone);
   if (zone === "center") {
-    t.panels.splice(index == null ? t.panels.length : Math.max(0, Math.min(index, t.panels.length)), 0, panel);
+    t.panels.splice(index == null ? t.panels.length : clamp(index, 0, t.panels.length), 0, panel);
     t.active = panel;
     return s;
   }
