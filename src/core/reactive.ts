@@ -146,9 +146,11 @@ function run(c: Computation): void {
   Listener = prevL; Owner = prevO;
   if (!c.effect && !c.equals(c.value, next)) {
     c.value = next;
+    // an effect that was clean is not queued yet (a stale one is): no scan of the queue per observer
     if (c.observers) for (const o of c.observers) {
+      const was = o.state;
       o.state = DIRTY;
-      if (o.effect) { if (!queue.includes(o)) queue.push(o); } else markObservers(o, CHECK);
+      if (o.effect) { if (was === CLEAN) queue.push(o); } else markObservers(o, CHECK);
     }
   } else c.value = next;
 }

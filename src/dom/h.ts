@@ -211,10 +211,13 @@ function setClass(el: MarchEl, v: unknown): void {
     return;
   }
   el.__hmUser = v;
-  let s: unknown = v;
-  if (Array.isArray(v)) s = v.filter(Boolean).join(" ");
-  else if (v && typeof v === "object") s = Object.keys(v).filter((k) => (v as Record<string, unknown>)[k]).join(" ");
-  el.setAttribute("class", [s ?? "", el.__hmClass ?? ""].join(" ").trim());
+  // one pass, no intermediate arrays: array entries / object keys whose value is truthy, then the sx classes
+  let s = "";
+  if (Array.isArray(v)) { for (const x of v) if (x) s += ` ${x}`; }
+  else if (v && typeof v === "object") { for (const k in v) if ((v as Record<string, unknown>)[k]) s += ` ${k}`; }
+  else if (v != null) s = ` ${v}`;
+  if (el.__hmClass) s += ` ${el.__hmClass}`;
+  el.setAttribute("class", s.trim());
 }
 
 // Event delegation: `onClick`, `onInput`, `onKeyDown`… without modifiers, on elements of a tree mounted with render()
@@ -259,11 +262,12 @@ function listen(el: Element, key: string, handler: unknown): void {
       return;
     }
   }
+  // modifiers read once, not on every event
+  const self = mods.includes("self"), trusted = mods.includes("trusted"), prevent = mods.includes("prevent"), stop = mods.includes("stop");
   const fn = (e: Event): void => {
-    if (mods.includes("self") && e.target !== el) return;
-    if (mods.includes("trusted") && !e.isTrusted) return;
-    if (mods.includes("prevent")) e.preventDefault();
-    if (mods.includes("stop")) e.stopPropagation();
+    if ((self && e.target !== el) || (trusted && !e.isTrusted)) return;
+    if (prevent) e.preventDefault();
+    if (stop) e.stopPropagation();
     batch(() => (handler as (this: Element, e: Event) => void).call(el, e));
   };
   const opts = { capture: mods.includes("capture"), once: mods.includes("once"), passive: mods.includes("passive") };
