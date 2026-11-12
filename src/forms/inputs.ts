@@ -280,7 +280,7 @@ export function Checkbox(props: CheckboxProps): unknown {
     ...ctl(props), type: "checkbox", class: "hm-check-input", checked: () => !!get(), indeterminate: () => !!props.indeterminate,
     disabled: () => !!(props.disabled || props.readonly), onChange: (e: Event) => set(inputOf(e).checked),
   });
-  return h("span", { class: cx(lookClass(props, "checkbox"), "hm-choice-single", props.class), "data-hm-color": colorAttr(props.color) },
+  return h("span", { class: () => cx(lookClass(props, "checkbox"), "hm-choice-single", typeof props.class === "function" ? (props.class as () => unknown)() : props.class), "data-hm-color": () => colorAttr(props.color) },
     h("label", { class: "hm-check" }, input, choiceBox("checkbox", props), choiceText(() => props.label ?? props.children, props.hint, props.icon && props.variant === "card" ? props.icon : null, props.variant)));
 }
 
@@ -307,7 +307,7 @@ export interface ChoiceGroupLook extends ChoiceLook {
 }
 
 export interface CheckboxGroupProps<T = unknown> extends ControlProps<T[]>, ChoiceGroupLook {
-  /** [{ value, label, hint?, icon?, disabled? }] (icon and hint show in the card variant). */
+  /** [{ value, label, hint?, icon?, meta?, disabled? }] (icon, hint and meta — a price or badge — show in the card variant). */
   options?: OptionsProp;
   inline?: boolean | undefined;
 }
@@ -321,15 +321,15 @@ export function CheckboxGroup<T = unknown>(props: CheckboxGroupProps<T>): unknow
   const field = useField();
   const baseId = props.id ?? field?.id ?? uid("hm-cbg");
   const c = ctl(props);
-  return h("div", { "data-hm-color": colorAttr(props.color), role: "group", class: groupClass(props, "checkbox"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
-    () => normOptions(props.options).map((o, i) => h("label", { class: "hm-check", "data-hm-color": itemColor(props.colors, i) },
+  return h("div", { "data-hm-color": () => colorAttr(props.color), role: "group", class: () => groupClass(props, "checkbox"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
+    () => normOptions(props.options).map((o, i) => h("label", { class: "hm-check", "data-hm-color": () => itemColor(props.colors, i) },
       h("input", {
         type: "checkbox", class: "hm-check-input", id: i ? `${baseId}-${i}` : baseId, name: props.name, onBlur: props.onBlur,
         checked: () => (get() ?? []).some((x) => same(x, o.value)), disabled: () => !!(props.disabled || props.readonly || o.disabled),
         onChange: (e: Event) => { const cur = (untrack(get) ?? []).filter((x) => !same(x, o.value)); set(inputOf(e).checked ? [...cur, o.value as T] : cur); },
       }),
       choiceBox("checkbox", props),
-      choiceText(o.label, o.hint, o["icon"], props.variant))));
+      choiceText(o.label, o.hint, o["icon"], props.variant, o["meta"]))));
 }
 
 export interface RadioGroupProps<T = unknown> extends ControlProps<T | null>, ChoiceGroupLook {
@@ -344,15 +344,15 @@ export function RadioGroup<T = unknown>(props: RadioGroupProps<T>): unknown {
   const baseId = props.id ?? field?.id ?? uid("hm-rg");
   const name = props.name ?? baseId;
   const c = ctl(props);
-  return h("div", { "data-hm-color": colorAttr(props.color), role: "radiogroup", class: groupClass(props, "radio"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
-    () => normOptions(props.options).map((o, i) => h("label", { class: "hm-check", "data-hm-color": itemColor(props.colors, i) },
+  return h("div", { "data-hm-color": () => colorAttr(props.color), role: "radiogroup", class: () => groupClass(props, "radio"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
+    () => normOptions(props.options).map((o, i) => h("label", { class: "hm-check", "data-hm-color": () => itemColor(props.colors, i) },
       h("input", {
         type: "radio", class: "hm-check-input", id: i ? `${baseId}-${i}` : baseId, name, onBlur: props.onBlur,
         checked: () => same(get(), o.value), disabled: () => !!(props.disabled || props.readonly || o.disabled),
         onChange: (e: Event) => { if (inputOf(e).checked) set(o.value as T); },
       }),
       choiceBox("radio", props),
-      choiceText(o.label, o.hint, o["icon"], props.variant))));
+      choiceText(o.label, o.hint, o["icon"], props.variant, o["meta"]))));
 }
 
 export interface SegmentedProps<T = unknown> extends ControlProps<T | null> {

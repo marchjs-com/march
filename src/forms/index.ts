@@ -11,6 +11,7 @@ export { TextInput, Textarea, PasswordInput, EmailInput, UrlInput, PhoneInput, N
 export type { AffixProps, TextAttrProps, TextInputProps, TextareaProps, PasswordInputProps, PhoneInputProps, NumberInputProps, MoneyInputProps,
   PercentInputProps, SelectProps, CheckboxProps, ToggleProps, CheckboxGroupProps, RadioGroupProps, SegmentedProps, SliderProps, ColorInputProps,
   CodeInputProps } from "./inputs.ts";
+export { shapesFor, type ChoiceVariant, type ChoiceSize, type ChoiceShape, type ChoiceLook } from "./choice.ts";
 export { Combobox, MultiSelect } from "./pickers.ts";
 export type { ComboboxProps, MultiSelectProps } from "./pickers.ts";
 export { Calendar, DatePicker, TimeInput, DateTimeInput, DateRangePicker, rangePresets, parseDate, formatDate, addDays, addMonths, todayIso, firstDayOf } from "./date.ts";

@@ -43,18 +43,52 @@ test("selection controls: drawn box over a real input, variants, brand colors pe
     h(U.Checkbox, { variant: "soft", size: "lg", shape: "circle", indeterminate: true, label: "x" }),
   ]);
   const [group, radios, single] = el.children;
-  assert.match(group.getAttribute("class"), /hm-choices hm-choice hm-choice-chip hm-choice-md hm-shape-rounded/);
+  assert.match(group.getAttribute("class"), /hm-choices hm-choice hm-choice-chip hm-choice-md hm-shape-circle/);
   assert.deepEqual([...group.querySelectorAll(".hm-check")].map((l) => l.getAttribute("data-hm-color")), ["brand-orange", "brand-blue", "brand-green", "brand-purple", "brand-orange"]);
   for (const l of group.querySelectorAll(".hm-check")) {
     assert.ok(l.querySelector('input[type="checkbox"].hm-check-input'), "the real input stays (keyboard, forms, screen readers)");
     assert.equal(l.querySelector(".hm-check-box").getAttribute("aria-hidden"), "true");
     assert.ok(l.querySelector(".hm-check-box .hm-check-mark"), "drawn tick");
   }
-  assert.ok(radios.querySelector(".hm-radio-dot") && radios.querySelector(".hm-choice-card-title").textContent === "One" && radios.querySelector(".hm-choice-card-desc").textContent === "first");
-  assert.match(radios.getAttribute("class"), /hm-shape-circle/, "radios are round");
+  assert.ok(!radios.querySelector(".hm-radio-dot") && radios.querySelector(".hm-check-mark"), "a radio card shows a tick badge, not a dot");
+  assert.ok(radios.querySelector(".hm-choice-card-title").textContent === "One" && radios.querySelector(".hm-choice-card-desc").textContent === "first");
+  assert.match(radios.getAttribute("class"), /hm-choice-radio/, "radio boxes are round (CSS)");
   assert.match(single.getAttribute("class"), /hm-choice-soft hm-choice-lg hm-shape-circle/);
   assert.equal(single.querySelector("input").indeterminate, true);
   const css = read("forms/choice.css");
   assert.match(css, /\.hm-check-input:checked:not\(:indeterminate\) \+ \.hm-check-box \.hm-check-mark path \{ stroke-dashoffset: 0; \}/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test("selection controls: size and shape change every variant; impossible shapes are reported", async () => {
+  const U2 = await import("../src/forms/choice.ts");
+  const css = read("forms/choice.css");
+  // size and shape act through variables that every variant reads
+  for (const v of ["--hm-ch-size", "--hm-ch-pad-y", "--hm-ch-card-pad", "--hm-ch-icon"]) assert.match(css, new RegExp(`\.hm-choice-(sm|lg) \{[^}]*${v}:`), v);
+  for (const v of ["--hm-ch-radius", "--hm-ch-item-radius", "--hm-ch-card-radius"]) assert.match(css, new RegExp(`\.hm-choice\.hm-shape-square \{[^}]*${v}:`), v);
+  assert.match(css, /\.hm-choice-chip \.hm-check \{[^}]*padding: var\(--hm-ch-pad-y\) var\(--hm-ch-pad-x\); border: 1px solid var\(--hm-border-strong\); border-radius: var\(--hm-ch-item-radius\)/);
+  assert.match(css, /\.hm-choice-toggle \.hm-check, \.hm-choice-segmented \.hm-check \{[^}]*padding: var\(--hm-ch-pad-y\) var\(--hm-ch-pad-x\); border-radius: var\(--hm-ch-item-radius\)/);
+  assert.match(css, /border-radius: var\(--hm-ch-card-radius\)/);
+  assert.deepEqual(U2.shapesFor("card", "checkbox"), ["square", "rounded"]);
+  assert.deepEqual(U2.shapesFor("classic", "radio"), []);
+  assert.deepEqual(U2.shapesFor("chip", "radio"), ["square", "rounded", "circle"]);
+  for (const v of ["classic", "soft", "chip", "card", "toggle"]) for (const size of ["sm", "md", "lg"]) assert.match(U2.lookClass({ variant: v, size }, "checkbox"), new RegExp(`hm-choice-${v} hm-choice-${size}`));
+});
+
+test("app accent: setAccent remaps the primary family on <html>, is remembered, and primary means the current accent", async () => {
+  const A = await import("../src/ui/accent.ts");
+  localStorage.clear();
+  assert.equal(A.setAccent("brand-green"), "brand-green");
+  assert.equal(document.documentElement.getAttribute("data-hm-accent"), "brand-green");
+  assert.equal(JSON.parse(localStorage.getItem("hm.accent")), "brand-green");
+  assert.equal(A.setAccent("primary"), "primary");
+  assert.equal(document.documentElement.getAttribute("data-hm-accent"), null);
+  assert.equal(A.setAccent("not-a-token"), "primary", "unknown names fall back to the theme");
+  const css = read("ui/accent.css");
+  assert.match(css, /:root\[data-hm-accent="brand-green"\]\[data-hm-accent\] \{ --hm-primary: var\(--hm-brand-green, var\(--hm-cat-3\)\); --hm-primary-solid: /);
+  assert.match(css, /--hm-progress-fill: var\(--hm-brand-green, var\(--hm-cat-3\)\); --hm-spinner-paint: none;/, "an accent replaces the multicolor defaults");
+  assert.doesNotMatch(css, /data-hm-accent="primary"/);
+  assert.match(read("css/colors.css"), /\[data-hm-color="primary"\] \{ --hm-accent: var\(--hm-primary\);/, "primary = the current (possibly remapped) primary");
+  const { execFileSync } = await import("node:child_process");
+  assert.match(execFileSync(process.execPath, ["tools/gen-accent.js", "--check"], { encoding: "utf8" }), /up to date/);
 });

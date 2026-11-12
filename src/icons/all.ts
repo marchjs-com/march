@@ -117,6 +117,7 @@ export { clipboard } from "./glyphs/clipboard.ts";
 export { lightbulb } from "./glyphs/lightbulb.ts";
 export { gamepad } from "./glyphs/gamepad.ts";
 export { palette } from "./glyphs/palette.ts";
+export { droplet } from "./glyphs/droplet.ts";
 export { compass } from "./glyphs/compass.ts";
 export { home } from "./glyphs/home.ts";
 export { mapPin } from "./glyphs/mapPin.ts";

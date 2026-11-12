@@ -217,6 +217,9 @@ const tr: Record<string, string> = {
   "Collapse all": "Tümünü kapat",
   "Search or ask…": "Ara ya da sor…",
   "Search the menu": "Menüde ara",
+  // accent picker (src/ui/accent.ts)
+  "Accent": "Vurgu rengi", "Orange": "Turuncu", "Blue": "Mavi", "Green": "Yeşil", "Purple": "Mor", "Pink": "Pembe", "Gold": "Altın",
+  "Info": "Bilgi", "Success": "Başarı", "Danger": "Tehlike", "Neutral": "Nötr",
   // built-in theme names and descriptions (src/theme/presets.ts)
   "HADİ Sosyal: navy ink and the four official colors": "HADİ Sosyal: lacivert mürekkep, dört resmi renk",
   "Classic Cream": "Klasik Krem",

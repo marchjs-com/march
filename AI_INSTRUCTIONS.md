@@ -113,6 +113,10 @@ shown; the server must enforce permissions.
 - Text the user reads may be any language, through `t`…`` (`t("Night Blue")` for data such as theme names).
 - `node tools/lint-identifiers.mjs` lists violations; the test suite runs it.
 
+**Accent**: one app-wide accent: `setAccent("brand-green")` (remembered) or `<AccentPicker />` in the top bar. It remaps the
+primary family, so every component without its own `color` (and `color="primary"`) follows it. Do not add per-page color
+pickers; give a component an explicit `color` only when it must differ from the accent.
+
 **Colors**: controls take `color` with a theme token, never a CSS color: `primary` (default), `info`, `success`,
 `warning`, `danger`, `neutral`, `brand-orange|blue|green|purple|gold|pink`, `cat-1..8`. Put it on `<Form>`, `<Field>` or a
 group to color everything inside; a control's own `color` wins. Errors stay `danger`. In CSS read

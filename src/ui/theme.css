@@ -33,3 +33,12 @@
 .hm-theme-opt.is-active .hm-theme-opt-check { opacity: 1; }
 .hm-theme-opt.is-active { background: var(--hm-primary-soft); }
 .hm-theme-list::-webkit-scrollbar-track { margin-block: var(--hm-radius-2); }
+/* AccentPicker (accent.ts) */
+.hm-accent-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: var(--hm-space-1); }
+.hm-accent-opt { display: flex; align-items: center; gap: var(--hm-space-2); min-width: 0; padding: .4375rem .5rem; border: 0; border-radius: var(--hm-radius-1); background: none; color: var(--hm-text); font: inherit; font-size: var(--hm-text-sm); text-align: start; cursor: pointer; }
+.hm-accent-opt:hover { background: var(--hm-surface-2); }
+.hm-accent-opt:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: -2px; }
+.hm-accent-dot { flex: none; width: 1rem; height: 1rem; border-radius: 50%; background: var(--hm-dot); box-shadow: inset 0 0 0 1px rgb(0 0 0 / .12); }
+.hm-accent-opt .hm-swatch { flex: none; }
+.hm-accent-name { flex: 1; min-width: 0; }
+.hm-accent-opt .hm-theme-opt-check { opacity: 0; } .hm-accent-opt.is-active .hm-theme-opt-check { opacity: 1; }
