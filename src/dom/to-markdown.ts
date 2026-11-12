@@ -54,8 +54,10 @@ function blockMd(el: Node): string {
   if (tag === "ul" || tag === "ol") {
     const start = Number(e.getAttribute("start") ?? 1) || 1;
     return Array.from(e.childNodes).filter((li) => li.nodeType === 1).map((li, i) => {
+      // a task item: a checkbox (rendered Markdown) or data-task="x" / " " (rich text editors)
       const box = (li as Element).querySelector?.("input[type=checkbox]") as HTMLInputElement | null;
-      const task = box ? `[${box.checked || box.hasAttribute("checked") ? "x" : " "}] ` : "";
+      const mark = (li as Element).getAttribute("data-task");
+      const task = box ? `[${box.checked || box.hasAttribute("checked") ? "x" : " "}] ` : mark ? `[${mark === "x" ? "x" : " "}] ` : "";
       const text = inlineBlock(li).replace(/\\\n/g, "\\\n   ");
       return `${tag === "ol" ? `${start + i}.` : "-"} ${task}${text}`;
     }).join("\n");

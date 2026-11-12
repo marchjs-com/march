@@ -23,7 +23,7 @@ export const isSafeLink = (u: unknown): boolean => {
 export const RICH_SCHEMA: SafeSchema = {
   tags: {
     p: [], br: [], strong: [], em: [], u: [], s: [], code: ["class"], a: ["href"], h1: [], h2: [], h3: [], h4: [],
-    blockquote: [], ul: [], ol: ["start"], li: [], pre: [], hr: [], span: ["data-mention"],
+    blockquote: [], ul: [], ol: ["start"], li: ["data-task"], pre: [], hr: [], span: ["data-mention"],
   },
   rename: { b: "strong", i: "em", strike: "s", del: "s", ins: "u", h5: "h4", h6: "h4", tt: "code", kbd: "code", samp: "code" },
 };

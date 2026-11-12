@@ -21,6 +21,7 @@ const tr: Record<string, string> = {
   "New paragraph": "Yeni paragraf",
   "Line break": "Satır sonu",
   "Mention": "Bahsetme",
+  "Task": "Görev",
   "Emoji": "Emoji",
   "Remove link": "Bağlantıyı kaldır",
   "Apply": "Uygula",

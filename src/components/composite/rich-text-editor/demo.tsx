@@ -1,5 +1,9 @@
 // Showcase stage for RichTextEditor: the editor and its live Markdown value, for the Playground values (playground.ts).
-import { RichTextEditor, type Mention } from "./index.ts";
+import { lazy } from "../../../dom/lazy.ts";
+import type { Mention, RichTextEditorProps } from "./index.ts";
+
+// the editor is one lazy chunk, shared with MarkdownEditor's rich view (two entries would split it into a shared chunk)
+const RichTextEditor = lazy<RichTextEditorProps>(() => import("./index.ts").then((m) => ({ default: m.RichTextEditor })), { placeholder: "form" });
 
 export const code = `const team: Mention[] = [{ id: "u1", label: "Deniz Kaya", hint: "Tasarım" }, …]
 let $notes = "## Sürüm notları\n\n**Yeni:** karanlık tema"

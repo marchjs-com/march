@@ -6,6 +6,7 @@
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, RichTextEditor |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 
@@ -40,6 +41,18 @@ A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left 
 ```
 
 Full page: src/components/overlays/drawer/docs.md
+
+## MarkdownEditor
+
+Markdown source with a live preview. Four views: **write**, **preview**, **split** (resizable; both panes scroll together) and **rich** (the same value in a RichTextEditor, loaded the first time it is opened). The toolbar and shortcuts write Markdown syntax as native undo steps (Ctrl+Z keeps working); Enter continues lists and quotes, Tab / Shift+Tab indent list lines; HTML pasted from a web page or an office suite becomes Markdown through the safe content core.
+
+```tsx
+<MarkdownEditor bind:value={$doc} view="split" />
+<MarkdownEditor value={md} views={["write", "preview"]} toolbar={false} />
+<MarkdownEditor bind:value={$doc} view="rich" stats={false} />
+```
+
+Full page: src/components/composite/markdown-editor/docs.md
 
 ## PullToRefresh
 

@@ -19,7 +19,8 @@ import { pruneBareImports } from "./prune-imports.js";
 // look up in the build manifest to preload all of the route's chunks at once (see src/dom/preload.ts).
 const EXTS = ["", ".tsx", ".ts", ".jsx", ".js", "/index.tsx", "/index.ts", "/index.jsx", "/index.js"];
 export function tagLoaders(code, file, cwd) {
-  return code.replace(/\(\s*\)\s*=>\s*import\(\s*(["'])(\.{1,2}\/[^"'\n]+)\1\s*\)/g, (all, q, spec) => {
+  // only a bare loader: in `() => import("x").then(…)` the arrow returns something else (tagging it would break .then)
+  return code.replace(/\(\s*\)\s*=>\s*import\(\s*(["'])(\.{1,2}\/[^"'\n]+)\1\s*\)(?!\s*[.?[])/g, (all, q, spec) => {
     const base = resolve(dirname(file), spec);
     const hit = EXTS.map((e) => base + e).find((p) => existsSync(p) && statSync(p).isFile());
     if (!hit) return all;

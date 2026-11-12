@@ -17,7 +17,7 @@ import { Avatar } from "../../../ui/avatar.ts";
 import { floating } from "../../../ui/popover.ts";
 import { markdownNodes } from "../../../dom/markdown.ts";
 import { toMarkdown } from "../../../dom/to-markdown.ts";
-import { parseHtml, sanitizeNode, isSafeLink } from "../../../dom/sanitize.ts";
+import { parseHtml, sanitizeNode, normalizeBlocks, isSafeLink } from "../../../dom/sanitize.ts";
 import { undoHistory, type UndoStack } from "../../../managers/undo/history.ts";
 import { bold } from "../../../icons/glyphs/bold.ts";
 import { italic } from "../../../icons/glyphs/italic.ts";
@@ -90,9 +90,26 @@ interface Suggest { kind: "@" | ":"; query: string; items: { id: string; label: 
 const mod = (e: KeyboardEvent): boolean => e.ctrlKey || e.metaKey;
 const fragOf = (nodes: readonly Node[]): DocumentFragment => { const f = globalThis.document.createDocumentFragment(); for (const n of nodes) f.appendChild(n); return f; };
 /** Markdown → clean editor nodes (through the schema: the renderer's extras such as rel / target / checkboxes go away). */
-const mdFragment = (md: string): DocumentFragment => sanitizeNode(fragOf(markdownNodes(md, { images: false, newTab: false })));
+const mdFragment = (md: string): DocumentFragment => {
+  const nodes = markdownNodes(md, { images: false, newTab: false });
+  // task items keep their state as data-task (the checkbox input is not editor content)
+  for (const n of nodes) for (const li of Array.from(n.querySelectorAll?.("li.hm-task") ?? [])) {
+    const box = li.querySelector("input");
+    li.setAttribute("data-task", box && (box as HTMLInputElement).checked ? "x" : " ");
+    box?.remove();
+    if (li.firstChild?.nodeType === 3) (li.firstChild as Text).data = (li.firstChild as Text).data.replace(/^\s+/, "");
+  }
+  return sanitizeNode(fragOf(nodes));
+};
 const looksLikeMarkdown = (s: string): boolean => /^(#{1,6} |> |[-*+] |\d+[.)] |```)|\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\)/m.test(s);
 const WORD = /[\p{L}\p{N}_'’-]/u;
+
+/** HTML (a web page, an office suite, the clipboard) → Markdown, through the safe content core's allowlist. */
+export function htmlToMarkdown(html: string): string {
+  const holder = globalThis.document.createElement("div");
+  holder.appendChild(parseHtml(html));
+  return toMarkdown(normalizeBlocks(holder, { topHeading: 2 }));
+}
 
 /** Rich text editor: `<RichTextEditor bind:value={$markdown} mentions={team} />`. The value is Markdown. */
 export function RichTextEditor(props: RichTextEditorProps): unknown {
@@ -124,7 +141,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     "aria-controls": () => (sug() ? `${id}-sug` : null), "aria-activedescendant": () => (sug()?.items.length ? `${id}-sug-${sug()!.active}` : null),
     onKeyDown: (e: KeyboardEvent) => keydown(e), onBeforeInput: (e: InputEvent) => beforeInput(e), onInput: (e: InputEvent) => input(e),
     onPaste: (e: ClipboardEvent) => paste(e), onFocus: props.onFocus, onBlur: (e: FocusEvent) => { props.onBlur?.(e); },
-    onMouseUp: () => refresh(), onKeyUp: () => refresh(),
+    onMouseUp: () => refresh(), onKeyUp: () => refresh(), onMouseDown: (e: MouseEvent) => taskClick(e),
   }) as HTMLElement;
 
   // ------------------------------------------------------------------ content ⇄ value
@@ -300,6 +317,17 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     closest: (sel: string) => root.closest(sel),
   } as unknown as Element;
 
+  // ------------------------------------------------------------------ task items: the box at the item's start toggles it
+  const taskClick = (e: MouseEvent): void => {
+    const li = (e.target as Element | null)?.closest?.("li[data-task]");
+    if (!li || !root.contains(li) || ro()) return;
+    const r = li.getBoundingClientRect();
+    const from = untrack(dir) === "rtl" ? r.right - e.clientX : e.clientX - r.left;
+    if (from > 22) return;
+    e.preventDefault();
+    run(t`Task`, (s) => { li.setAttribute("data-task", li.getAttribute("data-task") === "x" ? " " : "x"); return s; });
+  };
+
   // ------------------------------------------------------------------ input
   const keydown = (e: KeyboardEvent): void => {
     const st = sug.peek();
@@ -356,6 +384,16 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     if (props.shortcuts !== false && e.inputType === "insertText" && (e.data === " " || e.data === " ")) {
       const s = ops.saveSel(root);
       const before = s ? ops.textBefore(root, s).replace(/ /g, " ") : "";
+      // "[ ] " / "[x] " at the start of a list item makes it a task
+      const task = /^\[([ xX]?)\] $/.exec(before);
+      const li = s && task ? ops.blockOf(root, ops.pointOf(root, s[0])[0]) : null;
+      if (s && task && li?.tagName === "LI") {
+        const at = ops.deleteBefore(root, s, before.length);
+        li.setAttribute("data-task", task[1]?.trim() ? "x" : " ");
+        ops.restoreSel(root, at);
+        record(t`Task`);
+        return;
+      }
       const m = /^(#{1,3}|[-*+]|\d+[.)]|>|```) $/.exec(before);
       if (s && m) {
         const type = BLOCK_RULE[m[1]!] ?? "ol";

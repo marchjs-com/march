@@ -97,3 +97,16 @@ test("RichTextEditor: renders Markdown, toolbar, accessible textbox and counter"
   assert.equal(html(box).replace(/^<div[^>]*>|<\/div>$/g, ""), "<ul><li>one</li><li>two</li></ul>");
   dispose();
 });
+
+test("RichTextEditor: task items keep their state as data-task and round-trip", async () => {
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  let api = null;
+  const dispose = render(() => h(RichTextEditor, { value: "- [x] done\n- [ ] todo\n- plain", api: (a) => { api = a; } }), el);
+  await Promise.resolve();
+  const items = el.querySelectorAll("li");
+  assert.deepEqual(items.map((li) => li.getAttribute("data-task")), ["x", " ", null]);
+  assert.equal(el.querySelector("input"), null, "no checkbox inputs inside the editable text");
+  assert.equal(api.markdown(), "- [x] done\n- [ ] todo\n- plain");
+  dispose();
+});

@@ -3,14 +3,16 @@ import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";
 import m0 from "./composite/bottom-nav/meta.ts";
 import m1 from "./chip/meta.ts";
 import m2 from "./overlays/drawer/meta.ts";
-import m3 from "./feedback/pull-to-refresh/meta.ts";
-import m4 from "./composite/rich-text-editor/meta.ts";
+import m3 from "./composite/markdown-editor/meta.ts";
+import m4 from "./feedback/pull-to-refresh/meta.ts";
+import m5 from "./composite/rich-text-editor/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 export const registry: readonly RegistryEntry[] = [
   { folder: "composite/bottom-nav", meta: m0, code: "<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />", demo: () => import("./composite/bottom-nav/demo.tsx"), playground: () => import("./composite/bottom-nav/playground.ts") },
   { folder: "chip", meta: m1, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./chip/demo.tsx"), playground: () => import("./chip/playground.ts") },
   { folder: "overlays/drawer", meta: m2, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
-  { folder: "feedback/pull-to-refresh", meta: m3, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
-  { folder: "composite/rich-text-editor", meta: m4, code: "<RichTextEditor bind:value={$notes} mentions={team} placeholder=\"Write…\" />\n<RichTextEditor value={md} toolbar={[\"bold\", \"italic\", \"link\", \"|\", \"ul\", \"ol\"]} emoji={false} />\n<RichTextEditor api={(e) => editor = e} />   // editor.insert(\"**Hi**\"), editor.exec(\"h2\"), editor.undo()", demo: () => import("./composite/rich-text-editor/demo.tsx"), playground: () => import("./composite/rich-text-editor/playground.ts") },
+  { folder: "composite/markdown-editor", meta: m3, code: "<MarkdownEditor bind:value={$doc} view=\"split\" />\n<MarkdownEditor value={md} views={[\"write\", \"preview\"]} toolbar={false} />\n<MarkdownEditor bind:value={$doc} view=\"rich\" stats={false} />", demo: () => import("./composite/markdown-editor/demo.tsx"), playground: () => import("./composite/markdown-editor/playground.ts") },
+  { folder: "feedback/pull-to-refresh", meta: m4, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
+  { folder: "composite/rich-text-editor", meta: m5, code: "<RichTextEditor bind:value={$notes} mentions={team} placeholder=\"Write…\" />\n<RichTextEditor value={md} toolbar={[\"bold\", \"italic\", \"link\", \"|\", \"ul\", \"ol\"]} emoji={false} />\n<RichTextEditor api={(e) => editor = e} />   // editor.insert(\"**Hi**\"), editor.exec(\"h2\"), editor.undo()", demo: () => import("./composite/rich-text-editor/demo.tsx"), playground: () => import("./composite/rich-text-editor/playground.ts") },
 ];

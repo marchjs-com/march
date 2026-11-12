@@ -1,0 +1,27 @@
+// Turkish texts of MarkdownEditor. English source → Turkish.
+const tr: Record<string, string> = {
+  "Write": "Yaz",
+  "Preview": "Önizle",
+  "Split": "Böl",
+  "Rich text": "Zengin",
+  "Editor view": "Düzenleyici görünümü",
+  "Markdown source": "Markdown kaynağı",
+  "Formatting": "Biçimlendirme",
+  "Heading 2": "Başlık 2",
+  "Heading 3": "Başlık 3",
+  "Bold": "Kalın",
+  "Italic": "İtalik",
+  "Strikethrough": "Üstü çizili",
+  "Inline code": "Satır içi kod",
+  "Link": "Bağlantı",
+  "Bulleted list": "Madde işaretli liste",
+  "Numbered list": "Numaralı liste",
+  "Task list": "Görev listesi",
+  "Quote": "Alıntı",
+  "Code block": "Kod bloğu",
+  "Resize the panes": "Bölmeleri yeniden boyutlandır",
+  "{0} words": "{0} kelime",
+  "{0} min read": "{0} dk okuma",
+  "Markdown: **bold**, _italic_, # heading, - list": "Markdown: **kalın**, _italik_, # başlık, - liste",
+};
+export default tr;

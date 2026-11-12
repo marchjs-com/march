@@ -35,7 +35,7 @@ export function decodeEntities(s: string): string {
 }
 
 /** Attribute values worth keeping: safe URLs, a code language class only. */
-const attrOk = (a: string, v: string): boolean => (a === "href" || a === "src" ? isSafeLink(v) : a === "class" ? /^language-[\w-]{1,30}$/.test(v) : true);
+const attrOk = (a: string, v: string): boolean => (a === "href" || a === "src" ? isSafeLink(v) : a === "class" ? /^language-[\w-]{1,30}$/.test(v) : a === "data-task" ? v === "x" || v === " " : true);
 
 interface Frame { tag: string; node: Node | null; drop: boolean }
 const STYLE_MARKS: [RegExp, string][] = [[/font-weight\s*:\s*(bold|[6-9]00)/i, "strong"], [/font-style\s*:\s*italic/i, "em"], [/text-decoration[^;]*underline/i, "u"], [/text-decoration[^;]*line-through/i, "s"]];

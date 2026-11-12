@@ -10,8 +10,7 @@ import { x as xIcon } from "../icons/glyphs/x.ts";
 import { h } from "../dom/h.ts";
 import { For } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
-import { model, ctl, cx, uid, useField, syncValue, labelledBy, live, type ControlProps, type ClassProp } from "./util.ts";
-import { Textarea, type TextareaProps } from "./inputs.ts";
+import { model, ctl, cx, uid, useField, syncValue, labelledBy, type ControlProps, type ClassProp } from "./util.ts";
 
 const GLYPH: Record<string, IconDef> = { "↑": arrowUp, "↓": arrowDown, "×": xIcon };
 const iconBtn = (label: string, text: string, onClick: () => void, disabled?: () => boolean) => h("button", { type: "button", class: "hm-icon-btn", "aria-label": label, title: label, onClick, disabled }, GLYPH[text] ? svgIcon(GLYPH[text] as IconDef) : text);
@@ -208,42 +207,5 @@ export function Markdown(props: MarkdownProps): unknown {
   return h("div", { class: cx("hm-markdown", props.class) }, () => markdownNodes(props.source ?? props.children ?? "", { images: props.images, newTab: props.newTab, headingOffset: props.headingOffset }));
 }
 
-export interface MarkdownEditorProps extends ControlProps<string> {
-  rows?: number | undefined;
-  placeholder?: string | undefined;
-  /** "tab" (default): Write / Preview tabs; "split": side by side. */
-  preview?: "tab" | "split" | undefined;
-}
-
-/** Markdown textarea with Write / Preview tabs. Props: rows, placeholder, preview ("tab" default, or "split"). */
-export function MarkdownEditor(props: MarkdownEditorProps): unknown {
-  const [get, set] = model(props, "");
-  const tab = signal("write");
-  const id = uid("hm-md");
-  const split = props.preview === "split";
-  const tabBtn = (name: string, label: string) => h("button", {
-    type: "button", role: "tab", class: "hm-editor-tab", id: `${id}-${name}`, "aria-selected": () => String(tab() === name), "aria-controls": `${id}-${name}-panel`,
-    tabindex: () => (tab() === name ? "0" : "-1"), onClick: () => tab.set(name),
-    onKeyDown: (e: KeyboardEvent) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); const n = tab.peek() === "write" ? "preview" : "write"; tab.set(n); globalThis.document?.getElementById(`${id}-${n}`)?.focus(); } },
-  }, label);
-  const tp = ctlProps(props);
-  Object.defineProperty(tp, "value", { get, enumerable: true });
-  Object.assign(tp, { setValue: set, rows: props.rows ?? 8 });
-  const editor = Textarea(tp);
-  const preview = h(Markdown, { source: live(() => get()) });
-  if (split) return h("div", { class: cx("hm-md-editor hm-md-split", props.class) }, editor, h("div", { class: "hm-md-preview" }, preview));
-  return h("div", { class: cx("hm-md-editor", props.class) },
-    h("div", { role: "tablist", class: "hm-editor-tabs", "aria-label": t`Editor mode` }, tabBtn("write", t`Write`), tabBtn("preview", t`Preview`)),
-    h("div", { role: "tabpanel", id: `${id}-write-panel`, "aria-labelledby": `${id}-write`, hidden: () => tab() !== "write" }, editor),
-    h("div", { role: "tabpanel", id: `${id}-preview-panel`, class: "hm-md-preview", "aria-labelledby": `${id}-preview`, hidden: () => tab() !== "preview" }, () => (tab() === "preview" ? preview : null)));
-}
-
-// Live props a wrapped Textarea should keep (getters preserved).
-function ctlProps(props: MarkdownEditorProps): TextareaProps {
-  const o: TextareaProps = {};
-  for (const k of ["id", "name", "placeholder", "disabled", "readonly", "required", "onBlur", "invalid", "describedby"]) {
-    const d = Object.getOwnPropertyDescriptor(props, k);
-    if (d) Object.defineProperty(o, k, d);
-  }
-  return o;
-}
+// MarkdownEditor moved to src/components/composite/markdown-editor/ (modular structure); this path keeps working.
+export { MarkdownEditor, type MarkdownEditorProps, type MarkdownView, type MarkdownTool } from "../components/composite/markdown-editor/index.ts";

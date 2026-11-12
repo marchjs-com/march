@@ -96,11 +96,13 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
   const skip = new Set();
   for (let round = 0; round < 500; round++) {
     const g = graph(outs);
-    // a chunk only one small lazy module imports (code esbuild split out because tree-shaken barrels also reach it) is
-    // that module's own code: it joins it, so the lazy module is judged by its real size and never inlined into its parent
-    const own = (k) => { const u = g.importers.get(k) ?? []; return u.length === 1 && !!outs[u[0]].entryPoint && u[0] !== entryKey && (outs[u[0]].bytes ?? 0) < minSize ? u[0] : null; };
+    // a heavy chunk only one small lazy module imports (code esbuild split out because tree-shaken barrels also reach
+    // it) is that module's own code: it joins it, so the lazy module is judged by its real size and is never inlined into
+    // its parent (a 3 KB demo entry over 30 KB of editor code). Small ones keep the usual folding below.
+    const own = (k) => { const u = g.importers.get(k) ?? []; return (outs[k].bytes ?? 0) >= minSize && u.length === 1 && !!outs[u[0]].entryPoint && u[0] !== entryKey && (outs[u[0]].bytes ?? 0) < minSize ? u[0] : null; };
     const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && ((outs[k].bytes ?? 0) < minSize || own(k)))
-      .sort((a, b) => (outs[a].bytes ?? 0) - (outs[b].bytes ?? 0));
+      // a lazy module's own code first: once something else joined it, it may no longer count as small
+      .sort((a, b) => (own(a) ? 0 : 1) - (own(b) ? 0 : 1) || (outs[a].bytes ?? 0) - (outs[b].bytes ?? 0));
     let done = false;
     for (const t of small) {
       const rt = g.reach.get(t), deps = [...g.closure(t)].filter((d) => d !== t), users = g.importers.get(t) ?? [];

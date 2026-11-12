@@ -368,6 +368,7 @@ export function splitBlock(root: Element, sel: Sel): Sel {
   const tailEmpty = !(tail.textContent ?? "").length && !tail.querySelector?.("[data-mention],img");
   const next = d.createElement(kind === "li" ? "li" : tailEmpty && /^(h\d|blockquote)$/.test(kind) ? "p" : kind === "hr" ? "p" : kind);
   next.appendChild(tail);
+  if (kind === "li" && b.hasAttribute("data-task")) next.setAttribute("data-task", " ");
   if (kind === "li") b.after(next);
   else (b as Element).after(next);
   tidy(root);
