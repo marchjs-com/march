@@ -23,3 +23,19 @@
 `rehashOutputs` (every rewritten JS file is renamed by the hash of its content and of everything it reaches) →
 chunk manifest (index.html data block) → size report and budget (fails the build).
 A hashed file name always means the same bytes, so immutable caching can never mix two builds.
+
+## Layers and portals
+
+```
+body
+ ├ #app                      inert while a modal layer is open
+ └ .hm-layers                one stack (dom/portal.ts)
+    ├ .hm-layer popover      z = dialog band + 0
+    ├ .hm-layer dialog       z = dialog band + 1   (modal: everything below it inert)
+    ├ .hm-layer menu         z = dialog band + 2   (opened from the dialog: usable)
+    └ .hm-layer toast        z = toast band + 3    (always usable)
+```
+
+Named targets (`PortalTarget`) are a registry of signals: a `Portal to` follows its target, moves in when it appears,
+waits (detached, alive) when it goes. The showcase shell has `title`, `toolbar` (top bar, lazy part), `aside` and
+`bottom-action` targets. Later: the registry joins the messaging layer (component registry, channels).

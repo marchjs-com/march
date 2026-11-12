@@ -6,7 +6,7 @@ import "./button.css";
 import "./field.css";
 import { signal, createRoot, onCleanup, untrack, type Signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
-import { Portal } from "../dom/flow.ts";
+import { Portal, openLayer } from "../dom/portal.ts";
 import { t } from "../core/i18n.ts";
 import { val, cx, uid, glyph, type MaybeFn } from "./util.ts";
 import { x as xIcon } from "../icons/glyphs/x.ts";
@@ -118,8 +118,7 @@ export function openDialog(render: (close: (value?: unknown) => void) => unknown
       let done = false;
       const close = (v?: unknown): void => { if (done) return; done = true; dispose(); resolve(v); };
       const node = untrack(() => frame({ ...opts, onClose: () => close(opts.dismissValue), children: render(close), footer: opts.footer?.(close) }));
-      globalThis.document.body.appendChild(node);
-      onCleanup(() => node.remove());
+      onCleanup(openLayer(opts.kind === "drawer" ? "drawer" : "dialog", node));
     }, null);
   });
 }
@@ -264,7 +263,7 @@ export interface DialogProps {
 function sheet(kind: "dialog" | "drawer"): (props: DialogProps) => () => unknown {
   return (props) => () => {
     if (!val(props.open)) return null;
-    return h(Portal, { children: untrack(() => frame({
+    return h(Portal, { layer: kind, children: untrack(() => frame({
       kind, side: props.side, title: props.title === undefined ? undefined : () => val(props.title), size: () => val(props.size),
       dismissable: () => props.dismissable, class: props.class, label: props.label,
       onClose: () => props.onClose?.(), footer: props.footer, children: props.children,

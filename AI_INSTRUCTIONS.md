@@ -239,6 +239,15 @@ back closes it, a direct visit or reload shows the full page. Page transitions a
 `<Link preload="hover|visible|none">`, `beforeLeave(() => !dirty() || confirm(…))` (links, navigate, back/forward, tab close),
 `setMeta({ title, description })`, `queryParam("tab")` signal. `navigate()` is async.
 
+## 14b. Layers and portals
+
+Layers and teleporting ALWAYS go through `Portal` (never `document.body.append…`; a test fails on it). Overlays use
+the one layer stack: `<Portal layer="dialog|drawer|popover|menu|tooltip|palette|lightbox|toast|fx">` or
+`openLayer(kind, node)` — the last opened is on top, a modal layer (dialog, drawer, palette, lightbox) makes the page and
+the layers under it `inert`, toasts and effects stay above. Shell places: `<PortalTarget name="toolbar" />` in the shell,
+`<Portal to="toolbar" order={10}>…</Portal>` in a page — sorted by `order`, removed when the page goes, waits (and moves
+in) when the target is a lazy part not loaded yet. Context, theme, i18n and cleanup stay with the source component.
+
 ## 15. Motion and fx
 
 ```tsx

@@ -4,6 +4,12 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Portals and layers (later in 0.1.0)
+- `dom/portal.ts`: one layer stack (`<Portal layer>`, `openLayer`): last opened on top, modal layers make the page and lower
+  layers `inert`, toasts / fx above. Dialog, Drawer, openDialog, popovers, menus, tooltips, toasts and confetti use it.
+- Named targets: `<PortalTarget name>` + `<Portal to order>`; sources sorted, cleaned up with their owner, waiting for a
+  target that is not mounted yet. No code appends to `document.body` itself (test).
+
 ### Router outlets (later in 0.1.0)
 - Persistent layouts: `<Outlet />`; a layout mounts once and survives navigation below it, only the deepest changed
   level is rebuilt. Per-level error boundary (retry) and busy state; the shell paints before the page on first load.

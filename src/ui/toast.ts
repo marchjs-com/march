@@ -4,7 +4,8 @@ import "./toast.css";
 import "./button.css";
 import { signal, createRoot, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
-import { For, Portal } from "../dom/flow.ts";
+import { For } from "../dom/flow.ts";
+import { Portal } from "../dom/portal.ts";
 import { t } from "../core/i18n.ts";
 import { val, glyph, type MaybeFn } from "./util.ts";
 import { x as xIcon } from "../icons/glyphs/x.ts";
@@ -45,7 +46,7 @@ export const toast: Toast = Object.assign((message: unknown, opts: ToastOptions 
   const id = ++seq;
   const kind = opts.kind ?? "info";
   const item: ToastItem = { id, message, kind, action: opts.action ?? null };
-  if (!hosts && !autoHost && globalThis.document?.body) autoHost = createRoot(() => h(Portal, { children: h(ToastHost, {}) }), null) ?? true;
+  if (!hosts && !autoHost && globalThis.document?.body) autoHost = createRoot(() => h(Portal, { layer: "toast", children: h(ToastHost, {}) }), null) ?? true;
   list.update((l) => [...l, item].slice(-MAX));
   const ms = opts.timeout ?? (opts.action || kind === "danger" ? 8000 : 4000);
   if (ms > 0) timers.set(id, setTimeout(() => toast.dismiss(id), ms));

@@ -258,10 +258,11 @@ test("CSV quoting, BOM, formatted vs raw; JSON; download uses a revoked object U
   URL.createObjectURL = (b) => { made.push(b); return "blob:x"; };
   URL.revokeObjectURL = (u) => revoked.push(u);
   let clicked = null;
-  document.body.addEventListener("click", (e) => { if (e.target.getAttribute?.("download")) clicked = e.target.getAttribute("download"); });
-  await tb.exportCSV({ filename: "people" });
-  await tick();
-  assert.equal(clicked, "people.csv");
+  const origClick = Element.prototype.click;
+  Element.prototype.click = function () { if (this.getAttribute?.("download")) clicked = { name: this.getAttribute("download"), attached: this.isConnected }; return origClick?.call(this); };
+  try { await tb.exportCSV({ filename: "people" }); await tick(); } finally { Element.prototype.click = origClick; }
+  assert.equal(clicked?.name, "people.csv");
+  assert.equal(clicked?.attached, false, "the download link is never added to the page");
   assert.equal(made.length, 1);
   assert.deepEqual(revoked, ["blob:x"]);
   assert.equal(new TextDecoder("utf-8", { ignoreBOM: true }).decode(await made[0].arrayBuffer()), String.fromCharCode(0xfeff) + `${tb.toCSV({ formatted: false })}`);

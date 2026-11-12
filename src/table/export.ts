@@ -55,10 +55,8 @@ export function download(filename: string, text: string, type = "text/plain;char
   const a = doc.createElement("a");
   a.setAttribute("href", url);
   a.setAttribute("download", filename);
-  a.className = "hm-sr-only";
-  doc.body.appendChild(a);
+  // a detached link is enough for click(): nothing is added to the page
   try { a.click(); } finally {
-    a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 0);
   }
   return url;

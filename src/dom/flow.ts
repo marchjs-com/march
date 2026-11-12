@@ -1,4 +1,4 @@
-// Control flow components: If/Else, For, Switch/Match, Try, Await, Portal, Dynamic.
+// Control flow components: If/Else, For, Switch/Match, Try, Await, Dynamic (Portal: dom/portal.ts).
 // Each returns a live region; only the active branch exists in the DOM and it is disposed (with its listeners) on switch.
 import { computed, signal, createRoot, getOwner, runWithOwner, untrack, onCleanup, catchError, effect, read, provide, reportError, isReactive, type Accessor, type Signal, type Cleanup } from "../core/reactive.ts";
 import { h, insert, clearBetween, removeNode, LoadingContext, type Component } from "./h.ts";
@@ -218,18 +218,6 @@ export function Await<T>(props: AwaitProps<T>): () => unknown {
     }
     return call(props.loading ?? null);
   };
-}
-
-export interface PortalProps { mount?: Element | DocumentFragment; children?: unknown }
-/** Render children into another element (default: document.body). */
-export function Portal(props: PortalProps): null {
-  const doc = globalThis.document;
-  const target = props.mount ?? doc.body;
-  const start = doc.createComment("portal"), end = doc.createComment("/portal");
-  target.append(start, end);
-  insert(target, () => props.children, end);
-  onCleanup(() => { clearBetween(start, end); removeNode(start); removeNode(end); });
-  return null;
 }
 
 export type DynamicProps = { component: MaybeFn<string | Component<never> | null | undefined | false> } & Record<string, unknown>;

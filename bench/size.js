@@ -7,7 +7,9 @@ import { resolve, join } from "node:path";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 
-export const BUDGET = { core: 10.5 * 1024, minimal: 5 * 1024 };
+// core = the whole barrel (every core export at once; apps tree-shake and pay only for what they import, see minimal).
+// 11.25 KB since the layer stack + named portal targets (dom/portal.ts) became core: one mechanism for every overlay.
+export const BUDGET = { core: 11.25 * 1024, minimal: 5 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 

@@ -2,7 +2,7 @@
 // flipped when they would leave the viewport, closed on outside pointer, Escape, scroll and resize.
 import { signal, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
-import { Portal } from "../dom/flow.ts";
+import { Portal } from "../dom/portal.ts";
 import { on, cx } from "./util.ts";
 
 export type Placement = "bottom-start" | "bottom-end" | "top-start" | "top-end" | "top" | "bottom";
@@ -56,5 +56,5 @@ export function floating(o: FloatingOptions): unknown {
   on<KeyboardEvent>(d, "keydown", (e) => { if (e.key === "Escape") { e.stopPropagation(); e.preventDefault(); o.onClose(true); } }, true);
   on(globalThis.window, "resize", update);
   on(globalThis.window, "scroll", update, true);
-  return h(Portal, { children: el });
+  return h(Portal, { layer: o.role === "tooltip" ? "tooltip" : o.role === "menu" || o.role === "listbox" ? "menu" : "popover", children: el });
 }

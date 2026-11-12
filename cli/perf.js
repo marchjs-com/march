@@ -75,6 +75,8 @@ export function routePaths(meta, cwd, keys) {
  * @param {{ entry?: number, route?: number, part?: number, css?: number, routes?: Record<string, number>, fail?: boolean } | false | undefined} budget
  * @param {Record<string, string>} [routes]  manifest key → route path (routePaths())
  */
+/** A layout module (march gen routes: _layout.tsx): it ships with its routes, so it has the route budget. */
+const LAYOUT = /(^|\/)_?layout\.[cm]?[jt]sx?$/;
 export function sizeReport(m, outdir, budget, routes = {}) {
   const size = (files) => {
     let js = 0, css = 0;
@@ -82,14 +84,15 @@ export function sizeReport(m, outdir, budget, routes = {}) {
     return { js, css };
   };
   const rows = [{ name: "(entry)", key: null, kind: "entry", files: m.entryFiles, ...size(m.entryFiles), entry: true }];
-  const rest = Object.entries(m.manifest).map(([k, files]) => ({ name: routes[k] ?? k, key: k, kind: routes[k] ? "route" : "part", files, ...size(files), entry: false }));
+  const rest = Object.entries(m.manifest).map(([k, files]) => ({ name: routes[k] ?? k, key: k, kind: routes[k] ? "route" : LAYOUT.test(k) ? "layout" : "part", files, ...size(files), entry: false }));
   // routes by path, then the lazy parts by name
-  rest.sort((a, b) => (a.kind === b.kind ? a.name.localeCompare(b.name) : a.kind === "route" ? -1 : 1));
+  const RANK = { route: 0, layout: 1, part: 2 };
+  rest.sort((a, b) => (a.kind === b.kind ? a.name.localeCompare(b.name) : RANK[a.kind] - RANK[b.kind]));
   rows.push(...rest);
   const b = budget === false ? null : { entry: 15 * 1024, route: 60 * 1024, fail: false, ...(budget ?? {}) };
   const over = [];
   for (const r of rows) {
-    r.limit = !b ? Infinity : r.kind === "entry" ? b.entry : r.kind === "route" ? b.routes?.[r.name] ?? b.route : b.part ?? b.route;
+    r.limit = !b ? Infinity : r.kind === "entry" ? b.entry : r.kind === "route" ? b.routes?.[r.name] ?? b.route : r.kind === "layout" ? b.route : b.part ?? b.route;
     r.cssLimit = b?.css ?? Infinity;
     r.over = r.js > r.limit || r.css > r.cssLimit;
     if (r.over) over.push(r);

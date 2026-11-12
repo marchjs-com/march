@@ -3,6 +3,7 @@
 // Separate, lazily loaded module. Canvas drawing and CSS custom properties only (CSP safe). Pauses when hidden or
 // off screen; prefers-reduced-motion draws a single still frame.
 import "./fx.css";
+import { openLayer } from "../dom/portal.ts";
 import { h } from "../dom/h.ts";
 import { onCleanup } from "../core/reactive.ts";
 import { reducedMotion, setStyle, frame } from "../motion/env.ts";
@@ -112,7 +113,7 @@ export function confetti({ x, y, count = 120, colors = ["#6d5dfc", "#3b82f6", "#
   const doc = globalThis.document;
   if (!doc || reducedMotion()) return Promise.resolve();
   const canvas = h("canvas", { class: "hm-fx-confetti", "aria-hidden": "true" }) as HTMLCanvasElement;
-  doc.body.appendChild(canvas);
+  const close = openLayer("fx", canvas);
   const ctx = canvas.getContext?.("2d") ?? null;
   const W = globalThis.innerWidth || 800, H = globalThis.innerHeight || 600;
   canvas.width = W; canvas.height = H;
@@ -123,7 +124,7 @@ export function confetti({ x, y, count = 120, colors = ["#6d5dfc", "#3b82f6", "#
   });
   return new Promise((resolve) => {
     const tick = (): void => {
-      if (!ctx) { canvas.remove(); resolve(); return; }
+      if (!ctx) { close(); resolve(); return; }
       ctx.clearRect(0, 0, W, H);
       let alive = 0;
       for (const b of bits) {
@@ -131,7 +132,7 @@ export function confetti({ x, y, count = 120, colors = ["#6d5dfc", "#3b82f6", "#
         if (b.y < H + 20 && b.life < 240) alive++;
         ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.rot); ctx.fillStyle = b.c; ctx.globalAlpha = Math.max(0, 1 - b.life / 240); ctx.fillRect(-4, -2, 8, 4); ctx.restore();
       }
-      if (alive) frame(tick); else { canvas.remove(); resolve(); }
+      if (alive) frame(tick); else { close(); resolve(); }
     };
     frame(tick);
   });

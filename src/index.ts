@@ -2,7 +2,8 @@
 export { signal, computed, effect, batch, untrack, onCleanup, createRoot, getOwner, runWithOwner, catchError, context, provide, useContext, reactive, isReactive, read, DEV, _enter, _leave } from "./core/reactive.ts";
 export { store, patch, unwrap } from "./core/store.ts";
 export { h, Fragment, insert, lazyChildren, safeUrl, registerTransition } from "./dom/h.ts";
-export { If, Else, For, Switch, Match, Try, Await, Portal, Dynamic, setFlipHook } from "./dom/flow.ts";
+export { If, Else, For, Switch, Match, Try, Await, Dynamic, setFlipHook } from "./dom/flow.ts";
+export { Portal, PortalTarget, portalTarget, openLayer, layers, type LayerKind, type PortalProps, type PortalTargetProps } from "./dom/portal.ts";
 export { render } from "./dom/render.ts";
 export { define } from "./dom/define.ts";
 export { pipe, applyPipe, toDate } from "./core/pipes.ts";

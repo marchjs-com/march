@@ -398,7 +398,7 @@ export async function navigate(to: Href, { replace = false, state = null, force 
   const r = S.router;
   if (!r) throw new Error("March: navigate() before createRouter().");
   const s = String(to);
-  if (/^[a-z][a-z0-9+.-]*:/i.test(s) || s.startsWith("//")) throw new Error("March: navigate() only accepts same-origin paths. Use location.assign for external URLs.");
+  if (/^[a-z][a-z0-9+.-]*:/i.test(s) || s.startsWith("//")) throw new Error("March: navigate(): same-origin paths only");
   const samePage = s.split(/[?#]/)[0] === untrack(() => S.path());
   if (!force && !samePage && leaveGuards.size && !(await allowLeave())) return;
   saveScroll();
@@ -495,7 +495,7 @@ export function Outlet(props: { name?: string; empty?: Renderable; children?: un
   if (!r) throw new Error("March: <Outlet/> needs createRouter() first.");
   if (!props.name) {
     const ctx = useContext(OutletContext);
-    if (!ctx) throw new Error("March: <Outlet/> without a name must be inside a layout rendered by <Router/>.");
+    if (!ctx) throw new Error("March: <Outlet/> outside a layout");
     return ctx.take ? ctx.take() : level(r, ctx);
   }
   // named outlets and the modal outlet: their own (small, lazy) module, loaded where one is used
