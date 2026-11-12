@@ -535,8 +535,13 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Button | stable | Button in five variants and three sizes with icons, loading (locks and spins), router links (href) and block width; ActionButton draws an action() with its guard, confirm and toasts. | — |
+| ButtonGroup | stable | Groups related buttons (role=group with a label), spaced or attached into one segmented strip; RTL keeps the rounded ends outside. | — |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| CopyButton | stable | Copies text to the clipboard: a text or icon-only button that confirms (Copied) for a moment and reports failure with a toast. | — |
+| IconButton | stable | Icon-only button: the label is required and becomes its accessible name and title; sizes and a danger tone. | — |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
+| Menu | stable | Trigger button with a floating menu of items, links and action()s (separators, shortcuts, danger, permissions) and the full menu keyboard model; Dropdown floats any content. | — |
 
 ### Data display — `hadi-march/data`
 
@@ -567,6 +572,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 |---|---|---|---|
 | ContextMenu | experimental | Right-click / Shift+F10 menu anchored to the pointer: the same items, actions and keyboard as Menu, chosen per target. | — |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| Tooltip | stable | Short hint on hover (after a delay) and on keyboard focus, positioned by the popover engine and linked with aria-describedby; Esc hides it. | — |
 
 ### Navigation — `hadi-march/navigation`
 

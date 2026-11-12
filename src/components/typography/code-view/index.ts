@@ -1,10 +1,10 @@
 // CodeView: read-only code block with line numbers, wrap, copy and syntax colours (hadi-march/ui). Folder: src/components/typography/code-view/.
 import "./code-view.css";
-import "../../../ui/button.css";
+import "../../actions/button/button.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { CopyButton } from "../../../ui/button.ts";
+import { CopyButton } from "../../actions/copy-button/index.ts";
 import { tokenLines, type Token } from "../../../ui/highlight.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 

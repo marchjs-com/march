@@ -7,15 +7,20 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| CodeView | stable | Read-only code block: line numbers, syntax colours (js/ts/jsx/tsx, css, html, json, sh), wrap toggle and a copy button. | CopyButton |
+| CodeView | stable | Read-only code block: line numbers, syntax colours (js/ts/jsx/tsx, css, html, json, sh), wrap toggle and a copy button. | [CopyButton](#copybutton) |
 | Kbd | stable | Keyboard key: text, or a shortcut string (mod+k) written for the platform (Ctrl+K, ⌘K). | — |
 
 ### Actions — `hadi-march/actions`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Button | stable | Button in five variants and three sizes with icons, loading (locks and spins), router links (href) and block width; ActionButton draws an action() with its guard, confirm and toasts. | — |
+| ButtonGroup | stable | Groups related buttons (role=group with a label), spaced or attached into one segmented strip; RTL keeps the rounded ends outside. | — |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| CopyButton | stable | Copies text to the clipboard: a text or icon-only button that confirms (Copied) for a moment and reports failure with a toast. | — |
+| IconButton | stable | Icon-only button: the label is required and becomes its accessible name and title; sizes and a danger tone. | — |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
+| Menu | stable | Trigger button with a floating menu of items, links and action()s (separators, shortcuts, danger, permissions) and the full menu keyboard model; Dropdown floats any content. | — |
 
 ### Data display — `hadi-march/data`
 
@@ -23,12 +28,12 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 |---|---|---|---|
 | Badge | stable | Small status label in a tone, a dot badge, or a count badge (hidden at 0, 120 → 99+) with an accessible label. | — |
 | Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | — |
-| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [Chip](#chip), Menu, FilterControl, CellEditor |
+| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [Chip](#chip), [Menu](#menu), FilterControl, CellEditor |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | — |
 | JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | — |
 | Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | — |
 | KeyValue | stable | Definition list for detail views: label / value rows in 1–4 columns, hints, hidden rows and a placeholder for empty values. | — |
-| Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | Button, IconButton, ButtonGroup, Segmented |
+| Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | [Button](#button), [IconButton](#iconbutton), [ButtonGroup](#buttongroup), Segmented |
 | Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | — |
 | Tree | stable | Expandable tree (role=tree) with icons, trailing meta, selection and the full keyboard model; long labels scroll with OverflowText. | OverflowText |
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
@@ -46,12 +51,13 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 |---|---|---|---|
 | ContextMenu | experimental | Right-click / Shift+F10 menu anchored to the pointer: the same items, actions and keyboard as Menu, chosen per target. | — |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| Tooltip | stable | Short hint on hover (after a delay) and on keyboard focus, positioned by the popover engine and linked with aria-describedby; Esc hides it. | — |
 
 ### Navigation — `hadi-march/navigation`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
+| Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, [Button](#button) |
 
 ### Motion — `hadi-march/motion`
 
@@ -78,27 +84,27 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | [Badge](#badge), OverflowText |
-| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, [ReactionPicker](#reactionpicker) |
+| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | [Menu](#menu), Textarea, [ReactionPicker](#reactionpicker) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), Avatar |
-| ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
+| ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | [IconButton](#iconbutton), Segmented |
 | CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, OverflowText |
-| ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, [Card](#card), Dialog, Toggle |
+| ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | [Button](#button), [Card](#card), Dialog, Toggle |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
-| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle |
-| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, [Chip](#chip), OverflowText |
+| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), [IconButton](#iconbutton), OverflowText, Field, TextInput, NumberInput, Select, Toggle |
+| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | [Button](#button), [IconButton](#iconbutton), Segmented, [Chip](#chip), OverflowText |
 | FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, OverflowText |
-| GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | [ColorPicker](#colorpicker), Segmented, IconButton |
-| ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | Segmented, Slider, IconButton |
+| GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | [ColorPicker](#colorpicker), Segmented, [IconButton](#iconbutton) |
+| ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | Segmented, Slider, [IconButton](#iconbutton) |
 | JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | [TreeEditor](#treeeditor) |
-| KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | [EasingCurveEditor](#easingcurveeditor), IconButton, Segmented |
-| MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, [RichTextEditor](#richtexteditor) |
+| KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | [EasingCurveEditor](#easingcurveeditor), [IconButton](#iconbutton), Segmented |
+| MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, [IconButton](#iconbutton), [RichTextEditor](#richtexteditor) |
 | NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
-| PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
-| ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll](#countroll), Button, Menu |
-| RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
+| PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, [Menu](#menu), [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
+| ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll](#countroll), [Button](#button), [Menu](#menu) |
+| RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, [IconButton](#iconbutton), Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
-| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | [Badge](#badge), IconButton, Toggle |
+| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | [Badge](#badge), [IconButton](#iconbutton), Toggle |
 | Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress |
 
 ## Badge
@@ -125,6 +131,31 @@ Composed of: [Badge](#badge), OverflowText
 
 Full page: src/components/composite/bottom-nav/docs.md
 
+## Button
+
+The button. Five variants (`primary` is the theme's orange fill, `secondary` the default, `ghost`, `danger`, `dark` ink fill), three sizes, a leading or trailing icon, `loading` (locks the button and shows a spinner instead of the icon), `block` width, and `href` (renders a router link styled as a button).
+
+```tsx
+<Button variant="primary" icon={plus}>New project</Button>
+<Button loading={$saving} on:click={save}>Save</Button>
+<Button href="/docs" iconEnd={arrowRight}>Docs</Button>
+<ActionButton action={remove} args={[row]} />
+```
+
+Full page: src/components/actions/button/docs.md
+
+## ButtonGroup
+
+Related buttons side by side: spaced (the default) or `attached` into one strip whose outer ends are rounded. The group has `role="group"` and a label, so screen readers announce what the buttons belong to.
+
+```tsx
+<ButtonGroup attached label="Alignment">
+  <Button>Start</Button><Button>Center</Button><Button>End</Button>
+</ButtonGroup>
+```
+
+Full page: src/components/actions/button-group/docs.md
+
 ## Card
 
 A surface for one piece of content: an optional header with a title, a subtitle and actions, the body, and an optional footer. `action()` objects in `actions` render as buttons that run, confirm and report the action.
@@ -150,7 +181,7 @@ Full page: src/components/social/chat-bubble/docs.md
 
 The message field of a chat. On the start side an attach Menu whose + turns 45° while it is open; in the middle a growing Textarea (Enter sends, Shift+Enter breaks the line) with an emoji button that opens a ReactionPicker grid (the emoji goes in at the caret). On the end side one round button morphs on the motion engine: a microphone in Heyecan orange while the field is empty, a send arrow in Aktivite blue once there is text. Recording replaces the field with a pulsing dot, a running timer and a live waveform; the round button sends it, the trash button or Esc drops it. A reply preview with an orange bar sits above.
 
-Composed of: Menu, Textarea, [ReactionPicker](#reactionpicker)
+Composed of: [Menu](#menu), Textarea, [ReactionPicker](#reactionpicker)
 
 ```tsx
 <ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />
@@ -188,7 +219,7 @@ Full page: src/components/actions/chip/docs.md
 
 A read-only code block: line numbers, syntax colours for js / ts / jsx / tsx, css, html, json and sh (other languages stay plain), a wrap toggle and a copy button. Text is inserted as text nodes, never as HTML. Every showcase Code tab draws it through the `code-view` widget point.
 
-Composed of: CopyButton
+Composed of: [CopyButton](#copybutton)
 
 ```tsx
 <CodeView code={source} lang="tsx" copy />
@@ -201,7 +232,7 @@ Full page: src/components/typography/code-view/docs.md
 
 An advanced color picker: a saturation / brightness area, hue and alpha sliders, an eyedropper (where the browser has one), an old / new preview (click the old half to go back), the value as hex, rgb() or hsl() text (any CSS color can be typed or pasted), WCAG contrast on white and black, and palettes: the four HADİ colors, the theme's palette and the recent picks. Theme colors are read from the tokens at the moment they are picked, so they follow the active theme.
 
-Composed of: IconButton, Segmented
+Composed of: [IconButton](#iconbutton), Segmented
 
 ```tsx
 <ColorPicker bind:value={$color} />
@@ -228,7 +259,7 @@ Full page: src/components/composite/command-palette/docs.md
 
 The consent manager's UI. A bottom banner asks until there is a valid decision for the current policy version (Reject all sits next to Accept all, with the same weight); the preferences panel lists every category as a Card with a Toggle (a Dialog on wide screens, a bottom sheet on phones); `ConsentGate` keeps third-party content behind a placeholder that can allow it in place. The module is lazy on purpose: load it with `lazy(() => import("hadi-march/managers/consent/ui"), { pick: "ConsentBanner" })`.
 
-Composed of: Button, [Card](#card), Dialog, Toggle
+Composed of: [Button](#button), [Card](#card), Dialog, Toggle
 
 ```tsx
 <ConsentBanner title="Cookies" text="We use analytics to measure visits." />
@@ -249,6 +280,17 @@ The menu that opens where you right-click, or with Shift+F10 / the Menu key on t
 
 Full page: src/components/overlays/context-menu/docs.md
 
+## CopyButton
+
+Copies text to the clipboard. The button says "Copied" (or swaps its icon for a tick) for a moment and announces it; when the clipboard is not available a toast reports the failure.
+
+```tsx
+<CopyButton text="npm i hadi-march" />
+<CopyButton text={() => token} iconOnly label="Copy key" />
+```
+
+Full page: src/components/actions/copy-button/docs.md
+
 ## CountRoll
 
 An odometer number for likes, comments and followers. When the value changes only the digits that changed roll: upward when it grows, downward when it shrinks, on the motion engine (global speed, pause and reduced motion apply). The text is compact in the active locale (`1,2 B`, `12K`); `format="full"` groups it instead.
@@ -264,7 +306,7 @@ Full page: src/components/social/count-roll/docs.md
 
 A spreadsheet-like grid for large data. It runs on the table engine (`createTable`: sorting, filters, search, column layout, selection, inline edit, CSV) and the shared virtual window, which windows **rows and columns**: only the cells in view are in the DOM, so 100 000 rows × many columns scroll smoothly. On top it adds grouping with aggregates, a totals footer, pinned columns, drag to reorder and resize columns, and a keyboard cell cursor.
 
-Composed of: [Chip](#chip), Menu, FilterControl, CellEditor
+Composed of: [Chip](#chip), [Menu](#menu), FilterControl, CellEditor
 
 ```tsx
 import { DataGrid } from "hadi-march/components/data/data-grid";
@@ -319,7 +361,7 @@ Full page: src/components/composite/feed/docs.md
 
 A node editor on an endless canvas: pan and zoom, snap to the grid, nodes with ports and form fields, bezier edges, values flowing along the edges as moving dots, box and multi selection, copy / paste, undo, a minimap, layered auto layout, groups, a context menu and full keyboard use. The flow lives in a store (`createFlow`) that FlowPalette adds to and FlowControls runs; it reads and writes a readable JSON schema (`march.flow/v1`).
 
-Composed of: [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle
+Composed of: [ContextMenu](#contextmenu), [IconButton](#iconbutton), OverflowText, Field, TextInput, NumberInput, Select, Toggle
 
 ```tsx
 const flow = createFlow({ types, doc })          // types: [{ type, label, icon, color, inputs, outputs, fields, run }]
@@ -334,7 +376,7 @@ Full page: src/components/composite/flow-canvas/docs.md
 
 Run, pause, step and reset a flow; choose the speed; see the state, the clock and how many nodes finished. `createFlowRunner(flow)` executes the flow node by node and writes the state FlowCanvas draws: the running node glows, a failing node shakes and shows its error, values travel along the edges as dots and every edge counts what passed. `FlowTimeline` is the run record: one bar per executed node on a time axis with a playhead.
 
-Composed of: Button, IconButton, Segmented, [Chip](#chip), OverflowText
+Composed of: [Button](#button), [IconButton](#iconbutton), Segmented, [Chip](#chip), OverflowText
 
 ```tsx
 const runner = createFlowRunner(flow, { nodeMs: 650, travelMs: 560 })
@@ -386,7 +428,7 @@ Full page: src/components/data/gantt/docs.md
 
 Build a CSS gradient by hand. Pick the type (linear, radial, conic), turn the angle dial or press a quick angle, click the stop bar to add a color stop (its color is the gradient's color at that point), drag stops to move them, drag one down (or press Delete) to remove it, and edit the selected stop's color with a full ColorPicker. Presets start from the HADİ colors and the theme palette; the CSS is ready to copy.
 
-Composed of: [ColorPicker](#colorpicker), Segmented, IconButton
+Composed of: [ColorPicker](#colorpicker), Segmented, [IconButton](#iconbutton)
 
 ```tsx
 <GradientEditor bind:value={$background} />
@@ -395,11 +437,22 @@ Composed of: [ColorPicker](#colorpicker), Segmented, IconButton
 
 Full page: src/components/composite/gradient-editor/docs.md
 
+## IconButton
+
+A button that shows only an icon. `label` is required: it becomes the accessible name (`aria-label`) and the native tooltip (`title`), so an icon-only control is never unnamed. Leaving it out throws while you develop.
+
+```tsx
+<IconButton icon={heart} label="Like" on:click={like} />
+<IconButton icon={trash} label="Delete" variant="danger" size="sm" />
+```
+
+Full page: src/components/actions/icon-button/docs.md
+
 ## ImageCropper
 
 Crop an image the way phones do: the frame stays centered, the picture moves under it. Drag the image to move it, zoom with the wheel, the slider or + −, turn it by 90° with the buttons (or R) and by fine angles with the angle slider (or [ ]), mirror it (F), resize the frame from its corners or pick an aspect ratio. At any angle the image always covers the frame, so the result never has empty corners. The result is drawn on a canvas (`api.toCanvas()`, `api.toBlob()`); a small live preview shows it with its size in pixels.
 
-Composed of: Segmented, Slider, IconButton
+Composed of: Segmented, Slider, [IconButton](#iconbutton)
 
 ```tsx
 <ImageCropper src={url} bind:value={$crop} aspect={1} api={(c) => cropper = c} />
@@ -469,7 +522,7 @@ Full page: src/components/data/key-value/docs.md
 
 Edit and play a keyframe animation on the motion engine. Each track animates one property (x, y, scale, rotate, opacity) of a target; its lane shows the value curve and the keyframes as diamonds you drag along time (snapped, Alt for free). Scrub the ruler or drag the playhead; play, pause, loop and change the speed. The selected keyframe has its time, value and an EasingCurveEditor for the curve into it. Playback is a motion engine `Playback`, so the global speed, "Stop all" and reduced motion apply; `timelineCode(model)` writes the same animation as engine timeline code.
 
-Composed of: [EasingCurveEditor](#easingcurveeditor), IconButton, Segmented
+Composed of: [EasingCurveEditor](#easingcurveeditor), [IconButton](#iconbutton), Segmented
 
 ```tsx
 <KeyframeTimeline bind:value={$scene} />
@@ -506,7 +559,7 @@ Full page: src/components/actions/made-with-march/docs.md
 
 Markdown source with a live preview. Four views: **write**, **preview**, **split** (resizable; both panes scroll together) and **rich** (the same value in a RichTextEditor, loaded the first time it is opened). The toolbar and shortcuts write Markdown syntax as native undo steps (Ctrl+Z keeps working); Enter continues lists and quotes, Tab / Shift+Tab indent list lines; HTML pasted from a web page or an office suite becomes Markdown through the safe content core.
 
-Composed of: Splitter, Toolbar, IconButton, [RichTextEditor](#richtexteditor)
+Composed of: Splitter, Toolbar, [IconButton](#iconbutton), [RichTextEditor](#richtexteditor)
 
 ```tsx
 <MarkdownEditor bind:value={$doc} view="split" />
@@ -528,6 +581,17 @@ Composed of: Skeleton
 
 Full page: src/components/social/media-grid/docs.md
 
+## Menu
+
+A trigger button with a floating menu. Items are plain entries (`label`, `icon`, `onSelect`, `href`, `shortcut`, `danger`, `disabled`, `hidden`, `can`), `action()` objects (their guard, confirmation and toasts come along) or separators (`"-"`). `args` are passed to every action and `onSelect`.
+
+```tsx
+<Menu label="Actions" icon={more} items={[{ label: "Edit", icon: edit, shortcut: "E", onSelect: edit }, "-", remove]} args={[row]} />
+<Dropdown label="Filters">{(close) => <FilterForm onDone={close} />}</Dropdown>
+```
+
+Full page: src/components/actions/menu/docs.md
+
 ## NavSidebar
 
 The app's side menu: categories that open and close, a typo-tolerant search over every item, recent visits and featured items at the top, a collapsible icon rail and a resizable width, all remembered per user. Items are links (router `Link`), so the current page is marked and the menu follows navigation.
@@ -547,7 +611,7 @@ Full page: src/components/composite/nav-sidebar/docs.md
 
 One post of a social feed. The header shows the author (Avatar, name with a verified mark), the relative time and the place, with an optional ⋯ Menu. Photos sit in a MediaGrid; a double tap on them likes the post with a large heart that pops over the photo and bursts in the four HADİ colors. The action row has a LikeButton and rolling counts for comments and shares; the caption folds to three lines with a "more" button.
 
-Composed of: Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll)
+Composed of: Avatar, [Menu](#menu), [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll)
 
 ```tsx
 <PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />
@@ -559,7 +623,7 @@ Full page: src/components/composite/post-card/docs.md
 
 The top of a profile. A cover (a photo, or a soft art of the four HADİ colors) with a bottom dim; the avatar in a StoryRing that overlaps it and opens the stories; the name with a verified mark, the handle and the bio; stats as buttons with rolling counts; a FollowButton, a Message button and a ⋯ Menu. Following adds you to the followers, so the count rolls together with the button's morph. On your own profile an Edit button replaces follow and message.
 
-Composed of: [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll](#countroll), Button, Menu
+Composed of: [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll](#countroll), [Button](#button), [Menu](#menu)
 
 ```tsx
 <ProfileHeader user={u} follow={$f} onFollow={(s) => $f = s} onMessage={openChat} onStat={openList} />
@@ -592,7 +656,7 @@ Full page: src/components/social/reaction-picker/docs.md
 
 A rich text field whose value is **Markdown**. Write with the toolbar, keyboard shortcuts or Markdown shortcuts (`# `, `## `, `- `, `1. `, `> `, ```` ``` ````); mention people with `@`, insert emoji with `:`; pasted HTML from any site or office suite is cleaned through the safe content core (allowlist, no HTML parser — Trusted Types safe). Undo / redo use an UndoManager history of the editor's own (typing merges into one step).
 
-Composed of: Toolbar, IconButton, Avatar
+Composed of: Toolbar, [IconButton](#iconbutton), Avatar
 
 ```tsx
 <RichTextEditor bind:value={$notes} mentions={team} placeholder="Write…" />
@@ -606,7 +670,7 @@ Full page: src/components/composite/rich-text-editor/docs.md
 
 A month / week / day calendar of events. Drag an event to move it (minutes snap to `step`; across columns it changes day), drag its edge to resize it, drag on an empty slot to create one. Dates and times are formatted with Intl in the current locale: month and weekday names, the first day of the week, 12 / 24 hour clock and the reading direction. Overlapping events share the column width; all-day and multi-day events sit in their own lane as bars.
 
-Composed of: Button, IconButton, ButtonGroup, Segmented
+Composed of: [Button](#button), [IconButton](#iconbutton), [ButtonGroup](#buttongroup), Segmented
 
 ```tsx
 import { Scheduler } from "hadi-march/components/data/scheduler";
@@ -623,7 +687,7 @@ Full page: src/components/data/scheduler/docs.md
 
 Progress through stages, with motion that shows where you are going. Stepper draws Steps and adds a liquid highlight that stretches from the old step to the new one and settles there, and step panels that morph into each other: the old panel blurs and slides toward the past, the new one arrives from the future (mirrored in RTL) while the frame's height follows. Back / Next buttons and a step counter come with it.
 
-Composed of: Steps, Button
+Composed of: Steps, [Button](#button)
 
 ```tsx
 <Stepper steps={[{ title: "Cart" }, { title: "Address" }, { title: "Payment" }]} current={$step} onSelect={(i) => $step = i}
@@ -692,6 +756,16 @@ An ordered list of events. Each item has an optional time, title, body, tone (th
 
 Full page: src/components/data/timeline/docs.md
 
+## Tooltip
+
+A short hint for the element it wraps. It appears on hover after a short delay and at once on keyboard focus, hides on leave, blur or Esc, and is linked to the element with `aria-describedby`. The popover engine places it and flips it when there is no room.
+
+```tsx
+<Tooltip text="Copy link" placement="top"><Button icon={link}>Share</Button></Tooltip>
+```
+
+Full page: src/components/overlays/tooltip/docs.md
+
 ## Tree
 
 An expandable tree for small hierarchies (file lists, settings sections). Every node can carry an icon and a trailing meta text; long labels scroll with OverflowText instead of ending in an ellipsis. For thousands of nodes, lazy children or drag and drop use TreeView.
@@ -708,7 +782,7 @@ Full page: src/components/data/tree/docs.md
 
 Edit any JSON value as a tree. Each row shows its key, a **type badge** in a HADİ color (objects and lists Heyecan, numbers Aktivite, text Dostluk, true / false İletişim) that converts the value to another type, and the value: a text or number you edit in place, a switch for true / false, a count for objects and lists. Rows add, duplicate and delete; a search box keeps the matches and their parents; a JSON Schema subset marks invalid rows with their message. Every change is one step of the editor's own undo history.
 
-Composed of: [Badge](#badge), IconButton, Toggle
+Composed of: [Badge](#badge), [IconButton](#iconbutton), Toggle
 
 ```tsx
 <TreeEditor bind:value={$config} schema={schema} />

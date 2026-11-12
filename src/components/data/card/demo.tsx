@@ -14,7 +14,7 @@ export default function CardDemo(props: { values: { head: boolean; actions: bool
   let $edits = 0
   return <div class="sc-col">
     {() => {
-      const v = props.values
+      const p = props.values, v = { head: p.head, actions: p.actions, footer: p.footer, flush: p.flush }
       return <Card title={v.head ? "Acme Ltd." : undefined} subtitle={v.head ? "Kurumsal plan" : undefined}
         actions={v.head && v.actions ? [<Button size="sm" icon={edit} on:click={() => { $edits++ }}>Düzenle</Button>] : undefined}
         footer={v.footer ? <span class="hm-muted">{() => ($edits ? `${$edits} düzenleme yapıldı` : "Son güncelleme: bugün")}</span> : undefined} flush={v.flush}>

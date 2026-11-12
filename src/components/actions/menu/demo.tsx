@@ -1,0 +1,40 @@
+// Showcase stage for Menu / Dropdown: kind and trigger follow the Playground values (playground.ts).
+import { Menu, Dropdown } from "./index.ts";
+import { Chip } from "../chip/index.ts";
+import { action } from "../../../ui/action.ts";
+import { edit } from "../../../icons/glyphs/edit.ts";
+import { copy } from "../../../icons/glyphs/copy.ts";
+import { trash } from "../../../icons/glyphs/trash.ts";
+import { more } from "../../../icons/glyphs/more.ts";
+import { filter } from "../../../icons/glyphs/filter.ts";
+
+export const code = `const remove = action("Sil", api.remove, { icon: trash, danger: true, confirm: "Silinsin mi?" })
+<Menu label="Eylemler" icon={more} items={[
+  { label: "Düzenle", icon: edit, shortcut: "E", onSelect: () => open(row) },
+  "-", remove,                                           // an action(): guarded, confirmed, toasted
+]} args={[row]} />
+<Dropdown label="Süzgeç">{(close) => <FilterForm onDone={close} />}</Dropdown>`
+
+export default function MenuDemo(props: { values: { kind: string; trigger: string } }) {
+  let $last = ""
+  let $filters = new Set(["Açık"])
+  const remove = action("Sil", async () => { await new Promise((r) => setTimeout(r, 400)) }, { icon: trash, danger: true, confirm: "Bu öğe silinsin mi?", success: "Silindi" })
+  const toggle = (f: string) => { const n = new Set($filters); if (n.has(f)) n.delete(f); else n.add(f); $filters = n }
+  return <div class="sc-row">
+    {() => {
+      const kind = props.values.kind, icon = props.values.trigger === "icon"
+      if (kind === "dropdown") return <Dropdown label="Süzgeç" icon={icon ? filter : undefined} variant="secondary">
+        <div class="sc-col"><strong>Durum</strong>
+          <div class="sc-row">{["Açık", "Bekliyor", "Çözüldü"].map((f) => <Chip selected={() => $filters.has(f)} onClick={() => toggle(f)}>{f}</Chip>)}</div>
+        </div>
+      </Dropdown>
+      return <Menu label="Eylemler" icon={icon ? more : undefined} placement="bottom-start" items={[
+        { label: "Düzenle", icon: edit, shortcut: "E", onSelect: () => { $last = "Düzenle" } },
+        { label: "Kopyala", icon: copy, shortcut: "mod+c", onSelect: () => { $last = "Kopyala" } },
+        { label: "Arşivle", disabled: true },
+        "-", remove,
+      ]} />
+    }}
+    <span class="hm-muted">{() => (props.values.kind === "dropdown" ? `Süzgeç: ${[...$filters].join(", ") || "yok"}` : $last ? `Seçilen: ${$last}` : "")}</span>
+  </div>
+}

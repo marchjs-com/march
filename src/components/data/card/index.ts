@@ -1,6 +1,5 @@
 // Card (hadi-march/ui). Folder: src/components/data/card/.
 import "./card.css";
-import "../../../ui/button.css";
 import { h } from "../../../dom/h.ts";
 import { rest, val, cx, type ClassProp } from "../../../ui/util.ts";
 import { type ActionsProp, actionsOf } from "../../../ui/display-base.ts";

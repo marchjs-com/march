@@ -10,5 +10,5 @@ const ORDER = {
 }
 
 export default function JsonViewDemo(props: { values: { open: number } }) {
-  return <div class="sc-col">{() => <JsonView value={ORDER} open={props.values.open} />}</div>
+  return <div class="sc-col">{() => { const open = props.values.open; return <JsonView value={ORDER} open={open} /> }}</div>
 }

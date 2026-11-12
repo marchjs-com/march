@@ -13,7 +13,7 @@ const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 test("1: table danger actions use the button's real class (hm-btn-danger)", () => {
   const src = readFileSync(new URL("../src/table/render.ts", import.meta.url), "utf8");
   assert.ok(!src.includes("hm-btn--danger"));
-  assert.ok(readFileSync(new URL("../src/ui/button.css", import.meta.url), "utf8").includes(".hm-btn-danger"));
+  assert.ok(readFileSync(new URL("../src/components/actions/button/button.css", import.meta.url), "utf8").includes(".hm-btn-danger"));
 });
 
 test("2: Wizard progress is the Progress component (styled by its own CSS)", () => {

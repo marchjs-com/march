@@ -1,47 +1,6 @@
-/* HADI March — Button, IconButton, ButtonGroup, CopyButton. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-/* ---------- buttons */
-.hm-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: var(--hm-space-2); min-height: var(--hm-control-h); padding: 0 .875rem;
-  border: 1px solid transparent; border-radius: var(--hm-radius); font: var(--hm-weight-medium) var(--hm-text-md)/1.2 var(--hm-font); letter-spacing: -.005em;
-  color: var(--hm-text); background: var(--hm-surface-2); cursor: pointer; text-decoration: none; white-space: nowrap; user-select: none;
-  transition: background-color var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease); }
-.hm-btn:hover { background: var(--hm-surface-3); }
-.hm-btn:active:not(:disabled) { transform: translateY(.5px) scale(.985); }
-.hm-btn:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-focus)); outline-offset: 2px; }
-.hm-btn:disabled, .hm-btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
-.hm-btn .hm-svg { width: 1rem; height: 1rem; }
-.hm-btn-primary { color: var(--hm-on-accent, var(--hm-on-primary)); background: var(--hm-accent, var(--hm-primary-solid)); border-color: color-mix(in srgb, var(--hm-accent, var(--hm-primary-solid)) 82%, var(--hm-text));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / .18), 0 1px 2px color-mix(in srgb, var(--hm-accent, var(--hm-primary-solid)) 35%, transparent); }
-.hm-btn-primary:hover { background: var(--hm-accent-hover, var(--hm-primary-solid-hover)); }
-.hm-btn-dark { color: var(--hm-surface); background: var(--hm-text); border-color: var(--hm-text); box-shadow: 0 1px 2px color-mix(in srgb, var(--hm-text) 30%, transparent); }
-.hm-btn-dark:hover { background: color-mix(in srgb, var(--hm-text) 86%, var(--hm-surface)); }
-.hm-btn-secondary { background: var(--hm-surface); border-color: var(--hm-border-strong); box-shadow: var(--hm-shadow-1); }
-.hm-btn-secondary:hover { background: var(--hm-surface-2); border-color: color-mix(in srgb, var(--hm-border-strong) 70%, var(--hm-text)); }
-.hm-btn-ghost { background: transparent; color: var(--hm-text-2); }
-.hm-btn-ghost:hover { background: var(--hm-surface-2); color: var(--hm-text); }
-.hm-btn-danger { color: var(--hm-on-status, #fff); background: var(--hm-danger-solid); border-color: transparent; box-shadow: inset 0 1px 0 rgb(255 255 255 / .15); }
-.hm-btn-danger:hover { background: color-mix(in srgb, var(--hm-danger-solid) 86%, var(--hm-text)); }
-.hm-btn-sm { min-height: var(--hm-control-h-sm); padding: 0 .625rem; font-size: var(--hm-text-sm); gap: .375rem; border-radius: var(--hm-radius-1); }
-.hm-btn-sm .hm-svg { width: .875rem; height: .875rem; }
-.hm-btn-lg { min-height: var(--hm-control-h-lg); padding: 0 var(--hm-space-5); font-size: var(--hm-text-lg); }
-.hm-btn-block { display: flex; width: 100%; }
-.hm-btn.is-loading { cursor: progress; }
-.hm-btn-spin { width: 1em; height: 1em; border-width: 2px; border-top-color: currentColor; }
-.hm-icon-btn { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--hm-control-h); height: var(--hm-control-h); padding: 0; border: 0;
-  border-radius: var(--hm-radius); background: transparent; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-lg); cursor: pointer; text-decoration: none;
-  transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }
-.hm-icon-btn:hover { background: var(--hm-surface-2); color: var(--hm-text); }
-.hm-icon-btn:active { background: var(--hm-surface-3); }
-.hm-icon-btn .hm-svg { width: 1.0625rem; height: 1.0625rem; }
-.hm-icon-btn.hm-btn-sm { width: var(--hm-control-h-sm); height: var(--hm-control-h-sm); font-size: var(--hm-text-md); }
-.hm-icon-btn.hm-btn-sm .hm-svg { width: .9375rem; height: .9375rem; }
-.hm-icon-btn-danger { color: var(--hm-danger); }
-.hm-icon-btn { position: relative; }
-.hm-icon-btn > .hm-badge-count { position: absolute; top: 2px; inset-inline-end: 0; min-width: 1rem; min-height: 1rem; padding: 0 .25rem; font-size: .625rem; line-height: 1rem;
-  box-shadow: 0 0 0 2px var(--hm-bg); animation: hm-scale-in var(--hm-dur-slow) var(--hm-ease-spring); }
-.hm-btn-group { display: inline-flex; flex-wrap: wrap; gap: var(--hm-space-2); }
-.hm-btn-group-attached { gap: 0; }
-.hm-btn-group-attached > .hm-btn { border-radius: 0; }
-.hm-btn-group-attached > .hm-btn:first-child { border-radius: var(--hm-radius) 0 0 var(--hm-radius); }
-.hm-btn-group-attached > .hm-btn:last-child { border-radius: 0 var(--hm-radius) var(--hm-radius) 0; }
-.hm-btn-group-attached > .hm-btn + .hm-btn { margin-left: -1px; }
-.hm-copy.is-copied { color: var(--hm-success-text); }
+/* HADI March — button classes (.hm-btn, .hm-icon-btn, .hm-btn-group, .hm-copy) for modules that draw raw buttons.
+   The rules live with their components in src/components/actions/; this file keeps the old import path working. */
+@import "../components/actions/button/button.css";
+@import "../components/actions/icon-button/icon-button.css";
+@import "../components/actions/button-group/button-group.css";
+@import "../components/actions/copy-button/copy-button.css";

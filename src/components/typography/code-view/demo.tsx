@@ -29,8 +29,9 @@ npx march dev --port 5173`,
 export default function CodeViewDemo(props: { values: { lang: string; lineNumbers: boolean; wrap: boolean; copy: boolean } }) {
   return <div class="sc-col">
     {() => {
-      const v = props.values
-      return <CodeView code={SAMPLE[v.lang]} lang={v.lang} lineNumbers={v.lineNumbers} wrap={v.wrap} copy={v.copy} />
+      // read the values here: CodeView takes them when it is built, so the stage rebuilds it when one changes
+      const v = props.values, lang = v.lang, lineNumbers = v.lineNumbers, wrap = v.wrap, copy = v.copy
+      return <CodeView code={SAMPLE[lang]} lang={lang} lineNumbers={lineNumbers} wrap={wrap} copy={copy} />
     }}
   </div>
 }
