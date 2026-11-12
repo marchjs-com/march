@@ -381,6 +381,26 @@ replay(), stop() }`. Never split text by hand or animate letters with your own l
 - Catalog: `TEXT_ANIMATIONS` in `hadi-march/motion/text/meta`. Reference: src/motion/text/docs.md. Showcase: Hareket ›
   Metin animasyonları (/text-motion).
 
+### 15c. Ready-made animations (all on the engine, each its own export)
+
+```ts
+import { drawPath, morphPath, followPath, clipReveal, filterBlur, displace, goo } from "hadi-march/motion";
+drawPath(svg.querySelectorAll("path"), { stagger: 80 });       // stroke draws in (pathLength=1, no measuring)
+morphPath(pathEl, starD, { easing: "spring" });                // any two paths: different point counts are resampled
+followPath(dot, roadD, { rotate: true, trail: roadEl });       // along a path, the trail drawn in the same frame
+clipReveal(card, { shape: "circle", origin: { x: 20, y: 80 } }); // circle | wipe (RTL mirrored) | diamond | curtain | blinds | inset
+filterBlur(title, { from: 16, axis: "x" }); displace(card, { from: 60 }); const off = goo(container);
+```
+Pure path tools (no DOM): `parsePath`, `flatten`, `pathSampler`, `resample`, `interpolatePath`, `toD`.
+```ts
+morph(button, dialog); await morphBack(dialog, button).finished;   // container transform (clip + move, no stretching)
+morph(thumb, big, { mode: "scale", hideSource: false });            // shared element FLIP
+morphIcon(pathEl, playing ? "pause" : "play");                      // MORPH_ICONS: play pause menu close plus check minus
+shapeMorph(el, "star");                                             // circle square triangle diamond hexagon star blob flower
+usePageTransitions(circle, cube, wipe);                             // then meta: { transition: "cube" } per route
+// variants: circle wipe stack cube flipPage zoomThrough curtain blinds pixelDissolve morphPage (PAGE_VARIANTS = all)
+```
+
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 
 **Never call `fetch()`, `new WebSocket()` or `new EventSource()` in app code. All traffic goes through `net` or an
