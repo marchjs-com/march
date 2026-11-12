@@ -19,3 +19,16 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run size
+  # every Playground / options control in the showcase must change something visible (tools/control-audit.mjs)
+  showcase-controls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: node examples/showcase/build.mjs
+      - run: npm run audit:controls
+        env:
+          BROWSER_PATH: /usr/bin/google-chrome

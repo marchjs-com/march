@@ -23,6 +23,15 @@ export function showcaseRoutes() {
   return existsSync(navFile) ? [...readFileSync(navFile, "utf8").matchAll(/path: "([^"]+)"/g)].map((m) => m[1]) : ["/"];
 }
 
+/** Every showcase page: the top-level list (nav.ts), the pages under a wildcard route (nav-meta.ts › SUB_PAGES:
+ * /motion/svg…) and the router demo's own pages. */
+export function allShowcaseRoutes() {
+  const read = (f) => { const p = join(ROOT, "examples/showcase/src", f); return existsSync(p) ? readFileSync(p, "utf8") : ""; };
+  const sub = read("nav-meta.ts").match(/SUB_PAGES[^=]*=\s*\[([\s\S]*?)\n\]/)?.[1] ?? "";
+  const extra = read("routes.ts").includes('"/navigation/router"') ? ["/navigation/router"] : [];
+  return [...new Set([...showcaseRoutes(), ...[...sub.matchAll(/path: "([^"]+)"/g)].map((m) => m[1]), ...extra])];
+}
+
 export async function openHeadless({ base = null } = {}) {
   let server;
   if (!base) {
