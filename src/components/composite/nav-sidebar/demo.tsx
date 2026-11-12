@@ -17,7 +17,9 @@ const ITEMS = [
 ]
 
 export default function NavSidebarDemo(props: { values: { groupOrder: string; defaultOpen: string; collapsible: boolean; recent: number } }) {
-  return <div class="sc-sb-frame">{() => <NavSidebar title="Acme" items={ITEMS} storageKey={`sc.sb.pg.${props.values.defaultOpen}`}
-    groupOrder={props.values.groupOrder === "alpha" ? "alpha" : "none"} defaultOpen={props.values.defaultOpen as "all"}
-    collapsible={props.values.collapsible} recent={props.values.recent} hotkey={false} palette={false} label="Playground kenar çubuğu" />}</div>
+  // read here: JSX attributes become getters, so the sidebar is drawn again only for values read in this function
+  return <div class="sc-sb-frame">{() => { const { groupOrder, defaultOpen, collapsible, recent } = { groupOrder: props.values.groupOrder, defaultOpen: props.values.defaultOpen, collapsible: props.values.collapsible, recent: props.values.recent }
+    return <NavSidebar title="Acme" items={ITEMS} storageKey={`sc.sb.pg.${defaultOpen}`}
+      groupOrder={groupOrder === "alpha" ? "alpha" : "none"} defaultOpen={defaultOpen as "all"}
+      collapsible={collapsible} recent={recent} hotkey={false} palette={false} label="Playground kenar çubuğu" /> }}</div>
 }

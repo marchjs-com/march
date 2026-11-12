@@ -2,12 +2,12 @@
 // visible; modes: bounce, loop, once. Direction-aware (dir="auto", RTL scrolls the other way), fade mask at the
 // logical edges, prefers-reduced-motion respected, screen readers read the text once (copies are aria-hidden).
 // Motion is WAAPI on a transform only; no inline style attribute.
-import "./marquee.css";
-import { signal, computed, effect, getOwner, onCleanup } from "../core/reactive.ts";
-import { h } from "../dom/h.ts";
-import { reducedMotion, frame, animateEl } from "../motion/env.ts";
-import { val, cx, on, type MaybeFn, type ClassProp } from "./util.ts";
-import { isRtl } from "../core/util.ts";
+import "./overflow-text.css";
+import { signal, computed, effect, getOwner, onCleanup } from "../../../core/reactive.ts";
+import { h } from "../../../dom/h.ts";
+import { reducedMotion, frame, animateEl } from "../../../motion/env.ts";
+import { val, cx, on, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { isRtl } from "../../../core/util.ts";
 
 export type MarqueeTrigger = "hover" | "focus" | "always" | "visible";
 export type MarqueeMode = "bounce" | "loop" | "once";

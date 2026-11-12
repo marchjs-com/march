@@ -1,13 +1,13 @@
 // Tabs: `<Tabs tabs={[{ id, label, badge, content: () => node }]} query="tab" />` or `<Tabs><Tab id label>…</Tab></Tabs>`.
 // Roving focus with ← → Home End (automatic activation). With `query="tab"` the active tab is kept in the URL (?tab=id).
 import "./tabs.css";
-import { signal, computed, untrack } from "../core/reactive.ts";
-import { h } from "../dom/h.ts";
-import { query as routeQuery, setQuery } from "../router/index.ts";
-import { Badge } from "./badge.ts";
-import { roving } from "./focus.ts";
-import { val, cx, uid, type MaybeFn, type ClassProp } from "./util.ts";
-import { colorAttr, type ColorToken } from "../theme/colors.ts";
+import { signal, computed, untrack } from "../../../core/reactive.ts";
+import { h } from "../../../dom/h.ts";
+import { query as routeQuery, setQuery } from "../../../router/index.ts";
+import { Badge } from "../../../ui/badge.ts";
+import { roving } from "../../../ui/focus.ts";
+import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 /** A tab: `content` is a node or a function rendering the panel (called when the tab becomes active). */
 export interface TabSpec {

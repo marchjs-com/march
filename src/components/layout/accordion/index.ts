@@ -1,10 +1,10 @@
 // Accordion (hadi-march/ui).
 import "./accordion.css";
-import { signal } from "../core/reactive.ts";
-import { h } from "../dom/h.ts";
-import { val, cx, uid, icon, glyph, type ClassProp } from "./util.ts";
-import { chevronDown } from "../icons/glyphs/chevronDown.ts";
-import { roving } from "./focus.ts";
+import { signal } from "../../../core/reactive.ts";
+import { h } from "../../../dom/h.ts";
+import { val, cx, uid, icon, glyph, type ClassProp } from "../../../ui/util.ts";
+import { chevronDown } from "../../../icons/glyphs/chevronDown.ts";
+import { roving } from "../../../ui/focus.ts";
 
 export interface AccordionItem { id?: string; title: unknown; subtitle?: unknown; icon?: unknown; content: unknown; disabled?: boolean }
 export interface AccordionProps { items: readonly AccordionItem[]; multiple?: boolean; open?: readonly (string | number)[]; variant?: "separated" | "contained"; class?: ClassProp }

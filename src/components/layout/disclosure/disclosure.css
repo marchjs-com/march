@@ -5,7 +5,10 @@
   border-radius: inherit; transition: background-color var(--hm-dur) var(--hm-ease); }
 .hm-disclosure-summary:hover { background: var(--hm-surface-2); }
 .hm-disclosure-summary::-webkit-details-marker { display: none; }
-.hm-disclosure-summary::before { content: ""; width: .4375rem; height: .4375rem; margin-inline: .125rem .25rem; border-right: 1.75px solid var(--hm-muted); border-bottom: 1.75px solid var(--hm-muted);
+.hm-disclosure-summary::before { content: ""; width: .4375rem; height: .4375rem; margin-inline: .125rem .25rem; border-inline-end: 1.75px solid var(--hm-muted); border-bottom: 1.75px solid var(--hm-muted);
   transform: rotate(-45deg); transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-disclosure[open] > .hm-disclosure-summary::before { transform: rotate(45deg); }
+/* RTL: the border sits on the other side, so the turn is mirrored (closed points left, open points down) */
+.hm-disclosure-summary:dir(rtl)::before { transform: rotate(45deg); }
+.hm-disclosure[open] > .hm-disclosure-summary:dir(rtl)::before { transform: rotate(-45deg); }
 .hm-disclosure-body { padding: 0 var(--hm-space-4) var(--hm-space-4); }

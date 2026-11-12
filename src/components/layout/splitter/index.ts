@@ -1,11 +1,11 @@
 // Splitter (hadi-march/ui).
 import "./splitter.css";
-import { signal } from "../core/reactive.ts";
-import { h } from "../dom/h.ts";
-import { t } from "../core/i18n.ts";
-import { val, cx, type ClassProp } from "./util.ts";
-import { clamp, setStyle } from "../core/util.ts";
-import { resizeHandle } from "../behaviors/resize-handle/index.ts";
+import { signal } from "../../../core/reactive.ts";
+import { h } from "../../../dom/h.ts";
+import { t } from "../../../core/i18n.ts";
+import { val, cx, type ClassProp } from "../../../ui/util.ts";
+import { clamp, setStyle } from "../../../core/util.ts";
+import { resizeHandle } from "../../../behaviors/resize-handle/index.ts";
 
 export interface SplitterProps { start: unknown; end: unknown; /** Initial share of the first pane, 0..1. */ initial?: number; min?: number; label?: string; class?: ClassProp }
 /** Two resizable panes (drag the handle, or ← → on it). */

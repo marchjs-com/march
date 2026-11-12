@@ -1,9 +1,9 @@
 // Steps (hadi-march/ui).
 import "./steps.css";
-import { h } from "../dom/h.ts";
-import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
-import { check } from "../icons/glyphs/check.ts";
-import { colorAttr, type ColorToken } from "../theme/colors.ts";
+import { h } from "../../../dom/h.ts";
+import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { check } from "../../../icons/glyphs/check.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface StepItem { title: unknown; description?: unknown; icon?: unknown }
 export interface StepsProps { /** Theme color token. */ color?: ColorToken | undefined; steps: readonly StepItem[]; current: MaybeFn<number>; onSelect?: (i: number) => void; vertical?: boolean; class?: ClassProp }

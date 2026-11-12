@@ -1,8 +1,8 @@
 // Disclosure: a collapsible section built on native <details>/<summary> (keyboard and screen reader support for free).
 //   <Disclosure title="Advanced" open={false} onToggle={(open) => …}>…</Disclosure>
 import "./disclosure.css";
-import { h } from "../dom/h.ts";
-import { read } from "../core/reactive.ts";
+import { h } from "../../../dom/h.ts";
+import { read } from "../../../core/reactive.ts";
 
 export interface DisclosureProps { title: unknown; open?: boolean | (() => boolean); onToggle?: (open: boolean) => void; class?: string; children?: unknown }
 

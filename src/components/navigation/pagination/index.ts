@@ -1,12 +1,12 @@
 // Pagination (hadi-march/ui).
 import "./pagination.css";
-import { computed, untrack } from "../core/reactive.ts";
-import { h } from "../dom/h.ts";
-import { t } from "../core/i18n.ts";
-import { val, cx, glyph, type MaybeFn, type ClassProp } from "./util.ts";
-import { chevronLeft } from "../icons/glyphs/chevronLeft.ts";
-import { chevronRight } from "../icons/glyphs/chevronRight.ts";
-import { more } from "../icons/glyphs/more.ts";
+import { computed, untrack } from "../../../core/reactive.ts";
+import { h } from "../../../dom/h.ts";
+import { t } from "../../../core/i18n.ts";
+import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
+import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
+import { more } from "../../../icons/glyphs/more.ts";
 
 export interface PaginationProps { page: MaybeFn<number>; pages: MaybeFn<number>; onPage?: (p: number) => void; setPage?: (p: number) => void; siblings?: number; class?: ClassProp }
 /** Numbered pages with ellipses: `<Pagination bind:page={$page} pages={20} />` (1-based). */

@@ -6,7 +6,7 @@ import { installDom } from "../src/testing/dom.ts";
 installDom();
 const { h } = await import("../src/index.ts");
 const U = await import("../src/ui/index.ts");
-const css = readFileSync(new URL("../src/ui/grid.css", import.meta.url), "utf8");
+const css = readFileSync(new URL("../src/components/layout/grid/grid.css", import.meta.url), "utf8");
 const cls = (el) => el.getAttribute("class").split(/\s+/);
 
 test("Grid: default fixed columns, auto columns with --hm-grid-min", () => {

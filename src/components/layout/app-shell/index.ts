@@ -1,9 +1,9 @@
 // AppShell (hadi-march/ui): the application frame. Its own module so an app's entry does not pull in Page, tabs or
 // search (layout.ts) just to draw the frame.
-import "./layout.css";
-import { h } from "../dom/h.ts";
-import { t } from "../core/i18n.ts";
-import { val, cx, type ClassProp } from "../core/util.ts";
+import "./app-shell.css";
+import { h } from "../../../dom/h.ts";
+import { t } from "../../../core/i18n.ts";
+import { val, cx, type ClassProp } from "../../../core/util.ts";
 
 export interface AppShellProps {
   nav?: unknown;
