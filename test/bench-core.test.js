@@ -48,10 +48,10 @@ function fakeApp() {
 test("operations: setup → act passes the check; doing nothing fails it", () => {
   for (const op of OPS) {
     const { app, dom } = fakeApp(), src = rowSource(3);
-    op.setup(app, src, dom); op.act(app, src, dom);
+    op.setup(app, src, dom); op.mark?.(dom); op.act(app, src, dom);
     assert.ok(op.check(dom), `${op.id} check`);
     const idle = fakeApp();
-    op.setup(idle.app, src, idle.dom);
+    op.setup(idle.app, src, idle.dom); op.mark?.(idle.dom);
     if (op.id !== "clear" || idle.dom.count()) assert.ok(!op.check(idle.dom), `${op.id}: skipping the work must fail`);
   }
   assert.equal(new Set(OPS.map((o) => o.id)).size, OPS.length);
