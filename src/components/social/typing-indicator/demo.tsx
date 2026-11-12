@@ -2,9 +2,9 @@
 import { TypingIndicator } from "./index.ts";
 
 export const code = `<TypingIndicator names={$typing} />                       // dots in a bubble, announced
-<TypingIndicator names={["Acme", "Beta"]} variant="inline" text />`
+<TypingIndicator names={["HADİ", "Beta"]} variant="inline" text />`
 
-const PEOPLE = ["Acme Koşu Kulübü", "Kitap Kulübü", "Fotoğraf Atölyesi", "Masa Oyunları Ekibi"]
+const PEOPLE = ["HADİ Koşu Kulübü", "Kitap Kulübü", "Fotoğraf Atölyesi", "Masa Oyunları Ekibi"]
 
 export default function TypingIndicatorDemo(props: { values: { people: number; variant: string; text: boolean } }) {
   return <div class="sc-row sc-social-typing">

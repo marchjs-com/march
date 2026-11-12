@@ -6,7 +6,7 @@ export const code = `<Field label="İlçe"><Combobox bind:value={$town} options=
 <Field label="Üye"><Combobox bind:value={$member} search={(q) => api.members(q)} /></Field>`
 
 const TOWNS = ["Kadıköy", "Beşiktaş", "Üsküdar", "Şişli", "Bakırköy", "Ataşehir", "Sarıyer", "Fatih", "Beyoğlu", "Maltepe"].map((x) => ({ value: x, label: x }))
-const MEMBERS = ["Acme Tasarım", "Acme Lojistik", "Atlas Yazılım", "Bora Gıda", "Deniz Medya", "Ege Enerji", "Kuzey Mimarlık"].map((x, i) => ({ value: i + 1, label: x, hint: `#${100 + i}` }))
+const MEMBERS = ["HADİ Tasarım", "HADİ Lojistik", "Atlas Yazılım", "Bora Gıda", "Deniz Medya", "Ege Enerji", "Kuzey Mimarlık"].map((x, i) => ({ value: i + 1, label: x, hint: `#${100 + i}` }))
 const search = (q: string) => new Promise<typeof MEMBERS>((r) => setTimeout(() => r(MEMBERS.filter((m) => m.label.toLocaleLowerCase("tr").includes(q.toLocaleLowerCase("tr")))), 300))
 
 export default function ComboboxDemo(props: { values: { source: string; disabled: boolean } }) {

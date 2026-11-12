@@ -99,7 +99,7 @@ params to any API: a string renames a param, `null` drops it, and a function ret
 pass a function that receives the whole params object.
 
 ```jsx
-// GET /api/orders?skip=40&limit=20&order=-total,customer&q=acme
+// GET /api/orders?skip=40&limit=20&order=-total,customer&q=hadi
 <Table
   source={(p, { signal }) => fetchJson(`/api/orders?${new URLSearchParams(p)}`, { signal })}
   paramNames={{

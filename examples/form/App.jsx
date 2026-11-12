@@ -18,7 +18,7 @@ const Signup = schema({
 
 // Pretend API
 const wait = (ms) => new Promise((r) => setTimeout(r, ms))
-let stored = { name: "Acme", timezone: "Europe/Berlin", seats: 25, links: ["https://acme.example"], about: "**Hello** team", meta: { region: "eu" } }
+let stored = { name: "HADİ", timezone: "Europe/Berlin", seats: 25, links: ["https://hadisosyal.com"], about: "**Hello** team", meta: { region: "eu" } }
 const api = {
   async signup(v) { await wait(400); if (v.email.endsWith("@taken.com")) throw Object.assign(new Error("Rejected"), { fieldErrors: { email: "This address is already registered" } }) },
   async settings() { await wait(300); return structuredClone(stored) },

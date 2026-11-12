@@ -10,7 +10,7 @@ const { Breadcrumbs } = await import("./index.ts");
 test("Breadcrumbs: nav + ordered list, current page, buttons, sibling menus, separators", async () => {
   let went = 0;
   const m = mount(() => h(Breadcrumbs, { label: "File path", items: [
-    { id: "acme", label: "acme", onSelect: () => went++ },
+    { id: "hadi", label: "hadi", onSelect: () => went++ },
     { id: "src", label: "src", siblings: [{ id: "docs", label: "docs", onSelect: () => {} }] },
     { id: "app", label: "app.ts" },
   ] }));

@@ -114,7 +114,7 @@ export function setColorTheme(id: string): string {
 }
 /** Themes offered by <ThemePicker> (reactive). */
 export const colorThemes = (): readonly ThemeInfo[] => infos();
-/** Offer extra themes: `registerThemes([{ id: "acme", name: "Acme", href: "themes/acme.css" }])` (CSS made with themeCss()). */
+/** Offer extra themes: `registerThemes([{ id: "hadi-marka", name: "HADİ", href: "themes/hadi-marka.css" }])` (CSS made with themeCss()). */
 export function registerThemes(list: readonly ThemeInfo[]): void { infos.update((l) => [...l.filter((x) => !list.some((y) => y.id === x.id)), ...list]); }
 
 /** Small preview of a theme drawn by the theme itself (data-hm-theme scope; no inline styles). */

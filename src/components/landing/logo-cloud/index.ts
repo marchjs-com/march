@@ -38,7 +38,7 @@ function logoNode(l: Logo): Element {
   return l.href ? h("a", { class: "hm-logo", href: l.href, "aria-label": l.node != null ? l.name : null }, inner) as Element : h("span", { class: "hm-logo" }, inner) as Element;
 }
 
-/** `<LogoCloud title="Trusted by" logos={[{ name: "Acme", src: "/acme.svg", width: 120, height: 32 }]} variant="marquee" />` */
+/** `<LogoCloud title="Trusted by" logos={[{ name: "HADİ", src: "/hadi.svg", width: 120, height: 32 }]} variant="marquee" />` */
 export function LogoCloud(props: LogoCloudProps): Element {
   const variant = props.variant ?? "grid";
   const body = variant === "marquee"

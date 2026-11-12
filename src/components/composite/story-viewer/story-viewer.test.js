@@ -6,7 +6,7 @@ const { h, render, signal } = await import("../../../index.ts");
 const { StoryViewer } = await import("./index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
 const groups = [
-  { id: "a", name: "Acme", items: [{ id: "a1", src: "1.svg" }, { id: "a2", src: "2.svg" }] },
+  { id: "a", name: "HADİ", items: [{ id: "a1", src: "1.svg" }, { id: "a2", src: "2.svg" }] },
   { id: "b", name: "Beta", items: [{ id: "b1", src: "3.svg" }] },
 ];
 const key = (el, k) => el.dispatchEvent(Object.assign(new globalThis.Event("keydown", { bubbles: true, cancelable: true }), { key: k }));
@@ -19,13 +19,13 @@ test("StoryViewer: opens at the start person, arrows move through stories and pe
   assert.ok(dlg);
   assert.equal(dlg.getAttribute("aria-label"), "Stories");
   const story = document.querySelector(".hm-story");
-  assert.match(story.querySelector("[aria-live]").textContent, /Acme: story 1 of 2/);
+  assert.match(story.querySelector("[aria-live]").textContent, /HADİ: story 1 of 2/);
   key(story, "ArrowRight");
-  assert.match(story.querySelector("[aria-live]").textContent, /Acme: story 2 of 2/);
+  assert.match(story.querySelector("[aria-live]").textContent, /HADİ: story 2 of 2/);
   key(story, "ArrowRight");
   assert.match(story.querySelector("[aria-live]").textContent, /Beta: story 1 of 1/);
   key(story, "ArrowLeft");
-  assert.match(story.querySelector("[aria-live]").textContent, /Acme/);
+  assert.match(story.querySelector("[aria-live]").textContent, /HADİ/);
   assert.deepEqual(seen.slice(0, 3), ["a1", "a2", "b1"]);
   const pause = [...story.querySelectorAll("button")].find((b) => b.getAttribute("aria-label") === "Pause");
   pause.click();

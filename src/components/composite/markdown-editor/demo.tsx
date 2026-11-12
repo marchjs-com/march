@@ -4,9 +4,9 @@ import { untrack } from "../../../core/reactive.ts";
 import { MarkdownEditor, type MarkdownView } from "./index.ts";
 
 const START = [
-  "## Acme ekip toplantısı",
+  "## HADİ ekip toplantısı",
   "",
-  "Toplantı **perşembe 10:00** saatinde, _ana ofiste_. Ayrıntılar [etkinlik sayfasında](https://acme.example/etkinlik).",
+  "Toplantı **perşembe 10:00** saatinde, _ana ofiste_. Ayrıntılar [etkinlik sayfasında](https://hadisosyal.com/etkinlik).",
   "",
   "### Gündem",
   "",
@@ -20,7 +20,7 @@ const START = [
   "> Not: Otoparka giriş yan kapıdan.",
   "",
   "```bash",
-  "npm create march@latest acme",
+  "npm create march@latest hadi",
   "```",
 ].join("\n")
 

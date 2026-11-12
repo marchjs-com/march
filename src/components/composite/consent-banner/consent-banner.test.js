@@ -14,9 +14,9 @@ test("ConsentBanner: the managers/consent/ui subpath is this module; own wording
   consent.withdraw();
   const host = document.createElement("div");
   document.body.appendChild(host);
-  const off = render(() => h(C.ConsentBanner, { inline: true, title: "Çerezler", text: "Acme analitik kullanır." }), host);
+  const off = render(() => h(C.ConsentBanner, { inline: true, title: "Çerezler", text: "HADİ analitik kullanır." }), host);
   assert.equal(host.querySelector(".hm-consent [role=region], .hm-consent")?.getAttribute("aria-label"), "Çerezler");
-  assert.match(host.textContent, /Acme analitik kullanır\./);
+  assert.match(host.textContent, /HADİ analitik kullanır\./);
   const accept = [...host.querySelectorAll(".hm-consent-actions button")].at(-1); // Accept all (last, primary)
   accept.click();
   assert.equal(host.querySelector(".hm-consent"), null);

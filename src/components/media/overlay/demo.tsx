@@ -11,7 +11,7 @@ export default function OverlayDemo(props: { values: { effect: string; front: bo
       const v = props.values
       return <div class="sc-ov-card">
         <Overlay effect={v.effect as "mesh"} front={v.front} opacity={v.opacity} />
-        <strong>Acme Konferansı</strong>
+        <strong>HADİ Konferansı</strong>
         <p>Katman tıklamaları almaz: bu düğme çalışır.</p>
         <button type="button" class="hm-btn hm-btn-sm">Kayıt ol</button>
       </div>

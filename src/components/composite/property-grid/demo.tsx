@@ -24,7 +24,7 @@ const PROPS: PropertySpec[] = [
 ]
 
 export default function PropertyGridDemo(props: { values: { layout: string; search: boolean; save: boolean } }) {
-  const card = signal<Record<string, unknown>>({ title: "Acme bülteni", body: "Haftalık özet", width: 300, align: "start", elevated: true, radius: 12, tone: "light", accent: "#1d9ad6" })
+  const card = signal<Record<string, unknown>>({ title: "HADİ bülteni", body: "Haftalık özet", width: 300, align: "start", elevated: true, radius: 12, tone: "light", accent: "#1d9ad6" })
   return <div class="sc-pg-stage">
     <div class="sc-pg-preview" aria-hidden="true">
       {() => {

@@ -41,24 +41,24 @@ test("deep imports rewrite the import header only, never an import written insid
 
 test("icon packs: icon() and <Icon name> resolve 'pack:name' and plain names (March) through registerIconPack, lazily", async () => {
   const P = await import("../src/icons/packs.ts");
-  const acme = { name: "acme-star", d: ["M12 2 2 22h20z"], fill: true, vb: "0 0 24 24" };
-  const off = P.registerIconPack({ id: "acme", name: "Acme", license: "MIT", resolve: (n) => Promise.resolve(n === "star" ? acme : undefined) });
-  assert.deepEqual(P.parseIconRef("acme:star"), ["acme", "star"]);
+  const hadi = { name: "hadi-star", d: ["M12 2 2 22h20z"], fill: true, vb: "0 0 24 24" };
+  const off = P.registerIconPack({ id: "hadi", name: "HADİ", license: "MIT", resolve: (n) => Promise.resolve(n === "star" ? hadi : undefined) });
+  assert.deepEqual(P.parseIconRef("hadi:star"), ["hadi", "star"]);
   assert.deepEqual(P.parseIconRef("user"), ["march", "user"]);
-  const el = mount(() => h(P.Icon, { name: "acme:star", size: "lg" }));
+  const el = mount(() => h(P.Icon, { name: "hadi:star", size: "lg" }));
   const svg = el.querySelector("svg");
   assert.equal(svg.childNodes.length, 0, "empty until the pack answers");
   await new Promise((r) => setTimeout(r, 0));
-  assert.equal(svg.getAttribute("data-icon"), "acme-star");
+  assert.equal(svg.getAttribute("data-icon"), "hadi-star");
   assert.match(svg.getAttribute("class"), /hm-svg-lg hm-svg-fill/);
   assert.equal(svg.querySelector("path").getAttribute("d"), "M12 2 2 22h20z");
   assert.equal(await P.loadIcon("arrow-left").then((d) => d.name), "arrow-left", "no prefix: the March set (its catalog loads on use)");
-  assert.equal(await P.loadIcon("acme:nope"), undefined);
-  assert.deepEqual(P.icon("acme:nope").d, [], "unknown or still loading: an icon without shapes (safe in any icon prop)");
-  assert.equal(P.icon("acme:star").name, "acme-star");
+  assert.equal(await P.loadIcon("hadi:nope"), undefined);
+  assert.deepEqual(P.icon("hadi:nope").d, [], "unknown or still loading: an icon without shapes (safe in any icon prop)");
+  assert.equal(P.icon("hadi:star").name, "hadi-star");
   assert.ok(P.iconPacks().some((p) => p.id === "march"));
   off();
-  assert.equal(P.iconPack("acme"), undefined);
+  assert.equal(P.iconPack("hadi"), undefined);
   // a name asked for before its pack is registered draws once the pack arrives
   const late = mount(() => h(P.Icon, { name: "late:dot" }));
   assert.equal(late.querySelector("svg").childNodes.length, 0);

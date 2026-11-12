@@ -13,7 +13,7 @@ export default function TabsDemo(props: { values: { badges: boolean; disabled: b
   const pending = signal(3)
   return <div class="sc-tabs-demo">
     {() => { const badges = props.values.badges, off = props.values.disabled; return <Tabs value={tab} onChange={(id: string) => tab.set(id)} label="Proje" tabs={[
-      { id: "overview", label: "Genel bakış", content: () => <p>Acme web sitesi: 12 görev açık, son sürüm dün yayımlandı.</p> },
+      { id: "overview", label: "Genel bakış", content: () => <p>HADİ web sitesi: 12 görev açık, son sürüm dün yayımlandı.</p> },
       { id: "members", label: "Üyeler", badge: () => (badges ? pending() : null), content: () => <div>
         <p>{() => (pending() ? `${pending()} davet onay bekliyor.` : "Bekleyen davet yok.")}</p>
         <button type="button" class="hm-btn hm-btn-sm" disabled={() => !pending()} onClick={() => pending.set(pending() - 1)}>Birini onayla</button>

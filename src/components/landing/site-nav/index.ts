@@ -60,7 +60,7 @@ function toSection(e: Event, href: string): boolean {
   return true;
 }
 
-/** `<SiteNav brand={{ name: "Acme", mark: logo, href: "/" }} links={[{ label: "Pricing", href: "#pricing" }]} actions={<Button>Start</Button>} mode="transparent" />` */
+/** `<SiteNav brand={{ name: "HADİ", mark: logo, href: "/" }} links={[{ label: "Pricing", href: "#pricing" }]} actions={<Button>Start</Button>} mode="transparent" />` */
 export function SiteNav(props: SiteNavProps): Element {
   const scrolled = signal(false), hidden = signal(false);
   const links = props.links ?? [];

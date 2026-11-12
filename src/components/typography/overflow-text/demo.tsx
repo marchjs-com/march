@@ -19,7 +19,7 @@ const SAMPLES = [
   ["TR", "Haftalık etkinlik özeti: Kadıköy koşu grubu, Moda sahili buluşması ve akşam yemeği"],
   ["EN", "Weekly digest: Saturday running club, beach clean-up meetup and the community dinner"],
   ["AR", "ملخص الأسبوع: نادي الجري يوم السبت، لقاء تنظيف الشاطئ وعشاء المجتمع"],
-  ["Karışık", "Acme — مرحبا بكم في المجتمع — welcome to the community"],
+  ["Karışık", "HADİ — مرحبا بكم في المجتمع — welcome to the community"],
   ["Kısa", "Sığan metin kaymaz"],
 ] as const
 

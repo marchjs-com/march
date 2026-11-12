@@ -11,7 +11,7 @@ export const code = `<DataGrid rows={$orders} rowKey="id" selectable groupBy={["
   onEdit={(row, key, value) => save(row.id, key, value)} />`
 
 interface Order { id: number; customer: string; region: string; status: string; product: string; qty: number; amount: number; date: string }
-const CUSTOMERS = ["Acme", "Globex", "Initech", "Umbrella", "Stark Lojistik", "Wayne Gıda", "Hooli", "Vandelay", "Soylent", "Wonka", "Tyrell", "Cyberdyne"];
+const CUSTOMERS = ["HADİ", "Globex", "Initech", "Umbrella", "Stark Lojistik", "Wayne Gıda", "Hooli", "Vandelay", "Soylent", "Wonka", "Tyrell", "Cyberdyne"];
 const REGIONS = ["Marmara", "Ege", "İç Anadolu", "Akdeniz", "Karadeniz"];
 const STATUS = [{ value: "new", label: "Yeni" }, { value: "paid", label: "Ödendi" }, { value: "shipped", label: "Kargoda" }, { value: "done", label: "Teslim" }];
 const PRODUCTS = ["Kalem", "Defter", "Çanta", "Masa", "Sandalye", "Lamba", "Monitör", "Klavye"];

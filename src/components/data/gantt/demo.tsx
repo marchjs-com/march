@@ -19,7 +19,7 @@ const PLAN: [id: string, name: string, from: number, days: number, progress: num
   ["mobile", "Mobil uygulama", 8, 12, 0, ["design", "api"], "brand-orange"],
   ["qa", "Test ve düzeltmeler", 21, 6, 0, ["web", "mobile"], "brand-gold"],
   ["docs", "Belgeler", 18, 7, 0, ["web"], "brand-green"],
-  ["beta", "Acme ile beta", 27, 1, 0, ["qa"], "brand-pink", true],
+  ["beta", "HADİ ile beta", 27, 1, 0, ["qa"], "brand-pink", true],
   ["launch", "Yayın", 30, 1, 0, ["beta", "docs"], "brand-orange", true],
 ];
 

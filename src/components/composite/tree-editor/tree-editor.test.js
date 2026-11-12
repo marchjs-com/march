@@ -33,7 +33,7 @@ test("json-path: schema subset reports problems with their paths", () => {
     name: { type: "string", minLength: 1 }, port: { type: "integer", minimum: 1, maximum: 65535 },
     mode: { enum: ["dev", "prod"] }, admins: { type: "array", items: { type: "string", format: "email" }, maxItems: 2 },
   } };
-  const errs = J.validateJson({ name: "", port: 70000.5, mode: "test", admins: ["a@acme.example", "nope"], extra: 1 }, schema);
+  const errs = J.validateJson({ name: "", port: 70000.5, mode: "test", admins: ["a@hadisosyal.com", "nope"], extra: 1 }, schema);
   const by = Object.fromEntries(errs.map((e) => [J.pointer(e.path), e.message]));
   assert.equal(by["/name"], "Cannot be empty");
   assert.match(by["/port"], /Expected whole number/);
@@ -45,7 +45,7 @@ test("json-path: schema subset reports problems with their paths", () => {
 });
 
 test("TreeEditor: rows, type badges, add / duplicate / delete as undoable steps, validation marks rows", async () => {
-  const v = signal({ name: "Acme", port: 80, debug: false, tags: ["a", "b"], owner: null });
+  const v = signal({ name: "HADİ", port: 80, debug: false, tags: ["a", "b"], owner: null });
   const schema = { type: "object", properties: { port: { type: "integer", minimum: 1024 } } };
   const { el, dispose } = mount(() => h(TreeEditor, { "bind:value": v, schema }));
   const rows = () => el.querySelectorAll("[role=treeitem]");

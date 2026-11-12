@@ -25,7 +25,7 @@ and focus returns to the ring that opened it.
 ## Accessibility
 
 A modal dialog named "Stories". ← / → move (mirrored in RTL), Space pauses, Esc closes; previous / next buttons
-appear on hover and on keyboard focus, the pause button has `aria-pressed`. A polite live region says "Acme: story 2 of
+appear on hover and on keyboard focus, the pause button has `aria-pressed`. A polite live region says "HADİ: story 2 of
 3"; the progress bar has its own value text.
 
 ## Composed of

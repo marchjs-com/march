@@ -9,7 +9,7 @@ import { Chip } from "../../actions/chip/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import type { ThemeEditorContext } from "./types.ts";
 
-const ROWS: readonly [string, string, string, number][] = [["Acme", "Design", "success", 92], ["Globex", "Product", "warn", 64], ["Initech", "Support", "danger", 31]];
+const ROWS: readonly [string, string, string, number][] = [["HADİ", "Design", "success", 92], ["Globex", "Product", "warn", 64], ["Initech", "Support", "danger", 31]];
 
 /** Alerts, table, chips and motion of the ThemeEditor preview. */
 export function PreviewTable({ ctx }: { ctx: ThemeEditorContext }): Element {

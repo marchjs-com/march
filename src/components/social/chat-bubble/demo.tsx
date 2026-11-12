@@ -16,7 +16,7 @@ export default function ChatBubbleDemo(props: { values: { mine: boolean; status:
     {() => {
       const mine = props.values.mine, v = props.values
       return [
-        <ChatBubble mine={mine} position="first" text="Pazar sabahı rotayı değiştirdik 🌲" time={minutesAgo(12)} status={v.status as MessageStatus} sender={v.group ? "Acme Koşu Kulübü" : undefined} senderColor={0} onReply={() => { $log = "Yanıt: 1. mesaj" }} />,
+        <ChatBubble mine={mine} position="first" text="Pazar sabahı rotayı değiştirdik 🌲" time={minutesAgo(12)} status={v.status as MessageStatus} sender={v.group ? "HADİ Koşu Kulübü" : undefined} senderColor={0} onReply={() => { $log = "Yanıt: 1. mesaj" }} />,
         <ChatBubble mine={mine} position="middle" text="Orman yolu 8 km, tempo herkes için uygun." time={minutesAgo(11)} status={v.status as MessageStatus} onReply={() => { $log = "Yanıt: 2. mesaj" }} />,
         <ChatBubble mine={mine} position="last" text="Buluşma 7:00'de giriş kapısında. Kim geliyor?" time={minutesAgo(10)} status={v.status as MessageStatus}
           reply={v.reply ? { name: "Kitap Kulübü", text: "Bu hafta rota nerede olacak?" } : undefined}

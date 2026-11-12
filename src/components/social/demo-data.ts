@@ -19,7 +19,7 @@ export const PHOTOS: readonly MediaItem[] = [
 
 export interface DemoUser { id: string; name: string; handle: string; verified?: boolean }
 export const USERS: readonly DemoUser[] = [
-  { id: "u1", name: "Acme Koşu Kulübü", handle: "acme.kosu", verified: true },
+  { id: "u1", name: "HADİ Koşu Kulübü", handle: "hadi.kosu", verified: true },
   { id: "u2", name: "Pazar Bisiklet Grubu", handle: "pazar.bisiklet" },
   { id: "u3", name: "Fotoğraf Atölyesi", handle: "foto.atolye", verified: true },
   { id: "u4", name: "Kitap Kulübü", handle: "kitap.kulubu" },

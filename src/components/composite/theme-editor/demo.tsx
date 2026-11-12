@@ -15,7 +15,7 @@ import { presetDraft, draftFromTheme, draftFromColor, deriveDark, draftToTheme, 
   draftCode, draftCss, draftJson, importTheme, normalizeDraft, encodeDraft, decodeDraft, shareUrl, sharedDraft,
   toneScale, typeScale, contrastAudit, PRESETS } from "hadi-march/components/composite/theme-editor"
 
-const d = draftFromColor("#0e7490", "Acme")        // or presetDraft("night"), draftFromTheme(myDef), presetCopy("neon")
+const d = draftFromColor("#0e7490", "HADİ")        // or presetDraft("night"), draftFromTheme(myDef), presetCopy("neon")
 d.dark = deriveDark(d.light)
 contrastAudit(d.light)          // [{ fg: "muted", bg: "surface", ratio: 4.9, min: 4.5, ok: true, fix: null }, …]
 toneScale(d.light.primary)      // 50 … 900;  typeScale(d.type) → 2xs … 5xl in px
@@ -34,7 +34,7 @@ export default function ThemeEditorDemo(props: { values: { base: string; preview
   let lastBase = ""
   return <div class="sc-te">{() => {
     const base = props.values.base
-    if (lastBase && base !== lastBase) $draft = base === "scratch" ? draftFromColor("#0e7490", "Acme") : presetCopy(base)
+    if (lastBase && base !== lastBase) $draft = base === "scratch" ? draftFromColor("#0e7490", "HADİ") : presetCopy(base)
     lastBase = base
     return <ThemeEditor base={base} value={untrack(() => $draft)} onChange={(v: ThemeDraft) => { $draft = v }}
       tabs={TABS[props.values.tabs]} preview={props.values.preview} readonly={props.values.readonly} />

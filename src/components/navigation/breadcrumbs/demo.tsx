@@ -6,8 +6,8 @@ import { fileText } from "../../../icons/glyphs/fileText.ts";
 import { hash } from "../../../icons/glyphs/hash.ts";
 
 export const code = `<Breadcrumbs label="Dosya yolu" items={[
-  { id: "acme", label: "acme", icon: folder, onSelect: () => openFolder("acme") },
-  { id: "src", label: "src", icon: folder, siblings: () => folders("acme") },   // kardeşlere menüyle git
+  { id: "hadi", label: "hadi", icon: folder, onSelect: () => openFolder("hadi") },
+  { id: "src", label: "src", icon: folder, siblings: () => folders("hadi") },   // kardeşlere menüyle git
   { id: "file", label: "app.ts", icon: fileText },
 ]} />`
 
@@ -18,7 +18,7 @@ export default function BreadcrumbsDemo(props: { values: { width: number; siblin
   const items = (): Crumb[] => {
     const sib = props.values.siblings ? FILES.map((f) => ({ id: f, label: f, icon: fileText, onSelect: () => file.set(f) })) : undefined
     return [
-      { id: "acme", label: "acme", icon: folder, onSelect: () => file.set("app.ts") },
+      { id: "hadi", label: "hadi", icon: folder, onSelect: () => file.set("app.ts") },
       { id: "packages", label: "packages", icon: folder },
       { id: "web", label: "web-istemci", icon: folder },
       { id: "src", label: "src", icon: folder },

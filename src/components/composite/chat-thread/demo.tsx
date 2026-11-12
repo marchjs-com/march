@@ -11,14 +11,14 @@ export const code = `<ChatThread messages={$messages} typing={$typing} group
 
 const day = (d: number, h: number, m: number) => { const x = new Date(); x.setDate(x.getDate() - d); x.setHours(h, m, 0, 0); return x }
 const START: ChatMessage[] = [
-  { id: "m1", senderId: "a", senderName: "Acme Koşu Kulübü", text: "Herkese günaydın! Pazar rotası belli oldu.", time: day(1, 9, 2) },
-  { id: "m2", senderId: "a", senderName: "Acme Koşu Kulübü", text: "Orman yolu, 8 km 🌲", time: day(1, 9, 3), image: { src: PHOTO("forest"), alt: "Orman yolu" } },
+  { id: "m1", senderId: "a", senderName: "HADİ Koşu Kulübü", text: "Herkese günaydın! Pazar rotası belli oldu.", time: day(1, 9, 2) },
+  { id: "m2", senderId: "a", senderName: "HADİ Koşu Kulübü", text: "Orman yolu, 8 km 🌲", time: day(1, 9, 3), image: { src: PHOTO("forest"), alt: "Orman yolu" } },
   { id: "m3", mine: true, text: "Süper, ben varım!", time: day(1, 9, 20), status: "read", reactions: [{ emoji: "❤️", count: 2 }] },
   { id: "m4", senderId: "b", senderName: "Kitap Kulübü", text: "Biz de dönüşte kahveye geçeriz ☕", time: day(0, 8, 41) },
   { id: "m5", senderId: "b", senderName: "Kitap Kulübü", text: "Kimler geliyor?", time: day(0, 8, 42) },
   { id: "m6", mine: true, text: "👋", time: minutesAgo(3), status: "delivered" },
 ]
-const ANSWERS = [["a", "Acme Koşu Kulübü", "Harika, listeye ekledim ✅"], ["b", "Kitap Kulübü", "Ben de geliyorum!"], ["a", "Acme Koşu Kulübü", "Su ve rahat ayakkabı unutmayın 👟"]] as const
+const ANSWERS = [["a", "HADİ Koşu Kulübü", "Harika, listeye ekledim ✅"], ["b", "Kitap Kulübü", "Ben de geliyorum!"], ["a", "HADİ Koşu Kulübü", "Su ve rahat ayakkabı unutmayın 👟"]] as const
 
 export default function ChatThreadDemo(props: { values: { group: boolean; replyDelay: number } }) {
   let $messages: ChatMessage[] = START

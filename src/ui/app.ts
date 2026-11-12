@@ -22,7 +22,7 @@ export interface BrandProps {
   size?: "md" | "lg";
   class?: ClassProp;
 }
-/** Logo lockup: `<Brand mark={logo} name="Acme" sub="Admin" href="/" />` */
+/** Logo lockup: `<Brand mark={logo} name="HADİ" sub="Admin" href="/" />` */
 export function Brand(props: BrandProps): Element {
   const inner = [
     props.mark != null && h("span", { class: "hm-brand-mark" }, icon(props.mark, "hm-brand-glyph")),

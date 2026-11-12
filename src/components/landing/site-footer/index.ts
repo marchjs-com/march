@@ -29,7 +29,7 @@ export interface SiteFooterProps {
   class?: ClassProp | undefined;
 }
 
-/** `<SiteFooter brand={{ name: "Acme" }} columns={[{ title: "Product", links: [{ label: "Pricing", href: "/pricing" }] }]} />` */
+/** `<SiteFooter brand={{ name: "HADİ" }} columns={[{ title: "Product", links: [{ label: "Pricing", href: "/pricing" }] }]} />` */
 export function SiteFooter(props: SiteFooterProps): Element {
   const isNode = (props.brand as Node).nodeType != null;
   const name = isNode ? "" : String(val((props.brand as BrandProps).name) ?? "");

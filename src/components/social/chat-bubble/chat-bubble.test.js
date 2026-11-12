@@ -11,7 +11,7 @@ test("ChatBubble: mine/theirs, run position, ticks, reply quote, reaction chips,
   const status = signal("sent");
   const reacted = [];
   const m = mount(() => [
-    h(ChatBubble, { mine: true, text: "Hi", position: "last", status, time: new Date(2026, 0, 1, 9, 5), reply: { name: "Acme", text: "Hello?" }, reactions: [{ emoji: "❤️", count: 2, mine: true }], onReact: (e) => reacted.push(e), onReply: () => {} }),
+    h(ChatBubble, { mine: true, text: "Hi", position: "last", status, time: new Date(2026, 0, 1, 9, 5), reply: { name: "HADİ", text: "Hello?" }, reactions: [{ emoji: "❤️", count: 2, mine: true }], onReact: (e) => reacted.push(e), onReply: () => {} }),
     h(ChatBubble, { text: "🎉", sender: "Beta", senderColor: 2 }),
   ]);
   const [a, b] = m.el.querySelectorAll(".hm-msg");
@@ -20,7 +20,7 @@ test("ChatBubble: mine/theirs, run position, ticks, reply quote, reaction chips,
   status.set("read");
   assert.equal(a.querySelector(".hm-msg-tick").getAttribute("aria-label"), "Read");
   assert.equal(a.querySelectorAll(".hm-msg-2tick .hm-svg").length, 2);
-  assert.match(a.querySelector(".hm-msg-quote").textContent, /AcmeHello\?/);
+  assert.match(a.querySelector(".hm-msg-quote").textContent, /HadiHello\?/);
   const chip = a.querySelector(".hm-msg-react");
   assert.equal(chip.getAttribute("aria-pressed"), "true");
   chip.click();

@@ -7,7 +7,7 @@ recent picks. Theme colors are read from the tokens at the moment they are picke
 
 ```tsx
 <ColorPicker bind:value={$color} />
-<ColorPicker value={brand} format="hsl" alpha={false} palettes={[{ label: "Acme", colors: ["#0b5", "brand-blue"] }]} />
+<ColorPicker value={brand} format="hsl" alpha={false} palettes={[{ label: "HADİ", colors: ["#0b5", "brand-blue"] }]} />
 ```
 
 ## Props

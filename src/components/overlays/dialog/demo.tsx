@@ -31,7 +31,7 @@ export default function DialogDemo(props: { values: { size: string; footer: bool
       const v = props.values
       return <Dialog open={() => $open} onClose={() => close("Escape / perde / ×")} title="Davet gönder" size={v.size as "md"} dismissable={v.dismissable}
         footer={v.footer ? [<Button on:click={() => close("Vazgeç")}>Vazgeç</Button>, <Button variant="primary" on:click={() => close("Gönder")}>Gönder</Button>] : undefined}>
-        <p>Acme ekibine katılması için bir davet bağlantısı gönderilecek. Odak pencerenin içinde döner; kapanınca açan düğmeye geri gelir.</p>
+        <p>HADİ ekibine katılması için bir davet bağlantısı gönderilecek. Odak pencerenin içinde döner; kapanınca açan düğmeye geri gelir.</p>
         {v.long ? Array.from({ length: 14 }, (_, i) => <p>Ayrıntı {i + 1}: davet 7 gün geçerli, yalnız bir kez kullanılabilir.</p>) : null}
         {!v.footer && !v.dismissable ? <Button on:click={() => close("içerikteki düğme")}>Tamam</Button> : null}
       </Dialog>

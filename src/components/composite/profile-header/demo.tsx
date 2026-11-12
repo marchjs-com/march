@@ -13,7 +13,7 @@ export default function ProfileHeaderDemo(props: { values: { self: boolean; cove
   let $follow: FollowState = "follow"
   let $log = ""
   const user = (): ProfileUser => ({
-    name: "Acme Koşu Kulübü", handle: "acme.kosu", verified: true, story: props.values.story as "new",
+    name: "HADİ Koşu Kulübü", handle: "hadi.kosu", verified: true, story: props.values.story as "new",
     cover: props.values.photo ? PHOTO("sea") : undefined,
     bio: "Her pazar sabahı sahilde koşuyoruz. Tempo grupları, yeni başlayanlar için yürüyüş ve dönüşte kahve ☕",
     posts: 248, followers: 986, following: 186,

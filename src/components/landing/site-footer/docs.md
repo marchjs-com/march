@@ -5,7 +5,7 @@ a bottom row (copyright, legal links, back to top). Columns fold to two per row 
 optional big wordmark fills the last line.
 
 ```tsx
-<SiteFooter brand={{ name: "Acme", mark: logo }} about="…" wordmark="Acme"
+<SiteFooter brand={{ name: "HADİ", mark: logo }} about="…" wordmark="HADİ"
   columns={[{ title: "Product", links: [{ label: "Pricing", href: "/pricing" }] }]}
   social={[{ label: "Blog", href: "/blog", icon: globe }]}
   newsletter={{ title: "Newsletter", onSubmit: (e) => api.subscribe(e) }}

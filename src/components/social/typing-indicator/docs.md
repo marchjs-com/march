@@ -1,7 +1,7 @@
 # TypingIndicator
 
 Three dots that lift in turn on the motion engine (a staggered loop; still with reduced motion) and an optional
-sentence: "Acme is typing…", "Acme and Beta are typing…", "3 people are typing…". It is a polite status, so screen
+sentence: "HADİ is typing…", "HADİ and Beta are typing…", "3 people are typing…". It is a polite status, so screen
 readers hear the sentence once even when it is not shown. With no names it hides.
 
 ```tsx

@@ -1,4 +1,4 @@
-// Sample node types and an order flow for the demos (Acme store). Not part of the library API: the showcase and the
+// Sample node types and an order flow for the demos (HADİ store). Not part of the library API: the showcase and the
 // component demos import it from here.
 import { emit, FLOW_SCHEMA, type FlowDoc, type FlowNodeType } from "./model.ts";
 import { zap } from "../../../icons/glyphs/zap.ts";
@@ -24,7 +24,7 @@ export const sampleTypes: readonly FlowNodeType[] = [
     type: "fetch", label: "Müşteriyi getir", description: "HTTP isteği", category: "Eylemler", icon: globe, color: "brand-blue",
     inputs: [{ id: "in", label: "sipariş" }], outputs: [{ id: "out", label: "müşteri" }],
     fields: [{ key: "url", label: "Adres", kind: "text", default: "/api/customers" }],
-    run: ({ input }) => ({ ...(input as object), customer: "Acme Ltd." }),
+    run: ({ input }) => ({ ...(input as object), customer: "HADİ" }),
   },
   {
     type: "condition", label: "Tutar kontrolü", description: "Eşiğe göre iki yol", category: "Mantık", icon: filter, color: "brand-purple",
@@ -72,7 +72,7 @@ export const sampleTypes: readonly FlowNodeType[] = [
 /** The order flow: two branches (payment / review) that meet again, a group, a notification and a log. */
 export function sampleDoc(): FlowDoc {
   return {
-    schema: FLOW_SCHEMA, name: "Acme sipariş akışı",
+    schema: FLOW_SCHEMA, name: "HADİ sipariş akışı",
     nodes: [
       { id: "hook", type: "webhook", x: 0, y: 112 },
       { id: "customer", type: "fetch", x: 320, y: 112 },

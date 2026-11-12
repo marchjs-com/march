@@ -22,7 +22,7 @@ export function PreviewCharts(): Element {
       h(BarChart, { data: SALES, x: "m", y: ["a", "b"], series: [t`Online`, t`Store`], height: 150, grid: true, legend: "bottom" as const })),
     h(Card, { title: t`New project` },
       h("div", { class: "hm-te-form-demo" },
-        h("label", { class: "hm-te-mini-label" }, t`Project name`, h(TextInput, { value: "Acme", placeholder: t`Name` })),
+        h("label", { class: "hm-te-mini-label" }, t`Project name`, h(TextInput, { value: "HADİ", placeholder: t`Name` })),
         h("label", { class: "hm-te-mini-label" }, t`Team`, h(Select, { value: "design", options: [{ value: "design", label: t`Design` }, { value: "product", label: t`Product` }] })),
         h(Checkbox, { value: true, label: t`Private project` }),
         h(Toggle, { get value() { return notify(); }, onChange: (v: boolean) => notify.set(v), label: t`Notifications` }),

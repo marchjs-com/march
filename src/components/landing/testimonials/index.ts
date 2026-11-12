@@ -36,7 +36,7 @@ function quoteCard(it: Testimonial, hidden = false): Element {
       h("span", { class: "hm-tm-id" }, h("cite", { class: "hm-tm-name" }, it.name), it.role != null ? h("span", { class: "hm-tm-role" }, it.role) : null))) as Element;
 }
 
-/** `<Testimonials variant="wall" items={[{ quote: "…", name: "Ada", role: "CTO, Acme", rating: 5 }]} />` */
+/** `<Testimonials variant="wall" items={[{ quote: "…", name: "Ada", role: "CTO, HADİ", rating: 5 }]} />` */
 export function Testimonials(props: TestimonialsProps): Element {
   const variant = props.variant ?? "grid";
   const cls = cx("hm-tm", `hm-tm-${variant}`, val(props.class));

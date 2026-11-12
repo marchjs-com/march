@@ -8,11 +8,11 @@ const { ProfileHeader } = await import("./index.ts");
 
 test("ProfileHeader: heading, stats, follow bumps followers, self shows Edit", () => {
   const follow = signal("follow"), self = signal(false), stats = [];
-  const m = mount(() => h(ProfileHeader, { user: { name: "Acme", handle: "acme", verified: true, story: "new", posts: 3, followers: 10, following: 2 }, self, follow, onFollow: (s) => follow.set(s), onMessage: () => {}, onEdit: () => {}, onStat: (w) => stats.push(w), onAvatar: () => {} }));
+  const m = mount(() => h(ProfileHeader, { user: { name: "HADİ", handle: "hadisosyal", verified: true, story: "new", posts: 3, followers: 10, following: 2 }, self, follow, onFollow: (s) => follow.set(s), onMessage: () => {}, onEdit: () => {}, onStat: (w) => stats.push(w), onAvatar: () => {} }));
   const sec = m.el.querySelector("section.hm-prof");
-  assert.equal(sec.getAttribute("aria-label"), "Profile of Acme");
-  assert.equal(sec.querySelector("h2").textContent, "Acme");
-  assert.equal(sec.querySelector(".hm-prof-handle").textContent, "@acme");
+  assert.equal(sec.getAttribute("aria-label"), "Profile of HADİ");
+  assert.equal(sec.querySelector("h2").textContent, "HADİ");
+  assert.equal(sec.querySelector(".hm-prof-handle").textContent, "@hadisosyal");
   const statBtns = sec.querySelectorAll("button.hm-prof-stat");
   assert.equal(statBtns.length, 3);
   assert.match(statBtns[1].querySelector(".hm-sr-only").textContent, /10/);

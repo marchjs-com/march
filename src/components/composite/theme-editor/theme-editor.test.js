@@ -41,8 +41,8 @@ test("model: contrast audit with fixes, dark from light, from scratch", () => {
     const c = M.contrastAudit({ ...presetDraft("hadi").light, [x.fix.key]: x.fix.color }).find((y) => y.id === x.id);
     assert.ok(c.ok, `${x.id} passes after its fix`);
   }
-  const s = M.draftFromColor("#0e7490", "Acme Gece");
-  assert.equal(s.id, "acme-gece");
+  const s = M.draftFromColor("#0e7490", "HADİ Gece");
+  assert.equal(s.id, "hadi-gece");
   assert.equal(s.base, null);
   assert.ok(M.contrastAudit(s.light).every((x) => x.ok), "a draft from one color passes in light");
   assert.ok(M.contrastAudit(s.dark).every((x) => x.ok), "and in its derived dark mode");
@@ -50,14 +50,14 @@ test("model: contrast audit with fixes, dark from light, from scratch", () => {
 });
 
 test("model: output and import round trips", () => {
-  const d = { ...M.draftFromColor("#a3338c", "Acme"), type: { ...presetDraft("hadi").type, ratio: 1.25 } };
+  const d = { ...M.draftFromColor("#a3338c", "HADİ Mor"), type: { ...presetDraft("hadi").type, ratio: 1.25 } };
   assert.deepEqual(M.importTheme(M.draftJson(d)), d);
   assert.deepEqual(M.importTheme(M.draftCss(d)), d);
-  assert.deepEqual(M.importTheme(M.shareUrl(d, "https://acme.test/x")), d);
+  assert.deepEqual(M.importTheme(M.shareUrl(d, "https://hadisosyal.com/x")), d);
   assert.deepEqual(M.decodeDraft(M.encodeDraft(d)), d);
-  assert.equal(M.sharedDraft("https://acme.test/#theme=nope"), null);
-  assert.match(M.draftCode(d), /export const acme = defineTheme\(\{\n  id: "acme",/);
-  assert.match(M.draftCode(d), /registerThemes\(\[\{ id: "acme", name: "Acme" \}\]\)/);
+  assert.equal(M.sharedDraft("https://hadisosyal.com/#theme=nope"), null);
+  assert.match(M.draftCode(d), /export const hadiMor = defineTheme\(\{\n  id: "hadi-mor",/);
+  assert.match(M.draftCode(d), /registerThemes\(\[\{ id: "hadi-mor", name: "HADİ Mor" \}\]\)/);
   // a plain theme stylesheet: colors, fonts and radius come back
   const n = M.importTheme(themeCss(hadi));
   assert.equal(n.light.primary, "#F2801F");
@@ -114,13 +114,13 @@ test("ThemeEditor: tokens, color edit, undo / redo, audit fix, scoped preview va
 });
 
 test("registerDraft: the theme picker offers a runtime theme that applies itself", async () => {
-  const d = M.draftFromColor("#0e7490", "Acme");
+  const d = M.draftFromColor("#0e7490", "HADİ Mor");
   registerDraft(d);
-  assert.ok(colorThemes().some((x) => x.id === "acme" && typeof x.load === "function"));
-  setColorTheme("acme");
+  assert.ok(colorThemes().some((x) => x.id === "hadi-mor" && typeof x.load === "function"));
+  setColorTheme("hadi-mor");
   await Promise.resolve(); await Promise.resolve();
   const root = document.documentElement;
-  assert.equal(root.getAttribute("data-hm-theme"), "acme");
+  assert.equal(root.getAttribute("data-hm-theme"), "hadi-mor");
   assert.equal(root.style.getPropertyValue("--hm-primary"), "#0e7490");
   setColorTheme("hadi");
   assert.equal(root.style.getPropertyValue("--hm-primary"), "", "switching away removes its variables");

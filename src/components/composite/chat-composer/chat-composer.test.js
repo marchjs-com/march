@@ -8,7 +8,7 @@ const wait = (ms = 30) => new Promise((r) => setTimeout(r, ms));
 const { ChatComposer } = await import("./index.ts");
 
 test("ChatComposer: mic when empty, send when typed, Enter sends and clears, emoji panel, reply preview", async () => {
-  const sent = [], reply = signal({ name: "Acme", text: "Where?" });
+  const sent = [], reply = signal({ name: "HADİ", text: "Where?" });
   const m = mount(() => h(ChatComposer, { onSend: (t) => sent.push(t), onVoice: () => {}, replyTo: reply, onCancelReply: () => reply.set(null) }));
   const act = m.el.querySelector(".hm-compose-act");
   assert.ok(act.classList.contains("is-mic"));
@@ -26,7 +26,7 @@ test("ChatComposer: mic when empty, send when typed, Enter sends and clears, emo
   assert.equal(emoji.getAttribute("aria-expanded"), "true");
   m.el.querySelector(".hm-compose-emoji button").click();
   assert.ok(act.classList.contains("is-send"), "an emoji is text");
-  assert.match(m.el.querySelector(".hm-compose-reply").textContent, /Replying to Acme/);
+  assert.match(m.el.querySelector(".hm-compose-reply").textContent, /Replying to HADİ/);
   m.el.querySelector(".hm-compose-reply button").click();
   assert.equal(m.el.querySelector(".hm-compose-reply"), null);
   m.dispose();

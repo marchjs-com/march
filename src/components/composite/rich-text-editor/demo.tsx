@@ -11,11 +11,11 @@ const TEAM: Mention[] = [
   { id: "u3", label: "Mert Aydın", hint: "Mühendislik" },
   { id: "u4", label: "Selin Çelik", hint: "Pazarlama" },
   { id: "u5", label: "Kaan Öztürk", hint: "Destek" },
-  { id: "t1", label: "Acme Tasarım Ekibi", hint: "Ekip" },
+  { id: "t1", label: "HADİ Tasarım Ekibi", hint: "Ekip" },
 ]
-const START = `## Acme sürüm notları
+const START = `## HADİ sürüm notları
 
-Bu sürümde **karanlık tema**, *daha hızlı* arama ve yeni [belgeler](https://acme.example/docs) var. Sorular için [@Ece Demir](mention:u2) ile konuşun.
+Bu sürümde **karanlık tema**, *daha hızlı* arama ve yeni [belgeler](https://hadisosyal.com/docs) var. Sorular için [@Ece Demir](mention:u2) ile konuşun.
 
 - Yeni gösterge paneli
 - Toplu dışa aktarma
