@@ -382,7 +382,7 @@ export function Router(props: { loading?: Renderable; fallback?: unknown; notFou
 }
 
 /** `<Link href="/users" exact prefetch="hover">Users</Link>` — client-side navigation, aria-current, preloading. */
-export function Link(props: { href: Href | (() => Href); exact?: boolean; replace?: boolean; preload?: "hover" | "visible" | "none"; prefetch?: "hover" | "visible" | "none"; target?: string; children?: unknown; [k: string]: unknown }): unknown {
+export function Link(props: { href: Href | (() => Href); exact?: boolean; replace?: boolean; preload?: "hover" | "visible" | "idle" | "none"; prefetch?: "hover" | "visible" | "idle" | "none"; target?: string; children?: unknown; [k: string]: unknown }): unknown {
   const href = (): string => String(read(props.href));
   const active = (): boolean => {
     const p = S.path(), to = href().split("?")[0] ?? "";
@@ -390,7 +390,8 @@ export function Link(props: { href: Href | (() => Href); exact?: boolean; replac
   };
   const rest: Record<string, unknown> = { ...props };
   for (const k of ["href", "exact", "activeClass", "children", "replace", "preload", "prefetch"]) delete rest[k];
-  // prefetch (download only, via the manifest) on hover/focus by default; "visible" when it scrolls into view
+  // prefetch (download only, via the manifest) on hover/focus by default; "visible" when it scrolls into view; "idle"
+  // when the browser is idle after it renders. All of them are skipped with Save-Data / 2G (prefetch() checks).
   const mode = props.prefetch ?? props.preload ?? "hover";
   const pre = (): void => prefetch(href());
   const a = h("a", {
@@ -405,6 +406,7 @@ export function Link(props: { href: Href | (() => Href); exact?: boolean; replac
       void navigate(href() as Href, { replace: !!props.replace });
     },
   }, () => props.children) as Element;
+  if (mode === "idle") { const cancel = whenIdle(pre, 3000); if (getOwner()) onCleanup(cancel); }
   if (mode === "visible" && typeof globalThis.IntersectionObserver === "function") {
     const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { pre(); io.disconnect(); } });
     io.observe(a);

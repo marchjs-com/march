@@ -157,7 +157,7 @@ arrives is cached.
   `<link rel="modulepreload">`. Named imports from `hadi-march/ui` etc. are compiled to the defining module, and bare
   imports of chunks the entry does not use are removed. Without both, esbuild would put page-only code into a chunk the
   entry must load.
-- **Prefetch.** `<Link>` prefetches its route on hover/focus (`prefetch="hover" | "visible" | "none"`). When idle after
+- **Prefetch.** `<Link>` prefetches its route on hover/focus (`prefetch="hover" | "visible" | "idle" | "none"`). When idle after
   the first page, the router prefetches the routes linked from what is on screen with `<link rel="prefetch">` (lowest
   priority, at most 6). Both are off when the user saves data or the connection is 2G-class.
 - **Cache.** File names are content-hashed; `march build` writes a `_headers` file (Netlify / Cloudflare Pages format)

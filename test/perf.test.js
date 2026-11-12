@@ -199,3 +199,41 @@ test("mergeEntry: the entry and its static chunks become one file; old chunks re
     for (const s of stubs) assert.match(readFileSync(resolve(app.dir, s), "utf8"), /^(export \{[^}]*\} from|import) "\.\.\/main-/, "a stub re-exports from the merged entry");
   } finally { app.cleanup(); }
 });
+
+test("route prefetch: Link hover / idle and prefetchLinks use the manifest (idle = rel=prefetch); nothing with Save-Data", async () => {
+  const R = await import("../src/router/index.ts");
+  L.setPreloadManifest({ "a.tsx": ["assets/chunks/a-1.js"], "b.tsx": ["assets/chunks/b-2.js"], "c.tsx": ["assets/chunks/c-3.js"] }, "https://x.test/");
+  const page = (k) => Object.assign(async () => ({ default: () => k }), { hm: `${k}.tsx` });
+  R.createRouter({ routes: { "/": { component: () => null }, "/a": page("a"), "/b": page("b"), "/c": page("c") }, prefetch: "none" });
+  await new Promise((r) => setTimeout(r, 0));
+  const links = () => [...document.head.querySelectorAll("link[data-march-preload]")].map((l) => `${l.getAttribute("rel")} ${l.getAttribute("href").replace("https://x.test/assets/chunks/", "")}`);
+  const conn = { saveData: true, effectiveType: "4g" };
+  Object.defineProperty(navigator, "connection", { value: conn, configurable: true });
+  try {
+    const host = document.createElement("div"); document.body.appendChild(host);
+    const dispose = render(() => [h(R.Link, { href: "/a" }, "A"), h(R.Link, { href: "/b", prefetch: "idle" }, "B")], host);
+    const [a] = host.querySelectorAll("a");
+    a.dispatchEvent(new Event("pointerenter"));
+    await new Promise((r) => setTimeout(r, 250));
+    R.prefetchLinks();
+    assert.deepEqual(links(), [], "Save-Data: no speculative download");
+    conn.saveData = false;
+    a.dispatchEvent(new Event("pointerenter"));
+    R.prefetch("/b");
+    assert.deepEqual(links(), ["modulepreload a-1.js", "modulepreload b-2.js"], "hover / explicit prefetch: modulepreload");
+    const c = document.createElement("a"); c.setAttribute("href", a.getAttribute("href").replace("/a", "/c")); document.body.appendChild(c);
+    R.prefetchLinks();
+    assert.ok(links().includes("prefetch c-3.js"), "idle prefetch of on-screen links: lowest priority");
+    c.remove(); dispose(); host.remove();
+  } finally {
+    delete navigator.connection;
+    for (const l of document.head.querySelectorAll("link[data-march-preload]")) l.remove();
+    L.setPreloadManifest(null);
+  }
+});
+
+test("published showcase: no service worker file and no SW precache (sw only with --serve)", () => {
+  const cfg = readFileSync(resolve("examples/showcase/march.config.js"), "utf8");
+  assert.match(cfg, /sw:\s*process\.env\.MARCH_SHOWCASE_SW === "1"/);
+  assert.doesNotMatch(readFileSync(resolve("examples/showcase/build.mjs"), "utf8").replace(/serve[\s\S]*?MARCH_SHOWCASE_SW/, ""), /MARCH_SHOWCASE_SW\s*=\s*"1"/);
+});

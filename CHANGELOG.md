@@ -11,7 +11,7 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
   network. Production builds merge the entry closure into one file (`mergeEntry`, off with `mergeEntry: false`).
   The old internal children marker is now `lazyChildren` (compiler helper).
 - Build manifest in `index.html` + loader tags from the compiler: a route's chunks preload at once (`modulepreload`).
-  `<Link prefetch="hover|visible|none">`; idle `rel=prefetch` of on-screen links; off with Save-Data / 2G.
+  `<Link prefetch="hover|visible|idle|none">`; idle `rel=prefetch` of on-screen links; off with Save-Data / 2G.
 - Named imports from March barrels compile to the defining module, and bare imports of unused side-effect-free chunks
   are pruned, so pages' code no longer rides along with the entry. `display.ts` is split per component; icons are one
   module each (`glyphs/`, generated) plus `hadi-march/icons/catalog` for galleries; the command palette view loads on
