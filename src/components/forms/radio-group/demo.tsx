@@ -1,6 +1,8 @@
 // Showcase stage for RadioGroup: look and size.
 import { RadioGroup } from "./index.ts";
 import { users, zap, shieldCheck } from "../../../icons/index.ts";
+// unions live outside JSX: the March compiler reads `|` in a JSX expression as a pipe
+type Maybe<T> = T | null | undefined
 
 export const code = `<RadioGroup bind:value={$size} inline options={["S", "M", "L", "XL"]} />
 <RadioGroup variant="card" bind:value={$plan} options={plans} />
@@ -16,7 +18,7 @@ export default function RadioGroupDemo(props: { values: { variant: string; size:
   let $plan = "team"
   return <div>{() => {
     const v = props.values, card = v.variant === "card"
-    return <RadioGroup value={$plan} onChange={(x: string | null) => { $plan = x ?? "" }} variant={v.variant as "chip"} size={v.size as "md"} inline={!card}
+    return <RadioGroup value={$plan} onChange={(x: Maybe<string>) => { $plan = x ?? "" }} variant={v.variant as "chip"} size={v.size as "md"} inline={!card}
       options={card ? PLANS : PLANS.map(({ value, label }) => ({ value, label }))} aria-label="Plan" />
   }}</div>
 }
