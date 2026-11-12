@@ -31,7 +31,7 @@ export interface SpinnerProps {
 export function Spinner(props: SpinnerProps): Element {
   const el = h("span", { class: () => cx("hm-loading", props.size && `hm-spin-${props.size}`, props.colors === "single" && "hm-spin-single", val(props.class)), role: "status", "aria-label": () => val(props.label) ?? t`Loading` }) as HTMLElement;
   const list = colorList(props.colors);
-  if (list) { el.style.setProperty("--hm-spinner-paint", `conic-gradient(from 0deg, transparent 0 8%, ${list.map(tokenColor).join(", ")})`); el.style.setProperty("--hm-spinner-track", "transparent"); el.style.setProperty("--hm-spinner-head", "transparent"); }
+  if (list) { el.setAttribute("data-hm-colors", Array.isArray(props.colors) ? "custom" : String(props.colors)); el.style.setProperty("--hm-spinner-paint", `conic-gradient(from 0deg, transparent 0 8%, ${list.map(tokenColor).join(", ")})`); el.style.setProperty("--hm-spinner-track", "transparent"); el.style.setProperty("--hm-spinner-head", "transparent"); }
   return el;
 }
 

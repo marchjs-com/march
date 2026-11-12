@@ -45,15 +45,24 @@ await ev(`localStorage.setItem("hm.colorTheme", "hadi"); localStorage.setItem("h
 
 const SCAN = `(() => {
   const ORANGE = "rgb(242, 128, 31)";
-  const INTERACTIVE = "button, a[href], input, select, textarea, [role=tab], [role=radio], [role=switch], [role=checkbox], [role=option], .hm-check-box, .hm-switch, .hm-progress2-fill, .hm-loading, .hm-ring-value, .hm-sb-item, .hm-tab, .hm-segment, .hm-slider";
-  // allowed on purpose: explicit orange, brand multicolor, theme previews / swatches, brand color samples, charts
-  const ALLOWED = '[data-hm-color="brand-orange"], [data-hm-color="cat-1"], [data-hm-theme], .hm-swatch, .sc-brand, .sc-brands, .sc-ribbon, .hm-chart, .sc-cats, .sc-cat, svg.hm-ring';
+  const INTERACTIVE = "button, a[href], input, select, textarea, label, [role=tab], [role=radio], [role=switch], [role=checkbox], [role=option], [role=radiogroup], [role=progressbar], .hm-check-box, .hm-switch, .hm-progress2, .hm-loading, .hm-ring-multi, .hm-sb-item, .hm-tab, .hm-segment, .hm-slider, .hm-otp, .hm-steps2, .hm-cal";
+  // allowed on purpose: explicit orange, explicit multicolor (data-hm-colors), the brand mark, theme previews / swatches,
+  // brand color samples, charts
+  const ALLOWED = '[data-hm-color="brand-orange"], [data-hm-color="cat-1"], [data-hm-colors], [data-hm-theme], .hm-swatch, .hm-brand-mark, .sc-brand, .sc-brands, .sc-ribbon, .hm-chart, .sc-cats, .sc-cat, svg.hm-ring';
   const hits = [];
+  // the element and everything inside it (a star's inner span, an icon's SVG path): color, fills, strokes, borders, gradients
+  const props = ["backgroundColor", "borderTopColor", "borderBottomColor", "color", "accentColor", "outlineColor", "caretColor", "fill", "stroke", "backgroundImage", "boxShadow"];
+  const seen = new Set();
   for (const el of document.querySelectorAll(INTERACTIVE)) {
     if (el.closest(ALLOWED) || !el.getClientRects().length) continue;
-    const cs = getComputedStyle(el);
-    for (const p of ["backgroundColor", "borderTopColor", "color", "accentColor", "outlineColor", "stroke", "fill"]) {
-      if (cs[p] === ORANGE) { hits.push((el.className?.baseVal ?? el.className ?? el.tagName).toString().slice(0, 60) + " · " + p); break; }
+    for (const node of [el, ...el.querySelectorAll("*")]) {
+      if (seen.has(node) || node.closest(ALLOWED)) continue;
+      seen.add(node);
+      const cs = getComputedStyle(node);
+      if (cs.opacity === "0" || cs.visibility === "hidden" || !node.getClientRects().length) continue;
+      for (const p of props) {
+        if (String(cs[p]).includes(ORANGE)) { hits.push((node.className?.baseVal ?? node.className ?? node.tagName).toString().slice(0, 60) + " · " + p); break; }
+      }
     }
   }
   return [...new Set(hits)];

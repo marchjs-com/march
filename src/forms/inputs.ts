@@ -536,7 +536,7 @@ export function CodeInput(props: CodeInputProps): unknown {
   onCleanup(() => { boxes.length = 0; });
   // codes read left to right in every language
   return h("div", {
-    "data-hm-color": colorAttr(props.color), role: "group", dir: "ltr",
+    "data-hm-color": colorAttr(props.color), "data-hm-colors": props.colors && props.colors !== "single" ? (Array.isArray(props.colors) ? "custom" : props.colors) : null, role: "group", dir: "ltr",
     class: () => cx("hm-otp", `hm-otp-${props.size ?? "md"}`, `hm-otp-${props.variant ?? "outline"}`, props.font && `hm-otp-font-${props.font}`, props.colors === "single" && "hm-otp-single", props.class),
     "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"],
   }, parts);

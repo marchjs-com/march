@@ -117,3 +117,13 @@ test("CodeInput: length 3–12, pattern, groups, brand colors per box, paste tri
   a.value = "ş"; a.dispatchEvent(new Event("input", { bubbles: true })); assert.equal(a.value, "Ş", "letters are upper-cased (locale aware)");
   assert.match(read("theme/presets.ts"), /--hm-otp-1: \$\{a\}; --hm-otp-2: \$\{b\}; --hm-otp-3: \$\{d\}; --hm-otp-4: \$\{e\}; --hm-otp-font: var\(--hm-font-display\);/, "HADİ default: brand colors + display font");
 });
+
+test("Rating follows the accent (gold on request); multicolor components are marked", () => {
+  const css = read("ui/rating.css");
+  assert.match(css, /\.hm-rating-on \{ color: var\(--hm-accent, var\(--hm-primary\)\);/);
+  assert.match(css, /\.hm-rating\.is-hovering \.hm-rating-on \{ color: color-mix\(/, "hover preview in a lighter tone");
+  assert.ok(COLOR_TOKENS.includes("gold"));
+  assert.ok(read("css/colors.css").includes('[data-hm-color="gold"] { --hm-accent: var(--hm-brand-gold, var(--hm-cat-6));'));
+  const el = mount(() => [h(U.Progress, { value: 3, colors: "brand" }), h(U.Progress, { value: 3 }), h(U.CodeInput, { length: 3, colors: "brand" })]);
+  assert.deepEqual([...el.querySelectorAll("[data-hm-colors]")].map((x) => x.getAttribute("data-hm-colors")), ["brand", "brand"]);
+});

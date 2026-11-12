@@ -45,7 +45,7 @@ export function Rating(props: RatingProps): Element {
     }, h("span", { class: "hm-rating-off" }, glyph(star)), h("span", { class: "hm-rating-on" }, glyph(starFilled)));
   });
   return h("span", { "data-hm-color": colorAttr(props.color),
-    class: () => cx("hm-rating", `hm-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", val(props.class)), role: "radiogroup",
+    class: () => cx("hm-rating", `hm-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", hover() != null && "is-hovering", val(props.class)), role: "radiogroup",
     "aria-label": () => val(props.label) ?? t`Rating`, onMouseleave: () => hover.set(null),
   }, stars);
 }

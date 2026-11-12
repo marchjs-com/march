@@ -44,6 +44,7 @@ export function Progress(props: ProgressProps): Element {
     bar);
   effect(sync);
   const list = colorList(props.colors);
+  if (list) root.setAttribute("data-hm-colors", Array.isArray(props.colors) ? "custom" : String(props.colors));
   if (list && props.paint === "cycle") setVar(root, "--hm-progress-cycle", paintOf(list, "gradient", "linear", true));
   else if (list) setVar(root, "--hm-progress-c", paintOf(list, props.paint === "segments" ? "segments" : "gradient", "linear"));
   return root;

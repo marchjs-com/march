@@ -13,6 +13,7 @@
 [data-hm-color="brand-blue"] { --hm-accent: var(--hm-brand-blue, var(--hm-cat-2)); --hm-accent-text: var(--hm-brand-blue-text, var(--hm-cat-2-text)); --hm-on-accent: var(--hm-on-brand-blue, var(--hm-on-cat-2)); }
 [data-hm-color="brand-green"] { --hm-accent: var(--hm-brand-green, var(--hm-cat-3)); --hm-accent-text: var(--hm-brand-green-text, var(--hm-cat-3-text)); --hm-on-accent: var(--hm-on-brand-green, var(--hm-on-cat-3)); }
 [data-hm-color="brand-purple"] { --hm-accent: var(--hm-brand-purple, var(--hm-cat-4)); --hm-accent-text: var(--hm-brand-purple-text, var(--hm-cat-4-text)); --hm-on-accent: var(--hm-on-brand-purple, var(--hm-on-cat-4)); }
+[data-hm-color="gold"] { --hm-accent: var(--hm-brand-gold, var(--hm-cat-6)); --hm-accent-text: var(--hm-brand-gold-text, var(--hm-cat-6-text)); --hm-on-accent: var(--hm-on-brand-gold, var(--hm-on-cat-6)); }
 [data-hm-color="brand-gold"] { --hm-accent: var(--hm-brand-gold, var(--hm-cat-6)); --hm-accent-text: var(--hm-brand-gold-text, var(--hm-cat-6-text)); --hm-on-accent: var(--hm-on-brand-gold, var(--hm-on-cat-6)); }
 [data-hm-color="brand-pink"] { --hm-accent: var(--hm-brand-pink, var(--hm-cat-5)); --hm-accent-text: var(--hm-brand-pink-text, var(--hm-cat-5-text)); --hm-on-accent: var(--hm-on-brand-pink, var(--hm-on-cat-5)); }
 [data-hm-color="cat-1"] { --hm-accent: var(--hm-cat-1); --hm-accent-text: var(--hm-cat-1-text); --hm-on-accent: var(--hm-on-cat-1); }
