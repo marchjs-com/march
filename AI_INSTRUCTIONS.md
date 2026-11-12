@@ -148,6 +148,12 @@ Overlays never take input; put content after them. `front` only for foreground e
   folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
   parent, or joins a group chunk with the entry's other small lazy modules that share the most code (second build pass).
   A file still under the limit fails the build; `allow` needs a reason. `chunks: false` turns it off.
+  A group never pushes a route past `budget.route`: groups are measured after each pass and one over budget is taken
+  apart and planned again.
+- Many pages: keep the route table (paths, titles, loaders) OUT of the entry, or the entry grows with every page. Put it
+  in `src/routes.ts` (or the generated `src/routes.gen.js`), load it with `import()` from `main` and list it in
+  `budget.boot`; its pages are grouped like the entry's own lazy imports and never folded into the table
+  (`chunks.routeTables` names other table files). The shell reads titles from the table, not from a page list in the entry.
 
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.
