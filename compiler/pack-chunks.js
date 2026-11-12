@@ -117,7 +117,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
 
   // 2. small shared chunks fold into a chunk that is always loaded with them
   const skip = new Set();
-  for (let round = 0; round < 500; round++) {
+  for (let round = 0; round < 5000; round++) {
     const g = graph(outs);
     // a heavy chunk only one small lazy module imports (code esbuild split out because tree-shaken barrels also reach
     // it) is that module's own code: it joins it, so the lazy module is judged by its real size and is never inlined into
@@ -152,7 +152,9 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
         const both = new Set([...g.closure(b), ...g.closure(t)]);
         // into a start-up piece: start-up as a whole (beyond the entry) stays within its own budget
         if (!bootFits(b, t)) return false;
-        for (const e of new Set([...rt, ...g.reach.get(b)])) {
+        // only who loads one side and not the other downloads more; who loads both is unchanged (even when over budget)
+        const rb = g.reach.get(b);
+        for (const e of new Set([...[...rt].filter((x) => !rb.has(x)), ...[...rb].filter((x) => !rt.has(x))])) {
           const lim = budgetOf(e)?.limit;
           if (lim == null) continue;
           let n = 0;
