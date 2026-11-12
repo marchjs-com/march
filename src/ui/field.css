@@ -18,7 +18,7 @@
 /* text controls */
 .hm-input, .hm-select {
   width: 100%; min-height: var(--hm-control-h); padding: var(--hm-space-2) var(--hm-space-3); font: inherit; color: var(--hm-text);
-  font-size: var(--hm-text-md); background: var(--hm-surface); border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); box-shadow: var(--hm-shadow-inset);
+  font-size: var(--hm-text-md); background: var(--hm-surface); border: var(--hm-border-w, 1px) solid var(--hm-border-strong); border-radius: var(--hm-radius); box-shadow: var(--hm-shadow-inset);
   transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease);
 }
 .hm-input:hover:not(:focus):not(:disabled), .hm-select:hover:not(:focus):not(:disabled) { border-color: color-mix(in srgb, var(--hm-border-strong) 65%, var(--hm-text)); }
@@ -38,7 +38,7 @@
 .hm-select[multiple] { background-image: none; padding-inline-end: var(--hm-space-3); }
 
 /* prefix / suffix / inline buttons */
-.hm-affix { display: flex; align-items: stretch; width: 100%; border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); background: var(--hm-surface); position: relative; box-shadow: var(--hm-shadow-inset); transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-affix { display: flex; align-items: stretch; width: 100%; border: var(--hm-border-w, 1px) solid var(--hm-border-strong); border-radius: var(--hm-radius); background: var(--hm-surface); position: relative; box-shadow: var(--hm-shadow-inset); transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
 .hm-affix:focus-within { border-color: var(--hm-accent, var(--hm-focus)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-accent, var(--hm-focus)) 22%, transparent); }
 .hm-affix > .hm-input { border: 0; box-shadow: none; flex: 1; min-width: 0; background: transparent; }
 .hm-affix:has(.hm-input[aria-invalid="true"]) { border-color: var(--hm-danger); }

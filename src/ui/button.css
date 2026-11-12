@@ -1,7 +1,7 @@
 /* HADI March — Button, IconButton, ButtonGroup, CopyButton. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- buttons */
 .hm-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: var(--hm-space-2); min-height: var(--hm-control-h); padding: 0 .875rem;
-  border: 1px solid transparent; border-radius: var(--hm-radius); font: var(--hm-weight-medium) var(--hm-text-md)/1.2 var(--hm-font); letter-spacing: -.005em;
+  border: var(--hm-border-w, 1px) solid transparent; border-radius: var(--hm-radius); font: var(--hm-weight-medium) var(--hm-text-md)/1.2 var(--hm-font); letter-spacing: -.005em;
   color: var(--hm-text); background: var(--hm-surface-2); cursor: pointer; text-decoration: none; white-space: nowrap; user-select: none;
   transition: background-color var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease); }
 .hm-btn:hover { background: var(--hm-surface-3); }

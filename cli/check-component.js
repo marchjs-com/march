@@ -36,7 +36,9 @@ export async function checkComponent(root, folder, { runTests = true } = {}) {
     add("meta: category matches the folder", meta.category === category, `meta.category "${meta.category}", folder ${category}/`);
     add("meta: composedOf is a list", Array.isArray(meta.composedOf));
     if (category === "composite") add("meta: a composite names its parts (composedOf)", (meta.composedOf ?? []).length > 0);
-    for (const c of meta.composedOf ?? []) add(`composedOf ${c} is used (not copied)`, new RegExp(`\\b${c}\\b`).test(code), "named in meta but not imported / used in index.ts");
+    // the component's own modules count too (tabs or panels split out of index.ts and loaded lazily); not demo, playground, meta
+    const own = files.filter((f) => /\.tsx?$/.test(f) && !/^(demo|playground|meta|tr)\.tsx?$/.test(f)).map(read).join("\n");
+    for (const c of meta.composedOf ?? []) add(`composedOf ${c} is used (not copied)`, new RegExp(`\\b${c}\\b`).test(own), "named in meta but not imported / used in the component's modules");
   }
   // security and CSP
   add("no innerHTML / outerHTML / insertAdjacentHTML", !/\b(innerHTML|outerHTML|insertAdjacentHTML)\b/.test(code));

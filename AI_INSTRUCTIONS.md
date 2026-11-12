@@ -511,6 +511,23 @@ value (all outputs), `emit({ port: value })` (chosen outputs) or throws (fails; 
 `<Field label="…">{control}</Field>` (hadi-march/forms, src/forms/field.ts) labels a control without the form engine.
 A heavy feature like this marks `entry` in its meta.ts: it stays out of the ui barrel and its page imports its demo.
 
+## 16c. Themes (hadi-march/theme) and ThemeEditor
+
+A theme is `defineTheme({ id, name, font, display, radius, light, dark, tokens? })`; `themeCss(def)` writes its
+stylesheet at build time and `registerThemes([{ id, name }])` offers it in ThemePicker / ThemeMenu. `tokens` adds
+`--hm-*` tokens for both modes (`{ "text-md": ".9375rem", "space-4": "1.125rem", "radius-3": "14px", "dur": "180ms",
+"border-w": "1.5px" }`); `--hm-border-w` sets the border of buttons, inputs and cards. A theme made at run time has
+`ThemeInfo.load` instead of a stylesheet. To make one, use the ThemeEditor (large: not in the ui barrel):
+```tsx
+import { ThemeEditor, draftFromColor, draftToTheme, draftCss, contrastAudit, registerDraft } from "hadi-march/components/composite/theme-editor"
+<ThemeEditor bind:value={$draft} base="night" storageKey="acme.theme" />  // colors (light + dark), type, shape, motion, export
+const d = draftFromColor("#0e7490", "Acme"); contrastAudit(d.light)          // WCAG pairs with fixes
+fs.writeFileSync("themes/acme.css", draftCss(d))                            // or draftToTheme(d) → themeCss
+registerDraft(d)                                                             // runtime theme in ThemePicker / ThemeMenu
+```
+Preview a draft in one element only: `data-hm-theme` on it plus `draftVars(d, mode)` set with setStyle (never a style
+attribute). Undo / redo, unsaved-change warning and saving come from undoHistory, DirtyState and StorageManager.
+
 ## 17. Managers (hadi-march/managers/*)
 
 One instance each, started on first use, `configureX()` for global options, `disposeX()` to shut down. Import each
@@ -653,6 +670,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, StoryProgress, LikeButton |
+| ThemeEditor | experimental | Theme builder: color tokens for light and dark with a WCAG audit, type, shape and motion, a live scoped preview, code / CSS / JSON out. | ColorPicker, EasingCurveEditor, Tabs, Segmented, Slider, Select, TextInput, Textarea, Toggle, Button, IconButton, CopyButton, Badge, ThemeSwatch, CodeView |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
 | Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress |

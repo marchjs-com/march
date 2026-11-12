@@ -56,12 +56,13 @@ import m52 from "./social/story-progress/meta.ts";
 import m53 from "./social/story-ring/meta.ts";
 import m54 from "./composite/story-viewer/meta.ts";
 import m55 from "./navigation/tabs/meta.ts";
-import m56 from "./composite/theme-menu/meta.ts";
-import m57 from "./composite/tree-editor/meta.ts";
-import m58 from "./data/tree-view/meta.ts";
-import m59 from "./social/typing-indicator/meta.ts";
-import m60 from "./data/virtual-list/meta.ts";
-import m61 from "./composite/wizard/meta.ts";
+import m56 from "./composite/theme-editor/meta.ts";
+import m57 from "./composite/theme-menu/meta.ts";
+import m58 from "./composite/tree-editor/meta.ts";
+import m59 from "./data/tree-view/meta.ts";
+import m60 from "./social/typing-indicator/meta.ts";
+import m61 from "./data/virtual-list/meta.ts";
+import m62 from "./composite/wizard/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 const ownPage = (name: string): Promise<never> => Promise.reject(new Error(`${name} has its own entry: its page imports the demo`));
@@ -123,10 +124,11 @@ export const registry: readonly RegistryEntry[] = [
   { folder: "social/story-ring", meta: m53, code: "<StoryRing name={u.name} src={u.avatar} state={u.seen ? \"seen\" : \"new\"} label={u.handle} onClick={() => open(u)} />", demo: () => import("./social-5.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-5.demos.gen.ts").then((m) => m.p2) },
   { folder: "composite/story-viewer", meta: m54, code: "<StoryViewer open={$open} onClose={() => $open = false} groups={stories} start={tappedId} onSeen={markSeen} onReply={send} />", demo: () => import("./social-6.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-6.demos.gen.ts").then((m) => m.p2) },
   { folder: "navigation/tabs", meta: m55, code: "<Tabs value={$tab} onChange={(id) => $tab = id} tabs={[\n  { id: \"general\", label: \"General\", content: () => <General /> },\n  { id: \"members\", label: \"Members\", badge: () => $pending, content: () => <Members /> },\n]} />", demo: () => import("./navigation-3.demos.gen.ts").then((m) => m.d2), playground: () => import("./navigation-3.demos.gen.ts").then((m) => m.p2) },
-  { folder: "composite/theme-menu", meta: m56, code: "<ThemeMenu />\n<ThemeMenu themes={false} accents={[\"primary\", \"brand-orange\", \"brand-blue\"]} />", demo: () => import("./composite/theme-menu/demo.tsx"), playground: () => import("./composite/theme-menu/playground.ts") },
-  { folder: "composite/tree-editor", meta: m57, code: "<TreeEditor bind:value={$config} schema={schema} />\n<TreeEditor value={data} readonly search={false} expand={1} />", demo: () => import("./editors-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./editors-3.demos.gen.ts").then((m) => m.p1) },
-  { folder: "data/tree-view", meta: m58, code: "import { TreeView } from \"hadi-march/components/data/tree-view\";\n\n<TreeView nodes={files} selection=\"multiple\" draggable search={$q}\n  load={(node) => api.children(node.id)}\n  onSelect={(ids) => $selected = ids}\n  onMove={(ids, target, position) => api.move(ids, target, position)} />", demo: () => import("./data/tree-view/demo.tsx"), playground: () => import("./data/tree-view/playground.ts") },
-  { folder: "social/typing-indicator", meta: m59, code: "<TypingIndicator names={$typing} />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p2) },
-  { folder: "data/virtual-list", meta: m60, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p2) },
-  { folder: "composite/wizard", meta: m61, code: "<Wizard submitLabel=\"Finish\" onSubmit={save} steps={[\n  { title: \"Account\", schema: schema({ email: { type: \"email\", required: true } }) },\n  { title: \"Profile\", schema: schema({ name: { type: \"text\", required: true } }), validate: (v) => (v.name === \"admin\" ? \"Pick another name\" : null) },\n]} />", demo: () => import("./composite/wizard/demo.tsx"), playground: () => import("./composite/wizard/playground.ts") },
+  { folder: "composite/theme-editor", meta: m56, code: "<ThemeEditor />\n<ThemeEditor bind:value={$draft} base=\"night\" />", demo: () => import("./composite/theme-editor/demo.tsx"), playground: () => import("./composite/theme-editor/playground.ts") },
+  { folder: "composite/theme-menu", meta: m57, code: "<ThemeMenu />\n<ThemeMenu themes={false} accents={[\"primary\", \"brand-orange\", \"brand-blue\"]} />", demo: () => import("./composite/theme-menu/demo.tsx"), playground: () => import("./composite/theme-menu/playground.ts") },
+  { folder: "composite/tree-editor", meta: m58, code: "<TreeEditor bind:value={$config} schema={schema} />\n<TreeEditor value={data} readonly search={false} expand={1} />", demo: () => import("./editors-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./editors-3.demos.gen.ts").then((m) => m.p1) },
+  { folder: "data/tree-view", meta: m59, code: "import { TreeView } from \"hadi-march/components/data/tree-view\";\n\n<TreeView nodes={files} selection=\"multiple\" draggable search={$q}\n  load={(node) => api.children(node.id)}\n  onSelect={(ids) => $selected = ids}\n  onMove={(ids, target, position) => api.move(ids, target, position)} />", demo: () => import("./data/tree-view/demo.tsx"), playground: () => import("./data/tree-view/playground.ts") },
+  { folder: "social/typing-indicator", meta: m60, code: "<TypingIndicator names={$typing} />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p2) },
+  { folder: "data/virtual-list", meta: m61, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p2) },
+  { folder: "composite/wizard", meta: m62, code: "<Wizard submitLabel=\"Finish\" onSubmit={save} steps={[\n  { title: \"Account\", schema: schema({ email: { type: \"email\", required: true } }) },\n  { title: \"Profile\", schema: schema({ name: { type: \"text\", required: true } }), validate: (v) => (v.name === \"admin\" ? \"Pick another name\" : null) },\n]} />", demo: () => import("./composite/wizard/demo.tsx"), playground: () => import("./composite/wizard/playground.ts") },
 ];

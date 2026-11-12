@@ -1,0 +1,42 @@
+// Showcase stage for ThemeEditor: the editor itself, for the Playground values (playground.ts). Its first draft is the
+// saved one or a share link; a new start choice starts that preset (or one accent color, "scratch").
+import { untrack } from "../../../core/reactive.ts";
+import { ThemeEditor, presetCopy, draftFromColor, type ThemeEditorTab, type ThemeDraft } from "./index.ts";
+
+export const code = `import { ThemeEditor, registerDraft, applyDraft, presetCopy } from "hadi-march/components/composite/theme-editor"
+
+<ThemeEditor />                                    // HADİ copy, a share link (?theme=…) or the saved draft
+<ThemeEditor bind:value={$draft} base="night" tabs={["colors", "type"]} storageKey={false} onSave={(d) => api.save(d)} />
+registerDraft(draft)    // ThemePicker / ThemeMenu offer it (a runtime theme, no stylesheet)
+applyDraft(draft)       // … and switch the whole app to it
+
+// the model: plain data in, theme out
+import { presetDraft, draftFromTheme, draftFromColor, deriveDark, draftToTheme, draftTokens, draftVars,
+  draftCode, draftCss, draftJson, importTheme, normalizeDraft, encodeDraft, decodeDraft, shareUrl, sharedDraft,
+  toneScale, typeScale, contrastAudit, PRESETS } from "hadi-march/components/composite/theme-editor"
+
+const d = draftFromColor("#0e7490", "Acme")        // or presetDraft("night"), draftFromTheme(myDef), presetCopy("neon")
+d.dark = deriveDark(d.light)
+contrastAudit(d.light)          // [{ fg: "muted", bg: "surface", ratio: 4.9, min: 4.5, ok: true, fix: null }, …]
+toneScale(d.light.primary)      // 50 … 900;  typeScale(d.type) → 2xs … 5xl in px
+draftToTheme(d)                 // ThemeDef (defineTheme) with tokens: draftTokens(d)
+draftCode(d)  draftCss(d)  draftJson(d)   // defineTheme module, themeCss stylesheet, JSON
+draftVars(d, "dark")            // { "--hm-bg": "#…", … } for a scoped element
+importTheme(pasted)             // JSON, defineTheme JSON, CSS or a share link → draft (normalizeDraft fills gaps)
+shareUrl(d)  sharedDraft(location.href)  encodeDraft(d)  decodeDraft(code)
+PRESETS.map((p) => p.name)`
+
+const TABS: Record<string, readonly ThemeEditorTab[] | undefined> = { all: undefined, colors: ["colors"], noexport: ["colors", "type", "shape", "motion"] }
+
+export default function ThemeEditorDemo(props: { values: { base: string; preview: boolean; tabs: string; readonly: boolean } }) {
+  // the draft outlives a redraw (preview, sections, read-only); a new start choice replaces it
+  let $draft: ThemeDraft | null = null
+  let lastBase = ""
+  return <div class="sc-te">{() => {
+    const base = props.values.base
+    if (lastBase && base !== lastBase) $draft = base === "scratch" ? draftFromColor("#0e7490", "Acme") : presetCopy(base)
+    lastBase = base
+    return <ThemeEditor base={base} value={untrack(() => $draft)} onChange={(v: ThemeDraft) => { $draft = v }}
+      tabs={TABS[props.values.tabs]} preview={props.values.preview} readonly={props.values.readonly} />
+  }}</div>
+}
