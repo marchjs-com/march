@@ -345,7 +345,7 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
     lastUrl = globalThis.location?.href ?? "";
     if (r.opts.scroll !== false) restoreScroll(pop);
     // after the first page: the routes linked from it, and the shared "common" chunk most pages import (march build)
-    if (initial && r.opts.prefetch !== "none") whenIdle(() => { prefetchLinks(); prefetchCommon(); }, 3000);
+    if (initial && r.opts.prefetch !== "none") whenIdle(() => { void import("./extras.ts").then((m) => m.prefetchLinks()); prefetchCommon(); }, 3000);
   } catch (e) {
     // the error shows at the level that failed; the layouts above it stay
     if (seq === r.seq) batch(() => { r.view.set({ error: e, levels: [...curLevels.slice(0, depth), { key: `error:${seq}`, comp: () => routeError(e, () => { void sync({ initial: true }); }), page: true }] }); S.pendingDepth.set(-1); });
@@ -393,29 +393,6 @@ export function prefetch(to: string): void {
   const loaders = [m.route.load, ...(m.route.layouts ?? [])].filter((l): l is Loader => !!l);
   const known = loaders.map((l) => preloadChunks(loaderKey(l)));
   if (known.some((k) => !k)) void preload(to);
-}
-
-/**
- * Prefetch (lowest priority, <link rel="prefetch">) the routes linked from what is on screen now, at most `max`
- * routes; called when idle after the first page.
- */
-export function prefetchLinks(max = 6): void {
-  const d = globalThis.document, r = S.router;
-  if (!d || !r || saveData()) return;
-  const seen = new Set<string>();
-  const vh = globalThis.innerHeight || 0, vw = globalThis.innerWidth || 0;
-  for (const a of d.querySelectorAll<HTMLAnchorElement>("a[href]")) {
-    if (seen.size >= max) break;
-    const b = a.getBoundingClientRect?.();
-    if (b && vh && (b.bottom < 0 || b.top > vh || b.right < 0 || b.left > vw || (!b.width && !b.height))) continue;
-    // the route a link points to: "#/x", or a path under the base ("../x"); another site's path matches no route
-    const raw = a.getAttribute("href") ?? "";
-    const to = raw[0] === "#" ? (raw[1] === "/" ? raw.slice(1) : null) : raw && stripBase(new URL(raw, globalThis.location.href).pathname, r.base);
-    if (!to || seen.has(to)) continue;
-    seen.add(to);
-    const m = matchTo(r, to);
-    if (m && !m.route.component && m.path !== S.path.peek()) for (const l of [m.route.load, ...(m.route.layouts ?? [])]) if (l) preloadChunks(loaderKey(l), true);
-  }
 }
 
 /** Load a route's page (and layouts) ahead of time, e.g. on hover. */
@@ -582,7 +559,7 @@ export function Outlet(props: { name?: string; empty?: Renderable; children?: un
 const NamedOutlet = lazy(() => import("./outlets.ts"), { pick: "NamedOutlet", placeholder: "none" });
 
 /** Internals for the outlets module and router/extras.ts (not public API). */
-export const _router = { S, slot, matchRoute, loadRoute, pageKey, notFoundComp, forbiddenComp, routeError, leaveGuards, depth: (): number => vtDepth };
+export const _router = { S, slot, matchRoute, loadRoute, pageKey, notFoundComp, forbiddenComp, routeError, leaveGuards, stripBase, matchTo, depth: (): number => vtDepth };
 
 /** `<Link href="/users" exact prefetch="hover">Users</Link>` — client-side navigation, aria-current, preloading. */
 export function Link(props: { href: Href | (() => Href); exact?: boolean; replace?: boolean; modal?: boolean; outlet?: string; preload?: "hover" | "visible" | "idle" | "none"; prefetch?: "hover" | "visible" | "idle" | "none"; target?: string; children?: unknown; [k: string]: unknown }): unknown {
