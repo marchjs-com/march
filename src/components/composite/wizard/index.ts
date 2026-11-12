@@ -1,7 +1,7 @@
 // Wizard (composite: Steps, Progress): one form split into steps. Each step validates its own fields (and an optional validate fn) before Next.
 import "./wizard.css";
 import "../../../ui/button.css";
-import { signal, computed, untrack, provide } from "../../../core/reactive.ts";
+import { signal, computed, untrack, provide, effect } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { schema as makeSchema, type Schema, type SchemaSpec, type Values } from "../../../schema/index.ts";
@@ -57,10 +57,20 @@ export interface WizardProps<V = Values> {
  */
 export function Wizard<V = Values>(props: WizardProps<V>): unknown;
 export function Wizard(props: WizardProps): unknown {
-  return scoped(() => {
+  // `steps` is live: a new list builds the wizard again (the schema comes from it), carrying over what was typed
+  let carried: Values | undefined;
+  return () => {
     const steps = props.steps;
+    return untrack(() => build(props, steps, carried, (v) => (carried = v)));
+  };
+}
+
+function build(props: WizardProps, steps: readonly WizardStep[], carried: Values | undefined, carry: (v: Values) => void): unknown {
+  return scoped(() => {
     const sch = props.schema ?? makeSchema(Object.assign({}, ...steps.map((s) => (s.schema ? specOf(s.schema) : {}))) as SchemaSpec);
-    const form = props.form ?? useForm(sch, props.initial, { onSubmit: props.onSubmit, validateOn: props.validateOn ?? "blur" });
+    const initial = carried ? { ...(typeof props.initial === "function" ? props.initial() : props.initial), ...carried } : props.initial;
+    const form = props.form ?? useForm(sch, initial, { onSubmit: props.onSubmit, validateOn: props.validateOn ?? "blur" });
+    effect(() => carry({ ...form.values }));
     provide(FormContext, form);
     const index = signal(0);
     const stepError = signal<string | null>(null);
@@ -88,7 +98,7 @@ export function Wizard(props: WizardProps): unknown {
     const api: WizardApi = { index: () => index(), next, back, go: (i) => { if (i < index.peek() || [...Array(i).keys()].every(check)) go(i); } };
     props.onReady?.(form, api);
     const current = computed(() => index());
-    return h("form", { "data-hm-color": colorAttr(props.color),
+    return h("form", { "data-hm-color": () => colorAttr(props.color),
       class: cx("hm-wizard", props.class), novalidate: true, "aria-busy": () => (form.submitting() ? "true" : null),
       onSubmit: (e: Event) => { e.preventDefault(); next(); },
     },
@@ -96,13 +106,15 @@ export function Wizard(props: WizardProps): unknown {
     h(Steps, { class: "hm-wizard-steps", steps: steps.map((s, i) => ({ title: s.title ?? t`Step ${i + 1}` })), current: () => index(), onSelect: (i: number) => api.go(i) }),
     // the Progress component (its own CSS travels with it; the old .hm-progress markup was only styled by file.css)
     h(Progress, { class: "hm-wizard-progress", value: () => index() + 1, max: steps.length, size: "sm", label: () => t`Step ${index() + 1} of ${steps.length}` }),
+    // layout and cols are live too: the step's fields are laid out again (values stay in the form)
     () => {
       const i = current();
       const s = steps[i]!;
+      const layout = props.layout, cols = props.cols;
       return untrack(() => h("section", { class: "hm-wizard-step", "aria-labelledby": `${id}-title` },
         h("h3", { class: "hm-wizard-title", id: `${id}-title`, tabindex: "-1" }, s.title ?? t`Step ${i + 1}`),
         s.description ? h("p", { class: "hm-section-desc" }, s.description) : null,
-        s.render ? s.render(form) : renderFields(form, namesOf(s), { layout: props.layout, cols: props.cols })));
+        s.render ? s.render(form) : renderFields(form, namesOf(s), { layout, cols })));
     },
     () => (stepError() ? h("div", { class: "hm-form-error", role: "alert" }, stepError()) : null),
     () => (form.submitError() ? h("div", { class: "hm-form-error", role: "alert" }, form.submitError()) : null),

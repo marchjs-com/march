@@ -66,6 +66,10 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   const win = globalThis as unknown as Window;
   const vp = (): number => (axis === "x" ? win.innerWidth : win.innerHeight) || 0;
   const px = (p: number): number => (p <= 1 ? p * vp() : p);
+  // the content's own size along the axis (head, handle and the whole body): a sheet never grows past it, and snap
+  // points above it are cut down to it (Infinity until the panel is in the page, or across the axis)
+  let natural = Infinity;
+  const snapPx = (i: number): number => Math.min(px(snaps![i]!), natural);
   // snap indexes from the smallest to the largest size
   const order = snaps ? snaps.map((_, i) => i).sort((a, b) => px(snaps[a]!) - px(snaps[b]!)) : [];
   const largest = (): number => (snaps ? order[order.length - 1]! : 0);
@@ -87,7 +91,10 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   const panel = root.firstElementChild as HTMLElement;
   const body = panel.querySelector<HTMLElement>(".hm-dialog-body");
   if (handle) { if (edge === "top") panel.append(handle); else panel.prepend(handle); }
-  if (snaps) setStyle(panel, { "--hm-sheet-size": `${Math.round(px(snaps[largest()]!))}px` });
+  const fit = (): void => {
+    if (axis === "y" && body) { setStyle(panel, { "--hm-sheet-size": null, "--hm-sheet-off": null }); const n = panel.offsetHeight - body.clientHeight + body.scrollHeight; natural = n > 0 ? n : Infinity; }
+    if (snaps) setStyle(panel, { "--hm-sheet-size": `${Math.ceil(snapPx(largest()))}px` });
+  };
 
   // offset: distance from the open position toward the edge (0 = fully open, size = hidden)
   let cur = 0, size = 0, from0 = 0;
@@ -96,15 +103,22 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   const sign = (): number => (edge === "top" ? -1 : edge === "bottom" ? 1 : (edge === "end") !== rtl() ? 1 : -1);
   const tr = (o: number): string => (axis === "x" ? `translate3d(${sign() * o}px, 0, 0)` : `translate3d(0, ${sign() * o}px, 0)`);
   const measure = (): number => { const r = panel.getBoundingClientRect(); return (axis === "x" ? r.width : r.height) || vp(); };
-  const rest = (i = idx.peek()): number => (snaps ? Math.max(0, size - px(snaps[i]!)) : 0);
+  const rest = (i = idx.peek()): number => (snaps ? Math.max(0, size - snapPx(i)) : 0);
+  // the part pushed past the edge at a smaller snap point is padding: the body fits the visible part and scrolls to its
+  // end (past the smallest point, closing, it stays put and slides away whole)
+  const reveal = (o: number): void => { if (snaps) setStyle(panel, { "--hm-sheet-off": `${Math.round(Math.min(Math.max(0, o), rest(smallest())))}px` }); };
   const to = (o: number, duration = SETTLE): Promise<void> => {
     run?.cancel();
     const from = cur;
     cur = o;
     setStyle(panel, { transform: o ? tr(o) : null });
-    run = animate(panel, [{ transform: tr(from) }, { transform: tr(o) }], { duration, easing: "easeOutCubic", fill: "none" });
+    // growing: the body takes the room at once (it slides in filled); shrinking: once the sheet has settled
+    if (o <= from) reveal(o);
+    const r = animate(panel, [{ transform: tr(from) }, { transform: tr(o) }], { duration, easing: "easeOutCubic", fill: "none" });
+    run = r;
     touchPolicy();
-    return run.finished;
+    if (o > from) void r.finished.then(() => { if (run === r) reveal(o); });
+    return r.finished;
   };
   const choose = (i: number): void => { if (i !== idx.peek()) { idx.set(i); props.onSnap?.(i); } void to(rest(i)); };
 
@@ -143,6 +157,7 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
       const lo = rest(largest()), hi = canClose() ? size : rest(smallest());
       cur = raw < lo ? lo - rubberBand(lo - raw) : raw > hi ? hi + rubberBand(raw - hi) : raw;
       setStyle(panel, { transform: tr(cur) });
+      if (cur < from0) reveal(cur);
     },
     onEnd: (p) => {
       panel.classList.remove("is-dragging");
@@ -162,8 +177,8 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   });
   body?.addEventListener("scroll", touchPolicy, { passive: true });
   const onResize = (): void => {
-    if (snaps) setStyle(panel, { "--hm-sheet-size": `${Math.round(px(snaps[largest()]!))}px` });
-    size = measure(); cur = rest(); setStyle(panel, { transform: cur ? tr(cur) : null });
+    fit();
+    size = measure(); cur = rest(); setStyle(panel, { transform: cur ? tr(cur) : null }); reveal(cur);
   };
   win.addEventListener?.("resize", onResize);
   onCleanup(() => { run?.cancel(); fade?.cancel(); win.removeEventListener?.("resize", onResize); });
@@ -172,7 +187,7 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   if (snaps) effect(() => { const i = val(props.snap); if (i != null && snaps[i] != null && i !== untrack(idx)) untrack(() => { idx.set(i); void to(rest(i)); }); });
 
   // enter: from the edge to the resting offset (the motion engine skips it with reduced motion)
-  queueMicrotask(() => { if (!panel.isConnected) return; size = measure(); cur = size; void to(rest()); });
+  queueMicrotask(() => { if (!panel.isConnected) return; fit(); size = measure(); cur = size; reveal(rest()); void to(rest()); });
 
   register({
     exit(done) {

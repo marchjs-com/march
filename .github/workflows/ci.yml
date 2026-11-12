@@ -19,3 +19,20 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run size
+  # browser checks on the built showcase: every Playground / options control changes something visible
+  # (tools/control-audit.mjs); RichTextEditor :emoji and @mention insert at the caret (tools/editor-suggest-check.mjs)
+  showcase-controls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: node examples/showcase/build.mjs
+      - run: npm run audit:controls
+        env:
+          BROWSER_PATH: /usr/bin/google-chrome
+      - run: npm run check:editor-suggest
+        env:
+          BROWSER_PATH: /usr/bin/google-chrome

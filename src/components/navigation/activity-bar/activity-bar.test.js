@@ -39,3 +39,23 @@ test("ActivityBar: tablist, selection, collapse on the active view, end items, b
   assert.equal(document.activeElement, tabs[1]);
   m.dispose();
 });
+
+test("ActivityBar: orientation is live (the same bar turns; arrow keys follow the new axis)", async () => {
+  const view = signal("files"), dir = signal("vertical");
+  const m = mount(() => h(ActivityBar, { value: view, onChange: (v) => view.set(v), orientation: dir, items: [
+    { id: "files", label: "Files", icon: "F" }, { id: "search", label: "Search", icon: "S" },
+  ] }));
+  await tick();
+  const bar = m.el.querySelector('[role="tablist"]');
+  assert.ok(bar.classList.contains("hm-ab-v"));
+  dir.set("horizontal");
+  await tick();
+  assert.equal(m.el.querySelector('[role="tablist"]'), bar, "the bar is not rebuilt");
+  assert.ok(bar.classList.contains("hm-ab-h") && !bar.classList.contains("hm-ab-v"));
+  assert.equal(bar.getAttribute("aria-orientation"), "horizontal");
+  const tabs = [...bar.querySelectorAll('[role="tab"]')];
+  tabs[0].focus();
+  tabs[0].dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+  assert.equal(document.activeElement, tabs[1], "→ moves in a horizontal bar");
+  m.dispose();
+});

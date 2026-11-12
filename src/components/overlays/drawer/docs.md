@@ -15,9 +15,9 @@ A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left 
 | `side` | `start` `end` `top` `bottom` (`left` = start, `right` = end) | `end` | read when it opens |
 | `modal` | `boolean` | `true` | false: no scrim, no focus trap, no scroll lock |
 | `dragToClose` | `boolean` | `true` | needs `dismissable` |
-| `snapPoints` | `number[]` | | fractions of the viewport (`0.4`) or pixels (`320`); the largest sets the panel size |
+| `snapPoints` | `number[]` | | fractions of the viewport (`0.4`) or pixels (`320`); the largest sets the panel size, cut down to the content: a short sheet is as tall as its content |
 | `snap` / `onSnap` | `number` / `(i) => void` | `0` | index into `snapPoints`: it opens at the first listed point |
-| `size` | `sm` `md` `lg` `full` | `md` | without snap points |
+| `size` | `sm` `md` `lg` `full` | `md` | without snap points: the largest size; top / bottom sheets are as tall as their content up to it, then the body scrolls (handle and head stay) |
 | `title`, `label`, `footer`, `dismissable`, `class` | | | as in Dialog |
 
 ## Accessibility
@@ -25,6 +25,10 @@ A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left 
 `role="dialog"`, labelled by the title (or `label`); `aria-modal` only when modal. Escape closes the topmost one, focus
 moves in and returns to the opener. With snap points the grab handle is a button ("Resize panel") that steps through
 them with Enter / Space, so every size is reachable without a pointer. With reduced motion the panel appears at once.
+
+Content longer than the sheet scrolls in the body only (`overscroll-behavior: contain`; the modal layer locks the page,
+iOS included). At a smaller snap point the body ends at the screen edge, so its last line can be scrolled to. A drag
+on the body scrolls it first; at its top, dragging down moves the sheet (and closes it past the smallest point).
 
 ## Composed of
 

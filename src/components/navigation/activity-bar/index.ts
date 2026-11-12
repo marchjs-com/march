@@ -3,7 +3,7 @@
 // choosing the active view again collapses it (value null). An indicator glides to the active view (motion engine).
 // Items can sit at the end of the bar (settings, account) and carry count badges.
 import "./activity-bar.css";
-import { computed, effect, untrack } from "../../../core/reactive.ts";
+import { computed, effect, untrack, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, icon, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -35,7 +35,7 @@ export interface ActivityBarProps {
   onChange: (id: string | null) => void;
   /** Choosing the active view again collapses it (default true). */
   collapsible?: boolean;
-  orientation?: "vertical" | "horizontal";
+  orientation?: MaybeFn<"vertical" | "horizontal">;
   /** id of the element the views are shown in (aria-controls). */
   controls?: string;
   label?: MaybeFn<string | undefined>;
@@ -45,7 +45,8 @@ export interface ActivityBarProps {
 /** `<ActivityBar items={[{ id: "files", label: "Files", icon: files }, …]} value={$view} onChange={(v) => $view = v} controls="side" />` */
 export function ActivityBar(props: ActivityBarProps): Element {
   const base = uid("hm-ab");
-  const horizontal = props.orientation === "horizontal";
+  // orientation is live: the bar turns, the indicator moves to the other edge and keys follow the new axis
+  const horizontal = (): boolean => val(props.orientation) === "horizontal";
   const list = computed(() => val(props.items) ?? []);
   const current = (): string | null => val(props.value) ?? null;
   let root: HTMLElement | undefined, ind: HTMLElement | undefined;
@@ -59,15 +60,17 @@ export function ActivityBar(props: ActivityBarProps): Element {
   effect(() => {
     const id = current();
     list();
+    const hz = horizontal();
     queueMicrotask(() => {
       const el = id ? root?.querySelector<HTMLElement>(`[data-view="${id}"]`) : null;
       if (!ind || !root) return;
       if (!el) { ind.classList.remove("is-on"); lastAt = null; return; }
       const box = root.getBoundingClientRect(), r = el.getBoundingClientRect();
-      const to = horizontal ? `translateX(${(isRtl(root) ? r.right - box.right : r.left - box.left)}px)` : `translateY(${r.top - box.top}px)`;
-      const size = horizontal ? r.width : r.height;
+      const to = hz ? `translateX(${(isRtl(root) ? r.right - box.right : r.left - box.left)}px)` : `translateY(${r.top - box.top}px)`;
+      const size = hz ? r.width : r.height;
       setStyle(ind, { "--hm-ab-size": `${size}px` });
-      const from = lastAt;
+      // a turned bar starts the indicator afresh (a glide from the other axis would cross the bar)
+      const from = lastAt && lastAt.startsWith(hz ? "translateX" : "translateY") ? lastAt : null;
       lastAt = to;
       ind.classList.add("is-on");
       if (from && from !== to && !reducedMotion()) animate(ind, [{ transform: from }, { transform: to }], { duration: 260, easing: "easeOutBack", fill: "forwards" });
@@ -86,12 +89,12 @@ export function ActivityBar(props: ActivityBarProps): Element {
       onClick: () => choose(it),
     }, icon(it.icon, "hm-ab-icon"),
     it.badge !== undefined && h("span", { class: "hm-ab-badge" }, h(Badge, { count: () => val(it.badge), tone: "primary" })));
-    return h(Tooltip, { text: name, placement: horizontal ? "top" : "bottom-start", children: btn });
+    return h(Tooltip, { text: name, placement: reactive(() => (horizontal() ? "top" : "bottom-start")), children: btn });
   };
-  const onKeydown = (e: KeyboardEvent): void => { roving(e, tabs(), { horizontal }); };
+  const onKeydown = (e: KeyboardEvent): void => { roving(e, tabs(), { horizontal: horizontal() }); };
 
   return h("div", {
-    class: () => cx("hm-ab", horizontal ? "hm-ab-h" : "hm-ab-v", val(props.class)), role: "tablist", "aria-orientation": horizontal ? "horizontal" : "vertical",
+    class: () => cx("hm-ab", horizontal() ? "hm-ab-h" : "hm-ab-v", val(props.class)), role: "tablist", "aria-orientation": () => (horizontal() ? "horizontal" : "vertical"),
     "aria-label": () => val(props.label) ?? t`Views`, ref: (x: HTMLElement) => { root = x; }, onKeydown,
   },
   h("span", { class: "hm-ab-ind", "aria-hidden": "true", ref: (x: HTMLElement) => { ind = x; } }),

@@ -29,6 +29,7 @@ const tr: Record<string, string> = {
   "Only http(s), mailto, tel and relative links": "Yalnız http(s), mailto, tel ve göreli bağlantılar",
   "Suggestions": "Öneriler",
   "No matches": "Eşleşme yok",
+  "Keep typing to search": "Aramak için yazmaya devam edin",
   "{0} words": "{0} kelime",
   "{0} characters": "{0} karakter",
   "Type @ to mention, : for emoji": "Bahsetmek için @, emoji için : yazın",

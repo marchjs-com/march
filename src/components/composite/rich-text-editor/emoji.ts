@@ -28,3 +28,6 @@ export const EMOJI: readonly EmojiEntry[] = [
   ["🍎", "apple", "elma"], ["🐱", "cat", "kedi"], ["🐶", "dog", "köpek"], ["🦊", "fox", "tilki"],
   ["⚽", "soccer", "futbol top"], ["🎮", "game", "oyun"], ["🎵", "music", "müzik nota"], ["📷", "camera", "kamera fotoğraf"],
 ];
+
+/** Shown at once for a lone ":" (by shortcode, in this order). */
+export const POPULAR_EMOJI: readonly string[] = ["smile", "joy", "heart_eyes", "thumbsup", "heart", "fire", "tada", "clap", "pray", "thinking", "wink", "rocket"];

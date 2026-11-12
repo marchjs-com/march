@@ -1,4 +1,4 @@
-// Showcase stage for Wizard: an account setup in steps, drawn again when a Playground value changes.
+// Showcase stage for Wizard: an account setup in steps; the Playground sets the step count, the field layout and the color.
 import { Wizard, type WizardStep } from "./index.ts";
 import { schema } from "../../../schema/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
@@ -17,6 +17,7 @@ const ALL: WizardStep[] = [
 ]
 
 export default function WizardDemo(props: { values: { steps: number; layout: string; color: string } }) {
-  return <div>{() => <Wizard steps={ALL.slice(0, props.values.steps - 1).concat(ALL[3]!)} submitLabel="Bitir"
-    layout={props.values.layout as "stack"} cols={2} color={props.values.color as ColorToken} />}</div>
+  // Wizard's steps, layout and color props are live: each Playground change reaches it without drawing the card again
+  return <Wizard steps={ALL.slice(0, props.values.steps - 1).concat(ALL[3]!)} submitLabel="Bitir"
+    layout={props.values.layout as "stack"} cols={2} color={props.values.color as ColorToken} />
 }

@@ -21,7 +21,7 @@ bottom bar on phones), and mirrored in RTL.
 | `value` | string / null / accessor | — | the active view |
 | `onChange` | `(id \| null) => void` | — | |
 | `collapsible` | boolean | `true` | choosing the active view again gives `null` |
-| `orientation` | `vertical` `horizontal` | `vertical` | |
+| `orientation` | `vertical` `horizontal` (or a signal) | `vertical` | live: the same bar turns, the indicator moves to the bottom edge, keys follow the axis |
 | `controls` | string | — | id of the side view (`aria-controls`) |
 | `label` | string | "Views" | accessible name |
 

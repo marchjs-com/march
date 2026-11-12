@@ -35,7 +35,7 @@ import { redo as redoIcon } from "../../../icons/glyphs/redo.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { trash } from "../../../icons/glyphs/trash.ts";
 import * as ops from "./ops.ts";
-import { EMOJI, type EmojiEntry } from "./emoji.ts";
+import { EMOJI, POPULAR_EMOJI, type EmojiEntry } from "./emoji.ts";
 import tr from "./tr.ts";
 
 messages("tr", tr);
@@ -46,9 +46,9 @@ export type { BlockType, Mark } from "./ops.ts";
 /** A person (or anything) to mention with @. */
 export interface Mention { id: string; label: string; hint?: string; avatar?: string }
 /** Toolbar items, in the order given. "|" draws a separator. */
-export type ToolName = "paragraph" | "h2" | "h3" | "bold" | "italic" | "strike" | "code" | "link" | "ul" | "ol" | "quote" | "codeblock" | "undo" | "redo" | "|";
+export type ToolName = "paragraph" | "h2" | "h3" | "bold" | "italic" | "strike" | "code" | "link" | "emoji" | "ul" | "ol" | "quote" | "codeblock" | "undo" | "redo" | "|";
 /** Toolbar buttons RichTextEditor shows when `tools` is not given, in order. */
-export const DEFAULT_TOOLS: readonly ToolName[] = ["paragraph", "h2", "h3", "|", "bold", "italic", "strike", "code", "link", "|", "ul", "ol", "quote", "codeblock", "|", "undo", "redo"];
+export const DEFAULT_TOOLS: readonly ToolName[] = ["paragraph", "h2", "h3", "|", "bold", "italic", "strike", "code", "link", "emoji", "|", "ul", "ol", "quote", "codeblock", "|", "undo", "redo"];
 
 /** What `api` hands out: drive the editor from outside (an AI assistant, a template picker …). */
 export interface RichTextApi {
@@ -86,7 +86,7 @@ export interface RichTextEditorProps extends ControlProps<string> {
   class?: ClassProp;
 }
 
-interface Suggest { kind: "@" | ":"; query: string; items: { id: string; label: string; hint?: string | undefined; avatar?: string | undefined; insert: string }[]; active: number }
+interface Suggest { kind: "@" | ":"; query: string; button?: boolean; items: { id: string; label: string; hint?: string | undefined; avatar?: string | undefined; insert: string }[]; active: number }
 
 const mod = (e: KeyboardEvent): boolean => e.ctrlKey || e.metaKey;
 const fragOf = (nodes: readonly Node[]): DocumentFragment => { const f = globalThis.document.createDocumentFragment(); for (const n of nodes) f.appendChild(n); return f; };
@@ -227,7 +227,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   const LABEL: Record<Exclude<ToolName, "|">, () => string> = {
     paragraph: () => t`Paragraph`, h2: () => t`Heading 2`, h3: () => t`Heading 3`, bold: () => t`Bold`, italic: () => t`Italic`, strike: () => t`Strikethrough`,
     code: () => t`Inline code`, link: () => t`Link`, ul: () => t`Bulleted list`, ol: () => t`Numbered list`, quote: () => t`Quote`, codeblock: () => t`Code block`,
-    undo: () => t`Undo`, redo: () => t`Redo`,
+    emoji: () => t`Emoji`, undo: () => t`Undo`, redo: () => t`Redo`,
   };
   const MARK_OF: Partial<Record<ToolName, ops.Mark>> = { bold: "strong", italic: "em", strike: "s", code: "code" };
   const BLOCK_OF: Partial<Record<ToolName, ops.BlockType>> = { paragraph: "p", h2: "h2", h3: "h3", ul: "ul", ol: "ol", quote: "blockquote", codeblock: "pre" };
@@ -236,6 +236,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     if (m) run(LABEL[tool](), (s) => { const w = wordSel(s); ops.toggleMark(root, w, m); return s[0] === s[1] ? s : w; });
     else if (b) run(LABEL[tool](), (s) => { ops.setBlocks(root, ops.blocksBetween(root, s), b); return s; });
     else if (tool === "link") openLink();
+    else if (tool === "emoji") openEmoji();
     else if (tool === "undo") void history.undo();
     else if (tool === "redo") void history.redo();
   };
@@ -269,24 +270,39 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
       return s;
     });
   };
+  // the toolbar's emoji button opens the same list as a typed ":" (the common ones), inserting at the caret
+  const openEmoji = (): void => {
+    if (ro()) return;
+    root.focus({ preventScroll: true });
+    if (!ops.saveSel(root)) ops.restoreSel(root, lastSel ?? [1, 1]);
+    if (sug.peek()?.button) { sug.set(null); return; }
+    sug.set({ kind: ":", query: "", items: commonEmoji(), active: 0, button: true });
+  };
   const unlink = (): void => { linkOpen.set(false); run(t`Remove link`, (s) => { ops.removeLinks(root, s); return s; }); };
 
   // ------------------------------------------------------------------ suggestions (@mentions, :emoji)
   const emojiList = (): readonly EmojiEntry[] => (Array.isArray(props.emoji) ? (props.emoji as readonly EmojiEntry[]) : EMOJI);
   const fold = (s: string): string => s.toLocaleLowerCase(untrack(dir) === "rtl" ? undefined : "tr").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ı/g, "i");
+  const commonEmoji = (): Suggest["items"] => {
+    const list = emojiList(), common = Array.isArray(props.emoji) ? list.slice(0, 10) : POPULAR_EMOJI.map((n) => list.find((e) => e[1] === n)!).filter(Boolean);
+    return common.map(([e, name]) => ({ id: name, label: e, hint: `:${name}:`, insert: e }));
+  };
   const updateSuggest = async (): Promise<void> => {
     const s = ops.saveSel(root);
     if (!s || s[0] !== s[1]) { sug.set(null); return; }
-    const m = /(?:^|[\s(])([@:])([\p{L}\p{N}_.-]{0,24})$/u.exec(ops.textBefore(root, s).replace(/ /g, " "));
+    const m = ops.suggestTrigger(ops.textBefore(root, s));
     if (!m) { sug.set(null); return; }
-    const kind = m[1] as "@" | ":", query = m[2]!;
+    const { kind, query } = m;
     const seq = ++sugSeq;
     let items: Suggest["items"] = [];
     if (kind === "@" && props.mentions) {
       const q = fold(query);
       const list = typeof props.mentions === "function" ? await props.mentions(query) : props.mentions.filter((p) => fold(`${p.label} ${p.hint ?? ""}`).includes(q));
       items = list.slice(0, 8).map((p) => ({ id: p.id, label: p.label, hint: p.hint, avatar: p.avatar, insert: p.label }));
-    } else if (kind === ":" && props.emoji !== false && query.length >= 1) {
+    } else if (kind === ":" && props.emoji !== false && !query) {
+      // a lone ":" after a space or at a line start: the common ones at once; typing on filters them
+      items = commonEmoji();
+    } else if (kind === ":" && props.emoji !== false) {
       const q = fold(query);
       items = emojiList().filter(([, name, kw]) => name.startsWith(q) || fold(kw).split(" ").some((w) => w.startsWith(q))).slice(0, 8).map(([e, name]) => ({ id: name, label: e, hint: `:${name}:`, insert: e }));
     } else { sug.set(null); return; }
@@ -300,7 +316,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     if (!st || !item) return;
     sug.set(null);
     run(st.kind === "@" ? t`Mention` : t`Emoji`, (s) => {
-      const at = ops.deleteBefore(root, s, st.query.length + 1);
+      const at = st.button ? s : ops.deleteBefore(root, s, st.query.length + 1);
       const d = globalThis.document;
       let node: Node;
       if (st.kind === "@") { const span = d.createElement("span"); span.setAttribute("data-mention", item.id); span.setAttribute("contenteditable", "false"); span.textContent = `@${item.insert}`; node = span; }
@@ -426,8 +442,8 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   };
 
   // ------------------------------------------------------------------ view
-  const tools = (): readonly ToolName[] => (props.toolbar === false ? [] : Array.isArray(props.toolbar) ? (props.toolbar as readonly ToolName[]) : DEFAULT_TOOLS);
-  const ICON: Record<Exclude<ToolName, "|">, Parameters<typeof glyph>[0]> = { paragraph: pilcrow, h2: heading, h3: heading, bold, italic, strike: strikethrough, code: codeIcon, link: linkIcon, ul: listIcon, ol: listOrdered, quote, codeblock: terminal, undo: undoIcon, redo: redoIcon };
+  const tools = (): readonly ToolName[] => (props.toolbar === false ? [] : Array.isArray(props.toolbar) ? (props.toolbar as readonly ToolName[]) : DEFAULT_TOOLS).filter((x) => x !== "emoji" || props.emoji !== false);
+  const ICON: Record<Exclude<ToolName, "|" | "emoji">, Parameters<typeof glyph>[0]> = { paragraph: pilcrow, h2: heading, h3: heading, bold, italic, strike: strikethrough, code: codeIcon, link: linkIcon, ul: listIcon, ol: listOrdered, quote, codeblock: terminal, undo: undoIcon, redo: redoIcon };
   const pressed = (tool: ToolName): boolean => {
     const m = MARK_OF[tool];
     if (m) return !!marks()[m];
@@ -436,11 +452,12 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     return !!b && block() === b;
   };
   const toolButton = (tool: Exclude<ToolName, "|">, i: number): Element => {
-    const toggle = tool !== "undo" && tool !== "redo" && tool !== "link";
+    const toggle = tool !== "undo" && tool !== "redo" && tool !== "link" && tool !== "emoji";
     const btn = h(IconButton, {
-      icon: glyph(ICON[tool]), label: LABEL[tool], size: "sm", class: () => cx("hm-rte-tool", pressed(tool) && "is-on", (tool === "h2" || tool === "h3") && `hm-rte-tool-${tool}`),
+      icon: tool === "emoji" ? h("span", { class: "hm-rte-tool-emoji", "aria-hidden": "true" }, "☺") : glyph(ICON[tool]), label: LABEL[tool], size: "sm", class: () => cx("hm-rte-tool", pressed(tool) && "is-on", (tool === "h2" || tool === "h3") && `hm-rte-tool-${tool}`),
       "aria-pressed": toggle ? () => String(pressed(tool)) : null, "aria-keyshortcuts": KEYS[tool] ?? null, tabindex: i === 0 ? "0" : "-1",
-      "aria-haspopup": tool === "link" ? "dialog" : null, "aria-expanded": tool === "link" ? () => String(linkOpen()) : null,
+      "aria-haspopup": tool === "link" ? "dialog" : tool === "emoji" ? "listbox" : null,
+      "aria-expanded": tool === "link" ? () => String(linkOpen()) : tool === "emoji" ? () => String(!!sug()?.button) : null,
       disabled: () => ro() || (tool === "undo" && !history.canUndo()) || (tool === "redo" && !history.canRedo()),
       // keep the text selection: the button never takes focus on pointer down
       onMouseDown: (e: MouseEvent) => e.preventDefault(),
@@ -511,7 +528,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
       },
       st.kind === "@" ? h(Avatar, { name: it.label, src: it.avatar ?? null, size: "sm" }) : h("span", { class: "hm-rte-sug-emoji-glyph", "aria-hidden": "true" }, it.label),
       h("span", { class: "hm-rte-sug-label" }, st.kind === "@" ? it.label : it.hint),
-      st.kind === "@" && it.hint ? h("span", { class: "hm-rte-sug-hint" }, it.hint) : null)) : h("div", { class: "hm-rte-sug-empty" }, () => t`No matches`),
+      st.kind === "@" && it.hint ? h("span", { class: "hm-rte-sug-hint" }, it.hint) : null)).concat(st.kind === ":" && !st.query && !st.button ? [h("div", { class: "hm-rte-sug-more", "aria-hidden": "true" }, () => t`Keep typing to search`)] : []) : h("div", { class: "hm-rte-sug-empty" }, () => t`No matches`),
     });
   };
 

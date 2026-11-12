@@ -28,8 +28,8 @@ export function Badge(props: BadgeProps): unknown {
     return () => {
       const n = Number(val(props.count)) || 0;
       if (!n && !props.showZero) return null;
-      return h("span", { "data-hm-color": colorAttr(props.color), class: cx("hm-badge", "hm-badge-count", `hm-badge-${val(props.tone) ?? "danger"}`, val(props.class)), "aria-label": props.label ? `${n} ${val(props.label)}` : null }, countLabel(n, props.max ?? 99));
+      return h("span", { "data-hm-color": () => colorAttr(props.color), class: cx("hm-badge", "hm-badge-count", `hm-badge-${val(props.tone) ?? "danger"}`, val(props.class)), "aria-label": props.label ? `${n} ${val(props.label)}` : null }, countLabel(n, props.max ?? 99));
     };
   }
-  return h("span", { "data-hm-color": colorAttr(props.color), class: () => cx("hm-badge", `hm-badge-${val(props.tone) ?? "neutral"}`, props.dot && "hm-badge-dot", val(props.class)) }, props.children);
+  return h("span", { "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-badge", `hm-badge-${val(props.tone) ?? "neutral"}`, props.dot && "hm-badge-dot", val(props.class)) }, props.children);
 }

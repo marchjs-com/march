@@ -8,7 +8,10 @@
 .hm-crop-view:focus-visible { box-shadow: 0 0 0 3px var(--hm-focus); }
 .hm-crop-view.is-busy { cursor: grabbing; }
 .hm-crop-stage { position: absolute; inset: 0; pointer-events: none; }
-.hm-crop-img { position: absolute; inset: 0; margin: auto; inline-size: var(--hm-crop-iw); block-size: var(--hm-crop-ih); max-inline-size: none; max-block-size: none;
+/* centered by its own half size: "inset: 0; margin: auto" stops centering once the image is larger than the view (the
+   auto margins drop to 0 and the image hangs off one side), which left a bare strip inside the frame */
+.hm-crop-img { position: absolute; inset-block-start: 50%; inset-inline-start: 50%; margin-block-start: calc(var(--hm-crop-ih, 0px) / -2); margin-inline-start: calc(var(--hm-crop-iw, 0px) / -2);
+  inline-size: var(--hm-crop-iw); block-size: var(--hm-crop-ih); max-inline-size: none; max-block-size: none;
   translate: var(--hm-crop-tx, 0px) var(--hm-crop-ty, 0px); rotate: var(--hm-crop-r, 0deg); scale: var(--hm-crop-sx, 1) var(--hm-crop-sy, 1);
   transition: rotate var(--hm-dur) var(--hm-ease), scale var(--hm-dur-fast) var(--hm-ease); }
 .hm-crop-view.is-busy .hm-crop-img { transition: none; }

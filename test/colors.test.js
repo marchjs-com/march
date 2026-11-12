@@ -127,3 +127,25 @@ test("Rating follows the accent (gold on request); multicolor components are mar
   const el = mount(() => [h(U.Progress, { value: 3, colors: "brand" }), h(U.Progress, { value: 3 }), h(U.CodeInput, { length: 3, colors: "brand" })]);
   assert.deepEqual([...el.querySelectorAll("[data-hm-colors]")].map((x) => x.getAttribute("data-hm-colors")), ["brand", "brand"]);
 });
+
+test("a color prop stays live: a new value reaches data-hm-color (the showcase Playground changes it)", async () => {
+  const { signal, reactive } = await import("../src/core/reactive.ts");
+  const { Stepper } = await import("../src/components/navigation/stepper/index.ts");
+  const color = signal("brand-blue");
+  const cases = [
+    ["Steps", (c) => h(U.Steps, { steps: [{ title: "A" }, { title: "B" }], current: 0, color: c })],
+    ["Progress", (c) => h(U.Progress, { value: 1, max: 2, color: c })],
+    ["Badge", (c) => h(U.Badge, { color: c }, "x")],
+    ["Stepper", (c) => h(Stepper, { steps: [{ title: "A" }, { title: "B" }], color: c })],
+  ];
+  for (const [name, make] of cases) {
+    const el = document.createElement("div"); document.body.appendChild(el);
+    color.set("brand-blue");
+    const dispose = render(() => make(reactive(() => color())), el);
+    const node = el.querySelector("[data-hm-color]");
+    assert.equal(node?.getAttribute("data-hm-color"), "brand-blue", name);
+    color.set("brand-purple");
+    assert.equal(node.getAttribute("data-hm-color"), "brand-purple", `${name}: the new color reaches it`);
+    dispose();
+  }
+});

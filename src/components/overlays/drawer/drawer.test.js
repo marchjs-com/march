@@ -86,3 +86,33 @@ test("Drawer: dragging toward the edge closes it; a parent that keeps it open ge
   assert.ok(panelOf(), "parent kept it open");
   dispose();
 });
+
+test("Drawer: a short sheet is as tall as its content (snap points cut down to it); a long one keeps the body scrollable to its end", async () => {
+  const vh = 800, was = globalThis.innerHeight;
+  globalThis.innerHeight = vh;
+  const layout = (panel, contentH) => {
+    // the fake DOM has no layout: give the panel and its body the sizes a browser would
+    const body = panel.querySelector(".hm-dialog-body");
+    Object.defineProperty(panel, "offsetHeight", { configurable: true, get: () => 80 + body.clientHeight });
+    Object.defineProperty(body, "clientHeight", { configurable: true, get: () => 50 });
+    Object.defineProperty(body, "scrollHeight", { configurable: true, get: () => contentH });
+  };
+  // short: 80 px of head and handle + 120 px of content = 200 px, below both snap points
+  let dispose = mount(() => h(Drawer, { open: true, side: "bottom", snapPoints: [0.4, 0.9], label: "Short" }, "x"));
+  layout(panelOf(), 120);
+  await tick();
+  assert.equal(panelOf().style.getPropertyValue("--hm-sheet-size"), "200px", "the content's height, not 90% of the screen");
+  dispose(); await tick();
+  // long: the largest snap point sets the size; resting on the smaller one, the part past the edge is padding
+  dispose = mount(() => h(Drawer, { open: true, side: "bottom", snapPoints: [0.4, 0.9], label: "Long" }, "x"));
+  const panel = panelOf();
+  layout(panel, 5000);
+  Object.defineProperty(panel, "getBoundingClientRect", { configurable: true, value: () => ({ width: 390, height: Math.ceil(0.9 * vh), top: 0, left: 0, right: 390, bottom: Math.ceil(0.9 * vh) }) });
+  await tick();
+  assert.equal(panel.style.getPropertyValue("--hm-sheet-size"), `${Math.ceil(0.9 * vh)}px`);
+  const off = parseFloat(panel.style.getPropertyValue("--hm-sheet-off"));
+  assert.ok(Math.abs(off - (Math.ceil(0.9 * vh) - 0.4 * vh)) <= 1, `the hidden part (${off}px) is padding, so the body ends at the screen edge`);
+  dispose();
+  globalThis.innerHeight = was;
+});
+

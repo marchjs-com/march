@@ -9,7 +9,7 @@ export interface StepItem { title: unknown; description?: unknown; icon?: unknow
 export interface StepsProps { /** Theme color token. */ color?: ColorToken | undefined; steps: readonly StepItem[]; current: MaybeFn<number>; onSelect?: (i: number) => void; vertical?: boolean; class?: ClassProp }
 /** Progress through stages: `<Steps steps={[{ title: "Account" }, …]} current={$step} onSelect={(i) => $step = i} />` */
 export function Steps(props: StepsProps): Element {
-  return h("ol", { "data-hm-color": colorAttr(props.color), class: () => cx("hm-steps2", props.vertical && "hm-steps2-v", val(props.class)) }, props.steps.map((s, i) => {
+  return h("ol", { "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-steps2", props.vertical && "hm-steps2-v", val(props.class)) }, props.steps.map((s, i) => {
     const state = (): string => { const c = val(props.current); return i < c ? "done" : i === c ? "current" : "todo"; };
     const inner = [
       h("span", { class: "hm-step2-dot" }, () => (state() === "done" ? glyph(check) : s.icon != null ? icon(s.icon) : String(i + 1))),
