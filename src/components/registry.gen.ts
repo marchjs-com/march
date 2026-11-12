@@ -9,7 +9,10 @@ import m5 from "./social/like-button/meta.ts";
 import m6 from "./social/media-grid/meta.ts";
 import m7 from "./composite/post-card/meta.ts";
 import m8 from "./feedback/pull-to-refresh/meta.ts";
-import m9 from "./data/virtual-list/meta.ts";
+import m9 from "./social/story-progress/meta.ts";
+import m10 from "./social/story-ring/meta.ts";
+import m11 from "./composite/story-viewer/meta.ts";
+import m12 from "./data/virtual-list/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 export const registry: readonly RegistryEntry[] = [
@@ -22,5 +25,8 @@ export const registry: readonly RegistryEntry[] = [
   { folder: "social/media-grid", meta: m6, code: "<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d3), playground: () => import("./demos-social.gen.ts").then((m) => m.p3) },
   { folder: "composite/post-card", meta: m7, code: "<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d4), playground: () => import("./demos-social.gen.ts").then((m) => m.p4) },
   { folder: "feedback/pull-to-refresh", meta: m8, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./demos-navigation.gen.ts").then((m) => m.d1), playground: () => import("./demos-navigation.gen.ts").then((m) => m.p1) },
-  { folder: "data/virtual-list", meta: m9, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d5), playground: () => import("./demos-social.gen.ts").then((m) => m.p5) },
+  { folder: "social/story-progress", meta: m9, code: "<StoryProgress count={items.length} index={$i} run={item.id} paused={$hold} onDone={next} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d5), playground: () => import("./demos-social.gen.ts").then((m) => m.p5) },
+  { folder: "social/story-ring", meta: m10, code: "<StoryRing name={u.name} src={u.avatar} state={u.seen ? \"seen\" : \"new\"} label={u.handle} onClick={() => open(u)} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d6), playground: () => import("./demos-social.gen.ts").then((m) => m.p6) },
+  { folder: "composite/story-viewer", meta: m11, code: "<StoryViewer open={$open} onClose={() => $open = false} groups={stories} start={tappedId} onSeen={markSeen} onReply={send} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d7), playground: () => import("./demos-social.gen.ts").then((m) => m.p7) },
+  { folder: "data/virtual-list", meta: m12, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d8), playground: () => import("./demos-social.gen.ts").then((m) => m.p8) },
 ];

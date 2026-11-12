@@ -12,6 +12,9 @@
 | MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, MediaGrid, LikeButton, CountRoll |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+| StoryProgress | experimental | Segmented story bars: done, current filling over its duration on the motion engine (pause holds it), onDone when full; RTL fills from the right. | — |
+| StoryRing | experimental | Avatar in a story ring: new (four HADİ colors), seen, close friends, none; + badge, turning ring while loading, label for story trays. | Avatar |
+| StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, StoryProgress, LikeButton |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
 ## BottomNav
@@ -106,6 +109,36 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 ```
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
+
+## StoryProgress
+
+The segmented bars on top of a story. Segments before the current one are full, later ones empty, and the current one fills over its duration on the motion engine. The fill is an essential animation: it keeps time with reduced motion (the story would otherwise skip at once), while "pause all" and the global speed still apply. `paused` holds the fill where it is; `onDone` fires when it is full. In RTL the bars fill from the right.
+
+```tsx
+<StoryProgress count={items.length} index={$i} run={item.id} paused={$hold} onDone={next} />
+```
+
+Full page: src/components/social/story-progress/docs.md
+
+## StoryRing
+
+An Avatar inside a ring that tells the story state: `new` sweeps the four HADİ colors (and pink), `seen` is a quiet line, `close` is the friends-only green, `none` has no ring. As a button it opens the stories, and while they load the ring turns on the motion engine. A `+` badge marks your own ring (add a story); a label under it makes a story tray.
+
+```tsx
+<StoryRing name={u.name} src={u.avatar} state={u.seen ? "seen" : "new"} label={u.handle} onClick={() => open(u)} />
+```
+
+Full page: src/components/social/story-ring/docs.md
+
+## StoryViewer
+
+Full-screen stories on a dark stage. StoryProgress bars fill on top; a tap on the start third goes back and anywhere else forward (mirrored in RTL); pressing and holding pauses; a horizontal swipe moves to the next or previous person with a slide; dragging down shrinks the story and closes it past 120 px (or a quick flick). The bottom bar has a reply field (typing pauses) and a LikeButton. The next picture is preloaded. It is a Dialog: focus stays inside, Esc closes and focus returns to the ring that opened it.
+
+```tsx
+<StoryViewer open={$open} onClose={() => $open = false} groups={stories} start={tappedId} onSeen={markSeen} onReply={send} />
+```
+
+Full page: src/components/composite/story-viewer/docs.md
 
 ## VirtualList
 
