@@ -78,7 +78,10 @@ export function model<T>(props: object, def: T, name = "value"): [get: () => T, 
 
 /** A props view with extra live (getter) props; the original descriptors (incl. bind:value getters) are kept. */
 export function extend<P extends object>(props: P, getters: { [K in keyof P]?: () => P[K] }): P {
-  const o = Object.defineProperties({}, Object.getOwnPropertyDescriptors(props)) as P;
+  // copies are configurable: JSX props may arrive as non-configurable getters, and an override must replace them
+  const d = Object.getOwnPropertyDescriptors(props) as PropertyDescriptorMap;
+  for (const k in d) d[k]!.configurable = true;
+  const o = Object.defineProperties({}, d) as P;
   for (const k in getters) Object.defineProperty(o, k, { get: getters[k] as () => unknown, enumerable: true, configurable: true });
   return o;
 }

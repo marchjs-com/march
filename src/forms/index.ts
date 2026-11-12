@@ -13,6 +13,8 @@ export type { AffixProps, TextAttrProps, TextInputProps, TextareaProps, Password
   CodeInputProps } from "./inputs.ts";
 export { shapesFor, type ChoiceVariant, type ChoiceSize, type ChoiceShape, type ChoiceLook } from "./choice.ts";
 export { Combobox, MultiSelect } from "./pickers.ts";
+export { ChoicePicker, pickerKind } from "./choice-picker.ts";
+export type { ChoicePickerProps, PickerKind } from "./choice-picker.ts";
 export type { ComboboxProps, MultiSelectProps } from "./pickers.ts";
 export { Calendar, DatePicker, TimeInput, DateTimeInput, DateRangePicker, rangePresets, parseDate, formatDate, addDays, addMonths, todayIso, firstDayOf } from "./date.ts";
 export type { IsoDate, CalendarProps, DatePickerProps, TimeInputProps, DateTimeInputProps, DateRangePickerProps, DateRange, RangePreset } from "./date.ts";

@@ -31,7 +31,7 @@ const ROUTES = flag("--routes", null)?.split(",") ?? (existsSync(navFile) ? [...
 // extra states per route: [label, script run after load]
 const STATES = {
   "/layout": [["container 50%", `(() => { const s = document.querySelectorAll("input[type=range]")[1]; s.value = "50"; s.dispatchEvent(new Event("input", { bubbles: true })); })()`],
-    ["container 30%, 6 columns", `(() => { const s = document.querySelectorAll("input[type=range]")[1]; s.value = "30"; s.dispatchEvent(new Event("input", { bubbles: true })); [...document.querySelectorAll("[role=radio]")].find((b) => b.textContent === "6 sütun")?.click(); })()`]],
+    ["container 30%, 6 columns", `(() => { const s = document.querySelectorAll("input[type=range]")[1]; s.value = "30"; s.dispatchEvent(new Event("input", { bubbles: true })); [...document.querySelectorAll("[role=radio]")].find((b) => b.textContent.trim() === "6")?.click(); })()`]],
 };
 
 // ---- server (unless --base)

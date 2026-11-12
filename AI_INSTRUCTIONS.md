@@ -287,6 +287,13 @@ the layers under it `inert`, toasts and effects stay above. Shell places: `<Port
 `<Portal to="toolbar" order={10}>…</Portal>` in a page — sorted by `order`, removed when the page goes, waits (and moves
 in) when the target is a lazy part not loaded yet. Context, theme, i18n and cleanup stay with the source component.
 
+## 14b2. Option panels (Playground rule)
+
+Single choices with few values never use a drop-down: `<ChoicePicker bind:value={$x} options={…} />` picks the look —
+2–6 short labels → Segmented, 7–9 → chips, options with `preview: () => node` → preview cards (`kind="grid"`: square
+tiles), 10+ → Combobox. An option panel shows an option only while it has an effect (`visibleWhen`) and sits beside
+the stage (below it on a phone), so options appearing or going never move the stage (showcase: `Playground`).
+
 ## 14c. Widget points (hadi-march/widget, re-exported by ui)
 
 A widget point is a named place other code fills: `widgetPoint<Input>(id, { defaults })`, `point.provide({ id, slot,

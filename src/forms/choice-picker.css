@@ -1,0 +1,12 @@
+/* ChoicePicker: compact preview cards and square tiles for option panels (the card variant made small). */
+.hm-picker { min-width: 0; }
+.hm-picker.hm-picker-cards .hm-choices, .hm-picker.hm-picker-cards .hm-choice-card { grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); grid-auto-rows: auto; gap: var(--hm-space-2); }
+.hm-picker.hm-picker-grid .hm-choices, .hm-picker.hm-picker-grid .hm-choice-card { grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr)); grid-auto-rows: auto; gap: var(--hm-space-2); }
+.hm-picker.hm-picker-cards .hm-check, .hm-picker.hm-picker-grid .hm-check { padding: var(--hm-space-1); padding-inline-end: var(--hm-space-1); }
+.hm-picker.hm-picker-cards .hm-choice-card-body, .hm-picker.hm-picker-grid .hm-choice-card-body { display: flex; flex-direction: column; align-items: stretch; gap: var(--hm-space-1); width: 100%; }
+.hm-picker.hm-picker-cards .hm-choice-card-icon, .hm-picker.hm-picker-grid .hm-choice-card-icon { display: block; position: relative; overflow: hidden; width: 100%; height: auto; margin: 0;
+  aspect-ratio: 16 / 10; border-radius: calc(var(--hm-ch-card-radius) - 4px); background: var(--hm-bg-subtle); }
+.hm-picker.hm-picker-grid .hm-choice-card-icon { aspect-ratio: 1; }
+.hm-picker.hm-picker-cards .hm-choice-card-icon > *, .hm-picker.hm-picker-grid .hm-choice-card-icon > * { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hm-picker.hm-picker-cards .hm-choice-card-title, .hm-picker.hm-picker-grid .hm-choice-card-title { padding-inline: var(--hm-space-1); font-size: var(--hm-text-xs); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-picker.hm-picker-cards .hm-check-box, .hm-picker.hm-picker-grid .hm-check-box { inset-block-start: .375rem; inset-inline-end: .375rem; width: 1.125rem; height: 1.125rem; }

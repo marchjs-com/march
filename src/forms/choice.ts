@@ -61,7 +61,7 @@ export function choiceText(label: unknown, hint: unknown, icon: unknown, variant
   if (variant === "card") {
     // icon | title + description | meta (a price or a badge)
     return h("span", { class: "hm-check-label hm-choice-card-body" },
-      icon ? h("span", { class: "hm-choice-card-icon", "aria-hidden": "true" }, typeof icon === "object" ? glyph(icon as IconDef) : icon) : null,
+      icon ? h("span", { class: "hm-choice-card-icon", "aria-hidden": "true" }, typeof icon === "object" && !(icon as Partial<Node>).nodeType && !Array.isArray(icon) ? glyph(icon as IconDef) : icon) : null,
       h("span", { class: "hm-choice-card-text" },
         h("span", { class: "hm-choice-card-title" }, label as MaybeFn<unknown>),
         hint != null ? h("span", { class: "hm-choice-card-desc" }, hint as MaybeFn<unknown>) : null),
