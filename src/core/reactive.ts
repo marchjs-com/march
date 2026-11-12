@@ -184,7 +184,7 @@ export function signal<T>(value: T, opts?: { equals?: Equals<T>; name?: string }
   const w = read as unknown as Record<string | symbol, unknown>;
   w["peek"] = () => node.value as T;
   w["set"] = (v: T): T => {
-    if (Listener && !Listener.effect && DEV.enabled) DEV.warn(`writing signal${opts?.name ? ` "${opts.name}"` : ""} inside computed() is not allowed; use an effect.`);
+    if (Listener && !Listener.effect && DEV.enabled) DEV.warn(`writing signal${opts?.name ? ` "${opts.name}"` : ""} in computed(); use an effect.`);
     if (node.equals(node.value, v)) return v;
     node.value = v;
     markObservers(node, DIRTY);
@@ -217,31 +217,24 @@ export function _setCell<T>(f: Cell<T>, v: T): void {
   flush();
 }
 
-class KeyNode implements Source {
-  observers: Set<Computation> | null = null;
-  map: Map<unknown, KeyNode>;
-  key: unknown;
-  constructor(map: Map<unknown, KeyNode>, key: unknown) { this.map = map; this.key = key; }
-  drop(): void { if (this.map.get(this.key) === this) this.map.delete(this.key); }
-}
 /**
  * Selector: `const isSelected = selector(() => $selected)`, then `isSelected(row.id)` in each row. A row reading it
  * re-runs only when its own answer changes (the old and the new key), not on every change of the source: choosing one
  * row in 1.000 wakes two rows, not 1.000.
  */
 export function selector<T>(source: () => T, equals: (key: T, value: T) => boolean = Object.is): (key: T) => boolean {
-  const map = new Map<unknown, KeyNode>();
-  const wake = (k: unknown): void => { const n = map.get(k); if (n) markObservers(n, DIRTY); };
-  let prev: T, first = true;
+  // one source node per key that is read; a node leaves the map when its last reader goes
+  const map = new Map<unknown, Source>();
+  let prev: T;
   effect(() => {
-    const v = source();
-    if (!first && !Object.is(prev, v)) { const p = prev; untrack(() => { wake(p); wake(v); }); }
-    prev = v; first = false;
+    const v = source(), p = prev;
+    prev = v;
+    if (p !== v) for (const k of [p, v]) { const n = map.get(k); if (n) markObservers(n, DIRTY); }
   });
   return (key: T): boolean => {
     if (Listener) {
       let n = map.get(key);
-      if (!n) map.set(key, (n = new KeyNode(map, key)));
+      if (!n) map.set(key, (n = { observers: null, drop: () => map.delete(key) }));
       track(n);
     }
     return equals(key, prev);
@@ -372,7 +365,7 @@ export function context<T>(defaultValue?: T): Context<T> {
 }
 /** Provide a context value for everything created after this call in the current owner. */
 export function provide<T>(ctx: { id: symbol }, value: T): void {
-  if (!Owner) throw new Error("March: provide() must run inside a component or root.");
+  if (!Owner) throw new Error("March: provide() needs a component or root.");
   (Owner.context ??= new Map()).set(ctx.id, value);
 }
 /** Read the nearest provided value (or the default). */
@@ -385,3 +378,6 @@ export function useContext<T>(ctx: { id: symbol; defaultValue: T }): T {
 export const read = <T>(v: T | (() => T)): T => (isReactive(v) ? (v as () => T)() : (v as T));
 
 export const _internal = { Computation, disposeOwner };
+/** A bare owner for a list row (<For>): run code in it with runWithOwner, dispose it with _dispose. */
+export const _owner = (parent: Owner | null): Owner => new OwnerNode(parent);
+export { disposeOwner as _dispose };

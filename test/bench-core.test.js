@@ -73,3 +73,13 @@ test("unreliable: sd or half of the 95% interval above 15% of the median", async
   assert.equal(unreliable(stats([10, 11])), true); // n=2: the t quantile makes the interval wide
   assert.equal(unreliable(stats([5])), false);
 });
+
+test("realistic scenarios: same seed, same workload; every step stays in its stated range", async () => {
+  const { SCENARIOS } = await import("../examples/showcase/src/bench/scenarios/list.ts");
+  const { ticker } = await import("../examples/showcase/src/bench/scenarios/ticker/def.ts");
+  assert.ok(SCENARIOS.length >= 1 && SCENARIOS.every((s) => s.desc.length > 60 && s.steps > 0));
+  const d = ticker.data(7);
+  assert.equal(d.length, 2000);
+  assert.deepEqual(ticker.plan(d, 7, 5), ticker.plan(ticker.data(7), 7, 5));
+  for (const step of ticker.plan(d, 7, 50)) assert.ok(step.length >= 20 && step.length <= 100 && new Set(step.map((t) => t.i)).size === step.length);
+});

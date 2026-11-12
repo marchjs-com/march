@@ -125,7 +125,7 @@ const s = <svg viewBox="0 0 1 1"><path d="M0 0" /></svg>; const sp = <div {...p}
   assert.match(out, /_\$p\(_\d+, "a", "class", _\$r\(\(\) => \(\$sel\)\)\)/, "a bound class is wired");
   assert.match(out, /_\$p\(_\d+, "a", "onClick", go\)/, "events are wired, not template attributes");
   assert.match(out, /_\$p\(_\d+, "a", "href", "\/x"\)/, "URL attributes keep their runtime check");
-  assert.match(out, /_\$ins\(_\d+, label, _\d+\)/, "a child before static text is inserted before it");
+  assert.match(out, /_\$ins\(_\d+, label, _\d+, 1\)/, "a child before static text is inserted before it (owned by the clone: no cleanup)");
   assert.match(out, /_\$h\("svg"/, "SVG keeps h() (namespace)");
   assert.match(out, /_\$h\("div", \{\.\.\.p\}/, "spreads keep h()");
   assert.ok(isStaticCode("_$t3((_r) => { _$p(_r, \"a\", \"x\", 1); })") && isStaticCode("_$t1()"));

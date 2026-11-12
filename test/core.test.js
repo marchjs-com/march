@@ -288,3 +288,26 @@ test("selector: only the old and the new key wake", async () => {
   assert.deepEqual(runs.slice(1), [2, 2, 1]);
   dispose();
 });
+
+test("event delegation: onClick inside render() runs from one document listener, in bubble order", () => {
+  const seen = [];
+  let direct = 0;
+  const { el } = mount(() => h("div", { onClick: (e) => seen.push(["outer", e.currentTarget.tagName]) },
+    h("button", { class: "a", onClick: (e) => seen.push(["a", e.currentTarget.tagName]) }),
+    h("button", { class: "b", onClick: (e) => { seen.push(["b"]); e.stopPropagation(); } }),
+    h("button", { class: "c", "on:click": () => direct++ })));
+  const a = el.querySelector(".a");
+  assert.equal(a.$$click !== undefined, true, "handler kept on the element");
+  a.click();
+  assert.deepEqual(seen, [["a", "BUTTON"], ["outer", "DIV"]]);
+  seen.length = 0;
+  el.querySelector(".b").click();
+  assert.deepEqual(seen, [["b"]], "stopPropagation stops the walk");
+  el.querySelector(".c").click();
+  assert.equal(direct, 1, "on:click keeps a direct listener");
+  // outside render(): a direct listener (works on detached elements too)
+  let n = 0;
+  const btn = h("button", { onClick: () => n++ });
+  btn.click();
+  assert.equal(n, 1);
+});

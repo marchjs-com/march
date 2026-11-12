@@ -1,5 +1,5 @@
 // Keyed list <For> (its own module: a page that only needs If/Try does not pull it into its chunk).
-import { createRoot, getOwner, untrack, onCleanup, effect, _cell, _setCell, type Accessor, type Cell, type Cleanup } from "../core/reactive.ts";
+import { getOwner, untrack, onCleanup, effect, runWithOwner, _cell, _setCell, _owner, _dispose, type Accessor, type Cell, type Owner } from "../core/reactive.ts";
 import { insert, removeNode, disposeDetached, LEAVE } from "./h.ts";
 import { val, call } from "./flow.ts";
 
@@ -19,7 +19,7 @@ export interface ForProps<T> {
   /** FLIP-animate moves, enter and leave (needs hadi-march/motion). */
   animate?: unknown;
 }
-interface Row<T> { nodes: Node[]; item: Cell<T>; index: Cell<number> | null; dispose: Cleanup; /** position in the previous order */ at: number }
+interface Row<T> { nodes: Node[]; item: Cell<T>; index: Cell<number> | null; o: Owner; /** key */ k: unknown; /** position in the previous order */ at: number }
 
 /**
  * Keyed list. `<For each={items} key="id">{(item, index) => …}</For>`; `item` and `index` are accessors.
@@ -35,74 +35,70 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
   const owner = getOwner();
   const pk = props.key;
   const keyOf: (x: T) => unknown = typeof pk === "function" ? pk : typeof pk === "string" ? (x) => (x as Record<string, unknown> | null | undefined)?.[pk] : (x) => x;
-  let rows = new Map<unknown, Row<T>>();
   let order: Row<T>[] = [];
-  let fallback: { d: Cleanup; nodes: Node[] } | null = null;
+  let fallback: { o: Owner; nodes: Node[] } | null = null;
   const render: unknown = props.children;
-  if (typeof render !== "function") throw new TypeError("March: <For> child must be (item, index) => …");
+  if (typeof render !== "function") throw new TypeError("March: <For> needs a row function.");
   const renderRow = render as ForProps<T>["children"];
   const wantsIndex = renderRow.length !== 1; // `(item) => …` never reads the index: no index signal per row
 
-  const make = (it: T, i: number): Row<T> => {
+  const make = (it: T, i: number, k: unknown): Row<T> => {
     const item = _cell(it), index = wantsIndex ? _cell(i) : null;
-    return createRoot((dispose): Row<T> => ({ item, index, dispose, at: i, nodes: collect(() => renderRow(item, index as Accessor<number>)) }), owner);
+    const o = _owner(owner);
+    return { item, index, o, k, at: i, nodes: runWithOwner(o, () => collect(() => renderRow(item, index as Accessor<number>))) };
+  };
+  /** Drop rows; when they are every row of a parent the list owns alone, empty the parent at once. */
+  const drop = (rs: Row<T>[], all: boolean, host: Node): void => {
+    if (all && host.firstChild === start && host.lastChild === end && host.nodeType === 1 && !props.animate && rs.every(plain)) {
+      disposeDetached(() => { for (const r of rs) _dispose(r.o); });
+      (host as Element).textContent = "";
+      host.appendChild(start); host.appendChild(end);
+    } else for (const r of rs) dropRow(r);
   };
 
   effect(() => {
     const list = (val(props.each) ?? []) as readonly T[];
     const host = end.parentNode as Node;
     untrack(() => {
-      const n = list.length;
-      if (!n) {
-        if (order.length) {
-          // the list owns its parent alone: drop every row at once
-          if (host.firstChild === start && host.lastChild === end && host.nodeType === 1 && !props.animate && order.every(plain)) {
-            disposeDetached(() => { for (const r of order) r.dispose(); });
-            (host as Element).textContent = "";
-            host.appendChild(start); host.appendChild(end);
-          } else for (const r of order) dropRow(r);
-        }
-        rows = new Map(); order = [];
-        if (props.fallback != null && !fallback) {
-          const fb = createRoot((d) => ({ d, nodes: collect(() => call(props.fallback)) }), owner);
-          fallback = fb;
-          for (const x of fb.nodes) host.insertBefore(x, end);
-        }
-        return;
-      }
-      if (fallback) { fallback.d(); fallback.nodes.forEach(removeNode); fallback = null; }
-      const next = new Map<unknown, Row<T>>();
-      const nextOrder: Row<T>[] = new Array(n);
-      // the old position of each row (-1: new)
-      const was = new Int32Array(n);
-      for (let i = 0; i < n; i++) {
+      const n = list.length, old = order, m = old.length;
+      if (fallback && n) { dropRow(fallback); fallback = null; }
+      const next: Row<T>[] = (order = new Array(n));
+      // the same key at the same end: the row stays where it is (only its item and index update)
+      const same = (i: number, r: Row<T> | undefined): boolean => {
         const it = list[i] as T;
-        let k = keyOf(it);
-        if (next.has(k)) { if (pk != null) console.warn(`[march] <For> duplicate key "${String(k)}"`); k = { dup: k, i }; }
-        let row = rows.get(k);
-        if (row) {
-          rows.delete(k);
-          was[i] = row.at;
-          _setCell(row.item, it);
-          if (row.index) _setCell(row.index, i);
-          row.at = i;
-        } else {
-          row = make(it, i);
-          was[i] = -1;
-        }
-        next.set(k, row);
-        nextOrder[i] = row;
+        if (!r || keyOf(it) !== r.k) return false;
+        _setCell(r.item, it);
+        if (r.index) _setCell(r.index, i);
+        r.at = i; next[i] = r;
+        return true;
+      };
+      let s = 0, e1 = m - 1, e2 = n - 1;
+      while (s <= e1 && s <= e2 && same(s, old[s])) s++;
+      while (s <= e1 && s <= e2 && same(e2, old[e1])) { e1--; e2--; }
+      // the middle: old rows s…e1 become new rows s…e2 (reused by key, made, or dropped)
+      const byKey = new Map<unknown, Row<T>>();
+      for (let i = s; i <= e1; i++) byKey.set((old[i] as Row<T>).k, old[i] as Row<T>);
+      const was: number[] = []; // old position of each middle row (-1: new)
+      for (let i = s; i <= e2; i++) {
+        const it = list[i] as T, k = keyOf(it), r = byKey.get(k);
+        if (r) { byKey.delete(k); was.push(r.at); same(i, r); }
+        else { was.push(-1); next[i] = make(it, i, k); }
       }
-      for (const r of rows.values()) dropRow(r);
-      rows = next; order = nextOrder;
+      drop([...byKey.values()], byKey.size === m, host);
+      if (!n && props.fallback != null && !fallback) {
+        const o = _owner(owner);
+        fallback = { o, nodes: runWithOwner(o, () => collect(() => call(props.fallback))) };
+        for (const x of fallback.nodes) host.insertBefore(x, end);
+      }
+      if (s > e2) return;
       // rows on a longest increasing run of old positions stay; the others (moved or new) are gathered in order and
       // inserted, one fragment at a time, before the next row that stays. Filling an empty list is one insert.
       const place = (): void => {
         const keep = lis(was);
-        let ref: Node = end, pending: DocumentFragment | null = null;
-        for (let i = n - 1; i >= 0; i--) {
-          const ns = (nextOrder[i] as Row<T>).nodes;
-          if (keep[i]) {
+        let ref: Node = e2 + 1 < n ? ((next[e2 + 1] as Row<T>).nodes[0] ?? end) : end, pending: DocumentFragment | null = null;
+        for (let i = e2; i >= s; i--) {
+          const ns = (next[i] as Row<T>).nodes;
+          if (keep[i - s]) {
             if (pending) { host.insertBefore(pending, ref); pending = null; }
             if (ns.length) ref = ns[0] as Node;
           } else {
@@ -112,11 +108,11 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
         }
         if (pending) host.insertBefore(pending, ref);
       };
-      if (props.animate && flipHook) flipHook(order.flatMap((r) => r.nodes).filter((x): x is Element => x.nodeType === 1), place, props.animate);
+      if (props.animate && flipHook) flipHook(next.flatMap((r) => r.nodes).filter((x): x is Element => x.nodeType === 1), place, props.animate);
       else place();
     });
   });
-  onCleanup(() => { for (const r of order) dropRow(r); fallback?.d(); });
+  onCleanup(() => { for (const r of order) dropRow(r); if (fallback) dropRow(fallback); });
   return frag;
 }
 
@@ -125,8 +121,8 @@ function plain(r: { nodes: Node[] }): boolean {
   for (const n of r.nodes) if (n.nodeType !== 1 || (n as unknown as { [LEAVE]?: unknown })[LEAVE]) return false;
   return true;
 }
-function dropRow(r: { dispose: Cleanup; nodes: Node[] }): void {
-  if (plain(r)) disposeDetached(r.dispose); else r.dispose();
+function dropRow(r: { o: Owner; nodes: Node[] }): void {
+  if (plain(r)) disposeDetached(() => _dispose(r.o)); else _dispose(r.o);
   for (const n of r.nodes) removeNode(n);
 }
 

@@ -34,7 +34,7 @@ export function safeUrl(v: unknown, tag?: string): string {
   if (!/^[a-z][a-z0-9+.-]*:/i.test(s)) return s; // relative
   if (/^(https?|mailto|tel|sms):/i.test(s)) return s;
   if (/^(blob|data:image\/(png|jpe?g|gif|webp|avif);)/i.test(s) && (tag === "img" || tag === "image" || tag === "a" || tag === "audio" || tag === "video" || tag === "source")) return s;
-  if (DEV.enabled) DEV.warn(`blocked unsafe URL "${s.slice(0, 40)}" on <${tag ?? "?"}>`);
+  if (DEV.enabled) DEV.warn(`blocked unsafe URL "${s.slice(0, 40)}"`);
   return "about:blank";
 }
 
@@ -217,13 +217,47 @@ function setClass(el: MarchEl, v: unknown): void {
   el.setAttribute("class", [s ?? "", el.__hmClass ?? ""].join(" ").trim());
 }
 
+// Event delegation: `onClick`, `onInput`, `onKeyDown`… without modifiers, on elements of a tree mounted with render()
+// into a document, are kept on the element and run by one document listener per event type, walking from the target
+// up (bubble order; stopPropagation stops the walk; currentTarget is the element, as with a direct listener).
+// `on:click` (the colon form, with or without modifiers) always adds a direct listener.
+const DELEGATED = new Set(["click", "dblclick", "input", "keydown", "keyup"]);
+/** The document a render() tree delegates its events to (null: direct listeners). */
+export const DelegateRoot: { id: symbol; defaultValue: Document | null } = { id: Symbol("hm.delegate"), defaultValue: null };
+function dispatch(e: Event): void {
+  const key = `$$${e.type}`;
+  let n = (e.composedPath?.()[0] ?? e.target) as (Node & Record<string, unknown> & { host?: Node }) | null;
+  try {
+    while (n && n.nodeType !== 9) {
+      const h = n[key] as ((this: Node, e: Event) => void) | undefined;
+      if (h) {
+        const at = n;
+        Object.defineProperty(e, "currentTarget", { configurable: true, value: at });
+        batch(() => h.call(at, e));
+        if (e.cancelBubble) break;
+      }
+      n = (n.parentNode ?? n.host ?? null) as typeof n;
+    }
+  } finally { delete (e as unknown as Record<string, unknown>)["currentTarget"]; }
+}
+
 function listen(el: Element, key: string, handler: unknown): void {
   if (handler == null || handler === false) return;
   let name: string, mods: string[] = [];
   if (key.startsWith("on:")) { const [n = "", ...m] = key.slice(3).split("|"); name = n; mods = m; }
   else name = key.slice(2).toLowerCase();
-  for (const m of mods) if (!MODS.has(m)) throw new Error(`March: unknown event modifier "${m}" on ${key}.`);
+  for (const m of mods) if (!MODS.has(m)) throw new Error(`March: unknown event modifier "${m}".`);
   if (typeof handler !== "function") throw new TypeError(`March: ${key} handler must be a function.`);
+  // onClick-style handlers (no modifiers) inside a render() tree: one listener per event type on the document
+  if (key[2] !== ":" && DELEGATED.has(name)) {
+    const d = useContext(DelegateRoot);
+    if (d) {
+      (el as unknown as Record<string, unknown>)[`$$${name}`] = handler;
+      const on = ((d as unknown as { $hm?: Set<string> }).$hm ??= new Set());
+      if (!on.has(name)) { on.add(name); d.addEventListener(name, dispatch); }
+      return;
+    }
+  }
   const fn = (e: Event): void => {
     if (mods.includes("self") && e.target !== el) return;
     if (mods.includes("trusted") && !e.isTrusted) return;
@@ -286,8 +320,8 @@ function transition(el: MarchEl, name: string, opts: unknown): void {
 
 // ------------------------------------------------------------------ children
 /** Insert any renderable value into `parent` (before `before`). Functions become live regions. */
-export function insert(parent: Node, value: unknown, before: Node | null = null): void {
-  if (typeof value === "function") return region(parent, value as () => unknown, before);
+export function insert(parent: Node, value: unknown, before: Node | null = null, owned?: unknown): void {
+  if (typeof value === "function") return region(parent, value as () => unknown, before, owned);
   if (Array.isArray(value)) { for (const v of value) insert(parent, v, before); return; }
   const n = toNode(value);
   if (n) parent.insertBefore(n, before);
@@ -296,13 +330,12 @@ export function insert(parent: Node, value: unknown, before: Node | null = null)
 function toNode(v: unknown): Node | null {
   if (v == null || v === true || v === false) return null;
   if (typeof v === "string" || typeof v === "number" || typeof v === "bigint") return doc().createTextNode(String(v));
-  if (typeof globalThis.Node === "function" && v instanceof globalThis.Node) return v;
   if (typeof v === "object" && (v as { nodeType?: number }).nodeType) return v as Node;
   if (DEV.enabled) DEV.warn("cannot render value", v);
   return doc().createTextNode(String(v));
 }
 
-function region(parent: Node, fn: () => unknown, before: Node | null): void {
+function region(parent: Node, fn: () => unknown, before: Node | null, owned?: unknown): void {
   // A text node marks the start and, while the value is text (the usual case), is the region itself; an end marker
   // is added the first time the value is something else (nodes, a list, nothing). Placed now: an effect created
   // inside batch() runs later, and the region must keep its place among its siblings.
@@ -318,7 +351,8 @@ function region(parent: Node, fn: () => unknown, before: Node | null): void {
     clearBetween(start, end);
     insert(host, v, end);
   });
-  onCleanup(() => { if (!detaching) { if (end) { clearBetween(start, end); removeNode(end); } removeNode(start); } });
+  // inside an element its own owner made (a template clone), the region leaves with that element: no cleanup
+  if (!owned) onCleanup(() => { if (!detaching) { if (end) { clearBetween(start, end); removeNode(end); } removeNode(start); } });
 }
 
 /** Remove every node between two markers (leave transitions finish first). */
