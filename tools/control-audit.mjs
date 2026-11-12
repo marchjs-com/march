@@ -3,7 +3,9 @@
 // choice (radio / segmented / chip / pressed button) or slider in a Playground panel (.sc-play-panel: Playground,
 // PlayStage / ComponentDemo, LitePlayground, MotionDemo), an options row (.sc-options) or a card titled "Seçenekler" —
 // must change something that can be seen when it is used: the text, or the computed style of an element outside the
-// control itself. One that changes nothing is reported as `dead-control`.
+// control itself. One that changes nothing is reported as `dead-control`. The control is focused and used (a slider is
+// moved in several steps, as a drag does): it must stay the same DOM node and keep the focus, else `rebuilt-control`
+// (a control rebuilt on every change breaks a drag: pointer and focus stay with the old node).
 // (Controls that are the demo's subject, such as a day picker in a form demo, are not options and are not checked.)
 //
 // Every page is covered: the top-level pages and the ones under a wildcard route (/motion/svg…). Cards that load
@@ -64,8 +66,9 @@ const SETUP = `(() => {
   const fire = (c) => { c.dispatchEvent(new Event("input", { bubbles: true })); c.dispatchEvent(new Event("change", { bubbles: true })); };
   const use = (c) => {
     if (c.matches("input[type=range]")) {
-      const old = c.value, min = Number(c.min || 0), max = Number(c.max || 100);
-      c.value = String(Number(old) === max ? min : max); fire(c);
+      // a drag: several input events through the range, as a pointer gives them; the slider must stay the same node
+      const old = c.value, min = Number(c.min || 0), max = Number(c.max || 100), to = Number(old) === max ? min : max;
+      for (let k = 1; k <= 4; k++) { c.value = String(Number(old) + ((to - Number(old)) * k) / 4); fire(c); }
       return () => { c.value = old; fire(c); };
     }
     if (choice(c)) {
@@ -110,11 +113,17 @@ for (const route of ROUTES) {
       c.scrollIntoView({ block: "center" }); return { name: __ca.name(c), where: __ca.where(c), key: __ca.key(c) }; })()`);
     if (!info) break;
     await sleep(150);
-    const changed = await ev(`(async () => { const c = [...document.querySelectorAll("[data-ca-done]")].find((x) => __ca.key(x) === ${JSON.stringify(info.key)}); if (!c) return true;
-      const before = __ca.snap(c); const undo = __ca.use(c); await new Promise((r) => setTimeout(r, 450)); const after = __ca.snap(c);
-      undo(); await new Promise((r) => setTimeout(r, 250)); return before !== after; })()`);
-    if (VERBOSE) console.log(`  ${changed === false ? "✖" : "✓"} ${route} [${info.where}] ${info.name}`);
+    // the control is focused and used; it must stay the same DOM node with the focus (a control rebuilt on every change
+    // breaks a slider drag: the pointer and the focus go with the old node and the value moves one step at a time)
+    const res = await ev(`(async () => { const c = [...document.querySelectorAll("[data-ca-done]")].find((x) => __ca.key(x) === ${JSON.stringify(info.key)}); if (!c) return { changed: true, kept: true };
+      const before = __ca.snap(c); c.focus({ preventScroll: true }); const focused = document.activeElement === c;
+      const undo = __ca.use(c); await new Promise((r) => setTimeout(r, 450)); const after = __ca.snap(c);
+      const kept = c.isConnected && (!focused || document.activeElement === c);
+      undo(); await new Promise((r) => setTimeout(r, 250)); return { changed: before !== after, kept }; })()`);
+    const changed = res?.changed;
+    if (VERBOSE) console.log(`  ${changed === false || res?.kept === false ? "✖" : "✓"} ${route} [${info.where}] ${info.name}`);
     if (changed === false) findings.push({ route, kind: "dead-control", at: info.where, detail: info.name });
+    if (res?.kept === false) findings.push({ route, kind: "rebuilt-control", at: info.where, detail: `${info.name}: the control was rebuilt (or lost the focus) when used` });
   }
   total += n;
   if (n >= MAX_PER_PAGE) findings.push({ route, kind: "limit", at: "", detail: `more than ${MAX_PER_PAGE} controls: the page keeps adding them` });

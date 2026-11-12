@@ -171,10 +171,12 @@ export function PropertyGrid(props: PropertyGridProps): Element {
   // rows are built once and kept; search and `hidden` only show / hide them
   const rows = new Map<string, Element>();
   const rowOf = (p: PropertySpec): Element => { let r = rows.get(p.key); if (!r) rows.set(p.key, (r = row(p))); return r; };
+  // equal sets are the same value: a value change that hides or shows nothing must not touch the rows (a slider
+  // being dragged stays the same node, keeps focus and pointer capture)
   const matches = computed(() => {
     const q = query().trim();
     return new Set(visible().filter((p) => !q || score(q, labelOf(p), [p.key, p.group ?? "", p.keywords ?? "", p.description ?? ""]) > 0).map((p) => p.key));
-  });
+  }, { equals: (a, b) => !!a && !!b && a.size === b.size && [...a].every((k) => b.has(k)) });
   const grouped = computed(() => {
     const order = [...(props.groups ?? [])];
     for (const p of list()) { const g = p.group ?? ""; if (!order.includes(g)) order.push(g); }
@@ -182,12 +184,14 @@ export function PropertyGrid(props: PropertyGridProps): Element {
   });
   const body = (): unknown => grouped().map((g) => untrack(() => {
     const items = g.items.map((p) => { const el = rowOf(p); return () => (matches().has(p.key) ? el : null); });
-    const shown = (): number => g.items.filter((p) => matches().has(p.key)).length;
+    const shown = computed((): boolean => g.items.some((p) => matches().has(p.key)));
     const changedIn = (): number => g.items.filter((p) => changes().includes(p.key)).length;
     const head = [h("span", { class: "hm-pg-group-name" }, g.name || t`General`),
       () => (changedIn() ? h("span", { class: "hm-pg-count", "aria-label": t`${changedIn()} changed` }, String(changedIn())) : null)];
     const content = h("div", { class: "hm-pg-rows" }, items);
-    return () => (shown() ? (g.name || grouped().length > 1 ? h(Disclosure, { title: head, open: () => { query(); return true; }, class: "hm-pg-group", children: content }) : content) : null);
+    // the group box is built once (body runs again when the groups change): rows are never moved while they are used
+    const box = g.name || grouped().length > 1 ? h(Disclosure, { title: head, open: () => { query(); return true; }, class: "hm-pg-group", children: content }) : content;
+    return () => (shown() ? box : null);
   }));
 
   const btn = (label: () => string, ic: Parameters<typeof glyph>[0], onClick: () => void, disabled: () => boolean, cls = "hm-pg-btn"): Element =>

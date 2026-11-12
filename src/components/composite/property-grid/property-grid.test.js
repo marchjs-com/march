@@ -95,3 +95,21 @@ test("PropertyGrid: history and dirty can be switched off; any control works", a
   assert.ok(!dirtyState().is("pg2"));
   m.dispose();
 });
+
+test("PropertyGrid: a slider being dragged stays the same node in the same group box (focus and pointer kept)", async () => {
+  const value = signal({ name: "Acme", width: 320, visible: true, radius: 8 });
+  const m = mount(() => h(PropertyGrid, { properties: PROPS, value, id: "pg-drag", history: false, dirty: false }));
+  await tick();
+  const slider = m.el.querySelector("#pg-drag-radius");
+  const box = slider.closest("details");
+  slider.focus();
+  for (const v of [9, 12, 16, 20, 24]) {
+    type(slider, String(v));
+    await tick();
+    assert.equal(m.el.querySelector("#pg-drag-radius"), slider, `same input at ${v}`);
+    assert.equal(slider.closest("details"), box, `same group box at ${v}`);
+    assert.equal(value().radius, v);
+  }
+  assert.equal(document.activeElement, slider);
+  m.dispose();
+});

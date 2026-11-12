@@ -155,7 +155,10 @@ export function ImageCropper(props: ImageCropperProps): unknown {
   // the sliders follow the state (signals, so the controls stay live)
   const deg = (): number => Math.round(((((st().rotate % 360) + 540) % 360) - 180) * 10) / 10;
   const zoomView = signal(1), fineView = signal(0);
-  effect(() => { const z = Math.round(st().zoom * 100) / 100, d = deg(); untrack(() => batch(() => { zoomView.set(z); fineView.set(clamp(d - Math.round(d / 90) * 90, -45, 45)); })); });
+  // the quarter turn a fine angle is added to: ±45° belongs to the quarter nearer 0, so dragging the angle slider to its
+  // end does not flip it to the other end (45° stays 45°, not 90° − 45°)
+  const quarter = (d: number): number => Math.round((d - Math.sign(d) * 1e-6) / 90) * 90;
+  effect(() => { const z = Math.round(st().zoom * 100) / 100, d = deg(); untrack(() => batch(() => { zoomView.set(z); fineView.set(clamp(d - quarter(d), -45, 45)); })); });
 
   return h("div", { class: () => cx("hm-crop", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? t`Image cropper` },
     viewport,
@@ -170,7 +173,7 @@ export function ImageCropper(props: ImageCropperProps): unknown {
       h("label", { class: "hm-crop-slider" }, h("span", null, () => t`Zoom`),
         h(Slider, { min: 1, max: maxZoom(), step: 0.01, value: zoomView, onChange: (v: number) => change({ zoom: v }), format: (v: number) => `${Math.round(v * 100)}%`, disabled: props.disabled, readonly: props.readonly })),
       h("label", { class: "hm-crop-slider" }, h("span", null, () => t`Angle`),
-        h(Slider, { min: -45, max: 45, step: 0.5, value: fineView, onChange: (v: number) => change({ rotate: Math.round(st.peek().rotate / 90) * 90 + v }), format: (v: number) => `${v}°`, disabled: props.disabled, readonly: props.readonly }))),
+        h(Slider, { min: -45, max: 45, step: 0.5, value: fineView, onChange: (v: number) => change({ rotate: quarter(st.peek().rotate) + v }), format: (v: number) => `${v}°`, disabled: props.disabled, readonly: props.readonly }))),
     () => (props.preview === false ? null : h("figure", { class: "hm-crop-out" },
       h("canvas", { class: "hm-crop-canvas", role: "img", "aria-label": () => t`Cropped result`, ref: (el: HTMLCanvasElement) => { out = el; drawPreview(); } }),
       h("figcaption", null, () => { const [fw, fh] = frame(), S = scale(); return `${Math.round(fw / S)} × ${Math.round(fh / S)} px`; }))));
