@@ -119,7 +119,8 @@ function budgetOf(budget, meta, plan) {
     if (ep.startsWith("march-group:")) return plan?.boot?.includes(ep.slice(12)) ? { boot: true } : { limit: budget.route ?? 60 * 1024 };
     if (boot.has(ep)) return { boot: true };
     const path = routes[ep];
-    return { limit: path ? budget.routes?.[path] ?? budget.route ?? 60 * 1024 : budget.part ?? budget.route ?? 60 * 1024 };
+    // budget.parts: a lazy part with its own, argued limit ({ limit, why }), e.g. a third-party library loaded on demand
+    return { limit: path ? budget.routes?.[path] ?? budget.route ?? 60 * 1024 : budget.parts?.[ep]?.limit ?? budget.part ?? budget.route ?? 60 * 1024 };
   };
   // start-up beyond the entry (the "(boot)" row of the size report)
   of.bootLimit = budget.bootLimit ?? budget.route ?? 60 * 1024;
