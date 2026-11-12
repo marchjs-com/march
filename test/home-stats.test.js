@@ -49,7 +49,9 @@ export function shownDigits(src) {
     if (/^(hadi-march|\.\.?\/)/.test(v)) continue; // import
     if (/^[\w-]+(\s+[\w-]+)*$/.test(v) && /-|^[a-z]/.test(v) && !/\s\d|^\d/.test(v)) continue; // class / token names (sc-h2, hm-grid-3)
     if (/^-?[\d.]+(px|rem|em|ms|s|%|deg|fr|vh|vw)?(\s+-?[\d.]+(px|rem|em|ms|s|%|deg|fr|vh|vw)?)*$/.test(v)) continue; // CSS value
-    if (/^\$\{[^}]*\}(\s*[A-Za-z%]*)?$/.test(v)) continue; // `${n}` / `${n} KB` formatting a live value
+    if (!/\d/.test(v.replace(/\$\{[^}]*\}/g, ""))) continue; // `${n} KB`, `Tema ${i} / ${n}`: every digit is a live value
+    if (/^(\s*[a-zA-Z-]+\([^()]*\))+\s*$/.test(v)) continue; // CSS function values: "translate(0, 0) scale(1)"
+    if (/^[Mm][\d\s.,MmLlHhVvCcSsQqTtAaZz-]*$/.test(v)) continue; // SVG path data: a drawing, not a count
     out.push(v);
   }
   return out;
@@ -68,4 +70,6 @@ test("shownDigits catches a typed count and lets live values through", () => {
   assert.deepEqual(shownDigits('<Counter to={90} suffix="+" />'), ["to=90"]);
   assert.deepEqual(shownDigits('<Demo code={`\nlet $n = 0\n`} />'), []);
   assert.deepEqual(shownDigits('<span>{n}</span> class="sc-h2" delay: 80 `${kb} KB` "1.5rem"'), []);
+  assert.deepEqual(shownDigits('`Tema ${i + 1} / ${n}` "translate(0, 0) scale(1)"'), []);
+  assert.deepEqual(shownDigits('`${n} bileşen · 7 tema`'), ["${n} bileşen · 7 tema"]);
 });
