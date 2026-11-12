@@ -82,15 +82,19 @@ export function debounce<A extends unknown[]>(fn: (...a: A) => unknown, ms: numb
 
 export const doc = (): Document => globalThis.document;
 
+/** `x` when it is an array, else an empty one (props that may be missing or a single value). */
+export const arr = <T>(x: unknown): T[] => (Array.isArray(x) ? (x as T[]) : []);
+
 /** `v` kept between `lo` and `hi` (`lo` wins when they cross): `Math.max(lo, Math.min(hi, v))`. */
 export const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v));
 /** Linear blend from `a` (t = 0) to `b` (t = 1). */
 export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
 
 /** Set several style properties (custom properties too) through the CSSOM: CSP safe, `null` removes one. */
-export function setStyle(el: { style: CSSStyleDeclaration } | null | undefined, props: Record<string, string | number | null | undefined>): void {
-  if (!el) return;
-  for (const k in props) { const v = props[k]; if (v == null) el.style.removeProperty(k); else el.style.setProperty(k, String(v)); }
+export function setStyle(el: Element | null | undefined, props: Record<string, string | number | null | undefined>): void {
+  const st = (el as HTMLElement | null | undefined)?.style;
+  if (!st) return;
+  for (const k in props) { const v = props[k]; if (v == null) st.removeProperty(k); else st.setProperty(k, String(v)); }
 }
 
 /** Add several listeners at once (`{ pointermove: fn, pointerup: fn }`); returns one off, also run with the owner. */
