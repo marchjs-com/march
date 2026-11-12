@@ -6,12 +6,13 @@ import m2 from "./composite/color-picker/meta.ts";
 import m3 from "./overlays/drawer/meta.ts";
 import m4 from "./composite/easing-curve-editor/meta.ts";
 import m5 from "./composite/gradient-editor/meta.ts";
-import m6 from "./composite/json-editor/meta.ts";
-import m7 from "./composite/keyframe-timeline/meta.ts";
-import m8 from "./composite/markdown-editor/meta.ts";
-import m9 from "./feedback/pull-to-refresh/meta.ts";
-import m10 from "./composite/rich-text-editor/meta.ts";
-import m11 from "./composite/tree-editor/meta.ts";
+import m6 from "./composite/image-cropper/meta.ts";
+import m7 from "./composite/json-editor/meta.ts";
+import m8 from "./composite/keyframe-timeline/meta.ts";
+import m9 from "./composite/markdown-editor/meta.ts";
+import m10 from "./feedback/pull-to-refresh/meta.ts";
+import m11 from "./composite/rich-text-editor/meta.ts";
+import m12 from "./composite/tree-editor/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 export const registry: readonly RegistryEntry[] = [
@@ -21,10 +22,11 @@ export const registry: readonly RegistryEntry[] = [
   { folder: "overlays/drawer", meta: m3, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
   { folder: "composite/easing-curve-editor", meta: m4, code: "<EasingCurveEditor bind:value={$easing} name=\"acme-pop\" />\nanimate(card, frames, { duration: 600, easing: \"acme-pop\" })", demo: () => import("./composite/easing-curve-editor/demo.tsx"), playground: () => import("./composite/easing-curve-editor/playground.ts") },
   { folder: "composite/gradient-editor", meta: m5, code: "<GradientEditor bind:value={$background} />\n<GradientEditor value=\"radial-gradient(circle, #ffd27a 0%, #f2801f 100%)\" types={[\"radial\"]} presets={false} />", demo: () => import("./composite/gradient-editor/demo.tsx"), playground: () => import("./composite/gradient-editor/playground.ts") },
-  { folder: "composite/json-editor", meta: m6, code: "<JsonEditor bind:value={$settings} mode=\"tree\" schema={schema} />\n<JsonEditor bind:value={$raw} modes={[\"text\"]} validate={(v) => (v.version ? null : \"version is required\")} />", demo: () => import("./composite/json-editor/demo.tsx"), playground: () => import("./composite/json-editor/playground.ts") },
-  { folder: "composite/keyframe-timeline", meta: m7, code: "<KeyframeTimeline bind:value={$scene} />\n<KeyframeTimeline value={model} snap={100} loop={false} renderTarget={(name) => <img src={`/${name}.svg`} alt=\"\" />} />", demo: () => import("./composite/keyframe-timeline/demo.tsx"), playground: () => import("./composite/keyframe-timeline/playground.ts") },
-  { folder: "composite/markdown-editor", meta: m8, code: "<MarkdownEditor bind:value={$doc} view=\"split\" />\n<MarkdownEditor value={md} views={[\"write\", \"preview\"]} toolbar={false} />\n<MarkdownEditor bind:value={$doc} view=\"rich\" stats={false} />", demo: () => import("./composite/markdown-editor/demo.tsx"), playground: () => import("./composite/markdown-editor/playground.ts") },
-  { folder: "feedback/pull-to-refresh", meta: m9, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
-  { folder: "composite/rich-text-editor", meta: m10, code: "<RichTextEditor bind:value={$notes} mentions={team} placeholder=\"Write…\" />\n<RichTextEditor value={md} toolbar={[\"bold\", \"italic\", \"link\", \"|\", \"ul\", \"ol\"]} emoji={false} />\n<RichTextEditor api={(e) => editor = e} />   // editor.insert(\"**Hi**\"), editor.exec(\"h2\"), editor.undo()", demo: () => import("./composite/rich-text-editor/demo.tsx"), playground: () => import("./composite/rich-text-editor/playground.ts") },
-  { folder: "composite/tree-editor", meta: m11, code: "<TreeEditor bind:value={$config} schema={schema} />\n<TreeEditor value={data} readonly search={false} expand={1} />", demo: () => import("./composite/tree-editor/demo.tsx"), playground: () => import("./composite/tree-editor/playground.ts") },
+  { folder: "composite/image-cropper", meta: m6, code: "<ImageCropper src={url} bind:value={$crop} aspect={1} api={(c) => cropper = c} />\nconst blob = await cropper.toBlob(\"image/webp\", 0.9, 512)", demo: () => import("./composite/image-cropper/demo.tsx"), playground: () => import("./composite/image-cropper/playground.ts") },
+  { folder: "composite/json-editor", meta: m7, code: "<JsonEditor bind:value={$settings} mode=\"tree\" schema={schema} />\n<JsonEditor bind:value={$raw} modes={[\"text\"]} validate={(v) => (v.version ? null : \"version is required\")} />", demo: () => import("./composite/json-editor/demo.tsx"), playground: () => import("./composite/json-editor/playground.ts") },
+  { folder: "composite/keyframe-timeline", meta: m8, code: "<KeyframeTimeline bind:value={$scene} />\n<KeyframeTimeline value={model} snap={100} loop={false} renderTarget={(name) => <img src={`/${name}.svg`} alt=\"\" />} />", demo: () => import("./composite/keyframe-timeline/demo.tsx"), playground: () => import("./composite/keyframe-timeline/playground.ts") },
+  { folder: "composite/markdown-editor", meta: m9, code: "<MarkdownEditor bind:value={$doc} view=\"split\" />\n<MarkdownEditor value={md} views={[\"write\", \"preview\"]} toolbar={false} />\n<MarkdownEditor bind:value={$doc} view=\"rich\" stats={false} />", demo: () => import("./composite/markdown-editor/demo.tsx"), playground: () => import("./composite/markdown-editor/playground.ts") },
+  { folder: "feedback/pull-to-refresh", meta: m10, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
+  { folder: "composite/rich-text-editor", meta: m11, code: "<RichTextEditor bind:value={$notes} mentions={team} placeholder=\"Write…\" />\n<RichTextEditor value={md} toolbar={[\"bold\", \"italic\", \"link\", \"|\", \"ul\", \"ol\"]} emoji={false} />\n<RichTextEditor api={(e) => editor = e} />   // editor.insert(\"**Hi**\"), editor.exec(\"h2\"), editor.undo()", demo: () => import("./composite/rich-text-editor/demo.tsx"), playground: () => import("./composite/rich-text-editor/playground.ts") },
+  { folder: "composite/tree-editor", meta: m12, code: "<TreeEditor bind:value={$config} schema={schema} />\n<TreeEditor value={data} readonly search={false} expand={1} />", demo: () => import("./composite/tree-editor/demo.tsx"), playground: () => import("./composite/tree-editor/playground.ts") },
 ];

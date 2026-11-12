@@ -92,7 +92,8 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
     added++;
   }
   // inlining a small lazy module makes everyone who loads its parent download its static closure too: when that brings
-  // more than minSize of code the parent does not already load (a tiny demo in front of a 30 KB editor), it stays lazy —
+  // more than minSize of code the parent does not already load (a tiny demo in front of a 30 KB editor), and the parent
+  // is shared by several pages, it stays lazy —
   // a small file that gates a big download (smallFiles lets it through)
   const deps = new Map(Object.entries(outs).map(([k, o]) => [k, (o.imports ?? []).filter((im) => im.kind === "import-statement" && outs[im.path]).map((im) => im.path)]));
   const reach = (k) => { const c = new Set([k]); const st = [k]; while (st.length) for (const d of deps.get(st.pop()) ?? []) if (!c.has(d)) { c.add(d); st.push(d); } return c; };

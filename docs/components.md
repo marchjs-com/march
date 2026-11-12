@@ -9,6 +9,7 @@
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
 | EasingCurveEditor | experimental | Cubic-bezier easing editor: draggable handles, the engine's named curves as presets, live preview on the motion engine clock, registers the curve by name (defineEasing). | — |
 | GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | ColorPicker, Segmented, IconButton |
+| ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | Segmented, Slider, IconButton |
 | JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | TreeEditor |
 | KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | EasingCurveEditor, IconButton, Segmented |
 | MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, RichTextEditor |
@@ -80,6 +81,17 @@ Build a CSS gradient by hand. Pick the type (linear, radial, conic), turn the an
 ```
 
 Full page: src/components/composite/gradient-editor/docs.md
+
+## ImageCropper
+
+Crop an image the way phones do: the frame stays centered, the picture moves under it. Drag the image to move it, zoom with the wheel, the slider or + −, turn it by 90° with the buttons (or R) and by fine angles with the angle slider (or [ ]), mirror it (F), resize the frame from its corners or pick an aspect ratio. At any angle the image always covers the frame, so the result never has empty corners. The result is drawn on a canvas (`api.toCanvas()`, `api.toBlob()`); a small live preview shows it with its size in pixels.
+
+```tsx
+<ImageCropper src={url} bind:value={$crop} aspect={1} api={(c) => cropper = c} />
+const blob = await cropper.toBlob("image/webp", 0.9, 512)
+```
+
+Full page: src/components/composite/image-cropper/docs.md
 
 ## JsonEditor
 

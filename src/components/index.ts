@@ -5,6 +5,7 @@ export * from "./composite/color-picker/index.ts";
 export * from "./overlays/drawer/index.ts";
 export * from "./composite/easing-curve-editor/index.ts";
 export * from "./composite/gradient-editor/index.ts";
+export * from "./composite/image-cropper/index.ts";
 export * from "./composite/json-editor/index.ts";
 export * from "./composite/keyframe-timeline/index.ts";
 export * from "./composite/markdown-editor/index.ts";
