@@ -33,3 +33,18 @@ test("Stepper: Steps inside, panels follow the current step, Back / Next / Finis
   assert.equal(cur(), 0);
   dispose();
 });
+
+test("Stepper: vertical is live (the same stepper turns); morph off switches the panel at once", async () => {
+  const step = signal(0), vertical = signal(false), morph = signal(false);
+  const root = document.createElement("div"); document.body.appendChild(root);
+  render(() => h(Stepper, { steps: [{ title: "A" }, { title: "B" }], current: step, onSelect: (i) => step.set(i), vertical, morph, panels: ["one", "two"] }), root);
+  const st = root.querySelector(".hm-stepper");
+  assert.ok(!st.classList.contains("hm-stepper-v"));
+  vertical.set(true);
+  assert.equal(root.querySelector(".hm-stepper"), st, "not rebuilt");
+  assert.ok(st.classList.contains("hm-stepper-v") && st.querySelector(".hm-steps2").classList.contains("hm-steps2-v"));
+  step.set(1);
+  const panes = st.querySelectorAll(".hm-stepper-pane");
+  assert.equal(panes.length, 1, "morph off: the old panel is gone at once");
+  assert.match(panes[0].textContent, /two/);
+});

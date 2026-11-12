@@ -13,7 +13,7 @@ export default function PullToRefreshDemo(props: { values: { threshold: number; 
   const PHASES: Record<string, string> = { idle: "Hazır", pull: "Çekiliyor", ready: "Bırakınca yenilenir", refreshing: "Yenileniyor…" }
   const items = () => Array.from({ length: 14 }, (_, i) => `${NAMES[(i + $round) % NAMES.length]} · ${$round ? `${$round}. yenileme` : "ilk liste"}`)
   return <div class="sc-ptr-wrap">
-    <span class="sc-strip-label" aria-live="polite">{() => `Durum: ${PHASES[$phase]} · eşik ${props.values.threshold}px`}</span>
+    <span class="sc-strip-label" aria-live="polite">{() => `Durum: ${props.values.disabled ? "kapalı, çekmek yenilemez" : PHASES[$phase]} · eşik ${props.values.threshold}px`}</span>
     {() => <PullToRefresh threshold={props.values.threshold} disabled={props.values.disabled} onPhase={(p) => { $phase = p }}
       onRefresh={() => new Promise((r) => setTimeout(r, props.values.delay)).then(() => { $round = $round + 1 })}
       class="sc-ptr-demo">

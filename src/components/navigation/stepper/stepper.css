@@ -7,3 +7,8 @@
 .hm-stepper-pane { min-inline-size: 0; }
 .hm-stepper-nav { display: flex; align-items: center; justify-content: space-between; gap: var(--hm-space-3); }
 .hm-stepper-count { color: var(--hm-text-2); font-size: var(--hm-text-sm); font-variant-numeric: tabular-nums; }
+/* vertical: the steps in a column, the panel and its buttons beside them (stacked again when narrow) */
+.hm-stepper { container-type: inline-size; }
+.hm-stepper-v { grid-template-columns: max-content minmax(0, 1fr); align-items: start; column-gap: var(--hm-space-6); }
+.hm-stepper-v > .hm-steps2 { grid-row: 1 / span 2; }
+@container (max-width: 30rem) { .hm-stepper-v { grid-template-columns: minmax(0, 1fr); } .hm-stepper-v > .hm-steps2 { grid-row: auto; } }

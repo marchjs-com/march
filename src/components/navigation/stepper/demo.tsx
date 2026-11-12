@@ -13,7 +13,7 @@ const steps = [
   { title: "Onay", description: "Özet" },
 ]
 
-export default function StepperDemo(props: { values: { vertical: boolean; panels: boolean; color: string } }) {
+export default function StepperDemo(props: { values: { vertical: boolean; morph: boolean; color: string } }) {
   let $step = 1
   let $done = false
   const panels = [
@@ -24,8 +24,7 @@ export default function StepperDemo(props: { values: { vertical: boolean; panels
   ]
   const color = (): ColorToken | undefined => (props.values.color || undefined) as ColorToken
   return <div class="sc-step-demo">
-    {() => <Stepper steps={steps} current={() => $step} onSelect={(i) => { $step = i; $done = false }} vertical={props.values.vertical}
-      color={color()}
-      panels={props.values.panels ? panels : undefined} nav onFinish={() => { $done = true }} finishLabel="Bitir" />}
+    <Stepper steps={steps} current={() => $step} onSelect={(i) => { $step = i; $done = false }} vertical={() => props.values.vertical}
+      morph={() => props.values.morph} color={color()} panels={panels} nav onFinish={() => { $done = true }} finishLabel="Bitir" />
   </div>
 }
