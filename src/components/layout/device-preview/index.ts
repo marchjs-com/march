@@ -129,7 +129,8 @@ export function DevicePreview(props: DevicePreviewProps): Element {
     const move = (e: PointerEvent): void => {
       if (!on()) return;
       const o = offset();
-      dot.style.transform = `translate(${o.x + e.clientX / z()}px, ${o.y + e.clientY / z()}px)`;
+      // the `translate` property, not transform: the pressed `scale` then shrinks the dot in place instead of scaling its position
+      dot.style.translate = `${o.x + e.clientX / z()}px ${o.y + e.clientY / z()}px`;
       if (!start || e.pointerId !== start.id) return;
       const dx = (e.clientX - last.x) / z(), dy = (e.clientY - last.y) / z(), dt = Math.max(1, e.timeStamp - last.t);
       if (!start.moved && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 6) { start.moved = true; clearTimeout(press); (start.target as HTMLElement | null)?.setPointerCapture?.(e.pointerId); }

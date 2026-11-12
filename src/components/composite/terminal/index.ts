@@ -280,7 +280,7 @@ export function Terminal(props: TerminalProps): Element {
       look.colors?.forEach((c, i) => { style[`--hm-term-c${i}`] = c; });
     }
     const bg = val(props.background);
-    if (bg) { style["--hm-term-bg"] = bg; if (!look?.fg || typeof sc === "string") delete style["--hm-term-fg"]; }
+    if (bg) { style["--hm-term-bg"] = bg; delete style["--hm-term-fg"]; }
     if (props.font) style["--hm-term-font"] = props.font;
     if (props.height) style["--hm-term-h"] = props.height;
     for (const k of set) if (!(k in style)) root.style.removeProperty(k);
