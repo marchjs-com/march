@@ -64,3 +64,17 @@ export const weekdayNames = (loc: string | undefined, firstDay: number, width: "
   Array.from({ length: 7 }, (_, i) => dateFormat(loc, { weekday: width }).format(new Date(Date.UTC(2023, 0, 1 + ((firstDay + i) % 7))))); // 2023-01-01 is a Sunday
 /** Minutes rounded to a step (snap for drag and resize). */
 export const snapMinutes = (m: number, step: number): number => Math.round(m / step) * step;
+
+/** A local date-time "YYYY-MM-DDTHH:mm" (no zone) or a date "YYYY-MM-DD" → { date, minutes } (minutes 0 for a date). */
+export function splitDateTime(s: string): { date: IsoDate; minutes: number } {
+  const [d, tm] = String(s).split("T");
+  const [hh, mm] = (tm ?? "0:0").split(":").map(Number);
+  return { date: d as IsoDate, minutes: (hh || 0) * 60 + (mm || 0) };
+}
+/** { date, minutes } → "YYYY-MM-DDTHH:mm"; minutes outside 0…1439 roll over into the neighbouring days. */
+export function joinDateTime(date: IsoDate, minutes: number): string {
+  const days = Math.floor(minutes / 1440), m = minutes - days * 1440;
+  return `${addDays(date, days)}T${pad2(Math.floor(m / 60))}:${pad2(m % 60)}`;
+}
+/** Is the day a Saturday or Sunday. */
+export const isWeekend = (iso: IsoDate): boolean => { const d = dayOfWeek(iso); return d === 0 || d === 6; };

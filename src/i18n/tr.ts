@@ -283,5 +283,15 @@ const tr: Record<string, string> = {
   "Nothing matches \"{0}\"": "“{0}” ile eşleşen yok",
   "Empty": "Boş",
   "Tree": "Ağaç",
+  "All day": "Tüm gün",
+  "{0} moved to {1}, {2}": "{0} taşındı: {1}, {2}",
+  "+{0} more": "+{0} daha",
+  "Month": "Ay",
+  "Week": "Hafta",
+  "Day": "Gün",
+  "Period": "Dönem",
+  "View": "Görünüm",
+  "Calendar": "Takvim",
+  "Drag an event to move it, its edge to resize it. Keyboard: Alt+arrows move, Alt+Shift+arrows resize, PageUp / PageDown change the period.": "Etkinliği taşımak için sürükle, boyutlamak için kenarını sürükle. Klavye: Alt+oklar taşır, Alt+Shift+oklar boyutlar, PageUp / PageDown dönemi değiştirir.",
 };
 export default tr;

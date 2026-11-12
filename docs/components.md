@@ -5,6 +5,7 @@
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | Chip, Menu, FilterControl, CellEditor |
+| Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | Button, IconButton, ButtonGroup, Segmented |
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
 
 ## Chip
@@ -28,6 +29,21 @@ Full page: src/components/chip/docs.md
 ```
 
 Full page: src/components/data/data-grid/docs.md
+
+## Scheduler
+
+A month / week / day calendar of events. Drag an event to move it (minutes snap to `step`; across columns it changes day), drag its edge to resize it, drag on an empty slot to create one. Dates and times are formatted with Intl in the current locale: month and weekday names, the first day of the week, 12 / 24 hour clock and the reading direction. Overlapping events share the column width; all-day and multi-day events sit in their own lane as bars.
+
+```tsx
+import { Scheduler } from "hadi-march/components/data/scheduler";
+
+<Scheduler events={$events} view="week" step={15}
+  onChange={(event, range) => api.update(event.id, range)}
+  onCreate={(range) => $events = [...$events, { id: uid(), title: "New", ...range }]}
+  onSelect={(event) => open(event)} />
+```
+
+Full page: src/components/data/scheduler/docs.md
 
 ## TreeView
 
