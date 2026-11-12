@@ -1,10 +1,12 @@
 /* Back-to-top button: a round raised button; hidden (and out of the tab order) until the page is scrolled down. */
-.hm-to-top {
+.hm-icon-btn.hm-to-top {
   inline-size: 2.75rem;
   block-size: 2.75rem;
   border-radius: 999px;
-  box-shadow: var(--hm-shadow-2);
+  border: 1px solid var(--hm-border);
+  box-shadow: var(--hm-shadow-3);
   background: var(--hm-surface);
+  color: var(--hm-text);
 }
+.hm-icon-btn.hm-to-top:hover { color: var(--hm-primary); border-color: var(--hm-primary); }
 .hm-to-top[data-shown="false"] { opacity: 0; pointer-events: none; }
-.hm-to-top:hover { color: var(--hm-primary); }
