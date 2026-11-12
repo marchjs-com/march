@@ -71,7 +71,15 @@
     "./managers/perf": "./src/managers/perf/index.ts",
     "./managers/rate": "./src/managers/rate/index.ts",
     "./seo": "./src/seo/index.ts",
-    "./seo/hydrate": "./src/seo/hydrate.ts"
+    "./seo/hydrate": "./src/seo/hydrate.ts",
+    "./managers/layer": "./src/managers/layer/index.ts",
+    "./managers/focus": "./src/managers/focus/index.ts",
+    "./managers/hotkey": "./src/managers/hotkey/index.ts",
+    "./managers/announcer": "./src/managers/announcer/index.ts",
+    "./managers/accessibility": "./src/managers/accessibility/index.ts",
+    "./managers/accessibility/ui": "./src/managers/accessibility/ui.ts",
+    "./managers/shortcut-hint": "./src/managers/shortcut-hint/index.ts",
+    "./managers/shortcut-hint/ui": "./src/managers/shortcut-hint/ui.ts"
   },
   "bin": {
     "march": "./cli/march.js"
