@@ -3,8 +3,21 @@
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
+| PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+
+## BottomNav
+
+The mobile tab bar: a colored bubble slides to the active tab, tabs carry count or dot badges, and an optional raised Create button in the middle wears a slowly turning ring of the four HADİ colors (Heyecan, Aktivite, Dostluk, İletişim).
+
+```tsx
+<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />
+```
+
+Full page: src/components/composite/bottom-nav/docs.md
 
 ## Chip
 
@@ -18,6 +31,16 @@ A label pill. Three uses: a static label, a **filter** you can switch on and off
 
 Full page: src/components/chip/docs.md
 
+## Drawer
+
+A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
+
+```tsx
+<Drawer open={$open} onClose={() => $open = false} side="bottom" snapPoints={[0.4, 0.9]} title="Filters">…</Drawer>
+```
+
+Full page: src/components/overlays/drawer/docs.md
+
 ## MadeWithMarch
 
 An optional credit line: "Developed with HADI March and 💗", with "HADI March" as a link. Using it is a request, not a requirement: the licence stays MIT and nothing here is needed to use March.
@@ -29,3 +52,13 @@ An optional credit line: "Developed with HADI March and 💗", with "HADI March"
 ```
 
 Full page: src/components/made-with-march/docs.md
+
+## PullToRefresh
+
+A scroll area that refreshes when its top is pulled down past a threshold, by touch, pen or mouse. A spinning indicator follows the pull and keeps turning until the async `onRefresh` settles.
+
+```tsx
+<PullToRefresh onRefresh={() => api.get("/feed").then((x) => $items = x)}>…</PullToRefresh>
+```
+
+Full page: src/components/feedback/pull-to-refresh/docs.md
