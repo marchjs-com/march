@@ -5,8 +5,9 @@ import { signal, computed, read, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { scaleLinear, scaleBand, niceTicks } from "./scale.ts";
 import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, useSize, attr, textWidth, navIndex, sameBox, each,
-  type MaybeReactive, type DataProp, type Field, type SeriesSpec, type SeriesLabels, type FormatSpec, type ChartBaseProps, type ChartPoint, type TooltipProp, type Box } from "./util.ts";
+  type MaybeReactive, type DataProp, type Field, type SeriesSpec, type SeriesLabels, type FormatSpec, type ChartBaseProps, type ChartPoint, type TooltipProp, type Box, f1 } from "./util.ts";
 import { Frame, Axis, Grid, tooltipState, showTip, tipBody, thin, type Tick } from "./parts.ts";
+import { clamp } from "../core/util.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -29,7 +30,6 @@ export interface BarChartProps<D = unknown> extends ChartBaseProps {
 }
 interface Bar { key: string; index: number; si: number; x: number; y: number; width: number; height: number }
 
-const f1 = (v: number): number => Math.round(v * 10) / 10;
 
 /** Bar chart. See docs/charts.md for props. */
 export function BarChart<D>(props: BarChartProps<D>): Element {
@@ -78,7 +78,7 @@ export function BarChart<D>(props: BarChartProps<D>): Element {
 
   const bars = computed(() => {
     const vals = values(), vis = visible(), bs = band(), v = vs(), c = cats(), out: Bar[] = [];
-    const zero = v(Math.max(nice().min, Math.min(nice().max, 0)));
+    const zero = v(clamp(0, nice().min, nice().max));
     const inner = stacked() ? bs.bandwidth : bs.bandwidth / Math.max(1, vis.length);
     for (let i = 0; i < c.length; i++) {
       let pos = 0, neg = 0;

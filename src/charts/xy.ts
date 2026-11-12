@@ -7,8 +7,9 @@ import { applyPipe } from "../core/pipes.ts";
 import { scaleLinear, niceTicks, timeTicks } from "./scale.ts";
 import { lttb } from "./lttb.ts";
 import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, xKind, timeMs, timeFormat, timeDetail, useSize, attr, textWidth, localPoint, navIndex, sameBox, each,
-  type MaybeReactive, type DataProp, type Field, type SeriesSpec, type SeriesLabels, type FormatSpec, type Formatter, type ChartBaseProps, type ChartPoint, type TooltipProp, type Box, type Series, type XKind } from "./util.ts";
+  type MaybeReactive, type DataProp, type Field, type SeriesSpec, type SeriesLabels, type FormatSpec, type Formatter, type ChartBaseProps, type ChartPoint, type TooltipProp, type Box, type Series, type XKind, f1 } from "./util.ts";
 import { Frame, Axis, Grid, tooltipState, showTip, tipBody, thin, type Tick } from "./parts.ts";
+import { clamp } from "../core/util.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -40,7 +41,6 @@ export function LineChart<D>(props: LineChartProps<D>): Element { return xyChart
 export function AreaChart<D>(props: AreaChartProps<D>): Element { return xyChart(props, "area"); }
 
 const M = { t: 12, r: 16, b: 28 };
-const f1 = (v: number): number => Math.round(v * 10) / 10;
 
 function xyChart<D>(props: AreaChartProps<D>, kind: "line" | "area"): Element {
   const size = useSize(props, 640, 240);
@@ -117,7 +117,7 @@ function xyChart<D>(props: AreaChartProps<D>, kind: "line" | "area"): Element {
   const maxPoints = computed(() => num(read(props.maxPoints)) ?? Math.max(64, Math.round(box().w * 2)));
   const layout = computed(() => {
     const [a, b] = range(), xv = xNum(), sx = xs(), sy = ys(), lim = maxPoints(), out = new Map<string, { line: string; area: string }>();
-    const y0 = sy(Math.max(yNice().min, Math.min(yNice().max, 0)));
+    const y0 = sy(clamp(0, yNice().min, yNice().max));
     for (const s of visible()) {
       const { lo, hi } = stack().get(s.key) as { lo: number[] | null; hi: (number | null)[] };
       const X = (i: number): number => xv[i] as number, Y = (i: number): number => hi[i] as number;
@@ -166,7 +166,7 @@ function xyChart<D>(props: AreaChartProps<D>, kind: "line" | "area"): Element {
   };
   const hide = (): void => { active.set(-1); tip.at.set(null); };
   const px = (e: PointerEvent): number => localPoint(svg, e, size.width())[0] - box().x;
-  const clampX = (p: number): number => Math.max(0, Math.min(box().w, p));
+  const clampX = (p: number): number => clamp(p, 0, box().w);
   const select = (): void => { const i = active.peek(); if (i >= 0) props.onSelect?.(pointAt(i)); };
 
   const handlers = {

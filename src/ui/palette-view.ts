@@ -15,6 +15,7 @@ import { sparkles } from "../icons/glyphs/sparkles.ts";
 import { OverflowText } from "./marquee.ts";
 import { isOpen } from "./palette-state.ts";
 import type { PaletteEntry, CommandPaletteProps } from "./palette.ts";
+import { clamp } from "../core/util.ts";
 
 type Row =
   | { kind: "item"; item: PaletteEntry; score: number; reason?: undefined }
@@ -100,7 +101,7 @@ export function PaletteView(props: CommandPaletteProps): unknown {
     const n = untrack(rows).length;
     if (!n) return;
     const cur = untrack(sel);
-    const next = Math.abs(d) > 1 ? Math.max(0, Math.min(n - 1, cur + d)) : (cur + d + n) % n;
+    const next = Math.abs(d) > 1 ? clamp(cur + d, 0, n - 1) : (cur + d + n) % n;
     sel.set(next);
     globalThis.document.getElementById(`${base}-o-${next}`)?.scrollIntoView?.({ block: "nearest" });
   };

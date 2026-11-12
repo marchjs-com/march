@@ -9,11 +9,11 @@ import type { Schema } from "../schema/index.ts";
 import { fold, prop, valueOf, optionsOf, isEmptyFilter, matchFilter, describeFilter, sortRows, encodeFilter, decodeFilter } from "./filters.ts";
 import type { Column, ColumnInput, TableColumn, FilterOption, Pin, Row, SortDir, SortSpec } from "./filters.ts";
 import { toCSV, toJSON, download, type CSVOptions, type JSONOptions } from "./export.ts";
+import { clamp, uid, load, save, debounce } from "../core/util.ts";
 
 type MaybeFn<T> = T | (() => T);
 const val = <T>(v: MaybeFn<T>): T => (typeof v === "function" ? (v as () => T)() : v);
 const titleCase = (k: string): string => String(k).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[_-]+/g, " ").replace(/^./, (c) => c.toUpperCase());
-let uid = 0;
 const sameList = <T>(a: readonly T[], b: readonly T[]): boolean => a === b || (!!a && !!b && a.length === b.length && a.every((x, i) => x === b[i]));
 
 // numbers, money, sizes, percentages and dates line up on their last digit: end-aligned, tabular digits (header too)
@@ -228,8 +228,8 @@ export interface TableState<R = Row> {
   exportJSON(opts?: JSONOptions<R> & ExportFileOptions): Promise<string>;
 }
 
-function readStore(key: string): Record<string, unknown> { try { return (JSON.parse(globalThis.localStorage?.getItem(key) ?? "null") as Record<string, unknown> | null) ?? {}; } catch { return {}; } }
-function writeStore(key: string, v: unknown): void { try { globalThis.localStorage?.setItem(key, JSON.stringify(v)); } catch { /* storage blocked or full */ } }
+const readStore = (key: string): Record<string, unknown> => load<Record<string, unknown> | null>(key, null) ?? {};
+const writeStore = save;
 const EMPTY_COLS = (): ColState => ({ order: [], hidden: {}, widths: {}, pins: {} });
 const keyStr = (c: { key?: string | undefined }): string => String(c.key);
 
@@ -239,7 +239,7 @@ const keyStr = (c: { key?: string | undefined }): string => String(c.key);
  * onEdit, exportAll, filename, queryKey, loading, error.
  */
 export function createTable<R = Row>(o: TableOptions<R> = {}): TableState<R> {
-  const id = o.queryKey ?? o.storageKey ?? o.urlKey ?? `t${++uid}`;
+  const id = o.queryKey ?? o.storageKey ?? o.urlKey ?? uid("t");
   const source = typeof o.source === "function" ? o.source : null;
   const server = !!source;
   const cursorMode = o.paging === "cursor";
@@ -350,7 +350,7 @@ export function createTable<R = Row>(o: TableOptions<R> = {}): TableState<R> {
     toggleColumn: (key) => table.setHidden(key, !untrack(() => table.isHidden(key))),
     moveColumn(key, delta) {
       const vis = untrack(orderedColumns).filter((c) => !isHidden(c, untrack(colState))).map((c) => c.key);
-      const i = vis.indexOf(key), j = Math.max(0, Math.min(vis.length - 1, i + delta));
+      const i = vis.indexOf(key), j = clamp(i + delta, 0, vis.length - 1);
       if (i < 0 || i === j) return;
       const ks = orderKeys().filter((k) => k !== key), at = ks.indexOf(vis[j] as string);
       ks.splice(delta < 0 ? at : at + 1, 0, key);
@@ -410,7 +410,7 @@ export function createTable<R = Row>(o: TableOptions<R> = {}): TableState<R> {
     },
     // paging
     page: curPage, size, pageCount, hasNext, hasPrev,
-    setPage: (n) => page.set(Math.max(1, Math.min(Number(n) || 1, untrack(pageCount) ?? Infinity))),
+    setPage: (n) => page.set(clamp(untrack(pageCount) ?? Infinity, 1, Number(n) || 1)),
     setSize: (n) => batch(() => { size.set(Number(n) || defaultSize); resetPaging(); }),
     next() {
       if (!untrack(hasNext)) return;
@@ -581,13 +581,13 @@ export function createTable<R = Row>(o: TableOptions<R> = {}): TableState<R> {
         globalThis.history?.replaceState(globalThis.history.state, "", `${globalThis.location.pathname}${qs ? `?${qs}` : ""}${globalThis.location.hash ?? ""}`);
       }
     };
-    let timer: ReturnType<typeof setTimeout> | undefined;
     const delay = o.urlDelay ?? 250;
+    const later = debounce(write, delay);
     effect(() => {
       const w = want();
-      untrack(() => { clearTimeout(timer); if (delay) timer = setTimeout(() => write(w), delay); else write(w); });
+      untrack(() => (delay ? later(w) : write(w)));
     });
-    onCleanup(() => clearTimeout(timer));
+    onCleanup(later.cancel);
   }
   return table;
 }

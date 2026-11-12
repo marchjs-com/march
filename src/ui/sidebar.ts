@@ -16,13 +16,14 @@ import { OverflowText } from "./marquee.ts";
 import { compareText } from "../core/text.ts";
 import { registerPages } from "./registry.ts";
 import { key as hotkey, formatKey } from "./keys.ts";
-import { val, cx, uid, icon, glyph, load, save, on, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, uid, icon, glyph, load, save, on, arr, type MaybeFn, type ClassProp } from "./util.ts";
 import { menu } from "../icons/glyphs/menu.ts";
 import { search as searchIcon } from "../icons/glyphs/search.ts";
 import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 import { clock } from "../icons/glyphs/clock.ts";
 import { panelLeft } from "../icons/glyphs/panelLeft.ts";
 import { x as xIcon } from "../icons/glyphs/x.ts";
+import { clamp, listen } from "../core/util.ts";
 
 /** One NavSidebar entry. `href` navigates (router Link); `onSelect` runs instead. */
 export interface NavSidebarItem {
@@ -89,7 +90,6 @@ export interface NavSidebarProps {
 }
 
 interface Saved { open?: unknown; recent?: unknown; rail?: unknown; width?: unknown }
-const arr = <T>(x: unknown): T[] => (Array.isArray(x) ? x as T[] : []);
 const text = (x: MaybeFn<string | null | undefined> | undefined): string => String(val(x as MaybeFn<string>) ?? "");
 
 export function NavSidebar(props: NavSidebarProps): Element {
@@ -109,7 +109,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const widthKey = typeof props.persist === "string" ? props.persist : null;
   const keepWidth = !!props.resizable && props.persist !== false;
   const savedW = keepWidth ? Number(widthKey ? load<unknown>(widthKey, null) : saved.width) : NaN;
-  const width = signal<number | null>(Number.isFinite(savedW) && savedW > 0 ? Math.max(minW, Math.min(maxW, savedW)) : null);
+  const width = signal<number | null>(Number.isFinite(savedW) && savedW > 0 ? clamp(savedW, minW, maxW) : null);
   const resizing = signal(false);
   const shownWidth = signal(0); // rendered width (aria-valuenow when no width was set)
   const drawer = signal(false);
@@ -249,7 +249,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
     }
     if (!target.classList.contains("hm-sb-row")) return;
     const list = rows(), i = list.indexOf(target);
-    const go = (j: number): void => { e.preventDefault(); list[Math.max(0, Math.min(list.length - 1, j))]?.focus(); };
+    const go = (j: number): void => { e.preventDefault(); list[clamp(j, 0, list.length - 1)]?.focus(); };
     if (e.key === "ArrowDown") go(i + 1);
     else if (e.key === "ArrowUp") { if (i === 0) { e.preventDefault(); searchEl?.focus(); } else go(i - 1); }
     else if (e.key === "Home") go(0);
@@ -275,7 +275,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
       if (px < props.collapseBelow) { if (!rail.peek()) { rail.set(true); persist(); } return; }
       if (rail.peek()) rail.set(false);
     }
-    const w = Math.round(Math.max(minW, Math.min(maxW, px)));
+    const w = Math.round(clamp(px, minW, maxW));
     width.set(w);
     props.onResize?.(w);
     if (done) persist();
@@ -300,10 +300,10 @@ export function NavSidebar(props: NavSidebarProps): Element {
       const edge = navEl?.getBoundingClientRect();
       const move = (ev: PointerEvent): void => { if (edge) setWidth(rtl() ? edge.right - ev.clientX : ev.clientX - edge.left); };
       const up = (): void => {
-        handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up); handle.removeEventListener("pointercancel", up);
+        off();
         doc.classList.remove("hm-sb-resizing"); resizing.set(false); persist(); if (width.peek() != null) props.onResize?.(width.peek() as number);
       };
-      handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up); handle.addEventListener("pointercancel", up);
+      const off = listen(handle, { pointermove: move, pointerup: up, pointercancel: up });
     },
     onDblclick: () => { width.set(null); if (rail.peek() && props.collapseBelow != null) rail.set(false); persist(); props.onResize?.(currentPx()); },
     onKeydown: (e: KeyboardEvent) => {

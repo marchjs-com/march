@@ -7,6 +7,7 @@ import { openLayer } from "../dom/portal.ts";
 import { h } from "../dom/h.ts";
 import { onCleanup } from "../core/reactive.ts";
 import { reducedMotion, setStyle, frame } from "../motion/env.ts";
+import { listen } from "../core/util.ts";
 
 type Props = Record<string, unknown>;
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
@@ -81,10 +82,9 @@ export function Particles(props: Props): HTMLCanvasElement {
   });
   const ro = typeof globalThis.ResizeObserver === "function" ? new ResizeObserver(() => resize()) : null;
   ro?.observe(canvas);
-  canvas.addEventListener("pointermove", onMove);
-  canvas.addEventListener("pointerleave", onLeave);
-  globalThis.document?.addEventListener?.("visibilitychange", onVis);
-  onCleanup(() => { stop(); ro?.disconnect(); canvas.removeEventListener("pointermove", onMove); canvas.removeEventListener("pointerleave", onLeave); globalThis.document?.removeEventListener?.("visibilitychange", onVis); });
+  const off = listen(canvas, { pointermove: onMove, pointerleave: onLeave });
+  const offVis = listen(globalThis.document, { visibilitychange: onVis });
+  onCleanup(() => { stop(); ro?.disconnect(); off(); offVis(); });
   return canvas;
 }
 
@@ -104,8 +104,7 @@ export function spotlight(el: Element): () => void {
     const r = el.getBoundingClientRect();
     setStyle(el, { "--hm-spot-x": `${e.clientX - r.left}px`, "--hm-spot-y": `${e.clientY - r.top}px` });
   };
-  h2.addEventListener("pointermove", move);
-  return () => h2.removeEventListener("pointermove", move);
+  return listen(h2, { pointermove: move });
 }
 
 /** Confetti burst from a point (defaults to the screen center). Removes its canvas when done. */

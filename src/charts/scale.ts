@@ -1,3 +1,4 @@
+import { clamp } from "../core/util.ts";
 // Scales and ticks for charts: linear, time, band. Plain functions, no DOM.
 //   const x = scaleLinear([0, 100], [0, 640]); x(50) === 320; x.invert(320) === 50; x.ticks(5)
 //   const t = scaleTime([start, end], [0, 640]); t(date) → px; t.ticks(6) → ms values on calendar boundaries
@@ -138,7 +139,7 @@ export function scaleBand<V>(domain: readonly V[] = [], range: Range = [0, 1], {
   const fn = (v: V): number => { const i = index.get(v); return i == null ? NaN : start + i * step; };
   return Object.assign(fn, {
     center: (v: V): number => fn(v) + bandwidth / 2,
-    invert: (p: number): V | undefined => domain[Math.max(0, Math.min(n - 1, Math.floor((p - start + (step - bandwidth) / 2) / (step || 1))))],
+    invert: (p: number): V | undefined => domain[clamp(Math.floor((p - start + (step - bandwidth) / 2) / (step || 1)), 0, n - 1)],
     domain,
     range: [r0, r1] as [number, number],
     bandwidth,

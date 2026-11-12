@@ -5,6 +5,7 @@ import { applyPipe } from "../core/pipes.ts";
 import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, useSize, attr, navIndex, each,
   type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type TooltipProp } from "./util.ts";
 import { Frame, tooltipState, showTip, tipBody } from "./parts.ts";
+import { clamp } from "../core/util.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -73,7 +74,7 @@ export function PieChart<D>(props: PieChartProps<D>): Element {
   const geo = computed(() => {
     const w = size.width(), hh = size.height(), r = Math.max(4, Math.min(w, hh) / 2 - 8);
     const d = read(props.donut), ratio = d === true ? 0.6 : num(d) ?? 0;
-    return { cx: w / 2, cy: hh / 2, r, r0: r * Math.max(0, Math.min(0.95, ratio)) };
+    return { cx: w / 2, cy: hh / 2, r, r0: r * clamp(ratio, 0, 0.95) };
   });
   const slices = computed((): Slice<D>[] => {
     const list = shown(), lay = pieLayout(list.map((s) => s.value), { padAngle: num(read(props.padAngle)) ?? (list.length > 1 ? 0.01 : 0) });

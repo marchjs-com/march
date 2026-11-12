@@ -5,9 +5,10 @@
 // inert and hidden from screen readers (an image with a meaningful `alt` excepted). Position, size and order are CSS
 // variables set through CSSOM (no inline style attribute, CSP safe). Video and canvas code load as separate chunks.
 import "./overlay.css";
-import { signal, onCleanup, getOwner } from "../core/reactive.ts";
+import { signal, getOwner } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "./util.ts";
+import { listen } from "../core/util.ts";
 
 export type OverlayEffect = "glass" | "gradient" | "mesh" | "noise" | "vignette" | "spotlight" | "grid" | "dots";
 export type OverlayFit = "cover" | "contain" | "fill" | "none" | "scale-down";
@@ -120,8 +121,7 @@ export function Overlay(props: OverlayProps): Element {
         (root as HTMLElement & { hmPointer?: unknown }).hmPointer = { x, y };
       };
       const leave = (): void => { pointer.set(null); (root as HTMLElement & { hmPointer?: unknown }).hmPointer = null; };
-      host.addEventListener("pointermove", move); host.addEventListener("pointerleave", leave);
-      if (getOwner()) onCleanup(() => { host?.removeEventListener("pointermove", move); host?.removeEventListener("pointerleave", leave); });
+      listen(host, { pointermove: move, pointerleave: leave });
     }
   };
   queueMicrotask(attach);

@@ -9,6 +9,7 @@ import { t } from "../core/i18n.ts";
 import { applyPipe } from "../core/pipes.ts";
 import { model, ctl, cx, uid, type ControlProps } from "./util.ts";
 import { OverflowText } from "../ui/marquee.ts";
+import { clamp } from "../core/util.ts";
 
 /** Does `file` match an accept list like "image/*,.pdf,application/json"? */
 export function accepts(file: { name?: string; type?: string }, accept: string | null | undefined): boolean {
@@ -72,7 +73,7 @@ export function FileUpload<R = unknown>(props: FileUploadProps<R>): unknown {
     it.status.set("uploading");
     Promise.resolve().then(() => props.upload!(it.file, {
       signal: ctrl.signal,
-      onProgress: (p) => { const f = typeof p === "number" ? p : p && p.total ? p.loaded / p.total : 0; it.progress.set(Math.max(0, Math.min(1, f))); },
+      onProgress: (p) => { const f = typeof p === "number" ? p : p && p.total ? p.loaded / p.total : 0; it.progress.set(clamp(f, 0, 1)); },
     })).then((res) => {
       if (ctrl.signal.aborted) return;
       it.result = res; it.progress.set(1); it.status.set("done"); emit();

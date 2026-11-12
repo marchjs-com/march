@@ -3,6 +3,7 @@ import "./display.css";
 import "./grid.css";
 import { h } from "../dom/h.ts";
 import { rest, val, cx, type MaybeFn, type ClassProp } from "./util.ts";
+import { clamp } from "../core/util.ts";
 
 export type Align = "start" | "center" | "end" | "stretch" | "baseline" | "between";
 const ALIGN: Record<string, string | undefined> = { start: "start", center: "center", end: "end", stretch: "stretch", baseline: "baseline", between: "between" };
@@ -60,7 +61,7 @@ const minBucket = (v: string | undefined): number => {
   return MIN_COLS.reduce((a, b) => (Math.abs(b - rem) < Math.abs(a - rem) ? b : a), 9);
 };
 export function Grid(props: GridProps): Element {
-  const cols = Math.max(1, Math.min(props.cols ?? 2, 6));
+  const cols = clamp(6, 1, props.cols ?? 2);
   // span mode: fixed columns that must fill the last row and/or keep all rows equal (pure CSS, see grid.css)
   const span = !props.min && !props.balance && (!!props.fill || !!props.equal) && props.cols != null;
   const flex = !span && (!!props.fill || !!props.balance);

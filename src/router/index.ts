@@ -20,6 +20,7 @@ import { h, lazyChildren } from "../dom/h.ts";
 import { Try } from "../dom/flow.ts";
 import { lazy } from "../dom/lazy.ts";
 import { preloadChunks, loaderKey, saveData, whenIdle, runLoad } from "../dom/preload.ts";
+import { onVisible } from "../core/util.ts";
 
 // ------------------------------------------------------------------ types
 export type Component = (props: Record<string, unknown>) => unknown;
@@ -563,11 +564,7 @@ export function Link(props: { href: Href | (() => Href); exact?: boolean; replac
     },
   }, () => props.children) as Element;
   if (mode === "idle") { const cancel = whenIdle(pre, 3000); if (getOwner()) onCleanup(cancel); }
-  if (mode === "visible" && typeof globalThis.IntersectionObserver === "function") {
-    const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { pre(); io.disconnect(); } });
-    io.observe(a);
-    if (getOwner()) onCleanup(() => io.disconnect());
-  }
+  if (mode === "visible" && typeof globalThis.IntersectionObserver === "function") onVisible(a, pre);
   return a;
 }
 provideLink(Link as (props: Record<string, unknown>) => unknown);

@@ -7,6 +7,7 @@ import { val, cx, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { star } from "../icons/glyphs/star.ts";
 import { starFilled } from "../icons/glyphs/starFilled.ts";
 import { colorAttr, type ColorToken } from "../theme/colors.ts";
+import { clamp } from "../core/util.ts";
 
 export interface RatingProps {
   /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
@@ -38,7 +39,7 @@ export function Rating(props: RatingProps): Element {
         const d = e.key === "ArrowRight" || e.key === "ArrowUp" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowDown" ? -1 : 0;
         if (!d) return;
         e.preventDefault();
-        const next = Math.max(1, Math.min(max, n + d));
+        const next = clamp(n + d, 1, max);
         set(next);
         ((e.currentTarget as HTMLElement).parentElement?.children[next - 1] as HTMLElement | undefined)?.focus();
       },
