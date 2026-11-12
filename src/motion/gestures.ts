@@ -3,7 +3,7 @@
 //   use:press   use:magnet={{ strength: 0.3 }}   use:tilt={{ max: 8 }}
 import { animate, type Controls, type AnimateOptions } from "./animate.ts";
 import { setStyle, reducedMotion, frame } from "./env.ts";
-import { clamp } from "../core/util.ts";
+import { clamp, listen } from "../core/util.ts";
 
 type Opts<T> = T | undefined;
 const obj = <T extends object>(raw: unknown): Partial<T> => (raw && typeof raw === "object" ? (raw as Partial<T>) : {});
@@ -107,13 +107,9 @@ export function drag(el: Element, raw?: unknown): () => void {
     apply();
     o.onMove?.({ x, y, dx: m[0], dy: m[1] });
   };
-  h.addEventListener("pointerdown", down);
-  h.addEventListener("pointermove", move);
-  h.addEventListener("pointerup", up);
-  h.addEventListener("pointercancel", up);
-  h.addEventListener("keydown", key);
+  const off = listen(h, { pointerdown: down, pointermove: move, pointerup: up, pointercancel: up, keydown: key });
   setStyle(el, { touchAction: o.axis === "x" ? "pan-y" : o.axis === "y" ? "pan-x" : "none" });
-  return () => { stop(release); unlift(); h.removeEventListener("pointerdown", down); h.removeEventListener("pointermove", move); h.removeEventListener("pointerup", up); h.removeEventListener("pointercancel", up); h.removeEventListener("keydown", key); };
+  return () => { stop(release); unlift(); off(); };
 }
 
 /** Action: detect a swipe (left/right/up/down) with distance and velocity thresholds. */
@@ -128,9 +124,7 @@ export function swipe(el: Element, raw?: unknown): () => void {
     if (Math.max(Math.abs(dx), Math.abs(dy)) < min && Math.hypot(dx, dy) / dt < 0.5) return;
     o.onSwipe?.(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up");
   };
-  h.addEventListener("pointerdown", down);
-  h.addEventListener("pointerup", up);
-  return () => { h.removeEventListener("pointerdown", down); h.removeEventListener("pointerup", up); };
+  return listen(h, { pointerdown: down, pointerup: up });
 }
 
 /** Action: subtle press-down scale. */
@@ -150,11 +144,8 @@ export function press(el: Element, raw?: Opts<number>): () => void {
     pressed = false; stop(held);
     release.a = animate(el, [{ transform: `scale(${scale})` }, { transform: "none" }], { duration: 160, easing: "easeOutBack", fill: "none" });
   };
-  h.addEventListener("pointerdown", down);
-  h.addEventListener("pointerup", up);
-  h.addEventListener("pointerleave", up);
-  h.addEventListener("pointercancel", up);
-  return () => { stop(held); stop(release); h.removeEventListener("pointerdown", down); h.removeEventListener("pointerup", up); h.removeEventListener("pointerleave", up); h.removeEventListener("pointercancel", up); };
+  const off = listen(h, { pointerdown: down, pointerup: up, pointerleave: up, pointercancel: up });
+  return () => { stop(held); stop(release); off(); };
 }
 
 /** Action: the element is pulled toward the pointer while hovered. */
@@ -179,9 +170,8 @@ export function magnet(el: Element, raw?: unknown): () => void {
     const from = `translate3d(${mx}px, ${my}px, 0)`; mx = 0; my = 0;
     settle(el, release, from, null, { duration: 400, easing: "easeOutElastic" });
   };
-  h.addEventListener("pointermove", move);
-  h.addEventListener("pointerleave", leave);
-  return () => { stop(release); h.removeEventListener("pointermove", move); h.removeEventListener("pointerleave", leave); };
+  const off = listen(h, { pointermove: move, pointerleave: leave });
+  return () => { stop(release); off(); };
 }
 
 /** Action: 3D tilt toward the pointer (max degrees), with an optional glare via --hm-tilt-x/--hm-tilt-y custom properties. */
@@ -203,9 +193,8 @@ export function tilt(el: Element, raw?: unknown): () => void {
     inside = false;
     settle(el, release, getComputedTransform(el), null, { duration: 300 });
   };
-  h.addEventListener("pointermove", move);
-  h.addEventListener("pointerleave", leave);
-  return () => { stop(release); h.removeEventListener("pointermove", move); h.removeEventListener("pointerleave", leave); };
+  const off = listen(h, { pointermove: move, pointerleave: leave });
+  return () => { stop(release); off(); };
 }
 function getComputedTransform(el: Element): string {
   return (el as HTMLElement).style?.getPropertyValue?.("transform") || "none";

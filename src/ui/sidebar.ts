@@ -23,7 +23,7 @@ import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 import { clock } from "../icons/glyphs/clock.ts";
 import { panelLeft } from "../icons/glyphs/panelLeft.ts";
 import { x as xIcon } from "../icons/glyphs/x.ts";
-import { clamp } from "../core/util.ts";
+import { clamp, listen } from "../core/util.ts";
 
 /** One NavSidebar entry. `href` navigates (router Link); `onSelect` runs instead. */
 export interface NavSidebarItem {
@@ -301,10 +301,10 @@ export function NavSidebar(props: NavSidebarProps): Element {
       const edge = navEl?.getBoundingClientRect();
       const move = (ev: PointerEvent): void => { if (edge) setWidth(rtl() ? edge.right - ev.clientX : ev.clientX - edge.left); };
       const up = (): void => {
-        handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up); handle.removeEventListener("pointercancel", up);
+        off();
         doc.classList.remove("hm-sb-resizing"); resizing.set(false); persist(); if (width.peek() != null) props.onResize?.(width.peek() as number);
       };
-      handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up); handle.addEventListener("pointercancel", up);
+      const off = listen(handle, { pointermove: move, pointerup: up, pointercancel: up });
     },
     onDblclick: () => { width.set(null); if (rail.peek() && props.collapseBelow != null) rail.set(false); persist(); props.onResize?.(currentPx()); },
     onKeydown: (e: KeyboardEvent) => {

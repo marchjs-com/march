@@ -9,6 +9,7 @@ import { signal, getOwner, runWithOwner, untrack, onCleanup } from "../core/reac
 import { h } from "./h.ts";
 import { whenIdle, runLoad } from "./preload.ts";
 import { t } from "../core/i18n.ts";
+import { onVisible, listen } from "../core/util.ts";
 
 type Comp<P> = (props: P) => unknown;
 type Loaded<P> = Comp<P> | { default: Comp<P> } | Record<string, unknown>;
@@ -80,14 +81,10 @@ export function lazy<P = Record<string, unknown>>(load: () => Promise<Loaded<P>>
     else if (when === "idle") { const cancel = whenIdle(start, 1500); onCleanup(cancel); }
     else queueMicrotask(() => {
       if (!alive) return;
-      if (when === "visible" && typeof IntersectionObserver === "function") {
-        const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); start(); } }, { rootMargin: "300px" });
-        io.observe(slot);
-        onCleanup(() => io.disconnect());
-      } else if (when === "interaction") {
-        const go = (): void => { for (const ev of EVENTS) slot.removeEventListener(ev, go); start(); };
-        for (const ev of EVENTS) slot.addEventListener(ev, go, { passive: true });
-        onCleanup(() => { for (const ev of EVENTS) slot.removeEventListener(ev, go); });
+      if (when === "visible" && typeof IntersectionObserver === "function") onVisible(slot, start, { rootMargin: "300px" });
+      else if (when === "interaction") {
+        const go = (): void => { off(); start(); };
+        const off = listen(slot, Object.fromEntries(EVENTS.map((ev) => [ev, go])), { passive: true });
       } else start();
     });
     return slot;
