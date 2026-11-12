@@ -20,6 +20,7 @@ export const LOADERS: Record<string, () => Promise<unknown>> = {
   "/feedback": () => import("./pages/feedback.tsx"),
   "/motion": () => import("./pages/motion.tsx"),
   "/animation": () => import("./pages/animation.tsx"),
+  "/text-motion": () => import("./pages/text-motion.tsx"),
   "/speed": () => import("./pages/speed.tsx"),
   "/messaging": () => import("./pages/messaging.tsx"),
   "/network": () => import("./pages/network.tsx"),
@@ -28,6 +29,11 @@ export const LOADERS: Record<string, () => Promise<unknown>> = {
   "/overlay": () => import("./pages/overlay.tsx"),
   "/language": () => import("./pages/language.tsx"),
   "/managers": () => import("./pages/managers.tsx"),
+  "/managers-data": () => import("./pages/managers-data.tsx"),
+  "/managers-ops": () => import("./pages/managers-ops.tsx"),
+  "/seo": () => import("./pages/seo.tsx"),
+  "/managers-a11y": () => import("./pages/managers-a11y.tsx"),
+  "/managers-env": () => import("./pages/managers-env.tsx"),
 };
 
 const ShellNav = lazy(() => import("./shell-nav.tsx"), { fallback: () => <div class="sc-nav-placeholder" aria-hidden="true" /> })
