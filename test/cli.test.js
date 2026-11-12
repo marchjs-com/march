@@ -149,6 +149,20 @@ test("march build: base \"./\" writes only relative asset URLs (the app works fr
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
+test("march build: credit: true adds the Built with HADI March comment; off by default", () => {
+  const dir = mkdtempSync(join(tmpdir(), "march-credit-"));
+  try {
+    mkdirSync(join(dir, "src"), { recursive: true });
+    writeFileSync(join(dir, "src/main.jsx"), "render(() => <p>hi</p>, document.getElementById('app'))\n");
+    writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
+    execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
+    assert.doesNotMatch(readFileSync(join(dir, "dist/index.html"), "utf8"), /Built with HADI March/);
+    writeFileSync(join(dir, "march.config.js"), "export default { credit: true }\n");
+    execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
+    assert.match(readFileSync(join(dir, "dist/index.html"), "utf8"), /<!-- Built with HADI March -->/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
 const ROOT_DIR = fileURLToPath(new URL("..", import.meta.url));
 test("showcase dist: no absolute /assets/ URL anywhere in index.html", { skip: !existsSync(join(ROOT_DIR, "examples/showcase/dist/index.html")) }, () => {
   assert.doesNotMatch(readFileSync(join(ROOT_DIR, "examples/showcase/dist/index.html"), "utf8"), /"\/assets\//);

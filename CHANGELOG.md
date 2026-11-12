@@ -4,6 +4,10 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Credit (later in 0.1.0)
+- `<MadeWithMarch />` (`src/components/made-with-march`, category actions): optional "Developed with HADI March and 💗" line, variants text / badge / small, link in one constant (`MARCH_URL`). The licence stays MIT; using it is a request.
+- `credit: true` in `march.config.js` adds `<!-- Built with HADI March -->` to the built `index.html` (off by default).
+
 ### Build output (later in 0.1.0)
 - `stableNames: true` / `--stable-names`: `main.js`, `chunks/home.js`, `chunks/shared-N.js` with `?v=<version>` in every
   reference (imports, CSS loaders, index.html, manifest): deploys overwrite the same paths; deterministic output.
