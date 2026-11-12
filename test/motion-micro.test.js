@@ -84,3 +84,24 @@ test("ripple: an element made before it is in the document (static position) sti
     off(); card.remove();
   } finally { globalThis.getComputedStyle = origCs; }
 });
+
+test("stateMorph: 3 success and 3 error rounds with changing options; after each the button is exactly as it was", () => {
+  const b = document.createElement("button");
+  b.className = "hm-btn hm-btn-primary";
+  b.textContent = "Değişiklikleri kaydet";
+  // the box follows the inline width (natural width 160)
+  b.getBoundingClientRect = () => { const w = parseFloat(b.style.getPropertyValue("width")) || 160; return { left: 0, top: 0, width: w, height: 40, right: w, bottom: 40 }; };
+  document.body.append(b);
+  const snap = () => ({ style: b.getAttribute("style"), cls: b.className, text: b.firstChild.textContent, state: b.getAttribute("data-hm-state"), busy: b.hasAttribute("aria-busy"), disabled: b.hasAttribute("aria-disabled"), width: b.getBoundingClientRect().width, icon: b.querySelector(".hm-state-icon")?.children.length ?? 0, live: b.querySelector("[aria-live]")?.textContent ?? "" });
+  const first = snap();
+  const rounds = [["success", { duration: 300 }], ["error", { duration: 500 }], ["success", { duration: 200, labels: { success: "Kaydedildi" } }], ["error", {}], ["success", { duration: 600 }], ["error", { duration: 250 }]];
+  for (const [result, o] of rounds) {
+    M.stateMorph(b, "loading", o).finish();
+    assert.equal(b.getBoundingClientRect().width, 40, "loading: a circle");
+    const r = M.stateMorph(b, result, o); r.finish();
+    assert.equal(b.getAttribute("data-hm-state"), result);
+    M.stateMorph(b, "idle", o).finish();
+    assert.deepEqual(snap(), first, `after a ${result} round the button is as it was`);
+  }
+  b.remove();
+});

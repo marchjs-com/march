@@ -89,7 +89,7 @@ export interface StateMorphOptions {
   labels?: Partial<Record<ButtonState, string>>;
 }
 
-interface Saved { width: string; radius: string; live: HTMLElement; icon: SVGSVGElement; spin: Playback | null; state: ButtonState }
+interface Saved { width: string; radius: string; live: HTMLElement; icon: SVGSVGElement; spin: Playback | null; fx: Playback[]; state: ButtonState }
 const saved = new WeakMap<HTMLElement, Saved>();
 const css = (el: Element): Partial<CSSStyleDeclaration> => globalThis.getComputedStyle?.(el) ?? {};
 
@@ -118,7 +118,7 @@ export function stateMorph(el: Element, state: ButtonState, o: StateMorphOptions
     const svg = globalThis.document.createElementNS(NS, "svg");
     svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("class", "hm-state-icon");
     h.append(live, svg);
-    s = { width: h.style.getPropertyValue("width"), radius: h.style.getPropertyValue("border-radius"), live, icon: svg, spin: null, state: "idle" };
+    s = { width: h.style.getPropertyValue("width"), radius: h.style.getPropertyValue("border-radius"), live, icon: svg, spin: null, fx: [], state: "idle" };
     saved.set(h, s);
   }
   const prev = s.state;
@@ -126,6 +126,9 @@ export function stateMorph(el: Element, state: ButtonState, o: StateMorphOptions
   const r = h.getBoundingClientRect();
   const look = (): Keyframe => { const c = css(h); return { borderRadius: c.borderRadius || "0px", ...(c.backgroundColor ? { backgroundColor: c.backgroundColor } : {}) }; };
   const from = { width: `${r.width}px`, ...look() };
+  // the previous state's effects go before the new end is measured: nothing is held (each one is unfilled, its end is
+  // the inline size and the data-hm-state colours), so idle measures the natural width and colour again
+  for (const p of s.fx.splice(0)) p.cancel();
   s.spin?.cancel(); s.spin = null;
   if (state === "idle") h.removeAttribute("data-hm-state"); else h.setAttribute("data-hm-state", state);
   h.toggleAttribute("aria-busy", state === "loading");
@@ -139,14 +142,16 @@ export function stateMorph(el: Element, state: ButtonState, o: StateMorphOptions
   // the idle width is the natural one: measure it without the inline width, then animate to that number
   const to = { width: `${round ? r.height : h.getBoundingClientRect().width}px`, ...look() };
   if (!round) setStyle(h, { width: s.width || null });
-  const main = animate(h, [from, to], { duration: dur, easing: state === "idle" ? "spring-soft" : "expo" });
+  if (!round && h.getAttribute("style") === "") h.removeAttribute("style");
+  const main = animate(h, [from, to], { duration: dur, easing: state === "idle" ? "spring-soft" : "expo", fill: "none" });
+  s.fx.push(main);
 
   // the icon: spinner / check / cross, drawn in
   s.icon.replaceChildren(...(state === "idle" ? [] : [icon(state)]));
   const shape = s.icon.firstElementChild;
   if (shape && state === "loading") s.spin = animate(s.icon, [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 800, iterations: Infinity, easing: "linear" });
   else if (shape) drawPath(shape, { duration: dur, delay: dur * 0.35, easing: "out" });
-  if (state === "error") animate(h, [{ translate: "0" }, { translate: "-6px" }, { translate: "5px" }, { translate: "-3px" }, { translate: "2px" }, { translate: "0" }], { duration: 420, delay: dur * 0.5, easing: "out" });
+  if (state === "error") s.fx.push(animate(h, [{ translate: "0" }, { translate: "-6px" }, { translate: "5px" }, { translate: "-3px" }, { translate: "2px" }, { translate: "0" }], { duration: 420, delay: dur * 0.5, easing: "out", fill: "none" }));
   if (state === "success" && prev !== "success" && o.confetti && !reducedNow()) {
     const b = h.getBoundingClientRect(), root = css(globalThis.document.documentElement);
     const colors = ["--hm-brand-orange", "--hm-brand-blue", "--hm-brand-green", "--hm-brand-purple"].map((v) => root.getPropertyValue?.(v).trim() ?? "").filter(Boolean);
