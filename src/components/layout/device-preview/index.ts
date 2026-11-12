@@ -43,6 +43,8 @@ export interface DevicePreviewProps {
   touch?: MaybeFn<boolean | undefined>;
   /** Scale down to fit the width of its place (default true). */
   fit?: boolean;
+  /** Show this address in the device (an iframe: real viewport, real scrolling, real media queries) instead of children. */
+  src?: MaybeFn<string | undefined>;
   class?: ClassProp;
   children?: unknown;
 }
@@ -66,7 +68,10 @@ export function DevicePreview(props: DevicePreviewProps): Element {
   onCleanup(() => clearInterval(tick));
   const scale = signal(1);
 
-  const viewport = h("div", { class: "hm-device-viewport" }, props.children) as HTMLElement;
+  const spec = (): DeviceSpec => specOf(val(props.device));
+  const land = (): boolean => !!val(props.landscape);
+  const frame = props.src != null ? h("iframe", { class: "hm-device-frame", src: () => val(props.src) ?? "about:blank", title: () => t`${spec().name} preview`, loading: "lazy" }) as HTMLIFrameElement : null;
+  const viewport = h("div", { class: () => cx("hm-device-viewport", frame && "is-framed") }, frame ?? props.children) as HTMLElement;
   const dot = h("div", { class: "hm-device-touch", "aria-hidden": "true" }) as HTMLElement;
   const screen = h(OverlayScope, { class: "hm-device-screen", children: [
     h("div", { class: "hm-device-status", "aria-hidden": "true" },
@@ -76,8 +81,6 @@ export function DevicePreview(props: DevicePreviewProps): Element {
     h("div", { class: "hm-device-home", "aria-hidden": "true" }),
     dot,
   ] }) as HTMLElement;
-  const spec = (): DeviceSpec => specOf(val(props.device));
-  const land = (): boolean => !!val(props.landscape);
   const body = h("div", {
     class: () => cx("hm-device", `hm-device-${spec().kind ?? "phone"}`, `hm-device-cam-${spec().camera ?? "none"}`, land() && "is-landscape", val(props.touch) !== false && "is-touch", val(props.class)),
     role: "group", "aria-label": () => t`${spec().name} preview`,
@@ -99,55 +102,79 @@ export function DevicePreview(props: DevicePreviewProps): Element {
     onCleanup(() => ro.disconnect());
   }
 
-  // touch: the mouse acts like a finger
-  let start: { x: number; y: number; t: number; target: Element | null; sx?: HTMLElement; sy?: HTMLElement; moved: boolean; id: number } | null = null;
-  let last = { x: 0, y: 0, t: 0, vx: 0, vy: 0 };
-  let fling: { cancel(): void } | null = null;
-  let press: ReturnType<typeof setTimeout> | undefined;
+  // touch: the mouse acts like a finger — on the screen, or inside the iframe (same origin) on every page it loads
   const on = (): boolean => val(props.touch) !== false;
   const k = (): number => scale() || 1;
-  const move = (e: PointerEvent): void => {
-    if (!on()) return;
-    const r = screen.getBoundingClientRect();
-    dot.style.transform = `translate(${(e.clientX - r.left) / k()}px, ${(e.clientY - r.top) / k()}px)`;
-    if (!start || e.pointerId !== start.id) return;
-    const dx = (e.clientX - last.x) / k(), dy = (e.clientY - last.y) / k(), dt = Math.max(1, e.timeStamp - last.t);
-    if (!start.moved && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 6) { start.moved = true; clearTimeout(press); screen.setPointerCapture?.(e.pointerId); }
-    if (start.moved) {
-      start.sy ??= scrollerOf(start.target, viewport, "y");
-      start.sx ??= scrollerOf(start.target, viewport, "x");
-      start.sy.scrollTop -= dy;
-      if (start.sx !== viewport || viewport.scrollWidth > viewport.clientWidth) start.sx.scrollLeft -= dx;
-      last = { x: e.clientX, y: e.clientY, t: e.timeStamp, vx: dx / dt, vy: dy / dt };
-    }
+  const bind = (surface: Document | HTMLElement, root: () => HTMLElement, offset: () => { x: number; y: number }, zoomed: boolean): (() => void) => {
+    let start: { x: number; y: number; target: Element | null; sx?: HTMLElement; sy?: HTMLElement; moved: boolean; id: number } | null = null;
+    let last = { x: 0, y: 0, t: 0, vx: 0, vy: 0 };
+    let fling: { cancel(): void } | null = null;
+    let press: ReturnType<typeof setTimeout> | undefined;
+    let dragged = false;
+    const z = (): number => (zoomed ? k() : 1);
+    const move = (e: PointerEvent): void => {
+      if (!on()) return;
+      const o = offset();
+      dot.style.transform = `translate(${o.x + e.clientX / z()}px, ${o.y + e.clientY / z()}px)`;
+      if (!start || e.pointerId !== start.id) return;
+      const dx = (e.clientX - last.x) / z(), dy = (e.clientY - last.y) / z(), dt = Math.max(1, e.timeStamp - last.t);
+      if (!start.moved && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 6) { start.moved = true; clearTimeout(press); (start.target as HTMLElement | null)?.setPointerCapture?.(e.pointerId); }
+      if (start.moved) {
+        const r = root();
+        start.sy ??= scrollerOf(start.target, r, "y");
+        start.sx ??= scrollerOf(start.target, r, "x");
+        start.sy.scrollTop -= dy;
+        if (start.sx !== r || r.scrollWidth > r.clientWidth) start.sx.scrollLeft -= dx;
+        last = { x: e.clientX, y: e.clientY, t: e.timeStamp, vx: dx / dt, vy: dy / dt };
+      }
+    };
+    const down = (e: PointerEvent): void => {
+      if (!on() || e.pointerType !== "mouse" || e.button !== 0) return;
+      fling?.cancel();
+      screen.classList.add("is-pressed");
+      start = { x: e.clientX, y: e.clientY, target: e.target as Element, moved: false, id: e.pointerId };
+      last = { x: e.clientX, y: e.clientY, t: e.timeStamp, vx: 0, vy: 0 };
+      // a long press opens the context menu, as on a phone
+      press = setTimeout(() => { if (start && !start.moved) start.target?.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: e.clientX, clientY: e.clientY })); }, 550);
+    };
+    const end = (): void => {
+      clearTimeout(press);
+      screen.classList.remove("is-pressed");
+      dragged = !!start?.moved;
+      if (start?.moved && start.sy) {
+        // the fling: the content keeps moving and slows down (motion engine: global speed and reduced motion apply)
+        const sy = start.sy, v = last.vy * 16;
+        if (Math.abs(v) > 0.5) { const from = sy.scrollTop; fling = animateValue(0, 1, { duration: 700, easing: "easeOutCubic", onUpdate: (p: number) => { sy.scrollTop = from - v * 22 * p; } }); }
+      }
+      start = null;
+    };
+    // a drag must not also click what it started on
+    const click = (e: Event): void => { if (dragged) { dragged = false; e.preventDefault(); e.stopPropagation(); } };
+    const noDrag = (e: Event): void => { if (on()) e.preventDefault(); };
+    const enter = (): void => screen.classList.add("is-over"), leave = (): void => screen.classList.remove("is-over");
+    const map: [string, EventListener, boolean?][] = [["pointermove", move as EventListener], ["pointerdown", down as EventListener], ["pointerup", end], ["pointercancel", end], ["click", click, true], ["dragstart", noDrag], ["pointerenter", enter], ["pointerleave", leave]];
+    for (const [t, f, c] of map) surface.addEventListener(t, f, c);
+    return () => { for (const [t, f, c] of map) surface.removeEventListener(t, f, c); fling?.cancel(); };
   };
-  screen.addEventListener("pointermove", move);
-  screen.addEventListener("pointerdown", (e: PointerEvent) => {
-    if (!on() || e.pointerType !== "mouse" || e.button !== 0) return;
-    fling?.cancel();
-    screen.classList.add("is-pressed");
-    start = { x: e.clientX, y: e.clientY, t: e.timeStamp, target: e.target as Element, moved: false, id: e.pointerId };
-    last = { x: e.clientX, y: e.clientY, t: e.timeStamp, vx: 0, vy: 0 };
-    // a long press opens the context menu, as on a phone
-    press = setTimeout(() => { if (start && !start.moved) start.target?.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: e.clientX, clientY: e.clientY })); }, 550);
-  });
-  let dragged = false;
-  const end = (): void => {
-    clearTimeout(press);
-    screen.classList.remove("is-pressed");
-    dragged = !!start?.moved;
-    if (start?.moved && start.sy) {
-      // the fling: the content keeps moving and slows down (motion engine: global speed and reduced motion apply)
-      const sy = start.sy, v = last.vy * 16;
-      if (Math.abs(v) > 0.5) { const from = sy.scrollTop; fling = animateValue(0, 1, { duration: 700, easing: "easeOutCubic", onUpdate: (p: number) => { sy.scrollTop = from - v * 22 * p; } }); }
-    }
-    start = null;
-  };
-  screen.addEventListener("pointerup", end);
-  screen.addEventListener("pointercancel", end);
-  // a drag must not also click what it started on
-  screen.addEventListener("click", (e) => { if (dragged) { dragged = false; e.preventDefault(); e.stopPropagation(); } }, true);
-  screen.addEventListener("dragstart", (e) => { if (on()) e.preventDefault(); });
+  if (frame) {
+    // each page the frame loads gets the finger (same origin only; a foreign page keeps the mouse)
+    let unbind: (() => void) | undefined;
+    const attach = (): void => {
+      unbind?.();
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const st = doc.createElement("style");
+      st.textContent = "html.hm-touch-sim, html.hm-touch-sim * { cursor: none !important; } html.hm-touch-sim { -webkit-user-select: none; user-select: none; } html.hm-touch-sim :is(input, textarea, select, [contenteditable=true]) { user-select: text; } html.hm-touch-sim ::-webkit-scrollbar { display: none; } html.hm-touch-sim { scrollbar-width: none; }";
+      doc.head?.appendChild(st);
+      doc.documentElement.classList.toggle("hm-touch-sim", on());
+      unbind = bind(doc, () => (doc.scrollingElement ?? doc.documentElement) as HTMLElement, () => ({ x: frame.offsetLeft, y: frame.offsetTop + viewport.offsetTop }), false);
+    };
+    frame.addEventListener("load", attach);
+    onCleanup(() => unbind?.());
+  } else {
+    const off = bind(screen, () => viewport, () => { const r = screen.getBoundingClientRect(); return { x: -r.left / k(), y: -r.top / k() }; }, true);
+    onCleanup(off);
+  }
 
   return outer;
 }

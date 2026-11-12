@@ -53,3 +53,7 @@
 /* a preview is looked at, not copied from: only fields keep text selection */
 .hm-device-screen { user-select: none; -webkit-user-select: none; }
 .hm-device-screen :is(input, textarea, select, [contenteditable="true"]) { user-select: text; -webkit-user-select: text; }
+/* src mode: the content is a page in an iframe (its own viewport, scrolling and media queries) */
+.hm-device-viewport.is-framed { overflow: hidden; }
+.hm-device-frame { display: block; inline-size: 100%; block-size: 100%; border: 0; background: var(--hm-bg); }
+.hm-device.is-touch .hm-device-screen.is-over .hm-device-touch { opacity: 1; }
