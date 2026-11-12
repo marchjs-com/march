@@ -12,7 +12,7 @@ export { timeline, type Timeline, type StepOptions, type Target } from "./timeli
 export { inView, reveal, scrollProgress, parallax, type InViewOptions } from "./scroll.ts";
 export { pageTransitions, transitionFrames, resolveTransition, type PageTransitionOptions, type PageTransitionSpec, type PageTransitionType } from "./page.ts";
 export { drag, swipe, press, magnet, tilt, type DragOptions } from "./gestures.ts";
-export { reducedMotion, setReducedMotion, frame } from "./env.ts";
+export { reducedMotion, setReducedMotion, frame, frameLoop, animateEl } from "./env.ts";
 export * as easing from "./easing.ts";
 
 // the engine (new API)

@@ -1,10 +1,10 @@
 // CSS animations and transitions under the same control: getAnimations() finds them (CSSAnimation / CSSTransition),
 // so the global speed, pause and reduced motion reach plain CSS too — `.spinner { animation: spin 1s infinite }` slows
-// down with the speed slider and stops with "Stop all".
+// down with the speed slider and stops with "Stop all". Pseudo-elements (::before spinners, ::after shimmers) and
+// View Transition snapshots included.
 //   cssAnimations(panel).pause()   cssAnimations().rate(0.5)   cssAnimations(dialog).finish()
 import { onConfig, rateScale, pausedNow } from "./config.ts";
-import { reducedNow } from "./prefs.ts";
-import { ours } from "./playback.ts";
+import { ours, baseRate, pausedByUs, adopt } from "./native.ts";
 
 export interface CssControls {
   /** The CSS animations and transitions found (not the engine's own). */
@@ -17,9 +17,6 @@ export interface CssControls {
   /** Set the playback rate (multiplied by the global speed). */
   rate(r: number): void;
 }
-
-const base = new WeakMap<Animation, number>();
-const pausedByUs = new Set<Animation>();
 
 function find(root: Element | Document | undefined): Animation[] {
   const r = root ?? globalThis.document;
@@ -37,21 +34,8 @@ export function cssAnimations(root?: Element | Document): CssControls {
     play: () => list.forEach((a) => a.play()),
     finish: () => list.forEach((a) => { try { a.finish(); } catch { /* endless */ } }),
     cancel: () => list.forEach((a) => a.cancel()),
-    rate: (r) => list.forEach((a) => { base.set(a, r); a.updatePlaybackRate(r * rateScale()); }),
+    rate: (r) => list.forEach((a) => { baseRate.set(a, r); a.updatePlaybackRate(r * rateScale()); }),
   };
-}
-
-/** Apply the global settings to one CSS animation (speed, pause, reduced motion). */
-function adopt(a: Animation): void {
-  if (ours.has(a)) return;
-  if (!base.has(a)) base.set(a, a.playbackRate || 1);
-  const r = base.get(a)! * rateScale();
-  if (a.playbackRate !== r) { try { a.updatePlaybackRate(r); } catch { a.playbackRate = r; } }
-  if (pausedNow() && a.playState === "running") { a.pause(); pausedByUs.add(a); }
-  if (reducedNow()) {
-    const t = a.effect?.getTiming?.();
-    if (t && t.iterations !== Infinity) { try { a.finish(); } catch { /* ignore */ } }
-  }
 }
 
 let installed = false;
@@ -62,7 +46,8 @@ export function installCssControl(): void {
   const doc = globalThis.document;
   const onStart = (e: Event): void => {
     const el = e.target as Element | null;
-    for (const a of el?.getAnimations?.() ?? []) adopt(a);
+    // the element's own animations and its pseudo-elements' (subtree: true lists ::before / ::after too)
+    for (const a of el?.getAnimations?.({ subtree: true }) ?? []) if ((a.effect as KeyframeEffect | null)?.target === el) adopt(a);
   };
   doc.addEventListener("animationstart", onStart, true);
   doc.addEventListener("transitionrun", onStart, true);

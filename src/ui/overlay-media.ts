@@ -1,5 +1,6 @@
 // Overlay video and canvas: a separate chunk, loaded only when an Overlay has a video or a draw function.
 import type { DrawFn } from "./overlay.ts";
+import { frameLoop } from "../motion/env.ts";
 
 /** Muted, looping, inline, control-less video that plays only while visible. */
 export function mountVideo(root: HTMLElement, src: string, poster: string | undefined, posterEl: HTMLElement | null): void {
@@ -36,26 +37,34 @@ export function mountCanvas(root: HTMLElement, draw: DrawFn, animate: boolean): 
   root.append(c);
   const ctx = c.getContext("2d");
   if (!ctx) return;
-  let w = 0, h = 0, dpr = 1, raf = 0, visible = true, t0 = 0;
-  const frame = (now: number): void => {
-    if (!t0) t0 = now;
+  // the engine's clock drives the loop: global speed, "pause all" and off-screen stop reach the canvas too
+  let w = 0, h = 0, dpr = 1, visible = true, time = 0, stop: (() => void) | null = null;
+  const paint = (): void => {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
-    draw(ctx, { width: w, height: h, dpr, time: now - t0, theme: themeColors(root), pointer: (root as HTMLElement & { hmPointer?: { x: number; y: number } | null }).hmPointer ?? null });
-    raf = animate && visible && root.isConnected ? requestAnimationFrame(frame) : 0;
+    draw(ctx, { width: w, height: h, dpr, time, theme: themeColors(root), pointer: (root as HTMLElement & { hmPointer?: { x: number; y: number } | null }).hmPointer ?? null });
+  };
+  const run = (): void => {
+    if (stop || !animate || !visible || !root.isConnected) return;
+    stop = frameLoop((dt) => {
+      if (!visible || !root.isConnected) { stop?.(); stop = null; return; }
+      time += Math.min(dt, 100);
+      paint();
+    });
   };
   const resize = (): void => {
     const r = root.getBoundingClientRect();
     dpr = Math.min(globalThis.devicePixelRatio || 1, 3);
     w = Math.max(1, Math.round(r.width)); h = Math.max(1, Math.round(r.height));
     c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
-    if (!raf) frame(performance.now());
+    paint();
+    run();
   };
   const ro = new ResizeObserver(resize);
   ro.observe(root);
   const IO = globalThis.IntersectionObserver;
   if (IO) {
-    const io = new IO((es) => { visible = es.some((e) => e.isIntersecting); if (visible && animate && !raf) raf = requestAnimationFrame(frame); }, { threshold: 0 });
+    const io = new IO((es) => { visible = es.some((e) => e.isIntersecting); if (visible) run(); }, { threshold: 0 });
     io.observe(root);
   }
   resize();
