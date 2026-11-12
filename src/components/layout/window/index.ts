@@ -143,9 +143,10 @@ export function Window(props: WindowProps): unknown {
         geo.set(fit({ ...from, x: from.x + dx, y: from.y + p.dy }));
         snapTo.set(edgeOf(p.px, p.py, box()));
       },
-      onEnd: () => {
+      onEnd: (p) => {
         moving.set(false);
-        const s = snapTo.peek();
+        // the drop point decides (a quick drag may end without a move event at the edge)
+        const s = p.dx || p.dy ? edgeOf(p.px, p.py, box()) : null;
         snapTo.set(null);
         if (s) setState(s); else keep();
       },
