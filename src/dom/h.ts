@@ -55,7 +55,7 @@ export function h(type: string | Component<never>, props?: Props | null, ...chil
 }
 
 /** Mark a thunk as lazily evaluated children (compiler output for component children). */
-export function lazy<F extends () => unknown>(fn: F): F { (fn as unknown as Record<symbol, boolean>)[CHILDREN] = true; return fn; }
+export function lazyChildren<F extends () => unknown>(fn: F): F { (fn as unknown as Record<symbol, boolean>)[CHILDREN] = true; return fn; }
 
 function createComponent(Comp: Component<Props>, raw: Props, children: unknown[]): unknown {
   const props: Props = {};

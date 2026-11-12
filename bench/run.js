@@ -8,7 +8,7 @@ import { installDom } from "../src/testing/dom.ts";
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
 const sizes = String(arg("--rows", "1000,10000")).split(",").map(Number);
 installDom();
-const { signal, h, render, For, lazy, batch } = await import("../src/index.ts");
+const { signal, h, render, For, lazyChildren, batch } = await import("../src/index.ts");
 
 const ms = (fn) => { const t = performance.now(); fn(); return performance.now() - t; };
 const row = (i, v = 0) => ({ id: i, label: `row ${i}`, v });
@@ -18,7 +18,7 @@ function listBench(n) {
   const el = document.createElement("table");
   let dispose;
   const create = ms(() => {
-    dispose = render(() => h("tbody", {}, h(For, { each: items, key: "id" }, lazy(() => [(r) => h("tr", {}, h("td", {}, () => r().id), h("td", {}, () => r().label), h("td", {}, () => r().v))]))), el);
+    dispose = render(() => h("tbody", {}, h(For, { each: items, key: "id" }, lazyChildren(() => [(r) => h("tr", {}, h("td", {}, () => r().id), h("td", {}, () => r().label), h("td", {}, () => r().v))]))), el);
   });
   const update = ms(() => items.set(items.peek().map((r, i) => (i % 10 === 0 ? { ...r, v: r.v + 1 } : r))));
   const swap = ms(() => { const a = [...items.peek()]; [a[1], a[n - 2]] = [a[n - 2], a[1]]; items.set(a); });

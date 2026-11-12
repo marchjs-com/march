@@ -9,7 +9,7 @@ import { h } from "../dom/h.ts";
 import { Portal } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
 import { val, cx, uid, glyph, type MaybeFn } from "./util.ts";
-import { x as xIcon } from "../icons/set.ts";
+import { x as xIcon } from "../icons/glyphs/x.ts";
 import { trapTab, focusables } from "./focus.ts";
 
 export type DialogSize = "sm" | "md" | "lg" | "full";

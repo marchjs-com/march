@@ -14,6 +14,8 @@ export const MODULES = [
   ["hadi-march/ui", "src/ui/index.ts"],
   ["hadi-march/data", "src/data/index.ts"],
   ["hadi-march/router", "src/router/index.ts"],
+  ["hadi-march/lazy", "src/lazy/index.ts"],
+  ["hadi-march/sw", "src/sw/index.ts"],
   ["hadi-march/schema", "src/schema/index.ts"],
   ["hadi-march/table", "src/table/index.ts"],
   ["hadi-march/crud", "src/crud/index.ts"],

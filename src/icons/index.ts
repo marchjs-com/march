@@ -7,7 +7,7 @@ import { svgIcon, type IconDef } from "./svg.ts";
 
 export { svgIcon, defineIcon, isIconDef } from "./svg.ts";
 export type { IconDef } from "./svg.ts";
-export * from "./set.ts";
+export * from "./all.ts";
 
 export interface IconProps {
   of: IconDef;

@@ -275,6 +275,7 @@ test("CommandPalette: mod+k opens, ranks commands and pages, Enter runs, ask hoo
   const m = mount(() => h(U.CommandPalette, { ask: async (q) => { asked = q; return { results: [{ id: "export", reason: "matches intent" }] }; }, askDelay: 10 }));
   key(document.body, "k", { ctrlKey: true });
   assert.equal(U.paletteOpen(), true);
+  await U.preloadPalette(); // the dialog is a separate chunk, loaded on first open
   await tick();
   const inp = top().querySelector(".hm-pal-input");
   assert.equal(document.activeElement, inp);

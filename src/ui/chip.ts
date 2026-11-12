@@ -3,7 +3,8 @@ import "./chip.css";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
-import { x as xIcon, check } from "../icons/set.ts";
+import { x as xIcon } from "../icons/glyphs/x.ts";
+import { check } from "../icons/glyphs/check.ts";
 import { OverflowText } from "./marquee.ts";
 
 export interface ChipProps {

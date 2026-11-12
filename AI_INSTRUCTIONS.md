@@ -108,6 +108,16 @@ shown; the server must enforce permissions.
 - Clean up manual subscriptions with `onCleanup`.
 - Test with `node --test` + `hadi-march/testing` (`renderTest`, `installDom`).
 
+**Performance, always** (page speed comes first)
+- Every route is a lazy chunk: `routes: { "/x": () => import("./pages/x.tsx") }`. Never import a page statically.
+- Heavy components (charts, tables, DatePicker, editors, maps, fx/landing) go behind `lazy(() => import("./X.tsx"))`
+  when they are not on the first screen. Keep the entry under 15 KB gzip: run `march build` and read the report. If
+  the entry is over budget, move the listed modules behind `import()`/`lazy()`.
+- Import named exports (`import { Card } from "hadi-march/ui"`), never `import * as` from a March module. Use
+  `hadi-march/icons/catalog` for icon galleries.
+- Leave `<Link>` prefetch on (default hover). Do not prefetch everything by hand.
+- Set `budget` in `march.config.js` for production apps; turn on `sw: true` when offline use matters.
+
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.
   March throws on `innerHTML`/string styles and refuses `<script>`/`<iframe>`.

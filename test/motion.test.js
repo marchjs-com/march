@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../src/testing/dom.ts";
 installDom();
-const { signal, h, render, For, lazy, createRoot } = await import("../src/index.ts");
+const { signal, h, render, For, lazyChildren, createRoot } = await import("../src/index.ts");
 const M = await import("../src/motion/index.ts");
 await import("../src/motion/install.ts"); // transition: names and <For animate> are opt-in now
 const { createRouter, navigate, Router, _resetRouter } = await import("../src/router/index.ts");
@@ -56,7 +56,7 @@ test("easing: cubicBezier matches its end points and is monotonic for ease-out",
 test("<For animate> runs the FLIP hook and keeps order", () => {
   const items = signal([1, 2, 3]);
   const el = document.createElement("ul");
-  render(() => h(For, { each: items, animate: true }, lazy(() => [(x) => h("li", {}, () => String(x()))])), el);
+  render(() => h(For, { each: items, animate: true }, lazyChildren(() => [(x) => h("li", {}, () => String(x()))])), el);
   items.set([3, 1, 2]);
   assert.deepEqual(el.querySelectorAll("li").map((l) => l.textContent), ["3", "1", "2"]);
 });

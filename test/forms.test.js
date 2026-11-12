@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, serialize, Event } from "../src/testing/dom.ts";
 const { document } = installDom();
-const { h, render, createRoot, signal, reactive, lazy } = await import("../src/index.ts");
+const { h, render, createRoot, signal, reactive, lazyChildren } = await import("../src/index.ts");
 const { schema } = await import("../src/schema/index.ts");
 const F = await import("../src/forms/index.ts");
 
@@ -98,7 +98,7 @@ test("Form with custom children uses useFormContext and Field", () => {
   const s = schema({ title: { type: "text", required: true } });
   let ctx;
   const Custom = () => { ctx = F.useFormContext(); return h("div", null, ctx.field("title", { help: "Short" }), h("input", ctx.register("title"))); };
-  const { el } = mount(() => h(F.Form, { schema: s }, lazy(() => h(Custom, {}))));
+  const { el } = mount(() => h(F.Form, { schema: s }, lazyChildren(() => h(Custom, {}))));
   const [a, b] = el.querySelectorAll("input");
   type(b, "Hello");
   assert.equal(ctx.values.title, "Hello");

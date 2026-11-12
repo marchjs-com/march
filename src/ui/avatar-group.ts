@@ -4,9 +4,9 @@ import "./display.css";
 import { untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
-import { Avatar } from "./display.ts";
+import { Avatar } from "./avatar.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "./util.ts";
-import { more } from "../icons/set.ts";
+import { more } from "../icons/glyphs/more.ts";
 
 export interface AvatarGroupProps { names: MaybeFn<readonly (string | { name: string; src?: string })[]>; max?: number; size?: "sm" | "md" | "lg"; class?: ClassProp }
 /** Overlapping avatars with "+N": `<AvatarGroup names={["Ada", "Linus", …]} max={4} />` */

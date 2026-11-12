@@ -4,7 +4,7 @@ import "./tabs.css";
 import { signal, computed, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { query as routeQuery, setQuery } from "../router/index.ts";
-import { Badge } from "./display.ts";
+import { Badge } from "./badge.ts";
 import { roving } from "./focus.ts";
 import { val, cx, uid, type MaybeFn, type ClassProp } from "./util.ts";
 

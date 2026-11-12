@@ -17,7 +17,12 @@ import { compareText } from "../core/text.ts";
 import { registerPages } from "./registry.ts";
 import { key as hotkey, formatKey } from "./keys.ts";
 import { val, cx, uid, icon, glyph, load, save, on, type MaybeFn, type ClassProp } from "./util.ts";
-import { menu, search as searchIcon, chevronRight, clock, panelLeft, x as xIcon } from "../icons/set.ts";
+import { menu } from "../icons/glyphs/menu.ts";
+import { search as searchIcon } from "../icons/glyphs/search.ts";
+import { chevronRight } from "../icons/glyphs/chevronRight.ts";
+import { clock } from "../icons/glyphs/clock.ts";
+import { panelLeft } from "../icons/glyphs/panelLeft.ts";
+import { x as xIcon } from "../icons/glyphs/x.ts";
 
 /** One NavSidebar entry. `href` navigates (router Link); `onSelect` runs instead. */
 export interface NavSidebarItem {

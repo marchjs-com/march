@@ -12,7 +12,8 @@ import { floating, type Placement } from "./popover.ts";
 import { roving } from "./focus.ts";
 import { formatKey } from "./keys.ts";
 import { val, cx, rest, uid, icon, glyph, later, debounce, type MaybeFn, type ClassProp } from "./util.ts";
-import { check, copy as copyIcon } from "../icons/set.ts";
+import { check } from "../icons/glyphs/check.ts";
+import { copy as copyIcon } from "../icons/glyphs/copy.ts";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";

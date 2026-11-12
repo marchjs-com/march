@@ -7,7 +7,11 @@ import { h } from "../dom/h.ts";
 import { For, Portal } from "../dom/flow.ts";
 import { t } from "../core/i18n.ts";
 import { val, glyph, type MaybeFn } from "./util.ts";
-import { x as xIcon, info, checkCircle, alertTriangle, alertCircle } from "../icons/set.ts";
+import { x as xIcon } from "../icons/glyphs/x.ts";
+import { info } from "../icons/glyphs/info.ts";
+import { checkCircle } from "../icons/glyphs/checkCircle.ts";
+import { alertTriangle } from "../icons/glyphs/alertTriangle.ts";
+import { alertCircle } from "../icons/glyphs/alertCircle.ts";
 const KIND_ICON = { info, success: checkCircle, warn: alertTriangle, danger: alertCircle } as const;
 
 export type ToastKind = "info" | "success" | "warn" | "danger";

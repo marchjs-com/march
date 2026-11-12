@@ -8,12 +8,17 @@ import { h } from "../dom/h.ts";
 import { t, locale } from "../core/i18n.ts";
 import { Link, path, navigate, type Href } from "../router/index.ts";
 import { can, type PermCheck } from "../access/index.ts";
-import { Badge } from "./display.ts";
+import { Badge } from "./badge.ts";
 import { rank } from "./fold.ts";
 import { compareText } from "../core/text.ts";
 import { registerPages } from "./registry.ts";
 import { val, cx, uid, icon, glyph, load, save, on, type MaybeFn, type ClassProp } from "./util.ts";
-import { menu, star, starFilled, chevronRight, search, panelLeft } from "../icons/set.ts";
+import { menu } from "../icons/glyphs/menu.ts";
+import { star } from "../icons/glyphs/star.ts";
+import { starFilled } from "../icons/glyphs/starFilled.ts";
+import { chevronRight } from "../icons/glyphs/chevronRight.ts";
+import { search } from "../icons/glyphs/search.ts";
+import { panelLeft } from "../icons/glyphs/panelLeft.ts";
 import { OverflowText } from "./marquee.ts";
 
 /** A NavMenu entry. */

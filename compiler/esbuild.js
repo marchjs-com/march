@@ -3,15 +3,31 @@
 //   import { march } from "hadi-march/esbuild";
 //   esbuild.build({ entryPoints: ["src/main.jsx"], bundle: true, plugins: [march({ components: "src/components" })] })
 import { readFile, writeFile } from "node:fs/promises";
-import { join, resolve, dirname } from "node:path";
+import { existsSync, statSync } from "node:fs";
+import { join, resolve, dirname, relative, sep } from "node:path";
 import { compile } from "./index.js";
 import { loadAutoImports, MARCH_ROOT, MODULES } from "./autoimports.js";
 import { setupCssSplit } from "./css-split.js";
+import { deepImports } from "./deep-imports.js";
+import { pruneBareImports } from "./prune-imports.js";
 
 /**
- * @param {{ components?: string|string[], i18nOut?: string, dev?: boolean, filter?: RegExp, onKeys?: (keys: string[]) => void, cssSplit?: boolean }} [opts]
+ * @param {{ components?: string|string[], i18nOut?: string, dev?: boolean, filter?: RegExp, onKeys?: (keys: string[]) => void, cssSplit?: boolean, deepImports?: boolean }} [opts]
  * cssSplit (default true): component CSS follows the component's code into the output chunk that uses it (css-split.js).
  */
+// `() => import("./pages/x.tsx")` → the same loader tagged with its source key (`.hm`), which the router and lazy()
+// look up in the build manifest to preload all of the route's chunks at once (see src/dom/preload.ts).
+const EXTS = ["", ".tsx", ".ts", ".jsx", ".js", "/index.tsx", "/index.ts", "/index.jsx", "/index.js"];
+export function tagLoaders(code, file, cwd) {
+  return code.replace(/\(\s*\)\s*=>\s*import\(\s*(["'])(\.{1,2}\/[^"'\n]+)\1\s*\)/g, (all, q, spec) => {
+    const base = resolve(dirname(file), spec);
+    const hit = EXTS.map((e) => base + e).find((p) => existsSync(p) && statSync(p).isFile());
+    if (!hit) return all;
+    const key = relative(cwd, hit).split(sep).join("/");
+    return `Object.assign(${all}, { hm: ${JSON.stringify(key)} })`;
+  });
+}
+
 export function march(opts = {}) {
   return {
     name: "march",
@@ -23,8 +39,11 @@ export function march(opts = {}) {
       if (opts.cssSplit !== false) setupCssSplit(build);
 
       // hadi-march/* → files of this March copy
-      const files = Object.fromEntries(MODULES.map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
-      build.onResolve({ filter: /^hadi-march(\/[\w-]+)?$/ }, (a) => (files[a.path] ? { path: files[a.path] } : undefined));
+      const files = Object.fromEntries([...MODULES, ["hadi-march/icons", "src/icons/index.ts"], ["hadi-march/icons/catalog", "src/icons/catalog.ts"], ["hadi-march/theme", "src/theme/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
+      // named imports from March barrels go straight to the defining module (see deep-imports.js); off with deepImports: false
+      const deep = opts.deepImports === false ? (c) => c : (c) => (c.includes("hadi-march") ? deepImports(c, files) : c);
+      const cwd = build.initialOptions.absWorkingDir ?? process.cwd();
+      build.onResolve({ filter: /^hadi-march(\/[\w-]+){1,2}$|^hadi-march$/ }, (a) => (files[a.path] ? { path: files[a.path] } : undefined));
       build.onResolve({ filter: /^hadi-march\/css\// }, (a) => ({ path: join(MARCH_ROOT, "src", a.path.slice("hadi-march/".length)) }));
 
       build.onLoad({ filter, namespace: "file" }, async (a) => {
@@ -32,7 +51,7 @@ export function march(opts = {}) {
         try {
           const r = compile(source, { filename: a.path, autoImports: auto, dev: opts.dev });
           for (const k of r.keys) keys.add(k);
-          let contents = r.code;
+          let contents = deep(tagLoaders(r.code, a.path, cwd));
           if (r.css) { css.set(a.path, r.css); contents += `\nimport ${JSON.stringify(`march-css:${a.path}`)};`; }
           return { contents, loader: a.path.endsWith(".tsx") ? "ts" : "js", resolveDir: dirname(a.path), warnings: r.warnings.map((text) => ({ text })) };
         } catch (e) {
@@ -40,9 +59,19 @@ export function march(opts = {}) {
           return { errors: [{ text: e.message.replace(/^March compile error in [^:]+(:\d+:\d+)?: /, ""), location: { file: a.path, line: e.line ?? 1, column: Math.max(0, (e.column ?? 1) - 1), lineText: source.split("\n")[(e.line ?? 1) - 1] ?? "" }, detail: e.frame }] };
         }
       });
+      // generated route tables (plain .js) get the same loader tags
+      build.onLoad({ filter: /routes\.gen\.js$/, namespace: "file" }, async (a) => ({ contents: deep(tagLoaders(await readFile(a.path, "utf8"), a.path, cwd)), loader: "js", resolveDir: dirname(a.path) }));
+      // the app's own .ts/.js modules (not March, not node_modules): same rewrites
+      build.onLoad({ filter: /\.(ts|js|mjs)$/, namespace: "file" }, async (a) => {
+        if (a.path.endsWith(".d.ts") || a.path.includes(sep + "node_modules" + sep) || a.path.startsWith(join(MARCH_ROOT, "src")) || a.path.startsWith(join(MARCH_ROOT, "compiler")) || !a.path.startsWith(cwd)) return undefined;
+        const code = await readFile(a.path, "utf8");
+        if (!code.includes("hadi-march") && !code.includes("import(")) return undefined;
+        return { contents: deep(tagLoaders(code, a.path, cwd)), loader: a.path.endsWith(".ts") ? "ts" : "js", resolveDir: dirname(a.path) };
+      });
       build.onResolve({ filter: /^march-css:/ }, (a) => ({ path: a.path.slice(10), namespace: "march-css" }));
       build.onLoad({ filter: /.*/, namespace: "march-css" }, (a) => ({ contents: css.get(a.path) ?? "", loader: "css" }));
-      build.onEnd(async () => {
+      build.onEnd(async (result) => {
+        if (opts.prune !== false && !result.errors?.length) await pruneBareImports(result, build, MARCH_ROOT);
         if (opts.onKeys) opts.onKeys([...keys]);
         if (opts.i18nOut) await writeFile(opts.i18nOut, `${JSON.stringify([...keys].sort(), null, 2)}\n`);
       });

@@ -12,7 +12,7 @@ import { importTs } from "./load-ts.js";
 const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.meta.url));
 
 const H = { h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave" };
-const HELPER_SOURCE = { h: "h", lazy: "lazy", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave" };
+const HELPER_SOURCE = { h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave" };
 const NO_WRAP = /^(on[A-Z]|on:|ref$|use:|bind:|key$)/;
 const ASSIGN_OPS = ["**=", "??=", "||=", "&&=", "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "|=", "^="];
 

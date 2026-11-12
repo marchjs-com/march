@@ -7,7 +7,8 @@
 //   march gen api openapi.json [--out src/api.gen.js] typed client + schemas from an OpenAPI 3 document
 //   march i18n [--messages src/i18n]                 report keys missing from translation files
 //   march check [--src src]                          type-check .tsx/.ts including March syntax (pipes, modifiers…)
-// Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html }.
+// Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html,
+//   budget: { entry, route, fail } (gzip JS bytes; false = off), sw: true (offline service worker), headers: false (no _headers) }.
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, cpSync, rmSync, watch } from "node:fs";
 import { join, resolve, relative, dirname, extname, basename, sep } from "node:path";
@@ -17,6 +18,7 @@ import { march } from "../compiler/esbuild.js";
 import { genRoutes } from "./routes.js";
 import { genApi, mockHandler } from "./openapi.js";
 import { templates } from "./templates.js";
+import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs } from "./perf.js";
 
 const cwd = process.cwd();
 const argv = process.argv.slice(2);
@@ -53,7 +55,7 @@ function buildOptions(cfg, esbuild, { dev }) {
 }
 
 /** Write index.html with the hashed entry script/style tags (no inline scripts). */
-function writeHtml(cfg, meta, { dev }) {
+function writeHtml(cfg, meta, { dev }, manifest = null) {
   const out = resolve(cwd, cfg.outdir);
   const src = existsSync(join(cwd, cfg.html)) ? readFileSync(join(cwd, cfg.html), "utf8") : templates.indexHtml();
   // the app entry (lazy pages are entry points of their own chunks too, so match the configured entry file)
@@ -61,7 +63,10 @@ function writeHtml(cfg, meta, { dev }) {
   const entry = Object.entries(meta.outputs).find(([, o]) => o.entryPoint && resolve(cwd, o.entryPoint) === want) ?? Object.entries(meta.outputs).find(([, o]) => o.entryPoint);
   const js = `/${relative(out, resolve(cwd, entry[0])).split(sep).join("/")}`;
   const css = entry[1].cssBundle ? `/${relative(out, resolve(cwd, entry[1].cssBundle)).split(sep).join("/")}` : null;
-  const tags = `${css ? `<link rel="stylesheet" href="${css}">` : ""}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : ""}`;
+  // the chunk manifest is a JSON data block (never executed, so CSP script-src does not apply); the router and lazy()
+  // read it to preload all of a route's files at once
+  const data = manifest && Object.keys(manifest).length ? `<script type="application/json" id="march-manifest">${JSON.stringify(manifest).replace(/</g, "\\u003c")}</script>` : "";
+  const tags = `${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : ""}`;
   const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
   writeFileSync(join(out, "index.html"), html);
 }
@@ -88,8 +93,21 @@ async function build({ dev = false } = {}) {
   const t0 = Date.now();
   try {
     const r = await esbuild.build(buildOptions(cfg, esbuild, { dev }));
-    writeHtml(cfg, r.metafile, { dev });
+    const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
+    writeHtml(cfg, r.metafile, { dev }, chunks.manifest);
     if (cfg.themes !== false) await copyThemes(out, esbuild, { dev });
+    if (!dev) {
+      if (cfg.headers !== false && !existsSync(join(out, "_headers"))) writeFileSync(join(out, "_headers"), headersFile());
+      if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
+      const rep = sizeReport(chunks, out, cfg.budget);
+      printReport(rep);
+      writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ entry: rep.rows[0], routes: rep.rows.slice(1).map(({ name, js, css, files }) => ({ name, js, css, files })), budget: rep.budget }, null, 2)}\n`);
+      if (rep.over.length) {
+        const msg = `bütçe aşıldı: ${rep.over.map((x) => x.name).join(", ")}`;
+        if (rep.over.some((x) => x.entry) || flag("--analyze") === true) { console.log("  girişte en büyük modüller (min, gzip öncesi) — ağır olanı import()/lazy() arkasına alın:"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, flag("--analyze") === true ? 40 : 12)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
+        if (rep.budget?.fail) { console.error(`\x1b[31m✖\x1b[0m ${msg}`); process.exitCode = 1; } else console.warn(`\x1b[33m!\x1b[0m ${msg}`);
+      }
+    }
     const bytes = Object.values(r.metafile.outputs).reduce((s, o) => s + o.bytes, 0);
     console.log(`\x1b[32m✔\x1b[0m built ${relative(cwd, out)} in ${Date.now() - t0} ms (${(bytes / 1024).toFixed(1)} KB)`);
     return r;
@@ -121,7 +139,7 @@ async function dev() {
     b.onEnd((r) => {
       lastErrors = r.errors.map((e) => ({ text: e.text, file: e.location?.file, line: e.location?.line, column: e.location?.column, lineText: e.location?.lineText, detail: typeof e.detail === "string" ? e.detail : "" }));
       if (r.errors.length) { r.errors.forEach((e) => console.error(formatError(e))); send("build-error", lastErrors); return; }
-      try { writeHtml(cfg, r.metafile, { dev: true }); } catch { /* first build */ }
+      try { writeHtml(cfg, r.metafile, { dev: true }, chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry }).manifest); } catch { /* first build */ }
       console.log(`\x1b[32m✔\x1b[0m rebuilt`);
       send("reload", {});
     });

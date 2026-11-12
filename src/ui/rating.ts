@@ -4,7 +4,8 @@ import { signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "./util.ts";
-import { star, starFilled } from "../icons/set.ts";
+import { star } from "../icons/glyphs/star.ts";
+import { starFilled } from "../icons/glyphs/starFilled.ts";
 
 export interface RatingProps {
   value?: MaybeFn<number | null | undefined>;

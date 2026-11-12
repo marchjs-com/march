@@ -139,7 +139,33 @@ Without the plugin, `hadi-march/css/ui.css` and `hadi-march/css/forms.css` still
 `test/size.test.js` builds the one-Button app and fails if another component's class or code, another theme or the
 router gets in, or if it grows past its budget (`node bench/size.js` prints the entry sizes).
 
-## Performance
+## Performance, always
+
+A March app is a single-page app that loads progressively: nothing is downloaded before it is needed, everything that
+arrives is cached.
+
+- **Small first download.** The entry holds the core, the router and the shell. Each route is its own chunk
+  (`() => import("./pages/x.tsx")`); heavy components load on first render with `lazy()` and a skeleton:
+  `const Chart = lazy(() => import("./SalesChart.tsx"))`. The command palette, themes and charts load on first use.
+- **No waterfalls.** `march build` writes a chunk manifest into `index.html` (a JSON data block, CSP safe). The compiler
+  tags each `() => import()` with its key, so loading a route fetches all of its files at once with
+  `<link rel="modulepreload">`. Named imports from `hadi-march/ui` etc. are compiled to the defining module, and bare
+  imports of chunks the entry does not use are removed. Without both, esbuild would put page-only code into a chunk the
+  entry must load.
+- **Prefetch.** `<Link>` prefetches its route on hover/focus (`prefetch="hover" | "visible" | "none"`). When idle after
+  the first page, the router prefetches the routes linked from what is on screen with `<link rel="prefetch">` (lowest
+  priority, at most 6). Both are off when the user saves data or the connection is 2G-class.
+- **Cache.** File names are content-hashed; `march build` writes a `_headers` file (Netlify / Cloudflare Pages format)
+  that serves `assets/*` as `immutable` and revalidates the page. With `sw: true` in `march.config.js` it also writes
+  `sw.js`: `import { registerServiceWorker } from "hadi-march/sw"` caches chunks the first time they arrive, opens
+  the app offline on the second visit and deletes the caches of older versions. `register()` is a Trusted Types sink:
+  under `require-trusted-types-for 'script'` the CSP must allow the `march-sw` policy.
+- **Budget.** Every build prints the gzip size of the entry and of each route and writes `march-report.json`. With
+  `budget: { entry: 15 * 1024, route: 60 * 1024, fail: true }` an overrun fails the build. When the entry is over,
+  the build lists its largest modules (`march build --analyze` always does). The goal is under 15 KB of entry JS and an
+  LCP under 1 s on slow 4G.
+- **Icons** are one module each (`src/icons/glyphs/`, generated from `set.ts`). An icon gallery reads
+  `hadi-march/icons/catalog` instead of `import * as icons`.
 
 `npm run bench` creates/updates keyed lists of 1,000 and 10,000 rows and runs table, chart (10k–100k points with LTTB)
 and animation scenarios. Only changed bindings update; keyed rows are reused and moved, never re-created.

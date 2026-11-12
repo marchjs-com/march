@@ -6,11 +6,16 @@ import { signal, computed, untrack, effect, onCleanup, type Signal } from "../co
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { Link, back as historyBack, type Href } from "../router/index.ts";
-import { actionsOf, type ActionsProp } from "./display.ts";
+import { actionsOf } from "./display-base.ts";
+import { type ActionsProp } from "./display.ts";
 import { Tabs, type TabSpec } from "./tabs.ts";
 import { key } from "./keys.ts";
 import { val, cx, rest, debounce, glyph, type MaybeFn, type ClassProp } from "./util.ts";
-import { arrowLeft, search as searchIcon, x as xIcon, chevronLeft, chevronRight } from "../icons/set.ts";
+import { arrowLeft } from "../icons/glyphs/arrowLeft.ts";
+import { search as searchIcon } from "../icons/glyphs/search.ts";
+import { x as xIcon } from "../icons/glyphs/x.ts";
+import { chevronLeft } from "../icons/glyphs/chevronLeft.ts";
+import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 
 /** A breadcrumb; the last one is the current page. */
 export interface Breadcrumb { label: MaybeFn<string>; href?: Href }

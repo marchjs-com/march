@@ -9,6 +9,7 @@ import { provideLink } from "../dom/link.ts";
 import { signal, computed, untrack, batch, effect, onCleanup, read, getOwner } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { Try } from "../dom/flow.ts";
+import { preloadChunks, loaderKey, saveData, whenIdle } from "../dom/preload.ts";
 
 // ------------------------------------------------------------------ types
 type Component = (props: Record<string, unknown>) => unknown;
@@ -30,6 +31,12 @@ export interface RouterOptions {
   notFound?: unknown;
   scroll?: boolean;
   title?: (to: RouteTarget) => string | null | undefined;
+  /**
+   * Speculative downloads (default "idle"): once the first page is shown and the browser is idle, the chunks of the
+   * routes linked from the page are fetched with <link rel="modulepreload"> (not executed). Off with "none", and
+   * always off when the user saves data or is on a 2G-class connection.
+   */
+  prefetch?: "idle" | "none";
 }
 
 /** Augmented by the generated pages.d.ts: `declare module "hadi-march/router" { interface Register { routes: "/" | "/users/:id" } }`. */
@@ -172,8 +179,9 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
     let page: View | null = null, mod: PageModule | null = null;
     let meta: Record<string, unknown> = {};
     if (m) {
-      mod = await loadRoute(m.route);
-      const layouts = await Promise.all((m.route.layouts ?? []).map((l) => loadModule(l)));
+      // page and layouts in parallel (each preloads all of its chunks at once: no import waterfall)
+      const [pageMod, ...layouts] = await Promise.all([loadRoute(m.route), ...(m.route.layouts ?? []).map((l) => loadModule(l))]);
+      mod = pageMod ?? null;
       if (seq !== r.seq) return;
       meta = { ...(m.route.meta ?? {}), ...(mod?.meta ?? {}) };
       const to: RouteTarget = { path: p, params: m.params, query: Object.fromEntries(new URLSearchParams(search)), meta, route: m.route };
@@ -197,6 +205,7 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
     if (navWrapper && !initial) await navWrapper(apply, { pop }); else apply();
     lastUrl = globalThis.location?.href ?? "";
     if (r.opts.scroll !== false) restoreScroll(pop);
+    if (initial && r.opts.prefetch !== "none") whenIdle(prefetchLinks, 3000);
   } catch (e) {
     if (seq === r.seq) r.view.set({ error: e });
   } finally {
@@ -208,6 +217,7 @@ const moduleCache = new Map<Loader, Promise<PageModule | null>>();
 function loadModule(l: Loader): Promise<PageModule | null> {
   let p = moduleCache.get(l);
   if (!p) {
+    preloadChunks(loaderKey(l));
     p = Promise.resolve(l()).then((m) => (typeof m === "function" ? { default: m as Component } : (m as PageModule)));
     p.catch(() => moduleCache.delete(l));
     moduleCache.set(l, p);
@@ -217,6 +227,42 @@ function loadModule(l: Loader): Promise<PageModule | null> {
 function loadRoute(rt: CompiledRoute): Promise<PageModule | null> {
   if (rt.component) return Promise.resolve({ default: rt.component });
   return rt.load ? loadModule(rt.load) : Promise.resolve(null);
+}
+
+/**
+ * Fetch (but do not run) every chunk a route needs, via the build manifest: one round of <link rel="modulepreload">.
+ * Without a manifest (dev server, tests) it falls back to preload(). Skipped when the user saves data.
+ */
+export function prefetch(to: string): void {
+  const r = S.router;
+  if (!r || saveData()) return;
+  const m = matchRoute(r.routes, String(to).split(/[?#]/)[0] ?? "/");
+  if (!m || m.route.component) return;
+  const loaders = [m.route.load, ...(m.route.layouts ?? [])].filter((l): l is Loader => !!l);
+  const known = loaders.map((l) => preloadChunks(loaderKey(l)));
+  if (known.some((k) => !k)) void preload(to);
+}
+
+/**
+ * Prefetch (lowest priority, <link rel="prefetch">) the routes linked from what is on screen now, at most `max`
+ * routes; called when idle after the first page.
+ */
+export function prefetchLinks(max = 6): void {
+  const d = globalThis.document, r = S.router;
+  if (!d || !r || saveData()) return;
+  const seen = new Set<string>();
+  const vh = globalThis.innerHeight || 0, vw = globalThis.innerWidth || 0;
+  for (const a of d.querySelectorAll<HTMLAnchorElement>("a[href]")) {
+    if (seen.size >= max) break;
+    const b = a.getBoundingClientRect?.();
+    if (b && vh && (b.bottom < 0 || b.top > vh || b.right < 0 || b.left > vw || (!b.width && !b.height))) continue;
+    const raw = a.getAttribute("href") ?? "";
+    const to = r.mode === "hash" ? (raw.startsWith("#/") ? raw.slice(1) : null) : raw.startsWith("/") && !raw.startsWith("//") ? raw.slice(r.base.length) || "/" : null;
+    if (!to || seen.has(to)) continue;
+    seen.add(to);
+    const m = matchRoute(r.routes, to.split(/[?#]/)[0] ?? "/");
+    if (m && !m.route.component && m.path !== S.path.peek()) for (const l of [m.route.load, ...(m.route.layouts ?? [])]) if (l) preloadChunks(loaderKey(l), true);
+  }
 }
 
 /** Load a route's page (and layouts) ahead of time, e.g. on hover. */
@@ -334,17 +380,18 @@ export function Router(props: { loading?: Renderable; fallback?: unknown; notFou
   });
 }
 
-/** `<Link href="/users" exact preload="hover">Users</Link>` — client-side navigation, aria-current, preloading. */
-export function Link(props: { href: Href | (() => Href); exact?: boolean; replace?: boolean; preload?: "hover" | "visible" | "none"; target?: string; children?: unknown; [k: string]: unknown }): unknown {
+/** `<Link href="/users" exact prefetch="hover">Users</Link>` — client-side navigation, aria-current, preloading. */
+export function Link(props: { href: Href | (() => Href); exact?: boolean; replace?: boolean; preload?: "hover" | "visible" | "none"; prefetch?: "hover" | "visible" | "none"; target?: string; children?: unknown; [k: string]: unknown }): unknown {
   const href = (): string => String(read(props.href));
   const active = (): boolean => {
     const p = S.path(), to = href().split("?")[0] ?? "";
     return props.exact ? p === to : p === to || (to !== "/" && p.startsWith(`${to}/`));
   };
   const rest: Record<string, unknown> = { ...props };
-  for (const k of ["href", "exact", "activeClass", "children", "replace", "preload"]) delete rest[k];
-  const mode = props.preload ?? "hover";
-  const pre = (): void => { void preload(href()); };
+  for (const k of ["href", "exact", "activeClass", "children", "replace", "preload", "prefetch"]) delete rest[k];
+  // prefetch (download only, via the manifest) on hover/focus by default; "visible" when it scrolls into view
+  const mode = props.prefetch ?? props.preload ?? "hover";
+  const pre = (): void => prefetch(href());
   const a = h("a", {
     ...rest,
     href: () => (S.router?.mode === "hash" ? `#${href()}` : `${S.router?.base ?? ""}${href()}`),

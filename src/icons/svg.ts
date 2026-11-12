@@ -8,7 +8,8 @@ export interface IconDef { readonly name: string; readonly d: readonly string[];
 const NS = "http://www.w3.org/2000/svg";
 
 /** Make an icon definition (frozen). `fill: true` draws filled shapes instead of strokes. */
-export const defineIcon = (name: string, d: readonly string[], fill = false): IconDef => Object.freeze({ name, d: Object.freeze([...d]), ...(fill ? { fill } : {}) });
+/** Pure: unused icons are dropped from bundles (esbuild honours @__NO_SIDE_EFFECTS__). */
+export const defineIcon = /* @__NO_SIDE_EFFECTS__ */ (name: string, d: readonly string[], fill = false): IconDef => Object.freeze({ name, d: Object.freeze([...d]), ...(fill ? { fill } : {}) });
 
 export const isIconDef = (x: unknown): x is IconDef =>
   !!x && typeof x === "object" && Array.isArray((x as IconDef).d) && typeof (x as IconDef).name === "string";

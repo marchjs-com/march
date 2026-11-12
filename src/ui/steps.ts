@@ -2,7 +2,7 @@
 import "./steps.css";
 import { h } from "../dom/h.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
-import { check } from "../icons/set.ts";
+import { check } from "../icons/glyphs/check.ts";
 
 export interface StepItem { title: unknown; description?: unknown; icon?: unknown }
 export interface StepsProps { steps: readonly StepItem[]; current: MaybeFn<number>; onSelect?: (i: number) => void; vertical?: boolean; class?: ClassProp }

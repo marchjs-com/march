@@ -147,7 +147,7 @@ test("If / Else branch disposal", () => {
   const show = signal(true);
   const log = [];
   const A = () => { onCleanup(() => log.push("A gone")); return h("span", {}, "A"); };
-  const { el } = mount(() => h("div", {}, h(If, { when: show, else: () => h("em", {}, "B") }, M.lazy(() => [h(A, {})]))));
+  const { el } = mount(() => h("div", {}, h(If, { when: show, else: () => h("em", {}, "B") }, M.lazyChildren(() => [h(A, {})]))));
   assert.equal(el.textContent, "A");
   show.set(false);
   assert.equal(el.textContent, "B");
@@ -159,7 +159,7 @@ test("If / Else branch disposal", () => {
 test("For: keyed reuse, reorder, update in place, removal", () => {
   const items = signal([{ id: 1, n: "a" }, { id: 2, n: "b" }, { id: 3, n: "c" }]);
   let created = 0;
-  const { el } = mount(() => h("ul", {}, h(For, { each: items, key: "id" }, M.lazy(() => [(it) => { created++; return h("li", {}, () => it().n); }]))));
+  const { el } = mount(() => h("ul", {}, h(For, { each: items, key: "id" }, M.lazyChildren(() => [(it) => { created++; return h("li", {}, () => it().n); }]))));
   const lis = () => el.querySelectorAll("li");
   assert.equal(lis().map((x) => x.textContent).join(), "a,b,c");
   const first = lis()[0];
@@ -173,9 +173,9 @@ test("For: keyed reuse, reorder, update in place, removal", () => {
 
 test("Switch / Match", () => {
   const s = signal("b");
-  const { el } = mount(() => h(Switch, { fallback: () => "none" }, M.lazy(() => [
-    h(Match, { when: () => s() === "a" }, M.lazy(() => ["A"])),
-    h(Match, { when: () => s() === "b" }, M.lazy(() => ["B"])),
+  const { el } = mount(() => h(Switch, { fallback: () => "none" }, M.lazyChildren(() => [
+    h(Match, { when: () => s() === "a" }, M.lazyChildren(() => ["A"])),
+    h(Match, { when: () => s() === "b" }, M.lazyChildren(() => ["B"])),
   ])));
   assert.equal(el.textContent, "B");
   s.set("z");
@@ -184,21 +184,21 @@ test("Switch / Match", () => {
 
 test("Try catches render errors and async component errors; async components show then resolve", async () => {
   const Boom = () => { throw new Error("bad"); };
-  const { el } = mount(() => h(Try, { fallback: (e, reset) => h("p", {}, `oops ${e.message}`), log: false }, M.lazy(() => [h(Boom, {})])));
+  const { el } = mount(() => h(Try, { fallback: (e, reset) => h("p", {}, `oops ${e.message}`), log: false }, M.lazyChildren(() => [h(Boom, {})])));
   assert.equal(el.textContent, "oops bad");
   const Late = async () => { await tick(); return h("b", {}, "ready"); };
-  const m2 = mount(() => h(Try, { loading: () => "…", log: false }, M.lazy(() => [h(Late, {})])));
+  const m2 = mount(() => h(Try, { loading: () => "…", log: false }, M.lazyChildren(() => [h(Late, {})])));
   assert.equal(m2.el.textContent, "…");
   await tick(); await tick();
   assert.equal(m2.el.textContent, "ready");
   const Fail = async () => { await tick(); throw new Error("late"); };
-  const m3 = mount(() => h(Try, { fallback: (e) => `caught ${e.message}`, log: false }, M.lazy(() => [h(Fail, {})])));
+  const m3 = mount(() => h(Try, { fallback: (e) => `caught ${e.message}`, log: false }, M.lazyChildren(() => [h(Fail, {})])));
   await tick(); await tick();
   assert.equal(m3.el.textContent, "caught late");
 });
 
 test("Await", async () => {
-  const { el } = mount(() => h(Await, { for: Promise.resolve(41), loading: "wait" }, M.lazy(() => [(v) => `got ${v + 1}`])));
+  const { el } = mount(() => h(Await, { for: Promise.resolve(41), loading: "wait" }, M.lazyChildren(() => [(v) => `got ${v + 1}`])));
   assert.equal(el.textContent, "wait");
   await tick();
   assert.equal(el.textContent, "got 42");

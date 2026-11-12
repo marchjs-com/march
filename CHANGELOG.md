@@ -4,6 +4,18 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Progressive loading (later in 0.1.0)
+- `lazy(() => import("./X.tsx"))` (`hadi-march/lazy`, auto-imported): component chunks with a skeleton, `.preload()`.
+  The old internal children marker is now `lazyChildren` (compiler helper).
+- Build manifest in `index.html` + loader tags from the compiler: a route's chunks preload at once (`modulepreload`).
+  `<Link prefetch="hover|visible|none">`; idle `rel=prefetch` of on-screen links; off with Save-Data / 2G.
+- Named imports from March barrels compile to the defining module, and bare imports of unused side-effect-free chunks
+  are pruned, so pages' code no longer rides along with the entry. `display.ts` is split per component; icons are one
+  module each (`glyphs/`, generated) plus `hadi-march/icons/catalog` for galleries; the command palette view loads on
+  first open. Showcase entry: 70.9 → 42.6 KB gzip (sum of files).
+- `march build`: per-route gzip report + `march-report.json`, `budget` (warn / `fail`), largest entry modules
+  (`--analyze`), `_headers` (immutable assets), optional `sw.js` (`sw: true`) with `hadi-march/sw`.
+
 ### Fixed (later in 0.1.0)
 - Works when installed under `node_modules` (e.g. `npm i github:tlghn/hadimarch#sha`): node refuses to strip types there, so
   the compiler (auto-import table, `sx`) imports March's sources from a mirror in the OS temp folder, and

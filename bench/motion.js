@@ -3,12 +3,12 @@
 import { fileURLToPath } from "node:url";
 export async function run({ installDom }) {
   installDom();
-  const { signal, h, render, For, lazy, createRoot } = await import("../src/index.ts");
+  const { signal, h, render, For, lazyChildren, createRoot } = await import("../src/index.ts");
   const M = await import("../src/motion/index.ts");
   const ms = (fn) => { const t = performance.now(); fn(); return performance.now() - t; };
   const items = signal(Array.from({ length: 1000 }, (_, i) => i));
   const el = document.createElement("ul");
-  render(() => h(For, { each: items, animate: true }, lazy(() => [(x) => h("li", {}, () => String(x()))])), el);
+  render(() => h(For, { each: items, animate: true }, lazyChildren(() => [(x) => h("li", {}, () => String(x()))])), el);
   const flip = ms(() => items.set([...items.peek()].reverse()));
   const target = signal(0);
   let springs = [];

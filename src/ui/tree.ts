@@ -4,7 +4,7 @@ import { signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
-import { chevronRight } from "../icons/set.ts";
+import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 import { OverflowText } from "./marquee.ts";
 
 export interface TreeNode { id: string; label: unknown; icon?: unknown; meta?: unknown; children?: readonly TreeNode[] }

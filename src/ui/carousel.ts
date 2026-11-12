@@ -4,7 +4,8 @@ import { signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "./util.ts";
-import { chevronLeft, chevronRight } from "../icons/set.ts";
+import { chevronLeft } from "../icons/glyphs/chevronLeft.ts";
+import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 
 export interface CarouselProps { label?: MaybeFn<string | undefined>; /** Slides per view on wide screens. */ perView?: 1 | 2 | 3 | 4; class?: ClassProp; children?: unknown }
 /** Scroll-snap carousel with buttons and dots (swipe on touch): `<Carousel perView={3}>{slides}</Carousel>` */

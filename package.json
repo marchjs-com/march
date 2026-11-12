@@ -21,6 +21,8 @@
     "./crud": "./src/crud/index.ts",
     "./forms": "./src/forms/index.ts",
     "./register": "./compiler/register.js",
+    "./lazy": "./src/lazy/index.ts",
+    "./sw": "./src/sw/index.ts",
     "./motion": "./src/motion/index.ts",
     "./motion/motion.css": "./src/motion/motion.css",
     "./fx": "./src/fx/index.ts",
@@ -29,6 +31,7 @@
     "./i18n": "./src/i18n/index.ts",
     "./i18n/tr": "./src/i18n/tr.ts",
     "./icons": "./src/icons/index.ts",
+    "./icons/catalog": "./src/icons/catalog.ts",
     "./theme": "./src/theme/index.ts",
     "./motion/install": "./src/motion/install.ts",
     "./css/themes/*": "./src/css/themes/*"

@@ -6,9 +6,10 @@ import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { Link, type Href } from "../router/index.ts";
 import { Menu, type MenuItem } from "./menu.ts";
-import { Avatar } from "./display.ts";
+import { Avatar } from "./avatar.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
-import { chevronsUpDown, arrowUpRight } from "../icons/set.ts";
+import { chevronsUpDown } from "../icons/glyphs/chevronsUpDown.ts";
+import { arrowUpRight } from "../icons/glyphs/arrowUpRight.ts";
 import { OverflowText } from "./marquee.ts";
 
 export interface BrandProps {
