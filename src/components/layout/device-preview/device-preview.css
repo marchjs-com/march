@@ -50,3 +50,6 @@
 .hm-device-screen.is-pressed .hm-device-touch { scale: .8; background: color-mix(in srgb, var(--hm-primary) 35%, transparent); }
 .hm-device:not(.is-touch) .hm-device-touch { display: none; }
 @media (prefers-reduced-motion: reduce) { .hm-device-touch { transition: none; } }
+/* a preview is looked at, not copied from: only fields keep text selection */
+.hm-device-screen { user-select: none; -webkit-user-select: none; }
+.hm-device-screen :is(input, textarea, select, [contenteditable="true"]) { user-select: text; -webkit-user-select: text; }
