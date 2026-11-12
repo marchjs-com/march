@@ -4,6 +4,7 @@
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, Portal |
 
 ## Chip
 
@@ -16,3 +17,18 @@ A label pill. Three uses: a static label, a **filter** you can switch on and off
 ```
 
 Full page: src/components/chip/docs.md
+
+## DockLayout
+
+An IDE workspace: split areas holding tab groups. Drag a tab to a **side** of a group (a new split), onto its **centre** or **between two tabs** (a tab there), to an **edge** of the whole layout, or **out** of it (a floating window). An animated preview shows where it will land. Groups maximize, panels minimize to a tray, and the layout is saved and loaded as plain JSON. Each panel's content is rendered once and moves between groups without being rebuilt.
+
+```tsx
+<DockLayout panels={[
+  { id: "files", title: "Files", icon: folder, content: () => <FileTree /> },
+  { id: "editor", title: "main.ts", icon: fileText, content: () => <Editor />, dirty: () => $dirty },
+  { id: "console", title: "Console", icon: terminal, content: () => <Console /> },
+]} layout={{ row: [["files"], { column: [["editor"], ["console"]], share: .68 }], share: .26 }}
+   persist="ide.layout" storage={storage().local} api={(a) => dock = a} />
+```
+
+Full page: src/components/composite/dock-layout/docs.md

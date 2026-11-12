@@ -56,6 +56,14 @@ export const calendar = /* @__PURE__ */ i("calendar", ["b:3,4.5,18,16.5,2", "M3 
 export const clock = /* @__PURE__ */ i("clock", ["o:12,12,9", "M12 7v5l3 2"]);
 export const hourglass = /* @__PURE__ */ i("hourglass", ["M5 22h14", "M5 2h14", "M17 22v-4.2a2 2 0 0 0-.6-1.4L12 12l-4.4 4.4a2 2 0 0 0-.6 1.4V22", "M7 2v4.2a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2"]);
 
+export const maximize = /* @__PURE__ */ i("maximize", ["M15 3h6v6", "M9 21H3v-6", "M21 3l-7 7", "M3 21l7-7"]);
+export const minimize = /* @__PURE__ */ i("minimize", ["M4 14h6v6", "M20 10h-6V4", "M14 10l7-7", "M3 21l7-7"]);
+export const appWindow = /* @__PURE__ */ i("app-window", ["b:3,4,18,16,2", "M3 9h18", "M7 6.5h.01", "M10 6.5h.01"]);
+export const columns = /* @__PURE__ */ i("columns", ["b:3,3,18,18,2", "M12 3v18"]);
+export const rows = /* @__PURE__ */ i("rows", ["b:3,3,18,18,2", "M3 12h18"]);
+export const gitBranch = /* @__PURE__ */ i("git-branch", ["o:6,5,2", "o:6,19,2", "o:18,7,2", "M6 7v10", "M18 9a6 6 0 0 1-6 6H8"]);
+export const files = /* @__PURE__ */ i("files", ["M15 3H9a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z", "M15 3v5h5", "M4 7v12a2 2 0 0 0 2 2h9"]);
+
 // ---- status
 export const info = /* @__PURE__ */ i("info", ["o:12,12,9", "M12 16v-4", "M12 8h.01"]);
 export const alertTriangle = /* @__PURE__ */ i("alert-triangle", ["M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z", "M12 9v4", "M12 17h.01"]);

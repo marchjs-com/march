@@ -440,4 +440,5 @@ separate button handler. Manager events go through `setManagerEmit`.
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, Portal |
 <!-- components:end -->
