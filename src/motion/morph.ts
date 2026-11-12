@@ -41,27 +41,56 @@ function frames(a: Box, b: Box, mode: "clip" | "scale"): [Keyframe, Keyframe] {
 const pick = (o: MorphOptions): AnimateOptions => ({ duration: 520, easing: "expo", fill: "none", ...o });
 const vis = (el: Element, on: boolean): void => { (el as HTMLElement).style?.setProperty("visibility", on ? "" : "hidden"); };
 
+// One morph run per element: a newer morph / morphBack on any of its elements stops it first (its effects removed,
+// a source it hid shown again), so overlapping clicks and reopening never stack effects or measure a moved box.
+interface Run { els: Element[]; anims: Playback[]; hidden: Element | null }
+const runs = new WeakMap<Element, Run>();
+function stop(el: Element, keepHidden?: Element): void {
+  const r = runs.get(el);
+  if (!r) return;
+  for (const e of r.els) if (runs.get(e) === r) runs.delete(e);
+  for (const a of r.anims) a.cancel();
+  if (r.hidden && r.hidden !== keepHidden) vis(r.hidden, true);
+}
+function claim(r: Run): Run { for (const e of r.els) { stop(e, r.hidden ?? undefined); runs.set(e, r); } return r; }
+
 /** `to` (already laid out where it ends) grows out of `from`'s box. */
 export function morph(from: Element, to: Element, o: MorphOptions = {}): Playback {
-  const mode = o.mode ?? "clip";
+  const mode = o.mode ?? "clip", hide = o.hideSource !== false;
+  const r = claim({ els: [from, to], anims: [], hidden: hide ? from : null });
   const [f0, f1] = frames(box(from), box(to), mode);
-  if (o.hideSource !== false) vis(from, false);
-  const p = animate(to, [f0, f1], pick(o));
+  if (hide) vis(from, false);
+  // one Playback for the box and its content: finish / cancel / finished cover both
+  const p = animate(to, [f0, f1], { ...pick(o), autoplay: false });
   if (mode === "clip" && o.fadeContent !== false && to.children.length) {
-    animate(Array.from(to.children), [{ opacity: 0 }, { opacity: 1 }], { duration: (o.duration ?? 520) * 0.5, delay: (o.duration ?? 520) * 0.3, easing: "out", fill: "backwards" });
+    p.add(Array.from(to.children), [{ opacity: 0 }, { opacity: 1 }], { at: 0, duration: (o.duration ?? 520) * 0.5, delay: (o.duration ?? 520) * 0.3, easing: "out", fill: "backwards" });
   }
-  return p;
+  r.anims.push(p);
+  return o.autoplay === false ? p : p.play();
 }
 
 /** `from` (shown) shrinks into `to`'s box; `to` is shown again at the end. Remove or close `from` after `finished`. */
 export function morphBack(from: Element, to: Element, o: MorphOptions = {}): Playback {
+  // the shrunk state is held until the caller's `finished` handlers ran, then every effect and inline style comes off
+  // `from` (a hidden `from` opens clean next time); a newer morph on either element cancels this one (state "idle")
   const mode = o.mode ?? "clip";
+  const r = claim({ els: [from, to], anims: [], hidden: to });
+  vis(to, false);
   const [f0, f1] = frames(box(to), box(from), mode);
+  const p = animate(from, [f1, f0], { duration: 420, easing: "in-out", fill: "forwards", ...o, autoplay: false });
   if (mode === "clip" && o.fadeContent !== false && from.children.length) {
-    animate(Array.from(from.children), [{ opacity: 1 }, { opacity: 0 }], { duration: (o.duration ?? 420) * 0.35, easing: "in", fill: "forwards" });
+    p.add(Array.from(from.children), [{ opacity: 1 }, { opacity: 0 }], { at: 0, duration: (o.duration ?? 420) * 0.35, easing: "in", fill: "forwards" });
   }
-  const p = animate(from, [f1, f0], { duration: 420, easing: "in-out", fill: "forwards", ...o });
-  void p.finished.then(() => vis(to, true), () => vis(to, true));
+  r.anims.push(p);
+  if (o.autoplay !== false) p.play();
+  const done = (): void => {
+    if (runs.get(from) !== r) return; // stopped by a newer morph: it already cleaned up
+    vis(to, true);
+    r.hidden = null;
+    // after the caller's own `finished` handlers (which hide or remove `from`): drop the held end state
+    setTimeout(() => { if (runs.get(from) === r) stop(from); }, 0);
+  };
+  void p.finished.then(done, done);
   return p;
 }
 
@@ -90,7 +119,10 @@ export type MorphIconName = keyof typeof MORPH_ICONS;
 /** Morph an icon <path> into another MORPH_ICONS shape (or any `d` with the same commands). */
 export function morphIcon(path: Element, to: MorphIconName | string, o: AnimateOptions = {}): Playback {
   const d = (MORPH_ICONS as Record<string, string>)[to] ?? to;
-  return morphPath(path, d, { duration: 380, easing: "spring-snappy", ...o });
+  stop(path);
+  const p = morphPath(path, d, { duration: 380, easing: "spring-snappy", ...o });
+  runs.set(path, { els: [path], anims: [p], hidden: null });
+  return p;
 }
 
 // ── shapes: radial outlines sampled at the same angles, so clip-path polygons interpolate cleanly ──
@@ -122,8 +154,13 @@ export function shapePolygon(shape: ShapeName, n = 60): string {
 export function shapeMorph(el: Element, to: ShapeName, o: AnimateOptions & { points?: number } = {}): Playback {
   const s = el as HTMLElement, n = o.points ?? 60;
   const prev = s.getAttribute("data-hm-shape") as ShapeName | null;
-  const from = shapePolygon(prev ?? "circle", n), end = shapePolygon(to, n);
+  // interrupted mid-way: go on from the outline on screen (same point count), not from the last shape
+  const cur = runs.has(el) ? globalThis.getComputedStyle?.(el)?.clipPath ?? "" : "";
+  const from = cur.startsWith("polygon(") && cur.split(",").length === n ? cur : shapePolygon(prev ?? "circle", n), end = shapePolygon(to, n);
   s.setAttribute("data-hm-shape", to);
+  stop(el);
   s.style?.setProperty("clip-path", end);
-  return animate(el, [{ clipPath: from }, { clipPath: end }], { duration: 650, easing: "spring", ...o });
+  const p = animate(el, [{ clipPath: from }, { clipPath: end }], { duration: 650, easing: "spring", ...o });
+  runs.set(el, { els: [el], anims: [p], hidden: null });
+  return p;
 }
