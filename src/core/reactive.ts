@@ -27,13 +27,20 @@ class OwnerNode {
 /** Opaque owner handle (component branch, effect, root). */
 export type Owner = OwnerNode;
 
-interface Source { observers: Set<Computation> | null; /** called when its last observer leaves (selector keys) */ drop?(): void }
+/** Who reads a node: one computation (the common case, no Set) or a Set of them. */
+type Observers = Computation | Set<Computation> | null;
+interface Source { observers: Observers; /** called when its last observer leaves (selector keys) */ drop?(): void }
+/** Calls fn for every observer (a copy-free walk over the one-or-many slot). */
+function forObservers(o: Observers, fn: (c: Computation) => void): void {
+  if (o instanceof Set) for (const c of o) fn(c);
+  else if (o) fn(o);
+}
 
 class Computation extends OwnerNode implements Source {
   state: State = DIRTY;
   /** What it read last run (an array: the observer set of each source already rules out duplicates). */
   sources: Source[] | null = null;
-  observers: Set<Computation> | null = null;
+  observers: Observers = null;
   equals: (a: unknown, b: unknown) => boolean = Object.is;
   fn: (prev: unknown) => unknown;
   value: unknown;
@@ -42,7 +49,7 @@ class Computation extends OwnerNode implements Source {
 }
 
 class SignalNode implements Source {
-  observers: Set<Computation> | null = null;
+  observers: Observers = null;
   equals: (a: unknown, b: unknown) => boolean;
   value: unknown;
   constructor(value: unknown, equals?: Equals<unknown>) { this.value = value; this.equals = equals === false ? () => false : equals ?? Object.is; }
@@ -59,26 +66,37 @@ function track(node: Source): void {
   const l = Listener;
   if (!l) return;
   const obs = node.observers;
-  if (obs) { if (obs.has(l)) return; obs.add(l); } else node.observers = new Set([l]);
+  if (!obs) node.observers = l;
+  else if (obs === l) return;
+  else if (obs instanceof Set) { if (obs.has(l)) return; obs.add(l); }
+  else node.observers = new Set([obs, l]);
   if (l.sources) l.sources.push(node); else l.sources = [node];
 }
 
 function markObservers(node: Source, state: State): void {
-  if (!node.observers) return;
-  for (const o of node.observers) {
-    if (o.state < state) {
-      const was = o.state;
-      o.state = state;
-      if (o.effect) { if (was === CLEAN) queue.push(o); }
-      else markObservers(o, CHECK);
-    }
+  const obs = node.observers;
+  if (!obs) return;
+  if (obs instanceof Set) { for (const o of obs) mark(o, state); }
+  else mark(obs, state);
+}
+function mark(o: Computation, state: State): void {
+  if (o.state < state) {
+    const was = o.state;
+    o.state = state;
+    if (o.effect) { if (was === CLEAN) queue.push(o); }
+    else markObservers(o, CHECK);
   }
 }
 
 function cleanNode(c: Computation): void {
   if (c.sources) {
     const src = c.sources;
-    for (let i = 0; i < src.length; i++) { const x = src[i]!; x.observers?.delete(c); if (x.drop && !x.observers?.size) x.drop(); }
+    for (let i = 0; i < src.length; i++) {
+      const x = src[i]!, o = x.observers;
+      if (o === c) x.observers = null;
+      else if (o instanceof Set) { o.delete(c); if (!o.size) x.observers = null; }
+      if (x.drop && !x.observers) x.drop();
+    }
     c.sources = null;
   }
   disposeChildren(c);
@@ -104,7 +122,7 @@ function disposeOwner(o: OwnerNode): void {
   if (o instanceof Computation) {
     cleanNode(o);
     o.state = CLEAN;
-    if (o.observers) for (const x of o.observers) { const i = x.sources?.indexOf(o) ?? -1; if (i >= 0) x.sources!.splice(i, 1); }
+    forObservers(o.observers, (x) => { const i = x.sources?.indexOf(o) ?? -1; if (i >= 0) x.sources!.splice(i, 1); });
     o.observers = null;
   } else disposeChildren(o);
 }
@@ -146,10 +164,10 @@ function run(c: Computation): void {
   Listener = prevL; Owner = prevO;
   if (!c.effect && !c.equals(c.value, next)) {
     c.value = next;
-    if (c.observers) for (const o of c.observers) {
+    forObservers(c.observers, (o) => {
       o.state = DIRTY;
       if (o.effect) { if (!queue.includes(o)) queue.push(o); } else markObservers(o, CHECK);
-    }
+    });
   } else c.value = next;
 }
 
@@ -182,7 +200,9 @@ export function signal<T>(value: T, opts?: { equals?: Equals<T>; name?: string }
   const node = new SignalNode(value, opts?.equals as Equals<unknown> | undefined);
   const read = (() => { track(node); return node.value as T; }) as Signal<T>;
   const w = read as unknown as Record<string | symbol, unknown>;
-  w["peek"] = () => node.value as T;
+  // peek and update are shared (they read the node through `this`); set is a closure, it is passed around unbound
+  w["n"] = node;
+  w["peek"] = peekCell;
   w["set"] = (v: T): T => {
     if (Listener && !Listener.effect && DEV.enabled) DEV.warn(`writing signal${opts?.name ? ` "${opts.name}"` : ""} in computed(); use an effect.`);
     if (node.equals(node.value, v)) return v;
@@ -191,12 +211,14 @@ export function signal<T>(value: T, opts?: { equals?: Equals<T>; name?: string }
     flush();
     return v;
   };
-  w["update"] = (fn: (v: T) => T): T => read.set(fn(node.value as T));
+  w["update"] = updateSignal;
   w[REACTIVE] = true;
   w["signal"] = true;
   if (opts?.name) w["displayName"] = opts.name;
   return read;
 }
+
+function updateSignal(this: Signal<unknown> & { n: SignalNode }, fn: (v: unknown) => unknown): unknown { return this.set(fn(this.n.value)); }
 
 /** A bare signal for list rows (<For>): the accessor plus `peek`, written with _setCell. No per-row method closures. */
 export interface Cell<T> extends Accessor<T> { n: SignalNode }
