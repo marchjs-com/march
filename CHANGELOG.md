@@ -4,6 +4,32 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Credit (later in 0.1.0)
+- `<MadeWithMarch />` (`src/components/made-with-march`, category actions): optional "Developed with HADI March and 💗" line, variants text / badge / small, link in one constant (`MARCH_URL`). The licence stays MIT; using it is a request.
+- `credit: true` in `march.config.js` adds `<!-- Built with HADI March -->` to the built `index.html` (off by default).
+- Console banner: `march dev` prints one styled line ("🧡 HADI March v0.1 · link") once per page; `banner: false` removes it. Production prints nothing and the bundle is byte-identical; `credit: true` prints the same line in production from a separate `credit.js`. The link constant moved to `src/brand.js`.
+### Text animations (later in 0.1.0)
+- `hadi-march/motion/text`: 56 text animations, one export each (entrances / exits, loops, decorations, content effects
+  such as typewriter, scramble, counter, odometer, word cycle, morph, and pointer effects). One shared core: `splitText()`
+  (accessible hidden copy + aria-hidden parts, grapheme clusters, RTL, joining scripts by word) and a stagger runner.
+- Everything plays on the motion engine (global speed, pause all, reduced motion). The core is about 1.5 KB gzip, each
+  animation 25–520 B more (`bench/text-size.js`, budget test). Catalog: `hadi-march/motion/text/meta`.
+### Chunks and budgets (later in 0.1.0)
+- Route tables (`src/routes.ts`, `src/routes.gen.js`, `chunks.routeTables`): their lazy imports are pages; they group
+  like the entry's own and are never folded into the table, so a start-up route table does not grow with pages.
+- Page groups respect `budget.route`: a merge whose download would be over it is not made, and a built group that is
+  over it is taken apart and planned again; a small page left alone joins the cheapest group within budget.
+- Showcase: the route table and the page list left the entry (start-up chunk with the shell pieces); entry 15.3 → 14.3 KB.
+
+### SEO (later in 0.1.0)
+- `hadi-march/seo`: `installSeo({ site, titleTemplate, defaults })`, route / page `head`, reactive `useHead()`, Open
+  Graph and Twitter cards, automatic canonical (history routing), `noindex` on not-found, JSON-LD builders (`ld.*`).
+- `march build` with `seo: { prerender }` writes each route's HTML (head and route CSS included) at build time, plus
+  `sitemap.xml` and `robots.txt`; `hydrate()` (`hadi-march/seo/hydrate`) takes the markup over without a blank frame
+  and drops it at once when the URL shows another route (hash routing safe).
+- `march seo check`: missing title, description, canonical, img alt, invalid JSON-LD; `checkHtml()` in the browser.
+- Router: `head` on routes and page modules, `setHeadHandler()`.
+
 ### Build output (later in 0.1.0)
 - `stableNames: true` / `--stable-names`: `main.js`, `chunks/home.js`, `chunks/shared-N.js` with `?v=<version>` in every
   reference (imports, CSS loaders, index.html, manifest): deploys overwrite the same paths; deterministic output.

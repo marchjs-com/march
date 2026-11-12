@@ -1,0 +1,14 @@
+/* Accessibility preferences (managers/accessibility): attributes on <html>, set by a11y.set(). */
+/* :root ×3 outranks the theme selectors (e.g. :root[data-hm-theme][data-theme="dark"]), whatever theme is active */
+:root:root:root[data-hm-a11y-contrast] {
+  --hm-muted: var(--hm-text);
+  --hm-text-2: var(--hm-text);
+  --hm-faint: color-mix(in srgb, var(--hm-text) 75%, var(--hm-bg));
+  --hm-border: color-mix(in srgb, var(--hm-text) 55%, var(--hm-bg));
+  --hm-border-subtle: color-mix(in srgb, var(--hm-text) 40%, var(--hm-bg));
+  --hm-border-strong: var(--hm-text);
+}
+html[data-hm-a11y-links] a:where(:not([role]):not(.hm-btn)) { text-decoration-line: underline; text-underline-offset: .18em; }
+html[data-hm-a11y-spacing] body { line-height: 1.5; letter-spacing: .12em; word-spacing: .16em; }
+html[data-hm-a11y-spacing] p { margin-block-end: 2em; }
+html[data-hm-a11y-focus] :focus-visible { outline: 3px solid var(--hm-focus) !important; outline-offset: 2px !important; box-shadow: 0 0 0 6px color-mix(in srgb, var(--hm-focus) 25%, transparent) !important; }

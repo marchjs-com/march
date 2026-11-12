@@ -57,7 +57,7 @@ export function march(opts = {}) {
       if (opts.cssSplit !== false) setupCssSplit(build);
 
       // hadi-march/* → files of this March copy
-      const files = Object.fromEntries([...MODULES, ["hadi-march/icons", "src/icons/index.ts"], ["hadi-march/icons/catalog", "src/icons/catalog.ts"], ["hadi-march/theme", "src/theme/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
+      const files = Object.fromEntries([...MODULES, ["hadi-march/icons", "src/icons/index.ts"], ["hadi-march/icons/catalog", "src/icons/catalog.ts"], ["hadi-march/theme", "src/theme/index.ts"], ["hadi-march/seo", "src/seo/index.ts"], ["hadi-march/seo/hydrate", "src/seo/hydrate.ts"], ["hadi-march/testing", "src/testing/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
       // named imports from March barrels go straight to the defining module (see deep-imports.js); off with deepImports: false
       const deep = opts.deepImports === false ? (c) => c : (c) => (c.includes("hadi-march") ? deepImports(c, files) : c);
       const cwd = build.initialOptions.absWorkingDir ?? process.cwd();

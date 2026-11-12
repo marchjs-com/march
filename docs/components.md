@@ -8,6 +8,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 
 ### Composite — `hadi-march/composite`
 
@@ -45,3 +46,15 @@ Composed of: Splitter, Tabs, Portal
 ```
 
 Full page: src/components/composite/dock-layout/docs.md
+
+## MadeWithMarch
+
+An optional credit line: "Developed with HADI March and 💗", with "HADI March" as a link. Using it is a request, not a requirement: the licence stays MIT and nothing here is needed to use March.
+
+```tsx
+<MadeWithMarch />
+<MadeWithMarch variant="badge" />
+<MadeWithMarch variant="small" />
+```
+
+Full page: src/components/actions/made-with-march/docs.md

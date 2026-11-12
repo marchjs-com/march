@@ -157,6 +157,8 @@ const tr: Record<string, string> = {
   "Reason for this change": "Bu değişikliğin gerekçesi",
   "Recent": "Son kullanılanlar",
   "Reload": "Yenile",
+  "Developed with {0} and {1}": "{0} ve {1} ile geliştirildi",
+  "Love": "Sevgi",
   "Remove": "Kaldır",
   "Remove filter {0}": "{0} süzgecini kaldır",
   "Remove {0}": "{0} kaldır",
