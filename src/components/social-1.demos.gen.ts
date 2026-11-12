@@ -5,4 +5,6 @@ import * as d1 from "./composite/chat-composer/demo.tsx";
 import * as p1 from "./composite/chat-composer/playground.ts";
 import * as d2 from "./composite/chat-thread/demo.tsx";
 import * as p2 from "./composite/chat-thread/playground.ts";
-export { d0, p0, d1, p1, d2, p2 };
+import * as d3 from "./social/count-roll/demo.tsx";
+import * as p3 from "./social/count-roll/playground.ts";
+export { d0, p0, d1, p1, d2, p2, d3, p3 };

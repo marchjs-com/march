@@ -8,16 +8,18 @@ import m4 from "./chip/meta.ts";
 import m5 from "./social/count-roll/meta.ts";
 import m6 from "./overlays/drawer/meta.ts";
 import m7 from "./composite/feed/meta.ts";
-import m8 from "./social/like-button/meta.ts";
-import m9 from "./social/media-grid/meta.ts";
-import m10 from "./composite/post-card/meta.ts";
-import m11 from "./feedback/pull-to-refresh/meta.ts";
-import m12 from "./social/reaction-picker/meta.ts";
-import m13 from "./social/story-progress/meta.ts";
-import m14 from "./social/story-ring/meta.ts";
-import m15 from "./composite/story-viewer/meta.ts";
-import m16 from "./social/typing-indicator/meta.ts";
-import m17 from "./data/virtual-list/meta.ts";
+import m8 from "./social/follow-button/meta.ts";
+import m9 from "./social/like-button/meta.ts";
+import m10 from "./social/media-grid/meta.ts";
+import m11 from "./composite/post-card/meta.ts";
+import m12 from "./composite/profile-header/meta.ts";
+import m13 from "./feedback/pull-to-refresh/meta.ts";
+import m14 from "./social/reaction-picker/meta.ts";
+import m15 from "./social/story-progress/meta.ts";
+import m16 from "./social/story-ring/meta.ts";
+import m17 from "./composite/story-viewer/meta.ts";
+import m18 from "./social/typing-indicator/meta.ts";
+import m19 from "./data/virtual-list/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 export const registry: readonly RegistryEntry[] = [
@@ -26,17 +28,19 @@ export const registry: readonly RegistryEntry[] = [
   { folder: "composite/chat-composer", meta: m2, code: "<ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p1) },
   { folder: "composite/chat-thread", meta: m3, code: "<ChatThread messages={$messages} typing={$typing} group onReact={toggleReaction} onReply={(m) => $replyTo = m} />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p2) },
   { folder: "chip", meta: m4, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./chip/demo.tsx"), playground: () => import("./chip/playground.ts") },
-  { folder: "social/count-roll", meta: m5, code: "<CountRoll value={$likes} />\n<CountRoll value={$followers} format=\"full\" />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "social/count-roll", meta: m5, code: "<CountRoll value={$likes} />\n<CountRoll value={$followers} format=\"full\" />", demo: () => import("./social-1.demos.gen.ts").then((m) => m.d3), playground: () => import("./social-1.demos.gen.ts").then((m) => m.p3) },
   { folder: "overlays/drawer", meta: m6, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
-  { folder: "composite/feed", meta: m7, code: "<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p1) },
-  { folder: "social/like-button", meta: m8, code: "<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p2) },
-  { folder: "social/media-grid", meta: m9, code: "<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d3), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p3) },
-  { folder: "composite/post-card", meta: m10, code: "<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p0) },
-  { folder: "feedback/pull-to-refresh", meta: m11, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./navigation.demos.gen.ts").then((m) => m.d1), playground: () => import("./navigation.demos.gen.ts").then((m) => m.p1) },
-  { folder: "social/reaction-picker", meta: m12, code: "<ReactionPicker selected={msg.myReaction} onPick={(e) => react(msg, e)} />\n<ReactionPicker layout=\"grid\" onPick={insertAtCaret} />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p1) },
-  { folder: "social/story-progress", meta: m13, code: "<StoryProgress count={items.length} index={$i} run={item.id} paused={$hold} onDone={next} />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p2) },
-  { folder: "social/story-ring", meta: m14, code: "<StoryRing name={u.name} src={u.avatar} state={u.seen ? \"seen\" : \"new\"} label={u.handle} onClick={() => open(u)} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p0) },
-  { folder: "composite/story-viewer", meta: m15, code: "<StoryViewer open={$open} onClose={() => $open = false} groups={stories} start={tappedId} onSeen={markSeen} onReply={send} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p1) },
-  { folder: "social/typing-indicator", meta: m16, code: "<TypingIndicator names={$typing} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p2) },
-  { folder: "data/virtual-list", meta: m17, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d3), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p3) },
+  { folder: "composite/feed", meta: m7, code: "<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p0) },
+  { folder: "social/follow-button", meta: m8, code: "<FollowButton state={$state} name={user.name} onChange={(s) => $state = s} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p1) },
+  { folder: "social/like-button", meta: m9, code: "<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p2) },
+  { folder: "social/media-grid", meta: m10, code: "<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />", demo: () => import("./social-2.demos.gen.ts").then((m) => m.d3), playground: () => import("./social-2.demos.gen.ts").then((m) => m.p3) },
+  { folder: "composite/post-card", meta: m11, code: "<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p0) },
+  { folder: "composite/profile-header", meta: m12, code: "<ProfileHeader user={u} follow={$f} onFollow={(s) => $f = s} onMessage={openChat} onStat={openList} />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p1) },
+  { folder: "feedback/pull-to-refresh", meta: m13, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./navigation.demos.gen.ts").then((m) => m.d1), playground: () => import("./navigation.demos.gen.ts").then((m) => m.p1) },
+  { folder: "social/reaction-picker", meta: m14, code: "<ReactionPicker selected={msg.myReaction} onPick={(e) => react(msg, e)} />\n<ReactionPicker layout=\"grid\" onPick={insertAtCaret} />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p2) },
+  { folder: "social/story-progress", meta: m15, code: "<StoryProgress count={items.length} index={$i} run={item.id} paused={$hold} onDone={next} />", demo: () => import("./social-3.demos.gen.ts").then((m) => m.d3), playground: () => import("./social-3.demos.gen.ts").then((m) => m.p3) },
+  { folder: "social/story-ring", meta: m16, code: "<StoryRing name={u.name} src={u.avatar} state={u.seen ? \"seen\" : \"new\"} label={u.handle} onClick={() => open(u)} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d0), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p0) },
+  { folder: "composite/story-viewer", meta: m17, code: "<StoryViewer open={$open} onClose={() => $open = false} groups={stories} start={tappedId} onSeen={markSeen} onReply={send} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d1), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p1) },
+  { folder: "social/typing-indicator", meta: m18, code: "<TypingIndicator names={$typing} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d2), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p2) },
+  { folder: "data/virtual-list", meta: m19, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./social-4.demos.gen.ts").then((m) => m.d3), playground: () => import("./social-4.demos.gen.ts").then((m) => m.p3) },
 ];

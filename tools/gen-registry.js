@@ -7,7 +7,7 @@
 //   AI_INSTRUCTIONS.md            the catalogue table between the <!-- components:begin/end --> markers
 //   node tools/gen-registry.js          write
 //   node tools/gen-registry.js --check  fail (exit 1) when a written file is out of date
-import { readdirSync, readFileSync, writeFileSync, existsSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync, existsSync, statSync, unlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -106,6 +106,11 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     if (now === text) continue;
     if (check) { console.error(`✖ ${rel} is out of date: run node tools/gen-registry.js`); stale++; }
     else { writeFileSync(p, text); console.log(`✔ ${rel}`); }
+  }
+  // demo modules of an earlier slicing (fewer cards, a page renamed) go away
+  for (const f of readdirSync(DIR).filter((f) => f.endsWith(".demos.gen.ts") && !files[`src/components/${f}`])) {
+    if (check) { console.error(`✖ src/components/${f} is stale: run node tools/gen-registry.js`); stale++; }
+    else { unlinkSync(join(DIR, f)); console.log(`✖ removed src/components/${f}`); }
   }
   for (const p of problems) console.error(`✖ ${p}`);
   if (stale || problems.length) process.exit(1);
