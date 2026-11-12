@@ -115,7 +115,7 @@ test("CodeInput: length 3–12, pattern, groups, brand colors per box, paste tri
   const a = mount(() => h(U.CodeInput, { length: 3, pattern: "alpha" })).querySelector(".hm-otp-box");
   a.value = "7"; a.dispatchEvent(new Event("input", { bubbles: true })); assert.equal(a.value, "", "alpha drops digits");
   a.value = "ş"; a.dispatchEvent(new Event("input", { bubbles: true })); assert.equal(a.value, "Ş", "letters are upper-cased (locale aware)");
-  assert.match(read("theme/presets.ts"), /--hm-otp-1: \$\{a\}; --hm-otp-2: \$\{b\}; --hm-otp-3: \$\{d\}; --hm-otp-4: \$\{e\}; --hm-otp-font: var\(--hm-font-display\);/, "HADİ default: brand colors + display font");
+  assert.match(read("theme/css.ts"), /--hm-otp-1: \$\{a\}; --hm-otp-2: \$\{b\}; --hm-otp-3: \$\{d\}; --hm-otp-4: \$\{e\}; --hm-otp-font: var\(--hm-font-display\);/, "HADİ default: brand colors + display font");
 });
 
 test("Rating follows the accent (gold on request); multicolor components are marked", () => {

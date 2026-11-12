@@ -66,6 +66,8 @@ export interface ThemeInfo {
   description?: string;
   /** Stylesheet URL of the theme (default: `themes/<id>.css` next to the page; see setThemeBase). */
   href?: string;
+  /** A theme made at run time (ThemeEditor): applies itself instead of loading a stylesheet; true when ready. */
+  load?: () => boolean | Promise<boolean>;
 }
 const THEME_NAME_KEY = "hm.colorTheme";
 const infos = signal<readonly ThemeInfo[]>(THEME_NAMES.map((x) => ({ ...x })));
@@ -83,6 +85,8 @@ const hrefOf = (id: string): string => {
 export function loadTheme(id: string): Promise<boolean> {
   const d = globalThis.document;
   if (!d || id === DEFAULT_THEME) return Promise.resolve(true);
+  const own = infos.peek().find((x) => x.id === id)?.load;
+  if (own) return Promise.resolve(own());
   const existing = d.querySelector<HTMLLinkElement>(`link[data-hm-theme-css="${id}"]`);
   if (existing) return (existing as HTMLLinkElement & { _hmReady?: Promise<boolean> })._hmReady ?? Promise.resolve(true);
   const l = d.createElement("link") as HTMLLinkElement & { _hmReady?: Promise<boolean> };

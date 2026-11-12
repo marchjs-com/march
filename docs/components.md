@@ -94,6 +94,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
+| ThemeEditor | experimental | Theme builder: color tokens for light and dark with a WCAG audit, type, shape and motion, a live scoped preview, code / CSS / JSON out. | [ColorPicker](#colorpicker), [EasingCurveEditor](#easingcurveeditor), Tabs, Segmented, Slider, Select, TextInput, Textarea, Toggle, Button, IconButton, CopyButton, Badge, ThemeSwatch, CodeView |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
 | Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress |
@@ -683,6 +684,19 @@ Composed of: Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#like
 ```
 
 Full page: src/components/composite/story-viewer/docs.md
+
+## ThemeEditor
+
+Make a whole theme and watch it live. Start from a built-in theme (HADİ, Classic Cream, Night Blue, Neon, Indigo, Minimal, High Contrast) or from scratch with one accent color; edit every color token for light and dark with a full ColorPicker (accent, surfaces, text, border, status, HADİ brand colors, the categorical palette), pick tones from an automatic tone scale, and fix contrast with the WCAG audit. Type (font families, scale ratio, line heights, weights), shape (radius scale, spacing, density, shadows, border width) and motion (durations, three easing curves) are tokens too. The preview is a small app screen of real components scoped to the editor (`data-hm-theme` + the draft's variables) in light or dark, LTR or RTL, with or without motion; "Apply to the app" switches the whole app to it. Out come the defineTheme module, the stylesheet (themeCss) and JSON; in go pasted JSON, CSS or a share link.
+
+Composed of: [ColorPicker](#colorpicker), [EasingCurveEditor](#easingcurveeditor), Tabs, Segmented, Slider, Select, TextInput, Textarea, Toggle, Button, IconButton, CopyButton, Badge, ThemeSwatch, CodeView
+
+```tsx
+<ThemeEditor />
+<ThemeEditor bind:value={$draft} base="night" />
+```
+
+Full page: src/components/composite/theme-editor/docs.md
 
 ## ThemeMenu
 
