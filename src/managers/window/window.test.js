@@ -12,13 +12,13 @@ globalThis.BroadcastChannel = class {
   close() { bcNet.delete(this); }
 };
 const { appWindow, configureWindow, disposeWindow } = await import("./index.ts");
-const { setManagerEmit } = await import("../manager.ts");
+const { onManager } = await import("../manager.ts");
 const tick = (ms = 10) => new Promise((r) => setTimeout(r, ms));
 
 test("other tabs: count, leader, messages, bye", async () => {
   configureWindow({ channel: "test:window", heartbeat: 50, ttl: 150 });
   const events = [];
-  const prev = setManagerEmit((e) => events.push(`${e.manager}:${e.type}`));
+  const prev = onManager("*", (e) => events.push(`${e.manager}:${e.type}`));
   const w = appWindow();
   assert.equal(w.count(), 1);
   assert.equal(w.leader(), true, "alone = leader");
@@ -44,7 +44,7 @@ test("other tabs: count, leader, messages, bye", async () => {
   assert.equal(w.leader(), true);
   assert.ok(events.includes("window:tabs") && events.includes("window:leader") && events.includes("window:message"));
   other.close();
-  setManagerEmit(prev);
+  prev();
   disposeWindow();
 });
 

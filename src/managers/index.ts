@@ -1,15 +1,13 @@
 // Managers: app-wide services with one instance, lazy start, global config and dispose (see manager.ts).
 // Import a single manager by its own path (hadi-march/managers/viewport…) to bundle only that one.
-export { defineManager, emit, setManagerEmit } from "./manager.ts";
-export type { Manager, ManagerEvent, ManagerEmit, Disposable } from "./manager.ts";
+export { defineManager, emit, onManager, managerChannel, managerChannelOf } from "./manager.ts";
+export type { Manager, ManagerEvent, ManagerMessage, ManagerChannelMessage, Disposable } from "./manager.ts";
 export { viewport, configureViewport, disposeViewport, viewportManager } from "./viewport/index.ts";
 export type { Viewport, ViewportConfig, Breakpoints, ContainerSize, PointerKind, Orientation, SafeArea } from "./viewport/index.ts";
 export { consent, configureConsent, disposeConsent, consentManager, DEFAULT_CATEGORIES } from "./consent/index.ts";
 export type { Consent, ConsentConfig, ConsentRecord, ConsentCategory, CategoryInfo, ConsentMethod, ConsentListener } from "./consent/index.ts";
 export { command, commands, onCommandRun, configureCommands, disposeCommands, commandManager, pickCommands, normalizeShortcut, ariaKeys } from "./command/index.ts";
 export type { Command, CommandSpec, CommandContext, CommandRun, CommandConfig, CommandPick, Concurrency, ShortcutConflict } from "./command/index.ts";
-export { connectManagerChannels, disconnectManagerChannels, onManager, managerChannel } from "./channels/index.ts";
-export type { ManagerMessage } from "./channels/index.ts";
 export { idle, configureIdle, disposeIdle, idleManager } from "./idle/index.ts";
 export type { Idle, IdleConfig } from "./idle/index.ts";
 export { sync, configureSync, disposeSync, syncManager } from "./sync/index.ts";
@@ -30,8 +28,7 @@ export { session, configureSession, disposeSession, sessionManager } from "./ses
 export type { Session, SessionConfig } from "./session/index.ts";
 export { presence, configurePresence, disposePresence, presenceManager } from "./presence/index.ts";
 export type { Presence, PresenceConfig, PresenceState, Peer } from "./presence/index.ts";
-export { managerChannelOf, publisher } from "./publish.ts";
-export type { ManagerChannelMessage } from "./publish.ts";
+export { publisher } from "./publish.ts";
 export { clipboard, configureClipboard, disposeClipboard, clipboardManager } from "./clipboard/index.ts";
 export type { Clipboard, ClipboardConfig, ClipContent, ClipEntry, PasteData } from "./clipboard/index.ts";
 export { undoStack, undoCommands, configureUndo, disposeUndo, undoManager } from "./undo/index.ts";

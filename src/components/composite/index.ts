@@ -2,4 +2,5 @@
 // Composite: Components built from other components (composedOf). Import: hadi-march/composite
 export * from "./bottom-nav/index.ts";
 export * from "./feed/index.ts";
+export * from "./nav-sidebar/index.ts";
 export * from "./post-card/index.ts";

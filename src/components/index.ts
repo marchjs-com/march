@@ -7,6 +7,7 @@ export * from "./composite/feed/index.ts";
 export * from "./social/like-button/index.ts";
 export * from "./actions/made-with-march/index.ts";
 export * from "./social/media-grid/index.ts";
+export * from "./composite/nav-sidebar/index.ts";
 export * from "./composite/post-card/index.ts";
 export * from "./feedback/pull-to-refresh/index.ts";
 export * from "./data/virtual-list/index.ts";

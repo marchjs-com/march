@@ -44,6 +44,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
+| NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
 
 ## BottomNav
@@ -162,6 +163,21 @@ Composed of: Skeleton
 ```
 
 Full page: src/components/social/media-grid/docs.md
+
+## NavSidebar
+
+The app's side menu: categories that open and close, a typo-tolerant search over every item, recent visits and featured items at the top, a collapsible icon rail and a resizable width, all remembered per user. Items are links (router `Link`), so the current page is marked and the menu follows navigation.
+
+Composed of: OverflowText, Link
+
+```tsx
+<NavSidebar title="Acme" items={[
+  { id: "/orders", label: "Orders", href: "/orders", group: "Sales", icon: cart, badge: () => $open },
+  { id: "/users", label: "Users", href: "/users", group: "Admin", can: "users.read" },
+]} collapsible resizable groupOrder={["Sales", "Admin"]} />
+```
+
+Full page: src/components/composite/nav-sidebar/docs.md
 
 ## PostCard
 

@@ -22,7 +22,7 @@ test("OverflowText: dir=auto, one readable copy, fade or ellipsis", () => {
 test("Marquee defaults to a visible loop; NavSidebar labels use OverflowText", () => {
   const m = h(U.Marquee, { text: "Duyuru" });
   assert.match(m.getAttribute("class"), /hm-marquee/);
-  const src = readFileSync(new URL("../src/ui/sidebar.ts", import.meta.url), "utf8");
+  const src = readFileSync(new URL("../src/components/composite/nav-sidebar/index.ts", import.meta.url), "utf8");
   assert.match(src, /h\(OverflowText, \{ class: "hm-sb-label"/);
 });
 
@@ -34,9 +34,9 @@ test("marquee.css: logical fade (RTL flips), reduced motion falls back", () => {
 
 test("one-line labels scroll instead of ending in an ellipsis", () => {
   const read = (f) => readFileSync(new URL(`../src/${f}`, import.meta.url), "utf8");
-  const uses = { "ui/sidebar.ts": ["hm-sb-label", "hm-sb-sub", "hm-sb-gname"], "ui/nav.ts": ["hm-nav-label"], "ui/app.ts": ["hm-link-card-title", "hm-user-name"],
+  const uses = { "components/composite/nav-sidebar/index.ts": ["hm-sb-label", "hm-sb-sub", "hm-sb-gname"], "ui/nav.ts": ["hm-nav-label"], "ui/app.ts": ["hm-link-card-title", "hm-user-name"],
     "components/actions/chip/index.ts": ["hm-chip2-label"], "ui/palette-view.ts": ["hm-pal-title"], "ui/tree.ts": ["hm-tree-label"], "forms/pickers.ts": ["hm-chip-label"], "forms/file.ts": ["hm-file-name"] };
   for (const [f, list] of Object.entries(uses)) for (const c of list) assert.ok(read(f).includes(`h(OverflowText, { class: "${c}"`), `${f} ${c}`);
-  assert.match(read("ui/sidebar.ts"), /class: "hm-sb-sub", mode: "loop", play: \(\) => active\(\) === x\.id/, "loops; the selected item keeps scrolling");
+  assert.match(read("components/composite/nav-sidebar/index.ts"), /class: "hm-sb-sub", mode: "loop", play: \(\) => active\(\) === x\.id/, "loops; the selected item keeps scrolling");
   assert.doesNotMatch(read("ui/app.css"), /line-clamp/, "LinkCard description is not clamped");
 });

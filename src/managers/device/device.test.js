@@ -5,7 +5,7 @@ import { installDom } from "../../testing/dom.ts";
 
 installDom();
 const { device, configureDevice, disposeDevice } = await import("./index.ts");
-const { setManagerEmit } = await import("../manager.ts");
+const { onManager } = await import("../manager.ts");
 // a minimal event target (the fake DOM replaces Event, which Node's own EventTarget rejects)
 const target = (props) => { const l = {}; return Object.assign({ addEventListener(t, f) { (l[t] ??= new Set()).add(f); }, removeEventListener(t, f) { l[t]?.delete(f); }, fire(t) { for (const f of [...(l[t] ?? [])]) f(); } }, props); };
 const tick = (ms = 5) => new Promise((r) => setTimeout(r, ms));
@@ -39,7 +39,7 @@ test("capabilities, low-end and features", async () => {
 test("network and battery are signals with events", async () => {
   disposeDevice();
   const events = [];
-  const prev = setManagerEmit((e) => events.push(e));
+  const prev = onManager("*", (e) => events.push(e));
   const d = device();
   assert.equal(d.network().effectiveType, "4g");
   assert.equal(d.slowNetwork(), false);
@@ -58,5 +58,5 @@ test("network and battery are signals with events", async () => {
   disposeDevice();
   conn.effectiveType = "4g";
   conn.fire("change");
-  setManagerEmit(prev);
+  prev();
 });

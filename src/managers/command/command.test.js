@@ -10,7 +10,7 @@ const { setAccess } = await import("../../access/index.ts");
 const { commands: paletteCommands } = await import("../../ui/registry.ts");
 const { command, commands, onCommandRun, disposeCommands, configureCommands, normalizeShortcut } = await import("./index.ts");
 const { commandItems, CommandButton, bindCommandKeys } = await import("./ui.ts");
-const { setManagerEmit } = await import("../manager.ts");
+const { onManager } = await import("../manager.ts");
 const tick = (ms = 5) => new Promise((r) => setTimeout(r, ms));
 const deferred = () => { let resolve; const p = new Promise((r) => { resolve = r; }); return { p, resolve }; };
 
@@ -60,7 +60,7 @@ test("async run: busy while running, cancel aborts the signal, concurrency ignor
 test("errors reject and are reported; history hook gets successful runs; events", async () => {
   disposeCommands();
   const events = [];
-  const prev = setManagerEmit((e) => events.push(`${e.manager}:${e.type}`));
+  const prev = onManager("*", (e) => events.push(`${e.manager}:${e.type}`));
   const runs = [];
   const off = onCommandRun((r) => runs.push([r.id, r.args, r.result]));
   const boom = command({ id: "boom", title: "Boom", run: () => { throw new Error("nope"); } });
@@ -69,7 +69,7 @@ test("errors reject and are reported; history hook gets successful runs; events"
   await ok.run(1);
   assert.deepEqual(runs, [["ok", [1], 2]]);
   assert.ok(["command:register", "command:run", "command:error", "command:done"].every((e) => events.includes(e)));
-  off(); setManagerEmit(prev);
+  off(); prev();
 });
 
 test("can: hidden and never runs without permission; when: shown but disabled", async () => {

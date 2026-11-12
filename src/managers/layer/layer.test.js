@@ -7,7 +7,7 @@ installDom();
 const { h, effect, createRoot } = await import("../../index.ts");
 const { openLayer } = await import("../../dom/portal.ts");
 const { layer, disposeLayers } = await import("./index.ts");
-const { setManagerEmit } = await import("../manager.ts");
+const { onManager } = await import("../manager.ts");
 const esc = () => { const e = new Event("keydown", { bubbles: true, cancelable: true }); Object.assign(e, { key: "Escape" }); document.body.dispatchEvent(e); return e; };
 
 test("stack and top are reactive; toasts never count as top", () => {
@@ -79,12 +79,12 @@ test("scroll lock: modal kinds lock by default, locks are counted, the old overf
 test("a layer opened inside an owner closes with it; events are reported", () => {
   disposeLayers();
   const seen = [];
-  const prev = setManagerEmit((e) => { if (e.manager === "layer") seen.push(e.type); });
+  const prev = onManager("*", (e) => { if (e.manager === "layer") seen.push(e.type); });
   let dispose;
   createRoot((d) => { dispose = d; layer.open("popover", h("div"), { label: "owned" }); });
   assert.equal(layer.stack().length, 1);
   dispose();
   assert.equal(layer.stack().length, 0);
   assert.deepEqual(seen, ["start", "open", "close"]);
-  setManagerEmit(prev);
+  prev();
 });
