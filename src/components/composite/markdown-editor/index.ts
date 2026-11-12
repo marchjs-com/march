@@ -6,7 +6,7 @@
 import "./markdown-editor.css";
 import "../../../forms/editors.css";
 import "../../../ui/field.css";
-import { signal, untrack } from "../../../core/reactive.ts";
+import { signal, untrack, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { lazy } from "../../../dom/lazy.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
@@ -187,7 +187,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
       if (v === "write") return area;
       if (v === "preview") return preview;
       if (v === "split") return h(Splitter, { start: area, end: preview, initial: props.split ?? 0.5, min: 0.2, label: t`Resize the panes`, class: "hm-mde-split" });
-      return h(RichView, { value: get(), onChange: (x: string) => set(x), readonly: props.readonly, disabled: props.disabled, rows: props.rows ?? 10, toolbar: undefined, counter: false });
+      return h(RichView, { value: get(), onChange: (x: string) => set(x), readonly: reactive(() => props.readonly), disabled: reactive(() => props.disabled), rows: props.rows ?? 10, toolbar: undefined, counter: false });
     });
   };
   const counts = () => md.stats(get());

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
+const { reactive } = await import("../../../core/reactive.ts");
 const { locale } = await import("../../../core/i18n.ts");
 locale.set("en");
 const J = await import("./json-path.ts");
@@ -81,5 +82,22 @@ test("TreeEditor: search keeps matches and their parents, readonly hides actions
   assert.deepEqual(el.querySelectorAll("[role=treeitem]").map((r) => r.getAttribute("data-ptr")), ["", "/a", "/a/deep"]);
   assert.equal(el.querySelector(".hm-tre-actions"), null);
   assert.equal(el.querySelector("[role=tree]").getAttribute("aria-readonly"), "true");
+  dispose();
+});
+
+test("TreeEditor: a switch flips in place (same row element, no redraw); read-only is live", () => {
+  const v = signal({ a: true, b: 1 });
+  const ro = signal(false);
+  const { el, dispose } = mount(() => h(TreeEditor, { "bind:value": v, readonly: reactive(() => ro()) }));
+  const row = () => el.querySelectorAll("[role=treeitem]").find((r) => r.getAttribute("data-ptr") === "/a");
+  const before = row(), other = el.querySelectorAll("[role=treeitem]").find((r) => r.getAttribute("data-ptr") === "/b");
+  v.set({ a: false, b: 1 });
+  assert.equal(row(), before, "the row is kept");
+  assert.equal(row().querySelector("[role=switch]").getAttribute("aria-checked"), "false");
+  assert.equal(el.querySelectorAll("[role=treeitem]").find((r) => r.getAttribute("data-ptr") === "/b"), other, "untouched rows are kept");
+  assert.ok(el.querySelector(".hm-tre-actions"));
+  ro.set(true);
+  assert.equal(el.querySelector(".hm-tre-actions"), null, "read-only takes effect at once");
+  assert.match(el.querySelector(".hm-tre-wrap").getAttribute("class"), /is-readonly/);
   dispose();
 });

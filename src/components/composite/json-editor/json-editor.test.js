@@ -39,3 +39,16 @@ test("JsonEditor: one mode hides the switcher", () => {
   assert.equal(el.querySelector("textarea").value, "[\n  1,\n  2\n]");
   dispose();
 });
+
+test("JsonEditor: read-only switches at once in the tree view", async () => {
+  const { reactive, signal: sig } = await import("../../../core/reactive.ts");
+  const ro = sig(false);
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const dispose = render(() => h(JsonEditor, { value: { a: true }, mode: "tree", readonly: reactive(() => ro()) }), host);
+  // the tree view loads on first use
+  for (let i = 0; i < 50 && !host.querySelector(".hm-tre-actions"); i++) await new Promise((r) => setTimeout(r, 10));
+  assert.ok(host.querySelector(".hm-tre-actions"));
+  ro.set(true);
+  assert.equal(host.querySelector(".hm-tre-actions"), null);
+  dispose();
+});

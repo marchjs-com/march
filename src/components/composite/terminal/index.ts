@@ -20,6 +20,7 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { signal, onCleanup, untrack, effect } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { clamp, load, save } from "../../../core/util.ts";
 import { tokenize, parseArgs, usageOf, type ArgSpec, type OptionSpec, type Parsed } from "./parse.ts";
 import { renderLine, ansi } from "./ansi.ts";
 
@@ -117,7 +118,7 @@ export function Terminal(props: TerminalProps): Element {
   const max = props.maxLines ?? 2000;
   const key = props.persist ? `hm.term.${props.persist}` : "";
   let hist: string[] = [];
-  try { if (key) hist = JSON.parse(globalThis.localStorage?.getItem(key) ?? "[]") as string[]; } catch { /* storage blocked */ }
+  if (key) hist = load<string[]>(key, []);
   let at = hist.length, draft = "";
   const busy = signal(false);
   let ctl: AbortController | null = null;
@@ -131,23 +132,33 @@ export function Terminal(props: TerminalProps): Element {
   const caret = h("span", { class: "hm-term-caret is-blinking", "aria-hidden": "true" }) as HTMLElement;
   const field = h("span", { class: "hm-term-field" }, input, measure, caret) as HTMLElement;
   const line = h("div", { class: "hm-term-line", "data-busy": () => (busy() ? "" : null) }, promptEl, field) as HTMLElement;
-  let caretFrame = 0;
+  let caretTimer: ReturnType<typeof setTimeout> | undefined;
+  // after the key's own effect (a keydown runs before the character lands)
   const syncCaret = (): void => {
-    cancelAnimationFrame(caretFrame);
-    caretFrame = requestAnimationFrame(() => {
+    clearTimeout(caretTimer);
+    caretTimer = setTimeout(() => {
       const at = input.selectionEnd ?? input.value.length;
       measure.textContent = input.value.slice(0, at);
       caret.textContent = input.value.charAt(at) || " ";
       caret.style.insetInlineStart = `${measure.offsetWidth - input.scrollLeft}px`;
       // typing restarts the blink: the cursor stays lit while keys come
       caret.classList.remove("is-blinking"); void caret.offsetWidth; caret.classList.add("is-blinking");
-    });
+    }, 0);
   };
   for (const ev of ["keydown", "keyup", "input", "pointerup", "focus", "blur", "select", "scroll"]) input.addEventListener(ev, syncCaret);
-  onCleanup(() => cancelAnimationFrame(caretFrame));
+  onCleanup(() => clearTimeout(caretTimer));
   const scroller = h("div", { class: "hm-term-scroll", onClick: (e: MouseEvent) => { if (!globalThis.getSelection?.()?.toString() && e.target !== input) input.focus(); } }, out, line) as HTMLElement;
 
-  const scrollDown = (): void => { scroller.scrollTop = scroller.scrollHeight; };
+  // pinned to the bottom: every answer (also one that grows later — a table, a progress bar, a JSON tree) keeps the
+  // last line in view; scrolling up to read unpins it until the reader comes back down or runs a command
+  let pinned = true;
+  const scrollDown = (): void => { pinned = true; scroller.scrollTop = scroller.scrollHeight; };
+  scroller.addEventListener("scroll", () => { pinned = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 8; }, { passive: true });
+  if (globalThis.ResizeObserver) {
+    const ro = new ResizeObserver(() => { if (pinned) scroller.scrollTop = scroller.scrollHeight; });
+    ro.observe(out);
+    onCleanup(() => ro.disconnect());
+  }
   const append = (node: Node, cls = ""): HTMLElement => {
     const row = h("div", { class: cx("hm-term-row", cls) }) as HTMLElement;
     row.appendChild(node);
@@ -189,7 +200,7 @@ export function Terminal(props: TerminalProps): Element {
       const bar = h("span", { class: "hm-term-bar" }, h("span", { class: "hm-term-bar-fill" })) as HTMLElement;
       const pct = h("span", { class: "hm-term-dim" }, " 0%") as HTMLElement;
       const row = append(h("span", {}, `${label} `, bar, pct) as Node);
-      const set = (f: number): void => { const p = Math.max(0, Math.min(1, f)); (bar.firstChild as HTMLElement).style.inlineSize = `${p * 100}%`; pct.textContent = ` ${Math.round(p * 100)}%`; };
+      const set = (f: number): void => { const p = clamp(f, 0, 1); (bar.firstChild as HTMLElement).style.inlineSize = `${p * 100}%`; pct.textContent = ` ${Math.round(p * 100)}%`; };
       return { set, done: (s) => { set(1); row.replaceChildren(textNode(s ?? label, { tone: "success" })); }, fail: (s) => { row.replaceChildren(textNode(s ?? label, { tone: "error" })); } };
     },
     spinner: (label) => {
@@ -213,7 +224,7 @@ export function Terminal(props: TerminalProps): Element {
     const lineText = raw.trim();
     append(h("span", {}, h("span", { class: "hm-term-prompt" }, val(props.prompt) ?? "$ "), lineText) as Node, "hm-term-echo");
     if (!lineText) return;
-    if (hist[hist.length - 1] !== lineText) { hist.push(lineText); if (hist.length > 500) hist = hist.slice(-500); try { if (key) globalThis.localStorage?.setItem(key, JSON.stringify(hist)); } catch { /* storage blocked */ } }
+    if (hist[hist.length - 1] !== lineText) { hist.push(lineText); if (hist.length > 500) hist = hist.slice(-500); if (key) save(key, hist); }
     at = hist.length;
     const words = tokenize(lineText);
     const found = resolve(words);

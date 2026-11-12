@@ -34,7 +34,7 @@ export function Rating(props: RatingProps): Element {
     return h("button", {
       type: "button", role: "radio", class: () => cx("hm-rating-star", filled() && "is-on", !filled() && shown() > n - 1 && "is-half"),
       "aria-checked": () => String(Math.round(Number(val(props.value) ?? 0)) === n), "aria-label": () => t`${n} of ${max}`,
-      tabindex: () => (Math.max(1, Math.round(Number(val(props.value) ?? 0))) === n ? "0" : "-1"), disabled: props.readonly,
+      tabindex: () => (Math.max(1, Math.round(Number(val(props.value) ?? 0))) === n ? "0" : "-1"), disabled: () => !!props.readonly,
       onClick: () => set(n), onMouseenter: () => !props.readonly && hover.set(n),
     }, h("span", { class: "hm-rating-off" }, glyph(star)), h("span", { class: "hm-rating-on" }, glyph(starFilled)));
   });

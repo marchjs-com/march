@@ -6,7 +6,7 @@ import "../../../forms/editors.css";
 import "../../../ui/field.css";
 import "../../../ui/button.css";
 import "./json-editor.css";
-import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { lazy } from "../../../dom/lazy.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
@@ -129,14 +129,15 @@ export function JsonEditor(props: JsonEditorProps): unknown {
   };
   const bar = h("div", { class: "hm-json-bar" },
     h("span", { id: msgId, class: () => (status().msg ? "hm-field-error" : "hm-help"), role: "status" }, () => status().msg ?? (text().trim() ? t`Valid JSON` : "")),
-    props.readonly ? null : h("button", { type: "button", class: "hm-btn hm-btn-sm", disabled: () => !parsed(), onClick: format }, t`Format`));
+    () => (props.readonly ? null : h("button", { type: "button", class: "hm-btn hm-btn-sm", disabled: () => !parsed(), onClick: format }, t`Format`)));
   // re-drawn only when the view changes (typing keeps the same textarea and caret)
   const showTree = computed(() => mode() === "tree" && parsed());
   const body = () => {
     if (!showTree()) return [area, bar];
     return untrack(() => h(Tree, {
       value: status.peek().value, onChange: (v: unknown) => { const s = JSON.stringify(v, null, props.indent ?? 2); text.set(s); lastEmitted = v; set(v); },
-      schema: props.schema, readonly: props.readonly, disabled: props.disabled, expand: props.expand, label: t`JSON tree`,
+      // live: switching read-only or disabled reaches the tree at once
+      schema: reactive(() => props.schema), readonly: reactive(() => props.readonly), disabled: reactive(() => props.disabled), expand: props.expand, label: t`JSON tree`,
       validate: props.validate ? (v: unknown) => { const m = props.validate!(v); return m ? [{ path: [], message: m }] : []; } : undefined,
     }));
   };

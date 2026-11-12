@@ -10,7 +10,7 @@ export const code = `<Terminal prompt="hadi$ " persist="demo" welcome="[info] he
 }} />`
 
 const wait = (ms: number, signal: AbortSignal): Promise<void> => new Promise((ok, no) => { const t = setTimeout(ok, ms); signal.addEventListener("abort", () => { clearTimeout(t); no(new Error("iptal")) }, { once: true }) })
-const USERS = [{ ad: "Ayşe", rol: "yönetici", durum: ansi.green("aktif") }, { ad: "Mert", rol: "editör", durum: ansi.yellow("davetli") }, { ad: "Deniz", rol: "okur", durum: ansi.gray("pasif") }]
+const USERS = [{ name: "Ayşe", role: "yönetici", status: ansi.green("aktif") }, { name: "Mert", role: "editör", status: ansi.yellow("davetli") }, { name: "Deniz", role: "okur", status: ansi.gray("pasif") }]
 
 const COMMANDS: Record<string, Command> = {
   deploy: { desc: "Bir ortama yayınlar (Ctrl+C ile iptal)", args: [{ name: "env", required: true, choices: ["staging", "prod"], desc: "ortam" }], options: { force: { alias: "f", desc: "onay sorma" } },
@@ -21,11 +21,11 @@ const COMMANDS: Record<string, Command> = {
       p.done(`HADİ ${a.args["env"]} ortamında yayında`)
     } },
   user: { desc: "Kullanıcılar", sub: {
-    list: { desc: "Listeler", run: (_a, io) => io.table(USERS) },
+    list: { desc: "Listeler", run: (_a, io) => io.table(USERS.map((u) => [u.name, u.role, u.status]), ["ad", "rol", "durum"]) },
     add: { desc: "Ekler", args: [{ name: "name", required: true }, { name: "role", choices: ["yönetici", "editör", "okur"], default: "okur" }], run: (a, io) => io.success(`${a.args["name"]} (${a.args["role"]}) eklendi`) },
   } },
   theme: { desc: "Vitrin temasını değiştirir", args: [{ name: "id", choices: colorThemes().map((t) => t.id) }], run: (a, io) => { if (!a.args["id"]) { io.print(colorThemes().map((t) => t.id).join("  ")); return } setColorTheme(String(a.args["id"])); io.success(`tema: ${a.args["id"]}`) } },
-  fetch: { desc: "Örnek veri çeker ve JSON ağacı gösterir", run: async (_a, io) => { const s = io.spinner("demo-api/users.json"); await wait(400, io.signal); s.done("geldi"); io.json({ users: USERS.map((u) => ({ ad: u.ad, rol: u.rol })), toplam: USERS.length }, 2) } },
+  fetch: { desc: "Örnek veri çeker ve JSON ağacı gösterir", run: async (_a, io) => { const s = io.spinner("demo-api/users.json"); await wait(400, io.signal); s.done("geldi"); io.json({ users: USERS.map((u) => ({ name: u.name, role: u.role })), total: USERS.length }, 2) } },
   colors: { desc: "16 rengi gösterir", run: (_a, io) => { io.print(Object.entries(ansi).filter(([k]) => !["strip", "bold", "dim", "italic", "underline"].includes(k)).map(([k, f]) => (f as (s: string) => string)(k)).join(" ")); io.print(`${ansi.bold("kalın")} ${ansi.dim("soluk")} ${ansi.italic("eğik")} ${ansi.underline("altı çizili")}`) } },
   motion: { desc: "Bekleme çarkı", run: async (_a, io) => { const s = io.spinner("hareket motoru ısınıyor"); await wait(900, io.signal); s.done("hazır") } },
 }

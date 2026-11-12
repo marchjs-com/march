@@ -3,7 +3,7 @@
 // Type (linear, radial, conic), an angle dial, a stop bar (click to add, drag to move, drag down or Delete to remove),
 // a ColorPicker for the selected stop, presets (the HADİ gradient first) and the CSS to copy.
 import "./gradient-editor.css";
-import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
@@ -170,7 +170,7 @@ export function GradientEditor(props: GradientEditorProps): unknown {
       const i = sel(), s = untrack(() => grad().stops[i]);
       if (!s) return null;
       return h("div", { class: "hm-ge-stop-editor", role: "group", "aria-label": t`Stop ${i + 1}` },
-        h(ColorPicker, { value: untrack(() => resolveColor(s.color, root)), onChange: (v: string) => setStop(i, { color: v }), palettes: undefined, contrast: false, disabled: props.disabled, readonly: props.readonly, class: "hm-ge-picker" }),
+        h(ColorPicker, { value: untrack(() => resolveColor(s.color, root)), onChange: (v: string) => setStop(i, { color: v }), palettes: undefined, contrast: false, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly), class: "hm-ge-picker" }),
         h("label", { class: "hm-ge-pos" }, h("span", null, () => t`Position`),
           h("input", { type: "number", class: "hm-input hm-ge-pos-input", min: "0", max: "100", step: "1", value: () => String(Math.round(grad().stops[i]?.at ?? 0)), readonly: () => !!props.readonly, onInput: (e: Event) => { const n = Number((e.target as HTMLInputElement).value); if (Number.isFinite(n)) setStop(i, { at: clamp(n, 0, 100) }); } }), "%"));
     },

@@ -3,7 +3,7 @@
 // The frame stays centered (drag its corners to resize it, or pick an aspect); drag the image to pan, wheel / slider /
 // + − to zoom, 90° buttons and a fine angle slider to rotate, a button to mirror. The image always covers the frame.
 import "./image-cropper.css";
-import { signal, computed, effect, untrack, batch, onCleanup } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, batch, onCleanup, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { track } from "../../../behaviors/drag/index.ts";
 import { t, messages } from "../../../core/i18n.ts";
@@ -171,9 +171,9 @@ export function ImageCropper(props: ImageCropperProps): unknown {
         h(IconButton, { icon: glyph(flipHorizontal), label: () => t`Mirror`, size: "sm", disabled: ro, class: () => cx(st().flip && "is-on"), "aria-pressed": () => String(st().flip), onClick: () => change({ flip: !st.peek().flip }) }),
         h(IconButton, { icon: glyph(refresh), label: () => t`Reset`, size: "sm", disabled: ro, onClick: api.reset })),
       h("label", { class: "hm-crop-slider" }, h("span", null, () => t`Zoom`),
-        h(Slider, { min: 1, max: maxZoom(), step: 0.01, value: zoomView, onChange: (v: number) => change({ zoom: v }), format: (v: number) => `${Math.round(v * 100)}%`, disabled: props.disabled, readonly: props.readonly })),
+        h(Slider, { min: 1, max: maxZoom(), step: 0.01, value: zoomView, onChange: (v: number) => change({ zoom: v }), format: (v: number) => `${Math.round(v * 100)}%`, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly) })),
       h("label", { class: "hm-crop-slider" }, h("span", null, () => t`Angle`),
-        h(Slider, { min: -45, max: 45, step: 0.5, value: fineView, onChange: (v: number) => change({ rotate: quarter(st.peek().rotate) + v }), format: (v: number) => `${v}°`, disabled: props.disabled, readonly: props.readonly }))),
+        h(Slider, { min: -45, max: 45, step: 0.5, value: fineView, onChange: (v: number) => change({ rotate: quarter(st.peek().rotate) + v }), format: (v: number) => `${v}°`, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly) }))),
     () => (props.preview === false ? null : h("figure", { class: "hm-crop-out" },
       h("canvas", { class: "hm-crop-canvas", role: "img", "aria-label": () => t`Cropped result`, ref: (el: HTMLCanvasElement) => { out = el; drawPreview(); } }),
       h("figcaption", null, () => { const [fw, fh] = frame(), S = scale(); return `${Math.round(fw / S)} × ${Math.round(fh / S)} px`; }))));

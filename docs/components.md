@@ -1831,29 +1831,12 @@ Full page: src/components/navigation/tabs/docs.md
 
 ## Terminal
 
-An extensible command line in the page — for a playground, a dev console, an admin panel or a product demo.
+
 
 Composed of: [JsonView](#jsonview)
 
 ```tsx
-import { Terminal, defineTerminalCommands, ansi } from "hadi-march/components/composite/terminal";
 
-<Terminal prompt="hadi$ " welcome="[info] help yaz" persist="demo" scheme="auto" cursor="block" commands={{
-  echo: (a, io) => io.print(a.rest.join(" ")),
-  deploy: {
-    desc: "Yayınla",
-    args: [{ name: "env", required: true, choices: ["staging", "prod"] }],
-    options: { force: { alias: "f", desc: "Onay sorma" } },
-    run: async (a, io) => {
-      const p = io.progress(`${a.args.env} yükleniyor`)
-      for (let i = 1; i <= 10; i++) { if (io.signal.aborted) return; await wait(120); p.set(i / 10) }
-      p.done(); io.success("Yayında")
-    },
-  },
-  user: { desc: "Kullanıcılar", sub: { list: (_a, io) => io.table(users), add: { args: [{ name: "name", required: true }], run: … } } },
-}} ref={(t) => t.exec("help")} />
-
-defineTerminalCommands({ ping: (_a, io) => io.print(ansi.green("pong")) })   // every terminal on the page
 ```
 
 Full page: src/components/composite/terminal/docs.md

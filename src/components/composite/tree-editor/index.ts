@@ -6,8 +6,9 @@
 import "./tree-editor.css";
 import "../../../ui/menu.css";
 import "../../../ui/field.css";
-import { signal, computed, untrack } from "../../../core/reactive.ts";
+import { signal, computed, untrack, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
+import { For } from "../../../dom/for.ts";
 import { t, dir } from "../../../core/i18n.ts";
 import { cx, uid, val, later, type ClassProp } from "../../../core/util.ts";
 import { glyph } from "../../../ui/util.ts";
@@ -239,9 +240,9 @@ export function TreeEditor(props: TreeEditorProps): unknown {
     return () => (editing()?.ptr === r.ptr && editing()?.field === "key" ? field(r, "key")
       : h("span", { class: "hm-tre-key", onDblClick: () => { if (!ro()) editing.set({ ptr: r.ptr, field: "key" }); } }, String(r.key)));
   };
-  const valueCell = (r: Row): unknown => {
+  const valueCell = (r: Row, cur: () => Row): unknown => {
     if (r.kind === "object" || r.kind === "array") return h("span", { class: "hm-tre-summary" }, r.kind === "array" ? t`${r.size} items` : t`${r.size} fields`);
-    if (r.kind === "boolean") return h(Toggle, { value: r.value as boolean, disabled: ro(), "aria-label": t`Value of ${String(r.key ?? t`root`)}`, class: "hm-tre-switch", onChange: (v: boolean) => change(t`Edit value`, J.updateAt(untrack(get), r.path, () => v), r.ptr) });
+    if (r.kind === "boolean") return h(Toggle, { value: reactive(() => cur().value as boolean), disabled: ro(), "aria-label": t`Value of ${String(r.key ?? t`root`)}`, class: "hm-tre-switch", onChange: (v: boolean) => change(t`Edit value`, J.updateAt(untrack(get), r.path, () => v), r.ptr) });
     if (r.kind === "null") return h("span", { class: "hm-tre-value hm-tre-null" }, "null");
     const sch = J.schemaAt(props.schema, r.path);
     return () => (editing()?.ptr === r.ptr && editing()?.field === "value" ? field(r, "value")
@@ -257,7 +258,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
     anchors.set(r.ptr, btn);
     return btn;
   };
-  const row = (r: Row): Element => {
+  const row = (r: Row, cur: () => Row = () => r): Element => {
     const err = (): string | undefined => errorAt().get(r.ptr);
     const container = r.kind === "object" || r.kind === "array";
     return h("div", {
@@ -271,7 +272,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
     container ? h("button", { type: "button", class: cx("hm-tre-chev", r.open && "is-open"), tabindex: "-1", "aria-hidden": "true", onClick: () => toggleOpen(r) }, glyph(chevronRight)) : h("span", { class: "hm-tre-chev-space" }),
     keyCell(r),
     typeBadge(r),
-    valueCell(r),
+    valueCell(r, cur),
     () => (err() ? h("span", { class: "hm-tre-error", id: `${id}-e${r.ptr}` }, err()) : null),
     ro() ? null : h("span", { class: "hm-tre-actions" },
       h(IconButton, { icon: glyph(plus), size: "sm", tabindex: "-1", label: container ? t`Add inside` : t`Add after`, onClick: () => add(r) }),
@@ -308,7 +309,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
       const n = errors().length;
       return h("span", { class: cx("hm-tre-status", n ? "is-error" : "is-ok"), role: "status" }, n ? t`${n} problems` : t`Valid`);
     },
-    stack && !ro() ? h("span", { class: "hm-tre-history" },
+    () => stack && !ro() ? h("span", { class: "hm-tre-history" },
       h(IconButton, { icon: glyph(undoIcon), size: "sm", label: () => t`Undo`, disabled: () => !stack.canUndo(), onClick: () => void stack.undo() }),
       h(IconButton, { icon: glyph(redoIcon), size: "sm", label: () => t`Redo`, disabled: () => !stack.canRedo(), onClick: () => void stack.redo() })) : null));
 
@@ -317,8 +318,14 @@ export function TreeEditor(props: TreeEditorProps): unknown {
     h("div", {
       id: `${id}-tree`, role: "tree", class: "hm-tre", "aria-label": () => c["aria-label"]() ?? props.label ?? t`JSON tree`, "aria-describedby": c["aria-describedby"],
       "aria-readonly": () => (ro() ? "true" : null), ref: (el: HTMLElement) => { tree = el; },
-    }, () => { anchors.clear(); const list = rows(); return list.length ? list.map(row) : h("div", { class: "hm-tre-none" }, () => t`No matches`); }),
+    },
+    // keyed rows: a change redraws only the rows it touched (a switch flips in place, no flash of the whole tree);
+    // a true/false row keeps its element when its value changes, read-only redraws all
+    () => { ro(); anchors.clear(); return h(For, { each: rows, key: rowKey, fallback: h("div", { class: "hm-tre-none" }, () => t`No matches`), children: (item: () => Row) => row(untrack(item), item) }); }),
     menu);
 }
+
+/** What a row shows, except a true/false value (its switch follows the value itself). */
+const rowKey = (r: Row): string => `${r.ptr}|${r.kind}|${r.depth}|${r.open}|${r.size}|${r.parentKind}|${r.kind === "boolean" || r.kind === "object" || r.kind === "array" ? "" : JSON.stringify(r.value)}`;
 
 const entries = (v: unknown): [string | number, unknown][] => (Array.isArray(v) ? v.map((x, i) => [i, x]) : Object.entries(v as Record<string, unknown>));

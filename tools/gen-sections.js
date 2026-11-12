@@ -9,8 +9,8 @@ const ROOT = new URL("..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "
 const PAGES = join(ROOT, "examples/showcase/src/pages");
 const OUT = join(ROOT, "examples/showcase/src/sections.gen.ts");
 
-/** Same as demoSlug() in examples/showcase/src/demo.tsx. */
-export const demoSlug = (s) => s.toLocaleLowerCase("tr").replace(/ı/g, "i").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+/** Same as demoSlug() in examples/showcase/src/demo.tsx: a short hash of the title. */
+export const demoSlug = (s) => { let x = 5381; for (const ch of s) x = (Math.imul(x, 33) ^ ch.codePointAt(0)) >>> 0; return x.toString(36); };
 
 const walk = (d) => readdirSync(d).flatMap((f) => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : /\.tsx$/.test(f) ? [p] : []; });
 const attr = (tag, name) => { const m = new RegExp(`\\b${name}="([^"]*)"`).exec(tag); return m ? m[1].replace(/&quot;/g, "\"") : undefined; };
