@@ -1,0 +1,5 @@
+/* HADI March — the page breadcrumb (.hm-crumbs): shared by Page (layout.css) and the AppShell header, so a page that never imports Page still gets it. */
+.hm-crumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; margin: 0; padding: 0; list-style: none; font-size: var(--hm-text-sm); color: var(--hm-muted); }
+.hm-crumbs li + li::before { content: "/"; margin-inline-end: .375rem; color: var(--hm-faint); }
+.hm-crumbs a { color: inherit; text-decoration: none; } .hm-crumbs a:hover { color: var(--hm-text); }
+.hm-crumbs [aria-current="page"] { color: var(--hm-text-2); }

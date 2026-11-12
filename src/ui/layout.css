@@ -4,10 +4,6 @@
   animation: hm-rise-in var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-page-narrow { max-width: 52rem; }
 .hm-page-head { display: flex; flex-direction: column; gap: var(--hm-space-2); }
-.hm-crumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; margin: 0; padding: 0; list-style: none; font-size: var(--hm-text-sm); color: var(--hm-muted); }
-.hm-crumbs li + li::before { content: "/"; margin-inline-end: .375rem; color: var(--hm-faint); }
-.hm-crumbs a { color: inherit; text-decoration: none; } .hm-crumbs a:hover { color: var(--hm-text); }
-.hm-crumbs [aria-current="page"] { color: var(--hm-text-2); }
 .hm-page-titlebar { display: flex; align-items: center; flex-wrap: wrap; gap: var(--hm-space-3) var(--hm-space-4); }
 .hm-page-back { width: 2rem; height: 2rem; border: 1px solid var(--hm-border); background: var(--hm-surface); box-shadow: var(--hm-shadow-1); }
 .hm-page-titles { flex: 1; min-width: 12rem; }
