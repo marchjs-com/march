@@ -17,23 +17,13 @@ export interface HydrateOptions {
   timeout?: number;
 }
 
+import { prerenderedFor } from "./prerendered.ts";
+export { prerenderedFor };
+
 /** Set on <html> while hydrate() builds the app off-screen: what renders then is already on screen as prerendered HTML,
  *  so entrance animations (motion reveal) skip it and the swap shows no change. A DOM attribute, not an import:
  *  the motion code needs no dependency on this chunk. */
 export const HYDRATING_ATTR = "data-hm-hydrating";
-
-const norm = (p: string): string => p.replace(/\/(index\.html)?$/, "") || "/";
-
-/**
- * True when the URL shows the route prerendered into `el` (data-hm-prerender: "#/x" for hash routing, else "/x").
- * History routing compares the end of the path, so it works under any base; "/" matches only a folder URL.
- */
-export function prerenderedFor(el: Element): boolean {
-  const pre = el.getAttribute("data-hm-prerender"), l = globalThis.location;
-  if (pre == null || !l) return false;
-  if (pre[0] === "#") return norm((l.hash.slice(1) || "/").split("?")[0] as string) === norm(pre.slice(1));
-  return pre === "/" ? /\/(index\.html)?$/.test(l.pathname) : norm(l.pathname).endsWith(norm(pre));
-}
 
 /** Take over prerendered HTML (data-hm-prerender) without a flash, or render normally when there is none. */
 export function hydrate(fn: () => unknown, el: Element, opts: HydrateOptions = {}): () => void {

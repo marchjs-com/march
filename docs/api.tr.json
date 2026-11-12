@@ -89,7 +89,8 @@
   "setMeta": "document.title ve <meta name=\"description\"> değerlerini ayarlar (yalnız DOM API'leri).",
   "setNavigationWrapper": "Her sayfa değişimini sarar (hadi-march/motion View Transitions için kullanır).",
   "setQuery": "Değerleri sorgu dizesine birleştirir (null/undefined/\"\" anahtarı kaldırır). Varsayılan olarak geçmişi değiştirir.",
-  "transitionOutlet": "İçeriği değişen outlet'i işaretler; böylece View Transition yalnız o bölümü canlandırır (kabuk yerinde kalır)."
+  "transitionOutlet": "İçeriği değişen outlet'i işaretler; böylece View Transition yalnız o bölümü canlandırır (kabuk yerinde kalır).",
+  "hrefOf": "Rotanın sayfaya yazılacak bağlantısı: geçmiş kipinde geçerli adrese göre göreli (\"../flow\"), her kökte ve yeni sekmede doğru; hash kipinde \"#/flow\"."
  },
  "hadi-march/data": {
   "access": "Reaktif erişim nesnesi.",
@@ -705,7 +706,8 @@
   "defineIcon": "Saf işlev: kullanılmayan simgeler paketlerden çıkarılır (esbuild @__NO_SIDE_EFFECTS__ işaretini dikkate alır).",
   "Icon": "`<Icon of={users} size=\"lg\" />`",
   "isIconDef": "Değer bir simge tanımı mı (defineIcon)?",
-  "svgIcon": "Bir simgeyi <svg> öğesi olarak oluşturur. Etiket verilmedikçe süslemedir (aria-hidden)."
+  "svgIcon": "Bir simgeyi <svg> öğesi olarak oluşturur. Etiket verilmedikçe süslemedir (aria-hidden).",
+  "paintIcon": "Bir ikonu var olan <svg> içine çizer (öznitelik ve şekiller değişir): canlı ikonlar yerinde yeniden boyanır."
  },
  "hadi-march/icons/catalog": {
   "ICONS": "Tüm yerleşik simgeler ada göre (simge seçiciler ve arama için; paketleri küçük tutmak için tek tek simge içe aktarın)."
@@ -997,7 +999,8 @@
  },
  "hadi-march/seo/hydrate": {
   "hydrate": "Önceden oluşturulmuş HTML'i (data-hm-prerender) titremeden devralır; yoksa normal çizer.",
-  "prerenderedFor": "URL, `el` içine önceden oluşturulmuş rotayı gösteriyorsa true (data-hm-prerender: karma yönlendirmede \"#/x\", aksi halde \"/x\"). Geçmiş yönlendirmesi yolun sonunu karşılaştırır, böylece her tabanda çalışır; \"/\" yalnız klasör URL'sine uyar."
+  "prerenderedFor": "URL, `el` içine önceden oluşturulmuş rotayı gösteriyorsa true (data-hm-prerender: karma yönlendirmede \"#/x\", aksi halde \"/x\"). Geçmiş yönlendirmesi yolun sonunu karşılaştırır, böylece her tabanda çalışır; \"/\" yalnız klasör URL'sine uyar.",
+  "HYDRATING_ATTR": "hydrate() uygulamayı ekran dışında kurarken <html> üzerinde duran öznitelik: giriş animasyonları ön işlenmiş içeriği yeniden oynatmaz."
  },
  "hadi-march/managers/accessibility/ui": {
   "AccessibilitySettings": "Tüm tercihler, değiştikçe uygulanır.",
@@ -1023,5 +1026,23 @@
  },
  "hadi-march/dom/to-markdown": {
   "toMarkdown": "Bir DOM ağacını (alt öğeleri blok olan bir kök: p, h1–h6, blockquote, ul / ol, pre, hr) Markdown olarak yazar."
+ },
+ "hadi-march/base": {
+  "_resetAppBase": "Önbelleğe alınmış kökü unutur (testler ya da belgenin <base> etiketi değiştiğinde).",
+  "appBase": "Uygulamanın kök yolu: /app/ altındaki uygulama için \"/app\", alan adı kökünde \"\" (sonda eğik çizgi yok).",
+  "appBaseUrl": "Uygulamanın kök klasörü URL olarak (\"/\" ile biter); tarayıcı dışında null.",
+  "appUrl": "Genel bir dosya ya da uygulama yolunu uygulama kökü altında tam URL yapar; baştaki \"/\" uygulama kökü demektir. Tam URL, data:, blob: ve \"#…\" olduğu gibi geçer.",
+  "setAppBase": "Kökü elle ayarlar (\"/app/\" ya da tam URL); null yeniden otomatik bulmaya döner."
+ },
+ "hadi-march/icons/packs": {
+  "Icon": "Ad ile ikon bileşeni (\"lucide:user\" gibi paket önekiyle); paket tembel yükleniyorsa geldiğinde çizilir.",
+  "icon": "Ad ile ikon (\"lucide:user\" gibi paket önekiyle); önek yoksa HADI March seti.",
+  "iconPack": "Bu kimlikle kayıtlı paket, varsa.",
+  "iconPacks": "Kayıtlı ikon paketleri (önce HADI March seti).",
+  "loadIcon": "Ad ile ikon; tembel yüklenen paketi bekler. Paket ya da ad yoksa undefined.",
+  "packIcon": "Paket ikonu oluşturur (dondurulmuş): packIcon(\"arrow-left\", [\"M19 12H5\", …], { sw: 2, rtl: true }).",
+  "packPaint": "Her paket ikonunun paint kancası: ızgara, çizgi kalınlığı, RTL aynalama, çift-tek dolgu.",
+  "parseIconRef": "\"lucide:user\" → [\"lucide\", \"user\"] olarak böler; önek yoksa HADI March seti.",
+  "registerIconPack": "İkon seti ekler; icon(\"id:…\") ve <Icon name=\"id:…\"> onu kullanır. Geri kaldıran bir işlev döndürür."
  }
 }
