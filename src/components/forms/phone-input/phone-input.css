@@ -1,0 +1,2 @@
+/* HADI March — PhoneInput. Imported by its component module; tokens.css provides the variables (shared text-control rules: ui/field.css). */
+.hm-phone, .hm-affix:has(> .hm-phone) > .hm-affix-prefix { font-variant-numeric: tabular-nums; }

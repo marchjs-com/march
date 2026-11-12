@@ -1,0 +1,5 @@
+/* HADI March — ListEditor. Imported by its component module; tokens.css provides the variables. */
+.hm-list-editor { display: flex; flex-direction: column; gap: var(--hm-space-2); }
+.hm-list-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--hm-space-1); }
+.hm-list-items:empty { display: none; }
+.hm-list-row, .hm-list-add { display: flex; gap: var(--hm-space-1); align-items: center; }

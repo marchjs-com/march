@@ -10,13 +10,43 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 
+### Forms — `hadi-march/forms`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Calendar | stable | Month grid with full keyboard support, min / max, disabled days and range highlight. | — |
+| Checkbox | stable | One drawn checkbox with its label: classic, soft, chip, card or toggle look, indeterminate state. | — |
+| CheckboxGroup | stable | Several checkboxes as one value (an array); any Checkbox look, per-option HADİ colors. | — |
+| ChoicePicker | stable | Single choice that picks its own look: segmented, chips, preview cards or a combobox, never a drop-down for a few values. | [Segmented](#segmented), [RadioGroup](#radiogroup), [Combobox](#combobox) |
+| CodeInput | stable | One-time code / PIN boxes: typing advances, paste fills, HADİ colors and display font in the HADİ theme. | — |
+| ColorInput | stable | Native color swatch plus a #RRGGBB text field, kept in sync. | — |
+| Combobox | stable | Typeahead over static options or an async search (debounced, keyboard, aria-activedescendant). | OverflowText |
+| DatePicker | stable | Typed date in the locale's order with a Calendar popover; ISO value, never an invalid date. | [Calendar](#calendar) |
+| DateRangePicker | stable | Date range { from, to } with presets (Segmented) and a custom pair of DatePickers. | [Segmented](#segmented), [DatePicker](#datepicker) |
+| DateTimeInput | stable | A DatePicker and a TimeInput editing one ISO timestamp in local time. | [DatePicker](#datepicker), [TimeInput](#timeinput) |
+| FileUpload | stable | Drop zone or click; accept / size checks, image and audio previews, upload progress and cancel. | Progress, OverflowText |
+| KeyValueEditor | stable | Edit key → value rows as an object; order kept, duplicate keys flagged, numbers on request. | — |
+| ListEditor | stable | Edit a list of strings: add, edit, reorder, remove; pasted lines become items. | — |
+| MultiSelect | stable | Several values as removable chips: a Combobox with multiple (static options or async search). | [Combobox](#combobox) |
+| NumberInput | stable | Locale-aware number (never NaN) with IntInput, MoneyInput (currency side and decimals) and PercentInput. | — |
+| PasswordInput | stable | Password field with a show / hide button (aria-pressed). | — |
+| PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | — |
+| RadioGroup | stable | Radio buttons for one value; classic, soft, chip, card or segmented look. | — |
+| Segmented | stable | Compact single choice of joined buttons; arrow keys move and select (roving focus). | — |
+| Select | stable | The native drop-down; option values keep their type (numbers, objects). | — |
+| Slider | stable | Range slider with its value shown in an <output>; custom value format. | — |
+| TextInput | stable | Single-line text with prefix / suffix; EmailInput and UrlInput set the keyboard, autocomplete and trimming. | — |
+| Textarea | stable | Multi-line text that grows with its content. | — |
+| TimeInput | stable | Native time field ("HH:MM", seconds with step), with min / max. | — |
+| Toggle | stable | On / off switch (role="switch") whose thumb slides toward the inline end and mirrors in RTL. | — |
+
 ### Data display — `hadi-march/data`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [Chip](#chip), Menu, FilterControl, CellEditor |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | — |
-| Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | Button, IconButton, ButtonGroup, Segmented |
+| Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | Button, IconButton, ButtonGroup, [Segmented](#segmented) |
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
@@ -64,19 +94,19 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
-| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, [ReactionPicker](#reactionpicker) |
+| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, [Textarea](#textarea), [ReactionPicker](#reactionpicker) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), Avatar |
-| ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
+| ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, [Segmented](#segmented) |
 | CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, OverflowText |
-| ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, Dialog, Toggle |
+| ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, Dialog, [Toggle](#toggle) |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
-| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle |
-| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, [Chip](#chip), OverflowText |
+| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), IconButton, OverflowText, Field, [TextInput](#textinput), [NumberInput](#numberinput), [Select](#select), [Toggle](#toggle) |
+| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, [Segmented](#segmented), [Chip](#chip), OverflowText |
 | FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, OverflowText |
-| GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | [ColorPicker](#colorpicker), Segmented, IconButton |
-| ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | Segmented, Slider, IconButton |
+| GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | [ColorPicker](#colorpicker), [Segmented](#segmented), IconButton |
+| ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | [Segmented](#segmented), [Slider](#slider), IconButton |
 | JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | [TreeEditor](#treeeditor) |
-| KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | [EasingCurveEditor](#easingcurveeditor), IconButton, Segmented |
+| KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | [EasingCurveEditor](#easingcurveeditor), IconButton, [Segmented](#segmented) |
 | MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, [RichTextEditor](#richtexteditor) |
 | NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
@@ -84,7 +114,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
-| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
+| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, [Toggle](#toggle) |
 | Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress |
 
 ## BottomNav
@@ -98,6 +128,17 @@ Composed of: Badge, OverflowText
 ```
 
 Full page: src/components/composite/bottom-nav/docs.md
+
+## Calendar
+
+A month grid. Dates are plain ISO strings (`"2026-03-14"`) and the arithmetic runs in UTC, so a daylight-saving change never shifts a day. The first weekday and the names come from the locale; days outside `min` / `max` or matched by `isDisabled` cannot be picked; `rangeFrom` / `rangeTo` highlight a range.
+
+```tsx
+<Calendar bind:value={$day} min="2026-03-10" max="2026-04-20" />
+<Calendar value={$from} rangeFrom={$from} rangeTo={$to} isDisabled={(iso) => holidays.has(iso)} />
+```
+
+Full page: src/components/forms/calendar/docs.md
 
 ## ChatBubble
 
@@ -113,7 +154,7 @@ Full page: src/components/social/chat-bubble/docs.md
 
 The message field of a chat. On the start side an attach Menu whose + turns 45° while it is open; in the middle a growing Textarea (Enter sends, Shift+Enter breaks the line) with an emoji button that opens a ReactionPicker grid (the emoji goes in at the caret). On the end side one round button morphs on the motion engine: a microphone in Heyecan orange while the field is empty, a send arrow in Aktivite blue once there is text. Recording replaces the field with a pulsing dot, a running timer and a live waveform; the round button sends it, the trash button or Esc drops it. A reply preview with an orange bar sits above.
 
-Composed of: Menu, Textarea, [ReactionPicker](#reactionpicker)
+Composed of: Menu, [Textarea](#textarea), [ReactionPicker](#reactionpicker)
 
 ```tsx
 <ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />
@@ -133,6 +174,29 @@ Composed of: [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [Re
 
 Full page: src/components/composite/chat-thread/docs.md
 
+## Checkbox
+
+One checkbox with its label. The box is drawn (the tick strokes in, the fill grows from the centre, it shrinks a little when pressed) while the real `<input>` stays for the keyboard, forms and screen readers. Looks: `classic`, `soft`, `chip`, `card` and `toggle`, each in three sizes and with the corner shapes that suit it (`shapesFor`).
+
+```tsx
+<Checkbox bind:value={$agree} label="I have read the terms" />
+<Checkbox value={true} indeterminate label="Some items selected" />
+<Checkbox variant="card" label="Team plan" hint="Up to 10 people" icon={users} />
+```
+
+Full page: src/components/forms/checkbox/docs.md
+
+## CheckboxGroup
+
+Several checkboxes; the value is the array of checked option values. Every Checkbox look works (`chip` and `card` are the usual ones for groups), `inline` lays them in a row, and `colors="brand"` gives each option the next HADİ color.
+
+```tsx
+<Field label="Days" group><CheckboxGroup bind:value={$days} inline variant="chip" options={days} /></Field>
+<CheckboxGroup variant="card" options={[{ value: "team", label: "Team", hint: "Up to 10 people", icon: users, meta: "$49" }]} />
+```
+
+Full page: src/components/forms/checkbox-group/docs.md
+
 ## Chip
 
 A label pill. Three uses: a static label, a **filter** you can switch on and off (`selected` + `onClick`, announced with `aria-pressed`), and a **removable** tag (`onRemove`, an ×-button with an accessible name).
@@ -147,11 +211,46 @@ Composed of: OverflowText
 
 Full page: src/components/actions/chip/docs.md
 
+## ChoicePicker
+
+One single-choice control that picks its look from the options, so option panels never show a drop-down for a handful of values. With `kind: "auto"`: 10 or more options → Combobox; options with a `preview` → preview cards; 2–6 short labels → Segmented; otherwise chips. Any other `kind` forces that look; `pickerKind(options)` tells which one auto picks.
+
+Composed of: [Segmented](#segmented), [RadioGroup](#radiogroup), [Combobox](#combobox)
+
+```tsx
+<ChoicePicker bind:value={$align} options={["start", "center", "end"]} />           // segmented
+<ChoicePicker bind:value={$blend} options={modes.map((m) => ({ value: m, label: m, preview: () => <Swatch mode={m} /> }))} kind="grid" />
+```
+
+Full page: src/components/forms/choice-picker/docs.md
+
+## CodeInput
+
+One-time code and PIN boxes. Typing moves forward, Backspace back, ← → move, a paste fills from the box (extra characters are cut) and `onComplete` fires once when every box is filled. In the HADİ theme each box takes the next HADİ color and the display font, as in the HADİ apps; boxes shrink on narrow screens instead of overflowing.
+
+```tsx
+<CodeInput length={6} groups={[3, 3]} onComplete={verify} />
+<CodeInput length={8} pattern="alphanumeric" colors="palette" font="mono" variant="filled" />
+<CodeInput length={4} mask size="lg" />
+```
+
+Full page: src/components/forms/code-input/docs.md
+
+## ColorInput
+
+A color as `#rrggbb`: the native swatch picker and a text field side by side, kept in sync (typing a valid hex moves the swatch; picking a swatch writes the text).
+
+```tsx
+<Field label="Brand color"><ColorInput bind:value={$color} /></Field>
+```
+
+Full page: src/components/forms/color-input/docs.md
+
 ## ColorPicker
 
 An advanced color picker: a saturation / brightness area, hue and alpha sliders, an eyedropper (where the browser has one), an old / new preview (click the old half to go back), the value as hex, rgb() or hsl() text (any CSS color can be typed or pasted), WCAG contrast on white and black, and palettes: the four HADİ colors, the theme's palette and the recent picks. Theme colors are read from the tokens at the moment they are picked, so they follow the active theme.
 
-Composed of: IconButton, Segmented
+Composed of: IconButton, [Segmented](#segmented)
 
 ```tsx
 <ColorPicker bind:value={$color} />
@@ -159,6 +258,19 @@ Composed of: IconButton, Segmented
 ```
 
 Full page: src/components/composite/color-picker/docs.md
+
+## Combobox
+
+A text field with a list of matching options: static `options` filtered as you type (accent and case-insensitive), or an async `search(q)` that is debounced, shows "Searching…" and ignores late answers. Arrow keys move, Enter picks, Escape closes. `multiple` turns it into chips (see MultiSelect); `allowCustom` lets typed text become the value.
+
+Composed of: OverflowText
+
+```tsx
+<Field label="District"><Combobox bind:value={$town} options={towns} placeholder="Start typing" /></Field>
+<Field label="Member"><Combobox bind:value={$userId} search={(q) => api.users(q)} labelOf={(id) => names[id]} /></Field>
+```
+
+Full page: src/components/forms/combobox/docs.md
 
 ## CommandPalette
 
@@ -178,7 +290,7 @@ Full page: src/components/composite/command-palette/docs.md
 
 The consent manager's UI. A bottom banner asks until there is a valid decision for the current policy version (Reject all sits next to Accept all, with the same weight); the preferences panel lists every category as a Card with a Toggle (a Dialog on wide screens, a bottom sheet on phones); `ConsentGate` keeps third-party content behind a placeholder that can allow it in place. The module is lazy on purpose: load it with `lazy(() => import("hadi-march/managers/consent/ui"), { pick: "ConsentBanner" })`.
 
-Composed of: Button, Card, Dialog, Toggle
+Composed of: Button, Card, Dialog, [Toggle](#toggle)
 
 ```tsx
 <ConsentBanner title="Cookies" text="We use analytics to measure visits." />
@@ -230,6 +342,44 @@ import { DataGrid } from "hadi-march/components/data/data-grid";
 
 Full page: src/components/data/data-grid/docs.md
 
+## DatePicker
+
+A date typed in the locale's own order (`14.03.2026`, `3/14/2026`) with a Calendar popover. The value is an ISO date string or `null`; an impossible date (`31.02`) or one outside `min` / `max` marks the field invalid instead of changing the value. `parseDate` and `formatDate` are the same rules as functions.
+
+Composed of: [Calendar](#calendar)
+
+```tsx
+<Field label="Date"><DatePicker bind:value={$date} min={todayIso()} /></Field>
+parseDate("14.3.2026", "de") // "2026-03-14"
+```
+
+Full page: src/components/forms/date-picker/docs.md
+
+## DateRangePicker
+
+A date range `{ from, to }` (either end may be open). Presets — today, the last 7 / 30 / 90 days, this month — sit in a Segmented row; "Custom" shows a from / to pair of DatePickers that keep each other in order. `rangePresets(today)` returns the built-in presets for your own list.
+
+Composed of: [Segmented](#segmented), [DatePicker](#datepicker)
+
+```tsx
+<Field label="Report period" group><DateRangePicker bind:value={$range} /></Field>
+<DateRangePicker bind:value={$range} presets={false} max={todayIso()} />
+```
+
+Full page: src/components/forms/date-range-picker/docs.md
+
+## DateTimeInput
+
+A date and a time edited side by side, stored as one ISO timestamp in UTC (like `new Date().toISOString()`) and shown in local time. Picking only a date uses `defaultTime`.
+
+Composed of: [DatePicker](#datepicker), [TimeInput](#timeinput)
+
+```tsx
+<Field label="Starts"><DateTimeInput bind:value={$startsAt} defaultTime="09:00" /></Field>
+```
+
+Full page: src/components/forms/date-time-input/docs.md
+
 ## Drawer
 
 A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
@@ -265,11 +415,24 @@ Composed of: [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [Post
 
 Full page: src/components/composite/feed/docs.md
 
+## FileUpload
+
+Drop files or click to choose. `accept` and `maxSize` are checked before anything is kept (the reasons are listed); images and audio get a preview (object URLs are revoked on cleanup). With an `upload(file, { onProgress, signal })` function each file shows its progress and can be cancelled, and the value becomes what `upload` resolves with.
+
+Composed of: Progress, OverflowText
+
+```tsx
+<FileUpload multiple accept="image/*" maxSize={5_000_000} label="Drop images or choose" />
+<FileUpload bind:value={$urls} multiple upload={(file, { onProgress, signal }) => api.upload(file, onProgress, signal)} />
+```
+
+Full page: src/components/forms/file-upload/docs.md
+
 ## FlowCanvas
 
 A node editor on an endless canvas: pan and zoom, snap to the grid, nodes with ports and form fields, bezier edges, values flowing along the edges as moving dots, box and multi selection, copy / paste, undo, a minimap, layered auto layout, groups, a context menu and full keyboard use. The flow lives in a store (`createFlow`) that FlowPalette adds to and FlowControls runs; it reads and writes a readable JSON schema (`march.flow/v1`).
 
-Composed of: [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle
+Composed of: [ContextMenu](#contextmenu), IconButton, OverflowText, Field, [TextInput](#textinput), [NumberInput](#numberinput), [Select](#select), [Toggle](#toggle)
 
 ```tsx
 const flow = createFlow({ types, doc })          // types: [{ type, label, icon, color, inputs, outputs, fields, run }]
@@ -284,7 +447,7 @@ Full page: src/components/composite/flow-canvas/docs.md
 
 Run, pause, step and reset a flow; choose the speed; see the state, the clock and how many nodes finished. `createFlowRunner(flow)` executes the flow node by node and writes the state FlowCanvas draws: the running node glows, a failing node shakes and shows its error, values travel along the edges as dots and every edge counts what passed. `FlowTimeline` is the run record: one bar per executed node on a time axis with a playhead.
 
-Composed of: Button, IconButton, Segmented, [Chip](#chip), OverflowText
+Composed of: Button, IconButton, [Segmented](#segmented), [Chip](#chip), OverflowText
 
 ```tsx
 const runner = createFlowRunner(flow, { nodeMs: 650, travelMs: 560 })
@@ -336,7 +499,7 @@ Full page: src/components/data/gantt/docs.md
 
 Build a CSS gradient by hand. Pick the type (linear, radial, conic), turn the angle dial or press a quick angle, click the stop bar to add a color stop (its color is the gradient's color at that point), drag stops to move them, drag one down (or press Delete) to remove it, and edit the selected stop's color with a full ColorPicker. Presets start from the HADİ colors and the theme palette; the CSS is ready to copy.
 
-Composed of: [ColorPicker](#colorpicker), Segmented, IconButton
+Composed of: [ColorPicker](#colorpicker), [Segmented](#segmented), IconButton
 
 ```tsx
 <GradientEditor bind:value={$background} />
@@ -349,7 +512,7 @@ Full page: src/components/composite/gradient-editor/docs.md
 
 Crop an image the way phones do: the frame stays centered, the picture moves under it. Drag the image to move it, zoom with the wheel, the slider or + −, turn it by 90° with the buttons (or R) and by fine angles with the angle slider (or [ ]), mirror it (F), resize the frame from its corners or pick an aspect ratio. At any angle the image always covers the frame, so the result never has empty corners. The result is drawn on a canvas (`api.toCanvas()`, `api.toBlob()`); a small live preview shows it with its size in pixels.
 
-Composed of: Segmented, Slider, IconButton
+Composed of: [Segmented](#segmented), [Slider](#slider), IconButton
 
 ```tsx
 <ImageCropper src={url} bind:value={$crop} aspect={1} api={(c) => cropper = c} />
@@ -371,11 +534,22 @@ Composed of: [TreeEditor](#treeeditor)
 
 Full page: src/components/composite/json-editor/docs.md
 
+## KeyValueEditor
+
+Edit an object as rows of key and value. Rows keep their order, empty keys are skipped, a duplicate key is flagged on its row, and with `numbers` numeric-looking values are stored as numbers.
+
+```tsx
+<Field label="Labels" group><KeyValueEditor bind:value={$labels} /></Field>
+<KeyValueEditor bind:value={$limits} numbers keyPlaceholder="Plan" valuePlaceholder="Seats" />
+```
+
+Full page: src/components/forms/key-value-editor/docs.md
+
 ## KeyframeTimeline
 
 Edit and play a keyframe animation on the motion engine. Each track animates one property (x, y, scale, rotate, opacity) of a target; its lane shows the value curve and the keyframes as diamonds you drag along time (snapped, Alt for free). Scrub the ruler or drag the playhead; play, pause, loop and change the speed. The selected keyframe has its time, value and an EasingCurveEditor for the curve into it. Playback is a motion engine `Playback`, so the global speed, "Stop all" and reduced motion apply; `timelineCode(model)` writes the same animation as engine timeline code.
 
-Composed of: [EasingCurveEditor](#easingcurveeditor), IconButton, Segmented
+Composed of: [EasingCurveEditor](#easingcurveeditor), IconButton, [Segmented](#segmented)
 
 ```tsx
 <KeyframeTimeline bind:value={$scene} />
@@ -395,6 +569,16 @@ Composed of: [CountRoll](#countroll)
 ```
 
 Full page: src/components/social/like-button/docs.md
+
+## ListEditor
+
+Edit an array of strings in place: type and press Enter to add, edit any row, move rows up and down, remove them. Pasting several lines adds one item per line; duplicates are skipped unless `unique={false}`; `max` caps the list.
+
+```tsx
+<Field label="Tags" group><ListEditor bind:value={$tags} max={10} placeholder="Add a tag" /></Field>
+```
+
+Full page: src/components/forms/list-editor/docs.md
 
 ## MadeWithMarch
 
@@ -434,6 +618,18 @@ Composed of: Skeleton
 
 Full page: src/components/social/media-grid/docs.md
 
+## MultiSelect
+
+Several values as chips in one field. It is a Combobox with `multiple`: the same static options or async search, the same keyboard; Backspace in the empty field removes the last chip and each chip has its own remove button.
+
+Composed of: [Combobox](#combobox)
+
+```tsx
+<Field label="Languages"><MultiSelect bind:value={$langs} options={[{ value: "tr", label: "Turkish" }, { value: "en", label: "English" }]} /></Field>
+```
+
+Full page: src/components/forms/multi-select/docs.md
+
 ## NavSidebar
 
 The app's side menu: categories that open and close, a typo-tolerant search over every item, recent visits and featured items at the top, a collapsible icon rail and a resizable width, all remembered per user. Items are links (router `Link`), so the current page is marked and the menu follows navigation.
@@ -448,6 +644,39 @@ Composed of: OverflowText, Link
 ```
 
 Full page: src/components/composite/nav-sidebar/docs.md
+
+## NumberInput
+
+A locale-aware number: accepts `12,5` and `12.5`, never produces `NaN` (bad text marks the field invalid and is put back on blur), clamps to `min` / `max` and steps with ArrowUp / ArrowDown. The family: **IntInput** (0 decimals), **MoneyInput** (the currency symbol on the locale's side, the currency's decimals, grouping) and **PercentInput** (shows 12.5 % for a stored 0.125).
+
+```tsx
+<Field label="Quantity"><NumberInput bind:value={$n} min={0} max={99} /></Field>
+<Field label="Price"><MoneyInput bind:value={$price} currency="EUR" /></Field>
+<Field label="Discount"><PercentInput bind:value={$rate} /></Field>
+```
+
+Full page: src/components/forms/number-input/docs.md
+
+## PasswordInput
+
+A password field with a Show / Hide button. `autocomplete` defaults to `current-password`; use `new-password` on sign-up forms so password managers offer to generate one.
+
+```tsx
+<Field label="Password" help="At least 10 characters"><PasswordInput bind:value={$pw} autocomplete="new-password" /></Field>
+```
+
+Full page: src/components/forms/password-input/docs.md
+
+## PhoneInput
+
+A phone number stored as `+` and digits (`"+447700900123"`). With `country` the calling code is shown as a prefix and put in front of national numbers; `normalizePhone(text, country)` is the same rule as a function.
+
+```tsx
+<Field label="Phone"><PhoneInput bind:value={$phone} country="+44" /></Field>
+normalizePhone("0 (532) 111-22-33", "+90") // "+905321112233"
+```
+
+Full page: src/components/forms/phone-input/docs.md
 
 ## PostCard
 
@@ -483,6 +712,17 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
 
+## RadioGroup
+
+Radio buttons; the value is the chosen option value. Same looks as CheckboxGroup plus `segmented` (joined buttons). Radio boxes are always round.
+
+```tsx
+<Field label="Size" group><RadioGroup bind:value={$size} inline options={["S", "M", "L", "XL"]} /></Field>
+<RadioGroup variant="card" bind:value={$plan} options={plans} />
+```
+
+Full page: src/components/forms/radio-group/docs.md
+
 ## ReactionPicker
 
 A row of emoji to react with, or a grid that serves as an emoji panel. It pops in (a spring scale and staggered emoji on the motion engine); the picked emoji sits on a soft Aktivite circle; hovering lifts an emoji. Arrow keys move between emoji (mirrored in RTL; up / down move by rows in the grid), Home / End jump.
@@ -512,7 +752,7 @@ Full page: src/components/composite/rich-text-editor/docs.md
 
 A month / week / day calendar of events. Drag an event to move it (minutes snap to `step`; across columns it changes day), drag its edge to resize it, drag on an empty slot to create one. Dates and times are formatted with Intl in the current locale: month and weekday names, the first day of the week, 12 / 24 hour clock and the reading direction. Overlapping events share the column width; all-day and multi-day events sit in their own lane as bars.
 
-Composed of: Button, IconButton, ButtonGroup, Segmented
+Composed of: Button, IconButton, ButtonGroup, [Segmented](#segmented)
 
 ```tsx
 import { Scheduler } from "hadi-march/components/data/scheduler";
@@ -524,6 +764,36 @@ import { Scheduler } from "hadi-march/components/data/scheduler";
 ```
 
 Full page: src/components/data/scheduler/docs.md
+
+## Segmented
+
+A compact single choice: joined buttons, the chosen one raised. Use it for 2–6 short options (view modes, units, periods). Arrow keys move and select; only the chosen button is in the Tab order.
+
+```tsx
+<Segmented bind:value={$view} options={[{ value: "list", label: "List" }, { value: "grid", label: "Grid" }]} aria-label="View" />
+```
+
+Full page: src/components/forms/segmented/docs.md
+
+## Select
+
+The native `<select>`, so phones show their own picker. Option values keep their type: a number stays a number, an object stays the same object. For a handful of values prefer ChoicePicker or Segmented; for many, Combobox.
+
+```tsx
+<Field label="City"><Select bind:value={$city} options={cities} placeholder="Choose…" /></Field>
+```
+
+Full page: src/components/forms/select/docs.md
+
+## Slider
+
+A range slider with the value shown next to it (an `<output>`). `format` turns the number into text (a unit, a percentage, a label).
+
+```tsx
+<Field label="Volume"><Slider bind:value={$vol} min={0} max={100} format={(v) => `${v} %`} /></Field>
+```
+
+Full page: src/components/forms/slider/docs.md
 
 ## Stepper
 
@@ -572,6 +842,28 @@ Composed of: Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#like
 
 Full page: src/components/composite/story-viewer/docs.md
 
+## TextInput
+
+Single-line text. Works standalone (`bind:value`, `value` + `onChange`, or uncontrolled) and inside a `<Field>` or `<Form>`, which wire its id, `aria-invalid` and `aria-describedby`. **EmailInput** and **UrlInput** are the same control with the right keyboard, autocomplete and trimming.
+
+```tsx
+<Field label="Search"><TextInput bind:value={$q} placeholder="Members, orders…" prefix={<Icon of={search} />} /></Field>
+<Field label="E-mail"><EmailInput bind:value={$mail} /></Field>
+<Field label="Website"><UrlInput bind:value={$site} /></Field>
+```
+
+Full page: src/components/forms/text-input/docs.md
+
+## Textarea
+
+Multi-line text that grows with what is typed (`autosize={false}` keeps the height fixed). Same value and field wiring as TextInput.
+
+```tsx
+<Field label="About" help={() => `${$about.length}/280`}><Textarea bind:value={$about} rows={3} maxLength={280} /></Field>
+```
+
+Full page: src/components/forms/textarea/docs.md
+
 ## ThemeMenu
 
 One top-bar menu for the whole look: light / dark / system, the color theme (each drawn by a live swatch of itself) and the accent color. Its sections are the same ones `ThemePicker` and `AccentPicker` show on their own, so an app can use one menu or the separate pickers and they always match. Choices are remembered.
@@ -585,11 +877,31 @@ Composed of: Dropdown, ThemeSwatch, OverflowText
 
 Full page: src/components/composite/theme-menu/docs.md
 
+## TimeInput
+
+The browser's own time field: the value is `"HH:MM"` (`"HH:MM:SS"` with a step under a minute), in the user's 12- or 24-hour display.
+
+```tsx
+<Field label="Start"><TimeInput bind:value={$start} min="09:00" max="18:00" /></Field>
+```
+
+Full page: src/components/forms/time-input/docs.md
+
+## Toggle
+
+An on / off switch for settings that apply at once. The thumb slides toward the inline end (mirrored in right-to-left pages); the track takes the color token when on.
+
+```tsx
+<Toggle bind:value={$notify} label="Instant notifications" />
+```
+
+Full page: src/components/forms/toggle/docs.md
+
 ## TreeEditor
 
 Edit any JSON value as a tree. Each row shows its key, a **type badge** in a HADİ color (objects and lists Heyecan, numbers Aktivite, text Dostluk, true / false İletişim) that converts the value to another type, and the value: a text or number you edit in place, a switch for true / false, a count for objects and lists. Rows add, duplicate and delete; a search box keeps the matches and their parents; a JSON Schema subset marks invalid rows with their message. Every change is one step of the editor's own undo history.
 
-Composed of: Badge, IconButton, Toggle
+Composed of: Badge, IconButton, [Toggle](#toggle)
 
 ```tsx
 <TreeEditor bind:value={$config} schema={schema} />

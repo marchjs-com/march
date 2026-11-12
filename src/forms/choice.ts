@@ -75,3 +75,13 @@ export function itemColor(colors: "brand" | readonly string[] | undefined, i: nu
   const list = colors === "brand" ? ["brand-orange", "brand-blue", "brand-green", "brand-purple"] : colors;
   return list && list.length ? (list[i % list.length] as string) : null;
 }
+
+/** Look of a group of choices: every option takes it; `colors="brand"` gives each option the next HADİ color. */
+export interface ChoiceGroupLook extends ChoiceLook {
+  /** "brand" (orange, blue, green, purple in turn) or a list of color tokens, one per option in turn. */
+  colors?: "brand" | readonly string[] | undefined;
+}
+
+/** Classes of a CheckboxGroup / RadioGroup wrapper. */
+export const groupClass = (props: ChoiceGroupLook & { inline?: boolean | undefined; class?: unknown }, kind: "checkbox" | "radio"): string =>
+  cx("hm-choices", lookClass(props, kind), props.inline && "hm-choices-inline", props.class as string);

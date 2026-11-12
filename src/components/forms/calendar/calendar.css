@@ -1,7 +1,4 @@
-/* HADI March — Calendar, DatePicker, TimeInput, DateRangePicker. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-/* calendar */
-.hm-date { max-width: 14rem; }
-.hm-cal-pop { position: fixed; z-index: var(--hm-z-dropdown); padding: var(--hm-space-3); background: var(--hm-surface-raised); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-3); animation: hm-scale-in var(--hm-dur) var(--hm-ease-out); }
+/* HADI March — Calendar (month grid). Imported by its component module; tokens.css provides the variables. */
 .hm-cal { display: inline-flex; flex-direction: column; gap: var(--hm-space-2); user-select: none; }
 .hm-cal-header { display: flex; align-items: center; justify-content: space-between; gap: var(--hm-space-2); }
 .hm-cal-title { font-weight: 600; text-transform: capitalize; }
@@ -16,7 +13,3 @@
 .hm-cal-range { background: var(--hm-accent-soft, var(--hm-primary-soft)); border-radius: 0; }
 .hm-cal-day[aria-selected="true"] { background: var(--hm-accent, var(--hm-primary)); color: var(--hm-on-accent, var(--hm-on-primary-fill)); font-weight: 600; }
 .hm-cal-day[aria-disabled="true"] { opacity: .35; cursor: not-allowed; background: transparent; text-decoration: line-through; }
-.hm-time { max-width: 9rem; }
-.hm-datetime, .hm-daterange-custom { display: flex; gap: var(--hm-space-2); align-items: center; flex-wrap: wrap; }
-.hm-daterange { display: flex; flex-direction: column; gap: var(--hm-space-2); }
-.hm-daterange-sep { color: var(--hm-muted); }

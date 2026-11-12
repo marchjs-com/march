@@ -1,0 +1,16 @@
+// Showcase stage for KeyValueEditor: numbers on or off (see the stored object) and read-only.
+import { KeyValueEditor } from "./index.ts";
+import { Field } from "../../../forms/field.ts";
+
+export const code = `<Field label="Kota" group><KeyValueEditor bind:value={$limits} numbers keyPlaceholder="Plan" valuePlaceholder="Koltuk" /></Field>`
+
+type Limits = Record<string, string | number>
+const START: Limits = { free: "1", team: "10" }
+
+export default function KeyValueEditorDemo(props: { values: { numbers: boolean; readonly: boolean } }) {
+  let $limits = START
+  return <div class="sc-stack">
+    {() => <Field label="Kota" group><KeyValueEditor value={$limits} onChange={(v: Limits) => { $limits = v }} numbers={props.values.numbers} readonly={props.values.readonly} keyPlaceholder="Plan" valuePlaceholder="Koltuk" /></Field>}
+    <pre class="hm-muted">{() => JSON.stringify(props.values.numbers ? Object.fromEntries(Object.entries($limits).map(([k, x]) => [k, x !== "" && !isNaN(Number(x)) ? Number(x) : x])) : $limits)}</pre>
+  </div>
+}

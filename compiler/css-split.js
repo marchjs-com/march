@@ -17,7 +17,8 @@ export const ORDER = [
   "ui/field.css", "ui/button.css", "ui/menu.css", "ui/dialog.css", "ui/toast.css", "ui/tabs.css", "ui/display.css", "ui/grid.css", "ui/layout.css", "ui/nav.css",
   "components/composite/nav-sidebar/nav-sidebar.css", "components/composite/command-palette/command-palette.css", "ui/theme.css", "ui/accent.css", "components/composite/theme-menu/theme-menu.css", "dom/lazy.css", "ui/overlay.css", "ui/theme-swatches.css", "ui/media.css", "ui/disclosure.css", "ui/app.css", "components/actions/chip/chip.css", "ui/marquee.css", "ui/avatar-group.css",
   "ui/progress.css", "ui/rating.css", "ui/accordion.css", "ui/steps.css", "ui/pagination.css", "ui/carousel.css", "ui/tree.css", "ui/kanban.css",
-  "ui/splitter.css", "forms/form.css", "forms/inputs.css", "forms/choice.css", "forms/pickers.css", "forms/date.css", "forms/file.css", "forms/editors.css",
+  "ui/splitter.css", "forms/form.css", "forms/inputs.css", "components/forms/toggle/toggle.css", "components/forms/segmented/segmented.css", "components/forms/slider/slider.css", "components/forms/color-input/color-input.css", "components/forms/code-input/code-input.css", "forms/choice.css",
+  "components/forms/combobox/combobox.css", "components/forms/calendar/calendar.css", "components/forms/date-picker/date-picker.css", "components/forms/time-input/time-input.css", "components/forms/date-time-input/date-time-input.css", "components/forms/date-range-picker/date-range-picker.css", "components/forms/file-upload/file-upload.css", "forms/editors.css", "components/forms/list-editor/list-editor.css", "components/forms/key-value-editor/key-value-editor.css",
   "components/composite/wizard/wizard.css", "forms/records.css", "css/table.css", "charts/charts.css", "fx/fx.css",
 ];
 const rank = (abs) => { const r = relative(SRC, abs).split(sep).join("/"); const i = ORDER.indexOf(r); return i < 0 ? ORDER.length : i; };
