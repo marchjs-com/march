@@ -29,11 +29,21 @@ export interface ConsentTexts {
 }
 
 export interface ConsentBannerProps extends ConsentTexts {
-  /** Show even after a decision (demos). */
+  /** Show even when a decision is already stored (demos); a choice made on the banner still closes it. */
   always?: boolean;
-  /** Render in place instead of the bottom layer (demos). */
+  /** Render in place, in the page flow, instead of the bottom layer (demos). */
   inline?: boolean;
 }
+
+// forced: shown on request (showConsentBanner). closedFor: the record the banner was closed with — it stays closed
+// while that record holds and comes back when it changes (withdrawal, a new policy version)
+const forced = signal(false);
+const NONE = {};
+const closedFor = signal<unknown>(NONE);
+/** Show the banner again, even when a decision is stored (a "cookie settings" link, demos). */
+export function showConsentBanner(): void { closedFor.set(NONE); forced.set(true); }
+/** Close the banner; a choice made on it calls this. It comes back when the stored decision changes or goes away. */
+export function hideConsentBanner(): void { forced.set(false); closedFor.set(untrack(() => consent.record())); }
 
 const policyLink = (p: ConsentTexts): unknown => {
   const href = consent.policyHref();
@@ -54,9 +64,9 @@ export function ConsentBanner(props: ConsentBannerProps = {}): unknown {
     h("div", { class: "hm-consent-text" },
       h("h2", { class: "hm-consent-title" }, () => txt(props.title, "Cookies and privacy")),
       h("p", {}, () => txt(props.text, "We use cookies that are needed for the site to work and, with your permission, others for preferences, statistics, marketing and third-party content. You can change your choice at any time."), " ", policyLink(props))),
-    choices(() => {}, () => { void openConsentPreferences(props); }));
-  const show = (): boolean => !!props.always || !consent.decided();
-  return () => (show() ? (props.inline ? body() : h(Portal, { layer: "toast" }, body())) : null);
+    choices(hideConsentBanner, () => { void openConsentPreferences(props).then((saved) => { if (saved) hideConsentBanner(); }); }));
+  const show = (): boolean => forced() || (closedFor() !== consent.record() && (!!props.always || !consent.decided()));
+  return () => (show() ? (props.inline ? h("div", { class: "hm-consent-inline" }, body()) : h(Portal, { layer: "toast" }, body())) : null);
 }
 
 /** One category: Card with the description and a Toggle (required ones are on and locked). */

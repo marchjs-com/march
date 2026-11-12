@@ -159,3 +159,58 @@ test("UI: banner until decided, Reject all is offered next to Accept all; gate p
   assert.equal(consent.record().method, "custom");
   off(); host.remove();
 });
+
+test("UI: a choice on the banner closes it, also with always (demos); showConsentBanner brings it back; withdrawal shows it again", async () => {
+  fresh();
+  const { ConsentBanner, showConsentBanner } = await import("./ui.ts");
+  const { setLocale } = await import("../../core/i18n.ts");
+  await setLocale("en");
+  const host = document.createElement("div");
+  document.body.appendChild(host);
+  const off = render(() => h(ConsentBanner, { inline: true, always: true }), host);
+  const click = (label) => [...host.querySelectorAll(".hm-consent button")].find((b) => b.textContent === label).click();
+  assert.ok(host.querySelector(".hm-consent"));
+  click("Accept all");
+  await tick();
+  assert.equal(host.querySelector(".hm-consent"), null, "Accept all closes it even with always");
+  assert.equal(consent.has("analytics"), true);
+  showConsentBanner();
+  await tick();
+  assert.ok(host.querySelector(".hm-consent"), "shown again on request");
+  click("Reject all");
+  await tick();
+  assert.equal(host.querySelector(".hm-consent"), null, "Reject all closes it");
+  assert.equal(consent.has("analytics"), false);
+  consent.withdraw();
+  await tick();
+  assert.ok(host.querySelector(".hm-consent"), "no decision any more: back");
+  off(); host.remove();
+});
+
+test("UI: the bottom banner sits in the toast band, above dialogs, menus and sticky parts", async () => {
+  fresh();
+  const fs = await import("node:fs");
+  const { ConsentBanner } = await import("./ui.ts");
+  const { layers, openLayer } = await import("../../dom/portal.ts");
+  const host = document.createElement("div");
+  document.body.appendChild(host);
+  const closeDialog = openLayer("dialog", document.createElement("div"));
+  const off = render(() => h(ConsentBanner, {}), host);
+  await tick();
+  const banner = document.querySelector(".hm-layer .hm-consent");
+  assert.ok(banner, "rendered into a layer, not in the page");
+  const layer = layers().find((l) => l.el.contains(banner));
+  assert.equal(layer.kind, "toast");
+  assert.match(layer.el.style.getPropertyValue("z-index"), /--hm-z-toast/);
+  const closeLater = openLayer("dialog", document.createElement("div"));
+  assert.match(layer.el.style.getPropertyValue("z-index"), /--hm-z-toast/, "a dialog opened later stays below");
+  const css = fs.readFileSync(new URL("./consent.css", import.meta.url), "utf8");
+  assert.match(css, /\.hm-consent \{[^}]*z-index: var\(--hm-z-toast/, "the banner box itself is in the toast band");
+  const tokens = fs.readFileSync(new URL("../../css/tokens.css", import.meta.url), "utf8");
+  const z = (n) => Number(tokens.match(new RegExp(`--hm-z-${n}: ([0-9]+)`))[1]);
+  assert.ok(z("toast") > z("dialog") && z("toast") > z("dropdown") && z("toast") > z("sticky"));
+  consent.acceptAll();
+  await tick();
+  assert.equal(document.querySelector(".hm-consent"), null, "gone after a decision");
+  closeLater(); closeDialog(); off(); host.remove();
+});

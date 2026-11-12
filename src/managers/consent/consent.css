@@ -2,7 +2,10 @@
 .hm-consent { position: fixed; inset-inline: var(--hm-space-3); inset-block-end: calc(var(--hm-space-3) + env(safe-area-inset-bottom, 0px));
   max-width: 56rem; margin-inline: auto; display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--hm-space-4);
   padding: var(--hm-space-4) var(--hm-space-5); pointer-events: auto; background: var(--hm-surface-raised); color: var(--hm-text);
-  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-3); }
+  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-3);
+  z-index: var(--hm-z-toast); }
+/* in the page flow (demos): no fixed position, so it never covers the content after it */
+.hm-consent-inline > .hm-consent { position: relative; inset: auto; margin-inline: 0; max-width: none; }
 .hm-consent-text { flex: 1 1 22rem; min-width: 0; }
 .hm-consent-text p { margin: 0; color: var(--hm-muted); font-size: var(--hm-text-sm); overflow-wrap: anywhere; }
 .hm-consent-title { margin: 0 0 var(--hm-space-1); font-size: var(--hm-text-md); font-weight: var(--hm-weight-semibold); }
