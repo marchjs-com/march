@@ -454,6 +454,24 @@ Throw `new AppError(msg, { type, code })` for domain errors; never show `e.messa
 - Components created outside `render()` (e.g. in an event handler) get their own root — prefer `openDialog()` for UI
   created on demand so it is disposed when closed.
 
+## 16b. Flows (hadi-march/flow) and ContextMenu (hadi-march/context-menu)
+
+Node-based flows have their own entry (pages that do not show a flow never load it):
+```tsx
+import { createFlow, FlowCanvas, FlowPalette, FlowControls, FlowTimeline, createFlowRunner, emit } from "hadi-march/flow";
+const flow = createFlow({ types: [{ type: "check", label: "Check", inputs: [{ id: "in" }], outputs: [{ id: "yes" }, { id: "no" }],
+  fields: [{ key: "limit", label: "Limit", kind: "number", default: 400 }], run: ({ input, data }) => (input.total >= data.limit ? emit({ yes: input }) : emit({ no: input })) }], doc })
+const runner = createFlowRunner(flow)
+<FlowControls runner={runner} flow={flow} /> <FlowPalette flow={flow} /> <FlowCanvas flow={flow} snap={16} /> <FlowTimeline runner={runner} flow={flow} />
+flow.toJSON()          // { schema: "march.flow/v1", nodes, edges: [{ id, from: "node.port", to: "node.port" }], groups }
+flow.load(doc, "Import")  // validateFlow(doc, types) first; one undo step (UndoManager)
+```
+Changes go through `flow.change(label, fn)` (one undo step); copy / paste use ClipboardManager. A node's `run` returns a
+value (all outputs), `emit({ port: value })` (chosen outputs) or throws (fails; what follows is skipped).
+`<ContextMenu items={(target) => [...MenuItem]}>` opens Menu items at the pointer (Shift+F10 / Menu key too).
+`<Field label="…">{control}</Field>` (hadi-march/forms, src/forms/field.ts) labels a control without the form engine.
+A heavy feature like this marks `entry` in its meta.ts: it stays out of the ui barrel and its page imports its demo.
+
 ## 17. Managers (hadi-march/managers/*)
 
 One instance each, started on first use, `configureX()` for global options, `disposeX()` to shut down. Import each
@@ -515,7 +533,14 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| ContextMenu | experimental | Right-click / Shift+F10 menu anchored to the pointer: the same items, actions and keyboard as Menu, chosen per target. | — |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+
+### Navigation — `hadi-march/navigation`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
 
 ### Social — `hadi-march/social`
 
@@ -539,6 +564,9 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, ReactionPicker |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | ChatBubble, TypingIndicator, ReactionPicker, Avatar |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | PullToRefresh, VirtualList, PostCard, Skeleton |
+| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | ContextMenu, IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle |
+| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, Chip, OverflowText |
+| FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, OverflowText |
 | NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, MediaGrid, LikeButton, CountRoll |
 | ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | StoryRing, FollowButton, CountRoll, Button, Menu |

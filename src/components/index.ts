@@ -16,6 +16,7 @@ export * from "./composite/post-card/index.ts";
 export * from "./composite/profile-header/index.ts";
 export * from "./feedback/pull-to-refresh/index.ts";
 export * from "./social/reaction-picker/index.ts";
+export * from "./navigation/stepper/index.ts";
 export * from "./social/story-progress/index.ts";
 export * from "./social/story-ring/index.ts";
 export * from "./composite/story-viewer/index.ts";

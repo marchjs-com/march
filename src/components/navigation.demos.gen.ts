@@ -5,4 +5,6 @@ import * as d1 from "./composite/nav-sidebar/demo.tsx";
 import * as p1 from "./composite/nav-sidebar/playground.ts";
 import * as d2 from "./feedback/pull-to-refresh/demo.tsx";
 import * as p2 from "./feedback/pull-to-refresh/playground.ts";
-export { d0, p0, d1, p1, d2, p2 };
+import * as d3 from "./navigation/stepper/demo.tsx";
+import * as p3 from "./navigation/stepper/playground.ts";
+export { d0, p0, d1, p1, d2, p2, d3, p3 };

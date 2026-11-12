@@ -1,0 +1,28 @@
+# ContextMenu
+
+The menu that opens where you right-click, or with Shift+F10 / the Menu key on the focused element. It draws the same
+items as `Menu` — plain items, actions, separators, shortcuts — with the same roving keyboard; `items` receives the
+element that was clicked, so one menu can offer different entries for different targets.
+
+```tsx
+<ContextMenu items={(target) => [{ label: "Copy", shortcut: "mod+c", onSelect: copy }, "-", { label: "Delete", danger: true, onSelect: remove }]}>
+  <ul class="files">…</ul>
+</ContextMenu>
+```
+
+## Props
+
+| Prop | Type | Default | |
+|---|---|---|---|
+| `items` | `(target, point) => MenuItem[]` | — | entries for this opening |
+| `when` | `(target) => boolean` | — | return false to keep the browser menu |
+| `label` | string | — | accessible name of the menu |
+
+## Accessibility
+
+The panel is a `menu` of `menuitem`s; the first item takes focus, ↑ ↓ Home End move, Enter runs, Escape closes and
+returns focus to where it was. Shift+F10 and the Menu key open it at the focused element, so it never needs a pointer.
+
+## Composed of
+
+The Menu item renderer and roving focus (shared with `Menu`), the floating panel and positioning engine (Portal layer).

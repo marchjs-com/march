@@ -22,6 +22,8 @@ export interface ComponentMeta {
   /** Behaviors (src/behaviors) and shared engines (positioning, collection, field, variants …) it uses. */
   behaviors?: readonly string[];
   hubs?: readonly string[];
+  /** Own package entry instead of the hadi-march/ui barrel (heavy features used on few pages), e.g. "hadi-march/flow". */
+  entry?: string;
   /** Showcase page path that shows it. */
   showcase?: string;
   /**

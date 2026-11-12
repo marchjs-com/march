@@ -30,7 +30,14 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| ContextMenu | experimental | Right-click / Shift+F10 menu anchored to the pointer: the same items, actions and keyboard as Menu, chosen per target. | — |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+
+### Navigation — `hadi-march/navigation`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
 
 ### Social — `hadi-march/social`
 
@@ -54,6 +61,9 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, [ReactionPicker](#reactionpicker) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), Avatar |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
+| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle |
+| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, [Chip](#chip), OverflowText |
+| FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, OverflowText |
 | NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
 | ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll](#countroll), Button, Menu |
@@ -119,6 +129,18 @@ Composed of: OverflowText
 
 Full page: src/components/actions/chip/docs.md
 
+## ContextMenu
+
+The menu that opens where you right-click, or with Shift+F10 / the Menu key on the focused element. It draws the same items as `Menu` — plain items, actions, separators, shortcuts — with the same roving keyboard; `items` receives the element that was clicked, so one menu can offer different entries for different targets.
+
+```tsx
+<ContextMenu items={(target) => [{ label: "Copy", shortcut: "mod+c", onSelect: copy }, "-", { label: "Delete", danger: true, onSelect: remove }]}>
+  <ul class="files">…</ul>
+</ContextMenu>
+```
+
+Full page: src/components/overlays/context-menu/docs.md
+
 ## CountRoll
 
 An odometer number for likes, comments and followers. When the value changes only the digits that changed roll: upward when it grows, downward when it shrinks, on the motion engine (global speed, pause and reduced motion apply). The text is compact in the active locale (`1,2 B`, `12K`); `format="full"` groups it instead.
@@ -173,6 +195,49 @@ Composed of: [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [Post
 ```
 
 Full page: src/components/composite/feed/docs.md
+
+## FlowCanvas
+
+A node editor on an endless canvas: pan and zoom, snap to the grid, nodes with ports and form fields, bezier edges, values flowing along the edges as moving dots, box and multi selection, copy / paste, undo, a minimap, layered auto layout, groups, a context menu and full keyboard use. The flow lives in a store (`createFlow`) that FlowPalette adds to and FlowControls runs; it reads and writes a readable JSON schema (`march.flow/v1`).
+
+Composed of: [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle
+
+```tsx
+const flow = createFlow({ types, doc })          // types: [{ type, label, icon, color, inputs, outputs, fields, run }]
+<FlowCanvas flow={flow} snap={16} minimap />
+flow.toJSON()                                     // { schema: "march.flow/v1", nodes, edges: [{ from: "hook.out", to: "check.in" }], groups }
+flow.load(JSON.parse(text), "Import")             // validated (validateFlow); one undo step
+```
+
+Full page: src/components/composite/flow-canvas/docs.md
+
+## FlowControls
+
+Run, pause, step and reset a flow; choose the speed; see the state, the clock and how many nodes finished. `createFlowRunner(flow)` executes the flow node by node and writes the state FlowCanvas draws: the running node glows, a failing node shakes and shows its error, values travel along the edges as dots and every edge counts what passed. `FlowTimeline` is the run record: one bar per executed node on a time axis with a playhead.
+
+Composed of: Button, IconButton, Segmented, [Chip](#chip), OverflowText
+
+```tsx
+const runner = createFlowRunner(flow, { nodeMs: 650, travelMs: 560 })
+<FlowControls runner={runner} flow={flow} timeline />
+await runner.run()        // "done" | "error"; runner.pause() / resume() / step() / reset()
+```
+
+Full page: src/components/composite/flow-controls/docs.md
+
+## FlowPalette
+
+The node types of a flow, grouped by category, with a search box (accent and Turkish-letter insensitive). Drag a card onto a FlowCanvas to place the node where you drop it, snapped to the grid; a click or Enter adds it in the middle of the view. The dragged card floats in the drag layer, tilts while it is held and melts into the canvas (or flies back when dropped outside) on the motion engine.
+
+Composed of: SearchBox, OverflowText
+
+```tsx
+const flow = createFlow({ types })
+<FlowPalette flow={flow} />
+<FlowCanvas flow={flow} />
+```
+
+Full page: src/components/composite/flow-palette/docs.md
 
 ## FollowButton
 
@@ -310,6 +375,19 @@ import { Scheduler } from "hadi-march/components/data/scheduler";
 ```
 
 Full page: src/components/data/scheduler/docs.md
+
+## Stepper
+
+Progress through stages, with motion that shows where you are going. Stepper draws Steps and adds a liquid highlight that stretches from the old step to the new one and settles there, and step panels that morph into each other: the old panel blurs and slides toward the past, the new one arrives from the future (mirrored in RTL) while the frame's height follows. Back / Next buttons and a step counter come with it.
+
+Composed of: Steps, Button
+
+```tsx
+<Stepper steps={[{ title: "Cart" }, { title: "Address" }, { title: "Payment" }]} current={$step} onSelect={(i) => $step = i}
+  panels={[<Cart />, <Address />, <Payment />]} onFinish={submit} />
+```
+
+Full page: src/components/navigation/stepper/docs.md
 
 ## StoryProgress
 
