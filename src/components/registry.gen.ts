@@ -2,9 +2,11 @@
 import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";
 import m0 from "./chip/meta.ts";
 import m1 from "./drawer/meta.ts";
+import m2 from "./pull-to-refresh/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 export const registry: readonly RegistryEntry[] = [
   { folder: "chip", meta: m0, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./chip/demo.tsx"), playground: () => import("./chip/playground.ts") },
   { folder: "drawer", meta: m1, code: "", demo: () => import("./drawer/demo.tsx"), playground: () => import("./drawer/playground.ts") },
+  { folder: "pull-to-refresh", meta: m2, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./pull-to-refresh/demo.tsx"), playground: () => import("./pull-to-refresh/playground.ts") },
 ];

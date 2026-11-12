@@ -5,6 +5,7 @@
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
 
 ## Chip
 
@@ -27,3 +28,13 @@ Full page: src/components/chip/docs.md
 ```
 
 Full page: src/components/drawer/docs.md
+
+## PullToRefresh
+
+A scroll area that refreshes when its top is pulled down past a threshold, by touch, pen or mouse. A spinning indicator follows the pull and keeps turning until the async `onRefresh` settles.
+
+```tsx
+<PullToRefresh onRefresh={() => api.get("/feed").then((x) => $items = x)}>…</PullToRefresh>
+```
+
+Full page: src/components/pull-to-refresh/docs.md
