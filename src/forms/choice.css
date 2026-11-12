@@ -1,3 +1,9 @@
+/* base (was inputs.css): checkbox / radio row and option list */
+.hm-check { display: inline-flex; align-items: flex-start; gap: var(--hm-space-2); cursor: pointer; line-height: 1.4; }
+.hm-check-input { width: 1rem; height: 1rem; margin: .1875rem 0 0; accent-color: var(--hm-accent, var(--hm-primary)); flex: none; cursor: pointer; }
+.hm-check-input:disabled + .hm-check-label { color: var(--hm-muted); }
+.hm-choices { display: flex; flex-direction: column; gap: var(--hm-space-2); }
+.hm-choices-inline { flex-direction: row; flex-wrap: wrap; gap: var(--hm-space-2) var(--hm-space-4); }
 /* HADI March — selection controls (Checkbox, CheckboxGroup, RadioGroup): a drawn box over a visually hidden input.
    Colors: --hm-accent (data-hm-color) with the theme primary as fallback. Motion: transform / stroke only.
    Every option has a visible effect in every variant: size → box / padding / type size, shape → corners. */
@@ -72,7 +78,6 @@
 .hm-choice-card .hm-check { display: flex; align-items: stretch; min-width: 0; padding: var(--hm-ch-card-pad); padding-inline-end: calc(var(--hm-ch-card-pad) + 1.75rem);
   border: 1px solid var(--hm-border); border-radius: var(--hm-ch-card-radius); background: var(--hm-surface); box-shadow: var(--hm-shadow-1);
   transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease); }
-.hm-choice-card.hm-choice-single { display: block; }
 .hm-choice-card .hm-check-input { inset: 0; width: 100%; height: 100%; }
 /* the tick badge: top end corner, springs in when selected */
 .hm-choice-card .hm-check-box { position: absolute; inset-block-start: .75rem; inset-inline-end: .75rem; margin: 0; width: 1.375rem; height: 1.375rem; border: 0; border-radius: 50%; background: none;
@@ -110,7 +115,6 @@
 .hm-choice-toggle .hm-check-input, .hm-choice-segmented .hm-check-input { inset: 0; width: 100%; height: 100%; }
 .hm-choice-toggle .hm-check-box, .hm-choice-segmented .hm-check-box { display: none; }
 .hm-choice-toggle .hm-check:has(.hm-check-input:checked) { background: var(--hm-ch-c); color: var(--hm-ch-on); box-shadow: 0 1px 2px rgb(var(--hm-shadow-rgb) / .15); }
-.hm-choice-segmented .hm-check:has(.hm-check-input:checked) { background: var(--hm-surface); color: var(--hm-ch-text); box-shadow: 0 1px 2px rgb(var(--hm-shadow-rgb) / .12), 0 0 0 1px var(--hm-border); }
 .hm-choice-toggle .hm-check:has(.hm-check-input:focus-visible), .hm-choice-segmented .hm-check:has(.hm-check-input:focus-visible) { box-shadow: 0 0 0 2px var(--hm-ch-c); }
 
 .hm-choice-still *, .hm-choice-still *::before { transition: none !important; }

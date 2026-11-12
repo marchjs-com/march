@@ -398,6 +398,11 @@ One interaction, written once, attached to any element; each behavior is its own
   (aria-activedescendant keys for a field with options). Never write your own ArrowUp / ArrowDown option loop.
 - **dropzone** — `dropzone(zone, { onFiles, onOver, accept, paste })`: counted enter / leave, files only, paste;
   `accepts(file, accept)`. Never write dragenter / dragover / drop handlers for files yourself.
+- **swipe** — `swipeable(el, { axis, accept, onMove, onEnd, onTap, holdMs, onHold })` + `rubberBand`, `fling`, `nearest`:
+  axis lock, veto, release velocity, tap / hold, click after a swipe swallowed (Drawer, PullToRefresh, ChatBubble,
+  StoryViewer). Never write your own follow-the-finger pointer loop.
+- **dismiss** — `dismiss(panel, { inside, onDismiss(why), on, escape })`: outside press + Escape (capture phase) for
+  popovers, menus and pickers. Never add document pointerdown / click / Escape listeners for that yourself.
 
 ### 15c. Ready-made animations (all on the engine, each its own export)
 
@@ -562,7 +567,32 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Calendar | stable | Month grid with full keyboard support, min / max, disabled days and range highlight. | — |
+| Checkbox | stable | One drawn checkbox with its label: classic, soft, chip, card or toggle look, indeterminate state. | — |
+| CheckboxGroup | stable | Several checkboxes as one value (an array); any Checkbox look, per-option HADİ colors. | — |
+| ChoicePicker | stable | Single choice that picks its own look: segmented, chips, preview cards or a combobox, never a drop-down for a few values. | Segmented, RadioGroup, Combobox |
+| CodeInput | stable | One-time code / PIN boxes: typing advances, paste fills, HADİ colors and display font in the HADİ theme. | — |
+| ColorInput | stable | Native color swatch plus a #RRGGBB text field, kept in sync. | — |
+| Combobox | stable | Typeahead over static options or an async search (debounced, keyboard, aria-activedescendant). | OverflowText |
+| DatePicker | stable | Typed date in the locale's order with a Calendar popover; ISO value, never an invalid date. | Calendar |
+| DateRangePicker | stable | Date range { from, to } with presets (Segmented) and a custom pair of DatePickers. | Segmented, DatePicker |
+| DateTimeInput | stable | A DatePicker and a TimeInput editing one ISO timestamp in local time. | DatePicker, TimeInput |
+| FileUpload | stable | Drop zone or click; accept / size checks, image and audio previews, upload progress and cancel. | Progress, OverflowText |
+| KeyValueEditor | stable | Edit key → value rows as an object; order kept, duplicate keys flagged, numbers on request. | — |
+| ListEditor | stable | Edit a list of strings: add, edit, reorder, remove; pasted lines become items. | — |
+| MultiSelect | stable | Several values as removable chips: a Combobox with multiple (static options or async search). | Combobox |
+| NumberInput | stable | Locale-aware number (never NaN) with IntInput, MoneyInput (currency side and decimals) and PercentInput. | — |
+| PasswordInput | stable | Password field with a show / hide button (aria-pressed). | — |
+| PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | — |
+| RadioGroup | stable | Radio buttons for one value; classic, soft, chip, card or segmented look. | — |
 | Rating | stable | Star rating as a radio group: arrow keys (RTL mirrored), hover preview, half stars when read-only, any colour token. | — |
+| Segmented | stable | Compact single choice of joined buttons; arrow keys move and select (roving focus). | — |
+| Select | stable | The native drop-down; option values keep their type (numbers, objects). | — |
+| Slider | stable | Range slider with its value shown in an <output>; custom value format. | — |
+| TextInput | stable | Single-line text with prefix / suffix; EmailInput and UrlInput set the keyboard, autocomplete and trimming. | — |
+| Textarea | stable | Multi-line text that grows with its content. | — |
+| TimeInput | stable | Native time field ("HH:MM", seconds with step), with min / max. | — |
+| Toggle | stable | On / off switch (role="switch") whose thumb slides toward the inline end and mirrors in RTL. | — |
 
 ### Data display — `hadi-march/data`
 

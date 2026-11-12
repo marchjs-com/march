@@ -1,0 +1,4 @@
+/* HADI March — ColorInput. Imported by its component module; tokens.css provides the variables. */
+.hm-color { display: flex; gap: var(--hm-space-2); align-items: center; }
+.hm-color-swatch { width: var(--hm-control-h); height: var(--hm-control-h); padding: 2px; border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); background: var(--hm-surface); cursor: pointer; }
+.hm-color-text { max-width: 9rem; font-family: var(--hm-font-mono); }

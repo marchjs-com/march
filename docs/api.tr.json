@@ -398,7 +398,9 @@
   "isSep": "Bu menü girdisi bir ayraç mı (\"-\" ya da `{ separator: true }`)?",
   "itemVisible": "Bu menü girdisi `args` için görünür mü (action koruması, `hidden`, `can` izni)?",
   "menuItems": "Bir menü panelinin etkin `role=\"menuitem\"` öğeleri, sırayla (gezici odak bunlar arasında dolaşır).",
-  "renderItem": "Tek bir menü girdisini çizer: ayraç, action() düğmesi, yönlendirici bağlantısı ya da düz düğme. ContextMenu da kullanır."
+  "renderItem": "Tek bir menü girdisini çizer: ayraç, action() düğmesi, yönlendirici bağlantısı ya da düz düğme. ContextMenu da kullanır.",
+  "affix": "Verildiyse bir denetimi ön ek / son ek metniyle sarar.",
+  "clampIso": "Bir ISO tarihini min / max arasında tutar."
  },
  "hadi-march/components/registry.gen.ts": {
   "registry": "Her bileşen klasörü: meta, Kod sekmesi parçası ve tembel demo / oyun alanı yükleyicileri."

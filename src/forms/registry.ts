@@ -1,9 +1,8 @@
 // Schema field type → input component. `inputFor(field)` picks `field.control` (a component or a registered name) or
 // the component registered for `field.type`. Add your own with `registerInput("iban", IbanInput)`.
-import { TextInput, Textarea, PasswordInput, EmailInput, UrlInput, PhoneInput, NumberInput, MoneyInput, PercentInput, Select, Checkbox, Toggle,
-  CheckboxGroup, RadioGroup, Segmented, Slider, ColorInput, CodeInput, type NumberInputProps } from "./inputs.ts";
+import { TextInput, Textarea, PasswordInput, EmailInput, UrlInput, PhoneInput, NumberInput, IntInput, MoneyInput, PercentInput, Select, Checkbox, Toggle,
+  CheckboxGroup, RadioGroup, Segmented, Slider, ColorInput, CodeInput } from "./inputs.ts";
 import { Combobox, MultiSelect } from "./pickers.ts";
-import { extend } from "./util.ts";
 import { lazy, skeleton } from "../dom/lazy.ts";
 import type { FieldSpec } from "../schema/index.ts";
 
@@ -22,8 +21,7 @@ const DatePicker = later(dates, "DatePicker"), TimeInput = later(dates, "TimeInp
 const ListEditor = later(editors, "ListEditor"), KeyValueEditor = later(editors, "KeyValueEditor"), JsonEditor = later(editors, "JsonEditor"), MarkdownEditor = later(editors, "MarkdownEditor");
 const FileUpload = later(() => import("./file.ts"), "FileUpload");
 
-/** Whole numbers: NumberInput with 0 decimals. */
-export const IntInput = (props: NumberInputProps): unknown => NumberInput(extend(props, { decimals: () => props.decimals ?? 0 }));
+export { IntInput };
 
 const registry = new Map<string, InputComponent | null>(Object.entries({
   text: TextInput, textarea: Textarea, password: PasswordInput, email: EmailInput, url: UrlInput, phone: PhoneInput,

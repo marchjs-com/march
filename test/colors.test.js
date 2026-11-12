@@ -26,7 +26,7 @@ test("color prop → data-hm-color on the control (or the group / form root that
 test("colors.css covers every token; components read the accent with their default as fallback; errors stay danger", () => {
   const css = read("css/colors.css");
   for (const c of COLOR_TOKENS) assert.ok(css.includes(`[data-hm-color="${c}"] { --hm-accent: `), c);
-  assert.match(read("forms/inputs.css"), /\.hm-switch\[aria-checked="true"\] \{ background: var\(--hm-accent, var\(--hm-primary\)\); \}/);
+  assert.match(read("components/forms/toggle/toggle.css"), /\.hm-switch\[aria-checked="true"\] \{ background: var\(--hm-accent, var\(--hm-primary\)\); \}/);
   assert.match(read("ui/field.css"), /\.hm-input:focus, \.hm-select:focus \{ outline: none; border-color: var\(--hm-accent, var\(--hm-focus\)\);/);
   assert.match(read("ui/field.css"), /\[aria-invalid="true"\][^{]*\{[^}]*var\(--hm-danger\)/, "invalid fields keep the danger color");
   for (const f of ["hadi", "cream", "night", "neon", "indigo", "minimal", "contrast"]) {
