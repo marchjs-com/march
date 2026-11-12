@@ -256,6 +256,16 @@ the layers under it `inert`, toasts and effects stay above. Shell places: `<Port
 `<Portal to="toolbar" order={10}>…</Portal>` in a page — sorted by `order`, removed when the page goes, waits (and moves
 in) when the target is a lazy part not loaded yet. Context, theme, i18n and cleanup stay with the source component.
 
+## 14c. Widget points (hadi-march/widget, re-exported by ui)
+
+A widget point is a named place other code fills: `widgetPoint<Input>(id, { defaults })`, `point.provide({ id, slot,
+order, when, render(input, ctx) })` (returns remove; removed with the owner), `<Widget sources={[point]} input={…} />`.
+One "main" provider draws (highest `order`, the latest wins a tie); "action" providers are controls the main provider
+places with `ctx.actions()`. Every Code tab is `<Widget sources={[codeView]} input={{ source, lang, files?, apply?,
+reset?, readOnly? }} />`; defaults: `CodeViewer` (read-only, coloured via `tokenize`), Copy and Fullscreen. A live
+editor is added with `codeView.provide({ id: "editor", render })` and replaces the viewer everywhere. Never build a
+second code block: use the point.
+
 ## 15. Motion and fx
 
 ```tsx

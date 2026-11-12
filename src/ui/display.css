@@ -133,3 +133,16 @@
 .hm-skel { --hm-skel-brand: linear-gradient(90deg, var(--hm-surface-2) 0%, color-mix(in srgb, var(--hm-cat-1) 10%, var(--hm-surface-2)) 30%, color-mix(in srgb, var(--hm-cat-2) 10%, var(--hm-surface-2)) 45%, color-mix(in srgb, var(--hm-cat-3) 10%, var(--hm-surface-2)) 60%, color-mix(in srgb, var(--hm-cat-4) 10%, var(--hm-surface-2)) 75%, var(--hm-surface-2) 100%); }
 .hm-skel-brand .hm-skel, .hm-skel.hm-skel-brand { --hm-skel-paint: var(--hm-skel-brand); }
 @media (prefers-reduced-motion: reduce) { .hm-skel { animation: none; } }
+/* Syntax colours (CodeView highlight): text-safe theme colours, so every theme and accent stays readable. */
+.hm-tok-com { color: var(--hm-faint); font-style: italic; }
+.hm-tok-str { color: var(--hm-success-text); }
+.hm-tok-num, .hm-tok-lit { color: var(--hm-warn-text); }
+.hm-tok-kw { color: var(--hm-special-text); font-weight: 600; }
+.hm-tok-tag { color: var(--hm-info-text); }
+.hm-tok-attr { color: var(--hm-primary-text); }
+.hm-tok-fn { color: var(--hm-danger-text); }
+.hm-tok-punct { color: var(--hm-muted); }
+.hm-code-files { display: flex; gap: var(--hm-space-1); margin-inline-end: auto; overflow-x: auto; }
+.hm-code-files + .hm-code-lang { margin-inline-end: 0; }
+.hm-widget { min-width: 0; }
+.hm-code-widget.is-expanded .hm-code-pre { max-height: none; }

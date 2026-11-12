@@ -44,14 +44,18 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, prev =
     const outByEntry = new Map(Object.entries(outs).filter(([, o]) => o.entryPoint).map(([k, o]) => [posix(o.entryPoint), k]));
     const bytes = (k) => outs[k]?.bytes ?? 0;
     let clusters = fresh.map((p) => { const k = outByEntry.get(posix(p.target)); return { keys: [posix(p.target)], size: bytes(k), reach: closure(k) }; });
-    const affinity = (x, y) => { let both = 0, any = 0; for (const k of new Set([...x.reach, ...y.reach])) { const w = bytes(k); any += w; if (x.reach.has(k) && y.reach.has(k)) both += w; } return any ? both / any : 0; };
+    // shared share of the merged reach, and the merged reach in bytes (what loading any member of the group costs)
+    const affinity = (x, y) => { let both = 0, any = 0; for (const k of new Set([...x.reach, ...y.reach])) { const w = bytes(k); any += w; if (x.reach.has(k) && y.reach.has(k)) both += w; } return [any ? both / any : 0, any]; };
     const maxGroup = minSize * 4;
     for (;;) {
-      let best = null, score = -1;
+      let best = null, score = -Infinity;
       for (let i = 0; i < clusters.length; i++) for (let j = i + 1; j < clusters.length; j++) {
         const x = clusters[i], y = clusters[j];
         if ((x.size >= minSize && y.size >= minSize) || x.size + y.size > maxGroup) continue;
-        const sc = affinity(x, y) - (x.size + y.size) / (maxGroup * 10);
+        // penalise the load cost, not only the group's own size: a dependency-free module (translations) must not
+        // join a page that pulls 30 KB of shared code when a lighter partner exists
+        const [aff, union] = affinity(x, y);
+        const sc = aff - union / (maxGroup * 10);
         if (sc > score) { score = sc; best = [i, j]; }
       }
       if (!best) break;

@@ -34,7 +34,8 @@
     "./icons/catalog": "./src/icons/catalog.ts",
     "./theme": "./src/theme/index.ts",
     "./motion/install": "./src/motion/install.ts",
-    "./css/themes/*": "./src/css/themes/*"
+    "./css/themes/*": "./src/css/themes/*",
+    "./widget": "./src/widget/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"

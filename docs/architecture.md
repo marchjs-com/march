@@ -40,6 +40,13 @@ Named targets (`PortalTarget`) are a registry of signals: a `Portal to` follows 
 waits (detached, alive) when it goes. The showcase shell has `title`, `toolbar` (top bar, lazy part), `aside` and
 `bottom-action` targets. Later: the registry joins the messaging layer (component registry, channels).
 
+## Widget points
+
+`src/widget/index.ts` (`hadi-march/widget`, re-exported by `hadi-march/ui`): `widgetPoint`, `Widget`, `pickMain`.
+First consumer: `src/ui/code-widget.ts` (`codeView` point, `CodeViewer`, Copy, Fullscreen) with `src/ui/highlight.ts`
+(`tokenize`, `tokenLines`). The showcase Demo card's Code tab draws `<Widget sources={[codeView]} />`. The messaging
+branch extends this module (contribution points); it does not add a second registry.
+
 ## Folders (modular structure; branches merge into this pattern)
 
 Every unit lives in its own folder with the same shape, so parallel branches add folders instead of editing shared files:
