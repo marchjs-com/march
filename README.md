@@ -37,7 +37,8 @@ The only build tool is [esbuild](https://esbuild.github.io/) (TypeScript is opti
 npm i github:tlghn/hadimarch#<commit-sha>   # pin a commit; not on the npm registry yet
 npm i -D esbuild typescript
 node node_modules/hadi-march/cli/march.js dev      # index.html + src/main.tsx, live reload, error overlay
-node node_modules/hadi-march/cli/march.js build    # dist/
+node node_modules/hadi-march/cli/march.js build    # dist/: release build (chunk planning, budgets, prerender)
+node node_modules/hadi-march/cli/march.js build --dev [--watch]   # fast build: one pass, incremental with --watch
 node node_modules/hadi-march/cli/march.js check    # type-check, including March syntax
 ```
 

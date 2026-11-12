@@ -2,7 +2,10 @@
 // HADI March CLI
 //   march dev [--port 5173] [--mock [openapi.json]]  dev server: rebuild on change, live reload, error overlay, optional mock API
 //                                                    (--mock also sets globalThis.MARCH_MOCK for net.mock in the app)
-//   march build [--outdir dist] [--no-minify]        production bundle (code splitting, hashed chunks, public/ copied)
+//   march build [--release] [--no-minify]            release bundle (code splitting, chunk planning with the 10 KB floor,
+//                                                    entry merge, budgets, prerender, public/ copied); --timing: phase times
+//   march build --dev [--watch]                      fast build: one esbuild pass, no chunk planning / prerender, budgets
+//                                                    only warn; --watch rebuilds incrementally (esbuild context)
 //   march gen routes                                 src/pages/** → src/routes.gen.js (+ pages.d.ts param types)
 //   march gen page users/[id] | gen component Name | gen crud products
 //   march gen api openapi.json [--out src/api.gen.js] typed client + schemas from an OpenAPI 3 document
@@ -56,6 +59,22 @@ async function loadEsbuild() {
   }
   fail("esbuild is required: npm i -D esbuild (it is March's only build dependency).");
 }
+/** Phase timer: `--timing` or MARCH_TIMING=1 prints each build phase (ms) and pass counts; MARCH_TIMING=<file> writes JSON. */
+function timer() {
+  const on = flag("--timing") === true || !!process.env.MARCH_TIMING;
+  const rows = [], counts = {};
+  let last = performance.now();
+  const t = (name) => { const now = performance.now(); rows.push([name, now - last]); last = now; };
+  t.count = (k) => { counts[k] = (counts[k] ?? 0) + 1; };
+  t.print = () => {
+    if (!on) return;
+    const sum = {};
+    for (const [n, ms] of rows) sum[n] = (sum[n] ?? 0) + ms;
+    console.log(`  timing: ${Object.entries(sum).map(([n, ms]) => `${n} ${Math.round(ms)}`).join(", ")} ms; ${Object.entries(counts).map(([k, n]) => `${k} ×${n}`).join(", ")}`);
+    if (process.env.MARCH_TIMING && process.env.MARCH_TIMING !== "1") writeFileSync(process.env.MARCH_TIMING, JSON.stringify({ phases: sum, counts }, null, 2));
+  };
+  return t;
+}
 function fail(msg) { console.error(`\x1b[31m✖\x1b[0m ${msg}`); process.exit(1); }
 
 function buildOptions(cfg, esbuild, { dev, plan = null }) {
@@ -69,7 +88,9 @@ function buildOptions(cfg, esbuild, { dev, plan = null }) {
     define: { "process.env.NODE_ENV": JSON.stringify(dev ? "development" : "production"), ...cfg.define },
     alias: cfg.alias,
     loader: { ".svg": "file", ".png": "file", ".woff2": "file", ".jpg": "file", ".webp": "file" },
-    plugins: [march({ components: resolve(cwd, cfg.components), dev, i18nOut: resolve(cwd, cfg.outdir, "i18n-keys.json"), ...(plan ? { inline: plan.inline, groups: plan.groups } : {}) })],
+    // compile cache (compiler/esbuild.js): every build and every planner pass reuses March modules compiled before;
+    // off with cache: false in march.config.js
+    plugins: [march({ components: resolve(cwd, cfg.components), dev, i18nOut: resolve(cwd, cfg.outdir, "i18n-keys.json"), ...(cfg.cache === false ? {} : { cache: resolve(cwd, "node_modules", ".cache", "march", "compile") }), ...(plan ? { inline: plan.inline, groups: plan.groups } : {}) })],
   };
 }
 
@@ -134,13 +155,16 @@ function budgetOf(budget, meta, plan) {
 }
 
 async function build({ dev = false } = {}) {
+  const T = timer();
   const cfg = await loadConfig();
   const esbuild = await loadEsbuild();
+  T("config");
   if (existsSync(resolve(cwd, cfg.pagesDir))) genRoutes(resolve(cwd, cfg.pagesDir), resolve(cwd, "src/routes.gen.js"));
   const out = resolve(cwd, cfg.outdir);
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
   if (existsSync(resolve(cwd, cfg.publicDir))) cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true });
+  T("routes+public");
   const t0 = Date.now();
   try {
     // chunks.minSize: no output file under it (default 10 KB before gzip); small lazy modules need a second pass
@@ -153,8 +177,10 @@ async function build({ dev = false } = {}) {
     // one build: esbuild, then (production) the entry merge and the chunk packer with the given packing strategy
     const once = async (strategy) => {
       if (builds++) rmSync(resolve(out, "assets"), { recursive: true, force: true });
+      if (builds > 1) T("clean");
       r = await esbuild.build(buildOptions(cfg, esbuild, { dev, plan }));
       rPlan = plan;
+      T("esbuild"); T.count("esbuild");
       entryKey = null;
       // production: the entry and its static chunks become one file (fewer requests, better compression)
       if (dev || cfg.mergeEntry === false) return false;
@@ -163,8 +189,10 @@ async function build({ dev = false } = {}) {
       if (!entryKey) return false;
       const minify = flag("--no-minify") !== true;
       await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
+      T("mergeEntry");
       // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
       if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: aim || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan), strategy });
+      T("packChunks");
       return true;
     };
     const left = () => (minSize && entryKey ? smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).length : 0);
@@ -176,6 +204,7 @@ async function build({ dev = false } = {}) {
       // chunks.commonRoom (gzip bytes): page groups stay this far under the route budget, so the shared "common" chunk
       // (pack-chunks.js) still fits on every route that loads it
       const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined, room: cfg.chunks?.commonRoom ?? 0, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
+      T("planSmallLazy"); T.count("planSmallLazy");
       if (!next) { settled = true; break; }
       // the planner's plans can cycle (a group taken apart, rebuilt, taken apart again): a plan seen before ends the passes
       if (seen.some((x) => x.key === JSON.stringify(next))) break;
@@ -194,6 +223,7 @@ async function build({ dev = false } = {}) {
         plan = p.plan;
         if (!(await once(s))) break search;
         const n = left();
+        T.count("strategy");
         if (process.env.MARCH_DEBUG_COMMON) console.log(`[pack] plan n${p.n} strategy ${s}: ${n} small`, smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).map((x) => `${x.file.split("/").pop()} ${x.bytes}`).join(", "));
         if (n < best.n) best = { plan, s, n };
         if (!n) break search;
@@ -202,15 +232,20 @@ async function build({ dev = false } = {}) {
     }
     // final names: every rewritten file gets a new content version (a cached file must never point at another build),
     // no name starts with _ or . (some hosts refuse those); stable names on request
+    T("smallFiles");
     if (!dev) rehashOutputs(r.metafile, { cwd, stable: !!cfg.stableNames || flag("--stable-names") === true });
+    T("rehash");
     if (process.env.MARCH_DEBUG_META) writeFileSync(process.env.MARCH_DEBUG_META, JSON.stringify({ meta: r.metafile, plan }));
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
     aliasGroups(chunks.manifest, plan);
     writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);
+    T("manifest+html");
     if (cfg.themes !== false) await copyThemes(out, esbuild, { dev });
+    T("themes");
     if (!dev && cfg.seo && cfg.seo.prerender !== false) {
       const { prerender } = await import("../compiler/prerender.js");
       const res = await prerender({ cwd, cfg, esbuild, out, importSeo: seoModule });
+      T("prerender");
       console.log(`  prerender: ${res.routes.length} page(s)${res.mode === "hash" ? " (hash routing: the start page)" : ""}${res.failed.length ? `, ${res.failed.length} left to the browser` : ""}`);
     }
     if (!dev) {
@@ -244,6 +279,8 @@ async function build({ dev = false } = {}) {
         if (rep.budget?.fail) { console.error(`\x1b[31m✖\x1b[0m ${msg}`); process.exitCode = 1; } else console.warn(`\x1b[33m!\x1b[0m ${msg}`);
       }
     }
+    T("report");
+    T.print();
     const bytes = Object.values(r.metafile.outputs).reduce((s, o) => s + o.bytes, 0);
     console.log(`\x1b[32m✔\x1b[0m built ${relative(cwd, out)} in ${Date.now() - t0} ms (${(bytes / 1024).toFixed(1)} KB)`);
     return r;
@@ -251,6 +288,82 @@ async function build({ dev = false } = {}) {
     for (const er of e.errors ?? [e]) console.error(formatError(er));
     process.exitCode = 1;
   }
+}
+
+/**
+ * `march build --dev [--watch]`: the fast build for development and checks. One esbuild pass (code splitting on,
+ * production semantics, minified), no chunk planning (no 10 KB floor, no entry merge, no packing passes), no prerender;
+ * budgets only warn. An esbuild context: `--watch` rebuilds incrementally on every change (unchanged modules come from
+ * esbuild's cache and the March compile cache, so a rebuild takes milliseconds). The release build is `march build`
+ * (= `march build --release`).
+ */
+async function buildDev({ watch: watching = false } = {}) {
+  const T = timer();
+  const cfg = await loadConfig();
+  const esbuild = await loadEsbuild();
+  const out = resolve(cwd, cfg.outdir);
+  const pages = existsSync(resolve(cwd, cfg.pagesDir)) ? resolve(cwd, cfg.pagesDir) : null;
+  if (pages) genRoutes(pages, resolve(cwd, "src/routes.gen.js"));
+  rmSync(out, { recursive: true, force: true });
+  mkdirSync(out, { recursive: true });
+  if (existsSync(resolve(cwd, cfg.publicDir))) cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true });
+  if (cfg.themes !== false) await copyThemes(out, esbuild, { dev: true });
+  T("setup");
+  const opts = buildOptions(cfg, esbuild, { dev: false });
+  opts.entryNames = "[name]";
+  // no rename pass here (the release build's rehashOutputs): a chunk named after src/pages/_layout.tsx must still not
+  // start with _ or . (publishing hosts refuse those)
+  opts.chunkNames = "chunks/c-[name]-[hash]";
+  // outputs stay in memory (the CSS split and import pruning rewrite them there); only files whose bytes changed since
+  // the previous build are written — a rebuild touches a handful of files instead of all of them
+  opts.write = false;
+  const written = new Map(); // abs path → bytes last written
+  const flush = (files) => {
+    const now = new Set();
+    for (const f of files) {
+      now.add(f.path);
+      const prev = written.get(f.path);
+      if (prev && Buffer.compare(prev, f.contents) === 0) continue;
+      mkdirSync(dirname(f.path), { recursive: true });
+      writeFileSync(f.path, f.contents);
+      written.set(f.path, Buffer.from(f.contents));
+    }
+    // files of the previous build that this one no longer has (new content hash → new name)
+    for (const p of [...written.keys()]) if (!now.has(p)) { rmSync(p, { force: true }); written.delete(p); }
+  };
+  let first = true, started = 0;
+  opts.plugins.push({ name: "march-dev-build", setup(b) {
+    b.onStart(() => { started = performance.now(); if (pages && !first) genRoutes(pages, resolve(cwd, "src/routes.gen.js")); });
+    b.onEnd((r) => {
+      if (r.errors.length) { r.errors.forEach((e) => console.error(formatError(e))); if (!watching) process.exitCode = 1; return; }
+      flush(r.outputFiles ?? []);
+      const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
+      writeHtml(cfg, r.metafile, { dev: false }, chunks.manifest, chunks.entryFiles);
+      if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
+      // budgets: a warning (the release build enforces them on the planned chunks; these unplanned ones are only a hint)
+      // (watch: only after the first build — gzip of every file would double each rebuild; --budget for every rebuild)
+      if (cfg.budget && flag("--no-budget") !== true && (first || flag("--budget") === true)) {
+        const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));
+        if (rep.over.length) console.warn(`[33m![0m over budget (dev build, unplanned chunks — the release build decides): ${rep.over.length} row(s); first: ${overText(rep.over[0])}`);
+      }
+      const bytes = Object.values(r.metafile.outputs).reduce((s, o) => s + o.bytes, 0);
+      console.log(`[32m✔[0m ${first ? "built" : "rebuilt"} ${relative(cwd, out)} (dev) in ${Math.round(performance.now() - started)} ms (${Object.keys(r.metafile.outputs).length} files, ${(bytes / 1024).toFixed(1)} KB)`);
+      first = false;
+    });
+  } });
+  const ctx = await esbuild.context(opts);
+  T("context");
+  const r = await ctx.rebuild().catch((e) => ({ errors: e.errors ?? [e] }));
+  T("esbuild+html");
+  if (!watching) {
+    await ctx.dispose();
+    if (r.errors?.length) process.exitCode = 1;
+    T.print();
+    return r;
+  }
+  if (existsSync(resolve(cwd, cfg.publicDir))) watch(resolve(cwd, cfg.publicDir), { recursive: true }, () => cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true }));
+  await ctx.watch();
+  console.log("watching for changes (Ctrl+C to stop)");
 }
 
 function formatError(er) {
@@ -424,7 +537,9 @@ async function seo() {
 
 const cmd = argv[0];
 const icons = async () => (await import("./icons.js")).main(argv.slice(1));
-const run = { dev, build: () => build(), gen, i18n, check: typecheck, seo, icons }[cmd];
+// `march build` and `march build --release`: the release build (chunk planning, 10 KB floor, budgets, prerender).
+// `march build --dev [--watch]`: the fast build (buildDev).
+const run = { dev, build: () => (flag("--dev") === true || flag("--watch") === true ? buildDev({ watch: flag("--watch") === true }) : build()), gen, i18n, check: typecheck, seo, icons }[cmd];
 if (!run) {
   console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)\n  march check component <name>   (in the hadi-march repo: the component checklist)\n  march seo check [--dir dist]   (titles, descriptions, canonical, img alt)\n  march icons list | add <pack…|all> | gallery <dir>   (open-source icon sets as icon packs)");
   process.exit(cmd ? 1 : 0);

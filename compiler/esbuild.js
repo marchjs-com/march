@@ -2,8 +2,10 @@
 // CSS bundle, collects t`` keys and resolves `hadi-march/*` to this copy of March (no npm install needed when vendored).
 //   import { march } from "hadi-march/esbuild";
 //   esbuild.build({ entryPoints: ["src/main.jsx"], bundle: true, plugins: [march({ components: "src/components" })] })
-import { readFile, writeFile } from "node:fs/promises";
-import { existsSync, statSync, readdirSync } from "node:fs";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { existsSync, statSync, readdirSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { fileURLToPath } from "node:url";
 import { join, resolve, dirname, relative, sep } from "node:path";
 import { compile } from "./index.js";
 import { loadAutoImports, MARCH_ROOT, MODULES } from "./autoimports.js";
@@ -21,6 +23,8 @@ function iconPackModules() {
 /**
  * @param {{ components?: string|string[], i18nOut?: string, dev?: boolean, filter?: RegExp, onKeys?: (keys: string[]) => void, cssSplit?: boolean, deepImports?: boolean }} [opts]
  * cssSplit (default true): component CSS follows the component's code into the output chunk that uses it (css-split.js).
+ * cache: a folder for compiled modules (keyed by the source, the compiler's own files and the auto-import table), so a
+ * cold build reuses what an earlier build compiled; in one process (watch / rebuild) unchanged files are always reused.
  */
 // `() => import("./pages/x.tsx")` → the same loader tagged with its source key (`.hm`), which the router and lazy()
 // look up in the build manifest to preload all of the route's chunks at once (see src/dom/preload.ts).
@@ -60,6 +64,7 @@ export function march(opts = {}) {
     async setup(build) {
       const filter = opts.filter ?? /\.(jsx|tsx)$/;
       const auto = await loadAutoImports({ components: [].concat(opts.components ?? []).map((d) => resolve(d)) });
+      const compiled = compileCache(opts, auto);
       const keys = new Set();
       const css = new Map();
       if (opts.cssSplit !== false) setupCssSplit(build);
@@ -84,7 +89,7 @@ export function march(opts = {}) {
       build.onLoad({ filter, namespace: "file" }, async (a) => {
         const source = await readFile(a.path, "utf8");
         try {
-          const r = compile(source, { filename: a.path, autoImports: auto, dev: opts.dev });
+          const r = await compiled(source, a.path, () => compile(source, { filename: a.path, autoImports: auto, dev: opts.dev }));
           for (const k of r.keys) keys.add(k);
           let contents = fixDyn(deep(tagLoaders(r.code, a.path, cwd)), a.path);
           if (r.css) { css.set(a.path, r.css); contents += `\nimport ${JSON.stringify(`march-css:${a.path}`)};`; }
@@ -111,5 +116,39 @@ export function march(opts = {}) {
         if (opts.i18nOut) await writeFile(opts.i18nOut, `${JSON.stringify([...keys].sort(), null, 2)}\n`);
       });
     },
+  };
+}
+
+const sha1 = (x) => createHash("sha1").update(x).digest("hex");
+let compilerDigest = null;
+/** The compiler's own sources: a change to any of them invalidates every cached module. */
+function compilerSalt() {
+  if (compilerDigest) return compilerDigest;
+  const dir = dirname(fileURLToPath(import.meta.url));
+  const h = createHash("sha1");
+  for (const f of readdirSync(dir).filter((n) => n.endsWith(".js")).sort()) h.update(f).update(readFileSync(join(dir, f)));
+  return (compilerDigest = h.digest("hex"));
+}
+/** compile() memoised per file (same source text → same result) in memory and, with opts.cache, on disk. */
+function compileCache(opts, auto) {
+  const mem = new Map();
+  const salt = sha1(`${compilerSalt()}|${JSON.stringify(auto)}|${!!opts.dev}`);
+  const dir = opts.cache;
+  let made = false;
+  return async (source, file, run) => {
+    const hit = mem.get(file);
+    if (hit && hit.source === source) return hit.r;
+    const key = dir ? join(dir, `${sha1(`${salt}|${file}|${source}`)}.json`) : null;
+    let r = null;
+    if (key) try { r = JSON.parse(await readFile(key, "utf8")); } catch { /* not cached */ }
+    if (!r) {
+      const c = run();
+      r = { code: c.code, css: c.css, keys: [...c.keys], warnings: c.warnings };
+      if (key) {
+        try { if (!made) { await mkdir(dir, { recursive: true }); made = true; } await writeFile(key, JSON.stringify(r)); } catch { /* best effort */ }
+      }
+    }
+    mem.set(file, { source, r });
+    return r;
   };
 }
