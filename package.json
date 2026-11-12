@@ -127,7 +127,8 @@
     "size": "node bench/size.js",
     "typecheck": "tsc -p tsconfig.json",
     "build:lib": "node tools/build-lib.js",
-    "audit:controls": "node tools/control-audit.mjs"
+    "audit:controls": "node tools/control-audit.mjs",
+    "check:editor-suggest": "node tools/editor-suggest-check.mjs"
   },
   "engines": {
     "node": ">=22.18"
