@@ -1,11 +1,11 @@
 // Every runtime export has a working example in the showcase API reference (İlk Adımlar › API başvurusu), written in
 // examples/showcase/src/api-examples/<group>.tsx; subpaths still being written are listed in PENDING (tools/api-examples.js).
-// Each example is generated into a lazy module of its own (api-examples/gen/), so a card loads only its example.
+// The examples are generated into a few lazy parts (api-examples/gen/part-NN.ex.tsx, 10–25 KB each): a card loads its part.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import ts from "typescript";
-const { generate, straySigs, splitGroup, fileKeys, EX } = await import("../tools/api-examples.js");
+const { generate, straySigs, splitGroup, fileKeys, EX, ONE } = await import("../tools/api-examples.js");
 
 test("every export of a finished subpath has an example", () => {
   const { missing } = generate();
@@ -26,7 +26,7 @@ test("the indexes, the per-example modules and the signature files are up to dat
   assert.equal(new Set(gen.map((f) => f.toLowerCase())).size, gen.length, "generated file names differ in more than case (case-insensitive file systems)");
 });
 
-test("examples load lazily: nothing at start-up, the API page's index loads a group index, which loads one example", () => {
+test("examples load lazily: nothing at start-up, the API page's index loads the part of an example", () => {
   const index = readFileSync(new URL("../examples/showcase/src/api-examples.gen.ts", import.meta.url), "utf8");
   assert.doesNotMatch(index, /^import (?!type )(?!\{ runLoad \} from "hadi-march\/lazy";$)/m, "the index imports no example statically");
   assert.doesNotMatch(index, /api-examples\/[a-z0-9-]+\.tsx"/, "the index never loads a whole group file");
@@ -38,13 +38,18 @@ test("examples load lazily: nothing at start-up, the API page's index loads a gr
     .filter((f) => /\.(tsx?|jsx?)$/.test(f) && !f.startsWith("api-examples") && readFileSync(new URL(f, src), "utf8").includes("api-examples.gen"));
   assert.deepEqual(users, ["pages/api.tsx"]);
   const { files } = generate();
-  // a group index holds loaders only, typed (the build lists bare loaders in index.html's manifest, ~900 of them)
-  for (const [rel, text] of Object.entries(files).filter(([f]) => f.endsWith(`/index${EX}`))) {
-    assert.doesNotMatch(text, /^import (?!type )/m, `${rel}: no static import`);
-    assert.doesNotMatch(text, /\(\)\s*=>\s*import\(/, `${rel}: example loaders are typed (): … => import()`);
+  // a part imports its examples statically (one file); few parts, each holding a share of the examples
+  const parts = Object.entries(files).filter(([f]) => f.endsWith(EX));
+  assert.ok(parts.length >= 5 && parts.length <= 40, `${parts.length} parts: a host takes a limited number of files per release`);
+  assert.ok(parts.every(([f]) => /\/gen\/part-\d\d\.ex\.tsx$/.test(f)), "only parts are lazy files");
+  const held = new Set();
+  for (const [rel, text] of parts) {
+    assert.doesNotMatch(text, /import\(/, `${rel}: imports its examples statically`);
+    for (const m of text.matchAll(/^import e\d+ from "\.\/(.+)";$/gm)) { assert.ok(m[1].endsWith(ONE), `${rel}: ${m[1]}`); held.add(m[1]); }
   }
+  assert.equal(held.size, Object.keys(files).filter((f) => f.endsWith(ONE)).length, "every example is in exactly one part");
   // an example module never imports its group file
-  for (const [rel, text] of Object.entries(files).filter(([f]) => f.endsWith(EX))) assert.doesNotMatch(text, /from "\.\.\/\.\.\/[a-z0-9-]+\.tsx"/, `${rel} imports a group file`);
+  for (const [rel, text] of Object.entries(files).filter(([f]) => f.endsWith(ONE))) assert.doesNotMatch(text, /from "\.\.\/\.\.\/[a-z0-9-]+\.tsx"/, `${rel} imports a group file`);
 });
 
 test("a group file splits into examples that import only what they use", () => {
@@ -78,7 +83,7 @@ export default examples({
   assert.deepEqual(problems, []);
   const keys = fileKeys(["signal", "Signal"]);
   assert.notEqual(keys.get("signal").toLowerCase(), keys.get("Signal").toLowerCase());
-  const sig = files[`gen/g/main--${keys.get("signal")}${EX}`];
+  const sig = files[`gen/g/main--${keys.get("signal")}${ONE}`];
   assert.match(sig, /^import \{ signal \} from "hadi-march";$/m);
   assert.match(sig, /^import \{ Button \} from "hadi-march\/ui";$/m);
   assert.match(sig, /^import \{ ensure \} from "\.\/_ready\.tsx";$/m, "a helper that writes a let stays with it");

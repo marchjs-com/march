@@ -66,7 +66,7 @@ src/net/  src/errors/  src/channel/  src/motion/   (modules)
   no Turkish summary, or the reference is stale.
 - Every runtime export also has a small working example there: a click on its card opens the signature (read from the
   declaration), the example code and the live result, with a Playground when the example gives options. Examples live in
-  `examples/showcase/src/api-examples/<group>.tsx` (one lazy file per group of subpaths, layout in `tools/api-examples.js`);
+  `examples/showcase/src/api-examples/<group>.tsx` (layout in `tools/api-examples.js`), generated into ~14 lazy parts of 10–25 KB (`api-examples/gen/part-NN.ex.tsx`; a card loads its part);
   test/api-examples.test.js fails for an export without one (subpaths still being written: PENDING in the tool).
   `tools/demo-coverage.mjs` (test/demo-coverage.test.js) checks that every component has a live demo card and a
   Playground (a page card, a component folder's demo.tsx + playground.ts, or its API example); `tools/api-examples-audit.mjs`
