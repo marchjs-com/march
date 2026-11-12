@@ -6,6 +6,8 @@ const { signal, h, render } = await import("../src/index.ts");
 const R = await import("../src/router/index.ts");
 const A = await import("../src/access/index.ts");
 const U = await import("../src/ui/index.ts");
+// the texts these tests check are the English sources (components register Turkish ones too)
+(await import("../src/core/i18n.ts")).locale.set("en");
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose, html: () => serialize(el) }; };

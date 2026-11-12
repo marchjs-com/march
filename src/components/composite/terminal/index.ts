@@ -21,13 +21,13 @@ import { t } from "../../../core/i18n.ts";
 import { signal, onCleanup, untrack, effect, reactive } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { clamp, load, save } from "../../../core/util.ts";
-import { tokenize, parseArgs, usageOf, type ArgSpec, type OptionSpec, type Parsed } from "./parse.ts";
+import { tokenizeCommand, parseArgs, usageOf, type ArgSpec, type OptionSpec, type Parsed } from "./parse.ts";
 import { renderLine, ansi } from "./ansi.ts";
 import { Window, type WindowProps } from "../../layout/window/index.ts";
 import { terminal as terminalIcon } from "../../../icons/glyphs/terminal.ts";
 import { glyph } from "../../../ui/util.ts";
 
-export { ansi, tokenize, parseArgs, usageOf };
+export { ansi, tokenizeCommand, parseArgs, usageOf };
 export type { ArgSpec, OptionSpec, Parsed };
 
 export type Tone = "success" | "warn" | "error" | "info" | "muted";
@@ -229,7 +229,7 @@ export function Terminal(props: TerminalProps): Element {
     if (!lineText) return;
     if (hist[hist.length - 1] !== lineText) { hist.push(lineText); if (hist.length > 500) hist = hist.slice(-500); if (key) save(key, hist); }
     at = hist.length;
-    const words = tokenize(lineText);
+    const words = tokenizeCommand(lineText);
     const found = resolve(words);
     if (!found) { print(t`command not found: ${words[0]} (try help)`, { tone: "error" }); return; }
     const { spec, path, rest } = found;
@@ -244,7 +244,7 @@ export function Terminal(props: TerminalProps): Element {
   };
 
   const complete = (): void => {
-    const v = input.value, words = tokenize(v), trailing = /\s$/.test(v);
+    const v = input.value, words = tokenizeCommand(v), trailing = /\s$/.test(v);
     const cur = trailing ? "" : words.pop() ?? "";
     let options: string[];
     if (words.length === 0) options = [...all().entries()].filter(([, c]) => !specOf(c).hidden).map(([k]) => k);

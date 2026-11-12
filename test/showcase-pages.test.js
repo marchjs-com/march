@@ -8,13 +8,19 @@ const SRC = fileURLToPath(new URL("../examples/showcase/src/", import.meta.url))
 const paths = (file, re) => [...readFileSync(SRC + file, "utf8").matchAll(re)].map((m) => m[1]).sort();
 
 test("menu pages, loaders and page files match", () => {
-  // top-level pages (nav.ts) and the pages under a wildcard route (nav-meta.ts SUB_PAGES, e.g. pages/motion/svg.tsx)
-  const subs = readFileSync(SRC + "nav-meta.ts", "utf8").match(/SUB_PAGES[^=]*=\s*\[([\s\S]*?)\]/)?.[1] ?? "";
-  const menu = [...paths("nav.ts", /path: "([^"]+)"/g), ...[...subs.matchAll(/path: "([^"]+)"/g)].map((m) => m[1])].sort();
+  // top-level pages (nav.ts PAGES) and the pages under a wildcard route (nav.ts SUB_PAGES). A sub page is its own file
+  // (pages/motion/svg.tsx), or a view of its parent page (/web/product is a view of pages/web.tsx)
+  const src = readFileSync(SRC + "nav.ts", "utf8");
+  const at = src.indexOf("export const SUB_PAGES");
+  const top = [...src.slice(0, at).matchAll(/path: "([^"]+)"/g)].map((m) => m[1]);
+  const subs = [...src.slice(at).matchAll(/path: "([^"]+)"/g)].map((m) => m[1]);
+  const file = (p) => `${SRC}pages/${p.slice(1) || "home"}.tsx`;
+  const own = subs.filter((p) => existsSync(file(p)));
+  for (const p of subs) assert.ok(existsSync(file(p)) || existsSync(file(p.slice(0, p.lastIndexOf("/")))), `${file(p)} or its parent page`);
   // loaders: routes.gen.js (march gen routes from pages/); the start page "/" is pages/home.tsx
   const loaders = paths("routes.gen.js", /^  "([^"]+)": \(\) => import\("\.\/pages\//gm).map((p) => (p === "/home" ? "/" : p)).sort();
-  assert.deepEqual(loaders, menu, "routes.gen.js loaders = nav.ts PAGES");
-  for (const p of menu) assert.ok(existsSync(`${SRC}pages/${p.slice(1) || "home"}.tsx`), `pages/${p.slice(1) || "home"}.tsx`);
+  assert.deepEqual(loaders, [...top, ...own].sort(), "routes.gen.js loaders = nav.ts pages with a file");
+  for (const p of top) assert.ok(existsSync(file(p)), file(p));
 });
 
 test("every menu group is one of MENU_GROUPS (src/components/categories.ts), in that order", async () => {

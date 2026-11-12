@@ -109,7 +109,7 @@ test("Layout: a nested Layout does not start the page-wide features its outer La
 });
 
 test("Layout features: connection badge while offline, aside sheet toggles, dev overlay on Alt+Shift+L, feedback button", () => {
-  const { connection, devOverlay, feedback } = L;
+  const { connectionFeature: connection, devOverlayFeature: devOverlay, feedbackFeature: feedback } = L;
   const nav = globalThis.navigator;
   const desc = Object.getOwnPropertyDescriptor(nav, "onLine");
   Object.defineProperty(nav, "onLine", { configurable: true, get: () => false });

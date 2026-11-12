@@ -12,6 +12,7 @@ import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { openLayer } from "../../../dom/portal.ts";
 
 export type Corner = "top-start" | "top-end" | "bottom-start" | "bottom-end";
+/** The four corners a control can sit in, in logical terms (start / end follow the writing direction). */
 export const CORNERS: readonly Corner[] = ["top-start", "top-end", "bottom-start", "bottom-end"];
 
 const hosts = new Map<Corner, HTMLElement>();

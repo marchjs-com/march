@@ -1,7 +1,7 @@
 import { t } from "../../../core/i18n.ts";
 
 // Terminal command lines: tokens (quotes, escapes), then a command's arguments and options checked against its spec.
-//   tokenize(`deploy "my app" --env=prod -f`)  → ["deploy", "my app", "--env=prod", "-f"]
+//   tokenizeCommand(`deploy "my app" --env=prod -f`)  → ["deploy", "my app", "--env=prod", "-f"]
 
 export type ArgType = "string" | "number" | "boolean";
 export interface ArgSpec {
@@ -18,7 +18,7 @@ export interface ArgSpec {
 export interface OptionSpec { type?: ArgType; desc?: string; alias?: string; choices?: readonly string[]; default?: unknown }
 
 /** Split a line into words: "double" and 'single' quotes keep spaces, \ escapes the next character. */
-export function tokenize(line: string): string[] {
+export function tokenizeCommand(line: string): string[] {
   const out: string[] = [];
   let cur = "", quote = "", any = false;
   for (let i = 0; i < line.length; i++) {

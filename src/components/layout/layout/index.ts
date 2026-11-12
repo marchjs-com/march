@@ -70,6 +70,7 @@ export interface LayoutProps {
   children?: unknown;
 }
 
+/** The nearest Layout's API for components inside it (`useLayout()` reads it). */
 export const LayoutContext = context<LayoutApi | null>(null);
 /** The Layout around this code, or null. */
 export const useLayout = (): LayoutApi | null => useContext(LayoutContext);
@@ -236,7 +237,7 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
 // Each is small here; what it needs (motion engine, router) comes in its own chunk when it starts.
 
 /** Back-to-top button in a corner (default bottom-end): shows after scrolling down, scrolls back on the motion engine. */
-export const scrollToTop = defineLayoutFeature("scrollToTop", (opts: { threshold?: number; corner?: Corner; order?: number; label?: string }) => (api) => {
+export const scrollToTopFeature = defineLayoutFeature("scrollToTop", (opts: { threshold?: number; corner?: Corner; order?: number; label?: string }) => (api) => {
   const wrap = h("span", { class: "hm-layout-ctl" }) as HTMLElement;
   const off = api.add(opts.corner ?? "bottom-end", wrap, opts.order ?? 0);
   let gone = false;
@@ -248,7 +249,7 @@ export const scrollToTop = defineLayoutFeature("scrollToTop", (opts: { threshold
 });
 
 /** A thin bar at the top that fills as the page is read (keeps working with reduced motion: it is information). */
-export const readingProgress = defineLayoutFeature("readingProgress", (opts: { color?: string; height?: number } = {}) => () => {
+export const readingProgressFeature = defineLayoutFeature("readingProgress", (opts: { color?: string; height?: number } = {}) => () => {
   const bar = h("div", { class: "hm-reading-progress", role: "progressbar", "aria-label": () => t`Reading progress`, style: { "--hm-rp-h": `${opts.height ?? 3}px`, ...(opts.color ? { "--hm-rp-c": opts.color } : {}) } }) as HTMLElement;
   const closeBar = openLayer("fx", bar);
   let stop: (() => void) | undefined;
@@ -258,7 +259,7 @@ export const readingProgress = defineLayoutFeature("readingProgress", (opts: { c
 });
 
 /** After a route change: focus moves to the page (main) and the new title is read out; nothing moves on first load. */
-export const routeFocus = defineLayoutFeature("routeFocus", () => (api) => {
+export const routeFocusFeature = defineLayoutFeature("routeFocus", () => (api) => {
   const live = h("div", { class: "hm-sr-only", "aria-live": "polite", "aria-atomic": "true" }) as HTMLElement;
   const closeLive = openLayer("fx", live);
   let stop: (() => void) | undefined;
@@ -280,7 +281,7 @@ export const routeFocus = defineLayoutFeature("routeFocus", () => (api) => {
 });
 
 /** The header slides away while scrolling down and comes back on the way up (more room on small screens). */
-export const autoHideHeader = defineLayoutFeature("autoHideHeader", (opts: { after?: number } = {}) => (api) => {
+export const autoHideHeaderFeature = defineLayoutFeature("autoHideHeader", (opts: { after?: number } = {}) => (api) => {
   const header = api.region("header");
   if (!header) return;
   let last = 0;
@@ -306,29 +307,29 @@ function lazyMount(api: LayoutApi, where: LayoutRegion | "body", order: number, 
 }
 
 /** "?" opens the list of every described shortcut; holding Alt shows shortcut badges on the page. */
-export const shortcuts = defineLayoutFeature("shortcuts", () => (api) =>
+export const shortcutsFeature = defineLayoutFeature("shortcuts", () => (api) =>
   lazyMount(api, "body", 0, async () => { const m = await import("../../../managers/shortcut-hint/ui.ts"); return () => m.ShortcutHints(); }));
 
 /** The cookie / storage consent banner (texts can be given; the decision is the consent manager's). */
-export const consent = defineLayoutFeature("consent", (texts: Record<string, unknown> = {}) => (api) =>
+export const consentFeature = defineLayoutFeature("consent", (texts: Record<string, unknown> = {}) => (api) =>
   lazyMount(api, "body", 0, async () => { const m = await import("../../composite/consent-banner/index.ts"); return () => m.ConsentBanner(texts as never); }));
 
 /** A toast host owned by the layout (toasts also work without it: the first toast() makes one). */
-export const toasts = defineLayoutFeature("toasts", () => (api) =>
+export const toastsFeature = defineLayoutFeature("toasts", () => (api) =>
   lazyMount(api, "body", 0, async () => {
     const [T, P] = await Promise.all([import("../../overlays/toast/index.ts"), import("../../../dom/portal.ts")]);
     return () => h(P.Portal, { layer: "toast", children: h(T.ToastHost, {}) });
   }));
 
 /** "Developed with March and 💗" — in the footer when there is one, else a small line in a corner. */
-export const credit = defineLayoutFeature("credit", (opts: { variant?: "text" | "badge" | "small"; corner?: Corner } = {}) => (api) =>
+export const creditFeature = defineLayoutFeature("credit", (opts: { variant?: "text" | "badge" | "small"; corner?: Corner } = {}) => (api) =>
   lazyMount(api, api.region("footer") && !opts.corner ? "footer" : opts.corner ?? "bottom-start", 100, async () => {
     const m = await import("../../actions/made-with-march/index.ts");
     return () => m.MadeWithMarch({ variant: opts.variant ?? "small" });
   }));
 
 /** A badge in a corner while the browser is offline (announced politely). */
-export const connection = defineLayoutFeature("connection", (opts: { corner?: Corner } = {}) => (api) => {
+export const connectionFeature = defineLayoutFeature("connection", (opts: { corner?: Corner } = {}) => (api) => {
   const nav = globalThis.navigator as Navigator | undefined;
   const badge = h("span", { class: "hm-offline", role: "status", "aria-live": "polite" }) as HTMLElement;
   const update = (): void => { const off = nav?.onLine === false; badge.toggleAttribute("hidden", !off); badge.textContent = off ? t`You are offline` : ""; };
@@ -340,7 +341,7 @@ export const connection = defineLayoutFeature("connection", (opts: { corner?: Co
 });
 
 /** A "Feedback" button in a corner: asks for a message and hands it to `onSubmit`, then thanks with a toast. */
-export const feedback = defineLayoutFeature("feedback", (opts: { onSubmit?: (text: string) => unknown; corner?: Corner; label?: string } = {}) => (api) => {
+export const feedbackFeature = defineLayoutFeature("feedback", (opts: { onSubmit?: (text: string) => unknown; corner?: Corner; label?: string } = {}) => (api) => {
   const open = async (): Promise<void> => {
     const { prompt } = await import("../../overlays/dialog/index.ts");
     const text = await prompt({ title: t`Feedback`, label: t`Your message`, multiline: true });
@@ -354,7 +355,7 @@ export const feedback = defineLayoutFeature("feedback", (opts: { onSubmit?: (tex
 });
 
 /** Development aid: Alt+Shift+L outlines the regions and lists the running features. */
-export const devOverlay = defineLayoutFeature("devOverlay", () => (api) => {
+export const devOverlayFeature = defineLayoutFeature("devOverlay", () => (api) => {
   const root = globalThis.document?.documentElement;
   if (!root) return;
   const panel = h("div", { class: "hm-layout-dev", role: "note", "aria-label": () => t`Layout regions`, hidden: true }) as HTMLElement;

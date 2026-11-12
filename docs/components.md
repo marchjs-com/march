@@ -1050,7 +1050,7 @@ Full page: src/components/composite/keyframe-timeline/docs.md
 The frame the screens of an app share, with changeable behavior. What every page needs lives here once, so pages never repeat it, and later page-wide features land in one place.
 
 ```tsx
-import { Layout, defineLayout, defineLayoutFeature, scrollToTop } from "hadi-march/layout";
+import { Layout, defineLayout, defineLayoutFeature, scrollToTopFeature } from "hadi-march/layout";
 
 <Layout header={<TopBar/>} nav={<SideNav/>} titleTemplate="%s · HADİ"><Outlet/></Layout>
 

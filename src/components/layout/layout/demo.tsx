@@ -1,7 +1,7 @@
 // Showcase stage for Layout: regions switched on and off; the page itself sits in the app's Layout (back-to-top corner).
 import { Layout } from "./index.ts";
 
-export const code = `import { Layout, defineLayout, scrollToTop } from "hadi-march/layout"
+export const code = `import { Layout, defineLayout, scrollToTopFeature } from "hadi-march/layout"
 
 <Layout><AppShell …><Outlet /></AppShell></Layout>              // app root: back-to-top on
 
@@ -9,7 +9,7 @@ export const code = `import { Layout, defineLayout, scrollToTop } from "hadi-mar
         corners={{ "top-end": <Status /> }}
         features={(base) => [...base, myFeature]}>…</Layout>
 
-const DocsLayout = Layout.extend({ aside: <Toc />, features: [scrollToTop({ threshold: 600 })] })
+const DocsLayout = Layout.extend({ aside: <Toc />, features: [scrollToTopFeature({ threshold: 600 })] })
 const myFeature = (api) => { const off = api.add("bottom-start", <HelpButton />); return off }`
 
 export default function LayoutDemo(props: { values: { header: boolean; nav: boolean; aside: boolean; footer: boolean } }) {

@@ -20,7 +20,7 @@ test("ChatBubble: mine/theirs, run position, ticks, reply quote, reaction chips,
   status.set("read");
   assert.equal(a.querySelector(".hm-msg-tick").getAttribute("aria-label"), "Read");
   assert.equal(a.querySelectorAll(".hm-msg-2tick .hm-svg").length, 2);
-  assert.match(a.querySelector(".hm-msg-quote").textContent, /HadiHello\?/);
+  assert.match(a.querySelector(".hm-msg-quote").textContent, /HADİHello\?/);
   const chip = a.querySelector(".hm-msg-react");
   assert.equal(chip.getAttribute("aria-pressed"), "true");
   chip.click();

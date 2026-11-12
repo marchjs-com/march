@@ -60,8 +60,8 @@ export function renderLine(text: string): DocumentFragment {
   return frag;
 }
 
-/** ANSI helpers for command output: `io.print(ansi.green("hazır"))`. */
 const wrap = (code: number, close = 39) => (s: string): string => `\x1b[${code}m${s}\x1b[${close}m`;
+/** ANSI helpers for command output: `io.print(ansi.green("hazır"))`; colors, bold, dim, italic, underline, strip. */
 export const ansi = {
   black: wrap(30), red: wrap(31), green: wrap(32), yellow: wrap(33), blue: wrap(34), magenta: wrap(35), cyan: wrap(36), white: wrap(37),
   gray: wrap(90), brightRed: wrap(91), brightGreen: wrap(92), brightYellow: wrap(93), brightBlue: wrap(94), brightMagenta: wrap(95), brightCyan: wrap(96),

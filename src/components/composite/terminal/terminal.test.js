@@ -3,13 +3,13 @@ import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
-const { Terminal, defineTerminalCommands, ansi, tokenize, parseArgs } = await import("./index.ts");
+const { Terminal, defineTerminalCommands, ansi, tokenizeCommand, parseArgs } = await import("./index.ts");
 const { parseAnsi } = await import("./ansi.ts");
 const mount = (props) => { const host = document.createElement("div"); document.body.appendChild(host); let api; const dispose = render(() => h(Terminal, { ...props, ref: (a) => { api = a; } }), host); return { host, api, dispose }; };
 const rows = (host) => [...host.querySelectorAll(".hm-term-row")].map((r) => r.textContent);
 
-test("tokenize and parseArgs: quotes, options, aliases, types, choices, required, rest", () => {
-  assert.deepEqual(tokenize(`deploy "my app" --env=prod -f 'a b' x\\ y`), ["deploy", "my app", "--env=prod", "-f", "a b", "x y"]);
+test("tokenizeCommand and parseArgs: quotes, options, aliases, types, choices, required, rest", () => {
+  assert.deepEqual(tokenizeCommand(`deploy "my app" --env=prod -f 'a b' x\\ y`), ["deploy", "my app", "--env=prod", "-f", "a b", "x y"]);
   const p = parseArgs(["prod", "3", "--force", "--tag", "v2"], [{ name: "env", choices: ["staging", "prod"], required: true }, { name: "n", type: "number" }], { force: { alias: "f" }, tag: { type: "string" } });
   assert.deepEqual(p.args, { env: "prod", n: 3 });
   assert.deepEqual(p.options, { force: true, tag: "v2" });
