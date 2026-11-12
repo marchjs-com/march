@@ -6,6 +6,9 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ### Progressive loading (later in 0.1.0)
 - `lazy(() => import("./X.tsx"))` (`hadi-march/lazy`, auto-imported): component chunks with a skeleton, `.preload()`.
+  Options: `when` (immediate | idle | visible | interaction), `placeholder` skeletons (CSS only, after 100 ms),
+  `height` / `aspect` reserve (CLS 0), `pick`, crossfade + stagger, retry on error. `setLoadDelay(ms)` simulates a slow
+  network. Production builds merge the entry closure into one file (`mergeEntry`, off with `mergeEntry: false`).
   The old internal children marker is now `lazyChildren` (compiler helper).
 - Build manifest in `index.html` + loader tags from the compiler: a route's chunks preload at once (`modulepreload`).
   `<Link prefetch="hover|visible|none">`; idle `rel=prefetch` of on-screen links; off with Save-Data / 2G.

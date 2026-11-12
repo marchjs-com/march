@@ -1,0 +1,39 @@
+/* HADI March — lazy() slots: the place is reserved, a themed skeleton appears only after 100 ms, a progress line after
+   300 ms, the content fades in and its children stagger in. transform / opacity only. */
+/* a slot without a reserved size adds no box (the component sits in its parent's layout as if it were not wrapped) */
+.hm-lazy-slot { display: contents; }
+.hm-lazy-slot.hm-lazy-sized { display: block; position: relative; min-width: 0; }
+.hm-lazy-sized.is-wait, .hm-lazy-sized.is-error { min-height: var(--hm-lazy-h, auto); aspect-ratio: var(--hm-lazy-aspect, auto); }
+/* skeleton: invisible for the first 100 ms (a cached chunk never shows it), then a soft fade in */
+.hm-lazy-slot.is-wait > .hm-lazy-skel { opacity: 0; animation: hm-lazy-show .2s ease-out .1s forwards; }
+.hm-lazy-sized > .hm-lazy-skel { position: absolute; inset: 0; }
+/* thin progress line once it takes longer than 300 ms */
+.hm-lazy-slot.is-wait::after { content: ""; position: absolute; inset-inline: 0; inset-block-start: 0; height: 2px; border-radius: 2px; transform-origin: 0 50%;
+  background: var(--hm-progress-fill, var(--hm-primary)); opacity: 0; transform: scaleX(0); animation: hm-lazy-show .2s ease-out .3s forwards, hm-lazy-grow 4s cubic-bezier(.1, .7, .3, 1) .3s forwards; }
+/* arrival: crossfade with a slight lift; direct children stagger in */
+.hm-lazy-slot.is-ready > * { animation: hm-lazy-in .24s var(--hm-ease-out, ease-out) both; }
+.hm-lazy-slot.is-ready > :nth-child(2) { animation-delay: 40ms; } .hm-lazy-slot.is-ready > :nth-child(3) { animation-delay: 80ms; }
+.hm-lazy-slot.is-ready > :nth-child(4) { animation-delay: 120ms; } .hm-lazy-slot.is-ready > :nth-child(n+5) { animation-delay: 160ms; }
+@keyframes hm-lazy-show { to { opacity: 1; } }
+@keyframes hm-lazy-grow { to { transform: scaleX(.9); } }
+@keyframes hm-lazy-in { from { opacity: 0; transform: translateY(4px) scale(.99); } }
+
+/* skeleton shapes: one element; lines / rows / bars / fields are background layers; a shimmer band slides over them */
+.hm-lazy-skel { --hm-sk: var(--hm-surface-2, #eee); position: relative; overflow: hidden; min-height: 6rem; height: 100%; border-radius: var(--hm-radius, 8px); background: var(--hm-sk); }
+.hm-lazy-skel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 20%, color-mix(in srgb, var(--hm-surface, #fff) 55%, transparent) 50%, transparent 80%);
+  transform: translateX(-100%); animation: hm-lazy-shimmer 1.6s ease-in-out infinite; }
+.hm-lazy-skel-text, .hm-lazy-skel-table, .hm-lazy-skel-form, .hm-lazy-skel-chart, .hm-lazy-skel-card { background-color: transparent; border-radius: 0; }
+.hm-lazy-skel-text { min-height: 4rem; background: linear-gradient(var(--hm-sk) 0 .875rem, transparent .875rem 1.375rem) 0 0 / 100% 1.375rem repeat-y; -webkit-mask: linear-gradient(#000 0 0) 0 0 / 100% calc(100% - 1.375rem) no-repeat, linear-gradient(#000 0 0) 0 100% / 60% 1.375rem no-repeat; mask: linear-gradient(#000 0 0) 0 0 / 100% calc(100% - 1.375rem) no-repeat, linear-gradient(#000 0 0) 0 100% / 60% 1.375rem no-repeat; }
+.hm-lazy-skel-table { background: linear-gradient(var(--hm-sk) 0 2.25rem, transparent 2.25rem 2.75rem) 0 0 / 100% 2.75rem repeat-y; }
+.hm-lazy-skel-form { background: linear-gradient(var(--hm-sk) 0 .75rem, transparent .75rem 1.25rem, var(--hm-sk) 1.25rem 3.75rem, transparent 3.75rem 5rem) 0 0 / 100% 5rem repeat-y; }
+.hm-lazy-skel-card { background: linear-gradient(var(--hm-sk) 0 0) 0 0 / 40% 1.125rem no-repeat, linear-gradient(var(--hm-sk) 0 0) 0 2rem / 100% calc(100% - 2rem) no-repeat; }
+.hm-lazy-skel-chart { min-height: 10rem; border-block-end: 2px solid var(--hm-border, #ddd); background:
+  linear-gradient(var(--hm-sk) 0 0) 2% 100% / 12% 40% no-repeat, linear-gradient(var(--hm-sk) 0 0) 19.6% 100% / 12% 70% no-repeat, linear-gradient(var(--hm-sk) 0 0) 37.2% 100% / 12% 55% no-repeat,
+  linear-gradient(var(--hm-sk) 0 0) 54.8% 100% / 12% 85% no-repeat, linear-gradient(var(--hm-sk) 0 0) 72.4% 100% / 12% 62% no-repeat, linear-gradient(var(--hm-sk) 0 0) 90% 100% / 12% 92% no-repeat; }
+@keyframes hm-lazy-shimmer { to { transform: translateX(100%); } }
+.hm-lazy-error { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-3, 12px); padding: var(--hm-space-3, 12px); border: 1px solid color-mix(in srgb, var(--hm-danger) 40%, transparent);
+  border-radius: var(--hm-radius-2, 8px); background: color-mix(in srgb, var(--hm-danger) 6%, var(--hm-surface)); color: var(--hm-danger-text, var(--hm-danger)); }
+@media (prefers-reduced-motion: reduce) {
+  .hm-lazy-slot.is-ready > *, .hm-lazy-skel::after { animation: none; }
+  .hm-lazy-slot.is-wait > .hm-lazy-skel { animation-duration: 0s; }
+}

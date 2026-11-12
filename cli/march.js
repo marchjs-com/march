@@ -18,6 +18,7 @@ import { march } from "../compiler/esbuild.js";
 import { genRoutes } from "./routes.js";
 import { genApi, mockHandler } from "./openapi.js";
 import { templates } from "./templates.js";
+import { mergeEntry } from "../compiler/merge-entry.js";
 import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs } from "./perf.js";
 
 const cwd = process.cwd();
@@ -55,7 +56,7 @@ function buildOptions(cfg, esbuild, { dev }) {
 }
 
 /** Write index.html with the hashed entry script/style tags (no inline scripts). */
-function writeHtml(cfg, meta, { dev }, manifest = null) {
+function writeHtml(cfg, meta, { dev }, manifest = null, entryFiles = null) {
   const out = resolve(cwd, cfg.outdir);
   const src = existsSync(join(cwd, cfg.html)) ? readFileSync(join(cwd, cfg.html), "utf8") : templates.indexHtml();
   // the app entry (lazy pages are entry points of their own chunks too, so match the configured entry file)
@@ -66,7 +67,9 @@ function writeHtml(cfg, meta, { dev }, manifest = null) {
   // the chunk manifest is a JSON data block (never executed, so CSP script-src does not apply); the router and lazy()
   // read it to preload all of a route's files at once
   const data = manifest && Object.keys(manifest).length ? `<script type="application/json" id="march-manifest">${JSON.stringify(manifest).replace(/</g, "\\u003c")}</script>` : "";
-  const tags = `${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : ""}`;
+  // the entry's own chunks are announced up front: fetched in parallel with the entry instead of after it is parsed
+  const pre = (entryFiles ?? []).filter((f) => f.endsWith(".js") && `/${f}` !== js).map((f) => `<link rel="modulepreload" href="/${f}">`).join("");
+  const tags = `${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : ""}`;
   const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
   writeFileSync(join(out, "index.html"), html);
 }
@@ -93,8 +96,14 @@ async function build({ dev = false } = {}) {
   const t0 = Date.now();
   try {
     const r = await esbuild.build(buildOptions(cfg, esbuild, { dev }));
+    // production: the entry and its static chunks become one file (fewer requests, better compression)
+    if (!dev && cfg.mergeEntry !== false) {
+      const want = resolve(cwd, cfg.entry);
+      const entryKey = Object.keys(r.metafile.outputs).find((k) => r.metafile.outputs[k].entryPoint && resolve(cwd, r.metafile.outputs[k].entryPoint) === want);
+      if (entryKey) await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify: flag("--no-minify") !== true });
+    }
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
-    writeHtml(cfg, r.metafile, { dev }, chunks.manifest);
+    writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);
     if (cfg.themes !== false) await copyThemes(out, esbuild, { dev });
     if (!dev) {
       if (cfg.headers !== false && !existsSync(join(out, "_headers"))) writeFileSync(join(out, "_headers"), headersFile());

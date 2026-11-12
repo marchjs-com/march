@@ -66,6 +66,12 @@ export function preloadChunks(key: string | undefined | null, low = false): bool
 /** The manifest key the compiler attached to a loader (`() => import("./x.tsx")`), if any. */
 export const loaderKey = (fn: unknown): string | undefined => (fn as { hm?: string } | null)?.hm;
 
+let delayMs = 0;
+/** Demo / testing: add an artificial delay (ms) before every lazy component and route chunk loads ("slow 3G"). */
+export function setLoadDelay(ms: number): void { delayMs = Math.max(0, ms | 0); }
+/** The artificial load delay (0 = off). */
+export const loadDelay = (): number => delayMs;
+
 /** Run `fn` when the browser is idle (setTimeout fallback). Returns a cancel function. */
 export function whenIdle(fn: () => void, timeout = 2000): () => void {
   const g = globalThis as typeof globalThis & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };

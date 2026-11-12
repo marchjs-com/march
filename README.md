@@ -145,8 +145,13 @@ A March app is a single-page app that loads progressively: nothing is downloaded
 arrives is cached.
 
 - **Small first download.** The entry holds the core, the router and the shell. Each route is its own chunk
-  (`() => import("./pages/x.tsx")`); heavy components load on first render with `lazy()` and a skeleton:
-  `const Chart = lazy(() => import("./SalesChart.tsx"))`. The command palette, themes and charts load on first use.
+  (`() => import("./pages/x.tsx")`); heavy components load with `lazy()`:
+  `const Chart = lazy(() => import("./SalesChart.tsx"), { when: "visible", placeholder: "chart", height: "16rem" })`.
+  `when` is `immediate` (default), `idle`, `visible` or `interaction`; the place is reserved (CLS 0), a skeleton of
+  the given kind (`block`, `text`, `card`, `table`, `chart`, `form`) shows only after 100 ms (never for a cached chunk),
+  and the content crossfades in. Errors show a retry in place. The command palette, themes and charts load on first use.
+- **One entry file.** `march build` merges the entry and the chunks it imports statically into one file (better gzip,
+  fewer requests); the old chunk files become re-export stubs, so lazy pages share the same instances.
 - **No waterfalls.** `march build` writes a chunk manifest into `index.html` (a JSON data block, CSP safe). The compiler
   tags each `() => import()` with its key, so loading a route fetches all of its files at once with
   `<link rel="modulepreload">`. Named imports from `hadi-march/ui` etc. are compiled to the defining module, and bare

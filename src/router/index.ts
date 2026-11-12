@@ -9,7 +9,7 @@ import { provideLink } from "../dom/link.ts";
 import { signal, computed, untrack, batch, effect, onCleanup, read, getOwner } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { Try } from "../dom/flow.ts";
-import { preloadChunks, loaderKey, saveData, whenIdle } from "../dom/preload.ts";
+import { preloadChunks, loaderKey, saveData, whenIdle, loadDelay } from "../dom/preload.ts";
 
 // ------------------------------------------------------------------ types
 type Component = (props: Record<string, unknown>) => unknown;
@@ -218,7 +218,8 @@ function loadModule(l: Loader): Promise<PageModule | null> {
   let p = moduleCache.get(l);
   if (!p) {
     preloadChunks(loaderKey(l));
-    p = Promise.resolve(l()).then((m) => (typeof m === "function" ? { default: m as Component } : (m as PageModule)));
+    const delay = loadDelay();
+    p = (delay ? new Promise((r) => setTimeout(r, delay)).then(() => l()) : Promise.resolve(l())).then((m) => (typeof m === "function" ? { default: m as Component } : (m as PageModule)));
     p.catch(() => moduleCache.delete(l));
     moduleCache.set(l, p);
   }

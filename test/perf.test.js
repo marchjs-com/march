@@ -71,22 +71,53 @@ test("preloadChunks adds one modulepreload per file (CSS as preload/style), reso
   L.setPreloadManifest(null);
 });
 
-test("lazy(): skeleton first, then the component in place; later renders are synchronous", async () => {
+test("lazy(): reserved slot + skeleton, then the component in place; later renders are synchronous", async () => {
   let resolveIt;
-  const Hello = L.lazy(() => new Promise((r) => { resolveIt = r; }));
+  const Hello = L.lazy(() => new Promise((r) => { resolveIt = r; }), { placeholder: "chart", height: "12rem" });
   const el = document.createElement("div");
   render(() => h("section", {}, h(Hello, { name: "Ada" })), el);
-  assert.ok(el.querySelector(".hm-lazy[aria-busy=true]"), "skeleton while loading");
+  const slot = el.querySelector(".hm-lazy-slot");
+  assert.equal(slot.getAttribute("aria-busy"), "true");
+  assert.ok(slot.classList.contains("hm-lazy-sized") && slot.style.getPropertyValue("--hm-lazy-h") === "12rem", "size reserved (no layout shift)");
+  assert.ok(slot.querySelector(".hm-lazy-skel.hm-lazy-skel-chart"), "chart-shaped skeleton (drawn by CSS)");
   resolveIt({ default: (p) => h("p", {}, `Merhaba ${p.name}`) });
   await new Promise((r) => setTimeout(r, 0));
   assert.equal(el.querySelector("p")?.textContent, "Merhaba Ada");
-  assert.equal(el.querySelector(".hm-lazy"), null);
+  assert.ok(slot.classList.contains("is-ready") && !slot.querySelector(".hm-lazy-skel"));
   assert.equal(Hello.loaded, true);
   const el2 = document.createElement("div");
   render(() => h(Hello, { name: "Can" }), el2);
-  assert.equal(el2.querySelector("p")?.textContent, "Merhaba Can", "cached: no skeleton");
+  assert.equal(el2.querySelector("p")?.textContent, "Merhaba Can", "cached: no slot, no skeleton");
+  assert.equal(el2.querySelector(".hm-lazy-slot"), null);
   const Picked = L.lazy(() => Promise.resolve({ Chart: () => h("b", {}, "c") }), { pick: "Chart" });
   assert.equal(typeof (await Picked.preload()), "function");
+});
+
+test("lazy(): when=interaction waits for hover/focus; errors show a retry in place", async () => {
+  let calls = 0;
+  const Later = L.lazy(() => { calls++; return Promise.resolve({ default: () => h("i", {}, "x") }); }, { when: "interaction" });
+  const el = document.createElement("div");
+  render(() => h(Later, {}), el);
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(calls, 0, "nothing loads before an interaction");
+  el.querySelector(".hm-lazy-slot").dispatchEvent(new Event("focusin", { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(calls, 1);
+  assert.equal(el.querySelector("i")?.textContent, "x");
+  let fail = true;
+  const Flaky = L.lazy(() => (fail ? Promise.reject(new Error("offline")) : Promise.resolve({ default: () => h("u", {}, "ok") })));
+  const el2 = document.createElement("div");
+  const { createRoot } = await import("../src/index.ts");
+  createRoot(() => { render(() => h(Flaky, {}), el2); });
+  await new Promise((r) => setTimeout(r, 0));
+  const retry = el2.querySelector(".hm-lazy-error button");
+  assert.ok(retry, "a retry button in place of the component");
+  fail = false;
+  retry.dispatchEvent(new Event("click", { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(el2.querySelector("u")?.textContent, "ok");
+  L.setLoadDelay(0);
+  assert.equal(L.loadDelay(), 0);
 });
 
 test("service worker: precache on install, one cache per version, old versions deleted, hashed assets cache-first", async () => {
@@ -145,4 +176,26 @@ test("icon glyph modules and the catalog are generated from set.ts", async () =>
   const all = await import("../src/icons/all.ts");
   assert.deepEqual(Object.keys(ICONS).sort(), Object.keys(all).sort());
   assert.deepEqual(ICONS.menu.d, all.menu.d);
+});
+
+test("mergeEntry: the entry and its static chunks become one file; old chunks re-export from it", async () => {
+  const { mergeEntry } = await import("../compiler/merge-entry.js");
+  const esbuild = (await import("esbuild")).default ?? (await import("esbuild"));
+  const app = await buildApp({
+    "main.tsx": `import { render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx") } })\nrender(() => h(Router, {}), document.body)\n`,
+    "a.tsx": `import { Card } from "hadi-march/ui"\nexport default () => <Card title="A">a</Card>\n`,
+    "b.tsx": `import { Card, Badge } from "hadi-march/ui"\nexport default () => <Card title="B"><Badge>b</Badge></Card>\n`,
+  });
+  try {
+    const entryKey = Object.keys(app.meta.outputs).find((k) => app.meta.outputs[k].entryPoint === "main.tsx");
+    const before = chunkManifest(app.meta, { cwd: app.dir, outdir: app.outdir, entry: "main.tsx" }).entryFiles.filter((f) => f.endsWith(".js")).length;
+    const stubs = await mergeEntry(app.meta, { cwd: app.dir, entryKey, esbuild });
+    const after = chunkManifest(app.meta, { cwd: app.dir, outdir: app.outdir, entry: "main.tsx" }).entryFiles.filter((f) => f.endsWith(".js"));
+    assert.ok(before > 1 && stubs.length === before - 1, `${before} entry files merged`);
+    assert.equal(after.length, 1, "one entry file");
+    const main = readFileSync(resolve(app.dir, entryKey), "utf8");
+    assert.doesNotMatch(main, /^import\s*[{"]/m, "no static imports left in the entry");
+    assert.match(main, /import\("\.\/chunks\/a-/, "lazy pages stay lazy (path re-based to the entry)");
+    for (const s of stubs) assert.match(readFileSync(resolve(app.dir, s), "utf8"), /^(export \{[^}]*\} from|import) "\.\.\/main-/, "a stub re-exports from the merged entry");
+  } finally { app.cleanup(); }
 });

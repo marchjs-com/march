@@ -136,7 +136,8 @@ Overlays never take input; put content after them. `front` only for foreground e
 **Performance, always** (page speed comes first)
 - Every route is a lazy chunk: `routes: { "/x": () => import("./pages/x.tsx") }`. Never import a page statically.
 - Heavy components (charts, tables, DatePicker, editors, maps, fx/landing) go behind `lazy(() => import("./X.tsx"))`
-  when they are not on the first screen. Keep the entry under 15 KB gzip: run `march build` and read the report. If
+  when they are not on the first screen: `lazy(load, { when: "visible", placeholder: "table", height: "30rem" })`
+  (`pick: "Name"` for a named export). Always reserve a size for below-the-fold parts. Keep the entry under 15 KB gzip: run `march build` and read the report. If
   the entry is over budget, move the listed modules behind `import()`/`lazy()`.
 - Import named exports (`import { Card } from "hadi-march/ui"`), never `import * as` from a March module. Use
   `hadi-march/icons/catalog` for icon galleries.
