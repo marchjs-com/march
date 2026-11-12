@@ -5,7 +5,11 @@
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| CountRoll | experimental | Odometer number: only the changed digits roll (up when it grows, down when it shrinks), compact in the active locale. | — |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| LikeButton | experimental | Heart toggle: spring pop, ring and a four-color HADİ particle burst on the motion engine; rolling count; heartBurst() for any element. | CountRoll |
+| MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton |
+| PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, MediaGrid, LikeButton, CountRoll |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
 
 ## BottomNav
@@ -30,15 +34,56 @@ A label pill. Three uses: a static label, a **filter** you can switch on and off
 
 Full page: src/components/chip/docs.md
 
-## Drawer
+## CountRoll
 
-
+An odometer number for likes, comments and followers. When the value changes only the digits that changed roll: upward when it grows, downward when it shrinks, on the motion engine (global speed, pause and reduced motion apply). The text is compact in the active locale (`1,2 B`, `12K`); `format="full"` groups it instead.
 
 ```tsx
+<CountRoll value={$likes} />
+<CountRoll value={$followers} format="full" />
+```
 
+Full page: src/components/social/count-roll/docs.md
+
+## Drawer
+
+A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
+
+```tsx
+<Drawer open={$open} onClose={() => $open = false} side="bottom" snapPoints={[0.4, 0.9]} title="Filters">…</Drawer>
 ```
 
 Full page: src/components/overlays/drawer/docs.md
+
+## LikeButton
+
+A heart toggle with a rolling count. Liking squashes and overshoots the heart on a spring, grows a ring and throws a burst of particles in the four HADİ colors; unliking is a small press. Everything runs on the motion engine, so the global speed, "pause all" and reduced motion apply (reduced motion keeps only the fill change).
+
+```tsx
+<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />
+```
+
+Full page: src/components/social/like-button/docs.md
+
+## MediaGrid
+
+The photos of a post in one frame: one photo keeps its own shape (between 4:5 and 1.91:1), two sit side by side, three are one large and two stacked, four are a 2×2 grid, and more show "+N" on the last tile. Each tile is a button that opens the photo; a Skeleton shimmers until the image arrives and it then fades in. With `onDoubleTap` a single tap waits 230 ms, so a double tap (like) never also opens the photo.
+
+```tsx
+<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />
+```
+
+Full page: src/components/social/media-grid/docs.md
+
+## PostCard
+
+One post of a social feed. The header shows the author (Avatar, name with a verified mark), the relative time and the place, with an optional ⋯ Menu. Photos sit in a MediaGrid; a double tap on them likes the post with a large heart that pops over the photo and bursts in the four HADİ colors. The action row has a LikeButton and rolling counts for comments and shares; the caption folds to three lines with a "more" button.
+
+```tsx
+<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />
+```
+
+Full page: src/components/composite/post-card/docs.md
 
 ## PullToRefresh
 
