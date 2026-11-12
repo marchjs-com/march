@@ -75,7 +75,8 @@ test("unreliable: sd or half of the 95% interval above 15% of the median", async
 });
 
 test("realistic scenarios: same seed, same workload; every step stays in its stated range", async () => {
-  const { SCENARIOS, ticker } = await import("../examples/showcase/src/bench/scenarios/core.ts");
+  const { SCENARIOS } = await import("../examples/showcase/src/bench/scenarios/list.ts");
+  const { ticker } = await import("../examples/showcase/src/bench/scenarios/ticker/def.ts");
   assert.ok(SCENARIOS.length >= 1 && SCENARIOS.every((s) => s.desc.length > 60 && s.steps > 0));
   const d = ticker.data(7);
   assert.equal(d.length, 2000);

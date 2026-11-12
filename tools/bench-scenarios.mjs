@@ -16,12 +16,33 @@ const want = flag(process.argv, "--scenarios", "");
 const libs = flag(process.argv, "--libs", "vanilla,march,react,preact,vue,svelte,solid,lit");
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
+// --dir <scenario>: run one scenario folder straight from its files (<id>/def.ts default export + one app per
+// library), before it is registered in list.ts and the per-library files — for writing a new scenario
+const dir = flag(process.argv, "--dir", "");
+const D = `./src/bench/scenarios/${dir}/`;
+const has = (f) => existsSync(join(SC, "src/bench/scenarios", dir, f));
+const direct = !dir ? "" : `
+import def from "${D}def.ts";
+import { withoutPolicyLookup } from "./src/bench/apps/no-tt.ts";
+const one = (p) => p.then((m) => ({ ${JSON.stringify(dir)}: m.mount }));
+const registry = {
+  ${has("vanilla.ts") ? `vanilla: () => one(import("${D}vanilla.ts")),` : ""}
+  ${has("march.tsx") ? `march: () => one(import("${D}march.tsx")),` : ""}
+  ${has("react.ts") ? `react: () => one(import("${D}react.ts")),` : ""}
+  ${has("preact.ts") ? `preact: () => one(import("${D}preact.ts")),` : ""}
+  ${has("vue.ts") ? `vue: () => one(import("${D}vue.ts")),` : ""}
+  ${has("solid.gen.js") ? `solid: () => one(import("${D}solid.gen.js")),` : ""}
+  ${has("lit.ts") ? `lit: () => one(withoutPolicyLookup(() => import("${D}lit.ts"))),` : ""}
+  ${has("svelte.gen.js") ? `svelte: () => withoutPolicyLookup(() => Promise.all([import("svelte"), import("${D}svelte.gen.js")])).then(([s, m]) => ({ ${JSON.stringify(dir)}: (host, data) => { const a = s.mount(m.default, { target: host, props: { data } }); s.flushSync(); return { step: (p) => a.step(p), destroy: () => { void s.unmount(a) } } } })),` : ""}
+};
+`;
 const entry = `
-import { SCENARIOS } from "./src/bench/scenarios/core.ts";
+import { SCENARIOS } from "./src/bench/scenarios/list.ts";
 import { runScenarios } from "./src/bench/scenarios/runner.ts";
+${direct}
 const want = ${JSON.stringify(want)};
-const scenarios = want ? SCENARIOS.filter((s) => want.split(",").includes(s.id)) : SCENARIOS;
-runScenarios({ scenarios, libs: ${JSON.stringify(libs.split(","))}, stage: document.getElementById("stage") }).then((r) => {
+const scenarios = ${dir ? "[def]" : `want ? SCENARIOS.filter((s) => want.split(",").includes(s.id)) : SCENARIOS`};
+runScenarios({ scenarios, libs: ${JSON.stringify(libs.split(","))}, stage: document.getElementById("stage")${dir ? ", registry" : ""} }).then((r) => {
   window.__scen = Object.fromEntries(Object.entries(r.results).map(([s, per]) => [s, Object.fromEntries(Object.entries(per).map(([l, x]) => [l, { median: x.stats.median, p95: [...x.samples].sort((a, b) => a - b)[Math.floor(x.samples.length * 0.95)] ?? null, dropped: x.dropped, n: x.samples.length, error: x.error ?? null }]))]));
 }, (e) => { window.__scen = { fatal: String(e && e.stack || e) }; });
 `;
