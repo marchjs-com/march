@@ -30,3 +30,16 @@ test("DevicePreview: a custom device; touch off removes the touch look", () => {
   assert.doesNotMatch(dev.getAttribute("class"), /is-touch/);
   dispose();
 });
+
+test("previewFrame: only pages of this site; another origin stays blank", async () => {
+  const { previewFrame } = await import("./index.ts");
+  const src = signal("/web/product?bare=1");
+  const host = document.createElement("div"); document.body.appendChild(host);
+  let f;
+  const dispose = render(() => (f = previewFrame(src, "p", "x")), host);
+  assert.equal(f.tagName.toLowerCase(), "iframe");
+  assert.match(f.getAttribute("src"), /^http:\/\/localhost\/web\/product\?bare=1$/);
+  src.set("https://evil.example/");
+  assert.equal(f.getAttribute("src"), "about:blank");
+  dispose();
+});

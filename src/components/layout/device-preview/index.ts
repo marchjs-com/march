@@ -9,7 +9,7 @@
 import "./device-preview.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { signal, onCleanup } from "../../../core/reactive.ts";
+import { signal, onCleanup, effect } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { OverlayScope } from "../overlay-scope/index.ts";
 import { animateValue } from "../../../motion/engine/value.ts";
@@ -61,6 +61,20 @@ function scrollerOf(el: Element | null, stop: Element, axis: "x" | "y"): HTMLEle
   return stop as HTMLElement;
 }
 
+/** A same-origin page in a frame (h() never creates <iframe>: only pages of this site, never another origin). */
+export function previewFrame(src: MaybeFn<string | undefined>, title: MaybeFn<string>, cls: string): HTMLIFrameElement {
+  const f = document.createElement("iframe");
+  f.className = cls;
+  effect(() => {
+    const raw = val(src);
+    let u = "about:blank";
+    try { const r = new URL(raw ?? "", location.href); if (raw && r.origin === location.origin) u = r.href; } catch { /* stays blank */ }
+    if (f.getAttribute("src") !== u) f.setAttribute("src", u);
+    f.title = val(title);
+  });
+  return f;
+}
+
 /** Content shown as on a phone or tablet, with touch behavior. */
 export function DevicePreview(props: DevicePreviewProps): Element {
   const time = signal(now());
@@ -70,7 +84,7 @@ export function DevicePreview(props: DevicePreviewProps): Element {
 
   const spec = (): DeviceSpec => specOf(val(props.device));
   const land = (): boolean => !!val(props.landscape);
-  const frame = props.src != null ? h("iframe", { class: "hm-device-frame", src: () => val(props.src) ?? "about:blank", title: () => t`${spec().name} preview`, loading: "lazy" }) as HTMLIFrameElement : null;
+  const frame = props.src != null ? previewFrame(props.src, () => t`${spec().name} preview`, "hm-device-frame") : null;
   const viewport = h("div", { class: () => cx("hm-device-viewport", frame && "is-framed") }, frame ?? props.children) as HTMLElement;
   const dot = h("div", { class: "hm-device-touch", "aria-hidden": "true" }) as HTMLElement;
   const screen = h(OverlayScope, { class: "hm-device-screen", children: [
