@@ -70,8 +70,8 @@
 .hm-ec-compact .hm-ec-plot { min-block-size: 10rem; max-block-size: 14rem; }
 .hm-ec-compact .hm-ec-css { display: none; }
 .hm-ec-compact .hm-ec-inputs { grid-template-columns: repeat(2, auto); }
-/* number boxes about 7 characters wide ("-0.354" fits) */
-.hm-ec-compact .hm-ec-num { inline-size: calc(7ch + .75rem + 2px); }
+/* number boxes about 7 characters wide plus the stepper ("-0.354" fits) */
+.hm-ec-compact .hm-ec-num { inline-size: calc(7ch + 2rem + 2px); }
 .hm-ec-compact .hm-ec-presets { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; padding-block-end: 2px; }
 .hm-ec-compact .hm-ec-preset { flex: none; padding: .25rem .375rem .125rem; }
 .hm-ec-compact .hm-ec-thumb { inline-size: 1.75rem; block-size: 1.75rem; }
