@@ -91,6 +91,7 @@ const newId = (): string => (globalThis.crypto?.randomUUID?.() ?? `${Date.now().
 
 /** A managed WebSocket. `In` = messages from the server, `Out` = messages to it. */
 export class ManagedSocket<In = unknown, Out = unknown> {
+  /** The connection state: idle, connecting, open, reconnecting or closed. */
   readonly state: Signal<SocketState> = signal<SocketState>("idle");
   /** Reconnect attempts since the last successful open. */
   readonly attempts = signal(0);
@@ -98,6 +99,7 @@ export class ManagedSocket<In = unknown, Out = unknown> {
   readonly queued = signal(0);
   /** True when this tab owns the shared connection (always true when not shared). */
   readonly leader = signal(true);
+  /** The resolved WebSocket address. */
   readonly url: string;
   private ws: SocketLike | null = null;
   private p: SocketProtocol;

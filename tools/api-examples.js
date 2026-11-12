@@ -2,7 +2,8 @@
 // Every runtime export has a small working example in the showcase API reference (İlk Adımlar › API başvurusu): a
 // click on its card shows the summary, the signature, the example code and the live result (with a Playground when
 // the example gives options). One source: the example files examples/showcase/src/api-examples/<group>.tsx, one per
-// group of package subpaths, each loaded lazily the first time one of its cards opens.
+// group of package subpaths, each loaded lazily the first time one of its cards opens. A big subpath may be split over
+// several files, each holding an alphabetical range of its names (by code point: "Z" < "a").
 //
 // Shared result widgets live in api-examples/_kit.tsx (files starting with "_" are not example files).
 // An example file is written in a fixed layout (the tool reads it as text, the showcase imports it):
@@ -31,19 +32,11 @@ const DIR = "examples/showcase/src/api-examples";
 const INDEX = "examples/showcase/src/api-examples.gen.ts";
 /** Subpaths whose examples are still being written (in groups). Each finished group leaves this list; the test fails
  *  when a listed subpath is already complete, and for every export of an unlisted subpath that has no example. */
+/* Subpaths with exports added after their examples were written (base path, icon packs, landing, motion scroll / list,
+ * menu and form helpers): their examples are the next group. */
 export const PENDING = new Set([
-  "hadi-march/landing", "hadi-march/store", "hadi-march/i18n", "hadi-march/lazy", "hadi-march/errors",
-  "hadi-march/router", "hadi-march/data", "hadi-march/schema", "hadi-march/ui", "hadi-march/components/registry.gen.ts",
-  "hadi-march/table", "hadi-march/charts", "hadi-march/crud", "hadi-march/sw", "hadi-march/motion", "hadi-march/motion/text",
-  "hadi-march/motion/text/meta", "hadi-march/fx", "hadi-march/channel", "hadi-march/behaviors/drag",
-  "hadi-march/behaviors/roving-focus", "hadi-march/behaviors/resize-handle", "hadi-march/behaviors/list-nav",
-  "hadi-march/behaviors/dropzone", "hadi-march/behaviors/swipe", "hadi-march/behaviors/dismiss", "hadi-march/icons",
-  "hadi-march/icons/catalog", "hadi-march/theme", "hadi-march/net", "hadi-march/net/mock", "hadi-march/managers",
-  "hadi-march/managers/consent/ui", "hadi-march/managers/command/ui", "hadi-march/managers/undo", "hadi-march/flow",
-  "hadi-march/context-menu", "hadi-march/managers/undo/history", "hadi-march/seo", "hadi-march/seo/hydrate", "hadi-march/base",
-  "hadi-march/icons/packs",
-  "hadi-march/managers/accessibility/ui", "hadi-march/managers/shortcut-hint", "hadi-march/managers/shortcut-hint/ui",
-  "hadi-march/dom/safe", "hadi-march/dom/sanitize", "hadi-march/dom/to-markdown",
+  "hadi-march/base", "hadi-march/icons", "hadi-march/icons/packs", "hadi-march/landing", "hadi-march/motion",
+  "hadi-march/router", "hadi-march/seo/hydrate", "hadi-march/ui",
 ]);
 
 /** Example files: group → { subs: { subpath → Set<name> }, plays: Set<"subpath#name"> (with a Playground) }, read by
@@ -119,27 +112,32 @@ export function generate(root = ROOT) {
     return true;
   }) })).filter((a) => a.items.length);
   const files = exampleFiles(root);
+  // a big subpath may be split over several files, each holding a contiguous (alphabetical) range of its names:
+  // subpath → [[group, first name], …] sorted by first name
   const groupOf = new Map();
   const problems = [];
+  const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
   for (const [group, { subs, sigExport }] of files) {
     if (!sigExport) problems.push(`${DIR}/${group}.tsx: add  export { default as SIG } from "./${group}.sig.gen.ts"`);
-    for (const sub of Object.keys(subs)) {
-      if (groupOf.has(sub)) problems.push(`${sub}: examples in two files (${groupOf.get(sub)}, ${group})`);
-      else groupOf.set(sub, group);
-    }
+    for (const [sub, names] of Object.entries(subs)) if (names.size) groupOf.set(sub, [...(groupOf.get(sub) ?? []), [group, [...names].sort(cmp)[0]]].sort((a, b) => cmp(a[1], b[1])));
+  }
+  /** The file whose range holds `name`. */
+  const fileOf = (sub, name) => { const r = groupOf.get(sub); if (!r) return null; let g = r[0][0]; for (const [x, first] of r) if (cmp(first, name) <= 0) g = x; return g; };
+  const has = (sub, name) => { const g = fileOf(sub, name); return !!g && files.get(g).subs[sub].has(name); };
+  for (const [group, { subs }] of files) for (const [sub, names] of Object.entries(subs)) for (const n of names) {
+    if (fileOf(sub, n) !== group) problems.push(`${group}.tsx: ${sub} › ${n} is outside this file's range (split a subpath into alphabetical ranges, one per file)`);
   }
   const known = new Map(listed.map((a) => [a.subpath, new Set(a.items.map((i) => i.name))]));
   const missing = [];
   for (const a of listed) {
     if (PENDING.has(a.subpath)) continue;
-    const have = groupOf.has(a.subpath) ? files.get(groupOf.get(a.subpath)).subs[a.subpath] : new Set();
-    for (const i of a.items) if (!have.has(i.name)) missing.push(`${a.subpath} › ${i.name}`);
+    for (const i of a.items) if (!has(a.subpath, i.name)) missing.push(`${a.subpath} › ${i.name}`);
   }
   for (const [group, { subs }] of files) for (const [sub, names] of Object.entries(subs)) {
     if (!known.has(sub)) { problems.push(`${group}.tsx: "${sub}" is not a package subpath (or has no runtime export)`); continue; }
     for (const n of names) if (!known.get(sub).has(n)) problems.push(`${group}.tsx: ${sub} › ${n} is not listed under that subpath`);
   }
-  const done = [...PENDING].filter((sub) => known.has(sub) && groupOf.has(sub) && [...known.get(sub)].every((n) => files.get(groupOf.get(sub)).subs[sub].has(n)));
+  const done = [...PENDING].filter((sub) => known.has(sub) && groupOf.has(sub) && [...known.get(sub)].every((n) => has(sub, n)));
   const HEAD = "// GENERATED by tools/api-examples.js — do not edit.\n";
   const out = {};
   const exports = new Map(apis.flatMap((a) => a.items.map((i) => [`${a.subpath}#${i.name}`, i])));
@@ -160,12 +158,19 @@ export function generate(root = ROOT) {
       `const sig: Record<string, Record<string, string>> = ${JSON.stringify(sig, null, 1)};\nexport default sig;\n`;
   }
   out[INDEX] = HEAD +
-    "// Which lazy example file holds the examples of a subpath (examples/showcase/src/api-examples/<group>.tsx).\n" +
+    "// Which lazy example file holds an export's example (examples/showcase/src/api-examples/<group>.tsx): per subpath, its\n" +
+    "// files with the first name of each one's alphabetical range.\n" +
     'import type { ApiExampleModule } from "./api-examples/types.ts";\n' +
     `const groups: Record<string, () => Promise<ApiExampleModule>> = {\n${[...files.keys()].map((g) => `  ${JSON.stringify(g)}: () => import("./api-examples/${g}.tsx"),\n`).join("")}};\n` +
-    `const bySubpath: Record<string, string> = ${JSON.stringify(Object.fromEntries([...groupOf].sort()), null, 1)};\n` +
-    "/** The example file of a subpath (loaded once), or null when it has none yet. */\n" +
-    "export const loadExamples = (subpath: string): Promise<ApiExampleModule> | null => { const g = bySubpath[subpath]; return g ? groups[g]!() : null; };\n";
+    `const bySubpath: Record<string, [group: string, first: string][]> = {\n${[...groupOf].sort((a, b) => cmp(a[0], b[0])).map(([s, r]) => `  ${JSON.stringify(s)}: ${JSON.stringify(r)},\n`).join("")}};\n` +
+    "/** The example file of an export (a lazy part, loaded once), or null when its subpath has none yet. */\n" +
+    "export const loadExamples = (subpath: string, name: string): Promise<ApiExampleModule> | null => {\n" +
+    "  const r = bySubpath[subpath];\n" +
+    "  if (!r) return null;\n" +
+    "  let g = r[0]![0];\n" +
+    "  for (const [x, first] of r) if (first <= name) g = x;\n" +
+    "  return groups[g]!();\n" +
+    "};\n";
   return { files: out, missing, problems, done, count: listed.reduce((s, a) => s + a.items.length, 0) };
 }
 

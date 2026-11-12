@@ -24,13 +24,21 @@ const byStatus = (s: number): ErrorType =>
 
 /** An error with a type (network, auth, validation, server …), a code, the HTTP status and field errors. */
 export class AppError extends Error {
+  /** The kind of failure, such as network, auth, validation or server. */
   type: ErrorType;
+  /** A stable machine-readable code, such as HTTP_404. */
   code: string;
+  /** The HTTP status, or 0 when there was no response. */
   status: number;
+  /** How serious the error is: info, warning or error. */
   severity: Severity;
+  /** Which part of the app raised the error. */
   source: ErrorSource;
+  /** True when trying the same request again may succeed. */
   retryable: boolean;
+  /** The original error or value that caused this one. */
   override cause: unknown;
+  /** Extra details about the failure, such as the URL or field errors. */
   context: Record<string, unknown>;
   constructor(message: string, init: AppErrorInit = {}) {
     super(message);

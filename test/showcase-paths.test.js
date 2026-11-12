@@ -18,7 +18,8 @@ const code = (l) => l.replace(/\/\*.*?\*\//g, "").replace(/(^|\s)\/\/.*$/, "");
 const hits = (re, { samples = false } = {}) => files.flatMap(({ f, s }) => (samples ? s : live(s)).split("\n").flatMap((l, i) => (re.test(code(l)) ? [`${f}:${i + 1}: ${l.trim().slice(0, 120)}`] : [])));
 
 test("showcase: no #/ address in code (links, routes, page texts, code samples)", () => {
-  assert.deepEqual(hits(/#\//, { samples: true }).filter((h) => !/\/\^#\\\//.test(h)), []);
+  // a JSON Schema / OpenAPI reference ($ref: "#/components/…") points inside a document: not an address
+  assert.deepEqual(hits(/#\//, { samples: true }).filter((h) => !/\/\^#\\\//.test(h) && !/\$ref"?:\s*"#\//.test(h)), []);
 });
 
 test("showcase: history routing with an automatic base", () => {
@@ -33,6 +34,7 @@ test("showcase: no root-absolute link or file path; public files through appUrl(
   assert.deepEqual(hits(/\s(src|poster|srcset)=["'`]\/(?!\/)/), [], "a root-absolute file path");
   assert.deepEqual(hits(/\s(src|poster)=["'`](\.\/)?(media|demo-api)\//), [], "a relative public file: appUrl(\"media/…\")");
   assert.deepEqual(hits(/\bfetch\(\s*["'`](?![a-z]+:)/), [], "fetch of a public file: fetch(appUrl(\"…\"))");
-  assert.deepEqual(hits(/\bbase\s*=\s*["'`](?![a-z]+:)[^"'`]/), [], "an Api base under the app's root: appUrl(\"…\")");
+  // the net examples talk to a mock server (mockNet): its paths are not files of the app
+  assert.deepEqual(hits(/\bbase\s*=\s*["'`](?![a-z]+:)[^"'`]/).filter((h) => !h.startsWith("examples/showcase/src/api-examples/net.tsx")), [],"an Api base under the app's root: appUrl(\"…\")");
   assert.deepEqual(hits(/location\.hash\b/).filter((h) => !h.startsWith("examples/showcase/src/perflog.ts")), [], "routes come from the router, not location.hash");
 });

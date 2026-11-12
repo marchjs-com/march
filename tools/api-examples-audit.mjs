@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-// Opens every API reference example in a headless browser (İlk Adımlar › API başvurusu, built showcase in
-// examples/showcase/dist) and reports the ones that throw, render nothing or overflow their card.
+// Opens every API example on the showcase API page (#/api/<subpath>/<name>, built showcase in examples/showcase/dist)
+// in a headless browser and reports the ones whose page throws, whose live demo renders nothing, or that overflow.
 //   node tools/api-examples-audit.mjs [--sub hadi-march/ui] [--width 390] [--base http://…]
 // Build first: node examples/showcase/build.mjs. Exit 1 on a problem.
 import { openHeadless, flag, sleep } from "./lib/headless.mjs";
 import { exampleFiles } from "./api-examples.js";
+import { slugOf } from "./api-docs.js";
 
 const argv = process.argv.slice(2);
 const only = flag(argv, "--sub", null);
@@ -13,34 +14,26 @@ const want = [];
 for (const { subs } of exampleFiles().values()) for (const [sub, names] of Object.entries(subs)) if (!only || sub === only) for (const n of names) want.push([sub, n]);
 
 const b = await openHeadless({ base: flag(argv, "--base", null) });
-await b.load("/start", width);
-// the reference loads when it scrolls into view
-for (let i = 0; i < 60 && !(await b.ev(`!!document.querySelector(".sc-api-toggle")`)); i++) {
-  await b.ev(`(() => { const h = [...document.querySelectorAll("main h2")].find((x) => /API başvurusu/.test(x.textContent)); h?.scrollIntoView(); })()`);
-  await sleep(250);
-}
+await b.load("/api", width);
 const problems = [];
 for (const [sub, name] of want) {
   b.errs.length = 0;
   const r = await b.ev(`(async () => {
-    const group = [...document.querySelectorAll(".sc-api-group")].find((g) => g.querySelector(".sc-api-sub code")?.textContent === ${JSON.stringify(sub)});
-    const row = group && [...group.querySelectorAll(".sc-api-row")].find((li) => li.querySelector(".sc-api-name")?.textContent === ${JSON.stringify(name)});
-    if (!row) return { err: "no card" };
-    const btn = row.querySelector(".sc-api-toggle");
-    if (btn.getAttribute("aria-expanded") !== "true") btn.click();
-    for (let i = 0; i < 60 && !row.querySelector(".sc-api-stage, .sc-play, [role=alert], .sc-api-note:not([aria-live])"); i++) await new Promise((r) => setTimeout(r, 100));
-    await new Promise((r) => setTimeout(r, 250));
-    const stage = row.querySelector(".sc-api-stage, .sc-play");
-    const alert = row.querySelector(".sc-api-detail [role=alert]")?.textContent;
-    const note = row.querySelector(".sc-api-note")?.textContent;
-    const box = row.getBoundingClientRect(), wide = [...row.querySelectorAll("*")].some((e) => e.getBoundingClientRect().right > box.right + 1 && getComputedStyle(e).position !== "fixed" && !e.closest("[style*=overflow], pre, .hm-code, .sc-ex-log"));
-    const out = { sig: !!row.querySelector(".sc-api-sig"), empty: !stage || !(stage.textContent.trim() || stage.querySelector("svg, canvas, img, input, button, video")), alert, note, wide, overflow: document.documentElement.scrollWidth > innerWidth };
-    btn.click();
-    return out;
+    location.hash = ${JSON.stringify(`#/api/${slugOf(sub)}/${name}`)};
+    const ready = () => document.querySelector(".sc-apip-name")?.textContent === ${JSON.stringify(name)} && document.querySelector(".sc-apip-stage, .sc-apip-doc .sc-play, .sc-apip-doc [role=alert], .sc-apip-doc .sc-apip-note:not(:empty)");
+    for (let i = 0; i < 100 && !ready(); i++) await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 300));
+    const doc = document.querySelector(".sc-apip-doc");
+    if (!doc || document.querySelector(".sc-apip-name")?.textContent !== ${JSON.stringify(name)}) return { err: "no doc" };
+    const stage = doc.querySelector(".sc-apip-stage, .sc-play");
+    const alert = doc.querySelector("[role=alert]")?.textContent;
+    const note = [...doc.querySelectorAll(".sc-apip-note")].map((n) => n.textContent).join(" ");
+    const main = document.querySelector(".sc-apip-main").getBoundingClientRect();
+    const wide = [...doc.querySelectorAll(".sc-apip-stage *, .sc-play *")].some((e) => e.getBoundingClientRect().right > main.right + 1 && getComputedStyle(e).position !== "fixed" && !e.closest(".sc-ex-log, pre"));
+    return { sig: !!doc.querySelector(".sc-apip-pre"), empty: !stage || !(stage.textContent.trim() || stage.querySelector("svg, canvas, img, input, button, video")), alert, note, wide, overflow: document.documentElement.scrollWidth > innerWidth };
   })()`);
   const errs = [...b.errs];
-  const bad = !r || r.err || r.empty || r.alert || r.note || r.wide || r.overflow || errs.length;
-  if (bad) problems.push(`${sub} › ${name}: ${JSON.stringify({ ...r, errs: errs.slice(0, 2) })}`);
+  if (!r || r.err || r.empty || r.alert || r.note || r.wide || r.overflow || errs.length) problems.push(`${sub} › ${name}: ${JSON.stringify({ ...r, errs: errs.slice(0, 2) })}`);
 }
 await b.close();
 for (const p of problems) console.error(`✖ ${p}`);

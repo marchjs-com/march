@@ -71,7 +71,12 @@ export type MockHandlers = Record<string, MockHandler | unknown>;
 
 /** A mock response with status, body and headers (return it from a mock handler). */
 export class MockReply {
-  readonly status: number; readonly body: unknown; readonly headers: Record<string, string>;
+  /** The HTTP status of the reply. */
+  readonly status: number;
+  /** The response body. */
+  readonly body: unknown;
+  /** The response headers. */
+  readonly headers: Record<string, string>;
   constructor(status: number, body?: unknown, headers: Record<string, string> = {}) { this.status = status; this.body = body; this.headers = headers; }
 }
 /** A response with a status: `reply(404, { message: "No such user" })`. */
@@ -165,6 +170,7 @@ const compile = (spec: string, handler: unknown): Route => {
 /** Transport that answers from handlers or an OpenAPI document, with delay, error rate and passthrough. */
 export class MockTransport implements Transport {
   readonly name = "mock";
+  /** The current latency, error rate and passthrough settings (reactive). */
   readonly options = signal<Required<Omit<MockOptions, "seed">>>({ delay: [40, 160], errorRate: 0, passthrough: false });
   /** Requests answered so far. */
   readonly hits = signal(0);
