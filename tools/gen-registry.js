@@ -22,6 +22,12 @@ export async function categories(root = ROOT) {
   return (await import(pathToFileURL(join(root, "src/components/categories.ts")).href)).CATEGORIES;
 }
 
+/**
+ * Categories reachable only through their own subpath (hadi-march/landing), not through the ui barrel: a website's
+ * blocks are a page of their own, and a barrel re-export would put them in the static graph of every ui page.
+ */
+const OUTSIDE_UI = new Set(["landing"]);
+
 /** Subpaths that existed before the categories: their module index re-exports the category barrel instead. */
 const OWN_MODULE = { forms: "src/forms/index.ts", data: "src/data/index.ts", motion: "src/motion/index.ts" };
 
@@ -60,7 +66,8 @@ export async function generate(root = ROOT) {
   const files = {};
   // large components (meta.barrel === false) stay out of the barrels: import them from hadi-march/components/<folder>
   const barrel = list.filter((c) => c.meta?.barrel !== false);
-  files["src/components/index.ts"] = HEAD + barrel.map((c) => `export * from "./${c.folder}/index.ts";\n`).join("");
+  // categories with their own subpath only (hadi-march/landing) stay out of the ui barrel, in their category barrel
+  files["src/components/index.ts"] = HEAD + barrel.filter((c) => !OUTSIDE_UI.has(c.category)).map((c) => `export * from "./${c.folder}/index.ts";\n`).join("");
   for (const cat of cats) {
     const own = barrel.filter((c) => c.category === cat.id);
     files[`src/components/${cat.id}/index.ts`] = HEAD + `// ${cat.title}: ${cat.desc} Import: hadi-march/${cat.id}\n` +
