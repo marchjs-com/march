@@ -80,3 +80,14 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
   wipe's `start` / `end` follow the text direction.
 - `filterBlur`, `displace` (feTurbulence + feDisplacementMap), `goo` (blur + alpha contrast): one `<filter>` per call in a
   hidden `<svg>`, removed when the value settles at 0 (or by the returned cleanup for `goo`).
+
+### Morph (src/motion/morph.ts)
+- `morph(from, to, { mode, hideSource, fadeContent })` — container transform: `to` (laid out where it ends) starts
+  clipped to `from`'s box (`clip-path: inset(… round r)`) and moved onto it, then opens; background colour and corner
+  radius blend; the content fades in, it is never stretched. `mode: "scale"` is a FLIP with a scale (shared element:
+  the same picture in two places). Unfilled: nothing stays on the target afterwards.
+- `morphBack(from, to)` — the reverse; `to` is shown again when it ends (close / remove `from` after `finished`).
+- `morphIcon(path, name)` with `MORPH_ICONS` (play, pause, menu, close, plus, check, minus): every icon is three 4-point
+  bars with the same commands, so any two tween number by number.
+- `shapeMorph(el, shape)` / `shapePolygon(shape, n)` — radial outlines sampled at the same angles (circle, square,
+  triangle, diamond, hexagon, star, blob, flower): clip-path polygons the browser interpolates.

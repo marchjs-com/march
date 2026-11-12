@@ -363,6 +363,12 @@ clipReveal(card, { shape: "circle", origin: { x: 20, y: 80 } }); // circle | wip
 filterBlur(title, { from: 16, axis: "x" }); displace(card, { from: 60 }); const off = goo(container);
 ```
 Pure path tools (no DOM): `parsePath`, `flatten`, `pathSampler`, `resample`, `interpolatePath`, `toD`.
+```ts
+morph(button, dialog); await morphBack(dialog, button).finished;   // container transform (clip + move, no stretching)
+morph(thumb, big, { mode: "scale", hideSource: false });            // shared element FLIP
+morphIcon(pathEl, playing ? "pause" : "play");                      // MORPH_ICONS: play pause menu close plus check minus
+shapeMorph(el, "star");                                             // circle square triangle diamond hexagon star blob flower
+```
 
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 
