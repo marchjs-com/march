@@ -1,9 +1,9 @@
 # Component checklist
 
 Every component lives in `src/components/<name>/` and is done only when all of this holds. `march check component
-<name>` checks the source items (✔ / ✖) and lists the browser items (·), which `tools/visual-audit.mjs` and the
-showcase cover. `node tools/gen-registry.js` writes the barrel, the registry and the catalogues; `--check` (and
-`npm test`) fails when they drift.
+<name>` checks the source items (✔ / ✖) and lists the browser items (·), which the showcase, `tools/visual-audit.mjs` and
+`tools/control-audit.mjs` (every option control changes something visible) cover. `node tools/gen-registry.js` writes
+the barrel, the registry and the catalogues; `--check` (and `npm test`) fails when they drift.
 
 ## Start
 
