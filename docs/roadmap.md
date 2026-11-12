@@ -19,3 +19,14 @@ The motion core is NOT on this list: it is core order step 10 (docs/parallel.md)
 | 8 | Design-token export: Figma (Tokens Studio JSON), Flutter (HADİ mobile ThemeData / hadi_colors.dart) | S | — | from theme tokens |
 | 9 | Version / migration tools: `march upgrade` codemods, API changelog, warnings | M | 0.1.0 release | |
 | 10 | App templates: `march create --template admin|landing|social|shop` | M | most of the above | last |
+
+## Infrastructure (founder, 12 Nov 2026; details and dependencies in docs/parallel.md › Infrastructure)
+
+| # | Area | Size | Needs |
+|---|---|---|---|
+| w | Version and stability contract (stable / experimental / deprecated in meta.ts, deprecation warnings, generated CHANGELOG, semver) | M | modular structure |
+| x | Size and performance guard in CI (size, Slow 3G first load, frame rate; regression fails; `npm run perf`) | M | — |
+| y | Debug ids (component / signal names, file:line in errors and DevTools; dev only) | M | compiler |
+| z | Accessibility tree snapshots per showcase page | S | visual-audit |
+| aa | Package contract test (`npm pack` → temporary project, end to end) | S | — |
+| bb | One source: docs.md + demo.tsx → docs, showcase, AI catalogue (`--check`) | M | modular structure |

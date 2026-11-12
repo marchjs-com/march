@@ -34,32 +34,50 @@ Main, in this order:
 9. Core managers (CommandManager, LayerManager, FocusManager, ViewportManager, ConsentManager)
 10. Parallel phase: the remaining managers (waves below) and the complex components.
 
-## Shared hubs (founder decision, 12 Nov 2026)
+## Shared hubs (founder decisions, 12 Nov 2026)
 
-One implementation each; components only draw. With the modular structure (highest impact first):
-1. **Positioning engine** (`position` / `anchor`): flip and shift on collision, size limits, arrow placement,
-   updates on scroll and resize; CSS Anchor Positioning where supported, JS otherwise. Users: Popover, Tooltip, Menu,
-   Dropdown, Combobox, DatePicker, ContextMenu, HoverCard.
-2. **Collection and selection model:** items, single / multiple / range selection, focused item, disabled items,
-   sections / groups, typeahead. Users: Listbox, Select, Combobox, Menu, Tree, Table, Tabs, RadioGroup, Kanban.
-3. **Field contract:** value, disabled, readOnly, invalid, required, error; label / description / error ids and ARIA
-   from one controller. Every form control uses it; the form engine builds on it.
-4. **Variant and style system:** the same prop names and scales everywhere (`size`, `variant`, `color`, `radius`,
-   `density`); declarative variant definitions (cva-like), less repeated CSS; Playground options are generated from it.
+One implementation each; components only draw. Built inside the modular structure (core order step 7), in this order;
+each hub is its own HAZIR step, existing components move onto it with unchanged behaviour (tests + visual audit), and
+docs/composition.md records before / after lines and bytes.
 
-Right after:
-5. **Virtual list engine:** variable heights, sticky headers, reverse (chat), grid, infinite loading. Users: Table,
-   Tree, Combobox, chat, feeds.
-6. **Input mask and parsing:** phone, money, date, time, card, code; locale-aware. Users: PhoneInput, MoneyInput,
-   NumberInput, DatePicker, TimePicker, CodeInput.
+| # | Hub | What | Users | Needs |
+|---|---|---|---|---|
+| a | Positioning engine (`position` / `anchor`) | flip / shift / size / arrow, scroll + resize updates; CSS Anchor Positioning where supported (via f) | Popover, Tooltip, Menu, Dropdown, Combobox, DatePicker, ContextMenu, HoverCard | f |
+| b | Collection and selection model | items, single / multiple / range, focused item, disabled, sections, typeahead | Listbox, Select, Combobox, Menu, Tree, Table, Tabs, RadioGroup, Kanban | h |
+| c | Field contract | value, disabled, readOnly, invalid, required, error; label / description / error ids + ARIA from one controller | every form control; form engine | — |
+| d | Variant and style system | same names and scales everywhere (`size`, `variant`, `color`, `radius`, `density`); declarative variants; Playground options generated from it | every component, Playground | — |
+| e | Safe content renderer | Markdown / restricted HTML to nodes, no innerHTML, Trusted Types, URL cleaning | Markdown, rich text, chat | g |
+| f | Feature detection + fallbacks | View Transitions, anchor positioning, scroll-driven animations, popover, … | a, motion, router | — |
+| g | Security core | Trusted Types policy, URL and link safety, file type checks | e, FileUpload, links | — |
+| h | Search and fuzzy matching | Turkish İ/ı folding, scoring, highlighting; replaces the 4 copies of `rank()` | Combobox, Table, Nav, Palette | — |
+| i | Async state view | loading / empty / error / retry in one component | lazy, query, net | — |
+| j | Intl service | one cache: number, currency, date, relative, plural, list, collator | pipes, i18n, forms, charts | — |
+| k | Text fitting | overflow measuring, line-clamp, Marquee / OverflowText, fit-text, auto-growing textarea | Marquee, Textarea, cards | — |
+| l | Virtual list engine | variable heights, sticky, reverse (chat), grid, infinite | Table, Tree, Combobox, chat, feeds | b |
+| m | Input mask and parsing | phone, money, date, time, card, code; locale-aware | PhoneInput, MoneyInput, NumberInput, DatePicker, CodeInput | j |
+| n | Data source abstraction | local / paged / cursor / infinite / live behind one interface | Table, lists, l | net |
+| o | Date and time core | calendar maths, ranges, time zones | DatePicker, Calendar, Timeline | j |
+| p | Colour engine | OKLab, contrast, palettes | themes, ColorPicker, charts | motion OKLab |
+| q | Media core | playback state, pause off-screen, saveData, poster, srcset, blurred placeholder | Overlay, VideoBackground, VideoPlayer, Lightbox | — |
+| r | Global defaults | `<Defaults button={{ size: "sm" }} table={{ density: "compact" }}>`, nested per section / app | every component | d |
+| s | Slots and headless mode | named parts (`header` / `item` / `empty` …) replaceable one by one; `unstyled` = behaviour + ARIA only | every component | d |
+| t | Global event delegation | one pointer / keyboard / scroll listener at the root, dispatched to components | big lists, Table, behaviors | — |
+| u | Ownership and leak detector | every timer, observer, listener and subscription bound to an owner and cleaned up; dev-mode warning for leaks | core, behaviors, managers | — |
+| v | Lifecycle hooks (plugin API) | plugins add shared behaviour to every component | DevTools, analytics, a11y audit | u |
 
-In the duplicate merge:
-7. **Intl service:** one cache; number, currency, date, relative time, plural, list, collator (Turkish sorting).
-8. **Text fitting service:** overflow measuring, line-clamp, Marquee / OverflowText, fit-text, auto-growing textarea.
+Order: a–k with the modular structure; l–n right after; o–q before their own components; r–v with the modular
+structure where they fit (d before r / s; u early, it guards every other hub).
 
-Before the media components:
-9. **Media core:** playback state, pause when off-screen, saveData, poster, srcset / responsive images, blurred
-   placeholder. Users: Overlay video, VideoBackground, VideoPlayer, Lightbox.
+## Infrastructure (founder decisions, 12 Nov 2026)
+
+| # | Area | What | Needs |
+|---|---|---|---|
+| w | Version and stability contract | stable / experimental / deprecated per API (meta.ts), dev-mode deprecation warnings, CHANGELOG generated from commits + meta, semver rules | modular structure (meta.ts) |
+| x | Size and performance guard (CI) | every commit measures package size, showcase first load on Slow 3G and frame rate; a regression past the threshold fails; `march_olcum_*.mjs` move to `tools/` behind `npm run perf` | tools/visual-audit.mjs |
+| y | Debug ids | dev mode: every component and signal carries a readable name; errors and DevTools say which component, file:line; added by the compiler, dropped in production | compiler |
+| z | Accessibility tree check | every showcase page's tree (CDP `Accessibility.getFullAXTree`) compared with a snapshot | tools/visual-audit.mjs |
+| aa | Package contract test | `npm pack`, install in a temporary project; build, types, sub-path imports and lazy loading end to end | — |
+| bb | One source for docs, showcase and AI catalogue | component docs, showcase demo and the AI_INSTRUCTIONS catalogue generated from `docs.md` + `demo.tsx`; drift caught by `--check` | modular structure, gen-registry |
 
 ## Complex components (parallel phase)
 
