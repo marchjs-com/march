@@ -45,5 +45,7 @@ export interface PlaygroundOption<V = Record<string, unknown>> {
 }
 export interface PlaygroundSpec<V = Record<string, unknown>> { options: readonly PlaygroundOption<V>[] }
 
+/** Typed helper for a component folder's meta.ts (name, status, category, composedOf …). */
 export const defineMeta = (m: ComponentMeta): ComponentMeta => m;
+/** Typed helper for a component folder's playground.ts (the showcase options). */
 export const definePlayground = <V = Record<string, unknown>>(p: PlaygroundSpec<V>): PlaygroundSpec<V> => p;

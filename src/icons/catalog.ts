@@ -3,6 +3,7 @@
 //   import { ICONS } from "hadi-march/icons/catalog"   (an icon gallery; apps import single icons from "hadi-march/icons")
 import type { IconDef } from "./svg.ts";
 
+/** Every built-in icon by name (for icon pickers and search; import single icons to keep bundles small). */
 export const ICONS: Readonly<Record<string, IconDef>> = {
   menu: { name: "menu", d: ["M4 6h16", "M4 12h16", "M4 18h16"] },
   x: { name: "x", d: ["M18 6 6 18", "M6 6l12 12"] },

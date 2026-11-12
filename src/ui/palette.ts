@@ -46,7 +46,9 @@ export function openPalette(): void {
   if (!mounted && globalThis.document?.body) createRoot(() => h(CommandPalette, {}), null);
   isOpen.set(true);
 }
+/** Close the command palette. */
 export const closePalette = (): void => { isOpen.set(false); };
+/** Is the command palette open (reactive)? */
 export const paletteOpen = (): boolean => isOpen();
 
 export interface CommandPaletteProps {

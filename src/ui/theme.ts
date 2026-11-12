@@ -50,6 +50,7 @@ export const theme: Theme = Object.assign((): ThemeMode => mode(), {
     return v;
   },
 });
+/** Set light, dark or system mode. */
 export const setTheme = theme.set;
 /** Effective theme after resolving "system" with prefers-color-scheme (not reactive to OS changes). */
 export const resolvedTheme = (): "light" | "dark" => {

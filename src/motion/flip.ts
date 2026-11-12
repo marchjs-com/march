@@ -8,6 +8,7 @@ export interface FlipOptions { duration?: number; easing?: string; enter?: boole
 
 const seen = new WeakSet<Element>();
 
+/** FLIP: measure elements, apply a DOM change, then animate them from their old place to the new one. */
 export function flip(elements: Element[], mutate: () => void, raw: unknown = {}): void {
   const o: FlipOptions = raw && typeof raw === "object" ? (raw as FlipOptions) : {};
   if (reducedMotion()) { mutate(); for (const el of elements) seen.add(el); return; }
@@ -28,4 +29,5 @@ export function flip(elements: Element[], mutate: () => void, raw: unknown = {})
   }
 }
 
+/** Enable `<For animate>` reordering animations (FLIP on the motion engine). */
 export function installFlip(): void { setFlipHook(flip); }

@@ -5,6 +5,7 @@ const coord = (p: unknown, i: 0 | 1, k: "x" | "y"): number =>
   (Array.isArray(p) ? (p as readonly number[])[i] : (p as Record<string, number>)[k]) as number;
 
 /**
+ * Downsample a series to `threshold` points and keep its visual shape (Largest-Triangle-Three-Buckets).
  * @param points input, sorted by x
  * @param threshold wanted output length (≥ 3; smaller values return the input)
  * @param getX default `p[0]` (or `p.x`)

@@ -82,6 +82,7 @@ function plain(e: AppError): { type: ErrorType; code: string; status: number; se
 
 function emit(name: ErrorEventName, c: Captured): void { for (const fn of listeners.get(name) ?? []) { try { fn(c); } catch { /* a listener must not break capture */ } } }
 
+/** Captured errors: recent list, listeners, report and clear. */
 export const errors = {
   /** Recent errors, newest first (max 50, de-duplicated). */
   list: signal<Captured[]>([]),

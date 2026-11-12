@@ -192,6 +192,7 @@ onConfig((why) => {
 interface Item { at: number; node: Effect | Playback }
 type Label = number;
 
+/** A timeline of animations with labels, play, pause, seek, reverse and speed. */
 export class Playback {
   readonly items: Item[] = [];
   readonly labels = new Map<string, Label>();

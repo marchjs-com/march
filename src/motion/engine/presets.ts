@@ -2,6 +2,7 @@
 // installPresets() is called, so apps that do not use them do not ship them.
 import { keyframes, type KeyframesDef } from "./keyframes.ts";
 
+/** Built-in keyframe presets (fadeIn, slideUp, pop …) with their default duration and easing. */
 export const PRESETS = {
   fadeIn: [{ opacity: [0, 1] }, { duration: 220, easing: "out" }],
   fadeOut: [{ opacity: [1, 0] }, { duration: 180, easing: "in" }],
