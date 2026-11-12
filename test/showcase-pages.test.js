@@ -21,5 +21,5 @@ test("every menu group is one of MENU_GROUPS (src/components/categories.ts), in 
   const { MENU_GROUPS } = await import("../src/components/categories.ts");
   const groups = paths("nav-meta.ts", /group: "([^"]+)"/g);
   for (const g of new Set(groups)) assert.ok(MENU_GROUPS.includes(g), `nav-meta.ts group "${g}" is not a menu group: ${MENU_GROUPS.join(", ")}`);
-  assert.match(readFileSync(SRC + "shell-nav.tsx", "utf8"), /groupOrder=\{MENU_GROUPS\}/, "the side menu orders its groups by MENU_GROUPS");
+  assert.match(readFileSync(SRC + "shell-menu.tsx", "utf8"), /groupOrder=\{MENU_GROUPS\}/, "the side menu orders its groups by MENU_GROUPS");
 });
