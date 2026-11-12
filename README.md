@@ -109,7 +109,7 @@ setTheme("dark");                      // light | dark | system
 
 Write your own: `defineTheme({ id, name, font, display, radius, light: {...}, dark: {...} })` from `hadi-march/theme`,
 write `themeCss(def)` to a .css file at build time, load it, and `registerThemes([{ id, name }])` to offer it in pickers.
-Icons: `hadi-march/icons` (132 original SVG icons, each a separate export, rendered with createElementNS).
+Icons: `hadi-march/icons` (160 original SVG icons, each a separate export, rendered with createElementNS) and optional open-source packs, one export per icon: `hadi-march/icons/lucide`, `/tabler`, `/heroicons`, `/phosphor`, `/feather`, `/material-symbols`, `/remix`, `/bootstrap`, `/simple-icons` (licenses included; `march icons add` updates them). See [docs/icons.md](docs/icons.md).
 Live gallery of everything: `node examples/showcase/build.mjs --serve`.
 
 ## Only what you use is bundled

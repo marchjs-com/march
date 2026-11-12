@@ -4,6 +4,17 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Icon packs (later in 0.1.0)
+- Open-source icon sets as optional subpaths, one export per icon: `hadi-march/icons/lucide`, `/tabler`, `/heroicons`,
+  `/phosphor`, `/feather`, `/material-symbols`, `/remix`, `/bootstrap`, `/simple-icons` (about 22,000 icons; each pack
+  ships its license). A shared drawing layer keeps each set's grid, stroke width or fill and mirrors direction icons in
+  right-to-left text; start-up code is unchanged.
+- `hadi-march/icons/packs`: `registerIconPack`, `icon("lucide:rocket")` for any icon prop, `<Icon name="…" />`,
+  `loadIcon`, `packIcon`. No prefix means the HADI March set.
+- `march icons list | add <pack> | gallery <dir>`: converts a set from its official npm package (sha512 checked,
+  nothing in it is run); licenses outside MIT, ISC, Apache-2.0, CC0-1.0, CC-BY-4.0, OFL-1.1 are refused.
+- `<Icon>` follows live props (`size={$size}`); `deepImports` leaves `import` lines inside strings (code samples) alone.
+
 ### Credit (later in 0.1.0)
 - `<MadeWithMarch />` (`src/components/actions/made-with-march`): optional "Developed with HADI March and 💗" line, variants text / badge / small, link in one constant (`MARCH_URL`). The licence stays MIT; using it is a request.
 - `credit: true` in `march.config.js` adds `<!-- Built with HADI March -->` to the built `index.html` (off by default).
