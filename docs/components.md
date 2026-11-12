@@ -7,13 +7,26 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Accordion | stable | Stacked sections that open one at a time or several together: animated height, ↑ ↓ Home End between headers, separated or contained look. | — |
+| AppShell | stable | The application frame: a sidebar column and the main area with optional banner and sticky header; a skip link; full width on narrow screens. | — |
+| Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | — |
+| Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
+| Spacer | stable | A flexible gap in a row that pushes the following items to the end. | — |
+| Splitter | stable | Two resizable panes: drag the handle or use the arrow keys (mirrored in RTL), Home / End, Enter resets. | — |
+| Stack | stable | Layout primitives: Stack (a row or column with token gaps and alignment), Toolbar (a labelled bar of controls), Divider (a rule, labelled or vertical). | — |
 | StatusBar | experimental | Bottom strip of an editor or app: start / end items, text or buttons (actions or command ids), tones with a breathing busy dot, live announcements, low-priority items to a … menu when narrow. | Menu, Tooltip |
+
+### Typography — `hadi-march/typography`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| OverflowText | stable | Text that scrolls only when it does not fit: hover, focus, always or while visible; bounce, loop or once; RTL-aware fade; Marquee is the endless ticker. | — |
 
 ### Actions — `hadi-march/actions`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | [OverflowText](#overflowtext) |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 | OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Menu, Tooltip |
 
@@ -46,7 +59,11 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 |---|---|---|---|
 | ActivityBar | experimental | Editor icon bar that switches the side view: a tablist with a gliding indicator, count badges, end items, collapse by choosing the active view again; vertical or horizontal, RTL aware. | Badge, Tooltip |
 | Breadcrumbs | experimental | Path bar: links, buttons or sibling menus per crumb; the middle collapses into a … menu when narrow; separators mirrored in RTL. | Menu |
-| Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
+| NavMenu | stable | Sidebar navigation for apps: collapsible groups, pinned and recent items, a filter box, the active item from the router; a drawer on narrow screens. | Badge, [OverflowText](#overflowtext) |
+| Pagination | stable | Numbered pages with ellipses and Previous / Next; the current page is marked for screen readers. | — |
+| Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | [Steps](#steps), Button |
+| Steps | stable | Progress through stages: done, current and upcoming steps with titles and descriptions; clickable when onSelect is given; horizontal or vertical. | — |
+| Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), badges, disabled and hidden tabs, the active tab optionally kept in the URL. | — |
 
 ### Motion — `hadi-march/motion`
 
@@ -72,31 +89,44 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
+| BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, [OverflowText](#overflowtext) |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, [ReactionPicker](#reactionpicker) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), Avatar |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
-| CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, OverflowText |
+| CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, [OverflowText](#overflowtext) |
 | ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, Dialog, Toggle |
-| DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, Portal |
+| DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | [Splitter](#splitter), [Tabs](#tabs), Portal |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
-| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle |
-| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, [Chip](#chip), OverflowText |
-| FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, OverflowText |
+| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), IconButton, [OverflowText](#overflowtext), Field, TextInput, NumberInput, Select, Toggle |
+| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, [Chip](#chip), [OverflowText](#overflowtext) |
+| FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, [OverflowText](#overflowtext) |
 | GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | [ColorPicker](#colorpicker), Segmented, IconButton |
 | ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | Segmented, Slider, IconButton |
 | JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | [TreeEditor](#treeeditor) |
 | KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | [EasingCurveEditor](#easingcurveeditor), IconButton, Segmented |
-| MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, [RichTextEditor](#richtexteditor) |
-| NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
+| MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | [Splitter](#splitter), Toolbar, IconButton, [RichTextEditor](#richtexteditor) |
+| NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | [OverflowText](#overflowtext), Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
 | ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll](#countroll), Button, Menu |
-| PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
+| PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | [Disclosure](#disclosure), TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
-| ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
+| ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, [OverflowText](#overflowtext) |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
-| Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress |
+| Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | [Steps](#steps), Progress |
+
+## Accordion
+
+Stacked sections with a header button each. By default opening one closes the others; `multiple` lets several stay open. The panel height animates, ↑ ↓ Home End move between headers, and closed panels are inert. Headers can carry an icon and a subtitle; `variant="contained"` draws one framed list instead of separate cards.
+
+```tsx
+<Accordion multiple open={[0]} items={[
+  { title: "Shipping", subtitle: "2–3 days", content: <Shipping /> },
+  { title: "Returns", content: <Returns /> },
+]} />
+```
+
+Full page: src/components/layout/accordion/docs.md
 
 ## ActivityBar
 
@@ -114,11 +144,23 @@ Composed of: Badge, Tooltip
 
 Full page: src/components/navigation/activity-bar/docs.md
 
+## AppShell
+
+The application frame. Desktop: a sticky sidebar column (usually a NavMenu or NavSidebar) and a scrolling main area; above the main column an optional banner slot (`top`, for update or offline banners) and a sticky header (`header`, for the title, search and user menu). Narrow screens: a slim top bar with the menu button and a full-width main. A "Skip to content" link comes first. It is its own module, so an app's entry does not pull in page scaffolding.
+
+```tsx
+<AppShell nav={<NavMenu items={items} />} top={<UpdateBanner />} header={<PageTitle />}>
+  <Outlet />
+</AppShell>
+```
+
+Full page: src/components/layout/app-shell/docs.md
+
 ## BottomNav
 
 The mobile tab bar: a colored bubble slides to the active tab, tabs carry count or dot badges, and an optional raised Create button in the middle wears a slowly turning ring of the four HADİ colors (Heyecan, Aktivite, Dostluk, İletişim).
 
-Composed of: Badge, OverflowText
+Composed of: Badge, [OverflowText](#overflowtext)
 
 ```tsx
 <BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />
@@ -180,7 +222,7 @@ Full page: src/components/composite/chat-thread/docs.md
 
 A label pill. Three uses: a static label, a **filter** you can switch on and off (`selected` + `onClick`, announced with `aria-pressed`), and a **removable** tag (`onRemove`, an ×-button with an accessible name).
 
-Composed of: OverflowText
+Composed of: [OverflowText](#overflowtext)
 
 ```tsx
 <Chip>Design</Chip>
@@ -207,7 +249,7 @@ Full page: src/components/composite/color-picker/docs.md
 
 Ctrl/⌘+K opens a search over every registered command, every NavMenu page and every action, ranked with typo tolerance. An optional `ask(query)` hook (an intent search the app provides) adds an "Ask" row: it runs on Enter, or by itself when local results are weak. Only a small shell ships with the page; the dialog loads on first open, and hovering or focusing a `PaletteButton` fetches it ahead of time.
 
-Composed of: Dialog, OverflowText
+Composed of: Dialog, [OverflowText](#overflowtext)
 
 ```tsx
 <CommandPalette ask={(q) => api.intent(q)} placeholder="Search pages or actions…" />
@@ -273,11 +315,23 @@ import { DataGrid } from "hadi-march/components/data/data-grid";
 
 Full page: src/components/data/data-grid/docs.md
 
+## Disclosure
+
+A collapsible section built on the native `<details>` / `<summary>` elements, so keyboard and screen reader support come for free and the browser's find-in-page opens it. The summary line has a turning chevron and the body opens with an animation. `open` can be a signal; `onToggle` reports the new state.
+
+```tsx
+<Disclosure title="Advanced settings" open={false} onToggle={(open) => save({ advanced: open })}>
+  <AdvancedForm />
+</Disclosure>
+```
+
+Full page: src/components/layout/disclosure/docs.md
+
 ## DockLayout
 
 An IDE workspace: split areas holding tab groups. Drag a tab to a **side** of a group (a new split), onto its **centre** or **between two tabs** (a tab there), to an **edge** of the whole layout, or **out** of it (a floating window). An animated preview shows where it will land. Groups maximize, panels minimize to a tray, and the layout is saved and loaded as plain JSON. Each panel's content is rendered once and moves between groups without being rebuilt.
 
-Composed of: Splitter, Tabs, Portal
+Composed of: [Splitter](#splitter), [Tabs](#tabs), Portal
 
 ```tsx
 <DockLayout panels={[
@@ -329,7 +383,7 @@ Full page: src/components/composite/feed/docs.md
 
 A node editor on an endless canvas: pan and zoom, snap to the grid, nodes with ports and form fields, bezier edges, values flowing along the edges as moving dots, box and multi selection, copy / paste, undo, a minimap, layered auto layout, groups, a context menu and full keyboard use. The flow lives in a store (`createFlow`) that FlowPalette adds to and FlowControls runs; it reads and writes a readable JSON schema (`march.flow/v1`).
 
-Composed of: [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle
+Composed of: [ContextMenu](#contextmenu), IconButton, [OverflowText](#overflowtext), Field, TextInput, NumberInput, Select, Toggle
 
 ```tsx
 const flow = createFlow({ types, doc })          // types: [{ type, label, icon, color, inputs, outputs, fields, run }]
@@ -344,7 +398,7 @@ Full page: src/components/composite/flow-canvas/docs.md
 
 Run, pause, step and reset a flow; choose the speed; see the state, the clock and how many nodes finished. `createFlowRunner(flow)` executes the flow node by node and writes the state FlowCanvas draws: the running node glows, a failing node shakes and shows its error, values travel along the edges as dots and every edge counts what passed. `FlowTimeline` is the run record: one bar per executed node on a time axis with a playhead.
 
-Composed of: Button, IconButton, Segmented, [Chip](#chip), OverflowText
+Composed of: Button, IconButton, Segmented, [Chip](#chip), [OverflowText](#overflowtext)
 
 ```tsx
 const runner = createFlowRunner(flow, { nodeMs: 650, travelMs: 560 })
@@ -358,7 +412,7 @@ Full page: src/components/composite/flow-controls/docs.md
 
 The node types of a flow, grouped by category, with a search box (accent and Turkish-letter insensitive). Drag a card onto a FlowCanvas to place the node where you drop it, snapped to the grid; a click or Enter adds it in the middle of the view. The dragged card floats in the drag layer, tilts while it is held and melts into the canvas (or flies back when dropped outside) on the motion engine.
 
-Composed of: SearchBox, OverflowText
+Composed of: SearchBox, [OverflowText](#overflowtext)
 
 ```tsx
 const flow = createFlow({ types })
@@ -404,6 +458,17 @@ Composed of: [ColorPicker](#colorpicker), Segmented, IconButton
 ```
 
 Full page: src/components/composite/gradient-editor/docs.md
+
+## Grid
+
+A responsive grid that never overflows horizontally. Fixed columns (`cols`, 1–6) step down on tablets and phones, or `min` gives automatic columns of at least that width. The last row can share the remaining space (`fill="stretch"`) or give it to the last item (`fill="last"`), and `balance` picks the column count that spreads items evenly over the rows (5 in 4 columns → 3 + 2, not 4 + 1). `equal` makes every row as tall as the tallest. Pure CSS (grid, flex-wrap and `:has()`); no measuring script.
+
+```tsx
+<Grid cols={4} gap={3} fill="stretch" balance>{cards}</Grid>
+<Grid min="16rem">{cards}</Grid>
+```
+
+Full page: src/components/layout/grid/docs.md
 
 ## ImageCropper
 
@@ -472,7 +537,7 @@ Full page: src/components/actions/made-with-march/docs.md
 
 Markdown source with a live preview. Four views: **write**, **preview**, **split** (resizable; both panes scroll together) and **rich** (the same value in a RichTextEditor, loaded the first time it is opened). The toolbar and shortcuts write Markdown syntax as native undo steps (Ctrl+Z keeps working); Enter continues lists and quotes, Tab / Shift+Tab indent list lines; HTML pasted from a web page or an office suite becomes Markdown through the safe content core.
 
-Composed of: Splitter, Toolbar, IconButton, [RichTextEditor](#richtexteditor)
+Composed of: [Splitter](#splitter), Toolbar, IconButton, [RichTextEditor](#richtexteditor)
 
 ```tsx
 <MarkdownEditor bind:value={$doc} view="split" />
@@ -494,11 +559,26 @@ Composed of: Skeleton
 
 Full page: src/components/social/media-grid/docs.md
 
+## NavMenu
+
+Sidebar navigation for big apps. Items are grouped (collapsible groups with icons), can be pinned, and the recently used ones are listed first; a filter box narrows the list with accent- and case-insensitive search. The active item follows the router path, and the pages are registered with the command palette. On narrow screens the menu becomes a drawer opened by a menu button; `collapsible` adds an icon rail on wide screens. UI state persists in localStorage. NavSidebar is the richer sidebar built on the same container.
+
+Composed of: Badge, [OverflowText](#overflowtext)
+
+```tsx
+<NavMenu brand={<Brand />} items={[
+  { id: "inbox", title: "Inbox", href: "/inbox", icon: inbox, badge: () => $unread },
+  { id: "users", title: "Users", href: "/users", icon: users, group: "Admin" },
+]} />
+```
+
+Full page: src/components/navigation/nav-menu/docs.md
+
 ## NavSidebar
 
 The app's side menu: categories that open and close, a typo-tolerant search over every item, recent visits and featured items at the top, a collapsible icon rail and a resizable width, all remembered per user. Items are links (router `Link`), so the current page is marked and the menu follows navigation.
 
-Composed of: OverflowText, Link
+Composed of: [OverflowText](#overflowtext), Link
 
 ```tsx
 <NavSidebar title="Acme" items={[
@@ -508,6 +588,17 @@ Composed of: OverflowText, Link
 ```
 
 Full page: src/components/composite/nav-sidebar/docs.md
+
+## OverflowText
+
+Text that scrolls only when it does not fit; text that fits stays put. It starts on hover or focus of its nearest link, button or list item (or always, or while visible), and moves in one of three modes: bounce to the end and back, an endless loop with a separator, or once. The clipped edges fade on the logical side (RTL scrolls the other way), screen readers read the text once, and under reduced motion it does not move: the end fades and the full text is in the tooltip. `Marquee` is the endless ticker preset (`trigger="visible"`, `mode="loop"`).
+
+```tsx
+<OverflowText text={title} />
+<Marquee text="New: dark theme · faster search · RTL" separator="✦" />
+```
+
+Full page: src/components/typography/overflow-text/docs.md
 
 ## OverflowToolbar
 
@@ -526,6 +617,16 @@ Composed of: Menu, Tooltip
 ```
 
 Full page: src/components/actions/overflow-toolbar/docs.md
+
+## Pagination
+
+Numbered pages with ellipses: the first and last pages, the current page and `siblings` pages on each side stay visible, the rest collapse into a gap. Previous / Next buttons are disabled at the ends. Pages are 1-based.
+
+```tsx
+<Pagination bind:page={$page} pages={20} />
+```
+
+Full page: src/components/navigation/pagination/docs.md
 
 ## PostCard
 
@@ -555,7 +656,7 @@ Full page: src/components/composite/profile-header/docs.md
 
 An inspector: property rows in collapsible groups, a search field, and for each property the form control of its type. Every change is an **undo step** in the app's Undo history (typing in one field merges into one step), unsaved changes are registered with **DirtyState** (leave warning, `saveAll()`), and changed rows are marked and can be reset one by one. The footer counts the changes and offers Revert and Save.
 
-Composed of: Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea
+Composed of: [Disclosure](#disclosure), TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea
 
 ```tsx
 <PropertyGrid label="Card" bind:value={$card} onSave={(v) => api.save(v)} properties={[
@@ -620,6 +721,38 @@ import { Scheduler } from "hadi-march/components/data/scheduler";
 
 Full page: src/components/data/scheduler/docs.md
 
+## Spacer
+
+A flexible gap in a row: everything after it moves to the end of the row (the logical end, so it mirrors in RTL). The usual way to put a title on one side of a top bar and its actions on the other.
+
+```tsx
+<Stack direction="row" align="center"><Brand /><Spacer /><UserMenu /></Stack>
+```
+
+Full page: src/components/layout/spacer/docs.md
+
+## Splitter
+
+Two panes side by side with a handle between them. Drag the handle, or focus it and use ← → (mirrored in RTL), Home / End for the limits and Enter to go back to the initial share. Each pane keeps at least `min` of the width.
+
+```tsx
+<Splitter start={<FileList />} end={<Preview />} initial={0.35} min={0.2} label="Resize the file list" />
+```
+
+Full page: src/components/layout/splitter/docs.md
+
+## Stack
+
+Layout primitives. `Stack` lays children out in a column or a row with a gap from the spacing tokens (0–8), alignment and justification, and optional wrapping. `Toolbar` is a labelled bar of controls with an end slot. `Divider` is a horizontal rule, a labelled one ("or"), or a vertical separator between inline items.
+
+```tsx
+<Stack direction="row" gap={2} align="center" justify="between" wrap>…</Stack>
+<Toolbar label="Filters" end={<Button>Export</Button>}>…</Toolbar>
+<Divider label="or" />
+```
+
+Full page: src/components/layout/stack/docs.md
+
 ## StatusBar
 
 The strip at the bottom of an editor or app. Items sit at the **start** or the **end** (writing direction), are plain text or buttons (an action or a **command id** from the Command manager), and carry a tone: info, success, warn, danger, or busy (a breathing dot on the motion engine). When the bar is too narrow, the lowest `priority` items move to a "…" menu. Items marked `live` are announced when their text changes ("Saving…", "Saved").
@@ -641,7 +774,7 @@ Full page: src/components/layout/status-bar/docs.md
 
 Progress through stages, with motion that shows where you are going. Stepper draws Steps and adds a liquid highlight that stretches from the old step to the new one and settles there, and step panels that morph into each other: the old panel blurs and slides toward the past, the new one arrives from the future (mirrored in RTL) while the frame's height follows. Back / Next buttons and a step counter come with it.
 
-Composed of: Steps, Button
+Composed of: [Steps](#steps), Button
 
 ```tsx
 <Stepper steps={[{ title: "Cart" }, { title: "Address" }, { title: "Payment" }]} current={$step} onSelect={(i) => $step = i}
@@ -649,6 +782,16 @@ Composed of: Steps, Button
 ```
 
 Full page: src/components/navigation/stepper/docs.md
+
+## Steps
+
+Progress through stages. Done steps show a check, the current step is highlighted and marked for screen readers, the rest are upcoming. With `onSelect` every step is a button (a checkout that lets you go back); `vertical` stacks them with their descriptions. Stepper and Wizard are built on it.
+
+```tsx
+<Steps steps={[{ title: "Account" }, { title: "Profile" }, { title: "Done" }]} current={$step} onSelect={(i) => $step = i} />
+```
+
+Full page: src/components/navigation/steps/docs.md
 
 ## StoryProgress
 
@@ -684,11 +827,24 @@ Composed of: Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#like
 
 Full page: src/components/composite/story-viewer/docs.md
 
+## Tabs
+
+Tabbed panels. Give `tabs` as data or write `<Tab>` children; only the active panel exists (switching disposes the old one). Arrow keys move between tabs with automatic activation, mirrored in RTL. Tabs can carry a count badge, be disabled or hidden, and `query="tab"` keeps the active tab in the URL (`?tab=id`) so a reload or a shared link opens it.
+
+```tsx
+<Tabs value={$tab} onChange={(id) => $tab = id} tabs={[
+  { id: "general", label: "General", content: () => <General /> },
+  { id: "members", label: "Members", badge: () => $pending, content: () => <Members /> },
+]} />
+```
+
+Full page: src/components/navigation/tabs/docs.md
+
 ## ThemeMenu
 
 One top-bar menu for the whole look: light / dark / system, the color theme (each drawn by a live swatch of itself) and the accent color. Its sections are the same ones `ThemePicker` and `AccentPicker` show on their own, so an app can use one menu or the separate pickers and they always match. Choices are remembered.
 
-Composed of: Dropdown, ThemeSwatch, OverflowText
+Composed of: Dropdown, ThemeSwatch, [OverflowText](#overflowtext)
 
 ```tsx
 <ThemeMenu />
@@ -751,7 +907,7 @@ Full page: src/components/data/virtual-list/docs.md
 
 One form split into steps. Each step shows and validates its own fields (plus an optional `validate` check) before Next; Back keeps what was typed; Finish submits the whole form. The stage list on top is the Steps component: a later stage can be picked once every stage before it passes.
 
-Composed of: Steps, Progress
+Composed of: [Steps](#steps), Progress
 
 ```tsx
 <Wizard submitLabel="Finish" onSubmit={save} steps={[

@@ -1,0 +1,9 @@
+import { definePlayground } from "../../meta.ts";
+
+interface Values { spacer: boolean }
+
+export default definePlayground<Values>({
+  options: [
+    { key: "spacer", label: "Spacer", default: true },
+  ],
+});

@@ -14,10 +14,10 @@ import { MARCH_ROOT } from "./autoimports.js";
 const SRC = join(MARCH_ROOT, "src");
 /** Cascade order of component stylesheets (later wins on equal specificity). Others follow alphabetically. */
 export const ORDER = [
-  "ui/field.css", "ui/button.css", "ui/menu.css", "ui/dialog.css", "ui/toast.css", "ui/tabs.css", "ui/display.css", "ui/grid.css", "ui/layout.css", "ui/nav.css",
-  "components/composite/nav-sidebar/nav-sidebar.css", "components/composite/command-palette/command-palette.css", "ui/theme.css", "ui/accent.css", "components/composite/theme-menu/theme-menu.css", "dom/lazy.css", "ui/overlay.css", "ui/theme-swatches.css", "ui/media.css", "ui/disclosure.css", "ui/app.css", "components/actions/chip/chip.css", "ui/marquee.css", "ui/avatar-group.css",
-  "ui/progress.css", "ui/rating.css", "ui/accordion.css", "ui/steps.css", "ui/pagination.css", "ui/carousel.css", "ui/tree.css", "ui/kanban.css",
-  "ui/splitter.css", "forms/form.css", "forms/inputs.css", "forms/choice.css", "forms/pickers.css", "forms/date.css", "forms/file.css", "forms/editors.css",
+  "ui/field.css", "ui/button.css", "ui/menu.css", "ui/dialog.css", "ui/toast.css", "components/navigation/tabs/tabs.css", "ui/display.css", "components/layout/stack/stack.css", "components/layout/grid/grid.css", "ui/layout.css", "components/layout/app-shell/app-shell.css", "components/navigation/nav-menu/nav-menu.css",
+  "components/composite/nav-sidebar/nav-sidebar.css", "components/composite/command-palette/command-palette.css", "ui/theme.css", "ui/accent.css", "components/composite/theme-menu/theme-menu.css", "dom/lazy.css", "ui/overlay.css", "ui/theme-swatches.css", "ui/media.css", "components/layout/disclosure/disclosure.css", "ui/app.css", "components/layout/spacer/spacer.css", "components/actions/chip/chip.css", "components/typography/overflow-text/overflow-text.css", "ui/avatar-group.css",
+  "ui/progress.css", "ui/rating.css", "components/layout/accordion/accordion.css", "components/navigation/steps/steps.css", "components/navigation/pagination/pagination.css", "ui/carousel.css", "ui/tree.css", "ui/kanban.css",
+  "components/layout/splitter/splitter.css", "forms/form.css", "forms/inputs.css", "forms/choice.css", "forms/pickers.css", "forms/date.css", "forms/file.css", "forms/editors.css",
   "components/composite/wizard/wizard.css", "forms/records.css", "css/table.css", "charts/charts.css", "fx/fx.css",
 ];
 const rank = (abs) => { const r = relative(SRC, abs).split(sep).join("/"); const i = ORDER.indexOf(r); return i < 0 ? ORDER.length : i; };

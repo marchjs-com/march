@@ -1,4 +1,4 @@
-/* HADI March — Page, Section, ListDetail, Pager, SearchBox, AppShell. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* HADI March — Page, Section, ListDetail, Pager, SearchBox (AppShell: src/components/layout/app-shell). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- page scaffolding */
 .hm-page { display: flex; flex-direction: column; gap: var(--hm-space-5); padding: var(--hm-space-6) var(--hm-space-6) var(--hm-space-7); max-width: 92rem; margin: 0 auto; width: 100%;
   animation: hm-rise-in var(--hm-dur-slow) var(--hm-ease-out); }
@@ -38,35 +38,3 @@
 .hm-search-clear { position: absolute; inset-inline-end: 3px; width: 1.875rem; height: 1.875rem; }
 .hm-search-kbd { position: absolute; inset-inline-end: var(--hm-space-2); pointer-events: none; }
 .hm-search-clear ~ .hm-search-kbd, .hm-search:focus-within .hm-search-kbd { display: none; }
-.hm-skip { position: fixed; z-index: var(--hm-z-toast); inset-inline-start: var(--hm-space-3); top: var(--hm-space-3); padding: var(--hm-space-2) var(--hm-space-3); border-radius: var(--hm-radius);
-  background: var(--hm-surface); color: var(--hm-text); box-shadow: var(--hm-shadow-3); transform: translateY(-200%); transition: transform var(--hm-dur) var(--hm-ease); }
-.hm-skip:focus { transform: none; }
-
-/* ---------- app shell (sidebar + main) */
-.hm-shell { display: grid; grid-template-columns: auto minmax(0, 1fr); min-height: 100vh; min-height: 100dvh; }
-.hm-shell-nav { position: sticky; top: 0; height: 100vh; height: 100dvh; display: flex; z-index: var(--hm-z-sticky); }
-.hm-shell-body { min-width: 0; display: flex; flex-direction: column; }
-.hm-shell-header { position: sticky; top: 0; z-index: var(--hm-z-sticky); display: flex; align-items: center; gap: var(--hm-space-3); min-height: var(--hm-topbar-h);
-  padding: 0 var(--hm-space-5); background: color-mix(in srgb, var(--hm-bg) 82%, transparent); backdrop-filter: saturate(160%) blur(12px); border-bottom: 1px solid var(--hm-border); }
-.hm-shell-main { flex: 1 1 auto; min-width: 0; outline: none; }
-.hm-shell-top:empty { display: none; }
-.hm-nav-wrap .hm-nav-burger { display: none; }
-@media (max-width: 900px) {
-  .hm-shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
-  .hm-shell-nav { height: auto; z-index: var(--hm-z-dropdown); background: var(--hm-surface); border-bottom: 1px solid var(--hm-border); padding: var(--hm-space-1) var(--hm-space-2); }
-  .hm-nav-wrap .hm-nav-burger { display: inline-flex; }
-  /* with a header the menu button floats into it */
-  .hm-shell-has-header { grid-template-rows: 1fr; }
-  .hm-shell-has-header > .hm-shell-nav { position: fixed; top: 0; inset-inline-start: 0; height: var(--hm-topbar-h); padding: 0 var(--hm-space-2); display: flex; align-items: center;
-    background: transparent; border: 0; z-index: calc(var(--hm-z-sticky) + 1); }
-  .hm-shell-has-header .hm-shell-header { padding-inline: 3.25rem var(--hm-space-3); gap: var(--hm-space-1); }
-}
-@media (max-width: 640px) {
-  .hm-shell-header .hm-crumbs li:not(:last-child) { display: none; }
-  .hm-shell-header .hm-crumbs li + li::before { content: none; }
-  .hm-shell-header .hm-crumbs { min-width: 0; font-weight: 600; color: var(--hm-text); }
-  .hm-shell-header .hm-crumbs ol { flex-wrap: nowrap; overflow: hidden; white-space: nowrap; }
-  .hm-shell-header .hm-pal-trigger { width: var(--hm-control-h); height: var(--hm-control-h); padding: 0; justify-content: center; border-color: transparent; box-shadow: none; background: transparent; color: var(--hm-muted); }
-  .hm-shell-header .hm-pal-trigger-label, .hm-shell-header .hm-pal-trigger-kbd { display: none; }
-  .hm-shell-header .hm-pal-trigger-icon { width: 1.0625rem; height: 1.0625rem; }
-}
