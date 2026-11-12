@@ -1,0 +1,42 @@
+/* HADI March — BottomNav (src/components/composite/bottom-nav). Theme tokens, logical properties; the bubble slide, icon pop and
+   ring turn come from the motion engine (no keyframes here). */
+.hm-bnav { container-type: inline-size; display: block; padding: 0 var(--hm-space-3) var(--hm-space-3); }
+.hm-bnav-flat { padding: 0; }
+.hm-bnav-bar { position: relative; display: grid; grid-template-columns: repeat(var(--hm-bnav-n, 4), minmax(0, 1fr)); height: 4.375rem;
+  background: var(--hm-surface-raised); border: 1px solid var(--hm-border-subtle); border-radius: var(--hm-radius-4); box-shadow: var(--hm-shadow-3); }
+.hm-bnav-flat .hm-bnav-bar { border-radius: 0; border-inline: 0; border-block-end: 0; box-shadow: var(--hm-shadow-2);
+  height: calc(4.375rem + env(safe-area-inset-bottom, 0px)); padding-block-end: env(safe-area-inset-bottom, 0px); }
+
+/* the sliding bubble behind the active tab */
+.hm-bnav-bubble { position: absolute; z-index: 0; inset-block: 0.4375rem; inset-inline-start: calc(var(--hm-bnav-i, 0) * 100% / var(--hm-bnav-n, 4));
+  width: calc(100% / var(--hm-bnav-n, 4)); pointer-events: none; transition: opacity var(--hm-dur) var(--hm-ease); }
+.hm-bnav-flat .hm-bnav-bubble { inset-block-end: calc(0.4375rem + env(safe-area-inset-bottom, 0px)); }
+.hm-bnav-bubble::before { content: ""; position: absolute; inset-block: 0; inset-inline: 0.375rem; border-radius: 1.25rem;
+  background: var(--hm-accent, var(--hm-primary)); box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 45%, transparent);
+  transition: background-color var(--hm-dur-slow) var(--hm-ease), box-shadow var(--hm-dur-slow) var(--hm-ease); }
+.hm-bnav-bubble.is-hidden { opacity: 0; }
+
+/* tabs */
+.hm-bnav-item { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem;
+  min-width: 0; margin: 0; padding: 0 0.625rem; border: 0; background: none; color: var(--hm-text-2); font: inherit; font-size: var(--hm-text-xs);
+  line-height: 1.2; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color var(--hm-dur) var(--hm-ease); }
+.hm-bnav-item:hover { color: var(--hm-text); }
+.hm-bnav-item.is-active { color: var(--hm-on-accent, var(--hm-on-primary)); font-weight: var(--hm-weight-semibold); }
+.hm-bnav-item:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: -0.375rem; border-radius: 1.25rem; }
+.hm-bnav-icon { position: relative; display: grid; place-items: center; width: 1.5rem; height: 1.5rem; flex: none; }
+.hm-bnav-icon .hm-bnav-glyph, .hm-bnav-icon .hm-svg { width: 100%; height: 100%; }
+.hm-bnav-nolabels .hm-bnav-icon { width: 1.625rem; height: 1.625rem; }
+.hm-bnav-badge { position: absolute; inset-block-start: -0.4375rem; inset-inline-start: 0.875rem; pointer-events: none; }
+.hm-bnav-dot { position: absolute; inset-block-start: -0.125rem; inset-inline-start: 1.125rem; pointer-events: none; }
+.hm-bnav-label { display: block; max-width: 100%; }
+@container (max-width: 17rem) { .hm-bnav-label { display: none; } }
+
+/* the raised Create button: a turning four-color ring around a solid core */
+.hm-bnav-create-slot { position: relative; z-index: 2; display: grid; place-items: center; min-width: 0; }
+.hm-bnav-create { position: relative; width: min(3.5rem, 100%); aspect-ratio: 1; margin: -1.75rem 0 0; padding: 0; border: 0; border-radius: 50%;
+  background: none; color: var(--hm-text); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 6px 16px -2px color-mix(in srgb, var(--hm-brand-purple, var(--hm-cat-4)) 35%, transparent); }
+.hm-bnav-create:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: 3px; }
+.hm-bnav-ring { position: absolute; inset: 0; border-radius: 50%; background: var(--hm-bnav-ring, var(--hm-brand-gradient)); }
+.hm-bnav-core { position: absolute; inset: 0.25rem; display: grid; place-items: center; border-radius: 50%; background: var(--hm-surface-raised); }
+.hm-bnav-core .hm-bnav-glyph { width: 1.75rem; height: 1.75rem; }
