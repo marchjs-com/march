@@ -71,7 +71,7 @@ export function Field(props: FieldProps): unknown {
     const labelEl = inlineLabel ? null : group
       ? h("div", { class: "hm-label", id: labelId }, labelKids)
       : h("label", { class: "hm-label", id: labelId, for: id }, labelKids);
-    return h("div", { "data-hm-color": colorAttr(props.color),
+    return h("div", { "data-hm-color": () => colorAttr(props.color),
       class: cx("hm-field", props.inline && "hm-field-inline", props.compact && "hm-field-compact", f?.["span"] ? `hm-span-${f["span"]}` : false, props.class),
       "class:hm-field-invalid": () => !!error(), "data-field": name ?? null,
     },

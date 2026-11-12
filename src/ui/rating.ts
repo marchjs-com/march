@@ -38,7 +38,7 @@ export function Rating(props: RatingProps): Element {
       onClick: () => set(n), onMouseenter: () => !props.readonly && hover.set(n),
     }, h("span", { class: "hm-rating-off" }, glyph(star)), h("span", { class: "hm-rating-on" }, glyph(starFilled)));
   });
-  return h("span", { "data-hm-color": colorAttr(props.color),
+  return h("span", { "data-hm-color": () => colorAttr(props.color),
     class: () => cx("hm-rating", `hm-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", hover() != null && "is-hovering", val(props.class)), role: "radiogroup",
     "aria-label": () => val(props.label) ?? t`Rating`, onMouseleave: () => hover.set(null),
     // radio group keys: arrows (RTL mirrored), Home / End, no wrap; the value follows focus

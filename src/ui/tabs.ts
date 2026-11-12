@@ -71,7 +71,7 @@ export function Tabs(props: TabsProps): Element {
   let bar: HTMLElement | undefined;
   type TabButton = HTMLButtonElement;
   const tabEls = (): TabButton[] => (bar ? Array.from(bar.querySelectorAll<TabButton>('[role="tab"]')).filter((x) => !x.disabled) : []);
-  const nav = h("div", { "data-hm-color": colorAttr(props.color),
+  const nav = h("div", { "data-hm-color": () => colorAttr(props.color),
     class: "hm-tabs-bar", role: "tablist", "aria-label": () => val(props.label) ?? null, ref: (x: HTMLElement) => { bar = x; },
     onKeydown: (e: KeyboardEvent) => { const el = roving(e, tabEls(), { horizontal: true }); if (el) select(el.dataset["tab"]); },
   }, () => list().map((x) => untrack(() => {

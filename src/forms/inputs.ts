@@ -371,7 +371,7 @@ export function Segmented<T = unknown>(props: SegmentedProps<T>): unknown {
   const c = ctl(props);
   let root: Element;
   const onKeyDown = (e: KeyboardEvent) => { const target = roving(e, [...root.querySelectorAll("button")].filter((b) => !b.disabled), { horizontal: true }); if (target) target.click(); };
-  root = h("div", { "data-hm-color": colorAttr(props.color), role: "radiogroup", class: cx("hm-segmented", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
+  root = h("div", { "data-hm-color": () => colorAttr(props.color), role: "radiogroup", class: cx("hm-segmented", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
     () => {
       const opts = normOptions(props.options);
       return opts.map((o, i) => h("button", {
@@ -540,7 +540,7 @@ export function CodeInput(props: CodeInputProps): unknown {
   onCleanup(() => { boxes.length = 0; });
   // codes read left to right in every language
   return h("div", {
-    "data-hm-color": colorAttr(props.color), "data-hm-colors": props.colors && props.colors !== "single" ? (Array.isArray(props.colors) ? "custom" : props.colors) : null, role: "group", dir: "ltr",
+    "data-hm-color": () => colorAttr(props.color), "data-hm-colors": props.colors && props.colors !== "single" ? (Array.isArray(props.colors) ? "custom" : props.colors) : null, role: "group", dir: "ltr",
     class: () => cx("hm-otp", `hm-otp-${props.size ?? "md"}`, `hm-otp-${props.variant ?? "outline"}`, props.font && `hm-otp-font-${props.font}`, props.colors === "single" && "hm-otp-single", props.class),
     "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"],
   }, parts);

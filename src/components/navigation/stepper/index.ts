@@ -91,7 +91,7 @@ export function Stepper(props: StepperProps): Element {
 
   const withNav = props.nav ?? (!!props.panels && !!props.onSelect);
   const go = (i: number): void => props.onSelect?.(clamp(i, 0, n - 1));
-  const el = h("div", { ref: (x: HTMLElement) => { root = x; }, class: () => cx("hm-stepper", props.vertical && "hm-stepper-v", val(props.class)), "data-hm-color": colorAttr(props.color) },
+  const el = h("div", { ref: (x: HTMLElement) => { root = x; }, class: () => cx("hm-stepper", props.vertical && "hm-stepper-v", val(props.class)), "data-hm-color": () => colorAttr(props.color) },
     h("span", { class: "hm-stepper-blob", "aria-hidden": "true", ref: (x: HTMLElement) => { blob = x; } }),
     h(Steps, { steps: props.steps, current: cur, ...(props.onSelect ? { onSelect: props.onSelect } : {}), ...(props.vertical ? { vertical: true } : {}) }),
     props.panels && h("div", { class: "hm-stepper-frame", id: panelId, role: "region", "aria-live": "polite", "aria-label": () => t`Step ${cur() + 1} of ${n}`, ref: (x: HTMLElement) => { frame = x; } }),

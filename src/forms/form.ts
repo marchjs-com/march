@@ -370,7 +370,7 @@ export function Form(props: FormProps): unknown {
         renderFields(form, s.fields, { ...layout, cols: s.cols ?? layout.cols })))
       : renderFields(form, null, layout));
     const noBar = props.actions === false || props.readonly;
-    return h("form", { "data-hm-color": colorAttr(props.color),
+    return h("form", { "data-hm-color": () => colorAttr(props.color),
       class: cx("hm-form", props.class), novalidate: true, "aria-busy": () => (form.submitting() ? "true" : null),
       onSubmit: (e: Event) => { e.preventDefault(); form.submit(); },
       onKeyDown: noBar ? (e: KeyboardEvent) => { const el = e.target as HTMLInputElement; if (e.key === "Enter" && !e.defaultPrevented && el.tagName === "INPUT" && !["checkbox", "radio", "button", "file"].includes(el.type)) { e.preventDefault(); form.submit(); } } : null,

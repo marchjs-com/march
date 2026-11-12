@@ -37,7 +37,7 @@ export function Progress(props: ProgressProps): Element {
     "aria-valuenow": () => { const v = val(props.value); return v == null ? null : String(v); }, "aria-label": () => val(props.label) ?? t`Progress`,
   }, fill);
   const sync = (): void => { const p = pct(); setStyle(fill, { "--hm-progress": p == null ? "0" : String(p / 100) }); };
-  const root = h("div", { "data-hm-color": colorAttr(props.color), class: () => cx("hm-progress2", `hm-progress2-${props.size ?? "md"}`, `hm-progress2-${val(props.tone) ?? "primary"}`, pct() == null && "is-indeterminate", props.colors === "single" && "hm-paint-single", props.paint === "cycle" && "hm-paint-cycle", val(props.class)) },
+  const root = h("div", { "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-progress2", `hm-progress2-${props.size ?? "md"}`, `hm-progress2-${val(props.tone) ?? "primary"}`, pct() == null && "is-indeterminate", props.colors === "single" && "hm-paint-single", props.paint === "cycle" && "hm-paint-cycle", val(props.class)) },
     (props.label != null || props.showValue) && h("div", { class: "hm-progress2-head" },
       h("span", { class: "hm-progress2-label" }, () => val(props.label) ?? ""),
       props.showValue && h("span", { class: "hm-progress2-value" }, () => (pct() == null ? "" : `${Math.round(pct() as number)}%`))),
