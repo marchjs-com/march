@@ -124,7 +124,7 @@ async function build({ dev = false } = {}) {
       await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
       // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
       if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: minSize || 2048 });
-      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, prev: plan }) : null;
+      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, boot: cfg.budget?.boot ?? [], prev: plan }) : null;
       if (!next) break;
       plan = next;
     }
@@ -140,7 +140,7 @@ async function build({ dev = false } = {}) {
       if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
       const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));
       printReport(rep);
-      const small = minSize ? smallFiles(r.metafile, { cwd, minSize, allow, entryKey: chunks.entryKey }) : [];
+      const small = minSize ? smallFiles(r.metafile, { cwd, minSize, allow, entryKey: chunks.entryKey, boot: cfg.budget?.boot ?? [], plan }) : [];
       const files = Object.keys(r.metafile.outputs).filter((k) => /.(js|css)$/.test(k) && existsSync(resolve(cwd, k)));
       const sizes = files.map((k) => readFileSync(resolve(cwd, k)).length);
       const smallest = files.map((k, i) => ({ file: posix(relative(out, resolve(cwd, k))), bytes: sizes[i] })).sort((a, b) => a.bytes - b.bytes)[0] ?? null;

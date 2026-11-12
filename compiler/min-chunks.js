@@ -13,12 +13,16 @@ const posix = (p) => p.split(sep).join("/");
 /**
  * The second-pass plan, merged into `prev` (plans accumulate over passes). Returns null when nothing new is planned.
  * @param {import("esbuild").Metafile} meta
- * @param {{ cwd: string, entryKey: string, minSize: number, allow?: Record<string, string>, prev?: Plan | null }} o
- * @typedef {{ inline: Record<string, { spec: string, mode: "static" | "group", group?: string, name?: string }[]>, groups: Record<string, { abs: string, name: string, key: string }[]> }} Plan
+ * `boot` (march.config.js › budget.boot): the lazy modules the app loads at start-up (shell pieces). They group only with
+ * each other — a page must never ride along at start-up — and their group is exempt from the minimum size.
+ * @param {{ cwd: string, entryKey: string, minSize: number, allow?: Record<string, string>, boot?: string[], prev?: Plan | null }} o
+ * @typedef {{ inline: Record<string, { spec: string, mode: "static" | "group", group?: string, name?: string }[]>, groups: Record<string, { abs: string, name: string, key: string }[]>, boot?: string[] }} Plan
  */
-export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, prev = null }) {
+export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot = [], prev = null }) {
   const outs = meta.outputs;
-  const plan = prev ? { inline: structuredClone(prev.inline), groups: structuredClone(prev.groups) } : { inline: {}, groups: {} };
+  const plan = prev ? { inline: structuredClone(prev.inline), groups: structuredClone(prev.groups), boot: [...(prev.boot ?? [])] } : { inline: {}, groups: {}, boot: [] };
+  const bootSet = new Set(boot.map(posix));
+  const isBoot = (c) => c.keys.some((k) => bootSet.has(k));
   const outOf = (input) => Object.keys(outs).find((k) => k.endsWith(".js") && outs[k].inputs?.[input]);
   let added = 0;
   const pending = [];
@@ -51,7 +55,7 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, prev =
       let best = null, score = -Infinity;
       for (let i = 0; i < clusters.length; i++) for (let j = i + 1; j < clusters.length; j++) {
         const x = clusters[i], y = clusters[j];
-        if ((x.size >= minSize && y.size >= minSize) || x.size + y.size > maxGroup) continue;
+        if ((x.size >= minSize && y.size >= minSize) || x.size + y.size > maxGroup || isBoot(x) !== isBoot(y)) continue;
         // penalise the load cost, not only the group's own size: a dependency-free module (translations) must not
         // join a page that pulls 30 KB of shared code when a lighter partner exists
         const [aff, union] = affinity(x, y);
@@ -64,6 +68,15 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, prev =
     }
     let g = Object.keys(plan.groups).length;
     for (const c of clusters) {
+      // start-up pieces: one group of their own whatever its size (a lone piece stays as it is)
+      if (isBoot(c)) {
+        if (c.keys.length < 2) continue;
+        const name = `g${g++}`;
+        plan.groups[name] = c.keys.map((key, n) => ({ abs: resolve(cwd, key), name: `n${n}`, key, group: name }));
+        plan.boot.push(name);
+        for (const m of plan.groups[name]) known.set(m.key, m);
+        continue;
+      }
       // still under the limit with everything it could join (a small app): into the entry; alone: a group gains nothing
       if (c.size < minSize) { for (const key of c.keys) known.set(key, { key, static: true }); continue; }
       if (c.keys.length < 2) continue;
@@ -93,10 +106,12 @@ const allowed = (allow, file, entryPoint) => Object.keys(allow).some((a) => file
  * @param {import("esbuild").Metafile} meta
  * @returns {{ file: string, bytes: number }[]}
  */
-export function smallFiles(meta, { cwd, minSize, allow = {}, entryKey = null }) {
+export function smallFiles(meta, { cwd, minSize, allow = {}, entryKey = null, boot = [], plan = null }) {
   const out = [];
-  // the entry and its CSS have nowhere to go (a small app is allowed a small main.js)
+  // the entry and its CSS have nowhere to go (a small app is allowed a small main.js); neither do the start-up pieces
   const skip = new Set([entryKey, entryKey && meta.outputs[entryKey]?.cssBundle].filter(Boolean));
+  const bootEntries = new Set([...boot.map(posix), ...(plan?.boot ?? []).map((g) => `march-group:${g}`)]);
+  for (const [k, o] of Object.entries(meta.outputs)) if (o.entryPoint && bootEntries.has(posix(o.entryPoint))) { skip.add(k); if (o.cssBundle) skip.add(o.cssBundle); }
   for (const [k, o] of Object.entries(meta.outputs)) {
     if (!/\.(js|css)$/.test(k) || skip.has(k) || !existsSync(resolve(cwd, k))) continue;
     const bytes = readFileSync(resolve(cwd, k)).length;

@@ -58,3 +58,28 @@ test("smallFiles: under the limit is reported; the entry and its CSS are exempt;
     assert.deepEqual(smallFiles(meta, { cwd: dir, minSize: 1024, entryKey: "main.js", allow: { "src/a.jsx": "why", "c.css": "why" } }), []);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("min-chunks: start-up pieces (budget.boot) group only with each other, never with a page", async () => {
+  const { planSmallLazy, smallFiles } = await import("../compiler/min-chunks.js");
+  const out = (entryPoint, bytes, imports = []) => ({ entryPoint, bytes, imports: imports.map((p) => ({ path: p, kind: "import-statement" })), inputs: { [entryPoint]: {} } });
+  const meta = {
+    outputs: {
+      "dist/main.js": { entryPoint: "src/main.tsx", bytes: 40000, imports: [], inputs: { "src/main.tsx": {} } },
+      "dist/shell-a.js": out("src/shell-a.tsx", 3000, ["dist/shared.js"]),
+      "dist/shell-b.js": out("src/shell-b.tsx", 2500, ["dist/shared.js"]),
+      "dist/home.js": out("src/pages/home.tsx", 4000, ["dist/shared.js"]),
+      "dist/about.js": out("src/pages/about.tsx", 7000, ["dist/shared.js"]),
+      "dist/shared.js": { bytes: 30000, imports: [], inputs: {} },
+    },
+    inputs: { "src/main.tsx": { imports: ["src/shell-a.tsx", "src/shell-b.tsx", "src/pages/home.tsx", "src/pages/about.tsx"].map((p) => ({ path: p, kind: "dynamic-import", original: `./${p}` })) } },
+  };
+  const plan = planSmallLazy(meta, { cwd: process.cwd(), entryKey: "dist/main.js", minSize: 10240, boot: ["src/shell-a.tsx", "src/shell-b.tsx"] });
+  const groups = Object.entries(plan.groups).map(([g, m]) => [g, m.map((x) => x.key).sort()]);
+  const bootGroup = groups.find(([, keys]) => keys.includes("src/shell-a.tsx"));
+  assert.deepEqual(bootGroup[1], ["src/shell-a.tsx", "src/shell-b.tsx"], "shell pieces together, no page");
+  assert.deepEqual(plan.boot, [bootGroup[0]]);
+  assert.ok(groups.some(([, keys]) => keys.includes("src/pages/home.tsx") && keys.includes("src/pages/about.tsx")), "pages group among themselves");
+  // the boot group (5.5 KB) is exempt from the minimum size
+  meta.outputs["dist/g0.js"] = { entryPoint: `march-group:${bootGroup[0]}`, bytes: 5500, imports: [], inputs: {} };
+  assert.equal(smallFiles(meta, { cwd: process.cwd(), minSize: 10240, entryKey: "dist/main.js", boot: ["src/shell-a.tsx"], plan }).length, 0);
+});
