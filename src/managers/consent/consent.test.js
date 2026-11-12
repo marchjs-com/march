@@ -204,7 +204,7 @@ test("UI: the bottom banner sits in the toast band, above dialogs, menus and sti
   assert.match(layer.el.style.getPropertyValue("z-index"), /--hm-z-toast/);
   const closeLater = openLayer("dialog", document.createElement("div"));
   assert.match(layer.el.style.getPropertyValue("z-index"), /--hm-z-toast/, "a dialog opened later stays below");
-  const css = fs.readFileSync(new URL("./consent.css", import.meta.url), "utf8");
+  const css = fs.readFileSync(new URL("../../components/composite/consent-banner/consent-banner.css", import.meta.url), "utf8");
   assert.match(css, /\.hm-consent \{[^}]*z-index: var\(--hm-z-toast/, "the banner box itself is in the toast band");
   const tokens = fs.readFileSync(new URL("../../css/tokens.css", import.meta.url), "utf8");
   const z = (n) => Number(tokens.match(new RegExp(`--hm-z-${n}: ([0-9]+)`))[1]);

@@ -1,4 +1,4 @@
-// Turkish texts of the consent UI (registered by consent/ui.ts). English source → Turkish.
+// Turkish texts of the consent UI (registered by the ConsentBanner module). English source → Turkish.
 const tr: Record<string, string> = {
   "Cookies and privacy": "Çerezler ve gizlilik",
   "We use cookies that are needed for the site to work and, with your permission, others for preferences, statistics, marketing and third-party content. You can change your choice at any time.":
