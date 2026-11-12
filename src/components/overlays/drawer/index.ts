@@ -6,7 +6,7 @@ import { h } from "../../../dom/h.ts";
 import { Portal } from "../../../dom/portal.ts";
 import { t } from "../../../core/i18n.ts";
 import { frame, type DialogProps } from "../../../ui/dialog.ts";
-import { val, cx, type MaybeFn } from "../../../ui/util.ts";
+import { val, cx, clamp, type MaybeFn } from "../../../ui/util.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
 import { clamp } from "../../../core/util.ts";

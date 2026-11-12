@@ -16,6 +16,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 |---|---|---|---|
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [Chip](#chip), Menu, FilterControl, CellEditor |
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
+| VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
 ### Feedback — `hadi-march/feedback`
 
@@ -29,11 +30,21 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 |---|---|---|---|
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
 
+### Social — `hadi-march/social`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| CountRoll | experimental | Odometer number: only the changed digits roll (up when it grows, down when it shrinks), compact in the active locale. | — |
+| LikeButton | experimental | Heart toggle: spring pop, ring and a four-color HADİ particle burst on the motion engine; rolling count; heartBurst() for any element. | [CountRoll](#countroll) |
+| MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton |
+
 ### Composite — `hadi-march/composite`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
+| Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
+| PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
 
 ## BottomNav
 
@@ -60,6 +71,17 @@ Composed of: OverflowText
 ```
 
 Full page: src/components/actions/chip/docs.md
+
+## CountRoll
+
+An odometer number for likes, comments and followers. When the value changes only the digits that changed roll: upward when it grows, downward when it shrinks, on the motion engine (global speed, pause and reduced motion apply). The text is compact in the active locale (`1,2 B`, `12K`); `format="full"` groups it instead.
+
+```tsx
+<CountRoll value={$likes} />
+<CountRoll value={$followers} format="full" />
+```
+
+Full page: src/components/social/count-roll/docs.md
 
 ## DataGrid
 
@@ -93,6 +115,30 @@ Composed of: Portal, Dialog
 
 Full page: src/components/overlays/drawer/docs.md
 
+## Feed
+
+A social feed. PostCards sit in a VirtualList, so only the posts near the viewport are in the DOM, inside a PullToRefresh (the feed is the scroll area; keyboard users get a Refresh button). The first page shows skeleton posts; reaching the end loads the next page with a skeleton at the bottom (infinite scroll) and an end mark once there is nothing more. New posts waiting above show a "N new posts" pill that merges them and scrolls to the top.
+
+Composed of: [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton
+
+```tsx
+<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />
+```
+
+Full page: src/components/composite/feed/docs.md
+
+## LikeButton
+
+A heart toggle with a rolling count. Liking squashes and overshoots the heart on a spring, grows a ring and throws a burst of particles in the four HADİ colors; unliking is a small press. Everything runs on the motion engine, so the global speed, "pause all" and reduced motion apply (reduced motion keeps only the fill change).
+
+Composed of: [CountRoll](#countroll)
+
+```tsx
+<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />
+```
+
+Full page: src/components/social/like-button/docs.md
+
 ## MadeWithMarch
 
 An optional credit line: "Developed with HADI March and 💗", with "HADI March" as a link. Using it is a request, not a requirement: the licence stays MIT and nothing here is needed to use March.
@@ -104,6 +150,30 @@ An optional credit line: "Developed with HADI March and 💗", with "HADI March"
 ```
 
 Full page: src/components/actions/made-with-march/docs.md
+
+## MediaGrid
+
+The photos of a post in one frame: one photo keeps its own shape (between 4:5 and 1.91:1), two sit side by side, three are one large and two stacked, four are a 2×2 grid, and more show "+N" on the last tile. Each tile is a button that opens the photo; a Skeleton shimmers until the image arrives and it then fades in. With `onDoubleTap` a single tap waits 230 ms, so a double tap (like) never also opens the photo.
+
+Composed of: Skeleton
+
+```tsx
+<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />
+```
+
+Full page: src/components/social/media-grid/docs.md
+
+## PostCard
+
+One post of a social feed. The header shows the author (Avatar, name with a verified mark), the relative time and the place, with an optional ⋯ Menu. Photos sit in a MediaGrid; a double tap on them likes the post with a large heart that pops over the photo and bursts in the four HADİ colors. The action row has a LikeButton and rolling counts for comments and shares; the caption folds to three lines with a "more" button.
+
+Composed of: Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll)
+
+```tsx
+<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />
+```
+
+Full page: src/components/composite/post-card/docs.md
 
 ## PullToRefresh
 
@@ -131,3 +201,13 @@ import { TreeView } from "hadi-march/components/data/tree-view";
 ```
 
 Full page: src/components/data/tree-view/docs.md
+
+## VirtualList
+
+A long list that keeps only the rows near the viewport in the DOM, so 100,000 rows scroll like 20. Rows can have any height: each is measured when it renders and an estimate stands in until then; when a row above the viewport changes height the content stays still (scroll anchoring). Rows keep their DOM while they stay in range and receive an accessor to their item, so an updated item (a like, an edit) updates its row instead of rebuilding it.
+
+```tsx
+<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />
+```
+
+Full page: src/components/data/virtual-list/docs.md
