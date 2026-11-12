@@ -16,7 +16,14 @@ const PHYSICAL = /(?:^|[;{\s])(margin-left|margin-right|padding-left|padding-rig
  * @returns {Promise<{ ok: boolean, results: { item: string, ok: boolean | null, note?: string }[] }>}  ok null = browser check
  */
 export async function checkComponent(root, name, { runTests = true } = {}) {
-  const dir = join(root, "src/components", name);
+  // `drawer` or `overlays/drawer`: a component may sit in a category folder (src/components/<category>/<name>/)
+  const base = join(root, "src/components");
+  let dir = join(base, name);
+  if (!existsSync(join(dir, "meta.ts")) && existsSync(base)) {
+    const hit = readdirSync(base).map((c) => join(base, c, name)).find((d) => existsSync(join(d, "meta.ts")));
+    if (hit) dir = hit;
+  }
+  name = name.split("/").pop();
   const results = [];
   const add = (item, ok, note) => results.push({ item, ok, note });
   if (!existsSync(dir)) return { ok: false, results: [{ item: "folder", ok: false, note: `src/components/${name} not found` }] };
