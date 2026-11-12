@@ -59,8 +59,10 @@ export async function generate(root = ROOT) {
   const list = await components(root);
   const cats = await categories(root);
   const files = {};
-  // large components (meta.barrel === false) stay out of the barrels: import them from hadi-march/components/<folder>
-  const barrel = list.filter((c) => c.meta?.barrel !== false);
+  // large components (meta.barrel === false) stay out of the barrels: import them from hadi-march/components/<folder>;
+  // a component with its own package entry (meta.entry, e.g. "hadi-march/flow") too: pages that import hadi-march/ui
+  // must not reach a heavy one-page feature (esbuild places code by reachability)
+  const barrel = list.filter((c) => c.meta?.barrel !== false && !c.meta?.entry);
   files["src/components/index.ts"] = HEAD + barrel.map((c) => `export * from "./${c.folder}/index.ts";\n`).join("");
   for (const cat of cats) {
     const own = barrel.filter((c) => c.category === cat.id);
@@ -76,7 +78,7 @@ export async function generate(root = ROOT) {
   const pages = new Map();
   // a large component (barrel: false) keeps its own demo module: its code alone is over the chunk floor, and grouping
   // it would make every card of the page download it
-  for (const c of list) if (c.meta?.showcase && c.meta?.barrel !== false) pages.set(c.meta.showcase, [...(pages.get(c.meta.showcase) ?? []), c]);
+  for (const c of list) if (c.meta?.showcase && c.meta?.barrel !== false && !c.meta?.entry) pages.set(c.meta.showcase, [...(pages.get(c.meta.showcase) ?? []), c]);
   const groupOf = new Map();
   for (const [page, all] of pages) {
     if (all.length < 2) continue;
@@ -93,10 +95,13 @@ export async function generate(root = ROOT) {
         `export { ${members.map((_, j) => `d${j}, p${j}`).join(", ")} };\n`;
     }
   }
-  const loader = (c, kind, file) => { const g = groupOf.get(c.folder); return g ? `() => import("./${g.file}").then((m) => m.${kind}${g.j})` : `() => import("./${c.folder}/${file}")`; };
+  // a component with its own entry is shown statically on its page: no lazy loader here (a lazy demo would be a part
+  // carrying the whole feature), the page imports demo.tsx and playground.ts itself
+  const loader = (c, kind, file) => { if (c.meta?.entry) return `() => ownPage("${nameOf(c)}")`; const g = groupOf.get(c.folder); return g ? `() => import("./${g.file}").then((m) => m.${kind}${g.j})` : `() => import("./${c.folder}/${file}")`; };
   files["src/components/registry.gen.ts"] = HEAD + `import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";\n` +
     list.map((c, i) => `import m${i} from "./${c.folder}/meta.ts";\n`).join("") +
     `\nexport interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }\n` +
+    (list.some((c) => c.meta?.entry) ? `const ownPage = (name: string): Promise<never> => Promise.reject(new Error(\`\${name} has its own entry: its page imports the demo\`));\n` : "") +
     `/** Every component folder: meta, Code-tab snippet and lazy demo / playground loaders. */\nexport const registry: readonly RegistryEntry[] = [\n` +
     list.map((c, i) => `  { folder: "${c.folder}", meta: m${i}, code: ${JSON.stringify(firstCode(c.docs))}, demo: ${loader(c, "d", "demo.tsx")}, playground: ${loader(c, "p", "playground.ts")} },\n`).join("") + `];\n`;
 

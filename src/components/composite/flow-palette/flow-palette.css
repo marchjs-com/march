@@ -1,0 +1,24 @@
+/* HADI March — FlowPalette. Cards carry their node type's colour (data-hm-color → --hm-accent). */
+.hm-flowpal { display: grid; align-content: start; gap: .75rem; min-inline-size: 0; }
+.hm-flowpal-cat { display: grid; gap: .375rem; min-inline-size: 0; }
+.hm-flowpal-cattitle { margin: 0; font-size: var(--hm-text-xs); font-weight: 600; letter-spacing: var(--hm-tracking-caps); text-transform: uppercase; color: var(--hm-text-2); }
+.hm-flowpal-list { display: grid; gap: .375rem; margin: 0; padding: 0; list-style: none; }
+.hm-flowpal-item { min-inline-size: 0; }
+.hm-flowpal-card { position: relative; display: flex; align-items: center; gap: .625rem; inline-size: 100%; min-inline-size: 0; padding: .5rem .625rem; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-2);
+  background: var(--hm-surface); color: var(--hm-text); font: inherit; text-align: start; cursor: grab; touch-action: none; overflow: hidden;
+  transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease); }
+.hm-flowpal-card::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 3px; background: var(--hm-accent, var(--hm-primary)); }
+.hm-flowpal-card:hover { border-color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 50%, var(--hm-border)); box-shadow: var(--hm-shadow-2); transform: translateY(-1px); }
+.hm-flowpal-card:focus-visible { outline: 3px solid var(--hm-focus); outline-offset: 2px; }
+.hm-flowpal-card.is-dragging { opacity: .45; }
+.hm-flowpal-icon { display: inline-grid; place-items: center; flex: none; inline-size: 2rem; block-size: 2rem; border-radius: .5rem;
+  background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 14%, var(--hm-surface)); color: var(--hm-accent-text, var(--hm-primary-text)); }
+.hm-flowpal-icon .hm-svg { inline-size: 1rem; block-size: 1rem; }
+.hm-flowpal-text { display: grid; flex: 1; min-inline-size: 0; }
+.hm-flowpal-name { font-size: var(--hm-text-sm); font-weight: 600; }
+.hm-flowpal-desc { font-size: var(--hm-text-xs); color: var(--hm-text-2); }
+.hm-flowpal-grip { flex: none; inline-size: .5rem; block-size: 1rem; opacity: .45;
+  background-image: radial-gradient(circle, currentColor 1px, transparent 1.4px); background-size: 4px 4px; }
+.hm-flowpal-ghost { position: absolute; margin: 0; box-shadow: var(--hm-shadow-4); cursor: grabbing; pointer-events: none; }
+.hm-flowpal-ghost.is-over { border-color: var(--hm-accent, var(--hm-primary)); }
+.hm-flowpal-empty { margin: 0; color: var(--hm-text-2); font-size: var(--hm-text-sm); }

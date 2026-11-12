@@ -1,0 +1,57 @@
+/* HADI March — EasingCurveEditor. Imported by its component module; tokens.css provides the variables. */
+.hm-ec { --hm-ec-accent: var(--hm-accent, var(--hm-primary)); --hm-ec-h1: var(--hm-brand-orange, var(--hm-cat-1)); --hm-ec-h2: var(--hm-brand-blue, var(--hm-cat-2));
+  display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%; padding: var(--hm-space-3);
+  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
+.hm-ec-main { display: grid; grid-template-columns: minmax(10rem, 15rem) minmax(0, 1fr); gap: var(--hm-space-4); align-items: start; }
+@container (max-width: 30rem) { .hm-ec-main { grid-template-columns: minmax(0, 1fr); } }
+.hm-ec { container-type: inline-size; }
+
+/* plot and lane: time runs left to right in every writing direction */
+.hm-ec-plot, .hm-ec-lane { direction: ltr; }
+.hm-ec-plot { inline-size: 100%; aspect-ratio: 112 / 224; overflow: visible; touch-action: none; cursor: crosshair; user-select: none; }
+.hm-ec-zone { fill: var(--hm-bg-subtle); stroke: none; }
+.hm-ec-grid { stroke: var(--hm-border-subtle); stroke-width: .35; }
+.hm-ec-axis { stroke: var(--hm-border-strong); stroke-width: .5; }
+.hm-ec-diag { stroke: var(--hm-border); stroke-width: .6; stroke-dasharray: 2 2; }
+.hm-ec-curve { fill: none; stroke: var(--hm-text); stroke-width: 1.6; stroke-linecap: round; }
+.hm-ec-curve-glow { fill: none; stroke: var(--hm-ec-accent); stroke-width: 5; stroke-linecap: round; opacity: .18; }
+.hm-ec-arm { stroke-width: .9; }
+.hm-ec-h1 .hm-ec-arm { stroke: var(--hm-ec-h1); }
+.hm-ec-h2 .hm-ec-arm { stroke: var(--hm-ec-h2); }
+.hm-ec-knob { stroke: var(--hm-surface); stroke-width: 1.6; cursor: grab; outline: none; transition: r var(--hm-dur-fast) var(--hm-ease-spring); }
+.hm-ec-h1 .hm-ec-knob { fill: var(--hm-ec-h1); }
+.hm-ec-h2 .hm-ec-knob { fill: var(--hm-ec-h2); }
+.hm-ec-knob:hover, .hm-ec-handle.is-active .hm-ec-knob { r: 5.4; }
+.hm-ec-knob:focus-visible { stroke: var(--hm-focus); stroke-width: 2.2; }
+.hm-ec-marker { fill: var(--hm-ec-accent); stroke: var(--hm-surface); stroke-width: 1; }
+
+/* preview: a ball eased along the lane, a faint linear one beside it */
+.hm-ec-side { display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; }
+.hm-ec-stage { padding: var(--hm-space-3); border-radius: var(--hm-radius-2); background: var(--hm-bg-subtle); }
+.hm-ec-lane { position: relative; block-size: 2.25rem; }
+.hm-ec-lane::before { content: ""; position: absolute; inset-inline: .5rem; inset-block-start: 50%; block-size: 2px; border-radius: 2px; background: var(--hm-border); }
+.hm-ec-ball { position: absolute; inset-block-start: 50%; inset-inline-start: 0; inline-size: 1.5rem; block-size: 1.5rem; margin-block-start: -.75rem; border-radius: 50%;
+  background: var(--hm-ec-accent); box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--hm-ec-accent) 70%, transparent);
+  translate: calc(var(--hm-ec-p, 0) * (var(--hm-ec-w, 14rem) - 1.5rem)) 0; }
+.hm-ec-ghost { background: var(--hm-border-strong); box-shadow: none; opacity: .45; inline-size: .75rem; block-size: .75rem; margin-block-start: -.375rem; translate: calc(var(--hm-ec-t, 0) * (var(--hm-ec-w, 14rem) - .75rem)) 0; }
+.hm-ec-lane { --hm-ec-w: 100%; container-type: inline-size; }
+.hm-ec-stage .hm-ec-ball { translate: calc(var(--hm-ec-p, 0) * (100cqi - 1.5rem)) 0; }
+.hm-ec-stage .hm-ec-ghost { translate: calc(var(--hm-ec-t, 0) * (100cqi - .75rem)) 0; }
+.hm-ec-stage.is-scale .hm-ec-ball { inset-inline-start: calc(50% - .75rem); translate: none; scale: calc(.2 + var(--hm-ec-p, 0) * 1.1); }
+.hm-ec-stage.is-fade .hm-ec-ball { inset-inline-start: calc(50% - .75rem); translate: none; opacity: var(--hm-ec-p, 0); }
+.hm-ec-stage.is-scale .hm-ec-ghost, .hm-ec-stage.is-fade .hm-ec-ghost { display: none; }
+
+/* numbers, output, presets */
+.hm-ec-inputs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--hm-space-2); }
+.hm-ec-field { display: flex; flex-direction: column; gap: .125rem; color: var(--hm-faint); font-size: var(--hm-text-xs); font-family: var(--hm-font-mono); }
+.hm-ec-num { min-width: 0; padding-inline: .375rem; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); }
+.hm-ec-css { padding: var(--hm-space-2) var(--hm-space-3); border-radius: var(--hm-radius-2); background: var(--hm-surface-2); font-family: var(--hm-font-mono); font-size: var(--hm-text-xs); overflow-wrap: anywhere; }
+.hm-ec-name { margin: 0; color: var(--hm-text-2); font-size: var(--hm-text-xs); }
+.hm-ec-presets { display: flex; flex-wrap: wrap; gap: var(--hm-space-2); }
+.hm-ec-preset { display: inline-flex; flex-direction: column; align-items: center; gap: .125rem; padding: .375rem .5rem .25rem; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-2);
+  background: var(--hm-surface); color: var(--hm-text-2); font: inherit; font-size: .6875rem; cursor: pointer;
+  transition: border-color var(--hm-dur-fast) var(--hm-ease), background-color var(--hm-dur-fast) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease-spring); }
+.hm-ec-preset:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--hm-border-strong); }
+.hm-ec-preset.is-on { border-color: var(--hm-ec-accent); background: var(--hm-accent-soft, var(--hm-primary-soft)); color: var(--hm-accent-text, var(--hm-primary-text)); }
+.hm-ec-thumb { inline-size: 2.25rem; block-size: 2.25rem; }
+.hm-ec-thumb path { fill: none; stroke: currentColor; stroke-width: 8; stroke-linecap: round; }

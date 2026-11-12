@@ -1,0 +1,10 @@
+/* HADI March — JsonEditor (the text view's own rules are in forms/editors.css). */
+.hm-json-modes { display: inline-flex; align-self: flex-end; gap: 2px; padding: 2px; border-radius: var(--hm-radius-full); background: var(--hm-surface-3); }
+.hm-json-mode { min-height: 1.75rem; padding: 0 .85rem; border: 0; border-radius: var(--hm-radius-full); background: transparent; color: var(--hm-text-2);
+  font: inherit; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-medium); cursor: pointer;
+  transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-json-mode:hover { color: var(--hm-text); }
+.hm-json-mode[aria-selected="true"] { background: var(--hm-surface); color: var(--hm-accent-text, var(--hm-primary-text)); box-shadow: var(--hm-shadow-1); }
+.hm-json-mode[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+.hm-json-mode:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: 1px; }
+.hm-json-panel { display: flex; flex-direction: column; gap: var(--hm-space-1); min-width: 0; }

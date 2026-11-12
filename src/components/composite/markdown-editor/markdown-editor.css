@@ -1,0 +1,50 @@
+/* HADI March — MarkdownEditor. Imported by its component module; tokens.css provides the variables. */
+.hm-mde { --hm-mde-accent: var(--hm-accent, var(--hm-primary)); display: flex; flex-direction: column; min-width: 0; max-width: 100%;
+  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface);
+  transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-mde:focus-within { border-color: var(--hm-mde-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-mde-accent) 16%, transparent); }
+.hm-mde.is-disabled { opacity: .6; }
+.hm-mde-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--hm-space-2); min-height: 2.75rem;
+  padding: var(--hm-space-1) var(--hm-space-2); border-block-end: 1px solid var(--hm-border-subtle);
+  border-start-start-radius: inherit; border-start-end-radius: inherit; background: color-mix(in srgb, var(--hm-surface-2) 55%, var(--hm-surface)); }
+.hm-mde-toolbar, .hm-mde-toolbar .hm-toolbar-start { gap: 2px; }
+.hm-mde-sep { inline-size: 1px; block-size: 1.125rem; margin-inline: var(--hm-space-1); background: var(--hm-border); }
+.hm-mde-tool { position: relative; color: var(--hm-text-2); border-radius: var(--hm-radius-2); transition: background-color var(--hm-dur-fast) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease); }
+.hm-mde-tool:active:not(:disabled) { transform: scale(.92); }
+.hm-mde-tool-h2::before, .hm-mde-tool-h3::before { position: absolute; inset-inline-end: 3px; inset-block-end: 3px; font-size: .5625rem; font-weight: 700; line-height: 1; }
+.hm-mde-tool-h2::before { content: "2"; }
+.hm-mde-tool-h3::before { content: "3"; }
+
+/* view switcher: a pill per view */
+.hm-mde-views { display: inline-flex; gap: 2px; margin-inline-start: auto; padding: 2px; border-radius: var(--hm-radius-full); background: var(--hm-surface-3); }
+.hm-mde-view { min-height: 1.75rem; padding: 0 .75rem; border: 0; border-radius: var(--hm-radius-full); background: transparent; color: var(--hm-text-2);
+  font: inherit; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-medium); cursor: pointer;
+  transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-mde-view:hover { color: var(--hm-text); }
+.hm-mde-view[aria-selected="true"] { background: var(--hm-surface); color: var(--hm-accent-text, var(--hm-primary-text)); box-shadow: var(--hm-shadow-1); }
+.hm-mde-view:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: 1px; }
+
+/* body */
+.hm-mde-body { display: grid; min-height: 0; }
+.hm-mde-source { display: block; inline-size: 100%; min-block-size: 14rem; margin: 0; padding: var(--hm-space-3) var(--hm-space-4); border: 0; border-radius: 0; background: transparent;
+  box-shadow: none; resize: vertical; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); line-height: 1.7; tab-size: 2; caret-color: var(--hm-mde-accent); }
+.hm-mde-source:focus { outline: none; box-shadow: none; }
+.hm-mde-preview { min-block-size: 14rem; max-block-size: 36rem; overflow: auto; padding: var(--hm-space-3) var(--hm-space-4); line-height: 1.65; overflow-wrap: anywhere; }
+.hm-mde-preview:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: -2px; }
+.hm-mde-preview li::marker { color: var(--hm-mde-accent); }
+.hm-mde-preview blockquote { border-inline-start-color: var(--hm-mde-accent); }
+.is-write .hm-mde-source, .is-split .hm-mde-source { max-block-size: 36rem; }
+.hm-mde-split { min-height: 14rem; border: 0; border-radius: 0; background: transparent; }
+.hm-mde-split .hm-split-pane { display: grid; }
+.hm-mde-split .hm-mde-preview { background: var(--hm-bg-subtle); }
+.hm-mde.is-rich .hm-mde-body { padding: var(--hm-space-2); }
+.hm-mde.is-rich .hm-rte { border-color: var(--hm-border-subtle); }
+
+/* footer */
+.hm-mde-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-1) var(--hm-space-2); padding: var(--hm-space-1) var(--hm-space-4) var(--hm-space-2);
+  border-block-start: 1px solid var(--hm-border-subtle); color: var(--hm-faint); font-size: var(--hm-text-xs); font-variant-numeric: tabular-nums; }
+.hm-mde-hint { margin-inline-start: auto; font-family: var(--hm-font-mono); }
+
+/* narrow: the split stacks (source over preview) */
+@container (max-width: 36rem) { .hm-mde-split { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; } .hm-mde-split .hm-split-handle { display: none; } }
+.hm-mde { container-type: inline-size; }

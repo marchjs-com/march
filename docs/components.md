@@ -30,7 +30,20 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| ContextMenu | experimental | Right-click / Shift+F10 menu anchored to the pointer: the same items, actions and keyboard as Menu, chosen per target. | — |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+
+### Navigation — `hadi-march/navigation`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
+
+### Motion — `hadi-march/motion`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| EasingCurveEditor | experimental | Cubic-bezier easing editor: draggable handles, the engine's named curves as presets, live preview on the motion engine clock, registers the curve by name (defineEasing). | — |
 
 ### Social — `hadi-march/social`
 
@@ -53,14 +66,25 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, [ReactionPicker](#reactionpicker) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), Avatar |
+| ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
 | CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, OverflowText |
 | ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, Dialog, Toggle |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
+| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle |
+| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, [Chip](#chip), OverflowText |
+| FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, OverflowText |
+| GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | [ColorPicker](#colorpicker), Segmented, IconButton |
+| ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | Segmented, Slider, IconButton |
+| JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | [TreeEditor](#treeeditor) |
+| KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | [EasingCurveEditor](#easingcurveeditor), IconButton, Segmented |
+| MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, [RichTextEditor](#richtexteditor) |
 | NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
 | ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll](#countroll), Button, Menu |
+| RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
+| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
 
 ## BottomNav
 
@@ -122,6 +146,19 @@ Composed of: OverflowText
 
 Full page: src/components/actions/chip/docs.md
 
+## ColorPicker
+
+An advanced color picker: a saturation / brightness area, hue and alpha sliders, an eyedropper (where the browser has one), an old / new preview (click the old half to go back), the value as hex, rgb() or hsl() text (any CSS color can be typed or pasted), WCAG contrast on white and black, and palettes: the four HADİ colors, the theme's palette and the recent picks. Theme colors are read from the tokens at the moment they are picked, so they follow the active theme.
+
+Composed of: IconButton, Segmented
+
+```tsx
+<ColorPicker bind:value={$color} />
+<ColorPicker value={brand} format="hsl" alpha={false} palettes={[{ label: "Acme", colors: ["#0b5", "brand-blue"] }]} />
+```
+
+Full page: src/components/composite/color-picker/docs.md
+
 ## CommandPalette
 
 Ctrl/⌘+K opens a search over every registered command, every NavMenu page and every action, ranked with typo tolerance. An optional `ask(query)` hook (an intent search the app provides) adds an "Ask" row: it runs on Enter, or by itself when local results are weak. Only a small shell ships with the page; the dialog loads on first open, and hovering or focusing a `PaletteButton` fetches it ahead of time.
@@ -148,6 +185,18 @@ Composed of: Button, Card, Dialog, Toggle
 ```
 
 Full page: src/components/composite/consent-banner/docs.md
+
+## ContextMenu
+
+The menu that opens where you right-click, or with Shift+F10 / the Menu key on the focused element. It draws the same items as `Menu` — plain items, actions, separators, shortcuts — with the same roving keyboard; `items` receives the element that was clicked, so one menu can offer different entries for different targets.
+
+```tsx
+<ContextMenu items={(target) => [{ label: "Copy", shortcut: "mod+c", onSelect: copy }, "-", { label: "Delete", danger: true, onSelect: remove }]}>
+  <ul class="files">…</ul>
+</ContextMenu>
+```
+
+Full page: src/components/overlays/context-menu/docs.md
 
 ## CountRoll
 
@@ -192,6 +241,17 @@ Composed of: Portal, Dialog
 
 Full page: src/components/overlays/drawer/docs.md
 
+## EasingCurveEditor
+
+Edit a `cubic-bezier()` easing by its two handles and watch it run. The preview runs on the motion engine's clock, so the global speed, "Stop all" and reduced motion apply to it; a faint dot moves linearly beside the eased one, and a marker rides the curve. The presets are the engine's named curves. With `name`, every change registers the curve in the engine (`defineEasing`), so any animation can use it by name.
+
+```tsx
+<EasingCurveEditor bind:value={$easing} name="acme-pop" />
+animate(card, frames, { duration: 600, easing: "acme-pop" })
+```
+
+Full page: src/components/motion/easing-curve-editor/docs.md
+
 ## Feed
 
 A social feed. PostCards sit in a VirtualList, so only the posts near the viewport are in the DOM, inside a PullToRefresh (the feed is the scroll area; keyboard users get a Refresh button). The first page shows skeleton posts; reaching the end loads the next page with a skeleton at the bottom (infinite scroll) and an end mark once there is nothing more. New posts waiting above show a "N new posts" pill that merges them and scrolls to the top.
@@ -203,6 +263,49 @@ Composed of: [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [Post
 ```
 
 Full page: src/components/composite/feed/docs.md
+
+## FlowCanvas
+
+A node editor on an endless canvas: pan and zoom, snap to the grid, nodes with ports and form fields, bezier edges, values flowing along the edges as moving dots, box and multi selection, copy / paste, undo, a minimap, layered auto layout, groups, a context menu and full keyboard use. The flow lives in a store (`createFlow`) that FlowPalette adds to and FlowControls runs; it reads and writes a readable JSON schema (`march.flow/v1`).
+
+Composed of: [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle
+
+```tsx
+const flow = createFlow({ types, doc })          // types: [{ type, label, icon, color, inputs, outputs, fields, run }]
+<FlowCanvas flow={flow} snap={16} minimap />
+flow.toJSON()                                     // { schema: "march.flow/v1", nodes, edges: [{ from: "hook.out", to: "check.in" }], groups }
+flow.load(JSON.parse(text), "Import")             // validated (validateFlow); one undo step
+```
+
+Full page: src/components/composite/flow-canvas/docs.md
+
+## FlowControls
+
+Run, pause, step and reset a flow; choose the speed; see the state, the clock and how many nodes finished. `createFlowRunner(flow)` executes the flow node by node and writes the state FlowCanvas draws: the running node glows, a failing node shakes and shows its error, values travel along the edges as dots and every edge counts what passed. `FlowTimeline` is the run record: one bar per executed node on a time axis with a playhead.
+
+Composed of: Button, IconButton, Segmented, [Chip](#chip), OverflowText
+
+```tsx
+const runner = createFlowRunner(flow, { nodeMs: 650, travelMs: 560 })
+<FlowControls runner={runner} flow={flow} timeline />
+await runner.run()        // "done" | "error"; runner.pause() / resume() / step() / reset()
+```
+
+Full page: src/components/composite/flow-controls/docs.md
+
+## FlowPalette
+
+The node types of a flow, grouped by category, with a search box (accent and Turkish-letter insensitive). Drag a card onto a FlowCanvas to place the node where you drop it, snapped to the grid; a click or Enter adds it in the middle of the view. The dragged card floats in the drag layer, tilts while it is held and melts into the canvas (or flies back when dropped outside) on the motion engine.
+
+Composed of: SearchBox, OverflowText
+
+```tsx
+const flow = createFlow({ types })
+<FlowPalette flow={flow} />
+<FlowCanvas flow={flow} />
+```
+
+Full page: src/components/composite/flow-palette/docs.md
 
 ## FollowButton
 
@@ -228,6 +331,58 @@ import { Gantt } from "hadi-march/components/data/gantt";
 
 Full page: src/components/data/gantt/docs.md
 
+## GradientEditor
+
+Build a CSS gradient by hand. Pick the type (linear, radial, conic), turn the angle dial or press a quick angle, click the stop bar to add a color stop (its color is the gradient's color at that point), drag stops to move them, drag one down (or press Delete) to remove it, and edit the selected stop's color with a full ColorPicker. Presets start from the HADİ colors and the theme palette; the CSS is ready to copy.
+
+Composed of: [ColorPicker](#colorpicker), Segmented, IconButton
+
+```tsx
+<GradientEditor bind:value={$background} />
+<GradientEditor value="radial-gradient(circle, #ffd27a 0%, #f2801f 100%)" types={["radial"]} presets={false} />
+```
+
+Full page: src/components/composite/gradient-editor/docs.md
+
+## ImageCropper
+
+Crop an image the way phones do: the frame stays centered, the picture moves under it. Drag the image to move it, zoom with the wheel, the slider or + −, turn it by 90° with the buttons (or R) and by fine angles with the angle slider (or [ ]), mirror it (F), resize the frame from its corners or pick an aspect ratio. At any angle the image always covers the frame, so the result never has empty corners. The result is drawn on a canvas (`api.toCanvas()`, `api.toBlob()`); a small live preview shows it with its size in pixels.
+
+Composed of: Segmented, Slider, IconButton
+
+```tsx
+<ImageCropper src={url} bind:value={$crop} aspect={1} api={(c) => cropper = c} />
+const blob = await cropper.toBlob("image/webp", 0.9, 512)
+```
+
+Full page: src/components/composite/image-cropper/docs.md
+
+## JsonEditor
+
+JSON in two views. **Text**: the source with live parse errors (line and column), Format and Tab indentation. **Tree**: a TreeEditor with type badges, inline editing and undo, loaded the first time the view is opened (a form that only needs the text view stays small). A `schema` (JSON Schema subset) and `validate` check both views: the text view lists the first problem with its path, the tree marks every invalid row.
+
+Composed of: [TreeEditor](#treeeditor)
+
+```tsx
+<JsonEditor bind:value={$settings} mode="tree" schema={schema} />
+<JsonEditor bind:value={$raw} modes={["text"]} validate={(v) => (v.version ? null : "version is required")} />
+```
+
+Full page: src/components/composite/json-editor/docs.md
+
+## KeyframeTimeline
+
+Edit and play a keyframe animation on the motion engine. Each track animates one property (x, y, scale, rotate, opacity) of a target; its lane shows the value curve and the keyframes as diamonds you drag along time (snapped, Alt for free). Scrub the ruler or drag the playhead; play, pause, loop and change the speed. The selected keyframe has its time, value and an EasingCurveEditor for the curve into it. Playback is a motion engine `Playback`, so the global speed, "Stop all" and reduced motion apply; `timelineCode(model)` writes the same animation as engine timeline code.
+
+Composed of: [EasingCurveEditor](#easingcurveeditor), IconButton, Segmented
+
+```tsx
+<KeyframeTimeline bind:value={$scene} />
+<KeyframeTimeline value={model} snap={100} loop={false} renderTarget={(name) => <img src={`/${name}.svg`} alt="" />} />
+```
+
+Full page: src/components/composite/keyframe-timeline/docs.md
+
 ## LikeButton
 
 A heart toggle with a rolling count. Liking squashes and overshoots the heart on a spring, grows a ring and throws a burst of particles in the four HADİ colors; unliking is a small press. Everything runs on the motion engine, so the global speed, "pause all" and reduced motion apply (reduced motion keeps only the fill change).
@@ -251,6 +406,20 @@ An optional credit line: "Developed with HADI March and 💗", with "HADI March"
 ```
 
 Full page: src/components/actions/made-with-march/docs.md
+
+## MarkdownEditor
+
+Markdown source with a live preview. Four views: **write**, **preview**, **split** (resizable; both panes scroll together) and **rich** (the same value in a RichTextEditor, loaded the first time it is opened). The toolbar and shortcuts write Markdown syntax as native undo steps (Ctrl+Z keeps working); Enter continues lists and quotes, Tab / Shift+Tab indent list lines; HTML pasted from a web page or an office suite becomes Markdown through the safe content core.
+
+Composed of: Splitter, Toolbar, IconButton, [RichTextEditor](#richtexteditor)
+
+```tsx
+<MarkdownEditor bind:value={$doc} view="split" />
+<MarkdownEditor value={md} views={["write", "preview"]} toolbar={false} />
+<MarkdownEditor bind:value={$doc} view="rich" stats={false} />
+```
+
+Full page: src/components/composite/markdown-editor/docs.md
 
 ## MediaGrid
 
@@ -324,6 +493,20 @@ A row of emoji to react with, or a grid that serves as an emoji panel. It pops i
 
 Full page: src/components/social/reaction-picker/docs.md
 
+## RichTextEditor
+
+A rich text field whose value is **Markdown**. Write with the toolbar, keyboard shortcuts or Markdown shortcuts (`# `, `## `, `- `, `1. `, `> `, ```` ``` ````); mention people with `@`, insert emoji with `:`; pasted HTML from any site or office suite is cleaned through the safe content core (allowlist, no HTML parser — Trusted Types safe). Undo / redo use an UndoManager history of the editor's own (typing merges into one step).
+
+Composed of: Toolbar, IconButton, Avatar
+
+```tsx
+<RichTextEditor bind:value={$notes} mentions={team} placeholder="Write…" />
+<RichTextEditor value={md} toolbar={["bold", "italic", "link", "|", "ul", "ol"]} emoji={false} />
+<RichTextEditor api={(e) => editor = e} />   // editor.insert("**Hi**"), editor.exec("h2"), editor.undo()
+```
+
+Full page: src/components/composite/rich-text-editor/docs.md
+
 ## Scheduler
 
 A month / week / day calendar of events. Drag an event to move it (minutes snap to `step`; across columns it changes day), drag its edge to resize it, drag on an empty slot to create one. Dates and times are formatted with Intl in the current locale: month and weekday names, the first day of the week, 12 / 24 hour clock and the reading direction. Overlapping events share the column width; all-day and multi-day events sit in their own lane as bars.
@@ -340,6 +523,19 @@ import { Scheduler } from "hadi-march/components/data/scheduler";
 ```
 
 Full page: src/components/data/scheduler/docs.md
+
+## Stepper
+
+Progress through stages, with motion that shows where you are going. Stepper draws Steps and adds a liquid highlight that stretches from the old step to the new one and settles there, and step panels that morph into each other: the old panel blurs and slides toward the past, the new one arrives from the future (mirrored in RTL) while the frame's height follows. Back / Next buttons and a step counter come with it.
+
+Composed of: Steps, Button
+
+```tsx
+<Stepper steps={[{ title: "Cart" }, { title: "Address" }, { title: "Payment" }]} current={$step} onSelect={(i) => $step = i}
+  panels={[<Cart />, <Address />, <Payment />]} onFinish={submit} />
+```
+
+Full page: src/components/navigation/stepper/docs.md
 
 ## StoryProgress
 
@@ -387,6 +583,19 @@ Composed of: Dropdown, ThemeSwatch, OverflowText
 ```
 
 Full page: src/components/composite/theme-menu/docs.md
+
+## TreeEditor
+
+Edit any JSON value as a tree. Each row shows its key, a **type badge** in a HADİ color (objects and lists Heyecan, numbers Aktivite, text Dostluk, true / false İletişim) that converts the value to another type, and the value: a text or number you edit in place, a switch for true / false, a count for objects and lists. Rows add, duplicate and delete; a search box keeps the matches and their parents; a JSON Schema subset marks invalid rows with their message. Every change is one step of the editor's own undo history.
+
+Composed of: Badge, IconButton, Toggle
+
+```tsx
+<TreeEditor bind:value={$config} schema={schema} />
+<TreeEditor value={data} readonly search={false} expand={1} />
+```
+
+Full page: src/components/composite/tree-editor/docs.md
 
 ## TreeView
 

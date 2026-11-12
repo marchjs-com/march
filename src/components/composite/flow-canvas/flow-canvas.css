@@ -1,0 +1,104 @@
+/* HADI March — FlowCanvas. World units are CSS pixels (scaled by the view transform); NODE_W, NODE_HEAD and PORT_ROW
+   in model.ts match the sizes below. Logical properties: the drawing mirrors in RTL. Motion runs on the engine. */
+.hm-flow { --hm-flow-node-w: 232px; --hm-flow-head: 44px; --hm-flow-row: 26px; --hm-flow-line: color-mix(in srgb, var(--hm-text) 30%, transparent);
+  position: relative; container-type: inline-size; min-block-size: 26rem; block-size: 100%; overflow: hidden; touch-action: none; user-select: none; outline: none;
+  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background-color: var(--hm-bg-subtle);
+  background-image: radial-gradient(circle at center, color-mix(in srgb, var(--hm-text) 22%, transparent) 1px, transparent 1.6px);
+  background-size: var(--hm-flow-gs, 16px) var(--hm-flow-gs, 16px); background-position: var(--hm-flow-gx, 0) var(--hm-flow-gy, 0); }
+.hm-flow:dir(rtl) { background-position: right var(--hm-flow-gx, 0) top var(--hm-flow-gy, 0); }
+.hm-flow:focus-visible { box-shadow: 0 0 0 3px var(--hm-focus); }
+.hm-flow.is-hand, .hm-flow.is-panning { cursor: grab; }
+.hm-flow.is-connecting .hm-flow-port { box-shadow: 0 0 0 4px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 22%, transparent); }
+.hm-flow-world { position: absolute; inset-block-start: 0; inset-inline-start: 0; inline-size: 0; block-size: 0; transform-origin: 0 0; will-change: transform; }
+.hm-flow-nodes, .hm-flow-pills, .hm-flow-groups { position: absolute; inset: 0; }
+
+/* edges: one SVG at the world origin; mirrored in RTL (it holds no text) */
+.hm-flow-edges { position: absolute; inset: 0 auto auto 0; /* physical on purpose: mirrored below with scaleX */ block-size: 1px; inline-size: 1px; overflow: visible; pointer-events: none; transform-origin: 0 0; }
+.hm-flow:dir(rtl) .hm-flow-edges { transform: scaleX(-1); }
+.hm-flow-edge-hit { fill: none; stroke: transparent; stroke-width: 14; pointer-events: stroke; cursor: pointer; }
+.hm-flow-edge-line { fill: none; stroke: var(--hm-flow-line); stroke-width: 2; stroke-linecap: round; transition: stroke var(--hm-dur) var(--hm-ease), stroke-width var(--hm-dur) var(--hm-ease); }
+.hm-flow-edge-flow { fill: none; stroke: var(--hm-brand-orange, var(--hm-primary)); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 4 20; opacity: 0; transition: opacity var(--hm-dur) var(--hm-ease); }
+.hm-flow-edge:hover .hm-flow-edge-line { stroke: color-mix(in srgb, var(--hm-text) 55%, transparent); }
+.hm-flow-edge.is-live .hm-flow-edge-line { stroke: color-mix(in srgb, var(--hm-brand-orange, var(--hm-primary)) 45%, transparent); }
+.hm-flow-edge.is-live .hm-flow-edge-flow { opacity: 1; }
+.hm-flow-edge.is-selected .hm-flow-edge-line { stroke: var(--hm-primary); stroke-width: 3; }
+.hm-flow-edge.is-skipped .hm-flow-edge-line { stroke-dasharray: 2 6; opacity: .55; }
+.hm-flow-draft { fill: none; stroke: var(--hm-primary); stroke-width: 2.5; stroke-dasharray: 6 6; }
+.hm-flow-dot { fill: var(--hm-brand-orange, var(--hm-primary)); }
+.hm-flow-dot-0 { stroke: color-mix(in srgb, var(--hm-brand-orange, var(--hm-primary)) 35%, transparent); stroke-width: 6; }
+.hm-flow-dot-1 { opacity: .55; } .hm-flow-dot-2 { opacity: .28; }
+
+/* counters at the middle of each edge */
+.hm-flow-pill { position: absolute; transform: translate(-50%, -50%); display: inline-grid; place-items: center; min-inline-size: .75rem; block-size: .75rem; padding: 0;
+  border: 2px solid var(--hm-surface); border-radius: var(--hm-radius-full); background: var(--hm-flow-line); color: var(--hm-on-primary-fill); font: 600 var(--hm-text-2xs)/1 var(--hm-font-mono, inherit);
+  cursor: pointer; transition: background-color var(--hm-dur) var(--hm-ease), min-inline-size var(--hm-dur) var(--hm-ease), block-size var(--hm-dur) var(--hm-ease); }
+.hm-flow:dir(rtl) .hm-flow-pill { transform: translate(50%, -50%); }
+.hm-flow-pill.is-counting { min-inline-size: 1.5rem; block-size: 1.375rem; padding-inline: .375rem; background: var(--hm-brand-orange, var(--hm-primary)); box-shadow: var(--hm-shadow-2); }
+.hm-flow-pill.is-selected { outline: 2px solid var(--hm-primary); outline-offset: 2px; }
+.hm-flow-pill:focus-visible { outline: 3px solid var(--hm-focus); outline-offset: 2px; }
+
+/* nodes */
+.hm-flow-node { position: absolute; inline-size: var(--hm-flow-node-w); border: 1px solid var(--hm-border); border-radius: 14px; background: var(--hm-surface); color: var(--hm-text);
+  box-shadow: var(--hm-shadow-2); cursor: grab; outline: none; transition: box-shadow var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease); }
+.hm-flow-node::before { content: ""; position: absolute; inset-inline: 12px; inset-block-start: -1px; block-size: 3px; border-radius: 0 0 3px 3px; background: var(--hm-accent, var(--hm-primary)); }
+.hm-flow-node:hover { box-shadow: var(--hm-shadow-3); }
+.hm-flow-node:focus-visible { box-shadow: 0 0 0 3px var(--hm-focus), var(--hm-shadow-3); }
+.hm-flow-node.is-selected { border-color: var(--hm-accent, var(--hm-primary)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 28%, transparent), var(--hm-shadow-3); }
+.hm-flow-node.is-done { border-color: color-mix(in srgb, var(--hm-success) 60%, var(--hm-border)); }
+.hm-flow-node.is-error { border-color: var(--hm-danger); }
+.hm-flow-node.is-skipped { opacity: .55; }
+.hm-flow-node.is-queued .hm-flow-state { background: var(--hm-surface-3); }
+.hm-flow-glow { position: absolute; inset: -7px; border-radius: 20px; pointer-events: none; opacity: 0;
+  box-shadow: 0 0 0 2px var(--hm-accent, var(--hm-primary)), 0 0 28px 4px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 55%, transparent); }
+.hm-flow-node.is-running .hm-flow-glow { opacity: .6; }
+.hm-flow-head { display: flex; align-items: center; gap: .5rem; block-size: var(--hm-flow-head); padding-inline: .625rem .5rem; border-block-end: 1px solid var(--hm-border-subtle); }
+.hm-flow-icon { display: inline-grid; place-items: center; flex: none; inline-size: 1.75rem; block-size: 1.75rem; border-radius: .5rem;
+  background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 14%, var(--hm-surface)); color: var(--hm-accent-text, var(--hm-primary-text)); }
+.hm-flow-icon .hm-svg { inline-size: .9375rem; block-size: .9375rem; }
+.hm-flow-title { flex: 1; min-inline-size: 0; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); }
+.hm-flow-state { display: inline-grid; place-items: center; flex: none; inline-size: 1.25rem; block-size: 1.25rem; border-radius: 50%; }
+.hm-flow-node.is-done .hm-flow-state { background: var(--hm-success); color: var(--hm-on-success-fill); }
+.hm-flow-node.is-error .hm-flow-state { background: var(--hm-danger); color: var(--hm-on-danger-fill); }
+.hm-flow-node.is-running .hm-flow-state { background: var(--hm-accent, var(--hm-primary)); box-shadow: 0 0 0 4px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 25%, transparent); inline-size: .625rem; block-size: .625rem; margin-inline: .3125rem; }
+.hm-flow-state .hm-svg { inline-size: .75rem; block-size: .75rem; }
+.hm-flow-ports { padding-block: 0; }
+.hm-flow-portline { display: grid; grid-template-columns: 1fr 1fr; block-size: var(--hm-flow-row); }
+.hm-flow-portrow { position: relative; display: flex; align-items: center; min-inline-size: 0; font-size: var(--hm-text-xs); color: var(--hm-text-2); }
+.hm-flow-portrow.is-in { padding-inline-start: .75rem; }
+.hm-flow-portrow.is-out { justify-content: flex-end; padding-inline-end: .75rem; }
+.hm-flow-portlabel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-flow-port { position: absolute; inset-block-start: 50%; inline-size: 14px; block-size: 14px; margin-block-start: -7px; padding: 0; border-radius: 50%; cursor: crosshair;
+  border: 2px solid var(--hm-flow-line); background: var(--hm-surface); transition: transform var(--hm-dur-fast) var(--hm-ease), background-color var(--hm-dur-fast) var(--hm-ease), border-color var(--hm-dur-fast) var(--hm-ease); }
+.hm-flow-portrow.is-in .hm-flow-port { inset-inline-start: -8px; }
+.hm-flow-portrow.is-out .hm-flow-port { inset-inline-end: -8px; }
+.hm-flow-port:hover, .hm-flow-port:focus-visible { transform: scale(1.3); border-color: var(--hm-accent, var(--hm-primary)); }
+.hm-flow-port:focus-visible { outline: 3px solid var(--hm-focus); outline-offset: 2px; }
+.hm-flow-port.is-connected { border-color: var(--hm-accent, var(--hm-primary)); background: var(--hm-accent, var(--hm-primary)); }
+.hm-flow-port.is-pending { transform: scale(1.35); border-color: var(--hm-primary); background: var(--hm-primary-soft); }
+.hm-flow-fields { display: grid; gap: .375rem; padding: .5rem .625rem .625rem; border-block-start: 1px solid var(--hm-border-subtle); cursor: default; user-select: text; }
+.hm-flow-fields .hm-label { font-size: var(--hm-text-xs); }
+.hm-flow-fields .hm-input, .hm-flow-fields select { min-block-size: var(--hm-control-h-sm); font-size: var(--hm-text-sm); }
+.hm-flow-error { margin: 0 .625rem .625rem; padding: .375rem .5rem; border-radius: var(--hm-radius-1); background: var(--hm-danger-soft); color: var(--hm-danger-text); font-size: var(--hm-text-xs); }
+
+/* groups */
+.hm-flow-group { position: absolute; border: 1.5px dashed color-mix(in srgb, var(--hm-accent, var(--hm-special)) 55%, transparent); border-radius: 22px;
+  background: color-mix(in srgb, var(--hm-accent, var(--hm-special)) 6%, transparent); transition: background-color var(--hm-dur) var(--hm-ease); }
+.hm-flow-group.is-selected { border-style: solid; background: color-mix(in srgb, var(--hm-accent, var(--hm-special)) 11%, transparent); }
+.hm-flow-group-label { position: absolute; inset-block-start: .5rem; inset-inline-start: .75rem; max-inline-size: calc(100% - 1.5rem); padding: .1875rem .625rem; border: 0; border-radius: var(--hm-radius-full);
+  background: color-mix(in srgb, var(--hm-accent, var(--hm-special)) 16%, var(--hm-surface)); color: var(--hm-accent-text, var(--hm-special-text)); font-size: var(--hm-text-xs); font-weight: 600; cursor: grab; }
+.hm-flow-group-label:focus-visible { outline: 3px solid var(--hm-focus); outline-offset: 2px; }
+
+/* selection box, zoom bar, minimap */
+.hm-flow-marquee { position: absolute; border: 1.5px solid var(--hm-primary); border-radius: 4px; background: color-mix(in srgb, var(--hm-primary) 10%, transparent); pointer-events: none; }
+.hm-flow-zoom { position: absolute; inset-block-end: .75rem; inset-inline-start: .75rem; display: flex; align-items: center; gap: .125rem; padding: .25rem;
+  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-full); background: color-mix(in srgb, var(--hm-surface) 92%, transparent); box-shadow: var(--hm-shadow-2); }
+.hm-flow-zoomval { min-inline-size: 2.75rem; text-align: center; font: 500 var(--hm-text-xs)/1 var(--hm-font-mono, inherit); color: var(--hm-text-2); font-variant-numeric: tabular-nums; }
+.hm-flow-minimap { position: absolute; inset-block-end: .75rem; inset-inline-end: .75rem; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-2);
+  background: color-mix(in srgb, var(--hm-surface) 92%, transparent); box-shadow: var(--hm-shadow-2); cursor: pointer; }
+.hm-flow-minimap:focus-visible { outline: 3px solid var(--hm-focus); outline-offset: 2px; }
+.hm-flow:dir(rtl) .hm-flow-minimap { transform: scaleX(-1); }
+.hm-flow-mm-node { fill: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 70%, var(--hm-surface)); }
+.hm-flow-mm-node.is-running { fill: var(--hm-brand-orange, var(--hm-primary)); }
+.hm-flow-mm-node.is-error { fill: var(--hm-danger); }
+.hm-flow-mm-view { fill: color-mix(in srgb, var(--hm-primary) 8%, transparent); stroke: var(--hm-primary); stroke-width: 1.5; }
+@container (max-width: 34rem) { .hm-flow-minimap { display: none; } .hm-flow-zoomval { display: none; } }

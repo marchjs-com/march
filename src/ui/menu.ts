@@ -34,16 +34,16 @@ export interface MenuItemSpec {
 /** A menu entry: a plain item, an action(), or a separator ("-" or `{ separator: true }`). */
 export type MenuItem = MenuItemSpec | Action | "-" | { separator: true };
 
-const isSep = (it: MenuItem): it is "-" | { separator: true } => it === "-" || !!(it as { separator?: boolean } | null)?.separator;
-const itemVisible = (it: MenuItem, args: unknown[]): boolean => {
+export const isSep = (it: MenuItem): it is "-" | { separator: true } => it === "-" || !!(it as { separator?: boolean } | null)?.separator;
+export const itemVisible = (it: MenuItem, args: unknown[]): boolean => {
   if (isSep(it)) return true;
   if (isAction(it)) return it.visible(...args);
   return !val(it.hidden) && can(it.can);
 };
 type Disableable = HTMLElement & { disabled?: boolean };
-const menuItems = (panel: HTMLElement | undefined): HTMLElement[] => (panel ? Array.from(panel.querySelectorAll<Disableable>('[role="menuitem"]')).filter((x) => !x.disabled) : []);
+export const menuItems = (panel: HTMLElement | undefined): HTMLElement[] => (panel ? Array.from(panel.querySelectorAll<Disableable>('[role="menuitem"]')).filter((x) => !x.disabled) : []);
 
-function renderItem(it: MenuItem, args: unknown[], close: (refocus: boolean) => void): unknown {
+export function renderItem(it: MenuItem, args: unknown[], close: (refocus: boolean) => void): unknown {
   if (isSep(it)) return h("div", { role: "separator", class: "hm-menu-sep" });
   if (isAction(it)) {
     return h("button", {

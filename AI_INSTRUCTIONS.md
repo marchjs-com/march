@@ -454,6 +454,24 @@ Throw `new AppError(msg, { type, code })` for domain errors; never show `e.messa
 - Components created outside `render()` (e.g. in an event handler) get their own root — prefer `openDialog()` for UI
   created on demand so it is disposed when closed.
 
+## 16b. Flows (hadi-march/flow) and ContextMenu (hadi-march/context-menu)
+
+Node-based flows have their own entry (pages that do not show a flow never load it):
+```tsx
+import { createFlow, FlowCanvas, FlowPalette, FlowControls, FlowTimeline, createFlowRunner, emit } from "hadi-march/flow";
+const flow = createFlow({ types: [{ type: "check", label: "Check", inputs: [{ id: "in" }], outputs: [{ id: "yes" }, { id: "no" }],
+  fields: [{ key: "limit", label: "Limit", kind: "number", default: 400 }], run: ({ input, data }) => (input.total >= data.limit ? emit({ yes: input }) : emit({ no: input })) }], doc })
+const runner = createFlowRunner(flow)
+<FlowControls runner={runner} flow={flow} /> <FlowPalette flow={flow} /> <FlowCanvas flow={flow} snap={16} /> <FlowTimeline runner={runner} flow={flow} />
+flow.toJSON()          // { schema: "march.flow/v1", nodes, edges: [{ id, from: "node.port", to: "node.port" }], groups }
+flow.load(doc, "Import")  // validateFlow(doc, types) first; one undo step (UndoManager)
+```
+Changes go through `flow.change(label, fn)` (one undo step); copy / paste use ClipboardManager. A node's `run` returns a
+value (all outputs), `emit({ port: value })` (chosen outputs) or throws (fails; what follows is skipped).
+`<ContextMenu items={(target) => [...MenuItem]}>` opens Menu items at the pointer (Shift+F10 / Menu key too).
+`<Field label="…">{control}</Field>` (hadi-march/forms, src/forms/field.ts) labels a control without the form engine.
+A heavy feature like this marks `entry` in its meta.ts: it stays out of the ui barrel and its page imports its demo.
+
 ## 17. Managers (hadi-march/managers/*)
 
 One instance each, started on first use, `configureX()` for global options, `disposeX()` to shut down. Import each
@@ -515,7 +533,20 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| ContextMenu | experimental | Right-click / Shift+F10 menu anchored to the pointer: the same items, actions and keyboard as Menu, chosen per target. | — |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+
+### Navigation — `hadi-march/navigation`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
+
+### Motion — `hadi-march/motion`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| EasingCurveEditor | experimental | Cubic-bezier easing editor: draggable handles, the engine's named curves as presets, live preview on the motion engine clock, registers the curve by name (defineEasing). | — |
 
 ### Social — `hadi-march/social`
 
@@ -538,12 +569,23 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, ReactionPicker |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | ChatBubble, TypingIndicator, ReactionPicker, Avatar |
+| ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
 | CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, OverflowText |
 | ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, Dialog, Toggle |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | PullToRefresh, VirtualList, PostCard, Skeleton |
+| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | ContextMenu, IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle |
+| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, Chip, OverflowText |
+| FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, OverflowText |
+| GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | ColorPicker, Segmented, IconButton |
+| ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | Segmented, Slider, IconButton |
+| JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | TreeEditor |
+| KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | EasingCurveEditor, IconButton, Segmented |
+| MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, RichTextEditor |
 | NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, MediaGrid, LikeButton, CountRoll |
 | ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | StoryRing, FollowButton, CountRoll, Button, Menu |
+| RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, StoryProgress, LikeButton |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
+| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
 <!-- components:end -->

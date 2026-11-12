@@ -1,0 +1,26 @@
+// Turkish texts of ColorPicker. English source → Turkish.
+const tr: Record<string, string> = {
+  "Color picker": "Renk seçici",
+  "Saturation and brightness": "Doygunluk ve parlaklık",
+  "Saturation {0}%, brightness {1}%": "Doygunluk %{0}, parlaklık %{1}",
+  "Hue": "Ton",
+  "Opacity": "Saydamlık",
+  "{0} degrees": "{0} derece",
+  "Pick a color from the screen": "Ekrandan renk al",
+  "New color {0}, was {1}": "Yeni renk {0}, önceki {1}",
+  "Back to {0}": "{0} rengine dön",
+  "Color value": "Renk değeri",
+  "Color format": "Renk biçimi",
+  "HADİ colors": "HADİ renkleri",
+  "Theme": "Tema",
+  "Recent": "Son kullanılanlar",
+  "Contrast": "Kontrast",
+  "on white": "beyaz üstünde",
+  "on black": "siyah üstünde",
+  "Enough for large text only": "Yalnız büyük metin için yeterli",
+  "Excitement orange": "Heyecan turuncusu",
+  "Activity blue": "Aktivite mavisi",
+  "Friendship green": "Dostluk yeşili",
+  "Communication purple": "İletişim moru",
+};
+export default tr;

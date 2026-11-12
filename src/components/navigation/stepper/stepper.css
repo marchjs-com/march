@@ -1,0 +1,9 @@
+/* HADI March — Stepper: Steps plus a liquid highlight and morphing panels. Tokens only; logical properties. */
+.hm-stepper { position: relative; display: grid; gap: var(--hm-space-4); min-inline-size: 0; }
+.hm-stepper-blob { position: absolute; inset: 0 auto auto 0; /* physical: placed by measured offsets */ z-index: 0; inline-size: 0; block-size: 0; opacity: 0; pointer-events: none; border-radius: var(--hm-radius-full);
+  background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 18%, transparent); box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 45%, transparent), 0 6px 22px -6px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 60%, transparent); }
+.hm-stepper > .hm-steps2 { position: relative; z-index: 1; }
+.hm-stepper-frame { position: relative; min-inline-size: 0; overflow: hidden; }
+.hm-stepper-pane { min-inline-size: 0; }
+.hm-stepper-nav { display: flex; align-items: center; justify-content: space-between; gap: var(--hm-space-3); }
+.hm-stepper-count { color: var(--hm-text-2); font-size: var(--hm-text-sm); font-variant-numeric: tabular-nums; }
