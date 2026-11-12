@@ -1,7 +1,7 @@
 // Table filtering and sorting primitives: locale folding, per-type filter predicates, chip text, value comparison.
 import { toDate } from "../core/pipes.ts";
 import { t } from "../core/i18n.ts";
-import { fold, compareText } from "../core/text.ts";
+import { fold, collator } from "../core/text.ts";
 import type { Column as SchemaColumn } from "../schema/index.ts";
 
 export { fold };
@@ -99,30 +99,46 @@ const num = (v: unknown): number | null => (v == null || v === "" ? null : Numbe
 const list = (f: unknown): unknown[] => ([] as unknown[]).concat(f);
 interface RangeValue { min?: unknown; max?: unknown; from?: unknown; to?: unknown }
 
-/** Does `row` pass the filter `f` on column `col`? */
-export function matchFilter<R>(row: R, col: Column<R>, f: unknown): boolean {
-  if (col.filterFn) return col.filterFn(row, f);
-  const v = col.filterValue ? col.filterValue(row) : valueOf(row, col);
+/** Does `row` pass the filter `f` on column `col`? (One row; for many rows use filterFn(col, f) once.) */
+export function matchFilter<R>(row: R, col: Column<R>, f: unknown): boolean { return filterFn(col, f)(row); }
+
+/** Label of each option value (first wins), or null when the column has no options. */
+export function optionLabels(col: { options?: OptionsInput | undefined }): Map<unknown, string> | null {
+  if (!col.options) return null;
+  const m = new Map<unknown, string>();
+  for (const o of optionsOf(col)) if (!m.has(o.value)) m.set(o.value, o.label);
+  return m;
+}
+
+/**
+ * The filter `f` of column `col` as a row predicate. Everything that depends only on the filter (bounds, the folded
+ * text, the wanted values, the option labels) is worked out here once, not again for every row.
+ */
+export function filterFn<R>(col: Column<R>, f: unknown): (row: R) => boolean {
+  const own = col.filterFn;
+  if (own) return (row) => own(row, f);
+  const get = col.filterValue ?? ((row: R) => valueOf(row, col));
   const r = f as RangeValue;
   switch (col.filter === true ? "text" : col.filter) {
     case "range": {
-      const n = num(v), min = num(r.min), max = num(r.max);
-      if (n == null || Number.isNaN(n)) return false;
-      return (min == null || n >= min) && (max == null || n <= max);
+      const min = num(r.min), max = num(r.max);
+      return (row) => { const n = num(get(row)); return n != null && !Number.isNaN(n) && (min == null || n >= min) && (max == null || n <= max); };
     }
     case "dateRange": {
-      const d = dayOf(v);
-      if (!d) return false;
-      return (!r.from || d >= (dayOf(r.from) as string)) && (!r.to || d <= (dayOf(r.to) as string));
+      const from = r.from ? dayOf(r.from) as string : null, to = r.to ? dayOf(r.to) as string : null;
+      return (row) => { const d = dayOf(get(row)); return !!d && (from == null || d >= from) && (to == null || d <= to); };
     }
     case "select": {
-      const want = list(f), have: unknown[] = Array.isArray(v) ? v : [v];
-      return have.some((x) => want.some((w) => w === x || String(w) === String(x)));
+      // a value matches a wanted one when equal or equal as text
+      const want = new Set<unknown>();
+      for (const w of list(f)) { want.add(w); want.add(String(w)); }
+      const one = (x: unknown): boolean => want.has(x) || want.has(String(x));
+      return (row) => { const v = get(row); if (!Array.isArray(v)) return one(v); for (const x of v) if (one(x)) return true; return false; };
     }
-    case "bool": return !!v === (f === true || f === "true");
+    case "bool": { const on = f === true || f === "true"; return (row) => !!get(row) === on; }
     default: {
-      const label = col.options ? optionsOf(col).find((o) => o.value === v)?.label : null;
-      return fold(label ?? (Array.isArray(v) ? v.join(" ") : v)).includes(fold(f));
+      const q = fold(f), labels = optionLabels(col);
+      return (row) => { const v = get(row); const label = labels?.get(v); return fold(label ?? (Array.isArray(v) ? v.join(" ") : v)).includes(q); };
     }
   }
 }
@@ -164,19 +180,24 @@ export function sortRows<R>(rows: readonly R[], sort: readonly SortSpec[], colum
     if (c) { const sv = c.sortValue; specs.push({ get: sv ?? ((r) => valueOf(r, c)), dir: s.dir === "desc" ? -1 : 1 }); }
   }
   if (!specs.length) return rows;
-  const dec = rows.map((r, i) => ({ r, i, k: specs.map((s) => sortKey(s.get(r))) }));
-  dec.sort((a, b) => {
-    for (let j = 0; j < specs.length; j++) {
-      const x = a.k[j] as SortKey, y = b.k[j] as SortKey;
+  // keys read once per row (flat: row i's keys at i*ns…), then an index permutation is sorted: no object per row
+  const n = rows.length, ns = specs.length, keys: SortKey[] = new Array(n * ns), idx = new Array<number>(n);
+  for (let i = 0; i < n; i++) { idx[i] = i; const r = rows[i] as R; for (let j = 0; j < ns; j++) keys[i * ns + j] = sortKey((specs[j] as (typeof specs)[0]).get(r)); }
+  const text = collator(locale), dirs = specs.map((s) => s.dir);
+  idx.sort((a, b) => {
+    for (let j = 0; j < ns; j++) {
+      const x = keys[a * ns + j] as SortKey, y = keys[b * ns + j] as SortKey;
       if (x === y) continue;
       if (x == null) return 1;
       if (y == null) return -1;
-      const c = typeof x === "string" || typeof y === "string" ? compareText(x, y, locale) : x < y ? -1 : x > y ? 1 : 0;
-      if (c) return c * (specs[j] as { dir: number }).dir;
+      const c = typeof x === "string" || typeof y === "string" ? text.compare(String(x), String(y)) : x < y ? -1 : x > y ? 1 : 0;
+      if (c) return c * (dirs[j] as number);
     }
-    return a.i - b.i;
+    return a - b;
   });
-  return dec.map((d) => d.r);
+  const out = new Array<R>(n);
+  for (let i = 0; i < n; i++) out[i] = rows[idx[i] as number] as R;
+  return out;
 }
 
 /** URL encoding of filter values: strings stay readable, everything else is JSON. */

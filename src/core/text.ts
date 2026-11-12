@@ -1,9 +1,13 @@
 // Shared text helpers for search, filters and sorting (used by ui, table and apps).
 // fold(): lower case, accents removed, Turkish dotted/dotless i unified ("İstanbul", "ıstanbul" → "istanbul").
 
+const NON_ASCII = /[^\u0000-\u007f]/;
 /** Fold text for matching. */
 export function fold(s: unknown): string {
-  return String(s ?? "")
+  const t = String(s ?? "");
+  // plain ASCII (most data): lower case is all there is to do; the replacements below only touch other characters
+  if (!NON_ASCII.test(t)) return t.toLowerCase();
+  return t
     .replace(/[İI]/g, "i").replace(/ı/g, "i")
     .toLowerCase()
     .normalize("NFD").replace(/[̀-ͯ]/g, "")
@@ -33,10 +37,14 @@ export function distance(a: string, b: string, max = Infinity): number {
 
 /** Locale-aware comparison for sorting (cached Intl.Collator per locale). */
 const collators = new Map<string | undefined, Intl.Collator>();
-export function compareText(a: unknown, b: unknown, loc?: string): number {
+/** The sorting collator of a locale (cached): take it once before a sort, not per comparison. */
+export function collator(loc?: string): Intl.Collator {
   let c = collators.get(loc);
   if (!c) { c = new Intl.Collator(loc, { sensitivity: "base", numeric: true }); collators.set(loc, c); }
-  return c.compare(String(a ?? ""), String(b ?? ""));
+  return c;
+}
+export function compareText(a: unknown, b: unknown, loc?: string): number {
+  return collator(loc).compare(String(a ?? ""), String(b ?? ""));
 }
 
 /**

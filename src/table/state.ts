@@ -6,7 +6,7 @@ import { t, locale } from "../core/i18n.ts";
 import { query as dataQuery, type QueryOptions } from "../data/query.ts";
 import { setQuery } from "../router/router.ts";
 import type { Schema } from "../schema/index.ts";
-import { fold, prop, valueOf, optionsOf, isEmptyFilter, matchFilter, describeFilter, sortRows, encodeFilter, decodeFilter } from "./filters.ts";
+import { fold, prop, valueOf, optionsOf, optionLabels, filterFn, isEmptyFilter, describeFilter, sortRows, encodeFilter, decodeFilter } from "./filters.ts";
 import type { Column, ColumnInput, TableColumn, FilterOption, Pin, Row, SortDir, SortSpec } from "./filters.ts";
 import { toCSV, toJSON, download, type CSVOptions, type JSONOptions } from "./export.ts";
 import { clamp, uid, load, save, debounce } from "../core/util.ts";
@@ -289,17 +289,35 @@ export function createTable<R = Row>(o: TableOptions<R> = {}): TableState<R> {
   // ------------------------------------------------------------------ client pipeline
   const allRows = computed((): readonly R[] => (server ? [] : val(o.rows) ?? []));
   const filtered = computed(() => {
-    let rows = allRows();
+    const rows = allRows();
     const cols = allColumns(), f = filters(), q = fold(search().trim());
-    const active = Object.keys(f).filter((k) => !isEmptyFilter(f[k])).map((k) => [cols.find((c) => c.key === k), f[k]] as const)
-      .filter((x): x is readonly [TableColumn<R>, unknown] => !!x[0]);
-    if (active.length) rows = rows.filter((r) => active.every(([c, v]) => matchFilter(r, c, v)));
-    if (q) {
-      const sc = cols.filter((c) => c.searchable);
-      const text = (r: R, c: TableColumn<R>): unknown => { const v = c.searchValue ? c.searchValue(r) : valueOf(r, c); return c.options ? optionsOf(c).find((x) => x.value === v)?.label ?? v : Array.isArray(v) ? v.join(" ") : v; };
-      rows = rows.filter((r) => sc.some((c) => fold(text(r, c)).includes(q)));
+    // every active filter as a predicate built once (bounds, folded text, option labels), then one pass over the rows
+    // for filters and search together: no intermediate array, no per-row lookup of what does not depend on the row
+    const tests: ((r: R) => boolean)[] = [];
+    for (const k in f) {
+      if (isEmptyFilter(f[k])) continue;
+      const c = cols.find((x) => x.key === k);
+      if (c) tests.push(filterFn(c, f[k]));
     }
-    return rows;
+    const sc: { c: TableColumn<R>; labels: Map<unknown, string> | null }[] = [];
+    if (q) for (const c of cols) if (c.searchable) sc.push({ c, labels: optionLabels(c) });
+    if (!tests.length && !sc.length) return rows;
+    const out: R[] = [];
+    rows: for (let i = 0, n = rows.length; i < n; i++) {
+      const r = rows[i] as R;
+      for (const t of tests) if (!t(r)) continue rows;
+      if (sc.length) {
+        let hit = false;
+        for (const { c, labels } of sc) {
+          const v = c.searchValue ? c.searchValue(r) : valueOf(r, c);
+          const label = labels?.get(v);
+          if (fold(label ?? (Array.isArray(v) ? v.join(" ") : v)).includes(q)) { hit = true; break; }
+        }
+        if (!hit) continue;
+      }
+      out.push(r);
+    }
+    return out;
   });
   const sorted = computed(() => sortRows(filtered(), sort(), allColumns(), locale()));
 
