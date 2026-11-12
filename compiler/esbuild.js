@@ -3,13 +3,20 @@
 //   import { march } from "hadi-march/esbuild";
 //   esbuild.build({ entryPoints: ["src/main.jsx"], bundle: true, plugins: [march({ components: "src/components" })] })
 import { readFile, writeFile } from "node:fs/promises";
-import { existsSync, statSync } from "node:fs";
+import { existsSync, statSync, readdirSync } from "node:fs";
 import { join, resolve, dirname, relative, sep } from "node:path";
 import { compile } from "./index.js";
 import { loadAutoImports, MARCH_ROOT, MODULES } from "./autoimports.js";
 import { setupCssSplit } from "./css-split.js";
 import { deepImports } from "./deep-imports.js";
 import { pruneBareImports } from "./prune-imports.js";
+
+// hadi-march/icons/<pack> and …/<pack>/pack: the icon packs made by `march icons add` (src/icons/packs/<id>/)
+function iconPackModules() {
+  let ids = [];
+  try { ids = readdirSync(join(MARCH_ROOT, "src/icons/packs")); } catch { /* none */ }
+  return ids.flatMap((id) => [[`hadi-march/icons/${id}`, `src/icons/packs/${id}/index.js`], [`hadi-march/icons/${id}/pack`, `src/icons/packs/${id}/pack.js`]]);
+}
 
 /**
  * @param {{ components?: string|string[], i18nOut?: string, dev?: boolean, filter?: RegExp, onKeys?: (keys: string[]) => void, cssSplit?: boolean, deepImports?: boolean }} [opts]
@@ -58,11 +65,11 @@ export function march(opts = {}) {
       if (opts.cssSplit !== false) setupCssSplit(build);
 
       // hadi-march/* → files of this March copy
-      const files = Object.fromEntries([...MODULES, ["hadi-march/icons", "src/icons/index.ts"], ["hadi-march/icons/catalog", "src/icons/catalog.ts"], ["hadi-march/theme", "src/theme/index.ts"], ["hadi-march/seo", "src/seo/index.ts"], ["hadi-march/seo/hydrate", "src/seo/hydrate.ts"], ["hadi-march/testing", "src/testing/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
+      const files = Object.fromEntries([...MODULES, ["hadi-march/icons", "src/icons/index.ts"], ["hadi-march/icons/catalog", "src/icons/catalog.ts"], ["hadi-march/icons/packs", "src/icons/packs.ts"], ...iconPackModules(), ["hadi-march/theme", "src/theme/index.ts"], ["hadi-march/seo", "src/seo/index.ts"], ["hadi-march/seo/hydrate", "src/seo/hydrate.ts"], ["hadi-march/testing", "src/testing/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
       // named imports from March barrels go straight to the defining module (see deep-imports.js); off with deepImports: false
       const deep = opts.deepImports === false ? (c) => c : (c) => (c.includes("hadi-march") ? deepImports(c, files) : c);
       const cwd = build.initialOptions.absWorkingDir ?? process.cwd();
-      build.onResolve({ filter: /^hadi-march(\/[\w-]+){1,2}$|^hadi-march$/ }, (a) => (files[a.path] ? { path: files[a.path] } : undefined));
+      build.onResolve({ filter: /^hadi-march(\/[\w-]+){1,3}$|^hadi-march$/ }, (a) => (files[a.path] ? { path: files[a.path] } : undefined));
       // second pass of march build: small lazy chunks join their parent (static) or a group chunk (see rewriteDynamic)
       const inline = opts.inline ?? {};
       const fixDyn = (code, file) => (inline[file] ? rewriteDynamic(code, inline[file]) : code);

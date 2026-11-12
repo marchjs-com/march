@@ -45,6 +45,9 @@
     "./i18n/tr": "./src/i18n/tr.ts",
     "./icons": "./src/icons/index.ts",
     "./icons/catalog": "./src/icons/catalog.ts",
+    "./icons/packs": "./src/icons/packs.ts",
+    "./icons/*/pack": "./src/icons/packs/*/pack.js",
+    "./icons/*": "./src/icons/packs/*/index.js",
     "./theme": "./src/theme/index.ts",
     "./motion/install": "./src/motion/install.ts",
     "./css/themes/*": "./src/css/themes/*",
@@ -142,6 +145,7 @@
     "./src/net/mock.ts",
     "./src/errors/index.ts",
     "./src/managers/*/index.ts",
-    "./src/managers/*/ui.ts"
+    "./src/managers/*/ui.ts",
+    "./src/icons/packs.ts"
   ]
 }

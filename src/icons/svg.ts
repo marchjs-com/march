@@ -3,7 +3,13 @@
 // createElementNS (no innerHTML, Trusted Types safe); every icon is its own export, so bundlers drop unused ones.
 
 /** An icon: a name (for debugging and data-icon) and its shapes. */
-export interface IconDef { readonly name: string; readonly d: readonly string[]; readonly fill?: boolean }
+export interface IconDef {
+  readonly name: string;
+  readonly d: readonly string[];
+  readonly fill?: boolean;
+  /** Finishes the drawing after the shapes (icon packs: their grid, stroke width, RTL mirroring; see ./pack-paint.ts). */
+  readonly paint?: (svg: SVGSVGElement, def: IconDef) => void;
+}
 
 const NS = "http://www.w3.org/2000/svg";
 
@@ -43,6 +49,7 @@ export function paintIcon(svg: SVGSVGElement, def: IconDef, cls = "hm-svg", labe
   if (label) { svg.setAttribute("role", "img"); svg.setAttribute("aria-label", label); svg.removeAttribute("aria-hidden"); }
   else { svg.removeAttribute("role"); svg.removeAttribute("aria-label"); svg.setAttribute("aria-hidden", "true"); }
   svg.replaceChildren(...def.d.map(shape));
+  def.paint?.(svg, def);
   return svg;
 }
 
