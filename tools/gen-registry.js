@@ -83,10 +83,27 @@ export async function generate(root = ROOT) {
   for (const [page, all] of pages) {
     if (all.length < 2) continue;
     const base = page.replace(/^\//, "").replace(/[^\w-]+/g, "-") || "home";
-    // even slices (4 4 3 3, not 4 4 4 2): a small last module would fall under the chunk floor again
-    const slices = Math.ceil(all.length / GROUP);
+    // a component and the parts it is built from (meta.composedOf) on the same page share a module: split apart, their
+    // common code would become a small chunk that both modules load
+    // (families never grow past a module's size: a feed built from ten social parts still spreads over several modules)
+    // about even slices (4 4 3 3, not 4 4 4 2), cut only between families
+    const target = Math.ceil(all.length / Math.ceil(all.length / GROUP));
+    const byName = new Map(all.map((c) => [nameOf(c), c]));
+    const root = new Map(all.map((c) => [c, c])), size = new Map(all.map((c) => [c, 1]));
+    const find = (c) => { while (root.get(c) !== c) c = root.get(c); return c; };
+    for (const c of all) for (const n of c.meta?.composedOf ?? []) {
+      const d = byName.get(n), a = find(c), b = d && find(d);
+      if (b && a !== b && size.get(a) + size.get(b) <= target) { root.set(a, b); size.set(b, size.get(a) + size.get(b)); }
+    }
+    const families = [...Map.groupBy(all, find).values()];
+    const slicesOf = [];
+    for (const f of families) {
+      const last = slicesOf.at(-1);
+      if (last && last.length + f.length <= target) last.push(...f); else slicesOf.push([...f]);
+    }
+    const slices = slicesOf.length;
     for (let s = 0; s < slices; s++) {
-      const members = all.slice(Math.floor((s * all.length) / slices), Math.floor(((s + 1) * all.length) / slices));
+      const members = slicesOf[s];
       // *.demos.gen.ts: the showcase config lets these stay small lazy files (chunks.allow), never joining the registry
       const file = `${base}${slices > 1 ? `-${s + 1}` : ""}.demos.gen.ts`;
       members.forEach((c, j) => groupOf.set(c.folder, { file, j }));

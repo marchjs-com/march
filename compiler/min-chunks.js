@@ -62,6 +62,18 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
   // estimates come from the previous layout; a group built from them may still cost more once built: such a group is
   // taken apart (its members are planned again next pass) and its members' estimates are scaled by what it really cost
   plan.tight = { ...(prev?.tight ?? {}) };
+  // the other way round: a group may come out smaller than its members' sum (their shared code goes to a shared chunk)
+  // and land under the floor; it is taken apart too, and its members' sizes are scaled by what it really weighed
+  plan.est = { ...(prev?.est ?? {}) };
+  plan.shrink = { ...(prev?.shrink ?? {}) };
+  for (const [name, ms] of Object.entries(plan.groups)) {
+    const k = outByEntry.get(`march-group:${name}`);
+    if (plan.boot.includes(name) || !k || !plan.est[name] || bytes(k) >= minSize) continue;
+    delete plan.groups[name];
+    for (const [imp, list] of Object.entries(plan.inline)) plan.inline[imp] = list.filter((x) => x.group !== name);
+    for (const m of ms) plan.shrink[m.key] = Math.min(plan.shrink[m.key] ?? 1, (bytes(k) / plan.est[name]) * 0.95);
+    added++;
+  }
   const tightOf = (x, y) => Math.max(1, ...[...x.keys, ...y.keys].map((k) => plan.tight[k] ?? 1));
   const fits = (x, y) => !maxLoad || load(x, y) * tightOf(x, y) <= maxLoad;
   if (maxLoad) for (const [name, ms] of Object.entries(plan.groups)) {
@@ -81,7 +93,7 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
   const fresh = [...new Map(toEntry.filter((p) => !known.has(posix(p.target))).map((p) => [posix(p.target), p])).values()];
   let g = Math.max(-1, ...Object.keys(plan.groups).map((n) => Number(n.slice(1)) || 0)) + 1;
   if (fresh.length) {
-    let clusters = fresh.map((p) => { const k = outByEntry.get(posix(p.target)); return { keys: [posix(p.target)], size: bytes(k), reach: closure(k) }; });
+    let clusters = fresh.map((p) => { const k = outByEntry.get(posix(p.target)); return { keys: [posix(p.target)], size: bytes(k) * (plan.shrink[posix(p.target)] ?? 1), reach: closure(k) }; });
     // shared share of the merged reach, and the merged reach in bytes (what loading any member of the group costs)
     const affinity = (x, y) => { let both = 0, any = 0; for (const k of new Set([...x.reach, ...y.reach])) { const w = bytes(k); any += w; if (x.reach.has(k) && y.reach.has(k)) both += w; } return [any ? both / any : 0, any]; };
     const maxGroup = minSize * 4;
@@ -120,6 +132,7 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
         // into a group that is already built: it gains a member
         for (const key of x.keys) { const m = { abs: resolve(cwd, key), name: `n${plan.groups[y.name].length}`, key, group: y.name }; plan.groups[y.name].push(m); known.set(key, m); }
         y.keys.push(...x.keys); y.size += x.size; for (const r of x.reach) y.reach.add(r);
+        if (plan.est[y.name]) plan.est[y.name] += x.size;
       } else {
         const j = clusters.indexOf(y);
         clusters[j] = { keys: [...y.keys, ...x.keys], size: x.size + y.size, reach: new Set([...x.reach, ...y.reach]) };
@@ -140,6 +153,7 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
       if (c.size < minSize) { for (const key of c.keys) known.set(key, { key, static: true }); continue; }
       if (c.keys.length < 2) continue;
       const name = `g${g++}`;
+      plan.est[name] = c.size;
       plan.groups[name] = c.keys.map((key, n) => ({ abs: resolve(cwd, key), name: `n${n}`, key, group: name }));
       for (const m of plan.groups[name]) known.set(m.key, m);
     }

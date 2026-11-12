@@ -138,6 +138,9 @@ async function build({ dev = false } = {}) {
     // chunks.minSize: no output file under it (default 10 KB before gzip); small lazy modules need a second pass
     const minSize = cfg.chunks === false ? 0 : cfg.chunks?.minSize ?? cfg.packChunks?.minSize ?? 10240;
     const allow = (cfg.chunks && cfg.chunks.allow) || {};
+    // the planners aim 5% over the floor: their sizes come before the final rewrites (shorter import names, CSS loaders
+    // stripped), which shrink a file a little — a chunk planned at 10.1 KB must not end at 9.9 KB
+    const aim = Math.ceil(minSize * 1.05);
     let plan = null, r;
     for (let pass = 0; pass < 6; pass++) {
       if (pass) rmSync(resolve(out, "assets"), { recursive: true, force: true });
@@ -150,8 +153,8 @@ async function build({ dev = false } = {}) {
       const minify = flag("--no-minify") !== true;
       await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
       // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
-      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: minSize || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan) });
-      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
+      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: aim || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan) });
+      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
       if (!next) break;
       plan = next;
     }

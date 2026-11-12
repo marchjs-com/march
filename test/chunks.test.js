@@ -86,8 +86,8 @@ test("min-chunks: start-up pieces (budget.boot) group only with each other, neve
 
 test("tagLoaders tags bare loaders only: () => import(x).then(…) stays a function returning a promise", () => {
   const root = fileURLToPath(new URL("..", import.meta.url));
-  const file = join(root, "src/components/chip/demo.tsx");
-  assert.equal(tagLoaders(`f(() => import("./index.ts"))`, file, root), `f(Object.assign(() => import("./index.ts"), { hm: "src/components/chip/index.ts" }))`);
+  const file = join(root, "src/components/actions/chip/demo.tsx");
+  assert.equal(tagLoaders(`f(() => import("./index.ts"))`, file, root), `f(Object.assign(() => import("./index.ts"), { hm: "src/components/actions/chip/index.ts" }))`);
   const chained = `lazy(() => import("./index.ts").then((m) => ({ default: m.Chip })))`;
   assert.equal(tagLoaders(chained, file, root), chained);
 });
