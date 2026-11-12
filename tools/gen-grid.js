@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// src/ui/grid.css is generated: the balance table and the span mode are long, regular rule sets.
+// src/components/layout/grid/grid.css is generated: the balance table and the span mode are long, regular rule sets.
 //   node tools/gen-grid.js           write it
 //   node tools/gen-grid.js --check   fail when it is stale (test/grid.test.js)
 //
@@ -11,7 +11,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const OUT = fileURLToPath(new URL("../src/ui/grid.css", import.meta.url));
+const OUT = fileURLToPath(new URL("../src/components/layout/grid/grid.css", import.meta.url));
 const BASE = 60;
 export const MIN_COLS = [9, 13, 17]; // rem; Grid maps minCol to the nearest
 const GAP = 1; // rem assumed between columns when computing the breakpoints
@@ -68,9 +68,9 @@ for (const m of MIN_COLS) for (let c = 1; c <= 6; c++) for (let k = 1; k <= c; k
 
 const css = `${L.join("\n")}\n`;
 if (process.argv.includes("--check")) {
-  if (readFileSync(OUT, "utf8") !== css) { console.error("✖ src/ui/grid.css is stale: node tools/gen-grid.js"); process.exit(1); }
+  if (readFileSync(OUT, "utf8") !== css) { console.error("✖ src/components/layout/grid/grid.css is stale: node tools/gen-grid.js"); process.exit(1); }
   console.log("✔ grid.css up to date");
 } else if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   writeFileSync(OUT, css);
-  console.log(`✔ src/ui/grid.css (${L.length} lines, ${(css.length / 1024).toFixed(1)} KB)`);
+  console.log(`✔ src/components/layout/grid/grid.css (${L.length} lines, ${(css.length / 1024).toFixed(1)} KB)`);
 }

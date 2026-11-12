@@ -7,7 +7,7 @@ import { effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, uid, clamp, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { Steps, type StepItem } from "../../../ui/steps.ts";
+import { Steps, type StepItem } from "../steps/index.ts";
 import { Button } from "../../../ui/button.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";

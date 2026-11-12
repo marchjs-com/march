@@ -3,7 +3,7 @@
 // between rows, → opens and ← closes a category (← on an item goes to its category), Enter activates, typing filters.
 // Remembers open categories and recent visits (localStorage); icon rail mode; drawer with a menu button on small screens.
 import "./nav-sidebar.css";
-import "../../../ui/nav.css";
+import "../../navigation/nav-menu/nav-menu.css";
 import "../../../ui/button.css";
 import "../../../ui/display.css";
 import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";

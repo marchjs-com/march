@@ -313,3 +313,84 @@ test("packChunks: entry stubs and tiny shared chunks fold away; every import sti
     for (const k of keys) for (const im of app.meta.outputs[k].imports ?? []) if (im.path.endsWith(".js")) assert.ok(app.meta.outputs[im.path], `metafile: ${im.path} exists`);
   } finally { app.cleanup(); }
 });
+
+test("packChunks: small shared code with no free host goes to one common chunk; the manifest lists it under march:common", async () => {
+  const { mergeEntry } = await import("../compiler/merge-entry.js");
+  const { packChunks } = await import("../compiler/pack-chunks.js");
+  const esbuild = await import("esbuild");
+  const app = await buildApp({
+    "main.tsx": `import { render } from "hadi-march"
+import { createRouter, Router } from "hadi-march/router"
+createRouter({ routes: { "/a": () => import("./a.tsx"), "/b": () => import("./b.tsx"), "/c": () => import("./c.tsx") } })
+render(() => h(Router, {}), document.body)
+`,
+    "s1.ts": `export const one = (x: number) => x + 1
+`,
+    "s2.ts": `export const two = (x: number) => x * 2
+`,
+    "a.tsx": `import { one } from "./s1.ts"
+import { two } from "./s2.ts"
+export default () => <p>{one(two(1))}</p>
+`,
+    "b.tsx": `import { one } from "./s1.ts"
+export default () => <p>{one(1)}</p>
+`,
+    "c.tsx": `import { two } from "./s2.ts"
+export default () => <p>{two(2)}</p>
+`,
+  });
+  try {
+    const outs = app.meta.outputs;
+    const entryKey = Object.keys(outs).find((k) => outs[k].entryPoint === "main.tsx");
+    await mergeEntry(app.meta, { cwd: app.dir, entryKey, esbuild });
+    const budgetOf = Object.assign((k) => (outs[k]?.entryPoint ? { limit: 60 * 1024 } : undefined), { bootLimit: 52 * 1024, partLimit: 25 * 1024 });
+    const r = await packChunks(app.meta, { cwd: app.dir, entryKey, esbuild, minSize: 10240, budgetOf, fallback: false });
+    assert.equal(r.common, 1, "one common chunk");
+    const common = Object.keys(outs).filter((k) => outs[k].common);
+    assert.equal(common.length, 1);
+    const pages = Object.keys(outs).filter((k) => /^(a|b|c)\.tsx$/.test(outs[k].entryPoint ?? ""));
+    for (const p of pages) assert.ok(outs[p].imports.some((im) => im.path === common[0]), `${outs[p].entryPoint} imports the common chunk`);
+    const keys = Object.keys(outs).filter((k) => k.endsWith(".js"));
+    assert.ok(!keys.some((k) => !outs[k].entryPoint && !outs[k].common && k !== entryKey), "no other shared chunk is left");
+    const names = new Set(keys.map((k) => k.split("/").pop()));
+    for (const k of keys) for (const m of readFileSync(resolve(app.dir, k), "utf8").matchAll(/["'](\.{1,2}\/[^"']+\.js)["']/g)) assert.ok(names.has(m[1].split("/").pop()), `${k} → ${m[1]} exists`);
+    const m = chunkManifest(app.meta, { cwd: app.dir, outdir: app.outdir, entry: "main.tsx" });
+    assert.equal(m.manifest["march:common"]?.length, 1, "manifest: march:common");
+    assert.ok(m.manifest["a.tsx"].includes(m.manifest["march:common"][0]), "a route's files include the common chunk");
+  } finally { app.cleanup(); }
+});
+
+test("prefetchCommon: the common chunk is prefetched at the lowest priority, never with Save-Data", () => {
+  const { prefetchCommon, setPreloadManifest } = L;
+  const links = () => [...document.querySelectorAll("link[data-march-preload]")].filter((l) => l.getAttribute("href").includes("common"));
+  setPreloadManifest({ "march:common": ["assets/chunks/common.js"] }, "https://x.test/");
+  const nav = globalThis.navigator;
+  Object.defineProperty(nav, "connection", { value: { saveData: true }, configurable: true });
+  assert.equal(prefetchCommon(), false, "Save-Data: nothing");
+  assert.equal(links().length, 0);
+  Object.defineProperty(nav, "connection", { value: { saveData: false, effectiveType: "4g" }, configurable: true });
+  assert.equal(prefetchCommon(), true);
+  assert.equal(links().length, 1);
+  assert.equal(links()[0].getAttribute("rel"), "prefetch");
+  delete nav.connection;
+  for (const l of links()) l.remove();
+  setPreloadManifest(null);
+});
+
+test("start-up does not grow with the page count: more pages add only their route row to the entry", async () => {
+  const app = async (n) => {
+    const names = Array.from({ length: n }, (_, i) => `p${i}`);
+    const files = {
+      "main.tsx": `import { render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { ${names.map((p) => `"/${p}": () => import("./${p}.tsx")`).join(", ")} } })\nrender(() => h(Router, {}), document.body)\n`,
+    };
+    for (const p of names) files[`${p}.tsx`] = `import { Card } from "hadi-march/ui"\nexport default () => <Card title="${p}">${"page body ".repeat(40)}${p}</Card>\n`;
+    const a = await buildApp(files);
+    try {
+      const m = chunkManifest(a.meta, { cwd: a.dir, outdir: a.outdir, entry: "main.tsx" });
+      return m.entryFiles.filter((f) => f.endsWith(".js")).reduce((s, f) => s + gzipSync(readFileSync(resolve(a.outdir, f))).length, 0);
+    } finally { a.cleanup(); }
+  };
+  const few = await app(3), many = await app(30);
+  // a route row ("/p12": () => import("./p12-HASH.js") with its manifest tag) is all a page may add
+  assert.ok((many - few) / 27 <= 64, `start-up: ${few} B with 3 pages, ${many} B with 30 (${((many - few) / 27).toFixed(1)} B per page)`);
+});

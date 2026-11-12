@@ -147,6 +147,10 @@ Overlays never take input; put content after them. `front` only for foreground e
 - `chunks: { minSize: 10240, allow: { "chunks/x.js": "reason" } }` (default 10 KB before gzip): no JS/CSS file under it. Small shared code
   folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
   parent, or joins a group chunk with the entry's other small lazy modules that share the most code (second build pass).
+  Small shared code with no host at all (start-up at `budget.bootLimit`, every partner over a budget) goes into a shared
+  `common` chunk outside start-up (split by users when it would pass `budget.part`): routes import it, and the router
+  prefetches it when idle after the first page (`prefetchCommon()`, manifest key `march:common`, never with Save-Data).
+  `chunks.commonRoom` (gzip bytes) keeps page groups that far under `budget.route`, so it still fits.
   A file still under the limit fails the build; `allow` needs a reason. `chunks: false` turns it off.
 
 **Don't (security)**
@@ -533,7 +537,20 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Accordion | stable | Stacked sections that open one at a time or several together: animated height, ↑ ↓ Home End between headers, separated or contained look. | — |
+| AppShell | stable | The application frame: a sidebar column and the main area with optional banner and sticky header; a skip link; full width on narrow screens. | — |
+| Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | — |
+| Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
+| Spacer | stable | A flexible gap in a row that pushes the following items to the end. | — |
+| Splitter | stable | Two resizable panes: drag the handle or use the arrow keys (mirrored in RTL), Home / End, Enter resets. | — |
+| Stack | stable | Layout primitives: Stack (a row or column with token gaps and alignment), Toolbar (a labelled bar of controls), Divider (a rule, labelled or vertical). | — |
 | StatusBar | experimental | Bottom strip of an editor or app: start / end items, text or buttons (actions or command ids), tones with a breathing busy dot, live announcements, low-priority items to a … menu when narrow. | Menu, Tooltip |
+
+### Typography — `hadi-march/typography`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| OverflowText | stable | Text that scrolls only when it does not fit: hover, focus, always or while visible; bounce, loop or once; RTL-aware fade; Marquee is the endless ticker. | — |
 
 ### Actions — `hadi-march/actions`
 
@@ -572,7 +589,11 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 |---|---|---|---|
 | ActivityBar | experimental | Editor icon bar that switches the side view: a tablist with a gliding indicator, count badges, end items, collapse by choosing the active view again; vertical or horizontal, RTL aware. | Badge, Tooltip |
 | Breadcrumbs | experimental | Path bar: links, buttons or sibling menus per crumb; the middle collapses into a … menu when narrow; separators mirrored in RTL. | Menu |
+| NavMenu | stable | Sidebar navigation for apps: collapsible groups, pinned and recent items, a filter box, the active item from the router; a drawer on narrow screens. | Badge, OverflowText |
+| Pagination | stable | Numbered pages with ellipses and Previous / Next; the current page is marked for screen readers. | — |
 | Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
+| Steps | stable | Progress through stages: done, current and upcoming steps with titles and descriptions; clickable when onSelect is given; horizontal or vertical. | — |
+| Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), badges, disabled and hidden tabs, the active tab optionally kept in the URL. | — |
 
 ### Motion — `hadi-march/motion`
 

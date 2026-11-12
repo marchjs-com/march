@@ -122,6 +122,8 @@ function budgetOf(budget, meta, plan) {
   };
   // start-up beyond the entry (the "(boot)" row of the size report)
   of.bootLimit = budget.bootLimit ?? budget.route ?? 60 * 1024;
+  // a shared "common" chunk is a lazy download of its own: the part budget
+  of.partLimit = budget.part ?? budget.route ?? 60 * 1024;
   return of;
 }
 
@@ -154,7 +156,9 @@ async function build({ dev = false } = {}) {
       await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
       // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
       if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: aim || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan) });
-      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
+      // chunks.commonRoom (gzip bytes): page groups stay this far under the route budget, so the shared "common" chunk
+      // (pack-chunks.js) still fits on every route that loads it
+      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route - (cfg.chunks?.commonRoom ?? 0) : undefined, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
       if (!next) break;
       plan = next;
     }

@@ -1,8 +1,2 @@
-// Spacer (hadi-march/ui): its own module so a top bar does not pull in the rest of app.ts (menus, dialogs).
-import "./app.css";
-import { h } from "../dom/h.ts";
-
-/** Flexible gap in a row (pushes the following items to the end). */
-export function Spacer(_props: Record<string, never> = {}): Element {
-  return h("span", { class: "hm-spacer", "aria-hidden": "true" });
-}
+// Moved to src/components/layout/spacer/ (component folder); this path keeps working for existing imports.
+export * from "../components/layout/spacer/index.ts";

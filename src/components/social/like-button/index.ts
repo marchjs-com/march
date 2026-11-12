@@ -84,7 +84,7 @@ export function LikeButton(props: LikeButtonProps): Element {
   return h("button", {
     type: "button",
     class: () => cx("hm-like", `hm-like-${val(props.size) ?? "md"}`, val(props.liked) && "is-liked", val(props.class)),
-    "data-hm-color": colorAttr(props.color ?? "brand-pink"),
+    "data-hm-color": () => colorAttr(props.color ?? "brand-pink"),
     "aria-pressed": () => String(!!val(props.liked)),
     "aria-label": () => val(props.label) ?? t`Like`,
     onClick: toggle,
