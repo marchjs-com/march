@@ -102,7 +102,7 @@ export function sizeReport(m, outdir, budget, routes = {}) {
   const b = budget === false ? null : { entry: 15 * 1024, route: 60 * 1024, fail: false, ...(budget ?? {}) };
   const over = [];
   for (const r of rows) {
-    r.limit = !b ? Infinity : r.kind === "entry" ? b.entry : r.kind === "boot" ? b.bootLimit ?? b.route : r.kind === "route" ? b.routes?.[r.name] ?? b.route : r.kind === "layout" ? b.route : b.part ?? b.route;
+    r.limit = !b ? Infinity : r.kind === "entry" ? b.entry : r.kind === "boot" ? b.bootLimit ?? b.route : r.kind === "route" ? b.routes?.[r.name] ?? b.route : r.kind === "layout" ? b.route : b.parts?.[r.key]?.limit ?? b.part ?? b.route;
     r.cssLimit = b?.css ?? Infinity;
     r.over = r.js > r.limit || r.css > r.cssLimit;
     if (r.over) over.push(r);

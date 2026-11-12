@@ -1,7 +1,7 @@
 // Headless Chromium (Edge / Chrome) over CDP for the browser audits: serves examples/showcase/dist (unless a base URL
 // is given), starts the browser with a throwaway profile and returns small helpers.
 //
-//   const b = await openHeadless({ base })        b.base, b.send(method, params), b.ev(expr), b.errs, b.load(route, w)
+//   const b = await openHeadless({ base, csp, args })  csp: serve with the showcase's strict CSP header (build.mjs)        b.base, b.send(method, params), b.ev(expr), b.errs, b.load(route, w)
 //   await b.close()
 // Browser: $BROWSER_PATH, else Edge / Chrome in the usual places.
 import { spawn } from "node:child_process";
@@ -23,8 +23,10 @@ export function showcaseRoutes() {
   return existsSync(navFile) ? [...readFileSync(navFile, "utf8").matchAll(/path: "([^"]+)"/g)].map((m) => m[1]) : ["/"];
 }
 
-export async function openHeadless({ base = null } = {}) {
+export async function openHeadless({ base = null, csp = false, args = [] } = {}) {
   let server;
+  // the published showcase's CSP, read from build.mjs (importing it would start a build)
+  const policy = csp ? readFileSync(join(ROOT, "examples/showcase/build.mjs"), "utf8").match(/export const CSP = "([^"]+)"/)?.[1] : null;
   if (!base) {
     const dist = join(ROOT, "examples/showcase/dist");
     if (!existsSync(dist)) { console.error("✖ examples/showcase/dist is missing: run node examples/showcase/build.mjs first"); process.exit(2); }
@@ -32,7 +34,7 @@ export async function openHeadless({ base = null } = {}) {
     server = createServer((req, res) => {
       let p = resolve(dist, "." + decodeURIComponent(new URL(req.url, "http://x").pathname));
       if (!p.startsWith(dist) || !existsSync(p) || statSync(p).isDirectory()) p = join(dist, "index.html");
-      res.writeHead(200, { "content-type": TYPES[extname(p)] ?? "application/octet-stream" });
+      res.writeHead(200, { "content-type": TYPES[extname(p)] ?? "application/octet-stream", ...(policy ? { "content-security-policy": policy } : {}) });
       res.end(readFileSync(p));
     });
     await new Promise((r) => server.listen(0, "127.0.0.1", r));
@@ -44,7 +46,7 @@ export async function openHeadless({ base = null } = {}) {
   if (!exe) { console.error("✖ Edge/Chrome not found (set BROWSER_PATH)"); process.exit(2); }
   const port = 9300 + Math.floor(Math.random() * 500);
   const profile = mkdtempSync(join(tmpdir(), "march-audit-"));
-  const browser = spawn(exe, ["--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "--no-first-run", "--disable-extensions", "--hide-scrollbars", "about:blank"], { stdio: "ignore" });
+  const browser = spawn(exe, ["--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "--no-first-run", "--disable-extensions", "--hide-scrollbars", ...args, "about:blank"], { stdio: "ignore" });
   let target;
   for (let i = 0; i < 80 && !target; i++) { try { target = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()).find((t) => t.type === "page"); } catch { await sleep(200); } }
   const ws = new WebSocket(target.webSocketDebuggerUrl);
