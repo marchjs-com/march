@@ -8,8 +8,6 @@ export interface ComponentMeta {
   /** Exported component name. */
   name: string;
   status: Stability;
-  /** Group of the component (for example "actions"). */
-  category?: string;
   /** Version it appeared in. */
   since: string;
   /** One line for catalogues. */

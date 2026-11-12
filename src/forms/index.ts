@@ -1,6 +1,8 @@
 // HADI March forms: schema-driven forms, field wrapper and a complete input set. Styles: "hadi-march/css/forms.css".
-export { useForm, useFormContext, FormContext, Form, Field, FormActions, EditForm, renderFields, clone, deepEqual } from "./form.ts";
-export type { FormController, FormOptions, FormProps, FieldProps, FormActionsProps, EditFormProps, FormSection, FieldsLayout, SaveContext,
+export { useForm, useFormContext, Form, FormActions, EditForm, renderFields, clone, deepEqual } from "./form.ts";
+export { Field, FormContext } from "./field.ts";
+export type { FieldProps } from "./field.ts";
+export type { FormController, FormOptions, FormProps, FormActionsProps, EditFormProps, FormSection, FieldsLayout, SaveContext,
   ReasonValue, ReasonOptions, ReasonPrompt, RegisterProps, ValidateOn, FieldName } from "./form.ts";
 export { Wizard } from "./wizard.ts";
 export type { WizardProps, WizardStep, WizardApi } from "./wizard.ts";

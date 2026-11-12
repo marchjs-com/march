@@ -105,6 +105,26 @@ async function copyThemes(out, esbuild, { dev }) {
   }
 }
 
+/** Budget of a lazy output (gzip bytes): a start-up piece, a route (its page module) or a lazy part; undefined without a budget. */
+function budgetOf(budget, meta, plan) {
+  if (!budget) return undefined;
+  const boot = new Set((budget.boot ?? []).map((k) => k.split(sep).join("/")));
+  const outs = meta.outputs;
+  const routes = routePaths(meta, cwd, Object.values(outs).map((o) => o.entryPoint).filter(Boolean).map((k) => k.split(sep).join("/")));
+  const of = (k) => {
+    const ep = (outs[k]?.entryPoint ?? "").split(sep).join("/");
+    if (!ep) return undefined;
+    // a group of small pages / parts (min-chunks): each member's download includes the whole group
+    if (ep.startsWith("march-group:")) return plan?.boot?.includes(ep.slice(12)) ? { boot: true } : { limit: budget.route ?? 60 * 1024 };
+    if (boot.has(ep)) return { boot: true };
+    const path = routes[ep];
+    return { limit: path ? budget.routes?.[path] ?? budget.route ?? 60 * 1024 : budget.part ?? budget.route ?? 60 * 1024 };
+  };
+  // start-up beyond the entry (the "(boot)" row of the size report)
+  of.bootLimit = budget.bootLimit ?? budget.route ?? 60 * 1024;
+  return of;
+}
+
 async function build({ dev = false } = {}) {
   const cfg = await loadConfig();
   const esbuild = await loadEsbuild();
@@ -130,14 +150,16 @@ async function build({ dev = false } = {}) {
       const minify = flag("--no-minify") !== true;
       await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
       // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
-      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: minSize || 2048 });
-      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, boot: cfg.budget?.boot ?? [], prev: plan }) : null;
+      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: minSize || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan) });
+      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined }) : null;
+      if (process.env.MARCH_PLAN_DEBUG) console.log("PLAN", JSON.stringify(next && { groups: Object.fromEntries(Object.entries(next.groups).map(([g, ms]) => [g, ms.map((m) => m.key)])), boot: next.boot, inline: Object.fromEntries(Object.entries(next.inline).map(([k, v]) => [k.slice(-40), v.map((x) => x.spec + ":" + x.mode + (x.group ?? ""))])) }));
       if (!next) break;
       plan = next;
     }
     // final names: every rewritten file gets a new content version (a cached file must never point at another build),
     // no name starts with _ or . (some hosts refuse those); stable names on request
     if (!dev) rehashOutputs(r.metafile, { cwd, stable: !!cfg.stableNames || flag("--stable-names") === true });
+    if (process.env.MARCH_PLAN_DEBUG) writeFileSync(join(cwd, ".march-meta.json"), JSON.stringify(r.metafile));
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
     aliasGroups(chunks.manifest, plan);
     writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);

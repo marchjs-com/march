@@ -11,6 +11,7 @@
 // entry directly. The extra bytes a fold costs (pages that load B but did not need T) are kept small by choosing the B
 // with the fewest such pages. Names are fixed afterwards by rehashOutputs.
 import { readFileSync, writeFileSync, rmSync, existsSync } from "node:fs";
+import { gzipSync } from "node:zlib";
 
 /** Remove the CSS loader of `css` (css-split.js form, plain or minified) from a chunk's code; null when not found. */
 function stripCssLoader(code, css) {
@@ -68,11 +69,15 @@ function graph(outs) {
 
 /**
  * @param {import("esbuild").Metafile} meta
- * @param {{ cwd: string, entryKey: string, esbuild: typeof import("esbuild"), minify?: boolean, minSize?: number }} o
+ * `budgetOf(outputKey)` (from march.config.js › budget): `{ boot: true }` for a start-up piece, else `{ limit }` in gzip
+ * bytes (route or lazy part). A fold that is not free never pushes a route or part past its limit.
+ * @param {{ cwd: string, entryKey: string, esbuild: typeof import("esbuild"), minify?: boolean, minSize?: number, budgetOf?: (k: string) => { boot?: boolean, limit?: number } | undefined }} o
  * @returns {Promise<{ stubs: number, folded: number, cssMoved: number }>}
  */
-export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048 }) {
+export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048, budgetOf }) {
   const outs = meta.outputs;
+  const gzCache = new Map();
+  const gz = (k) => { if (!gzCache.has(k)) { const f = resolve(cwd, k); gzCache.set(k, existsSync(f) ? gzipSync(readFileSync(f)).length : 0); } return gzCache.get(k); };
   const text = (k) => readFileSync(resolve(cwd, k), "utf8");
   let stubs = 0, folded = 0;
 
@@ -114,6 +119,32 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
       // also get T, pages that load T now also get B. Never the entry; never a merge that would close an import cycle.
       if (!best) {
         const bytes = (k) => outs[k].bytes ?? 0;
+        // what start-up already downloaded (the entry, the boot pieces) is not part of a route's or part's cost
+        const have = new Set([...g.closure(entryKey), ...g.js.filter((e) => outs[e].entryPoint && budgetOf?.(e)?.boot).flatMap((e) => [...g.closure(e)])]);
+        // after T and B become one file, everyone loading either loads both closures: none may go past its budget
+        const bootEntries = g.js.filter((e) => outs[e].entryPoint && budgetOf?.(e)?.boot);
+        const fits = (b) => {
+          if (!budgetOf) return true;
+          const both = new Set([...g.closure(b), ...g.closure(t)]);
+          // into a start-up piece: start-up as a whole (beyond the entry) stays within its own budget
+          if (bootEntries.some((e) => g.closure(e).has(b))) {
+            const lim = budgetOf.bootLimit;
+            if (lim != null) {
+              let n = 0;
+              const entry = g.closure(entryKey);
+              for (const x of new Set([...bootEntries.flatMap((e) => [...g.closure(e)]), ...both])) if (!entry.has(x)) n += gz(x);
+              if (n > lim) return false;
+            }
+          }
+          for (const e of new Set([...rt, ...g.reach.get(b)])) {
+            const lim = budgetOf(e)?.limit;
+            if (lim == null) continue;
+            let n = 0;
+            for (const x of new Set([...g.closure(e), ...both])) if (!have.has(x)) n += gz(x);
+            if (n > lim) return false;
+          }
+          return true;
+        };
         for (const b of g.js) {
           if (b === t || b === entryKey || outs[b].entryPoint) continue; // a page or lazy part never becomes a static dependency
           const rb = g.reach.get(b), cb = g.closure(b), ct = g.closure(t);
@@ -122,13 +153,14 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
           if (users.some((u) => u !== b && cb.has(u))) continue;
           // what each side newly downloads is the other's whole static closure, not just its own file: a small chunk with
           // heavy imports must not ride along with a start-up chunk
-          const extra = (from, have) => [...from].reduce((s, x) => s + (have.has(x) ? 0 : bytes(x)), 0);
+          // (start-up downloads are already there for everyone: a start-up piece is a free host for widely shared code)
+          const extra = (from, got) => [...from].reduce((s, x) => s + (got.has(x) || have.has(x) ? 0 : bytes(x)), 0);
           const c = [...rt].filter((e) => !rb.has(e)).length * extra(cb, ct) + [...rb].filter((e) => !rt.has(e)).length * extra(ct, cb);
-          if (c < cost) { cost = c; best = b; }
+          if (c < cost && fits(b)) { cost = c; best = b; }
         }
       }
       if (!best || !(await fold(t, best, g.importers.get(t) ?? []))) { skip.add(t); continue; }
-      folded++; done = true; break;
+      folded++; done = true; gzCache.clear(); break;
     }
     if (!done) break;
   }
