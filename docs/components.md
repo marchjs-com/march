@@ -15,6 +15,8 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [Chip](#chip), Menu, FilterControl, CellEditor |
+| Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | — |
+| Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | Button, IconButton, ButtonGroup, Segmented |
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
@@ -128,6 +130,20 @@ Composed of: [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [Post
 
 Full page: src/components/composite/feed/docs.md
 
+## Gantt
+
+A project timeline. Each task is a bar on a day / week / month scale with its progress filled in; dependency arrows link a predecessor's end to its successor's start (red and dashed while they overlap). Drag a bar to move it, drag its ends to resize it, drag the knob under it to set progress. With `cascade`, successors that would start before their predecessor ends are pushed later, keeping their length. A today line marks the current day; the task names stay pinned while the timeline scrolls.
+
+```tsx
+import { Gantt } from "hadi-march/components/data/gantt";
+
+<Gantt tasks={$tasks} scale="day" cascade
+  onChange={(task) => api.save(task)}
+  onSelect={(task) => open(task)} />
+```
+
+Full page: src/components/data/gantt/docs.md
+
 ## LikeButton
 
 A heart toggle with a rolling count. Liking squashes and overshoots the heart on a spring, grows a ring and throws a burst of particles in the four HADİ colors; unliking is a small press. Everything runs on the motion engine, so the global speed, "pause all" and reduced motion apply (reduced motion keeps only the fill change).
@@ -200,6 +216,23 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 ```
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
+
+## Scheduler
+
+A month / week / day calendar of events. Drag an event to move it (minutes snap to `step`; across columns it changes day), drag its edge to resize it, drag on an empty slot to create one. Dates and times are formatted with Intl in the current locale: month and weekday names, the first day of the week, 12 / 24 hour clock and the reading direction. Overlapping events share the column width; all-day and multi-day events sit in their own lane as bars.
+
+Composed of: Button, IconButton, ButtonGroup, Segmented
+
+```tsx
+import { Scheduler } from "hadi-march/components/data/scheduler";
+
+<Scheduler events={$events} view="week" step={15}
+  onChange={(event, range) => api.update(event.id, range)}
+  onCreate={(range) => $events = [...$events, { id: uid(), title: "New", ...range }]}
+  onSelect={(event) => open(event)} />
+```
+
+Full page: src/components/data/scheduler/docs.md
 
 ## TreeView
 
