@@ -7,7 +7,7 @@
 // engine animates the old page out and the new one in. Back reverses the animation; "slide" follows the text
 // direction (RTL mirrors it). Reduced motion or a paused engine: the swap is instant. Named outlets and the modal
 // outlet get the same transitions (the modal's own dialog opens and closes it).
-import { setNavigationWrapper, transitionOutlet, type NavInfo } from "../router/index.ts";
+import { setNavigationWrapper, transitionOutlet, _router as I } from "../router/index.ts";
 import type { OutletWrapper } from "../router/outlets.ts";
 // the outlets module is the router's own lazy part: loaded here only to hand it the outlet transition
 const outlets = (fn: OutletWrapper | null): Promise<void> => import("../router/outlets.ts").then((m) => m.setOutletWrapper(fn), () => undefined);
@@ -46,9 +46,13 @@ export function transitionFrames(type: PageTransitionType, side: "in" | "out", d
 const TYPES = new Set(["fade", "slide", "scale", "none"]);
 export interface ResolvedTransition { type: PageTransitionType; duration: number; easing: string; distance: number }
 /** The transition of a swap: the route shown decides going forward, the route left going back (so back reverses it). */
-export function resolveTransition(base: PageTransitionSpec, to: Record<string, unknown> | undefined, from: Record<string, unknown> | undefined, dir: Dir): ResolvedTransition {
-  const pick = (m: Record<string, unknown> | undefined): PageTransitionSpec | null => {
-    const v = m?.["transition"];
+/** One side of a swap: the route's meta (route + page module) and its params. */
+export interface TransitionSide { meta?: Record<string, unknown>; params?: Record<string, string> }
+/** `meta.transition` may also be a function of the route params (one route, several transitions). */
+export function resolveTransition(base: PageTransitionSpec, to: TransitionSide | null | undefined, from: TransitionSide | null | undefined, dir: Dir): ResolvedTransition {
+  const pick = (side: TransitionSide | null | undefined): PageTransitionSpec | null => {
+    let v = side?.meta?.["transition"];
+    if (typeof v === "function") v = (v as (p: Record<string, string>) => unknown)(side?.params ?? {});
     if (typeof v === "string" && TYPES.has(v)) return { type: v as PageTransitionType };
     if (v === false) return { type: "none" };
     return v && typeof v === "object" ? (v as PageTransitionSpec) : null;
@@ -95,16 +99,31 @@ function isRtl(): boolean {
   return (root.getAttribute?.("dir") || globalThis.getComputedStyle?.(root)?.direction) === "rtl";
 }
 
-// back or forward: the history order the router keeps in history.state.hmIdx (a popstate to a lower index is "back");
-// one answer per history entry, so a page and an outlet swapping in the same navigation agree
+// back or forward: every history entry gets its order in history.state.hmIdx the first time a swap sees it (a new
+// entry is one past the last); a popstate to a lower index is "back". One answer per entry, so a page and an outlet
+// swapping in the same navigation agree. Kept here, not in the router: the router entry stays as small as it was.
 let lastIdx = 0, lastState: unknown, lastDir: Dir = "forward";
+function stamp(idx: number): void {
+  const h = globalThis.history;
+  try { h?.replaceState({ ...((h.state as object | null) ?? {}), hmIdx: idx }, ""); } catch { /* sandboxed */ }
+}
 function direction(pop: boolean): Dir {
   const st = globalThis.history?.state as { hmIdx?: number } | null;
   if (st && st === lastState) return lastDir;
-  const idx = typeof st?.hmIdx === "number" ? st.hmIdx : 0;
+  let idx = st?.hmIdx;
+  // an entry without an order is one this app just pushed (the entry it started on is stamped at install)
+  if (typeof idx !== "number") { idx = lastIdx + 1; stamp(idx); }
   lastDir = pop && idx < lastIdx ? "back" : "forward";
-  lastIdx = idx; lastState = st;
+  lastIdx = idx; lastState = globalThis.history?.state;
   return lastDir;
+}
+/** The route the router is going to (its path is already set when the swap starts): meta of the route and its page module. */
+async function nextSide(): Promise<TransitionSide> {
+  const r = I.S.router;
+  const m = r ? I.matchRoute(r.routes, I.S.path.peek()) : null;
+  if (!m) return {};
+  const mod = await I.loadRoute(m.route).catch(() => null);
+  return { meta: { ...(m.route.meta ?? {}), ...(mod?.meta ?? {}) }, params: m.params };
 }
 /** Direction of the navigation now (for tests and custom wrappers). */
 export const navDirection = (pop = true): Dir => direction(pop);
@@ -112,13 +131,24 @@ export const navDirection = (pop = true): Dir => direction(pop);
 interface ViewTransitionLike { updateCallbackDone: Promise<void>; finished: Promise<void>; ready?: Promise<void> }
 type StartVT = (cb: () => void) => ViewTransitionLike;
 
+let swaps = 0;
 /** Turn page transitions on. Returns a function that turns them off. */
 export function pageTransitions(o: PageTransitionOptions = {}): () => void {
-  lastIdx = (globalThis.history?.state as { hmIdx?: number } | null)?.hmIdx ?? 0; lastState = globalThis.history?.state;
-  setNavigationWrapper(async (apply: () => void, info: NavInfo) => {
-    const nav = { ...info, dir: direction(info.pop) };
+  const st0 = globalThis.history?.state as { hmIdx?: number } | null;
+  lastIdx = typeof st0?.hmIdx === "number" ? st0.hmIdx : 0;
+  if (typeof st0?.hmIdx !== "number") stamp(0);
+  lastState = globalThis.history?.state;
+  setNavigationWrapper(async (run: () => void, { pop }: { pop: boolean }) => {
+    const at = I.S.path.peek(), my = ++swaps;
+    const nav = { pop, dir: direction(pop) };
+    const from = I.S.match.peek();
+    const to = await nextSide();
+    if (my !== swaps) return; // a newer swap is already on its way
+    // a newer navigation that started meanwhile wins: this one's page must not land over it (also the second sync of
+    // one history move: hash mode hears both popstate and hashchange)
+    const apply = (): void => { if (my === swaps && I.S.path.peek() === at) run(); };
     const doc = globalThis.document as (Document & { startViewTransition?: StartVT }) | undefined;
-    const t = resolveTransition(o, nav.to, nav.from, nav.dir);
+    const t = resolveTransition(o, to, from, nav.dir);
     if (!doc || reducedNow() || pausedNow() || t.type === "none") { apply(); return; }
     const root = doc.documentElement;
     const rtl = isRtl();
@@ -134,7 +164,10 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
       if (old) vtName(old, "hm-page");
       for (const [id, el] of oldShared) { vtName(el, `hm-shared-${ident(id)}`); named.push(el); }
       root.setAttribute("data-hm-vt", scope);
-      const vt = doc.startViewTransition(() => {
+      let swapped = false;
+      const update = (): void => {
+        if (swapped) return;
+        swapped = true;
         for (const el of named) vtName(el, null);
         vtName(old, null);
         apply();
@@ -142,7 +175,11 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
         if (old) vtName(now, "hm-page");
         named = now ? [now] : [];
         for (const [id, el] of sharedOf(now ?? doc)) if (oldShared.has(id)) { vtName(el, `hm-shared-${ident(id)}`); named.push(el); }
-      });
+      };
+      const vt = doc.startViewTransition(update) as ViewTransitionLike & { skipTransition?: () => void };
+      // a page that does not render (a background tab, a hidden frame) never calls the update: the page changes anyway
+      const late = setTimeout(() => { if (!swapped) { vt.skipTransition?.(); update(); } }, Math.max(400, t.duration * 2));
+      void Promise.resolve(vt.updateCallbackDone).finally(() => clearTimeout(late)).catch(() => undefined);
       const done = (): void => { for (const el of named) vtName(el, null); root.removeAttribute("data-hm-vt"); };
       // an aborted transition (resize, a second navigation) is not an error: the DOM update still happened
       void Promise.resolve(vt.ready).then(() => {
@@ -157,7 +194,7 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
         }
       }, () => undefined);
       void Promise.resolve(vt.finished).catch(() => undefined).then(done);
-      await Promise.resolve(vt.updateCallbackDone).catch(() => undefined);
+      await Promise.race([Promise.resolve(vt.updateCallbackDone).catch(() => undefined), new Promise<void>((r) => setTimeout(r, Math.max(450, t.duration * 2 + 50)))]);
       return;
     }
 
@@ -173,9 +210,9 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
   });
 
   void outlets((name, apply, { to, from }) => {
-    // a modal opened or closed by a history move: popstate already ran, so pop=true reads the order right
+    // the outlet does not know whether a history move brought it: the entry order tells
     const dir = direction(true);
-    const t = resolveTransition(o, to?.meta, from?.meta, dir);
+    const t = resolveTransition(o, to, from, dir);
     // the modal's dialog opens and closes itself: only a swap inside it animates here
     if (reducedNow() || pausedNow() || t.type === "none" || !to || (name === "modal" && !from)) { apply(); return; }
     const doc = globalThis.document;

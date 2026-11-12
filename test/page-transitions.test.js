@@ -32,30 +32,32 @@ test("transitionFrames: back reverses, RTL mirrors slide, scale and fade", () =>
   assert.deepEqual(M.transitionFrames("none", "in", "forward"), []);
 });
 
-test("resolveTransition: the route shown decides forward, the route left decides back", () => {
+test("resolveTransition: the route shown decides forward, the route left decides back; a function of the params", () => {
   const base = { type: "fade", duration: 200 };
-  assert.equal(M.resolveTransition(base, { transition: "slide" }, {}, "forward").type, "slide");
-  assert.equal(M.resolveTransition(base, {}, { transition: "scale" }, "back").type, "scale");
+  const m = (transition, params) => ({ meta: { transition }, params });
+  assert.equal(M.resolveTransition(base, m("slide"), {}, "forward").type, "slide");
+  assert.equal(M.resolveTransition(base, {}, m("scale"), "back").type, "scale");
   assert.equal(M.resolveTransition(base, {}, {}, "forward").type, "fade");
-  assert.equal(M.resolveTransition(base, { transition: false }, {}, "forward").type, "none");
-  const r = M.resolveTransition(base, { transition: { type: "slide", duration: 500 } }, {}, "forward");
+  assert.equal(M.resolveTransition(base, m(false), {}, "forward").type, "none");
+  const byTab = (p) => (p.tab === "s" ? "slide" : "scale");
+  assert.equal(M.resolveTransition(base, m(byTab, { tab: "s" }), {}, "forward").type, "slide");
+  assert.equal(M.resolveTransition(base, m(byTab, { tab: "x" }), {}, "forward").type, "scale");
+  const r = M.resolveTransition(base, m({ type: "slide", duration: 500 }), {}, "forward");
   assert.equal(r.duration, 500);
   assert.equal(M.resolveTransition(base, {}, {}, "forward").duration, 200);
 });
 
-test("back / forward from the history order, and both routes' meta reach the wrapper", async () => {
+test("back / forward from the history order (each entry stamped once)", async () => {
   const seen = [];
-  R.setNavigationWrapper((apply, nav) => { seen.push([M.navDirection(nav.pop), nav.to.transition ?? null, nav.from.transition ?? null]); apply(); });
-  const a = app({ "/": page("home"), "/a": page("a", { transition: "slide" }), "/b": page("b", { transition: "scale" }) });
+  R.setNavigationWrapper((apply, nav) => { seen.push([M.navDirection(nav.pop), R.path()]); apply(); });
+  const a = app({ "/": page("home"), "/a": page("a"), "/b": page("b") });
   await tick();
+  M.navDirection(false); // the entry the app starts on (pageTransitions() stamps it at install)
   await R.navigate("/a"); await R.navigate("/b");
   globalThis.history.back(); await tick();
   globalThis.history.back(); await tick();
   globalThis.history.forward(); await tick();
-  assert.deepEqual(seen, [
-    ["forward", "slide", null], ["forward", "scale", "slide"],
-    ["back", "slide", "scale"], ["back", null, "slide"], ["forward", "slide", null],
-  ]);
+  assert.deepEqual(seen, [["forward", "/a"], ["forward", "/b"], ["back", "/a"], ["back", "/"], ["forward", "/a"]]);
   R.setNavigationWrapper(null);
   a.done();
 });
@@ -136,4 +138,18 @@ test("modal outlet: opening is left to the dialog, a swap inside it animates thr
   assert.deepEqual(swaps, [["modal", "forward", null, "/p/1"], ["modal", "forward", "/p/1", "/p/2"], ["modal", "back", "/p/2", "/p/1"]]);
   O.setOutletWrapper(null);
   a.done();
+});
+
+test("a View Transition that never runs its update (page not rendering) still swaps the page", async () => {
+  const orig = document.startViewTransition;
+  let skipped = 0;
+  document.startViewTransition = () => ({ updateCallbackDone: new Promise(() => {}), ready: new Promise(() => {}), finished: new Promise(() => {}), skipTransition() { skipped++; } });
+  const stop = M.pageTransitions({ type: "fade", duration: 50 });
+  const a = app({ "/": page("home"), "/a": page("a") });
+  await tick();
+  await R.navigate("/a");
+  assert.equal(a.host.querySelector(".pg").textContent, "a");
+  assert.equal(skipped, 1);
+  document.startViewTransition = orig;
+  stop(); a.done();
 });

@@ -102,11 +102,8 @@ const pageKey = (route: CompiledRoute, prm: Record<string, string>): string => `
 const NO_ROUTER = "March: call createRouter() first";
 const leaveGuards = new Set<() => boolean | Promise<boolean>>();
 
-/** A page swap: history move or not, the meta of the route shown and of the one left (`meta.transition` picks the page
- *  transition). Entries this router pushes carry their history order in `history.state.hmIdx` (back vs forward). */
-export interface NavInfo { pop: boolean; to: Record<string, unknown>; from: Record<string, unknown> }
-let navWrapper: ((apply: () => void, o: NavInfo) => void | Promise<void>) | null = null;
-/** Wrap every page swap (hadi-march/motion uses it for page transitions). */
+let navWrapper: ((apply: () => void, o: { pop: boolean }) => void | Promise<void>) | null = null;
+/** Wrap every page swap (hadi-march/motion uses it for View Transitions). */
 export function setNavigationWrapper(fn: typeof navWrapper): void { navWrapper = fn; }
 
 /** Current path (reactive). */
@@ -275,15 +272,14 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
       const title = r.opts.title?.(to) ?? (typeof mod?.title === "function" ? mod.title(to) : mod?.title) ?? m.route.title;
       setMeta({ ...(title ? { title } : {}), ...(typeof meta["description"] === "string" ? { description: meta["description"] } : {}) });
     }
-    // a newer navigation that got here first wins (a transition may run this late)
-    const apply = (): void => { if (seq === r.seq) batch(() => {
+    const apply = (): void => batch(() => {
       S.path.set(p); S.search.set(search); S.hash.set(hash);
       S.match.set(m ? { route: m.route, params: m.params, path: p, meta } : null);
       r.view.set(page ?? { levels: [{ key: "notfound", comp: notFoundComp, page: true }] });
       S.pendingDepth.set(-1);
-    }); };
+    });
     vtDepth = depth;
-    if (navWrapper && !initial) await navWrapper(apply, { pop, to: meta, from: cur?.meta ?? {} }); else apply();
+    if (navWrapper && !initial) await navWrapper(apply, { pop }); else apply();
     lastUrl = globalThis.location?.href ?? "";
     if (r.opts.scroll !== false) restoreScroll(pop);
     if (initial && r.opts.prefetch !== "none") whenIdle(prefetchLinks, 3000);
@@ -427,9 +423,9 @@ export async function navigate(to: Href, { replace = false, state = null, force 
   saveScroll();
   const url = r.mode === "hash" ? `#${s}` : `${r.base}${s}`;
   // a modal keeps the page it was opened from (or that page's own background, when one modal opens another)
-  const curState = globalThis.history?.state as { hmModal?: boolean; hmBg?: string; hmIdx?: number } | null;
+  const curState = globalThis.history?.state as { hmModal?: boolean; hmBg?: string } | null;
   const bg = curState?.hmModal && curState.hmBg ? curState.hmBg : `${untrack(() => S.path())}${untrack(() => S.search())}`;
-  const st = { ...(state ?? {}), hmKey: Math.random().toString(36).slice(2), hmIdx: (curState?.hmIdx ?? 0) + (replace ? 0 : 1), ...(modal ? { hmModal: true, hmBg: bg } : {}) };
+  const st = { ...(state ?? {}), hmKey: Math.random().toString(36).slice(2), ...(modal ? { hmModal: true, hmBg: bg } : {}) };
   if (replace) globalThis.history.replaceState(st, "", url); else globalThis.history.pushState(st, "", url);
   return sync();
 }

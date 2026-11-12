@@ -51,10 +51,17 @@ export function installCssControl(): void {
   };
   doc.addEventListener("animationstart", onStart, true);
   doc.addEventListener("transitionrun", onStart, true);
+  // while paused, a page that arrives (a route change) is caught as it is inserted too: animation events only fire on
+  // rendered frames, so a page in the background would otherwise start its CSS loops unpaused
+  let mo: MutationObserver | null = null, queued = false;
+  const sweep = (): void => { queued = false; if (pausedNow()) for (const a of find(doc)) { if (a.playState === "running") { a.pause(); pausedByUs.add(a); } } };
   onConfig((why) => {
     if (why === "pause") {
-      if (pausedNow()) for (const a of find(doc)) { if (a.playState === "running") { a.pause(); pausedByUs.add(a); } }
-      else { for (const a of pausedByUs) { try { a.play(); } catch { /* gone */ } } pausedByUs.clear(); }
+      if (pausedNow()) {
+        sweep();
+        const MO = globalThis.MutationObserver;
+        if (MO && !mo) { mo = new MO(() => { if (!queued) { queued = true; setTimeout(sweep, 0); } }); mo.observe(doc, { childList: true, subtree: true }); }
+      } else { mo?.disconnect(); mo = null; for (const a of pausedByUs) { try { a.play(); } catch { /* gone */ } } pausedByUs.clear(); }
       return;
     }
     for (const a of find(doc)) adopt(a);
