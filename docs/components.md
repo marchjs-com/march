@@ -7,10 +7,12 @@
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | CountRoll | experimental | Odometer number: only the changed digits roll (up when it grows, down when it shrinks), compact in the active locale. | — |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | PullToRefresh, VirtualList, PostCard, Skeleton |
 | LikeButton | experimental | Heart toggle: spring pop, ring and a four-color HADİ particle burst on the motion engine; rolling count; heartBurst() for any element. | CountRoll |
 | MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, MediaGrid, LikeButton, CountRoll |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+| VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
 ## BottomNav
 
@@ -55,6 +57,16 @@ A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left 
 
 Full page: src/components/overlays/drawer/docs.md
 
+## Feed
+
+A social feed. PostCards sit in a VirtualList, so only the posts near the viewport are in the DOM, inside a PullToRefresh (the feed is the scroll area; keyboard users get a Refresh button). The first page shows skeleton posts; reaching the end loads the next page with a skeleton at the bottom (infinite scroll) and an end mark once there is nothing more. New posts waiting above show a "N new posts" pill that merges them and scrolls to the top.
+
+```tsx
+<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />
+```
+
+Full page: src/components/composite/feed/docs.md
+
 ## LikeButton
 
 A heart toggle with a rolling count. Liking squashes and overshoots the heart on a spring, grows a ring and throws a burst of particles in the four HADİ colors; unliking is a small press. Everything runs on the motion engine, so the global speed, "pause all" and reduced motion apply (reduced motion keeps only the fill change).
@@ -94,3 +106,13 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 ```
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
+
+## VirtualList
+
+A long list that keeps only the rows near the viewport in the DOM, so 100,000 rows scroll like 20. Rows can have any height: each is measured when it renders and an estimate stands in until then; when a row above the viewport changes height the content stays still (scroll anchoring). Rows keep their DOM while they stay in range and receive an accessor to their item, so an updated item (a like, an edit) updates its row instead of rebuilding it.
+
+```tsx
+<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />
+```
+
+Full page: src/components/data/virtual-list/docs.md

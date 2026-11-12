@@ -4,10 +4,12 @@ import m0 from "./composite/bottom-nav/meta.ts";
 import m1 from "./chip/meta.ts";
 import m2 from "./social/count-roll/meta.ts";
 import m3 from "./overlays/drawer/meta.ts";
-import m4 from "./social/like-button/meta.ts";
-import m5 from "./social/media-grid/meta.ts";
-import m6 from "./composite/post-card/meta.ts";
-import m7 from "./feedback/pull-to-refresh/meta.ts";
+import m4 from "./composite/feed/meta.ts";
+import m5 from "./social/like-button/meta.ts";
+import m6 from "./social/media-grid/meta.ts";
+import m7 from "./composite/post-card/meta.ts";
+import m8 from "./feedback/pull-to-refresh/meta.ts";
+import m9 from "./data/virtual-list/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 export const registry: readonly RegistryEntry[] = [
@@ -15,8 +17,10 @@ export const registry: readonly RegistryEntry[] = [
   { folder: "chip", meta: m1, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./chip/demo.tsx"), playground: () => import("./chip/playground.ts") },
   { folder: "social/count-roll", meta: m2, code: "<CountRoll value={$likes} />\n<CountRoll value={$followers} format=\"full\" />", demo: () => import("./demos-social.gen.ts").then((m) => m.d0), playground: () => import("./demos-social.gen.ts").then((m) => m.p0) },
   { folder: "overlays/drawer", meta: m3, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
-  { folder: "social/like-button", meta: m4, code: "<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d1), playground: () => import("./demos-social.gen.ts").then((m) => m.p1) },
-  { folder: "social/media-grid", meta: m5, code: "<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d2), playground: () => import("./demos-social.gen.ts").then((m) => m.p2) },
-  { folder: "composite/post-card", meta: m6, code: "<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d3), playground: () => import("./demos-social.gen.ts").then((m) => m.p3) },
-  { folder: "feedback/pull-to-refresh", meta: m7, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./demos-navigation.gen.ts").then((m) => m.d1), playground: () => import("./demos-navigation.gen.ts").then((m) => m.p1) },
+  { folder: "composite/feed", meta: m4, code: "<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d1), playground: () => import("./demos-social.gen.ts").then((m) => m.p1) },
+  { folder: "social/like-button", meta: m5, code: "<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d2), playground: () => import("./demos-social.gen.ts").then((m) => m.p2) },
+  { folder: "social/media-grid", meta: m6, code: "<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d3), playground: () => import("./demos-social.gen.ts").then((m) => m.p3) },
+  { folder: "composite/post-card", meta: m7, code: "<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d4), playground: () => import("./demos-social.gen.ts").then((m) => m.p4) },
+  { folder: "feedback/pull-to-refresh", meta: m8, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./demos-navigation.gen.ts").then((m) => m.d1), playground: () => import("./demos-navigation.gen.ts").then((m) => m.p1) },
+  { folder: "data/virtual-list", meta: m9, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./demos-social.gen.ts").then((m) => m.d5), playground: () => import("./demos-social.gen.ts").then((m) => m.p5) },
 ];
