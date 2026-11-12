@@ -7,7 +7,6 @@ import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { cx, val, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Overlay, type OverlayProps } from "../../../ui/overlay.ts";
 import { parallaxLayers } from "../../../motion/scroll-fx.ts";
-import { hoverParallax } from "../../../motion/micro.ts";
 
 export interface ParallaxLayer {
   /** Image URL (or use `content`). */
@@ -53,7 +52,9 @@ export function Parallax(props: ParallaxProps): Element {
     if (inner) inner.setAttribute("data-depth", String((l.depth ?? (l.speed ?? 0.2) * 60) / 60));
   });
   const offs = [parallaxLayers(root, { selector: ".hm-plx-layer", strength: 420 })];
-  if (props.pointer) offs.push(hoverParallax(root, { depth: 60 * props.pointer, selector: ".hm-plx-layer > [data-depth]" }));
-  if (getOwner()) onCleanup(() => offs.forEach((f) => f()));
+  let live = true;
+  // the pointer layer comes with motion/micro (ripple, state morph…): loaded only when a parallax follows the mouse
+  if (props.pointer) void import("../../../motion/micro.ts").then((m) => { if (live) offs.push(m.hoverParallax(root, { depth: 60 * (props.pointer ?? 1), selector: ".hm-plx-layer > [data-depth]" })); });
+  if (getOwner()) onCleanup(() => { live = false; offs.forEach((f) => f()); });
   return root;
 }

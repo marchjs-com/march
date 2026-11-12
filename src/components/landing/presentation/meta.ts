@@ -9,5 +9,5 @@ export default defineMeta({
   composedOf: ["IconButton"],
   behaviors: ["motion engine", "swipe", "channel (crossTab)"],
   showcase: "/web",
-  demoGroup: "scroll",
+  demoGroup: "talk",
 });
