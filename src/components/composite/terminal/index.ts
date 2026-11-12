@@ -18,11 +18,14 @@
 import "./terminal.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { signal, onCleanup, untrack, effect } from "../../../core/reactive.ts";
+import { signal, onCleanup, untrack, effect, reactive } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { clamp, load, save } from "../../../core/util.ts";
 import { tokenize, parseArgs, usageOf, type ArgSpec, type OptionSpec, type Parsed } from "./parse.ts";
 import { renderLine, ansi } from "./ansi.ts";
+import { Window, type WindowProps } from "../../layout/window/index.ts";
+import { terminal as terminalIcon } from "../../../icons/glyphs/terminal.ts";
+import { glyph } from "../../../ui/util.ts";
 
 export { ansi, tokenize, parseArgs, usageOf };
 export type { ArgSpec, OptionSpec, Parsed };
@@ -323,6 +326,31 @@ export function Terminal(props: TerminalProps): Element {
   syncCaret();
   onCleanup(() => ctl?.abort());
   return root;
+}
+
+/** Window props a TerminalWindow passes to its window (the rest go to the terminal; `persist` keys both). */
+export type TerminalWindowProps = TerminalProps & Pick<WindowProps, "title" | "icon" | "chrome" | "x" | "y" | "width" | "minWidth" | "minHeight" | "state" | "onStateChange"
+  | "open" | "onClose" | "minimizable" | "maximizable" | "closable" | "movable" | "resizable" | "snap"> & {
+  /** Window height in px (the terminal fills it). */
+  windowHeight?: number;
+};
+
+const WINDOW_KEYS = new Set(["title", "icon", "chrome", "x", "y", "width", "windowHeight", "minWidth", "minHeight", "state", "onStateChange", "open", "onClose",
+  "minimizable", "maximizable", "closable", "movable", "resizable", "snap", "class"]);
+
+/** A Terminal in a Window: move, resize, dock, minimize, fill, close; Windows, Mac or HADİ look. */
+export function TerminalWindow(props: TerminalWindowProps): unknown {
+  // forward each prop as a getter, so live props (scheme, prompt, chrome, open…) stay live on both sides
+  const term: Record<string, unknown> = {}, win: Record<string, unknown> = {};
+  for (const k of Object.keys(props)) Object.defineProperty(WINDOW_KEYS.has(k) ? win : term, k, { get: () => (props as Record<string, unknown>)[k], enumerable: true });
+  const p = props as Record<string, unknown>;
+  return h(Window, {
+    title: reactive(() => (p["title"] as string | undefined) ?? "Terminal"), icon: props.icon ?? glyph(terminalIcon), chrome: reactive(() => val(props.chrome)),
+    x: props.x, y: props.y, width: props.width ?? 560, height: props.windowHeight ?? 340, minWidth: props.minWidth ?? 280, minHeight: props.minHeight,
+    state: reactive(() => val(props.state)), onStateChange: props.onStateChange, open: props.open == null ? undefined : reactive(() => val(props.open)), onClose: props.onClose,
+    minimizable: props.minimizable, maximizable: props.maximizable, closable: props.closable, movable: props.movable, resizable: props.resizable, snap: props.snap,
+    persist: props.persist ? `term.${props.persist}` : undefined, class: reactive(() => cx("hm-term-window", val(props.class))),
+  }, h(Terminal, Object.defineProperty(term, "height", { value: "100%", enumerable: true }) as TerminalProps));
 }
 
 const BUILTIN = new Map<string, Command>([

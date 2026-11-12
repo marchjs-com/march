@@ -12,3 +12,4 @@ export * from "./spacer/index.ts";
 export * from "./splitter/index.ts";
 export * from "./stack/index.ts";
 export * from "./status-bar/index.ts";
+export * from "./window/index.ts";

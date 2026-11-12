@@ -1,0 +1,107 @@
+/* March — Window. Placed in its area (the nearest positioned ancestor) by --hm-win-x / -y / -w / -h (logical: x from
+   the inline start). States fill or fold it; the three looks change only the frame. Tokens only. */
+.hm-win {
+  --hm-win-bar-h: 2.25rem;
+  position: absolute; inset-inline-start: var(--hm-win-x, 0); inset-block-start: var(--hm-win-y, 0);
+  inline-size: var(--hm-win-w, 32rem); block-size: var(--hm-win-h, 20rem);
+  display: flex; flex-direction: column; min-inline-size: 0; box-sizing: border-box;
+  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-lg); background: var(--hm-surface); color: var(--hm-text);
+  box-shadow: var(--hm-shadow-3, var(--hm-shadow-2));
+  transition: inset-inline-start var(--hm-dur) var(--hm-ease), inset-block-start var(--hm-dur) var(--hm-ease),
+    inline-size var(--hm-dur) var(--hm-ease), block-size var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease);
+}
+.hm-win[hidden] { display: none; }
+.hm-win:focus-within { box-shadow: var(--hm-shadow-4); }
+.hm-win.is-moving { transition: none; }
+
+/* states: fill the area, dock to half of it, or fold to the title bar at the bottom */
+.hm-win.is-maximized { inset-inline-start: 0; inset-block-start: 0; inline-size: 100%; block-size: 100%; border-radius: 0; }
+.hm-win.is-start { inset-inline-start: 0; inset-block-start: 0; inline-size: 50%; block-size: 100%; border-radius: 0; }
+.hm-win.is-end { inset-inline-start: 50%; inset-block-start: 0; inline-size: 50%; block-size: 100%; border-radius: 0; }
+.hm-win.is-bottom { inset-inline-start: 0; inset-block-start: 50%; inline-size: 100%; block-size: 50%; border-radius: 0; }
+.hm-win.is-minimized { inset-block-start: auto; inset-block-end: var(--hm-space-2); block-size: auto; inline-size: min(16rem, var(--hm-win-w, 16rem)); }
+.hm-win.is-minimized .hm-win-bar { border-radius: inherit; border-block-end: 0; }
+
+/* title bar */
+.hm-win-bar {
+  display: flex; align-items: center; gap: var(--hm-space-2); min-block-size: var(--hm-win-bar-h); padding-inline: var(--hm-space-3) var(--hm-space-2);
+  border-block-end: 1px solid var(--hm-border-subtle); border-start-start-radius: inherit; border-start-end-radius: inherit;
+  background: var(--hm-surface-2); cursor: default; user-select: none; -webkit-user-select: none; touch-action: none; outline: none;
+}
+.hm-win-bar:focus-visible { box-shadow: inset 0 0 0 2px var(--hm-focus, var(--hm-primary)); }
+.hm-win-icon { display: inline-flex; color: var(--hm-text-2); }
+.hm-win-icon .hm-svg { inline-size: 1rem; block-size: 1rem; }
+.hm-win-title { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); }
+.hm-win:not(:focus-within) .hm-win-title { color: var(--hm-muted); }
+.hm-win-buttons { display: flex; align-items: center; gap: var(--hm-space-1); }
+.hm-win-btn { display: inline-grid; place-items: center; padding: 0; border: 0; background: transparent; color: var(--hm-text-2); cursor: pointer; font: inherit;
+  transition: background-color var(--hm-dur-fast) var(--hm-ease), color var(--hm-dur-fast) var(--hm-ease); }
+.hm-win-btn:focus-visible { outline: 2px solid var(--hm-focus, var(--hm-primary)); outline-offset: -2px; }
+.hm-win-glyph { display: inline-flex; }
+.hm-win-glyph .hm-svg { inline-size: .875rem; block-size: .875rem; }
+.hm-win-min { order: 1; } .hm-win-max { order: 2; } .hm-win-close { order: 3; }
+
+/* body */
+.hm-win-body { flex: 1; min-block-size: 0; display: flex; flex-direction: column; overflow: auto; background: var(--hm-surface);
+  border-end-start-radius: inherit; border-end-end-radius: inherit; }
+.hm-win-body[hidden] { display: none; }
+.hm-win-body > .hm-term { flex: 1; block-size: auto; border: 0; border-radius: 0; }
+
+/* resize grips: edges and corners (only while floating) */
+.hm-win-rz { position: absolute; z-index: 2; touch-action: none; }
+.hm-win-rz-n, .hm-win-rz-s { inset-inline: .5rem; block-size: .5rem; cursor: ns-resize; }
+.hm-win-rz-n { inset-block-start: -.25rem; } .hm-win-rz-s { inset-block-end: -.25rem; }
+.hm-win-rz-start, .hm-win-rz-end { inset-block: .5rem; inline-size: .5rem; cursor: ew-resize; }
+.hm-win-rz-start { inset-inline-start: -.25rem; } .hm-win-rz-end { inset-inline-end: -.25rem; }
+.hm-win-rz-n-start, .hm-win-rz-n-end, .hm-win-rz-s-start, .hm-win-rz-s-end { inline-size: .875rem; block-size: .875rem; }
+.hm-win-rz-n-start { inset-block-start: -.25rem; inset-inline-start: -.25rem; cursor: nwse-resize; }
+.hm-win-rz-n-end { inset-block-start: -.25rem; inset-inline-end: -.25rem; cursor: nesw-resize; }
+.hm-win-rz-s-start { inset-block-end: -.25rem; inset-inline-start: -.25rem; cursor: nesw-resize; }
+.hm-win-rz-s-end { inset-block-end: -.25rem; inset-inline-end: -.25rem; cursor: nwse-resize; }
+.hm-win-rz-n-start:dir(rtl), .hm-win-rz-s-end:dir(rtl) { cursor: nesw-resize; }
+.hm-win-rz-n-end:dir(rtl), .hm-win-rz-s-start:dir(rtl) { cursor: nwse-resize; }
+.hm-win:not(.is-normal) .hm-win-rz, .hm-win.is-fixed-size .hm-win-rz { display: none; }
+
+/* where a drop would dock */
+.hm-win-snap { position: absolute; z-index: 3; display: none; pointer-events: none;
+  inset-inline-start: var(--hm-win-sx, 0); inset-block-start: var(--hm-win-sy, 0); inline-size: var(--hm-win-sw, 0); block-size: var(--hm-win-sh, 0);
+  border: 2px solid color-mix(in srgb, var(--hm-primary) 55%, transparent); border-radius: var(--hm-radius-lg);
+  background: color-mix(in srgb, var(--hm-primary) 12%, transparent); }
+.hm-win-snap.is-on { display: block; }
+
+/* ---------- Windows: title first, square buttons at the end, the close button turns red */
+.hm-win-windows { border-radius: var(--hm-radius-1, .25rem); }
+.hm-win-windows .hm-win-bar { padding-inline-end: 0; background: var(--hm-surface); }
+.hm-win-windows .hm-win-buttons { align-self: stretch; gap: 0; }
+.hm-win-windows .hm-win-btn { inline-size: 2.75rem; align-self: stretch; }
+.hm-win-windows .hm-win-btn:hover { background: color-mix(in srgb, var(--hm-text) 9%, transparent); }
+.hm-win-windows .hm-win-close:hover { background: var(--hm-danger); color: white; }
+.hm-win-windows .hm-win-close { border-start-end-radius: inherit; }
+
+/* ---------- Mac: three colored lights at the start, title centered, symbols on hover */
+.hm-win-mac { border-radius: .75rem; }
+.hm-win-mac .hm-win-bar { padding-inline: .75rem; }
+.hm-win-mac .hm-win-buttons { order: -1; gap: .5rem; }
+.hm-win-mac .hm-win-icon { display: none; }
+.hm-win-mac .hm-win-title { text-align: center; padding-inline-end: 3.25rem; }
+.hm-win-mac .hm-win-btn { inline-size: .8125rem; block-size: .8125rem; border-radius: 50%; color: color-mix(in srgb, black 60%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, black 12%, transparent); }
+.hm-win-mac .hm-win-close { order: 1; background: var(--hm-danger); }
+.hm-win-mac .hm-win-min { order: 2; background: var(--hm-warn); }
+.hm-win-mac .hm-win-max { order: 3; background: var(--hm-success); }
+.hm-win-mac .hm-win-glyph { opacity: 0; transition: opacity var(--hm-dur-fast) var(--hm-ease); }
+.hm-win-mac .hm-win-glyph .hm-svg { inline-size: .5625rem; block-size: .5625rem; stroke-width: 3.2; }
+.hm-win-mac .hm-win-buttons:hover .hm-win-glyph, .hm-win-mac .hm-win-btn:focus-visible .hm-win-glyph { opacity: 1; }
+.hm-win-mac:not(:focus-within):not(:hover) .hm-win-btn { background: var(--hm-border-strong); }
+
+/* ---------- HADİ: brand stripe on top, round buttons at the end */
+.hm-win-hadi { overflow: visible; }
+.hm-win-hadi .hm-win-bar { position: relative; padding-block-start: 3px; background: var(--hm-surface); }
+.hm-win-hadi .hm-win-bar::before { content: ""; position: absolute; inset-block-start: 0; inset-inline: 0; block-size: 3px; border-start-start-radius: inherit; border-start-end-radius: inherit;
+  background: linear-gradient(90deg, var(--hm-brand-orange, var(--hm-cat-1)), var(--hm-brand-blue, var(--hm-cat-2)), var(--hm-brand-green, var(--hm-cat-3)), var(--hm-brand-purple, var(--hm-cat-5))); }
+.hm-win-hadi .hm-win-icon { color: var(--hm-primary); }
+.hm-win-hadi .hm-win-btn { inline-size: 1.75rem; block-size: 1.75rem; border-radius: 50%; }
+.hm-win-hadi .hm-win-btn:hover { background: var(--hm-primary-soft, color-mix(in srgb, var(--hm-primary) 14%, transparent)); color: var(--hm-primary-text, var(--hm-primary)); }
+.hm-win-hadi .hm-win-close:hover { background: color-mix(in srgb, var(--hm-danger) 16%, transparent); color: var(--hm-danger); }
+
+@media (prefers-reduced-motion: reduce) { .hm-win { transition: none; } }

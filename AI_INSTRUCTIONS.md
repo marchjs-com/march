@@ -596,6 +596,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Splitter | stable | Two resizable panes: drag the handle or use the arrow keys (mirrored in RTL), Home / End, Enter resets. | — |
 | Stack | stable | Layout primitives: Stack (a row or column with token gaps and alignment), Toolbar (a labelled bar of controls), Divider (a rule, labelled or vertical). | — |
 | StatusBar | experimental | Bottom strip of an editor or app: start / end items, text or buttons (actions or command ids), tones with a breathing busy dot, live announcements, low-priority items to a … menu when narrow. | Menu, Tooltip |
+| Window | stable | A movable, resizable window inside its area: dock to an edge, minimize, fill, close; Windows, Mac or HADİ look. | — |
 
 ### Typography — `hadi-march/typography`
 
@@ -756,7 +757,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, StoryProgress, LikeButton |
-| Terminal | experimental | Extensible command line: typed commands, sub-commands and async handlers (Ctrl+C), ANSI colors, tables, JSON, progress; history, completion, themable colors. | JsonView |
+| Terminal | experimental | Extensible command line: typed commands, sub-commands and async handlers (Ctrl+C), ANSI colors, tables, JSON, progress; history, completion, themable colors. | JsonView, Window |
 | ThemeEditor | experimental | Theme builder: color tokens for light and dark with a WCAG audit, type, shape and motion, a live scoped preview, code / CSS / JSON out. | ColorPicker, EasingCurveEditor, Tabs, Segmented, Slider, Select, TextInput, Textarea, Toggle, Button, IconButton, CopyButton, Badge, ThemeSwatch, CodeView |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |

@@ -144,5 +144,6 @@ export const code: Record<string, string> = {
   "social/typing-indicator": "<TypingIndicator names={$typing} />",
   "landing/video-background": "<VideoBackground src=\"/media/clip.webm\" poster=\"/media/clip.jpg\" tint=\"dark\">\n  <h1>…</h1>\n</VideoBackground>",
   "data/virtual-list": "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />",
+  "layout/window": "import { Window } from \"hadi-march/layout\";\n\n<div class=\"desk\">                                   {/* position: relative; any size */}\n  <Window title=\"Notlar\" chrome=\"mac\" persist=\"notes\">…</Window>\n</div>",
   "composite/wizard": "<Wizard submitLabel=\"Finish\" onSubmit={save} steps={[\n  { title: \"Account\", schema: schema({ email: { type: \"email\", required: true } }) },\n  { title: \"Profile\", schema: schema({ name: { type: \"text\", required: true } }), validate: (v) => (v.name === \"admin\" ? \"Pick another name\" : null) },\n]} />",
 };

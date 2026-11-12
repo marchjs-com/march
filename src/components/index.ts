@@ -110,3 +110,4 @@ export * from "./data/tree/index.ts";
 export * from "./composite/tree-editor/index.ts";
 export * from "./social/typing-indicator/index.ts";
 export * from "./data/virtual-list/index.ts";
+export * from "./layout/window/index.ts";

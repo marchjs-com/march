@@ -1,6 +1,7 @@
 // Showcase stage for Terminal: a few commands that show typed arguments, sub-commands, async work with Ctrl+C,
 // colored output, tables, JSON and progress. Try: help, deploy staging, user list, theme hadi, motion, fetch, colors.
-import { Terminal, ansi, type Command, type ColorScheme } from "./index.ts";
+import { Terminal, TerminalWindow, ansi, type Command, type ColorScheme } from "./index.ts";
+import { signal } from "../../../core/reactive.ts";
 import { setColorTheme, colorThemes } from "../../../ui/theme.ts";
 
 export const code = `<Terminal prompt="hadi$ " persist="demo" welcome="[info] help yaz, Tab ile tamamla" commands={{
@@ -33,9 +34,21 @@ const COMMANDS: Record<string, Command> = {
 const SCHEMES: Record<string, ColorScheme> = { auto: "auto", surface: "surface", dark: "dark", light: "light",
   hadi: { bg: "#13233a", fg: "#f3f6fb", cursor: "#f2801f", colors: ["#13233a", "#ff6b6b", "#78be3a", "#f2801f", "#1d9ad6", "#a3338c", "#4cc3e0", "#d8e0ec", "#7d8ba3", "#ff8e8e", "#9bd468", "#ffa04d", "#53b8e6", "#c95db2", "#7fd6ea", "#ffffff"] } }
 
-export default function TerminalDemo(props: { values: { scheme: string; background: string; cursor: string; prompt: string } }) {
+export default function TerminalDemo(props: { values: { window: string; scheme: string; background: string; cursor: string; prompt: string } }) {
+  const v = props.values
+  const welcome = ["[info] March terminali: help yaz, Tab ile tamamla, ↑ geçmiş, Ctrl+R ara, Ctrl+C iptal", "Dene: deploy staging · user list · fetch · colors"]
+  const open = signal(true)
   return <div class="sc-term-demo">
-    <Terminal scheme={() => SCHEMES[props.values.scheme] ?? "auto"} background={() => props.values.background || undefined} cursor={props.values.cursor as "bar"} prompt={props.values.prompt}
-      persist="showcase" commands={COMMANDS} welcome={["[info] March terminali: help yaz, Tab ile tamamla, ↑ geçmiş, Ctrl+R ara, Ctrl+C iptal", "Dene: deploy staging · user list · fetch · colors"]} />
+    {() => v.window === "none"
+      ? <Terminal scheme={() => SCHEMES[v.scheme] ?? "auto"} background={() => v.background || undefined} cursor={v.cursor as "bar"} prompt={v.prompt}
+          persist="showcase" commands={COMMANDS} welcome={welcome} />
+      // in a window: drag the title bar, drop it on an edge to dock, double click to fill; the area is this box
+      : <div class="sc-term-desk">
+          <TerminalWindow chrome={() => v.window as "hadi"} title="hadi@march: ~" x={16} y={16} width={560} windowHeight={300}
+            open={() => open()} onClose={() => open.set(false)}
+            scheme={() => SCHEMES[v.scheme] ?? "auto"} background={() => v.background || undefined} cursor={v.cursor as "bar"} prompt={v.prompt}
+            persist="showcase" commands={COMMANDS} welcome={welcome} />
+          {() => (open() ? null : <button type="button" class="hm-btn hm-btn-sm sc-term-reopen" onClick={() => open.set(true)}>Terminali yeniden aç</button>)}
+        </div>}
   </div>
 }

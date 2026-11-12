@@ -28,10 +28,10 @@ export function parseAnsi(text: string): Span[] {
       else if (c === 24) st = { ...st, underline: false };
       else if (c >= 30 && c <= 37) st = { ...st, fg: c - 30 };
       else if (c >= 90 && c <= 97) st = { ...st, fg: c - 90 + 8 };
-      else if (c === 39) st = { ...st, fg: undefined };
+      else if (c === 39) { const { fg: _fg, ...rest } = st; st = rest; }
       else if (c >= 40 && c <= 47) st = { ...st, bg: c - 40 };
       else if (c >= 100 && c <= 107) st = { ...st, bg: c - 100 + 8 };
-      else if (c === 49) st = { ...st, bg: undefined };
+      else if (c === 49) { const { bg: _bg, ...rest } = st; st = rest; }
     }
   }
   if (last < text.length) out.push({ ...st, text: text.slice(last) });
