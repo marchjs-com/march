@@ -18,7 +18,7 @@ requirement: the licence stays MIT and nothing here is needed to use March.
 
 ## Link
 
-The address is the exported constant `MARCH_URL` (one place). It points to the repository for now; the project page
+The address is the constant `MARCH_URL` in `src/brand.js` (one place, shared with the console banner; re-exported here). It points to the repository for now; the project page
 `https://devs.hadisosyal.com/march` replaces it once that page is published.
 
 ## Accessibility and i18n
@@ -29,4 +29,4 @@ properties, so dark themes and RTL need nothing extra. The link opens in a new t
 
 ## Without a component
 
-`march.config.js` has `credit: true`: the built `index.html` then carries `<!-- Built with HADI March -->`. Off by default.
+`march.config.js` has `credit: true`: the built `index.html` then carries `<!-- Built with HADI March -->`. Off by default. It also prints the console banner in production (a separate tiny `credit.js`); in `march dev` the banner is on unless `banner: false`.

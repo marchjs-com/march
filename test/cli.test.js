@@ -195,3 +195,71 @@ test("march build --stable-names: hash-free names, ?v= versions everywhere, dete
     for (const [p, code] of one) assert.equal(two.get(p), code, `${p}: same bytes when nothing changed`);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("console banner: dev client prints one line once per page; banner: false removes it; production bundles stay free of it", async () => {
+  const { bannerSource } = await import("../cli/banner.js");
+  const { MARCH_URL } = await import("../src/brand.js");
+  const { runInNewContext } = await import("node:vm");
+  // once: running the source twice in one page logs one line (re-mounts / repeated evaluation)
+  const logs = [];
+  const sandbox = { console: { log: (...a) => logs.push(a) }, globalThis: null };
+  sandbox.globalThis = sandbox;
+  const src = bannerSource("0.1.0", "a tip");
+  runInNewContext(src, sandbox); runInNewContext(src, sandbox);
+  assert.equal(logs.length, 2, "banner line + tip line, once");
+  assert.match(logs[0][0], /^%c🧡 HADI March v0\.1 · /);
+  assert.ok(logs[0][0].includes(MARCH_URL), "same constant as the badge");
+  assert.match(logs[0][1], /color/);
+  assert.equal(logs[1][0], "a tip");
+
+  const dir = mkdtempSync(join(tmpdir(), "march-banner-"));
+  const buildJs = (cfg) => {
+    writeFileSync(join(dir, "march.config.js"), `export default ${cfg}\n`);
+    execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
+    const files = readdirSync(join(dir, "dist/assets"), { recursive: true }).filter((f) => f.endsWith(".js"));
+    return { files, text: files.map((f) => readFileSync(join(dir, "dist/assets", f), "utf8")).join("\n"), html: readFileSync(join(dir, "dist/index.html"), "utf8"), dist: readdirSync(join(dir, "dist")) };
+  };
+  try {
+    mkdirSync(join(dir, "src"), { recursive: true });
+    writeFileSync(join(dir, "src/main.jsx"), "render(() => <p>hi</p>, document.getElementById('app'))\n");
+    writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
+    // production default: nothing printed, no banner code in any bundle, no extra file, size identical with banner: false
+    const a = buildJs("{}"), b = buildJs("{ banner: false }");
+    assert.doesNotMatch(a.text, /HADI March v|hadi-march\.banner/);
+    assert.equal(a.text.length, b.text.length, "banner config changes no production byte");
+    assert.ok(!a.dist.includes("credit.js") && !/credit\.js/.test(a.html));
+    // credit: true prints in production too, from a separate tiny file (the bundle is untouched)
+    const c = buildJs("{ credit: true }");
+    assert.equal(c.text.length, a.text.length, "the app bundle is the same size with credit");
+    assert.ok(c.dist.includes("credit.js") && /<script src="\.?\/?credit\.js"><\/script>/.test(c.html));
+    const credit = readFileSync(join(dir, "dist/credit.js"), "utf8");
+    assert.ok(credit.length < 400, `credit.js is tiny (${credit.length} B)`);
+    const l2 = []; const sb = { console: { log: (...x) => l2.push(x) } }; sb.globalThis = sb;
+    runInNewContext(credit, sb); runInNewContext(credit, sb);
+    assert.equal(l2.length, 1);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+
+  // dev: the served client starts with the banner; banner: false serves the client alone
+  const { spawn } = await import("node:child_process");
+  const serve = async (cfg, port) => {
+    const d = mkdtempSync(join(tmpdir(), "march-banner-dev-"));
+    mkdirSync(join(d, "src"), { recursive: true });
+    writeFileSync(join(d, "src/main.jsx"), "render(() => <p>hi</p>, document.getElementById('app'))\n");
+    writeFileSync(join(d, "package.json"), "{\"type\":\"module\"}");
+    writeFileSync(join(d, "march.config.js"), `export default ${cfg}\n`);
+    const child = spawn(process.execPath, [CLI, "dev", "--port", String(port)], { cwd: d, stdio: "pipe" });
+    try {
+      let text = null;
+      for (let i = 0; i < 60 && text === null; i++) {
+        await new Promise((r) => setTimeout(r, 250));
+        try { text = await (await fetch(`http://127.0.0.1:${port}/__march/client.js`)).text(); } catch { /* not up yet */ }
+      }
+      return text;
+    } finally { child.kill(); await new Promise((r) => setTimeout(r, 500)); try { rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* temp dir, the OS cleans it */ } }
+  };
+  const on = await serve("{}", 5391), off = await serve("{ banner: false }", 5392);
+  assert.match(on, /^if \(!globalThis\[Symbol\.for\("hadi-march\.banner"\)\]\)/);
+  assert.ok(on.includes("EventSource"));
+  assert.doesNotMatch(off, /HADI March v/);
+  assert.ok(off.startsWith("// March dev client"));
+});

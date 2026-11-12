@@ -198,4 +198,4 @@ import { MadeWithMarch } from "hadi-march/ui";
 <MadeWithMarch variant="badge" />      // or "small"
 ```
 
-Prefer no visible text? `credit: true` in `march.config.js` only adds the comment `<!-- Built with HADI March -->` to the built `index.html`. It is off by default.
+Prefer no visible text? `credit: true` in `march.config.js` only adds the comment `<!-- Built with HADI March -->` to the built `index.html`. The comment is off by default; with it on, production also prints one console line. `march dev` prints a banner once per page (`banner: false` turns it off); production bundles never contain it.

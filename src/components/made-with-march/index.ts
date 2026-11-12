@@ -4,12 +4,9 @@ import { h } from "../../dom/h.ts";
 import { t } from "../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../ui/util.ts";
 
-/**
- * Where the "HADI March" link points. The one place to change it.
- * NOTE: the intended target is https://devs.hadisosyal.com/march, but that page is not published yet;
- * until it is, the link goes to the repository.
- */
-export const MARCH_URL = "https://github.com/tlghn/hadimarch";
+import { MARCH_URL } from "../../brand.js";
+/** Where "HADI March" links point: one constant in src/brand.js (shared with the console banner). */
+export { MARCH_URL };
 
 export interface MadeWithMarchProps {
   /** `text` (plain line, default), `badge` (bordered pill), `small` (compact, muted). */
