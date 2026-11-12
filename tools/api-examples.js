@@ -40,7 +40,8 @@ export const PENDING = new Set([
   "hadi-march/behaviors/dropzone", "hadi-march/behaviors/swipe", "hadi-march/behaviors/dismiss", "hadi-march/icons",
   "hadi-march/icons/catalog", "hadi-march/theme", "hadi-march/net", "hadi-march/net/mock", "hadi-march/managers",
   "hadi-march/managers/consent/ui", "hadi-march/managers/command/ui", "hadi-march/managers/undo", "hadi-march/flow",
-  "hadi-march/context-menu", "hadi-march/managers/undo/history", "hadi-march/seo", "hadi-march/seo/hydrate",
+  "hadi-march/context-menu", "hadi-march/managers/undo/history", "hadi-march/seo", "hadi-march/seo/hydrate", "hadi-march/base",
+  "hadi-march/icons/packs",
   "hadi-march/managers/accessibility/ui", "hadi-march/managers/shortcut-hint", "hadi-march/managers/shortcut-hint/ui",
   "hadi-march/dom/safe", "hadi-march/dom/sanitize", "hadi-march/dom/to-markdown",
 ]);

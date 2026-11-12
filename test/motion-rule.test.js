@@ -18,6 +18,7 @@ const ALLOWED = {
   "src/testing/dom.ts": "test DOM shim",
   "src/router/index.ts": "scroll restoration after a page swap, not an animation",
   "src/ui/popover.ts": "positions a popover once after mount, not an animation",
+  "examples/showcase/src/bench/paint.ts": "benchmark: time to the next paint, a measurement (global speed or stop-all must not change it)",
 };
 
 test("animations go through the motion engine (inventory of raw requestAnimationFrame / el.animate / setInterval)", () => {
