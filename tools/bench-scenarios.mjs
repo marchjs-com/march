@@ -14,6 +14,7 @@ const SC = join(ROOT, "examples/showcase");
 // own output folder per run: several runs may build at the same time
 const out = resolve(process.env.TMP ?? join(ROOT, ".tmp"), `march-bench-scenarios-${process.pid}`);
 const want = flag(process.argv, "--scenarios", "");
+const large = process.argv.includes("--large");
 const libs = flag(process.argv, "--libs", "vanilla,march,react,preact,vue,svelte,solid,lit");
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
@@ -43,8 +44,8 @@ import { runScenarios } from "./src/bench/scenarios/runner.ts";
 ${direct}
 const want = ${JSON.stringify(want)};
 const scenarios = ${dir ? "[def]" : `want ? SCENARIOS.filter((s) => want.split(",").includes(s.id)) : SCENARIOS`};
-runScenarios({ scenarios, libs: ${JSON.stringify(libs.split(","))}, stage: document.getElementById("stage")${dir ? ", registry" : ""} }).then((r) => {
-  window.__scen = Object.fromEntries(Object.entries(r.results).map(([s, per]) => [s, Object.fromEntries(Object.entries(per).map(([l, x]) => [l, { median: x.stats.median, p95: [...x.samples].sort((a, b) => a - b)[Math.floor(x.samples.length * 0.95)] ?? null, dropped: x.dropped, n: x.samples.length, error: x.error ?? null }]))]));
+runScenarios({ scenarios, libs: ${JSON.stringify(libs.split(","))}, stage: document.getElementById("stage"), large: ${large}${dir ? ", registry" : ""} }).then((r) => {
+  window.__scen = Object.fromEntries(Object.entries(r.results).map(([s, per]) => [s, Object.fromEntries(Object.entries(per).map(([l, x]) => [l, { median: x.stats.median, p95: [...x.samples].sort((a, b) => a - b)[Math.floor(x.samples.length * 0.95)] ?? null, dropped: x.dropped, n: x.samples.length, mount: x.mountMs ?? null, heap: x.heapMB ?? null, error: x.error ?? null }]))]));
 }, (e) => { window.__scen = { fatal: String(e && e.stack || e) }; });
 `;
 await build({
@@ -66,7 +67,7 @@ const server = createServer((req, res) => {
   res.end(readFileSync(p));
 });
 await new Promise((r) => server.listen(0, "127.0.0.1", r));
-const b = await openHeadless({ base: `http://127.0.0.1:${server.address().port}`, args: ["--js-flags=--expose-gc"] });
+const b = await openHeadless({ base: `http://127.0.0.1:${server.address().port}`, args: ["--js-flags=--expose-gc", "--enable-precise-memory-info"] });
 const fail = [];
 let res;
 try {
@@ -79,7 +80,7 @@ try {
     console.log(s);
     const base = per.vanilla?.median;
     for (const [lib, x] of Object.entries(per)) {
-      console.log(`  ${lib.padEnd(8)} median ${x.median?.toFixed(2)} ms  p95 ${x.p95?.toFixed(2)}  dropped ${x.dropped}/${x.n}${base ? `  ×${(x.median / base).toFixed(2)}` : ""}${x.error ? `  ✖ ${x.error}` : ""}`);
+      console.log(`  ${lib.padEnd(8)} median ${x.median?.toFixed(2)} ms  p95 ${x.p95?.toFixed(2)}  dropped ${x.dropped}/${x.n}${base ? `  ×${(x.median / base).toFixed(2)}` : ""}  mount ${x.mount?.toFixed(1)} ms  heap ${x.heap?.toFixed(2)} MB${x.error ? `  ✖ ${x.error}` : ""}`);
       if (x.error) fail.push(`${s}/${lib}: ${x.error}`);
     }
   }
