@@ -35,7 +35,11 @@
     "./theme": "./src/theme/index.ts",
     "./motion/install": "./src/motion/install.ts",
     "./css/themes/*": "./src/css/themes/*",
-    "./widget": "./src/widget/index.ts"
+    "./widget": "./src/widget/index.ts",
+    "./net": "./src/net/index.ts",
+    "./net/mock": "./src/net/mock.ts",
+    "./errors": "./src/errors/index.ts",
+    "./errors/errors.css": "./src/errors/errors.css"
   },
   "bin": {
     "march": "./cli/march.js"
@@ -66,6 +70,9 @@
   },
   "sideEffects": [
     "*.css",
-    "./src/motion/install.ts"
+    "./src/motion/install.ts",
+    "./src/net/index.ts",
+    "./src/net/mock.ts",
+    "./src/errors/index.ts"
   ]
 }

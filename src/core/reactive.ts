@@ -274,7 +274,11 @@ export function _enter<T>(owner: Owner | null, value: T): T {
 
 // ------------------------------------------------------------------ errors
 const ERROR = Symbol("hm.error");
+let errorHook: ((e: unknown) => void) | null = null;
+/** Observe every error a boundary handles or that escapes (hadi-march/errors installs itself here). */
+export function setErrorHook(fn: ((e: unknown) => void) | null): void { errorHook = fn; }
 function handleError(err: unknown, owner: OwnerNode | null): void {
+  errorHook?.(err);
   for (let o = owner; o; o = o.parent) {
     const h = o.context?.get(ERROR) as ((e: unknown) => void) | undefined;
     if (h) { h(err); return; }
