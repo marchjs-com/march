@@ -15,7 +15,7 @@
   inline-size: 100%; block-size: 100%; overflow: hidden; border-radius: var(--hm-dev-r);
   background: var(--hm-bg); color: var(--hm-text); display: flex; flex-direction: column;
 }
-.hm-device-viewport { position: relative; flex: 1 1 auto; overflow: auto; overscroll-behavior: contain; scrollbar-width: none; container: hm-site / inline-size; }
+.hm-device-viewport { --hm-site-nav-top: 0px; position: relative; isolation: isolate; flex: 1 1 auto; overflow: auto; overscroll-behavior: contain; scrollbar-width: none; container: hm-site / inline-size; }
 .hm-device-viewport::-webkit-scrollbar { display: none; }
 /* status bar */
 .hm-device-status { flex: none; display: flex; align-items: center; justify-content: space-between; block-size: 2.75rem; padding-inline: 1.75rem 1.4rem;
@@ -43,7 +43,7 @@
 .hm-device.is-landscape .hm-device-status { block-size: 1.5rem; }
 /* touch: no cursor, a finger dot that grows while pressed */
 .hm-device.is-touch .hm-device-screen, .hm-device.is-touch .hm-device-screen * { cursor: none !important; }
-.hm-device-touch { position: absolute; z-index: 4; inset-block-start: 0; inset-inline-start: 0; inline-size: 2.2rem; block-size: 2.2rem; margin-block-start: -1.1rem; margin-inline-start: -1.1rem; border-radius: 50%;
+.hm-device-touch { position: absolute; z-index: var(--hm-z-drag, 250); inset-block-start: 0; inset-inline-start: 0; inline-size: 2.2rem; block-size: 2.2rem; margin-block-start: -1.1rem; margin-inline-start: -1.1rem; border-radius: 50%;
   background: color-mix(in srgb, var(--hm-text) 18%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--hm-bg) 60%, transparent); pointer-events: none; opacity: 0;
   transition: opacity var(--hm-dur-fast) var(--hm-ease), scale var(--hm-dur-fast) var(--hm-ease); }
 .hm-device.is-touch .hm-device-screen:hover .hm-device-touch { opacity: 1; }
