@@ -17,6 +17,8 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SC = join(ROOT, "examples/showcase");
 const check = process.argv.includes("--check");
+// --only <scenario>: compile just that scenario folder's Vue/Svelte/Solid files (while writing a new scenario)
+const only = process.argv.includes("--only") ? process.argv[process.argv.indexOf("--only") + 1] : "";
 
 /** Library id → source file and npm packages (keep in step with examples/showcase/src/bench/libs.ts). */
 export const APPS = {
@@ -93,10 +95,13 @@ const scenarioSources = (dir) => {
 
 async function compiled() {
   const out = {};
-  out["src/bench/apps/vue.render.gen.js"] = await compileVue("src/bench/apps/vue.template.html");
-  out["src/bench/apps/svelte.gen.js"] = await compileSvelte("src/bench/apps/svelte.svelte");
-  out["src/bench/apps/solid.gen.js"] = await compileSolid("src/bench/apps/solid.jsx");
+  if (!only) {
+    out["src/bench/apps/vue.render.gen.js"] = await compileVue("src/bench/apps/vue.template.html");
+    out["src/bench/apps/svelte.gen.js"] = await compileSvelte("src/bench/apps/svelte.svelte");
+    out["src/bench/apps/solid.gen.js"] = await compileSolid("src/bench/apps/solid.jsx");
+  }
   for (const dir of scenarioDirs()) {
+    if (only && dir !== only) continue;
     const base = `${SCEN}/${dir}`;
     for (const f of readdirSync(join(SC, base))) {
       if (f.endsWith(".template.html")) out[`${base}/${f.replace(/\.template\.html$/, ".render.gen.js")}`] = await compileVue(`${base}/${f}`);
@@ -148,7 +153,7 @@ for (const pkg of [...new Set(Object.values(APPS).flatMap((a) => a.pkgs))]) {
 }
 
 const scenSources = Object.fromEntries(scenarioDirs().map((dir) => [dir, Object.fromEntries(Object.entries(scenarioSources(dir)).map(([id, fs]) => [id, fs.map((f) => (fs.length > 1 ? `// ── ${f.split("/").pop()}\n` : "") + readFileSync(join(SC, f), "utf8").replace(/\r\n/g, "\n").trim()).join("\n\n") + "\n"]))]));
-const files = { "public/bench/scenario-sources.json": json(scenSources), "public/bench/sources.json": json(sources), "public/bench/licenses.json": json(licenses), "public/bench/sizes.json": json(await sizes()), ...gen };
+const files = only ? gen : { "public/bench/scenario-sources.json": json(scenSources), "public/bench/sources.json": json(sources), "public/bench/licenses.json": json(licenses), "public/bench/sizes.json": json(await sizes()), ...gen };
 let stale = [];
 // sizes follow the library sources: --check only asks that every library has a size
 const SIZES = "public/bench/sizes.json";
