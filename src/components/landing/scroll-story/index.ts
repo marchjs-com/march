@@ -1,7 +1,8 @@
 // ScrollStory (hadi-march/landing): scrollytelling. The media column stays pinned while the text steps scroll past;
 // the step nearest the middle of the viewport is the active one — its picture cross-fades in (motion engine), the dots
-// follow, and with `theme` the whole section takes that step's colour (a CSS transition on the background). On phones
-// the pinned media sits at the top with the steps flowing under it.
+// follow, and with `theme` the whole section takes that step's colour (a CSS transition on the background). When the
+// section is narrow (under 820 px of its own width: a phone, a narrow column) nothing is pinned: every step is a card
+// with its own picture above its text, so the picture and its words are always seen together.
 import "./scroll-story.css";
 import { h } from "../../../dom/h.ts";
 import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
@@ -33,8 +34,11 @@ export interface ScrollStoryProps {
 /** `<ScrollStory steps={[{ title: "Plan", body: "…", media: <Chart/>, color: "brand-blue" }, …]} />` */
 export function ScrollStory(props: ScrollStoryProps): Element {
   const active = signal(0);
-  const media = props.steps.map((s, i) => h("div", { class: () => cx("hm-story-media", active() === i && "is-active"), "aria-hidden": () => (active() === i ? null : "true") }, s.media) as HTMLElement);
+  const stacked = signal(false);
+  const media = props.steps.map((s, i) => h("div", { class: () => cx("hm-story-media", active() === i && "is-active"), "aria-hidden": () => (stacked() || active() === i ? null : "true") }, s.media) as HTMLElement);
+  const slots = props.steps.map(() => h("div", { class: "hm-story-inline" }) as HTMLElement);
   const steps = props.steps.map((s, i) => h("article", { class: () => cx("hm-story-step", active() === i && "is-active") },
+    slots[i],
     h("span", { class: "hm-story-num", "aria-hidden": "true" }, String(i + 1).padStart(2, "0")),
     h("h3", { class: "hm-story-title" }, s.title),
     s.body != null ? h("p", { class: "hm-story-body" }, s.body) : null) as HTMLElement);
@@ -45,6 +49,19 @@ export function ScrollStory(props: ScrollStoryProps): Element {
   },
   h("div", { class: "hm-story-pin" }, h("div", { class: "hm-story-stage" }, media), dots),
   h("div", { class: "hm-story-steps" }, steps)) as HTMLElement;
+
+  // narrow (by the section's own width): each picture moves into its step card; wide: back into the pinned stage
+  const stage = root.querySelector(".hm-story-stage") as HTMLElement;
+  if (globalThis.ResizeObserver) {
+    const ro = new ResizeObserver(() => { const n = root.clientWidth > 0 && root.clientWidth < 820; if (n !== stacked.peek()) stacked.set(n); });
+    ro.observe(root);
+    if (getOwner()) onCleanup(() => ro.disconnect());
+  }
+  effect(() => {
+    const n = stacked();
+    root.classList.toggle("is-stacked", n);
+    media.forEach((m, i) => (n ? slots[i]!.appendChild(m) : stage.appendChild(m)));
+  });
 
   // the active step: the one whose middle is nearest the viewport middle
   const offScroll = onScrollProgress({ track: root }, () => {
@@ -59,7 +76,8 @@ export function ScrollStory(props: ScrollStoryProps): Element {
     const i = active();
     untrack(() => {
       props.onStep?.(i);
-      if (i === prev || reducedMotion()) { prev = i; return; }
+      // stacked: every picture is shown in its own card, nothing cross-fades
+      if (i === prev || reducedMotion() || stacked.peek()) { prev = i; return; }
       const dir = i > prev ? 1 : -1;
       const inEl = media[i], outEl = media[prev];
       if (inEl) animate(inEl, { opacity: [0, 1], transform: [`translate3d(0, ${24 * dir}px, 0) scale(.97)`, "translate3d(0, 0, 0) scale(1)"] }, { duration: 620, easing: "expo" });
