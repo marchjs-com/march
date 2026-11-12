@@ -34,6 +34,7 @@ import { bannerSource } from "./banner.js";
 import { templates } from "./templates.js";
 import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
 import { packChunks, STRATEGIES } from "../compiler/pack-chunks.js";
+import { packLoop, PACK_BUDGET } from "../compiler/pack-loop.js";
 import { planSmallLazy, smallFiles, aliasGroups } from "../compiler/min-chunks.js";
 import { chunkManifest, htmlManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText, fileSizes } from "./perf.js";
 import { posix } from "../compiler/fs-util.js";
@@ -174,13 +175,12 @@ async function build({ dev = false } = {}) {
     // the planners aim 5% over the floor: their sizes come before the final rewrites (shorter import names, CSS loaders
     // stripped), which shrink a file a little — a chunk planned at 10.1 KB must not end at 9.9 KB
     const aim = Math.ceil(minSize * 1.05);
-    let plan = null, r, entryKey = null, builds = 0, seen = [], settled = false, rPlan = null;
+    let plan = null, r, entryKey = null, builds = 0;
     // one build: esbuild, then (production) the entry merge and the chunk packer with the given packing strategy
     const once = async (strategy) => {
       if (builds++) rmSync(resolve(out, "assets"), { recursive: true, force: true });
       if (builds > 1) T("clean");
       r = await esbuild.build(buildOptions(cfg, esbuild, { dev, plan }));
-      rPlan = plan;
       T("esbuild"); T.count("esbuild");
       entryKey = null;
       // production: the entry and its static chunks become one file (fewer requests, better compression)
@@ -197,40 +197,21 @@ async function build({ dev = false } = {}) {
       return true;
     };
     const left = () => (minSize && entryKey ? smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).length : 0);
-    for (let pass = 0; pass < 9; pass++) {
-      if (!(await once(0))) break;
-      const n = left();
-      if (process.env.MARCH_DEBUG_COMMON) console.log(`[pack] pass ${pass}: ${n} small`, smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).map((x) => `${x.file.split("/").pop()} ${x.bytes}`).join(", "));
-      if (!seen.some((x) => x.key === JSON.stringify(plan))) seen.push({ plan, n, key: JSON.stringify(plan) });
+    // the packing loop (compiler/pack-loop.js): passes until the planner settles, then the other packing strategies while
+    // small files are left; a budget of builds and seconds (chunks.maxBuilds / chunks.maxSeconds, MARCH_PACK_MAX_BUILDS /
+    // MARCH_PACK_SECONDS); one line per build with its time
+    const env = (k) => (process.env[k] ? Number(process.env[k]) : undefined);
+    const res = await packLoop({
+      build: async (p, s) => { plan = p; const ok = await once(s); if (process.env.MARCH_DEBUG_COMMON && ok) console.log("[pack] small:", smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).map((x) => `${x.file.split("/").pop()} ${x.bytes}`).join(", ")); return ok && !!minSize; },
+      left,
       // chunks.commonRoom (gzip bytes): page groups stay this far under the route budget, so the shared "common" chunk
       // (pack-chunks.js) still fits on every route that loads it
-      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined, room: cfg.chunks?.commonRoom ?? 0, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
-      T("planSmallLazy"); T.count("planSmallLazy");
-      if (!next) { settled = true; break; }
-      // the planner's plans can cycle (a group taken apart, rebuilt, taken apart again): a plan seen before ends the passes
-      if (seen.some((x) => x.key === JSON.stringify(next))) break;
-      plan = next;
-    }
-    // last step of packing: small files still left on the final plan → the same build with the next packing strategy
-    // (another fold order). The planner may not settle (its plans can cycle): then every plan it made is tried, the one
-    // with the fewest small files first. The first build with none left wins, else the one with the fewest (it fails).
-    plan = rPlan; // the plan of the build on disk (the passes may end on a newer one)
-    if (!dev && entryKey && cfg.packChunks !== false && left()) {
-      const last = plan;
-      let best = { plan, s: 0, n: left() };
-      const plans = settled ? [{ plan, n: best.n }] : [...seen].sort((a, b) => a.n - b.n).slice(0, 2);
-      search: for (const p of plans) for (let s = 0; s < STRATEGIES.length; s++) {
-        if (p.plan === last && s === 0) continue; // the build already done
-        plan = p.plan;
-        if (!(await once(s))) break search;
-        const n = left();
-        T.count("strategy");
-        if (process.env.MARCH_DEBUG_COMMON) console.log(`[pack] plan n${p.n} strategy ${s}: ${n} small`, smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).map((x) => `${x.file.split("/").pop()} ${x.bytes}`).join(", "));
-        if (n < best.n) best = { plan, s, n };
-        if (!n) break search;
-      }
-      if (best.n) { plan = best.plan; await once(best.s); }
-    }
+      next: (p) => { const n = planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: p, maxLoad: cfg.budget ? cfg.budget.route : undefined, room: cfg.chunks?.commonRoom ?? 0, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }); T("planSmallLazy"); T.count("planSmallLazy"); return n; },
+      strategies: dev || cfg.packChunks === false ? 1 : STRATEGIES.length,
+      maxBuilds: env("MARCH_PACK_MAX_BUILDS") ?? cfg.chunks?.maxBuilds ?? PACK_BUDGET.maxBuilds,
+      maxMs: (env("MARCH_PACK_SECONDS") ?? cfg.chunks?.maxSeconds ?? PACK_BUDGET.maxSeconds) * 1000,
+    });
+    plan = res.plan;
     // final names: every rewritten file gets a new content version (a cached file must never point at another build),
     // no name starts with _ or . (some hosts refuse those); stable names on request
     T("smallFiles");

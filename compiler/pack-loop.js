@@ -1,0 +1,69 @@
+// The packing loop of `march build` (release): build → plan the small lazy modules → build again, until the planner
+// settles; then, while small files are left, the same build with the other packing strategies. Each build is a full
+// esbuild + entry merge + packChunks run (the expensive part), so the loop has a budget: at most `maxBuilds` builds and
+// `maxMs` milliseconds. Past it the best build so far is kept (it may still leave small files: the build reports them).
+// Every build prints one line: which step, how many small files, how long it took.
+//
+//   const res = await packLoop({ build, left, next, strategies: STRATEGIES.length, maxBuilds: 14, maxMs: 600_000 })
+//   build(plan, strategy) → false when there is nothing to pack (dev build, no entry); left() → small files on disk;
+//   next(plan) → the planner's next plan, or null when it is settled.
+
+/** Default budget: builds and seconds (march.config.js › chunks.maxBuilds / chunks.maxSeconds, or the env overrides). */
+export const PACK_BUDGET = { maxBuilds: 14, maxSeconds: 600 };
+
+/**
+ * @param {{ build: (plan: unknown, strategy: number) => Promise<boolean>, left: () => number, next: (plan: unknown) => unknown,
+ *   strategies: number, maxPasses?: number, maxBuilds?: number, maxMs?: number, now?: () => number, log?: (line: string) => void }} o
+ * @returns {Promise<{ plan: unknown, strategy: number, small: number, builds: number, stopped: string | null }>}
+ */
+export async function packLoop({ build, left, next, strategies, maxPasses = 9, maxBuilds = PACK_BUDGET.maxBuilds, maxMs = PACK_BUDGET.maxSeconds * 1000, now = () => Date.now(), log = (l) => console.log(l) }) {
+  const t0 = now();
+  let builds = 0, stopped = null, onDisk = { plan: null, strategy: 0 };
+  const over = () => {
+    if (builds >= maxBuilds) return (stopped = `build limit (${maxBuilds})`);
+    if (now() - t0 >= maxMs) return (stopped = `time limit (${Math.round(maxMs / 1000)} s)`);
+    return null;
+  };
+  const run = async (plan, strategy, what) => {
+    const t = now();
+    const ok = await build(plan, strategy);
+    builds++;
+    onDisk = { plan, strategy };
+    const small = ok ? left() : 0;
+    log(`[pack] build ${builds} (${what}): ${small} small, ${((now() - t) / 1000).toFixed(1)} s`);
+    return ok ? small : -1;
+  };
+  // passes: plan, build, plan again (strategy 0)
+  let plan = null, settled = false, small = -1;
+  const seen = [];
+  for (let pass = 0; pass < maxPasses; pass++) {
+    small = await run(plan, 0, `pass ${pass + 1}`);
+    if (small < 0) return { plan, strategy: 0, small: 0, builds, stopped };
+    const key = JSON.stringify(plan);
+    if (!seen.some((x) => x.key === key)) seen.push({ plan, n: small, key });
+    const nxt = next(plan);
+    if (!nxt) { settled = true; break; }
+    // the planner's plans can cycle: a plan seen before ends the passes
+    if (seen.some((x) => x.key === JSON.stringify(nxt))) break;
+    if (over()) break;
+    plan = nxt;
+  }
+  // the build on disk is the last one; its plan is `plan` (the passes may have ended on a newer, unbuilt plan)
+  plan = onDisk.plan;
+  let best = { plan, strategy: 0, n: small };
+  if (small > 0 && !stopped) {
+    const plans = settled ? [{ plan, n: small }] : [...seen].sort((a, b) => a.n - b.n).slice(0, 2);
+    search: for (const p of plans) for (let s = 0; s < strategies; s++) {
+      if (p.plan === onDisk.plan && s === onDisk.strategy) continue; // that build is on disk
+      if (over()) break search;
+      const n = await run(p.plan, s, `last step, strategy ${s}`);
+      if (n < 0) break search;
+      if (n < best.n) best = { plan: p.plan, strategy: s, n };
+      if (!n) break search;
+    }
+  }
+  // the best build back on disk when it is not the last one (allowed past the budget: the output must be the best)
+  if (onDisk.plan !== best.plan || onDisk.strategy !== best.strategy) await run(best.plan, best.strategy, "best again");
+  log(`[pack] ${builds} build(s) in ${((now() - t0) / 1000).toFixed(1)} s, ${best.n} small file(s) left${stopped ? `; stopped at the ${stopped}` : ""}`);
+  return { plan: best.plan, strategy: best.strategy, small: best.n, builds, stopped };
+}

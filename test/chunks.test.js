@@ -122,3 +122,29 @@ test("tagLoaders tags bare loaders only: () => import(x).then(…) stays a funct
   const chained = `lazy(() => import("./index.ts").then((m) => ({ default: m.Chip })))`;
   assert.equal(tagLoaders(chained, file, root), chained);
 });
+
+test("packLoop: a planner that never settles stops at the build limit; the best build is back on disk; one line per build", async () => {
+  const { packLoop } = await import("../compiler/pack-loop.js");
+  let clock = 0, disk = null, plans = 0;
+  const lines = [];
+  // every build: 10 s; small files: 5 for plan 0, then 3, 4, 3, 4 … (a cycle-free but endless planner), strategy 2 best
+  const build = async (plan, s) => { clock += 10_000; disk = { plan, s }; return true; };
+  const left = () => (disk.s === 2 ? 1 : disk.plan == null ? 5 : 3 + (disk.plan % 2));
+  const next = () => ++plans;
+  const res = await packLoop({ build, left, next, strategies: 6, maxBuilds: 8, maxMs: 1e9, now: () => clock, log: (l) => lines.push(l) });
+  assert.ok(res.builds <= 9, `${res.builds} builds: the limit (8) plus the one that puts the best build back`);
+  assert.match(res.stopped, /build limit/);
+  assert.deepEqual(disk, { plan: res.plan, s: res.strategy }, "the best build is the one on disk");
+  assert.equal(lines.filter((l) => /^\[pack\] build \d+ \(.+\): \d+ small, [\d.]+ s$/.test(l)).length, res.builds, "one timed line per build");
+  assert.match(lines.at(-1), /build\(s\) in [\d.]+ s, \d+ small file\(s\) left; stopped at the build limit/);
+});
+
+test("packLoop: the time limit ends the passes; a settled planner with nothing small left builds once", async () => {
+  const { packLoop } = await import("../compiler/pack-loop.js");
+  let clock = 0, n = 0;
+  const slow = await packLoop({ build: async () => { clock += 100_000; return true; }, left: () => 2, next: () => ++n, strategies: 6, maxBuilds: 99, maxMs: 300_000, now: () => clock, log: () => {} });
+  assert.match(slow.stopped, /time limit/);
+  assert.ok(slow.builds <= 4, `${slow.builds} builds in a 300 s budget of 100 s builds`);
+  const done = await packLoop({ build: async () => true, left: () => 0, next: () => null, strategies: 6, log: () => {} });
+  assert.deepEqual([done.builds, done.small, done.stopped], [1, 0, null]);
+});
