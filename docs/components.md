@@ -7,6 +7,7 @@
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| EasingCurveEditor | experimental | Cubic-bezier easing editor: draggable handles, the engine's named curves as presets, live preview on the motion engine clock, registers the curve by name (defineEasing). | — |
 | GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | ColorPicker, Segmented, IconButton |
 | JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | TreeEditor |
 | MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, RichTextEditor |
@@ -56,6 +57,17 @@ A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left 
 ```
 
 Full page: src/components/overlays/drawer/docs.md
+
+## EasingCurveEditor
+
+Edit a `cubic-bezier()` easing by its two handles and watch it run. The preview runs on the motion engine's clock, so the global speed, "Stop all" and reduced motion apply to it; a faint dot moves linearly beside the eased one, and a marker rides the curve. The presets are the engine's named curves. With `name`, every change registers the curve in the engine (`defineEasing`), so any animation can use it by name.
+
+```tsx
+<EasingCurveEditor bind:value={$easing} name="acme-pop" />
+animate(card, frames, { duration: 600, easing: "acme-pop" })
+```
+
+Full page: src/components/composite/easing-curve-editor/docs.md
 
 ## GradientEditor
 
