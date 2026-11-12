@@ -352,6 +352,18 @@ Rules:
 - Check: `node tools/motion-audit.mjs` (headless Edge: Stop all, speed, 200-item stagger: no long task).
 Reference: docs/motion.md. The showcase page "Animasyon motoru" (/animation) shows every piece.
 
+### 15c. Ready-made animations (all on the engine, each its own export)
+
+```ts
+import { drawPath, morphPath, followPath, clipReveal, filterBlur, displace, goo } from "hadi-march/motion";
+drawPath(svg.querySelectorAll("path"), { stagger: 80 });       // stroke draws in (pathLength=1, no measuring)
+morphPath(pathEl, starD, { easing: "spring" });                // any two paths: different point counts are resampled
+followPath(dot, roadD, { rotate: true, trail: roadEl });       // along a path, the trail drawn in the same frame
+clipReveal(card, { shape: "circle", origin: { x: 20, y: 80 } }); // circle | wipe (RTL mirrored) | diamond | curtain | blinds | inset
+filterBlur(title, { from: 16, axis: "x" }); displace(card, { from: 60 }); const off = goo(container);
+```
+Pure path tools (no DOM): `parsePath`, `flatten`, `pathSampler`, `resample`, `interpolatePath`, `toD`.
+
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 
 **Never call `fetch()`, `new WebSocket()` or `new EventSource()` in app code. All traffic goes through `net` or an

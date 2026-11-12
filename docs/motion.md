@@ -63,3 +63,20 @@ slow motion and reduced motion reach all of it:
 Not animations (left as they are): popover positioning after mount, scroll restoration after a page swap, polling and
 heartbeat timers. `test/motion-rule.test.js` keeps it this way: a new `requestAnimationFrame` loop, raw `el.animate()`
 or a `setInterval` that moves something fails the tests.
+
+## Ready-made animations
+
+Each is a separate export of `hadi-march/motion` built on `animate()` / `animateValue()`, so tree shaking keeps only
+what a page imports and global speed, "Stop all" and reduced motion reach every one. Showcase: Hareket › SVG,
+Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
+
+### SVG (src/motion/svg.ts, path.ts, clip.ts, svg-filter.ts)
+- `drawPath(targets, { from, to, stagger })` — `pathLength="1"` and a dash offset (native WAAPI); erase with `from: 1, to: 0`.
+- `morphPath(path, d, { points })` — same command lists tween number by number (curves stay curves); otherwise both
+  paths are resampled to `points` evenly spaced points and a closed outline is rotated so the points travel least.
+- `followPath(el, d, { rotate, angle, trail })` — position (and tangent) per frame; SVG targets get a `transform`
+  attribute in user units, HTML targets a CSS transform in px. `trail` draws a stroke up to the element in the same frame.
+- `clipReveal(el, { shape, origin, from, count, vertical, hide })` and the pure `clipAt(p, o)` / `clipFrames(o)`; the
+  wipe's `start` / `end` follow the text direction.
+- `filterBlur`, `displace` (feTurbulence + feDisplacementMap), `goo` (blur + alpha contrast): one `<filter>` per call in a
+  hidden `<svg>`, removed when the value settles at 0 (or by the returned cleanup for `goo`).

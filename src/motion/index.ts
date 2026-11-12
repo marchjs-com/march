@@ -14,6 +14,11 @@ export { pageTransitions, transitionFrames, resolveTransition, navDirection, typ
 export { drag, swipe, press, magnet, tilt, type DragOptions } from "./gestures.ts";
 export { reducedMotion, setReducedMotion, frame, frameLoop, animateEl } from "./env.ts";
 export * as easing from "./easing.ts";
+// SVG: stroke drawing, path morph (resampled), motion along a path, clip reveals, SVG filters
+export { drawPath, morphPath, followPath, type DrawOptions, type MorphPathOptions, type FollowOptions } from "./svg.ts";
+export { parsePath, flatten, pathLength, pathSampler, resample, interpolatePath, toD, type PathPoint } from "./path.ts";
+export { clipReveal, clipFrames, clipAt, type ClipShape, type ClipSide, type ClipOptions } from "./clip.ts";
+export { filterBlur, displace, goo, type BlurOptions, type DisplaceOptions, type GooOptions } from "./svg-filter.ts";
 
 // the engine (new API)
 export {
