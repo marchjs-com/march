@@ -28,7 +28,7 @@ import { genApi, genApiClasses, mockHandler } from "./openapi.js";
 import { bannerSource } from "./banner.js";
 import { templates } from "./templates.js";
 import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
-import { packChunks } from "../compiler/pack-chunks.js";
+import { packChunks, STRATEGIES } from "../compiler/pack-chunks.js";
 import { planSmallLazy, smallFiles, aliasGroups } from "../compiler/min-chunks.js";
 import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText, fileSizes } from "./perf.js";
 import { posix } from "../compiler/fs-util.js";
@@ -144,24 +144,43 @@ async function build({ dev = false } = {}) {
     // the planners aim 5% over the floor: their sizes come before the final rewrites (shorter import names, CSS loaders
     // stripped), which shrink a file a little — a chunk planned at 10.1 KB must not end at 9.9 KB
     const aim = Math.ceil(minSize * 1.05);
-    let plan = null, r;
-    for (let pass = 0; pass < 6; pass++) {
-      if (pass) rmSync(resolve(out, "assets"), { recursive: true, force: true });
+    let plan = null, r, entryKey = null, builds = 0;
+    // one build: esbuild, then (production) the entry merge and the chunk packer with the given packing strategy
+    const once = async (strategy) => {
+      if (builds++) rmSync(resolve(out, "assets"), { recursive: true, force: true });
       r = await esbuild.build(buildOptions(cfg, esbuild, { dev, plan }));
+      entryKey = null;
       // production: the entry and its static chunks become one file (fewer requests, better compression)
-      if (dev || cfg.mergeEntry === false) break;
+      if (dev || cfg.mergeEntry === false) return false;
       const want = resolve(cwd, cfg.entry);
-      const entryKey = Object.keys(r.metafile.outputs).find((k) => r.metafile.outputs[k].entryPoint && resolve(cwd, r.metafile.outputs[k].entryPoint) === want);
-      if (!entryKey) break;
+      entryKey = Object.keys(r.metafile.outputs).find((k) => r.metafile.outputs[k].entryPoint && resolve(cwd, r.metafile.outputs[k].entryPoint) === want);
+      if (!entryKey) return false;
       const minify = flag("--no-minify") !== true;
       await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
       // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
-      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: aim || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan) });
+      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: aim || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan), strategy });
+      return true;
+    };
+    const left = () => (minSize && entryKey ? smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).length : 0);
+    for (let pass = 0; pass < 6; pass++) {
+      if (!(await once(0))) break;
       // chunks.commonRoom (gzip bytes): page groups stay this far under the route budget, so the shared "common" chunk
       // (pack-chunks.js) still fits on every route that loads it
       const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route - (cfg.chunks?.commonRoom ?? 0) : undefined, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
       if (!next) break;
       plan = next;
+    }
+    // last step of packing: small shared chunks still left on the final plan → the same build with the next packing
+    // strategy (another fold order); the first with none left wins, else the one with the fewest (the build then fails)
+    if (!dev && entryKey && cfg.packChunks !== false && left()) {
+      let best = { s: 0, n: left() };
+      for (let s = 1; s < STRATEGIES.length && best.n; s++) {
+        if (!(await once(s))) break;
+        const n = left();
+        if (process.env.MARCH_DEBUG_COMMON) console.log(`[pack] strategy ${s}: ${n} small`, smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).map((x) => `${x.file} ${x.bytes}`).join(", "));
+        if (n < best.n) best = { s, n };
+      }
+      if (best.n && best.s !== STRATEGIES.length - 1) await once(best.s);
     }
     // final names: every rewritten file gets a new content version (a cached file must never point at another build),
     // no name starts with _ or . (some hosts refuse those); stable names on request

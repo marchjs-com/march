@@ -159,7 +159,7 @@ export function ProgressRing(props: ProgressRingProps): Element {
   const level = computed(() => { const [a, b] = read(props.thresholds) ?? [50, 80], p = (v() / max()) * 100; return p < a ? "low" : p < b ? "mid" : "high"; });
   const text = (): unknown => formatter(read<FormatSpec | null | undefined>(props.format), (x) => String(Math.round(x as number)))(v());
   const list = colorList(props.colors);
-  const svg = h("svg", { "data-hm-color": colorAttr(props.color),
+  const svg = h("svg", { "data-hm-color": () => colorAttr(props.color),
     class: () => `hm-ring hm-ring-${level()}`, role: "img", viewBox: () => `0 0 ${S()} ${S()}`, width: S, height: S,
     "aria-label": () => `${read(props.label) ?? "Score"}: ${text()} of ${max()}`,
   },
@@ -170,7 +170,7 @@ export function ProgressRing(props: ProgressRingProps): Element {
   if (!list && props.paint !== "cycle") return svg as Element;
   // several colors: SVG strokes cannot take a sweep gradient, so a conic paint is masked to the ring (CSS) and laid over
   const paint = h("span", { class: cx("hm-ring-paint", props.paint === "cycle" && "is-cycle"), "aria-hidden": "true" }) as HTMLElement;
-  const wrap = h("span", { class: "hm-ring-multi", "data-hm-color": colorAttr(props.color), "data-hm-colors": list ? (Array.isArray(props.colors) ? "custom" : String(props.colors)) : null }, svg, paint) as HTMLElement;
+  const wrap = h("span", { class: "hm-ring-multi", "data-hm-color": () => colorAttr(props.color), "data-hm-colors": list ? (Array.isArray(props.colors) ? "custom" : String(props.colors)) : null }, svg, paint) as HTMLElement;
   paint.style.setProperty("--hm-ring-paint", paintOf(list ?? ["cat-1", "cat-2", "cat-3", "cat-4"], props.paint === "segments" ? "segments" : "gradient", "conic", true));
   effect(() => { wrap.style.setProperty("--hm-ring-s", `${S()}px`); wrap.style.setProperty("--hm-ring-t", `${T()}px`); wrap.style.setProperty("--hm-ring-p", String(props.paint === "cycle" ? 1 : v() / max())); });
   return wrap

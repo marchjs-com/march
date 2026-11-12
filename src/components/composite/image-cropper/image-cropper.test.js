@@ -43,3 +43,30 @@ test("ImageCropper: labelled area, aspect choices, rotate / mirror / reset butto
   assert.deepEqual([v().zoom, v().rotate, v().flip], [1, 0, false]);
   dispose();
 });
+
+test("crop geometry: at every angle and aspect the image covers the frame, and the pan limit is exactly the edge", () => {
+  const iw = 1600, ih = 1067; // a landscape photo, as in the showcase
+  const view = [640, 480];
+  for (const aspect of [null, 1, 4 / 3, 16 / 9, 9 / 16, 3 / 4]) {
+    for (const rotate of [0, 90, 17, -17, 45, 180, 270, 33.3]) {
+      for (const zoom of [1, 1.7, 4]) {
+        const st = { ...G.DEFAULT_CROP, aspect, rotate, zoom };
+        const [fw, fh] = G.frameSize(st, view[0], view[1]);
+        const S = G.coverScale(iw, ih, fw, fh, rotate) * zoom, a = (rotate * Math.PI) / 180, c = Math.cos(a), s = Math.sin(a);
+        // the frame corners in image pixels, for a pan pushed far to each side
+        for (const [dx, dy] of [[-9, 0], [9, 0], [0, -9], [0, 9], [-9, -9], [9, 9], [0, 0]]) {
+          const [x, y] = G.clampPan({ ...st, x: dx, y: dy }, iw, ih, fw, fh);
+          let reach = 0;
+          for (const [kx, ky] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+            const px = (kx * fw) / 2 - x * fw, py = (ky * fh) / 2 - y * fh; // corner relative to the image center (screen px)
+            const u = (px * c + py * s) / S, v = (-px * s + py * c) / S;     // back into image pixels
+            assert.ok(Math.abs(u) <= iw / 2 + 1e-6 && Math.abs(v) <= ih / 2 + 1e-6, `corner outside the image: aspect ${aspect} ${rotate}° zoom ${zoom} pan ${dx},${dy}`);
+            reach = Math.max(reach, Math.abs(u) / (iw / 2), Math.abs(v) / (ih / 2));
+          }
+          // pushed to a side, the image edge meets the frame edge: no more, no less
+          if (dx || dy) assert.ok(reach > 1 - 1e-6, `pan stops short of the edge: aspect ${aspect} ${rotate}° zoom ${zoom} pan ${dx},${dy} (${reach})`);
+        }
+      }
+    }
+  }
+});

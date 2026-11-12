@@ -50,6 +50,8 @@ export interface EasingCurveEditorProps extends ControlProps<string> {
   duration?: number | undefined;
   /** Live preview: "move" (default), "scale", "fade" or "none". */
   preview?: "move" | "scale" | "fade" | "none" | undefined;
+  /** A small curve, presets in one scrolling row, no CSS line: for an inspector (KeyframeTimeline uses it). */
+  compact?: boolean | undefined;
   class?: ClassProp;
 }
 
@@ -165,7 +167,7 @@ export function EasingCurveEditor(props: EasingCurveEditorProps): unknown {
   }, h("svg", { ...NS, viewBox: "-4 20 108 180", class: "hm-ec-thumb", "aria-hidden": "true" }, h("path", { d: curvePath(p.value) })), h("span", null, p.label ?? p.name)))) : null);
 
   return h("div", {
-    class: () => cx("hm-ec", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? t`Easing curve editor`, "data-hm-color": c["data-hm-color"],
+    class: () => cx("hm-ec", props.compact && "hm-ec-compact", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? t`Easing curve editor`, "data-hm-color": c["data-hm-color"],
     ref: (el: HTMLElement) => { root = el; },
   },
   h("div", { class: "hm-ec-main" }, svg, h("div", { class: "hm-ec-side" }, stage, inputs,

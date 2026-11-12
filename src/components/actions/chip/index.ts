@@ -30,6 +30,6 @@ export function Chip(props: ChipProps): Element {
     h(OverflowText, { class: "hm-chip2-label" }, props.children),
   ];
   const remove = props.onRemove && h("button", { type: "button", class: "hm-chip2-x", "aria-label": () => t`Remove`, onClick: (e: Event) => { e.stopPropagation(); props.onRemove?.(); } }, glyph(xIcon));
-  if (toggle) return h("span", { "data-hm-color": colorAttr(props.color), class: cls }, h("button", { type: "button", class: "hm-chip2-hit", "aria-pressed": () => (props.selected !== undefined ? String(!!val(props.selected)) : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, body), remove);
-  return h("span", { "data-hm-color": colorAttr(props.color), class: cls }, body, remove);
+  if (toggle) return h("span", { "data-hm-color": () => colorAttr(props.color), class: cls }, h("button", { type: "button", class: "hm-chip2-hit", "aria-pressed": () => (props.selected !== undefined ? String(!!val(props.selected)) : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, body), remove);
+  return h("span", { "data-hm-color": () => colorAttr(props.color), class: cls }, body, remove);
 }

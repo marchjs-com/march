@@ -52,7 +52,7 @@ export function Button(props: ButtonProps): unknown {
     props.children != null && h("span", { class: "hm-btn-label" }, props.children),
     props.iconEnd != null && icon(props.iconEnd),
   ];
-  const attrs = { ...rest(props, ["variant", "size", "loading", "icon", "iconEnd", "block", "href", "disabled", "type", "color"]), "data-hm-color": colorAttr(props.color) };
+  const attrs = { ...rest(props, ["variant", "size", "loading", "icon", "iconEnd", "block", "href", "disabled", "type", "color"]), "data-hm-color": () => colorAttr(props.color) };
   if (props.href != null) {
     const href = (): Href => val(props.href as MaybeFn<Href>);
     const L = routerLink(); // the router's Link when the app has a router; otherwise a plain link

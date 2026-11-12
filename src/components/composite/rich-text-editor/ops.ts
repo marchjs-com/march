@@ -428,3 +428,12 @@ export function applySnapshot(root: Element, s: Snapshot, focus = true): void {
 }
 /** Snapshots equal (same markup). */
 export const sameContent = (a: Snapshot, root: Element): boolean => a.nodes.length === root.childNodes.length && a.nodes.every((n, i) => (n as Element).isEqualNode?.(root.childNodes[i]!) ?? false);
+
+/**
+ * The suggestion a caret is in, from the text before it: "@" or ":" right after a space, "(" or a line start, then up to
+ * 24 word characters. Inside a word ("10:30", "http:", "a@b") nothing opens. A lone ":" opens the common emoji.
+ */
+export function suggestTrigger(before: string): { kind: "@" | ":"; query: string } | null {
+  const m = /(?:^|[\s(])([@:])([\p{L}\p{N}_.-]{0,24})$/u.exec(before.replace(/\u00a0/g, " "));
+  return m ? { kind: m[1] as "@" | ":", query: m[2]! } : null;
+}

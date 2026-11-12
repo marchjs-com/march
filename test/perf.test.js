@@ -394,3 +394,54 @@ test("start-up does not grow with the page count: more pages add only their rout
   // a route row ("/p12": () => import("./p12-HASH.js") with its manifest tag) is all a page may add
   assert.ok((many - few) / 27 <= 64, `start-up: ${few} B with 3 pages, ${many} B with 30 (${((many - few) / 27).toFixed(1)} B per page)`);
 });
+
+test("packChunks last step: random pages and shared code, added and removed — no shared chunk under 10 KB is left", async () => {
+  const { mergeEntry } = await import("../compiler/merge-entry.js");
+  const { packChunks, STRATEGIES } = await import("../compiler/pack-chunks.js");
+  const esbuild = await import("esbuild");
+  // a seeded generator: the same seed is always the same app
+  const rng = (seed) => () => ((seed = Math.imul(seed ^ (seed >>> 15), 2246822507) + 0x6d2b79f5) >>> 0) / 2 ** 32;
+  const WORDS = "alpha beta gamma delta kappa lambda sigma omega river stone cloud ember maple cedar orbit pixel vector".split(" ");
+  // shared module i: 1–6 KB of data a page really uses (no tree shaking)
+  const shared = (r, i) => `export const s${i} = [${Array.from({ length: 40 + Math.floor(r() * 220) }, () => JSON.stringify(`${WORDS[Math.floor(r() * WORDS.length)]}-${Math.floor(r() * 1e6).toString(36)}`)).join(",")}]\n`;
+  const app = (seed, pages) => {
+    const r = rng(seed), files = {}, nShared = 12;
+    for (let i = 0; i < nShared; i++) files[`s${i}.ts`] = shared(r, i);
+    files["main.tsx"] = `import { render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { ${pages.map((p) => `"/${p}": () => import("./${p}.tsx")`).join(", ")} } })\nrender(() => h(Router, {}), document.body)\n`;
+    for (const p of pages) {
+      const r2 = rng(seed * 31 + p.length * 7 + p.charCodeAt(p.length - 1));
+      const use = [...new Set(Array.from({ length: 1 + Math.floor(r2() * 4) }, () => Math.floor(r2() * nShared)))];
+      files[`${p}.tsx`] = `${use.map((i) => `import { s${i} } from "./s${i}.ts"`).join("\n")}\nexport default () => <p>${use.map((i) => `{s${i}.join(",")}`).join("")}${"page ".repeat(30)}</p>\n`;
+    }
+    return files;
+  };
+  // march build's last step: the next packing strategy while small shared chunks are left
+  const pack = async (files) => {
+    let best = null;
+    for (let s = 0; s < STRATEGIES.length; s++) {
+      const a = await buildApp(files);
+      const outs = a.meta.outputs;
+      const entryKey = Object.keys(outs).find((k) => outs[k].entryPoint === "main.tsx");
+      await mergeEntry(a.meta, { cwd: a.dir, entryKey, esbuild });
+      const budgetOf = Object.assign((k) => (outs[k]?.entryPoint ? { limit: 60 * 1024 } : undefined), { bootLimit: 52 * 1024, partLimit: 25 * 1024 });
+      await packChunks(a.meta, { cwd: a.dir, entryKey, esbuild, minSize: 10240, budgetOf, strategy: s });
+      const small = Object.keys(outs).filter((k) => k.endsWith(".js") && !outs[k].entryPoint && k !== entryKey && readFileSync(resolve(a.dir, k)).length < 10240);
+      const keys = Object.keys(outs).filter((k) => k.endsWith(".js"));
+      const names = new Set(keys.map((k) => k.split("/").pop()));
+      for (const k of keys) for (const m of readFileSync(resolve(a.dir, k), "utf8").matchAll(/["'](\.{1,2}\/[^"']+\.js)["']/g)) assert.ok(names.has(m[1].split("/").pop()), `${k} → ${m[1]} exists`);
+      a.cleanup();
+      if (!best || small.length < best.length) best = small;
+      if (!small.length) break;
+    }
+    return best;
+  };
+  let pages = ["home", "about", "sales", "rows", "chat", "docs"];
+  for (let step = 0; step < 8; step++) {
+    const r = rng(1000 + step);
+    // a demo page added, or one removed
+    if (r() < 0.6 || pages.length < 4) pages = [...pages, `demo${step}`];
+    else pages = pages.filter((_, i) => i !== Math.floor(r() * pages.length));
+    const left = await pack(app(step + 1, pages));
+    assert.deepEqual(left, [], `step ${step} (${pages.join(", ")}): shared chunks under 10 KB left`);
+  }
+});

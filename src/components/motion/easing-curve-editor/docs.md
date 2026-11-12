@@ -18,6 +18,7 @@ animate(card, frames, { duration: 600, easing: "acme-pop" })
 | `name` | string | — | register the curve in the motion engine under this name |
 | `presets` | `EasingPreset[]` or `false` | engine curves | `{ name, label?, value: [x1, y1, x2, y2] }` |
 | `preview` | `move` `scale` `fade` `none` | `move` | |
+| `compact` | boolean | `false` | small curve beside the numbers, presets in one scrolling row, no CSS line (an inspector: KeyframeTimeline) |
 | `duration` | ms | `900` | preview duration |
 | `readonly`, `disabled` | | | |
 

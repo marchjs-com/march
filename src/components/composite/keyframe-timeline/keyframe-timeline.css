@@ -64,5 +64,5 @@
 .hm-kt-fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--hm-space-2); }
 .hm-kt-field { display: flex; flex-direction: column; gap: .125rem; color: var(--hm-faint); font-size: var(--hm-text-xs); }
 .hm-kt-field .hm-input { inline-size: 7rem; }
-.hm-kt-ease { flex: 1 1 22rem; }
+.hm-kt-ease { flex: 1 1 20rem; min-inline-size: 0; max-inline-size: 100%; }
 .hm-kt-empty { margin: 0; color: var(--hm-faint); font-size: var(--hm-text-sm); }

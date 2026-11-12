@@ -2,7 +2,8 @@
 
 Every component lives in `src/components/<category>/<name>/` and is done only when all of this holds. `march check component
 <name>` checks the source items (✔ / ✖) and lists the browser items (·), which the showcase, `tools/visual-audit.mjs` and
-`tools/control-audit.mjs` (every option control changes something visible) cover. `node tools/gen-registry.js` writes
+`tools/control-audit.mjs` (every option control changes something visible; `npm run audit:controls`, run by CI on the built
+showcase) cover. `test/playground-keys.test.js` (in `npm test`) fails when demo.tsx never reads a Playground key. `node tools/gen-registry.js` writes
 the barrel, the registry and the catalogues; `--check` (and `npm test`) fails when they drift.
 
 ## Start

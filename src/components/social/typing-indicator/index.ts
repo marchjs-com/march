@@ -35,7 +35,7 @@ export function TypingIndicator(props: TypingIndicatorProps): Element {
   const runs: { cancel(): void }[] = [];
   const el = h("span", {
     class: () => cx("hm-typing", `hm-typing-${val(props.variant) ?? "bubble"}`, !names().length && "is-off", val(props.class)),
-    "data-hm-color": colorAttr(props.color ?? "brand-blue"), role: "status", "aria-live": "polite",
+    "data-hm-color": () => colorAttr(props.color ?? "brand-blue"), role: "status", "aria-live": "polite",
   },
   h("span", { class: "hm-typing-dots", "aria-hidden": "true" }, [0, 1, 2].map(() => h("i", { ref: (x: HTMLElement) => { dots.push(x); } }))),
   h("span", { class: () => cx("hm-typing-text", !(val(props.text) ?? val(props.variant) === "inline") && "hm-sr-only") }, () => typingText(val(props.names) ?? [])));

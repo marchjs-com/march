@@ -131,7 +131,7 @@ export function ctl(props: CommonProps, extra: Record<string, unknown> = {}): Ct
     "aria-invalid": () => (props.invalid ?? fc?.invalid?.() ? "true" : null),
     "aria-describedby": () => props.describedby ?? (fc?.describedby?.() || null),
     "aria-label": () => props["aria-label"] ?? props.ariaLabel ?? null,
-    "data-hm-color": colorAttr(props.color),
+    "data-hm-color": () => colorAttr(props.color),
     onBlur: props.onBlur,
     onFocus: props.onFocus,
     ...extra,

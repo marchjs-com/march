@@ -8,16 +8,17 @@ export const code = `<Drawer open={$open} onClose={() => $open = false} side="bo
 
 const SNAPS: Record<string, number[] | undefined> = { none: undefined, two: [0.4, 0.9], three: [0.25, 0.55, 0.9] }
 
-export default function DrawerDemo(props: { values: { side: string; modal: boolean; snap: string; size: string; dragToClose: boolean } }) {
+export default function DrawerDemo(props: { values: { side: string; modal: boolean; snap: string; size: string; dragToClose: boolean; content: string } }) {
   let $open = false
   let $snap = 0
-  const rows = Array.from({ length: 24 }, (_, i) => `Satır ${i + 1}`)
   return <div class="sc-row">
     <Button variant="primary" on:click={() => { $open = !$open }}>{() => ($open ? "Çekmeceyi kapat" : "Çekmeceyi aç")}</Button>
     <span class="sc-strip-label" aria-live="polite">{() => (SNAPS[props.values.snap] && $open ? `Durma noktası: ${$snap + 1}` : "")}</span>
     {() => {
       const v = props.values
       const snaps = SNAPS[v.snap]
+      // short: the sheet is as tall as its content (snap points above it are cut down); long: the body scrolls
+      const rows = Array.from({ length: v.content === "short" ? 3 : 40 }, (_, i) => `Satır ${i + 1}`)
       return <Drawer open={() => $open} onClose={() => { $open = false }} side={v.side as "bottom"} modal={v.modal} dragToClose={v.dragToClose}
         snapPoints={snaps} size={v.size as "md"} onSnap={(i) => { $snap = i }} title="Çekmece">
         <p>Tutamaçtan ya da başlıktan sürükleyin; bırakınca en yakın durma noktasına oturur, kenara atınca kapanır.</p>
