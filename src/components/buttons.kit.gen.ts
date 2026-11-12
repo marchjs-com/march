@@ -7,4 +7,5 @@ export * from "./actions/icon-button/index.ts";
 export * from "./typography/kbd/index.ts";
 export * from "./actions/made-with-march/index.ts";
 export * from "./actions/menu/index.ts";
+export * from "./actions/scroll-to-top/index.ts";
 export * from "./overlays/tooltip/index.ts";

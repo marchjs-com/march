@@ -29,6 +29,7 @@ const tr: Record<string, string> = {
   "Subscribe": "Abone ol",
   "Thanks! Check your inbox.": "Teşekkürler! Gelen kutunuza bakın.",
   "Back to top": "Başa dön",
+  "Page controls": "Sayfa denetimleri",
   "Reading progress": "Okuma ilerlemesi",
   "Filter projects": "Projeleri süz",
   "Role": "Rol",

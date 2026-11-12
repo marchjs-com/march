@@ -1,0 +1,99 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { installDom } from "../../../testing/dom.ts";
+const { document } = installDom({ url: "http://localhost/" });
+const { h, render, signal } = await import("../../../index.ts");
+const mount = (fn) => { const host = document.createElement("div"); document.body.appendChild(host); const dispose = render(fn, host); return { host, dispose }; };
+const L = await import("./index.ts");
+const { Layout, defineLayout, defineLayoutFeature, useLayout } = L;
+const { cornerControls } = await import("../bottom-right-controls/index.ts");
+
+test("Layout: without regions it adds no frame; with regions it draws header, nav, main, aside, footer", () => {
+  const a = mount(() => h(Layout, { features: [] }, "PAGE"));
+  assert.equal(a.host.querySelector(".hm-shell"), null);
+  assert.equal(a.host.textContent, "PAGE");
+  a.dispose();
+  const b = mount(() => h(Layout, { features: [], header: "H", nav: "N", aside: "A", footer: "F", mainId: "m" }, "PAGE"));
+  const q = (s) => b.host.querySelector(s);
+  assert.equal(q("header.hm-shell-header").textContent, "H");
+  assert.equal(q("aside.hm-shell-nav").textContent, "N");
+  assert.equal(q("aside.hm-layout-aside").textContent, "A");
+  assert.equal(q("footer.hm-layout-footer").textContent, "F");
+  assert.equal(q("main#m").textContent, "PAGE");
+  assert.equal(q(".hm-skip").getAttribute("href"), "#m");
+  assert.match(q(".hm-shell").getAttribute("class"), /hm-layout-has-aside/);
+  b.dispose();
+});
+
+test("Layout: features by name — defaults on, a config toggles and sets options, a list replaces; they stop with the layout", () => {
+  const log = [];
+  const ping = defineLayoutFeature("ping", (o) => () => { log.push(`on:${o.tag ?? ""}`); return () => log.push("off"); });
+  const Base = defineLayout({ features: { ping: true } });
+  const a = mount(() => h(Base, {}, "x"));
+  assert.deepEqual(log, ["on:"]);
+  a.dispose();
+  assert.deepEqual(log, ["on:", "off"]);
+  log.length = 0;
+  const b = mount(() => h(Base, { features: { ping: { tag: "t" } } }, "x"));
+  assert.deepEqual(log, ["on:t"], "options");
+  b.dispose(); log.length = 0;
+  const c = mount(() => h(Base, { features: { ping: false } }, "x"));
+  assert.deepEqual(log, [], "off by name");
+  c.dispose();
+  const d = mount(() => h(Base, { features: [] }, "x"));
+  assert.deepEqual(log, [], "a list replaces the defaults");
+  d.dispose();
+});
+
+test("Layout.extend: regions override, features merge by name", () => {
+  const seen = [];
+  defineLayoutFeature("one", () => () => { seen.push("one"); });
+  defineLayoutFeature("two", () => () => { seen.push("two"); });
+  const A = defineLayout({ header: "A", features: { one: true } });
+  const B = A.extend({ header: "B", footer: "F", features: { two: true } });
+  const m = mount(() => h(B, {}, "x"));
+  assert.equal(m.host.querySelector("header").textContent, "B");
+  assert.equal(m.host.querySelector("footer").textContent, "F");
+  assert.deepEqual(seen.sort(), ["one", "two"]);
+  m.dispose();
+});
+
+test("Layout API: corners, slot content swapped while a part is shown, features listed and disabled by name", () => {
+  let api;
+  const show = signal(true);
+  const Part = () => { const a = useLayout(); a.set("aside", "FILTERS"); a.add("bottom-start", Object.assign(document.createElement("i"), { textContent: "c" })); return "part"; };
+  const m = mount(() => h(Layout, { features: [], aside: "TOC", corners: { "top-end": Object.assign(document.createElement("b"), { textContent: "S" }) } },
+    () => { api = useLayout(); return show() ? h(Part, {}) : "none"; }));
+  const aside = m.host.querySelector(".hm-layout-aside");
+  assert.equal(aside.textContent, "FILTERS");
+  assert.equal(cornerControls("top-end").textContent, "S");
+  assert.equal(cornerControls("bottom-start").textContent, "c");
+  show.set(false);
+  assert.equal(aside.textContent, "TOC", "restored when the part goes away");
+  assert.equal(cornerControls("bottom-start").textContent, "");
+  const f = Object.assign(() => () => {}, { featureName: "demo" });
+  api.use(f);
+  assert.ok(api.features().includes("demo"));
+  api.disable("demo");
+  assert.ok(!api.features().includes("demo"));
+  m.dispose();
+  assert.equal(cornerControls("top-end").textContent, "", "corner content leaves with the layout");
+});
+
+test("Layout: the default has back-to-top and route focus; Page under it writes the title and adds its corners", async () => {
+  assert.deepEqual(Object.keys(Layout.defaults.features).sort(), ["routeFocus", "scrollToTop"]);
+  const { Page } = await import("../../../ui/layout.ts");
+  const Base = defineLayout({ features: [], titleTemplate: "%s · HADİ" });
+  const m = mount(() => h(Base, {}, h(Page, { title: "Kullanıcılar", corners: { "bottom-end": Object.assign(document.createElement("u"), { textContent: "P" }) } }, "body")));
+  assert.equal(document.title, "Kullanıcılar · HADİ");
+  assert.match(cornerControls("bottom-end").textContent, /P/);
+  m.dispose();
+  assert.doesNotMatch(cornerControls("bottom-end").textContent, /P/);
+  const Narrow = Page.extend({ narrow: true });
+  const n = mount(() => h(Base, {}, h(Narrow, { title: "Ayarlar" }, "b")));
+  assert.match(n.host.querySelector(".hm-page").getAttribute("class"), /hm-page-narrow/);
+  n.dispose();
+  const solo = mount(() => h(Page, { title: "Tek", features: [] }, "b"));
+  assert.ok(solo.host.querySelector(".hm-layout"), "a Page on its own brings a Layout");
+  solo.dispose();
+});

@@ -12,6 +12,8 @@ import { type ActionsProp } from "./display.ts";
 import { Tabs, type TabSpec } from "./tabs.ts";
 import { key } from "./keys.ts";
 import { val, cx, rest, debounce, glyph, type MaybeFn, type ClassProp } from "./util.ts";
+import { Layout, useLayout, addControls, resolveFeatures, type LayoutProps, type SlotName } from "../components/layout/layout/index.ts";
+import { CORNERS } from "../components/layout/bottom-right-controls/index.ts";
 import { arrowLeft } from "../icons/glyphs/arrowLeft.ts";
 import { search as searchIcon } from "../icons/glyphs/search.ts";
 import { x as xIcon } from "../icons/glyphs/x.ts";
@@ -20,8 +22,12 @@ import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 
 /** A breadcrumb; the last one is the current page. */
 export interface Breadcrumb { label: MaybeFn<string>; href?: Href }
-export interface PageProps {
+export interface PageProps extends Pick<LayoutProps, "corners" | "features"> {
   title: MaybeFn<unknown>;
+  /** Region content of the surrounding Layout while this page is shown, e.g. `{ aside: <Filters/> }`. */
+  layout?: Partial<Pick<LayoutProps, "top" | "header" | "nav" | "aside" | "footer">> | undefined;
+  /** Write the title to the document (through the Layout's titleTemplate). Default true. */
+  documentTitle?: boolean | undefined;
   subtitle?: MaybeFn<unknown>;
   actions?: ActionsProp;
   breadcrumbs?: MaybeFn<readonly Breadcrumb[] | null | undefined>;
@@ -40,10 +46,24 @@ export interface PageProps {
  * `<Page title="Users" subtitle="…" actions={[invite, exportCsv]} breadcrumbs={[{ label: "Admin", href: "/admin" }]}
  *        back="/users" tabs={[…]} tabsQuery="tab">…</Page>`
  * `back`: a path (Link) or `true` (history back). Actions render through ActionButton (hidden when not allowed).
+ * A Page builds on Layout: under one it adds its `corners` content, `features` and `layout` region content to it (all
+ * leave with the page) and writes its title to the document; on its own it brings the default Layout first.
+ * `Page.extend({ narrow: true, tabsQuery: "tab" })` makes a page kind with its own defaults.
  */
 export function Page(props: PageProps): Element {
+  const layout = useLayout();
+  // on its own: the same Page again, under a Layout (the props object is passed on as it is: getters stay live)
+  if (!layout) return h(Layout, { children: () => Page(props) });
+  for (const c of CORNERS) if (props.corners?.[c] != null) addControls(layout, c, props.corners[c], 20);
+  for (const f of resolveFeatures(undefined, props.features)) layout.use(f);
+  for (const [slot, content] of Object.entries(props.layout ?? {})) if (content !== undefined) layout.set(slot as SlotName, content);
+  if (props.documentTitle !== false && globalThis.document) {
+    const before = globalThis.document.title;
+    effect(() => { const title = val(props.title); if (typeof title === "string" && title) globalThis.document.title = layout.titleTemplate.replace("%s", title); });
+    onCleanup(() => { globalThis.document.title = before; });
+  }
   const crumbs = (): readonly Breadcrumb[] => val(props.breadcrumbs) ?? [];
-  return h("div", { ...rest(props, ["title", "subtitle", "actions", "breadcrumbs", "back", "tabs", "tabsQuery", "narrow"]), class: () => cx("hm-page", props.narrow && "hm-page-narrow", val(props.class)) },
+  return h("div", { ...rest(props, ["title", "subtitle", "actions", "breadcrumbs", "back", "tabs", "tabsQuery", "narrow", "corners", "features", "layout", "documentTitle"]), class: () => cx("hm-page", props.narrow && "hm-page-narrow", val(props.class)) },
     h("header", { class: "hm-page-head" },
       () => crumbs().length > 0 && h("nav", { class: "hm-crumbs", "aria-label": t`Breadcrumb` },
         h("ol", {}, crumbs().map((c, i, a) => h("li", {}, c.href && i < a.length - 1 ? h(Link, { href: c.href, children: () => val(c.label) }) : h("span", { "aria-current": i === a.length - 1 ? "page" : null }, () => val(c.label)))))),
@@ -59,6 +79,20 @@ export function Page(props: PageProps): Element {
       props.children,
       props.tabs != null && h(Tabs, { tabs: () => val(props.tabs), query: props.tabsQuery, label: () => val(props.title) as string })));
 }
+
+/** Props over defaults, keeping the props' getters live (a compiled reactive prop is a getter). */
+function over<T extends object>(defaults: Partial<T>, props: T): T {
+  const out = { ...defaults } as T;
+  for (const k of Object.keys(props)) Object.defineProperty(out, k, Object.getOwnPropertyDescriptor(props, k)!);
+  return out;
+}
+export interface PageComponent { (props: PageProps): Element; extend(defaults: Partial<PageProps>): PageComponent }
+/** A page kind with its own defaults: `const SettingsPage = Page.extend({ narrow: true, tabsQuery: "tab" })`. */
+Page.extend = function extend(defaults: Partial<PageProps>): PageComponent {
+  const P = ((props: PageProps) => Page(over(defaults, props))) as PageComponent;
+  P.extend = (more) => Page.extend({ ...defaults, ...more });
+  return P;
+};
 
 export interface SectionProps { title?: MaybeFn<unknown>; description?: MaybeFn<unknown>; actions?: ActionsProp; class?: ClassProp; children?: unknown }
 /** Titled block inside a page: `<Section title="Security" description="…" actions={[…]}>…</Section>` */

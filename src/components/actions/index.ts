@@ -8,3 +8,4 @@ export * from "./icon-button/index.ts";
 export * from "./made-with-march/index.ts";
 export * from "./menu/index.ts";
 export * from "./overflow-toolbar/index.ts";
+export * from "./scroll-to-top/index.ts";

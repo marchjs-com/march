@@ -1,0 +1,16 @@
+/* Page corners for page-wide controls: fixed, above content and below dialogs; start/end mirror in RTL; safe areas kept. */
+.hm-corner {
+  --hm-corner-gap: max(var(--hm-space-4, 1rem), env(safe-area-inset-bottom));
+  position: fixed;
+  z-index: var(--hm-z-sticky, 40);
+  display: flex;
+  gap: var(--hm-space-2, 0.5rem);
+  pointer-events: none;
+}
+.hm-corner:empty { display: none; }
+.hm-corner > * { pointer-events: auto; }
+.hm-corner-top-start, .hm-corner-top-end { inset-block-start: max(var(--hm-space-4, 1rem), env(safe-area-inset-top)); flex-direction: column; }
+.hm-corner-bottom-start, .hm-corner-bottom-end { inset-block-end: var(--hm-corner-gap); flex-direction: column-reverse; }
+.hm-corner-top-start, .hm-corner-bottom-start { inset-inline-start: max(var(--hm-space-4, 1rem), env(safe-area-inset-left)); align-items: flex-start; }
+.hm-corner-top-end, .hm-corner-bottom-end { inset-inline-end: max(var(--hm-space-4, 1rem), env(safe-area-inset-right)); align-items: flex-end; }
+@media print { .hm-corner { display: none; } }

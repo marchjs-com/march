@@ -8,9 +8,11 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Accordion | stable | Stacked sections that open one at a time or several together: animated height, ↑ ↓ Home End between headers, separated or contained look. | — |
-| AppShell | stable | The application frame: a sidebar column and the main area with optional banner and sticky header; a skip link; full width on narrow screens. | — |
+| AppShell | stable | The application frame: a sidebar column and the main area with optional banner and sticky header; a skip link; full width on narrow screens. | [Layout](#layout) |
+| BottomRightControls | stable | One fixed page corner (bottom, end side; mirrors in RTL) that page-wide controls put themselves into, in order, instead of overlapping. | — |
 | Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | — |
 | Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
+| Layout | stable | The frame all pages of an app share: content plus the page corner (BottomRightControls) with its back-to-top button; Page builds on it. | — |
 | Spacer | stable | A flexible gap in a row that pushes the following items to the end. | — |
 | Splitter | stable | Two resizable panes: drag the handle or use the arrow keys (mirrored in RTL), Home / End, Enter resets. | — |
 | Stack | stable | Layout primitives: Stack (a row or column with token gaps and alignment), Toolbar (a labelled bar of controls), Divider (a rule, labelled or vertical). | — |
@@ -36,6 +38,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | MadeWithMarch | stable | Optional credit line "Developed with March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 | Menu | stable | Trigger button with a floating menu of items, links and action()s (separators, shortcuts, danger, permissions) and the full menu keyboard model; Dropdown floats any content. | — |
 | OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | [Menu](#menu), [Tooltip](#tooltip) |
+| ScrollToTop | stable | Back-to-top button: shows after the page is scrolled down, scrolls back on the motion engine; puts itself into BottomRightControls. | [IconButton](#iconbutton), [BottomRightControls](#bottomrightcontrols) |
 
 ### Forms — `hadi-march/forms`
 
@@ -250,6 +253,8 @@ Full page: src/components/feedback/alert/docs.md
 
 The application frame. Desktop: a sticky sidebar column (usually a NavMenu or NavSidebar) and a scrolling main area; above the main column an optional banner slot (`top`, for update or offline banners) and a sticky header (`header`, for the title, search and user menu). Narrow screens: a slim top bar with the menu button and a full-width main. A "Skip to content" link comes first. It is its own module, so an app's entry does not pull in page scaffolding.
 
+Composed of: [Layout](#layout)
+
 ```tsx
 <AppShell nav={<NavMenu items={items} />} top={<UpdateBanner />} header={<PageTitle />}>
   <Outlet />
@@ -281,6 +286,20 @@ Composed of: [Badge](#badge), [OverflowText](#overflowtext)
 ```
 
 Full page: src/components/composite/bottom-nav/docs.md
+
+## BottomRightControls
+
+Four fixed page corners — `top-start`, `top-end`, `bottom-start`, `bottom-end` (start/end mirror in RTL) — that page-wide controls put themselves into: back to top, a chat bubble, a feedback button, a connection badge. Controls do not each pick a fixed position and overlap: they stack in their corner in `order`. `BottomRightControls` is the bottom-end corner. Inside a Layout use `useLayout().add(corner, node)` or the `corners` prop.
+
+```tsx
+import { addCornerControl, BottomRightControls, CornerControls } from "hadi-march/layout";
+
+const off = addCornerControl("bottom-end", <button>Geri bildirim</button>, 10)  // lower order = nearer the edge
+off()                                                                           // also on component cleanup
+<CornerControls corner="top-end" />   // render a corner yourself (else it is made on first use)
+```
+
+Full page: src/components/layout/bottom-right-controls/docs.md
 
 ## Breadcrumbs
 
@@ -1006,6 +1025,29 @@ Composed of: [EasingCurveEditor](#easingcurveeditor), [IconButton](#iconbutton),
 
 Full page: src/components/composite/keyframe-timeline/docs.md
 
+## Layout
+
+The frame the screens of an app share, with changeable behavior. What every page needs lives here once, so pages never repeat it, and later page-wide features land in one place.
+
+```tsx
+import { Layout, defineLayout, defineLayoutFeature, scrollToTop } from "hadi-march/layout";
+
+<Layout header={<TopBar/>} nav={<SideNav/>} titleTemplate="%s · HADİ"><Outlet/></Layout>
+
+<Layout features={{ readingProgress: true, scrollToTop: { threshold: 600 }, routeFocus: false }}
+        corners={{ "top-end": <Status/> }}>…</Layout>
+
+const DocsLayout = Layout.extend({ aside: <Toc/>, features: { readingProgress: true } })
+
+const help = defineLayoutFeature("help", () => (api) => api.add("bottom-start", <HelpButton/>))
+<Layout features={{ help: true }}>…</Layout>
+
+<Page title="Kullanıcılar" layout={{ aside: <Filters/> }} corners={{ "bottom-end": <NewUser/> }}>…</Page>
+const SettingsPage = Page.extend({ narrow: true, tabsQuery: "tab" })
+```
+
+Full page: src/components/layout/layout/docs.md
+
 ## LikeButton
 
 A heart toggle with a rolling count. Liking squashes and overshoots the heart on a spring, grows a ring and throws a burst of particles in the four HADİ colors; unliking is a small press. Everything runs on the motion engine, so the global speed, "pause all" and reduced motion apply (reduced motion keeps only the fill change).
@@ -1507,6 +1549,22 @@ Scrollytelling. The media column stays pinned while the text steps scroll past; 
 ```
 
 Full page: src/components/landing/scroll-story/docs.md
+
+## ScrollToTop
+
+A "back to top" button that appears once the page is scrolled down and scrolls back to the top on the motion engine (global speed, "stop all" and reduced motion apply); the user taking over (wheel, touch, keys) stops it. It follows whatever scrolls: the window or a scrolling container. By default it puts itself into the bottom-end page corner; in a Layout it is the `scrollToTop` feature (on by default).
+
+Composed of: [IconButton](#iconbutton), [BottomRightControls](#bottomrightcontrols)
+
+```tsx
+import { ScrollToTop } from "hadi-march/ui";
+
+<ScrollToTop />                          // once; shows after 320 px
+<ScrollToTop threshold={600} order={-1} />
+<ScrollToTop inline target={box} />      // in place, for a scrolling box
+```
+
+Full page: src/components/actions/scroll-to-top/docs.md
 
 ## Segmented
 

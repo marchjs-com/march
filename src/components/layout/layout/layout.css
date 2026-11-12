@@ -1,0 +1,22 @@
+/* Layout. Without regions it adds no box; with regions it is the AppShell frame (app-shell.css) plus aside and footer. */
+.hm-layout:not(.hm-shell) { display: contents; }
+.hm-layout-no-nav { grid-template-columns: minmax(0, 1fr); }
+.hm-layout-row { flex: 1 1 auto; display: flex; min-width: 0; }
+.hm-layout-main { flex: 1 1 auto; }
+.hm-layout-aside { flex: none; inline-size: clamp(14rem, 22vw, 18rem); position: sticky; top: var(--hm-topbar-h, 3.5rem); align-self: flex-start;
+  max-block-size: calc(100dvh - var(--hm-topbar-h, 3.5rem)); overflow: auto; padding: var(--hm-space-5) var(--hm-space-4); border-inline-start: 1px solid var(--hm-border); }
+.hm-layout-footer { border-top: 1px solid var(--hm-border); padding: var(--hm-space-5); color: var(--hm-muted); }
+.hm-layout-footer:empty, .hm-layout-aside:empty { display: none; }
+.hm-layout-ctl { display: contents; }
+/* autoHideHeader */
+.hm-shell-header { transition: transform var(--hm-dur) var(--hm-ease); }
+.hm-shell-header[data-hidden] { transform: translateY(-100%); }
+@media (prefers-reduced-motion: reduce) { .hm-shell-header { transition: none; } }
+/* readingProgress */
+.hm-reading-progress { position: fixed; inset-block-start: 0; inset-inline: 0; block-size: var(--hm-rp-h, 3px); z-index: calc(var(--hm-z-sticky, 40) + 2);
+  background: var(--hm-rp-c, var(--hm-primary)); transform: scaleX(0); pointer-events: none; }
+@media (max-width: 1100px) {
+  .hm-layout-row { flex-direction: column; }
+  .hm-layout-aside { position: static; inline-size: auto; max-block-size: none; border-inline-start: 0; border-top: 1px solid var(--hm-border); }
+}
+@media print { .hm-reading-progress, .hm-skip { display: none; } }

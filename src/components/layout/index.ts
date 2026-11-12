@@ -2,8 +2,10 @@
 // Layout: Page structure, grids, stacks, splitters. Import: hadi-march/layout
 export * from "./accordion/index.ts";
 export * from "./app-shell/index.ts";
+export * from "./bottom-right-controls/index.ts";
 export * from "./disclosure/index.ts";
 export * from "./grid/index.ts";
+export * from "./layout/index.ts";
 export * from "./spacer/index.ts";
 export * from "./splitter/index.ts";
 export * from "./stack/index.ts";
