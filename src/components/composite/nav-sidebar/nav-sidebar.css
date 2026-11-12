@@ -1,6 +1,7 @@
 /* March — NavSidebar. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- NavSidebar (src/ui/sidebar.ts); container, drawer and rail come from .hm-nav */
-.hm-sb { position: relative; width: var(--hm-sb-w, 17.5rem); background: var(--hm-surface); }
+/* .hm-nav.hm-sb: above NavMenu's own `.hm-nav { width }` whatever order the two stylesheets load in (lazy chunks) */
+.hm-nav.hm-sb { position: relative; width: var(--hm-sb-w, 17.5rem); background: var(--hm-surface); }
 /* resize grip on the inner (logical end) edge; the width is the --hm-sb-w variable on the wrapper */
 .hm-sb-resize { position: absolute; z-index: 2; inset-block: 0; inset-inline-end: -4px; width: 8px; cursor: col-resize; touch-action: none; outline: none; }
 .hm-sb-resize::after { content: ""; position: absolute; inset-block: 0; inset-inline-start: 3px; width: 2px; border-radius: 2px; background: transparent; transition: background-color var(--hm-dur) var(--hm-ease); }
@@ -102,4 +103,4 @@ html.hm-sb-resizing .hm-nav { transition: none; }
   .hm-sb-wrap.is-rail .hm-sb-group + .hm-sb-group { border-top: 1px solid var(--hm-border-subtle); padding-top: 2px; }
   .hm-sb-wrap.is-rail .hm-sb-item.is-active::before { inset-inline-start: -.5rem; }
 }
-@media (max-width: 900px) { .hm-sb { width: min(21rem, 88vw); } .hm-sb-input { font-size: 1rem; } .hm-sb-resize { display: none; } }
+@media (max-width: 900px) { .hm-nav.hm-sb { width: min(21rem, 88vw); } .hm-sb-input { font-size: 1rem; } .hm-sb-resize { display: none; } }
