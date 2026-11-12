@@ -24,11 +24,12 @@ import { preloadChunks, loaderKey, saveData, whenIdle, runLoad } from "../dom/pr
 // ------------------------------------------------------------------ types
 export type Component = (props: Record<string, unknown>) => unknown;
 type Loader = () => Promise<unknown>;
-export interface PageModule { default?: Component; component?: Component; guard?: Guard; title?: string | ((to: RouteTarget) => string); meta?: Record<string, unknown> }
+export interface PageModule { default?: Component; component?: Component; guard?: Guard; title?: string | ((to: RouteTarget) => string); meta?: Record<string, unknown>; head?: unknown }
 export interface RouteTarget { path: string; params: Record<string, string>; query: Record<string, string>; meta: Record<string, unknown>; route: CompiledRoute }
 export type GuardResult = boolean | string | void | undefined;
 export type Guard = (to: RouteTarget) => GuardResult | Promise<GuardResult>;
 export interface RouteDef { path: string; component?: Component; load?: Loader; layouts?: Loader[]; meta?: Record<string, unknown>; title?: string; preload?: boolean;
+  /** Head tags of this route (hadi-march/seo: title, description, og, jsonLd…); a page module's `head` export wins. */ head?: unknown;
   /** Shown at once (after 100 ms) while this page loads; else the Router's `skeleton`, else its `loading`. */ skeleton?: unknown }
 export type RouteTable = Record<string, Loader | Omit<RouteDef, "path">>;
 export interface CompiledRoute extends RouteDef { pattern: string; keys: string[]; re: RegExp; score: number }
@@ -103,6 +104,9 @@ const NO_ROUTER = "March: call createRouter() first";
 const leaveGuards = new Set<() => boolean | Promise<boolean>>();
 
 let navWrapper: ((apply: () => void, o: { pop: boolean }) => void | Promise<void>) | null = null;
+let headHandler: ((to: RouteTarget | null, head: unknown, title: string | undefined) => void) | null = null;
+/** Receive each route's head (hadi-march/seo installs it); `to` is null on "not found". */
+export function setHeadHandler(fn: typeof headHandler): void { headHandler = fn; }
 /** Wrap every page swap (hadi-march/motion uses it for View Transitions). */
 export function setNavigationWrapper(fn: typeof navWrapper): void { navWrapper = fn; }
 
@@ -271,7 +275,8 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
       page ??= { to, levels: [...layoutLevels(layouts, to), { key: pageKey(m.route, m.params), comp: comp ?? (() => null), page: true, to }] };
       const title = r.opts.title?.(to) ?? (typeof mod?.title === "function" ? mod.title(to) : mod?.title) ?? m.route.title;
       setMeta({ ...(title ? { title } : {}), ...(typeof meta["description"] === "string" ? { description: meta["description"] } : {}) });
-    }
+      headHandler?.(to, mod?.head ?? m.route.head, title ?? undefined);
+    } else headHandler?.(null, null, undefined);
     const apply = (): void => batch(() => {
       S.path.set(p); S.search.set(search); S.hash.set(hash);
       S.match.set(m ? { route: m.route, params: m.params, path: p, meta } : null);

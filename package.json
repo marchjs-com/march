@@ -69,7 +69,9 @@
     "./managers/flags": "./src/managers/flags/index.ts",
     "./managers/log": "./src/managers/log/index.ts",
     "./managers/perf": "./src/managers/perf/index.ts",
-    "./managers/rate": "./src/managers/rate/index.ts"
+    "./managers/rate": "./src/managers/rate/index.ts",
+    "./seo": "./src/seo/index.ts",
+    "./seo/hydrate": "./src/seo/hydrate.ts"
   },
   "bin": {
     "march": "./cli/march.js"

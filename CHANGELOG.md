@@ -14,6 +14,14 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
   (accessible hidden copy + aria-hidden parts, grapheme clusters, RTL, joining scripts by word) and a stagger runner.
 - Everything plays on the motion engine (global speed, pause all, reduced motion). The core is about 1.5 KB gzip, each
   animation 25–520 B more (`bench/text-size.js`, budget test). Catalog: `hadi-march/motion/text/meta`.
+### SEO (later in 0.1.0)
+- `hadi-march/seo`: `installSeo({ site, titleTemplate, defaults })`, route / page `head`, reactive `useHead()`, Open
+  Graph and Twitter cards, automatic canonical (history routing), `noindex` on not-found, JSON-LD builders (`ld.*`).
+- `march build` with `seo: { prerender }` writes each route's HTML (head and route CSS included) at build time, plus
+  `sitemap.xml` and `robots.txt`; `hydrate()` (`hadi-march/seo/hydrate`) takes the markup over without a blank frame
+  and drops it at once when the URL shows another route (hash routing safe).
+- `march seo check`: missing title, description, canonical, img alt, invalid JSON-LD; `checkHtml()` in the browser.
+- Router: `head` on routes and page modules, `setHeadHandler()`.
 
 ### Build output (later in 0.1.0)
 - `stableNames: true` / `--stable-names`: `main.js`, `chunks/home.js`, `chunks/shared-N.js` with `?v=<version>` in every
