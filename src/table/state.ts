@@ -16,11 +16,19 @@ const titleCase = (k: string): string => String(k).replace(/([a-z])([A-Z])/g, "$
 let uid = 0;
 const sameList = <T>(a: readonly T[], b: readonly T[]): boolean => a === b || (!!a && !!b && a.length === b.length && a.every((x, i) => x === b[i]));
 
+// numbers, money, sizes, percentages and dates line up on their last digit: end-aligned, tabular digits (header too)
+const NUMERIC = new Set(["number", "integer", "int", "float", "decimal", "money", "currency", "bytes", "filesize", "percent", "date", "datetime", "time", "duration"]);
+/** Default alignment of a column: "end" for numeric / date types, formats and range filters, else "start". */
+export function defaultAlign(d: { type?: string; format?: unknown; filter?: unknown }): "start" | "end" {
+  const fmt = typeof d.format === "string" ? d.format : Array.isArray(d.format) ? String(d.format[0]) : "";
+  return NUMERIC.has(String(d.type ?? "")) || NUMERIC.has(fmt) || d.filter === "range" || d.filter === "dateRange" ? "end" : "start";
+}
+
 /** Normalize one column definition. */
 export function column<R = Row>(c: ColumnInput<R>): TableColumn<R> {
   const d = (typeof c === "string" ? { key: c } : c) as Column<R>;
   const filter = d.filter === true ? "text" : d.filter ?? null;
-  return { sortable: d.key != null || !!d.sortValue, searchable: d.key != null && filter !== "range" && filter !== "dateRange", align: "start", minWidth: 48, ...d, filter, label: d.label ?? titleCase(d.key ?? "") };
+  return { sortable: d.key != null || !!d.sortValue, searchable: d.key != null && filter !== "range" && filter !== "dateRange", minWidth: 48, ...d, align: d.align ?? defaultAlign({ ...d, filter }), filter, label: d.label ?? titleCase(d.key ?? "") };
 }
 
 /** Display text of a cell: `format` (fn | pipe name | [pipe, ...args]), option labels, Yes/No, lists. */

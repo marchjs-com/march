@@ -83,6 +83,10 @@
 .hm-table-sort { display: inline-flex; align-items: center; gap: var(--hm-space-1); padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
 .hm-table-sort:hover { color: var(--hm-text); }
 .hm-table-sort-icon { display: inline-flex; min-width: .8em; color: var(--hm-text); }
+/* the sort arrow sits on the outer side of the text and never moves it: in an end-aligned column it goes before the text
+   (row-reverse is logical: in RTL too the text stays on the end edge) */
+.hm-table-th.hm-align-end .hm-table-sort { flex-direction: row-reverse; }
+.hm-table-th.hm-align-center .hm-table-sort { padding-inline-start: calc(.8em + var(--hm-space-1)); }
 .hm-table-sort-icon .hm-svg { width: .75rem; height: .75rem; }
 .hm-table-sort-n { font-size: var(--hm-text-xs); color: var(--hm-primary-text); }
 .hm-table-resize { position: absolute; top: 0; inset-inline-end: 0; width: .5rem; height: 100%; cursor: col-resize; touch-action: none; }

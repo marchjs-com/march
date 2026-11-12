@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { installDom } from "../src/testing/dom.ts";
 const { document, window } = installDom({ url: "http://localhost/list" });
 const { signal, h, render, createRoot, store, setLocale } = await import("../src/index.ts");
@@ -434,4 +435,18 @@ test("row actions run with the row; kebab menu for more than two", async () => {
   menu.querySelectorAll("[role=menuitem]")[1].click();
   await tick(); await tick();
   assert.deepEqual(log, ["Archive:2"]);
+});
+
+test("table alignment: numeric / date columns are end-aligned by default and their header follows the column", async () => {
+  const { column, defaultAlign } = await import("../src/table/state.ts");
+  assert.equal(column({ key: "n", type: "number" }).align, "end");
+  assert.equal(column({ key: "m", format: ["money", "TRY"] }).align, "end");
+  assert.equal(column({ key: "d", format: "date" }).align, "end");
+  assert.equal(column({ key: "r", filter: "range" }).align, "end");
+  assert.equal(column({ key: "s" }).align, "start");
+  assert.equal(column({ key: "n", type: "number", align: "center" }).align, "center", "explicit align wins");
+  assert.equal(defaultAlign({ type: "text" }), "start");
+  const css = readFileSync(new URL("../src/css/table.css", import.meta.url), "utf8");
+  assert.match(css, /\.hm-table-th\.hm-align-end \.hm-table-sort \{ flex-direction: row-reverse; \}/, "sort arrow before the text in end-aligned headers");
+  assert.match(css, /\.hm-align-end \{ text-align: end !important; font-variant-numeric: tabular-nums; \}/);
 });
