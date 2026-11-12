@@ -5,6 +5,7 @@
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | Chip, Menu, FilterControl, CellEditor |
+| TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
 
 ## Chip
 
@@ -27,3 +28,18 @@ Full page: src/components/chip/docs.md
 ```
 
 Full page: src/components/data/data-grid/docs.md
+
+## TreeView
+
+A tree for large hierarchies. Only the rows in view are in the DOM (shared virtual window), so thousands of open nodes stay smooth. Children can load lazily the first time a folder opens, selection is single or multiple, nodes move by drag and drop (before / after / inside, with edge auto-scroll and auto-open of a folder you hover), and search keeps the path to every hit open and highlights the matching text. For a short static tree, `<Tree>` is enough.
+
+```tsx
+import { TreeView } from "hadi-march/components/data/tree-view";
+
+<TreeView nodes={files} selection="multiple" draggable search={$q}
+  load={(node) => api.children(node.id)}
+  onSelect={(ids) => $selected = ids}
+  onMove={(ids, target, position) => api.move(ids, target, position)} />
+```
+
+Full page: src/components/data/tree-view/docs.md

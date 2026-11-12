@@ -1,0 +1,400 @@
+// TreeView (hadi-march/components/data/tree-view): a large, virtual tree — lazy children (loaded on first open), single /
+// multiple selection, drag and drop (before / after / inside, with auto-scroll and auto-open), search that keeps the
+// path to every hit open and highlights it, full tree keyboard model. Built on the shared virtual window
+// (core/virtual) and selection model (core/selection); the small <Tree> stays for short static trees.
+import "./tree-view.css";
+import { signal, computed, effect, untrack, batch, createRoot, onCleanup } from "../../../core/reactive.ts";
+import { h } from "../../../dom/h.ts";
+import { openLayer } from "../../../dom/portal.ts";
+import { t, dir } from "../../../core/i18n.ts";
+import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp } from "../../../core/util.ts";
+import { fold } from "../../../core/text.ts";
+import { createAxis, createViewport } from "../../../core/virtual.ts";
+import { createSelection, moveCursor, type SelectionMode } from "../../../core/selection.ts";
+import { animate, stagger } from "../../../motion/animate.ts";
+import { pointerDrag } from "../../../motion/pointer.ts";
+import { markText } from "../../../ui/mark.ts";
+import { Spinner } from "../../../ui/feedback.ts";
+import { icon, glyph } from "../../../ui/util.ts";
+import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
+import { folder } from "../../../icons/glyphs/folder.ts";
+import { fileText } from "../../../icons/glyphs/fileText.ts";
+import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
+
+export interface TreeViewNode {
+  id: string;
+  label: string;
+  icon?: unknown;
+  /** Trailing text (size, count …). */
+  meta?: unknown;
+  /** Child nodes; `null` / missing = a leaf unless `lazy`. */
+  children?: readonly TreeViewNode[] | null | undefined;
+  /** Children are loaded by `load(node)` the first time it opens. */
+  lazy?: boolean | undefined;
+  disabled?: boolean | undefined;
+  /** Anything of yours. */
+  data?: unknown;
+}
+export type DropPosition = "before" | "after" | "inside";
+
+export interface TreeViewProps {
+  nodes: MaybeFn<readonly TreeViewNode[]>;
+  /** Children of a `lazy` node (called once per node; a rejection shows a retry row). */
+  load?: ((node: TreeViewNode) => Promise<readonly TreeViewNode[]>) | undefined;
+  selection?: MaybeFn<SelectionMode | undefined>;
+  /** Initially selected ids. */
+  selected?: readonly string[] | undefined;
+  onSelect?: ((ids: string[], nodes: TreeViewNode[]) => void) | undefined;
+  /** Initially open ids. */
+  expanded?: readonly string[] | undefined;
+  onExpand?: ((id: string, open: boolean) => void) | undefined;
+  /** Search text: shows the hits and the path to them, highlighted. */
+  search?: MaybeFn<string | null | undefined>;
+  /** Drag and drop to reorder / reparent (Alt+↑ / Alt+↓ moves among siblings from the keyboard). */
+  draggable?: MaybeFn<boolean | undefined>;
+  canDrop?: ((ids: string[], target: TreeViewNode, position: DropPosition) => boolean) | undefined;
+  /** After a move; the tree already shows it (pass `nodes` as an accessor to own the data instead). */
+  onMove?: ((ids: string[], targetId: string, position: DropPosition) => void) | undefined;
+  /** Enter / double-click on a leaf. */
+  onActivate?: ((node: TreeViewNode) => void) | undefined;
+  /** Px height of the scroll area (default 360). */
+  height?: number | undefined;
+  rowHeight?: number | undefined;
+  /** Folder / file icons when a node has none (default true). */
+  icons?: MaybeFn<boolean | undefined>;
+  label?: MaybeFn<string | undefined>;
+  class?: ClassProp;
+}
+
+interface Row { node: TreeViewNode; depth: number; parent: string | null; pos: number; size: number; open: boolean; kids: boolean }
+
+// ------------------------------------------------------------------ immutable tree edits
+const kidsOf = (n: TreeViewNode): readonly TreeViewNode[] => n.children ?? [];
+function mapNode(list: readonly TreeViewNode[], id: string, fn: (n: TreeViewNode) => TreeViewNode): readonly TreeViewNode[] {
+  let changed = false;
+  const out = list.map((n) => {
+    if (n.id === id) { changed = true; return fn(n); }
+    if (!n.children?.length) return n;
+    const c = mapNode(n.children, id, fn);
+    if (c === n.children) return n;
+    changed = true;
+    return { ...n, children: c };
+  });
+  return changed ? out : list;
+}
+function removeIds(list: readonly TreeViewNode[], ids: Set<string>, taken: TreeViewNode[]): readonly TreeViewNode[] {
+  const out: TreeViewNode[] = [];
+  for (const n of list) {
+    if (ids.has(n.id)) { taken.push(n); continue; }
+    out.push(n.children?.length ? { ...n, children: removeIds(n.children, ids, taken) } : n);
+  }
+  return out;
+}
+function insertAt(list: readonly TreeViewNode[], target: string, pos: DropPosition, add: TreeViewNode[]): readonly TreeViewNode[] {
+  const i = list.findIndex((n) => n.id === target);
+  if (i >= 0) {
+    if (pos === "inside") return list.map((n) => (n.id === target ? { ...n, children: [...kidsOf(n), ...add] } : n));
+    const out = [...list];
+    out.splice(pos === "before" ? i : i + 1, 0, ...add);
+    return out;
+  }
+  return list.map((n) => (n.children?.length ? { ...n, children: insertAt(n.children, target, pos, add) } : n));
+}
+
+/** `<TreeView nodes={files} load={(n) => api.children(n.id)} selection="multiple" search={$q} draggable />` */
+export function TreeView(props: TreeViewProps): Element {
+  const id = uid("hm-tv");
+  const rowH = props.rowHeight ?? 32;
+  const roots = signal<readonly TreeViewNode[]>(untrack(() => val(props.nodes)) ?? []);
+  if (typeof props.nodes === "function") effect(() => { const n = val(props.nodes); untrack(() => roots.set(n ?? [])); });
+  const open = signal(new Set(props.expanded ?? []));
+  const loading = signal(new Set<string>());
+  const failed = signal(new Map<string, string>());
+  const query = (): string => (val(props.search) ?? "").trim();
+  const rtl = (): boolean => dir() === "rtl";
+  const canDrag = (): boolean => !!val(props.draggable);
+
+  // ------------------------------------------------------------------ index: every loaded node, its parent
+  const index = computed(() => {
+    const byId = new Map<string, TreeViewNode>(), parent = new Map<string, string | null>();
+    const walk = (list: readonly TreeViewNode[], p: string | null): void => { for (const n of list) { byId.set(n.id, n); parent.set(n.id, p); if (n.children) walk(n.children, n.id); } };
+    walk(roots(), null);
+    return { byId, parent };
+  });
+  // lazy nodes whose children were fetched (a node dropped into an unloaded folder waits there for the fetch)
+  const fetched = new Set<string>();
+  const hasKids = (n: TreeViewNode): boolean => !!n.children?.length || (!!n.lazy && !fetched.has(n.id));
+  // search: the hits and every ancestor of a hit (shown open)
+  const hits = computed((): Set<string> | null => {
+    const q = fold(query());
+    if (!q) return null;
+    const keep = new Set<string>(), { byId, parent } = index();
+    for (const [nid, n] of byId) if (fold(n.label).includes(q)) for (let p: string | null = nid; p && !keep.has(p); p = parent.get(p) ?? null) keep.add(p);
+    return keep;
+  });
+
+  // ------------------------------------------------------------------ flat visible rows
+  const flat = computed((): Row[] => {
+    const out: Row[] = [], o = open(), keep = hits();
+    const walk = (list: readonly TreeViewNode[], depth: number, p: string | null): void => {
+      const shown = keep ? list.filter((n) => keep.has(n.id)) : list;
+      shown.forEach((node, i) => {
+        const kids = hasKids(node), isOpen = kids && (o.has(node.id) || (!!keep && !!node.children?.some((c) => keep.has(c.id))));
+        out.push({ node, depth, parent: p, pos: i + 1, size: shown.length, open: isOpen, kids });
+        if (isOpen && node.children) walk(node.children, depth + 1, node.id);
+      });
+    };
+    walk(roots(), 0, null);
+    return out;
+  });
+  const rowIndex = computed(() => new Map(flat().map((r, i) => [r.node.id, i])));
+  const sel = createSelection<string, string>({
+    items: () => flat().filter((r) => !r.node.disabled).map((r) => r.node.id), mode: () => val(props.selection) ?? "single", initial: props.selected,
+    onChange: (ids) => props.onSelect?.(ids, ids.map((k) => untrack(index).byId.get(k)).filter((n): n is TreeViewNode => !!n)),
+  });
+  const cursor = signal(0);
+
+  // ------------------------------------------------------------------ open / load
+  let justOpened: string | null = null;
+  const setOpen = (node: TreeViewNode, want: boolean): void => {
+    if (!hasKids(node) || untrack(open).has(node.id) === want) return;
+    if (want) justOpened = node.id;
+    open.update((s) => { const n = new Set(s); if (want) n.add(node.id); else n.delete(node.id); return n; });
+    props.onExpand?.(node.id, want);
+    if (want) fetchKids(node);
+  };
+  const fetchKids = (node: TreeViewNode): void => { if (node.lazy && !fetched.has(node.id) && props.load && !untrack(loading).has(node.id)) void loadKids(node); };
+  const loadKids = async (node: TreeViewNode): Promise<void> => {
+    batch(() => { loading.update((s) => new Set(s).add(node.id)); failed.update((m) => { const n = new Map(m); n.delete(node.id); return n; }); });
+    try {
+      const kids = await props.load!(node);
+      justOpened = node.id;
+      fetched.add(node.id);
+      roots.update((r) => mapNode(r, node.id, (n) => ({ ...n, children: [...kids, ...(n.children ?? [])] })));
+    } catch (e) {
+      failed.update((m) => new Map(m).set(node.id, String((e as Error)?.message ?? e)));
+    } finally {
+      loading.update((s) => { const n = new Set(s); n.delete(node.id); return n; });
+    }
+  };
+
+  // ------------------------------------------------------------------ moving nodes
+  const isInside = (nid: string, ancestor: string): boolean => { const par = untrack(index).parent; for (let p: string | null | undefined = nid; p; p = par.get(p)) if (p === ancestor) return true; return false; };
+  const dropOk = (ids: string[], target: TreeViewNode, pos: DropPosition): boolean =>
+    !ids.some((d) => isInside(target.id, d)) && (pos !== "inside" || target.children != null || !!target.lazy) && (props.canDrop?.(ids, target, pos) ?? true);
+  const move = (ids: string[], target: string, pos: DropPosition): void => {
+    const set = new Set(ids), taken: TreeViewNode[] = [];
+    // keep the visible order of what moves; a node inside another moving node travels with it
+    const order = untrack(rowIndex);
+    let next = removeIds(untrack(roots), set, taken);
+    taken.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+    next = insertAt(next, target, pos, taken);
+    batch(() => {
+      roots.set(next);
+      if (pos === "inside") open.update((s) => new Set(s).add(target));
+    });
+    const t0 = untrack(index).byId.get(target);
+    if (pos === "inside" && t0) fetchKids(t0);
+    landed = new Set(ids);
+    props.onMove?.(ids, target, pos);
+  };
+  let landed: Set<string> | null = null;
+
+  // ------------------------------------------------------------------ virtual rows
+  const rows = createAxis({ count: () => flat().length, size: rowH });
+  const vp = createViewport({ rows, height: props.height ?? 360 });
+  const drop = signal<{ id: string; pos: DropPosition; ok: boolean } | null>(null);
+  const dragging = signal(new Set<string>());
+
+  const rowEl = (r: Row, i: number): HTMLElement => {
+    const n = r.node, isSel = sel.has(n.id), q = query(), isLoading = loading().has(n.id), err = failed().get(n.id);
+    const def = val(props.icons) === false ? null : hasKids(n) ? folder : fileText;
+    const el = h("div", {
+      role: "treeitem", id: `${id}-${i}`, class: cx("hm-tv-row", isSel && "is-selected", n.disabled && "is-disabled", dragging().has(n.id) && "is-dragging"),
+      "aria-level": String(r.depth + 1), "aria-setsize": String(r.size), "aria-posinset": String(r.pos),
+      "aria-expanded": r.kids ? String(r.open) : null, "aria-selected": sel.mode() === "none" ? null : String(isSel), "aria-disabled": n.disabled ? "true" : null,
+      "aria-busy": isLoading ? "true" : null, "data-i": String(i), "data-id": n.id,
+    },
+    h("span", { class: cx("hm-tv-chev", !r.kids && "is-leaf", r.open && "is-open"), "data-chev": "", "aria-hidden": "true" }, r.kids ? glyph(chevronRight) : null),
+    n.icon != null ? icon(n.icon, "hm-tv-icon") : def ? h("span", { class: cx("hm-tv-icon", r.kids && "is-folder"), "aria-hidden": "true" }, glyph(def)) : null,
+    h("span", { class: "hm-tv-label" }, q ? markText(n.label, q) : n.label),
+    isLoading ? h(Spinner, { size: "sm", label: t`Loading ${n.label}` }) : null,
+    err ? h("button", { type: "button", class: "hm-tv-retry", "data-chev": "", onClick: (e: Event) => { e.stopPropagation(); void loadKids(n); } }, glyph(alertCircle), t`Retry`) : null,
+    n.meta != null ? h("span", { class: "hm-tv-meta" }, n.meta) : null) as HTMLElement;
+    setStyle(el, { height: `${rowH}px`, transform: `translateY(${i * rowH}px)`, "--hm-tv-depth": String(r.depth) });
+    return el;
+  };
+
+  const canvas = h("div", { class: "hm-tv-canvas", role: "none" }) as HTMLElement;
+  const dropLine = h("div", { class: "hm-tv-drop", "aria-hidden": "true" }) as HTMLElement;
+  const empty = h("div", { class: "hm-tv-empty", hidden: () => flat().length > 0 }, () => (query() ? t`Nothing matches "${query()}"` : t`Empty`)) as HTMLElement;
+  const scroller = h("div", {
+    role: "tree", class: () => cx("hm-tv", val(props.class)), tabindex: "0", "aria-label": () => val(props.label) ?? t`Tree`,
+    "aria-multiselectable": () => (sel.mode() === "multiple" ? "true" : null),
+  }, canvas, dropLine, empty) as HTMLElement;
+  setStyle(scroller, { height: `${props.height ?? 360}px` });
+
+  const painted = new Map<string, { el: HTMLElement; sig: string; dispose: () => void }>();
+  const paint = (): void => {
+    const list = flat(), range = vp.rows(), cur = cursor(), d = drop(), dr = dragging();
+    void sel.selected(); void loading(); void failed(); const q = query(), icons = val(props.icons);
+    setStyle(canvas, { height: `${rows.total()}px` });
+    const keep = new Set<string>(), fresh: HTMLElement[] = [];
+    for (let i = range.start; i < range.end; i++) {
+      const r = list[i];
+      if (!r) continue;
+      const n = r.node, k = n.id;
+      keep.add(k);
+      const sig = [i, r.depth, r.open, r.kids, r.pos, r.size, sel.has(k), loading().has(k), failed().get(k) ?? "", dr.has(k), q, icons, n.label, n.meta, n.disabled].join("|");
+      const p = painted.get(k);
+      if (p && p.sig === sig && (p.el as unknown as { _n?: unknown })._n === n) continue;
+      p?.dispose(); p?.el.remove();
+      createRoot((dispose) => {
+        const el = rowEl(r, i);
+        (el as unknown as { _n?: unknown })._n = n;
+        canvas.append(el);
+        painted.set(k, { el, sig, dispose });
+        if (!p && justOpened && isInside(k, justOpened) && k !== justOpened) fresh.push(el);
+        else if (landed?.has(k)) fresh.push(el);
+      });
+    }
+    for (const [k, p] of painted) if (!keep.has(k)) { p.dispose(); p.el.remove(); painted.delete(k); }
+    // cursor (aria-activedescendant) and drop target
+    for (const x of canvas.querySelectorAll(".is-cursor, .is-drop-inside, .is-drop-bad")) x.classList.remove("is-cursor", "is-drop-inside", "is-drop-bad");
+    const curEl = canvas.querySelector<HTMLElement>(`#${id}-${cur}`);
+    curEl?.classList.add("is-cursor");
+    if (curEl) scroller.setAttribute("aria-activedescendant", curEl.id); else scroller.removeAttribute("aria-activedescendant");
+    const di = d ? rowIndex().get(d.id) : undefined;
+    if (d && di != null) {
+      const target = painted.get(d.id)?.el;
+      if (d.pos === "inside" || !d.ok) target?.classList.add(d.ok ? "is-drop-inside" : "is-drop-bad");
+      const depth = (list[di] as Row).depth;
+      setStyle(dropLine, { opacity: d.ok && d.pos !== "inside" ? "1" : "0", transform: `translateY(${(d.pos === "after" ? di + 1 : di) * rowH - 1}px)`, "--hm-tv-depth": String(depth) });
+    } else setStyle(dropLine, { opacity: "0" });
+    if (fresh.length) {
+      const st = stagger(18);
+      fresh.slice(0, 30).forEach((el, n) => void animate(el, landed ? [{ opacity: .3, scale: ".97" }, { opacity: 1, scale: "1" }] : [{ opacity: 0, translate: "0 -8px" }, { opacity: 1, translate: "0 0" }], { duration: landed ? 360 : 220, delay: st(n), easing: landed ? "easeOutBack" : "easeOutCubic" }));
+    }
+    justOpened = null; landed = null;
+  };
+
+  // ------------------------------------------------------------------ interaction
+  const focusRow = (i: number): void => {
+    const n = flat().length;
+    if (!n) return;
+    const next = clamp(i, 0, n - 1);
+    cursor.set(next);
+    vp.reveal(next);
+  };
+  const rowAt = (e: Event): number | null => { const el = (e.target as Element).closest<HTMLElement>(".hm-tv-row"); return el ? Number(el.dataset["i"]) : null; };
+  let typed = "", typedAt: ReturnType<typeof later> | undefined;
+  const typeahead = (ch: string): void => {
+    clearTimeout(typedAt);
+    typed += fold(ch);
+    typedAt = later(() => { typed = ""; }, 600);
+    const list = flat(), from = untrack(cursor);
+    for (let k = 1; k <= list.length; k++) { const i = (from + (typed.length > 1 ? 0 : k)) % list.length; if (fold((list[i] as Row).node.label).startsWith(typed)) { focusRow(i); return; } }
+  };
+  const siblingMove = (r: Row, delta: number): void => {
+    const list = untrack(flat), siblings = list.filter((x) => x.parent === r.parent && x.depth === r.depth);
+    const at = siblings.findIndex((x) => x.node.id === r.node.id), other = siblings[at + delta];
+    if (!other) return;
+    move([r.node.id], other.node.id, delta < 0 ? "before" : "after");
+    const i = untrack(rowIndex).get(r.node.id);
+    if (i != null) focusRow(i);
+  };
+  const onKey = (e: KeyboardEvent): void => {
+    const list = flat(), i = untrack(cursor), r = list[i];
+    if (!r) return;
+    const multi = sel.mode() === "multiple", ctrl = e.ctrlKey || e.metaKey;
+    const fwd = rtl() ? "ArrowLeft" : "ArrowRight", back = rtl() ? "ArrowRight" : "ArrowLeft";
+    if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown") && canDrag()) { e.preventDefault(); siblingMove(r, e.key === "ArrowUp" ? -1 : 1); return; }
+    const page = Math.max(1, Math.floor(scroller.clientHeight / rowH) - 1);
+    const ni = moveCursor({ key: e.key, index: i, count: list.length, page, ctrl });
+    if (ni != null) {
+      e.preventDefault();
+      focusRow(ni);
+      const target = list[ni] as Row;
+      if (target.node.disabled) return;
+      if (multi && e.shiftKey) sel.range(target.node.id, ctrl);
+      else if (!multi && sel.mode() === "single") sel.pick(target.node.id);
+      return;
+    }
+    if (e.key === fwd) { e.preventDefault(); if (r.kids && !r.open) setOpen(r.node, true); else if (r.open) focusRow(i + 1); }
+    else if (e.key === back) { e.preventDefault(); if (r.open) setOpen(r.node, false); else if (r.parent) focusRow(untrack(rowIndex).get(r.parent) ?? i); }
+    else if (e.key === "Enter") { e.preventDefault(); if (!r.node.disabled) sel.pick(r.node.id, multi ? { ctrlKey: ctrl, shiftKey: e.shiftKey } : {}); if (r.kids) setOpen(r.node, !r.open); else props.onActivate?.(r.node); }
+    else if (e.key === " ") { e.preventDefault(); if (!r.node.disabled) { if (multi) sel.toggle(r.node.id); else sel.pick(r.node.id); } }
+    else if (e.key === "*") { e.preventDefault(); for (const x of list) if (x.parent === r.parent && x.kids) setOpen(x.node, true); }
+    else if (multi && ctrl && e.key.toLowerCase() === "a") { e.preventDefault(); sel.selectAll(); }
+    else if (e.key === "Escape" && multi) sel.clear();
+    else if (e.key.length === 1 && !ctrl && !e.altKey) typeahead(e.key);
+  };
+  const onClick = (e: MouseEvent): void => {
+    const i = rowAt(e);
+    if (i == null) return;
+    const r = untrack(flat)[i];
+    if (!r) return;
+    cursor.set(i);
+    scroller.focus({ preventScroll: true });
+    if ((e.target as Element).closest("[data-chev]")) { if (r.kids) setOpen(r.node, !r.open); return; }
+    if (!r.node.disabled) sel.pick(r.node.id, e);
+  };
+  const onDbl = (e: MouseEvent): void => {
+    const i = rowAt(e), r = i == null ? null : untrack(flat)[i];
+    if (!r || (e.target as Element).closest("[data-chev]")) return;
+    if (r.kids) setOpen(r.node, !r.open); else props.onActivate?.(r.node);
+  };
+
+  // drag and drop: ghost in the drag layer, a drop line (before / after) or a highlighted row (inside)
+  const onDown = (e: PointerEvent): void => {
+    if (e.button !== 0 || !canDrag() || (e.target as Element).closest("[data-chev]")) return;
+    const i = rowAt(e), r = i == null ? null : untrack(flat)[i];
+    if (!r || r.node.disabled) return;
+    let ids: string[] = [], ghost: HTMLElement | null = null, closeGhost = (): void => {}, hover: { id: string; at: ReturnType<typeof later> } | null = null;
+    pointerDrag(e, {
+      scroll: scroller,
+      onStart: () => {
+        const s = sel.has(r.node.id) ? sel.keys() : [r.node.id];
+        ids = s.filter((k) => !s.some((o) => o !== k && isInside(k, o)));
+        dragging.set(new Set(ids));
+        ghost = h("div", { class: "hm-tv-ghost" }, h("span", { class: "hm-tv-ghost-label" }, r.node.label), ids.length > 1 ? h("b", { class: "hm-tv-ghost-count" }, String(ids.length)) : null) as HTMLElement;
+        setStyle(ghost, { left: "0", top: "0" }); // viewport coordinates of the pointer, the same in RTL
+        closeGhost = openLayer("drag", ghost);
+        void animate(ghost, [{ opacity: 0, scale: ".9" }, { opacity: 1, scale: "1" }], { duration: 160, easing: "easeOutCubic" });
+      },
+      onMove: (p) => {
+        setStyle(ghost, { transform: `translate(${p.clientX + 14}px, ${p.clientY + 10}px)` });
+        const box = scroller.getBoundingClientRect(), y = p.clientY - box.top + scroller.scrollTop;
+        const list = untrack(flat), ti = Math.floor(y / rowH), tr = list[ti];
+        if (!tr || y < 0) { drop.set(null); return; }
+        const within = y - ti * rowH, canIn = tr.node.children != null || !!tr.node.lazy;
+        const pos: DropPosition = canIn && within > rowH * 0.28 && within < rowH * 0.72 ? "inside" : within < rowH / 2 ? "before" : "after";
+        const ok = dropOk(ids, tr.node, pos);
+        const cur = untrack(drop);
+        if (!cur || cur.id !== tr.node.id || cur.pos !== pos || cur.ok !== ok) drop.set({ id: tr.node.id, pos, ok });
+        // hovering inside a closed folder opens it after a moment
+        if (pos === "inside" && ok && tr.kids && !tr.open) { if (hover?.id !== tr.node.id) { if (hover) clearTimeout(hover.at); hover = { id: tr.node.id, at: later(() => setOpen(tr.node, true), 650) }; } }
+        else if (hover) { clearTimeout(hover.at); hover = null; }
+      },
+      onEnd: (_p, cancelled) => {
+        if (hover) clearTimeout(hover.at);
+        const d = untrack(drop);
+        batch(() => { drop.set(null); dragging.set(new Set()); });
+        const g = ghost as HTMLElement | null;
+        if (g) void animate(g, [{ opacity: 1 }, { opacity: 0, scale: ".9" }], { duration: 140 }).finished.then(closeGhost); else closeGhost();
+        if (!cancelled && d?.ok) move(ids, d.id, d.pos);
+      },
+    });
+  };
+
+  scroller.addEventListener("keydown", onKey);
+  scroller.addEventListener("click", onClick);
+  scroller.addEventListener("dblclick", onDbl);
+  scroller.addEventListener("pointerdown", onDown);
+  vp.bind(scroller);
+  effect(() => paint());
+  // keep the cursor on a row
+  effect(() => { const n = flat().length; if (untrack(cursor) >= n) cursor.set(Math.max(0, n - 1)); });
+  onCleanup(() => { for (const p of painted.values()) p.dispose(); painted.clear(); });
+  return scroller;
+}

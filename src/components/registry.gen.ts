@@ -2,9 +2,11 @@
 import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";
 import m0 from "./chip/meta.ts";
 import m1 from "./data/data-grid/meta.ts";
+import m2 from "./data/tree-view/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 export const registry: readonly RegistryEntry[] = [
   { folder: "chip", meta: m0, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./chip/demo.tsx"), playground: () => import("./chip/playground.ts") },
   { folder: "data/data-grid", meta: m1, code: "", demo: () => import("./data/data-grid/demo.tsx"), playground: () => import("./data/data-grid/playground.ts") },
+  { folder: "data/tree-view", meta: m2, code: "import { TreeView } from \"hadi-march/components/data/tree-view\";\n\n<TreeView nodes={files} selection=\"multiple\" draggable search={$q}\n  load={(node) => api.children(node.id)}\n  onSelect={(ids) => $selected = ids}\n  onMove={(ids, target, position) => api.move(ids, target, position)} />", demo: () => import("./data/tree-view/demo.tsx"), playground: () => import("./data/tree-view/playground.ts") },
 ];

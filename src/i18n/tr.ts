@@ -279,5 +279,9 @@ const tr: Record<string, string> = {
   "Group with a column menu": "Sütun menüsünden grupla",
   "Show all columns": "Tüm sütunları göster",
   "Filters ({0})": "Süzgeçler ({0})",
+  "Loading {0}": "{0} yükleniyor",
+  "Nothing matches \"{0}\"": "“{0}” ile eşleşen yok",
+  "Empty": "Boş",
+  "Tree": "Ağaç",
 };
 export default tr;
