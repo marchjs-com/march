@@ -7,6 +7,13 @@
 @import "../ui/toast.css";
 @import "../ui/tabs.css";
 @import "../ui/display.css";
+@import "../components/data/card/card.css";
+@import "../components/data/badge/badge.css";
+@import "../components/data/key-value/key-value.css";
+@import "../components/data/timeline/timeline.css";
+@import "../components/typography/kbd/kbd.css";
+@import "../components/typography/code-view/code-view.css";
+@import "../components/data/json-view/json-view.css";
 @import "../ui/grid.css";
 @import "../ui/layout.css";
 @import "../ui/nav.css";
@@ -28,6 +35,6 @@
 @import "../ui/steps.css";
 @import "../ui/pagination.css";
 @import "../ui/carousel.css";
-@import "../ui/tree.css";
-@import "../ui/kanban.css";
+@import "../components/data/tree/tree.css";
+@import "../components/data/kanban/kanban.css";
 @import "../ui/splitter.css";

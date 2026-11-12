@@ -3,6 +3,13 @@
 
 Grouped by category (src/components/categories.ts). Each category is a subpath: `import { Chip } from "hadi-march/actions"`; `hadi-march/ui` re-exports every component.
 
+### Typography — `hadi-march/typography`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| CodeView | stable | Read-only code block: line numbers, syntax colours (js/ts/jsx/tsx, css, html, json, sh), wrap toggle and a copy button. | CopyButton |
+| Kbd | stable | Keyboard key: text, or a shortcut string (mod+k) written for the platform (Ctrl+K, ⌘K). | — |
+
 ### Actions — `hadi-march/actions`
 
 | Component | Status | What | Composed of |
@@ -14,9 +21,16 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Badge | stable | Small status label in a tone, a dot badge, or a count badge (hidden at 0, 120 → 99+) with an accessible label. | — |
+| Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | — |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [Chip](#chip), Menu, FilterControl, CellEditor |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | — |
+| JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | — |
+| Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | — |
+| KeyValue | stable | Definition list for detail views: label / value rows in 1–4 columns, hints, hidden rows and a placeholder for empty values. | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | Button, IconButton, ButtonGroup, Segmented |
+| Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | — |
+| Tree | stable | Expandable tree (role=tree) with icons, trailing meta, selection and the full keyboard model; long labels scroll with OverflowText. | OverflowText |
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
@@ -63,12 +77,12 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
+| BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | [Badge](#badge), OverflowText |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, [ReactionPicker](#reactionpicker) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), Avatar |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
 | CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, OverflowText |
-| ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, Dialog, Toggle |
+| ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, [Card](#card), Dialog, Toggle |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
 | FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle |
 | FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, [Chip](#chip), OverflowText |
@@ -84,20 +98,43 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
-| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
+| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | [Badge](#badge), IconButton, Toggle |
 | Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress |
+
+## Badge
+
+A small label: a status in a tone, a dot badge (a coloured dot before the text) or a count badge. Count badges hide at 0 (unless `showZero`), cap at `max` ("99+") and can carry an accessible label ("3 unread").
+
+```tsx
+<Badge tone="success">Active</Badge>
+<Badge tone="warn" dot>Pending</Badge>
+<Badge count={unread} label="unread" />
+```
+
+Full page: src/components/data/badge/docs.md
 
 ## BottomNav
 
 The mobile tab bar: a colored bubble slides to the active tab, tabs carry count or dot badges, and an optional raised Create button in the middle wears a slowly turning ring of the four HADİ colors (Heyecan, Aktivite, Dostluk, İletişim).
 
-Composed of: Badge, OverflowText
+Composed of: [Badge](#badge), OverflowText
 
 ```tsx
 <BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />
 ```
 
 Full page: src/components/composite/bottom-nav/docs.md
+
+## Card
+
+A surface for one piece of content: an optional header with a title, a subtitle and actions, the body, and an optional footer. `action()` objects in `actions` render as buttons that run, confirm and report the action.
+
+```tsx
+<Card title="Acme Ltd." subtitle="Business plan" actions={[edit]} footer={<span>Updated today</span>}>…</Card>
+<Card flush>…</Card>
+```
+
+Full page: src/components/data/card/docs.md
 
 ## ChatBubble
 
@@ -147,6 +184,19 @@ Composed of: OverflowText
 
 Full page: src/components/actions/chip/docs.md
 
+## CodeView
+
+A read-only code block: line numbers, syntax colours for js / ts / jsx / tsx, css, html, json and sh (other languages stay plain), a wrap toggle and a copy button. Text is inserted as text nodes, never as HTML. Every showcase Code tab draws it through the `code-view` widget point.
+
+Composed of: CopyButton
+
+```tsx
+<CodeView code={source} lang="tsx" copy />
+<CodeView code={css} lang="css" lineNumbers={false} wrap />
+```
+
+Full page: src/components/typography/code-view/docs.md
+
 ## ColorPicker
 
 An advanced color picker: a saturation / brightness area, hue and alpha sliders, an eyedropper (where the browser has one), an old / new preview (click the old half to go back), the value as hex, rgb() or hsl() text (any CSS color can be typed or pasted), WCAG contrast on white and black, and palettes: the four HADİ colors, the theme's palette and the recent picks. Theme colors are read from the tokens at the moment they are picked, so they follow the active theme.
@@ -178,7 +228,7 @@ Full page: src/components/composite/command-palette/docs.md
 
 The consent manager's UI. A bottom banner asks until there is a valid decision for the current policy version (Reject all sits next to Accept all, with the same weight); the preferences panel lists every category as a Card with a Toggle (a Dialog on wide screens, a bottom sheet on phones); `ConsentGate` keeps third-party content behind a placeholder that can allow it in place. The module is lazy on purpose: load it with `lazy(() => import("hadi-march/managers/consent/ui"), { pick: "ConsentBanner" })`.
 
-Composed of: Button, Card, Dialog, Toggle
+Composed of: Button, [Card](#card), Dialog, Toggle
 
 ```tsx
 <ConsentBanner title="Cookies" text="We use analytics to measure visits." />
@@ -370,6 +420,50 @@ Composed of: [TreeEditor](#treeeditor)
 ```
 
 Full page: src/components/composite/json-editor/docs.md
+
+## JsonView
+
+A collapsible, read-only JSON tree for API responses, settings and logs. Keys, strings, numbers, booleans and null have their own theme colours; a closed object or array shows how many keys or items it holds. Dates print as ISO strings and a circular reference is marked instead of looping.
+
+```tsx
+<JsonView value={response} open={1} />
+```
+
+Full page: src/components/data/json-view/docs.md
+
+## Kanban
+
+A board: columns with a toned dot, a title and a count, and cards you move between columns by drag and drop or from the keyboard (Alt+← / Alt+→ on a focused card). The board does not move cards itself: `onMove` tells you, you update the columns.
+
+```tsx
+<Kanban columns={$board} itemKey={(x) => x.id} card={(x) => <strong>{x.title}</strong>}
+  onMove={(item, from, to) => { $board = move($board, item, from, to) }} />
+```
+
+Full page: src/components/data/kanban/docs.md
+
+## Kbd
+
+A keyboard key. Give it text (`<Kbd>Esc</Kbd>`) or a shortcut string: `keys="mod+k"` is written for the platform (⌘K on macOS, Ctrl+K elsewhere), the same way `key()` and the shortcut list read it.
+
+```tsx
+<Kbd keys="mod+k" />
+<Kbd keys="shift+enter" />
+<Kbd>Esc</Kbd>
+```
+
+Full page: src/components/typography/kbd/docs.md
+
+## KeyValue
+
+A definition list (`<dl>`) for detail views: one label / value pair per row, in up to four columns. Values may be text, nodes or accessors; an empty value shows a placeholder.
+
+```tsx
+<KeyValue columns={2} items={[{ label: "Email", value: user.email }, { label: "Total", value: total, hint: "incl. VAT" }]} />
+<KeyValue items={{ Plan: "Business", Seats: 48 }} />
+```
+
+Full page: src/components/data/key-value/docs.md
 
 ## KeyframeTimeline
 
@@ -585,11 +679,36 @@ Composed of: Dropdown, ThemeSwatch, OverflowText
 
 Full page: src/components/composite/theme-menu/docs.md
 
+## Timeline
+
+An ordered list of events. Each item has an optional time, title, body, tone (the dot colour) and icon. A `Date`, epoch milliseconds or an ISO string is formatted for the current locale; other text is shown as is.
+
+```tsx
+<Timeline items={[
+  { time: "Today 09:12", title: "Order placed", body: "#48210 · 3 items", tone: "info" },
+  { time: paidAt, title: "Payment received", tone: "success", icon: check },
+]} />
+```
+
+Full page: src/components/data/timeline/docs.md
+
+## Tree
+
+An expandable tree for small hierarchies (file lists, settings sections). Every node can carry an icon and a trailing meta text; long labels scroll with OverflowText instead of ending in an ellipsis. For thousands of nodes, lazy children or drag and drop use TreeView.
+
+Composed of: OverflowText
+
+```tsx
+<Tree label="Files" nodes={files} expanded={["src"]} selected={() => $file} onSelect={(n) => { $file = n.id }} />
+```
+
+Full page: src/components/data/tree/docs.md
+
 ## TreeEditor
 
 Edit any JSON value as a tree. Each row shows its key, a **type badge** in a HADİ color (objects and lists Heyecan, numbers Aktivite, text Dostluk, true / false İletişim) that converts the value to another type, and the value: a text or number you edit in place, a switch for true / false, a count for objects and lists. Rows add, duplicate and delete; a search box keeps the matches and their parents; a JSON Schema subset marks invalid rows with their message. Every change is one step of the editor's own undo history.
 
-Composed of: Badge, IconButton, Toggle
+Composed of: [Badge](#badge), IconButton, Toggle
 
 ```tsx
 <TreeEditor bind:value={$config} schema={schema} />

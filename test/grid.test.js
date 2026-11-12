@@ -40,7 +40,7 @@ test("Grid: minCol and equal; cards fill their cell; fixed grids never crush col
   assert.match(css, /@container hm-grid \(width < 19rem\)/);
   const display = readFileSync(new URL("../src/ui/display.css", import.meta.url), "utf8");
   assert.match(display, /repeat\(auto-fill, minmax\(min\(100%, max\(var\(--hm-grid-col-min, 9rem\)/);
-  assert.match(display, /\.hm-card \{ position: relative; display: flex; flex-direction: column;/);
+  assert.match(readFileSync(new URL("../src/components/data/card/card.css", import.meta.url), "utf8"), /\.hm-card \{ position: relative; display: flex; flex-direction: column;/);
 });
 
 test("Grid span mode: fill + equal together with fixed columns; generated CSS fills the last row", async () => {

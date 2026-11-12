@@ -1,0 +1,24 @@
+/* HADI March — CodeView (and the Code tab widget). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+.hm-code { border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-bg-subtle); overflow: hidden; }
+.hm-code-bar { display: flex; align-items: center; justify-content: flex-end; gap: var(--hm-space-1); padding: var(--hm-space-1) var(--hm-space-2); border-bottom: 1px solid var(--hm-border); background: var(--hm-surface); }
+.hm-code-lang { margin-inline-end: auto; padding-inline-start: var(--hm-space-1); color: var(--hm-muted); font-size: var(--hm-text-2xs); font-weight: 600; text-transform: uppercase; letter-spacing: var(--hm-tracking-caps); }
+.hm-code-pre { margin: 0; padding: var(--hm-space-3) 0; overflow: auto; max-height: 70vh; font: var(--hm-text-sm)/1.6 var(--hm-font-mono); counter-reset: none; }
+.hm-code-line { display: block; padding-inline-end: var(--hm-space-3); }
+.hm-code-ln { display: inline-block; width: 3.5em; padding-inline-end: var(--hm-space-3); text-align: end; color: var(--hm-faint); user-select: none; }
+.hm-code-text { white-space: pre; }
+.hm-code.is-wrapped .hm-code-line { display: flex; }
+.hm-code.is-wrapped .hm-code-ln { flex: none; }
+.hm-code.is-wrapped .hm-code-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* Syntax colours (CodeView highlight): text-safe theme colours, so every theme and accent stays readable. */
+.hm-tok-com { color: var(--hm-faint); font-style: italic; }
+.hm-tok-str { color: var(--hm-success-text); }
+.hm-tok-num, .hm-tok-lit { color: var(--hm-warn-text); }
+.hm-tok-kw { color: var(--hm-special-text); font-weight: 600; }
+.hm-tok-tag { color: var(--hm-info-text); }
+.hm-tok-attr { color: var(--hm-primary-text); }
+.hm-tok-fn { color: var(--hm-danger-text); }
+.hm-tok-punct { color: var(--hm-muted); }
+.hm-code-files { display: flex; gap: var(--hm-space-1); margin-inline-end: auto; overflow-x: auto; }
+.hm-code-files + .hm-code-lang { margin-inline-end: 0; }
+.hm-widget { min-width: 0; }
+.hm-code-widget.is-expanded .hm-code-pre { max-height: none; }

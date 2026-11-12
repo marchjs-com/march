@@ -12,7 +12,7 @@
 //   const list = users.list.query();                     // hadi-march/data query, key ["users", "/", null]
 //   const save = users.update.mutation();                // invalidates "users" (net cache + data queries)
 //   users.live.subscribe((e) => …);
-import { invalidate as invalidateQueries, query as dataQuery, mutation as dataMutation, type Query, type QueryOptions, type Mutation, type MutationOptions } from "../data/index.ts";
+import { invalidate as invalidateQueries, query as dataQuery, mutation as dataMutation, type Query, type QueryOptions, type Mutation, type MutationOptions } from "../data/query.ts";
 import { signal, onCleanup, getOwner, type Accessor } from "../core/reactive.ts";
 import { AppError } from "../errors/app-error.ts";
 import { onInvalidate, type Net, type RequestOptions } from "./core.ts";

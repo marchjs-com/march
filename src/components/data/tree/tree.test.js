@@ -1,0 +1,30 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { installDom } from "../../../testing/dom.ts";
+const { document } = installDom({ url: "http://localhost/" });
+const { h, render, signal } = await import("../../../index.ts");
+const { Tree } = await import("./index.ts");
+const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
+const key = (el, k) => el.dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: k, bubbles: true }));
+
+test("Tree: ARIA, expand / collapse with keys and clicks, selection", () => {
+  const sel = signal(null);
+  const nodes = [{ id: "a", label: "a", children: [{ id: "a1", label: "a1", meta: "3" }] }, { id: "b", label: "b" }];
+  const m = mount(() => h(Tree, { nodes, selected: sel, onSelect: (n) => sel.set(n.id), label: "Files" }));
+  const tree = m.el.querySelector("[role=tree]");
+  assert.equal(tree.getAttribute("aria-label"), "Files");
+  const a = [...tree.children].find((x) => x.getAttribute("role") === "treeitem");
+  assert.equal(a.getAttribute("aria-expanded"), "false");
+  const row = a.querySelector(".hm-tree-row");
+  key(row, "ArrowRight");
+  assert.equal(a.getAttribute("aria-expanded"), "true");
+  assert.equal(a.querySelector("[role=group]").hidden, false);
+  key(row, "ArrowLeft");
+  assert.equal(a.getAttribute("aria-expanded"), "false");
+  row.click();
+  assert.equal(sel(), "a");
+  assert.equal(a.getAttribute("aria-selected"), "true");
+  assert.equal(a.querySelector(".hm-tree-meta").textContent, "3");
+  assert.equal(a.querySelector("[role=treeitem]").getAttribute("aria-level"), "2");
+  m.dispose();
+});

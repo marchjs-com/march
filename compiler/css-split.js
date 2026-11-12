@@ -14,9 +14,9 @@ import { MARCH_ROOT } from "./autoimports.js";
 const SRC = join(MARCH_ROOT, "src");
 /** Cascade order of component stylesheets (later wins on equal specificity). Others follow alphabetically. */
 export const ORDER = [
-  "ui/field.css", "ui/button.css", "ui/menu.css", "ui/dialog.css", "ui/toast.css", "ui/tabs.css", "ui/display.css", "ui/grid.css", "ui/layout.css", "ui/nav.css",
+  "ui/field.css", "ui/button.css", "ui/menu.css", "ui/dialog.css", "ui/toast.css", "ui/tabs.css", "ui/display.css", "components/data/card/card.css", "components/data/badge/badge.css", "components/data/key-value/key-value.css", "components/data/timeline/timeline.css", "components/typography/kbd/kbd.css", "components/typography/code-view/code-view.css", "components/data/json-view/json-view.css", "ui/grid.css", "ui/layout.css", "ui/nav.css",
   "components/composite/nav-sidebar/nav-sidebar.css", "components/composite/command-palette/command-palette.css", "ui/theme.css", "ui/accent.css", "components/composite/theme-menu/theme-menu.css", "dom/lazy.css", "ui/overlay.css", "ui/theme-swatches.css", "ui/media.css", "ui/disclosure.css", "ui/app.css", "components/actions/chip/chip.css", "ui/marquee.css", "ui/avatar-group.css",
-  "ui/progress.css", "ui/rating.css", "ui/accordion.css", "ui/steps.css", "ui/pagination.css", "ui/carousel.css", "ui/tree.css", "ui/kanban.css",
+  "ui/progress.css", "ui/rating.css", "ui/accordion.css", "ui/steps.css", "ui/pagination.css", "ui/carousel.css", "components/data/tree/tree.css", "components/data/kanban/kanban.css",
   "ui/splitter.css", "forms/form.css", "forms/inputs.css", "forms/choice.css", "forms/pickers.css", "forms/date.css", "forms/file.css", "forms/editors.css",
   "components/composite/wizard/wizard.css", "forms/records.css", "css/table.css", "charts/charts.css", "fx/fx.css",
 ];

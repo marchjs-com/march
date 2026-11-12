@@ -1,0 +1,11 @@
+/* HADI March — Card. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+.hm-card { position: relative; display: flex; flex-direction: column; background: var(--hm-surface); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-1); min-width: 0; }
+.hm-card-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--hm-space-3); padding: var(--hm-space-4) var(--hm-space-5) 0; }
+.hm-card-titles { flex: 1; min-width: min(12rem, 100%); }
+.hm-card-title { margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); letter-spacing: var(--hm-tracking-tight); }
+.hm-card-sub { margin: .1875rem 0 0; color: var(--hm-muted); font-size: var(--hm-text-sm); }
+.hm-card-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
+.hm-card-body { flex: 1 1 auto; min-width: 0; padding: var(--hm-space-4) var(--hm-space-5) var(--hm-space-5); }
+.hm-card-flush .hm-card-body { padding: 0; }
+.hm-card-flush .hm-card-head { padding-bottom: var(--hm-space-4); border-bottom: 1px solid var(--hm-border-subtle); }
+.hm-card-foot { padding: var(--hm-space-3) var(--hm-space-5); border-top: 1px solid var(--hm-border-subtle); background: var(--hm-bg-subtle); border-radius: 0 0 var(--hm-radius-3) var(--hm-radius-3); }
