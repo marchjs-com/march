@@ -33,7 +33,7 @@ export function animate(el: Element, frames: Frames | string, opts: AnimateOptio
   return p;
 }
 
-/** Stagger helper: delay for item i (ms). `from`: "start" | "end" | "center" | "edges" | "random" | index. */
+/** Stagger helper: delay for item i (ms). `from`: "start" | "end" | "center" | "edges" | index. */
 export function stagger(each = 40, o: Parameters<typeof engineStagger>[1] = {}): (i: number, total?: number) => number {
   const f = engineStagger(each, o);
   return (i: number, total = o.total ?? 0) => f(i, total);

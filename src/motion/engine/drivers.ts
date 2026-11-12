@@ -120,7 +120,7 @@ export const domDriver: Driver<HTMLElement> = {
       if (k.startsWith("--")) { const g = guessSyntax(f[k]); if (!g || !registerVar(k, g[0], g[1])) return null; }
       else if (DEV.enabled && !COMPOSITOR.has(kebab(k)) && !warned.has(k)) {
         warned.add(k);
-        DEV.warn(`motion: "${k}" is not compositor-only (layout or paint every frame). Prefer transform / opacity / filter.`);
+        DEV.warn(`motion: "${k}" is not compositor-only; prefer transform / opacity / filter`);
       }
     }
     const a = el.animate(frames, timing);

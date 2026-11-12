@@ -25,13 +25,13 @@ export function oklabToSrgb(L: number, a: number, b: number, out: Float64Array |
   out[i + 2] = clamp01(toGamma(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s));
 }
 
-const NAMED: Record<string, string> = { transparent: "#0000", black: "#000", white: "#fff", red: "#f00", green: "#008000", blue: "#00f", yellow: "#ff0", cyan: "#0ff", magenta: "#f0f", gray: "#808080", grey: "#808080", orange: "#ffa500", purple: "#800080", pink: "#ffc0cb" };
+const NAMED: Record<string, string> = { transparent: "#0000", black: "#000", white: "#fff" };
 const NUM = /-?(?:\d*\.\d+|\d+)(?:e[-+]?\d+)?%?|none/gi;
 const part = (s: string | undefined, scale: number): number => (s == null || s === "none" ? 0 : s.endsWith("%") ? (parseFloat(s) / 100) * scale : parseFloat(s));
 
 /**
  * Parse a CSS color into premultiplied OKLab + alpha: out = [L·α, a·α, b·α, α]. Returns false when `s` is not a color
- * this parser knows (hex, rgb(), hsl(), oklab(), oklch(), a few names).
+ * this parser knows (hex, rgb(), oklab(), oklch(), transparent / black / white; others such as hsl() switch halfway in JS and stay native in CSS).
  */
 export function parseColor(input: string, out: Float64Array | number[], i = 0): boolean {
   let s = input.trim().toLowerCase();
@@ -46,18 +46,14 @@ export function parseColor(input: string, out: Float64Array | number[], i = 0): 
     rgb(at(0), at(1), at(2));
     if (h.length === 4 || h.length === 8) alpha = at(3);
   } else {
-    const m = /^(rgba?|hsla?|oklab|oklch)\((.*)\)$/.exec(s);
+    const m = /^(rgba?|oklab|oklch)\((.*)\)$/.exec(s);
     if (!m) return false;
     const v = m[2]!.match(NUM) ?? [];
     if (v.length < 3) return false;
     const fn = m[1]!;
     if (v[3] != null) alpha = part(v[3], 1);
     if (fn.startsWith("rgb")) rgb(part(v[0], 255) / 255, part(v[1], 255) / 255, part(v[2], 255) / 255);
-    else if (fn.startsWith("hsl")) {
-      const H = (((parseFloat(v[0]!) % 360) + 360) % 360) / 360, S = part(v[1], 100) / 100, Li = part(v[2], 100) / 100;
-      const f = (n: number): number => { const k = (n + H * 12) % 12; const a = S * Math.min(Li, 1 - Li); return Li - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); };
-      rgb(f(0), f(8), f(4));
-    } else if (fn === "oklab") { L = part(v[0], 1); A = part(v[1], 0.4); B = part(v[2], 0.4); }
+    else if (fn === "oklab") { L = part(v[0], 1); A = part(v[1], 0.4); B = part(v[2], 0.4); }
     else { L = part(v[0], 1); const C = part(v[1], 0.4), h = (parseFloat(v[2]!) * Math.PI) / 180; A = C * Math.cos(h); B = C * Math.sin(h); }
   }
   out[i] = L! * alpha; out[i + 1] = A! * alpha; out[i + 2] = B! * alpha; out[i + 3] = alpha;

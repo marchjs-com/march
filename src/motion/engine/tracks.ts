@@ -6,7 +6,7 @@
 //   colors             "#f00" → "oklch(.7 .1 200)"         (n = 4, premultiplied OKLab + alpha)
 //   strings w/ numbers "translate(0px, 10%) rotate(0deg)"  (n = count of numbers; the text around them must match)
 //   anything else      switches halfway (discrete)
-import { ease as toEase, type Ease, type EaseInput } from "./ease.ts";
+import { ease as toEase, spread, NUM, type Ease, type EaseInput } from "./ease.ts";
 import { parseColor, formatOklab, oklabToRgba } from "./color.ts";
 
 export type Value = number | string | ArrayLike<number> | null | undefined;
@@ -51,23 +51,6 @@ export function normalize(frames: Frames): RawTrack[] {
 }
 /** A vector value inside property-indexed frames: an array of arrays means keyframes, a flat number array of length>1 at the top level means keyframes too. Vectors are typed arrays or nested arrays. */
 const isVector = (v: unknown): boolean => ArrayBuffer.isView(v);
-/** Missing offsets: the first is 0, the last 1 (a single frame is the end), the rest spread evenly between known ones. */
-function spread(o: (number | null)[]): number[] {
-  const n = o.length;
-  if (n === 1) return [o[0] ?? 1];
-  const r = o.slice();
-  if (r[0] == null) r[0] = 0;
-  if (r[n - 1] == null) r[n - 1] = 1;
-  for (let i = 1; i < n; i++) {
-    if (r[i] != null) continue;
-    let j = i; while (r[j] == null) j++;
-    const a = r[i - 1]!, b = r[j]!;
-    for (let k = i; k < j; k++) r[k] = a + ((b - a) * (k - i + 1)) / (j - i + 1);
-  }
-  return r as number[];
-}
-
-const NUM = /-?(?:\d*\.\d+|\d+)(?:e[-+]?\d+)?/gi;
 const KIND_NUM = 0, KIND_COLOR = 1, KIND_DISCRETE = 2;
 const fmt = (x: number): string => `${Math.round(x * 1000) / 1000}`;
 
@@ -84,22 +67,22 @@ export class Track {
   readonly scalar: boolean;
   /** The value was an array / typed array (a vector). */
   readonly vector: boolean;
-  private offs: Float64Array;
-  private vals: Float64Array;
-  private eases: (Ease | null)[];
-  private parts: string[] | null;
-  private strs: string[] | null;
-  private seg = 0;
-  private pick = 0;
+  #offs: Float64Array;
+  #vals: Float64Array;
+  #eases: (Ease | null)[];
+  #parts: string[] | null = null;
+  #strs: string[] | null = null;
+  #seg = 0;
+  #pick = 0;
 
   constructor(raw: RawTrack, current: () => Value) {
     this.prop = raw.prop;
     const values = raw.values.map((v) => (v == null ? current() : v));
     const first = values.find((v) => v != null);
     const k = values.length;
-    this.offs = Float64Array.from(raw.offsets);
-    this.eases = raw.eases.map((e) => (e == null ? null : toEase(e, "linear")));
-    this.parts = null; this.strs = null;
+    this.#offs = Float64Array.from(raw.offsets);
+    this.#eases = raw.eases.map((e) => (e == null ? null : toEase(e, "linear")));
+    
     this.scalar = typeof first === "number";
     this.vector = first != null && typeof first === "object";
     let kind = KIND_NUM, n = 1;
@@ -121,40 +104,40 @@ export class Track {
         const nums = strs.map((s) => (s.match(NUM) ?? []).map(Number));
         const same = parts.every((p) => p.length === parts[0]!.length && p.every((x, i) => x === parts[0]![i]));
         if (same && nums[0]!.length > 0) {
-          n = nums[0]!.length; this.parts = parts[0]!; vals = new Float64Array(k * n);
+          n = nums[0]!.length; this.#parts = parts[0]!; vals = new Float64Array(k * n);
           nums.forEach((arr, i) => arr.forEach((x, j) => { vals[i * n + j] = x; }));
-        } else { kind = KIND_DISCRETE; this.strs = strs; n = 0; }
+        } else { kind = KIND_DISCRETE; this.#strs = strs; n = 0; }
       }
     }
-    this.kind = kind; this.n = n; this.vals = vals;
+    this.kind = kind; this.n = n; this.#vals = vals;
     this.out = new Float64Array(Math.max(n, 1));
   }
 
   /** Sample at progress p (0..1, may overshoot with back / spring easings: the end segments extrapolate). */
   sample(p: number): void {
-    const o = this.offs, last = o.length - 1;
-    if (last <= 0) { this.copy(0); return; }
-    let i = this.seg;
+    const o = this.#offs, last = o.length - 1;
+    if (last <= 0) { this.#copy(0); return; }
+    let i = this.#seg;
     while (i > 0 && p < o[i]!) i--;
     while (i < last - 1 && p >= o[i + 1]!) i++;
-    this.seg = i;
+    this.#seg = i;
     const a = o[i]!, b = o[i + 1]!;
     let t = b > a ? (p - a) / (b - a) : 1;
-    const e = this.eases[i];
+    const e = this.#eases[i];
     if (e && t > 0 && t < 1) t = e(t);
-    if (this.kind === KIND_DISCRETE) { this.pick = t < 0.5 ? i : i + 1; return; }
-    const n = this.n, v = this.vals, out = this.out, x = i * n, y = x + n;
+    if (this.kind === KIND_DISCRETE) { this.#pick = t < 0.5 ? i : i + 1; return; }
+    const n = this.n, v = this.#vals, out = this.out, x = i * n, y = x + n;
     for (let j = 0; j < n; j++) { const s = v[x + j]!; out[j] = s + (v[y + j]! - s) * t; }
   }
-  private copy(i: number): void {
-    if (this.kind === KIND_DISCRETE) { this.pick = i; return; }
-    for (let j = 0; j < this.n; j++) this.out[j] = this.vals[i * this.n + j]!;
+  #copy(i: number): void {
+    if (this.kind === KIND_DISCRETE) { this.#pick = i; return; }
+    for (let j = 0; j < this.n; j++) this.out[j] = this.#vals[i * this.n + j]!;
   }
   /** The current value as a CSS string (colors as oklab()). */
   text(): string {
-    if (this.kind === KIND_DISCRETE) return this.strs![this.pick] ?? "";
+    if (this.kind === KIND_DISCRETE) return this.#strs![this.#pick] ?? "";
     if (this.kind === KIND_COLOR) return formatOklab(this.out);
-    const p = this.parts;
+    const p = this.#parts;
     if (!p) return fmt(this.out[0]!);
     let s = p[0]!;
     for (let j = 0; j < this.n; j++) s += fmt(this.out[j]!) + p[j + 1]!;

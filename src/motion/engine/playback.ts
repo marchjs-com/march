@@ -41,7 +41,7 @@ export interface StepOptions extends AnimateOptions {
 }
 
 /** Stagger delays: `stagger(40, { from: "center" })`, grids (`grid: [cols, rows]`), eased spreading. */
-export function stagger(each = 40, o: { from?: "start" | "end" | "center" | "edges" | "random" | number; total?: number; grid?: [number, number]; ease?: EaseInput; start?: number } = {}): StaggerFn {
+export function stagger(each = 40, o: { from?: "start" | "end" | "center" | "edges" | number; total?: number; grid?: [number, number]; ease?: EaseInput; start?: number } = {}): StaggerFn {
   const e = o.ease ? ease(o.ease) : null;
   return (i: number, total?: number) => {
     const n = o.total ?? total ?? 0;
@@ -53,9 +53,6 @@ export function stagger(each = 40, o: { from?: "start" | "end" | "center" | "edg
       const oy = from === "center" ? (rows - 1) / 2 : from === "end" ? rows - 1 : typeof from === "number" ? Math.floor(from / cols) : 0;
       d = Math.hypot((i % cols) - ox, Math.floor(i / cols) - oy);
       max = Math.hypot(Math.max(ox, cols - 1 - ox), Math.max(oy, rows - 1 - oy));
-    } else if (from === "random") {
-      const x = Math.sin((i + 1) * 12.9898) * 43758.5453;
-      d = (x - Math.floor(x)) * Math.max(1, n - 1); max = Math.max(1, n - 1);
     } else {
       const origin = from === "start" ? 0 : from === "end" ? Math.max(0, n - 1) : from === "center" ? (n - 1) / 2 : from === "edges" ? -1 : from;
       d = from === "edges" ? Math.min(i, Math.max(0, n - 1 - i)) : Math.abs(i - origin);
@@ -80,9 +77,9 @@ export class Effect {
   native: Animation | null = null;
   tracks: Track[] | null = null;
   readonly useNative: boolean;
-  private nativeFrames: Keyframe[] | null = null;
-  private wasVisible = true;
-  private unwatch: (() => void) | null = null;
+  #nativeFrames: Keyframe[] | null = null;
+  #wasVisible = true;
+  #unwatch: (() => void) | null = null;
   readonly target: unknown;
   constructor(target: unknown, frames: Frames, t: Timing, forceJs: boolean) {
     this.target = target;
@@ -95,7 +92,7 @@ export class Effect {
     this.iterations = Math.max(0, t.iterations ?? 1);
     this.direction = t.direction ?? "normal"; this.fill = t.fill ?? "both";
     let ok = !forceJs && !!this.driver.native && !!cssOf(this.ease);
-    if (ok) { this.nativeFrames = nativeFrames(this.raw); ok = !!this.nativeFrames; }
+    if (ok) { this.#nativeFrames = nativeFrames(this.raw); ok = !!this.#nativeFrames; }
     this.useNative = ok;
   }
   /** Local end (delay + active + endDelay); Infinity for endless effects. */
@@ -104,7 +101,7 @@ export class Effect {
   /** Create the native animation (paused) once; null when the driver refuses (then the JS path takes over). */
   ensureNative(): Animation | null {
     if (!this.useNative || this.native) return this.native;
-    const a = this.driver.native!(this.target, this.nativeFrames!, {
+    const a = this.driver.native!(this.target, this.#nativeFrames!, {
       duration: this.duration, delay: this.start + this.delay, endDelay: this.endDelay, iterations: this.iterations,
       direction: this.direction, fill: this.fill, easing: cssOf(this.ease)!,
     });
@@ -113,7 +110,7 @@ export class Effect {
     this.native = a;
     if (this.iterations === Infinity) {
       const el = this.driver.element?.(this.target);
-      if (el) this.unwatch = watchVisibility(el, (v) => { if (a.playState === "running" || a.playState === "paused") { if (v && this.liveRoot?.state === "running" && !pausedNow()) a.play(); else if (!v) a.pause(); } });
+      if (el) this.#unwatch = watchVisibility(el, (v) => { if (a.playState === "running" || a.playState === "paused") { if (v && this.liveRoot?.state === "running" && !pausedNow()) a.play(); else if (!v) a.pause(); } });
     }
     return a;
   }
@@ -156,8 +153,8 @@ export class Effect {
     if (p == null) { this.restore(); return; }
     const el = this.driver.element?.(this.target);
     const vis = isVisible(el);
-    if (!vis && !this.wasVisible) return;
-    this.wasVisible = vis;
+    if (!vis && !this.#wasVisible) return;
+    this.#wasVisible = vis;
     for (const tr of tracks) { tr.sample(p); this.driver.apply(this.target, tr); }
     if (this.driver.flush) { if (!dirty.size) nextFrame(flushDirty, "render"); dirty.set(this.target, this.driver); }
   }
@@ -165,10 +162,10 @@ export class Effect {
   watch(on: boolean): void {
     const el = this.useNative ? null : this.driver.element?.(this.target);
     if (!el) return;
-    if (on && !this.unwatch) this.unwatch = watchVisibility(el);
-    else if (!on && this.unwatch && !this.native) { this.unwatch(); this.unwatch = null; }
+    if (on && !this.#unwatch) this.#unwatch = watchVisibility(el);
+    else if (!on && this.#unwatch && !this.native) { this.#unwatch(); this.#unwatch = null; }
   }
-  dispose(): void { this.native?.cancel(); this.native = null; this.unwatch?.(); this.unwatch = null; }
+  dispose(): void { this.native?.cancel(); this.native = null; this.#unwatch?.(); this.#unwatch = null; }
 }
 
 // targets written this frame whose driver draws once per frame (canvas, WebGL)
@@ -196,41 +193,41 @@ type Label = number;
 export class Playback {
   readonly items: Item[] = [];
   readonly labels = new Map<string, Label>();
-  private calls: { at: number; fn: () => void }[] = [];
+  #calls: { at: number; fn: () => void }[] = [];
   parent: Playback | null = null;
   state: "idle" | "running" | "paused" | "finished" = "idle";
   essential = false;
   onUpdate: ((progress: number, time: number) => void) | undefined;
   onComplete: (() => void) | undefined;
-  private t = 0;
-  private rate = 1;
-  private flat: Effect[] | null = null;
-  private off: (() => void) | null = null;
-  private done!: Promise<void>;
-  private resolve!: () => void;
-  private prog = signal(0);
-  private lastStart = 0;
-  private lastEnd = 0;
-  private hinted = false;
-  private gen = 0;
+  #t = 0;
+  #rate = 1;
+  #flat: Effect[] | null = null;
+  #off: (() => void) | null = null;
+  #done!: Promise<void>;
+  #resolve!: () => void;
+  #prog = signal(0);
+  #lastStart = 0;
+  #lastEnd = 0;
+  #hinted = false;
+  #gen = 0;
 
   readonly defaults: AnimateOptions;
   constructor(defaults: AnimateOptions = {}) {
     this.defaults = defaults;
     this.essential = !!defaults.essential;
     this.onUpdate = defaults.onUpdate; this.onComplete = defaults.onComplete;
-    this.fresh();
+    this.#fresh();
   }
-  private fresh(): void { this.done = new Promise<void>((r) => { this.resolve = r; }); }
+  #fresh(): void { this.#done = new Promise<void>((r) => { this.#resolve = r; }); }
 
   // ---- building
   /** Add an animation of `target` (or a nested playback) at a position. */
   add(target: Target | Playback, frames?: KeyframesInput, opts: StepOptions = {}): this {
     if (target instanceof Playback) {
-      const at = this.position(opts.at);
+      const at = this.#position(opts.at);
       target.parent = this;
       this.items.push({ at, node: target });
-      this.mark(at, at + target.duration);
+      this.#mark(at, at + target.duration);
       return this;
     }
     let fr: Frames, base: Timing = {};
@@ -239,7 +236,7 @@ export class Playback {
     else fr = (frames ?? {}) as Frames;
     const o: StepOptions = { ...stripRuntime(this.defaults), ...base, ...opts };
     const list = resolveTargets(target, opts.root ?? this.defaults.root);
-    const at = this.position(opts.at);
+    const at = this.#position(opts.at);
     const st = typeof o.stagger === "function" ? o.stagger : o.stagger ? stagger(o.stagger) : null;
     let end = at;
     list.forEach((el, i) => {
@@ -247,24 +244,24 @@ export class Playback {
       this.items.push({ at, node: fx });
       end = Math.max(end, at + finite(fx.end === Infinity ? fx.delay + fx.duration : fx.end));
     });
-    this.mark(at, end);
+    this.#mark(at, end);
     return this;
   }
   /** A named position (`tl.label("intro", 400)`; default: the current end). */
-  label(name: string, at?: number | string): this { this.labels.set(name, this.position(at)); return this; }
+  label(name: string, at?: number | string): this { this.labels.set(name, this.#position(at)); return this; }
   /** Call `fn` when playback passes `at` (either direction). */
-  call(fn: () => void, at?: number | string): this { this.calls.push({ at: this.position(at), fn }); return this; }
+  call(fn: () => void, at?: number | string): this { this.#calls.push({ at: this.#position(at), fn }); return this; }
 
-  private mark(start: number, end: number): void { this.lastStart = start; this.lastEnd = Math.max(this.lastEnd, end); this.flat = null; }
-  private position(at: number | string | undefined): number {
+  #mark(start: number, end: number): void { this.#lastStart = start; this.#lastEnd = Math.max(this.#lastEnd, end); this.#flat = null; }
+  #position(at: number | string | undefined): number {
     if (typeof at === "number") return Math.max(0, at);
-    if (at == null || at === ">") return this.lastEnd;
+    if (at == null || at === ">") return this.#lastEnd;
     const m = /^(<|>)?([A-Za-z_][\w-]*)?(?:([+-])=(-?[\d.]+))?$/.exec(at.trim());
-    if (!m) return this.lastEnd;
+    if (!m) return this.#lastEnd;
     const [, rel, label, sign, n] = m;
-    let base = this.lastEnd;
-    if (rel === "<") base = this.lastStart;
-    if (label) base = this.labels.get(label) ?? this.lastEnd;
+    let base = this.#lastEnd;
+    if (rel === "<") base = this.#lastStart;
+    if (label) base = this.labels.get(label) ?? this.#lastEnd;
     const d = sign ? (sign === "+" ? 1 : -1) * Number(n) : 0;
     return Math.max(0, base + d);
   }
@@ -274,25 +271,25 @@ export class Playback {
   get duration(): number {
     let m = 0;
     for (const { at, node } of this.items) m = Math.max(m, at + (node instanceof Playback ? node.duration : node.end));
-    for (const c of this.calls) m = Math.max(m, c.at);
+    for (const c of this.#calls) m = Math.max(m, c.at);
     return m;
   }
-  get currentTime(): number { return this.t; }
+  get currentTime(): number { return this.#t; }
   set currentTime(ms: number) { this.seek(ms); }
-  get playbackRate(): number { return this.rate; }
-  set playbackRate(r: number) { this.rate = r; this.syncRate(); }
+  get playbackRate(): number { return this.#rate; }
+  set playbackRate(r: number) { this.#rate = r; this.syncRate(); }
   /** Resolves when it finishes (or is cancelled). */
-  get finished(): Promise<void> { return this.done; }
+  get finished(): Promise<void> { return this.#done; }
   /** 0..1 (reactive). */
-  progress(): number { return this.prog(); }
+  progress(): number { return this.#prog(); }
   /** The first native animation (compatibility with the old Controls). */
-  get animation(): Animation | null { return this.collect().find((e) => e.native)?.native ?? null; }
+  get animation(): Animation | null { return this.#collect().find((e) => e.native)?.native ?? null; }
   /** Await the end: `await animate(el, "fadeIn")`. */
-  then<A = void, B = never>(ok?: ((v: void) => A | PromiseLike<A>) | null, err?: ((e: unknown) => B | PromiseLike<B>) | null): Promise<A | B> { return this.done.then(ok, err); }
+  then<A = void, B = never>(ok?: ((v: void) => A | PromiseLike<A>) | null, err?: ((e: unknown) => B | PromiseLike<B>) | null): Promise<A | B> { return this.#done.then(ok, err); }
 
-  private root(): Playback { let p: Playback = this; while (p.parent) p = p.parent; return p; }
-  private collect(): Effect[] {
-    if (this.flat) return this.flat;
+  #root(): Playback { let p: Playback = this; while (p.parent) p = p.parent; return p; }
+  #collect(): Effect[] {
+    if (this.#flat) return this.#flat;
     const out: Effect[] = [];
     const walk = (p: Playback, base: number): void => {
       for (const { at, node } of p.items) {
@@ -301,171 +298,171 @@ export class Playback {
       }
     };
     walk(this, 0);
-    return (this.flat = out);
+    return (this.#flat = out);
   }
 
   // ---- controls
   play(): this {
-    if (this.parent) { this.root().play(); return this; }
+    if (this.parent) { this.#root().play(); return this; }
     const dur = this.duration;
     if (this.state === "running") return this;
     if (this.state === "finished" || this.state === "idle") {
-      if (this.state === "finished") this.fresh();
-      if (this.rate >= 0 && this.t >= dur) this.t = 0;
-      if (this.rate < 0 && this.t <= 0) this.t = dur;
+      if (this.state === "finished") this.#fresh();
+      if (this.#rate >= 0 && this.#t >= dur) this.#t = 0;
+      if (this.#rate < 0 && this.#t <= 0) this.#t = dur;
     }
     if (reducedNow() && !this.essential) {
-      if (Number.isFinite(dur)) { this.seek(this.rate >= 0 ? dur : 0); this.complete(); }
-      else { this.seek(0); this.state = "paused"; this.resolve(); }
+      if (Number.isFinite(dur)) { this.seek(this.#rate >= 0 ? dur : 0); this.#complete(); }
+      else { this.seek(0); this.state = "paused"; this.#resolve(); }
       return this;
     }
     this.state = "running";
-    const fx = this.collect();
+    const fx = this.#collect();
     for (const e of fx) { e.liveRoot = this; e.watch(true); }
-    this.hint(true);
-    this.syncNatives(true);
+    this.#hint(true);
+    this.#syncNatives(true);
     live.add(this);
-    this.sampleJs(this.t);
-    if (!this.off) this.off = onFrame((_, dt) => this.tick(dt), { phase: "write" });
+    this.#sampleJs(this.#t);
+    if (!this.#off) this.#off = onFrame((_, dt) => this.#tick(dt), { phase: "write" });
     // all native: the browser's own end also ends the playback (it may run ahead of the clock)
     if (fx.length && fx.every((e) => e.native)) {
-      const gen = ++this.gen;
+      const gen = ++this.#gen;
       void Promise.all(fx.map((e) => e.native!.finished)).then(() => {
-        if (gen === this.gen && this.state === "running") { this.t = this.rate >= 0 ? this.duration : 0; this.report(); this.complete(); }
+        if (gen === this.#gen && this.state === "running") { this.#t = this.#rate >= 0 ? this.duration : 0; this.#report(); this.#complete(); }
       }, () => undefined);
     }
     return this;
   }
   pause(): this {
-    if (this.parent) { this.root().pause(); return this; }
-    if (this.state === "idle") { this.seek(this.t); }
+    if (this.parent) { this.#root().pause(); return this; }
+    if (this.state === "idle") { this.seek(this.#t); }
     this.state = "paused";
-    this.stopTick();
-    this.syncNatives(false);
-    this.hint(false);
+    this.#stopTick();
+    this.#syncNatives(false);
+    this.#hint(false);
     return this;
   }
   /** Play backwards from where it is (or forwards again). */
   reverse(): this {
-    if (this.parent) { this.root().reverse(); return this; }
-    this.rate = -this.rate;
+    if (this.parent) { this.#root().reverse(); return this; }
+    this.#rate = -this.#rate;
     if (this.state === "running") this.syncRate();
     else this.play();
     return this;
   }
   /** Jump to a time (ms) or a label; keeps the play state. */
   seek(to: number | string): this {
-    if (this.parent) { this.root().seek(typeof to === "string" ? to : to + this.offsetInRoot()); return this; }
+    if (this.parent) { this.#root().seek(typeof to === "string" ? to : to + this.#offsetInRoot()); return this; }
     const dur = this.duration;
     const ms = typeof to === "string" ? this.labels.get(to) ?? 0 : to;
-    const prev = this.t;
-    this.t = Math.max(0, Math.min(Number.isFinite(dur) ? dur : ms, ms));
+    const prev = this.#t;
+    this.#t = Math.max(0, Math.min(Number.isFinite(dur) ? dur : ms, ms));
     if (this.state === "idle" || this.state === "finished") this.state = "paused";
-    this.syncNatives(this.state === "running");
-    this.sampleJs(this.t);
-    this.fire(prev, this.t);
-    this.report();
+    this.#syncNatives(this.state === "running");
+    this.#sampleJs(this.#t);
+    this.#fire(prev, this.#t);
+    this.#report();
     return this;
   }
   /** Jump to the end and finish. */
   finish(): this {
-    if (this.parent) { this.root().finish(); return this; }
+    if (this.parent) { this.#root().finish(); return this; }
     const d = this.duration;
     if (!Number.isFinite(d)) return this;
-    this.seek(this.rate >= 0 ? d : 0);
-    this.complete();
+    this.seek(this.#rate >= 0 ? d : 0);
+    this.#complete();
     return this;
   }
   /** Stop and remove every effect (elements return to their own styles). */
   cancel(): this {
-    if (this.parent) { this.root().cancel(); return this; }
-    this.stopTick();
-    for (const e of this.collect()) { e.dispose(); if (!e.useNative) e.restore(); e.watch(false); }
-    this.hint(false);
-    this.t = 0;
+    if (this.parent) { this.#root().cancel(); return this; }
+    this.#stopTick();
+    for (const e of this.#collect()) { e.dispose(); if (!e.useNative) e.restore(); e.watch(false); }
+    this.#hint(false);
+    this.#t = 0;
     this.state = "idle";
-    this.prog.set(0);
+    this.#prog.set(0);
     live.delete(this);
-    this.resolve();
-    this.fresh();
+    this.#resolve();
+    this.#fresh();
     return this;
   }
 
-  private offsetInRoot(): number {
+  #offsetInRoot(): number {
     let o = 0, p: Playback = this;
     while (p.parent) { o += p.parent.items.find((i) => i.node === p)?.at ?? 0; p = p.parent; }
     return o;
   }
-  private stopTick(): void { this.off?.(); this.off = null; this.gen++; live.delete(this); }
-  private tick(dt: number): void {
-    const prev = this.t, dur = this.duration;
-    let t = prev + dt * this.rate, end = false;
-    if (this.rate >= 0 && t >= dur) { t = dur; end = true; }
-    if (this.rate < 0 && t <= 0) { t = 0; end = true; }
-    this.t = t;
-    this.sampleJs(t);
-    this.fire(prev, t);
-    this.report();
-    if (end) this.complete();
+  #stopTick(): void { this.#off?.(); this.#off = null; this.#gen++; live.delete(this); }
+  #tick(dt: number): void {
+    const prev = this.#t, dur = this.duration;
+    let t = prev + dt * this.#rate, end = false;
+    if (this.#rate >= 0 && t >= dur) { t = dur; end = true; }
+    if (this.#rate < 0 && t <= 0) { t = 0; end = true; }
+    this.#t = t;
+    this.#sampleJs(t);
+    this.#fire(prev, t);
+    this.#report();
+    if (end) this.#complete();
   }
-  private report(): void {
+  #report(): void {
     const d = this.duration;
-    const p = Number.isFinite(d) ? (d > 0 ? this.t / d : 1) : 0;
-    this.prog.set(p);
-    this.onUpdate?.(p, this.t);
+    const p = Number.isFinite(d) ? (d > 0 ? this.#t / d : 1) : 0;
+    this.#prog.set(p);
+    this.onUpdate?.(p, this.#t);
   }
-  private fire(a: number, b: number): void {
-    if (a === b || !this.calls.length) return;
+  #fire(a: number, b: number): void {
+    if (a === b || !this.#calls.length) return;
     const lo = Math.min(a, b), hi = Math.max(a, b);
-    for (const c of this.calls) if (c.at > lo && c.at <= hi) c.fn();
+    for (const c of this.#calls) if (c.at > lo && c.at <= hi) c.fn();
   }
-  private sampleJs(t: number): void {
-    for (const e of this.collect()) {
+  #sampleJs(t: number): void {
+    for (const e of this.#collect()) {
       if (e.native) continue;
       if (e.useNative && e.ensureNative()) continue;
       e.sample(t - e.start);
     }
   }
-  private complete(): void {
-    this.stopTick();
+  #complete(): void {
+    this.#stopTick();
     this.state = "finished";
-    for (const e of this.collect()) {
+    for (const e of this.#collect()) {
       // finished natives can be dropped by the browser once a newer animation replaces them (no pile-up)
       if (e.native && e.native.playState !== "finished") { try { e.native.finish(); } catch { e.native.pause(); } }
       e.watch(false);
     }
-    this.hint(false);
-    this.prog.set(this.rate >= 0 ? 1 : 0);
-    this.resolve();
+    this.#hint(false);
+    this.#prog.set(this.#rate >= 0 ? 1 : 0);
+    this.#resolve();
     this.onComplete?.();
   }
-  private hint(on: boolean): void {
-    if (on === this.hinted) return;
-    this.hinted = on;
-    for (const e of this.collect()) (on ? e.driver.begin : e.driver.end)?.(e.target, e.props);
+  #hint(on: boolean): void {
+    if (on === this.#hinted) return;
+    this.#hinted = on;
+    for (const e of this.#collect()) (on ? e.driver.begin : e.driver.end)?.(e.target, e.props);
   }
 
   /** Put every native animation at this playback's time, rate and play state. */
-  private syncNatives(running: boolean): void {
-    const rate = this.rate * rateScale();
-    for (const e of this.collect()) {
+  #syncNatives(running: boolean): void {
+    const rate = this.#rate * rateScale();
+    for (const e of this.#collect()) {
       let a = e.native ?? e.ensureNative();
       if (a && a.replaceState === "removed") { a.cancel(); e.native = null; a = e.ensureNative(); }
       if (!a) continue;
       try {
         a.playbackRate = rate;
-        a.currentTime = this.t;
+        a.currentTime = this.#t;
         if (running && !pausedNow()) a.play(); else a.pause();
       } catch { /* detached element: ignore */ }
     }
   }
   /** Global speed or own rate changed. */
   syncRate(): void {
-    const rate = this.rate * rateScale();
-    for (const e of this.collect()) if (e.native) { try { e.native.updatePlaybackRate(rate); } catch { e.native.playbackRate = rate; } }
+    const rate = this.#rate * rateScale();
+    for (const e of this.#collect()) if (e.native) { try { e.native.updatePlaybackRate(rate); } catch { e.native.playbackRate = rate; } }
   }
   /** Global pause changed. */
-  syncPause(): void { if (this.state === "running") this.syncNatives(true); }
+  syncPause(): void { if (this.state === "running") this.#syncNatives(true); }
 }
 
 const RUNTIME = ["at", "autoplay", "onUpdate", "onComplete", "root", "stagger"] as const;

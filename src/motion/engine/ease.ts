@@ -113,27 +113,34 @@ export function toLinear(fn: (t: number) => number, points = 48): string {
   return `linear(${keep.map((i, j) => (j === 0 || j === keep.length - 1 ? `${ys[i]}` : `${ys[i]} ${r(xs[i]! * 100)}%`)).join(", ")})`;
 }
 
+/** Missing offsets: the first is 0, the last 1 (a single frame is the end), the rest spread evenly between known ones. */
+export function spread(o: (number | null)[]): number[] {
+  const n = o.length;
+  if (n === 1) return [o[0] ?? 1];
+  const r = o.slice();
+  if (r[0] == null) r[0] = 0;
+  if (r[n - 1] == null) r[n - 1] = 1;
+  for (let i = 1; i < n; i++) {
+    if (r[i] != null) continue;
+    let j = i; while (r[j] == null) j++;
+    const a = r[i - 1]!, b = r[j]!;
+    for (let k = i; k < j; k++) r[k] = a + ((b - a) * (k - i + 1)) / (j - i + 1);
+  }
+  return r as number[];
+}
+
 /** Parse a CSS linear() easing into a function (for JS targets). */
 function parseLinear(s: string): Ease | null {
   const body = /^linear\((.*)\)$/.exec(s.trim())?.[1];
   if (!body) return null;
-  const pts: [number, number | null][] = body.split(",").map((p) => { const [y, x] = p.trim().split(/\s+/); return [parseFloat(y ?? "0"), x ? parseFloat(x) / 100 : null]; });
-  if (pts.length < 2 || pts.some(([y]) => !Number.isFinite(y))) return null;
-  if (pts[0]![1] == null) pts[0]![1] = 0;
-  if (pts[pts.length - 1]![1] == null) pts[pts.length - 1]![1] = 1;
-  for (let i = 1; i < pts.length; i++) {
-    if (pts[i]![1] != null) continue;
-    let j = i; while (pts[j]![1] == null) j++;
-    const a = pts[i - 1]![1]!, b = pts[j]![1]!;
-    for (let k = i; k < j; k++) pts[k]![1] = a + ((b - a) * (k - i + 1)) / (j - i + 1);
-  }
+  const parts = body.split(",").map((p) => p.trim().split(/\s+/));
+  const ys = parts.map((p) => parseFloat(p[0]!)), xs = spread(parts.map((p) => (p[1] ? parseFloat(p[1]) / 100 : null)));
+  if (ys.length < 2 || ys.some((y) => !Number.isFinite(y))) return null;
   return make((t) => {
-    if (t <= pts[0]![1]!) return pts[0]![0];
-    for (let i = 1; i < pts.length; i++) {
-      const [y1, x1] = pts[i]!, [y0, x0] = pts[i - 1]!;
-      if (t <= x1!) return x1 === x0 ? y1 : y0 + ((y1 - y0) * (t - x0!)) / (x1! - x0!);
-    }
-    return pts[pts.length - 1]![0];
+    let i = 1;
+    while (i < xs.length - 1 && t > xs[i]!) i++;
+    const x0 = xs[i - 1]!, x1 = xs[i]!, y0 = ys[i - 1]!, y1 = ys[i]!;
+    return t <= x0 ? y0 : t >= x1 ? y1 : y0 + ((y1 - y0) * (t - x0)) / (x1 - x0);
   }, s.trim());
 }
 
@@ -151,11 +158,12 @@ export function defineEasing(name: string, def: EaseInput | (() => Ease)): void 
 }
 const BASE: Record<string, string> = {
   in: "cubic-bezier(.32,0,.67,0)", out: "cubic-bezier(.33,1,.68,1)", "in-out": "cubic-bezier(.65,0,.35,1)",
-  back: "cubic-bezier(.34,1.56,.64,1)", expo: "cubic-bezier(.16,1,.3,1)", standard: "cubic-bezier(.2,0,0,1)",
+  back: "cubic-bezier(.34,1.56,.64,1)", expo: "cubic-bezier(.16,1,.3,1)",
   ease: "cubic-bezier(.25,.1,.25,1)", "ease-in": "cubic-bezier(.42,0,1,1)", "ease-out": "cubic-bezier(0,0,.58,1)", "ease-in-out": "cubic-bezier(.42,0,.58,1)",
-  easeInCubic: "cubic-bezier(.32,0,.67,0)", easeOutCubic: "cubic-bezier(.33,1,.68,1)", easeInOutCubic: "cubic-bezier(.65,0,.35,1)",
-  easeOutQuart: "cubic-bezier(.25,1,.5,1)", easeOutExpo: "cubic-bezier(.16,1,.3,1)", easeOutBack: "cubic-bezier(.34,1.56,.64,1)",
+  easeOutQuart: "cubic-bezier(.25,1,.5,1)",
 };
+// older camelCase names (hadi-march/motion easing.ts) → token names
+const ALIAS: Record<string, string> = { easeInCubic: "in", easeOutCubic: "out", easeInOutCubic: "in-out", easeOutExpo: "expo", easeOutBack: "back", easeOutBounce: "bounce", easeOutElastic: "elastic" };
 for (const [k, v] of Object.entries(BASE)) defineEasing(k, v);
 defineEasing("linear", linear);
 defineEasing("spring", () => springEase());
@@ -163,14 +171,14 @@ defineEasing("spring-soft", () => springEase({ stiffness: 120, damping: 14 }));
 defineEasing("spring-snappy", () => springEase({ stiffness: 380, damping: 30 }));
 defineEasing("spring-wobbly", () => springEase({ stiffness: 180, damping: 9 }));
 defineEasing("bounce", () => bounceEase());
-defineEasing("easeOutBounce", () => bounceEase(3, 0.3));
 defineEasing("elastic", () => springEase({ stiffness: 260, damping: 7 }));
-defineEasing("easeOutElastic", () => springEase({ stiffness: 260, damping: 7 }));
 
 /** Names of every registered easing (for pickers). */
 export const easingNames = (): string[] => [...REG.keys()];
 
-const nums = (s: string): number[] => (s.match(/-?(?:\d*\.\d+|\d+)(?:e[-+]?\d+)?/gi) ?? []).map(Number);
+/** A number inside CSS text (shared with tracks.ts). */
+export const NUM = /-?(?:\d*\.\d+|\d+)(?:e[-+]?\d+)?/gi;
+const nums = (s: string): number[] => (s.match(NUM) ?? []).map(Number);
 function parse(s: string): Ease | null {
   const t = s.trim();
   if (t.startsWith("cubic-bezier(")) { const [a, b, c, d] = nums(t); return a != null && b != null && c != null && d != null ? cubicBezier(a, b, c, d) : null; }
@@ -188,7 +196,8 @@ export function ease(input: EaseInput | null | undefined, fallback: EaseInput = 
   if (input == null || input === "") return input === fallback ? linear : ease(fallback, "linear");
   if (isEase(input)) return input;
   if (typeof input === "function") return make(input, null);
-  const key = input.startsWith("--hm-ease-") ? input.slice(10) : input.startsWith("var(--hm-ease-") ? input.slice(14, -1) : input;
+  const raw = input.startsWith("--hm-ease-") ? input.slice(10) : input.startsWith("var(--hm-ease-") ? input.slice(14, -1) : input;
+  const key = ALIAS[raw] ?? raw;
   const hit = cache.get(key);
   if (hit) return hit;
   const def = REG.get(key);
