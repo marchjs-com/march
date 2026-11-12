@@ -17,9 +17,9 @@ Undo / redo use an UndoManager history of the editor's own (typing merges into o
 |---|---|---|---|
 | `value` / `bind:value` | Markdown string | `""` | `onChange(md)` on every change |
 | `placeholder` | string | — | shown while empty (`aria-placeholder`) |
-| `toolbar` | `false` or `ToolName[]` | all tools | `paragraph h2 h3 bold italic strike code link ul ol quote codeblock undo redo`, `"|"` separates |
+| `toolbar` | `false` or `ToolName[]` | all tools | `paragraph h2 h3 bold italic strike code link emoji ul ol quote codeblock undo redo`, `"|"` separates |
 | `mentions` | `Mention[]` or `(query) => Mention[] \| Promise` | — | `{ id, label, hint?, avatar? }`; stored as `[@Label](mention:id)` |
-| `emoji` | boolean or `EmojiEntry[]` | `true` | `:` suggestions (English shortcodes, Turkish keywords) |
+| `emoji` | boolean or `EmojiEntry[]` | `true` | `:` suggestions (English shortcodes, Turkish keywords): a lone `:` after a space or at a line start lists the common ones at once, typing filters; never inside a word (`10:30`, `http:`). The toolbar's emoji button opens the same list at the caret. `false` hides both |
 | `shortcuts` | boolean | `true` | Markdown block shortcuts while typing |
 | `history` | UndoStack | own `undoHistory()` | pass `undoStack()` to share the app's history |
 | `rows` | number | `6` | minimum height in lines |

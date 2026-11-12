@@ -110,3 +110,12 @@ test("RichTextEditor: task items keep their state as data-task and round-trip", 
   assert.equal(api.markdown(), "- [x] done\n- [ ] todo\n- plain");
   dispose();
 });
+
+test("suggestions open after a space or a line start, never inside a word", () => {
+  assert.deepEqual(ops.suggestTrigger(":"), { kind: ":", query: "" }, "a lone colon at a line start: the common emoji");
+  assert.deepEqual(ops.suggestTrigger("Merhaba :"), { kind: ":", query: "" });
+  assert.deepEqual(ops.suggestTrigger("Merhaba\u00a0:sm"), { kind: ":", query: "sm" }, "a no-break space counts as a space");
+  assert.deepEqual(ops.suggestTrigger("(:gül"), { kind: ":", query: "gül" });
+  assert.deepEqual(ops.suggestTrigger("selam @De"), { kind: "@", query: "De" });
+  for (const s of ["saat 10:30", "http:", "https://acme.example", "Not:", "a@b", "e-posta: x@y", "Merhaba :sm "]) assert.equal(ops.suggestTrigger(s), null, s);
+});
