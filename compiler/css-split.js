@@ -17,7 +17,7 @@ export const ORDER = [
   "ui/field.css", "ui/button.css", "ui/menu.css", "ui/dialog.css", "ui/toast.css", "ui/tabs.css", "ui/display.css", "ui/grid.css", "ui/layout.css", "ui/nav.css",
   "ui/sidebar.css", "ui/palette.css", "ui/theme.css", "ui/theme-swatches.css", "ui/media.css", "ui/disclosure.css", "ui/app.css", "ui/chip.css", "ui/marquee.css", "ui/avatar-group.css",
   "ui/progress.css", "ui/rating.css", "ui/accordion.css", "ui/steps.css", "ui/pagination.css", "ui/carousel.css", "ui/tree.css", "ui/kanban.css",
-  "ui/splitter.css", "forms/form.css", "forms/inputs.css", "forms/pickers.css", "forms/date.css", "forms/file.css", "forms/editors.css",
+  "ui/splitter.css", "forms/form.css", "forms/inputs.css", "forms/choice.css", "forms/pickers.css", "forms/date.css", "forms/file.css", "forms/editors.css",
   "forms/wizard.css", "forms/records.css", "css/table.css", "charts/charts.css", "fx/fx.css",
 ];
 const rank = (abs) => { const r = relative(SRC, abs).split(sep).join("/"); const i = ORDER.indexOf(r); return i < 0 ? ORDER.length : i; };

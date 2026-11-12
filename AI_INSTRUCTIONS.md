@@ -118,6 +118,10 @@ shown; the server must enforce permissions.
 group to color everything inside; a control's own `color` wins. Errors stay `danger`. In CSS read
 `var(--hm-accent, var(--hm-primary))`; fills/lines/icons use `--hm-X`, text uses `--hm-X-text`, text on a fill `--hm-on-X-fill`.
 
+**Selection controls**: `<Checkbox>`, `<CheckboxGroup>`, `<RadioGroup>` take `variant` (`classic` default, `soft`, `chip` for
+compact pickers such as weekdays, `card` for plans/options with `hint` and `icon`, `toggle`; radios also `segmented`),
+`size`, `shape`, `icon` and `colors="brand"` (one HADİ color per option). Never restyle the native input.
+
 **Sidebars**: big apps use `<NavSidebar>`; add `resizable` (+ `minWidth`, `maxWidth`, `collapseBelow`) when users
 should set its width. Never size it with inline styles.
 

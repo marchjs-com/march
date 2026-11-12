@@ -2,6 +2,7 @@
 @import "../ui/field.css";
 @import "../forms/form.css";
 @import "../forms/inputs.css";
+@import "../forms/choice.css";
 @import "../forms/pickers.css";
 @import "../forms/date.css";
 @import "../forms/file.css";

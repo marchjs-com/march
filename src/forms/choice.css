@@ -1,0 +1,87 @@
+/* HADI March — selection controls (Checkbox, CheckboxGroup, RadioGroup): a drawn box over a visually hidden input.
+   Colors: --hm-accent (data-hm-color) with the theme primary as fallback. Motion: transform / stroke only. */
+.hm-choice { --hm-ch-c: var(--hm-accent, var(--hm-primary)); --hm-ch-on: var(--hm-on-accent, var(--hm-on-primary-fill)); --hm-ch-soft: var(--hm-accent-soft, var(--hm-primary-soft));
+  --hm-ch-text: var(--hm-accent-text, var(--hm-primary-text)); --hm-ch-size: 1.25rem; --hm-ch-radius: .375rem; --hm-ch-ease: cubic-bezier(.34, 1.56, .64, 1); }
+.hm-choice-sm { --hm-ch-size: 1rem; --hm-ch-radius: .3125rem; }
+.hm-choice-lg { --hm-ch-size: 1.5rem; --hm-ch-radius: .5rem; }
+.hm-shape-square { --hm-ch-radius: .1875rem; }
+.hm-shape-circle { --hm-ch-radius: 50%; }
+/* a single control is its own .hm-choice; in a group the group carries it */
+.hm-check { position: relative; display: inline-flex; align-items: flex-start; gap: .625rem; cursor: pointer; line-height: 1.4; -webkit-tap-highlight-color: transparent; }
+.hm-choice .hm-check-input, .hm-check .hm-check-input { position: absolute; inset-block-start: 0; inset-inline-start: 0; width: var(--hm-ch-size, 1.25rem); height: var(--hm-ch-size, 1.25rem); margin: 0; opacity: 0; cursor: pointer; }
+.hm-check-box { position: relative; display: inline-grid; place-items: center; flex: none; width: var(--hm-ch-size); height: var(--hm-ch-size); margin-block-start: calc((1.4em - var(--hm-ch-size)) / 2);
+  border: 1.5px solid var(--hm-border-strong); border-radius: var(--hm-ch-radius); background: var(--hm-surface); color: var(--hm-ch-on);
+  transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease); }
+/* the fill grows from the center */
+.hm-check-box::before { content: ""; position: absolute; inset: -1.5px; border-radius: inherit; background: var(--hm-ch-c); transform: scale(0); transition: transform var(--hm-dur-slow) var(--hm-ch-ease); }
+.hm-check-box > * { position: relative; }
+.hm-check-mark, .hm-check-dash, .hm-check-icon { width: 78%; height: 78%; grid-area: 1 / 1; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.hm-check-mark path { stroke-dasharray: 21; stroke-dashoffset: 21; transition: stroke-dashoffset var(--hm-dur-slow) var(--hm-ease-out) 60ms; }
+.hm-check-dash path { stroke-dasharray: 11; stroke-dashoffset: 11; transition: stroke-dashoffset var(--hm-dur) var(--hm-ease-out); }
+.hm-check-icon { transform: scale(0); transition: transform var(--hm-dur-slow) var(--hm-ch-ease); stroke-width: 2.4; }
+.hm-radio-dot { width: 42%; height: 42%; border-radius: 50%; background: var(--hm-ch-on); transform: scale(0); transition: transform var(--hm-dur-slow) var(--hm-ch-ease); }
+/* checked / indeterminate */
+.hm-check-input:checked + .hm-check-box, .hm-check-input:indeterminate + .hm-check-box { border-color: var(--hm-ch-c); }
+.hm-check-input:checked + .hm-check-box::before, .hm-check-input:indeterminate + .hm-check-box::before { transform: scale(1); }
+.hm-check-input:checked:not(:indeterminate) + .hm-check-box .hm-check-mark path { stroke-dashoffset: 0; }
+.hm-check-input:checked:not(:indeterminate) + .hm-check-box .hm-check-icon { transform: scale(1); }
+.hm-check-input:indeterminate + .hm-check-box .hm-check-dash path { stroke-dashoffset: 0; }
+.hm-check-input:checked + .hm-check-box .hm-radio-dot { transform: scale(1); }
+/* hover halo, press, focus ring, disabled, invalid */
+.hm-check:hover .hm-check-input:not(:disabled) + .hm-check-box { box-shadow: 0 0 0 5px color-mix(in srgb, var(--hm-ch-c) 12%, transparent); border-color: color-mix(in srgb, var(--hm-ch-c) 55%, var(--hm-border-strong)); }
+.hm-check:active .hm-check-input:not(:disabled) + .hm-check-box { transform: scale(.9); }
+.hm-check-input:focus-visible + .hm-check-box { box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-ch-c); }
+.hm-check-input:disabled + .hm-check-box { opacity: .5; }
+.hm-check:has(.hm-check-input:disabled) { cursor: not-allowed; }
+.hm-check-input:disabled ~ .hm-check-label { color: var(--hm-muted); }
+[aria-invalid="true"] .hm-check-box, .hm-check-input[aria-invalid="true"] + .hm-check-box { border-color: var(--hm-danger); }
+
+/* soft: tinted box, colored tick */
+.hm-choice-soft .hm-check-box::before { background: var(--hm-ch-soft); }
+.hm-choice-soft .hm-check-box { color: var(--hm-ch-text); }
+.hm-choice-soft .hm-radio-dot { background: var(--hm-ch-c); }
+.hm-choice-soft .hm-check-input:checked + .hm-check-box { border-color: color-mix(in srgb, var(--hm-ch-c) 60%, transparent); }
+
+/* chip: a pill that fills when selected; the tick slides in */
+.hm-choice-chip.hm-choices, .hm-choice-chip .hm-choices { flex-direction: row; flex-wrap: wrap; gap: var(--hm-space-2); }
+.hm-choice-chip .hm-check { align-items: center; gap: .375rem; padding: .375rem .875rem; border: 1px solid var(--hm-border-strong); border-radius: 999px; background: var(--hm-surface);
+  font-weight: 500; transition: background-color var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease); }
+.hm-choice-chip .hm-check-input { inset: 0; width: 100%; height: 100%; }
+.hm-choice-chip .hm-check-box { width: 0; margin: 0; border: 0; background: none; overflow: hidden; color: currentColor; transition: width var(--hm-dur-slow) var(--hm-ch-ease); --hm-ch-size: 1rem; height: 1rem; }
+.hm-choice-chip .hm-check-box::before { display: none; }
+.hm-choice-chip .hm-check:has(.hm-check-input:checked) { background: var(--hm-ch-c); border-color: var(--hm-ch-c); color: var(--hm-ch-on); }
+.hm-choice-chip .hm-check:has(.hm-check-input:checked) .hm-check-box { width: 1rem; }
+.hm-choice-chip .hm-check:hover:not(:has(:disabled)) { border-color: var(--hm-ch-c); }
+.hm-choice-chip .hm-check:active { transform: scale(.96); }
+.hm-choice-chip .hm-check:has(.hm-check-input:focus-visible) { box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-ch-c); }
+.hm-choice-chip .hm-check-box, .hm-choice-chip .hm-check:active .hm-check-box { transform: none; box-shadow: none; }
+.hm-choice-chip .hm-radio-dot { background: currentColor; }
+
+/* card: large selectable card with a tick badge in the corner */
+.hm-choice-card.hm-choices, .hm-choice-card .hm-choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr)); gap: var(--hm-space-3); }
+.hm-choice-card .hm-check { display: flex; padding: var(--hm-space-4); padding-inline-end: calc(var(--hm-space-4) + var(--hm-ch-size)); border: 1.5px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface);
+  transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease); }
+.hm-choice-card .hm-check-input { inset: 0; width: 100%; height: 100%; }
+.hm-choice-card .hm-check-box { position: absolute; inset-block-start: .625rem; inset-inline-end: .625rem; margin: 0; --hm-ch-radius: 50%; border-radius: 50%; }
+.hm-choice-card .hm-check:has(.hm-check-input:checked) { border-color: var(--hm-ch-c); background: color-mix(in srgb, var(--hm-ch-c) 6%, var(--hm-surface)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-ch-c) 14%, transparent); }
+.hm-choice-card .hm-check:hover:not(:has(:disabled)) { border-color: color-mix(in srgb, var(--hm-ch-c) 55%, var(--hm-border)); }
+.hm-choice-card .hm-check:active { transform: scale(.985); }
+.hm-choice-card .hm-check:has(.hm-check-input:focus-visible) { box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-ch-c); }
+.hm-choice-card-text { display: grid; gap: .25rem; }
+.hm-choice-card-icon { display: inline-grid; place-items: center; width: 2.25rem; height: 2.25rem; margin-block-end: .25rem; border-radius: var(--hm-radius-2); background: var(--hm-ch-soft); color: var(--hm-ch-text); }
+.hm-choice-card-icon .hm-svg { width: 1.125rem; height: 1.125rem; }
+.hm-choice-card-title { font-weight: 600; }
+.hm-choice-card-desc { color: var(--hm-muted); font-size: var(--hm-text-sm); }
+
+/* toggle / segmented: joined buttons, the selected one filled */
+.hm-choice-toggle.hm-choices, .hm-choice-segmented.hm-choices { flex-direction: row; flex-wrap: wrap; gap: 0; width: fit-content; max-width: 100%; padding: 3px; border: 1px solid var(--hm-border); border-radius: calc(var(--hm-radius) + 3px); background: var(--hm-surface-2); }
+.hm-choice-toggle .hm-check, .hm-choice-segmented .hm-check { align-items: center; padding: .375rem .875rem; border-radius: var(--hm-radius); font-weight: 500; color: var(--hm-text-2);
+  transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-choice-toggle .hm-check-input, .hm-choice-segmented .hm-check-input { inset: 0; width: 100%; height: 100%; }
+.hm-choice-toggle .hm-check-box, .hm-choice-segmented .hm-check-box { display: none; }
+.hm-choice-toggle .hm-check:has(.hm-check-input:checked) { background: var(--hm-ch-c); color: var(--hm-ch-on); box-shadow: 0 1px 2px rgb(var(--hm-shadow-rgb) / .15); }
+.hm-choice-segmented .hm-check:has(.hm-check-input:checked) { background: var(--hm-surface); color: var(--hm-ch-text); box-shadow: 0 1px 2px rgb(var(--hm-shadow-rgb) / .12), 0 0 0 1px var(--hm-border); }
+.hm-choice-toggle .hm-check:has(.hm-check-input:focus-visible), .hm-choice-segmented .hm-check:has(.hm-check-input:focus-visible) { box-shadow: 0 0 0 2px var(--hm-ch-c); }
+
+.hm-choice-still *, .hm-choice-still *::before { transition: none !important; }
+@media (prefers-reduced-motion: reduce) { .hm-choice *, .hm-choice *::before, .hm-choice .hm-check { transition: none !important; } }
