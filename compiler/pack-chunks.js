@@ -153,8 +153,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
           if (users.some((u) => u !== b && cb.has(u))) continue;
           // what each side newly downloads is the other's whole static closure, not just its own file: a small chunk with
           // heavy imports must not ride along with a start-up chunk
-          // (start-up downloads are already there for everyone: a start-up piece is a free host for widely shared code)
-          const extra = (from, got) => [...from].reduce((s, x) => s + (got.has(x) || have.has(x) ? 0 : bytes(x)), 0);
+          const extra = (from, got) => [...from].reduce((s, x) => s + (got.has(x) ? 0 : bytes(x)), 0);
           const c = [...rt].filter((e) => !rb.has(e)).length * extra(cb, ct) + [...rb].filter((e) => !rt.has(e)).length * extra(ct, cb);
           if (c < cost && fits(b)) { cost = c; best = b; }
         }

@@ -218,8 +218,11 @@ const manager = defineManager<StorageHub, StorageConfig>("storage", create, { pr
 
 /** The storage manager (created on first call). */
 export const storage = (): StorageHub => manager.get();
+/** Set the storage manager's options (merged into the current config). */
 export const configureStorage = (config: Partial<StorageConfig>): void => manager.configure(config);
+/** Stop the storage manager and remove its listeners; the next call starts it again. */
 export const disposeStorage = (): void => manager.dispose();
+/** The storage manager (get, configure, dispose). */
 export const storageManager = manager;
 
 /**

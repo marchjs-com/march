@@ -58,16 +58,18 @@ export async function generate(root = ROOT) {
   const list = await components(root);
   const cats = await categories(root);
   const files = {};
-  files["src/components/index.ts"] = HEAD + list.map((c) => `export * from "./${c.folder}/index.ts";\n`).join("");
+  // large components (meta.barrel === false) stay out of the barrels: import them from hadi-march/components/<folder>
+  const barrel = list.filter((c) => c.meta?.barrel !== false);
+  files["src/components/index.ts"] = HEAD + barrel.map((c) => `export * from "./${c.folder}/index.ts";\n`).join("");
   for (const cat of cats) {
-    const own = list.filter((c) => c.category === cat.id);
+    const own = barrel.filter((c) => c.category === cat.id);
     files[`src/components/${cat.id}/index.ts`] = HEAD + `// ${cat.title}: ${cat.desc} Import: hadi-march/${cat.id}\n` +
       (own.length ? own.map((c) => `export * from "./${c.name}/index.ts";\n`).join("") : "export {};\n");
   }
   files["src/components/registry.gen.ts"] = HEAD + `import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";\n` +
     list.map((c, i) => `import m${i} from "./${c.folder}/meta.ts";\n`).join("") +
     `\nexport interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }\n` +
-    `export const registry: readonly RegistryEntry[] = [\n` +
+    `/** Every component folder: meta, Code-tab snippet and lazy demo / playground loaders. */\nexport const registry: readonly RegistryEntry[] = [\n` +
     list.map((c, i) => `  { folder: "${c.folder}", meta: m${i}, code: ${JSON.stringify(firstCode(c.docs))}, demo: () => import("./${c.folder}/demo.tsx"), playground: () => import("./${c.folder}/playground.ts") },\n`).join("") + `];\n`;
 
   // catalogue by category (menu order), "composed of" links to the parts
@@ -105,10 +107,13 @@ export async function generate(root = ROOT) {
   return { files, list };
 }
 
-/** Exported names of hadi-march and hadi-march/ui (a part named in composedOf may still live there while folders move). */
+/** Exported names of hadi-march, hadi-march/ui, hadi-march/router and hadi-march/table (a part named in composedOf may still live there while folders move). */
 function uiExports(root) {
-  const text = ["src/index.ts", "src/ui/index.ts", "src/forms/index.ts"].map((f) => readFileSync(join(root, f), "utf8")).join("\n");
-  return new Set([...text.matchAll(/^export\s*\{([^}]*)\}/gm)].flatMap((m) => m[1].split(",").map((s) => s.trim().split(/\s+as\s+/).pop()).filter(Boolean)));
+  const text = ["src/index.ts", "src/ui/index.ts", "src/forms/index.ts", "src/router/index.ts", "src/table/index.ts"].map((f) => readFileSync(join(root, f), "utf8")).join("\n");
+  return new Set([
+    ...[...text.matchAll(/^export\s*\{([^}]*)\}/gm)].flatMap((m) => m[1].split(",").map((s) => s.trim().split(/\s+as\s+/).pop()).filter(Boolean)),
+    ...[...text.matchAll(/^export\s+(?:function|const|class)\s+([A-Z][\w$]*)/gm)].map((m) => m[1]),
+  ]);
 }
 
 /** Folder problems: missing files, a missing or wrong category, composedOf rules (a composite names its parts, and

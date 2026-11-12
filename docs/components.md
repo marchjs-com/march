@@ -10,6 +10,14 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 
+### Data display — `hadi-march/data`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [Chip](#chip), Menu, FilterControl, CellEditor |
+| TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
+| VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
+
 ### Feedback — `hadi-march/feedback`
 
 | Component | Status | What | Composed of |
@@ -22,11 +30,22 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 |---|---|---|---|
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
 
+### Social — `hadi-march/social`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| CountRoll | experimental | Odometer number: only the changed digits roll (up when it grows, down when it shrinks), compact in the active locale. | — |
+| LikeButton | experimental | Heart toggle: spring pop, ring and a four-color HADİ particle burst on the motion engine; rolling count; heartBurst() for any element. | [CountRoll](#countroll) |
+| MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton |
+
 ### Composite — `hadi-march/composite`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
+| Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
+| NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
+| PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
 
 ## BottomNav
 
@@ -54,6 +73,37 @@ Composed of: OverflowText
 
 Full page: src/components/actions/chip/docs.md
 
+## CountRoll
+
+An odometer number for likes, comments and followers. When the value changes only the digits that changed roll: upward when it grows, downward when it shrinks, on the motion engine (global speed, pause and reduced motion apply). The text is compact in the active locale (`1,2 B`, `12K`); `format="full"` groups it instead.
+
+```tsx
+<CountRoll value={$likes} />
+<CountRoll value={$followers} format="full" />
+```
+
+Full page: src/components/social/count-roll/docs.md
+
+## DataGrid
+
+A spreadsheet-like grid for large data. It runs on the table engine (`createTable`: sorting, filters, search, column layout, selection, inline edit, CSV) and the shared virtual window, which windows **rows and columns**: only the cells in view are in the DOM, so 100 000 rows × many columns scroll smoothly. On top it adds grouping with aggregates, a totals footer, pinned columns, drag to reorder and resize columns, and a keyboard cell cursor.
+
+Composed of: [Chip](#chip), Menu, FilterControl, CellEditor
+
+```tsx
+import { DataGrid } from "hadi-march/components/data/data-grid";
+
+<DataGrid rows={$orders} rowKey="id" selectable groupBy={["region"]}
+  columns={[
+    { key: "customer", label: "Customer", pin: "left", editable: true },
+    { key: "region", label: "Region", filter: "select" },
+    { key: "amount", label: "Amount", format: ["money", "USD"], aggregate: "sum" },
+  ]}
+  onEdit={(row, key, value) => save(row.id, key, value)} />
+```
+
+Full page: src/components/data/data-grid/docs.md
+
 ## Drawer
 
 A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
@@ -65,6 +115,30 @@ Composed of: Portal, Dialog
 ```
 
 Full page: src/components/overlays/drawer/docs.md
+
+## Feed
+
+A social feed. PostCards sit in a VirtualList, so only the posts near the viewport are in the DOM, inside a PullToRefresh (the feed is the scroll area; keyboard users get a Refresh button). The first page shows skeleton posts; reaching the end loads the next page with a skeleton at the bottom (infinite scroll) and an end mark once there is nothing more. New posts waiting above show a "N new posts" pill that merges them and scrolls to the top.
+
+Composed of: [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton
+
+```tsx
+<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />
+```
+
+Full page: src/components/composite/feed/docs.md
+
+## LikeButton
+
+A heart toggle with a rolling count. Liking squashes and overshoots the heart on a spring, grows a ring and throws a burst of particles in the four HADİ colors; unliking is a small press. Everything runs on the motion engine, so the global speed, "pause all" and reduced motion apply (reduced motion keeps only the fill change).
+
+Composed of: [CountRoll](#countroll)
+
+```tsx
+<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />
+```
+
+Full page: src/components/social/like-button/docs.md
 
 ## MadeWithMarch
 
@@ -78,6 +152,45 @@ An optional credit line: "Developed with HADI March and 💗", with "HADI March"
 
 Full page: src/components/actions/made-with-march/docs.md
 
+## MediaGrid
+
+The photos of a post in one frame: one photo keeps its own shape (between 4:5 and 1.91:1), two sit side by side, three are one large and two stacked, four are a 2×2 grid, and more show "+N" on the last tile. Each tile is a button that opens the photo; a Skeleton shimmers until the image arrives and it then fades in. With `onDoubleTap` a single tap waits 230 ms, so a double tap (like) never also opens the photo.
+
+Composed of: Skeleton
+
+```tsx
+<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />
+```
+
+Full page: src/components/social/media-grid/docs.md
+
+## NavSidebar
+
+The app's side menu: categories that open and close, a typo-tolerant search over every item, recent visits and featured items at the top, a collapsible icon rail and a resizable width, all remembered per user. Items are links (router `Link`), so the current page is marked and the menu follows navigation.
+
+Composed of: OverflowText, Link
+
+```tsx
+<NavSidebar title="Acme" items={[
+  { id: "/orders", label: "Orders", href: "/orders", group: "Sales", icon: cart, badge: () => $open },
+  { id: "/users", label: "Users", href: "/users", group: "Admin", can: "users.read" },
+]} collapsible resizable groupOrder={["Sales", "Admin"]} />
+```
+
+Full page: src/components/composite/nav-sidebar/docs.md
+
+## PostCard
+
+One post of a social feed. The header shows the author (Avatar, name with a verified mark), the relative time and the place, with an optional ⋯ Menu. Photos sit in a MediaGrid; a double tap on them likes the post with a large heart that pops over the photo and bursts in the four HADİ colors. The action row has a LikeButton and rolling counts for comments and shares; the caption folds to three lines with a "more" button.
+
+Composed of: Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll)
+
+```tsx
+<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />
+```
+
+Full page: src/components/composite/post-card/docs.md
+
 ## PullToRefresh
 
 A scroll area that refreshes when its top is pulled down past a threshold, by touch, pen or mouse. A spinning indicator follows the pull and keeps turning until the async `onRefresh` settles.
@@ -87,3 +200,30 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 ```
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
+
+## TreeView
+
+A tree for large hierarchies. Only the rows in view are in the DOM (shared virtual window), so thousands of open nodes stay smooth. Children can load lazily the first time a folder opens, selection is single or multiple, nodes move by drag and drop (before / after / inside, with edge auto-scroll and auto-open of a folder you hover), and search keeps the path to every hit open and highlights the matching text. For a short static tree, `<Tree>` is enough.
+
+Composed of: Spinner
+
+```tsx
+import { TreeView } from "hadi-march/components/data/tree-view";
+
+<TreeView nodes={files} selection="multiple" draggable search={$q}
+  load={(node) => api.children(node.id)}
+  onSelect={(ids) => $selected = ids}
+  onMove={(ids, target, position) => api.move(ids, target, position)} />
+```
+
+Full page: src/components/data/tree-view/docs.md
+
+## VirtualList
+
+A long list that keeps only the rows near the viewport in the DOM, so 100,000 rows scroll like 20. Rows can have any height: each is measured when it renders and an estimate stands in until then; when a row above the viewport changes height the content stays still (scroll anchoring). Rows keep their DOM while they stay in range and receive an accessor to their item, so an updated item (a like, an edit) updates its row instead of rebuilding it.
+
+```tsx
+<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />
+```
+
+Full page: src/components/data/virtual-list/docs.md

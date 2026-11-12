@@ -6,7 +6,7 @@ import { installDom } from "../../testing/dom.ts";
 installDom();
 const { session, configureSession, disposeSession } = await import("./index.ts");
 const { configureIdle, disposeIdle } = await import("../idle/index.ts");
-const { setManagerEmit } = await import("../manager.ts");
+const { onManager } = await import("../manager.ts");
 const tick = (ms = 5) => new Promise((r) => setTimeout(r, ms));
 const storageEvent = (key, value) => { const e = new Event("storage"); e.key = key; e.newValue = value; window.dispatchEvent(e); };
 
@@ -32,7 +32,7 @@ test("start, warning window, extend, end", () => {
 
 test("expires: onExpire once, events, expired()", async () => {
   const events = [];
-  const prev = setManagerEmit((e) => e.manager === "session" && events.push(e.type));
+  const prev = onManager("*", (e) => e.manager === "session" && events.push(e.type));
   let expired = 0;
   configureSession({ duration: 50, warnBefore: 1000, storageKey: null, onExpire: () => expired++, extendOnActivity: false });
   session().start();
@@ -41,7 +41,7 @@ test("expires: onExpire once, events, expired()", async () => {
   assert.equal(session().active(), false);
   assert.equal(expired, 1);
   assert.deepEqual(events.filter((t) => t !== "start" && t !== "dispose"), ["warn", "expire"]);
-  setManagerEmit(prev);
+  prev();
   disposeSession();
 });
 

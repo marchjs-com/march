@@ -2,15 +2,34 @@
 import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";
 import m0 from "./composite/bottom-nav/meta.ts";
 import m1 from "./actions/chip/meta.ts";
-import m2 from "./overlays/drawer/meta.ts";
-import m3 from "./actions/made-with-march/meta.ts";
-import m4 from "./feedback/pull-to-refresh/meta.ts";
+import m2 from "./social/count-roll/meta.ts";
+import m3 from "./data/data-grid/meta.ts";
+import m4 from "./overlays/drawer/meta.ts";
+import m5 from "./composite/feed/meta.ts";
+import m6 from "./social/like-button/meta.ts";
+import m7 from "./actions/made-with-march/meta.ts";
+import m8 from "./social/media-grid/meta.ts";
+import m9 from "./composite/nav-sidebar/meta.ts";
+import m10 from "./composite/post-card/meta.ts";
+import m11 from "./feedback/pull-to-refresh/meta.ts";
+import m12 from "./data/tree-view/meta.ts";
+import m13 from "./data/virtual-list/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
+/** Every component folder: meta, Code-tab snippet and lazy demo / playground loaders. */
 export const registry: readonly RegistryEntry[] = [
   { folder: "composite/bottom-nav", meta: m0, code: "<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />", demo: () => import("./composite/bottom-nav/demo.tsx"), playground: () => import("./composite/bottom-nav/playground.ts") },
   { folder: "actions/chip", meta: m1, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./actions/chip/demo.tsx"), playground: () => import("./actions/chip/playground.ts") },
-  { folder: "overlays/drawer", meta: m2, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
-  { folder: "actions/made-with-march", meta: m3, code: "<MadeWithMarch />\n<MadeWithMarch variant=\"badge\" />\n<MadeWithMarch variant=\"small\" />", demo: () => import("./actions/made-with-march/demo.tsx"), playground: () => import("./actions/made-with-march/playground.ts") },
-  { folder: "feedback/pull-to-refresh", meta: m4, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
+  { folder: "social/count-roll", meta: m2, code: "<CountRoll value={$likes} />\n<CountRoll value={$followers} format=\"full\" />", demo: () => import("./social/count-roll/demo.tsx"), playground: () => import("./social/count-roll/playground.ts") },
+  { folder: "data/data-grid", meta: m3, code: "import { DataGrid } from \"hadi-march/components/data/data-grid\";\n\n<DataGrid rows={$orders} rowKey=\"id\" selectable groupBy={[\"region\"]}\n  columns={[\n    { key: \"customer\", label: \"Customer\", pin: \"left\", editable: true },\n    { key: \"region\", label: \"Region\", filter: \"select\" },\n    { key: \"amount\", label: \"Amount\", format: [\"money\", \"USD\"], aggregate: \"sum\" },\n  ]}\n  onEdit={(row, key, value) => save(row.id, key, value)} />", demo: () => import("./data/data-grid/demo.tsx"), playground: () => import("./data/data-grid/playground.ts") },
+  { folder: "overlays/drawer", meta: m4, code: "<Drawer open={$open} onClose={() => $open = false} side=\"bottom\" snapPoints={[0.4, 0.9]} title=\"Filters\">…</Drawer>", demo: () => import("./overlays/drawer/demo.tsx"), playground: () => import("./overlays/drawer/playground.ts") },
+  { folder: "composite/feed", meta: m5, code: "<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />", demo: () => import("./composite/feed/demo.tsx"), playground: () => import("./composite/feed/playground.ts") },
+  { folder: "social/like-button", meta: m6, code: "<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />", demo: () => import("./social/like-button/demo.tsx"), playground: () => import("./social/like-button/playground.ts") },
+  { folder: "actions/made-with-march", meta: m7, code: "<MadeWithMarch />\n<MadeWithMarch variant=\"badge\" />\n<MadeWithMarch variant=\"small\" />", demo: () => import("./actions/made-with-march/demo.tsx"), playground: () => import("./actions/made-with-march/playground.ts") },
+  { folder: "social/media-grid", meta: m8, code: "<MediaGrid items={post.media} onOpen={(i, el) => openLightbox(post.media, i, el)} onDoubleTap={() => like(post)} />", demo: () => import("./social/media-grid/demo.tsx"), playground: () => import("./social/media-grid/playground.ts") },
+  { folder: "composite/nav-sidebar", meta: m9, code: "<NavSidebar title=\"Acme\" items={[\n  { id: \"/orders\", label: \"Orders\", href: \"/orders\", group: \"Sales\", icon: cart, badge: () => $open },\n  { id: \"/users\", label: \"Users\", href: \"/users\", group: \"Admin\", can: \"users.read\" },\n]} collapsible resizable groupOrder={[\"Sales\", \"Admin\"]} />", demo: () => import("./composite/nav-sidebar/demo.tsx"), playground: () => import("./composite/nav-sidebar/playground.ts") },
+  { folder: "composite/post-card", meta: m10, code: "<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />", demo: () => import("./composite/post-card/demo.tsx"), playground: () => import("./composite/post-card/playground.ts") },
+  { folder: "feedback/pull-to-refresh", meta: m11, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
+  { folder: "data/tree-view", meta: m12, code: "import { TreeView } from \"hadi-march/components/data/tree-view\";\n\n<TreeView nodes={files} selection=\"multiple\" draggable search={$q}\n  load={(node) => api.children(node.id)}\n  onSelect={(ids) => $selected = ids}\n  onMove={(ids, target, position) => api.move(ids, target, position)} />", demo: () => import("./data/tree-view/demo.tsx"), playground: () => import("./data/tree-view/playground.ts") },
+  { folder: "data/virtual-list", meta: m13, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./data/virtual-list/demo.tsx"), playground: () => import("./data/virtual-list/playground.ts") },
 ];

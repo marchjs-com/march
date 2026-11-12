@@ -22,10 +22,13 @@ export interface ComponentMeta {
   /** Behaviors (src/behaviors) and shared engines (positioning, collection, field, variants …) it uses. */
   behaviors?: readonly string[];
   hubs?: readonly string[];
-  /** Category folder (src/components/<category>/<name>/): overlays, feedback, navigation, composite … */
-  category?: string;
   /** Showcase page path that shows it. */
   showcase?: string;
+  /**
+   * `false`: a large component kept out of the `hadi-march/ui` barrel (a barrel re-export puts a module into the static
+   * graph of every page that imports the barrel). Import it from `hadi-march/components/<folder>`.
+   */
+  barrel?: boolean;
   /** Deprecated: what to use instead. */
   replacedBy?: string;
 }
@@ -37,7 +40,7 @@ export interface PlaygroundOption<V = Record<string, unknown>> {
   label: string;
   default: unknown;
   /** Choices (ChoicePicker picks the look); omit for a boolean (switch) or give min / max (slider). */
-  options?: readonly (string | { value: unknown; label: string })[];
+  options?: readonly (string | number | { value: unknown; label: string })[];
   kind?: "segmented" | "chips" | "cards" | "grid" | "combobox";
   min?: number;
   max?: number;

@@ -86,6 +86,7 @@ src/managers/<name>/ui.ts        its UI, a separate lazy module (banner, panel, 
   tracks a version signal: after `configure()` a binding that reads through the manager moves to the new instance.
 - Namespaced props (`when:`, `consent:`, `command:`) go through `registerNamespace(ns, fn)` in `dom/h.ts`; a manager
   registers its namespace when its module loads (listed in `sideEffects`).
-- **Events.** Every manager reports through `emit(manager, type, detail)` in `manager.ts`, which hands the event to one
-  sink set with `setManagerEmit(fn)`. The messaging layer connects there: it publishes each event to a `managers`
-  channel (topic `<manager>:<type>`); manager code does not change.
+- **Events.** Every manager reports through `emit(manager, type, detail)` in `manager.ts`, which publishes on channels
+  (`src/channel`): the `managers` channel with the topic `<manager>:<type>` (last 50 replay) and the manager's own
+  `managers.<name>` channel. Listen with `onManager("session:*", fn)`, `managerChannelOf(name).on(fn)` or
+  `onChannels("managers.*", fn)`: no single sink, nothing to connect, any number of listeners.

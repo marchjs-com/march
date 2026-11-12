@@ -11,7 +11,7 @@ Each manager: `src/managers/<name>/index.ts` (+ `ui.ts` when it has UI), a test 
 | `viewport()` / `consent` / `command()`, `commands` | the instance (created on first use) |
 | `configureViewport(cfg)`, `configureConsent(cfg)`, `configureCommands(cfg)` | global options; bindings follow the new instance |
 | `disposeViewport()`, `disposeConsent()`, `disposeCommands()` | remove listeners; the next use starts again |
-| `setManagerEmit(fn)` | every manager event `{ manager, type, detail }` (one sink; see docs/architecture.md) |
+| `onManager(pattern, fn)` | manager events on the `managers` channel, topic `<manager>:<type>` (`"session:*"`, `"*"`); also `managerChannelOf(name)` and `onChannels("managers.*")` |
 
 Configure a manager at app start, before components subscribe: listeners added with `on()` belong to the instance and
 end with it.
@@ -81,7 +81,7 @@ Each lives in `src/managers/<name>/` (import `hadi-march/managers/<name>`), foll
 instance, `configureX()` / `disposeX()`) and reports through `emit()`. Showcase: Temel › Ortam yöneticileri.
 
 ```ts
-connectManagerChannels();  onManager("session:*", (m) => …)   // every event on the `managers` channel, topic <manager>:<type>
+onManager("session:*", (m) => …)   // every event is on the `managers` channel (topic <manager>:<type>); nothing to connect
 idle().idle()  idle().onIdle(fn)  idle().pause()                                  // configureIdle({ timeout })
 sync().enqueue({ url, method: "POST", body })  sync().pending()  sync().status()  // offline queue over net, backoff, Idempotency-Key
 device().network()  device().lowEnd()  device().supports("share")  device().battery()  await device().storage()

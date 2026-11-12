@@ -195,6 +195,9 @@ function create(cfg: SyncConfig): Sync {
 const manager = defineManager<Sync, SyncConfig>("sync", create, DEFAULTS);
 /** The sync manager (created on first call; sends what an earlier visit left in the queue). */
 export const sync = (): Sync => manager.get();
+/** Set the sync manager's options (merged into the current config). */
 export const configureSync = (config: Partial<SyncConfig>): void => manager.configure(config);
+/** Stop the sync manager and remove its listeners; the next call starts it again. */
 export const disposeSync = (): void => manager.dispose();
+/** The sync manager (get, configure, dispose). */
 export const syncManager = manager;

@@ -7,22 +7,46 @@
 //
 // Bindings that read through get() follow a re-configured instance: get() tracks a version signal.
 //
-// Events: every manager reports through emit(manager, type, detail); the app, devtools or the messaging layer listen
-// with setManagerEmit(fn) (docs/architecture.md).
+// Events go through channels (src/channel), not a callback: emit(manager, type, detail) publishes to
+//   "managers"            every event, topic "<manager>:<type>" (the last 50 replay for late listeners and devtools)
+//   "managers.<manager>"  that manager's events, payload { type, detail }
+// Listen with onManager("session:*", fn), managerChannelOf("undo").on(fn) or onChannels("managers.*", fn); nothing
+// has to be connected first, and any number of listeners can follow (docs/architecture.md).
 
 import { signal, untrack, createRoot } from "../core/reactive.ts";
+import { channel, type Channel } from "../channel/index.ts";
 
 /** One event a manager reports, e.g. { manager: "consent", type: "change", detail: { analytics: true } }. */
 export interface ManagerEvent { manager: string; type: string; detail?: unknown }
-export type ManagerEmit = (e: ManagerEvent) => void;
+/** A manager event on the `managers` channel. */
+export interface ManagerMessage extends ManagerEvent { topic: string; at: number }
+/** One event on a manager's own channel ("managers.<name>"). */
+export interface ManagerChannelMessage<D = unknown> { type: string; detail?: D }
 
-let sink: ManagerEmit | null = null;
-/** Receive every manager event (one sink: the app, devtools or the messaging layer). Returns the previous sink. */
-export function setManagerEmit(fn: ManagerEmit | null): ManagerEmit | null { const prev = sink; sink = fn; return prev; }
-/** Report an event from a manager. Never throws into the manager. */
+/** The `managers` channel: every manager event with the topic `<manager>:<type>` (keeps the last 50 for late listeners). */
+export const managerChannel: Channel<ManagerMessage> = channel<ManagerMessage>("managers", { replay: 50 });
+const own = new Map<string, Channel<ManagerChannelMessage>>();
+/** The channel one manager publishes to ("managers.<name>"). */
+export const managerChannelOf = (name: string): Channel<ManagerChannelMessage> => {
+  let ch = own.get(name);
+  if (!ch) own.set(name, (ch = channel<ManagerChannelMessage>(`managers.${name}`)));
+  return ch;
+};
+
+/** Report an event from a manager on its channels. A failing listener never throws into the manager. */
 export function emit(manager: string, type: string, detail?: unknown): void {
-  if (!sink) return;
-  try { sink({ manager, type, detail }); } catch (e) { console.error(e); }
+  try {
+    managerChannel.emit({ manager, type, detail, topic: `${manager}:${type}`, at: Date.now() });
+    managerChannelOf(manager).emit(detail === undefined ? { type } : { type, detail });
+  } catch (e) { console.error(e); }
+}
+
+const matches = (pattern: string, topic: string): boolean =>
+  pattern === "*" || (pattern.endsWith("*") ? topic.startsWith(pattern.slice(0, -1)) : topic === pattern);
+/** Listen to manager events by topic: "idle:idle", "session:*", "*". Returns off (removed with the owning component).
+ *  Replayed messages are skipped unless `replay` is true. */
+export function onManager(pattern: string, fn: (m: ManagerMessage) => void, opts: { replay?: boolean } = {}): () => void {
+  return managerChannel.on((m) => { if (matches(pattern, m.topic)) fn(m); }, { replay: opts.replay ?? false });
 }
 
 /** An instance a manager factory returns: anything, with an optional dispose(). */
