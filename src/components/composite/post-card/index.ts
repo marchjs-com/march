@@ -2,7 +2,7 @@
 // place, a ⋯ Menu), MediaGrid, an action row (LikeButton, comments and shares as rolling counts) and a caption that
 // folds to three lines. A double tap on the photos likes the post: a large heart pops over the photo and bursts in the
 // four HADİ colors (heartPop / heartBurst from LikeButton, motion engine).
-import { signal } from "../../../core/reactive.ts";
+import { signal, computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -59,6 +59,11 @@ export interface PostCardProps {
 export function PostCard(props: PostCardProps): Element {
   const post = (): Post => val(props.post);
   const open = signal(false);
+  // the photos and the caption redraw only when they really change (a like must not reload the images)
+  const sameMedia = (a?: readonly MediaItem[], b?: readonly MediaItem[]): boolean => a === b || (!!a && !!b && a.length === b.length && a.every((x, i) => x.src === b[i]?.src));
+  const media = computed(() => post().media, { equals: sameMedia });
+  const caption = computed(() => `${post().author.handle ?? post().author.name}\u0000${post().text ?? ""}`);
+  const head = computed(() => { const p = post(); return `${p.author.name}\u0000${p.author.avatar ?? ""}\u0000${p.author.verified ? 1 : 0}\u0000${String(p.time)}\u0000${p.place ?? ""}`; });
   let big!: HTMLElement, stage!: HTMLElement;
   const like = (next: boolean): void => props.onLike?.(next, post());
   const doubleTap = (): void => {
@@ -69,11 +74,14 @@ export function PostCard(props: PostCardProps): Element {
     heartBurst(stage, { count: 14, radius: 70 });
     void animate(big, [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 900, easing: "linear" }).finished.then(() => { big.hidden = true; });
   };
-  const counter = (icon: Parameters<typeof glyph>[0], n: () => number | undefined, label: () => string, fn?: () => void): Element | null =>
-    fn || n() ? h("button", { type: "button", class: "hm-post-act", "aria-label": label, onClick: () => fn?.(), disabled: !fn },
-      glyph(icon), h(CountRoll, { value: () => n() ?? 0, hideZero: true })) : null;
+  // a count button: shown while it has a handler or a count; the button stays while the number changes (it rolls)
+  const counter = (icon: Parameters<typeof glyph>[0], n: () => number | undefined, label: () => string, fn?: () => void): (() => Element | null) => {
+    const shown = computed(() => !!fn || !!n());
+    return () => (shown() ? untrack(() => h("button", { type: "button", class: "hm-post-act", "aria-label": label, onClick: () => fn?.(), disabled: !fn },
+      glyph(icon), h(CountRoll, { value: () => n() ?? 0, hideZero: true }))) : null);
+  };
   const author = (): Element => {
-    const a = post().author;
+    const a = untrack(post).author;
     return h("span", { class: "hm-post-name" }, h("span", { class: "hm-post-name-text" }, a.name),
       a.verified ? h("span", { class: "hm-post-verified", role: "img", "aria-label": () => t`Verified` }, glyph(badgeCheck)) : null);
   };
@@ -83,23 +91,24 @@ export function PostCard(props: PostCardProps): Element {
   },
   h("header", { class: "hm-post-head" },
     () => {
-      const a = post().author;
+      head();
+      const a = untrack(post).author;
       const inner = [
         h(Avatar, { name: a.name, src: a.avatar, size: "md" }),
         h("span", { class: "hm-post-id" }, author(),
           h("span", { class: "hm-post-meta" },
-            h("time", { dateTime: new Date(post().time).toISOString() }, applyPipe("relative", post().time)),
-            post().place ? h("span", { class: "hm-post-place" }, glyph(mapPin), post().place) : null)),
+            h("time", { dateTime: new Date(untrack(post).time).toISOString() }, applyPipe("relative", untrack(post).time)),
+            untrack(post).place ? h("span", { class: "hm-post-place" }, glyph(mapPin), untrack(post).place) : null)),
       ];
       return props.onAuthor ? h("button", { type: "button", class: "hm-post-who", onClick: () => props.onAuthor?.(post()) }, inner) : h("span", { class: "hm-post-who" }, inner);
     },
     props.menu?.length ? h(Menu, { icon: moreVertical, label: () => t`Post options`, variant: "ghost", size: "sm", class: "hm-post-more", items: props.menu, args: [post()] }) : null),
   () => {
-    const media = post().media;
-    if (!media?.length) return null;
+    const items = media();
+    if (!items?.length) return null;
     return h("div", { class: "hm-post-media", ref: (x: HTMLElement) => { stage = x; } },
       h(MediaGrid, {
-        items: media, gap: "thin",
+        items, gap: "thin",
         onOpen: (i: number, el: HTMLElement) => props.onOpenMedia?.(i, el, post()),
         onDoubleTap: val(props.doubleTapLike) === false ? undefined : doubleTap,
       }),
@@ -107,10 +116,10 @@ export function PostCard(props: PostCardProps): Element {
   },
   h("div", { class: "hm-post-actions" },
     h(LikeButton, { liked: () => !!post().liked, count: () => post().likes, onToggle: like, label: () => t`Like` }),
-    () => counter(message, () => post().comments, () => t`Comments: ${post().comments ?? 0}`, props.onComment && (() => props.onComment?.(post()))),
-    () => counter(send, () => post().shares, () => t`Share: ${post().shares ?? 0}`, props.onShare && (() => props.onShare?.(post())))),
+    counter(message, () => post().comments, () => t`Comments: ${post().comments ?? 0}`, props.onComment && (() => props.onComment?.(post()))),
+    counter(send, () => post().shares, () => t`Share: ${post().shares ?? 0}`, props.onShare && (() => props.onShare?.(post())))),
   () => {
-    const text = post().text;
+    const [handle, text] = caption().split("\u0000") as [string, string];
     if (!text) return null;
     const lines = val(props.clamp) ?? 3;
     let p!: HTMLElement;
@@ -118,7 +127,7 @@ export function PostCard(props: PostCardProps): Element {
     queueMicrotask(() => { if (p && lines && p.scrollHeight > p.clientHeight + 1) more.set(true); });
     return h("div", { class: "hm-post-body" },
       h("p", { class: () => cx("hm-post-text", lines && !open() && "is-clamped"), "data-lines": String(lines), ref: (x: HTMLElement) => { p = x; } },
-        h("b", { class: "hm-post-handle" }, post().author.handle ?? post().author.name), " ", text),
+        h("b", { class: "hm-post-handle" }, handle), " ", text),
       () => (more() && !open() ? h("button", { type: "button", class: "hm-post-more-text", "aria-expanded": "false", onClick: () => open.set(true) }, t`more`) : null));
   },
   () => (props.onComment && post().comments ? h("button", { type: "button", class: "hm-post-all", onClick: () => props.onComment?.(post()) }, t`View all ${post().comments} comments`) : null));
