@@ -1,0 +1,15 @@
+/* LogoCloud. One muted tone by default (filter), full colour on hover; equal grid cells; marquee rows never wrap. */
+.hm-logos { display: flex; flex-direction: column; gap: var(--hm-space-5); min-width: 0; }
+.hm-logos-title { margin: 0; text-align: center; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-medium); color: var(--hm-muted); }
+.hm-logo { display: inline-flex; align-items: center; justify-content: center; height: 2.75rem; color: var(--hm-text); text-decoration: none;
+  transition: opacity var(--hm-dur) var(--hm-ease), filter var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease); }
+.hm-logo-img { display: block; max-height: 100%; width: auto; max-width: 9rem; object-fit: contain; }
+.hm-logo-node { display: inline-flex; align-items: center; }
+.is-mono .hm-logo { opacity: .62; filter: grayscale(1); }
+.is-mono .hm-logo:hover, .is-mono .hm-logo:focus-visible { opacity: 1; filter: none; }
+.hm-logos-cell { display: grid; place-items: center; min-height: 5rem; padding: var(--hm-space-3); border-radius: var(--hm-radius-3); border: 1px solid var(--hm-border); background: var(--hm-surface); }
+.hm-logos-cell:hover .hm-logo { transform: scale(1.06); }
+.hm-logos-marquee { display: block; width: 100%; }
+.hm-logos-row, .hm-logos-row-copy { display: inline-flex; align-items: center; gap: clamp(2rem, 5vw, 4rem); padding-inline-end: clamp(2rem, 5vw, 4rem); }
+.hm-logos-marquee .hm-marquee-sep { display: none; }
+@media (prefers-reduced-motion: reduce) { .hm-logos-cell:hover .hm-logo { transform: none; } }

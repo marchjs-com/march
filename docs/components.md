@@ -98,6 +98,34 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
 | Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress |
 
+### Landing — `hadi-march/landing`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Counter | experimental | Animated number: counts up when visible, glides to new values, or rolls each digit like an odometer; Intl formatted. | — |
+| CtaBand | experimental | Call-to-action panel: title, lead, actions over gradient, mesh, glass, plain or video; pointer light; scales in. | [SiteSection](#sitesection), Overlay, [Reveal](#reveal), [VideoBackground](#videobackground) |
+| Faq | experimental | Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking. | Accordion, SearchBox, [Reveal](#reveal) |
+| FeatureGrid | experimental | Product features as cards (pointer light), plain, a two-column list or a bento grid of mixed tile sizes; staggered entrance. | Grid, Card, IconTile, [Reveal](#reveal) |
+| Hero | experimental | First screen in seven looks (centered, split, video, mesh, aurora, product, parallax): eyebrow, gradient-highlight title, lead, actions. | [Reveal](#reveal), Overlay, Button, Badge, [VideoBackground](#videobackground), [Parallax](#parallax) |
+| HorizontalScroll | experimental | Pinned section whose panels slide sideways while the page scrolls down; progress line; native snap scroller on touch. | — |
+| LogoCloud | experimental | Trusted-by logos as an equal grid or an endless Marquee ticker; one muted tone, full colour on hover. | Marquee, Grid, [Reveal](#reveal) |
+| Newsletter | experimental | Email sign-up, inline or stacked: validation, busy button, success check that pops in, error shake and announcement. | TextInput, Button |
+| Parallax | experimental | Layered depth: every layer (image or node) moves at its own scroll speed and, optionally, with the mouse; transform only. | Overlay |
+| Presentation | experimental | Slides: keys, wheel, swipe, step-by-step fragments, slide / fade / zoom, full screen, URL index, speaker window (cross-tab), print. | IconButton |
+| Pricing | experimental | Plans with a monthly / yearly switch: prices roll like an odometer, the switch thumb slides, the featured plan glows. | Card, Badge, Segmented, [Counter](#counter), [Reveal](#reveal) |
+| ProjectDetail | experimental | One project: title, facts (KeyValue, service Chips), shared-element cover, story, Lightbox gallery, next project. | Button, KeyValue, [Chip](#chip), openMedia, [Reveal](#reveal) |
+| ProjectGrid | experimental | Portfolio covers with filter Chips: FLIP re-layout on filter, open into ProjectDetail (shared element) or the Lightbox. | Card, [Chip](#chip), openMedia, [Reveal](#reveal) |
+| Reveal | experimental | Scroll entrance for any block: fade, rise, slide (RTL mirrored), scale, blur, flip; stagger; scrub follows the scroll. | — |
+| Roadmap | experimental | Timeline whose line fills with the scroll: done / now / next statuses, passed dots light up; roadmaps, stories, work history. | Timeline, Badge, [Reveal](#reveal) |
+| ScrollProgress | experimental | Reading progress bar for the page or one article: fixed or inline, brand gradient or accent, RTL aware, a progressbar. | — |
+| ScrollStory | experimental | Scrollytelling: pinned media column, steps scroll past, the active step's media cross-fades and the section takes its colour. | — |
+| SiteFooter | experimental | Website footer: brand and about line, link columns, social links, optional Newsletter, legal row, back-to-top, big wordmark. | Brand, [Newsletter](#newsletter), IconButton |
+| SiteNav | experimental | Website top bar: sticky, transparent-to-glass or floating pill, shrinks and hides on scroll, sliding link pill, Drawer menu on phones. | Brand, IconButton, openDrawer |
+| SiteSection | experimental | Frame of every website block: width, rhythm, tone (plain, muted, inverse, brand) and an eyebrow / title / lead heading that reveals. | [Reveal](#reveal) |
+| StatsBand | experimental | Row of big numbers that count up (or roll) when visible, with labels and notes; plain, divided or cards. | [Counter](#counter), [Reveal](#reveal) |
+| Testimonials | experimental | Customer quotes as a grid, two drifting Marquee rows, a masonry wall with Show more, or a Carousel; Avatar and Rating. | Card, Avatar, Rating, Marquee, Carousel, Button, [Reveal](#reveal) |
+| VideoBackground | experimental | Muted looping video behind content: poster first (and on save-data / reduced motion), plays only while visible, readable tint, pause button. | Overlay, IconButton |
+
 ## ActivityBar
 
 The narrow icon bar at the edge of an editor that switches the side view (files, search, source control…). An indicator glides to the active view; choosing the active view again collapses the side view (`value` becomes `null`). Items can carry count badges, sit at the far end (settings, account) or be plain actions. Vertical or horizontal (a bottom bar on phones), and mirrored in RTL.
@@ -253,6 +281,31 @@ An odometer number for likes, comments and followers. When the value changes onl
 
 Full page: src/components/social/count-roll/docs.md
 
+## Counter
+
+An animated number. It counts up when it scrolls into view and glides to every new value; `mode="roll"` turns each digit like an odometer (only the digits that change move). Formatting follows the locale through `Intl.NumberFormat`: grouping, decimals, currency, percent, compact.
+
+```tsx
+<Counter value={12840} />
+<Counter value={$price} mode="roll" format={{ style: "currency", currency: "EUR" }} />
+<Counter value={0.98} format={{ style: "percent" }} />
+```
+
+Full page: src/components/landing/counter/docs.md
+
+## CtaBand
+
+The "ready to start?" band near the end of a page: a rounded panel with a title, a lead and actions over a themed background — `gradient` (brand colours), `mesh`, `glass`, `plain` or `video`. A light follows the pointer; the panel scales in when it scrolls into view.
+
+Composed of: [SiteSection](#sitesection), Overlay, [Reveal](#reveal), [VideoBackground](#videobackground)
+
+```tsx
+<CtaBand variant="gradient" title="Start today" lead="…"
+  actions={[{ label: "Try free", href: "/start", iconEnd: arrowRight }, { label: "Talk to sales" }]} note="14 days free" />
+```
+
+Full page: src/components/landing/cta-band/docs.md
+
 ## DataGrid
 
 A spreadsheet-like grid for large data. It runs on the table engine (`createTable`: sorting, filters, search, column layout, selection, inline edit, CSV) and the shared virtual window, which windows **rows and columns**: only the cells in view are in the DOM, so 100 000 rows × many columns scroll smoothly. On top it adds grouping with aggregates, a totals footer, pinned columns, drag to reorder and resize columns, and a keyboard cell cursor.
@@ -312,6 +365,36 @@ animate(card, frames, { duration: 600, easing: "acme-pop" })
 ```
 
 Full page: src/components/motion/easing-curve-editor/docs.md
+
+## Faq
+
+Frequently asked questions as an Accordion. `split` puts the heading and a contact line at the start (sticky) and the questions at the end; `search` adds a SearchBox that narrows the list with the shared fuzzy ranking (accent- and case-insensitive, typo tolerant) and announces how many questions match.
+
+Composed of: Accordion, SearchBox, [Reveal](#reveal)
+
+```tsx
+<Faq layout="split" search title="Questions" lead="…" contact={<Button variant="secondary">Write to us</Button>}
+  items={[{ q: "Is it free?", a: "Yes, MIT licensed." }, …]} />
+```
+
+Full page: src/components/landing/faq/docs.md
+
+## FeatureGrid
+
+What a product does, as a grid: `cards` (Cards with an IconTile; a soft light follows the pointer across the grid), `plain` (no boxes), `list` (icon beside the text, two columns) or `bento` (tiles of different sizes with optional media). Items enter one after another; tiles in a row share one height; on phones everything stacks.
+
+Composed of: Grid, Card, IconTile, [Reveal](#reveal)
+
+```tsx
+<FeatureGrid variant="bento" items={[
+  { icon: zap, title: "Fast", body: "…", span: "big", media: <Screenshot /> },
+  { icon: shieldCheck, title: "Secure", body: "…" },
+  { icon: globe, title: "Every language", body: "…", span: "wide" },
+]} />
+<FeatureGrid variant="cards" cols={3} items={features} />
+```
+
+Full page: src/components/landing/feature-grid/docs.md
 
 ## Feed
 
@@ -405,6 +488,33 @@ Composed of: [ColorPicker](#colorpicker), Segmented, IconButton
 
 Full page: src/components/composite/gradient-editor/docs.md
 
+## Hero
+
+The first screen of a website in seven looks that share one structure: an eyebrow pill, a large title whose `highlight` gets the brand gradient, a lead, actions and a note. The stage changes by variant: `centered` (soft grid and spotlight), `split` (media at the end), `video` (VideoBackground), `mesh` (gradient mesh, spotlight, grain), `aurora` (drifting colour), `product` (a product frame that tilts in 3D and flattens as you scroll) and `parallax` (layered depth).
+
+Composed of: [Reveal](#reveal), Overlay, Button, Badge, [VideoBackground](#videobackground), [Parallax](#parallax)
+
+```tsx
+<Hero variant="mesh" eyebrow="New: 2.0" title="The fastest way to build a website" highlight="fastest"
+  lead="…" note="No card needed" actions={[{ label: "Start free", href: "/start", iconEnd: arrowRight }, { label: "Watch demo" }]} />
+<Hero variant="product" media={{ src: "/screen.png", alt: "Dashboard", width: 1600, height: 1000 }} … />
+<Hero variant="video" video={{ src: "/clip.webm", poster: "/clip.jpg" }} … />
+```
+
+Full page: src/components/landing/hero/docs.md
+
+## HorizontalScroll
+
+A pinned section whose panels move sideways while the page scrolls down: the vertical distance equals the track's overflow, so the last panel arrives as the section ends. A progress line follows. RTL moves the other way. On touch screens and with reduced motion it is a native horizontal scroller with snap points.
+
+```tsx
+<HorizontalScroll label="Case studies" panel="26rem">
+  {cases.map((c) => <Card>…</Card>)}
+</HorizontalScroll>
+```
+
+Full page: src/components/landing/horizontal-scroll/docs.md
+
 ## ImageCropper
 
 Crop an image the way phones do: the frame stays centered, the picture moves under it. Drag the image to move it, zoom with the wheel, the slider or + −, turn it by 90° with the buttons (or R) and by fine angles with the angle slider (or [ ]), mirror it (F), resize the frame from its corners or pick an aspect ratio. At any angle the image always covers the frame, so the result never has empty corners. The result is drawn on a canvas (`api.toCanvas()`, `api.toBlob()`); a small live preview shows it with its size in pixels.
@@ -455,6 +565,21 @@ Composed of: [CountRoll](#countroll)
 ```
 
 Full page: src/components/social/like-button/docs.md
+
+## LogoCloud
+
+"Trusted by" logos. `grid` lines them up in equal cells that light up on hover; `marquee` runs them as an endless ticker (Marquee: edges fade, it stops off screen, reduced motion keeps it still). Logos share one muted tone by default and show their colour on hover.
+
+Composed of: Marquee, Grid, [Reveal](#reveal)
+
+```tsx
+<LogoCloud title="Trusted by teams at" variant="marquee" logos={[
+  { name: "Acme", src: "/logos/acme.svg", width: 120, height: 32 },
+  { name: "Northwind", node: <NorthwindLogo /> },
+]} />
+```
+
+Full page: src/components/landing/logo-cloud/docs.md
 
 ## MadeWithMarch
 
@@ -509,6 +634,19 @@ Composed of: OverflowText, Link
 
 Full page: src/components/composite/nav-sidebar/docs.md
 
+## Newsletter
+
+An email sign-up, inline (field and button on one line) or stacked. While sending, the button shows its spinner; on success the form folds away and a check with the thank-you line pops in; on an error the field shakes and the message is announced.
+
+Composed of: TextInput, Button
+
+```tsx
+<Newsletter title="Stay in the loop" lead="One email a month."
+  onSubmit={(email) => api.subscribe(email)} note="Unsubscribe any time." />
+```
+
+Full page: src/components/landing/newsletter/docs.md
+
 ## OverflowToolbar
 
 A toolbar that never wraps or squeezes: items that do not fit move to a **More** menu, lowest `priority` first, and come back (with a short slide-in) when there is room again. An item is a plain action or a **command id**: the Command manager then supplies its label, icon, shortcut, availability and busy state, so the palette, menus and this toolbar always agree.
@@ -527,6 +665,24 @@ Composed of: Menu, Tooltip
 
 Full page: src/components/actions/overflow-toolbar/docs.md
 
+## Parallax
+
+Layered depth. Each layer (an image or any node, placed with Overlay) moves at its own speed while the section scrolls past and, with `pointer`, shifts with the mouse by its depth, smoothed on the motion engine clock. Transform only; layers get room to travel so no edge shows.
+
+Composed of: Overlay
+
+```tsx
+<Parallax pointer={1} layers={[
+  { src: "/sky.jpg", speed: 0.5 },
+  { src: "/hills.png", speed: 0.25 },
+  { content: <Shapes />, speed: -0.15 },
+]}>
+  <h2>Depth</h2>
+</Parallax>
+```
+
+Full page: src/components/landing/parallax/docs.md
+
 ## PostCard
 
 One post of a social feed. The header shows the author (Avatar, name with a verified mark), the relative time and the place, with an optional ⋯ Menu. Photos sit in a MediaGrid; a double tap on them likes the post with a large heart that pops over the photo and bursts in the four HADİ colors. The action row has a LikeButton and rolling counts for comments and shares; the caption folds to three lines with a "more" button.
@@ -539,6 +695,39 @@ Composed of: Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [
 
 Full page: src/components/composite/post-card/docs.md
 
+## Presentation
+
+Slides in the browser. `<Presentation>` holds `<Slide>`s; `<Appear>` reveals its children one per step. Arrow keys, Page Up / Down, Space, Home / End, the wheel (full screen), swipes and the buttons move through it; `F` goes full screen and `P` opens the speaker window. Slides change with a slide, fade or zoom transition (mirrored in RTL). The slide number can live in the URL. The speaker view shows the current and next slide, the notes and a timer, and every window of the same deck stays in step. Printing (or saving as PDF) puts each slide on its own page with all steps visible.
+
+Composed of: IconButton
+
+```tsx
+let $slide = Number(queryParam("slide")() ?? 0)
+<Presentation bind:index={$slide} transition="slide" presenterUrl="#/talk?presenter=1">
+  <Slide layout="title" tone="brand" notes="Welcome everyone">…</Slide>
+  <Slide notes="Three points, one by one"><h2>Why?</h2><Appear><li>Fast</li><li>Accessible</li><li>Beautiful</li></Appear></Slide>
+</Presentation>
+```
+
+Full page: src/components/landing/presentation/docs.md
+
+## Pricing
+
+Plans side by side with a monthly / yearly switch. Switching morphs every price: the digits roll to the new amount (Counter, odometer mode), the "billed" line cross-fades and the switch thumb slides. The featured plan is lifted with a brand-gradient border. Cards share one height; on phones they stack with the featured plan first.
+
+Composed of: Card, Badge, Segmented, [Counter](#counter), [Reveal](#reveal)
+
+```tsx
+let $period = "monthly"
+<Pricing bind:period={$period} saving="2 months free" currency="EUR" plans={[
+  { name: "Starter", price: 0, features: ["1 project", "Community support"], cta: { label: "Start free" } },
+  { name: "Pro", price: { monthly: 29, yearly: 24 }, featured: true, badge: "Most popular", features: […], cta: { label: "Go Pro" } },
+  { name: "Enterprise", price: null, features: […], cta: { label: "Talk to sales" } },
+]} />
+```
+
+Full page: src/components/landing/pricing/docs.md
+
 ## ProfileHeader
 
 The top of a profile. A cover (a photo, or a soft art of the four HADİ colors) with a bottom dim; the avatar in a StoryRing that overlaps it and opens the stories; the name with a verified mark, the handle and the bio; stats as buttons with rolling counts; a FollowButton, a Message button and a ⋯ Menu. Following adds you to the followers, so the count rolls together with the button's morph. On your own profile an Edit button replaces follow and message.
@@ -550,6 +739,34 @@ Composed of: [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll]
 ```
 
 Full page: src/components/composite/profile-header/docs.md
+
+## ProjectDetail
+
+The page of one project: a back button, a big title, the facts (role, client, year, services as chips), the cover — marked as the shared element, so a ProjectGrid card can grow into it — the story, a gallery that opens in the Lightbox and the next project.
+
+Composed of: Button, KeyValue, [Chip](#chip), openMedia, [Reveal](#reveal)
+
+```tsx
+let $open: Project | null = null
+const open = (p, cover) => sharedTransition(`project-${p.id}`, cover, () => { $open = p })
+<If when={$open}>{(p) => <ProjectDetail project={p} onBack={() => $open = null} next={{ project: nextOf(p), onOpen: open }} />}
+<Else><ProjectGrid projects={work} onOpen={open} /></Else></If>
+```
+
+Full page: src/components/landing/project-detail/docs.md
+
+## ProjectGrid
+
+Portfolio work as cover cards with filter chips. Choosing a filter fades out what no longer matches and glides the rest into their new places (FLIP); new matches scale in. Opening a card hands its cover to `onOpen` — for a shared element transition into ProjectDetail — or, without it, shows the cover in the Lightbox.
+
+Composed of: Card, [Chip](#chip), openMedia, [Reveal](#reveal)
+
+```tsx
+<ProjectGrid projects={work} onOpen={(p, cover) => sharedTransition(`project-${p.id}`, cover, () => { $open = p })} />
+<ProjectGrid projects={work} />
+```
+
+Full page: src/components/landing/project-grid/docs.md
 
 ## PropertyGrid
 
@@ -589,6 +806,20 @@ A row of emoji to react with, or a grid that serves as an emoji panel. It pops i
 
 Full page: src/components/social/reaction-picker/docs.md
 
+## Reveal
+
+Children enter when the block scrolls into view: fade, rise, fall, slide from the start or the end (mirrored in RTL), scale, blur or a 3D flip, one after another. `scrub` ties the effect to the scroll position. The motion engine plays it (transform, opacity, filter); with reduced motion the content is simply there.
+
+```tsx
+<Reveal effect="up" stagger={80}>
+  <Card>…</Card><Card>…</Card><Card>…</Card>
+</Reveal>
+<ul use:revealOnScroll={{ effect: "start" }}>…</ul>
+<Reveal effect="blur" scrub>…</Reveal>
+```
+
+Full page: src/components/landing/reveal/docs.md
+
 ## RichTextEditor
 
 A rich text field whose value is **Markdown**. Write with the toolbar, keyboard shortcuts or Markdown shortcuts (`# `, `## `, `- `, `1. `, `> `, ```` ``` ````); mention people with `@`, insert emoji with `:`; pasted HTML from any site or office suite is cleaned through the safe content core (allowlist, no HTML parser — Trusted Types safe). Undo / redo use an UndoManager history of the editor's own (typing merges into one step).
@@ -602,6 +833,22 @@ Composed of: Toolbar, IconButton, Avatar
 ```
 
 Full page: src/components/composite/rich-text-editor/docs.md
+
+## Roadmap
+
+A Timeline whose line fills as you scroll: a product roadmap, a company story or a work history. Every entry has a status (`done`, `now`, `next`); the dot of each entry the fill has passed lights up and the current one glows. The fill is a transform written in the scroll scene's write phase.
+
+Composed of: Timeline, Badge, [Reveal](#reveal)
+
+```tsx
+<Roadmap items={[
+  { time: "2025 Q1", title: "First release", body: "…", status: "done" },
+  { time: "2026 Q3", title: "Teams", body: "…", status: "now" },
+  { time: "2027", title: "Plugins", body: "…", status: "next" },
+]} />
+```
+
+Full page: src/components/landing/roadmap/docs.md
 
 ## Scheduler
 
@@ -619,6 +866,89 @@ import { Scheduler } from "hadi-march/components/data/scheduler";
 ```
 
 Full page: src/components/data/scheduler/docs.md
+
+## ScrollProgress
+
+A thin bar that fills as the page (or one article) is read. Fixed to the top or inline; brand gradient or the accent. The fill is a transform written in the scroll scene's write phase; in RTL it fills from the right.
+
+```tsx
+<ScrollProgress />
+<ScrollProgress target={() => article} position="inline" paint="accent" />
+```
+
+Full page: src/components/landing/scroll-progress/docs.md
+
+## ScrollStory
+
+Scrollytelling. The media column stays pinned while the text steps scroll past; the step nearest the middle of the viewport is active — its picture cross-fades in, the dots follow, and with `theme` the section takes that step's colour. On phones the pinned media sits at the top and the steps flow under it.
+
+```tsx
+<ScrollStory steps={[
+  { title: "Design", body: "…", media: <Mock />, color: "brand-orange" },
+  { title: "Build", body: "…", media: <Chart />, color: "brand-blue" },
+]} />
+```
+
+Full page: src/components/landing/scroll-story/docs.md
+
+## SiteFooter
+
+The end of a website: brand and a short line about the product, link columns, social links, an optional Newsletter and a bottom row (copyright, legal links, back to top). Columns fold to two per row on tablets and stack on phones; an optional big wordmark fills the last line.
+
+Composed of: Brand, [Newsletter](#newsletter), IconButton
+
+```tsx
+<SiteFooter brand={{ name: "Acme", mark: logo }} about="…" wordmark="Acme"
+  columns={[{ title: "Product", links: [{ label: "Pricing", href: "/pricing" }] }]}
+  social={[{ label: "Blog", href: "/blog", icon: globe }]}
+  newsletter={{ title: "Newsletter", onSubmit: (e) => api.subscribe(e) }}
+  legal={[{ label: "Privacy", href: "/privacy" }]} />
+```
+
+Full page: src/components/landing/site-footer/docs.md
+
+## SiteNav
+
+The top bar of a website. Sticky; `transparent` starts see-through over a hero and turns to glass after a few pixels of scroll; `floating` is a centred glass pill; `shrink` lowers it once scrolled; `hide` slides it away while scrolling down and back when scrolling up. A pill slides under the hovered link (mirrored in RTL) and rests on the current one. Below 860 px the links move into a Drawer.
+
+Composed of: Brand, IconButton, openDrawer
+
+```tsx
+<SiteNav mode="transparent" brand={{ name: "Acme", mark: logo, href: "/" }}
+  links={[{ label: "Features", href: "#features" }, { label: "Pricing", href: "#pricing", active: () => $section === "pricing" }]}
+  actions={<><Button variant="ghost">Sign in</Button><Button>Start</Button></>} />
+```
+
+Full page: src/components/landing/site-nav/docs.md
+
+## SiteSection
+
+The frame of every website block: content width, vertical rhythm, a tone (plain, muted, inverse, brand) and an optional heading group (eyebrow, title, lead) that enters with Reveal. Pages are a stack of sections.
+
+Composed of: [Reveal](#reveal)
+
+```tsx
+<SiteSection eyebrow="Features" title="Everything you need" lead="…" tone="muted">
+  <FeatureGrid items={features} />
+</SiteSection>
+```
+
+Full page: src/components/landing/site-section/docs.md
+
+## StatsBand
+
+A row of big numbers that count up when the band scrolls into view (Counter), each with a label and an optional note. Plain, divided by lines, or as cards.
+
+Composed of: [Counter](#counter), [Reveal](#reveal)
+
+```tsx
+<StatsBand items={[
+  { value: 12000, label: "teams", format: { notation: "compact" }, suffix: "+" },
+  { value: 99.98, decimals: 2, suffix: "%", label: "uptime" },
+]} />
+```
+
+Full page: src/components/landing/stats-band/docs.md
 
 ## StatusBar
 
@@ -684,6 +1014,21 @@ Composed of: Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#like
 
 Full page: src/components/composite/story-viewer/docs.md
 
+## Testimonials
+
+What customers say, in four layouts: `grid` (quote cards in equal rows), `marquee` (two endless rows drifting at different speeds), `wall` (a masonry wall that fades out, with "Show more") and `slider` (a Carousel). Every card has the quote, an optional star rating, an Avatar, the name and the role.
+
+Composed of: Card, Avatar, Rating, Marquee, Carousel, Button, [Reveal](#reveal)
+
+```tsx
+<Testimonials variant="wall" items={[
+  { quote: "Our new site was live in a week.", name: "Dana Ray", role: "Head of product, Acme", rating: 5 },
+  …
+]} />
+```
+
+Full page: src/components/landing/testimonials/docs.md
+
 ## ThemeMenu
 
 One top-bar menu for the whole look: light / dark / system, the color theme (each drawn by a live swatch of itself) and the accent color. Its sections are the same ones `ThemePicker` and `AccentPicker` show on their own, so an app can use one menu or the separate pickers and they always match. Choices are remembered.
@@ -736,6 +1081,20 @@ Three dots that lift in turn on the motion engine (a staggered loop; still with 
 ```
 
 Full page: src/components/social/typing-indicator/docs.md
+
+## VideoBackground
+
+A muted, looping video behind content (a hero, a CTA band, a slide). Built on Overlay: the poster shows first and stays on save-data, 2G and reduced motion; the video plays only while it is visible and is released when it leaves the page. A tint keeps text readable and a small button pauses the motion.
+
+Composed of: Overlay, IconButton
+
+```tsx
+<VideoBackground src="/media/clip.webm" poster="/media/clip.jpg" tint="dark">
+  <h1>…</h1>
+</VideoBackground>
+```
+
+Full page: src/components/landing/video-background/docs.md
 
 ## VirtualList
 

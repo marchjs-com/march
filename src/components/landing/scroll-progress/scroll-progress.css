@@ -1,0 +1,8 @@
+/* ScrollProgress. One transformed fill; logical origin (RTL fills from the inline start too). */
+.hm-sprog { --hm-sprog-h: 3px; height: var(--hm-sprog-h); overflow: hidden; pointer-events: none; }
+.hm-sprog-fixed { position: fixed; inset-inline: 0; inset-block-start: var(--hm-site-nav-top, 0); z-index: calc(var(--hm-z-sticky) + 1); }
+.hm-sprog-inline { position: relative; border-radius: var(--hm-radius-full); background: var(--hm-surface-2); }
+.hm-sprog-fill { display: block; height: 100%; transform: scaleX(0); transform-origin: 0 50%; will-change: transform; }
+:dir(rtl) .hm-sprog-fill { transform-origin: 100% 50%; }
+.hm-sprog-gradient .hm-sprog-fill { background: var(--hm-brand-gradient); }
+.hm-sprog-accent .hm-sprog-fill { background: var(--hm-accent, var(--hm-primary)); }
