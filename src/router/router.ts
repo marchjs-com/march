@@ -32,7 +32,9 @@ export type GuardResult = boolean | string | void | undefined;
 export type Guard = (to: RouteTarget) => GuardResult | Promise<GuardResult>;
 export interface RouteDef { path: string; component?: Component; load?: Loader; layouts?: Loader[]; meta?: Record<string, unknown>; title?: string; preload?: boolean;
   /** Head tags of this route (hadi-march/seo: title, description, og, jsonLd…); a page module's `head` export wins. */ head?: unknown;
-  /** Shown at once (after 100 ms) while this page loads; else the Router's `skeleton`, else its `loading`. */ skeleton?: unknown }
+  /** Shown at once (after 100 ms) while this page loads; else the Router's `skeleton`, else its `loading`. */ skeleton?: unknown;
+  /** Keep the page when only its params change (/api/core/batch → /api/core/computed): it reads them with params()
+   *  and keeps its own state (search text, scroll, open panels). Default: a new page per params. */ keep?: boolean }
 export type RouteTable = Record<string, Loader | Omit<RouteDef, "path">>;
 export interface CompiledRoute extends RouteDef { pattern: string; keys: string[]; re: RegExp; score: number }
 export interface Match { route: CompiledRoute; params: Record<string, string>; path: string; meta: Record<string, unknown> }
@@ -109,7 +111,7 @@ const slot = (name: string): Sig<Slot | null> => { let x = S.slots.get(name); if
 const ids = new WeakMap<object, string>();
 let nextId = 0;
 const idOf = (o: object): string => { let v = ids.get(o); if (!v) ids.set(o, (v = String(++nextId))); return v; };
-const pageKey = (route: CompiledRoute, prm: Record<string, string>): string => `page:${route.pattern}:${JSON.stringify(prm)}`;
+const pageKey = (route: CompiledRoute, prm: Record<string, string>): string => (route.keep ? `page:${route.pattern}` : `page:${route.pattern}:${JSON.stringify(prm)}`);
 const NO_ROUTER = "March: call createRouter() first";
 const leaveGuards = new Set<() => boolean | Promise<boolean>>();
 

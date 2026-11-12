@@ -117,3 +117,12 @@ test("Link: a plain getter href (Button href=…) is called, not turned into tex
   assert.equal(a.R.path(), "/motion");
   a.done();
 });
+
+test("route keep: the page stays while only its params change (pageKey without params)", async () => {
+  const R = await import("../src/router/index.ts");
+  const { _router } = await import("../src/router/router.ts");
+  const kept = { pattern: "/api/*", keep: true }, fresh = { pattern: "/users/:id" };
+  assert.equal(_router.pageKey(kept, { rest: "core/batch" }), _router.pageKey(kept, { rest: "core/computed" }));
+  assert.notEqual(_router.pageKey(fresh, { id: "1" }), _router.pageKey(fresh, { id: "2" }));
+  assert.ok(R);
+});
