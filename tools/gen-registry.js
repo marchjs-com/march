@@ -74,7 +74,9 @@ export async function generate(root = ROOT) {
   // component card keeps its direct import.
   const GROUP = 4;
   const pages = new Map();
-  for (const c of list) if (c.meta?.showcase) pages.set(c.meta.showcase, [...(pages.get(c.meta.showcase) ?? []), c]);
+  // a large component (barrel: false) keeps its own demo module: its code alone is over the chunk floor, and grouping
+  // it would make every card of the page download it
+  for (const c of list) if (c.meta?.showcase && c.meta?.barrel !== false) pages.set(c.meta.showcase, [...(pages.get(c.meta.showcase) ?? []), c]);
   const groupOf = new Map();
   for (const [page, all] of pages) {
     if (all.length < 2) continue;

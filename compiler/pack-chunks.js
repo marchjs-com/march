@@ -104,6 +104,17 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && (outs[k].bytes ?? 0) < minSize)
       .sort((a, b) => (outs[a].bytes ?? 0) - (outs[b].bytes ?? 0));
     let done = false;
+    // start-up pieces (budget.boot) and what they reach: a fold into one of them adds T to start-up for everyone
+    const bootEntries = g.js.filter((e) => outs[e].entryPoint && budgetOf?.(e)?.boot);
+    const bootReach = new Set(bootEntries.flatMap((e) => [...g.closure(e)]));
+    const entryReach = g.closure(entryKey);
+    const bootFits = (b, t) => {
+      const lim = budgetOf?.bootLimit;
+      if (lim == null || !bootReach.has(b) || bootReach.has(t)) return true;
+      let n = 0;
+      for (const x of new Set([...bootReach, ...g.closure(t)])) if (!entryReach.has(x)) n += gz(x);
+      return n <= lim;
+    };
     for (const t of small) {
       const rt = g.reach.get(t), deps = [...g.closure(t)].filter((d) => d !== t), users = g.importers.get(t) ?? [];
       let best = null, cost = Infinity;
@@ -112,6 +123,8 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
         const rb = g.reach.get(b), cb = g.closure(b);
         if (cb.has(t) && !users.includes(b)) continue; // B reaches T through another module: that one would cycle
         if (![...rt].every((e) => rb.has(e)) || !deps.every((d) => cb.has(d)) || users.some((u) => u !== b && cb.has(u))) continue;
+        // free for the pages, not for start-up: a host that start-up loads must keep start-up within its budget
+        if (!bootFits(b, t)) continue;
         const c = (rb.size - rt.size) * 1e6 + (outs[b].bytes ?? 0);
         if (c < cost) { cost = c; best = b; }
       }
@@ -122,20 +135,11 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
         // what start-up already downloaded (the entry, the boot pieces) is not part of a route's or part's cost
         const have = new Set([...g.closure(entryKey), ...g.js.filter((e) => outs[e].entryPoint && budgetOf?.(e)?.boot).flatMap((e) => [...g.closure(e)])]);
         // after T and B become one file, everyone loading either loads both closures: none may go past its budget
-        const bootEntries = g.js.filter((e) => outs[e].entryPoint && budgetOf?.(e)?.boot);
         const fits = (b) => {
           if (!budgetOf) return true;
           const both = new Set([...g.closure(b), ...g.closure(t)]);
           // into a start-up piece: start-up as a whole (beyond the entry) stays within its own budget
-          if (bootEntries.some((e) => g.closure(e).has(b))) {
-            const lim = budgetOf.bootLimit;
-            if (lim != null) {
-              let n = 0;
-              const entry = g.closure(entryKey);
-              for (const x of new Set([...bootEntries.flatMap((e) => [...g.closure(e)]), ...both])) if (!entry.has(x)) n += gz(x);
-              if (n > lim) return false;
-            }
-          }
+          if (!bootFits(b, t)) return false;
           for (const e of new Set([...rt, ...g.reach.get(b)])) {
             const lim = budgetOf(e)?.limit;
             if (lim == null) continue;
