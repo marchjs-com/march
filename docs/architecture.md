@@ -1,4 +1,4 @@
-# HADI March architecture
+# March architecture
 
 ## Router: the outlet tree
 

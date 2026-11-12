@@ -1,4 +1,4 @@
-/* HADI March — OverflowText / Marquee. The track moves with WAAPI (transform only); edges fade with a logical mask. */
+/* March — OverflowText / Marquee. The track moves with WAAPI (transform only); edges fade with a logical mask. */
 .hm-marquee { display: block; min-width: 0; max-width: 100%; overflow: hidden; white-space: nowrap; }
 .hm-marquee-track { display: flex; max-width: 100%; }
 .hm-marquee-item { flex: 0 1 auto; min-width: 0; overflow: hidden; }

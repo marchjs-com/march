@@ -1,4 +1,4 @@
-// march icons — open-source icon sets as HADI March icon packs (no npm dependency: the SVGs are converted once).
+// march icons — open-source icon sets as March icon packs (no npm dependency: the SVGs are converted once).
 //
 //   march icons list                                  the known packs, their source package and license
 //   march icons add lucide tabler … | all [--out src/icons/packs] [--src <download dir>] [--from <unpacked package dir>]
@@ -181,12 +181,12 @@ function readPack(packsDir, id) {
   return { info, P: { vb: "0 0 24 24", ...P }, icons };
 }
 
-/** The HADI March set from its catalog (src/icons/catalog.ts), when the packs live inside the March repo. */
+/** The March set from its catalog (src/icons/catalog.ts), when the packs live inside the March repo. */
 function readMarch(packsDir) {
   const f = join(packsDir, "..", "catalog.ts");
   if (!existsSync(f)) return null;
   const icons = [...readFileSync(f, "utf8").matchAll(/^ {2}(\w+): \{ name: ("[^"]*"), d: (\[.*\])(, fill: true)? \},$/gm)].map((m) => [JSON.parse(m[2]), m[1], JSON.parse(m[3]), ...(m[4] ? [2] : [])]);
-  return { info: { id: "march", name: "HADI March", license: "MIT", home: "https://github.com/tlghn/hadimarch", count: icons.length, viewBox: "0 0 24 24", mode: "stroke" }, P: { vb: "0 0 24 24" }, icons };
+  return { info: { id: "march", name: "March", license: "MIT", home: "https://github.com/tlghn/hadimarch", count: icons.length, viewBox: "0 0 24 24", mode: "stroke" }, P: { vb: "0 0 24 24" }, icons };
 }
 
 /**

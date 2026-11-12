@@ -5,7 +5,7 @@ export default defineMeta({
   status: "stable",
   since: "0.1.0",
   category: "actions",
-  summary: "Optional credit line \"Developed with HADI March and 💗\": text, badge or small; the link is one constant (MARCH_URL).",
+  summary: "Optional credit line \"Developed with March and 💗\": text, badge or small; the link is one constant (MARCH_URL).",
   composedOf: [],
   behaviors: [],
   showcase: "/buttons",

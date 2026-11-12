@@ -1,4 +1,4 @@
-/* HADI March — Feed. The PullToRefresh is the scroll area; give .hm-feed a height (or put it in a flex column). */
+/* March — Feed. The PullToRefresh is the scroll area; give .hm-feed a height (or put it in a flex column). */
 .hm-feed { position: relative; display: flex; flex-direction: column; min-height: 0; height: 100%; background: var(--hm-bg); }
 .hm-feed-scroll { flex: 1; min-height: 0; padding: var(--hm-space-3); scroll-padding-block-start: var(--hm-space-3); }
 .hm-feed-flat .hm-feed-scroll { padding-inline: 0; padding-block-start: 0; }

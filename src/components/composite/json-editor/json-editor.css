@@ -1,4 +1,4 @@
-/* HADI March — JsonEditor (the text view's own rules are in forms/editors.css). */
+/* March — JsonEditor (the text view's own rules are in forms/editors.css). */
 .hm-json-modes { display: inline-flex; align-self: flex-end; gap: 2px; padding: 2px; border-radius: var(--hm-radius-full); background: var(--hm-surface-3); }
 .hm-json-mode { min-height: 1.75rem; padding: 0 .85rem; border: 0; border-radius: var(--hm-radius-full); background: transparent; color: var(--hm-text-2);
   font: inherit; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-medium); cursor: pointer;

@@ -1,4 +1,4 @@
-/* HADI March — Wizard (composite). Imported by its component module; the stage list and the bar bring their own CSS (Steps, Progress). */
+/* March — Wizard (composite). Imported by its component module; the stage list and the bar bring their own CSS (Steps, Progress). */
 .hm-wizard-progress { flex-basis: auto; }
 .hm-wizard-title { margin: 0 0 var(--hm-space-2); font-size: var(--hm-text-lg); }
 .hm-wizard-title:focus { outline: none; }

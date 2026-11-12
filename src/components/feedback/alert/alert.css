@@ -1,4 +1,4 @@
-/* HADI March — Alert. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Alert. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-alert { display: flex; align-items: flex-start; gap: var(--hm-space-3); padding: .75rem var(--hm-space-4); border-radius: var(--hm-radius-3); border: 1px solid transparent;
   font-size: var(--hm-text-md); line-height: 1.55; color: var(--hm-text-2); }
 .hm-alert-icon { display: inline-flex; margin-top: .1875rem; }

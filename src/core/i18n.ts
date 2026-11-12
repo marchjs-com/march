@@ -1,4 +1,4 @@
-// HADI March i18n: a locale signal, t`` / t(key, vars) with ICU-style plural, select and number/date arguments,
+// March i18n: a locale signal, t`` / t(key, vars) with ICU-style plural, select and number/date arguments,
 // lazy locale packs, RTL direction, <html lang dir> kept in sync, typed message catalogs.
 //   t`Hello ${name}`                                   key "Hello {0}"
 //   t("cart.items", { n: 3 })                          "{n, plural, =0 {Empty} one {# item} other {# items}}"

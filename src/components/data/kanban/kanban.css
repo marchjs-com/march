@@ -1,4 +1,4 @@
-/* HADI March — Kanban. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Kanban. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- kanban */
 .hm-kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(15rem, 1fr); gap: var(--hm-space-3); overflow-x: auto; padding-bottom: var(--hm-space-2); }
 .hm-kanban-col { display: flex; flex-direction: column; gap: var(--hm-space-2); min-height: 12rem; padding: var(--hm-space-3); border-radius: var(--hm-radius-3); background: var(--hm-bg-subtle);

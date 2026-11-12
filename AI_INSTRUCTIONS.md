@@ -1,4 +1,4 @@
-# HADI March — instructions for AI assistants
+# March — instructions for AI assistants
 
 Read this before writing code with March. It is the contract; when in doubt, prefer the patterns here.
 
@@ -151,7 +151,7 @@ Overlays never take input; put content after them. `front` only for foreground e
 - Import named exports (`import { Card } from "hadi-march/ui"`), never `import * as` from a March module. Use
   `hadi-march/icons/catalog` for icon galleries.
 - Leave `<Link>` prefetch on (default hover). Do not prefetch everything by hand.
-- Credit is optional and never required (the licence stays MIT): `<MadeWithMarch />` (`variant` text / badge / small, link constant `MARCH_URL`) or `credit: true` in `march.config.js` (adds `<!-- Built with HADI March -->` to the built `index.html` and prints the one-line console banner in production too, from a separate tiny `credit.js`; off by default). `march dev` prints the banner once per page; `banner: false` turns it off. Production never prints it otherwise and the app bundle never contains it (size effect 0). The link comes from one constant, `MARCH_URL` in `src/brand.js`. Add it to a footer when the user wants it; never add it unasked.
+- Credit is optional and never required (the licence stays MIT): `<MadeWithMarch />` (`variant` text / badge / small, link constant `MARCH_URL`) or `credit: true` in `march.config.js` (adds `<!-- Built with March -->` to the built `index.html` and prints the one-line console banner in production too, from a separate tiny `credit.js`; off by default). `march dev` prints the banner once per page; `banner: false` turns it off. Production never prints it otherwise and the app bundle never contains it (size effect 0). The link comes from one constant, `MARCH_URL` in `src/brand.js`. Add it to a footer when the user wants it; never add it unasked.
 - Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, parts: { "src/x.ts": { limit, why } }, fail: true }`); `parts` gives one lazy part (by its import source) its own limit with a written reason, e.g. a third-party library loaded on demand. Turn on `sw: true` when offline use matters.
 - `chunks: { minSize: 10240, allow: { "chunks/x.js": "reason" } }` (default 10 KB before gzip): no JS/CSS file under it. Small shared code
   folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
@@ -610,7 +610,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | CopyButton | stable | Copies text to the clipboard: a text or icon-only button that confirms (Copied) for a moment and reports failure with a toast. | — |
 | IconButton | stable | Icon-only button: the label is required and becomes its accessible name and title; sizes and a danger tone. | — |
-| MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
+| MadeWithMarch | stable | Optional credit line "Developed with March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 | Menu | stable | Trigger button with a floating menu of items, links and action()s (separators, shortcuts, danger, permissions) and the full menu keyboard model; Dropdown floats any content. | — |
 | OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Menu, Tooltip |
 

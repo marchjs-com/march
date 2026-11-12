@@ -1,6 +1,6 @@
 # MadeWithMarch
 
-An optional credit line: "Developed with HADI March and 💗", with "HADI March" as a link. Using it is a request, not a
+An optional credit line: "Developed with March and 💗", with "March" as a link. Using it is a request, not a
 requirement: the licence stays MIT and nothing here is needed to use March.
 
 ```tsx
@@ -23,10 +23,10 @@ The address is the constant `MARCH_URL` in `src/brand.js` (one place, shared wit
 
 ## Accessibility and i18n
 
-The sentence is one message (`Developed with {0} and {1}`), so word order follows the language (Turkish: "HADI March ve
+The sentence is one message (`Developed with {0} and {1}`), so word order follows the language (Turkish: "March ve
 💗 ile geliştirildi"). The heart is `role="img"` with an `aria-label`. Colours are theme tokens and spacing uses logical
 properties, so dark themes and RTL need nothing extra. The link opens in a new tab with `rel="noopener"`.
 
 ## Without a component
 
-`march.config.js` has `credit: true`: the built `index.html` then carries `<!-- Built with HADI March -->`. Off by default. It also prints the console banner in production (a separate tiny `credit.js`); in `march dev` the banner is on unless `banner: false`.
+`march.config.js` has `credit: true`: the built `index.html` then carries `<!-- Built with March -->`. Off by default. It also prints the console banner in production (a separate tiny `credit.js`); in `march dev` the banner is on unless `banner: false`.

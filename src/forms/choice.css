@@ -4,7 +4,7 @@
 .hm-check-input:disabled + .hm-check-label { color: var(--hm-muted); }
 .hm-choices { display: flex; flex-direction: column; gap: var(--hm-space-2); }
 .hm-choices-inline { flex-direction: row; flex-wrap: wrap; gap: var(--hm-space-2) var(--hm-space-4); }
-/* HADI March — selection controls (Checkbox, CheckboxGroup, RadioGroup): a drawn box over a visually hidden input.
+/* March — selection controls (Checkbox, CheckboxGroup, RadioGroup): a drawn box over a visually hidden input.
    Colors: --hm-accent (data-hm-color) with the theme primary as fallback. Motion: transform / stroke only.
    Every option has a visible effect in every variant: size → box / padding / type size, shape → corners. */
 .hm-choice { --hm-ch-c: var(--hm-accent, var(--hm-primary)); --hm-ch-on: var(--hm-on-accent, var(--hm-on-primary-fill)); --hm-ch-soft: var(--hm-accent-soft, var(--hm-primary-soft));

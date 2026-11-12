@@ -1,4 +1,4 @@
-/* HADI March — lazy() slots: the place is reserved, a themed skeleton appears only after 100 ms, a progress line after
+/* March — lazy() slots: the place is reserved, a themed skeleton appears only after 100 ms, a progress line after
    300 ms, the content fades in and its children stagger in. transform / opacity only. */
 /* a slot without a reserved size adds no box (the component sits in its parent's layout as if it were not wrapped) */
 .hm-lazy-slot { display: contents; }

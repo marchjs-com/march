@@ -1,4 +1,4 @@
-/* HADI March — Menu and Dropdown (and the .hm-pop panel of every floating() popover). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Menu and Dropdown (and the .hm-pop panel of every floating() popover). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- popovers, menus, tooltips */
 .hm-pop { position: fixed; z-index: var(--hm-z-dropdown); background: var(--hm-surface-raised); color: var(--hm-text); border: 1px solid var(--hm-border);
   border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-3); animation: hm-scale-in var(--hm-dur) var(--hm-ease-out); transform-origin: top; }

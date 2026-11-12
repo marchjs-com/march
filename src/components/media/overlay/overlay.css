@@ -1,4 +1,4 @@
-/* HADI March — Overlay. The host gets position + isolation; overlays are absolutely placed by CSS variables and never take
+/* March — Overlay. The host gets position + isolation; overlays are absolutely placed by CSS variables and never take
    pointer input (clicks reach the content underneath). Effects are CSS only and themed. */
 .hm-ov-host { position: relative; isolation: isolate; }
 .hm-ov { position: absolute; z-index: var(--hm-ov-z, -1); inset-block-start: var(--hm-ov-top, 0); inset-block-end: var(--hm-ov-bottom, 0);

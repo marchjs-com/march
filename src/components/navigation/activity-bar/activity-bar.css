@@ -1,4 +1,4 @@
-/* HADI March — ActivityBar. Imported by its component module; tokens.css provides the variables. */
+/* March — ActivityBar. Imported by its component module; tokens.css provides the variables. */
 .hm-ab { position: relative; display: flex; gap: .25rem; background: var(--hm-surface-2); }
 .hm-ab-v { flex-direction: column; width: 3rem; height: 100%; padding-block: .375rem; border-inline-end: 1px solid var(--hm-border); }
 .hm-ab-h { flex-direction: row; height: 3rem; padding-inline: .375rem; border-block-start: 1px solid var(--hm-border); }

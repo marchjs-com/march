@@ -1,4 +1,4 @@
-// HADI March ui — accessible components, dialogs, toasts, navigation, command palette and shortcuts.
+// March ui — accessible components, dialogs, toasts, navigation, command palette and shortcuts.
 // Styles: import "hadi-march/css/tokens.css"; each component brings its own CSS (the March esbuild plugin bundles only
 // what you use, per lazy chunk). Without the plugin, import "hadi-march/css/ui.css" (everything).
 export { action, isAction } from "./action.ts";

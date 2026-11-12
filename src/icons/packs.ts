@@ -2,7 +2,7 @@
 //   import { registerIconPack, icon, Icon } from "hadi-march/icons/packs";
 //   import lucide from "hadi-march/icons/lucide/pack";      // or your own: { id, name, license, resolve(name) }
 //   registerIconPack(lucide);
-//   <Icon name="lucide:user" />   <Icon name="user" />   (no prefix: the HADI March set)
+//   <Icon name="lucide:user" />   <Icon name="user" />   (no prefix: the March set)
 //   <Button icon={icon("tabler:chart-bar")}>…</Button>    (any icon prop)
 // A pack's icons load on first use (its resolve may return a promise); icon() is reactive and draws nothing until the
 // icon is there. For the smallest bundles import single icons instead: import { user } from "hadi-march/icons/lucide".
@@ -41,7 +41,7 @@ const blanks = new Map<string, IconDef>();
 /** What icon() returns while a pack loads (or for an unknown name): an icon with no shapes. */
 const blank = (ref: string): IconDef => blanks.get(ref) ?? (blanks.set(ref, Object.freeze({ name: ref, d: [] })), blanks.get(ref)!);
 
-/** Split "lucide:user" → ["lucide", "user"]; no prefix → the HADI March set. */
+/** Split "lucide:user" → ["lucide", "user"]; no prefix → the March set. */
 export const parseIconRef = (ref: string): [pack: string, name: string] => {
   const i = ref.indexOf(":");
   return i < 0 ? ["march", ref] : [ref.slice(0, i), ref.slice(i + 1)];
@@ -55,14 +55,14 @@ export function registerIconPack(pack: IconPack): () => void {
   return () => { if (packs.get(pack.id) === pack) { packs.delete(pack.id); registered.set(registered.peek() + 1); } };
 }
 
-/** Registered packs (the HADI March set first). */
+/** Registered packs (the March set first). */
 export const iconPacks = (): IconPack[] => [...packs.values()];
 
 /** The pack with this id, if registered. */
 export const iconPack = (id: string): IconPack | undefined => packs.get(id);
 
 /**
- * Icon by name: "user" (HADI March), "lucide:user", "tabler:chart-bar" — usable in any icon prop. Reactive: read in a
+ * Icon by name: "user" (March), "lucide:user", "tabler:chart-bar" — usable in any icon prop. Reactive: read in a
  * component or effect, it updates when a lazily loaded pack arrives; until then (and for an unknown name) it is an
  * icon without shapes. loadIcon() tells whether a name exists.
  */
@@ -90,7 +90,7 @@ export function loadIcon(ref: string): Promise<IconDef | undefined> {
 
 export interface NamedIconProps extends Omit<IconProps, "of"> {
   of?: IconDef | undefined;
-  /** "user" (HADI March) or "pack:name" ("lucide:user"), from a registered pack. */
+  /** "user" (March) or "pack:name" ("lucide:user"), from a registered pack. */
   name?: string | undefined;
 }
 
@@ -106,8 +106,8 @@ export function Icon(props: NamedIconProps): SVGSVGElement {
 
 const camel = (n: string): string => n.replace(/[^A-Za-z0-9]+(.)?/g, (_m, c: string | undefined) => (c ? c.toUpperCase() : "")).replace(/^[A-Z]/, (c) => c.toLowerCase());
 
-// the HADI March set: names as written in the set ("arrow-left") or as exported ("arrowLeft"); its catalog loads on use
+// the March set: names as written in the set ("arrow-left") or as exported ("arrowLeft"); its catalog loads on use
 registerIconPack({
-  id: "march", name: "HADI March", license: "MIT", viewBox: "0 0 24 24", mode: "stroke",
+  id: "march", name: "March", license: "MIT", viewBox: "0 0 24 24", mode: "stroke",
   resolve: (n) => import("./catalog.ts").then((m) => m.ICONS[camel(n)]),
 });

@@ -1,4 +1,4 @@
-/* HADI March — table (hadi-march/table). Uses tokens.css custom properties. */
+/* March — table (hadi-march/table). Uses tokens.css custom properties. */
 .hm-table { --hm-table-lead: 0px; --hm-table-trail: 0px; --hm-table-lead-w: 2.5rem; --hm-table-row-h: auto;
   display: flex; flex-direction: column; gap: var(--hm-space-2); color: var(--hm-text); font-size: var(--hm-text-sm); min-width: 0; }
 .hm-table.is-refreshing .hm-table-grid tbody { opacity: .6; transition: opacity var(--hm-dur) var(--hm-ease); }

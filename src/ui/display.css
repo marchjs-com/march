@@ -1,4 +1,4 @@
-/* HADI March — display components (Avatar) and layout helpers. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — display components (Avatar) and layout helpers. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- display */
 .hm-page-actions, .hm-section-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
 .hm-avatar { display: inline-flex; align-items: center; justify-content: center; flex: none; overflow: hidden; border-radius: 50%; font-weight: 600; color: #fff; background: var(--hm-primary-solid);

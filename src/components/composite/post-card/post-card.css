@@ -1,4 +1,4 @@
-/* HADI March — PostCard. Flat card with a soft accent shadow (HADİ feed), header 38px avatar, 26px action icons. */
+/* March — PostCard. Flat card with a soft accent shadow (HADİ feed), header 38px avatar, 26px action icons. */
 .hm-post { display: flex; flex-direction: column; gap: var(--hm-space-2); min-width: 0; padding-block: var(--hm-space-3); color: var(--hm-text); }
 .hm-post-card { background: var(--hm-surface); border: 1px solid var(--hm-border-subtle, var(--hm-border)); border-radius: var(--hm-radius-4);
   box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 22%, transparent); }

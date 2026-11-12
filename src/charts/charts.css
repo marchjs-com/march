@@ -1,4 +1,4 @@
-/* HADI March charts. Colors are CSS custom properties; override them on :root or on any wrapper. */
+/* March charts. Colors are CSS custom properties; override them on :root or on any wrapper. */
 /* Chart colors follow the March tokens (tokens.css), so light / dark themes come for free. Override on :root or a wrapper. */
 :root {
   /* series palette: the theme's categorical colors */

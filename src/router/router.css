@@ -1,4 +1,4 @@
-/* HADI March router: an outlet adds no box (its page sits in the layout as if it were not wrapped). While the level it
+/* March router: an outlet adds no box (its page sits in the layout as if it were not wrapped). While the level it
    holds loads, the old content stays (interactive above it) for 100 ms, then the route's skeleton replaces it. */
 .hm-outlet { display: contents; }
 /* a named / modal outlet's page: its own box, so a page transition can move it */

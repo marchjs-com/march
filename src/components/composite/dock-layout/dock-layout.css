@@ -1,4 +1,4 @@
-/* HADI March — DockLayout. Imported by its component module; tokens.css provides the variables. */
+/* March — DockLayout. Imported by its component module; tokens.css provides the variables. */
 .hm-dock { --hm-dock-bar: 2.25rem; position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; height: 100%; min-height: 18rem; min-width: 0;
   background: var(--hm-surface-2); border-radius: var(--hm-radius-3); container-type: inline-size; isolation: isolate; }
 .hm-dock.is-dragging { user-select: none; cursor: grabbing; }

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// HADI March CLI
+// March CLI
 //   march dev [--port 5173] [--mock [openapi.json]]  dev server: rebuild on change, live reload, error overlay, optional mock API
 //                                                    (--mock also sets globalThis.MARCH_MOCK for net.mock in the app)
 //   march build [--release] [--no-minify]            release bundle (code splitting, chunk planning with the 10 KB floor,
@@ -19,7 +19,7 @@
 //   Cloudflare Pages / Netlify, absolute base only), fallback404: false (no 404.html), stableNames: true (or --stable-names:
 //   main.js, chunks/home.js… with ?v=<version> in every reference; deploys overwrite the same paths), packChunks: false,
 //   budget: { entry, route, part, css, routes: { "/x": bytes }, fail } (gzip bytes; false = off), sw: true (offline service worker), headers: false (no _headers),
-//   credit: true (adds <!-- Built with HADI March --> to the built index.html and prints the one-line console banner in production too; off by default),
+//   credit: true (adds <!-- Built with March --> to the built index.html and prints the one-line console banner in production too; off by default),
 //   banner: false (no console banner in `march dev`; production never prints one unless credit is on) }.
 //   seo: { site, prerender: true | ["/a"], sitemap, robots, head } (compiler/prerender.js: static HTML per route + sitemap.xml/robots.txt) }.
 import { createServer } from "node:http";
@@ -116,7 +116,7 @@ function writeHtml(cfg, meta, { dev }, manifest = null, entryFiles = null) {
   // an absolute base ("/app/") is written down for the router and appUrl() (hadi-march/base); a relative build ("./")
   // finds its root from the entry script instead
   const baseTag = base.startsWith("/") ? `<meta name="march-base" content="${base.replace(/\/?$/, "/")}">` : "";
-  const tags = `${cfg.credit === true ? "<!-- Built with HADI March -->" : ""}${baseTag}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
+  const tags = `${cfg.credit === true ? "<!-- Built with March -->" : ""}${baseTag}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
   const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
   writeFileSync(join(out, "index.html"), html);
   if (!dev && cfg.credit === true) writeFileSync(join(out, "credit.js"), bannerSource(marchVersion()));
@@ -534,7 +534,7 @@ const icons = async () => (await import("./icons.js")).main(argv.slice(1));
 // `march build --dev [--watch]`: the fast build (buildDev).
 const run = { dev, build: () => (flag("--dev") === true || flag("--watch") === true ? buildDev({ watch: flag("--watch") === true }) : build()), gen, i18n, check: typecheck, seo, icons }[cmd];
 if (!run) {
-  console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)\n  march check component <name>   (in the hadi-march repo: the component checklist)\n  march seo check [--dir dist]   (titles, descriptions, canonical, img alt)\n  march icons list | add <pack…|all> | gallery <dir>   (open-source icon sets as icon packs)");
+  console.log("March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)\n  march check component <name>   (in the hadi-march repo: the component checklist)\n  march seo check [--dir dist]   (titles, descriptions, canonical, img alt)\n  march icons list | add <pack…|all> | gallery <dir>   (open-source icon sets as icon packs)");
   process.exit(cmd ? 1 : 0);
 }
 await run();

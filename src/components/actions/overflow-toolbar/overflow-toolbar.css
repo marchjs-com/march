@@ -1,4 +1,4 @@
-/* HADI March — OverflowToolbar. Imported by its component module; tokens.css provides the variables. */
+/* March — OverflowToolbar. Imported by its component module; tokens.css provides the variables. */
 .hm-otb { display: flex; align-items: center; gap: 2px; min-width: 0; padding: 2px; }
 .hm-otb-items { display: flex; flex: 1 1 auto; align-items: center; gap: 2px; min-width: 0; overflow: hidden; }
 .hm-otb-item { display: flex; flex: none; align-items: center; }

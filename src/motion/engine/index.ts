@@ -1,4 +1,4 @@
-// HADI March motion engine: one keyframe-based engine for every animation.
+// March motion engine: one keyframe-based engine for every animation.
 //   value layer  keyframes(), tracks (numbers, vectors, OKLab colors, CSS strings), easing registry, stagger
 //   playback     animate() / timeline(): play, pause, reverse, seek, rate, labels, callbacks, finished
 //   drivers      dom (WAAPI first), cssVar (@property), object, canvas2d, webgl, defineDriver()

@@ -1,4 +1,4 @@
-/* HADI March — Page, Section, ListDetail, Pager, SearchBox (AppShell: src/components/layout/app-shell). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Page, Section, ListDetail, Pager, SearchBox (AppShell: src/components/layout/app-shell). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- page scaffolding */
 .hm-page { display: flex; flex-direction: column; gap: var(--hm-space-5); padding: var(--hm-space-6) var(--hm-space-6) var(--hm-space-7); max-width: 92rem; margin: 0 auto; width: 100%;
   animation: hm-rise-in var(--hm-dur-slow) var(--hm-ease-out); }

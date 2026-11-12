@@ -1,4 +1,4 @@
-/* HADI March — button classes (.hm-btn, .hm-icon-btn, .hm-btn-group, .hm-copy) for modules that draw raw buttons.
+/* March — button classes (.hm-btn, .hm-icon-btn, .hm-btn-group, .hm-copy) for modules that draw raw buttons.
    The rules live with their components in src/components/actions/; this file keeps the old import path working. */
 @import "../components/actions/button/button.css";
 @import "../components/actions/icon-button/icon-button.css";

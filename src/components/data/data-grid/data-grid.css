@@ -1,4 +1,4 @@
-/* HADI March — DataGrid. Imported by its component module; tokens.css provides the variables. Logical properties only (RTL). */
+/* March — DataGrid. Imported by its component module; tokens.css provides the variables. Logical properties only (RTL). */
 .hm-dg { display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%; }
 
 /* toolbar: wraps on narrow screens, nothing overflows */

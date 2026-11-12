@@ -1,4 +1,4 @@
-/* HADI March — Drawer (src/components/overlays/drawer). Builds on the Dialog frame (dialog.css); movement comes from the motion
+/* March — Drawer (src/components/overlays/drawer). Builds on the Dialog frame (dialog.css); movement comes from the motion
    engine, so the frame's CSS entrance is switched off here. */
 .hm-overlay.hm-sheet-at { padding: 0; align-items: stretch; }
 .hm-sheet-at-start { justify-content: flex-start; }

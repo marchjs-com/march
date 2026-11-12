@@ -1,4 +1,4 @@
-/* HADI March — TreeView. Imported by its component module; tokens.css provides the variables. Logical properties only (RTL). */
+/* March — TreeView. Imported by its component module; tokens.css provides the variables. Logical properties only (RTL). */
 .hm-tv { position: relative; overflow: auto; overscroll-behavior: contain; max-width: 100%; padding-block: var(--hm-space-1); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3);
   background: var(--hm-surface); box-shadow: var(--hm-shadow-1); font-size: var(--hm-text-sm); outline: none; }
 .hm-tv:focus-visible { border-color: var(--hm-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-focus) 22%, transparent); }

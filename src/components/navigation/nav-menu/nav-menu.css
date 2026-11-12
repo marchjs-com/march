@@ -1,4 +1,4 @@
-/* HADI March — NavMenu (also the sidebar container, drawer and rail of NavSidebar). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — NavMenu (also the sidebar container, drawer and rail of NavSidebar). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- navigation menu (sidebar) */
 .hm-nav-wrap { display: contents; }
 .hm-nav { display: flex; flex-direction: column; width: var(--hm-sidebar-w); height: 100%; min-height: 0; background: var(--hm-bg-subtle); border-inline-end: 1px solid var(--hm-border);

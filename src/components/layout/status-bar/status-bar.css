@@ -1,4 +1,4 @@
-/* HADI March — StatusBar. Imported by its component module; tokens.css provides the variables. */
+/* March — StatusBar. Imported by its component module; tokens.css provides the variables. */
 .hm-sbar { display: flex; align-items: center; gap: 2px; min-width: 0; min-height: 1.625rem; padding-inline: .25rem; background: var(--hm-surface-2); border-block-start: 1px solid var(--hm-border);
   color: var(--hm-text-2); font-size: var(--hm-text-xs); overflow: hidden; }
 .hm-sbar-side { display: flex; align-items: center; gap: 2px; min-width: 0; }

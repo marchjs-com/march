@@ -1,4 +1,4 @@
-/* HADI March — Disclosure. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Disclosure. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- disclosure */
 .hm-disclosure { border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
 .hm-disclosure-summary { cursor: pointer; padding: var(--hm-space-3) var(--hm-space-4); font-weight: var(--hm-weight-medium); list-style: none; display: flex; align-items: center; gap: var(--hm-space-2);

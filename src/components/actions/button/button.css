@@ -1,4 +1,4 @@
-/* HADI March — Button (and ActionButton). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Button (and ActionButton). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: var(--hm-space-2); min-height: var(--hm-control-h); padding: 0 .875rem;
   border: var(--hm-border-w, 1px) solid transparent; border-radius: var(--hm-radius); font: var(--hm-weight-medium) var(--hm-text-md)/1.2 var(--hm-font); letter-spacing: -.005em;
   color: var(--hm-text); background: var(--hm-surface-2); cursor: pointer; text-decoration: none; white-space: nowrap; user-select: none;

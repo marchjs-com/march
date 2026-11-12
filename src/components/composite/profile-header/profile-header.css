@@ -1,4 +1,4 @@
-/* HADI March — ProfileHeader. Cover with a bottom dim, an 88px StoryRing overlapping it, stats as soft tiles. */
+/* March — ProfileHeader. Cover with a bottom dim, an 88px StoryRing overlapping it, stats as soft tiles. */
 .hm-prof { display: flex; flex-direction: column; min-width: 0; background: var(--hm-surface); border-radius: var(--hm-radius-4); overflow: hidden; border: 1px solid var(--hm-border-subtle, var(--hm-border)); }
 .hm-prof-cover { position: relative; height: 10.5rem; overflow: hidden; background: var(--hm-surface-2); }
 .hm-prof-cover-sm .hm-prof-cover { height: 7.5rem; } .hm-prof-cover-lg .hm-prof-cover { height: 13.5rem; }

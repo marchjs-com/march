@@ -1,4 +1,4 @@
-// hadi-march/icons — the HADI March icon set and <Icon>. Every icon is its own export (tree-shaken):
+// hadi-march/icons — the March icon set and <Icon>. Every icon is its own export (tree-shaken):
 //   import { Icon, users, search } from "hadi-march/icons";
 //   <Icon of={users} />            decorative, inherits the text color and font size (1.25em by default)
 //   <Icon of={search} label="Search" size="lg" />

@@ -1,2 +1,2 @@
-/* HADI March — NumberInput, IntInput, MoneyInput, PercentInput. Imported by its component module; tokens.css provides the variables (shared text-control rules: ui/field.css). */
+/* March — NumberInput, IntInput, MoneyInput, PercentInput. Imported by its component module; tokens.css provides the variables (shared text-control rules: ui/field.css). */
 .hm-number, .hm-affix:has(> .hm-number) > .hm-affix-text { font-variant-numeric: tabular-nums; }

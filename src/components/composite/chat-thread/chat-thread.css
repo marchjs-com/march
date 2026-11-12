@@ -1,4 +1,4 @@
-/* HADI March — ChatThread. Runs sit 2px apart, senders 10px; the day pill and the jump button float on the mist. */
+/* March — ChatThread. Runs sit 2px apart, senders 10px; the day pill and the jump button float on the mist. */
 .hm-chat { position: relative; display: flex; flex-direction: column; gap: 2px; min-height: 0; height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: var(--hm-space-3);
   box-sizing: border-box; background: var(--hm-bg); scroll-padding-block-end: var(--hm-space-3); }
 .hm-chat:focus-visible { outline: 2px solid var(--hm-brand-blue, var(--hm-primary)); outline-offset: -2px; }

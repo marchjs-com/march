@@ -1,4 +1,4 @@
-/* HADI March — TreeEditor. Imported by its component module; tokens.css provides the variables. */
+/* March — TreeEditor. Imported by its component module; tokens.css provides the variables. */
 .hm-tre-wrap { --hm-tre-accent: var(--hm-accent, var(--hm-primary)); --hm-tre-step: 1.25rem; display: flex; flex-direction: column; min-width: 0; max-width: 100%;
   border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
 .hm-tre-wrap:focus-within { border-color: var(--hm-tre-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-tre-accent) 14%, transparent); }

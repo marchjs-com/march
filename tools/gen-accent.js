@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const src = readFileSync(`${root}src/css/colors.css`, "utf8");
 const rows = [...src.matchAll(/\[data-hm-color="([\w-]+)"\] \{ --hm-accent: (.*?); --hm-accent-text: (.*?); --hm-on-accent: (.*?); \}/g)];
-const lines = ["/* HADI March — app accent (setAccent / <AccentPicker>): <html data-hm-accent=\"…\"> remaps the primary color family, so",
+const lines = ["/* March — app accent (setAccent / <AccentPicker>): <html data-hm-accent=\"…\"> remaps the primary color family, so",
   "   every component without its own `color` (and color=\"primary\") follows the chosen accent: fills, focus rings, links,",
   "   active navigation, buttons; a multicolor theme default (progress, spinner) becomes the accent too (colors=\"brand\" stays).",
   "   Generated from src/css/colors.css by tools/gen-accent.js. Scoped themes keep their own. */"];

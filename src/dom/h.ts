@@ -1,4 +1,4 @@
-// HADI March — DOM creation without a virtual DOM (TypeScript).
+// March — DOM creation without a virtual DOM (TypeScript).
 // `h(tag, props, ...children)` creates real nodes once. A function (signal, computed, compiler thunk) placed in a child or
 // attribute position becomes a live binding: only that text node / attribute / region updates when its signals change.
 // Security: no HTML strings ever (no innerHTML), URL attributes are sanitized, <script> cannot be created, Trusted Types safe.

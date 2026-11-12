@@ -1,4 +1,4 @@
-/* HADI March — ThemeToggle, ThemePicker, UpdateBanner. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — ThemeToggle, ThemePicker, UpdateBanner. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- theme, update banner */
 .hm-update { position: fixed; z-index: var(--hm-z-toast); inset-block-start: var(--hm-space-3); inset-inline: 50% auto; transform: translateX(-50%); display: flex; align-items: center; gap: var(--hm-space-3);
   padding: var(--hm-space-1) var(--hm-space-1) var(--hm-space-1) var(--hm-space-4); max-width: calc(100vw - 2rem); background: var(--hm-inverse-bg); color: var(--hm-inverse-text);

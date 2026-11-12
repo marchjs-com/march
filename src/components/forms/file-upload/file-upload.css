@@ -1,4 +1,4 @@
-/* HADI March — FileUpload (drop zone, file rows; upload progress is the Progress component). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — FileUpload (drop zone, file rows; upload progress is the Progress component). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* file upload */
 .hm-upload { display: flex; flex-direction: column; gap: var(--hm-space-2); }
 .hm-drop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--hm-space-1); min-height: 6rem; padding: var(--hm-space-4); text-align: center; color: var(--hm-muted); border: 1.5px dashed var(--hm-border-strong); border-radius: var(--hm-radius-3); background: var(--hm-bg-subtle); cursor: pointer; transition: border-color var(--hm-dur) var(--hm-ease), background var(--hm-dur) var(--hm-ease); }

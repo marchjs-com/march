@@ -1,4 +1,4 @@
-// HADI March router (TypeScript): History API (or hash) routing with lazy pages, nested layouts, guards, redirects,
+// March router (TypeScript): History API (or hash) routing with lazy pages, nested layouts, guards, redirects,
 // preloading, leave confirmation, title/meta, live `params`/`query` signals and scroll restoration.
 // File based: `march gen routes` turns `pages/users/[id].jsx` (+ `_layout.jsx` files) into a route table and a
 // `pages.d.ts` that registers the paths so `navigate()` / `<Link href>` reject unknown routes at compile time.

@@ -1,4 +1,4 @@
-/* HADI March — ReactionPicker. A card-colored pill (row) or panel (grid); the picked emoji on a soft accent circle. */
+/* March — ReactionPicker. A card-colored pill (row) or panel (grid); the picked emoji on a soft accent circle. */
 .hm-react { display: inline-flex; align-items: center; gap: .125rem; padding: .25rem; border-radius: var(--hm-radius-full); background: var(--hm-surface-raised, var(--hm-surface));
   border: 1px solid var(--hm-border-subtle, var(--hm-border)); box-shadow: var(--hm-shadow-3); transform-origin: 50% 100%; max-width: 100%; }
 .hm-react-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr)); gap: .125rem; padding: .5rem; border-radius: var(--hm-radius-4); width: 100%; box-sizing: border-box;

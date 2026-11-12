@@ -1,4 +1,4 @@
-/* HADI March — Card. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Card. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-card { position: relative; display: flex; flex-direction: column; background: var(--hm-surface); border: var(--hm-border-w, 1px) solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-1); min-width: 0; }
 .hm-card-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--hm-space-3); padding: var(--hm-space-4) var(--hm-space-5) 0; }
 .hm-card-titles { flex: 1; min-width: min(12rem, 100%); }

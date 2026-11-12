@@ -1,4 +1,4 @@
-/* HADI March — FlowControls and FlowTimeline. Tokens only; logical properties (bars grow from the inline start). */
+/* March — FlowControls and FlowTimeline. Tokens only; logical properties (bars grow from the inline start). */
 .hm-flowctl { display: grid; gap: .75rem; min-inline-size: 0; }
 .hm-flowctl-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; min-inline-size: 0; }
 .hm-flowctl-run { min-inline-size: 7.5rem; }

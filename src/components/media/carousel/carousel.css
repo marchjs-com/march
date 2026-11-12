@@ -1,4 +1,4 @@
-/* HADI March — Carousel. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Carousel. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- carousel */
 .hm-carousel { position: relative; --hm-per: 1; }
 .hm-carousel-2 { --hm-per: 2; } .hm-carousel-3 { --hm-per: 3; } .hm-carousel-4 { --hm-per: 4; }

@@ -1,4 +1,4 @@
-/* HADI March — Breadcrumbs. Imported by its component module; tokens.css provides the variables. */
+/* March — Breadcrumbs. Imported by its component module; tokens.css provides the variables. */
 .hm-bc { min-width: 0; overflow: hidden; font-size: var(--hm-text-sm); }
 .hm-bc-ol { display: flex; align-items: center; margin: 0; padding: 0; list-style: none; min-width: 0; }
 .hm-bc-li { display: flex; flex: none; align-items: center; min-width: 0; }

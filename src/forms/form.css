@@ -1,4 +1,4 @@
-/* HADI March — Form, EditForm, FormActions. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Form, EditForm, FormActions. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-form, .hm-wizard, .hm-edit-form { display: flex; flex-direction: column; gap: var(--hm-space-4); }
 .hm-form-stack { display: flex; flex-direction: column; gap: var(--hm-space-4); }
 .hm-form-grid { display: grid; gap: var(--hm-space-4) var(--hm-space-5); align-items: start; }

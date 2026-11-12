@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to HADI March. Versions follow [semver](https://semver.org/).
+All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
@@ -28,7 +28,7 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
   ships its license). A shared drawing layer keeps each set's grid, stroke width or fill and mirrors direction icons in
   right-to-left text; start-up code is unchanged.
 - `hadi-march/icons/packs`: `registerIconPack`, `icon("lucide:rocket")` for any icon prop, `<Icon name="…" />`,
-  `loadIcon`, `packIcon`. No prefix means the HADI March set.
+  `loadIcon`, `packIcon`. No prefix means the March set.
 - `march icons list | add <pack> | gallery <dir>`: converts a set from its official npm package (sha512 checked,
   nothing in it is run); licenses outside MIT, ISC, Apache-2.0, CC0-1.0, CC-BY-4.0, OFL-1.1 are refused.
 - `<Icon>` follows live props (`size={$size}`); `deepImports` leaves `import` lines inside strings (code samples) alone.
@@ -41,9 +41,9 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
   (same import paths): an app that uses them on a lazy page no longer carries them in its start-up chunk.
 
 ### Credit (later in 0.1.0)
-- `<MadeWithMarch />` (`src/components/actions/made-with-march`): optional "Developed with HADI March and 💗" line, variants text / badge / small, link in one constant (`MARCH_URL`). The licence stays MIT; using it is a request.
-- `credit: true` in `march.config.js` adds `<!-- Built with HADI March -->` to the built `index.html` (off by default).
-- Console banner: `march dev` prints one styled line ("🧡 HADI March v0.1 · link") once per page; `banner: false` removes it. Production prints nothing and the bundle is byte-identical; `credit: true` prints the same line in production from a separate `credit.js`. The link constant moved to `src/brand.js`.
+- `<MadeWithMarch />` (`src/components/actions/made-with-march`): optional "Developed with March and 💗" line, variants text / badge / small, link in one constant (`MARCH_URL`). The licence stays MIT; using it is a request.
+- `credit: true` in `march.config.js` adds `<!-- Built with March -->` to the built `index.html` (off by default).
+- Console banner: `march dev` prints one styled line ("🧡 March v0.1 · link") once per page; `banner: false` removes it. Production prints nothing and the bundle is byte-identical; `credit: true` prints the same line in production from a separate `credit.js`. The link constant moved to `src/brand.js`.
 ### Text animations (later in 0.1.0)
 - `hadi-march/motion/text`: 56 text animations, one export each (entrances / exits, loops, decorations, content effects
   such as typewriter, scramble, counter, odometer, word cycle, morph, and pointer effects). One shared core: `splitText()`
@@ -131,7 +131,7 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
   (`types/jsx.d.ts`); `march check` type-checks the full March syntax; `hadi-march/register` runs .jsx/.tsx in node;
   TSX in the compiler (typed `# Changelog
 
-All notable changes to HADI March. Versions follow [semver](https://semver.org/).
+All notable changes to March. Versions follow [semver](https://semver.org/).
 
  declarations, generic arrows, inline return types).
 - Store v2 (`hadi-march/store`): path events with wildcards, typed `Path<T>`, batch groups, persist, history, readonly,

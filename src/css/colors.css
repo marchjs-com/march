@@ -1,4 +1,4 @@
-/* HADI March — color tokens for components: `color="brand-blue"` renders data-hm-color="brand-blue", which sets the local
+/* March — color tokens for components: `color="brand-blue"` renders data-hm-color="brand-blue", which sets the local
    accent (fill, text tone, text on a fill, soft and hover tints). Components read var(--hm-accent, <default>), so the
    value inherits: <Form color=…> or <CheckboxGroup color=…> colors every control inside. Error states keep --hm-danger. */
 [data-hm-color="primary"] { --hm-accent: var(--hm-primary); --hm-accent-text: var(--hm-primary-text); --hm-on-accent: var(--hm-on-primary-fill); }
