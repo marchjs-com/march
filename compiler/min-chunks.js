@@ -68,10 +68,12 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
   plan.shrink = { ...(prev?.shrink ?? {}) };
   for (const [name, ms] of Object.entries(plan.groups)) {
     const k = outByEntry.get(`march-group:${name}`);
-    if (plan.boot.includes(name) || !k || !plan.est[name] || bytes(k) >= minSize) continue;
+    // measured on disk: the metafile size is before the build's own rewrites
+    const real = existsSync(resolve(cwd, k)) ? readFileSync(resolve(cwd, k)).length : bytes(k);
+    if (plan.boot.includes(name) || !k || !plan.est[name] || real >= minSize) continue;
     delete plan.groups[name];
     for (const [imp, list] of Object.entries(plan.inline)) plan.inline[imp] = list.filter((x) => x.group !== name);
-    for (const m of ms) plan.shrink[m.key] = Math.min(plan.shrink[m.key] ?? 1, (bytes(k) / plan.est[name]) * 0.95);
+    for (const m of ms) plan.shrink[m.key] = Math.min(plan.shrink[m.key] ?? 1, (real / plan.est[name]) * 0.95);
     added++;
   }
   const tightOf = (x, y) => Math.max(1, ...[...x.keys, ...y.keys].map((k) => plan.tight[k] ?? 1));
