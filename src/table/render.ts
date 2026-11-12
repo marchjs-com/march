@@ -18,6 +18,7 @@ import { createTable, type TableOptions, type TableState, type TableAction, type
 import type { Row as DefaultRow, TableColumn } from "./filters.ts";
 import { createVirtual, type Virtual } from "./virtual.ts";
 import { clamp, uid, debounce } from "../core/util.ts";
+import { dismiss } from "../behaviors/dismiss/index.ts";
 import { FilterControl, CellEditor } from "./controls.ts";
 import { resizeHandle } from "../behaviors/resize-handle/index.ts";
 export { FilterControl, CellEditor };
@@ -103,10 +104,11 @@ function useLayout<R>(props: TableProps<R>): () => "cards" | "table" {
 
 /** Close open menus of this table when clicking elsewhere. */
 function closeMenusOnOutsideClick(root: Element): void {
-  const doc = globalThis.document;
-  const on = (e: Event): void => { for (const d of root.querySelectorAll("details[open]")) if (!d.contains(e.target as Node | null)) d.removeAttribute("open"); };
-  doc.addEventListener("click", on);
-  onCleanup(() => doc.removeEventListener("click", on));
+  // each open menu: a click outside it closes it, Escape closes all of them (the dismiss behavior)
+  dismiss(null, {
+    on: "click", inside: () => [], escape: false,
+    onDismiss: (_why, e) => { for (const d of root.querySelectorAll("details[open]")) if (!d.contains(e.target as Node | null)) d.removeAttribute("open"); },
+  });
 }
 
 /**
