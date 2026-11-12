@@ -7,7 +7,7 @@
 //   <Dialog open={session().warning}>… <Button on:click={() => session().extend()}>Stay signed in</Button>
 //
 // Events: session:start, session:extend ({ expiresAt }), session:warn ({ remaining }), session:expire, session:end.
-import { signal, computed } from "../../core/reactive.ts";
+import { signal, computed, effect, onCleanup, untrack } from "../../core/reactive.ts";
 import { defineManager, emit } from "../manager.ts";
 import { idle } from "../idle/index.ts";
 
@@ -118,9 +118,12 @@ function create(cfg: SessionConfig): Session {
   // pick up a session another tab started before this one loaded
   try { const s = JSON.parse(ls?.getItem(cfg.storageKey!) ?? "null") as Stored | null; if (s?.exp && s.exp > Date.now()) { dur = s.dur || dur; setExp(s.exp, false); } } catch { /* ignore */ }
 
-  const offActivity = cfg.extendOnActivity ? idle().onActivity(() => {
-    if (exp.peek() === null || warning() || Date.now() - lastExtend < cfg.extendEvery) return;
-    extend();
+  // through an effect: a re-configured IdleManager (new instance) is followed
+  const offActivity = cfg.extendOnActivity ? effect(() => {
+    onCleanup(idle().onActivity(() => {
+      if (exp.peek() === null || untrack(warning) || Date.now() - lastExtend < cfg.extendEvery) return;
+      extend();
+    }));
   }) : null;
 
   return {
