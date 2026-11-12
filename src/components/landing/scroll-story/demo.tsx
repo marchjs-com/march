@@ -17,6 +17,6 @@ export const STORY: StoryStep[] = [
 
 export default function ScrollStoryDemo(props: { values: { side: string; theme: boolean } }) {
   return <div>
-    {() => <ScrollStory steps={STORY} side={props.values.side as "end"} theme={props.values.theme} />}
+    {() => { const v = { ...props.values }; return <ScrollStory steps={STORY} side={v.side as "end"} theme={v.theme} /> }}
   </div>
 }

@@ -21,7 +21,7 @@ march check component <category>/<name>
 | `<name>.css` | `hm-` classes, theme tokens, logical properties, durations from `--hm-dur*`, no `@keyframes` (motion core) |
 | `<name>.test.js` | behaviour, ARIA, keyboard |
 | `docs.md` | first paragraph + first code block feed the catalogues; `## Props`, `## Accessibility`, `## Composed of` |
-| `demo.tsx` | showcase stage: `default (props: { values })` draws it for the Playground values |
+| `demo.tsx` | showcase stage: `default (props: { values })` draws it for the Playground values. A thunk that rebuilds the component reads the values itself (`{() => { const v = { ...props.values }; return <X tone={v.tone} /> }}`): a value only passed on as a prop becomes a live getter the component reads once, untracked, and the option changes nothing. An option that acts on the next interaction shows its effect at once (a `sc-demo-call` line, or the state it shapes opened) |
 | `playground.ts` | options with an effect only (`visibleWhen` while they have none); choices go through ChoicePicker |
 | `meta.ts` | `name`, `status` (stable / experimental / deprecated), `since`, `summary`, `category`, `composedOf`, `behaviors`, `hubs`; `entry` for a heavy feature with its own package entry (e.g. `hadi-march/flow`): it stays out of the `hadi-march/ui` barrel and the registry, and its page imports `demo.tsx` + `playground.ts` (type-only meta import) itself |
 

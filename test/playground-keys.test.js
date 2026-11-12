@@ -25,8 +25,9 @@ test("every Playground option key is read by the folder's demo", () => {
   for (const dir of folders) {
     const spec = readFileSync(join(dir, "playground.ts"), "utf8");
     const demo = readFileSync(join(dir, "demo.tsx"), "utf8");
-    // `props.values.key`, or an alias: `const v = props.values` … `v.key`, or `const { key } = props.values`
-    const names = ["values", ...[...demo.matchAll(/(?:const|let|,)\s*(\w+)\s*=\s*props\.values(?![.\w])/g)].map((m) => m[1])].join("|");
+    // `props.values.key`, or an alias: `const v = props.values` / `const v = { ...props.values }` … `v.key`, or
+    // `const { key } = props.values`
+    const names = ["values", ...[...demo.matchAll(/(?:const|let|,)\s*(\w+)\s*=\s*(?:\{\s*\.\.\.)?props\.values(?![.\w])/g)].map((m) => m[1])].join("|");
     for (const [, key] of spec.matchAll(/\bkey:\s*"([^"]+)"/g)) {
       const read = new RegExp(`\\b(${names})\\.${key}\\b|\\b(${names})\\[["']${key}["']\\]|[{,]\\s*${key}\\s*[,}=:][^\\n]*=\\s*props\\.values`).test(demo);
       if (!read) unread.push(`${dir.slice(ROOT.length + 1).replaceAll("\\", "/")} › ${key}`);

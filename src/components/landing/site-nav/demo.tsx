@@ -12,7 +12,7 @@ export default function SiteNavDemo(props: { values: { mode: string; shrink: boo
   const links = [["Özellikler", "#features"], ["Fiyatlar", "#pricing"], ["Müşteriler", "#customers"], ["SSS", "#faq"]].map(([label, href]) => ({ label, href: href!, active: () => $active === href }))
   return <div class="sc-site-frame sc-nav-frame">
     {() => {
-      const v = props.values
+      const v = { ...props.values }
       return <div class="sc-nav-stage">
         <SiteNav mode={v.mode as "solid"} shrink={v.shrink} hide={v.hide} brand={{ name: "Acme", mark: sparkles }} links={links}
           onNavigate={(h) => { $active = h }}

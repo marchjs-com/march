@@ -3,6 +3,7 @@ import { Presentation, Slide, Appear } from "./index.ts";
 import { Overlay } from "../../../ui/overlay.ts";
 import { Counter } from "../counter/index.ts";
 import { MockApp } from "../demo-kit.tsx";
+import { effect, untrack } from "../../../core/reactive.ts";
 
 export const code = `let $slide = Number(queryParam("slide")() ?? 0)
 <Presentation bind:index={$slide} transition="slide" presenterUrl="#/web?view=slides&presenter=1">
@@ -11,6 +12,9 @@ export const code = `let $slide = Number(queryParam("slide")() ?? 0)
 </Presentation>`
 
 /** The sample deck (also used by the full-page slides sample). */
+/** Number of slides in DemoSlides. */
+const SLIDES = 5
+
 export function DemoSlides() {
   return [
     <Slide layout="title" tone="brand" notes="Herkese merhaba. Bu sunum tamamen tarayıcıda, HADI March ile.">
@@ -38,7 +42,19 @@ export function DemoSlides() {
 }
 
 export default function PresentationDemo(props: { values: { transition: string; presenter: boolean } }) {
+  // the transition plays when the slide changes: choosing one moves to the next slide, so it is seen at once (the deck
+  // reads the transition live, it is not rebuilt for it)
+  let $slide = 0
+  let first = true
+  effect(() => {
+    void props.values.transition
+    if (first) { first = false; return }
+    untrack(() => { $slide = $slide >= SLIDES - 1 ? 0 : $slide + 1 })
+  })
   return <div>
-    {() => <Presentation transition={props.values.transition as "slide"} presenter={props.values.presenter} sync="demo" label="Örnek sunum"><DemoSlides /></Presentation>}
+    {() => {
+      const presenter = props.values.presenter
+      return <Presentation bind:index={$slide} transition={props.values.transition as "slide"} presenter={presenter} sync="demo" label="Örnek sunum"><DemoSlides /></Presentation>
+    }}
   </div>
 }

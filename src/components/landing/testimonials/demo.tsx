@@ -20,7 +20,7 @@ export const QUOTES: Testimonial[] = [
 export default function TestimonialsDemo(props: { values: { variant: string; cols: number } }) {
   return <div>
     {() => {
-      const v = props.values
+      const v = { ...props.values }
       return <Testimonials variant={v.variant as "grid"} cols={v.cols as 3} items={QUOTES} />
     }}
   </div>

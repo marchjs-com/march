@@ -8,7 +8,7 @@ export const code = `<SiteSection eyebrow="Özellikler" title="İhtiyacın olan 
 export default function SiteSectionDemo(props: { values: { tone: string; align: string; width: string } }) {
   return <div class="sc-site-frame">
     {() => {
-      const v = props.values
+      const v = { ...props.values }
       return <SiteSection tone={v.tone as SectionTone} align={v.align as "center"} width={v.width as "default"} space="sm" eyebrow="Özellikler" title="İhtiyacın olan her şey, tek pakette" lead="Bileşenler, tema, hareket ve hız: hepsi aynı dili konuşur.">
         <div class="sc-site-placeholder">İçerik</div>
       </SiteSection>
