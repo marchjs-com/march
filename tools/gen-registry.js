@@ -83,9 +83,10 @@ export async function generate(root = ROOT) {
   // component card keeps its direct import. meta.demoGroup names a family that loads together; the page's building
   // blocks share one kit (<page>.kit.gen.ts).
   const GROUP = 3;
-  // pages whose demos are heavier than the usual card: fewer per module (/forms: three input demos with their editors
-  // passed the 25 KB part budget)
-  const GROUP_OF = { "/forms": 2 };
+  // pages whose demos are heavier than the usual card may get fewer per module. /forms is not one: its demo parts weigh
+  // mostly the input code the /forms page already loads (a part row counts it too), two per module measured as heavy as
+  // three (28–30 KB) and made 13 parts instead of 9, each splitting the shared code further
+  const GROUP_OF = {};
   const pages = new Map();
   // a large component (barrel: false) keeps its own demo module: its code alone is over the chunk floor, and grouping
   // it would make every card of the page download it

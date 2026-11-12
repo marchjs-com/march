@@ -360,6 +360,60 @@ export default () => <p>{two(2)}</p>
   } finally { app.cleanup(); }
 });
 
+test("packChunks forced step: routes already over budget may grow; a shared chunk under 2 KB is never a file of its own", async () => {
+  const { mergeEntry } = await import("../compiler/merge-entry.js");
+  const { packChunks } = await import("../compiler/pack-chunks.js");
+  const esbuild = await import("esbuild");
+  const files = {
+    "main.tsx": `import { render } from "hadi-march"
+import { createRouter, Router } from "hadi-march/router"
+createRouter({ routes: { "/a": () => import("./a.tsx"), "/b": () => import("./b.tsx"), "/c": () => import("./c.tsx") } })
+render(() => h(Router, {}), document.body)
+`,
+    "s1.ts": `export const one = (x: number) => x + 1
+`,
+    "s2.ts": `export const two = (x: number) => x * 2
+`,
+    "a.tsx": `import { one } from "./s1.ts"
+import { two } from "./s2.ts"
+export default () => <p>{one(two(1))}</p>
+`,
+    "b.tsx": `import { one } from "./s1.ts"
+export default () => <p>{one(1)}</p>
+`,
+    "c.tsx": `import { two } from "./s2.ts"
+export default () => <p>{two(2)}</p>
+`,
+  };
+  // limit(outs) → every page's budget; returns the shared chunks left and checks that every import still resolves
+  const run = async (limit, opts = {}) => {
+    const a = await buildApp(files);
+    try {
+      const outs = a.meta.outputs;
+      const entryKey = Object.keys(outs).find((k) => outs[k].entryPoint === "main.tsx");
+      await mergeEntry(a.meta, { cwd: a.dir, entryKey, esbuild });
+      const lim = limit(outs, a.dir);
+      const budgetOf = Object.assign((k) => (outs[k]?.entryPoint ? { limit: lim(k) } : undefined), { bootLimit: 52 * 1024, partLimit: 25 * 1024 });
+      await packChunks(a.meta, { cwd: a.dir, entryKey, esbuild, minSize: 10240, budgetOf, ...opts });
+      const keys = Object.keys(outs).filter((k) => k.endsWith(".js"));
+      const names = new Set(keys.map((k) => k.split("/").pop()));
+      for (const k of keys) for (const m of readFileSync(resolve(a.dir, k), "utf8").matchAll(/["'](\.{1,2}\/[^"']+\.js)["']/g)) assert.ok(names.has(m[1].split("/").pop()), `${k} → ${m[1]} exists`);
+      return keys.filter((k) => !outs[k].entryPoint && k !== entryKey);
+    } finally { a.cleanup(); }
+  };
+  // every page already over its budget (a 50-byte limit): before the forced step nothing could fold anywhere
+  assert.deepEqual(await run(() => () => 50), [], "over-budget pages host the small shared code");
+  // every page exactly at its budget: any fold pushes one past it — only the 2 KB rule folds them
+  const atLimit = (outs, dir) => {
+    const closure = (k, seen = new Set()) => { if (seen.has(k)) return seen; seen.add(k); for (const im of outs[k]?.imports ?? []) if (im.kind === "import-statement" && outs[im.path]) closure(im.path, seen); return seen; };
+    const entryKey = Object.keys(outs).find((k) => outs[k].entryPoint === "main.tsx");
+    const have = closure(entryKey);
+    return (k) => [...closure(k)].filter((x) => !have.has(x)).reduce((n, x) => n + gzipSync(readFileSync(resolve(dir, x))).length, 0);
+  };
+  assert.ok((await run(atLimit, { forceSize: 0 })).length > 0, "forceSize 0: budgets within their limit are kept, the small chunks stay");
+  assert.deepEqual(await run(atLimit), [], "under 2 KB: folded, budgets aside");
+});
+
 test("prefetchCommon: the common chunk is prefetched at the lowest priority, never with Save-Data", () => {
   const { prefetchCommon, setPreloadManifest } = L;
   const links = () => [...document.querySelectorAll("link[data-march-preload]")].filter((l) => l.getAttribute("href").includes("common"));

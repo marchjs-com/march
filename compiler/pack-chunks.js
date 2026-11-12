@@ -92,7 +92,7 @@ function explain(g, t, users, fits, bootFits) {
   for (const [r, list] of why) console.log(`  ${r}: ${list.length} — ${list.slice(0, 6).join(", ")}`);
 }
 
-export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048, budgetOf, fallback = true, strategy = 0 }) {
+export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048, budgetOf, fallback = true, strategy = 0, forceSize = FORCE_SIZE }) {
   const outs = meta.outputs;
   const gzCache = new Map();
   const gz = (k) => { if (!gzCache.has(k)) { const f = resolve(cwd, k); gzCache.set(k, existsSync(f) ? gzipSync(readFileSync(f)).length : 0); } return gzCache.get(k); };
@@ -133,16 +133,27 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     await foldSmall(fallback, order);
     common = await commonChunks();
   }
+  // 2d. forced step (fallback builds only): a host is still found for what is left. "grow" — a route / part already over
+  // its budget may grow (it fails the budget either way; a file of its own would only add a request and a file), but no
+  // route / part within its budget is pushed past it; "free" — a chunk under `forceSize` (2 KB) is never a file of its
+  // own: any cycle-safe host outside start-up, budgets aside. Without this, a few lazy parts far over their budget (every
+  // fold that reaches them is refused) leave hundreds of 100-byte files: the host's file limit fails the build instead.
+  if (fallback) {
+    await foldSmall(true, order, "grow");
+    if (forceSize > 0) await foldSmall(true, order, "free");
+  }
 
-  async function foldSmall(fallback, order = 0) {
+  async function foldSmall(fallback, order = 0, force = null) {
   const skip = new Set();
+  // in a forced step a route / lazy part may host code it imports itself (as with the entryHost strategies)
+  const hostEntries = entryHost || !!force;
   for (let round = 0; round < 5000; round++) {
     const g = graph(outs);
     // a heavy chunk only one small lazy module imports (code esbuild split out because tree-shaken barrels also reach
     // it) is that module's own code: it joins it, so the lazy module is judged by its real size and is never inlined into
     // its parent (a 3 KB demo entry over 30 KB of editor code). Small ones keep the usual folding below.
     const own = (k) => { const u = g.importers.get(k) ?? []; return (outs[k].bytes ?? 0) >= minSize && u.length === 1 && !!outs[u[0]].entryPoint && u[0] !== entryKey && (outs[u[0]].bytes ?? 0) < minSize ? u[0] : null; };
-    const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && ((outs[k].bytes ?? 0) < minSize || own(k)))
+    const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && ((outs[k].bytes ?? 0) < (force === "free" ? Math.min(forceSize, minSize) : minSize) || (!force && own(k))))
       // a lazy module's own code first (once something else joined it, it may no longer count as small); then widely
       // shared code (it competes for the start-up budget with narrow code), then the smallest; the name breaks ties so
       // the same input always folds the same way
@@ -162,12 +173,16 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     };
     // what start-up already downloaded (the entry, the boot pieces) is not part of a route's or part's cost
     const have = new Set([...entryReach, ...bootReach]);
+    // what a route / part downloads beyond start-up now (before this fold): "grow" lets one already over its limit grow
+    const loadMemo = new Map();
+    const loadOf = (e) => { if (!loadMemo.has(e)) { let n = 0; for (const x of g.closure(e)) if (!have.has(x)) n += gz(x); loadMemo.set(e, n); } return loadMemo.get(e); };
     for (const t of small) {
       const rt = g.reach.get(t), deps = [...g.closure(t)].filter((d) => d !== t), users = g.importers.get(t) ?? [];
       let best = own(t), cost = best ? 0 : Infinity;
       // after T and B become one file, everyone loading either loads both closures: none may go past its budget
       const fits = (b) => {
         if (!budgetOf) return true;
+        if (force === "free") return bootFits(b, t);
         const both = new Set([...g.closure(b), ...g.closure(t)]);
         // into a start-up piece: start-up as a whole (beyond the entry) stays within its own budget
         if (!bootFits(b, t)) return false;
@@ -178,7 +193,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
           if (lim == null) continue;
           let n = 0;
           for (const x of new Set([...g.closure(e), ...both])) if (!have.has(x)) n += gz(x);
-          if (n > lim) return false;
+          if (n > lim && !(force === "grow" && loadOf(e) > lim)) return false;
         }
         return true;
       };
@@ -201,7 +216,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
           if (b === t || b === entryKey) continue;
           // a route / lazy part is a host only for code it imports itself (its other users then load it statically: their
           // budgets decide), never a start-up piece, never one with a stylesheet (its rules would apply on other pages)
-          if (outs[b].entryPoint && (!entryHost || !users.includes(b) || budgetOf?.(b)?.boot || outs[b].cssBundle)) continue;
+          if (outs[b].entryPoint && (!hostEntries || !users.includes(b) || budgetOf?.(b)?.boot || outs[b].cssBundle)) continue;
           const rb = g.reach.get(b), cb = g.closure(b), ct = g.closure(t);
           if (cb.has(t) && !users.includes(b)) continue; // B → X → T
           if ([...ct].some((x) => x !== t && x !== b && g.closure(x).has(b))) continue; // T → X → B
@@ -478,6 +493,8 @@ ${bCss}`), inputs: { ...(outs[bc]?.inputs ?? {}), ...(outs[tc]?.inputs ?? {}) } 
 // while small chunks are left. order: the order of the paid folds (2c) — widely shared code first (it competes for the
 // start-up budget with narrow code), narrow code first, the largest first. entryHost: a route / lazy part may host small
 // code it imports itself (its other users then load it statically; their budgets decide)
+/** packChunks › forceSize default: a shared chunk under it is never a file of its own (march.config.js › chunks.forceSize). */
+export const FORCE_SIZE = 2048;
 const ORDERS = [
   (g, a, b) => g.reach.get(b).size - g.reach.get(a).size || (g.outs[a].bytes ?? 0) - (g.outs[b].bytes ?? 0),
   (g, a, b) => g.reach.get(a).size - g.reach.get(b).size || (g.outs[a].bytes ?? 0) - (g.outs[b].bytes ?? 0),

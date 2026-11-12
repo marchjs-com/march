@@ -192,7 +192,7 @@ async function build({ dev = false } = {}) {
       await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
       T("mergeEntry");
       // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
-      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: aim || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan), strategy });
+      if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: aim || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan), strategy, ...(cfg.chunks?.forceSize != null ? { forceSize: cfg.chunks.forceSize } : {}) });
       T("packChunks");
       return true;
     };

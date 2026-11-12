@@ -4,6 +4,12 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Fewer files from the chunk packer (later in 0.1.0)
+- `march build`'s packer ends with a forced step: a shared chunk still under the floor joins a host even when a route
+  or lazy part it reaches is already over its budget (that row fails either way; a file of its own only adds a request),
+  and a shared chunk under `chunks.forceSize` (default 2 KB) is never a file of its own. Budgets within their limit are
+  kept in the first case; start-up's budget is kept in both.
+
 ### Normal addresses on every host (later in 0.1.0)
 - The router uses normal addresses under any base path: `createRouter({ mode: "history", base: "auto" })` (the
   defaults). The base comes from a `<base href>`, the base `march build` writes into `index.html`, or the entry
