@@ -6,6 +6,7 @@
 // and "morph" start where the pointer last pressed (a link, a card). Every frame is an engine animation.
 import { definePageTransition, type PageTransitionFrames } from "./page.ts";
 import { transitionOutlet } from "../router/index.ts";
+import { onConfig, pausedNow } from "./engine/config.ts";
 import { clipAt } from "./clip.ts";
 
 export interface PageVariant { readonly name: string; readonly frames: PageTransitionFrames }
@@ -27,7 +28,9 @@ function track(): void {
   }, { capture: true, passive: true });
 }
 function pageRect(): DOMRect | null {
-  const el = (transitionOutlet()?.firstElementChild ?? globalThis.document?.documentElement) as Element | null;
+  // the part that animates (a [data-hm-transition] stage, else the page)
+  const page = transitionOutlet()?.firstElementChild;
+  const el = (page?.querySelector("[data-hm-transition]") ?? page ?? globalThis.document?.documentElement) as Element | null;
   return el?.getBoundingClientRect?.() ?? null;
 }
 const rel = (x: number, y: number): { x: number; y: number } => {
@@ -141,7 +144,8 @@ export const morphPage: PageVariant = make("morph", (side, dir) => {
   track();
   const r = pageRect(), b = press.rect;
   let from = clipAt(0, { shape: "inset", radius: "24px" });
-  if (r && b && r.width && r.height) {
+  // a link outside the animated part (a stage's own menu): grow from the default rounded box
+  if (r && b && r.width && r.height && b.bottom > r.top && b.top < r.bottom && b.right > r.left && b.left < r.right) {
     const t = Math.max(0, ((b.top - r.top) / r.height) * 100), l = Math.max(0, ((b.left - r.left) / r.width) * 100);
     const bt = Math.max(0, ((r.bottom - b.bottom) / r.height) * 100), rt = Math.max(0, ((r.right - b.right) / r.width) * 100);
     from = `inset(${t.toFixed(2)}% ${rt.toFixed(2)}% ${bt.toFixed(2)}% ${l.toFixed(2)}% round 16px)`;
@@ -152,7 +156,20 @@ export const morphPage: PageVariant = make("morph", (side, dir) => {
 /** Every variant above. */
 export const PAGE_VARIANTS: readonly PageVariant[] = [circle, wipe, stack, cube, flip, zoomThrough, curtain, blinds, pixelDissolve, morphPage];
 
+// "Stop all" during a swap would freeze its snapshot layers on screen (a View Transition ends only when its
+// animations do): remove them, the transition ends and the new page shows at once
+let guarded = false;
+function guard(): void {
+  if (guarded) return;
+  guarded = true;
+  onConfig((why) => {
+    if (why !== "pause" || !pausedNow()) return;
+    for (const a of globalThis.document?.getAnimations?.() ?? []) if ((a.effect as KeyframeEffect | null)?.pseudoElement?.startsWith("::view-transition")) a.cancel();
+  });
+}
+
 /** Register variants so routes can name them in `meta.transition`. */
 export function usePageTransitions(...variants: PageVariant[]): void {
+  guard();
   for (const v of variants) definePageTransition(v.name, v.frames);
 }

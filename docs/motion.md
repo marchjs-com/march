@@ -103,4 +103,7 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
 clip-path cells, one polygon), `morphPage` ("morph": grows out of the pressed link's box). Register with
 `usePageTransitions(circle, cube)`; `PAGE_VARIANTS` lists all. Going back, the old page plays the reverse on top
 (`zIndex`); wipe, stack, cube and flip mirror in RTL. With View Transitions the engine animates the pseudo-elements,
-otherwise the page elements themselves.
+otherwise the page elements themselves. The snapshot layers are clipped to the box of the part that changes, so a scaled, blurred
+or turning page never covers the menu. Mark an element inside the page with `data-hm-transition` (a demo stage, a content
+column) and only that part animates; the rest of the page swaps at once. "Stop all" during a variant transition ends
+it at once (its layer animations are removed), and a newer navigation replaces a running one, so no layer stays.

@@ -332,6 +332,7 @@ timeline({ root }).add(".card", fadeUp, { stagger: 60 }).play();
 pageTransitions({ type: "slide" });           // View Transitions with an engine fallback; back reverses, RTL mirrors
 // per route: { path: "/photos/:id", meta: { transition: "scale" } } ("fade" | "slide" | "scale" | "none" | { type, duration });
 // shared element: the same data-hm-shared="photo-3" on the old and the new page moves between them. Named and modal outlets too.
+// only a part animates: <div data-hm-transition> inside the page (a stage); the layers stay clipped to that box
 ```
 Rules: animate only `transform`/`opacity` (WAAPI or the `style` object); everything honors `prefers-reduced-motion`
 (`reducedMotion()`); never use string styles. fx (`Particles`, `Aurora`, `confetti`) is decorative — keep it off admin
