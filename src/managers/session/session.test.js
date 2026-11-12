@@ -63,3 +63,17 @@ test("other tabs: extend and sign-out travel through storage; activity extends",
   disposeSession();
   disposeIdle();
 });
+
+test("activity still extends after IdleManager is re-configured", () => {
+  configureSession({ duration: 60_000, warnBefore: 1000, storageKey: null, extendOnActivity: true, extendEvery: 0, onExpire: null });
+  const s = session();
+  s.start(30_000);
+  configureIdle({ throttle: 0, timeout: 5000 });
+  const before = s.expiresAt();
+  const t0 = Date.now();
+  while (Date.now() === t0) { /* next ms */ }
+  document.dispatchEvent(new Event("pointerdown"));
+  assert.ok(s.expiresAt() > before);
+  disposeSession();
+  disposeIdle();
+});
