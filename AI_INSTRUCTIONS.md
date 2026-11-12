@@ -368,6 +368,8 @@ morph(button, dialog); await morphBack(dialog, button).finished;   // container 
 morph(thumb, big, { mode: "scale", hideSource: false });            // shared element FLIP
 morphIcon(pathEl, playing ? "pause" : "play");                      // MORPH_ICONS: play pause menu close plus check minus
 shapeMorph(el, "star");                                             // circle square triangle diamond hexagon star blob flower
+usePageTransitions(circle, cube, wipe);                             // then meta: { transition: "cube" } per route
+// variants: circle wipe stack cube flipPage zoomThrough curtain blinds pixelDissolve morphPage (PAGE_VARIANTS = all)
 ```
 
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)

@@ -91,3 +91,12 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
   bars with the same commands, so any two tween number by number.
 - `shapeMorph(el, shape)` / `shapePolygon(shape, n)` — radial outlines sampled at the same angles (circle, square,
   triangle, diamond, hexagon, star, blob, flower): clip-path polygons the browser interpolates.
+
+### Page transition variants (src/motion/page-fx.ts)
+`definePageTransition(name, (side, dir, rtl, distance) => keyframes)` adds a `meta.transition` name to
+`pageTransitions()`. Ready variants, each its own export: `circle` (from the last pressed point), `wipe`, `stack`,
+`cube`, `flipPage` ("flip"), `zoomThrough` ("zoom-through"), `curtain`, `blinds`, `pixelDissolve` ("pixel": stepped
+clip-path cells, one polygon), `morphPage` ("morph": grows out of the pressed link's box). Register with
+`usePageTransitions(circle, cube)`; `PAGE_VARIANTS` lists all. Going back, the old page plays the reverse on top
+(`zIndex`); wipe, stack, cube and flip mirror in RTL. With View Transitions the engine animates the pseudo-elements,
+otherwise the page elements themselves.
