@@ -76,7 +76,8 @@ const SETUP = `(() => {
     c.click();
     return () => c.click();
   };
-  const key = (c) => where(c) + " § " + name(c);
+  // numbers left out: a slider's label carries its value, which changes while it is tried
+  const key = (c) => where(c) + " § " + name(c).replace(/[\\d.,]+/g, "#");
   // every visible, enabled option control not tried yet (a choice that is already selected changes nothing by design)
   const pending = () => [...new Set(optionRoots().flatMap((o) => [...o.querySelectorAll(SEL)]))].filter((c) => !skip(c) && shown(c) && !c.disabled
     && c.getAttribute("aria-disabled") !== "true" && !(choice(c) && picked(c)) && !c.hasAttribute("data-ca-done") && !window.__ca.tried.has(key(c)));

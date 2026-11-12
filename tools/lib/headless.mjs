@@ -35,7 +35,8 @@ export function allShowcaseRoutes() {
 export async function openHeadless({ base = null } = {}) {
   let server;
   if (!base) {
-    const dist = join(ROOT, "examples/showcase/dist");
+    // MARCH_SHOWCASE_DIST: another built copy (an audit can run while the showcase is built again)
+    const dist = resolve(process.env.MARCH_SHOWCASE_DIST ?? join(ROOT, "examples/showcase/dist"));
     if (!existsSync(dist)) { console.error("✖ examples/showcase/dist is missing: run node examples/showcase/build.mjs first"); process.exit(2); }
     const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".woff2": "font/woff2", ".json": "application/json" };
     server = createServer((req, res) => {
@@ -64,9 +65,18 @@ export async function openHeadless({ base = null } = {}) {
     if (d.id && wait.has(d.id)) { wait.get(d.id)(d); wait.delete(d.id); }
     else if (d.method === "Runtime.exceptionThrown") errs.push(d.params.exceptionDetails?.exception?.description?.split("\n")[0]);
     else if (d.method === "Runtime.consoleAPICalled" && d.params.type === "error") errs.push(d.params.args.map((a) => a.value ?? a.description).join(" ").slice(0, 200));
+    // an alert / confirm / prompt (or a beforeunload ask) would block every later evaluate: dismiss it
+    else if (d.method === "Page.javascriptDialogOpening") send("Page.handleJavaScriptDialog", { accept: d.params.type === "beforeunload" });
   };
   const send = (method, params = {}) => new Promise((r) => { const i = ++id; wait.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
-  const ev = async (e) => (await send("Runtime.evaluate", { expression: e, awaitPromise: true, returnByValue: true })).result?.result?.value;
+  /** Evaluate in the page; undefined (and an entry in errs) when it does not settle within `ms`. */
+  const ev = async (e, ms = 30000) => {
+    let timer;
+    const late = new Promise((r) => { timer = setTimeout(() => { errs.push(`evaluate timed out after ${ms} ms: ${e.slice(0, 80).replace(/\s+/g, " ")}`); r(undefined); }, ms); });
+    const out = await Promise.race([send("Runtime.evaluate", { expression: e, awaitPromise: true, returnByValue: true }).then((d) => d.result?.result?.value), late]);
+    clearTimeout(timer);
+    return out;
+  };
   await send("Page.enable"); await send("Runtime.enable");
   /** Open a showcase route at a width, from a fresh reload. */
   const load = async (route, w = 1440) => {
