@@ -74,8 +74,9 @@ test("ThemeEditor: tokens, color edit, undo / redo, audit fix, scoped preview va
   const el = document.createElement("div");
   document.body.appendChild(el);
   const dispose = render(() => h(ThemeEditor, { "bind:value": v, storageKey: false, warnUnsaved: false, share: false }), el);
-  // the editor, its colors tab and the preview are chunks of their own
-  for (let i = 0; i < 100 && !(el.querySelector(".hm-te-token") && el.querySelector(".hm-te-screen")); i++) await new Promise((r) => setTimeout(r, 10));
+  // the editor, its colors tab, the preview and its two parts (chart, table) are chunks of their own
+  for (let i = 0; i < 100 && !(el.querySelector(".hm-te-token") && el.querySelector(".hm-te-cards .hm-card") && el.querySelector(".hm-te-table")); i++) await new Promise((r) => setTimeout(r, 10));
+  assert.ok(el.querySelector(".hm-te-cards .hm-card") && el.querySelector(".hm-te-table"), "both preview parts arrive");
   assert.equal(el.querySelector(".hm-te").getAttribute("aria-label"), "Theme editor");
   assert.equal(el.querySelectorAll(".hm-te-base").length, 8, "seven presets and from scratch");
   const tokens = el.querySelectorAll(".hm-te-token");
