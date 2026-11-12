@@ -12,6 +12,7 @@ import { defineManager } from "../manager.ts";
 import { publisher } from "../publish.ts";
 
 export type Level = "debug" | "info" | "warn" | "error";
+/** Log levels from the most to the least verbose. */
 export const LEVELS: readonly Level[] = ["debug", "info", "warn", "error"];
 const rank = (l: Level): number => LEVELS.indexOf(l);
 
@@ -162,6 +163,9 @@ const manager = defineManager<LogHub, LogConfig>("log", create, {
 
 /** The app logger (created on first call). */
 export const logger = (): LogHub => manager.get();
+/** Set the log manager's options (merged into the current config). */
 export const configureLog = (config: Partial<LogConfig>): void => manager.configure(config);
+/** Stop the log manager and remove its listeners; the next call starts it again. */
 export const disposeLog = (): void => manager.dispose();
+/** The log manager (get, configure, dispose). */
 export const logManager = manager;

@@ -20,6 +20,7 @@ export interface Measure { name: string; duration: number; start: number; ok?: b
 export const THRESHOLDS: Record<VitalName, [number, number]> = {
   lcp: [2500, 4000], cls: [0.1, 0.25], inp: [200, 500], fcp: [1800, 3000], ttfb: [800, 1800],
 };
+/** Web Vitals rating of a value: "good", "needs-improvement" or "poor" (the published thresholds). */
 export const rateVital = (name: VitalName, v: number): Rating => {
   const [good, poor] = THRESHOLDS[name];
   return v <= good ? "good" : v <= poor ? "needs-improvement" : "poor";
@@ -152,6 +153,9 @@ const manager = defineManager<Perf, PerfConfig>("perf", create, { keep: 50, pref
 
 /** The performance manager (created on first call; observers start then). */
 export const perf = (): Perf => manager.get();
+/** Set the performance manager's options (merged into the current config). */
 export const configurePerf = (config: Partial<PerfConfig>): void => manager.configure(config);
+/** Stop the performance manager and remove its listeners; the next call starts it again. */
 export const disposePerf = (): void => manager.dispose();
+/** The performance manager (get, configure, dispose). */
 export const perfManager = manager;

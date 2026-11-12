@@ -121,6 +121,9 @@ export const announcer: Announcer = {
   regions: () => untrack(() => manager.get()).regions(),
   dispose: () => manager.dispose(),
 };
+/** Set the announcer manager's options (merged into the current config). */
 export const configureAnnouncer = (config: Partial<AnnouncerConfig>): void => manager.configure(config);
+/** Stop the announcer manager and remove its listeners; the next call starts it again. */
 export const disposeAnnouncer = (): void => manager.dispose();
+/** The announcer manager (get, configure, dispose). */
 export const announcerManager = manager;

@@ -122,6 +122,9 @@ const manager = defineManager<DirtyState, DirtyConfig>("dirty", create, { warnOn
 
 /** The unsaved-changes manager (created on first call). */
 export const dirtyState = (): DirtyState => manager.get();
+/** Set the dirty-state manager's options (merged into the current config). */
 export const configureDirty = (config: Partial<DirtyConfig>): void => manager.configure(config);
+/** Stop the dirty-state manager and remove its listeners; the next call starts it again. */
 export const disposeDirty = (): void => manager.dispose();
+/** The dirty-state manager (get, configure, dispose). */
 export const dirtyManager = manager;

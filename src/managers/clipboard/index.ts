@@ -134,8 +134,11 @@ const manager = defineManager<Clipboard, ClipboardConfig>("clipboard", create, {
 
 /** The clipboard manager (created on first call). */
 export const clipboard = (): Clipboard => manager.get();
+/** Set the clipboard manager's options (merged into the current config). */
 export const configureClipboard = (config: Partial<ClipboardConfig>): void => manager.configure(config);
+/** Stop the clipboard manager and remove its listeners; the next call starts it again. */
 export const disposeClipboard = (): void => manager.dispose();
+/** The clipboard manager (get, configure, dispose). */
 export const clipboardManager = manager;
 
 // copy:text={value} — a click copies the value; aria-live tells screen readers. `copy:html` copies { text, html }.

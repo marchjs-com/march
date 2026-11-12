@@ -185,8 +185,11 @@ export const focus: Focus = {
   active: () => manager.get().active(),
   dispose: () => manager.dispose(),
 };
+/** Set the focus manager's options (merged into the current config). */
 export const configureFocus = (config: Partial<FocusConfig>): void => manager.configure(config);
+/** Stop the focus manager and remove its listeners; the next call starts it again. */
 export const disposeFocus = (): void => manager.dispose();
+/** The focus manager (get, configure, dispose). */
 export const focusManager = manager;
 
 // focus:trap on an element: trap while it is mounted (the value false turns it off).

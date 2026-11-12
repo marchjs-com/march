@@ -122,6 +122,9 @@ function create(cfg: NotificationConfig): Notifications {
 const manager = defineManager<Notifications, NotificationConfig>("notification", create, DEFAULTS);
 /** The notification manager (created on first call; asks nothing until request()). */
 export const notifications = (): Notifications => manager.get();
+/** Set the notification manager's options (merged into the current config). */
 export const configureNotifications = (config: Partial<NotificationConfig>): void => manager.configure(config);
+/** Stop the notification manager and remove its listeners; the next call starts it again. */
 export const disposeNotifications = (): void => manager.dispose();
+/** The notification manager (get, configure, dispose). */
 export const notificationManager = manager;

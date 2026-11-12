@@ -174,7 +174,10 @@ export const layer: Layers = {
   scrollLocked: () => manager.get().scrollLocked(),
   dispose: () => manager.dispose(),
 };
+/** Set the layer manager's options (merged into the current config). */
 export const configureLayers = (config: Partial<LayerConfig>): void => manager.configure(config);
+/** Stop the layer manager and remove its listeners; the next call starts it again. */
 export const disposeLayers = (): void => manager.dispose();
+/** The layer manager (get, configure, dispose). */
 export const layerManager = manager;
 export type { LayerKind };

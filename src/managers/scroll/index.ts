@@ -190,6 +190,9 @@ function create(cfg: ScrollConfig): Scroll {
 const manager = defineManager<Scroll, ScrollConfig>("scroll", create, DEFAULTS);
 /** The scroll manager (created on first call). */
 export const scroll = (): Scroll => manager.get();
+/** Set the scroll manager's options (merged into the current config). */
 export const configureScroll = (config: Partial<ScrollConfig>): void => manager.configure(config);
+/** Stop the scroll manager and remove its listeners; the next call starts it again. */
 export const disposeScroll = (): void => manager.dispose();
+/** The scroll manager (get, configure, dispose). */
 export const scrollManager = manager;

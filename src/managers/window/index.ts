@@ -150,6 +150,9 @@ function create(cfg: WindowConfig): AppWindow {
 const manager = defineManager<AppWindow, WindowConfig>("window", create, DEFAULTS);
 /** The window manager (created on first call). */
 export const appWindow = (): AppWindow => manager.get();
+/** Set the window manager's options (merged into the current config). */
 export const configureWindow = (config: Partial<WindowConfig>): void => manager.configure(config);
+/** Stop the window manager and remove its listeners; the next call starts it again. */
 export const disposeWindow = (): void => manager.dispose();
+/** The window manager (get, configure, dispose). */
 export const windowManager = manager;

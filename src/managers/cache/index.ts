@@ -166,6 +166,9 @@ const manager = defineManager<AppCache, CacheConfig>("cache", create, { maxEntri
 
 /** The app cache (created on first call). */
 export const appCache = (): AppCache => manager.get();
+/** Set the cache manager's options (merged into the current config). */
 export const configureCache = (config: Partial<CacheConfig>): void => manager.configure(config);
+/** Stop the cache manager and remove its listeners; the next call starts it again. */
 export const disposeCache = (): void => manager.dispose();
+/** The cache manager (get, configure, dispose). */
 export const cacheManager = manager;

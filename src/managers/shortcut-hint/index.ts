@@ -120,6 +120,9 @@ export const shortcutHints: ShortcutHints = {
   targets: (r) => untrack(() => manager.get()).targets(r),
   dispose: () => manager.dispose(),
 };
+/** Set the shortcut hint manager's options (merged into the current config). */
 export const configureShortcutHints = (config: Partial<ShortcutHintConfig>): void => manager.configure(config);
+/** Stop the shortcut hint manager and remove its listeners; the next call starts it again. */
 export const disposeShortcutHints = (): void => manager.dispose();
+/** The shortcut hint manager (get, configure, dispose). */
 export const shortcutHintManager = manager;

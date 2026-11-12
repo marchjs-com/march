@@ -57,6 +57,7 @@ export interface A11y {
   dispose(): void;
 }
 
+/** Accessibility preferences before the user changes any (follow the system for motion, no extra contrast, scale 1). */
 export const DEFAULT_PREFS: A11yPrefs = { motion: "system", contrast: false, fontScale: 1, underlineLinks: false, textSpacing: false, strongFocus: false };
 
 const clampScale = (n: unknown): number => { const v = Number(n); return Number.isFinite(v) ? Math.min(2, Math.max(0.85, Math.round(v * 100) / 100)) : 1; };
@@ -168,6 +169,9 @@ export const a11y: A11y = {
   audit: (r) => untrack(() => manager.get()).audit(r),
   dispose: () => manager.dispose(),
 };
+/** Set the accessibility manager's options (merged into the current config). */
 export const configureA11y = (config: Partial<A11yConfig>): void => manager.configure(config);
+/** Stop the accessibility manager and remove its listeners; the next call starts it again. */
 export const disposeA11y = (): void => manager.dispose();
+/** The accessibility manager (get, configure, dispose). */
 export const a11yManager = manager;
