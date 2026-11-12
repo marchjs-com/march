@@ -36,7 +36,9 @@
     "./motion/install": "./src/motion/install.ts",
     "./css/themes/*": "./src/css/themes/*",
     "./net": "./src/net/index.ts",
-    "./net/mock": "./src/net/mock.ts"
+    "./net/mock": "./src/net/mock.ts",
+    "./errors": "./src/errors/index.ts",
+    "./errors/errors.css": "./src/errors/errors.css"
   },
   "bin": {
     "march": "./cli/march.js"
@@ -69,6 +71,7 @@
     "*.css",
     "./src/motion/install.ts",
     "./src/net/index.ts",
-    "./src/net/mock.ts"
+    "./src/net/mock.ts",
+    "./src/errors/index.ts"
   ]
 }
