@@ -17,18 +17,8 @@ export interface HydrateOptions {
   timeout?: number;
 }
 
-const norm = (p: string): string => p.replace(/\/(index\.html)?$/, "") || "/";
-
-/**
- * True when the URL shows the route prerendered into `el` (data-hm-prerender: "#/x" for hash routing, else "/x").
- * History routing compares the end of the path, so it works under any base; "/" matches only a folder URL.
- */
-export function prerenderedFor(el: Element): boolean {
-  const pre = el.getAttribute("data-hm-prerender"), l = globalThis.location;
-  if (pre == null || !l) return false;
-  if (pre[0] === "#") return norm((l.hash.slice(1) || "/").split("?")[0] as string) === norm(pre.slice(1));
-  return pre === "/" ? /\/(index\.html)?$/.test(l.pathname) : norm(l.pathname).endsWith(norm(pre));
-}
+import { prerenderedFor } from "./prerendered.ts";
+export { prerenderedFor };
 
 /** Take over prerendered HTML (data-hm-prerender) without a flash, or render normally when there is none. */
 export function hydrate(fn: () => unknown, el: Element, opts: HydrateOptions = {}): () => void {

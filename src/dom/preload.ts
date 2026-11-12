@@ -4,6 +4,8 @@
 // `() => import("./pages/users.tsx")` with that key, so preloading a route fetches ALL its chunks at once with
 // <link rel="modulepreload"> instead of discovering them one import at a time.
 
+import { appBaseUrl } from "../base/index.ts";
+
 type Manifest = Record<string, readonly string[]>;
 let manifest: Manifest | null | undefined;
 let root: URL | null = null;
@@ -15,9 +17,8 @@ function read(): Manifest | null {
   const d = globalThis.document;
   const el = d?.getElementById("march-manifest");
   try { manifest = el ? (JSON.parse(el.textContent ?? "{}") as Manifest) : null; } catch { manifest = null; }
-  // file paths are relative to the build's root folder: the entry script lives in <root>/assets/
-  const entry = d?.querySelector<HTMLScriptElement>("script[type=module][src]");
-  try { root = entry ? new URL("../", entry.src) : d ? new URL("./", d.baseURI) : null; } catch { root = null; }
+  // file paths are relative to the build's root folder (the app's base, whatever route the page shows)
+  root = appBaseUrl();
   return manifest;
 }
 

@@ -221,7 +221,7 @@ test("route prefetch: Link hover / idle and prefetchLinks use the manifest (idle
     a.dispatchEvent(new Event("pointerenter"));
     R.prefetch("/b");
     assert.deepEqual(links(), ["modulepreload a-1.js", "modulepreload b-2.js"], "hover / explicit prefetch: modulepreload");
-    const c = document.createElement("a"); c.setAttribute("href", a.getAttribute("href").replace("/a", "/c")); document.body.appendChild(c);
+    const c = document.createElement("a"); c.setAttribute("href", a.getAttribute("href").replace(/a$/, "c")); document.body.appendChild(c); // a relative href, as Link writes it
     R.prefetchLinks();
     assert.ok(links().includes("prefetch c-3.js"), "idle prefetch of on-screen links: lowest priority");
     c.remove(); dispose(); host.remove();

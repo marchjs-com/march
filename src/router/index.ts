@@ -21,6 +21,7 @@ import { Try } from "../dom/flow.ts";
 import { lazy } from "../dom/lazy.ts";
 import { preloadChunks, loaderKey, saveData, whenIdle, runLoad, prefetchCommon } from "../dom/preload.ts";
 import { onVisible } from "../core/util.ts";
+import { appBase } from "../base/index.ts";
 
 // ------------------------------------------------------------------ types
 export type Component = (props: Record<string, unknown>) => unknown;
@@ -37,7 +38,15 @@ export interface CompiledRoute extends RouteDef { pattern: string; keys: string[
 export interface Match { route: CompiledRoute; params: Record<string, string>; path: string; meta: Record<string, unknown> }
 export interface RouterOptions {
   routes: RouteTable | RouteDef[];
+  /**
+   * "history" (default): normal addresses (/app/users/7). Where the page cannot change its address (file://, a sandboxed
+   * iframe) the router falls back to hash addresses (#/users/7) on its own, with the same routes. "hash": always #/….
+   */
   mode?: "history" | "hash";
+  /**
+   * The base path every route lives under (default "auto": a <base href>, else the base `march build` wrote into
+   * index.html, else the folder of the entry script — see appBase() in hadi-march). Or a path: "/app".
+   */
   base?: string;
   guard?: Guard;
   redirects?: Record<string, string>;
@@ -75,7 +84,7 @@ interface Level { key: string; comp: Component; to?: RouteTarget; page?: boolean
 interface View { to?: RouteTarget; levels: Level[]; error?: unknown }
 /** What a named outlet (or the modal outlet) shows. */
 export interface Slot { key: string; comp: Component; to: RouteTarget }
-export interface RouterState { loading?: Renderable; skeleton?: Renderable; routes: CompiledRoute[]; mode: "history" | "hash"; base: string; opts: RouterOptions; cache: Map<string, Promise<PageModule | null>>; seq: number; view: Sig<View | null>; redirects: CompiledRoute[]; outlets: Map<string, CompiledRoute[]>; dispose: () => void }
+export interface RouterState { loading?: Renderable; skeleton?: Renderable; routes: CompiledRoute[]; mode: "history" | "hash"; base: string; fallback?: boolean; onPop?: () => void; opts: RouterOptions; cache: Map<string, Promise<PageModule | null>>; seq: number; view: Sig<View | null>; redirects: CompiledRoute[]; outlets: Map<string, CompiledRoute[]>; dispose: () => void }
 
 const S = {
   router: null as RouterState | null,
@@ -174,20 +183,51 @@ export function createRouter(opts: RouterOptions): { navigate: typeof navigate; 
   const list: RouteDef[] = Array.isArray(opts.routes) ? opts.routes : Object.entries(opts.routes).map(([p, v]) => (typeof v === "function" ? { path: p, load: v } : { ...v, path: p }));
   const routes = list.map(compile).sort((a, b) => b.score - a.score);
   const redirects = Object.entries(opts.redirects ?? {}).map(([from, to]) => compile({ path: from, meta: { to } }));
-  const mode = opts.mode ?? "history";
-  const base = (opts.base ?? "").replace(/\/$/, "");
+  const base = resolveBase(opts.base);
+  // history mode where the address cannot change (file://, a sandboxed iframe): hash addresses, same routes
+  const fallback = (opts.mode ?? "history") === "history" && !historyUsable();
+  const mode = fallback ? "hash" : opts.mode ?? "history";
   const outlets = new Map(Object.entries(opts.outlets ?? {}).map(([name, tbl]) => [name, (Array.isArray(tbl) ? tbl : Object.entries(tbl).map(([p, v]) => (typeof v === "function" ? { path: p, load: v } : { ...v, path: p }))).map(compile).sort((a, b) => b.score - a.score)]));
-  const r: RouterState = { routes, mode, base, opts, cache: new Map(), seq: 0, view: sig<View | null>(null), redirects, outlets, dispose: () => {} };
+  const r: RouterState = { routes, mode, base, fallback, opts, cache: new Map(), seq: 0, view: sig<View | null>(null), redirects, outlets, dispose: () => {} };
   S.router = r;
+  if (mode === "history") restoreAddress(base);
   const onPop = (): void => { void sync({ pop: true }); };
   const onUnload = (e: BeforeUnloadEvent): void => { if ([...leaveGuards].some((g) => g() === false)) { e.preventDefault(); e.returnValue = ""; } };
   globalThis.addEventListener?.("popstate", onPop);
   globalThis.addEventListener?.("beforeunload", onUnload);
   if (mode === "hash") globalThis.addEventListener?.("hashchange", onPop);
+  r.onPop = onPop;
   r.dispose = () => { globalThis.removeEventListener?.("popstate", onPop); globalThis.removeEventListener?.("hashchange", onPop); globalThis.removeEventListener?.("beforeunload", onUnload); };
   if (globalThis.history && "scrollRestoration" in globalThis.history && opts.scroll !== false) globalThis.history.scrollRestoration = "manual";
   void sync({ initial: true });
   return { navigate, back, routes, dispose: r.dispose };
+}
+
+/** "auto" (or nothing) → the app's base path; "/app/" → "/app"; "./" (relative) counts as "auto". */
+function resolveBase(b: string | undefined): string {
+  return b && b[0] !== "." && b !== "auto" ? `/${b}`.replace(/^\/+/, "/").replace(/\/+$/, "") : appBase();
+}
+
+/** Can this page change its address with pushState? Not from files, opaque origins (sandboxed iframes) or about:/data:. */
+function historyUsable(): boolean {
+  const l = globalThis.location, h = globalThis.history;
+  try { return /^https?:$/.test(l.protocol) && l.origin !== "null" && (h.replaceState(h.state, "", l.href), true); } catch { return false; }
+}
+
+/** The route part of a path under the base: "/app/users/7/" → "/users/7" (a host's directory slash is not part of the
+ * route), "/app/index.html" → "/". */
+function stripBase(p: string, base: string): string {
+  return (`${p}/`.startsWith(`${base}/`) ? p.slice(base.length) : p).replace(/(\/index\.html?)?\/*$/, "") || "/";
+}
+
+/**
+ * History mode, first thing: an address another host or an older version produced becomes the normal one, without a
+ * history entry: ?hm-path=/x (written by the 404.html fallback of a static host) and #/x (old hash links).
+ */
+function restoreAddress(base: string): void {
+  const l = globalThis.location;
+  const to = /^#\//.test(l.hash) ? l.hash.slice(1) : new URLSearchParams(l.search).get("hm-path");
+  if (to?.[0] === "/" && to[1] !== "/") globalThis.history.replaceState(globalThis.history.state, "", base + to);
 }
 
 function currentLocation(): { p: string; search: string; hash: string } {
@@ -195,11 +235,27 @@ function currentLocation(): { p: string; search: string; hash: string } {
   const r = S.router;
   if (!l) return { p: "/", search: "", hash: "" };
   if (r?.mode === "hash") {
+    // the fallback reads the path too: a prerendered sub-page opened from files (dist/motion/index.html) is /motion
+    if (r.fallback && !/^#\//.test(l.hash)) return { p: stripBase(l.pathname, r.base), search: l.search, hash: l.hash };
     const u = new URL(l.hash.slice(1) || "/", "http://x");
     return { p: u.pathname, search: u.search, hash: "" };
   }
-  const p = r?.base && l.pathname.startsWith(r.base) ? l.pathname.slice(r.base.length) || "/" : l.pathname;
-  return { p, search: l.search, hash: l.hash };
+  return { p: stripBase(l.pathname, r?.base ?? ""), search: l.search, hash: l.hash };
+}
+
+/**
+ * The href of a route as it goes into the page: in history mode relative to the current address ("../flow"), so the
+ * link is right under any base, also opened in a new tab; in hash mode "#/flow".
+ */
+export function hrefOf(to: string): string {
+  const r = S.router;
+  if (r?.mode !== "history") return `#${to}`;
+  const [, p = "", rest] = /^([^?#]*)(.*)$/.exec(r.base + to)!;
+  // folders of the current address ("/app/motion/svg" → app, motion) against the target's segments
+  const from = globalThis.location.pathname.split("/").slice(1, -1), dest = p.split("/").slice(1);
+  let i = 0;
+  while (i < from.length && i < dest.length - 1 && from[i] === dest[i]) i++;
+  return ("../".repeat(from.length - i) + dest.slice(i).join("/") || "./") + rest;
 }
 
 let lastUrl = "";
@@ -354,8 +410,9 @@ export function prefetchLinks(max = 6): void {
     if (seen.size >= max) break;
     const b = a.getBoundingClientRect?.();
     if (b && vh && (b.bottom < 0 || b.top > vh || b.right < 0 || b.left > vw || (!b.width && !b.height))) continue;
+    // the route a link points to: "#/x", or a path under the base ("../x"); another site's path matches no route
     const raw = a.getAttribute("href") ?? "";
-    const to = r.mode === "hash" ? (raw.startsWith("#/") ? raw.slice(1) : null) : raw.startsWith("/") && !raw.startsWith("//") ? raw.slice(r.base.length) || "/" : null;
+    const to = raw[0] === "#" ? (raw[1] === "/" ? raw.slice(1) : null) : raw && stripBase(new URL(raw, globalThis.location.href).pathname, r.base);
     if (!to || seen.has(to)) continue;
     seen.add(to);
     const m = matchRoute(r.routes, to.split(/[?#]/)[0] ?? "/");
@@ -431,12 +488,14 @@ export async function navigate(to: Href, { replace = false, state = null, force 
   const samePage = s.split(/[?#]/)[0] === untrack(() => S.path());
   if (!force && !samePage && leaveGuards.size && !(await allowLeave())) return;
   saveScroll();
-  const url = r.mode === "hash" ? `#${s}` : `${r.base}${s}`;
   // a modal keeps the page it was opened from (or that page's own background, when one modal opens another)
   const curState = globalThis.history?.state as { hmModal?: boolean; hmBg?: string } | null;
   const bg = curState?.hmModal && curState.hmBg ? curState.hmBg : `${untrack(() => S.path())}${untrack(() => S.search())}`;
   const st = { ...(state ?? {}), hmKey: Math.random().toString(36).slice(2), ...(modal ? { hmModal: true, hmBg: bg } : {}) };
-  if (replace) globalThis.history.replaceState(st, "", url); else globalThis.history.pushState(st, "", url);
+  const write = (): void => globalThis.history[replace ? "replaceState" : "pushState"](st, "", r.mode === "hash" ? `#${s}` : r.base + s);
+  // a sandbox that refuses only the first real change of address: hash addresses from now on, same routes (a refusal
+  // in hash mode throws again)
+  try { write(); } catch { r.mode = "hash"; r.fallback = true; globalThis.addEventListener("hashchange", r.onPop!); write(); }
   return sync();
 }
 /** Go back one entry in history. */
@@ -560,7 +619,8 @@ export function Link(props: { href: Href | (() => Href); exact?: boolean; replac
   const pre = (): void => prefetch(href());
   const a = h("a", {
     ...rest,
-    href: () => (S.router?.mode === "hash" ? `#${href()}` : `${S.router?.base ?? ""}${href()}`),
+    // relative to the current address, so re-read on every route change
+    href: () => { S.path(); return hrefOf(href()); },
     "aria-current": () => (active() ? "page" : null),
     // the link being opened shows a spinner while the navigation is slow (router.css)
     "aria-busy": () => (S.slow() && S.path() === href().split("?")[0] ? "true" : null),

@@ -5,6 +5,7 @@ import "./theme-swatches.css";
 import "./button.css";
 import "./field.css";
 import { signal, computed, untrack, onCleanup } from "../core/reactive.ts";
+import { appUrl } from "../base/index.ts";
 import { h } from "../dom/h.ts";
 import { t, locale, setLocale } from "../core/i18n.ts";
 import { val, cx, on, glyph, type MaybeFn, type ClassProp } from "./util.ts";
@@ -64,7 +65,7 @@ export interface ThemeInfo {
   id: string;
   name: string;
   description?: string;
-  /** Stylesheet URL of the theme (default: `themes/<id>.css` next to the page; see setThemeBase). */
+  /** Stylesheet URL of the theme, relative to the app's root (default: `themes/<id>.css`; see setThemeBase). */
   href?: string;
 }
 const THEME_NAME_KEY = "hm.colorTheme";
@@ -72,12 +73,11 @@ const infos = signal<readonly ThemeInfo[]>(THEME_NAMES.map((x) => ({ ...x })));
 const readName = (): string => { try { return globalThis.localStorage?.getItem(THEME_NAME_KEY) || DEFAULT_THEME; } catch { return DEFAULT_THEME; } };
 const themeName = signal<string>(readName(), { name: "colorTheme" });
 let themeBase: string | null = null;
-/** Where the built-in theme stylesheets live (default "themes/" relative to the page; `march build` copies them there). */
+/** Where the built-in theme stylesheets live (default "themes/" under the app's root, on any route; `march build` copies them there). */
 export function setThemeBase(url: string): void { themeBase = url.endsWith("/") ? url : `${url}/`; }
 const hrefOf = (id: string): string => {
   const custom = infos.peek().find((x) => x.id === id)?.href;
-  const d = globalThis.document;
-  return new URL(custom ?? `${themeBase ?? "themes/"}${id}.css`, d?.baseURI ?? "http://localhost/").href;
+  return new URL(appUrl(custom ?? `${themeBase ?? "themes/"}${id}.css`), "http://localhost/").href;
 };
 /** Load a theme's stylesheet once (<link rel="stylesheet">, CSP style-src 'self'); resolves when it is ready (or failed). */
 export function loadTheme(id: string): Promise<boolean> {
@@ -110,7 +110,7 @@ export function setColorTheme(id: string): string {
 }
 /** Themes offered by <ThemePicker> (reactive). */
 export const colorThemes = (): readonly ThemeInfo[] => infos();
-/** Offer extra themes: `registerThemes([{ id: "acme", name: "Acme", href: "/themes/acme.css" }])` (CSS made with themeCss()). */
+/** Offer extra themes: `registerThemes([{ id: "acme", name: "Acme", href: "themes/acme.css" }])` (CSS made with themeCss()). */
 export function registerThemes(list: readonly ThemeInfo[]): void { infos.update((l) => [...l.filter((x) => !list.some((y) => y.id === x.id)), ...list]); }
 
 /** Small preview of a theme drawn by the theme itself (data-hm-theme scope; no inline styles). */
