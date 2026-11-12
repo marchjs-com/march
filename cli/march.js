@@ -200,13 +200,12 @@ async function build({ dev = false } = {}) {
     }
     if (!dev) {
       if (cfg.headers !== false && !existsSync(join(out, "_headers"))) writeFileSync(join(out, "_headers"), headersFile({ stable: !!cfg.stableNames || flag("--stable-names") === true }));
-      // redirects: true → _redirects (Cloudflare Pages, Netlify): every address without a file opens the app. Only with an
-      // absolute base: a relative build's index.html cannot load its files from a deeper address (404.html covers it)
+      // redirects: true → _redirects (Cloudflare Pages, Netlify; files win over it): every address without a file opens the
+      // app. An absolute base rewrites to index.html; a relative build's index.html cannot load its files from a deeper
+      // address, so it rewrites to 404.html, which hands the address to the app's root (dist/ deployed at the site root)
       if (cfg.redirects && !existsSync(join(out, "_redirects"))) {
         const b = cfg.base ?? "/";
-        if (b.startsWith("/")) { const root = b.replace(/\/?$/, "/"); writeFileSync(join(out, "_redirects"), `${root}*  ${root}index.html  200
-`); }
-        else console.log("  redirects: skipped for a relative base (404.html sends unknown addresses to the app)");
+        writeFileSync(join(out, "_redirects"), b.startsWith("/") ? `${b.replace(/\/?$/, "/")}*  ${b.replace(/\/?$/, "/")}index.html  200\n` : "/*  /404.html  200\n");
       }
       if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
       const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));

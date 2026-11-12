@@ -55,8 +55,7 @@ test("relative build: a page per route with paths for its depth, the shell where
     assert.match(nf, /<meta name="robots" content="noindex">/);
     for (const p of ["./", "../", "../../", "../../../"]) assert.ok(nf.includes(`<script type="module" src="${p}march-404.js">`), p);
     assert.ok(a.has("march-404.js"));
-    assert.ok(!a.has("_redirects"), "no _redirects with a relative base");
-    assert.match(a.log, /redirects: skipped for a relative base/);
+    assert.equal(a.read("_redirects"), "/*  /404.html  200\n", "a relative index.html cannot load its files from a deeper address: 404.html hands it over");
   } finally { a.done(); }
 });
 
