@@ -328,7 +328,7 @@ class Document_ extends Node_ {
   querySelectorAll(s: string): Element_[] { return this.documentElement.querySelectorAll(s); }
 }
 
-interface FakeStorage { getItem(k: string): string | null; setItem(k: string, v: unknown): void; removeItem(k: string): void; clear(): void; readonly length: number }
+interface FakeStorage { getItem(k: string): string | null; setItem(k: string, v: unknown): void; removeItem(k: string): void; clear(): void; key(i: number): string | null; readonly length: number }
 interface HistoryEntry { state: unknown; url: string }
 interface FakeHistory {
   _stack: HistoryEntry[]; _i: number; readonly state: unknown;
@@ -367,7 +367,7 @@ export function installDom({ url = "http://localhost/" }: { url?: string } = {})
   const location = { assign(u: string) { history.pushState(null, "", u); }, replace(u: string) { history.replaceState(null, "", u); }, reload() {} } as FakeLocation;
   function sync(): void { const u = new URL(entry().url); for (const k of ["href", "origin", "pathname", "search", "hash", "host", "hostname", "protocol"] as const) location[k] = u[k]; }
   sync();
-  const storage = (): FakeStorage => { const m = new Map<string, string>(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k), clear: () => m.clear(), get length() { return m.size; } }; };
+  const storage = (): FakeStorage => { const m = new Map<string, string>(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k), clear: () => m.clear(), key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; } }; };
   const window = new EventTarget_() as FakeWindow;
   Object.assign(window, { document, location, history, localStorage: storage(), sessionStorage: storage(), innerWidth: 1024, innerHeight: 768,
     scrollTo() {}, scrollX: 0, scrollY: 0, matchMedia: (q: string): MediaQueryStub => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} }),

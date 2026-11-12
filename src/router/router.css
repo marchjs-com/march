@@ -1,6 +1,8 @@
 /* HADI March router: an outlet adds no box (its page sits in the layout as if it were not wrapped). While the level it
    holds loads, the old content stays (interactive above it) for 100 ms, then the route's skeleton replaces it. */
 .hm-outlet { display: contents; }
+/* a named / modal outlet's page: its own box, so a page transition can move it */
+.hm-outlet-page { min-width: 0; }
 .hm-outlet[aria-busy="true"] > * { opacity: .72; transition: opacity var(--hm-dur-2, .2s) var(--hm-ease-out, ease-out) .3s; }
 .hm-route-error { display: grid; gap: var(--hm-space-2, 8px); justify-items: start; margin: var(--hm-space-4, 16px) 0; }
 .hm-route-error p { margin: 0; }

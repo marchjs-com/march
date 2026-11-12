@@ -7,6 +7,7 @@
 //   - whatever is still under the limit fails the build, unless chunks.allow names it with a reason.
 import { relative, resolve, sep } from "node:path";
 import { readFileSync, existsSync } from "node:fs";
+import { gzipSync } from "node:zlib";
 
 const posix = (p) => p.split(sep).join("/");
 
@@ -15,14 +16,17 @@ const posix = (p) => p.split(sep).join("/");
  * @param {import("esbuild").Metafile} meta
  * `boot` (march.config.js › budget.boot): the lazy modules the app loads at start-up (shell pieces). They group only with
  * each other — a page must never ride along at start-up — and their group is exempt from the minimum size.
- * @param {{ cwd: string, entryKey: string, minSize: number, allow?: Record<string, string>, boot?: string[], prev?: Plan | null }} o
+ * `maxLoad` (march.config.js › budget.route, gzip bytes): two pages never share a group whose download (the group and
+ * every chunk it reaches) would be over it — grouping must not push a route past its budget.
+ * @param {{ cwd: string, entryKey: string, minSize: number, allow?: Record<string, string>, boot?: string[], prev?: Plan | null, maxLoad?: number }} o
  * @typedef {{ inline: Record<string, { spec: string, mode: "static" | "group", group?: string, name?: string }[]>, groups: Record<string, { abs: string, name: string, key: string }[]>, boot?: string[] }} Plan
  */
-export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot = [], prev = null }) {
+export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot = [], prev = null, maxLoad }) {
   const outs = meta.outputs;
   const plan = prev ? { inline: structuredClone(prev.inline), groups: structuredClone(prev.groups), boot: [...(prev.boot ?? [])] } : { inline: {}, groups: {}, boot: [] };
   const bootSet = new Set(boot.map(posix));
   const isBoot = (c) => c.keys.some((k) => bootSet.has(k));
+  const bootOut = (k) => { const ep = posix(outs[k]?.entryPoint ?? ""); return bootSet.has(ep) || (ep.startsWith("march-group:") && plan.boot.includes(ep.slice(12))); };
   const outOf = (input) => Object.keys(outs).find((k) => k.endsWith(".js") && outs[k].inputs?.[input]);
   let added = 0;
   const pending = [];
@@ -33,7 +37,9 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
         if (im.kind !== "dynamic-import" || im.path !== o.entryPoint) continue;
         const from = outOf(inp);
         if (!from) continue;
-        pending.push({ importer: resolve(cwd, inp), spec: im.original ?? im.path, target: o.entryPoint, toEntry: from === entryKey });
+        // a start-up piece (the route table, the shell) loads pages the way the entry does: never fold them into it
+        if (process.env.MARCH_PLAN_DEBUG) console.log("PEND", inp, "->", o.entryPoint, "from", from, outs[from]?.entryPoint, bootOut(from));
+        pending.push({ importer: resolve(cwd, inp), spec: im.original ?? im.path, target: o.entryPoint, toEntry: from === entryKey || bootOut(from) });
       }
     }
   }
@@ -51,11 +57,21 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
     // shared share of the merged reach, and the merged reach in bytes (what loading any member of the group costs)
     const affinity = (x, y) => { let both = 0, any = 0; for (const k of new Set([...x.reach, ...y.reach])) { const w = bytes(k); any += w; if (x.reach.has(k) && y.reach.has(k)) both += w; } return [any ? both / any : 0, any]; };
     const maxGroup = minSize * 4;
+    // a merged group comes out smaller than the sum of its members (each chunk's own import / export glue goes), so a
+    // group counts as big enough only with a margin; a single module is measured as it is
+    const big = (c) => c.size >= (c.keys.length > 1 ? minSize * 1.15 : minSize);
+    // gzip size of each output on disk (what the route budget counts); a group costs at most the sum of its parts
+    const gzCache = new Map();
+    const gz = (k) => { if (!gzCache.has(k)) { const f = resolve(cwd, k); gzCache.set(k, existsSync(f) ? gzipSync(readFileSync(f)).length : 0); } return gzCache.get(k); };
+    // what start-up already downloaded (the boot pieces and what they reach) is not part of a route's cost
+    const bootReach = new Set(Object.keys(outs).filter((k) => k.endsWith(".js") && bootOut(k)).flatMap((k) => [...closure(k)]));
+    const load = (x, y) => { let n = 0; for (const k of new Set([...x.reach, ...y.reach])) if (k.endsWith(".js") && !bootReach.has(k)) n += gz(k); return n; };
     for (;;) {
       let best = null, score = -Infinity;
       for (let i = 0; i < clusters.length; i++) for (let j = i + 1; j < clusters.length; j++) {
         const x = clusters[i], y = clusters[j];
-        if ((x.size >= minSize && y.size >= minSize) || x.size + y.size > maxGroup || isBoot(x) !== isBoot(y)) continue;
+        if ((big(x) && big(y)) || x.size + y.size > maxGroup || isBoot(x) !== isBoot(y)) continue;
+        if (maxLoad && !isBoot(x) && load(x, y) > maxLoad) continue;
         // penalise the load cost, not only the group's own size: a dependency-free module (translations) must not
         // join a page that pulls 30 KB of shared code when a lighter partner exists
         const [aff, union] = affinity(x, y);
@@ -78,7 +94,7 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
         continue;
       }
       // still under the limit with everything it could join (a small app): into the entry; alone: a group gains nothing
-      if (c.size < minSize) { for (const key of c.keys) known.set(key, { key, static: true }); continue; }
+      if (!big(c)) { for (const key of c.keys) known.set(key, { key, static: true }); continue; }
       if (c.keys.length < 2) continue;
       const name = `g${g++}`;
       plan.groups[name] = c.keys.map((key, n) => ({ abs: resolve(cwd, key), name: `n${n}`, key, group: name }));

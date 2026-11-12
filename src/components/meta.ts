@@ -22,6 +22,8 @@ export interface ComponentMeta {
   /** Behaviors (src/behaviors) and shared engines (positioning, collection, field, variants …) it uses. */
   behaviors?: readonly string[];
   hubs?: readonly string[];
+  /** Category folder (src/components/<category>/<name>/): overlays, feedback, navigation, composite … */
+  category?: string;
   /** Showcase page path that shows it. */
   showcase?: string;
   /** Deprecated: what to use instead. */

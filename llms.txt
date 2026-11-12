@@ -4,6 +4,7 @@
 - [AI instructions](AI_INSTRUCTIONS.md): concepts, syntax, data, actions, schema/forms/tables, routing, do/don't, mistakes
 - [README](README.md): overview, language table, modules
 - [Core](docs/core.md): signals, store, h(), control flow, pipes, i18n
+- [SEO](docs/seo.md): route head, useHead, Open Graph/Twitter, JSON-LD, prerender + hydrate, sitemap/robots, march seo check
 - [UI](docs/ui.md), [Forms](docs/forms.md), [Table](docs/table.md), [Charts](docs/charts.md)
 - [Examples](examples/): counter, form, crud, router, async, table, charts
 - [Changelog](CHANGELOG.md)

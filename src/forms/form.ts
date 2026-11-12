@@ -10,8 +10,10 @@ import { t } from "../core/i18n.ts";
 import { schema as makeSchema, options as schemaOptions, type Schema, type SchemaSpec, type FieldValue, type Values, type Field as SchemaField } from "../schema/index.ts";
 import { askReason } from "../ui/dialog.ts";
 import { toast } from "../ui/toast.ts";
-import { FieldContext, scoped, cx, uid, live, type FieldCtx, type ClassProp } from "./util.ts";
-import { inputFor, GROUP_CONTROLS, INLINE_LABEL, type InputComponent } from "./registry.ts";
+import { scoped, cx, uid, live, type FieldCtx, type ClassProp } from "./util.ts";
+import { inputFor, GROUP_CONTROLS, INLINE_LABEL } from "./registry.ts";
+import { Field, FormContext, setControlBuilder, type FieldProps, type BuiltControl } from "./field.ts";
+export { Field, FormContext, type FieldProps } from "./field.ts";
 import { colorAttr, type ColorToken } from "../theme/colors.ts";
 
 /** When fields validate: on blur (default), on every change, or only on submit. */
@@ -82,7 +84,6 @@ export interface FormController<V = Values> {
 }
 
 /** Context holding the nearest form (from <Form>, <Wizard>, <EditForm>). */
-export const FormContext: { id: symbol; defaultValue: FormController | null } = { id: Symbol("hm.form"), defaultValue: null };
 /** The enclosing form's controller (from useForm). */
 export const useFormContext = <V = Values>(): FormController<V> | null => useContext(FormContext) as FormController<V> | null;
 
@@ -238,34 +239,12 @@ export function useForm(spec?: Schema | SchemaSpec | null, initial?: Initial<Val
 }
 
 // ------------------------------------------------------------------ Field
+// <Field> lives in field.ts (no input registry, so a page that only wraps its own control in a Field does not download
+// every input). A field bound to a schema needs a form, and the form installs the schema control builder here.
 const NOT_FORWARDED = new Set(["name", "label", "type", "help", "when", "validate", "default", "column", "format", "hidden", "control", "props",
   "requiredMessage", "pattern", "patternMessage", "span", "readonly", "disabled", "options", "value", "minLength", "section", "variant"]);
 
-/** Props of <Field>. */
-export interface FieldProps<V = Values> {
-  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
-  color?: ColorToken | undefined;
-  /** A schema field of the enclosing (or `form`) form; its control is rendered. Without it, the children are wrapped. */
-  name?: FieldName<V> | undefined;
-  form?: FormController<V> | null | undefined;
-  id?: string | undefined;
-  label?: unknown;
-  help?: unknown;
-  error?: string | null | undefined;
-  required?: boolean | null | undefined;
-  inline?: boolean | undefined;
-  compact?: boolean | undefined;
-  /** Label as a group label (div) instead of <label for>. */
-  group?: boolean | undefined;
-  disabled?: boolean | undefined;
-  readonly?: boolean | undefined;
-  class?: ClassProp;
-  /** Extra props for the rendered control. */
-  controlProps?: Record<string, unknown> | undefined;
-  children?: unknown;
-}
-
-function controlFor(form: FormController, f: SchemaField, props: FieldProps, ctx: FieldCtx): { Comp: InputComponent; el: unknown } | null {
+function controlFor(form: FormController, f: SchemaField, props: FieldProps, ctx: FieldCtx): BuiltControl | null {
   const Comp = inputFor(f);
   if (!Comp) return null;
   const name = f.name;
@@ -282,46 +261,10 @@ function controlFor(form: FormController, f: SchemaField, props: FieldProps, ctx
   Object.defineProperty(p, "disabled", { get: () => !!(props.disabled || f.disabled || form.submitting()), enumerable: true });
   Object.defineProperty(p, "readonly", { get: () => !!(props.readonly || f.readonly || form.readonly?.()), enumerable: true });
   if (INLINE_LABEL.has(Comp)) p["label"] = props.label ?? f.label;
-  return { Comp, el: untrack(() => Comp(p)) };
+  return { el: untrack(() => Comp(p)), group: GROUP_CONTROLS.has(Comp), inlineLabel: INLINE_LABEL.has(Comp) };
 }
 
-/**
- * Label + control + help + error. With `name` inside a form (or `form` prop) it renders the schema field's input;
- * otherwise wraps its children. Props: name, form, label, help, error, required, inline, compact, class, controlProps.
- */
-export function Field<V = Values>(props: FieldProps<V>): unknown;
-export function Field(props: FieldProps): unknown {
-  return scoped(() => {
-    const form = props.form ?? useContext(FormContext);
-    const name = props.name;
-    const f = form && name ? form.schema.field(name) : null;
-    if (form && name && !f) throw new Error(`March forms: field "${name}" is not in the schema.`);
-    const id = props.id ?? (form && name ? form.idOf(name) : uid("hm-f"));
-    const labelId = `${id}-label`, helpId = `${id}-help`, errId = `${id}-error`;
-    const error = () => props.error ?? (form && name ? form.errors[name] : null) ?? null;
-    const help = () => props.help ?? f?.help ?? null;
-    const label = () => props.label ?? f?.label ?? null;
-    const required = () => !!(props.required ?? f?.required);
-    const ctx: FieldCtx = { id, labelId, invalid: () => !!error(), describedby: () => [help() ? helpId : null, error() ? errId : null].filter(Boolean).join(" ") };
-    provide(FieldContext, ctx);
-    const built = f && form ? controlFor(form, f, props, ctx) : null;
-    const control = built ? built.el : props.children;
-    const group = props.group ?? (built ? GROUP_CONTROLS.has(built.Comp) : false);
-    const inlineLabel = built ? INLINE_LABEL.has(built.Comp) : false;
-    const labelKids = [() => label(), () => (required() ? h("span", { class: "hm-req", "aria-hidden": "true" }, " *") : null)];
-    const labelEl = inlineLabel ? null : group
-      ? h("div", { class: "hm-label", id: labelId }, labelKids)
-      : h("label", { class: "hm-label", id: labelId, for: id }, labelKids);
-    return h("div", { "data-hm-color": colorAttr(props.color),
-      class: cx("hm-field", props.inline && "hm-field-inline", props.compact && "hm-field-compact", f?.["span"] ? `hm-span-${f["span"]}` : false, props.class),
-      "class:hm-field-invalid": () => !!error(), "data-field": name ?? null,
-    },
-    () => (label() != null && labelEl ? labelEl : null),
-    h("div", { class: "hm-field-control" }, control,
-      () => (help() ? h("div", { class: "hm-help", id: helpId }, help()) : null),
-      h("div", { class: "hm-field-error", id: errId, "aria-live": "polite", hidden: () => !error() }, () => error() ?? "")));
-  });
-}
+setControlBuilder(controlFor);
 
 // ------------------------------------------------------------------ Form
 /** Layout of auto-rendered fields. */
