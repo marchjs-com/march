@@ -121,3 +121,42 @@ test("NavSidebar resizable: grip with separator ARIA, keyboard widths within min
   assert.equal(off.el.querySelector(".hm-sb-resize"), null, "not resizable by default");
   off.dispose();
 });
+
+test("NavSidebar: navigating keeps the menu (same nodes, one mount, scroll position) and only moves the active row", async () => {
+  localStorage.clear();
+  R.createRouter({ routes: Object.fromEntries(["/", "/members", "/roles", "/payments", "/refunds", "/diamonds", "/support"].map((p) => [p, { component: () => null }])) });
+  R.navigate("/"); await tick();
+  let mounts = 0;
+  const Counted = (p) => { mounts++; return h(U.NavSidebar, p); };
+  const m = mount(() => h(Counted, { items: ITEMS, storageKey: "t.sb-keep", hotkey: false, defaultOpen: "all",
+    featured: [{ id: "support", label: "Destek", href: "/support" }] }));
+  await tick();
+  const scroller = m.el.querySelector(".hm-sb-scroll");
+  const cats = m.el.querySelector(".hm-sb-cats"), featured = m.el.querySelector(".hm-sb-featured");
+  const refunds = m.el.querySelector('[data-where="group"][data-id="refunds"]');
+  scroller.scrollTop = 300; // the user scrolled the menu
+  const scrolls = [];
+  scroller.scrollTo = (o) => scrolls.push(o);
+
+  for (const p of ["/refunds", "/members", "/payments", "/support", "/refunds"]) {
+    R.navigate(p); await tick();
+    assert.equal(m.el.querySelector(".hm-sb-scroll"), scroller, `${p}: the scroll container is kept`);
+    assert.equal(m.el.querySelector(".hm-sb-cats"), cats, `${p}: the categories are not rebuilt`);
+    assert.equal(m.el.querySelector(".hm-sb-featured"), featured, `${p}: the featured list is not rebuilt`);
+    assert.equal(scroller.scrollTop, 300, `${p}: the scroll position is kept`);
+  }
+  assert.equal(mounts, 1, "NavSidebar mounted once");
+  assert.equal(m.el.querySelector('[data-where="group"][data-id="refunds"]'), refunds, "rows are the same nodes");
+  assert.ok(refunds.classList.contains("is-active") && refunds.getAttribute("aria-current") === "page", "only the active state moves");
+  assert.equal([...m.el.querySelectorAll(".hm-sb-item.is-active")].filter((r) => r.dataset.where !== "recent").length, 1);
+  assert.deepEqual(scrolls, [], "a row already in view does not scroll the menu");
+
+  // an active row below the visible area is brought into view (nearest edge), the menu alone scrolls
+  const box = (top, height) => () => ({ x: 0, y: top, left: 0, top, right: 200, bottom: top + height, width: 200, height });
+  scroller.getBoundingClientRect = box(0, 400);
+  m.el.querySelector('[data-where="group"][data-id="diamonds"]').getBoundingClientRect = box(520, 40);
+  R.navigate("/diamonds"); await tick();
+  assert.equal(scrolls.length, 1);
+  assert.equal(scrolls[0].top, 300 + 160, "scrolled by the overflow (block: nearest)");
+  m.dispose();
+});

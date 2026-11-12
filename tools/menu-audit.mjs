@@ -3,6 +3,8 @@
 //   - each page of nav.ts and nav-meta.ts SUB_PAGES, by hash (a direct visit: #/motion) and by a click on its side
 //     menu link (the way a user opens it), shows its page: no "not found" view, no console error
 //   - the page transition variant routes (#/motion/pages/<variant>) open the variants page
+//   - the menu is kept across navigations: after a click on a link of a scrolled menu it is the same DOM node and keeps
+//     its scroll position; an active row outside the visible area comes into view
 // Usage: node examples/showcase/build.mjs && node tools/menu-audit.mjs   (exit 1 on a failure)
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -41,6 +43,37 @@ for (const p of pages) {
   let s = await b.ev(STATE), streak = 0;
   for (let i = 0; i < 60 && streak < 2; i++) { await sleep(300); s = await b.ev(STATE); streak = ok(s) ? streak + 1 : 0; }
   check(s.path === `#${p}` && !s.nf && s.len >= 40 && !b.errs.length, `${p}: opens from the menu`, s.path !== `#${p}` ? `at ${s.path}` : s.nf ? "not found view" : s.len < 40 ? "empty page" : b.errs.slice(0, 2).join(" | "));
+}
+
+// the menu is kept: same node, same scroll position; only the active row changes
+{
+  await b.load("/start");
+  let ready = false;
+  for (let i = 0; i < 40 && !ready; i++) { await sleep(250); ready = await b.ev(`!!document.querySelector("nav .hm-sb-scroll .hm-sb-gitems a[href]")`); }
+  const mark = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"); window.__menuNav = sc.closest("nav"); window.__menuScroller = sc;
+    sc.scrollTop = Math.min(400, sc.scrollHeight - sc.clientHeight); const top = sc.scrollTop, c = sc.getBoundingClientRect();
+    // a category link in view, not the current page
+    const a = [...sc.querySelectorAll(".hm-sb-gitems a[href]")].find((a) => { const r = a.getBoundingClientRect(); return r.height && r.top >= c.top && r.bottom <= c.bottom && a.getAttribute("aria-current") !== "page" });
+    if (!a) return { top, href: null }; const href = a.getAttribute("href"); a.click(); return { top, href } })()`);
+  if (!mark.href) check(false, "menu kept on navigation", "no link in view");
+  else {
+    let s;
+    for (let i = 0; i < 40; i++) { await sleep(250); s = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"); return { path: location.hash, same: sc === window.__menuScroller && sc.closest("nav") === window.__menuNav, top: sc.scrollTop,
+      active: !!sc.querySelector('.hm-sb-gitems a[aria-current="page"][href="${mark.href}"]') } })()`); if (s.path.endsWith(mark.href.replace(/^#/, "")) && s.active) break; }
+    check(s.same, "menu kept on navigation: same DOM node", s.same ? "" : "the menu was rebuilt");
+    check(Math.abs(s.top - mark.top) <= 1, "menu kept on navigation: scroll position", `${mark.top} → ${s.top}`);
+    check(s.active, "menu kept on navigation: the clicked row is active");
+  }
+  // an active row below the visible area comes into view
+  const far = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"); sc.scrollTop = 0; const c = sc.getBoundingClientRect();
+    const a = [...sc.querySelectorAll(".hm-sb-gitems a[href]")].reverse().find((a) => { const r = a.getBoundingClientRect(); return r.height && r.top > c.bottom }); return a?.getAttribute("href") ?? null })()`);
+  if (far) {
+    await b.ev(`location.hash = ${JSON.stringify(far.startsWith("#") ? far : `#${far}`)}`);
+    let seen = false;
+    for (let i = 0; i < 20 && !seen; i++) { await sleep(250); seen = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"), a = sc.querySelector('.hm-sb-gitems a[aria-current="page"]'); if (!a) return false;
+      const r = a.getBoundingClientRect(), c = sc.getBoundingClientRect(); return r.top >= c.top - 1 && r.bottom <= c.bottom + 1 })()`); }
+    check(seen, `menu reveals the active row (${far})`);
+  }
 }
 
 await b.close();
