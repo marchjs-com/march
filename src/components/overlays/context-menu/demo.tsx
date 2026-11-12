@@ -24,7 +24,7 @@ export default function ContextMenuDemo(props: { values: { danger: boolean; shor
   }
   return <div class="sc-flow-stack">
     <ContextMenu items={items} label="Dosya işlemleri">
-      <div class="sc-row">{() => $cards.map((c) => <button type="button" class="hm-btn hm-btn-secondary" data-card={c}>{c}</button>)}</div>
+      <div class="sc-row">{() => $cards.map((c, i) => <button type="button" class="hm-btn hm-btn-secondary" data-card={c} data-audit-try={i === 0 ? "contextmenu" : undefined}>{c}</button>)}</div>
     </ContextMenu>
     <p class="sc-flow-muted" role="status">{() => $last}</p>
   </div>

@@ -12,7 +12,7 @@ Home / End for the limits and Enter to go back to the initial share. Each pane k
 | Prop | Type | Default | |
 |---|---|---|---|
 | `start` / `end` | node | — | the two panes (logical order) |
-| `initial` | number 0–1 | `0.5` | first pane's share |
+| `initial` | number 0–1 | `0.5` | first pane's share (kept within `min` … 1 − `min`) |
 | `min` | number 0–0.5 | `0.15` | smallest share of either pane |
 | `label` | string | "Resize" | accessible name of the handle |
 

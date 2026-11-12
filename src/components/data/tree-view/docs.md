@@ -20,13 +20,13 @@ import { TreeView } from "hadi-march/components/data/tree-view";
 |---|---|---|---|
 | `nodes` | `TreeViewNode[]` / accessor | — | `{ id, label, icon?, meta?, children?, lazy?, disabled?, data? }`; an accessor replaces the tree when it changes |
 | `load` | `(node) => Promise<TreeViewNode[]>` | — | children of a `lazy` node, loaded once; a failure shows Retry |
-| `selection` | `single` `multiple` `none` | `single` | |
+| `selection` | `single` `multiple` `none` (or an accessor) | `single` | live: a narrower mode trims the selection at once |
 | `selected` | `string[]` | — | initially selected ids |
 | `onSelect` | `(ids, nodes) => void` | — | |
-| `expanded` | `string[]` | — | initially open ids |
+| `expanded` | `string[]` | — | initially open ids (a lazy folder among them loads at once) |
 | `onExpand` | `(id, open) => void` | — | |
 | `search` | string / accessor | — | shows the hits and their path, highlighted (loaded nodes only) |
-| `draggable` | boolean / accessor | `false` | drag and drop; Alt+↑ / Alt+↓ moves a node among its siblings |
+| `draggable` | boolean / accessor | `false` | drag and drop (rows show a grab cursor); Alt+↑ / Alt+↓ moves a node among its siblings |
 | `canDrop` | `(ids, target, position) => boolean` | — | refuse a drop (a node never drops into itself) |
 | `onMove` | `(ids, targetId, position) => void` | — | after a move; the tree already shows it |
 | `onActivate` | `(node) => void` | — | Enter / double-click on a leaf |

@@ -45,3 +45,6 @@
   background: var(--hm-surface); color: var(--hm-text); box-shadow: var(--hm-shadow-3); border: 1px solid var(--hm-border); font-size: var(--hm-text-sm); pointer-events: none; }
 .hm-tv-ghost-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hm-tv-ghost-count { flex: none; min-width: 1.25rem; padding: 0 .375rem; border-radius: var(--hm-radius-full); background: var(--hm-primary); color: var(--hm-inverse-text); font-size: var(--hm-text-xs); text-align: center; }
+/* rows that can be dragged say so (grab cursor) */
+.hm-tv.is-draggable .hm-tv-row:not(.is-disabled) { cursor: grab; }
+.hm-tv.is-draggable .hm-tv-row.is-dragging { cursor: grabbing; }

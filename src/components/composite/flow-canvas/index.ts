@@ -557,7 +557,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
 
   const canvas = h("div", {
     ref: (x: HTMLElement) => { root = x; },
-    class: () => cx("hm-flow", val(props.tool) === "pan" && "is-hand", pending() && "is-connecting", val(props.class)),
+    class: () => cx("hm-flow", val(props.tool) === "pan" && "is-hand", pending() && "is-connecting", grid() <= 0 && "is-free", val(props.class)),
     tabindex: "0", role: "application",
     "aria-roledescription": () => t`flow editor`,
     "aria-label": () => val(props.label) ?? t`Flow editor`,

@@ -27,7 +27,9 @@ export interface SplitterProps {
 /** Two resizable panes (drag the handle, or the arrow keys / Home / End on it; Enter resets). */
 export function Splitter(props: SplitterProps): Element {
   const vertical = props.orientation === "vertical";
-  const share = signal(untrack(() => val(props.value)) ?? props.initial ?? 0.5), min = props.min ?? 0.15;
+  const min = props.min ?? 0.15;
+  // the first share keeps to the limits too (an initial 35 % with min 40 % starts at 40 %)
+  const share = signal(clamp(untrack(() => val(props.value)) ?? props.initial ?? 0.5, min, 1 - min));
   let root: HTMLElement | undefined;
   const apply = (): void => { if (root) setStyle(root, { "--hm-split": `${(share.peek() * 100).toFixed(2)}%` }); };
   const setShare = (v: number): void => { const n = clamp(v, min, 1 - min); if (n === share.peek()) return; share.set(n); apply(); props.onChange?.(n); };
