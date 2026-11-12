@@ -40,9 +40,52 @@ export function exportMap(file, seen = new Set()) {
  * @param {Record<string, string>} barrels  specifier → absolute index file
  */
 export function deepImports(code, barrels) {
-  return code.replace(/import\s*\{([^}]*)\}\s*from\s*(["'])(hadi-march(?:\/[\w-]+)?)\2\s*;?/g, (all, list, q, spec) => {
+  // only real import statements are rewritten: the same text inside a string or template literal (a code sample in a
+  // demo) or a comment is content and stays as written
+  const live = statementStarts(code);
+  return rewrite(code, barrels, live);
+}
+
+// Offsets where an `import` keyword starts a statement in code: after a line break, `;` or `}` (or at the start),
+// outside strings, template literals, comments and regular expressions.
+function statementStarts(code) {
+  const out = new Set();
+  const n = code.length;
+  const tpl = []; // brace depth at each open `${`
+  let depth = 0, prev = ";", word = "", i = 0;
+  const regexOk = () => /[(,=:[!&|?{};+\-*%<>~^\n]/.test(prev) || (prev === "a" && /^(?:return|typeof|case|do|else|in|of|void|yield|await|delete|throw|new)$/.test(word));
+  while (i < n) {
+    const c = code[i];
+    if (c === "/" && code[i + 1] === "/") { const e = code.indexOf("\n", i); i = e < 0 ? n : e; continue; }
+    if (c === "/" && code[i + 1] === "*") { const e = code.indexOf("*/", i + 2); i = e < 0 ? n : e + 2; continue; }
+    if (c === "'" || c === '"') { i++; while (i < n && code[i] !== c && code[i] !== "\n") i += code[i] === "\\" ? 2 : 1; i++; prev = "a"; word = ""; continue; }
+    if (c === "`" || (c === "}" && tpl.length && tpl[tpl.length - 1] === depth)) {
+      if (c === "}") tpl.pop(); // back inside the template after `${ … }`
+      i++;
+      while (i < n && code[i] !== "`" && !(code[i] === "$" && code[i + 1] === "{")) i += code[i] === "\\" ? 2 : 1;
+      if (code[i] === "$") { tpl.push(depth); i += 2; prev = "{"; } else { i++; prev = "a"; word = ""; }
+      continue;
+    }
+    if (c === "/" && regexOk()) {
+      i++;
+      let cls = false;
+      while (i < n && code[i] !== "\n" && (cls || code[i] !== "/")) { if (code[i] === "\\") i++; else if (code[i] === "[") cls = true; else if (code[i] === "]") cls = false; i++; }
+      i++; prev = "a"; word = ""; continue;
+    }
+    if (c === "{") depth++;
+    else if (c === "}") depth--;
+    if (c === "i" && (prev === ";" || prev === "}" || prev === "\n") && code.startsWith("import", i) && !/[\w$]/.test(code[i + 6] ?? "")) out.add(i);
+    if (c === "\n") prev = "\n";
+    else if (!/\s/.test(c)) { const w = /[\w$]/.test(c); word = w ? (prev === "a" && /[\w$]/.test(code[i - 1]) ? word + c : c) : ""; prev = w ? "a" : c; }
+    i++;
+  }
+  return out;
+}
+
+function rewrite(code, barrels, live) {
+  return code.replace(/import\s*\{([^}]*)\}\s*from\s*(["'])(hadi-march(?:\/[\w-]+)?)\2\s*;?/g, (all, list, q, spec, at) => {
     const index = barrels[spec];
-    if (!index) return all;
+    if (!index || !live.has(at)) return all;
     const map = exportMap(index);
     const groups = new Map(), keep = [];
     for (const part of list.split(",")) {
