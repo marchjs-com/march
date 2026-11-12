@@ -9,6 +9,7 @@ import { frame, type DialogProps } from "../../../ui/dialog.ts";
 import { val, cx, type MaybeFn } from "../../../ui/util.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
+import { clamp } from "../../../core/util.ts";
 import "./drawer.css";
 
 /** Edge the drawer comes from. `start` / `end` follow the writing direction; `left` / `right` are aliases of them. */
@@ -157,7 +158,7 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
     dragging = false;
     panel.classList.remove("is-dragging");
     // fling: velocity (px/ms, capped) projects the release point
-    const projected = cur + Math.max(-2, Math.min(2, v)) * 160;
+    const projected = cur + clamp(v, -2, 2) * 160;
     const spots: [number, number][] = snaps ? order.map((i) => [rest(i), i]) : [[0, 0]];
     if (canClose()) spots.push([size, -1]);
     const [o, i] = spots.reduce((a, b) => (Math.abs(b[0] - projected) < Math.abs(a[0] - projected) ? b : a));
