@@ -3,9 +3,20 @@
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+
+## BottomNav
+
+The mobile tab bar: a colored bubble slides to the active tab, tabs carry count or dot badges, and an optional raised Create button in the middle wears a slowly turning ring of the four HADİ colors (Heyecan, Aktivite, Dostluk, İletişim).
+
+```tsx
+<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />
+```
+
+Full page: src/components/bottom-nav/docs.md
 
 ## Chip
 

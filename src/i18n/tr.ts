@@ -257,5 +257,6 @@ const tr: Record<string, string> = {
   "Release to refresh": "Yenilemek için bırakın",
   "Refreshing…": "Yenileniyor…",
   "Refresh": "Yenile",
+  "Create": "Oluştur",
 };
 export default tr;
