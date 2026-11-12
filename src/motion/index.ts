@@ -11,6 +11,8 @@ export { flip, installFlip, type FlipOptions } from "./flip.ts";
 export { timeline, type Timeline, type StepOptions, type Target } from "./timeline.ts";
 export { inView, reveal, scrollProgress, parallax, type InViewOptions } from "./scroll.ts";
 export { pageTransitions, transitionFrames, resolveTransition, navDirection, definePageTransition, type PageTransitionOptions, type PageTransitionSpec, type PageTransitionType, type PageTransitionFrames } from "./page.ts";
+// micro-interactions (magnet, tilt, press: gestures.ts)
+export { ripple, hoverParallax, stateMorph, type RippleOptions, type HoverParallaxOptions, type ButtonState, type StateMorphOptions } from "./micro.ts";
 // page transition variants: register the ones a route uses (each is its own export)
 export { circle, wipe, stack, cube, flip as flipPage, zoomThrough, curtain, blinds, pixelDissolve, morphPage, PAGE_VARIANTS, usePageTransitions, type PageVariant } from "./page-fx.ts";
 export { drag, swipe, press, magnet, tilt, type DragOptions } from "./gestures.ts";

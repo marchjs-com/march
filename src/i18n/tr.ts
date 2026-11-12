@@ -110,6 +110,7 @@ const tr: Record<string, string> = {
   "Last 90 days": "Son 90 gün",
   "Light theme": "Açık tema",
   "Loading": "Yükleniyor",
+  "Failed": "Başarısız",
   "MM": "AA",
   "Main": "Ana menü",
   "Make {0} the default view": "{0} varsayılan görünüm olsun",
