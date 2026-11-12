@@ -11,6 +11,8 @@ import { gzipSync } from "node:zlib";
 import { posix } from "./fs-util.js";
 
 /** Route tables found by default: `march gen routes` output and a hand-written src/routes.* file. */
+/** A module whose group was taken apart this many times is not planned again (see planSmallLazy › plan.apart). */
+export const MAX_TAKEN_APART = 2;
 export const ROUTE_TABLES = ["src/routes.gen.js", "src/routes.gen.ts", "src/routes.ts", "src/routes.tsx", "src/routes.js", "src/routes.jsx"];
 
 /**
@@ -23,7 +25,7 @@ export const ROUTE_TABLES = ["src/routes.gen.js", "src/routes.gen.ts", "src/rout
  * `tables` (march.config.js › chunks.routeTables): source files whose lazy imports are pages (the route table). Like the
  * entry's, those pages join page groups; they are never folded into the table (a start-up chunk would grow per page).
  * @param {{ cwd: string, entryKey: string, minSize: number, allow?: Record<string, string>, boot?: string[], prev?: Plan | null, maxLoad?: number, room?: number, tables?: string[] }} o
- * @typedef {{ inline: Record<string, { spec: string, mode: "static" | "group", group?: string, name?: string }[]>, groups: Record<string, { abs: string, name: string, key: string }[]>, boot?: string[], keep?: string[] }} Plan
+ * @typedef {{ inline: Record<string, { spec: string, mode: "static" | "group", group?: string, name?: string }[]>, groups: Record<string, { abs: string, name: string, key: string }[]>, boot?: string[], keep?: string[], apart?: Record<string, number> }} Plan
  */
 export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot = [], prev = null, maxLoad, room = 0, tables = ROUTE_TABLES }) {
   const outs = meta.outputs;
@@ -66,6 +68,11 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
   // and land under the floor; it is taken apart too, and its members' sizes are scaled by what it really weighed
   plan.est = { ...(prev?.est ?? {}) };
   plan.shrink = { ...(prev?.shrink ?? {}) };
+  // how often each module's group was taken apart: corrected estimates usually settle a group the second time; a module
+  // whose group fell apart MAX_TAKEN_APART times is planned no more (it stays a file of its own for the packer's last
+  // step). Without this the passes can cycle: a group built, taken apart, built again from the same estimates.
+  plan.apart = { ...(prev?.apart ?? {}) };
+  const takenApart = (ms) => { for (const m of ms) plan.apart[m.key] = (plan.apart[m.key] ?? 0) + 1; };
   for (const [name, ms] of Object.entries(plan.groups)) {
     const k = outByEntry.get(`march-group:${name}`);
     // measured on disk: the metafile size is before the build's own rewrites
@@ -74,6 +81,7 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
     delete plan.groups[name];
     for (const [imp, list] of Object.entries(plan.inline)) plan.inline[imp] = list.filter((x) => x.group !== name);
     for (const m of ms) plan.shrink[m.key] = Math.min(plan.shrink[m.key] ?? 1, (real / plan.est[name]) * 0.95);
+    takenApart(ms);
     added++;
   }
   const tightOf = (x, y) => Math.max(1, ...[...x.keys, ...y.keys].map((k) => plan.tight[k] ?? 1));
@@ -88,13 +96,14 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
     delete plan.groups[name];
     for (const [imp, list] of Object.entries(plan.inline)) plan.inline[imp] = list.filter((x) => x.group !== name);
     for (const m of ms) plan.tight[m.key] = Math.max(plan.tight[m.key] ?? 1, (real / maxLoad) * 1.05);
+    takenApart(ms);
     added++;
   }
   // the entry's small lazy modules join group chunks: clusters of the modules that share the most code, merged pairwise
   // only until each is over the limit (and never past maxGroup), so related pages and shell pieces load together
   const toEntry = pending.filter((p) => p.toEntry);
   const known = new Map(Object.values(plan.groups).flat().map((m) => [m.key, m]));
-  const fresh = [...new Map(toEntry.filter((p) => !known.has(posix(p.target))).map((p) => [posix(p.target), p])).values()];
+  const fresh = [...new Map(toEntry.filter((p) => !known.has(posix(p.target)) && (plan.apart[posix(p.target)] ?? 0) < MAX_TAKEN_APART).map((p) => [posix(p.target), p])).values()];
   let g = Math.max(-1, ...Object.keys(plan.groups).map((n) => Number(n.slice(1)) || 0)) + 1;
   if (fresh.length) {
     let clusters = fresh.map((p) => { const k = outByEntry.get(posix(p.target)); return { keys: [posix(p.target)], size: bytes(k) * (plan.shrink[posix(p.target)] ?? 1), reach: closure(k) }; });

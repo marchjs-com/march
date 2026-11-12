@@ -84,6 +84,37 @@ test("min-chunks: start-up pieces (budget.boot) group only with each other, neve
   assert.equal(smallFiles(meta, { cwd: process.cwd(), minSize: 10240, entryKey: "dist/main.js", boot: ["src/shell-a.tsx"], plan }).length, 0);
 });
 
+test("min-chunks: a group taken apart twice is not planned again (the passes settle instead of cycling)", async () => {
+  const { planSmallLazy, MAX_TAKEN_APART } = await import("../compiler/min-chunks.js");
+  const out = (entryPoint, bytes) => ({ entryPoint, bytes, imports: [{ path: "dist/shared.js", kind: "import-statement" }], inputs: { [entryPoint]: {} } });
+  const pages = ["src/pages/home.tsx", "src/pages/about.tsx"];
+  // the build before grouping: two small pages, each its own file
+  const separate = () => ({
+    outputs: { "dist/main.js": { entryPoint: "src/main.tsx", bytes: 40000, imports: [], inputs: { "src/main.tsx": {} } },
+      "dist/home.js": out(pages[0], 6000), "dist/about.js": out(pages[1], 7000), "dist/shared.js": { bytes: 30000, imports: [], inputs: {} } },
+    inputs: { "src/main.tsx": { imports: pages.map((p) => ({ path: p, kind: "dynamic-import", original: `./${p}` })) } },
+  });
+  // the build of a plan: the group came out under the floor (its shared code went elsewhere)
+  const grouped = (plan) => {
+    const name = Object.keys(plan.groups).find((g) => plan.groups[g].some((m) => m.key === pages[0]));
+    const meta = separate();
+    delete meta.outputs["dist/home.js"]; delete meta.outputs["dist/about.js"];
+    meta.outputs[`dist/${name}.js`] = { entryPoint: `march-group:${name}`, bytes: 9000, imports: [], inputs: {} };
+    return meta;
+  };
+  const o = { cwd: process.cwd(), entryKey: "dist/main.js", minSize: 10240 };
+  let plan = planSmallLazy(separate(), o);
+  assert.ok(Object.values(plan.groups).some((ms) => ms.some((m) => m.key === pages[0])), "first pass: the pages group");
+  plan = planSmallLazy(grouped(plan), { ...o, prev: plan });
+  assert.equal(plan.apart[pages[0]], 1, "the group under the floor is taken apart");
+  assert.ok(!Object.values(plan.groups).some((ms) => ms.some((m) => m.key === pages[0])));
+  // taken apart once: the members are planned again from the corrected estimates
+  assert.notEqual(planSmallLazy(separate(), { ...o, prev: plan }), null, "planned again");
+  // after MAX_TAKEN_APART the members are left as they are (files of their own for the packer's last step)
+  plan.apart = Object.fromEntries(pages.map((p) => [p, MAX_TAKEN_APART]));
+  assert.equal(planSmallLazy(separate(), { ...o, prev: plan }), null, "nothing new is planned: the passes end");
+});
+
 test("tagLoaders tags bare loaders only: () => import(x).then(…) stays a function returning a promise", () => {
   const root = fileURLToPath(new URL("..", import.meta.url));
   const file = join(root, "src/components/actions/chip/demo.tsx");
