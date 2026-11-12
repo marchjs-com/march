@@ -3,7 +3,13 @@
 // createElementNS (no innerHTML, Trusted Types safe); every icon is its own export, so bundlers drop unused ones.
 
 /** An icon: a name (for debugging and data-icon) and its shapes. */
-export interface IconDef { readonly name: string; readonly d: readonly string[]; readonly fill?: boolean }
+export interface IconDef {
+  readonly name: string;
+  readonly d: readonly string[];
+  readonly fill?: boolean;
+  /** Finishes the drawing after the shapes (icon packs: their grid, stroke width, RTL mirroring; see ./pack-paint.ts). */
+  readonly paint?: (svg: SVGSVGElement, def: IconDef) => void;
+}
 
 const NS = "http://www.w3.org/2000/svg";
 
@@ -34,15 +40,20 @@ function shape(spec: string): Element {
   return p;
 }
 
-/** Render an icon as an <svg> element. Decorative (aria-hidden) unless a label is given. */
-export function svgIcon(def: IconDef, cls = "hm-svg", label?: string): SVGSVGElement {
-  const svg = document.createElementNS(NS, "svg");
+/** Draw an icon into an existing <svg> (attributes and shapes replaced): live icons repaint in place. */
+export function paintIcon(svg: SVGSVGElement, def: IconDef, cls = "hm-svg", label?: string): SVGSVGElement {
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("class", def.fill ? `${cls} hm-svg-fill` : cls);
   svg.setAttribute("data-icon", def.name);
   svg.setAttribute("focusable", "false");
-  if (label) { svg.setAttribute("role", "img"); svg.setAttribute("aria-label", label); }
-  else svg.setAttribute("aria-hidden", "true");
-  for (const s of def.d) svg.appendChild(shape(s));
+  if (label) { svg.setAttribute("role", "img"); svg.setAttribute("aria-label", label); svg.removeAttribute("aria-hidden"); }
+  else { svg.removeAttribute("role"); svg.removeAttribute("aria-label"); svg.setAttribute("aria-hidden", "true"); }
+  svg.replaceChildren(...def.d.map(shape));
+  def.paint?.(svg, def);
   return svg;
+}
+
+/** Render an icon as an <svg> element. Decorative (aria-hidden) unless a label is given. */
+export function svgIcon(def: IconDef, cls = "hm-svg", label?: string): SVGSVGElement {
+  return paintIcon(document.createElementNS(NS, "svg"), def, cls, label);
 }

@@ -1,0 +1,12 @@
+{
+  "id": "bootstrap",
+  "name": "Bootstrap Icons",
+  "license": "MIT",
+  "version": "1.13.2",
+  "source": "bootstrap-icons@1.13.2",
+  "home": "https://icons.getbootstrap.com",
+  "count": 2077,
+  "viewBox": "0 0 16 16",
+  "mode": "fill",
+  "skipped": 1
+}

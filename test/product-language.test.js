@@ -21,7 +21,9 @@ const TEXT = /\.(ts|tsx|js|mjs|jsx|css|md|json|txt|html)$/;
 function published() {
   const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
   const roots = [...pkg.files, "AI_INSTRUCTIONS.md", "llms.txt", "CHANGELOG.md", "docs", "examples/showcase/src", "examples/showcase/index.html"];
-  return roots.map((r) => join(ROOT, r)).filter(existsSync).flatMap((p) => (statSync(p).isDirectory() ? walk(p) : [p])).filter((f) => TEXT.test(f));
+  // generated icon packs (march icons add) list third-party icon names, brand names included: data, not our wording
+  const iconData = /icons[\\/]packs[\\/][^\\/]+[\\/]index\.(js|d\.ts)$/;
+  return roots.map((r) => join(ROOT, r)).filter(existsSync).flatMap((p) => (statSync(p).isDirectory() ? walk(p) : [p])).filter((f) => TEXT.test(f) && !iconData.test(f));
 }
 
 test("published files use product language only", () => {

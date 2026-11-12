@@ -24,7 +24,8 @@ kartlar bilgi uyari hata basari onay iptal kapat ac goster gizle genislik yuksek
 `.trim().split(/\s+/));
 
 const DEFAULT_DIRS = ["src", "examples/showcase/src", "tools", "cli", "compiler", "test"];
-const SKIP = /(^|[\\/])(node_modules|dist|i18n[\\/]tr\.ts|fonts)([\\/]|$)|\.d\.ts$/;
+// generated icon packs (march icons add): their names are the upstream sets' own ("paint-roller", "ac-unit")
+const SKIP = /(^|[\\/])(node_modules|dist|i18n[\\/]tr\.ts|fonts)([\\/]|$)|\.d\.ts$|icons[\\/]packs[\\/][^\\/]+[\\/]index\.js$/;
 
 const words = (id) => id.replace(/^\$+/, "").split(/(?<=[a-zçğıöşü0-9])(?=[A-ZÇĞİÖŞÜ])|[_\-\s/.:#$@]+/).filter(Boolean).map((w) => w.toLowerCase());
 export const isTurkish = (id) => TURKISH_LETTERS.test(id) || words(id).some((w) => TURKISH_WORDS.has(w));

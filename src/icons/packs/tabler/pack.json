@@ -1,0 +1,12 @@
+{
+  "id": "tabler",
+  "name": "Tabler Icons",
+  "license": "MIT",
+  "version": "3.51.0",
+  "source": "@tabler/icons@3.51.0",
+  "home": "https://tabler.io/icons",
+  "count": 5233,
+  "viewBox": "0 0 24 24",
+  "mode": "stroke",
+  "skipped": 0
+}

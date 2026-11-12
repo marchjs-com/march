@@ -10,6 +10,7 @@
 //   march i18n [--messages src/i18n]                 report keys missing from translation files
 //   march check [--src src]                          type-check .tsx/.ts including March syntax (pipes, modifiers…)
 //   march seo check [--dir dist] [--no-canonical]    built pages: missing title / description / canonical / img alt…
+//   march icons list | add lucide … | gallery <dir>  open-source icon sets → hadi-march/icons/<pack> (see cli/icons.js)
 // Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html,
 //   base: "/" | "./" (asset URLs in index.html; "./" = works from any sub-folder), stableNames: true (or --stable-names:
 //   main.js, chunks/home.js… with ?v=<version> in every reference; deploys overwrite the same paths), packChunks: false,
@@ -409,9 +410,10 @@ async function seo() {
 }
 
 const cmd = argv[0];
-const run = { dev, build: () => build(), gen, i18n, check: typecheck, seo }[cmd];
+const icons = async () => (await import("./icons.js")).main(argv.slice(1));
+const run = { dev, build: () => build(), gen, i18n, check: typecheck, seo, icons }[cmd];
 if (!run) {
-  console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)\n  march check component <name>   (in the hadi-march repo: the component checklist)\n  march seo check [--dir dist]   (titles, descriptions, canonical, img alt)");
+  console.log("HADI March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)\n  march check component <name>   (in the hadi-march repo: the component checklist)\n  march seo check [--dir dist]   (titles, descriptions, canonical, img alt)\n  march icons list | add <pack…|all> | gallery <dir>   (open-source icon sets as icon packs)");
   process.exit(cmd ? 1 : 0);
 }
 await run();

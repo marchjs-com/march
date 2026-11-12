@@ -141,6 +141,14 @@ Overlays never take input; put content after them. `front` only for foreground e
   the entry is over budget, move the listed modules behind `import()`/`lazy()`.
 - Import named exports (`import { Card } from "hadi-march/ui"`), never `import * as` from a March module. Use
   `hadi-march/icons/catalog` for icon galleries.
+- Icons: the HADI March set first (`import { Icon, users } from "hadi-march/icons"`, `<Icon of={users} size="lg" />`).
+  Other open-source sets are optional subpaths with one export per icon: `import { rocket } from
+  "hadi-march/icons/lucide"` (also tabler, heroicons, phosphor, feather, material-symbols, remix, bootstrap,
+  simple-icons). Import single icons. By name: `registerIconPack(lucide)` (`import lucide from
+  "hadi-march/icons/lucide/pack"`), then `<Icon name="lucide:rocket" />` with `Icon` from `hadi-march/icons/packs`, or
+  `icon("lucide:rocket")` in any icon prop; the whole set loads lazily on first use.
+  Never add an icon library as an npm dependency: `march icons add <pack>` converts a set (license kept). Direction
+  icons mirror in RTL by themselves. See docs/icons.md.
 - Leave `<Link>` prefetch on (default hover). Do not prefetch everything by hand.
 - Credit is optional and never required (the licence stays MIT): `<MadeWithMarch />` (`variant` text / badge / small, link constant `MARCH_URL`) or `credit: true` in `march.config.js` (adds `<!-- Built with HADI March -->` to the built `index.html` and prints the one-line console banner in production too, from a separate tiny `credit.js`; off by default). `march dev` prints the banner once per page; `banner: false` turns it off. Production never prints it otherwise and the app bundle never contains it (size effect 0). The link comes from one constant, `MARCH_URL` in `src/brand.js`. Add it to a footer when the user wants it; never add it unasked.
 - Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, fail: true }`); turn on `sw: true` when offline use matters.

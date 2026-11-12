@@ -1,0 +1,12 @@
+{
+  "id": "phosphor",
+  "name": "Phosphor",
+  "license": "MIT",
+  "version": "2.1.1",
+  "source": "@phosphor-icons/core@2.1.1",
+  "home": "https://phosphoricons.com",
+  "count": 1512,
+  "viewBox": "0 0 256 256",
+  "mode": "fill",
+  "skipped": 0
+}
