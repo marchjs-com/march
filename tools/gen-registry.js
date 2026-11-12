@@ -44,19 +44,29 @@ export async function generate(root = ROOT) {
   const list = await components(root);
   const files = {};
   files["src/components/index.ts"] = HEAD + list.map((c) => `export * from "./${c.folder}/index.ts";\n`).join("");
-  // Demos shown on the same showcase page load as ONE lazy module (demos-<page>.gen.ts): one small chunk per demo would
-  // fall under the 10 KB chunk floor and fold into the registry's parent group, which every page with a component card
-  // loads. A page with a single component card keeps its direct import.
+  // Demos shown on the same showcase page load together, up to GROUP per lazy module (<page>[-n].demos.gen.ts): one
+  // small chunk per demo would fall under the 10 KB chunk floor and fold into the registry's parent group, which every
+  // page with a component card loads; one module for a page with many cards would pass the lazy part budget. Members
+  // are in folder-name order, so related folders (chat-…, story-…) usually share a module. A page with a single
+  // component card keeps its direct import.
+  const GROUP = 4;
   const pages = new Map();
   for (const c of list) if (c.meta?.showcase) pages.set(c.meta.showcase, [...(pages.get(c.meta.showcase) ?? []), c]);
   const groupOf = new Map();
-  for (const [page, members] of pages) {
-    if (members.length < 2) continue;
-    const file = `demos-${page.replace(/^\//, "").replace(/[^\w-]+/g, "-") || "home"}.gen.ts`;
-    members.forEach((c, j) => groupOf.set(c.folder, { file, j }));
-    files[`src/components/${file}`] = HEAD.replace("src/components/*/", `the component folders shown on ${page}`) +
-      members.map((c, j) => `import * as d${j} from "./${c.folder}/demo.tsx";\nimport * as p${j} from "./${c.folder}/playground.ts";\n`).join("") +
-      `export { ${members.map((_, j) => `d${j}, p${j}`).join(", ")} };\n`;
+  for (const [page, all] of pages) {
+    if (all.length < 2) continue;
+    const base = page.replace(/^\//, "").replace(/[^\w-]+/g, "-") || "home";
+    // even slices (4 4 3 3, not 4 4 4 2): a small last module would fall under the chunk floor again
+    const slices = Math.ceil(all.length / GROUP);
+    for (let s = 0; s < slices; s++) {
+      const members = all.slice(Math.floor((s * all.length) / slices), Math.floor(((s + 1) * all.length) / slices));
+      // *.demos.gen.ts: the showcase config lets these stay small lazy files (chunks.allow), never joining the registry
+      const file = `${base}${slices > 1 ? `-${s + 1}` : ""}.demos.gen.ts`;
+      members.forEach((c, j) => groupOf.set(c.folder, { file, j }));
+      files[`src/components/${file}`] = HEAD.replace("src/components/*/", `the component folders shown on ${page}`) +
+        members.map((c, j) => `import * as d${j} from "./${c.folder}/demo.tsx";\nimport * as p${j} from "./${c.folder}/playground.ts";\n`).join("") +
+        `export { ${members.map((_, j) => `d${j}, p${j}`).join(", ")} };\n`;
+    }
   }
   const loader = (c, kind, file) => { const g = groupOf.get(c.folder); return g ? `() => import("./${g.file}").then((m) => m.${kind}${g.j})` : `() => import("./${c.folder}/${file}")`; };
   files["src/components/registry.gen.ts"] = HEAD + `import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";\n` +

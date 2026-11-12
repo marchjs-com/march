@@ -4,6 +4,9 @@
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
+| ChatBubble | experimental | Chat message: Aktivite gradient (mine) or card (theirs), run corners with a tail, sender color, reply quote, emoji-only size, time and ticks, reaction chips, drag to reply. | — |
+| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, ReactionPicker |
+| ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | ChatBubble, TypingIndicator, ReactionPicker, Avatar |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | CountRoll | experimental | Odometer number: only the changed digits roll (up when it grows, down when it shrinks), compact in the active locale. | — |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
@@ -12,9 +15,11 @@
 | MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, MediaGrid, LikeButton, CountRoll |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+| ReactionPicker | experimental | Emoji row (reactions) or grid (emoji panel): pop-in with staggered emoji, picked one on a soft circle, arrow keys (RTL mirrored), optional +. | — |
 | StoryProgress | experimental | Segmented story bars: done, current filling over its duration on the motion engine (pause holds it), onDone when full; RTL fills from the right. | — |
 | StoryRing | experimental | Avatar in a story ring: new (four HADİ colors), seen, close friends, none; + badge, turning ring while loading, label for story trays. | Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, StoryProgress, LikeButton |
+| TypingIndicator | experimental | Three dots lifting in turn (motion engine) and an optional "… is typing" line; a polite status for screen readers. | — |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
 ## BottomNav
@@ -26,6 +31,36 @@ The mobile tab bar: a colored bubble slides to the active tab, tabs carry count 
 ```
 
 Full page: src/components/composite/bottom-nav/docs.md
+
+## ChatBubble
+
+One chat message. Mine is an Aktivite-blue gradient with light text, theirs the card color with a line. A run of one sender's messages tightens the inner corners and only the last bubble keeps the small "tail" corner. Inside: the sender's name in group chats (one of the four HADİ colors per sender), a reply quote with an orange bar, the text (emoji-only messages grow and lose the bubble), time and delivery ticks (sending · sent · delivered · read · failed with Retry) and reaction chips. Drag a bubble sideways to reply: an arrow appears, and past the threshold it fires when you let go while the bubble springs back on the motion engine.
+
+```tsx
+<ChatBubble mine text="See you at 7" time={m.at} status="read" position="last" reactions={m.reactions} onReact={toggle} onReply={() => reply(m)} />
+```
+
+Full page: src/components/social/chat-bubble/docs.md
+
+## ChatComposer
+
+The message field of a chat. On the start side an attach Menu whose + turns 45° while it is open; in the middle a growing Textarea (Enter sends, Shift+Enter breaks the line) with an emoji button that opens a ReactionPicker grid (the emoji goes in at the caret). On the end side one round button morphs on the motion engine: a microphone in Heyecan orange while the field is empty, a send arrow in Aktivite blue once there is text. Recording replaces the field with a pulsing dot, a running timer and a live waveform; the round button sends it, the trash button or Esc drops it. A reply preview with an orange bar sits above.
+
+```tsx
+<ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />
+```
+
+Full page: src/components/composite/chat-composer/docs.md
+
+## ChatThread
+
+A conversation. Messages become ChatBubbles grouped into runs per sender (5 minutes apart at most), with sticky day separators ("Today", "Yesterday", a date). The TypingIndicator sits under the last message; the smile button of a bubble opens a ReactionPicker under it. Motion: your new message rises from the composer on a spring, theirs slides in from its side. While you are at the bottom it follows new messages; scrolled up, they wait behind a "↓ N new" button. Rows are keyed, so an edit, a status or a reaction updates one bubble.
+
+```tsx
+<ChatThread messages={$messages} typing={$typing} group onReact={toggleReaction} onReply={(m) => $replyTo = m} />
+```
+
+Full page: src/components/composite/chat-thread/docs.md
 
 ## Chip
 
@@ -110,6 +145,17 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
 
+## ReactionPicker
+
+A row of emoji to react with, or a grid that serves as an emoji panel. It pops in (a spring scale and staggered emoji on the motion engine); the picked emoji sits on a soft Aktivite circle; hovering lifts an emoji. Arrow keys move between emoji (mirrored in RTL; up / down move by rows in the grid), Home / End jump.
+
+```tsx
+<ReactionPicker selected={msg.myReaction} onPick={(e) => react(msg, e)} />
+<ReactionPicker layout="grid" onPick={insertAtCaret} />
+```
+
+Full page: src/components/social/reaction-picker/docs.md
+
 ## StoryProgress
 
 The segmented bars on top of a story. Segments before the current one are full, later ones empty, and the current one fills over its duration on the motion engine. The fill is an essential animation: it keeps time with reduced motion (the story would otherwise skip at once), while "pause all" and the global speed still apply. `paused` holds the fill where it is; `onDone` fires when it is full. In RTL the bars fill from the right.
@@ -139,6 +185,16 @@ Full-screen stories on a dark stage. StoryProgress bars fill on top; a tap on th
 ```
 
 Full page: src/components/composite/story-viewer/docs.md
+
+## TypingIndicator
+
+Three dots that lift in turn on the motion engine (a staggered loop; still with reduced motion) and an optional sentence: "Acme is typing…", "Acme and Beta are typing…", "3 people are typing…". It is a polite status, so screen readers hear the sentence once even when it is not shown. With no names it hides.
+
+```tsx
+<TypingIndicator names={$typing} />
+```
+
+Full page: src/components/social/typing-indicator/docs.md
 
 ## VirtualList
 
