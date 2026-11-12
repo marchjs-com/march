@@ -15,7 +15,11 @@
 /* the router names only the outlet that changes (hm-page); the rest of the page (shell, layouts) is not captured */
 :root[data-hm-vt="hm-page"] { view-transition-name: none; }
 :root[data-hm-vt]::view-transition-old(root), :root[data-hm-vt]::view-transition-new(root),
-:root[data-hm-vt]::view-transition-old(hm-page), :root[data-hm-vt]::view-transition-new(hm-page) { animation: none; mix-blend-mode: normal; }
+::view-transition-old(hm-page), ::view-transition-new(hm-page) { animation: none; mix-blend-mode: normal; }
+/* the snapshots stay inside the box of the part that changes (the page, or a [data-hm-transition] stage): a scaled,
+   blurred or turning layer never covers the menu or the rest of the page (hm-page is the router's name only, so these
+   hold even when rapid clicks end one transition while the next one runs) */
+::view-transition-group(hm-page) { clip-path: inset(0); }
 
 /* Scroll-driven reveal without JS where supported: class="hm-scroll-reveal" */
 @supports (animation-timeline: view()) {

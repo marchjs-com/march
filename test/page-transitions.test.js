@@ -153,3 +153,74 @@ test("a View Transition that never runs its update (page not rendering) still sw
   document.startViewTransition = orig;
   stop(); a.done();
 });
+
+// a View Transition stand-in: finished resolves on its own after `ms` (0: never), or at once when skipped
+function fakeVT(log, ms = 0) {
+  return (cb) => {
+    let end; const finished = new Promise((r) => { end = r; if (ms) setTimeout(r, ms); });
+    const vt = { named: [...document.querySelectorAll("*")].filter((e) => e.style?.getPropertyValue?.("view-transition-name")), updateCallbackDone: Promise.resolve().then(cb), ready: Promise.resolve(), finished, skipTransition() { log.skipped++; end(); } };
+    // like a browser: starting a transition skips the running one
+    const prev = log.vts.at(-1);
+    if (prev && !prev.over) prev.skipTransition();
+    void finished.then(() => { vt.over = true; });
+    log.vts.push(vt);
+    return vt;
+  };
+}
+function fakeAnimate(log) {
+  return (frames, timing) => { const a = { pause() {}, play() {}, cancel() { log.cancelled++; }, finish() {}, updatePlaybackRate() {}, playbackRate: 1, currentTime: 0, playState: "running", finished: new Promise(() => {}), effect: { pseudoElement: timing.pseudoElement, getTiming: () => ({}), updateTiming() {} }, addEventListener() {}, removeEventListener() {} }; log.anims.push(a); return a; };
+}
+
+test("page transition variants: \"Stop all\" during a swap removes its layer animations (the transition ends, no layer stays)", async () => {
+  const root = document.documentElement, log = { skipped: 0, cancelled: 0, vts: [], anims: [] };
+  const origA = root.animate, orig = document.startViewTransition, origG = document.getAnimations;
+  root.animate = fakeAnimate(log); document.startViewTransition = fakeVT(log); document.getAnimations = () => log.anims;
+  M.usePageTransitions(M.curtain);
+  const stop = M.pageTransitions({ type: "curtain", duration: 60 });
+  const a = app({ "/": page("home"), "/a": page("a") });
+  await tick();
+  await R.navigate("/a"); await tick(10);
+  assert.equal(log.anims.length, 2, "the old and new page layers animate");
+  M.motion.pauseAll();
+  M.motion.resumeAll();
+  assert.equal(log.cancelled, 2, "both layer animations were removed: the browser ends the transition");
+  log.vts[0].skipTransition(); await tick();
+  assert.equal(root.getAttribute("data-hm-vt"), null);
+  document.startViewTransition = orig; root.animate = origA; document.getAnimations = origG;
+  stop(); a.done();
+});
+
+test("View Transitions: a newer navigation ends the running one first; rapid swaps leave no mark", async () => {
+  const root = document.documentElement, log = { skipped: 0, cancelled: 0, vts: [], anims: [] };
+  const origA = root.animate, orig = document.startViewTransition;
+  root.animate = fakeAnimate(log); document.startViewTransition = fakeVT(log, 80);
+  const stop = M.pageTransitions({ type: "fade", duration: 60 });
+  const routes = { "/": page("home") };
+  for (const v of ["circle", "wipe", "stack", "cube", "flip", "zoom-through", "curtain", "blinds", "pixel", "morph"]) routes[`/${v}`] = page(v, { transition: v });
+  M.usePageTransitions(...M.PAGE_VARIANTS);
+  const a = app(routes);
+  await tick();
+  for (const v of Object.keys(routes).slice(1)) { await R.navigate(v); await tick(15); }
+  await tick(700);
+  assert.equal(a.host.querySelector(".pg").textContent, "morph");
+  assert.ok(log.skipped >= 1, "a running transition was ended by the next one");
+  assert.equal(root.getAttribute("data-hm-vt"), null, "no mark left");
+  assert.equal([...document.querySelectorAll("*")].filter((e) => e.style?.getPropertyValue?.("view-transition-name")).length, 0, "no element keeps a transition name");
+  document.startViewTransition = orig; root.animate = origA;
+  stop(); a.done();
+});
+
+test("a [data-hm-transition] part of the page is what a transition animates (the rest swaps at once)", async () => {
+  const root = document.documentElement, log = { skipped: 0, cancelled: 0, vts: [], anims: [] };
+  const origA = root.animate, orig = document.startViewTransition;
+  root.animate = fakeAnimate(log); document.startViewTransition = fakeVT(log, 20);
+  const stop = M.pageTransitions({ type: "fade", duration: 20 });
+  const stage = (k) => ({ component: () => h("section", { class: "pg" }, h("h1", {}, "title"), h("div", { class: "stage", "data-hm-transition": "" }, k)) });
+  const a = app({ "/": stage("one"), "/a": stage("two") });
+  await tick();
+  await R.navigate("/a"); await tick(100);
+  assert.deepEqual(log.vts[0].named.map((e) => e.className), ["stage"], "only the stage is named for the transition");
+  assert.equal(a.host.querySelector(".stage").textContent, "two");
+  document.startViewTransition = orig; root.animate = origA;
+  stop(); a.done();
+});

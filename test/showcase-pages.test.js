@@ -23,3 +23,30 @@ test("every menu group is one of MENU_GROUPS (src/components/categories.ts), in 
   for (const g of new Set(groups)) assert.ok(MENU_GROUPS.includes(g), `nav-meta.ts group "${g}" is not a menu group: ${MENU_GROUPS.join(", ")}`);
   assert.match(readFileSync(SRC + "shell-menu.tsx", "utf8"), /groupOrder=\{MENU_GROUPS\}/, "the side menu orders its groups by MENU_GROUPS");
 });
+
+test("every menu page opens its own route (an exact route beats a wildcard that matched nothing)", async () => {
+  const { compilePath, matchRoute } = await import("../src/router/index.ts");
+  const top = paths("nav.ts", /path: "([^"]+)"/g);
+  const routesSrc = readFileSync(SRC + "routes.ts", "utf8");
+  const extra = [...routesSrc.matchAll(/^  "(\/[^"]+)": \{/gm)].map((m) => m[1]);
+  // the router's order: best score first, stable
+  const table = [...top, ...extra].map((p) => ({ path: p, ...compilePath(p) })).sort((a, b) => b.score - a.score);
+  for (const p of top) assert.equal(matchRoute(table, p)?.route.pattern, p, `${p} opens its own page, not a wildcard route`);
+  // the pages under a wildcard route: the wildcard route matches and its hub module knows the page
+  const subs = readFileSync(SRC + "nav-meta.ts", "utf8").match(/SUB_PAGES[^=]*=\s*\[([\s\S]*?)\]/)?.[1] ?? "";
+  const hub = readFileSync(SRC + "motion-hub.tsx", "utf8");
+  for (const [, p] of subs.matchAll(/path: "([^"]+)"/g)) {
+    const m = matchRoute(table, p);
+    assert.ok(m?.route.pattern.endsWith("/*"), `${p} matches a wildcard route`);
+    assert.ok(hub.includes(`"${p}":`), `${p} is a page of motion-hub.tsx (else it shows "Sayfa bulunamadı")`);
+  }
+});
+
+test("router: a wildcard that matched nothing is only a fallback", async () => {
+  const { compilePath, matchRoute } = await import("../src/router/index.ts");
+  const table = ["/a/*", "/a", "/b/*"].map((p) => ({ path: p, ...compilePath(p) })).sort((x, y) => y.score - x.score);
+  assert.equal(matchRoute(table, "/a")?.route.pattern, "/a");
+  assert.equal(matchRoute(table, "/a/")?.route.pattern, "/a");
+  assert.equal(matchRoute(table, "/a/x")?.route.pattern, "/a/*");
+  assert.equal(matchRoute(table, "/b")?.route.pattern, "/b/*", "with no exact route the wildcard still matches");
+});

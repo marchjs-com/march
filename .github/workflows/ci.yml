@@ -19,6 +19,9 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run size
+      - name: every showcase menu page opens (headless Chrome)
+        if: matrix.node == 22
+        run: node examples/showcase/build.mjs && node tools/menu-audit.mjs
   # browser checks on the built showcase: every Playground / options control changes something visible
   # (tools/control-audit.mjs); RichTextEditor :emoji and @mention insert at the caret (tools/editor-suggest-check.mjs)
   showcase-controls:

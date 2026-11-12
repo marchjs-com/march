@@ -38,16 +38,13 @@ export function transitionFrames(type: PageTransitionType, side: "in" | "out", d
   if (type === "none") return [];
   const extra = EXTRA.get(type);
   if (extra) return extra(side, dir, rtl, distance);
-  if (type === "fade") return side === "in" ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 1 }, { opacity: 0 }];
-  if (type === "scale") {
-    const s = side === "in" ? (back ? 0.96 : 1.04) : (back ? 1.04 : 0.96);
-    return side === "in" ? [{ opacity: 0, transform: `scale(${s})` }, { opacity: 1, transform: "none" }] : [{ opacity: 1, transform: "none" }, { opacity: 0, transform: `scale(${s})` }];
-  }
+  const inn = side === "in";
+  // hidden → shown coming in, shown → hidden going out
+  const io = (hid: Keyframe, shown: Keyframe): Keyframe[] => (inn ? [hid, shown] : [shown, hid]);
+  if (type === "fade") return io({ opacity: 0 }, { opacity: 1 });
   // slide: forward = the new page comes from the inline end (the right in LTR, the left in RTL)
-  const sign = (back ? -1 : 1) * (rtl ? -1 : 1);
-  return side === "in"
-    ? [{ opacity: 0, transform: `translateX(${sign * distance}px)` }, { opacity: 1, transform: "none" }]
-    : [{ opacity: 1, transform: "none" }, { opacity: 0, transform: `translateX(${-sign * distance}px)` }];
+  const sign = (back ? -1 : 1) * (rtl ? -1 : 1) * (inn ? 1 : -1);
+  return io({ opacity: 0, transform: type === "scale" ? `scale(${inn === back ? 0.96 : 1.04})` : `translateX(${sign * distance}px)` }, { opacity: 1, transform: "none" });
 }
 
 const TYPES = new Set(["fade", "slide", "scale", "none"]);
@@ -102,8 +99,7 @@ function vtName(el: HTMLElement | null | undefined, name: string | null): void {
 }
 function isRtl(): boolean {
   const root = globalThis.document?.documentElement;
-  if (!root) return false;
-  return (root.getAttribute?.("dir") || globalThis.getComputedStyle?.(root)?.direction) === "rtl";
+  return !!root && (root.getAttribute?.("dir") || globalThis.getComputedStyle?.(root)?.direction) === "rtl";
 }
 
 // back or forward: every history entry gets its order in history.state.hmIdx the first time a swap sees it (a new
@@ -141,9 +137,8 @@ type StartVT = (cb: () => void) => ViewTransitionLike;
 let swaps = 0;
 /** Turn page transitions on. Returns a function that turns them off. */
 export function pageTransitions(o: PageTransitionOptions = {}): () => void {
-  const st0 = globalThis.history?.state as { hmIdx?: number } | null;
-  lastIdx = typeof st0?.hmIdx === "number" ? st0.hmIdx : 0;
-  if (typeof st0?.hmIdx !== "number") stamp(0);
+  const i0 = (globalThis.history?.state as { hmIdx?: number } | null)?.hmIdx;
+  lastIdx = typeof i0 === "number" ? i0 : (stamp(0), 0);
   lastState = globalThis.history?.state;
   setNavigationWrapper(async (run: () => void, { pop }: { pop: boolean }) => {
     const at = I.S.path.peek(), my = ++swaps;
@@ -161,7 +156,9 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
     const rtl = isRtl();
     const timing = { duration: t.duration, easing: t.easing };
     // only the outlet whose content changes takes part (the shell and the layouts above it stay still)
-    const pageEl = (): HTMLElement | null => (transitionOutlet()?.firstElementChild as HTMLElement | null) ?? null;
+    // the part a transition animates: a [data-hm-transition] element inside the page (a demo stage, a content column),
+    // else the page itself; the rest of the page swaps at once
+    const pageEl = (): HTMLElement | undefined => { const p = transitionOutlet()?.firstElementChild as HTMLElement | undefined; return p?.querySelector<HTMLElement>("[data-hm-transition]") ?? p; };
 
     if (o.viewTransitions !== false && typeof doc.startViewTransition === "function") {
       const old = pageEl();
@@ -185,7 +182,8 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
       };
       const vt = doc.startViewTransition(update) as ViewTransitionLike & { skipTransition?: () => void };
       // a page that does not render (a background tab, a hidden frame) never calls the update: the page changes anyway
-      const late = setTimeout(() => { if (!swapped) { vt.skipTransition?.(); update(); } }, Math.max(400, t.duration * 2));
+      const wait = Math.max(400, t.duration * 2);
+      const late = setTimeout(() => { if (!swapped) { vt.skipTransition?.(); update(); } }, wait);
       void Promise.resolve(vt.updateCallbackDone).finally(() => clearTimeout(late)).catch(() => undefined);
       const done = (): void => { for (const el of named) vtName(el, null); root.removeAttribute("data-hm-vt"); };
       // an aborted transition (resize, a second navigation) is not an error: the DOM update still happened
@@ -201,7 +199,7 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
         }
       }, () => undefined);
       void Promise.resolve(vt.finished).catch(() => undefined).then(done);
-      await Promise.race([Promise.resolve(vt.updateCallbackDone).catch(() => undefined), new Promise<void>((r) => setTimeout(r, Math.max(450, t.duration * 2 + 50)))]);
+      await Promise.race([Promise.resolve(vt.updateCallbackDone).catch(() => undefined), new Promise<void>((r) => setTimeout(r, wait + 50))]);
       return;
     }
 

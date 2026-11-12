@@ -90,7 +90,7 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
   clipped to `from`'s box (`clip-path: inset(… round r)`) and moved onto it, then opens; background colour and corner
   radius blend; the content fades in, it is never stretched. `mode: "scale"` is a FLIP with a scale (shared element:
   the same picture in two places). Unfilled: nothing stays on the target afterwards.
-- `morphBack(from, to)` — the reverse; `to` is shown again when it ends (close / remove `from` after `finished`).
+- `morphBack(from, to)` — the reverse; `to` is shown again when it ends (close / remove `from` after `finished`). Right after, every effect and inline style comes off `from`, so it opens clean next time. A newer morph on any of the same elements cancels the running one (its effects removed, a source it hid shown again; `finished` resolves with `state` `"idle"`), so overlapping clicks never stack effects. `morphIcon` and `shapeMorph` likewise replace a running morph on the same element.
 - `morphIcon(path, name)` with `MORPH_ICONS` (play, pause, menu, close, plus, check, minus): every icon is three 4-point
   bars with the same commands, so any two tween number by number.
 - `shapeMorph(el, shape)` / `shapePolygon(shape, n)` — radial outlines sampled at the same angles (circle, square,
@@ -103,4 +103,7 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
 clip-path cells, one polygon), `morphPage` ("morph": grows out of the pressed link's box). Register with
 `usePageTransitions(circle, cube)`; `PAGE_VARIANTS` lists all. Going back, the old page plays the reverse on top
 (`zIndex`); wipe, stack, cube and flip mirror in RTL. With View Transitions the engine animates the pseudo-elements,
-otherwise the page elements themselves.
+otherwise the page elements themselves. The snapshot layers are clipped to the box of the part that changes, so a scaled, blurred
+or turning page never covers the menu. Mark an element inside the page with `data-hm-transition` (a demo stage, a content
+column) and only that part animates; the rest of the page swaps at once. "Stop all" during a variant transition ends
+it at once (its layer animations are removed), and a newer navigation replaces a running one, so no layer stays.

@@ -62,3 +62,46 @@ test("stateMorph: loading is busy and round, success sets the state for the toke
   assert.equal(b.querySelector(".hm-state-icon").children.length, 0);
   b.remove();
 });
+
+test("ripple: an element made before it is in the document (static position) still gets the ink inside it; Enter starts it in the centre", () => {
+  const origCs = globalThis.getComputedStyle;
+  // like a browser: a detached element has no computed position, a connected one without a rule is static
+  globalThis.getComputedStyle = (el) => ({ position: el.isConnected ? el.style.getPropertyValue("position") || "static" : "", getPropertyValue: () => "" });
+  try {
+    const card = rect(document.createElement("div"), 100, 50, 200, 80);
+    const off = M.ripple(card, { duration: 10 });   // the action runs first (JSX), the element is attached after
+    document.body.append(card);
+    card.dispatchEvent(Object.assign(new Event("pointerdown"), { clientX: 120, clientY: 60 }));
+    assert.equal(card.style.getPropertyValue("position"), "relative", "the ink's containing block is the card");
+    const ink = card.querySelector("span");
+    const v = (el, k) => parseFloat(el.style.getPropertyValue(k)), size = v(ink, "width");
+    assert.equal(v(ink, "left") + size / 2, 20, "centred on the press point (x)");
+    assert.equal(v(ink, "top") + size / 2, 10, "centred on the press point (y)");
+    card.dispatchEvent(Object.assign(new Event("keydown"), { key: "Enter" }));
+    const k = card.querySelectorAll("span")[1], ks = v(k, "width");
+    assert.equal(v(k, "left") + ks / 2, 100, "keyboard: from the centre (x)");
+    assert.equal(v(k, "top") + ks / 2, 40, "keyboard: from the centre (y)");
+    off(); card.remove();
+  } finally { globalThis.getComputedStyle = origCs; }
+});
+
+test("stateMorph: 3 success and 3 error rounds with changing options; after each the button is exactly as it was", () => {
+  const b = document.createElement("button");
+  b.className = "hm-btn hm-btn-primary";
+  b.textContent = "Değişiklikleri kaydet";
+  // the box follows the inline width (natural width 160)
+  b.getBoundingClientRect = () => { const w = parseFloat(b.style.getPropertyValue("width")) || 160; return { left: 0, top: 0, width: w, height: 40, right: w, bottom: 40 }; };
+  document.body.append(b);
+  const snap = () => ({ style: b.getAttribute("style"), cls: b.className, text: b.firstChild.textContent, state: b.getAttribute("data-hm-state"), busy: b.hasAttribute("aria-busy"), disabled: b.hasAttribute("aria-disabled"), width: b.getBoundingClientRect().width, icon: b.querySelector(".hm-state-icon")?.children.length ?? 0, live: b.querySelector("[aria-live]")?.textContent ?? "" });
+  const first = snap();
+  const rounds = [["success", { duration: 300 }], ["error", { duration: 500 }], ["success", { duration: 200, labels: { success: "Kaydedildi" } }], ["error", {}], ["success", { duration: 600 }], ["error", { duration: 250 }]];
+  for (const [result, o] of rounds) {
+    M.stateMorph(b, "loading", o).finish();
+    assert.equal(b.getBoundingClientRect().width, 40, "loading: a circle");
+    const r = M.stateMorph(b, result, o); r.finish();
+    assert.equal(b.getAttribute("data-hm-state"), result);
+    M.stateMorph(b, "idle", o).finish();
+    assert.deepEqual(snap(), first, `after a ${result} round the button is as it was`);
+  }
+  b.remove();
+});
