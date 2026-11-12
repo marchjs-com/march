@@ -5,7 +5,7 @@
 import "./marquee.css";
 import { signal, computed, effect, getOwner, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
-import { reducedMotion, frame } from "../motion/env.ts";
+import { reducedMotion, frame, animateEl } from "../motion/env.ts";
 import { val, cx, on, type MaybeFn, type ClassProp } from "./util.ts";
 
 export type MarqueeTrigger = "hover" | "focus" | "always" | "visible";
@@ -95,7 +95,7 @@ export function OverflowText(props: OverflowTextProps): Element {
     const fadeFrames = (stops: Array<[number, boolean, boolean]>): Keyframe[] => stops.map(([offset, s, e]) => ({ offset, "--hm-mq-fs": s ? F : "0px", "--hm-mq-fe": e ? F : "0px" } as Keyframe));
     const fade = (frames: Keyframe[], o: KeyframeAnimationOptions): void => {
       const r = root as HTMLElement & { animate?: (k: Keyframe[], o: KeyframeAnimationOptions) => Anim };
-      if (props.fade !== false && typeof r.animate === "function") { try { fadeAnim = r.animate(frames, o); } catch { fadeAnim = null; } }
+      if (props.fade !== false && typeof r.animate === "function") { try { fadeAnim = animateEl(r, frames, o); } catch { fadeAnim = null; } }
     };
     if (mode === "loop") {
       const sep = h("span", { class: "hm-marquee-sep", "aria-hidden": "true" }, props.separator ?? "•");
@@ -106,7 +106,7 @@ export function OverflowText(props: OverflowTextProps): Element {
       copies = [sep, copy];
       const span = copy.getBoundingClientRect().left - item.getBoundingClientRect().left;
       const travel = (Math.abs(span) / speed) * 1000, total = travel + pause;
-      anim = el.animate([
+      anim = animateEl(el, [
         { transform: "translateX(0)", offset: 0 },
         { transform: "translateX(0)", offset: pause / total },
         { transform: `translateX(${sign * Math.abs(span)}px)`, offset: 1 },
@@ -117,7 +117,7 @@ export function OverflowText(props: OverflowTextProps): Element {
     }
     const d = dist.peek(), travel = (d / speed) * 1000, total = 2 * travel + 2 * pause;
     const end = `translateX(${sign * d}px)`;
-    anim = el.animate([
+    anim = animateEl(el, [
       { transform: "translateX(0)", offset: 0 },
       { transform: "translateX(0)", offset: pause / total, easing: "ease-in-out" },
       { transform: end, offset: (pause + travel) / total },
@@ -127,7 +127,7 @@ export function OverflowText(props: OverflowTextProps): Element {
     const a = pause / total, b = (pause + travel) / total, c = (2 * pause + travel) / total, e = Math.min(0.03, travel / total / 4);
     fade(fadeFrames([[0, false, true], [a, false, true], [a + e, true, true], [b - e, true, true], [b, true, false], [c, true, false], [c + e, true, true], [1 - e, true, true], [1, false, true]]),
       { duration: total, iterations: mode === "once" ? 1 : Infinity, fill: "none" });
-    if (mode === "once") (anim as Anim & { onfinish?: () => void }).onfinish = () => { anim = null; running.set(false); };
+    if (mode === "once" && anim) (anim as Anim & { onfinish?: () => void }).onfinish = () => { anim = null; running.set(false); };
   };
 
   effect(() => {
