@@ -102,9 +102,18 @@ const pageKey = (route: CompiledRoute, prm: Record<string, string>): string => `
 const NO_ROUTER = "March: call createRouter() first";
 const leaveGuards = new Set<() => boolean | Promise<boolean>>();
 
-let navWrapper: ((apply: () => void, o: { pop: boolean }) => void | Promise<void>) | null = null;
-/** Wrap every page swap (hadi-march/motion uses it for View Transitions). */
+/** What a page swap is: back/forward (history order, so a forward button after back is "forward"), the meta of the route
+ *  shown and of the one left (a route's `meta.transition` picks its page transition). */
+export interface NavInfo { pop: boolean; dir: "forward" | "back"; to: Record<string, unknown>; from: Record<string, unknown> }
+let navWrapper: ((apply: () => void, o: NavInfo) => void | Promise<void>) | null = null;
+/** Wrap every page swap (hadi-march/motion uses it for page transitions). */
 export function setNavigationWrapper(fn: typeof navWrapper): void { navWrapper = fn; }
+/** Wrap every named / modal outlet swap: `apply` puts the new page in; `from` / `to` are null when the outlet empties / fills. */
+export type OutletWrapper = (name: string, apply: () => void, o: { dir: "forward" | "back"; to: RouteTarget | null; from: RouteTarget | null }) => void | Promise<void>;
+let outletWrapper: OutletWrapper | null = null;
+export function setOutletWrapper(fn: OutletWrapper | null): void { outletWrapper = fn; }
+// history order of the entries this app pushed (state.hmIdx): a popstate to a lower index is "back"
+let lastIdx = 0, lastDir: "forward" | "back" = "forward";
 
 /** Current path (reactive). */
 export const path = (): string => S.path();
@@ -201,7 +210,10 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
   if (!r) return;
   let { p, search, hash } = currentLocation();
   // modal route: the URL is the modal's, the page behind stays the one it was opened from (history state hmBg)
-  const st = globalThis.history?.state as { hmModal?: boolean; hmBg?: string } | null;
+  const st = globalThis.history?.state as { hmModal?: boolean; hmBg?: string; hmIdx?: number } | null;
+  const idx = typeof st?.hmIdx === "number" ? st.hmIdx : 0;
+  lastDir = pop && idx < lastIdx ? "back" : "forward";
+  lastIdx = idx;
   let modalTo: string | null = null;
   if (st?.hmModal && st.hmBg) {
     // a direct visit / reload of a modal URL shows the page in full (and forgets the modal state)
@@ -272,14 +284,15 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
       const title = r.opts.title?.(to) ?? (typeof mod?.title === "function" ? mod.title(to) : mod?.title) ?? m.route.title;
       setMeta({ ...(title ? { title } : {}), ...(typeof meta["description"] === "string" ? { description: meta["description"] } : {}) });
     }
-    const apply = (): void => batch(() => {
+    // a newer navigation that got here first wins (a transition may run this late)
+    const apply = (): void => { if (seq === r.seq) batch(() => {
       S.path.set(p); S.search.set(search); S.hash.set(hash);
       S.match.set(m ? { route: m.route, params: m.params, path: p, meta } : null);
       r.view.set(page ?? { levels: [{ key: "notfound", comp: notFoundComp, page: true }] });
       S.pendingDepth.set(-1);
-    });
+    }); };
     vtDepth = depth;
-    if (navWrapper && !initial) await navWrapper(apply, { pop }); else apply();
+    if (navWrapper && !initial) await navWrapper(apply, { pop, dir: lastDir, to: meta, from: cur?.meta ?? {} }); else apply();
     lastUrl = globalThis.location?.href ?? "";
     if (r.opts.scroll !== false) restoreScroll(pop);
     if (initial && r.opts.prefetch !== "none") whenIdle(prefetchLinks, 3000);
@@ -423,9 +436,10 @@ export async function navigate(to: Href, { replace = false, state = null, force 
   saveScroll();
   const url = r.mode === "hash" ? `#${s}` : `${r.base}${s}`;
   // a modal keeps the page it was opened from (or that page's own background, when one modal opens another)
-  const curState = globalThis.history?.state as { hmModal?: boolean; hmBg?: string } | null;
+  const curState = globalThis.history?.state as { hmModal?: boolean; hmBg?: string; hmIdx?: number } | null;
+  const curIdx = typeof curState?.hmIdx === "number" ? curState.hmIdx : 0;
   const bg = curState?.hmModal && curState.hmBg ? curState.hmBg : `${untrack(() => S.path())}${untrack(() => S.search())}`;
-  const st = { ...(state ?? {}), hmKey: Math.random().toString(36).slice(2), ...(modal ? { hmModal: true, hmBg: bg } : {}) };
+  const st = { ...(state ?? {}), hmKey: Math.random().toString(36).slice(2), hmIdx: replace ? curIdx : curIdx + 1, ...(modal ? { hmModal: true, hmBg: bg } : {}) };
   if (replace) globalThis.history.replaceState(st, "", url); else globalThis.history.pushState(st, "", url);
   return sync();
 }
@@ -527,7 +541,11 @@ export function Outlet(props: { name?: string; empty?: Renderable; children?: un
 const NamedOutlet = lazy(() => import("./outlets.ts"), { pick: "NamedOutlet", placeholder: "none" });
 
 /** Internals for the outlets module (not public API). */
-export const _router = { S, slot, matchRoute, loadRoute, pageKey, notFoundComp, forbiddenComp, routeError };
+export const _router = { S, slot, matchRoute, loadRoute, pageKey, notFoundComp, forbiddenComp, routeError,
+  swapOutlet: (name: string, apply: () => void, to: RouteTarget | null, from: RouteTarget | null): void => {
+    if (!outletWrapper || to?.path === from?.path) { apply(); return; }
+    void Promise.resolve(outletWrapper(name, apply, { dir: lastDir, to, from })).catch(() => apply());
+  } };
 
 /** Mark the outlet whose content changes, so a View Transition animates only that part (the shell stays put). */
 export function transitionOutlet(): Element | null {

@@ -32,7 +32,7 @@ function install(): void {
     effect(() => {
       const to = target();
       const my = ++seq;
-      untrack(() => { void resolve(table, to).then((v) => { if (my === seq) I.slot(name).set(v); }, (e: unknown) => { if (my === seq) I.slot(name).set(errorSlot(e, to)); }); });
+      untrack(() => { void resolve(table, to).then((v) => { if (my === seq) { const sl = I.slot(name); I.swapOutlet(name, () => sl.set(v), v?.to ?? null, sl.peek()?.to ?? null); } }, (e: unknown) => { if (my === seq) I.slot(name).set(errorSlot(e, to)); }); });
     });
   };
   installed = { r, dispose: createRoot((dispose) => {
@@ -53,7 +53,8 @@ export function NamedOutlet(props: { name: string; empty?: unknown; children?: u
     return untrack(() => {
       const sl = cur.peek();
       if (!sl) return null;
-      const page = (): unknown => h(Try, { fallback: (e: unknown) => I.routeError(e, close) }, () => h(sl.comp, { params: sl.to.params, query: sl.to.query, meta: sl.to.meta, close }));
+      // the page sits in its own box so a transition can move it (hm-outlet-page)
+      const page = (): unknown => h("div", { class: "hm-outlet-page", "data-outlet-page": name }, () => h(Try, { fallback: (e: unknown) => I.routeError(e, close) }, () => h(sl.comp, { params: sl.to.params, query: sl.to.query, meta: sl.to.meta, close })));
       return typeof props.children === "function" ? (props.children as (page: () => unknown, close: () => void, to: RouteTarget) => unknown)(page, close, sl.to) : page();
     });
   }) as Element;
