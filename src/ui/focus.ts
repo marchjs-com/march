@@ -1,4 +1,7 @@
 // Focus helpers: focusable lookup, Tab trapping, roving focus in lists.
+// isRtl lives in core/util (one home); re-exported here for the modules that import it with the focus helpers
+import { isRtl } from "../core/util.ts";
+export { isRtl };
 const FOCUSABLE = "button,input,select,textarea,a[href],[tabindex],[contenteditable]";
 
 type Focusable = HTMLElement & { disabled?: boolean };
@@ -34,7 +37,9 @@ export function focusFirst(root: HTMLElement): void {
 export interface RovingOptions { horizontal?: boolean; wrap?: boolean; /** Right to left: ArrowLeft is "next" (horizontal only). */ rtl?: boolean }
 
 /** Move focus among `items` with arrow keys / Home / End. Returns the focused item when the key was handled, else false. */
-export function roving<T extends HTMLElement>(e: KeyboardEvent, items: readonly T[], { horizontal = false, wrap = true, rtl = false }: RovingOptions = {}): T | false {
+export function roving<T extends HTMLElement>(e: KeyboardEvent, items: readonly T[], { horizontal = false, wrap = true, rtl: rtlOpt }: RovingOptions = {}): T | false {
+  // right-to-left: the visual order of a horizontal row is mirrored, so ← moves to the next item
+  const rtl = horizontal && (rtlOpt ?? isRtl(e.target as Element));
   const prev = horizontal ? (rtl ? "ArrowRight" : "ArrowLeft") : "ArrowUp", next = horizontal ? (rtl ? "ArrowLeft" : "ArrowRight") : "ArrowDown";
   if (![prev, next, "Home", "End"].includes(e.key) || !items.length) return false;
   const i = items.indexOf((e.target as Node).ownerDocument?.activeElement as T);

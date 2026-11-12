@@ -9,6 +9,8 @@ import { frame, type DialogProps } from "../../../ui/dialog.ts";
 import { val, cx, clamp, type MaybeFn } from "../../../ui/util.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
+import { isRtl } from "../../../core/util.ts";
+import { swipeable, rubberBand, fling, nearest, type SwipePoint } from "../../../behaviors/swipe/index.ts";
 import "./drawer.css";
 
 /** Edge the drawer comes from. `start` / `end` follow the writing direction; `left` / `right` are aliases of them. */
@@ -34,7 +36,6 @@ type Edge = "start" | "end" | "top" | "bottom";
 const edgeOf = (s: DrawerPlacement | undefined): Edge => (s === "left" ? "start" : s === "right" || !s ? "end" : s);
 const SETTLE = 300, EXIT = 220;
 const INTERACTIVE = "button, a, input, select, textarea, label, [contenteditable], [role=slider]";
-const rubber = (d: number): number => Math.sqrt(d) * 4;
 
 interface Controls { exit(done: () => void): void; reopen(): void }
 
@@ -91,7 +92,7 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   // offset: distance from the open position toward the edge (0 = fully open, size = hidden)
   let cur = 0, size = 0, from0 = 0;
   let run: { cancel(): void; finished: Promise<void> } | null = null, fade: { cancel(): void } | null = null;
-  const rtl = (): boolean => (globalThis.getComputedStyle?.(panel)?.direction || panel.closest("[dir]")?.getAttribute("dir")) === "rtl";
+  const rtl = (): boolean => isRtl(panel);
   const sign = (): number => (edge === "top" ? -1 : edge === "bottom" ? 1 : (edge === "end") !== rtl() ? 1 : -1);
   const tr = (o: number): string => (axis === "x" ? `translate3d(${sign() * o}px, 0, 0)` : `translate3d(0, ${sign() * o}px, 0)`);
   const measure = (): number => { const r = panel.getBoundingClientRect(); return (axis === "x" ? r.width : r.height) || vp(); };
@@ -122,57 +123,43 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
     return cur > rest(largest()) + 1;
   };
 
-  // drag: pointer (touch, pen, mouse) along the axis; release picks the nearest resting point, projected by velocity
-  let armed = false, dragging = false, fromBody = false, sx = 0, sy = 0, start = 0, last = 0, lastT = 0, v = 0;
-  const along = (e: PointerEvent): number => (axis === "x" ? e.clientX : e.clientY) * sign();
-  const down = (e: PointerEvent): void => {
-    if (e.button > 0 || (!canClose() && !snaps)) return;
-    const el = e.target as Element;
-    if (el !== handle && el.closest?.(INTERACTIVE)) return;
-    fromBody = !!body?.contains(el);
-    armed = true; dragging = false; sx = e.clientX; sy = e.clientY; start = along(e); v = 0;
-  };
-  const move = (e: PointerEvent): void => {
-    if (!armed) return;
-    if (!dragging) {
-      const ax = Math.abs(e.clientX - sx), ay = Math.abs(e.clientY - sy);
-      if (Math.max(ax, ay) < 6) return;
-      if ((axis === "x" ? ay > ax : ax > ay) || (fromBody && !bodyLets(along(e) - start))) { armed = false; return; }
-      dragging = true; run?.cancel(); from0 = cur; start = along(e); last = start; lastT = e.timeStamp;
-      try { panel.setPointerCapture?.(e.pointerId); } catch { /* pointer already gone */ }
-      panel.classList.add("is-dragging");
-    }
-    e.preventDefault();
-    const raw = from0 + (along(e) - start);
-    const lo = rest(largest()), hi = canClose() ? size : rest(smallest());
-    const o = raw < lo ? lo - rubber(lo - raw) : raw > hi ? hi + rubber(raw - hi) : raw;
-    v = (along(e) - last) / Math.max(1, e.timeStamp - lastT); last = along(e); lastT = e.timeStamp;
-    cur = o;
-    setStyle(panel, { transform: tr(o) });
-  };
-  const up = (): void => {
-    if (!armed) return;
-    armed = false;
-    if (!dragging) return;
-    dragging = false;
-    panel.classList.remove("is-dragging");
-    // fling: velocity (px/ms, capped) projects the release point
-    const projected = cur + clamp(v, -2, 2) * 160;
-    const spots: [number, number][] = snaps ? order.map((i) => [rest(i), i]) : [[0, 0]];
-    if (canClose()) spots.push([size, -1]);
-    const [o, i] = spots.reduce((a, b) => (Math.abs(b[0] - projected) < Math.abs(a[0] - projected) ? b : a));
-    if (i < 0) {
-      void to(size, EXIT);
-      props.onClose?.();
-      // a parent that keeps it open gets it back
-      queueMicrotask(() => { if (val(props.open)) void to(rest()); });
-    } else if (snaps) choose(i);
-    else void to(o);
-  };
-  panel.addEventListener("pointerdown", down);
-  panel.addEventListener("pointermove", move);
-  panel.addEventListener("pointerup", up);
-  panel.addEventListener("pointercancel", up);
+  // drag: the swipe behavior along the axis (touch, pen, mouse); release picks the nearest resting point, projected by
+  // the release velocity (fling)
+  let fromBody = false, d0 = 0;
+  const along = (p: SwipePoint): number => (axis === "x" ? p.dx : p.dy) * sign();
+  swipeable(panel, {
+    axis, ignore: ":not(*)",
+    onPress: (e) => {
+      if (!canClose() && !snaps) return false;
+      const el = e.target as Element;
+      if (el !== handle && el.closest?.(INTERACTIVE)) return false;
+      fromBody = !!body?.contains(el);
+      return true;
+    },
+    accept: (p) => !fromBody || bodyLets((axis === "x" ? p.dx : p.dy) * sign()),
+    onStart: (p) => { run?.cancel(); from0 = cur; d0 = along(p); panel.classList.add("is-dragging"); },
+    onMove: (p) => {
+      const raw = from0 + (along(p) - d0);
+      const lo = rest(largest()), hi = canClose() ? size : rest(smallest());
+      cur = raw < lo ? lo - rubberBand(lo - raw) : raw > hi ? hi + rubberBand(raw - hi) : raw;
+      setStyle(panel, { transform: tr(cur) });
+    },
+    onEnd: (p) => {
+      panel.classList.remove("is-dragging");
+      const projected = fling(cur, (axis === "x" ? p.vx : p.vy) * sign());
+      const spots: [number, number][] = snaps ? order.map((i) => [rest(i), i]) : [[0, 0]];
+      if (canClose()) spots.push([size, -1]);
+      const at = nearest(spots.map((x) => x[0]), projected);
+      const [o, i] = spots.find((x) => x[0] === at) as [number, number];
+      if (i < 0) {
+        void to(size, EXIT);
+        props.onClose?.();
+        // a parent that keeps it open gets it back
+        queueMicrotask(() => { if (val(props.open)) void to(rest()); });
+      } else if (snaps) choose(i);
+      else void to(o);
+    },
+  });
   body?.addEventListener("scroll", touchPolicy, { passive: true });
   const onResize = (): void => {
     if (snaps) setStyle(panel, { "--hm-sheet-size": `${Math.round(px(snaps[largest()]!))}px` });

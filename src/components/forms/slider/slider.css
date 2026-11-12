@@ -1,4 +1,4 @@
 /* HADI March — Slider. Imported by its component module; tokens.css provides the variables. */
-.hm-slider-wrap { display: flex; align-items: center; gap: var(--hm-space-3); }
-.hm-slider { flex: 1; accent-color: var(--hm-accent, var(--hm-primary)); }
+.hm-slider-wrap { display: flex; min-width: 0; align-items: center; gap: var(--hm-space-3); }
+.hm-slider { flex: 1; min-width: 0; accent-color: var(--hm-accent, var(--hm-primary)); }
 .hm-slider-value { min-width: 3ch; text-align: end; font-variant-numeric: tabular-nums; color: var(--hm-muted); }

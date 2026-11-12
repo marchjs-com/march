@@ -74,6 +74,24 @@ function graph(outs) {
  * @param {{ cwd: string, entryKey: string, esbuild: typeof import("esbuild"), minify?: boolean, minSize?: number, budgetOf?: (k: string) => { boot?: boolean, limit?: number } | undefined }} o
  * @returns {Promise<{ stubs: number, folded: number, cssMoved: number }>}
  */
+// MARCH_DEBUG_PACK=<part of an input path>: for a small chunk holding that input that found no host, print why each
+// candidate host was refused (the last pass is the one that counts)
+const DEBUG = process.env.MARCH_DEBUG_PACK;
+function explain(g, t, users, fits, bootFits) {
+  const ct = g.closure(t), why = new Map();
+  for (const b of g.js) {
+    if (b === t) continue;
+    const cb = g.closure(b);
+    const r = cb.has(t) && !users.includes(b) ? "B reaches T"
+      : [...ct].some((x) => x !== t && x !== b && g.closure(x).has(b)) ? "T reaches B"
+      : users.some((u) => u !== b && cb.has(u)) ? "a user of T is in B's closure"
+      : !bootFits(b, t) ? `start-up budget (${bootFits.last})` : !fits(b) ? "route / part budget" : "entry point or not cheaper";
+    why.set(r, [...(why.get(r) ?? []), b.split("/").pop()]);
+  }
+  console.log(`[pack] ${t.split("/").pop()} (${g.reach.get(t).size} entries) stays small:`);
+  for (const [r, list] of why) console.log(`  ${r}: ${list.length} — ${list.slice(0, 6).join(", ")}`);
+}
+
 export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048, budgetOf }) {
   const outs = meta.outputs;
   const gzCache = new Map();
@@ -99,7 +117,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
 
   // 2. small shared chunks fold into a chunk that is always loaded with them
   const skip = new Set();
-  for (let round = 0; round < 500; round++) {
+  for (let round = 0; round < 5000; round++) {
     const g = graph(outs);
     // a heavy chunk only one small lazy module imports (code esbuild split out because tree-shaken barrels also reach
     // it) is that module's own code: it joins it, so the lazy module is judged by its real size and is never inlined into
@@ -116,12 +134,12 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     const bootReach = new Set(bootEntries.flatMap((e) => [...g.closure(e)]));
     const entryReach = g.closure(entryKey);
     // once T and B are one file, start-up loading either one loads both closures
+    const bootAfter = (b, t) => { let n = 0; for (const x of new Set([...bootReach, ...g.closure(t), ...g.closure(b)])) if (!entryReach.has(x)) n += gz(x); return n; };
     const bootFits = (b, t) => {
       const lim = budgetOf?.bootLimit;
       if (lim == null || bootReach.has(b) === bootReach.has(t)) return true;
-      let n = 0;
-      for (const x of new Set([...bootReach, ...g.closure(t), ...g.closure(b)])) if (!entryReach.has(x)) n += gz(x);
-      return n <= lim;
+      if (DEBUG) bootFits.last = `${bootAfter(b, t)} > ${lim}`;
+      return bootAfter(b, t) <= lim;
     };
     // what start-up already downloaded (the entry, the boot pieces) is not part of a route's or part's cost
     const have = new Set([...entryReach, ...bootReach]);
@@ -134,7 +152,9 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
         const both = new Set([...g.closure(b), ...g.closure(t)]);
         // into a start-up piece: start-up as a whole (beyond the entry) stays within its own budget
         if (!bootFits(b, t)) return false;
-        for (const e of new Set([...rt, ...g.reach.get(b)])) {
+        // only who loads one side and not the other downloads more; who loads both is unchanged (even when over budget)
+        const rb = g.reach.get(b);
+        for (const e of new Set([...[...rt].filter((x) => !rb.has(x)), ...[...rb].filter((x) => !rt.has(x))])) {
           const lim = budgetOf(e)?.limit;
           if (lim == null) continue;
           let n = 0;
@@ -170,6 +190,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
           if (c < cost && fits(b)) { cost = c; best = b; }
         }
       }
+      if (!best && DEBUG && Object.keys(outs[t].inputs ?? {}).some((i) => i.includes(DEBUG))) explain(g, t, users, fits, bootFits);
       if (!best || !(await fold(t, best, g.importers.get(t) ?? []))) { skip.add(t); continue; }
       folded++; done = true; gzCache.clear(); break;
     }

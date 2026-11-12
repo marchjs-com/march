@@ -18,6 +18,7 @@ import { LikeButton } from "../../social/like-button/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./story-viewer.css";
 import { isRtl } from "../../../core/util.ts";
+import { swipeable } from "../../../behaviors/swipe/index.ts";
 
 export interface StoryItem { id: string; src: string; alt?: string | undefined; time?: Date | string | number | undefined; caption?: string | undefined; /** ms. */ duration?: number | undefined }
 export interface StoryGroup { id: string; name: string; avatar?: string | undefined; items: readonly StoryItem[] }
@@ -96,49 +97,37 @@ function body(props: StoryViewerProps): Element {
     });
   });
 
-  // pointer: tap halves, hold to pause, swipe sideways for the next person, drag down to close
-  let sx = 0, sy = 0, st = 0, dx = 0, dy = 0, mode: "" | "tap" | "down" | "side" = "", timer: ReturnType<typeof setTimeout> | null = null;
-  const down = (e: PointerEvent): void => {
-    if (e.button > 0 || (e.target as Element).closest("button, input, a, form")) return;
-    sx = e.clientX; sy = e.clientY; st = e.timeStamp; dx = dy = 0; mode = "tap";
-    timer = setTimeout(() => { timer = null; hold.set(true); }, HOLD);
-    try { stage.setPointerCapture?.(e.pointerId); } catch { /* gone */ }
-  };
-  const move = (e: PointerEvent): void => {
-    if (!mode) return;
-    dx = e.clientX - sx; dy = e.clientY - sy;
-    if (mode === "tap" && Math.max(Math.abs(dx), Math.abs(dy)) > 10) {
-      if (timer) { clearTimeout(timer); timer = null; }
-      mode = dy > 0 && dy > Math.abs(dx) ? "down" : Math.abs(dx) > Math.abs(dy) ? "side" : "";
-      if (mode) hold.set(true);
-    }
-    if (mode === "down") {
-      const d = Math.max(0, dy);
-      setStyle(stage, { transform: `translateY(${d}px) scale(${1 - d / 1600})` });
-      setStyle(root, { "--hm-story-dim": String(Math.max(0.3, 1 - d / 500)) });
-    } else if (mode === "side") setStyle(stage, { transform: `translateX(${dx * 0.35}px)` });
-  };
-  const up = (e: PointerEvent): void => {
-    if (!mode) return;
-    if (timer) { clearTimeout(timer); timer = null; }
-    const m = mode, held = hold.peek();
-    mode = "";
-    const v = Math.abs(dy) / Math.max(1, e.timeStamp - st);
-    if (m === "down") {
-      if (dy > CLOSE_AT || v > 0.7) { void close(Math.max(0, dy)); return; }
-      animate(stage, [{ transform: `translateY(${Math.max(0, dy)}px) scale(${1 - Math.max(0, dy) / 1600})` }, { transform: "translateY(0) scale(1)" }], { duration: 260, easing: "easeOutBack" });
-      setStyle(stage, { transform: null }); setStyle(root, { "--hm-story-dim": null }); hold.set(false); return;
-    }
-    if (m === "side") {
-      setStyle(stage, { transform: null }); hold.set(false);
-      if (Math.abs(dx) > 60) nextGroup(((dx < 0) !== rtl() ? 1 : -1)); return;
-    }
-    hold.set(false);
-    if (held) return; // it was a hold: resume only
-    const r = stage.getBoundingClientRect();
-    const x = (e.clientX - r.left) / Math.max(1, r.width);
-    const back = rtl() ? x > 2 / 3 : x < 1 / 3;
-    if (back) prev(); else next();
+  // pointer (the swipe behavior): tap halves, hold to pause, swipe sideways for the next person, drag down to close
+  const gesture = (el: HTMLElement): void => {
+    swipeable(el, {
+      ignore: "button, input, a, form", holdMs: HOLD,
+      onHold: () => hold.set(true), onRelease: () => hold.set(false),
+      accept: (p) => p.axis === "x" || p.dy > 0,
+      onStart: () => hold.set(true),
+      onMove: (p) => {
+        if (p.axis === "y") {
+          const d = Math.max(0, p.dy);
+          setStyle(stage, { transform: `translateY(${d}px) scale(${1 - d / 1600})` });
+          setStyle(root, { "--hm-story-dim": String(Math.max(0.3, 1 - d / 500)) });
+        } else setStyle(stage, { transform: `translateX(${p.dx * 0.35}px)` });
+      },
+      onEnd: (p) => {
+        if (p.axis === "y") {
+          const dy = Math.max(0, p.dy);
+          if (dy > CLOSE_AT || p.vy > 0.7) { void close(dy); return; }
+          animate(stage, [{ transform: `translateY(${dy}px) scale(${1 - dy / 1600})` }, { transform: "translateY(0) scale(1)" }], { duration: 260, easing: "easeOutBack" });
+          setStyle(stage, { transform: null }); setStyle(root, { "--hm-story-dim": null }); hold.set(false); return;
+        }
+        setStyle(stage, { transform: null }); hold.set(false);
+        if (Math.abs(p.dx) > 60 || Math.abs(p.vx) > 0.6) nextGroup((p.dx < 0) !== rtl() ? 1 : -1);
+      },
+      onTap: (e) => {
+        const r = stage.getBoundingClientRect();
+        const x = (e.clientX - r.left) / Math.max(1, r.width);
+        const back = rtl() ? x > 2 / 3 : x < 1 / 3;
+        if (back) prev(); else next();
+      },
+    });
   };
   const key = (e: KeyboardEvent): void => {
     if ((e.target as Element).closest("input, textarea")) return;
@@ -146,7 +135,6 @@ function body(props: StoryViewerProps): Element {
     if (e.key === fwd) { e.preventDefault(); next(); } else if (e.key === bwd) { e.preventDefault(); prev(); }
     else if (e.key === " " && !(e.target as Element).closest("button")) { e.preventDefault(); manual.set(!manual()); }
   };
-  onCleanup(() => { if (timer) clearTimeout(timer); });
 
   const reply = (e: Event): void => {
     e.preventDefault();
@@ -160,7 +148,7 @@ function body(props: StoryViewerProps): Element {
   };
 
   return h("div", { class: () => cx("hm-story", paused() && "is-paused"), ref: (x: HTMLElement) => { root = x; }, onKeydown: key },
-    h("div", { class: "hm-story-stage", ref: (x: HTMLElement) => { stage = x; }, onPointerdown: down, onPointermove: move, onPointerup: up, onPointercancel: up, onContextmenu: (e: Event) => e.preventDefault() },
+    h("div", { class: "hm-story-stage", ref: (x: HTMLElement) => { stage = x; gesture(x); }, onContextmenu: (e: Event) => e.preventDefault() },
       () => { const it = item(); return it ? h("img", { class: "hm-story-media", src: it.src, alt: it.alt ?? "", draggable: "false", decoding: "async" }) : null; },
       h("div", { class: "hm-story-scrim", "aria-hidden": "true" }),
       h("div", { class: "hm-story-top" },

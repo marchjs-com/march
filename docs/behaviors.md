@@ -102,3 +102,42 @@ An element that takes dropped (and, with `paste: true`, pasted) files: `dropzone
 onReject, single, paste, disabled })`. Enter / leave are counted, so passing over the zone's children does not flicker;
 only drags that carry files count; the zone has `is-drop-over` while one is over it. `accepts(file, "image/*,.pdf")` is
 the `<input accept>` check (FileUpload validates with it). Keep a click / keyboard way to choose files next to it.
+
+## swipe — `hadi-march/behaviors/swipe`
+
+"Follow the finger, then settle" gestures: sheets and drawers, pull to refresh, swipe to reply, story navigation.
+`swipeable(el, opts)` listens on the element (pointer capture once the gesture is claimed); the helpers are the shared
+physics.
+
+```ts
+import { swipeable, rubberBand, fling, nearest } from "hadi-march/behaviors/swipe";
+
+swipeable(sheet, {
+  axis: "y", accept: (p) => p.dy > 0,                       // claim only a downward swipe; anything else stays the page's
+  onMove: (p) => follow(p.dy > limit ? limit + rubberBand(p.dy - limit) : p.dy),
+  onEnd: (p) => settle(nearest([0, half, full], fling(pos, p.vy))),
+});
+```
+
+| Option | | |
+|---|---|---|
+| `axis` | `"x"`, `"y"`, `"both"` (default) | the first clear movement (`threshold`, 6 px) locks the axis; the other one is left to scrolling |
+| `accept(p)` | | veto when the axis is decided (`{ dx, dy, axis }`): wrong direction, content still scrollable … |
+| `onPress(e)`, `ignore` | | per-press veto; targets that never start (form fields, buttons, links, sliders by default) |
+| `onStart`, `onMove`, `onEnd(p, cancelled)` | | `p`: `{ dx, dy, di, axis, vx, vy, event }`; `di` along the writing direction, `vx` / `vy` px/ms over the last 100 ms |
+| `onTap(e)`, `holdMs` + `onHold` / `onRelease` | | presses that never swiped: tap, or press and hold (StoryViewer pauses) |
+
+`rubberBand(over, k = 4)` is the resistance past a limit, `fling(pos, v, ms = 160)` where a release comes to rest
+(velocity capped), `nearest(points, target)` the snap point. The click that ends a mouse swipe is swallowed. Drawer,
+PullToRefresh, ChatBubble (swipe to reply) and StoryViewer use it; `swipe()` in hadi-march/motion is the animation
+gesture effect (direction events), not this.
+
+## dismiss — `hadi-march/behaviors/dismiss`
+
+Close a light surface — popover, menu, picker, a `<details>` menu — on a press outside it or Escape:
+`dismiss(panel, { inside: [trigger], onDismiss: (why) => close(why === "escape") })`. `inside` (elements or a getter)
+adds what also counts as inside (the trigger, a panel in a portal); `on: "click"` waits for the click instead of the
+pointerdown (a tap that scrolls does not close); `escape: false` leaves the key alone. Escape is taken in the capture
+phase, so the innermost open surface closes before a dialog underneath sees it. Floating panels (Menu, Dropdown,
+Tooltip, ContextMenu), Table menus and the chat reaction picker use it; modal dialogs keep their own stack.
+
