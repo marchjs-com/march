@@ -1,0 +1,186 @@
+// Presentation (hadi-march/landing): slides in the browser. `<Presentation>` holds `<Slide>`s; `<Appear>` reveals its
+// children one per step (fragments). Navigation: arrow keys, Page Up / Down, Space, Home / End, the mouse wheel, swipes
+// and the buttons; `F` goes full screen, `P` opens the speaker window. Slides change with a slide, fade or zoom transition
+// on the motion engine (mirrored in RTL). The slide number can live in the URL (`bind:index`). The speaker view shows the
+// current slide, the next one, the notes and a timer; windows of the same deck stay in step through a cross-tab channel.
+// Printing (or saving as PDF) lays every slide on its own page with all steps shown. Slides keep a 16:9 stage and scale
+// their type with the stage (container units), so a deck looks the same on a laptop and a projector.
+import "./presentation.css";
+import { h } from "../../../dom/h.ts";
+import { signal, computed, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
+import { t } from "../../../core/i18n.ts";
+import { cx, val, glyph, listen, setStyle, clamp, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { IconButton } from "../../../ui/button.ts";
+import { channel } from "../../../channel/index.ts";
+import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
+import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
+import { monitor } from "../../../icons/glyphs/monitor.ts";
+import { defineIcon } from "../../../icons/svg.ts";
+import { animate } from "../../../motion/engine/playback.ts";
+import { reducedMotion } from "../../../motion/engine/prefs.ts";
+import { swipe } from "../../../motion/gestures.ts";
+
+const EXPAND = /* @__PURE__ */ defineIcon("expand", ["M4 9V4h5", "M20 9V4h-5", "M4 15v5h5", "M20 15v5h-5"]);
+
+export interface SlideProps {
+  /** Speaker notes (shown in the speaker view). */
+  notes?: string | undefined;
+  /** title (centred, large) · content (heading + body, default) · split (two columns) · center · image (full-bleed media). */
+  layout?: "title" | "content" | "split" | "center" | "image" | undefined;
+  /** plain · inverse · brand (gradient) */
+  tone?: "plain" | "inverse" | "brand" | undefined;
+  /** A decorative layer behind the slide (an Overlay, a VideoBackground…). */
+  background?: unknown;
+  class?: ClassProp | undefined;
+  children?: unknown;
+}
+/** One slide: `<Slide layout="title" notes="Welcome everyone">…</Slide>` */
+export function Slide(props: SlideProps): Element {
+  return h("section", { class: cx("hm-slide", `hm-slide-${props.layout ?? "content"}`, `hm-slide-tone-${props.tone ?? "plain"}`, val(props.class)), "data-notes": props.notes ?? null },
+    props.background != null ? h("div", { class: "hm-slide-bg" }, props.background) : null,
+    h("div", { class: "hm-slide-body" }, props.children)) as Element;
+}
+
+/** Fragments: every child appears on its own step. `<Appear><li>One</li><li>Two</li></Appear>` (renders a list). */
+export function Appear(props: { as?: string | undefined; effect?: "up" | "fade" | "scale" | undefined; class?: ClassProp | undefined; children?: unknown }): Element {
+  return h(props.as ?? "ul", { class: cx("hm-appear", `hm-appear-${props.effect ?? "up"}`, val(props.class)) }, props.children) as Element;
+}
+
+export interface PresentationProps {
+  /** Current slide, 0-based. With `setIndex` it is controlled (`bind:index`, e.g. a URL query parameter). */
+  index?: MaybeFn<number | undefined>;
+  setIndex?: ((i: number) => void) | undefined;
+  transition?: "slide" | "fade" | "zoom" | "none" | undefined;
+  /** Show the speaker view (current, next, notes, timer). */
+  presenter?: boolean | undefined;
+  /** Keep windows of this deck in step (the speaker window and the audience). Default "deck". */
+  sync?: string | false | undefined;
+  /** URL the speaker button opens in a new window (a page rendering this deck with `presenter`). */
+  presenterUrl?: string | undefined;
+  /** Accessible name of the deck. */
+  label?: string | undefined;
+  class?: ClassProp | undefined;
+  children?: unknown;
+}
+
+interface Pos { i: number; s: number }
+
+/** `<Presentation bind:index={$slide} transition="slide"><Slide layout="title">…</Slide><Slide>…</Slide></Presentation>` */
+export function Presentation(props: PresentationProps): Element {
+  const stage = h("div", { class: "hm-deck-stage" }, props.children) as HTMLElement;
+  const slides = (): HTMLElement[] => ([...stage.children] as HTMLElement[]).filter((c) => c.classList.contains("hm-slide"));
+  const steps = (el: HTMLElement | undefined): HTMLElement[] => (el ? [...el.querySelectorAll<HTMLElement>(".hm-appear")].flatMap((a) => [...a.children] as HTMLElement[]) : []);
+  const list = slides();
+  const n = list.length;
+
+  const own = signal(clamp(untrack(() => val(props.index)) ?? 0, 0, Math.max(0, n - 1)));
+  const index = (): number => clamp((props.setIndex ? val(props.index) : own()) ?? 0, 0, Math.max(0, n - 1));
+  const setIndex = (i: number): void => { if (props.setIndex) props.setIndex(i); else own.set(i); };
+  const step = signal(0);
+  const pos = computed<Pos>(() => ({ i: index(), s: step() }));
+
+  const sync = props.sync === false ? null : channel<Pos>(`hm.deck.${props.sync ?? "deck"}`, { crossTab: true });
+  let remote = false;
+  const go = (p: Pos): void => {
+    const i = clamp(p.i, 0, n - 1), s = clamp(p.s, 0, steps(list[i]).length);
+    if (i !== index()) setIndex(i);
+    step.set(s);
+    if (sync && !remote) sync.emit({ i, s });
+  };
+  const next = (): void => { const p = pos.peek(); if (p.s < steps(list[p.i]).length) go({ i: p.i, s: p.s + 1 }); else if (p.i < n - 1) go({ i: p.i + 1, s: 0 }); };
+  const prev = (): void => { const p = pos.peek(); if (p.s > 0) go({ i: p.i, s: p.s - 1 }); else if (p.i > 0) go({ i: p.i - 1, s: steps(list[p.i - 1]).length }); };
+  if (sync) sync.on((p, from) => { if (from !== "tab") return; remote = true; go(p); remote = false; });
+
+  const bar = h("span", { class: "hm-deck-bar-fill" }) as HTMLElement;
+  // the visible slide and its steps; the change animates (direction-aware, mirrored in RTL)
+  let shown = -1;
+  let root: HTMLElement | null = null;
+  effect(() => {
+    const { i, s } = pos();
+    untrack(() => {
+      list.forEach((el, k) => { const on = k === i; el.classList.toggle("is-current", on); el.toggleAttribute("inert", !on); el.setAttribute("aria-hidden", on ? "false" : "true"); });
+      steps(list[i]).forEach((el, k) => {
+        const vis = k < s;
+        if (vis && !el.classList.contains("is-shown") && shown === i && !reducedMotion()) animate(el, { opacity: [0, 1], transform: ["translate3d(0, .6em, 0)", "translate3d(0, 0, 0)"] }, { duration: 420, easing: "expo" });
+        el.classList.toggle("is-shown", vis);
+      });
+      if (shown >= 0 && shown !== i && !reducedMotion() && props.transition !== "none") {
+        const dir = (i > shown ? 1 : -1) * ((root && globalThis.getComputedStyle?.(root).direction === "rtl") ? -1 : 1);
+        const inEl = list[i], outEl = list[shown];
+        const tr = props.transition ?? "slide";
+        const fin = tr === "fade" ? { opacity: [0, 1] } : tr === "zoom" ? { opacity: [0, 1], transform: ["scale(.9)", "scale(1)"] } : { opacity: [0, 1], transform: [`translate3d(${8 * dir}%, 0, 0)`, "translate3d(0, 0, 0)"] };
+        const fout = tr === "fade" ? { opacity: [1, 0] } : tr === "zoom" ? { opacity: [1, 0], transform: ["scale(1)", "scale(1.06)"] } : { opacity: [1, 0], transform: ["translate3d(0, 0, 0)", `translate3d(${-8 * dir}%, 0, 0)`] };
+        if (outEl) { outEl.classList.add("is-leaving"); void animate(outEl, fout, { duration: 420, easing: "in-out" }).finished.then(() => outEl.classList.remove("is-leaving")); }
+        if (inEl) animate(inEl, fin, { duration: 520, easing: "expo" });
+      }
+      shown = i;
+      setStyle(bar, { transform: `scaleX(${n > 1 ? (i / (n - 1)).toFixed(4) : "1"})` });
+    });
+  });
+
+  const fullscreen = (): void => {
+    const d = globalThis.document as Document & { fullscreenElement?: Element | null };
+    if (d.fullscreenElement) void d.exitFullscreen?.().catch(() => undefined);
+    else void root?.requestFullscreen?.().catch(() => undefined);
+  };
+  const openSpeaker = (): void => { if (props.presenterUrl) globalThis.open?.(props.presenterUrl, "hm-deck-speaker", "popup,width=1100,height=720"); };
+
+  const counter = h("span", { class: "hm-deck-count", "aria-live": "polite" }, () => t`Slide ${index() + 1} of ${n}`) as HTMLElement;
+  const controls = h("div", { class: "hm-deck-controls" },
+    h(IconButton, { label: () => t`Previous slide`, variant: "ghost", size: "sm", onClick: prev, disabled: () => pos().i === 0 && pos().s === 0 }, glyph(chevronLeft)),
+    counter,
+    h(IconButton, { label: () => t`Next slide`, variant: "ghost", size: "sm", onClick: next, disabled: () => pos().i === n - 1 && pos().s >= steps(list[n - 1]).length }, glyph(chevronRight)),
+    h("span", { class: "hm-deck-spacer" }),
+    props.presenterUrl && !props.presenter ? h(IconButton, { label: () => t`Open speaker view`, variant: "ghost", size: "sm", onClick: openSpeaker }, glyph(monitor)) : null,
+    h(IconButton, { label: () => t`Full screen`, variant: "ghost", size: "sm", onClick: fullscreen }, glyph(EXPAND)));
+
+  // speaker view: the next slide (a clone, inert), notes and a timer
+  const started = Date.now();
+  const clock = signal(0);
+  let speaker: unknown = null;
+  if (props.presenter) {
+    const timer = setInterval(() => clock.set(Date.now() - started), 1000) as unknown as { unref?: () => void };
+    timer.unref?.(); // never keeps a test process (or a server render) alive
+    if (getOwner()) onCleanup(() => clearInterval(timer as never));
+    const fmt = (ms: number): string => { const s = Math.floor(ms / 1000); return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; };
+    speaker = h("aside", { class: "hm-deck-speaker", "aria-label": t`Speaker view` },
+      h("div", { class: "hm-deck-next" }, h("p", { class: "hm-deck-cap" }, t`Next`), () => {
+        const nx = list[index() + 1];
+        if (!nx) return h("p", { class: "hm-deck-end" }, t`End of the deck`);
+        const c = nx.cloneNode(true) as HTMLElement;
+        c.classList.add("is-current", "is-preview"); c.removeAttribute("inert"); c.setAttribute("aria-hidden", "true");
+        for (const x of steps(c)) x.classList.add("is-shown");
+        return h("div", { class: "hm-deck-preview", inert: "" }, c);
+      }),
+      h("div", { class: "hm-deck-notes" }, h("p", { class: "hm-deck-cap" }, t`Notes`), h("p", { class: "hm-deck-note" }, () => list[index()]?.getAttribute("data-notes") || t`No notes for this slide.`)),
+      h("p", { class: "hm-deck-timer", role: "timer", "aria-label": t`Elapsed time` }, () => fmt(clock())));
+  }
+
+  root = h("div", {
+    class: cx("hm-deck", props.presenter && "is-presenter", val(props.class)), tabindex: "0", role: "region",
+    "aria-roledescription": t`slide deck`, "aria-label": props.label ?? t`Presentation`,
+  }, h("div", { class: "hm-deck-main" }, stage, h("span", { class: "hm-deck-bar", "aria-hidden": "true" }, bar), controls), speaker) as HTMLElement;
+  const deck = root;
+
+  // keyboard (on the deck, and on the page while it is full screen), wheel, swipe
+  let wheelAt = 0;
+  const key = (e: KeyboardEvent): void => {
+    if ((e.target as Element)?.closest?.("input, textarea, select, [contenteditable]")) return;
+    const k = e.key;
+    if (k === "ArrowRight" || k === "ArrowDown" || k === "PageDown" || k === " ") { e.preventDefault(); (globalThis.getComputedStyle?.(deck).direction === "rtl" && k === "ArrowRight") ? prev() : next(); }
+    else if (k === "ArrowLeft" || k === "ArrowUp" || k === "PageUp") { e.preventDefault(); (globalThis.getComputedStyle?.(deck).direction === "rtl" && k === "ArrowLeft") ? next() : prev(); }
+    else if (k === "Home") { e.preventDefault(); go({ i: 0, s: 0 }); }
+    else if (k === "End") { e.preventDefault(); go({ i: n - 1, s: steps(list[n - 1]).length }); }
+    else if (k === "f" || k === "F") fullscreen();
+    else if ((k === "p" || k === "P") && props.presenterUrl) openSpeaker();
+  };
+  const offs = [
+    listen(deck, {
+      keydown: key,
+      wheel: (e: WheelEvent) => { if (!deck.matches(":fullscreen") && !props.presenter) return; const now = Date.now(); if (now - wheelAt < 650 || Math.abs(e.deltaY) < 20) return; wheelAt = now; if (e.deltaY > 0) next(); else prev(); },
+    }),
+    swipe(stage, { onSwipe: (d: string) => { const rtl = globalThis.getComputedStyle?.(deck).direction === "rtl"; if (d === "left") rtl ? prev() : next(); else if (d === "right") rtl ? next() : prev(); } }),
+  ];
+  if (getOwner()) onCleanup(() => offs.forEach((f) => f()));
+  return deck;
+}

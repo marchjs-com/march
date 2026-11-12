@@ -107,3 +107,27 @@ otherwise the page elements themselves. The snapshot layers are clipped to the b
 or turning page never covers the menu. Mark an element inside the page with `data-hm-transition` (a demo stage, a content
 column) and only that part animates; the rest of the page swaps at once. "Stop all" during a variant transition ends
 it at once (its layer animations are removed), and a newer navigation replaces a running one, so no layer stays.
+
+### Micro-interactions (src/motion/micro.ts; magnet, tilt, press in gestures.ts)
+- `use:ripple={{ duration, opacity, center }}` — ink from the press point (Enter / Space: the centre), `currentColor`.
+- `use:hoverParallax={{ depth, tilt, selector }}` — children with `data-depth` shift with the pointer, the container may
+  tilt; leaving springs them back (`spring-wobbly`).
+- `use:press={{ scale, easing }}` — the release can be a spring (`"spring-wobbly"` brings its own duration).
+- `stateMorph(button, "loading" | "success" | "error" | "idle", { confetti, labels })` — narrows to a circle with a
+  spinner, draws a check or a cross (error shakes), colours from the tokens via `data-hm-state` (motion.css), announces
+  the state in a polite live region, `aria-busy` while loading; `confetti: true` loads hadi-march/fx on demand.
+
+### Scroll (src/motion/scroll-fx.ts)
+A paused Playback is seeked by scroll progress (read phase, once per frame), so keyframes, timelines and easings are the
+same as for time. `source` is a scroll box (default the page), `track` the element whose passage counts, `range` a
+window of it. `scrollTimeline(target, frames | null, o)`, `parallaxLayers(container, { strength })` (`data-depth`,
+still with reduced motion), `stickyReveal(section, { steps, onStep })` (sets `--hm-scroll`), `scrollIndicator(bar)`
+(grows from the inline start, RTL mirrored, essential), `scrollFraction(o)`, `onScrollProgress(o, fn)`. "Pause all"
+freezes them.
+
+### Lists (src/motion/list.ts)
+- `animateList(container, { enter, exit, move, duration, stagger })` — watches the children (any renderer): added ones
+  enter, removed ones leave as an inert ghost copy where they were, moved ones glide (FLIP from layout offsets; one
+  caught mid-flight starts where it is on screen).
+- `staggerIn(targets, { preset, each, from, grid })`, `listFrames(preset, "in" | "out", rtl)` with the presets fade,
+  scale, rise, slide (RTL mirrored), pop (spring), flip.

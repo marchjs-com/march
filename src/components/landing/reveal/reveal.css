@@ -1,0 +1,5 @@
+/* Reveal. Content waits hidden until it is in view (no flash); the motion engine plays the entrance. */
+.hm-reveal-box { display: block; }
+.hm-reveal.is-pending:not(:has(.hm-reveal-item)) > *, .hm-reveal.is-pending:not(:has(> *)), .hm-reveal.is-pending .hm-reveal-item { opacity: 0; }
+.hm-reveal.is-scrub > * { will-change: transform, opacity; }
+@media (prefers-reduced-motion: reduce) { .hm-reveal.is-pending > *, .hm-reveal.is-pending:not(:has(> *)), .hm-reveal.is-pending .hm-reveal-item { opacity: 1; } }
