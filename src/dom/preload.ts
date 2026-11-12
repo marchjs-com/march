@@ -45,7 +45,7 @@ export function preloadFiles(files: readonly string[], low = false): void {
     if (requested.has(f) || (low && prefetched.has(f))) continue;
     (low ? prefetched : requested).add(f);
     const link = d.createElement("link");
-    const css = f.endsWith(".css");
+    const css = /\.css(\?|$)/.test(f); // stable names carry ?v=<version>
     link.setAttribute("rel", low ? "prefetch" : css ? "preload" : "modulepreload");
     if (css && !low) link.setAttribute("as", "style");
     link.setAttribute("href", root ? new URL(f, root).href : f);

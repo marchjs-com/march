@@ -94,6 +94,7 @@ const ids = new WeakMap<object, string>();
 let nextId = 0;
 const idOf = (o: object): string => { let v = ids.get(o); if (!v) ids.set(o, (v = String(++nextId))); return v; };
 const pageKey = (route: CompiledRoute, prm: Record<string, string>): string => `page:${route.pattern}:${JSON.stringify(prm)}`;
+const NO_ROUTER = "March: call createRouter() first";
 const leaveGuards = new Set<() => boolean | Promise<boolean>>();
 
 let navWrapper: ((apply: () => void, o: { pop: boolean }) => void | Promise<void>) | null = null;
@@ -396,7 +397,7 @@ function restoreScroll(pop: boolean): void {
 /** Go to a path (same origin only). Leave guards may cancel. */
 export async function navigate(to: Href, { replace = false, state = null, force = false, modal = false }: { replace?: boolean; state?: Record<string, unknown> | null; force?: boolean; modal?: boolean } = {}): Promise<void> {
   const r = S.router;
-  if (!r) throw new Error("March: navigate() before createRouter().");
+  if (!r) throw new Error(NO_ROUTER);
   const s = String(to);
   if (/^[a-z][a-z0-9+.-]*:/i.test(s) || s.startsWith("//")) throw new Error("March: navigate(): same-origin paths only");
   const samePage = s.split(/[?#]/)[0] === untrack(() => S.path());
@@ -480,7 +481,7 @@ function level(r: RouterState, ctx: OutletCtx, loading?: Renderable): Element {
  */
 export function Router(props: { loading?: Renderable; fallback?: unknown; notFound?: Renderable; forbidden?: Renderable; wrap?: (page: () => unknown, to: RouteTarget) => unknown }): unknown {
   const r = S.router;
-  if (!r) throw new Error("March: <Router/> needs createRouter() first.");
+  if (!r) throw new Error(NO_ROUTER);
   r.loading = props.loading;
   return level(r, { depth: 0, wrap: props.wrap, notFound: props.notFound, forbidden: props.forbidden }, props.loading);
 }
@@ -492,7 +493,7 @@ export function Router(props: { loading?: Renderable; fallback?: unknown; notFou
  */
 export function Outlet(props: { name?: string; empty?: Renderable; children?: unknown }): unknown {
   const r = S.router;
-  if (!r) throw new Error("March: <Outlet/> needs createRouter() first.");
+  if (!r) throw new Error(NO_ROUTER);
   if (!props.name) {
     const ctx = useContext(OutletContext);
     if (!ctx) throw new Error("March: <Outlet/> outside a layout");

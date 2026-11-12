@@ -4,6 +4,12 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Build output (later in 0.1.0)
+- `stableNames: true` / `--stable-names`: `main.js`, `chunks/home.js`, `chunks/shared-N.js` with `?v=<version>` in every
+  reference (imports, CSS loaders, index.html, manifest): deploys overwrite the same paths; deterministic output.
+- `packChunks`: tiny shared chunks fold into a chunk always loaded with them (showcase JS 129 → 69 files).
+- No output name starts with `_` or `.` (`_layout` → `layout`); `headers: false` skips `_headers`.
+
 ### Portals and layers (later in 0.1.0)
 - `dom/portal.ts`: one layer stack (`<Portal layer>`, `openLayer`): last opened on top, modal layers make the page and lower
   layers `inert`, toasts / fx above. Dialog, Drawer, openDialog, popovers, menus, tooltips, toasts and confetti use it.

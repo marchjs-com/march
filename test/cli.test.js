@@ -152,4 +152,32 @@ test("march build: base \"./\" writes only relative asset URLs (the app works fr
 const ROOT_DIR = fileURLToPath(new URL("..", import.meta.url));
 test("showcase dist: no absolute /assets/ URL anywhere in index.html", { skip: !existsSync(join(ROOT_DIR, "examples/showcase/dist/index.html")) }, () => {
   assert.doesNotMatch(readFileSync(join(ROOT_DIR, "examples/showcase/dist/index.html"), "utf8"), /"\/assets\//);
+  // the publishing host refuses names starting with _ or .
+  const walk = (d) => readdirSync(d, { withFileTypes: true }).flatMap((f) => (f.isDirectory() ? [f.name, ...walk(join(d, f.name))] : [f.name]));
+  for (const n of walk(join(ROOT_DIR, "examples/showcase/dist"))) assert.doesNotMatch(n, /^[_.]/, n);
+});
+
+test("march build --stable-names: hash-free names, ?v= versions everywhere, deterministic; no name starts with _ or .", () => {
+  const dir = mkdtempSync(join(tmpdir(), "march-stable-"));
+  try {
+    mkdirSync(join(dir, "src/pages/team"), { recursive: true });
+    writeFileSync(join(dir, "src/pages/index.jsx"), "export default function Home() { return <p>home</p> }\n");
+    writeFileSync(join(dir, "src/pages/team/_layout.jsx"), "export default function L(p) { return <section>{p.children}</section> }\n");
+    writeFileSync(join(dir, "src/pages/team/index.jsx"), "export default function Team() { return <p>team</p> }\n");
+    writeFileSync(join(dir, "src/main.jsx"), "import routes from './routes.gen.js'\ncreateRouter({ routes })\nrender(() => <Router />, document.getElementById('app'))\n");
+    writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
+    writeFileSync(join(dir, "march.config.js"), "export default { base: \"./\", stableNames: true }\n");
+    const files = () => { const out = new Map(); const walk = (d) => { for (const f of readdirSync(d, { withFileTypes: true })) { const p = join(d, f.name); if (f.isDirectory()) walk(p); else out.set(p.slice(dir.length), readFileSync(p, "utf8")); } }; walk(join(dir, "dist")); return out; };
+    execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
+    const one = files();
+    for (const p of one.keys()) for (const seg of p.split(/[\/]/).filter(Boolean)) assert.doesNotMatch(seg, /^[_.]/, `${p}: no name starts with _ or .`);
+    for (const p of one.keys()) if (/\.(js|css)$/.test(p)) assert.doesNotMatch(p, /-[A-Z0-9]{8}\.(js|css)$/, `${p} has no hash in its name`);
+    const html = one.get([...one.keys()].find((p) => p.endsWith("index.html")));
+    assert.match(html, /src="\.\/assets\/main\.js\?v=[A-Z0-9]{8}"/);
+    for (const [p, code] of one) if (p.endsWith(".js")) for (const m of code.matchAll(/["'](\.{1,2}\/[^"']+\.(?:js|css))(\?v=[A-Z0-9]+)?["']/g)) assert.ok(m[2], `${p}: ${m[1]} carries ?v=`);
+    execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
+    const two = files();
+    assert.deepEqual([...two.keys()].sort(), [...one.keys()].sort(), "same paths");
+    for (const [p, code] of one) assert.equal(two.get(p), code, `${p}: same bytes when nothing changed`);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });

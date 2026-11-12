@@ -71,16 +71,23 @@ export async function mergeEntry(meta, { cwd, entryKey, esbuild, minify = true }
 }
 
 /**
- * Re-name every JS output after it was rewritten, so a hashed name always means the same bytes (assets are cached as
- * immutable: a stub that kept its old name could be served from a browser cache and import an older entry, which would
- * then run a second copy of the app). Each file's hash covers its own code (other output names masked) and the code
- * of every file it reaches (static or dynamic, cycles included), the way esbuild hashes. Updates the files, the
- * references between them and the metafile.
+ * Name every JS (and, with `stable`, CSS) output after the build was rewritten, so a URL always means the same bytes
+ * (assets are cached hard: a file that kept its old name could be served from a cache and import an older entry, which
+ * would then run a second copy of the app). A file's version covers its own code (other output names masked) and the
+ * code of every file it reaches (static or dynamic, cycles included), the way esbuild hashes.
+ *
+ * - default: the version is in the name (`home-K3QX7WPA.js`)
+ * - `stable: true`: names never change between builds (`main.js`, `chunks/home.js`, `chunks/shared-3.js`) and every
+ *   reference carries the version as a query (`./chunks/home.js?v=K3QX7WPA`): a deploy overwrites the same paths, no
+ *   old files pile up, and a changed file still gets a new URL. Output is deterministic: unchanged code, same bytes.
+ * No output name starts with "_" or "." (some hosts refuse those): `_layout` becomes `layout`.
+ * Updates the files, the references between them and the metafile (outputs[k].version).
  * @returns {Record<string, string>} old key → new key
  */
-export function rehashOutputs(meta, { cwd }) {
+export function rehashOutputs(meta, { cwd, stable = false }) {
   const outs = meta.outputs;
-  const keys = Object.keys(outs).filter((k) => k.endsWith(".js") && /-[A-Z0-9]{8}\.js$/.test(k));
+  const HASH = /-[A-Z0-9]{8}(\.(?:js|css))$/;
+  const keys = Object.keys(outs).filter((k) => (k.endsWith(".js") || (stable && k.endsWith(".css"))) && HASH.test(k));
   if (!keys.length) return {};
   const base = (k) => k.split("/").pop();
   const names = Object.keys(outs).map(base).sort((a, b) => b.length - a.length);
@@ -90,30 +97,58 @@ export function rehashOutputs(meta, { cwd }) {
   const text = new Map(keys.map((k) => [k, readFileSync(resolve(cwd, k), "utf8")]));
   const iso = new Map(), refs = new Map();
   for (const [k, t] of text) {
-    refs.set(k, [...new Set([...t.matchAll(anyName)].map((m) => byBase.get(m[0])).filter((r) => r && r !== k))]);
+    refs.set(k, k.endsWith(".css") ? [] : [...new Set([...t.matchAll(anyName)].map((m) => byBase.get(m[0])).filter((r) => r && r !== k))]);
     iso.set(k, createHash("sha256").update(t.replace(anyName, "\0")).digest("hex"));
   }
   const closure = (k) => { const seen = new Set([k]); const st = [k]; while (st.length) for (const r of refs.get(st.pop()) ?? []) if (!seen.has(r)) { seen.add(r); st.push(r); } return seen; };
   const B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-  const rename = {};
+  const stem = (k) => k.replace(HASH, "$1");
+  const version = new Map();
   for (const k of keys) {
     // own name first (files of one import cycle share their closure), then everything it reaches
     const h = createHash("sha256").update(`${k}\n`);
-    for (const r of [...closure(k)].sort()) h.update(`${r.replace(/-[A-Z0-9]{8}(\.\w+)$/, "$1")}:${iso.get(r) ?? outs[r]?.bytes ?? ""}\n`);
-    const d = h.digest();
-    const tag = Array.from(d.subarray(0, 8), (b) => B32[b & 31]).join("");
-    rename[k] = k.replace(/-[A-Z0-9]{8}\.js$/, `-${tag}.js`);
+    for (const r of [...closure(k)].sort()) h.update(`${stem(r)}:${iso.get(r) ?? outs[r]?.bytes ?? ""}\n`);
+    version.set(k, Array.from(h.digest().subarray(0, 8), (b) => B32[b & 31]).join(""));
   }
-  const map = new Map(Object.entries(rename).map(([a, b]) => [base(a), base(b)]));
+  // new names: hashed (default) or stable; never starting with "_" / "."
+  const clean = (n) => n.replace(/^[_.]+/, "") || "file";
+  const rename = {};
+  if (!stable) for (const k of keys) { const dir = k.slice(0, k.length - base(k).length); rename[k] = dir + clean(base(k)).replace(HASH, `-${version.get(k)}$1`); }
+  else {
+    // shared chunks are numbered by their first source module (stable while the code layout stays the same)
+    const first = (k) => Object.keys(outs[k].inputs ?? {}).sort()[0] ?? k;
+    const taken = new Set();
+    const shared = keys.filter((k) => /^chunk$/.test(base(stem(k)).replace(/\.\w+$/, ""))).sort((a, b) => first(a).localeCompare(first(b)) || a.localeCompare(b));
+    const order = [...keys.filter((k) => !shared.includes(k)).sort((a, b) => first(a).localeCompare(first(b)) || a.localeCompare(b)), ...shared];
+    let n = 0;
+    for (const k of order) {
+      const dir = k.slice(0, k.length - base(k).length), ext = k.endsWith(".css") ? ".css" : ".js";
+      let name = shared.includes(k) ? `shared-${++n}` : clean(base(stem(k)).replace(/\.\w+$/, ""));
+      // a .css next to its .js keeps the same stem (main.js + main.css)
+      let cand = `${dir}${name}${ext}`, i = 1;
+      while (taken.has(cand)) cand = `${dir}${name}-${++i}${ext}`;
+      taken.add(cand);
+      rename[k] = cand;
+    }
+    // CSS that belongs to a JS file (same stem) follows that file's name
+    for (const k of keys.filter((x) => x.endsWith(".css"))) {
+      const js = keys.find((x) => x.endsWith(".js") && stem(x).replace(/\.js$/, "") === stem(k).replace(/\.css$/, ""));
+      if (js) { const want = rename[js].replace(/\.js$/, ".css"); if (![...Object.values(rename)].includes(want) || rename[k] === want) rename[k] = want; }
+    }
+  }
+  const ref = (k) => (stable ? `${base(rename[k])}?v=${version.get(k)}` : base(rename[k]));
+  const map = new Map(keys.map((k) => [base(k), ref(k)]));
   for (const [k, t] of text) {
-    const next = t.replace(anyName, (m) => map.get(m) ?? m);
+    const next = k.endsWith(".css") ? t : t.replace(anyName, (m) => map.get(m) ?? m);
     rmSync(resolve(cwd, k), { force: true });
     writeFileSync(resolve(cwd, rename[k]), next);
   }
   const fixed = {};
   for (const [k, o] of Object.entries(outs)) {
     const nk = rename[k] ?? k;
-    fixed[nk] = { ...o, imports: (o.imports ?? []).map((im) => ({ ...im, path: rename[im.path] ?? im.path })) };
+    fixed[nk] = { ...o, ...(version.has(k) && stable ? { version: version.get(k) } : {}), cssBundle: o.cssBundle ? rename[o.cssBundle] ?? o.cssBundle : o.cssBundle,
+      imports: (o.imports ?? []).map((im) => ({ ...im, path: rename[im.path] ?? im.path })) };
+    if (fixed[nk].cssBundle === undefined) delete fixed[nk].cssBundle;
   }
   for (const k of Object.keys(outs)) delete outs[k];
   Object.assign(outs, fixed);

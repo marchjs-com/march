@@ -8,7 +8,8 @@
 //   march i18n [--messages src/i18n]                 report keys missing from translation files
 //   march check [--src src]                          type-check .tsx/.ts including March syntax (pipes, modifiers…)
 // Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html,
-//   base: "/" | "./" (asset URLs in index.html; "./" = works from any sub-folder),
+//   base: "/" | "./" (asset URLs in index.html; "./" = works from any sub-folder), stableNames: true (or --stable-names:
+//   main.js, chunks/home.js… with ?v=<version> in every reference; deploys overwrite the same paths), packChunks: false,
 //   budget: { entry, route, part, css, routes: { "/x": bytes }, fail } (gzip bytes; false = off), sw: true (offline service worker), headers: false (no _headers) }.
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, cpSync, rmSync, watch } from "node:fs";
@@ -66,13 +67,14 @@ function writeHtml(cfg, meta, { dev }, manifest = null, entryFiles = null) {
   const entry = Object.entries(meta.outputs).find(([, o]) => o.entryPoint && resolve(cwd, o.entryPoint) === want) ?? Object.entries(meta.outputs).find(([, o]) => o.entryPoint);
   // base: "/" (default, history routing on any path) or "./" (relative: the app works from any sub-folder)
   const base = dev ? "/" : cfg.base ?? "/";
-  const js = `${base}${relative(out, resolve(cwd, entry[0])).split(sep).join("/")}`;
-  const css = entry[1].cssBundle ? `${base}${relative(out, resolve(cwd, entry[1].cssBundle)).split(sep).join("/")}` : null;
+  const v = (k) => (meta.outputs[k]?.version ? `?v=${meta.outputs[k].version}` : "");
+  const js = `${base}${relative(out, resolve(cwd, entry[0])).split(sep).join("/")}${v(entry[0])}`;
+  const css = entry[1].cssBundle ? `${base}${relative(out, resolve(cwd, entry[1].cssBundle)).split(sep).join("/")}${v(entry[1].cssBundle)}` : null;
   // the chunk manifest is a JSON data block (never executed, so CSP script-src does not apply); the router and lazy()
   // read it to preload all of a route's files at once
   const data = manifest && Object.keys(manifest).length ? `<script type="application/json" id="march-manifest">${JSON.stringify(manifest).replace(/</g, "\\u003c")}</script>` : "";
   // the entry's own chunks are announced up front: fetched in parallel with the entry instead of after it is parsed
-  const pre = (entryFiles ?? []).filter((f) => f.endsWith(".js") && `${base}${f}` !== js).map((f) => `<link rel="modulepreload" href="${base}${f}">`).join("");
+  const pre = (entryFiles ?? []).filter((f) => /\.js(\?|$)/.test(f) && `${base}${f}` !== js).map((f) => `<link rel="modulepreload" href="${base}${f}">`).join("");
   const tags = `${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : ""}`;
   const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
   writeFileSync(join(out, "index.html"), html);
@@ -104,20 +106,21 @@ async function build({ dev = false } = {}) {
     if (!dev && cfg.mergeEntry !== false) {
       const want = resolve(cwd, cfg.entry);
       const entryKey = Object.keys(r.metafile.outputs).find((k) => r.metafile.outputs[k].entryPoint && resolve(cwd, r.metafile.outputs[k].entryPoint) === want);
-      // merged files get new content hashes (a cached stub must never point at another build's entry)
       if (entryKey) {
         const minify = flag("--no-minify") !== true;
-        const merged = (await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify })).length;
+        await mergeEntry(r.metafile, { cwd, entryKey, esbuild, minify });
         // tiny shared chunks fold into a chunk always loaded with them (fewer requests and files); off with packChunks: false
-        const packed = cfg.packChunks === false ? { stubs: 0, folded: 0 } : await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: cfg.packChunks?.minSize ?? 2048 });
-        if (merged || packed.stubs || packed.folded) rehashOutputs(r.metafile, { cwd });
+        if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: cfg.packChunks?.minSize ?? 2048 });
       }
     }
+    // final names: every rewritten file gets a new content version (a cached file must never point at another build),
+    // no name starts with _ or . (some hosts refuse those); stable names on request
+    if (!dev) rehashOutputs(r.metafile, { cwd, stable: !!cfg.stableNames || flag("--stable-names") === true });
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
     writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);
     if (cfg.themes !== false) await copyThemes(out, esbuild, { dev });
     if (!dev) {
-      if (cfg.headers !== false && !existsSync(join(out, "_headers"))) writeFileSync(join(out, "_headers"), headersFile());
+      if (cfg.headers !== false && !existsSync(join(out, "_headers"))) writeFileSync(join(out, "_headers"), headersFile({ stable: !!cfg.stableNames || flag("--stable-names") === true }));
       if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
       const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));
       printReport(rep);

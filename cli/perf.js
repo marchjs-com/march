@@ -26,7 +26,8 @@ export function chunkManifest(meta, { cwd, outdir, entry }) {
     for (const im of outs[key].imports ?? []) if (im.kind === "import-statement" && !im.external) closure(im.path, seen);
     return seen;
   };
-  const rel = (k) => posix(relative(outdir, resolve(cwd, k)));
+  // with stable names the version travels as a query (the same URL the chunks import, so a preload is reused)
+  const rel = (k) => posix(relative(outdir, resolve(cwd, k))) + (outs[k]?.version ? `?v=${outs[k].version}` : "");
   const base = entryKey ? closure(entryKey) : new Set();
   const manifest = {};
   for (const [k, o] of Object.entries(outs)) {
@@ -39,7 +40,7 @@ export function chunkManifest(meta, { cwd, outdir, entry }) {
   return { manifest, entryFiles: [...base].map(rel), entryKey };
 }
 
-const gz = (file) => (existsSync(file) ? gzipSync(readFileSync(file)).length : 0);
+const gz = (file) => { file = file.replace(/\?.*$/, ""); return existsSync(file) ? gzipSync(readFileSync(file)).length : 0; };
 
 /**
  * Route paths of lazy pages, read from the app's own sources: `"/x": () => import("./pages/x.tsx")` and
@@ -80,7 +81,7 @@ const LAYOUT = /(^|\/)_?layout\.[cm]?[jt]sx?$/;
 export function sizeReport(m, outdir, budget, routes = {}) {
   const size = (files) => {
     let js = 0, css = 0;
-    for (const f of files) { const n = gz(resolve(outdir, f)); if (f.endsWith(".css")) css += n; else js += n; }
+    for (const f of files) { const n = gz(resolve(outdir, f)); if (/\.css(\?|$)/.test(f)) css += n; else js += n; }
     return { js, css };
   };
   const rows = [{ name: "(entry)", key: null, kind: "entry", files: m.entryFiles, ...size(m.entryFiles), entry: true }];
@@ -114,9 +115,10 @@ export function printReport(rep, log = console.log) {
 }
 
 /** `_headers` for static hosts: hashed files are cached forever, the HTML and the service worker are revalidated. */
-export function headersFile() {
+export function headersFile({ stable = false } = {}) {
   return [
-    "/assets/*", "  Cache-Control: public, max-age=31536000, immutable", "",
+    // stable names: the same path gets new bytes on a deploy, so caches revalidate (the ?v= query still busts them)
+    "/assets/*", stable ? "  Cache-Control: public, max-age=0, must-revalidate" : "  Cache-Control: public, max-age=31536000, immutable", "",
     "/themes/*", "  Cache-Control: public, max-age=86400, stale-while-revalidate=604800", "",
     "/", "  Cache-Control: no-cache", "",
     "/index.html", "  Cache-Control: no-cache", "",
@@ -182,7 +184,7 @@ self.addEventListener("fetch", (e) => {
  * (move a heavy import behind import() or lazy()) is obvious.
  */
 export function topInputs(meta, cwd, outdir, files, n = 12) {
-  const want = new Set(files.map((f) => posix(relative(cwd, resolve(outdir, f)))));
+  const want = new Set(files.map((f) => posix(relative(cwd, resolve(outdir, f.replace(/\?.*$/, ""))))));
   const by = new Map();
   for (const [k, o] of Object.entries(meta.outputs)) {
     if (!want.has(posix(k)) || !k.endsWith(".js")) continue;
