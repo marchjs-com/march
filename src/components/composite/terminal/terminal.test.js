@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
-const { h, render } = await import("../../../index.ts");
+const { h, render, signal } = await import("../../../index.ts");
 const { Terminal, defineTerminalCommands, ansi, tokenize, parseArgs } = await import("./index.ts");
 const { parseAnsi } = await import("./ansi.ts");
 const mount = (props) => { const host = document.createElement("div"); document.body.appendChild(host); let api; const dispose = render(() => h(Terminal, { ...props, ref: (a) => { api = a; } }), host); return { host, api, dispose }; };
@@ -78,5 +78,21 @@ test("input: Enter runs, ↑ recalls, Tab completes commands and choices", async
   await new Promise((r) => setTimeout(r, 0));
   key("ArrowUp");
   assert.equal(input.value, "deploy staging");
+  m.dispose();
+});
+
+test("scheme and background are live: switching replaces the variables the previous look set", () => {
+  const scheme = signal("auto"), bg = signal(undefined);
+  const m = mount({ scheme, background: bg });
+  const root = m.host.querySelector(".hm-term");
+  assert.match(root.getAttribute("class"), /hm-term-auto/);
+  scheme.set("dark");
+  assert.match(root.getAttribute("class"), /hm-term-dark/);
+  assert.ok(root.style.getPropertyValue("--hm-term-c1"), "the fixed scheme sets its palette");
+  scheme.set("auto");
+  assert.equal(root.style.getPropertyValue("--hm-term-c1"), "", "the previous scheme's colors are gone");
+  bg.set("#0b1d33");
+  assert.equal(root.style.getPropertyValue("--hm-term-bg"), "#0b1d33");
+  assert.match(root.getAttribute("class"), /is-custom-bg/);
   m.dispose();
 });

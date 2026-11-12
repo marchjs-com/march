@@ -40,7 +40,8 @@ defineTerminalCommands({ ping: (_a, io) => io.print(ansi.green("pong")) })   // 
 | `prompt` | Prompt text (reactive), default `"$ "`. |
 | `welcome` | Lines printed first. |
 | `persist` | Keep history in localStorage under `hm.term.<persist>`. |
-| `scheme` | `"auto"` (follows the theme), `"dark"`, `"light"` or `{ bg, fg, cursor, selection, colors[16] }`. |
+| `scheme` | `"auto"` (default: very dark charcoal tinted by the theme color), `"surface"` (the page's surfaces), `"dark"`, `"light"` or `{ bg, fg, cursor, selection, colors[16] }`. Live. |
+| `background` | Any CSS color; the text turns light or dark for contrast. Live. |
 | `cursor` | `"bar"`, `"block"`, `"underline"`. |
 | `font`, `height` | Font family and height (CSS). |
 | `maxLines` | Oldest lines are dropped past this many (default 2000). |

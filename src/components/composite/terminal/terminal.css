@@ -1,5 +1,6 @@
-/* Terminal. Colors are tokens: "auto" follows the theme (light or dark), "dark" / "light" are fixed schemes, a custom
-   scheme sets --hm-term-* on the element. The 16 palette colors are --hm-term-c0…c15 (ANSI order). */
+/* Terminal. "auto" (default) is a very dark charcoal tinted by the theme color, in light and dark themes alike;
+   "surface" uses the page's own surfaces; "dark" / "light" are fixed schemes; a custom scheme or a background sets
+   --hm-term-* on the element. The 16 palette colors are --hm-term-c0…c15 (ANSI order). */
 .hm-term {
   --hm-term-font: var(--hm-font-mono);
   --hm-term-h: 22rem;
@@ -44,3 +45,22 @@
 .hm-term-bg-8 { background: var(--hm-term-c8); } .hm-term-bg-9 { background: var(--hm-term-c9); } .hm-term-bg-10 { background: var(--hm-term-c10); } .hm-term-bg-11 { background: var(--hm-term-c11); }
 .hm-term-bg-12 { background: var(--hm-term-c12); } .hm-term-bg-13 { background: var(--hm-term-c13); } .hm-term-bg-14 { background: var(--hm-term-c14); } .hm-term-bg-15 { background: var(--hm-term-c15); }
 @media (prefers-reduced-motion: reduce) { .hm-term-spin { animation-duration: calc(var(--hm-dur-slow) * 3); } .hm-term-bar-fill { transition: none; } }
+
+/* auto: charcoal with a hint of the theme color, light text, a palette lifted for a dark ground */
+.hm-term-auto {
+  --hm-term-bg: color-mix(in oklab, var(--hm-primary) 6%, color-mix(in oklab, black 87%, white));
+  --hm-term-fg: color-mix(in oklab, white 88%, var(--hm-term-bg));
+  --hm-term-c0: color-mix(in oklab, white 22%, var(--hm-term-bg)); --hm-term-c7: color-mix(in oklab, white 78%, var(--hm-term-bg));
+  --hm-term-c8: color-mix(in oklab, white 48%, var(--hm-term-bg)); --hm-term-c15: white;
+  --hm-term-c1: color-mix(in oklab, var(--hm-danger) 78%, white); --hm-term-c2: color-mix(in oklab, var(--hm-success) 75%, white);
+  --hm-term-c3: color-mix(in oklab, var(--hm-warn) 80%, white); --hm-term-c4: color-mix(in oklab, var(--hm-info) 72%, white);
+  --hm-term-c5: color-mix(in oklab, var(--hm-cat-5) 72%, white); --hm-term-c6: color-mix(in oklab, var(--hm-cat-2) 72%, white);
+  --hm-term-c9: color-mix(in oklab, var(--hm-danger) 55%, white); --hm-term-c10: color-mix(in oklab, var(--hm-success) 55%, white);
+  --hm-term-c11: color-mix(in oklab, var(--hm-warn) 60%, white); --hm-term-c12: color-mix(in oklab, var(--hm-info) 55%, white);
+  --hm-term-c13: color-mix(in oklab, var(--hm-cat-5) 55%, white); --hm-term-c14: color-mix(in oklab, var(--hm-cat-2) 55%, white);
+  border-color: color-mix(in oklab, white 10%, var(--hm-term-bg));
+}
+/* a chosen background: the text turns light or dark for contrast */
+@supports (color: oklch(from white l c h)) {
+  .hm-term.is-custom-bg { --hm-term-fg: oklch(from var(--hm-term-bg) clamp(0.18, (0.62 - l) * 100, 0.94) 0.01 h); }
+}

@@ -18,7 +18,7 @@
 import "./terminal.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { signal, onCleanup, untrack } from "../../../core/reactive.ts";
+import { signal, onCleanup, untrack, effect } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { tokenize, parseArgs, usageOf, type ArgSpec, type OptionSpec, type Parsed } from "./parse.ts";
 import { renderLine, ansi } from "./ansi.ts";
@@ -68,7 +68,7 @@ export interface TerminalApi {
   cancel(): void;
 }
 
-export type ColorScheme = "auto" | "dark" | "light" | { bg?: string; fg?: string; cursor?: string; selection?: string; colors?: readonly string[] };
+export type ColorScheme = "auto" | "surface" | "dark" | "light" | { bg?: string; fg?: string; cursor?: string; selection?: string; colors?: readonly string[] };
 
 export interface TerminalProps {
   commands?: Record<string, Command>;
@@ -77,7 +77,11 @@ export interface TerminalProps {
   welcome?: string | readonly string[];
   /** Keep the history in localStorage under "hm.term.<persist>". */
   persist?: string;
-  scheme?: ColorScheme;
+  /** "auto" (default): a very dark charcoal tinted by the theme color; "surface": the page's own surfaces (light in a
+   *  light theme); "dark" / "light": fixed schemes; or your own colors. Live: changing it restyles the terminal. */
+  scheme?: MaybeFn<ColorScheme | undefined>;
+  /** Background color (any CSS color); the text color follows it for contrast. Live. */
+  background?: MaybeFn<string | undefined>;
   cursor?: "bar" | "block" | "underline";
   font?: string;
   /** Oldest lines are dropped past this many (default 2000). */
@@ -260,21 +264,30 @@ export function Terminal(props: TerminalProps): Element {
   };
   Object.defineProperty(api, "_all", { value: all });
 
-  const scheme = props.scheme ?? "auto";
-  const style: Record<string, string> = {};
-  const custom = typeof scheme === "object" ? scheme : scheme === "auto" ? null : TERMINAL_SCHEMES[scheme];
-  if (custom) {
-    const scheme = custom;
-    if (scheme.bg) style["--hm-term-bg"] = scheme.bg;
-    if (scheme.fg) style["--hm-term-fg"] = scheme.fg;
-    if (scheme.cursor) style["--hm-term-cursor"] = scheme.cursor;
-    if (scheme.selection) style["--hm-term-sel"] = scheme.selection;
-    scheme.colors?.forEach((c, i) => { style[`--hm-term-c${i}`] = c; });
-  }
-  if (props.font) style["--hm-term-font"] = props.font;
-  if (props.height) style["--hm-term-h"] = props.height;
-  const root = h("div", { class: () => cx("hm-term", `hm-term-${typeof scheme === "string" ? scheme : "custom"}`, `hm-term-cursor-${props.cursor ?? "bar"}`, val(props.class)), dir: "ltr" }, scroller) as HTMLElement;
-  for (const [k, v] of Object.entries(style)) root.style.setProperty(k, v);
+  const schemeOf = (): ColorScheme => val(props.scheme) ?? "auto";
+  const root = h("div", { class: () => { const sc = schemeOf(); return cx("hm-term", `hm-term-${typeof sc === "string" ? sc : "custom"}`, `hm-term-cursor-${props.cursor ?? "bar"}`, val(props.class)); }, dir: "ltr" }, scroller) as HTMLElement;
+  // the look is live: a new scheme or background replaces the variables the previous one set
+  let set: string[] = [];
+  effect(() => {
+    const sc = schemeOf();
+    const look = typeof sc === "object" ? sc : sc === "dark" || sc === "light" ? TERMINAL_SCHEMES[sc] : null;
+    const style: Record<string, string> = {};
+    if (look) {
+      if (look.bg) style["--hm-term-bg"] = look.bg;
+      if (look.fg) style["--hm-term-fg"] = look.fg;
+      if (look.cursor) style["--hm-term-cursor"] = look.cursor;
+      if (look.selection) style["--hm-term-sel"] = look.selection;
+      look.colors?.forEach((c, i) => { style[`--hm-term-c${i}`] = c; });
+    }
+    const bg = val(props.background);
+    if (bg) { style["--hm-term-bg"] = bg; if (!look?.fg || typeof sc === "string") delete style["--hm-term-fg"]; }
+    if (props.font) style["--hm-term-font"] = props.font;
+    if (props.height) style["--hm-term-h"] = props.height;
+    for (const k of set) if (!(k in style)) root.style.removeProperty(k);
+    for (const [k, v] of Object.entries(style)) root.style.setProperty(k, v);
+    set = Object.keys(style);
+    root.classList.toggle("is-custom-bg", !!bg);
+  });
 
   for (const l of typeof props.welcome === "string" ? [props.welcome] : props.welcome ?? []) print(l);
   untrack(() => props.ref?.(api));

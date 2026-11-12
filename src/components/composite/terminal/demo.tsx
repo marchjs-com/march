@@ -30,12 +30,12 @@ const COMMANDS: Record<string, Command> = {
   motion: { desc: "Bekleme çarkı", run: async (_a, io) => { const s = io.spinner("hareket motoru ısınıyor"); await wait(900, io.signal); s.done("hazır") } },
 }
 
-const SCHEMES: Record<string, ColorScheme> = { auto: "auto", dark: "dark", light: "light",
+const SCHEMES: Record<string, ColorScheme> = { auto: "auto", surface: "surface", dark: "dark", light: "light",
   hadi: { bg: "#13233a", fg: "#f3f6fb", cursor: "#f2801f", colors: ["#13233a", "#ff6b6b", "#78be3a", "#f2801f", "#1d9ad6", "#a3338c", "#4cc3e0", "#d8e0ec", "#7d8ba3", "#ff8e8e", "#9bd468", "#ffa04d", "#53b8e6", "#c95db2", "#7fd6ea", "#ffffff"] } }
 
-export default function TerminalDemo(props: { values: { scheme: string; cursor: string; prompt: string } }) {
+export default function TerminalDemo(props: { values: { scheme: string; background: string; cursor: string; prompt: string } }) {
   return <div class="sc-term-demo">
-    {() => <Terminal scheme={SCHEMES[props.values.scheme] ?? "auto"} cursor={props.values.cursor as "bar"} prompt={props.values.prompt}
-      persist="showcase" commands={COMMANDS} welcome={["[info] March terminali: help yaz, Tab ile tamamla, ↑ geçmiş, Ctrl+R ara, Ctrl+C iptal", "Dene: deploy staging · user list · fetch · colors"]} />}
+    <Terminal scheme={() => SCHEMES[props.values.scheme] ?? "auto"} background={() => props.values.background || undefined} cursor={props.values.cursor as "bar"} prompt={props.values.prompt}
+      persist="showcase" commands={COMMANDS} welcome={["[info] March terminali: help yaz, Tab ile tamamla, ↑ geçmiş, Ctrl+R ara, Ctrl+C iptal", "Dene: deploy staging · user list · fetch · colors"]} />
   </div>
 }
