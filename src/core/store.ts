@@ -5,7 +5,7 @@
 //   subscribe(app.cart, (c) => …)   on(app, "cart.items", fn)   on(app, "users.*.name", fn)   // change events
 //   batch(() => { … })  → listeners get ONE { op: "batch", changes } event
 //   persist(app.prefs, "prefs")  history(app.form)  readonly(app)  snapshot(app)  derive(() => app.cart.items.length)
-import { signal, batch, untrack, computed, afterBatch, isBatching, DEV } from "./reactive.ts";
+import { signal, batch, untrack, computed, afterBatch, isBatching, DEV, _cell, _setCell, type Cell } from "./reactive.ts";
 
 // ------------------------------------------------------------------ types
 type Primitive = string | number | boolean | bigint | symbol | null | undefined | Date | RegExp | ((...a: never[]) => unknown);
@@ -30,9 +30,12 @@ export type Listener = (event: StoreEvent) => void;
 const RAW = Symbol("hm.raw");
 const META = Symbol("hm.meta");
 interface Root { listeners: Set<{ prefix: string[]; pattern: string[] | null; fn: Listener }>; pending: Change[] | null; log: Change[] | null }
-interface Meta { root: Root; path: string[]; signals: Map<PropertyKey, Sig>; version: Sig }
+// one bare cell per key that is read (no per-signal method closures); `version` counts structural changes (keys
+// added or removed, length, array operations) for readers that iterate
+interface Meta { root: Root; path: string[]; signals: Map<PropertyKey, Cell<unknown>>; version: Cell<unknown> }
 interface Sig { (): unknown; set(v: unknown): unknown; peek(): unknown }
 const mkSig = (v: unknown): Sig => signal(v, { equals: false }) as unknown as Sig;
+const bump = (m: Meta): void => _setCell(m.version, 0, true);
 
 const isPlain = (v: unknown): v is Record<PropertyKey, unknown> => {
   if (v === null || typeof v !== "object") return false;
@@ -48,12 +51,12 @@ let inArrayOp = 0;
 
 function metaOf(target: object, root: Root, path: string[]): Meta {
   let m = metas.get(target);
-  if (!m) { m = { root, path, signals: new Map(), version: mkSig(0) }; metas.set(target, m); }
+  if (!m) { m = { root, path, signals: new Map(), version: _cell(0) }; metas.set(target, m); }
   return m;
 }
-function sigOf(m: Meta, key: PropertyKey, target: Record<PropertyKey, unknown>): Sig {
+function sigOf(m: Meta, key: PropertyKey, target: Record<PropertyKey, unknown>): Cell<unknown> {
   let s = m.signals.get(key);
-  if (!s) { s = mkSig(target[key]); m.signals.set(key, s); }
+  if (!s) { s = _cell(target[key]); m.signals.set(key, s); }
   return s;
 }
 function wrap<T>(v: T, root: Root, path: string[]): T {
@@ -66,9 +69,11 @@ function wrap<T>(v: T, root: Root, path: string[]): T {
   return p as T;
 }
 
-function emit(root: Root, c: Change): void {
+function emit(root: Root, make: () => Change): void {
+  if (!root.log && !root.listeners.size) return;
+  const c = make();
   root.log?.push(c);
-  if (DEV.enabled && root.log && root.log.length > 1000) root.log.splice(0, root.log.length - 1000);
+  if (root.log && root.log.length > 2000) root.log.splice(0, root.log.length - 1000);
   if (isBatching()) {
     if (!root.pending) { root.pending = []; afterBatch(() => { const cs = root.pending ?? []; root.pending = null; deliver(root, cs); }); }
     root.pending.push(c);
@@ -117,7 +122,8 @@ const handler: ProxyHandler<Record<PropertyKey, unknown>> = {
     if (Array.isArray(target) && !own && typeof (target as unknown as Record<string, unknown>)[key] === "function") { m.version(); return Reflect.get(target, key, receiver); }
     sigOf(m, key, target)();
     if (Array.isArray(target) && key === "length") m.version();
-    return wrap(target[key], m.root, [...m.path, String(key)]);
+    const v = target[key];
+    return isPlain(v) ? (proxies.get(v) as typeof v) ?? wrap(v, m.root, [...m.path, String(key)]) : v;
   },
   has(target, key) { (metas.get(target) as Meta).version(); return key in target; },
   ownKeys(target) { (metas.get(target) as Meta).version(); return Reflect.ownKeys(target); },
@@ -126,13 +132,18 @@ const handler: ProxyHandler<Record<PropertyKey, unknown>> = {
     const v = raw(value);
     const had = Object.prototype.hasOwnProperty.call(target, key);
     const old = target[key];
-    if (had && old === v && !Array.isArray(target)) return true;
+    if (had && old === v) return true;
+    const len = (target as unknown as unknown[]).length;
     target[key] = v;
-    batch(() => {
-      m.signals.get(key)?.set(v);
-      if (!had || Array.isArray(target)) { m.version.set(0); m.signals.get("length")?.set((target as unknown as unknown[]).length); }
+    const s = m.signals.get(key);
+    if (had && len === (target as unknown as unknown[]).length) { if (s) _setCell(s, v); }
+    else batch(() => {
+      if (s) _setCell(s, v);
+      bump(m);
+      const l = m.signals.get("length");
+      if (l) _setCell(l, (target as unknown as unknown[]).length);
     });
-    if (!inArrayOp && typeof key === "string") emit(m.root, { path: [...m.path, key].join("."), op: "set", value: v, old });
+    if (!inArrayOp && typeof key === "string") emit(m.root, () => ({ path: [...m.path, key].join("."), op: "set", value: v, old }));
     return true;
   },
   deleteProperty(target, key) {
@@ -140,8 +151,8 @@ const handler: ProxyHandler<Record<PropertyKey, unknown>> = {
     const m = metas.get(target) as Meta;
     const old = target[key];
     delete target[key];
-    batch(() => { m.signals.get(key)?.set(undefined); m.version.set(0); });
-    if (typeof key === "string") emit(m.root, { path: [...m.path, key].join("."), op: "delete", old });
+    batch(() => { const s = m.signals.get(key); if (s) _setCell(s, undefined); bump(m); });
+    if (typeof key === "string") emit(m.root, () => ({ path: [...m.path, key].join("."), op: "delete", old }));
     return true;
   },
 };
@@ -153,13 +164,14 @@ function arrayOp(arr: unknown[], m: Meta, op: ChangeOp, args: unknown[]): unknow
   try {
     result = batch(() => {
       const r = (Array.prototype[op as "push"] as (...a: unknown[]) => unknown).apply(arr, args.map(raw));
-      for (const [k, s] of m.signals) if (k !== "length") s.set(arr[k as number]);
-      m.signals.get("length")?.set(arr.length);
-      m.version.set(0);
+      for (const [k, s] of m.signals) if (k !== "length") _setCell(s, arr[k as number]);
+      const l = m.signals.get("length");
+      if (l) _setCell(l, arr.length);
+      bump(m);
       return r;
     });
   } finally { inArrayOp--; }
-  emit(m.root, { path: m.path.join("."), op, args, value: op === "push" || op === "unshift" ? args : result, old: before });
+  emit(m.root, () => ({ path: m.path.join("."), op, args, value: op === "push" || op === "unshift" ? args : result, old: before }));
   return result;
 }
 

@@ -209,9 +209,9 @@ export function _cell<T>(value: T): Cell<T> {
   (f as unknown as Record<symbol, unknown>)[REACTIVE] = true;
   return f;
 }
-export function _setCell<T>(f: Cell<T>, v: T): void {
+export function _setCell<T>(f: Cell<T>, v: T, force?: boolean): void {
   const n = f.n;
-  if (n.value === v) return;
+  if (n.value === v && !force) return;
   n.value = v;
   markObservers(n, DIRTY);
   flush();
