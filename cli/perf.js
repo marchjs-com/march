@@ -40,7 +40,9 @@ export function chunkManifest(meta, { cwd, outdir, entry }) {
   // the shared "common" chunks (pack-chunks.js) outside start-up: the router prefetches them when idle
   const common = Object.keys(outs).filter((k) => outs[k].common && k.endsWith(".js"));
   if (common.length) manifest["march:common"] = [...new Set(common.flatMap((k) => [...closure(k)]))].filter((f) => !base.has(f)).sort((a, b) => Number(a.endsWith(".css")) - Number(b.endsWith(".css"))).map(rel);
-  return { manifest, entryFiles: [...base].map(rel), entryKey };
+  // each common chunk with what it imports: a size report row of its own (each one is held to the part budget)
+  const commons = common.map((k) => [...closure(k)].filter((f) => !base.has(f)).map(rel));
+  return { manifest, entryFiles: [...base].map(rel), entryKey, commons };
 }
 
 const gz = (file) => { file = file.replace(/\?.*$/, ""); return existsSync(file) ? gzipSync(readFileSync(file)).length : 0; };
@@ -94,7 +96,9 @@ export function sizeReport(m, outdir, budget, routes = {}) {
   const rows = [{ name: "(entry)", key: null, kind: "entry", files: m.entryFiles, ...size(m.entryFiles), entry: true }];
   if (bootFiles.size) rows.push({ name: "(boot)", key: null, kind: "boot", files: [...bootFiles], ...size([...bootFiles]), entry: false });
   // a group chunk shows as its members (each route row)
-  const rest = Object.entries(m.manifest).filter(([k]) => !bootKeys.includes(k) && !k.startsWith("march-group:")).map(([k, all]) => ({ files: all.filter((f) => !bootFiles.has(f)), k })).map(({ k, files }) => ({ name: routes[k] ?? k, key: k, kind: routes[k] ? "route" : LAYOUT.test(k) ? "layout" : "part", files, ...size(files), entry: false }));
+  // march:common is every common chunk prefetched together; each common chunk is a row (and a part budget) of its own
+  const commonRows = (m.commons ?? []).length > 1 ? m.commons.map((files, i) => [`march:common ${i + 1}`, files]) : [];
+  const rest = [...Object.entries(m.manifest).filter(([k]) => !bootKeys.includes(k) && !k.startsWith("march-group:") && !(commonRows.length && k === "march:common")), ...commonRows].map(([k, all]) => ({ files: all.filter((f) => !bootFiles.has(f)), k })).map(({ k, files }) => ({ name: routes[k] ?? k, key: k, kind: routes[k] ? "route" : LAYOUT.test(k) ? "layout" : "part", files, ...size(files), entry: false }));
   // routes by path, then the lazy parts by name
   const RANK = { route: 0, layout: 1, part: 2 };
   rest.sort((a, b) => (a.kind === b.kind ? a.name.localeCompare(b.name) : RANK[a.kind] - RANK[b.kind]));

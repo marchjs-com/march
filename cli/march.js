@@ -143,11 +143,12 @@ async function build({ dev = false } = {}) {
     // the planners aim 5% over the floor: their sizes come before the final rewrites (shorter import names, CSS loaders
     // stripped), which shrink a file a little — a chunk planned at 10.1 KB must not end at 9.9 KB
     const aim = Math.ceil(minSize * 1.05);
-    let plan = null, r, entryKey = null, builds = 0;
+    let plan = null, r, entryKey = null, builds = 0, seen = [], settled = false, rPlan = null;
     // one build: esbuild, then (production) the entry merge and the chunk packer with the given packing strategy
     const once = async (strategy) => {
       if (builds++) rmSync(resolve(out, "assets"), { recursive: true, force: true });
       r = await esbuild.build(buildOptions(cfg, esbuild, { dev, plan }));
+      rPlan = plan;
       entryKey = null;
       // production: the entry and its static chunks become one file (fewer requests, better compression)
       if (dev || cfg.mergeEntry === false) return false;
@@ -161,25 +162,37 @@ async function build({ dev = false } = {}) {
       return true;
     };
     const left = () => (minSize && entryKey ? smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).length : 0);
-    for (let pass = 0; pass < 6; pass++) {
+    for (let pass = 0; pass < 9; pass++) {
       if (!(await once(0))) break;
+      const n = left();
+      if (process.env.MARCH_DEBUG_COMMON) console.log(`[pack] pass ${pass}: ${n} small`, smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).map((x) => `${x.file.split("/").pop()} ${x.bytes}`).join(", "));
+      if (!seen.some((x) => x.key === JSON.stringify(plan))) seen.push({ plan, n, key: JSON.stringify(plan) });
       // chunks.commonRoom (gzip bytes): page groups stay this far under the route budget, so the shared "common" chunk
       // (pack-chunks.js) still fits on every route that loads it
-      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route - (cfg.chunks?.commonRoom ?? 0) : undefined, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
-      if (!next) break;
+      const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize: aim, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined, room: cfg.chunks?.commonRoom ?? 0, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
+      if (!next) { settled = true; break; }
+      // the planner's plans can cycle (a group taken apart, rebuilt, taken apart again): a plan seen before ends the passes
+      if (seen.some((x) => x.key === JSON.stringify(next))) break;
       plan = next;
     }
-    // last step of packing: small shared chunks still left on the final plan → the same build with the next packing
-    // strategy (another fold order); the first with none left wins, else the one with the fewest (the build then fails)
+    // last step of packing: small files still left on the final plan → the same build with the next packing strategy
+    // (another fold order). The planner may not settle (its plans can cycle): then every plan it made is tried, the one
+    // with the fewest small files first. The first build with none left wins, else the one with the fewest (it fails).
+    plan = rPlan; // the plan of the build on disk (the passes may end on a newer one)
     if (!dev && entryKey && cfg.packChunks !== false && left()) {
-      let best = { s: 0, n: left() };
-      for (let s = 1; s < STRATEGIES.length && best.n; s++) {
-        if (!(await once(s))) break;
+      const last = plan;
+      let best = { plan, s: 0, n: left() };
+      const plans = settled ? [{ plan, n: best.n }] : [...seen].sort((a, b) => a.n - b.n).slice(0, 2);
+      search: for (const p of plans) for (let s = 0; s < STRATEGIES.length; s++) {
+        if (p.plan === last && s === 0) continue; // the build already done
+        plan = p.plan;
+        if (!(await once(s))) break search;
         const n = left();
-        if (process.env.MARCH_DEBUG_COMMON) console.log(`[pack] strategy ${s}: ${n} small`, smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).map((x) => `${x.file} ${x.bytes}`).join(", "));
-        if (n < best.n) best = { s, n };
+        if (process.env.MARCH_DEBUG_COMMON) console.log(`[pack] plan n${p.n} strategy ${s}: ${n} small`, smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).map((x) => `${x.file.split("/").pop()} ${x.bytes}`).join(", "));
+        if (n < best.n) best = { plan, s, n };
+        if (!n) break search;
       }
-      if (best.n && best.s !== STRATEGIES.length - 1) await once(best.s);
+      if (best.n) { plan = best.plan; await once(best.s); }
     }
     // final names: every rewritten file gets a new content version (a cached file must never point at another build),
     // no name starts with _ or . (some hosts refuse those); stable names on request

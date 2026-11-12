@@ -22,10 +22,10 @@ export const ROUTE_TABLES = ["src/routes.gen.js", "src/routes.gen.ts", "src/rout
  * every chunk it reaches) would be over it — grouping must not push a route past its budget.
  * `tables` (march.config.js › chunks.routeTables): source files whose lazy imports are pages (the route table). Like the
  * entry's, those pages join page groups; they are never folded into the table (a start-up chunk would grow per page).
- * @param {{ cwd: string, entryKey: string, minSize: number, allow?: Record<string, string>, boot?: string[], prev?: Plan | null, maxLoad?: number, tables?: string[] }} o
+ * @param {{ cwd: string, entryKey: string, minSize: number, allow?: Record<string, string>, boot?: string[], prev?: Plan | null, maxLoad?: number, room?: number, tables?: string[] }} o
  * @typedef {{ inline: Record<string, { spec: string, mode: "static" | "group", group?: string, name?: string }[]>, groups: Record<string, { abs: string, name: string, key: string }[]>, boot?: string[], keep?: string[] }} Plan
  */
-export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot = [], prev = null, maxLoad, tables = ROUTE_TABLES }) {
+export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot = [], prev = null, maxLoad, room = 0, tables = ROUTE_TABLES }) {
   const outs = meta.outputs;
   const plan = prev ? { inline: structuredClone(prev.inline), groups: structuredClone(prev.groups), boot: [...(prev.boot ?? [])], keep: [...(prev.keep ?? [])] } : { inline: {}, groups: {}, boot: [], keep: [] };
   const bootSet = new Set(boot.map(posix));
@@ -77,7 +77,9 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
     added++;
   }
   const tightOf = (x, y) => Math.max(1, ...[...x.keys, ...y.keys].map((k) => plan.tight[k] ?? 1));
-  const fits = (x, y) => !maxLoad || load(x, y) * tightOf(x, y) <= maxLoad;
+  // room (chunks.commonRoom): new groups stay that far under maxLoad (space for the shared "common" chunk); a page that
+  // would otherwise stay alone and small may still use the whole budget
+  const fits = (x, y, r = room) => !maxLoad || load(x, y) * tightOf(x, y) <= maxLoad - r;
   if (maxLoad) for (const [name, ms] of Object.entries(plan.groups)) {
     const k = outByEntry.get(`march-group:${name}`);
     if (plan.boot.includes(name) || !k) continue;
@@ -125,7 +127,7 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
       const x = clusters[i];
       if (x.size >= minSize || isBoot(x) || !x.keys.some((k) => tableKeys.has(k))) continue;
       const all = [...clusters.filter((y, j) => j !== i && !isBoot(y)), ...built];
-      const y = all.filter((c) => fits(x, c)).sort((a, b) => load(x, a) - load(x, b))[0];
+      const y = (all.filter((c) => fits(x, c)).length ? all.filter((c) => fits(x, c)) : all.filter((c) => fits(x, c, 0))).sort((a, b) => load(x, a) - load(x, b))[0];
       // nothing to join at all (a small app): the usual rule below; partners only over budget: a file of its own
       if (!y) { x.lone = all.length > 0; continue; }
       clusters.splice(i, 1);
