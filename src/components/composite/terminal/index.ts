@@ -126,7 +126,25 @@ export function Terminal(props: TerminalProps): Element {
   const out = h("div", { class: "hm-term-out", role: "log", "aria-live": "polite", "aria-label": () => props.label ?? t`Terminal output` }) as HTMLElement;
   const input = h("input", { class: "hm-term-input", type: "text", spellcheck: "false", autocomplete: "off", autocapitalize: "off", "aria-label": () => t`Command` }) as HTMLInputElement;
   const promptEl = h("span", { class: "hm-term-prompt", "aria-hidden": "true" }, () => (search ? `(${t`history search`}) ` : val(props.prompt) ?? "$ ")) as HTMLElement;
-  const line = h("div", { class: "hm-term-line", "data-busy": () => (busy() ? "" : null) }, promptEl, input) as HTMLElement;
+  // our own cursor: the browser's caret shows only while the input has focus; this one blinks always (solid while typing)
+  const measure = h("span", { class: "hm-term-measure", "aria-hidden": "true" }) as HTMLElement;
+  const caret = h("span", { class: "hm-term-caret is-blinking", "aria-hidden": "true" }) as HTMLElement;
+  const field = h("span", { class: "hm-term-field" }, input, measure, caret) as HTMLElement;
+  const line = h("div", { class: "hm-term-line", "data-busy": () => (busy() ? "" : null) }, promptEl, field) as HTMLElement;
+  let caretFrame = 0;
+  const syncCaret = (): void => {
+    cancelAnimationFrame(caretFrame);
+    caretFrame = requestAnimationFrame(() => {
+      const at = input.selectionEnd ?? input.value.length;
+      measure.textContent = input.value.slice(0, at);
+      caret.textContent = input.value.charAt(at) || " ";
+      caret.style.insetInlineStart = `${measure.offsetWidth - input.scrollLeft}px`;
+      // typing restarts the blink: the cursor stays lit while keys come
+      caret.classList.remove("is-blinking"); void caret.offsetWidth; caret.classList.add("is-blinking");
+    });
+  };
+  for (const ev of ["keydown", "keyup", "input", "pointerup", "focus", "blur", "select", "scroll"]) input.addEventListener(ev, syncCaret);
+  onCleanup(() => cancelAnimationFrame(caretFrame));
   const scroller = h("div", { class: "hm-term-scroll", onClick: (e: MouseEvent) => { if (!globalThis.getSelection?.()?.toString() && e.target !== input) input.focus(); } }, out, line) as HTMLElement;
 
   const scrollDown = (): void => { scroller.scrollTop = scroller.scrollHeight; };
@@ -291,6 +309,7 @@ export function Terminal(props: TerminalProps): Element {
 
   for (const l of typeof props.welcome === "string" ? [props.welcome] : props.welcome ?? []) print(l);
   untrack(() => props.ref?.(api));
+  syncCaret();
   onCleanup(() => ctl?.abort());
   return root;
 }

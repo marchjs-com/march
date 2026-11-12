@@ -22,9 +22,19 @@
 .hm-term-prompt { color: var(--hm-term-c2); font-weight: var(--hm-weight-semibold); white-space: pre; }
 .hm-term-line { display: flex; align-items: baseline; }
 .hm-term-line[data-busy] { opacity: .5; }
-.hm-term-input { flex: 1; min-inline-size: 0; padding: 0; border: 0; outline: 0; background: transparent; color: inherit; font: inherit; caret-color: var(--hm-term-cursor); }
-.hm-term-cursor-block .hm-term-input { caret-shape: block; }
-.hm-term-cursor-underline .hm-term-input { caret-shape: underscore; }
+.hm-term-field { position: relative; display: flex; flex: 1; min-inline-size: 0; }
+.hm-term-input { flex: 1; min-inline-size: 0; padding: 0; border: 0; outline: 0; background: transparent; color: inherit; font: inherit; caret-color: transparent; }
+/* the cursor is drawn here (not the browser caret): it blinks with or without focus; a mirror measures where it goes */
+.hm-term-measure { position: absolute; visibility: hidden; white-space: pre; pointer-events: none; }
+.hm-term-caret { position: absolute; inset-block: 0; white-space: pre; pointer-events: none; color: transparent; }
+.hm-term-caret::before { content: ""; position: absolute; inset-block: .15em; inset-inline-start: 0; inline-size: 2px; background: var(--hm-term-cursor); }
+.hm-term-cursor-block .hm-term-caret { color: var(--hm-term-bg); background: var(--hm-term-cursor); }
+.hm-term-cursor-block .hm-term-caret::before { content: none; }
+.hm-term-cursor-underline .hm-term-caret::before { inset-block: auto .05em; inline-size: 100%; block-size: 2px; }
+.hm-term-cursor-block:not(:focus-within) .hm-term-caret { color: transparent; background: transparent; box-shadow: inset 0 0 0 1px var(--hm-term-cursor); }
+/* blink: the shared fade keyframes in two hard steps (lit half, dark half), reversed so it starts lit */
+.hm-term-caret.is-blinking { animation: hm-fade-in calc(var(--hm-dur-slow) * 4.4) steps(2, jump-none) infinite reverse; }
+.hm-term-line[data-busy] .hm-term-caret { visibility: hidden; }
 .hm-term-tag { display: inline-block; padding-inline: .35em; border-radius: .25em; border: 1px solid currentColor; font-size: .82em; line-height: 1.3; text-transform: uppercase; letter-spacing: .03em; }
 .hm-term-b { font-weight: 700; } .hm-term-dim { opacity: .65; } .hm-term-i { font-style: italic; } .hm-term-u { text-decoration: underline; }
 .hm-term-link { color: var(--hm-term-c12); text-decoration: underline; }
@@ -44,7 +54,7 @@
 .hm-term-bg-4 { background: var(--hm-term-c4); } .hm-term-bg-5 { background: var(--hm-term-c5); } .hm-term-bg-6 { background: var(--hm-term-c6); } .hm-term-bg-7 { background: var(--hm-term-c7); }
 .hm-term-bg-8 { background: var(--hm-term-c8); } .hm-term-bg-9 { background: var(--hm-term-c9); } .hm-term-bg-10 { background: var(--hm-term-c10); } .hm-term-bg-11 { background: var(--hm-term-c11); }
 .hm-term-bg-12 { background: var(--hm-term-c12); } .hm-term-bg-13 { background: var(--hm-term-c13); } .hm-term-bg-14 { background: var(--hm-term-c14); } .hm-term-bg-15 { background: var(--hm-term-c15); }
-@media (prefers-reduced-motion: reduce) { .hm-term-spin { animation-duration: calc(var(--hm-dur-slow) * 3); } .hm-term-bar-fill { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .hm-term-caret.is-blinking { animation: none; } .hm-term-spin { animation-duration: calc(var(--hm-dur-slow) * 3); } .hm-term-bar-fill { transition: none; } }
 
 /* auto: charcoal with a hint of the theme color, light text, a palette lifted for a dark ground */
 .hm-term-auto {
