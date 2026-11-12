@@ -8,6 +8,7 @@ import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.t
 import { refresh as refreshIcon } from "../../../icons/glyphs/refresh.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
+import { swipeable } from "../../../behaviors/swipe/index.ts";
 import "./pull-to-refresh.css";
 
 export type PullPhase = "idle" | "pull" | "ready" | "refreshing";
@@ -33,7 +34,7 @@ export function PullToRefresh(props: PullToRefreshProps): Element {
   const phase = signal<PullPhase>("idle");
   const setPhase = (p: PullPhase): void => { if (p !== phase.peek()) { phase.set(p); props.onPhase?.(p); } };
   let root!: HTMLElement, content!: HTMLElement, ind!: HTMLElement, spin!: HTMLElement;
-  let pull = 0, sx = 0, sy = 0, armed = false, active = false, dragged = false;
+  let pull = 0;
   let settle: { cancel(): void; finished: Promise<void> } | null = null, spinning: { cancel(): void } | null = null;
 
   const paint = (d: number): void => {
@@ -67,37 +68,23 @@ export function PullToRefresh(props: PullToRefreshProps): Element {
     setPhase("idle");
   };
 
-  const down = (e: PointerEvent): void => {
-    if (e.button > 0 || val(props.disabled) || phase.peek() === "refreshing" || root.scrollTop > 0) return;
-    if ((e.target as Element).closest?.("input, textarea, select, [contenteditable]")) return;
-    armed = true; active = false; dragged = false; sx = e.clientX; sy = e.clientY;
+  // the gesture: the swipe behavior (axis lock, veto while the list is scrolled, click after a mouse pull swallowed)
+  const gesture = (el: HTMLElement): void => {
+    swipeable(el, {
+      axis: "y", ignore: "input, textarea, select, [contenteditable]",
+      onPress: () => !val(props.disabled) && phase.peek() !== "refreshing" && !(root.scrollTop > 0),
+      accept: (p) => p.dy > 0 && !(root.scrollTop > 0),
+      onStart: () => { settle?.cancel(); },
+      onMove: (p) => {
+        const d = Math.max(0, p.dy);
+        // resistance: 1:2 up to the threshold, then softer up to max
+        const r = d / 2 <= threshold ? d / 2 : threshold + (max - threshold) * (1 - Math.exp(-(d / 2 - threshold) / (max - threshold)));
+        paint(r);
+        setPhase(r >= threshold ? "ready" : "pull");
+      },
+      onEnd: () => { if (pull >= threshold) void run(); else { void to(0); setPhase("idle"); } },
+    });
   };
-  const move = (e: PointerEvent): void => {
-    if (!armed) return;
-    const dy = e.clientY - sy, dx = e.clientX - sx;
-    if (!active) {
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < 6) return;
-      if (dy <= 0 || Math.abs(dx) > dy || root.scrollTop > 0) { armed = false; return; }
-      active = true; dragged = true; settle?.cancel(); sy = e.clientY;
-      try { root.setPointerCapture?.(e.pointerId); } catch { /* pointer already gone */ }
-    }
-    e.preventDefault();
-    const d = Math.max(0, e.clientY - sy);
-    // resistance: 1:2 up to the threshold, then softer up to max
-    const r = d / 2 <= threshold ? d / 2 : threshold + (max - threshold) * (1 - Math.exp(-(d / 2 - threshold) / (max - threshold)));
-    paint(r);
-    setPhase(r >= threshold ? "ready" : "pull");
-  };
-  const up = (): void => {
-    if (!armed) return;
-    armed = false;
-    if (!active) return;
-    active = false;
-    if (pull >= threshold) void run();
-    else { void to(0); setPhase("idle"); }
-  };
-  // a click that ends a mouse pull must not activate the item under the pointer
-  const click = (e: MouseEvent): void => { if (dragged) { dragged = false; e.preventDefault(); e.stopPropagation(); } };
   onCleanup(() => { settle?.cancel(); spinning?.cancel(); });
 
   const status = (): string => {
@@ -107,8 +94,8 @@ export function PullToRefresh(props: PullToRefreshProps): Element {
   return h("div", {
     class: () => cx("hm-ptr", (phase() === "pull" || phase() === "ready") && "is-pulling", phase() === "refreshing" && "is-refreshing", phase() === "ready" && "is-ready", val(props.class)),
     "aria-busy": () => (phase() === "refreshing" ? "true" : null),
-    ref: (x: HTMLElement) => { root = x; queueMicrotask(touchPolicy); },
-    onPointerdown: down, onPointermove: move, onPointerup: up, onPointercancel: up, onScroll: touchPolicy, "on:click|capture": click,
+    ref: (x: HTMLElement) => { root = x; gesture(x); queueMicrotask(touchPolicy); },
+    onScroll: touchPolicy,
   },
   h("div", { class: "hm-ptr-ind", "aria-hidden": "true", ref: (x: HTMLElement) => { ind = x; } },
     h("span", { class: "hm-ptr-spin", ref: (x: HTMLElement) => { spin = x; } }, glyph(refreshIcon))),
