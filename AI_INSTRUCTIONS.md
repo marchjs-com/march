@@ -317,10 +317,38 @@ pageTransitions({ type: "slide" });           // View Transitions with fallback
 Rules: animate only `transform`/`opacity` (WAAPI or the `style` object); everything honors `prefers-reduced-motion`
 (`reducedMotion()`); never use string styles. fx (`Particles`, `Aurora`, `confetti`) is decorative — keep it off admin
 screens.
-Coming (core order step 10, docs/parallel.md): ONE motion engine for every animation — a target-independent value layer
-with drivers (dom / cssVar / canvas2d / webgl / object), one clock, global speed / pause / reduced motion, compositor-only
-properties, off-screen animations stop, frame drops measured on a 200-item stagger. New animation code must be ready to
-move onto it: no private rAF loops or timers.
+
+### 15a. Animation ALWAYS goes through motion (one engine)
+
+Every animation — DOM, CSS variables, canvas, WebGL, plain values — runs on the one motion engine (`hadi-march/motion`,
+src/motion/engine). Never write a private `requestAnimationFrame` loop, `setInterval` animation or raw `el.animate()`:
+the engine's clock is what global speed, "Stop all", reduced motion, slow motion and off-screen pausing act on.
+
+```ts
+import { animate, timeline, keyframes, stagger, track, canvas2d, webgl, onFrame, motion } from "hadi-march/motion";
+keyframes("cardIn", { opacity: [0, 1], transform: ["translateY(12px)", "translateY(0px)"] }, { duration: 320, easing: "expo" });
+animate(el, "cardIn");                                        // WAAPI (compositor) where it can, the clock otherwise
+const tl = timeline().add(".card", "cardIn", { stagger: stagger(40, { from: "center" }) })
+  .add(canvas2d(c, draw, { phase: 0 }), { phase: [0, 6.28] }, { at: "<" }).play();   // DOM + canvas, one time
+tl.pause(); tl.seek(200); tl.reverse(); tl.playbackRate = 2; await tl.finished;
+const $x = track(() => $target, { spring: { stiffness: 200, damping: 20 } });         // a value that follows a signal
+onFrame((t, dt) => sim.step(dt), { phase: "update" });                               // per-frame work: the shared clock
+motion.config({ speed: 0.5, reduce: "system", character: "calm" }); motion.pauseAll(); // global, saved
+```
+Rules:
+- DOM: animate only compositor properties (`transform`, `translate`, `scale`, `rotate`, `opacity`, `filter`); the dev
+  build warns about others. CSS variables animate natively once registered (`cssVars(el, { "--hue": "<number>" })`).
+- Easing by name or token (`"out"`, `"--hm-ease-expo"`, `"spring"`, `"bounce"`, `"steps(4)"`); springs and bounces become
+  CSS `linear()` and stay on WAAPI. Add names with `defineEasing` / `defineMotion({ easings, keyframes, presets, characters })`.
+- Colors interpolate in OKLab (give hex / rgb() / oklch()). Vectors (`Float32Array`) are written in place — no per-frame
+  allocation for JS targets.
+- Reads and writes: measure in `measure(fn)`, write in `mutate(fn)` (batched per frame, no layout thrashing).
+- Plain CSS animations are fine (`.hm-anim-<name>` from `keyframesCss()` / `tools/gen-motion-css.js`); the engine
+  controls them too (`cssAnimations(root).pause()`, global speed / pause reach them).
+- Reduced motion: non-`essential` animations jump to their end, endless ones stay still; never bypass it.
+- New targets (Three.js, SVG paths…): `defineDriver(name, { supports, apply, read?, flush? })`, not a custom loop.
+- Check: `node tools/motion-audit.mjs` (headless Edge: Stop all, speed, 200-item stagger: no long task).
+Reference: docs/motion.md. The showcase page "Animasyon motoru" (/animation) shows every piece.
 
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 

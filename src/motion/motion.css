@@ -51,6 +51,9 @@
 .hm-dragging-rel { position: relative; }
 .hm-drag-lift { z-index: var(--hm-z-drag, 250) !important; }
 
+/* reduced motion: the system preference, or the user setting (motion.config({ reduce: "reduce" }) sets data-hm-reduced) */
+:root[data-hm-reduced] :is(.hm-shimmer, .hm-float) { animation: none; }
+:root[data-hm-reduced]::view-transition-old(root), :root[data-hm-reduced]::view-transition-new(root), :root[data-hm-reduced]::view-transition-old(hm-page), :root[data-hm-reduced]::view-transition-new(hm-page) { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .hm-shimmer, .hm-float { animation: none; }
   ::view-transition-old(root), ::view-transition-new(root), ::view-transition-old(hm-page), ::view-transition-new(hm-page) { animation: none; }
