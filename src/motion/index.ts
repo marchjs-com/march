@@ -15,6 +15,9 @@ export { sharedTransition } from "./shared-element.ts";
 export { pageTransitions, transitionFrames, resolveTransition, navDirection, definePageTransition, type PageTransitionOptions, type PageTransitionSpec, type PageTransitionType, type PageTransitionFrames } from "./page.ts";
 // micro-interactions (magnet, tilt, press: gestures.ts)
 export { ripple, hoverParallax, stateMorph, type RippleOptions, type HoverParallaxOptions, type ButtonState, type StateMorphOptions } from "./micro.ts";
+// scroll-linked animation and list animation
+export { scrollTimeline, parallaxLayers, stickyReveal, scrollIndicator, scrollFraction, onScrollProgress, type ScrollSource, type ScrollTimelineOptions, type ParallaxLayersOptions, type StickyRevealOptions, type IndicatorOptions } from "./scroll-fx.ts";
+export { animateList, staggerIn, listFrames, type ListPreset, type ListOptions, type StaggerInOptions } from "./list.ts";
 // page transition variants: register the ones a route uses (each is its own export)
 export { circle, wipe, stack, cube, flip as flipPage, zoomThrough, curtain, blinds, pixelDissolve, morphPage, PAGE_VARIANTS, usePageTransitions, type PageVariant } from "./page-fx.ts";
 export { drag, swipe, press, magnet, tilt, type DragOptions } from "./gestures.ts";

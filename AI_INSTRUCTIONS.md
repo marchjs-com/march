@@ -433,6 +433,14 @@ shapeMorph(el, "star");                                             // circle sq
 usePageTransitions(circle, cube, wipe);                             // then meta: { transition: "cube" } per route
 // variants: circle wipe stack cube flipPage zoomThrough curtain blinds pixelDissolve morphPage (PAGE_VARIANTS = all)
 ```
+```tsx
+<button use:ripple use:press={{ scale: 0.92, easing: "spring-wobbly" }}>…</button>   // magnet, tilt: gestures
+<div use:hoverParallax={{ depth: 16, tilt: 8 }}><img data-depth="0.4" /></div>
+stateMorph(btn, "loading"); stateMorph(btn, ok ? "success" : "error", { confetti: true }); stateMorph(btn, "idle");
+scrollTimeline(card, fadeUp, { range: [0, 0.4] }); parallaxLayers(hero); stickyReveal(section); scrollIndicator(bar);
+const off = animateList(ul, { enter: "pop", exit: "scale" });  // any renderer: enter, exit ghost, FLIP moves
+staggerIn(".tile", { preset: "rise", from: "center", grid: [4, 3] });
+```
 
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 
