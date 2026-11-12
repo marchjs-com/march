@@ -446,6 +446,7 @@ separate button handler. Manager events go through `setManagerEmit`.
 | EasingCurveEditor | experimental | Cubic-bezier easing editor: draggable handles, the engine's named curves as presets, live preview on the motion engine clock, registers the curve by name (defineEasing). | — |
 | GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | ColorPicker, Segmented, IconButton |
 | JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | TreeEditor |
+| KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | EasingCurveEditor, IconButton, Segmented |
 | MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, RichTextEditor |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |

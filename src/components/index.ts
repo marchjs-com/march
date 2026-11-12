@@ -6,6 +6,7 @@ export * from "./overlays/drawer/index.ts";
 export * from "./composite/easing-curve-editor/index.ts";
 export * from "./composite/gradient-editor/index.ts";
 export * from "./composite/json-editor/index.ts";
+export * from "./composite/keyframe-timeline/index.ts";
 export * from "./composite/markdown-editor/index.ts";
 export * from "./feedback/pull-to-refresh/index.ts";
 export * from "./composite/rich-text-editor/index.ts";

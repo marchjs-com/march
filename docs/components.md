@@ -10,6 +10,7 @@
 | EasingCurveEditor | experimental | Cubic-bezier easing editor: draggable handles, the engine's named curves as presets, live preview on the motion engine clock, registers the curve by name (defineEasing). | — |
 | GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | ColorPicker, Segmented, IconButton |
 | JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | TreeEditor |
+| KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | EasingCurveEditor, IconButton, Segmented |
 | MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, RichTextEditor |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
@@ -90,6 +91,17 @@ JSON in two views. **Text**: the source with live parse errors (line and column)
 ```
 
 Full page: src/components/composite/json-editor/docs.md
+
+## KeyframeTimeline
+
+Edit and play a keyframe animation on the motion engine. Each track animates one property (x, y, scale, rotate, opacity) of a target; its lane shows the value curve and the keyframes as diamonds you drag along time (snapped, Alt for free). Scrub the ruler or drag the playhead; play, pause, loop and change the speed. The selected keyframe has its time, value and an EasingCurveEditor for the curve into it. Playback is a motion engine `Playback`, so the global speed, "Stop all" and reduced motion apply; `timelineCode(model)` writes the same animation as engine timeline code.
+
+```tsx
+<KeyframeTimeline bind:value={$scene} />
+<KeyframeTimeline value={model} snap={100} loop={false} renderTarget={(name) => <img src={`/${name}.svg`} alt="" />} />
+```
+
+Full page: src/components/composite/keyframe-timeline/docs.md
 
 ## MarkdownEditor
 
