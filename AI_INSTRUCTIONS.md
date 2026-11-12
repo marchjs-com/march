@@ -13,7 +13,7 @@ Read this before writing code with March. It is the contract; when in doubt, pre
 4. **Ownership cleans up.** Listeners, effects, timers registered with `onCleanup`, queries and child components are
    disposed when their branch disappears (`<If>`, `<For>` row removed, route change).
 5. **Control flow is components:** `If/Else`, `For` (keyed), `Switch/Match`, `Try` (errors + async loading), `Await`.
-6. **Modules are separate:** core, router, data (+access), schema, ui (+forms), table, charts, testing.
+6. **Modules are separate:** core, router, data (+access), schema, ui (+forms), table, charts, channel, testing.
 
 ## 2. Syntax cheat sheet (March JSX, `.jsx` files)
 
@@ -219,6 +219,37 @@ persist(app.prefs, "prefs"); const h = history(app.form); h.undo();
 readonly(app); snapshot(app); derive(() => app.cart.items.length);
 ```
 Do not keep references to plain objects you put into a store and mutate them — mutate through the store.
+
+## 12b. Channels (hadi-march/channel)
+
+```ts
+// channels.ts — every channel of the app, once: a wrong name or payload is a compile error
+export const ch = defineChannels({
+  "cart.changed": of<{ count: number }>({ sticky: true }),       // a late (lazy) listener gets the last one at once
+  "chart.select": of<{ month: string } | null>({ sticky: true }),
+  "toast.shown": of<string>({ replay: 5 }),                     // the last 5
+  "theme.set": of<string>({ crossTab: true }),                  // other tabs too (BroadcastChannel)
+  "editor.changed": of<number>({ scoped: true }),               // per <ChannelScope>
+});
+ch["cart.changed"].emit({ count: 3 });
+ch["cart.changed"].on((p) => …);           // inside a component: removed with it; { priority, async, replay: false }
+ch.on("cart.*", (m) => m.name === "cart.changed" && m.payload.count);
+const $sel = ch["chart.select"].toSignal(); ch["cart.changed"].last(); await ch["x"].once();
+const editor = useChannel(ch["editor.changed"]); // in setup; use `editor.emit` in handlers (they have no scope)
+```
+
+| Need | Use |
+|---|---|
+| Parent gives data to a child it renders | **props** (getters stay live) |
+| A value many parts read and change (cart items, user, filters) | **store** / signal (state: always has a current value) |
+| "Something happened" for parts that do not know each other (added to cart, row opened, saved) | **channel** (event) |
+| A late part must see the latest event (lazy chart, tab opened later) | channel with `sticky` / `replay`, or keep it in a store |
+| The same event in other tabs | channel `crossTab: true` (payload: structured-cloneable data, no functions/DOM nodes/class instances) |
+| Two copies of a widget must not hear each other | `scoped: true` channel + `<ChannelScope>` around each copy |
+
+- Never put state only in a channel; if a value must be read later, it belongs in a store (a sticky channel is a catch-up, not storage).
+- A listener's error never stops the others; it goes to `setChannelErrorHandler` (the errors module) or the listener's `<Try>`.
+- Dev: `channelDevtools.traffic()` / `.watch(fn)` / `.channels()` show the message flow. Details: `docs/channel.md`.
 
 ## 13. i18n (hadi-march/i18n)
 
