@@ -48,12 +48,12 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
     return { item, index, o, k, at: i, nodes: runWithOwner(o, () => collect(() => renderRow(item, index as Accessor<number>))) };
   };
   /** Drop rows; when they are every row of a parent the list owns alone, empty the parent at once. */
-  const drop = (rs: Row<T>[], all: boolean, host: Node): void => {
-    if (all && host.firstChild === start && host.lastChild === end && host.nodeType === 1 && !props.animate && rs.every(plain)) {
-      disposeDetached(() => { for (const r of rs) _dispose(r.o); });
+  const drop = (rs: Map<unknown, Row<T>>, all: boolean, host: Node): void => {
+    if (all && host.firstChild === start && host.lastChild === end && host.nodeType === 1 && !props.animate && everyPlain(rs)) {
+      disposeDetached(() => { for (const r of rs.values()) _dispose(r.o); });
       (host as Element).textContent = "";
       host.appendChild(start); host.appendChild(end);
-    } else for (const r of rs) dropRow(r);
+    } else for (const r of rs.values()) dropRow(r);
   };
 
   effect(() => {
@@ -78,13 +78,13 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
       // the middle: old rows s…e1 become new rows s…e2 (reused by key, made, or dropped)
       const byKey = new Map<unknown, Row<T>>();
       for (let i = s; i <= e1; i++) byKey.set((old[i] as Row<T>).k, old[i] as Row<T>);
-      const was: number[] = []; // old position of each middle row (-1: new)
+      const was = new Int32Array(e2 >= s ? e2 - s + 1 : 0); // old position of each middle row (-1: new)
       for (let i = s; i <= e2; i++) {
-        const it = list[i] as T, k = keyOf(it), r = byKey.get(k);
-        if (r) { byKey.delete(k); was.push(r.at); same(i, r); }
-        else { was.push(-1); next[i] = make(it, i, k); }
+        const it = list[i] as T, k = keyOf(it), r = byKey.size ? byKey.get(k) : undefined;
+        if (r) { byKey.delete(k); was[i - s] = r.at; same(i, r); }
+        else { was[i - s] = -1; next[i] = make(it, i, k); }
       }
-      drop([...byKey.values()], byKey.size === m, host);
+      if (byKey.size) drop(byKey, byKey.size === m, host);
       if (!n && props.fallback != null && !fallback) {
         const o = _owner(owner);
         fallback = { o, nodes: runWithOwner(o, () => collect(() => call(props.fallback))) };
@@ -119,6 +119,10 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
 /** A row whose top nodes are plain elements (no leave transition): removing them removes everything the row drew. */
 function plain(r: { nodes: Node[] }): boolean {
   for (const n of r.nodes) if (n.nodeType !== 1 || (n as unknown as { [LEAVE]?: unknown })[LEAVE]) return false;
+  return true;
+}
+function everyPlain(rs: Map<unknown, { nodes: Node[] }>): boolean {
+  for (const r of rs.values()) if (!plain(r)) return false;
   return true;
 }
 function dropRow(r: { o: Owner; nodes: Node[] }): void {

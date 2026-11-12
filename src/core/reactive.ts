@@ -74,18 +74,15 @@ function track(node: Source): void {
 }
 
 function markObservers(node: Source, state: State): void {
-  const obs = node.observers;
-  if (!obs) return;
-  if (obs instanceof Set) { for (const o of obs) mark(o, state); }
-  else mark(obs, state);
+  forObservers(node.observers, (o) => mark(o, state));
 }
 function mark(o: Computation, state: State): void {
-  if (o.state < state) {
-    const was = o.state;
-    o.state = state;
-    if (o.effect) { if (was === CLEAN) queue.push(o); }
-    else markObservers(o, CHECK);
-  }
+  const was = o.state;
+  if (was >= state) return;
+  o.state = state;
+  // an effect is queued once (when it leaves CLEAN); a computed passes CHECK on to its own observers
+  if (!o.effect) markObservers(o, CHECK);
+  else if (was === CLEAN) queue.push(o);
 }
 
 function cleanNode(c: Computation): void {
@@ -93,8 +90,7 @@ function cleanNode(c: Computation): void {
     const src = c.sources;
     for (let i = 0; i < src.length; i++) {
       const x = src[i]!, o = x.observers;
-      if (o === c) x.observers = null;
-      else if (o instanceof Set) { o.delete(c); if (!o.size) x.observers = null; }
+      if (o === c || (o instanceof Set && o.delete(c) && !o.size)) x.observers = null;
       if (x.drop && !x.observers) x.drop();
     }
     c.sources = null;
@@ -164,10 +160,9 @@ function run(c: Computation): void {
   Listener = prevL; Owner = prevO;
   if (!c.effect && !c.equals(c.value, next)) {
     c.value = next;
-    forObservers(c.observers, (o) => {
-      o.state = DIRTY;
-      if (o.effect) { if (!queue.includes(o)) queue.push(o); } else markObservers(o, CHECK);
-    });
+    // the same marking as a written signal: an observer already DIRTY was marked (its effects queued, its own observers
+    // CHECK) when it became so, and it is clean again only after re-reading this value; a clean effect is queued once
+    markObservers(c, DIRTY);
   } else c.value = next;
 }
 
@@ -197,47 +192,42 @@ export function reactive<F extends (...a: never[]) => unknown>(fn: F): F {
 
 /** Create a signal. Read: `count()`. Write: `count.set(v)`, `count.update(fn)`. Read untracked: `count.peek()`. */
 export function signal<T>(value: T, opts?: { equals?: Equals<T>; name?: string }): Signal<T> {
-  const node = new SignalNode(value, opts?.equals as Equals<unknown> | undefined);
-  const read = (() => { track(node); return node.value as T; }) as Signal<T>;
+  // a cell (accessor, node, shared peek) with the signal's own equality; update is shared too (it reads `this`), set is
+  // a closure: it is passed around unbound
+  const read = _cell(value, opts?.equals as Equals<unknown> | undefined) as unknown as Signal<T>, node = (read as unknown as Cell<T>).n;
   const w = read as unknown as Record<string | symbol, unknown>;
-  // peek and update are shared (they read the node through `this`); set is a closure, it is passed around unbound
-  w["n"] = node;
-  w["peek"] = peekCell;
   w["set"] = (v: T): T => {
     if (Listener && !Listener.effect && DEV.enabled) DEV.warn(`writing signal${opts?.name ? ` "${opts.name}"` : ""} in computed(); use an effect.`);
-    if (node.equals(node.value, v)) return v;
-    node.value = v;
-    markObservers(node, DIRTY);
-    flush();
+    write(node, v);
     return v;
   };
   w["update"] = updateSignal;
-  w[REACTIVE] = true;
   w["signal"] = true;
   if (opts?.name) w["displayName"] = opts.name;
   return read;
 }
 
 function updateSignal(this: Signal<unknown> & { n: SignalNode }, fn: (v: unknown) => unknown): unknown { return this.set(fn(this.n.value)); }
+/** Write a node: observers are marked and run unless the value is equal (by the node's equality) and not forced. */
+function write(n: SignalNode, v: unknown, force?: boolean): void {
+  if (!force && n.equals(n.value, v)) return;
+  n.value = v;
+  markObservers(n, DIRTY);
+  flush();
+}
 
 /** A bare signal for list rows (<For>): the accessor plus `peek`, written with _setCell. No per-row method closures. */
 export interface Cell<T> extends Accessor<T> { n: SignalNode }
 function peekCell(this: Cell<unknown>): unknown { return this.n.value; }
-export function _cell<T>(value: T): Cell<T> {
-  const n = new SignalNode(value);
+export function _cell<T>(value: T, equals?: Equals<unknown>): Cell<T> {
+  const n = new SignalNode(value, equals);
   const f = (() => { track(n); return n.value as T; }) as Cell<T>;
   f.n = n;
   f.peek = peekCell as () => T;
   (f as unknown as Record<symbol, unknown>)[REACTIVE] = true;
   return f;
 }
-export function _setCell<T>(f: Cell<T>, v: T, force?: boolean): void {
-  const n = f.n;
-  if (n.value === v && !force) return;
-  n.value = v;
-  markObservers(n, DIRTY);
-  flush();
-}
+export function _setCell<T>(f: Cell<T>, v: T, force?: boolean): void { write(f.n, v, force); }
 
 /**
  * Selector: `const isSelected = selector(() => $selected)`, then `isSelected(row.id)` in each row. A row reading it

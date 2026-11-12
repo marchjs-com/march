@@ -222,20 +222,37 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     const list = group(table.pinOf(key));
     let target: string | null = null;
     const marker = h("span", { class: "hm-dg-drop", "aria-hidden": "true" }) as HTMLElement;
+    // the headers of this pin group and their boxes, measured once when the drag starts (before the dragged header
+    // moves): a move compares numbers instead of querying and measuring every header (a layout read per header per
+    // pointer event). Auto-scroll shifts every header alike: the boxes are corrected by the scroll since the start.
+    let heads: { x: HTMLElement; key: string; left: number; right: number; at: number }[] = [];
+    let parentLeft = 0, scroll0 = 0;
+    const at = new Map<string, number>();
+    list.forEach((c, i) => at.set(String(c.key), i));
     pointerDrag(e, {
       scroll: scroller,
       onClick: (ev) => { if (col.sortable) table.toggleSort(key, ev.shiftKey); },
-      onStart: () => { el.classList.add("is-dragging"); el.parentElement?.appendChild(marker); },
+      onStart: () => {
+        heads = [];
+        for (const x of el.parentElement?.parentElement?.querySelectorAll<HTMLElement>(".hm-dg-th") ?? []) {
+          const k = x.dataset["key"] ?? "", i = at.get(k);
+          if (i === undefined) continue;
+          const r = x.getBoundingClientRect();
+          heads.push({ x, key: k, left: r.left, right: r.right, at: i });
+        }
+        parentLeft = (el.parentElement as HTMLElement).getBoundingClientRect().left;
+        scroll0 = scroller.scrollLeft;
+        el.classList.add("is-dragging"); el.parentElement?.appendChild(marker);
+      },
       onMove: (p) => {
         setStyle(el, { transform: `translateX(${p.dx}px)` });
-        const heads = [...(el.parentElement?.parentElement?.querySelectorAll<HTMLElement>(".hm-dg-th") ?? [])].filter((x) => list.some((c) => String(c.key) === x.dataset["key"]));
-        let best: HTMLElement | null = null;
-        for (const x of heads) { const r = x.getBoundingClientRect(); if (p.clientX >= r.left && p.clientX <= r.right) best = x; }
-        target = best && best !== el ? best.dataset["key"] ?? null : null;
+        const shift = scroller.scrollLeft - scroll0, x = p.clientX + shift;
+        let best: (typeof heads)[number] | null = null;
+        for (const hd of heads) if (x >= hd.left && x <= hd.right) best = hd;
+        target = best && best.x !== el ? best.key : null;
         if (best && target) {
-          const r = best.getBoundingClientRect(), pr = (el.parentElement as HTMLElement).getBoundingClientRect();
-          const after = list.findIndex((c) => String(c.key) === target) > list.findIndex((c) => String(c.key) === key);
-          const edge = (after !== rtl() ? r.right : r.left) - pr.left;
+          const after = best.at > (at.get(key) ?? -1);
+          const edge = (after !== rtl() ? best.right : best.left) - parentLeft;
           setStyle(marker, { transform: `translateX(${edge}px)`, opacity: "1" });
         } else setStyle(marker, { opacity: "0" });
       },
@@ -254,11 +271,15 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     for (const x of scroller.querySelectorAll<HTMLElement>(".hm-dg-th")) xs.set(x.dataset["key"] as string, x.getBoundingClientRect().left);
     change();
     paint();
+    // each column's shift measured once on its header (not once per cell: a layout read per cell per header before)
+    const shift = new Map<string, number>();
+    for (const x of scroller.querySelectorAll<HTMLElement>(".hm-dg-th")) {
+      const k = x.dataset["key"] as string, old = xs.get(k);
+      if (old != null && !shift.has(k)) shift.set(k, old - x.getBoundingClientRect().left);
+    }
     for (const cell of scroller.querySelectorAll<HTMLElement>(".hm-dg-head .hm-dg-th, .hm-dg-body .hm-dg-cell[data-key]")) {
-      const head = [...scroller.querySelectorAll<HTMLElement>(".hm-dg-th")].find((x) => x.dataset["key"] === cell.dataset["key"]);
-      const old = xs.get(cell.dataset["key"] as string);
-      if (!head || old == null) continue;
-      const d = old - head.getBoundingClientRect().left;
+      const d = shift.get(cell.dataset["key"] as string);
+      if (d == null) continue;
       if (Math.abs(d) > 1) void animate(cell, [{ transform: `translateX(${d}px)` }, { transform: "none" }], { duration: 260, easing: "easeOutCubic" });
     }
   };

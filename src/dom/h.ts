@@ -211,10 +211,13 @@ function setClass(el: MarchEl, v: unknown): void {
     return;
   }
   el.__hmUser = v;
-  let s: unknown = v;
-  if (Array.isArray(v)) s = v.filter(Boolean).join(" ");
-  else if (v && typeof v === "object") s = Object.keys(v).filter((k) => (v as Record<string, unknown>)[k]).join(" ");
-  el.setAttribute("class", [s ?? "", el.__hmClass ?? ""].join(" ").trim());
+  // one pass, no intermediate arrays: array entries / object keys whose value is truthy, then the sx classes
+  let s = "";
+  if (Array.isArray(v)) { for (const x of v) if (x) s += ` ${x}`; }
+  else if (v && typeof v === "object") { for (const k in v) if ((v as Record<string, unknown>)[k]) s += ` ${k}`; }
+  else if (v != null) s = ` ${v}`;
+  if (el.__hmClass) s += ` ${el.__hmClass}`;
+  el.setAttribute("class", s.trim());
 }
 
 // Event delegation: `onClick`, `onInput`, `onKeyDown`… without modifiers, on elements of a tree mounted with render()
@@ -247,7 +250,9 @@ function listen(el: Element, key: string, handler: unknown): void {
   let name: string, mods: string[] = [];
   if (key.startsWith("on:")) { const [n = "", ...m] = key.slice(3).split("|"); name = n; mods = m; }
   else name = key.slice(2).toLowerCase();
-  for (const m of mods) if (!MODS.has(m)) throw new Error(`March: unknown event modifier "${m}".`);
+  // the modifiers as flags, read once (not on every event)
+  const f: Record<string, boolean> = {};
+  for (const m of mods) { if (!MODS.has(m)) throw new Error(`March: unknown event modifier "${m}".`); f[m] = true; }
   if (typeof handler !== "function") throw new TypeError(`March: ${key} handler must be a function.`);
   // onClick-style handlers (no modifiers) inside a render() tree: one listener per event type on the document
   if (key[2] !== ":" && DELEGATED.has(name)) {
@@ -260,13 +265,12 @@ function listen(el: Element, key: string, handler: unknown): void {
     }
   }
   const fn = (e: Event): void => {
-    if (mods.includes("self") && e.target !== el) return;
-    if (mods.includes("trusted") && !e.isTrusted) return;
-    if (mods.includes("prevent")) e.preventDefault();
-    if (mods.includes("stop")) e.stopPropagation();
+    if ((f["self"] && e.target !== el) || (f["trusted"] && !e.isTrusted)) return;
+    if (f["prevent"]) e.preventDefault();
+    if (f["stop"]) e.stopPropagation();
     batch(() => (handler as (this: Element, e: Event) => void).call(el, e));
   };
-  const opts = { capture: mods.includes("capture"), once: mods.includes("once"), passive: mods.includes("passive") };
+  const opts = { capture: !!f["capture"], once: !!f["once"], passive: !!f["passive"] };
   el.addEventListener(name, fn, opts);
   onCleanup(() => { if (!detaching) el.removeEventListener(name, fn, opts); });
 }
