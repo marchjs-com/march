@@ -8,7 +8,7 @@
 // component's head goes away with it. `march build` with `seo: { prerender }` writes each route's HTML (head included)
 // at build time; hydrate() (hadi-march/seo/hydrate) takes it over in the browser. See docs/seo.md.
 import { signal, effect, createRoot, onCleanup, getOwner, untrack } from "../core/reactive.ts";
-import { setHeadHandler, _router, type RouteTarget } from "../router/index.ts";
+import { setHeadHandler, _router, type RouteTarget } from "../router/router.ts";
 import { resolveHead, applyHead, type HeadInput, type Tag } from "./head.ts";
 
 export { resolveHead, applyHead, headToHtml, ogTags, twitterTags, jsonLdText, tagKey, _resetHead } from "./head.ts";

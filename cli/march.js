@@ -30,7 +30,7 @@ import { templates } from "./templates.js";
 import { mergeEntry, rehashOutputs } from "../compiler/merge-entry.js";
 import { packChunks } from "../compiler/pack-chunks.js";
 import { planSmallLazy, smallFiles, aliasGroups } from "../compiler/min-chunks.js";
-import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText, fileSizes } from "./perf.js";
+import { chunkManifest, htmlManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText, fileSizes } from "./perf.js";
 import { posix } from "../compiler/fs-util.js";
 
 const cwd = process.cwd();
@@ -168,7 +168,7 @@ async function build({ dev = false } = {}) {
     if (process.env.MARCH_DEBUG_META) writeFileSync(process.env.MARCH_DEBUG_META, JSON.stringify({ meta: r.metafile, plan }));
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
     aliasGroups(chunks.manifest, plan);
-    writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);
+    writeHtml(cfg, r.metafile, { dev }, htmlManifest(chunks.manifest, r.metafile, cwd), dev ? null : chunks.entryFiles);
     if (cfg.themes !== false) await copyThemes(out, esbuild, { dev });
     if (!dev && cfg.seo && cfg.seo.prerender !== false) {
       const { prerender } = await import("../compiler/prerender.js");

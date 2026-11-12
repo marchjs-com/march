@@ -5,7 +5,7 @@
 // Back reverses each one; "wipe", "stack", "cube" and "flip" follow the text direction (RTL mirrors them); "circle"
 // and "morph" start where the pointer last pressed (a link, a card). Every frame is an engine animation.
 import { definePageTransition, type PageTransitionFrames } from "./page.ts";
-import { transitionOutlet } from "../router/index.ts";
+import { transitionOutlet } from "../router/extras.ts";
 import { clipAt } from "./clip.ts";
 
 export interface PageVariant { readonly name: string; readonly frames: PageTransitionFrames }

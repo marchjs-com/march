@@ -145,20 +145,3 @@ export function t(strings: TemplateStringsArray | string, ...vals: unknown[]): s
   const key = strings.reduce((acc, s, i) => acc + s + (i < vals.length ? `{${i}}` : ""), "");
   return format(lookup(key), Object.fromEntries(vals.map((v, i) => [String(i), v])), locale());
 }
-/** Key a tagged template produces (compiler and tests). */
-export const tKey = (strings: readonly string[]): string => strings.reduce((acc, s, i) => acc + s + (i < strings.length - 1 ? `{${i}}` : ""), "");
-
-
-// ------------------------------------------------------------------ typed catalogs
-type Trim<S extends string> = S extends ` ${infer R}` ? Trim<R> : S extends `${infer R} ` ? Trim<R> : S;
-/** Variable names used in an ICU message: "{n, plural, one {# {thing}} other {…}}" → "n" | "thing". */
-export type VarsOf<S extends string> =
-  S extends `${string}{${infer Inner}}${infer Rest}`
-    ? (Inner extends `${infer Name},${string}` ? Trim<Name> : Inner extends `${infer N}{${string}` ? Trim<N> : Trim<Inner>) | VarsOf<Rest>
-    : never;
-type Args<S extends string> = [VarsOf<S>] extends [never] ? [] : [vars: { [K in VarsOf<S>]: unknown }];
-
-/** Typed translator for a catalog: keys must exist and every variable must be passed. */
-export function typed<M extends Record<string, string>>(): <K extends keyof M & string>(key: K, ...args: Args<M[K]>) => string {
-  return (key, ...args) => t(key, (args[0] ?? {}) as Record<string, unknown>);
-}

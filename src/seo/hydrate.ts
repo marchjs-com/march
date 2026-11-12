@@ -8,7 +8,7 @@
 // it is exactly render(). When the URL shows another route than the one prerendered (an SPA fallback, or a hash
 // route such as #/charts on a page prerendered for #/) the stale content is dropped at once, so it never flashes.
 import { render } from "../dom/render.ts";
-import { _router } from "../router/index.ts";
+import { _router } from "../router/router.ts";
 
 export interface HydrateOptions {
   /** Ready to swap (default: the router shows its first page and nothing is loading). */

@@ -4,7 +4,7 @@ import "./app.css";
 import "./button.css";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
-import { Link, type Href } from "../router/index.ts";
+import { Link, type Href } from "../router/router.ts";
 import { Menu, type MenuItem } from "./menu.ts";
 import { Avatar } from "./avatar.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";

@@ -43,6 +43,20 @@ export function chunkManifest(meta, { cwd, outdir, entry }) {
   return { manifest, entryFiles: [...base].map(rel), entryKey };
 }
 
+/**
+ * The part of the manifest index.html carries: only keys some code can look up. A key is read by its string — a tagged
+ * loader's `hm: "src/pages/x.tsx"`, "march:common", or a literal chunksOf("…") — so a key no output file mentions (a
+ * plain `import()` that is not a bare loader) is never read, and dropping it keeps the start-up HTML small.
+ * The size report still uses the whole manifest.
+ * @param {Record<string, string[]>} manifest
+ * @param {import("esbuild").Metafile} meta
+ * @param {string} cwd
+ */
+export function htmlManifest(manifest, meta, cwd) {
+  const code = Object.keys(meta.outputs).filter((k) => k.endsWith(".js") && existsSync(resolve(cwd, k))).map((k) => readFileSync(resolve(cwd, k), "utf8")).join("\n");
+  return Object.fromEntries(Object.entries(manifest).filter(([k]) => k.startsWith("march:") || code.includes(JSON.stringify(k)) || code.includes(`'${k}'`)));
+}
+
 const gz = (file) => { file = file.replace(/\?.*$/, ""); return existsSync(file) ? gzipSync(readFileSync(file)).length : 0; };
 
 /**

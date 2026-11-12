@@ -4,7 +4,7 @@
 import { computed, effect, untrack, createRoot } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { Try } from "../dom/flow.ts";
-import { _router as I, query, closeModal, openOutlet, type Slot, type RouteTarget, type CompiledRoute, type RouterState } from "./index.ts";
+import { _router as I, query, closeModal, openOutlet, type Slot, type RouteTarget, type CompiledRoute, type RouterState } from "./router.ts";
 
 const noRoute = null as unknown as CompiledRoute;
 const errorSlot = (e: unknown, to: string): Slot => ({ key: `error:${to}`, comp: () => I.routeError(e, () => undefined), to: { path: to, params: {}, query: {}, meta: {}, route: noRoute } });

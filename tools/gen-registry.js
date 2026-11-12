@@ -159,7 +159,7 @@ export async function generate(root = ROOT) {
 
 /** Exported names of hadi-march, hadi-march/ui, hadi-march/router and hadi-march/table (a part named in composedOf may still live there while folders move). */
 function uiExports(root) {
-  const text = ["src/index.ts", "src/ui/index.ts", "src/forms/index.ts", "src/router/index.ts", "src/table/index.ts"].map((f) => readFileSync(join(root, f), "utf8")).join("\n");
+  const text = ["src/index.ts", "src/ui/index.ts", "src/forms/index.ts", "src/router/index.ts", "src/router/router.ts", "src/table/index.ts"].map((f) => readFileSync(join(root, f), "utf8")).join("\n");
   return new Set([
     ...[...text.matchAll(/^export\s*\{([^}]*)\}/gm)].flatMap((m) => m[1].split(",").map((s) => s.trim().split(/\s+as\s+/).pop()).filter(Boolean)),
     ...[...text.matchAll(/^export\s+(?:function|const|class)\s+([A-Z][\w$]*)/gm)].map((m) => m[1]),

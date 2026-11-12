@@ -3,7 +3,7 @@ import "./button.css";
 import { signal, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
-import type { Href } from "../router/index.ts";
+import type { Href } from "../router/router.ts";
 import { routerLink } from "../dom/link.ts";
 import { can, type PermCheck } from "../access/index.ts";
 import { isAction, type Action } from "./action.ts";

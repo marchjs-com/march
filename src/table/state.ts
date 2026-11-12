@@ -4,7 +4,7 @@ import { signal, computed, effect, untrack, batch, onCleanup, createRoot, type A
 import { applyPipe } from "../core/pipes.ts";
 import { t, locale } from "../core/i18n.ts";
 import { query as dataQuery, type QueryOptions } from "../data/index.ts";
-import { setQuery } from "../router/index.ts";
+import { setQuery } from "../router/router.ts";
 import type { Schema } from "../schema/index.ts";
 import { fold, prop, valueOf, optionsOf, isEmptyFilter, matchFilter, describeFilter, sortRows, encodeFilter, decodeFilter } from "./filters.ts";
 import type { Column, ColumnInput, TableColumn, FilterOption, Pin, Row, SortDir, SortSpec } from "./filters.ts";
