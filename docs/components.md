@@ -15,6 +15,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, Portal |
+| PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
 
 ## Chip
 
@@ -58,3 +59,20 @@ An optional credit line: "Developed with HADI March and 💗", with "HADI March"
 ```
 
 Full page: src/components/actions/made-with-march/docs.md
+
+## PropertyGrid
+
+An inspector: property rows in collapsible groups, a search field, and for each property the form control of its type. Every change is an **undo step** in the app's Undo history (typing in one field merges into one step), unsaved changes are registered with **DirtyState** (leave warning, `saveAll()`), and changed rows are marked and can be reset one by one. The footer counts the changes and offers Revert and Save.
+
+Composed of: Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea
+
+```tsx
+<PropertyGrid label="Card" bind:value={$card} onSave={(v) => api.save(v)} properties={[
+  { key: "title", label: "Title", group: "Content" },
+  { key: "width", label: "Width", type: "number", unit: "px", group: "Layout", validate: (v) => v > 420 ? "At most 420" : null },
+  { key: "elevated", label: "Shadow", type: "switch", group: "Look" },
+  { key: "radius", label: "Radius", type: "slider", min: 0, max: 24, group: "Look", hidden: (v) => !v.elevated },
+]} />
+```
+
+Full page: src/components/composite/property-grid/docs.md

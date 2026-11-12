@@ -3,10 +3,12 @@ import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";
 import m0 from "./actions/chip/meta.ts";
 import m1 from "./composite/dock-layout/meta.ts";
 import m2 from "./actions/made-with-march/meta.ts";
+import m3 from "./composite/property-grid/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 export const registry: readonly RegistryEntry[] = [
   { folder: "actions/chip", meta: m0, code: "<Chip>Design</Chip>\n<Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>\n<Chip tone=\"primary\" onRemove={() => remove(tag)}>{tag}</Chip>", demo: () => import("./actions/chip/demo.tsx"), playground: () => import("./actions/chip/playground.ts") },
   { folder: "composite/dock-layout", meta: m1, code: "<DockLayout panels={[\n  { id: \"files\", title: \"Files\", icon: folder, content: () => <FileTree /> },\n  { id: \"editor\", title: \"main.ts\", icon: fileText, content: () => <Editor />, dirty: () => $dirty },\n  { id: \"console\", title: \"Console\", icon: terminal, content: () => <Console /> },\n]} layout={{ row: [[\"files\"], { column: [[\"editor\"], [\"console\"]], share: .68 }], share: .26 }}\n   persist=\"ide.layout\" storage={storage().local} api={(a) => dock = a} />", demo: () => import("./composite/dock-layout/demo.tsx"), playground: () => import("./composite/dock-layout/playground.ts") },
   { folder: "actions/made-with-march", meta: m2, code: "<MadeWithMarch />\n<MadeWithMarch variant=\"badge\" />\n<MadeWithMarch variant=\"small\" />", demo: () => import("./actions/made-with-march/demo.tsx"), playground: () => import("./actions/made-with-march/playground.ts") },
+  { folder: "composite/property-grid", meta: m3, code: "<PropertyGrid label=\"Card\" bind:value={$card} onSave={(v) => api.save(v)} properties={[\n  { key: \"title\", label: \"Title\", group: \"Content\" },\n  { key: \"width\", label: \"Width\", type: \"number\", unit: \"px\", group: \"Layout\", validate: (v) => v > 420 ? \"At most 420\" : null },\n  { key: \"elevated\", label: \"Shadow\", type: \"switch\", group: \"Look\" },\n  { key: \"radius\", label: \"Radius\", type: \"slider\", min: 0, max: 24, group: \"Look\", hidden: (v) => !v.elevated },\n]} />", demo: () => import("./composite/property-grid/demo.tsx"), playground: () => import("./composite/property-grid/playground.ts") },
 ];

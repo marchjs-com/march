@@ -2,3 +2,4 @@
 export * from "./actions/chip/index.ts";
 export * from "./composite/dock-layout/index.ts";
 export * from "./actions/made-with-march/index.ts";
+export * from "./composite/property-grid/index.ts";
