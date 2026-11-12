@@ -11,4 +11,5 @@ export * from "./social/media-grid/index.ts";
 export * from "./composite/nav-sidebar/index.ts";
 export * from "./composite/post-card/index.ts";
 export * from "./feedback/pull-to-refresh/index.ts";
+export * from "./composite/theme-menu/index.ts";
 export * from "./data/virtual-list/index.ts";

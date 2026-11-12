@@ -14,8 +14,9 @@ import m10 from "./social/media-grid/meta.ts";
 import m11 from "./composite/nav-sidebar/meta.ts";
 import m12 from "./composite/post-card/meta.ts";
 import m13 from "./feedback/pull-to-refresh/meta.ts";
-import m14 from "./data/tree-view/meta.ts";
-import m15 from "./data/virtual-list/meta.ts";
+import m14 from "./composite/theme-menu/meta.ts";
+import m15 from "./data/tree-view/meta.ts";
+import m16 from "./data/virtual-list/meta.ts";
 
 export interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }
 /** Every component folder: meta, Code-tab snippet and lazy demo / playground loaders. */
@@ -34,6 +35,7 @@ export const registry: readonly RegistryEntry[] = [
   { folder: "composite/nav-sidebar", meta: m11, code: "<NavSidebar title=\"Acme\" items={[\n  { id: \"/orders\", label: \"Orders\", href: \"/orders\", group: \"Sales\", icon: cart, badge: () => $open },\n  { id: \"/users\", label: \"Users\", href: \"/users\", group: \"Admin\", can: \"users.read\" },\n]} collapsible resizable groupOrder={[\"Sales\", \"Admin\"]} />", demo: () => import("./composite/nav-sidebar/demo.tsx"), playground: () => import("./composite/nav-sidebar/playground.ts") },
   { folder: "composite/post-card", meta: m12, code: "<PostCard post={post} onLike={(on) => like(post, on)} onComment={openComments} onOpenMedia={(i, el) => openLightbox(post.media, i, el)} />", demo: () => import("./composite/post-card/demo.tsx"), playground: () => import("./composite/post-card/playground.ts") },
   { folder: "feedback/pull-to-refresh", meta: m13, code: "<PullToRefresh onRefresh={() => api.get(\"/feed\").then((x) => $items = x)}>…</PullToRefresh>", demo: () => import("./feedback/pull-to-refresh/demo.tsx"), playground: () => import("./feedback/pull-to-refresh/playground.ts") },
-  { folder: "data/tree-view", meta: m14, code: "import { TreeView } from \"hadi-march/components/data/tree-view\";\n\n<TreeView nodes={files} selection=\"multiple\" draggable search={$q}\n  load={(node) => api.children(node.id)}\n  onSelect={(ids) => $selected = ids}\n  onMove={(ids, target, position) => api.move(ids, target, position)} />", demo: () => import("./data/tree-view/demo.tsx"), playground: () => import("./data/tree-view/playground.ts") },
-  { folder: "data/virtual-list", meta: m15, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./data/virtual-list/demo.tsx"), playground: () => import("./data/virtual-list/playground.ts") },
+  { folder: "composite/theme-menu", meta: m14, code: "<ThemeMenu />\n<ThemeMenu themes={false} accents={[\"primary\", \"brand-orange\", \"brand-blue\"]} />", demo: () => import("./composite/theme-menu/demo.tsx"), playground: () => import("./composite/theme-menu/playground.ts") },
+  { folder: "data/tree-view", meta: m15, code: "import { TreeView } from \"hadi-march/components/data/tree-view\";\n\n<TreeView nodes={files} selection=\"multiple\" draggable search={$q}\n  load={(node) => api.children(node.id)}\n  onSelect={(ids) => $selected = ids}\n  onMove={(ids, target, position) => api.move(ids, target, position)} />", demo: () => import("./data/tree-view/demo.tsx"), playground: () => import("./data/tree-view/playground.ts") },
+  { folder: "data/virtual-list", meta: m16, code: "<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />", demo: () => import("./data/virtual-list/demo.tsx"), playground: () => import("./data/virtual-list/playground.ts") },
 ];

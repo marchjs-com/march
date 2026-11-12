@@ -5,3 +5,4 @@ export * from "./command-palette/index.ts";
 export * from "./feed/index.ts";
 export * from "./nav-sidebar/index.ts";
 export * from "./post-card/index.ts";
+export * from "./theme-menu/index.ts";

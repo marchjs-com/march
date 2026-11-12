@@ -48,6 +48,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
 | NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
+| ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
 
 ## BottomNav
 
@@ -229,6 +230,19 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 ```
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
+
+## ThemeMenu
+
+One top-bar menu for the whole look: light / dark / system, the color theme (each drawn by a live swatch of itself) and the accent color. Its sections are the same ones `ThemePicker` and `AccentPicker` show on their own, so an app can use one menu or the separate pickers and they always match. Choices are remembered.
+
+Composed of: Dropdown, ThemeSwatch, OverflowText
+
+```tsx
+<ThemeMenu />
+<ThemeMenu themes={false} accents={["primary", "brand-orange", "brand-blue"]} />
+```
+
+Full page: src/components/composite/theme-menu/docs.md
 
 ## TreeView
 

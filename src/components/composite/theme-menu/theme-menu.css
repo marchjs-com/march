@@ -1,0 +1,5 @@
+/* ThemeMenu: the ThemePicker / AccentPicker sections in one panel (their own CSS comes with theme.css and accent.css). */
+.hm-theme-menu { max-height: min(36rem, calc(100dvh - var(--hm-space-6))); overflow: auto; }
+.hm-theme-menu-heading { margin: var(--hm-space-2) 0 0; padding-inline: var(--hm-space-2); color: var(--hm-faint); font-size: var(--hm-text-2xs);
+  font-weight: var(--hm-weight-semibold); text-transform: uppercase; letter-spacing: .06em; }
+.hm-theme-menu .hm-theme-list { max-height: none; overflow: visible; }

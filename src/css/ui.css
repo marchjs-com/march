@@ -14,6 +14,7 @@
 @import "../components/composite/command-palette/command-palette.css";
 @import "../ui/theme.css";
 @import "../ui/accent.css";
+@import "../components/composite/theme-menu/theme-menu.css";
 @import "../ui/overlay.css";
 @import "../ui/media.css";
 @import "../ui/disclosure.css";

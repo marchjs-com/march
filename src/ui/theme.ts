@@ -120,25 +120,32 @@ export function ThemeSwatch(props: { id: string; class?: ClassProp }): Element {
 }
 
 export interface ThemePickerProps { label?: MaybeFn<string | undefined>; class?: ClassProp; placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end" }
-/** Theme menu: color themes (with live swatches) and light / dark / system. `<ThemePicker />` */
-export function ThemePicker(props: ThemePickerProps = {}): unknown {
+/** The light / dark / system buttons of a theme menu (ThemePicker, ThemeMenu). */
+export function themeModes(): Element {
   const modeBtn = (m: ThemeMode, icon: typeof sun, label: () => string): Element => h("button", {
     type: "button", class: () => cx("hm-theme-mode", mode() === m && "is-active"), "aria-pressed": () => String(mode() === m), onClick: () => theme.set(m),
   }, glyph(icon), h("span", {}, label));
+  return h("div", { class: "hm-theme-modes", role: "group", "aria-label": () => t`Appearance` },
+    modeBtn("light", sun, () => t`Light`), modeBtn("dark", moon, () => t`Dark`), modeBtn("system", monitor, () => t`System`)) as Element;
+}
+
+/** The color theme choices (live swatches) of a theme menu (ThemePicker, ThemeMenu). */
+export function themeList(): Element {
+  return h("div", { class: "hm-theme-list", role: "radiogroup", "aria-label": () => t`Theme` },
+    () => infos().map((x) => untrack(() => h("button", {
+      type: "button", role: "radio", class: () => cx("hm-theme-opt", themeName() === x.id && "is-active"), "aria-checked": () => String(themeName() === x.id),
+      onClick: () => setColorTheme(x.id),
+    }, h(ThemeSwatch, { id: x.id }), h("span", { class: "hm-theme-opt-text" }, // theme names and descriptions are English in code; the locale pack translates them
+      h("span", { class: "hm-theme-opt-name" }, () => t(x.name)),
+      x.description ? h(OverflowText, { class: "hm-theme-opt-desc" }, () => t(x.description ?? "")) : null),
+      h("span", { class: "hm-theme-opt-check", "aria-hidden": "true" }, glyph(check)))))) as Element;
+}
+
+/** Theme menu: color themes (with live swatches) and light / dark / system. `<ThemePicker />` */
+export function ThemePicker(props: ThemePickerProps = {}): unknown {
   return h(Dropdown, {
     icon: paletteIcon, label: () => val(props.label) ?? t`Theme`, placement: props.placement ?? "bottom-end", class: props.class, panelClass: "hm-theme-panel",
-    children: [
-      h("div", { class: "hm-theme-modes", role: "group", "aria-label": () => t`Appearance` },
-        modeBtn("light", sun, () => t`Light`), modeBtn("dark", moon, () => t`Dark`), modeBtn("system", monitor, () => t`System`)),
-      h("div", { class: "hm-theme-list", role: "radiogroup", "aria-label": () => t`Theme` },
-        () => infos().map((x) => untrack(() => h("button", {
-          type: "button", role: "radio", class: () => cx("hm-theme-opt", themeName() === x.id && "is-active"), "aria-checked": () => String(themeName() === x.id),
-          onClick: () => setColorTheme(x.id),
-        }, h(ThemeSwatch, { id: x.id }), h("span", { class: "hm-theme-opt-text" }, // theme names and descriptions are English in code; the locale pack translates them
-          h("span", { class: "hm-theme-opt-name" }, () => t(x.name)),
-          x.description ? h(OverflowText, { class: "hm-theme-opt-desc" }, () => t(x.description ?? "")) : null),
-          h("span", { class: "hm-theme-opt-check", "aria-hidden": "true" }, glyph(check)))))),
-    ],
+    children: [themeModes(), themeList()],
   });
 }
 
