@@ -17,6 +17,11 @@ export interface HydrateOptions {
   timeout?: number;
 }
 
+/** Set on <html> while hydrate() builds the app off-screen: what renders then is already on screen as prerendered HTML,
+ *  so entrance animations (motion reveal) skip it and the swap shows no change. A DOM attribute, not an import:
+ *  the motion code needs no dependency on this chunk. */
+export const HYDRATING_ATTR = "data-hm-hydrating";
+
 const norm = (p: string): string => p.replace(/\/(index\.html)?$/, "") || "/";
 
 /**
@@ -37,10 +42,12 @@ export function hydrate(fn: () => unknown, el: Element, opts: HydrateOptions = {
   el.removeAttribute("data-hm-prerender");
   if (!fresh) { el.replaceChildren(); return render(fn, el); }
   const box = el.ownerDocument.createElement("div"), S = _router.S, end = Date.now() + (opts.timeout ?? 4000);
+  const html = el.ownerDocument.documentElement;
+  html.setAttribute(HYDRATING_ATTR, "");
   const dispose = render(fn, box);
   const ready = opts.ready ?? ((): boolean => !S.router || (!!S.router.view.peek() && !S.pending.peek() && !box.querySelector("[aria-busy=true]")));
   let done = false;
-  const swap = (): void => { if (!done) { done = true; el.replaceChildren(...box.childNodes); } };
+  const swap = (): void => { if (!done) { done = true; el.replaceChildren(...box.childNodes); html.removeAttribute(HYDRATING_ATTR); } };
   const tick = (): void => { if (!done) { if (ready() || Date.now() > end) swap(); else setTimeout(tick, 16); } };
   tick();
   return () => { swap(); dispose(); };

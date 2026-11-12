@@ -33,12 +33,18 @@ export function Particles(props: Props): HTMLCanvasElement {
   let stop = (): void => {};
   let visible = true;
 
+  // sized from getBoundingClientRect and kept by a ResizeObserver: a canvas built before it is on screen (detached,
+  // hidden, or taken over from prerendered HTML) measures 0, so particles are only placed once it has a real size,
+  // spread over the whole area; a later resize scales their positions with it
   const resize = (): void => {
     const r = canvas.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) return;
     dpr = Math.min(2, globalThis.devicePixelRatio || 1);
-    w = Math.max(1, r.width); hgt = Math.max(1, r.height);
+    const ow = w, oh = hgt;
+    w = r.width; hgt = r.height;
     canvas.width = Math.round(w * dpr); canvas.height = Math.round(hgt * dpr);
     if (!parts.length) parts = Array.from({ length: count }, () => ({ x: Math.random() * w, y: Math.random() * hgt, vx: (Math.random() - 0.5) * speed, vy: (Math.random() - 0.5) * speed, r: 1 + Math.random() * 1.8 }));
+    else if (ow > 0 && oh > 0 && (ow !== w || oh !== hgt)) for (const p of parts) { p.x *= w / ow; p.y *= hgt / oh; }
     color = resolveColor(str(props["color"], "var(--hm-primary)"));
     draw();
   };
@@ -63,6 +69,7 @@ export function Particles(props: Props): HTMLCanvasElement {
   };
   const step = (): void => {
     if (!visible || reducedMotion()) return;
+    if (!parts.length) { resize(); stop = frame(step); return; }
     for (const p of parts) {
       if (mouse && props["interactive"]) { const dx = mouse.x - p.x, dy = mouse.y - p.y, d = Math.hypot(dx, dy) || 1; if (d < 140) { p.vx += (dx / d) * 0.02; p.vy += (dy / d) * 0.02; } }
       p.vx *= 0.995; p.vy *= 0.995;
@@ -73,7 +80,14 @@ export function Particles(props: Props): HTMLCanvasElement {
     draw();
     stop = frame(step);
   };
-  const onMove = (e: PointerEvent): void => { const r = canvas.getBoundingClientRect(); mouse = { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  // the canvas usually sits behind content (z-index), so it gets no pointer events of its own: follow the pointer on
+  // the window, relative to the canvas box; touch and pens leave the particles drifting calmly
+  const onMove = (e: PointerEvent): void => {
+    if (e.pointerType && e.pointerType !== "mouse") { mouse = null; return; }
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    mouse = x >= 0 && y >= 0 && x <= r.width && y <= r.height ? { x, y } : null;
+  };
   const onLeave = (): void => { mouse = null; };
   const onVis = (): void => { const was = visible; visible = globalThis.document.visibilityState !== "hidden"; if (visible && !was) step(); };
   queueMicrotask(() => {
@@ -82,7 +96,7 @@ export function Particles(props: Props): HTMLCanvasElement {
   });
   const ro = typeof globalThis.ResizeObserver === "function" ? new ResizeObserver(() => resize()) : null;
   ro?.observe(canvas);
-  const off = listen(canvas, { pointermove: onMove, pointerleave: onLeave });
+  const off = props["interactive"] ? listen(globalThis.window, { pointermove: onMove, blur: onLeave }, { passive: true }) : () => {};
   const offVis = listen(globalThis.document, { visibilitychange: onVis });
   onCleanup(() => { stop(); ro?.disconnect(); off(); offVis(); });
   return canvas;
