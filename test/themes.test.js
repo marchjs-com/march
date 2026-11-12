@@ -93,3 +93,17 @@ test("HADİ theme: the four official colors as tokens, legible semantic mapping,
   assert.equal(T.onBrandFill("#78BE3A"), "#14181F", "white on the brand green is under 2.6:1, so dark text");
   assert.equal(T.onBrandFill("#1D9AD6"), "#FFFFFF");
 });
+
+test("restyleInstantly: a theme, mode or accent change lands with transitions off for one style pass", async () => {
+  const TH = await import("../src/ui/theme.ts");
+  const root = document.documentElement;
+  let seen = null;
+  TH.restyleInstantly(() => { seen = root.hasAttribute("data-hm-restyling"); root.setAttribute("data-theme", "dark"); });
+  assert.equal(seen, true, "the change runs while transitions are off");
+  assert.equal(root.getAttribute("data-theme"), "dark");
+  await new Promise((r) => setTimeout(r, 5));
+  assert.equal(root.hasAttribute("data-hm-restyling"), false, "and they come back right after");
+  const css = (await import("node:fs")).readFileSync(new URL("../src/ui/theme.css", import.meta.url), "utf8");
+  assert.match(css, /\[data-hm-restyling\][^{]*\{\s*transition:\s*none !important/);
+  root.removeAttribute("data-theme");
+});

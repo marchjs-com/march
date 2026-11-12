@@ -11,7 +11,7 @@ import { val, cx, glyph, load, save, type MaybeFn, type ClassProp } from "./util
 import { check } from "../icons/glyphs/check.ts";
 import { droplet } from "../icons/glyphs/droplet.ts";
 import { COLOR_TOKENS, tokenColor, type ColorToken } from "../theme/colors.ts";
-import { ThemeSwatch, colorTheme } from "./theme.ts";
+import { ThemeSwatch, colorTheme, restyleInstantly } from "./theme.ts";
 
 const KEY = "hm.accent";
 /** The current app accent ("primary" = the theme's own). */
@@ -23,7 +23,7 @@ export function setAccent(token: ColorToken | null | undefined): ColorToken {
   accent.set(next);
   save(KEY, next === "primary" ? null : next);
   const html = globalThis.document?.documentElement;
-  if (html) { if (next === "primary") html.removeAttribute("data-hm-accent"); else html.setAttribute("data-hm-accent", next); }
+  if (html) restyleInstantly(() => { if (next === "primary") html.removeAttribute("data-hm-accent"); else html.setAttribute("data-hm-accent", next); });
   return next;
 }
 // apply the remembered choice as soon as the module loads (no flash)

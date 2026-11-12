@@ -42,3 +42,6 @@
 .hm-accent-opt .hm-swatch { flex: none; }
 .hm-accent-name { flex: 1; min-width: 0; }
 .hm-accent-opt .hm-theme-opt-check { opacity: 0; } .hm-accent-opt.is-active .hm-theme-opt-check { opacity: 1; }
+
+/* restyleInstantly(): no element transitions for the one style pass that applies a new theme, mode or accent */
+[data-hm-restyling] *, [data-hm-restyling] *::before, [data-hm-restyling] *::after { transition: none !important; }

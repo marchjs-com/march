@@ -26,10 +26,24 @@ const isMode = (v: unknown): v is ThemeMode => MODES.includes(v as ThemeMode);
 const readTheme = (): ThemeMode => { try { const v = globalThis.localStorage?.getItem(THEME_KEY); return isMode(v) ? v : "system"; } catch { return "system"; } };
 const mode = signal<ThemeMode>(readTheme(), { name: "theme" });
 
+/**
+ * Apply a page-wide restyle (color theme, light/dark, accent) in one step. Without this every element with a color or
+ * shadow transition starts its own transition at once — hundreds on a real page — and the browser stalls for a few
+ * hundred ms. Transitions are off for the one style pass that takes the new values, then back on.
+ */
+export function restyleInstantly(change: () => void): void {
+  const root = globalThis.document?.documentElement;
+  if (!root) { change(); return; }
+  root.setAttribute("data-hm-restyling", "");
+  change();
+  globalThis.getComputedStyle?.(root).getPropertyValue("color"); // the new values land while transitions are off
+  setTimeout(() => root.removeAttribute("data-hm-restyling"), 0);
+}
+
 function apply(v: ThemeMode): void {
   const root = globalThis.document?.documentElement;
   if (!root) return;
-  if (v === "system") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", v);
+  restyleInstantly(() => { if (v === "system") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", v); });
 }
 apply(mode.peek());
 
@@ -98,9 +112,9 @@ export function loadTheme(id: string): Promise<boolean> {
 function applyName(id: string): void {
   const root = globalThis.document?.documentElement;
   if (!root) return;
-  if (id === DEFAULT_THEME) { root.removeAttribute("data-hm-theme"); return; }
+  if (id === DEFAULT_THEME) { restyleInstantly(() => root.removeAttribute("data-hm-theme")); return; }
   // switch only once the stylesheet is in: no flash of half-themed UI
-  void loadTheme(id).then((ok) => { if (themeName.peek() !== id) return; if (ok) root.setAttribute("data-hm-theme", id); else console.warn(`March: theme "${id}" could not be loaded (${hrefOf(id)})`); });
+  void loadTheme(id).then((ok) => { if (themeName.peek() !== id) return; if (ok) restyleInstantly(() => root.setAttribute("data-hm-theme", id)); else console.warn(`March: theme "${id}" could not be loaded (${hrefOf(id)})`); });
 }
 applyName(themeName.peek());
 /** The active color theme id (reactive). */
