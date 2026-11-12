@@ -46,7 +46,17 @@
     "./managers/consent": "./src/managers/consent/index.ts",
     "./managers/consent/ui": "./src/managers/consent/ui.ts",
     "./managers/command": "./src/managers/command/index.ts",
-    "./managers/command/ui": "./src/managers/command/ui.ts"
+    "./managers/command/ui": "./src/managers/command/ui.ts",
+    "./layout": "./src/components/layout/index.ts",
+    "./typography": "./src/components/typography/index.ts",
+    "./actions": "./src/components/actions/index.ts",
+    "./feedback": "./src/components/feedback/index.ts",
+    "./overlays": "./src/components/overlays/index.ts",
+    "./navigation": "./src/components/navigation/index.ts",
+    "./media": "./src/components/media/index.ts",
+    "./social": "./src/components/social/index.ts",
+    "./composite": "./src/components/composite/index.ts",
+    "./landing": "./src/components/landing/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"

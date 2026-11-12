@@ -1,5 +1,6 @@
 // Component metadata (each folder's meta.ts) and playground specs (playground.ts). Read by tools/gen-registry.js
 // (registry, barrel, AI catalogue), `march check component` and the showcase (Playground options).
+import type { CategoryId } from "./categories.ts";
 
 /** API stability. */
 export type Stability = "stable" | "experimental" | "deprecated";
@@ -12,7 +13,11 @@ export interface ComponentMeta {
   since: string;
   /** One line for catalogues. */
   summary: string;
-  /** March components it is built from: a complex component reuses these instead of copying their work. */
+  /** Category (src/components/categories.ts): the folder src/components/<category>/<name>/, the subpath
+   *  hadi-march/<category>, the showcase menu group and the catalogue section. */
+  category: CategoryId;
+  /** March components it is built from: a complex component reuses these instead of copying their work. A
+   *  "composite" component must name at least one, and each must be a registered component. */
   composedOf: readonly string[];
   /** Behaviors (src/behaviors) and shared engines (positioning, collection, field, variants …) it uses. */
   behaviors?: readonly string[];

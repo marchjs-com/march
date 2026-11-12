@@ -14,3 +14,10 @@ test("menu pages, loaders and page files match", () => {
   const files = readdirSync(SRC + "pages").filter((f) => f.endsWith(".tsx")).map((f) => f.replace(/\.tsx$/, ""));
   for (const p of menu) assert.ok(files.includes(p === "/" ? "home" : p.slice(1)), `pages/${p.slice(1) || "home"}.tsx`);
 });
+
+test("every menu group is one of MENU_GROUPS (src/components/categories.ts), in that order", async () => {
+  const { MENU_GROUPS } = await import("../src/components/categories.ts");
+  const groups = paths("nav-meta.ts", /group: "([^"]+)"/g);
+  for (const g of new Set(groups)) assert.ok(MENU_GROUPS.includes(g), `nav-meta.ts group "${g}" is not a menu group: ${MENU_GROUPS.join(", ")}`);
+  assert.match(readFileSync(SRC + "shell-nav.tsx", "utf8"), /groupOrder=\{MENU_GROUPS\}/, "the side menu orders its groups by MENU_GROUPS");
+});

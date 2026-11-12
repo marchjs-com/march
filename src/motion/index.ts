@@ -27,3 +27,5 @@ export {
   type MotionSettings, type MotionExtension, type CssControls, type FrameMonitor, type Canvas2DTarget, type WebGLTarget,
   type StaggerFn, type KeyframesInput, type Phase, type PresetName,
 } from "./engine/index.ts";
+// components of the "motion" category (src/components/motion, generated barrel)
+export * from "../components/motion/index.ts";
