@@ -28,3 +28,21 @@ test("Wizard: the stage list is Steps; a later stage opens only when the ones be
   assert.equal(el.querySelector("[name=a]").value, "x", "values survive");
   assert.equal(el.querySelector(".hm-wizard-progress [role=progressbar]")?.getAttribute("aria-valuenow") ?? "1", "1");
 });
+
+test("Wizard: steps, layout and color are live props (the showcase Playground drives them)", async () => {
+  const { signal, reactive } = await import("../../../core/reactive.ts");
+  const n = signal(2), layout = signal("stack"), color = signal("primary");
+  const all = ["A", "B", "C", "D"].map((t) => ({ title: t, schema: schema({ [t.toLowerCase()]: { type: "text" }, [t.toLowerCase() + "2"]: { type: "text" } }) }));
+  const el = mount(() => h(Wizard, { steps: reactive(() => all.slice(0, n())), layout: reactive(() => layout()), cols: 2, color: reactive(() => color()) }));
+  assert.equal(el.querySelectorAll(".hm-step2").length, 2);
+  type(el.querySelector("[name=a]"), "kept");
+  n.set(4);
+  assert.equal(el.querySelectorAll(".hm-step2").length, 4, "step count follows");
+  assert.equal(el.querySelector("[name=a]").value, "kept", "typed values survive a new step list");
+  assert.ok(el.querySelector(".hm-form-stack"));
+  layout.set("grid");
+  assert.ok(el.querySelector(".hm-form-grid.hm-cols-2"), "layout follows");
+  assert.equal(el.querySelector("[name=a]").value, "kept");
+  color.set("brand-purple");
+  assert.equal(el.querySelector("form.hm-wizard").getAttribute("data-hm-color"), "brand-purple", "color follows");
+});

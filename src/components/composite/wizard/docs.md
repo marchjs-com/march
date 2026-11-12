@@ -13,6 +13,9 @@ stage can be picked once every stage before it passes.
 
 ## Props
 
+`steps`, `layout`, `cols` and `color` are live: pass a getter (or a signal-backed value in JSX) and the wizard follows it.
+A new `steps` list builds the form again from the first step, keeping the values typed so far.
+
 | Prop | Type | Default | |
 |---|---|---|---|
 | `steps` | `WizardStep[]` | — | `title`, `description`, `fields` or `schema`, `validate(values)`, `render(form)` |
