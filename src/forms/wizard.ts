@@ -8,6 +8,7 @@ import { schema as makeSchema, type Schema, type SchemaSpec, type Values } from 
 import { scoped, cx, uid, type ClassProp } from "./util.ts";
 import { useForm, renderFields, FormContext, type FormController, type FieldName, type ValidateOn } from "./form.ts";
 import { colorAttr, type ColorToken } from "../theme/colors.ts";
+import { Progress } from "../ui/progress.ts";
 
 const specOf = (s: Schema): SchemaSpec => Object.fromEntries(s.fields.map((f) => [f.name, f]));
 
@@ -94,8 +95,8 @@ export function Wizard(props: WizardProps): unknown {
       class: "hm-step", "class:hm-step-done": () => i < index(), "class:hm-step-current": () => i === index(), "aria-current": () => (i === index() ? "step" : null),
     }, h("button", { type: "button", class: "hm-step-btn", disabled: () => i > index(), onClick: () => api.go(i) },
       h("span", { class: "hm-step-num", "aria-hidden": "true" }, String(i + 1)), h("span", { class: "hm-step-title" }, s.title ?? t`Step ${i + 1}`))))),
-    h("div", { class: "hm-progress hm-wizard-progress", role: "progressbar", "aria-valuemin": "1", "aria-valuemax": String(steps.length), "aria-valuenow": () => String(index() + 1), "aria-valuetext": () => t`Step ${index() + 1} of ${steps.length}` },
-      h("div", { class: "hm-progress-bar", style: () => ({ width: `${((index() + 1) / steps.length) * 100}%` }) })),
+    // the Progress component (its own CSS travels with it; the old .hm-progress markup was only styled by file.css)
+    h(Progress, { class: "hm-wizard-progress", value: () => index() + 1, max: steps.length, size: "sm", label: () => t`Step ${index() + 1} of ${steps.length}` }),
     () => {
       const i = current();
       const s = steps[i]!;

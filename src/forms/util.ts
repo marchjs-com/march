@@ -19,8 +19,9 @@ export interface FieldCtx {
 /** Context set by <Field>: { id, describedby(), invalid() } — controls pick their id / aria attributes from it. */
 export const FieldContext: { id: symbol; defaultValue: FieldCtx | null } = { id: Symbol("hm.field"), defaultValue: null };
 
-/** A class prop. */
-export type ClassProp = string | false | null | undefined;
+/** A class prop: the same as every ui component (strings, arrays, { name: bool }, accessors). */
+export type { ClassProp } from "../core/util.ts";
+import type { ClassProp } from "../core/util.ts";
 
 /** Props every control understands (id / aria wiring, state, focus handlers). */
 export interface CommonProps {
@@ -232,8 +233,8 @@ export function listNav({ count, active, onPick, onOpen, isOpen = () => true, lo
   };
 }
 
-/** Normalize text for matching (case and accent insensitive). */
-export const fold = (s: unknown): string => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLocaleLowerCase();
+/** Normalize text for matching: the one fold (core/text) — Turkish İ/ı, accents, ß/æ — same as Table, Nav, Palette. */
+export { fold } from "../core/text.ts";
 
 /** Equality for option values (primitives, or objects by JSON). Truthy when equal. */
 export const same = (a: unknown, b: unknown): unknown => a === b || (a && b && typeof a === "object" && JSON.stringify(a) === JSON.stringify(b));

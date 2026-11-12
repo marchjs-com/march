@@ -19,6 +19,7 @@ export function cx(...parts: unknown[]): string {
     if (!p) return;
     if (typeof p === "string") out.push(p);
     else if (Array.isArray(p)) p.forEach(add);
+    else if (typeof p === "function" && !p.length) add((p as () => unknown)()); // a ClassProp accessor
     else if (typeof p === "object") for (const k in p) if ((p as Record<string, unknown>)[k]) out.push(k);
   };
   parts.forEach(add);

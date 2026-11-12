@@ -75,7 +75,7 @@ function runAction<A extends unknown[]>(a: TableAction<A>, args: A): Promise<unk
 function ActionButton<A extends unknown[]>(a: TableAction<A>, args: () => A, onRun: () => unknown, extra: Record<string, unknown> = {}): Element {
   return h("button", {
     type: "button", ...extra,
-    class: ["hm-btn", "hm-table-action", a.opts?.danger && "hm-btn--danger", extra["class"]],
+    class: ["hm-btn", "hm-table-action", a.opts?.danger && "hm-btn-danger", extra["class"]],
     hidden: () => (a.visible ? !a.visible(...args()) : false),
     disabled: () => !!a.disabled?.(...args()),
     "aria-busy": () => (a.busy?.() ? "true" : null),
