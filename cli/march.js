@@ -8,7 +8,7 @@
 //   march i18n [--messages src/i18n]                 report keys missing from translation files
 //   march check [--src src]                          type-check .tsx/.ts including March syntax (pipes, modifiers…)
 // Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html,
-//   budget: { entry, route, fail } (gzip JS bytes; false = off), sw: true (offline service worker), headers: false (no _headers) }.
+//   budget: { entry, route, part, css, routes: { "/x": bytes }, fail } (gzip bytes; false = off), sw: true (offline service worker), headers: false (no _headers) }.
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, cpSync, rmSync, watch } from "node:fs";
 import { join, resolve, relative, dirname, extname, basename, sep } from "node:path";
@@ -19,7 +19,7 @@ import { genRoutes } from "./routes.js";
 import { genApi, mockHandler } from "./openapi.js";
 import { templates } from "./templates.js";
 import { mergeEntry } from "../compiler/merge-entry.js";
-import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs } from "./perf.js";
+import { chunkManifest, sizeReport, printReport, headersFile, swSource, buildVersion, topInputs, routePaths, overText } from "./perf.js";
 
 const cwd = process.cwd();
 const argv = process.argv.slice(2);
@@ -108,11 +108,11 @@ async function build({ dev = false } = {}) {
     if (!dev) {
       if (cfg.headers !== false && !existsSync(join(out, "_headers"))) writeFileSync(join(out, "_headers"), headersFile());
       if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
-      const rep = sizeReport(chunks, out, cfg.budget);
+      const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));
       printReport(rep);
-      writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ entry: rep.rows[0], routes: rep.rows.slice(1).map(({ name, js, css, files }) => ({ name, js, css, files })), budget: rep.budget }, null, 2)}\n`);
+      writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ entry: rep.rows[0], routes: rep.rows.filter((x) => x.kind === "route").map(({ name, key, js, css, limit, over, files }) => ({ name, key, js, css, limit, over, files })), parts: rep.rows.filter((x) => x.kind === "part").map(({ name, js, css, limit, over, files }) => ({ name, js, css, limit, over, files })), budget: rep.budget }, null, 2)}\n`);
       if (rep.over.length) {
-        const msg = `over budget: ${rep.over.map((x) => x.name).join(", ")}`;
+        const msg = `over budget: ${rep.over.map(overText).join("; ")}`;
         if (rep.over.some((x) => x.entry) || flag("--analyze") === true) { console.log("  largest modules in the entry (minified, before gzip) — move heavy ones behind import()/lazy():"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, flag("--analyze") === true ? 40 : 12)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
         if (rep.budget?.fail) { console.error(`\x1b[31m✖\x1b[0m ${msg}`); process.exitCode = 1; } else console.warn(`\x1b[33m!\x1b[0m ${msg}`);
       }

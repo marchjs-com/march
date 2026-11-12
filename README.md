@@ -165,8 +165,10 @@ arrives is cached.
   `sw.js`: `import { registerServiceWorker } from "hadi-march/sw"` caches chunks the first time they arrive, opens
   the app offline on the second visit and deletes the caches of older versions. `register()` is a Trusted Types sink:
   under `require-trusted-types-for 'script'` the CSP must allow the `march-sw` policy.
-- **Budget.** Every build prints the gzip size of the entry and of each route and writes `march-report.json`. With
-  `budget: { entry: 15 * 1024, route: 60 * 1024, fail: true }` an overrun fails the build. When the entry is over,
+- **Budget.** Every build prints the gzip size of the entry, of each route (by its path, e.g. `/data`) and of each lazy
+  part (`lazy()` components, locale packs) and writes `march-report.json`. With
+  `budget: { entry: 15 * 1024, route: 60 * 1024, part: 25 * 1024, routes: { "/data": 80 * 1024 }, css: 40 * 1024, fail: true }`
+  an overrun fails the build and names the row (`/data JS 82.3 KB > 80.0 KB`). When the entry is over,
   the build lists its largest modules (`march build --analyze` always does). The goal is under 15 KB of entry JS and an
   LCP under 1 s on slow 4G.
 - **Icons** are one module each (`src/icons/glyphs/`, generated from `set.ts`). An icon gallery reads

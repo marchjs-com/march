@@ -6,7 +6,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { createHash } from "node:crypto";
-import { relative, resolve, sep } from "node:path";
+import { dirname, relative, resolve, sep } from "node:path";
 
 const posix = (p) => p.split(sep).join("/");
 
@@ -42,33 +42,72 @@ export function chunkManifest(meta, { cwd, outdir, entry }) {
 const gz = (file) => (existsSync(file) ? gzipSync(readFileSync(file)).length : 0);
 
 /**
+ * Route paths of lazy pages, read from the app's own sources: `"/x": () => import("./pages/x.tsx")` and
+ * `"/x": { load: () => import(…) }` (what `march gen routes` writes). Returns manifest key → route path.
+ * @param {import("esbuild").Metafile} meta
+ * @param {string} cwd
+ * @param {string[]} keys  manifest keys (dynamic import sources, relative to cwd)
+ */
+export function routePaths(meta, cwd, keys) {
+  const RE = /["'`](\/[^"'`]*)["'`]\s*:\s*(?:\{\s*load\s*:\s*)?\(\)\s*=>\s*import\(\s*["'`]([^"'`]+)["'`]\s*\)/g;
+  const strip = (k) => k.replace(/\.[cm]?[jt]sx?$/, "");
+  const byBase = new Map(keys.map((k) => [strip(k), k]));
+  const out = {};
+  for (const inp of Object.keys(meta.inputs)) {
+    if (inp.includes("node_modules") || inp.startsWith("..") || !/\.[cm]?[jt]sx?$/.test(inp)) continue;
+    const file = resolve(cwd, inp);
+    if (!existsSync(file)) continue;
+    for (const [, path, spec] of readFileSync(file, "utf8").matchAll(RE)) {
+      if (!spec.startsWith(".")) continue;
+      const key = byBase.get(strip(posix(relative(cwd, resolve(dirname(file), spec)))));
+      if (key && !(key in out)) out[key] = path;
+    }
+  }
+  return out;
+}
+
+/**
+ * One row per download unit: the entry, each route (named by its path when known) and each lazy part (a lazy()
+ * component, a lazily loaded shell piece, a locale pack). Budgets are gzip bytes of JavaScript; CSS is reported, and
+ * checked too when `css` is set.
  * @param {{ manifest: Record<string,string[]>, entryFiles: string[] }} m
  * @param {string} outdir
- * @param {{ entry?: number, route?: number, fail?: boolean } | false | undefined} budget  gzip bytes (JS + CSS)
+ * @param {{ entry?: number, route?: number, part?: number, css?: number, routes?: Record<string, number>, fail?: boolean } | false | undefined} budget
+ * @param {Record<string, string>} [routes]  manifest key → route path (routePaths())
  */
-export function sizeReport(m, outdir, budget) {
+export function sizeReport(m, outdir, budget, routes = {}) {
   const size = (files) => {
     let js = 0, css = 0;
     for (const f of files) { const n = gz(resolve(outdir, f)); if (f.endsWith(".css")) css += n; else js += n; }
     return { js, css };
   };
-  const rows = [{ name: "(entry)", files: m.entryFiles, ...size(m.entryFiles), entry: true }];
-  for (const [k, files] of Object.entries(m.manifest)) rows.push({ name: k, files, ...size(files), entry: false });
+  const rows = [{ name: "(entry)", key: null, kind: "entry", files: m.entryFiles, ...size(m.entryFiles), entry: true }];
+  const rest = Object.entries(m.manifest).map(([k, files]) => ({ name: routes[k] ?? k, key: k, kind: routes[k] ? "route" : "part", files, ...size(files), entry: false }));
+  // routes by path, then the lazy parts by name
+  rest.sort((a, b) => (a.kind === b.kind ? a.name.localeCompare(b.name) : a.kind === "route" ? -1 : 1));
+  rows.push(...rest);
   const b = budget === false ? null : { entry: 15 * 1024, route: 60 * 1024, fail: false, ...(budget ?? {}) };
   const over = [];
   for (const r of rows) {
-    const limit = b ? (r.entry ? b.entry : b.route) : Infinity;
-    r.over = r.js > limit; // the budget is for JavaScript (CSS is reported)
+    r.limit = !b ? Infinity : r.kind === "entry" ? b.entry : r.kind === "route" ? b.routes?.[r.name] ?? b.route : b.part ?? b.route;
+    r.cssLimit = b?.css ?? Infinity;
+    r.over = r.js > r.limit || r.css > r.cssLimit;
     if (r.over) over.push(r);
   }
   return { rows, over, budget: b };
 }
 
+const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
+/** Why a row is over budget: "/data JS 62.1 KB > 60.0 KB". */
+export const overText = (r) => [r.js > r.limit ? `${r.name} JS ${kb(r.js)} > ${kb(r.limit)}` : "", r.css > r.cssLimit ? `${r.name} CSS ${kb(r.css)} > ${kb(r.cssLimit)}` : ""].filter(Boolean).join(", ");
+
 export function printReport(rep, log = console.log) {
-  const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
-  log("  size (gzip)                           JS        CSS");
-  for (const r of rep.rows) log(`  ${r.over ? "\x1b[33m!" : " "} ${r.name.padEnd(36).slice(0, 36)} ${kb(r.js).padStart(8)}  ${kb(r.css).padStart(8)}${r.over ? "  over budget\x1b[0m" : ""}`);
-  if (rep.budget) log(`  budget: entry JS ≤ ${kb(rep.budget.entry)}, route JS ≤ ${kb(rep.budget.route)} (march.config.js › budget)`);
+  log("  size (gzip)                                  kind      JS        CSS     budget");
+  for (const r of rep.rows) {
+    const lim = Number.isFinite(r.limit) ? kb(r.limit) : "—";
+    log(`  ${r.over ? "\x1b[33m!" : " "} ${r.name.padEnd(42).slice(0, 42)} ${r.kind.padEnd(6)} ${kb(r.js).padStart(8)}  ${kb(r.css).padStart(8)}  ${lim.padStart(8)}${r.over ? "  over budget\x1b[0m" : ""}`);
+  }
+  if (rep.budget) log(`  budget: entry JS ≤ ${kb(rep.budget.entry)}, route JS ≤ ${kb(rep.budget.route)}, part JS ≤ ${kb(rep.budget.part ?? rep.budget.route)}${rep.budget.css ? `, CSS ≤ ${kb(rep.budget.css)}` : ""}${rep.budget.routes ? ` (+${Object.keys(rep.budget.routes).length} per-route)` : ""} (march.config.js › budget)`);
 }
 
 /** `_headers` for static hosts: hashed files are cached forever, the HTML and the service worker are revalidated. */

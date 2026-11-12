@@ -16,7 +16,8 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
   are pruned, so pages' code no longer rides along with the entry. `display.ts` is split per component; icons are one
   module each (`glyphs/`, generated) plus `hadi-march/icons/catalog` for galleries; the command palette view loads on
   first open. Showcase entry: 70.9 → 42.6 KB gzip (sum of files).
-- `march build`: per-route gzip report + `march-report.json`, `budget` (warn / `fail`), largest entry modules
+- `march build`: per-route gzip report (rows named by route path; entry / route / part) + `march-report.json`,
+  `budget` (`entry`, `route`, `part`, per-route `routes`, optional `css`; warn / `fail`), largest entry modules
   (`--analyze`), `_headers` (immutable assets), optional `sw.js` (`sw: true`) with `hadi-march/sw`.
 
 ### Fixed (later in 0.1.0)

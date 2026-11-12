@@ -142,7 +142,7 @@ Overlays never take input; put content after them. `front` only for foreground e
 - Import named exports (`import { Card } from "hadi-march/ui"`), never `import * as` from a March module. Use
   `hadi-march/icons/catalog` for icon galleries.
 - Leave `<Link>` prefetch on (default hover). Do not prefetch everything by hand.
-- Set `budget` in `march.config.js` for production apps; turn on `sw: true` when offline use matters.
+- Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, fail: true }`); turn on `sw: true` when offline use matters.
 
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.

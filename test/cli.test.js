@@ -113,3 +113,22 @@ test("installed under node_modules: register runs .tsx/.ts, march build bundles 
     assert.ok(existsSync(join(pkg, "types", "jsx.d.ts")), "types/ is part of the package files");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("march build: per-route size report by path; a route over its budget fails the build and is named", () => {
+  const dir = mkdtempSync(join(tmpdir(), "march-budget-"));
+  try {
+    mkdirSync(join(dir, "src/pages"), { recursive: true });
+    writeFileSync(join(dir, "src/pages/index.jsx"), "export default function Home() { return <p>home</p> }\n");
+    writeFileSync(join(dir, "src/pages/big.jsx"), `const rows = ${JSON.stringify(Array.from({ length: 3000 }, (_, i) => `row ${i} ${Math.random().toString(36)}`))}\nexport default function Big() { return <ul>{rows.map((r) => <li>{r}</li>)}</ul> }\n`);
+    writeFileSync(join(dir, "src/main.jsx"), "import routes from './routes.gen.js'\ncreateRouter({ routes })\nrender(() => <Router />, document.getElementById('app'))\n");
+    writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
+    writeFileSync(join(dir, "march.config.js"), "export default { budget: { entry: 64 * 1024, route: 64 * 1024, routes: { \"/big\": 8 * 1024 }, fail: true } }\n");
+    let err = null;
+    try { execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" }); } catch (e) { err = e; }
+    assert.ok(err && err.status === 1, "the build exits with 1");
+    assert.match(String(err.stderr), /over budget: \/big JS [\d.]+ KB > 8\.0 KB/);
+    const rep = JSON.parse(readFileSync(join(dir, "dist/march-report.json"), "utf8"));
+    assert.deepEqual(rep.routes.map((r) => [r.name, r.over]).sort(), [["/", false], ["/big", true]]);
+    assert.equal(rep.routes.find((r) => r.name === "/big").limit, 8 * 1024);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
