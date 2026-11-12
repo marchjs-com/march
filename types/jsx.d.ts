@@ -26,6 +26,12 @@ interface MarchDomAttributes {
   [key: `use:${string}`]: unknown;
   [key: `bind:${string}`]: unknown;
   [key: `transition:${string}`]: unknown;
+  /** ViewportManager flag: shown while it holds (`={false}`: while it does not). */
+  [key: `when:${string}`]: Reactive<boolean> | undefined;
+  /** ConsentManager category: shown while granted (`={false}`: while refused). */
+  [key: `consent:${string}`]: Reactive<boolean> | undefined;
+  /** CommandManager id: click runs it; disabled / hidden / aria-busy follow it. Value: true or the arguments. */
+  [key: `command:${string}`]: unknown;
   [key: `data-${string}`]: unknown;
   [key: `aria-${string}`]: unknown;
   [attr: string]: unknown;

@@ -39,3 +39,19 @@ body
 Named targets (`PortalTarget`) are a registry of signals: a `Portal to` follows its target, moves in when it appears,
 waits (detached, alive) when it goes. The showcase shell has `title`, `toolbar` (top bar, lazy part), `aside` and
 `bottom-action` targets. Later: the registry joins the messaging layer (component registry, channels).
+
+## Managers: one instance, lazy, configured globally
+
+```
+src/managers/manager.ts          defineManager(name, create, defaults) → get / configure / dispose / alive
+src/managers/<name>/index.ts     the manager (small; what other code gates on)
+src/managers/<name>/ui.ts        its UI, a separate lazy module (banner, panel, buttons)
+```
+
+- `get()` creates the instance on first use, in a root of its own (it outlives the component that asked first) and
+  tracks a version signal: after `configure()` a binding that reads through the manager moves to the new instance.
+- Namespaced props (`when:`, `consent:`, `command:`) go through `registerNamespace(ns, fn)` in `dom/h.ts`; a manager
+  registers its namespace when its module loads (listed in `sideEffects`).
+- **Events.** Every manager reports through `emit(manager, type, detail)` in `manager.ts`, which hands the event to one
+  sink set with `setManagerEmit(fn)`. The messaging layer connects there: it publishes each event to a `managers`
+  channel (topic `<manager>:<type>`); manager code does not change.

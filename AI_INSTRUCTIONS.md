@@ -276,3 +276,34 @@ move onto it: no private rAF loops or timers.
 - Project components are auto-imported by file name (named or default export).
 - Components created outside `render()` (e.g. in an event handler) get their own root — prefer `openDialog()` for UI
   created on demand so it is disposed when closed.
+
+## 17. Managers (hadi-march/managers/*)
+
+One instance each, started on first use, `configureX()` for global options, `disposeX()` to shut down. Import each
+from its own path. Full reference: `docs/managers.md`.
+
+**ViewportManager** — never call `matchMedia` or add resize / online / visibility listeners yourself:
+```tsx
+import { viewport } from "hadi-march/managers/viewport";
+const vp = viewport();  vp.mobile()  vp.up("lg")  vp.dark()  vp.reducedMotion()  vp.online()  vp.visible()  vp.safeArea()
+<aside when:desktop>…</aside>   <video when:reducedData={false} />   vp.container(el).name()   // container size class
+```
+
+**ConsentManager** — analytics, log shipping and third-party code run only behind consent:
+```tsx
+import { consent, configureConsent } from "hadi-march/managers/consent";
+configureConsent({ version: "2026-11", policyHref: "/privacy" });
+const track = consent.gate("analytics", send);   consent.whenGranted("thirdParty", () => loadMap());
+// lazy UI: <ConsentBanner text={…app's legal text…} />, openConsentPreferences(), <ConsentGate category="thirdParty">
+```
+
+**CommandManager** — register a user command once; palette, menus, toolbars and buttons read the registry:
+```tsx
+import { command } from "hadi-march/managers/command";
+import { commandItems, CommandButton } from "hadi-march/managers/command/ui";
+command({ id: "doc.save", title: () => t`Save`, shortcut: "mod+s", group: "File", can: "docs.edit", when: () => $dirty,
+  run: async ({ signal }, doc) => api.save(doc, { signal }) });
+<button command:doc.save>Save</button>   <Menu items={commandItems({ group: "File" })} />   <CommandButton command="doc.save" />
+```
+`can` hides, `when` disables, `busy()` follows a running call, `cancel()` aborts it. Do not duplicate a command as a
+separate button handler. Manager events go through `setManagerEmit`.
