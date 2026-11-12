@@ -1,27 +1,20 @@
 // Motion environment: reduced-motion preference (live), frame scheduling, element style helpers (CSSOM only — CSP safe).
-import { signal } from "../core/reactive.ts";
-
-type Accessor<T> = (() => T) & { peek(): T };
-
-const mq = typeof globalThis.matchMedia === "function" ? globalThis.matchMedia("(prefers-reduced-motion: reduce)") : null;
-const reduced = signal<boolean>(mq?.matches ?? false) as Accessor<boolean> & { set(v: boolean): boolean };
-mq?.addEventListener?.("change", (e: MediaQueryListEvent) => reduced.set(e.matches));
+// Frames and time come from the engine's one clock (engine/clock.ts): global speed, pause and slow motion apply to
+// everything that schedules through here (springs, tweens, marquee, fx particles, scroll effects).
+import { reducedMotion as reducedPref, setReducedOverride } from "./engine/prefs.ts";
+import { nextFrame, now as clockNow } from "./engine/clock.ts";
 
 /** True when the user asked for reduced motion (live). Animations shorten to a near-instant fade or skip. */
-export const reducedMotion = (): boolean => reduced();
-/** Force reduced motion on/off (tests, user setting). */
-export function setReducedMotion(on: boolean): void { reduced.set(on); }
+export const reducedMotion = (): boolean => reducedPref();
+/** Force reduced motion on/off (tests, user setting); null follows the system again. */
+export function setReducedMotion(on: boolean | null): void { setReducedOverride(on); }
 
-export const now = (): number => (globalThis.performance?.now?.() ?? Date.now());
+/** Engine clock time (ms): scaled by the global speed, frozen while motion is paused. */
+export const now = (): number => clockNow();
 
-/** requestAnimationFrame with a timer fallback (node tests). Returns a cancel function. */
+/** Run `fn(time)` on the next frame of the shared clock. Returns a cancel function. */
 export function frame(fn: (t: number) => void): () => void {
-  if (typeof globalThis.requestAnimationFrame === "function") {
-    const id = globalThis.requestAnimationFrame(fn);
-    return () => globalThis.cancelAnimationFrame?.(id);
-  }
-  const id = setTimeout(() => fn(now()), 16);
-  return () => clearTimeout(id);
+  return nextFrame((t) => fn(t));
 }
 
 /** Set CSS properties through CSSOM (never the style attribute string). */

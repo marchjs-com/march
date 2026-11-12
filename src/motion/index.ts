@@ -2,6 +2,7 @@
 // what you use. To enable the extra `transition:` names (blur, fly + WAAPI fade/slide/scale) and `<For animate>` FLIP,
 // call installTransitions() / installFlip() once, or import "hadi-march/motion/install" (does both).
 // Everything honors prefers-reduced-motion and uses only transform/opacity via WAAPI or CSSOM.
+// All of it runs on ONE engine (./engine): keyframes, timelines, easing, drivers, one clock, global control.
 
 export { animate, stagger, type AnimateOptions, type Controls, type Frames } from "./animate.ts";
 export { defineTransition, installTransitions, type TransitionOptions } from "./transitions.ts";
@@ -13,3 +14,16 @@ export { pageTransitions, type PageTransitionOptions } from "./page.ts";
 export { drag, swipe, press, magnet, tilt, type DragOptions } from "./gestures.ts";
 export { reducedMotion, setReducedMotion, frame } from "./env.ts";
 export * as easing from "./easing.ts";
+
+// the engine (new API)
+export {
+  keyframes, preset, getKeyframes, keyframeNames, keyframesCss, Playback, Effect,
+  ease, defineEasing, easingNames, steps, springEase, bounceEase, toLinear, supportsLinear,
+  normalize, Track, parseColor, mixColor,
+  defineDriver, driverFor, cssVars, registerVar, canvas2d, webgl, DRIVER, COMPOSITOR,
+  animateValue, track, onFrame, nextFrame, measure, mutate, yieldToMain,
+  motion, defineMotion, viewTransition, MOTION_DEFAULTS, cssAnimations, frameMonitor, installPresets, PRESETS,
+  type Timing, type KeyframesDef, type Ease, type EaseInput, type Driver, type Tracked, type TrackOptions,
+  type MotionSettings, type MotionExtension, type CssControls, type FrameMonitor, type Canvas2DTarget, type WebGLTarget,
+  type StaggerFn, type KeyframesInput, type Phase, type PresetName,
+} from "./engine/index.ts";
