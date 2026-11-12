@@ -1,0 +1,8 @@
+/* HADI March — TypingIndicator. 5px dots in the local accent (brand-blue by default). */
+.hm-typing { display: inline-flex; align-items: center; gap: .5rem; min-width: 0; }
+.hm-typing.is-off { display: none; }
+.hm-typing-dots { display: inline-flex; align-items: center; gap: 4px; }
+.hm-typing-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--hm-accent); opacity: .45; }
+.hm-typing-bubble .hm-typing-dots { padding: .75rem .875rem; border-radius: 1.25rem 1.25rem 1.25rem .375rem; background: var(--hm-surface); border: 1px solid var(--hm-border-subtle, var(--hm-border)); }
+:dir(rtl) .hm-typing-bubble .hm-typing-dots { border-radius: 1.25rem 1.25rem .375rem 1.25rem; }
+.hm-typing-text { font-size: var(--hm-text-xs); font-weight: 600; font-style: italic; color: var(--hm-text-3, var(--hm-muted)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

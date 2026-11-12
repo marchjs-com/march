@@ -54,3 +54,11 @@
   .hm-shimmer, .hm-float { animation: none; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
 }
+
+/* stateMorph (hadi-march/motion micro.ts): a button between states; colours from the theme tokens */
+[data-hm-state] { color: transparent !important; overflow: hidden; white-space: nowrap; }
+[data-hm-state] > :not(.hm-state-icon):not(.hm-sr-only) { visibility: hidden; }
+[data-hm-state="success"] { background: var(--hm-success) !important; border-color: var(--hm-success) !important; --hm-state-fg: var(--hm-on-success-fill, var(--hm-surface)); }
+[data-hm-state="error"] { background: var(--hm-danger) !important; border-color: var(--hm-danger) !important; --hm-state-fg: var(--hm-on-danger-fill, var(--hm-surface)); }
+.hm-state-icon { position: absolute; inset: 0; margin: auto; inline-size: 1.25em; block-size: 1.25em; fill: none; stroke: var(--hm-state-fg, var(--hm-on-primary-fill, var(--hm-surface))); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.hm-state-icon:empty { display: none; }

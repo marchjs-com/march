@@ -127,9 +127,10 @@ export function swipe(el: Element, raw?: unknown): () => void {
   return listen(h, { pointerdown: down, pointerup: up });
 }
 
-/** Action: subtle press-down scale. */
-export function press(el: Element, raw?: Opts<number>): () => void {
-  const scale = typeof raw === "number" ? raw : 0.97;
+/** Action: subtle press-down scale; `{ scale, easing }` for a springy release (`easing: "spring-wobbly"`). */
+export function press(el: Element, raw?: Opts<number | { scale?: number; easing?: string }>): () => void {
+  const o = typeof raw === "number" ? { scale: raw } : raw ?? {};
+  const scale = o.scale ?? 0.97, easing = o.easing ?? "easeOutBack";
   const h = el as HTMLElement;
   // the pressed scale is a filled animation held only while pressed; release plays unfilled, so nothing outlives the press
   const held: Slot = { a: null }, release: Slot = { a: null };
@@ -142,7 +143,8 @@ export function press(el: Element, raw?: Opts<number>): () => void {
   const up = (): void => {
     if (!pressed) return;
     pressed = false; stop(held);
-    release.a = animate(el, [{ transform: `scale(${scale})` }, { transform: "none" }], { duration: 160, easing: "easeOutBack", fill: "none" });
+    // a spring brings its own natural duration
+    release.a = animate(el, [{ transform: `scale(${scale})` }, { transform: "none" }], { ...(easing.startsWith("spring") ? {} : { duration: 160 }), easing, fill: "none" });
   };
   const off = listen(h, { pointerdown: down, pointerup: up, pointerleave: up, pointercancel: up });
   return () => { stop(held); stop(release); off(); };

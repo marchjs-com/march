@@ -9,11 +9,12 @@
 //   package.json                         "exports" has "./<category>" for every category
 //   node tools/gen-registry.js          write
 //   node tools/gen-registry.js --check  fail (exit 1) when a written file is out of date or a folder is malformed
-import { readdirSync, readFileSync, writeFileSync, existsSync, statSync, mkdirSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync, existsSync, statSync, mkdirSync, unlinkSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
+const DIR = join(ROOT, "src/components");
 const REQUIRED = ["index.ts", "docs.md", "demo.tsx", "playground.ts", "meta.ts"];
 const isDir = (p) => existsSync(p) && statSync(p).isDirectory();
 
@@ -73,11 +74,36 @@ export async function generate(root = ROOT) {
     files[`src/components/${cat.id}/index.ts`] = HEAD + `// ${cat.title}: ${cat.desc} Import: hadi-march/${cat.id}\n` +
       (own.length ? own.map((c) => `export * from "./${c.name}/index.ts";\n`).join("") : "export {};\n");
   }
+  // Demos shown on the same showcase page load together, up to GROUP per lazy module (<page>[-n].demos.gen.ts): one
+  // small chunk per demo would fall under the 10 KB chunk floor and fold into the registry's parent group, which every
+  // page with a component card loads; one module for a page with many cards would pass the lazy part budget. Members
+  // are in folder-name order, so related folders (chat-…, story-…) usually share a module. A page with a single
+  // component card keeps its direct import.
+  const GROUP = 4;
+  const pages = new Map();
+  for (const c of list) if (c.meta?.showcase) pages.set(c.meta.showcase, [...(pages.get(c.meta.showcase) ?? []), c]);
+  const groupOf = new Map();
+  for (const [page, all] of pages) {
+    if (all.length < 2) continue;
+    const base = page.replace(/^\//, "").replace(/[^\w-]+/g, "-") || "home";
+    // even slices (4 4 3 3, not 4 4 4 2): a small last module would fall under the chunk floor again
+    const slices = Math.ceil(all.length / GROUP);
+    for (let s = 0; s < slices; s++) {
+      const members = all.slice(Math.floor((s * all.length) / slices), Math.floor(((s + 1) * all.length) / slices));
+      // *.demos.gen.ts: the showcase config lets these stay small lazy files (chunks.allow), never joining the registry
+      const file = `${base}${slices > 1 ? `-${s + 1}` : ""}.demos.gen.ts`;
+      members.forEach((c, j) => groupOf.set(c.folder, { file, j }));
+      files[`src/components/${file}`] = HEAD.replace("src/components/<category>/<name>/", `the component folders shown on ${page}`) +
+        members.map((c, j) => `import * as d${j} from "./${c.folder}/demo.tsx";\nimport * as p${j} from "./${c.folder}/playground.ts";\n`).join("") +
+        `export { ${members.map((_, j) => `d${j}, p${j}`).join(", ")} };\n`;
+    }
+  }
+  const loader = (c, kind, file) => { const g = groupOf.get(c.folder); return g ? `() => import("./${g.file}").then((m) => m.${kind}${g.j})` : `() => import("./${c.folder}/${file}")`; };
   files["src/components/registry.gen.ts"] = HEAD + `import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";\n` +
     list.map((c, i) => `import m${i} from "./${c.folder}/meta.ts";\n`).join("") +
     `\nexport interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }\n` +
     `/** Every component folder: meta, Code-tab snippet and lazy demo / playground loaders. */\nexport const registry: readonly RegistryEntry[] = [\n` +
-    list.map((c, i) => `  { folder: "${c.folder}", meta: m${i}, code: ${JSON.stringify(firstCode(c.docs))}, demo: () => import("./${c.folder}/demo.tsx"), playground: () => import("./${c.folder}/playground.ts") },\n`).join("") + `];\n`;
+    list.map((c, i) => `  { folder: "${c.folder}", meta: m${i}, code: ${JSON.stringify(firstCode(c.docs))}, demo: ${loader(c, "d", "demo.tsx")}, playground: ${loader(c, "p", "playground.ts")} },\n`).join("") + `];\n`;
 
   // catalogue by category (menu order), "composed of" links to the parts
   const byName = new Map(list.map((c) => [nameOf(c), c]));
@@ -153,6 +179,11 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     if (now === text) continue;
     if (check) { console.error(`✖ ${rel} is out of date: run node tools/gen-registry.js`); stale++; }
     else { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, text); console.log(`✔ ${rel}`); }
+  }
+  // demo modules of an earlier slicing (fewer cards, a page renamed) go away
+  for (const f of readdirSync(DIR).filter((f) => f.endsWith(".demos.gen.ts") && !files[`src/components/${f}`])) {
+    if (check) { console.error(`✖ src/components/${f} is stale: run node tools/gen-registry.js`); stale++; }
+    else { unlinkSync(join(DIR, f)); console.log(`✖ removed src/components/${f}`); }
   }
   for (const p of problems) console.error(`✖ ${p}`);
   if (stale || problems.length) process.exit(1);

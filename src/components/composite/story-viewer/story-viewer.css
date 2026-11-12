@@ -1,0 +1,44 @@
+/* HADI March — StoryViewer. A dark stage in every theme (media chrome tokens), the story at 9:16 in the middle. */
+.hm-overlay:has(> .hm-story-dlg) { background: color-mix(in srgb, var(--hm-scrim) 92%, transparent); padding: 0; }
+.hm-dialog.hm-story-dlg { max-width: none; width: 100%; height: 100%; max-height: none; margin: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: hidden; }
+.hm-story-dlg .hm-dialog-body { padding: 0; height: 100%; overflow: hidden; }
+.hm-story { --hm-story-dim: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--hm-space-2); height: 100%;
+  padding: var(--hm-space-2); box-sizing: border-box; color: var(--hm-on-scrim); background: color-mix(in srgb, var(--hm-scrim) calc(var(--hm-story-dim) * 100%), transparent); user-select: none; }
+.hm-story-stage { position: relative; width: min(100%, calc((100dvh - 5.5rem) * 9 / 16)); aspect-ratio: 9 / 16; max-height: calc(100% - 3.75rem); border-radius: 1rem; overflow: hidden;
+  background: color-mix(in srgb, var(--hm-on-scrim) 8%, var(--hm-scrim)); touch-action: none; cursor: pointer; transform-origin: 50% 30%; }
+.hm-story-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.hm-story-scrim { position: absolute; inset-inline: 0; inset-block-start: 0; height: 8rem; pointer-events: none;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--hm-scrim) 62%, transparent), color-mix(in srgb, var(--hm-scrim) 30%, transparent) 55%, transparent); }
+.hm-story-top { position: absolute; inset-inline: 0; inset-block-start: 0; display: flex; flex-direction: column; gap: .625rem; padding: .625rem .625rem 0; }
+.hm-story-head { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.hm-story-who { display: flex; align-items: baseline; gap: .5rem; flex: 1; min-width: 0; font-size: var(--hm-text-sm); }
+.hm-story-who b { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-story-who span { flex: none; font-size: var(--hm-text-xs); opacity: .85; }
+.hm-story-btn { display: inline-grid; place-items: center; flex: none; width: 2.25rem; height: 2.25rem; padding: 0; border: 0; border-radius: 50%; background: none; color: inherit; cursor: pointer; }
+.hm-story-btn:hover { background: color-mix(in srgb, var(--hm-on-scrim) 14%, transparent); }
+.hm-story-btn:focus-visible, .hm-story-nav:focus-visible { outline: 2px solid var(--hm-on-scrim); outline-offset: 1px; }
+.hm-story-btn .hm-svg { width: 1.25rem; height: 1.25rem; }
+.hm-story-pp { position: relative; display: inline-flex; gap: 4px; width: 14px; height: 14px; justify-content: center; }
+.hm-story-pp i { width: 4px; height: 14px; border-radius: 1.5px; background: currentColor; transition: transform var(--hm-dur) var(--hm-ease); }
+/* play: the two bars fold into a triangle-ish arrow */
+.hm-story-pp.is-play { gap: 0; } .hm-story-pp.is-play i:first-child { width: 0; height: 0; border-radius: 0; background: none; border-block: 7px solid transparent; border-inline-start: 12px solid currentColor; }
+.hm-story-pp.is-play i:last-child { display: none; }
+.hm-story-caption { position: absolute; inset-inline: 0; inset-block-end: 0; margin: 0; padding: 2.5rem 1rem 1rem; font-size: var(--hm-text-md); font-weight: 600; line-height: 1.4; pointer-events: none;
+  background: linear-gradient(to top, color-mix(in srgb, var(--hm-scrim) 60%, transparent), transparent); }
+.hm-story-nav { position: absolute; inset-block-start: 50%; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; margin-block-start: -1.125rem; padding: 0; border: 0; border-radius: 50%;
+  background: color-mix(in srgb, var(--hm-on-scrim) 82%, transparent); color: var(--hm-scrim); cursor: pointer; opacity: 0; transition: opacity var(--hm-dur) var(--hm-ease); }
+.hm-story-prev { inset-inline-start: .5rem; } .hm-story-next { inset-inline-end: .5rem; }
+:dir(rtl) .hm-story-nav .hm-svg { transform: scaleX(-1); }
+.hm-story-stage:hover .hm-story-nav, .hm-story-nav:focus-visible { opacity: 1; }
+@media (hover: none) { .hm-story-nav:not(:focus-visible) { opacity: 0; pointer-events: none; } }
+.hm-story-nav .hm-svg { width: 1.25rem; height: 1.25rem; }
+.hm-story.is-paused .hm-story-top { opacity: .55; transition: opacity var(--hm-dur) var(--hm-ease); }
+.hm-story-bar { display: flex; align-items: center; gap: .375rem; width: min(100%, calc((100dvh - 5.5rem) * 9 / 16)); }
+.hm-story-input { flex: 1; min-width: 0; height: 2.75rem; padding: 0 1.125rem; border-radius: var(--hm-radius-full); border: 1px solid color-mix(in srgb, var(--hm-on-scrim) 54%, transparent);
+  background: color-mix(in srgb, var(--hm-on-scrim) 12%, transparent); color: var(--hm-on-scrim); font: inherit; font-size: var(--hm-text-md); }
+.hm-story-input::placeholder { color: color-mix(in srgb, var(--hm-on-scrim) 70%, transparent); }
+.hm-story-input:focus { outline: none; border-color: var(--hm-on-scrim); }
+.hm-story-bar .hm-like { color: var(--hm-on-scrim); }
+.hm-story-bar .hm-like.is-liked { color: var(--hm-accent); }
+.hm-story-sent { position: absolute; inset-block-end: 4.5rem; inset-inline: 0; margin-inline: auto; width: max-content; padding: .375rem .875rem; border-radius: var(--hm-radius-full);
+  background: var(--hm-on-scrim); color: var(--hm-scrim); font-size: var(--hm-text-sm); font-weight: 800; }

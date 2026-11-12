@@ -1,0 +1,35 @@
+/* HADI March — ProfileHeader. Cover with a bottom dim, an 88px StoryRing overlapping it, stats as soft tiles. */
+.hm-prof { display: flex; flex-direction: column; min-width: 0; background: var(--hm-surface); border-radius: var(--hm-radius-4); overflow: hidden; border: 1px solid var(--hm-border-subtle, var(--hm-border)); }
+.hm-prof-cover { position: relative; height: 10.5rem; overflow: hidden; background: var(--hm-surface-2); }
+.hm-prof-cover-sm .hm-prof-cover { height: 7.5rem; } .hm-prof-cover-lg .hm-prof-cover { height: 13.5rem; }
+.hm-prof-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hm-prof-cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 45%, color-mix(in srgb, var(--hm-scrim) 35%, transparent)); }
+.hm-prof-cover-art { position: absolute; inset: 0; background: var(--hm-brand-blue-soft, var(--hm-surface-2)); }
+.hm-prof-cover-art i { position: absolute; width: 60%; aspect-ratio: 1; border-radius: 50%; filter: blur(32px); opacity: .55; }
+.hm-prof-cover-art i:nth-child(1) { inset-inline-start: -10%; inset-block-start: -40%; background: var(--hm-brand-orange, var(--hm-cat-1)); }
+.hm-prof-cover-art i:nth-child(2) { inset-inline-start: 30%; inset-block-start: -55%; background: var(--hm-brand-blue, var(--hm-cat-2)); }
+.hm-prof-cover-art i:nth-child(3) { inset-inline-end: -15%; inset-block-start: -10%; background: var(--hm-brand-green, var(--hm-cat-3)); }
+.hm-prof-cover-art i:nth-child(4) { inset-inline-start: 15%; inset-block-end: -60%; background: var(--hm-brand-purple, var(--hm-cat-4)); }
+.hm-prof-top { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--hm-space-3); padding: 0 var(--hm-space-4); margin-block-start: -2.75rem; position: relative; z-index: 1; flex-wrap: wrap; }
+.hm-prof-cover-none .hm-prof-top { margin-block-start: var(--hm-space-4); }
+.hm-prof-avatar .hm-sring-frame { background: var(--hm-surface); border-radius: 50%; box-shadow: 0 0 0 4px var(--hm-surface); }
+.hm-prof-actions { display: flex; align-items: center; gap: var(--hm-space-2); padding-block-end: .25rem; flex-wrap: wrap; min-width: 0; }
+.hm-prof-msg { display: inline-flex; align-items: center; gap: .375rem; min-height: 2.5rem; padding: 0 1rem; border: 0; border-radius: .75rem; background: var(--hm-surface-2); color: var(--hm-text);
+  font: inherit; font-size: var(--hm-text-md); font-weight: 800; cursor: pointer; transition: background-color var(--hm-dur) var(--hm-ease); }
+.hm-prof-msg:hover { background: var(--hm-surface-3, var(--hm-border)); }
+.hm-prof-msg:focus-visible { outline: 2px solid var(--hm-brand-blue, var(--hm-primary)); outline-offset: 2px; }
+.hm-prof-msg .hm-svg { width: 1.125rem; height: 1.125rem; }
+.hm-prof-id { display: flex; flex-direction: column; gap: .125rem; padding: var(--hm-space-3) var(--hm-space-4) 0; min-width: 0; }
+.hm-prof-name { display: flex; align-items: center; gap: .375rem; margin: 0; font-size: var(--hm-text-xl); font-weight: 800; letter-spacing: var(--hm-tracking-tight); min-width: 0; }
+.hm-prof-name > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-prof-verified { display: inline-grid; flex: none; color: var(--hm-brand-blue, var(--hm-info)); } .hm-prof-verified .hm-svg { width: 1.25rem; height: 1.25rem; }
+.hm-prof-handle { color: var(--hm-text-3, var(--hm-muted)); font-size: var(--hm-text-sm); font-weight: 600; }
+.hm-prof-bio { margin: .5rem 0 0; font-size: var(--hm-text-md); line-height: 1.5; overflow-wrap: anywhere; }
+.hm-prof-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--hm-space-2); padding: var(--hm-space-3) var(--hm-space-4) var(--hm-space-4); }
+.hm-prof-stat { display: flex; flex-direction: column; align-items: center; gap: .125rem; padding: .5rem .375rem; border: 0; border-radius: .75rem; background: var(--hm-surface-2); color: var(--hm-text); font: inherit; min-width: 0; }
+button.hm-prof-stat { cursor: pointer; transition: background-color var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease-spring); }
+button.hm-prof-stat:hover { background: var(--hm-brand-blue-soft, var(--hm-surface-3)); }
+button.hm-prof-stat:active { transform: scale(.97); }
+button.hm-prof-stat:focus-visible { outline: 2px solid var(--hm-brand-blue, var(--hm-primary)); outline-offset: 2px; }
+.hm-prof-stat b { font-size: var(--hm-text-lg); font-weight: 900; }
+.hm-prof-stat span { font-size: var(--hm-text-xs); color: var(--hm-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
