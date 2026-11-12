@@ -39,3 +39,22 @@ body
 Named targets (`PortalTarget`) are a registry of signals: a `Portal to` follows its target, moves in when it appears,
 waits (detached, alive) when it goes. The showcase shell has `title`, `toolbar` (top bar, lazy part), `aside` and
 `bottom-action` targets. Later: the registry joins the messaging layer (component registry, channels).
+
+## Folders (modular structure; branches merge into this pattern)
+
+Every unit lives in its own folder with the same shape, so parallel branches add folders instead of editing shared files:
+
+```
+src/components/<name>/   <name>.ts  <name>.css  index.ts  README.md   (UI: draws only; state comes from hubs/behaviors)
+src/behaviors/<name>/    <name>.ts  index.ts                          (use:<name> actions: draggable, rovingFocus, …)
+src/managers/<name>/     <name>.ts  index.ts                          (app-wide services: Command, Layer, Focus, …)
+src/hubs/<name>/         <name>.ts  index.ts                          (shared engines: position, collection, field,
+                                                                       variants, virtual, mask, intl, textfit, media)
+src/net/  src/errors/    (feat/net branch)      src/motion/ + new engine files (feat/motion branch)
+```
+
+- `tools/gen-registry.js` writes the barrels (`hadi-march/ui` etc.) and the component registry from these folders;
+  nobody edits a barrel by hand, so two branches that add folders do not conflict.
+- A folder imports other units only through their `index.ts`; core (`src/core`, `src/dom`) never imports a unit.
+- CSS stays next to its component (css-split follows the code); names keep the `hm-` prefix.
+- `march check component <name>` checks theme/accent, RTL, i18n, ARIA, keyboard, reduced motion, overflow.
