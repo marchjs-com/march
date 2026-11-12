@@ -9,7 +9,7 @@ import { t, locale } from "../core/i18n.ts";
 import { roving } from "../ui/focus.ts";
 import { model, ctl, cx, uid, extend, syncValue, parseNumber, formatNumber, normOptions, same, labelledBy, useField,
   type ControlProps, type ClassProp, type OptionsProp } from "./util.ts";
-import { colorAttr } from "../theme/colors.ts";
+import { colorAttr, type ColorToken } from "../theme/colors.ts";
 import { choiceBox, choiceText, itemColor, lookClass, type ChoiceLook } from "./choice.ts";
 
 /** prefix / suffix text around a control. */
@@ -412,26 +412,54 @@ export function ColorInput(props: ColorInputProps): unknown {
 }
 
 export interface CodeInputProps extends ControlProps<string> {
-  /** Hide the characters (PINs): boxes render as password inputs. */
-  masked?: boolean | (() => boolean) | undefined;
-
-  /** Number of boxes (6). */
+  /** Number of boxes, 3–12 (default 6). */
   length?: number | undefined;
-  /** Digits only (default true); `false` allows letters (upper-cased). */
+  /** Characters allowed: "numeric" (default; numeric keypad, one-time-code autofill), "alpha" or "alphanumeric". */
+  pattern?: "numeric" | "alpha" | "alphanumeric" | undefined;
+  /** @deprecated use pattern: `false` = "alphanumeric". */
   numeric?: boolean | undefined;
+  /** Force capitals (default true for letters). */
+  uppercase?: boolean | undefined;
+  /** Visual groups, e.g. [3, 3] → "123 456" with a separator between the groups. */
+  groups?: readonly number[] | undefined;
+  /** Hide the characters (PINs). */
+  mask?: boolean | (() => boolean) | undefined;
+  /** @deprecated alias of mask. */
+  masked?: boolean | (() => boolean) | undefined;
+  /**
+   * Box colors: "single" (the accent / `color`), "brand" (the four HADİ colors in turn — the HADİ theme's default), "palette"
+   * (the theme's categorical colors) or a list of color tokens.
+   */
+  colors?: "single" | "brand" | "palette" | readonly ColorToken[] | undefined;
+  /** Digits font: "display" (the theme's display face — HADİ: Bricolage; the HADİ default), "mono" or "body". */
+  font?: "display" | "mono" | "body" | undefined;
+  size?: "sm" | "md" | "lg" | undefined;
+  /** "outline" (default), "filled" or "underline". */
+  variant?: "outline" | "filled" | "underline" | undefined;
+  /** Pop the character in (default true; off with prefers-reduced-motion). */
+  animate?: boolean | undefined;
   onComplete?: ((code: string) => void) | undefined;
   autofocus?: boolean | undefined;
 }
 
+const PALETTE = ["cat-1", "cat-2", "cat-3", "cat-4", "cat-5", "cat-6", "cat-7", "cat-8"];
+
 /**
- * One-time code: N boxes, paste fills them, typing advances, Backspace goes back. Value is the code string.
- * Props: length (6), numeric (true), onComplete(code), autofocus, masked (PIN).
+ * One-time code / PIN boxes: `<CodeInput length={6} groups={[3, 3]} onComplete={verify} />`. Typing moves forward, Backspace
+ * back, ← → move, paste fills from the box (extra characters are cut). Colors, font, size and variant are props; in the HADİ
+ * theme each box takes the next HADİ color and the display font, as in the HADİ apps.
  */
 export function CodeInput(props: CodeInputProps): unknown {
-  const n = props.length ?? 6;
+  const n = Math.max(3, Math.min(12, props.length ?? 6));
   const [get, set] = model(props, "");
-  const numeric = props.numeric !== false;
-  const clean = (s: unknown) => (numeric ? String(s ?? "").replace(/\D/g, "") : String(s ?? "").replace(/[^0-9a-z]/gi, "").toUpperCase());
+  const kind = props.pattern ?? (props.numeric === false ? "alphanumeric" : "numeric");
+  const upper = props.uppercase ?? kind !== "numeric";
+  const clean = (s: unknown): string => {
+    const x = String(s ?? "");
+    const kept = kind === "numeric" ? x.replace(/\D/g, "") : kind === "alpha" ? x.replace(/[^\p{L}]/gu, "") : x.replace(/[^\p{L}\p{N}]/gu, "");
+    return upper ? kept.toLocaleUpperCase() : kept;
+  };
+  const masked = (): boolean => { const m = props.mask ?? props.masked; return typeof m === "function" ? m() : !!m; };
   const cells = signal(Array.from({ length: n }, (_, i) => clean(untrack(get))[i] ?? ""));
   let completed: string | null = null;
   const boxes: HTMLInputElement[] = [];
@@ -444,13 +472,17 @@ export function CodeInput(props: CodeInputProps): unknown {
     set(code);
     if (arr.every(Boolean)) { if (completed !== code) { completed = code; props.onComplete?.(code); } } else completed = null;
   };
+  const pop = (el: HTMLElement): void => {
+    if (props.animate === false || !el.animate || globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    el.animate([{ transform: "scale(.82)" }, { transform: "scale(1)" }], { duration: 180, easing: "cubic-bezier(.34, 1.56, .64, 1)" });
+  };
   const fill = (i: number, text: string) => {
-    const chars = clean(text).split("");
+    const chars = [...clean(text)];
     if (!chars.length) return;
     if (chars.length >= n) i = 0;
     const arr = [...cells.peek()];
     let j = i;
-    for (const ch of chars) { if (j >= n) break; arr[j++] = ch; }
+    for (const ch of chars) { if (j >= n) break; arr[j] = ch; pop(boxes[j] as HTMLElement); j++; }
     write(arr);
     boxes[Math.min(j, n - 1)]?.focus();
   };
@@ -458,9 +490,15 @@ export function CodeInput(props: CodeInputProps): unknown {
     const v = clean(get());
     if (v !== cells.peek().join("")) cells.set(Array.from({ length: n }, (_, i) => v[i] ?? ""));
   });
+  const colorOf = (i: number): string | null => {
+    const list = props.colors === "brand" ? ["brand-orange", "brand-blue", "brand-green", "brand-purple"] : props.colors === "palette" ? PALETTE : Array.isArray(props.colors) ? props.colors : null;
+    return list && list.length ? (list[i % list.length] as string) : null;
+  };
   for (let i = 0; i < n; i++) {
     const el = h("input", {
-      type: () => ((typeof props.masked === "function" ? props.masked() : props.masked) ? "password" : "text"), class: "hm-otp-box", id: i ? `${baseId}-${i}` : baseId, inputmode: numeric ? "numeric" : "text", pattern: numeric ? "[0-9]*" : null,
+      type: () => (masked() ? "password" : "text"), class: () => cx("hm-otp-box", `hm-otp-b${(i % 4) + 1}`, cells()[i] && "is-filled"), id: i ? `${baseId}-${i}` : baseId,
+      "data-hm-color": colorOf(i), inputmode: kind === "numeric" ? "numeric" : "text", pattern: kind === "numeric" ? "[0-9]*" : null, maxlength: 2,
+      autocapitalize: upper ? "characters" : "off", spellcheck: "false",
       autocomplete: i === 0 ? "one-time-code" : "off", "aria-label": t`Character ${i + 1} of ${n}`, "aria-invalid": c["aria-invalid"],
       disabled: () => !!props.disabled, readonly: () => !!props.readonly, onBlur: props.onBlur, autofocus: i === 0 && props.autofocus ? true : null,
       onFocus: (e: FocusEvent) => inputOf(e).select?.(),
@@ -473,6 +511,7 @@ export function CodeInput(props: CodeInputProps): unknown {
         arr[i] = v;
         write(arr);
         inputOf(e).value = v;
+        if (v) pop(inputOf(e));
         if (v && i < n - 1) boxes[i + 1]!.focus();
       },
       onKeyDown: (e: KeyboardEvent) => {
@@ -485,6 +524,20 @@ export function CodeInput(props: CodeInputProps): unknown {
     syncValue(el, () => cells()[i]);
     boxes.push(el);
   }
+  // groups: a separator between them ([3, 3] → 123–456)
+  const parts: unknown[] = [];
+  const sizes = props.groups?.length ? props.groups : [n];
+  let k = 0;
+  sizes.forEach((g, gi) => {
+    if (gi) parts.push(h("span", { class: "hm-otp-sep", "aria-hidden": "true" }));
+    for (let x = 0; x < g && k < n; x++) parts.push(boxes[k++]);
+  });
+  while (k < n) parts.push(boxes[k++]);
   onCleanup(() => { boxes.length = 0; });
-  return h("div", { "data-hm-color": colorAttr(props.color), role: "group", class: cx("hm-otp", props.class), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"] }, boxes);
+  // codes read left to right in every language
+  return h("div", {
+    "data-hm-color": colorAttr(props.color), role: "group", dir: "ltr",
+    class: () => cx("hm-otp", `hm-otp-${props.size ?? "md"}`, `hm-otp-${props.variant ?? "outline"}`, props.font && `hm-otp-font-${props.font}`, props.colors === "single" && "hm-otp-single", props.class),
+    "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"],
+  }, parts);
 }

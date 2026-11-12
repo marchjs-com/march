@@ -92,3 +92,28 @@ test("app accent: setAccent remaps the primary family on <html>, is remembered, 
   const { execFileSync } = await import("node:child_process");
   assert.match(execFileSync(process.execPath, ["tools/gen-accent.js", "--check"], { encoding: "utf8" }), /up to date/);
 });
+
+test("CodeInput: length 3–12, pattern, groups, brand colors per box, paste trims and completes", async () => {
+  let done = null;
+  const el = mount(() => h(U.CodeInput, { length: 4, groups: [2, 2], colors: "brand", font: "mono", size: "lg", variant: "filled", onComplete: (c) => { done = c; }, "aria-label": "c" }));
+  const g = el.querySelector(".hm-otp");
+  assert.match(g.getAttribute("class"), /hm-otp hm-otp-lg hm-otp-filled hm-otp-font-mono/);
+  assert.equal(g.getAttribute("dir"), "ltr", "codes read left to right");
+  const boxes = [...g.querySelectorAll(".hm-otp-box")];
+  assert.equal(boxes.length, 4);
+  assert.equal(g.querySelectorAll(".hm-otp-sep").length, 1, "one separator between [2, 2]");
+  assert.deepEqual(boxes.map((b) => b.getAttribute("data-hm-color")), ["brand-orange", "brand-blue", "brand-green", "brand-purple"]);
+  assert.equal(boxes[0].getAttribute("autocomplete"), "one-time-code");
+  assert.equal(boxes[0].getAttribute("inputmode"), "numeric");
+  const ev = new Event("paste", { bubbles: true, cancelable: true });
+  ev.clipboardData = { getData: () => "98-76 54 32" };
+  boxes[0].dispatchEvent(ev);
+  assert.deepEqual(boxes.map((b) => b.value), ["9", "8", "7", "6"], "non-digits dropped, extra characters cut");
+  assert.equal(done, "9876");
+  assert.equal(mount(() => h(U.CodeInput, { length: 40 })).querySelectorAll(".hm-otp-box").length, 12, "length clamped to 12");
+  assert.equal(mount(() => h(U.CodeInput, { length: 1 })).querySelectorAll(".hm-otp-box").length, 3, "length clamped to 3");
+  const a = mount(() => h(U.CodeInput, { length: 3, pattern: "alpha" })).querySelector(".hm-otp-box");
+  a.value = "7"; a.dispatchEvent(new Event("input", { bubbles: true })); assert.equal(a.value, "", "alpha drops digits");
+  a.value = "ş"; a.dispatchEvent(new Event("input", { bubbles: true })); assert.equal(a.value, "Ş", "letters are upper-cased (locale aware)");
+  assert.match(read("theme/presets.ts"), /--hm-otp-1: \$\{a\}; --hm-otp-2: \$\{b\}; --hm-otp-3: \$\{d\}; --hm-otp-4: \$\{e\}; --hm-otp-font: var\(--hm-font-display\);/, "HADİ default: brand colors + display font");
+});

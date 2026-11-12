@@ -25,7 +25,7 @@
   --hm-brand-gold: #D9A93A; --hm-brand-gold-soft: #FBF3DD; --hm-on-brand-gold: #14181F; --hm-brand-gold-text: #8D6E26;
   --hm-brand-pink: #D33C73; --hm-brand-pink-soft: color-mix(in srgb, #D33C73 16%, #FFFFFF); --hm-on-brand-pink: #FFFFFF; --hm-brand-pink-text: #D33C73;
   --hm-brand-navy: #17344F; --hm-brand-navy-soft: color-mix(in srgb, #17344F 16%, #FFFFFF); --hm-on-brand-navy: #FFFFFF; --hm-brand-navy-text: #17344F;
-  --hm-progress-fill: linear-gradient(90deg, #F2801F, #1D9AD6, #78BE3A, #A3338C); --hm-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, #F2801F 20%, #1D9AD6 45%, #78BE3A 70%, #A3338C); --hm-spinner-track: transparent; --hm-spinner-head: transparent; --hm-skel-paint: var(--hm-skel-brand);
+  --hm-progress-fill: linear-gradient(90deg, #F2801F, #1D9AD6, #78BE3A, #A3338C); --hm-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, #F2801F 20%, #1D9AD6 45%, #78BE3A 70%, #A3338C); --hm-spinner-track: transparent; --hm-spinner-head: transparent; --hm-skel-paint: var(--hm-skel-brand); --hm-otp-1: #F2801F; --hm-otp-2: #1D9AD6; --hm-otp-3: #78BE3A; --hm-otp-4: #A3338C; --hm-otp-font: var(--hm-font-display);
 }
 @media (prefers-color-scheme: dark) {
   :root[data-hm-theme="hadi"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-hm-theme="hadi"], :root:not([data-hm-theme]):not([data-theme="light"]) {
@@ -55,7 +55,7 @@
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;
-  --hm-progress-fill: linear-gradient(90deg, #F2801F, #1D9AD6, #78BE3A, #C95BB5); --hm-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, #F2801F 20%, #1D9AD6 45%, #78BE3A 70%, #C95BB5); --hm-spinner-track: transparent; --hm-spinner-head: transparent; --hm-skel-paint: var(--hm-skel-brand);
+  --hm-progress-fill: linear-gradient(90deg, #F2801F, #1D9AD6, #78BE3A, #C95BB5); --hm-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, #F2801F 20%, #1D9AD6 45%, #78BE3A 70%, #C95BB5); --hm-spinner-track: transparent; --hm-spinner-head: transparent; --hm-skel-paint: var(--hm-skel-brand); --hm-otp-1: #F2801F; --hm-otp-2: #1D9AD6; --hm-otp-3: #78BE3A; --hm-otp-4: #C95BB5; --hm-otp-font: var(--hm-font-display);
   }
 }
 :root[data-hm-theme="hadi"][data-theme="dark"], :root[data-theme="dark"] [data-hm-theme="hadi"], :root:not([data-hm-theme])[data-theme="dark"] {
@@ -85,5 +85,5 @@
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;
-  --hm-progress-fill: linear-gradient(90deg, #F2801F, #1D9AD6, #78BE3A, #C95BB5); --hm-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, #F2801F 20%, #1D9AD6 45%, #78BE3A 70%, #C95BB5); --hm-spinner-track: transparent; --hm-spinner-head: transparent; --hm-skel-paint: var(--hm-skel-brand);
+  --hm-progress-fill: linear-gradient(90deg, #F2801F, #1D9AD6, #78BE3A, #C95BB5); --hm-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, #F2801F 20%, #1D9AD6 45%, #78BE3A 70%, #C95BB5); --hm-spinner-track: transparent; --hm-spinner-head: transparent; --hm-skel-paint: var(--hm-skel-brand); --hm-otp-1: #F2801F; --hm-otp-2: #1D9AD6; --hm-otp-3: #78BE3A; --hm-otp-4: #C95BB5; --hm-otp-font: var(--hm-font-display);
 }

@@ -28,12 +28,30 @@
 .hm-color-text { max-width: 9rem; font-family: var(--hm-font-mono); }
 
 /* one-time code */
-.hm-otp { display: flex; gap: var(--hm-space-2); max-width: 100%; }
-.hm-otp-box { flex: 0 1 2.75rem; width: 2.75rem; min-width: 1.75rem; height: 3.25rem; text-align: center; font: 600 var(--hm-text-xl)/1 var(--hm-font); font-variant-numeric: tabular-nums; color: var(--hm-text); background: var(--hm-surface); border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius-2); box-shadow: var(--hm-shadow-inset); caret-color: var(--hm-accent, var(--hm-primary)); transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
-.hm-otp-box:focus { outline: none; border-color: var(--hm-accent, var(--hm-focus)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-accent, var(--hm-focus)) 22%, transparent); }
-.hm-otp-box[aria-invalid="true"] { border-color: var(--hm-danger); }
 
 /* a color token (data-hm-color on the control or an ancestor): selected segment, caret and selected text follow it */
 [data-hm-color] .hm-segment[aria-checked="true"], .hm-segmented[data-hm-color] .hm-segment[aria-checked="true"] { background: var(--hm-accent-soft); color: var(--hm-accent-text); }
 .hm-input, .hm-textarea { caret-color: var(--hm-accent, var(--hm-primary)); }
 .hm-input::selection, .hm-textarea::selection { background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 28%, transparent); }
+
+/* CodeInput: boxes shrink to fit (never overflow); per-box color --hm-box-c: own color token > theme multicolor (HADİ) > accent */
+.hm-otp { --hm-otp-w: 3rem; --hm-otp-h: 3.75rem; --hm-otp-r: .875rem; --hm-otp-fs: var(--hm-text-2xl); display: flex; align-items: center; gap: var(--hm-space-2); max-width: 100%; }
+.hm-otp-sm { --hm-otp-w: 2.25rem; --hm-otp-h: 2.75rem; --hm-otp-r: .625rem; --hm-otp-fs: var(--hm-text-lg); gap: .375rem; }
+.hm-otp-lg { --hm-otp-w: 3.5rem; --hm-otp-h: 4.25rem; --hm-otp-r: 1rem; --hm-otp-fs: var(--hm-text-3xl); }
+.hm-otp-box { --hm-box-c: var(--hm-accent, var(--hm-primary)); flex: 1 1 0; min-width: 0; max-width: var(--hm-otp-w); height: var(--hm-otp-h); padding: 0; text-align: center;
+  font: 600 var(--hm-otp-fs)/1 var(--hm-otp-font, var(--hm-font)); font-variant-numeric: tabular-nums; color: var(--hm-text); caret-color: var(--hm-box-c);
+  background: var(--hm-surface); border: 1.4px solid var(--hm-border-strong); border-radius: var(--hm-otp-r);
+  transition: border-color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-otp-b1 { --hm-box-c: var(--hm-otp-1, var(--hm-accent, var(--hm-primary))); } .hm-otp-b2 { --hm-box-c: var(--hm-otp-2, var(--hm-accent, var(--hm-primary))); }
+.hm-otp-b3 { --hm-box-c: var(--hm-otp-3, var(--hm-accent, var(--hm-primary))); } .hm-otp-b4 { --hm-box-c: var(--hm-otp-4, var(--hm-accent, var(--hm-primary))); }
+.hm-otp-single .hm-otp-box, .hm-otp-box[data-hm-color] { --hm-box-c: var(--hm-accent, var(--hm-primary)); }
+.hm-otp-box.is-filled { border-color: var(--hm-box-c); background: color-mix(in srgb, var(--hm-box-c) 12%, var(--hm-surface)); }
+.hm-otp-box:focus { outline: none; border-color: var(--hm-box-c); border-width: 2.2px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-box-c) 20%, transparent); }
+.hm-otp-filled .hm-otp-box { border-color: transparent; background: var(--hm-surface-2); }
+.hm-otp-filled .hm-otp-box.is-filled { background: color-mix(in srgb, var(--hm-box-c) 14%, var(--hm-surface)); }
+.hm-otp-underline .hm-otp-box { border-width: 0 0 2px; border-radius: 0; background: none; }
+.hm-otp-underline .hm-otp-box:focus { border-width: 0 0 3px; box-shadow: none; }
+.hm-otp-font-display { --hm-otp-font: var(--hm-font-display); } .hm-otp-font-mono { --hm-otp-font: var(--hm-font-mono); } .hm-otp-font-body { --hm-otp-font: var(--hm-font); }
+.hm-otp-sep { flex: none; width: .5rem; height: 2px; border-radius: 2px; background: var(--hm-border-strong); }
+/* errors win over every color */
+.hm-otp-box[aria-invalid="true"], [aria-invalid="true"] .hm-otp-box { --hm-box-c: var(--hm-danger); border-color: var(--hm-danger); }

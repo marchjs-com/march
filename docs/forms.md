@@ -345,3 +345,14 @@ DatePicker) take the color of their control.
 Tokens: `primary`, `info`, `success`, `warning`, `danger`, `neutral`, `special`, `brand-orange`, `brand-blue`,
 `brand-green`, `brand-purple`, `brand-gold`, `brand-pink`, `cat-1` … `cat-8` (`COLOR_TOKENS` in `hadi-march/theme`). Text
 on a filled state is chosen for legibility (white when it reaches the brand minimum, otherwise near-black).
+
+
+## CodeInput
+
+`<CodeInput length={6} groups={[3, 3]} onComplete={verify} />` — one-time codes and PINs. `length` 3–12; `pattern`
+`"numeric"` (default: numeric keypad, `autocomplete="one-time-code"`), `"alpha"`, `"alphanumeric"` (`uppercase`, default
+on for letters); `groups` adds separators; `mask` hides characters. Look: `colors` (`"single"`, `"brand"`, `"palette"`,
+token list), `font` (`"display"`, `"mono"`, `"body"`), `size`, `variant` (`"outline"`, `"filled"`, `"underline"`),
+`animate`. The HADİ theme defaults to the four brand colors and the display font; an app accent replaces the colors.
+Paste fills from the focused box and cuts what does not fit; errors (`invalid`) turn every box `danger`. Codes are laid
+out left to right in every language; boxes shrink on narrow screens.

@@ -82,6 +82,7 @@ function multiVars(c: ThemeColors): string {
     `--hm-spinner-track: transparent; --hm-spinner-head: transparent;`,
     // the shimmer itself lives with Skeleton (display.css › --hm-skel-brand); the theme only switches it on
     `--hm-skel-paint: var(--hm-skel-brand);`,
+    `--hm-otp-1: ${a}; --hm-otp-2: ${b}; --hm-otp-3: ${d}; --hm-otp-4: ${e}; --hm-otp-font: var(--hm-font-display);`,
   ].join(" ");
 }
 
