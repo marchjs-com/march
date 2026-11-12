@@ -2,7 +2,7 @@
   "name": "hadi-march",
   "version": "0.1.0",
   "private": true,
-  "description": "HADI March: a tiny, fine-grained reactive UI library. Signals instead of a virtual DOM, JSX compiled by an esbuild plugin, zero runtime dependencies, CSP and Trusted Types friendly.",
+  "description": "HADI March: a tiny, fine-grained reactive TypeScript framework. Signals instead of a virtual DOM, JSX compiled by an esbuild plugin, zero runtime dependencies, CSP and Trusted Types friendly.",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -79,7 +79,17 @@
     "./managers/accessibility": "./src/managers/accessibility/index.ts",
     "./managers/accessibility/ui": "./src/managers/accessibility/ui.ts",
     "./managers/shortcut-hint": "./src/managers/shortcut-hint/index.ts",
-    "./managers/shortcut-hint/ui": "./src/managers/shortcut-hint/ui.ts"
+    "./managers/shortcut-hint/ui": "./src/managers/shortcut-hint/ui.ts",
+    "./layout": "./src/components/layout/index.ts",
+    "./typography": "./src/components/typography/index.ts",
+    "./actions": "./src/components/actions/index.ts",
+    "./feedback": "./src/components/feedback/index.ts",
+    "./overlays": "./src/components/overlays/index.ts",
+    "./navigation": "./src/components/navigation/index.ts",
+    "./media": "./src/components/media/index.ts",
+    "./social": "./src/components/social/index.ts",
+    "./composite": "./src/components/composite/index.ts",
+    "./landing": "./src/components/landing/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"

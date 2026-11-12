@@ -18,7 +18,7 @@
 @import "../ui/media.css";
 @import "../ui/disclosure.css";
 @import "../ui/app.css";
-@import "../components/chip/chip.css";
+@import "../components/actions/chip/chip.css";
 @import "../ui/marquee.css";
 @import "../ui/avatar-group.css";
 @import "../ui/progress.css";

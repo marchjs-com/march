@@ -1,10 +1,10 @@
 // MadeWithMarch (hadi-march/ui): an optional "Developed with HADI March and 💗" line. Folder: src/components/made-with-march/.
 import "./made-with-march.css";
-import { h } from "../../dom/h.ts";
-import { t } from "../../core/i18n.ts";
-import { val, cx, type MaybeFn, type ClassProp } from "../../ui/util.ts";
+import { h } from "../../../dom/h.ts";
+import { t } from "../../../core/i18n.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 
-import { MARCH_URL } from "../../brand.js";
+import { MARCH_URL } from "../../../brand.js";
 /** Where "HADI March" links point: one constant in src/brand.js (shared with the console banner). */
 export { MARCH_URL };
 

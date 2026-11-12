@@ -1,12 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom } from "../../testing/dom.ts";
+import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
-const { render } = await import("../../index.ts");
-const { h } = await import("../../index.ts");
+const { render } = await import("../../../index.ts");
+const { h } = await import("../../../index.ts");
 const { MadeWithMarch, MARCH_URL } = await import("./index.ts");
-const { messages, setLocale } = await import("../../core/i18n.ts");
-const { default: tr } = await import("../../i18n/tr.ts");
+const { messages, setLocale } = await import("../../../core/i18n.ts");
+const { default: tr } = await import("../../../i18n/tr.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
 
 test("MadeWithMarch: sentence, link from the constant, accessible heart, variants", () => {

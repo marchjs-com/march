@@ -313,11 +313,17 @@ function isLibrary() {
 async function libComponent(name, put) {
   const folder = name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
   const Name = folder.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join("");
+  const { CATEGORIES } = await import(pathToFileURL(resolve(cwd, "src/components/categories.ts")).href);
+  const ids = CATEGORIES.map((c) => c.id);
+  const category = flag("--category");
+  if (typeof category !== "string" || !ids.includes(category)) fail(`usage: march gen component ${Name} --category <${ids.join("|")}> [--parts A,B]`);
+  const parts = typeof flag("--parts") === "string" ? flag("--parts").split(",").map((s) => s.trim()).filter(Boolean) : [];
+  if (category === "composite" && !parts.length) fail("a composite component is built from others: --parts Button,Menu …");
   const { libComponent: files } = await import("./lib-templates.js");
-  for (const [f, text] of Object.entries(files(folder, Name))) put(join("src/components", folder, f), text);
+  for (const [f, text] of Object.entries(files(folder, Name, category, parts))) put(join("src/components", category, folder, f), text);
   const { spawnSync } = await import("node:child_process");
-  spawnSync(process.execPath, [resolve(cwd, "tools/gen-registry.js")], { cwd, stdio: "inherit" });
-  console.log(`next: march check component ${folder}  (checklist: docs/component-checklist.md)`);
+  spawnSync(process.execPath, ["--import", pathToFileURL(resolve(cwd, "compiler/register.js")).href, resolve(cwd, "tools/gen-registry.js")], { cwd, stdio: "inherit" });
+  console.log(`next: march check component ${category}/${folder}  (checklist: docs/component-checklist.md)`);
 }
 
 async function typecheck() {

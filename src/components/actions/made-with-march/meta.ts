@@ -1,4 +1,4 @@
-import { defineMeta } from "../meta.ts";
+import { defineMeta } from "../../meta.ts";
 
 export default defineMeta({
   name: "MadeWithMarch",

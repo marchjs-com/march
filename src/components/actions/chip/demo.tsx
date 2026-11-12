@@ -1,6 +1,6 @@
 // Showcase stage for Chip: draws the chips for the Playground values (playground.ts). Code is shown in the Code tab.
 import { Chip } from "./index.ts";
-import type { ColorToken } from "../../theme/colors.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<Chip>Tasarım</Chip>
 <Chip selected={$on} onClick={() => $on = !$on}>Açık</Chip>          // filter: aria-pressed
