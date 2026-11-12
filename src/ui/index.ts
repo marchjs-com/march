@@ -32,6 +32,8 @@ export { CommandPalette, PaletteButton, openPalette, closePalette, paletteOpen, 
 export type { PaletteButtonProps, CommandPaletteProps, PaletteEntry, AskResult, Command, CommandEntry, PageEntry } from "./palette.ts";
 export { key, shortcuts, formatKey, parseKey, isMac } from "./keys.ts";
 export type { KeyOptions, ParsedKey, ShortcutInfo } from "./keys.ts";
+export { Overlay, quietMedia } from "./overlay.ts";
+export type { OverlayProps, OverlayEffect, OverlayFit, DrawFn, DrawContext } from "./overlay.ts";
 export { accent, setAccent, AccentPicker, ACCENT_CHOICES } from "./accent.ts";
 export type { AccentPickerProps } from "./accent.ts";
 export { theme, setTheme, resolvedTheme, ThemeToggle, LocaleSelect, UpdateBanner, colorTheme, setColorTheme, colorThemes, registerThemes, loadTheme, setThemeBase, ThemePicker, ThemeSwatch } from "./theme.ts";

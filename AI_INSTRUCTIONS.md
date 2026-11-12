@@ -129,6 +129,10 @@ compact pickers such as weekdays, `card` for plans/options with `hint` and `icon
 **Sidebars**: big apps use `<NavSidebar>`; add `resizable` (+ `minWidth`, `maxWidth`, `collapseBelow`) when users
 should set its width. Never size it with inline styles.
 
+**Overlays**: decorative layers go in the container as `<Overlay>` (image, `src` video with `poster`, `svg`, `draw` canvas,
+`effect="glass|gradient|mesh|noise|vignette|spotlight|grid|dots"`), never as absolutely positioned divs with inline styles.
+Overlays never take input; put content after them. `front` only for foreground effects; `interactive` almost never.
+
 **Performance, always** (page speed comes first)
 - Every route is a lazy chunk: `routes: { "/x": () => import("./pages/x.tsx") }`. Never import a page statically.
 - Heavy components (charts, tables, DatePicker, editors, maps, fx/landing) go behind `lazy(() => import("./X.tsx"))`
