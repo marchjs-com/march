@@ -246,13 +246,22 @@ function currentLocation(): { p: string; search: string; hash: string } {
 export function hrefOf(to: string): string {
   const r = S.router;
   if (r?.mode !== "history") return `#${to}`;
+  // every link re-reads its href on a route change: the answer depends only on the current folder and the target, so
+  // it is kept until the folder changes (a menu of 100 links, navigating between pages of one folder: no work)
+  const cur = globalThis.location.pathname, dir = cur.slice(0, cur.lastIndexOf("/") + 1);
+  if (dir !== hrefDir || r !== hrefRouter) { hrefDir = dir; hrefRouter = r; hrefMemo.clear(); }
+  let out = hrefMemo.get(to);
+  if (out !== undefined) return out;
   const [, p = "", rest] = /^([^?#]*)(.*)$/.exec(r.base + to)!;
   // folders of the current address ("/app/motion/svg" → app, motion) against the target's segments
-  const from = globalThis.location.pathname.split("/").slice(1, -1), dest = p.split("/").slice(1);
+  const from = dir.split("/").slice(1, -1), dest = p.split("/").slice(1);
   let i = 0;
   while (i < from.length && i < dest.length - 1 && from[i] === dest[i]) i++;
-  return ("../".repeat(from.length - i) + dest.slice(i).join("/") || "./") + rest;
+  hrefMemo.set(to, (out = ("../".repeat(from.length - i) + dest.slice(i).join("/") || "./") + rest));
+  return out;
 }
+let hrefDir = "", hrefRouter: RouterState | null = null;
+const hrefMemo = new Map<string, string>();
 
 let lastUrl = "";
 /** The URL state (path, query, hash) in one batch. */
@@ -563,13 +572,20 @@ export const _router = { S, slot, matchRoute, loadRoute, pageKey, notFoundComp, 
 
 /** `<Link href="/users" exact prefetch="hover">Users</Link>` — client-side navigation, aria-current, preloading. */
 export function Link(props: { href: Href | (() => Href); exact?: boolean; replace?: boolean; modal?: boolean; outlet?: string; preload?: "hover" | "visible" | "idle" | "none"; prefetch?: "hover" | "visible" | "idle" | "none"; target?: string; children?: unknown; [k: string]: unknown }): unknown {
-  const href = (): string => String(read(props.href));
-  const active = (): boolean => {
-    const p = S.path(), to = href().split("?")[0] ?? "";
+  // a fixed href is read and split once; a live one once per change (not once per binding)
+  const live = typeof props.href === "function";
+  const fixed = live ? "" : String(props.href);
+  const href = live ? computed(() => String(read(props.href))) : (): string => fixed;
+  const pathOf = (s: string): string => { const q = s.indexOf("?"); return q < 0 ? s : s.slice(0, q); };
+  const fixedTo = pathOf(fixed);
+  const target = live ? computed(() => pathOf(href())) : (): string => fixedTo;
+  // aria-current and class:active share one computation
+  const active = computed((): boolean => {
+    const p = S.path(), to = target();
     return props.exact ? p === to : p === to || (to !== "/" && p.startsWith(`${to}/`));
-  };
-  const rest: Record<string, unknown> = { ...props };
-  for (const k of ["href", "exact", "activeClass", "children", "replace", "preload", "prefetch", "modal", "outlet"]) delete rest[k];
+  });
+  const rest: Record<string, unknown> = {};
+  for (const k in props) if (!LINK_OWN.has(k)) rest[k] = props[k];
   // prefetch (download only, via the manifest) on hover/focus by default; "visible" when it scrolls into view; "idle"
   // when the browser is idle after it renders. All of them are skipped with Save-Data / 2G (prefetch() checks).
   const mode = props.prefetch ?? props.preload ?? "hover";
@@ -580,7 +596,7 @@ export function Link(props: { href: Href | (() => Href); exact?: boolean; replac
     href: () => { S.path(); return hrefOf(href()); },
     "aria-current": () => (active() ? "page" : null),
     // the link being opened shows a spinner while the navigation is slow (router.css)
-    "aria-busy": () => (S.slow() && S.path() === href().split("?")[0] ? "true" : null),
+    "aria-busy": () => (S.slow() && S.path() === target() ? "true" : null),
     "class:active": active,
     ...(mode === "hover" ? { onPointerenter: pre, onFocus: pre } : {}),
     onClick: (e: MouseEvent) => {
@@ -594,6 +610,7 @@ export function Link(props: { href: Href | (() => Href); exact?: boolean; replac
   if (mode === "visible" && typeof globalThis.IntersectionObserver === "function") onVisible(a, pre);
   return a;
 }
+const LINK_OWN = new Set(["href", "exact", "activeClass", "children", "replace", "preload", "prefetch", "modal", "outlet"]);
 provideLink(Link as (props: Record<string, unknown>) => unknown);
 
 /** Reset router state (tests). */
