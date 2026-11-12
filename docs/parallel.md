@@ -6,21 +6,32 @@ steps is fixed by the founder; inside a step, the listed items are independent u
 ## Core order (sequential)
 
 1. Router + Outlet + Portal — **done** (ed75864, 4d56eb9, 8268f1e)
-2. Instant navigation + `hadi-march/net` (transport, middleware, API classes, WebSocket, mock) + `hadi-march/errors`
-3. Code tab as a widget point (`codeView`, `CodeViewer`, Copy / Fullscreen) — the first widget-point consumer
-4. Modular structure: `src/components/<name>/`, `src/behaviors/<name>/`, `src/managers/<name>/`, `tools/gen-registry.js`,
-   `march gen component`, `march check component`, duplicate merge (review report: 27 items + 4 bugs), composition audit
-5. Behaviors layer (draggable, sortable, droppable, resizable, swipe, pullRefresh, pressable, longPress, hoverIntent,
-   focusTrap, rovingFocus, typeahead, dismissable, position, intersection, resizeObserver, scrollLock, virtualList,
-   clipboard, hotkeys, inertia)
-6. Managers: the core five first (CommandManager, LayerManager, FocusManager, ViewportManager, ConsentManager)
-7. Motion core (keyframes registry, timeline, easing, drivers: dom / cssVar / canvas2d / webgl / object, one clock)
-8. Messaging (channels, `expose` / `component(id)`, sticky / replay) + widget contribution points
-9. Complex components (notifications, theme editor, BottomNav, Overlay paint/WebGL, landing…)
+2. Grid comparison fix ("Five modes side by side") — **done** (5a6bd53)
+3. Instant navigation — **done** (b41151a)
+4. `hadi-march/net` (categories, policies, priority, retry, offline queue, transport, middleware, API classes,
+   WebSocket / SSE, mock provider, `march dev --mock`; route and lazy chunk loads run through it)
+5. `hadi-march/errors` (AppError, rules, report hook, dev layer; Outlet/Try boundaries report to it)
+6. Showcase "Network and errors" section
+7. Code tab as a widget point (`codeView`, `CodeViewer`, Copy / Fullscreen) — the first widget-point consumer
+8. Overlay Playground: an option shows only while it has an effect; visual pickers instead of selects
+9. Modular structure (`src/components/<name>/`, `src/behaviors/<name>/`, `src/managers/<name>/`, `tools/gen-registry.js`,
+   `march gen component`, `march check component`), duplicate merge (review report: 27 items + 4 bugs), behaviors layer
+   (draggable, sortable, droppable, resizable, swipe, pullRefresh, pressable, longPress, hoverIntent, focusTrap,
+   rovingFocus, typeahead, dismissable, position, intersection, resizeObserver, scrollLock, virtualList, clipboard,
+   hotkeys, inertia), composition audit
+10. **Motion core** — part of the core order, not the parallel phase. One keyframe-based engine for every animation:
+    a target-independent value layer + drivers (dom / cssVar / canvas2d / webgl / object), WAAPI, timeline, easing,
+    controls CSS animations too, one clock, global speed / pause / reduced motion. Compositor-only properties;
+    off-screen animations stop; frame drops are measured on a 200-item stagger. Showcase: gallery, timeline editor,
+    curve editor, "Stop all".
+11. Messaging (channels, `expose` / `component(id)`, sticky / replay) + widget contribution points
+12. Core managers (CommandManager, LayerManager, FocusManager, ViewportManager, ConsentManager)
+13. Parallel phase: the remaining managers (waves below), complex components (notifications, theme editor, BottomNav,
+    Overlay paint/WebGL, landing…)
 
 ## Managers: dependency order
 
-Wave 0 (core, one agent, in this order): **CommandManager → LayerManager → FocusManager → ViewportManager → ConsentManager**.
+Wave 0 (core order step 12, one agent, in this order): **CommandManager → LayerManager → FocusManager → ViewportManager → ConsentManager**.
 
 Wave 1 (after wave 0; independent of each other, one agent each):
 | Manager | Needs |

@@ -4,6 +4,9 @@ Sizes: S ≈ a day, M ≈ a few days, L ≈ a week or more of focused work. Prio
 core order (docs/parallel.md) does not change because of this list. Visual regression and DevTools shorten the bug loop
 and may be worth pulling forward.
 
+The motion core is NOT on this list: it is core order step 10 (docs/parallel.md) — one engine for every animation
+(value layer + drivers, one clock, compositor-only, off-screen stops, 200-item stagger frame-drop check).
+
 | # | Area | Size | Needs | Notes |
 |---|---|---|---|---|
 | 1 | DevTools panel: signals, component tree, requests (net), events (channels), manager state; in-app panel + optional browser extension | L | messaging, net, managers | app panel first, extension later |

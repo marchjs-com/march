@@ -265,6 +265,10 @@ pageTransitions({ type: "slide" });           // View Transitions with fallback
 Rules: animate only `transform`/`opacity` (WAAPI or the `style` object); everything honors `prefers-reduced-motion`
 (`reducedMotion()`); never use string styles. fx (`Particles`, `Aurora`, `confetti`) is decorative — keep it off admin
 screens.
+Coming (core order step 10, docs/parallel.md): ONE motion engine for every animation — a target-independent value layer
+with drivers (dom / cssVar / canvas2d / webgl / object), one clock, global speed / pause / reduced motion, compositor-only
+properties, off-screen animations stop, frame drops measured on a 200-item stagger. New animation code must be ready to
+move onto it: no private rAF loops or timers.
 
 ## 16. Names to remember
 
