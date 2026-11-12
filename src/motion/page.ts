@@ -7,7 +7,10 @@
 // engine animates the old page out and the new one in. Back reverses the animation; "slide" follows the text
 // direction (RTL mirrors it). Reduced motion or a paused engine: the swap is instant. Named outlets and the modal
 // outlet get the same transitions (the modal's own dialog opens and closes it).
-import { setNavigationWrapper, setOutletWrapper, transitionOutlet, type NavInfo } from "../router/index.ts";
+import { setNavigationWrapper, transitionOutlet, type NavInfo } from "../router/index.ts";
+import type { OutletWrapper } from "../router/outlets.ts";
+// the outlets module is the router's own lazy part: loaded here only to hand it the outlet transition
+const outlets = (fn: OutletWrapper | null): Promise<void> => import("../router/outlets.ts").then((m) => m.setOutletWrapper(fn), () => undefined);
 import { animate, ours } from "./engine/playback.ts";
 import { DRIVER, type Driver } from "./engine/drivers.ts";
 import { defaultTiming, pausedNow, rateScale } from "./engine/config.ts";
@@ -92,12 +95,28 @@ function isRtl(): boolean {
   return (root.getAttribute?.("dir") || globalThis.getComputedStyle?.(root)?.direction) === "rtl";
 }
 
+// back or forward: the history order the router keeps in history.state.hmIdx (a popstate to a lower index is "back");
+// one answer per history entry, so a page and an outlet swapping in the same navigation agree
+let lastIdx = 0, lastState: unknown, lastDir: Dir = "forward";
+function direction(pop: boolean): Dir {
+  const st = globalThis.history?.state as { hmIdx?: number } | null;
+  if (st && st === lastState) return lastDir;
+  const idx = typeof st?.hmIdx === "number" ? st.hmIdx : 0;
+  lastDir = pop && idx < lastIdx ? "back" : "forward";
+  lastIdx = idx; lastState = st;
+  return lastDir;
+}
+/** Direction of the navigation now (for tests and custom wrappers). */
+export const navDirection = (pop = true): Dir => direction(pop);
+
 interface ViewTransitionLike { updateCallbackDone: Promise<void>; finished: Promise<void>; ready?: Promise<void> }
 type StartVT = (cb: () => void) => ViewTransitionLike;
 
 /** Turn page transitions on. Returns a function that turns them off. */
 export function pageTransitions(o: PageTransitionOptions = {}): () => void {
-  setNavigationWrapper(async (apply: () => void, nav: NavInfo) => {
+  lastIdx = (globalThis.history?.state as { hmIdx?: number } | null)?.hmIdx ?? 0; lastState = globalThis.history?.state;
+  setNavigationWrapper(async (apply: () => void, info: NavInfo) => {
+    const nav = { ...info, dir: direction(info.pop) };
     const doc = globalThis.document as (Document & { startViewTransition?: StartVT }) | undefined;
     const t = resolveTransition(o, nav.to, nav.from, nav.dir);
     if (!doc || reducedNow() || pausedNow() || t.type === "none") { apply(); return; }
@@ -153,7 +172,9 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
     for (const [id, el] of sharedOf(now)) flipFrom(el, rects.get(id), t.duration, t.easing);
   });
 
-  setOutletWrapper((name, apply, { dir, to, from }) => {
+  void outlets((name, apply, { to, from }) => {
+    // a modal opened or closed by a history move: popstate already ran, so pop=true reads the order right
+    const dir = direction(true);
     const t = resolveTransition(o, to?.meta, from?.meta, dir);
     // the modal's dialog opens and closes itself: only a swap inside it animates here
     if (reducedNow() || pausedNow() || t.type === "none" || !to || (name === "modal" && !from)) { apply(); return; }
@@ -168,7 +189,7 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
     for (const [id, s] of sharedOf(el)) flipFrom(s, rects.get(id), t.duration, t.easing);
   });
 
-  return () => { setNavigationWrapper(null); setOutletWrapper(null); };
+  return () => { setNavigationWrapper(null); void outlets(null); };
 }
 
 /** FLIP: an element that was at `from` moves (and scales) from there to where it is now. */

@@ -43,9 +43,9 @@ test("resolveTransition: the route shown decides forward, the route left decides
   assert.equal(M.resolveTransition(base, {}, {}, "forward").duration, 200);
 });
 
-test("the router tells the wrapper the direction (history order) and both routes' meta", async () => {
+test("back / forward from the history order, and both routes' meta reach the wrapper", async () => {
   const seen = [];
-  R.setNavigationWrapper((apply, nav) => { seen.push([nav.dir, nav.to.transition ?? null, nav.from.transition ?? null]); apply(); });
+  R.setNavigationWrapper((apply, nav) => { seen.push([M.navDirection(nav.pop), nav.to.transition ?? null, nav.from.transition ?? null]); apply(); });
   const a = app({ "/": page("home"), "/a": page("a", { transition: "slide" }), "/b": page("b", { transition: "scale" }) });
   await tick();
   await R.navigate("/a"); await R.navigate("/b");
@@ -125,7 +125,8 @@ test("fallback without View Transitions: the old page leaves, the new one enters
 
 test("modal outlet: opening is left to the dialog, a swap inside it animates through the outlet wrapper", async () => {
   const swaps = [];
-  R.setOutletWrapper((name, apply, o) => { swaps.push([name, o.dir, o.from?.path ?? null, o.to?.path ?? null]); apply(); });
+  const O = await import("../src/router/outlets.ts");
+  O.setOutletWrapper((name, apply, o) => { swaps.push([name, M.navDirection(true), o.from?.path ?? null, o.to?.path ?? null]); apply(); });
   const a = app({ "/": page("home"), "/p/:id": { component: (p) => h("div", { class: "photo" }, `photo ${p.params.id}`), meta: { transition: "scale" } } });
   await tick();
   await R.navigate("/p/1", { modal: true }); await tick();
@@ -133,6 +134,6 @@ test("modal outlet: opening is left to the dialog, a swap inside it animates thr
   assert.equal(a.host.querySelector("[data-outlet-page=modal] .photo")?.textContent, "photo 2");
   globalThis.history.back(); await tick();
   assert.deepEqual(swaps, [["modal", "forward", null, "/p/1"], ["modal", "forward", "/p/1", "/p/2"], ["modal", "back", "/p/2", "/p/1"]]);
-  R.setOutletWrapper(null);
+  O.setOutletWrapper(null);
   a.done();
 });

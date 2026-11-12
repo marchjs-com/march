@@ -10,7 +10,7 @@ export { tween, spring, type Animated, type Animatable, type TweenOptions, type 
 export { flip, installFlip, type FlipOptions } from "./flip.ts";
 export { timeline, type Timeline, type StepOptions, type Target } from "./timeline.ts";
 export { inView, reveal, scrollProgress, parallax, type InViewOptions } from "./scroll.ts";
-export { pageTransitions, transitionFrames, resolveTransition, type PageTransitionOptions, type PageTransitionSpec, type PageTransitionType } from "./page.ts";
+export { pageTransitions, transitionFrames, resolveTransition, navDirection, type PageTransitionOptions, type PageTransitionSpec, type PageTransitionType } from "./page.ts";
 export { drag, swipe, press, magnet, tilt, type DragOptions } from "./gestures.ts";
 export { reducedMotion, setReducedMotion, frame, frameLoop, animateEl } from "./env.ts";
 export * as easing from "./easing.ts";
