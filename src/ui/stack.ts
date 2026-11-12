@@ -39,23 +39,37 @@ export interface GridProps {
   balance?: boolean;
   /** Narrowest column (default "9rem"): when the box is too narrow for `cols` of this width, fewer columns are used. */
   minCol?: string;
-  /** Every row as tall as the tallest (fixed-column grids). Cards in a row are always equal height. */
+  /**
+   * Every row as tall as the tallest, across the whole grid. With `cols` it combines with `fill` (span mode: the last
+   * row is filled AND all rows are equal). Cards in one row are always equal height.
+   */
   equal?: boolean;
   class?: ClassProp;
   children?: unknown;
   [attr: string]: unknown;
 }
 /**
- * `<Grid cols={3} gap={4}>`, `<Grid min="16rem">` (auto columns), `<Grid cols={4} fill="stretch" balance>`.
+ * `<Grid cols={3} gap={4}>`, `<Grid min="16rem">` (auto columns), `<Grid cols={4} fill="stretch" balance>`,
+ * `<Grid cols={4} minCol="17rem" fill="stretch" equal>` (last row filled, every row equally tall).
  * Pure CSS (grid / flex-wrap, :has() for balance); items never overflow horizontally.
  */
+// span mode buckets: the generated container queries exist for these minimum column widths (tools/gen-grid.js)
+const MIN_COLS = [9, 13, 17];
+const minBucket = (v: string | undefined): number => {
+  const rem = !v ? 9 : v.endsWith("px") ? parseFloat(v) / 16 : parseFloat(v);
+  return MIN_COLS.reduce((a, b) => (Math.abs(b - rem) < Math.abs(a - rem) ? b : a), 9);
+};
 export function Grid(props: GridProps): Element {
-  const flex = !!props.fill || !!props.balance;
   const cols = Math.max(1, Math.min(props.cols ?? 2, 6));
+  // span mode: fixed columns that must fill the last row and/or keep all rows equal (pure CSS, see grid.css)
+  const span = !props.min && !props.balance && (!!props.fill || !!props.equal) && props.cols != null;
+  const flex = !span && (!!props.fill || !!props.balance);
   return h("div", { ...rest(props, ["cols", "gap", "min", "fill", "balance", "minCol", "equal"]),
     class: () => cx("hm-grid", `hm-grid-gap-${props.gap ?? 4}`,
-      flex ? ["hm-grid-flex", props.min ? "hm-grid-flex-min" : `hm-grid-c${cols}`, props.fill && `hm-grid-fill-${props.fill}`, props.balance && "hm-grid-balance"]
-        : props.min ? "hm-grid-auto" : `hm-grid-${cols}`, props.equal && "hm-grid-equal",
+      span ? ["hm-grid-span", `hm-gc-${cols}`, `hm-gm-${minBucket(props.minCol)}`, props.fill && `hm-grid-fill-${props.fill}`]
+        : flex ? ["hm-grid-flex", props.min ? "hm-grid-flex-min" : `hm-grid-c${cols}`, props.fill && `hm-grid-fill-${props.fill}`, props.balance && "hm-grid-balance"]
+          : props.min ? "hm-grid-auto" : `hm-grid-${cols}`,
+      props.equal && "hm-grid-equal",
       val(props.class)),
     style: props.min || props.minCol ? { ...(props.min ? { "--hm-grid-min": props.min } : {}), ...(props.minCol ? { "--hm-grid-col-min": props.minCol } : {}) } : undefined }, props.children);
 }
