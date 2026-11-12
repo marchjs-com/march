@@ -1,5 +1,4 @@
-// Every page in the showcase menu (nav.ts) has a loader (routes.gen.js, generated from pages/ by `march gen routes`)
-// and a file in pages/, and the other way round.
+// Every page in the showcase menu (nav.ts) has a loader (routes.gen.js) and a file in pages/, and the other way round.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
@@ -10,9 +9,9 @@ const paths = (file, re) => [...readFileSync(SRC + file, "utf8").matchAll(re)].m
 
 test("menu pages, loaders and page files match", () => {
   const menu = paths("nav.ts", /path: "([^"]+)"/g);
-  // the start page is pages/home.tsx (src/routes.ts maps "/" to it)
+  // loaders: routes.gen.js (march gen routes from pages/); the start page "/" is pages/home.tsx
   const loaders = paths("routes.gen.js", /^  "([^"]+)": \(\) => import\("\.\/pages\//gm).map((p) => (p === "/home" ? "/" : p)).sort();
-  assert.deepEqual(loaders, menu, "routes.gen.js (pages/) = nav.ts PAGES");
+  assert.deepEqual(loaders, menu, "routes.gen.js loaders = nav.ts PAGES");
   const files = readdirSync(SRC + "pages").filter((f) => f.endsWith(".tsx")).map((f) => f.replace(/\.tsx$/, ""));
   for (const p of menu) assert.ok(files.includes(p === "/" ? "home" : p.slice(1)), `pages/${p.slice(1) || "home"}.tsx`);
 });

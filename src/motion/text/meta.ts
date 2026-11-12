@@ -20,7 +20,7 @@ const fam = (family: TextFamily, options: readonly TextOptionKey[], names: strin
   return { name, family, options, ...(sample ? { sample: sample.replace(/_/g, " ") } : {}) };
 });
 
-/** Catalogue of every text animation: name, family, the options it takes and a sample text (for pickers and docs). */
+/** Every text animation with its family (enter, exit, loop, decorate, change, interactive), split mode and cost. */
 export const TEXT_ANIMATIONS: readonly TextAnimMeta[] = [
   ...fam("enter", ALL, "fade dissolve blurIn rise drop slideIn pop zoomIn flip rotateIn swing elastic bounceIn tilt perspective skewIn splitReveal maskReveal wipe cascade spin jelly trackIn implode explode inkBleed pixelate glitch shake"),
   ...fam("loop", ALL, "wave bounce jitter float pulse rainbow neon breathe glow shimmer"),

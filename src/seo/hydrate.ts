@@ -30,7 +30,7 @@ export function prerenderedFor(el: Element): boolean {
   return pre === "/" ? /\/(index\.html)?$/.test(l.pathname) : norm(l.pathname).endsWith(norm(pre));
 }
 
-/** Take over server- or build-rendered markup in `el` with the live app (`fn`) instead of rendering it again; returns dispose. */
+/** Take over prerendered HTML (data-hm-prerender) without a flash, or render normally when there is none. */
 export function hydrate(fn: () => unknown, el: Element, opts: HydrateOptions = {}): () => void {
   if (!el.hasAttribute("data-hm-prerender")) return render(fn, el);
   const fresh = prerenderedFor(el);
