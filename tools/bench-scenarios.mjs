@@ -11,7 +11,8 @@ import { march } from "../compiler/esbuild.js";
 import { openHeadless, ROOT, flag } from "./lib/headless.mjs";
 
 const SC = join(ROOT, "examples/showcase");
-const out = resolve(process.env.TMP ?? join(ROOT, ".tmp"), "march-bench-scenarios");
+// own output folder per run: several runs may build at the same time
+const out = resolve(process.env.TMP ?? join(ROOT, ".tmp"), `march-bench-scenarios-${process.pid}`);
 const want = flag(process.argv, "--scenarios", "");
 const libs = flag(process.argv, "--libs", "vanilla,march,react,preact,vue,svelte,solid,lit");
 rmSync(out, { recursive: true, force: true });
@@ -83,6 +84,6 @@ try {
     }
   }
   fail.push(...b.errs.filter(Boolean).map((e) => `page error: ${e}`));
-} finally { await b.close(); server.close(); }
+} finally { await b.close(); server.close(); rmSync(out, { recursive: true, force: true }); }
 if (fail.length) { console.error(`✖ bench-scenarios:\n  ${fail.join("\n  ")}`); process.exit(1); }
 console.log("✔ bench-scenarios: strict CSP, all checks passed");
