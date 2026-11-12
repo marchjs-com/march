@@ -45,3 +45,8 @@ and reduced-motion rules.
 - No allocation per frame for JS targets (typed arrays, cached segment index); one clock callback per root playback.
 - `test/motion-engine.test.js` measures a 200-item stagger (start < 50 ms, JS frame for 200 targets < 8 ms);
   `tools/motion-audit.mjs` checks the showcase in headless Edge (Stop all, global speed, 200-item stagger without long tasks).
+
+## Text animations
+
+`hadi-march/motion/text` adds 56 text animations on this engine (one export each, a shared split core of about
+1.5 KB gzip). See [src/motion/text/docs.md](../src/motion/text/docs.md).
