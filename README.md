@@ -1,6 +1,6 @@
 # HADI March
 
-**Run once, then march.** A small, fast UI library for TypeScript and JavaScript where components run a single time and
+**Run once, then march.** A small, fast framework for TypeScript and JavaScript where components run a single time and
 only the DOM that depends on a changed value updates — no virtual DOM, no re-renders, no runtime dependencies.
 
 ```tsx
