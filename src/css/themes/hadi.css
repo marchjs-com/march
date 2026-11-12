@@ -15,6 +15,9 @@
   --hm-primary-text: #A95A16; --hm-info-text: #177BAB; --hm-success-text: #4E7C26; --hm-warn-text: #8D6E26; --hm-danger-text: #D24444;
   --hm-special-text: #A3338C;
   --hm-on-primary-fill: #FFFFFF;
+  --hm-on-info-fill: #FFFFFF; --hm-on-success-fill: #14181F; --hm-on-warn-fill: #14181F; --hm-on-danger-fill: #FFFFFF;
+  --hm-on-special-fill: #FFFFFF;
+  --hm-cat-1-text: #A95A16; --hm-on-cat-1: #FFFFFF; --hm-cat-2-text: #177BAB; --hm-on-cat-2: #FFFFFF; --hm-cat-3-text: #4E7C26; --hm-on-cat-3: #14181F; --hm-cat-4-text: #A3338C; --hm-on-cat-4: #FFFFFF; --hm-cat-5-text: #D33C73; --hm-on-cat-5: #FFFFFF; --hm-cat-6-text: #8D6E26; --hm-on-cat-6: #14181F; --hm-cat-7-text: #17344F; --hm-on-cat-7: #FFFFFF; --hm-cat-8-text: #0B7F72; --hm-on-cat-8: #FFFFFF;
   --hm-brand-orange: #F2801F; --hm-brand-orange-soft: #FEF0E3; --hm-on-brand-orange: #FFFFFF; --hm-brand-orange-text: #A95A16;
   --hm-brand-blue: #1D9AD6; --hm-brand-blue-soft: #E5F4FB; --hm-on-brand-blue: #FFFFFF; --hm-brand-blue-text: #177BAB;
   --hm-brand-green: #78BE3A; --hm-brand-green-soft: #EEF7E5; --hm-on-brand-green: #14181F; --hm-brand-green-text: #4E7C26;
@@ -38,6 +41,9 @@
   --hm-primary-text: #F2801F; --hm-info-text: #1D9AD6; --hm-success-text: #78BE3A; --hm-warn-text: #D9A93A; --hm-danger-text: #D96060;
   --hm-special-text: #CC63B9;
   --hm-on-primary-fill: #FFFFFF;
+  --hm-on-info-fill: #FFFFFF; --hm-on-success-fill: #14181F; --hm-on-warn-fill: #14181F; --hm-on-danger-fill: #FFFFFF;
+  --hm-on-special-fill: #FFFFFF;
+  --hm-cat-1-text: #F2801F; --hm-on-cat-1: #FFFFFF; --hm-cat-2-text: #1D9AD6; --hm-on-cat-2: #FFFFFF; --hm-cat-3-text: #78BE3A; --hm-on-cat-3: #14181F; --hm-cat-4-text: #CC63B9; --hm-on-cat-4: #FFFFFF; --hm-cat-5-text: #E9658F; --hm-on-cat-5: #FFFFFF; --hm-cat-6-text: #D9A93A; --hm-on-cat-6: #14181F; --hm-cat-7-text: #9DB0C2; --hm-on-cat-7: #14181F; --hm-cat-8-text: #2EC4B2; --hm-on-cat-8: #14181F;
   --hm-brand-orange: #F2801F; --hm-brand-orange-soft: color-mix(in srgb, #F2801F 16%, #0D2033); --hm-on-brand-orange: #FFFFFF; --hm-brand-orange-text: #F2801F;
   --hm-brand-blue: #1D9AD6; --hm-brand-blue-soft: color-mix(in srgb, #1D9AD6 16%, #0D2033); --hm-on-brand-blue: #FFFFFF; --hm-brand-blue-text: #1D9AD6;
   --hm-brand-green: #78BE3A; --hm-brand-green-soft: color-mix(in srgb, #78BE3A 16%, #0D2033); --hm-on-brand-green: #14181F; --hm-brand-green-text: #78BE3A;
@@ -64,6 +70,9 @@
   --hm-primary-text: #F2801F; --hm-info-text: #1D9AD6; --hm-success-text: #78BE3A; --hm-warn-text: #D9A93A; --hm-danger-text: #D96060;
   --hm-special-text: #CC63B9;
   --hm-on-primary-fill: #FFFFFF;
+  --hm-on-info-fill: #FFFFFF; --hm-on-success-fill: #14181F; --hm-on-warn-fill: #14181F; --hm-on-danger-fill: #FFFFFF;
+  --hm-on-special-fill: #FFFFFF;
+  --hm-cat-1-text: #F2801F; --hm-on-cat-1: #FFFFFF; --hm-cat-2-text: #1D9AD6; --hm-on-cat-2: #FFFFFF; --hm-cat-3-text: #78BE3A; --hm-on-cat-3: #14181F; --hm-cat-4-text: #CC63B9; --hm-on-cat-4: #FFFFFF; --hm-cat-5-text: #E9658F; --hm-on-cat-5: #FFFFFF; --hm-cat-6-text: #D9A93A; --hm-on-cat-6: #14181F; --hm-cat-7-text: #9DB0C2; --hm-on-cat-7: #14181F; --hm-cat-8-text: #2EC4B2; --hm-on-cat-8: #14181F;
   --hm-brand-orange: #F2801F; --hm-brand-orange-soft: color-mix(in srgb, #F2801F 16%, #0D2033); --hm-on-brand-orange: #FFFFFF; --hm-brand-orange-text: #F2801F;
   --hm-brand-blue: #1D9AD6; --hm-brand-blue-soft: color-mix(in srgb, #1D9AD6 16%, #0D2033); --hm-on-brand-blue: #FFFFFF; --hm-brand-blue-text: #1D9AD6;
   --hm-brand-green: #78BE3A; --hm-brand-green-soft: color-mix(in srgb, #78BE3A 16%, #0D2033); --hm-on-brand-green: #14181F; --hm-brand-green-text: #78BE3A;

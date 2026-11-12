@@ -4,7 +4,7 @@
 .hm-step-btn:disabled { cursor: default; }
 .hm-step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; border: 1px solid var(--hm-border-strong); font-weight: 600; font-size: var(--hm-text-xs); }
 .hm-step-current .hm-step-btn { color: var(--hm-text); font-weight: 600; }
-.hm-step-current .hm-step-num { background: var(--hm-primary); border-color: var(--hm-primary); color: var(--hm-on-primary-fill); }
+.hm-step-current .hm-step-num { background: var(--hm-accent, var(--hm-primary)); border-color: var(--hm-accent, var(--hm-primary)); color: var(--hm-on-accent, var(--hm-on-primary-fill)); }
 .hm-step-done .hm-step-num { background: var(--hm-success-soft); border-color: var(--hm-success); color: var(--hm-success-text); }
 .hm-wizard-progress { flex-basis: auto; }
 .hm-wizard-title { margin: 0 0 var(--hm-space-2); font-size: var(--hm-text-lg); }

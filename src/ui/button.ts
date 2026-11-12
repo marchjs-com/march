@@ -14,6 +14,7 @@ import { formatKey } from "./keys.ts";
 import { val, cx, rest, uid, icon, glyph, later, debounce, type MaybeFn, type ClassProp } from "./util.ts";
 import { check } from "../icons/glyphs/check.ts";
 import { copy as copyIcon } from "../icons/glyphs/copy.ts";
+import { colorAttr, type ColorToken } from "../theme/colors.ts";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "dark";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -22,6 +23,8 @@ const sizeClass = (s: ButtonSize | null | undefined): string | undefined => (s ?
 
 /** Props of <Button>. Other props (onClick, title, aria-*, data-*) go to the <button> / <a>. */
 export interface ButtonProps {
+  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
+  color?: ColorToken | undefined;
   variant?: MaybeFn<ButtonVariant | undefined>;
   size?: MaybeFn<ButtonSize | undefined>;
   loading?: MaybeFn<boolean | null | undefined>;
@@ -49,7 +52,7 @@ export function Button(props: ButtonProps): unknown {
     props.children != null && h("span", { class: "hm-btn-label" }, props.children),
     props.iconEnd != null && icon(props.iconEnd),
   ];
-  const attrs = rest(props, ["variant", "size", "loading", "icon", "iconEnd", "block", "href", "disabled", "type"]);
+  const attrs = { ...rest(props, ["variant", "size", "loading", "icon", "iconEnd", "block", "href", "disabled", "type", "color"]), "data-hm-color": colorAttr(props.color) };
   if (props.href != null) {
     const href = (): Href => val(props.href as MaybeFn<Href>);
     const L = routerLink(); // the router's Link when the app has a router; otherwise a plain link

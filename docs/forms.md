@@ -332,3 +332,16 @@ For settings and admin screens.
 
 It shows a loading skeleton, a load error with Retry, a Reload button and an "Unsaved changes" badge; Reset restores the
 loaded values; Save is disabled until something changed. Server `fieldErrors` map to fields like `<Form>`.
+
+
+## Colors
+
+Every control takes `color` (a theme token): focus ring and border, caret, selected text, checked state, slider,
+selected option and day, chips, active step and the drop zone use it. `<Form color="brand-blue">`, `<Field color=…>` and
+groups (`<CheckboxGroup>`, `<RadioGroup>`, `<Segmented>`) pass it to everything inside (CSS inheritance of
+`data-hm-color`); a control's own `color` overrides it. Invalid fields always show `danger`. Floating panels (Select,
+DatePicker) take the color of their control.
+
+Tokens: `primary`, `info`, `success`, `warning`, `danger`, `neutral`, `special`, `brand-orange`, `brand-blue`,
+`brand-green`, `brand-purple`, `brand-gold`, `brand-pink`, `cat-1` … `cat-8` (`COLOR_TOKENS` in `hadi-march/theme`). Text
+on a filled state is chosen for legibility (white when it reaches the brand minimum, otherwise near-black).

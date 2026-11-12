@@ -7,6 +7,7 @@ import { t } from "../core/i18n.ts";
 import { schema as makeSchema, type Schema, type SchemaSpec, type Values } from "../schema/index.ts";
 import { scoped, cx, uid, type ClassProp } from "./util.ts";
 import { useForm, renderFields, FormContext, type FormController, type FieldName, type ValidateOn } from "./form.ts";
+import { colorAttr, type ColorToken } from "../theme/colors.ts";
 
 const specOf = (s: Schema): SchemaSpec => Object.fromEntries(s.fields.map((f) => [f.name, f]));
 
@@ -29,6 +30,8 @@ export interface WizardApi { index: () => number; next: () => void; back: () => 
 
 /** Props of <Wizard>. */
 export interface WizardProps<V = Values> {
+  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
+  color?: ColorToken | undefined;
   steps: readonly WizardStep<V>[];
   /** Optional when every step has its own schema. */
   schema?: Schema<V> | undefined;
@@ -83,7 +86,7 @@ export function Wizard(props: WizardProps): unknown {
     const api: WizardApi = { index: () => index(), next, back, go: (i) => { if (i < index.peek() || [...Array(i).keys()].every(check)) go(i); } };
     props.onReady?.(form, api);
     const current = computed(() => index());
-    return h("form", {
+    return h("form", { "data-hm-color": colorAttr(props.color),
       class: cx("hm-wizard", props.class), novalidate: true, "aria-busy": () => (form.submitting() ? "true" : null),
       onSubmit: (e: Event) => { e.preventDefault(); next(); },
     },

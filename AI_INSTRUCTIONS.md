@@ -113,6 +113,11 @@ shown; the server must enforce permissions.
 - Text the user reads may be any language, through `t`…`` (`t("Night Blue")` for data such as theme names).
 - `node tools/lint-identifiers.mjs` lists violations; the test suite runs it.
 
+**Colors**: controls take `color` with a theme token, never a CSS color: `primary` (default), `info`, `success`,
+`warning`, `danger`, `neutral`, `brand-orange|blue|green|purple|gold|pink`, `cat-1..8`. Put it on `<Form>`, `<Field>` or a
+group to color everything inside; a control's own `color` wins. Errors stay `danger`. In CSS read
+`var(--hm-accent, var(--hm-primary))`; fills/lines/icons use `--hm-X`, text uses `--hm-X-text`, text on a fill `--hm-on-X-fill`.
+
 **Sidebars**: big apps use `<NavSidebar>`; add `resizable` (+ `minWidth`, `maxWidth`, `collapseBelow`) when users
 should set its width. Never size it with inline styles.
 

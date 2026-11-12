@@ -5,6 +5,7 @@
    (prefers-color-scheme) unless [data-theme="light"|"dark"] is set on <html>. Components read only these tokens.
    Self-hosted fonts: import "hadi-march/css/font.css". No inline styles are ever needed (CSP: style-src 'self'). */
 @import "./themes/hadi.css";
+@import "./colors.css";
 
 :root {
   /* ---- type */

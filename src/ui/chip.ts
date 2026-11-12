@@ -6,8 +6,11 @@ import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { x as xIcon } from "../icons/glyphs/x.ts";
 import { check } from "../icons/glyphs/check.ts";
 import { OverflowText } from "./marquee.ts";
+import { colorAttr, type ColorToken } from "../theme/colors.ts";
 
 export interface ChipProps {
+  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
+  color?: ColorToken | undefined;
   tone?: MaybeFn<"neutral" | "primary" | "success" | "warn" | "danger" | "info" | undefined>;
   icon?: unknown;
   /** Toggle chip (filters): pressed state. */
@@ -27,6 +30,6 @@ export function Chip(props: ChipProps): Element {
     h(OverflowText, { class: "hm-chip2-label" }, props.children),
   ];
   const remove = props.onRemove && h("button", { type: "button", class: "hm-chip2-x", "aria-label": () => t`Remove`, onClick: (e: Event) => { e.stopPropagation(); props.onRemove?.(); } }, glyph(xIcon));
-  if (toggle) return h("span", { class: cls }, h("button", { type: "button", class: "hm-chip2-hit", "aria-pressed": () => (props.selected !== undefined ? String(!!val(props.selected)) : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, body), remove);
-  return h("span", { class: cls }, body, remove);
+  if (toggle) return h("span", { "data-hm-color": colorAttr(props.color), class: cls }, h("button", { type: "button", class: "hm-chip2-hit", "aria-pressed": () => (props.selected !== undefined ? String(!!val(props.selected)) : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, body), remove);
+  return h("span", { "data-hm-color": colorAttr(props.color), class: cls }, body, remove);
 }

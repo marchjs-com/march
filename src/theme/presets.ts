@@ -91,6 +91,9 @@ function modeVars(c: ThemeColors, mode: "light" | "dark"): string {
     `--hm-special-text: ${ensureContrast(c.special ?? c.cat[3] ?? c.primary, c.surface)};`,
     // text on a fill of the pure primary color (selected day, step number…): white when it reaches the brand minimum
     `--hm-on-primary-fill: ${onBrandFill(c.primary)};`,
+    (["info", "success", "warn", "danger"] as const).map((k) => `--hm-on-${k}-fill: ${onBrandFill(c[k])};`).join(" "),
+    `--hm-on-special-fill: ${onBrandFill(c.special ?? c.cat[3] ?? c.primary)};`,
+    c.cat.map((x, i) => `--hm-cat-${i + 1}-text: ${ensureContrast(x, c.surface)}; --hm-on-cat-${i + 1}: ${onBrandFill(x)};`).join(" "),
     ...Object.entries(c.brand ?? {}).map(([n, b]) => `--hm-${n}: ${b.color}; --hm-${n}-soft: ${b.soft ?? `color-mix(in srgb, ${b.color} 16%, ${c.surface})`}; --hm-on-${n}: ${onBrandFill(b.color)}; --hm-${n}-text: ${ensureContrast(b.color, c.surface)};`),
   ];
   if (mode === "dark") lines.push(

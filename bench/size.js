@@ -51,7 +51,8 @@ import { render, h } from "hadi-march";
 import { Button } from "hadi-march/ui";
 render(() => h(Button, { variant: "primary" }, "Merhaba"), document.body);
 `;
-export const APP_BUDGET = { buttonJs: 6.5 * 1024, buttonCss: 4.5 * 1024 };
+// buttonCss 5 KB: includes the color tokens every themable component reads (src/css/colors.css) and the text / on-fill tones
+export const APP_BUDGET = { buttonJs: 6.5 * 1024, buttonCss: 5 * 1024 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const s = await sizes();

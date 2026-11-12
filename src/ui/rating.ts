@@ -6,8 +6,11 @@ import { t } from "../core/i18n.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { star } from "../icons/glyphs/star.ts";
 import { starFilled } from "../icons/glyphs/starFilled.ts";
+import { colorAttr, type ColorToken } from "../theme/colors.ts";
 
 export interface RatingProps {
+  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
+  color?: ColorToken | undefined;
   value?: MaybeFn<number | null | undefined>;
   setValue?: (v: number) => void;
   onChange?: (v: number) => void;
@@ -41,7 +44,7 @@ export function Rating(props: RatingProps): Element {
       },
     }, h("span", { class: "hm-rating-off" }, glyph(star)), h("span", { class: "hm-rating-on" }, glyph(starFilled)));
   });
-  return h("span", {
+  return h("span", { "data-hm-color": colorAttr(props.color),
     class: () => cx("hm-rating", `hm-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", val(props.class)), role: "radiogroup",
     "aria-label": () => val(props.label) ?? t`Rating`, onMouseleave: () => hover.set(null),
   }, stars);

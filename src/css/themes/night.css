@@ -15,6 +15,9 @@
   --hm-primary-text: #5CB8EC; --hm-info-text: #5CB8EC; --hm-success-text: #7FD8A0; --hm-warn-text: #FBC25A; --hm-danger-text: #FF8A8D;
   --hm-special-text: #C78BE0;
   --hm-on-primary-fill: #14181F;
+  --hm-on-info-fill: #14181F; --hm-on-success-fill: #14181F; --hm-on-warn-fill: #14181F; --hm-on-danger-fill: #14181F;
+  --hm-on-special-fill: #14181F;
+  --hm-cat-1-text: #4AA3E8; --hm-on-cat-1: #FFFFFF; --hm-cat-2-text: #5CB8EC; --hm-on-cat-2: #14181F; --hm-cat-3-text: #7C9CF0; --hm-on-cat-3: #FFFFFF; --hm-cat-4-text: #C78BE0; --hm-on-cat-4: #14181F; --hm-cat-5-text: #E9658F; --hm-on-cat-5: #FFFFFF; --hm-cat-6-text: #E5BE5C; --hm-on-cat-6: #14181F; --hm-cat-7-text: #2EC4B2; --hm-on-cat-7: #14181F; --hm-cat-8-text: #9DB0C2; --hm-on-cat-8: #14181F;
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;
@@ -34,6 +37,9 @@
   --hm-primary-text: #5CB8EC; --hm-info-text: #5CB8EC; --hm-success-text: #7FD8A0; --hm-warn-text: #FBC25A; --hm-danger-text: #FF8A8D;
   --hm-special-text: #C78BE0;
   --hm-on-primary-fill: #14181F;
+  --hm-on-info-fill: #14181F; --hm-on-success-fill: #14181F; --hm-on-warn-fill: #14181F; --hm-on-danger-fill: #14181F;
+  --hm-on-special-fill: #14181F;
+  --hm-cat-1-text: #4AA3E8; --hm-on-cat-1: #FFFFFF; --hm-cat-2-text: #5CB8EC; --hm-on-cat-2: #14181F; --hm-cat-3-text: #7C9CF0; --hm-on-cat-3: #FFFFFF; --hm-cat-4-text: #C78BE0; --hm-on-cat-4: #14181F; --hm-cat-5-text: #E9658F; --hm-on-cat-5: #FFFFFF; --hm-cat-6-text: #E5BE5C; --hm-on-cat-6: #14181F; --hm-cat-7-text: #2EC4B2; --hm-on-cat-7: #14181F; --hm-cat-8-text: #9DB0C2; --hm-on-cat-8: #14181F;
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;
@@ -53,6 +59,9 @@
   --hm-primary-text: #5CB8EC; --hm-info-text: #5CB8EC; --hm-success-text: #7FD8A0; --hm-warn-text: #FBC25A; --hm-danger-text: #FF8A8D;
   --hm-special-text: #C78BE0;
   --hm-on-primary-fill: #14181F;
+  --hm-on-info-fill: #14181F; --hm-on-success-fill: #14181F; --hm-on-warn-fill: #14181F; --hm-on-danger-fill: #14181F;
+  --hm-on-special-fill: #14181F;
+  --hm-cat-1-text: #4AA3E8; --hm-on-cat-1: #FFFFFF; --hm-cat-2-text: #5CB8EC; --hm-on-cat-2: #14181F; --hm-cat-3-text: #7C9CF0; --hm-on-cat-3: #FFFFFF; --hm-cat-4-text: #C78BE0; --hm-on-cat-4: #14181F; --hm-cat-5-text: #E9658F; --hm-on-cat-5: #FFFFFF; --hm-cat-6-text: #E5BE5C; --hm-on-cat-6: #14181F; --hm-cat-7-text: #2EC4B2; --hm-on-cat-7: #14181F; --hm-cat-8-text: #9DB0C2; --hm-on-cat-8: #14181F;
   --hm-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --hm-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);
   --hm-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --hm-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);
   --hm-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --hm-mix-surface: 6%;

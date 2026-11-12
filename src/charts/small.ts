@@ -5,6 +5,7 @@ import { lttb } from "./lttb.ts";
 import { svgIcon, isIconDef } from "../icons/svg.ts";
 import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, attr, each, type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps } from "./util.ts";
 import { OverflowText } from "../ui/marquee.ts";
+import { colorAttr, type ColorToken } from "../theme/colors.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -39,6 +40,8 @@ export interface StatProps<D = unknown> {
   icon?: unknown;
 }
 export interface ProgressRingProps {
+  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
+  color?: ColorToken | undefined;
   value?: Opt<number>;
   max?: Opt<number>;
   size?: Opt<number>;
@@ -147,7 +150,7 @@ export function ProgressRing(props: ProgressRingProps): Element {
   const r = computed(() => (S() - T()) / 2), C = computed(() => 2 * Math.PI * r());
   const level = computed(() => { const [a, b] = read(props.thresholds) ?? [50, 80], p = (v() / max()) * 100; return p < a ? "low" : p < b ? "mid" : "high"; });
   const text = (): unknown => formatter(read<FormatSpec | null | undefined>(props.format), (x) => String(Math.round(x as number)))(v());
-  return h("svg", {
+  return h("svg", { "data-hm-color": colorAttr(props.color),
     class: () => `hm-ring hm-ring-${level()}`, role: "img", viewBox: () => `0 0 ${S()} ${S()}`, width: S, height: S,
     "aria-label": () => `${read(props.label) ?? "Score"}: ${text()} of ${max()}`,
   },

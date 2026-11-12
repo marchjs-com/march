@@ -23,7 +23,7 @@
 }
 .hm-input:hover:not(:focus):not(:disabled), .hm-select:hover:not(:focus):not(:disabled) { border-color: color-mix(in srgb, var(--hm-border-strong) 65%, var(--hm-text)); }
 .hm-input::placeholder, .hm-textarea::placeholder { color: var(--hm-faint); opacity: 1; }
-.hm-input:focus, .hm-select:focus { outline: none; border-color: var(--hm-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-focus) 22%, transparent); }
+.hm-input:focus, .hm-select:focus { outline: none; border-color: var(--hm-accent, var(--hm-focus)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-accent, var(--hm-focus)) 22%, transparent); }
 .hm-input[aria-invalid="true"], .hm-select[aria-invalid="true"], .hm-field-invalid .hm-input, .hm-field-invalid .hm-select { border-color: var(--hm-danger); }
 .hm-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-danger) 20%, transparent); }
 .hm-input:disabled, .hm-select:disabled { background: var(--hm-surface-2); color: var(--hm-muted); cursor: not-allowed; }
@@ -39,7 +39,7 @@
 
 /* prefix / suffix / inline buttons */
 .hm-affix { display: flex; align-items: stretch; width: 100%; border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); background: var(--hm-surface); position: relative; box-shadow: var(--hm-shadow-inset); transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
-.hm-affix:focus-within { border-color: var(--hm-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-focus) 22%, transparent); }
+.hm-affix:focus-within { border-color: var(--hm-accent, var(--hm-focus)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-accent, var(--hm-focus)) 22%, transparent); }
 .hm-affix > .hm-input { border: 0; box-shadow: none; flex: 1; min-width: 0; background: transparent; }
 .hm-affix:has(.hm-input[aria-invalid="true"]) { border-color: var(--hm-danger); }
 .hm-affix-text { display: flex; align-items: center; padding: 0 var(--hm-space-3); color: var(--hm-muted); background: var(--hm-bg-subtle); font-size: var(--hm-text-sm); white-space: nowrap; }

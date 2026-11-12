@@ -9,6 +9,7 @@ import { t, locale } from "../core/i18n.ts";
 import { roving } from "../ui/focus.ts";
 import { model, ctl, cx, uid, extend, syncValue, parseNumber, formatNumber, normOptions, same, labelledBy, useField,
   type ControlProps, type ClassProp, type OptionsProp } from "./util.ts";
+import { colorAttr } from "../theme/colors.ts";
 
 /** prefix / suffix text around a control. */
 export interface AffixProps { prefix?: unknown; suffix?: unknown; class?: ClassProp }
@@ -303,7 +304,7 @@ export function CheckboxGroup<T = unknown>(props: CheckboxGroupProps<T>): unknow
   const field = useField();
   const baseId = props.id ?? field?.id ?? uid("hm-cbg");
   const c = ctl(props);
-  return h("div", { role: "group", class: cx("hm-choices", props.inline && "hm-choices-inline", props.class), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
+  return h("div", { "data-hm-color": colorAttr(props.color), role: "group", class: cx("hm-choices", props.inline && "hm-choices-inline", props.class), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
     () => normOptions(props.options).map((o, i) => h("label", { class: "hm-check" },
       h("input", {
         type: "checkbox", class: "hm-check-input", id: i ? `${baseId}-${i}` : baseId, name: props.name, onBlur: props.onBlur,
@@ -325,7 +326,7 @@ export function RadioGroup<T = unknown>(props: RadioGroupProps<T>): unknown {
   const baseId = props.id ?? field?.id ?? uid("hm-rg");
   const name = props.name ?? baseId;
   const c = ctl(props);
-  return h("div", { role: "radiogroup", class: cx("hm-choices", props.inline && "hm-choices-inline", props.class), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
+  return h("div", { "data-hm-color": colorAttr(props.color), role: "radiogroup", class: cx("hm-choices", props.inline && "hm-choices-inline", props.class), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
     () => normOptions(props.options).map((o, i) => h("label", { class: "hm-check" },
       h("input", {
         type: "radio", class: "hm-check-input", id: i ? `${baseId}-${i}` : baseId, name, onBlur: props.onBlur,
@@ -347,7 +348,7 @@ export function Segmented<T = unknown>(props: SegmentedProps<T>): unknown {
   const c = ctl(props);
   let root: Element;
   const onKeyDown = (e: KeyboardEvent) => { const target = roving(e, [...root.querySelectorAll("button")].filter((b) => !b.disabled), { horizontal: true }); if (target) target.click(); };
-  root = h("div", { role: "radiogroup", class: cx("hm-segmented", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
+  root = h("div", { "data-hm-color": colorAttr(props.color), role: "radiogroup", class: cx("hm-segmented", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
     () => {
       const opts = normOptions(props.options);
       return opts.map((o, i) => h("button", {
@@ -466,5 +467,5 @@ export function CodeInput(props: CodeInputProps): unknown {
     boxes.push(el);
   }
   onCleanup(() => { boxes.length = 0; });
-  return h("div", { role: "group", class: cx("hm-otp", props.class), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"] }, boxes);
+  return h("div", { "data-hm-color": colorAttr(props.color), role: "group", class: cx("hm-otp", props.class), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"] }, boxes);
 }
