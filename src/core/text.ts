@@ -38,3 +38,20 @@ export function compareText(a: unknown, b: unknown, loc?: string): number {
   if (!c) { c = new Intl.Collator(loc, { sensitivity: "base", numeric: true }); collators.set(loc, c); }
   return c.compare(String(a ?? ""), String(b ?? ""));
 }
+
+/**
+ * Where `query` occurs in `text` when both are folded (accents, case, Turkish i): [start, end) ranges in the ORIGINAL
+ * text, for highlighting search hits. Every occurrence; an empty query gives none.
+ */
+export function matchRanges(text: string, query: string): [number, number][] {
+  const q = fold(query.trim());
+  if (!q) return [];
+  // fold char by char so each folded position maps back to its source character
+  let folded = "";
+  const src: number[] = [];
+  for (let i = 0; i < text.length; i++) { const f = fold(text[i]); folded += f; for (let k = 0; k < f.length; k++) src.push(i); }
+  src.push(text.length);
+  const out: [number, number][] = [];
+  for (let at = folded.indexOf(q); at >= 0; at = folded.indexOf(q, at + q.length)) out.push([src[at] as number, (src[at + q.length - 1] as number) + 1]);
+  return out;
+}

@@ -14,6 +14,7 @@ export { pageTransitions, transitionFrames, resolveTransition, navDirection, def
 // page transition variants: register the ones a route uses (each is its own export)
 export { circle, wipe, stack, cube, flip as flipPage, zoomThrough, curtain, blinds, pixelDissolve, morphPage, PAGE_VARIANTS, usePageTransitions, type PageVariant } from "./page-fx.ts";
 export { drag, swipe, press, magnet, tilt, type DragOptions } from "./gestures.ts";
+export { pointerDrag, type PointerDragOptions, type DragPoint } from "./pointer.ts";
 export { reducedMotion, setReducedMotion, frame, frameLoop, animateEl } from "./env.ts";
 export * as easing from "./easing.ts";
 // SVG: stroke drawing, path morph (resampled), motion along a path, clip reveals, SVG filters

@@ -10,6 +10,13 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 
+### Data display — `hadi-march/data`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [Chip](#chip), Menu, FilterControl, CellEditor |
+| TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
+
 ### Feedback — `hadi-march/feedback`
 
 | Component | Status | What | Composed of |
@@ -54,6 +61,26 @@ Composed of: OverflowText
 
 Full page: src/components/actions/chip/docs.md
 
+## DataGrid
+
+A spreadsheet-like grid for large data. It runs on the table engine (`createTable`: sorting, filters, search, column layout, selection, inline edit, CSV) and the shared virtual window, which windows **rows and columns**: only the cells in view are in the DOM, so 100 000 rows × many columns scroll smoothly. On top it adds grouping with aggregates, a totals footer, pinned columns, drag to reorder and resize columns, and a keyboard cell cursor.
+
+Composed of: [Chip](#chip), Menu, FilterControl, CellEditor
+
+```tsx
+import { DataGrid } from "hadi-march/components/data/data-grid";
+
+<DataGrid rows={$orders} rowKey="id" selectable groupBy={["region"]}
+  columns={[
+    { key: "customer", label: "Customer", pin: "left", editable: true },
+    { key: "region", label: "Region", filter: "select" },
+    { key: "amount", label: "Amount", format: ["money", "USD"], aggregate: "sum" },
+  ]}
+  onEdit={(row, key, value) => save(row.id, key, value)} />
+```
+
+Full page: src/components/data/data-grid/docs.md
+
 ## Drawer
 
 A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
@@ -87,3 +114,20 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 ```
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
+
+## TreeView
+
+A tree for large hierarchies. Only the rows in view are in the DOM (shared virtual window), so thousands of open nodes stay smooth. Children can load lazily the first time a folder opens, selection is single or multiple, nodes move by drag and drop (before / after / inside, with edge auto-scroll and auto-open of a folder you hover), and search keeps the path to every hit open and highlights the matching text. For a short static tree, `<Tree>` is enough.
+
+Composed of: Spinner
+
+```tsx
+import { TreeView } from "hadi-march/components/data/tree-view";
+
+<TreeView nodes={files} selection="multiple" draggable search={$q}
+  load={(node) => api.children(node.id)}
+  onSelect={(ids) => $selected = ids}
+  onMove={(ids, target, position) => api.move(ids, target, position)} />
+```
+
+Full page: src/components/data/tree-view/docs.md

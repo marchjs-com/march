@@ -24,6 +24,11 @@ export interface ComponentMeta {
   hubs?: readonly string[];
   /** Showcase page path that shows it. */
   showcase?: string;
+  /**
+   * `false`: a large component kept out of the `hadi-march/ui` barrel (a barrel re-export puts a module into the static
+   * graph of every page that imports the barrel). Import it from `hadi-march/components/<folder>`.
+   */
+  barrel?: boolean;
   /** Deprecated: what to use instead. */
   replacedBy?: string;
 }

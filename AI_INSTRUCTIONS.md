@@ -500,6 +500,13 @@ separate button handler. Manager events go through `setManagerEmit`.
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 
+### Data display — `hadi-march/data`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | Chip, Menu, FilterControl, CellEditor |
+| TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
+
 ### Feedback — `hadi-march/feedback`
 
 | Component | Status | What | Composed of |
