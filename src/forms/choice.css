@@ -79,6 +79,8 @@
   transform: scale(0); transition: transform var(--hm-dur-slow) var(--hm-ch-ease); }
 .hm-choice-card .hm-check-box::before { inset: 0; transform: scale(1); }
 .hm-choice-card .hm-check-input:checked + .hm-check-box { transform: scale(1); }
+/* a one-line card (a title only): the badge is centred on the block axis, at the line end */
+.hm-choice-card .hm-check:not(:has(.hm-choice-card-desc, .hm-choice-card-icon, .hm-choice-card-meta)) .hm-check-box { inset-block: 0; margin-block: auto; }
 .hm-choice-card .hm-check:hover .hm-check-input:not(:disabled) + .hm-check-box { box-shadow: none; }
 .hm-choice-card .hm-check:has(.hm-check-input:checked) { border-color: var(--hm-ch-c); box-shadow: 0 0 0 1px var(--hm-ch-c), 0 6px 18px -8px color-mix(in srgb, var(--hm-ch-c) 45%, transparent);
   background: color-mix(in srgb, var(--hm-ch-c) 5%, var(--hm-surface)); }
