@@ -5,6 +5,8 @@
 //   overflow        an element's content is wider than its box and spills out (overflow: visible)
 //   broken-word     a word is split across lines (letter-by-letter wrapping, overflow-wrap: anywhere in a narrow box)
 //   uneven-row      cards in the same Grid row have different heights
+//   grid-cell       an item of a CSS grid (one column, stretching) is narrower than its track: a margin or width
+//                   rule meant for something else, such as a class name used by two features
 //   overlap         neighbouring items of a flex row draw on top of each other
 //   double-mount    after in-app navigation (menu clicks, back / forward) more than one app shell or page heading
 //   console         a script error
@@ -118,6 +120,23 @@ const SCAN = `(() => {
     const rows = new Map();
     for (const k of g.children) { if (!shown(k)) continue; const r = k.getBoundingClientRect(); const key = Math.round(r.top); (rows.get(key) ?? rows.set(key, []).get(key)).push(r.height); }
     for (const hs of rows.values()) if (hs.length > 1 && Math.max(...hs) - Math.min(...hs) > 2) { out.push(["uneven-row", where(g), hs.map(Math.round).join("/")]); break; }
+  }
+  // any CSS grid: a one-column item that stretches (the default) must fill its track
+  for (const g of document.body.querySelectorAll("*")) {
+    if (skip(g) || !shown(g)) continue;
+    const gs = getComputedStyle(g);
+    if (gs.display !== "grid" && gs.display !== "inline-grid") continue;
+    if (!/^(normal|stretch|legacy)$/.test(gs.justifyItems)) continue;
+    const tracks = gs.gridTemplateColumns.split(" ").map(parseFloat).filter((x) => x > 0);
+    if (tracks.length < 2) continue;
+    for (const k of g.children) {
+      if (!shown(k) || skip(k)) continue;
+      const ks = getComputedStyle(k);
+      if (/absolute|fixed/.test(ks.position) || /^inline|^table/.test(ks.display)) continue;
+      if (!/^(auto|span 1)$/.test(ks.gridColumnEnd) || !/^(auto|normal|stretch)$/.test(ks.justifySelf)) continue;
+      const w = k.offsetWidth;
+      if (!tracks.some((t) => Math.abs(t - w) <= 2) && w < Math.max(...tracks) - 2) { out.push(["grid-cell", where(k), w + " in " + tracks.map(Math.round).join("/")]); break; }
+    }
   }
   return out;
 })()`;
