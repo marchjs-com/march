@@ -22,3 +22,10 @@ test("only what you use is bundled: a Button-only app has no other component's C
   assert.ok(r.jsGzip <= APP_BUDGET.buttonJs, `JS ${r.jsGzip} B gzip > ${APP_BUDGET.buttonJs} B`);
   assert.ok(r.cssGzip <= APP_BUDGET.buttonCss, `CSS ${r.cssGzip} B gzip > ${APP_BUDGET.buttonCss} B`);
 });
+
+test("a typical small app (signals, For, If, one component) stays within its JS budget", async () => {
+  const { buildApp, TYPICAL_APP, APP_BUDGET } = await import("../bench/size.js");
+  const r = await buildApp(TYPICAL_APP);
+  assert.ok(!r.js.includes("pushState"), "no router");
+  assert.ok(r.jsGzip <= APP_BUDGET.typicalJs, `JS ${r.jsGzip} B gzip > ${APP_BUDGET.typicalJs} B`);
+});

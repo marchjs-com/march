@@ -55,12 +55,35 @@ import { render, h } from "hadi-march";
 import { Button } from "hadi-march/ui";
 render(() => h(Button, { variant: "primary" }, "Merhaba"), document.body);
 `;
+/**
+ * A typical small app (what most users ship first): signals, a keyed list, a condition and one component, written the
+ * way the docs show it (JSX through the March plugin). Its JS gzip is the size that matters to an app, not the barrel.
+ */
+export const TYPICAL_APP = `import { render, signal, For, If } from "hadi-march";
+import { Button } from "hadi-march/ui";
+const todos = signal([{ id: 1, text: "Write docs", done: false }]);
+const text = signal("");
+const add = () => { const t = text().trim(); if (t) { todos.set([...todos(), { id: Date.now(), text: t, done: false }]); text.set(""); } };
+function App() {
+  return <main>
+    <input value={text()} onInput={(e) => text.set(e.currentTarget.value)} />
+    <Button variant="primary" on:click={add}>Add</Button>
+    <If when={todos().length} fallback={<p>Nothing to do</p>}>
+      <ul><For each={todos()} key="id">{(t) => <li class={t().done ? "done" : ""}>{t().text}</li>}</For></ul>
+    </If>
+  </main>;
+}
+render(() => <App />, document.body);
+`;
 // buttonCss 5.25 KB: includes the color tokens every themable component reads (src/css/colors.css), the text / on-fill
 // tones and the HADİ theme's multicolor defaults (progress, spinner)
-export const APP_BUDGET = { buttonJs: 6.5 * 1024, buttonCss: 5.25 * 1024 };
+// typicalJs 7.5 KB: TYPICAL_APP measured 7.42 KB (h.ts is most of it: every prop kind setProp knows ships with it)
+export const APP_BUDGET = { buttonJs: 6.5 * 1024, buttonCss: 5.25 * 1024, typicalJs: 7.5 * 1024 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const s = await sizes();
+  const app = await buildApp(TYPICAL_APP);
+  s.typical = { min: app.js.length, gzip: app.jsGzip };
   console.log("entry      min KB   gzip KB");
-  for (const [n, v] of Object.entries(s)) console.log(`${n.padEnd(10)} ${(v.min / 1024).toFixed(1).padStart(6)}   ${(v.gzip / 1024).toFixed(2).padStart(7)}${BUDGET[n] ? `   (budget ${(BUDGET[n] / 1024).toFixed(0)} KB)` : ""}`);
+  for (const [n, v] of Object.entries(s)) console.log(`${n.padEnd(10)} ${(v.min / 1024).toFixed(1).padStart(6)}   ${(v.gzip / 1024).toFixed(2).padStart(7)}${BUDGET[n] ? `   (budget ${(BUDGET[n] / 1024).toFixed(2)} KB)` : ""}`);
 }
