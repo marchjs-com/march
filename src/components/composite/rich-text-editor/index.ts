@@ -488,7 +488,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
         h("input", {
           id: `${id}-href`, class: () => cx("hm-input hm-rte-link-input", linkText().trim() && !isSafeLink(linkText().trim()) && "is-invalid"), type: "url", inputmode: "url", autocomplete: "off", spellcheck: "false",
           placeholder: "https://", value: untrack(linkText), "aria-invalid": () => (linkText().trim() && !isSafeLink(linkText().trim()) ? "true" : null), "aria-describedby": `${id}-href-help`,
-          ref: (el: HTMLInputElement) => queueMicrotask(() => { el.focus(); el.select(); }),
+          ref: (el: HTMLInputElement) => queueMicrotask(() => { el.focus(); el.select?.(); }),
           onInput: (e: Event) => linkText.set((e.target as HTMLInputElement).value),
           onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); applyLink(); } },
         }),

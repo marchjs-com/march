@@ -6,9 +6,11 @@
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
+| JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | TreeEditor |
 | MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, RichTextEditor |
 | PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
+| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
 
 ## BottomNav
 
@@ -41,6 +43,17 @@ A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left 
 ```
 
 Full page: src/components/overlays/drawer/docs.md
+
+## JsonEditor
+
+JSON in two views. **Text**: the source with live parse errors (line and column), Format and Tab indentation. **Tree**: a TreeEditor with type badges, inline editing and undo, loaded the first time the view is opened (a form that only needs the text view stays small). A `schema` (JSON Schema subset) and `validate` check both views: the text view lists the first problem with its path, the tree marks every invalid row.
+
+```tsx
+<JsonEditor bind:value={$settings} mode="tree" schema={schema} />
+<JsonEditor bind:value={$raw} modes={["text"]} validate={(v) => (v.version ? null : "version is required")} />
+```
+
+Full page: src/components/composite/json-editor/docs.md
 
 ## MarkdownEditor
 
@@ -75,3 +88,14 @@ A rich text field whose value is **Markdown**. Write with the toolbar, keyboard 
 ```
 
 Full page: src/components/composite/rich-text-editor/docs.md
+
+## TreeEditor
+
+Edit any JSON value as a tree. Each row shows its key, a **type badge** in a HADİ color (objects and lists Heyecan, numbers Aktivite, text Dostluk, true / false İletişim) that converts the value to another type, and the value: a text or number you edit in place, a switch for true / false, a count for objects and lists. Rows add, duplicate and delete; a search box keeps the matches and their parents; a JSON Schema subset marks invalid rows with their message. Every change is one step of the editor's own undo history.
+
+```tsx
+<TreeEditor bind:value={$config} schema={schema} />
+<TreeEditor value={data} readonly search={false} expand={1} />
+```
+
+Full page: src/components/composite/tree-editor/docs.md

@@ -5,19 +5,6 @@ import type { Mention, RichTextEditorProps } from "./index.ts";
 // the editor is one lazy chunk, shared with MarkdownEditor's rich view (two entries would split it into a shared chunk)
 const RichTextEditor = lazy<RichTextEditorProps>(() => import("./index.ts").then((m) => ({ default: m.RichTextEditor })), { placeholder: "form" });
 
-export const code = `const team: Mention[] = [{ id: "u1", label: "Deniz Kaya", hint: "Tasarım" }, …]
-let $notes = "## Sürüm notları\n\n**Yeni:** karanlık tema"
-
-<RichTextEditor bind:value={$notes} mentions={team} placeholder="Bir şeyler yazın…" />
-<RichTextEditor value={md} toolbar={["bold", "italic", "link", "|", "ul", "ol"]} emoji={false} />
-<RichTextEditor bind:value={$md} mentions={(q) => api.get(\`/people?q=\${q}\`)} />    // async lookup
-<RichTextEditor api={(e) => editor = e} />   // editor.insert("**Merhaba**"), editor.exec("h2"), editor.undo()
-
-// Markdown in / out and the safe content core on their own:
-import { markdownNodes } from "hadi-march/dom/markdown"
-import { toMarkdown } from "hadi-march/dom/to-markdown"
-import { parseHtml } from "hadi-march/dom/sanitize"    // HTML → allowlisted nodes, no HTML parser (Trusted Types safe)`
-
 const TEAM: Mention[] = [
   { id: "u1", label: "Deniz Kaya", hint: "Tasarım" },
   { id: "u2", label: "Ece Demir", hint: "Ürün" },

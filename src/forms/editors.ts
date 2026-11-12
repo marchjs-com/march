@@ -115,81 +115,8 @@ export function KeyValueEditor(props: KeyValueEditorProps): unknown {
     () => (ro() ? null : h("button", { type: "button", class: "hm-btn hm-kv-add", onClick: () => { rows.set([...rows.peek(), ["", ""]]); } }, t`Add row`)));
 }
 
-// ------------------------------------------------------------------ JSON
-/** Result of parseJson(). */
-export type JsonParseResult = { value: unknown; error?: undefined } | { error: string; line: number | null; column: number | null; value?: undefined };
-
-/** Parse JSON; returns { value } or { error, line, column }. */
-export function parseJson(text: string): JsonParseResult {
-  try { return { value: JSON.parse(text) }; } catch (e) {
-    const msg = String((e as Error).message);
-    let line: number | null = null, column: number | null = null;
-    const lc = /line (\d+) column (\d+)/.exec(msg);
-    const pos = /position (\d+)/.exec(msg);
-    if (lc) [line, column] = [+lc[1]!, +lc[2]!];
-    else {
-      const p = pos ? +pos[1]! : text.length;
-      const before = text.slice(0, p).split("\n");
-      line = before.length; column = before[before.length - 1]!.length + 1;
-    }
-    return { error: msg.replace(/^JSON\.parse: /, "").replace(/ in JSON at position \d+.*$/, "").replace(/\s*\(line \d+ column \d+\)$/, ""), line, column };
-  }
-}
-
-export interface JsonEditorProps extends ControlProps<unknown> {
-  rows?: number | undefined;
-  /** Extra check of the parsed value → message or null. */
-  validate?: ((value: unknown) => string | null | undefined) | undefined;
-  /** Format indent (2). */
-  indent?: number | undefined;
-  /** Tab inserts two spaces (default true). */
-  tabIndent?: boolean | undefined;
-}
-
-/**
- * JSON text editor with live validation (message with line / column), a Format button and an optional
- * `validate(value) → message|null`. Value: the parsed JSON (null when empty); while the text is invalid the raw string.
- */
-export function JsonEditor(props: JsonEditorProps): unknown {
-  const [get, set] = model<unknown>(props, null);
-  const text = signal(untrack(get) == null ? "" : typeof untrack(get) === "string" ? untrack(get) as string : JSON.stringify(untrack(get), null, 2));
-  let lastEmitted = untrack(get);
-  effect(() => {
-    const v = get();
-    if (v === lastEmitted) return;
-    lastEmitted = v;
-    untrack(() => text.set(v == null ? "" : typeof v === "string" ? v : JSON.stringify(v, null, 2)));
-  });
-  const status = computed((): { value?: unknown; msg?: string } => {
-    const s = text();
-    if (!s.trim()) return { value: null };
-    const r = parseJson(s);
-    if (r.error) return { msg: t`Invalid JSON at line ${r.line}, column ${r.column}: ${r.error}` };
-    const custom = props.validate?.(r.value);
-    return custom ? { value: r.value, msg: custom } : { value: r.value };
-  });
-  const msgId = uid("hm-json");
-  const emit = (s: string) => {
-    text.set(s);
-    const st = status.peek();
-    lastEmitted = "value" in st ? st.value : s;
-    set(lastEmitted);
-  };
-  const c = ctl(props);
-  const area = h("textarea", {
-    ...c, class: "hm-input hm-textarea hm-mono hm-json", rows: props.rows ?? 8, spellcheck: "false", autocomplete: "off", readonly: () => !!props.readonly,
-    "aria-invalid": () => (status().msg || c["aria-invalid"]() ? "true" : null),
-    "aria-describedby": () => [status().msg ? msgId : null, c["aria-describedby"]()].filter(Boolean).join(" ") || null,
-    onInput: (e: Event) => emit((e.target as HTMLTextAreaElement).value),
-    onKeyDown: (e: KeyboardEvent) => { if (e.key === "Tab" && !e.shiftKey && props.tabIndent !== false) { e.preventDefault(); const el = e.target as HTMLTextAreaElement, a = el.selectionStart ?? el.value.length, b = el.selectionEnd ?? a; el.value = el.value.slice(0, a) + "  " + el.value.slice(b); el.selectionStart = el.selectionEnd = a + 2; emit(el.value); } },
-  }) as HTMLTextAreaElement;
-  syncValue(area, text);
-  const format = () => { const st = status.peek(); if (st.msg && !("value" in st)) return; emit(st.value == null ? "" : JSON.stringify(st.value, null, props.indent ?? 2)); };
-  return h("div", { class: cx("hm-json-editor", props.class) }, area,
-    h("div", { class: "hm-json-bar" },
-      h("span", { id: msgId, class: () => (status().msg ? "hm-field-error" : "hm-help"), role: "status" }, () => status().msg ?? (text().trim() ? t`Valid JSON` : "")),
-      props.readonly ? null : h("button", { type: "button", class: "hm-btn hm-btn-sm", disabled: () => !!status().msg && !("value" in status()), onClick: format }, t`Format`)));
-}
+// ------------------------------------------------------------------ JSON (moved to src/components/composite/json-editor/; these paths keep working)
+export { JsonEditor, parseJson, type JsonEditorProps, type JsonParseResult, type JsonMode } from "../components/composite/json-editor/index.ts";
 
 // ------------------------------------------------------------------ Markdown (the parser lives in the safe content core: dom/markdown.ts)
 import { markdownNodes, type MarkdownOptions } from "../dom/markdown.ts";
