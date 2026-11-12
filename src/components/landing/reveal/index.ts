@@ -5,11 +5,10 @@
 import "./reveal.css";
 import { h } from "../../../dom/h.ts";
 import { onCleanup, getOwner } from "../../../core/reactive.ts";
-import { cx, val, onVisible, clamp, lerp, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, onVisible, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { animate, stagger as staggerFn } from "../../../motion/engine/playback.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
-import { scrollScene } from "../../../motion/scroll-scene.ts";
-import { setStyle } from "../../../core/util.ts";
+import { scrollTimeline } from "../../../motion/scroll-fx.ts";
 
 export type RevealEffect = "fade" | "up" | "down" | "start" | "end" | "scale" | "blur" | "flip";
 
@@ -70,21 +69,14 @@ export function revealOnScroll(el: Element, raw?: unknown): () => void {
   el.classList.add("hm-reveal");
   if (o.scrub) {
     el.classList.add("is-scrub");
-    return scrollScene(el, (s) => {
-      const list = targets(el, o.self, o.select);
-      const { from } = revealFrames(effect, dist, rtl(el));
-      list.forEach((t, i) => {
-        if (reducedMotion()) { setStyle(t, { opacity: null, transform: null, filter: null }); return; }
-        // each child starts a little later; fully in at 45 % of the block's pass through the viewport
-        const p = clamp((s.progress - 0.04 * i) / 0.4, 0, 1), e = 1 - (1 - p) ** 3;
-        const tf = typeof from["transform"] === "string" ? from["transform"] as string : "";
-        setStyle(t, {
-          opacity: String(lerp(0, 1, e)),
-          transform: tf ? scaleTransform(tf, 1 - e) : null,
-          filter: from["filter"] ? `blur(${(14 * (1 - e)).toFixed(1)}px)` : null,
-        });
-      });
-    });
+    // the motion core's scroll timeline: the entrance is seeked by the block's passage (fully in at 45 %), the children
+    // a little after one another; reduced motion leaves the content as it is
+    if (reducedMotion()) return () => {};
+    const list = targets(el, o.self, o.select);
+    const { from, to } = revealFrames(effect, dist, rtl(el));
+    const frames: Record<string, unknown[]> = {};
+    for (const k of Object.keys(from)) frames[k] = [from[k], to[k]];
+    return scrollTimeline(list, frames as never, { track: el, range: [0, 0.45], easing: "out", stagger: o.self ? 0 : 60 });
   }
   el.classList.add("is-pending");
   // descendants picked by a selector are hidden by their own class until the reveal
@@ -101,12 +93,6 @@ export function revealOnScroll(el: Element, raw?: unknown): () => void {
     el.classList.add("is-revealed");
   };
   return onVisible(el, go, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
-}
-
-/** Multiply every number in a transform by `k` (translate / rotate toward 0, scale toward 1). */
-function scaleTransform(tf: string, k: number): string {
-  return tf.replace(/(scale\()([\d.]+)/g, (_, a: string, n: string) => `${a}${(1 - (1 - Number(n)) * k).toFixed(4)}`)
-    .replace(/(translate3d\(|rotateX\()([^)]*)/g, (_, a: string, args: string) => a + args.replace(/-?[\d.]+(?=px|deg)/g, (n) => (Number(n) * k).toFixed(2)));
 }
 
 /** `<Reveal effect="up" stagger={80}><Card/><Card/><Card/></Reveal>` */

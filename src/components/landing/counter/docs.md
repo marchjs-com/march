@@ -32,4 +32,4 @@ the width steady. Reduced motion shows the value at once.
 
 ## Composed of
 
-Motion engine (`animate`, `animateValue`), `onVisible`.
+Motion engine (`animateValue`), `rollDigits` (motion/digits.ts, shared with CountRoll), `onVisible`.

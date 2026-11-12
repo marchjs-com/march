@@ -1,14 +1,13 @@
 // Parallax (hadi-march/landing): layered depth. Each layer (an image or any node, placed with Overlay) moves at its own
-// speed while the section scrolls past, and — with `pointer` — shifts with the mouse by its depth, smoothed on the motion
-// engine's clock. Transform only; layers get room to travel so no edge ever shows. Reduced motion: still layers.
+// speed while the section scrolls past (motion parallaxLayers), and — with `pointer` — shifts with the mouse by its depth
+// (motion hoverParallax). Transform only; layers get room to travel so no edge ever shows. Reduced motion: still layers.
 import "./parallax.css";
 import { h } from "../../../dom/h.ts";
 import { onCleanup, getOwner } from "../../../core/reactive.ts";
-import { cx, val, listen, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Overlay, type OverlayProps } from "../../../ui/overlay.ts";
-import { onFrame } from "../../../motion/engine/clock.ts";
-import { reducedMotion } from "../../../motion/engine/prefs.ts";
-import { scrollScene } from "../../../motion/scroll-scene.ts";
+import { parallaxLayers } from "../../../motion/scroll-fx.ts";
+import { hoverParallax } from "../../../motion/micro.ts";
 
 export interface ParallaxLayer {
   /** Image URL (or use `content`). */
@@ -45,35 +44,16 @@ export function Parallax(props: ParallaxProps): Element {
   const root = h("div", { class: cx("hm-plx", val(props.class)) }, layerEls, h("div", { class: "hm-plx-content" }, props.children)) as HTMLElement;
   if (props.height) setStyle(root, { "--hm-plx-h": props.height });
 
-  // scroll offset (px per layer) and pointer offset (−1..1, smoothed)
-  let scrollP = 0.5, height = 0;
-  const goal = { x: 0, y: 0 }, cur = { x: 0, y: 0 };
-  const write = (): void => {
-    const still = reducedMotion();
-    props.layers.forEach((l, i) => {
-      const el = layerEls[i];
-      if (!el) return;
-      if (still) { setStyle(el, { transform: null }); return; }
-      const sp = l.speed ?? 0.2, d = (l.depth ?? sp * 60) * (props.pointer ?? 0);
-      const y = (scrollP - 0.5) * height * sp + cur.y * d, x = cur.x * d;
-      setStyle(el, { transform: `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)` });
-    });
-  };
-  scrollScene(root, (s) => { scrollP = s.progress; height = s.height; write(); });
-  if (props.pointer) {
-    let loop: (() => void) | null = null;
-    const ease = (_t: number, dt: number): void => {
-      const k = 1 - Math.exp(-dt / 140);
-      cur.x += (goal.x - cur.x) * k; cur.y += (goal.y - cur.y) * k;
-      write();
-      if (Math.abs(goal.x - cur.x) < 0.001 && Math.abs(goal.y - cur.y) < 0.001) { loop?.(); loop = null; }
-    };
-    const start = (): void => { if (!loop && !reducedMotion()) loop = onFrame(ease, { phase: "write" }); };
-    const off = listen(root, {
-      pointermove: (e: PointerEvent) => { const r = root.getBoundingClientRect(); goal.x = ((e.clientX - r.left) / r.width - 0.5) * 2; goal.y = ((e.clientY - r.top) / r.height - 0.5) * 2; start(); },
-      pointerleave: () => { goal.x = 0; goal.y = 0; start(); },
-    });
-    if (getOwner()) onCleanup(() => { off(); loop?.(); });
-  }
+  // scroll: the motion core's parallaxLayers seeks each layer by the section's passage (far layers lag: negative depth);
+  // pointer: hoverParallax shifts the layer contents by their depth with a spring. Reduced motion: still layers.
+  layerEls.forEach((el, i) => {
+    const l = props.layers[i]!;
+    el.setAttribute("data-depth", String(-(l.speed ?? 0.2)));
+    const inner = el.firstElementChild as HTMLElement | null;
+    if (inner) inner.setAttribute("data-depth", String((l.depth ?? (l.speed ?? 0.2) * 60) / 60));
+  });
+  const offs = [parallaxLayers(root, { selector: ".hm-plx-layer", strength: 420 })];
+  if (props.pointer) offs.push(hoverParallax(root, { depth: 60 * props.pointer, selector: ".hm-plx-layer > [data-depth]" }));
+  if (getOwner()) onCleanup(() => offs.forEach((f) => f()));
   return root;
 }

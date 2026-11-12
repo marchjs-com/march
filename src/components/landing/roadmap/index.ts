@@ -1,6 +1,6 @@
 // Roadmap (hadi-march/landing): a Timeline whose line fills as you scroll — a product roadmap, a company story or a
 // work history. Each entry has a status (done, now, next); the dot of every entry the fill has passed lights up and the
-// current one pulses. The fill is a transform (scaleY) written in the scroll scene's write phase.
+// current one pulses. The fill is the motion core's scrollIndicator (scaleY).
 import "./roadmap.css";
 import { h } from "../../../dom/h.ts";
 import { onCleanup, getOwner } from "../../../core/reactive.ts";
@@ -9,7 +9,7 @@ import { Timeline, type TimelineItem } from "../../../ui/timeline.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { t } from "../../../core/i18n.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
-import { scrollScene } from "../../../motion/scroll-scene.ts";
+import { scrollIndicator, onScrollProgress } from "../../../motion/scroll-fx.ts";
 // Reveal: entries enter one after another
 import { revealOnScroll } from "../reveal/index.ts";
 
@@ -40,13 +40,14 @@ export function Roadmap(props: RoadmapProps): Element {
   // statuses on the list items (dot colours, pulse)
   queueMicrotask(() => [...tl.children].forEach((li, i) => li.classList.add(`is-${props.items[i]?.status ?? "next"}`)));
   if (props.scroll !== false) {
-    scrollScene(root, (s) => {
-      // the line is full when the end of the list reaches 60 % of the viewport height
-      const p = reducedMotion() ? 1 : clamp((s.vh * 0.6 - s.top) / Math.max(1, s.height), 0, 1);
-      setStyle(fill, { transform: `scaleY(${p.toFixed(4)})` });
-      const edge = s.top + p * s.height;
+    // the motion core's scrollTimeline fills the line (an indicator: it keeps working with reduced motion); the dots
+    // the fill has passed light up
+    const range: [number, number] = [0.2, 0.75];
+    const offs = [scrollIndicator(fill, { track: root, range, vertical: true }), onScrollProgress({ track: root, range }, (p) => {
+      const r = root.getBoundingClientRect(), edge = r.top + p * r.height;
       for (const li of tl.children as HTMLCollectionOf<HTMLElement>) li.classList.toggle("is-passed", li.getBoundingClientRect().top + 10 <= edge);
-    });
+    })];
+    if (getOwner()) onCleanup(() => offs.forEach((f) => f()));
   }
   const stop = revealOnScroll(tl, { effect: "start", stagger: 90, distance: 20 });
   if (getOwner()) onCleanup(stop);

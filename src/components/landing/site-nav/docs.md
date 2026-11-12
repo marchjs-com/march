@@ -35,4 +35,4 @@ A `<header>` with a `<nav aria-label="Main">`; the current link has `aria-curren
 
 ## Composed of
 
-Brand, IconButton, openDrawer (Drawer); `scrollScene`, motion engine.
+Brand, IconButton, openDrawer (Drawer); `onScrollProgress` (motion scroll core), motion engine.

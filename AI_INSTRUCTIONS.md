@@ -399,8 +399,9 @@ existing components, animated on the motion engine, themed, RTL and i18n ready. 
   speaker window (same deck name stays in step across windows); print = one slide per page.
 - Effects: `Reveal` / `use:revealOnScroll` (fade, up, start, end, scale, blur, flip; stagger; `scrub`), `Parallax`
   (layers by speed, pointer depth), `ScrollProgress`, `VideoBackground` (poster first, quiet on save-data).
-- Scroll-linked code goes through `scrollScene(el, fn)` (hadi-march/motion): one listener, reads before writes, off-screen
-  scenes skipped. Never add your own scroll listener or rAF loop.
+- Scroll-linked code goes through the motion scroll core (hadi-march/motion: `scrollTimeline`, `onScrollProgress`,
+  `parallaxLayers`, `scrollIndicator`, `stickyReveal`); the blocks are built on it. Never add your own scroll listener or
+  rAF loop. Numbers that roll use `rollDigits` (motion/digits.ts), shared by Counter and CountRoll.
 
 Recipes:
 - "Write a product landing page": `SiteNav mode="floating"` → `Hero variant="product" media={screenshot}` →

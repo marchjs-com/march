@@ -6,18 +6,19 @@
 //   video     a VideoBackground behind the copy
 //   mesh      a gradient mesh with a pointer spotlight and grain
 //   aurora    drifting colour blobs (hadi-march/fx Aurora)
-//   product   copy, then a product frame that tilts in 3D and flattens as you scroll (Overlay glass, scrollScene)
+//   product   copy, then a product frame that tilts in 3D and flattens as you scroll (Overlay glass, scrollTimeline)
 //   parallax  layered depth behind the copy (Parallax)
 // The copy enters with Reveal; hero media loads eagerly with its size reserved (no layout shift).
 import "./hero.css";
 import { h } from "../../../dom/h.ts";
-import { cx, val, setStyle, lerp, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Overlay } from "../../../ui/overlay.ts";
 import { Button, type ButtonVariant } from "../../../ui/button.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { Aurora } from "../../../fx/index.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
-import { scrollScene } from "../../../motion/scroll-scene.ts";
+import { scrollTimeline } from "../../../motion/scroll-fx.ts";
+import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { Reveal } from "../reveal/index.ts";
 import { VideoBackground } from "../video-background/index.ts";
 import { Parallax, type ParallaxLayer } from "../parallax/index.ts";
@@ -112,12 +113,11 @@ export function Hero(props: HeroProps): Element {
       mediaNode(props.media, "hm-hero-frame-body")) as HTMLElement;
     const wrap = h("div", { class: "hm-hero-product" }, frame) as HTMLElement;
     // tilted at first, flat once the frame is well into the viewport (Linear / Apple style)
-    scrollScene(wrap, (s) => {
-      if (reducedMotion()) { setStyle(frame, { transform: null }); return; }
-      const p = Math.min(1, Math.max(0, (s.vh - s.top) / (s.vh * 0.9)));
-      const e = 1 - (1 - p) ** 3;
-      setStyle(frame, { transform: `perspective(1400px) rotateX(${lerp(22, 0, e).toFixed(2)}deg) scale(${lerp(0.9, 1, e).toFixed(4)}) translate3d(0, ${lerp(40, 0, e).toFixed(1)}px, 0)` });
-    });
+    // (the motion core's scrollTimeline seeks the tilt by the frame's passage; reduced motion keeps it flat)
+    if (!reducedMotion()) {
+      const stop = scrollTimeline(frame, { transform: ["perspective(1400px) rotateX(22deg) scale(.9) translate3d(0, 40px, 0)", "perspective(1400px) rotateX(0deg) scale(1) translate3d(0, 0, 0)"] }, { track: wrap, range: [0, 0.5], easing: "out" });
+      if (getOwner()) onCleanup(stop);
+    }
     stage = wrap;
   }
   return h("section", { class: cls }, ...bg, h("div", { class: "hm-hero-inner" }, copy, stage));

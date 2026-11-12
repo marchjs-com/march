@@ -5,9 +5,9 @@
 import "./horizontal-scroll.css";
 import { h } from "../../../dom/h.ts";
 import { onCleanup, getOwner } from "../../../core/reactive.ts";
-import { cx, val, setStyle, type ClassProp } from "../../../ui/util.ts";
+import { cx, val, setStyle, clamp, type ClassProp } from "../../../ui/util.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
-import { scrollScene } from "../../../motion/scroll-scene.ts";
+import { onScrollProgress } from "../../../motion/scroll-fx.ts";
 
 export interface HorizontalScrollProps {
   /** Panel width (CSS length, default min(80vw, 32rem)). */
@@ -39,12 +39,15 @@ export function HorizontalScroll(props: HorizontalScrollProps): Element {
   const RO = globalThis.ResizeObserver;
   if (RO) { const ro = new RO(size); ro.observe(track); ro.observe(pin); if (getOwner()) onCleanup(() => ro.disconnect()); }
   queueMicrotask(size);
-  scrollScene(root, (s) => {
+  // the pinned passage (section top at the viewport top → section end at the viewport bottom) from the motion scroll core
+  const offScroll = onScrollProgress({ track: root }, () => {
     if (native() || !overflow) { setStyle(track, { transform: null }); setStyle(bar, { transform: null }); return; }
+    const r = root.getBoundingClientRect(), vh = globalThis.innerHeight || 1;
+    const pin = clamp(-r.top / Math.max(1, r.height - vh), 0, 1);
     const rtl = globalThis.getComputedStyle?.(root).direction === "rtl";
-    const x = s.pin * overflow * (rtl ? 1 : -1);
-    setStyle(track, { transform: `translate3d(${x.toFixed(1)}px, 0, 0)` });
-    setStyle(bar, { transform: `scaleX(${s.pin.toFixed(4)})` });
+    setStyle(track, { transform: `translate3d(${(pin * overflow * (rtl ? 1 : -1)).toFixed(1)}px, 0, 0)` });
+    setStyle(bar, { transform: `scaleX(${pin.toFixed(4)})` });
   });
+  if (getOwner()) onCleanup(offScroll);
   return root;
 }

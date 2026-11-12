@@ -13,7 +13,7 @@ import { openDrawer } from "../../../ui/dialog.ts";
 import { menu } from "../../../icons/glyphs/menu.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
-import { scrollScene } from "../../../motion/scroll-scene.ts";
+import { onScrollProgress } from "../../../motion/scroll-fx.ts";
 
 export interface SiteNavLink { label: unknown; href: string; active?: MaybeFn<boolean | undefined> }
 export interface SiteNavProps {
@@ -102,10 +102,11 @@ export function SiteNav(props: SiteNavProps): Element {
 
   const threshold = props.threshold ?? 12;
   let lastY = 0;
-  scrollScene(null, (s) => {
-    scrolled.set(s.scrollY > threshold);
-    if (props.hide) { const down = s.scrollY > lastY; if (Math.abs(s.scrollY - lastY) > 4) hidden.set(down && s.scrollY > 120); }
-    lastY = s.scrollY;
+  const offScroll = onScrollProgress({}, () => {
+    const y = globalThis.scrollY ?? 0;
+    scrolled.set(y > threshold);
+    if (props.hide) { const down = y > lastY; if (Math.abs(y - lastY) > 4) hidden.set(down && y > 120); }
+    lastY = y;
   });
   const mode = props.mode ?? "solid";
   const nav = h("header", {
@@ -118,6 +119,6 @@ export function SiteNav(props: SiteNavProps): Element {
     links.length ? h(IconButton, { class: "hm-snav-menu", label: () => t`Open menu`, onClick: openMenu }, glyph(menu)) : null)) as HTMLElement;
   // rest on the current link once laid out
   queueMicrotask(() => { if (nav.isConnected) moveTo(current()); });
-  if (getOwner()) onCleanup(offList);
+  if (getOwner()) onCleanup(() => { offList(); offScroll(); });
   return nav;
 }

@@ -27,4 +27,4 @@ line full.
 
 ## Composed of
 
-Timeline, Badge, Reveal; `scrollScene`.
+Timeline, Badge, Reveal; `scrollIndicator` and `onScrollProgress` (motion scroll core).

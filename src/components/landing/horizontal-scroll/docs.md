@@ -24,4 +24,4 @@ and reduced motion keeps the usual swipe behaviour.
 
 ## Composed of
 
-`scrollScene`.
+`onScrollProgress` (motion scroll core).

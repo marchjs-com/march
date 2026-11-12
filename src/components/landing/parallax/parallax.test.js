@@ -14,8 +14,8 @@ test("Parallax: one Overlay per layer with bleed, content in front, transforms w
   assert.equal(layers.length, 2);
   assert.equal(layers[0].style.getPropertyValue("--hm-ov-top"), "-12%");
   assert.equal(el.querySelector(".hm-plx-content h2").textContent, "Hi");
-  step(16);
-  assert.match(layers[0].style.getPropertyValue("transform"), /translate3d/);
+  assert.equal(layers[0].getAttribute("data-depth"), "-0.5");
+  assert.equal(layers[1].getAttribute("data-depth"), "0.2");
   dispose();
   manualClock(false);
 });

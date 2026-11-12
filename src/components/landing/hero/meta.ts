@@ -7,7 +7,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "First screen in seven looks (centered, split, video, mesh, aurora, product, parallax): eyebrow, gradient-highlight title, lead, actions.",
   composedOf: ["Reveal", "Overlay", "Button", "Badge", "VideoBackground", "Parallax"],
-  behaviors: ["scrollScene"],
+  behaviors: ["scrollTimeline"],
   showcase: "/web",
   demoGroup: "hero",
 });

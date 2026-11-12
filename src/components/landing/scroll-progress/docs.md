@@ -23,4 +23,4 @@ The fill is a transform written in the scroll scene's write phase; in RTL it fil
 
 ## Composed of
 
-`scrollScene`.
+`scrollIndicator` and `onScrollProgress` (motion scroll core).

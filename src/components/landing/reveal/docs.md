@@ -35,4 +35,4 @@ motion skips the animation; without JavaScript-driven motion nothing stays hidde
 
 ## Composed of
 
-Motion engine (`animate`, `stagger`), `scrollScene`, `onVisible`.
+Motion engine (`animate`, `stagger`), `scrollTimeline` (motion scroll core), `onVisible`.

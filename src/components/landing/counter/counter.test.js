@@ -17,9 +17,9 @@ test("Counter: the final value is announced; roll mode draws a column per digit"
   const [a, b] = el.querySelectorAll(".hm-counter");
   assert.match(a.querySelector(".hm-sr-only").textContent, /1.?200/);
   assert.equal(a.querySelector(".hm-counter-view").getAttribute("aria-hidden"), "true");
-  assert.equal(b.querySelectorAll(".hm-counter-col").length, 4);
+  assert.equal(b.querySelectorAll(".hm-roll-d").length, 4);
   v.set(98765);
-  assert.equal(b.querySelectorAll(".hm-counter-col").length, 5);
+  assert.equal(b.querySelectorAll(".hm-roll-d").length, 5);
   assert.match(b.querySelector(".hm-sr-only").textContent, /98.?765/);
   dispose();
 });

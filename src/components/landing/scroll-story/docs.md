@@ -27,4 +27,4 @@ Steps are articles with headings in reading order; only the active picture is ex
 
 ## Composed of
 
-`scrollScene`, motion engine, theme colour tokens (`data-hm-color`).
+`onScrollProgress` (motion scroll core), motion engine, theme colour tokens (`data-hm-color`).

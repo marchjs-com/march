@@ -295,12 +295,10 @@ Full page: src/components/landing/hero/docs.md
 
 ## HorizontalScroll
 
-A pinned section whose panels move sideways while the page scrolls down: the vertical distance equals the track's overflow, so the last panel arrives as the section ends. A progress line follows. RTL moves the other way. On touch screens and with reduced motion it is a native horizontal scroller with snap points.
+
 
 ```tsx
-<HorizontalScroll label="Case studies" panel="26rem">
-  {cases.map((c) => <Card>…</Card>)}
-</HorizontalScroll>
+
 ```
 
 Full page: src/components/landing/horizontal-scroll/docs.md
@@ -386,18 +384,12 @@ Full page: src/components/landing/newsletter/docs.md
 
 ## Parallax
 
-Layered depth. Each layer (an image or any node, placed with Overlay) moves at its own speed while the section scrolls past and, with `pointer`, shifts with the mouse by its depth, smoothed on the motion engine clock. Transform only; layers get room to travel so no edge shows.
+
 
 Composed of: Overlay
 
 ```tsx
-<Parallax pointer={1} layers={[
-  { src: "/sky.jpg", speed: 0.5 },
-  { src: "/hills.png", speed: 0.25 },
-  { content: <Shapes />, speed: -0.15 },
-]}>
-  <h2>Depth</h2>
-</Parallax>
+
 ```
 
 Full page: src/components/landing/parallax/docs.md
@@ -506,30 +498,22 @@ Full page: src/components/social/reaction-picker/docs.md
 
 ## Reveal
 
-Children enter when the block scrolls into view: fade, rise, fall, slide from the start or the end (mirrored in RTL), scale, blur or a 3D flip, one after another. `scrub` ties the effect to the scroll position. The motion engine plays it (transform, opacity, filter); with reduced motion the content is simply there.
+
 
 ```tsx
-<Reveal effect="up" stagger={80}>
-  <Card>…</Card><Card>…</Card><Card>…</Card>
-</Reveal>
-<ul use:revealOnScroll={{ effect: "start" }}>…</ul>
-<Reveal effect="blur" scrub>…</Reveal>
+
 ```
 
 Full page: src/components/landing/reveal/docs.md
 
 ## Roadmap
 
-A Timeline whose line fills as you scroll: a product roadmap, a company story or a work history. Every entry has a status (`done`, `now`, `next`); the dot of each entry the fill has passed lights up and the current one glows. The fill is a transform written in the scroll scene's write phase.
+
 
 Composed of: Timeline, Badge, [Reveal](#reveal)
 
 ```tsx
-<Roadmap items={[
-  { time: "2025 Q1", title: "First release", body: "…", status: "done" },
-  { time: "2026 Q3", title: "Teams", body: "…", status: "now" },
-  { time: "2027", title: "Plugins", body: "…", status: "next" },
-]} />
+
 ```
 
 Full page: src/components/landing/roadmap/docs.md
@@ -553,24 +537,20 @@ Full page: src/components/data/scheduler/docs.md
 
 ## ScrollProgress
 
-A thin bar that fills as the page (or one article) is read. Fixed to the top or inline; brand gradient or the accent. The fill is a transform written in the scroll scene's write phase; in RTL it fills from the right.
+
 
 ```tsx
-<ScrollProgress />
-<ScrollProgress target={() => article} position="inline" paint="accent" />
+
 ```
 
 Full page: src/components/landing/scroll-progress/docs.md
 
 ## ScrollStory
 
-Scrollytelling. The media column stays pinned while the text steps scroll past; the step nearest the middle of the viewport is active — its picture cross-fades in, the dots follow, and with `theme` the section takes that step's colour. On phones the pinned media sits at the top and the steps flow under it.
+
 
 ```tsx
-<ScrollStory steps={[
-  { title: "Design", body: "…", media: <Mock />, color: "brand-orange" },
-  { title: "Build", body: "…", media: <Chart />, color: "brand-blue" },
-]} />
+
 ```
 
 Full page: src/components/landing/scroll-story/docs.md

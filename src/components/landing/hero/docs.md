@@ -38,4 +38,4 @@ frame flat and the layers still.
 
 ## Composed of
 
-Reveal, Overlay, Button, Badge, Aurora (hadi-march/fx), VideoBackground, Parallax; `scrollScene`.
+Reveal, Overlay, Button, Badge, Aurora (hadi-march/fx), VideoBackground, Parallax; `scrollTimeline` (motion scroll core).

@@ -4,12 +4,12 @@
 // the pinned media sits at the top with the steps flowing under it.
 import "./scroll-story.css";
 import { h } from "../../../dom/h.ts";
-import { signal, effect, untrack } from "../../../core/reactive.ts";
+import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
-import { scrollScene } from "../../../motion/scroll-scene.ts";
+import { onScrollProgress } from "../../../motion/scroll-fx.ts";
 
 export interface StoryStep {
   title: unknown;
@@ -47,12 +47,13 @@ export function ScrollStory(props: ScrollStoryProps): Element {
   h("div", { class: "hm-story-steps" }, steps)) as HTMLElement;
 
   // the active step: the one whose middle is nearest the viewport middle
-  scrollScene(root, (s) => {
-    const mid = s.vh / 2;
+  const offScroll = onScrollProgress({ track: root }, () => {
+    const mid = (globalThis.innerHeight || 800) / 2;
     let best = 0, dist = Infinity;
     steps.forEach((el, i) => { const r = el.getBoundingClientRect(); const d = Math.abs(r.top + r.height / 2 - mid); if (d < dist) { dist = d; best = i; } });
     if (best !== active.peek()) active.set(best);
   });
+  if (getOwner()) onCleanup(offScroll);
   let prev = 0;
   effect(() => {
     const i = active();

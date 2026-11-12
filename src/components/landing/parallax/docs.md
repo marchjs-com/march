@@ -31,4 +31,4 @@ every layer still. The scroll effect pauses while the section is off screen.
 
 ## Composed of
 
-Overlay; `scrollScene` and the motion engine clock.
+Overlay; `parallaxLayers` and `hoverParallax` (motion).
