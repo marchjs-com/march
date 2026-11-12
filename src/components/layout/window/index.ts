@@ -219,7 +219,7 @@ export function Window(props: WindowProps): unknown {
   const frame = h("section", {
     class: () => cx("hm-win", `hm-win-${chrome()}`, `is-${state()}`, moving() && "is-moving", props.resizable === false && "is-fixed-size", val(props.class)),
     "aria-labelledby": `${id}-title`, hidden: () => (shown() ? null : ""),
-    style: () => { const g = geo(); return g ? { "--hm-win-x": `${g.x}px`, "--hm-win-y": `${g.y}px`, "--hm-win-w": `${g.w}px`, "--hm-win-h": `${g.h}px`, "z-index": String(z()) } : { "z-index": String(z()), visibility: "hidden" }; },
+    style: () => { const g = geo(); return g ? { "--hm-win-x": `${g.x}px`, "--hm-win-y": `${g.y}px`, "--hm-win-w": `${g.w}px`, "--hm-win-h": `${g.h}px`, "z-index": String(z()), visibility: "visible" } : { "z-index": String(z()), visibility: "hidden" }; },
     onPointerDown: raise, onFocusIn: raise,
     ref: (el: HTMLElement) => { root = el; },
   },
