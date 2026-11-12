@@ -14,7 +14,6 @@ import { join, resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const DIR = join(ROOT, "src/components");
 const REQUIRED = ["index.ts", "docs.md", "demo.tsx", "playground.ts", "meta.ts"];
 const isDir = (p) => existsSync(p) && statSync(p).isDirectory();
 
@@ -22,6 +21,12 @@ const isDir = (p) => existsSync(p) && statSync(p).isDirectory();
 export async function categories(root = ROOT) {
   return (await import(pathToFileURL(join(root, "src/components/categories.ts")).href)).CATEGORIES;
 }
+
+/**
+ * Categories reachable only through their own subpath (hadi-march/landing), not through the ui barrel: a website's
+ * blocks are a page of their own, and a barrel re-export would put them in the static graph of every ui page.
+ */
+const OUTSIDE_UI = new Set(["landing"]);
 
 /** Subpaths that existed before the categories: their module index re-exports the category barrel instead. */
 const OWN_MODULE = { forms: "src/forms/index.ts", data: "src/data/index.ts", motion: "src/motion/index.ts" };
@@ -63,17 +68,18 @@ export async function generate(root = ROOT) {
   // a component with its own package entry (meta.entry, e.g. "hadi-march/flow") too: pages that import hadi-march/ui
   // must not reach a heavy one-page feature (esbuild places code by reachability)
   const barrel = list.filter((c) => c.meta?.barrel !== false && !c.meta?.entry);
-  files["src/components/index.ts"] = HEAD + barrel.map((c) => `export * from "./${c.folder}/index.ts";\n`).join("");
+  // categories with their own subpath only (hadi-march/landing) stay out of the ui barrel, in their category barrel
+  files["src/components/index.ts"] = HEAD + barrel.filter((c) => !OUTSIDE_UI.has(c.category)).map((c) => `export * from "./${c.folder}/index.ts";
+`).join("");
   for (const cat of cats) {
     const own = barrel.filter((c) => c.category === cat.id);
     files[`src/components/${cat.id}/index.ts`] = HEAD + `// ${cat.title}: ${cat.desc} Import: hadi-march/${cat.id}\n` +
       (own.length ? own.map((c) => `export * from "./${c.name}/index.ts";\n`).join("") : "export {};\n");
   }
-  // Demos shown on the same showcase page load together, up to GROUP per lazy module (<page>[-n].demos.gen.ts): one
+  // Demos shown on the same showcase page load together, up to GROUP (4) per lazy module (<page>[-n].demos.gen.ts): one
   // small chunk per demo would fall under the 10 KB chunk floor and fold into the registry's parent group, which every
-  // page with a component card loads; one module for a page with many cards would pass the lazy part budget. Members
-  // are in folder-name order, so related folders (chat-…, story-…) usually share a module. A page with a single
-  // component card keeps its direct import.
+  // page with a component card loads; one module for a page with many cards would pass the lazy part budget.
+  // meta.demoGroup names a family that loads together; the page's building blocks share one kit (<page>.kit.gen.ts).
   const GROUP = 4;
   const pages = new Map();
   // a large component (barrel: false) keeps its own demo module: its code alone is over the chunk floor, and grouping
@@ -83,31 +89,25 @@ export async function generate(root = ROOT) {
   for (const [page, all] of pages) {
     if (all.length < 2) continue;
     const base = page.replace(/^\//, "").replace(/[^\w-]+/g, "-") || "home";
-    // a component and the parts it is built from (meta.composedOf) on the same page share a module: split apart, their
-    // common code would become a small chunk that both modules load
-    // (families never grow past a module's size: a feed built from ten social parts still spreads over several modules)
-    // about even slices (4 4 3 3, not 4 4 4 2), cut only between families
-    const target = Math.ceil(all.length / Math.ceil(all.length / GROUP));
-    const byName = new Map(all.map((c) => [nameOf(c), c]));
-    const root = new Map(all.map((c) => [c, c])), size = new Map(all.map((c) => [c, 1]));
-    const find = (c) => { while (root.get(c) !== c) c = root.get(c); return c; };
-    for (const c of all) for (const n of c.meta?.composedOf ?? []) {
-      const d = byName.get(n), a = find(c), b = d && find(d);
-      if (b && a !== b && size.get(a) + size.get(b) <= target) { root.set(a, b); size.set(b, size.get(a) + size.get(b)); }
-    }
-    const families = [...Map.groupBy(all, find).values()];
-    const slicesOf = [];
-    for (const f of families) {
-      const last = slicesOf.at(-1);
-      if (last && last.length + f.length <= target) last.push(...f); else slicesOf.push([...f]);
-    }
-    const slices = slicesOf.length;
-    for (let s = 0; s < slices; s++) {
-      const members = slicesOf[s];
+    const named = new Map(), rest = [];
+    for (const c of all) if (c.meta?.demoGroup) named.set(c.meta.demoGroup, [...(named.get(c.meta.demoGroup) ?? []), c]); else rest.push(c);
+    const parts = [...named].map(([g, members]) => ({ name: `${base}-${g}`, members }));
+    const slices = Math.ceil(rest.length / GROUP);
+    for (let s = 0; s < slices; s++) parts.push({ name: `${base}${slices > 1 || parts.length ? `-${s + 1}` : ""}`, members: rest.slice(Math.floor((s * rest.length) / slices), Math.floor(((s + 1) * rest.length) / slices)) });
+    // landing blocks are many and large: only the ones other blocks are built from (composedOf) go in the kit, the rest
+    // stay in their family module; the category's demo data (<category>/demo-kit.tsx) rides in the kit too
+    const usedByOthers = (c) => all.some((o) => o !== c && (o.meta?.composedOf ?? []).includes(c.meta?.name));
+    const blocks = parts.length > 1 ? all.filter((c) => c.category && c.category !== "composite" && (c.category !== "landing" || usedByOthers(c))) : [];
+    const demoKits = [...new Set(blocks.map((c) => c.category))].filter((k) => existsSync(join(root, "src/components", k, "demo-kit.tsx")));
+    const kit = blocks.length > 1 ? `${base}.kit.gen.ts` : null;
+    const gen = (what) => `// GENERATED by tools/gen-registry.js: ${what} — do not edit.\n`;
+    if (kit) files[`src/components/${kit}`] = gen(`the building blocks shown on ${page}`) + blocks.map((c) => `export * from "./${c.folder}/index.ts";\n`).join("") +
+      demoKits.map((k) => `export * from "./${k}/demo-kit.tsx";\n`).join("");
+    for (const { name, members } of parts) {
       // *.demos.gen.ts: the showcase config lets these stay small lazy files (chunks.allow), never joining the registry
-      const file = `${base}${slices > 1 ? `-${s + 1}` : ""}.demos.gen.ts`;
+      const file = `${name}.demos.gen.ts`;
       members.forEach((c, j) => groupOf.set(c.folder, { file, j }));
-      files[`src/components/${file}`] = HEAD.replace("src/components/<category>/<name>/", `the component folders shown on ${page}`) +
+      files[`src/components/${file}`] = gen(`the component folders shown on ${page}`) + (kit ? `export * from "./${kit}";\n` : "") +
         members.map((c, j) => `import * as d${j} from "./${c.folder}/demo.tsx";\nimport * as p${j} from "./${c.folder}/playground.ts";\n`).join("") +
         `export { ${members.map((_, j) => `d${j}, p${j}`).join(", ")} };\n`;
     }
@@ -198,9 +198,10 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     else { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, text); console.log(`✔ ${rel}`); }
   }
   // demo modules of an earlier slicing (fewer cards, a page renamed) go away
-  for (const f of readdirSync(DIR).filter((f) => f.endsWith(".demos.gen.ts") && !files[`src/components/${f}`])) {
+  const dir = join(ROOT, "src/components");
+  for (const f of readdirSync(dir).filter((f) => (f.endsWith(".demos.gen.ts") || f.endsWith(".kit.gen.ts")) && !files[`src/components/${f}`])) {
     if (check) { console.error(`✖ src/components/${f} is stale: run node tools/gen-registry.js`); stale++; }
-    else { unlinkSync(join(DIR, f)); console.log(`✖ removed src/components/${f}`); }
+    else { unlinkSync(join(dir, f)); console.log(`✖ removed src/components/${f}`); }
   }
   for (const p of problems) console.error(`✖ ${p}`);
   if (stale || problems.length) process.exit(1);

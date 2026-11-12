@@ -381,6 +381,40 @@ replay(), stop() }`. Never split text by hand or animate letters with your own l
 - Catalog: `TEXT_ANIMATIONS` in `hadi-march/motion/text/meta`. Reference: src/motion/text/docs.md. Showcase: Hareket ›
   Metin animasyonları (/text-motion).
 
+## 15a. Websites (hadi-march/landing)
+
+Blocks for product pages, home pages, portfolios and talks. Each is a folder in src/components/landing/ built from
+existing components, animated on the motion engine, themed, RTL and i18n ready. Import only from `hadi-march/landing`
+(it is not in the ui barrel, so other pages never download it); load a marketing page as its own lazy route.
+
+- Frame: `SiteNav` (solid | transparent | floating, shrink, hide, Drawer menu; `#id` links scroll to sections),
+  `SiteSection` (eyebrow / title / lead, tone plain | muted | inverse | brand, width), `SiteFooter` (+ `Newsletter`).
+- Story: `Hero` (centered | split | video | mesh | aurora | product | parallax; `highlight` = gradient words),
+  `FeatureGrid` (cards | plain | list | bento), `LogoCloud` (grid | marquee), `StatsBand` + `Counter`, `ScrollStory`
+  (pinned media, colour per step), `HorizontalScroll`, `Roadmap` (fills with the scroll), `CtaBand`.
+- Sell: `Pricing` (monthly / yearly, prices roll), `Testimonials` (grid | marquee | wall | slider), `Faq` (search).
+- Portfolio: `ProjectGrid` (filters, FLIP) + `ProjectDetail`; `sharedTransition("project-" + id, cover, update)`
+  (hadi-march/motion) grows the card cover into the detail cover and back.
+- Talks: `Presentation` + `Slide` + `Appear` (fragments); `bind:index` to a query parameter; `presenterUrl` opens the
+  speaker window (same deck name stays in step across windows); print = one slide per page.
+- Effects: `Reveal` / `use:revealOnScroll` (fade, up, start, end, scale, blur, flip; stagger; `scrub`), `Parallax`
+  (layers by speed, pointer depth), `ScrollProgress`, `VideoBackground` (poster first, quiet on save-data).
+- Scroll-linked code goes through the motion scroll core (hadi-march/motion: `scrollTimeline`, `onScrollProgress`,
+  `parallaxLayers`, `scrollIndicator`, `stickyReveal`); the blocks are built on it. Never add your own scroll listener or
+  rAF loop. Numbers that roll use `rollDigits` (motion/digits.ts), shared by Counter and CountRoll.
+
+Recipes:
+- "Write a product landing page": `SiteNav mode="floating"` → `Hero variant="product" media={screenshot}` →
+  `LogoCloud variant="marquee"` → `SiteSection` + `FeatureGrid variant="bento"` → `ScrollStory` → `StatsBand` →
+  `Pricing` → `Testimonials variant="wall"` → `Faq layout="split" search` → `CtaBand` → `SiteFooter newsletter`.
+  Images: give width / height (no layout shift); the hero image loads eagerly, everything else lazily.
+- "Make a portfolio": `SiteNav mode="transparent"` → `Hero variant="split"` → `ProjectGrid onOpen` (state `$open`,
+  `sharedTransition`) ⇄ `ProjectDetail onBack next` → about (`StatsBand variant="plain"`) → skills
+  (`FeatureGrid variant="list"`) → `Roadmap` (work history, `badges={false}`) → contact `<Form schema>` → `SiteFooter`.
+- "Prepare a presentation": one `<Presentation bind:index={$slide} presenterUrl="…?presenter=1">` with a `<Slide>` per
+  slide (`layout`, `tone`, `notes`, `background={<Overlay …/>}`), lists in `<Appear>`; render the same deck with
+  `presenter` on the speaker URL.
+Full samples: showcase › Landing › Web siteleri (`#/web?view=product|portfolio|slides`).
 ### 15c. Ready-made animations (all on the engine, each its own export)
 
 ```ts
@@ -399,6 +433,14 @@ morphIcon(pathEl, playing ? "pause" : "play");                      // MORPH_ICO
 shapeMorph(el, "star");                                             // circle square triangle diamond hexagon star blob flower
 usePageTransitions(circle, cube, wipe);                             // then meta: { transition: "cube" } per route
 // variants: circle wipe stack cube flipPage zoomThrough curtain blinds pixelDissolve morphPage (PAGE_VARIANTS = all)
+```
+```tsx
+<button use:ripple use:press={{ scale: 0.92, easing: "spring-wobbly" }}>…</button>   // magnet, tilt: gestures
+<div use:hoverParallax={{ depth: 16, tilt: 8 }}><img data-depth="0.4" /></div>
+stateMorph(btn, "loading"); stateMorph(btn, ok ? "success" : "error", { confetti: true }); stateMorph(btn, "idle");
+scrollTimeline(card, fadeUp, { range: [0, 0.4] }); parallaxLayers(hero); stickyReveal(section); scrollIndicator(bar);
+const off = animateList(ul, { enter: "pop", exit: "scale" });  // any renderer: enter, exit ghost, FLIP moves
+staggerIn(".tile", { preset: "rise", from: "center", grid: [4, 3] });
 ```
 
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
@@ -596,4 +638,32 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, StoryProgress, LikeButton |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
+
+### Landing — `hadi-march/landing`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| Counter | experimental | Animated number: counts up when visible, glides to new values, or rolls each digit like an odometer; Intl formatted. | — |
+| CtaBand | experimental | Call-to-action panel: title, lead, actions over gradient, mesh, glass, plain or video; pointer light; scales in. | SiteSection, Overlay, Reveal, VideoBackground |
+| Faq | experimental | Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking. | Accordion, SearchBox, Reveal |
+| FeatureGrid | experimental | Product features as cards (pointer light), plain, a two-column list or a bento grid of mixed tile sizes; staggered entrance. | Grid, Card, IconTile, Reveal |
+| Hero | experimental | First screen in seven looks (centered, split, video, mesh, aurora, product, parallax): eyebrow, gradient-highlight title, lead, actions. | Reveal, Overlay, Button, Badge, VideoBackground, Parallax |
+| HorizontalScroll | experimental | Pinned section whose panels slide sideways while the page scrolls down; progress line; native snap scroller on touch. | — |
+| LogoCloud | experimental | Trusted-by logos as an equal grid or an endless Marquee ticker; one muted tone, full colour on hover. | Marquee, Grid, Reveal |
+| Newsletter | experimental | Email sign-up, inline or stacked: validation, busy button, success check that pops in, error shake and announcement. | TextInput, Button |
+| Parallax | experimental | Layered depth: every layer (image or node) moves at its own scroll speed and, optionally, with the mouse; transform only. | Overlay |
+| Presentation | experimental | Slides: keys, wheel, swipe, step-by-step fragments, slide / fade / zoom, full screen, URL index, speaker window (cross-tab), print. | IconButton |
+| Pricing | experimental | Plans with a monthly / yearly switch: prices roll like an odometer, the switch thumb slides, the featured plan glows. | Card, Badge, Segmented, Counter, Reveal |
+| ProjectDetail | experimental | One project: title, facts (KeyValue, service Chips), shared-element cover, story, Lightbox gallery, next project. | Button, KeyValue, Chip, openMedia, Reveal |
+| ProjectGrid | experimental | Portfolio covers with filter Chips: FLIP re-layout on filter, open into ProjectDetail (shared element) or the Lightbox. | Card, Chip, openMedia, Reveal |
+| Reveal | experimental | Scroll entrance for any block: fade, rise, slide (RTL mirrored), scale, blur, flip; stagger; scrub follows the scroll. | — |
+| Roadmap | experimental | Timeline whose line fills with the scroll: done / now / next statuses, passed dots light up; roadmaps, stories, work history. | Timeline, Badge, Reveal |
+| ScrollProgress | experimental | Reading progress bar for the page or one article: fixed or inline, brand gradient or accent, RTL aware, a progressbar. | — |
+| ScrollStory | experimental | Scrollytelling: pinned media column, steps scroll past, the active step's media cross-fades and the section takes its colour. | — |
+| SiteFooter | experimental | Website footer: brand and about line, link columns, social links, optional Newsletter, legal row, back-to-top, big wordmark. | Brand, Newsletter, IconButton |
+| SiteNav | experimental | Website top bar: sticky, transparent-to-glass or floating pill, shrinks and hides on scroll, sliding link pill, Drawer menu on phones. | Brand, IconButton, openDrawer |
+| SiteSection | experimental | Frame of every website block: width, rhythm, tone (plain, muted, inverse, brand) and an eyebrow / title / lead heading that reveals. | Reveal |
+| StatsBand | experimental | Row of big numbers that count up (or roll) when visible, with labels and notes; plain, divided or cards. | Counter, Reveal |
+| Testimonials | experimental | Customer quotes as a grid, two drifting Marquee rows, a masonry wall with Show more, or a Carousel; Avatar and Rating. | Card, Avatar, Rating, Marquee, Carousel, Button, Reveal |
+| VideoBackground | experimental | Muted looping video behind content: poster first (and on save-data / reduced motion), plays only while visible, readable tint, pause button. | Overlay, IconButton |
 <!-- components:end -->

@@ -1,0 +1,5 @@
+/* Counter. Tabular digits keep the width steady while it counts; roll mode draws with motion/digits.ts. */
+.hm-counter { display: inline-flex; align-items: baseline; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hm-counter-view { display: inline-flex; align-items: baseline; }
+.hm-counter-roll .hm-counter-view { overflow: hidden; padding-block: .06em; margin-block: -.06em; }
+.hm-counter-affix { white-space: pre; }
