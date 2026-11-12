@@ -27,11 +27,12 @@ class OwnerNode {
 /** Opaque owner handle (component branch, effect, root). */
 export type Owner = OwnerNode;
 
-interface Source { observers: Set<Computation> | null }
+interface Source { observers: Set<Computation> | null; /** called when its last observer leaves (selector keys) */ drop?(): void }
 
 class Computation extends OwnerNode implements Source {
   state: State = DIRTY;
-  sources: Set<Source> | null = null;
+  /** What it read last run (an array: the observer set of each source already rules out duplicates). */
+  sources: Source[] | null = null;
   observers: Set<Computation> | null = null;
   equals: (a: unknown, b: unknown) => boolean = Object.is;
   fn: (prev: unknown) => unknown;
@@ -55,9 +56,11 @@ let flushing = false;
 let batchEnd: Array<() => void> = [];
 
 function track(node: Source): void {
-  if (!Listener) return;
-  (Listener.sources ??= new Set()).add(node);
-  (node.observers ??= new Set()).add(Listener);
+  const l = Listener;
+  if (!l) return;
+  const obs = node.observers;
+  if (obs) { if (obs.has(l)) return; obs.add(l); } else node.observers = new Set([l]);
+  if (l.sources) l.sources.push(node); else l.sources = [node];
 }
 
 function markObservers(node: Source, state: State): void {
@@ -74,7 +77,8 @@ function markObservers(node: Source, state: State): void {
 
 function cleanNode(c: Computation): void {
   if (c.sources) {
-    for (const s of c.sources) s.observers?.delete(c);
+    const src = c.sources;
+    for (let i = 0; i < src.length; i++) { const x = src[i]!; x.observers?.delete(c); if (x.drop && !x.observers?.size) x.drop(); }
     c.sources = null;
   }
   disposeChildren(c);
@@ -100,7 +104,7 @@ function disposeOwner(o: OwnerNode): void {
   if (o instanceof Computation) {
     cleanNode(o);
     o.state = CLEAN;
-    if (o.observers) for (const x of o.observers) x.sources?.delete(o);
+    if (o.observers) for (const x of o.observers) { const i = x.sources?.indexOf(o) ?? -1; if (i >= 0) x.sources!.splice(i, 1); }
     o.observers = null;
   } else disposeChildren(o);
 }
@@ -111,7 +115,9 @@ function adopt(o: OwnerNode): void { if (Owner) (Owner.owned ??= []).push(o); }
 function update(c: Computation): void {
   if (c.disposed) return;
   if (c.state === CHECK) {
-    for (const s of c.sources ?? []) {
+    const src = c.sources;
+    if (src) for (let i = 0; i < src.length; i++) {
+      const s = src[i];
       if (s instanceof Computation) {
         update(s);
         if ((c.state as State) === DIRTY) break;
@@ -154,7 +160,7 @@ function flush(): void {
     for (let i = 0; i < queue.length; i++) {
       const e = queue[i] as Computation;
       if (e.state !== CLEAN && !e.disposed) update(e);
-      if (i > 100_000) throw new Error("March: effect loop did not settle (an effect keeps writing a signal it reads).");
+      if (i > 100_000) throw new Error("March: effect loop did not settle (an effect writes a signal it reads).");
     }
   } finally {
     queue = [];
@@ -190,6 +196,56 @@ export function signal<T>(value: T, opts?: { equals?: Equals<T>; name?: string }
   w["signal"] = true;
   if (opts?.name) w["displayName"] = opts.name;
   return read;
+}
+
+/** A bare signal for list rows (<For>): the accessor plus `peek`, written with _setCell. No per-row method closures. */
+export interface Cell<T> extends Accessor<T> { n: SignalNode }
+function peekCell(this: Cell<unknown>): unknown { return this.n.value; }
+export function _cell<T>(value: T): Cell<T> {
+  const n = new SignalNode(value);
+  const f = (() => { track(n); return n.value as T; }) as Cell<T>;
+  f.n = n;
+  f.peek = peekCell as () => T;
+  (f as unknown as Record<symbol, unknown>)[REACTIVE] = true;
+  return f;
+}
+export function _setCell<T>(f: Cell<T>, v: T): void {
+  const n = f.n;
+  if (n.value === v) return;
+  n.value = v;
+  markObservers(n, DIRTY);
+  flush();
+}
+
+class KeyNode implements Source {
+  observers: Set<Computation> | null = null;
+  map: Map<unknown, KeyNode>;
+  key: unknown;
+  constructor(map: Map<unknown, KeyNode>, key: unknown) { this.map = map; this.key = key; }
+  drop(): void { if (this.map.get(this.key) === this) this.map.delete(this.key); }
+}
+/**
+ * Selector: `const isSelected = selector(() => $selected)`, then `isSelected(row.id)` in each row. A row reading it
+ * re-runs only when its own answer changes (the old and the new key), not on every change of the source: choosing one
+ * row in 1.000 wakes two rows, not 1.000.
+ */
+export function selector<T>(source: () => T, equals: (key: T, value: T) => boolean = Object.is): (key: T) => boolean {
+  const map = new Map<unknown, KeyNode>();
+  const wake = (k: unknown): void => { const n = map.get(k); if (n) markObservers(n, DIRTY); };
+  let prev: T, first = true;
+  effect(() => {
+    const v = source();
+    if (!first && !Object.is(prev, v)) { const p = prev; untrack(() => { wake(p); wake(v); }); }
+    prev = v; first = false;
+  });
+  return (key: T): boolean => {
+    if (Listener) {
+      let n = map.get(key);
+      if (!n) map.set(key, (n = new KeyNode(map, key)));
+      track(n);
+    }
+    return equals(key, prev);
+  };
 }
 
 /** Derived value, cached; recomputed lazily when a dependency changes. */
@@ -242,7 +298,7 @@ export function untrack<T>(fn: () => T): T {
 /** Register a callback that runs when the current owner is disposed or re-runs. */
 export function onCleanup(fn: Cleanup): Cleanup {
   if (Owner) (Owner.cleanups ??= []).push(fn);
-  else if (DEV.enabled) DEV.warn("onCleanup() called outside a component or effect; it will never run.");
+  else if (DEV.enabled) DEV.warn("onCleanup() outside a component or effect never runs.");
   return fn;
 }
 

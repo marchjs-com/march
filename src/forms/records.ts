@@ -15,7 +15,7 @@ import { arrowUp } from "../icons/glyphs/arrowUp.ts";
 import { arrowDown } from "../icons/glyphs/arrowDown.ts";
 import { x as xIcon } from "../icons/glyphs/x.ts";
 import { h } from "../dom/h.ts";
-import { For } from "../dom/flow.ts";
+import { For } from "../dom/for.ts";
 import { t } from "../core/i18n.ts";
 import { schema as makeSchema, fieldType, options as schemaOptions, type Schema, type SchemaSpec, type Values, type FieldSpec, type Field as SchemaField } from "../schema/index.ts";
 import { model, cx, labelledBy, extend, live, type ControlProps } from "./util.ts";

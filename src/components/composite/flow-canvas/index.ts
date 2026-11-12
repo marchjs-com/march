@@ -7,7 +7,7 @@
 import "./flow-canvas.css";
 import { signal, computed, effect, untrack, batch, onCleanup, getOwner, runWithOwner } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { For } from "../../../dom/flow.ts";
+import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, uid, icon, glyph, clamp, lerp, listen, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr } from "../../../theme/colors.ts";

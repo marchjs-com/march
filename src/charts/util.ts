@@ -4,7 +4,7 @@ import "./charts.css";
 import { signal, computed, read, onCleanup, untrack, type Accessor, type Signal } from "../core/reactive.ts";
 import { applyPipe, toDate } from "../core/pipes.ts";
 import { h } from "../dom/h.ts";
-import { For, type ForProps } from "../dom/flow.ts";
+import { For, type ForProps } from "../dom/for.ts";
 import { uid } from "../core/util.ts";
 
 /** A prop that may be a plain value or a reactive accessor (signal, computed, compiler thunk). */

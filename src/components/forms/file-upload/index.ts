@@ -4,7 +4,7 @@ import "./file-upload.css";
 import "../../../ui/button.css";
 import { signal, untrack, onCleanup, type Accessor, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { For } from "../../../dom/flow.ts";
+import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
 import { applyPipe } from "../../../core/pipes.ts";
 import { model, ctl, cx, uid, type ControlProps } from "../../../forms/util.ts";

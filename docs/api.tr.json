@@ -1,6 +1,8 @@
 {
  "hadi-march": {
   "_enter": "Eşzamansız bileşenler için derleyici kancası: `await` sonrasında sahibi geri yükler (doğrudan kullanım için değil).",
+  "_prop": "Derleyici yardımcısı (doğrudan kullanım için değil): şablon kopyasındaki bir öğeye tek bir JSX özelliğini h() gibi uygular (bağlı öznitelik, olay, ref, yönerge).",
+  "_tpl": "Derleyici yardımcısı (doğrudan kullanım için değil): yerel öğe ağacını bir kez DOM çağrılarıyla kurar (HTML dizgesi yok), her kullanımda kopyalar; yalnız dinamik kısımlar bağlanır.",
   "_leave": "Eşzamansız bileşenler: derleyici `await x` ifadesini `_enter(owner, await _leave(x))` biçimine çevirir; böylece await sonrasındaki kod yeniden bileşenin sahibiyle çalışır. Devam sona erince sahip sıfırlanır.",
   "applyPipe": "Kayıtlı bir boru (pipe) uygular (derleyici çıktısı). Yerleşik metin boruları `string`, özel borular `unknown` döndürür.",
   "Await": "`<Await for={promise} loading={…} catch={(e) => …}>{(value) => …}</Await>` — bir sözü (promise) bekler, yüklenirken, hatada ve sonuçta farklı içerik gösterir.",
@@ -44,6 +46,7 @@
   "setFallbackLocale": "Etkin dilde bir anahtar yoksa iletileri kullanılacak dil (varsayılan \"en\").",
   "setFlipHook": "`<For animate>` öğesinin yeniden sıralamayı canlandırmak için kullandığı kanca (installFlip() motion FLIP'ini buraya yerleştirir).",
   "setLocale": "Dili değiştirir (önce tembel bir paketi yükler). <html lang dir> öğesini günceller. Yalnızca t() ile bağlanmış metin yeniden çizilir.",
+  "selector": "Seçici: `isSelected(key)` okuyan bir satır yalnız kendi cevabı değişince (eski ve yeni anahtar) yeniden çalışır; 1.000 satırdan birini seçmek iki satırı uyandırır.",
   "signal": "Sinyal oluşturur. Okuma: `count()`. Yazma: `count.set(v)`, `count.update(fn)`. İzlemesiz okuma: `count.peek()`.",
   "store": "Düz bir nesne veya diziden depo oluşturur. İç içe nesneler/diziler tembel olarak reaktif olur.",
   "Switch": "`<Switch fallback={…}><Match when={a}>…</Match>…</Switch>` — doğru olan ilk Match kazanır.",

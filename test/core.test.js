@@ -250,3 +250,41 @@ test("calling an async helper without awaiting it keeps the component's owner", 
   assert.equal(afterCall, true);
   assert.equal(inContinuation, true);
 });
+
+test("For: a swap moves two rows, not the rows between; clearing the whole list empties the parent at once", async () => {
+  const { lis } = await import("../src/dom/for.ts");
+  assert.deepEqual([...lis([2, 0, -1, 1, 3])], [0, 1, 0, 1, 1]);
+  assert.equal(lis([]).length, 0);
+  const mk = (n) => Array.from({ length: n }, (_, i) => ({ id: i + 1 }));
+  const items = signal(mk(20));
+  const { el } = mount(() => h("ul", {}, h(For, { each: items, key: "id" }, M.lazyChildren(() => [(it) => h("li", {}, String(it().id))]))));
+  const ul = el.querySelector("ul");
+  let moves = 0;
+  const ins = ul.insertBefore.bind(ul);
+  ul.insertBefore = (n, r) => { moves += n.nodeType === 11 ? n.childNodes.length : 1; return n.nodeType === 11 ? [...n.childNodes].forEach((c) => ins(c, r)) : ins(n, r); };
+  const x = items().slice(); const t = x[1]; x[1] = x[18]; x[18] = t;
+  items.set(x);
+  assert.equal(ul.querySelectorAll("li").map((li) => li.textContent).join(), x.map((r) => r.id).join());
+  assert.ok(moves <= 2, `moved ${moves} rows`);
+  items.set([...items(), ...mk(25).slice(20)]);
+  assert.equal(ul.querySelectorAll("li").length, 25);
+  items.set([]);
+  assert.equal(ul.querySelectorAll("li").length, 0);
+  items.set(mk(3));
+  assert.equal(ul.textContent, "123");
+});
+
+test("selector: only the old and the new key wake", async () => {
+  const { selector } = M;
+  const sel = signal(1);
+  const isSel = selector(sel);
+  const runs = [0, 0, 0, 0];
+  const dispose = M.createRoot((d) => { for (let k = 1; k <= 3; k++) M.effect(() => { isSel(k); runs[k]++; }); return d; });
+  assert.deepEqual(runs.slice(1), [1, 1, 1]);
+  sel.set(2);
+  assert.deepEqual(runs.slice(1), [2, 2, 1]);
+  assert.equal(isSel(2), true);
+  sel.set(2);
+  assert.deepEqual(runs.slice(1), [2, 2, 1]);
+  dispose();
+});

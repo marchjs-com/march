@@ -10,6 +10,8 @@ import { installDom } from "../src/testing/dom.ts";
 
 const RT = new URL("../src/index.ts", import.meta.url).href;
 const c = (src, o = {}) => compile(src, { runtime: RT, ...o }).code;
+// the h() form (templates: false) keeps these structural checks readable; templates have their own test
+const NOTPL = { templates: false };
 const body = (src, o) => c(src, o).replace(/^import[^\n]*?;\s*(import[^\n]*?;\s*)*/, "");
 
 test("$ variables: declaration, read, write, compound, ++, computed", () => {
@@ -40,13 +42,13 @@ test("JSX elements, text whitespace, entities, fragments", () => {
   const out = body(`const a = <div class="x" id={id}>
     Hello &amp; welcome
     <b>bold</b>
-  </div>; const f = <><i/><i/></>`);
+  </div>; const f = <><i/><i/></>`, NOTPL);
   assert.match(out, /_\$h\("div", \{class: "x", id: id\}, "Hello & welcome", _\$h\("b", null, "bold"\)\)/);
   assert.match(out, /\[_\$h\("i", null\), _\$h\("i", null\)\]/);
 });
 
 test("dynamic expressions become live bindings; static ones do not", () => {
-  const out = body("let $n = 0\nconst v = <p title={props.t} data-x={1} onClick={() => go()} ref={el}>{$n} {name} {fmt(x)}</p>");
+  const out = body("let $n = 0\nconst v = <p title={props.t} data-x={1} onClick={() => go()} ref={el}>{$n} {name} {fmt(x)}</p>", NOTPL);
   assert.match(out, /title: _\$r\(\(\) => \(props\.t\)\)/);
   assert.match(out, /"data-x": 1/);
   assert.match(out, /onClick: \(\) => go\(\)/);
@@ -58,7 +60,7 @@ test("dynamic expressions become live bindings; static ones do not", () => {
 });
 
 test("directives, shorthand attributes, bind needs a $variable", () => {
-  const out = body("let $v = ''\nconst e = <input bind:value={$v} on:input|stop={h} class:on={$v} use:focus={1} transition:fade />; const r = <Row {user} {$v} />");
+  const out = body("let $v = ''\nconst e = <input bind:value={$v} on:input|stop={h} class:on={$v} use:focus={1} transition:fade />; const r = <Row {user} {$v} />", NOTPL);
   assert.match(out, /"bind:value": \$v[,}]/);
   assert.match(out, /"on:input\|stop": h/);
   assert.match(out, /"class:on": _\$r\(\(\) => \(\$v\(\)\)\)/);
@@ -76,13 +78,13 @@ test("pipes", () => {
 });
 
 test("sx literal resolves at build time; invalid sx fails the build", () => {
-  assert.match(body("const e = <div sx={{ p: 2, cols: 3 }} />"), /sx: "hm-p-2 hm-cols-3"/);
+  assert.match(body("const e = <div sx={{ p: 2, cols: 3 }} />", NOTPL), /sx: "hm-p-2 hm-cols-3"/);
   assert.throws(() => c("const e = <div sx={{ p: 42 }} />"), /out of range/);
-  assert.match(body("const e = <div sx={dyn} />"), /sx: _\$r\(\(\) => \(_\$sx\(dyn\)\)\)/);
+  assert.match(body("const e = <div sx={dyn} />", NOTPL), /sx: _\$r\(\(\) => \(_\$sx\(dyn\)\)\)/);
 });
 
 test("components get lazy children; If/Else split", () => {
-  const out = body("const e = <Card title='x'><p>a</p>{b}</Card>; const f = <If when={ok}>yes<Else>no</Else></If>");
+  const out = body("const e = <Card title='x'><p>a</p>{b}</Card>; const f = <If when={ok}>yes<Else>no</Else></If>", NOTPL);
   assert.match(out, /_\$h\(Card, \{title: "x"\}, _\$lazy\(\(\) => \[_\$h\("p", null, "a"\), b\]\)\)/);
   assert.match(out, /_\$h\(If, \{when: ok, else: \(\) => \["no"\]\}, _\$lazy\(\(\) => \["yes"\]\)\)/);
 });
@@ -112,6 +114,22 @@ test("auto imports: runtime names and components; declared names are not importe
 test("compile errors point at the source", () => {
   try { c("const a = 1\nconst e = <div><b></div>"); assert.fail("should throw"); }
   catch (e) { assert.match(e.message, /expected <\/b>/); assert.match(e.message, /:2:/); assert.ok(e.frame.includes(">    2 |")); }
+});
+
+test("templates: a native subtree is built once and cloned; only its dynamic parts are wired", () => {
+  const out = c(`const e = <tr class="row"><td class="c1">{id}</td><td><a class={$sel} onClick={go} href="/x">{label} !</a></td><td hidden /></tr>
+const s = <svg viewBox="0 0 1 1"><path d="M0 0" /></svg>; const sp = <div {...p}><b>x</b></div>`);
+  const decl = out.match(/const _\$t\d+ = _\$tpl\(/g) ?? [];
+  assert.equal(decl.length, 2, "one template for the row (inner cells taken in) and one for <b> inside the spread <div>");
+  assert.match(out, /_\$tpl\(\["tr",\[\["class","row"\]\],\["td",\[\["class","c1"\]\]\],\["td",\[\],\["a",\[\]," !"\]\],\["td",\[\["hidden",""\]\]\]\]\)/);
+  assert.match(out, /_\$p\(_\d+, "a", "class", _\$r\(\(\) => \(\$sel\)\)\)/, "a bound class is wired");
+  assert.match(out, /_\$p\(_\d+, "a", "onClick", go\)/, "events are wired, not template attributes");
+  assert.match(out, /_\$p\(_\d+, "a", "href", "\/x"\)/, "URL attributes keep their runtime check");
+  assert.match(out, /_\$ins\(_\d+, label, _\d+\)/, "a child before static text is inserted before it");
+  assert.match(out, /_\$h\("svg"/, "SVG keeps h() (namespace)");
+  assert.match(out, /_\$h\("div", \{\.\.\.p\}/, "spreads keep h()");
+  assert.ok(isStaticCode("_$t3((_r) => { _$p(_r, \"a\", \"x\", 1); })") && isStaticCode("_$t1()"));
+  assert.doesNotMatch(c("const e = <p>{a}</p>", { templates: false }), /_\$tpl/);
 });
 
 test("end to end: compiled component renders and reacts in the DOM", async () => {

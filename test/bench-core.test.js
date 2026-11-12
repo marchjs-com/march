@@ -65,3 +65,11 @@ test("share link: deflate + base64url round trip, junk gives null", async () => 
   assert.deepEqual(back.samples.vanilla.create1k, [12.3, 11, 13]);
   assert.equal(await decodeResult("not-a-result"), null);
 });
+
+test("unreliable: sd or half of the 95% interval above 15% of the median", async () => {
+  const { unreliable } = await import("../examples/showcase/src/bench/core.ts");
+  assert.equal(unreliable(stats([10, 10.2, 9.9, 10.1, 10])), false);
+  assert.equal(unreliable(stats([10, 14, 7, 12, 9])), true);
+  assert.equal(unreliable(stats([10, 11])), true); // n=2: the t quantile makes the interval wide
+  assert.equal(unreliable(stats([5])), false);
+});

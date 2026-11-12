@@ -5,7 +5,7 @@
 import "./flow-controls.css";
 import { computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { For } from "../../../dom/flow.ts";
+import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, glyph, clamp, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Button, IconButton } from "../../../ui/button.ts";

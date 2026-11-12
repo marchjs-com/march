@@ -2,6 +2,9 @@
 // Showcase › Hız › Karşılaştırma: data the benchmark page fetches on demand (never part of a JS chunk).
 //   public/bench/sources.json   each library's benchmark app source (the Code section shows what is measured)
 //   public/bench/licenses.json  license texts of the packaged libraries
+//   public/bench/sizes.json     each app bundled on its own with its library (esbuild, minified): raw and gzip bytes,
+//                               the "İndirilen (gzip)" column. The values follow the library sources, so --check only
+//                               asks that every library has one (a core change elsewhere must not fail the test).
 //   src/bench/apps/*.gen.js     compiled apps, as each library's own build step would make them: Vue's template
 //                               compiler, the Svelte compiler (fragments: "tree") and babel-preset-solid. The CSP's
 //                               Trusted Types refuse HTML strings, so Solid's string templates become DOM-built ones
@@ -81,6 +84,28 @@ const licenseText = (pkg) => {
 };
 const json = (x) => JSON.stringify(x, null, 1) + "\n";
 
+/** Every app bundled alone (its library included, minified) → raw and gzip (level 9) bytes. */
+async function sizes() {
+  const { build } = await import("esbuild");
+  const { march } = await import("../compiler/esbuild.js");
+  const { gzipSync } = await import("node:zlib");
+  const out = {};
+  for (const [id, a] of Object.entries(APPS)) {
+    const entry = id === "svelte" ? "src/bench/apps/svelte.ts" : id === "lit" ? "src/bench/apps/lit.ts" : id === "solid" ? "src/bench/apps/solid.gen.js" : id === "vue" ? "src/bench/apps/vue.ts" : a.src[0];
+    const r = await build({
+      entryPoints: [join(SC, entry)], bundle: true, minify: true, format: "esm", write: false, absWorkingDir: SC, logLevel: "error",
+      alias: { "hadi-march": join(ROOT, "src") },
+      define: { "process.env.NODE_ENV": '"production"', __VUE_OPTIONS_API__: "true", __VUE_PROD_DEVTOOLS__: "false", __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false" },
+      plugins: [march({ components: join(SC, "src/components"), cssSplit: false })], loader: { ".css": "empty" },
+    });
+    const js = r.outputFiles.filter((f) => !f.path.endsWith(".css")).map((f) => f.contents);
+    const raw = js.reduce((s, b) => s + b.length, 0);
+    const gzip = js.reduce((s, b) => s + gzipSync(b, { level: 9 }).length, 0);
+    out[id] = { raw, gzip };
+  }
+  return out;
+}
+
 const gen = await compiled();
 // the Code section: every source file of an app, one after another
 const sources = Object.fromEntries(Object.entries(APPS).map(([id, a]) => [id, a.src.map((f) => (a.src.length > 1 ? `// ── ${f.split("/").pop()}\n` : "") + readFileSync(join(SC, f), "utf8").replace(/\r\n/g, "\n").trim()).join("\n\n") + "\n"]));
@@ -91,8 +116,16 @@ for (const pkg of [...new Set(Object.values(APPS).flatMap((a) => a.pkgs))]) {
   licenses.push({ name: pkg, version: p.version, license: p.license, text: licenseText(pkg) });
 }
 
-const files = { "public/bench/sources.json": json(sources), "public/bench/licenses.json": json(licenses), ...gen };
+const files = { "public/bench/sources.json": json(sources), "public/bench/licenses.json": json(licenses), "public/bench/sizes.json": json(await sizes()), ...gen };
 let stale = [];
+// sizes follow the library sources: --check only asks that every library has a size
+const SIZES = "public/bench/sizes.json";
+if (check) {
+  const p = join(SC, SIZES);
+  const have = existsSync(p) ? Object.keys(JSON.parse(readFileSync(p, "utf8"))) : [];
+  if (Object.keys(APPS).some((id) => !have.includes(id))) stale.push(SIZES);
+  delete files[SIZES];
+}
 for (const [name, text] of Object.entries(files)) {
   const path = join(SC, name);
   const old = existsSync(path) ? readFileSync(path, "utf8") : null;

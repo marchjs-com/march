@@ -11,8 +11,18 @@ import { importTs } from "./load-ts.js";
 // sx is shared with the runtime; importTs also works when March is installed under node_modules
 const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.meta.url));
 
-const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave" };
-const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave" };
+const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins" };
+const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert" };
+// Templates: a native element subtree is built once (DOM calls, no HTML strings) and cloned; only its dynamic parts
+// (bound attributes, events, refs, directives, {expressions}, components) are wired on the clone. Not templated:
+// SVG (namespace), forbidden tags (h() throws for them), spreads.
+const TPL_SKIP_TAGS = new Set(["svg", "g", "path", "circle", "ellipse", "rect", "line", "polyline", "polygon", "text", "tspan", "defs",
+  "linearGradient", "radialGradient", "stop", "clipPath", "mask", "pattern", "use", "symbol", "title", "desc", "marker", "foreignObject",
+  "script", "iframe", "object", "embed", "base", "meta", "math"]);
+const TPL_URL_ATTRS = new Set(["href", "src", "action", "formaction", "poster", "cite", "background"]);
+const TPL_PROP_ATTRS = new Set(["value", "checked", "selected", "indeterminate", "muted", "style", "sx", "ref", "key", "innerHTML", "outerHTML", "dangerouslySetInnerHTML", "srcdoc"]);
+/** A literal attribute that can live in the template as a plain attribute (no runtime meaning). */
+const staticAttr = (name) => /^[A-Za-z][\w-]*$/.test(name) && !/^on/i.test(name) && !TPL_URL_ATTRS.has(name) && !TPL_PROP_ATTRS.has(name) && name !== "className" && name !== "htmlFor";
 const NO_WRAP = /^(on[A-Z]|on:|ref$|use:|bind:|key$)/;
 const ASSIGN_OPS = ["**=", "??=", "||=", "&&=", "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "|=", "^="];
 
@@ -25,7 +35,7 @@ export function compile(source, opts = {}) {
   const t = new Transformer(source, opts);
   try {
     let code = t.parse(source.length, false);
-    const head = t.imports();
+    const head = t.imports(code);
     return { code: head + code, css: t.css.join("\n"), keys: [...t.keys], warnings: t.warnings };
   } catch (e) {
     if (e instanceof SyntaxError || e.marchCompile) {
@@ -91,9 +101,12 @@ class Transformer {
 
   helper(k) { this.helpers.add(k); return H[k]; }
 
-  imports() {
+  imports(code = "") {
     const rt = this.opts.runtime ?? "hadi-march";
     const lines = [];
+    // a template its parent element took in is not referenced any more: declare only the used ones
+    const tpls = [...(this.tpls ?? [])].filter(([name]) => code.includes(`${name}(`));
+    if (!tpls.length) { this.helpers.delete("tpl"); this.helpers.delete("p"); this.helpers.delete("ins"); }
     if (this.helpers.size) lines.push(`import { ${[...this.helpers].map((k) => `${HELPER_SOURCE[k]} as ${H[k]}`).join(", ")} } from ${JSON.stringify(rt)};`);
     const auto = this.opts.autoImports ?? {};
     const bySpec = new Map();
@@ -108,6 +121,7 @@ class Transformer {
       if (spec.endsWith("#default")) { for (const n of names) lines.push(`import ${n} from ${JSON.stringify(spec.slice(0, -8))};`); continue; }
       lines.push(`import { ${names.sort().join(", ")} } from ${JSON.stringify(spec)};`);
     }
+    for (const [name, spec] of tpls) lines.push(`const ${name} = ${H.tpl}(${spec});`);
     return lines.join(" ");
   }
 
@@ -605,6 +619,75 @@ class Transformer {
     }
   }
 
+  /** Template node of a native element, or null when it cannot be one. Kids that are template nodes nest. */
+  tnode(tag, attrs, kids, childCode) {
+    if (TPL_SKIP_TAGS.has(tag) || !/^[a-z][\w-]*$/.test(tag)) return null;
+    const statics = [], props = [];
+    for (const a of attrs) {
+      if (a.spread) return null;
+      const literal = a.literal !== undefined ? a.literal : a.code === "true" && !a.raw && !a.dynamic ? "" : undefined;
+      if (literal !== undefined && staticAttr(a.name)) { statics.push([a.name, literal]); continue; }
+      if ((a.name === "class" || a.name === "className") && a.literal !== undefined) { statics.push(["class", a.literal]); continue; }
+      if (a.name === "htmlFor" && a.literal !== undefined) { statics.push(["for", a.literal]); continue; }
+      let value;
+      if (a.name.startsWith("use:")) {
+        const fn = a.name.slice(4);
+        if (!/^[A-Za-z_$][\w$.]*$/.test(fn)) throw fail(this.src, this.pos, `invalid action name in ${a.name}`);
+        this.used.add(fn.split(".")[0]);
+        value = `[${fn}, ${a.code === "true" && !a.raw ? "undefined" : a.code}]`;
+      } else value = a.dynamic ? `${this.helper("r")}(() => (${a.code}))` : a.code;
+      props.push([a.name, value]);
+    }
+    const out = [];
+    for (const k of kids) {
+      if (k.text) out.push({ text: JSON.parse(k.code) });
+      else if (!k.dynamic && this.tnodes?.has(k.code)) out.push(this.tnodes.get(k.code));
+      else out.push({ expr: childCode(k) });
+    }
+    return { tag, statics, props, kids: out };
+  }
+
+  /** `_$tN((r) => { …wire the clone… })`, with `const _$tN = _$tpl(spec)` declared at the top of the module. */
+  emitTemplate(tn) {
+    this.tplCount = (this.tplCount ?? 0) + 1;
+    const name = `_$t${this.tplCount}`;
+    const spec = (n) => [n.tag, n.statics, ...n.kids.filter((k) => !k.expr).map((k) => (k.text !== undefined ? k.text : spec(k)))];
+    (this.tpls ??= new Map()).set(name, JSON.stringify(spec(tn)));
+    this.helper("tpl");
+    const decl = [], wire = [];
+    let v = 0;
+    const needs = (n) => n.props.length > 0 || n.kids.some((k) => k.expr || (k.tag && needs(k)));
+    const nextStatic = (n, i) => n.kids.slice(i + 1).find((x) => !x.expr);
+    const walk = (n, ref) => {
+      for (const [key, value] of n.props) wire.push(`${this.helper("p")}(${ref}, ${JSON.stringify(n.tag)}, ${JSON.stringify(key)}, ${value});`);
+      // the template children (text and elements) that need a name: wired elements and the anchors of runtime children
+      const stat = n.kids.filter((k) => !k.expr);
+      const want = new Set();
+      n.kids.forEach((k, i) => {
+        if (k.tag && needs(k)) want.add(k);
+        if (k.expr) { const next = nextStatic(n, i); if (next) want.add(next); }
+      });
+      const last = Math.max(-1, ...stat.map((k, i) => (want.has(k) ? i : -1)));
+      const names = new Map();
+      for (let i = 0, prev = null; i <= last; i++) {
+        const nm = `_${++v}`;
+        decl.push(`${nm} = ${prev ? `${prev}.nextSibling` : `${ref}.firstChild`}`);
+        names.set(stat[i], nm);
+        prev = nm;
+      }
+      for (const k of stat) if (k.tag && want.has(k)) walk(k, names.get(k));
+      n.kids.forEach((k, i) => {
+        if (!k.expr) return;
+        const next = nextStatic(n, i);
+        wire.push(`${this.helper("ins")}(${ref}, ${k.expr}, ${next ? names.get(next) : "null"});`);
+      });
+    };
+    walk(tn, "_r");
+    if (!wire.length) return `${name}()`;
+    // every node is named before anything is inserted (inserting changes the sibling chain)
+    return `${name}((_r) => { ${decl.length ? `const ${decl.join(", ")}; ` : ""}${wire.join(" ")} })`;
+  }
+
   element(tag, isComp, attrs, kids, start) {
     void start;
     const props = [];
@@ -642,6 +725,12 @@ class Transformer {
       const body = kids.length ? `, ${this.helper("lazy")}(() => [${kids.map(childCode).join(", ")}])` : "";
       code = `${h}(${tagCode}, {${props.join(", ")}}${body})`;
     } else {
+      const tn = this.opts.typecheck || this.opts.templates === false ? null : this.tnode(tag, attrs, kids, childCode);
+      if (tn) {
+        code = this.emitTemplate(tn);
+        (this.tnodes ??= new Map()).set(code, tn);
+        return code;
+      }
       code = `${h}(${tagCode}, ${props.length ? `{${props.join(", ")}}` : "null"}${kids.map((k) => `, ${childCode(k)}`).join("")})`;
     }
     if (tag === "Else") { this.elseCodes ??= new Map(); this.elseCodes.set(code, kids.map(childCode).join(", ")); }
@@ -661,6 +750,7 @@ export function isStaticCode(code) {
   if (/^(async\s+)?function\b/.test(c)) return true;
   if (/^(async\s*)?(\([^()]*(\([^()]*\)[^()]*)*\)|[A-Za-z_$][\w$]*)\s*=>/.test(c)) return true;
   if (c.startsWith(`${H.h}(`) && balancedCall(c)) return true;
+  if (/^_\$t\d+\(/.test(c) && balancedCall(c)) return true; // a template clone
   return false;
 }
 function balancedCall(c) {
