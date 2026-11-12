@@ -184,7 +184,7 @@ button.hm-barlist-row:focus-visible { outline: 2px solid var(--hm-chart-1); bord
 
 /* multicolor ring: a conic paint masked to the ring and to the progress angle */
 @property --hm-ring-p { syntax: "<number>"; inherits: true; initial-value: 0; }
-.hm-ring-multi { position: relative; display: inline-grid; place-items: center; transition: --hm-ring-p .5s var(--hm-ease-out, ease); }
+.hm-ring-multi { position: relative; display: inline-grid; place-items: center; overflow: clip; transition: --hm-ring-p .5s var(--hm-ease-out, ease); }
 .hm-ring-multi > * { grid-area: 1 / 1; }
 .hm-ring-multi .hm-ring-value { display: none; }
 .hm-ring-paint { width: var(--hm-ring-s); height: var(--hm-ring-s); border-radius: 50%; background: var(--hm-ring-paint); pointer-events: none;

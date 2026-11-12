@@ -130,7 +130,4 @@ export function LinkCard(props: LinkCardProps): Element {
   }) as Element;
 }
 
-/** Flexible gap in a row (pushes the following items to the end). */
-export function Spacer(_props: Record<string, never> = {}): Element {
-  return h("span", { class: "hm-spacer", "aria-hidden": "true" });
-}
+export { Spacer } from "./spacer.ts";
