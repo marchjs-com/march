@@ -108,6 +108,11 @@ shown; the server must enforce permissions.
 - Clean up manual subscriptions with `onCleanup`.
 - Test with `node --test` + `hadi-march/testing` (`renderTest`, `installDom`).
 
+**Identifiers in English, user-facing text via i18n**
+- Names in code are English: `$pending`, `CATEGORY_ICONS`, `id: "members"`, `href: "/members"`, `.sc-card`, `--hm-brand-orange`.
+- Text the user reads may be any language, through `t`…`` (`t("Night Blue")` for data such as theme names).
+- `node tools/lint-identifiers.mjs` lists violations; the test suite runs it.
+
 **Performance, always** (page speed comes first)
 - Every route is a lazy chunk: `routes: { "/x": () => import("./pages/x.tsx") }`. Never import a page statically.
 - Heavy components (charts, tables, DatePicker, editors, maps, fx/landing) go behind `lazy(() => import("./X.tsx"))`

@@ -217,5 +217,17 @@ const tr: Record<string, string> = {
   "Collapse all": "Tümünü kapat",
   "Search or ask…": "Ara ya da sor…",
   "Search the menu": "Menüde ara",
+  // built-in theme names and descriptions (src/theme/presets.ts)
+  "HADİ Sosyal: navy ink and the four official colors": "HADİ Sosyal: lacivert mürekkep, dört resmi renk",
+  "Classic Cream": "Klasik Krem",
+  "HADİ on a warm cream background": "HADİ, kırık beyaz krem zeminde",
+  "Night Blue": "Gece Mavisi",
+  "Navy night, cool blue": "Lacivert gece, serin mavi",
+  "Dark background, bright neon": "Koyu zemin, parlak neon",
+  "Black and white, plain and tight": "Siyah-beyaz, sade ve sıkı",
+  "Indigo": "İndigo",
+  "Sharp, modern dashboard look": "Keskin, modern panel görünümü",
+  "High Contrast": "Yüksek Kontrast",
+  "Accessibility: black, white, yellow": "Erişilebilirlik: siyah, beyaz, sarı",
 };
 export default tr;

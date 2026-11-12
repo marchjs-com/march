@@ -52,7 +52,7 @@ export function sizeReport(m, outdir, budget) {
     for (const f of files) { const n = gz(resolve(outdir, f)); if (f.endsWith(".css")) css += n; else js += n; }
     return { js, css };
   };
-  const rows = [{ name: "(giriş)", files: m.entryFiles, ...size(m.entryFiles), entry: true }];
+  const rows = [{ name: "(entry)", files: m.entryFiles, ...size(m.entryFiles), entry: true }];
   for (const [k, files] of Object.entries(m.manifest)) rows.push({ name: k, files, ...size(files), entry: false });
   const b = budget === false ? null : { entry: 15 * 1024, route: 60 * 1024, fail: false, ...(budget ?? {}) };
   const over = [];
@@ -66,9 +66,9 @@ export function sizeReport(m, outdir, budget) {
 
 export function printReport(rep, log = console.log) {
   const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
-  log("  boyut (gzip)                          JS        CSS");
-  for (const r of rep.rows) log(`  ${r.over ? "\x1b[33m!" : " "} ${r.name.padEnd(36).slice(0, 36)} ${kb(r.js).padStart(8)}  ${kb(r.css).padStart(8)}${r.over ? "  bütçe aşıldı\x1b[0m" : ""}`);
-  if (rep.budget) log(`  bütçe: giriş JS ≤ ${kb(rep.budget.entry)}, rota JS ≤ ${kb(rep.budget.route)} (march.config.js › budget)`);
+  log("  size (gzip)                           JS        CSS");
+  for (const r of rep.rows) log(`  ${r.over ? "\x1b[33m!" : " "} ${r.name.padEnd(36).slice(0, 36)} ${kb(r.js).padStart(8)}  ${kb(r.css).padStart(8)}${r.over ? "  over budget\x1b[0m" : ""}`);
+  if (rep.budget) log(`  budget: entry JS ≤ ${kb(rep.budget.entry)}, route JS ≤ ${kb(rep.budget.route)} (march.config.js › budget)`);
 }
 
 /** `_headers` for static hosts: hashed files are cached forever, the HTML and the service worker are revalidated. */

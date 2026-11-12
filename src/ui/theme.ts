@@ -57,7 +57,7 @@ export const resolvedTheme = (): "light" | "dark" => {
   return m !== "system" ? m : globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 };
 
-// ---------------------------------------------------------------- color themes (hadi, krem, gece, neon, indigo, minimal, kontrast…)
+// ---------------------------------------------------------------- color themes (hadi, cream, night, neon, indigo, minimal, contrast…)
 /** A theme a picker can offer (built-in ones are listed already; add your own after loading its CSS). */
 export interface ThemeInfo {
   id: string;
@@ -133,8 +133,9 @@ export function ThemePicker(props: ThemePickerProps = {}): unknown {
         () => infos().map((x) => untrack(() => h("button", {
           type: "button", role: "radio", class: () => cx("hm-theme-opt", themeName() === x.id && "is-active"), "aria-checked": () => String(themeName() === x.id),
           onClick: () => setColorTheme(x.id),
-        }, h(ThemeSwatch, { id: x.id }), h("span", { class: "hm-theme-opt-text" }, h("span", { class: "hm-theme-opt-name" }, x.name),
-          x.description ? h(OverflowText, { class: "hm-theme-opt-desc" }, x.description) : null),
+        }, h(ThemeSwatch, { id: x.id }), h("span", { class: "hm-theme-opt-text" }, // theme names and descriptions are English in code; the locale pack translates them
+          h("span", { class: "hm-theme-opt-name" }, () => t(x.name)),
+          x.description ? h(OverflowText, { class: "hm-theme-opt-desc" }, () => t(x.description ?? "")) : null),
           h("span", { class: "hm-theme-opt-check", "aria-hidden": "true" }, glyph(check)))))),
     ],
   });

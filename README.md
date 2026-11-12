@@ -93,7 +93,7 @@ Türkçe: [`README.tr.md`](README.tr.md) · Changes: [`CHANGELOG.md`](CHANGELOG.
 Every component reads design tokens (CSS custom properties). A theme is ~25 colors per mode (light and dark), a body and a
 display font and a base radius; surfaces, hover and soft tints, borders, radii and shadows are derived with `color-mix()`.
 Built-in themes (`src/theme/presets.ts` → `src/css/themes.css`): **hadi** (default, the HADİ Sosyal brand: Figtree +
-Bricolage Grotesque), krem, gece, neon, indigo, minimal, kontrast. Switching is one attribute, no inline styles:
+Bricolage Grotesque), cream, night, neon, indigo, minimal, contrast. Switching is one attribute, no inline styles:
 
 ```js
 import "hadi-march/css/font.css";      // self-hosted Inter, Figtree, Bricolage Grotesque (OFL), font-src 'self'
@@ -103,7 +103,7 @@ import { setColorTheme, setTheme, ThemePicker } from "hadi-march/ui";
 setColorTheme("neon");                 // <html data-hm-theme="neon">, remembered in localStorage
 setTheme("dark");                      // light | dark | system
 <ThemePicker />                        // theme list with live swatches + appearance switch
-<section data-hm-theme="gece">…</section>   // scope a theme to part of the page
+<section data-hm-theme="night">…</section>   // scope a theme to part of the page
 ```
 
 Write your own: `defineTheme({ id, name, font, display, radius, light: {...}, dark: {...} })` from `hadi-march/theme`,

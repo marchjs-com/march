@@ -11,19 +11,19 @@ const mount = (fn) => { const el = document.createElement("div"); document.body.
 const key = (el, k, init = {}) => el.dispatchEvent(new Event("keydown", { key: k, bubbles: true, cancelable: true, ...init }));
 
 const ITEMS = [
-  { id: "uyeler", label: "Üyeler", href: "/uyeler", group: "Üyeler ve roller", keywords: "members" },
-  { id: "roller", label: "Roller", href: "/roller", group: "Üyeler ve roller" },
-  { id: "odemeler", label: "Ödemeler", href: "/odemeler", group: "Ekonomi" },
-  { id: "iadeler", label: "İadeler", href: "/iadeler", group: "Ekonomi" },
-  { id: "elmas", label: "Elmas & Akçe", href: "/elmas", group: "Ekonomi" },
+  { id: "members", label: "Üyeler", href: "/members", group: "Üyeler ve roller", keywords: "members" },
+  { id: "roles", label: "Roller", href: "/roles", group: "Üyeler ve roller" },
+  { id: "payments", label: "Ödemeler", href: "/payments", group: "Ekonomi" },
+  { id: "refunds", label: "İadeler", href: "/refunds", group: "Ekonomi" },
+  { id: "diamonds", label: "Elmas & Akçe", href: "/diamonds", group: "Ekonomi" },
 ];
 
 test("NavSidebar: categories with counts, auto-open active category, recent list, featured badge, persistence", async () => {
   localStorage.clear();
-  R.createRouter({ routes: Object.fromEntries(["/", "/uyeler", "/roller", "/odemeler", "/iadeler", "/elmas", "/destek"].map((p) => [p, { component: () => null }])) });
+  R.createRouter({ routes: Object.fromEntries(["/", "/members", "/roles", "/payments", "/refunds", "/diamonds", "/support"].map((p) => [p, { component: () => null }])) });
   const awaiting = signal(3);
   const props = { items: ITEMS, title: "HADİ Kurucu", storageKey: "t.sb", hotkey: false,
-    featured: [{ id: "destek", label: "Destek talepleri", sub: () => (awaiting() ? `${awaiting()} yanıt bekliyor` : "Yanıt bekleyen talep yok"), href: "/destek", badge: awaiting }] };
+    featured: [{ id: "support", label: "Destek talepleri", sub: () => (awaiting() ? `${awaiting()} yanıt bekliyor` : "Yanıt bekleyen talep yok"), href: "/support", badge: awaiting }] };
   let m = mount(() => h(U.NavSidebar, props));
   await tick();
   const groups = () => [...m.el.querySelectorAll(".hm-sb-gbtn")].map((b) => [b.dataset.group, b.querySelector(".hm-sb-count").textContent, b.getAttribute("aria-expanded")]);
@@ -33,12 +33,12 @@ test("NavSidebar: categories with counts, auto-open active category, recent list
   assert.equal(m.el.querySelector(".hm-sb-featured .hm-sb-badge"), null);
   assert.ok(m.el.querySelector(".hm-sb-featured").textContent.includes("Yanıt bekleyen talep yok"));
 
-  R.navigate("/iadeler"); await tick();
+  R.navigate("/refunds"); await tick();
   assert.deepEqual(groups()[0], ["Ekonomi", "3", "true"], "the category of the current page opens");
-  assert.ok(m.el.querySelector('.hm-sb-group.has-active [data-id="iadeler"]').classList.contains("is-active"));
-  R.navigate("/uyeler"); await tick();
+  assert.ok(m.el.querySelector('.hm-sb-group.has-active [data-id="refunds"]').classList.contains("is-active"));
+  R.navigate("/members"); await tick();
   const recent = [...m.el.querySelectorAll('[data-where="recent"]')].map((a) => [a.dataset.id, a.querySelector(".hm-sb-sub").textContent]);
-  assert.deepEqual(recent, [["uyeler", "Üyeler ve roller"], ["iadeler", "Ekonomi"]]);
+  assert.deepEqual(recent, [["members", "Üyeler ve roller"], ["refunds", "Ekonomi"]]);
 
   // both categories were opened by the visits above, so the link reads "Collapse all"
   assert.equal(m.el.querySelector(".hm-sb-all").textContent, "Collapse all");
@@ -63,7 +63,7 @@ test("NavSidebar: typing filters across categories; keyboard moves, opens and cl
   const input = m.el.querySelector(".hm-sb-input");
   input.value = "iade"; input.dispatchEvent(new Event("input", { bubbles: true })); await tick();
   const hits = [...m.el.querySelectorAll('[data-where="search"]')];
-  assert.deepEqual(hits.map((a) => a.dataset.id), ["iadeler"]);
+  assert.deepEqual(hits.map((a) => a.dataset.id), ["refunds"]);
   assert.equal(hits[0].querySelector(".hm-sb-sub").textContent, "Ekonomi");
   key(input, "Escape"); await tick();
   assert.equal(m.el.querySelectorAll('[data-where="search"]').length, 0);
@@ -73,7 +73,7 @@ test("NavSidebar: typing filters across categories; keyboard moves, opens and cl
   key(document.activeElement, "ArrowRight"); await tick();
   assert.equal(m.el.querySelector('[data-group="Ekonomi"]').getAttribute("aria-expanded"), "true");
   key(document.activeElement, "ArrowDown");
-  assert.equal(document.activeElement.dataset.id, "elmas", "first item inside the opened category (A–Z)");
+  assert.equal(document.activeElement.dataset.id, "diamonds", "first item inside the opened category (A–Z)");
   key(document.activeElement, "ArrowLeft");
   assert.equal(document.activeElement.dataset.group, "Ekonomi", "← from an item goes to its category");
   key(document.activeElement, "ArrowLeft"); await tick();

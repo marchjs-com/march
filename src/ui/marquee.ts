@@ -41,7 +41,7 @@ const HOST = "a, button, li, label, summary, [tabindex], [role=option], [role=me
 type Anim = { cancel(): void };
 
 /**
- * `<OverflowText text="Çok uzun bir başlık…" />` — scrolls on hover/focus only when clipped.
+ * `<OverflowText text="A very long title…" />` — scrolls on hover/focus only when clipped.
  * `<OverflowText trigger="visible" mode="loop" text={news} />`, `<OverflowText trigger="always" mode="bounce">…</OverflowText>`.
  */
 export function OverflowText(props: OverflowTextProps): Element {

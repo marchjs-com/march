@@ -1,7 +1,7 @@
 /* HADI March — design tokens and base styles.
    Layers: a THEME (themes.css, generated from src/theme/presets.ts) sets ~25 base colors per mode, fonts and a radius;
    this file derives everything else (surfaces, hover and soft tints, borders, shadows, radii) with color-mix(), so a theme
-   switch is one attribute: <html data-hm-theme="hadi|krem|gece|neon|indigo|minimal|kontrast">. Light / dark: automatic
+   switch is one attribute: <html data-hm-theme="hadi|cream|night|neon|indigo|minimal|contrast">. Light / dark: automatic
    (prefers-color-scheme) unless [data-theme="light"|"dark"] is set on <html>. Components read only these tokens.
    Self-hosted fonts: import "hadi-march/css/font.css". No inline styles are ever needed (CSP: style-src 'self'). */
 @import "./themes/hadi.css";

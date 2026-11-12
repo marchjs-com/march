@@ -29,15 +29,15 @@ const navFile = join(ROOT, "examples/showcase/src/nav.ts");
 const ROUTES = flag("--routes", null)?.split(",") ?? (existsSync(navFile) ? [...readFileSync(navFile, "utf8").matchAll(/path: "([^"]+)"/g)].map((m) => m[1]) : ["/"]);
 // extra states per route: [label, script run after load]
 const STATES = {
-  "/yerlesim": [["kapsayıcı %50", `(() => { const s = document.querySelectorAll("input[type=range]")[1]; s.value = "50"; s.dispatchEvent(new Event("input", { bubbles: true })); })()`],
-    ["kapsayıcı %30, 6 sütun", `(() => { const s = document.querySelectorAll("input[type=range]")[1]; s.value = "30"; s.dispatchEvent(new Event("input", { bubbles: true })); [...document.querySelectorAll("[role=radio]")].find((b) => b.textContent === "6 sütun")?.click(); })()`]],
+  "/layout": [["container 50%", `(() => { const s = document.querySelectorAll("input[type=range]")[1]; s.value = "50"; s.dispatchEvent(new Event("input", { bubbles: true })); })()`],
+    ["container 30%, 6 columns", `(() => { const s = document.querySelectorAll("input[type=range]")[1]; s.value = "30"; s.dispatchEvent(new Event("input", { bubbles: true })); [...document.querySelectorAll("[role=radio]")].find((b) => b.textContent === "6 sütun")?.click(); })()`]],
 };
 
 // ---- server (unless --base)
 let base = flag("--base", null), server;
 if (!base) {
   const dist = join(ROOT, "examples/showcase/dist");
-  if (!existsSync(dist)) { console.error("✖ examples/showcase/dist yok: önce node examples/showcase/build.mjs"); process.exit(2); }
+  if (!existsSync(dist)) { console.error("✖ examples/showcase/dist is missing: run node examples/showcase/build.mjs first"); process.exit(2); }
   const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".woff2": "font/woff2", ".json": "application/json" };
   server = createServer((req, res) => {
     let p = resolve(dist, "." + decodeURIComponent(new URL(req.url, "http://x").pathname));
@@ -53,7 +53,7 @@ if (!base) {
 const CANDIDATES = [process.env.BROWSER_PATH, "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe", "C:/Program Files/Microsoft/Edge/Application/msedge.exe",
   "C:/Program Files/Google/Chrome/Application/chrome.exe", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/microsoft-edge"].filter(Boolean);
 const exe = CANDIDATES.find((p) => existsSync(p));
-if (!exe) { console.error("✖ Edge/Chrome bulunamadı (BROWSER_PATH)"); process.exit(2); }
+if (!exe) { console.error("✖ Edge/Chrome not found (set BROWSER_PATH)"); process.exit(2); }
 const port = 9300 + Math.floor(Math.random() * 500);
 const profile = mkdtempSync(join(tmpdir(), "march-audit-"));
 const browser = spawn(exe, ["--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "--no-first-run", "--disable-extensions", "--hide-scrollbars", "about:blank"], { stdio: "ignore" });
@@ -137,5 +137,5 @@ for (const route of ROUTES) for (const w of WIDTHS) for (const [label, script] o
 ws.close(); browser.kill(); server?.close(); await sleep(300); try { rmSync(profile, { recursive: true, force: true }); } catch {}
 console.log("");
 for (const f of findings) console.log(`✖ ${f.route} @${f.w}${f.state ? ` (${f.state})` : ""}  ${f.kind}  ${f.at}  ${f.detail}`);
-console.log(findings.length ? `${findings.length} sorun` : `✔ ${ROUTES.length} sayfa × ${WIDTHS.length} genişlik: taşma, kırık kelime, eşitsiz kart, üst üste binme yok`);
+console.log(findings.length ? `${findings.length} problems` : `✔ ${ROUTES.length} pages × ${WIDTHS.length} widths: no overflow, broken words, uneven cards or overlap`);
 process.exit(findings.length ? 1 : 0);

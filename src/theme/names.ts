@@ -4,36 +4,36 @@ export const THEME_NAMES: readonly { id: string; name: string; description?: str
   {
     "id": "hadi",
     "name": "HADİ",
-    "description": "HADİ Sosyal: lacivert mürekkep, dört resmi renk (Heyecan, Aktivite, Dostluk, İletişim)"
+    "description": "HADİ Sosyal: navy ink and the four official colors"
   },
   {
-    "id": "krem",
-    "name": "Klasik Krem",
-    "description": "HADİ, kırık beyaz krem zeminde"
+    "id": "cream",
+    "name": "Classic Cream",
+    "description": "HADİ on a warm cream background"
   },
   {
-    "id": "gece",
-    "name": "Gece Mavisi",
-    "description": "Lacivert gece, serin mavi"
+    "id": "night",
+    "name": "Night Blue",
+    "description": "Navy night, cool blue"
   },
   {
     "id": "neon",
     "name": "Neon",
-    "description": "Koyu zemin, parlak neon"
+    "description": "Dark background, bright neon"
   },
   {
     "id": "indigo",
-    "name": "İndigo",
-    "description": "Keskin, modern panel görünümü"
+    "name": "Indigo",
+    "description": "Sharp, modern dashboard look"
   },
   {
     "id": "minimal",
     "name": "Minimal",
-    "description": "Siyah-beyaz, sade ve sıkı"
+    "description": "Black and white, plain and tight"
   },
   {
-    "id": "kontrast",
-    "name": "Yüksek Kontrast",
-    "description": "Erişilebilirlik: siyah, beyaz, sarı"
+    "id": "contrast",
+    "name": "High Contrast",
+    "description": "Accessibility: black, white, yellow"
   }
 ];

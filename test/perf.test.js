@@ -48,7 +48,7 @@ test("entry has no chart/table code; the manifest lists the lazy route's files; 
     const salesJs = sales.filter((f) => f.endsWith(".js")).map((f) => readFileSync(resolve(app.outdir, f), "utf8")).join("\n");
     assert.match(salesJs, /hm-chart/);
     const rep = sizeReport(m, app.outdir, { entry: 15 * 1024, route: 60 * 1024 });
-    assert.equal(rep.rows[0].name, "(giriş)");
+    assert.equal(rep.rows[0].name, "(entry)");
     const gz = m.entryFiles.filter((f) => f.endsWith(".js")).reduce((s, f) => s + gzipSync(readFileSync(resolve(app.outdir, f))).length, 0);
     assert.equal(rep.rows[0].js, gz);
     assert.ok(rep.rows[0].js < 15 * 1024, `entry JS ${rep.rows[0].js} B gzip < 15 KB`);

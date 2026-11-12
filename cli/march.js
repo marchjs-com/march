@@ -103,8 +103,8 @@ async function build({ dev = false } = {}) {
       printReport(rep);
       writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ entry: rep.rows[0], routes: rep.rows.slice(1).map(({ name, js, css, files }) => ({ name, js, css, files })), budget: rep.budget }, null, 2)}\n`);
       if (rep.over.length) {
-        const msg = `bütçe aşıldı: ${rep.over.map((x) => x.name).join(", ")}`;
-        if (rep.over.some((x) => x.entry) || flag("--analyze") === true) { console.log("  girişte en büyük modüller (min, gzip öncesi) — ağır olanı import()/lazy() arkasına alın:"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, flag("--analyze") === true ? 40 : 12)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
+        const msg = `over budget: ${rep.over.map((x) => x.name).join(", ")}`;
+        if (rep.over.some((x) => x.entry) || flag("--analyze") === true) { console.log("  largest modules in the entry (minified, before gzip) — move heavy ones behind import()/lazy():"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, flag("--analyze") === true ? 40 : 12)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
         if (rep.budget?.fail) { console.error(`\x1b[31m✖\x1b[0m ${msg}`); process.exitCode = 1; } else console.warn(`\x1b[33m!\x1b[0m ${msg}`);
       }
     }

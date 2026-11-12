@@ -122,53 +122,56 @@ ${darkSet} {
 
 // ------------------------------------------------------------------ built-in themes
 const FIGTREE = `"Figtree Variable", "Figtree"`, BRICOLAGE = `"Bricolage Grotesque Variable", "Bricolage Grotesque"`, INTER = `"InterVariable", "Inter"`;
-/** HADİ Sosyal's official colors (hadimobile lib/theme/hadi_colors.dart › HadiColors, HadiLight; night tones). */
+/**
+ * HADİ Sosyal's official colors (hadimobile lib/theme/hadi_colors.dart › HadiColors, HadiLight; night tones).
+ * The four brand colors and their HADİ names: orange = Heyecan, blue = Aktivite, green = Dostluk, purple = İletişim.
+ */
 export const HADI = {
-  heyecan: "#F2801F", aktivite: "#1D9AD6", dostluk: "#78BE3A", iletisim: "#A3338C", pink: "#D33C73", gold: "#D9A93A", error: "#D24444",
+  orange: "#F2801F", blue: "#1D9AD6", green: "#78BE3A", purple: "#A3338C", pink: "#D33C73", gold: "#D9A93A", error: "#D24444",
   ink: "#17344F", ink2: "#3E5770", ink3: "#6B7F92", mist: "#F2F6F9", line: "#DCE4EB",
   night: "#0D2033", nightCard: "#152D45", nightLine: "#244460", nightText: "#E8EFF5", nightMuted: "#9DB0C2",
 } as const;
-/** The four-color ribbon in its official order: Heyecan, Aktivite, Dostluk, İletişim. */
-const HADI_RIBBON_GRADIENT = `linear-gradient(135deg, ${HADI.heyecan} 0%, ${HADI.aktivite} 36%, ${HADI.dostluk} 66%, ${HADI.iletisim} 100%)`;
+/** The four-color ribbon in its official order: orange, blue, green, purple. */
+const HADI_RIBBON_GRADIENT = `linear-gradient(135deg, ${HADI.orange} 0%, ${HADI.blue} 36%, ${HADI.green} 66%, ${HADI.purple} 100%)`;
 const HADI_GLOW = ["rgb(242 128 31 / .7)", "rgb(29 154 214 / .6)", "rgb(120 190 58 / .45)", "rgb(163 51 140 / .55)"] as const;
 
 /** HADİ — the HADİ Sosyal brand (default): navy ink, the four-color ribbon, Figtree + Bricolage Grotesque. */
 export const hadi = defineTheme({
-  id: "hadi", name: "HADİ", description: "HADİ Sosyal: lacivert mürekkep, dört resmi renk (Heyecan, Aktivite, Dostluk, İletişim)",
+  id: "hadi", name: "HADİ", description: "HADİ Sosyal: navy ink and the four official colors",
   font: FIGTREE, display: BRICOLAGE, displayWeight: 700, radius: 12,
   light: {
     bg: HADI.mist, surface: "#FFFFFF", text: HADI.ink, muted: ensureContrast(HADI.ink3, "#FFFFFF"), border: HADI.line,
     // accent = Heyecan; as text it is shaded until it reads on white (AA), like HadiColors.readableOn
-    primary: ensureContrast(HADI.heyecan, "#FFFFFF"), solid: HADI.ink, onSolid: onBrandFill(HADI.ink),
-    danger: ensureContrast(HADI.error, "#FFFFFF"), success: ensureContrast(HADI.dostluk, "#FFFFFF"), warn: ensureContrast(HADI.gold, "#FFFFFF"),
-    info: ensureContrast(HADI.aktivite, "#FFFFFF"), special: ensureContrast(HADI.iletisim, "#FFFFFF"),
-    cat: [HADI.heyecan, HADI.aktivite, HADI.dostluk, HADI.iletisim, HADI.pink, HADI.gold, HADI.ink, "#0E9F8E"],
+    primary: ensureContrast(HADI.orange, "#FFFFFF"), solid: HADI.ink, onSolid: onBrandFill(HADI.ink),
+    danger: ensureContrast(HADI.error, "#FFFFFF"), success: ensureContrast(HADI.green, "#FFFFFF"), warn: ensureContrast(HADI.gold, "#FFFFFF"),
+    info: ensureContrast(HADI.blue, "#FFFFFF"), special: ensureContrast(HADI.purple, "#FFFFFF"),
+    cat: [HADI.orange, HADI.blue, HADI.green, HADI.purple, HADI.pink, HADI.gold, HADI.ink, "#0E9F8E"],
     mark: HADI_RIBBON_GRADIENT, stage: HADI.night, glow: HADI_GLOW,
     brand: {
-      heyecan: { color: HADI.heyecan, soft: "#FEF0E3" }, aktivite: { color: HADI.aktivite, soft: "#E5F4FB" },
-      dostluk: { color: HADI.dostluk, soft: "#EEF7E5" }, iletisim: { color: HADI.iletisim, soft: "#F6E8F3" },
-      gold: { color: HADI.gold, soft: "#FBF3DD" }, pink: { color: HADI.pink }, navy: { color: HADI.ink },
+      "brand-orange": { color: HADI.orange, soft: "#FEF0E3" }, "brand-blue": { color: HADI.blue, soft: "#E5F4FB" },
+      "brand-green": { color: HADI.green, soft: "#EEF7E5" }, "brand-purple": { color: HADI.purple, soft: "#F6E8F3" },
+      "brand-gold": { color: HADI.gold, soft: "#FBF3DD" }, "brand-pink": { color: HADI.pink }, "brand-navy": { color: HADI.ink },
     },
   },
   dark: {
     // HadiPreset klasik › night tones
     bg: "#0B1B2B", surface: HADI.night, raised: HADI.nightCard, text: HADI.nightText, muted: HADI.nightMuted, border: HADI.nightLine,
-    primary: ensureContrast(HADI.heyecan, HADI.night), solid: HADI.heyecan, onSolid: onBrandFill(HADI.heyecan),
-    danger: ensureContrast(HADI.error, HADI.night), success: ensureContrast(HADI.dostluk, HADI.night), warn: ensureContrast(HADI.gold, HADI.night),
-    info: ensureContrast(HADI.aktivite, HADI.night), special: ensureContrast("#C95BB5", HADI.night),
-    cat: [HADI.heyecan, HADI.aktivite, HADI.dostluk, "#C95BB5", "#E9658F", HADI.gold, HADI.nightMuted, "#2EC4B2"],
+    primary: ensureContrast(HADI.orange, HADI.night), solid: HADI.orange, onSolid: onBrandFill(HADI.orange),
+    danger: ensureContrast(HADI.error, HADI.night), success: ensureContrast(HADI.green, HADI.night), warn: ensureContrast(HADI.gold, HADI.night),
+    info: ensureContrast(HADI.blue, HADI.night), special: ensureContrast("#C95BB5", HADI.night),
+    cat: [HADI.orange, HADI.blue, HADI.green, "#C95BB5", "#E9658F", HADI.gold, HADI.nightMuted, "#2EC4B2"],
     mark: HADI_RIBBON_GRADIENT, stage: HADI.night, glow: HADI_GLOW,
     brand: {
-      heyecan: { color: HADI.heyecan }, aktivite: { color: HADI.aktivite }, dostluk: { color: HADI.dostluk }, iletisim: { color: "#C95BB5" },
-      gold: { color: HADI.gold }, pink: { color: HADI.pink }, navy: { color: HADI.nightCard },
+      "brand-orange": { color: HADI.orange }, "brand-blue": { color: HADI.blue }, "brand-green": { color: HADI.green }, "brand-purple": { color: "#C95BB5" },
+      "brand-gold": { color: HADI.gold }, "brand-pink": { color: HADI.pink }, "brand-navy": { color: HADI.nightCard },
     },
   },
-  swatches: [HADI.ink, HADI.heyecan, HADI.aktivite, HADI.dostluk, HADI.iletisim],
+  swatches: [HADI.ink, HADI.orange, HADI.blue, HADI.green, HADI.purple],
 });
 
-/** Klasik Krem — HADİ on a warm off-white; espresso in the dark. */
-export const krem = defineTheme({
-  id: "krem", name: "Klasik Krem", description: "HADİ, kırık beyaz krem zeminde",
+/** Classic Cream — HADİ on a warm off-white; espresso in the dark. */
+export const cream = defineTheme({
+  id: "cream", name: "Classic Cream", description: "HADİ on a warm cream background",
   font: FIGTREE, display: BRICOLAGE, displayWeight: 700, radius: 12,
   light: {
     bg: "#F7F3EA", surface: "#FDFBF7", text: "#17344F", muted: "#4E6073", border: "#E3DACB",
@@ -188,9 +191,9 @@ export const krem = defineTheme({
   },
 });
 
-/** Gece Mavisi — always dark navy night, cool blue. */
-export const gece = defineTheme({
-  id: "gece", name: "Gece Mavisi", description: "Lacivert gece, serin mavi", alwaysDark: true,
+/** Night Blue — always dark navy night, cool blue. */
+export const night = defineTheme({
+  id: "night", name: "Night Blue", description: "Navy night, cool blue", alwaysDark: true,
   font: FIGTREE, display: BRICOLAGE, displayWeight: 700, radius: 14,
   light: {
     bg: "#F3F6FA", surface: "#FFFFFF", text: "#132A40", muted: "#4E6377", border: "#D3DEE9", primary: "#1D6AAE", solid: "#0D2033", onSolid: "#FFFFFF",
@@ -209,7 +212,7 @@ export const gece = defineTheme({
 
 /** Neon — night club: deep violet, bright neon. */
 export const neon = defineTheme({
-  id: "neon", name: "Neon", description: "Koyu zemin, parlak neon", alwaysDark: true,
+  id: "neon", name: "Neon", description: "Dark background, bright neon", alwaysDark: true,
   font: FIGTREE, display: BRICOLAGE, displayWeight: 800, radius: 12,
   light: {
     bg: "#F6F5FB", surface: "#FFFFFF", text: "#15122B", muted: "#57527A", border: "#D9D5EE", primary: "#A3127A", solid: "#15122B", onSolid: "#FFFFFF",
@@ -228,7 +231,7 @@ export const neon = defineTheme({
 
 /** Minimal — black and white, tight and quiet (Inter). */
 export const minimal = defineTheme({
-  id: "minimal", name: "Minimal", description: "Siyah-beyaz, sade ve sıkı",
+  id: "minimal", name: "Minimal", description: "Black and white, plain and tight",
   font: INTER, display: INTER, displayWeight: 650, radius: 8,
   light: {
     bg: "#FAFAFA", surface: "#FFFFFF", text: "#111111", muted: "#5C5C5C", border: "#E5E5E5", primary: "#111111", solid: "#111111", onSolid: "#FFFFFF",
@@ -246,7 +249,7 @@ export const minimal = defineTheme({
 
 /** Indigo — a crisp SaaS look (Inter, indigo accent). */
 export const indigo = defineTheme({
-  id: "indigo", name: "İndigo", description: "Keskin, modern panel görünümü",
+  id: "indigo", name: "Indigo", description: "Sharp, modern dashboard look",
   font: INTER, display: INTER, displayWeight: 680, radius: 8,
   light: {
     bg: "#F7F7F9", surface: "#FFFFFF", text: "#17171A", muted: "#696973", border: "#E7E7EB", primary: "#4F46E5", solid: "#4F46E5", onSolid: "#FFFFFF",
@@ -262,9 +265,9 @@ export const indigo = defineTheme({
   },
 });
 
-/** Yüksek Kontrast — accessibility: black, white, strong blue / yellow. */
-export const kontrast = defineTheme({
-  id: "kontrast", name: "Yüksek Kontrast", description: "Erişilebilirlik: siyah, beyaz, sarı",
+/** High Contrast — accessibility: black, white, strong blue / yellow. */
+export const contrastTheme = defineTheme({
+  id: "contrast", name: "High Contrast", description: "Accessibility: black, white, yellow",
   font: FIGTREE, display: FIGTREE, displayWeight: 800, radius: 6,
   light: {
     bg: "#FFFFFF", surface: "#FFFFFF", text: "#000000", muted: "#333333", border: "#6B6B6B", primary: "#0040C0", solid: "#000000", onSolid: "#FFFFFF",
@@ -281,5 +284,5 @@ export const kontrast = defineTheme({
 });
 
 /** Built-in themes, default first. */
-export const THEMES: readonly ThemeDef[] = [hadi, krem, gece, neon, indigo, minimal, kontrast];
+export const THEMES: readonly ThemeDef[] = [hadi, cream, night, neon, indigo, minimal, contrastTheme];
 export const DEFAULT_THEME = "hadi";
