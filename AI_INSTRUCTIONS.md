@@ -398,6 +398,11 @@ One interaction, written once, attached to any element; each behavior is its own
   (aria-activedescendant keys for a field with options). Never write your own ArrowUp / ArrowDown option loop.
 - **dropzone** — `dropzone(zone, { onFiles, onOver, accept, paste })`: counted enter / leave, files only, paste;
   `accepts(file, accept)`. Never write dragenter / dragover / drop handlers for files yourself.
+- **swipe** — `swipeable(el, { axis, accept, onMove, onEnd, onTap, holdMs, onHold })` + `rubberBand`, `fling`, `nearest`:
+  axis lock, veto, release velocity, tap / hold, click after a swipe swallowed (Drawer, PullToRefresh, ChatBubble,
+  StoryViewer). Never write your own follow-the-finger pointer loop.
+- **dismiss** — `dismiss(panel, { inside, onDismiss(why), on, escape })`: outside press + Escape (capture phase) for
+  popovers, menus and pickers. Never add document pointerdown / click / Escape listeners for that yourself.
 
 ### 15c. Ready-made animations (all on the engine, each its own export)
 

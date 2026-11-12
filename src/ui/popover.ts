@@ -5,6 +5,7 @@ import { h } from "../dom/h.ts";
 import { Portal } from "../dom/portal.ts";
 import { on, cx } from "./util.ts";
 import { clamp } from "../core/util.ts";
+import { dismiss } from "../behaviors/dismiss/index.ts";
 
 export type Placement = "bottom-start" | "bottom-end" | "top-start" | "top-end" | "top" | "bottom";
 /** Fixed position as a style object. */
@@ -51,10 +52,8 @@ export function floating(o: FloatingOptions): unknown {
   update();
   const raf = globalThis.requestAnimationFrame?.(update);
   onCleanup(() => globalThis.cancelAnimationFrame?.(raf as number));
-  const d = globalThis.document;
-  on(d, "pointerdown", (e) => { const tg = e.target as Node | null; if (!panel?.contains(tg) && !o.anchor?.contains(tg)) o.onClose(); }, true);
-  // capture phase: Escape closes the innermost popover before a dialog underneath sees it
-  on<KeyboardEvent>(d, "keydown", (e) => { if (e.key === "Escape") { e.stopPropagation(); e.preventDefault(); o.onClose(true); } }, true);
+  // a press outside (panel and anchor are inside) or Escape (capture: the innermost popover first) closes it
+  dismiss(() => panel, { inside: () => [o.anchor], onDismiss: (why) => (why === "escape" ? o.onClose(true) : o.onClose()) });
   on(globalThis.window, "resize", update);
   on(globalThis.window, "scroll", update, true);
   return h(Portal, { layer: o.role === "tooltip" ? "tooltip" : o.role === "menu" || o.role === "listbox" ? "menu" : "popover", children: el });

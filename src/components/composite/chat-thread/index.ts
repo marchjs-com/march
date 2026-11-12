@@ -7,7 +7,7 @@ import { signal, computed, effect, untrack, onCleanup } from "../../../core/reac
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/flow.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, listen, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { applyPipe } from "../../../core/pipes.ts";
 import { arrowDown } from "../../../icons/glyphs/arrowDown.ts";
 import { Avatar } from "../../../ui/avatar.ts";
@@ -18,6 +18,7 @@ import { animate } from "../../../motion/animate.ts";
 import { measure } from "../../../motion/engine/clock.ts";
 import "./chat-thread.css";
 import { isRtl } from "../../../core/util.ts";
+import { dismiss } from "../../../behaviors/dismiss/index.ts";
 
 export interface ChatMessage {
   id: string;
@@ -138,11 +139,7 @@ export function ChatThread(props: ChatThreadProps): Element {
   effect(() => {
     if (!picking()) return;
     untrack(() => queueMicrotask(() => root?.querySelector<HTMLElement>(".hm-chat-pick button[tabindex='0']")?.focus()));
-    const off = listen(globalThis.document, {
-      keydown: (e: KeyboardEvent) => { if (e.key === "Escape") { picking.set(null); } },
-      pointerdown: (e: PointerEvent) => { if (!(e.target as Element).closest?.(".hm-chat-pick, .hm-msg-tool")) picking.set(null); },
-    });
-    onCleanup(off);
+    onCleanup(dismiss(null, { inside: () => [...(root?.querySelectorAll(".hm-chat-pick, .hm-msg-tool") ?? [])], onDismiss: () => picking.set(null) }));
   });
 
   root = h("div", {

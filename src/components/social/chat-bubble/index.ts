@@ -16,6 +16,7 @@ import { arrowLeft } from "../../../icons/glyphs/arrowLeft.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./chat-bubble.css";
 import { isRtl } from "../../../core/util.ts";
+import { swipeable } from "../../../behaviors/swipe/index.ts";
 
 export type MessageStatus = "sending" | "sent" | "delivered" | "read" | "failed";
 export interface Reaction { emoji: string; count: number; mine?: boolean | undefined }
@@ -55,27 +56,28 @@ export function ChatBubble(props: ChatBubbleProps): Element {
   const armed = signal(false);
   const mine = (): boolean => !!val(props.mine);
   // drag to reply: toward the inline end for theirs, toward the start for mine (away from the edge it hugs)
-  let sx = 0, sy = 0, d = 0, on = false, side = false;
+  let d = 0;
   const dirSign = (): number => { const rtl = isRtl(row); return (mine() ? -1 : 1) * (rtl ? -1 : 1); };
-  const down = (e: PointerEvent): void => { if (!props.onReply || e.button > 0 || (e.target as Element).closest("button, a")) return; sx = e.clientX; sy = e.clientY; on = true; side = false; d = 0; };
-  const move = (e: PointerEvent): void => {
-    if (!on) return;
-    const dx = (e.clientX - sx) * dirSign(), dy = e.clientY - sy;
-    if (!side) { if (Math.abs(dy) > 10) { on = false; return; } if (dx < 8) return; side = true; try { row.setPointerCapture?.(e.pointerId); } catch { /* gone */ } }
-    d = clamp(dx * 0.75, 0, SWIPE);
-    setStyle(bub, { transform: `translateX(${d * dirSign()}px)` });
-    setStyle(hint, { opacity: String(Math.min(1, d / TRIGGER)), transform: `scale(${0.6 + 0.4 * Math.min(1, d / TRIGGER)})` });
-    armed.set(d >= TRIGGER);
-  };
-  const up = (): void => {
-    if (!on) return;
-    on = false;
-    if (!side) return;
-    const fired = d >= TRIGGER, from = d * dirSign();
-    setStyle(bub, { transform: null }); setStyle(hint, { opacity: null, transform: null });
-    animate(bub, [{ transform: `translateX(${from}px)` }, { transform: "translateX(0)" }], { duration: 280, easing: "easeOutBack" });
-    armed.set(false);
-    if (fired) props.onReply?.();
+  // the swipe behavior: horizontal only, and only away from the edge the bubble hugs
+  const gesture = (el: HTMLElement): void => {
+    swipeable(el, {
+      axis: "x", ignore: "button, a",
+      onPress: () => !!props.onReply,
+      accept: (p) => p.dx * dirSign() > 0,
+      onMove: (p) => {
+        d = clamp(p.dx * dirSign() * 0.75, 0, SWIPE);
+        setStyle(bub, { transform: `translateX(${d * dirSign()}px)` });
+        setStyle(hint, { opacity: String(Math.min(1, d / TRIGGER)), transform: `scale(${0.6 + 0.4 * Math.min(1, d / TRIGGER)})` });
+        armed.set(d >= TRIGGER);
+      },
+      onEnd: (_p, cancelled) => {
+        const fired = !cancelled && d >= TRIGGER, from = d * dirSign();
+        setStyle(bub, { transform: null }); setStyle(hint, { opacity: null, transform: null });
+        animate(bub, [{ transform: `translateX(${from}px)` }, { transform: "translateX(0)" }], { duration: 280, easing: "easeOutBack" });
+        armed.set(false); d = 0;
+        if (fired) props.onReply?.();
+      },
+    });
   };
   const ticks = (): Element | null => {
     if (!mine()) return null;
@@ -89,7 +91,7 @@ export function ChatBubble(props: ChatBubbleProps): Element {
   const big = (): boolean => EMOJI_ONLY.test(text().trim()) && !val(props.reply);
   row = h("div", {
     class: () => cx("hm-msg", mine() ? "hm-msg-mine" : "hm-msg-theirs", `hm-msg-${val(props.position) ?? "single"}`, big() && "is-emoji", armed() && "is-armed", val(props.class)),
-    onPointerdown: down, onPointermove: move, onPointerup: up, onPointercancel: up,
+    ref: (x: HTMLElement) => gesture(x),
   },
   h("span", { class: "hm-msg-hint", "aria-hidden": "true", ref: (x: HTMLElement) => { hint = x; } }, glyph(arrowLeft)),
   h("div", { class: "hm-msg-col" },
