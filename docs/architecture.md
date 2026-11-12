@@ -61,7 +61,9 @@ src/net/  src/errors/  src/channel/  src/motion/   (modules)
 
 - Every runtime export of every package subpath has a one-line JSDoc summary. `tools/api-coverage.js` turns them into
   the showcase API reference (İlk Adımlar › API başvurusu, `examples/showcase/src/api.gen*.ts`, lazy parts);
-  test/api-coverage.test.js fails when an export has no summary or the reference is stale.
+  docs/api.tr.json holds the one-line Turkish summary of every export (code names untouched); the reference loads only the
+  active language and shows English for every other one. test/api-coverage.test.js fails when an export has no summary,
+  no Turkish summary, or the reference is stale.
 - Categories: `src/components/categories.ts` (folder, subpath `hadi-march/<category>`, showcase menu group, catalogue
   section); `meta.category` must match the folder.
 - `tools/gen-registry.js` writes `src/components/index.ts` (re-exported by `hadi-march/ui`), one barrel per category
