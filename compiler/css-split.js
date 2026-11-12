@@ -56,7 +56,8 @@ export function setupCssSplit(build) {
   });
 }
 
-const loaderJs = (file) => `await new Promise((r)=>{if(typeof document==="undefined")return r();const u=new URL(${JSON.stringify(`./${file}`)},import.meta.url).href;if(document.querySelector('link[data-hm-css="'+u+'"]'))return r();const l=document.createElement("link");l.rel="stylesheet";l.href=u;l.dataset.hmCss=u;l.onload=l.onerror=()=>r();document.head.appendChild(l)});\n`;
+/** The CSS loader put at the top of a chunk (exported: pack-chunks removes it when it merges that CSS elsewhere). */
+export const loaderJs = (file) => `await new Promise((r)=>{if(typeof document==="undefined")return r();const u=new URL(${JSON.stringify(`./${file}`)},import.meta.url).href;if(document.querySelector('link[data-hm-css="'+u+'"]'))return r();const l=document.createElement("link");l.rel="stylesheet";l.href=u;l.dataset.hmCss=u;l.onload=l.onerror=()=>r();document.head.appendChild(l)});\n`;
 
 async function distribute(result, build, own) {
   const o = build.initialOptions;
