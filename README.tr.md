@@ -22,7 +22,7 @@ export function Sayac(props: { etiket: string }) {
   tablo, yetki, arayüz seti, veri tablosu, grafikler, hareket (yay, FLIP, zaman çizelgesi, jestler, sayfa geçişleri),
   fx (parçacık, aurora), i18n (ICU çoğul/seçim, RTL), test yardımcıları.
 
-Tek derleme aracı esbuild'dir. `march dev` geliştirme sunucusu, `march build` `dist/`, `march check` tür denetimi.
+Tek derleme aracı esbuild'dir. `march dev` geliştirme sunucusu, `march build` `dist/` (yayın derlemesi; hızlı ve artımlı derleme: `march build --dev [--watch]`), `march check` tür denetimi.
 Ayrıntılar için İngilizce [README](README.md) ve [`AI_INSTRUCTIONS.md`](AI_INSTRUCTIONS.md).
 
 Lisans: MIT. Lisans değişmedi; aşağıdaki yalnızca bir rica.

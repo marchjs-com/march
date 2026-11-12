@@ -122,11 +122,16 @@
   ],
   "types": "./src/index.ts",
   "scripts": {
-    "test": "node --import ./compiler/register.js --test",
+    "test": "node tools/run-tests.mjs",
+    "test:changed": "node tools/run-tests.mjs --changed",
+    "test:release": "node tools/run-tests.mjs --release",
+    "test:all": "node tools/run-tests.mjs --all",
     "bench": "node bench/run.js",
     "size": "node bench/size.js",
     "typecheck": "tsc -p tsconfig.json",
     "build:lib": "node tools/build-lib.js",
+    "build:showcase": "node examples/showcase/build.mjs",
+    "build:showcase:release": "node examples/showcase/build.mjs --release",
     "audit:controls": "node tools/control-audit.mjs",
     "check:editor-suggest": "node tools/editor-suggest-check.mjs"
   },

@@ -32,6 +32,7 @@ function inlined(file, seen = new Set()) {
 /** Plugin part: record `module → stylesheets` and make the CSS imports no-ops for esbuild. */
 export function setupCssSplit(build) {
   const own = new Map(); // abs module path → Set(abs css path)
+  const minified = new Map(); // CSS text → minified (rebuilds of one context mostly minify the same text again)
   build.initialOptions.metafile = true;
   const o = build.initialOptions;
   const cwd = o.absWorkingDir ?? process.cwd();
@@ -52,14 +53,14 @@ export function setupCssSplit(build) {
   build.onLoad({ filter: /.*/, namespace: "hm-css-split" }, () => ({ contents: "", loader: "js" }));
   build.onEnd(async (result) => {
     if (result.errors.length || !result.metafile) return;
-    await distribute(result, build, own);
+    await distribute(result, build, own, minified);
   });
 }
 
 /** The CSS loader put at the top of a chunk (exported: pack-chunks removes it when it merges that CSS elsewhere). */
 export const loaderJs = (file) => `await new Promise((r)=>{if(typeof document==="undefined")return r();const u=new URL(${JSON.stringify(`./${file}`)},import.meta.url).href;if(document.querySelector('link[data-hm-css="'+u+'"]'))return r();const l=document.createElement("link");l.rel="stylesheet";l.href=u;l.dataset.hmCss=u;l.onload=l.onerror=()=>r();document.head.appendChild(l)});\n`;
 
-async function distribute(result, build, own) {
+async function distribute(result, build, own, minified = new Map()) {
   const o = build.initialOptions;
   const cwd = o.absWorkingDir ?? process.cwd();
   const abs = (p) => resolve(cwd, p);
@@ -77,7 +78,11 @@ async function distribute(result, build, own) {
   };
   const cssText = new Map();
   const load = async (p) => { if (!cssText.has(p)) cssText.set(p, inlined(p)); return cssText.get(p); };
-  const minify = async (text) => (o.minify && build.esbuild ? (await build.esbuild.transform(text, { loader: "css", minify: true, legalComments: "none" })).code : text);
+  const minify = async (text) => {
+    if (!o.minify || !build.esbuild) return text;
+    if (!minified.has(text)) minified.set(text, (await build.esbuild.transform(text, { loader: "css", minify: true, legalComments: "none" })).code);
+    return minified.get(text);
+  };
 
   const jsOutputs = Object.entries(meta.outputs).filter(([f]) => f.endsWith(".js"));
   const wanted = (out) => {
