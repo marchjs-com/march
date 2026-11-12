@@ -1,11 +1,12 @@
 // Small charts: Sparkline, Stat (KPI box), ProgressRing (0–100 score) and BarList (ranked horizontal bars).
-import { computed, read, reactive } from "../core/reactive.ts";
+import { computed, read, reactive, effect } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { lttb } from "./lttb.ts";
 import { svgIcon, isIconDef } from "../icons/svg.ts";
 import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, attr, each, type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps } from "./util.ts";
 import { OverflowText } from "../ui/marquee.ts";
-import { colorAttr, type ColorToken } from "../theme/colors.ts";
+import { colorAttr, colorList, paintOf, type ColorToken, type MultiColors } from "../theme/colors.ts";
+import { cx } from "../ui/util.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -40,6 +41,13 @@ export interface StatProps<D = unknown> {
   icon?: unknown;
 }
 export interface ProgressRingProps {
+  /**
+   * Several colors: "brand" (the four HADİ colors, the HADİ theme's default), a list of color tokens, or "single" (one
+   * color even in a multicolor theme).
+   */
+  colors?: MultiColors | undefined;
+  /** How several colors are laid out: "gradient" (default), "segments" (equal parts) or "cycle" (colors flow). */
+  paint?: "gradient" | "segments" | "cycle" | undefined;
   /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
   color?: ColorToken | undefined;
   value?: Opt<number>;
@@ -150,7 +158,8 @@ export function ProgressRing(props: ProgressRingProps): Element {
   const r = computed(() => (S() - T()) / 2), C = computed(() => 2 * Math.PI * r());
   const level = computed(() => { const [a, b] = read(props.thresholds) ?? [50, 80], p = (v() / max()) * 100; return p < a ? "low" : p < b ? "mid" : "high"; });
   const text = (): unknown => formatter(read<FormatSpec | null | undefined>(props.format), (x) => String(Math.round(x as number)))(v());
-  return h("svg", { "data-hm-color": colorAttr(props.color),
+  const list = colorList(props.colors);
+  const svg = h("svg", { "data-hm-color": colorAttr(props.color),
     class: () => `hm-ring hm-ring-${level()}`, role: "img", viewBox: () => `0 0 ${S()} ${S()}`, width: S, height: S,
     "aria-label": () => `${read(props.label) ?? "Score"}: ${text()} of ${max()}`,
   },
@@ -158,6 +167,13 @@ export function ProgressRing(props: ProgressRingProps): Element {
   h("circle", { class: "hm-ring-value", cx: () => S() / 2, cy: () => S() / 2, r, "stroke-width": T, transform: () => `rotate(-90 ${S() / 2} ${S() / 2})`,
     "stroke-dasharray": attr(() => `${f1((C() * v()) / max())} ${f1(C())}`) }),
   h("text", { class: "hm-ring-text", x: () => S() / 2, y: () => S() / 2, "text-anchor": "middle", "dominant-baseline": "central", "aria-hidden": "true" }, text));
+  if (!list && props.paint !== "cycle") return svg as Element;
+  // several colors: SVG strokes cannot take a sweep gradient, so a conic paint is masked to the ring (CSS) and laid over
+  const paint = h("span", { class: cx("hm-ring-paint", props.paint === "cycle" && "is-cycle"), "aria-hidden": "true" }) as HTMLElement;
+  const wrap = h("span", { class: "hm-ring-multi", "data-hm-color": colorAttr(props.color) }, svg, paint) as HTMLElement;
+  paint.style.setProperty("--hm-ring-paint", paintOf(list ?? ["cat-1", "cat-2", "cat-3", "cat-4"], props.paint === "segments" ? "segments" : "gradient", "conic", true));
+  effect(() => { wrap.style.setProperty("--hm-ring-s", `${S()}px`); wrap.style.setProperty("--hm-ring-t", `${T()}px`); wrap.style.setProperty("--hm-ring-p", String(props.paint === "cycle" ? 1 : v() / max())); });
+  return wrap
 }
 
 /** Ranked horizontal bars with labels ("top N" lists). Rows are buttons when `onSelect` is set. */

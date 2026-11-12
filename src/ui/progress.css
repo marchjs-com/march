@@ -6,9 +6,19 @@
 .hm-progress2-value { color: var(--hm-muted); font-variant-numeric: tabular-nums; }
 .hm-progress2-track { position: relative; display: block; height: .5rem; border-radius: var(--hm-radius-full); background: var(--hm-surface-3); overflow: hidden; }
 .hm-progress2-sm .hm-progress2-track { height: .3125rem; } .hm-progress2-lg .hm-progress2-track { height: .75rem; }
-.hm-progress2-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--hm-progress-c, var(--hm-accent, var(--hm-primary))); transform-origin: left center; transform: scaleX(var(--hm-progress, 0));
-  transition: transform .45s var(--hm-ease-out); }
+/* the fill is clipped, not scaled: a multicolor paint stays put along the track (orange at the start, purple at the end) */
+.hm-progress2-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--hm-progress-c, var(--hm-accent, var(--hm-progress-fill, var(--hm-primary))));
+  clip-path: inset(0 calc((1 - var(--hm-progress, 0)) * 100%) 0 0 round 999px); transition: clip-path .45s var(--hm-ease-out); }
+.hm-progress2-fill:dir(rtl) { clip-path: inset(0 0 0 calc((1 - var(--hm-progress, 0)) * 100%) round 999px); }
+/* single color requested over a multicolor theme */
+.hm-paint-single .hm-progress2-fill { background: var(--hm-progress-c, var(--hm-accent, var(--hm-primary))); }
+/* cycle: the colors flow along the bar (determinate or not) */
+.hm-paint-cycle .hm-progress2-fill { overflow: hidden; background: none; }
+.hm-paint-cycle .hm-progress2-fill::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 200%; background: var(--hm-progress-cycle, linear-gradient(90deg, var(--hm-cat-1), var(--hm-cat-2), var(--hm-cat-3), var(--hm-cat-4), var(--hm-cat-1))) 0 0 / 50% 100% repeat-x; animation: hm-cycle 2.4s linear infinite; }
+@keyframes hm-cycle { to { transform: translateX(-50%); } }
 .hm-progress2-success { --hm-progress-c: var(--hm-success-solid); } .hm-progress2-warn { --hm-progress-c: var(--hm-warn-solid); }
 .hm-progress2-danger { --hm-progress-c: var(--hm-danger-solid); } .hm-progress2-info { --hm-progress-c: var(--hm-info-solid); }
-.hm-progress2.is-indeterminate .hm-progress2-fill { width: 40%; transform: none; animation: hm-indet 1.3s var(--hm-ease) infinite; }
+.hm-progress2.is-indeterminate .hm-progress2-fill { width: 40%; clip-path: none; animation: hm-indet 1.3s var(--hm-ease) infinite; }
+.hm-progress2.is-indeterminate.hm-paint-cycle .hm-progress2-fill { width: auto; inset: 0; animation: none; }
+@media (prefers-reduced-motion: reduce) { .hm-paint-cycle .hm-progress2-fill::before, .hm-progress2.is-indeterminate .hm-progress2-fill { animation: none; } }
 @keyframes hm-indet { from { left: -40%; } to { left: 100%; } }

@@ -40,6 +40,7 @@ export interface ThemeDef {
   dark: ThemeColors;
   /** Always dark (light mode shows the dark colors). */ alwaysDark?: boolean;
   /** Preview swatches for pickers. */ swatches?: readonly string[];
+  /** Progress bars, spinners and skeletons use the first four categorical colors by default (HADİ). */ multicolor?: boolean;
 }
 
 /** Validate and freeze a theme definition. */
@@ -71,6 +72,18 @@ export const onBrandFill = (bg: string): string => (contrast("#FFFFFF", bg) >= 2
 
 const SANS = `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
 const DIM = { light: { shadow: "16 24 40", overlay: "rgb(10 14 24 / .42)" }, dark: { shadow: "0 0 0", overlay: "rgb(0 0 0 / .62)" } } as const;
+
+/** Multicolor defaults (ThemeDef.multicolor): progress fill, spinner and skeleton shimmer in the first four cat colors. */
+function multiVars(c: ThemeColors): string {
+  const [a, b, d, e] = c.cat;
+  return [
+    `--hm-progress-fill: linear-gradient(90deg, ${a}, ${b}, ${d}, ${e});`,
+    `--hm-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, ${a} 20%, ${b} 45%, ${d} 70%, ${e});`,
+    `--hm-spinner-track: transparent; --hm-spinner-head: transparent;`,
+    // the shimmer itself lives with Skeleton (display.css › --hm-skel-brand); the theme only switches it on
+    `--hm-skel-paint: var(--hm-skel-brand);`,
+  ].join(" ");
+}
 
 function modeVars(c: ThemeColors, mode: "light" | "dark"): string {
   const d = DIM[mode];
@@ -111,8 +124,9 @@ export function themeCss(def: ThemeDef, isDefault = false): string {
   const darkSys = [`:root${id}:not([data-theme="light"])`, `:root:not([data-theme="light"]) ${id}`, ...(isDefault ? [':root:not([data-hm-theme]):not([data-theme="light"])'] : [])].join(", ");
   const darkSet = [`:root${id}[data-theme="dark"]`, `:root[data-theme="dark"] ${id}`, ...(isDefault ? [':root:not([data-hm-theme])[data-theme="dark"]'] : [])].join(", ");
   const base = `--hm-font: ${def.font}, ${SANS}; --hm-font-display: ${def.display}, ${def.font}, ${SANS}; --hm-display-weight: ${def.displayWeight ?? 700}; --hm-r: ${def.radius}px;`;
-  const lightVars = def.alwaysDark ? modeVars(def.dark, "dark") : modeVars(def.light, "light");
-  const dark = modeVars(def.dark, "dark");
+  const multi = (c: ThemeColors): string => !def.multicolor ? "" : `\n  ${multiVars(c)}`;
+  const lightVars = (def.alwaysDark ? modeVars(def.dark, "dark") : modeVars(def.light, "light")) + multi(def.alwaysDark ? def.dark : def.light);
+  const dark = modeVars(def.dark, "dark") + multi(def.dark);
   return `/* ${def.name}${def.description ? ` — ${def.description}` : ""} */
 ${light} {
   ${base}
@@ -176,6 +190,7 @@ export const hadi = defineTheme({
     },
   },
   swatches: [HADI.ink, HADI.orange, HADI.blue, HADI.green, HADI.purple],
+  multicolor: true,
 });
 
 /** Classic Cream — HADİ on a warm off-white; espresso in the dark. */

@@ -181,3 +181,14 @@ button.hm-barlist-row:focus-visible { outline: 2px solid var(--hm-chart-1); bord
 @media (prefers-reduced-motion: reduce) {
   .hm-chart-bar, .hm-chart-slice, .hm-ring-value { transition: none; }
 }
+
+/* multicolor ring: a conic paint masked to the ring and to the progress angle */
+@property --hm-ring-p { syntax: "<number>"; inherits: true; initial-value: 0; }
+.hm-ring-multi { position: relative; display: inline-grid; place-items: center; transition: --hm-ring-p .5s var(--hm-ease-out, ease); }
+.hm-ring-multi > * { grid-area: 1 / 1; }
+.hm-ring-multi .hm-ring-value { display: none; }
+.hm-ring-paint { width: var(--hm-ring-s); height: var(--hm-ring-s); border-radius: 50%; background: var(--hm-ring-paint); pointer-events: none;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--hm-ring-t)), #000 calc(100% - var(--hm-ring-t) + .5px)), conic-gradient(#000 calc(var(--hm-ring-p) * 1turn), transparent 0);
+  -webkit-mask-composite: source-in; mask: radial-gradient(farthest-side, transparent calc(100% - var(--hm-ring-t)), #000 calc(100% - var(--hm-ring-t) + .5px)) intersect, conic-gradient(#000 calc(var(--hm-ring-p) * 1turn), transparent 0); }
+.hm-ring-paint.is-cycle { animation: hm-spin 2.4s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .hm-ring-paint.is-cycle { animation: none; } }
