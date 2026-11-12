@@ -12,21 +12,17 @@ const PHYSICAL = /(?:^|[;{\s])(margin-left|margin-right|padding-left|padding-rig
 
 /**
  * @param {string} root  repository root (contains src/components)
- * @param {string} name  folder name
+ * @param {string} name  folder: "<category>/<name>" or just "<name>" (looked up in the category folders)
  * @returns {Promise<{ ok: boolean, results: { item: string, ok: boolean | null, note?: string }[] }>}  ok null = browser check
  */
-export async function checkComponent(root, name, { runTests = true } = {}) {
-  // `drawer` or `overlays/drawer`: a component may sit in a category folder (src/components/<category>/<name>/)
+export async function checkComponent(root, folder, { runTests = true } = {}) {
   const base = join(root, "src/components");
-  let dir = join(base, name);
-  if (!existsSync(join(dir, "meta.ts")) && existsSync(base)) {
-    const hit = readdirSync(base).map((c) => join(base, c, name)).find((d) => existsSync(join(d, "meta.ts")));
-    if (hit) dir = hit;
-  }
-  name = name.split("/").pop();
+  if (!folder.includes("/") && existsSync(base)) folder = readdirSync(base).map((c) => `${c}/${folder}`).find((f) => existsSync(join(base, f, "meta.ts"))) ?? folder;
+  const dir = join(base, folder);
+  const [category, name] = folder.includes("/") ? folder.split("/") : [undefined, folder];
   const results = [];
   const add = (item, ok, note) => results.push({ item, ok, note });
-  if (!existsSync(dir)) return { ok: false, results: [{ item: "folder", ok: false, note: `src/components/${name} not found` }] };
+  if (!existsSync(dir) || !category) return { ok: false, results: [{ item: "folder", ok: false, note: `src/components/<category>/${name} not found` }] };
   const files = readdirSync(dir);
   const read = (f) => (existsSync(join(dir, f)) ? readFileSync(join(dir, f), "utf8") : "");
   for (const f of ["index.ts", `${name}.css`, `${name}.test.js`, "docs.md", "demo.tsx", "playground.ts", "meta.ts"]) add(`file ${f}`, files.includes(f), files.includes(f) ? undefined : "missing (CSS may be absent only for components without styles)");
@@ -37,7 +33,9 @@ export async function checkComponent(root, name, { runTests = true } = {}) {
   try { meta = (await import(pathToFileURL(join(dir, "meta.ts")).href)).default; } catch (e) { add("meta.ts loads", false, e.message); }
   if (meta) {
     add("meta: status stable / experimental / deprecated", STATUS.has(meta.status), meta.status);
+    add("meta: category matches the folder", meta.category === category, `meta.category "${meta.category}", folder ${category}/`);
     add("meta: composedOf is a list", Array.isArray(meta.composedOf));
+    if (category === "composite") add("meta: a composite names its parts (composedOf)", (meta.composedOf ?? []).length > 0);
     for (const c of meta.composedOf ?? []) add(`composedOf ${c} is used (not copied)`, new RegExp(`\\b${c}\\b`).test(code), "named in meta but not imported / used in index.ts");
   }
   // security and CSP

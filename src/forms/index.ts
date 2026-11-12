@@ -26,3 +26,5 @@ export { FieldContext, parseNumber, formatNumber, model } from "./util.ts";
 export type { FieldCtx, CommonProps, ControlProps, Option, OptionsProp, FormatNumberOptions } from "./util.ts";
 export { RecordListEditor, validateRecords } from "./records.ts";
 export type { RecordListEditorProps, RecordFields } from "./records.ts";
+// components of the "forms" category (src/components/forms, generated barrel)
+export * from "../components/forms/index.ts";

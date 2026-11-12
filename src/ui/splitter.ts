@@ -5,9 +5,8 @@ import { signal, effect, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "./util.ts";
-import { clamp, listen } from "../core/util.ts";
+import { clamp, listen, setStyle } from "../core/util.ts";
 import { isRtl } from "./focus.ts";
-const setVar = (el: Element, name: string, value: string): void => { (el as HTMLElement).style?.setProperty(name, value); };
 
 export interface SplitterProps {
   start: unknown;
@@ -30,7 +29,7 @@ export function Splitter(props: SplitterProps): Element {
   const vertical = props.orientation === "vertical";
   const share = signal(untrack(() => val(props.value)) ?? props.initial ?? 0.5), min = props.min ?? 0.15;
   let root: HTMLElement | undefined;
-  const apply = (): void => { if (root) setVar(root, "--hm-split", `${(share.peek() * 100).toFixed(2)}%`); };
+  const apply = (): void => { if (root) setStyle(root, { "--hm-split": `${(share.peek() * 100).toFixed(2)}%` }); };
   const setShare = (v: number): void => { const n = clamp(v, min, 1 - min); if (n === share.peek()) return; share.set(n); apply(); props.onChange?.(n); };
   effect(() => { const v = val(props.value); if (v != null && v !== untrack(share)) { share.set(clamp(v, min, 1 - min)); apply(); } });
   const onDown = (e: PointerEvent): void => {

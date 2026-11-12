@@ -1,6 +1,6 @@
 # HADI March (Türkçe)
 
-**Bir kez çalış, sonra yürü.** TypeScript ve JavaScript için küçük, hızlı bir arayüz kitaplığı: bileşenler bir kez çalışır,
+**Bir kez çalış, sonra yürü.** TypeScript ve JavaScript için küçük, hızlı bir çatı: bileşenler bir kez çalışır,
 bir değer değişince yalnız ona bağlı DOM güncellenir. Sanal DOM yok, yeniden render yok, çalışma zamanı bağımlılığı yok.
 
 ```tsx

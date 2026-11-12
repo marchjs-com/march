@@ -93,7 +93,7 @@ export function syncValue(el: { value: string }, fn: () => unknown): void {
 }
 
 /** Read a prop that may be a getter or a plain function accessor (signal / thunk). */
-export const val = <T>(v: T | (() => T)): T => (typeof v === "function" && !v.length ? (v as () => T)() : (v as T));
+export { val } from "../core/util.ts";
 
 /** `reactive()` typed as its value: a live prop for h(Component, { x: live(() => …) }) (becomes a getter). */
 export const live = reactive as <T>(fn: () => T) => T;

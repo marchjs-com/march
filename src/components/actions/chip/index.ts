@@ -1,12 +1,12 @@
-// Chip (hadi-march/ui): a label pill — static, toggle (filters) or removable. Folder: src/components/chip/.
+// Chip (hadi-march/ui): a label pill — static, toggle (filters) or removable. Folder: src/components/actions/chip/.
 import "./chip.css";
-import { h } from "../../dom/h.ts";
-import { t } from "../../core/i18n.ts";
-import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../ui/util.ts";
-import { x as xIcon } from "../../icons/glyphs/x.ts";
-import { check } from "../../icons/glyphs/check.ts";
-import { OverflowText } from "../../ui/marquee.ts";
-import { colorAttr, type ColorToken } from "../../theme/colors.ts";
+import { h } from "../../../dom/h.ts";
+import { t } from "../../../core/i18n.ts";
+import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { x as xIcon } from "../../../icons/glyphs/x.ts";
+import { check } from "../../../icons/glyphs/check.ts";
+import { OverflowText } from "../../../ui/marquee.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface ChipProps {
   /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
