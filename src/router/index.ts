@@ -19,7 +19,7 @@ import { t } from "../core/i18n.ts";
 import { h, lazyChildren } from "../dom/h.ts";
 import { Try } from "../dom/flow.ts";
 import { lazy } from "../dom/lazy.ts";
-import { preloadChunks, loaderKey, saveData, whenIdle, loadDelay } from "../dom/preload.ts";
+import { preloadChunks, loaderKey, saveData, whenIdle, runLoad } from "../dom/preload.ts";
 
 // ------------------------------------------------------------------ types
 export type Component = (props: Record<string, unknown>) => unknown;
@@ -306,9 +306,7 @@ const moduleCache = new Map<Loader, Promise<PageModule | null>>();
 function loadModule(l: Loader): Promise<PageModule | null> {
   let p = moduleCache.get(l);
   if (!p) {
-    preloadChunks(loaderKey(l));
-    const delay = loadDelay();
-    p = (delay ? new Promise((r) => setTimeout(r, delay)).then(() => l()) : Promise.resolve(l())).then((m) => (typeof m === "function" ? { default: m as Component } : (m as PageModule)));
+    p = runLoad(l, { kind: "route", key: "" }).then((m) => (typeof m === "function" ? { default: m as Component } : (m as PageModule)));
     p.catch(() => moduleCache.delete(l));
     moduleCache.set(l, p);
   }

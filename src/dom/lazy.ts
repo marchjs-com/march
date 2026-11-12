@@ -7,7 +7,7 @@
 import "./lazy.css";
 import { signal, getOwner, runWithOwner, untrack, onCleanup } from "../core/reactive.ts";
 import { h } from "./h.ts";
-import { preloadChunks, loaderKey, whenIdle, loadDelay } from "./preload.ts";
+import { whenIdle, runLoad } from "./preload.ts";
 import { t } from "../core/i18n.ts";
 
 type Comp<P> = (props: P) => unknown;
@@ -49,9 +49,7 @@ export function lazy<P = Record<string, unknown>>(load: () => Promise<Loaded<P>>
   const preload = (): Promise<Comp<P>> => {
     if (comp) return Promise.resolve(comp);
     if (!pending) {
-      preloadChunks(loaderKey(load));
-      const delay = loadDelay();
-      pending = (delay ? new Promise((r) => setTimeout(r, delay)).then(load) : load()).then((m) => (comp = pick(m)), (e: unknown) => { pending = null; throw e; });
+      pending = runLoad(load, { kind: "part", key: "" }).then((m) => (comp = pick(m)), (e: unknown) => { pending = null; throw e; });
     }
     return pending;
   };
