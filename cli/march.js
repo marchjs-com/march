@@ -152,14 +152,13 @@ async function build({ dev = false } = {}) {
       // small shared chunks fold into a chunk loaded with them, else the cheapest partner; off with packChunks: false
       if (cfg.packChunks !== false) await packChunks(r.metafile, { cwd, entryKey, esbuild, minify, minSize: minSize || 2048, budgetOf: budgetOf(cfg.budget, r.metafile, plan) });
       const next = minSize ? planSmallLazy(r.metafile, { cwd, entryKey, minSize, allow, boot: cfg.budget?.boot ?? [], prev: plan, maxLoad: cfg.budget ? cfg.budget.route : undefined, ...(cfg.chunks?.routeTables ? { tables: cfg.chunks.routeTables } : {}) }) : null;
-      if (process.env.MARCH_PLAN_DEBUG) console.log("PLAN", JSON.stringify(next && { groups: Object.fromEntries(Object.entries(next.groups).map(([g, ms]) => [g, ms.map((m) => m.key)])), boot: next.boot, inline: Object.fromEntries(Object.entries(next.inline).map(([k, v]) => [k.slice(-40), v.map((x) => x.spec + ":" + x.mode + (x.group ?? ""))])) }));
       if (!next) break;
       plan = next;
     }
     // final names: every rewritten file gets a new content version (a cached file must never point at another build),
     // no name starts with _ or . (some hosts refuse those); stable names on request
     if (!dev) rehashOutputs(r.metafile, { cwd, stable: !!cfg.stableNames || flag("--stable-names") === true });
-    if (process.env.MARCH_PLAN_DEBUG) writeFileSync(join(cwd, ".march-meta.json"), JSON.stringify(r.metafile));
+    if (process.env.MARCH_DEBUG_META) writeFileSync(process.env.MARCH_DEBUG_META, JSON.stringify({ meta: r.metafile, plan }));
     const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
     aliasGroups(chunks.manifest, plan);
     writeHtml(cfg, r.metafile, { dev }, chunks.manifest, dev ? null : chunks.entryFiles);

@@ -1,0 +1,15 @@
+/* HADI March — FollowButton. 42px pill: filled Aktivite (follow), outline (following / requested). */
+.hm-follow { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: .375rem; min-height: 2.625rem; padding: 0 1.125rem; border-radius: var(--hm-radius-full);
+  border: 1.5px solid var(--hm-brand-blue, var(--hm-primary)); background: var(--hm-brand-blue, var(--hm-primary)); color: var(--hm-on-brand-blue, var(--hm-on-primary-fill));
+  font: inherit; font-size: var(--hm-text-md); font-weight: 800; white-space: nowrap; cursor: pointer; overflow: visible; -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--hm-dur-slow) var(--hm-ease), color var(--hm-dur-slow) var(--hm-ease), border-color var(--hm-dur-slow) var(--hm-ease), transform var(--hm-dur) var(--hm-ease-spring); }
+.hm-follow:active { transform: scale(.96); }
+.hm-follow:focus-visible { outline: 2px solid var(--hm-brand-blue, var(--hm-primary)); outline-offset: 2px; }
+.hm-follow.is-following, .hm-follow.is-requested { background: var(--hm-surface); color: var(--hm-text); border-color: var(--hm-border-strong, var(--hm-border)); }
+.hm-follow.is-following:hover { color: var(--hm-danger-text, var(--hm-danger)); border-color: color-mix(in srgb, var(--hm-danger) 55%, transparent); background: var(--hm-danger-soft); }
+.hm-follow.is-requested { color: var(--hm-text-2); }
+.hm-follow-ico { display: inline-grid; place-items: center; }
+.hm-follow-ico .hm-svg { width: 1.0625rem; height: 1.0625rem; }
+.hm-follow-sm { min-height: 2rem; padding: 0 .875rem; font-size: var(--hm-text-sm); } .hm-follow-sm .hm-follow-ico .hm-svg { width: .9375rem; height: .9375rem; }
+.hm-follow-block { display: flex; width: 100%; }
+.hm-follow .hm-burst { z-index: 2; }

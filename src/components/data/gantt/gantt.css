@@ -1,0 +1,66 @@
+/* HADI March — Gantt. Imported by its component module; tokens.css provides the variables. Logical properties only (RTL). */
+.hm-gantt { display: flex; flex-direction: column; gap: var(--hm-space-2); min-width: 0; max-width: 100%; }
+.hm-gantt-scroll { position: relative; display: flex; overflow: auto; overscroll-behavior: contain; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface);
+  box-shadow: var(--hm-shadow-1); font-size: var(--hm-text-sm); }
+.hm-gantt-help { margin: 0; color: var(--hm-text-2); font-size: var(--hm-text-xs); }
+.hm-gantt-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* task names: sticky at the inline start */
+.hm-gantt-side { position: sticky; inset-inline-start: 0; z-index: 6; flex: none; width: var(--hm-gantt-name-w, 220px); max-width: 45%; height: max-content; min-height: 100%; background: var(--hm-surface);
+  box-shadow: 1px 0 0 var(--hm-border); }
+[dir="rtl"] .hm-gantt-side { box-shadow: -1px 0 0 var(--hm-border); }
+.hm-gantt-side-head { position: sticky; inset-block-start: 0; z-index: 1; display: flex; align-items: flex-end; height: 3.5rem; box-sizing: border-box; padding: .5rem .75rem; background: var(--hm-surface-2);
+  border-block-end: 1px solid var(--hm-border); color: var(--hm-text-2); font-size: var(--hm-text-xs); font-weight: var(--hm-weight-semibold); text-transform: uppercase; letter-spacing: var(--hm-tracking-caps); }
+.hm-gantt-name { display: flex; align-items: center; gap: .5rem; height: var(--hm-gantt-row, 36px); box-sizing: border-box; padding-inline: .75rem; border-block-end: 1px solid var(--hm-border-subtle);
+  transition: background-color var(--hm-dur-fast) var(--hm-ease); }
+.hm-gantt-name.is-hot { background: var(--hm-primary-soft); }
+.hm-gantt-name-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: var(--hm-weight-medium); }
+.hm-gantt-name-meta { flex: none; color: var(--hm-faint); font-size: var(--hm-text-xs); font-variant-numeric: tabular-nums; }
+
+/* timeline */
+.hm-gantt-canvas { position: relative; flex: none; min-height: 100%; }
+.hm-gantt-head { position: sticky; inset-block-start: 0; z-index: 5; height: 3.5rem; background: var(--hm-surface-2); border-block-end: 1px solid var(--hm-border); }
+.hm-gantt-hrow { position: relative; height: 50%; }
+.hm-gantt-hrow + .hm-gantt-hrow { border-block-start: 1px solid var(--hm-border-subtle); }
+.hm-gantt-hrow:only-child { height: 100%; }
+.hm-gantt-hcell { position: absolute; inset-block: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: .25rem; overflow: hidden; white-space: nowrap;
+  border-inline-end: 1px solid var(--hm-border-subtle); color: var(--hm-text-2); font-size: var(--hm-text-xs); font-variant-numeric: tabular-nums; }
+.hm-gantt-month { justify-content: flex-start; padding-inline-start: .5rem; font-weight: var(--hm-weight-semibold); color: var(--hm-text); }
+.hm-gantt-month > span { position: sticky; inset-inline-start: calc(var(--hm-gantt-name-w, 220px) + .5rem); overflow: hidden; text-overflow: ellipsis; }
+.hm-gantt-day small { color: var(--hm-faint); font-size: .625rem; }
+.hm-gantt-day.is-weekend { background: color-mix(in srgb, var(--hm-surface-3) 50%, transparent); }
+.hm-gantt-day.is-today { color: var(--hm-primary-text, var(--hm-text)); font-weight: var(--hm-weight-bold); }
+.hm-gantt-rows { position: relative; height: var(--hm-gantt-rows, 0px); }
+.hm-gantt-row { position: absolute; inset-inline: 0; border-block-end: 1px solid var(--hm-border-subtle); }
+.hm-gantt-row:nth-child(even) { background: color-mix(in srgb, var(--hm-surface-2) 40%, transparent); }
+.hm-gantt-today { position: absolute; inset-block: 0; width: 2px; margin-inline-start: -1px; background: var(--hm-primary); z-index: 2; pointer-events: none; }
+.hm-gantt-today > span { position: sticky; inset-block-start: 3.75rem; display: inline-block; margin-inline-start: 4px; padding: .0625rem .375rem; border-radius: var(--hm-radius-full); background: var(--hm-primary);
+  color: var(--hm-on-primary-fill, var(--hm-inverse-text)); font-size: .625rem; font-weight: var(--hm-weight-semibold); white-space: nowrap; }
+
+/* dependency links */
+.hm-gantt-arrows { position: absolute; inset-block-start: 0; inset-inline-start: 0; z-index: 3; overflow: visible; pointer-events: none; }
+[dir="rtl"] .hm-gantt-arrows { transform: scaleX(-1); transform-origin: center; }
+.hm-gantt-link { fill: none; stroke: var(--hm-border-strong); stroke-width: 1.5; transition: stroke var(--hm-dur-fast) var(--hm-ease), stroke-width var(--hm-dur-fast) var(--hm-ease); }
+.hm-gantt-link.is-late { stroke: var(--hm-danger-solid); stroke-dasharray: 4 3; }
+.hm-gantt-link.is-hot { stroke: var(--hm-primary); stroke-width: 2.25; }
+.hm-gantt-tip { fill: var(--hm-border-strong); }
+
+/* bars */
+.hm-gantt-bar { --hm-gantt-c: var(--hm-accent, var(--hm-primary)); position: absolute; z-index: 4; display: flex; align-items: center; height: calc(var(--hm-gantt-row, 36px) - 14px); min-width: 6px; box-sizing: border-box;
+  margin: 0; padding: 0 .5rem; border: 0; border-radius: var(--hm-radius-2); overflow: hidden; background: color-mix(in srgb, var(--hm-gantt-c) 22%, var(--hm-surface)); color: var(--hm-text);
+  font: inherit; font-size: var(--hm-text-xs); font-weight: var(--hm-weight-semibold); cursor: grab; touch-action: none; user-select: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-gantt-c) 45%, transparent);
+  transition: box-shadow var(--hm-dur-fast) var(--hm-ease), filter var(--hm-dur-fast) var(--hm-ease); }
+.hm-gantt-fill { position: absolute; inset-block: 0; inset-inline-start: 0; width: var(--hm-gantt-p, 0%); background: var(--hm-gantt-c); pointer-events: none; transition: width var(--hm-dur) var(--hm-ease); }
+.hm-gantt-bar-label { position: relative; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; pointer-events: none; mix-blend-mode: normal; }
+.hm-gantt-bar:hover, .hm-gantt-bar.is-hot { box-shadow: inset 0 0 0 1px var(--hm-gantt-c), var(--hm-shadow-2); }
+.hm-gantt-bar:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: 2px; }
+.hm-gantt-bar.is-dragging { z-index: 7; cursor: grabbing; box-shadow: inset 0 0 0 1px var(--hm-gantt-c), var(--hm-shadow-3); }
+.hm-gantt-bar.is-done .hm-gantt-bar-label { color: var(--hm-on-accent, var(--hm-inverse-text)); }
+.hm-gantt-bar.is-milestone { height: auto; aspect-ratio: 1; padding: 0; border-radius: 3px; background: var(--hm-gantt-c); transform: rotate(45deg); box-shadow: var(--hm-shadow-1); }
+.hm-gantt-handle { position: absolute; inset-block: 0; width: 8px; cursor: ew-resize; }
+.hm-gantt-handle-start { inset-inline-start: 0; } .hm-gantt-handle-end { inset-inline-end: 0; }
+.hm-gantt-handle::after { content: ""; position: absolute; inset-block: 25%; inset-inline-start: 3px; width: 2px; border-radius: 2px; background: var(--hm-text); opacity: 0; transition: opacity var(--hm-dur-fast) var(--hm-ease); }
+.hm-gantt-bar:hover .hm-gantt-handle::after { opacity: .35; }
+.hm-gantt-knob { position: absolute; inset-block-end: -1px; inset-inline-start: calc(var(--hm-gantt-p, 0%) - 5px); width: 10px; height: 7px; cursor: ew-resize; background: var(--hm-text); opacity: 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%); transition: opacity var(--hm-dur-fast) var(--hm-ease); }
+.hm-gantt-bar:hover .hm-gantt-knob, .hm-gantt-bar.is-dragging .hm-gantt-knob { opacity: .7; }

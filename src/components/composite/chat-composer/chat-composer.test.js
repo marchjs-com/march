@@ -1,0 +1,33 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { installDom } from "../../../testing/dom.ts";
+const { document } = installDom({ url: "http://localhost/" });
+const { h, render, signal } = await import("../../../index.ts");
+const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
+const wait = (ms = 30) => new Promise((r) => setTimeout(r, ms));
+const { ChatComposer } = await import("./index.ts");
+
+test("ChatComposer: mic when empty, send when typed, Enter sends and clears, emoji panel, reply preview", async () => {
+  const sent = [], reply = signal({ name: "Acme", text: "Where?" });
+  const m = mount(() => h(ChatComposer, { onSend: (t) => sent.push(t), onVoice: () => {}, replyTo: reply, onCancelReply: () => reply.set(null) }));
+  const act = m.el.querySelector(".hm-compose-act");
+  assert.ok(act.classList.contains("is-mic"));
+  assert.equal(act.getAttribute("aria-label"), "Record voice message");
+  const ta = m.el.querySelector("textarea");
+  assert.equal(ta.getAttribute("aria-label"), "Message");
+  ta.value = "hello"; ta.dispatchEvent(new globalThis.Event("input", { bubbles: true }));
+  assert.ok(act.classList.contains("is-send"));
+  assert.equal(act.getAttribute("aria-label"), "Send");
+  ta.dispatchEvent(Object.assign(new globalThis.Event("keydown", { bubbles: true, cancelable: true }), { key: "Enter" }));
+  assert.deepEqual(sent, ["hello"]);
+  assert.ok(act.classList.contains("is-mic"), "cleared");
+  const emoji = m.el.querySelector(".hm-compose-emoji-btn");
+  emoji.click();
+  assert.equal(emoji.getAttribute("aria-expanded"), "true");
+  m.el.querySelector(".hm-compose-emoji button").click();
+  assert.ok(act.classList.contains("is-send"), "an emoji is text");
+  assert.match(m.el.querySelector(".hm-compose-reply").textContent, /Replying to Acme/);
+  m.el.querySelector(".hm-compose-reply button").click();
+  assert.equal(m.el.querySelector(".hm-compose-reply"), null);
+  m.dispose();
+});
