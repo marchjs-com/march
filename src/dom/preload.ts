@@ -63,6 +63,12 @@ export function preloadChunks(key: string | undefined | null, low = false): bool
   return true;
 }
 
+/**
+ * Prefetch (lowest priority) the shared "common" chunk(s) `march build` makes from small code many pages use (manifest key
+ * "march:common"); the router calls it when idle after the first page. Skipped when the user saves data.
+ */
+export function prefetchCommon(): boolean { return !saveData() && preloadChunks("march:common", true); }
+
 /** The manifest key the compiler attached to a loader (`() => import("./x.tsx")`), if any. */
 export const loaderKey = (fn: unknown): string | undefined => (fn as { hm?: string } | null)?.hm;
 

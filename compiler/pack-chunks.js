@@ -92,7 +92,7 @@ function explain(g, t, users, fits, bootFits) {
   for (const [r, list] of why) console.log(`  ${r}: ${list.length} — ${list.slice(0, 6).join(", ")}`);
 }
 
-export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048, budgetOf }) {
+export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048, budgetOf, fallback = true }) {
   const outs = meta.outputs;
   const gzCache = new Map();
   const gz = (k) => { if (!gzCache.has(k)) { const f = resolve(cwd, k); gzCache.set(k, existsSync(f) ? gzipSync(readFileSync(f)).length : 0); } return gzCache.get(k); };
@@ -175,7 +175,8 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
       }
       // no free host: the chunk (often another small one) that costs the fewest extra bytes: pages that load B now
       // also get T, pages that load T now also get B. Never the entry; never a merge that would close an import cycle.
-      if (!best) {
+      // fallback: false — no cheapest partner; what has no free host goes to the shared "common" chunk (2b)
+      if (!best && fallback) {
         const bytes = (k) => outs[k].bytes ?? 0;
         for (const b of g.js) {
           if (b === t || b === entryKey || outs[b].entryPoint) continue; // a page or lazy part never becomes a static dependency
@@ -196,6 +197,12 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     }
     if (!done) break;
   }
+
+  // 2b. what is still small has no free host (start-up is at its limit, every other host would push a route or part past
+  // its budget): it goes into one shared "common" chunk outside start-up (two or more when one would pass the part
+  // budget, split by who uses it). Routes import it statically; the router prefetches it when idle after start-up
+  // (manifest key "march:common", never with Save-Data). Its size is a row of its own in the report: counted honestly.
+  const common = await commonChunks();
 
   // 3. a small CSS file joins the CSS of a chunk that is always loaded with its own (else main.css): its loader goes
   let cssMoved = 0;
@@ -261,7 +268,104 @@ ${css}`);
     writeFileSync(resolve(cwd, entryKey), code);
     outs[entryKey].bytes = Buffer.byteLength(code);
   }
-  return { stubs, folded, cssMoved };
+  return { stubs, folded, cssMoved, common };
+
+  async function commonChunks() {
+    const g = graph(outs);
+    const bootEntries = g.js.filter((e) => outs[e].entryPoint && budgetOf?.(e)?.boot);
+    const bootReach = new Set(bootEntries.flatMap((e) => [...g.closure(e)]));
+    const have = new Set([...g.closure(entryKey), ...bootReach]);
+    let cand = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !have.has(k) && (outs[k].bytes ?? 0) < minSize);
+    const DBG = process.env.MARCH_DEBUG_COMMON;
+    if (DBG) console.log("[common] small outside start-up:", cand.map((k) => `${base(k)} ${outs[k].bytes} r${g.reach.get(k).size}`).join(", "), "| small in start-up:", g.js.filter((k) => !outs[k].entryPoint && have.has(k) && k !== entryKey && (outs[k].bytes ?? 0) < minSize).map(base).join(","));
+    // no import cycle through the common chunk: nothing outside it may lie between two of its members
+    for (let changed = true; changed;) {
+      const inC = new Set(cand);
+      const bad = new Set(cand.filter((t) => [...g.closure(t)].some((x) => !inC.has(x) && [...g.closure(x)].some((y) => y !== x && inC.has(y)))));
+      changed = bad.size > 0;
+      cand = cand.filter((t) => !bad.has(t));
+    }
+    if (DBG) console.log("[common] after cycle check:", cand.map(base).join(", "));
+    if (!cand.length) return 0;
+    const partLimit = budgetOf?.partLimit ?? 25 * 1024;
+    // members with the same users stay together when the chunk has to split
+    const sig = (k) => [...g.reach.get(k)].sort().join("|");
+    cand.sort((a, b) => g.reach.get(b).size - g.reach.get(a).size || sig(a).localeCompare(sig(b)) || (a < b ? -1 : 1));
+    // every route / part that loads a member now loads the whole group (and its imports): none may pass its budget
+    const fitsAll = (group) => {
+      if (!budgetOf) return true;
+      const users = new Set(group.flatMap((t) => [...g.reach.get(t)]));
+      const both = new Set(group.flatMap((t) => [...g.closure(t)]));
+      for (const e of users) {
+        const lim = budgetOf(e)?.limit;
+        if (lim == null) continue;
+        let n = 0;
+        for (const x of new Set([...g.closure(e), ...both])) if (!have.has(x)) n += gz(x);
+        if (n > lim) { if (process.env.MARCH_DEBUG_COMMON) console.log(`[common] ${group.map(base).join("+")}: ${outs[e].entryPoint} would be ${n} > ${lim}`); return false; }
+      }
+      return true;
+    };
+    const groups = [];
+    for (const t of cand) {
+      const grp = groups.find((x) => x.reduce((s, y) => s + gz(y), 0) + gz(t) <= partLimit && fitsAll([...x, t]));
+      if (grp) grp.push(t); else groups.push([t]);
+    }
+    if (DBG) console.log("[common] groups:", groups.map((x) => x.map(base).join("+")).join(" | "));
+    let made = 0;
+    for (const grp of groups) if (grp.length > 1 && (await mergeGroup(grp, made))) made++;
+    return made;
+  }
+
+  /** One file from several small chunks: their importers import from it instead. */
+  async function mergeGroup(grp, n) {
+    const key = `${dirname(grp[0])}/common-${"ABCDEFGHIJ"[n] ?? "Z"}AAAAAAA.js`;
+    const cAbs = resolve(cwd, key);
+    const inside = new Set(grp.map((t) => resolve(cwd, t)));
+    const aliases = new Map();
+    const lines = grp.map((t, j) => {
+      const exp = outs[t].exports ?? [];
+      const alias = new Map(exp.map((e, i) => [e, `__cm${n.toString(36)}_${j.toString(36)}_${i.toString(36)}`]));
+      aliases.set(t, alias);
+      const spec = JSON.stringify(rel(cAbs, resolve(cwd, t)));
+      return exp.length ? `export { ${[...alias].map(([e, a]) => `${e} as ${a}`).join(", ")} } from ${spec};` : `import ${spec};`;
+    });
+    let res;
+    try {
+      res = await esbuild.build({
+        stdin: { contents: lines.join("\n"), resolveDir: dirname(cAbs), sourcefile: "march-common.js", loader: "js" },
+        bundle: true, format: "esm", write: false, minify, legalComments: "none", target: "es2022", logLevel: "silent", charset: "utf8",
+        plugins: [{ name: "march-common", setup(x) {
+          x.onResolve({ filter: /.*/ }, (a) => {
+            if (a.kind === "entry-point" || !a.importer) return undefined;
+            const abs = resolve(a.resolveDir || dirname(a.importer), a.path);
+            return inside.has(abs) ? { path: abs } : { path: rel(cAbs, abs), external: true };
+          });
+          x.onLoad({ filter: /\.js$/ }, (a) => ({ contents: readFileSync(a.path, "utf8").replace(/new URL\("(\.\/[^"]+\.css)",import\.meta\.url\)/g, (_m, css) => `new URL(${JSON.stringify(rel(cAbs, resolve(dirname(a.path), css)))},import.meta.url)`), loader: "js", resolveDir: dirname(a.path) }));
+        } }],
+      });
+    } catch { return false; }
+    const g = graph(outs);
+    const users = [...new Set(grp.flatMap((t) => g.importers.get(t) ?? []))].filter((u) => !grp.includes(u));
+    const before = new Map(users.map((u) => [u, text(u)]));
+    for (const t of grp) {
+      const us = (g.importers.get(t) ?? []).filter((u) => !grp.includes(u));
+      if (!us.every((u) => retarget(cwd, u, t, key, aliases.get(t)))) { for (const [u, x] of before) writeFileSync(resolve(cwd, u), x); return false; }
+    }
+    const code = res.outputFiles[0].text;
+    writeFileSync(cAbs, code);
+    const css = grp.map((t) => outs[t].cssBundle).filter(Boolean);
+    outs[key] = {
+      bytes: Buffer.byteLength(code), common: true, entryPoint: undefined,
+      imports: dedupe(grp.flatMap((t) => outs[t].imports ?? []).filter((im) => !grp.includes(im.path))),
+      exports: grp.flatMap((t) => [...aliases.get(t).values()]),
+      inputs: Object.assign({}, ...grp.map((t) => outs[t].inputs ?? {})),
+      ...(css.length ? { cssBundle: css[0], cssBundles: css } : {}),
+    };
+    for (const u of users) outs[u].imports = dedupe((outs[u].imports ?? []).map((im) => (grp.includes(im.path) ? { ...im, path: key } : im)));
+    for (const t of grp) { rmSync(resolve(cwd, t), { force: true }); delete outs[t]; }
+    gzCache.clear();
+    return true;
+  }
 
   /**
    * T's CSS moves in front of B's (T loads first): one file, one loader. Returns an undo (the fold may still fail), or

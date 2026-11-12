@@ -147,6 +147,10 @@ Overlays never take input; put content after them. `front` only for foreground e
 - `chunks: { minSize: 10240, allow: { "chunks/x.js": "reason" } }` (default 10 KB before gzip): no JS/CSS file under it. Small shared code
   folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
   parent, or joins a group chunk with the entry's other small lazy modules that share the most code (second build pass).
+  Small shared code with no host at all (start-up at `budget.bootLimit`, every partner over a budget) goes into a shared
+  `common` chunk outside start-up (split by users when it would pass `budget.part`): routes import it, and the router
+  prefetches it when idle after the first page (`prefetchCommon()`, manifest key `march:common`, never with Save-Data).
+  `chunks.commonRoom` (gzip bytes) keeps page groups that far under `budget.route`, so it still fits.
   A file still under the limit fails the build; `allow` needs a reason. `chunks: false` turns it off.
 
 **Don't (security)**

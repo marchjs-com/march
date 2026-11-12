@@ -22,7 +22,7 @@ export function chunkManifest(meta, { cwd, outdir, entry }) {
   const closure = (key, seen = new Set()) => {
     if (!outs[key] || seen.has(key)) return seen;
     seen.add(key);
-    if (outs[key].cssBundle) seen.add(outs[key].cssBundle);
+    for (const c of outs[key].cssBundles ?? (outs[key].cssBundle ? [outs[key].cssBundle] : [])) seen.add(c);
     for (const im of outs[key].imports ?? []) if (im.kind === "import-statement" && !im.external) closure(im.path, seen);
     return seen;
   };
@@ -37,6 +37,9 @@ export function chunkManifest(meta, { cwd, outdir, entry }) {
     files.sort((a, b) => (a === k ? -1 : b === k ? 1 : Number(a.endsWith(".css")) - Number(b.endsWith(".css"))));
     manifest[posix(o.entryPoint)] = files.map(rel);
   }
+  // the shared "common" chunks (pack-chunks.js) outside start-up: the router prefetches them when idle
+  const common = Object.keys(outs).filter((k) => outs[k].common && k.endsWith(".js"));
+  if (common.length) manifest["march:common"] = [...new Set(common.flatMap((k) => [...closure(k)]))].filter((f) => !base.has(f)).sort((a, b) => Number(a.endsWith(".css")) - Number(b.endsWith(".css"))).map(rel);
   return { manifest, entryFiles: [...base].map(rel), entryKey };
 }
 
