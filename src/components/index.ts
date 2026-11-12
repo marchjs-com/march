@@ -95,6 +95,7 @@ export * from "./social/story-progress/index.ts";
 export * from "./social/story-ring/index.ts";
 export * from "./composite/story-viewer/index.ts";
 export * from "./navigation/tabs/index.ts";
+export * from "./composite/terminal/index.ts";
 export * from "./forms/text-input/index.ts";
 export * from "./forms/textarea/index.ts";
 export * from "./composite/theme-menu/index.ts";

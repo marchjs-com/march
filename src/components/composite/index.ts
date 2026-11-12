@@ -18,5 +18,6 @@ export * from "./profile-header/index.ts";
 export * from "./property-grid/index.ts";
 export * from "./rich-text-editor/index.ts";
 export * from "./story-viewer/index.ts";
+export * from "./terminal/index.ts";
 export * from "./theme-menu/index.ts";
 export * from "./tree-editor/index.ts";

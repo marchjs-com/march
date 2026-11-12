@@ -177,6 +177,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | [Disclosure](#disclosure), [TextInput](#textinput), [NumberInput](#numberinput), [Slider](#slider), [Toggle](#toggle), [Select](#select), [Segmented](#segmented), [ColorInput](#colorinput), [Textarea](#textarea) |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, [IconButton](#iconbutton), Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | [Dialog](#dialog), Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
+| Terminal | experimental | Extensible command line: typed commands, sub-commands and async handlers (Ctrl+C), ANSI colors, tables, JSON, progress; history, completion, themable colors. | [JsonView](#jsonview) |
 | ThemeEditor | experimental | Theme builder: color tokens for light and dark with a WCAG audit, type, shape and motion, a live scoped preview, code / CSS / JSON out. | [ColorPicker](#colorpicker), [EasingCurveEditor](#easingcurveeditor), [Tabs](#tabs), [Segmented](#segmented), [Slider](#slider), [Select](#select), [TextInput](#textinput), [Textarea](#textarea), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton), [CopyButton](#copybutton), [Badge](#badge), ThemeSwatch, [CodeView](#codeview) |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, [OverflowText](#overflowtext) |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | [Badge](#badge), [IconButton](#iconbutton), [Toggle](#toggle) |
@@ -1793,6 +1794,35 @@ Tabbed panels. Give `tabs` as data or write `<Tab>` children; only the active pa
 ```
 
 Full page: src/components/navigation/tabs/docs.md
+
+## Terminal
+
+An extensible command line in the page — for a playground, a dev console, an admin panel or a product demo.
+
+Composed of: [JsonView](#jsonview)
+
+```tsx
+import { Terminal, defineTerminalCommands, ansi } from "hadi-march/components/composite/terminal";
+
+<Terminal prompt="hadi$ " welcome="[info] help yaz" persist="demo" scheme="auto" cursor="block" commands={{
+  echo: (a, io) => io.print(a.rest.join(" ")),
+  deploy: {
+    desc: "Yayınla",
+    args: [{ name: "env", required: true, choices: ["staging", "prod"] }],
+    options: { force: { alias: "f", desc: "Onay sorma" } },
+    run: async (a, io) => {
+      const p = io.progress(`${a.args.env} yükleniyor`)
+      for (let i = 1; i <= 10; i++) { if (io.signal.aborted) return; await wait(120); p.set(i / 10) }
+      p.done(); io.success("Yayında")
+    },
+  },
+  user: { desc: "Kullanıcılar", sub: { list: (_a, io) => io.table(users), add: { args: [{ name: "name", required: true }], run: … } } },
+}} ref={(t) => t.exec("help")} />
+
+defineTerminalCommands({ ping: (_a, io) => io.print(ansi.green("pong")) })   // every terminal on the page
+```
+
+Full page: src/components/composite/terminal/docs.md
 
 ## Testimonials
 
