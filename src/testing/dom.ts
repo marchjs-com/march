@@ -121,6 +121,22 @@ class Node_ extends EventTarget_ {
   removeChild<N extends Node_>(n: N): N { const i = this.childNodes.indexOf(n); if (i < 0) throw new Error("removeChild: not a child"); this.childNodes.splice(i, 1); n.parentNode = null; return n; }
   replaceChildren(...ns: Insertable[]): void { for (const c of [...this.childNodes]) this.removeChild(c); this.append(...ns); }
   remove(): void { this.parentNode?.removeChild(this); }
+  after(...ns: Insertable[]): void { const p = this.parentNode, ref = this.nextSibling; if (p) for (const n of ns) p.insertBefore(typeof n === "string" ? this.ownerDocument.createTextNode(n) : n, ref); }
+  before(...ns: Insertable[]): void { const p = this.parentNode; if (p) for (const n of ns) p.insertBefore(typeof n === "string" ? this.ownerDocument.createTextNode(n) : n, this); }
+  replaceWith(...ns: Insertable[]): void { const p = this.parentNode; if (!p) return; this.before(...ns); p.removeChild(this); }
+  get nextElementSibling(): Element_ | null { for (let n = this.nextSibling; n; n = n.nextSibling) if (n.nodeType === 1) return n as Element_; return null; }
+  get lastElementChild(): Element_ | null { for (let i = this.childNodes.length - 1; i >= 0; i--) if (this.childNodes[i]!.nodeType === 1) return this.childNodes[i] as Element_; return null; }
+  /** Merge adjacent text nodes and drop empty ones (deep). */
+  normalize(): void {
+    for (let i = 0; i < this.childNodes.length; i++) {
+      const c = this.childNodes[i] as Node_ & { data: string };
+      if (c.nodeType === 3) {
+        while (this.childNodes[i + 1]?.nodeType === 3) { c.data += (this.childNodes[i + 1] as Node_ & { data: string }).data; this.childNodes[i + 1]!.parentNode = null; this.childNodes.splice(i + 1, 1); }
+        if (!c.data) { c.parentNode = null; this.childNodes.splice(i--, 1); }
+      } else c.normalize();
+    }
+  }
+  isEqualNode(o: Node_ | null): boolean { return !!o && o.nodeType === this.nodeType && serialize(this) === serialize(o); }
   contains(n: Node_ | null): boolean { for (let x = n; x; x = x.parentNode) if (x === this) return true; return false; }
   cloneNode(deep?: boolean): Node_ {
     const self = this as unknown as Element_ & Text_;
@@ -254,7 +270,7 @@ class Element_ extends Node_ {
 
 function walk(n: Node_, fn: (n: Node_) => void): void { fn(n); for (const c of n.childNodes) walk(c, fn); }
 
-/** Selector support: tag, #id, .class, [attr], [attr=value], [attr^=v], :not() not supported; descendant combinator. */
+/** Selector support: tag, #id, .class, [attr], [attr=value], [attr^=v], descendant combinator; :not() not supported. */
 function matchCompound(el: Element_, sel: string): boolean {
   const parts = sel.split(/\s+/).filter(Boolean);
   if (parts.length > 1) {

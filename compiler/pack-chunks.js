@@ -101,10 +101,15 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
   const skip = new Set();
   for (let round = 0; round < 500; round++) {
     const g = graph(outs);
-    const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && (outs[k].bytes ?? 0) < minSize)
-      // widely shared code first (it competes for the start-up budget with narrow code), then the smallest; the name
-      // breaks ties so the same input always folds the same way
-      .sort((a, b) => g.reach.get(b).size - g.reach.get(a).size || (outs[a].bytes ?? 0) - (outs[b].bytes ?? 0) || (a < b ? -1 : 1));
+    // a heavy chunk only one small lazy module imports (code esbuild split out because tree-shaken barrels also reach
+    // it) is that module's own code: it joins it, so the lazy module is judged by its real size and is never inlined into
+    // its parent (a 3 KB demo entry over 30 KB of editor code). Small ones keep the usual folding below.
+    const own = (k) => { const u = g.importers.get(k) ?? []; return (outs[k].bytes ?? 0) >= minSize && u.length === 1 && !!outs[u[0]].entryPoint && u[0] !== entryKey && (outs[u[0]].bytes ?? 0) < minSize ? u[0] : null; };
+    const small = g.js.filter((k) => !outs[k].entryPoint && k !== entryKey && !skip.has(k) && ((outs[k].bytes ?? 0) < minSize || own(k)))
+      // a lazy module's own code first (once something else joined it, it may no longer count as small); then widely
+      // shared code (it competes for the start-up budget with narrow code), then the smallest; the name breaks ties so
+      // the same input always folds the same way
+      .sort((a, b) => (own(a) ? 0 : 1) - (own(b) ? 0 : 1) || g.reach.get(b).size - g.reach.get(a).size || (outs[a].bytes ?? 0) - (outs[b].bytes ?? 0) || (a < b ? -1 : 1));
     let done = false;
     // start-up pieces (budget.boot) and what they reach: a fold into one of them adds T to start-up for everyone
     const bootEntries = g.js.filter((e) => outs[e].entryPoint && budgetOf?.(e)?.boot);
@@ -122,7 +127,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     const have = new Set([...entryReach, ...bootReach]);
     for (const t of small) {
       const rt = g.reach.get(t), deps = [...g.closure(t)].filter((d) => d !== t), users = g.importers.get(t) ?? [];
-      let best = null, cost = Infinity;
+      let best = own(t), cost = best ? 0 : Infinity;
       // after T and B become one file, everyone loading either loads both closures: none may go past its budget
       const fits = (b) => {
         if (!budgetOf) return true;
@@ -138,7 +143,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
         }
         return true;
       };
-      for (const b of g.js) {
+      for (const b of best ? [] : g.js) {
         if (b === t || b === entryKey) continue;
         const rb = g.reach.get(b), cb = g.closure(b);
         if (cb.has(t) && !users.includes(b)) continue; // B reaches T through another module: that one would cycle

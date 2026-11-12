@@ -1,0 +1,76 @@
+/* HADI March — TreeEditor. Imported by its component module; tokens.css provides the variables. */
+.hm-tre-wrap { --hm-tre-accent: var(--hm-accent, var(--hm-primary)); --hm-tre-step: 1.25rem; display: flex; flex-direction: column; min-width: 0; max-width: 100%;
+  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
+.hm-tre-wrap:focus-within { border-color: var(--hm-tre-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-tre-accent) 14%, transparent); }
+
+/* bar: search, status, history */
+.hm-tre-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); padding: var(--hm-space-2); border-block-end: 1px solid var(--hm-border-subtle);
+  background: color-mix(in srgb, var(--hm-surface-2) 55%, var(--hm-surface)); border-start-start-radius: inherit; border-start-end-radius: inherit; }
+.hm-tre-search { position: relative; flex: 1 1 12rem; min-width: 0; }
+.hm-tre-search-icon { position: absolute; inset-inline-start: .6rem; inset-block-start: 50%; translate: 0 -50%; display: inline-flex; color: var(--hm-faint); pointer-events: none; }
+.hm-tre-search-icon .hm-svg { width: .95rem; height: .95rem; }
+.hm-tre-search-input { width: 100%; min-height: var(--hm-control-h-sm); padding-inline-start: 2rem; }
+.hm-tre-status { display: inline-flex; align-items: center; gap: .35rem; min-height: 1.5rem; padding: 0 .6rem; border-radius: var(--hm-radius-full); font-size: var(--hm-text-xs); font-weight: var(--hm-weight-semibold);
+  transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }
+.hm-tre-status::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; background: currentColor; }
+.hm-tre-status.is-ok { background: var(--hm-success-soft); color: var(--hm-success-text, var(--hm-success)); }
+.hm-tre-status.is-error { background: var(--hm-danger-soft); color: var(--hm-danger-text, var(--hm-danger)); }
+.hm-tre-history { display: inline-flex; gap: 2px; }
+
+/* tree */
+.hm-tre { max-height: 28rem; overflow: auto; padding: var(--hm-space-1) 0; font-size: var(--hm-text-sm); }
+.hm-tre-row { position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: .375rem; min-height: 2.125rem; margin-inline: var(--hm-space-1);
+  padding-block: .1875rem; padding-inline: calc(var(--hm-tre-depth, 0) * var(--hm-tre-step) + .25rem) .25rem; border-radius: var(--hm-radius-2); outline: 2px solid transparent; outline-offset: -2px;
+  transition: background-color var(--hm-dur-fast) var(--hm-ease), outline-color var(--hm-dur) var(--hm-ease); }
+.hm-tre-row:hover { background: var(--hm-surface-2); }
+.hm-tre-row:focus { outline: none; }
+.hm-tre-row:focus-visible, .hm-tre-row.is-active:focus-within { background: var(--hm-accent-soft, var(--hm-primary-soft)); }
+.hm-tre-row:focus-visible { outline-color: var(--hm-tre-accent); }
+.hm-tre-row.is-invalid { background: color-mix(in srgb, var(--hm-danger) 6%, transparent); }
+.hm-tre-row.is-invalid::before { content: ""; position: absolute; inset-inline-start: 0; inset-block: 4px; width: 3px; border-radius: 3px; background: var(--hm-danger); }
+.hm-tre-row.is-flash { outline-color: var(--hm-danger); }
+.hm-tre-guides { position: absolute; inset-block: 0; inset-inline-start: .25rem; width: calc(var(--hm-tre-depth, 0) * var(--hm-tre-step)); pointer-events: none;
+  background-image: repeating-linear-gradient(to right, transparent 0 calc(var(--hm-tre-step) / 2 + .1rem), var(--hm-border-subtle) calc(var(--hm-tre-step) / 2 + .1rem) calc(var(--hm-tre-step) / 2 + .1rem + 1px), transparent calc(var(--hm-tre-step) / 2 + .1rem + 1px) var(--hm-tre-step)); }
+:dir(rtl) .hm-tre-guides { transform: scaleX(-1); }
+.hm-tre-chev, .hm-tre-chev-space { flex: none; display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem; }
+.hm-tre-chev { padding: 0; border: 0; border-radius: var(--hm-radius-1); background: none; color: var(--hm-faint); cursor: pointer; transition: transform var(--hm-dur) var(--hm-ease-spring), color var(--hm-dur-fast) var(--hm-ease); }
+.hm-tre-chev .hm-svg { width: .9rem; height: .9rem; }
+.hm-tre-chev:hover { color: var(--hm-text); }
+.hm-tre-chev.is-open { transform: rotate(90deg); }
+:dir(rtl) .hm-tre-chev { transform: scaleX(-1); }
+:dir(rtl) .hm-tre-chev.is-open { transform: rotate(90deg); }
+
+.hm-tre-key { font-weight: var(--hm-weight-semibold); color: var(--hm-text); overflow-wrap: anywhere; cursor: text; }
+.hm-tre-key::after { content: ":"; color: var(--hm-faint); font-weight: 400; }
+.hm-tre-root { cursor: default; color: var(--hm-text-2); }
+.hm-tre-root::after { content: none; }
+.hm-tre-index { font-family: var(--hm-font-mono); font-size: var(--hm-text-xs); font-weight: 500; color: var(--hm-faint); cursor: default; }
+
+/* type badge (a button that opens the type menu) */
+.hm-tre-type { flex: none; padding: 0; border: 0; background: none; cursor: pointer; border-radius: var(--hm-radius-full); transition: transform var(--hm-dur-fast) var(--hm-ease-spring); }
+.hm-tre-type:hover:not(:disabled) { transform: translateY(-1px) scale(1.06); }
+.hm-tre-type:disabled { cursor: default; }
+.hm-tre-badge { font-family: var(--hm-font-mono); font-size: .6875rem; letter-spacing: -.02em; min-width: 2.25rem; justify-content: center; }
+.hm-tre-menu { min-width: 11rem; }
+.hm-tre-menu-item[aria-checked="true"] { background: var(--hm-surface-2); font-weight: var(--hm-weight-semibold); }
+
+/* values */
+.hm-tre-value { min-width: 0; max-width: 100%; overflow-wrap: anywhere; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); cursor: text; padding: 0 .25rem; border-radius: var(--hm-radius-1); }
+.hm-tre-value:hover { background: var(--hm-surface-3); }
+.hm-tre-string { color: color-mix(in srgb, var(--hm-brand-green, var(--hm-cat-3)) 62%, var(--hm-text)); }
+.hm-tre-string::before, .hm-tre-string::after { content: "\""; color: var(--hm-faint); }
+.hm-tre-number { color: color-mix(in srgb, var(--hm-brand-blue, var(--hm-cat-2)) 70%, var(--hm-text)); }
+.hm-tre-null { color: var(--hm-faint); font-style: italic; cursor: default; }
+.hm-tre-null:hover { background: none; }
+.hm-tre-empty { color: var(--hm-faint); font-family: var(--hm-font-body, inherit); font-style: italic; }
+.hm-tre-summary { color: var(--hm-faint); font-size: var(--hm-text-xs); }
+.hm-tre-input { min-height: 1.75rem; height: 1.75rem; padding: 0 .5rem; width: auto; min-width: 6rem; max-width: 100%; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); }
+.hm-tre-input-key { min-width: 5rem; font-family: inherit; font-weight: var(--hm-weight-semibold); }
+.hm-tre-error { flex-basis: 100%; padding-inline-start: 3rem; color: var(--hm-danger-text, var(--hm-danger)); font-size: var(--hm-text-xs); }
+
+/* row actions: shown on hover / focus */
+.hm-tre-actions { display: inline-flex; gap: 1px; margin-inline-start: auto; opacity: 0; transition: opacity var(--hm-dur-fast) var(--hm-ease); }
+.hm-tre-row:hover .hm-tre-actions, .hm-tre-row:focus-within .hm-tre-actions, .hm-tre-row.is-active .hm-tre-actions { opacity: 1; }
+@media (hover: none) { .hm-tre-actions { opacity: 1; } }
+.hm-tre-none { padding: var(--hm-space-4); color: var(--hm-faint); text-align: center; }
+.hm-tre-wrap.is-readonly .hm-tre-key, .hm-tre-wrap.is-readonly .hm-tre-value { cursor: default; }

@@ -1,0 +1,68 @@
+/* HADI March — KeyframeTimeline. Imported by its component module; tokens.css provides the variables. */
+.hm-kt { --hm-kt-label-w: 8.5rem; --hm-kt-accent: var(--hm-accent, var(--hm-primary)); display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%;
+  padding: var(--hm-space-3); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
+@media (max-width: 30rem) { .hm-kt { --hm-kt-label-w: 5.5rem; } }
+
+/* stage: the targets, moved by CSS variables (CSSOM) */
+.hm-kt-stage { position: relative; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-evenly; gap: var(--hm-space-4); min-block-size: 9rem; padding: var(--hm-space-5);
+  border-radius: var(--hm-radius-3); overflow: hidden; background: radial-gradient(circle at 50% 120%, color-mix(in srgb, var(--hm-kt-accent) 14%, transparent), transparent 60%), var(--hm-bg-subtle); }
+.hm-kt-actor { translate: calc(var(--hm-kt-x, 0) * 1px) calc(var(--hm-kt-y, 0) * 1px); scale: var(--hm-kt-s, 1); rotate: calc(var(--hm-kt-r, 0) * 1deg); opacity: var(--hm-kt-o, 1); will-change: translate, scale, rotate, opacity; }
+.hm-kt-target { display: grid; place-items: center; min-inline-size: 4.5rem; min-block-size: 2.75rem; padding: 0 var(--hm-space-3); border-radius: var(--hm-radius-full);
+  background: var(--hm-accent); color: var(--hm-on-accent, var(--hm-inverse-text)); font-weight: var(--hm-weight-bold); box-shadow: 0 10px 24px -12px var(--hm-accent); }
+
+/* transport */
+.hm-kt-transport { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
+.hm-kt-play { inline-size: 2.5rem; block-size: 2.5rem; border-radius: 50%; background: var(--hm-kt-accent); color: var(--hm-on-accent, var(--hm-inverse-text));
+  box-shadow: 0 6px 16px -6px var(--hm-kt-accent); transition: transform var(--hm-dur-fast) var(--hm-ease-spring), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-kt-play:hover { background: var(--hm-kt-accent); color: var(--hm-on-accent, var(--hm-inverse-text)); transform: scale(1.06); }
+.hm-kt-play:active { transform: scale(.94); }
+.hm-kt.is-playing .hm-kt-play { box-shadow: 0 0 0 4px color-mix(in srgb, var(--hm-kt-accent) 22%, transparent), 0 6px 16px -6px var(--hm-kt-accent); }
+.hm-kt-loop.is-on { color: var(--hm-accent-text, var(--hm-primary-text)); background: var(--hm-accent-soft, var(--hm-primary-soft)); }
+.hm-kt-time { margin-inline: var(--hm-space-2) auto; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); color: var(--hm-faint); font-variant-numeric: tabular-nums; }
+.hm-kt-time b { color: var(--hm-text); font-weight: var(--hm-weight-semibold); }
+
+/* grid: time runs left to right in every writing direction (like any timeline) */
+.hm-kt-grid { direction: ltr; display: grid; grid-template-columns: var(--hm-kt-label-w) minmax(0, 1fr); border: 1px solid var(--hm-border-subtle); border-radius: var(--hm-radius-2); overflow: hidden; }
+.hm-kt-corner { border-block-end: 1px solid var(--hm-border-subtle); background: var(--hm-surface-2); }
+.hm-kt-ruler-wrap { position: relative; block-size: 1.75rem; margin-inline: .5rem; border-block-end: 1px solid var(--hm-border-subtle); }
+.hm-kt-ruler { position: absolute; inset: 0; cursor: ew-resize; touch-action: none; }
+.hm-kt-tick { position: absolute; inset-block-end: 0; inset-inline-start: var(--hm-kt-at); block-size: .375rem; border-inline-start: 1px solid var(--hm-border); }
+.hm-kt-tick.is-major { block-size: .75rem; border-color: var(--hm-border-strong); padding-inline-start: .25rem; font-size: .625rem; line-height: 0; color: var(--hm-faint); font-family: var(--hm-font-mono); }
+.hm-kt-head { position: absolute; inset-block: 0; inset-inline-start: var(--hm-kt-ph, 0%); z-index: 3; inline-size: 0; outline: none; cursor: grab; touch-action: none; }
+.hm-kt-head-grip { position: absolute; inset-block-start: .125rem; inset-inline-start: -.4375rem; inline-size: .875rem; block-size: 1rem; border-radius: .25rem .25rem .4375rem .4375rem;
+  background: var(--hm-kt-accent); box-shadow: 0 2px 6px -1px color-mix(in srgb, var(--hm-kt-accent) 60%, transparent); transition: scale var(--hm-dur-fast) var(--hm-ease-spring); }
+.hm-kt-head:hover .hm-kt-head-grip, .hm-kt-head:focus-visible .hm-kt-head-grip { scale: 1.18; }
+.hm-kt-head:focus-visible .hm-kt-head-grip { box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-focus); }
+
+/* rows */
+.hm-kt-rows { position: relative; grid-column: 1 / -1; }
+.hm-kt-row { display: grid; grid-template-columns: var(--hm-kt-label-w) minmax(0, 1fr); --hm-kt-c: var(--hm-accent); }
+.hm-kt-row + .hm-kt-row { border-block-start: 1px solid var(--hm-border-subtle); }
+.hm-kt-label { display: flex; align-items: center; gap: .375rem; min-width: 0; padding: 0 var(--hm-space-2); background: var(--hm-surface-2); font-size: var(--hm-text-xs); unicode-bidi: plaintext; }
+.hm-kt-label b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-kt-prop { color: var(--hm-faint); font-family: var(--hm-font-mono); }
+.hm-kt-dot { flex: none; inline-size: .5rem; block-size: .5rem; border-radius: 50%; background: var(--hm-kt-c); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-kt-c) 22%, transparent); }
+.hm-kt-lane { position: relative; block-size: 2.5rem; margin-inline: .5rem; cursor: cell; transition: background-color var(--hm-dur-fast) var(--hm-ease); }
+.hm-kt-lane:hover { background: color-mix(in srgb, var(--hm-kt-c) 5%, transparent); }
+.hm-kt-spark { position: absolute; inset: .375rem 0; inline-size: 100%; block-size: calc(100% - .75rem); overflow: visible; pointer-events: none; }
+.hm-kt-spark path { fill: none; stroke: var(--hm-kt-c); stroke-width: 1.5; vector-effect: non-scaling-stroke; opacity: .45; }
+.hm-kt-key { position: absolute; inset-block-start: 50%; inset-inline-start: var(--hm-kt-at); inline-size: .875rem; block-size: .875rem; margin: -.4375rem 0 0 -.4375rem; padding: 0; z-index: 1;
+  border: 2px solid var(--hm-surface); border-radius: .1875rem; background: var(--hm-kt-c); rotate: 45deg; cursor: grab; touch-action: none;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--hm-kt-c) 70%, var(--hm-text)), 0 2px 6px -2px var(--hm-kt-c);
+  transition: scale var(--hm-dur-fast) var(--hm-ease-spring), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-kt-key:hover { scale: 1.25; }
+.hm-kt-key:active { cursor: grabbing; }
+.hm-kt-key.is-hit { scale: 1.45; box-shadow: 0 0 0 1px var(--hm-kt-c), 0 0 0 7px color-mix(in srgb, var(--hm-kt-c) 25%, transparent); }
+.hm-kt-key.is-selected { scale: 1.35; box-shadow: 0 0 0 2px var(--hm-text), 0 0 14px 2px color-mix(in srgb, var(--hm-kt-c) 60%, transparent); }
+.hm-kt-key:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-focus); }
+.hm-kt-playline { position: absolute; inset-block: 0; z-index: 2; inline-size: 2px; margin-inline-start: -1px; pointer-events: none; background: var(--hm-kt-accent);
+  inset-inline-start: calc(var(--hm-kt-label-w) + .5rem + (100% - var(--hm-kt-label-w) - 1rem) * var(--hm-kt-f, 0));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--hm-kt-accent) 60%, transparent); }
+
+/* inspector */
+.hm-kt-inspector { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--hm-space-3); }
+.hm-kt-fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--hm-space-2); }
+.hm-kt-field { display: flex; flex-direction: column; gap: .125rem; color: var(--hm-faint); font-size: var(--hm-text-xs); }
+.hm-kt-field .hm-input { inline-size: 7rem; }
+.hm-kt-ease { flex: 1 1 22rem; }
+.hm-kt-empty { margin: 0; color: var(--hm-faint); font-size: var(--hm-text-sm); }

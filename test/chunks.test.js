@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { rewriteDynamic } from "../compiler/esbuild.js";
+import { rewriteDynamic, tagLoaders } from "../compiler/esbuild.js";
 import { smallFiles } from "../compiler/min-chunks.js";
 
 const CLI = fileURLToPath(new URL("../cli/march.js", import.meta.url));
@@ -82,4 +82,12 @@ test("min-chunks: start-up pieces (budget.boot) group only with each other, neve
   // the boot group (5.5 KB) is exempt from the minimum size
   meta.outputs["dist/g0.js"] = { entryPoint: `march-group:${bootGroup[0]}`, bytes: 5500, imports: [], inputs: {} };
   assert.equal(smallFiles(meta, { cwd: process.cwd(), minSize: 10240, entryKey: "dist/main.js", boot: ["src/shell-a.tsx"], plan }).length, 0);
+});
+
+test("tagLoaders tags bare loaders only: () => import(x).then(…) stays a function returning a promise", () => {
+  const root = fileURLToPath(new URL("..", import.meta.url));
+  const file = join(root, "src/components/chip/demo.tsx");
+  assert.equal(tagLoaders(`f(() => import("./index.ts"))`, file, root), `f(Object.assign(() => import("./index.ts"), { hm: "src/components/chip/index.ts" }))`);
+  const chained = `lazy(() => import("./index.ts").then((m) => ({ default: m.Chip })))`;
+  assert.equal(tagLoaders(chained, file, root), chained);
 });
