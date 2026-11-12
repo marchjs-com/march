@@ -350,6 +350,18 @@ Rules:
 - Check: `node tools/motion-audit.mjs` (headless Edge: Stop all, speed, 200-item stagger: no long task).
 Reference: docs/motion.md. The showcase page "Animasyon motoru" (/animation) shows every piece.
 
+### 15a2. Text animations (hadi-march/motion/text)
+
+56 text animations, one export each (tree-shaken): `import { rise, wave, typewriter, counter } from "hadi-march/motion/text"`.
+Call `name(el, { by, duration, stagger, easing, delay, from, out, iterations })`; it returns `{ playback, finished,
+replay(), stop() }`. Never split text by hand or animate letters with your own loop: `splitText(el, "char" | "word" |
+"line")` keeps an accessible copy, grapheme clusters (Turkish letters, emoji), RTL and joining scripts safe.
+- Entrances put the plain text back when done; `out: true` plays any of them as an exit. Loops run until `stop()`.
+- Content effects (typewriter, scramble, counter, wordCycle…) change what is shown; readers keep the real text.
+- `typeLoop`, `wordCycle`, `morph` take `words` (or the text split at `|`); `counter` reads the number in the text.
+- Catalog: `TEXT_ANIMATIONS` in `hadi-march/motion/text/meta`. Reference: src/motion/text/docs.md. Showcase: Hareket ›
+  Metin animasyonları (/text-motion).
+
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 
 **Never call `fetch()`, `new WebSocket()` or `new EventSource()` in app code. All traffic goes through `net` or an

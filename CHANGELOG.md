@@ -4,6 +4,13 @@ All notable changes to HADI March. Versions follow [semver](https://semver.org/)
 
 ## 0.1.0 — unreleased
 
+### Text animations (later in 0.1.0)
+- `hadi-march/motion/text`: 56 text animations, one export each (entrances / exits, loops, decorations, content effects
+  such as typewriter, scramble, counter, odometer, word cycle, morph, and pointer effects). One shared core: `splitText()`
+  (accessible hidden copy + aria-hidden parts, grapheme clusters, RTL, joining scripts by word) and a stagger runner.
+- Everything plays on the motion engine (global speed, pause all, reduced motion). The core is about 1.5 KB gzip, each
+  animation 25–520 B more (`bench/text-size.js`, budget test). Catalog: `hadi-march/motion/text/meta`.
+
 ### Build output (later in 0.1.0)
 - `stableNames: true` / `--stable-names`: `main.js`, `chunks/home.js`, `chunks/shared-N.js` with `?v=<version>` in every
   reference (imports, CSS loaders, index.html, manifest): deploys overwrite the same paths; deterministic output.
