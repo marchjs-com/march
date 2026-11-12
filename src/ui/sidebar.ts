@@ -23,6 +23,7 @@ import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 import { clock } from "../icons/glyphs/clock.ts";
 import { panelLeft } from "../icons/glyphs/panelLeft.ts";
 import { x as xIcon } from "../icons/glyphs/x.ts";
+import { clamp } from "../core/util.ts";
 
 /** One NavSidebar entry. `href` navigates (router Link); `onSelect` runs instead. */
 export interface NavSidebarItem {
@@ -109,7 +110,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const widthKey = typeof props.persist === "string" ? props.persist : null;
   const keepWidth = !!props.resizable && props.persist !== false;
   const savedW = keepWidth ? Number(widthKey ? load<unknown>(widthKey, null) : saved.width) : NaN;
-  const width = signal<number | null>(Number.isFinite(savedW) && savedW > 0 ? Math.max(minW, Math.min(maxW, savedW)) : null);
+  const width = signal<number | null>(Number.isFinite(savedW) && savedW > 0 ? clamp(savedW, minW, maxW) : null);
   const resizing = signal(false);
   const shownWidth = signal(0); // rendered width (aria-valuenow when no width was set)
   const drawer = signal(false);
@@ -249,7 +250,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
     }
     if (!target.classList.contains("hm-sb-row")) return;
     const list = rows(), i = list.indexOf(target);
-    const go = (j: number): void => { e.preventDefault(); list[Math.max(0, Math.min(list.length - 1, j))]?.focus(); };
+    const go = (j: number): void => { e.preventDefault(); list[clamp(j, 0, list.length - 1)]?.focus(); };
     if (e.key === "ArrowDown") go(i + 1);
     else if (e.key === "ArrowUp") { if (i === 0) { e.preventDefault(); searchEl?.focus(); } else go(i - 1); }
     else if (e.key === "Home") go(0);
@@ -275,7 +276,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
       if (px < props.collapseBelow) { if (!rail.peek()) { rail.set(true); persist(); } return; }
       if (rail.peek()) rail.set(false);
     }
-    const w = Math.round(Math.max(minW, Math.min(maxW, px)));
+    const w = Math.round(clamp(px, minW, maxW));
     width.set(w);
     props.onResize?.(w);
     if (done) persist();

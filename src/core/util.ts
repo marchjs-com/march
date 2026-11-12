@@ -81,3 +81,31 @@ export function debounce<A extends unknown[]>(fn: (...a: A) => unknown, ms: numb
 }
 
 export const doc = (): Document => globalThis.document;
+
+/** `v` kept between `lo` and `hi` (`lo` wins when they cross): `Math.max(lo, Math.min(hi, v))`. */
+export const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v));
+/** Linear blend from `a` (t = 0) to `b` (t = 1). */
+export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
+
+/** Set several style properties (custom properties too) through the CSSOM: CSP safe, `null` removes one. */
+export function setStyle(el: { style: CSSStyleDeclaration } | null | undefined, props: Record<string, string | number | null | undefined>): void {
+  if (!el) return;
+  for (const k in props) { const v = props[k]; if (v == null) el.style.removeProperty(k); else el.style.setProperty(k, String(v)); }
+}
+
+/** Add several listeners at once (`{ pointermove: fn, pointerup: fn }`); returns one off, also run with the owner. */
+export function listen(target: EventTarget | null | undefined, map: Record<string, ((e: never) => void) | undefined>, opts?: boolean | AddEventListenerOptions): () => void {
+  const offs = Object.keys(map).flatMap((type) => (map[type] ? [on(target, type, map[type] as (e: Event) => void, opts)] : []));
+  return () => offs.forEach((off) => off());
+}
+
+/** Run `fn` once when `el` comes near the viewport (IntersectionObserver; at once where there is none). Returns stop. */
+export function onVisible(el: Element, fn: () => void, opts: IntersectionObserverInit = {}): () => void {
+  const IO = globalThis.IntersectionObserver;
+  if (!IO) { fn(); return () => {}; }
+  const io = new IO((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); } }, opts);
+  io.observe(el);
+  const stop = (): void => io.disconnect();
+  if (getOwner()) onCleanup(stop);
+  return stop;
+}

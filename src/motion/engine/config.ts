@@ -2,6 +2,7 @@
 // Saved in localStorage (a preference, not a secret) so the user's choice survives reloads.
 import { signal } from "../../core/reactive.ts";
 import { setReducedOverride } from "./prefs.ts";
+import { load, save } from "../../core/util.ts";
 
 export type ReduceMode = "system" | "reduce" | "full";
 export interface MotionSettings {
@@ -40,12 +41,13 @@ function clean(raw: Partial<MotionSettings>, base: MotionSettings): MotionSettin
     character: typeof raw.character === "string" && raw.character ? raw.character : base.character,
   };
 }
-function load(): MotionSettings {
-  try { const s = globalThis.localStorage?.getItem(KEY); if (s) return clean(JSON.parse(s) as Partial<MotionSettings>, DEFAULTS); } catch { /* private mode */ }
+function read(): MotionSettings {
+  const s = load<Partial<MotionSettings> | null>(KEY, null);
+  try { if (s && typeof s === "object") return clean(s, DEFAULTS); } catch { /* a broken record */ }
   return { ...DEFAULTS };
 }
 
-let cur = load();
+let cur = read();
 let pausedFlag = false;
 const settingsSig = signal<MotionSettings>(cur);
 const pausedSig = signal(false);
@@ -61,7 +63,7 @@ export function configure(patch: Partial<MotionSettings> = {}, { persist = true 
   cur = clean(patch, cur);
   settingsSig.set(cur);
   setReducedOverride(cur.reduce === "system" ? null : cur.reduce === "reduce");
-  if (persist) { try { globalThis.localStorage?.setItem(KEY, JSON.stringify(cur)); } catch { /* full or blocked */ } }
+  if (persist) save(KEY, cur);
   emit("settings");
   return cur;
 }

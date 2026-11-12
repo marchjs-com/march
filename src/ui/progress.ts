@@ -5,6 +5,7 @@ import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "./util.ts";
 import { colorAttr, colorList, paintOf, type ColorToken, type MultiColors } from "../theme/colors.ts";
+import { clamp } from "../core/util.ts";
 const setVar = (el: Element, name: string, value: string): void => { (el as HTMLElement).style?.setProperty(name, value); };
 
 export interface ProgressProps {
@@ -30,7 +31,7 @@ export interface ProgressProps {
 /** `<Progress value={$p} label="Uploading" showValue />`, `<Progress />` (indeterminate). */
 export function Progress(props: ProgressProps): Element {
   const max = props.max ?? 100;
-  const pct = computed(() => { const v = val(props.value); return v == null ? null : Math.max(0, Math.min(100, (v / max) * 100)); });
+  const pct = computed(() => { const v = val(props.value); return v == null ? null : clamp((v / max) * 100, 0, 100); });
   const fill = h("span", { class: "hm-progress2-fill" });
   const bar = h("span", {
     class: "hm-progress2-track", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(max),

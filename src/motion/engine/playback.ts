@@ -14,6 +14,7 @@ import { normalize, nativeFrames, Track, type Frames, type RawTrack } from "./tr
 import { driverFor, type Driver } from "./drivers.ts";
 import { getKeyframes, type KeyframesDef, type Timing } from "./keyframes.ts";
 import { isVisible, watchVisibility } from "./visibility.ts";
+import { clamp } from "../../core/util.ts";
 
 export type { Timing };
 export type Target = unknown;
@@ -356,7 +357,7 @@ export class Playback {
     const dur = this.duration;
     const ms = typeof to === "string" ? this.labels.get(to) ?? 0 : to;
     const prev = this.#t;
-    this.#t = Math.max(0, Math.min(Number.isFinite(dur) ? dur : ms, ms));
+    this.#t = clamp(ms, 0, Number.isFinite(dur) ? dur : ms);
     if (this.state === "idle" || this.state === "finished") this.state = "paused";
     this.#syncNatives(this.state === "running");
     this.#sampleJs(this.#t);

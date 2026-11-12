@@ -4,6 +4,7 @@ import { signal, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { Portal } from "../dom/portal.ts";
 import { on, cx } from "./util.ts";
+import { clamp } from "../core/util.ts";
 
 export type Placement = "bottom-start" | "bottom-end" | "top-start" | "top-end" | "top" | "bottom";
 /** Fixed position as a style object. */
@@ -21,7 +22,7 @@ export function place(anchor: Element, panel: Element | null | undefined, placem
   else if (side === "top" && a.top - gap - p.height < 0) side = "bottom";
   const top = side === "bottom" ? a.bottom + gap : a.top - gap - p.height;
   let left = align === "start" ? a.left : align === "end" ? a.right - p.width : a.left + (a.width - p.width) / 2;
-  left = Math.max(8, Math.min(left, vw - p.width - 8));
+  left = clamp(vw - p.width - 8, 8, left);
   return { top: `${Math.round(top)}px`, left: `${Math.round(left)}px`, "min-width": align === "center" ? null : `${Math.round(a.width)}px` };
 }
 

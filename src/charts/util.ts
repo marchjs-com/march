@@ -5,6 +5,7 @@ import { signal, computed, read, onCleanup, untrack, type Accessor, type Signal 
 import { applyPipe, toDate } from "../core/pipes.ts";
 import { h } from "../dom/h.ts";
 import { For, type ForProps } from "../dom/flow.ts";
+import { uid } from "../core/util.ts";
 
 /** A prop that may be a plain value or a reactive accessor (signal, computed, compiler thunk). */
 export type MaybeReactive<T> = T | (() => T);
@@ -39,8 +40,7 @@ export interface ChartBaseProps {
   height?: MaybeReactive<number | string | null | undefined> | undefined;
 }
 
-let uid = 0;
-export const nextId = (p = "hm-chart"): string => `${p}-${++uid}`;
+export const nextId = (p = "hm-chart"): string => uid(p);
 
 /** Data prop: array, signal, getter or any function returning an array. */
 export const rowsOf = <D>(v: DataProp<D>): D[] => {

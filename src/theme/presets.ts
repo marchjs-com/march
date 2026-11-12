@@ -1,3 +1,4 @@
+import { clamp } from "../core/util.ts";
 // HADI March themes. A theme is a small set of colors (light + dark), fonts and a base radius; everything else (hover,
 // soft tints, borders, surfaces) is derived in tokens.css with color-mix(). Built-in themes are compiled to
 // src/css/themes.css by tools/gen-themes.js (CSS only: switching a theme just sets data-hm-theme on <html>; CSP safe).
@@ -55,7 +56,7 @@ export function defineTheme(def: ThemeDef): ThemeDef {
 
 // ---- contrast helpers (WCAG relative luminance), as in HADİ's palette_math.dart
 const rgb = (hex: string): [number, number, number] => { const h = hex.replace("#", ""); const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h.slice(0, 6), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
-const hex = (c: readonly number[]): string => `#${c.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, "0")).join("").toUpperCase()}`;
+const hex = (c: readonly number[]): string => `#${c.map((v) => Math.round(clamp(v, 0, 255)).toString(16).padStart(2, "0")).join("").toUpperCase()}`;
 const lum = (h: string): number => { const [r, g, b] = rgb(h).map((v) => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * (r as number) + 0.7152 * (g as number) + 0.0722 * (b as number); };
 /** WCAG contrast ratio of two hex colors. */
 export const contrast = (a: string, b: string): number => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };

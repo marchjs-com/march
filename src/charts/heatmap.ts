@@ -7,6 +7,7 @@ import { locale } from "../core/i18n.ts";
 import { rowsOf, accessor, formatter, num, useSize, attr, textWidth, each,
   type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type Getter, type TooltipProp } from "./util.ts";
 import { Frame, tooltipState, showTip, tipBody, thin } from "./parts.ts";
+import { clamp } from "../core/util.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -46,7 +47,7 @@ const weekdays = (): string[] => { const f = new Intl.DateTimeFormat(locale(), {
 /** Level 0 (empty / ≤ 0) … levels-1 for a value relative to `max`. */
 export function heatLevel(v: number | null | undefined, max: number, levels = 5): number {
   if (v == null || !(v > 0) || !(max > 0)) return 0;
-  return Math.max(1, Math.min(levels - 1, Math.ceil((v / max) * (levels - 1))));
+  return clamp(Math.ceil((v / max) * (levels - 1)), 1, levels - 1);
 }
 
 /** Heatmap. See docs/charts.md for props. */
@@ -86,7 +87,7 @@ export function Heatmap<D>(props: HeatmapProps<D>): Element {
   const ml = computed(() => Math.min(120, 8 + Math.max(0, ...grid().ys.map((y) => textWidth(y.label)))));
   const cell = computed(() => {
     const g = grid(), fixed = num(read(props.cell));
-    return fixed ?? Math.max(4, Math.min(32, (size.width() - ml() - 8) / Math.max(1, g.xs.length)));
+    return fixed ?? clamp((size.width() - ml() - 8) / Math.max(1, g.xs.length), 4, 32);
   });
   const height = computed(() => num(read(props.height)) ?? Math.ceil(22 + cell() * grid().ys.length + 4));
   const box = computed(() => ({ x: ml(), y: 22, w: cell() * grid().xs.length, h: cell() * grid().ys.length }));
@@ -114,7 +115,7 @@ export function Heatmap<D>(props: HeatmapProps<D>): Element {
     const moves: Record<string, number> = { ArrowRight: i + 1, ArrowLeft: i - 1, ArrowDown: i + nx, ArrowUp: i - nx, Home: 0, End: n - 1 };
     if (!(e.key in moves)) return;
     e.preventDefault();
-    show(active.peek() < 0 ? 0 : Math.max(0, Math.min(n - 1, moves[e.key] as number)));
+    show(active.peek() < 0 ? 0 : clamp(moves[e.key] as number, 0, n - 1));
   };
 
   const body = [

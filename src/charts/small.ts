@@ -7,6 +7,7 @@ import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, attr, each, 
 import { OverflowText } from "../ui/marquee.ts";
 import { colorAttr, colorList, paintOf, type ColorToken, type MultiColors } from "../theme/colors.ts";
 import { cx } from "../ui/util.ts";
+import { clamp } from "../core/util.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -154,7 +155,7 @@ export function Stat<D>(props: StatProps<D>): Element {
 export function ProgressRing(props: ProgressRingProps): Element {
   const S = computed(() => num(read(props.size)) ?? 64), T = computed(() => num(read(props.thickness)) ?? 8);
   const max = computed(() => num(read(props.max)) ?? 100);
-  const v = computed(() => Math.max(0, Math.min(max(), num(read(props.value)) ?? 0)));
+  const v = computed(() => clamp(num(read(props.value)) ?? 0, 0, max()));
   const r = computed(() => (S() - T()) / 2), C = computed(() => 2 * Math.PI * r());
   const level = computed(() => { const [a, b] = read(props.thresholds) ?? [50, 80], p = (v() / max()) * 100; return p < a ? "low" : p < b ? "mid" : "high"; });
   const text = (): unknown => formatter(read<FormatSpec | null | undefined>(props.format), (x) => String(Math.round(x as number)))(v());

@@ -17,11 +17,11 @@ import { t } from "../core/i18n.ts";
 import { createTable, type TableOptions, type TableState, type TableAction, type RowAction, type BulkAction } from "./state.ts";
 import type { Row as DefaultRow, TableColumn } from "./filters.ts";
 import { createVirtual, type Virtual } from "./virtual.ts";
+import { clamp, uid, debounce } from "../core/util.ts";
 
 const INTERACTIVE = "button,input,select,textarea,a,label,summary,details,[data-no-row-click]";
 const labelOf = (a: { label: string | (() => string) }): string => (typeof a.label === "function" ? a.label() : a.label);
 const each = <T>(props: ForProps<T>): unknown => h<ForProps<T>>(For, props);
-let uid = 0;
 
 /** <Table> props: every createTable() option (or a ready `table`) plus rendering options. */
 export interface TableProps<R = DefaultRow> extends TableOptions<R> {
@@ -120,7 +120,7 @@ export function Table<R = DefaultRow>(props: TableProps<R>): Element {
   const editable = (): boolean => table.visibleColumns().some((c) => c.editable);
   const lead = (selectable ? 1 : 0) + (expand ? 1 : 0), trail = actions ? 1 : 0;
   const ctx: Ctx<R> = {
-    id: `hm-table-${++uid}`, table, props, selectable, expand, actions, editable,
+    id: uid("hm-table"), table, props, selectable, expand, actions, editable,
     interactive: selectable || !!actions || !!expand || !!props.onRowClick || untrack(editable),
     lead, trail,
     colCount: () => table.visibleColumns().length + lead + trail,
@@ -149,16 +149,16 @@ function Menu(cls: string, label: unknown, ...body: unknown[]): Element {
 
 function Toolbar<R>(ctx: Ctx<R>): Element {
   const { table, props } = ctx;
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  onCleanup(() => clearTimeout(timer));
   const delay = props.searchDelay ?? (table.mode === "server" ? 300 : 120);
+  const search = debounce((v: string) => table.setSearch(v), delay);
+  onCleanup(search.cancel);
   const filterCols = (): TableColumn<R>[] => table.allColumns().filter((c) => c.filter);
   return h("div", { class: "hm-table-toolbar" },
     props.search !== false ? h("input", {
       type: "search", class: "hm-table-search", placeholder: t`Search…`, "aria-label": t`Search`,
       "aria-controls": ctx.id,
       value: () => table.search(),
-      onInput: (e: Event) => { const el = e.target as HTMLInputElement; clearTimeout(timer); if (delay) timer = setTimeout(() => table.setSearch(el.value), delay); else table.setSearch(el.value); },
+      onInput: (e: Event) => { const v = (e.target as HTMLInputElement).value; if (delay) search(v); else table.setSearch(v); },
     }) : null,
     () => (filterCols().length ? untrack(() => Menu("hm-table-filters", t`Filters`, ...filterCols().map((c) => FilterControl(table, c)))) : null),
     Menu("hm-table-columns", t`Columns`, ColumnsPanel(ctx)),
@@ -549,7 +549,7 @@ function onGridKey<R>(e: KeyboardEvent, ctx: GridCtx<R>): void {
     if (!row && vt && r < 0) { vt.scrollTop.set(Math.max(0, vt.scrollTop.peek() - vt.rowHeight)); row = grid.querySelectorAll("tr[data-row]")[0]; }
     if (!row) return;
     const cs = cellsOf(row);
-    const next = cs[Math.max(0, Math.min(cs.length - 1, c))];
+    const next = cs[clamp(c, 0, cs.length - 1)];
     if (!next) return;
     e.preventDefault();
     ctx.active?.setAttribute("tabindex", "-1");

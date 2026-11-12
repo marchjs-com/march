@@ -11,6 +11,7 @@ import { model, ctl, cx, uid, extend, syncValue, parseNumber, formatNumber, norm
   type ControlProps, type ClassProp, type OptionsProp } from "./util.ts";
 import { colorAttr, type ColorToken } from "../theme/colors.ts";
 import { choiceBox, choiceText, itemColor, lookClass, type ChoiceLook } from "./choice.ts";
+import { clamp } from "../core/util.ts";
 
 /** prefix / suffix text around a control. */
 export interface AffixProps { prefix?: unknown; suffix?: unknown; class?: ClassProp }
@@ -162,7 +163,7 @@ export function NumberInput(props: NumberInputProps): unknown {
   const scale = () => props.scale ?? 1;
   const shown = (v: number | null) => (v == null ? "" : formatNumber(precise(v * scale()), loc(), { decimals: props.decimals, minDecimals: props.minDecimals ?? 0, grouping: !!props.grouping }));
   const bad = signal(false);
-  const clamp = (v: number | null) => {
+  const toRange = (v: number | null) => {
     if (v == null) return v;
     if (props.min != null && v < props.min) v = props.min;
     if (props.max != null && v > props.max) v = props.max;
@@ -174,7 +175,7 @@ export function NumberInput(props: NumberInputProps): unknown {
   let el: HTMLInputElement;
   const commit = () => {
     if (bad.peek()) bad.set(false);
-    else { const v = untrack(get), c = clamp(v); if (c !== v) set(c); }
+    else { const v = untrack(get), c = toRange(v); if (c !== v) set(c); }
     el.value = untrack(() => shown(get()));
   };
   el = h("input", {
@@ -194,7 +195,7 @@ export function NumberInput(props: NumberInputProps): unknown {
       if ((e.key !== "ArrowUp" && e.key !== "ArrowDown") || props.readonly) return;
       e.preventDefault();
       const step = (props.step ?? 1) / scale();
-      set(clamp(precise((untrack(get) ?? 0) + (e.key === "ArrowUp" ? step : -step))));
+      set(toRange(precise((untrack(get) ?? 0) + (e.key === "ArrowUp" ? step : -step))));
       el.value = untrack(() => shown(get()));
     },
   }) as HTMLInputElement;
@@ -450,7 +451,7 @@ const PALETTE = ["cat-1", "cat-2", "cat-3", "cat-4", "cat-5", "cat-6", "cat-7", 
  * theme each box takes the next HADİ color and the display font, as in the HADİ apps.
  */
 export function CodeInput(props: CodeInputProps): unknown {
-  const n = Math.max(3, Math.min(12, props.length ?? 6));
+  const n = clamp(props.length ?? 6, 3, 12);
   const [get, set] = model(props, "");
   const kind = props.pattern ?? (props.numeric === false ? "alphanumeric" : "numeric");
   const upper = props.uppercase ?? kind !== "numeric";

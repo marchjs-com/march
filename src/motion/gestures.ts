@@ -3,6 +3,7 @@
 //   use:press   use:magnet={{ strength: 0.3 }}   use:tilt={{ max: 8 }}
 import { animate, type Controls, type AnimateOptions } from "./animate.ts";
 import { setStyle, reducedMotion, frame } from "./env.ts";
+import { clamp } from "../core/util.ts";
 
 type Opts<T> = T | undefined;
 const obj = <T extends object>(raw: unknown): Partial<T> => (raw && typeof raw === "object" ? (raw as Partial<T>) : {});
@@ -61,7 +62,7 @@ export function drag(el: Element, raw?: unknown): () => void {
   const release: Slot = { a: null };
   let drop: (() => void) | null = null;
   const unlift = (): void => { drop?.(); drop = null; };
-  const clamp = (v: number, lo?: number, hi?: number): number => Math.min(hi ?? Infinity, Math.max(lo ?? -Infinity, v));
+  const bound = (v: number, lo?: number, hi?: number): number => clamp(v, lo ?? -Infinity, hi ?? Infinity);
   const apply = (): void => setStyle(el, { transform: `translate3d(${x}px, ${y}px, 0)` });
   const down = (e: PointerEvent): void => {
     stop(release);
@@ -73,8 +74,8 @@ export function drag(el: Element, raw?: unknown): () => void {
   };
   const move = (e: PointerEvent): void => {
     if (!active) return;
-    const nx = o.axis === "y" ? x : clamp(e.clientX - sx, o.bounds?.left, o.bounds?.right);
-    const ny = o.axis === "x" ? y : clamp(e.clientY - sy, o.bounds?.top, o.bounds?.bottom);
+    const nx = o.axis === "y" ? x : bound(e.clientX - sx, o.bounds?.left, o.bounds?.right);
+    const ny = o.axis === "x" ? y : bound(e.clientY - sy, o.bounds?.top, o.bounds?.bottom);
     const dt = Math.max(1, e.timeStamp - t);
     vx = (e.clientX - px) / dt; vy = (e.clientY - py) / dt; px = e.clientX; py = e.clientY; t = e.timeStamp;
     o.onMove?.({ x: nx, y: ny, dx: nx - x, dy: ny - y });
@@ -101,8 +102,8 @@ export function drag(el: Element, raw?: unknown): () => void {
     if (!m) return;
     e.preventDefault();
     stop(release);
-    if (o.axis !== "y") x = clamp(x + m[0], o.bounds?.left, o.bounds?.right);
-    if (o.axis !== "x") y = clamp(y + m[1], o.bounds?.top, o.bounds?.bottom);
+    if (o.axis !== "y") x = bound(x + m[0], o.bounds?.left, o.bounds?.right);
+    if (o.axis !== "x") y = bound(y + m[1], o.bounds?.top, o.bounds?.bottom);
     apply();
     o.onMove?.({ x, y, dx: m[0], dy: m[1] });
   };
