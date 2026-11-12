@@ -3,12 +3,19 @@
 
 Grouped by category (src/components/categories.ts). Each category is a subpath: `import { Chip } from "hadi-march/actions"`; `hadi-march/ui` re-exports every component.
 
+### Layout — `hadi-march/layout`
+
+| Component | Status | What | Composed of |
+|---|---|---|---|
+| StatusBar | experimental | Bottom strip of an editor or app: start / end items, text or buttons (actions or command ids), tones with a breathing busy dot, live announcements, low-priority items to a … menu when narrow. | Menu, Tooltip |
+
 ### Actions — `hadi-march/actions`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
 | MadeWithMarch | stable | Optional credit line "Developed with HADI March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
+| OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Menu, Tooltip |
 
 ### Data display — `hadi-march/data`
 
@@ -37,6 +44,8 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| ActivityBar | experimental | Editor icon bar that switches the side view: a tablist with a gliding indicator, count badges, end items, collapse by choosing the active view again; vertical or horizontal, RTL aware. | Badge, Tooltip |
+| Breadcrumbs | experimental | Path bar: links, buttons or sibling menus per crumb; the middle collapses into a … menu when narrow; separators mirrored in RTL. | Menu |
 | Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
 
 ### Motion — `hadi-march/motion`
@@ -67,6 +76,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, [ReactionPicker](#reactionpicker) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), Avatar |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
+| DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, Portal |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), Skeleton |
 | FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle |
 | FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, [Chip](#chip), OverflowText |
@@ -79,9 +89,26 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll) |
 | ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll](#countroll), Button, Menu |
+| PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
+
+## ActivityBar
+
+The narrow icon bar at the edge of an editor that switches the side view (files, search, source control…). An indicator glides to the active view; choosing the active view again collapses the side view (`value` becomes `null`). Items can carry count badges, sit at the far end (settings, account) or be plain actions. Vertical or horizontal (a bottom bar on phones), and mirrored in RTL.
+
+Composed of: Badge, Tooltip
+
+```tsx
+<ActivityBar value={$view} onChange={(v) => $view = v} controls="side-view" items={[
+  { id: "files", label: "Files", icon: files, shortcut: "mod+shift+e" },
+  { id: "search", label: "Search", icon: search, badge: () => $hits },
+  { id: "settings", label: "Settings", icon: settings, position: "end", onSelect: openSettings },
+]} />
+```
+
+Full page: src/components/navigation/activity-bar/docs.md
 
 ## BottomNav
 
@@ -94,6 +121,22 @@ Composed of: Badge, OverflowText
 ```
 
 Full page: src/components/composite/bottom-nav/docs.md
+
+## Breadcrumbs
+
+A path bar (folder › file › symbol). A crumb is a link (`href`), a button (`onSelect`) or, with `siblings`, a menu of the items beside it — jump to another file of the same folder. When the path does not fit, the middle crumbs collapse into a "…" menu; the first and the last always stay. Separators follow the reading direction.
+
+Composed of: Menu
+
+```tsx
+<Breadcrumbs label="File path" items={[
+  { id: "acme", label: "acme", icon: folder, onSelect: () => openFolder("acme") },
+  { id: "src", label: "src", icon: folder, siblings: () => folders("acme") },
+  { id: "file", label: "app.ts", icon: fileText },
+]} />
+```
+
+Full page: src/components/navigation/breadcrumbs/docs.md
 
 ## ChatBubble
 
@@ -198,6 +241,23 @@ import { DataGrid } from "hadi-march/components/data/data-grid";
 ```
 
 Full page: src/components/data/data-grid/docs.md
+
+## DockLayout
+
+An IDE workspace: split areas holding tab groups. Drag a tab to a **side** of a group (a new split), onto its **centre** or **between two tabs** (a tab there), to an **edge** of the whole layout, or **out** of it (a floating window). An animated preview shows where it will land. Groups maximize, panels minimize to a tray, and the layout is saved and loaded as plain JSON. Each panel's content is rendered once and moves between groups without being rebuilt.
+
+Composed of: Splitter, Tabs, Portal
+
+```tsx
+<DockLayout panels={[
+  { id: "files", title: "Files", icon: folder, content: () => <FileTree /> },
+  { id: "editor", title: "main.ts", icon: fileText, content: () => <Editor />, dirty: () => $dirty },
+  { id: "console", title: "Console", icon: terminal, content: () => <Console /> },
+]} layout={{ row: [["files"], { column: [["editor"], ["console"]], share: .68 }], share: .26 }}
+   persist="ide.layout" storage={storage().local} api={(a) => dock = a} />
+```
+
+Full page: src/components/composite/dock-layout/docs.md
 
 ## Drawer
 
@@ -418,6 +478,24 @@ Composed of: OverflowText, Link
 
 Full page: src/components/composite/nav-sidebar/docs.md
 
+## OverflowToolbar
+
+A toolbar that never wraps or squeezes: items that do not fit move to a **More** menu, lowest `priority` first, and come back (with a short slide-in) when there is room again. An item is a plain action or a **command id**: the Command manager then supplies its label, icon, shortcut, availability and busy state, so the palette, menus and this toolbar always agree.
+
+Composed of: Menu, Tooltip
+
+```tsx
+<OverflowToolbar label="Document" items={[
+  { id: "new", label: "New", icon: plus, onSelect: create, priority: 10 },
+  { id: "save", command: "doc.save", priority: 9 },
+  { id: "s1", separator: true },
+  { id: "split", label: "Split", icon: columns, pressed: () => $split, onSelect: () => $split = !$split },
+  { id: "delete", label: "Delete", icon: trash, danger: true },
+]} />
+```
+
+Full page: src/components/actions/overflow-toolbar/docs.md
+
 ## PostCard
 
 One post of a social feed. The header shows the author (Avatar, name with a verified mark), the relative time and the place, with an optional ⋯ Menu. Photos sit in a MediaGrid; a double tap on them likes the post with a large heart that pops over the photo and bursts in the four HADİ colors. The action row has a LikeButton and rolling counts for comments and shares; the caption folds to three lines with a "more" button.
@@ -441,6 +519,23 @@ Composed of: [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll]
 ```
 
 Full page: src/components/composite/profile-header/docs.md
+
+## PropertyGrid
+
+An inspector: property rows in collapsible groups, a search field, and for each property the form control of its type. Every change is an **undo step** in the app's Undo history (typing in one field merges into one step), unsaved changes are registered with **DirtyState** (leave warning, `saveAll()`), and changed rows are marked and can be reset one by one. The footer counts the changes and offers Revert and Save.
+
+Composed of: Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea
+
+```tsx
+<PropertyGrid label="Card" bind:value={$card} onSave={(v) => api.save(v)} properties={[
+  { key: "title", label: "Title", group: "Content" },
+  { key: "width", label: "Width", type: "number", unit: "px", group: "Layout", validate: (v) => v > 420 ? "At most 420" : null },
+  { key: "elevated", label: "Shadow", type: "switch", group: "Look" },
+  { key: "radius", label: "Radius", type: "slider", min: 0, max: 24, group: "Look", hidden: (v) => !v.elevated },
+]} />
+```
+
+Full page: src/components/composite/property-grid/docs.md
 
 ## PullToRefresh
 
@@ -493,6 +588,23 @@ import { Scheduler } from "hadi-march/components/data/scheduler";
 ```
 
 Full page: src/components/data/scheduler/docs.md
+
+## StatusBar
+
+The strip at the bottom of an editor or app. Items sit at the **start** or the **end** (writing direction), are plain text or buttons (an action or a **command id** from the Command manager), and carry a tone: info, success, warn, danger, or busy (a breathing dot on the motion engine). When the bar is too narrow, the lowest `priority` items move to a "…" menu. Items marked `live` are announced when their text changes ("Saving…", "Saved").
+
+Composed of: Menu, Tooltip
+
+```tsx
+<StatusBar items={[
+  { id: "branch", icon: gitBranch, text: "main", onSelect: pickBranch, priority: 5 },
+  { id: "pos", side: "end", text: () => "Ln " + $line, priority: 4 },
+  { id: "save", side: "end", text: () => $state, tone: () => $busy ? "busy" : "success", live: true, priority: 9 },
+  { id: "format", side: "end", command: "editor.format" },
+]} />
+```
+
+Full page: src/components/layout/status-bar/docs.md
 
 ## Stepper
 

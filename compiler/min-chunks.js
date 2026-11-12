@@ -185,7 +185,8 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
   return added ? plan : null;
 }
 
-const allowed = (allow, file, entryPoint) => Object.keys(allow).some((a) => file.endsWith(a) || posix(entryPoint ?? "") === a || posix(entryPoint ?? "").endsWith(a));
+// an allow key names an output file, an entry point, or a module: a shared chunk holding that module is allowed too
+const allowed = (allow, file, entryPoint, inputs = []) => Object.keys(allow).some((a) => file.endsWith(a) || posix(entryPoint ?? "") === a || posix(entryPoint ?? "").endsWith(a) || inputs.some((i) => posix(i).endsWith(a)));
 
 /**
  * Output files under the limit (JS and CSS in the assets folder), minus chunks.allow.
@@ -204,7 +205,7 @@ export function smallFiles(meta, { cwd, minSize, allow = {}, entryKey = null, bo
   for (const [k, o] of Object.entries(meta.outputs)) {
     if (!/\.(js|css)$/.test(k) || skip.has(k) || !existsSync(resolve(cwd, k))) continue;
     const bytes = readFileSync(resolve(cwd, k)).length;
-    if (bytes < minSize && !allowed(allow, k, o.entryPoint)) out.push({ file: posix(relative(cwd, resolve(cwd, k))), bytes });
+    if (bytes < minSize && !allowed(allow, k, o.entryPoint, Object.keys(o.inputs ?? {}))) out.push({ file: posix(relative(cwd, resolve(cwd, k))), bytes });
   }
   return out.sort((a, b) => a.bytes - b.bytes);
 }

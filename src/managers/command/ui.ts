@@ -97,3 +97,23 @@ export function bindCommandKeys(): () => void {
   if (getOwner()) onCleanup(unbind);
   return unbind;
 }
+
+/** What a bar item needs from a command: label, icon, shortcut, availability, run. Fields of `item` win over the command's. */
+export interface CommandBinding { label: () => string; icon: () => unknown; shortcut: () => string | undefined; disabled: () => boolean; hidden: () => boolean; busy: () => boolean; run: () => void }
+/**
+ * Bind a toolbar / status bar item to a command id (OverflowToolbar, StatusBar): its own `label`, `icon`, `shortcut`,
+ * `disabled` and `onSelect` override the command's. Reactive: a command registered later is picked up.
+ */
+export function commandBinding(item: { command?: string | undefined; label?: unknown; icon?: unknown; shortcut?: string | undefined; disabled?: unknown; onSelect?: (() => unknown) | undefined }): CommandBinding {
+  const cmd = (): Command | undefined => (item.command ? commands.list().find((c) => c.id === item.command) : undefined);
+  const read = (v: unknown): unknown => (typeof v === "function" ? (v as () => unknown)() : v);
+  return {
+    label: () => (read(item.label) as string | undefined) ?? cmd()?.title() ?? item.command ?? "",
+    icon: () => item.icon ?? cmd()?.spec.icon,
+    shortcut: () => item.shortcut ?? cmd()?.spec.shortcut,
+    disabled: () => !!read(item.disabled) || (!!item.command && !(cmd()?.enabled() ?? false)),
+    hidden: () => !!item.command && !!cmd() && !cmd()!.visible(),
+    busy: () => cmd()?.busy() ?? false,
+    run: () => { if (item.onSelect) void item.onSelect(); else void cmd()?.run().catch(noop); },
+  };
+}

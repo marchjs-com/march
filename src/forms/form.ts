@@ -15,6 +15,7 @@ import { inputFor, GROUP_CONTROLS, INLINE_LABEL } from "./registry.ts";
 import { Field, FormContext, setControlBuilder, type FieldProps, type BuiltControl } from "./field.ts";
 export { Field, FormContext, type FieldProps } from "./field.ts";
 import { colorAttr, type ColorToken } from "../theme/colors.ts";
+import { isPlain, deepEqual } from "../core/equal.ts";
 
 /** When fields validate: on blur (default), on every change, or only on submit. */
 export type ValidateOn = "blur" | "change" | "submit";
@@ -87,7 +88,6 @@ export interface FormController<V = Values> {
 /** The enclosing form's controller (from useForm). */
 export const useFormContext = <V = Values>(): FormController<V> | null => useContext(FormContext) as FormController<V> | null;
 
-const isPlain = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && (Array.isArray(v) || Object.getPrototypeOf(v) === Object.prototype || Object.getPrototypeOf(v) === null);
 /** Deep copy of plain objects / arrays (Files, Dates and class instances are kept by reference). */
 export function clone<T>(v: T): T {
   v = unwrap(v);
@@ -97,14 +97,7 @@ export function clone<T>(v: T): T {
   for (const k of Object.keys(v)) o[k] = clone(v[k]);
   return o as T;
 }
-/** Structural equality for form values. */
-export function deepEqual(a: unknown, b: unknown): boolean {
-  if (Object.is(a, b)) return true;
-  if ((a == null || a === "") && (b == null || b === "")) return true;
-  if (!isPlain(a) || !isPlain(b) || Array.isArray(a) !== Array.isArray(b)) return false;
-  const ka = Object.keys(a), kb = Object.keys(b);
-  return ka.length === kb.length && ka.every((k) => deepEqual(a[k], b[k]));
-}
+export { deepEqual };
 
 const CANCELLED = Object.freeze({ cancelled: true });
 /** Value type of a plain spec (Infer without the Schema branch). */

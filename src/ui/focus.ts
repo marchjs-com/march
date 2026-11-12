@@ -1,4 +1,7 @@
 // Focus helpers: focusable lookup, Tab trapping, roving focus in lists.
+/** The element is laid out right-to-left (its computed direction; an ancestor's dir="rtl" counts). */
+export const isRtl = (el: Element | null | undefined): boolean =>
+  !!el && (globalThis.getComputedStyle?.(el)?.direction === "rtl" || el.closest?.("[dir]")?.getAttribute("dir") === "rtl");
 const FOCUSABLE = "button,input,select,textarea,a[href],[tabindex],[contenteditable]";
 
 type Focusable = HTMLElement & { disabled?: boolean };
@@ -35,7 +38,9 @@ export interface RovingOptions { horizontal?: boolean; wrap?: boolean }
 
 /** Move focus among `items` with arrow keys / Home / End. Returns the focused item when the key was handled, else false. */
 export function roving<T extends HTMLElement>(e: KeyboardEvent, items: readonly T[], { horizontal = false, wrap = true }: RovingOptions = {}): T | false {
-  const prev = horizontal ? "ArrowLeft" : "ArrowUp", next = horizontal ? "ArrowRight" : "ArrowDown";
+  // right-to-left: the visual order of a horizontal row is mirrored, so ← moves to the next item
+  const rtl = horizontal && isRtl(e.target as Element);
+  const prev = horizontal ? (rtl ? "ArrowRight" : "ArrowLeft") : "ArrowUp", next = horizontal ? (rtl ? "ArrowLeft" : "ArrowRight") : "ArrowDown";
   if (![prev, next, "Home", "End"].includes(e.key) || !items.length) return false;
   const i = items.indexOf((e.target as Node).ownerDocument?.activeElement as T);
   let j = e.key === "Home" ? 0 : e.key === "End" ? items.length - 1 : i + (e.key === next ? 1 : -1);
