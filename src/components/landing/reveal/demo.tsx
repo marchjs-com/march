@@ -10,7 +10,7 @@ export const code = `<Reveal effect="up" stagger={80}>
 
 export default function RevealDemo(props: { values: { effect: string; stagger: number; scrub: boolean } }) {
   let $run = 0
-  return <div class="sc-col">
+  return <div class="sc-web-col">
     <Button size="sm" variant="secondary" onClick={() => $run++}>Tekrar oynat</Button>
     {() => {
       $run

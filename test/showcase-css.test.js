@@ -22,11 +22,19 @@ export function baseRules(css) {
   return out;
 }
 
-test("every showcase class has one base rule", () => {
-  const dupes = [];
-  for (const f of readdirSync(DIR).filter((n) => n.endsWith(".css"))) {
-    for (const [sel, at] of baseRules(readFileSync(join(DIR, f), "utf8"))) if (at.length > 1) dupes.push(`${f}: ${sel} on lines ${at.join(", ")}`);
+/** Every stylesheet under examples/showcase/src (pages, home sections, samples), relative to it. */
+const cssFiles = (dir = DIR, rel = "") => readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? cssFiles(join(dir, d.name), `${rel}${d.name}/`) : d.name.endsWith(".css") ? [`${rel}${d.name}`] : []));
+
+test("every showcase class has one base rule, across all showcase stylesheets", () => {
+  const dupes = [], where = new Map();
+  for (const f of cssFiles()) {
+    for (const [sel, at] of baseRules(readFileSync(join(DIR, f), "utf8"))) {
+      if (at.length > 1) dupes.push(`${f}: ${sel} on lines ${at.join(", ")}`);
+      (where.get(sel) ?? where.set(sel, []).get(sel)).push(`${f}:${at[0]}`);
+    }
   }
+  // the same class with a base rule in two files: two features restyle each other (home .sc-cat vs the theme swatches)
+  for (const [sel, files] of where) if (files.length > 1) dupes.push(`${sel} in ${files.join(", ")}`);
   assert.deepEqual(dupes, [], "merge the rules, or give the second feature its own class name");
 });
 
