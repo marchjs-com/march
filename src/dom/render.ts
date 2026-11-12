@@ -1,6 +1,6 @@
 // Mount a component tree into a container. Returns a disposer that removes the nodes and runs every cleanup.
-import { createRoot } from "../core/reactive.ts";
-import { insert, clearBetween, removeNode } from "./h.ts";
+import { createRoot, provide } from "../core/reactive.ts";
+import { insert, clearBetween, removeNode, DelegateRoot } from "./h.ts";
 
 /** `render(() => <App />, document.getElementById("app"))` */
 export function render(fn: () => unknown, container: Element | DocumentFragment | ShadowRoot | null | undefined): () => void {
@@ -9,7 +9,11 @@ export function render(fn: () => unknown, container: Element | DocumentFragment 
   const doc = container.ownerDocument ?? globalThis.document;
   const start = doc.createComment("march"), end = doc.createComment("/march");
   container.append(start, end);
+  // a tree mounted in the document (not a shadow root, not detached) delegates onClick-style events to it
+  let top: Node = container;
+  while (top.parentNode) top = top.parentNode;
   return createRoot((dispose) => {
+    if (top.nodeType === 9) provide(DelegateRoot, top as Document);
     insert(container, fn(), end);
     return () => { dispose(); clearBetween(start, end); removeNode(start); removeNode(end); };
   });

@@ -1,5 +1,5 @@
 // Keyed list <For> (its own module: a page that only needs If/Try does not pull it into its chunk).
-import { createRoot, getOwner, untrack, onCleanup, effect, _cell, _setCell, type Accessor, type Cell, type Cleanup } from "../core/reactive.ts";
+import { getOwner, untrack, onCleanup, effect, runWithOwner, _cell, _setCell, _owner, _dispose, type Accessor, type Cell, type Owner } from "../core/reactive.ts";
 import { insert, removeNode, disposeDetached, LEAVE } from "./h.ts";
 import { val, call } from "./flow.ts";
 
@@ -19,7 +19,7 @@ export interface ForProps<T> {
   /** FLIP-animate moves, enter and leave (needs hadi-march/motion). */
   animate?: unknown;
 }
-interface Row<T> { nodes: Node[]; item: Cell<T>; index: Cell<number> | null; dispose: Cleanup; /** position in the previous order */ at: number }
+interface Row<T> { nodes: Node[]; item: Cell<T>; index: Cell<number> | null; o: Owner; /** position in the previous order */ at: number }
 
 /**
  * Keyed list. `<For each={items} key="id">{(item, index) => …}</For>`; `item` and `index` are accessors.
@@ -37,15 +37,16 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
   const keyOf: (x: T) => unknown = typeof pk === "function" ? pk : typeof pk === "string" ? (x) => (x as Record<string, unknown> | null | undefined)?.[pk] : (x) => x;
   let rows = new Map<unknown, Row<T>>();
   let order: Row<T>[] = [];
-  let fallback: { d: Cleanup; nodes: Node[] } | null = null;
+  let fallback: { o: Owner; nodes: Node[] } | null = null;
   const render: unknown = props.children;
-  if (typeof render !== "function") throw new TypeError("March: <For> child must be (item, index) => …");
+  if (typeof render !== "function") throw new TypeError("March: <For> needs a row function.");
   const renderRow = render as ForProps<T>["children"];
   const wantsIndex = renderRow.length !== 1; // `(item) => …` never reads the index: no index signal per row
 
   const make = (it: T, i: number): Row<T> => {
     const item = _cell(it), index = wantsIndex ? _cell(i) : null;
-    return createRoot((dispose): Row<T> => ({ item, index, dispose, at: i, nodes: collect(() => renderRow(item, index as Accessor<number>)) }), owner);
+    const o = _owner(owner);
+    return { item, index, o, at: i, nodes: runWithOwner(o, () => collect(() => renderRow(item, index as Accessor<number>))) };
   };
 
   effect(() => {
@@ -57,20 +58,20 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
         if (order.length) {
           // the list owns its parent alone: drop every row at once
           if (host.firstChild === start && host.lastChild === end && host.nodeType === 1 && !props.animate && order.every(plain)) {
-            disposeDetached(() => { for (const r of order) r.dispose(); });
+            disposeDetached(() => { for (const r of order) _dispose(r.o); });
             (host as Element).textContent = "";
             host.appendChild(start); host.appendChild(end);
           } else for (const r of order) dropRow(r);
         }
         rows = new Map(); order = [];
         if (props.fallback != null && !fallback) {
-          const fb = createRoot((d) => ({ d, nodes: collect(() => call(props.fallback)) }), owner);
-          fallback = fb;
-          for (const x of fb.nodes) host.insertBefore(x, end);
+          const o = _owner(owner);
+          fallback = { o, nodes: runWithOwner(o, () => collect(() => call(props.fallback))) };
+          for (const x of fallback.nodes) host.insertBefore(x, end);
         }
         return;
       }
-      if (fallback) { fallback.d(); fallback.nodes.forEach(removeNode); fallback = null; }
+      if (fallback) { dropRow(fallback); fallback = null; }
       const next = new Map<unknown, Row<T>>();
       const nextOrder: Row<T>[] = new Array(n);
       // the old position of each row (-1: new)
@@ -116,7 +117,7 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
       else place();
     });
   });
-  onCleanup(() => { for (const r of order) dropRow(r); fallback?.d(); });
+  onCleanup(() => { for (const r of order) dropRow(r); if (fallback) dropRow(fallback); });
   return frag;
 }
 
@@ -125,8 +126,8 @@ function plain(r: { nodes: Node[] }): boolean {
   for (const n of r.nodes) if (n.nodeType !== 1 || (n as unknown as { [LEAVE]?: unknown })[LEAVE]) return false;
   return true;
 }
-function dropRow(r: { dispose: Cleanup; nodes: Node[] }): void {
-  if (plain(r)) disposeDetached(r.dispose); else r.dispose();
+function dropRow(r: { o: Owner; nodes: Node[] }): void {
+  if (plain(r)) disposeDetached(() => _dispose(r.o)); else _dispose(r.o);
   for (const n of r.nodes) removeNode(n);
 }
 

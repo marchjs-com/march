@@ -679,7 +679,7 @@ class Transformer {
       n.kids.forEach((k, i) => {
         if (!k.expr) return;
         const next = nextStatic(n, i);
-        wire.push(`${this.helper("ins")}(${ref}, ${k.expr}, ${next ? names.get(next) : "null"});`);
+        wire.push(`${this.helper("ins")}(${ref}, ${k.expr}, ${next ? names.get(next) : "null"}, 1);`);
       });
     };
     walk(tn, "_r");

@@ -18,7 +18,7 @@ export function applyPipe(name: TextPipe, value: unknown, ...args: unknown[]): s
 export function applyPipe(name: string, value: unknown, ...args: unknown[]): unknown;
 export function applyPipe(name: string, value: unknown, ...args: unknown[]): unknown {
   const fn = registry.get(name) as ((value: unknown, ...args: unknown[]) => unknown) | undefined;
-  if (!fn) throw new Error(`March: unknown pipe "${name}". Register it with pipe("${name}", fn).`);
+  if (!fn) throw new Error(`March: unknown pipe "${name}" (register it with pipe()).`);
   return fn(value, ...args);
 }
 export const hasPipe = (name: string): boolean => registry.has(name);

@@ -86,6 +86,7 @@ class Event_ {
   }
   preventDefault(): void { if (this.cancelable) this.defaultPrevented = true; }
   stopPropagation(): void { this._stop = true; }
+  get cancelBubble(): boolean { return !!this._stop; }
   stopImmediatePropagation(): void { this._stop = true; this._stopImm = true; }
 }
 

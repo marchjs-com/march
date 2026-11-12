@@ -24,6 +24,12 @@ array, object, fn), `class:name`, `style` (object only), `sx`, `ref`, `on:event|
 `use:action`, `transition:fade|slide|scale`. URL attributes are sanitized; `innerHTML`, string `style`, `<script>`, `<iframe>`
 throw. `render(() => <App />, el)` mounts and returns a disposer. `insert(parent, value)` low-level insertion.
 
+Speed: the compiler turns a native element subtree into a template built once with DOM calls (no HTML strings) and
+cloned; only bound attributes, events, refs, directives and `{expressions}` are wired on the clone (`templates: false`
+turns it off). Inside a `render()` tree mounted in the document, `onClick`, `onDblClick`, `onInput`, `onKeyDown` and
+`onKeyUp` without modifiers are delegated: one listener per event type on the document runs them in bubble order
+(`currentTarget` is the element, `stopPropagation` stops the walk). `on:click` always adds a direct listener.
+
 ## Components
 Functions called once with a props object. Props from JSX are getters (live). Async components return a promise; while
 pending the nearest `<Try loading>` (or a default spinner) shows; rejections go to the nearest `<Try fallback>`.
@@ -31,7 +37,9 @@ pending the nearest `<Try loading>` (or a default spinner) shows; rejections go 
 
 ## Control flow
 `If` (`when`, `else`/`<Else>`, function child gets the value), `For` (`each`, `key`, `fallback`; child `(item, index) =>`
-with accessors; rows reused by key and moved minimally), `Switch`/`Match`, `Try` (`fallback(err, reset)`, `loading`),
+with accessors; rows reused by key, reordered with the fewest moves (longest increasing subsequence), cleared at once
+when the list owns its parent), `selector(source)` (`isSelected(key)` in each row: a change wakes only the old and
+the new key's rows), `Switch`/`Match`, `Try` (`fallback(err, reset)`, `loading`),
 `Await` (`for`, `loading`, `catch`), `Portal` (`mount`), `Dynamic` (`component`).
 
 ## Pipes and i18n

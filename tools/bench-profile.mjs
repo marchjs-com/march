@@ -30,7 +30,9 @@ const stage = document.getElementById("stage");
 const heap = () => performance.memory.usedJSHeapSize;
 const settle = async () => { gc(); await new Promise((r) => setTimeout(r, 20)); await afterPaint(); };
 (async () => {
-  const res = {};
+  const res = {}, apps = [];
+  // every library mounted at once, measured in turns (sample i of each library back to back), so a busy machine
+  // slows all of them alike and the ratios hold
   for (const lib of LIBS.filter((l) => ${JSON.stringify(libs)}.split(",").includes(l.id))) {
     const host = document.createElement("div"); stage.append(host);
     const app = await (await lib.load()).mount(host);
@@ -40,19 +42,23 @@ const settle = async () => { gc(); await new Promise((r) => setTimeout(r, 20)); 
     r.heapKB = Math.round((heap() - h0) / 1024);
     r.nodes = host.getElementsByTagName("*").length;
     app.clear(); await settle();
-    for (const op of ops) {
-      const xs = [];
-      for (let i = 0; i < ${reps} + op.warm; i++) {
-        op.setup(app, rows, dom); await afterPaint(); await settle(); op.mark?.(dom);
-        const t0 = performance.now(); op.act(app, rows, dom); const t = performance.now() - t0;
-        await afterPaint();
-        if (!op.check(dom)) { xs.length = 0; xs.push(NaN); break; }
-        if (i >= op.warm) xs.push(t);
-      }
-      r[op.id] = stats(xs).median;
-    }
-    app.destroy(); host.remove();
+    apps.push({ id: lib.id, app, dom, rows, r });
   }
+  for (const op of ops) {
+    const xs = new Map(apps.map((a) => [a.id, []]));
+    for (let i = 0; i < ${reps} + op.warm; i++) {
+      for (const a of apps) {
+        op.setup(a.app, a.rows, a.dom); await afterPaint(); await settle(); op.mark?.(a.dom);
+        const t0 = performance.now(); op.act(a.app, a.rows, a.dom); const t = performance.now() - t0;
+        await afterPaint();
+        if (!op.check(a.dom)) xs.get(a.id).push(NaN);
+        else if (i >= op.warm) xs.get(a.id).push(t);
+        a.app.clear(); await afterPaint();
+      }
+    }
+    for (const a of apps) a.r[op.id] = stats(xs.get(a.id)).median;
+  }
+  for (const a of apps) a.app.destroy();
   window.__prof = res;
 })().catch((e) => { window.__prof = { fatal: String(e && e.stack || e) }; });
 `;
