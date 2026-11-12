@@ -2,29 +2,34 @@
 .hm-ec { --hm-ec-accent: var(--hm-accent, var(--hm-primary)); --hm-ec-h1: var(--hm-brand-orange, var(--hm-cat-1)); --hm-ec-h2: var(--hm-brand-blue, var(--hm-cat-2));
   display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%; padding: var(--hm-space-3);
   border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
-/* the plot's size comes from the width but stays bounded: the square plus the overshoot room is at most 17rem tall */
-.hm-ec-main { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--hm-space-4); align-items: start; }
+/* the plot fills its cell: it shows only the value range the curve uses and stretches to the box; lines and handles
+   keep their pixel size (non-scaling strokes; a handle is a zero-length round-capped line) */
+.hm-ec-main { display: grid; grid-template-columns: minmax(8rem, 2fr) minmax(0, 3fr); gap: var(--hm-space-4); align-items: stretch; }
 @container (max-width: 30rem) { .hm-ec-main { grid-template-columns: minmax(0, 1fr); } }
 .hm-ec { container-type: inline-size; }
 
 /* plot and lane: time runs left to right in every writing direction */
 .hm-ec-plot, .hm-ec-lane { direction: ltr; }
-.hm-ec-plot { inline-size: clamp(6rem, 32cqi, 8.5rem); justify-self: center; aspect-ratio: 112 / 224; overflow: visible; touch-action: none; cursor: crosshair; user-select: none; }
+.hm-ec-plot { display: block; inline-size: 100%; block-size: 100%; min-block-size: 11rem; max-block-size: 18rem; overflow: visible; touch-action: none; cursor: crosshair; user-select: none; }
+.hm-ec-plot :is(line, path) { vector-effect: non-scaling-stroke; }
 .hm-ec-zone { fill: var(--hm-bg-subtle); stroke: none; }
-.hm-ec-grid { stroke: var(--hm-border-subtle); stroke-width: .35; }
-.hm-ec-axis { stroke: var(--hm-border-strong); stroke-width: .5; }
-.hm-ec-diag { stroke: var(--hm-border); stroke-width: .6; stroke-dasharray: 2 2; }
-.hm-ec-curve { fill: none; stroke: var(--hm-text); stroke-width: 1.6; stroke-linecap: round; }
-.hm-ec-curve-glow { fill: none; stroke: var(--hm-ec-accent); stroke-width: 5; stroke-linecap: round; opacity: .18; }
-.hm-ec-arm { stroke-width: .9; }
+.hm-ec-grid { stroke: var(--hm-border-subtle); stroke-width: 1px; }
+.hm-ec-axis { stroke: var(--hm-border-strong); stroke-width: 1px; }
+.hm-ec-diag { stroke: var(--hm-border); stroke-width: 1px; stroke-dasharray: 4 4; }
+.hm-ec-curve { fill: none; stroke: var(--hm-text); stroke-width: 2.5px; stroke-linecap: round; }
+.hm-ec-curve-glow { fill: none; stroke: var(--hm-ec-accent); stroke-width: 8px; stroke-linecap: round; opacity: .18; }
+.hm-ec-arm { stroke-width: 1.5px; }
 .hm-ec-h1 .hm-ec-arm { stroke: var(--hm-ec-h1); }
 .hm-ec-h2 .hm-ec-arm { stroke: var(--hm-ec-h2); }
-.hm-ec-knob { stroke: var(--hm-surface); stroke-width: 1.6; cursor: grab; outline: none; transition: r var(--hm-dur-fast) var(--hm-ease-spring); }
-.hm-ec-h1 .hm-ec-knob { fill: var(--hm-ec-h1); }
-.hm-ec-h2 .hm-ec-knob { fill: var(--hm-ec-h2); }
-.hm-ec-knob:hover, .hm-ec-handle.is-active .hm-ec-knob { r: 5.4; }
-.hm-ec-knob:focus-visible { stroke: var(--hm-focus); stroke-width: 2.2; }
-.hm-ec-marker { fill: var(--hm-ec-accent); stroke: var(--hm-surface); stroke-width: 1; }
+.hm-ec-ring, .hm-ec-knob, .hm-ec-marker { stroke-linecap: round; transition: stroke-width var(--hm-dur-fast) var(--hm-ease-spring); }
+.hm-ec-ring { stroke: var(--hm-surface); stroke-width: 15px; pointer-events: none; }
+.hm-ec-knob { stroke-width: 11px; cursor: grab; outline: none; }
+.hm-ec-h1 .hm-ec-knob { stroke: var(--hm-ec-h1); }
+.hm-ec-h2 .hm-ec-knob { stroke: var(--hm-ec-h2); }
+.hm-ec-handle:hover .hm-ec-knob, .hm-ec-handle.is-active .hm-ec-knob { stroke-width: 14px; }
+.hm-ec-handle:hover .hm-ec-ring, .hm-ec-handle.is-active .hm-ec-ring { stroke-width: 18px; }
+.hm-ec-handle:has(.hm-ec-knob:focus-visible) .hm-ec-ring { stroke: var(--hm-focus); stroke-width: 20px; }
+.hm-ec-marker { stroke: var(--hm-ec-accent); stroke-width: 7px; }
 
 /* preview: a ball eased along the lane, a faint linear one beside it */
 .hm-ec-side { display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; }
@@ -61,8 +66,8 @@
 /* compact (an inspector): a small curve beside the numbers, presets in one scrolling row */
 .hm-ec-compact { gap: var(--hm-space-2); padding: var(--hm-space-2); }
 .hm-ec-compact .hm-ec-main { gap: var(--hm-space-3); grid-template-columns: minmax(0, 1fr) auto; }
-/* the curve takes the room the numbers leave (square + overshoot room, at most 17rem = 272 px tall) */
-.hm-ec-compact .hm-ec-plot { inline-size: min(100%, 8.5rem); }
+/* the curve takes all the room the numbers leave */
+.hm-ec-compact .hm-ec-plot { min-block-size: 10rem; max-block-size: 14rem; }
 .hm-ec-compact .hm-ec-css { display: none; }
 .hm-ec-compact .hm-ec-inputs { grid-template-columns: repeat(2, auto); }
 /* number boxes about 7 characters wide ("-0.354" fits) */
@@ -71,4 +76,4 @@
 .hm-ec-compact .hm-ec-preset { flex: none; padding: .25rem .375rem .125rem; }
 .hm-ec-compact .hm-ec-thumb { inline-size: 1.75rem; block-size: 1.75rem; }
 /* narrow (a phone): the curve above the numbers */
-@container (max-width: 22rem) { .hm-ec-compact .hm-ec-main { grid-template-columns: minmax(0, 1fr); } .hm-ec-compact .hm-ec-side { justify-self: center; } }
+@container (max-width: 22rem) { .hm-ec-compact .hm-ec-main { grid-template-columns: minmax(0, 1fr); } .hm-ec-compact .hm-ec-side { justify-self: center; } .hm-ec-compact .hm-ec-plot { block-size: 10rem; } }

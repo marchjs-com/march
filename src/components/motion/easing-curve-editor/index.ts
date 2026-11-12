@@ -55,10 +55,15 @@ export interface EasingCurveEditorProps extends ControlProps<string> {
   class?: ClassProp;
 }
 
-// plot: x 0–1 → 0–100; y −.6–1.6 → 220–0 (room for anticipation and overshoot)
-const Y0 = 160, H = 220;
-const py = (v: number): number => Y0 - v * 100;
+// plot: x 0–1 → 0–100; y value v → −100·v (up is more). The plot shows only the room the curve uses (0–1 plus its
+// anticipation / overshoot) and stretches to fill its box; strokes and handles keep their pixel size at any stretch.
+const py = (v: number): number => -v * 100;
 const curvePath = (b: Bezier): string => `M0 ${py(0)} C${b[0] * 100} ${py(b[1])} ${b[2] * 100} ${py(b[3])} 100 ${py(1)}`;
+const PAD = 0.12;
+const rangeOf = (b: Bezier): { lo: number; hi: number } => ({ lo: Math.min(0, b[1], b[3]) - PAD, hi: Math.max(1, b[1], b[3]) + PAD });
+/** A round dot of fixed pixel size in a stretched SVG: a zero-length line with round caps and a non-scaling stroke. */
+const dot = (cls: string, x: () => number, y: () => number, extra: Record<string, unknown> = {}): Element =>
+  h("line", { class: cls, x1: x, y1: y, x2: x, y2: y, ...extra });
 
 /** Cubic-bezier easing editor: `<EasingCurveEditor bind:value={$easing} />`. */
 export function EasingCurveEditor(props: EasingCurveEditorProps): unknown {
@@ -79,10 +84,16 @@ export function EasingCurveEditor(props: EasingCurveEditorProps): unknown {
 
   // ------------------------------------------------------------------ plot
   const NS = { xmlns: "http://www.w3.org/2000/svg" };
+  // the visible value range follows the curve, but holds still while a handle is dragged (no jump under the pointer)
+  let held = false;
+  const range = signal(rangeOf(bz.peek()));
+  effect(() => { const r = rangeOf(bz()); if (!held) untrack(() => range.set(r)); });
+  const kx = (i: 0 | 1): number => bz()[i * 2]! * 100, ky = (i: 0 | 1): number => py(bz()[i * 2 + 1]!);
   const handle = (i: 0 | 1): Element => h("g", { class: () => cx("hm-ec-handle", `hm-ec-h${i + 1}`, active() === i && "is-active") },
-    h("line", { class: "hm-ec-arm", x1: i ? 100 : 0, y1: py(i ? 1 : 0), x2: () => bz()[i * 2]! * 100, y2: () => py(bz()[i * 2 + 1]!) }),
-    h("circle", {
-      class: "hm-ec-knob", r: 4.2, cx: () => bz()[i * 2]! * 100, cy: () => py(bz()[i * 2 + 1]!), tabindex: () => (props.disabled ? "-1" : "0"), role: "slider",
+    h("line", { class: "hm-ec-arm", x1: i ? 100 : 0, y1: py(i ? 1 : 0), x2: () => kx(i), y2: () => ky(i) }),
+    dot("hm-ec-ring", () => kx(i), () => ky(i), { "aria-hidden": "true" }),
+    dot("hm-ec-knob", () => kx(i), () => ky(i), {
+      tabindex: () => (props.disabled ? "-1" : "0"), role: "slider",
       "aria-label": () => (i ? t`Second handle` : t`First handle`), "aria-valuemin": "0", "aria-valuemax": "1", "aria-valuenow": () => String(bz()[i * 2]),
       "aria-valuetext": () => t`time ${num(bz()[i * 2]!)}, progress ${num(bz()[i * 2 + 1]!)}`, "aria-disabled": () => (ro() ? "true" : null),
       onFocus: () => active.set(i), onBlur: () => active.set(null),
@@ -96,10 +107,13 @@ export function EasingCurveEditor(props: EasingCurveEditorProps): unknown {
         commit(b);
       },
     }));
-  const grid = [0, 0.25, 0.5, 0.75, 1].flatMap((v) => [h("line", { class: v === 0 || v === 1 ? "hm-ec-axis" : "hm-ec-grid", x1: v * 100, y1: py(-0.6), x2: v * 100, y2: py(1.6) }), h("line", { class: v === 0 || v === 1 ? "hm-ec-axis" : "hm-ec-grid", x1: 0, y1: py(v), x2: 100, y2: py(v) })]);
-  const marker = h("circle", { class: "hm-ec-marker", r: 2.6, cx: 0, cy: py(0) }) as SVGCircleElement;
+  const grid = [0, 0.25, 0.5, 0.75, 1].flatMap((v) => [
+    h("line", { class: v === 0 || v === 1 ? "hm-ec-axis" : "hm-ec-grid", x1: v * 100, y1: () => py(range().lo), x2: v * 100, y2: () => py(range().hi) }),
+    h("line", { class: v === 0 || v === 1 ? "hm-ec-axis" : "hm-ec-grid", x1: 0, y1: py(v), x2: 100, y2: py(v) })]);
+  const marker = h("line", { class: "hm-ec-marker", x1: 0, y1: py(0), x2: 0, y2: py(0) }) as SVGLineElement;
   const svg = h("svg", {
-    ...NS, class: "hm-ec-plot", viewBox: `-6 -2 112 ${H + 4}`, role: "group", "aria-label": () => t`Easing curve ${css()}`,
+    ...NS, class: "hm-ec-plot", preserveAspectRatio: "none", role: "group", "aria-label": () => t`Easing curve ${css()}`,
+    viewBox: () => { const r = range(); return `-6 ${py(r.hi)} 112 ${(r.hi - r.lo) * 100}`; },
   },
   h("rect", { class: "hm-ec-zone", x: 0, y: py(1), width: 100, height: 100 }),
   ...grid,
@@ -108,25 +122,31 @@ export function EasingCurveEditor(props: EasingCurveEditorProps): unknown {
   h("path", { class: "hm-ec-curve", d: () => curvePath(bz()) }),
   marker,
   handle(0), handle(1)) as SVGSVGElement;
+  // pointer → curve values, through the range shown when the drag began
+  const at = (p: { px: number; py: number; rect: { width: number; height: number } }): [number, number] => {
+    const r = range.peek();
+    return [(-6 + (p.px / p.rect.width) * 112) / 100, r.hi - (p.py / p.rect.height) * (r.hi - r.lo)];
+  };
   // drag the nearer handle (or the one pressed)
   let dragging: 0 | 1 = 0;
   track(svg, {
     onStart: (p) => {
       if (ro()) return false;
-      const x = ((p.px / p.rect.width) * 112 - 6) / 100, y = (Y0 - ((p.py / p.rect.height) * (H + 4) - 2)) / 100, b = bz.peek();
+      held = true;
+      const [x, y] = at(p), b = bz.peek();
       const d0 = Math.hypot(x - b[0], y - b[1]), d1 = Math.hypot(x - b[2], y - b[3]);
       const hit = (p.event.target as Element)?.closest?.(".hm-ec-handle");
       dragging = hit ? (hit.classList.contains("hm-ec-h2") ? 1 : 0) : d1 < d0 ? 1 : 0;
       active.set(dragging);
     },
     onMove: (p) => {
-      const x = ((p.px / p.rect.width) * 112 - 6) / 100, y = (Y0 - ((p.py / p.rect.height) * (H + 4) - 2)) / 100;
+      const [x, y] = at(p);
       const b = [...bz.peek()] as Bezier;
       b[dragging * 2] = x;
       b[dragging * 2 + 1] = p.event.shiftKey ? Math.round(y * 20) / 20 : y;
       commit(b);
     },
-    onEnd: () => { (svg.querySelectorAll(".hm-ec-knob")[dragging] as SVGElement | undefined)?.focus?.(); },
+    onEnd: () => { held = false; range.set(rangeOf(bz.peek())); (svg.querySelectorAll(".hm-ec-knob")[dragging] as SVGElement | undefined)?.focus?.(); },
     clamp: false,
   });
 
@@ -144,8 +164,8 @@ export function EasingCurveEditor(props: EasingCurveEditorProps): unknown {
       else { const ph = time % cycle; tt = ph < D ? ph / D : ph < D + 350 ? 1 : ph < 2 * D + 350 ? 1 - (ph - D - 350) / D : 0; }
       const p = untrack(fn)(tt);
       setStyle(root, { "--hm-ec-p": p.toFixed(4), "--hm-ec-t": tt.toFixed(4) });
-      marker.setAttribute("cx", String(tt * 100));
-      marker.setAttribute("cy", String(py(p)));
+      for (const k of ["x1", "x2"]) marker.setAttribute(k, String(tt * 100));
+      for (const k of ["y1", "y2"]) marker.setAttribute(k, String(py(p)));
     });
     onCleanup(off);
   });
@@ -164,7 +184,7 @@ export function EasingCurveEditor(props: EasingCurveEditorProps): unknown {
   const presetRow = () => (presets().length ? h("div", { class: "hm-ec-presets", role: "group", "aria-label": () => t`Presets` }, presets().map((p) => h("button", {
     type: "button", class: () => cx("hm-ec-preset", same(p.value) && "is-on"), "aria-pressed": () => String(same(p.value)), disabled: ro, title: p.label ?? p.name,
     onClick: () => commit([...p.value] as Bezier),
-  }, h("svg", { ...NS, viewBox: "-4 20 108 180", class: "hm-ec-thumb", "aria-hidden": "true" }, h("path", { d: curvePath(p.value) })), h("span", null, p.label ?? p.name)))) : null);
+  }, h("svg", { ...NS, viewBox: "-4 -140 108 180", class: "hm-ec-thumb", "aria-hidden": "true" }, h("path", { d: curvePath(p.value) })), h("span", null, p.label ?? p.name)))) : null);
 
   return h("div", {
     class: () => cx("hm-ec", props.compact && "hm-ec-compact", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? t`Easing curve editor`, "data-hm-color": c["data-hm-color"],
