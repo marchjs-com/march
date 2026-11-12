@@ -1,0 +1,11 @@
+/* VideoBackground. The Overlay layers sit under the content; the tint is a themed vignette; the toggle sits at the end corner. */
+.hm-vbg { position: relative; isolation: isolate; overflow: hidden; border-radius: inherit; color: var(--hm-text); }
+.hm-vbg-tint-dark { color: var(--hm-inverse-text); --hm-text: var(--hm-inverse-text); --hm-muted: color-mix(in srgb, var(--hm-inverse-text) 76%, transparent); }
+.hm-vbg-tint-dark .hm-vbg-tint { background: linear-gradient(180deg, color-mix(in srgb, var(--hm-inverse-bg) 55%, transparent), color-mix(in srgb, var(--hm-inverse-bg) 85%, transparent)); }
+.hm-vbg-tint-light .hm-vbg-tint { background: linear-gradient(180deg, color-mix(in srgb, var(--hm-bg) 50%, transparent), color-mix(in srgb, var(--hm-bg) 88%, transparent)); }
+.hm-vbg-tint-brand { color: var(--hm-inverse-text); --hm-text: var(--hm-inverse-text); --hm-muted: color-mix(in srgb, var(--hm-inverse-text) 80%, transparent); }
+.hm-vbg-tint-brand .hm-vbg-tint { background: linear-gradient(135deg, color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 75%, transparent), color-mix(in srgb, var(--hm-inverse-bg) 80%, transparent)); }
+.hm-vbg-content { position: relative; z-index: 1; min-width: 0; }
+.hm-vbg-toggle { position: absolute; z-index: 2; inset-block-end: var(--hm-space-3); inset-inline-end: var(--hm-space-3); color: inherit;
+  background: color-mix(in srgb, var(--hm-inverse-bg) 35%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--hm-radius-full); }
+.hm-vbg-toggle:hover { background: color-mix(in srgb, var(--hm-inverse-bg) 55%, transparent); }

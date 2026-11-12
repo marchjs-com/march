@@ -440,4 +440,27 @@ separate button handler. Manager events go through `setManagerEmit`.
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
+| Counter | experimental | Animated number: counts up when visible, glides to new values, or rolls each digit like an odometer; Intl formatted. | — |
+| CtaBand | experimental | Call-to-action panel: title, lead, actions over gradient, mesh, glass, plain or video; pointer light; scales in. | SiteSection, Overlay, Reveal, VideoBackground |
+| Faq | experimental | Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking. | Accordion, SearchBox, Reveal |
+| FeatureGrid | experimental | Product features as cards (pointer light), plain, a two-column list or a bento grid of mixed tile sizes; staggered entrance. | Grid, Card, IconTile, Reveal |
+| Hero | experimental | First screen in seven looks (centered, split, video, mesh, aurora, product, parallax): eyebrow, gradient-highlight title, lead, actions. | Reveal, Overlay, Button, Badge, Aurora, VideoBackground, Parallax |
+| HorizontalScroll | experimental | Pinned section whose panels slide sideways while the page scrolls down; progress line; native snap scroller on touch. | — |
+| LogoCloud | experimental | Trusted-by logos as an equal grid or an endless Marquee ticker; one muted tone, full colour on hover. | Marquee, Grid, Reveal |
+| Newsletter | experimental | Email sign-up, inline or stacked: validation, busy button, success check that pops in, error shake and announcement. | TextInput, Button |
+| Parallax | experimental | Layered depth: every layer (image or node) moves at its own scroll speed and, optionally, with the mouse; transform only. | Overlay |
+| Presentation | experimental | Slides: keys, wheel, swipe, step-by-step fragments, slide / fade / zoom, full screen, URL index, speaker window (cross-tab), print. | IconButton |
+| Pricing | experimental | Plans with a monthly / yearly switch: prices roll like an odometer, the switch thumb slides, the featured plan glows. | Card, Badge, Segmented, Counter, Reveal |
+| ProjectDetail | experimental | One project: title, facts (KeyValue, service Chips), shared-element cover, story, Lightbox gallery, next project. | Button, KeyValue, Chip, openMedia, Reveal |
+| ProjectGrid | experimental | Portfolio covers with filter Chips: FLIP re-layout on filter, open into ProjectDetail (shared element) or the Lightbox. | Card, Chip, openMedia, Reveal |
+| Reveal | experimental | Scroll entrance for any block: fade, rise, slide (RTL mirrored), scale, blur, flip; stagger; scrub follows the scroll. | — |
+| Roadmap | experimental | Timeline whose line fills with the scroll: done / now / next statuses, passed dots light up; roadmaps, stories, work history. | Timeline, Badge, Reveal |
+| ScrollProgress | experimental | Reading progress bar for the page or one article: fixed or inline, brand gradient or accent, RTL aware, a progressbar. | — |
+| ScrollStory | experimental | Scrollytelling: pinned media column, steps scroll past, the active step's media cross-fades and the section takes its colour. | — |
+| SiteFooter | experimental | Website footer: brand and about line, link columns, social links, optional Newsletter, legal row, back-to-top, big wordmark. | Brand, Newsletter, IconButton |
+| SiteNav | experimental | Website top bar: sticky, transparent-to-glass or floating pill, shrinks and hides on scroll, sliding link pill, Drawer menu on phones. | Brand, IconButton, openDrawer |
+| SiteSection | experimental | Frame of every website block: width, rhythm, tone (plain, muted, inverse, brand) and an eyebrow / title / lead heading that reveals. | Reveal |
+| StatsBand | experimental | Row of big numbers that count up (or roll) when visible, with labels and notes; plain, divided or cards. | Counter, Reveal |
+| Testimonials | experimental | Customer quotes as a grid, two drifting Marquee rows, a masonry wall with Show more, or a Carousel; Avatar and Rating. | Card, Avatar, Rating, Marquee, Carousel, Button, Reveal |
+| VideoBackground | experimental | Muted looping video behind content: poster first (and on save-data / reduced motion), plays only while visible, readable tint, pause button. | Overlay, IconButton |
 <!-- components:end -->

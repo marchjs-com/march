@@ -21,9 +21,10 @@ export async function checkComponent(root, name, { runTests = true } = {}) {
   const add = (item, ok, note) => results.push({ item, ok, note });
   if (!existsSync(dir)) return { ok: false, results: [{ item: "folder", ok: false, note: `src/components/${name} not found` }] };
   const files = readdirSync(dir);
+  const base = name.split("/").pop(); // <category>/<name>: files are named after the last part
   const read = (f) => (existsSync(join(dir, f)) ? readFileSync(join(dir, f), "utf8") : "");
-  for (const f of ["index.ts", `${name}.css`, `${name}.test.js`, "docs.md", "demo.tsx", "playground.ts", "meta.ts"]) add(`file ${f}`, files.includes(f), files.includes(f) ? undefined : "missing (CSS may be absent only for components without styles)");
-  const code = read("index.ts"), css = read(`${name}.css`), docs = read("docs.md"), demo = read("demo.tsx");
+  for (const f of ["index.ts", `${base}.css`, `${base}.test.js`, "docs.md", "demo.tsx", "playground.ts", "meta.ts"]) add(`file ${f}`, files.includes(f), files.includes(f) ? undefined : "missing (CSS may be absent only for components without styles)");
+  const code = read("index.ts"), css = read(`${base}.css`), docs = read("docs.md"), demo = read("demo.tsx");
 
   // meta: stability + composedOf, and every composed component is really used (reuse, not a copy)
   let meta = null;
@@ -59,8 +60,8 @@ export async function checkComponent(root, name, { runTests = true } = {}) {
     for (const o of pg.options ?? []) add(`playground option "${o.key}" is used by demo.tsx`, new RegExp(`\\.${o.key}\\b`).test(demo));
   } catch (e) { add("playground.ts loads", false, e.message); }
   // tests
-  if (runTests && files.includes(`${name}.test.js`)) {
-    const r = spawnSync(process.execPath, ["--import", pathToFileURL(join(root, "compiler/register.js")).href, "--test", join(dir, `${name}.test.js`)], { cwd: root, encoding: "utf8" });
+  if (runTests && files.includes(`${base}.test.js`)) {
+    const r = spawnSync(process.execPath, ["--import", pathToFileURL(join(root, "compiler/register.js")).href, "--test", join(dir, `${base}.test.js`)], { cwd: root, encoding: "utf8" });
     add("tests pass", r.status === 0, r.status === 0 ? undefined : (r.stdout + r.stderr).split("\n").filter((l) => /✖|Error/.test(l)).slice(0, 3).join(" | "));
   }
   // browser checks (tools/visual-audit.mjs and the showcase): listed, not run here

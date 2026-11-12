@@ -1,0 +1,10 @@
+/* Counter. Tabular digits keep the width steady while it counts; roll columns are clipped strips of 0–9. */
+.hm-counter { display: inline-flex; align-items: baseline; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hm-counter-view { display: inline-flex; align-items: baseline; }
+.hm-counter-roll .hm-counter-view { align-items: stretch; }
+.hm-counter-col { display: inline-block; height: 1.15em; overflow: hidden; line-height: 1.15em;
+  -webkit-mask-image: linear-gradient(transparent, black 18%, black 82%, transparent); mask-image: linear-gradient(transparent, black 18%, black 82%, transparent); }
+.hm-counter-strip { display: flex; flex-direction: column; will-change: transform; }
+.hm-counter-strip > span { display: block; height: 1.15em; text-align: center; }
+.hm-counter-sym { display: inline-block; line-height: 1.15em; }
+.hm-counter-affix { white-space: pre; }

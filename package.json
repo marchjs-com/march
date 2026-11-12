@@ -27,6 +27,7 @@
     "./motion/motion.css": "./src/motion/motion.css",
     "./fx": "./src/fx/index.ts",
     "./fx/fx.css": "./src/fx/fx.css",
+    "./landing": "./src/landing/index.ts",
     "./store": "./src/store/index.ts",
     "./channel": "./src/channel/index.ts",
     "./i18n": "./src/i18n/index.ts",

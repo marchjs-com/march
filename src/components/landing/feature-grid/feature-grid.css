@@ -1,0 +1,37 @@
+/* FeatureGrid. Card / bento tiles get a pointer light (--hm-fg-x/y from JS) on the surface and the border. */
+.hm-fg { min-width: 0; }
+.hm-fg-item { position: relative; min-width: 0; }
+.hm-fg-item .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-3); height: 100%; }
+.hm-fg-text { display: flex; flex-direction: column; gap: var(--hm-space-2); min-width: 0; }
+.hm-fg-title { margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); line-height: 1.3; overflow-wrap: anywhere; }
+.hm-fg-body { margin: 0; color: var(--hm-muted); line-height: 1.6; overflow-wrap: anywhere; }
+.hm-fg-link { color: inherit; text-decoration: none; }
+.hm-fg-link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.hm-fg-link:focus-visible { outline: none; }
+.hm-fg-item:has(.hm-fg-link:focus-visible) { outline: 2px solid var(--hm-focus, var(--hm-primary)); outline-offset: 2px; }
+.hm-fg-item.hm-card { transition: transform var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease); }
+.hm-fg-item.is-link:hover { transform: translateY(-3px); box-shadow: var(--hm-shadow-3); }
+
+/* pointer light */
+.is-spotlight .hm-fg-item.hm-card { isolation: isolate; overflow: hidden; }
+.is-spotlight .hm-fg-item.hm-card::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity var(--hm-dur) var(--hm-ease);
+  background: radial-gradient(420px circle at var(--hm-fg-x, 50%) var(--hm-fg-y, 50%), color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 12%, transparent), transparent 60%); }
+.is-spotlight .hm-fg-item.hm-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; padding: 1px; opacity: 0; transition: opacity var(--hm-dur) var(--hm-ease);
+  background: radial-gradient(280px circle at var(--hm-fg-x, 50%) var(--hm-fg-y, 50%), color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 70%, transparent), transparent 70%);
+  -webkit-mask: linear-gradient(black 0 0) content-box, linear-gradient(black 0 0); -webkit-mask-composite: xor; mask: linear-gradient(black 0 0) content-box exclude, linear-gradient(black 0 0); }
+.is-spotlight:hover .hm-fg-item.hm-card::before, .is-spotlight:hover .hm-fg-item.hm-card::after { opacity: 1; }
+
+/* plain and list */
+.hm-fg-plain .hm-fg-item { display: flex; flex-direction: column; gap: var(--hm-space-3); }
+.hm-fg-list .hm-fg-item { display: flex; gap: var(--hm-space-3); align-items: flex-start; }
+.hm-fg-list .hm-fg-title { font-size: var(--hm-text-md); }
+
+/* bento: 4 columns, tiles span by size; 2 columns on tablets, 1 on phones */
+.hm-fg-bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(12rem, auto); gap: var(--hm-space-4); grid-auto-flow: dense; }
+.hm-fg-span-wide { grid-column: span 2; } .hm-fg-span-tall { grid-row: span 2; } .hm-fg-span-big { grid-column: span 2; grid-row: span 2; }
+.hm-fg-bento .hm-fg-item .hm-card-body { padding: var(--hm-space-5); }
+.hm-fg-media { flex: 1 1 auto; min-height: 6rem; margin-block-start: auto; border-radius: var(--hm-radius-3); overflow: hidden; background: var(--hm-surface-2); display: grid; }
+.hm-fg-media > * { min-width: 0; min-height: 0; }
+@media (max-width: 960px) { .hm-fg-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hm-fg-span-big { grid-row: span 1; } }
+@media (max-width: 560px) { .hm-fg-bento { grid-template-columns: minmax(0, 1fr); } .hm-fg-span-wide, .hm-fg-span-big { grid-column: span 1; } .hm-fg-span-tall { grid-row: span 1; } }
+@media (prefers-reduced-motion: reduce) { .hm-fg-item.is-link:hover { transform: none; } }
