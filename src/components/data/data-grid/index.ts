@@ -16,7 +16,7 @@ import { FilterControl, CellEditor } from "../../../table/controls.ts";
 import { valueOf, type Column, type TableColumn, type Row } from "../../../table/filters.ts";
 import { groupRows, aggregates, type Aggregate, type GroupItem, type GroupHeader, type GroupRow, type GroupAggregate } from "../../../data/group.ts";
 import { animate, stagger } from "../../../motion/animate.ts";
-import { pointerDrag } from "../../../motion/pointer.ts";
+import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { Menu, type MenuItem } from "../../../ui/menu.ts";
 import { Chip } from "../../actions/chip/index.ts";
 import { glyph } from "../../../ui/util.ts";

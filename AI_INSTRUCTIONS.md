@@ -381,6 +381,13 @@ replay(), stop() }`. Never split text by hand or animate letters with your own l
 - Catalog: `TEXT_ANIMATIONS` in `hadi-march/motion/text/meta`. Reference: src/motion/text/docs.md. Showcase: Hareket ›
   Metin animasyonları (/text-motion).
 
+### 15a3. Behaviors (hadi-march/behaviors/*)
+One interaction, written once, attached to any element; each behavior is its own subpath (docs/behaviors.md).
+- **drag** — `draggable(el, { handle, scroll, onMove, onEnd })` or `pointerDrag(downEvent, opts)`: threshold (click stays
+  a click), pointer capture, Escape cancels, edge auto-scroll on the motion clock, `p.di` along the writing direction
+  (RTL mirrored). As an action: `<div use:draggable={[draggable, opts]}>`. NEVER write your own pointermove /
+  pointerup / setPointerCapture loop in a component.
+
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)
 
 **Never call `fetch()`, `new WebSocket()` or `new EventSource()` in app code. All traffic goes through `net` or an
