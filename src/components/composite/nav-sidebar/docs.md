@@ -28,6 +28,17 @@ featured items at the top, a collapsible icon rail and a resizable width, all re
 | `storageKey`, `persist` | string, boolean | `"hm.sidebar"` | where open categories, recents and width are kept |
 | `placeholder`, `label` | string | `t` texts | search placeholder, landmark name |
 
+### Nested items
+
+An item with `parent: "<id>"` is listed indented under that item, in a fold of its own with a chevron at the end of the
+parent row. The fold opens by itself while the parent or one of its children is the current page; the chevron (or → / ←
+on the focused row) opens and closes it, and the choice is remembered. The group count counts top-level items.
+
+```ts
+{ id: "/editors", label: "Editörler", href: "/editors", group: "Formlar" },
+{ id: "/editors/terminal", label: "Terminal", href: "/editors/terminal", group: "Formlar", parent: "/editors" },
+```
+
 ## Accessibility
 
 A `nav` landmark with a `search` region; category buttons carry `aria-expanded` and `aria-controls`, the current page

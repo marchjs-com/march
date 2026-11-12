@@ -26,13 +26,18 @@ for (const file of walk(PAGES)) {
   const path = rel === "home" ? "/" : `/${rel}`;
   const src = readFileSync(file, "utf8");
   const page = /export const title = "([^"]+)"/.exec(src)?.[1] ?? navTitle(path) ?? rel;
+  // a section with one page per topic (<Hub base="/editors" … render={RENDER}>): a demo inside the `"slug": () =>`
+  // entry before it belongs to that topic's page (/editors/terminal)
+  const hub = /<Hub\s+base="([^"]+)"/.exec(src)?.[1];
+  const keys = hub ? [...src.matchAll(/^\s+"([a-z0-9-]+)": \(\) =>/gm)].map((k) => ({ at: k.index, slug: k[1] })) : [];
   for (const m of src.matchAll(/<(ComponentDemo|Demo)\b([^>]*?)\/?>/gs)) {
+    const key = keys.filter((k) => k.at < m.index).pop();
     const tag = m[2];
     const title = attr(tag, "title");
     const folder = m[1] === "ComponentDemo" ? attr(tag, "folder") : undefined;
     if (!title && !folder) continue;
     const id = attr(tag, "id") ?? (folder ? `c-${folder.split("/").join("-")}` : `d-${demoSlug(title)}`);
-    out.push({ path, page, id, title: title ?? folder.split("/").pop(), desc: (attr(tag, "desc") ?? "").slice(0, 160), comp: folder ? folder.split("/").pop() : "" });
+    out.push({ path: key ? `${hub}/${key.slug}` : path, page, id, title: title ?? folder.split("/").pop(), desc: (attr(tag, "desc") ?? "").slice(0, 160), comp: folder ? folder.split("/").pop() : "" });
   }
 }
 out.sort((a, b) => a.path.localeCompare(b.path));

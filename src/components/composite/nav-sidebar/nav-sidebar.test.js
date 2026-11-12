@@ -160,3 +160,26 @@ test("NavSidebar: navigating keeps the menu (same nodes, one mount, scroll posit
   assert.equal(scrolls[0].top, 300 + 160, "scrolled by the overflow (block: nearest)");
   m.dispose();
 });
+
+test("NavSidebar: nested items sit under their parent, fold with it, open by themselves while active", () => {
+  const items = [
+    { id: "/editors", label: "Editors", href: "/editors", group: "Forms" },
+    { id: "/editors/terminal", label: "Terminal", href: "/editors/terminal", group: "Forms", parent: "/editors" },
+    { id: "/editors/json", label: "JSON", href: "/editors/json", group: "Forms", parent: "/editors" },
+    { id: "/forms", label: "Forms", href: "/forms", group: "Forms" },
+  ];
+  const m = mount(() => h(U.NavSidebar, { items, storageKey: "t.nest", palette: false, hotkey: false, defaultOpen: "all", recent: 0 }));
+  const parent = m.el.querySelector(".hm-sb-li.is-parent");
+  assert.ok(parent, "the parent row has a fold");
+  assert.equal(parent.querySelector(".hm-sb-row").getAttribute("data-id"), "/editors");
+  assert.deepEqual(parent.querySelectorAll(".hm-sb-sublist .hm-sb-row").map((r) => r.getAttribute("data-id")), ["/editors/terminal", "/editors/json"]);
+  assert.equal(m.el.querySelector(".hm-sb-count").textContent, "2", "the group counts top-level items");
+  const btn = parent.querySelector(".hm-sb-kids-btn");
+  assert.equal(btn.getAttribute("aria-expanded"), "false");
+  assert.equal(parent.querySelector(".hm-sb-kids").hasAttribute("inert"), true, "a closed fold is out of the tab order");
+  btn.click();
+  assert.equal(btn.getAttribute("aria-expanded"), "true");
+  key(parent.querySelector(".hm-sb-row"), "ArrowLeft");
+  assert.equal(btn.getAttribute("aria-expanded"), "false", "← closes the fold");
+  m.dispose();
+});

@@ -43,6 +43,8 @@ export interface NavSidebarItem {
   keywords?: string;
   can?: PermCheck;
   hidden?: MaybeFn<boolean | undefined>;
+  /** Id of the item this one sits under: listed indented below it, folding with it (opens by itself while active). */
+  parent?: string;
 }
 
 export interface NavSidebarProps {
@@ -125,9 +127,15 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const navId = uid("hm-sb");
   let searchEl: HTMLInputElement | undefined, navEl: HTMLElement | undefined;
 
+  // nested items: children by their parent's id (a parent that is not in the list leaves its children at the top)
+  const kidsOf = computed(() => {
+    const ids = new Set(items().map((x) => x.id)), m = new Map<string, NavSidebarItem[]>();
+    for (const x of items()) if (x.parent && x.parent !== x.id && ids.has(x.parent)) { let l = m.get(x.parent); if (!l) m.set(x.parent, l = []); l.push(x); }
+    return m;
+  });
   const groups = computed(() => {
     const map = new Map<string, NavSidebarItem[]>();
-    for (const x of items()) { const g = x.group ?? ""; if (!g) continue; let l = map.get(g); if (!l) map.set(g, l = []); l.push(x); }
+    for (const x of items()) { const g = x.group ?? ""; if (!g || (x.parent && kidsOf().has(x.parent))) continue; let l = map.get(g); if (!l) map.set(g, l = []); l.push(x); }
     const byText = (a: NavSidebarItem, b: NavSidebarItem): number => compareText(text(a.label), text(b.label));
     let out = [...map].map(([name, list]) => ({ name, items: props.itemOrder === "none" ? list : [...list].sort(byText) }));
     const order = props.groupOrder ?? "alpha";
@@ -135,7 +143,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
     else if (Array.isArray(order)) out = out.sort((a, b) => { const i = order.indexOf(a.name), j = order.indexOf(b.name); return (i < 0 ? 1e9 : i) - (j < 0 ? 1e9 : j); });
     return out;
   });
-  const loose = computed(() => items().filter((x) => !x.group));
+  const loose = computed(() => items().filter((x) => !x.group && !(x.parent && kidsOf().has(x.parent))));
 
   const active = computed(() => {
     const p = path();
@@ -148,6 +156,19 @@ export function NavSidebar(props: NavSidebarProps): Element {
     return best?.id ?? chosen();
   });
   const activeGroup = (): string | undefined => { const id = active(); return id ? byId().get(id)?.group : undefined; };
+  /** A parent's children show while it is opened, or by themselves while it or one of them is the current page. */
+  const kidsOpen = (id: string): boolean => {
+    const s = open();
+    if (s.has(`>${id}`)) return true;
+    if (s.has(`<${id}`)) return false;
+    const a = active();
+    return a === id || (!!a && (kidsOf().get(id) ?? []).some((k) => k.id === a));
+  };
+  const toggleKids = (id: string): void => {
+    const to = !kidsOpen(id);
+    open.update((s) => { const n = new Set(s); n.delete(`>${id}`); n.delete(`<${id}`); n.add(`${to ? ">" : "<"}${id}`); return n; });
+    persist();
+  };
 
   // first visit: open the requested categories; always open the category of the current page; remember visits
   if (firstVisit && props.defaultOpen === "all") open.set(new Set(untrack(groups).map((g) => g.name)));
@@ -220,7 +241,16 @@ export function NavSidebar(props: NavSidebarProps): Element {
     const el = x.href && !x.onSelect
       ? h(Link, { ...common, href: x.href, children: body })
       : h("button", { ...common, type: "button", onClick: () => { if (!x.href) chosen.set(x.id); x.onSelect?.(); if (x.href) void navigate(x.href); } }, body);
-    return h("li", { class: "hm-sb-li" }, el);
+    const kids = where === "group" || where === "main" ? kidsOf().get(x.id) : undefined;
+    if (!kids?.length) return h("li", { class: "hm-sb-li" }, el);
+    const kid = uid("hm-sbk");
+    return h("li", { class: () => cx("hm-sb-li", "is-parent", kidsOpen(x.id) && "is-kids-open") },
+      el,
+      h("button", { type: "button", class: "hm-sb-kids-btn", tabindex: "-1", "aria-expanded": () => String(kidsOpen(x.id)), "aria-controls": kid,
+        "aria-label": () => (kidsOpen(x.id) ? t`Hide pages under ${text(x.label)}` : t`Show pages under ${text(x.label)}`), onClick: () => toggleKids(x.id) },
+        glyph(chevronRight)),
+      h("div", { class: "hm-sb-kids", id: kid, inert: () => !kidsOpen(x.id) },
+        h("ul", { class: "hm-sb-list hm-sb-sublist" }, kids.map((k) => row(k, "child")))));
   };
   const sectionHead = (label: () => string, ic: unknown, extra?: unknown): Element =>
     h("div", { class: "hm-sb-section" }, icon(ic, "hm-icon hm-sb-section-icon"), h("span", { class: "hm-sb-section-label" }, label), extra ?? null);
@@ -281,6 +311,20 @@ export function NavSidebar(props: NavSidebarProps): Element {
     else if (e.key === "ArrowUp") { if (i === 0) { e.preventDefault(); searchEl?.focus(); } else go(i - 1); }
     else if (e.key === "Home") go(0);
     else if (e.key === "End") go(list.length - 1);
+    // nested items: → opens a parent's children, ← closes them, or goes from a child back to its parent
+    else if ((e.key === "ArrowRight" || e.key === "ArrowLeft") && target.closest(".is-parent, .hm-sb-sublist")) {
+      const li = target.parentElement, id = target.dataset["id"] ?? "";
+      if (li?.classList.contains("is-parent") && target.dataset["where"] !== "child") {
+        if (e.key === "ArrowRight") { e.preventDefault(); if (!kidsOpen(id)) toggleKids(id); else list[i + 1]?.focus(); return; }
+        if (kidsOpen(id)) { e.preventDefault(); toggleKids(id); return; }
+      } else if (e.key === "ArrowLeft") {
+        const up = target.closest(".is-parent")?.querySelector<HTMLElement>(":scope > .hm-sb-row");
+        if (up) { e.preventDefault(); up.focus(); return; }
+      }
+      if (e.key === "ArrowRight") return;
+      const g = target.closest(".hm-sb-group")?.querySelector<HTMLElement>(".hm-sb-gbtn");
+      if (g) { e.preventDefault(); g.focus(); }
+    }
     else if (e.key === "ArrowRight" && target.dataset["group"]) { e.preventDefault(); if (!open.peek().has(target.dataset["group"])) toggle(target.dataset["group"], true); else list[i + 1]?.focus(); }
     else if (e.key === "ArrowLeft") {
       const g = target.dataset["group"] ?? target.closest(".hm-sb-group")?.querySelector<HTMLElement>(".hm-sb-gbtn")?.dataset["group"];

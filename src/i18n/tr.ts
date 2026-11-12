@@ -374,6 +374,8 @@ const tr: Record<string, string> = {
   "System": "Sistem",
   "Categories": "Kategoriler",
   "Expand all": "Tümünü aç",
+  "Show pages under {0}": "{0} altındaki sayfaları göster",
+  "Hide pages under {0}": "{0} altındaki sayfaları gizle",
   "Collapse all": "Tümünü kapat",
   "Search or ask…": "Ara ya da sor…",
   "Search the menu": "Menüde ara",
