@@ -1,6 +1,6 @@
 // Showcase stage for BottomNav: a phone-width frame with the bar at the bottom, for the Playground values (playground.ts).
 import { BottomNav, type BottomNavItem } from "./index.ts";
-import { home, compass, message, bell, user, calendar } from "../../icons/index.ts";
+import { home, compass, message, bell, user, calendar } from "../../../icons/index.ts";
 
 export const code = `<BottomNav value={$tab} onChange={(id) => $tab = id} onCreate={compose} items={[
   { id: "home", label: "Akış", icon: home },

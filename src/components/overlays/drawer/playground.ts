@@ -1,4 +1,4 @@
-import { definePlayground } from "../meta.ts";
+import { definePlayground } from "../../meta.ts";
 
 interface Values { side: string; modal: boolean; snap: string; size: string; dragToClose: boolean }
 

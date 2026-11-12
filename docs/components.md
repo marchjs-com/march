@@ -16,7 +16,7 @@ The mobile tab bar: a colored bubble slides to the active tab, tabs carry count 
 <BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />
 ```
 
-Full page: src/components/bottom-nav/docs.md
+Full page: src/components/composite/bottom-nav/docs.md
 
 ## Chip
 
@@ -38,7 +38,7 @@ Full page: src/components/chip/docs.md
 
 ```
 
-Full page: src/components/drawer/docs.md
+Full page: src/components/overlays/drawer/docs.md
 
 ## PullToRefresh
 
@@ -48,4 +48,4 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 <PullToRefresh onRefresh={() => api.get("/feed").then((x) => $items = x)}>…</PullToRefresh>
 ```
 
-Full page: src/components/pull-to-refresh/docs.md
+Full page: src/components/feedback/pull-to-refresh/docs.md

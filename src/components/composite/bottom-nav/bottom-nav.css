@@ -1,4 +1,4 @@
-/* HADI March — BottomNav (src/components/bottom-nav). Theme tokens, logical properties; the bubble slide, icon pop and
+/* HADI March — BottomNav (src/components/composite/bottom-nav). Theme tokens, logical properties; the bubble slide, icon pop and
    ring turn come from the motion engine (no keyframes here). */
 .hm-bnav { container-type: inline-size; display: block; padding: 0 var(--hm-space-3) var(--hm-space-3); }
 .hm-bnav-flat { padding: 0; }

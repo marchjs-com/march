@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom } from "../../testing/dom.ts";
+import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
-const { h, render, signal } = await import("../../index.ts");
+const { h, render, signal } = await import("../../../index.ts");
 const { Drawer } = await import("./index.ts");
-const { layers } = await import("../../dom/portal.ts");
+const { layers } = await import("../../../dom/portal.ts");
 const tick = () => new Promise((r) => setTimeout(r, 0));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); return render(fn, el); };
 const panelOf = () => document.querySelector(".hm-sheet");

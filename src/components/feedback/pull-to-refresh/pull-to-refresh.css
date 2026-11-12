@@ -1,4 +1,4 @@
-/* HADI March — PullToRefresh (src/components/pull-to-refresh). The element is the scroll area; the indicator sits above
+/* HADI March — PullToRefresh (src/components/feedback/pull-to-refresh). The element is the scroll area; the indicator sits above
    the content and follows the pull. Movement comes from the motion engine (no keyframes here). */
 .hm-ptr { position: relative; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
 .hm-ptr.is-pulling { user-select: none; cursor: grabbing; }

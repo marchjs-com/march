@@ -1,4 +1,4 @@
-import { definePlayground } from "../meta.ts";
+import { definePlayground } from "../../meta.ts";
 
 interface Values { threshold: number; delay: number; disabled: boolean }
 

@@ -1,4 +1,4 @@
-import { definePlayground } from "../meta.ts";
+import { definePlayground } from "../../meta.ts";
 
 interface Values { count: number; create: boolean; labels: boolean; variant: string; tint: string; badges: boolean }
 
