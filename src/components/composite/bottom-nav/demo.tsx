@@ -1,5 +1,6 @@
 // Showcase stage for BottomNav: a phone-width frame with the bar at the bottom, for the Playground values (playground.ts).
 import { BottomNav, type BottomNavItem } from "./index.ts";
+import { OverlayScope } from "../../layout/overlay-scope/index.ts";
 import { home, compass, message, bell, user, calendar, image, film, radio, barChart } from "../../../icons/index.ts";
 
 export const code = `<BottomNav value={$tab} onChange={(id) => $tab = id} onCreate={compose}   // long press: compose at once
@@ -37,7 +38,8 @@ export default function BottomNavDemo(props: { values: { count: number; create: 
   let $created = 0
   let $last = ""
   const label = (id: string) => ALL.find((x) => x.id === id)?.label ?? id
-  return <div class="sc-bnav-frame">
+  // the frame is an OverlayScope: the Create menu (and its dimmed backdrop) opens inside the phone-sized frame
+  return <OverlayScope class="sc-bnav-frame">
     <div class="sc-bnav-page" aria-live="polite">{() => `${label($tab)}${$last ? ` · ${$last} seçildi` : $created ? ` · ${$created} kez oluşturuldu` : ""}`}</div>
     {() => {
       const v = props.values
@@ -53,5 +55,5 @@ export default function BottomNavDemo(props: { values: { count: number; create: 
         onAction={(id) => { $last = ACTIONS.find((a) => a.id === id)?.label ?? id }}
         labels={v.labels} variant={v.variant as "floating"} tint={v.tint as "brand"} />
     }}
-  </div>
+  </OverlayScope>
 }
