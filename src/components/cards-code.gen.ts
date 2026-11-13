@@ -5,7 +5,7 @@ export const code: Record<string, string> = {
   "feedback/alert": "<Alert tone=\"warn\" title=\"Quota\" dismissable onDismiss={() => track(\"quota\")}>90% of the storage is used this month.</Alert>",
   "layout/app-shell": "<AppShell nav={<NavMenu items={items} />} top={<UpdateBanner />} header={<PageTitle />}>\n  <Outlet />\n</AppShell>",
   "data/badge": "<Badge tone=\"success\">Active</Badge>\n<Badge tone=\"warn\" dot>Pending</Badge>\n<Badge count={unread} label=\"unread\" />",
-  "composite/bottom-nav": "<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />",
+  "composite/bottom-nav": "",
   "layout/bottom-right-controls": "import { addCornerControl, BottomRightControls, CornerControls } from \"hadi-march/layout\";\n\nconst off = addCornerControl(\"bottom-end\", <button>Geri bildirim</button>, 10)  // lower order = nearer the edge\noff()                                                                           // also on component cleanup\n<CornerControls corner=\"top-end\" />   // render a corner yourself (else it is made on first use)",
   "navigation/breadcrumbs": "<Breadcrumbs label=\"File path\" items={[\n  { id: \"hadi\", label: \"hadi\", icon: folder, onSelect: () => openFolder(\"hadi\") },\n  { id: \"src\", label: \"src\", icon: folder, siblings: () => folders(\"hadi\") },\n  { id: \"file\", label: \"app.ts\", icon: fileText },\n]} />",
   "actions/button": "<Button variant=\"primary\" icon={plus}>New project</Button>\n<Button loading={$saving} on:click={save}>Save</Button>\n<Button href=\"/docs\" iconEnd={arrowRight}>Docs</Button>\n<ActionButton action={remove} args={[row]} />",

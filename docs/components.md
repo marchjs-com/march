@@ -281,12 +281,12 @@ Full page: src/components/data/badge/docs.md
 
 ## BottomNav
 
-The mobile tab bar: a colored bubble slides to the active tab, tabs carry count or dot badges, and an optional raised Create button in the middle wears a slowly turning ring of the four HADİ colors (Heyecan, Aktivite, Dostluk, İletişim).
+
 
 Composed of: [Badge](#badge), [OverflowText](#overflowtext)
 
 ```tsx
-<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />
+
 ```
 
 Full page: src/components/composite/bottom-nav/docs.md
