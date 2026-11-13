@@ -13,7 +13,10 @@ test("menu pages, loaders and page files match", () => {
   const src = readFileSync(SRC + "nav.ts", "utf8");
   const at = src.indexOf("export const SUB_PAGES");
   const top = [...src.slice(0, at).matchAll(/path: "([^"]+)"/g)].map((m) => m[1]);
-  const subs = [...src.slice(at).matchAll(/path: "([^"]+)"/g)].map((m) => m[1]);
+  // …and the topics of the sections with one page per topic (topics.ts: "/motion": [{ slug: "svg" … }])
+  const topics = [...readFileSync(SRC + "topics.ts", "utf8").matchAll(/^  "(\/[\w-]+)": \[([\s\S]*?)^  \],/gm)]
+    .flatMap((m) => [...m[2].matchAll(/slug: "([^"]+)"/g)].map((k) => `${m[1]}/${k[1]}`));
+  const subs = [...src.slice(at).matchAll(/path: "([^"]+)"/g)].map((m) => m[1]).concat(topics);
   const file = (p) => `${SRC}pages/${p.slice(1) || "home"}.tsx`;
   const own = subs.filter((p) => existsSync(file(p)));
   for (const p of subs) assert.ok(existsSync(file(p)) || existsSync(file(p.slice(0, p.lastIndexOf("/")))), `${file(p)} or its parent page`);

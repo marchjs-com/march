@@ -1205,15 +1205,12 @@ Full page: src/components/navigation/nav-menu/docs.md
 
 ## NavSidebar
 
-The app's side menu: categories that open and close, a typo-tolerant search over every item, recent visits and featured items at the top, a collapsible icon rail and a resizable width, all remembered per user. Items are links (router `Link`), so the current page is marked and the menu follows navigation.
+
 
 Composed of: [OverflowText](#overflowtext), Link
 
 ```tsx
-<NavSidebar title="HADİ" items={[
-  { id: "/orders", label: "Orders", href: "/orders", group: "Sales", icon: cart, badge: () => $open },
-  { id: "/users", label: "Users", href: "/users", group: "Admin", can: "users.read" },
-]} collapsible resizable groupOrder={["Sales", "Admin"]} />
+
 ```
 
 Full page: src/components/composite/nav-sidebar/docs.md

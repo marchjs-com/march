@@ -26,9 +26,9 @@ for (const file of walk(PAGES)) {
   const path = rel === "home" ? "/" : `/${rel}`;
   const src = readFileSync(file, "utf8");
   const page = /export const title = "([^"]+)"/.exec(src)?.[1] ?? navTitle(path) ?? rel;
-  // a section with one page per topic (<Hub base="/editors" … render={RENDER}>): a demo inside the `"slug": () =>`
+  // a section with one page per topic (<Hub section="/editors" … render={RENDER}>): a demo inside the `"slug": () =>`
   // entry before it belongs to that topic's page (/editors/terminal)
-  const hub = /<Hub\s+base="([^"]+)"/.exec(src)?.[1];
+  const hub = /<Hub\s+section="([^"]+)"/.exec(src)?.[1];
   const keys = hub ? [...src.matchAll(/^\s+"([a-z0-9-]+)": \(\) =>/gm)].map((k) => ({ at: k.index, slug: k[1] })) : [];
   for (const m of src.matchAll(/<(ComponentDemo|Demo)\b([^>]*?)\/?>/gs)) {
     const key = keys.filter((k) => k.at < m.index).pop();

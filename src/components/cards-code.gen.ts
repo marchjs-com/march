@@ -78,7 +78,7 @@ export const code: Record<string, string> = {
   "actions/menu": "<Menu label=\"Actions\" icon={more} items={[{ label: \"Edit\", icon: edit, shortcut: \"E\", onSelect: edit }, \"-\", remove]} args={[row]} />\n<Dropdown label=\"Filters\">{(close) => <FilterForm onDone={close} />}</Dropdown>",
   "forms/multi-select": "<Field label=\"Languages\"><MultiSelect bind:value={$langs} options={[{ value: \"tr\", label: \"Turkish\" }, { value: \"en\", label: \"English\" }]} /></Field>",
   "navigation/nav-menu": "<NavMenu brand={<Brand />} items={[\n  { id: \"inbox\", title: \"Inbox\", href: \"/inbox\", icon: inbox, badge: () => $unread },\n  { id: \"users\", title: \"Users\", href: \"/users\", icon: users, group: \"Admin\" },\n]} />",
-  "composite/nav-sidebar": "<NavSidebar title=\"HADİ\" items={[\n  { id: \"/orders\", label: \"Orders\", href: \"/orders\", group: \"Sales\", icon: cart, badge: () => $open },\n  { id: \"/users\", label: \"Users\", href: \"/users\", group: \"Admin\", can: \"users.read\" },\n]} collapsible resizable groupOrder={[\"Sales\", \"Admin\"]} />",
+  "composite/nav-sidebar": "",
   "landing/newsletter": "<Newsletter title=\"Stay in the loop\" lead=\"One email a month.\"\n  onSubmit={(email) => api.subscribe(email)} note=\"Unsubscribe any time.\" />",
   "forms/number-input": "<Field label=\"Quantity\"><NumberInput bind:value={$n} min={0} max={99} /></Field>\n<Field label=\"Price\"><MoneyInput bind:value={$price} currency=\"EUR\" /></Field>\n<Field label=\"Discount\"><PercentInput bind:value={$rate} /></Field>",
   "typography/overflow-text": "<OverflowText text={title} />\n<Marquee text=\"New: dark theme · faster search · RTL\" separator=\"✦\" />",
