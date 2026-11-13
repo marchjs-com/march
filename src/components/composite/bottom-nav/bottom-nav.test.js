@@ -63,3 +63,29 @@ test("BottomNav: count and dot badges, labels off keep the accessible name, link
   assert.ok(m.el.querySelector(".hm-bnav-bubble").classList.contains("is-hidden"));
   m.dispose();
 });
+
+test("BottomNav: the Create menu opens on the layer stack, picks an action, Escape closes it", async () => {
+  const picked = [], ran = [];
+  const actions = [{ id: "post", label: "Post", run: () => ran.push("post") }, { id: "story", label: "Story" }, { id: "live", label: "Live", disabled: true }];
+  for (const look of ["fan", "stack", "sheet"]) {
+    const m = mount(() => h(BottomNav, { items: ITEMS, value: "home", createActions: actions, createMenu: look, createTitle: "Create", onAction: (id) => picked.push(id) }));
+    const btn = m.el.querySelector(".hm-bnav-create");
+    assert.equal(btn.getAttribute("aria-haspopup"), "menu");
+    assert.equal(btn.getAttribute("aria-expanded"), "false");
+    btn.click();
+    assert.equal(btn.getAttribute("aria-expanded"), "true");
+    const menu = document.querySelector(`.hm-bnav-actions.is-${look}`);
+    assert.ok(menu, `${look}: the menu opened`);
+    assert.equal(menu.getAttribute("role"), "menu");
+    assert.equal(menu.querySelectorAll("[role=menuitem]").length, 3);
+    assert.ok(!m.el.contains(menu), "the menu is on the layer stack, not inside the bar");
+    if (look === "fan") menu.querySelector("[role=menuitem]").click();
+    else menu.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await new Promise((r) => setTimeout(r, 220));
+    assert.equal(document.querySelector(`.hm-bnav-actions.is-${look}`), null, `${look}: closed`);
+    assert.equal(btn.getAttribute("aria-expanded"), "false");
+    m.dispose();
+  }
+  assert.deepEqual(picked, ["post"]);
+  assert.deepEqual(ran, ["post"]);
+});

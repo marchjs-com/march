@@ -40,3 +40,47 @@
 .hm-bnav-ring { position: absolute; inset: 0; border-radius: 50%; background: var(--hm-bnav-ring, var(--hm-brand-gradient)); }
 .hm-bnav-core { position: absolute; inset: 0.25rem; display: grid; place-items: center; border-radius: 50%; background: var(--hm-surface-raised); }
 .hm-bnav-core .hm-bnav-glyph { width: 1.75rem; height: 1.75rem; }
+
+/* ---------- the Create menu (actions.ts): a layer over the page (or over the OverlayScope it opened in) */
+.hm-bnav-create .hm-bnav-core { transition: rotate var(--hm-dur) var(--hm-ease-spring, var(--hm-ease)); }
+.hm-bnav-create.is-open .hm-bnav-core { rotate: 45deg; }
+.hm-bnav-menu { position: fixed; inset: 0; }
+.hm-bnav-scrim { position: absolute; inset: 0; background: color-mix(in srgb, var(--hm-bg) 55%, transparent); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.hm-bnav-actions { position: absolute; outline: none; }
+.hm-bnav-action { position: relative; display: flex; align-items: center; gap: var(--hm-space-3); padding: 0; border: 0; background: none; color: var(--hm-text); font: inherit; cursor: pointer; text-align: start; }
+.hm-bnav-action:disabled { opacity: .45; cursor: default; }
+.hm-bnav-action:focus-visible { outline: none; }
+.hm-bnav-action:focus-visible .hm-bnav-action-icon { box-shadow: 0 0 0 3px var(--hm-surface), 0 0 0 5px var(--hm-focus, var(--hm-primary)); }
+.hm-bnav-action-icon { display: grid; place-items: center; flex: none; inline-size: 3rem; block-size: 3rem; border-radius: 50%;
+  background: var(--hm-accent, var(--hm-primary)); color: var(--hm-on-accent, var(--hm-on-primary-fill, white)); box-shadow: var(--hm-shadow-3, var(--hm-shadow-2)); }
+.hm-bnav-action-icon .hm-bnav-glyph { inline-size: 1.375rem; block-size: 1.375rem; }
+.hm-bnav-action-text { display: flex; flex-direction: column; min-inline-size: 0; }
+.hm-bnav-action-label { font-weight: var(--hm-weight-semibold); font-size: var(--hm-text-sm); }
+.hm-bnav-action-desc { color: var(--hm-muted); font-size: var(--hm-text-xs); }
+.hm-bnav-action-badge { position: absolute; inset-block-start: -.25rem; inset-inline-start: 2.25rem; min-inline-size: 1.125rem; padding-inline: .3rem; border-radius: 999px;
+  background: var(--hm-danger); color: white; font-size: .6875rem; font-weight: 700; line-height: 1.125rem; text-align: center; }
+
+/* fan: round buttons on an arc above the Create button, the label under each */
+.hm-bnav-actions.is-fan { inline-size: 0; block-size: 0; }
+.hm-bnav-actions.is-fan .hm-bnav-action { position: absolute; inset-block-start: -1.5rem; inset-inline-start: -2.5rem; inline-size: 5rem; flex-direction: column; gap: var(--hm-space-1); }
+.hm-bnav-actions.is-fan .hm-bnav-action-text { align-items: center; text-align: center; }
+.hm-bnav-actions.is-fan .hm-bnav-action-label { font-size: var(--hm-text-xs); text-shadow: 0 1px 2px var(--hm-bg); }
+.hm-bnav-actions.is-fan .hm-bnav-action-badge { inset-inline-start: 3.25rem; }
+
+/* stack: pills stacked above the Create button, the first one nearest to it */
+.hm-bnav-actions.is-stack { display: flex; flex-direction: column-reverse; align-items: center; gap: var(--hm-space-2); translate: -50% 0; }
+.hm-bnav-actions.is-stack .hm-bnav-action { padding: .375rem 1rem .375rem .375rem; border-radius: 999px; background: var(--hm-surface); box-shadow: var(--hm-shadow-3, var(--hm-shadow-2)); white-space: nowrap; }
+.hm-bnav-actions.is-stack .hm-bnav-action-icon { inline-size: 2.25rem; block-size: 2.25rem; box-shadow: none; }
+.hm-bnav-actions.is-stack .hm-bnav-action-icon .hm-bnav-glyph { inline-size: 1.125rem; block-size: 1.125rem; }
+
+/* sheet: a list rising from the bottom edge */
+.hm-bnav-actions.is-sheet { inset-inline: 0; inset-block-end: 0; display: flex; flex-direction: column; gap: var(--hm-space-1); max-block-size: 80%; overflow: auto;
+  padding: var(--hm-space-2) var(--hm-space-3) calc(var(--hm-space-4) + env(safe-area-inset-bottom, 0px)); border-start-start-radius: 1.25rem; border-start-end-radius: 1.25rem;
+  background: var(--hm-surface); box-shadow: var(--hm-shadow-4); }
+.hm-bnav-sheet-handle { align-self: center; inline-size: 2.5rem; block-size: .3125rem; margin-block-end: var(--hm-space-2); border-radius: 999px; background: var(--hm-border-strong); }
+.hm-bnav-sheet-title { padding: 0 var(--hm-space-2) var(--hm-space-2); font-size: var(--hm-text-md); }
+.hm-bnav-actions.is-sheet .hm-bnav-action { padding: var(--hm-space-2); border-radius: var(--hm-radius-3); }
+.hm-bnav-actions.is-sheet .hm-bnav-action:hover:not(:disabled), .hm-bnav-actions.is-sheet .hm-bnav-action:focus-visible { background: var(--hm-bg-subtle); }
+.hm-bnav-actions.is-sheet .hm-bnav-action-icon { inline-size: 2.5rem; block-size: 2.5rem; box-shadow: none; }
+.hm-bnav-actions.is-sheet .hm-bnav-action-badge { position: static; margin-inline-start: auto; }
+@media (prefers-reduced-motion: reduce) { .hm-bnav-create .hm-bnav-core { transition: none; } }

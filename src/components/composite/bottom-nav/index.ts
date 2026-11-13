@@ -1,7 +1,7 @@
 // BottomNav (hadi-march/ui): the mobile tab bar. A colored bubble slides to the active tab (motion engine, FLIP), the
 // active icon pops, tabs carry count / dot badges, and an optional raised Create button in the middle wears a slowly
 // turning ring of the four HADİ colors (decorative: it stays still with reduced motion).
-import { effect, untrack, onCleanup } from "../../../core/reactive.ts";
+import { effect, untrack, onCleanup, signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -11,7 +11,10 @@ import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
+import { openCreateMenu, type BottomNavAction, type CreateMenuLook } from "./actions.ts";
 import "./bottom-nav.css";
+
+export type { BottomNavAction, CreateMenuLook };
 
 export interface BottomNavItem {
   id: string;
@@ -34,8 +37,16 @@ export interface BottomNavProps {
   /** Active item id. */
   value: MaybeFn<string | null | undefined>;
   onChange?: ((id: string) => void) | undefined;
-  /** Shows the raised Create button in the middle. */
+  /** Shows the raised Create button in the middle. With `createActions` it runs on a long press (the default action). */
   onCreate?: (() => void) | undefined;
+  /** The Create button opens a menu of these actions (new post, story, live…). Live. */
+  createActions?: MaybeFn<readonly BottomNavAction[] | null | undefined>;
+  /** Look of the Create menu: "fan" (round buttons on an arc, default), "stack" (pills above the button) or "sheet" (a list from the bottom). */
+  createMenu?: MaybeFn<CreateMenuLook | undefined>;
+  /** Title of the Create menu (the sheet's heading and the menu's name). */
+  createTitle?: MaybeFn<string | undefined>;
+  /** Called with the action a person picked (after its own `run`). */
+  onAction?: ((id: string) => void) | undefined;
   createLabel?: MaybeFn<string | undefined>;
   createIcon?: unknown;
   /** Ring colors of the Create button (CSS colors). Default: the four HADİ colors (a theme's brand tokens first). */
@@ -58,7 +69,7 @@ export const HADI_RING: readonly string[] = ["var(--hm-brand-orange, #F2801F)", 
 /** `<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />` */
 export function BottomNav(props: BottomNavProps): Element {
   const items = props.items;
-  const create = props.onCreate != null;
+  const create = props.onCreate != null || props.createActions != null;
   const createAt = create ? Math.floor(items.length / 2) : -1;
   const slots = items.length + (create ? 1 : 0);
   const slotOf = (i: number): number => (create && i >= createAt ? i + 1 : i);
@@ -93,14 +104,45 @@ export function BottomNav(props: BottomNavProps): Element {
   };
 
   const ringColors = props.ring?.length ? props.ring : HADI_RING;
-  const press = (): void => {
-    if (core) animate(core, [{ transform: "rotate(0deg)" }, { transform: "rotate(90deg)" }, { transform: "rotate(0deg)" }], { duration: 420, easing: "easeOutBack", fill: "none" });
+  const actions = (): readonly BottomNavAction[] => val(props.createActions) ?? [];
+  const menuOpen = signal(false);
+  let closeMenu: (() => void) | null = null, held = false, timer: ReturnType<typeof setTimeout> | undefined;
+  const bounce = (): void => {
     const btn = ring?.parentElement;
     if (btn) animate(btn, [{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }], { duration: 420, fill: "none" });
+  };
+  const press = (e: MouseEvent): void => {
+    if (held) { held = false; return; } // a long press already ran the default action
+    if (actions().length) {
+      if (closeMenu) { closeMenu(); return; }
+      bounce();
+      menuOpen.set(true);
+      closeMenu = openCreateMenu(e.currentTarget as HTMLElement, actions(), {
+        look: val(props.createMenu) ?? "fan", title: val(props.createTitle),
+        onPick: (a) => { a.run?.(); props.onAction?.(a.id); },
+        onClose: () => { closeMenu = null; menuOpen.set(false); },
+      });
+      return;
+    }
+    if (core) animate(core, [{ transform: "rotate(0deg)" }, { transform: "rotate(90deg)" }, { transform: "rotate(0deg)" }], { duration: 420, easing: "easeOutBack", fill: "none" });
+    bounce();
     props.onCreate?.();
   };
+  // with a menu, a long press runs the default action (onCreate) at once, as on a phone
+  const hold = (e: PointerEvent): void => {
+    if (!actions().length || !props.onCreate || e.button !== 0) return;
+    clearTimeout(timer);
+    timer = setTimeout(() => { held = true; bounce(); props.onCreate?.(); }, 520);
+  };
+  const release = (): void => clearTimeout(timer);
+  onCleanup(() => { clearTimeout(timer); closeMenu?.(); });
   const createSlot = create && h("div", { class: "hm-bnav-create-slot" },
-    h("button", { type: "button", class: "hm-bnav-create", "aria-label": () => val(props.createLabel) ?? t`Create`, onClick: press },
+    h("button", {
+      type: "button", class: () => cx("hm-bnav-create", menuOpen() && "is-open"), "aria-label": () => val(props.createLabel) ?? t`Create`, onClick: press,
+      "aria-haspopup": () => (actions().length ? "menu" : null), "aria-expanded": () => (actions().length ? String(menuOpen()) : null),
+      onPointerDown: hold, onPointerUp: release, onPointerLeave: release, onPointerCancel: release,
+      onContextMenu: (e: Event) => { if (actions().length && props.onCreate) e.preventDefault(); },
+    },
       h("span", { class: "hm-bnav-ring", "aria-hidden": "true", ref: (x: HTMLElement) => { ring = x; setStyle(x, { "--hm-bnav-ring": `conic-gradient(${[...ringColors, ringColors[0]].join(", ")})` }); } }),
       h("span", { class: "hm-bnav-core", ref: (x: HTMLElement) => { core = x; } }, props.createIcon != null ? icon(props.createIcon, "hm-bnav-glyph") : glyph(plus, "hm-svg hm-bnav-glyph"))));
 
