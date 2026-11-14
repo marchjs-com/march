@@ -5,7 +5,8 @@
 // look, kept in step with the page while it is up, and the paint eats soft holes into the veil until none of it is left.
 //   drip   a thick paint poured at one place along the top: a stream runs down fast, the paint spreads to both
 //          sides in a waving edge of rounded lobes, drips run ahead; a shine along its edge
-//   spray  one nozzle from a random place, strokes in changing directions, each heading for a bare part
+//   spray  a spray can from a random place: a dense core, a mist of fine specks thinning out, splats and drips
+//          (a CSS Paint worklet, spray-worklet.js, served by the app); without it one nozzle in strokes of soft spots
 //   sweep  the nozzle sweeps its row from a random place, then the rows above and below in turn
 //   splat  patches burst out from the pressed point, specks flying ahead
 import { animateEl } from "./env.ts";
@@ -14,6 +15,20 @@ import { clamp, uid } from "../core/util.ts";
 
 export type PaintShape = "drip" | "spray" | "sweep" | "splat";
 export interface PaintOptions { shape: PaintShape; origin?: { x: number; y: number } | null | undefined; duration?: number | undefined }
+
+/**
+ * The spray's paint worklet (spray-worklet.js, served by the app from its own origin): loaded once; until it is in
+ * (or where CSS Paint is missing) "spray" falls back to soft mask spots.
+ */
+let sprayWorklet: Promise<boolean> | null = null, sprayOn = false;
+export function prepareSpray(url: string): Promise<boolean> {
+  const css = (globalThis as { CSS?: { paintWorklet?: { addModule(u: string): Promise<void> }; registerProperty?: (d: object) => void; supports?: (p: string, v: string) => boolean } }).CSS;
+  if (sprayWorklet) return sprayWorklet;
+  if (!css?.paintWorklet || !css.supports?.("mask-image", "paint(m-spray)")) return (sprayWorklet = Promise.resolve(false));
+  // the progress is a typed number, so the browser animates it smoothly (and may paint off the main thread)
+  try { css.registerProperty?.({ name: "--m-spray-t", syntax: "<number>", inherits: false, initialValue: "0" }); } catch { /* registered already */ }
+  return (sprayWorklet = css.paintWorklet.addModule(url).then(() => (sprayOn = true), () => false));
+}
 
 /** One spot of paint: centre, full radius, when it starts (0–1 of the wave) and how long it takes to grow. */
 export interface Spot { x: number; y: number; r: number; at: number; grow: number }
@@ -383,6 +398,12 @@ export async function paintWave(doc: Document, change: () => void, o: PaintOptio
     const st = dripState(w, h);
     runs.push([v, liquidFrames(st, false)]);
     gloss = liquidBody(doc, st, runs);
+  } else if (o.shape === "spray" && sprayOn) {
+    // the worklet sprays from a random place in the middle of the screen: a dense core, a mist of specks thinning out,
+    // splats, drips (spray-worklet.js); only its progress is animated
+    for (const [k, val] of [["mask-image", "paint(m-spray)"], ["mask-size", "100% 100%"], ["--m-spray-x", px(w * (0.3 + 0.4 * Math.random()))],
+      ["--m-spray-y", px(h * (0.3 + 0.35 * Math.random()))], ["--m-spray-seed", String(Math.floor(Math.random() * 1e6))]] as const) v.style.setProperty(k, val);
+    runs.push([v, [{ "--m-spray-t": "0" } as Keyframe, { "--m-spray-t": "1" } as Keyframe]]);
   } else {
     const layers = paintLayers(o.shape, w, h, o.origin);
     masked(v, layers, true);
@@ -395,7 +416,7 @@ export async function paintWave(doc: Document, change: () => void, o: PaintOptio
   cap.seal();
   cap.release(120);
   // the pour takes its time (thick paint); the sprays are quicker
-  const timing = { duration: o.duration ?? (o.shape === "drip" ? 2200 : 1600), easing: "linear", fill: "forwards" as const };
+  const timing = { duration: o.duration ?? (o.shape === "drip" ? 2200 : o.shape === "spray" && sprayOn ? 2000 : 1600), easing: "linear", fill: "forwards" as const };
   const anims = runs.map(([el, frames]) => animateEl(el, frames, timing));
   const done = cap;
   return new Promise<void>((resolve) => {

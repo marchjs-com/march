@@ -106,9 +106,17 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
     lobes, everything slowing as the paint runs out (an ease out); drips run ahead with a heavy round drop; a shine runs
     along the edge. One outline (`dripState`, `liquidPath`), a clip path with the same commands in every keyframe, so
     the browser tweens it. The showcase uses it.
-  - `spray`, `sweep`, `splat` (default 1600 ms): soft mask layers subtracted from a full layer, their sizes and places
-    tweened (`paintLayers`, `paintFrames`, `paintMask`): one nozzle from a random place in strokes of changing
-    direction; a nozzle sweeping row by row; patches bursting out from the pressed point.
+  - `spray` with `worklet` (default 2000 ms): a spray can from a random place in the middle: a dense core with an
+    uneven edge, around it a mist of up to 32 000 fine specks thinning out (each in a fixed place, showing once the
+    band between the core and the front passes it), splats and drips. Drawn by a CSS Paint worklet
+    (`src/motion/spray-worklet.js`, `mask-image: paint(m-spray)` on the veil; only the registered `--m-spray-t` is
+    animated). The app serves the file from its own origin (CSP `script-src 'self'`; the showcase build copies it next
+    to the page) and passes its address: `installThemeWave({ shape: "spray", worklet: "/spray-worklet.js" })`.
+    Without it, or where CSS Paint is missing (Firefox, Safari), `spray` falls back to the soft spots below.
+  - `spray` without a worklet, `sweep`, `splat` (default 1600 ms): soft mask layers subtracted from a full layer, their
+    sizes and places tweened (`paintLayers`, `paintFrames`, `paintMask`): one nozzle from a random place in strokes of
+    changing direction; a nozzle sweeping row by row; patches bursting out from the pressed point.
+  The showcase's choice of shape and length is on Motion › Page transitions (Tema geçişleri, `examples/showcase/src/wave.ts`).
 - `installThemeWave()` puts it around every `setTheme` / `setColorTheme` / `setAccent` (through `setRestyleTransition`
   of hadi-march/ui), so ThemeMenu, ThemePicker, ThemeToggle and AccentPicker all spread from the pressed point (the
   focused control for a key press). It returns the function that turns it off.

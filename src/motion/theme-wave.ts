@@ -24,6 +24,9 @@ export interface ThemeWaveOptions {
   shape?: ThemeWaveShape | undefined;
   /** ms (default 700 for the circle, 2200 for the drip, 1600 for the other painted shapes). */
   duration?: number | undefined;
+  /** The address of spray-worklet.js on your own origin (from hadi-march/src/motion/): the "spray" shape draws with it
+   *  (thousands of fine specks); without it, or where CSS Paint is missing, it sprays soft spots. */
+  worklet?: string | undefined;
   /** CSS easing of the circle (default a fast start with a soft landing). */
   easing?: string | undefined;
 }
@@ -44,7 +47,10 @@ export function themeWave(change: () => void, o: ThemeWaveOptions = {}, taken?: 
   if (from && "getBoundingClientRect" in from) { const r = from.getBoundingClientRect(); x = r.left + r.width / 2; y = r.top + r.height / 2; }
   else if (from) { x = from.x; y = from.y; }
   const shape = o.shape ?? "circle";
-  if (shape !== "circle") return paint().then((m) => m.paintWave(doc, change, { shape, origin: { x, y }, duration: o.duration }, taken as Parameters<typeof m.paintWave>[3]), () => { change(); });
+  if (shape !== "circle") return paint().then(async (m) => {
+    if (shape === "spray" && o.worklet) await m.prepareSpray(o.worklet);
+    return m.paintWave(doc, change, { shape, origin: { x, y }, duration: o.duration }, taken as Parameters<typeof m.paintWave>[3]);
+  }, () => { change(); });
   if (typeof doc.startViewTransition !== "function") { change(); return Promise.resolve(); }
   // far enough to reach the farthest corner
   const reach = Math.hypot(Math.max(x, w - x), Math.max(y, h - y));
@@ -71,7 +77,7 @@ export function installThemeWave(o: Omit<ThemeWaveOptions, "origin"> = {}): () =
   // changes anything (prepare), so the controls showing the choice keep their old state on it
   const painted = !!o.shape && o.shape !== "circle";
   let part: Awaited<ReturnType<typeof paint>> | null = null, taken: { stop(): void } | null = null;
-  if (painted) void paint().then((m) => { part = m; m.prepareVeil(view); }, () => undefined);
+  if (painted) void paint().then((m) => { part = m; m.prepareVeil(view); if (o.shape === "spray" && o.worklet) void m.prepareSpray(o.worklet); }, () => undefined);
   const prepare = (): void => { if (!part || reducedNow() || pausedNow()) return; taken?.stop(); taken = part.captureVeil(view); };
   let last: { x: number; y: number; at: number } | null = null;
   const press = (e: Event): void => { const p = e as PointerEvent; last = { x: p.clientX, y: p.clientY, at: Date.now() }; };
