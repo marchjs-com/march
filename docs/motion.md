@@ -124,7 +124,10 @@ it at once (its layer animations are removed), and a newer navigation replaces a
 ### Micro-interactions (src/motion/micro.ts; magnet, tilt, press in gestures.ts)
 - `use:ripple={{ duration, opacity, center }}` — ink from the press point (Enter / Space: the centre), `currentColor`.
 - `use:hoverParallax={{ depth, tilt, selector }}` — children with `data-depth` shift with the pointer, the container may
-  tilt; leaving springs them back (`spring-wobbly`).
+  tilt; leaving springs them back (`spring-wobbly`). `hold: true` keeps the pose when the pointer leaves and eases to
+  wherever it comes back in (no reset, no jump); `layerTilt` (degrees) also turns every layer about its own centre
+  (give the container a CSS `perspective`); `glare: true` writes the pointer's place inside each layer to
+  `--m-glare-x` / `--m-glare-y` for a glare drawn in CSS (glass cards). A negative `depth` moves layers away from the pointer.
 - `use:press={{ scale, easing }}` — the release can be a spring (`"spring-wobbly"` brings its own duration).
 - `stateMorph(button, "loading" | "success" | "error" | "idle", { confetti, labels })` — narrows to a circle with a
   spinner, draws a check or a cross (error shakes), colours from the tokens via `data-m-state` (motion.css), announces

@@ -1,11 +1,13 @@
 // Micro-interactions on the motion engine (`use:` actions and helpers; transform / opacity / clip-path only):
 //   use:ripple                 ink ripple from the press point (keyboard: from the centre)
 //   use:hoverParallax={{ depth: 12 }}   layers ([data-depth]) shift with the pointer, settle with a spring
+//                              (`hold`: the pose stays when the pointer leaves; `layerTilt`, `glare`: glass cards)
 //   stateMorph(button, "loading" | "success" | "error" | "idle", { confetti: true })   a button morphs through states
 // (magnet, tilt and press live in gestures.ts; this file adds what they do not cover.)
 import { animate, type Playback } from "./engine/playback.ts";
 import { reducedNow } from "./engine/prefs.ts";
 import { frame } from "./env.ts";
+import { onFrame } from "./engine/clock.ts";
 import { drawPath } from "./svg.ts";
 import { listen, setStyle } from "../core/util.ts";
 import { t } from "../core/i18n.ts";
@@ -41,32 +43,72 @@ export function ripple(el: Element, raw?: unknown): () => void {
   });
 }
 
-export interface HoverParallaxOptions { /** Largest shift in px (a layer moves depth × its data-depth). */ depth: number; /** Layer selector. */ selector: string; /** Also tilt the container (degrees). */ tilt: number }
+export interface HoverParallaxOptions {
+  /** Largest shift in px (a layer moves depth × its data-depth); negative: layers move away from the pointer. */
+  depth: number;
+  /** Layer selector. */
+  selector: string;
+  /** Also tilt the container (degrees). */
+  tilt: number;
+  /** Also tilt every layer about its own centre (degrees), under the container's CSS `perspective`. */
+  layerTilt: number;
+  /** Keep the pose when the pointer leaves (no spring back); wherever it comes back in, the layers ease there from that pose. */
+  hold: boolean;
+  /** Write the pointer's place inside each layer to `--m-glare-x` / `--m-glare-y` (px), for a glare drawn in CSS. */
+  glare: boolean;
+}
 
 /** Action: children marked `data-depth="0.2…1"` shift with the pointer (deeper ones more); the container may tilt. */
 export function hoverParallax(el: Element, raw?: unknown): () => void {
   const o = obj<HoverParallaxOptions>(raw);
-  const depth = o.depth ?? 14, tiltDeg = o.tilt ?? 0, sel = o.selector ?? "[data-depth]";
+  const depth = o.depth ?? 14, tiltDeg = o.tilt ?? 0, layerTilt = o.layerTilt ?? 0, hold = !!o.hold, sel = o.selector ?? "[data-depth]";
   const h = el as HTMLElement;
-  let px = 0, py = 0, pending = false, inside = false;
+  // px / py: where the pointer is (−0.5…0.5); cx / cy: the pose drawn (with `hold` it eases toward the pointer)
+  let px = 0, py = 0, cx = 0, cy = 0, mx = 0, my = 0, pending = false, inside = false, stopEase: (() => void) | null = null;
   const settle: Playback[] = [];
   const layers = (): HTMLElement[] => Array.from(h.querySelectorAll<HTMLElement>(sel));
+  const pose = (x: number, y: number): void => {
+    const list = layers();
+    // read every box first, then write (no layout between the writes)
+    const boxes = o.glare ? list.map((l) => l.getBoundingClientRect()) : null;
+    list.forEach((l, i) => {
+      const d = Number(l.dataset.depth ?? 1) * depth;
+      const turn = layerTilt ? ` rotateX(${(-y * layerTilt).toFixed(2)}deg) rotateY(${(x * layerTilt).toFixed(2)}deg)` : "";
+      setStyle(l, { transform: `translate3d(${(x * d).toFixed(2)}px, ${(y * d).toFixed(2)}px, 0)${turn}` });
+      if (boxes) { const r = boxes[i]!; setStyle(l, { "--m-glare-x": `${Math.round(mx - r.left)}px`, "--m-glare-y": `${Math.round(my - r.top)}px` }); }
+    });
+    if (tiltDeg) setStyle(h, { transform: `perspective(900px) rotateX(${(-y * tiltDeg).toFixed(2)}deg) rotateY(${(x * tiltDeg).toFixed(2)}deg)` });
+  };
   const write = (): void => {
     pending = false;
     if (!inside) return;
-    for (const l of layers()) { const d = Number(l.dataset.depth ?? 1) * depth; setStyle(l, { transform: `translate3d(${(px * d).toFixed(2)}px, ${(py * d).toFixed(2)}px, 0)` }); }
-    if (tiltDeg) setStyle(h, { transform: `perspective(900px) rotateX(${(-py * tiltDeg).toFixed(2)}deg) rotateY(${(px * tiltDeg).toFixed(2)}deg)` });
+    cx = px; cy = py;
+    pose(cx, cy);
+  };
+  // hold: the pose follows the pointer on the motion clock, so a pointer that comes in somewhere else never makes it jump
+  const ease = (): void => {
+    if (stopEase) return;
+    stopEase = onFrame((_t, dt) => {
+      const k = 1 - Math.exp(-Math.min(dt, 64) / 110);
+      cx += (px - cx) * k; cy += (py - cy) * k;
+      const done = Math.abs(px - cx) < 0.002 && Math.abs(py - cy) < 0.002;
+      if (done) { cx = px; cy = py; stopEase?.(); stopEase = null; }
+      pose(cx, cy);
+    });
   };
   const move = (e: PointerEvent): void => {
     if (reducedNow()) return;
     if (!inside) { inside = true; for (const s of settle.splice(0)) s.cancel(); }
     const r = h.getBoundingClientRect();
+    mx = e.clientX; my = e.clientY;
     px = (e.clientX - r.left) / (r.width || 1) - 0.5; py = (e.clientY - r.top) / (r.height || 1) - 0.5;
-    if (!pending) { pending = true; frame(write); }
+    if (hold) ease();
+    else if (!pending) { pending = true; frame(write); }
   };
   const leave = (): void => {
     if (!inside) return;
     inside = false;
+    if (hold) return; // the pose stays where the pointer left it
     // spring back from where each layer is (unfilled: the inline transform is cleared first)
     const targets: HTMLElement[] = tiltDeg ? [...layers(), h] : layers();
     for (const l of targets) {
@@ -76,7 +118,7 @@ export function hoverParallax(el: Element, raw?: unknown): () => void {
     }
   };
   const off = listen(h, { pointermove: move, pointerleave: leave });
-  return () => { for (const s of settle.splice(0)) s.cancel(); off(); };
+  return () => { for (const s of settle.splice(0)) s.cancel(); stopEase?.(); stopEase = null; off(); };
 }
 
 // ── state morph ──

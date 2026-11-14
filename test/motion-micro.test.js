@@ -43,6 +43,33 @@ test("hoverParallax: deeper layers move more; leaving clears the inline transfor
   } finally { E.manualClock(false); }
 });
 
+test("hoverParallax hold: the pose stays when the pointer leaves, eases to where it comes back in; layerTilt and glare", async () => {
+  E.manualClock(true);
+  try {
+    const box = rect(document.createElement("div"), 0, 0, 200, 100);
+    const a = rect(document.createElement("span"), 20, 10, 50, 50); a.setAttribute("data-depth", "1");
+    box.append(a); document.body.append(box);
+    const off = M.hoverParallax(box, { depth: 20, hold: true, layerTilt: 10, glare: true });
+    box.dispatchEvent(Object.assign(new Event("pointermove"), { clientX: 200, clientY: 50 }));
+    for (let i = 0; i < 200; i++) E.step(16);
+    const at = a.style.getPropertyValue("transform");
+    assert.equal(at, "translate3d(10.00px, 0.00px, 0) rotateX(0.00deg) rotateY(5.00deg)", "settles on the pointer, layer turned");
+    assert.equal(a.style.getPropertyValue("--m-glare-x"), "180px");
+    assert.equal(a.style.getPropertyValue("--m-glare-y"), "40px");
+    box.dispatchEvent(new Event("pointerleave"));
+    for (let i = 0; i < 120; i++) E.step(16);
+    assert.equal(a.style.getPropertyValue("transform"), at, "nothing resets on leave");
+    // coming back in at the other side: the first frame is still near the old pose (no jump)
+    box.dispatchEvent(Object.assign(new Event("pointermove"), { clientX: 0, clientY: 50 }));
+    E.step(16);
+    const x = Number(/translate3d\(([-\d.]+)px/.exec(a.style.getPropertyValue("transform"))[1]);
+    assert.ok(x < 10 && x > 5, `eases from the held pose (${x})`);
+    for (let i = 0; i < 200; i++) E.step(16);
+    assert.match(a.style.getPropertyValue("transform"), /^translate3d\(-10\.00px/);
+    off(); box.remove();
+  } finally { E.manualClock(false); }
+});
+
 test("stateMorph: loading is busy and round, success sets the state for the token colours, idle restores", () => {
   const b = rect(document.createElement("button"), 0, 0, 160, 40);
   b.textContent = "Kaydet";
