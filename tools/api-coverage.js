@@ -90,12 +90,38 @@ function managerSummary(name, file) {
   return "";
 }
 
-/** Subpaths with their runtime exports (CSS, compiler and testing entries are tools, not app APIs). */
-export function packageApis(root = ROOT) {
+/** Entries of package.json "exports" that are code: [subpath key ("./ui"), target file ("./src/ui/index.ts")]. The
+ *  component wildcard ("./components/*") is opened to the component folders (src/components/<category>/<name>/) that
+ *  have a runtime export no named entry gives: a large component kept out of its category barrel (meta.barrel === false)
+ *  is imported from hadi-march/components/<category>/<name> and is listed under that subpath. Other wildcards (CSS
+ *  files, icon packs) are not app APIs of their own. */
+export function packageEntries(root = ROOT) {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const out = [];
   for (const [sub, target] of Object.entries(pkg.exports)) {
     if (typeof target !== "string" || sub.includes("*") || !/\.(ts|js)$/.test(target)) continue;
+    out.push([sub, target]);
+  }
+  const wild = pkg.exports["./components/*"];
+  if (typeof wild !== "string" || !wild.includes("*")) return out;
+  const key = (at, name) => `${at.file}#${name}`;
+  const given = new Set(out.flatMap(([, target]) => [...runtimeExports(join(root, target))].map(([name, at]) => key(at, name))));
+  const [before, after] = wild.split("*");
+  const base = join(root, before);
+  const dirs = (p) => (existsSync(p) ? readdirSync(p, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort() : []);
+  for (const cat of dirs(base)) for (const name of dirs(join(base, cat))) {
+    const target = `${before}${cat}/${name}${after}`;
+    const file = join(root, target);
+    if (!existsSync(file) || out.some(([, t]) => join(root, t) === file)) continue;
+    if ([...runtimeExports(file)].some(([n, at]) => !given.has(key(at, n)))) out.push([`./components/${cat}/${name}`, target]);
+  }
+  return out;
+}
+
+/** Subpaths with their runtime exports (CSS, compiler and testing entries are tools, not app APIs). */
+export function packageApis(root = ROOT) {
+  const out = [];
+  for (const [sub, target] of packageEntries(root)) {
     if (/^\.\/(compiler|esbuild|register|testing)$/.test(sub)) continue;
     const names = [...runtimeExports(join(root, target))].sort(([a], [b]) => a.localeCompare(b));
     out.push({

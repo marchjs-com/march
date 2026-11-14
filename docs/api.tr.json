@@ -1150,5 +1150,43 @@
   "StatsBand": "Rakam bandı: `<StatsBand items={[{ value: 12000, label: \"ekip\", format: { notation: \"compact\" } }, { value: 99.9, decimals: 1, suffix: \"%\", label: \"çalışma süresi\" }]} />`.",
   "Testimonials": "Kullanıcı yorumları: `<Testimonials variant=\"wall\" items={[{ quote: \"…\", name: \"Ada\", role: \"CTO, HADİ\", rating: 5 }]} />`.",
   "VideoBackground": "Video arka plan: `<VideoBackground src=\"/clip.webm\" poster=\"/clip.jpg\"><h1>…</h1></VideoBackground>`."
+ },
+ "hadi-march/components/composite/theme-editor": {
+  "applyDraft": "Bir taslağı kaydeder ve tüm uygulamayı ona geçirir (setColorTheme).",
+  "contrastAudit": "Bir kipin WCAG denetimleri: metin çiftleri 4,5:1, vurgular ve göstergeler 3:1 ister (WCAG 1.4.11); her hata için bir düzeltme önerilir.",
+  "decodeDraft": "encodeDraft kodundan taslak üretir (kod bir taslak değilse null).",
+  "deriveDark": "Açık renklerden türetilen koyu kip: renk tonlu koyu zemin, okunur metin, korunan vurgular (gerekirse açılır).",
+  "draftCode": "Bir taslağın defineTheme modülü: tanım, CSS'ini yazan derleme adımı ve seçici girdisi.",
+  "draftCss": "Bir taslağın stil dosyası (themeCss); taslak bir yorumda kodlanır, böylece CSS geri içe aktarılabilir.",
+  "draftFromColor": "Tek bir vurgu renginden yeni taslak: o renkle tonlanmış nötr yüzeyler, standart durum renkleri, türetilmiş koyu kip.",
+  "draftFromTheme": "Bir tema tanımının (yerleşik bir hazır tema ya da sizinki) taslağı.",
+  "draftJson": "Taslağı JSON olarak verir.",
+  "draftTokens": "Bir taslağın ek belirteçleri (ThemeDef.tokens): yazı boyutları, satır yükseklikleri, kalınlıklar, mono yazı tipi, köşe yarıçapı adımları, boşluklar, denetim yükseklikleri, gölgeler, kenarlık kalınlığı, süreler, yumuşatmalar ve birincil ton ölçeği.",
+  "draftToTheme": "Bir taslağın ThemeDef'i (defineTheme ile denetlenmiş): renkler, yazı tipleri, köşe yarıçapı ve ek belirteçler.",
+  "draftVars": "Bir taslağın tek kip için CSS değişkenleri; stil dosyasının (themeCss) ayarladığı biçimde, tüm belirteçlerle.",
+  "encodeDraft": "Bir taslağı URL'ye uygun bir koda çevirir (paylaşım bağlantıları, CSS yorumu).",
+  "importTheme": "Yapıştırılan metni içe aktarır: taslak (JSON), ThemeDef (JSON), paylaşım bağlantısı ya da kodu, ya da tema stil dosyası (themeCss / ThemeEditor CSS'i).",
+  "normalizeDraft": "Gevşek veriden eksiksiz ve geçerli bir taslak üretir (eksik ya da hatalı alanlar `base` değerlerini alır); taslak değilse null.",
+  "presetCopy": "Yerleşik bir hazır temanın, kendi kimliği ve adı olan taslağı (\"my-night\", \"Night Blue (copy)\"): çalışma anı teması hiçbir zaman yerleşik bir kimlik almaz.",
+  "presetDraft": "Kimliğiyle yerleşik bir hazır temanın taslağı (bilinmiyorsa HADİ).",
+  "PRESETS": "Yerleşik hazır temalar (HADİ, Classic Cream, Night Blue, Neon, Indigo, Minimal, High Contrast).",
+  "registerDraft": "Bir taslağı ThemePicker / ThemeMenu içinde ayrı bir tema olarak sunar (stil dosyası gerekmez); yeniden çağırmak onu günceller.",
+  "sharedDraft": "Paylaşım bağlantısındaki taslak (bağlantıda yoksa null).",
+  "shareUrl": "`href` adresine, taslağı bir ThemeEditor'da açan bağlantı (`?theme=<code>`; hash rotası olduğu gibi kalır).",
+  "ThemeEditor": "Tema düzenleyici: `<ThemeEditor />`, `<ThemeEditor bind:value={$draft} base=\"night\" storageKey={false} />` (gövdesi ayrı bir parça olarak yüklenir).",
+  "toneScale": "Bir rengin 10 adımlı ton ölçeği: 500'ün altında beyaza doğru açılır, üstünde siyaha doğru koyulaşır.",
+  "typeScale": "Bir taslağın px cinsinden yazı boyutları (2xs … 5xl): taban × oran^adım; adımlar, 1,2 oranı yerleşik ölçeği verecek biçimde ayarlıdır."
+ },
+ "hadi-march/components/data/data-grid": {
+  "DataGrid": "Gruplama, toplam satırları ve seçim içeren veri ızgarası: `<DataGrid rows={rows} columns={[{ key: \"amount\", aggregate: \"sum\" }]} groupBy={[\"region\"]} selectable />`"
+ },
+ "hadi-march/components/data/gantt": {
+  "Gantt": "Görevleri zaman ekseninde çubuklarla gösteren Gantt şeması: `<Gantt tasks={$tasks} scale=\"week\" onChange={(task) => save(task)} />`"
+ },
+ "hadi-march/components/data/scheduler": {
+  "Scheduler": "Etkinliklerin taşınıp oluşturulabildiği takvim: `<Scheduler events={$events} view=\"week\" onChange={(ev, r) => save(ev.id, r)} onCreate={(r) => add(r)} />`"
+ },
+ "hadi-march/components/data/tree-view": {
+  "TreeView": "Tembel yükleme, çoklu seçim, arama ve sürüklemeyle büyük ağaç görünümü: `<TreeView nodes={files} load={(n) => api.children(n.id)} selection=\"multiple\" search={$q} draggable />`"
  }
 }

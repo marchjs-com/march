@@ -10,7 +10,7 @@ import ts from "typescript";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from "node:fs";
 import { join, resolve, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { packageApis } from "./api-coverage.js";
+import { packageApis, packageEntries } from "./api-coverage.js";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const OUT = "examples/showcase/public/api";
@@ -30,6 +30,9 @@ export const MD_PENDING = new Set([
   "hadi-march/seo", "hadi-march/seo/hydrate", "hadi-march/managers/accessibility/ui",
   "hadi-march/managers/shortcut-hint", "hadi-march/managers/shortcut-hint/ui", "hadi-march/dom/safe",
   "hadi-march/dom/sanitize", "hadi-march/dom/to-markdown",
+  // large components outside their category barrel (hadi-march/components/<category>/<name>)
+  "hadi-march/components/composite/theme-editor", "hadi-march/components/data/data-grid",
+  "hadi-march/components/data/gantt", "hadi-march/components/data/scheduler", "hadi-march/components/data/tree-view",
 ]);
 /** Raw bytes per docs file, about (a file is fetched whole: neighbours in package order share one; gzip ≈ 1/4). */
 const GROUP_BYTES = 75_000;
@@ -55,11 +58,9 @@ const tagMap = (tags) => {
 };
 
 export function collect(root = ROOT) {
-  const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const apis = packageApis(root);
   const entries = new Map();
-  for (const [sub, target] of Object.entries(pkg.exports)) {
-    if (typeof target !== "string" || !/\.(ts|js)$/.test(target)) continue;
+  for (const [sub, target] of packageEntries(root)) {
     entries.set(sub === "." ? "hadi-march" : `hadi-march/${sub.slice(2)}`, join(root, target));
   }
   const program = ts.createProgram([...entries.values()], { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler, allowImportingTsExtensions: true, noEmit: true, jsx: ts.JsxEmit.Preserve, skipLibCheck: true, allowJs: true });
