@@ -2,6 +2,7 @@
 // (playground.ts).
 import { setStyle } from "../../../core/util.ts";
 import { effect, untrack, computed, signal } from "../../../core/reactive.ts";
+import { storage } from "../../../managers/storage/index.ts";
 import { FontPicker, type FontChoice, type FontCategory, type FontSort } from "./index.ts";
 import type { Values } from "./playground.ts";
 
@@ -11,6 +12,9 @@ export const code = `<FontPicker bind:value={$font} onPick={(f) => setStyle(card
 
 export default function FontPickerDemo(props: { values: Values }) {
   let $font = "Georgia"
+  // a first visit starts with two recent picks and a favourite (device fonts: nothing is requested), so those groups show
+  const kept = untrack(storage).local
+  if (kept.getSync<string[] | null>("showcase.fonts.recent", null) == null) { kept.setSync("showcase.fonts.recent", ["Georgia", "Trebuchet MS"]); kept.setSync("showcase.fonts.favorites", ["Palatino"]) }
   const choice = signal<FontChoice | null>(null)
   const card = (<div class="sc-fp-card">
     <span class="sc-fp-kicker">Cumartesi · 20.00</span>
