@@ -4,15 +4,15 @@ import { MockApp } from "../demo-kit.tsx";
 import { Counter } from "../counter/index.ts";
 
 export const code = `<ScrollStory steps={[
-  { title: "Tasarla", body: "…", media: <Mock />, color: "brand-orange" },
-  { title: "Kur", body: "…", media: <Chart />, color: "brand-blue" },
+  { title: "Keşfet", body: "…", media: <Map />, color: "brand-orange" },
+  { title: "Katıl", body: "…", media: <Count />, color: "brand-blue" },
 ]} />`
 
 export const STORY: StoryStep[] = [
-  { title: "Tasarla", body: "Blokları seç, temayı ayarla: tek vurgu rengi her şeyi değiştirir.", media: <MockApp class="sc-story-mock" />, color: "brand-orange" },
-  { title: "Kur", body: "Sayfalar tembel parçalar; ilk boyama 15 KB'ın altında kalır.", media: <div class="sc-story-num"><Counter value={14.6} decimals={1} suffix=" KB" /></div>, color: "brand-blue" },
-  { title: "Canlandır", body: "Tek hareket motoru: yalnız transform ve opacity, görünmeyen durur.", media: <div class="sc-story-orbs"><i /><i /><i /></div>, color: "brand-green" },
-  { title: "Yayınla", body: "CSP uyumlu, erişilebilir, her dilde. Bugün yayına al.", media: <div class="sc-story-num"><Counter value={100} suffix="%" /></div>, color: "brand-purple" },
+  { title: "Keşfet", body: "Yakınındaki etkinlikler, ilgi alanına göre: bugün, bu hafta sonu, gelecek ay.", media: <MockApp class="sc-story-mock" />, color: "brand-orange" },
+  { title: "Katıl", body: "Tek dokunuşla yerini ayır; gerekiyorsa biletini al. Kimlerin geleceğini önceden gör.", media: <div class="sc-story-num"><Counter value={12} suffix=" kişi" /></div>, color: "brand-blue" },
+  { title: "Tanış", body: "Etkinlik sohbetinde merhaba de, istersen görüntülü tanış. Buluşmada kimse yabancı kalmaz.", media: <div class="sc-story-orbs"><i /><i /><i /></div>, color: "brand-green" },
+  { title: "Paylaş", body: "Anıları akışta ve hikâyelerde paylaş; yeni arkadaşlarını listene ekle.", media: <div class="sc-story-num"><Counter value={48} suffix=" anı" /></div>, color: "brand-purple" },
 ]
 
 export default function ScrollStoryDemo(props: { values: { side: string; theme: boolean } }) {

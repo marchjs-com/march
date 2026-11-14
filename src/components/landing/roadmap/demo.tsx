@@ -2,17 +2,17 @@
 import { Roadmap, type RoadmapItem } from "./index.ts";
 
 export const code = `<Roadmap items={[
-  { time: "2025 · 1. çeyrek", title: "İlk sürüm", body: "…", status: "done" },
-  { time: "2026 · 3. çeyrek", title: "Ekipler", body: "…", status: "now" },
-  { time: "2027", title: "Eklentiler", body: "…", status: "next" },
+  { time: "Bahar", title: "Tanışma yemekleri", body: "…", status: "done" },
+  { time: "Yaz", title: "Bilet satışı", body: "…", status: "now" },
+  { time: "Sonbahar", title: "Yeni şehirler", body: "…", status: "next" },
 ]} />`
 
 export const ROADMAP: RoadmapItem[] = [
-  { time: "2025 · 1. çeyrek", title: "İlk sürüm", body: "Çekirdek, yönlendirici ve 40 bileşen.", status: "done" },
-  { time: "2025 · 3. çeyrek", title: "Tek hareket motoru", body: "Her animasyon tek saatte; görünmeyen durur.", status: "done" },
-  { time: "2026 · 2. çeyrek", title: "Web sitesi blokları", body: "Hero, fiyatlar, portfolyo ve sunum.", status: "now" },
-  { time: "2026 · 4. çeyrek", title: "Görsel düzenleyici", body: "Blokları sürükle, temayı canlı ayarla.", status: "next" },
-  { time: "2027", title: "Eklenti pazarı", body: "Toplulukların blok ve temaları.", status: "next" },
+  { time: "1. adım", title: "Etkinlik keşfi", body: "Yakınındaki etkinlikler, haritada ve takvimde.", status: "done" },
+  { time: "2. adım", title: "Sohbet ve görüntülü görüşme", body: "Birebir, grup ve etkinlik sohbetleri.", status: "done" },
+  { time: "3. adım", title: "Akış ve hikâyeler", body: "Anıları paylaş, beğen, keşfet.", status: "done" },
+  { time: "Şimdi", title: "Tanışma yemekleri", body: "Ortak ilgi alanı olanlarla aynı masada.", status: "now" },
+  { time: "Sırada", title: "Yeni şehirler", body: "Etkinlikler her ilde, her hafta.", status: "next" },
 ]
 
 export default function RoadmapDemo(props: { values: { badges: boolean; scroll: boolean } }) {

@@ -1,20 +1,20 @@
-// Showcase stage for Testimonials: neutral people and companies.
+// Showcase stage for Testimonials: what people say about HADİ (sample quotes).
 import { Testimonials, type Testimonial } from "./index.ts";
 
 export const code = `<Testimonials variant="wall" items={[
-  { quote: "Bir hafta sonunda yeni sitemiz yayındaydı.", name: "Deniz Arı", role: "Ürün lideri, HADİ", rating: 5 },
+  { quote: "Yeni şehirde ilk arkadaşlarımı bir tanışma yemeğinde buldum.", name: "Deniz Arı", role: "İzmir", rating: 5 },
   …
 ]} />`
 
 export const QUOTES: Testimonial[] = [
-  { quote: "Bir hafta sonunda yeni sitemiz yayındaydı ve ilk boyama yarıya indi.", name: "Deniz Arı", role: "Ürün lideri, HADİ", rating: 5 },
-  { quote: "Hareketler akıcı ama asla abartılı değil. Müşterilerimiz farkı hemen gördü.", name: "Mert Kaya", role: "Tasarım, Northwind", rating: 5 },
-  { quote: "RTL ve çok dil desteği kutudan çıktığı gibi çalıştı; Arapça sürüm bir günde hazırdı.", name: "Leyla Demir", role: "Mühendislik, Orbit", rating: 5 },
-  { quote: "Bloklar birbirine çok iyi uyuyor. Tema rengini değiştirdik, her şey takip etti.", name: "Can Yıldız", role: "Ortak, Kite", rating: 4 },
-  { quote: "Erişilebilirlik denetiminden ilk seferde geçtik.", name: "Ece Tan", role: "Ön yüz, Lumen", rating: 5 },
-  { quote: "Portfolyo şablonunu kendi projelerimle doldurdum, akşam yayındaydı.", name: "Arda Su", role: "Serbest tasarımcı", rating: 5 },
-  { quote: "Fiyat tablosundaki geçiş müşterilerin en çok sevdiği ayrıntı oldu.", name: "Selin Ak", role: "Pazarlama, Quanta", rating: 5 },
-  { quote: "Bağımlılık yok, CSP sorunu yok. Güvenlik ekibimiz ilk kez itiraz etmedi.", name: "Bora Er", role: "Güvenlik, Helix", rating: 5 },
+  { quote: "Yeni şehirde ilk arkadaşlarımı bir tanışma yemeğinde buldum.", name: "Deniz Arı", role: "İzmir", rating: 5 },
+  { quote: "Koşu grubumuzu HADİ'de kurduk; her salı yeni biri katılıyor.", name: "Mert Kaya", role: "Etkinlik düzenleyici, İstanbul", rating: 5 },
+  { quote: "Atölyemin biletlerini ayrı bir siteye gerek kalmadan sattım.", name: "Leyla Demir", role: "Seramik atölyesi, Ankara", rating: 5 },
+  { quote: "Sohbet, akış, etkinlik: telefonumda artık tek uygulama var.", name: "Can Yıldız", role: "Eskişehir", rating: 4 },
+  { quote: "Hafta sonu ne yapsak derdi bitti; yakındakilere bakıp çıkıyoruz.", name: "Ece Tan", role: "Bursa", rating: 5 },
+  { quote: "Etkinlik öncesi görüntülü tanıştık, buluşmada kimse yabancı değildi.", name: "Arda Su", role: "Antalya", rating: 5 },
+  { quote: "Premium'daki filtrelerle tam ilgimi çeken etkinlikleri buluyorum.", name: "Selin Ak", role: "HADİ Premium, İstanbul", rating: 5 },
+  { quote: "Kitap kulübümüzün anılarını hikâyelerde paylaşıyoruz.", name: "Bora Er", role: "Kitap kulübü, Trabzon", rating: 5 },
 ]
 
 export default function TestimonialsDemo(props: { values: { variant: string; cols: number } }) {
