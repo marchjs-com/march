@@ -17,7 +17,7 @@ test("compiler: a constant m:user-select on a native element is a plain attribut
   assert.equal(M_ATTRS["user-select"], ATTR);
   const on = c("const a = <div m:user-select><input /></div>");
   assert.match(on, /\["data-m-user-select",""\]/);
-  assert.match(on, /import "hadi-march\/css\/props\.css";/);
+  assert.ok(on.includes(`import ${JSON.stringify(PROPS)};`), "the module is imported once for its CSS and the text-control guard");
   assert.doesNotMatch(on, /mProps/);
   assert.match(c("const a = <div m:user-select={true}>x</div>"), /\["data-m-user-select",""\]/);
   assert.match(c("const a = <div m:user-select={false}>x</div>"), /\["data-m-user-select","false"\]/);
@@ -92,6 +92,23 @@ export function App() {
     assert.equal(h("div", { "m:tone": "calm" }).getAttribute("data-tone"), "calm");
     assert.throws(() => mProps(h("div", null), { nope: 1 }), /unknown common prop m:nope/);
     assert.equal(mProps(null, { "user-select": true }), null, "nothing rendered: nothing to do");
+
+    // text controls: a selection made inside a blocked subtree collapses to the caret; an open one is left alone
+    const sel = (input, a, b, dir = "forward") => {
+      Object.assign(input, { selectionStart: a, selectionEnd: b, selectionDirection: dir, setSelectionRange(s, e) { this.selectionStart = s; this.selectionEnd = e; } });
+      const ev = new (document.defaultView?.Event ?? Event)("select", { bubbles: true });
+      input.dispatchEvent(ev);
+      return [input.selectionStart, input.selectionEnd];
+    };
+    const blocked = q("#st input");
+    assert.deepEqual(sel(blocked, 2, 7), [7, 7], "collapses to the caret end");
+    assert.deepEqual(sel(blocked, 2, 7, "backward"), [2, 2]);
+    const open = h("input", {});
+    q("#open").appendChild(open);
+    assert.deepEqual(sel(open, 1, 3), [1, 3], "m:user-select={false}: untouched");
+    const outside = h("input", {});
+    root.appendChild(outside);
+    assert.deepEqual(sel(outside, 1, 3), [1, 3], "outside any m:user-select: untouched");
     dispose();
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

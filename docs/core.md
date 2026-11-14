@@ -45,8 +45,10 @@ own props. The list is open; the first member is `m:user-select`.
   subtree selectable again, also inside a blocked ancestor: the nearest `m:user-select` wins. `null` / `undefined`:
   not set.
 - How it compiles: a constant on a native element becomes the attribute `data-m-user-select` in the template (no
-  runtime code; one CSS rule in `hadi-march/css/props.css`, loaded with the first use). A live value, and every
-  component, compile to `mProps(node, { "user-select": value })` from `hadi-march/props`, which sets the attribute on
+  per-element code; `hadi-march/props` is imported once for its CSS rule, `hadi-march/css/props.css`). Page text is
+  blocked by that rule. The text inside `<input>` / `<textarea>` is drawn by the browser's own editor, which ignores
+  the rule, so one document listener collapses a selection made in a blocked text control back to the caret. A live
+  value, and every component, compile to `mProps(node, { "user-select": value })` from `hadi-march/props`, which sets the attribute on
   the element or on each root element of the component's output (a component that returns a live region is followed).
   The component never sees the prop. Content a component renders elsewhere (a dialog or menu in a portal) is not
   inside its root and is not covered: put the prop on that content.
