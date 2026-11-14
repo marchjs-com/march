@@ -1,19 +1,19 @@
 // Showcase stage for NotForYou: who HADİ is not for (and who it is for); mark the lines that apply.
 import { NotForYou, type NotForYouItem } from "./index.ts";
 
-export const code = `<NotForYou check items={[{ text: "Büyük bir konferans düzenliyorsun", detail: "…" }]}
-  forYou={[{ text: "Hafta sonu için plan arıyorsun" }]} />`
+export const code = `<NotForYou check items={[{ text: "Hep aynı beş arkadaşla buluşuyorsun", detail: "…" }]}
+  forYou={[{ text: "Yeni insanlarla tanışmak istiyorsun" }]} />`
 
 export const NOT_FOR_YOU: NotForYouItem[] = [
-  { text: "Bin kişilik bir konferans düzenliyorsun", detail: "Salon, sponsor ve kayıt masası yönetimi için bir etkinlik platformu daha uygun." },
-  { text: "Yalnız iş bağlantısı arıyorsun", detail: "HADİ ortak ilgi alanlarıyla tanışmak için; profesyonel ağ kurmak için başka uygulamalar daha uygun." },
-  { text: "Evden hiç çıkmak istemiyorsun", detail: "Görüntülü görüşme var, ama HADİ'nin asıl amacı insanları gerçek hayatta bir araya getirmek." },
-  { text: "Yalnız içerik izlemek istiyorsun", detail: "Keşfet akışı ve beğeniler var, ama HADİ'de akış bir etkinliğe katılmanın yolu, amacı değil." },
+  { text: "Hep aynı beş arkadaşla buluşuyorsun", detail: "Yeni biri gelmesin istiyorsan bir mesaj grubu sana yeter." },
+  { text: "Tek bir sade sohbet istiyorsun", detail: "HADİ akış, sohbet, etkinlik, tanışma: hepsi bir arada. Sana fazla gelebilir." },
+  { text: "Yeni insanlarla tanışmak istemiyorsun", detail: "HADİ'nin kapısı hep yeni insanlara açık." },
+  { text: "Telefonu az açmak istiyorsun", detail: "Akış, hikâyeler, etkinlik bildirimleri: HADİ'de hep bir şey oluyor." },
 ]
 export const FOR_YOU: NotForYouItem[] = [
-  { text: "Hafta sonu için plan arıyorsun", detail: "Yakınındaki etkinlikleri önceden gör, yerini ayır." },
-  { text: "Yeni bir şehre taşındın", detail: "Ortak ilgi alanları olan insanlarla tanış." },
-  { text: "Kendi buluşmanı kurmak istiyorsun", detail: "Ne, nerede, ne zaman: birkaç adımda." },
+  { text: "Yeni insanlarla tanışmak istiyorsun", detail: "Tanışma yemekleri, ilgi alanına göre gruplar." },
+  { text: "Etkinlik bulmak da kurmak da istiyorsun", detail: "Planlı etkinlikler, takvim, gerekirse bilet." },
+  { text: "Sohbet, akış ve etkinlik tek yerde olsun", detail: "Ayrı ayrı uygulama yerine tek bir HADİ." },
 ]
 
 export default function NotForYouDemo(props: { values: { variant: string; check: boolean; both: boolean } }) {
