@@ -1,8 +1,9 @@
 // Showcase stage for LiveFeed: sample HADİ activity, one new line every couple of seconds.
 import { LiveFeed, type FeedItem } from "./index.ts";
 
-export const code = `<LiveFeed next={() => nextActivity()} every={2400} max={5} />
-<LiveFeed items={$events} variant="wall" live="polite" />   // newest first, pushed from a socket`
+export const code = `<LiveFeed next={() => nextActivity()} every={2400} max={5} enter="drop" leave="fall" />
+<LiveFeed items={$events} variant="wall" live="polite" />   // newest first, pushed from a socket
+<LiveFeed next={next} enter={{ keyframes: { opacity: [0, 1], transform: ["rotate(-6deg) scale(.8)", "none"] }, duration: 500 }} />`
 
 const PEOPLE = ["Elif", "Mert", "Zeynep", "Can", "Deniz", "Ece", "Arda", "Selin", "Bora", "Leyla", "Kerem", "Defne"]
 const CITIES = ["Kadıköy", "Beşiktaş", "Çankaya", "Karşıyaka", "Nilüfer", "Muratpaşa", "Ortahisar", "Tepebaşı"]
@@ -27,8 +28,8 @@ export function activitySource(): () => FeedItem {
   }
 }
 
-export default function LiveFeedDemo(props: { values: { variant: string; every: number; max: number } }) {
+export default function LiveFeedDemo(props: { values: { variant: string; enter: string; leave: string; glow: boolean; every: number; max: number } }) {
   return <div class="sc-lf-stage">
-    {() => { const v = { ...props.values }; return <LiveFeed variant={v.variant as "list" | "wall"} every={v.every} max={v.max} next={activitySource()} label="HADİ'de şimdi" /> }}
+    {() => { const v = { ...props.values }; return <LiveFeed variant={v.variant as "list" | "wall"} enter={v.enter as "flip"} leave={v.leave as "blur"} glow={v.glow} every={v.every} max={v.max} next={activitySource()} label="HADİ'de şimdi" /> }}
   </div>
 }

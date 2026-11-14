@@ -7,14 +7,17 @@
 import "./live-feed.css";
 import { h } from "../../../dom/h.ts";
 import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
-import { t, messages } from "../../../core/i18n.ts";
+import { t, dir, messages } from "../../../core/i18n.ts";
 import { cx, val, listen, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { flip } from "../../../motion/flip.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
+import { FEED_ENTER, FEED_LEAVE, feedMotion, type FeedEnter, type FeedLeave, type FeedMotion } from "./presets.ts";
 import tr from "./tr.ts";
+
+export { FEED_ENTER, FEED_LEAVE, type FeedEnter, type FeedLeave, type FeedMotion };
 
 messages("tr", tr);
 
@@ -47,6 +50,14 @@ export interface LiveFeedProps {
   live?: "off" | "polite" | undefined;
   /** Show the pause button (default true). */
   pausable?: boolean | undefined;
+  /** How a new item arrives: flip (default), slide, fade, pop, drop, zoom, blur, swing, unfold, glide, spin, or your own keyframes. */
+  enter?: FeedEnter | FeedMotion | undefined;
+  /** How the oldest item leaves: blur (default), fade, shrink, fall, slide, dissolve, fold, or your own keyframes. */
+  leave?: FeedLeave | FeedMotion | undefined;
+  /** Accent ring that glows around a new item and fades (default true). */
+  glow?: boolean | undefined;
+  /** The others glide to their new place (default true); false: they jump. */
+  move?: boolean | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -66,8 +77,9 @@ export function LiveFeed(props: LiveFeedProps): Element {
 
   const list = h("ul", { class: "hm-lf-list", role: "list", "aria-live": () => (props.live === "polite" && !paused() ? "polite" : "off"), "aria-relevant": "additions" }) as HTMLElement;
 
-  // one item arrives at the top. Motion: it swings down in 3D out of a blur, a ring of the accent colour glows around it
-  // and fades, its avatar springs in; the others glide one place on (FLIP); the oldest beyond `max` shrinks into a blur
+  // one item arrives at the top with the `enter` motion (default: it swings down in 3D out of a blur), a ring of the accent
+  // colour glows around it and fades, its avatar springs in; the others glide one place on (FLIP); the oldest beyond
+  // `max` leaves with the `leave` motion (default: it shrinks into a blur)
   const add = (it: FeedItem, animated: boolean): void => {
     if (nodes.has(it.id)) return;
     const el = card(it);
@@ -89,17 +101,16 @@ export function LiveFeed(props: LiveFeedProps): Element {
       });
     };
     if (!motion) { mutate(); return; }
-    flip(staying, mutate, { enter: false, duration: 680, easing: "expo" });
+    if (props.move === false) mutate(); else flip(staying, mutate, { enter: false, duration: 680, easing: "expo" });
     flip([el], () => {}, { enter: false });
-    animate(el, wall()
-      ? { opacity: [0, 1], transform: ["perspective(800px) rotateX(-80deg) translateY(-32px) scale(.8)", "perspective(800px) rotateX(0deg) translateY(0px) scale(1)"], filter: ["blur(10px)", "blur(0px)"] }
-      : { opacity: [0, 1], transform: ["perspective(800px) rotateX(-70deg) translateY(-36px)", "perspective(800px) rotateX(0deg) translateY(0px)"], filter: ["blur(8px)", "blur(0px)"] },
-    { duration: 900, easing: "spring" });
+    const ctx = { wall: wall(), rtl: untrack(dir) === "rtl" };
+    const inn = feedMotion(FEED_ENTER, props.enter, "flip", ctx), out = feedMotion(FEED_LEAVE, props.leave, "blur", ctx);
+    animate(el, inn.keyframes as never, { duration: inn.duration ?? 700, easing: inn.easing ?? "out" });
     const glow = el.querySelector(".hm-lf-glow"), avatar = el.querySelector(".hm-lf-avatar, .hm-lf-dot");
-    if (glow) animate(glow, { opacity: [0, 1, 0], transform: ["scale(.96)", "scale(1.02)", "scale(1)"] }, { duration: 2200, easing: "out" });
+    if (glow && props.glow !== false) animate(glow, { opacity: [0, 1, 0], transform: ["scale(.96)", "scale(1.02)", "scale(1)"] }, { duration: 2200, easing: "out" });
     if (avatar) animate(avatar, { transform: ["scale(0) rotate(-40deg)", "scale(1.18) rotate(8deg)", "scale(1) rotate(0deg)"] }, { duration: 760, delay: 160, easing: "out" });
     for (const old of leaving) {
-      void animate(old, { opacity: [1, 0], transform: ["scale(1)", "scale(.72) translateY(12px)"], filter: ["blur(0px)", "blur(8px)"] }, { duration: 480, easing: "in", fill: "forwards" })
+      void animate(old, out.keyframes as never, { duration: out.duration ?? 450, easing: out.easing ?? "in", fill: "forwards" })
         .finished.then(() => old.remove());
     }
   };

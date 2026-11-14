@@ -72,7 +72,7 @@ export const code: Record<string, string> = {
   "social/like-button": "<LikeButton liked={$liked} count={$likes} onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />",
   "forms/list-editor": "<Field label=\"Tags\" group><ListEditor bind:value={$tags} max={10} placeholder=\"Add a tag\" /></Field>",
   "landing/live-counter": "<LiveCounter value={$online} label=\"people online\" />\n<LiveCounter from={18420} rate={40} label=\"joined an event this week\" format={{ notation: \"compact\" }} />",
-  "landing/live-feed": "<LiveFeed next={() => nextActivity()} every={2400} max={5} />\n<LiveFeed items={$events} variant=\"wall\" live=\"polite\" />",
+  "landing/live-feed": "<LiveFeed next={() => nextActivity()} every={2400} max={5} />\n<LiveFeed items={$events} variant=\"wall\" live=\"polite\" />\n<LiveFeed next={next} enter=\"drop\" leave=\"fall\" glow={false} />\n<LiveFeed next={next} enter={{ keyframes: { opacity: [0, 1], transform: [\"rotate(-6deg) scale(.8)\", \"none\"] }, duration: 500 }} />",
   "feedback/loader": "<Loader text=\"Preparing dashboards…\" />",
   "landing/logo-cloud": "<LogoCloud title=\"Trusted by teams at\" variant=\"marquee\" logos={[\n  { name: \"HADİ\", src: \"/logos/hadi.svg\", width: 120, height: 32 },\n  { name: \"Northwind\", node: <NorthwindLogo /> },\n]} />",
   "actions/made-with-march": "<MadeWithMarch />\n<MadeWithMarch variant=\"badge\" />\n<MadeWithMarch variant=\"small\" />",

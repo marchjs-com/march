@@ -1138,11 +1138,13 @@ Full page: src/components/landing/live-counter/docs.md
 
 ## LiveFeed
 
-A living wall: new activity slides in at the top (rows) or pops into the first cell (wall), and the oldest leaves, so the page looks inhabited. Feed it a reactive list (`items`, newest first: from a socket or a store) or a `next()` function the feed calls every `every` ms while it is on screen.
+A living wall: new activity slides in at the top (rows) or pops into the first cell (wall), and the oldest leaves, so the page looks inhabited. Feed it a reactive list (`items`, newest first: from a socket or a store) or a `next()` function the feed calls every `every` ms while it is on screen. It starts full and keeps its size: a leaving item is lifted out of the flow while it fades and wall cards share one height, so the page never shifts.
 
 ```tsx
 <LiveFeed next={() => nextActivity()} every={2400} max={5} />
 <LiveFeed items={$events} variant="wall" live="polite" />
+<LiveFeed next={next} enter="drop" leave="fall" glow={false} />
+<LiveFeed next={next} enter={{ keyframes: { opacity: [0, 1], transform: ["rotate(-6deg) scale(.8)", "none"] }, duration: 500 }} />
 ```
 
 Full page: src/components/landing/live-feed/docs.md

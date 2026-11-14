@@ -8,6 +8,8 @@ lifted out of the flow while it fades and wall cards share one height, so the pa
 ```tsx
 <LiveFeed next={() => nextActivity()} every={2400} max={5} />
 <LiveFeed items={$events} variant="wall" live="polite" />
+<LiveFeed next={next} enter="drop" leave="fall" glow={false} />
+<LiveFeed next={next} enter={{ keyframes: { opacity: [0, 1], transform: ["rotate(-6deg) scale(.8)", "none"] }, duration: 500 }} />
 ```
 
 ## Props
@@ -22,6 +24,15 @@ lifted out of the flow while it fades and wall cards share one height, so the pa
 | `label` | string | "Live activity" | accessible name |
 | `live` | `off` `polite` | `off` | announce new items |
 | `pausable` | boolean | `true` | the Live · pause button |
+| `enter` | preset / `{ keyframes, duration?, easing? }` | `flip` | how a new item arrives |
+| `leave` | preset / `{ keyframes, duration?, easing? }` | `blur` | how the oldest leaves |
+| `glow` | boolean | `true` | accent ring around a new item |
+| `move` | boolean | `true` | the others glide to their new place (FLIP) |
+
+`enter` presets: `flip` (3D swing out of a blur), `slide`, `fade`, `pop` (overshoot), `drop` (falls and bounces),
+`zoom` (from in front), `blur` (sharpens out of a glow), `swing` (hangs and swings), `unfold` (blind), `glide` (from
+the side, mirrored in RTL), `spin`. `leave` presets: `blur`, `fade`, `shrink`, `fall`, `slide`, `dissolve` (into
+light), `fold`. The tables are exported as `FEED_ENTER` and `FEED_LEAVE`.
 
 `FeedItem`: `{ id, title, body?, avatar?, meta?, color? }`.
 

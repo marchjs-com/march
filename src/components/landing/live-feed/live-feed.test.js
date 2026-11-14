@@ -6,7 +6,7 @@ const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
 locale.set("en");
 const { manualClock, step } = await import("../../../motion/engine/clock.ts");
-const { LiveFeed } = await import("./index.ts");
+const { LiveFeed, FEED_ENTER, FEED_LEAVE } = await import("./index.ts");
 
 const titles = (el) => [...el.querySelectorAll(".hm-lf-item")].filter((x) => !x.classList.contains("is-leaving")).map((x) => x.querySelector(".hm-lf-title").textContent);
 
@@ -56,6 +56,24 @@ test("LiveFeed: next is read once (a JSX getter that builds a new source each re
   Object.defineProperty(props, "next", { get: source, enumerable: true });
   const dispose = render(() => h(LiveFeed, props), el);
   assert.deepEqual(titles(el), ["s2", "s1", "s0"]);
+  dispose();
+  manualClock(false);
+});
+
+test("LiveFeed: every enter / leave preset gives keyframes; a custom motion and other presets run", () => {
+  for (const [name, f] of [...Object.entries(FEED_ENTER), ...Object.entries(FEED_LEAVE)]) {
+    const m = f({ wall: false, rtl: false });
+    assert.ok(m.keyframes.opacity, `${name}: opacity`);
+    for (const k of Object.keys(m.keyframes)) assert.ok(["opacity", "transform", "filter"].includes(k), `${name}: compositor only (${k})`);
+  }
+  assert.notEqual(FEED_ENTER.glide({ wall: false, rtl: true }).keyframes.transform[0], FEED_ENTER.glide({ wall: false, rtl: false }).keyframes.transform[0], "mirrored in RTL");
+  manualClock(true);
+  let k = 0;
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(LiveFeed, { next: () => ({ id: k, title: `m${k++}` }), every: 50, max: 2, enter: { keyframes: { opacity: [0, 1] }, duration: 100 }, leave: "fall", glow: false }), el);
+  for (let i = 0; i < 10; i++) step(16);
+  assert.equal(titles(el)[0], "m3");
+  assert.equal(titles(el).length, 2);
   dispose();
   manualClock(false);
 });
