@@ -16,14 +16,18 @@ test("notForYouVerdict: prompt, some still apply, none of these is you", () => {
 test("NotForYou: lines toggle, the verdict follows, onCheck gets the indexes", () => {
   const seen = [];
   const el = document.createElement("div"); document.body.appendChild(el);
-  const items = [{ text: "A" }, { text: "B", detail: "why" }, { text: "C" }];
+  const items = [{ text: "A", instead: "good A" }, { text: "B", detail: "why" }, { text: "C" }];
   const dispose = render(() => h(NotForYou, { check: true, items, forYou: [{ text: "D" }], onCheck: (m) => seen.push(m) }), el);
   const boxes = el.querySelectorAll('.hm-nfy-not [role="checkbox"]');
   assert.equal(boxes.length, 3);
   assert.equal(el.querySelectorAll(".hm-nfy-for [role=checkbox]").length, 0, "the for-you list is not checkable");
   const verdict = el.querySelector('[role="status"]');
   assert.match(verdict.textContent, /Strike out/);
+  const instead = boxes[0].querySelector(".hm-nfy-instead");
+  assert.equal(instead.textContent, "good A");
+  assert.equal(instead.getAttribute("aria-hidden"), "true", "hidden until struck out");
   boxes[2].click(); boxes[0].click();
+  assert.equal(instead.getAttribute("aria-hidden"), "false");
   assert.equal(boxes[0].getAttribute("aria-checked"), "true");
   assert.match(boxes[0].textContent, /That's me/);
   assert.match(boxes[0].textContent, /Not you$/);

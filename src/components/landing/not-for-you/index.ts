@@ -1,6 +1,6 @@
 // NotForYou (hadi-march/landing): the anti-landing block. It says plainly who the product is NOT for (and, optionally,
 // who it is for). With `check` every line is a toggle card: red at first ("That's me", "Not you? Tap it!"); a tap
-// strikes it out and turns it green, with `markedHint` under the label. A verdict line under the list sums it up
+// strikes it out, turns it green and reveals the item's positive side (`instead`), with `markedHint` under the label. A verdict line under the list sums it up
 // honestly, e.g. "2 of 4 still apply". The verdict is announced politely.
 import "./not-for-you.css";
 import { h } from "../../../dom/h.ts";
@@ -18,6 +18,8 @@ export interface NotForYouItem {
   text: unknown;
   /** One more sentence: why, or where to go instead. */
   detail?: unknown | undefined;
+  /** The positive side, revealed under the line once it is struck out: "You are open to new faces". */
+  instead?: unknown | undefined;
 }
 export interface NotForYouProps {
   /** Who it is not for. */
@@ -67,7 +69,10 @@ export function NotForYou(props: NotForYouProps): Element {
   const line = (it: NotForYouItem, i: number, kind: "not" | "for"): Element => {
     const body = [
       h("span", { class: "hm-nfy-mark", "aria-hidden": "true" }, glyph(kind === "not" ? xIcon : checkIcon)),
-      h("span", { class: "hm-nfy-text" }, h("strong", null, it.text), it.detail != null ? h("span", { class: "hm-nfy-detail" }, it.detail) : null),
+      h("span", { class: "hm-nfy-text" }, h("strong", null, it.text), it.detail != null ? h("span", { class: "hm-nfy-detail" }, it.detail) : null,
+        kind === "not" && props.check && it.instead != null
+          ? h("span", { class: "hm-nfy-instead", "aria-hidden": () => String(!marked().has(i)) }, h("span", { class: "hm-nfy-instead-in" }, it.instead))
+          : null),
     ];
     if (kind === "not" && props.check) {
       return h("li", { class: "hm-nfy-item" },

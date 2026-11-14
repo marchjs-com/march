@@ -2,7 +2,7 @@
 
 The anti-landing block: it says plainly who the product is **not** for, and optionally who it is for. With `check`,
 every "not for you" line is a toggle card: red at first, with "That's me" and a small "Not you? Tap it!"; a tap
-strikes the line out and turns the card green, with `markedHint` under the label ("You belong here"). A verdict under
+strikes the line out, turns the card green and reveals the item's positive side (`instead`), with `markedHint` under the label ("You belong here"). A verdict under
 the list says how many still apply.
 
 ```tsx
@@ -15,7 +15,7 @@ the list says how many still apply.
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `items` | `{ text, detail? }[]` | — | who it is not for |
+| `items` | `{ text, detail?, instead? }[]` | — | who it is not for; `instead`: the positive side, shown once struck out |
 | `forYou` | `{ text, detail? }[]` | — | who it is for (second column) |
 | `title`, `forYouTitle` | node | "Not for you if…", "For you if…" | column headings |
 | `check` | boolean | `false` | lines become toggles (strike out "not me"), a verdict appears |
