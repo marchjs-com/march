@@ -9,12 +9,12 @@
 
 .m-drawer.m-sheet { position: relative; margin: 0; max-width: 100vw; max-height: 100vh; overflow: hidden; will-change: transform; }
 .m-drawer.m-sheet-start, .m-drawer.m-sheet-end { height: 100%; width: var(--m-sheet-size, min(30rem, 100vw)); }
-.m-drawer.m-sheet-start { border-inline-start: 0; border-inline-end: 1px solid var(--m-border); }
+.m-drawer.m-sheet-start { border-inline-start: 0; border-inline-end: var(--m-border-w, 1px) solid var(--m-border); }
 /* top / bottom: as tall as the content up to the size (then the body scrolls; handle and head stay) */
 .m-drawer.m-sheet-top, .m-drawer.m-sheet-bottom { width: 100%; height: auto; max-height: var(--m-sheet-size, 92vh); border-inline-start: 0; }
 .m-drawer.m-sheet-snap.m-sheet-top, .m-drawer.m-sheet-snap.m-sheet-bottom { height: var(--m-sheet-size, auto); }
-.m-drawer.m-sheet-bottom { border-block-start: 1px solid var(--m-border); border-start-start-radius: var(--m-radius-4); border-start-end-radius: var(--m-radius-4); }
-.m-drawer.m-sheet-top { border-block-end: 1px solid var(--m-border); border-end-start-radius: var(--m-radius-4); border-end-end-radius: var(--m-radius-4); }
+.m-drawer.m-sheet-bottom { border-block-start: var(--m-border-w, 1px) solid var(--m-border); border-start-start-radius: var(--m-radius-4); border-start-end-radius: var(--m-radius-4); }
+.m-drawer.m-sheet-top { border-block-end: var(--m-border-w, 1px) solid var(--m-border); border-end-start-radius: var(--m-radius-4); border-end-end-radius: var(--m-radius-4); }
 .m-drawer.m-sheet-snap { max-height: none; }
 /* at a smaller snap point the part past the screen edge is padding, so the body ends where the screen does */
 .m-drawer.m-sheet-snap.m-sheet-bottom { padding-block-end: var(--m-sheet-off, 0px); }

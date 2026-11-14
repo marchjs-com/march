@@ -31,7 +31,7 @@
 .m-rte-content pre { padding: var(--m-space-3); border-radius: var(--m-radius-2); background: var(--m-surface-2); font-family: var(--m-font-mono); font-size: var(--m-text-sm);
   white-space: pre-wrap; tab-size: 2; }
 .m-rte-content a { color: var(--m-accent-text, var(--m-primary-text)); text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); text-underline-offset: 2px; }
-.m-rte-content hr { border: 0; border-block-start: 1px solid var(--m-border); }
+.m-rte-content hr { border: 0; border-block-start: var(--m-border-w, 1px) solid var(--m-border); }
 .m-rte-content [data-mention] { display: inline-block; padding: 0 .4em; border-radius: var(--m-radius-full); background: var(--m-accent-soft, var(--m-primary-soft));
   color: var(--m-accent-text, var(--m-primary-text)); font-weight: var(--m-weight-medium); line-height: 1.45; white-space: nowrap; user-select: all; }
 
@@ -49,4 +49,4 @@
 .m-rte-sug-emoji .m-listrow-title { font-family: var(--m-font-mono); font-size: var(--m-text-sm); color: var(--m-text-2); }
 .m-rte-sug-emoji .m-listrow-lead { inline-size: 1.5rem; justify-content: center; color: inherit; font-size: 1.25rem; line-height: 1; transition: transform var(--m-dur-fast) var(--m-ease-spring); }
 .m-rte-sug-emoji .is-active .m-listrow-lead { transform: scale(1.25); }
-.m-rte-sug-more { padding: var(--m-space-1) var(--m-space-3) var(--m-space-2); color: var(--m-faint); font-size: var(--m-text-xs); border-block-start: 1px solid var(--m-border); }
+.m-rte-sug-more { padding: var(--m-space-1) var(--m-space-3) var(--m-space-2); color: var(--m-faint); font-size: var(--m-text-xs); border-block-start: var(--m-border-w, 1px) solid var(--m-border); }

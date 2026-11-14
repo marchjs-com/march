@@ -8,5 +8,5 @@
 }
 .m-shortcut-help { display: grid; gap: var(--m-space-4, 1rem); }
 .m-shortcut-group h3 { margin: 0 0 var(--m-space-2, .5rem); font-size: var(--m-text-sm, .8125rem); color: var(--m-muted); }
-.m-shortcut-row { display: flex; align-items: center; justify-content: space-between; gap: var(--m-space-3, .75rem); padding-block: 4px; border-block-end: 1px solid var(--m-border-subtle); }
+.m-shortcut-row { display: flex; align-items: center; justify-content: space-between; gap: var(--m-space-3, .75rem); padding-block: 4px; border-block-end: var(--m-border-w, 1px) solid var(--m-border-subtle); }
 .m-shortcut-row[data-inactive] { opacity: .55; }

@@ -3,12 +3,12 @@
 .m-bs-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--m-space-2) var(--m-space-4); }
 /* the trail is a Breadcrumbs in a pill look: an earlier step is a button, the current one is filled */
 .m-bs-trail { flex: 1 1 12rem; min-inline-size: 0; }
-.m-bc.m-bs-trail .m-bc-item { padding-inline: var(--m-space-2); border: 1px solid var(--m-border); border-radius: var(--m-radius-full); font-size: var(--m-text-sm); }
+.m-bc.m-bs-trail .m-bc-item { padding-inline: var(--m-space-2); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-full); font-size: var(--m-text-sm); }
 .m-bc.m-bs-trail .m-bc-item.is-current { background: var(--m-primary); border-color: transparent; color: var(--m-on-primary, var(--m-bg)); font-weight: var(--m-weight-semibold); }
 .m-bs-found { font-size: var(--m-text-xs); color: var(--m-muted); white-space: nowrap; }
 
 .m-bs-stage { position: relative; display: grid; min-block-size: var(--m-bs-min, 20rem); }
-.m-bs-passage { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--m-space-5); align-content: start; padding: var(--m-space-6); border: 1px solid var(--m-border); border-radius: var(--m-radius-4); background: var(--m-surface); box-shadow: var(--m-shadow-2); transform-origin: 50% 50%; backface-visibility: hidden; }
+.m-bs-passage { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--m-space-5); align-content: start; padding: var(--m-space-6); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-4); background: var(--m-surface); box-shadow: var(--m-shadow-2); transform-origin: 50% 50%; backface-visibility: hidden; }
 .m-bs-passage:has(.m-bs-media) { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); }
 @media (max-width: 720px) { .m-bs-passage:has(.m-bs-media) { grid-template-columns: minmax(0, 1fr); } }
 @container m-site (max-width: 720px) { .m-bs-passage:has(.m-bs-media) { grid-template-columns: minmax(0, 1fr); } }
@@ -24,7 +24,7 @@
 
 .m-bs-choices { display: grid; gap: var(--m-space-2); margin: var(--m-space-2) 0 0; padding: 0; list-style: none; }
 /* a choice: a button card around a ListRow (key · label · note) */
-.m-bs-choice { display: block; inline-size: 100%; padding: var(--m-space-3) var(--m-space-4); border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-bg); color: var(--m-text); font: inherit; text-align: start; cursor: pointer; transition: border-color var(--m-dur) var(--m-ease), background var(--m-dur) var(--m-ease), opacity var(--m-dur) var(--m-ease), translate var(--m-dur) var(--m-ease-spring); }
+.m-bs-choice { display: block; inline-size: 100%; padding: var(--m-space-3) var(--m-space-4); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-bg); color: var(--m-text); font: inherit; text-align: start; cursor: pointer; transition: border-color var(--m-dur) var(--m-ease), background var(--m-dur) var(--m-ease), opacity var(--m-dur) var(--m-ease), translate var(--m-dur) var(--m-ease-spring); }
 .m-bs-choice:hover { border-color: var(--m-accent, var(--m-primary)); translate: 4px 0; }
 .m-bs-choice:dir(rtl):hover { translate: -4px 0; }
 .m-bs-choice:focus-visible { outline: 2px solid var(--m-primary); outline-offset: 2px; }

@@ -21,14 +21,14 @@
 .m-snav .m-snav-menu { display: none; }
 
 /* looks */
-.m-snav-solid { background: color-mix(in srgb, var(--m-bg) 82%, transparent); -webkit-backdrop-filter: saturate(160%) blur(14px); backdrop-filter: saturate(160%) blur(14px); border-block-end: 1px solid var(--m-border); }
+.m-snav-solid { background: color-mix(in srgb, var(--m-bg) 82%, transparent); -webkit-backdrop-filter: saturate(160%) blur(14px); backdrop-filter: saturate(160%) blur(14px); border-block-end: var(--m-border-w, 1px) solid var(--m-border); }
 .m-snav-transparent { background: transparent; border-block-end: 1px solid transparent; }
 .m-snav-transparent.is-scrolled { background: color-mix(in srgb, var(--m-bg) 78%, transparent); -webkit-backdrop-filter: saturate(160%) blur(14px); backdrop-filter: saturate(160%) blur(14px); border-block-end-color: var(--m-border); box-shadow: var(--m-shadow-1); }
 .m-snav-transparent:not(.is-scrolled) { margin-block-end: calc(-1 * var(--m-snav-h)); }
 .m-snav-floating { padding-block-start: var(--m-space-3); margin-block-end: calc(-1 * (var(--m-snav-h) + var(--m-space-3))); }
 .m-snav-floating .m-snav-bar { max-width: min(68rem, calc(100% - 2rem)); border-radius: var(--m-radius-full); padding-inline: var(--m-space-3) var(--m-space-2);
   background: color-mix(in srgb, var(--m-surface) 70%, transparent); -webkit-backdrop-filter: saturate(170%) blur(16px); backdrop-filter: saturate(170%) blur(16px);
-  border: 1px solid var(--m-border); box-shadow: var(--m-shadow-2); transition: height var(--m-dur-slow) var(--m-ease-out), max-width var(--m-dur-slow) var(--m-ease-out); }
+  border: var(--m-border-w, 1px) solid var(--m-border); box-shadow: var(--m-shadow-2); transition: height var(--m-dur-slow) var(--m-ease-out), max-width var(--m-dur-slow) var(--m-ease-out); }
 .m-snav-floating.is-scrolled .m-snav-bar { max-width: min(56rem, calc(100% - 2rem)); box-shadow: var(--m-shadow-3); }
 
 /* drawer (mobile) */

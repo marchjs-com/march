@@ -12,7 +12,7 @@
 .m-dock .m-dock-split > .m-split-handle { --m-rh-rest: transparent; }
 
 /* a group: the Tabs, compact, with its actions at the end of the tab bar */
-.m-dock-group { position: relative; display: grid; min-height: 0; min-width: 0; margin: 2px; border: 1px solid var(--m-border); border-radius: var(--m-radius-2);
+.m-dock-group { position: relative; display: grid; min-height: 0; min-width: 0; margin: 2px; border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-2);
   background: var(--m-surface); overflow: hidden; transition: border-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease); }
 .m-dock-group.is-focused { border-color: color-mix(in srgb, var(--m-primary) 45%, var(--m-border)); }
 .m-dock-tabs { display: grid; grid-template-rows: var(--m-dock-bar) minmax(0, 1fr); min-height: 0; min-width: 0; }
@@ -53,7 +53,7 @@
 .m-dock-resize.m-resize-handle { --m-rh-out: 0px; --m-rh-rest: var(--m-border-strong); z-index: 1; }
 
 /* the minimized tray */
-.m-dock-tray { gap: .375rem; padding: .375rem .5rem; border-block-start: 1px solid var(--m-border); }
+.m-dock-tray { gap: .375rem; padding: .375rem .5rem; border-block-start: var(--m-border-w, 1px) solid var(--m-border); }
 .m-dock-tray-btn.m-btn { min-height: 1.75rem; max-width: 100%; font-size: var(--m-text-xs); font-weight: 400; }
 
 /* drop preview (moved by the motion engine: translate + scale of a layout-sized box) and the drag ghost */

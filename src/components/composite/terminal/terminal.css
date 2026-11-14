@@ -12,7 +12,7 @@
   --m-term-c4: var(--m-info); --m-term-c5: var(--m-cat-5); --m-term-c6: var(--m-cat-2); --m-term-c7: var(--m-muted);
   --m-term-c8: var(--m-muted); --m-term-c9: var(--m-danger); --m-term-c10: var(--m-cat-3); --m-term-c11: var(--m-cat-1);
   --m-term-c12: var(--m-cat-2); --m-term-c13: var(--m-cat-5); --m-term-c14: var(--m-cat-6); --m-term-c15: var(--m-bg);
-  display: block; block-size: var(--m-term-h); border: 1px solid var(--m-border); border-radius: var(--m-radius-lg); overflow: hidden;
+  display: block; block-size: var(--m-term-h); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-lg); overflow: hidden;
   background: var(--m-term-bg); color: var(--m-term-fg); font: var(--m-text-sm) / 1.55 var(--m-term-font); text-align: start;
 }
 .m-term-scroll { block-size: 100%; overflow: auto; padding: var(--m-space-3) var(--m-space-4); box-sizing: border-box; cursor: text; }

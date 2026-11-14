@@ -1,5 +1,6 @@
 /* March — Card. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.m-card { position: relative; display: flex; flex-direction: column; background: var(--m-surface); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); box-shadow: var(--m-shadow-1); min-width: 0; }
+/* the panel tokens (--m-panel-*) come from the theme's style: surface kind, glow, glass blur */
+.m-card { position: relative; display: flex; flex-direction: column; background: var(--m-panel-bg, var(--m-surface)); border: var(--m-border-w, 1px) solid var(--m-panel-border, var(--m-border)); border-radius: var(--m-radius-3); box-shadow: var(--m-panel-shadow, var(--m-shadow-1)); -webkit-backdrop-filter: var(--m-panel-filter, none); backdrop-filter: var(--m-panel-filter, none); min-width: 0; }
 /* the head is a PanelHeader (lg); the card keeps its measure: it wraps, long titles break, the body follows closely */
 .m-card-head.m-panel-header { flex-wrap: wrap; min-block-size: 0; padding: var(--m-space-4) var(--m-space-5) 0; }
 .m-card-head .m-card-titles { flex: 1; min-inline-size: min(12rem, 100%); }
@@ -10,4 +11,4 @@
 .m-card-flush .m-card-body { padding: 0; }
 .m-card-plain { background: none; border: 0; border-radius: 0; box-shadow: none; }
 .m-card-flush .m-card-head.m-panel-header { padding-block-end: var(--m-space-4); }
-.m-card-foot { padding: var(--m-space-3) var(--m-space-5); border-top: 1px solid var(--m-border-subtle); background: var(--m-bg-subtle); border-radius: 0 0 var(--m-radius-3) var(--m-radius-3); }
+.m-card-foot { padding: var(--m-space-3) var(--m-space-5); border-top: var(--m-border-w, 1px) solid var(--m-border-subtle); background: var(--m-bg-subtle); border-radius: 0 0 var(--m-radius-3) var(--m-radius-3); }

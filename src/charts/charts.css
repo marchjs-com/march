@@ -91,7 +91,7 @@
   max-width: 280px;
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid var(--m-border, #e7e7eb);
+  border: var(--m-border-w, 1px) solid var(--m-border, #e7e7eb);
   background: var(--m-chart-tooltip-bg);
   color: var(--m-chart-tooltip-text);
   font-size: 12px;

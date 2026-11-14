@@ -18,7 +18,7 @@
   background: var(--m-surface); border: 2px solid var(--m-text); box-shadow: var(--m-shadow-1); }
 .m-ge-dial-value { position: absolute; inset: 0; display: grid; place-items: center; font-size: var(--m-text-xs); font-weight: var(--m-weight-semibold); font-variant-numeric: tabular-nums; pointer-events: none; }
 .m-ge-angles { display: grid; grid-template-columns: repeat(4, 1.5rem); gap: .25rem; }
-.m-ge-angle-btn.m-icon-btn { border: 1px solid var(--m-border); border-radius: var(--m-radius-1); }
+.m-ge-angle-btn.m-icon-btn { border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-1); }
 .m-ge-angle-btn.m-icon-btn:hover { border-color: var(--m-border-strong); }
 .m-ge-angle-btn.m-icon-btn.is-pressed { border-color: var(--m-accent, var(--m-primary)); }
 .m-ge-angle-hand { inline-size: 2px; block-size: .7rem; border-radius: 2px; background: currentColor; rotate: var(--m-ge-a); translate: 0 -2px; transform-origin: 50% 90%; }

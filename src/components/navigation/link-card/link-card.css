@@ -1,5 +1,5 @@
 /* LinkCard. Theme tokens only, logical properties, durations from --m-dur tokens, no @keyframes (motion core). */
-.m-link-card { position: relative; display: flex; align-items: flex-start; gap: var(--m-space-3); min-width: 0; padding: .875rem var(--m-space-4); border: 1px solid var(--m-border);
+.m-link-card { position: relative; display: flex; align-items: flex-start; gap: var(--m-space-3); min-width: 0; padding: .875rem var(--m-space-4); border: var(--m-border-w, 1px) solid var(--m-border);
   border-radius: var(--m-radius-3); background: var(--m-surface); color: var(--m-text); text-decoration: none; box-shadow: var(--m-shadow-1);
   transition: border-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur-slow) var(--m-ease), transform var(--m-dur-slow) var(--m-ease-out); }
 .m-link-card:hover { border-color: var(--m-border-strong); box-shadow: var(--m-shadow-2); transform: translateY(-1px); }

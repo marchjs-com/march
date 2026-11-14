@@ -1,5 +1,5 @@
 /* March — ChatComposer. Mist field (radius 24), round action: mic in Heyecan, send in Aktivite. */
-.m-compose { display: flex; flex-direction: column; gap: .375rem; padding: .375rem .375rem .5rem; background: var(--m-surface); border-block-start: 1px solid var(--m-border-subtle, var(--m-border)); min-width: 0; }
+.m-compose { display: flex; flex-direction: column; gap: .375rem; padding: .375rem .375rem .5rem; background: var(--m-surface); border-block-start: var(--m-border-w, 1px) solid var(--m-border-subtle, var(--m-border)); min-width: 0; }
 .m-compose-row { display: flex; align-items: flex-end; gap: .25rem; min-width: 0; }
 .m-compose-field { position: relative; display: flex; align-items: flex-end; flex: 1; min-width: 0; border-radius: 1.5rem; background: var(--m-surface-2); border: 1.5px solid transparent;
   transition: border-color var(--m-dur) var(--m-ease); }

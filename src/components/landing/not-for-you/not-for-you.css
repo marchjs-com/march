@@ -7,7 +7,7 @@
 .m-nfy-title { margin: 0 0 var(--m-space-3); font-size: var(--m-text-lg); }
 .m-nfy-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--m-space-3); }
 /* a line is a ListRow (mark · text · label) in a card: the card is the row itself, or the checkbox button around it */
-.m-nfy-item > :is(.m-nfy-row, .m-nfy-toggle) { inline-size: 100%; box-sizing: border-box; padding: var(--m-space-4); border: 1px solid var(--m-border); border-radius: var(--m-radius-4); background: var(--m-surface); color: var(--m-text); font: inherit; text-align: start; }
+.m-nfy-item > :is(.m-nfy-row, .m-nfy-toggle) { inline-size: 100%; box-sizing: border-box; padding: var(--m-space-4); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-4); background: var(--m-surface); color: var(--m-text); font: inherit; text-align: start; }
 .m-nfy-toggle { display: block; cursor: pointer; transition: border-color var(--m-dur) var(--m-ease), background var(--m-dur) var(--m-ease), translate var(--m-dur) var(--m-ease-spring); }
 .m-nfy-item > .m-nfy-toggle { border-color: var(--m-danger); background: var(--m-danger-soft, var(--m-surface-2)); }
 .m-nfy-item > .m-nfy-toggle:hover { border-color: var(--m-danger-solid, var(--m-danger)); }

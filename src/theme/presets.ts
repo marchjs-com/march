@@ -1,7 +1,8 @@
-import { defineTheme, ensureContrast, onBrandFill, type ThemeDef } from "./css.ts";
+import { defineTheme, ensureContrast, onBrandFill, contrast, type ThemeDef, type ThemeColors } from "./css.ts";
 
 export { defineTheme, themeCss, contrast, ensureContrast, onBrandFill } from "./css.ts";
-export type { ThemeDef, ThemeColors } from "./css.ts";
+export { spaceTokens } from "./css.ts";
+export type { ThemeDef, ThemeColors, ThemeStyle, SurfaceKind, ShadowKind, Density } from "./css.ts";
 
 // ------------------------------------------------------------------ built-in themes
 const FIGTREE = `"Figtree Variable", "Figtree"`, BRICOLAGE = `"Bricolage Grotesque Variable", "Bricolage Grotesque"`, INTER = `"InterVariable", "Inter"`;
@@ -167,7 +168,148 @@ export const contrastTheme = defineTheme({
   },
 });
 
+// ------------------------------------------------------------------ themes with a style of their own (ThemeStyle)
+const SERIF = `"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif`;
+const SYSTEM = `"Segoe UI Variable Text", "Segoe UI", system-ui`;
+/** Text on a fill: white or near-black, whichever reads better. */
+const ink = (fill: string): string => (contrast("#FFFFFF", fill) >= contrast("#14181F", fill) ? "#FFFFFF" : "#14181F");
+/** A soft light of a color (the sign-in backdrop, the lit page behind glass). */
+const light = (color: string, pct: number): string => `color-mix(in srgb, ${color} ${pct}%, transparent)`;
+const lights = (a: string, b: string, c: string, d: string): string[] => [light(a, 70), light(b, 55), light(c, 50), light(d, 35)];
+
+const AURORA: ThemeColors = {
+  bg: "#070B1A", surface: "#0F1630", raised: "#141C3B", text: "#EEF1FF", muted: "#A3ABCF", border: "#262F58",
+  primary: "#8FA2FF", solid: "#5566F2", onSolid: "#FFFFFF", special: "#B56CFF",
+  danger: "#FF8096", success: "#5CE6A8", warn: "#FFD166", info: "#59D2FF",
+  cat: ["#7C8CFF", "#3DE0F2", "#C77DFF", "#FF7AC6", "#5CE6A8", "#FFD166", "#59A8FF", "#A3ABCF"],
+  mark: "linear-gradient(135deg, #7C8CFF, #C77DFF 50%, #3DE0F2)", stage: "#050816", glow: lights("#7C8CFF", "#C77DFF", "#3DE0F2", "#FF7AC6"),
+};
+/** Aurora — always dark: glass panels over a softly lit navy page, a glowing periwinkle edge, gradient buttons. */
+export const aurora = defineTheme({
+  id: "aurora", name: "Aurora", description: "Glass panels and a glowing edge on deep navy", alwaysDark: true,
+  font: FIGTREE, display: BRICOLAGE, displayWeight: 700, radius: 16, light: AURORA, dark: AURORA,
+  style: { surface: "glass", glow: 0.55, accent: "gradient", tracking: -0.02 },
+});
+
+const NOIR: ThemeColors = {
+  bg: "#0A0A0B", surface: "#131314", raised: "#1A1A1C", text: "#F3EFE6", muted: "#ADA595", border: "#2E2B25",
+  primary: "#D9B25F", solid: "#C9A24B", onSolid: ink("#C9A24B"), special: "#E8D5A3",
+  danger: "#F08A7C", success: "#9CCB8B", warn: "#E6C067", info: "#9DB7D6",
+  cat: ["#D9B25F", "#E8D5A3", "#9DB7D6", "#C98F7A", "#9CCB8B", "#B69CD9", "#8A8577", "#F3EFE6"],
+  mark: "linear-gradient(135deg, #F0D58A, #C9A24B 55%, #8A6A24)", onMark: "#17130A", stage: "#050505", glow: lights("#D9B25F", "#E8D5A3", "#8A6A24", "#F3EFE6"),
+};
+/** Noir Gold — always dark: black, a gold accent, thin frames, a serif for headings. */
+export const noirGold = defineTheme({
+  id: "noir-gold", name: "Noir Gold", description: "Black and gold, thin frames, serif headings", alwaysDark: true,
+  font: INTER, display: SERIF, displayWeight: 600, radius: 4, light: NOIR, dark: NOIR,
+  style: { surface: "outlined", shadow: "none", glow: 0.18, tracking: 0.01, iconStroke: 1.25 },
+});
+
+const EMBER: ThemeColors = {
+  bg: "#14100D", surface: "#1E1814", raised: "#261F1A", text: "#F7EFE8", muted: "#BCAFA3", border: "#3A2F27",
+  primary: "#FF8A3D", solid: "#BF4E0E", onSolid: "#FFFFFF", special: "#FFC857",
+  danger: "#FF7B72", success: "#8FD694", warn: "#FFC857", info: "#7CC4F5",
+  cat: ["#FF8A3D", "#FFC857", "#E5533D", "#8FD694", "#7CC4F5", "#D98BD0", "#BCAFA3", "#F2A65A"],
+  mark: "linear-gradient(135deg, #FFB36B, #F2681C 55%, #C2410C)", stage: "#0D0A08", glow: lights("#FF8A3D", "#FFC857", "#E5533D", "#F2A65A"),
+};
+/** Ember — always dark: warm charcoal and orange, big round corners, raised cards, roomy spacing. */
+export const ember = defineTheme({
+  id: "ember", name: "Ember", description: "Warm charcoal and orange, round and roomy", alwaysDark: true,
+  font: FIGTREE, display: BRICOLAGE, displayWeight: 800, radius: 18, light: EMBER, dark: EMBER,
+  style: { surface: "raised", density: "comfortable" },
+});
+
+const VOYAGE: ThemeColors = {
+  bg: "#0C1626", surface: "#122036", raised: "#17283F", text: "#EAF1FA", muted: "#9FB2C8", border: "#243955",
+  primary: "#4CC9F0", solid: "#4CC9F0", onSolid: ink("#4CC9F0"), special: "#FF6B6B",
+  danger: "#FF7A7A", success: "#3BDDB0", warn: "#FFD166", info: "#4CC9F0",
+  cat: ["#4CC9F0", "#FF6B6B", "#FFD166", "#06D6A0", "#B388FF", "#FF9F1C", "#9FB2C8", "#F78FB3"],
+  mark: "linear-gradient(135deg, #4CC9F0, #B388FF 50%, #FF6B6B)", stage: "#08101C", glow: lights("#4CC9F0", "#B388FF", "#FF6B6B", "#FFD166"),
+};
+/** Voyage — always dark: flat navy surfaces without shadows, vivid accents in many colors. */
+export const voyage = defineTheme({
+  id: "voyage", name: "Voyage", description: "Flat navy, vivid accents, no shadows", alwaysDark: true,
+  font: FIGTREE, display: BRICOLAGE, displayWeight: 700, radius: 14, light: VOYAGE, dark: VOYAGE,
+  style: { surface: "flat", shadow: "none" }, multicolor: true,
+});
+
+/** Graphite — neutral grey for desktop apps: small corners, compact spacing, thin icons. */
+export const graphite = defineTheme({
+  id: "graphite", name: "Graphite", description: "Neutral grey, compact, for desktop apps",
+  font: SYSTEM, display: SYSTEM, displayWeight: 600, radius: 5,
+  light: {
+    bg: "#F3F3F3", surface: "#FBFBFB", text: "#1B1B1B", muted: "#5E5E5E", border: "#DEDEDE", primary: "#0A5FB4", solid: "#0A5FB4", onSolid: "#FFFFFF",
+    danger: "#C42B1C", success: "#0F7B0F", warn: "#9D5D00", info: "#0A5FB4", special: "#8764B8",
+    cat: ["#0A5FB4", "#0F7B0F", "#C239B3", "#CA5010", "#038387", "#8764B8", "#5E5E5E", "#C42B1C"],
+    mark: "linear-gradient(135deg, #5A5A5A, #1B1B1B)", stage: "#1C1C1C", glow: lights("#FFFFFF", "#9A9A9A", "#0A5FB4", "#FFFFFF"),
+  },
+  dark: {
+    bg: "#202020", surface: "#2B2B2B", raised: "#323232", text: "#F2F2F2", muted: "#B8B8B8", border: "#404040", primary: "#6CC8FA", solid: "#6CC8FA", onSolid: ink("#6CC8FA"), onMark: "#1B1B1B",
+    danger: "#FF99A4", success: "#6CCB5F", warn: "#FCE100", info: "#6CC8FA", special: "#B4A0FF",
+    cat: ["#6CC8FA", "#6CCB5F", "#EE9CE5", "#FFB37A", "#5CD6D6", "#B4A0FF", "#B8B8B8", "#FF99A4"],
+    mark: "linear-gradient(135deg, #F2F2F2, #B8B8B8)", stage: "#141414", glow: lights("#FFFFFF", "#9A9A9A", "#6CC8FA", "#FFFFFF"),
+  },
+  style: { density: "compact", iconStroke: 1.5, tracking: 0 },
+});
+
+/** Paper — editorial: a paper tone, serif headings, framed surfaces, no shadows. */
+export const paper = defineTheme({
+  id: "paper", name: "Paper", description: "Editorial: paper tone, serif headings, frames",
+  font: INTER, display: SERIF, displayWeight: 600, radius: 2,
+  light: {
+    bg: "#F6F1E7", surface: "#FBF8F1", text: "#22201B", muted: "#625C50", border: "#D8CFBC", primary: "#8C2F1B", solid: "#22201B", onSolid: "#FBF8F1",
+    danger: "#A4281C", success: "#3F6B2A", warn: "#8A5A00", info: "#285E8E", special: "#8C2F1B",
+    cat: ["#8C2F1B", "#285E8E", "#3F6B2A", "#8A5A00", "#6B3F7A", "#1F6F6B", "#625C50", "#B5532A"],
+    mark: "#22201B", stage: "#1B1915", glow: lights("#B5532A", "#D8CFBC", "#8C2F1B", "#FBF8F1"),
+  },
+  dark: {
+    bg: "#171512", surface: "#1F1C18", raised: "#26231E", text: "#EFE8DA", muted: "#B3AA98", border: "#3B362D", primary: "#E08A6F", solid: "#EFE8DA", onSolid: "#1F1C18", onMark: "#1F1C18",
+    danger: "#F0907F", success: "#A5C98C", warn: "#E3B55C", info: "#8DB8DE", special: "#E08A6F",
+    cat: ["#E08A6F", "#8DB8DE", "#A5C98C", "#E3B55C", "#C39BD3", "#7CC7C1", "#B3AA98", "#E8A07A"],
+    mark: "#EFE8DA", stage: "#12100D", glow: lights("#E08A6F", "#B3AA98", "#E3B55C", "#EFE8DA"),
+  },
+  style: { surface: "outlined", shadow: "none", tracking: -0.005 },
+});
+
+/** Mint — fresh green: soft raised cards, big corners, roomy spacing. */
+export const mint = defineTheme({
+  id: "mint", name: "Mint", description: "Fresh green, soft and roomy",
+  font: FIGTREE, display: BRICOLAGE, displayWeight: 700, radius: 18,
+  light: {
+    bg: "#F1F8F5", surface: "#FFFFFF", text: "#12332B", muted: "#4F6B63", border: "#D3E6DE", primary: "#0B7A5E", solid: "#0B7A5E", onSolid: "#FFFFFF",
+    danger: "#C4372E", success: "#1E8E4E", warn: "#A66300", info: "#1F7CB8", special: "#3B82C4",
+    cat: ["#12B886", "#3B82C4", "#F2B84B", "#E8718D", "#7C6FD6", "#2BB0A6", "#4F6B63", "#F08A4B"],
+    mark: "linear-gradient(135deg, #3FD1A5, #0E8F6E 55%, #0B6B55)", stage: "#0C1F1A", glow: lights("#3FD1A5", "#3B82C4", "#F2B84B", "#2BB0A6"),
+  },
+  dark: {
+    bg: "#0D1B17", surface: "#13251F", raised: "#182D26", text: "#E6F4EE", muted: "#9DB8AE", border: "#274238", primary: "#4FD6AE", solid: "#2FBF95", onSolid: ink("#2FBF95"),
+    danger: "#FF8F87", success: "#6FDB9A", warn: "#F5C15A", info: "#6FC2F0", special: "#7FB6EA",
+    cat: ["#3FD1A5", "#6FB0E8", "#F2C562", "#F08FA6", "#A096EA", "#4CCDC2", "#9DB8AE", "#F5A26E"],
+    mark: "linear-gradient(135deg, #3FD1A5, #0E8F6E 55%, #0B6B55)", stage: "#0C1F1A", glow: lights("#3FD1A5", "#6FB0E8", "#F2C562", "#4CCDC2"),
+  },
+  style: { surface: "raised", density: "comfortable" },
+});
+
+/** Candy — playful pastel: gradient buttons, pill-like corners, a soft glow, thick icons. */
+export const candy = defineTheme({
+  id: "candy", name: "Candy", description: "Playful pastel with gradient buttons",
+  font: FIGTREE, display: BRICOLAGE, displayWeight: 800, radius: 22,
+  light: {
+    bg: "#FFF5FA", surface: "#FFFFFF", text: "#3B2145", muted: "#75597F", border: "#F3D9E8", primary: "#C92F90", solid: "#C92F90", onSolid: "#FFFFFF",
+    danger: "#D93654", success: "#1F9D6B", warn: "#B36B00", info: "#3B82F6", special: "#7C5CFF",
+    cat: ["#FF5CAD", "#7C5CFF", "#3EC9F0", "#FFC53D", "#35D69B", "#FF8A5C", "#B07CFF", "#75597F"],
+    mark: "linear-gradient(135deg, #FF5CAD, #B07CFF 55%, #3EC9F0)", stage: "#2A1533", glow: lights("#FF5CAD", "#B07CFF", "#3EC9F0", "#FFC53D"),
+  },
+  dark: {
+    bg: "#1D1124", surface: "#281832", raised: "#301D3C", text: "#FCEFF8", muted: "#C3A9CC", border: "#473154", primary: "#FF7CC0", solid: "#C92F90", onSolid: "#FFFFFF",
+    danger: "#FF8FA3", success: "#5FE0A8", warn: "#FFD166", info: "#7FB3FF", special: "#A48CFF",
+    cat: ["#FF5CAD", "#A48CFF", "#3EC9F0", "#FFC53D", "#35D69B", "#FF8A5C", "#C79BFF", "#C3A9CC"],
+    mark: "linear-gradient(135deg, #FF5CAD, #B07CFF 55%, #3EC9F0)", stage: "#170C1D", glow: lights("#FF5CAD", "#A48CFF", "#3EC9F0", "#FFC53D"),
+  },
+  style: { accent: "gradient", glow: 0.25, tracking: -0.02, iconStroke: 2 }, multicolor: true,
+});
+
 /** Built-in themes, default first. */
-export const THEMES: readonly ThemeDef[] = [hadi, cream, night, neon, indigo, minimal, contrastTheme];
+export const THEMES: readonly ThemeDef[] = [hadi, cream, night, neon, indigo, minimal, contrastTheme, aurora, noirGold, ember, voyage, graphite, paper, mint, candy];
 /** Name of the default theme ("hadi"). */
 export const DEFAULT_THEME = "hadi";

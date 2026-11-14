@@ -3,6 +3,6 @@
 .m-typing.is-off { display: none; }
 .m-typing-dots { display: inline-flex; align-items: center; gap: 4px; }
 .m-typing-dots .m-status-dot { opacity: .45; }
-.m-typing-bubble .m-typing-dots { padding: .75rem .875rem; border-radius: 1.25rem 1.25rem 1.25rem .375rem; background: var(--m-surface); border: 1px solid var(--m-border-subtle, var(--m-border)); }
+.m-typing-bubble .m-typing-dots { padding: .75rem .875rem; border-radius: 1.25rem 1.25rem 1.25rem .375rem; background: var(--m-surface); border: var(--m-border-w, 1px) solid var(--m-border-subtle, var(--m-border)); }
 :dir(rtl) .m-typing-bubble .m-typing-dots { border-radius: 1.25rem 1.25rem .375rem 1.25rem; }
 .m-typing-text { font-size: var(--m-text-xs); font-weight: 600; font-style: italic; color: var(--m-text-3, var(--m-muted)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

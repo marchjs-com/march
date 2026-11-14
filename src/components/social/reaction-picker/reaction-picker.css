@@ -1,6 +1,6 @@
 /* March — ReactionPicker. A card-colored pill (row) or panel (grid); the picked emoji on a soft accent circle. */
 .m-react { display: inline-flex; align-items: center; gap: .125rem; padding: .25rem; border-radius: var(--m-radius-full); background: var(--m-surface-raised, var(--m-surface));
-  border: 1px solid var(--m-border-subtle, var(--m-border)); box-shadow: var(--m-shadow-3); transform-origin: 50% 100%; max-width: 100%; }
+  border: var(--m-border-w, 1px) solid var(--m-border-subtle, var(--m-border)); box-shadow: var(--m-shadow-3); transform-origin: 50% 100%; max-width: 100%; }
 .m-react-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr)); gap: .125rem; padding: .5rem; border-radius: var(--m-radius-4); width: 100%; box-sizing: border-box;
   max-height: 13rem; overflow-y: auto; box-shadow: none; transform-origin: 50% 100%; }
 .m-react-e { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer;

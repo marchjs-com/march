@@ -6,5 +6,6 @@ import tr from "./tr.panels.ts";
 messages("tr", tr);
 
 export { TypePanel, ShapePanel } from "./forms.ts";
+export { StylePanel } from "./style.ts";
 export { MotionPanel } from "./motion.ts";
 export { ExportPanel } from "./export.ts";

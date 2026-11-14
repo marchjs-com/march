@@ -5,10 +5,10 @@
 /* the figure: fluid size, a soft vertical gradient of the text colour */
 .m-stats .m-stat-tile-value { font-size: clamp(2.25rem, 1.6rem + 2.4cqi, 3.5rem);
   background: linear-gradient(180deg, var(--m-text), color-mix(in srgb, var(--m-text) 62%, transparent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.m-stats-divided .m-stats-item + .m-stats-item { border-inline-start: 1px solid var(--m-border); }
+.m-stats-divided .m-stats-item + .m-stats-item { border-inline-start: var(--m-border-w, 1px) solid var(--m-border); }
 .m-stats-cards > .m-stats-item { padding: var(--m-space-5); box-shadow: var(--m-shadow-1); }
-@media (max-width: 640px) { .m-stats-divided .m-stats-item + .m-stats-item { border-inline-start: 0; border-block-start: 1px solid var(--m-border); } }
-@container m-site (max-width: 640px) { .m-stats-divided .m-stats-item + .m-stats-item { border-inline-start: 0; border-block-start: 1px solid var(--m-border); } }
+@media (max-width: 640px) { .m-stats-divided .m-stats-item + .m-stats-item { border-inline-start: 0; border-block-start: var(--m-border-w, 1px) solid var(--m-border); } }
+@container m-site (max-width: 640px) { .m-stats-divided .m-stats-item + .m-stats-item { border-inline-start: 0; border-block-start: var(--m-border-w, 1px) solid var(--m-border); } }
 /* own colour (data-m-color sets --m-accent): the numbers take it */
 .m-stats[data-m-color] .m-stat-tile-value { background-image: linear-gradient(180deg, var(--m-accent), color-mix(in srgb, var(--m-accent) 62%, transparent)); color: transparent; }
 .m-stats-plain { font-variant-numeric: tabular-nums; white-space: nowrap; }

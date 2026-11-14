@@ -6,7 +6,7 @@
 .m-msg-mine .m-msg-col { align-items: flex-end; }
 .m-msg-bubble { position: relative; display: flex; flex-direction: column; gap: .25rem; min-width: 3.5rem; padding: .5rem .75rem .375rem; border-radius: var(--m-msg-r);
   font-size: var(--m-text-md); line-height: 1.35; overflow-wrap: anywhere; box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--m-text) 18%, transparent); }
-.m-msg-theirs .m-msg-bubble { background: var(--m-surface); color: var(--m-text); border: 1px solid var(--m-border-subtle, var(--m-border)); }
+.m-msg-theirs .m-msg-bubble { background: var(--m-surface); color: var(--m-text); border: var(--m-border-w, 1px) solid var(--m-border-subtle, var(--m-border)); }
 .m-msg-mine .m-msg-bubble { color: var(--m-on-brand-blue, var(--m-on-info-fill));
   background: linear-gradient(135deg, var(--m-msg-blue), color-mix(in srgb, var(--m-msg-blue) 76%, var(--m-scrim))); }
 /* runs: inner corners tighten, the last bubble keeps the tail */

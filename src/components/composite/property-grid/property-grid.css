@@ -4,7 +4,7 @@
 .m-pg-head.m-panel-header { gap: .375rem; padding: .5rem; }
 .m-pg-search.m-search { flex: 1; min-width: 0; }
 .m-pg-body { min-height: 0; overflow: auto; padding-block: .25rem; }
-.m-pg-group { border: 0; border-block-end: 1px solid var(--m-border); border-radius: 0; }
+.m-pg-group { border: 0; border-block-end: var(--m-border-w, 1px) solid var(--m-border); border-radius: 0; }
 .m-pg-group > .m-disclosure-summary { display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem; }
 .m-pg-group-name.m-section-label { color: var(--m-muted); }
 .m-pg-group > .m-disclosure-body { padding: 0 0 .375rem; }

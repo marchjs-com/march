@@ -1,7 +1,7 @@
 /* March — Combobox (and MultiSelect, which is a Combobox): input, chips (Chip), list (OptionList in the .m-pop panel). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* combobox, multiselect, listbox */
 .m-combo { position: relative; width: 100%; }
-.m-multi { display: flex; flex-wrap: wrap; gap: var(--m-space-1); align-items: center; padding: 3px; border: 1px solid var(--m-border-strong); border-radius: var(--m-radius); background: var(--m-surface); }
+.m-multi { display: flex; flex-wrap: wrap; gap: var(--m-space-1); align-items: center; padding: 3px; border: var(--m-border-w, 1px) solid var(--m-border-strong); border-radius: var(--m-radius); background: var(--m-surface); }
 .m-multi:focus-within { border-color: var(--m-accent, var(--m-focus)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-accent, var(--m-focus)) 22%, transparent); }
 .m-multi > .m-input { border: 0; box-shadow: none; flex: 1 1 8rem; min-height: calc(var(--m-control-h) - 8px); padding-block: 0; background: transparent; }
 /* the list panel is the shared .m-pop frame around an OptionList; here only its height */

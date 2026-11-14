@@ -2,7 +2,7 @@
 .m-consent { position: fixed; inset-inline: var(--m-space-3); inset-block-end: calc(var(--m-space-3) + env(safe-area-inset-bottom, 0px));
   max-width: 56rem; margin-inline: auto; display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--m-space-4);
   padding: var(--m-space-4) var(--m-space-5); pointer-events: auto; background: var(--m-surface-raised); color: var(--m-text);
-  border: 1px solid var(--m-border); border-radius: var(--m-radius-3); box-shadow: var(--m-shadow-3);
+  border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); box-shadow: var(--m-shadow-3);
   z-index: var(--m-z-toast); }
 /* in the page flow (demos): no fixed position, so it never covers the content after it */
 .m-consent-inline > .m-consent { position: relative; inset: auto; margin-inline: 0; max-width: none; }

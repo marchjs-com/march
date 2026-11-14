@@ -23,7 +23,7 @@ barrel). The Colors tab, the preview, saving and the other tabs (one chunk) load
 |---|---|---|---|
 | `value` / `bind:value` | `ThemeDraft` | share link, saved draft, then `base` | the draft is plain data (JSON-safe) |
 | `base` | preset id or `"scratch"` | `"hadi"` | where a new draft starts; a preset becomes a copy with its own id (`my-night`) |
-| `tabs` | `("colors" \| "type" \| "shape" \| "motion" \| "export")[]` | all | sections shown |
+| `tabs` | `("colors" \| "type" \| "shape" \| "style" \| "motion" \| "export")[]` | all | sections shown |
 | `preview` | boolean | `true` | live preview beside the controls |
 | `storageKey` | string or `false` | `"theme-editor"` | Save writes the draft here (StorageManager, local area) |
 | `share` | boolean | `true` | read `?theme=…` from the URL on start |
@@ -48,7 +48,12 @@ The texts inside the tabs and the preview are ordinary `t` texts: the locale pac
 
 ## Theme draft and tokens
 
-A `ThemeDraft` holds `light` and `dark` colors (the `ThemeColors` roles, `cat`, `brand`), `type`, `shape` and `motion`.
+A `ThemeDraft` holds `light` and `dark` colors (the `ThemeColors` roles, `cat`, `brand`), `type`, `shape`, `style` and `motion`.
+The Style tab edits the look beyond colors and sizes (`ThemeStyle`): how panels sit on the page (soft, flat, raised,
+outlined, glass), a glowing edge in the accent color, the kind of shadow (soft, hard, none), a gradient fill for
+primary buttons, heading letter spacing and the stroke of line icons. Each becomes tokens components read
+(`--m-panel-bg`, `--m-panel-border`, `--m-panel-shadow`, `--m-panel-filter`, `--m-primary-fill`, `--m-accent-glow`,
+`--m-tracking-tight`, `--m-icon-stroke`, `--m-bg-image`).
 `draftToTheme(d)` makes the `ThemeDef` — colors, fonts, radius and `tokens` (new in `defineTheme`: extra `--m-*`
 tokens for both modes, such as `text-md`, `space-4`, `radius-3`, `shadow-2`, `border-w`, `dur`, `ease-out`,
 `primary-500`). Tokens equal to the built-in values are left out, so a theme stays small. `--m-border-w` sets the

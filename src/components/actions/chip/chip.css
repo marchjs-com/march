@@ -1,5 +1,5 @@
 /* March — Chip. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.m-chip2 { display: inline-flex; align-items: center; gap: .3125rem; min-height: 1.75rem; max-width: 100%; padding: 0 .625rem; border-radius: var(--m-radius-full); border: 1px solid var(--m-border);
+.m-chip2 { display: inline-flex; align-items: center; gap: .3125rem; min-height: 1.75rem; max-width: 100%; padding: 0 .625rem; border-radius: var(--m-radius-full); border: var(--m-border-w, 1px) solid var(--m-border);
   background: var(--m-surface); color: var(--m-text-2); font-size: var(--m-text-sm); font-weight: 500; white-space: nowrap; transition: background-color var(--m-dur) var(--m-ease), border-color var(--m-dur) var(--m-ease), color var(--m-dur) var(--m-ease); }
 .m-chip2-sm { min-height: 1.375rem; padding: 0 .5rem; font-size: var(--m-text-xs); }
 .m-chip2-icon { display: inline-flex; } .m-chip2-icon .m-svg { width: .8125rem; height: .8125rem; }

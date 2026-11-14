@@ -42,7 +42,7 @@
 .m-affix:has(.m-input[aria-invalid="true"]) { border-color: var(--m-danger); }
 .m-affix-text { display: flex; align-items: center; padding: 0 var(--m-space-3); color: var(--m-muted); background: var(--m-bg-subtle); font-size: var(--m-text-sm); white-space: nowrap; }
 .m-affix-text:has(> .m-svg) { background: transparent; border: 0; padding-inline: .75rem 0; color: var(--m-faint); }
-.m-affix-prefix { border-inline-end: 1px solid var(--m-border); border-radius: var(--m-radius) 0 0 var(--m-radius); }
-.m-affix-suffix { border-inline-start: 1px solid var(--m-border); border-radius: 0 var(--m-radius) var(--m-radius) 0; }
+.m-affix-prefix { border-inline-end: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius) 0 0 var(--m-radius); }
+.m-affix-suffix { border-inline-start: var(--m-border-w, 1px) solid var(--m-border); border-radius: 0 var(--m-radius) var(--m-radius) 0; }
 .m-icon-btn:disabled { opacity: .45; cursor: not-allowed; }
 .m-icon { flex: none; }

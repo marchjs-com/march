@@ -8,9 +8,9 @@
 .m-btn:focus-visible { outline: 2px solid var(--m-accent, var(--m-focus)); outline-offset: 2px; }
 .m-btn:disabled, .m-btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
 .m-btn .m-svg { width: 1rem; height: 1rem; }
-.m-btn-primary { color: var(--m-on-accent, var(--m-on-primary)); background: var(--m-accent, var(--m-primary-solid)); border-color: color-mix(in srgb, var(--m-accent, var(--m-primary-solid)) 82%, var(--m-text));
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--m-on-scrim) 18%, transparent), 0 1px 2px color-mix(in srgb, var(--m-accent, var(--m-primary-solid)) 35%, transparent); }
-.m-btn-primary:hover { background: var(--m-accent-hover, var(--m-primary-solid-hover)); }
+.m-btn-primary { color: var(--m-on-accent, var(--m-on-primary)); background: var(--m-accent, var(--m-primary-fill, var(--m-primary-solid))); border-color: color-mix(in srgb, var(--m-accent, var(--m-primary-solid)) 82%, var(--m-text));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--m-on-scrim) 18%, transparent), 0 1px 2px color-mix(in srgb, var(--m-accent, var(--m-primary-solid)) 35%, transparent), var(--m-accent-glow, 0 0 0 0 transparent); }
+.m-btn-primary:hover { background: var(--m-accent-hover, var(--m-primary-fill-hover, var(--m-primary-solid-hover))); }
 .m-btn-dark { color: var(--m-surface); background: var(--m-text); border-color: var(--m-text); box-shadow: 0 1px 2px color-mix(in srgb, var(--m-text) 30%, transparent); }
 .m-btn-dark:hover { background: color-mix(in srgb, var(--m-text) 86%, var(--m-surface)); }
 .m-btn-secondary { background: var(--m-surface); border-color: var(--m-border-strong); box-shadow: var(--m-shadow-1); }

@@ -35,5 +35,45 @@ export const THEME_NAMES: readonly { id: string; name: string; description?: str
     "id": "contrast",
     "name": "High Contrast",
     "description": "Accessibility: black, white, yellow"
+  },
+  {
+    "id": "aurora",
+    "name": "Aurora",
+    "description": "Glass panels and a glowing edge on deep navy"
+  },
+  {
+    "id": "noir-gold",
+    "name": "Noir Gold",
+    "description": "Black and gold, thin frames, serif headings"
+  },
+  {
+    "id": "ember",
+    "name": "Ember",
+    "description": "Warm charcoal and orange, round and roomy"
+  },
+  {
+    "id": "voyage",
+    "name": "Voyage",
+    "description": "Flat navy, vivid accents, no shadows"
+  },
+  {
+    "id": "graphite",
+    "name": "Graphite",
+    "description": "Neutral grey, compact, for desktop apps"
+  },
+  {
+    "id": "paper",
+    "name": "Paper",
+    "description": "Editorial: paper tone, serif headings, frames"
+  },
+  {
+    "id": "mint",
+    "name": "Mint",
+    "description": "Fresh green, soft and roomy"
+  },
+  {
+    "id": "candy",
+    "name": "Candy",
+    "description": "Playful pastel with gradient buttons"
   }
 ];

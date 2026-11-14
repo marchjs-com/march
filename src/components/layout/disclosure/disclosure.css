@@ -1,6 +1,6 @@
 /* March — Disclosure. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- disclosure */
-.m-disclosure { border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface); }
+.m-disclosure { border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface); }
 .m-disclosure-summary { cursor: pointer; padding: var(--m-space-3) var(--m-space-4); font-weight: var(--m-weight-medium); list-style: none; display: flex; align-items: center; gap: var(--m-space-2);
   border-radius: inherit; transition: background-color var(--m-dur) var(--m-ease); }
 .m-disclosure-summary:hover { background: var(--m-surface-2); }

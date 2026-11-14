@@ -1,6 +1,6 @@
 /* March — Menu and Dropdown (and the .m-pop panel of every floating() popover). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- popovers, menus, tooltips */
-.m-pop { position: fixed; z-index: var(--m-z-dropdown); background: var(--m-surface-raised); color: var(--m-text); border: 1px solid var(--m-border);
+.m-pop { position: fixed; z-index: var(--m-z-dropdown); background: var(--m-panel-raised-bg, var(--m-surface-raised)); -webkit-backdrop-filter: var(--m-panel-filter, none); backdrop-filter: var(--m-panel-filter, none); color: var(--m-text); border: var(--m-border-w, 1px) solid var(--m-panel-border, var(--m-border));
   border-radius: var(--m-radius-3); box-shadow: var(--m-shadow-3); animation: m-scale-in var(--m-dur) var(--m-ease-out); transform-origin: top; }
 /* the menu panel is a Popover (flush): its width, height and the gap around the entries */
 .m-pop.m-menu { --m-pop-pad: .3125rem; min-inline-size: 12rem; max-inline-size: min(22rem, calc(100vw - 16px)); max-block-size: 60vh; padding: var(--m-pop-pad); }

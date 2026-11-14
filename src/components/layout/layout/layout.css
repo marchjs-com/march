@@ -4,8 +4,8 @@
 .m-layout-row { flex: 1 1 auto; display: flex; min-width: 0; }
 .m-layout-main { flex: 1 1 auto; }
 .m-layout-aside { flex: none; inline-size: clamp(14rem, 22vw, 18rem); position: sticky; top: var(--m-topbar-h, 3.5rem); align-self: flex-start;
-  max-block-size: calc(100dvh - var(--m-topbar-h, 3.5rem)); overflow: auto; padding: var(--m-space-5) var(--m-space-4); border-inline-start: 1px solid var(--m-border); }
-.m-layout-footer { border-top: 1px solid var(--m-border); padding: var(--m-space-5); color: var(--m-muted); }
+  max-block-size: calc(100dvh - var(--m-topbar-h, 3.5rem)); overflow: auto; padding: var(--m-space-5) var(--m-space-4); border-inline-start: var(--m-border-w, 1px) solid var(--m-border); }
+.m-layout-footer { border-top: var(--m-border-w, 1px) solid var(--m-border); padding: var(--m-space-5); color: var(--m-muted); }
 .m-layout-footer:empty, .m-layout-aside:empty { display: none; }
 .m-layout-ctl { display: contents; }
 .m-layout-aside-btn { display: none; }
@@ -29,7 +29,7 @@
   .m-layout-row { flex-direction: column; }
   /* the aside is a bottom sheet, opened from its corner button */
   .m-layout-aside { position: fixed; inset-inline: 0; inset-block-end: 0; inline-size: auto; max-block-size: 70dvh; z-index: var(--m-z-dropdown);
-    background: var(--m-surface); border: 0; border-top: 1px solid var(--m-border); border-start-start-radius: var(--m-radius-lg); border-start-end-radius: var(--m-radius-lg);
+    background: var(--m-surface); border: 0; border-top: var(--m-border-w, 1px) solid var(--m-border); border-start-start-radius: var(--m-radius-lg); border-start-end-radius: var(--m-radius-lg);
     box-shadow: var(--m-shadow-3); transform: translateY(100%); visibility: hidden; transition: transform var(--m-dur) var(--m-ease), visibility var(--m-dur) step-end; }
   .m-layout-aside[data-open] { transform: none; visibility: visible; transition: transform var(--m-dur) var(--m-ease), visibility var(--m-dur) step-start; }
   .m-layout-aside-btn { display: inline-flex; box-shadow: var(--m-shadow-2); }

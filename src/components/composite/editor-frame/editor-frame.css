@@ -1,7 +1,7 @@
 /* EditorFrame: the frame of the editors (MarkdownEditor, RichTextEditor, TreeEditor): border, focus ring, and the look
    of the head and foot bars (PanelHeader). One definition; the editors add only what is their own. */
 .m-editor-frame { --m-editor-accent: var(--m-accent, var(--m-primary)); display: flex; flex-direction: column; min-inline-size: 0; max-inline-size: 100%;
-  border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface); color: var(--m-text);
+  border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface); color: var(--m-text);
   transition: border-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease); }
 .m-editor-frame:focus-within { border-color: var(--m-editor-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-editor-accent) 16%, transparent); }
 .m-editor-frame.is-plain:focus-within { border-color: var(--m-border); box-shadow: none; }

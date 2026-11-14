@@ -20,7 +20,7 @@ export function row(label: () => string, control: (labelId: string, id: string) 
   return h(Field, { id, group: !native, class: "m-te-field", label: live(() => label()), help: live(() => hint?.()) }, control(`${id}-label`, id)) as Element;
 }
 /** A slider bound to one number of the draft. */
-export function num<K extends "type" | "shape" | "motion">(ctx: ThemeEditorContext, part: K, key: keyof M.ThemeDraft[K] & string, label: () => string, o: { min: number; max: number; step: number; format: (v: number) => string }): Element {
+export function num<K extends "type" | "shape" | "style" | "motion">(ctx: ThemeEditorContext, part: K, key: keyof M.ThemeDraft[K] & string, label: () => string, o: { min: number; max: number; step: number; format: (v: number) => string }): Element {
   return row(label, (labelledby) => h(Slider, {
     labelledby, min: o.min, max: o.max, step: o.step, format: o.format, readonly: live(() => ctx.readonly()),
     value: live(() => ctx.draft()[part][key] as number),

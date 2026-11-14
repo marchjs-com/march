@@ -1,5 +1,5 @@
 /* March — TreeView. Imported by its component module; tokens.css provides the variables. Logical properties only (RTL). */
-.m-tv { position: relative; overflow: auto; overscroll-behavior: contain; max-width: 100%; padding-block: var(--m-space-1); border: 1px solid var(--m-border); border-radius: var(--m-radius-3);
+.m-tv { position: relative; overflow: auto; overscroll-behavior: contain; max-width: 100%; padding-block: var(--m-space-1); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3);
   background: var(--m-surface); box-shadow: var(--m-shadow-1); font-size: var(--m-text-sm); outline: none; }
 .m-tv:focus-visible { border-color: var(--m-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-focus) 22%, transparent); }
 .m-tv-canvas { position: relative; }
@@ -32,7 +32,7 @@
 .m-tv-drop::before { content: ""; position: absolute; inset-inline-start: -4px; inset-block-start: -3px; width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--m-primary); background: var(--m-surface); box-sizing: border-box; }
 /* the drag ghost lives in the drag layer (fixed, pointer-events none); dragGhost places it at the pointer (viewport px) */
 .m-tv-ghost { position: fixed; display: inline-flex; align-items: center; gap: .5rem; max-width: 16rem; padding: .375rem .75rem; border-radius: var(--m-radius-2);
-  background: var(--m-surface); color: var(--m-text); box-shadow: var(--m-shadow-3); border: 1px solid var(--m-border); font-size: var(--m-text-sm); pointer-events: none; }
+  background: var(--m-surface); color: var(--m-text); box-shadow: var(--m-shadow-3); border: var(--m-border-w, 1px) solid var(--m-border); font-size: var(--m-text-sm); pointer-events: none; }
 .m-tv-ghost-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* rows that can be dragged say so (grab cursor) */
 .m-tv.is-draggable .m-tv-row.m-listrow:not(.is-disabled) { cursor: grab; }

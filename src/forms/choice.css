@@ -60,7 +60,7 @@
 
 /* chip: a pill (shape: square / rounded / circle = pill) that fills when selected; the tick slides in */
 .m-choice-chip.m-choices, .m-choice-chip .m-choices { flex-direction: row; flex-wrap: wrap; gap: var(--m-space-2); }
-.m-choice-chip .m-check { align-items: center; gap: .375rem; padding: var(--m-ch-pad-y) var(--m-ch-pad-x); border: 1px solid var(--m-border-strong); border-radius: var(--m-ch-item-radius); background: var(--m-surface);
+.m-choice-chip .m-check { align-items: center; gap: .375rem; padding: var(--m-ch-pad-y) var(--m-ch-pad-x); border: var(--m-border-w, 1px) solid var(--m-border-strong); border-radius: var(--m-ch-item-radius); background: var(--m-surface);
   font-weight: 500; transition: background-color var(--m-dur) var(--m-ease), border-color var(--m-dur) var(--m-ease), color var(--m-dur) var(--m-ease), transform var(--m-dur-fast) var(--m-ease); }
 .m-choice-chip .m-check-input { inset: 0; width: 100%; height: 100%; }
 .m-choice-chip .m-check-box { --m-ch-size: 1em; width: 0; height: 1em; margin: 0; border: 0; background: none; overflow: hidden; color: currentColor; transition: width var(--m-dur-slow) var(--m-ch-ease); }
@@ -76,7 +76,7 @@
 /* card: equal-width, equal-height cards; selected = surface + 2px accent border + soft tint + tick badge (no dot) */
 .m-choice-card.m-choices, .m-choice-card .m-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); grid-auto-rows: 1fr; gap: var(--m-space-3); width: 100%; }
 .m-choice-card .m-check { display: flex; align-items: stretch; min-width: 0; padding: var(--m-ch-card-pad); padding-inline-end: calc(var(--m-ch-card-pad) + 1.75rem);
-  border: 1px solid var(--m-border); border-radius: var(--m-ch-card-radius); background: var(--m-surface); box-shadow: var(--m-shadow-1);
+  border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-ch-card-radius); background: var(--m-surface); box-shadow: var(--m-shadow-1);
   transition: border-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease), background-color var(--m-dur) var(--m-ease), transform var(--m-dur-fast) var(--m-ease); }
 .m-choice-card .m-check-input { inset: 0; width: 100%; height: 100%; }
 /* the tick badge: top end corner, springs in when selected */
@@ -109,7 +109,7 @@
 @container (max-width: 15rem) { .m-choice-card-body, .m-choice-card-body:not(:has(.m-choice-card-icon)) { grid-template-columns: auto minmax(0, 1fr); } .m-choice-card-body:not(:has(.m-choice-card-icon)) { grid-template-columns: minmax(0, 1fr); } .m-choice-card-meta { grid-column: -2; justify-self: start; } }
 
 /* toggle / segmented: joined buttons, the selected one filled (shape → corners, size → padding / type) */
-.m-choice-toggle.m-choices, .m-choice-segmented.m-choices { flex-direction: row; flex-wrap: wrap; gap: 0; width: fit-content; max-width: 100%; padding: 3px; border: 1px solid var(--m-border); border-radius: calc(var(--m-ch-item-radius) + 3px); background: var(--m-surface-2); }
+.m-choice-toggle.m-choices, .m-choice-segmented.m-choices { flex-direction: row; flex-wrap: wrap; gap: 0; width: fit-content; max-width: 100%; padding: 3px; border: var(--m-border-w, 1px) solid var(--m-border); border-radius: calc(var(--m-ch-item-radius) + 3px); background: var(--m-surface-2); }
 .m-choice-toggle .m-check, .m-choice-segmented .m-check { align-items: center; padding: var(--m-ch-pad-y) var(--m-ch-pad-x); border-radius: var(--m-ch-item-radius); font-weight: 500; color: var(--m-text-2);
   transition: background-color var(--m-dur) var(--m-ease), color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease); }
 .m-choice-toggle .m-check-input, .m-choice-segmented .m-check-input { inset: 0; width: 100%; height: 100%; }

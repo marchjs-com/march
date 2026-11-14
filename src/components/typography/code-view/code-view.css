@@ -1,5 +1,5 @@
 /* March — CodeView (and the Code tab widget). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.m-code { border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-bg-subtle); overflow: hidden; }
+.m-code { border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-bg-subtle); overflow: hidden; }
 /* the bar is a PanelHeader (the language at the start, the tools at the end) */
 .m-panel-header.m-code-bar { --m-ph-pad: var(--m-space-2); border-block-end-color: var(--m-border); background: var(--m-surface); }
 .m-code-lang { padding-inline-start: var(--m-space-1); color: var(--m-muted); font-size: var(--m-text-2xs); font-weight: 600; text-transform: uppercase; letter-spacing: var(--m-tracking-caps); }

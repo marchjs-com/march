@@ -1,9 +1,9 @@
 /* TimeRuler. Theme tokens only, logical properties, durations from --m-dur tokens, no @keyframes (motion core).
    --m-time-ruler-reach: how far the playhead line runs below the ruler (over the rows of a timeline; default 0). */
-.m-time-ruler { position: relative; min-inline-size: 0; block-size: 1.75rem; border-block-end: 1px solid var(--m-border-subtle); }
+.m-time-ruler { position: relative; min-inline-size: 0; block-size: 1.75rem; border-block-end: var(--m-border-w, 1px) solid var(--m-border-subtle); }
 .m-time-ruler-rail { position: absolute; inset: 0; }
 .m-time-ruler.is-seekable .m-time-ruler-rail { cursor: ew-resize; touch-action: none; }
-.m-time-ruler-tick { position: absolute; inset-block-end: 0; inset-inline-start: var(--m-time-ruler-at); block-size: .375rem; border-inline-start: 1px solid var(--m-border); pointer-events: none; }
+.m-time-ruler-tick { position: absolute; inset-block-end: 0; inset-inline-start: var(--m-time-ruler-at); block-size: .375rem; border-inline-start: var(--m-border-w, 1px) solid var(--m-border); pointer-events: none; }
 .m-time-ruler-tick.is-major { block-size: .75rem; border-color: var(--m-border-strong); padding-inline-start: .25rem; font: var(--m-text-2xs)/0 var(--m-font-mono, inherit); color: var(--m-faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .m-time-ruler-head { position: absolute; inset-block: 0 calc(-1 * var(--m-time-ruler-reach, 0px)); inset-inline-start: var(--m-time-ruler-at, 0%); z-index: 1; inline-size: 2px; margin-inline-start: -1px; border-radius: 2px;
   background: var(--m-accent, var(--m-primary)); outline: none; pointer-events: none; }

@@ -33,10 +33,10 @@ a.m-section-head-eyebrow:hover .m-hero-eyebrow-arrow { transform: translateX(3px
 /* product frame: browser-like chrome, glass edge, perspective tilt from JS */
 .m-hero-product { position: relative; width: 100%; max-width: 64rem; margin-inline: auto; perspective: 1400px; overflow: clip; overflow-clip-margin: 3rem; }
 .m-hero-product::before { content: ""; position: absolute; inset: 10% 6% -6%; z-index: -1; border-radius: 50%; filter: blur(60px); opacity: .45; background: var(--m-brand-gradient); }
-.m-hero-frame { position: relative; border-radius: var(--m-radius-4); overflow: hidden; background: var(--m-surface); border: 1px solid var(--m-border); box-shadow: var(--m-shadow-4);
+.m-hero-frame { position: relative; border-radius: var(--m-radius-4); overflow: hidden; background: var(--m-surface); border: var(--m-border-w, 1px) solid var(--m-border); box-shadow: var(--m-shadow-4);
   transform-origin: 50% 0; will-change: transform; }
 .m-hero-frame-glass { opacity: .25; }
-.m-hero-frame-bar { display: flex; gap: 6px; padding: 10px 14px; border-block-end: 1px solid var(--m-border); background: var(--m-surface-2); }
+.m-hero-frame-bar { display: flex; gap: 6px; padding: 10px 14px; border-block-end: var(--m-border-w, 1px) solid var(--m-border); background: var(--m-surface-2); }
 .m-hero-frame-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--m-border-strong); }
 .m-hero-frame-body { position: relative; min-width: 0; }
 .m-hero-frame-body .m-hero-img { aspect-ratio: auto; }

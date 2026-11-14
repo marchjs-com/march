@@ -31,6 +31,7 @@ messages("tr", tr);
 const ColorsPanel = lazy(() => import("./colors.ts"), { pick: "ColorsPanel", placeholder: "form", height: "40rem" });
 const TypePanel = lazy(() => import("./panels.ts"), { pick: "TypePanel", placeholder: "form", height: "24rem" });
 const ShapePanel = lazy(() => import("./panels.ts"), { pick: "ShapePanel", placeholder: "form", height: "24rem" });
+const StylePanel = lazy(() => import("./panels.ts"), { pick: "StylePanel", placeholder: "form", height: "24rem" });
 const MotionPanel = lazy(() => import("./panels.ts"), { pick: "MotionPanel", placeholder: "form", height: "24rem" });
 const ExportPanel = lazy(() => import("./panels.ts"), { pick: "ExportPanel", placeholder: "form", height: "24rem" });
 const Preview = lazy(() => import("./preview.ts"), { pick: "ThemePreview", placeholder: "card", height: "34rem" });
@@ -128,6 +129,7 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
     { id: "colors", label: () => L().tabs?.colors ?? t`Colors`, content: () => h(ColorsPanel, { ctx }) },
     { id: "type", label: () => L().tabs?.type ?? t`Typography`, content: () => h(TypePanel, { ctx }) },
     { id: "shape", label: () => L().tabs?.shape ?? t`Shape`, content: () => h(ShapePanel, { ctx }) },
+    { id: "style", label: () => L().tabs?.style ?? t`Style`, content: () => h(StylePanel, { ctx }) },
     { id: "motion", label: () => L().tabs?.motion ?? t`Motion`, content: () => h(MotionPanel, { ctx }) },
     { id: "export", label: () => L().tabs?.export ?? t`Export`, content: () => h(ExportPanel, { ctx }) },
   ];

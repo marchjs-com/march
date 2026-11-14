@@ -20,7 +20,7 @@
 .m-price-custom { font-size: clamp(2rem, 1.6rem + 1.2cqi, 2.5rem); font-weight: 800; letter-spacing: -.03em; line-height: 1; }
 .m-price-per { display: flex; flex-direction: column; font-size: var(--m-text-sm); color: var(--m-muted); line-height: 1.25; padding-block-end: .2rem; }
 .m-price-cta > * { width: 100%; justify-content: center; }
-.m-price-feats { display: flex; flex-direction: column; gap: var(--m-space-2); margin: 0; padding: var(--m-space-4) 0 0; list-style: none; border-block-start: 1px solid var(--m-border); }
+.m-price-feats { display: flex; flex-direction: column; gap: var(--m-space-2); margin: 0; padding: var(--m-space-4) 0 0; list-style: none; border-block-start: var(--m-border-w, 1px) solid var(--m-border); }
 .m-price-feat { display: flex; align-items: flex-start; gap: var(--m-space-2); line-height: 1.45; }
 .m-price-feat-icon { flex: none; margin-block-start: .05rem; }
 .m-price-feat.is-off { color: var(--m-muted); }

@@ -2,7 +2,7 @@
    in model.ts match the sizes below. Logical properties: the drawing mirrors in RTL. Motion runs on the engine. */
 .m-flow { --m-flow-node-w: 232px; --m-flow-head: 44px; --m-flow-row: 26px; --m-flow-line: color-mix(in srgb, var(--m-text) 30%, transparent);
   position: relative; container-type: inline-size; min-block-size: 26rem; block-size: 100%; overflow: hidden; touch-action: none; user-select: none; outline: none;
-  border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background-color: var(--m-bg-subtle);
+  border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); background-color: var(--m-bg-subtle);
   background-image: radial-gradient(circle at center, color-mix(in srgb, var(--m-text) 22%, transparent) 1px, transparent 1.6px);
   background-size: var(--m-flow-gs, 16px) var(--m-flow-gs, 16px); background-position: var(--m-flow-gx, 0) var(--m-flow-gy, 0); }
 .m-flow:dir(rtl) { background-position: right var(--m-flow-gx, 0) top var(--m-flow-gy, 0); }
@@ -40,7 +40,7 @@
 .m-flow-pill:focus-visible { outline: 3px solid var(--m-focus); outline-offset: 2px; }
 
 /* nodes */
-.m-flow-node { position: absolute; inline-size: var(--m-flow-node-w); border: 1px solid var(--m-border); border-radius: 14px; background: var(--m-surface); color: var(--m-text);
+.m-flow-node { position: absolute; inline-size: var(--m-flow-node-w); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: 14px; background: var(--m-surface); color: var(--m-text);
   box-shadow: var(--m-shadow-2); cursor: grab; outline: none; transition: box-shadow var(--m-dur) var(--m-ease), border-color var(--m-dur) var(--m-ease); }
 .m-flow-node::before { content: ""; position: absolute; inset-inline: 12px; inset-block-start: -1px; block-size: 3px; border-radius: 0 0 3px 3px; background: var(--m-accent, var(--m-primary)); }
 .m-flow-node:hover { box-shadow: var(--m-shadow-3); }
@@ -52,7 +52,7 @@
 .m-flow-glow { position: absolute; inset: -7px; border-radius: 20px; pointer-events: none; opacity: 0;
   box-shadow: 0 0 0 2px var(--m-accent, var(--m-primary)), 0 0 28px 4px color-mix(in srgb, var(--m-accent, var(--m-primary)) 55%, transparent); }
 .m-flow-node.is-running .m-flow-glow { opacity: .6; }
-.m-flow-head { display: flex; align-items: center; gap: .5rem; block-size: var(--m-flow-head); padding-inline: .625rem .5rem; border-block-end: 1px solid var(--m-border-subtle); }
+.m-flow-head { display: flex; align-items: center; gap: .5rem; block-size: var(--m-flow-head); padding-inline: .625rem .5rem; border-block-end: var(--m-border-w, 1px) solid var(--m-border-subtle); }
 .m-flow-title { flex: 1; min-inline-size: 0; font-size: var(--m-text-sm); font-weight: var(--m-weight-semibold); }
 /* run state: a CheckMark disc (done / failed) or a StatusDot (running: with a ring; queued) */
 .m-flow-state { display: inline-grid; place-items: center; flex: none; min-inline-size: 1.25rem; }
@@ -71,7 +71,7 @@
 .m-flow-port:focus-visible { outline: 3px solid var(--m-focus); outline-offset: 2px; }
 .m-flow-port.is-connected { border-color: var(--m-accent, var(--m-primary)); background: var(--m-accent, var(--m-primary)); }
 .m-flow-port.is-pending { transform: scale(1.35); border-color: var(--m-primary); background: var(--m-primary-soft); }
-.m-flow-fields { display: grid; gap: .375rem; padding: .5rem .625rem .625rem; border-block-start: 1px solid var(--m-border-subtle); cursor: default; user-select: text; }
+.m-flow-fields { display: grid; gap: .375rem; padding: .5rem .625rem .625rem; border-block-start: var(--m-border-w, 1px) solid var(--m-border-subtle); cursor: default; user-select: text; }
 .m-flow-fields .m-label { font-size: var(--m-text-xs); }
 .m-flow-fields .m-input, .m-flow-fields select { min-block-size: var(--m-control-h-sm); font-size: var(--m-text-sm); }
 .m-flow-error.m-alert { margin: 0 .625rem .625rem; padding: .375rem .5rem; border-radius: var(--m-radius-1); color: var(--m-danger-text); font-size: var(--m-text-xs); }
@@ -88,9 +88,9 @@
 .m-flow-marquee { position: absolute; border: 1.5px solid var(--m-primary); border-radius: 4px; background: color-mix(in srgb, var(--m-primary) 10%, transparent); pointer-events: none; }
 .m-flow-zoom, .m-flow-zoom .m-toolbar-start { flex-wrap: nowrap; gap: .125rem; }
 .m-flow-zoom { position: absolute; inset-block-end: .75rem; inset-inline-start: .75rem; padding: .25rem;
-  border: 1px solid var(--m-border); border-radius: var(--m-radius-full); background: color-mix(in srgb, var(--m-surface) 92%, transparent); box-shadow: var(--m-shadow-2); }
+  border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-full); background: color-mix(in srgb, var(--m-surface) 92%, transparent); box-shadow: var(--m-shadow-2); }
 .m-flow-zoomval { min-inline-size: 2.75rem; text-align: center; font: 500 var(--m-text-xs)/1 var(--m-font-mono, inherit); color: var(--m-text-2); font-variant-numeric: tabular-nums; }
-.m-flow-minimap { position: absolute; inset-block-end: .75rem; inset-inline-end: .75rem; border: 1px solid var(--m-border); border-radius: var(--m-radius-2);
+.m-flow-minimap { position: absolute; inset-block-end: .75rem; inset-inline-end: .75rem; border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-2);
   background: color-mix(in srgb, var(--m-surface) 92%, transparent); box-shadow: var(--m-shadow-2); cursor: pointer; }
 .m-flow-minimap:focus-visible { outline: 3px solid var(--m-focus); outline-offset: 2px; }
 .m-flow:dir(rtl) .m-flow-minimap { transform: scaleX(-1); }

@@ -1,5 +1,5 @@
 /* March — Segmented. Imported by its component module; tokens.css provides the variables. */
-.m-segmented { display: inline-flex; align-self: flex-start; flex-wrap: wrap; max-width: 100%; padding: 3px; gap: 2px; background: var(--m-surface-2); border: 1px solid var(--m-border); border-radius: calc(var(--m-radius) + 2px); }
+.m-segmented { display: inline-flex; align-self: flex-start; flex-wrap: wrap; max-width: 100%; padding: 3px; gap: 2px; background: var(--m-surface-2); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: calc(var(--m-radius) + 2px); }
 .m-segment { flex: none; white-space: nowrap; border: 0; background: transparent; color: var(--m-muted); font: inherit; font-size: var(--m-text-md); font-weight: 500; min-height: 1.75rem; padding: 0 .75rem; border-radius: calc(var(--m-radius) - 1px); cursor: pointer; transition: color var(--m-dur) var(--m-ease), background-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease); }
 .m-segment:hover { color: var(--m-text); }
 .m-segment[aria-checked="true"] { background: var(--m-surface); color: var(--m-text); box-shadow: var(--m-shadow-1), 0 0 0 1px var(--m-border); }

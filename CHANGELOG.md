@@ -4,6 +4,19 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
+### Theme style and eight new themes (later in 0.1.0)
+- `ThemeDef.style` (`ThemeStyle`): `surface` ("soft" | "flat" | "raised" | "outlined" | "glass"), `glow` (0–1), `shadow`
+  ("soft" | "hard" | "none"), `accent` ("solid" | "gradient"), `tracking`, `iconStroke`, `density`, `borderWidth`.
+  `themeCss` turns them into tokens: `--m-panel-bg`, `--m-panel-raised-bg`, `--m-panel-border`, `--m-panel-shadow`,
+  `--m-panel-filter`, `--m-bg-image`, `--m-primary-fill`, `--m-accent-glow`, `--m-tracking-tight`, `--m-icon-stroke`.
+  Card, StatTile, Dialog, Drawer and the popover / menu panel read the panel tokens; the primary Button reads the fill
+  and the glow. A theme resets the tokens it does not set, so a theme scoped inside another keeps its own look.
+- Every hairline reads `--m-border-w` (it was a fixed 1px in 77 stylesheets): the border width of a theme now reaches
+  every component.
+- Eight built-in themes (15 in all): Aurora, Noir Gold, Ember, Voyage (always dark), Graphite, Paper, Mint, Candy.
+- ThemeEditor: a Style tab (surface, glow, shadow kind, accent fill, heading letter spacing, icon stroke); the draft
+  has a `style` part, kept in JSON, share links and the generated `defineTheme` code. `spaceTokens(space, density)`.
+
 ### FontPicker (later in 0.1.0)
 - New component `FontPicker` (`hadi-march/ui`): device fonts and a web font catalog (Google Fonts by default, about
   1,900 open-licensed families) in one searchable list; each name in its own type (only the letters shown are

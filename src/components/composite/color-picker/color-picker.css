@@ -3,7 +3,7 @@
    the full hue circle (keywords and hsl() below), whatever the theme. */
 .m-cp { --m-cp-accent: var(--m-accent, var(--m-primary));
   display: flex; flex-direction: column; gap: var(--m-space-3); inline-size: min(100%, 20rem); padding: var(--m-space-3);
-  border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface); }
+  border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface); }
 .m-cp.is-disabled { opacity: .6; }
 
 /* the 2D area: hue underneath, white to the side, black down */

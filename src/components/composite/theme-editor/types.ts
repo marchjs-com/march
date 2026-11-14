@@ -3,7 +3,7 @@ import type { Accessor, Signal } from "../../../core/reactive.ts";
 import type { ClassProp } from "../../../core/util.ts";
 import type * as M from "./model.ts";
 
-export type ThemeEditorTab = "colors" | "type" | "shape" | "motion" | "export";
+export type ThemeEditorTab = "colors" | "type" | "shape" | "style" | "motion" | "export";
 export interface ThemeEditorProps {
   /** The draft (`bind:value` works); default: a share link in the URL, the saved draft, then `base`. */
   value?: M.ThemeDraft | null | undefined;

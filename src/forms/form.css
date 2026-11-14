@@ -3,7 +3,7 @@
 .m-form-stack { display: flex; flex-direction: column; gap: var(--m-space-4); }
 .m-form-grid { display: grid; gap: var(--m-space-4) var(--m-space-5); align-items: start; }
 @media (max-width: 40rem) { .m-form-grid.m-form-grid { grid-template-columns: minmax(0, 1fr); } .m-form-grid > .m-field { grid-column: auto; } }
-fieldset.m-section, .m-form .m-section { border: 1px solid var(--m-border); border-radius: var(--m-radius-3); padding: var(--m-space-4) var(--m-space-5) var(--m-space-5); margin: 0; min-width: 0; background: var(--m-surface); box-shadow: var(--m-shadow-1); }
+fieldset.m-section, .m-form .m-section { border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); padding: var(--m-space-4) var(--m-space-5) var(--m-space-5); margin: 0; min-width: 0; background: var(--m-surface); box-shadow: var(--m-shadow-1); }
 fieldset > .m-section-title, legend.m-section-title { font-weight: 600; font-size: var(--m-text-lg); padding: 0 var(--m-space-2); letter-spacing: var(--m-tracking-tight); }
 .m-section-desc { color: var(--m-muted); font-size: var(--m-text-sm); margin: 0 0 var(--m-space-3); }
 

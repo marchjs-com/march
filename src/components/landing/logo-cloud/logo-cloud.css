@@ -7,7 +7,7 @@
 .m-logo-node { display: inline-flex; align-items: center; }
 .is-mono .m-logo { opacity: .62; filter: grayscale(1); }
 .is-mono .m-logo:hover, .is-mono .m-logo:focus-visible { opacity: 1; filter: none; }
-.m-logos-cell { display: grid; place-items: center; min-height: 5rem; padding: var(--m-space-3); border-radius: var(--m-radius-3); border: 1px solid var(--m-border); background: var(--m-surface); }
+.m-logos-cell { display: grid; place-items: center; min-height: 5rem; padding: var(--m-space-3); border-radius: var(--m-radius-3); border: var(--m-border-w, 1px) solid var(--m-border); background: var(--m-surface); }
 .m-logos-cell:hover .m-logo { transform: scale(1.06); }
 .m-logos-marquee { display: block; width: 100%; }
 .m-logos-row { display: inline-flex; align-items: center; gap: clamp(2rem, 5cqi, 4rem); padding-inline-end: clamp(2rem, 5cqi, 4rem); }

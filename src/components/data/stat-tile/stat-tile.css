@@ -20,7 +20,7 @@
 .m-stat-tile-xl .m-stat-tile-hint, .m-stat-tile-lg .m-stat-tile-hint { font-size: var(--m-text-xs); }
 /* looks */
 .m-stat-tile-tile { padding: .5rem .625rem; border-radius: var(--m-radius-3); background: var(--m-surface-2); }
-.m-stat-tile-card { padding: var(--m-space-4); border: 1px solid var(--m-border); border-radius: var(--m-radius-4); background: var(--m-surface); }
+.m-stat-tile-card { padding: var(--m-space-4); border: var(--m-border-w, 1px) solid var(--m-panel-border, var(--m-border)); border-radius: var(--m-radius-4); background: var(--m-panel-bg, var(--m-surface)); box-shadow: var(--m-panel-shadow, none); -webkit-backdrop-filter: var(--m-panel-filter, none); backdrop-filter: var(--m-panel-filter, none); }
 /* button / link */
 .m-stat-tile.is-action { cursor: pointer; border-radius: var(--m-radius-3); transition: background-color var(--m-dur) var(--m-ease), transform var(--m-dur) var(--m-ease-spring); }
 .m-stat-tile-plain.is-action { padding: .25rem .5rem; }

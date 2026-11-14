@@ -1,3 +1,3 @@
 /* March — Kbd. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.m-kbd { display: inline-flex; align-items: center; justify-content: center; padding: 0 .3125rem; min-width: 1.25rem; height: 1.25rem; border: 1px solid var(--m-border);
+.m-kbd { display: inline-flex; align-items: center; justify-content: center; padding: 0 .3125rem; min-width: 1.25rem; height: 1.25rem; border: var(--m-border-w, 1px) solid var(--m-border);
   border-radius: .3125rem; background: var(--m-surface); color: var(--m-muted); box-shadow: 0 1px 0 var(--m-border); font: 500 var(--m-text-2xs)/1 var(--m-font); letter-spacing: .02em; }

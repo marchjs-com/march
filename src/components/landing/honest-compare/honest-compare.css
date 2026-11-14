@@ -3,10 +3,10 @@
 .m-hc-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--m-space-3); }
 .m-hc-counts { margin: 0; color: var(--m-muted); }
 .m-hc-scroll:focus-visible { outline: 2px solid var(--m-primary); outline-offset: 2px; }
-.m-hc-scroll { overflow-x: auto; border: 1px solid var(--m-border); border-radius: var(--m-radius-4); background: var(--m-surface); }
+.m-hc-scroll { overflow-x: auto; border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-4); background: var(--m-surface); }
 .m-hc-table { inline-size: 100%; min-inline-size: 34rem; border-collapse: collapse; font-size: var(--m-text-sm); }
 .m-hc-caption { caption-side: top; padding: var(--m-space-3) var(--m-space-4); text-align: start; font-weight: var(--m-weight-semibold); }
-.m-hc-table th, .m-hc-table td { padding: var(--m-space-3) var(--m-space-4); border-block-end: 1px solid var(--m-border); text-align: center; vertical-align: middle; }
+.m-hc-table th, .m-hc-table td { padding: var(--m-space-3) var(--m-space-4); border-block-end: var(--m-border-w, 1px) solid var(--m-border); text-align: center; vertical-align: middle; }
 .m-hc-head { font-size: var(--m-text-md); font-weight: var(--m-weight-semibold); }
 .m-hc-corner, .m-hc-label { position: sticky; inset-inline-start: 0; z-index: 1; background: var(--m-surface); }
 .m-hc-label { text-align: start !important; font-weight: var(--m-weight-medium, 500); }

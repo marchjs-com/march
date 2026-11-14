@@ -1,6 +1,6 @@
 /* March — Tabs. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- tabs */
-.m-tabs-bar { position: relative; display: flex; gap: var(--m-space-1); border-bottom: 1px solid var(--m-border); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.m-tabs-bar { position: relative; display: flex; gap: var(--m-space-1); border-bottom: var(--m-border-w, 1px) solid var(--m-border); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .m-tabs-bar::-webkit-scrollbar { display: none; }
 .m-tab { position: relative; display: inline-flex; align-items: center; gap: var(--m-space-2); padding: .625rem .75rem; border: 0; margin-bottom: -1px;
   background: none; color: var(--m-muted); font: inherit; font-size: var(--m-text-md); font-weight: var(--m-weight-medium); white-space: nowrap; cursor: pointer;
@@ -27,7 +27,7 @@
 /* actions at the end of the bar: outside the tab list, the line runs under both */
 .m-tabs-head { display: flex; align-items: stretch; min-width: 0; }
 .m-tabs-head > .m-tabs-bar { flex: 1; min-width: 0; }
-.m-tabs-actions { display: flex; flex: none; align-items: center; gap: var(--m-space-1); padding-inline-start: var(--m-space-2); border-bottom: 1px solid var(--m-border); }
+.m-tabs-actions { display: flex; flex: none; align-items: center; gap: var(--m-space-1); padding-inline-start: var(--m-space-2); border-bottom: var(--m-border-w, 1px) solid var(--m-border); }
 /* pill: a rounded switch, the active tab raised */
 .m-tabs-bar-pill { width: fit-content; max-width: 100%; gap: 2px; padding: 2px; border-bottom: 0; border-radius: var(--m-radius-full); background: var(--m-surface-3); }
 .m-tabs-bar-pill .m-tab { min-height: 1.75rem; margin: 0; padding: 0 .85rem; border-radius: var(--m-radius-full); color: var(--m-text-2); font-size: var(--m-text-sm);

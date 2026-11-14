@@ -3,8 +3,8 @@
 html.m-scroll-lock { overflow: hidden; }
 .m-overlay { position: fixed; inset: 0; z-index: var(--m-z-dialog); display: flex; align-items: center; justify-content: center; padding: var(--m-space-4);
   background: var(--m-overlay); backdrop-filter: blur(3px); animation: m-fade-in var(--m-dur-slow) var(--m-ease); }
-.m-dialog { display: flex; flex-direction: column; width: 100%; max-height: calc(100vh - 2rem); background: var(--m-surface-raised); color: var(--m-text);
-  border: 1px solid var(--m-border); border-radius: var(--m-radius-4); box-shadow: var(--m-shadow-4); outline: none; animation: m-scale-in var(--m-dur-slow) var(--m-ease-out); }
+.m-dialog { display: flex; flex-direction: column; width: 100%; max-height: calc(100vh - 2rem); background: var(--m-panel-raised-bg, var(--m-surface-raised)); -webkit-backdrop-filter: var(--m-panel-filter, none); backdrop-filter: var(--m-panel-filter, none); color: var(--m-text);
+  border: var(--m-border-w, 1px) solid var(--m-panel-border, var(--m-border)); border-radius: var(--m-radius-4); box-shadow: var(--m-shadow-4); outline: none; animation: m-scale-in var(--m-dur-slow) var(--m-ease-out); }
 .m-dialog-sm { max-width: 26rem; } .m-dialog-md { max-width: 36rem; } .m-dialog-lg { max-width: 56rem; }
 .m-dialog-full { max-width: none; height: 100%; max-height: none; }
 /* head and foot are PanelHeader bars; only the dialog's own spacing is set here */
@@ -13,11 +13,11 @@ html.m-scroll-lock { overflow: hidden; }
 .m-dialog-x.m-icon-btn { margin-inline-end: calc(-1 * var(--m-space-1)); width: 2rem; height: 2rem; }
 .m-dialog-body { flex: 1 1 auto; min-height: 0; padding: var(--m-space-4) var(--m-space-5); overflow: auto; overscroll-behavior: contain; }
 .m-dialog-msg { margin: 0 0 var(--m-space-3); color: var(--m-text-2); white-space: pre-line; }
-.m-dialog-foot.m-panel-header { flex: none; min-block-size: 0; margin-block-start: auto; padding: var(--m-space-3) var(--m-space-5); border-top: 1px solid var(--m-border-subtle);
+.m-dialog-foot.m-panel-header { flex: none; min-block-size: 0; margin-block-start: auto; padding: var(--m-space-3) var(--m-space-5); border-top: var(--m-border-w, 1px) solid var(--m-border-subtle);
   background: var(--m-bg-subtle); border-radius: 0 0 var(--m-radius-4) var(--m-radius-4); }
 .m-dialog-foot > .m-panel-header-body { justify-content: flex-end; flex-wrap: wrap; }
 /* the panel of a <Drawer> (drawer.css places and moves it) */
-.m-drawer { display: flex; flex-direction: column; background: var(--m-surface-raised); color: var(--m-text); box-shadow: var(--m-shadow-4); outline: none; border-inline-start: 1px solid var(--m-border); }
+.m-drawer { display: flex; flex-direction: column; background: var(--m-panel-raised-bg, var(--m-surface-raised)); -webkit-backdrop-filter: var(--m-panel-filter, none); backdrop-filter: var(--m-panel-filter, none); color: var(--m-text); box-shadow: var(--m-shadow-4); outline: none; border-inline-start: var(--m-border-w, 1px) solid var(--m-border); }
 .m-drawer .m-dialog-foot.m-panel-header { border-radius: 0; }
 @media (max-width: 640px) {
   .m-overlay:not(.m-overlay-drawer) { align-items: flex-end; padding: 0; }

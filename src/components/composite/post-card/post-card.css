@@ -4,7 +4,7 @@
 .m-post.m-card > .m-card-body { display: flex; flex-direction: column; gap: var(--m-space-2); padding-block: var(--m-space-3); }
 .m-post-card.m-card { border-color: var(--m-border-subtle, var(--m-border)); border-radius: var(--m-radius-4);
   box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--m-accent, var(--m-primary)) 22%, transparent); }
-.m-post-flat.m-card { border-block-end: 1px solid var(--m-border-subtle, var(--m-border)); }
+.m-post-flat.m-card { border-block-end: var(--m-border-w, 1px) solid var(--m-border-subtle, var(--m-border)); }
 .m-post-head { display: flex; align-items: center; gap: var(--m-space-2); padding-inline: var(--m-space-3) var(--m-space-2); min-width: 0; }
 /* who: a ListRow without its own padding or hover fill */
 .m-post-who.m-listrow { flex: 1 1 auto; gap: .625rem; inline-size: auto; min-block-size: 0; padding: 0; color: inherit; }

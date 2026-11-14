@@ -5,7 +5,7 @@
   position: absolute; inset-inline-start: var(--m-win-x, 0); inset-block-start: var(--m-win-y, 0);
   inline-size: var(--m-win-w, 32rem); block-size: var(--m-win-h, 20rem);
   display: flex; flex-direction: column; min-inline-size: 0; box-sizing: border-box;
-  border: 1px solid var(--m-border); border-radius: var(--m-radius-lg); background: var(--m-surface); color: var(--m-text);
+  border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-lg); background: var(--m-surface); color: var(--m-text);
   box-shadow: var(--m-shadow-3, var(--m-shadow-2));
   transition: inset-inline-start var(--m-dur) var(--m-ease), inset-block-start var(--m-dur) var(--m-ease),
     inline-size var(--m-dur) var(--m-ease), block-size var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease);
@@ -25,7 +25,7 @@
 /* title bar: a PanelHeader (drag bar, focus ring, title ellipsis) with the frame's own height and tint */
 .m-win-bar.m-panel-header {
   min-block-size: var(--m-win-bar-h); padding-block: 0; padding-inline: var(--m-space-3) var(--m-space-2);
-  border-block-end: 1px solid var(--m-border-subtle); border-start-start-radius: inherit; border-start-end-radius: inherit;
+  border-block-end: var(--m-border-w, 1px) solid var(--m-border-subtle); border-start-start-radius: inherit; border-start-end-radius: inherit;
   background: var(--m-surface-2); cursor: default;
 }
 .m-win-title { display: block; }

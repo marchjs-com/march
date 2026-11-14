@@ -78,7 +78,7 @@ test("ThemeEditor: tokens, color edit, undo / redo, audit fix, scoped preview va
   for (let i = 0; i < 100 && !(el.querySelector(".m-te-token") && el.querySelector(".m-te-cards .m-card") && el.querySelector(".m-te-table")); i++) await new Promise((r) => setTimeout(r, 10));
   assert.ok(el.querySelector(".m-te-cards .m-card") && el.querySelector(".m-te-table"), "both preview parts arrive");
   assert.equal(el.querySelector(".m-te").getAttribute("aria-label"), "Theme editor");
-  assert.equal(el.querySelectorAll(".m-te-base").length, 8, "seven presets and from scratch");
+  assert.equal(el.querySelectorAll(".m-te-base").length, 16, "fifteen presets and from scratch");
   const tokens = el.querySelectorAll(".m-te-token");
   assert.equal(tokens.length, 4 + 3 + 3 + 4 + 4 + 8);
   assert.equal(tokens[0].getAttribute("aria-pressed"), "true");
@@ -170,5 +170,51 @@ test("ThemeEditor: the section tabs switch; rows are Fields; undo keys and the n
   el.querySelector(".m-te").dispatchEvent(new KeyboardEvent("keydown", { key: "y", ctrlKey: true, bubbles: true }));
   await new Promise((r) => setTimeout(r, 10));
   assert.equal(undo.disabled, false, "mod+Y redoes");
+  dispose();
+});
+
+test("style: surface kind, glow, shadow kind, gradient accent, tracking, icon stroke, density become tokens and round trip", async () => {
+  const P = await import("../../../theme/presets.ts");
+  const css = themeCss(P.aurora);
+  for (const token of ["--m-panel-bg: color-mix(", "--m-panel-filter: blur(", "--m-bg-image: radial-gradient(", "--m-primary-fill: linear-gradient(", "--m-accent-glow: ", "--m-panel-shadow: ", "--m-tracking-tight: -0.02em"]) assert.ok(css.includes(token), token);
+  assert.ok(themeCss(P.noirGold).includes("--m-panel-border: var(--m-border-strong)") && themeCss(P.noirGold).includes("--m-shadow-1: none") && themeCss(P.noirGold).includes("--m-icon-stroke: 1.25"));
+  assert.ok(themeCss(P.graphite).includes(`--m-space-4: ${P.spaceTokens(4, "compact")["space-4"]}`) && themeCss(P.graphite).includes("--m-control-h: "));
+  assert.ok(themeCss(hadi).includes("--m-panel-bg: initial;") && !themeCss(hadi).includes("--m-panel-bg: color-mix"), "a theme without a style keeps the built-in look (and resets an outer theme's)");
+  // preset → draft → theme keeps the style; density and border width live in the draft's shape
+  const d = M.draftFromTheme(P.aurora);
+  assert.deepEqual(d.style, { surface: "glass", glow: 0.55, shadowKind: "soft", accent: "gradient", tracking: -0.02, iconStroke: 1.75 });
+  assert.deepEqual(M.draftToTheme(d).style, P.aurora.style);
+  assert.equal(M.draftFromTheme(P.graphite).shape.density, "compact");
+  assert.equal(M.draftToTheme(presetDraft("hadi")).style, undefined);
+  // edits reach the variables of the preview; hard shadows are solid blocks in the text color
+  const hard = { ...presetDraft("hadi"), style: { ...M.DEFAULT_STYLE, shadowKind: "hard", surface: "raised", glow: 1 } };
+  const vars = M.draftVars(hard, "light");
+  assert.equal(vars["--m-shadow-1"], `2px 2px 0 ${hard.light.text}`);
+  assert.match(vars["--m-panel-shadow"], /^var\(--m-shadow-2\), 0 0 0 1px color-mix\(/);
+  assert.equal(vars["--m-panel-border"], "transparent");
+  // a draft saved before the style existed, and wrong values, get the built-in style
+  const old = JSON.parse(JSON.stringify(presetDraft("night"))); delete old.style;
+  assert.deepEqual(M.normalizeDraft(old).style, M.DEFAULT_STYLE);
+  assert.equal(M.normalizeDraft({ ...old, style: { surface: "wood", glow: 9, accent: "gradient" } }).style.glow, 1);
+  assert.deepEqual(M.importTheme(M.draftJson(d)).style, d.style);
+});
+
+test("ThemeEditor: the Style tab edits the surface, the glow and the icon stroke", async () => {
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  const v = signal(null);
+  const dispose = render(() => h(ThemeEditor, { "bind:value": v, base: "hadi", storageKey: false, share: false, warnUnsaved: false, tabs: ["style"], preview: false }), el);
+  const wait = (ms = 80) => new Promise((r) => setTimeout(r, ms));
+  await wait(200);
+  const glass = [...el.querySelectorAll("[role=radio]")].find((b) => b.textContent.trim() === "Glass");
+  assert.ok(glass, "the surface choice is there");
+  glass.click();
+  await wait();
+  assert.equal(v().style.surface, "glass");
+  const gradient = [...el.querySelectorAll("[role=radio]")].find((b) => b.textContent.trim() === "Gradient");
+  gradient.click();
+  await wait();
+  assert.equal(v().style.accent, "gradient");
+  assert.equal(el.querySelectorAll("input[type=range]").length, 3, "glow, heading letter spacing, icon stroke");
   dispose();
 });

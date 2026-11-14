@@ -1,6 +1,6 @@
 /* CtaBand. A rounded panel; gradient and video looks use light text, the rest follow the theme. */
 .m-cta-panel { position: relative; isolation: isolate; overflow: hidden; border-radius: clamp(var(--m-radius-4), 3cqi, 2rem); padding: clamp(2.5rem, 7cqi, 5rem) clamp(1.25rem, 5cqi, 4rem);
-  background: var(--m-surface); border: 1px solid var(--m-border); box-shadow: var(--m-shadow-3); }
+  background: var(--m-surface); border: var(--m-border-w, 1px) solid var(--m-border); box-shadow: var(--m-shadow-3); }
 /* the copy is a SectionHead (lg) above the decorative layers */
 .m-cta-copy.m-section-head { position: relative; z-index: 1; gap: var(--m-space-4); max-inline-size: 44rem; }
 .m-cta-copy .m-section-head-lead { max-inline-size: none; }

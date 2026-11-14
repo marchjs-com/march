@@ -6,7 +6,7 @@
 .m-story-pin { order: 2; position: sticky; inset-block-start: calc(var(--m-site-nav-top, 0px) + 12vh); height: 70vh; display: flex; flex-direction: column; gap: var(--m-space-3); align-self: start; }
 .m-story-media-start .m-story-pin { order: 0; }
 .m-story-steps { order: 1; display: flex; flex-direction: column; }
-.m-story-stage { position: relative; flex: 1 1 auto; border-radius: var(--m-radius-4); overflow: hidden; background: var(--m-surface); border: 1px solid var(--m-border); box-shadow: var(--m-shadow-3); }
+.m-story-stage { position: relative; flex: 1 1 auto; border-radius: var(--m-radius-4); overflow: hidden; background: var(--m-surface); border: var(--m-border-w, 1px) solid var(--m-border); box-shadow: var(--m-shadow-3); }
 .m-story-media { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; }
 .m-story-media.is-active { opacity: 1; }
 .m-story-media > * { max-width: 100%; max-height: 100%; }
@@ -23,7 +23,7 @@
 .m-story.is-stacked .m-story-pin { display: none; }
 .m-story.is-stacked .m-story-steps { gap: var(--m-space-4); }
 .m-story.is-stacked .m-story-step, .m-story.is-stacked .m-story-step:first-child, .m-story.is-stacked .m-story-step:last-child { min-height: 0; justify-content: flex-start; opacity: 1;
-  padding: var(--m-space-3); border-radius: var(--m-radius-4); background: var(--m-surface); border: 1px solid var(--m-border); box-shadow: var(--m-shadow-1);
+  padding: var(--m-space-3); border-radius: var(--m-radius-4); background: var(--m-surface); border: var(--m-border-w, 1px) solid var(--m-border); box-shadow: var(--m-shadow-1);
   transition: box-shadow var(--m-dur) var(--m-ease), border-color var(--m-dur) var(--m-ease); }
 .m-story.is-stacked .m-story-step.is-active { border-color: color-mix(in srgb, var(--m-story-c) 45%, var(--m-border)); box-shadow: var(--m-shadow-2); }
 .m-story.is-stacked .m-story-inline { position: relative; aspect-ratio: 4 / 3; margin: calc(-1 * var(--m-space-3)) calc(-1 * var(--m-space-3)) var(--m-space-2);

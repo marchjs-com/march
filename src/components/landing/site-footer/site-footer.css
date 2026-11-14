@@ -1,5 +1,5 @@
 /* SiteFooter. Grid: about, columns, newsletter; fluid wordmark clipped at the bottom edge. */
-.m-sfoot { border-block-start: 1px solid var(--m-border); background: var(--m-bg); color: var(--m-text); overflow: hidden; container-type: inline-size; }
+.m-sfoot { border-block-start: var(--m-border-w, 1px) solid var(--m-border); background: var(--m-bg); color: var(--m-text); overflow: hidden; container-type: inline-size; }
 .m-sfoot-inner { max-width: 76rem; margin-inline: auto; padding: clamp(3rem, 7cqi, 5rem) clamp(1rem, 4cqi, 2.5rem) var(--m-space-5); }
 .m-sfoot-top { display: grid; grid-template-columns: minmax(14rem, 1.4fr) repeat(auto-fit, minmax(9rem, 1fr)); gap: clamp(2rem, 4cqi, 3rem); }
 .m-sfoot-about { display: flex; flex-direction: column; gap: var(--m-space-3); min-width: 0; }
@@ -15,7 +15,7 @@
 .m-sfoot-link:hover { color: var(--m-text); }
 .m-sfoot-news { min-width: 0; }
 .m-sfoot-top:has(.m-sfoot-news) { grid-template-columns: minmax(14rem, 1.3fr) repeat(auto-fit, minmax(9rem, 1fr)) minmax(16rem, 1.4fr); }
-.m-sfoot-bottom { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-3) var(--m-space-5); margin-block-start: clamp(2.5rem, 5cqi, 4rem); padding-block-start: var(--m-space-4); border-block-start: 1px solid var(--m-border); }
+.m-sfoot-bottom { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-3) var(--m-space-5); margin-block-start: clamp(2.5rem, 5cqi, 4rem); padding-block-start: var(--m-space-4); border-block-start: var(--m-border-w, 1px) solid var(--m-border); }
 .m-sfoot-copy { margin: 0; font-size: var(--m-text-sm); color: var(--m-muted); }
 .m-sfoot-legal { flex-direction: row; flex-wrap: wrap; gap: var(--m-space-4); }
 .m-sfoot-top-btn { margin-inline-start: auto; }

@@ -5,7 +5,7 @@
 .m-md-editor { display: flex; flex-direction: column; gap: var(--m-space-2); }
 .m-md-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 @media (max-width: 40rem) { .m-md-split { grid-template-columns: minmax(0, 1fr); } }
-.m-md-preview { min-height: 6rem; padding: var(--m-space-3); border: 1px solid var(--m-border); border-radius: var(--m-radius); background: var(--m-surface); overflow-wrap: break-word; }
+.m-md-preview { min-height: 6rem; padding: var(--m-space-3); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius); background: var(--m-surface); overflow-wrap: break-word; }
 .m-markdown > :first-child { margin-top: 0; }
 .m-markdown > :last-child { margin-bottom: 0; }
 .m-markdown code { font-family: var(--m-font-mono); font-size: .9em; background: var(--m-surface-2); padding: .1em .3em; border-radius: var(--m-radius-1); }
@@ -15,6 +15,6 @@
 .m-markdown img { max-width: 100%; height: auto; }
 .m-markdown a { color: var(--m-accent-text, var(--m-primary-text)); }
 .m-task { list-style: none; }
-.m-editor-tabs { display: flex; gap: var(--m-space-1); border-bottom: 1px solid var(--m-border); }
+.m-editor-tabs { display: flex; gap: var(--m-space-1); border-bottom: var(--m-border-w, 1px) solid var(--m-border); }
 .m-editor-tab { border: 0; background: transparent; color: var(--m-muted); font: inherit; font-size: var(--m-text-sm); padding: var(--m-space-2) var(--m-space-3); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
 .m-editor-tab[aria-selected="true"] { color: var(--m-text); border-bottom-color: var(--m-accent, var(--m-primary)); font-weight: 500; }

@@ -1,7 +1,7 @@
 /* March — ActivityBar. Imported by its component module; tokens.css provides the variables. */
 .m-ab { position: relative; display: flex; align-items: center; gap: .25rem; background: var(--m-surface-2); }
-.m-ab-v { flex-direction: column; width: 3rem; height: 100%; padding-block: .375rem; border-inline-end: 1px solid var(--m-border); }
-.m-ab-h { flex-direction: row; height: 3rem; padding-inline: .375rem; border-block-start: 1px solid var(--m-border); }
+.m-ab-v { flex-direction: column; width: 3rem; height: 100%; padding-block: .375rem; border-inline-end: var(--m-border-w, 1px) solid var(--m-border); }
+.m-ab-h { flex-direction: row; height: 3rem; padding-inline: .375rem; border-block-start: var(--m-border-w, 1px) solid var(--m-border); }
 /* items at the far end: the first of them (the tab, or the tooltip anchor around it) takes the free room */
 .m-ab-v > :is(.m-ab-end, :has(> .m-ab-end)) { margin-block-start: auto; }
 .m-ab-h > :is(.m-ab-end, :has(> .m-ab-end)) { margin-inline-start: auto; }

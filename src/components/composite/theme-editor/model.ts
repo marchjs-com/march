@@ -3,7 +3,7 @@
 // scales, a dark mode derived from the light one and the WCAG contrast audit. Pure functions, no DOM.
 import { clamp } from "../../../core/util.ts";
 import { contrast } from "../../../theme/contrast.ts";
-import { defineTheme, themeCss, ensureContrast, onBrandFill, type ThemeDef, type ThemeColors } from "../../../theme/css.ts";
+import { defineTheme, themeCss, ensureContrast, onBrandFill, spaceTokens, type ThemeDef, type ThemeColors, type ThemeStyle, type SurfaceKind, type ShadowKind, type Density } from "../../../theme/css.ts";
 import { parse, format, mix } from "../color-picker/color.ts";
 
 /** The mode a color belongs to. */
@@ -30,7 +30,7 @@ export interface DraftType {
   /** Line heights. */ leading: number; leadingTight: number;
   /** Weights. */ medium: number; semibold: number; bold: number; displayWeight: number;
 }
-export type Density = "compact" | "normal" | "comfortable";
+export type { Density, SurfaceKind, ShadowKind };
 export interface DraftShape {
   /** Base radius in px. */ radius: number;
   /** How far the radius steps spread apart (0 = all equal, 1 = built-in, 2 = twice). */ spread: number;
@@ -38,6 +38,15 @@ export interface DraftShape {
   density: Density;
   /** Shadow strength (0 = none, 1 = built-in, 2 = twice). */ shadow: number;
   /** Border width in px. */ border: number;
+}
+/** The look beyond colors and sizes (ThemeStyle): how panels sit, glow, shadow kind, accent fill, heading tracking, icon stroke. */
+export interface DraftStyle {
+  surface: SurfaceKind;
+  /** Glowing edge, 0 (none) … 1. */ glow: number;
+  shadowKind: ShadowKind;
+  accent: "solid" | "gradient";
+  /** Heading letter spacing in em. */ tracking: number;
+  /** Icon stroke width. */ iconStroke: number;
 }
 export interface DraftMotion {
   /** Durations in ms. */ fast: number; base: number; slow: number;
@@ -54,6 +63,7 @@ export interface ThemeDraft {
   dark: DraftColors;
   type: DraftType;
   shape: DraftShape;
+  style: DraftStyle;
   motion: DraftMotion;
   multicolor?: boolean;
 }
@@ -62,6 +72,7 @@ const MONO = `ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo,
 /** Built-in type, shape and motion (tokens.css): tokens equal to these are left out of the CSS. */
 export const DEFAULT_TYPE: Omit<DraftType, "body" | "display"> = { mono: MONO, base: 14, ratio: 1.2, leading: 1.5, leadingTight: 1.2, medium: 500, semibold: 600, bold: 700, displayWeight: 700 };
 export const DEFAULT_SHAPE: DraftShape = { radius: 12, spread: 1, space: 4, density: "normal", shadow: 1, border: 1 };
+export const DEFAULT_STYLE: DraftStyle = { surface: "soft", glow: 0, shadowKind: "soft", accent: "solid", tracking: -0.015, iconStroke: 1.75 };
 export const DEFAULT_MOTION: DraftMotion = { fast: 100, base: 150, slow: 240, ease: "cubic-bezier(.2, .8, .2, 1)", easeOut: "cubic-bezier(.16, 1, .3, 1)", easeSpring: "cubic-bezier(.34, 1.36, .64, 1)" };
 
 // ------------------------------------------------------------------ colors
@@ -110,7 +121,11 @@ export function draftFromTheme(def: ThemeDef): ThemeDraft {
     id: def.id, name: def.name, ...(def.description ? { description: def.description } : {}), base: def.id,
     light: colorsOf(def.alwaysDark ? def.dark : def.light), dark: colorsOf(def.dark),
     type: { ...DEFAULT_TYPE, body: def.font, display: def.display, displayWeight: def.displayWeight ?? 700 },
-    shape: { ...DEFAULT_SHAPE, radius: def.radius },
+    shape: { ...DEFAULT_SHAPE, radius: def.radius, density: def.style?.density ?? "normal", border: def.style?.borderWidth ?? 1 },
+    style: {
+      surface: def.style?.surface ?? "soft", glow: def.style?.glow ?? 0, shadowKind: def.style?.shadow ?? "soft", accent: def.style?.accent ?? "solid",
+      tracking: def.style?.tracking ?? DEFAULT_STYLE.tracking, iconStroke: def.style?.iconStroke ?? DEFAULT_STYLE.iconStroke,
+    },
     motion: { ...DEFAULT_MOTION },
     ...(def.multicolor ? { multicolor: true } : {}),
   };
@@ -144,7 +159,7 @@ export function draftFromColor(seed: string, name = "My theme"): ThemeDraft {
   };
   return {
     id: slug(name), name, base: null, light, dark: deriveDark(light),
-    type: { ...DEFAULT_TYPE, body: `"Inter"`, display: `"Inter"`, displayWeight: 700 }, shape: { ...DEFAULT_SHAPE, radius: 10 }, motion: { ...DEFAULT_MOTION },
+    type: { ...DEFAULT_TYPE, body: `"Inter"`, display: `"Inter"`, displayWeight: 700 }, shape: { ...DEFAULT_SHAPE, radius: 10 }, style: { ...DEFAULT_STYLE }, motion: { ...DEFAULT_MOTION },
   };
 }
 
@@ -158,10 +173,8 @@ export function slug(name: string): string {
 
 // ------------------------------------------------------------------ tokens
 const TEXT_STEPS: readonly [string, number][] = [["2xs", -1.32], ["xs", -0.85], ["sm", -0.41], ["md", 0], ["lg", 0.73], ["xl", 1.96], ["2xl", 2.96], ["3xl", 4.53], ["4xl", 6.28], ["5xl", 7.98]];
-const SPACE_STEPS = [1, 2, 3, 4, 6, 8, 12, 16];
 const RADIUS_STEPS = [0.75, 1, 1.4, 1.9];
 const SHADOW_ALPHA = [[0.06], [0.05, 0.12], [0.06, 0.2], [0.07, 0.32]];
-const DENSITY: Record<Density, number> = { compact: 0.875, normal: 1, comfortable: 1.125 };
 const rem = (px: number): string => `${+(px / 16).toFixed(4)}rem`;
 const px = (n: number): string => `${+n.toFixed(2)}px`;
 
@@ -186,9 +199,8 @@ export function draftTokens(d: ThemeDraft, all = false): Record<string, string> 
   if (all || t.bold !== DEFAULT_TYPE.bold) o["weight-bold"] = String(t.bold);
   if (all || t.mono !== DEFAULT_TYPE.mono) o["font-mono"] = t.mono;
   if (all || s.spread !== 1) RADIUS_STEPS.forEach((k, i) => { o[`radius-${i + 1}`] = px(s.radius * (k === 1 ? 1 : k ** s.spread)); });
-  const dens = DENSITY[s.density] ?? 1;
-  if (all || s.space !== DEFAULT_SHAPE.space || s.density !== "normal") SPACE_STEPS.forEach((k, i) => { o[`space-${i + 1}`] = rem(s.space * k * dens); });
-  if (all || s.density !== "normal") { o["control-h"] = rem(36 * dens); o["control-h-sm"] = rem(30 * dens); o["control-h-lg"] = rem(44 * dens); }
+  if (all || s.space !== DEFAULT_SHAPE.space || s.density !== "normal") Object.assign(o, spaceTokens(s.space, s.density));
+  if (all && s.density === "normal") { o["control-h"] = rem(36); o["control-h-sm"] = rem(30); o["control-h-lg"] = rem(44); }
   if (all || s.shadow !== 1) {
     const sh = (a: number): string => `rgb(var(--m-shadow-rgb, 16 24 40) / ${+(a * s.shadow).toFixed(3)})`;
     const shapes = [["0 1px 2px"], ["0 1px 2px", "0 4px 14px -4px"], ["0 2px 6px", "0 16px 40px -8px"], ["0 4px 10px", "0 28px 70px -12px"]];
@@ -212,9 +224,23 @@ const colorsOut = (c: DraftColors): ThemeColors => ({
   brand: Object.fromEntries(Object.entries(c.brand).map(([k, v]) => [k, v.soft ? { color: v.color, soft: v.soft } : { color: v.color }])),
 });
 
-/** The ThemeDef of a draft (defineTheme-checked): colors, fonts, radius and the extra tokens. */
+/** The ThemeStyle of a draft: only what differs from the built-in look. */
+export function draftStyle(d: ThemeDraft): ThemeStyle {
+  const s = d.style ?? DEFAULT_STYLE, o: ThemeStyle = {};
+  if (s.surface !== "soft") o.surface = s.surface;
+  if (s.glow > 0) o.glow = s.glow;
+  if (s.shadowKind !== "soft") o.shadow = s.shadowKind;
+  if (s.accent !== "solid") o.accent = s.accent;
+  if (s.tracking !== DEFAULT_STYLE.tracking) o.tracking = s.tracking;
+  if (s.iconStroke !== DEFAULT_STYLE.iconStroke) o.iconStroke = s.iconStroke;
+  return o;
+}
+
+/** The ThemeDef of a draft (defineTheme-checked): colors, fonts, radius, the style and the extra tokens. */
 export function draftToTheme(d: ThemeDraft, allTokens = false): ThemeDef {
+  const style = draftStyle(d);
   return defineTheme({
+    ...(Object.keys(style).length ? { style } : {}),
     id: d.id, name: d.name, ...(d.description ? { description: d.description } : {}),
     font: d.type.body, display: d.type.display, displayWeight: d.type.displayWeight, radius: d.shape.radius,
     light: colorsOut(d.light), dark: colorsOut(d.dark), ...(d.multicolor ? { multicolor: true } : {}), tokens: draftTokens(d, allTokens),

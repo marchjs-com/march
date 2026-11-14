@@ -1,7 +1,7 @@
 /* March — NavMenu (also the sidebar container, drawer and rail of NavSidebar). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- navigation menu (sidebar) */
 .m-nav-wrap { display: contents; }
-.m-nav { display: flex; flex-direction: column; width: var(--m-sidebar-w); height: 100%; min-height: 0; background: var(--m-bg-subtle); border-inline-end: 1px solid var(--m-border);
+.m-nav { display: flex; flex-direction: column; width: var(--m-sidebar-w); height: 100%; min-height: 0; background: var(--m-bg-subtle); border-inline-end: var(--m-border-w, 1px) solid var(--m-border);
   transition: width var(--m-dur-slow) var(--m-ease-out); }
 .m-nav-brand { display: flex; align-items: center; gap: var(--m-space-2); min-height: var(--m-topbar-h); padding: 0 var(--m-space-2) 0 var(--m-space-4); font-weight: 650; }
 .m-nav-brand-main { flex: 1; min-width: 0; display: flex; align-items: center; }
@@ -11,7 +11,7 @@
 .m-nav-filter .m-search { flex: 1; min-width: 0; }
 .m-nav-filter .m-input { min-height: 2rem; background: var(--m-surface); border-color: var(--m-border); box-shadow: none; font-size: var(--m-text-md); }
 .m-nav-scroll { flex: 1; overflow: auto; overscroll-behavior: contain; padding: var(--m-space-1) var(--m-space-2) var(--m-space-4); }
-.m-nav-foot { padding: var(--m-space-2); border-top: 1px solid var(--m-border); }
+.m-nav-foot { padding: var(--m-space-2); border-top: var(--m-border-w, 1px) solid var(--m-border); }
 .m-nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .m-nav-group { margin-top: var(--m-space-2); }
 /* headings: SectionLabel (Pinned, Recent) and a ListRow button with a Chevron (a group) */
@@ -48,7 +48,7 @@
   .m-nav-wrap.is-rail .m-nav-brand-main { flex: none; justify-content: center; }
   .m-nav-wrap.is-rail :is(.m-nav-item .m-listrow-text, .m-nav-item .m-listrow-trail, .m-nav-gbtn, .m-nav-heading, .m-nav-pin, .m-nav-filter, .m-nav-item .m-badge, .m-rail-hide) { display: none; }
   .m-nav-wrap.is-rail .m-nav-scroll { padding-inline: .625rem; }
-  .m-nav-wrap.is-rail .m-nav-group { margin-top: var(--m-space-1); padding-top: var(--m-space-1); border-top: 1px solid var(--m-border-subtle); }
+  .m-nav-wrap.is-rail .m-nav-group { margin-top: var(--m-space-1); padding-top: var(--m-space-1); border-top: var(--m-border-w, 1px) solid var(--m-border-subtle); }
   .m-nav-wrap.is-rail .m-nav-group > .m-nav-list { padding: 0; animation: none; }
   .m-nav-wrap.is-rail .m-nav-item { justify-content: center; padding: 0; min-height: 2.25rem; }
   .m-nav-wrap.is-rail .m-nav-foot { padding: var(--m-space-2) .625rem; }

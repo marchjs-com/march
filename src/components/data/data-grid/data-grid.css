@@ -14,13 +14,13 @@
 .m-dg-total b { color: var(--m-primary-text, var(--m-text)); font-weight: var(--m-weight-semibold); }
 
 /* scroll area: the only scroller; header / footer / pinned columns are sticky inside it */
-.m-dg-scroll { position: relative; overflow: auto; overscroll-behavior: contain; border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface);
+.m-dg-scroll { position: relative; overflow: auto; overscroll-behavior: contain; border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface);
   box-shadow: var(--m-shadow-1); max-width: 100%; outline: none; font-size: var(--m-text-sm); font-variant-numeric: tabular-nums; }
 .m-dg-scroll:focus-visible { border-color: var(--m-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-focus) 22%, transparent); }
 .m-dg-canvas { position: relative; min-inline-size: 100%; }
 .m-dg-row { display: flex; align-items: stretch; box-sizing: border-box; }
 .m-dg-cell { flex: none; box-sizing: border-box; display: flex; align-items: center; gap: .375rem; min-width: 0; padding-inline: .75rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
-  border-block-end: 1px solid var(--m-border-subtle); color: var(--m-text); position: relative; }
+  border-block-end: var(--m-border-w, 1px) solid var(--m-border-subtle); color: var(--m-text); position: relative; }
 .m-dg-cell.m-align-end { justify-content: flex-end; text-align: end; }
 .m-dg-cell.m-align-center { justify-content: center; }
 .m-dg-gap { flex: none; }
@@ -34,7 +34,7 @@
 .m-dg-head { position: sticky; inset-block-start: 0; z-index: 4; background: var(--m-surface-2); }
 .m-dg-head-row { background: var(--m-surface-2); }
 .m-dg-th { font-weight: var(--m-weight-semibold); color: var(--m-text-2); font-size: var(--m-text-xs); text-transform: uppercase; letter-spacing: var(--m-tracking-caps);
-  border-block-end: 1px solid var(--m-border); user-select: none; padding-inline-end: .25rem; transition: background-color var(--m-dur-fast) var(--m-ease), color var(--m-dur-fast) var(--m-ease); }
+  border-block-end: var(--m-border-w, 1px) solid var(--m-border); user-select: none; padding-inline-end: .25rem; transition: background-color var(--m-dur-fast) var(--m-ease), color var(--m-dur-fast) var(--m-ease); }
 .m-dg-th.is-sortable { cursor: pointer; }
 .m-dg-th:hover { background: var(--m-surface-3); color: var(--m-text); }
 .m-dg-th.is-sorted { color: var(--m-primary-text, var(--m-text)); }

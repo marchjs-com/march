@@ -71,6 +71,7 @@ const tr: Record<string, string> = {
   "Colors": "Renkler",
   "Typography": "Tipografi",
   "Shape": "Biçim",
+  "Style": "Stil",
   "Motion": "Hareket",
   "Export": "Dışa aktar",
   "Theme preview": "Tema önizlemesi",

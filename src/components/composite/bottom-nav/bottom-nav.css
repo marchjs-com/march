@@ -3,7 +3,7 @@
 .m-bnav { container-type: inline-size; display: block; padding: 0 var(--m-space-3) var(--m-space-3); }
 .m-bnav-flat { padding: 0; }
 .m-bnav-bar { position: relative; display: grid; grid-template-columns: repeat(var(--m-bnav-n, 4), minmax(0, 1fr)); height: 4.375rem;
-  background: var(--m-surface-raised); border: 1px solid var(--m-border-subtle); border-radius: var(--m-radius-4); box-shadow: var(--m-shadow-3); }
+  background: var(--m-surface-raised); border: var(--m-border-w, 1px) solid var(--m-border-subtle); border-radius: var(--m-radius-4); box-shadow: var(--m-shadow-3); }
 .m-bnav-flat .m-bnav-bar { border-radius: 0; border-inline: 0; border-block-end: 0; box-shadow: var(--m-shadow-2);
   height: calc(4.375rem + env(safe-area-inset-bottom, 0px)); padding-block-end: env(safe-area-inset-bottom, 0px); }
 

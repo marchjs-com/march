@@ -2,7 +2,7 @@
 // from loose data, JSON, CSS or a link. A module of its own: only the export tab and the editor's start step load it.
 import { clamp } from "../../../core/util.ts";
 import { defineTheme, themeCss, type ThemeDef } from "../../../theme/css.ts";
-import { COLOR_ROLES, DEFAULT_MOTION, DEFAULT_TYPE, draftFromColor, draftFromTheme, draftToTheme, slug, type ColorRole, type DraftColors, type ThemeDraft } from "./model.ts";
+import { COLOR_ROLES, DEFAULT_MOTION, DEFAULT_STYLE, DEFAULT_TYPE, draftFromColor, draftFromTheme, draftToTheme, slug, type ColorRole, type DraftColors, type ThemeDraft } from "./model.ts";
 
 // ------------------------------------------------------------------ output
 const ident = (json: string): string => json.replace(/"([A-Za-z_$][\w$]*)":/g, "$1:");
@@ -54,7 +54,7 @@ const normColors = (v: unknown, d: DraftColors): DraftColors => {
 /** A complete, valid draft from loose data (missing or wrong fields take `base`'s values); null when not a draft. */
 export function normalizeDraft(v: unknown, base: ThemeDraft = draftFromColor("#f2801f")): ThemeDraft | null {
   if (!isObj(v) || !isObj(v["light"]) || !isObj(v["dark"])) return null;
-  const t = isObj(v["type"]) ? v["type"] : {}, s = isObj(v["shape"]) ? v["shape"] : {}, m = isObj(v["motion"]) ? v["motion"] : {};
+  const t = isObj(v["type"]) ? v["type"] : {}, s = isObj(v["shape"]) ? v["shape"] : {}, m = isObj(v["motion"]) ? v["motion"] : {}, y = isObj(v["style"]) ? v["style"] : {};
   const name = str(v["name"], "My theme");
   const id = typeof v["id"] === "string" && /^[a-z][a-z0-9-]*$/.test(v["id"]) ? v["id"] : slug(name);
   return {
@@ -68,6 +68,11 @@ export function normalizeDraft(v: unknown, base: ThemeDraft = draftFromColor("#f
     shape: {
       radius: num(s["radius"], base.shape.radius, 0, 40), spread: num(s["spread"], 1, 0, 2), space: num(s["space"], 4, 2, 8),
       density: (["compact", "normal", "comfortable"] as const).find((x) => x === s["density"]) ?? "normal", shadow: num(s["shadow"], 1, 0, 3), border: num(s["border"], 1, 0, 4),
+    },
+    style: {
+      surface: (["soft", "flat", "raised", "outlined", "glass"] as const).find((x) => x === y["surface"]) ?? "soft", glow: num(y["glow"], 0, 0, 1),
+      shadowKind: (["soft", "hard", "none"] as const).find((x) => x === y["shadowKind"]) ?? "soft", accent: y["accent"] === "gradient" ? "gradient" : "solid",
+      tracking: num(y["tracking"], DEFAULT_STYLE.tracking, -0.08, 0.2), iconStroke: num(y["iconStroke"], DEFAULT_STYLE.iconStroke, 0.75, 3),
     },
     motion: {
       fast: num(m["fast"], 100, 0, 2000), base: num(m["base"], 150, 0, 2000), slow: num(m["slow"], 240, 0, 3000),

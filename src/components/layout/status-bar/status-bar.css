@@ -1,5 +1,5 @@
 /* March — StatusBar. Imported by its component module; tokens.css provides the variables. */
-.m-sbar { display: flex; align-items: center; gap: 2px; min-width: 0; min-height: 1.625rem; padding-inline: .25rem; background: var(--m-surface-2); border-block-start: 1px solid var(--m-border);
+.m-sbar { display: flex; align-items: center; gap: 2px; min-width: 0; min-height: 1.625rem; padding-inline: .25rem; background: var(--m-surface-2); border-block-start: var(--m-border-w, 1px) solid var(--m-border);
   color: var(--m-text-2); font-size: var(--m-text-xs); overflow: hidden; }
 .m-sbar-side { display: flex; align-items: center; gap: 2px; min-width: 0; }
 .m-sbar-end { margin-inline-start: auto; }

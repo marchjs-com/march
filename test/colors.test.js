@@ -29,7 +29,7 @@ test("colors.css covers every token; components read the accent with their defau
   assert.match(read("components/forms/toggle/toggle.css"), /\.m-switch\[aria-checked="true"\] \{ background: var\(--m-accent, var\(--m-primary\)\); \}/);
   assert.match(read("ui/field.css"), /\.m-input:focus, \.m-select:focus \{ outline: none; border-color: var\(--m-accent, var\(--m-focus\)\);/);
   assert.match(read("ui/field.css"), /\[aria-invalid="true"\][^{]*\{[^}]*var\(--m-danger\)/, "invalid fields keep the danger color");
-  for (const f of ["hadi", "cream", "night", "neon", "indigo", "minimal", "contrast"]) {
+  for (const f of ["hadi", "cream", "night", "neon", "indigo", "minimal", "contrast", "aurora", "noir-gold", "ember", "voyage", "graphite", "paper", "mint", "candy"]) {
     const t = read(`css/themes/${f}.css`);
     for (const k of ["primary", "info", "success", "warn", "danger", "special"]) assert.match(t, new RegExp(`--m-on-${k}-fill: #`), `${f} on-${k}-fill`);
     for (let n = 1; n <= 8; n++) assert.match(t, new RegExp(`--m-cat-${n}-text: #[0-9A-F]{6}; --m-on-cat-${n}: #`, "i"), `${f} cat-${n}`);
@@ -66,7 +66,7 @@ test("selection controls: size and shape change every variant; impossible shapes
   // size and shape act through variables that every variant reads
   for (const v of ["--m-ch-size", "--m-ch-pad-y", "--m-ch-card-pad", "--m-ch-icon"]) assert.match(css, new RegExp(`\.m-choice-(sm|lg) \{[^}]*${v}:`), v);
   for (const v of ["--m-ch-radius", "--m-ch-item-radius", "--m-ch-card-radius"]) assert.match(css, new RegExp(`\.m-choice\.m-shape-square \{[^}]*${v}:`), v);
-  assert.match(css, /\.m-choice-chip \.m-check \{[^}]*padding: var\(--m-ch-pad-y\) var\(--m-ch-pad-x\); border: 1px solid var\(--m-border-strong\); border-radius: var\(--m-ch-item-radius\)/);
+  assert.match(css, /\.m-choice-chip \.m-check \{[^}]*padding: var\(--m-ch-pad-y\) var\(--m-ch-pad-x\); border: var\(--m-border-w, 1px\) solid var\(--m-border-strong\); border-radius: var\(--m-ch-item-radius\)/);
   assert.match(css, /\.m-choice-toggle \.m-check, \.m-choice-segmented \.m-check \{[^}]*padding: var\(--m-ch-pad-y\) var\(--m-ch-pad-x\); border-radius: var\(--m-ch-item-radius\)/);
   assert.match(css, /border-radius: var\(--m-ch-card-radius\)/);
   assert.deepEqual(U2.shapesFor("card", "checkbox"), ["square", "rounded"]);

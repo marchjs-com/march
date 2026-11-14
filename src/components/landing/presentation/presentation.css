@@ -3,7 +3,7 @@
 .m-deck:focus-visible .m-deck-stage { outline: 2px solid var(--m-focus, var(--m-primary)); outline-offset: 3px; }
 .m-deck.is-presenter { grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 1fr); align-items: start; }
 .m-deck-main { display: flex; flex-direction: column; gap: var(--m-space-2); min-width: 0; }
-.m-deck-stage { position: relative; aspect-ratio: 16 / 9; width: 100%; overflow: hidden; border-radius: var(--m-radius-4); background: var(--m-bg); border: 1px solid var(--m-border); box-shadow: var(--m-shadow-3); container-type: size; isolation: isolate; touch-action: pan-y; }
+.m-deck-stage { position: relative; aspect-ratio: 16 / 9; width: 100%; overflow: hidden; border-radius: var(--m-radius-4); background: var(--m-bg); border: var(--m-border-w, 1px) solid var(--m-border); box-shadow: var(--m-shadow-3); container-type: size; isolation: isolate; touch-action: pan-y; }
 .m-deck:fullscreen { background: var(--m-inverse-bg); padding: 0; display: grid; place-items: center; }
 .m-deck:fullscreen .m-deck-main { width: min(100cqi, calc(100vh * 16 / 9)); }
 .m-deck:fullscreen .m-deck-stage { border-radius: 0; border: 0; }
@@ -42,7 +42,7 @@
 /* speaker view */
 .m-deck-speaker { display: flex; flex-direction: column; gap: var(--m-space-4); min-width: 0; }
 .m-deck-cap { margin: 0 0 var(--m-space-2); font-size: var(--m-text-xs); font-weight: var(--m-weight-semibold); text-transform: uppercase; letter-spacing: var(--m-tracking-caps, .08em); color: var(--m-muted); }
-.m-deck-preview { position: relative; aspect-ratio: 16 / 9; border-radius: var(--m-radius-3); overflow: hidden; border: 1px solid var(--m-border); container-type: size; }
+.m-deck-preview { position: relative; aspect-ratio: 16 / 9; border-radius: var(--m-radius-3); overflow: hidden; border: var(--m-border-w, 1px) solid var(--m-border); container-type: size; }
 .m-deck-end { margin: 0; padding: var(--m-space-5); text-align: center; color: var(--m-muted); border: 1px dashed var(--m-border); border-radius: var(--m-radius-3); }
 .m-deck-note { margin: 0; font-size: var(--m-text-lg); line-height: 1.6; white-space: pre-wrap; }
 .m-deck-timer { margin: 0; font-size: var(--m-text-3xl); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }

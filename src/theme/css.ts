@@ -34,6 +34,39 @@ export interface ThemeColors {
   brand?: Readonly<Record<string, { color: string; soft?: string }>>;
 }
 
+/** How cards and panels sit on the page: "soft" (a hairline and a light shadow, the default), "flat" (a hairline, no shadow), "raised" (a shadow, no hairline), "outlined" (a strong line, no shadow), "glass" (see-through and blurred over a lit page). */
+export type SurfaceKind = "soft" | "flat" | "raised" | "outlined" | "glass";
+/** The kind of shadow: "soft" (blurred, the default), "hard" (a solid offset block), "none". */
+export type ShadowKind = "soft" | "hard" | "none";
+/** How tight controls and spacing are. */
+export type Density = "compact" | "normal" | "comfortable";
+const DENSITY: Record<Density, number> = { compact: 0.875, normal: 1, comfortable: 1.125 };
+const SPACE_STEPS = [1, 2, 3, 4, 6, 8, 12, 16];
+const rem = (px: number): string => `${+(px / 16).toFixed(4)}rem`;
+/** The spacing steps (`space-1` … `space-8`) and control heights of a spacing unit in px and a density, as token names → values. */
+export function spaceTokens(space = 4, density: Density = "normal"): Record<string, string> {
+  const k = DENSITY[density] ?? 1, o: Record<string, string> = {};
+  SPACE_STEPS.forEach((step, i) => { o[`space-${i + 1}`] = rem(space * step * k); });
+  if (density !== "normal") { o["control-h"] = rem(36 * k); o["control-h-sm"] = rem(30 * k); o["control-h-lg"] = rem(44 * k); }
+  return o;
+}
+
+/**
+ * The look of a theme beyond its colors. Each field becomes tokens the components read (`--m-panel-*`, `--m-shadow-*`,
+ * `--m-primary-fill`, `--m-accent-glow`, `--m-tracking-*`, `--m-icon-stroke`, `--m-bg-image`); a field left out keeps
+ * the built-in look.
+ */
+export interface ThemeStyle {
+  /** Cards, panels, dialogs and menus. */ surface?: SurfaceKind | undefined;
+  /** A glowing edge in the accent color around panels and filled buttons: 0 (none) … 1 (strong). */ glow?: number | undefined;
+  shadow?: ShadowKind | undefined;
+  /** Filled primary buttons: one color ("solid", the default) or a gradient from the accent to the special color. */ accent?: "solid" | "gradient" | undefined;
+  /** Letter spacing of headings in em (default -0.015; 0 = none, positive = wide). */ tracking?: number | undefined;
+  /** Stroke width of line icons (default 1.75). */ iconStroke?: number | undefined;
+  /** Spacing and control heights: "compact", "normal" (default), "comfortable". */ density?: Density | undefined;
+  /** Width of hairlines and control borders in px (default 1). */ borderWidth?: number | undefined;
+}
+
 export interface ThemeDef {
   id: string;
   name: string;
@@ -52,6 +85,8 @@ export interface ThemeDef {
    * radius steps, shadows, border width, motion… e.g. `{ "text-md": ".9375rem", "dur": "180ms", "border-w": "1.5px" }`.
    */
   tokens?: Readonly<Record<string, string>>;
+  /** Surface kind, glow, shadow kind, gradient accent, heading tracking, icon stroke (see ThemeStyle). */
+  style?: ThemeStyle | undefined;
 }
 
 /** Validate and freeze a theme definition. */
@@ -93,7 +128,56 @@ function multiVars(c: ThemeColors): string {
   ].join(" ");
 }
 
-function modeVars(c: ThemeColors, mode: "light" | "dark"): string {
+/** The tokens of a theme style that do not depend on the mode's colors. */
+function styleBase(st: ThemeStyle | undefined): string {
+  if (!st) return " --m-primary-fill: initial; --m-primary-fill-hover: initial;";
+  const out: string[] = [];
+  if (st.tracking != null && st.tracking !== -0.015) out.push(`--m-tracking-tight: ${+st.tracking.toFixed(4)}em; --m-tracking-tighter: ${+(st.tracking < 0 ? st.tracking * 1.6 : st.tracking).toFixed(4)}em;`);
+  if (st.iconStroke != null && st.iconStroke !== 1.75) out.push(`--m-icon-stroke: ${+st.iconStroke.toFixed(2)};`);
+  if (st.density && st.density !== "normal") out.push(Object.entries(spaceTokens(4, st.density)).map(([k, v]) => `--m-${k}: ${v};`).join(" "));
+  if (st.borderWidth != null && st.borderWidth !== 1) out.push(`--m-border-w: ${+st.borderWidth.toFixed(2)}px;`);
+  if (st.accent === "gradient") out.push("--m-primary-fill: linear-gradient(135deg, var(--m-primary-solid), color-mix(in oklab, var(--m-primary-solid) 60%, var(--m-special))); --m-primary-fill-hover: linear-gradient(135deg, var(--m-primary-solid-hover), color-mix(in oklab, var(--m-primary-solid-hover) 60%, var(--m-special)));");
+  if (st.accent !== "gradient") out.push("--m-primary-fill: initial; --m-primary-fill-hover: initial;");
+  return out.map((x) => ` ${x}`).join("");
+}
+/** The tokens of a theme style for one mode: panel background / line / shadow / blur, the shadow steps, the glow, the lit page. */
+// tokens a theme leaves to the built-in look are reset, so a theme scoped inside another one (a preview card on a
+// glass page) does not inherit the outer theme's panels, fills and glow
+const STYLE_TOKENS = ["panel-bg", "panel-raised-bg", "panel-filter", "panel-border", "panel-shadow", "bg-image", "accent-glow"];
+const resetUnset = (lines: string[], names: readonly string[]): string => {
+  const rest = names.filter((n) => !lines.some((l) => l.includes(`--m-${n}:`)));
+  return rest.map((n) => `--m-${n}: initial;`).join(" ");
+};
+function styleMode(st: ThemeStyle | undefined, c: ThemeColors, mode: "light" | "dark"): string[] {
+  const out = styleLines(st ?? {}, c, mode);
+  return [...out, resetUnset(out, STYLE_TOKENS)].filter(Boolean);
+}
+function styleLines(st: ThemeStyle, c: ThemeColors, mode: "light" | "dark"): string[] {
+  const out: string[] = [];
+  const dark = mode === "dark", kind = st.surface ?? "soft", g = clamp(st.glow ?? 0, 0, 1);
+  if (st.shadow === "hard") out.push(`--m-shadow-1: 2px 2px 0 ${c.text}; --m-shadow-2: 3px 3px 0 ${c.text}; --m-shadow-3: 5px 5px 0 ${c.text}; --m-shadow-4: 8px 8px 0 ${c.text}; --m-shadow-inset: none;`);
+  else if (st.shadow === "none") out.push("--m-shadow-1: none; --m-shadow-2: none; --m-shadow-3: 0 0 0 1px var(--m-border-strong); --m-shadow-4: 0 0 0 1px var(--m-border-strong); --m-shadow-inset: none;");
+  let shadow = kind === "flat" || kind === "outlined" ? "none" : kind === "raised" ? "var(--m-shadow-2)" : kind === "glass" ? `inset 0 1px 0 rgb(255 255 255 / ${dark ? ".1" : ".7"}), var(--m-shadow-2)` : "";
+  if (kind === "raised") out.push(`--m-panel-border: ${dark ? `color-mix(in srgb, ${c.text} 7%, transparent)` : "transparent"};`);
+  if (kind === "outlined") out.push("--m-panel-border: var(--m-border-strong);");
+  if (kind === "glass") {
+    const [a, b, d] = c.glow;
+    out.push(
+      `--m-panel-bg: color-mix(in srgb, ${c.surface} ${dark ? 58 : 66}%, transparent); --m-panel-raised-bg: color-mix(in srgb, ${c.raised ?? c.surface} ${dark ? 78 : 84}%, transparent);`,
+      `--m-panel-filter: blur(20px) saturate(1.5); --m-panel-border: color-mix(in srgb, ${c.text} ${dark ? 14 : 10}%, transparent);`,
+      // the lit page a glass panel needs behind it: three soft lights in the theme's glow colors
+      `--m-bg-image: radial-gradient(56rem 38rem at 8% -8%, color-mix(in srgb, ${a} ${dark ? 34 : 22}%, transparent), transparent 62%), radial-gradient(48rem 34rem at 104% 4%, color-mix(in srgb, ${b} ${dark ? 30 : 20}%, transparent), transparent 60%), radial-gradient(52rem 36rem at 50% 112%, color-mix(in srgb, ${d} ${dark ? 26 : 16}%, transparent), transparent 62%);`);
+  }
+  if (g > 0) {
+    const glow = `0 0 0 1px color-mix(in srgb, ${c.primary} ${Math.round(g * 46)}%, transparent), 0 0 ${Math.round(14 + g * 30)}px -6px color-mix(in srgb, ${c.primary} ${Math.round(g * 72)}%, transparent)`;
+    shadow = shadow && shadow !== "none" ? `${shadow}, ${glow}` : shadow === "none" ? glow : `var(--m-shadow-1), ${glow}`;
+    out.push(`--m-accent-glow: 0 6px ${Math.round(12 + g * 20)}px -6px color-mix(in srgb, ${c.solid} ${Math.round(g * 80)}%, transparent);`);
+  }
+  if (shadow) out.push(`--m-panel-shadow: ${shadow};`);
+  return out;
+}
+
+function modeVars(c: ThemeColors, mode: "light" | "dark", st?: ThemeStyle): string {
   const d = DIM[mode];
   const lines = [
     `color-scheme: ${mode};`,
@@ -121,6 +205,7 @@ function modeVars(c: ThemeColors, mode: "light" | "dark"): string {
     "--m-shadow-1: 0 1px 2px rgb(0 0 0 / .4); --m-shadow-2: 0 1px 2px rgb(0 0 0 / .4), 0 6px 18px -6px rgb(0 0 0 / .6);",
     "--m-shadow-3: 0 0 0 1px rgb(255 255 255 / .05), 0 18px 44px -10px rgb(0 0 0 / .75); --m-shadow-4: 0 0 0 1px rgb(255 255 255 / .07), 0 30px 80px -12px rgb(0 0 0 / .85);",
     "--m-shadow-inset: inset 0 1px 1px rgb(0 0 0 / .25); --m-highlight: inset 0 1px 0 rgb(255 255 255 / .06); --m-mix-surface: 6%;");
+  lines.push(...styleMode(st, c, mode));
   return lines.join("\n  ");
 }
 
@@ -131,10 +216,11 @@ export function themeCss(def: ThemeDef, isDefault = false): string {
   const light = [`:root${id}`, id, ...(isDefault ? [":root:not([data-m-theme])"] : [])].join(", ");
   const darkSys = [`:root${id}:not([data-theme="light"])`, `:root:not([data-theme="light"]) ${id}`, ...(isDefault ? [':root:not([data-m-theme]):not([data-theme="light"])'] : [])].join(", ");
   const darkSet = [`:root${id}[data-theme="dark"]`, `:root[data-theme="dark"] ${id}`, ...(isDefault ? [':root:not([data-m-theme])[data-theme="dark"]'] : [])].join(", ");
-  const base = `--m-font: ${def.font}, ${SANS}; --m-font-display: ${def.display}, ${def.font}, ${SANS}; --m-display-weight: ${def.displayWeight ?? 700}; --m-r: ${def.radius}px;${Object.entries(def.tokens ?? {}).map(([k, v]) => ` --m-${k}: ${v};`).join("")}`;
-  const multi = (c: ThemeColors): string => !def.multicolor ? "" : `\n  ${multiVars(c)}`;
-  const lightVars = (def.alwaysDark ? modeVars(def.dark, "dark") : modeVars(def.light, "light")) + multi(def.alwaysDark ? def.dark : def.light);
-  const dark = modeVars(def.dark, "dark") + multi(def.dark);
+  const base = `--m-font: ${def.font}, ${SANS}; --m-font-display: ${def.display}, ${def.font}, ${SANS}; --m-display-weight: ${def.displayWeight ?? 700}; --m-r: ${def.radius}px;${Object.entries(def.tokens ?? {}).map(([k, v]) => ` --m-${k}: ${v};`).join("")}${styleBase(def.style)}`;
+  // a theme without the multicolor defaults resets them (see STYLE_TOKENS)
+  const multi = (c: ThemeColors): string => `\n  ${def.multicolor ? multiVars(c) : resetUnset([], ["progress-fill", "spinner-paint", "spinner-track", "spinner-head", "skel-paint", "otp-1", "otp-2", "otp-3", "otp-4", "otp-font"])}`;
+  const lightVars = (def.alwaysDark ? modeVars(def.dark, "dark", def.style) : modeVars(def.light, "light", def.style)) + multi(def.alwaysDark ? def.dark : def.light);
+  const dark = modeVars(def.dark, "dark", def.style) + multi(def.dark);
   return `/* ${def.name}${def.description ? ` — ${def.description}` : ""} */
 ${light} {
   ${base}
