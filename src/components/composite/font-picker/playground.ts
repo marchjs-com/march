@@ -7,7 +7,8 @@ export interface Values {
 
 export default definePlayground<Values>({
   options: [
-    { key: "view", label: "Görünüm", default: "popover", kind: "segmented", options: [{ value: "popover", label: "Açılır panel" }, { value: "dialog", label: "Diyalog" }, { value: "inline", label: "Satır içi" }] },
+    // the stage starts inline so every option below shows at once; the picker's own default is the popover
+    { key: "view", label: "Görünüm", default: "inline", kind: "segmented", options: [{ value: "inline", label: "Satır içi" }, { value: "popover", label: "Açılır panel" }, { value: "dialog", label: "Diyalog" }] },
     { key: "preview", label: "Satırda", default: "name", kind: "segmented", options: [{ value: "name", label: "Ad" }, { value: "sample", label: "Örnek metin" }] },
     { key: "category", label: "Tür", default: "all", kind: "chips", options: [{ value: "all", label: "Tümü" }, { value: "sans-serif", label: "Sans" }, { value: "serif", label: "Serif" }, { value: "display", label: "Dekoratif" }, { value: "handwriting", label: "El yazısı" }, { value: "monospace", label: "Mono" }] },
     { key: "sort", label: "Sıralama", default: "popular", kind: "segmented", options: [{ value: "popular", label: "Popüler" }, { value: "name", label: "A–Z" }, { value: "newest", label: "Yeni" }] },
