@@ -14,6 +14,16 @@ when there is no room.
 |---|---|---|---|
 | `text` | string / accessor | — | hint text |
 | `placement` | Placement | `top` | preferred side |
+| `delay` | ms | `300` | hover delay before it shows (focus shows it at once) |
+| `disabled` | boolean / accessor | `false` | `true`: it never shows |
+| `motion` | `scale` `fade` `none` | `scale` | entrance motion |
+| `color` | ColorToken | inverse surface | colour of the bubble |
+| `class` | ClassProp | — | extra class on the bubble (`.hm-tooltip`) |
+
+```tsx
+<Tooltip text="Saved" color="success" delay={0} motion="fade"><IconButton icon={check} label="Save" /></Tooltip>
+<Tooltip text="Copy link" disabled={() => $touch}><Button>Share</Button></Tooltip>
+```
 
 ## Accessibility
 

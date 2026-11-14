@@ -16,3 +16,13 @@
   background: none; color: var(--hm-muted); cursor: pointer; padding: 0; }
 .hm-toast-close:hover { background: var(--hm-surface-2); color: var(--hm-text); }
 @media (max-width: 640px) { .hm-toasts { inset-inline: var(--hm-space-3); width: auto; } }
+/* per-toast choices: own icon color, entrance */
+.hm-toast[data-hm-color] .hm-toast-icon { color: var(--hm-accent); }
+.hm-toast.hm-toast-fade { animation-name: hm-fade-in; animation-timing-function: var(--hm-ease); }
+.hm-toast.hm-toast-still { animation: none; }
+/* <ToastHost position>: the block edge everywhere, the inline edge where the stack does not span the width */
+.hm-toasts-top-end, .hm-toasts-top-start, .hm-toasts-top-center { inset-block: var(--hm-space-4) auto; }
+@media (min-width: 641px) {
+  .hm-toasts-bottom-start, .hm-toasts-top-start { inset-inline: var(--hm-space-4) auto; }
+  .hm-toasts-bottom-center, .hm-toasts-top-center { inset-inline: 0; margin-inline: auto; }
+}

@@ -17,6 +17,12 @@ element that was clicked, so one menu can offer different entries for different 
 | `items` | `(target, point) => MenuItem[]` | — | entries for this opening |
 | `when` | `(target) => boolean` | — | return false to keep the browser menu |
 | `label` | string | — | accessible name of the menu |
+| `menuClass` | ClassProp | — | extra class on the floating menu panel (`.hm-menu`) |
+| `class` | ClassProp | — | extra class on the host around the children (it adds no box: `display: contents`) |
+| `children` | node | — | the area that answers the right-click |
+
+Every text, icon, shortcut and colour of the menu comes from your `items` (the `MenuItem` of `Menu`), so there is
+nothing built in to replace: `<ContextMenu items={items} menuClass="files-menu" label="File actions">…</ContextMenu>`.
 
 ## Accessibility
 

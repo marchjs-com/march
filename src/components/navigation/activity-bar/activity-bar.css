@@ -9,11 +9,11 @@
   transition: color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), scale var(--hm-dur) var(--hm-ease); }
 .hm-ab-btn:hover { color: var(--hm-text); background: color-mix(in srgb, var(--hm-text) 6%, transparent); }
 .hm-ab-btn:active { scale: .92; }
-.hm-ab-btn.is-active { color: var(--hm-primary); }
+.hm-ab-btn.is-active { color: var(--hm-accent, var(--hm-primary)); }
 .hm-ab-btn:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: -2px; }
 .hm-ab-icon { display: inline-flex; } .hm-ab-icon .hm-svg { width: 1.375rem; height: 1.375rem; }
 .hm-ab-badge { position: absolute; inset-block-start: .1875rem; inset-inline-end: .0625rem; pointer-events: none; }
 .hm-ab-badge .hm-badge { min-width: 1rem; height: 1rem; padding-inline: .25rem; font-size: .625rem; line-height: 1rem; }
-.hm-ab-ind { position: absolute; inset-block-start: 0; inset-inline-start: 0; width: 2px; height: var(--hm-ab-size, 2.5rem); border-radius: 2px; background: var(--hm-primary); opacity: 0; pointer-events: none; }
+.hm-ab-ind { position: absolute; inset-block-start: 0; inset-inline-start: 0; width: 2px; height: var(--hm-ab-size, 2.5rem); border-radius: 2px; background: var(--hm-accent, var(--hm-primary)); opacity: 0; pointer-events: none; }
 .hm-ab-h .hm-ab-ind { inset-block-start: auto; inset-block-end: 0; width: var(--hm-ab-size, 2.5rem); height: 2px; }
 .hm-ab-ind.is-on { opacity: 1; }

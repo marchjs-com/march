@@ -32,3 +32,23 @@ test("Tabs: <Tab> children and panel={false}", () => {
   assert.equal(host.querySelector('[role="tabpanel"]'), null);
   dispose();
 });
+
+test("Tabs: indicator off, motion none, own motion gets the panel and the direction", () => {
+  const cur = signal("a"), calls = [];
+  const tabs = [{ id: "a", label: "A", content: "one" }, { id: "b", label: "B", content: "two" }];
+  const { host, dispose } = mount(() => [
+    h(Tabs, { tabs, indicator: false, motion: "none" }),
+    h(Tabs, { tabs, value: cur, motion: (panel, dir) => calls.push([panel.getAttribute("role"), dir]) }),
+    h(Tabs, { tabs }),
+  ]);
+  const [plain, own, std] = host.querySelectorAll(".hm-tabs");
+  assert.match(plain.getAttribute("class"), /hm-tabs-plain/);
+  assert.match(plain.getAttribute("class"), /hm-tabs-still/);
+  assert.doesNotMatch(std.getAttribute("class"), /hm-tabs-plain|hm-tabs-still/);
+  assert.deepEqual(calls, [], "no motion for the first panel");
+  cur.set("b");
+  cur.set("a");
+  assert.deepEqual(calls, [["tabpanel", 1], ["tabpanel", -1]]);
+  assert.match(own.querySelector('[role="tabpanel"]').textContent, /one/);
+  dispose();
+});

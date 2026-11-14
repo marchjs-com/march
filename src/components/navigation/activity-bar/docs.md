@@ -24,6 +24,16 @@ bottom bar on phones), and mirrored in RTL.
 | `orientation` | `vertical` `horizontal` (or a signal) | `vertical` | live: the same bar turns, the indicator moves to the bottom edge, keys follow the axis |
 | `controls` | string | — | id of the side view (`aria-controls`) |
 | `label` | string | "Views" | accessible name |
+| `indicator` | boolean | `true` | the line that marks the active view |
+| `motion` | `glide` `fade` `none` | `glide` | how the indicator moves to a new view |
+| `tooltips` | boolean | `true` | name tooltips on hover and focus (the accessible name stays either way) |
+| `color` | ColorToken | theme primary | colour of the active view and the indicator |
+| `class` | ClassProp | — | extra class on the bar |
+
+```tsx
+<ActivityBar items={views} value={$view} onChange={(v) => $view = v} color="brand-purple" motion="fade" tooltips={false} />
+<ActivityBar items={views} value={$view} onChange={(v) => $view = v} indicator={false} />
+```
 
 ## Accessibility
 

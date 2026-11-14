@@ -1,13 +1,16 @@
 // Tabs: `<Tabs tabs={[{ id, label, badge, content: () => node }]} query="tab" />` or `<Tabs><Tab id label>…</Tab></Tabs>`.
 // Roving focus with ← → Home End (automatic activation). With `query="tab"` the active tab is kept in the URL (?tab=id).
 import "./tabs.css";
-import { signal, computed, untrack } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { query as routeQuery, setQuery } from "../../../router/router.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { roving } from "../../../ui/focus.ts";
 import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { animate } from "../../../motion/animate.ts";
+import { reducedMotion } from "../../../motion/env.ts";
+import { isRtl } from "../../../core/util.ts";
 
 /** A tab: `content` is a node or a function rendering the panel (called when the tab becomes active). */
 export interface TabSpec {
@@ -46,7 +49,21 @@ export interface TabsProps {
   children?: unknown;
   /** false: render only the tab bar. */
   panel?: boolean;
+  /** The underline of the active tab (default true). */
+  indicator?: boolean | undefined;
+  /**
+   * Panel motion. Default: the panel rises in once, when it first appears. "none": no motion. "fade", "rise", "slide"
+   * (from the side of the new tab, mirrored in RTL) play on every switch; or your own `(panel, dir) => void`
+   * (dir 1: a later tab, -1: an earlier one).
+   */
+  motion?: "none" | "fade" | "rise" | "slide" | ((panel: HTMLElement, dir: 1 | -1) => void) | undefined;
 }
+
+const PANEL_FRAMES = {
+  fade: () => [{ opacity: 0 }, { opacity: 1 }],
+  rise: () => [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }],
+  slide: (d: number) => [{ opacity: 0, transform: `translateX(${d * 24}px)` }, { opacity: 1, transform: "translateX(0)" }],
+};
 
 /** `value` + `onChange` make it controlled (`bind:value` works). */
 export function Tabs(props: TabsProps): Element {
@@ -89,5 +106,21 @@ export function Tabs(props: TabsProps): Element {
       const tab = untrack(list).find((x) => x.id === id);
       return tab ? untrack(() => (typeof tab.content === "function" ? (tab.content as () => unknown)() : tab.content)) : null;
     });
-  return h("div", { class: () => cx("hm-tabs", val(props.class)) }, nav, props.panel === false ? null : panel);
+  // motion on every switch (opt-in): the motion engine plays it on the panel; reduced motion switches at once
+  const motion = props.motion;
+  if (motion && motion !== "none" && props.panel !== false) {
+    let last: string | null | undefined;
+    effect(() => {
+      const id = current();
+      untrack(() => {
+        const ids = list().map((x) => x.id), prev = last;
+        last = id;
+        if (prev == null || id == null || prev === id || reducedMotion()) return;
+        const dir = ids.indexOf(id) > ids.indexOf(prev) ? 1 : -1;
+        if (typeof motion === "function") motion(panel as HTMLElement, dir);
+        else animate(panel as HTMLElement, PANEL_FRAMES[motion](dir * (isRtl(panel as HTMLElement) ? -1 : 1)), { duration: 240, easing: "out" });
+      });
+    });
+  }
+  return h("div", { class: () => cx("hm-tabs", props.indicator === false && "hm-tabs-plain", motion && "hm-tabs-still", val(props.class)) }, nav, props.panel === false ? null : panel);
 }

@@ -4,7 +4,9 @@ import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<Stepper steps={[{ title: "Sepet" }, { title: "Adres" }, { title: "Ödeme" }, { title: "Onay" }]}
   current={$step} onSelect={(i) => $step = i}
-  panels={[<Cart />, <Address />, <Payment />, <Done />]} onFinish={submit} />`
+  panels={[<Cart />, <Address />, <Payment />, <Done />]} onFinish={submit}
+  highlight={false} counter={(i, n) => (n - i - 1) + " adım kaldı"} doneIcon={false}
+  labels={{ back: "Önceki", next: "Devam" }} finishLabel="Bitir" />`
 
 const steps = [
   { title: "Sepet", description: "3 ürün" },
@@ -13,7 +15,7 @@ const steps = [
   { title: "Onay", description: "Özet" },
 ]
 
-export default function StepperDemo(props: { values: { vertical: boolean; morph: boolean; color: string } }) {
+export default function StepperDemo(props: { values: { vertical: boolean; morph: boolean; color: string; highlight: boolean; counter: string; done: string } }) {
   let $step = 1
   let $done = false
   const panels = [
@@ -23,8 +25,14 @@ export default function StepperDemo(props: { values: { vertical: boolean; morph:
     <div class="sc-step-pane"><b>Onay</b><p>{() => ($done ? "Sipariş alındı. Teşekkürler!" : "Her şey hazır: Bitir'e basın.")}</p></div>,
   ]
   const color = (): ColorToken | undefined => (props.values.color || undefined) as ColorToken
+  // highlight, counter and the done mark are read once by the stepper: it is drawn again when one of them changes
   return <div class="sc-step-demo">
-    <Stepper steps={steps} current={() => $step} onSelect={(i) => { $step = i; $done = false }} vertical={() => props.values.vertical}
-      morph={() => props.values.morph} color={color()} panels={panels} nav onFinish={() => { $done = true }} finishLabel="Bitir" />
+    {() => {
+      const highlight = props.values.highlight, counter = props.values.counter, done = props.values.done
+      return <Stepper steps={steps} current={() => $step} onSelect={(i) => { $step = i; $done = false }} vertical={() => props.values.vertical}
+        morph={() => props.values.morph} color={color()} panels={panels} nav onFinish={() => { $done = true }} finishLabel="Bitir"
+        highlight={highlight} doneIcon={done === "number" ? false : undefined}
+        counter={counter === "off" ? false : counter === "own" ? (i: number, n: number) => (n - i - 1 ? `${n - i - 1} adım kaldı` : "son adım") : true} />
+    }}
   </div>
 }

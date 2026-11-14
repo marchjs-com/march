@@ -17,6 +17,15 @@ with their descriptions. Stepper and Wizard are built on it.
 | `onSelect` | `(i) => void` | — | makes each step a button |
 | `vertical` | boolean | `false` | vertical list |
 | `color` | ColorToken | theme primary | accent of done and current steps |
+| `doneIcon` | icon / string / `false` | check | mark of a done step; `false` keeps the number (or the step's icon) |
+| `renderDot` | `(i, state, step) => node` | — | your own dot content; `state` is `done`, `current` or `todo` |
+| `connector` | boolean | `true` | the line between the steps |
+| `class` | ClassProp | — | extra class on the list |
+
+```tsx
+<Steps steps={steps} current={$step} doneIcon={false} connector={false} />                 // numbers stay, no line
+<Steps steps={steps} current={$step} renderDot={(i, state) => (state === "done" ? "★" : i + 1)} />
+```
 
 ## Accessibility
 

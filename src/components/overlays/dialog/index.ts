@@ -12,9 +12,12 @@ import { t } from "../../../core/i18n.ts";
 import { val, cx, uid, glyph, type MaybeFn } from "../../../ui/util.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { trapTab, focusables } from "../../../ui/focus.ts";
+import { isIconDef } from "../../../icons/svg.ts";
 
 export type DialogSize = "sm" | "md" | "lg" | "full";
 export type DrawerSide = "left" | "right" | "bottom";
+/** Entrance of a dialog panel: "scale" (default), "fade", "rise" or "none" (the scrim then appears at once too). */
+export type DialogMotion = "scale" | "fade" | "rise" | "none";
 /** Text shown in a dialog: a string or an accessor. */
 export type Label = MaybeFn<string>;
 
@@ -51,6 +54,12 @@ export interface FrameOptions {
   label?: string | undefined;
   /** false: a non-modal panel (no scroll lock, no aria-modal, no focus trap; the page stays usable). Default true. */
   modal?: boolean | undefined;
+  /** The × button in the head: true (default), false (Escape and the scrim still close), or your own icon / node. */
+  closeButton?: unknown;
+  /** Accessible name of the × button (default "Close"). */
+  closeLabel?: MaybeFn<string | undefined>;
+  /** Entrance of the panel (default "scale"; a CSS drawer slides in). */
+  motion?: DialogMotion | undefined;
 }
 
 /** Build a modal frame (overlay + panel). Must run inside an owner; the frame unregisters and restores focus on cleanup. */
@@ -67,20 +76,21 @@ export function frame(o: FrameOptions): HTMLElement {
   let panel: HTMLElement | undefined, body: HTMLElement | undefined, down: boolean | null = null;
   const drawer = o.kind === "drawer";
   const overlay = h("div", {
-    class: cx("hm-overlay", drawer && "hm-overlay-drawer", !modal && "is-modeless"),
+    class: cx("hm-overlay", drawer && "hm-overlay-drawer", !modal && "is-modeless", o.motion === "none" && "hm-motion-none"),
     onPointerdown: (e: Event) => { down = e.target === overlay; },
     onClick: (e: Event) => { if (e.target === overlay && down !== false && dismissable()) o.onClose(); down = null; },
   },
   h("div", {
     ref: (x: HTMLElement) => { panel = x; },
-    class: cx(drawer ? `hm-drawer hm-drawer-${o.side ?? "right"}` : `hm-dialog hm-dialog-${val(o.size) ?? "md"}`, o.class),
+    class: cx(drawer ? `hm-drawer hm-drawer-${o.side ?? "right"}` : `hm-dialog hm-dialog-${val(o.size) ?? "md"}`, o.motion && o.motion !== "scale" && `hm-motion-${o.motion}`, o.class),
     role: o.role ?? "dialog", "aria-modal": modal ? "true" : null, tabindex: "-1",
     "aria-labelledby": o.title != null ? titleId : null, "aria-label": o.title == null ? o.label ?? null : null,
     onKeydown: (e: KeyboardEvent) => { if (panel && modal) trapTab(panel)(e); },
   },
   o.title != null && h("div", { class: "hm-dialog-head" },
     h("h2", { id: titleId, class: "hm-dialog-title" }, () => val(o.title)),
-    () => dismissable() && h("button", { type: "button", class: "hm-icon-btn hm-dialog-x", "aria-label": () => t`Close`, onClick: () => o.onClose() }, glyph(xIcon))),
+    () => dismissable() && o.closeButton !== false && h("button", { type: "button", class: "hm-icon-btn hm-dialog-x", "aria-label": () => val(o.closeLabel) ?? t`Close`, onClick: () => o.onClose() },
+      o.closeButton == null || o.closeButton === true ? glyph(xIcon) : isIconDef(o.closeButton) ? glyph(o.closeButton) : o.closeButton)),
   h("div", { class: "hm-dialog-body", ref: (x: HTMLElement) => { body = x; } }, o.children),
   o.footer != null && h("div", { class: "hm-dialog-foot" }, o.footer))) as HTMLElement;
   queueMicrotask(() => {
@@ -110,6 +120,12 @@ export interface DialogOptions<T = unknown> {
   dismissValue?: T;
   /** Where it opens: the nearest <OverlayScope> (default), the whole page ("page") or a scope element. */
   target?: "nearest" | "page" | HTMLElement;
+  /** The × button in the head: true (default), false, or your own icon / node. */
+  closeButton?: unknown;
+  /** Accessible name of the × button (default "Close"). */
+  closeLabel?: MaybeFn<string | undefined>;
+  /** Entrance of the panel: "scale" (default), "fade", "rise" or "none". */
+  motion?: DialogMotion | undefined;
 }
 
 /**
@@ -147,11 +163,13 @@ export interface ConfirmOptions {
   danger?: boolean | undefined;
   ok?: Label | undefined;
   cancel?: Label | undefined;
+  /** Look of the dialog itself: size, class, the × button and its name, entrance, where it opens. */
+  dialog?: Pick<DialogOptions, "size" | "class" | "target" | "closeButton" | "closeLabel" | "motion"> | undefined;
 }
 /** Ask a yes/no question. Resolves true (ok) or false (cancel, Escape, overlay). */
-export function confirm({ title, message, danger = false, ok, cancel }: ConfirmOptions = {}): Promise<boolean> {
+export function confirm({ title, message, danger = false, ok, cancel, dialog }: ConfirmOptions = {}): Promise<boolean> {
   return openDialog<boolean>(() => message != null && h("p", { class: "hm-dialog-msg" }, () => val(message)), {
-    title: title ?? (() => t`Are you sure?`), size: "sm", role: "alertdialog", dismissValue: false,
+    size: "sm", ...dialog, title: title ?? (() => t`Are you sure?`), role: "alertdialog", dismissValue: false,
     footer: (close) => [
       btn(cancel ?? (() => t`Cancel`), "hm-btn-secondary", () => close(false), { "data-cancel": "", "data-autofocus": danger ? "" : null }),
       btn(ok ?? (() => t`OK`), danger ? "hm-btn-danger" : "hm-btn-primary", () => close(true), { "data-ok": "", "data-autofocus": danger ? null : "" }),
@@ -186,10 +204,13 @@ export interface PromptOptions {
   /** Returns an error message, or null/undefined when the value is valid. */
   validate?: ((value: string) => string | null | undefined) | undefined;
   ok?: Label | undefined;
+  cancel?: Label | undefined;
   multiline?: boolean | undefined;
+  /** Look of the dialog itself: size, class, the × button and its name, entrance, where it opens. */
+  dialog?: Pick<DialogOptions, "size" | "class" | "target" | "closeButton" | "closeLabel" | "motion"> | undefined;
 }
 /** Ask for a text value. `validate(v)` returns an error message or null. Resolves the string, or null when cancelled. */
-export function prompt({ title, message, label, value = "", placeholder, validate, ok, multiline = false }: PromptOptions = {}): Promise<string | null> {
+export function prompt({ title, message, label, value = "", placeholder, validate, ok, cancel, multiline = false, dialog }: PromptOptions = {}): Promise<string | null> {
   const text = signal(String(value ?? "")), error = signal<string | null>(null);
   let submit = (): void => {};
   return openDialog<string | null>((close) => {
@@ -197,8 +218,8 @@ export function prompt({ title, message, label, value = "", placeholder, validat
     return [message != null && h("p", { class: "hm-dialog-msg" }, () => val(message)),
       field({ id: uid("hm-prompt"), label, value: text.peek(), multiline, placeholder, error, onInput: (v) => { text.set(v); error.set(null); }, onEnter: () => submit() })];
   }, {
-    title: title ?? (() => t`Enter a value`), size: "sm", dismissValue: null,
-    footer: (close) => [btn(() => t`Cancel`, "hm-btn-secondary", () => close(null), { "data-cancel": "" }), btn(ok ?? (() => t`OK`), "hm-btn-primary", () => submit(), { "data-ok": "" })],
+    size: "sm", ...dialog, title: title ?? (() => t`Enter a value`), dismissValue: null,
+    footer: (close) => [btn(cancel ?? (() => t`Cancel`), "hm-btn-secondary", () => close(null), { "data-cancel": "" }), btn(ok ?? (() => t`OK`), "hm-btn-primary", () => submit(), { "data-ok": "" })],
   });
 }
 
@@ -215,6 +236,13 @@ export interface AskReasonOptions {
   ok?: Label | undefined;
   /** When given (non-empty), a purpose must be chosen too and the result is `{ category, text }`. */
   purposes?: readonly Purpose[] | undefined;
+  cancel?: Label | undefined;
+  /** Own texts: the field labels, the empty choice of the purpose list and the two error messages. */
+  labels?: { reason?: Label; purpose?: Label; choose?: Label; choosePurpose?: Label; tooShort?: (min: number) => string } | undefined;
+  /** The "12 / 10" character counter under the field (default true). */
+  counter?: boolean | undefined;
+  /** Look of the dialog itself: size, class, the × button and its name, entrance, where it opens. */
+  dialog?: Pick<DialogOptions, "size" | "class" | "target" | "closeButton" | "closeLabel" | "motion"> | undefined;
 }
 
 /**
@@ -225,28 +253,28 @@ export interface AskReasonOptions {
 export function askReason(opts: AskReasonOptions & { purposes: readonly Purpose[] }): Promise<ReasonWithPurpose | null>;
 export function askReason(opts?: AskReasonOptions & { purposes?: undefined }): Promise<string | null>;
 export function askReason(opts?: AskReasonOptions): Promise<string | ReasonWithPurpose | null>;
-export function askReason({ title, message, min = 10, danger = false, ok, purposes }: AskReasonOptions = {}): Promise<string | ReasonWithPurpose | null> {
+export function askReason({ title, message, min = 10, danger = false, ok, purposes, cancel, labels, counter, dialog }: AskReasonOptions = {}): Promise<string | ReasonWithPurpose | null> {
   const text = signal(""), cat = signal(""), error = signal<string | null>(null);
   let submit = (): void => {};
   return openDialog<string | ReasonWithPurpose | null>((close) => {
     submit = () => {
       const v = text.peek().trim();
-      if (purposes?.length && !cat.peek()) { error.set(t`Choose a purpose.`); return; }
-      if (v.length < min) { error.set(t`Please write at least ${min} characters.`); return; }
+      if (purposes?.length && !cat.peek()) { error.set(labels?.choosePurpose != null ? val(labels.choosePurpose) : t`Choose a purpose.`); return; }
+      if (v.length < min) { error.set(labels?.tooShort ? labels.tooShort(min) : t`Please write at least ${min} characters.`); return; }
       close(purposes?.length ? { category: cat.peek(), text: v } : v);
     };
     const selId = uid("hm-purpose");
     return [message != null && h("p", { class: "hm-dialog-msg" }, () => val(message)),
       purposes?.length && h("div", { class: "hm-field" },
-        h("label", { class: "hm-label", for: selId }, () => t`Purpose`),
+        h("label", { class: "hm-label", for: selId }, () => (labels?.purpose != null ? val(labels.purpose) : t`Purpose`)),
         h("select", { id: selId, class: "hm-select", onChange: (e: Event) => { cat.set((e.target as HTMLSelectElement).value); error.set(null); } },
-          h("option", { value: "" }, () => t`Choose…`),
+          h("option", { value: "" }, () => (labels?.choose != null ? val(labels.choose) : t`Choose…`)),
           purposes.map((p) => h("option", { value: p.value }, () => val(p.label))))),
-      field({ id: uid("hm-reason"), label: () => t`Reason`, value: "", multiline: true, error, onInput: (v) => { text.set(v); error.set(null); }, onEnter: () => submit() }),
-      h("div", { class: "hm-field-hint", "aria-live": "polite" }, () => `${text().trim().length} / ${min}`)];
+      field({ id: uid("hm-reason"), label: () => (labels?.reason != null ? val(labels.reason) : t`Reason`), value: "", multiline: true, error, onInput: (v) => { text.set(v); error.set(null); }, onEnter: () => submit() }),
+      counter !== false && h("div", { class: "hm-field-hint", "aria-live": "polite" }, () => `${text().trim().length} / ${min}`)];
   }, {
-    title: title ?? (() => t`Reason`), size: "sm", dismissValue: null,
-    footer: (close) => [btn(() => t`Cancel`, "hm-btn-secondary", () => close(null), { "data-cancel": "" }),
+    size: "sm", ...dialog, title: title ?? (() => t`Reason`), dismissValue: null,
+    footer: (close) => [btn(cancel ?? (() => t`Cancel`), "hm-btn-secondary", () => close(null), { "data-cancel": "" }),
       btn(ok ?? (() => t`Continue`), danger ? "hm-btn-danger" : "hm-btn-primary", () => submit(), { "data-ok": "" })],
   });
 }
@@ -266,14 +294,24 @@ export interface DialogProps {
   children?: unknown;
   /** Drawer only. */
   side?: DrawerSide;
+  /** false: a non-modal panel (no scrim, no scroll lock, no focus trap; the page stays usable). Default true. */
+  modal?: boolean | undefined;
+  /** The × button in the head: true (default), false (Escape and the scrim still close), or your own icon / node. */
+  closeButton?: unknown;
+  /** Accessible name of the × button (default "Close"). */
+  closeLabel?: MaybeFn<string | undefined>;
+  /** Entrance of the panel: "scale" (default), "fade", "rise" or "none". */
+  motion?: DialogMotion | undefined;
 }
 
 function sheet(kind: "dialog" | "drawer"): (props: DialogProps) => () => unknown {
   return (props) => () => {
     if (!val(props.open)) return null;
-    return h(Portal, { layer: kind, children: untrack(() => frame({
+    // a non-modal panel sits in a layer that leaves the page usable
+    return h(Portal, { layer: props.modal === false ? "popover" : kind, children: untrack(() => frame({
       kind, side: props.side, title: props.title === undefined ? undefined : () => val(props.title), size: () => val(props.size),
       dismissable: () => props.dismissable, class: props.class, label: props.label,
+      modal: props.modal, closeButton: props.closeButton, closeLabel: () => val(props.closeLabel), motion: props.motion,
       onClose: () => props.onClose?.(), footer: props.footer, children: props.children,
     })) });
   };

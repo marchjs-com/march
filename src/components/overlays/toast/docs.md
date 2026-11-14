@@ -13,9 +13,22 @@ toast("File archived", { kind: "success", action: { label: "Undo", run: () => re
 | `kind` | `info` `success` `warn` `danger` | `info` | icon and colour |
 | `action` | `{ label, run }` | | a button; the toast closes first |
 | `timeout` | ms | 4000; 8000 with an action or for danger | `0`: stays until dismissed |
+| `icon` | icon / short text / node / `false` | the kind's icon | your own icon, or none |
+| `color` | ColorToken | the kind's colour | colour of the icon |
+| `closable` | boolean | `true` | the close (×) button; without it give a timeout, an action, or dismiss it yourself |
+| `closeLabel` | string | "Dismiss" | accessible name of the close button |
+| `motion` | `spring` `fade` `none` | `spring` | entrance motion |
+| `class` | string | — | extra class on the toast |
+| `action.error` | string | "Something went wrong." | error toast when `run` fails without a message |
+
+```tsx
+toast("Level up!", { icon: "🎉", color: "brand-purple", closable: false, motion: "fade", timeout: 3000 });
+toast("Saved", { icon: false, closeLabel: "Close the message" });
+```
 
 `toast.dismiss(id)`, `toast.clear()`, `toast.list()` (reactive). `<ToastHost />` renders the stack where you place it
-(optional).
+(optional); it takes `position` (`bottom-end` default, `bottom-start`, `bottom-center`, `top-end`, `top-start`,
+`top-center`; start / end follow the writing direction) and `class`: `<ToastHost position="top-center" />`.
 
 ## Accessibility
 

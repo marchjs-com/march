@@ -30,3 +30,10 @@ html.hm-scroll-lock { overflow: hidden; }
   .hm-dialog-foot { border-radius: 0; }
 }
 .hm-dialog-body::-webkit-scrollbar-track { margin-block: var(--hm-radius-2); }
+/* a non-modal panel: no scrim, the page behind stays usable */
+.hm-overlay.is-modeless { background: none; backdrop-filter: none; pointer-events: none; animation: none; }
+.hm-overlay.is-modeless > * { pointer-events: auto; }
+/* entrance choices (motion); after the phone rule and as specific, so they hold there too */
+.hm-dialog.hm-motion-fade, .hm-drawer.hm-motion-fade, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-fade:not(.hm-dialog-full) { animation-name: hm-fade-in; }
+.hm-dialog.hm-motion-rise, .hm-drawer.hm-motion-rise, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-rise:not(.hm-dialog-full) { animation-name: hm-rise-in; }
+.hm-dialog.hm-motion-none, .hm-drawer.hm-motion-none, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-none:not(.hm-dialog-full), .hm-overlay.hm-motion-none { animation: none; }

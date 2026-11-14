@@ -14,6 +14,7 @@ import { roving, isRtl } from "../../../ui/focus.ts";
 import { formatKey } from "../../../ui/keys.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 messages("tr", { "Views": "Görünümler" });
 
@@ -39,6 +40,14 @@ export interface ActivityBarProps {
   /** id of the element the views are shown in (aria-controls). */
   controls?: string;
   label?: MaybeFn<string | undefined>;
+  /** The line that marks the active view (default true). */
+  indicator?: boolean | undefined;
+  /** How the indicator moves to a new view: "glide" (default), "fade" (it appears in place) or "none". */
+  motion?: "glide" | "fade" | "none" | undefined;
+  /** Name tooltips on hover and focus (default true; the accessible name stays either way). */
+  tooltips?: boolean | undefined;
+  /** Theme color token of the active view and the indicator (default: the theme's primary). */
+  color?: ColorToken | undefined;
   class?: ClassProp;
 }
 
@@ -51,13 +60,14 @@ export function ActivityBar(props: ActivityBarProps): Element {
   const current = (): string | null => val(props.value) ?? null;
   let root: HTMLElement | undefined, ind: HTMLElement | undefined;
   let lastAt: string | null = null;
+  const motion = props.motion ?? "glide";
 
   const choose = (it: ActivityItem): void => {
     if (it.onSelect) { void it.onSelect(); return; }
     props.onChange(current() === it.id && props.collapsible !== false ? null : it.id);
   };
   // the indicator glides from the old view to the new one
-  effect(() => {
+  if (props.indicator !== false) effect(() => {
     const id = current();
     list();
     const hz = horizontal();
@@ -73,7 +83,8 @@ export function ActivityBar(props: ActivityBarProps): Element {
       const from = lastAt && lastAt.startsWith(hz ? "translateX" : "translateY") ? lastAt : null;
       lastAt = to;
       ind.classList.add("is-on");
-      if (from && from !== to && !reducedMotion()) animate(ind, [{ transform: from }, { transform: to }], { duration: 260, easing: "easeOutBack", fill: "forwards" });
+      if (motion === "none") setStyle(ind, { transform: to });
+      else if (motion === "glide" && from && from !== to && !reducedMotion()) animate(ind, [{ transform: from }, { transform: to }], { duration: 260, easing: "easeOutBack", fill: "forwards" });
       else animate(ind, [{ transform: to, opacity: 0 }, { transform: to, opacity: 1 }], { duration: 160, fill: "forwards" });
     });
   });
@@ -89,15 +100,16 @@ export function ActivityBar(props: ActivityBarProps): Element {
       onClick: () => choose(it),
     }, icon(it.icon, "hm-ab-icon"),
     it.badge !== undefined && h("span", { class: "hm-ab-badge" }, h(Badge, { count: () => val(it.badge), tone: "primary" })));
-    return h(Tooltip, { text: name, placement: reactive(() => (horizontal() ? "top" : "bottom-start")), children: btn });
+    if (props.tooltips === false) return btn;
+    return h(Tooltip, { text: name, placement: reactive(() => (horizontal() ? "top" : "bottom-start")) as never, children: btn });
   };
   const onKeydown = (e: KeyboardEvent): void => { roving(e, tabs(), { horizontal: horizontal() }); };
 
   return h("div", {
     class: () => cx("hm-ab", horizontal() ? "hm-ab-h" : "hm-ab-v", val(props.class)), role: "tablist", "aria-orientation": () => (horizontal() ? "horizontal" : "vertical"),
-    "aria-label": () => val(props.label) ?? t`Views`, ref: (x: HTMLElement) => { root = x; }, onKeydown,
+    "aria-label": () => val(props.label) ?? t`Views`, "data-hm-color": () => colorAttr(props.color), ref: (x: HTMLElement) => { root = x; }, onKeydown,
   },
-  h("span", { class: "hm-ab-ind", "aria-hidden": "true", ref: (x: HTMLElement) => { ind = x; } }),
+  props.indicator !== false && h("span", { class: "hm-ab-ind", "aria-hidden": "true", ref: (x: HTMLElement) => { ind = x; } }),
   h("div", { class: "hm-ab-group" }, () => list().filter((x) => x.position !== "end").map((x) => untrack(() => button(x)))),
   h("div", { class: "hm-ab-group hm-ab-end" }, () => list().filter((x) => x.position === "end").map((x) => untrack(() => button(x)))));
 }

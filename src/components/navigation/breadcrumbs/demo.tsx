@@ -4,16 +4,20 @@ import { Breadcrumbs, type Crumb } from "./index.ts";
 import { folder } from "../../../icons/glyphs/folder.ts";
 import { fileText } from "../../../icons/glyphs/fileText.ts";
 import { hash } from "../../../icons/glyphs/hash.ts";
+import { arrowRight } from "../../../icons/glyphs/arrowRight.ts";
 
 export const code = `<Breadcrumbs label="Dosya yolu" items={[
   { id: "hadi", label: "hadi", icon: folder, onSelect: () => openFolder("hadi") },
   { id: "src", label: "src", icon: folder, siblings: () => folders("hadi") },   // kardeşlere menüyle git
   { id: "file", label: "app.ts", icon: fileText },
-]} />`
+]} />
+<Breadcrumbs items={path} separator="/" />                       // kendi ayracın: metin, ikon ya da () => düğüm
+<Breadcrumbs items={path} separator={false} collapse={false} />  // ayraçsız, toplamadan`
 
 const FILES = ["app.ts", "router.ts", "theme.css", "store.ts"]
+const SEPARATORS: Record<string, unknown> = { chevron: undefined, slash: "/", dot: "•", icon: arrowRight, off: false }
 
-export default function BreadcrumbsDemo(props: { values: { width: number; siblings: boolean } }) {
+export default function BreadcrumbsDemo(props: { values: { width: number; siblings: boolean; separator: string; collapse: boolean } }) {
   const file = signal("app.ts")
   const items = (): Crumb[] => {
     const sib = props.values.siblings ? FILES.map((f) => ({ id: f, label: f, icon: fileText, onSelect: () => file.set(f) })) : undefined
@@ -26,5 +30,9 @@ export default function BreadcrumbsDemo(props: { values: { width: number; siblin
       { id: "sym", label: "startApp()", icon: hash },
     ]
   }
-  return <div class="sc-bc-stage" style={{ "--sc-bc-w": `${props.values.width}px` }}><Breadcrumbs items={items} label="Dosya yolu" /></div>
+  // separator and collapse are read once: the path is drawn again when one of them changes
+  return <div class="sc-bc-stage" style={{ "--sc-bc-w": `${props.values.width}px` }}>{() => {
+    const separator = SEPARATORS[props.values.separator], collapse = props.values.collapse
+    return <Breadcrumbs items={items} label="Dosya yolu" separator={separator} collapse={collapse} />
+  }}</div>
 }

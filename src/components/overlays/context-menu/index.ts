@@ -16,6 +16,8 @@ export interface ContextMenuProps {
   label?: MaybeFn<string | undefined>;
   /** Called before opening; return false to keep the browser menu. */
   when?: (target: Element) => boolean;
+  /** Extra class on the floating menu panel (`.hm-menu`); `class` goes to the host around the children. */
+  menuClass?: ClassProp;
   class?: ClassProp;
   children?: unknown;
 }
@@ -55,7 +57,7 @@ export function ContextMenu(props: ContextMenuProps): Element {
     return untrack(() => {
       const items = props.items(o.target, { x: o.x, y: o.y }).filter((it) => itemVisible(it, []));
       return floating({
-        anchor, placement: "bottom-start", role: "menu", id, class: "hm-menu", onClose: close, ref: (x) => { panel = x; },
+        anchor, placement: "bottom-start", role: "menu", id, class: cx("hm-menu", val(props.menuClass)), onClose: close, ref: (x) => { panel = x; },
         attrs: { "aria-label": () => val(props.label) ?? null, onKeydown: (e: KeyboardEvent) => { if (e.key === "Tab") close(false); else roving(e, menuItems(panel)); } },
         children: items.map((it) => renderItem(it, [], close)),
       });

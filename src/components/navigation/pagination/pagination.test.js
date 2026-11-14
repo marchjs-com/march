@@ -21,3 +21,25 @@ test("Pagination: ends stay, the middle collapses, Previous / Next and the curre
   assert.equal(host.querySelector('[aria-current="page"]').textContent, "2");
   dispose();
 });
+
+test("Pagination: own texts and names, own Previous / Next and gap, color; controls and gap off", () => {
+  const { host, dispose } = mount(() => [
+    h(Pagination, { page: 10, pages: 20, prev: "Back", next: "More", gap: "·", color: "brand-blue", label: "Result pages", labels: { previous: "Previous page", next: "Next page", page: (n) => `Page ${n}` } }),
+    h(Pagination, { page: 10, pages: 20, controls: false, gap: false }),
+  ]);
+  const [own, bare] = host.querySelectorAll("nav");
+  assert.equal(own.getAttribute("aria-label"), "Result pages");
+  assert.equal(own.getAttribute("data-hm-color"), "brand-blue");
+  const [prev, next] = own.querySelectorAll(".hm-page-nav");
+  assert.equal(prev.getAttribute("aria-label"), "Previous page");
+  assert.equal(prev.textContent, "Back");
+  assert.equal(next.getAttribute("aria-label"), "Next page");
+  assert.equal(next.textContent, "More");
+  assert.equal(own.querySelector(".hm-page-gap").textContent, "·");
+  assert.equal(own.querySelector('[aria-current="page"]').getAttribute("aria-label"), "Page 10");
+  assert.equal(bare.querySelectorAll(".hm-page-nav").length, 0);
+  assert.equal(bare.querySelector(".hm-page-gap"), null);
+  assert.equal(bare.getAttribute("data-hm-color"), null);
+  assert.equal(bare.querySelector('[aria-current="page"]').textContent, "10");
+  dispose();
+});

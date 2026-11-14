@@ -18,6 +18,16 @@ into a "…" menu; the first and the last always stay. Separators follow the rea
 |---|---|---|---|
 | `items` | `Crumb[]` / accessor | — | `{ id, label, icon, href, onSelect, siblings }` |
 | `label` | string | "Path" | accessible name of the nav |
+| `separator` | icon / short text / `() => node` / `false` | chevron | what stands between the crumbs; `false`: nothing |
+| `collapse` | boolean | `true` | collapse the middle into the "…" menu when narrow; `false`: the path is clipped instead |
+| `ellipsis` | node | "…" | content of the collapsed-crumbs trigger |
+| `labels` | `{ more?, goTo?: (name) => string }` | "Hidden path parts", "name: go to" | accessible names of the "…" menu and of a sibling menu |
+| `class` | ClassProp | — | extra class on the nav |
+
+```tsx
+<Breadcrumbs items={path} separator="/" ellipsis="···" labels={{ more: "Folders in between", goTo: (name) => `Open next to ${name}` }} />
+<Breadcrumbs items={path} separator={false} collapse={false} />
+```
 
 ## Accessibility
 

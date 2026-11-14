@@ -16,7 +16,7 @@ import "./drawer.css";
 /** Edge the drawer comes from. `start` / `end` follow the writing direction; `left` / `right` are aliases of them. */
 export type DrawerPlacement = "start" | "end" | "top" | "bottom" | "left" | "right";
 
-export interface DrawerProps extends Omit<DialogProps, "side" | "size"> {
+export interface DrawerProps extends Omit<DialogProps, "side" | "size" | "motion"> {
   /** Edge (read when it opens). Default "end". */
   side?: MaybeFn<DrawerPlacement | undefined>;
   /** Width (start / end) or height (top / bottom): sm, md, lg, full. Ignored with snapPoints. */
@@ -30,6 +30,15 @@ export interface DrawerProps extends Omit<DialogProps, "side" | "size"> {
   /** Index into snapPoints (controlled). Default 0: it opens at the first listed point. */
   snap?: MaybeFn<number | undefined>;
   onSnap?: ((index: number) => void) | undefined;
+  /** The grab handle (default true: on top / bottom sheets and with snap points). Dragging the head still works without it. */
+  handle?: boolean | undefined;
+  /** Accessible name of the handle button of a sheet with snap points (default "Resize panel"). */
+  handleLabel?: MaybeFn<string | undefined>;
+  /**
+   * Movement: true (default), false (it appears and leaves at once), or your own timing
+   * `{ duration, exit, easing }` (ms; easing: a motion engine easing such as "easeOutBack").
+   */
+  motion?: boolean | { duration?: number | undefined; exit?: number | undefined; easing?: string | undefined } | undefined;
 }
 
 type Edge = "start" | "end" | "top" | "bottom";
@@ -60,6 +69,9 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   const edge = edgeOf(val(props.side));
   const axis = edge === "start" || edge === "end" ? "x" : "y";
   const modal = props.modal !== false;
+  const mo = props.motion;
+  const own = typeof mo === "object" ? mo : null;
+  const settleMs = mo === false ? 0 : own?.duration ?? SETTLE, exitMs = mo === false ? 0 : own?.exit ?? EXIT, ease = own?.easing ?? "easeOutCubic";
   const snaps = props.snapPoints?.length ? [...props.snapPoints] : null;
   const dismissable = (): boolean => props.dismissable !== false;
   const canClose = (): boolean => dismissable() && props.dragToClose !== false;
@@ -77,13 +89,14 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   const first = untrack(() => val(props.snap));
   const idx = signal(snaps && first != null && snaps[first] != null ? first : 0);
 
-  const handle = (axis === "y" || snaps) && (snaps
-    ? h("button", { type: "button", class: "hm-sheet-handle", "aria-label": () => t`Resize panel`, onClick: () => { const i = order.indexOf(idx.peek()); choose(order[(i + 1) % order.length]!); } })
+  const handle = props.handle !== false && (axis === "y" || snaps) && (snaps
+    ? h("button", { type: "button", class: "hm-sheet-handle", "aria-label": () => val(props.handleLabel) ?? t`Resize panel`, onClick: () => { const i = order.indexOf(idx.peek()); choose(order[(i + 1) % order.length]!); } })
     : h("div", { class: "hm-sheet-handle", "aria-hidden": "true" })) as HTMLElement | false;
 
   const root = frame({
     kind: "drawer", modal, title: props.title === undefined ? undefined : () => val(props.title),
     dismissable, label: props.label, footer: props.footer, children: props.children,
+    closeButton: props.closeButton, closeLabel: () => val(props.closeLabel),
     class: cx("hm-sheet", `hm-sheet-${edge}`, !snaps && `hm-sheet-${val(props.size) ?? "md"}`, snaps && "hm-sheet-snap", props.class),
     onClose: () => props.onClose?.(),
   });
@@ -107,14 +120,16 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   // the part pushed past the edge at a smaller snap point is padding: the body fits the visible part and scrolls to its
   // end (past the smallest point, closing, it stays put and slides away whole)
   const reveal = (o: number): void => { if (snaps) setStyle(panel, { "--hm-sheet-off": `${Math.round(Math.min(Math.max(0, o), rest(smallest())))}px` }); };
-  const to = (o: number, duration = SETTLE): Promise<void> => {
+  const to = (o: number, duration = settleMs): Promise<void> => {
     run?.cancel();
     const from = cur;
     cur = o;
     setStyle(panel, { transform: o ? tr(o) : null });
+    // motion off: the panel is simply there (or gone)
+    if (duration <= 0) { run = null; reveal(o); touchPolicy(); return Promise.resolve(); }
     // growing: the body takes the room at once (it slides in filled); shrinking: once the sheet has settled
     if (o <= from) reveal(o);
-    const r = animate(panel, [{ transform: tr(from) }, { transform: tr(o) }], { duration, easing: "easeOutCubic", fill: "none" });
+    const r = animate(panel, [{ transform: tr(from) }, { transform: tr(o) }], { duration, easing: ease, fill: "none" });
     run = r;
     touchPolicy();
     if (o > from) void r.finished.then(() => { if (run === r) reveal(o); });
@@ -167,7 +182,7 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
       const at = nearest(spots.map((x) => x[0]), projected);
       const [o, i] = spots.find((x) => x[0] === at) as [number, number];
       if (i < 0) {
-        void to(size, EXIT);
+        void to(size, exitMs);
         props.onClose?.();
         // a parent that keeps it open gets it back
         queueMicrotask(() => { if (val(props.open)) void to(rest()); });
@@ -192,9 +207,9 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   register({
     exit(done) {
       fade?.cancel();
-      if (modal) fade = animate(root, [{ opacity: 1 }, { opacity: 0 }], { duration: EXIT, fill: "forwards" });
+      if (modal && exitMs > 0) fade = animate(root, [{ opacity: 1 }, { opacity: 0 }], { duration: exitMs, fill: "forwards" });
       if (!size) size = measure();
-      void to(size, EXIT).then(done);
+      void to(size, exitMs).then(done);
     },
     reopen() { fade?.cancel(); fade = null; setStyle(root, { opacity: null }); void to(rest()); },
   });

@@ -59,3 +59,24 @@ test("ActivityBar: orientation is live (the same bar turns; arrow keys follow th
   assert.equal(document.activeElement, tabs[1], "→ moves in a horizontal bar");
   m.dispose();
 });
+
+test("ActivityBar: indicator and tooltips off, color token, motion none places the indicator at once", async () => {
+  const items = [{ id: "files", label: "Files", icon: "F" }, { id: "search", label: "Search", icon: "S" }];
+  const view = signal("files");
+  const m = mount(() => [
+    h(ActivityBar, { value: "files", onChange: () => {}, items, indicator: false, tooltips: false, color: "brand-purple" }),
+    h(ActivityBar, { value: view, onChange: (v) => view.set(v), items, motion: "none" }),
+  ]);
+  await tick();
+  const [bare, still] = m.el.querySelectorAll('[role="tablist"]');
+  assert.equal(bare.querySelector(".hm-ab-ind"), null);
+  assert.equal(bare.querySelector(".hm-tip-anchor"), null, "no tooltip wrapper");
+  assert.equal(bare.querySelector('[role="tab"]').getAttribute("aria-label"), "Files", "the name stays");
+  assert.equal(bare.getAttribute("data-hm-color"), "brand-purple");
+  assert.equal(still.getAttribute("data-hm-color"), null);
+  assert.ok(still.querySelector(".hm-tip-anchor"));
+  const ind = still.querySelector(".hm-ab-ind");
+  assert.ok(ind.classList.contains("is-on"));
+  assert.match(ind.style.getPropertyValue("transform"), /^translateY\(/);
+  m.dispose();
+});

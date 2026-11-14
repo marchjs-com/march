@@ -3,12 +3,34 @@ import "./pagination.css";
 import { computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { more } from "../../../icons/glyphs/more.ts";
 
-export interface PaginationProps { page: MaybeFn<number>; pages: MaybeFn<number>; onPage?: (p: number) => void; setPage?: (p: number) => void; siblings?: number; class?: ClassProp }
+export interface PaginationProps {
+  page: MaybeFn<number>;
+  pages: MaybeFn<number>;
+  onPage?: (p: number) => void;
+  setPage?: (p: number) => void;
+  siblings?: number;
+  /** Accessible name of the nav (default "Pagination"). */
+  label?: MaybeFn<string | undefined>;
+  /** Accessible names: the Previous / Next buttons, and `page(n)` for a page button (default: the number). */
+  labels?: { previous?: MaybeFn<string | undefined>; next?: MaybeFn<string | undefined>; page?: ((n: number) => string) | undefined } | undefined;
+  /** The Previous / Next buttons (default true). */
+  controls?: boolean | undefined;
+  /** Content of the Previous button: an icon or a short text (default: a chevron). */
+  prev?: unknown;
+  /** Content of the Next button: an icon or a short text (default: a chevron). */
+  next?: unknown;
+  /** The mark where pages are left out: the dots (default), your own icon or short text, or false for none. */
+  gap?: unknown;
+  /** Theme color token of the current page (default: neutral). */
+  color?: ColorToken | undefined;
+  class?: ClassProp;
+}
 /** Numbered pages with ellipses: `<Pagination bind:page={$page} pages={20} />` (1-based). */
 export function Pagination(props: PaginationProps): Element {
   const go = (p: number): void => { props.onPage?.(p); props.setPage?.(p); };
@@ -21,10 +43,13 @@ export function Pagination(props: PaginationProps): Element {
     }
     return out;
   });
-  return h("nav", { class: () => cx("hm-pagination", val(props.class)), "aria-label": () => t`Pagination` },
-    h("button", { type: "button", class: "hm-page-btn hm-page-nav", "aria-label": () => t`Previous`, disabled: () => val(props.page) <= 1, onClick: () => go(val(props.page) - 1) }, glyph(chevronLeft)),
+  const controls = props.controls !== false, pageName = props.labels?.page;
+  const own = (x: unknown, fallback: Parameters<typeof glyph>[0]): unknown => (x == null || x === true ? glyph(fallback) : icon(x, "hm-page-own"));
+  return h("nav", { class: () => cx("hm-pagination", val(props.class)), "aria-label": () => val(props.label) ?? t`Pagination`, "data-hm-color": () => colorAttr(props.color) },
+    controls && h("button", { type: "button", class: "hm-page-btn hm-page-nav hm-page-prev", "aria-label": () => val(props.labels?.previous) ?? t`Previous`, disabled: () => val(props.page) <= 1, onClick: () => go(val(props.page) - 1) }, own(props.prev, chevronLeft)),
     () => items().map((it) => untrack(() => (it === "…"
-      ? h("span", { class: "hm-page-gap", "aria-hidden": "true" }, glyph(more))
-      : h("button", { type: "button", class: () => cx("hm-page-btn", val(props.page) === it && "is-active"), "aria-current": () => (val(props.page) === it ? "page" : null), onClick: () => go(it) }, String(it))))),
-    h("button", { type: "button", class: "hm-page-btn hm-page-nav", "aria-label": () => t`Next`, disabled: () => val(props.page) >= val(props.pages), onClick: () => go(val(props.page) + 1) }, glyph(chevronRight)));
+      ? props.gap !== false && h("span", { class: "hm-page-gap", "aria-hidden": "true" }, own(props.gap, more))
+      : h("button", { type: "button", class: () => cx("hm-page-btn", val(props.page) === it && "is-active"), "aria-current": () => (val(props.page) === it ? "page" : null),
+        "aria-label": pageName ? pageName(it) : null, onClick: () => go(it) }, String(it))))),
+    controls && h("button", { type: "button", class: "hm-page-btn hm-page-nav hm-page-next", "aria-label": () => val(props.labels?.next) ?? t`Next`, disabled: () => val(props.page) >= val(props.pages), onClick: () => go(val(props.page) + 1) }, own(props.next, chevronRight)));
 }

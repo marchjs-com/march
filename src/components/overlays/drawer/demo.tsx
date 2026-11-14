@@ -4,11 +4,13 @@ import { Button } from "../../../ui/button.ts";
 
 export const code = `<Drawer open={$open} onClose={() => $open = false} side="bottom" snapPoints={[0.4, 0.9]} title="Filtreler">…</Drawer>
 <Drawer open={$menu} onClose={() => $menu = false} side="start" size="sm" title="Menü">…</Drawer>     // RTL'de sağdan
-<Drawer open={$panel} onClose={() => $panel = false} side="end" modal={false} title="Ayrıntı">…</Drawer>`
+<Drawer open={$panel} onClose={() => $panel = false} side="end" modal={false} title="Ayrıntı">…</Drawer>
+<Drawer open={$open} onClose={close} handle={false} closeButton={false} motion={{ duration: 520, easing: "easeOutBack" }}>…</Drawer>  // parçalar ve hareket senin`
 
 const SNAPS: Record<string, number[] | undefined> = { none: undefined, two: [0.4, 0.9], three: [0.25, 0.55, 0.9] }
+const MOTIONS: Record<string, boolean | { duration: number; exit: number; easing: string }> = { default: true, bouncy: { duration: 620, exit: 380, easing: "easeOutBack" }, off: false }
 
-export default function DrawerDemo(props: { values: { side: string; modal: boolean; snap: string; size: string; dragToClose: boolean; content: string } }) {
+export default function DrawerDemo(props: { values: { side: string; modal: boolean; snap: string; size: string; dragToClose: boolean; content: string; handle: boolean; closeButton: boolean; motion: string } }) {
   let $open = false
   let $snap = 0
   return <div class="sc-row">
@@ -20,7 +22,8 @@ export default function DrawerDemo(props: { values: { side: string; modal: boole
       // short: the sheet is as tall as its content (snap points above it are cut down); long: the body scrolls
       const rows = Array.from({ length: v.content === "short" ? 3 : 40 }, (_, i) => `Satır ${i + 1}`)
       return <Drawer open={() => $open} onClose={() => { $open = false }} side={v.side as "bottom"} modal={v.modal} dragToClose={v.dragToClose}
-        snapPoints={snaps} size={v.size as "md"} onSnap={(i) => { $snap = i }} title="Çekmece">
+        snapPoints={snaps} size={v.size as "md"} onSnap={(i) => { $snap = i }} title="Çekmece"
+        handle={v.handle} closeButton={v.closeButton} motion={MOTIONS[v.motion] ?? true}>
         <p>{snaps ? "Tutamaçtan ya da başlıktan sürükleyin; bırakınca en yakın durma noktasına oturur" : "Tutamaçtan ya da başlıktan sürükleyebilirsiniz"}{v.dragToClose ? ", kenara atınca kapanır." : "; sürükleyerek kapanmaz, kapatmak için düğmeyi ya da Escape tuşunu kullanın."}</p>
         <ul>{rows.map((r) => <li>{r}</li>)}</ul>
       </Drawer>

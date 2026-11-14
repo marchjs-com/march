@@ -43,6 +43,10 @@
 .hm-nav-pin.is-pinned { color: var(--hm-warn-solid); }
 .hm-nav-li:hover .hm-nav-item .hm-badge { visibility: hidden; }
 .hm-nav-none { color: var(--hm-muted); font-size: var(--hm-text-sm); padding: var(--hm-space-3); }
+/* without pins the item keeps its badge on hover and needs no room for the star; without the search icon the box starts at the edge */
+.hm-nav-nopins .hm-nav-item { padding-inline-end: var(--hm-space-2); }
+.hm-nav-nopins .hm-nav-li:hover .hm-nav-item .hm-badge { visibility: visible; }
+.hm-nav-filter-bare .hm-input { padding-inline-start: var(--hm-space-3); }
 .hm-nav-burger { display: none; }
 .hm-nav-scrim { display: none; }
 @media (hover: none) { .hm-nav-pin { opacity: .6; } }

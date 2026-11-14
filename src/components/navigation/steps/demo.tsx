@@ -2,9 +2,12 @@
 import { signal } from "../../../core/reactive.ts";
 import { Steps } from "./index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
+import { star } from "../../../icons/glyphs/star.ts";
 
 export const code = `<Steps steps={[{ title: "Sepet" }, { title: "Adres" }, { title: "Ödeme" }, { title: "Onay" }]}
-  current={$step} onSelect={(i) => $step = i} />`
+  current={$step} onSelect={(i) => $step = i} />
+<Steps steps={steps} current={$step} doneIcon={star} connector={false} />                  // kendi işaretin, çizgisiz
+<Steps steps={steps} current={$step} renderDot={(i, state) => (state === "done" ? "✓" : "ABCD"[i])} />`
 
 const STEPS = [
   { title: "Sepet", description: "3 ürün" },
@@ -13,12 +16,16 @@ const STEPS = [
   { title: "Onay", description: "Özet" },
 ]
 
-export default function StepsDemo(props: { values: { vertical: boolean; clickable: boolean; color: string } }) {
+export default function StepsDemo(props: { values: { vertical: boolean; clickable: boolean; color: string; done: string; connector: boolean } }) {
   const step = signal(1)
   return <div class="sc-steps-demo">
     {() => {
       const vertical = props.values.vertical, color = (props.values.color || undefined) as ColorToken, clickable = props.values.clickable
-      return <Steps steps={STEPS} current={step} vertical={vertical} color={color} {...(clickable ? { onSelect: (i: number) => { step.set(i) } } : {})} />
+      const done = props.values.done, connector = props.values.connector
+      return <Steps steps={STEPS} current={step} vertical={vertical} color={color} connector={connector}
+        doneIcon={done === "star" ? star : done === "number" ? false : undefined}
+        renderDot={done === "own" ? (i: number, state: string) => (state === "done" ? "✓" : "ABCD"[i]) : undefined}
+        {...(clickable ? { onSelect: (i: number) => { step.set(i) } } : {})} />
     }}
     <div class="sc-steps-nav">
       <button type="button" class="hm-btn hm-btn-sm" disabled={() => step() === 0} onClick={() => step.set(step() - 1)}>Geri</button>

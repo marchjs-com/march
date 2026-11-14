@@ -48,3 +48,24 @@ test("Stepper: vertical is live (the same stepper turns); morph off switches the
   assert.equal(panes.length, 1, "morph off: the old panel is gone at once");
   assert.match(panes[0].textContent, /two/);
 });
+
+test("Stepper: highlight and counter off, own counter and texts, done mark passed to Steps", () => {
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const dispose = render(() => [
+    h(Stepper, { steps: [{ title: "A" }, { title: "B" }], current: 1, onSelect: () => {}, panels: ["one", "two"], highlight: false, counter: false, doneIcon: false, connector: false }),
+    h(Stepper, { steps: [{ title: "A" }, { title: "B" }, { title: "C" }], current: 1, onSelect: () => {}, panels: ["one", "two", "three"],
+      counter: (i, n) => `${n - i - 1} left`, labels: { back: "Previous", next: "Continue", step: (i, n) => `Stage ${i + 1}/${n}` } }),
+  ], host);
+  const [off, own] = host.querySelectorAll(".hm-stepper");
+  assert.equal(off.querySelector(".hm-stepper-blob"), null);
+  assert.equal(off.querySelector(".hm-stepper-count"), null);
+  assert.equal(off.querySelector(".hm-step2-dot").textContent, "1", "doneIcon={false} keeps the number");
+  assert.ok(off.querySelector(".hm-steps2-bare"));
+  assert.ok(own.querySelector(".hm-stepper-blob"));
+  assert.equal(own.querySelector(".hm-stepper-count").textContent, "1 left");
+  const [back, next] = own.querySelectorAll(".hm-stepper-nav button");
+  assert.equal(back.textContent, "Previous");
+  assert.equal(next.textContent, "Continue");
+  assert.equal(own.querySelector(".hm-stepper-frame").getAttribute("aria-label"), "Stage 2/3");
+  dispose();
+});

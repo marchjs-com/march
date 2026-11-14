@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { side: string; modal: boolean; snap: string; size: string; dragToClose: boolean; content: string }
+interface Values { side: string; modal: boolean; snap: string; size: string; dragToClose: boolean; content: string; handle: boolean; closeButton: boolean; motion: string }
 
 export default definePlayground<Values>({
   options: [
@@ -8,6 +8,10 @@ export default definePlayground<Values>({
     { key: "content", label: "İçerik", default: "long", options: [{ value: "short", label: "kısa" }, { value: "long", label: "uzun" }] },
     { key: "modal", label: "Modal (perde, odak kilidi)", default: true },
     { key: "dragToClose", label: "Sürükleyerek kapat", default: true },
+    { key: "motion", label: "Hareket", default: "default", options: [{ value: "default", label: "hazır (0,3 sn)" }, { value: "bouncy", label: "kendi ayarım (yavaş, yaylı)" }, { value: "off", label: "yok" }] },
+    // a handle is drawn on top / bottom sheets and with snap points
+    { key: "handle", label: "Tutamaç", default: true, visibleWhen: (v) => v.side === "top" || v.side === "bottom" || v.snap !== "none" },
+    { key: "closeButton", label: "Kapat (×) düğmesi", default: true },
     { key: "snap", label: "Durma noktaları", default: "two", options: [{ value: "none", label: "yok" }, { value: "two", label: "%40 · %90" }, { value: "three", label: "%25 · %55 · %90" }] },
     // size has an effect only without snap points (the largest snap point sets the size), and on a top / bottom sheet
     // only when the content is taller than it (a short sheet is as tall as its content)

@@ -19,3 +19,4 @@ span.hm-step2-hit { cursor: default; }
 .hm-steps2-v .hm-step2-hit { flex-direction: row; align-items: flex-start; }
 .hm-steps2-v .hm-step2:not(:last-child)::after { top: 2.25rem; bottom: calc(-1 * var(--hm-space-5) + .25rem); inset-inline: .9375rem auto; width: 2px; height: auto; }
 @media (max-width: 640px) { .hm-steps2:not(.hm-steps2-v) .hm-step2-desc { display: none; } .hm-steps2:not(.hm-steps2-v) .hm-step2-title { font-size: var(--hm-text-sm); } }
+.hm-steps2.hm-steps2-bare .hm-step2:not(:last-child)::after { display: none; }

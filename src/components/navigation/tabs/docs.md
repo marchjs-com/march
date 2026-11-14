@@ -22,12 +22,20 @@ disabled or hidden, and `query="tab"` keeps the active tab in the URL (`?tab=id`
 | `label` | string | — | accessible name of the tab list |
 | `panel` | boolean | `true` | `false` draws only the tab bar (the panel lives elsewhere) |
 | `color` | ColorToken | theme primary | accent of the active tab |
+| `indicator` | boolean | `true` | the underline of the active tab |
+| `motion` | `"none"` `"fade"` `"rise"` `"slide"` / `(panel, dir) => void` | the panel rises in once | `"none"`: no motion; the named ones play on every switch (`slide` comes from the side of the new tab); a function gets the panel element and the direction (`1` later tab, `-1` earlier) |
+| `class` | ClassProp | — | extra class on the root |
+
+```tsx
+<Tabs tabs={tabs} motion="slide" indicator={false} />
+<Tabs tabs={tabs} motion={(panel, dir) => animate(panel, [{ opacity: 0, transform: `translateX(${dir * 40}px)` }, { opacity: 1, transform: "none" }], { duration: 300 })} />
+```
 
 ## Accessibility
 
 `role="tablist"` with `role="tab"` buttons (`aria-selected`, `aria-controls`) and one `role="tabpanel"` labelled by the
 active tab. Only the active tab is a Tab stop; ← → Home End move and activate (mirrored in RTL). Disabled tabs are
-skipped.
+skipped. Reduced motion: the panel switches without motion.
 
 ## Composed of
 

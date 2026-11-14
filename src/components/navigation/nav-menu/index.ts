@@ -20,6 +20,7 @@ import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { search } from "../../../icons/glyphs/search.ts";
 import { panelLeft } from "../../../icons/glyphs/panelLeft.ts";
 import { OverflowText } from "../../typography/overflow-text/index.ts";
+import { isIconDef } from "../../../icons/svg.ts";
 
 /** A NavMenu entry. */
 export interface NavItem {
@@ -56,6 +57,19 @@ export interface NavMenuProps {
   groupsCollapsed?: boolean;
   /** Icons for group headings (also the default icon of the group's items): `{ "Billing": wallet }`. */
   groupIcons?: Readonly<Record<string, unknown>>;
+  /** The pin (star) button of every item and the Pinned block (default true). */
+  pins?: boolean | undefined;
+  /**
+   * Own icons for the built-in parts (an IconDef, a short string or a node): the menu button, the pin star (off / on),
+   * the group chevron, the filter's search icon and the rail button. `chevron: false` / `search: false` drop that mark.
+   */
+  icons?: { menu?: unknown; pin?: unknown; pinned?: unknown; chevron?: unknown; search?: unknown; rail?: unknown } | undefined;
+  /** Own texts (strings or accessors); defaults are the translated ones. `pin` / `unpin` name an item's pin button. */
+  labels?: {
+    filter?: MaybeFn<string>; filterPlaceholder?: MaybeFn<string>; noMatches?: MaybeFn<string>; pinned?: MaybeFn<string>; recent?: MaybeFn<string>;
+    menu?: MaybeFn<string>; expandSidebar?: MaybeFn<string>; collapseSidebar?: MaybeFn<string>;
+    pin?: (title: string) => string; unpin?: (title: string) => string;
+  } | undefined;
   class?: ClassProp;
 }
 
@@ -85,7 +99,12 @@ export function NavMenu(props: NavMenuProps): Element {
   const q = signal("");
   const open = signal(false);
   const navId = uid("hm-nav");
-
+  const pinsOn = props.pins !== false;
+  type TextKey = Exclude<keyof NonNullable<NavMenuProps["labels"]>, "pin" | "unpin">;
+  const L = (k: TextKey, d: string): string => val(props.labels?.[k]) ?? d;
+  type IconKey = keyof NonNullable<NavMenuProps["icons"]>;
+  // a built-in mark, or the developer's own (an IconDef is drawn like the built-in one)
+  const mark = (k: IconKey, d: Parameters<typeof glyph>[0]): unknown => { const x = props.icons?.[k]; return x == null || x === true || x === false ? glyph(d) : isIconDef(x) ? glyph(x) : x; };
   const items = computed(() => arr<NavItem | null | undefined | false>(val(props.items)).filter((x): x is NavItem => !!x && !val(x.hidden) && can(x.can)));
   const byId = computed(() => new Map(items().map((x) => [x.id, x])));
   const cmp = computed(() => sorter(props.sort, locale()));
@@ -142,11 +161,12 @@ export function NavMenu(props: NavMenuProps): Element {
       children: [icon(x.icon ?? (x.group ? props.groupIcons?.[x.group] : undefined), "hm-icon hm-nav-icon"), h(OverflowText, { class: "hm-nav-label" }, () => titleOf(x)),
         x.badge !== undefined && h(Badge, { count: () => val(x.badge), max: 99 })],
     }),
-    h("button", {
+    pinsOn && h("button", {
       type: "button", class: () => cx("hm-nav-pin", isPinned(x.id) && "is-pinned"), "data-pin": x.id,
-      "aria-pressed": () => String(isPinned(x.id)), "aria-label": () => (isPinned(x.id) ? t`Unpin ${titleOf(x)}` : t`Pin ${titleOf(x)}`),
+      "aria-pressed": () => String(isPinned(x.id)),
+      "aria-label": () => (isPinned(x.id) ? props.labels?.unpin?.(titleOf(x)) ?? t`Unpin ${titleOf(x)}` : props.labels?.pin?.(titleOf(x)) ?? t`Pin ${titleOf(x)}`),
       onClick: () => togglePin(x.id),
-    }, () => glyph(isPinned(x.id) ? starFilled : star)));
+    }, () => (isPinned(x.id) ? mark("pinned", starFilled) : mark("pin", star))));
 
   const block = (label: () => string, list: NavItem[], where: string, cls: string): Element => h("div", { class: cx("hm-nav-group", cls) },
     h("div", { class: "hm-nav-heading" }, label),
@@ -156,18 +176,18 @@ export function NavMenu(props: NavMenuProps): Element {
     const query = q();
     if (query.trim()) {
       const hits = untrack(() => rank(query, items(), (x) => ({ title: titleOf(x), keywords: [x.keywords, x.group].filter(Boolean).join(" ") })));
-      if (!hits.length) return h("p", { class: "hm-nav-none" }, () => t`No matches`);
+      if (!hits.length) return h("p", { class: "hm-nav-none" }, () => L("noMatches", t`No matches`));
       return untrack(() => h("ul", { class: "hm-nav-list hm-nav-results" }, hits.map((r) => item(r.item, "filter"))));
     }
     const m = byId();
-    const pinned = pins().map((id) => m.get(id)).filter((x): x is NavItem => !!x);
+    const pinned = pinsOn ? pins().map((id) => m.get(id)).filter((x): x is NavItem => !!x) : [];
     // recents: grouped items other than the current page (top-level items are always visible anyway)
     const cur = active();
     const rec = recent().map((id) => m.get(id)).filter((x): x is NavItem => !!x && !!x.group && x.id !== cur);
     const gs = groups();
     return untrack(() => [
-      pinned.length > 0 && block(() => t`Pinned`, pinned, "pinned", "hm-nav-pinned"),
-      rec.length > 0 && block(() => t`Recent`, rec, "recent", "hm-nav-recent"),
+      pinned.length > 0 && block(() => L("pinned", t`Pinned`), pinned, "pinned", "hm-nav-pinned"),
+      rec.length > 0 && block(() => L("recent", t`Recent`), rec, "recent", "hm-nav-recent"),
       gs.map((g) => {
         if (g.name === "") return h("ul", { class: "hm-nav-list" }, g.items.map((x) => item(x, "main")));
         const gid = uid("hm-navg");
@@ -175,25 +195,26 @@ export function NavMenu(props: NavMenuProps): Element {
         return h("div", { class: "hm-nav-group" },
           h("button", { type: "button", class: "hm-nav-gbtn", "data-group": g.name, "aria-expanded": () => String(isOpen()), "aria-controls": gid, onClick: () => toggleGroup(g.name) },
             icon(props.groupIcons?.[g.name], "hm-icon hm-nav-gicon"), h(OverflowText, { class: "hm-nav-gname" }, g.name),
-            h("span", { class: "hm-nav-chev", "aria-hidden": "true" }, glyph(chevronRight))),
+            props.icons?.chevron !== false && h("span", { class: "hm-nav-chev", "aria-hidden": "true" }, mark("chevron", chevronRight))),
           h("ul", { class: "hm-nav-list", id: gid, hidden: () => !isOpen() }, g.items.map((x) => item(x, "main"))));
       }),
     ]);
   };
 
   const toggleRail = (): void => { rail.update((x) => !x); persist(); };
-  return h("div", { class: () => cx("hm-nav-wrap", open() && "is-open", rail() && "is-rail", val(props.class)) },
-    h("button", { type: "button", class: "hm-icon-btn hm-nav-burger", "aria-controls": navId, "aria-expanded": () => String(open()), "aria-label": () => t`Menu`, onClick: () => open.update((x) => !x) }, glyph(menu)),
+  const railName = (): string => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`));
+  return h("div", { class: () => cx("hm-nav-wrap", open() && "is-open", rail() && "is-rail", !pinsOn && "hm-nav-nopins", val(props.class)) },
+    h("button", { type: "button", class: "hm-icon-btn hm-nav-burger", "aria-controls": navId, "aria-expanded": () => String(open()), "aria-label": () => L("menu", t`Menu`), onClick: () => open.update((x) => !x) }, mark("menu", menu)),
     h("div", { class: "hm-nav-scrim", "aria-hidden": "true", onClick: () => open.set(false) }),
     h("nav", { class: "hm-nav", id: navId, "aria-label": () => val(props.label) ?? t`Main` },
       (props.brand != null || props.collapsible) && h("div", { class: "hm-nav-brand" },
         props.brand != null && h("div", { class: "hm-nav-brand-main" }, props.brand),
         props.collapsible && h("button", { type: "button", class: "hm-icon-btn hm-btn-sm hm-nav-rail-btn", "aria-pressed": () => String(rail()),
-          "aria-label": () => (rail() ? t`Expand sidebar` : t`Collapse sidebar`), title: () => (rail() ? t`Expand sidebar` : t`Collapse sidebar`), onClick: toggleRail }, glyph(panelLeft))),
-      props.filter !== false && h("div", { class: "hm-nav-filter" },
-        h("span", { class: "hm-nav-filter-icon", "aria-hidden": "true" }, glyph(search)),
+          "aria-label": railName, title: railName, onClick: toggleRail }, mark("rail", panelLeft))),
+      props.filter !== false && h("div", { class: cx("hm-nav-filter", props.icons?.search === false && "hm-nav-filter-bare") },
+        props.icons?.search !== false && h("span", { class: "hm-nav-filter-icon", "aria-hidden": "true" }, mark("search", search)),
         h("input", {
-          type: "search", class: "hm-input hm-input-sm hm-nav-filter-input", placeholder: () => t`Filter…`, "aria-label": () => t`Filter menu`,
+          type: "search", class: "hm-input hm-input-sm hm-nav-filter-input", placeholder: () => L("filterPlaceholder", t`Filter…`), "aria-label": () => L("filter", t`Filter menu`),
           onInput: (e: Event) => q.set((e.target as HTMLInputElement).value),
           onKeydown: (e: KeyboardEvent) => {
             const el = e.target as HTMLInputElement;

@@ -18,11 +18,29 @@ A modal window over the page. Declarative: `<Dialog open={…} onClose={…}>`; 
 | `footer` | node | | bottom bar (buttons) |
 | `dismissable` | `boolean` / accessor | `true` | false: only the content closes it |
 | `modal` | `boolean` | `true` | false: no scrim lock, the page stays usable |
+| `closeButton` | boolean / icon / node | `true` | the × in the head; `false`: no × (Escape and the scrim still close); or your own icon |
+| `closeLabel` | `string` | "Close" | accessible name of the × |
+| `motion` | `scale` `fade` `rise` `none` | `scale` | entrance of the panel (`none`: the scrim appears at once too) |
 | `class` | `string` | | |
 
-`openDialog(render, { title, size, footer, dismissable, dismissValue })`, `openDrawer(render, { side: "left" | "right" | "bottom", … })`,
-`confirm({ title, message, danger, ok, cancel })` → `boolean`, `prompt({ title, label, value, placeholder, validate, multiline })` → `string | null`,
-`askReason({ title, min, purposes })` → the text (or `{ category, text }`) or `null`.
+```tsx
+<Dialog open={$open} onClose={close} title="Invite" closeButton={false} motion="fade">…</Dialog>
+<Dialog open={$open} onClose={close} title="Invite" closeButton={arrowLeft} closeLabel="Back to the list">…</Dialog>
+```
+
+`openDialog(render, { title, size, footer, dismissable, dismissValue, closeButton, closeLabel, motion })`, `openDrawer(render, { side: "left" | "right" | "bottom", … })`,
+`confirm({ title, message, danger, ok, cancel })` → `boolean`, `prompt({ title, label, value, placeholder, validate, multiline, ok, cancel })` → `string | null`,
+`askReason({ title, min, purposes, ok, cancel, labels, counter })` → the text (or `{ category, text }`) or `null`.
+
+Every text of the ready-made dialogs is yours: `ok` and `cancel` name the buttons; `askReason` also takes
+`labels: { reason, purpose, choose, choosePurpose, tooShort: (min) => string }` (field labels, the empty choice and the
+two error messages) and `counter: false` (no character counter). All three take `dialog: { size, class, target,
+closeButton, closeLabel, motion }` for the look of the dialog itself:
+
+```tsx
+await prompt({ title: "New name", ok: "Rename", cancel: "Keep the old one", dialog: { motion: "rise", closeButton: false } });
+await askReason({ min: 20, counter: false, labels: { reason: "Why?", tooShort: (n) => `At least ${n} characters, please.` } });
+```
 
 ## Accessibility
 

@@ -26,3 +26,18 @@ test("Steps: without onSelect the steps are not buttons", () => {
   assert.match(host.querySelector("ol").getAttribute("class"), /hm-steps2-v/);
   dispose();
 });
+
+test("Steps: doneIcon off / own, renderDot, connector off", () => {
+  const { host, dispose } = mount(() => [
+    h(Steps, { steps: [{ title: "A" }, { title: "B" }], current: 1, doneIcon: false, connector: false }),
+    h(Steps, { steps: [{ title: "A" }, { title: "B" }], current: 1, doneIcon: "★" }),
+    h(Steps, { steps: [{ title: "A" }, { title: "B" }], current: 1, renderDot: (i, state) => `${state}-${i}` }),
+  ]);
+  const [off, own, fn] = host.querySelectorAll("ol");
+  assert.equal(off.querySelector(".hm-step2-dot").textContent, "1", "the number stays");
+  assert.match(off.getAttribute("class"), /hm-steps2-bare/);
+  assert.equal(own.querySelector(".hm-step2-dot").textContent, "★");
+  assert.doesNotMatch(own.getAttribute("class"), /hm-steps2-bare/);
+  assert.deepEqual([...fn.querySelectorAll(".hm-step2-dot")].map((d) => d.textContent), ["done-0", "current-1"]);
+  dispose();
+});

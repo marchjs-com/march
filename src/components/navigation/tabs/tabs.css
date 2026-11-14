@@ -13,3 +13,5 @@
 .hm-tab:disabled { opacity: .5; cursor: not-allowed; }
 .hm-tab .hm-badge { font-weight: 600; }
 .hm-tabs-panel { padding-top: var(--hm-space-5); outline: none; animation: hm-rise-in var(--hm-dur-slow) var(--hm-ease-out); }
+.hm-tabs-plain .hm-tab::after { display: none; }
+.hm-tabs-still > .hm-tabs-panel { animation: none; }

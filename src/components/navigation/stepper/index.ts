@@ -34,6 +34,18 @@ export interface StepperProps {
   morph?: MaybeFn<boolean | undefined>;
   /** Theme color token. */
   color?: ColorToken | undefined;
+  /** The liquid highlight around the current step (default true). */
+  highlight?: boolean | undefined;
+  /** The "2 / 4" counter between Back and Next: true (default), false, or `(i, n) => content` (i is 0-based). */
+  counter?: boolean | ((i: number, n: number) => unknown) | undefined;
+  /** Texts: the Back and Next buttons and the panel's accessible name (`step(i, n)`, i is 0-based). */
+  labels?: { back?: MaybeFn<string | undefined>; next?: MaybeFn<string | undefined>; step?: ((i: number, n: number) => string) | undefined } | undefined;
+  /** Passed to Steps: the mark of a done step (icon, string, or false to keep the number). */
+  doneIcon?: unknown;
+  /** Passed to Steps: your own dot content. */
+  renderDot?: ((i: number, state: "done" | "current" | "todo", step: StepItem) => unknown) | undefined;
+  /** Passed to Steps: the line between the steps (default true). */
+  connector?: boolean | undefined;
   class?: ClassProp;
 }
 
@@ -44,7 +56,7 @@ export function Stepper(props: StepperProps): Element {
   const morph = (): boolean => val(props.morph) !== false;
   const n = props.steps.length;
   const panelId = uid("hm-stepper-panel");
-  let root!: HTMLElement, blob!: HTMLElement, frame: HTMLElement | null = null;
+  let root!: HTMLElement, blob: HTMLElement | undefined, frame: HTMLElement | null = null;
   const rtl = (): boolean => isRtl(root);
   /** The dot of step i, in px relative to the root (physical: measured). */
   const dotBox = (i: number): { x: number; y: number; w: number; h: number } | null => {
@@ -54,17 +66,18 @@ export function Stepper(props: StepperProps): Element {
     const pad = 6;
     return { x: r.left - o.left - pad, y: r.top - o.top - pad, w: r.width + pad * 2, h: r.height + pad * 2 };
   };
-  const place = (b: { x: number; y: number; w: number; h: number }): void =>
-    setStyle(blob, { translate: `${b.x}px ${b.y}px`, width: `${b.w}px`, height: `${b.h}px`, opacity: "1" });
+  const place = (b: { x: number; y: number; w: number; h: number }): void => {
+    if (blob) setStyle(blob, { translate: `${b.x}px ${b.y}px`, width: `${b.w}px`, height: `${b.h}px`, opacity: "1" });
+  };
 
   // the highlight: stretch over both dots, then settle on the new one (a liquid move)
   let last = -1;
-  effect(() => {
+  if (props.highlight !== false) effect(() => {
     const i = cur();
     vertical(); // a turned stepper: the highlight moves to the dot's new place
     untrack(() => nextFrame(() => {
       const to = dotBox(i);
-      if (!to) return;
+      if (!to || !blob) return;
       const from = last >= 0 && last !== i ? dotBox(last) : null;
       last = i;
       if (!from || reducedMotion() || !morph()) { place(to); return; }
@@ -97,15 +110,17 @@ export function Stepper(props: StepperProps): Element {
 
   const withNav = props.nav ?? (!!props.panels && !!props.onSelect);
   const go = (i: number): void => props.onSelect?.(clamp(i, 0, n - 1));
+  const counter = props.counter, stepName = props.labels?.step;
   const el = h("div", { ref: (x: HTMLElement) => { root = x; }, class: () => cx("hm-stepper", vertical() && "hm-stepper-v", val(props.class)), "data-hm-color": () => colorAttr(props.color) },
-    h("span", { class: "hm-stepper-blob", "aria-hidden": "true", ref: (x: HTMLElement) => { blob = x; } }),
-    h(Steps, { steps: props.steps, current: cur, ...(props.onSelect ? { onSelect: props.onSelect } : {}), vertical: reactive(vertical) }),
-    props.panels && h("div", { class: "hm-stepper-frame", id: panelId, role: "region", "aria-live": "polite", "aria-label": () => t`Step ${cur() + 1} of ${n}`, ref: (x: HTMLElement) => { frame = x; } }),
+    props.highlight !== false && h("span", { class: "hm-stepper-blob", "aria-hidden": "true", ref: (x: HTMLElement) => { blob = x; } }),
+    h(Steps, { steps: props.steps, current: cur, ...(props.onSelect ? { onSelect: props.onSelect } : {}), vertical: reactive(vertical) as never,
+      doneIcon: props.doneIcon, renderDot: props.renderDot, connector: props.connector }),
+    props.panels && h("div", { class: "hm-stepper-frame", id: panelId, role: "region", "aria-live": "polite", "aria-label": () => (stepName ? stepName(cur(), n) : t`Step ${cur() + 1} of ${n}`), ref: (x: HTMLElement) => { frame = x; } }),
     withNav && h("div", { class: "hm-stepper-nav" },
-      h(Button, { variant: "secondary", disabled: () => cur() === 0, onClick: () => go(cur() - 1), "aria-controls": panelId }, () => t`Back`),
-      h("span", { class: "hm-stepper-count", "aria-hidden": "true" }, () => `${cur() + 1} / ${n}`),
+      h(Button, { variant: "secondary", disabled: () => cur() === 0, onClick: () => go(cur() - 1), "aria-controls": panelId }, () => val(props.labels?.back) ?? t`Back`),
+      counter !== false && h("span", { class: "hm-stepper-count", "aria-hidden": "true" }, () => (typeof counter === "function" ? counter(cur(), n) : `${cur() + 1} / ${n}`)),
       h(Button, { variant: "primary", onClick: () => (cur() === n - 1 ? props.onFinish?.() : go(cur() + 1)), "aria-controls": panelId },
-        () => (cur() === n - 1 ? val(props.finishLabel) ?? t`Finish` : t`Next`))),
+        () => (cur() === n - 1 ? val(props.finishLabel) ?? t`Finish` : val(props.labels?.next) ?? t`Next`))),
   ) as Element;
   let shown = -1;
   if (props.panels) {

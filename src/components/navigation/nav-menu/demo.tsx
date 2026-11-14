@@ -6,13 +6,16 @@ import { users } from "../../../icons/glyphs/users.ts";
 import { wallet } from "../../../icons/glyphs/wallet.ts";
 import { barChart } from "../../../icons/glyphs/barChart.ts";
 import { settings } from "../../../icons/glyphs/settings.ts";
+import { plus } from "../../../icons/glyphs/plus.ts";
 import type { Href } from "../../../router/router.ts";
 
 export const code = `<NavMenu brand="HADİ" filter collapsible items={[
   { id: "inbox", title: "Gelen kutusu", href: "/inbox", icon: inbox, badge: () => $unread },
   { id: "members", title: "Üyeler", href: "/members", group: "Yönetim" },
   { id: "payments", title: "Ödemeler", href: "/payments", group: "Finans" },
-]} groupIcons={{ Yönetim: users, Finans: wallet }} />`
+]} groupIcons={{ Yönetim: users, Finans: wallet }} />
+<NavMenu items={items} pins={false} icons={{ chevron: plus, search: false }}
+  labels={{ filterPlaceholder: "Sayfa bul…", noMatches: "Böyle bir sayfa yok" }} />`
 
 // demo links stay on this page (a query only)
 const link = (id: string): Href => `/navigation?nm=${id}` as Href
@@ -27,13 +30,16 @@ const ITEMS = [
   { id: "settings", title: "Ayarlar", href: link("settings"), icon: settings },
 ]
 
-export default function NavMenuDemo(props: { values: { filter: boolean; groupsCollapsed: boolean; collapsible: boolean } }) {
+export default function NavMenuDemo(props: { values: { filter: boolean; groupsCollapsed: boolean; collapsible: boolean; pins: boolean; chevron: string; texts: boolean } }) {
   return <div class="sc-navmenu-frame">
     {() => {
       // read here so the menu is drawn again when an option changes (it reads its props once)
       const { filter, groupsCollapsed, collapsible } = { filter: props.values.filter, groupsCollapsed: props.values.groupsCollapsed, collapsible: props.values.collapsible }
+      const pins = props.values.pins, chevron = props.values.chevron, texts = props.values.texts
       return <NavMenu items={ITEMS} brand={<strong>HADİ</strong>} label="Örnek menü" palette={false} storageKey={`sc.navmenu.${groupsCollapsed}`}
-        filter={filter} groupsCollapsed={groupsCollapsed} collapsible={collapsible} groupIcons={{ "Yönetim": users, "Finans": wallet }} />
+        filter={filter} groupsCollapsed={groupsCollapsed} collapsible={collapsible} groupIcons={{ "Yönetim": users, "Finans": wallet }}
+        pins={pins} icons={chevron === "plus" ? { chevron: plus } : chevron === "off" ? { chevron: false } : undefined}
+        labels={texts ? { filterPlaceholder: "Sayfa bul…", filter: "Sayfalarda ara", noMatches: "Böyle bir sayfa yok", pinned: "Sık kullandıklarım", recent: "Son baktıklarım" } : undefined} />
     }}
     <div class="sc-navmenu-main hm-muted">Sayfa içeriği</div>
   </div>

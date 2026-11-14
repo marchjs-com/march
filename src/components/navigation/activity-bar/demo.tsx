@@ -7,21 +7,28 @@ import { gitBranch } from "../../../icons/glyphs/gitBranch.ts";
 import { bug } from "../../../icons/glyphs/bug.ts";
 import { settings } from "../../../icons/glyphs/settings.ts";
 import { user } from "../../../icons/glyphs/user.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<ActivityBar value={$view} onChange={(v) => $view = v} controls="side-view" items={[
   { id: "files", label: "Dosyalar", icon: files, shortcut: "mod+shift+e" },
   { id: "search", label: "Ara", icon: search, badge: () => $hits },
   { id: "git", label: "Kaynak denetimi", icon: gitBranch, badge: () => $changes },
   { id: "settings", label: "Ayarlar", icon: settings, position: "end", onSelect: openSettings },
-]} />`
+]} />
+<ActivityBar items={views} value={$view} onChange={(v) => $view = v} color="brand-purple" motion="fade" tooltips={false} />
+<ActivityBar items={views} value={$view} onChange={(v) => $view = v} indicator={false} />`
 
 const TITLES: Record<string, string> = { files: "Dosyalar", search: "Ara", git: "Kaynak denetimi", debug: "Hata ayıkla" }
 
-export default function ActivityBarDemo(props: { values: { orientation: string; badges: boolean } }) {
+export default function ActivityBarDemo(props: { values: { orientation: string; badges: boolean; indicator: string; color: string; tooltips: boolean } }) {
   const view = signal<string | null>("files")
   return <div class={() => (props.values.orientation === "horizontal" ? "sc-ab-stage is-h" : "sc-ab-stage")}>
-    <ActivityBar value={view} onChange={(v: string | null) => view.set(v)} controls="sc-ab-view"
-      orientation={props.values.orientation as "vertical"} label="Görünümler" items={[
+    {() => {
+      // the indicator, its motion, the tooltips and the color are read once: the bar is drawn again when one changes
+      const ind = props.values.indicator, tooltips = props.values.tooltips, color = (props.values.color || undefined) as ColorToken
+      return <ActivityBar value={view} onChange={(v: string | null) => view.set(v)} controls="sc-ab-view"
+      indicator={ind !== "off"} motion={ind === "off" ? undefined : ind as "glide"} tooltips={tooltips} color={color}
+      orientation={() => props.values.orientation as "vertical"} label="Görünümler" items={[
         { id: "files", label: "Dosyalar", icon: files, shortcut: "mod+shift+e" },
         { id: "search", label: "Ara", icon: search, badge: () => (props.values.badges ? 12 : 0) },
         { id: "git", label: "Kaynak denetimi", icon: gitBranch, badge: () => (props.values.badges ? 3 : 0) },
@@ -29,6 +36,7 @@ export default function ActivityBarDemo(props: { values: { orientation: string; 
         { id: "account", label: "Hesap", icon: user, position: "end", onSelect: () => view.set(null) },
         { id: "settings", label: "Ayarlar", icon: settings, position: "end", onSelect: () => view.set(null) },
       ]} />
+    }}
     <div id="sc-ab-view" class="sc-ab-view" role="tabpanel">{() => (view() ? <strong>{TITLES[view()!]}</strong> : <span class="hm-muted">Yan görünüm kapalı: bir simgeye bas.</span>)}</div>
   </div>
 }

@@ -116,3 +116,29 @@ test("Drawer: a short sheet is as tall as its content (snap points cut down to i
   globalThis.innerHeight = was;
 });
 
+test("Drawer: handle and × off, own handle name, own × name; motion off leaves at once", async () => {
+  const open = signal(true);
+  let dispose = mount(() => [
+    h(Drawer, { open, side: "bottom", title: "A", class: "d-a", handle: false, closeButton: false, motion: false }, "a"),
+    h(Drawer, { open: true, side: "bottom", title: "B", class: "d-b", snapPoints: [0.4, 0.9], handleLabel: "Change height", closeLabel: "Shut" }, "b"),
+  ]);
+  await tick();
+  const a = document.querySelector(".d-a"), b = document.querySelector(".d-b");
+  assert.equal(a.querySelector(".hm-sheet-handle"), null);
+  assert.equal(a.querySelector(".hm-dialog-x"), null);
+  assert.equal(b.querySelector("button.hm-sheet-handle").getAttribute("aria-label"), "Change height");
+  assert.equal(b.querySelector(".hm-dialog-x").getAttribute("aria-label"), "Shut");
+  open.set(false);
+  await tick();
+  assert.equal(document.querySelector(".d-a"), null, "gone without an exit animation");
+  dispose();
+  // own timing still opens and closes
+  const again = signal(true);
+  dispose = mount(() => h(Drawer, { open: again, side: "end", title: "C", class: "d-c", motion: { duration: 10, exit: 10, easing: "easeOutBack" } }, "c"));
+  await tick();
+  assert.ok(document.querySelector(".d-c"));
+  again.set(false);
+  await tick(); await tick();
+  assert.equal(document.querySelector(".d-c"), null);
+  dispose();
+});
