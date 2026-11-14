@@ -4,6 +4,19 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
+### m:parts, CodeEditor, ExplodedView (later in 0.1.0)
+- `m:parts` (common prop): `<PostCard m:parts={{ Avatar: { size: "lg" }, LikeButton: { color: "brand-blue" } }} />`
+  gives props to the components drawn inside any element or component, by component; no composite needs a prop of
+  its own. The compiler turns the names into the components (`withParts(new Map([[Avatar, {…}]]), () => …)`,
+  `hadi-march/props`); a name that is not in scope is a compile error. The scope's props win over the parent's, the
+  nearest scope wins, values stay live. Core: one hook in component creation (set by `hadi-march/props`).
+- CodeEditor (`hadi-march/ui`): a code field coloured as it is typed, suggestions at the caret (`complete`; ready
+  for a JSX tag: `jsxCompleter`), marked ranges (`marks`: flash / error), a foot line (`message`, `status`).
+- ExplodedView (`hadi-march/ui`): the same elements tilt and rise as plates and come back (`parts`: selectors and
+  names; without it the layers of one element: shadow, surface, content, focus ring); `onPick`, `active`.
+- DevicePreview `fitHeight`. `ComponentMeta.root`. Playground specs can write code: `PlaygroundOption.prop` /
+  `toCode` / `fromCode`, kind `"text"`, `PlaygroundSpec.code` (`{ tag, props, children, root }`).
+
 ### Theme style and eight new themes (later in 0.1.0)
 - `ThemeDef.style` (`ThemeStyle`): `surface` ("soft" | "flat" | "raised" | "outlined" | "glass"), `glow` (0–1), `shadow`
   ("soft" | "hard" | "none"), `accent` ("solid" | "gradient"), `tracking`, `iconStroke`, `density`, `borderWidth`.

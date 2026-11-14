@@ -263,7 +263,7 @@
   "EditForm": "Yükle → düzenle → kaydet. Prop'lar: schema, load() → Promise<values>, save(values, { reason, changed }) → Promise<any>, reason (en az uzunluk sayısı ya da { min, title, message, purposes, danger }), title, description, sections ve diğerleri.",
   "CodeEditor": "Küçük kod alanı: yazdıkça renklenir, imleçte öneri listesi açar (`complete`), aralıkları işaretler (`marks`), alt satırda durumu söyler (`message`, `status`); kodu çalıştırmaz: `<CodeEditor bind:value={$code} complete={jsxCompleter({ tag, props })} />`",
   "EditorFrame": "Bir editörün çerçevesi: kenar ve odak halkası, üst çubuk (`head`, `actions`), yazma alanı ve alt çubuk (`foot`); çubuklar koşula bağlanır: `<EditorFrame head={<FormatToolbar onTool={exec} />} foot=\"120 kelime\">…</EditorFrame>`.",
-  "ExplodedView": "İçeriğini parçalarına ayırır ve geri birleştirir: aynı öğeler eğilip plaka plaka yükselir (`parts`: seçiciler ve adlar) ya da tek öğe gölge, zemin, içerik, odak halkası katmanlarına açılır: `<ExplodedView bind:open={$apart} parts={[{ selector: \".m-avatar\", label: \"Avatar\" }]}>…</ExplodedView>`",
+  "ExplodedView": "İçeriğini parçalarına ayırır ve geri birleştirir: aynı öğeler eğilip plaka plaka yükselir (`parts`: seçici ve ad) ya da tek öğe gölge, zemin, içerik, odak halkası katmanlarına açılır: `<ExplodedView bind:open={$apart} parts={parts}>…</ExplodedView>`",
   "EmailInput": "E-posta adresi için metin girdisi (e-posta klavyesi, kırpılır, küçük harfe çevrilir).",
   "EMOJI_SET": "Panelin varsayılan emoji ızgarası (ChatComposer emoji düğmesi).",
   "Empty": "`<Empty icon=\"📭\" title=\"No users yet\" action={…}>Invite someone to get started.</Empty>` — boş durum bileşeni.",
@@ -770,6 +770,7 @@
   "spotlight": "Bir öğe üzerinde imleci izleyen radyal ışık (--m-spot-x/--m-spot-y ayarlar). `use:spotlight`"
  },
  "hadi-march/props": {
+  "withParts": "`m:parts` ortak prop'unun elle yazımı: içeride çizilen bileşenlere türüne göre özellik verir (ebeveynin verdiğini ezer, en yakın kapsam kazanır): `withParts(new Map([[Avatar, { size: \"lg\" }]]), () => h(PostCard, props))`.",
   "mProps": "Ortak (`m:`) prop'ları elle uygular: `mProps(h(Card, props), { \"no-select\": true })`. Öğeye ya da bileşenin kök öğelerine yazar; değer fonksiyon olabilir (canlı).",
   "registerMProp": "Yeni bir ortak prop ekler: `registerMProp(\"tone\", (el, v) => …)` ile `m:tone` her öğede ve bileşende çalışır."
  },

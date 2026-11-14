@@ -46,7 +46,11 @@ $items.peek()                            // read without tracking (explicit API 
   set). Use it for interface chrome (toolbars, drag surfaces, tabs), NEVER on content people may copy (codes,
   addresses, errors): keyboard selection and select-to-speak stop working too. Do not write `user-select` CSS or a
   `selectstart` handler for this. By hand: `mProps(h(Card, props), { "no-select": true })` from `hadi-march/props`;
-  a new member: `registerMProp(name, (el, value) => …)`. Content in a portal (dialog, menu) is outside the root: put
+  a new member: `registerMProp(name, (el, value) => …)`. `m:parts={{ Avatar: { size: "lg" }, LikeButton: { color: "brand-blue" } }}`
+  gives props to the components drawn INSIDE (keys: component names in scope; they win over what the parent gave;
+  the nearest scope wins; by hand `withParts(new Map([[Avatar, {…}]]), () => h(PostCard, props))`). Never add a
+  `parts` / `avatarProps` prop to a composite for this; inside a library component draw parts with `h(Comp, …)`,
+  never by calling the component function, or `m:parts` cannot reach them. Content in a portal (dialog, menu) is outside the root: put
   the prop on that content.
 - Async component: `async function Page() { const data = await api(); return <View data={data} /> }` — wrap in
   `<Try loading={…} fallback={(e, retry) => …}>` (or rely on the default spinner / error box).

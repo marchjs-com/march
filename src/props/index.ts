@@ -2,8 +2,8 @@
 // component does with its own props. The compiler turns `<Card m:no-select>` into `mProps(h(Card, …), {…})`;
 // a constant on a native element becomes a plain attribute at build time and only the CSS file is loaded.
 // New members are added with registerMProp(); the list is open.
-import { effect } from "../core/reactive.ts";
-import { registerNamespace } from "../dom/h.ts";
+import { effect, computed, untrack, getOwner, reactive, isReactive, context, provide, useContext } from "../core/reactive.ts";
+import { registerNamespace, _partsHook } from "../dom/h.ts";
 import "../css/props.css";
 
 /** Applies one common prop to one element; called again whenever a live value changes. */
@@ -48,3 +48,47 @@ registerMProp("no-select", (el, v) => {
 
 // h() by hand on a native element: h("div", { "m:no-select": true })
 registerNamespace("m", (el, name, value) => { mProps(el, { [name]: value }); });
+
+// ------------------------------------------------------------------ m:parts
+/** A component (the key of a parts map). */
+type Comp = (props: never) => unknown;
+/** Props for the components drawn inside a scope, by component: `new Map([[Avatar, { size: "lg" }]])`. */
+export type PartsMap = ReadonlyMap<Comp, Readonly<Record<string, unknown>>>;
+type Lookup = (c: Comp) => Readonly<Record<string, unknown>> | undefined;
+const Parts = context<Lookup | null>(null);
+let hooked = false;
+
+/**
+ * Give props to the components drawn inside `render`, whatever draws them: `m:parts` on any element or component.
+ * `<PostCard post={post} m:parts={{ Avatar: { size: "lg" }, LikeButton: { color: "brand-blue" } }} />` compiles to
+ * `withParts(new Map([[Avatar, {…}], [LikeButton, {…}]]), () => h(PostCard, {…}))`; write that call by hand in plain
+ * JS. Every component of that kind created inside the scope (now or later: a list row, a branch that opens) gets
+ * the props; they win over what its parent gave it, the nearest scope wins over an outer one. `parts` may be an
+ * accessor: the props that were set when a part was created stay live. A component called as a plain function
+ * (not through h() / JSX) is not reached.
+ */
+export function withParts<T>(parts: PartsMap | (() => PartsMap | null | undefined), render: () => T): T {
+  if (!hooked) {
+    hooked = true;
+    _partsHook((c, raw) => {
+      const find = useContext(Parts), now = find && untrack(() => find(c as Comp));
+      if (!now) return raw;
+      const out = { ...raw };
+      for (const key of Object.keys(now)) {
+        const given = raw[key];
+        const value = (): unknown => { const p = find!(c as Comp); return p && key in p ? p[key] : isReactive(given) ? (given as () => unknown)() : given; };
+        // listeners and children are read once by a component; everything else stays live
+        out[key] = key === "children" || /^on[A-Z:]/.test(key) ? now[key] : reactive(value);
+      }
+      return out;
+    });
+  }
+  const get = typeof parts === "function" ? parts : (): PartsMap => parts;
+  const run = (): T => {
+    const outer = useContext(Parts);
+    provide<Lookup>(Parts, (c) => get()?.get(c) ?? outer?.(c));
+    return render();
+  };
+  // its own owner: the scope does not reach the siblings of what is drawn here
+  return getOwner() ? computed(() => untrack(run))() : run();
+}
