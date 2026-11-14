@@ -28,6 +28,7 @@ test("NotForYou: lines toggle, the verdict follows, onCheck gets the indexes", (
   assert.equal(instead.getAttribute("aria-hidden"), "true", "hidden until struck out");
   boxes[2].click(); boxes[0].click();
   assert.equal(instead.getAttribute("aria-hidden"), "false");
+  assert.ok(boxes[0].querySelector(".hm-nfy-mark-x") && boxes[0].querySelector(".hm-nfy-mark-ok"), "cross and tick, swapped by state");
   assert.equal(boxes[0].getAttribute("aria-checked"), "true");
   assert.match(boxes[0].textContent, /That's me/);
   assert.match(boxes[0].textContent, /Not you$/);

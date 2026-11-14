@@ -68,7 +68,10 @@ export function NotForYou(props: NotForYouProps): Element {
 
   const line = (it: NotForYouItem, i: number, kind: "not" | "for"): Element => {
     const body = [
-      h("span", { class: "hm-nfy-mark", "aria-hidden": "true" }, glyph(kind === "not" ? xIcon : checkIcon)),
+      // a checkable line has both marks: the cross turns into a tick once it is struck out
+      h("span", { class: "hm-nfy-mark", "aria-hidden": "true" }, kind === "not" && props.check
+        ? [glyph(xIcon, "hm-svg hm-nfy-mark-x"), glyph(checkIcon, "hm-svg hm-nfy-mark-ok")]
+        : glyph(kind === "not" ? xIcon : checkIcon)),
       h("span", { class: "hm-nfy-text" }, h("strong", null, it.text), it.detail != null ? h("span", { class: "hm-nfy-detail" }, it.detail) : null,
         kind === "not" && props.check && it.instead != null
           ? h("span", { class: "hm-nfy-instead", "aria-hidden": () => String(!marked().has(i)) }, h("span", { class: "hm-nfy-instead-in" }, it.instead))
