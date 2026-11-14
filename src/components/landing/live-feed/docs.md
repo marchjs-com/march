@@ -2,7 +2,8 @@
 
 A living wall: new activity slides in at the top (rows) or pops into the first cell (wall), and the oldest leaves, so
 the page looks inhabited. Feed it a reactive list (`items`, newest first: from a socket or a store) or a `next()`
-function the feed calls every `every` ms while it is on screen.
+function the feed calls every `every` ms while it is on screen. It starts full and keeps its size: a leaving item is
+lifted out of the flow while it fades and wall cards share one height, so the page never shifts.
 
 ```tsx
 <LiveFeed next={() => nextActivity()} every={2400} max={5} />

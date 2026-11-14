@@ -1,13 +1,14 @@
 // LiveFeed (hadi-march/landing): a living wall. New items slide in at the top (list) or pop into the first cell (wall)
 // and the oldest leave, so the page looks inhabited. Items come from `items` (a reactive list, newest first: push from
-// a socket or a store) or from `next()`, which the feed calls every `every` ms while it is on screen. The feed pauses
+// a socket or a store) or from `next()`, which the feed calls every `every` ms while it is on screen. It starts full and
+// keeps its size: a leaving item is lifted out of the flow while it fades, wall cards have one height (no layout shift). The feed pauses
 // while the pointer or focus is inside and has a Pause button (WCAG 2.2.2: moving content can be stopped); off screen
 // it does not pull. New items are not announced by default (a busy feed would talk over everything): `live="polite"`.
 import "./live-feed.css";
 import { h } from "../../../dom/h.ts";
 import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { cx, val, listen, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, listen, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { animate } from "../../../motion/engine/playback.ts";
@@ -74,10 +75,18 @@ export function LiveFeed(props: LiveFeedProps): Element {
     const drop = Math.max(0, shown.length + 1 - max());
     const leaving = shown.slice(shown.length - drop).map((x) => nodes.get(x.id)!);
     const staying = shown.slice(0, shown.length - drop).map((x) => nodes.get(x.id)!);
+    // a leaving item is lifted out of the flow where it stands, so the list never grows while it fades (no layout shift)
+    const at = motion ? list.getBoundingClientRect() : null;
+    const boxes = motion ? leaving.map((x) => x.getBoundingClientRect()) : [];
     const mutate = (): void => {
       shown.unshift(it); nodes.set(it.id, el); list.prepend(el);
       for (let i = 0; i < drop; i++) nodes.delete(shown.pop()!.id);
-      for (const old of leaving) { if (motion) old.classList.add("is-leaving"); else old.remove(); }
+      leaving.forEach((old, k) => {
+        if (!motion || !at) { old.remove(); return; }
+        const b = boxes[k]!;
+        old.classList.add("is-leaving");
+        setStyle(old, { top: `${b.top - at.top}px`, left: `${b.left - at.left}px`, width: `${b.width}px`, height: `${b.height}px` });
+      });
     };
     if (!motion) { mutate(); return; }
     flip(staying, mutate, { enter: false, duration: 680, easing: "expo" });
@@ -114,8 +123,8 @@ export function LiveFeed(props: LiveFeedProps): Element {
   const next = props.next;
   const pull = (): void => { const it = next?.(); if (it) add(it, true); };
   if (next) {
-    // start nearly full: a wall of cards (max − 1), a few rows (up to 3)
-    const start = wall() ? max() - 1 : Math.min(max(), 3);
+    // start full: the feed has its final size from the first paint and never grows (no layout shift)
+    const start = max();
     for (let i = 0; i < start; i++) { const it = next(); if (it) add(it, false); }
     let stop: (() => void) | null = null;
     effect(() => {
