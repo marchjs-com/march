@@ -17,10 +17,14 @@ One element for images, video and audio: it fits its container, guesses the kind
 | `controls` | `boolean` | `true` | video and audio |
 | `autoplay`, `loop`, `muted` | `boolean` | `false` | |
 | `size` | `sm` `md` | | `sm`: a square thumbnail |
-| `fallback` | `string` / accessor | "Could not load media" (translated) | |
+| `fallback` | text / node / accessor | "Could not load media", "No media" (translated) | shown when loading fails or there is no `src` |
 | `class` | class value | | |
 
-`openMedia(src, { title, kind, alt, poster, size, autoplay })` returns the dialog's promise.
+`openMedia(src, { title, kind, alt, poster, size, autoplay, fallback })` returns the dialog's promise (`title` defaults to "Preview", translated).
+
+```tsx
+<Media src={url} fallback={<Empty icon={image} title="The photo is gone" />} />
+```
 
 ## Accessibility
 

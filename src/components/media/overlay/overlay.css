@@ -10,7 +10,9 @@
 .hm-ov.is-interactive, .hm-ov.is-interactive * { pointer-events: auto !important; }
 .hm-ov-media { display: block; width: 100%; height: 100%; object-fit: var(--hm-ov-fit, cover); object-position: var(--hm-ov-pos, center); }
 .hm-ov-video .hm-ov-poster { position: absolute; inset: 0; }
-.hm-ov-svg > svg { display: block; width: 100%; height: 100%; color: var(--hm-primary); }
+/* color prop: the layer's own variable, so an accent set by an ancestor never recolours an overlay */
+.hm-ov[data-hm-color] { --hm-ov-color: var(--hm-accent); }
+.hm-ov-svg > svg { display: block; width: 100%; height: 100%; color: var(--hm-ov-color, var(--hm-primary)); }
 
 /* effects */
 .hm-ov-fx-glass { background: color-mix(in srgb, var(--hm-surface) 38%, transparent); -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
@@ -24,9 +26,11 @@
   radial-gradient(at 80% 88%, color-mix(in srgb, var(--hm-cat-3) 60%, transparent) 0, transparent 52%),
   radial-gradient(at 18% 90%, color-mix(in srgb, var(--hm-cat-4) 60%, transparent) 0, transparent 50%), var(--hm-surface); }
 .hm-ov-fx-noise { background-image: radial-gradient(color-mix(in srgb, var(--hm-scrim) 14%, transparent) 1px, transparent 1px), radial-gradient(color-mix(in srgb, var(--hm-on-scrim) 10%, transparent) 1px, transparent 1px); background-size: 3px 3px, 4px 4px; background-position: 0 0, 2px 1px; mix-blend-mode: var(--hm-ov-blend, overlay); }
-.hm-ov-fx-vignette { background: radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--hm-scrim) 45%, transparent) 100%); }
-.hm-ov-fx-spotlight { background: radial-gradient(420px circle at var(--hm-ov-x, 50%) var(--hm-ov-y, 40%), color-mix(in srgb, var(--hm-primary) 22%, transparent), transparent 60%); }
+.hm-ov-fx-vignette { background: radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--hm-ov-color, var(--hm-scrim)) 45%, transparent) 100%); }
+.hm-ov-fx-spotlight { background: radial-gradient(420px circle at var(--hm-ov-x, 50%) var(--hm-ov-y, 40%), color-mix(in srgb, var(--hm-ov-color, var(--hm-primary)) 22%, transparent), transparent 60%); }
 .hm-ov-fx-grid { background-image: linear-gradient(var(--hm-border) 1px, transparent 1px), linear-gradient(90deg, var(--hm-border) 1px, transparent 1px); background-size: 24px 24px;
   -webkit-mask-image: radial-gradient(ellipse at center, var(--hm-scrim) 30%, transparent 80%); mask-image: radial-gradient(ellipse at center, var(--hm-scrim) 30%, transparent 80%); }
 .hm-ov-fx-dots { background-image: radial-gradient(color-mix(in srgb, var(--hm-text) 22%, transparent) 1.2px, transparent 1.2px); background-size: 16px 16px; }
+.hm-ov-fx-dots[data-hm-color] { background-image: radial-gradient(color-mix(in srgb, var(--hm-ov-color) 60%, transparent) 1.2px, transparent 1.2px); }
+.hm-ov-fx-grid[data-hm-color] { background-image: linear-gradient(color-mix(in srgb, var(--hm-ov-color) 45%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--hm-ov-color) 45%, transparent) 1px, transparent 1px); }
 @media (prefers-reduced-motion: reduce) { .hm-ov { transition: none; } }

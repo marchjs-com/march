@@ -26,8 +26,12 @@ export interface OverflowTextProps {
   pause?: number;
   /** Wait before starting after the trigger, ms (default 250). */
   delay?: number;
-  /** Loop separator (default "•"). */
-  separator?: string;
+  /** Loop separator: text or a node (default "•"); false puts nothing between the copies. */
+  separator?: unknown;
+  /** Easing of each travel in bounce / once (default "ease-in-out"); the loop is always linear. */
+  easing?: string;
+  /** Never scroll (the text stays clipped with its fade or ellipsis): `disabled={() => !settings.motion}`. */
+  disabled?: MaybeFn<boolean | undefined>;
   /** Fade the clipped edges (default true); false shows an ellipsis instead. */
   fade?: boolean;
   /** Extra condition that keeps it scrolling (e.g. the selected item of a menu): `play={() => isActive()}`. */
@@ -55,7 +59,7 @@ export function OverflowText(props: OverflowTextProps): Element {
 
   const item = h("span", { class: "hm-marquee-item" }, props.text != null ? () => val(props.text) ?? "" : props.children) as HTMLElement;
   const track = h("span", { class: "hm-marquee-track" }, item) as HTMLElement;
-  const { text: _t, children: _c, trigger: _tr, mode: _m, speed: _s, pause: _p, delay: _d, separator: _sep, fade: _f, host: _h, play: _pl, class: _cl, ...attrs } = props;
+  const { text: _t, children: _c, trigger: _tr, mode: _m, speed: _s, pause: _p, delay: _d, separator: _sep, fade: _f, host: _h, play: _pl, class: _cl, easing: _e, disabled: _dis, ...attrs } = props;
   const root = h("span", {
     dir: "auto", ...attrs,
     class: () => cx("hm-marquee", props.fade === false ? "hm-marquee-ellipsis" : "hm-marquee-fade", dist() > 0 && "is-overflow", running() && "is-running", val(props.class)),
@@ -71,7 +75,7 @@ export function OverflowText(props: OverflowTextProps): Element {
   };
 
   const engaged = computed(() => (!!val(props.play) || triggers.has("always") || triggers.has("visible") || (triggers.has("hover") && hovered()) || (triggers.has("focus") && focused())) && visible());
-  const wanted = computed(() => dist() > 0 && engaged() && !reducedMotion());
+  const wanted = computed(() => dist() > 0 && engaged() && !val(props.disabled) && !reducedMotion());
 
   let anim: Anim | null = null, fadeAnim: Anim | null = null, timer: ReturnType<typeof setTimeout> | null = null, copies: Element[] = [];
   const stop = (): void => {
@@ -99,12 +103,12 @@ export function OverflowText(props: OverflowTextProps): Element {
       if (props.fade !== false && typeof r.animate === "function") { try { fadeAnim = animateEl(r, frames, o); } catch { fadeAnim = null; } }
     };
     if (mode === "loop") {
-      const sep = h("span", { class: "hm-marquee-sep", "aria-hidden": "true" }, props.separator ?? "•");
+      const sep = props.separator === false ? null : h("span", { class: "hm-marquee-sep", "aria-hidden": "true" }, props.separator ?? "•");
       const copy = item.cloneNode(true) as HTMLElement;
       copy.setAttribute("aria-hidden", "true");
       copy.setAttribute("inert", "");
-      track.append(sep, copy);
-      copies = [sep, copy];
+      copies = sep ? [sep, copy] : [copy];
+      track.append(...copies);
       const span = copy.getBoundingClientRect().left - item.getBoundingClientRect().left;
       const travel = (Math.abs(span) / speed) * 1000, total = travel + pause;
       anim = animateEl(el, [
@@ -117,12 +121,12 @@ export function OverflowText(props: OverflowTextProps): Element {
       return;
     }
     const d = dist.peek(), travel = (d / speed) * 1000, total = 2 * travel + 2 * pause;
-    const end = `translateX(${sign * d}px)`;
+    const end = `translateX(${sign * d}px)`, ease = props.easing ?? "ease-in-out";
     anim = animateEl(el, [
       { transform: "translateX(0)", offset: 0 },
-      { transform: "translateX(0)", offset: pause / total, easing: "ease-in-out" },
+      { transform: "translateX(0)", offset: pause / total, easing: ease },
       { transform: end, offset: (pause + travel) / total },
-      { transform: end, offset: (2 * pause + travel) / total, easing: "ease-in-out" },
+      { transform: end, offset: (2 * pause + travel) / total, easing: ease },
       { transform: "translateX(0)", offset: 1 },
     ], { duration: total, iterations: mode === "once" ? 1 : Infinity, fill: "none" });
     const a = pause / total, b = (pause + travel) / total, c = (2 * pause + travel) / total, e = Math.min(0.03, travel / total / 4);

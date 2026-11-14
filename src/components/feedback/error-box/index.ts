@@ -9,6 +9,8 @@ export interface ErrorBoxProps {
   message?: MaybeFn<unknown>;
   title?: unknown;
   retry?: (() => unknown) | undefined;
+  /** Content of the retry button: text or a node (default "Retry", translated). */
+  retryLabel?: unknown;
   class?: ClassProp;
 }
 /** `<ErrorBox error={err} retry={() => refetch()} title="Could not load" />` */
@@ -20,6 +22,6 @@ export function ErrorBox(props: ErrorBoxProps): Element {
   };
   return h("div", { class: () => cx("hm-error", "hm-errorbox", val(props.class)), role: "alert" },
     props.title != null && h("strong", { class: "hm-errorbox-title" }, () => val(props.title)),
-    h("p", {}, msg),
-    props.retry && h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", onClick: () => props.retry?.() }, () => t`Retry`));
+    h("p", { class: "hm-errorbox-text" }, msg),
+    props.retry && h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm hm-errorbox-retry", onClick: () => props.retry?.() }, () => val(props.retryLabel) ?? t`Retry`));
 }

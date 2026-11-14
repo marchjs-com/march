@@ -40,3 +40,12 @@ test("one-line labels scroll instead of ending in an ellipsis", () => {
   assert.match(read("components/composite/nav-sidebar/index.ts"), /class: "hm-sb-sub", mode: "loop", play: \(\) => active\(\) === x\.id/, "loops; the selected item keeps scrolling");
   assert.doesNotMatch(read("ui/app.css"), /line-clamp/, "LinkCard description is not clamped");
 });
+
+test("OverflowText: disabled, easing and separator are props, not attributes", () => {
+  const el = h(U.OverflowText, { text: "x", disabled: true, easing: "linear", separator: false, class: "mine", "data-x": "1" });
+  assert.equal(el.getAttribute("disabled"), null);
+  assert.equal(el.getAttribute("easing"), null);
+  assert.equal(el.getAttribute("separator"), null);
+  assert.equal(el.getAttribute("data-x"), "1");
+  assert.match(el.getAttribute("class"), /\bmine\b/);
+});

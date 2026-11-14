@@ -8,12 +8,12 @@ export const code = `<Empty icon={inbox} title="Gelen kutusu boş" action={[<But
   Yeni bir konuşma başlatın ya da bir ekip arkadaşını davet edin.
 </Empty>`
 
-export default function EmptyDemo(props: { values: { icon: boolean; text: boolean; action: boolean } }) {
+export default function EmptyDemo(props: { values: { icon: boolean; title: boolean; text: boolean; action: boolean } }) {
   let $made = 0
   return <div class="sc-col">
     {() => {
       const v = props.values
-      return <Empty icon={v.icon ? inbox : undefined} title={() => ($made ? `${$made} taslak oluşturuldu` : "Gelen kutusu boş")}
+      return <Empty icon={v.icon ? inbox : undefined} title={v.title ? () => ($made ? `${$made} taslak oluşturuldu` : "Gelen kutusu boş") : false}
         action={v.action ? [<Button variant="primary" icon={plus} on:click={() => { $made++ }}>Yeni mesaj</Button>] : undefined}>
         {v.text ? "Yeni bir konuşma başlatın ya da bir ekip arkadaşını davet edin." : null}
       </Empty>

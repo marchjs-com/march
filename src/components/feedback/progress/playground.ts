@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { indeterminate: boolean; value: number; colors: string; paint: string; tone: string; size: string; showValue: boolean }
+interface Values { indeterminate: boolean; value: number; colors: string; paint: string; tone: string; size: string; showValue: boolean; valueText: string }
 
 export default definePlayground<Values>({
   options: [
@@ -10,6 +10,7 @@ export default definePlayground<Values>({
     { key: "paint", label: "Dizilim", default: "gradient", kind: "segmented", options: ["gradient", "segments", "cycle"], visibleWhen: (v) => v.colors !== "tone" },
     { key: "tone", label: "Ton", default: "primary", kind: "chips", options: [{ value: "primary", label: "birincil" }, { value: "success", label: "başarı" }, { value: "warn", label: "uyarı" }, { value: "danger", label: "tehlike" }, { value: "info", label: "bilgi" }], visibleWhen: (v) => v.colors === "tone" },
     { key: "size", label: "Boyut", default: "lg", kind: "segmented", options: ["sm", "md", "lg"] },
-    { key: "showValue", label: "Yüzdeyi göster", default: true, visibleWhen: (v) => !v.indeterminate },
+    { key: "showValue", label: "Değeri göster", default: true, visibleWhen: (v) => !v.indeterminate },
+    { key: "valueText", label: "Değer metni", default: "percent", kind: "segmented", options: [{ value: "percent", label: "yüzde" }, { value: "own", label: "kendi metnim (MB)" }], visibleWhen: (v) => !v.indeterminate && v.showValue },
   ],
 });

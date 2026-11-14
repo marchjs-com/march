@@ -14,7 +14,14 @@ Grey (or brand-tinted) shapes standing in for content that is loading: a few tex
 | `block` | `boolean` | `false` | one block instead of lines |
 | `height` | `sm` `md` `lg` | `md` | block height |
 | `colors` | `"brand"` / `"single"` | the theme's | brand: a four-colour shimmer; single: neutral even in a multicolour theme |
-| `class` | `string` | | |
+| `shimmer` | `boolean` | `true` | `false`: still shapes, no moving light |
+| `shortLast` | `boolean` | `true` | `false`: every line has the full width |
+| `label` | `string` | "Loading" (translated) | accessible name of the lines |
+| `class` | class value | | |
+
+```tsx
+<Skeleton lines={4} shimmer={false} shortLast={false} label="Loading the profile" />
+```
 
 ## Accessibility
 

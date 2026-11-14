@@ -17,12 +17,19 @@ A decorative layer that lives inside its container: an image, a muted looping vi
 | `svg` | node | | inline SVG |
 | `draw` / `animate` | `(ctx, info) => void` / `boolean` | | canvas drawing; every frame while visible |
 | `effect` | see above | | CSS effect |
+| `color` | colour token | the theme's | colour of `spotlight`, `dots`, `grid` and `vignette`, and of an inline SVG's `currentColor` |
 | `fit`, `position` | object-fit, object-position | `cover`, `center` | |
 | `inset`, `top`, `bottom`, `start`, `end`, `left`, `right` | space step or CSS length | `0` | `start` / `end` follow the text direction |
 | `opacity`, `blend` | `number`, mix-blend-mode | `1`, `normal` | |
 | `front` | `boolean` | `false` | above the content |
 | `layer` | `number` | insertion order | |
 | `interactive` | `boolean` | `false` | let it take pointer input |
+| `class` | class value | | |
+
+```tsx
+<Overlay effect="spotlight" color="brand-orange" />
+<Overlay effect="dots" color="brand-purple" opacity={0.6} />
+```
 
 `quietMedia()` is true on save-data, 2G or reduced motion.
 

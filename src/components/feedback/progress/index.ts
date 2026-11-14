@@ -22,8 +22,10 @@ export interface ProgressProps {
   max?: number;
   tone?: MaybeFn<"primary" | "success" | "warn" | "danger" | "info" | undefined>;
   label?: MaybeFn<string | undefined>;
-  /** Show the percentage next to the label. */
-  showValue?: boolean;
+  /** Accessible name when there is no visible `label` (default "Progress", translated). */
+  ariaLabel?: MaybeFn<string | undefined>;
+  /** Show the percentage next to the label; a function writes its own text: `(percent, value) => "3 of 8 files"`. */
+  showValue?: boolean | ((percent: number, value: number) => unknown);
   size?: "sm" | "md" | "lg";
   class?: ClassProp;
 }
@@ -34,13 +36,15 @@ export function Progress(props: ProgressProps): Element {
   const fill = h("span", { class: "hm-progress2-fill" });
   const bar = h("span", {
     class: "hm-progress2-track", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(max),
-    "aria-valuenow": () => { const v = val(props.value); return v == null ? null : String(v); }, "aria-label": () => val(props.label) ?? t`Progress`,
+    "aria-valuenow": () => { const v = val(props.value); return v == null ? null : String(v); }, "aria-label": () => val(props.label) ?? val(props.ariaLabel) ?? t`Progress`,
   }, fill);
   const sync = (): void => { const p = pct(); setStyle(fill, { "--hm-progress": p == null ? "0" : String(p / 100) }); };
+  const show = props.showValue;
+  const valueText = (): unknown => { const p = pct(); return p == null ? "" : typeof show === "function" ? show(Math.round(p), val(props.value) as number) : `${Math.round(p)}%`; };
   const root = h("div", { "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-progress2", `hm-progress2-${props.size ?? "md"}`, `hm-progress2-${val(props.tone) ?? "primary"}`, pct() == null && "is-indeterminate", props.colors === "single" && "hm-paint-single", props.paint === "cycle" && "hm-paint-cycle", val(props.class)) },
-    (props.label != null || props.showValue) && h("div", { class: "hm-progress2-head" },
+    (props.label != null || show) && h("div", { class: "hm-progress2-head" },
       h("span", { class: "hm-progress2-label" }, () => val(props.label) ?? ""),
-      props.showValue && h("span", { class: "hm-progress2-value" }, () => (pct() == null ? "" : `${Math.round(pct() as number)}%`))),
+      show && h("span", { class: "hm-progress2-value" }, valueText)),
     bar);
   effect(sync);
   const list = colorList(props.colors);

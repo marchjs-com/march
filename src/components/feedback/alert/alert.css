@@ -8,6 +8,9 @@
 .hm-alert-warn { background: var(--hm-warn-soft); border-color: color-mix(in srgb, var(--hm-warn) 25%, transparent); } .hm-alert-warn .hm-alert-icon { color: var(--hm-warn-text); }
 .hm-alert-danger { background: var(--hm-danger-soft); border-color: color-mix(in srgb, var(--hm-danger) 22%, transparent); } .hm-alert-danger .hm-alert-icon { color: var(--hm-danger-text); }
 .hm-alert-neutral { background: var(--hm-surface-2); border-color: var(--hm-border); } .hm-alert-neutral .hm-alert-icon { color: var(--hm-muted); }
+/* color prop: a theme color token instead of the tone colours */
+.hm-alert[data-hm-color] { background: var(--hm-accent-soft); border-color: color-mix(in srgb, var(--hm-accent) 22%, transparent); } .hm-alert[data-hm-color] .hm-alert-icon { color: var(--hm-accent-text); }
+.hm-alert-x-icon { display: inline-flex; }
 .hm-alert-main { flex: 1; min-width: 0; }
 .hm-alert-title { display: block; margin-bottom: .125rem; color: var(--hm-text); font-weight: var(--hm-weight-semibold); }
 .hm-alert-x { width: 1.75rem; height: 1.75rem; margin-block: -.25rem; margin-inline: 0 -.375rem; }

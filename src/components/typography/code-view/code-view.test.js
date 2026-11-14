@@ -26,3 +26,21 @@ test("CodeView: lines, numbers, colours, wrap toggle, copy", () => {
   assert.equal(n.el.querySelectorAll(".hm-code-bar button").length, 1);
   n.dispose();
 });
+
+test("CodeView: own texts, no wrap button, no language label, no toolbar", () => {
+  const a = mount(() => h(CodeView, { code: "x", lang: "js", langLabel: "main.js", wrapLabel: "Soft wrap", copyLabel: "Copy code", class: "mine" }));
+  const root = a.el.querySelector(".hm-code.mine");
+  assert.equal(root.querySelector(".hm-code-lang").textContent, "main.js");
+  assert.equal(root.querySelector(".hm-code-wrap").textContent, "Soft wrap");
+  assert.equal(root.querySelector(".hm-copy").textContent, "Copy code");
+  a.dispose();
+  const b = mount(() => h(CodeView, { code: "const a = 1", lang: "js", langLabel: false, wrapButton: false }));
+  assert.equal(b.el.querySelector(".hm-code-lang"), null);
+  assert.equal(b.el.querySelector(".hm-code-wrap"), null);
+  assert.ok(b.el.querySelector(".hm-tok-kw"), "colours stay without the label");
+  b.dispose();
+  const c = mount(() => h(CodeView, { code: "x", lang: "js", toolbar: false }));
+  assert.equal(c.el.querySelector(".hm-code-bar"), null);
+  assert.equal(c.el.querySelectorAll(".hm-code-line").length, 1);
+  c.dispose();
+});

@@ -12,7 +12,17 @@ A loading state that fills an area: a large spinner with a line of text under it
 |---|---|---|---|
 | `text` | `string` / accessor | | visible text; without it "Loading" is read to screen readers only |
 | `overlay` | `boolean` | `false` | covers the nearest positioned container |
+| `label` | `string` / accessor | "Loading" (translated) | screen-reader text while there is no visible `text` |
+| `spinner` | `boolean` / node | `true` | `false` leaves the spinner out; a node replaces it |
+| `color` | colour token | the theme's | one colour for the spinner |
+| `fade` | `boolean` | `true` | `false`: no delayed fade-in, the loader shows at once |
 | `class` | class value | | |
+
+```tsx
+<Loader text="Saving…" color="brand-orange" fade={false} />
+<Loader spinner={<Logo />} label="Opening the editor" />
+<Loader spinner={false} text="One moment…" />
+```
 
 `bootLoader.done({ id = "hm-boot", fade = 250 })` returns false when there is no boot element.
 

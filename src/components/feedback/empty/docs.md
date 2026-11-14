@@ -11,10 +11,14 @@ What a list, table or page shows when it has nothing yet: an icon in a raised ti
 | Prop | Type | Default | |
 |---|---|---|---|
 | `icon` | node / glyph / emoji | | shown in a raised tile |
-| `title` | `string` / accessor | "Nothing here yet" (translated) | |
+| `title` | `string` / accessor / `false` | "Nothing here yet" (translated) | `false` leaves the title out |
 | `action` | node / list / `action()` objects | | actions render as buttons |
 | children | node | | the explanation |
 | `class` | class value | | |
+
+```tsx
+<Empty title={false} icon={inbox}>Only the icon and this line.</Empty>
+```
 
 ## Accessibility
 

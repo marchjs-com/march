@@ -17,3 +17,11 @@ test("Kbd: plain text and formatted shortcut", () => {
   assert.match(b.textContent, /Alt|⌥/);
   m.dispose();
 });
+
+test("Kbd: own class on both forms", () => {
+  const m = mount(() => [h(Kbd, { class: "mine" }, "Esc"), h(Kbd, { keys: "mod+k", class: () => "live" })]);
+  const [a, b] = m.el.querySelectorAll("kbd.hm-kbd");
+  assert.ok(a.classList.contains("mine"));
+  assert.ok(b.classList.contains("live"));
+  m.dispose();
+});

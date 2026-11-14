@@ -14,7 +14,20 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 | `threshold` | `number` (px) | `72` | pull distance that triggers it (the pull has 1:2 resistance) |
 | `disabled` | `boolean` / accessor | `false` | |
 | `onPhase` | `(phase) => void` | | `idle` → `pull` → `ready` → `refreshing` → `idle` |
+| `labels` | `{ pull, release, refreshing, refresh }` | translated texts | the three announced states and the keyboard button |
+| `indicator` | `boolean` / `(phase) => node` | `true` | `false`: no indicator; a function draws its own content inside it for every phase |
+| `icon` | node / glyph | the refresh glyph | what turns inside the indicator |
+| `color` | colour token | `primary` | the indicator when ready and while refreshing |
+| `settle` | `number` (ms) / `false` | `260` | how long the spring back takes; `false` snaps |
+| `refreshButton` | `boolean` | `true` | the keyboard "Refresh" button shown on focus |
 | `class`, `children` | | | the element itself is the scroll area: give it a height |
+
+```tsx
+<PullToRefresh onRefresh={load} icon={rotateCw} color="brand-orange" labels={{ pull: "Pull for new events", refresh: "Load new events" }}>…</PullToRefresh>
+<PullToRefresh onRefresh={load} indicator={(phase) => (phase === "ready" ? "↑" : "↓")} settle={false}>…</PullToRefresh>
+```
+
+With `refreshButton={false}` give keyboard users another way to refresh.
 
 ## Accessibility
 

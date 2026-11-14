@@ -30,8 +30,8 @@ export interface MediaProps {
   muted?: boolean;
   /** "sm" thumbnail, "md". */
   size?: MaybeFn<"sm" | "md" | undefined>;
-  /** Shown when loading fails (default "Could not load media"). */
-  fallback?: MaybeFn<string | undefined>;
+  /** Shown when loading fails or there is no `src`: text or a node (defaults "Could not load media" / "No media", translated). */
+  fallback?: MaybeFn<unknown>;
   class?: ClassProp;
 }
 
@@ -56,8 +56,8 @@ export function Media(props: MediaProps): () => unknown {
   };
 }
 
-export interface OpenMediaOptions { title?: string; kind?: MediaKind | "auto"; alt?: string; poster?: string | undefined; size?: DialogSize; autoplay?: boolean }
-/** Open media in a dialog. Options: `title`, `kind` ("auto" by default), `alt`, `poster`, `size` ("lg"), `autoplay`. */
+export interface OpenMediaOptions { title?: string; kind?: MediaKind | "auto"; alt?: string; poster?: string | undefined; size?: DialogSize; autoplay?: boolean; /** Shown when loading fails (text or a node). */ fallback?: unknown }
+/** Open media in a dialog. Options: `title`, `kind` ("auto" by default), `alt`, `poster`, `size` ("lg"), `autoplay`, `fallback`. */
 export function openMedia(src: string, o: OpenMediaOptions = {}): Promise<unknown> {
-  return openDialog(() => h(Media, { src, kind: o.kind ?? "auto", alt: o.alt, poster: o.poster, autoplay: o.autoplay }), { title: o.title ?? t`Preview`, size: o.size ?? "lg" });
+  return openDialog(() => h(Media, { src, kind: o.kind ?? "auto", alt: o.alt, poster: o.poster, autoplay: o.autoplay, fallback: o.fallback }), { title: o.title ?? t`Preview`, size: o.size ?? "lg" });
 }

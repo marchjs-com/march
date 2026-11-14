@@ -15,8 +15,16 @@ A message that stays on the page: a tone (`info`, `success`, `warn`, `danger`, `
 | `icon` | node / glyph / `null` | the tone's icon | `null` hides it |
 | `body` / children | node | | the message |
 | `dismissable` | `boolean` | `false` | adds a × button |
+| `dismissLabel` | `string` / accessor | "Dismiss" (translated) | accessible name of the × button |
+| `dismissIcon` | node / glyph | the × glyph | what the dismiss button shows |
+| `color` | colour token | the tone's | paints the alert with a theme colour (`brand-purple`, `cat-3`…); the role still follows `tone` |
 | `onDismiss` | `() => void` | | after it is hidden |
 | `class` | class value | | |
+
+```tsx
+<Alert color="brand-purple" icon={sparkles} title="New">Dark theme is here.</Alert>
+<Alert dismissable dismissLabel="Close the notice" dismissIcon={check} icon={null}>Saved.</Alert>
+```
 
 ## Accessibility
 

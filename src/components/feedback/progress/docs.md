@@ -13,13 +13,19 @@ A progress bar with a label and the percentage, or an indeterminate one while th
 | `value` | `number` / accessor / `null` | | `null` or absent: indeterminate |
 | `max` | `number` | `100` | |
 | `label` | `string` / accessor | | shown above, and the accessible name |
-| `showValue` | `boolean` | `false` | the rounded percentage |
+| `showValue` | `boolean` / `(percent, value) => node` | `false` | the rounded percentage, or your own text |
+| `ariaLabel` | `string` / accessor | "Progress" (translated) | accessible name when there is no visible `label` |
 | `tone` | `primary` `success` `warn` `danger` `info` | `primary` | one-colour fill |
 | `size` | `sm` `md` `lg` | `md` | track height |
 | `color` | colour token | | the single colour |
 | `colors` | `"brand"` / colour tokens / `"single"` | the theme's | several colours, or one in a multicolour theme |
 | `paint` | `gradient` `segments` `cycle` | `gradient` | how several colours are laid out |
 | `class` | class value | | |
+
+```tsx
+<Progress value={$done} max={8} label="Upload" showValue={(percent, value) => `${value} of 8 files`} />
+<Progress value={40} ariaLabel="Storage used" />
+```
 
 ## Accessibility
 

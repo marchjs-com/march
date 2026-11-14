@@ -9,6 +9,7 @@ import { signal, getOwner, effect } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { listen } from "../../../core/util.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export type OverlayEffect = "glass" | "gradient" | "mesh" | "noise" | "vignette" | "spotlight" | "grid" | "dots";
 export type OverlayFit = "cover" | "contain" | "fill" | "none" | "scale-down";
@@ -43,6 +44,8 @@ export interface OverlayProps {
   /** Redraw every frame (paused while not visible and with reduced motion). */
   animate?: boolean;
   effect?: OverlayEffect;
+  /** Theme color of the effect (spotlight, dots, grid, vignette) and of an inline SVG's `currentColor`. */
+  color?: ColorToken | undefined;
   fit?: OverlayFit;
   /** object-position ("center", "50% 20%"). */
   position?: string;
@@ -85,7 +88,7 @@ export function Overlay(props: OverlayProps): Element {
   const physical = props.left != null || props.right != null;
   const root = h("div", {
     class: () => cx("hm-ov", `hm-ov-${kind}`, props.effect && `hm-ov-fx-${props.effect}`, props.front ? "hm-ov-front" : "hm-ov-behind", physical && "hm-ov-physical", props.interactive && "is-interactive", val(props.class)),
-    "aria-hidden": meaningful ? null : "true", inert: props.interactive ? null : "",
+    "aria-hidden": meaningful ? null : "true", inert: props.interactive ? null : "", "data-hm-color": () => colorAttr(props.color),
   }) as HTMLElement;
   // geometry and order: CSS variables (CSSOM)
   const set = (k: string, v: string | null): void => { if (v == null) root.style.removeProperty(k); else root.style.setProperty(k, v); };

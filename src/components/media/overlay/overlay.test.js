@@ -5,6 +5,7 @@ const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { Overlay, quietMedia } = await import("./index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); render(fn, el); return el; };
+const mountD = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
 
 test("Overlay: an effect layer is decorative and inert; front and physical sides set their variables", async () => {
   const el = mount(() => h("div", null, h(Overlay, { effect: "mesh" }), h(Overlay, { effect: "glass", front: true, left: 2 })));
@@ -29,4 +30,13 @@ test("Overlay: a live front / opacity prop restacks and refades the layer", asyn
   await new Promise((r) => setTimeout(r, 0));
   assert.ok(Number(o.style.getPropertyValue("--hm-ov-z")) > 0);
   assert.equal(o.style.getPropertyValue("--hm-ov-opacity"), "0.4");
+});
+
+test("Overlay: a colour token and an own class", () => {
+  const m = mountD(() => h("div", null, h(Overlay, { effect: "spotlight", color: "brand-orange", class: "mine" }), h(Overlay, { effect: "dots" })));
+  const [a, b] = m.el.querySelectorAll(".hm-ov");
+  assert.equal(a.getAttribute("data-hm-color"), "brand-orange");
+  assert.ok(a.classList.contains("mine") && a.classList.contains("hm-ov-fx-spotlight"));
+  assert.equal(b.getAttribute("data-hm-color"), null);
+  m.dispose();
 });

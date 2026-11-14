@@ -4,13 +4,28 @@ import "../spinner/spinner.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
-export interface LoaderProps { text?: MaybeFn<string> | undefined; overlay?: boolean; class?: ClassProp }
+export interface LoaderProps {
+  text?: MaybeFn<string> | undefined; overlay?: boolean; class?: ClassProp;
+  /** Screen-reader text while there is no visible `text` (default "Loading", translated). */
+  label?: MaybeFn<string | undefined>;
+  /** The spinner: true (default), false, or your own node. */
+  spinner?: boolean | Node | undefined;
+  /** One theme color for the spinner ("brand-orange", "success"…). Default: the theme's spinner. */
+  color?: ColorToken | undefined;
+  /** The delayed fade-in (default true); false shows the loader at once. */
+  fade?: boolean | undefined;
+}
 /** Full-area spinner: `<Loader text="Loading users…" />` */
 export function Loader(props: LoaderProps = {}): Element {
-  return h("div", { class: () => cx("hm-loader", props.overlay && "hm-loader-overlay", val(props.class)), role: "status", "aria-live": "polite" },
-    h("span", { class: "hm-loading hm-spin-lg", "aria-hidden": "true" }),
-    h("span", { class: props.text != null ? "hm-loader-text" : "hm-sr-only" }, () => val(props.text) ?? t`Loading`));
+  const own = props.spinner;
+  const spinner = own === false ? null
+    : own && own !== true ? h("span", { class: "hm-loader-spinner", "aria-hidden": "true" }, own)
+    : h("span", { class: cx("hm-loading hm-spin-lg", props.color && "hm-spin-single"), "aria-hidden": "true", "data-hm-color": colorAttr(props.color) });
+  return h("div", { class: () => cx("hm-loader", props.overlay && "hm-loader-overlay", props.fade === false && "is-still", val(props.class)), role: "status", "aria-live": "polite" },
+    spinner,
+    h("span", { class: props.text != null ? "hm-loader-text" : "hm-sr-only" }, () => val(props.text) ?? val(props.label) ?? t`Loading`));
 }
 
 /** Boot loader: the app's index.html shows a static `#hm-boot` element; call `bootLoader.done()` once the app rendered. */

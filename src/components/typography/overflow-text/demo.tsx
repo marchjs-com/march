@@ -1,12 +1,16 @@
 // Showcase stage for OverflowText and Marquee: rows in several scripts (RTL scrolls the other way) and a ticker
 // (Playground values in playground.ts).
 import { OverflowText, Marquee, type MarqueeTrigger, type MarqueeMode } from "./index.ts";
+import { Icon } from "../../../icons/index.ts";
+import { heart } from "../../../icons/glyphs/heart.ts";
 
 export const code = `<OverflowText text={title} play={() => selected()} /> // the selected row keeps scrolling
 <OverflowText text={title} />                         // hover + focus, bounces
 <OverflowText trigger="visible" mode="loop" text={…} />  // endless ticker while visible
 <OverflowText trigger="always" mode="once" speed={60} pause={800} />
-<Marquee text="Duyuru · …" separator="✦" />          // trigger=visible, mode=loop`
+<Marquee text="Duyuru · …" separator="✦" />          // trigger=visible, mode=loop
+<Marquee text="Duyuru · …" separator={<Icon of={heart} />} />   // own separator; separator={false}: none
+<OverflowText text={title} disabled={() => !prefs.motion} />   // never scrolls`
 
 const HINT: Record<string, string> = {
   hover: "Satırın üzerine gelin: sığmayan metin kayar.",
@@ -23,12 +27,16 @@ const SAMPLES = [
   ["Kısa", "Sığan metin kaymaz"],
 ] as const
 
-export default function OverflowTextDemo(props: { values: { trigger: string; mode: string; speed: number; ticker: boolean } }) {
+export default function OverflowTextDemo(props: { values: { trigger: string; mode: string; speed: number; disabled: boolean; ticker: boolean; separator: string } }) {
   return <div class="sc-mq-demo">
-    {() => { const trigger = props.values.trigger as MarqueeTrigger, mode = props.values.mode as MarqueeMode, speed = props.values.speed; return <div class="sc-mq-list">
-      <p class="hm-muted">{HINT[trigger]} İlk satır seçili satır gibi hep kayar (play).</p>
-      {SAMPLES.map(([lang, text], i) => <button type="button" class="sc-mq-row"><span class="sc-mq-lang">{lang}</span><OverflowText class="sc-mq-text" text={text} trigger={trigger} mode={mode} speed={speed} play={i === 0 ? () => true : undefined} /></button>)}
+    {() => { const trigger = props.values.trigger as MarqueeTrigger, mode = props.values.mode as MarqueeMode, speed = props.values.speed, disabled = props.values.disabled; return <div class="sc-mq-list">
+      <p class="hm-muted">{disabled ? "Kaydırma kapalı: sığmayan metin kırpılmış kalır." : `${HINT[trigger]} İlk satır seçili satır gibi hep kayar (play).`}</p>
+      {SAMPLES.map(([lang, text], i) => <button type="button" class="sc-mq-row"><span class="sc-mq-lang">{lang}</span><OverflowText class="sc-mq-text" text={text} trigger={trigger} mode={mode} speed={speed} disabled={disabled} play={i === 0 ? () => true : undefined} /></button>)}
     </div> }}
-    {() => (props.values.ticker ? <div class="sc-mq-ticker"><Marquee text="Yeni: koyu tema · daha hızlı arama · tam RTL · dört resmi renk" separator="✦" speed={props.values.speed} /></div> : null)}
+    {() => {
+      if (!props.values.ticker) return null
+      const sep = props.values.separator, speed = props.values.speed, disabled = props.values.disabled
+      return <div class="sc-mq-ticker"><Marquee text="Yeni: koyu tema · daha hızlı arama · tam RTL · dört resmi renk" separator={sep === "off" ? false : sep === "icon" ? <Icon of={heart} /> : "✦"} speed={speed} disabled={disabled} /></div>
+    }}
   </div>
 }

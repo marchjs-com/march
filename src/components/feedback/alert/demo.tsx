@@ -1,9 +1,12 @@
 // Showcase stage for Alert: one alert with the Playground values (playground.ts); a dismissed one comes back with "Geri getir".
 import { Alert } from "./index.ts";
 import { Button } from "../../../ui/button.ts";
+import { sparkles } from "../../../icons/glyphs/sparkles.ts";
+import { check } from "../../../icons/glyphs/check.ts";
 
 export const code = `<Alert tone="warn" title="Kota" dismissable onDismiss={() => …}>Bu ay depolamanın %90'ı kullanıldı.</Alert>
-<Alert tone="success">Domain doğrulandı.</Alert>          // role="status"; warn ve danger role="alert"`
+<Alert tone="success">Domain doğrulandı.</Alert>          // role="status"; warn ve danger role="alert"
+<Alert color="brand-purple" icon={sparkles} dismissable dismissIcon={check} dismissLabel="Bildirimi kapat">Yeni tema hazır.</Alert>`
 
 const TEXT: Record<string, [string, string]> = {
   info: ["Bakım penceresi", "Pazar 03:00–03:30 arası ödeme sağlayıcısı bakımda."],
@@ -13,7 +16,7 @@ const TEXT: Record<string, [string, string]> = {
   neutral: ["Not", "Değişiklikler bir sonraki girişte geçerli olur."],
 }
 
-export default function AlertDemo(props: { values: { tone: string; title: boolean; dismissable: boolean } }) {
+export default function AlertDemo(props: { values: { tone: string; color: string; icon: string; title: boolean; dismissable: boolean; dismissIcon: string } }) {
   let $round = 0
   let $gone = false
   return <div class="sc-col">
@@ -21,7 +24,8 @@ export default function AlertDemo(props: { values: { tone: string; title: boolea
       const v = props.values
       void $round
       const [title, body] = TEXT[v.tone] ?? TEXT.info!
-      return <Alert tone={v.tone} title={v.title ? title : undefined} dismissable={v.dismissable} onDismiss={() => { $gone = true }}>{body}</Alert>
+      return <Alert tone={v.tone} color={v.color === "tone" ? undefined : (v.color as "brand-purple")} icon={v.icon === "off" ? null : v.icon === "own" ? sparkles : undefined}
+        title={v.title ? title : undefined} dismissable={v.dismissable} dismissIcon={v.dismissIcon === "check" ? check : undefined} dismissLabel="Bildirimi kapat" onDismiss={() => { $gone = true }}>{body}</Alert>
     }}
     {() => ($gone ? <div class="sc-row"><Button size="sm" on:click={() => { $gone = false; $round++ }}>Geri getir</Button></div> : null)}
   </div>

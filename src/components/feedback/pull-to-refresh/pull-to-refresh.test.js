@@ -63,3 +63,38 @@ test("PullToRefresh: keyboard button refreshes; disabled ignores pulls", async (
   assert.ok(b.querySelector(".hm-ptr-kbd").disabled);
   m.dispose();
 });
+
+test("PullToRefresh: own labels, icon and colour; an own indicator; no indicator, no button, no settle", async () => {
+  const seen = [];
+  const m = mount(() => [
+    h(PullToRefresh, { threshold: 40, onRefresh: () => {}, labels: { release: "Let go", refresh: "Reload" }, icon: h("i", { class: "mine" }), color: "brand-orange" }, h("p", null, "a")),
+    h(PullToRefresh, { onRefresh: () => {}, indicator: (p) => { seen.push(p); return h("b", { class: "own" }, p); } }, "b"),
+    h(PullToRefresh, { threshold: 40, onRefresh: () => {}, indicator: false, refreshButton: false, settle: false }, h("p", null, "c")),
+  ]);
+  const [a, b, c] = m.el.querySelectorAll(".hm-ptr");
+  assert.equal(a.querySelector(".hm-ptr-kbd").textContent, "Reload");
+  assert.ok(a.querySelector(".hm-ptr-spin .mine"));
+  assert.equal(a.querySelector(".hm-ptr-spin svg"), null);
+  assert.equal(a.querySelector(".hm-ptr-ind").getAttribute("data-hm-color"), "brand-orange");
+  const p = a.querySelector("p");
+  p.dispatchEvent(ev("pointerdown", 10, 0));
+  p.dispatchEvent(ev("pointermove", 10, 140));
+  assert.equal(a.querySelector("[role=status]").textContent, "Let go");
+  p.dispatchEvent(ev("pointerup", 10, 140));
+  await tick(); await tick();
+  assert.ok(b.querySelector(".hm-ptr-ind.is-own .own"));
+  assert.equal(b.querySelector(".hm-ptr-spin"), null);
+  b.querySelector(".hm-ptr-kbd").click();
+  assert.equal(b.querySelector(".own").textContent, "refreshing");
+  await tick(); await tick();
+  assert.deepEqual(seen, ["idle", "refreshing", "idle"]);
+  assert.equal(c.querySelector(".hm-ptr-ind"), null);
+  assert.equal(c.querySelector(".hm-ptr-kbd"), null);
+  const q = c.querySelector("p");
+  q.dispatchEvent(ev("pointerdown", 10, 0));
+  q.dispatchEvent(ev("pointermove", 10, 140));
+  q.dispatchEvent(ev("pointerup", 10, 140));
+  await tick(); await tick();
+  assert.equal(c.getAttribute("aria-busy"), null, "refreshed and settled without an indicator");
+  m.dispose();
+});

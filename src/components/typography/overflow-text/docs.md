@@ -21,10 +21,18 @@ the tooltip. `Marquee` is the endless ticker preset (`trigger="visible"`, `mode=
 | `speed` | number | `40` | pixels per second |
 | `pause` | ms | `1000` | hold at each end |
 | `delay` | ms | `250` | wait after the trigger |
-| `separator` | string | `"•"` | loop separator |
+| `separator` | text / node / `false` | `"•"` | loop separator; `false`: nothing between the copies |
+| `easing` | CSS easing | `"ease-in-out"` | each travel in bounce / once (the loop is linear) |
+| `disabled` | boolean / accessor | `false` | never scroll: the text stays clipped with its fade or ellipsis |
 | `fade` | boolean | `true` | fade the clipped edges; `false` shows an ellipsis |
 | `play` | accessor | — | extra condition that keeps it scrolling |
 | `host` | element / accessor | nearest a, button, li … | element whose hover / focus starts it |
+| `class` | class value | — | other attributes pass through to the element |
+
+```tsx
+<Marquee text={news} separator={<Icon of={star} />} />
+<OverflowText text={title} easing="linear" disabled={() => !prefs.motion} />
+```
 
 ## Accessibility
 

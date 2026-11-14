@@ -21,6 +21,17 @@ draws it through the `code-view` widget point.
 | `copy` | boolean | `true` | copy button |
 | `label` | string / accessor | "Code" | accessible name of the scroll area |
 | `tools` | node | — | extra toolbar controls |
+| `toolbar` | boolean | `true` | `false`: no toolbar, only the code |
+| `langLabel` | text / node / `false` | `lang` | what the toolbar shows for the language; `false` hides it (colours stay) |
+| `wrapButton` | boolean | `true` | the Wrap toggle |
+| `wrapLabel` | string / accessor | "Wrap" (translated) | text of the Wrap button |
+| `copyLabel` | string / accessor | "Copy" (translated) | text of the copy button |
+| `class` | class value | — | |
+
+```tsx
+<CodeView code={source} lang="tsx" langLabel="Counter.tsx" wrapLabel="Soft wrap" copyLabel="Copy code" />
+<CodeView code={snippet} lang="sh" toolbar={false} lineNumbers={false} />
+```
 
 ## Accessibility
 

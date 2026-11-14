@@ -9,7 +9,10 @@
   transition: color var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease); }
 .hm-ptr-spin { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; }
 .hm-ptr-spin .hm-svg { width: 100%; height: 100%; }
+.hm-ptr-icon { display: grid; place-items: center; width: 100%; height: 100%; }
 .hm-ptr.is-ready .hm-ptr-ind, .hm-ptr.is-refreshing .hm-ptr-ind { color: var(--hm-primary); border-color: var(--hm-primary); }
+/* color prop: the token sits on the indicator only, so the content keeps its own colours */
+.hm-ptr.is-ready .hm-ptr-ind[data-hm-color], .hm-ptr.is-refreshing .hm-ptr-ind[data-hm-color] { color: var(--hm-accent); border-color: var(--hm-accent); }
 /* keyboard: a Refresh button that appears only while focused */
 .hm-ptr-kbd { position: absolute; z-index: 2; inset-block-start: var(--hm-space-2); inset-inline-start: 50%; translate: -50% 0; padding: var(--hm-space-1) var(--hm-space-3);
   border: 1px solid var(--hm-border); border-radius: var(--hm-radius-full); background: var(--hm-surface-raised); color: var(--hm-text); font: inherit;

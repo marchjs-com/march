@@ -12,8 +12,13 @@ A ring that turns while something loads. Three sizes; in a multicolour theme (HA
 |---|---|---|---|
 | `size` | `sm` `md` `lg` | `md` | |
 | `colors` | `"brand"` / colour tokens / `"single"` | the theme's | a conic paint of the colours |
+| `color` | colour token | the theme's | one colour for the ring (`brand-orange`, `success`…) |
 | `label` | `string` / accessor | "Loading" (translated) | the accessible name |
 | `class` | class value | | |
+
+```tsx
+<Spinner color="brand-orange" />
+```
 
 ## Accessibility
 
