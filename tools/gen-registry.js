@@ -201,12 +201,14 @@ export async function generate(root = ROOT) {
     const css = existsSync(dir) ? readdirSync(dir).find((f) => f.endsWith(".css")) : null;
     return css ? /^\.(m-[a-z0-9-]+)/m.exec(readFileSync(join(dir, css), "utf8").replace(/\/\*[\s\S]*?\*\//g, ""))?.[1] ?? null : null;
   };
-  files["src/components/cards-roots.gen.ts"] = HEAD + `/** Component name → the class of its root element. */
-export const roots: Record<string, string> = {
-` +
-    list.filter((c) => rootClass(c)).map((c) => `  ${JSON.stringify(nameOf(c))}: ${JSON.stringify(rootClass(c))},
-`).join("") + `};
-`;
+  files["src/components/cards-roots.gen.ts"] = HEAD + "/** Component name → the class of its root element. */\nexport const roots: Record<string, string> = {\n" +
+    list.filter((c) => rootClass(c)).map((c) => `  ${JSON.stringify(nameOf(c))}: ${JSON.stringify(rootClass(c))},\n`).join("") + "};\n";
+  // The components other components are built from (every name in a composedOf), each behind its own loader: the
+  // showcase gives them props through m:parts when a part of a composite is chosen on the stage.
+  const partNames = new Set(list.flatMap((c) => c.meta?.composedOf ?? []));
+  files["src/components/cards-parts.gen.ts"] = HEAD + "/** Component name → a loader of the component itself (the key of an m:parts map). */\n" +
+    "export const parts: Record<string, () => Promise<unknown>> = {\n" +
+    list.filter((c) => partNames.has(nameOf(c)) && !c.meta?.entry).map((c) => `  ${nameOf(c)}: () => import("./${c.folder}/index.ts").then((m) => (m as Record<string, unknown>)[${JSON.stringify(nameOf(c))}]),\n`).join("") + "};\n";
   files["src/components/cards-code.gen.ts"] = HEAD + `export const code: Record<string, string> = {\n` +
     list.map((c) => `  ${JSON.stringify(c.folder)}: ${JSON.stringify(firstCode(c.docs))},\n`).join("") + `};\n`;
 

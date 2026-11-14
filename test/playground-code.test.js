@@ -90,3 +90,26 @@ test("the lexer keeps places and nested braces", () => {
   assert.equal(lex.closed, true);
   assert.equal(lexCode(`<Button>Tamam</Button>`).children, "Tamam");
 });
+
+test("m:parts: a part's own playground gives the options that work from outside; the attribute round-trips", async () => {
+  const { partOptions, partsAttr, parseParts } = await import("../examples/showcase/src/gen-code.ts");
+  const avatar = partOptions(await load("social/avatar")), like = partOptions(await load("social/like-button"));
+  assert.deepEqual(avatar.map((o) => o.prop), ["size", "shape", "color"], "content (text / icon) and src write code: left out");
+  assert.equal(avatar[2].value("name"), undefined, "the value that writes nothing sets nothing");
+  assert.equal(avatar[2].value("brand-orange"), "brand-orange");
+  assert.ok(like.some((o) => o.prop === "pop") && !like.some((o) => o.prop === "icon" || o.prop === "burstOptions"));
+  assert.equal(like.find((o) => o.prop === "pop").value(false), false);
+  assert.deepEqual(partOptions(await load("data/card")), [], "a playground without `code`: its keys may be the demo's, nothing is offered");
+
+  const known = { Avatar: avatar, LikeButton: like };
+  const code = partsAttr({ Avatar: { size: "lg", shape: "square" }, LikeButton: { pop: false }, CountRoll: {} });
+  assert.equal(code, `{{ Avatar: { size: "lg", shape: "square" }, LikeButton: { pop: false } }}`);
+  assert.equal(partsAttr({ Avatar: {} }), null);
+  assert.deepEqual(parseParts(code, known), { values: { Avatar: { size: "lg", shape: "square" }, LikeButton: { pop: false } }, errors: [] });
+  const bad = parseParts(`{{ Avatar: { size: "huge", shape: "square", nope: 1 }, Card: { flat: true } }}`, known);
+  assert.deepEqual(bad.values, { Avatar: { shape: "square" } }, "the valid part applies");
+  assert.match(bad.errors[0], /m:parts\.Avatar\.size: "huge" burada yok → "xs", "sm"/);
+  assert.match(bad.errors[1], /m:parts\.Avatar\.nope: buradan ayarlanmıyor → size, shape, color/);
+  assert.match(bad.errors[2], /m:parts\.Card: bu bileşende böyle bir parça yok → Avatar, LikeButton/);
+  assert.ok(parseParts(`{ Avatar }`, known).errors.length);
+});
