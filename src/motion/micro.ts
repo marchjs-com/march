@@ -58,7 +58,7 @@ export interface HoverParallaxOptions {
   glare: boolean;
 }
 
-/** Action: children marked `data-depth="0.2…1"` shift with the pointer (deeper ones more); the container may tilt. */
+/** Action: children marked `data-depth="0.2…1"` shift with the pointer (deeper ones more); the container may tilt. `hold` keeps the pose when the pointer leaves, `layerTilt` turns every layer too, `glare` writes the pointer's place inside each layer. */
 export function hoverParallax(el: Element, raw?: unknown): () => void {
   const o = obj<HoverParallaxOptions>(raw);
   const depth = o.depth ?? 14, tiltDeg = o.tilt ?? 0, layerTilt = o.layerTilt ?? 0, hold = !!o.hold, sel = o.selector ?? "[data-depth]";

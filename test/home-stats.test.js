@@ -47,6 +47,7 @@ export function shownDigits(src) {
     const v = m[2];
     if (!/\d/.test(v)) continue;
     if (/^(hadi-march|\.\.?\/)/.test(v)) continue; // import
+    if (/^\/[\w/-]*$/.test(v)) continue; // a route path ("/managers-a11y"): an address, not a count
     if (/^[\w-]+(\s+[\w-]+)*$/.test(v) && /-|^[a-z]/.test(v) && !/\s\d|^\d/.test(v)) continue; // class / token names (sc-h2, m-grid-3)
     if (/^-?[\d.]+(px|rem|em|ms|s|%|deg|fr|vh|vw)?(\s+-?[\d.]+(px|rem|em|ms|s|%|deg|fr|vh|vw)?)*$/.test(v)) continue; // CSS value
     if (!/\d/.test(v.replace(/\$\{[^}]*\}/g, ""))) continue; // `${n} KB`, `Tema ${i} / ${n}`: every digit is a live value
@@ -71,5 +72,6 @@ test("shownDigits catches a typed count and lets live values through", () => {
   assert.deepEqual(shownDigits('<Demo code={`\nlet $n = 0\n`} />'), []);
   assert.deepEqual(shownDigits('<span>{n}</span> class="sc-h2" delay: 80 `${kb} KB` "1.5rem"'), []);
   assert.deepEqual(shownDigits('`Tema ${i + 1} / ${n}` "translate(0, 0) scale(1)"'), []);
+  assert.deepEqual(shownDigits('href: "/managers-a11y" label="/ 7 tema"'), ["/ 7 tema"]);
   assert.deepEqual(shownDigits('`${n} bileşen · 7 tema`'), ["${n} bileşen · 7 tema"]);
 });
