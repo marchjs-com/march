@@ -52,7 +52,7 @@ export default function OverflowToolbarDemo(props: { values: { width: number; si
       const v = props.values
       const motion = v.motion === "own" ? (el: Element) => animate(el, [{ opacity: 0, transform: "translateY(-10px)" }, { opacity: 1, transform: "none" }], { duration: 320, easing: "easeOutBack" }) : v.motion as "pop"
       return <OverflowToolbar label="Belge araçları" items={items} size={v.size as "sm"} motion={motion}
-        moreIcon={v.moreIcon === "menu" ? menu : v.moreIcon === "plus" ? plus : undefined} color={(v.color || undefined) as ColorToken | undefined} />
+        moreIcon={v.moreIcon === "menu" ? menu : v.moreIcon === "plus" ? plus : undefined} color={(v.color || undefined) as never} />
     }}
   </div>
 }

@@ -16,7 +16,7 @@ export default function CopyButtonDemo(props: { values: { iconOnly: boolean; ico
       const v = props.values
       return <CopyButton text="npm i hadi-march" iconOnly={v.iconOnly} label="Komutu kopyala" onCopy={() => { $copies++ }}
         icon={v.icon === "own" ? link : undefined} copiedIcon={v.copiedIcon === "off" ? false : v.copiedIcon === "own" ? heart : undefined}
-        copiedLabel={v.copiedLabel === "own" ? "Panoda!" : undefined} copiedColor={(v.copiedColor || undefined) as ColorToken | undefined} />
+        copiedLabel={v.copiedLabel === "own" ? "Panoda!" : undefined} copiedColor={(v.copiedColor || undefined) as never} />
     }}
     <span class="hm-muted">{() => ($copies ? `${$copies} kez kopyalandı` : "")}</span>
   </div>

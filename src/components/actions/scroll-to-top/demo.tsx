@@ -22,7 +22,7 @@ export default function ScrollToTopDemo(props: { values: { threshold: number; mo
         ? [{ opacity: 0, transform: "rotate(-180deg) scale(0.6)" }, { opacity: 1, transform: "none" }]
         : [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "rotate(180deg) scale(0.6)" }], { duration: 420, easing: "easeOutCubic", fill: "forwards" })
       return <ScrollToTop inline target={box} threshold={v.threshold} motion={v.motion === "own" ? spin : v.motion as "pop"}
-        icon={v.icon === "chevron" ? chevronUp : v.icon === "text" ? "⇧" : undefined} color={(v.color || undefined) as ColorToken | undefined} />
+        icon={v.icon === "chevron" ? chevronUp : v.icon === "text" ? "⇧" : undefined} color={(v.color || undefined) as never} />
     }}</div>
   </div>
 }
