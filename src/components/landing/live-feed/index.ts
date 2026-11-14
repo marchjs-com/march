@@ -101,7 +101,9 @@ export function LiveFeed(props: LiveFeedProps): Element {
   const next = props.next;
   const pull = (): void => { const it = next?.(); if (it) add(it, true); };
   if (next) {
-    for (let i = 0; i < Math.min(max(), 3); i++) { const it = next(); if (it) add(it, false); }
+    // start nearly full: a wall of cards (max − 1), a few rows (up to 3)
+    const start = wall() ? max() - 1 : Math.min(max(), 3);
+    for (let i = 0; i < start; i++) { const it = next(); if (it) add(it, false); }
     let stop: (() => void) | null = null;
     effect(() => {
       const run = visible() && !paused() && !hovering();
