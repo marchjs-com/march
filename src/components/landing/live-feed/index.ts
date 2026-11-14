@@ -40,6 +40,8 @@ export interface LiveFeedProps {
   next?: (() => FeedItem | null | undefined) | undefined;
   /** ms between `next()` calls (default 2400). */
   every?: number | undefined;
+  /** ms before the first `next()` call (default: `every`); a short one shows the motion at once. */
+  first?: number | undefined;
   /** Items kept on screen (default 5). */
   max?: number | undefined;
   /** `list` (default): rows, newest on top · `wall`: a grid of cards. */
@@ -130,7 +132,7 @@ export function LiveFeed(props: LiveFeedProps): Element {
 
   // pulled items: one per `every` ms of clock time while visible, not paused and not hovered
   // read once: a JSX prop is a getter, and `next={source()}` would build a new source on every read
-  let acc = 0;
+  let acc = Math.max(0, (props.every ?? 2400) - (props.first ?? props.every ?? 2400));
   const next = props.next;
   const pull = (): void => { const it = next?.(); if (it) add(it, true); };
   if (next) {

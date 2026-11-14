@@ -1,4 +1,5 @@
-// Showcase stage for LiveFeed: sample HADİ activity, one new line every couple of seconds.
+// Showcase stage for LiveFeed: sample HADİ activity, one new line every couple of seconds. Every option change starts
+// the feed again with other lines and brings the first new one after 0.6 s, so the chosen motion shows at once.
 import { LiveFeed, type FeedItem } from "./index.ts";
 
 export const code = `<LiveFeed next={() => nextActivity()} every={2400} max={5} enter="drop" leave="fall" />
@@ -20,16 +21,17 @@ const ACTS: [string, string][] = [
 const COLORS = ["brand-orange", "brand-blue", "brand-green", "brand-purple"] as const
 
 /** A source of sample activity: every call returns a new line (deterministic order, no randomness in tests). */
-export function activitySource(): () => FeedItem {
-  let i = 0
+export function activitySource(from = 0): () => FeedItem {
+  let i = from
   return () => {
     const k = i++, who = PEOPLE[(k * 5) % PEOPLE.length]!, [what, body] = ACTS[(k * 3) % ACTS.length]!, where = CITIES[(k * 7) % CITIES.length]!
     return { id: `a${k}`, avatar: who[0], title: `${who} ${what}`, body: `${where} · ${body}`, meta: "şimdi", color: COLORS[k % COLORS.length] }
   }
 }
 
+let round = 0
 export default function LiveFeedDemo(props: { values: { variant: string; enter: string; leave: string; glow: boolean; every: number; max: number } }) {
   return <div class="sc-lf-stage">
-    {() => { const v = { ...props.values }; return <LiveFeed variant={v.variant as "list" | "wall"} enter={v.enter as "flip"} leave={v.leave as "blur"} glow={v.glow} every={v.every} max={v.max} next={activitySource()} label="HADİ'de şimdi" /> }}
+    {() => { const v = { ...props.values }; return <LiveFeed variant={v.variant as "list" | "wall"} enter={v.enter as "flip"} leave={v.leave as "blur"} glow={v.glow} every={v.every} first={600} max={v.max} next={activitySource(round++ * 7)} label="HADİ'de şimdi" /> }}
   </div>
 }

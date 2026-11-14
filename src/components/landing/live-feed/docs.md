@@ -19,6 +19,7 @@ lifted out of the flow while it fades and wall cards share one height, so the pa
 | `items` | `FeedItem[]` / accessor | — | newest first; a new head slides in |
 | `next` | `() => FeedItem \| null` | — | pulled every `every` ms while visible and not paused |
 | `every` | ms | `2400` | clock time between pulls |
+| `first` | ms | `every` | time before the first pull |
 | `max` | number | `5` | items kept on screen |
 | `variant` | `list` `wall` | `list` | rows, or a grid of cards |
 | `label` | string | "Live activity" | accessible name |
