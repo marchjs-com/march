@@ -27,7 +27,7 @@ export const CATEGORIES = [
   { id: "motion", label: "Hareket", title: "Motion", desc: "Animated components on the motion engine." },
   { id: "social", label: "Sosyal", title: "Social", desc: "Avatars, reactions, comments, feeds, presence." },
   { id: "composite", label: "Karmaşık bileşenler", title: "Composite", desc: "Components built from other components (composedOf)." },
-  { id: "landing", label: "Landing", title: "Landing", desc: "Hero, feature, pricing and other landing page sections." },
+  { id: "landing", label: "Web tasarım araçları", title: "Landing", desc: "Hero, feature, pricing and other landing page sections." },
 ] as const satisfies readonly Category[];
 
 export type CategoryId = (typeof CATEGORIES)[number]["id"];

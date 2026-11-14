@@ -446,7 +446,7 @@ Recipes:
 - "Prepare a presentation": one `<Presentation bind:index={$slide} presenterUrl="…?presenter=1">` with a `<Slide>` per
   slide (`layout`, `tone`, `notes`, `background={<Overlay …/>}`), lists in `<Appear>`; render the same deck with
   `presenter` on the speaker URL.
-Full samples: showcase › Landing › Örnek web siteleri (`/sites/product|portfolio|slides|redesign`).
+Full samples: showcase › Web tasarım araçları › Örnek uygulamalar › Açılış sayfaları (`/sites/product|portfolio|slides|redesign|honest|live|story`).
 ### 15c. Ready-made animations (all on the engine, each its own export)
 
 ```ts

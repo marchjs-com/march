@@ -1140,13 +1140,16 @@ Full page: src/components/forms/list-editor/docs.md
 
 ## LiveCounter
 
-A number that grows while you watch. Feed it a live value (a signal from your server), or give it a start and a `rate` per minute: it then adds small random steps on the motion clock, only while it is on screen. The digits roll like an odometer and a pulsing dot marks it as live.
+A number that grows while you watch. Feed it a live value (a signal from your server), or give it a start and a `rate` per minute: it then adds small random steps on the motion clock, only while it is on screen. Every part is yours: how the digits change, the live dot, the "+N" bubble that rises on every increase, and the small beat of the number.
 
 Composed of: [Counter](#counter)
 
 ```tsx
+import { splitFlap } from "hadi-march/motion/text"
 <LiveCounter value={$online} label="people online" />
-<LiveCounter from={18420} rate={40} label="joined an event this week" format={{ notation: "compact" }} />
+<LiveCounter from={18420} rate={40} effect={splitFlap} effectOptions={{ duration: 900 }} dotColor="brand-orange"
+  bubble={(diff) => <b>❤ {diff}</b>} beat={false} label="joined an event this week" />
+<LiveCounter value={$n} effect="none" dot={false} bubble={false} />
 ```
 
 Full page: src/components/landing/live-counter/docs.md

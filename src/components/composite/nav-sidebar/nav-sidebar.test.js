@@ -197,3 +197,27 @@ test("NavSidebar: the parent of the current page is marked too", async () => {
   if (row("/editors/terminal").getAttribute("class").includes("is-active")) assert.match(row("/editors").getAttribute("class"), /is-active-parent/);
   m.dispose();
 });
+
+test("NavSidebar: nesting goes deeper than one level; ancestors of the current page open and are marked", async () => {
+  R.navigate?.("/sites/story");
+  await tick(10);
+  const items = [
+    { id: "/sites", label: "Apps", href: "/sites", group: "Web" },
+    { id: "/sites/landing", label: "Landing pages", href: "/sites/landing", group: "Web", parent: "/sites" },
+    { id: "/sites/story", label: "Story", href: "/sites/story", group: "Web", parent: "/sites/landing" },
+    { id: "/sites/live", label: "Live", href: "/sites/live", group: "Web", parent: "/sites/landing" },
+  ];
+  const m = mount(() => h(U.NavSidebar, { items, storageKey: "t.nest3", palette: false, hotkey: false, defaultOpen: "all", recent: 0 }));
+  await tick(10);
+  const mid = m.el.querySelector('.hm-sb-row[data-id="/sites/landing"]');
+  assert.ok(mid, "the middle level is listed");
+  const midLi = mid.parentElement;
+  assert.ok(midLi.classList.contains("is-parent"), "the middle level has its own fold");
+  assert.deepEqual(midLi.querySelector(".hm-sb-kids").querySelectorAll(".hm-sb-row").map((r) => r.getAttribute("data-id")), ["/sites/story", "/sites/live"]);
+  const row = (id) => m.el.querySelector(`.hm-sb-row[data-id="${id}"]`);
+  if (row("/sites/story").getAttribute("class").includes("is-active")) {
+    assert.match(row("/sites").getAttribute("class"), /is-active-parent/, "a grandparent is marked too");
+    assert.ok(row("/sites").parentElement.classList.contains("is-kids-open"), "and opens");
+  }
+  m.dispose();
+});

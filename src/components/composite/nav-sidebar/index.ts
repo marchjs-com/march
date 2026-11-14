@@ -156,13 +156,15 @@ export function NavSidebar(props: NavSidebarProps): Element {
     return best?.id ?? chosen();
   });
   const activeGroup = (): string | undefined => { const id = active(); return id ? byId().get(id)?.group : undefined; };
-  /** A parent's children show while it is opened, or by themselves while it or one of them is the current page. */
+  /** Whether `id` is a child, grandchild… of `parent` (nested menus have any depth). */
+  const under = (parent: string, id: string, depth = 0): boolean => depth < 8 && (kidsOf().get(parent) ?? []).some((k) => k.id === id || under(k.id, id, depth + 1));
+  /** A parent's children show while it is opened, or by themselves while it or one of its descendants is the current page. */
   const kidsOpen = (id: string): boolean => {
     const s = open();
     if (s.has(`>${id}`)) return true;
     if (s.has(`<${id}`)) return false;
     const a = active();
-    return a === id || (!!a && (kidsOf().get(id) ?? []).some((k) => k.id === a));
+    return a === id || (!!a && under(id, a));
   };
   const toggleKids = (id: string): void => {
     const to = !kidsOpen(id);
@@ -235,13 +237,13 @@ export function NavSidebar(props: NavSidebarProps): Element {
       badge(x),
     ];
     const common = {
-      class: () => cx("hm-sb-row", "hm-sb-item", active() === x.id && "is-active", active() !== x.id && (kidsOf().get(x.id) ?? []).some((k) => k.id === active()) && "is-active-parent"), "data-id": x.id, "data-where": where,
+      class: () => cx("hm-sb-row", "hm-sb-item", active() === x.id && "is-active", active() !== x.id && !!active() && under(x.id, active()!) && "is-active-parent"), "data-id": x.id, "data-where": where,
       title: () => (rail() ? text(x.label) : null), "aria-current": () => (active() === x.id ? "page" : null),
     };
     const el = x.href && !x.onSelect
       ? h(Link, { ...common, href: x.href, children: body })
       : h("button", { ...common, type: "button", onClick: () => { if (!x.href) chosen.set(x.id); x.onSelect?.(); if (x.href) void navigate(x.href); } }, body);
-    const kids = where === "group" || where === "main" ? kidsOf().get(x.id) : undefined;
+    const kids = where === "group" || where === "main" || where === "child" ? kidsOf().get(x.id) : undefined;
     if (!kids?.length) return h("li", { class: "hm-sb-li" }, el);
     const kid = uid("hm-sbk");
     return h("li", { class: () => cx("hm-sb-li", "is-parent", kidsOpen(x.id) && "is-kids-open") },

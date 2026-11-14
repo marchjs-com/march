@@ -10,9 +10,9 @@ html.hm-scroll-lock { overflow: hidden; }
 .hm-dialog-head { display: flex; align-items: center; gap: var(--hm-space-2); padding-block: var(--hm-space-4) 0; padding-inline: var(--hm-space-5) var(--hm-space-4); min-height: 3.25rem; }
 .hm-dialog-title { flex: 1; margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); letter-spacing: var(--hm-tracking-tight); }
 .hm-dialog-x { margin-inline-end: calc(-1 * var(--hm-space-1)); width: 2rem; height: 2rem; }
-.hm-dialog-body { padding: var(--hm-space-4) var(--hm-space-5); overflow: auto; overscroll-behavior: contain; }
+.hm-dialog-body { flex: 1 1 auto; min-height: 0; padding: var(--hm-space-4) var(--hm-space-5); overflow: auto; overscroll-behavior: contain; }
 .hm-dialog-msg { margin: 0 0 var(--hm-space-3); color: var(--hm-text-2); white-space: pre-line; }
-.hm-dialog-foot { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: var(--hm-space-2); padding: var(--hm-space-3) var(--hm-space-5); border-top: 1px solid var(--hm-border-subtle);
+.hm-dialog-foot { display: flex; justify-content: flex-end; margin-block-start: auto; flex-wrap: wrap; gap: var(--hm-space-2); padding: var(--hm-space-3) var(--hm-space-5); border-top: 1px solid var(--hm-border-subtle);
   background: var(--hm-bg-subtle); border-radius: 0 0 var(--hm-radius-4) var(--hm-radius-4); }
 .hm-overlay-drawer { padding: 0; justify-content: flex-end; align-items: stretch; }
 .hm-drawer { display: flex; flex-direction: column; width: min(30rem, 100vw); height: 100%; background: var(--hm-surface-raised); color: var(--hm-text); box-shadow: var(--hm-shadow-4); outline: none;
