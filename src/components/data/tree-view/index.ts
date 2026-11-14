@@ -20,6 +20,7 @@ import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { folder } from "../../../icons/glyphs/folder.ts";
 import { fileText } from "../../../icons/glyphs/fileText.ts";
 import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface TreeViewNode {
   id: string;
@@ -36,6 +37,22 @@ export interface TreeViewNode {
   data?: unknown;
 }
 export type DropPosition = "before" | "after" | "inside";
+/** Texts TreeView writes itself; pass any of them in `labels`. */
+export interface TreeViewLabels {
+  /** Accessible name of the spinner of a loading folder. */
+  loading: (label: string) => string;
+  retry: string;
+  /** Shown when the tree has no nodes. */
+  empty: string;
+  /** Shown when the search has no hit. */
+  noMatch: (query: string) => string;
+}
+const LABELS: { [K in keyof TreeViewLabels]: () => TreeViewLabels[K] } = {
+  loading: () => (label) => t`Loading ${label}`,
+  retry: () => t`Retry`,
+  empty: () => t`Empty`,
+  noMatch: () => (query) => t`Nothing matches "${query}"`,
+};
 
 export interface TreeViewProps {
   nodes: MaybeFn<readonly TreeViewNode[]>;
@@ -62,6 +79,18 @@ export interface TreeViewProps {
   rowHeight?: number | undefined;
   /** Folder / file icons when a node has none (default true). */
   icons?: MaybeFn<boolean | undefined>;
+  /** The open / close arrow: true (default), false (rows still open with a double click and the keyboard), or `(node, open) => node`. */
+  chevron?: boolean | ((node: TreeViewNode, open: boolean) => unknown) | undefined;
+  /** The empty state: true (default: the text in `labels`), false, or your own node. */
+  empty?: unknown;
+  /** Content of the drag ghost: `(nodes) => node` (default: the first label and a count). */
+  ghost?: ((nodes: TreeViewNode[]) => unknown) | undefined;
+  /** Your own texts: `{ loading, retry, empty, noMatch }`. */
+  labels?: Partial<TreeViewLabels> | undefined;
+  /** Opening, landing and ghost animations (default true). */
+  animate?: boolean | undefined;
+  /** Colour of selected rows (theme token; default: the accent). */
+  color?: ColorToken | undefined;
   label?: MaybeFn<string | undefined>;
   class?: ClassProp;
 }
@@ -113,6 +142,8 @@ export function TreeView(props: TreeViewProps): Element {
   const query = (): string => (val(props.search) ?? "").trim();
   const rtl = (): boolean => dir() === "rtl";
   const canDrag = (): boolean => !!val(props.draggable);
+  const lb = <K extends keyof TreeViewLabels>(k: K): TreeViewLabels[K] => props.labels?.[k] ?? LABELS[k]();
+  const motion = props.animate !== false;
 
   // ------------------------------------------------------------------ index: every loaded node, its parent
   const index = computed(() => {
@@ -178,7 +209,7 @@ export function TreeView(props: TreeViewProps): Element {
     }
   };
   // lazy folders that start open (expanded) load at once, as if opened by hand
-  queueMicrotask(() => { const byId = untrack(index).byId; for (const id of props.expanded ?? []) { const n = byId.get(id); if (n) fetchKids(n); } });
+  queueMicrotask(() => { const byId = (untrack(index) as ReturnType<typeof index> | undefined)?.byId; if (!byId) return; /* removed in the same tick */ for (const id of props.expanded ?? []) { const n = byId.get(id); if (n) fetchKids(n); } });
 
   // ------------------------------------------------------------------ moving nodes
   const isInside = (nid: string, ancestor: string): boolean => { const par = untrack(index).parent; for (let p: string | null | undefined = nid; p; p = par.get(p)) if (p === ancestor) return true; return false; };
@@ -217,11 +248,13 @@ export function TreeView(props: TreeViewProps): Element {
       "aria-expanded": r.kids ? String(r.open) : null, "aria-selected": sel.mode() === "none" ? null : String(isSel), "aria-disabled": n.disabled ? "true" : null,
       "aria-busy": isLoading ? "true" : null, "data-i": String(i), "data-id": n.id,
     },
-    h("span", { class: cx("hm-tv-chev", !r.kids && "is-leaf", r.open && "is-open"), "data-chev": "", "aria-hidden": "true" }, r.kids ? glyph(chevronRight) : null),
+    props.chevron === false ? null : typeof props.chevron === "function"
+      ? h("span", { class: cx("hm-tv-chev is-own", !r.kids && "is-leaf"), "data-chev": "", "aria-hidden": "true" }, r.kids ? props.chevron(n, r.open) : null)
+      : h("span", { class: cx("hm-tv-chev", !r.kids && "is-leaf", r.open && "is-open"), "data-chev": "", "aria-hidden": "true" }, r.kids ? glyph(chevronRight) : null),
     n.icon != null ? icon(n.icon, "hm-tv-icon") : def ? h("span", { class: cx("hm-tv-icon", r.kids && "is-folder"), "aria-hidden": "true" }, glyph(def)) : null,
     h("span", { class: "hm-tv-label" }, q ? markText(n.label, q) : n.label),
-    isLoading ? h(Spinner, { size: "sm", label: t`Loading ${n.label}` }) : null,
-    err ? h("button", { type: "button", class: "hm-tv-retry", "data-chev": "", onClick: (e: Event) => { e.stopPropagation(); void loadKids(n); } }, glyph(alertCircle), t`Retry`) : null,
+    isLoading ? h(Spinner, { size: "sm", label: lb("loading")(n.label) }) : null,
+    err ? h("button", { type: "button", class: "hm-tv-retry", "data-chev": "", onClick: (e: Event) => { e.stopPropagation(); void loadKids(n); } }, glyph(alertCircle), lb("retry")) : null,
     n.meta != null ? h("span", { class: "hm-tv-meta" }, n.meta) : null) as HTMLElement;
     setStyle(el, { height: `${rowH}px`, transform: `translateY(${i * rowH}px)`, "--hm-tv-depth": String(r.depth) });
     return el;
@@ -229,9 +262,10 @@ export function TreeView(props: TreeViewProps): Element {
 
   const canvas = h("div", { class: "hm-tv-canvas", role: "none" }) as HTMLElement;
   const dropLine = h("div", { class: "hm-tv-drop", "aria-hidden": "true" }) as HTMLElement;
-  const empty = h("div", { class: "hm-tv-empty", hidden: () => flat().length > 0 }, () => (query() ? t`Nothing matches "${query()}"` : t`Empty`)) as HTMLElement;
+  const empty = props.empty === false ? null : h("div", { class: "hm-tv-empty", hidden: () => flat().length > 0 },
+    props.empty != null && props.empty !== true ? props.empty : () => (query() ? lb("noMatch")(query()) : lb("empty"))) as HTMLElement;
   const scroller = h("div", {
-    role: "tree", class: () => cx("hm-tv", canDrag() && "is-draggable", val(props.class)), tabindex: "0", "aria-label": () => val(props.label) ?? t`Tree`,
+    role: "tree", class: () => cx("hm-tv", canDrag() && "is-draggable", val(props.class)), tabindex: "0", "aria-label": () => val(props.label) ?? t`Tree`, "data-hm-color": () => colorAttr(props.color),
     "aria-multiselectable": () => (sel.mode() === "multiple" ? "true" : null),
   }, canvas, dropLine, empty) as HTMLElement;
   setStyle(scroller, { height: `${props.height ?? 360}px` });
@@ -273,7 +307,7 @@ export function TreeView(props: TreeViewProps): Element {
       const depth = (list[di] as Row).depth;
       setStyle(dropLine, { opacity: d.ok && d.pos !== "inside" ? "1" : "0", transform: `translateY(${(d.pos === "after" ? di + 1 : di) * rowH - 1}px)`, "--hm-tv-depth": String(depth) });
     } else setStyle(dropLine, { opacity: "0" });
-    if (fresh.length) {
+    if (fresh.length && motion) {
       const st = stagger(18);
       fresh.slice(0, 30).forEach((el, n) => void animate(el, landed ? [{ opacity: .3, scale: ".97" }, { opacity: 1, scale: "1" }] : [{ opacity: 0, translate: "0 -8px" }, { opacity: 1, translate: "0 0" }], { duration: landed ? 360 : 220, delay: st(n), easing: landed ? "easeOutBack" : "easeOutCubic" }));
     }
@@ -359,10 +393,13 @@ export function TreeView(props: TreeViewProps): Element {
         const s = sel.has(r.node.id) ? sel.keys() : [r.node.id];
         ids = s.filter((k) => !s.some((o) => o !== k && isInside(k, o)));
         dragging.set(new Set(ids));
-        ghost = h("div", { class: "hm-tv-ghost" }, h("span", { class: "hm-tv-ghost-label" }, r.node.label), ids.length > 1 ? h("b", { class: "hm-tv-ghost-count" }, String(ids.length)) : null) as HTMLElement;
+        const byId = untrack(index).byId;
+        ghost = (props.ghost
+          ? h("div", { class: "hm-tv-ghost is-own" }, props.ghost(ids.map((k) => byId.get(k)).filter((x): x is TreeViewNode => !!x)))
+          : h("div", { class: "hm-tv-ghost" }, h("span", { class: "hm-tv-ghost-label" }, r.node.label), ids.length > 1 ? h("b", { class: "hm-tv-ghost-count" }, String(ids.length)) : null)) as HTMLElement;
         setStyle(ghost, { left: "0", top: "0" }); // viewport coordinates of the pointer, the same in RTL
         closeGhost = openLayer("drag", ghost);
-        void animate(ghost, [{ opacity: 0, scale: ".9" }, { opacity: 1, scale: "1" }], { duration: 160, easing: "easeOutCubic" });
+        if (motion) void animate(ghost, [{ opacity: 0, scale: ".9" }, { opacity: 1, scale: "1" }], { duration: 160, easing: "easeOutCubic" });
       },
       onMove: (p) => {
         setStyle(ghost, { transform: `translate(${p.clientX + 14}px, ${p.clientY + 10}px)` });
@@ -383,7 +420,7 @@ export function TreeView(props: TreeViewProps): Element {
         const d = untrack(drop);
         batch(() => { drop.set(null); dragging.set(new Set()); });
         const g = ghost as HTMLElement | null;
-        if (g) void animate(g, [{ opacity: 1 }, { opacity: 0, scale: ".9" }], { duration: 140 }).finished.then(closeGhost); else closeGhost();
+        if (g && motion) void animate(g, [{ opacity: 1 }, { opacity: 0, scale: ".9" }], { duration: 140 }).finished.then(closeGhost); else closeGhost();
         if (!cancelled && d?.ok) move(ids, d.id, d.pos);
       },
     });

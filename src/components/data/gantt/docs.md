@@ -27,7 +27,20 @@ import { Gantt } from "hadi-march/components/data/gantt";
 | `arrows` | boolean | `true` | dependency arrows |
 | `height` | px | `420` | |
 | `rowHeight` | px | `36` | |
+| `todayLine` | boolean / accessor | `true` | the today line and its label |
+| `names` | boolean | `true` | the pinned column of task names |
+| `help` | boolean / node | `true` | the hint under the chart: the text of `labels`, off, or your own node |
+| `barLabel` | `(task) => node` | the task name | content of a bar |
+| `labels` | `Partial<GanttLabels>` | built-in texts | `today`, `task`, `help`, `helpReadonly`, and the functions `days(n)`, `done(percent)`, `after(names)`, `moved(name, start, end)`, `pushed(n)` |
+| `animate` | boolean | `true` | arrow drawing, settle and scale-change animations |
 | `label` | string | "Project timeline" | accessible name |
+| `class` | class | — | extra class on the root |
+
+```tsx
+<Gantt tasks={$tasks} names={false} help={false} todayLine={false} animate={false}
+  barLabel={(task) => <>{task.name} · {Math.round((task.progress ?? 0) * 100)}%</>}
+  labels={{ today: "Now", task: "Work item", days: (n) => `${n} days` }} />
+```
 
 Dates come from `core/date` (`diffDays`, `addDays`, `startOfWeek`, `dateFormat` …), drags from `pointerDrag`
 (hadi-march/motion).

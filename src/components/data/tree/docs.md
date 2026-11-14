@@ -17,6 +17,14 @@ children or drag and drop use TreeView.
 | `selected` | id / accessor | — | selected node |
 | `onSelect` | `(node) => void` | — | click / Enter / Space |
 | `label` | string | "Tree" | accessible name |
+| `chevron` | boolean / `(node, open) => node` | `true` | the open / close arrow, off, or your own (`open()` is live) |
+| `color` | ColorToken | the accent | colour of the selected row |
+| `class` | class | — | extra class on the tree |
+
+```tsx
+<Tree nodes={files} color="brand-purple" chevron={(node, open) => <span>{() => (open() ? "−" : "+")}</span>} />
+<Tree nodes={files} chevron={false} />
+```
 
 ## Accessibility
 

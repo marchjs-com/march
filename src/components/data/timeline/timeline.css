@@ -10,3 +10,6 @@
 .hm-tl-time { display: block; color: var(--hm-muted); font-size: var(--hm-text-xs); font-variant-numeric: tabular-nums; }
 .hm-tl-title { font-weight: var(--hm-weight-medium); }
 .hm-tl-body { color: var(--hm-muted); font-size: var(--hm-text-sm); }
+.hm-tl-dot[data-hm-color] { border-color: var(--hm-accent); color: var(--hm-accent-text); }
+.hm-tl-dot.is-own { width: auto; min-width: 1rem; height: auto; border: 0; background: none; font-size: inherit; }
+.hm-timeline-no-line .hm-tl-item:not(:last-child)::before { display: none; }

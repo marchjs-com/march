@@ -33,6 +33,40 @@ export interface SchedulerEvent {
 }
 export type SchedulerView = "month" | "week" | "day";
 export interface SchedulerRange { start: string; end: string; allDay: boolean }
+/** Texts Scheduler writes itself; pass any of them in `labels`. */
+export interface SchedulerLabels {
+  allDay: string;
+  /** Hidden events of a month day ("+2 more"). */
+  more: (count: number) => string;
+  month: string;
+  week: string;
+  day: string;
+  /** Accessible name of the previous / today / next group. */
+  period: string;
+  previous: string;
+  today: string;
+  next: string;
+  /** Accessible name of the view switch. */
+  view: string;
+  /** The hint under the calendar while it is editable. */
+  help: string;
+  /** Announced after a move ("Demo moved to Monday 3 March, 10:00 – 11:00"). */
+  moved: (title: string, day: string, time: string) => string;
+}
+const LABELS: { [K in keyof SchedulerLabels]: () => SchedulerLabels[K] } = {
+  allDay: () => t`All day`,
+  more: () => (count) => t`+${count} more`,
+  month: () => t`Month`,
+  week: () => t`Week`,
+  day: () => t`Day`,
+  period: () => t`Period`,
+  previous: () => t`Previous`,
+  today: () => t`Today`,
+  next: () => t`Next`,
+  view: () => t`View`,
+  help: () => t`Drag an event to move it, its edge to resize it. Keyboard: Alt+arrows move, Alt+Shift+arrows resize, PageUp / PageDown change the period.`,
+  moved: () => (title, day, time) => t`${title} moved to ${day}, ${time}`,
+};
 
 export interface SchedulerProps {
   events: MaybeFn<readonly SchedulerEvent[]>;
@@ -61,6 +95,22 @@ export interface SchedulerProps {
   height?: number | undefined;
   /** Date locale (default: the app locale). Names, first day of week, 12 / 24 h and direction follow it. */
   locale?: MaybeFn<string | undefined>;
+  /** The bar above the calendar: period buttons, title and view switch (default true). */
+  toolbar?: boolean | undefined;
+  /** Views offered by the view switch (default all three); false or a single view hides the switch. */
+  views?: readonly SchedulerView[] | false | undefined;
+  /** The "Today" button (default true). */
+  todayButton?: boolean | undefined;
+  /** The line at the current time in week / day view (default true). */
+  nowLine?: boolean | undefined;
+  /** The hint under the calendar: true (default: the text in `labels`), false, or your own node. */
+  help?: unknown;
+  /** Content of an event: `(event, { view, time }) => node` (default: title, time and place). */
+  renderEvent?: ((event: SchedulerEvent, info: { view: SchedulerView; time: string }) => unknown) | undefined;
+  /** Your own texts (see SchedulerLabels). */
+  labels?: Partial<SchedulerLabels> | undefined;
+  /** Slide, view-change and settle animations (default true). */
+  animate?: boolean | undefined;
   label?: MaybeFn<string | undefined>;
   class?: ClassProp;
 }
@@ -94,6 +144,8 @@ export function Scheduler(props: SchedulerProps): Element {
   tickNow();
   onCleanup(() => clearTimeout(clock));
   const status = signal("");
+  const lb = <K extends keyof SchedulerLabels>(k: K): SchedulerLabels[K] => props.labels?.[k] ?? LABELS[k]();
+  const motion = props.animate !== false;
 
   // ------------------------------------------------------------------ events, normalized
   const norm = computed((): Norm[] => events().map((ev) => {
@@ -120,14 +172,14 @@ export function Scheduler(props: SchedulerProps): Element {
     const a = utcDate(ds[0] as IsoDate), b = utcDate(ds[ds.length - 1] as IsoDate);
     return f.formatRange ? f.formatRange(a, b) : `${f.format(a)} – ${f.format(b)}`;
   };
-  const timeText = (n: Norm): string => (n.allDay ? t`All day` : `${formatMinutes(n.sm, loc())} – ${formatMinutes(n.em, loc())}`);
+  const timeText = (n: Norm): string => (n.allDay ? lb("allDay") : `${formatMinutes(n.sm, loc())} – ${formatMinutes(n.em, loc())}`);
   const dayText = (d: IsoDate): string => dateFormat(loc(), { weekday: "long", day: "numeric", month: "long" }).format(utcDate(d));
   const evLabel = (n: Norm): string => `${n.ev.title}, ${dayText(n.sd)}${n.lastDay !== n.sd ? ` – ${dayText(n.lastDay)}` : ""}, ${timeText(n)}${n.ev.location ? `, ${n.ev.location}` : ""}`;
 
   // ------------------------------------------------------------------ navigation (slide in the direction of travel)
   let body!: HTMLElement;
   const slide = (dirn: number): void => {
-    if (!body) return;
+    if (!body || !motion) return;
     const x = dirn * (rtl() ? -1 : 1) * 28;
     void animate(body, [{ opacity: 0, transform: `translateX(${x}px)` }, { opacity: 1, transform: "none" }], { duration: 260, easing: "easeOutCubic" });
   };
@@ -141,7 +193,7 @@ export function Scheduler(props: SchedulerProps): Element {
     scrolledOnce = false;
     view.set(v);
     props.onView?.(v);
-    if (body) void animate(body, [{ opacity: 0, transform: "scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "easeOutCubic" });
+    if (body && motion) void animate(body, [{ opacity: 0, transform: "scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "easeOutCubic" });
   };
 
   // ------------------------------------------------------------------ changing events
@@ -149,8 +201,8 @@ export function Scheduler(props: SchedulerProps): Element {
     const ev = n.ev, upd: SchedulerEvent = { ...ev, start: next.start, end: next.end };
     events.set(untrack(events).map((x) => (x.id === ev.id ? upd : x)));
     props.onChange?.(upd, next);
-    if (say) { const m = untrack(norm).find((x) => x.ev.id === ev.id); if (m) status.set(t`${ev.title} moved to ${dayText(m.sd)}, ${timeText(m)}`); }
-    later(() => { const el = [...(body?.querySelectorAll<HTMLElement>("[data-ev]") ?? [])].find((x) => x.dataset["ev"] === ev.id); if (el) { el.focus({ preventScroll: true }); void animate(el, [{ transform: "scale(1.04)" }, { transform: "none" }], { duration: 320, easing: "easeOutBack" }); } }, 0);
+    if (say) { const m = untrack(norm).find((x) => x.ev.id === ev.id); if (m) status.set(lb("moved")(ev.title, dayText(m.sd), timeText(m))); }
+    later(() => { const el = [...(body?.querySelectorAll<HTMLElement>("[data-ev]") ?? [])].find((x) => x.dataset["ev"] === ev.id); if (el) { el.focus({ preventScroll: true }); if (motion) void animate(el, [{ transform: "scale(1.04)" }, { transform: "none" }], { duration: 320, easing: "easeOutBack" }); } }, 0);
   };
   const moveBy = (n: Norm, dDays: number, dMin: number, which: "move" | "start" | "end"): SchedulerRange => {
     if (n.allDay) {
@@ -183,9 +235,10 @@ export function Scheduler(props: SchedulerProps): Element {
       type: "button", class: cx("hm-sch-ev", cls, n.allDay && "is-allday"), "data-hm-color": colorAttr(n.ev.color ?? "primary"), "data-ev": n.ev.id,
       "aria-label": evLabel(n), title: evLabel(n), onKeydown: evKeys(n), ...extra,
     },
-    h("span", { class: "hm-sch-ev-title" }, n.ev.title),
-    !n.allDay && cls === "hm-sch-block" ? h("span", { class: "hm-sch-ev-time" }, timeText(n)) : null,
-    n.ev.location && cls === "hm-sch-block" ? h("span", { class: "hm-sch-ev-loc" }, n.ev.location) : null,
+    ...(props.renderEvent ? [h("span", { class: "hm-sch-ev-own" }, props.renderEvent(n.ev, { view: untrack(view), time: timeText(n) }))] : [
+      h("span", { class: "hm-sch-ev-title" }, n.ev.title),
+      !n.allDay && cls === "hm-sch-block" ? h("span", { class: "hm-sch-ev-time" }, timeText(n)) : null,
+      n.ev.location && cls === "hm-sch-block" ? h("span", { class: "hm-sch-ev-loc" }, n.ev.location) : null]),
     handles && editable() ? h("span", { class: "hm-sch-handle hm-sch-handle-end", "data-handle": "end", "aria-hidden": "true" }) : null,
     handles && editable() && cls === "hm-sch-block" ? h("span", { class: "hm-sch-handle hm-sch-handle-start", "data-handle": "start", "aria-hidden": "true" }) : null) as HTMLElement;
     el.addEventListener("click", () => { if (!dragged) props.onSelect?.(n.ev); });
@@ -263,7 +316,7 @@ export function Scheduler(props: SchedulerProps): Element {
               later(() => body?.querySelector<HTMLElement>(`[data-focus="${nd}"]`)?.focus(), 0);
             },
           }, String(Number(d.slice(8)))),
-          more ? h("button", { type: "button", class: "hm-sch-more", onClick: () => setView("day", d) }, t`+${more} more`) : null);
+          more ? h("button", { type: "button", class: "hm-sch-more", onClick: () => setView("day", d) }, lb("more")(more)) : null);
         if (editable() && props.onCreate) cell.addEventListener("dblclick", (e) => { if (e.target === cell) props.onCreate?.({ start: d, end: d, allDay: true }); });
         setStyle(cell as HTMLElement, { "grid-column": String(i + 1) });
         row.append(cell);
@@ -324,7 +377,7 @@ export function Scheduler(props: SchedulerProps): Element {
       if (editable()) el.addEventListener("pointerdown", (e) => { if (e.button) return; const hd = (e.target as HTMLElement).dataset["handle"] as "end" | undefined; dayDrag(e, s.n, alldayGrid, n, () => ds, hd ?? "move"); });
       alldayGrid.append(el);
     }
-    const allday = h("div", { class: "hm-sch-allday", role: "row" }, h("div", { class: "hm-sch-corner hm-sch-allday-label" }, t`All day`), alldayGrid);
+    const allday = h("div", { class: "hm-sch-allday", role: "row" }, h("div", { class: "hm-sch-corner hm-sch-allday-label" }, lb("allDay")), alldayGrid);
 
     // body: hour gutter + day columns
     const hours = h("div", { class: cx("hm-sch-hours", editable() && "is-editable"), "aria-hidden": "true" }, Array.from({ length: 24 }, (_, hr) => h("div", { class: "hm-sch-hour" }, hr ? h("span", {}, formatMinutes(hr * 60, loc(), { hour: "numeric" })) : null)));
@@ -345,7 +398,7 @@ export function Scheduler(props: SchedulerProps): Element {
         if (editable()) el.addEventListener("pointerdown", (e) => timeDrag(e, x, el, colW, ci, ds));
         col.append(el);
       }
-      if (d === td) { const now = h("div", { class: "hm-sch-now", "aria-hidden": "true" }) as HTMLElement; effect(() => setStyle(now, { top: `${(nowMin() / 60) * H}px` })); col.append(now); }
+      if (d === td && props.nowLine !== false) { const now = h("div", { class: "hm-sch-now", "aria-hidden": "true" }) as HTMLElement; effect(() => setStyle(now, { top: `${(nowMin() / 60) * H}px` })); col.append(now); }
       if (editable() && props.onCreate) col.addEventListener("pointerdown", (e) => { if (e.target === col && !e.button) createDrag(e, col, d); });
       cols.append(col);
     });
@@ -402,7 +455,7 @@ export function Scheduler(props: SchedulerProps): Element {
       onMove: (p) => { const m = clamp(m0 + snapMinutes((p.dy / H) * 60, st), 0, 1440); a = Math.min(m0, m); b = Math.max(m0 + st, m); draw(); },
       onEnd: (_p, cancelled) => {
         if (cancelled) { draft.remove(); return; }
-        void animate(draft, [{ opacity: 1 }, { opacity: 0 }], { duration: 180 }).finished.then(() => draft.remove());
+        if (motion) void animate(draft, [{ opacity: 1 }, { opacity: 0 }], { duration: 180 }).finished.then(() => draft.remove()); else draft.remove();
         props.onCreate?.({ start: joinDateTime(d, a), end: joinDateTime(d, b), allDay: false });
       },
       onClick: () => props.onCreate?.({ start: joinDateTime(d, m0), end: joinDateTime(d, m0 + 60), allDay: false }),
@@ -410,23 +463,23 @@ export function Scheduler(props: SchedulerProps): Element {
   };
 
   // ------------------------------------------------------------------ frame
-  const viewLabels = (): Record<SchedulerView, string> => ({ month: t`Month`, week: t`Week`, day: t`Day` });
-  const toolbar = h("div", { class: "hm-sch-toolbar" },
-    h(ButtonGroup, { label: () => t`Period`, attached: true },
-      h(IconButton, { icon: () => (rtl() ? chevronRight : chevronLeft), label: () => t`Previous`, variant: "ghost", onClick: () => shift(-1) }),
-      h(Button, { variant: "secondary", size: "sm", onClick: () => go(today(), cur() < today() ? 1 : -1) }, () => t`Today`),
-      h(IconButton, { icon: () => (rtl() ? chevronLeft : chevronRight), label: () => t`Next`, variant: "ghost", onClick: () => shift(1) })),
+  const viewList = props.views === false ? [] : props.views ?? VIEWS;
+  const toolbar = props.toolbar === false ? null : h("div", { class: "hm-sch-toolbar" },
+    h(ButtonGroup, { label: () => lb("period"), attached: true },
+      h(IconButton, { icon: () => (rtl() ? chevronRight : chevronLeft), label: () => lb("previous"), variant: "ghost", onClick: () => shift(-1) }),
+      props.todayButton === false ? null : h(Button, { variant: "secondary", size: "sm", onClick: () => go(today(), cur() < today() ? 1 : -1) }, () => lb("today")),
+      h(IconButton, { icon: () => (rtl() ? chevronLeft : chevronRight), label: () => lb("next"), variant: "ghost", onClick: () => shift(1) })),
     h("h3", { class: "hm-sch-title", id: `${id}-title`, "aria-live": "polite" }, title),
-    h(Segmented, { class: "hm-sch-views", "aria-label": t`View`, value: view, onChange: (v: unknown) => setView(v as SchedulerView), options: () => VIEWS.map((v) => ({ value: v, label: viewLabels()[v] })) }));
+    viewList.length < 2 ? null : h(Segmented, { class: "hm-sch-views", "aria-label": lb("view"), value: view, onChange: (v: unknown) => setView(v as SchedulerView), options: () => viewList.map((v) => ({ value: v, label: lb(v) })) }));
   body = h("div", { class: "hm-sch-body" }, () => (view() === "month" ? Month() : TimeGrid())) as HTMLElement;
   const root = h("section", {
-    class: () => cx("hm-sch", val(props.class)), lang: () => val(props.locale) ?? null, dir: () => (val(props.locale) ? (rtl() ? "rtl" : "ltr") : null), "aria-label": () => val(props.label) ?? t`Calendar`, "aria-describedby": `${id}-help`,
+    class: () => cx("hm-sch", val(props.class)), lang: () => val(props.locale) ?? null, dir: () => (val(props.locale) ? (rtl() ? "rtl" : "ltr") : null), "aria-label": () => val(props.label) ?? t`Calendar`, "aria-describedby": props.help === false ? null : `${id}-help`,
     onKeydown: (e: KeyboardEvent) => {
       if ((e.target as Element).closest(".hm-sch-ev")) return;
       if (e.key === "PageUp" || e.key === "PageDown") { e.preventDefault(); shift(e.key === "PageUp" ? -1 : 1); }
     },
   }, toolbar, body,
-  h("p", { class: "hm-sch-help", id: `${id}-help` }, () => (editable() ? t`Drag an event to move it, its edge to resize it. Keyboard: Alt+arrows move, Alt+Shift+arrows resize, PageUp / PageDown change the period.` : "")),
+  props.help === false ? null : h("p", { class: "hm-sch-help", id: `${id}-help` }, props.help != null && props.help !== true ? props.help : () => (editable() ? lb("help") : "")),
   h("div", { class: "hm-sch-status", role: "status", "aria-live": "polite" }, status)) as HTMLElement;
   onCleanup(() => { scrollBox = null; });
   return root;

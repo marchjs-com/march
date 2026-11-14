@@ -22,3 +22,17 @@ test("Kanban: columns, counts, tones and keyboard moves", () => {
   assert.deepEqual(moves, [["1", "a", "b"]], "no column before the first");
   m.dispose();
 });
+
+test("Kanban: colour token, own dot and count, parts off, no entrance", () => {
+  const cols = [{ id: "a", title: "A", color: "brand-orange", items: [{ id: "1" }] }];
+  const base = { columns: cols, itemKey: (x) => x.id, card: (x) => x.id };
+  const m = mount(() => [h(Kanban, base), h(Kanban, { ...base, dot: false, count: false, animate: false, class: "mine" }), h(Kanban, { ...base, dot: () => h("i", { class: "own-dot" }), count: (c) => `${c.items.length} / 5` })]);
+  const [a, b, c] = m.el.querySelectorAll(".hm-kanban");
+  assert.equal(a.querySelector(".hm-kanban-dot").getAttribute("data-hm-color"), "brand-orange");
+  assert.ok(!a.className.includes("is-still"));
+  assert.equal(b.querySelector(".hm-kanban-dot, .hm-kanban-count"), null);
+  assert.ok(b.className.includes("is-still") && b.className.includes("mine"));
+  assert.ok(c.querySelector(".hm-kanban-dot-own .own-dot"));
+  assert.equal(c.querySelector(".hm-kanban-count").textContent, "1 / 5");
+  m.dispose();
+});

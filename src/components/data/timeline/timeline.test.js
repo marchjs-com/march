@@ -20,3 +20,16 @@ test("Timeline: ordered items, tones, text and machine-readable times", () => {
   assert.equal(items[0].querySelector(".hm-tl-body").textContent, "#1");
   m.dispose();
 });
+
+test("Timeline: colour token, own dot, no dot, no line, own time text", () => {
+  const items = [{ time: 5, title: "A", color: "brand-purple" }, { title: "B" }];
+  const m = mount(() => [h(Timeline, { items }), h(Timeline, { items, dot: false, line: false, formatTime: (v) => `t${v}` }), h(Timeline, { items, dot: (_x, i) => h("b", {}, String(i + 1)) })]);
+  const [a, b, c] = m.el.querySelectorAll("ol.hm-timeline");
+  assert.equal(a.querySelector(".hm-tl-dot").getAttribute("data-hm-color"), "brand-purple");
+  assert.ok(!a.className.includes("hm-timeline-no-line"));
+  assert.equal(b.querySelector(".hm-tl-dot"), null);
+  assert.ok(b.className.includes("hm-timeline-no-line"));
+  assert.equal(b.querySelector("time").textContent, "t5");
+  assert.deepEqual([...c.querySelectorAll(".hm-tl-dot.is-own")].map((x) => x.textContent), ["1", "2"]);
+  m.dispose();
+});

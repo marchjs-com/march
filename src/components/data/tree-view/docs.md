@@ -33,7 +33,21 @@ import { TreeView } from "hadi-march/components/data/tree-view";
 | `height` | px | `360` | |
 | `rowHeight` | px | `32` | |
 | `icons` | boolean / accessor | `true` | folder / file icons for nodes without their own |
+| `chevron` | boolean / `(node, open) => node` | `true` | the open / close arrow, off (double click and the keyboard still open rows), or your own |
+| `empty` | boolean / node | `true` | the empty state: the text of `labels`, off, or your own node |
+| `ghost` | `(nodes) => node` | first label + count | content of the drag ghost |
+| `labels` | `{ loading?, retry?, empty?, noMatch? }` | built-in texts | your own texts; `loading(label)` and `noMatch(query)` are functions |
+| `animate` | boolean | `true` | opening, landing and ghost animations |
+| `color` | ColorToken | the accent | colour of selected rows |
 | `label` | string | "Tree" | accessible name |
+| `class` | class | — | extra class on the tree |
+
+```tsx
+<TreeView nodes={files} color="brand-purple" animate={false}
+  chevron={(node, open) => (open ? "−" : "+")}
+  labels={{ retry: "Try again", empty: "No files yet", noMatch: (q) => `No file named "${q}"` }}
+  ghost={(nodes) => <b>{nodes.length} files</b>} />
+```
 
 Shared pieces it uses: `createAxis` / `createViewport` (core/virtual), `createSelection` / `moveCursor`
 (core/selection), `pointerDrag` (hadi-march/motion), `markText` (ui/mark) and `matchRanges` (core/text), the drag layer

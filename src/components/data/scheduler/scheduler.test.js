@@ -81,3 +81,30 @@ test("Scheduler month view: bars in lanes, +N more, arrow keys move the day focu
   assert.equal(m.el.querySelector('.hm-sch-daynum[tabindex="0"]').dataset.focus, "2026-11-13");
   m.dispose();
 });
+
+test("Scheduler: own texts, parts off (toolbar, today, views, now line, hint), own event content", () => {
+  locale.set("en-GB");
+  const base = { events: evs(), date: "2026-11-12", view: "week" };
+  const m = mount(() => [
+    h(Scheduler, { ...base, labels: { allDay: "Whole day", today: "Now", week: "7 days" }, renderEvent: (e, i) => h("i", { class: "own-ev" }, `${e.title} @ ${i.time}`), help: "hint!" }),
+    h(Scheduler, { ...base, todayButton: false, views: ["week", "day"], help: false, nowLine: false, animate: false }),
+    h(Scheduler, { ...base, toolbar: false, class: "mine" }),
+    h(Scheduler, { ...base, views: false }),
+  ]);
+  const [a, b, c, d] = m.el.querySelectorAll(".hm-sch");
+  const texts = (el, sel) => [...el.querySelectorAll(sel)].map((x) => x.textContent);
+  assert.equal(a.querySelector(".hm-sch-allday-label").textContent, "Whole day");
+  assert.ok(texts(a, ".hm-sch-toolbar button").includes("Now"));
+  assert.ok(texts(a, ".hm-segment").includes("7 days"));
+  assert.match(a.querySelector(".hm-sch-block .own-ev").textContent, /Planning @ /);
+  assert.equal(a.querySelector(".hm-sch-ev-title"), null);
+  assert.equal(a.querySelector(".hm-sch-help").textContent, "hint!");
+  assert.ok(!texts(b, ".hm-sch-toolbar button").includes("Today"));
+  assert.deepEqual(texts(b, ".hm-segment"), ["Week", "Day"]);
+  assert.equal(b.querySelector(".hm-sch-help"), null);
+  assert.equal(b.getAttribute("aria-describedby"), null);
+  assert.equal(c.querySelector(".hm-sch-toolbar"), null);
+  assert.ok(c.className.includes("mine"));
+  assert.ok(d.querySelector(".hm-sch-toolbar") && !d.querySelector(".hm-segment"));
+  m.dispose();
+});

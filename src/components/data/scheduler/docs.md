@@ -33,7 +33,23 @@ import { Scheduler } from "hadi-march/components/data/scheduler";
 | `editable` | boolean | `true` | drag, resize, create |
 | `height` | px | `600` | week / day scroll height |
 | `locale` | string | app locale | date locale (names, first weekday, clock, direction) |
+| `toolbar` | boolean | `true` | the bar with period buttons, title and view switch |
+| `views` | `SchedulerView[]` / `false` | all three | views offered by the switch; `false` or one view hides it |
+| `todayButton` | boolean | `true` | the "Today" button |
+| `nowLine` | boolean | `true` | the line at the current time (week / day) |
+| `help` | boolean / node | `true` | the hint under the calendar: the text of `labels`, off, or your own node |
+| `renderEvent` | `(event, { view, time }) => node` | title, time, place | content of an event |
+| `labels` | `Partial<SchedulerLabels>` | built-in texts | `allDay`, `month`, `week`, `day`, `period`, `previous`, `today`, `next`, `view`, `help`, and the functions `more(n)`, `moved(title, day, time)` |
+| `animate` | boolean | `true` | slide, view-change and settle animations |
 | `label` | string | "Calendar" | accessible name |
+| `class` | class | — | extra class on the root |
+
+```tsx
+<Scheduler events={$events} views={["week", "day"]} todayButton={false} nowLine={false} help={false} animate={false}
+  labels={{ allDay: "Whole day", more: (n) => `${n} hidden` }}
+  renderEvent={(event, { time }) => <><b>{event.title}</b> <small>{time}</small></>} />
+<Scheduler events={$events} toolbar={false} view={$view} date={$date} />   // your own navigation
+```
 
 Calendar math is shared in `core/date` (`monthGrid`, `startOfWeek`, `splitDateTime`, `joinDateTime`, `weekdayNames`,
 `formatMinutes`, `dateFormat` …), drags in `pointerDrag` (hadi-march/motion).

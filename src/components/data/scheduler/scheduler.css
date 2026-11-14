@@ -107,3 +107,4 @@
 /* snap step ticks on the hour gutter (editable): a drag or resize lands on them */
 .hm-sch-hours.is-editable { background-image: repeating-linear-gradient(to bottom, var(--hm-border) 0 1px, transparent 1px var(--hm-sch-step, 12px)); background-size: .375rem 100%; background-repeat: no-repeat; background-position: right top; }
 [dir="rtl"] .hm-sch-hours.is-editable { background-position: left top; }
+.hm-sch-ev-own { display: block; min-width: 0; overflow: hidden; }

@@ -11,8 +11,8 @@
   background-image: repeating-linear-gradient(to var(--hm-tv-guide-to, right), transparent 0 .5rem, var(--hm-border-subtle) .5rem calc(.5rem + 1px), transparent calc(.5rem + 1px) 1.25rem); }
 [dir="rtl"] .hm-tv-row::before { --hm-tv-guide-to: left; }
 .hm-tv-row:hover { background: var(--hm-surface-2); }
-.hm-tv-row.is-selected { background: var(--hm-primary-soft); color: var(--hm-primary-text, var(--hm-text)); }
-.hm-tv-row.is-selected .hm-tv-icon.is-folder { color: var(--hm-primary); }
+.hm-tv-row.is-selected { background: var(--hm-accent-soft, var(--hm-primary-soft)); color: var(--hm-accent-text, var(--hm-primary-text, var(--hm-text))); }
+.hm-tv-row.is-selected .hm-tv-icon.is-folder { color: var(--hm-accent, var(--hm-primary)); }
 .hm-tv:focus-visible .hm-tv-row.is-cursor, .hm-tv:focus .hm-tv-row.is-cursor { box-shadow: inset 0 0 0 2px var(--hm-focus); }
 .hm-tv-row.is-disabled { opacity: .5; }
 .hm-tv-row.is-dragging { opacity: .4; }
@@ -48,3 +48,5 @@
 /* rows that can be dragged say so (grab cursor) */
 .hm-tv.is-draggable .hm-tv-row:not(.is-disabled) { cursor: grab; }
 .hm-tv.is-draggable .hm-tv-row.is-dragging { cursor: grabbing; }
+/* an own arrow does not turn by itself: it is drawn for the open state it gets */
+.hm-tv-chev.is-own, [dir="rtl"] .hm-tv-chev.is-own { width: auto; min-width: 1.25rem; transform: none; transition: none; }

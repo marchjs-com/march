@@ -17,11 +17,20 @@ A small label: a status in a tone, a dot badge (a coloured dot before the text) 
 |---|---|---|---|
 | `tone` | `neutral` `primary` `info` `success` `warn` `danger` | `neutral` (count: `danger`) | colour family |
 | `color` | ColorToken | theme primary | accent of the primary tone |
-| `dot` | boolean | `false` | dot before the text |
+| `dot` | boolean / node | `false` | dot before the text, or your own mark (an icon) |
+| `dotColor` | ColorToken | the tone's text colour | colour of the built-in dot |
 | `count` | number / accessor | — | count badge |
 | `max` | number | `99` | larger counts show `max+` |
 | `showZero` | boolean | `false` | show a count of 0 |
 | `label` | string / accessor | — | count badge accessible text after the number |
+| `format` | `(n, max) => node` | `countLabel` | count badge: your own text for the number |
+| `class` | class | — | extra class on the badge |
+
+```tsx
+<Badge dot dotColor="brand-orange">Live</Badge>
+<Badge dot={<Icon of={heart} />}>Liked</Badge>
+<Badge count={n} format={(n) => (n > 999 ? "1k+" : n)} />
+```
 
 ## Accessibility
 

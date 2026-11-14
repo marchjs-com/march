@@ -14,3 +14,6 @@
   transition: box-shadow var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease), opacity var(--hm-dur) var(--hm-ease); animation: hm-scale-in var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-kanban-card:hover { box-shadow: var(--hm-shadow-2); transform: translateY(-1px); }
 .hm-kanban-card.is-dragging { opacity: .45; transform: rotate(-1.5deg); }
+.hm-kanban-dot[data-hm-color] { background: var(--hm-accent); }
+.hm-kanban-dot-own { display: inline-flex; flex: none; }
+.hm-kanban.is-still .hm-kanban-card { animation: none; }

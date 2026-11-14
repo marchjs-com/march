@@ -44,3 +44,26 @@ test("Gantt: Alt+→ moves a task and cascades to its successors; Alt+Shift+→ 
   assert.equal(document.activeElement, bar(m.el, "b"));
   m.dispose();
 });
+
+test("Gantt: own texts, parts off (names, hint, today line), own bar content and hint", () => {
+  locale.set("en-GB");
+  const m = mount(() => [
+    h(Gantt, { tasks: tasks(), scale: "day", labels: { task: "Work", today: "Now", days: (n) => `${n} days`, done: (p) => `${p} percent` }, barLabel: (t) => `#${t.id}`, help: h("i", { class: "own-help" }, "hint") }),
+    h(Gantt, { tasks: tasks(), scale: "day", names: false, help: false, todayLine: false, animate: false, class: "mine" }),
+  ]);
+  const [a, b] = m.el.querySelectorAll(".hm-gantt");
+  assert.equal(a.querySelector(".hm-gantt-side-head").textContent, "Work");
+  assert.equal(a.querySelector(".hm-gantt-today").textContent, "Now");
+  assert.equal(a.querySelector(".hm-gantt-name-meta").textContent, "5 days");
+  assert.match(bar(a, "b").getAttribute("aria-label"), /40 percent/);
+  assert.equal(bar(a, "b").querySelector(".hm-gantt-bar-label").textContent, "#b");
+  assert.ok(a.querySelector(".hm-gantt-help .own-help"));
+  assert.ok(b.className.includes("mine"));
+  assert.equal(b.querySelector(".hm-gantt-side, .hm-gantt-help, .hm-gantt-today"), null);
+  assert.equal(b.querySelector("[role=grid]").getAttribute("aria-describedby"), null);
+  assert.equal(b.querySelectorAll(".hm-gantt-bar").length, 4);
+  // edits still work without the names column and without motion
+  key(bar(b, "a"), "ArrowRight", { altKey: true });
+  assert.match(b.querySelector(".hm-gantt-status").textContent, /Design/);
+  m.dispose();
+});

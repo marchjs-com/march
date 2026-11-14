@@ -1,12 +1,14 @@
 // Showcase stage for Scheduler: a team calendar around today (neutral demo data). Drag on an empty slot creates.
-import { signal } from "hadi-march";
+import { signal, computed, untrack } from "hadi-march";
 import { Scheduler, type SchedulerEvent, type SchedulerRange } from "./index.ts";
 import { todayIso, addDays, startOfWeek } from "../../../core/date.ts";
 
 export const code = `<Scheduler events={$events} view="week" step={15}
   onChange={(event, range) => api.update(event.id, range)}
   onCreate={(range) => $events = [...$events, { id: uid(), title: "Yeni", ...range }]}
-  onSelect={(event) => open(event)} />`
+  onSelect={(event) => open(event)} />
+// toolbar={false} views={["week", "day"]} todayButton={false} nowLine={false} help={false} animate={false}
+// labels={{ allDay: "Gün boyu", more: (n) => n + " tane daha" }} renderEvent={(event, { time }) => …}`
 
 const SEED: [day: number, from: string, to: string, title: string, color: string, loc?: string][] = [
   [0, "09:00", "09:30", "Günlük toplantı", "brand-blue", "Oda 2"],
@@ -22,7 +24,7 @@ const SEED: [day: number, from: string, to: string, title: string, color: string
   [4, "16:00", "16:30", "Haftalık özet", "brand-blue"],
 ];
 
-export default function SchedulerDemo(props: { values: { view: string; step: string; locale: string; weekends: boolean; editable: boolean } }) {
+export default function SchedulerDemo(props: { values: { view: string; step: string; locale: string; weekends: boolean; editable: boolean; toolbar: string; nowLine: boolean; event: string; help: string; animate: boolean } }) {
   const monday = startOfWeek(todayIso(), 1)
   const events = signal<SchedulerEvent[]>([
     ...SEED.map(([d, a, b, title, color, location], i) => ({ id: `e${i}`, title, start: `${addDays(monday, d)}T${a}`, end: `${addDays(monday, d)}T${b}`, color: color as "brand-blue", location })),
@@ -32,10 +34,21 @@ export default function SchedulerDemo(props: { values: { view: string; step: str
   const last = signal("")
   let n = 0
   const create = (r: SchedulerRange) => { events.set([...events(), { id: `new${++n}`, title: "Yeni etkinlik", ...r, color: "brand-orange" }]); last.set("Yeni etkinlik eklendi") }
+  const once = computed(() => [props.values.toolbar, props.values.nowLine, props.values.event, props.values.help, props.values.animate].join("|"))
+  const parts = () => { once(); return untrack(() => [props.values.toolbar, props.values.nowLine, props.values.event, props.values.help, props.values.animate] as const) }
   return <div class="sc-stage">
-    <Scheduler events={events} view={() => props.values.view as "week"} locale={() => props.values.locale} height={520}
-      step={() => Number(props.values.step)} weekends={() => props.values.weekends} editable={() => props.values.editable}
-      onChange={(e: SchedulerEvent) => { events.set(events().map((x) => (x.id === e.id ? e : x))); last.set(`“${e.title}” taşındı`) }} onCreate={create} onSelect={(e: SchedulerEvent) => last.set(`Seçildi: ${e.title}`)} />
+    {() => {
+      // parts read once by the calendar (toolbar, now line, event content, hint, motion): it is drawn again only when
+      // one of them changes; view, locale, step and the rest stay live on the same calendar
+      const [bar, nowLine, event, help, animate] = parts()
+      const own = event === "own"
+      return untrack(() => <Scheduler events={events} view={() => props.values.view as "week"} locale={() => props.values.locale} height={520}
+        step={() => Number(props.values.step)} weekends={() => props.values.weekends} editable={() => props.values.editable}
+        toolbar={bar !== "off"} todayButton={bar !== "noToday"} views={bar === "noViews" ? false : undefined} nowLine={nowLine} animate={animate}
+        help={help === "off" ? false : help === "own" ? "Etkinliği sürükleyin; boş bir saate sürükleyerek yenisini ekleyin." : true}
+        renderEvent={own ? (e: SchedulerEvent, info: { time: string }) => <span><b>{e.title}</b>{e.location ? ` · ${e.location}` : ""}<br /><small>{info.time}</small></span> : undefined}
+        onChange={(e: SchedulerEvent) => { events.set(events().map((x) => (x.id === e.id ? e : x))); last.set(`“${e.title}” taşındı`) }} onCreate={create} onSelect={(e: SchedulerEvent) => last.set(`Seçildi: ${e.title}`)} />)
+    }}
     <p role="status">{last}</p>
   </div>
 }

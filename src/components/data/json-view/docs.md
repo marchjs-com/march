@@ -14,6 +14,15 @@ and a circular reference is marked instead of looping.
 |---|---|---|---|
 | `value` | any / accessor | — | the data |
 | `open` | number | `1` | depth expanded at start |
+| `labels` | `{ items?, keys?, circular? }` | "items", "keys", "[circular]" | your own texts |
+| `arrow` | boolean / `(open) => node` | `true` | the open / close arrow, off, or your own (`open()` is live) |
+| `label` | string / accessor | — | accessible name of the tree |
+| `class` | class | — | extra class on the root |
+
+```tsx
+<JsonView value={response} labels={{ items: "entries", keys: "fields" }} arrow={(open) => <span>{() => (open() ? "−" : "+")}</span>} />
+<JsonView value={response} arrow={false} />
+```
 
 ## Accessibility
 

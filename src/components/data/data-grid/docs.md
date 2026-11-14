@@ -32,10 +32,27 @@ import { DataGrid } from "hadi-march/components/data/data-grid";
 | `selectable` | boolean | `false` | checkboxes, Space, Shift+↑↓, Ctrl+click, Ctrl+A |
 | `onEdit` | `(row, key, value) => void \| Promise` | — | save an edited cell; throw to show the message |
 | `footer` | boolean | when a column has `aggregate` | totals over all filtered rows |
-| `toolbar` | boolean | `true` | search, grouping chips, filters, CSV, counts |
+| `toolbar` | boolean / `{ search?, groups?, filters?, csv?, count? }` | `true` | search, grouping chips, filters, CSV, counts; an object turns single tools off |
+| `columnMenu` | boolean | `true` | the ⋮ menu of every column header |
+| `empty` | boolean / node | `true` | the empty state: the text of `labels`, off, or your own node |
+| `labels` | `Partial<DataGridLabels>` | built-in texts | every text the grid writes: toolbar, menu items, empty states, totals, aggregate names |
+| `animate` | boolean | `true` | row entrance, column slide, save flash |
 | `filename` | string | `"data"` | CSV file name |
 | `onActivate` | `(row, key) => void` | — | Enter / double-click on a cell that is not editable |
 | `label` | string | "Data grid" | accessible name |
+| `class` | class | — | extra class on the root |
+
+```tsx
+<DataGrid rows={rows} columns={columns} toolbar={{ csv: false, groups: false }} columnMenu={false} animate={false}
+  empty={<EmptyState title="No orders yet" />}
+  labels={{ search: "Find an order", rows: (n) => `${n} orders`, total: "Sum", filtersActive: (n) => `${n} filters on` }} />
+```
+
+`labels` keys: `search`, `tools`, `grouping`, `groupHint`, `showAll`, `filters`, `csv`, `noRows`, `noMatch`, `total`,
+`emptyGroup`, `selectAll`, `selectRow`, `sortAsc`, `sortDesc`, `clearSort`, `group`, `ungroup`, `pinStart`, `pinEnd`,
+`unpin`, `hide`, `sum`, `average`, `minimum`, `maximum`, `count`, `distinct`, and the functions `filtersActive(n)`,
+`rows(n)`, `selected(n)`, `columnMenu(column)`, `resize(column)`. The texts inside filter controls and cell editors
+belong to the table engine (`hadi-march/table`).
 
 Column extras: `aggregate` is `"sum" | "avg" | "min" | "max" | "count" | "distinct"` or `(values, rows) => result`;
 `groupable: false` hides "Group by this column". Every `createTable` column option works (`pin`, `width`, `format`,

@@ -18,7 +18,12 @@ export interface BadgeProps {
   showZero?: boolean;
   /** Count badges: accessible label after the number ("3 unread"). */
   label?: MaybeFn<string>;
-  dot?: boolean;
+  /** Dot before the text: `true` draws the built-in dot, a node is your own mark. */
+  dot?: boolean | Node | undefined;
+  /** Colour of the built-in dot (default: the text colour of the tone). */
+  dotColor?: ColorToken | undefined;
+  /** Count badges: your own text for the number (default `countLabel`: 120 → "99+"). */
+  format?: ((n: number, max: number) => unknown) | undefined;
   class?: ClassProp;
   children?: unknown;
 }
@@ -28,8 +33,12 @@ export function Badge(props: BadgeProps): unknown {
     return () => {
       const n = Number(val(props.count)) || 0;
       if (!n && !props.showZero) return null;
-      return h("span", { "data-hm-color": () => colorAttr(props.color), class: cx("hm-badge", "hm-badge-count", `hm-badge-${val(props.tone) ?? "danger"}`, val(props.class)), "aria-label": props.label ? `${n} ${val(props.label)}` : null }, countLabel(n, props.max ?? 99));
+      return h("span", { "data-hm-color": () => colorAttr(props.color), class: cx("hm-badge", "hm-badge-count", `hm-badge-${val(props.tone) ?? "danger"}`, val(props.class)), "aria-label": props.label ? `${n} ${val(props.label)}` : null }, props.format ? props.format(n, props.max ?? 99) : countLabel(n, props.max ?? 99));
     };
   }
-  return h("span", { "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-badge", `hm-badge-${val(props.tone) ?? "neutral"}`, props.dot && "hm-badge-dot", val(props.class)) }, props.children);
+  // the dot: the built-in one (a pseudo-element, or a coloured mark with `dotColor`) or the caller's node
+  const own = props.dot && props.dot !== true, mark = props.dot === true && !!props.dotColor;
+  return h("span", { "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-badge", `hm-badge-${val(props.tone) ?? "neutral"}`, props.dot === true && !mark && "hm-badge-dot", val(props.class)) },
+    own ? h("span", { class: "hm-badge-dot-own", "aria-hidden": "true" }, props.dot) : mark ? h("span", { class: "hm-badge-dot-mark", "aria-hidden": "true", "data-hm-color": colorAttr(props.dotColor) }) : null,
+    props.children);
 }

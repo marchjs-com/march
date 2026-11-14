@@ -37,6 +37,85 @@ export interface DataGridColumn<R = Row> extends Column<R> {
   groupable?: boolean | undefined;
 }
 
+/** Texts DataGrid writes itself; pass any of them in `labels`. Cell editors and filter controls come from the table engine. */
+export interface DataGridLabels {
+  /** Search box placeholder and accessible name. */
+  search: string;
+  /** Accessible names of the toolbar and its grouping area. */
+  tools: string;
+  grouping: string;
+  /** Shown in the grouping area while nothing is grouped. */
+  groupHint: string;
+  showAll: string;
+  filters: string;
+  filtersActive: (count: number) => string;
+  csv: string;
+  /** Row count at the end of the toolbar; `count` is already formatted. */
+  rows: (count: string) => string;
+  selected: (count: string) => string;
+  noRows: string;
+  noMatch: string;
+  /** First cell of the totals row. */
+  total: string;
+  /** Name of a group whose value is empty. */
+  emptyGroup: string;
+  selectAll: string;
+  selectRow: string;
+  sortAsc: string;
+  sortDesc: string;
+  clearSort: string;
+  group: string;
+  ungroup: string;
+  pinStart: string;
+  pinEnd: string;
+  unpin: string;
+  hide: string;
+  columnMenu: (column: string) => string;
+  resize: (column: string) => string;
+  /** Aggregate names (tooltips of the symbols). */
+  sum: string;
+  average: string;
+  minimum: string;
+  maximum: string;
+  count: string;
+  distinct: string;
+}
+const LABELS: { [K in keyof DataGridLabels]: () => DataGridLabels[K] } = {
+  search: () => t`Search`,
+  tools: () => t`Grid tools`,
+  grouping: () => t`Grouping`,
+  groupHint: () => t`Group with a column menu`,
+  showAll: () => t`Show all columns`,
+  filters: () => t`Filters`,
+  filtersActive: () => (count) => t`Filters (${count})`,
+  csv: () => t`CSV`,
+  rows: () => (count) => t`${count} rows`,
+  selected: () => (count) => t`${count} selected`,
+  noRows: () => t`No rows`,
+  noMatch: () => t`No matching rows`,
+  total: () => t`Total`,
+  emptyGroup: () => t`(empty)`,
+  selectAll: () => t`Select all rows`,
+  selectRow: () => t`Select row`,
+  sortAsc: () => t`Sort ascending`,
+  sortDesc: () => t`Sort descending`,
+  clearSort: () => t`Clear sort`,
+  group: () => t`Group by this column`,
+  ungroup: () => t`Ungroup`,
+  pinStart: () => t`Pin to start`,
+  pinEnd: () => t`Pin to end`,
+  unpin: () => t`Unpin`,
+  hide: () => t`Hide column`,
+  columnMenu: () => (column) => t`Column ${column}`,
+  resize: () => (column) => t`Resize ${column}`,
+  sum: () => t`Sum`,
+  average: () => t`Average`,
+  minimum: () => t`Minimum`,
+  maximum: () => t`Maximum`,
+  count: () => t`Count`,
+  distinct: () => t`Distinct`,
+};
+
 export interface DataGridProps<R = Row> {
   /** Rows (array, signal or getter). Ignored when `table` is given. */
   rows?: MaybeFn<readonly R[] | null | undefined>;
@@ -57,8 +136,16 @@ export interface DataGridProps<R = Row> {
   onEdit?: TableOptions<R>["onEdit"];
   /** Totals row with each column's aggregate over all filtered rows (default: when a column has `aggregate`). */
   footer?: boolean | undefined;
-  /** Toolbar with search, grouping, filters and CSV (default true). */
-  toolbar?: boolean | undefined;
+  /** Toolbar with search, grouping, filters, CSV and the row count (default true); an object turns single tools off: `{ csv: false }`. */
+  toolbar?: boolean | Partial<Record<"search" | "groups" | "filters" | "csv" | "count", boolean>> | undefined;
+  /** The ⋮ menu of every column header (default true). */
+  columnMenu?: boolean | undefined;
+  /** The empty state: true (default: the text in `labels`), false, or your own node. */
+  empty?: unknown;
+  /** Your own texts (see DataGridLabels). */
+  labels?: Partial<DataGridLabels> | undefined;
+  /** Row entrance, column slide and save flash (default true). */
+  animate?: boolean | undefined;
   /** CSV file name (without .csv). */
   filename?: string | undefined;
   /** Enter / double-click on a non-editable cell. */
@@ -86,6 +173,9 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   const rowH = (): number => val(props.rowHeight) ?? 36;
   const headH = (): number => rowH() + 4;
   const filterH = 44;
+  const lb = <K extends keyof DataGridLabels>(k: K): DataGridLabels[K] => props.labels?.[k] ?? LABELS[k]();
+  const motion = props.animate !== false;
+  const tool = (k: "search" | "groups" | "filters" | "csv" | "count"): boolean => typeof props.toolbar !== "object" || props.toolbar[k] !== false;
 
   // ------------------------------------------------------------------ grouping
   const ownGroups = signal<string[]>([...(untrack(() => val(props.groupBy)) ?? [])]);
@@ -156,7 +246,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   // after a save, flash the cell (motion engine; a soft layer fades out)
   const flash = (r: number, c: number): void => {
     const cell = scroller?.querySelector<HTMLElement>(`#${cellId(r, c)}`);
-    if (!cell) return;
+    if (!cell || !motion) return;
     const f = h("span", { class: "hm-dg-flash", "aria-hidden": "true" }) as HTMLElement;
     cell.appendChild(f);
     void animate(f, [{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: "ease-out" }).finished.then(() => f.remove());
@@ -185,25 +275,25 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     const key = String(col.key);
     const grouped = groupKeys().includes(key);
     const items: MenuItem[] = [
-      { label: () => t`Sort ascending`, onSelect: () => table.setSort([{ key, dir: "asc" }]) },
-      { label: () => t`Sort descending`, onSelect: () => table.setSort([{ key, dir: "desc" }]) },
-      { label: () => t`Clear sort`, hidden: () => !table.sortDir(key), onSelect: () => table.setSort(table.sort().filter((s) => s.key !== key)) },
+      { label: () => lb("sortAsc"), onSelect: () => table.setSort([{ key, dir: "asc" }]) },
+      { label: () => lb("sortDesc"), onSelect: () => table.setSort([{ key, dir: "desc" }]) },
+      { label: () => lb("clearSort"), hidden: () => !table.sortDir(key), onSelect: () => table.setSort(table.sort().filter((s) => s.key !== key)) },
       "-",
-      { label: () => (grouped ? t`Ungroup` : t`Group by this column`), hidden: () => defs.get(key)?.groupable === false, onSelect: () => setGroups(grouped ? groupKeys().filter((k) => k !== key) : [...groupKeys(), key]) },
-      { label: () => t`Pin to start`, hidden: () => pin === "left", onSelect: () => table.pin(key, "left") },
-      { label: () => t`Pin to end`, hidden: () => pin === "right", onSelect: () => table.pin(key, "right") },
-      { label: () => t`Unpin`, hidden: () => !pin, onSelect: () => table.pin(key, null) },
+      { label: () => (grouped ? lb("ungroup") : lb("group")), hidden: () => defs.get(key)?.groupable === false, onSelect: () => setGroups(grouped ? groupKeys().filter((k) => k !== key) : [...groupKeys(), key]) },
+      { label: () => lb("pinStart"), hidden: () => pin === "left", onSelect: () => table.pin(key, "left") },
+      { label: () => lb("pinEnd"), hidden: () => pin === "right", onSelect: () => table.pin(key, "right") },
+      { label: () => lb("unpin"), hidden: () => !pin, onSelect: () => table.pin(key, null) },
       "-",
-      { label: () => t`Hide column`, onSelect: () => table.setHidden(key, true) },
+      { label: () => lb("hide"), onSelect: () => table.setHidden(key, true) },
     ];
     const el = h("div", {
       role: "columnheader", class: cx("hm-dg-cell", "hm-dg-th", `hm-align-${col.align}`, col.sortable && "is-sortable", table.sortDir(key) && "is-sorted"),
       "aria-colindex": String(c + 1 + (props.selectable ? 1 : 0)), "aria-sort": ariaSort(key), "data-key": key, "data-c": String(c),
     },
     h("span", { class: "hm-dg-th-label", title: col.label }, col.label), sortMark(key),
-    h("span", { class: "hm-dg-th-menu", "data-no-drag": "" }, h(Menu, { label: () => t`Column ${col.label}`, icon: moreVertical, size: "sm", variant: "ghost", items })),
+    props.columnMenu === false ? null : h("span", { class: "hm-dg-th-menu", "data-no-drag": "" }, h(Menu, { label: () => lb("columnMenu")(col.label), icon: moreVertical, size: "sm", variant: "ghost", items })),
     col.resizable === false ? null : h("span", {
-      class: "hm-dg-resize", tabindex: "-1", "aria-label": t`Resize ${col.label}`, "data-no-drag": "",
+      class: "hm-dg-resize", tabindex: "-1", "aria-label": lb("resize")(col.label), "data-no-drag": "",
       // drag / arrows (RTL mirrored) / double click autosizes: the resize-handle behavior
       ref: (x: HTMLElement) => resizeHandle(x, {
         value: () => widthOf(col), set: (w) => table.setWidth(key, w), min: col.minWidth, reset: () => autosize(col),
@@ -280,7 +370,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     for (const cell of scroller.querySelectorAll<HTMLElement>(".hm-dg-head .hm-dg-th, .hm-dg-body .hm-dg-cell[data-key]")) {
       const d = shift.get(cell.dataset["key"] as string);
       if (d == null) continue;
-      if (Math.abs(d) > 1) void animate(cell, [{ transform: `translateX(${d}px)` }, { transform: "none" }], { duration: 260, easing: "easeOutCubic" });
+      if (Math.abs(d) > 1 && motion) void animate(cell, [{ transform: `translateX(${d}px)` }, { transform: "none" }], { duration: 260, easing: "easeOutCubic" });
     }
   };
   // fit a column to its header and the rendered cells (approximate: character count of the visible text)
@@ -315,7 +405,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
       role: "gridcell", id: cellId(r, 0), class: "hm-dg-cell hm-dg-group-label", "data-c": "0", "aria-colindex": "1", "aria-colspan": String(cols().nav.length + (props.selectable ? 1 : 0)),
     },
     h("span", { class: cx("hm-dg-chev", it.open && "is-open"), "aria-hidden": "true" }, glyph(chevronRight)),
-    h("span", { class: "hm-dg-group-name" }, `${lvl?.label ?? it.level}: `, h("b", {}, String(lvl ? formatValue(it.rows[0] as R, lvl) : it.value ?? "") || t`(empty)`)),
+    h("span", { class: "hm-dg-group-name" }, `${lvl?.label ?? it.level}: `, h("b", {}, String(lvl ? formatValue(it.rows[0] as R, lvl) : it.value ?? "") || lb("emptyGroup"))),
     h("span", { class: "hm-dg-count" }, num(it.count)),
     h("span", { class: "hm-dg-group-aggs" }, aggList().map((a) => { const col = table.column(a.key) as TableColumn<R>; return h("span", { class: "hm-dg-group-agg" }, h("small", {}, col.label), aggText(col, it.aggregates[a.key])); }))) as HTMLElement;
     setStyle(bar, { width: `${Math.max(240, vp.width() - 2)}px` });
@@ -327,7 +417,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     const sym: Record<string, string> = { sum: "Σ", avg: "x̄", min: "↓", max: "↑", count: "#", distinct: "≠" };
     return h("span", { class: "hm-dg-agg", title: typeof kind === "string" ? aggLabel(kind) : "" }, typeof kind === "string" ? h("small", { "aria-hidden": "true" }, sym[kind] ?? "") : null, String(shown)) as Node;
   };
-  const aggLabel = (k: string): string => ({ sum: t`Sum`, avg: t`Average`, min: t`Minimum`, max: t`Maximum`, count: t`Count`, distinct: t`Distinct` } as Record<string, string>)[k] ?? k;
+  const aggLabel = (k: string): string => ({ sum: lb("sum"), avg: lb("average"), min: lb("minimum"), max: lb("maximum"), count: lb("count"), distinct: lb("distinct") } as Record<string, string>)[k] ?? k;
   const editorKey = (e: KeyboardEvent): void => {
     if (e.key === "Tab") { e.preventDefault(); void commit(e.shiftKey ? "prev" : "next"); }
     else if (e.key === "Enter") { e.preventDefault(); void commit("down"); }
@@ -373,7 +463,8 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   const footRow = h("div", { role: "row", class: "hm-dg-row hm-dg-foot-row" }) as HTMLElement;
   const foot = h("div", { role: "rowgroup", class: "hm-dg-foot", hidden: () => !showFooter() }, footRow) as HTMLElement;
   const canvas = h("div", { class: "hm-dg-canvas" }, head, rowsEl, foot) as HTMLElement;
-  const empty = h("div", { class: "hm-dg-empty", hidden: () => count() > 0 || table.loading() }, () => (table.activeFilters().length || table.search() ? t`No matching rows` : t`No rows`)) as HTMLElement;
+  const empty = props.empty === false ? null : h("div", { class: "hm-dg-empty", hidden: () => count() > 0 || table.loading() },
+    props.empty != null && props.empty !== true ? props.empty : () => (table.activeFilters().length || table.search() ? lb("noMatch") : lb("noRows"))) as HTMLElement;
 
   const filterRow = (): Element => {
     const r = h("div", { role: "row", class: "hm-dg-row hm-dg-filter-row" }) as HTMLElement;
@@ -407,7 +498,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
       disposeHead();
       createRoot((d) => {
         disposeHead = d;
-        headRow.replaceChildren(rowShell((col, i, pin) => headerCell(col, i, pin), props.selectable ? checkCell(st === "all" ? true : st === "some" ? "mixed" : false, t`Select all rows`, () => table.selectPage(st !== "all"), "columnheader") : null));
+        headRow.replaceChildren(rowShell((col, i, pin) => headerCell(col, i, pin), props.selectable ? checkCell(st === "all" ? true : st === "some" ? "mixed" : false, lb("selectAll"), () => table.selectPage(st !== "all"), "columnheader") : null));
       });
       setStyle(headRow, { width: `${totalW()}px`, height: `${headH()}px` });
     }
@@ -434,7 +525,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
           "aria-rowindex": String(r + 2), "aria-selected": props.selectable && it.kind === "row" ? String(isSel) : null,
           "aria-expanded": it.kind === "group" ? String(it.open) : null, "aria-level": it.kind === "group" ? String(it.depth + 1) : null, "data-r": String(r),
         }) as HTMLElement;
-        const lead = props.selectable ? (it.kind === "row" ? checkCell(isSel, t`Select row`, (e) => { go(r, untrack(cursor).c); table.toggle(it.row, { range: e.shiftKey }); }) : (() => { const x = h("div", { role: "gridcell", class: "hm-dg-cell hm-dg-check" }) as HTMLElement; setStyle(x, { width: `${SEL_W}px` }); return x; })()) : null;
+        const lead = props.selectable ? (it.kind === "row" ? checkCell(isSel, lb("selectRow"), (e) => { go(r, untrack(cursor).c); table.toggle(it.row, { range: e.shiftKey }); }) : (() => { const x = h("div", { role: "gridcell", class: "hm-dg-cell hm-dg-check" }) as HTMLElement; setStyle(x, { width: `${SEL_W}px` }); return x; })()) : null;
         if (it.kind === "group") row.append(groupBar(it, r));
         else row.append(rowShell((col, i) => bodyCell(it, r, col, i), lead));
         setStyle(row, { width: `${totalW()}px`, height: `${h0}px`, transform: `translateY(${r * h0}px)`, "--hm-dg-depth": String(it.depth) });
@@ -459,13 +550,13 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
         setStyle(cell, { width: `${widthOf(col)}px` });
         const key = String(col.key);
         if (key in totals()) cell.append(aggText(col, totals()[key]));
-        else if (i === 0) cell.append(h("b", {}, t`Total`) as Node);
+        else if (i === 0) cell.append(h("b", {}, lb("total")) as Node);
         return cell;
       }, props.selectable ? (() => { const x = h("div", { class: "hm-dg-cell hm-dg-check", role: "gridcell" }) as HTMLElement; setStyle(x, { width: `${SEL_W}px` }); return x; })() : null));
       setStyle(footRow, { width: `${totalW()}px`, height: `${h0}px` });
     }
     // entrance: rows after a sort / group / filter change and rows revealed by opening a group
-    if (fresh.length) {
+    if (fresh.length && motion) {
       const d = stagger(14);
       fresh.slice(0, 40).forEach((el, i) => void animate(el, [{ opacity: 0, translate: "0 -6px" }, { opacity: 1, translate: "0 0" }], { duration: 240, delay: d(i), easing: "easeOutCubic" }));
     }
@@ -547,22 +638,22 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   const toolbar = props.toolbar === false ? null : Toolbar();
   function Toolbar(): Element {
     const searchBox = h("input", {
-      type: "search", class: "hm-table-input hm-dg-search", placeholder: () => t`Search`, "aria-label": () => t`Search`,
+      type: "search", class: "hm-table-input hm-dg-search", placeholder: () => lb("search"), "aria-label": () => lb("search"),
       value: () => table.search(), onInput: (e: Event) => table.setSearch((e.target as HTMLInputElement).value),
     });
-    return h("div", { class: "hm-dg-toolbar", role: "toolbar", "aria-label": () => t`Grid tools` },
-      h("label", { class: "hm-dg-searchwrap" }, h("span", { class: "hm-dg-search-icon", "aria-hidden": "true" }, glyph(searchIcon)), searchBox),
-      h("div", { class: "hm-dg-groups", "aria-label": () => t`Grouping` },
+    return h("div", { class: "hm-dg-toolbar", role: "toolbar", "aria-label": () => lb("tools") },
+      tool("search") ? h("label", { class: "hm-dg-searchwrap" }, h("span", { class: "hm-dg-search-icon", "aria-hidden": "true" }, glyph(searchIcon)), searchBox) : null,
+      tool("groups") ? h("div", { class: "hm-dg-groups", "aria-label": () => lb("grouping") },
         h("span", { class: "hm-dg-groups-icon", "aria-hidden": "true" }, glyph(layers)),
         () => (groupKeys().length
           ? groupKeys().map((k) => h(Chip, { size: "sm", tone: "primary", onRemove: () => setGroups(groupKeys().filter((x) => x !== k)) }, table.column(k)?.label ?? k))
-          : h("span", { class: "hm-dg-hint" }, t`Group with a column menu`))),
+          : h("span", { class: "hm-dg-hint" }, lb("groupHint")))) : null,
       h("span", { class: "hm-dg-spacer" }),
-      () => (table.visibleColumns().length < table.allColumns().length ? h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", onClick: () => { for (const c of table.allColumns()) table.setHidden(String(c.key), false); } }, t`Show all columns`) : null),
-      h("button", { type: "button", class: () => cx("hm-btn hm-btn-sm", filtersOpen() ? "hm-btn-primary" : "hm-btn-secondary"), "aria-pressed": () => String(filtersOpen()), onClick: () => filtersOpen.set(!filtersOpen()) },
-        glyph(filterIcon), () => (table.activeFilters().length ? t`Filters (${table.activeFilters().length})` : t`Filters`)),
-      h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", onClick: () => void table.exportCSV({ download: true, filename: `${props.filename ?? "data"}.csv` }) }, glyph(download), t`CSV`),
-      h("span", { class: "hm-dg-total", role: "status" }, () => t`${num(table.rows().length)} rows`, () => (table.selectedCount() ? h("b", {}, ` · ${t`${num(table.selectedCount())} selected`}`) : null)));
+      () => (table.visibleColumns().length < table.allColumns().length ? h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", onClick: () => { for (const c of table.allColumns()) table.setHidden(String(c.key), false); } }, lb("showAll")) : null),
+      tool("filters") ? h("button", { type: "button", class: () => cx("hm-btn hm-btn-sm", filtersOpen() ? "hm-btn-primary" : "hm-btn-secondary"), "aria-pressed": () => String(filtersOpen()), onClick: () => filtersOpen.set(!filtersOpen()) },
+        glyph(filterIcon), () => (table.activeFilters().length ? lb("filtersActive")(table.activeFilters().length) : lb("filters"))) : null,
+      tool("csv") ? h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", onClick: () => void table.exportCSV({ download: true, filename: `${props.filename ?? "data"}.csv` }) }, glyph(download), lb("csv")) : null,
+      tool("count") ? h("span", { class: "hm-dg-total", role: "status" }, () => lb("rows")(num(table.rows().length)), () => (table.selectedCount() ? h("b", {}, ` · ${lb("selected")(num(table.selectedCount()))}`) : null)) : null);
   }
 
   const root = h("div", { class: () => cx("hm-dg", val(props.class)) }, toolbar, scroller) as HTMLElement;

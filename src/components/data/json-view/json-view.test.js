@@ -23,3 +23,22 @@ test("JsonView: typed values, open depth, toggle, circular reference", () => {
   assert.match(root.textContent, /\[circular\]/);
   m.dispose();
 });
+
+test("JsonView: own texts, no arrow, own arrow, accessible name", () => {
+  const value = { list: [1, 2], o: { a: 1 } };
+  value.self = value;
+  const m = mount(() => [h(JsonView, { value, labels: { items: "entries", keys: "fields", circular: "(loop)" }, arrow: false, label: "Order" }), h(JsonView, { value, arrow: (open) => h("i", {}, () => (open() ? "-" : "+")) })]);
+  const [a, b] = m.el.querySelectorAll(".hm-json");
+  assert.equal(a.querySelector("[role=tree]").getAttribute("aria-label"), "Order");
+  assert.match(a.textContent, /2 entries/);
+  assert.match(a.textContent, /1 fields/);
+  assert.match(a.textContent, /\(loop\)/);
+  assert.ok(a.querySelector(".hm-json-toggle").className.includes("is-plain"));
+  assert.equal(a.querySelector(".hm-json-arrow"), null);
+  const t0 = b.querySelector(".hm-json-toggle");
+  assert.ok(t0.className.includes("is-own"));
+  assert.equal(t0.querySelector(".hm-json-arrow").textContent, "-");
+  t0.click();
+  assert.equal(t0.querySelector(".hm-json-arrow").textContent, "+");
+  m.dispose();
+});

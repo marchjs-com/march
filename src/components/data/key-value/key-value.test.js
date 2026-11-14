@@ -16,7 +16,8 @@ test("KeyValue: rows, object items, hints, hidden rows, empty placeholder, colum
   assert.equal(a.querySelectorAll("dt").length, 2, "hidden row skipped");
   assert.equal(a.querySelector(".hm-kv-hint").textContent, "h");
   assert.equal(a.querySelectorAll("dd")[1].textContent, "—");
-  assert.equal(b.querySelector("dt").textContent, "Plan");
+  assert.equal(b.querySelector("dt.hm-kv-label").textContent, "Plan");
+  assert.equal(b.querySelector("dd.hm-kv-value").textContent, "Pro");
   assert.equal(b.querySelector("dd").textContent, "Pro");
   m.dispose();
 });

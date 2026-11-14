@@ -15,6 +15,9 @@ nodes or accessors; an empty value shows a placeholder.
 | `items` | `{ label, value, hint?, hidden? }[]` or an object | — | rows; object keys become labels |
 | `columns` | 1–4 | `1` | columns; fewer on narrow screens (2 below 1024 px, 1 below 640 px) |
 | `empty` | node | `—` | shown for null / empty values |
+| `class` | class | — | extra class on the list |
+
+Parts carry stable classes: `hm-kv-row`, `hm-kv-label`, `hm-kv-value`, `hm-kv-hint`.
 
 ## Accessibility
 

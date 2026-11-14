@@ -116,3 +116,30 @@ test("DataGrid: grouping shows group rows with counts and aggregates; collapsing
   assert.equal(groups().length, 0);
   m.dispose();
 });
+
+test("DataGrid: own texts, single tools off, no column menu, empty state off or own", () => {
+  const rows = big.slice(0, 20), columns = [{ key: "name", label: "Name" }, { key: "amount", label: "Amount", aggregate: "sum" }];
+  const m = mount(() => [
+    h(DataGrid, { rows, columns, selectable: true, labels: { search: "Find", rows: (n) => `${n} orders`, total: "Sum of all", csv: "Export", selectAll: "All of them" } }),
+    h(DataGrid, { rows, columns, toolbar: { csv: false, groups: false, filters: false }, columnMenu: false, animate: false, class: "mine" }),
+    h(DataGrid, { rows: [], columns, toolbar: false, empty: false }),
+    h(DataGrid, { rows: [], columns, empty: h("i", { class: "own-empty" }, "nothing"), labels: { noRows: "unused" } }),
+    h(DataGrid, { rows: [], columns, labels: { noRows: "No orders" } }),
+  ]);
+  const [a, b, c, d, e] = m.el.querySelectorAll(".hm-dg");
+  assert.equal(a.querySelector(".hm-dg-search").getAttribute("placeholder"), "Find");
+  assert.equal(a.querySelector(".hm-dg-total").textContent, "20 orders");
+  assert.match(a.querySelector(".hm-dg-toolbar").textContent, /Export/);
+  assert.equal(a.querySelector(".hm-dg-foot-row b").textContent, "Sum of all");
+  assert.equal(a.querySelector(".hm-dg-head .hm-table-check").getAttribute("aria-label"), "All of them");
+  assert.ok(a.querySelector(".hm-dg-th-menu"));
+  assert.ok(b.className.includes("mine"));
+  assert.ok(b.querySelector(".hm-dg-search") && b.querySelector(".hm-dg-total"));
+  assert.equal(b.querySelector(".hm-dg-groups"), null);
+  assert.equal(b.querySelectorAll(".hm-dg-toolbar button").length, 0, "no filter and CSV buttons");
+  assert.equal(b.querySelector(".hm-dg-th-menu"), null);
+  assert.equal(c.querySelector(".hm-dg-toolbar, .hm-dg-empty"), null);
+  assert.ok(d.querySelector(".hm-dg-empty .own-empty"));
+  assert.equal(e.querySelector(".hm-dg-empty").textContent, "No orders");
+  m.dispose();
+});

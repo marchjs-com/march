@@ -28,6 +28,37 @@ export interface GanttTask {
   data?: unknown;
 }
 export type GanttScale = "day" | "week" | "month";
+/** Texts Gantt writes itself; pass any of them in `labels`. */
+export interface GanttLabels {
+  /** On the today line. */
+  today: string;
+  /** Head of the names column. */
+  task: string;
+  /** Length of a task next to its name ("5 d"). */
+  days: (count: number) => string;
+  /** The hint under the chart while it is editable / read-only. */
+  help: string;
+  helpReadonly: string;
+  /** Part of a bar's accessible name ("40% done"). */
+  done: (percent: number) => string;
+  /** Part of a bar's accessible name ("after Design, Build"). */
+  after: (names: string) => string;
+  /** Announced after a change ("Build: 9 Nov – 13 Nov"). */
+  moved: (name: string, start: string, end: string) => string;
+  /** Announced when `cascade` pushed successors. */
+  pushed: (count: number) => string;
+}
+const LABELS: { [K in keyof GanttLabels]: () => GanttLabels[K] } = {
+  today: () => t`Today`,
+  task: () => t`Task`,
+  days: () => (count) => t`${count} d`,
+  help: () => t`Drag a bar to move it, its ends to resize it, its knob to set progress. Keyboard: ↑ ↓ choose a task, Alt+← → move, Alt+Shift+← → resize.`,
+  helpReadonly: () => t`↑ ↓ choose a task.`,
+  done: () => (percent) => t`${percent}% done`,
+  after: () => (names) => t`after ${names}`,
+  moved: () => (name, start, end) => t`${name}: ${start} – ${end}`,
+  pushed: () => (count) => t`${count} following tasks moved`,
+};
 
 export interface GanttProps {
   tasks: MaybeFn<readonly GanttTask[]>;
@@ -43,6 +74,18 @@ export interface GanttProps {
   /** Px height of the chart (default 420). */
   height?: number | undefined;
   rowHeight?: number | undefined;
+  /** The today line and its label (default true). */
+  todayLine?: MaybeFn<boolean | undefined>;
+  /** The pinned column of task names (default true). */
+  names?: boolean | undefined;
+  /** The hint under the chart: true (default: the text in `labels`), false, or your own node. */
+  help?: unknown;
+  /** Content of a bar: `(task) => node` (default: the task name). */
+  barLabel?: ((task: GanttTask) => unknown) | undefined;
+  /** Your own texts: `{ today, task, days, help, helpReadonly, done, after, moved, pushed }`. */
+  labels?: Partial<GanttLabels> | undefined;
+  /** Arrow drawing, settle and scale-change animations (default true). */
+  animate?: boolean | undefined;
   label?: MaybeFn<string | undefined>;
   class?: ClassProp;
 }
@@ -62,6 +105,8 @@ export function Gantt(props: GanttProps): Element {
   const rtl = (): boolean => dir() === "rtl";
   const loc = (): string => locale();
   const today = todayIso();
+  const lb = <K extends keyof GanttLabels>(k: K): GanttLabels[K] => props.labels?.[k] ?? LABELS[k]();
+  const motion = props.animate !== false;
   // live preview while dragging: id → { start, end, progress }
   const preview = signal<Record<string, Partial<GanttTask>>>({});
   const view = (task: GanttTask): GanttTask => ({ ...task, ...preview()[task.id] });
@@ -129,10 +174,10 @@ export function Gantt(props: GanttProps): Element {
     tasks.set(untrack(tasks).map((x) => changed.get(x.id) ?? x));
     for (const x of changed.values()) props.onChange?.(x);
     const moved = changed.get(task.id) as GanttTask, f = dateFormat(loc(), { day: "numeric", month: "short" });
-    const pushed = changed.size > 1 ? t`${changed.size - 1} following tasks moved` : "";
-    status.set(`${t`${moved.name}: ${f.format(utcDate(moved.start))} – ${f.format(utcDate(moved.end))}`}${pushed ? `, ${pushed}` : ""}`);
+    const pushed = changed.size > 1 ? lb("pushed")(changed.size - 1) : "";
+    status.set(`${lb("moved")(moved.name, f.format(utcDate(moved.start)), f.format(utcDate(moved.end)))}${pushed ? `, ${pushed}` : ""}`);
     // pushed successors slide to their new place (they were re-rendered at it)
-    later(() => {
+    if (motion) later(() => {
       for (const [tid] of changed) {
         const el = canvas.querySelector<HTMLElement>(`[data-task="${tid}"]`);
         if (el) void animate(el, tid === task.id ? [{ transform: "scaleY(1.18)" }, { transform: "none" }] : [{ opacity: .4 }, { opacity: 1 }], { duration: 320, easing: "easeOutBack" });
@@ -191,7 +236,7 @@ export function Gantt(props: GanttProps): Element {
     el?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
   };
   const fmtRange = (x: GanttTask): string => { const f = dateFormat(loc(), { day: "numeric", month: "short", year: "numeric" }); return `${f.format(utcDate(x.start))} – ${f.format(utcDate(x.end))}`; };
-  const barLabel = (x: GanttTask): string => `${x.name}, ${fmtRange(x)}, ${t`${Math.round((x.progress ?? 0) * 100)}% done`}${x.deps?.length ? `, ${t`after ${x.deps.map((d) => untrack(tasks).find((y) => y.id === d)?.name ?? d).join(", ")}`}` : ""}`;
+  const barLabel = (x: GanttTask): string => `${x.name}, ${fmtRange(x)}, ${lb("done")(Math.round((x.progress ?? 0) * 100))}${x.deps?.length ? `, ${lb("after")(x.deps.map((d) => untrack(tasks).find((y) => y.id === d)?.name ?? d).join(", "))}` : ""}`;
 
   const bar = (task: GanttTask, row: number): Element => {
     const live = (): GanttTask => view(task);
@@ -204,7 +249,7 @@ export function Gantt(props: GanttProps): Element {
       onPointerenter: () => hot.set(task.id), onPointerleave: () => hot.set(null), onFocus: () => hot.set(task.id), onBlur: () => hot.set(null),
     },
     task.milestone ? null : h("span", { class: "hm-gantt-fill", "aria-hidden": "true" }),
-    h("span", { class: "hm-gantt-bar-label" }, task.milestone ? null : task.name),
+    h("span", { class: "hm-gantt-bar-label" }, task.milestone ? null : props.barLabel ? props.barLabel(task) : task.name),
     task.milestone || !editable() ? null : [
       h("span", { class: "hm-gantt-handle hm-gantt-handle-start", "data-handle": "start", "aria-hidden": "true" }),
       h("span", { class: "hm-gantt-handle hm-gantt-handle-end", "data-handle": "end", "aria-hidden": "true" }),
@@ -252,7 +297,7 @@ export function Gantt(props: GanttProps): Element {
     }
     effect(() => { svg.setAttribute("width", String(width())); svg.setAttribute("height", String(tasks().length * rowH)); });
     // the links draw themselves in once (motion engine: reduced motion shows them at once)
-    later(() => { const st = stagger(25); fresh.forEach((p, i) => { const len = p.getTotalLength?.() ?? 0; if (len) void animate(p, [{ strokeDasharray: `${len}`, strokeDashoffset: `${len}` }, { strokeDasharray: `${len}`, strokeDashoffset: "0" }], { duration: 520, delay: st(i), easing: "easeOutCubic" }); }); }, 0);
+    if (motion) later(() => { const st = stagger(25); fresh.forEach((p, i) => { const len = p.getTotalLength?.() ?? 0; if (len) void animate(p, [{ strokeDasharray: `${len}`, strokeDashoffset: `${len}` }, { strokeDasharray: `${len}`, strokeDashoffset: "0" }], { duration: 520, delay: st(i), easing: "easeOutCubic" }); }); }, 0);
     return svg as unknown as Element;
   };
 
@@ -260,18 +305,19 @@ export function Gantt(props: GanttProps): Element {
   const names = h("div", { class: "hm-gantt-names", role: "rowgroup" },
     () => tasks().map((task, i) => h("div", { role: "row", class: cx("hm-gantt-name", hot() === task.id && "is-hot"), "aria-rowindex": String(i + 1) },
       h("span", { role: "rowheader", class: "hm-gantt-name-text", title: task.name }, task.name),
-      h("span", { class: "hm-gantt-name-meta" }, () => { const x = view(task); return t`${diffDays(x.start, x.end) + 1} d`; }))));
+      h("span", { class: "hm-gantt-name-meta" }, () => { const x = view(task); return lb("days")(diffDays(x.start, x.end) + 1); }))));
   const canvas = h("div", { class: "hm-gantt-canvas" },
     () => header(),
     h("div", { class: "hm-gantt-rows" },
       () => { const n = tasks().length; return Array.from({ length: n }, (_, i) => { const r = h("div", { class: "hm-gantt-row" }) as HTMLElement; setStyle(r, { top: `${i * rowH}px`, height: `${rowH}px` }); return r; }); },
-      () => { const x = xOf(today); const el = h("div", { class: "hm-gantt-today" }, h("span", {}, t`Today`)) as HTMLElement; setStyle(el, { "inset-inline-start": `${x + px() / 2}px` }); return el; },
+      () => { if (val(props.todayLine) === false) return null; const x = xOf(today); const el = h("div", { class: "hm-gantt-today" }, h("span", {}, lb("today"))) as HTMLElement; setStyle(el, { "inset-inline-start": `${x + px() / 2}px` }); return el; },
       () => (val(props.arrows) ?? true ? arrows() : null),
       () => tasks().map((task, i) => bar(task, i)))) as HTMLElement;
   effect(() => { setStyle(canvas, { width: `${width()}px`, "--hm-gantt-rows": `${tasks().length * rowH}px`, "--hm-gantt-row": `${rowH}px`, "--hm-gantt-px": `${px()}px` }); });
-  const scroller = h("div", { class: "hm-gantt-scroll", role: "grid", "aria-label": () => val(props.label) ?? t`Project timeline`, "aria-describedby": `${id}-help` },
-    h("div", { class: "hm-gantt-side" }, h("div", { class: "hm-gantt-side-head" }, t`Task`), names), canvas) as HTMLElement;
-  setStyle(scroller, { height: `${props.height ?? 420}px`, "--hm-gantt-name-w": `${NAME_W}px` });
+  const side = props.names === false ? null : h("div", { class: "hm-gantt-side" }, h("div", { class: "hm-gantt-side-head" }, () => lb("task")), names) as HTMLElement;
+  const scroller = h("div", { class: "hm-gantt-scroll", role: "grid", "aria-label": () => val(props.label) ?? t`Project timeline`, "aria-describedby": props.help === false ? null : `${id}-help` },
+    side, canvas) as HTMLElement;
+  setStyle(scroller, { height: `${props.height ?? 420}px`, "--hm-gantt-name-w": `${side ? NAME_W : 0}px` });
   // scroll so today sits near the start; a scale change fades the canvas in
   let first = true;
   effect(() => {
@@ -281,16 +327,16 @@ export function Gantt(props: GanttProps): Element {
       const toToday = (tries: number): void => {
         if (scroller.scrollWidth <= scroller.clientWidth && tries) { later(() => toToday(tries - 1), 100); return; }
         // today about a third into the visible timeline (the names column covers the start of the canvas)
-        const side = (scroller.firstElementChild as HTMLElement | null)?.offsetWidth ?? 0;
-        const x = xOf(today) - Math.max(0, scroller.clientWidth - side) / 3;
+        const sideW = side?.offsetWidth ?? 0;
+        const x = xOf(today) - Math.max(0, scroller.clientWidth - sideW) / 3;
         scroller.scrollLeft = (rtl() ? -1 : 1) * Math.max(0, x);
       };
       toToday(50);
-      if (!first) void animate(canvas, [{ opacity: 0, transform: "scaleX(.97)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "easeOutCubic" });
+      if (!first && motion) void animate(canvas, [{ opacity: 0, transform: "scaleX(.97)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "easeOutCubic" });
       first = false;
     }, 0);
   });
   return h("div", { class: () => cx("hm-gantt", val(props.class)) }, scroller,
-    h("p", { class: "hm-gantt-help", id: `${id}-help` }, () => (editable() ? t`Drag a bar to move it, its ends to resize it, its knob to set progress. Keyboard: ↑ ↓ choose a task, Alt+← → move, Alt+Shift+← → resize.` : t`↑ ↓ choose a task.`)),
+    props.help === false ? null : h("p", { class: "hm-gantt-help", id: `${id}-help` }, props.help != null && props.help !== true ? props.help : () => (editable() ? lb("help") : lb("helpReadonly"))),
     h("div", { class: "hm-gantt-status", role: "status", "aria-live": "polite" }, status));
 }

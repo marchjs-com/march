@@ -8,7 +8,9 @@ export const code = `<DataGrid rows={$orders} rowKey="id" selectable groupBy={["
     { key: "region", label: "Bölge", filter: "select" },
     { key: "amount", label: "Tutar", format: ["money", "TRY"], aggregate: "sum" },
   ]}
-  onEdit={(row, key, value) => save(row.id, key, value)} />`
+  onEdit={(row, key, value) => save(row.id, key, value)} />
+// toolbar={{ csv: false, groups: false }} columnMenu={false} animate={false} empty={<EmptyState />}
+// labels={{ search: "Sipariş ara", rows: (n) => n + " sipariş", total: "Genel toplam" }}`
 
 interface Order { id: number; customer: string; region: string; status: string; product: string; qty: number; amount: number; date: string }
 const CUSTOMERS = ["HADİ", "Globex", "Initech", "Umbrella", "Stark Lojistik", "Wayne Gıda", "Hooli", "Vandelay", "Soylent", "Wonka", "Tyrell", "Cyberdyne"];
@@ -39,13 +41,16 @@ const columns = (pinned: boolean): DataGridColumn<Order>[] => [
   ...EXTRA.map((label, j): DataGridColumn<Order> => ({ key: `x${j}`, label, width: 150, value: (r) => `${label} ${1 + rnd(r.id * (j + 3), 60)}` })),
 ];
 
-export default function DataGridDemo(props: { values: { rows: string; group: string; density: string; selectable: boolean; pinned: boolean; footer: boolean } }) {
+export default function DataGridDemo(props: { values: { rows: string; group: string; density: string; selectable: boolean; pinned: boolean; footer: boolean; toolbar: string; columnMenu: boolean; labels: boolean; animate: boolean } }) {
   return <div class="sc-stage">
     {() => {
       const v = props.values
       const data = signal(make(Number(v.rows)))
       return <DataGrid rows={data} rowKey="id" height={460} label="Siparişler" filename="siparisler"
         selectable={v.selectable} footer={v.footer} columns={columns(v.pinned)}
+        toolbar={v.toolbar === "off" ? false : v.toolbar === "lean" ? { groups: false, filters: false, csv: false } : true}
+        columnMenu={v.columnMenu} animate={v.animate}
+        labels={v.labels ? { search: "Sipariş ara", rows: (n: string) => `${n} sipariş`, selected: (n: string) => `${n} tanesi seçili`, total: "Genel toplam", csv: "Dışa aktar", filters: "Süzgeçler", groupHint: "Gruplamak için sütun menüsünü kullanın" } : undefined}
         groupBy={() => (props.values.group ? props.values.group.split(",") : [])}
         rowHeight={() => Number(props.values.density)}
         onEdit={(row: Order, key: string, value: unknown) => { data.set(data().map((r) => (r.id === row.id ? { ...r, [key]: value, amount: key === "qty" ? Number(value) * (r.amount / r.qty) : r.amount } : r))) }} />

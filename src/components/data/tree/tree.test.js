@@ -28,3 +28,18 @@ test("Tree: ARIA, expand / collapse with keys and clicks, selection", () => {
   assert.equal(a.querySelector("[role=treeitem]").getAttribute("aria-level"), "2");
   m.dispose();
 });
+
+test("Tree: no chevron, own chevron that follows open, selection colour", () => {
+  const nodes = [{ id: "a", label: "a", children: [{ id: "a1", label: "a1" }] }];
+  const m = mount(() => [h(Tree, { nodes, chevron: false, color: "brand-purple" }), h(Tree, { nodes, chevron: (_n, open) => h("b", {}, () => (open() ? "-" : "+")) }), h(Tree, { nodes })]);
+  const [a, b, c] = m.el.querySelectorAll("[role=tree]");
+  assert.equal(a.querySelector(".hm-tree-chev"), null);
+  assert.equal(a.getAttribute("data-hm-color"), "brand-purple");
+  const own = b.querySelector(".hm-tree-chev.is-own");
+  assert.equal(own.textContent, "+");
+  key(b.querySelector(".hm-tree-row"), "ArrowRight");
+  assert.equal(own.textContent, "-");
+  assert.ok(c.querySelector(".hm-tree-chev .hm-svg"), "the default arrow stays");
+  assert.equal(c.getAttribute("data-hm-color"), null);
+  m.dispose();
+});

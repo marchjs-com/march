@@ -7,7 +7,8 @@ import { settings } from "../../../icons/glyphs/settings.ts";
 
 export const code = `<Tree label="Dosyalar" nodes={files} expanded={["src", "ui"]}
   selected={() => $file} onSelect={(n) => { $file = n.id }} />
-// node: { id, label, icon?, meta?, children? } — ↑ ↓ move, → opens, ← closes, Enter selects`
+// node: { id, label, icon?, meta?, children? } — ↑ ↓ move, → opens, ← closes, Enter selects
+<Tree nodes={files} color="brand-purple" chevron={(node, open) => <b>{() => (open() ? "−" : "+")}</b>} />   // or chevron={false}`
 
 const nodes = (icons: boolean, meta: boolean): TreeNode[] => {
   const n = (id: string, label: string, icon: unknown, m?: string, children?: TreeNode[]): TreeNode => ({ id, label, icon: icons ? icon : undefined, meta: meta ? m : undefined, children })
@@ -20,13 +21,15 @@ const nodes = (icons: boolean, meta: boolean): TreeNode[] => {
   ]
 }
 
-export default function TreeDemo(props: { values: { open: string; icons: boolean; meta: boolean } }) {
+export default function TreeDemo(props: { values: { open: string; icons: boolean; meta: boolean; chevron: string; color: string } }) {
   let $file = "button"
   return <div class="sc-col">
     {() => {
       const v = props.values
+      const color = v.color ? v.color as "brand-orange" : undefined
       const expanded = v.open === "all" ? ["src", "ui", "css"] : v.open === "some" ? ["src", "ui"] : []
-      return <Tree label="Dosyalar" nodes={nodes(v.icons, v.meta)} expanded={expanded} selected={() => $file} onSelect={(n: TreeNode) => { $file = n.id }} />
+      return <Tree label="Dosyalar" nodes={nodes(v.icons, v.meta)} expanded={expanded} color={color}
+        chevron={v.chevron === "off" ? false : v.chevron === "own" ? (_n: TreeNode, open: () => boolean) => <b>{() => (open() ? "−" : "+")}</b> : true} selected={() => $file} onSelect={(n: TreeNode) => { $file = n.id }} />
     }}
     <p class="hm-muted">Seçili: <code>{() => $file}</code></p>
   </div>

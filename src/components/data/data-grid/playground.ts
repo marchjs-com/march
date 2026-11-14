@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { rows: string; group: string; density: string; selectable: boolean; pinned: boolean; footer: boolean }
+interface Values { rows: string; group: string; density: string; selectable: boolean; pinned: boolean; footer: boolean; toolbar: string; columnMenu: boolean; labels: boolean; animate: boolean }
 
 export default definePlayground<Values>({
   options: [
@@ -10,5 +10,9 @@ export default definePlayground<Values>({
     { key: "selectable", label: "Satır seçimi", default: true },
     { key: "pinned", label: "Müşteri sütunu sabit", default: true },
     { key: "footer", label: "Toplam satırı", default: true },
+    { key: "toolbar", label: "Araç çubuğu", default: "full", options: [{ value: "full", label: "tam" }, { value: "lean", label: "yalnız arama + sayı" }, { value: "off", label: "yok" }] },
+    { key: "columnMenu", label: "Sütun menüsü (⋮)", default: true },
+    { key: "labels", label: "Kendi metinlerim (sipariş)", default: false },
+    { key: "animate", label: "Hareket", default: true },
   ],
 });

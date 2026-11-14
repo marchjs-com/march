@@ -7,9 +7,22 @@ import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
 import { roving } from "../../../ui/focus.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface TreeNode { id: string; label: unknown; icon?: unknown; meta?: unknown; children?: readonly TreeNode[] | undefined }
-export interface TreeProps { nodes: readonly TreeNode[]; selected?: MaybeFn<string | null | undefined>; onSelect?: (node: TreeNode) => void; expanded?: readonly string[]; label?: string; class?: ClassProp }
+export interface TreeProps {
+  nodes: readonly TreeNode[];
+  selected?: MaybeFn<string | null | undefined>;
+  onSelect?: (node: TreeNode) => void;
+  expanded?: readonly string[];
+  /** Accessible name (default "Tree"). */
+  label?: string;
+  /** The open / close arrow: true (default), false, or `(node, open) => node` (`open()` is live; yours does not turn by itself). */
+  chevron?: boolean | ((node: TreeNode, open: () => boolean) => unknown) | undefined;
+  /** Colour of the selected row (theme token; default: the accent). */
+  color?: ColorToken | undefined;
+  class?: ClassProp;
+}
 /** Expandable tree (role=tree; ↑ ↓ move, → opens, ← closes, Enter selects): `<Tree nodes={files} onSelect={…} />` */
 export function Tree(props: TreeProps): Element {
   const open = signal(new Set(props.expanded ?? []));
@@ -29,11 +42,13 @@ export function Tree(props: TreeProps): Element {
           else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (has) toggle(node.id); props.onSelect?.(node); }
         },
       },
-      h("span", { class: () => cx("hm-tree-chev", !has && "is-leaf", isOpen() && "is-open"), "aria-hidden": "true" }, has ? glyph(chevronRight) : null),
+      props.chevron === false ? null : typeof props.chevron === "function"
+        ? h("span", { class: cx("hm-tree-chev is-own", !has && "is-leaf"), "aria-hidden": "true" }, has ? props.chevron(node, isOpen) : null)
+        : h("span", { class: () => cx("hm-tree-chev", !has && "is-leaf", isOpen() && "is-open"), "aria-hidden": "true" }, has ? glyph(chevronRight) : null),
       icon(node.icon, "hm-tree-icon"), h(OverflowText, { class: "hm-tree-label" }, node.label), node.meta != null && h("span", { class: "hm-tree-meta" }, node.meta)),
       has && h("ul", { role: "group", class: "hm-tree-group", hidden: () => !isOpen() }, node.children?.map((c) => row(c, level + 1))));
   };
-  const root = h("ul", { role: "tree", class: () => cx("hm-tree", val(props.class)), "aria-label": props.label ?? t`Tree` }, props.nodes.map((n) => row(n, 1)));
+  const root = h("ul", { role: "tree", class: () => cx("hm-tree", val(props.class)), "aria-label": props.label ?? t`Tree`, "data-hm-color": () => colorAttr(props.color) }, props.nodes.map((n) => row(n, 1)));
   queueMicrotask(() => { const first = (root as HTMLElement).querySelector<HTMLElement>(".hm-tree-row"); if (first) first.tabIndex = 0; });
   return root;
 }

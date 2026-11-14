@@ -106,3 +106,33 @@ test("TreeView: a lazy folder that starts open loads its children at once", asyn
   assert.ok([...m.el.querySelectorAll('[role="treeitem"]')].some((r) => r.textContent.includes("x.ts")));
   m.dispose();
 });
+
+test("TreeView: own texts, own / no chevron, empty state off or own, selection colour", async () => {
+  const m = mount(() => [
+    h(TreeView, { nodes: nodes(), search: "zzz", labels: { noMatch: (q) => `none for ${q}`, retry: "Again" }, chevron: false, color: "brand-purple", animate: false, load: async () => { throw new Error("x"); } }),
+    h(TreeView, { nodes: nodes(), expanded: ["src"], chevron: (n, open) => h("b", { class: "own-chev" }, open ? "-" : "+") }),
+    h(TreeView, { nodes: [], empty: false }),
+    h(TreeView, { nodes: [], empty: h("i", { class: "own-empty" }, "nothing") }),
+    h(TreeView, { nodes: [], labels: { empty: "No files" } }),
+  ]);
+  const [a, b, c, d, e] = m.el.querySelectorAll("[role=tree]");
+  assert.equal(a.querySelector(".hm-tv-empty").textContent, "none for zzz");
+  assert.equal(a.getAttribute("data-hm-color"), "brand-purple");
+  assert.equal(b.querySelector('[data-id="src"] .own-chev').textContent, "-");
+  assert.equal(b.querySelector('[data-id="ui"] .own-chev').textContent, "+");
+  assert.equal(b.querySelector('[data-id="readme"] .own-chev'), null, "a leaf has no arrow");
+  assert.equal(c.querySelector(".hm-tv-empty"), null);
+  assert.ok(d.querySelector(".hm-tv-empty .own-empty"));
+  assert.equal(e.querySelector(".hm-tv-empty").textContent, "No files");
+  m.dispose();
+  // no chevron: rows still open from the keyboard; a failed load shows the own retry text
+  const m2 = mount(() => h(TreeView, { nodes: nodes(), chevron: false, labels: { retry: "Again" }, load: async () => { throw new Error("x"); } }));
+  const tree = m2.el.querySelector("[role=tree]");
+  assert.equal(tree.querySelector(".hm-tv-chev"), null);
+  key(tree, "ArrowRight");
+  assert.deepEqual(labels(m2.el), ["src", "ui", "core", "docs", "readme"]);
+  key(tree, "End"); key(tree, "ArrowUp"); key(tree, "ArrowRight");
+  await tick(); await tick();
+  assert.match(tree.querySelector(".hm-tv-retry").textContent, /Again/);
+  m2.dispose();
+});
