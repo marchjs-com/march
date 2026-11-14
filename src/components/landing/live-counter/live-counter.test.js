@@ -36,3 +36,27 @@ test("LiveCounter: simulated growth on the clock, never down", () => {
   dispose();
   manualClock(false);
 });
+
+test("LiveCounter: own effect, own bubble, no dot, no beat", () => {
+  manualClock(true);
+  const v = signal(10), calls = [];
+  const fx = (el, o) => { calls.push([el.textContent, o.start]); return { stop() {} }; };
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(LiveCounter, { value: v, effect: fx, dot: false, beat: false, bubble: (d) => h("b", { class: "own" }, `+${d}!`) }), el);
+  assert.equal(el.querySelector(".hm-lc-dot"), null);
+  assert.equal(el.querySelector(".hm-lc-text").textContent, "10");
+  v.set(15);
+  assert.equal(el.querySelector(".hm-lc-text").textContent, "15");
+  assert.deepEqual(calls, [["15", 10]], "the text animation runs with the previous value as start");
+  assert.equal(el.querySelector(".hm-lc-bubble .own")?.textContent, "+5!");
+  dispose();
+  manualClock(false);
+});
+
+test("LiveCounter: a coloured dot and an own dot node", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => [h(LiveCounter, { value: 1, dotColor: "brand-orange" }), h(LiveCounter, { value: 1, dot: h("i", { class: "mine" }) })], el);
+  assert.equal(el.querySelector(".hm-lc-dot").getAttribute("data-hm-color"), "brand-orange");
+  assert.ok(el.querySelector(".hm-lc-dot-own .mine"));
+  dispose();
+});

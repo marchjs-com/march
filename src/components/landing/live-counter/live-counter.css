@@ -8,3 +8,10 @@
 .hm-lc-label { grid-column: 1 / -1; color: var(--hm-muted); font-size: var(--hm-text-sm); }
 .hm-lc:has(.hm-lc-dot) .hm-lc-label { grid-column: 2; }
 @media (prefers-reduced-motion: reduce) { .hm-lc-dot::after { animation: none; } }
+/* own colours: data-hm-color sets --hm-accent */
+.hm-lc-dot[data-hm-color] { background: var(--hm-accent); }
+.hm-lc-dot[data-hm-color]::after { border-color: var(--hm-accent); }
+.hm-lc-bubble[data-hm-color] { background: color-mix(in srgb, var(--hm-accent) 18%, var(--hm-bg)); color: var(--hm-accent-text, var(--hm-text)); }
+.hm-lc-bubble.is-own { padding: 0; background: none; }
+.hm-lc-plain { display: inline-flex; align-items: baseline; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hm-lc-dot-own { display: inline-grid; place-items: center; }
