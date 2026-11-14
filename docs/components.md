@@ -188,6 +188,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | [Badge](#badge), [OverflowText](#overflowtext), [ListRow](#listrow), [Drawer](#drawer) |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | [Menu](#menu), [Textarea](#textarea), [ReactionPicker](#reactionpicker), [IconButton](#iconbutton), [StatusDot](#statusdot), [ReplyQuote](#replyquote) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), [Avatar](#avatar), [Button](#button), [Picture](#picture) |
+| CodeEditor | experimental | A small code field: coloured as it is typed, a suggestion list at the caret (prop names and values of a JSX tag, or your own), marked ranges that flash or underline, a foot line with a status and a copy button. | [EditorFrame](#editorframe), [Popover](#popover), [OptionList](#optionlist), [CopyButton](#copybutton), [Kbd](#kbd), [StatusDot](#statusdot) |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | [IconButton](#iconbutton), [Segmented](#segmented), [Badge](#badge), [SectionLabel](#sectionlabel), [Slider](#slider), [Swatch](#swatch), [TextInput](#textinput) |
 | CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | [Dialog](#dialog), [SearchBox](#searchbox), [ListRow](#listrow), [SectionLabel](#sectionlabel), [Empty](#empty), [Kbd](#kbd), [OverflowText](#overflowtext) |
 | ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | [Button](#button), [Card](#card), [Dialog](#dialog), [Toggle](#toggle), [Stack](#stack), [Empty](#empty) |
@@ -630,6 +631,28 @@ Composed of: [Button](#button)
 ```
 
 Full page: src/components/typography/clamp-text/docs.md
+
+## CodeEditor
+
+A small code field for one snippet: the text is coloured while it is typed (the CodeView colours; unfinished code too), a suggestion list opens at the caret, ranges can be marked (a flash for "this just changed", an underline for "this is wrong") and a foot line says what the owner thinks of the code. It does **not** run or compile anything: the owner reads `value` and decides what it means (the showcase reads a component's props from it).
+
+Composed of: [EditorFrame](#editorframe), [Popover](#popover), [OptionList](#optionlist), [CopyButton](#copybutton), [Kbd](#kbd), [StatusDot](#statusdot)
+
+```tsx
+import { CodeEditor, jsxCompleter } from "hadi-march/ui";
+
+<CodeEditor bind:value={$code} lang="tsx" message={$note} status={$bad ? "error" : "ok"}
+  complete={jsxCompleter({ tag: "Button", props: [
+    { name: "variant", hint: "look", values: ["primary", "secondary", "ghost"] },   // variant="…": values inside the quotes
+    { name: "icon", hint: "icon", value: "={plus}" },                              // written as icon={plus}
+    { name: "disabled" },                                                          // a bare prop
+  ] })}
+  marks={[{ from: 8, to: 23, kind: "flash" }]} />
+<CodeEditor value={$css} onChange={save} lang="css" complete={(ctx) => ({ from: ctx.caret, items: [{ label: "color" }] })} />
+<CodeEditor bind:value={$one} multiline={false} message={false} copy={false} />   // one bare line
+```
+
+Full page: src/components/composite/code-editor/docs.md
 
 ## CodeInput
 

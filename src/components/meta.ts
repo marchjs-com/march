@@ -84,6 +84,9 @@ export interface PlaygroundCode<V = Record<string, unknown>> {
   props?: Readonly<Record<string, string>>;
   /** The children as written (text or JSX); none: self-closing. An option with prop "children" wins. */
   children?: string | ((values: V) => string | null);
+  /** The element of the demo that attributes typed into the code (id, class, title, aria-*, m:…) are written on: a
+   * selector inside the stage (default: the first element with an `m-` class). */
+  root?: string;
 }
 export interface PlaygroundSpec<V = Record<string, unknown>> {
   options: readonly PlaygroundOption<V>[];

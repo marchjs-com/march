@@ -24,6 +24,7 @@ export * from "./actions/chevron/index.ts";
 export * from "./actions/chip/index.ts";
 export * from "./forms/choice-picker/index.ts";
 export * from "./typography/clamp-text/index.ts";
+export * from "./composite/code-editor/index.ts";
 export * from "./forms/code-input/index.ts";
 export * from "./typography/code-view/index.ts";
 export * from "./forms/color-input/index.ts";

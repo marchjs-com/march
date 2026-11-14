@@ -1,7 +1,7 @@
 import { definePlayground } from "../../meta.ts";
 
 export default definePlayground<{ kind: string; prefix: string; disabled: boolean; error: boolean; paste: boolean }>({
-  code: { tag: (v) => (v.kind === "email" ? "EmailInput" : v.kind === "url" ? "UrlInput" : "TextInput"), props: { "bind:value": "{$text}" } },
+  code: { tag: (v) => (v.kind === "email" ? "EmailInput" : v.kind === "url" ? "UrlInput" : "TextInput"), props: { "bind:value": "{$text}" }, root: "input" },
   options: [
     { key: "kind", label: "Tür", default: "text", options: [{ value: "text", label: "metin" }, { value: "email", label: "e-posta" }, { value: "url", label: "web adresi" }], prop: false },
     { key: "prefix", label: "Ön ek", default: "icon", options: [{ value: "none", label: "yok" }, { value: "icon", label: "ikon" }, { value: "text", label: "metin" }],
