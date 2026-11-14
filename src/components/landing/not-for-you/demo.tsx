@@ -2,18 +2,18 @@
 import { NotForYou, type NotForYouItem } from "./index.ts";
 
 export const code = `<NotForYou check items={[{ text: "Büyük bir konferans düzenliyorsun", detail: "…" }]}
-  forYou={[{ text: "Bu akşam bir şey yapmak istiyorsun" }]} />`
+  forYou={[{ text: "Hafta sonu için plan arıyorsun" }]} />`
 
 export const NOT_FOR_YOU: NotForYouItem[] = [
-  { text: "Bin kişilik bir konferans düzenliyorsun", detail: "Bilet, salon ve sponsor yönetimi yok. Bunun için bir etkinlik platformu daha iyi." },
-  { text: "Takipçi toplamak istiyorsun", detail: "HADİ'de beğeni sayısı ve keşfet akışı yok; buluşma bitince sohbet de biter." },
-  { text: "Yalnız çevrim içi tanışmak istiyorsun", detail: "Her etkinlik gerçek bir yerde ve saatte. Görüntülü görüşme yok." },
-  { text: "Planı haftalar önceden yaparsın", detail: "Etkinlikler çoğunlukla aynı gün ya da ertesi gün." },
+  { text: "Bin kişilik bir konferans düzenliyorsun", detail: "Salon, sponsor ve kayıt masası yönetimi için bir etkinlik platformu daha uygun." },
+  { text: "Yalnız iş bağlantısı arıyorsun", detail: "HADİ ortak ilgi alanlarıyla tanışmak için; profesyonel ağ kurmak için başka uygulamalar daha uygun." },
+  { text: "Evden hiç çıkmak istemiyorsun", detail: "Görüntülü görüşme var, ama HADİ'nin asıl amacı insanları gerçek hayatta bir araya getirmek." },
+  { text: "Yalnız içerik izlemek istiyorsun", detail: "Keşfet akışı ve beğeniler var, ama HADİ'de akış bir etkinliğe katılmanın yolu, amacı değil." },
 ]
 export const FOR_YOU: NotForYouItem[] = [
-  { text: "Bu akşam bir şey yapmak istiyorsun", detail: "Yakınındaki etkinlikler saate göre sıralı." },
-  { text: "Yeni bir şehre taşındın", detail: "Küçük gruplar, ortak ilgi alanları." },
-  { text: "Kendi buluşmanı kurmak istiyorsun", detail: "Bir dakikada: ne, nerede, kaç kişi." },
+  { text: "Hafta sonu için plan arıyorsun", detail: "Yakınındaki etkinlikleri önceden gör, yerini ayır." },
+  { text: "Yeni bir şehre taşındın", detail: "Ortak ilgi alanları olan insanlarla tanış." },
+  { text: "Kendi buluşmanı kurmak istiyorsun", detail: "Ne, nerede, ne zaman: birkaç adımda." },
 ]
 
 export default function NotForYouDemo(props: { values: { variant: string; check: boolean; both: boolean } }) {
