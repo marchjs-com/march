@@ -8,6 +8,8 @@ export * from "./feature-grid/index.ts";
 export * from "./hero/index.ts";
 export * from "./honest-compare/index.ts";
 export * from "./horizontal-scroll/index.ts";
+export * from "./live-counter/index.ts";
+export * from "./live-feed/index.ts";
 export * from "./logo-cloud/index.ts";
 export * from "./newsletter/index.ts";
 export * from "./not-for-you/index.ts";

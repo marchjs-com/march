@@ -1117,6 +1117,8 @@
   "notForYouVerdict": "NotForYou'nun varsayılan sonuç cümlesi: üstü çizilen satır sayısına göre yönlendirme, kaç maddenin hâlâ uyduğu ya da hiçbirinin uymadığı.",
   "HonestCompare": "Geride kalınan yerleri de gösteren karşılaştırma tablosu: `<HonestCompare columns={[{ id: \"us\", name: \"HADİ\" }, …]} rows={[…]} />`.",
   "compareRow": "Bir karşılaştırma satırında ürünün durumu: 1 önde, 0 eşit, -1 geride, null puanlanmıyor.",
+  "LiveFeed": "Canlı akış: `<LiveFeed next={() => yeniEtkinlik()} every={2400} />` ya da `items={$akış}`; yeni öğe kayarak gelir, üstüne gelince ve düğmeyle durur.",
+  "LiveCounter": "Canlı sayaç: `<LiveCounter value={$çevrimiçi} label=\"kişi şu an\" />` ya da `from` + `rate` (dakikada artış) ile ekrandayken büyür.",
   "Counter": "Sayaç: `<Counter value={12500} />`, `<Counter value={$price} mode=\"roll\" format={EUR} />` (format: Intl.NumberFormat seçenekleri).",
   "CtaBand": "Çağrı bandı: `<CtaBand title=\"…\" lead=\"…\" actions={[{ label: \"Başla\", href: \"/start\" }]} variant=\"gradient\" />`.",
   "Faq": "Sık sorulan sorular: `<Faq items={[{ q: \"Ücretsiz mi?\", a: \"Evet, MIT.\" }]} layout=\"split\" title=\"Sorular\" search />`.",

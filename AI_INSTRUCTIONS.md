@@ -775,6 +775,8 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Hero | experimental | First screen in seven looks (centered, split, video, mesh, aurora, product, parallax): eyebrow, gradient-highlight title, lead, actions. | Reveal, Overlay, Button, Badge, VideoBackground, Parallax |
 | HonestCompare | experimental | Comparison table that also shows where the product is behind: scored rows, ahead / even / behind summary, a filter for the losing rows and visible notes. | — |
 | HorizontalScroll | experimental | Pinned section whose panels slide sideways while the page scrolls down; progress line; native snap scroller on touch. | — |
+| LiveCounter | experimental | A number that grows while you watch: fed by a signal or simulated with a rate per minute on the motion clock (only while visible); odometer digits and a live dot. | Counter |
+| LiveFeed | experimental | Living wall: new activity slides in, the oldest leaves; pulls from next() on the motion clock while visible, pauses on hover, focus or the Pause button. | — |
 | LogoCloud | experimental | Trusted-by logos as an equal grid or an endless Marquee ticker; one muted tone, full colour on hover. | Marquee, Grid, Reveal |
 | Newsletter | experimental | Email sign-up, inline or stacked: validation, busy button, success check that pops in, error shake and announcement. | TextInput, Button |
 | NotForYou | experimental | Anti-landing block: who the product is not for (and who it is for); the visitor can mark the lines that apply and gets an honest verdict. | — |

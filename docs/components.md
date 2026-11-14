@@ -198,6 +198,8 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Hero | experimental | First screen in seven looks (centered, split, video, mesh, aurora, product, parallax): eyebrow, gradient-highlight title, lead, actions. | [Reveal](#reveal), [Overlay](#overlay), [Button](#button), [Badge](#badge), [VideoBackground](#videobackground), [Parallax](#parallax) |
 | HonestCompare | experimental | Comparison table that also shows where the product is behind: scored rows, ahead / even / behind summary, a filter for the losing rows and visible notes. | — |
 | HorizontalScroll | experimental | Pinned section whose panels slide sideways while the page scrolls down; progress line; native snap scroller on touch. | — |
+| LiveCounter | experimental | A number that grows while you watch: fed by a signal or simulated with a rate per minute on the motion clock (only while visible); odometer digits and a live dot. | [Counter](#counter) |
+| LiveFeed | experimental | Living wall: new activity slides in, the oldest leaves; pulls from next() on the motion clock while visible, pauses on hover, focus or the Pause button. | — |
 | LogoCloud | experimental | Trusted-by logos as an equal grid or an endless Marquee ticker; one muted tone, full colour on hover. | Marquee, [Grid](#grid), [Reveal](#reveal) |
 | Newsletter | experimental | Email sign-up, inline or stacked: validation, busy button, success check that pops in, error shake and announcement. | [TextInput](#textinput), [Button](#button) |
 | NotForYou | experimental | Anti-landing block: who the product is not for (and who it is for); the visitor can mark the lines that apply and gets an honest verdict. | — |
@@ -1120,6 +1122,30 @@ Edit an array of strings in place: type and press Enter to add, edit any row, mo
 ```
 
 Full page: src/components/forms/list-editor/docs.md
+
+## LiveCounter
+
+A number that grows while you watch. Feed it a live value (a signal from your server), or give it a start and a `rate` per minute: it then adds small random steps on the motion clock, only while it is on screen. The digits roll like an odometer and a pulsing dot marks it as live.
+
+Composed of: [Counter](#counter)
+
+```tsx
+<LiveCounter value={$online} label="people online" />
+<LiveCounter from={18420} rate={40} label="joined an event this week" format={{ notation: "compact" }} />
+```
+
+Full page: src/components/landing/live-counter/docs.md
+
+## LiveFeed
+
+A living wall: new activity slides in at the top (rows) or pops into the first cell (wall), and the oldest leaves, so the page looks inhabited. Feed it a reactive list (`items`, newest first: from a socket or a store) or a `next()` function the feed calls every `every` ms while it is on screen.
+
+```tsx
+<LiveFeed next={() => nextActivity()} every={2400} max={5} />
+<LiveFeed items={$events} variant="wall" live="polite" />
+```
+
+Full page: src/components/landing/live-feed/docs.md
 
 ## Loader
 

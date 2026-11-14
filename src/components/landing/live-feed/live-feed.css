@@ -1,0 +1,22 @@
+/* LiveFeed. Rows (newest on top) or a wall of cards; a pulsing dot on the pause button says it is live. */
+.hm-lf { display: grid; gap: var(--hm-space-3); min-inline-size: 0; }
+.hm-lf-pause { justify-self: start; display: inline-flex; align-items: center; gap: var(--hm-space-2); padding: .35em .85em; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-full); background: var(--hm-surface); color: var(--hm-text); font: inherit; font-size: var(--hm-text-xs); font-weight: var(--hm-weight-semibold); cursor: pointer; }
+.hm-lf-pause:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: 2px; }
+.hm-lf-pulse { position: relative; inline-size: .5rem; block-size: .5rem; border-radius: 50%; background: var(--hm-success); }
+.hm-lf-pulse::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid var(--hm-success); opacity: .35; animation: hm-fade-in var(--hm-dur-slow) var(--hm-ease) infinite alternate; }
+.hm-lf-pulse.is-off { background: var(--hm-muted); }
+.hm-lf-pulse.is-off::after { animation: none; }
+.hm-lf-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--hm-space-2); }
+.hm-lf-item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--hm-space-3); padding: var(--hm-space-3) var(--hm-space-4); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-4); background: var(--hm-surface); box-shadow: var(--hm-shadow-1); }
+.hm-lf-item.is-leaving { pointer-events: none; }
+.hm-lf-avatar { display: grid; place-items: center; inline-size: 2.25rem; block-size: 2.25rem; border-radius: 50%; background: var(--hm-accent, var(--hm-primary)); color: var(--hm-on-accent, var(--hm-bg)); font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); }
+.hm-lf-dot { inline-size: .6rem; block-size: .6rem; border-radius: 50%; background: var(--hm-accent, var(--hm-primary)); }
+.hm-lf-text { display: grid; min-inline-size: 0; }
+.hm-lf-title { font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-lf-body { color: var(--hm-muted); font-size: var(--hm-text-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-lf-meta { color: var(--hm-muted); font-size: var(--hm-text-xs); white-space: nowrap; }
+.hm-lf-wall .hm-lf-list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: var(--hm-space-3); }
+.hm-lf-wall .hm-lf-item { grid-template-columns: auto minmax(0, 1fr); align-content: start; }
+.hm-lf-wall .hm-lf-meta { grid-column: 2; }
+.hm-lf-wall .hm-lf-title, .hm-lf-wall .hm-lf-body { white-space: normal; }
+@media (prefers-reduced-motion: reduce) { .hm-lf-pulse::after { animation: none; } }
