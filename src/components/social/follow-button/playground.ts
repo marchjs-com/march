@@ -9,7 +9,7 @@ export default definePlayground<Values>({
     { key: "block", label: "Tam genişlik", default: false },
     { key: "labels", label: "Metinler", default: "default", options: [{ value: "default", label: "Takip et / Takip ediliyor" }, { value: "own", label: "kendi metnim (Katıl / Üyesin)" }] },
     { key: "icon", label: "İkon", default: "on", options: [{ value: "on", label: "+ / tik" }, { value: "own", label: "kendi ikonum" }, { value: "off", label: "yok" }] },
-    { key: "color", label: "Renk", default: "brand-blue", options: [{ value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }, { value: "brand-orange", label: "turuncu" }] },
+    { key: "color", label: "Renk", default: "brand-blue", options: [{ value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }, { value: "brand-orange", label: "turuncu" }], prop: "m:color" },
     { key: "burst", label: "Patlama", default: true, visibleWhen: (v) => !v.private },
     { key: "morph", label: "Geçiş hareketi", default: true },
   ],

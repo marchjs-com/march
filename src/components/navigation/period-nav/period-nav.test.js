@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -30,8 +31,7 @@ test("PeriodNav: previous / today / next, own texts; no today button without onT
 test("PeriodNav: a title between the arrows (today follows), today off / own, arrows off, own icons, limits, colour, part classes", () => {
   const month = signal("March 2026"), atStart = signal(true);
   const [el, dispose] = mount(() => [
-    h(PeriodNav, { title: month, onPrev: () => {}, onNext: () => {}, onToday: () => {}, today: "This month", prevIcon: "<", nextIcon: () => h("b", {}, ">"), prevDisabled: atStart,
-      color: "brand-orange", size: "sm", class: "mine", partClass: { prev: "my-prev", next: "my-next", today: "my-today", title: "my-title" } }),
+    mProps(h(PeriodNav, { title: month, onPrev: () => {}, onNext: () => {}, onToday: () => {}, today: "This month", prevIcon: "<", nextIcon: () => h("b", {}, ">"), prevDisabled: atStart, size: "sm", class: "mine", partClass: { prev: "my-prev", next: "my-next", today: "my-today", title: "my-title" } }), { color: "brand-orange" }),
     h(PeriodNav, { onPrev: () => {}, onNext: () => {}, onToday: () => {}, today: false }),
     h(PeriodNav, { onPrev: () => {}, onNext: () => {}, arrows: false }, "April"),
   ]);
@@ -47,7 +47,7 @@ test("PeriodNav: a title between the arrows (today follows), today off / own, ar
   assert.equal(a.querySelector(".my-prev").disabled, true);
   atStart.set(false);
   assert.equal(a.querySelector(".my-prev").disabled, false);
-  assert.equal(a.querySelector(".my-next").getAttribute("data-m-color"), "brand-orange");
+  assert.equal(a.querySelector(".my-next").closest("[data-m-color]")?.getAttribute("data-m-color"), "brand-orange");
   assert.ok(a.querySelector(".my-prev").classList.contains("m-btn-sm"));
   assert.equal(b.querySelectorAll("button").length, 2, "today off");
   assert.equal(c.querySelectorAll("button").length, 0, "arrows off");

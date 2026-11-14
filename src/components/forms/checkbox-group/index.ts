@@ -20,7 +20,7 @@ export function CheckboxGroup<T = unknown>(props: CheckboxGroupProps<T>): unknow
   const field = useField();
   const baseId = props.id ?? field?.id ?? uid("m-cbg");
   const c = ctl(props);
-  return h("div", { "data-m-color": () => colorAttr(props.color), role: "group", class: () => groupClass(props, "checkbox"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
+  return h("div", { role: "group", class: () => groupClass(props, "checkbox"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
     () => normOptions(props.options).map((o, i) => h("label", { class: "m-check", "data-m-color": () => itemColor(props.colors, i) },
       h("input", {
         type: "checkbox", class: "m-check-input", id: i ? `${baseId}-${i}` : baseId, name: props.name, onBlur: props.onBlur,

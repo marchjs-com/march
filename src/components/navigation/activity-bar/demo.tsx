@@ -15,7 +15,7 @@ export const code = `<ActivityBar value={$view} onChange={(v) => $view = v} cont
   { id: "git", label: "Kaynak denetimi", icon: gitBranch, badge: () => $changes },
   { id: "settings", label: "Ayarlar", icon: settings, position: "end", onSelect: openSettings },
 ]} />
-<ActivityBar items={views} value={$view} onChange={(v) => $view = v} color="brand-purple" motion="fade" tooltips={false} />
+<ActivityBar items={views} value={$view} onChange={(v) => $view = v} m:color="brand-purple" motion="fade" tooltips={false} />
 <ActivityBar items={views} value={$view} onChange={(v) => $view = v} indicator={false} />
 <ActivityBar items={views} value={$view} onChange={(v) => $view = v} showLabels tooltips={false} />   // adlar ikonun altında`
 
@@ -30,7 +30,7 @@ export default function ActivityBarDemo(props: { values: { orientation: string; 
       // the indicator, its motion, the tooltips and the color are read once: the bar is drawn again when one changes
       const ind = props.values.indicator, showLabels = props.values.showLabels, tooltips = props.values.tooltips && !showLabels, color = (props.values.color || undefined) as ColorToken
       return <ActivityBar value={view} onChange={(v: string | null) => view.set(v)} controls="sc-ab-view"
-      indicator={ind !== "off"} motion={ind === "off" ? undefined : ind as "glide"} tooltips={tooltips} showLabels={showLabels} color={color}
+      indicator={ind !== "off"} motion={ind === "off" ? undefined : ind as "glide"} tooltips={tooltips} showLabels={showLabels} m:color={color}
       orientation={() => props.values.orientation as "vertical"} label="Görünümler" items={[
         { id: "files", label: "Dosyalar", icon: files, shortcut: "mod+shift+e" },
         { id: "search", label: "Ara", icon: search, badge: () => (props.values.badges ? 12 : 0) },

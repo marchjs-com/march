@@ -14,7 +14,7 @@ always agree.
   { id: "delete", label: "Delete", icon: trash, danger: true },
 ]} />
 <OverflowToolbar label="Document" items={items} moreLabel="Other tools" moreIcon={menu} tooltips={false}
-  motion="fade" color="brand-purple" />
+  motion="fade" m:color="brand-purple" />
 <OverflowToolbar label="Document" items={items} motion={(el) => animate(el, { opacity: [0, 1], y: [-8, 0] }, { duration: 240 })} />
 ```
 

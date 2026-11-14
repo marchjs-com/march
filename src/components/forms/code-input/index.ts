@@ -6,7 +6,7 @@ import { animateEl, reducedMotion } from "../../../motion/env.ts";
 import { t } from "../../../core/i18n.ts";
 import { model, ctl, cx, uid, syncValue, labelledBy, useField, itemColor, type ControlProps } from "../../../forms/util.ts";
 import { inputOf } from "../../../forms/affix.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { clamp } from "../../../core/util.ts";
 import { ownPart } from "../../../ui/parts.ts";
 
@@ -138,7 +138,7 @@ export function CodeInput(props: CodeInputProps): unknown {
   onCleanup(() => { boxes.length = 0; });
   // codes read left to right in every language
   return h("div", {
-    "data-m-color": () => colorAttr(props.color), "data-m-colors": props.colors && props.colors !== "single" ? (Array.isArray(props.colors) ? "custom" : props.colors) : null, role: "group", dir: "ltr",
+    "data-m-colors": props.colors && props.colors !== "single" ? (Array.isArray(props.colors) ? "custom" : props.colors) : null, role: "group", dir: "ltr",
     class: () => cx("m-otp", `m-otp-${props.size ?? "md"}`, `m-otp-${props.variant ?? "outline"}`, props.font && `m-otp-font-${props.font}`, props.colors === "single" && "m-otp-single", props.class),
     "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"],
   }, parts);

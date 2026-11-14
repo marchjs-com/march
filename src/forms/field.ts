@@ -6,7 +6,7 @@ import { provide, useContext } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import type { Field as SchemaField } from "../schema/index.ts";
 import { FieldContext, scoped, cx, uid, type FieldCtx, type ClassProp } from "./util.ts";
-import { colorAttr, type ColorToken } from "../theme/colors.ts";
+import { type ColorToken } from "../theme/colors.ts";
 import type { FormController, FieldName } from "./form.ts";
 import type { Values } from "../schema/index.ts";
 
@@ -22,8 +22,6 @@ export const setControlBuilder = (fn: ControlBuilder): void => { buildControl = 
 
 /** Props of <Field>. */
 export interface FieldProps<V = Values> {
-  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
-  color?: ColorToken | undefined;
   /** A schema field of the enclosing (or `form`) form; its control is rendered. Without it, the children are wrapped. */
   name?: FieldName<V> | undefined;
   form?: FormController<V> | null | undefined;
@@ -71,7 +69,7 @@ export function Field(props: FieldProps): unknown {
     const labelEl = inlineLabel ? null : group
       ? h("div", { class: "m-label", id: labelId }, labelKids)
       : h("label", { class: "m-label", id: labelId, for: id }, labelKids);
-    return h("div", { "data-m-color": () => colorAttr(props.color),
+    return h("div", {
       class: cx("m-field", props.inline && "m-field-inline", props.compact && "m-field-compact", f?.["span"] ? `m-span-${f["span"]}` : false, props.class),
       "class:m-field-invalid": () => !!error(), "data-field": name ?? null,
     },

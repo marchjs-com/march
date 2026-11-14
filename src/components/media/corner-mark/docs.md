@@ -6,7 +6,7 @@ appears on a project cover, the "+" badge on a story ring. The parent must be po
 ```tsx
 <div class="tile"><Picture source={photo} fit="cover" /><CornerMark icon={video} /></div>
 <a class="card m-corner-host" href={href}>…<CornerMark icon={arrowUpRight} variant="surface" show="hover" /></a>
-<CornerMark corner="bottom-end" icon={plus} variant="solid" color="brand-orange" size="sm" ring overlap />
+<CornerMark corner="bottom-end" icon={plus} variant="solid" m:color="brand-orange" size="sm" ring overlap />
 ```
 
 ## Props

@@ -115,7 +115,7 @@ export function LiveCounter(props: LiveCounterProps): Element {
         // effect's: the next change must not dispose a bubble that is still rising)
         createRoot((dispose) => {
           const b = (typeof props.bubble === "function" ? h("span", { class: "m-lc-bubble is-own" }, props.bubble(d, label))
-            : h(Badge, { class: "m-lc-bubble", tone: props.bubbleColor ? "primary" : "success", color: props.bubbleColor }, label)) as HTMLElement;
+            : withColor(h(Badge, { class: "m-lc-bubble", tone: props.bubbleColor ? "primary" : "success" }, label), props.bubbleColor)) as HTMLElement;
           box.append(b);
           void animate(b, { opacity: [0, 1, 1, 0], transform: ["translateY(10px) scale(.6)", "translateY(-6px) scale(1.1)", "translateY(-22px) scale(1)", "translateY(-40px) scale(.9)"] }, { duration: 1500, easing: "out" })
             .finished.then(() => { b.remove(); dispose(); });

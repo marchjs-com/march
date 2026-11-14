@@ -7,7 +7,7 @@ import { arrowRight } from "../../../icons/glyphs/arrowRight.ts";
 
 export const code = `<PeriodNav onPrev={() => shift(-1)} onNext={() => shift(1)} onToday={() => go(today)} />     // ‹ Today ›
 <PeriodNav title={$monthName} onPrev={back} onNext={on} />                                    // ‹ March 2026 ›
-<PeriodNav title={$monthName} onPrev={back} onNext={on} onToday={now} today="Bu ay" color="brand-orange"
+<PeriodNav title={$monthName} onPrev={back} onNext={on} onToday={now} today="Bu ay" m:color="brand-orange"
   prevIcon={arrowLeft} nextIcon={arrowRight} labels={{ group: "Ay", previous: "Önceki ay", next: "Sonraki ay" }} />`
 
 interface Values { title: boolean; today: string; arrows: boolean; icons: string; attached: boolean; size: string; color: string; limit: boolean; labels: string }
@@ -32,7 +32,7 @@ export default function PeriodNavDemo(props: { values: Values }) {
       const today = v.today === "off" ? false : v.today === "own" ? "● Şimdi" : undefined
       return <PeriodNav title={title} onPrev={() => move(-1)} onNext={() => move(1)} onToday={() => { $offset = 0 }} today={today}
         arrows={v.arrows} prevIcon={own ? arrowLeft : undefined} nextIcon={own ? arrowRight : undefined} attached={v.title ? undefined : v.attached}
-        size={v.size as "md"} color={color} labels={labels}
+        size={v.size as "md"} m:color={color} labels={labels}
         prevDisabled={() => v.limit && $offset <= first} nextDisabled={() => v.limit && $offset >= last} />
     }}
     <p class="sc-demo-call">{() => `${name($offset)} (${$offset >= 0 ? "+" : ""}${$offset} ay)${limit() ? ` · sınır: ${name(first)} – ${name(last)}` : ""}`}</p>

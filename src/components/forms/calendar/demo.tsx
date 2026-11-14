@@ -7,7 +7,7 @@ import { computed, untrack } from "../../../core/reactive.ts";
 type Maybe<T> = T | null | undefined
 
 export const code = `<Calendar bind:value={$day} firstDay={1} min={todayIso()} max={addDays(todayIso(), 30)} />
-<Calendar bind:value={$day} color="brand-orange" weekdays={false} prevIcon="«" nextIcon="»"
+<Calendar bind:value={$day} m:color="brand-orange" weekdays={false} prevIcon="«" nextIcon="»"
   labels={{ prevMonth: "Önceki ay", nextMonth: "Sonraki ay" }} renderDay={(iso, d) => busy.has(iso) ? <b>{d}•</b> : d} />`
 
 export default function CalendarDemo(props: { values: { firstDay: string; window: boolean; color: string; weekdays: boolean; nav: string; busy: boolean } }) {
@@ -22,7 +22,7 @@ export default function CalendarDemo(props: { values: { firstDay: string; window
         const weekdays = props.values.weekdays, nav = props.values.nav, busy = props.values.busy, today = todayIso()
         return <Calendar value={$day} onChange={(x: Maybe<string>) => { $day = x ?? today }} firstDay={props.values.firstDay === "locale" ? undefined : Number(props.values.firstDay)}
         min={props.values.window ? addDays(today, -3) : undefined} max={props.values.window ? addDays(today, 10) : undefined}
-        color={props.values.color === "primary" ? undefined : (props.values.color as "brand-blue")} weekdays={weekdays} nav={nav !== "off"}
+        m:color={props.values.color === "primary" ? undefined : (props.values.color as "brand-blue")} weekdays={weekdays} nav={nav !== "off"}
         prevIcon={nav === "own" ? "«" : undefined} nextIcon={nav === "own" ? "»" : undefined} labels={{ prevMonth: "Önceki ay", nextMonth: "Sonraki ay" }}
         renderDay={busy ? (_iso: string, d: number) => (d % 4 === 0 ? <b>{`${d}•`}</b> : d) : undefined} />
       })

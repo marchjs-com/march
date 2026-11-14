@@ -22,13 +22,13 @@ Hovering "Following" turns it red before you unfollow.
 | `labels` | `{ follow, following, requested }` | built-in texts | your own button texts; any subset |
 | `ariaLabel` | `(state, name) => string` | built-in sentences | your own accessible name |
 | `icon` | boolean / `(state) => node` | `true` | the + / tick / clock: off, or your own |
-| `color` | ColorToken | `brand-blue` | fill of "Follow" and the focus ring |
+| `m:color` | ColorToken | `brand-blue` | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `burst` | boolean | true | the dots on a new follow |
 | `morph` | boolean | true | the width spring and the icon turn |
 | `class` | string | — | on the button (`m-follow`; parts: `m-follow-ico`, `m-follow-text`) |
 
 ```tsx
-<FollowButton state={$s} onChange={set} labels={{ follow: "Join", following: "Member" }} color="brand-green"
+<FollowButton state={$s} onChange={set} labels={{ follow: "Join", following: "Member" }} m:color="brand-green"
   icon={(s) => (s === "follow" ? <Icon of={star} /> : null)} burst={false} morph={false}
   ariaLabel={(s, name) => (s === "follow" ? `Join ${name}` : `Leave ${name}`)} />
 ```

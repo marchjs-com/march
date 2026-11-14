@@ -23,7 +23,7 @@ Stars to give or show a score. Editable it is a radio group: click or use the ar
 | `starLabel` | `(n, max) => string` | "3 of 5" | accessible name of a mark |
 | `animate` | boolean | `true` | `false`: no hover growth, no fade |
 
-Hearts instead of stars: `<Rating bind:value={$v} icon={heart} iconOn={heartFilled} color="danger"
+Hearts instead of stars: `<Rating bind:value={$v} icon={heart} iconOn={heartFilled} m:color="danger"
 starLabel={(n, max) => `${max} üzerinden ${n}`} animate={false} />`; `icon={(n) => <b>{n}</b>}` draws anything.
 
 ## Accessibility

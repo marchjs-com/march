@@ -35,7 +35,7 @@ export function Slider(props: SliderProps): unknown {
     onChange: (e: Event) => props.onCommit?.(Number(inputOf(e).value)),
   }) as HTMLInputElement;
   syncValue(el, get);
-  const rail = track == null ? el : h("span", { class: "m-slider-rail", "data-m-color": () => colorAttr(props.color) },
+  const rail = track == null ? el : h("span", { class: "m-slider-rail" },
     h("span", { class: cx("m-slider-track", track === true ? "m-slider-ramp" : typeof track === "string" && track), "aria-hidden": "true" }, track === true || typeof track === "string" ? null : track), el);
   return h("span", { class: () => cx("m-slider-wrap", props.class) }, rail, props.showValue === false ? null : h("output", { class: "m-slider-value", for: () => el.id || null }, () => (props.format ? props.format(get()) : String(get() ?? ""))));
 }

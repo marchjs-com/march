@@ -27,7 +27,7 @@ between emoji (mirrored in RTL; up / down move by rows in the grid), Home / End 
 | `class` | string | — | on the root (`m-react`; parts: `m-react-e`, `m-react-more`) |
 
 ```tsx
-<ReactionPicker onPick={react} onMore={openPanel} color="brand-orange" pop={false} label="React to the photo"
+<ReactionPicker onPick={react} onMore={openPanel} m:color="brand-orange" pop={false} label="React to the photo"
   emojiLabel={(e) => NAMES[e] ?? e} moreLabel="All emoji" moreIcon={<Icon of={smile} />} />
 ```
 

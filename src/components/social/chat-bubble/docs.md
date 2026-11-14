@@ -42,7 +42,7 @@ you let go while the bubble springs back on the motion engine.
 Every part is yours:
 
 ```tsx
-<ChatBubble mine text="Done" status="read" color="brand-purple" labels={{ read: "Seen", edited: "changed", retry: "Try again" }}
+<ChatBubble mine text="Done" status="read" m:color="brand-purple" labels={{ read: "Seen", edited: "changed", retry: "Try again" }}
   ticks={(s) => <b>{s === "read" ? "✓✓" : "✓"}</b>} formatTime={(d) => d.toLocaleTimeString("en", { hour: "numeric" })}
   replyHint={false} tools={false} />
 ```

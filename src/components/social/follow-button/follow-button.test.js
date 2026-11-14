@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
@@ -30,8 +31,8 @@ test("FollowButton: follow → following → follow; private → requested; name
 test("FollowButton: own texts, own name, own icon / no icon, color, no burst", async () => {
   const s = signal("follow");
   const m = mount(() => [
-    h(FollowButton, { state: s, name: "HADİ", onChange: (n) => s.set(n), labels: { follow: "Join", following: "Member" }, color: "brand-green", burst: false, morph: false,
-      ariaLabel: (st, n) => `${st}:${n}`, icon: (st) => h("i", { class: `own-${st}` }) }),
+    mProps(h(FollowButton, { state: s, name: "HADİ", onChange: (n) => s.set(n), labels: { follow: "Join", following: "Member" }, burst: false, morph: false,
+      ariaLabel: (st, n) => `${st}:${n}`, icon: (st) => h("i", { class: `own-${st}` }) }), { color: "brand-green" }),
     h(FollowButton, { state: "follow", onChange: () => {}, icon: false }),
   ]);
   const [a, b] = m.el.querySelectorAll("button.m-follow");

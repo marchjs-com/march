@@ -9,7 +9,7 @@ export default function SiteSectionDemo(props: { values: { tone: string; align: 
   return <div class="sc-site-frame">
     {() => {
       const v = { ...props.values }
-      return <SiteSection tone={v.tone as SectionTone} align={v.align as "center"} width={v.width as "default"} space="sm" color={v.color === "default" ? undefined : v.color as "brand-purple"} reveal={v.reveal === "off" ? false : { effect: v.reveal as "up" }} eyebrow="Özellikler" title="İhtiyacın olan her şey, tek pakette" lead="Bileşenler, tema, hareket ve hız: hepsi aynı dili konuşur.">
+      return <SiteSection tone={v.tone as SectionTone} align={v.align as "center"} width={v.width as "default"} space="sm" m:color={v.color === "default" ? undefined : v.color as "brand-purple"} reveal={v.reveal === "off" ? false : { effect: v.reveal as "up" }} eyebrow="Özellikler" title="İhtiyacın olan her şey, tek pakette" lead="Bileşenler, tema, hareket ve hız: hepsi aynı dili konuşur.">
         <div class="sc-site-placeholder">İçerik</div>
       </SiteSection>
     }}

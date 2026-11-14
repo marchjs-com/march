@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { Pricing } = await import("./index.ts");
@@ -34,8 +35,8 @@ test("Pricing: cards, featured badge, custom price, not-included feature, radio 
 test("Pricing: own texts, colour, own feature mark, no per line, plain price, no reveal", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => [
-    h(Pricing, { plans, class: "one", color: "brand-purple", featureColor: "brand-blue", priceEffect: "none", per: false, reveal: false,
-      labels: { monthly: "Pay monthly", yearly: "Pay yearly", custom: "Talk", notIncluded: "missing", billingPeriod: "Period" } }),
+    mProps(h(Pricing, { plans, class: "one", featureColor: "brand-blue", priceEffect: "none", per: false, reveal: false,
+      labels: { monthly: "Pay monthly", yearly: "Pay yearly", custom: "Talk", notIncluded: "missing", billingPeriod: "Period" } }), { color: "brand-purple" }),
     h(Pricing, { plans, class: "two", featureIcon: (on) => h("b", { class: "mine" }, on ? "+" : "-"), labels: { perMonth: "per seat", billedMonthly: "each month" } }),
     h(Pricing, { plans, class: "three", featureIcon: false, toggle: false }),
   ], el);

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const tick = () => new Promise((r) => setTimeout(r, 0));
@@ -64,7 +65,7 @@ test("ActivityBar: indicator and tooltips off, color token, motion none places t
   const items = [{ id: "files", label: "Files", icon: "F" }, { id: "search", label: "Search", icon: "S" }];
   const view = signal("files");
   const m = mount(() => [
-    h(ActivityBar, { value: "files", onChange: () => {}, items, indicator: false, tooltips: false, color: "brand-purple" }),
+    mProps(h(ActivityBar, { value: "files", onChange: () => {}, items, indicator: false, tooltips: false }), { color: "brand-purple" }),
     h(ActivityBar, { value: view, onChange: (v) => view.set(v), items, motion: "none" }),
   ]);
   await tick();

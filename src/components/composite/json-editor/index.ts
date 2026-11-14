@@ -120,7 +120,7 @@ export function JsonEditor(props: JsonEditorProps): unknown {
     id: c.id, name: props.name, value: text, onChange: emit, class: "m-json", mono: true, autosize: false, rows: props.rows ?? 8, spellcheck: "false", autocomplete: "off",
     tabIndent: live(() => props.tabIndent !== false), readonly: live(() => props.readonly), disabled: live(() => props.disabled), required: live(() => props.required),
     invalid: live(() => !!status().msg || c["aria-invalid"]() === "true"), describedby: live(() => [status().msg ? msgId : null, c["aria-describedby"]()].filter(Boolean).join(" ") || null),
-    "aria-label": live(() => c["aria-label"]()), color: props.color, onBlur: props.onBlur, onFocus: props.onFocus,
+    "aria-label": live(() => c["aria-label"]()), onBlur: props.onBlur, onFocus: props.onFocus,
   });
   const format = (): void => { const st = status.peek(); if (!("value" in st)) return; emit(st.value == null ? "" : JSON.stringify(st.value, null, props.indent ?? 2)); };
 

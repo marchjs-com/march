@@ -42,7 +42,7 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `suggestionsLabel` | string / accessor | "Suggestions" | accessible name of the list |
 | `multiline` | boolean | `true` | `false`: Enter does not write a new line |
 | `readonly`, `disabled` | boolean | `false` | |
-| `color` | color token | accent | focus ring, selection and flash |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `onBlur` | `(e) => void` | — | focus left the field (tidy the code here) |
 | `inputRef` | `(textarea) => void` | — | the text field |
 | `id`, `name`, `class` | | | |

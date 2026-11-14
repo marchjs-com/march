@@ -18,7 +18,7 @@ import { flip } from "../../../motion/flip.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts"; // Reveal: the cards enter one after another
-import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface ProjectCover extends PictureSource { alt: string; width: number; height: number }
 export interface Project {
@@ -46,8 +46,6 @@ export interface ProjectGridProps {
   allLabel?: MaybeFn<string> | undefined;
   /** Accessible name of the filter group (default "Filter projects"). */
   filtersLabel?: string | undefined;
-  /** Colour of the selected filter chip (default: the accent). */
-  color?: ColorToken | undefined;
   /** The arrow badge on a cover: true (default), false, or `(project) => node`. */
   arrow?: boolean | ((p: Project) => unknown) | undefined;
   /** Animate the filter change (fade out, glide, default true); false swaps the cards at once. */
@@ -96,9 +94,9 @@ export function ProjectGrid(props: ProjectGridProps): Element {
   };
   const chips = props.filters !== false && cats.length > 1
     ? h("div", { class: "m-pg-filters", role: "group", "aria-label": props.filtersLabel ?? t`Filter projects` },
-      withColor(h(Chip, { selected: () => filter() === null, onClick: () => choose(null) }, () => val(props.allLabel) ?? t`All`), props.color),
-      cats.map((c) => withColor(h(Chip, { selected: () => filter() === c, onClick: () => choose(c) }, c), props.color)))
+      h(Chip, { selected: () => filter() === null, onClick: () => choose(null) }, () => val(props.allLabel) ?? t`All`),
+      cats.map((c) => h(Chip, { selected: () => filter() === c, onClick: () => choose(c) }, c)))
     : null;
   if (props.reveal !== false) owned(revealOnScroll(grid, { effect: "up", stagger: 70, ...props.reveal, select: ".m-pg-card" }));
-  return h("div", { class: cx("m-pg", val(props.class)), "data-m-color": colorAttr(props.color) }, chips, grid) as Element;
+  return h("div", { class: cx("m-pg", val(props.class)) }, chips, grid) as Element;
 }

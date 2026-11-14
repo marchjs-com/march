@@ -336,10 +336,10 @@ loaded values; Save is disabled until something changed. Server `fieldErrors` ma
 
 ## Colors
 
-Every control takes `color` (a theme token): focus ring and border, caret, selected text, checked state, slider,
-selected option and day, chips, active step and the drop zone use it. `<Form color="brand-blue">`, `<Field color=…>` and
-groups (`<CheckboxGroup>`, `<RadioGroup>`, `<Segmented>`) pass it to everything inside (CSS inheritance of
-`data-m-color`); a control's own `color` overrides it. Invalid fields always show `danger`. Floating panels (Select,
+Every control takes the common prop `m:color` (a theme token): focus ring and border, caret, selected text, checked
+state, slider, selected option and day, chips, active step and the drop zone use it. `<Form m:color="brand-blue">`,
+`<Field m:color=…>` and groups (`<CheckboxGroup>`, `<RadioGroup>`, `<Segmented>`) pass it to everything inside (CSS
+inheritance of `data-m-color`); a control's own `m:color` overrides it. Per option colours of a group stay `colors`. Invalid fields always show `danger`. Floating panels (Select,
 DatePicker) take the color of their control.
 
 Tokens: `primary`, `info`, `success`, `warning`, `danger`, `neutral`, `special`, `brand-orange`, `brand-blue`,

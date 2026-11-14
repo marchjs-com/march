@@ -31,6 +31,7 @@ import { plus } from "../../../icons/glyphs/plus.ts";
 import { copy } from "../../../icons/glyphs/copy.ts";
 import { trash } from "../../../icons/glyphs/trash.ts";
 import * as J from "./json-path.ts";
+import { withColor } from "../../../theme/colors.ts";
 export * from "./json-path.ts";
 
 export interface TreeEditorProps extends ControlProps<unknown> {
@@ -269,7 +270,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
       : h("span", { class: cx("m-tre-value", `m-tre-${r.kind}`), title: sch?.description ?? null, onDblClick: () => { if (!ro()) editing.set({ ptr: r.ptr, field: "value" }); } },
         r.kind === "string" ? (r.value as string) || h("span", { class: "m-tre-empty" }, () => L().emptyText ?? t`empty text`) : String(r.value)));
   };
-  const kindBadge = (k: Kind, more?: Record<string, unknown>): unknown => h(Badge, { ...more, color: COLOR[k], tone: COLOR[k] ? "primary" : "neutral", class: cx("m-tre-badge", more && `m-tre-type m-tre-type-${k}`) }, GLYPH[k]);
+  const kindBadge = (k: Kind, more?: Record<string, unknown>): unknown => withColor(h(Badge, { ...more, tone: COLOR[k] ? "primary" : "neutral", class: cx("m-tre-badge", more && `m-tre-type m-tre-type-${k}`) }, GLYPH[k]), COLOR[k]);
   // the type of a row: a clickable badge that opens the type menu (also the T key). Without badges the menu opens by the row.
   const typeMenuOf = (r: Row): unknown => {
     const badge = props.typeBadges === false ? null : kindBadge(r.kind, { disabled: ro(), ariaLabel: L().typeOf?.(kindName(r.kind)) ?? t`Type: ${kindName(r.kind)}. Change`, onClick: (e: MouseEvent) => e.stopPropagation() }) as HTMLElement;

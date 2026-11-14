@@ -6,7 +6,7 @@ import { h } from "../../../dom/h.ts";
 import { cx, val, uid, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import type { RevealOptions } from "../reveal/index.ts";
 import { SectionHead } from "../section-head/index.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export type SectionTone = "plain" | "muted" | "inverse" | "brand";
 export interface SiteSectionProps {
@@ -22,8 +22,6 @@ export interface SiteSectionProps {
   space?: "none" | "sm" | "md" | "lg" | undefined;
   /** Heading level for the title (default 2). */
   level?: 1 | 2 | 3 | undefined;
-  /** Colour of the section: the eyebrow, the `brand` tone and every accent inside follow it (default: the accent). */
-  color?: ColorToken | undefined;
   /** Entrance of the heading group: Reveal options, or false for none (default: up, one after another). */
   reveal?: RevealOptions | false | undefined;
   id?: string | undefined;
@@ -34,12 +32,12 @@ export interface SiteSectionProps {
 
 /** `<SiteSection eyebrow="Features" title="Everything you need" lead="…">…</SiteSection>` */
 export function SiteSection(props: SiteSectionProps): Element {
-  const { eyebrow, title, lead, align, tone, width, space, level, color, reveal, class: c, children, ...attrs } = props;
+  const { eyebrow, title, lead, align, tone, width, space, level, reveal, class: c, children, ...attrs } = props;
   const hid = title != null ? uid("m-ss") : null;
   // the heading group is the shared SectionHead (it enters with Reveal; `reveal={false}` keeps it still)
   const head = title != null || eyebrow != null || lead != null
     ? h(SectionHead, { class: "m-ss-head", eyebrow, title, as: `h${level ?? 2}` as "h2", titleId: hid ?? undefined, lead, align: align ?? "center", reveal: reveal === false ? { effect: "none" } : reveal ?? true })
     : null;
-  return h("section", { ...attrs, "aria-labelledby": hid, "data-m-color": colorAttr(color), class: () => cx("m-ss", `m-ss-${tone ?? "plain"}`, `m-ss-w-${width ?? "default"}`, `m-ss-s-${space ?? "md"}`, val(c)) },
+  return h("section", { ...attrs, "aria-labelledby": hid, class: () => cx("m-ss", `m-ss-${tone ?? "plain"}`, `m-ss-w-${width ?? "default"}`, `m-ss-s-${space ?? "md"}`, val(c)) },
     h("div", { class: "m-ss-inner" }, head, children));
 }

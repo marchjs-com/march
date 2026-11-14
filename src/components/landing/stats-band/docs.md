@@ -22,7 +22,7 @@ Plain, divided by lines, or as cards.
 | `class` | class | — | on the list |
 
 ```tsx
-<StatsBand items={stats} color="brand-orange" reveal={{ effect: "scale", stagger: 140 }} />
+<StatsBand items={stats} m:color="brand-orange" reveal={{ effect: "scale", stagger: 140 }} />
 <StatsBand items={stats} mode="none" reveal={false} />
 ```
 

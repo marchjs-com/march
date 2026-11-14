@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { ScrollToTop } = await import("./index.ts");
@@ -51,7 +52,7 @@ test("ScrollToTop: your own icon, class, colour and motion (a function, or none)
   const host = document.createElement("div"); document.body.appendChild(host);
   const calls = [];
   const dispose = render(() => [
-    h(ScrollToTop, { inline: true, target: box, threshold: 100, icon: "^", class: "mine", color: "brand-blue", label: () => "Up", motion: (el, shown) => calls.push([el, shown]) }),
+    mProps(h(ScrollToTop, { inline: true, target: box, threshold: 100, icon: "^", class: "mine", label: () => "Up", motion: (el, shown) => calls.push([el, shown]) }), { color: "brand-blue" }),
     h(ScrollToTop, { inline: true, target: box, threshold: 100, motion: "none", smooth: false }),
   ], host);
   const [a, b] = host.querySelectorAll(".m-to-top");

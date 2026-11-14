@@ -48,8 +48,6 @@ export interface ActivityBarProps {
   tooltips?: boolean | undefined;
   /** The name under each icon (an item's `short`, else its `label`): a wider bar, as a section rail or a phone tab bar (default false). */
   showLabels?: boolean | undefined;
-  /** Theme color token of the active view and the indicator (default: the theme's primary). */
-  color?: ColorToken | undefined;
   class?: ClassProp;
 }
 
@@ -97,7 +95,7 @@ export function ActivityBar(props: ActivityBarProps): Element {
   return h(TabList, {
     tabs, value: selected, onSelect: (id: string) => choose(byId(id)), orientation: reactive(() => (horizontal() ? "horizontal" : "vertical")) as never,
     activation: "manual", variant: "none", controls: props.controls, tabId: (id: string) => `${base}-${id}`,
-    class: () => cx("m-ab", horizontal() ? "m-ab-h" : "m-ab-v", props.showLabels && "m-ab-labeled", val(props.class)), label: () => val(props.label) ?? t`Views`, color: reactive(() => props.color) as never,
+    class: () => cx("m-ab", horizontal() ? "m-ab-h" : "m-ab-v", props.showLabels && "m-ab-labeled", val(props.class)), label: () => val(props.label) ?? t`Views`,
     tabProps: (tab: TabSpec) => { const it = byId(tab.id)!; return { class: cx("m-ab-btn", it.position === "end" && "m-ab-end"), "data-view": it.id, "aria-label": () => name(it), "aria-keyshortcuts": it.shortcut ?? null }; },
     wrap: (btn: Element, tab: TabSpec) => (props.tooltips === false ? btn : h(Tooltip, { text: () => name(byId(tab.id)!), placement: reactive(() => (horizontal() ? "top" : "bottom-start")) as never, children: btn })),
     children: ind,

@@ -24,6 +24,7 @@ import "./chat-thread.css";
 import { isRtl } from "../../../core/util.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { dismiss } from "../../../behaviors/dismiss/index.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 export interface ChatMessage {
   id: string;
@@ -163,9 +164,8 @@ export function ChatThread(props: ChatThreadProps): Element {
   h(For as never, { each: entries, key: "key", children: (e: () => Entry) => row(e) }),
   h("div", { class: "m-chat-typing" }, h(TypingIndicator, { names: () => val(props.typing) ?? [] })),
   // "N new": a pill Button that floats over the end of the log
-  () => (unseen() && jump !== false ? h(Button, {
-    variant: "primary", shape: "pill", color: props.jumpColor ?? "brand-blue", class: "m-chat-jump", icon: typeof jump === "function" ? null : arrowDown, onClick: () => toBottom(true),
-  }, typeof jump === "function" ? jump(unseen()) : t`${unseen()} new`) : null)) as HTMLElement;
+  () => (unseen() && jump !== false ? withColor(h(Button, {
+    variant: "primary", shape: "pill", class: "m-chat-jump", icon: typeof jump === "function" ? null : arrowDown, onClick: () => toBottom(true) }, typeof jump === "function" ? jump(unseen()) : t`${unseen()} new`), props.jumpColor ?? "brand-blue") : null)) as HTMLElement;
   // pinned to the end until the reader scrolls up (80px of slack); back at the end nothing is unseen
   stick = stickToBottom(root, { threshold: 80, onChange: (pinned) => { if (pinned) unseen.set(0); } });
   return root;

@@ -7,7 +7,7 @@ screen reader reads. The text is visually hidden unless `text` shows it; every g
 <CheckMark value={row.included} />
 <CheckMark value="partial" text />
 <CheckMark value={false} variant="soft" label={false} />
-<CheckMark value labels={{ yes: "Included" }} icons={{ yes: heart }} color="primary" size="lg" />
+<CheckMark value labels={{ yes: "Included" }} icons={{ yes: heart }} m:color="primary" size="lg" />
 <CheckMark value={$done} variant="soft" motion="flip" />          // ✕ turns into ✓ when $done changes
 <CheckMark value={$ok} motion={(next, prev) => animate(next, { opacity: [0, 1], transform: ["translateY(6px)", "none"] }, { duration: 240 }).finished} />
 ```

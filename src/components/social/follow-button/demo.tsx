@@ -10,7 +10,7 @@ import { sparkles } from "../../../icons/glyphs/sparkles.ts";
 export const code = `<FollowButton state={$state} name={user.name} private={user.private}
   onChange={(s) => { $state = s; api.follow(user.id, s) }} />
 <FollowButton state={$state} onChange={set} labels={{ follow: "Katıl", following: "Üyesin" }}
-  color="brand-green" icon={(s) => <Icon of={s === "follow" ? sparkles : star} />} burst={false} />`
+  m:color="brand-green" icon={(s) => <Icon of={s === "follow" ? sparkles : star} />} burst={false} />`
 
 type Values = { private: boolean; size: string; block: boolean; labels: string; icon: string; color: string; burst: boolean; morph: boolean }
 
@@ -32,7 +32,7 @@ export default function FollowButtonDemo(props: { values: Values }) {
       button = (<FollowButton state={() => $state} name="HADİ Koşu Kulübü" private={v.private} size={v.size as "md"} block={v.block}
         labels={v.labels === "own" ? { follow: "Katıl", following: "Üyesin", requested: "Onay bekliyor" } : undefined}
         icon={icon === "off" ? false : icon === "own" ? (s: FollowState) => <Icon of={s === "follow" ? sparkles : star} /> : true}
-        color={v.color as ColorToken} burst={v.burst} morph={v.morph} onChange={(s) => { $state = s }} />) as HTMLElement
+        m:color={v.color as ColorToken} burst={v.burst} morph={v.morph} onChange={(s) => { $state = s }} />) as HTMLElement
       button.setAttribute("data-audit-try", "toggle")
       return button
     }}

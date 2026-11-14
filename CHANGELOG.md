@@ -11,8 +11,19 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
   on a native element compiles to the attribute itself.
 - **Breaking:** the components whose `color` prop only coloured their own root take `m:color` instead (their `color`
   prop is gone): Accordion, Alert, ChatBubble, CheckMark, Chevron, Chip, ClampText, CornerMark, EditorFrame, ExplodedView, HonestCompare, IconButton, IconTile, OptionList, OverflowToolbar, Overlay, PageDots, Pagination, PanelHeader, ProjectDetail, PullToRefresh, Rating, ReactionPicker, ReplyQuote, ResizeHandle, Roadmap, SearchBox, SectionHead, SectionLabel, StatTile, StatsBand, StatusDot, Stepper, Steps, TimeRuler, Tree, TreeView, VerifiedMark, Wizard. Write `<Chip m:color="brand-blue">`; by hand `mProps(h(Chip, props), { color: "brand-blue" })`.
-  Inside the library the same is done by `withColor(node, color)` (src/theme/colors.ts, internal). The components that use their colour for more
-  than their root (a default, an inner part, a series) keep their `color` prop for now.
+  Inside the library the same is done by `withColor(node, color)` (src/theme/colors.ts, internal).
+- **Breaking (second round):** `color` is also gone from every form control (it came from the shared control props:
+  TextInput, Select, Toggle, Checkbox, Slider, Segmented, CheckboxGroup, RadioGroup, Calendar, DatePicker, CodeInput…),
+  from `<Field>` and `<Form>`, and from Button, ActionButton, CopyButton, Menu, Badge, Tabs / TabList, ActivityBar,
+  FormatToolbar, FollowButton, LikeButton (pink unless `m:color` says otherwise), TypingIndicator (blue unless…),
+  StoryRing, SiteSection, Pricing, ProjectGrid, Splitter, Carousel, PeriodNav, RowTools, ScrollToTop, UndoRedo,
+  CodeEditor, JsonEditor, DateRangePicker, DateTimeInput: the root's `m:color` reaches their parts (a calendar or menu
+  panel takes the colour of its anchor). CopyButton keeps `copiedColor`.
+- Kept, because the colour means more than the root's scope: Spinner and Progress (one colour switches them to a single
+  colour), Loader and ScrollProgress (passed to those), Tooltip and Popover (the bubble / panel), Avatar (its colour
+  from the name), AvatarGroup, Swatch (the colour shown), Window, StoryProgress, Presentation; and the colours of
+  items (a Gantt task, a Scheduler event, a feed item, a story step). Named colours of inner parts (`likeColor`,
+  `jumpColor`, `messageColor`…) stay as they are.
 
 ### m:parts, CodeEditor, ExplodedView (later in 0.1.0)
 - `m:parts` (common prop): `<PostCard m:parts={{ Avatar: { size: "lg" }, LikeButton: { color: "brand-blue" } }} />`

@@ -16,6 +16,7 @@ import { Empty } from "../../feedback/empty/index.ts";
 import { Stack } from "../../layout/stack/index.ts";
 import { consent, type CategoryInfo } from "../../../managers/consent/index.ts";
 import tr from "./tr.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 messages("tr", tr);
 
@@ -113,7 +114,7 @@ export async function openConsentPreferences(p: ConsentTexts = {}): Promise<bool
       h("p", { class: "m-consent-lead" }, () => txt(l?.lead, "Choose which cookies and data uses you allow. Strictly necessary ones are always on."), " ", policyLink(p)),
       untrack(() => consent.categories()).map((c) => categoryCard(c, () => !!c.required || !!draft()[c.id], (v) => draft.update((d) => ({ ...d, [c.id]: v })), l)),
       rec ? h("p", { class: "m-consent-meta" }, () => l?.saved?.(new Date(rec.date).toLocaleString(), String(rec.version)) ?? t("Saved on {0} (policy version {1}).", { 0: new Date(rec.date).toLocaleString(), 1: rec.version }), " ",
-        h(Button, { variant: "link", color: "danger", class: "m-consent-withdraw", onClick: () => { consent.withdraw(); close(true); } }, () => txt(l?.withdraw, "Withdraw consent"))) : null);
+        withColor(h(Button, { variant: "link", class: "m-consent-withdraw", onClick: () => { consent.withdraw(); close(true); } }, () => txt(l?.withdraw, "Withdraw consent")), "danger")) : null);
   }, {
     title: () => txt(p.title, "Privacy preferences"), size: "md", dismissValue: false,
     ...(mobile ? { kind: "drawer" as const, side: "bottom" as const } : {}),

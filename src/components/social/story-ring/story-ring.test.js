@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { StoryRing } = await import("./index.ts");
@@ -35,7 +36,7 @@ test("StoryRing: without onClick it is an image", () => {
 
 test("StoryRing: own name, ring color, own badge content, own avatar node", () => {
   const m = mount(() => [
-    h(StoryRing, { name: "HADİ", ariaLabel: "3 new stories", color: "brand-purple", add: true, addIcon: h("i", { class: "own-add" }), avatar: h("b", { class: "own-av" }), class: "mine" }),
+    mProps(h(StoryRing, { name: "HADİ", ariaLabel: "3 new stories", add: true, addIcon: h("i", { class: "own-add" }), avatar: h("b", { class: "own-av" }), class: "mine" }), { color: "brand-purple" }),
     h(StoryRing, { name: "HADİ", add: true }),
   ]);
   const [a, b] = m.el.querySelectorAll(".m-sring");

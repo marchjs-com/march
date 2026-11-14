@@ -5,7 +5,7 @@ RichTextEditor use it; put it over your own editor and apply the format in `onTo
 
 ```tsx
 <FormatToolbar tools={["bold", "italic", "|", "link"]} onTool={exec} pressed={{ bold: () => $bold }} hints />
-<FormatToolbar onTool={exec} labels={{ bold: "Strong" }} icons={{ bold: "B" }} color="brand-orange" size="md" />
+<FormatToolbar onTool={exec} labels={{ bold: "Strong" }} icons={{ bold: "B" }} m:color="brand-orange" size="md" />
 ```
 
 `formatShortcut(event)` gives the tool of a formatting shortcut (mod+B / I / E / K, mod+Shift+X / 7 / 8 / 9), so the
@@ -26,7 +26,7 @@ keydown handler of the editor and the bar run the same tools. `formatToolName(to
 | `keys` | `{ tool: "Control+B" / false }` | `FORMAT_KEYS` | `aria-keyshortcuts` per tool; `false` removes one |
 | `hints` | boolean | `false` | the shortcut in the tooltip too: "Bold (Ctrl+B)" |
 | `size` | `xs` `sm` `md` | `sm` | size of the buttons |
-| `color` | color token | accent | colour of the pressed mark |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `prefix` | string | — | extra class names for a host: `<prefix>-toolbar`, `-tool`, `-sep`, `-tool-own` |
 | `attrs` | `(tool) => attributes` | — | extra attributes of a tool button (`aria-haspopup`, `ref`, `class`) |
 | `class` | class | — | |

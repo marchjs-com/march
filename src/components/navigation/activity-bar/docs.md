@@ -28,7 +28,7 @@ bottom bar on phones), and mirrored in RTL.
 | `motion` | `glide` `fade` `none` | `glide` | how the indicator moves to a new view |
 | `tooltips` | boolean | `true` | name tooltips on hover and focus (the accessible name stays either way) |
 | `showLabels` | boolean | `false` | the name under each icon (an item's `short`, else its `label`): a wider bar, for a section rail or a phone tab bar |
-| `color` | ColorToken | theme primary | colour of the active view and the indicator |
+| `m:color` | ColorToken | theme primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `class` | ClassProp | — | extra class on the bar |
 
 ```tsx

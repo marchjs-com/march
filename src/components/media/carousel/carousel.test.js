@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { Carousel } = await import("./index.ts");
@@ -24,7 +25,7 @@ test("Carousel: labelled region, per-view class, labelled buttons; previous disa
 test("Carousel: own labels, icons, dots and colour; arrows and dots can be left out", async () => {
   const slides = () => [1, 2, 3].map((n) => h("article", null, String(n)));
   const m = mountD(() => [
-    h(Carousel, { labels: { previous: "Back", next: "On", slide: (n) => `Photo ${n}` }, prevIcon: h("i", { class: "p" }), nextIcon: h("i", { class: "n" }), dots: (i, active) => h("b", { class: () => (active() ? "on" : "off") }, String(i + 1)), color: "brand-orange", smooth: false }, slides()),
+    mProps(h(Carousel, { labels: { previous: "Back", next: "On", slide: (n) => `Photo ${n}` }, prevIcon: h("i", { class: "p" }), nextIcon: h("i", { class: "n" }), dots: (i, active) => h("b", { class: () => (active() ? "on" : "off") }, String(i + 1)), smooth: false }, slides()), { color: "brand-orange" }),
     h(Carousel, { arrows: false, dots: false }, slides()),
   ]);
   await tick();
@@ -39,7 +40,7 @@ test("Carousel: own labels, icons, dots and colour; arrows and dots can be left 
   assert.ok(dots[0].classList.contains("is-own"));
   assert.equal(dots[0].querySelector("b").className, "on");
   assert.equal(dots[2].textContent, "3");
-  assert.equal(a.querySelector(".m-carousel-dots").getAttribute("data-m-color"), "brand-orange");
+  assert.equal(a.querySelector(".m-carousel-dots").closest("[data-m-color]")?.getAttribute("data-m-color"), "brand-orange");
   assert.ok(a.classList.contains("is-instant"));
   assert.equal(b.querySelector(".m-carousel-btn"), null);
   assert.equal(b.querySelector(".m-carousel-dots"), null);

@@ -25,8 +25,6 @@ export interface CarouselProps {
   nextIcon?: unknown;
   /** The dots: true (default), false, or `(index, active) => content` drawn inside each dot button. */
   dots?: boolean | ((index: number, active: () => boolean) => unknown) | undefined;
-  /** Theme color of the active dot (default: primary). */
-  color?: ColorToken | undefined;
   /** Buttons and dots scroll smoothly (default true); false jumps. */
   smooth?: boolean | undefined;
 }
@@ -52,6 +50,6 @@ export function Carousel(props: CarouselProps): Element {
     h("div", { class: "m-carousel-track", ref: (el: HTMLElement) => { track = el; }, onScroll: update, tabindex: "0" }, props.children),
     props.arrows !== false && arrow("prev", props.prevIcon, chevronLeft, () => props.labels?.previous ?? t`Previous`, () => index() <= 0, () => index() - 1),
     props.arrows !== false && arrow("next", props.nextIcon, chevronRight, () => props.labels?.next ?? t`Next`, () => index() >= last(), () => index() + 1),
-    props.dots !== false && withColor(h(PageDots, { class: "m-carousel-dots", count: () => Math.max(0, last() + 1), value: index, onChange: goTo,
-      labels: { page: (n: number) => props.labels?.slide?.(n) ?? t`Slide ${n}` }, ...(ownDot ? { dot: ownDot } : {}) }), props.color));
+    props.dots !== false && h(PageDots, { class: "m-carousel-dots", count: () => Math.max(0, last() + 1), value: index, onChange: goTo,
+      labels: { page: (n: number) => props.labels?.slide?.(n) ?? t`Slide ${n}` }, ...(ownDot ? { dot: ownDot } : {}) }));
 }

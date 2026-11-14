@@ -19,6 +19,7 @@ import { StoryRing, type StoryRingState } from "../../social/story-ring/index.ts
 import { FollowButton, type FollowState } from "../../social/follow-button/index.ts";
 import { CountRoll } from "../../social/count-roll/index.ts";
 import "./profile-header.css";
+import { withColor } from "../../../theme/colors.ts";
 
 export interface ProfileUser {
   name: string;
@@ -92,8 +93,8 @@ export function ProfileHeader(props: ProfileHeaderProps): Element {
           ? (props.onEdit ? h(Button, { variant: "secondary", onClick: () => props.onEdit?.() }, () => L().edit ?? t`Edit profile`) : null)
           : [
             props.onFollow ? h(FollowButton, { state: () => val(props.follow) ?? "follow", name: () => u().name, private: () => !!u().private, onChange: (s: FollowState) => props.onFollow?.(s) }) : null,
-            props.onMessage ? h(Button, { class: "m-prof-msg", variant: props.messageColor ? "primary" : "secondary", color: props.messageColor, icon: ownIcon(props.messageIcon, message, null), onClick: () => props.onMessage?.() },
-              () => L().message ?? t`Message`) : null,
+            props.onMessage ? withColor(h(Button, { class: "m-prof-msg", variant: props.messageColor ? "primary" : "secondary", icon: ownIcon(props.messageIcon, message, null), onClick: () => props.onMessage?.() },
+              () => L().message ?? t`Message`), props.messageColor) : null,
           ]),
         props.menu?.length ? h(Menu, { icon: props.menuIcon ?? moreVertical, label: () => L().more ?? t`More`, variant: "ghost", items: props.menu, class: "m-prof-more" }) : null)),
     h("div", { class: "m-prof-id" },

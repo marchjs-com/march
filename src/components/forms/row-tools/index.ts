@@ -38,8 +38,6 @@ export interface RowToolsProps {
   /** Own icons: an icon, text, a node or `() => node` each (a node is copied for every row). */
   icons?: Partial<Record<RowAction, unknown>> | undefined;
   size?: MaybeFn<IconButtonSize | undefined>;
-  /** Theme colour token of the icons. */
-  color?: ColorToken | undefined;
   /** The remove tool in the danger colour. */
   danger?: boolean | undefined;
   class?: ClassProp;
@@ -57,7 +55,7 @@ export function RowTools(props: RowToolsProps): Element {
   };
   const run = (a: RowAction): void => { (a === "up" ? props.onUp : a === "down" ? props.onDown : props.onRemove)?.(); props.onAction?.(a); };
   return h("span", { class: () => cx("m-row-tools", val(props.class)), role: "group", "aria-label": () => val(props.labels?.group) ?? t`Row tools` },
-    (props.actions ?? ALL).map((a) => withColor(h(IconButton, {
+    (props.actions ?? ALL).map((a) => h(IconButton, {
       class: `m-row-tool m-row-tool-${a}`, icon: () => ownPart(props.icons?.[a], () => ICON[a]), label: () => name(a), size: props.size,
-      variant: a === "remove" && props.danger ? "danger" : undefined, disabled: () => off(a), onClick: () => run(a) }), props.color)));
+      variant: a === "remove" && props.danger ? "danger" : undefined, disabled: () => off(a), onClick: () => run(a) })));
 }

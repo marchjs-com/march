@@ -10,7 +10,7 @@ export default definePlayground<Values>({
     { key: "copy", label: "Kopyala düğmesi", default: true, visibleWhen: (v) => v.message },
     { key: "flash", label: "Değişen yer parlar", default: true },
     { key: "multiline", label: "Enter yeni satır açar", default: true },
-    { key: "color", label: "Renk", default: "", options: [{ value: "", label: "vurgu" }, { value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }] },
+    { key: "color", label: "Renk", default: "", options: [{ value: "", label: "vurgu" }, { value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }], prop: "m:color" },
     { key: "state", label: "Durum", default: "normal", options: [{ value: "normal", label: "normal" }, { value: "readonly", label: "salt okunur" }, { value: "disabled", label: "devre dışı" }] },
   ],
 });

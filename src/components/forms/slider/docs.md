@@ -14,7 +14,7 @@ percentage, a label).
 | `value` / `bind:value` | number | `min` | |
 | `min`, `max`, `step` | number | `0`, `100`, `1` | |
 | `format` | `(v) => node` | the number | text of the shown value |
-| `color` | ColorToken | primary | |
+| `m:color` | ColorToken | primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `showValue` | boolean | `true` | `false` removes the value next to the slider |
 | `track` | `true` / class name / node | — | your own track under a drawn thumb: `true` a ramp in the control's color, a class (your gradient) or a node |
 | `valueText` | `(v) => string` | — | spoken value (`aria-valuetext`) |

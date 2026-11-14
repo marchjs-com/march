@@ -28,7 +28,7 @@ action handles confirmation, the reason prompt and the success / error toasts. I
 |---|---|---|---|
 | `variant` | `primary` `secondary` `ghost` `danger` `dark` `link` | `secondary` | `link`: no fill or padding, inherits the font of the text around it; `color` tints it |
 | `size` | `sm` `md` `lg` | `md` | |
-| `color` | ColorToken | theme primary | accent of the primary variant |
+| `m:color` | ColorToken | theme primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `icon` / `iconEnd` | icon | — | leading / trailing icon |
 | `loading` | boolean / accessor | — | spinner, `aria-busy`, disabled |
 | `spinner` | boolean / node / icon | `true` | the loading spinner: `false` keeps the icon, a node or icon replaces it |

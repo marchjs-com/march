@@ -22,7 +22,7 @@ let $period = "monthly"
 | `toggle` | boolean | `true` | show the switch |
 | `currency` | ISO code | `EUR` | Intl currency format for the locale |
 | `saving` | node | — | badge next to the switch, bright on yearly |
-| `color` | color token | brand gradient + accent | colour of the featured plan (border, glow, button, badge) |
+| `m:color` | color token | brand gradient + accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `featureIcon` | boolean / `(included) => node` | `true` | the tick / dash in front of a feature, or your own mark |
 | `featureColor` | color token | `success` | colour of the tick |
 | `per` | boolean | `true` | the "/ month · billed yearly" lines |
@@ -32,7 +32,7 @@ let $period = "monthly"
 | `class` | class | — | on the root |
 
 ```tsx
-<Pricing plans={plans} color="brand-purple" featureColor="brand-purple" priceEffect="count" reveal={{ effect: "scale" }}
+<Pricing plans={plans} m:color="brand-purple" featureColor="brand-purple" priceEffect="count" reveal={{ effect: "scale" }}
   labels={{ monthly: "Pay monthly", yearly: "Pay yearly", perMonth: "per seat", custom: "Let's talk" }} />
 <Pricing plans={plans} featureIcon={(included) => (included ? "+" : "–")} per={false} reveal={false} />
 ```

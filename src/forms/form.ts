@@ -11,7 +11,7 @@ import { scoped, cx, uid, live, type FieldCtx, type ClassProp } from "./util.ts"
 import { inputFor, GROUP_CONTROLS, INLINE_LABEL } from "./registry.ts";
 import { Field, FormContext, setControlBuilder, type FieldProps, type BuiltControl } from "./field.ts";
 export { Field, FormContext, type FieldProps } from "./field.ts";
-import { colorAttr, type ColorToken } from "../theme/colors.ts";
+import { type ColorToken } from "../theme/colors.ts";
 import { isPlain, deepEqual } from "../core/equal.ts";
 import { errorText } from "../ui/format.ts";
 import { Button } from "../components/actions/button/index.ts";
@@ -324,8 +324,6 @@ export interface FormSection<V> {
 
 /** Props of <Form>. */
 export interface FormProps<V = Values> extends FieldsLayout {
-  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
-  color?: ColorToken | undefined;
   schema?: Schema<V> | SchemaSpec | undefined;
   initial?: Initial<V>;
   onSubmit?: ((values: V, form: FormController<V>) => unknown) | undefined;
@@ -372,7 +370,7 @@ export function Form(props: FormProps): unknown {
         renderFields(form, s.fields, { ...layout, cols: s.cols ?? layout.cols })))
       : renderFields(form, null, layout));
     const noBar = props.actions === false || props.readonly;
-    return h("form", { "data-m-color": () => colorAttr(props.color),
+    return h("form", {
       class: cx("m-form", props.class), novalidate: true, "aria-busy": () => (form.submitting() ? "true" : null),
       onSubmit: (e: Event) => { e.preventDefault(); form.submit(); },
       onKeyDown: noBar ? (e: KeyboardEvent) => { const el = e.target as HTMLInputElement; if (e.key === "Enter" && !e.defaultPrevented && el.tagName === "INPUT" && !["checkbox", "radio", "button", "file"].includes(el.type)) { e.preventDefault(); form.submit(); } } : null,

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { ProjectGrid } = await import("./index.ts");
@@ -31,13 +32,13 @@ test("ProjectGrid: chips per category, filtering hides others, onOpen gets the c
 test("ProjectGrid: no arrow / own arrow, chip colour, own group name, instant filter, no reveal", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => [
-    h(ProjectGrid, { projects, class: "one", arrow: false, motion: false, reveal: false, color: "brand-purple", filtersLabel: "Pick" }),
+    mProps(h(ProjectGrid, { projects, class: "one", arrow: false, motion: false, reveal: false, filtersLabel: "Pick" }), { color: "brand-purple" }),
     h(ProjectGrid, { projects, class: "two", arrow: (p) => h("b", { class: "mine" }, p.id) }),
   ], el);
   const one = el.querySelector(".one");
   assert.equal(one.querySelector(".m-pg-go"), null);
   assert.equal(one.querySelector(".m-pg-filters").getAttribute("aria-label"), "Pick");
-  assert.equal(one.querySelector(".m-pg-filters .m-chip2").getAttribute("data-m-color"), "brand-purple");
+  assert.equal(one.querySelector(".m-pg-filters .m-chip2").closest("[data-m-color]")?.getAttribute("data-m-color"), "brand-purple");
   assert.ok(!one.querySelector(".m-pg-grid").classList.contains("m-reveal"));
   one.querySelectorAll(".m-pg-filters .m-chip2-hit")[2].click(); // Brand: no animation, hidden at once
   assert.deepEqual([...one.querySelectorAll(".m-pg-card")].map((c) => !!c.hidden), [true, false, true]);

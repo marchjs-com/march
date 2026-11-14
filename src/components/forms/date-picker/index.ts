@@ -92,7 +92,7 @@ export function DatePicker(props: DatePickerProps): unknown {
       anchor: () => wrap, open, label: choose, panelClass: "m-cal-pop", autoFocus: false,
       onOpenChange: (on: boolean, why: string) => { if (!on && why === "escape") input.focus(); },
       children: () => h(Calendar, {
-        color: props.color, labels: props.labels, ...props.calendar,
+        labels: props.labels, ...props.calendar,
         value: live(() => get()), setValue: (v) => set(v), min: live(() => props.min), max: live(() => props.max),
         firstDay: props.firstDay, locale: live(() => loc()), autoFocus: true, onPick: () => close(true), onEscape: () => close(true),
       }),

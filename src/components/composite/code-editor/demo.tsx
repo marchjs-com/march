@@ -47,7 +47,7 @@ export default function CodeEditorDemo(props: { values: { complete: boolean; mul
       const v = { ...props.values }
       const color: ColorToken | undefined = v.color ? v.color as ColorToken : undefined
       return <CodeEditor value={$code} onChange={change} lang="tsx" multiline={v.multiline} copy={v.copy} flash={v.flash ? "glow" : "none"}
-        color={color} readonly={v.state === "readonly"} disabled={v.state === "disabled"}
+        m:color={color} readonly={v.state === "readonly"} disabled={v.state === "disabled"}
         complete={v.complete ? jsxCompleter({ tag: "Button", props: PROPS }) : undefined}
         hint={v.hint ? undefined : false}
         message={v.message ? note : false} status={() => (bad() ? "error" : "ok")}

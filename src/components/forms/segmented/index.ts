@@ -38,7 +38,7 @@ export function Segmented<T = unknown>(props: SegmentedProps<T>): unknown {
   const thumb = slide ? h("span", { class: "m-segment-thumb", "aria-hidden": "true" }) as HTMLElement : null;
   let root: HTMLElement;
   const onKeyDown = (e: KeyboardEvent) => { const target = roving(e, [...root.querySelectorAll("button")].filter((b) => !b.disabled), { horizontal: true }); if (target) target.click(); };
-  root = h("div", { "data-m-color": () => colorAttr(props.color), role: "radiogroup", class: cx("m-segmented", slide && "m-segmented-slide", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
+  root = h("div", { role: "radiogroup", class: cx("m-segmented", slide && "m-segmented-slide", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
     thumb,
     () => {
       const opts = normOptions(props.options);

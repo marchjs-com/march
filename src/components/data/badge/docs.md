@@ -16,7 +16,7 @@ A small label: a status in a tone, a dot badge (a coloured dot before the text, 
 | Prop | Type | Default | |
 |---|---|---|---|
 | `tone` | `neutral` `primary` `info` `success` `warn` `danger` | `neutral` (count: `danger`) | colour family |
-| `color` | ColorToken | theme primary | accent of the primary tone |
+| `m:color` | ColorToken | theme primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `variant` | `soft` `solid` | `soft` | `solid`: the tone's full colour with the text on it (a count that must stand out) |
 | `dot` | boolean / node | `false` | dot before the text, or your own mark (an icon) |
 | `dotColor` | ColorToken | the tone's text colour | colour of the built-in dot |

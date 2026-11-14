@@ -13,7 +13,7 @@ and a toggle shows only the rows where the product loses.
     { label: "Ticketing", values: { us: false, events: true }, note: "Not planned: HADİ is for free meetups." },
     { label: "Price", values: { us: "Free", events: "Fee per ticket" } },
   ]} />
-<HonestCompare columns={…} rows={…} color="brand-green" tags={false} filter={false}
+<HonestCompare columns={…} rows={…} m:color="brand-green" tags={false} filter={false}
   labels={{ partly: "Half", behind: "We lose", counts: (c) => `${c.ahead} wins, ${c.behind} losses` }}
   renderCell={(value, { us }) => (value === true && us ? "✓✓" : undefined)} />   // undefined keeps the default mark
 ```

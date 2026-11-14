@@ -27,8 +27,8 @@ A decorative layer that lives inside its container: an image, a muted looping vi
 | `class` | class value | | |
 
 ```tsx
-<Overlay effect="spotlight" color="brand-orange" />
-<Overlay effect="dots" color="brand-purple" opacity={0.6} />
+<Overlay effect="spotlight" m:color="brand-orange" />
+<Overlay effect="dots" m:color="brand-purple" opacity={0.6} />
 ```
 
 `quietMedia()` is true on save-data, 2G or reduced motion.

@@ -13,7 +13,7 @@ import { ownIcon } from "../../../ui/parts.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { motionPreset } from "../../../motion/engine/parts.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { isRtl } from "../../../core/util.ts";
@@ -49,8 +49,6 @@ export function Tab(props: TabProps): TabDescriptor {
 
 /** What the tab strip and `<Tabs>` share. */
 export interface TabListLook {
-  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
-  color?: ColorToken | undefined;
   /** Accessible name of the tab list. */
   label?: MaybeFn<string | undefined>;
   /** "line" (default): underlined tabs; "pill": a rounded switch; "none" (TabList): no look, your own classes through `tabProps`. */
@@ -98,7 +96,7 @@ export function TabList(props: TabListProps): Element {
   type TabButton = HTMLButtonElement;
   const tabEls = (): TabButton[] => (bar ? Array.from(bar.querySelectorAll<TabButton>('[role="tab"]')).filter((x) => !x.disabled) : []);
   const closes = (x: TabSpec | undefined): boolean => !!x && !!val(x.closable) && !val(x.disabled);
-  return h("div", { "data-m-color": () => colorAttr(props.color),
+  return h("div", {
     class: () => cx(look() && "m-tabs-bar", val(props.variant) === "pill" && "m-tabs-bar-pill", val(props.class)), role: "tablist",
     "aria-orientation": () => (vertical() ? "vertical" : props.orientation !== undefined ? "horizontal" : null), "aria-label": () => val(props.label) ?? null, ref: (x: HTMLElement) => { bar = x; },
     onKeydown: (e: KeyboardEvent) => {
@@ -177,7 +175,7 @@ export function Tabs(props: TabsProps): Element {
   };
   const nav = h(TabList, {
     tabs: list, value: current, onSelect: select, controls: `${base}-p`, tabId: (id: string) => `${base}-t-${id}`,
-    color: live(() => props.color), label: () => val(props.label), variant: () => val(props.variant), labels: live(() => props.labels),
+    label: () => val(props.label), variant: () => val(props.variant), labels: live(() => props.labels),
     activation: props.activation, onClose: (id: string) => props.onClose?.(id), closeIcon: props.closeIcon, tabProps: props.tabProps,
   });
   // Only the active panel exists; switching disposes the old one.

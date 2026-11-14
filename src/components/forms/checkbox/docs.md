@@ -24,7 +24,7 @@ when pressed) while the real `<input>` stays for the keyboard, forms and screen 
 | `onClick` | `(e: MouseEvent) => void` | — | the click on the input with its modifier keys (`e.shiftKey`: range selection) |
 | `tabIndex` | number | — | tab order of the input (`-1` in a grid that moves focus with the arrow keys) |
 | `icon` | icon | — | drawn instead of the tick |
-| `color` | ColorToken | primary | |
+| `m:color` | ColorToken | primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `animate` | boolean | `true` | off: no motion (reduced motion is always respected) |
 
 Without a label only the box is drawn, for a selection cell of a table or a grid; name it with `aria-label`:

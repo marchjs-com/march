@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+const { mProps } = await import("../../../props/index.ts");
 import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
@@ -28,11 +29,11 @@ test("FormatToolbar: a named toolbar with the default tools, one Tab stop, short
 
 test("FormatToolbar: own tools, names, icons, keys, hints, pressed, disabled, colour, size, class", () => {
   const on = signal(false), color = signal("brand-green");
-  const [el, dispose] = mount(() => h(FormatToolbar, {
+  const [el, dispose] = mount(() => mProps(h(FormatToolbar, {
     tools: ["bold", "|", "link", "undo"], onTool: () => {}, label: "Text style", labels: { bold: "Strong" }, name: (tool) => (tool === "link" ? "Address" : undefined),
     icons: { bold: "B", link: false }, keys: { link: false, undo: "Control+Z" }, hints: true, pressed: { bold: on }, disabled: (tool) => tool === "undo",
-    color, size: "md", prefix: "my-ed", class: "mine", attrs: (tool) => (tool === "link" ? { "aria-haspopup": "dialog" } : {}),
-  }));
+    size: "md", prefix: "my-ed", class: "mine", attrs: (tool) => (tool === "link" ? { "aria-haspopup": "dialog" } : {}),
+  }), { color }));
   const bar = el.querySelector("[role=toolbar]");
   assert.equal(bar.getAttribute("aria-label"), "Text style");
   assert.ok(bar.classList.contains("mine") && bar.classList.contains("my-ed-toolbar"));

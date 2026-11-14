@@ -23,7 +23,7 @@ with the right keyboard, autocomplete and trimming.
 | `error` | string / accessor | — | error text of an input without a `<Field>`: the input turns invalid and the text shows under it |
 | `errorSpace` | boolean | `false` | with `error`: the error line keeps its height while empty (nothing moves when an error appears) |
 | `readonly`, `disabled`, `autofocus` | boolean | — | |
-| `color` | ColorToken | primary | focus ring, caret and selection |
+| `m:color` | ColorToken | primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 ```tsx

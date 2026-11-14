@@ -10,7 +10,7 @@ export default definePlayground<Values>({
     { key: "icons", label: "Ok ikonları", default: "default", options: [{ value: "default", label: "ok başı" }, { value: "own", label: "kendi ikonlarım" }], visibleWhen: (v) => v.arrows },
     { key: "attached", label: "Bitişik düğmeler", default: true, visibleWhen: (v) => !v.title },
     { key: "size", label: "Ok boyutu", default: "md", options: ["sm", "md"], visibleWhen: (v) => v.arrows },
-    { key: "color", label: "Renk", default: "primary", options: [{ value: "primary", label: "ana renk" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }] },
+    { key: "color", label: "Renk", default: "primary", options: [{ value: "primary", label: "ana renk" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }], prop: "m:color" },
     { key: "limit", label: "Sınır: yalnız bu yıl (uçta ok kapanır)", default: false, visibleWhen: (v) => v.arrows },
     { key: "labels", label: "Metinler", default: "default", options: [{ value: "default", label: "hazır" }, { value: "own", label: "kendi metinlerim" }] },
   ],

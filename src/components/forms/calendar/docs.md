@@ -29,7 +29,7 @@ never shifts a day. The first weekday and the names come from the locale; days o
 | `renderDay` | `(iso, day) => node` | the day number | content of a day cell |
 | `class`, `color` | | — | `color` is a theme token (selection, today ring, range) |
 
-Every part is yours: `<Calendar bind:value={$day} color="brand-orange" weekdays={false} prevIcon="‹" nextIcon="›"
+Every part is yours: `<Calendar bind:value={$day} m:color="brand-orange" weekdays={false} prevIcon="‹" nextIcon="›"
 labels={{ prevMonth: "Önceki ay", nextMonth: "Sonraki ay" }} renderDay={(iso, d) => busy.has(iso) ? <b>{d}</b> : d} />`.
 
 ## Accessibility

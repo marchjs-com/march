@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
@@ -44,7 +45,7 @@ test("Dropdown: dialog panel with a close function", async () => {
 
 test("Menu / Dropdown: the trigger takes a colour token, a class and its own content", () => {
   const m = mount(() => [
-    h(Menu, { label: "Actions", variant: "primary", color: "brand-purple", class: "mine", trigger: h("b", {}, "Me"), items: [] }),
+    mProps(h(Menu, { label: "Actions", variant: "primary", class: "mine", trigger: h("b", {}, "Me"), items: [] }), { color: "brand-purple" }),
     h(Dropdown, { label: "Filters" }, "body"),
   ]);
   const [a, b] = m.el.querySelectorAll("button");

@@ -107,7 +107,7 @@ export function Calendar(props: CalendarProps): unknown {
   if (props.autoFocus) { const id = setTimeout(() => body.querySelector<HTMLElement>(`[data-date="${focus.peek()}"]`)?.focus(), 0); onCleanup(() => clearTimeout(id)); }
   // the month row is a PeriodNav: the arrows around the (live) month name
   const step = (n: number) => () => go(addMonths(focus.peek(), n), false);
-  return h("div", { class: () => cx("m-cal", props.class), "data-m-color": () => colorAttr(props.color) },
+  return h("div", { class: () => cx("m-cal", props.class) },
     h(PeriodNav, {
       class: "m-cal-header", size: "sm", arrows: props.nav !== false, onPrev: step(-1), onNext: step(1), prevIcon: props.prevIcon, nextIcon: props.nextIcon,
       labels: { previous: () => props.labels?.prevMonth ?? t`Previous month`, next: () => props.labels?.nextMonth ?? t`Next month` },

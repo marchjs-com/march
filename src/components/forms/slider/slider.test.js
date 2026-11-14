@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { Slider } = await import("./index.ts");
@@ -32,12 +33,12 @@ test("Slider: the value next to it can go", () => {
 
 test("Slider: track (ramp, own class, own node) draws a decorative track under the real input; the default has none", () => {
   const { el } = mount(() => [
-    h(Slider, { value: 10, track: true, color: "brand-blue" }), h(Slider, { value: 10, track: "my-hue" }),
+    mProps(h(Slider, { value: 10, track: true }), { color: "brand-blue" }), h(Slider, { value: 10, track: "my-hue" }),
     h(Slider, { value: 10, track: h("i", { class: "own" }) }), h(Slider, { value: 10 }),
   ]);
   const [ramp, cls, node, plain] = el.querySelectorAll(".m-slider-wrap");
   assert.match(ramp.querySelector(".m-slider-track").getAttribute("class"), /m-slider-ramp/);
-  assert.equal(ramp.querySelector(".m-slider-rail").getAttribute("data-m-color"), "brand-blue");
+  assert.equal(ramp.querySelector(".m-slider-rail").closest("[data-m-color]")?.getAttribute("data-m-color"), "brand-blue");
   assert.equal(ramp.querySelector(".m-slider-track").getAttribute("aria-hidden"), "true");
   assert.match(ramp.querySelector("input").getAttribute("class"), /m-slider-own/);
   assert.equal(ramp.querySelector("input").getAttribute("type"), "range");

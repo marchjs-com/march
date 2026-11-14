@@ -15,7 +15,7 @@ readers hear the sentence once even when it is not shown. With no names it hides
 | `names` | string[] | — | who is typing; empty hides it |
 | `variant` | `bubble` `inline` | `bubble` | dots in a chat bubble, or a line |
 | `text` | boolean | inline: true | show the sentence (always announced) |
-| `color` | ColorToken | `brand-blue` | dot color |
+| `m:color` | ColorToken | `brand-blue` | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `label` | `(names) => string` | `typingText` | your own sentence |
 | `dots` | boolean / node | `true` | the three dots: off (text only), or your own node |
 | `motion` | `lift` `fade` `none` | `lift` | how the dots move: lift, only light up in turn, or stay still |

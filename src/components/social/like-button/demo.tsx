@@ -30,7 +30,7 @@ export default function LikeButtonDemo(props: { values: Values }) {
       // the icon is read once by the button: a new icon choice builds it again (the other props stay live)
       const icon = iconOf()
       const button = (<LikeButton liked={() => $liked} count={() => (props.values.count ? $likes : 0)} size={props.values.size as "md"}
-        burst={props.values.burst} colors={props.values.colors as "brand"} color={props.values.color as ColorToken}
+        burst={props.values.burst} colors={props.values.colors as "brand"} m:color={props.values.color as ColorToken}
         icon={icon === "star" ? <Icon of={star} /> as Node : icon === "swap" ? (on: boolean) => <Icon of={on ? star : sparkles} /> : undefined}
         pop={props.values.pop} burstOptions={{ ring: props.values.ring }}
         onToggle={(on) => { $liked = on; $likes = $likes + (on ? 1 : -1) }} />) as Element

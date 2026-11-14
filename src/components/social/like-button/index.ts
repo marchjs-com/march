@@ -21,8 +21,6 @@ export interface LikeButtonProps {
   onToggle: (next: boolean) => void;
   count?: MaybeFn<number | null | undefined>;
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
-  /** Heart color while liked. Default brand-pink. */
-  color?: ColorToken | undefined;
   /** Particle burst on like. Default true. */
   burst?: MaybeFn<boolean | undefined>;
   /** brand: particles in the four HADİ colors · single: the heart color. Default brand. */
@@ -53,7 +51,9 @@ export function LikeButton(props: LikeButtonProps): Element {
   const own = props.icon;
   // a ghost pill Button with a pressed state; the count rolls in its label
   return h(Button, {
-    variant: "ghost", shape: "pill", pressed: () => !!val(props.liked), color: live((): ColorToken => props.color ?? "brand-pink"),
+    variant: "ghost", shape: "pill", pressed: () => !!val(props.liked),
+    // brand pink unless m:color gives another (the common prop is applied after, on this root)
+    "data-m-color": "brand-pink",
     class: () => cx("m-like", `m-like-${val(props.size) ?? "md"}`, val(props.liked) && "is-liked", val(props.class)),
     "aria-label": () => val(props.label) ?? t`Like`,
     onClick: toggle,

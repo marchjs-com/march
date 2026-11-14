@@ -16,13 +16,13 @@ A row of slides that scrolls and snaps: one to four per view on wide screens (a 
 | `arrows` | `boolean` | `true` | the previous / next buttons |
 | `prevIcon`, `nextIcon` | node / glyph | chevrons | what the buttons show |
 | `dots` | `boolean` / `(index, active) => node` | `true` | `false`: no dots; a function draws its own content in each dot button |
-| `color` | colour token | `primary` | the active dot |
+| `m:color` | colour token | `primary` | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `smooth` | `boolean` | `true` | `false`: buttons and dots jump instead of scrolling smoothly |
 | children | nodes | | the slides |
 | `class` | class value | | |
 
 ```tsx
-<Carousel perView={2} color="brand-orange" prevIcon={arrowLeft} nextIcon={arrowRight} labels={{ previous: "Earlier", next: "Later", slide: (n) => `Photo ${n}` }}>{slides}</Carousel>
+<Carousel perView={2} m:color="brand-orange" prevIcon={arrowLeft} nextIcon={arrowRight} labels={{ previous: "Earlier", next: "Later", slide: (n) => `Photo ${n}` }}>{slides}</Carousel>
 <Carousel dots={(i) => i + 1} arrows={false} smooth={false}>{slides}</Carousel>
 ```
 

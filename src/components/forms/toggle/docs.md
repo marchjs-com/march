@@ -13,7 +13,7 @@ pages); the track takes the color token when on.
 |---|---|---|---|
 | `value` / `bind:value` | boolean | `false` | |
 | `label` or children | node | — | |
-| `color` | ColorToken | primary | track color when on |
+| `m:color` | ColorToken | primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `disabled`, `readonly` | boolean | — | |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 

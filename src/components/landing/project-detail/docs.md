@@ -29,7 +29,7 @@ const open = (p, cover) => sharedTransition(`project-${p.id}`, cover, () => { $o
 | `class` | class | — | on the article |
 
 ```tsx
-<ProjectDetail project={p} onBack={back} color="brand-orange" reveal={{ effect: "blur" }}
+<ProjectDetail project={p} onBack={back} m:color="brand-orange" reveal={{ effect: "blur" }}
   labels={{ back: "Back to work", next: "Up next", client: "For", openImage: (n) => `Photo ${n}` }} />
 <ProjectDetail project={p} facts={false} eyebrow={false} backIcon={false} nextIcon={false} reveal={false} />
 ```

@@ -32,7 +32,7 @@ visible, the rest collapse into a gap. Previous / Next buttons are disabled at t
 | `class` | ClassProp | — | extra class on the nav |
 
 ```tsx
-<Pagination bind:page={$page} pages={20} prev="‹ Back" next="More ›" gap="·" color="brand-blue"
+<Pagination bind:page={$page} pages={20} prev="‹ Back" next="More ›" gap="·" m:color="brand-blue"
   label="Result pages" labels={{ previous: "Previous page", next: "Next page", page: (n) => `Page ${n}` }} />
 <Pagination bind:page={$page} pages={5} controls={false} />          // numbers only
 <Pagination variant="simple" bind:page={$page} total={134} size={$size} sizes={[20, 50]} onSize={(n) => $size = n} />

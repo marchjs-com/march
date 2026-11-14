@@ -14,7 +14,7 @@ periods). Arrow keys move and select; only the chosen button is in the Tab order
 | `value` / `bind:value` | option value | `null` | |
 | `options` | `[value]` or `[{ value, label, icon, title, disabled }]` | — | `icon`: before the text; `title`: a tooltip (why it is disabled); `label: ""` with an icon: an icon-only segment named by `title` |
 | `indicator` | `"fill"` `"slide"` | `"fill"` | `"slide"`: one thumb glides to the chosen segment |
-| `color` | ColorToken | — | tints the chosen segment |
+| `m:color` | ColorToken | — | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `disabled`, `readonly` | boolean | — | |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 

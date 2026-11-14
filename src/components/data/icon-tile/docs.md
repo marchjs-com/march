@@ -5,7 +5,7 @@ nine named tones or any theme colour token.
 
 ```tsx
 <IconTile icon={users} tone="primary" />
-<IconTile icon={bell} color="brand-orange" variant="solid" shape="round" size="lg" />
+<IconTile icon={bell} m:color="brand-orange" variant="solid" shape="round" size="lg" />
 ```
 
 ## Props

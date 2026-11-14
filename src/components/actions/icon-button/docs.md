@@ -6,9 +6,9 @@ tooltip (`title`), so an icon-only control is never unnamed. Leaving it out thro
 ```tsx
 <IconButton icon={heart} label="Like" on:click={like} />
 <IconButton icon={trash} label="Delete" variant="danger" size="sm" />
-<IconButton icon={star} label="Star" color="brand-gold" title={false} />   // coloured, no native tooltip
+<IconButton icon={star} label="Star" m:color="brand-gold" title={false} />   // coloured, no native tooltip
 <IconButton icon={pin} label="Pin" size="xs" pressed={$pinned} on:click={toggle} />        // toggle: aria-pressed + pressed look
-<IconButton icon={send} label="Send" variant="solid" shape="round" color="brand-blue" />   // filled circle
+<IconButton icon={send} label="Send" variant="solid" shape="round" m:color="brand-blue" />   // filled circle
 <IconButton icon={arrowUp} label="Back to top" variant="raised" shape="round" />           // floating button
 <IconButton icon={x} label="Close" inverse />                                              // on a photo / video
 <IconButton icon={globe} label="Website" href="https://example.com" />                     // a link

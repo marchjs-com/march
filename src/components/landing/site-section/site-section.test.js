@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { SiteSection } = await import("./index.ts");
@@ -19,7 +20,7 @@ test("SiteSection: labelled by its title, tone and width classes", () => {
 
 test("SiteSection: own colour, heading without the entrance", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
-  const dispose = render(() => h(SiteSection, { title: "T", color: "brand-purple", reveal: false, class: "mine" }), el);
+  const dispose = render(() => mProps(h(SiteSection, { title: "T", reveal: false, class: "mine" }), { color: "brand-purple" }), el);
   const s = el.querySelector("section.m-ss");
   assert.equal(s.getAttribute("data-m-color"), "brand-purple");
   assert.equal(s.getAttribute("reveal"), null);

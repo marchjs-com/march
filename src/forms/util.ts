@@ -5,7 +5,7 @@ import { signal, computed, effect, untrack, useContext, provide, getOwner, react
 import { locale } from "../core/i18n.ts";
 import { cx, uid, on, debounce } from "../ui/util.ts";
 import type { Field } from "../schema/index.ts";
-import { colorAttr, BRAND_COLORS, type ColorToken } from "../theme/colors.ts";
+import { BRAND_COLORS } from "../theme/colors.ts";
 
 export { cx, uid, on, debounce };
 
@@ -39,11 +39,6 @@ export interface CommonProps {
   ariaLabel?: string | null | undefined;
   onBlur?: ((e: FocusEvent) => void) | undefined;
   onFocus?: ((e: FocusEvent) => void) | undefined;
-  /**
-   * Theme color token for focus, selection, caret and checked states: "primary" (default), "info", "success", "warning",
-   * "danger", "neutral", "brand-orange|blue|green|purple", "cat-1".."cat-8". Inherited from a <Form>/<Field>/group.
-   */
-  color?: ColorToken | undefined;
   /** The schema field (set when rendered by <Field>). */
   field?: Field | undefined;
 }
@@ -132,7 +127,6 @@ export function ctl(props: CommonProps, extra: Record<string, unknown> = {}): Ct
     "aria-invalid": () => (props.invalid ?? fc?.invalid?.() ? "true" : null),
     "aria-describedby": () => props.describedby ?? (fc?.describedby?.() || null),
     "aria-label": () => props["aria-label"] ?? props.ariaLabel ?? null,
-    "data-m-color": () => colorAttr(props.color),
     onBlur: props.onBlur,
     onFocus: props.onFocus,
     ...extra,

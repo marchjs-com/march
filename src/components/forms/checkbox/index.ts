@@ -33,6 +33,6 @@ export function Checkbox(props: CheckboxProps): unknown {
   });
   // no label, no hint: the box alone (a selection cell)
   const bare = props.label == null && props.children == null && props.hint == null;
-  return h("span", { class: () => cx(lookClass(props, "checkbox"), "m-choice-single", bare && "m-choice-bare", typeof props.class === "function" ? (props.class as () => unknown)() : props.class), "data-m-color": () => colorAttr(props.color) },
+  return h("span", { class: () => cx(lookClass(props, "checkbox"), "m-choice-single", bare && "m-choice-bare", typeof props.class === "function" ? (props.class as () => unknown)() : props.class) },
     h("label", { class: "m-check" }, input, choiceBox("checkbox", props), bare ? null : choiceText(() => props.label ?? props.children, props.hint, props.icon && props.variant === "card" ? props.icon : null, props.variant)));
 }

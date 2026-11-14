@@ -86,8 +86,6 @@ export interface PopoverButtonProps {
   trigger?: unknown;
   variant?: MaybeFn<ButtonVariant | undefined>;
   size?: MaybeFn<ButtonSize | undefined>;
-  /** Theme color token of the trigger (the primary variant's fill, an icon trigger's icon). */
-  color?: ColorToken | undefined;
   class?: ClassProp;
   panelClass?: string;
   placement?: Placement;
@@ -136,7 +134,7 @@ function popButton(props: PopoverButtonProps, role: "menu" | "dialog", panel: (p
   const iconOnly = !!props.icon && props.trigger == null;
   const own = props.trigger != null && typeof props.trigger !== "string";
   const attrs = {
-    ref: (x: HTMLElement) => { trigger = x; }, class: () => val(props.class), size: () => val(props.size), color: props.color,
+    ref: (x: HTMLElement) => { trigger = x; }, class: () => val(props.class), size: () => val(props.size),
     "aria-haspopup": role === "menu" ? "menu" : "dialog", "aria-expanded": () => String(open()), "aria-controls": id,
     "aria-label": (() => val(props.label) ?? null) as () => string, disabled: () => !!val(props.disabled),
     onClick: () => (open.peek() ? close(false) : show(0)),

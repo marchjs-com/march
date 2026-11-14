@@ -27,7 +27,7 @@ A message that stays on the page: a tone (`info`, `success`, `warn`, `danger`, `
 | `class` | class value | | |
 
 ```tsx
-<Alert color="brand-purple" icon={sparkles} title="New">Dark theme is here.</Alert>
+<Alert m:color="brand-purple" icon={sparkles} title="New">Dark theme is here.</Alert>
 <Alert dismissable dismissLabel="Close the notice" dismissIcon={check} icon={null}>Saved.</Alert>
 <Alert tone="danger" title="Could not load" actionPlacement="below" action={<Button size="sm" onClick={retry}>Retry</Button>}>The server did not answer.</Alert>
 <Alert tone="info" dismissable action={[reload]}>A new version is ready.</Alert>

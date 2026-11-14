@@ -8,7 +8,7 @@ import type { Action } from "../../../ui/action.ts";
 import { labelWithKey } from "../../../ui/keys.ts";
 import { val, cx, rest, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { spinnerRing } from "../../feedback/spinner/core.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "dark" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -34,8 +34,6 @@ export function buttonLink(attrs: Record<string, unknown>, to: MaybeFn<ButtonHre
 
 /** Props of <Button>. Other props (onClick, title, aria-*, data-*) go to the <button> / <a>. */
 export interface ButtonProps {
-  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
-  color?: ColorToken | undefined;
   variant?: MaybeFn<ButtonVariant | undefined>;
   size?: MaybeFn<ButtonSize | undefined>;
   loading?: MaybeFn<boolean | null | undefined>;
@@ -72,7 +70,7 @@ export function Button(props: ButtonProps): unknown {
     props.children != null && h("span", { class: "m-btn-label" }, props.children),
     props.iconEnd != null && icon(props.iconEnd),
   ];
-  const attrs = { ...rest(props, ["variant", "size", "loading", "spinner", "icon", "iconEnd", "block", "pressed", "shape", "href", "disabled", "type", "color"]), "data-m-color": () => colorAttr(props.color) };
+  const attrs = { ...rest(props, ["variant", "size", "loading", "spinner", "icon", "iconEnd", "block", "pressed", "shape", "href", "disabled", "type"]) };
   if (props.href != null) return buttonLink({ ...attrs, class: cls }, props.href as MaybeFn<ButtonHref>, body);
   return h("button", {
     "aria-pressed": () => pressedAttr(props.pressed), // the caller's own aria-pressed (in attrs) wins
@@ -105,8 +103,6 @@ export interface ActionButtonProps<A extends unknown[] = unknown[], R = unknown>
   run?: ((...args: A) => unknown) | undefined;
   variant?: MaybeFn<ButtonVariant | undefined>;
   size?: MaybeFn<ButtonSize | undefined>;
-  /** Theme color token of the button (see Button). */
-  color?: ColorToken | undefined;
   /** The busy spinner: true (default), false, or your own node / icon (see Button). */
   spinner?: unknown;
   icon?: unknown;
@@ -136,8 +132,8 @@ export function ActionButton<A extends unknown[], R>(props: ActionButtonProps<A,
     const o = a.opts ?? {};
     const label = (): string => (typeof a.label === "function" ? a.label() : a.label);
     return untrack(() => h(Button, {
-      ...rest(props, ["action", "args", "variant", "size", "color", "spinner", "icon", "iconOnly", "run", "onDone", "onError", "children", "onClick"]),
-      variant: props.variant ?? (o.danger ? "danger" : "secondary"), size: props.size, icon: props.icon ?? o.icon, class: props.class, color: props.color, spinner: props.spinner,
+      ...rest(props, ["action", "args", "variant", "size", "spinner", "icon", "iconOnly", "run", "onDone", "onError", "children", "onClick"]),
+      variant: props.variant ?? (o.danger ? "danger" : "secondary"), size: props.size, icon: props.icon ?? o.icon, class: props.class, spinner: props.spinner,
       loading: () => !!a.busy?.(), disabled: () => !!a.disabled?.(...argsOf(props)),
       title: props["title"] ?? (o.key ? labelWithKey(label(), o.key) : null),
       onClick: async (e: Event) => {

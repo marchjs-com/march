@@ -3,15 +3,13 @@ import "./badge.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import type { Tone } from "../../../ui/display-base.ts";
-import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
+import { type ColorToken, withColor } from "../../../theme/colors.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 
 /** Format a count for badges: 120 → "99+". */
 export const countLabel = (n: number, max = 99): string => (n > max ? `${max}+` : String(n));
 
 export interface BadgeProps {
-  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
-  color?: ColorToken | undefined;
   tone?: MaybeFn<Tone | undefined>;
   /** "soft" (default: a tinted fill) or "solid": the tone's full colour with the text on it (a count that must stand out). */
   variant?: "soft" | "solid" | undefined;
@@ -57,12 +55,12 @@ export function Badge(props: BadgeProps): unknown {
     return () => {
       const n = Number(val(props.count)) || 0;
       if (!n && !props.showZero) return null;
-      return h(tag, { ...own, "data-m-color": () => colorAttr(props.color), class: () => cx("m-badge", "m-badge-count", `m-badge-${val(props.tone) ?? "danger"}`, extra()), "aria-label": val(props.ariaLabel) ?? (props.label ? `${n} ${val(props.label)}` : null) }, props.format ? props.format(n, props.max ?? 99) : countLabel(n, props.max ?? 99));
+      return h(tag, { ...own, class: () => cx("m-badge", "m-badge-count", `m-badge-${val(props.tone) ?? "danger"}`, extra()), "aria-label": val(props.ariaLabel) ?? (props.label ? `${n} ${val(props.label)}` : null) }, props.format ? props.format(n, props.max ?? 99) : countLabel(n, props.max ?? 99));
     };
   }
   // the dot: the built-in one (a StatusDot in the text colour or `dotColor`, still or pulsing) or the caller's node
   const node = props.dot && props.dot !== true, pulse = !node && props.pulse ? props.pulse : false, builtIn = props.dot === true || !!pulse, mark = builtIn && !pulse && !!props.dotColor;
-  return h(tag, { ...own, "data-m-color": () => colorAttr(props.color), "aria-label": () => val(props.ariaLabel) ?? null, class: () => cx("m-badge", `m-badge-${val(props.tone) ?? "neutral"}`, builtIn && !mark && !pulse && "m-badge-dot", extra()) },
+  return h(tag, { ...own, "aria-label": () => val(props.ariaLabel) ?? null, class: () => cx("m-badge", `m-badge-${val(props.tone) ?? "neutral"}`, builtIn && !mark && !pulse && "m-badge-dot", extra()) },
     node ? h("span", { class: "m-badge-dot-own", "aria-hidden": "true" }, props.dot)
       : builtIn ? withColor(h(StatusDot, { size: "xs", pulse, class: pulse ? "m-badge-dot-pulse" : mark ? "m-badge-dot-mark" : null }), props.dotColor) : null,
     props.children);

@@ -5,7 +5,7 @@ accessible name; the icon, the text, the colour and the size can be changed.
 
 ```tsx
 <b>{user.name}</b> {user.verified && <VerifiedMark />}
-<VerifiedMark size="md" label="Verified organiser" color="brand-green" />
+<VerifiedMark size="md" label="Verified organiser" m:color="brand-green" />
 <VerifiedMark icon={shieldCheck} label={false} />
 ```
 

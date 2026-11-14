@@ -81,8 +81,6 @@ export interface CodeEditorProps extends ControlProps<string> {
   multiline?: boolean | undefined;
   /** How a "flash" mark shows: "glow" (default) or "none" / false. */
   flash?: "glow" | "none" | false | undefined;
-  /** Theme colour of the focus ring and the flash (default: the accent). */
-  color?: ColorToken | undefined;
   /** Called when focus leaves the editor (the owner may tidy the code). */
   onBlur?: ((e: FocusEvent) => void) | undefined;
   /** The textarea (to focus it, to read the selection). */
@@ -215,9 +213,9 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const foot = props.message === false ? undefined : h("span", { class: () => cx("m-ced-msg", status() === "error" && "is-error"), id: `${id}-msg`, role: "status", "aria-live": "polite" },
     () => (status() === false ? null : h(StatusDot, { tone: untrack(status) === "error" ? "warn" : "success", size: "sm" })),
     h("span", { class: "m-ced-msg-text" }, () => val(props.message)));
-  return withColor(h(EditorFrame, {
+  return h(EditorFrame, {
     class: () => cx("m-ced", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly,
     foot, showFoot: props.message !== false,
     footProps: { class: "m-ced-foot", divider: true, actions: [hint, props.copy !== false && h(CopyButton, { text: get, ...(props.copyLabel != null ? { label: props.copyLabel } : {}) })] },
-    children: [h("div", { class: "m-ced-area" }, pre, input), list] }), props.color) as Element;
+    children: [h("div", { class: "m-ced-area" }, pre, input), list] }) as Element;
 }

@@ -10,7 +10,7 @@ const PEOPLE = ["HADİ Koşu Kulübü", "Kitap Kulübü", "Fotoğraf Atölyesi",
 export default function TypingIndicatorDemo(props: { values: { people: number; variant: string; text: boolean; motion: string; color: string; label: string } }) {
   return <div class="sc-row sc-social-typing">
     {() => <TypingIndicator names={() => PEOPLE.slice(0, props.values.people)} variant={() => props.values.variant as "bubble"} text={() => props.values.text}
-      motion={() => props.values.motion as "lift"} color={props.values.color as ColorToken}
+      motion={() => props.values.motion as "lift"} m:color={props.values.color as ColorToken}
       label={props.values.label === "own" ? (n: readonly string[]) => `${n.length} kişi bir şeyler yazıyor ✍️` : undefined} />}
     {() => (props.values.people ? null : <span class="sc-strip-label">Kimse yazmıyor: gösterge gizli</span>)}
   </div>

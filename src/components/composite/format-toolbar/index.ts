@@ -9,7 +9,7 @@ import { t, messages } from "../../../core/i18n.ts";
 import { cx, val, glyph, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { isMod, labelWithKey } from "../../../ui/keys.ts";
 import { isIconDef, type IconDef } from "../../../icons/svg.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { rovingFocus } from "../../../behaviors/roving-focus/index.ts";
 import { Toolbar, Divider } from "../../layout/stack/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
@@ -81,8 +81,6 @@ export interface FormatToolbarProps<T extends FormatTool = FormatTool> {
   hints?: MaybeFn<boolean | undefined>;
   /** Size of the buttons (default "sm"). */
   size?: MaybeFn<"xs" | "sm" | "md" | undefined>;
-  /** Theme colour token of the pressed mark (default: the accent, or the editor's colour). */
-  color?: MaybeFn<ColorToken | undefined>;
   /** Class prefix of a host that keeps its own class names ("m-mde"): the bar is also `<prefix>-toolbar`, a button `<prefix>-tool`, a separator `<prefix>-sep`, an own icon `<prefix>-tool-own`. */
   prefix?: string | undefined;
   /** Extra attributes of a tool's button (`aria-haspopup`, `aria-expanded`, `class`, `ref` …). */
@@ -122,7 +120,6 @@ export function FormatToolbar<T extends FormatTool = FormatTool>(props: FormatTo
     label: () => val(props.label) ?? t`Formatting`, class: () => cx("m-format-toolbar", own("toolbar"), val(props.class)),
     children: (props.tools ?? (FORMAT_TOOLS as readonly (T | "|")[])).map(button),
   }) as HTMLElement;
-  effect(() => { const c = colorAttr(val(props.color)); if (c) bar.setAttribute("data-m-color", c); else bar.removeAttribute("data-m-color"); });
   // by tag: the class of a tool is a binding that may not be written yet
   rovingFocus(bar, { orientation: "horizontal", selector: "button" });
   return bar;

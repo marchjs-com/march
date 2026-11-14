@@ -24,7 +24,7 @@ export default function SegmentedDemo(props: { values: { count: number; color: s
         disabled: v.locked && i === all.length - 1,
         title: v.locked && i === all.length - 1 ? `${o.label} görünümü bu planda yok` : v.icons === "only" ? o.label : undefined,
       }))
-      return <Segmented value={$view} onChange={(x: Maybe<string>) => { $view = x ?? "day" }} options={options} indicator={v.indicator as "fill"} color={pick(v.color) as Opt<ColorToken>} aria-label="Dönem" />
+      return <Segmented value={$view} onChange={(x: Maybe<string>) => { $view = x ?? "day" }} options={options} indicator={v.indicator as "fill"} m:color={pick(v.color) as Opt<ColorToken>} aria-label="Dönem" />
     }}
     <p class="m-muted">{() => `Seçilen: ${ALL.find((o) => o.value === $view)?.label ?? "—"}`}</p>
   </div>

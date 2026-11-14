@@ -7,7 +7,7 @@ or a node (a Counter that rolls), a hint line is optional, and the tile becomes 
 ```tsx
 <StatTile value="128" label="Posts" />
 <StatTile value={<Counter value={$followers} mode="roll" />} label="Followers" variant="tile" onClick={openFollowers} />
-<StatTile value="$4,250" label="This month" hint="12% more than last month" align="start" size="lg" color="success" />
+<StatTile value="$4,250" label="This month" hint="12% more than last month" align="start" size="lg" m:color="success" />
 <dl><StatTile term value="42" label="Events" /></dl>
 ```
 

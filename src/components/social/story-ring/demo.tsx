@@ -14,9 +14,9 @@ export default function StoryRingDemo(props: { values: { state: string; size: st
   return <div class="sc-social-tray" role="list" aria-label="Hikâyeler">
     <div role="listitem">{() => <StoryRing name="Siz" state={() => props.values.state as StoryRingState} size={() => props.values.size as "md"} loading={() => props.values.loading} label="Hikâyen" onClick={() => {}}
       add={props.values.add !== "off"} addIcon={props.values.add === "own" ? <Icon of={star} /> : undefined}
-      color={props.values.color === "sweep" ? undefined : props.values.color as ColorToken} />}</div>
+      m:color={props.values.color === "sweep" ? undefined : props.values.color as ColorToken} />}</div>
     {USERS.slice(0, 5).map((u, i) => <div role="listitem"><StoryRing name={u.name} size={() => props.values.size as "md"} label={u.handle}
-      color={() => (props.values.color === "sweep" ? undefined : props.values.color as ColorToken)}
+      m:color={() => (props.values.color === "sweep" ? undefined : props.values.color as ColorToken)}
       state={() => ($seen.has(u.id) ? "seen" : i === 3 ? "close" : "new")} onClick={() => { $seen = new Set([...$seen, u.id]) }} /></div>)}
   </div>
 }

@@ -6,7 +6,7 @@ import { t } from "../../../core/i18n.ts";
 import { toast } from "../../overlays/toast/index.ts";
 import { val, cx, later, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
-import type { ColorToken } from "../../../theme/colors.ts";
+import { withColor, type ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../button/index.ts";
 import { IconButton } from "../icon-button/index.ts";
 import { check } from "../../../icons/glyphs/check.ts";
@@ -58,7 +58,7 @@ export function CopyButton(props: CopyButtonProps): Element {
   const text = (): string => (copied() ? val(props.copiedLabel) ?? t`Copied` : val(props.label) ?? t`Copy`);
   const shared = {
     class: () => cx("m-copy", copied() && "is-copied", val(props.class)), onClick: copy, "aria-live": "polite", icon: mark,
-    color: live(() => (copied() ? props.copiedColor : undefined)),
   };
-  return (props.iconOnly ? h(IconButton, { ...shared, label: text, title: false }) : h(Button, { ...shared, variant: "ghost", size: "sm" }, text)) as Element;
+  // the copied colour while the label says so (m:color on the button is the colour the rest of the time)
+  return withColor(props.iconOnly ? h(IconButton, { ...shared, label: text, title: false }) : h(Button, { ...shared, variant: "ghost", size: "sm" }, text), () => (copied() ? props.copiedColor : undefined)) as Element;
 }

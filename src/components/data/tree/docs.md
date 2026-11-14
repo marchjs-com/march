@@ -22,7 +22,7 @@ children or drag and drop use TreeView.
 | `class` | class | — | extra class on the tree |
 
 ```tsx
-<Tree nodes={files} color="brand-purple" chevron={(node, open) => <span>{() => (open() ? "−" : "+")}</span>} />
+<Tree nodes={files} m:color="brand-purple" chevron={(node, open) => <span>{() => (open() ? "−" : "+")}</span>} />
 <Tree nodes={files} chevron={false} />
 ```
 

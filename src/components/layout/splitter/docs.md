@@ -19,7 +19,7 @@ Home / End for the limits and Enter to go back to the initial share. Each pane k
 | `orientation` | `"horizontal"` / `"vertical"` | `"horizontal"` | side by side, or stacked |
 | `label` | string | "Resize" | accessible name of the handle |
 | `handle` | boolean / node | `true` | `false`: fixed panes with a plain divider; a node: your own grip drawn on the line |
-| `color` | color token | accent | colour of the handle while hovered, focused or dragged |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `class` | class | — | added to the root (`.m-splitter`); parts: `.m-split-pane`, `.m-split-handle`, `.m-split-grip` |
 
 ```tsx

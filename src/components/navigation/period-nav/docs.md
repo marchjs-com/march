@@ -7,7 +7,7 @@ Calendar) and the today button follows. The arrows swap in right-to-left text.
 ```tsx
 <PeriodNav onPrev={() => shift(-1)} onNext={() => shift(1)} onToday={() => go(today)} />
 <PeriodNav title={$monthName} onPrev={back} onNext={on} />
-<PeriodNav title={$monthName} onPrev={back} onNext={on} onToday={now} today="This month" color="brand-orange"
+<PeriodNav title={$monthName} onPrev={back} onNext={on} onToday={now} today="This month" m:color="brand-orange"
   prevIcon={arrowLeft} nextIcon={arrowRight} labels={{ group: "Month", previous: "Previous month", next: "Next month" }} />
 ```
 
@@ -26,7 +26,7 @@ Calendar) and the today button follows. The arrows swap in right-to-left text.
 | `rtl` | boolean / accessor | direction of the app | the default chevrons swap |
 | `attached` | boolean | `true` without a title | buttons joined into one control |
 | `size` | `sm` `md` | `md` | size of the arrows |
-| `color` | color token | accent | hover and focus colour of the buttons |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `partClass` | `{ prev, next, today, title }` | | an extra class on a part (a host that keeps its own class names) |
 | `class` | class value | | |
 

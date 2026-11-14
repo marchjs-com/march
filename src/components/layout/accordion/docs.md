@@ -27,7 +27,7 @@ icon and a subtitle; `variant="contained"` draws one framed list instead of sepa
 
 ```tsx
 <Accordion items={faq} chevron={false} />                                   // no arrow
-<Accordion items={faq} chevron={plus} color="brand-orange" />               // your own icon (it turns with the section)
+<Accordion items={faq} chevron={plus} m:color="brand-orange" />               // your own icon (it turns with the section)
 <Accordion items={faq} chevron={(open) => <b>{() => (open() ? "−" : "+")}</b>} animated={false} />
 ```
 

@@ -5,7 +5,7 @@ either an image with a name (`label`) or decoration next to text that already sa
 
 ```tsx
 <StatusDot tone="success" pulse label="Live" />
-<StatusDot color="brand-orange" size="xs" />
+<StatusDot m:color="brand-orange" size="xs" />
 <span><StatusDot tone="warn" pulse="blink" /> Unsaved</span>
 ```
 

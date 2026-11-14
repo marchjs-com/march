@@ -24,7 +24,7 @@ tooltip names the step and the shortcut ("Undo: Rename (Ctrl+Z)"). Or drive it w
 | `icons` | `{ undo?, redo? }` | | |
 | `partClass` | `{ undo?, redo? }` | | an extra class on a button (a host that keeps its own class names) |
 | `size` | `xs` `sm` `md` `lg` | IconButton default | |
-| `color` | color token | | colour of the icons |
+| `m:color` | color token | | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `disabled` | `boolean` / accessor | `false` | both buttons off (read-only editors) |
 | `class` | class value | | |
 

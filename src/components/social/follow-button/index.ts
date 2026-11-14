@@ -34,8 +34,6 @@ export interface FollowButtonProps {
   ariaLabel?: ((state: FollowState, name: string | undefined) => string) | undefined;
   /** The + / tick / clock icon: true (default), false, or `(state) => node`. */
   icon?: boolean | ((state: FollowState) => unknown) | undefined;
-  /** Fill color of "Follow". Default brand-blue. */
-  color?: MaybeFn<ColorToken | undefined>;
   /** The burst of dots on a new follow. Default true. */
   burst?: MaybeFn<boolean | undefined>;
   /** The width spring and the icon turn between states. Default true. */
@@ -67,7 +65,7 @@ export function FollowButton(props: FollowButtonProps): Element {
   return h(Button, {
     class: () => cx("m-follow", `m-follow-${val(props.size) ?? "md"}`, `is-${state()}`, val(props.class)),
     variant: () => (state() === "follow" ? "primary" : "secondary"), shape: "pill", size: () => val(props.size) ?? "md",
-    block: live(() => !!val(props.block)), color: live(() => val(props.color)), pressed: () => state() !== "follow",
+    block: live(() => !!val(props.block)), pressed: () => state() !== "follow",
     "aria-label": () => { const n = val(props.name); const s = state(); return props.ariaLabel ? props.ariaLabel(s, n) : n ? (s === "follow" ? t`Follow ${n}` : s === "following" ? t`Following ${n}, press to unfollow` : t`Follow request sent to ${n}, press to cancel`) : label(s); },
     ref: (x: HTMLElement) => { btn = x; },
     onClick: click,

@@ -23,7 +23,7 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 | `class`, `children` | | | the element itself is the scroll area: give it a height |
 
 ```tsx
-<PullToRefresh onRefresh={load} icon={rotateCw} color="brand-orange" labels={{ pull: "Pull for new events", refresh: "Load new events" }}>…</PullToRefresh>
+<PullToRefresh onRefresh={load} icon={rotateCw} m:color="brand-orange" labels={{ pull: "Pull for new events", refresh: "Load new events" }}>…</PullToRefresh>
 <PullToRefresh onRefresh={load} indicator={(phase) => (phase === "ready" ? "↑" : "↓")} settle={false}>…</PullToRefresh>
 ```
 

@@ -13,11 +13,11 @@ const { COLOR_TOKENS } = await import("../src/theme/colors.ts");
 const read = (f) => readFileSync(new URL(`../src/${f}`, import.meta.url), "utf8");
 const mount = (fn) => { const el = document.createElement("div"); render(fn, el); return el; };
 
-test("color prop → data-m-color on the control (or the group / form root that its children inherit from)", () => {
+test("m:color (and Progress's own color) → data-m-color on the control's root, which its parts inherit", () => {
   const el = mount(() => [
-    h(U.TextInput, { color: "brand-blue", "aria-label": "a" }), h(U.Checkbox, { color: "success", label: "b" }), h(U.Toggle, { color: "cat-3", "aria-label": "c" }),
-    h(U.Button, { color: "brand-purple", variant: "primary" }, "d"), h(U.Progress, { color: "brand-green", value: 3 }),
-    h(U.Segmented, { color: "brand-orange", "aria-label": "e", options: ["x", "y"] }), h(U.CheckboxGroup, { color: "danger", options: ["x"], "aria-label": "f" }),
+    mProps(h(U.TextInput, { "aria-label": "a" }), { color: "brand-blue" }), mProps(h(U.Checkbox, { label: "b" }), { color: "success" }), mProps(h(U.Toggle, { "aria-label": "c" }), { color: "cat-3" }),
+    mProps(h(U.Button, { variant: "primary" }, "d"), { color: "brand-purple" }), h(U.Progress, { color: "brand-green", value: 3 }),
+    mProps(h(U.Segmented, { "aria-label": "e", options: ["x", "y"] }), { color: "brand-orange" }), mProps(h(U.CheckboxGroup, { options: ["x"], "aria-label": "f" }), { color: "danger" }),
   ]);
   const colors = [...el.querySelectorAll("[data-m-color]")].map((x) => x.getAttribute("data-m-color"));
   for (const c of ["brand-blue", "success", "cat-3", "brand-purple", "brand-green", "brand-orange", "danger"]) assert.ok(colors.includes(c), c);
@@ -136,7 +136,7 @@ test("a color prop stays live: a new value reaches data-m-color (the showcase Pl
   const cases = [
     ["Steps (m:color)", (c) => mProps(h(U.Steps, { steps: [{ title: "A" }, { title: "B" }], current: 0 }), { color: c })],
     ["Progress", (c) => h(U.Progress, { value: 1, max: 2, color: c })],
-    ["Badge", (c) => h(U.Badge, { color: c }, "x")],
+    ["Badge (m:color)", (c) => mProps(h(U.Badge, {}, "x"), { color: c })],
     ["Stepper (m:color)", (c) => mProps(h(Stepper, { steps: [{ title: "A" }, { title: "B" }] }), { color: c })],
   ];
   for (const [name, make] of cases) {

@@ -18,7 +18,7 @@ export function RadioGroup<T = unknown>(props: RadioGroupProps<T>): unknown {
   const baseId = props.id ?? field?.id ?? uid("m-rg");
   const name = props.name ?? baseId;
   const c = ctl(props);
-  return h("div", { "data-m-color": () => colorAttr(props.color), role: "radiogroup", class: () => groupClass(props, "radio"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
+  return h("div", { role: "radiogroup", class: () => groupClass(props, "radio"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
     () => normOptions(props.options).map((o, i) => h("label", { class: "m-check", "data-m-color": () => itemColor(props.colors, i) },
       h("input", {
         type: "radio", class: "m-check-input", id: i ? `${baseId}-${i}` : baseId, name, onBlur: props.onBlur,

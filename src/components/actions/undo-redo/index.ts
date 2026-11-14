@@ -48,8 +48,6 @@ export interface UndoRedoProps {
   /** An extra class on a button, for a host that keeps its own class names: `{ undo, redo }`. */
   partClass?: Partial<Record<UndoRedoAction, string>> | undefined;
   size?: MaybeFn<IconButtonSize | undefined>;
-  /** Theme colour token of the icons. */
-  color?: ColorToken | undefined;
   disabled?: MaybeFn<boolean | undefined>;
   class?: ClassProp;
 }
@@ -72,8 +70,8 @@ export function UndoRedo(props: UndoRedoProps): Element {
   const combo = (a: UndoRedoAction): string | null => (props.shortcuts === false ? null : (typeof props.shortcuts === "object" ? props.shortcuts[a] : undefined) ?? KEYS[a]);
   const ICON: Record<UndoRedoAction, unknown> = { undo: undoIcon, redo: redoIcon };
   return h("span", { class: () => cx("m-undo-redo", val(props.class)), role: "group", "aria-label": () => val(props.labels?.group) ?? t`History` },
-    (props.actions ?? (["undo", "redo"] as const)).map((a) => withColor(h(IconButton, {
+    (props.actions ?? (["undo", "redo"] as const)).map((a) => h(IconButton, {
       class: cx("m-undo-redo-btn", `m-undo-redo-${a}`, props.partClass?.[a]), icon: props.icons?.[a] ?? ICON[a], size: props.size,
       label: () => name(a), title: () => labelWithKey(name(a), combo(a)),
-      disabled: () => !can(a), onClick: () => run(a) }), props.color)));
+      disabled: () => !can(a), onClick: () => run(a) })));
 }

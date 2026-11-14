@@ -7,7 +7,7 @@ out and the arrow follows the nearest ancestor with `aria-expanded` (or the summ
 ```tsx
 <Chevron open={$open} />
 <button aria-expanded={$open} onClick={toggle}>Details <Chevron direction="down" /></button>
-<Chevron open={$open} direction="down" motion="spring" size="lg" color="primary" icon={arrowRight} />
+<Chevron open={$open} direction="down" motion="spring" size="lg" m:color="primary" icon={arrowRight} />
 <Chevron leaf />
 ```
 

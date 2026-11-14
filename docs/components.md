@@ -546,7 +546,7 @@ The yes / no / partly mark of comparison tables, plan features and check lists: 
 <CheckMark value={row.included} />
 <CheckMark value="partial" text />
 <CheckMark value={false} variant="soft" label={false} />
-<CheckMark value labels={{ yes: "Included" }} icons={{ yes: heart }} color="primary" size="lg" />
+<CheckMark value labels={{ yes: "Included" }} icons={{ yes: heart }} m:color="primary" size="lg" />
 <CheckMark value={$done} variant="soft" motion="flip" />          // ✕ turns into ✓ when $done changes
 <CheckMark value={$ok} motion={(next, prev) => animate(next, { opacity: [0, 1], transform: ["translateY(6px)", "none"] }, { duration: 240 }).finished} />
 ```
@@ -583,7 +583,7 @@ The small arrow that turns when something opens: an accordion header, a disclosu
 ```tsx
 <Chevron open={$open} />
 <button aria-expanded={$open} onClick={toggle}>Details <Chevron direction="down" /></button>
-<Chevron open={$open} direction="down" motion="spring" size="lg" color="primary" icon={arrowRight} />
+<Chevron open={$open} direction="down" motion="spring" size="lg" m:color="primary" icon={arrowRight} />
 <Chevron leaf />
 ```
 
@@ -781,7 +781,7 @@ A small round mark in a corner of a picture, a card or an avatar: the video sign
 ```tsx
 <div class="tile"><Picture source={photo} fit="cover" /><CornerMark icon={video} /></div>
 <a class="card m-corner-host" href={href}>…<CornerMark icon={arrowUpRight} variant="surface" show="hover" /></a>
-<CornerMark corner="bottom-end" icon={plus} variant="solid" color="brand-orange" size="sm" ring overlap />
+<CornerMark corner="bottom-end" icon={plus} variant="solid" m:color="brand-orange" size="sm" ring overlap />
 ```
 
 Full page: src/components/media/corner-mark/docs.md
@@ -1163,7 +1163,7 @@ Composed of: Toolbar, [IconButton](#iconbutton), Divider
 
 ```tsx
 <FormatToolbar tools={["bold", "italic", "|", "link"]} onTool={exec} pressed={{ bold: () => $bold }} hints />
-<FormatToolbar onTool={exec} labels={{ bold: "Strong" }} icons={{ bold: "B" }} color="brand-orange" size="md" />
+<FormatToolbar onTool={exec} labels={{ bold: "Strong" }} icons={{ bold: "B" }} m:color="brand-orange" size="md" />
 ```
 
 Full page: src/components/composite/format-toolbar/docs.md
@@ -1241,7 +1241,7 @@ Composed of: [Badge](#badge), [Button](#button), [CheckMark](#checkmark)
     { label: "Ticketing", values: { us: false, events: true }, note: "Not planned: HADİ is for free meetups." },
     { label: "Price", values: { us: "Free", events: "Fee per ticket" } },
   ]} />
-<HonestCompare columns={…} rows={…} color="brand-green" tags={false} filter={false}
+<HonestCompare columns={…} rows={…} m:color="brand-green" tags={false} filter={false}
   labels={{ partly: "Half", behind: "We lose", counts: (c) => `${c.ahead} wins, ${c.behind} losses` }}
   renderCell={(value, { us }) => (value === true && us ? "✓✓" : undefined)} />   // undefined keeps the default mark
 ```
@@ -1271,9 +1271,9 @@ A button that shows only an icon. `label` is required: it becomes the accessible
 ```tsx
 <IconButton icon={heart} label="Like" on:click={like} />
 <IconButton icon={trash} label="Delete" variant="danger" size="sm" />
-<IconButton icon={star} label="Star" color="brand-gold" title={false} />   // coloured, no native tooltip
+<IconButton icon={star} label="Star" m:color="brand-gold" title={false} />   // coloured, no native tooltip
 <IconButton icon={pin} label="Pin" size="xs" pressed={$pinned} on:click={toggle} />        // toggle: aria-pressed + pressed look
-<IconButton icon={send} label="Send" variant="solid" shape="round" color="brand-blue" />   // filled circle
+<IconButton icon={send} label="Send" variant="solid" shape="round" m:color="brand-blue" />   // filled circle
 <IconButton icon={arrowUp} label="Back to top" variant="raised" shape="round" />           // floating button
 <IconButton icon={x} label="Close" inverse />                                              // on a photo / video
 <IconButton icon={globe} label="Website" href="https://example.com" />                     // a link
@@ -1287,7 +1287,7 @@ An icon in a tinted, rounded square: the lead of a card, a list row, an empty st
 
 ```tsx
 <IconTile icon={users} tone="primary" />
-<IconTile icon={bell} color="brand-orange" variant="solid" shape="round" size="lg" />
+<IconTile icon={bell} m:color="brand-orange" variant="solid" shape="round" size="lg" />
 ```
 
 Full page: src/components/data/icon-tile/docs.md
@@ -1741,7 +1741,7 @@ Composed of: [Button](#button), [IconButton](#iconbutton), Divider, [Menu](#menu
   { id: "delete", label: "Delete", icon: trash, danger: true },
 ]} />
 <OverflowToolbar label="Document" items={items} moreLabel="Other tools" moreIcon={menu} tooltips={false}
-  motion="fade" color="brand-purple" />
+  motion="fade" m:color="brand-purple" />
 <OverflowToolbar label="Document" items={items} motion={(el) => animate(el, { opacity: [0, 1], y: [-8, 0] }, { duration: 240 })} />
 ```
 
@@ -1779,7 +1779,7 @@ One dot per page; the current one is longer and takes the accent colour. Under a
 
 ```tsx
 <PageDots count={5} bind:value={$page} />
-<PageDots count={steps.length} value={$active} color="brand-orange" />
+<PageDots count={steps.length} value={$active} m:color="brand-orange" />
 <PageDots count={4} value={$i} onChange={(i) => $i = i} dot={(i) => i + 1} />
 ```
 
@@ -1854,7 +1854,7 @@ Composed of: [ButtonGroup](#buttongroup), [IconButton](#iconbutton), [Button](#b
 ```tsx
 <PeriodNav onPrev={() => shift(-1)} onNext={() => shift(1)} onToday={() => go(today)} />
 <PeriodNav title={$monthName} onPrev={back} onNext={on} />
-<PeriodNav title={$monthName} onPrev={back} onNext={on} onToday={now} today="This month" color="brand-orange"
+<PeriodNav title={$monthName} onPrev={back} onNext={on} onToday={now} today="This month" m:color="brand-orange"
   prevIcon={arrowLeft} nextIcon={arrowRight} labels={{ group: "Month", previous: "Previous month", next: "Next month" }} />
 ```
 
@@ -2206,7 +2206,7 @@ import { ScrollToTop } from "hadi-march/ui";
 <ScrollToTop />                          // once; shows after 320 px
 <ScrollToTop threshold={600} order={-1} />
 <ScrollToTop inline target={box} />      // in place, for a scrolling box
-<ScrollToTop icon={chevronUp} color="brand-blue" motion="fade" label="Up" class="my-top" />
+<ScrollToTop icon={chevronUp} m:color="brand-blue" motion="fade" label="Up" class="my-top" />
 <ScrollToTop motion={(el, shown) => animate(el, { opacity: shown ? [0, 1] : [1, 0], rotate: shown ? [-90, 0] : [0, 90] }, { duration: 300, fill: "forwards" })} />
 <ScrollToTop motion="none" smooth={false} />   // no animation at all
 ```
@@ -2395,7 +2395,7 @@ One value with its label: the numbers of a profile, an item of a stats band, a f
 ```tsx
 <StatTile value="128" label="Posts" />
 <StatTile value={<Counter value={$followers} mode="roll" />} label="Followers" variant="tile" onClick={openFollowers} />
-<StatTile value="$4,250" label="This month" hint="12% more than last month" align="start" size="lg" color="success" />
+<StatTile value="$4,250" label="This month" hint="12% more than last month" align="start" size="lg" m:color="success" />
 <dl><StatTile term value="42" label="Events" /></dl>
 ```
 
@@ -2439,7 +2439,7 @@ A small dot that shows a state: live, busy, changed, online. It takes a tone or 
 
 ```tsx
 <StatusDot tone="success" pulse label="Live" />
-<StatusDot color="brand-orange" size="xs" />
+<StatusDot m:color="brand-orange" size="xs" />
 <span><StatusDot tone="warn" pulse="blink" /> Unsaved</span>
 ```
 
@@ -2772,7 +2772,7 @@ The verified-account badge shown beside a name: a post author, a profile title, 
 
 ```tsx
 <b>{user.name}</b> {user.verified && <VerifiedMark />}
-<VerifiedMark size="md" label="Verified organiser" color="brand-green" />
+<VerifiedMark size="md" label="Verified organiser" m:color="brand-green" />
 <VerifiedMark icon={shieldCheck} label={false} />
 ```
 

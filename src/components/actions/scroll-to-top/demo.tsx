@@ -9,7 +9,7 @@ export const code = `// once in the app shell: shows after scrolling, sits in th
 <ScrollToTop />
 <ScrollToTop threshold={600} />      // later
 <ScrollToTop inline target={box} />  // inside a scrolling box
-<ScrollToTop icon={chevronUp} color="brand-blue" motion="fade" />   // motion: pop | fade | slide | none | (el, shown) => …`
+<ScrollToTop icon={chevronUp} m:color="brand-blue" motion="fade" />   // motion: pop | fade | slide | none | (el, shown) => …`
 
 const MOTIONS: Record<string, string> = { pop: "zıplayarak", fade: "belirerek", slide: "kayarak", own: "dönerek", none: "yok" }
 
@@ -31,7 +31,7 @@ export default function ScrollToTopDemo(props: { values: { threshold: number; mo
         ? [{ opacity: 0, transform: "rotate(-180deg) scale(0.6)" }, { opacity: 1, transform: "none" }]
         : [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "rotate(180deg) scale(0.6)" }], { duration: 420, easing: "easeOutCubic", fill: "forwards" })
       return <ScrollToTop inline target={box} threshold={v.threshold} motion={v.motion === "own" ? spin : v.motion as "pop"}
-        icon={v.icon === "chevron" ? chevronUp : v.icon === "text" ? "⇧" : undefined} color={(v.color || undefined) as never} />
+        icon={v.icon === "chevron" ? chevronUp : v.icon === "text" ? "⇧" : undefined} m:color={(v.color || undefined) as never} />
     }}</div>
   </div>
 }

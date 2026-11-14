@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const mount = (fn) => { const host = document.createElement("div"); document.body.appendChild(host); const dispose = render(fn, host); return { host, dispose }; };
@@ -25,10 +26,10 @@ test("Splitter: handle off (fixed divider), your own grip, colour token", () => 
   assert.equal(fixed.getAttribute("tabindex"), null);
   assert.equal(fixed.getAttribute("role"), "separator");
   off.dispose();
-  const own = mount(() => h(Splitter, { start: "L", end: "R", handle: h("i", {}, "::"), color: "brand-orange" }));
+  const own = mount(() => mProps(h(Splitter, { start: "L", end: "R", handle: h("i", {}, "::") }), { color: "brand-orange" }));
   const handle = own.host.querySelector(".m-split-handle");
   assert.equal(handle.querySelector(".m-split-grip").textContent, "::");
-  assert.equal(handle.getAttribute("data-m-color"), "brand-orange");
+  assert.equal(handle.closest("[data-m-color]")?.getAttribute("data-m-color"), "brand-orange");
   assert.equal(handle.getAttribute("tabindex"), "0");
   own.dispose();
   const def = mount(() => h(Splitter, { start: "L", end: "R" }));

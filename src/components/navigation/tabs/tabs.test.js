@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const mount = (fn) => { const host = document.createElement("div"); document.body.appendChild(host); const dispose = render(fn, host); return { host, dispose }; };
@@ -123,9 +124,9 @@ test("TabList: the strip alone, vertical, manual activation, wrap, no look", () 
 
 test("Tabs: color, label and variant stay live", () => {
   const variant = signal("line"), label = signal("One");
-  const { host, dispose } = mount(() => h(Tabs, { variant, label, color: "brand-blue", tabs: [{ id: "a", label: "A" }] }));
+  const { host, dispose } = mount(() => mProps(h(Tabs, { variant, label, tabs: [{ id: "a", label: "A" }] }), { color: "brand-blue" }));
   const bar = host.querySelector('[role="tablist"]');
-  assert.equal(bar.getAttribute("data-m-color"), "brand-blue");
+  assert.equal(bar.closest("[data-m-color]")?.getAttribute("data-m-color"), "brand-blue");
   assert.equal(bar.getAttribute("aria-label"), "One");
   variant.set("pill"); label.set("Two");
   assert.match(bar.getAttribute("class"), /m-tabs-bar-pill/);

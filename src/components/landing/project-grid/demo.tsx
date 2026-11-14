@@ -25,7 +25,7 @@ export default function ProjectGridDemo(props: { values: { cols: number; filters
     {() => {
       const v = { ...props.values }
       return <ProjectGrid projects={PROJECTS} cols={v.cols as 3} filters={v.filters} allLabel="Tümü" motion={v.motion}
-        color={v.color === "default" ? undefined : v.color as "brand-purple"}
+        m:color={v.color === "default" ? undefined : v.color as "brand-purple"}
         arrow={v.arrow === "off" ? false : v.arrow === "own" ? (p: Project) => <span>{p.year}</span> : true} />
     }}
   </div>

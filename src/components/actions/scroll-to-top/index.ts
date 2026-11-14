@@ -14,7 +14,7 @@ import { listen } from "../../../core/util.ts";
 import { IconButton } from "../../../ui/button.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
-import { type ColorToken, withColor } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { arrowUp } from "../../../icons/glyphs/arrowUp.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
@@ -35,8 +35,6 @@ export interface ScrollToTopProps {
   label?: MaybeFn<string | undefined>;
   /** The icon (default: an up arrow): your own node / icon. */
   icon?: unknown;
-  /** Theme color token of the icon and border (default: text colour, the theme's primary on hover). */
-  color?: ColorToken | undefined;
   /** How the button appears and leaves: "pop" (default), "fade", "slide", "none" / false, or `(el, shown) => …` (your own animation). */
   motion?: "pop" | "fade" | "slide" | "none" | false | ((el: HTMLElement, shown: boolean) => unknown) | undefined;
   /** Scroll back smoothly (default true); false jumps at once. */
@@ -80,8 +78,8 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
     s.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const btn = withColor(h(IconButton, { class: () => cx("m-to-top", val(props.class)), variant: "raised", shape: "round", size: "lg", label: () => val(props.label) ?? t`Back to top`, onClick: toTop,
-    icon: ownIcon(props.icon === false || props.icon == null ? undefined : props.icon, arrowUp) }), props.color) as HTMLElement;
+  const btn = h(IconButton, { class: () => cx("m-to-top", val(props.class)), variant: "raised", shape: "round", size: "lg", label: () => val(props.label) ?? t`Back to top`, onClick: toTop,
+    icon: ownIcon(props.icon === false || props.icon == null ? undefined : props.icon, arrowUp) }) as HTMLElement;
   btn.setAttribute("data-shown", "false");
   btn.inert = true;
   effect(() => {

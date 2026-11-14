@@ -9,6 +9,6 @@ export default definePlayground<Values>({
     { key: "text", label: "Metin", default: true, visibleWhen: (v) => v.people > 0 },
     { key: "label", label: "Cümle", default: "default", options: [{ value: "default", label: "… yazıyor" }, { value: "own", label: "kendi cümlem" }], visibleWhen: (v) => v.people > 0 && v.text },
     { key: "motion", label: "Nokta hareketi", default: "lift", options: [{ value: "lift", label: "zıplama" }, { value: "fade", label: "yanıp sönme" }, { value: "none", label: "yok" }], visibleWhen: (v) => v.people > 0 },
-    { key: "color", label: "Nokta rengi", default: "brand-blue", options: [{ value: "brand-blue", label: "mavi" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }], visibleWhen: (v) => v.people > 0 },
+    { key: "color", label: "Nokta rengi", default: "brand-blue", options: [{ value: "brand-blue", label: "mavi" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }], visibleWhen: (v) => v.people > 0, prop: "m:color" },
   ],
 });

@@ -23,7 +23,7 @@ import { icon, glyph } from "../../../ui/util.ts";
 import { folder } from "../../../icons/glyphs/folder.ts";
 import { fileText } from "../../../icons/glyphs/fileText.ts";
 import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
-import { type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken, withColor } from "../../../theme/colors.ts";
 
 export interface TreeViewNode {
   id: string;
@@ -252,7 +252,7 @@ export function TreeView(props: TreeViewProps): Element {
       label: q ? markText(n.label, q) : n.label,
       tools: [
         isLoading ? h(Spinner, { size: "sm", label: lb("loading")(n.label) }) : null,
-        err ? h(Button, { variant: "ghost", size: "sm", color: "danger", icon: alertCircle, class: "m-tv-retry", "data-chev": "", onClick: (e: Event) => { e.stopPropagation(); void loadKids(n); } }, lb("retry")) : null,
+        err ? withColor(h(Button, { variant: "ghost", size: "sm", icon: alertCircle, class: "m-tv-retry", "data-chev": "", onClick: (e: Event) => { e.stopPropagation(); void loadKids(n); } }, lb("retry")), "danger") : null,
       ],
       meta: n.meta,
     }, {

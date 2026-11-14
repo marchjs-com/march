@@ -8,7 +8,7 @@ import { h } from "../../../dom/h.ts";
 import { signal, computed } from "../../../core/reactive.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, val, type ClassProp } from "../../../ui/util.ts";
-import { type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken, withColor } from "../../../theme/colors.ts";
 import { CheckMark } from "../../feedback/check-mark/index.ts";
 import { Badge } from "../../data/badge/index.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -114,9 +114,8 @@ export function HonestCompare(props: HonestCompareProps): Element {
   const summary = props.summary === false ? null : h("div", { class: "m-hc-summary" },
     h("p", { class: "m-hc-counts" },
       () => (L.counts ? L.counts(counts()) : t`Ahead in ${counts().ahead}, even in ${counts().even}, behind in ${counts().behind}.`)),
-    counts().behind && props.filter !== false ? h(Button, {
-      class: "m-hc-filter", size: "sm", shape: "pill", color: "warn", pressed: () => onlyBehind(), onClick: () => onlyBehind.set(!onlyBehind.peek()),
-    }, () => (onlyBehind() ? L.showAll ?? t`Show all rows` : L.onlyBehind ?? t`Only where we are behind`)) : null);
+    counts().behind && props.filter !== false ? withColor(h(Button, {
+      class: "m-hc-filter", size: "sm", shape: "pill", pressed: () => onlyBehind(), onClick: () => onlyBehind.set(!onlyBehind.peek()) }, () => (onlyBehind() ? L.showAll ?? t`Show all rows` : L.onlyBehind ?? t`Only where we are behind`)), "warn") : null);
 
   return h("div", { class: () => cx("m-hc", val(props.class)) }, summary, h("div", { class: "m-hc-scroll", tabindex: "0", role: "region", "aria-label": () => L.region ?? t`Comparison table` }, table));
 }

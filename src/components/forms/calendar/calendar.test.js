@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { Calendar } = await import("./index.ts");
@@ -31,7 +32,7 @@ test("Calendar: grid keyboard, min / max clamping, aria states", () => {
 });
 
 test("Calendar: month buttons, weekday row, labels, icons, day content and color are yours", () => {
-  const { el, dispose } = mount(() => h(Calendar, { value: "2026-03-14", labels: { prevMonth: "Back", nextMonth: "Forward" }, prevIcon: "<", nextIcon: () => h("b", {}, ">"), weekdays: false, renderDay: (_iso, d) => `${d}.`, color: "brand-orange" }));
+  const { el, dispose } = mount(() => mProps(h(Calendar, { value: "2026-03-14", labels: { prevMonth: "Back", nextMonth: "Forward" }, prevIcon: "<", nextIcon: () => h("b", {}, ">"), weekdays: false, renderDay: (_iso, d) => `${d}.` }), { color: "brand-orange" }));
   const [p, n] = el.querySelectorAll(".m-cal-nav");
   assert.equal(p.getAttribute("aria-label"), "Back");
   assert.equal(n.getAttribute("aria-label"), "Forward");

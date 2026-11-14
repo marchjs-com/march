@@ -26,7 +26,7 @@ is a transform written in the scroll scene's write phase.
 | `class` | class | — | on the root |
 
 ```tsx
-<Roadmap items={items} color="brand-purple" labels={{ done: "Shipped", now: "Building", next: "Later" }} reveal={{ effect: "up" }} />
+<Roadmap items={items} m:color="brand-purple" labels={{ done: "Shipped", now: "Building", next: "Later" }} reveal={{ effect: "up" }} />
 <Roadmap items={items} badges={(status, text) => <em>{text}</em>} rail={false} reveal={false} />
 ```
 

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { Toggle } = await import("./index.ts");
@@ -13,7 +14,7 @@ void type; void key; void signal;
 
 test("Toggle: role=switch, aria-checked follows the value, disabled blocks clicks", () => {
   const v = signal(false);
-  const { el } = mount(() => h(Toggle, { "bind:value": v, label: "Wi-Fi", color: "brand-blue" }));
+  const { el } = mount(() => mProps(h(Toggle, { "bind:value": v, label: "Wi-Fi" }), { color: "brand-blue" }));
   const sw = el.querySelector("[role=switch]");
   assert.equal(sw.getAttribute("aria-checked"), "false");
   assert.equal(el.querySelector(".m-check-label").textContent, "Wi-Fi");

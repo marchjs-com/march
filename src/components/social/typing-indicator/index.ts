@@ -4,7 +4,7 @@ import { effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import "./typing-indicator.css";
@@ -16,8 +16,6 @@ export interface TypingIndicatorProps {
   variant?: MaybeFn<"bubble" | "inline" | undefined>;
   /** Show the "… is typing" text. Default true for inline, false for bubble (still announced). */
   text?: MaybeFn<boolean | undefined>;
-  /** Dot color. Default brand-blue. */
-  color?: ColorToken | undefined;
   /** Your own sentence: `(names) => "…"`. Default: typingText ("HADİ is typing…"). */
   label?: ((names: readonly string[]) => string) | undefined;
   /** The three dots: true (default), false (text only), or your own node in their place. */
@@ -42,7 +40,8 @@ export function TypingIndicator(props: TypingIndicatorProps): Element {
   const runs: { cancel(): void }[] = [];
   const el = h("span", {
     class: () => cx("m-typing", `m-typing-${val(props.variant) ?? "bubble"}`, !names().length && "is-off", val(props.class)),
-    "data-m-color": () => colorAttr(props.color ?? "brand-blue"), role: "status", "aria-live": "polite",
+    // brand blue unless m:color gives another (the common prop is applied after, on this root)
+    "data-m-color": "brand-blue", role: "status", "aria-live": "polite",
   },
   props.dots === false ? null
     : props.dots && props.dots !== true ? h("span", { class: "m-typing-dots is-own", "aria-hidden": "true" }, props.dots)

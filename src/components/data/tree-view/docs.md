@@ -43,7 +43,7 @@ import { TreeView } from "hadi-march/components/data/tree-view";
 | `class` | class | — | extra class on the tree |
 
 ```tsx
-<TreeView nodes={files} color="brand-purple" animate={false}
+<TreeView nodes={files} m:color="brand-purple" animate={false}
   chevron={(node, open) => (open ? "−" : "+")}
   labels={{ retry: "Try again", empty: "No files yet", noMatch: (q) => `No file named "${q}"` }}
   ghost={(nodes) => <b>{nodes.length} files</b>} />

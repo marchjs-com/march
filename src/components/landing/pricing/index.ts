@@ -16,7 +16,7 @@ import { minus } from "../../../icons/glyphs/minus.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { locale } from "../../../core/i18n.ts";
-import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
+import { type ColorToken, withColor } from "../../../theme/colors.ts";
 import { Counter, formatCount } from "../counter/index.ts";
 // Reveal: entries enter one after another
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts";
@@ -46,8 +46,6 @@ export interface PricingProps {
   currency?: string | undefined;
   /** Next to "Yearly" ("2 months free"). */
   saving?: MaybeFn<unknown> | undefined;
-  /** Colour of the featured plan (border, glow, button, badge). Default: the brand gradient and the accent. */
-  color?: ColorToken | undefined;
   /** The mark in front of a feature: true (default: a tick or a dash), false, or `(included) => node`. */
   featureIcon?: boolean | ((included: boolean) => unknown) | undefined;
   /** Colour of the tick of an included feature (default: success). */
@@ -117,7 +115,7 @@ export function Pricing(props: PricingProps): Element {
       feats.length ? h("ul", { class: "m-price-feats" }, feats) : null) as HTMLElement;
   });
   const row = h("div", { class: "m-price-row" }, cards) as HTMLElement;
-  const root = h("div", { class: cx("m-pricing", val(props.class)), "data-m-color": colorAttr(props.color) }, toggle, row) as HTMLElement;
+  const root = h("div", { class: cx("m-pricing", val(props.class)) }, toggle, row) as HTMLElement;
 
   // on a period change the "billed" lines cross-fade (the thumb of the switch is Segmented's own sliding indicator)
   let first = true;

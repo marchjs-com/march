@@ -8,7 +8,7 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { Avatar } from "../avatar/index.ts";
 import { animate } from "../../../motion/animate.ts";
-import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
+import { withColor } from "../../../theme/colors.ts";
 import { CornerMark } from "../../media/corner-mark/index.ts";
 import "./story-ring.css";
 
@@ -30,8 +30,6 @@ export interface StoryRingProps {
   onClick?: ((e: MouseEvent) => void) | undefined;
   /** Your own accessible name. Default: "HADİ, new story" / "HADİ, story seen" / the name. */
   ariaLabel?: MaybeFn<string | undefined>;
-  /** One color for the ring of a new / close story instead of the sweep. */
-  color?: MaybeFn<ColorToken | undefined>;
   /** Your own content for the + badge. */
   addIcon?: unknown;
   /** Your own node instead of the Avatar (a logo, an image). */
@@ -61,7 +59,6 @@ export function StoryRing(props: StoryRingProps): Element {
   onCleanup(() => spin?.cancel());
   const cls = (): string => cx("m-sring", `m-sring-${val(props.size) ?? "md"}`, `is-${state()}`, val(props.loading) && "is-loading", val(props.class));
   const name = (): string => { const own = val(props.ariaLabel); if (own != null) return own; const s = state(); const n = val(props.name); return s === "new" || s === "close" ? t`${n}, new story` : s === "seen" ? t`${n}, story seen` : n; };
-  const color = (): string | null => colorAttr(val(props.color));
-  if (props.onClick) return h("button", { type: "button", class: cls, "data-m-color": color, "aria-label": name, "aria-busy": () => (val(props.loading) ? "true" : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, inner);
-  return h("span", { class: cls, "data-m-color": color, role: "img", "aria-label": name }, inner);
+  if (props.onClick) return h("button", { type: "button", class: cls, "aria-label": name, "aria-busy": () => (val(props.loading) ? "true" : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, inner);
+  return h("span", { class: cls, role: "img", "aria-label": name }, inner);
 }

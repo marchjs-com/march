@@ -5,7 +5,7 @@ onboarding flow. With `onChange` (or `bind:value`) the dots are buttons; without
 
 ```tsx
 <PageDots count={5} bind:value={$page} />
-<PageDots count={steps.length} value={$active} color="brand-orange" />
+<PageDots count={steps.length} value={$active} m:color="brand-orange" />
 <PageDots count={4} value={$i} onChange={(i) => $i = i} dot={(i) => i + 1} />
 ```
 

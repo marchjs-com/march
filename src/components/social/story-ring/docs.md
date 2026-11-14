@@ -21,7 +21,7 @@ ring turns on the motion engine. A `+` badge marks your own ring (add a story); 
 | `loading` | boolean | false | the ring turns |
 | `onClick` | `(e) => void` | — | makes it a button |
 | `ariaLabel` | string | name + state | your own accessible name |
-| `color` | ColorToken | — | one color for the ring of a new / close story instead of the sweep |
+| `m:color` | ColorToken | — | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `addIcon` | node | + | your own content for the badge |
 | `avatar` | node | Avatar | your own node inside the ring |
 | `class` | string | — | on the root (`m-sring`; parts: `m-sring-ring`, `m-sring-av`, `m-sring-add`, `m-sring-label`) |

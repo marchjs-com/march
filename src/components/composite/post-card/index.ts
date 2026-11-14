@@ -27,6 +27,7 @@ import { heartBurst, heartPop } from "../../../motion/burst.ts";
 import { CountRoll } from "../../social/count-roll/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./post-card.css";
+import { withColor } from "../../../theme/colors.ts";
 
 export interface PostAuthor { name: string; handle?: string | undefined; avatar?: string | undefined; verified?: boolean | undefined }
 export interface Post {
@@ -162,7 +163,7 @@ export function PostCard(props: PostCardProps): Element {
       props.bigHeart === false ? null : h("span", { class: "m-post-big", hidden: true, "aria-hidden": "true", ref: (x: HTMLElement) => { big = x; } }, own(props.bigHeart, heart)));
   },
   h("div", { class: "m-post-actions" },
-    h(LikeButton, { liked: () => !!post().liked, count: () => post().likes, onToggle: like, label: () => L().like ?? t`Like`, color: props.likeColor }),
+    withColor(h(LikeButton, { liked: () => !!post().liked, count: () => post().likes, onToggle: like, label: () => L().like ?? t`Like` }), props.likeColor),
     counter(() => own(props.commentIcon, message), () => post().comments, () => L().comments?.(post().comments ?? 0) ?? t`Comments: ${post().comments ?? 0}`, props.onComment && (() => props.onComment?.(post()))),
     counter(() => own(props.shareIcon, send), () => post().shares, () => L().share?.(post().shares ?? 0) ?? t`Share: ${post().shares ?? 0}`, props.onShare && (() => props.onShare?.(post())))),
   () => {
