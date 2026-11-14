@@ -11,6 +11,7 @@ import { cx, val, listen, type ClassProp, type MaybeFn } from "../../../ui/util.
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { animate } from "../../../motion/engine/playback.ts";
+import { flip } from "../../../motion/flip.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import tr from "./tr.ts";
 
@@ -59,26 +60,38 @@ export function LiveFeed(props: LiveFeedProps): Element {
   const card = (it: FeedItem): HTMLElement => h("li", { class: "hm-lf-item", "data-hm-color": colorAttr(it.color) },
     it.avatar != null ? h("span", { class: "hm-lf-avatar", "aria-hidden": "true" }, it.avatar) : h("span", { class: "hm-lf-dot", "aria-hidden": "true" }),
     h("span", { class: "hm-lf-text" }, h("span", { class: "hm-lf-title" }, it.title), it.body != null ? h("span", { class: "hm-lf-body" }, it.body) : null),
-    it.meta != null ? h("span", { class: "hm-lf-meta" }, it.meta) : null) as HTMLElement;
+    it.meta != null ? h("span", { class: "hm-lf-meta" }, it.meta) : null,
+    h("span", { class: "hm-lf-glow", "aria-hidden": "true" })) as HTMLElement;
 
   const list = h("ul", { class: "hm-lf-list", role: "list", "aria-live": () => (props.live === "polite" && !paused() ? "polite" : "off"), "aria-relevant": "additions" }) as HTMLElement;
 
-  // show one item at the top: it slides (list) or pops (wall) in; the oldest beyond `max` fades out and leaves
+  // one item arrives at the top. Motion: it swings down in 3D out of a blur, a ring of the accent colour glows around it
+  // and fades, its avatar springs in; the others glide one place on (FLIP); the oldest beyond `max` shrinks into a blur
   const add = (it: FeedItem, animated: boolean): void => {
     if (nodes.has(it.id)) return;
     const el = card(it);
-    shown.unshift(it); nodes.set(it.id, el);
-    list.prepend(el);
     const motion = animated && !reducedMotion();
-    if (motion) animate(el, wall()
-      ? { opacity: [0, 1], transform: ["scale(.9)", "scale(1)"] }
-      : { opacity: [0, 1], transform: ["translateY(-14px)", "translateY(0px)"] }, { duration: 460, easing: "spring" });
-    while (shown.length > max()) {
-      const old = shown.pop()!, oldEl = nodes.get(old.id)!;
-      nodes.delete(old.id);
-      if (!motion) { oldEl.remove(); continue; }
-      oldEl.classList.add("is-leaving");
-      void animate(oldEl, { opacity: [1, 0] }, { duration: 260, easing: "out", fill: "forwards" }).finished.then(() => oldEl.remove());
+    const drop = Math.max(0, shown.length + 1 - max());
+    const leaving = shown.slice(shown.length - drop).map((x) => nodes.get(x.id)!);
+    const staying = shown.slice(0, shown.length - drop).map((x) => nodes.get(x.id)!);
+    const mutate = (): void => {
+      shown.unshift(it); nodes.set(it.id, el); list.prepend(el);
+      for (let i = 0; i < drop; i++) nodes.delete(shown.pop()!.id);
+      for (const old of leaving) { if (motion) old.classList.add("is-leaving"); else old.remove(); }
+    };
+    if (!motion) { mutate(); return; }
+    flip(staying, mutate, { enter: false, duration: 680, easing: "expo" });
+    flip([el], () => {}, { enter: false });
+    animate(el, wall()
+      ? { opacity: [0, 1], transform: ["perspective(800px) rotateX(-80deg) translateY(-32px) scale(.8)", "perspective(800px) rotateX(0deg) translateY(0px) scale(1)"], filter: ["blur(10px)", "blur(0px)"] }
+      : { opacity: [0, 1], transform: ["perspective(800px) rotateX(-70deg) translateY(-36px)", "perspective(800px) rotateX(0deg) translateY(0px)"], filter: ["blur(8px)", "blur(0px)"] },
+    { duration: 900, easing: "spring" });
+    const glow = el.querySelector(".hm-lf-glow"), avatar = el.querySelector(".hm-lf-avatar, .hm-lf-dot");
+    if (glow) animate(glow, { opacity: [0, 1, 0], transform: ["scale(.96)", "scale(1.02)", "scale(1)"] }, { duration: 2200, easing: "out" });
+    if (avatar) animate(avatar, { transform: ["scale(0) rotate(-40deg)", "scale(1.18) rotate(8deg)", "scale(1) rotate(0deg)"] }, { duration: 760, delay: 160, easing: "out" });
+    for (const old of leaving) {
+      void animate(old, { opacity: [1, 0], transform: ["scale(1)", "scale(.72) translateY(12px)"], filter: ["blur(0px)", "blur(8px)"] }, { duration: 480, easing: "in", fill: "forwards" })
+        .finished.then(() => old.remove());
     }
   };
 
