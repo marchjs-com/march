@@ -31,7 +31,14 @@ featured items at the top, a collapsible icon rail and a resizable width, all re
 | `headings` | boolean | `true` | the "Recent" and "Categories" headings |
 | `expandAll` | boolean | `true` | the "Expand all / Collapse all" button |
 | `groupCounts` | boolean | `true` | the item count beside each category name |
+| `groupHeads` | boolean | `true` | the category rows; `false`: a two-level menu (the items of the listed categories in one list, in category order, without the category names); "Expand all / Collapse all" then opens and closes the items with pages under them |
 | `nestedSubs` | boolean | `false` | nested items (a page under a page) show their `sub` line too |
+| `visibleGroups` | `string[]` (reactive) | — | only these categories are listed: one section of a large menu at a time. The other items stay in the search, the recent list and the palette; "Collapse all" then touches only the listed ones |
+| `itemSize` | `"md"` `"lg"` | `"md"` | `lg`: top-level rows are equal, roomy rows (`--m-sb-item-h`, 3.625rem): the icon in a tinted tile, one line of description, the number of pages under the row; nested rows are text only |
+| `subOverflow` | `"scroll"` `"marquee"` `"ellipsis"` | `"scroll"` | a row's text that does not fit: loops with a rest on hover / focus / the current row; `marquee` flows one way without a rest while the row is hovered, focused, current or open (never with reduced motion; text that fits stays still); `ellipsis` cuts it |
+| `sheetSide` | `"start"` `"end"` `"bottom"` | `"start"` | narrow screens: the edge the drawer comes from (`bottom`: a bottom sheet) |
+| `menuButton` | boolean | `true` | the menu button of narrow screens; `false`: open the drawer yourself with `open` |
+| `open`, `onOpenChange` | boolean (reactive), `(open) => void` | — | narrow screens: the drawer, controlled (a bottom bar opens it) |
 | `labels` | object | `t` texts | `search`, `clearSearch`, `noMatches`, `results`, `recent`, `categories`, `expandAll`, `collapseAll`, `menu`, `expandSidebar`, `collapseSidebar`, `resize` (strings or accessors), `showUnder(label)`, `hideUnder(label)` |
 | `width`, `onResize` | px / CSS length, `(px) => void` | 17.5rem | starting width; called while resizing |
 | `groupIcons` | `{ [group]: icon }` | — | icons beside category names |
@@ -41,6 +48,18 @@ featured items at the top, a collapsible icon rail and a resizable width, all re
 ```tsx
 <NavSidebar items={items} search={false} headings={false} groupCounts={false} />     // a plain list of categories
 <NavSidebar items={items} labels={{ recent: "Last opened", categories: "Sections", expandAll: "Open all", noMatches: "Nothing here" }} />
+```
+
+### A section rail beside the menu
+
+A large menu can show one section at a time: a rail (ActivityBar) picks the section, `visibleGroups` lists its
+categories. On a phone the rail becomes the bottom bar and opens the menu as a bottom sheet.
+
+```tsx
+<ActivityBar items={sections} value={$section} onChange={(id) => { $section = id; if (narrow()) $sheet = true }} showLabels tooltips={false} collapsible={false} />
+<NavSidebar items={items} title={() => current().label} visibleGroups={() => current().groups} search={false}
+  itemSize="lg" subOverflow="marquee" resizable minWidth={220} maxWidth={460}
+  sheetSide="bottom" menuButton={false} open={() => $sheet} onOpenChange={(o) => $sheet = o} />
 ```
 
 ### Nested items

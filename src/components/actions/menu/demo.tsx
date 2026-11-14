@@ -15,9 +15,10 @@ export const code = `const remove = action("Sil", api.remove, { icon: trash, dan
   "-", remove,                                           // an action(): guarded, confirmed, toasted
 ]} args={[row]} />
 <Menu label="Sırala" items={[{ label: "Ad", radio: true, checked: () => $sort === "ad", onSelect: () => { $sort = "ad" } }, …]} />   // işaretli öğe
+<Menu label="Bölümler" items={[{ label: "Formlar", sub: "Alanlar ve seçiciler", href: "/forms", current: true }, …]} />   // açıklama satırı, bulunulan öğe
 <Dropdown label="Süzgeç" variant="primary" color="brand-purple">{(close) => <FilterForm onDone={close} />}</Dropdown>`
 
-export default function MenuDemo(props: { values: { checks: string; kind: string; trigger: string; variant: string; color: string } }) {
+export default function MenuDemo(props: { values: { checks: string; subs: boolean; kind: string; trigger: string; variant: string; color: string } }) {
   let $last = ""
   let $filters = new Set(["Açık"])
   let $sort = "Ad"
@@ -29,7 +30,7 @@ export default function MenuDemo(props: { values: { checks: string; kind: string
       const checks = props.values.checks
       const choices = checks === "radio" ? ["-" as const, ...["Ad", "Tarih", "Boyut"].map((k) => ({ label: `Sırala: ${k}`, radio: true, checked: () => $sort === k, onSelect: () => { $sort = k; $last = `Sırala: ${k}` } }))]
         : checks === "checkbox" ? ["-" as const, { label: "Gizli dosyaları göster", checked: () => $hidden, onSelect: () => { $hidden = !$hidden; $last = $hidden ? "Gizli dosyalar açık" : "Gizli dosyalar kapalı" } }] : []
-      const kind = props.values.kind, icon = props.values.trigger === "icon"
+      const kind = props.values.kind, icon = props.values.trigger === "icon", subs = props.values.subs
       const variant = props.values.variant as "secondary", color = (props.values.color || undefined) as ColorToken | undefined
       if (kind === "dropdown") return <Dropdown label="Süzgeç" icon={icon ? filter : undefined} variant={variant} color={color}>
         <div class="sc-col"><strong>Durum</strong>
@@ -37,8 +38,8 @@ export default function MenuDemo(props: { values: { checks: string; kind: string
         </div>
       </Dropdown>
       return <Menu label="Eylemler" icon={icon ? more : undefined} variant={variant} color={color} placement="bottom-start" items={[
-        { label: "Düzenle", icon: edit, shortcut: "E", onSelect: () => { $last = "Düzenle" } },
-        { label: "Kopyala", icon: copy, shortcut: "mod+c", onSelect: () => { $last = "Kopyala" } },
+        { label: "Düzenle", icon: edit, shortcut: "E", onSelect: () => { $last = "Düzenle" }, ...(subs ? { sub: "Şu an açık olan kayıt", current: true } : {}) },
+        { label: "Kopyala", icon: copy, shortcut: "mod+c", onSelect: () => { $last = "Kopyala" }, ...(subs ? { sub: "Panoya bir kopyasını al" } : {}) },
         { label: "Arşivle", disabled: true },
         ...choices,
         "-", remove,

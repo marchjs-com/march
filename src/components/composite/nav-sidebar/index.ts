@@ -104,8 +104,25 @@ export interface NavSidebarProps {
   expandAll?: boolean;
   /** The item count beside each category name (default true). */
   groupCounts?: boolean;
+  /** The category rows (default true). false: a two-level menu: the items of every listed category form one list, in
+   *  category order (`groupOrder`), without the category names; "Expand all / Collapse all" then opens and closes the
+   *  items that have pages under them. */
+  groupHeads?: boolean;
   /** Nested items (a page under a page) also show their `sub` line (default false: only the label). */
   nestedSubs?: boolean;
+  /** Only these categories are listed (a section of a large menu; reactive). The other items stay in the search, the recent list and the palette. */
+  visibleGroups?: MaybeFn<readonly string[] | null | undefined>;
+  /** Top-level rows: "md" (default) or "lg": equal, roomy rows (height `--m-sb-item-h`, 3.625rem) with the icon in a tinted tile, one line of description and the number of pages under them. */
+  itemSize?: "md" | "lg";
+  /** A row's text that does not fit: "scroll" (default: loops with a rest, on hover / focus and on the current row), "marquee" (flows one way without a rest while the row is hovered, focused, current or open) or "ellipsis" (cut). */
+  subOverflow?: "scroll" | "marquee" | "ellipsis";
+  /** Narrow screens: the edge the drawer of the menu comes from (default "start"; "bottom" = a bottom sheet). */
+  sheetSide?: "start" | "end" | "bottom";
+  /** The menu button of narrow screens (default true); false: open the drawer yourself with `open`. */
+  menuButton?: boolean;
+  /** Narrow screens: whether the drawer is open (controlled; with `onOpenChange`). */
+  open?: MaybeFn<boolean | undefined>;
+  onOpenChange?: (open: boolean) => void;
   /** Own texts (strings or accessors); defaults are the translated ones. `showUnder` / `hideUnder` name the fold button of a parent item. */
   labels?: {
     search?: MaybeFn<string>; clearSearch?: MaybeFn<string>; noMatches?: MaybeFn<string>; results?: MaybeFn<string>;
@@ -146,12 +163,16 @@ export function NavSidebar(props: NavSidebarProps): Element {
     if (keepWidth && widthKey) save(widthKey, width.peek());
   };
   const navId = uid("m-sb");
+  const lgItems = props.itemSize === "lg", flow = props.subOverflow === "marquee";
   type TextKey = Exclude<keyof NonNullable<NavSidebarProps["labels"]>, "showUnder" | "hideUnder">;
   const L = (k: TextKey, d: string): string => val(props.labels?.[k]) ?? d;
   // narrow screens: the menu opens in a Drawer from the menu button; the current row comes into view there too
   let showActive: (() => void) | undefined;
-  const sheet = navDrawer({ id: navId, label: () => val(props.label) ?? t`Main`, menuLabel: () => L("menu", t`Menu`), icon: menu, class: () => cx("m-sb-sheet", props.nestedSubs && "is-nested-subs"), onShow: () => showActive?.() });
+  const sheet = navDrawer({ id: navId, label: () => val(props.label) ?? t`Main`, menuLabel: () => L("menu", t`Menu`), icon: menu, side: props.sheetSide, class: () => cx("m-sb-sheet", props.sheetSide === "bottom" && "m-sb-sheet-bottom", props.nestedSubs && "is-nested-subs", lgItems && "is-lg-items"), onShow: () => showActive?.() });
   const drawer = sheet.open;
+  // a controlled drawer: `open` moves it, every change (a choice, Escape, the scrim) is reported
+  if (props.open !== undefined) effect(() => { const o = !!val(props.open); untrack(() => drawer.set(o)); });
+  if (props.onOpenChange) { let was = drawer.peek(); effect(() => { const o = drawer(); if (o !== was) { was = o; untrack(() => props.onOpenChange?.(o)); } }); }
   const hasSearch = props.search !== false;
   let searchEl: HTMLInputElement | undefined, navEl: HTMLElement | undefined;
 
@@ -161,7 +182,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
     for (const x of items()) if (x.parent && x.parent !== x.id && ids.has(x.parent)) { let l = m.get(x.parent); if (!l) m.set(x.parent, l = []); l.push(x); }
     return m;
   });
-  const groups = computed(() => {
+  const allGroups = computed(() => {
     const map = new Map<string, NavSidebarItem[]>();
     for (const x of items()) { const g = x.group ?? ""; if (!g || (x.parent && kidsOf().has(x.parent))) continue; let l = map.get(g); if (!l) map.set(g, l = []); l.push(x); }
     const byText = (a: NavSidebarItem, b: NavSidebarItem): number => compareText(text(a.label), text(b.label));
@@ -171,6 +192,8 @@ export function NavSidebar(props: NavSidebarProps): Element {
     else if (Array.isArray(order)) out = out.sort((a, b) => { const i = order.indexOf(a.name), j = order.indexOf(b.name); return (i < 0 ? 1e9 : i) - (j < 0 ? 1e9 : j); });
     return out;
   });
+  // a section of the menu: only the named categories are listed
+  const groups = computed(() => { const only = val(props.visibleGroups); return only ? allGroups().filter((g) => only.includes(g.name)) : allGroups(); });
   const loose = computed(() => items().filter((x) => !x.group && !(x.parent && kidsOf().has(x.parent))));
 
   const active = computed(() => {
@@ -201,7 +224,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
   };
 
   // first visit: open the requested categories; always open the category of the current page; remember visits
-  if (firstVisit && props.defaultOpen === "all") open.set(new Set(untrack(groups).map((g) => g.name)));
+  if (firstVisit && props.defaultOpen === "all") open.set(new Set(untrack(allGroups).map((g) => g.name)));
   effect(() => {
     const id = active();
     untrack(() => {
@@ -241,8 +264,23 @@ export function NavSidebar(props: NavSidebarProps): Element {
     open.update((s) => { const n = new Set(s); if (to ?? !n.has(g)) n.add(g); else n.delete(g); return n; });
     persist();
   };
-  const allOpen = (): boolean => groups().length > 0 && groups().every((g) => open().has(g.name));
-  const setAll = (on: boolean): void => { open.set(on ? new Set(groups.peek().map((g) => g.name)) : new Set()); persist(); };
+  // groupHeads={false}: no category rows; "all" means the items with pages under them
+  const flat = props.groupHeads === false;
+  const parents = (): NavSidebarItem[] => groups().flatMap((g) => g.items).filter((x) => kidsOf().has(x.id));
+  const allOpen = (): boolean => (flat ? parents().length > 0 && parents().every((x) => kidsOpen(x.id)) : groups().length > 0 && groups().every((g) => open().has(g.name)));
+  const setAll = (on: boolean): void => {
+    if (flat) {
+      const ids = untrack(parents).map((x) => x.id);
+      open.update((s) => { const n = new Set(s); for (const id of ids) { n.delete(`>${id}`); n.delete(`<${id}`); n.add(`${on ? ">" : "<"}${id}`); } return n; });
+      persist();
+      return;
+    }
+    const names = groups.peek().map((g) => g.name);
+    // a section: only its categories change, the others keep their state
+    if (val(props.visibleGroups)) open.update((s) => { const n = new Set(s); for (const g of names) { if (on) n.add(g); else n.delete(g); } return n; });
+    else open.set(on ? new Set(names) : new Set());
+    persist();
+  };
 
   // ---- rows
   const badge = (x: NavSidebarItem): unknown => {
@@ -253,14 +291,18 @@ export function NavSidebar(props: NavSidebarProps): Element {
     return typeof b === "number" ? h(Badge, { ...look, count: b }) : h(Badge, look, b);
   };
   const row = (x: NavSidebarItem, where: string, sub?: () => string): Element => {
+    const kids = where === "group" || where === "main" || where === "child" ? kidsOf().get(x.id) : undefined;
+    const count = lgItems && kids?.length && where !== "child" && props.groupCounts !== false ? h("span", { class: "m-sb-count" }, String(kids.length)) : undefined;
     const el = h(ListRow, {
       class: () => cx("m-sb-row", "m-sb-item", active() !== x.id && !!active() && under(x.id, active()!) && "is-active-parent"), "data-id": x.id, "data-where": where,
       lead: x.icon ?? (x.group ? props.groupIcons?.[x.group] : undefined), title: () => text(x.label), sub: sub ?? (x.sub !== undefined ? () => text(x.sub) : undefined),
-      trail: x.badge !== undefined ? () => badge(x) : undefined, marquee: { mode: "loop" }, active: () => active() === x.id, indicator: where !== "featured",
+      trail: x.badge !== undefined ? () => badge(x) : count, marquee: { mode: "loop" }, active: () => active() === x.id, indicator: where !== "featured",
+      // "marquee": the text flows one way without a rest while the row is hovered, focused, current or open
+      ...(flow ? { marquee: { mode: "loop", pause: 0, speed: 28, separator: "", play: () => active() === x.id || (!!kids?.length && kidsOpen(x.id)) } } : {}),
+      overflow: props.subOverflow === "ellipsis" ? "ellipsis" : undefined,
       tooltip: () => (rail() ? text(x.label) : null), "aria-current": () => (active() === x.id ? "page" : null),
       ...(x.href && !x.onSelect ? { href: x.href } : { onClick: () => { if (!x.href) chosen.set(x.id); x.onSelect?.(); if (x.href) void navigate(x.href); } }),
     });
-    const kids = where === "group" || where === "main" || where === "child" ? kidsOf().get(x.id) : undefined;
     if (!kids?.length) return h("li", { class: "m-sb-li" }, el);
     const kid = uid("m-sbk");
     return h("li", { class: () => cx("m-sb-li", "is-parent", kidsOpen(x.id) && "is-kids-open") },
@@ -296,7 +338,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
       maxRecent > 0 && recentBlock,
       () => { const gs = groups(); return untrack(() => gs.length > 0 && h("div", { class: "m-sb-block m-sb-cats" },
         sectionHead(() => L("categories", t`Categories`), null, props.expandAll === false ? null : h(Button, { variant: "link", class: "m-sb-all", onClick: () => setAll(!allOpen()) }, () => (allOpen() ? L("collapseAll", t`Collapse all`) : L("expandAll", t`Expand all`)))),
-        h("ul", { class: "m-sb-list m-sb-groups" }, gs.map((g) => {
+        flat ? h("ul", { class: "m-sb-list m-sb-gitems m-sb-flat" }, gs.flatMap((g) => g.items.map((x) => row(x, "group")))) : h("ul", { class: "m-sb-list m-sb-groups" }, gs.map((g) => {
           const gid = uid("m-sbg");
           const isOpen = (): boolean => rail() || open().has(g.name);
           return h("li", { class: () => cx("m-sb-group", isOpen() && "is-open", activeGroup() === g.name && "is-active-group") },
@@ -374,8 +416,8 @@ export function NavSidebar(props: NavSidebarProps): Element {
   });
   const title = props.title; // read once: a node prop is built when it is read
   const railLabel = (): string => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`));
-  return h("div", { class: () => cx("m-nav-wrap", "m-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", props.nestedSubs && "is-nested-subs", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--m-sb-w", w); } },
-    sheet.burger,
+  return h("div", { class: () => cx("m-nav-wrap", "m-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", props.nestedSubs && "is-nested-subs", lgItems && "is-lg-items", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--m-sb-w", w); } },
+    props.menuButton === false ? null : sheet.burger,
     sheet.place(h("nav", { class: "m-nav m-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },
       h("div", { class: "m-sb-head" },
         (title != null || props.collapsible) && h(PanelHeader, { as: "div", class: "m-sb-titlebar", title: title ?? undefined, titleAs: "span", subtitle: props.subtitle ?? undefined,

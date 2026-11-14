@@ -17,3 +17,13 @@
 .m-ab-ind { position: absolute; inset-block-start: 0; inset-inline-start: 0; width: 2px; height: var(--m-ab-size, 2.5rem); border-radius: 2px; background: var(--m-accent, var(--m-primary)); opacity: 0; pointer-events: none; }
 .m-ab-h .m-ab-ind { inset-block-start: auto; inset-block-end: 0; width: var(--m-ab-size, 2.5rem); height: 2px; }
 .m-ab-ind.is-on { opacity: 1; }
+/* showLabels: the name under the icon; a wider bar (a section rail, a phone tab bar) */
+.m-ab-labeled.m-ab-v { width: 4.75rem; padding-block: .5rem; }
+.m-ab-labeled.m-ab-h { height: 3.875rem; justify-content: space-around; }
+.m-ab-labeled .m-ab-btn { grid-auto-flow: row; gap: .1875rem; width: 3.75rem; height: auto; min-height: 3.25rem; padding: .4375rem 0 .3125rem; border-radius: var(--m-radius-3); }
+.m-ab-labeled.m-ab-h .m-ab-btn { flex: 1 1 0; width: auto; min-width: 0; max-width: 5rem; }
+.m-ab-labeled .m-ab-btn.is-active { background: color-mix(in srgb, var(--m-accent, var(--m-primary)) 12%, transparent); color: var(--m-accent-text, var(--m-primary-text)); }
+.m-ab-text { max-width: 100%; overflow: hidden; font-family: var(--m-font); font-size: var(--m-text-2xs); font-weight: 600; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.m-ab-labeled.m-ab-h .m-ab-text { font-size: .65625rem; letter-spacing: -.01em; }
+.m-ab-labeled .m-ab-icon .m-svg { width: 1.25rem; height: 1.25rem; }
+.m-ab-labeled.m-ab-v .m-ab-ind { width: 3px; border-radius: 3px; }

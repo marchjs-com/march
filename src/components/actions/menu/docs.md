@@ -44,6 +44,16 @@ an icon, a shortcut or a separator only when you give one.
 <Menu label="Actions" variant="primary" color="brand-purple" trigger={<><Avatar name={user.name} /> {user.name}</>} items={items} />
 ```
 
+### Where the user is, and a second line
+
+`current: true` (or an accessor) marks the entry of where the user is now (the open page among its siblings): it is
+tinted (a link entry to the open page has `aria-current="page"` from the router). `sub` adds a quieter second line
+under the label.
+
+```tsx
+<Menu label="Sections" items={sections.map((s) => ({ label: s.title, sub: s.desc, icon: s.icon, href: s.path, current: () => path() === s.path }))} />
+```
+
 ## Accessibility
 
 The trigger has `aria-haspopup`, `aria-expanded` and `aria-controls`. ↓ / ↑ on the trigger opens on the first / last

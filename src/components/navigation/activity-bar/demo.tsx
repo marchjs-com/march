@@ -16,25 +16,26 @@ export const code = `<ActivityBar value={$view} onChange={(v) => $view = v} cont
   { id: "settings", label: "Ayarlar", icon: settings, position: "end", onSelect: openSettings },
 ]} />
 <ActivityBar items={views} value={$view} onChange={(v) => $view = v} color="brand-purple" motion="fade" tooltips={false} />
-<ActivityBar items={views} value={$view} onChange={(v) => $view = v} indicator={false} />`
+<ActivityBar items={views} value={$view} onChange={(v) => $view = v} indicator={false} />
+<ActivityBar items={views} value={$view} onChange={(v) => $view = v} showLabels tooltips={false} />   // adlar ikonun altında`
 
 const TITLES: Record<string, string> = { files: "Dosyalar", search: "Ara", git: "Kaynak denetimi", debug: "Hata ayıkla" }
 // the indicator's motion shows only while the view changes: the stage says which one is on
 const MOTIONS: Record<string, string> = { glide: "Çizgi etkin simgeye kayarak gider", fade: "Çizgi etkin simgede yerinde belirir", none: "Çizgi hareketsiz yer değiştirir", off: "Çizgi yok" }
 
-export default function ActivityBarDemo(props: { values: { orientation: string; badges: boolean; indicator: string; color: string; tooltips: boolean } }) {
+export default function ActivityBarDemo(props: { values: { orientation: string; badges: boolean; indicator: string; color: string; tooltips: boolean; showLabels: boolean } }) {
   const view = signal<string | null>("files")
   return <div class={() => (props.values.orientation === "horizontal" ? "sc-ab-stage is-h" : "sc-ab-stage")}>
     {() => {
       // the indicator, its motion, the tooltips and the color are read once: the bar is drawn again when one changes
-      const ind = props.values.indicator, tooltips = props.values.tooltips, color = (props.values.color || undefined) as ColorToken
+      const ind = props.values.indicator, showLabels = props.values.showLabels, tooltips = props.values.tooltips && !showLabels, color = (props.values.color || undefined) as ColorToken
       return <ActivityBar value={view} onChange={(v: string | null) => view.set(v)} controls="sc-ab-view"
-      indicator={ind !== "off"} motion={ind === "off" ? undefined : ind as "glide"} tooltips={tooltips} color={color}
+      indicator={ind !== "off"} motion={ind === "off" ? undefined : ind as "glide"} tooltips={tooltips} showLabels={showLabels} color={color}
       orientation={() => props.values.orientation as "vertical"} label="Görünümler" items={[
         { id: "files", label: "Dosyalar", icon: files, shortcut: "mod+shift+e" },
         { id: "search", label: "Ara", icon: search, badge: () => (props.values.badges ? 12 : 0) },
-        { id: "git", label: "Kaynak denetimi", icon: gitBranch, badge: () => (props.values.badges ? 3 : 0) },
-        { id: "debug", label: "Hata ayıkla", icon: bug },
+        { id: "git", label: "Kaynak denetimi", short: "Kaynak", icon: gitBranch, badge: () => (props.values.badges ? 3 : 0) },
+        { id: "debug", label: "Hata ayıkla", short: "Ayıkla", icon: bug },
         { id: "account", label: "Hesap", icon: user, position: "end", onSelect: () => view.set(null) },
         { id: "settings", label: "Ayarlar", icon: settings, position: "end", onSelect: () => view.set(null) },
       ]} />

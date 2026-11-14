@@ -21,6 +21,8 @@ export interface NavDrawerOptions {
   icon: unknown;
   /** Classes of the drawer panel: the host's size class and the state classes its rows are styled by. */
   class?: () => unknown;
+  /** The edge the drawer comes from (default "start"). */
+  side?: "start" | "end" | "bottom" | undefined;
   /** After the menu has moved into the drawer (bring the current row into view). */
   onShow?: () => void;
 }
@@ -47,7 +49,7 @@ export function navDrawer(o: NavDrawerOptions): NavDrawer {
     if (!narrow()) return nav;
     const s = sheet();
     return s ? untrack(() => h(s.Drawer, {
-      open: () => open(), onClose: () => open.set(false), side: "start", closeButton: false, label: reactive(o.label), class: reactive(() => cx("m-nav-sheet", o.class?.())),
+      open: () => open(), onClose: () => open.set(false), side: o.side ?? "start", closeButton: false, label: reactive(o.label), class: reactive(() => cx("m-nav-sheet", o.class?.())),
     } as unknown as DrawerProps, lazyChildren(() => { if (o.onShow) queueMicrotask(o.onShow); return nav; }))) : null;
   };
   return { open, narrow, burger, place };

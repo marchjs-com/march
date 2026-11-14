@@ -16,7 +16,7 @@ into a "…" menu; the first and the last always stay. Separators follow the rea
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `items` | `Crumb[]` / accessor | — | `{ id, label, icon, href, onSelect, siblings }` |
+| `items` | `Crumb[]` / accessor | — | `{ id, label, icon, href, onSelect, siblings }`; a sibling is `{ id, label, icon, sub, href, onSelect, current }` |
 | `label` | string | "Path" | accessible name of the nav |
 | `separator` | icon / short text / `() => node` / `false` | chevron | what stands between the crumbs; `false`: nothing |
 | `collapse` | boolean | `true` | collapse the middle into the "…" menu when narrow; `false`: the path is clipped instead |
@@ -27,6 +27,18 @@ into a "…" menu; the first and the last always stay. Separators follow the rea
 ```tsx
 <Breadcrumbs items={path} separator="/" ellipsis="···" labels={{ more: "Folders in between", goTo: (name) => `Open next to ${name}` }} />
 <Breadcrumbs items={path} separator={false} collapse={false} />
+```
+
+A sibling with `href` is a link (the router's Link: a middle click or "open in new tab" works), one with `onSelect`
+a button. `current: true` marks the sibling the path goes through (tinted; the link of the open page has
+`aria-current="page"` from the router), `sub` adds a quieter second line.
+
+```tsx
+<Breadcrumbs separator="/" items={[
+  { id: "home", label: "March", href: "/" },
+  { id: "forms", label: "Forms", siblings: sections.map((s) => ({ id: s.path, label: s.title, sub: s.desc, icon: s.icon, href: s.path, current: s.path === "/forms" })) },
+  { id: "select", label: "Select", siblings: pagesOf("/forms").map((p) => ({ id: p.path, label: p.title, href: p.path, current: p.path === here })) },
+]} />
 ```
 
 ## Accessibility

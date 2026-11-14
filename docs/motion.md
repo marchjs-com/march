@@ -85,6 +85,19 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
 - `filterBlur`, `displace` (feTurbulence + feDisplacementMap), `goo` (blur + alpha contrast): one `<filter>` per call in a
   hidden `<svg>`, removed when the value settles at 0 (or by the returned cleanup for `goo`).
 
+### Page-wide (src/motion/theme-wave.ts, spotlight.ts)
+- `themeWave(change, { origin, duration, easing })` runs a page-wide restyle as a circle of the new look that grows
+  from `origin` (a viewport point or an element): a View Transition whose new snapshot is clipped by an engine
+  animation (`:root[data-m-wave]` turns the browser's cross-fade off, motion.css). Without View Transitions, with
+  reduced motion or while paused the change lands at once.
+- `installThemeWave()` puts it around every `setTheme` / `setColorTheme` / `setAccent` (through `setRestyleTransition`
+  of hadi-march/ui), so ThemeMenu, ThemePicker, ThemeToggle and AccentPicker all spread from the pressed point (the
+  focused control for a key press). It returns the function that turns it off.
+- `spotlight(root, { selector, reach, look, litClass, xVar, yVar })` lights every card near the pointer from the real
+  pointer position (`--m-spot-x` / `--m-spot-y` inside each card, class `is-lit`), also from the gap between two cards,
+  so the light reads as one. One pass per frame on the engine clock; touch pointers are ignored. The ready look is
+  `.m-spotlight` (motion.css: a soft glow and a brighter ring; `--m-spot-color`, `--m-spot-glow`).
+
 ### Morph (src/motion/morph.ts)
 - `morph(from, to, { mode, hideSource, fadeContent })` — container transform: `to` (laid out where it ends) starts
   clipped to `from`'s box (`clip-path: inset(… round r)`) and moved onto it, then opens; background colour and corner

@@ -2,3 +2,9 @@
 .m-theme-menu { max-height: min(36rem, calc(100dvh - var(--m-space-6))); overflow: auto; }
 .m-theme-menu-heading.m-section-label { margin-block-start: var(--m-space-2); padding-inline: var(--m-space-2); }
 .m-theme-menu .m-theme-list { max-height: none; overflow: visible; }
+/* view="cards": a wider panel for the grid of preview cards */
+.m-theme-panel.m-theme-menu-cards { width: min(27rem, calc(100vw - 16px)); padding: calc(var(--m-space-3) + var(--m-radius-pad, 0px) / 2); }
+/* current: the button is the swatch and the name of the theme in use */
+.m-btn.m-theme-menu-btn { gap: var(--m-space-2); padding-inline: .375rem .75rem; border-radius: var(--m-radius-full); font-weight: 650; }
+.m-swatch.m-theme-menu-swatch { width: 1.5rem; height: 1.5rem; padding: 3px; border-radius: 50%; overflow: hidden; }
+.m-theme-menu-name { overflow: hidden; max-inline-size: 9rem; text-overflow: ellipsis; white-space: nowrap; }

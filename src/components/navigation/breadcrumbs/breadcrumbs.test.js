@@ -46,3 +46,33 @@ test("Breadcrumbs: own separator, no separator, own ellipsis and menu names", as
   assert.equal(fn.querySelectorAll(".m-bc-sep .own-sep").length, 3);
   m.dispose();
 });
+
+test("Breadcrumbs: a sibling with href is a link; the current one is marked; sub adds a second line", async () => {
+  const R = await import("../../../router/index.ts");
+  R.createRouter({ routes: Object.fromEntries(["/", "/forms", "/data"].map((p) => [p, { component: () => null }])) });
+  await R.navigate("/forms");
+  let picked = "";
+  const m = mount(() => h(Breadcrumbs, { items: [
+    { id: "home", label: "Home", href: "/" },
+    { id: "forms", label: "Forms", siblings: [
+      { id: "/forms", label: "Forms", sub: "Fields and pickers", href: "/forms", current: true },
+      { id: "/data", label: "Data", href: "/data", current: false },
+      { id: "x", label: "Action", onSelect: () => { picked = "x"; } },
+    ] },
+  ] }));
+  await tick(); await tick();
+  const trigger = [...m.el.querySelectorAll('button[aria-haspopup="menu"]')].at(-1); // the first one is the … menu
+  trigger.click(); await tick();
+  const items = [...document.getElementById(trigger.getAttribute("aria-controls")).querySelectorAll("[role=menuitem]")];
+  assert.equal(items.length, 3);
+  assert.equal(items[0].tagName, "A");
+  assert.ok(items[0].getAttribute("href").endsWith("forms"));
+  assert.equal(items[0].getAttribute("aria-current"), "page");
+  assert.ok(items[0].classList.contains("is-active"));
+  assert.equal(items[0].querySelector(".m-listrow-sub").textContent, "Fields and pickers");
+  assert.equal(items[1].getAttribute("aria-current"), null);
+  assert.equal(items[2].tagName, "BUTTON");
+  items[2].click();
+  assert.equal(picked, "x");
+  m.dispose();
+});

@@ -23,6 +23,9 @@ footer. `action()` objects in `actions` render as buttons that run, confirm and 
 
 Other attributes go to the root element.
 
+The inner padding follows the theme's corner: `--m-radius-pad` (tokens.css; 0 up to a 12px radius, a few px on
+rounder themes) is added to the head, body and foot, so rounder corners never crowd the content.
+
 ## Accessibility
 
 The title is a heading, so the card is reachable with heading navigation. The card never overflows its column: the

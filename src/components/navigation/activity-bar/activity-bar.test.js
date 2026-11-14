@@ -80,3 +80,18 @@ test("ActivityBar: indicator and tooltips off, color token, motion none places t
   assert.match(ind.style.getPropertyValue("transform"), /^translateY\(/);
   m.dispose();
 });
+
+test("ActivityBar: showLabels writes the name under each icon (short, else label)", async () => {
+  const m = mount(() => [
+    h(ActivityBar, { value: "a", onChange: () => {}, showLabels: true, tooltips: false, items: [{ id: "a", label: "Components", short: "Parts", icon: "A" }, { id: "b", label: "Motion", icon: "B" }] }),
+    h(ActivityBar, { value: "a", onChange: () => {}, items: [{ id: "a", label: "Components", short: "Parts", icon: "A" }] }),
+  ]);
+  await tick();
+  const [named, plain] = m.el.querySelectorAll('[role="tablist"]');
+  assert.ok(named.classList.contains("m-ab-labeled"));
+  assert.deepEqual([...named.querySelectorAll(".m-ab-text")].map((x) => x.textContent), ["Parts", "Motion"]);
+  assert.equal(named.querySelector('[role="tab"]').getAttribute("aria-label"), "Components", "the accessible name stays the full label");
+  assert.equal(plain.querySelector(".m-ab-text"), null, "no names by default");
+  assert.ok(!plain.classList.contains("m-ab-labeled"));
+  m.dispose();
+});

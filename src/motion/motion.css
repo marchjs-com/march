@@ -21,6 +21,22 @@
    hold even when rapid clicks end one transition while the next one runs) */
 ::view-transition-group(m-page) { clip-path: inset(0); }
 
+/* themeWave(): the new look is revealed by a growing circle (the helper animates the clip-path of the new snapshot),
+   so the browser's own cross-fade is off while a wave runs */
+:root[data-m-wave]::view-transition-old(root), :root[data-m-wave]::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+:root[data-m-wave]::view-transition-new(root) { z-index: 2; }
+
+/* spotlight(): the light of a card near the pointer. --m-spot-x / --m-spot-y are the pointer's place inside the card;
+   a soft glow over the card and a brighter ring on its border. Own colour: --m-spot-color; strength: --m-spot-glow. */
+:where(.m-spotlight) { position: relative; }
+.m-spotlight::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s var(--m-ease, ease);
+  background: radial-gradient(21rem circle at var(--m-spot-x, -999px) var(--m-spot-y, -999px), color-mix(in srgb, var(--m-spot-color, var(--m-accent, var(--m-primary))) var(--m-spot-glow, 13%), transparent), transparent 70%); }
+.m-spotlight::before { content: ""; position: absolute; inset: calc(var(--m-border-w, 1px) * -1); z-index: 1; padding: 1.5px; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s var(--m-ease, ease);
+  background: radial-gradient(16rem circle at var(--m-spot-x, -999px) var(--m-spot-y, -999px), var(--m-spot-color, var(--m-accent, var(--m-primary))), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.m-spotlight.is-lit::after, .m-spotlight.is-lit::before { opacity: 1; }
+@media (hover: none) { .m-spotlight::after, .m-spotlight::before { display: none; } }
+
 /* Scroll-driven reveal without JS where supported: class="m-scroll-reveal" */
 @supports (animation-timeline: view()) {
   .m-scroll-reveal { animation: m-reveal linear both; animation-timeline: view(); animation-range: entry 0% cover 30%; }

@@ -91,3 +91,19 @@ test("Menu: a checked item is a menuitemcheckbox / menuitemradio with aria-check
   assert.equal(panel.querySelectorAll("[role=menuitemradio]")[1].getAttribute("aria-checked"), "true");
   m.dispose();
 });
+
+test("Menu: current tints the entry of where the user is; sub adds a second line", async () => {
+  const here = signal("b");
+  const m = mount(() => h(Menu, { label: "Sections", items: [{ label: "A", sub: "First", current: () => here() === "a", onSelect: () => {} }, { label: "B", current: () => here() === "b", onSelect: () => {} }, { label: "Plain", onSelect: () => {} }] }));
+  const trigger = m.el.querySelector("button");
+  trigger.click(); await tick();
+  const items = [...document.getElementById(trigger.getAttribute("aria-controls")).querySelectorAll("[role=menuitem]")];
+  assert.equal(items.length, 3);
+  assert.ok(items[1].classList.contains("is-active") && !items[0].classList.contains("is-active"));
+  assert.equal(items[0].querySelector(".m-listrow-sub").textContent, "First");
+  assert.ok(items[0].classList.contains("is-two-line") && !items[2].classList.contains("is-two-line"));
+  assert.equal(items[2].querySelector(".m-listrow-sub"), null);
+  here.set("a"); await tick();
+  assert.ok(items[0].classList.contains("is-active") && !items[1].classList.contains("is-active"), "current is live");
+  m.dispose();
+});

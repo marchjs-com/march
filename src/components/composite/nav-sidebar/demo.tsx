@@ -9,20 +9,27 @@ import { load, save } from "../../../core/util.ts";
 
 export const code = `<NavSidebar title="HADİ" items={items} groupOrder="none" defaultOpen="all" collapsible recent={3} />
 <NavSidebar items={items} search={false} headings={false} groupCounts={false} />
-<NavSidebar items={items} labels={{ recent: "Son açtıkların", categories: "Bölümler", expandAll: "Hepsini aç" }} />`
+<NavSidebar items={items} labels={{ recent: "Son açtıkların", categories: "Bölümler", expandAll: "Hepsini aç" }} />
+<NavSidebar items={items} visibleGroups={["Satış"]} itemSize="lg" subOverflow="marquee" search={false} />   // bir bölüm, ferah satırlar, akan açıklama
+<NavSidebar items={items} groupHeads={false} />   // iki düzey: kategori satırı yok, öğeler tek listede`
 
 const ITEMS = [
   { id: "/demo/orders", label: "Siparişler", href: "/navigation" as Href, group: "Satış", icon: dashboard, sub: "Bugün 12 yeni" },
-  { id: "/demo/invoices", label: "Faturalar", href: "/navigation" as Href, group: "Satış", icon: barChart },
-  { id: "/demo/users", label: "Kullanıcılar", href: "/navigation" as Href, group: "Yönetim", icon: users },
+  { id: "/demo/invoices", label: "Faturalar", href: "/navigation" as Href, group: "Satış", icon: barChart, sub: "Kesilen, bekleyen ve gecikmiş faturalar; toplu gönderim ve hatırlatma" },
+  { id: "/demo/invoices/late", label: "Gecikenler", href: "/navigation" as Href, group: "Satış", parent: "/demo/invoices" },
+  { id: "/demo/invoices/drafts", label: "Taslaklar", href: "/navigation" as Href, group: "Satış", parent: "/demo/invoices" },
+  { id: "/demo/users", label: "Kullanıcılar", href: "/navigation" as Href, group: "Yönetim", icon: users, sub: "Üyeler, roller ve davetler" },
   { id: "/demo/settings", label: "Ayarlar", href: "/navigation" as Href, group: "Yönetim", icon: settings },
   { id: "/demo/reports", label: "Raporlar", href: "/navigation" as Href, group: "Analiz", icon: barChart },
 ]
 
-export default function NavSidebarDemo(props: { values: { groupOrder: string; defaultOpen: string; collapsible: boolean; recent: number; search: boolean; headings: boolean; expandAll: boolean; groupCounts: boolean; ownLabels: boolean } }) {
+const SECTIONS: Record<string, string[] | undefined> = { all: undefined, sales: ["Satış"], admin: ["Yönetim", "Analiz"] }
+
+export default function NavSidebarDemo(props: { values: { groupOrder: string; defaultOpen: string; collapsible: boolean; recent: number; search: boolean; headings: boolean; expandAll: boolean; groupCounts: boolean; groupHeads: boolean; ownLabels: boolean; section: string; itemSize: string; subOverflow: string } }) {
   // read here: JSX attributes become getters, so the sidebar is drawn again only for values read in this function
   return <div class="sc-sb-frame">{() => { const { groupOrder, defaultOpen, collapsible, recent } = { groupOrder: props.values.groupOrder, defaultOpen: props.values.defaultOpen, collapsible: props.values.collapsible, recent: props.values.recent }
-    const parts = { search: props.values.search, headings: props.values.headings, expandAll: props.values.expandAll, groupCounts: props.values.groupCounts }
+    const parts = { search: props.values.search, headings: props.values.headings, expandAll: props.values.expandAll, groupCounts: props.values.groupCounts, groupHeads: props.values.groupHeads }
+    const itemSize = props.values.itemSize as "md", subOverflow = props.values.subOverflow as "scroll"
     const labels = props.values.ownLabels ? { recent: "Son açtıkların", categories: "Bölümler", expandAll: "Hepsini aç", collapseAll: "Hepsini kapat" } : undefined
     // a few visits to start with (the demo links stay on this page, so none would ever be recorded): the recent block
     // and how many it keeps show at once
@@ -30,5 +37,5 @@ export default function NavSidebarDemo(props: { values: { groupOrder: string; de
     if (!Array.isArray(visits) || !visits.length) save(storageKey, { ...seen, recent: ITEMS.map((x) => x.id) })
     return <NavSidebar title="HADİ" items={ITEMS} storageKey={storageKey}
       groupOrder={groupOrder === "alpha" ? "alpha" : "none"} defaultOpen={defaultOpen as "all"}
-      collapsible={collapsible} recent={recent} {...parts} labels={labels} hotkey={false} palette={false} label="Playground kenar çubuğu" /> }}</div>
+      collapsible={collapsible} recent={recent} {...parts} labels={labels} itemSize={itemSize} subOverflow={subOverflow} visibleGroups={() => SECTIONS[props.values.section]} hotkey={false} palette={false} label="Playground kenar çubuğu" /> }}</div>
 }

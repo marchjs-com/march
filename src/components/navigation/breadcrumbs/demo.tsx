@@ -8,19 +8,20 @@ import { arrowRight } from "../../../icons/glyphs/arrowRight.ts";
 
 export const code = `<Breadcrumbs label="Dosya yolu" items={[
   { id: "hadi", label: "hadi", icon: folder, onSelect: () => openFolder("hadi") },
-  { id: "src", label: "src", icon: folder, siblings: () => folders("hadi") },   // kardeşlere menüyle git
+  { id: "src", label: "src", icon: folder, siblings: () => folders("hadi") },   // kardeşlere menüyle git: { id, label, sub, href | onSelect, current }
   { id: "file", label: "app.ts", icon: fileText },
 ]} />
 <Breadcrumbs items={path} separator="/" />                       // kendi ayracın: metin, ikon ya da () => düğüm
 <Breadcrumbs items={path} separator={false} collapse={false} />  // ayraçsız, toplamadan`
 
 const FILES = ["app.ts", "router.ts", "theme.css", "store.ts"]
+const ABOUT: Record<string, string> = { "app.ts": "Uygulamanın girişi", "router.ts": "Rota tablosu", "theme.css": "Tema tokenları", "store.ts": "Ortak durum" }
 const SEPARATORS: Record<string, unknown> = { chevron: undefined, slash: "/", dot: "•", icon: arrowRight, off: false }
 
-export default function BreadcrumbsDemo(props: { values: { width: number; siblings: boolean; separator: string; collapse: boolean } }) {
+export default function BreadcrumbsDemo(props: { values: { width: number; siblings: boolean; subs: boolean; separator: string; collapse: boolean } }) {
   const file = signal("app.ts")
   const items = (): Crumb[] => {
-    const sib = props.values.siblings ? FILES.map((f) => ({ id: f, label: f, icon: fileText, onSelect: () => file.set(f) })) : undefined
+    const sib = props.values.siblings ? FILES.map((f) => ({ id: f, label: f, icon: fileText, sub: props.values.subs ? ABOUT[f] : undefined, current: f === file(), onSelect: () => file.set(f) })) : undefined
     return [
       { id: "hadi", label: "hadi", icon: folder, onSelect: () => file.set("app.ts") },
       { id: "packages", label: "packages", icon: folder },

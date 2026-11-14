@@ -19,6 +19,7 @@ import { Segmented } from "../components/forms/segmented/index.ts";
 import { Select } from "../components/forms/select/index.ts";
 import { OptionList } from "../components/forms/option-list/index.ts";
 import { Alert } from "../components/feedback/alert/index.ts";
+import { restyleInstantly } from "./restyle.ts";
 
 // a live prop for h(Component, …): it becomes a getter
 const live = reactive as <T>(fn: () => T) => T;
@@ -33,19 +34,8 @@ const isMode = (v: unknown): v is ThemeMode => MODES.includes(v as ThemeMode);
 const readTheme = (): ThemeMode => { const v = stored(THEME_KEY); return isMode(v) ? v : "system"; };
 const mode = signal<ThemeMode>(readTheme(), { name: "theme" });
 
-/**
- * Apply a page-wide restyle (color theme, light/dark, accent) in one step. Without this every element with a color or
- * shadow transition starts its own transition at once — hundreds on a real page — and the browser stalls for a few
- * hundred ms. Transitions are off for the one style pass that takes the new values, then back on.
- */
-export function restyleInstantly(change: () => void): void {
-  const root = globalThis.document?.documentElement;
-  if (!root) { change(); return; }
-  root.setAttribute("data-m-restyling", "");
-  change();
-  globalThis.getComputedStyle?.(root).getPropertyValue("color"); // the new values land while transitions are off
-  setTimeout(() => root.removeAttribute("data-m-restyling"), 0);
-}
+// a page-wide restyle lands in one step (restyle.ts); a transition such as the theme wave can be put around it
+export { restyleInstantly, setRestyleTransition, type RestyleTransition } from "./restyle.ts";
 
 function apply(v: ThemeMode): void {
   const root = globalThis.document?.documentElement;
@@ -143,6 +133,13 @@ export function ThemeSwatch(props: { id: string; class?: ClassProp }): Element {
     h("span", { class: "m-swatch-a" }), h("span", { class: "m-swatch-b" }), h("span", { class: "m-swatch-c" }), h("span", { class: "m-swatch-d" }));
 }
 
+/** A small page drawn by a theme itself (ground, two surfaces, an accent bar, its text colour and corner): the picture of a theme card. */
+export function ThemePreview(props: { id: string; class?: ClassProp }): Element {
+  const bar = (): Element => h("span", { class: "m-theme-preview-bar" }) as Element;
+  return h("span", { class: () => cx("m-swatch", "m-theme-preview", val(props.class)), "data-m-theme": props.id, "aria-hidden": "true" },
+    h("span", { class: "m-theme-preview-text" }, "Aa"), bar(), bar());
+}
+
 export interface ThemePickerProps { label?: MaybeFn<string | undefined>; class?: ClassProp; placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end" }
 /** The light / dark / system choice of a theme menu (ThemePicker, ThemeMenu): a Segmented with icons. */
 export function themeModes(): Element {
@@ -152,12 +149,21 @@ export function themeModes(): Element {
   }) as Element;
 }
 
-/** The color theme choices (live swatches) of a theme menu (ThemePicker, ThemeMenu): an OptionList. */
-export function themeList(): Element {
+/**
+ * The color theme choices of a theme menu (ThemePicker, ThemeMenu): an OptionList. "list" (default): rows with a live
+ * swatch; "cards": a grid of preview cards, each a small page drawn by the theme (ThemePreview) over its name.
+ */
+export function themeList(view: "list" | "cards" = "list"): Element {
+  const cards = view === "cards";
   return h(OptionList<string>, {
-    class: "m-theme-list", label: () => t`Theme`, value: () => themeName(), onPick: (id: string) => { setColorTheme(id); },
+    class: cx("m-theme-list", cards && "m-theme-cards"), label: () => t`Theme`, value: () => themeName(), onPick: (id: string) => { setColorTheme(id); },
     // theme names and descriptions are English in code; the locale pack translates them
-    options: () => infos().map((x) => ({ value: x.id, label: () => t(x.name), hint: x.description ? () => t(x.description ?? "") : undefined, icon: h(ThemeSwatch, { id: x.id }) })),
+    options: () => infos().map((x) => ({ value: x.id, label: () => t(x.name), hint: x.description ? () => t(x.description ?? "") : undefined, icon: cards ? undefined : h(ThemeSwatch, { id: x.id }) })),
+    ...(cards ? {
+      columns: 3, check: false,
+      renderOption: (it: { value: string; label: unknown; hint?: unknown }) => h("span", { class: "m-theme-card" },
+        h(ThemePreview, { id: it.value }), h("span", { class: "m-theme-card-name" }, it.label), it.hint ? h("span", { class: "m-theme-card-desc" }, it.hint) : null),
+    } : {}),
   }) as Element;
 }
 

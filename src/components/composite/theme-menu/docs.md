@@ -9,6 +9,7 @@ one menu or the separate pickers and they always match. Choices are remembered.
 <ThemeMenu themes={false} accents={["primary", "brand-orange", "brand-blue"]} />
 <ThemeMenu icon={sun} modes={false} headings={false} />                       // own icon, no light / dark row, no headings
 <ThemeMenu icon={false} label="Look" labels={{ theme: "Palette", accent: "Highlight" }} panelClass="my-panel" />
+<ThemeMenu view="cards" current modes={false} />     // preview cards of every theme; the button shows the theme in use
 ```
 
 ## Props
@@ -21,6 +22,8 @@ one menu or the separate pickers and they always match. Choices are remembered.
 | `placement` | `"bottom-end"` … | `"bottom-end"` | where the panel opens |
 | `icon` | icon / `false` | palette | the button's icon; `false` = text only |
 | `modes` | boolean | `true` | the light / dark / system row |
+| `view` | `"list"` `"cards"` | `"list"` | how the themes are drawn: rows with a swatch, or a grid of preview cards (each a small page drawn by the theme: ground, surfaces, accent, text colour, corner) |
+| `current` | boolean | `false` | the button shows the theme in use (its swatch and name) instead of the icon |
 | `headings` | boolean | `true` | the section headings |
 | `labels` | `{ theme, accent }` | `Theme`, `Accent` | heading texts (strings or accessors) |
 | `class` | class | — | on the button |
@@ -34,4 +37,4 @@ of toggle buttons (`aria-pressed`); themes and accents are labelled `radiogroup`
 
 ## Composed of
 
-Dropdown (button and panel), SectionLabel (section headings), ThemeSwatch (live theme previews), OverflowText (long theme descriptions).
+Dropdown (button and panel), SectionLabel (section headings), ThemeSwatch (live theme previews; ThemePreview for the cards), OverflowText (long theme descriptions).

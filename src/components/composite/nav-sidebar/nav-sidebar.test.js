@@ -247,3 +247,50 @@ test("NavSidebar: search, headings, expand-all and counts can be turned off; tex
   assert.equal(own.el.querySelector(".m-sb-none").textContent, "Nothing here");
   own.dispose();
 });
+
+test("NavSidebar: visibleGroups lists one section; itemSize, subOverflow, a controlled bottom drawer without a menu button", async () => {
+  localStorage.clear();
+  R.createRouter({ routes: Object.fromEntries(["/", "/members", "/roles", "/payments", "/refunds", "/diamonds"].map((p) => [p, { component: () => null }])) });
+  const only = signal(["Ekonomi"]);
+  const open = signal(false);
+  const changes = [];
+  const items = [...ITEMS, { id: "late", label: "Geciken iadeler", href: "/refunds/late", group: "Ekonomi", parent: "refunds" }];
+  const m = mount(() => h(U.NavSidebar, { items, storageKey: "t.sb.sec", search: false, defaultOpen: "all", visibleGroups: only, itemSize: "lg", subOverflow: "marquee",
+    sheetSide: "bottom", menuButton: false, open, onOpenChange: (o) => changes.push(o) }));
+  await tick();
+  const groups = () => [...m.el.querySelectorAll(".m-sb-gbtn")].map((b) => b.dataset.group);
+  assert.deepEqual(groups(), ["Ekonomi"], "only the named categories are listed");
+  assert.ok(m.el.querySelector(".m-sb-wrap").classList.contains("is-lg-items"));
+  assert.equal(m.el.querySelector(".m-nav-burger"), null, "menuButton={false}: no menu button");
+  assert.equal(m.el.querySelector(".m-sb-search"), null);
+  assert.equal(m.el.querySelector('[data-id="refunds"] .m-sb-count').textContent, "1", "a roomy row shows how many pages are under it");
+  // "Collapse all" touches only the listed categories: the other section keeps its state
+  m.el.querySelector(".m-sb-all").click(); await tick();
+  assert.equal(m.el.querySelector(".m-sb-gbtn").getAttribute("aria-expanded"), "false");
+  only.set(["Üyeler ve roller"]); await tick();
+  assert.deepEqual(groups(), ["Üyeler ve roller"]);
+  assert.equal(m.el.querySelector(".m-sb-gbtn").getAttribute("aria-expanded"), "true", "still open as on the first visit");
+  only.set(null); await tick();
+  assert.equal(groups().length, 2, "no list: every category");
+  m.dispose();
+});
+
+test("NavSidebar: groupHeads={false} is a two-level menu; expand / collapse all works on the items with pages under them", async () => {
+  localStorage.clear();
+  R.createRouter({ routes: Object.fromEntries(["/", "/members", "/roles", "/payments", "/refunds", "/diamonds"].map((p) => [p, { component: () => null }])) });
+  const items = [...ITEMS, { id: "late", label: "Geciken iadeler", href: "/refunds/late", group: "Ekonomi", parent: "refunds" }, { id: "owners", label: "Sahipler", href: "/roles/owners", group: "Üyeler ve roller", parent: "roles" }];
+  const m = mount(() => h(U.NavSidebar, { items, storageKey: "t.sb.flat", search: false, groupHeads: false, groupOrder: ["Üyeler ve roller", "Ekonomi"], itemOrder: "none" }));
+  await tick();
+  assert.equal(m.el.querySelector(".m-sb-gbtn"), null, "no category rows");
+  assert.deepEqual([...m.el.querySelectorAll(".m-sb-flat .m-sb-item")].filter((r) => r.dataset.where === "group").map((r) => r.dataset.id), ["members", "roles", "payments", "refunds", "diamonds"], "one list, in category order");
+  const open = () => [...m.el.querySelectorAll(".m-sb-li.is-parent")].map((li) => li.classList.contains("is-kids-open"));
+  assert.deepEqual(open(), [false, false], "closed until opened or current");
+  const all = m.el.querySelector(".m-sb-all");
+  all.click(); await tick();
+  assert.deepEqual(open(), [true, true]);
+  all.click(); await tick();
+  assert.deepEqual(open(), [false, false]);
+  await R.navigate("/refunds/late"); await tick();
+  assert.deepEqual(open(), [false, false], "a closed choice is kept");
+  m.dispose();
+});

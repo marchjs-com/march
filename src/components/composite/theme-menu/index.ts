@@ -6,7 +6,7 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Dropdown } from "../../../ui/menu.ts";
-import { themeModes, themeList } from "../../../ui/theme.ts";
+import { themeModes, themeList, ThemeSwatch, colorTheme, colorThemes } from "../../../ui/theme.ts";
 import { accentList } from "../../../ui/accent.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { palette as paletteIcon } from "../../../icons/glyphs/palette.ts";
@@ -25,6 +25,10 @@ export interface ThemeMenuProps {
   icon?: unknown;
   /** Show light / dark / system (default true). */
   modes?: boolean | undefined;
+  /** How the themes are drawn: "list" (default: rows with a swatch) or "cards" (a grid of preview cards, each a small page drawn by the theme). */
+  view?: "list" | "cards" | undefined;
+  /** The button shows the current theme: its swatch and its name (default false: the icon alone). */
+  current?: boolean | undefined;
   /** Show the "Theme" / "Accent" section headings (default true). */
   headings?: boolean | undefined;
   /** Section heading texts (defaults "Theme", "Accent"). */
@@ -39,12 +43,16 @@ export interface ThemeMenuProps {
 export function ThemeMenu(props: ThemeMenuProps = {}): unknown {
   const heading = (text: () => string): Element | null => props.headings === false ? null
     : h(SectionLabel, { as: "p", class: "m-theme-menu-heading", "aria-hidden": "true", label: text }) as Element;
+  // current: the trigger is the swatch and the name of the theme in use
+  const name = (): string => { const id = colorTheme(); return t(colorThemes().find((x) => x.id === id)?.name ?? id); };
+  const trigger = props.current ? [() => h(ThemeSwatch, { id: colorTheme(), class: "m-theme-menu-swatch" }), h("span", { class: "m-theme-menu-name" }, name)] : undefined;
   return h(Dropdown, {
-    icon: props.icon === false ? undefined : props.icon ?? paletteIcon, label: () => val(props.label) ?? t`Appearance`, placement: props.placement ?? "bottom-end", class: props.class,
-    panelClass: cx("m-theme-panel m-theme-menu", props.panelClass),
+    ...(trigger ? { trigger, variant: "secondary" as const } : { icon: props.icon === false ? undefined : props.icon ?? paletteIcon }),
+    label: () => val(props.label) ?? t`Appearance`, placement: props.placement ?? "bottom-end", class: cx(props.current && "m-theme-menu-btn", props.class),
+    panelClass: cx("m-theme-panel m-theme-menu", props.view === "cards" && "m-theme-menu-cards", props.panelClass),
     children: [
       props.modes === false ? null : themeModes(),
-      props.themes === false ? null : [heading(() => val(props.labels?.theme) ?? t`Theme`), themeList()],
+      props.themes === false ? null : [heading(() => val(props.labels?.theme) ?? t`Theme`), themeList(props.view)],
       props.accents === false ? null : [heading(() => val(props.labels?.accent) ?? t`Accent`), accentList(props.accents)],
     ],
   });

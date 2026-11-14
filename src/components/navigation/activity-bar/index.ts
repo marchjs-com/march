@@ -19,6 +19,8 @@ messages("tr", { "Views": "Görünümler" });
 export interface ActivityItem {
   id: string;
   label: MaybeFn<string>;
+  /** A shorter name for under the icon (`showLabels`); the accessible name and the tooltip stay `label`. */
+  short?: MaybeFn<string | undefined>;
   icon: unknown;
   badge?: MaybeFn<number | null | undefined>;
   /** "end": at the far end of the bar (settings, account). */
@@ -44,6 +46,8 @@ export interface ActivityBarProps {
   motion?: "glide" | "fade" | "none" | undefined;
   /** Name tooltips on hover and focus (default true; the accessible name stays either way). */
   tooltips?: boolean | undefined;
+  /** The name under each icon (an item's `short`, else its `label`): a wider bar, as a section rail or a phone tab bar (default false). */
+  showLabels?: boolean | undefined;
   /** Theme color token of the active view and the indicator (default: the theme's primary). */
   color?: ColorToken | undefined;
   class?: ClassProp;
@@ -86,14 +90,14 @@ export function ActivityBar(props: ActivityBarProps): Element {
 
   const tabs = computed((): TabSpec[] => ordered().map((it) => ({
     id: it.id,
-    label: [icon(it.icon, "m-ab-icon"), it.badge !== undefined && h("span", { class: "m-ab-badge" }, h(Badge, { count: () => val(it.badge), tone: "primary", size: "xs" }))],
+    label: [icon(it.icon, "m-ab-icon"), props.showLabels && h("span", { class: "m-ab-text" }, () => val(it.short) ?? val(it.label)), it.badge !== undefined && h("span", { class: "m-ab-badge" }, h(Badge, { count: () => val(it.badge), tone: "primary", size: "xs" }))],
   })));
   // an action is never the selected view
   const selected = (): string | null => { const id = current(); return id != null && !byId(id)?.onSelect ? id : null; };
   return h(TabList, {
     tabs, value: selected, onSelect: (id: string) => choose(byId(id)), orientation: reactive(() => (horizontal() ? "horizontal" : "vertical")) as never,
     activation: "manual", variant: "none", controls: props.controls, tabId: (id: string) => `${base}-${id}`,
-    class: () => cx("m-ab", horizontal() ? "m-ab-h" : "m-ab-v", val(props.class)), label: () => val(props.label) ?? t`Views`, color: reactive(() => props.color) as never,
+    class: () => cx("m-ab", horizontal() ? "m-ab-h" : "m-ab-v", props.showLabels && "m-ab-labeled", val(props.class)), label: () => val(props.label) ?? t`Views`, color: reactive(() => props.color) as never,
     tabProps: (tab: TabSpec) => { const it = byId(tab.id)!; return { class: cx("m-ab-btn", it.position === "end" && "m-ab-end"), "data-view": it.id, "aria-label": () => name(it), "aria-keyshortcuts": it.shortcut ?? null }; },
     wrap: (btn: Element, tab: TabSpec) => (props.tooltips === false ? btn : h(Tooltip, { text: () => name(byId(tab.id)!), placement: reactive(() => (horizontal() ? "top" : "bottom-start")) as never, children: btn })),
     children: ind,

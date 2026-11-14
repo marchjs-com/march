@@ -145,7 +145,10 @@ compact pickers such as weekdays, `card` for plans/options with `hint` and `icon
 `size`, `shape`, `icon` and `colors="brand"` (one HADİ color per option). Never restyle the native input.
 
 **Sidebars**: big apps use `<NavSidebar>`; add `resizable` (+ `minWidth`, `maxWidth`, `collapseBelow`) when users
-should set its width. Never size it with inline styles.
+should set its width. Never size it with inline styles. A menu with sections: a rail (`<ActivityBar showLabels>`)
+picks the section, `visibleGroups` lists its categories; `itemSize="lg"` for roomy rows, `subOverflow="marquee"` for
+descriptions that flow; on phones the rail lies down as the bottom bar and opens the menu as a bottom sheet
+(`sheetSide="bottom" menuButton={false} open onOpenChange`). Breadcrumbs: give each crumb `siblings` (`href`, `current`).
 
 **Overlays**: decorative layers go in the container as `<Overlay>` (image, `src` video with `poster`, `svg`, `draw` canvas,
 `effect="glass|gradient|mesh|noise|vignette|spotlight|grid|dots"`), never as absolutely positioned divs with inline styles.
@@ -482,6 +485,8 @@ stateMorph(btn, "loading"); stateMorph(btn, ok ? "success" : "error", { confetti
 scrollTimeline(card, fadeUp, { range: [0, 0.4] }); parallaxLayers(hero); stickyReveal(section); scrollIndicator(bar);
 const off = animateList(ul, { enter: "pop", exit: "scale" });  // any renderer: enter, exit ghost, FLIP moves
 staggerIn(".tile", { preset: "rise", from: "center", grid: [4, 3] });
+installThemeWave();                                            // setTheme / setColorTheme / setAccent spread from the pressed point
+const stop = spotlight(document, { selector: ".card" });       // one pointer light over every card near the pointer
 ```
 
 ## 15b. Network and errors (hadi-march/net, hadi-march/errors)

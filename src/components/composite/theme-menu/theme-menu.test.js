@@ -45,3 +45,25 @@ test("ThemeMenu: icon, modes, headings and heading texts are yours", async () =>
   assert.ok(p.querySelector(".m-theme-list"));
   m.dispose();
 });
+
+test("ThemeMenu: view=\"cards\" draws a preview card per theme; current shows the theme in use on the button", async () => {
+  const m = mount(() => h(ThemeMenu, { class: "c", view: "cards", current: true, modes: false, accents: false }));
+  const btn = m.el.querySelector(".c");
+  assert.ok(btn.classList.contains("m-theme-menu-btn"));
+  assert.ok(btn.querySelector(".m-swatch"), "the swatch of the theme in use");
+  assert.equal(btn.querySelector(".m-theme-menu-name").textContent, U.colorThemes().find((x) => x.id === U.colorTheme()).name);
+  btn.click(); await tick();
+  const p = [...document.querySelectorAll(".m-theme-menu")].at(-1);
+  assert.ok(p.classList.contains("m-theme-menu-cards"));
+  const cards = [...p.querySelectorAll(".m-theme-cards [role=radio]")];
+  assert.equal(cards.length, U.colorThemes().length, "every theme has a card");
+  assert.equal(p.querySelectorAll(".m-theme-preview[data-m-theme]").length, cards.length);
+  assert.ok(cards[0].querySelector(".m-theme-card-name").textContent.length > 0);
+  const other = cards.find((c) => c.getAttribute("aria-checked") === "false");
+  const id = other.querySelector(".m-theme-preview").getAttribute("data-m-theme");
+  other.click(); await tick();
+  assert.equal(U.colorTheme(), id);
+  assert.equal(btn.querySelector(".m-theme-menu-name").textContent, U.colorThemes().find((x) => x.id === id).name, "the button follows the choice");
+  U.setColorTheme("hadi");
+  m.dispose();
+});

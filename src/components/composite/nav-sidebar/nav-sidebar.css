@@ -17,10 +17,13 @@ html.m-sb-resizing .m-nav { transition: none; }
 .m-sb-search.m-search .m-search-input { min-height: 2.375rem; padding-inline-end: 3.25rem; background: var(--m-bg-subtle); font-size: var(--m-text-md); }
 .m-sb-search.m-search .m-search-input:focus { background: var(--m-surface); }
 .m-sb-scroll { flex: 1; overflow: auto; overscroll-behavior: contain; scroll-padding-block: var(--m-space-2); padding: var(--m-space-2) var(--m-space-2) var(--m-space-5); }
+/* over the menu its scrollbar takes the accent */
+.m-sb-scroll:hover { --m-scrollbar: color-mix(in srgb, var(--m-accent, var(--m-primary)) 70%, transparent); }
 .m-sb-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .m-sb-block { margin-top: var(--m-space-4); }
 /* section headings: SectionLabel, sticky over the scrolling rows */
-.m-sb-section.m-section-label { position: sticky; top: calc(-1 * var(--m-space-2)); z-index: 1; gap: .375rem; padding: var(--m-space-2) var(--m-space-2) var(--m-space-1); background: var(--m-surface); color: var(--m-muted); }
+/* (it reaches into the side padding, so the active row's bar never shows beside it while rows scroll under) */
+.m-sb-section.m-section-label { position: sticky; top: calc(-1 * var(--m-space-2)); z-index: 1; gap: .375rem; margin-inline: -.5rem; padding: var(--m-space-2) calc(var(--m-space-2) + .5rem) var(--m-space-1); background: var(--m-surface); color: var(--m-muted); }
 .m-sb-all.m-btn-link { font-size: var(--m-text-xs); font-weight: 600; }
 
 /* rows: ListRow with the sidebar's measures */
@@ -72,7 +75,8 @@ html.m-sb-resizing .m-nav { transition: none; }
 }
 /* narrow screens: the menu is in a Drawer (nav-menu/drawer.ts) */
 .m-drawer.m-sb-sheet { --m-sheet-size: min(21rem, 88vw); }
-.m-sb-sheet .m-nav.m-sb { inline-size: auto; }
+.m-sb-sheet .m-nav.m-sb { inline-size: auto; min-inline-size: 0; }
+.m-sb-sheet .m-sb-scroll { overflow-x: hidden; }
 @media (max-width: 900px) { .m-sb-search.m-search .m-search-input { font-size: 1rem; } .m-sb-resize { display: none; } }
 
 /* nested items: children indented under their parent, folding with it; a chevron at the end of the parent row */
@@ -90,3 +94,24 @@ html.m-sb-resizing .m-nav { transition: none; }
 /* the parent of the current page: marked too, a step quieter than the page itself */
 .m-sb-item.m-listrow.is-active-parent { color: var(--m-primary-text); font-weight: 600; background: color-mix(in srgb, var(--m-primary-soft) 55%, transparent); }
 .m-sb-item.is-active-parent .m-listrow-lead { color: var(--m-primary); }
+
+/* itemSize="lg": top-level rows are equal, roomy rows (--m-sb-item-h): the icon in a tinted tile, one line of description */
+:is(.m-sb-wrap, .m-sb-sheet).is-lg-items { --m-sb-item-h: 3.625rem; }
+.is-lg-items .m-sb-gitems { gap: 2px; padding-inline-start: 0; }
+.is-lg-items :is(.m-sb-gitems, .m-sb-loose) > .m-sb-li > .m-sb-row.m-listrow { block-size: var(--m-sb-item-h); min-block-size: 0; gap: .75rem; padding-block: 0; padding-inline-start: .625rem; border-radius: var(--m-radius-3); color: var(--m-text); }
+.is-lg-items :is(.m-sb-gitems, .m-sb-loose) > .m-sb-li > .m-sb-row > .m-listrow-lead { inline-size: 2rem; block-size: 2rem; border-radius: var(--m-radius-2); background: color-mix(in srgb, var(--m-listrow-c) 13%, transparent); color: var(--m-listrow-c); }
+.is-lg-items :is(.m-sb-gitems, .m-sb-loose) > .m-sb-li > .m-sb-row .m-listrow-title { font-weight: 650; }
+.is-lg-items :is(.m-sb-gitems, .m-sb-loose) > .m-sb-li > .m-sb-row .m-listrow-sub { color: var(--m-muted); font-weight: 400; opacity: 1; }
+.is-lg-items :is(.m-sb-gitems, .m-sb-loose) > .m-sb-li.is-parent > .m-sb-row { padding-inline-end: 2.25rem; }
+.is-lg-items :is(.m-sb-gitems, .m-sb-loose) > .m-sb-li > .m-sb-kids-btn.m-icon-btn { inset-block-start: calc((var(--m-sb-item-h) - 1.5rem) / 2); inset-inline-end: .5rem; }
+.is-lg-items :is(.m-sb-gitems, .m-sb-loose) > .m-sb-li > .m-sb-kids > .m-sb-sublist { margin-inline-start: 1.5625rem; }
+.is-lg-items .m-sb-groups { gap: var(--m-space-1); }
+/* the pages under a roomy row are text only (the row above carries the icon) */
+.is-lg-items .m-sb-sublist .m-listrow-lead { display: none; }
+.is-lg-items .m-sb-sublist .m-sb-row.m-listrow { padding-inline-start: .625rem; }
+/* a bottom sheet (sheetSide="bottom"): the menu fills it */
+.m-drawer.m-sb-sheet.m-sb-sheet-bottom { --m-sheet-size: min(78dvh, 40rem); }
+.m-sb-sheet-bottom .m-nav.m-sb { block-size: 100%; }
+/* groupHeads={false}: one list of top-level rows, no category rows */
+/* (clipped like a category's list, with room at the start for the active row's bar) */
+:is(.m-sb-wrap, .m-sb-sheet) .m-sb-gitems.m-sb-flat { margin-inline-start: -.5rem; padding-inline-start: .5rem; }

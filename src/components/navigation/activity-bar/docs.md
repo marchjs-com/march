@@ -17,7 +17,7 @@ bottom bar on phones), and mirrored in RTL.
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `items` | `ActivityItem[]` / accessor | — | `{ id, label, icon, badge, position, shortcut, onSelect }` |
+| `items` | `ActivityItem[]` / accessor | — | `{ id, label, short, icon, badge, position, shortcut, onSelect }` (`short`: the shorter name under the icon with `showLabels`) |
 | `value` | string / null / accessor | — | the active view |
 | `onChange` | `(id \| null) => void` | — | |
 | `collapsible` | boolean | `true` | choosing the active view again gives `null` |
@@ -27,12 +27,15 @@ bottom bar on phones), and mirrored in RTL.
 | `indicator` | boolean | `true` | the line that marks the active view |
 | `motion` | `glide` `fade` `none` | `glide` | how the indicator moves to a new view |
 | `tooltips` | boolean | `true` | name tooltips on hover and focus (the accessible name stays either way) |
+| `showLabels` | boolean | `false` | the name under each icon (an item's `short`, else its `label`): a wider bar, for a section rail or a phone tab bar |
 | `color` | ColorToken | theme primary | colour of the active view and the indicator |
 | `class` | ClassProp | — | extra class on the bar |
 
 ```tsx
 <ActivityBar items={views} value={$view} onChange={(v) => $view = v} color="brand-purple" motion="fade" tooltips={false} />
 <ActivityBar items={views} value={$view} onChange={(v) => $view = v} indicator={false} />
+// a section rail with names; the same bar lies down as the tab bar of a phone
+<ActivityBar items={sections} value={$section} onChange={pick} showLabels tooltips={false} collapsible={false} orientation={() => (narrow() ? "horizontal" : "vertical")} />
 ```
 
 ## Accessibility

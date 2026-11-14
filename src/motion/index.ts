@@ -29,6 +29,9 @@ export { drawPath, morphPath, followPath, type DrawOptions, type MorphPathOption
 export { parsePath, flatten, pathLength, pathSampler, resample, interpolatePath, toD, type PathPoint } from "./path.ts";
 export { clipReveal, clipFrames, clipAt, type ClipShape, type ClipSide, type ClipOptions } from "./clip.ts";
 export { filterBlur, displace, goo, type BlurOptions, type DisplaceOptions, type GooOptions } from "./svg-filter.ts";
+// page-wide: the theme wave (a restyle revealed by a growing circle) and the pointer spotlight over cards
+export { themeWave, installThemeWave, type ThemeWaveOptions } from "./theme-wave.ts";
+export { spotlight, type SpotlightOptions } from "./spotlight.ts";
 // morph: container transform (button → dialog, card → page), shared element FLIP, icon and shape morphs
 export { morph, morphBack, morphIcon, shapeMorph, shapePolygon, MORPH_ICONS, type MorphOptions, type MorphIconName, type ShapeName } from "./morph.ts";
 

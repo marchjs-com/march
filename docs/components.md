@@ -2584,6 +2584,7 @@ Composed of: Dropdown, ThemeSwatch, [OverflowText](#overflowtext), [SectionLabel
 <ThemeMenu themes={false} accents={["primary", "brand-orange", "brand-blue"]} />
 <ThemeMenu icon={sun} modes={false} headings={false} />                       // own icon, no light / dark row, no headings
 <ThemeMenu icon={false} label="Look" labels={{ theme: "Palette", accent: "Highlight" }} panelClass="my-panel" />
+<ThemeMenu view="cards" current modes={false} />     // preview cards of every theme; the button shows the theme in use
 ```
 
 Full page: src/components/composite/theme-menu/docs.md

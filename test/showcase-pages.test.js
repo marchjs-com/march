@@ -33,6 +33,28 @@ test("every menu group is one of MENU_GROUPS (src/components/categories.ts), in 
   assert.match(readFileSync(SRC + "shell-menu.tsx", "utf8"), /groupOrder=\{MENU_GROUPS\}/, "the side menu orders its groups by MENU_GROUPS");
 });
 
+test("every menu group belongs to exactly one section of the rail (nav-meta.ts SECTIONS)", async () => {
+  const { MENU_GROUPS } = await import("../src/components/categories.ts");
+  const src = readFileSync(SRC + "nav-meta.ts", "utf8");
+  const block = src.match(/export const SECTIONS[^=]*=\s*\[([\s\S]*?)\n\];/)?.[1] ?? "";
+  const sections = [...block.matchAll(/\{ id: "([\w-]+)", label: "([^"]+)"[^\n]*?groups: \[([^\]]*)\](?:, pages: \[([^\]]*)\])?/g)]
+    .map((m) => ({ id: m[1], label: m[2], groups: [...m[3].matchAll(/"([^"]+)"/g)].map((x) => x[1]), pages: [...(m[4] ?? "").matchAll(/"([^"]+)"/g)].map((x) => x[1]) }));
+  assert.equal(sections.length, 6, "six sections: Başla, Bileşenler, Görünüm, Hareket, Hazır yapılar, Altyapı");
+  const owner = new Map();
+  for (const s of sections) for (const g of s.groups) {
+    assert.ok(MENU_GROUPS.includes(g), `section "${s.label}" names "${g}", which is not a menu group`);
+    assert.ok(!owner.has(g), `"${g}" is in two sections: ${owner.get(g)} and ${s.label}`);
+    owner.set(g, s.label);
+  }
+  for (const g of MENU_GROUPS) assert.ok(owner.has(g), `menu group "${g}" is in no section: its pages would not be listed`);
+  // a page a section takes from another group is a real top-level page
+  const top = paths("nav.ts", /path: "([^"]+)"/g);
+  for (const s of sections) for (const p of s.pages) assert.ok(top.includes(p), `section "${s.label}" names the page ${p}, which is not in nav.ts`);
+  const menu = readFileSync(SRC + "shell-menu.tsx", "utf8");
+  assert.match(menu, /visibleGroups=\{/, "the side menu lists one section's groups");
+  assert.match(menu, /<ActivityBar /, "the rail is the ActivityBar");
+});
+
 test("every menu page opens its own route (an exact route beats a wildcard that matched nothing)", async () => {
   const { compilePath, matchRoute } = await import("../src/router/index.ts");
   const top = paths("nav.ts", /path: "([^"]+)"/g);

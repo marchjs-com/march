@@ -10,6 +10,10 @@
 .m-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--m-focus); outline: none; }
 .m-listrow.m-menu-item.is-danger, .m-menu-item.is-danger .m-listrow-lead { color: var(--m-danger-text); }
 .m-menu-item > .m-listrow-trail { font-size: inherit; }
+/* an entry with a second line (`sub`) is a little taller; the entry of where the user is (`current`) is tinted */
+.m-listrow.m-menu-item.is-two-line { gap: .625rem; padding-block: .375rem; }
+.m-menu-item.is-two-line .m-listrow-title { font-weight: 600; }
+.m-menu-item.is-two-line .m-listrow-sub { line-height: 1.35; }
 .m-menu-kbd { margin-inline-start: auto; }
 /* a checked choice (menuitemcheckbox / menuitemradio): the mark keeps its place, shown only while checked */
 .m-checkmark.m-menu-check { flex: none; color: var(--m-accent, var(--m-primary)); visibility: hidden; }

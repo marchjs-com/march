@@ -34,6 +34,10 @@ export interface MenuItemSpec {
   checked?: MaybeFn<boolean | undefined>;
   /** With `checked`: one of a group where only one is on (`role="menuitemradio"`). */
   radio?: boolean;
+  /** The entry of where the user is now (the open page among its siblings): tinted (the router marks a link to the open page with `aria-current="page"`). */
+  current?: MaybeFn<boolean | undefined>;
+  /** A second, quieter line under the label. */
+  sub?: MaybeFn<string | undefined>;
   separator?: false;
 }
 /** A menu entry: a plain item, an action(), or a separator ("-" or `{ separator: true }`). */
@@ -63,7 +67,8 @@ export function renderItem(it: MenuItem, args: unknown[], close: (refocus: boole
   const x = isAction(it) ? specOf(it, args) : it;
   const choice = x.checked !== undefined;
   const trail = choice || x.shortcut ? [choice && h(CheckMark, { variant: "bare", label: false, class: "m-menu-check" }), x.shortcut && h(Kbd, { keys: x.shortcut, class: "m-menu-kbd" })] : undefined;
-  const row = { size: "sm" as const, overflow: "wrap" as const, tabindex: "-1", class: cx("m-menu-item", x.danger && "is-danger"), lead: x.icon, title: () => val(x.label), trail };
+  const row = { size: "sm" as const, overflow: "wrap" as const, tabindex: "-1", class: cx("m-menu-item", x.danger && "is-danger", x.sub !== undefined && "is-two-line"), lead: x.icon, title: () => val(x.label), trail,
+    ...(x.sub !== undefined ? { sub: () => val(x.sub) } : {}), ...(x.current !== undefined ? { active: () => !!val(x.current) } : {}) };
   if (x.href) return h(PlainListRow, { ...row, href: x.href, role: "menuitem", "on:click": () => close(false) });
   return h(PlainListRow, {
     ...row, role: choice ? (x.radio ? "menuitemradio" : "menuitemcheckbox") : "menuitem", "aria-checked": choice ? () => String(!!val(x.checked)) : null,
