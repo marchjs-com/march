@@ -1,0 +1,34 @@
+/* NotForYou. Two columns (not for / for) that stack on narrow screens; marked lines cross out softly. */
+.hm-nfy { display: grid; gap: var(--hm-space-5); }
+.hm-nfy-cols { display: grid; gap: var(--hm-space-5); align-items: start; }
+.hm-nfy-both .hm-nfy-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 760px) { .hm-nfy-both .hm-nfy-cols { grid-template-columns: minmax(0, 1fr); } }
+@container hm-site (max-width: 760px) { .hm-nfy-both .hm-nfy-cols { grid-template-columns: minmax(0, 1fr); } }
+.hm-nfy-title { margin: 0 0 var(--hm-space-3); font-size: var(--hm-text-lg); }
+.hm-nfy-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--hm-space-3); }
+.hm-nfy-row, .hm-nfy-toggle { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: var(--hm-space-3); inline-size: 100%; box-sizing: border-box; padding: var(--hm-space-4); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-4); background: var(--hm-surface); color: var(--hm-text); font: inherit; text-align: start; }
+.hm-nfy-toggle { cursor: pointer; transition: border-color var(--hm-dur) var(--hm-ease), background var(--hm-dur) var(--hm-ease), translate var(--hm-dur) var(--hm-ease-spring); }
+.hm-nfy-toggle:hover { border-color: var(--hm-danger); }
+.hm-nfy-toggle:active { translate: 0 1px; }
+.hm-nfy-toggle:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: 2px; }
+.hm-nfy-toggle.is-on { border-color: var(--hm-danger); background: var(--hm-danger-soft, var(--hm-surface-2)); }
+.hm-nfy-row { grid-template-columns: auto minmax(0, 1fr); }
+.hm-nfy-mark { display: grid; place-items: center; inline-size: 1.75rem; block-size: 1.75rem; border-radius: var(--hm-radius-full); }
+.hm-nfy-mark .hm-svg { inline-size: 1rem; block-size: 1rem; }
+.hm-nfy-not .hm-nfy-mark { background: var(--hm-danger-soft, var(--hm-surface-2)); color: var(--hm-danger-text); }
+.hm-nfy-for .hm-nfy-mark { background: var(--hm-success-soft, var(--hm-surface-2)); color: var(--hm-success-text); }
+.hm-nfy-text { display: grid; gap: var(--hm-space-1); min-inline-size: 0; }
+.hm-nfy-text strong { font-weight: var(--hm-weight-semibold); }
+.hm-nfy-detail { color: var(--hm-muted); font-size: var(--hm-text-sm); line-height: 1.5; }
+.hm-nfy-me { align-self: center; padding: .2em .65em; border-radius: var(--hm-radius-full); border: 1px solid var(--hm-border); font-size: var(--hm-text-xs); color: var(--hm-muted); white-space: nowrap; }
+.hm-nfy-toggle.is-on .hm-nfy-me { border-color: transparent; background: var(--hm-danger); color: var(--hm-on-danger, var(--hm-bg)); }
+.hm-nfy-toggle.is-on strong { text-decoration: line-through; text-decoration-color: var(--hm-danger); }
+.hm-nfy-item { min-inline-size: 0; }
+/* list variant: no boxes, a rule between the lines */
+.hm-nfy-v-list .hm-nfy-list { gap: 0; }
+.hm-nfy-v-list .hm-nfy-row, .hm-nfy-v-list .hm-nfy-toggle { border-width: 0 0 1px; border-radius: 0; background: transparent; padding-inline: 0; }
+.hm-nfy-v-list .hm-nfy-toggle.is-on { background: transparent; }
+.hm-nfy-verdict { margin: 0; padding: var(--hm-space-3) var(--hm-space-4); border-radius: var(--hm-radius-3); background: var(--hm-surface-2); font-weight: var(--hm-weight-semibold); transition: background var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }
+.hm-nfy-verdict.is-in { background: var(--hm-success-soft, var(--hm-surface-2)); color: var(--hm-success-text); }
+.hm-nfy-verdict.is-out { background: var(--hm-danger-soft, var(--hm-surface-2)); color: var(--hm-danger-text); }
+@media (prefers-reduced-motion: reduce) { .hm-nfy-toggle, .hm-nfy-verdict { transition: none; } }

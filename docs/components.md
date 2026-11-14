@@ -196,9 +196,11 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Faq | experimental | Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking. | [Accordion](#accordion), SearchBox, [Reveal](#reveal) |
 | FeatureGrid | experimental | Product features as cards (pointer light), plain, a two-column list or a bento grid of mixed tile sizes; staggered entrance. | [Grid](#grid), [Card](#card), IconTile, [Reveal](#reveal) |
 | Hero | experimental | First screen in seven looks (centered, split, video, mesh, aurora, product, parallax): eyebrow, gradient-highlight title, lead, actions. | [Reveal](#reveal), [Overlay](#overlay), [Button](#button), [Badge](#badge), [VideoBackground](#videobackground), [Parallax](#parallax) |
+| HonestCompare | experimental | Comparison table that also shows where the product is behind: scored rows, ahead / even / behind summary, a filter for the losing rows and visible notes. | — |
 | HorizontalScroll | experimental | Pinned section whose panels slide sideways while the page scrolls down; progress line; native snap scroller on touch. | — |
 | LogoCloud | experimental | Trusted-by logos as an equal grid or an endless Marquee ticker; one muted tone, full colour on hover. | Marquee, [Grid](#grid), [Reveal](#reveal) |
 | Newsletter | experimental | Email sign-up, inline or stacked: validation, busy button, success check that pops in, error shake and announcement. | [TextInput](#textinput), [Button](#button) |
+| NotForYou | experimental | Anti-landing block: who the product is not for (and who it is for); the visitor can mark the lines that apply and gets an honest verdict. | — |
 | Parallax | experimental | Layered depth: every layer (image or node) moves at its own scroll speed and, optionally, with the mouse; transform only. | [Overlay](#overlay) |
 | Presentation | experimental | Slides: keys, wheel, swipe, step-by-step fragments, slide / fade / zoom, full screen, URL index, speaker window (cross-tab), print. | [IconButton](#iconbutton) |
 | Pricing | experimental | Plans with a monthly / yearly switch: prices roll like an odometer, the switch thumb slides, the featured plan glows. | [Card](#card), [Badge](#badge), [Segmented](#segmented), [Counter](#counter), [Reveal](#reveal) |
@@ -941,6 +943,22 @@ Composed of: [Reveal](#reveal), [Overlay](#overlay), [Button](#button), [Badge](
 
 Full page: src/components/landing/hero/docs.md
 
+## HonestCompare
+
+A comparison table that also shows where the product is behind. A cell is `true` (yes), `false` (no), `"partial"` or any text / node (not scored). In every scored row the `us` column is compared with the best other column: ahead, even or behind. Behind rows get a mark and keep their `note` visible (why, what is planned). The summary counts the rows, and a toggle shows only the rows where the product loses.
+
+```tsx
+<HonestCompare
+  columns={[{ id: "us", name: "HADİ" }, { id: "events", name: "Event sites" }]}
+  rows={[
+    { label: "Nearby events by time", values: { us: true, events: "partial" } },
+    { label: "Ticketing", values: { us: false, events: true }, note: "Not planned: HADİ is for free meetups." },
+    { label: "Price", values: { us: "Free", events: "Fee per ticket" } },
+  ]} />
+```
+
+Full page: src/components/landing/honest-compare/docs.md
+
 ## HorizontalScroll
 
 A pinned section whose panels move sideways while the page scrolls down: the vertical distance equals the track's overflow, so the last panel arrives as the section ends. A progress line follows. RTL moves the other way. On touch screens and with reduced motion it is a native horizontal scroller with snap points.
@@ -1240,6 +1258,18 @@ Composed of: [TextInput](#textinput), [Button](#button)
 ```
 
 Full page: src/components/landing/newsletter/docs.md
+
+## NotForYou
+
+The anti-landing block: it says plainly who the product is **not** for, and optionally who it is for. With `check`, every "not for you" line is a toggle the visitor can mark ("This is me"); a verdict under the list sums it up honestly.
+
+```tsx
+<NotForYou check items={[{ text: "You run a 1,000-seat conference", detail: "No ticketing; an event platform fits better." }]}
+  forYou={[{ text: "You want to do something tonight" }]} />
+<NotForYou variant="list" items={…} verdict={(n, total) => `${n}/${total}`} />
+```
+
+Full page: src/components/landing/not-for-you/docs.md
 
 ## NumberInput
 

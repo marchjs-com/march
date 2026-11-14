@@ -2,8 +2,12 @@
 export * from "./web.kit.gen.ts";
 import * as d0 from "./landing/feature-grid/demo.tsx";
 import * as p0 from "./landing/feature-grid/playground.ts";
-import * as d1 from "./landing/logo-cloud/demo.tsx";
-import * as p1 from "./landing/logo-cloud/playground.ts";
-import * as d2 from "./landing/pricing/demo.tsx";
-import * as p2 from "./landing/pricing/playground.ts";
-export { d0, p0, d1, p1, d2, p2 };
+import * as d1 from "./landing/honest-compare/demo.tsx";
+import * as p1 from "./landing/honest-compare/playground.ts";
+import * as d2 from "./landing/logo-cloud/demo.tsx";
+import * as p2 from "./landing/logo-cloud/playground.ts";
+import * as d3 from "./landing/not-for-you/demo.tsx";
+import * as p3 from "./landing/not-for-you/playground.ts";
+import * as d4 from "./landing/pricing/demo.tsx";
+import * as p4 from "./landing/pricing/playground.ts";
+export { d0, p0, d1, p1, d2, p2, d3, p3, d4, p4 };
