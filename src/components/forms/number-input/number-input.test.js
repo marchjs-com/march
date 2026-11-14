@@ -45,3 +45,13 @@ test("IntInput rounds; MoneyInput symbol side and decimals; PercentInput stores 
   assert.equal(pm.el.querySelector("input").value, "12.5");
   assert.equal(pm.el.querySelector(".hm-affix-suffix").textContent, "%");
 });
+
+test("NumberInput: class reaches the input without a prefix / suffix, the wrapper with one", () => {
+  const a = mount(() => h(NumberInput, { value: 1, class: "mine" }));
+  assert.ok(a.el.querySelector("input").className.includes("mine"));
+  a.dispose();
+  const b = mount(() => h(NumberInput, { value: 1, class: "mine", suffix: "kg" }));
+  assert.ok(b.el.querySelector(".hm-affix").className.includes("mine"));
+  assert.ok(!b.el.querySelector("input").className.includes("mine"));
+  b.dispose();
+});

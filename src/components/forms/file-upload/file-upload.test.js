@@ -43,3 +43,29 @@ test("FileUpload: accept and size checks, preview, progress through the Progress
   assert.equal(uploads[1].sig.aborted, true);
   m2.dispose();
 });
+
+test("FileUpload: the hint, previews, the remove button and every text are yours", () => {
+  const errs = [];
+  const a = mount(() => h(FileUpload, { multiple: true, accept: "image/*", maxSize: 1000, maxFiles: 1, hint: false, preview: false, removeIcon: () => h("i", { class: "own-x" }, "x"), onError: (m) => errs.push(m),
+    labels: { remove: (n) => `Drop ${n}`, typeNotAllowed: (n) => `no ${n}`, tooLarge: (n, max) => `${n} > ${max}`, tooMany: (n) => `only ${n}` } }));
+  const zone = a.el.querySelector(".hm-drop");
+  assert.equal(zone.querySelector(".hm-hint"), null);
+  fire(zone, "drop", { dataTransfer: { files: [new File(["hi"], "a.txt", { type: "text/plain" })] } });
+  fire(zone, "drop", { dataTransfer: { files: [new File(["x".repeat(2000)], "big.png", { type: "image/png" })] } });
+  fire(zone, "drop", { dataTransfer: { files: [new File(["ok"], "ok.png", { type: "image/png" }), new File(["ok"], "two.png", { type: "image/png" })] } });
+  assert.equal(errs[0], "no a.txt");
+  assert.ok(errs[1].startsWith("big.png > "));
+  assert.equal(errs[2], "only 1");
+  const row = a.el.querySelector(".hm-file");
+  assert.equal(row.querySelector(".hm-file-thumb"), null);
+  const x = row.querySelector(".hm-icon-btn");
+  assert.equal(x.getAttribute("aria-label"), "Drop ok.png");
+  assert.ok(x.querySelector(".own-x"));
+  a.dispose();
+  const b = mount(() => h(FileUpload, { accept: ".pdf", maxSize: 1000, hint: "PDF only", }));
+  assert.equal(b.el.querySelector(".hm-drop-hint").textContent, "PDF only");
+  b.dispose();
+  const c = mount(() => h(FileUpload, { maxSize: 1000, labels: { max: (s) => `up to ${s}` } }));
+  assert.ok(c.el.querySelector(".hm-drop-hint").textContent.startsWith("up to "));
+  c.dispose();
+});

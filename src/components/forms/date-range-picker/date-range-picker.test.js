@@ -28,3 +28,25 @@ test("DateRangePicker: presets set the range; Custom shows the from / to pair", 
   assert.equal(none.el.querySelectorAll("[role=radio]").length, 0);
   assert.equal(none.el.querySelectorAll(".hm-date-input").length, 2);
 });
+
+test("DateRangePicker: texts, the Custom option, the separator and the pickers are yours", () => {
+  const a = mount(() => h(DateRangePicker, { value: null, today: "2026-03-14", labels: { range: "Period", custom: "Own dates", from: "Start", to: "End" }, separator: "→", picker: { icon: false } }));
+  assert.equal(a.el.querySelector("[role=radiogroup]").getAttribute("aria-label"), "Period");
+  const last = a.el.querySelectorAll("[role=radio]").find((b) => b.textContent === "Own dates");
+  assert.ok(last);
+  last.click();
+  const dates = a.el.querySelectorAll(".hm-date-input");
+  assert.equal(dates[0].getAttribute("aria-label"), "Start");
+  assert.equal(dates[1].getAttribute("aria-label"), "End");
+  assert.equal(a.el.querySelector(".hm-daterange-sep").textContent, "→");
+  assert.equal(a.el.querySelector(".hm-affix-btn"), null);
+  a.dispose();
+  const b = mount(() => h(DateRangePicker, { value: { from: "2020-01-01", to: "2020-01-05" }, today: "2026-03-14", custom: false }));
+  assert.equal(b.el.querySelectorAll("[role=radio]").length, 5);
+  assert.equal(b.el.querySelectorAll(".hm-date-input").length, 0);
+  b.dispose();
+  const c = mount(() => h(DateRangePicker, { value: null, presets: false, separator: false }));
+  assert.equal(c.el.querySelectorAll(".hm-date-input").length, 2);
+  assert.equal(c.el.querySelector(".hm-daterange-sep"), null);
+  c.dispose();
+});

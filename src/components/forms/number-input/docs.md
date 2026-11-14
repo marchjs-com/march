@@ -25,6 +25,7 @@ put back on blur), clamps to `min` / `max` and steps with ArrowUp / ArrowDown. T
 | `currency` | ISO 4217 | `"USD"` | MoneyInput |
 | `fraction` | boolean | `true` | PercentInput: `false` stores 12.5 for 12.5 % |
 | `prefix`, `suffix` | node | — | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 `currencyInfo(locale, currency)` returns the symbol, its side and the minor digits.
 

@@ -10,6 +10,8 @@ export interface SliderProps extends ControlProps<number> {
   step?: number | undefined;
   /** Text of the value shown next to the slider. */
   format?: ((v: number) => unknown) | undefined;
+  /** The value shown next to the slider: `false` removes it. */
+  showValue?: boolean | undefined;
 }
 
 /** Range slider with the current value shown. Props: min, max, step, format(v). */
@@ -20,5 +22,5 @@ export function Slider(props: SliderProps): unknown {
     disabled: () => !!(props.disabled || props.readonly), onInput: (e: Event) => set(Number(inputOf(e).value)),
   }) as HTMLInputElement;
   syncValue(el, get);
-  return h("span", { class: cx("hm-slider-wrap", props.class) }, el, h("output", { class: "hm-slider-value", for: () => el.id || null }, () => (props.format ? props.format(get()) : String(get() ?? ""))));
+  return h("span", { class: () => cx("hm-slider-wrap", props.class) }, el, props.showValue === false ? null : h("output", { class: "hm-slider-value", for: () => el.id || null }, () => (props.format ? props.format(get()) : String(get() ?? ""))));
 }

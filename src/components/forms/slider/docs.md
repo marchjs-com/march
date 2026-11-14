@@ -15,6 +15,10 @@ percentage, a label).
 | `min`, `max`, `step` | number | `0`, `100`, `1` | |
 | `format` | `(v) => node` | the number | text of the shown value |
 | `color` | ColorToken | primary | |
+| `showValue` | boolean | `true` | `false` removes the value next to the slider |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+`<Slider bind:value={$v} showValue={false} />` leaves only the track; `format` changes the text of the value.
 
 ## Accessibility
 

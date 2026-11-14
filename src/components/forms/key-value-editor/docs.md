@@ -16,6 +16,14 @@ its row, and with `numbers` numeric-looking values are stored as numbers.
 | `keyPlaceholder`, `valuePlaceholder` | string | "Key", "Value" | |
 | `numbers` | boolean | — | numeric-looking values become numbers |
 | `readonly`, `disabled` | boolean | — | hides the editing buttons |
+| `labels` | `{ key?, value?, remove?, add?, duplicate? }` | "Key", "Value", "Remove", "Add row", "Duplicate key" | |
+| `removable` | boolean | `true` | `false` removes the row's remove button |
+| `addable` | boolean | `true` | `false` removes the "Add row" button |
+| `removeIcon` | node, text or `() => node` | × icon | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+`<KeyValueEditor bind:value={$env} labels={{ key: "Ad", value: "Değer", add: "Satır ekle" }} removeIcon={() => <Icon of={trash} />} />`;
+`removable={false} addable={false}` leaves a fixed set of rows to fill in.
 
 ## Accessibility
 

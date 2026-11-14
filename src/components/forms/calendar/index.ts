@@ -8,6 +8,8 @@ import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { model, cx, uid, type ControlProps } from "../../../forms/util.ts";
+import { ownPart } from "../../../forms/rows.ts";
+import { colorAttr } from "../../../theme/colors.ts";
 import { utcDate as utc, isIso, todayIso, addDays, addMonths, dayOfWeek as dow, firstDayOf, dateFormat as dtf, type IsoDate } from "../../../core/date.ts";
 export type { IsoDate };
 
@@ -28,6 +30,18 @@ export interface CalendarProps extends ControlProps<IsoDate | null> {
   rangeFrom?: IsoDate | null | undefined;
   rangeTo?: IsoDate | null | undefined;
   autoFocus?: boolean | undefined;
+  /** Accessible names of the month buttons (default: "Previous month" / "Next month"). */
+  labels?: { prevMonth?: string | undefined; nextMonth?: string | undefined } | undefined;
+  /** The month buttons: `false` removes both (PageUp / PageDown still change the month). */
+  nav?: boolean | undefined;
+  /** Content of the previous-month button instead of the chevron (a node, text or `() => node`). */
+  prevIcon?: unknown;
+  /** Content of the next-month button instead of the chevron. */
+  nextIcon?: unknown;
+  /** The row of weekday names: `false` removes it. */
+  weekdays?: boolean | undefined;
+  /** Content of a day cell instead of the day number: `(iso, day) => node` (a dot under busy days, a price…). */
+  renderDay?: ((iso: IsoDate, day: number) => unknown) | undefined;
 }
 
 /**
@@ -68,7 +82,7 @@ export function Calendar(props: CalendarProps): unknown {
   const grid = h("div", {
     role: "grid", class: "hm-cal-grid", "aria-labelledby": titleId, onKeyDown,
     onClick: (e: MouseEvent) => { const b = (e.target as Element).closest?.("[data-date]"); if (b) { focus.set(b.getAttribute("data-date")!); pick(b.getAttribute("data-date")!); } },
-  }, head, body);
+  }, props.weekdays === false ? null : head, body);
   effect(() => {
     const f = focus(), sel = get(), l = loc(), fd = props.firstDay ?? firstDayOf(l), lo = props.min, hi = props.max, from = props.rangeFrom, to = props.rangeTo, today = todayIso();
     untrack(() => {
@@ -84,7 +98,7 @@ export function Calendar(props: CalendarProps): unknown {
         for (let r = 0; r < 6; r++) {
           rows.push(h("div", { role: "row", class: "hm-cal-row" }, Array.from({ length: 7 }, (_, c) => {
             const iso = addDays(start, r * 7 + c);
-            return h("button", { type: "button", role: "gridcell", class: cx("hm-cal-day", iso.slice(0, 7) !== f.slice(0, 7) && "hm-cal-out"), "data-date": iso, "aria-label": wl.format(utc(iso)) + " " + dtf(l, { dateStyle: "long" }).format(utc(iso)) }, String(+iso.slice(8)));
+            return h("button", { type: "button", role: "gridcell", class: cx("hm-cal-day", iso.slice(0, 7) !== f.slice(0, 7) && "hm-cal-out"), "data-date": iso, "aria-label": wl.format(utc(iso)) + " " + dtf(l, { dateStyle: "long" }).format(utc(iso)) }, props.renderDay ? props.renderDay(iso, +iso.slice(8)) : String(+iso.slice(8)));
           })));
         }
         body.replaceChildren(...rows);
@@ -103,7 +117,8 @@ export function Calendar(props: CalendarProps): unknown {
     });
   });
   if (props.autoFocus) { const id = setTimeout(() => body.querySelector<HTMLElement>(`[data-date="${focus.peek()}"]`)?.focus(), 0); onCleanup(() => clearTimeout(id)); }
-  const nav = (n: number, label: string) => h("button", { type: "button", class: "hm-cal-nav", "aria-label": label, onClick: () => go(addMonths(focus.peek(), n), false) }, svgIcon(n < 0 ? chevronLeft : chevronRight));
-  return h("div", { class: cx("hm-cal", props.class) },
-    h("div", { class: "hm-cal-header" }, nav(-1, t`Previous month`), title, nav(1, t`Next month`)), grid);
+  const nav = (n: number, label: () => string) => (props.nav === false ? null : h("button", { type: "button", class: cx("hm-cal-nav", n < 0 ? "hm-cal-prev" : "hm-cal-next"), "aria-label": label, onClick: () => go(addMonths(focus.peek(), n), false) },
+    ownPart(n < 0 ? props.prevIcon : props.nextIcon, () => svgIcon(n < 0 ? chevronLeft : chevronRight))));
+  return h("div", { class: () => cx("hm-cal", props.class), "data-hm-color": () => colorAttr(props.color) },
+    h("div", { class: "hm-cal-header" }, nav(-1, () => props.labels?.prevMonth ?? t`Previous month`), title, nav(1, () => props.labels?.nextMonth ?? t`Next month`)), grid);
 }

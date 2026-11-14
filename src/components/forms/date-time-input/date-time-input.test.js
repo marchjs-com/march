@@ -26,3 +26,12 @@ test("DateTimeInput: a DatePicker and a TimeInput write one ISO timestamp", () =
   type(time, "17:45");
   assert.equal(new Date(v()).getMinutes(), 45);
 });
+
+test("DateTimeInput: the time field's name and the date picker are yours", () => {
+  const { el, dispose } = mount(() => h(DateTimeInput, { value: null, timeLabel: "Hour", picker: { icon: false, placeholder: "day" } }));
+  const [date, time] = el.querySelectorAll("input");
+  assert.equal(time.getAttribute("aria-label"), "Hour");
+  assert.equal(date.getAttribute("placeholder"), "day");
+  assert.equal(el.querySelector("button"), null);
+  dispose();
+});

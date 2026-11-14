@@ -13,6 +13,14 @@ the swatch; picking a swatch writes the text).
 |---|---|---|---|
 | `value` / `bind:value` | string | `""` | lower-case `#rrggbb` |
 | `disabled`, `readonly` | boolean | — | |
+| `swatch` | boolean | `true` | `false`: only the text field |
+| `text` | boolean | `true` | `false`: only the swatch (it becomes the labelled control) |
+| `swatchLabel` | string | "Pick a color" | accessible name of the swatch |
+| `placeholder` | string | `"#RRGGBB"` | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+`<ColorInput bind:value={$c} text={false} swatchLabel="Marka rengi" />` shows only the swatch;
+`<ColorInput bind:value={$c} swatch={false} placeholder="#hex" />` only the text field.
 
 For palettes, gradients and contrast checks use ColorPicker.
 

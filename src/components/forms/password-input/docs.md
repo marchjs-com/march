@@ -15,6 +15,12 @@ sign-up forms so password managers offer to generate one.
 | `autocomplete` | string | `"current-password"` | |
 | `placeholder`, `maxLength`, `minLength` | | | |
 | `readonly`, `disabled` | boolean | — | |
+| `toggle` | boolean or `(shown) => node` | `true` | `false` removes the show / hide button; a function draws its content |
+| `labels` | `{ show?, hide?, showPassword?, hidePassword? }` | "Show", "Hide", "Show password", "Hide password" | button text and its accessible name |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+An icon instead of the text: `<PasswordInput bind:value={$pw} toggle={(shown) => <Icon of={shown ? eyeOff : eye} />} />`;
+your own words: `labels={{ show: "Göster", hide: "Gizle" }}`; no button: `toggle={false}`.
 
 ## Accessibility
 

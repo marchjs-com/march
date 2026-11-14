@@ -20,3 +20,5 @@
 .hm-otp-sep { flex: none; width: .5rem; height: 2px; border-radius: 2px; background: var(--hm-border-strong); }
 /* errors win over every color */
 .hm-otp-box[aria-invalid="true"], [aria-invalid="true"] .hm-otp-box { --hm-box-c: var(--hm-danger); border-color: var(--hm-danger); }
+/* your own separator (`separator` prop): content instead of the drawn dash */
+.hm-otp-sep-own { flex: none; display: inline-flex; align-items: center; color: var(--hm-muted); }

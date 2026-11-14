@@ -22,3 +22,10 @@ test("Slider: range input, value both ways, formatted output", () => {
   assert.equal(v(), 45);
   assert.equal(el.querySelector("output").textContent, "45 pts");
 });
+
+test("Slider: the value next to it can go", () => {
+  const a = mount(() => h(Slider, { value: 4, showValue: false }));
+  assert.equal(a.el.querySelector("output"), null);
+  assert.ok(a.el.querySelector("input[type=range]"));
+  a.dispose();
+});

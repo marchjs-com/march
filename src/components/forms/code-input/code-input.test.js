@@ -35,3 +35,25 @@ test("CodeInput: mask turns boxes into password fields", () => {
   const { el } = mount(() => h(CodeInput, { length: 4, mask: true }));
   assert.ok(el.querySelectorAll(".hm-otp-box").every((b) => b.getAttribute("type") === "password"));
 });
+
+test("CodeInput: the separator can go or be replaced; box names and the pop are yours", () => {
+  const off = mount(() => h(CodeInput, { length: 6, groups: [3, 3], separator: false }));
+  assert.equal(off.el.querySelector(".hm-otp-sep"), null);
+  assert.equal(off.el.querySelector(".hm-otp-sep-own"), null);
+  assert.equal(off.el.querySelectorAll("input").length, 6);
+  off.dispose();
+  const popped = [];
+  const own = mount(() => h(CodeInput, { length: 4, groups: [2, 2], separator: "/", boxLabel: (i, n) => `Digit ${i}/${n}`, animate: (box) => popped.push(box) }));
+  assert.equal(own.el.querySelector(".hm-otp-sep"), null);
+  assert.equal(own.el.querySelector(".hm-otp-sep-own").textContent, "/");
+  const first = own.el.querySelector("input");
+  assert.equal(first.getAttribute("aria-label"), "Digit 1/4");
+  type(first, "7");
+  assert.ok(popped.length <= 1); // none with reduced motion, one otherwise
+  if (popped.length) assert.equal(popped[0], first);
+  own.dispose();
+  const def = mount(() => h(CodeInput, { length: 4, groups: [2, 2] }));
+  assert.ok(def.el.querySelector(".hm-otp-sep"));
+  assert.equal(def.el.querySelector("input").getAttribute("aria-label"), "Character 1 of 4");
+  def.dispose();
+});

@@ -7,7 +7,12 @@ import { t } from "../../../core/i18n.ts";
 import { model, ctl, cx, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { textAttrs, inputOf, type TextAttrProps } from "../../../forms/affix.ts";
 
-export interface PasswordInputProps extends ControlProps<string>, TextAttrProps {}
+export interface PasswordInputProps extends ControlProps<string>, TextAttrProps {
+  /** The show / hide button: `false` removes it; a function draws its content (`(shown) => <Icon of={shown ? eyeOff : eye} />`). */
+  toggle?: boolean | ((shown: boolean) => unknown) | undefined;
+  /** Texts: `show` / `hide` (the button text), `showPassword` / `hidePassword` (its accessible name). */
+  labels?: { show?: unknown; hide?: unknown; showPassword?: string | undefined; hidePassword?: string | undefined } | undefined;
+}
 
 /** Password with a show / hide toggle. `autocomplete` defaults to "current-password" (use "new-password" on sign-up). */
 export function PasswordInput(props: PasswordInputProps): unknown {
@@ -18,7 +23,9 @@ export function PasswordInput(props: PasswordInputProps): unknown {
     autocomplete: props.autocomplete ?? "current-password", spellcheck: "false", onInput: (e: Event) => set(inputOf(e).value),
   }) as HTMLInputElement;
   syncValue(el, get);
-  return h("span", { class: cx("hm-affix hm-password", props.class) }, el,
-    h("button", { type: "button", class: "hm-affix-btn", "aria-pressed": () => String(show()), "aria-label": () => (show() ? t`Hide password` : t`Show password`),
-      disabled: () => !!props.disabled, onClick: () => show.set(!show.peek()) }, () => (show() ? t`Hide` : t`Show`)));
+  const draw = typeof props.toggle === "function" ? props.toggle : null;
+  return h("span", { class: () => cx("hm-affix hm-password", props.class) }, el,
+    props.toggle === false ? null : h("button", { type: "button", class: cx("hm-affix-btn hm-password-toggle", draw && "is-own"), "aria-pressed": () => String(show()),
+      "aria-label": () => (show() ? props.labels?.hidePassword ?? t`Hide password` : props.labels?.showPassword ?? t`Show password`),
+      disabled: () => !!props.disabled, onClick: () => show.set(!show.peek()) }, () => (draw ? draw(show()) : show() ? props.labels?.hide ?? t`Hide` : props.labels?.show ?? t`Show`)));
 }

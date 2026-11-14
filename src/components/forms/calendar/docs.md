@@ -22,6 +22,15 @@ never shifts a day. The first weekday and the names come from the locale; days o
 | `rangeFrom`, `rangeTo` | IsoDate | — | highlight |
 | `onPick`, `onEscape` | functions | — | |
 | `autoFocus` | boolean | — | focus the current day |
+| `labels` | `{ prevMonth?, nextMonth? }` | "Previous month" / "Next month" | names of the month buttons |
+| `nav` | boolean | `true` | `false` removes the month buttons (PageUp / PageDown still work) |
+| `prevIcon`, `nextIcon` | node, text or `() => node` | chevrons | content of the month buttons |
+| `weekdays` | boolean | `true` | `false` removes the weekday row |
+| `renderDay` | `(iso, day) => node` | the day number | content of a day cell |
+| `class`, `color` | | — | `color` is a theme token (selection, today ring, range) |
+
+Every part is yours: `<Calendar bind:value={$day} color="brand-orange" weekdays={false} prevIcon="‹" nextIcon="›"
+labels={{ prevMonth: "Önceki ay", nextMonth: "Sonraki ay" }} renderDay={(iso, d) => busy.has(iso) ? <b>{d}</b> : d} />`.
 
 ## Accessibility
 

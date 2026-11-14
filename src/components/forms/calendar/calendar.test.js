@@ -29,3 +29,21 @@ test("Calendar: grid keyboard, min / max clamping, aria states", () => {
   key(grid, "Enter");
   assert.equal(v(), "2026-04-20");
 });
+
+test("Calendar: month buttons, weekday row, labels, icons, day content and color are yours", () => {
+  const { el, dispose } = mount(() => h(Calendar, { value: "2026-03-14", labels: { prevMonth: "Back", nextMonth: "Forward" }, prevIcon: "<", nextIcon: () => h("b", {}, ">"), weekdays: false, renderDay: (_iso, d) => `${d}.`, color: "brand-orange" }));
+  const [p, n] = el.querySelectorAll(".hm-cal-nav");
+  assert.equal(p.getAttribute("aria-label"), "Back");
+  assert.equal(n.getAttribute("aria-label"), "Forward");
+  assert.equal(p.textContent, "<");
+  assert.equal(n.querySelector("b").textContent, ">");
+  assert.equal(el.querySelector(".hm-cal-head"), null);
+  assert.equal(el.querySelector('[data-date="2026-03-14"]').textContent, "14.");
+  assert.equal(el.querySelector(".hm-cal").getAttribute("data-hm-color"), "brand-orange");
+  dispose();
+  const m = mount(() => h(Calendar, { value: "2026-03-14", nav: false }));
+  assert.equal(m.el.querySelector(".hm-cal-nav"), null);
+  assert.ok(m.el.querySelector(".hm-cal-head"));
+  assert.equal(m.el.querySelector('[data-date="2026-03-14"]').textContent, "14");
+  m.dispose();
+});

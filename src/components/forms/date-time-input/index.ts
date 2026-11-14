@@ -6,7 +6,7 @@ import { t } from "../../../core/i18n.ts";
 import { toDate } from "../../../core/pipes.ts";
 import { model, cx, uid, useField, live, type ControlProps } from "../../../forms/util.ts";
 import { isoOf, ymd, pad2 as pad, type IsoDate } from "../../../core/date.ts";
-import { DatePicker } from "../date-picker/index.ts";
+import { DatePicker, type DatePickerProps } from "../date-picker/index.ts";
 import { TimeInput } from "../time-input/index.ts";
 
 export interface DateTimeInputProps extends ControlProps<string | null> {
@@ -15,6 +15,10 @@ export interface DateTimeInputProps extends ControlProps<string | null> {
   firstDay?: number | undefined;
   /** Time used when only a date is picked ("00:00"). */
   defaultTime?: string | undefined;
+  /** Accessible name of the time field (default "Time"). */
+  timeLabel?: string | undefined;
+  /** Extra props for the DatePicker (`{ icon, labels, calendar, locale, placeholder }`). */
+  picker?: Partial<DatePickerProps> | undefined;
 }
 
 /** Date + time; value is an ISO timestamp (UTC, like `new Date().toISOString()`), edited in local time. */
@@ -36,7 +40,7 @@ export function DateTimeInput(props: DateTimeInputProps): unknown {
     set(new Date(y, m - 1, dd, hh || 0, mm || 0).toISOString());
   };
   const field = useField();
-  return h("span", { class: cx("hm-datetime", props.class) },
-    h(DatePicker, { id: props.id ?? field?.id, value: live(() => date()), setValue: (v) => { date.set(v); emit(); }, min: props.min, max: props.max, disabled: live(() => props.disabled), readonly: live(() => props.readonly), onBlur: props.onBlur, firstDay: props.firstDay }),
-    h(TimeInput, { id: uid("hm-time"), "aria-label": t`Time`, value: live(() => time()), setValue: (v) => { time.set(v); emit(); }, disabled: live(() => props.disabled), readonly: live(() => props.readonly) }));
+  return h("span", { class: () => cx("hm-datetime", props.class) },
+    h(DatePicker, { color: props.color, ...props.picker, id: props.id ?? field?.id, value: live(() => date()), setValue: (v) => { date.set(v); emit(); }, min: props.min, max: props.max, disabled: live(() => props.disabled), readonly: live(() => props.readonly), onBlur: props.onBlur, firstDay: props.firstDay }),
+    h(TimeInput, { id: uid("hm-time"), "aria-label": live(() => props.timeLabel ?? t`Time`), color: props.color, value: live(() => time()), setValue: (v) => { time.set(v); emit(); }, disabled: live(() => props.disabled), readonly: live(() => props.readonly) }));
 }

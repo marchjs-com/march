@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-type V = { length: number; pattern: string; colors: string; font: string; size: string; variant: string; groups: boolean; mask: boolean }
+type V = { length: number; pattern: string; colors: string; font: string; size: string; variant: string; groups: boolean; mask: boolean; separator: string }
 
 export default definePlayground<V>({
   options: [
@@ -13,6 +13,7 @@ export default definePlayground<V>({
     { key: "variant", label: "Biçim", default: "outline", options: ["outline", "filled", "underline"] },
     // two groups need at least four boxes
     { key: "groups", label: "Gruplu", default: true, visibleWhen: (v) => v.length >= 4 },
+    { key: "separator", label: "Grup ayracı", default: "dash", options: [{ value: "dash", label: "çizgi" }, { value: "dot", label: "nokta (kendi işaretim)" }, { value: "off", label: "yok" }], visibleWhen: (v) => v.groups && v.length >= 4 },
     { key: "mask", label: "Gizli (PIN)", default: false },
   ],
 });

@@ -31,3 +31,23 @@ test("ListEditor: paste lines, edit, reorder, remove, Enter adds, max caps", () 
   assert.deepEqual(v(), ["c", "B", "d", "e"]);
   assert.equal(draft.hasAttribute("disabled"), true, "full at max");
 });
+
+test("ListEditor: row buttons can go or be redrawn; their names are yours", () => {
+  const a = mount(() => h(ListEditor, { value: ["a", "b"], labels: { item: (n) => `Row ${n}`, moveUp: "Up", moveDown: "Down", remove: "Drop" }, icons: { up: "U", down: () => h("b", {}, "D"), remove: "X" } }));
+  const row = a.el.querySelectorAll(".hm-list-row")[1];
+  assert.equal(row.querySelector("input").getAttribute("aria-label"), "Row 2");
+  const btns = row.querySelectorAll(".hm-icon-btn");
+  assert.deepEqual(btns.map((b) => b.getAttribute("aria-label")), ["Up", "Down", "Drop"]);
+  assert.deepEqual(btns.map((b) => b.textContent), ["U", "D", "X"]);
+  a.dispose();
+  const v = signal(["a", "b"]);
+  const b = mount(() => h(ListEditor, { "bind:value": v, sortable: false, addable: false }));
+  assert.equal(b.el.querySelectorAll(".hm-list-row")[0].querySelectorAll(".hm-icon-btn").length, 1);
+  assert.equal(b.el.querySelector(".hm-list-add"), null);
+  b.el.querySelector(".hm-icon-btn").click();
+  assert.deepEqual(v(), ["b"]);
+  b.dispose();
+  const c = mount(() => h(ListEditor, { value: ["a"], removable: false }));
+  assert.equal(c.el.querySelectorAll(".hm-list-row .hm-icon-btn").length, 2);
+  c.dispose();
+});

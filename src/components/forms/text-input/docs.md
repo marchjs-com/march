@@ -21,6 +21,7 @@ with the right keyboard, autocomplete and trimming.
 | `transform` | `(v) => string` | — | rewrites typed text (e.g. upper-case) |
 | `readonly`, `disabled`, `autofocus` | boolean | — | |
 | `color` | ColorToken | primary | focus ring, caret and selection |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 ## Accessibility
 

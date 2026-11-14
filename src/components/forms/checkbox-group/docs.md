@@ -17,6 +17,7 @@ the usual ones for groups), `inline` lays them in a row, and `colors="brand"` gi
 | `inline` | boolean | — | a row instead of a column |
 | `variant`, `size`, `shape`, `color` | | | as Checkbox |
 | `colors` | `"brand"` or tokens | — | one color per option in turn |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 ## Accessibility
 

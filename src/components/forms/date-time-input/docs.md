@@ -15,6 +15,11 @@ in local time. Picking only a date uses `defaultTime`.
 | `min`, `max` | IsoDate | — | for the date part |
 | `firstDay` | 0–6 | locale | |
 | `defaultTime` | `"HH:MM"` | `"00:00"` | |
+| `timeLabel` | string | "Time" | accessible name of the time field |
+| `picker` | `Partial<DatePickerProps>` | — | extra props for the DatePicker (`icon`, `labels`, `calendar`, `locale`, `placeholder`) |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+`<DateTimeInput bind:value={$at} timeLabel="Saat" picker={{ icon: false, labels: { choose: "Gün seç" } }} />`.
 
 ## Accessibility
 

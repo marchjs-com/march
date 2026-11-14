@@ -27,3 +27,21 @@ test("KeyValueEditor: rows → object, numbers, duplicate keys flagged", () => {
   const ro = mount(() => h(KeyValueEditor, { value: { x: "1" }, readonly: true }));
   assert.equal(ro.el.querySelector(".hm-kv-add"), null);
 });
+
+test("KeyValueEditor: texts, the remove button and the add button are yours", () => {
+  const a = mount(() => h(KeyValueEditor, { value: { a: "1" }, labels: { key: "Name", value: "Content", remove: "Drop", add: "New line" }, removeIcon: "del" }));
+  const [k, v] = a.el.querySelectorAll(".hm-kv-row input");
+  assert.equal(k.getAttribute("aria-label"), "Name");
+  assert.equal(k.getAttribute("placeholder"), "Name");
+  assert.equal(v.getAttribute("aria-label"), "Content");
+  const x = a.el.querySelector(".hm-kv-row .hm-icon-btn");
+  assert.equal(x.getAttribute("aria-label"), "Drop");
+  assert.equal(x.textContent, "del");
+  assert.equal(a.el.querySelector(".hm-kv-add").textContent, "New line");
+  a.dispose();
+  const b = mount(() => h(KeyValueEditor, { value: { a: "1" }, removable: false, addable: false }));
+  assert.equal(b.el.querySelector(".hm-icon-btn"), null);
+  assert.equal(b.el.querySelector(".hm-kv-add"), null);
+  assert.equal(b.el.querySelectorAll(".hm-kv-row input").length, 2);
+  b.dispose();
+});

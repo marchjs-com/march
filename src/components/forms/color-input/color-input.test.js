@@ -24,3 +24,23 @@ test("ColorInput: swatch and text stay in sync; invalid text leaves the swatch",
   type(swatch, "#78BE3A");
   assert.equal(text.value, "#78be3a");
 });
+
+test("ColorInput: either part can go; the swatch name and the placeholder are yours", () => {
+  const a = mount(() => h(ColorInput, { value: "#ff6600", swatch: false, placeholder: "#hex" }));
+  assert.equal(a.el.querySelector(".hm-color-swatch"), null);
+  assert.equal(a.el.querySelector(".hm-color-text").getAttribute("placeholder"), "#hex");
+  a.dispose();
+  const v = signal("#ff6600");
+  const b = mount(() => h(ColorInput, { "bind:value": v, text: false, id: "c1", swatchLabel: "Brand color" }));
+  assert.equal(b.el.querySelector(".hm-color-text"), null);
+  const sw = b.el.querySelector(".hm-color-swatch");
+  assert.equal(sw.getAttribute("id"), "c1");
+  assert.equal(sw.getAttribute("aria-label"), "Brand color");
+  type(sw, "#00AA00");
+  assert.equal(v(), "#00aa00");
+  b.dispose();
+  const c = mount(() => h(ColorInput, { value: "" }));
+  assert.equal(c.el.querySelector(".hm-color-swatch").getAttribute("aria-label"), "Pick a color");
+  assert.equal(c.el.querySelector(".hm-color-text").getAttribute("placeholder"), "#RRGGBB");
+  c.dispose();
+});

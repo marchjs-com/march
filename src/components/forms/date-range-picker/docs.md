@@ -17,6 +17,14 @@ returns the built-in presets for your own list.
 | `presets` | `RangePreset[]` or `false` | built-in | |
 | `today` | IsoDate | today | base of the built-in presets |
 | `min`, `max`, `firstDay` | | | for the custom pair |
+| `labels` | `{ range?, custom?, from?, to? }` | "Date range", "Custom", "From", "To" | |
+| `custom` | boolean | `true` | `false` removes the "Custom" option |
+| `separator` | `false`, node, text or `() => node` | "–" | between the two date fields |
+| `picker` | `Partial<DatePickerProps>` | — | extra props for both DatePickers (`icon`, `labels`, `calendar`, `locale`) |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+`<DateRangePicker bind:value={$r} labels={{ custom: "Kendi aralığım", from: "Başlangıç", to: "Bitiş" }} separator="→"
+picker={{ icon: false }} />`; `custom={false}` offers only the presets. Preset texts come from your `presets`.
 
 ## Accessibility
 

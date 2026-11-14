@@ -18,6 +18,13 @@ Stars to give or show a score. Editable it is a radio group: click or use the ar
 | `color` | colour token | the theme's primary | |
 | `label` | `string` / accessor | "Rating" (translated) | |
 | `class` | class value | | |
+| `icon` | icon or `(n) => node` | star outline | the empty mark |
+| `iconOn` | icon or `(n) => node` | filled star (or `icon`) | the filled mark |
+| `starLabel` | `(n, max) => string` | "3 of 5" | accessible name of a mark |
+| `animate` | boolean | `true` | `false`: no hover growth, no fade |
+
+Hearts instead of stars: `<Rating bind:value={$v} icon={heart} iconOn={heartFilled} color="danger"
+starLabel={(n, max) => `${max} üzerinden ${n}`} animate={false} />`; `icon={(n) => <b>{n}</b>}` draws anything.
 
 ## Accessibility
 

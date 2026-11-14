@@ -8,6 +8,7 @@ import { t } from "../../../core/i18n.ts";
 import { floating } from "../../../ui/popover.ts";
 import { model, ctl, cx, uid, debounce, listNav, fold, same, normOptions, type ControlProps, type Option, type OptionsProp } from "../../../forms/util.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
+import { ownPart } from "../../../forms/rows.ts";
 
 export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]> {
   /** Static options: [value] or [{ value, label, hint, disabled }]. */
@@ -28,6 +29,14 @@ export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]>
   /** Array value, chips. */
   multiple?: boolean | undefined;
   onSelect?: ((o: Option) => void) | undefined;
+  /** Texts the list and the chips write themselves (defaults: "Searching…", "Type to search", "No results", "Search failed: …", "Remove …"). */
+  labels?: {
+    searching?: unknown; typeToSearch?: unknown; noResults?: unknown;
+    searchFailed?: ((message: string) => unknown) | undefined;
+    remove?: ((label: string) => string) | undefined;
+  } | undefined;
+  /** The remove button of a chip (`multiple`): `false` removes it (Backspace still removes), a node / text / `() => node` replaces the "×". */
+  removeIcon?: unknown;
 }
 
 /**
@@ -128,16 +137,17 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
   }) as HTMLInputElement;
   effect(() => { const l = multi ? "" : labelOf(get()); untrack(() => { if (!editing && input.value !== l) input.value = l; }); });
   effect(() => { const i = active(); if (open() && i >= 0) untrack(() => globalThis.document?.getElementById(`${listId}-${i}`)?.scrollIntoView?.({ block: "nearest" })); });
-  const status = (text: string) => h("div", { class: "hm-listbox-status", role: "status" }, text);
+  const status = (text: unknown) => h("div", { class: "hm-listbox-status", role: "status" }, text);
   const panel = () => floating({
     anchor: wrap, class: "hm-listbox", role: "listbox", id: listId, onClose: () => { close(); restore(); },
     attrs: { "aria-multiselectable": multi ? "true" : null, "aria-label": props["aria-label"] ?? null },
     children: () => {
       const list = items();
-      if (error()) return status(t`Search failed: ${error()}`);
-      if (loading() && !list.length) return status(t`Searching…`);
-      if (props.search && remote() == null) return status(t`Type to search`);
-      if (!list.length) return status(t`No results`);
+      const lb = props.labels;
+      if (error()) return status(lb?.searchFailed ? lb.searchFailed(error()!) : t`Search failed: ${error()}`);
+      if (loading() && !list.length) return status(lb?.searching ?? t`Searching…`);
+      if (props.search && remote() == null) return status(lb?.typeToSearch ?? t`Type to search`);
+      if (!list.length) return status(lb?.noResults ?? t`No results`);
       return list.map((o, i) => h("div", {
         role: "option", id: `${listId}-${i}`, class: "hm-option", "class:hm-active": () => active() === i,
         "aria-selected": () => String(isSel(o.value)), "aria-disabled": o.disabled ? "true" : null,
@@ -145,11 +155,11 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
       }, props.renderOption ? props.renderOption(o) : [h("span", { class: "hm-option-label" }, o.label), o.hint ? h("small", { class: "hm-hint" }, o.hint) : null]));
     },
   });
-  wrap = h("div", { class: cx("hm-combo", multi && "hm-multi", props.class), "class:hm-disabled": () => !!props.disabled, onClick: (e: MouseEvent) => { if (e.target === wrap) input.focus(); } },
+  wrap = h("div", { class: () => cx("hm-combo", multi && "hm-multi", props.class), "class:hm-disabled": () => !!props.disabled, onClick: (e: MouseEvent) => { if (e.target === wrap) input.focus(); } },
     multi ? () => (getList() ?? []).map((v) => {
       const label = labelOf(v);
       return h("span", { class: "hm-chip" }, h(OverflowText, { class: "hm-chip-label" }, label),
-        props.readonly || props.disabled ? null : h("button", { type: "button", class: "hm-chip-x", "aria-label": t`Remove ${label}`, onClick: () => { removeAt(v); input.focus(); } }, "×"));
+        props.readonly || props.disabled || props.removeIcon === false ? null : h("button", { type: "button", class: "hm-chip-x", "aria-label": props.labels?.remove?.(label) ?? t`Remove ${label}`, onClick: () => { removeAt(v); input.focus(); } }, ownPart(props.removeIcon, () => "×")));
     }) : null,
     input,
     () => (open() ? panel() : null));

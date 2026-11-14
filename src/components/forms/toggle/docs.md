@@ -15,6 +15,7 @@ pages); the track takes the color token when on.
 | `label` or children | node | — | |
 | `color` | ColorToken | primary | track color when on |
 | `disabled`, `readonly` | boolean | — | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 ## Accessibility
 

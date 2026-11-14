@@ -2,7 +2,7 @@
 import "./phone-input.css";
 import "../../../ui/field.css";
 import { h } from "../../../dom/h.ts";
-import { model, ctl, extend, syncValue, type ControlProps } from "../../../forms/util.ts";
+import { model, ctl, cx, extend, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { affix, textAttrs, inputOf, type AffixProps, type TextAttrProps } from "../../../forms/affix.ts";
 
 /** Normalize a typed phone number to "+" and digits; `country` ("+90") is prepended to national numbers. */
@@ -23,7 +23,7 @@ export interface PhoneInputProps extends ControlProps<string>, TextAttrProps, Af
 export function PhoneInput(props: PhoneInputProps): unknown {
   const [get, set] = model(props, "");
   const el = h("input", {
-    ...ctl(props), ...textAttrs(props), type: "tel", inputmode: "tel", autocomplete: props.autocomplete ?? "tel", class: "hm-input hm-phone",
+    ...ctl(props), ...textAttrs(props), type: "tel", inputmode: "tel", autocomplete: props.autocomplete ?? "tel", class: cx("hm-input hm-phone", props.country == null && props.prefix == null && props.suffix == null && props.class),
     onInput: (e: Event) => set(normalizePhone(inputOf(e).value, props.country)),
   }) as HTMLInputElement;
   syncValue(el, () => { const v = get() ?? "", c = props.country; return c && v.startsWith(c) ? v.slice(c.length) : v; });

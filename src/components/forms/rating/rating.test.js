@@ -27,3 +27,21 @@ test("Rating: a radio group; click and ArrowRight set the value; read-only shows
   assert.ok(half.classList.contains("is-half"));
   assert.ok(half.disabled);
 });
+
+test("Rating: the marks, their names and the motion are yours", () => {
+  const heart = { name: "t-heart", d: ["M12 21l-8-8a5 5 0 0 1 8-6 5 5 0 0 1 8 6z"] };
+  const el = mount(() => [
+    h(Rating, { value: 2, max: 3, icon: heart, starLabel: (n, max) => `${n} hearts of ${max}`, animate: false }),
+    h(Rating, { value: 1, max: 2, icon: (n) => h("b", { class: "own-off" }, String(n)), iconOn: (n) => h("b", { class: "own-on" }, String(n)) }),
+    h(Rating, { value: 1, max: 2 }),
+  ]);
+  const [a, b, c] = el.querySelectorAll(".hm-rating");
+  assert.ok(a.className.includes("is-still"));
+  assert.equal(a.querySelectorAll(".hm-rating-star")[1].getAttribute("aria-label"), "2 hearts of 3");
+  assert.equal(a.querySelectorAll("svg").length, 6);
+  assert.equal(b.querySelectorAll("svg").length, 0);
+  assert.deepEqual(b.querySelectorAll(".own-on").map((x) => x.textContent), ["1", "2"]);
+  assert.equal(b.querySelectorAll(".own-off").length, 2);
+  assert.ok(!c.className.includes("is-still"));
+  assert.equal(c.querySelector(".hm-rating-star").getAttribute("aria-label"), "1 of 2");
+});

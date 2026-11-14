@@ -8,7 +8,8 @@ import { t, locale } from "../../../core/i18n.ts";
 import { floating } from "../../../ui/popover.ts";
 import { model, ctl, cx, live, type ControlProps } from "../../../forms/util.ts";
 import { isoOf, utcDate as utc, fromUtc, isIso, dateFormat as dtf, type IsoDate } from "../../../core/date.ts";
-import { Calendar } from "../calendar/index.ts";
+import { Calendar, type CalendarProps } from "../calendar/index.ts";
+import { ownPart } from "../../../forms/rows.ts";
 
 const NUMERIC: Intl.DateTimeFormatOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
 
@@ -50,6 +51,12 @@ export interface DatePickerProps extends ControlProps<IsoDate | null> {
   firstDay?: number | undefined;
   locale?: string | undefined;
   placeholder?: string | null | undefined;
+  /** The calendar button: `false` removes it (Alt+ArrowDown still opens the calendar), a node / text / `() => node` replaces the icon. */
+  icon?: unknown;
+  /** Accessible names: `choose` (the button and the popover, default "Choose date"), `prevMonth`, `nextMonth` (the calendar). */
+  labels?: { choose?: string | undefined; prevMonth?: string | undefined; nextMonth?: string | undefined } | undefined;
+  /** Extra props for the Calendar in the popover (`{ renderDay, weekdays: false, prevIcon, nextIcon, isDisabled }`). */
+  calendar?: Partial<CalendarProps> | undefined;
 }
 
 /** Date input with a calendar popover. Value: ISO date string or null. Props: min, max, firstDay, locale, placeholder. */
@@ -77,14 +84,16 @@ export function DatePicker(props: DatePickerProps): unknown {
   effect(() => { const s = formatDate(get(), loc()); untrack(() => { if (globalThis.document?.activeElement !== input || parseDate(input.value, loc()) !== get()) input.value = s; }); });
   const toggle = (on = !open.peek()) => { if (!props.disabled && !props.readonly) open.set(on); };
   const close = (refocus?: boolean) => { open.set(false); if (refocus) input.focus(); };
-  const btn = h("button", {
-    type: "button", class: "hm-affix-btn", "aria-label": t`Choose date`, "aria-haspopup": "dialog", "aria-expanded": () => String(open()),
+  const choose = () => props.labels?.choose ?? t`Choose date`;
+  const btn = props.icon === false ? null : h("button", {
+    type: "button", class: "hm-affix-btn hm-date-btn", "aria-label": choose, "aria-haspopup": "dialog", "aria-expanded": () => String(open()),
     disabled: () => !!(props.disabled || props.readonly), onClick: () => toggle(),
-  }, calIcon());
-  wrap = h("span", { class: cx("hm-affix hm-date", props.class) }, input, btn,
+  }, ownPart(props.icon, calIcon));
+  wrap = h("span", { class: () => cx("hm-affix hm-date", props.class) }, input, btn,
     () => (open() ? floating({
-      anchor: wrap, class: "hm-cal-pop", role: "dialog", attrs: { "aria-label": t`Choose date` }, onClose: close,
+      anchor: wrap, class: "hm-cal-pop", role: "dialog", attrs: { "aria-label": choose() }, onClose: close,
       children: h(Calendar, {
+        color: props.color, labels: props.labels, ...props.calendar,
         value: live(() => get()), setValue: (v) => set(v), min: live(() => props.min), max: live(() => props.max),
         firstDay: props.firstDay, locale: live(() => loc()), autoFocus: true, onPick: () => close(true), onEscape: () => close(true),
       }),

@@ -16,6 +16,7 @@ as TextInput.
 | `autosize` | boolean | `true` | grow with the content |
 | `placeholder`, `maxLength`, `minLength`, `spellcheck` | | | passed to the textarea |
 | `readonly`, `disabled` | boolean | — | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 ## Accessibility
 

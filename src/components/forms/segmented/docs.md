@@ -15,6 +15,7 @@ periods). Arrow keys move and select; only the chosen button is in the Tab order
 | `options` | `[value]` or `[{ value, label, disabled }]` | — | |
 | `color` | ColorToken | — | tints the chosen segment |
 | `disabled`, `readonly` | boolean | — | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 ## Accessibility
 

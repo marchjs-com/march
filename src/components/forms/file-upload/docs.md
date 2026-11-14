@@ -21,6 +21,14 @@ function each file shows its progress and can be cancelled, and the value become
 | `upload` | `(file, { onProgress, signal }) => Promise` | — | progress: 0…1 or `{ loaded, total }` |
 | `label` | node | "Drop a file here or click to choose" | |
 | `onError` | `(message, file) => void` | — | |
+| `hint` | `false`, node, text or `() => node` | accept · max size | the small line under the drop text |
+| `preview` | boolean | `true` | `false`: no thumbnails / audio players |
+| `removeIcon` | node, text or `() => node` | "×" | content of a file's remove button |
+| `labels` | `{ max?(size), uploaded?, cancel?, uploading?(name), cancelUpload?(name), remove?(name), typeNotAllowed?(name), tooLarge?(name, max), tooMany?(max) }` | built-in texts | every other text, including the rejection messages |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+`<FileUpload multiple label="Dosyaları bırak" hint="PNG ya da JPG, en çok 5 MB" preview={false}
+removeIcon={() => <Icon of={trash} />} labels={{ uploaded: "Tamam", cancel: "Vazgeç", tooLarge: (n, max) => `${n} çok büyük (${max})` }} />`.
 
 ## Accessibility
 

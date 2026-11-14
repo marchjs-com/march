@@ -4,7 +4,7 @@ import "../../../ui/field.css";
 import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { locale } from "../../../core/i18n.ts";
-import { model, ctl, extend, parseNumber, formatNumber, type ControlProps } from "../../../forms/util.ts";
+import { model, ctl, cx, extend, parseNumber, formatNumber, type ControlProps } from "../../../forms/util.ts";
 import { affix, textAttrs, inputOf, type AffixProps, type TextAttrProps } from "../../../forms/affix.ts";
 
 const precise = <N extends number | null | undefined>(n: N): N => (n == null ? n : (Number(n.toPrecision(15)) as N));
@@ -49,7 +49,7 @@ export function NumberInput(props: NumberInputProps): unknown {
     el.value = untrack(() => shown(get()));
   };
   el = h("input", {
-    ...base, ...textAttrs(props), type: "text", class: "hm-input hm-number",
+    ...base, ...textAttrs(props), type: "text", class: cx("hm-input hm-number", props.prefix == null && props.suffix == null && props.class),
     inputmode: props.inputmode ?? (props.decimals === 0 && (props.min ?? -1) >= 0 ? "numeric" : "decimal"), autocomplete: props.autocomplete ?? "off",
     "aria-invalid": () => (bad() || inv() ? "true" : null),
     onInput: (e: Event) => {

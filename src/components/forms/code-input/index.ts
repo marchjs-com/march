@@ -8,6 +8,7 @@ import { model, ctl, cx, uid, syncValue, labelledBy, useField, type ControlProps
 import { inputOf } from "../../../forms/affix.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { clamp } from "../../../core/util.ts";
+import { ownPart } from "../../../forms/rows.ts";
 
 export interface CodeInputProps extends ControlProps<string> {
   /** Number of boxes, 3–12 (default 6). */
@@ -34,8 +35,12 @@ export interface CodeInputProps extends ControlProps<string> {
   size?: "sm" | "md" | "lg" | undefined;
   /** "outline" (default), "filled" or "underline". */
   variant?: "outline" | "filled" | "underline" | undefined;
-  /** Pop the character in (default true; off with prefers-reduced-motion). */
-  animate?: boolean | undefined;
+  /** Pop the character in (default true; off with prefers-reduced-motion). `false`: no motion; a function: your own (`(box) => animate(box, …)`). */
+  animate?: boolean | ((box: HTMLElement) => void) | undefined;
+  /** The mark between groups: `false` removes it, a node / text / `() => node` replaces the drawn dash. */
+  separator?: unknown;
+  /** Accessible name of a box: `(position, length) => text` (default "Character 2 of 6"). */
+  boxLabel?: ((position: number, length: number) => string) | undefined;
   onComplete?: ((code: string) => void) | undefined;
   autofocus?: boolean | undefined;
 }
@@ -72,6 +77,7 @@ export function CodeInput(props: CodeInputProps): unknown {
   };
   const pop = (el: HTMLElement): void => {
     if (props.animate === false || reducedMotion()) return;
+    if (typeof props.animate === "function") { props.animate(el); return; }
     animateEl(el, [{ transform: "scale(.82)" }, { transform: "scale(1)" }], { duration: 180, easing: "cubic-bezier(.34, 1.56, .64, 1)" });
   };
   const fill = (i: number, text: string) => {
@@ -97,7 +103,7 @@ export function CodeInput(props: CodeInputProps): unknown {
       type: () => (masked() ? "password" : "text"), class: () => cx("hm-otp-box", `hm-otp-b${(i % 4) + 1}`, cells()[i] && "is-filled"), id: i ? `${baseId}-${i}` : baseId,
       "data-hm-color": colorOf(i), inputmode: kind === "numeric" ? "numeric" : "text", pattern: kind === "numeric" ? "[0-9]*" : null, maxlength: 2,
       autocapitalize: upper ? "characters" : "off", spellcheck: "false",
-      autocomplete: i === 0 ? "one-time-code" : "off", "aria-label": t`Character ${i + 1} of ${n}`, "aria-invalid": c["aria-invalid"],
+      autocomplete: i === 0 ? "one-time-code" : "off", "aria-label": () => props.boxLabel?.(i + 1, n) ?? t`Character ${i + 1} of ${n}`, "aria-invalid": c["aria-invalid"],
       disabled: () => !!props.disabled, readonly: () => !!props.readonly, onBlur: props.onBlur, autofocus: i === 0 && props.autofocus ? true : null,
       onFocus: (e: FocusEvent) => inputOf(e).select?.(),
       onInput: (e: Event) => {
@@ -127,7 +133,8 @@ export function CodeInput(props: CodeInputProps): unknown {
   const sizes = props.groups?.length ? props.groups : [n];
   let k = 0;
   sizes.forEach((g, gi) => {
-    if (gi) parts.push(h("span", { class: "hm-otp-sep", "aria-hidden": "true" }));
+    if (gi && props.separator !== false && props.separator !== null) parts.push(props.separator === undefined || props.separator === true ? h("span", { class: "hm-otp-sep", "aria-hidden": "true" })
+      : h("span", { class: "hm-otp-sep-own", "aria-hidden": "true" }, ownPart(props.separator, () => null)));
     for (let x = 0; x < g && k < n; x++) parts.push(boxes[k++]);
   });
   while (k < n) parts.push(boxes[k++]);

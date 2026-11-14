@@ -23,6 +23,13 @@ Escape closes. `multiple` turns it into chips (see MultiSelect); `allowCustom` l
 | `labelOf` | `(value) => string` | — | label of a value not in the options |
 | `allowCustom`, `multiple` | boolean | — | |
 | `onSelect` | `(option) => void` | — | |
+| `labels` | `{ searching?, typeToSearch?, noResults?, searchFailed?(message), remove?(label) }` | built-in texts | list states and the chip remove name |
+| `removeIcon` | `false`, node, text or `() => node` | "×" | the remove button of a chip (`multiple`) |
+| `placeholder` | string | — | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+Your own texts and chip button: `<Combobox multiple bind:value={$tags} options={tags} removeIcon={() => <Icon of={x} />}
+labels={{ noResults: "Sonuç yok", typeToSearch: "Aramak için yaz", remove: (l) => `${l} etiketini kaldır` }} />`.
 
 ## Accessibility
 

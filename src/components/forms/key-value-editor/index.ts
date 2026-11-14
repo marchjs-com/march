@@ -14,6 +14,14 @@ export interface KeyValueEditorProps extends ControlProps<Record<string, string 
   valuePlaceholder?: string | undefined;
   /** Numeric-looking values become numbers. */
   numbers?: boolean | undefined;
+  /** Texts: `key` / `value` (accessible names and default placeholders), `remove`, `add` ("Add row"), `duplicate` ("Duplicate key"). */
+  labels?: { key?: string | undefined; value?: string | undefined; remove?: string | undefined; add?: unknown; duplicate?: unknown } | undefined;
+  /** The remove button of a row: `false` removes it. */
+  removable?: boolean | undefined;
+  /** The "Add row" button: `false` removes it. */
+  addable?: boolean | undefined;
+  /** Content of the remove button instead of the "×" icon (a node, text or `() => node`). */
+  removeIcon?: unknown;
 }
 
 /**
@@ -37,15 +45,15 @@ export function KeyValueEditor(props: KeyValueEditorProps): unknown {
   const ro = () => !!(props.disabled || props.readonly);
   const field = useField();
   const edit = (i: number, col: 0 | 1, v: string) => { const rs = rows.peek().map((r): Row => [...r]); rs[i]![col] = v; emit(rs); };
-  return h("div", { class: cx("hm-kv-editor", props.class), role: "group", "aria-labelledby": labelledBy(props) },
+  return h("div", { class: () => cx("hm-kv-editor", props.class), role: "group", "aria-labelledby": labelledBy(props) },
     h(For, { each: idx, children: (i: Accessor<number>) => {
-      const k = h("input", { type: "text", class: "hm-input", id: () => (i() === 0 ? props.id ?? field?.id : null), "aria-label": t`Key`, placeholder: () => props.keyPlaceholder ?? t`Key`, readonly: ro, "aria-invalid": () => (dup(i()) ? "true" : null), onInput: (e: Event) => edit(i.peek(), 0, (e.target as HTMLInputElement).value), onBlur: props.onBlur }) as HTMLInputElement;
-      const v = h("input", { type: "text", class: "hm-input", "aria-label": t`Value`, placeholder: () => props.valuePlaceholder ?? t`Value`, readonly: ro, onInput: (e: Event) => edit(i.peek(), 1, (e.target as HTMLInputElement).value), onBlur: props.onBlur }) as HTMLInputElement;
+      const k = h("input", { type: "text", class: "hm-input", id: () => (i() === 0 ? props.id ?? field?.id : null), "aria-label": () => props.labels?.key ?? t`Key`, placeholder: () => props.keyPlaceholder ?? props.labels?.key ?? t`Key`, readonly: ro, "aria-invalid": () => (dup(i()) ? "true" : null), onInput: (e: Event) => edit(i.peek(), 0, (e.target as HTMLInputElement).value), onBlur: props.onBlur }) as HTMLInputElement;
+      const v = h("input", { type: "text", class: "hm-input", "aria-label": () => props.labels?.value ?? t`Value`, placeholder: () => props.valuePlaceholder ?? props.labels?.value ?? t`Value`, readonly: ro, onInput: (e: Event) => edit(i.peek(), 1, (e.target as HTMLInputElement).value), onBlur: props.onBlur }) as HTMLInputElement;
       syncValue(k, () => rows()[i()]?.[0]);
       syncValue(v, () => rows()[i()]?.[1]);
       return h("div", { class: "hm-kv-row" }, k, v,
-        () => (ro() ? null : iconBtn(t`Remove`, "×", () => emit(rows.peek().filter((_, j) => j !== i.peek())))),
-        () => (dup(i()) ? h("span", { class: "hm-field-error", role: "alert" }, t`Duplicate key`) : null));
+        () => (ro() || props.removable === false ? null : iconBtn(props.labels?.remove ?? t`Remove`, "×", () => emit(rows.peek().filter((_, j) => j !== i.peek())), undefined, props.removeIcon)),
+        () => (dup(i()) ? h("span", { class: "hm-field-error", role: "alert" }, props.labels?.duplicate ?? t`Duplicate key`) : null));
     } }),
-    () => (ro() ? null : h("button", { type: "button", class: "hm-btn hm-kv-add", onClick: () => { rows.set([...rows.peek(), ["", ""]]); } }, t`Add row`)));
+    () => (ro() || props.addable === false ? null : h("button", { type: "button", class: "hm-btn hm-kv-add", onClick: () => { rows.set([...rows.peek(), ["", ""]]); } }, props.labels?.add ?? t`Add row`)));
 }

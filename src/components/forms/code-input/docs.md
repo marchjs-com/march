@@ -26,6 +26,13 @@ HADİ color and the display font, as in the HADİ apps; boxes shrink on narrow s
 | `uppercase` | boolean | letters: `true` | |
 | `animate` | boolean | `true` | the pop when a character lands (motion engine; off with reduced motion) |
 | `onComplete` | `(code) => void` | — | |
+| `separator` | `false`, node, text or `() => node` | a drawn dash | the mark between groups |
+| `boxLabel` | `(position, length) => string` | "Character 2 of 6" | accessible name of a box |
+| `animate` | boolean or `(box) => void` | `true` | `false`: no pop; a function: your own motion |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+Your own parts: `<CodeInput groups={[3, 3]} separator="·" boxLabel={(i, n) => `${n} hanenin ${i}.`}
+animate={(box) => animate(box, { opacity: [0, 1] }, { duration: 200 })} />`; `separator={false}` keeps the gap only.
 
 ## Accessibility
 

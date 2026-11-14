@@ -16,6 +16,7 @@ labels → Segmented; otherwise chips. Any other `kind` forces that look; `picke
 | `value` / `bind:value` | option value | `null` | |
 | `options` | `[value]` or `[{ value, label, hint?, disabled?, preview? }]` | — | |
 | `kind` | `auto` `segmented` `chips` `cards` `grid` `combobox` | `auto` | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 ## Accessibility
 

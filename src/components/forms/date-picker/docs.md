@@ -18,6 +18,13 @@ parseDate("14.3.2026", "de") // "2026-03-14"
 | `firstDay` | 0–6 | locale | |
 | `locale` | string | app locale | typing order and placeholder |
 | `placeholder` | string | e.g. `DD.MM.YYYY` | |
+| `icon` | `false`, node, text or `() => node` | a calendar icon | `false` removes the button (Alt+ArrowDown still opens) |
+| `labels` | `{ choose?, prevMonth?, nextMonth? }` | "Choose date" … | names of the button, the popover and the month buttons |
+| `calendar` | `Partial<CalendarProps>` | — | extra props for the Calendar (`renderDay`, `weekdays`, `prevIcon`, `isDisabled`…) |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+`<DatePicker bind:value={$d} icon={() => <Icon of={clock} />} labels={{ choose: "Gün seç" }}
+calendar={{ weekdays: false, renderDay: (iso, d) => d }} />`; `icon={false}` leaves a plain typed field.
 
 ## Accessibility
 

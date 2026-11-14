@@ -16,6 +16,16 @@ export interface ListEditorProps extends ControlProps<string[]> {
   /** Skip duplicates (default true). */
   unique?: boolean | undefined;
   addLabel?: string | undefined;
+  /** Accessible names: `item` (`(position) => text`, default "Item 2"), `moveUp`, `moveDown`, `remove`. */
+  labels?: { item?: ((position: number) => string) | undefined; moveUp?: string | undefined; moveDown?: string | undefined; remove?: string | undefined } | undefined;
+  /** The move up / down buttons: `false` removes them. */
+  sortable?: boolean | undefined;
+  /** The remove button of a row: `false` removes it (clearing a row's text still removes it). */
+  removable?: boolean | undefined;
+  /** The "add an item" line under the list: `false` removes it. */
+  addable?: boolean | undefined;
+  /** Content of the row buttons instead of the ↑ ↓ × icons (each a node, text or `() => node`). */
+  icons?: { up?: unknown; down?: unknown; remove?: unknown } | undefined;
 }
 
 /**
@@ -43,10 +53,10 @@ export function ListEditor(props: ListEditorProps): unknown {
     onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); const v = draft.value.trim(); if (v) { add([v]); draft.value = ""; } } },
     onPaste: (e: ClipboardEvent) => { const text = e.clipboardData?.getData("text") ?? ""; const lines = splitLines(text); if (lines.length > 1) { e.preventDefault(); add(lines); draft.value = ""; } },
   }) as HTMLInputElement;
-  return h("div", { class: cx("hm-list-editor", props.class), role: "group", "aria-labelledby": labelledBy(props) },
+  return h("div", { class: () => cx("hm-list-editor", props.class), role: "group", "aria-labelledby": labelledBy(props) },
     h("ol", { class: "hm-list-items" }, h(For, { each: idx, children: (i: Accessor<number>) => {
       const row = h("input", {
-        type: "text", class: "hm-input", "aria-label": () => t`Item ${i() + 1}`, readonly: ro,
+        type: "text", class: "hm-input", "aria-label": () => props.labels?.item?.(i() + 1) ?? t`Item ${i() + 1}`, readonly: ro,
         onInput: (e: Event) => { const cur = [...untrack(list)]; cur[i.peek()] = (e.target as HTMLInputElement).value; set(cur); },
         onBlur: () => { const cur = untrack(list); if (!String(cur[i.peek()] ?? "").trim()) set(cur.filter((_, j) => j !== i.peek())); },
         onPaste: (e: ClipboardEvent) => {
@@ -57,11 +67,11 @@ export function ListEditor(props: ListEditorProps): unknown {
       syncValue(row, () => list()[i()] ?? "");
       return h("li", { class: "hm-list-row" }, row,
         () => (ro() ? null : [
-          iconBtn(t`Move up`, "↑", () => move(i.peek(), -1), () => i() === 0),
-          iconBtn(t`Move down`, "↓", () => move(i.peek(), 1), () => i() === list().length - 1),
-          iconBtn(t`Remove`, "×", () => set(untrack(list).filter((_, j) => j !== i.peek()))),
+          props.sortable === false ? null : iconBtn(props.labels?.moveUp ?? t`Move up`, "↑", () => move(i.peek(), -1), () => i() === 0, props.icons?.up),
+          props.sortable === false ? null : iconBtn(props.labels?.moveDown ?? t`Move down`, "↓", () => move(i.peek(), 1), () => i() === list().length - 1, props.icons?.down),
+          props.removable === false ? null : iconBtn(props.labels?.remove ?? t`Remove`, "×", () => set(untrack(list).filter((_, j) => j !== i.peek())), undefined, props.icons?.remove),
         ]));
     } })),
-    () => (ro() ? null : h("div", { class: "hm-list-add" }, draft,
+    () => (ro() || props.addable === false ? null : h("div", { class: "hm-list-add" }, draft,
       h("button", { type: "button", class: "hm-btn", disabled: () => full(), onClick: () => { const lines = splitLines(draft.value); if (lines.length) { add(lines); draft.value = ""; } draft.focus(); } }, () => props.addLabel ?? t`Add`))));
 }

@@ -8,6 +8,7 @@ import { star } from "../../../icons/glyphs/star.ts";
 import { starFilled } from "../../../icons/glyphs/starFilled.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { roving } from "../../../ui/focus.ts";
+import type { IconDef } from "../../../icons/svg.ts";
 import { isRtl } from "../../../core/util.ts";
 
 export interface RatingProps {
@@ -20,6 +21,14 @@ export interface RatingProps {
   readonly?: boolean;
   label?: MaybeFn<string | undefined>;
   size?: "sm" | "md" | "lg";
+  /** The empty mark instead of the star outline: an icon of hadi-march/icons, or `(n) => node` for your own drawing. */
+  icon?: IconDef | ((n: number) => unknown) | undefined;
+  /** The filled mark instead of the filled star (same forms as `icon`). */
+  iconOn?: IconDef | ((n: number) => unknown) | undefined;
+  /** Accessible name of a mark: `(n, max) => text` (default "3 of 5"). */
+  starLabel?: ((n: number, max: number) => string) | undefined;
+  /** `false`: no hover growth and no fade between empty and filled. */
+  animate?: boolean | undefined;
   class?: ClassProp;
 }
 /** Star rating (radio group; ← → change): `<Rating bind:value={$stars} />`, `<Rating value={4.5} readonly />` */
@@ -28,18 +37,19 @@ export function Rating(props: RatingProps): Element {
   const hover = signal<number | null>(null);
   const shown = (): number => hover() ?? Number(val(props.value) ?? 0);
   const set = (v: number): void => { if (props.readonly) return; props.setValue?.(v); props.onChange?.(v); };
+  const mark = (p: RatingProps["icon"], def: IconDef, n: number): unknown => (typeof p === "function" ? p(n) : glyph(p ?? def));
   const stars = Array.from({ length: max }, (_, i) => {
     const n = i + 1;
     const filled = (): boolean => shown() >= n - 0.25;
     return h("button", {
       type: "button", role: "radio", class: () => cx("hm-rating-star", filled() && "is-on", !filled() && shown() > n - 1 && "is-half"),
-      "aria-checked": () => String(Math.round(Number(val(props.value) ?? 0)) === n), "aria-label": () => t`${n} of ${max}`,
+      "aria-checked": () => String(Math.round(Number(val(props.value) ?? 0)) === n), "aria-label": () => props.starLabel?.(n, max) ?? t`${n} of ${max}`,
       tabindex: () => (Math.max(1, Math.round(Number(val(props.value) ?? 0))) === n ? "0" : "-1"), disabled: () => !!props.readonly,
       onClick: () => set(n), onMouseenter: () => !props.readonly && hover.set(n),
-    }, h("span", { class: "hm-rating-off" }, glyph(star)), h("span", { class: "hm-rating-on" }, glyph(starFilled)));
+    }, h("span", { class: "hm-rating-off" }, mark(props.icon, star, n)), h("span", { class: "hm-rating-on" }, mark(props.iconOn ?? props.icon, starFilled, n)));
   });
   return h("span", { "data-hm-color": () => colorAttr(props.color),
-    class: () => cx("hm-rating", `hm-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", hover() != null && "is-hovering", val(props.class)), role: "radiogroup",
+    class: () => cx("hm-rating", `hm-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", props.animate === false && "is-still", hover() != null && "is-hovering", val(props.class)), role: "radiogroup",
     "aria-label": () => val(props.label) ?? t`Rating`, onMouseleave: () => hover.set(null),
     // radio group keys: arrows (RTL mirrored), Home / End, no wrap; the value follows focus
     onKeydown: (e: KeyboardEvent) => {

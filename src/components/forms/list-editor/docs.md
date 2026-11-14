@@ -17,6 +17,15 @@ Pasting several lines adds one item per line; duplicates are skipped unless `uni
 | `unique` | boolean | `true` | |
 | `addLabel` | string | "Add" | |
 | `readonly`, `disabled` | boolean | — | hides the editing buttons |
+| `labels` | `{ item?(position), moveUp?, moveDown?, remove? }` | "Item 2", "Move up", "Move down", "Remove" | accessible names |
+| `sortable` | boolean | `true` | `false` removes the move buttons |
+| `removable` | boolean | `true` | `false` removes the remove button |
+| `addable` | boolean | `true` | `false` removes the add line |
+| `icons` | `{ up?, down?, remove? }` (node, text or `() => node`) | ↑ ↓ × icons | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+`<ListEditor bind:value={$tags} sortable={false} icons={{ remove: () => <Icon of={trash} /> }}
+labels={{ item: (n) => `${n}. etiket`, remove: "Kaldır" }} addLabel="Ekle" placeholder="Etiket ekle" />`.
 
 ## Accessibility
 

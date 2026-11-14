@@ -26,3 +26,26 @@ test("PasswordInput: show / hide toggles the type and aria-pressed", () => {
   type(input, "new");
   assert.equal(v(), "new");
 });
+
+test("PasswordInput: the toggle can go or be redrawn; its texts are yours", () => {
+  const off = mount(() => h(PasswordInput, { value: "x", toggle: false }));
+  assert.equal(off.el.querySelector("button"), null);
+  assert.equal(off.el.querySelector("input").getAttribute("type"), "password");
+  off.dispose();
+  const txt = mount(() => h(PasswordInput, { value: "x", labels: { show: "Reveal", hide: "Mask", showPassword: "Reveal the password", hidePassword: "Mask the password" } }));
+  const b = txt.el.querySelector("button");
+  assert.equal(b.textContent, "Reveal");
+  assert.equal(b.getAttribute("aria-label"), "Reveal the password");
+  b.click();
+  assert.equal(b.textContent, "Mask");
+  assert.equal(b.getAttribute("aria-label"), "Mask the password");
+  txt.dispose();
+  const own = mount(() => h(PasswordInput, { value: "x", toggle: (shown) => h("i", { class: shown ? "eye-off" : "eye" }) }));
+  const o = own.el.querySelector("button");
+  assert.ok(o.className.includes("is-own"));
+  assert.ok(o.querySelector(".eye"));
+  o.click();
+  assert.ok(o.querySelector(".eye-off"));
+  assert.equal(own.el.querySelector("input").getAttribute("type"), "text");
+  own.dispose();
+});

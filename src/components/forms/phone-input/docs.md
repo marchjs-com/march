@@ -15,6 +15,7 @@ normalizePhone("0 (532) 111-22-33", "+90") // "+905321112233"
 | `value` / `bind:value` | `string` | `""` | "+" and digits |
 | `country` | string | — | calling code, e.g. `"+90"` |
 | `placeholder`, `autocomplete` | | `"tel"` | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 ## Accessibility
 

@@ -15,6 +15,7 @@ The browser's own time field: the value is `"HH:MM"` (`"HH:MM:SS"` with a step u
 | `min`, `max` | `"HH:MM"` | — | |
 | `step` | seconds | — | `1` shows seconds |
 | `disabled`, `readonly` | boolean | — | |
+| `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 ## Accessibility
 

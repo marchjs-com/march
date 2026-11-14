@@ -14,3 +14,6 @@
 .hm-rating.is-hovering .hm-rating-on { color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 55%, var(--hm-surface)); }
 .hm-rating:not(.is-readonly) .hm-rating-star:hover { transform: scale(1.15); }
 .hm-rating.is-readonly .hm-rating-star { cursor: default; }
+/* animate={false}: no growth, no fade */
+.hm-rating.is-still .hm-rating-star, .hm-rating.is-still .hm-rating-on { transition: none; }
+.hm-rating.is-still:not(.is-readonly) .hm-rating-star:hover { transform: none; }
