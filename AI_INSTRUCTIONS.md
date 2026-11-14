@@ -768,6 +768,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | BeforeAfter | experimental | Before / after comparison: two layers and a divider you drag, press, follow with the pointer or move with the keyboard; vertical or horizontal, RTL mirrored. | — |
+| BranchingStory | experimental | Choose-your-own-path story: passages with choices, a trail that rewinds, endings found counter, 3D page turns, keys 1–9. | — |
 | Counter | experimental | Animated number: counts up when visible, glides to new values, or rolls each digit like an odometer; Intl formatted. | — |
 | CtaBand | experimental | Call-to-action panel: title, lead, actions over gradient, mesh, glass, plain or video; pointer light; scales in. | SiteSection, Overlay, Reveal, VideoBackground |
 | Faq | experimental | Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking. | Accordion, SearchBox, Reveal |

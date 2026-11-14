@@ -1121,6 +1121,8 @@
   "FEED_LEAVE": "LiveFeed gidiş animasyonları: blur, fade, shrink, fall, slide, dissolve, fold.",
   "LiveFeed": "Canlı akış: `<LiveFeed next={() => yeniEtkinlik()} every={2400} />` ya da `items={$akış}`; yeni öğe kayarak gelir, üstüne gelince ve düğmeyle durur.",
   "LiveCounter": "Canlı sayaç: `<LiveCounter value={$çevrimiçi} label=\"kişi şu an\" />` ya da `from` + `rate` (dakikada artış) ile ekrandayken büyür.",
+  "BranchingStory": "Seçimlerle ilerleyen hikâye: `<BranchingStory start=\"giris\" passages={{ giris: { body: \"…\", choices: [{ label: \"Devam\", to: \"son\" }] }, son: { body: \"…\", ending: \"Mutlu son\" } }} />`.",
+  "storyEndings": "Bir hikâyede başlangıçtan ulaşılabilen bütün sonlar (seçimi olmayan bölümler).",
   "Counter": "Sayaç: `<Counter value={12500} />`, `<Counter value={$price} mode=\"roll\" format={EUR} />` (format: Intl.NumberFormat seçenekleri).",
   "CtaBand": "Çağrı bandı: `<CtaBand title=\"…\" lead=\"…\" actions={[{ label: \"Başla\", href: \"/start\" }]} variant=\"gradient\" />`.",
   "Faq": "Sık sorulan sorular: `<Faq items={[{ q: \"Ücretsiz mi?\", a: \"Evet, MIT.\" }]} layout=\"split\" title=\"Sorular\" search />`.",

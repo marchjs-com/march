@@ -191,6 +191,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | BeforeAfter | experimental | Before / after comparison: two layers and a divider you drag, press, follow with the pointer or move with the keyboard; vertical or horizontal, RTL mirrored. | — |
+| BranchingStory | experimental | Choose-your-own-path story: passages with choices, a trail that rewinds, endings found counter, 3D page turns, keys 1–9. | — |
 | Counter | experimental | Animated number: counts up when visible, glides to new values, or rolls each digit like an odometer; Intl formatted. | — |
 | CtaBand | experimental | Call-to-action panel: title, lead, actions over gradient, mesh, glass, plain or video; pointer light; scales in. | [SiteSection](#sitesection), [Overlay](#overlay), [Reveal](#reveal), [VideoBackground](#videobackground) |
 | Faq | experimental | Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking. | [Accordion](#accordion), SearchBox, [Reveal](#reveal) |
@@ -321,6 +322,20 @@ off()                                                                           
 ```
 
 Full page: src/components/layout/bottom-right-controls/docs.md
+
+## BranchingStory
+
+A choose-your-own-path story. Every passage ends in choices; the reader's path collects as a trail at the top (any step rewinds the story to it) and the endings found so far are counted. A pick lights the chosen button, fades the others and turns the page: the new passage swings in from the reading direction, from the other side when going back, and mirrored in right-to-left text. Keys 1–9 pick a choice.
+
+```tsx
+<BranchingStory start="intro" action={<Button>Join</Button>} passages={{
+  intro: { title: "Saturday morning", body: "…", choices: [{ label: "Look around", to: "explore" }, { label: "Host", to: "host", note: "a few steps" }] },
+  explore: { body: "…", choices: [{ label: "The run", to: "friends" }] },
+  friends: { title: "New friends", body: "…", ending: "Social butterfly" },
+}} />
+```
+
+Full page: src/components/landing/branching-story/docs.md
 
 ## Breadcrumbs
 
