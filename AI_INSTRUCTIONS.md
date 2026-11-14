@@ -30,7 +30,7 @@ $items.peek()                            // read without tracking (explicit API 
 <p>{$price | money("EUR")} · {$when | relative}</p>
 <Row {user} {onSave} />                 // = user={user} onSave={onSave}
 <div sx={{ p: 2, gap: 1, cols: 3 }} />  // token classes; a literal resolves at build time, anything else via sxValue()
-<Toolbar m:user-select />               // m: common props work on EVERY element and component (see below)
+<Toolbar m:no-select />               // m: common props work on EVERY element and component (see below)
 ```
 
 - Event props: `onClick={fn}` or `on:click|prevent|stop={fn}`. Handlers are never wrapped; pass functions.
@@ -41,11 +41,11 @@ $items.peek()                            // read without tracking (explicit API 
 - `<For each={$list} key="id">{(item, index) => …}</For>`: `item` and `index` are **accessors** — call them: `item().name`.
 - `<If when={$user}>{(u) => …}<Else>…</Else></If>`: the function child receives the truthy value.
 - Common props (`m:`) work on every native element and every component; the component never sees them (they are
-  applied to its root elements). `m:user-select`: the element and its whole subtree cannot be selected, inputs
-  included (`={false}` inside a blocked subtree makes that part selectable again; the nearest one wins; `null` = not
+  applied to its root elements). `m:no-select`: the element and its whole subtree cannot be selected; the text typed
+  into inputs and editors stays selectable (`={false}` inside a blocked subtree makes that part selectable again; the nearest one wins; `null` = not
   set). Use it for interface chrome (toolbars, drag surfaces, tabs), NEVER on content people may copy (codes,
   addresses, errors): keyboard selection and select-to-speak stop working too. Do not write `user-select` CSS or a
-  `selectstart` handler for this. By hand: `mProps(h(Card, props), { "user-select": true })` from `hadi-march/props`;
+  `selectstart` handler for this. By hand: `mProps(h(Card, props), { "no-select": true })` from `hadi-march/props`;
   a new member: `registerMProp(name, (el, value) => …)`. Content in a portal (dialog, menu) is outside the root: put
   the prop on that content.
 - Async component: `async function Page() { const data = await api(); return <View data={data} /> }` — wrap in

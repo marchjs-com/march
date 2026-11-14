@@ -26,12 +26,12 @@ const staticAttr = (name) => /^[A-Za-z][\w-]*$/.test(name) && !/^on/i.test(name)
 const NO_WRAP = /^(on[A-Z]|on:|ref$|use:|bind:|key$)/;
 /**
  * `m:` common props (work on every native element and every component). A name listed here with a constant value on
- * a native element becomes this plain attribute at build time (no per-element code; hadi-march/props is imported once
- * for its CSS rule). Anything
+ * a native element becomes this plain attribute at build time (no runtime code; the CSS rule does the work).
+ * Anything
  * else (a live value, a component, a name registered at runtime with registerMProp) goes through mProps().
  * Add an entry to teach the compiler a new attribute-only prop.
  */
-export const M_ATTRS = { "user-select": "data-m-user-select" };
+export const M_ATTRS = { "no-select": "data-m-no-select" };
 const M_HELPER = "_$m";
 /** The constant boolean of an `m:` attribute (bare, {true}, {false}, "false"), or undefined when it is not constant. */
 function mConst(a) {
@@ -139,7 +139,7 @@ class Transformer {
     }
     const mp = this.opts.props ?? "hadi-march/props";
     if (this.mHelper) lines.push(`import { mProps as ${M_HELPER} } from ${JSON.stringify(mp)};`);
-    else if (this.mCss) lines.push(`import ${JSON.stringify(mp)};`); // the CSS rule and the text-control guard
+    else if (this.mCss) lines.push(`import ${JSON.stringify(this.opts.propsCss ?? "hadi-march/css/props.css")};`);
     for (const [name, spec] of tpls) lines.push(`const ${name} = ${H.tpl}(${spec});`);
     return lines.join(" ");
   }

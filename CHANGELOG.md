@@ -4,13 +4,12 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
-### Common props: `m:user-select` (later in 0.1.0)
+### Common props: `m:no-select` (later in 0.1.0)
 - A new namespace, `m:`, for props that work on every native element and every component. First member:
-  `m:user-select` (boolean): the element and its whole subtree cannot be selected, form controls included;
-  `m:user-select={false}` inside a blocked subtree makes that part selectable again (the nearest one wins).
-- A constant on a native element compiles to the attribute `data-m-user-select` (no per-element code; one CSS rule in
-  `hadi-march/css/props.css`, and one document listener that collapses selections inside blocked text controls,
-  which browsers do not let CSS block). Live values and components compile to `mProps()` from the new `hadi-march/props`
+  `m:no-select` (boolean): the element and its whole subtree cannot be selected (the text typed into inputs and editors stays selectable);
+  `m:no-select={false}` inside a blocked subtree makes that part selectable again (the nearest one wins).
+- A constant on a native element compiles to the attribute `data-m-no-select` (no runtime code; the CSS rules are in
+  `hadi-march/css/props.css`). Live values and components compile to `mProps()` from the new `hadi-march/props`
   module, which applies the prop to the component's root elements; the core entry does not grow.
 - Open list: `registerMProp(name, apply)` adds a member; `M_ATTRS` (`hadi-march/compiler`) adds an attribute-only one.
 

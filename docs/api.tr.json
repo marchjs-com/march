@@ -751,7 +751,7 @@
   "spotlight": "Bir öğe üzerinde imleci izleyen radyal ışık (--m-spot-x/--m-spot-y ayarlar). `use:spotlight`"
  },
  "hadi-march/props": {
-  "mProps": "Ortak (`m:`) prop'ları elle uygular: `mProps(h(Card, props), { \"user-select\": true })`. Öğeye ya da bileşenin kök öğelerine yazar; değer fonksiyon olabilir (canlı).",
+  "mProps": "Ortak (`m:`) prop'ları elle uygular: `mProps(h(Card, props), { \"no-select\": true })`. Öğeye ya da bileşenin kök öğelerine yazar; değer fonksiyon olabilir (canlı).",
   "registerMProp": "Yeni bir ortak prop ekler: `registerMProp(\"tone\", (el, v) => …)` ile `m:tone` her öğede ve bileşende çalışır."
  },
  "hadi-march/store": {
