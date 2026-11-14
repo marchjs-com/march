@@ -3,7 +3,7 @@
    inherited from the nearest ancestor that carries the state (is-auto). */
 [aria-expanded="true"], details[open] > summary { --hm-chevron-open: 1; }
 [aria-expanded="false"], details:not([open]) > summary { --hm-chevron-open: 0; }
-.hm-chevron { --hm-chevron-from: 0deg; --hm-chevron-turn: 90deg; display: inline-grid; place-items: center; flex: none; inline-size: .875rem; block-size: .875rem; line-height: 1; vertical-align: -.125em; /* sits on the text's middle when it follows a label inline */
+.hm-chevron { --hm-chevron-from: 0deg; --hm-chevron-turn: 90deg; display: inline-grid; place-items: center; flex: none; inline-size: .875rem; block-size: .875rem; line-height: 1; vertical-align: -.2em; /* sits on the text's middle when it follows a label inline */
   transform: rotate(calc(var(--hm-chevron-from) + var(--hm-chevron-open, 0) * var(--hm-chevron-turn))); transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-chevron.is-open { --hm-chevron-open: 1; }
 .hm-chevron.is-closed { --hm-chevron-open: 0; }
