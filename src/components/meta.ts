@@ -52,7 +52,12 @@ export interface PlaygroundOption<V = Record<string, unknown>> {
   unit?: string;
   visibleWhen?: (values: V) => boolean;
 }
-export interface PlaygroundSpec<V = Record<string, unknown>> { options: readonly PlaygroundOption<V>[] }
+export interface PlaygroundSpec<V = Record<string, unknown>> {
+  options: readonly PlaygroundOption<V>[];
+  /** How the showcase stage holds the demo: "fill" (default: the demo takes the stage's width) or "center" (a small
+   * component: centred in a framed stage). */
+  stage?: "fill" | "center";
+}
 
 /** Typed helper for a component folder's meta.ts (name, status, category, composedOf …). */
 export const defineMeta = (m: ComponentMeta): ComponentMeta => m;
