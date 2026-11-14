@@ -209,6 +209,31 @@ export async function generate(root = ROOT) {
   files["src/components/cards-parts.gen.ts"] = HEAD + "/** Component name → a loader of the component itself (the key of an m:parts map). */\n" +
     "export const parts: Record<string, () => Promise<unknown>> = {\n" +
     list.filter((c) => partNames.has(nameOf(c)) && !c.meta?.entry).map((c) => `  ${nameOf(c)}: () => import("./${c.folder}/index.ts").then((m) => (m as Record<string, unknown>)[${JSON.stringify(nameOf(c))}]),\n`).join("") + "};\n";
+  // The lower tabs of a component card (Özellikler, Erişilebilirlik): docs.md's "## Props" table (and the lines after
+  // it) and "## Accessibility", one JSON per category in the showcase's public folder, fetched when a tab opens.
+  const mdSection = (md, title) => md.match(new RegExp(`^## ${title}[^\\n]*\\n([\\s\\S]*?)(?=^## |(?![\\s\\S]))`, "m"))?.[1].trim() ?? "";
+  const cells = (line) => line.trim().replace(/^\||\|$/g, "").split(/(?<!\\)\|/).map((x) => x.trim().replace(/\\\|/g, "|"));
+  const propsOf = (md) => {
+    const sec = mdSection(md, "Props"), lines = sec.split("\n"), rows = [], rest = [];
+    let head = null;
+    for (const line of lines) {
+      if (/^\s*\|/.test(line)) {
+        const c = cells(line);
+        if (!head) { head = c.map((x) => x.toLowerCase()); continue; }
+        if (c.every((x) => /^:?-+:?$/.test(x) || !x)) continue;
+        const at = (k, d) => { const i = head.findIndex((h) => h.startsWith(k)); return i >= 0 ? c[i] ?? "" : d; };
+        const di = head.findIndex((h) => !/^(prop|type|default)/.test(h));
+        rows.push([at("prop", c[0] ?? ""), at("type", c[1] ?? ""), at("default", ""), di >= 0 ? c.slice(di).join(" | ") : ""]);
+      } else if (rows.length || !head) rest.push(line);
+    }
+    return { props: rows, notes: rest.join("\n").trim() };
+  };
+  const docsByCat = {};
+  for (const c of list) {
+    const { props, notes } = propsOf(c.docs);
+    (docsByCat[c.category] ??= {})[c.folder] = { props, notes, a11y: mdSection(c.docs, "Accessibility") };
+  }
+  for (const [cat, all] of Object.entries(docsByCat)) files[`examples/showcase/public/comp/${cat}.json`] = JSON.stringify(all) + "\n";
   files["src/components/cards-code.gen.ts"] = HEAD + `export const code: Record<string, string> = {\n` +
     list.map((c) => `  ${JSON.stringify(c.folder)}: ${JSON.stringify(firstCode(c.docs))},\n`).join("") + `};\n`;
 
