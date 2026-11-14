@@ -138,15 +138,21 @@ export async function generate(root = ROOT) {
   const secFile = join(root, "examples/showcase/src/sections.gen.ts");
   const sections = existsSync(secFile) ? JSON.parse(/SECTIONS: Section\[\] = (\[.*\]);/s.exec(readFileSync(secFile, "utf8"))?.[1] ?? "[]") : [];
   const ownPage = (c) => sections.find((x) => x.id === `c-${c.folder.split("/").join("-")}`)?.path ?? c.meta?.showcase;
-  const pick = (c) => ({ f: c.folder, n: nameOf(c), s: c.meta?.summary ?? "", ...(c.meta?.composedOf?.length ? { p: c.meta.composedOf } : {}), ...(ownPage(c) ? { w: ownPage(c) } : {}) });
+  // a: the API reference page of the component (/api/<a>/<name>): the subpath slug that documents it (API index)
+  const apiFile = join(root, "examples/showcase/public/api/index.en.json");
+  const apiIndex = existsSync(apiFile) ? JSON.parse(readFileSync(apiFile, "utf8")).subpaths : [];
+  const apiOf = (c) => apiIndex.find((x) => x.items.some((it) => it[0] === nameOf(c) && it[1] === "component"))?.slug ?? apiIndex.find((x) => x.items.some((it) => it[0] === nameOf(c) || it[0] === nameOf(c)[0].toLowerCase() + nameOf(c).slice(1)))?.slug;
+  // a component whose export is a function with a small first letter (Toast → toast)
+  const apiName = (c) => (apiIndex.some((x) => x.items.some((it) => it[0] === nameOf(c))) ? nameOf(c) : nameOf(c)[0].toLowerCase() + nameOf(c).slice(1));
+  const pick = (c) => ({ f: c.folder, n: nameOf(c), s: c.meta?.summary ?? "", ...(c.meta?.composedOf?.length ? { p: c.meta.composedOf } : {}), ...(ownPage(c) ? { w: ownPage(c) } : {}), ...(apiOf(c) ? { a: `${apiOf(c)}/${apiName(c)}` } : {}) });
   const load = (c) => {
     if (c.meta?.entry) return `...E`;
     const g = groupOf.get(c.folder);
     return g ? `...L(${groups.indexOf(g.file)}, ${g.j})` : `demo: () => import("./${c.folder}/demo.tsx"), playground: () => import("./${c.folder}/playground.ts")`;
   };
   files["src/components/cards.gen.ts"] = HEAD + `import type { PlaygroundSpec } from "./meta.ts";\n` +
-    `\n/** f: folder, n: name, s: summary, p: composedOf, w: showcase page (the Code tab: cardCode(folder)). */\n` +
-    `export interface CardEntry { f: string; n: string; s: string; p?: readonly string[]; w?: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }\n` +
+    `\n/** f: folder, n: name, s: summary, p: composedOf, w: showcase page, a: API reference page under /api (the Code tab: cardCode(folder)). */\n` +
+    `export interface CardEntry { f: string; n: string; s: string; p?: readonly string[]; w?: string; a?: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }\n` +
     `type Mod = Record<string, { default: never }>;\nconst G: (() => Promise<Mod>)[] = [${groups.map((f) => `() => import("./${f}") as Promise<never>`).join(", ")}];\n` +
     `const L = (i: number, j: number) => ({ demo: () => G[i]!().then((m) => m[\`d\${j}\`]!), playground: () => G[i]!().then((m) => m[\`p\${j}\`]!) });\n` +
     (list.some((c) => c.meta?.entry) ? `const own = (): Promise<never> => Promise.reject(new Error("this component has its own entry: its page imports the demo"));\nconst E = { demo: own, playground: own };\n` : "") +

@@ -27,7 +27,7 @@ export const GENERATORS = [
   { name: "themes", script: "tools/gen-themes.js", inputs: ["src/theme/presets.ts", "src/theme/contrast.ts", "src/core/util.ts"], outputs: ["src/css/themes.css", "src/theme/names.ts"] },
   { name: "accent", script: "tools/gen-accent.js", inputs: ["src/css/colors.css"], outputs: ["src/ui/accent.css"] },
   { name: "grid", script: "tools/gen-grid.js", inputs: [], outputs: ["src/components/layout/grid/grid.css"] },
-  { name: "registry", script: "tools/gen-registry.js", inputs: ["src/components", "examples/showcase/src/sections.gen.ts"], outputs: ["src/components/registry.gen.ts", "docs/components.md"] },
+  { name: "registry", script: "tools/gen-registry.js", inputs: ["src/components", "examples/showcase/src/sections.gen.ts", "examples/showcase/public/api/index.en.json"], outputs: ["src/components/registry.gen.ts", "docs/components.md"] },
   // reads every package export's JSDoc: the whole src/ tree and package.json (which the registry writes)
   { name: "api", script: "tools/api-coverage.js", inputs: ["src", "package.json", "docs/api.tr.json"], outputs: [] },
   // the API page data (public/api/*.json): JSDoc, Turkish summaries, long-form docs and the examples' demo links
