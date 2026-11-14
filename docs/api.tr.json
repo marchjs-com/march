@@ -1112,6 +1112,7 @@
  "hadi-march/landing": {
   "actionButtons": "Bir eylem listesi için düğmeler (ilki birincil): Hero, CtaBand ve Pricing ortak kullanır.",
   "Appear": "Parçalar: her alt öğe kendi adımında belirir. `<Appear><li>Bir</li><li>İki</li></Appear>` (liste çizer).",
+  "BeforeAfter": "Önce / sonra karşılaştırması: `<BeforeAfter before={eski} after={yeni} beforeLabel=\"Önce\" afterLabel=\"Sonra\" />`; sürükle, bas, klavye ya da `follow` ile imleci izle.",
   "Counter": "Sayaç: `<Counter value={12500} />`, `<Counter value={$price} mode=\"roll\" format={EUR} />` (format: Intl.NumberFormat seçenekleri).",
   "CtaBand": "Çağrı bandı: `<CtaBand title=\"…\" lead=\"…\" actions={[{ label: \"Başla\", href: \"/start\" }]} variant=\"gradient\" />`.",
   "Faq": "Sık sorulan sorular: `<Faq items={[{ q: \"Ücretsiz mi?\", a: \"Evet, MIT.\" }]} layout=\"split\" title=\"Sorular\" search />`.",

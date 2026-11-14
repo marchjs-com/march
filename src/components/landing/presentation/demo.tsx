@@ -6,7 +6,7 @@ import { MockApp } from "../demo-kit.tsx";
 import { effect, untrack } from "../../../core/reactive.ts";
 
 export const code = `let $slide = Number(queryParam("slide")() ?? 0)
-<Presentation bind:index={$slide} transition="slide" presenterUrl="#/web?view=slides&presenter=1">
+<Presentation bind:index={$slide} transition="slide" presenterUrl="#/sites/slides?presenter=1">
   <Slide layout="title" tone="brand" notes="Herkese merhaba">…</Slide>
   <Slide notes="Üç madde, tek tek"><h2>Neden?</h2><Appear><li>Hızlı</li><li>Erişilebilir</li><li>Güzel</li></Appear></Slide>
 </Presentation>`

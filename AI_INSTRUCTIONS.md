@@ -446,7 +446,7 @@ Recipes:
 - "Prepare a presentation": one `<Presentation bind:index={$slide} presenterUrl="…?presenter=1">` with a `<Slide>` per
   slide (`layout`, `tone`, `notes`, `background={<Overlay …/>}`), lists in `<Appear>`; render the same deck with
   `presenter` on the speaker URL.
-Full samples: showcase › Landing › Web siteleri (`#/web?view=product|portfolio|slides`).
+Full samples: showcase › Landing › Örnek web siteleri (`/sites/product|portfolio|slides|redesign`).
 ### 15c. Ready-made animations (all on the engine, each its own export)
 
 ```ts
@@ -767,6 +767,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| BeforeAfter | experimental | Before / after comparison: two layers and a divider you drag, press, follow with the pointer or move with the keyboard; vertical or horizontal, RTL mirrored. | — |
 | Counter | experimental | Animated number: counts up when visible, glides to new values, or rolls each digit like an odometer; Intl formatted. | — |
 | CtaBand | experimental | Call-to-action panel: title, lead, actions over gradient, mesh, glass, plain or video; pointer light; scales in. | SiteSection, Overlay, Reveal, VideoBackground |
 | Faq | experimental | Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking. | Accordion, SearchBox, Reveal |

@@ -190,6 +190,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| BeforeAfter | experimental | Before / after comparison: two layers and a divider you drag, press, follow with the pointer or move with the keyboard; vertical or horizontal, RTL mirrored. | — |
 | Counter | experimental | Animated number: counts up when visible, glides to new values, or rolls each digit like an odometer; Intl formatted. | — |
 | CtaBand | experimental | Call-to-action panel: title, lead, actions over gradient, mesh, glass, plain or video; pointer light; scales in. | [SiteSection](#sitesection), [Overlay](#overlay), [Reveal](#reveal), [VideoBackground](#videobackground) |
 | Faq | experimental | Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking. | [Accordion](#accordion), SearchBox, [Reveal](#reveal) |
@@ -278,6 +279,18 @@ A small label: a status in a tone, a dot badge (a coloured dot before the text) 
 ```
 
 Full page: src/components/data/badge/docs.md
+
+## BeforeAfter
+
+A before / after comparison: two layers on top of each other and a divider between them. Drag anywhere on the area (a press jumps the divider there), move the handle with the keyboard, or set `follow` so the divider tracks the mouse without a press. Horizontal or vertical; the horizontal one is mirrored in right-to-left text. The first time it scrolls into view the divider sways once, so it reads as something to move.
+
+```tsx
+<BeforeAfter before={<img src="old.png" alt="" />} after={<img src="new.png" alt="" />} beforeLabel="Before" afterLabel="After" />
+<BeforeAfter orientation="vertical" follow ratio="4 / 3" before={…} after={…} />
+<BeforeAfter value={$pos} onChange={(v) => $pos.set(v)} before={…} after={…} />
+```
+
+Full page: src/components/landing/before-after/docs.md
 
 ## BottomNav
 
