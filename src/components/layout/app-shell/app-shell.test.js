@@ -23,3 +23,14 @@ test("AppShell: skip link to main, sidebar, banner and header slots", () => {
   assert.equal(b.host.querySelector("main").id, "main");
   b.dispose();
 });
+
+test("AppShell: the skip link text is yours, or the link is off", () => {
+  const a = mount(() => h(AppShell, { features: [], labels: { skip: "Jump" }, class: "mine" }, "x"));
+  assert.equal(a.host.querySelector(".hm-skip").textContent, "Jump");
+  assert.match(a.host.querySelector(".hm-shell").getAttribute("class"), /mine/);
+  a.dispose();
+  const b = mount(() => h(AppShell, { features: [], skipLink: false }, "x"));
+  assert.equal(b.host.querySelector(".hm-skip"), null);
+  assert.ok(b.host.querySelector("main"));
+  b.dispose();
+});

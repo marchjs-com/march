@@ -20,6 +20,20 @@ for the title, search and user menu). Narrow screens: a slim top bar with the me
 | `header` | node | — | sticky header of the main column |
 | `mainId` | string | `"main"` | id of `<main>` (the skip link target) |
 | `children` | node | — | the page |
+| `aside`, `footer` | node | — | a side panel next to the page; a footer under it |
+| `corners` | `{ "top-end": node … }` | — | content for the page corners |
+| `features` | config / list | `scrollToTop`, `routeFocus` | page-wide behaviors (see Layout) |
+| `labels` | `{ skip, panel }` | translated | the skip link text and the aside button text |
+| `skipLink` | boolean | `true` | `false`: no "Skip to content" link |
+| `asideToggle` | boolean | `true` | `false`: no corner button for the aside sheet on narrow screens |
+| `class` | class | — | added to the frame (`.hm-shell`); parts: `.hm-skip`, `.hm-shell-nav`, `.hm-shell-top`, `.hm-shell-header`, `.hm-shell-main` |
+
+AppShell is `Layout.extend({ framed: true })`: every Layout prop works, and `AppShell.extend({ … })` derives your own.
+
+```tsx
+<AppShell nav={<NavMenu items={items} />} labels={{ skip: "Jump to the page" }}>…</AppShell>
+<AppShell nav={<NavMenu items={items} />} skipLink={false}>…</AppShell>
+```
 
 ## Accessibility
 

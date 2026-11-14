@@ -14,7 +14,7 @@
 .hm-shell-header[data-hidden] { transform: translateY(-100%); }
 /* readingProgress */
 .hm-reading-progress { position: fixed; inset-block-start: 0; inset-inline: 0; block-size: var(--hm-rp-h, 3px); z-index: calc(var(--hm-z-sticky, 40) + 2);
-  background: var(--hm-rp-c, var(--hm-primary)); transform: scaleX(0); pointer-events: none; }
+  background: var(--hm-rp-c, var(--hm-accent, var(--hm-primary))); transform: scaleX(0); pointer-events: none; }
 /* connection */
 .hm-offline { padding: var(--hm-space-1) var(--hm-space-3); border-radius: 999px; background: var(--hm-warn-bg, var(--hm-surface)); color: var(--hm-warn-fg, var(--hm-text));
   border: 1px solid var(--hm-border); box-shadow: var(--hm-shadow-2); font-size: var(--hm-text-sm); }

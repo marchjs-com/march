@@ -43,3 +43,25 @@ test("previewFrame: only pages of this site; another origin stays blank", async 
   assert.equal(f.getAttribute("src"), "about:blank");
   dispose();
 });
+
+test("DevicePreview: status bar, home indicator and camera off; your own status bar, clock text and label", () => {
+  const bar = signal(true);
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const dispose = render(() => h(DevicePreview, { device: "pixel-8", fit: false, statusBar: bar, homeIndicator: false, camera: false, time: "9:41", label: "Checkout" }, "x"), host);
+  const dev = host.querySelector(".hm-device");
+  assert.equal(dev.getAttribute("aria-label"), "Checkout");
+  assert.match(dev.getAttribute("class"), /hm-device-cam-none/);
+  assert.equal(host.querySelector(".hm-device-time").textContent, "9:41");
+  assert.equal(host.querySelector(".hm-device-home").hasAttribute("hidden"), true);
+  assert.equal(host.querySelector(".hm-device-status").hasAttribute("hidden"), false);
+  bar.set(false);
+  assert.equal(host.querySelector(".hm-device-status").hasAttribute("hidden"), true);
+  dispose();
+  const own = document.createElement("b"); own.textContent = "mine";
+  const d2 = render(() => h(DevicePreview, { device: "pixel-8", fit: false, statusBar: own }, "x"), host);
+  assert.equal(host.querySelector(".hm-device-status").textContent, "mine");
+  assert.equal(host.querySelector(".hm-device-time"), null);
+  assert.equal(host.querySelector(".hm-device-home").hasAttribute("hidden"), false);
+  assert.match(host.querySelector(".hm-device").getAttribute("class"), /hm-device-cam-punch/);
+  d2();
+});

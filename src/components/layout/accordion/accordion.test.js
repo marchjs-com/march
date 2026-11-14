@@ -25,3 +25,26 @@ test("Accordion: one open at a time by default; multiple keeps several; disabled
   assert.match(m.host.querySelector(".hm-accordion").getAttribute("class"), /hm-accordion-contained/);
   m.dispose();
 });
+
+test("Accordion: chevron off or your own, animated off, icon colour, onToggle", () => {
+  const items = [{ id: "a", title: "A", content: "a", icon: "★" }, { title: "B", content: "b" }];
+  const off = mount(() => h(Accordion, { items, chevron: false, animated: false, color: "brand-orange" }));
+  assert.equal(off.host.querySelector(".hm-acc-chev"), null);
+  assert.match(off.host.querySelector(".hm-accordion").getAttribute("class"), /is-static/);
+  assert.equal(off.host.querySelector(".hm-acc-head").getAttribute("data-hm-color"), "brand-orange");
+  off.dispose();
+  const seen = [];
+  const own = mount(() => h(Accordion, { items, onToggle: (k, o) => seen.push([k, o]), chevron: (open) => h("b", {}, () => (open() ? "-" : "+")) }));
+  const chevs = own.host.querySelectorAll(".hm-acc-chev.is-own");
+  assert.equal(chevs.length, 2);
+  assert.equal(chevs[0].textContent, "+");
+  own.host.querySelectorAll(".hm-acc-btn")[0].click();
+  assert.equal(chevs[0].textContent, "-");
+  own.host.querySelectorAll(".hm-acc-btn")[1].click();
+  assert.deepEqual(seen, [["a", true], [1, true]]);
+  own.dispose();
+  const txt = mount(() => h(Accordion, { items, chevron: "›" }));
+  assert.equal(txt.host.querySelector(".hm-acc-chev").textContent, "›");
+  assert.equal(mount(() => h(Accordion, { items })).host.querySelectorAll(".hm-acc-chev .hm-svg").length, 2);
+  txt.dispose();
+});

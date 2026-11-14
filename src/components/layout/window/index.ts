@@ -10,7 +10,8 @@ import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, val, uid, clamp, load, save, type ClassProp, type MaybeFn } from "../../../core/util.ts";
-import { glyph } from "../../../ui/util.ts";
+import { glyph, icon as iconOf } from "../../../ui/util.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { track } from "../../../behaviors/drag/index.ts";
 import { minus } from "../../../icons/glyphs/minus.ts";
 import { maximize } from "../../../icons/glyphs/maximize.ts";
@@ -57,6 +58,16 @@ export interface WindowProps {
   snap?: boolean | undefined;
   /** Keep place, size and state in localStorage under "hm.win.<persist>". */
   persist?: string | undefined;
+  /** Texts of the buttons and the title bar (the defaults are translated). */
+  labels?: { close?: string; minimize?: string; restore?: string; maximize?: string; move?: string; moveHint?: string } | undefined;
+  /** Your own button icons: an icon, a text or a node each. */
+  icons?: { close?: unknown; minimize?: unknown; maximize?: unknown; restore?: unknown } | undefined;
+  /** Accent of the frame: the title icon, the button hover and the dock preview (default: the accent). */
+  color?: ColorToken | undefined;
+  /** The brand stripe of the "hadi" look (default true). */
+  stripe?: boolean | undefined;
+  /** false: place and size change at once, without a transition (default true). */
+  animated?: boolean | undefined;
   class?: ClassProp | undefined;
   ref?: ((api: WindowApi) => void) | undefined;
   children?: unknown;
@@ -191,16 +202,20 @@ export function Window(props: WindowProps): unknown {
 
   // ------------------------------------------------------------------ frame
   const chrome = (): WindowChrome => val(props.chrome) ?? "hadi";
-  const btn = (cls: string, label: () => string, icon: () => Parameters<typeof glyph>[0], onClick: () => void): Element =>
+  type IconKey = "close" | "minimize" | "maximize" | "restore";
+  // a given icon (icon, text or node) replaces the built-in glyph
+  const pic = (k: IconKey, def: Parameters<typeof glyph>[0]): unknown => (props.icons?.[k] != null ? iconOf(props.icons[k], "hm-win-glyph-own") : glyph(def));
+  const restoreText = (): string => props.labels?.restore ?? t`Restore`;
+  const btn = (cls: string, label: () => string, icon: () => unknown, onClick: () => void): Element =>
     h("button", { type: "button", class: `hm-win-btn ${cls}`, "aria-label": label, title: label, onClick: (e: MouseEvent) => { e.stopPropagation(); onClick(); } },
-      h("span", { class: "hm-win-glyph", "aria-hidden": "true" }, () => glyph(icon())));
+      h("span", { class: "hm-win-glyph", "aria-hidden": "true" }, icon));
   const buttons = h("div", { class: "hm-win-buttons" },
-    props.closable === false ? null : btn("hm-win-close", () => t`Close`, () => xIcon, close),
-    props.minimizable === false ? null : btn("hm-win-min", () => (state() === "minimized" ? t`Restore` : t`Minimize`), () => minus, () => setState(state.peek() === "minimized" ? "normal" : "minimized")),
-    props.maximizable === false ? null : btn("hm-win-max", () => (state() === "normal" ? t`Fill the area` : t`Restore`), () => (state() === "normal" || state() === "minimized" ? maximize : copy), toggleMax));
+    props.closable === false ? null : btn("hm-win-close", () => props.labels?.close ?? t`Close`, () => pic("close", xIcon), close),
+    props.minimizable === false ? null : btn("hm-win-min", () => (state() === "minimized" ? restoreText() : props.labels?.minimize ?? t`Minimize`), () => pic("minimize", minus), () => setState(state.peek() === "minimized" ? "normal" : "minimized")),
+    props.maximizable === false ? null : btn("hm-win-max", () => (state() === "normal" ? props.labels?.maximize ?? t`Fill the area` : restoreText()), () => (state() === "normal" || state() === "minimized" ? pic("maximize", maximize) : pic("restore", copy)), toggleMax));
   bar = h("div", {
-    class: "hm-win-bar", tabindex: "0", role: "toolbar", "aria-label": () => t`Move window`,
-    "aria-description": () => t`Arrows move the window, Shift and arrows resize it, Enter fills the area`,
+    class: "hm-win-bar", tabindex: "0", role: "toolbar", "aria-label": () => props.labels?.move ?? t`Move window`, "data-hm-color": colorAttr(props.color),
+    "aria-description": () => props.labels?.moveHint ?? t`Arrows move the window, Shift and arrows resize it, Enter fills the area`,
     onDblClick: (e: MouseEvent) => { if (!(e.target as Element).closest(".hm-win-btn") && props.maximizable !== false) toggleMax(); },
     onKeyDown: onKey, ref: (el: HTMLElement) => moveTitle(el),
   },
@@ -212,13 +227,13 @@ export function Window(props: WindowProps): unknown {
   const snapRect = (s: WindowState, b: { w: number; h: number }): Geo =>
     s === "start" ? { x: 0, y: 0, w: b.w / 2, h: b.h } : s === "end" ? { x: b.w / 2, y: 0, w: b.w / 2, h: b.h } : s === "bottom" ? { x: 0, y: b.h / 2, w: b.w, h: b.h / 2 } : { x: 0, y: 0, w: b.w, h: b.h };
   const snapPreview = h("div", {
-    class: () => cx("hm-win-snap", snapTo() && "is-on"), "aria-hidden": "true",
+    class: () => cx("hm-win-snap", snapTo() && "is-on"), "aria-hidden": "true", "data-hm-color": colorAttr(props.color),
     style: () => { const s = snapTo(), g = geo(); if (!s || !g) return {}; const r = snapRect(s, box()); return { "--hm-win-sx": `${r.x - g.x}px`, "--hm-win-sy": `${r.y - g.y}px`, "--hm-win-sw": `${r.w}px`, "--hm-win-sh": `${r.h}px` }; },
   }) as HTMLElement;
   const shown = (): boolean => (props.open != null ? !!val(props.open) : !closed());
 
   const frame = h("section", {
-    class: () => cx("hm-win", `hm-win-${chrome()}`, `is-${state()}`, moving() && "is-moving", props.resizable === false && "is-fixed-size", val(props.class)),
+    class: () => cx("hm-win", `hm-win-${chrome()}`, `is-${state()}`, moving() && "is-moving", props.resizable === false && "is-fixed-size", props.stripe === false && "hm-win-no-stripe", props.animated === false && "is-static", val(props.class)),
     "aria-labelledby": `${id}-title`, hidden: () => (shown() ? null : ""),
     style: () => { const g = geo(); return g ? { "--hm-win-x": `${g.x}px`, "--hm-win-y": `${g.y}px`, "--hm-win-w": `${g.w}px`, "--hm-win-h": `${g.h}px`, "z-index": String(z()), visibility: "visible" } : { "z-index": String(z()), visibility: "hidden" }; },
     onPointerDown: raise, onFocusIn: raise,

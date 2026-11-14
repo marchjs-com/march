@@ -132,3 +132,32 @@ test("Layout features: connection badge while offline, aside sheet toggles, dev 
   assert.ok(!document.documentElement.hasAttribute("data-hm-layout-debug"));
   if (desc) Object.defineProperty(nav, "onLine", desc); else delete nav.onLine;
 });
+
+test("Layout: its own texts and parts — labels, skip link off, aside button off, feature texts and colour token", () => {
+  const { connectionFeature: connection, readingProgressFeature: readingProgress } = L;
+  const nav = globalThis.navigator;
+  const desc = Object.getOwnPropertyDescriptor(nav, "onLine");
+  Object.defineProperty(nav, "onLine", { configurable: true, get: () => false });
+  const m = mount(() => h(Layout, { features: [connection({ label: "No connection" }), readingProgress({ color: "brand-orange", label: "Article progress" })],
+    aside: "TOC", labels: { skip: "Jump", panel: () => "Contents" } }, "x"));
+  assert.equal(m.host.querySelector(".hm-skip").textContent, "Jump");
+  assert.equal(cornerControls("bottom-start").querySelector(".hm-layout-aside-btn").textContent, "Contents");
+  assert.equal(cornerControls("top-end").querySelector(".hm-offline").textContent, "No connection");
+  const bar = document.querySelector(".hm-reading-progress");
+  assert.equal(bar.getAttribute("aria-label"), "Article progress");
+  assert.equal(bar.getAttribute("data-hm-color"), "brand-orange");
+  assert.equal(bar.style.getPropertyValue("--hm-rp-c"), "");
+  m.dispose();
+  const raw = mount(() => h(Layout, { features: [readingProgress({ color: "rebeccapurple" })] }, "x"));
+  const b2 = document.querySelector(".hm-reading-progress");
+  assert.equal(b2.style.getPropertyValue("--hm-rp-c"), "rebeccapurple", "a CSS color still works");
+  assert.equal(b2.hasAttribute("data-hm-color"), false);
+  raw.dispose();
+  const Quiet = Layout.extend({ skipLink: false, asideToggle: false });
+  const q = mount(() => h(Quiet, { features: [], aside: "TOC" }, "x"));
+  assert.equal(q.host.querySelector(".hm-skip"), null);
+  assert.equal(cornerControls("bottom-start").querySelector(".hm-layout-aside-btn"), null);
+  assert.ok(q.host.querySelector(".hm-layout-aside"));
+  q.dispose();
+  if (desc) Object.defineProperty(nav, "onLine", desc); else delete nav.onLine;
+});

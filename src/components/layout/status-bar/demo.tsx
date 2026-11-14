@@ -1,6 +1,6 @@
 // Showcase stage for StatusBar: change the state and the width (Playground values in playground.ts).
 import { signal } from "../../../core/reactive.ts";
-import { StatusBar, type StatusItem } from "./index.ts";
+import { StatusBar, type StatusItem, type StatusTone } from "./index.ts";
 import { toast } from "../../../ui/toast.ts";
 import { gitBranch } from "../../../icons/glyphs/gitBranch.ts";
 import { alertTriangle } from "../../../icons/glyphs/alertTriangle.ts";
@@ -12,13 +12,13 @@ export const code = `<StatusBar items={[
   { id: "pos", side: "end", text: () => "Sa " + $line, priority: 4 },
   { id: "save", side: "end", text: () => $state, tone: () => $busy ? "busy" : "success", live: true, priority: 9 },
   { id: "format", side: "end", command: "editor.format" },          // komut: başlık, kısayol, etkinlik
-]} />`
+]} dot={(tone) => <b>{() => (tone() === "busy" ? "◌" : "◆")}</b>} pulse={false} />   // dot={false}: noktasız`
 
 const STATES: Record<string, { text: string; tone: "success" | "busy" | "danger" }> = {
   saved: { text: "Kaydedildi", tone: "success" }, busy: { text: "Kaydediliyor…", tone: "busy" }, error: { text: "Kaydedilemedi", tone: "danger" },
 }
 
-export default function StatusBarDemo(props: { values: { state: string; width: number } }) {
+export default function StatusBarDemo(props: { values: { state: string; width: number; dot: string; pulse: boolean } }) {
   const line = signal(12)
   const st = () => STATES[props.values.state] ?? STATES["saved"]!
   const items: StatusItem[] = [
@@ -30,5 +30,11 @@ export default function StatusBarDemo(props: { values: { state: string; width: n
     { id: "save", side: "end", text: () => st().text, tone: () => st().tone, live: true, priority: 9 },
     { id: "bell", side: "end", icon: bell, text: "2", title: "Bildirimler", onSelect: () => { toast("2 bildirim") }, priority: 6 },
   ]
-  return <div class="sc-sbar-stage" style={{ "--sc-sbar-w": `${props.values.width}px` }}><StatusBar items={items} label="Editör durumu" /></div>
+  return <div class="sc-sbar-stage" style={{ "--sc-sbar-w": `${props.values.width}px` }}>
+    {() => {
+      const pulse = props.values.pulse
+      const dot = props.values.dot === "off" ? false : props.values.dot === "own" ? (tone: () => StatusTone) => <b>{() => (tone() === "busy" ? "◌" : "◆")}</b> : true
+      return <StatusBar items={items} label="Editör durumu" dot={dot} pulse={pulse} />
+    }}
+  </div>
 }

@@ -34,6 +34,17 @@ import { Window } from "hadi-march/layout";
 | `movable`, `resizable`, `snap` | Turn moving, resizing or docking off. |
 | `persist` | localStorage key part for place, size and state. |
 | `ref` | Receives `{ state, set, restore, close, focus }`. |
+| `labels` | Texts of the buttons and the title bar: `{ close, minimize, restore, maximize, move, moveHint }` (each optional; the defaults are translated). |
+| `icons` | Your own button icons: `{ close, minimize, maximize, restore }`, an icon, a text or a node each. |
+| `color` | Color token for the accent of the frame: the title icon and button hover of the "hadi" look, and the dock preview. |
+| `stripe` | `false` removes the brand stripe of the "hadi" look. |
+| `animated` | `false`: place and size change at once (no transition). |
+| `class` | Added to the frame (`.hm-win`); parts: `.hm-win-bar`, `.hm-win-icon`, `.hm-win-title`, `.hm-win-buttons`, `.hm-win-btn` (`.hm-win-close` / `-min` / `-max`), `.hm-win-body`, `.hm-win-snap`. |
+
+```tsx
+<Window title="Notes" labels={{ close: "Close notes", maximize: "Full size" }} icons={{ close: "✕", minimize: chevronDown }} />
+<Window title="Notes" color="brand-orange" stripe={false} animated={false} />
+```
 
 ## Accessibility
 

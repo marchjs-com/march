@@ -10,6 +10,7 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { openLayer } from "../../../dom/portal.ts";
+import { cx, val, type ClassProp, type MaybeFn } from "../../../core/util.ts";
 
 export type Corner = "top-start" | "top-end" | "bottom-start" | "bottom-end";
 /** The four corners a control can sit in, in logical terms (start / end follow the writing direction). */
@@ -18,8 +19,16 @@ export const CORNERS: readonly Corner[] = ["top-start", "top-end", "bottom-start
 const hosts = new Map<Corner, HTMLElement>();
 const orders = new WeakMap<Node, number>();
 
-function make(corner: Corner): HTMLElement {
-  return h("div", { class: `hm-corner hm-corner-${corner}`, "data-corner": corner, role: "group", "aria-label": () => t`Page controls` }) as HTMLElement;
+/** What a rendered corner accepts. */
+export interface CornerControlsProps {
+  corner?: Corner;
+  /** Accessible name of the corner group (default "Page controls"). */
+  label?: MaybeFn<string | undefined>;
+  class?: ClassProp;
+}
+
+function make(corner: Corner, props: CornerControlsProps = {}): HTMLElement {
+  return h("div", { class: () => cx(`hm-corner hm-corner-${corner}`, val(props.class)), "data-corner": corner, role: "group", "aria-label": () => val(props.label) ?? t`Page controls` }) as HTMLElement;
 }
 
 /** The element of a corner: the rendered one, else made and put at the end of <body>. */
@@ -47,9 +56,9 @@ export function addCornerControl(corner: Corner, node: Node, order = 0): () => v
 }
 
 /** Renders a corner in place; controls added to it go in here (a corner made earlier hands its controls over). */
-export function CornerControls(props: { corner?: Corner } = {}): Element {
+export function CornerControls(props: CornerControlsProps = {}): Element {
   const corner = props.corner ?? "bottom-end";
-  const el = make(corner);
+  const el = make(corner, props);
   const old = hosts.get(corner);
   if (old && old !== el) { while (old.firstChild) el.appendChild(old.firstChild); old.remove(); }
   hosts.set(corner, el);
@@ -58,8 +67,8 @@ export function CornerControls(props: { corner?: Corner } = {}): Element {
 }
 
 /** The bottom-end corner (right in LTR, left in RTL). */
-export function BottomRightControls(_props: Record<string, never> = {}): Element {
-  return CornerControls({ corner: "bottom-end" });
+export function BottomRightControls(props: Omit<CornerControlsProps, "corner"> = {}): Element {
+  return CornerControls({ corner: "bottom-end", get label() { return props.label; }, get class() { return props.class; } });
 }
 /** Put a control into the bottom-end corner. */
 export const addBottomRightControl = (node: Node, order = 0): (() => void) => addCornerControl("bottom-end", node, order);

@@ -19,3 +19,6 @@
 .hm-sbar-item:is(.is-info, .is-success, .is-warn, .is-danger, .is-busy) .hm-sbar-dot { display: inline-block; background: var(--hm-sbar-c); }
 .hm-sbar-item:is(.is-info, .is-success, .is-warn, .is-danger, .is-busy) .hm-sbar-icon { color: var(--hm-sbar-c); }
 .hm-sbar-item.is-danger { color: var(--hm-danger-text, var(--hm-danger)); }
+/* dot={(tone, item) => node}: your own mark, shown (in the tone colour) where the dot would be */
+.hm-sbar-dot-own { display: none; color: var(--hm-sbar-c); }
+.hm-sbar-item:is(.is-info, .is-success, .is-warn, .is-danger, .is-busy) .hm-sbar-dot-own { display: inline-flex; }

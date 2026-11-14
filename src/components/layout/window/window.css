@@ -12,7 +12,7 @@
 }
 .hm-win[hidden] { display: none; }
 .hm-win:focus-within { box-shadow: var(--hm-shadow-4); }
-.hm-win.is-moving { transition: none; }
+.hm-win.is-moving, .hm-win.is-static { transition: none; }
 
 /* states: fill the area, dock to half of it, or fold to the title bar at the bottom */
 .hm-win.is-maximized { inset-inline-start: 0; inset-block-start: 0; inline-size: 100%; block-size: 100%; border-radius: 0; }
@@ -65,8 +65,8 @@
 /* where a drop would dock */
 .hm-win-snap { position: absolute; z-index: 3; display: none; pointer-events: none;
   inset-inline-start: var(--hm-win-sx, 0); inset-block-start: var(--hm-win-sy, 0); inline-size: var(--hm-win-sw, 0); block-size: var(--hm-win-sh, 0);
-  border: 2px solid color-mix(in srgb, var(--hm-primary) 55%, transparent); border-radius: var(--hm-radius-lg);
-  background: color-mix(in srgb, var(--hm-primary) 12%, transparent); }
+  border: 2px solid color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 55%, transparent); border-radius: var(--hm-radius-lg);
+  background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 12%, transparent); }
 .hm-win-snap.is-on { display: block; }
 
 /* ---------- Windows: title first, square buttons at the end, the close button turns red */
@@ -99,9 +99,12 @@
 .hm-win-hadi .hm-win-bar { position: relative; padding-block-start: 3px; background: var(--hm-surface); }
 .hm-win-hadi .hm-win-bar::before { content: ""; position: absolute; inset-block-start: 0; inset-inline: 0; block-size: 3px; border-start-start-radius: inherit; border-start-end-radius: inherit;
   background: linear-gradient(90deg, var(--hm-brand-orange, var(--hm-cat-1)), var(--hm-brand-blue, var(--hm-cat-2)), var(--hm-brand-green, var(--hm-cat-3)), var(--hm-brand-purple, var(--hm-cat-5))); }
-.hm-win-hadi .hm-win-icon { color: var(--hm-primary); }
+.hm-win-hadi .hm-win-icon { color: var(--hm-accent, var(--hm-primary)); }
 .hm-win-hadi .hm-win-btn { inline-size: 1.75rem; block-size: 1.75rem; border-radius: 50%; }
-.hm-win-hadi .hm-win-btn:hover { background: var(--hm-primary-soft, color-mix(in srgb, var(--hm-primary) 14%, transparent)); color: var(--hm-primary-text, var(--hm-primary)); }
+.hm-win-hadi .hm-win-btn:hover { background: var(--hm-accent-soft, var(--hm-primary-soft, color-mix(in srgb, var(--hm-primary) 14%, transparent))); color: var(--hm-accent-text, var(--hm-primary-text, var(--hm-primary))); }
+/* stripe={false} */
+.hm-win-hadi.hm-win-no-stripe .hm-win-bar { padding-block-start: 0; }
+.hm-win-hadi.hm-win-no-stripe .hm-win-bar::before { display: none; }
 .hm-win-hadi .hm-win-close:hover { background: color-mix(in srgb, var(--hm-danger) 16%, transparent); color: var(--hm-danger); }
 
 @media (prefers-reduced-motion: reduce) { .hm-win { transition: none; } }

@@ -7,7 +7,11 @@
 .hm-splitter-v > .hm-split-handle { width: auto; height: 9px; margin: -4px 0; cursor: row-resize; }
 .hm-split-handle::before { content: ""; position: absolute; inset: 0 4px; background: var(--hm-border); transition: background-color var(--hm-dur) var(--hm-ease), inset var(--hm-dur) var(--hm-ease); }
 .hm-splitter-v > .hm-split-handle::before { inset: 4px 0; }
-.hm-split-handle:hover::before, .hm-split-handle:focus-visible::before, .hm-splitter.is-dragging > .hm-split-handle::before { background: var(--hm-primary); inset-inline: 3px; }
+.hm-split-handle:hover::before, .hm-split-handle:focus-visible::before, .hm-splitter.is-dragging > .hm-split-handle::before { background: var(--hm-accent, var(--hm-primary)); inset-inline: 3px; }
 .hm-splitter-v > .hm-split-handle:hover::before, .hm-splitter-v > .hm-split-handle:focus-visible::before, .hm-splitter-v.is-dragging > .hm-split-handle::before { inset-inline: 0; inset-block: 3px; }
 .hm-split-handle:focus-visible { outline: none; }
 .hm-splitter.is-dragging { user-select: none; }
+/* handle={false}: a plain divider; handle={node}: your grip, centered on the line */
+.hm-split-handle.is-fixed { cursor: default; pointer-events: none; }
+.hm-split-grip { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; color: var(--hm-muted); pointer-events: none; }
+.hm-split-handle:hover > .hm-split-grip, .hm-split-handle:focus-visible > .hm-split-grip, .hm-splitter.is-dragging .hm-split-grip { color: var(--hm-accent, var(--hm-primary)); }

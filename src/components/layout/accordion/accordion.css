@@ -8,7 +8,7 @@
 .hm-acc-head { margin: 0; font: inherit; }
 .hm-acc-btn { display: flex; align-items: center; gap: var(--hm-space-3); width: 100%; padding: .875rem var(--hm-space-4); border: 0; background: none; color: var(--hm-text); font: inherit; text-align: start; cursor: pointer; border-radius: inherit; }
 .hm-acc-btn:hover { background: color-mix(in srgb, var(--hm-surface-2) 60%, transparent); }
-.hm-acc-icon { color: var(--hm-primary); }
+.hm-acc-icon { color: var(--hm-accent, var(--hm-primary)); }
 .hm-acc-titles { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .hm-acc-title { font-weight: 600; } .hm-acc-sub { color: var(--hm-muted); font-size: var(--hm-text-sm); }
 .hm-acc-chev { display: inline-flex; color: var(--hm-muted); transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
@@ -17,3 +17,5 @@
 .hm-acc-item.is-open .hm-acc-panel { grid-template-rows: 1fr; }
 .hm-acc-inner { overflow: hidden; }
 .hm-acc-body { padding: 0 var(--hm-space-4) var(--hm-space-4); color: var(--hm-text-2); line-height: 1.6; }
+/* animated={false}: no height animation, no turning arrow */
+.hm-accordion.is-static :is(.hm-acc-item, .hm-acc-panel, .hm-acc-chev) { transition: none; }

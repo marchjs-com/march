@@ -19,6 +19,7 @@ import { t } from "../../../core/i18n.ts";
 import { context, provide, useContext, onCleanup, signal, type Signal } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { openLayer } from "../../../dom/portal.ts";
+import { COLOR_TOKENS } from "../../../theme/colors.ts";
 import { addCornerControl, cornerControls, CORNERS, type Corner } from "../bottom-right-controls/index.ts";
 
 export type SlotName = "top" | "header" | "nav" | "aside" | "footer";
@@ -66,6 +67,12 @@ export interface LayoutProps {
   framed?: boolean | undefined;
   /** id of the main element (skip link target). Default "main". */
   mainId?: string | undefined;
+  /** Texts the frame writes itself: the skip link and the button that opens the aside on narrow screens. */
+  labels?: { skip?: MaybeFn<string>; panel?: MaybeFn<string> } | undefined;
+  /** false: no "Skip to content" link (default true). */
+  skipLink?: boolean | undefined;
+  /** false: no corner button for the aside sheet on narrow screens; open it yourself (`data-open` on the aside). */
+  asideToggle?: boolean | undefined;
   class?: MaybeFn<ClassProp>;
   children?: unknown;
 }
@@ -204,7 +211,7 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
 
   const out = framed
     ? h("div", { class: () => cx("hm-layout hm-shell", has("header") && "hm-shell-has-header", !has("nav") && "hm-layout-no-nav", has("aside") && "hm-layout-has-aside", val(props.class ?? defaults.class)) },
-      h("a", { class: "hm-skip", href: `#${mainId}` }, () => t`Skip to content`),
+      pick("skipLink") === false ? null : h("a", { class: "hm-skip", href: `#${mainId}` }, () => val(pick("labels")?.skip) ?? t`Skip to content`),
       slot("nav", "aside", "hm-shell-nav"),
       h("div", { class: "hm-shell-body" },
         slot("top", "div", "hm-shell-top"),
@@ -215,11 +222,11 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
 
   // narrow screens: the aside becomes a bottom sheet, opened from a corner button (Esc or the button closes it)
   const asideEl = els.get("aside");
-  if (asideEl) {
+  if (asideEl && pick("asideToggle") !== false) {
     asideEl.id ||= `${mainId}-aside`;
     const set = (open: boolean): void => { asideEl.toggleAttribute("data-open", open); btn.setAttribute("aria-expanded", String(open)); };
     const btn = h("button", { type: "button", class: "hm-btn hm-btn-sm hm-layout-aside-btn", "aria-controls": asideEl.id, "aria-expanded": "false",
-      onClick: () => set(!asideEl.hasAttribute("data-open")) }, () => t`Panel`) as HTMLElement;
+      onClick: () => set(!asideEl.hasAttribute("data-open")) }, () => val(pick("labels")?.panel) ?? t`Panel`) as HTMLElement;
     api.add("bottom-start", btn, -10);
     const esc = (e: KeyboardEvent): void => { if (e.key === "Escape" && asideEl.hasAttribute("data-open")) { set(false); btn.focus(); } };
     globalThis.addEventListener?.("keydown", esc);
@@ -249,8 +256,11 @@ export const scrollToTopFeature = defineLayoutFeature("scrollToTop", (opts: { th
 });
 
 /** A thin bar at the top that fills as the page is read (keeps working with reduced motion: it is information). */
-export const readingProgressFeature = defineLayoutFeature("readingProgress", (opts: { color?: string; height?: number } = {}) => () => {
-  const bar = h("div", { class: "hm-reading-progress", role: "progressbar", "aria-label": () => t`Reading progress`, style: { "--hm-rp-h": `${opts.height ?? 3}px`, ...(opts.color ? { "--hm-rp-c": opts.color } : {}) } }) as HTMLElement;
+export const readingProgressFeature = defineLayoutFeature("readingProgress", (opts: { color?: string; height?: number; label?: string } = {}) => () => {
+  // `color`: a theme token ("brand-orange"); any other value is used as a CSS color, as before
+  const token = !!opts.color && (COLOR_TOKENS as readonly string[]).includes(opts.color);
+  const bar = h("div", { class: "hm-reading-progress", role: "progressbar", "aria-label": () => opts.label ?? t`Reading progress`, "data-hm-color": token ? opts.color : null,
+    style: { "--hm-rp-h": `${opts.height ?? 3}px`, ...(opts.color && !token ? { "--hm-rp-c": opts.color } : {}) } }) as HTMLElement;
   const closeBar = openLayer("fx", bar);
   let stop: (() => void) | undefined;
   let gone = false;
@@ -329,10 +339,10 @@ export const creditFeature = defineLayoutFeature("credit", (opts: { variant?: "t
   }));
 
 /** A badge in a corner while the browser is offline (announced politely). */
-export const connectionFeature = defineLayoutFeature("connection", (opts: { corner?: Corner } = {}) => (api) => {
+export const connectionFeature = defineLayoutFeature("connection", (opts: { corner?: Corner; label?: string } = {}) => (api) => {
   const nav = globalThis.navigator as Navigator | undefined;
   const badge = h("span", { class: "hm-offline", role: "status", "aria-live": "polite" }) as HTMLElement;
-  const update = (): void => { const off = nav?.onLine === false; badge.toggleAttribute("hidden", !off); badge.textContent = off ? t`You are offline` : ""; };
+  const update = (): void => { const off = nav?.onLine === false; badge.toggleAttribute("hidden", !off); badge.textContent = off ? opts.label ?? t`You are offline` : ""; };
   update();
   const out = api.add(opts.corner ?? "top-end", badge, -10);
   globalThis.addEventListener?.("online", update);
@@ -341,14 +351,15 @@ export const connectionFeature = defineLayoutFeature("connection", (opts: { corn
 });
 
 /** A "Feedback" button in a corner: asks for a message and hands it to `onSubmit`, then thanks with a toast. */
-export const feedbackFeature = defineLayoutFeature("feedback", (opts: { onSubmit?: (text: string) => unknown; corner?: Corner; label?: string } = {}) => (api) => {
+export const feedbackFeature = defineLayoutFeature("feedback", (opts: { onSubmit?: (text: string) => unknown; corner?: Corner; label?: string; title?: string; messageLabel?: string; thanks?: string | false } = {}) => (api) => {
   const open = async (): Promise<void> => {
     const { prompt } = await import("../../overlays/dialog/index.ts");
-    const text = await prompt({ title: t`Feedback`, label: t`Your message`, multiline: true });
+    const text = await prompt({ title: opts.title ?? t`Feedback`, label: opts.messageLabel ?? t`Your message`, multiline: true });
     if (!text) return;
     await opts.onSubmit?.(text);
+    if (opts.thanks === false) return;
     const { toast } = await import("../../overlays/toast/index.ts");
-    toast(t`Thanks for your feedback!`, { kind: "success" });
+    toast(opts.thanks ?? t`Thanks for your feedback!`, { kind: "success" });
   };
   const btn = h("button", { type: "button", class: "hm-btn hm-btn-sm hm-layout-feedback", onClick: () => void open() }, () => opts.label ?? t`Feedback`) as Node;
   return api.add(opts.corner ?? "bottom-end", btn, 10);

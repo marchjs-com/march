@@ -21,6 +21,11 @@ alignment and justification, and optional wrapping. `Toolbar` is a labelled bar 
 | `as` | tag | `"div"` | element to draw |
 | Toolbar `label` / `end` | string / node | — | accessible name / end slot |
 | Divider `label` / `vertical` | string / boolean | — | labelled or vertical divider |
+| `class` | class | — | Stack, Toolbar and Divider each take one (roots `.hm-stack`, `.hm-toolbar`, `.hm-divider`; Toolbar parts `.hm-toolbar-start`, `.hm-toolbar-end`) |
+
+```tsx
+<Divider class="my-rule" />   <Toolbar class="my-bar" label="Filters">…</Toolbar>
+```
 
 ## Accessibility
 

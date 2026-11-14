@@ -12,3 +12,6 @@
 .hm-disclosure-summary:dir(rtl)::before { transform: rotate(45deg); }
 .hm-disclosure[open] > .hm-disclosure-summary:dir(rtl)::before { transform: rotate(-45deg); }
 .hm-disclosure-body { padding: 0 var(--hm-space-4) var(--hm-space-4); }
+/* marker={false} or your own node: the drawn arrow is off */
+.hm-disclosure-no-marker > .hm-disclosure-summary::before { display: none; }
+.hm-disclosure-marker { display: inline-flex; color: var(--hm-muted); }

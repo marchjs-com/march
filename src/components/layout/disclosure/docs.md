@@ -18,6 +18,13 @@ an animation. `open` can be a signal; `onToggle` reports the new state.
 | `open` | boolean / accessor | `false` | open state |
 | `onToggle` | `(open) => void` | — | called when the user opens or closes it |
 | `children` | node | — | the body |
+| `marker` | boolean / node | `true` | the turning arrow before the title: off, or your own mark |
+| `class` | class | — | added to the root (`.hm-disclosure`); parts: `.hm-disclosure-summary`, `.hm-disclosure-marker`, `.hm-disclosure-body` |
+
+```tsx
+<Disclosure title="Advanced" marker={false}>…</Disclosure>
+<Disclosure title="Advanced" marker={<Icon of={settings} />}>…</Disclosure>
+```
 
 ## Accessibility
 

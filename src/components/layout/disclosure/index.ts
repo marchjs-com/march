@@ -3,13 +3,23 @@
 import "./disclosure.css";
 import { h } from "../../../dom/h.ts";
 import { read } from "../../../core/reactive.ts";
+import { cx, val, type ClassProp } from "../../../core/util.ts";
 
-export interface DisclosureProps { title: unknown; open?: boolean | (() => boolean); onToggle?: (open: boolean) => void; class?: string; children?: unknown }
+export interface DisclosureProps {
+  title: unknown;
+  open?: boolean | (() => boolean);
+  onToggle?: (open: boolean) => void;
+  /** The turning arrow before the title: true (default), false, or your own node. */
+  marker?: boolean | unknown;
+  class?: ClassProp;
+  children?: unknown;
+}
 
 /** A native <details> section with an animated open/close and a summary line. */
 export function Disclosure(props: DisclosureProps): Element {
-  const el = h("details", { class: ["hm-disclosure", props.class], open: () => !!read(props.open ?? false) },
-    h("summary", { class: "hm-disclosure-summary" }, () => props.title),
+  const own = props.marker != null && props.marker !== true && props.marker !== false;
+  const el = h("details", { class: () => cx("hm-disclosure", (own || props.marker === false) && "hm-disclosure-no-marker", val(props.class)), open: () => !!read(props.open ?? false) },
+    h("summary", { class: "hm-disclosure-summary" }, own ? h("span", { class: "hm-disclosure-marker", "aria-hidden": "true" }, props.marker) : null, () => props.title),
     h("div", { class: "hm-disclosure-body" }, () => props.children)) as HTMLDetailsElement;
   el.addEventListener("toggle", () => props.onToggle?.(el.open));
   return el;

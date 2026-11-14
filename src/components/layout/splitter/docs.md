@@ -14,7 +14,18 @@ Home / End for the limits and Enter to go back to the initial share. Each pane k
 | `start` / `end` | node | — | the two panes (logical order) |
 | `initial` | number 0–1 | `0.5` | first pane's share (kept within `min` … 1 − `min`) |
 | `min` | number 0–0.5 | `0.15` | smallest share of either pane |
+| `value` | number 0–1 / accessor | — | controlled share of the first pane (with `onChange`) |
+| `onChange` | `(share) => void` | — | the new share, while dragging or on the keyboard |
+| `orientation` | `"horizontal"` / `"vertical"` | `"horizontal"` | side by side, or stacked |
 | `label` | string | "Resize" | accessible name of the handle |
+| `handle` | boolean / node | `true` | `false`: fixed panes with a plain divider; a node: your own grip drawn on the line |
+| `color` | color token | accent | colour of the handle while hovered, focused or dragged |
+| `class` | class | — | added to the root (`.hm-splitter`); parts: `.hm-split-pane`, `.hm-split-handle`, `.hm-split-grip` |
+
+```tsx
+<Splitter start={<A />} end={<B />} handle={<Icon of={moreVertical} />} color="brand-orange" />
+<Splitter start={<A />} end={<B />} handle={false} initial={0.3} />   // fixed: nothing to drag
+```
 
 ## Accessibility
 

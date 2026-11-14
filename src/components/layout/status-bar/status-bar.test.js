@@ -40,3 +40,29 @@ test("StatusBar: start and end sides, buttons from actions and commands, tones, 
   m.dispose();
   c.dispose();
 });
+
+test("StatusBar: dot off or your own, more menu label, overflow off", async () => {
+  const tone = signal("success");
+  const items = [{ id: "save", text: "Saved", tone }, { id: "plain", text: "UTF-8" }];
+  const off = mount(() => h(StatusBar, { items, dot: false }));
+  await tick();
+  assert.equal(off.el.querySelector(".hm-sbar-dot"), null);
+  off.dispose();
+  const own = mount(() => h(StatusBar, { items, pulse: false, moreLabel: "Other states", overflow: false, dot: (tn, it) => h("b", {}, () => `${it.id}:${tn()}`) }));
+  await tick(); await tick();
+  assert.equal(own.el.querySelector(".hm-sbar-dot"), null);
+  const marks = own.el.querySelectorAll(".hm-sbar-dot-own");
+  assert.equal(marks.length, 2);
+  assert.equal(marks[0].textContent, "save:success");
+  tone.set("busy");
+  assert.equal(marks[0].textContent, "save:busy");
+  assert.equal(own.el.querySelector(".hm-sbar-more button").getAttribute("aria-label"), "Other states");
+  assert.equal(own.el.querySelectorAll(".hm-sbar-item[hidden]").length, 0);
+  own.dispose();
+  tone.set("success");
+  const def = mount(() => h(StatusBar, { items }));
+  await tick();
+  assert.equal(def.el.querySelectorAll(".hm-sbar-dot").length, 2);
+  assert.match(def.el.querySelector(".hm-sbar-more button").getAttribute("aria-label"), /More status|Diğer durum/);
+  def.dispose();
+});

@@ -26,3 +26,10 @@ test("Toolbar and Divider: roles and labels", () => {
   const v = h(Divider, { vertical: true });
   assert.equal(v.getAttribute("aria-orientation"), "vertical");
 });
+
+test("Divider: class on every form", () => {
+  assert.equal(h(Divider, { class: "mine" }).getAttribute("class"), "hm-divider mine");
+  assert.equal(h(Divider, { vertical: true, class: "mine" }).getAttribute("class"), "hm-divider hm-divider-v mine");
+  assert.equal(h(Divider, { label: "or", class: "mine" }).getAttribute("class"), "hm-divider hm-divider-label mine");
+  assert.equal(h(Divider, {}).getAttribute("class"), "hm-divider");
+});

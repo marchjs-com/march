@@ -26,7 +26,18 @@ Devices: `iphone-15`, `iphone-se`, `pixel-8`, `galaxy-s24`, `ipad`, `ipad-pro` (
 | `landscape` | Rotate (reactive). |
 | `touch` | Mouse acts as a finger (default true). |
 | `fit` | Scale down to fit its place (default true). |
-| `class` | Class of the device. |
+| `src` | A same-origin address shown in an iframe instead of children (reactive). |
+| `label` | Accessible name of the device; default "<device> preview" (translated). |
+| `statusBar` | The status bar: `true` (default), `false` (reactive), or your own node in its place. |
+| `time` | Clock text of the status bar, e.g. `"9:41"` (default: the time now). |
+| `homeIndicator` | `false` hides the home indicator line (reactive). |
+| `camera` | `false` hides the camera of the device (reactive). |
+| `class` | Class of the device (`.hm-device`); parts: `.hm-device-screen`, `.hm-device-status`, `.hm-device-viewport`, `.hm-device-camera`, `.hm-device-home`, `.hm-device-touch`. |
+
+```tsx
+<DevicePreview device="iphone-15" time="9:41" homeIndicator={false} camera={false} label="Checkout on a phone">…</DevicePreview>
+<DevicePreview device="pixel-8" statusBar={<MyStatusBar />}>…</DevicePreview>      // statusBar={false}: none
+```
 
 ## Accessibility
 

@@ -31,11 +31,11 @@ export function Toolbar(props: ToolbarProps): Element {
     h("div", { class: "hm-toolbar-start" }, props.children),
     props.end != null && h("div", { class: "hm-toolbar-end" }, props.end));
 }
-export interface DividerProps { label?: MaybeFn<string>; vertical?: boolean }
+export interface DividerProps { label?: MaybeFn<string>; vertical?: boolean; class?: ClassProp }
 /** `<Divider />` or `<Divider label="or" />`; `vertical` for inline separators. */
 export function Divider(props: DividerProps = {}): Element {
-  if (props.label != null) return h("div", { class: "hm-divider hm-divider-label", role: "separator" }, h("span", {}, () => val(props.label)));
-  return h(props.vertical ? "span" : "hr", { class: cx("hm-divider", props.vertical && "hm-divider-v"), role: props.vertical ? "separator" : null, "aria-orientation": props.vertical ? "vertical" : null });
+  if (props.label != null) return h("div", { class: () => cx("hm-divider hm-divider-label", val(props.class)), role: "separator" }, h("span", {}, () => val(props.label)));
+  return h(props.vertical ? "span" : "hr", { class: () => cx("hm-divider", props.vertical && "hm-divider-v", val(props.class)), role: props.vertical ? "separator" : null, "aria-orientation": props.vertical ? "vertical" : null });
 }
 
 // ------------------------------------------------------------------ loaders

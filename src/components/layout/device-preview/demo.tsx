@@ -2,14 +2,15 @@
 import { DevicePreview } from "./index.ts";
 import { openDrawer } from "../../overlays/dialog/index.ts";
 
-export const code = `<DevicePreview device="iphone-15" landscape={false} touch>
+export const code = `<DevicePreview device="iphone-15" landscape={false} touch time="9:41" statusBar homeIndicator camera>
   <MyApp />          // its drawers and dialogs open inside the device
 </DevicePreview>`
 
 const ITEMS = Array.from({ length: 30 }, (_, i) => `HADİ etkinlik ${i + 1}`)
 
-export default function DevicePreviewDemo(props: { values: { device: string; landscape: boolean; touch: boolean } }) {
-  return <DevicePreview device={() => props.values.device} landscape={() => props.values.landscape} touch={() => props.values.touch}>
+export default function DevicePreviewDemo(props: { values: { device: string; landscape: boolean; touch: boolean; statusBar: boolean; homeIndicator: boolean; camera: boolean } }) {
+  return <DevicePreview device={() => props.values.device} landscape={() => props.values.landscape} touch={() => props.values.touch}
+    statusBar={() => props.values.statusBar} homeIndicator={() => props.values.homeIndicator} camera={() => props.values.camera}>
     <div class="sc-dev-app">
       <header class="sc-dev-head"><strong>HADİ</strong>
         <button type="button" class="hm-btn hm-btn-sm" onClick={() => void openDrawer(() => <ul class="sc-dev-menu"><li>Akış</li><li>Etkinlikler</li><li>Profil</li></ul>, { title: "Menü", side: "end" })}>Menü</button>

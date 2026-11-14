@@ -1,13 +1,16 @@
 // Showcase stage for Disclosure: two sections, one open (Playground values in playground.ts).
 import { signal } from "../../../core/reactive.ts";
 import { Disclosure } from "./index.ts";
+import { settings } from "../../../icons/glyphs/settings.ts";
+import { Icon } from "../../../icons/index.ts";
 
-export const code = `<Disclosure title="Gelişmiş ayarlar" open={$open} onToggle={(o) => $open = o}>…</Disclosure>`
+export const code = `<Disclosure title="Gelişmiş ayarlar" open={$open} onToggle={(o) => $open = o}>…</Disclosure>
+<Disclosure title="Gelişmiş ayarlar" marker={<Icon of={settings} />}>…</Disclosure>   // marker={false}: işaretsiz`
 
-export default function DisclosureDemo(props: { values: { open: boolean } }) {
+export default function DisclosureDemo(props: { values: { open: boolean; marker: string } }) {
   const last = signal("—")
   return <div class="sc-disc-demo">
-    {() => { const open = props.values.open; return <Disclosure title="Gelişmiş ayarlar" open={open} onToggle={(o: boolean) => last.set(o ? "açıldı" : "kapandı")}>
+    {() => { const open = props.values.open, marker = props.values.marker === "off" ? false : props.values.marker === "own" ? <Icon of={settings} /> : true; return <Disclosure title="Gelişmiş ayarlar" open={open} marker={marker} onToggle={(o: boolean) => last.set(o ? "açıldı" : "kapandı")}>
       <p>Önbellek süresi 10 dakika; günlük kayıtları 30 gün saklanır.</p>
     </Disclosure> }}
     <Disclosure title="Sık sorulan: verilerim nerede tutulur?">

@@ -63,3 +63,29 @@ test("Window: arrows move it, Shift and arrows resize it; close hides it or foll
   assert.equal(m.win.hasAttribute("hidden"), false);
   m.dispose();
 });
+
+test("Window: your own labels and button icons, colour token, stripe and transition off", async () => {
+  const { host, win, dispose } = mount({ labels: { close: "Shut", maximize: "Grow", restore: "Back", move: "Drag me" }, icons: { close: "X", restore: h("i", {}, "r") },
+    color: "brand-orange", stripe: false, animated: false });
+  await tick();
+  const btn = (cls) => host.querySelector(`.${cls}`);
+  assert.equal(btn("hm-win-close").getAttribute("aria-label"), "Shut");
+  assert.equal(btn("hm-win-close").textContent, "X");
+  assert.equal(btn("hm-win-max").getAttribute("aria-label"), "Grow");
+  assert.ok(btn("hm-win-max").querySelector(".hm-svg"), "no own icon given: the built-in glyph");
+  assert.equal(btn("hm-win-min").getAttribute("aria-label"), "Minimize");
+  btn("hm-win-max").click();
+  assert.equal(btn("hm-win-max").getAttribute("aria-label"), "Back");
+  assert.equal(btn("hm-win-max").textContent, "r");
+  const bar = host.querySelector(".hm-win-bar");
+  assert.equal(bar.getAttribute("aria-label"), "Drag me");
+  assert.equal(bar.getAttribute("data-hm-color"), "brand-orange");
+  assert.equal(host.querySelector(".hm-win-snap").getAttribute("data-hm-color"), "brand-orange");
+  assert.match(win.getAttribute("class"), /hm-win-no-stripe/);
+  assert.match(win.getAttribute("class"), /is-static/);
+  dispose();
+  const d = mount({});
+  assert.doesNotMatch(d.win.getAttribute("class"), /no-stripe|is-static/);
+  assert.equal(d.host.querySelector(".hm-win-bar").hasAttribute("data-hm-color"), false);
+  d.dispose();
+});

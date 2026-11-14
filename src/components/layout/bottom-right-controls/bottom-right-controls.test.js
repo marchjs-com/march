@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
-const { addCornerControl, cornerControls, CornerControls, addBottomRightControl, CORNERS } = await import("./index.ts");
+const { addCornerControl, cornerControls, CornerControls, BottomRightControls, addBottomRightControl, CORNERS } = await import("./index.ts");
 
 const btn = (txt) => { const b = document.createElement("button"); b.textContent = txt; return b; };
 
@@ -44,4 +44,16 @@ test("corners: a rendered corner takes over the controls added before, and a con
   d2();
   assert.equal(inner.parentElement, null, "cleaned up with its component");
   dispose();
+});
+
+test("corners: a rendered corner takes its own label and class", () => {
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const dispose = render(() => h(BottomRightControls, { label: "Quick actions", class: "mine" }), host);
+  const el = host.querySelector(".hm-corner-bottom-end");
+  assert.equal(el.getAttribute("aria-label"), "Quick actions");
+  assert.ok(el.classList.contains("mine"));
+  dispose();
+  const d2 = render(() => h(CornerControls, { corner: "top-end" }), host);
+  assert.equal(host.querySelector(".hm-corner-top-end").getAttribute("aria-label"), "Page controls");
+  d2();
 });

@@ -45,6 +45,16 @@ export interface DevicePreviewProps {
   fit?: boolean;
   /** Show this address in the device (an iframe: real viewport, real scrolling, real media queries) instead of children. */
   src?: MaybeFn<string | undefined>;
+  /** Accessible name of the device (default "<device> preview"). */
+  label?: MaybeFn<string | undefined>;
+  /** The status bar: true (default), false, or your own node in its place. */
+  statusBar?: MaybeFn<boolean | undefined> | Node;
+  /** The clock text of the status bar (default: the time now), e.g. "9:41". */
+  time?: MaybeFn<string | undefined>;
+  /** The home indicator line (default true). */
+  homeIndicator?: MaybeFn<boolean | undefined>;
+  /** false hides the camera (island, punch hole or notch) of the device (default true). */
+  camera?: MaybeFn<boolean | undefined>;
   class?: ClassProp;
   children?: unknown;
 }
@@ -84,20 +94,23 @@ export function DevicePreview(props: DevicePreviewProps): Element {
 
   const spec = (): DeviceSpec => specOf(val(props.device));
   const land = (): boolean => !!val(props.landscape);
-  const frame = props.src != null ? previewFrame(props.src, () => t`${spec().name} preview`, "hm-device-frame") : null;
+  const label = (): string => val(props.label) ?? t`${spec().name} preview`;
+  const frame = props.src != null ? previewFrame(props.src, label, "hm-device-frame") : null;
+  const sb = props.statusBar, ownBar = sb != null && typeof sb === "object";
   const viewport = h("div", { class: () => cx("hm-device-viewport", frame && "is-framed") }, frame ?? props.children) as HTMLElement;
   const dot = h("div", { class: "hm-device-touch", "aria-hidden": "true" }) as HTMLElement;
   const screen = h(OverlayScope, { class: "hm-device-screen", children: [
-    h("div", { class: "hm-device-status", "aria-hidden": "true" },
-      h("span", { class: "hm-device-time" }, time),
-      h("span", { class: "hm-device-icons" }, h("i", { class: "hm-device-signal" }), h("i", { class: "hm-device-wifi" }), h("i", { class: "hm-device-battery" }))),
+    ownBar ? h("div", { class: "hm-device-status is-own" }, sb)
+      : h("div", { class: "hm-device-status", "aria-hidden": "true", hidden: () => val(sb as MaybeFn<boolean | undefined>) === false },
+        h("span", { class: "hm-device-time" }, () => val(props.time) ?? time()),
+        h("span", { class: "hm-device-icons" }, h("i", { class: "hm-device-signal" }), h("i", { class: "hm-device-wifi" }), h("i", { class: "hm-device-battery" }))),
     viewport,
-    h("div", { class: "hm-device-home", "aria-hidden": "true" }),
+    h("div", { class: "hm-device-home", "aria-hidden": "true", hidden: () => val(props.homeIndicator) === false }),
     dot,
   ] }) as HTMLElement;
   const body = h("div", {
-    class: () => cx("hm-device", `hm-device-${spec().kind ?? "phone"}`, `hm-device-cam-${spec().camera ?? "none"}`, land() && "is-landscape", val(props.touch) !== false && "is-touch", val(props.class)),
-    role: "group", "aria-label": () => t`${spec().name} preview`,
+    class: () => cx("hm-device", `hm-device-${spec().kind ?? "phone"}`, `hm-device-cam-${val(props.camera) === false ? "none" : spec().camera ?? "none"}`, land() && "is-landscape", val(props.touch) !== false && "is-touch", val(props.class)),
+    role: "group", "aria-label": label,
     style: () => {
       const s = spec(), w = land() ? s.height : s.width, hh = land() ? s.width : s.height;
       return { "--hm-dev-w": `${w}px`, "--hm-dev-h": `${hh}px`, "--hm-dev-r": `${s.radius ?? 24}px`, "--hm-dev-scale": String(scale()) };

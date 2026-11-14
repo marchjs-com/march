@@ -20,6 +20,18 @@ to a "…" menu. Items marked `live` are announced when their text changes ("Sav
 |---|---|---|---|
 | `items` | `StatusItem[]` / accessor | — | `{ id, text, icon, side, tone, title, onSelect, command, priority, live }` |
 | `label` | string | "Status bar" | accessible name of the region |
+| `moreLabel` | string / accessor | "More status" | accessible name of the "…" menu |
+| `moreIcon` | icon | `more` | icon of the "…" menu button |
+| `overflow` | boolean | `true` | `false`: no "…" menu, every item stays in the bar |
+| `dot` | boolean / `(tone, item) => node` | `true` | the tone dot of items without an icon: off, or your own mark (`tone()` is live) |
+| `pulse` | boolean | `true` | `false`: the dot of a busy item stays still |
+| `class` | class | — | added to the root (`.hm-sbar`); parts: `.hm-sbar-side`, `.hm-sbar-item`, `.hm-sbar-icon`, `.hm-sbar-dot`, `.hm-sbar-text`, `.hm-sbar-more` |
+
+```tsx
+<StatusBar items={items} dot={false} />                                         // text and icons only
+<StatusBar items={items} dot={(tone) => <b>{() => (tone() === "busy" ? "…" : "●")}</b>} pulse={false} />
+<StatusBar items={items} moreLabel="Other states" moreIcon={chevronUp} />       // overflow={false}: no "…" menu
+```
 
 ## Accessibility
 

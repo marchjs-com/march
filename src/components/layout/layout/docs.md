@@ -46,7 +46,32 @@ const SettingsPage = Page.extend({ narrow: true, tabsQuery: "tab" })
 | `titleTemplate` | Document title pattern for pages, `"%s · March"`. |
 | `framed` | Always draw the frame (skip link, main), also without regions. |
 | `mainId` | id of the main element (skip-link target), default `main`. |
-| `class` | Class of the frame. |
+| `labels` | Texts the frame writes itself: `{ skip, panel }` — the skip link and the button that opens the aside on narrow screens (string or accessor each; the defaults are translated). |
+| `skipLink` | `false`: no "Skip to content" link. |
+| `asideToggle` | `false`: no corner button for the aside sheet on narrow screens (open it yourself: `data-open` on the aside). |
+| `class` | Class of the frame (`.hm-layout`); parts: `.hm-skip`, `.hm-shell-nav`, `.hm-shell-top`, `.hm-shell-header`, `.hm-layout-main`, `.hm-layout-aside`, `.hm-layout-footer`, `.hm-layout-aside-btn`. |
+
+```tsx
+<Layout nav={<SideNav/>} aside={<Toc/>} labels={{ skip: "Jump to the article", panel: "Contents" }}>…</Layout>
+<Layout header={<TopBar/>} skipLink={false} asideToggle={false}>…</Layout>
+```
+
+Options of the built-in features (every text and colour is yours):
+
+| Feature | Options |
+|---|---|
+| `scrollToTop` | `threshold`, `corner`, `order`, `label` (and the other ScrollToTop props) |
+| `readingProgress` | `color` (a color token; any other value is used as a CSS color), `height` (px), `label` |
+| `autoHideHeader` | `after` (px scrolled before it hides) |
+| `connection` | `corner`, `label` (the offline text) |
+| `feedback` | `onSubmit`, `corner`, `label` (button), `title`, `messageLabel` (the dialog), `thanks` (toast text; `false`: no toast) |
+| `credit` | `variant`, `corner` |
+| `consent` | the texts of ConsentBanner |
+
+```tsx
+<Layout features={{ readingProgress: { color: "brand-orange", label: "Article progress" },
+                    connection: { label: "No connection" }, feedback: { label: "Ideas?", thanks: false, onSubmit: send } }}>…</Layout>
+```
 
 ## Accessibility
 

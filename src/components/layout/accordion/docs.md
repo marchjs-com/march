@@ -19,6 +19,17 @@ icon and a subtitle; `variant="contained"` draws one framed list instead of sepa
 | `multiple` | boolean | `false` | several sections may be open |
 | `open` | `(id or index)[]` | `[]` | initially open sections |
 | `variant` | `"separated"` / `"contained"` | `"separated"` | look |
+| `chevron` | boolean / icon / text / `(open, item) => node` | `true` | the arrow at the end of a header: off, your own mark, or drawn per section (`open()` is live) |
+| `animated` | boolean | `true` | `false`: panels open at once and the arrow does not turn |
+| `color` | color token | accent | colour of the header icons |
+| `onToggle` | `(key, open) => void` | — | a section opened or closed (key: its `id`, else its index) |
+| `class` | class | — | added to the root (`.hm-accordion`); parts: `.hm-acc-item`, `.hm-acc-btn`, `.hm-acc-icon`, `.hm-acc-title`, `.hm-acc-sub`, `.hm-acc-chev`, `.hm-acc-body` |
+
+```tsx
+<Accordion items={faq} chevron={false} />                                   // no arrow
+<Accordion items={faq} chevron={plus} color="brand-orange" />               // your own icon (it turns with the section)
+<Accordion items={faq} chevron={(open) => <b>{() => (open() ? "−" : "+")}</b>} animated={false} />
+```
 
 ## Accessibility
 
