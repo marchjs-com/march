@@ -1,6 +1,7 @@
 // NotForYou (hadi-march/landing): the anti-landing block. It says plainly who the product is NOT for (and, optionally,
-// who it is for). With `check` every line is a toggle: the visitor strikes out the lines that are not them ("Not me!");
-// a verdict line under the list sums it up honestly, e.g. "2 of 4 still apply". The verdict is announced politely.
+// who it is for). With `check` every line is a toggle card: red at first ("That's me", "Not you? Tap it!"); a tap
+// strikes it out and turns it green, with `markedHint` under the label. A verdict line under the list sums it up
+// honestly, e.g. "2 of 4 still apply". The verdict is announced politely.
 import "./not-for-you.css";
 import { h } from "../../../dom/h.ts";
 import { signal, computed } from "../../../core/reactive.ts";
@@ -35,6 +36,12 @@ export interface NotForYouProps {
   variant?: "cards" | "list" | undefined;
   /** Called with the indexes of the struck-out lines. */
   onCheck?: ((marked: number[]) => void) | undefined;
+  /** The label on every checkable card (default "That's me"). */
+  meLabel?: unknown | undefined;
+  /** Small text under the label before a tap (default "Not you? Tap it!"). */
+  hint?: unknown | undefined;
+  /** Small text under the label after a tap (default "Not you"): e.g. "You belong here". */
+  markedHint?: unknown | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -67,7 +74,9 @@ export function NotForYou(props: NotForYouProps): Element {
         h("button", {
           type: "button", class: () => cx("hm-nfy-toggle", marked().has(i) && "is-on"), role: "checkbox",
           "aria-checked": () => String(marked().has(i)), onClick: () => toggle(i),
-        }, ...body, h("span", { class: "hm-nfy-me", "aria-hidden": "true" }, () => (marked().has(i) ? t`Not me!` : t`Me?`))));
+        }, ...body, h("span", { class: "hm-nfy-me", "aria-hidden": "true" },
+          h("span", { class: "hm-nfy-me-label" }, () => props.meLabel ?? t`That's me`),
+          h("small", { class: "hm-nfy-me-hint" }, () => (marked().has(i) ? props.markedHint ?? t`Not you` : props.hint ?? t`Not you? Tap it!`)))));
     }
     return h("li", { class: "hm-nfy-item" }, h("div", { class: "hm-nfy-row" }, ...body));
   };

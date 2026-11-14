@@ -1,8 +1,9 @@
 # NotForYou
 
 The anti-landing block: it says plainly who the product is **not** for, and optionally who it is for. With `check`,
-every "not for you" line is a toggle: the visitor strikes out the lines that are not them ("Not me!"), and a verdict
-under the list says how many still apply.
+every "not for you" line is a toggle card: red at first, with "That's me" and a small "Not you? Tap it!"; a tap
+strikes the line out and turns the card green, with `markedHint` under the label ("You belong here"). A verdict under
+the list says how many still apply.
 
 ```tsx
 <NotForYou check items={[{ text: "You run a 1,000-seat conference", detail: "No ticketing; an event platform fits better." }]}
@@ -21,6 +22,8 @@ under the list says how many still apply.
 | `verdict` | `(n, total) => node` | `notForYouVerdict` | the verdict text; `n` = struck-out lines |
 | `variant` | `cards` `list` | `cards` | boxes, or lines with a rule |
 | `onCheck` | `(marked: number[]) => void` | — | indexes of the struck-out lines |
+| `meLabel` | node | "That's me" | label on every checkable card |
+| `hint`, `markedHint` | node | "Not you? Tap it!", "Not you" | small text under the label, before / after a tap |
 
 `notForYouVerdict(n, total)` is the default verdict: a prompt, "none of these is you", or how many still apply.
 

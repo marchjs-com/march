@@ -46,3 +46,15 @@ test("LiveFeed: next() pulls on the clock; hover and the pause button stop it", 
   dispose();
   manualClock(false);
 });
+
+test("LiveFeed: next is read once (a JSX getter that builds a new source each read still works)", () => {
+  manualClock(true);
+  const source = () => { let k = 0; return () => ({ id: k, title: `s${k++}` }); };
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const props = { every: 50, max: 5 };
+  Object.defineProperty(props, "next", { get: source, enumerable: true });
+  const dispose = render(() => h(LiveFeed, props), el);
+  assert.deepEqual(titles(el), ["s2", "s1", "s0"]);
+  dispose();
+  manualClock(false);
+});

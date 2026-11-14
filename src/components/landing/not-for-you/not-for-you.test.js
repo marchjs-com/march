@@ -25,7 +25,9 @@ test("NotForYou: lines toggle, the verdict follows, onCheck gets the indexes", (
   assert.match(verdict.textContent, /Strike out/);
   boxes[2].click(); boxes[0].click();
   assert.equal(boxes[0].getAttribute("aria-checked"), "true");
-  assert.match(boxes[0].textContent, /Not me!/);
+  assert.match(boxes[0].textContent, /That's me/);
+  assert.match(boxes[0].textContent, /Not you$/);
+  assert.match(boxes[1].textContent, /Not you\? Tap it!/);
   assert.match(verdict.textContent, /1 of 3 still apply/);
   assert.ok(verdict.classList.contains("is-some"));
   boxes[1].click();

@@ -96,10 +96,12 @@ export function LiveFeed(props: LiveFeedProps): Element {
   }
 
   // pulled items: one per `every` ms of clock time while visible, not paused and not hovered
+  // read once: a JSX prop is a getter, and `next={source()}` would build a new source on every read
   let acc = 0;
-  const pull = (): void => { const it = props.next?.(); if (it) add(it, true); };
-  if (props.next) {
-    for (let i = 0; i < Math.min(max(), 3); i++) { const it = props.next(); if (it) add(it, false); }
+  const next = props.next;
+  const pull = (): void => { const it = next?.(); if (it) add(it, true); };
+  if (next) {
+    for (let i = 0; i < Math.min(max(), 3); i++) { const it = next(); if (it) add(it, false); }
     let stop: (() => void) | null = null;
     effect(() => {
       const run = visible() && !paused() && !hovering();

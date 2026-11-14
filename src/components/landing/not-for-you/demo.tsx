@@ -18,6 +18,6 @@ export const FOR_YOU: NotForYouItem[] = [
 
 export default function NotForYouDemo(props: { values: { variant: string; check: boolean; both: boolean } }) {
   return <div>
-    {() => { const v = { ...props.values }; return <NotForYou variant={v.variant as "cards" | "list"} check={v.check} items={NOT_FOR_YOU} forYou={v.both ? FOR_YOU : undefined} /> }}
+    {() => { const v = { ...props.values }; return <NotForYou variant={v.variant as "cards" | "list"} check={v.check} markedHint="Sen bir HADİ'lisin" items={NOT_FOR_YOU} forYou={v.both ? FOR_YOU : undefined} /> }}
   </div>
 }
