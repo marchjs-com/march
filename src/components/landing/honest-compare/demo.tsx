@@ -12,6 +12,9 @@ export const COMPARE_ROWS: CompareRow[] = [
   { label: "Etkinlik kur, katılımcıları yönet", values: { us: true, events: true, social: "partial" } },
   { label: "Beğeni ve keşfet akışı", values: { us: true, events: false, social: true } },
   { label: "Görüntülü görüşme", values: { us: true, events: false, social: true } },
+  { label: "Bilet satışı", values: { us: true, events: true, social: false } },
+  { label: "Arkadaş listesi", values: { us: true, events: false, social: true } },
+  { label: "Tarayıcıdan kullan, kurulum gerekmez", values: { us: true, events: true, social: true } },
   { label: "Büyük konferans yönetimi (salon, sponsor)", values: { us: false, events: true, social: false }, note: "HADİ bunun için tasarlanmadı. Yüzlerce kişilik etkinlikte bir etkinlik platformu daha uygun." },
   { label: "Profesyonel ağ", values: { us: "partial", events: false, social: true }, note: "HADİ ilgi alanlarıyla tanışmak için; iş bağlantısı için profesyonel ağlar daha güçlü." },
 ]
