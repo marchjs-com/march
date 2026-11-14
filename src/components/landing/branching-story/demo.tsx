@@ -51,7 +51,7 @@ export const SATURDAY: Record<string, StoryPassage> = {
     body: <p>Gün bitmeden arkadaş listen dört kişi büyüdü. Hafta içi sohbet hiç durmadı.</p> },
   story: { title: "Anılar akışta", ending: "Hikâye anlatıcısı", color: "brand-purple", media: <Scene kind="hearts" label="48" />,
     body: <p>Paylaştığın hikâye kırk sekiz beğeni aldı; iki kişi bir dahaki etkinliği soruyor.</p> },
-  regular: { title: "Her hafta", ending: "Topluluk kurucusu", color: "brand-orange", media: <Scene kind="pin" label="her salı" />,
+  regular: { title: "Her hafta", ending: "Topluluk lideri", color: "brand-orange", media: <Scene kind="pin" label="her salı" />,
     body: <p>Etkinliğini tekrarlayan yaptın. Üçüncü haftada yeni gelenler eskileri geçti.</p> },
   tickets: { title: "Biletler tükendi", ending: "Girişimci", color: "brand-blue", media: <Scene kind="table" label="12/12" />,
     body: <p>Atölyenin on iki bileti bir günde bitti; bekleme listesine yedi kişi yazıldı.</p> },
