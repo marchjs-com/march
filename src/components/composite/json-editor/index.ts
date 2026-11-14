@@ -55,6 +55,20 @@ export interface JsonEditorProps extends ControlProps<unknown> {
   modes?: readonly JsonMode[] | undefined;
   /** Tree levels open at start (default 2). */
   expand?: number | undefined;
+  /** The Format button under the text (default true). */
+  format?: boolean | undefined;
+  /** The "Valid JSON" confirmation under the text (default true). Problems are shown either way. */
+  status?: boolean | undefined;
+  /**
+   * Own texts; each falls back to the built-in one: the two views (`text`, `tree`), the switcher's name (`view`), the
+   * tree's name (`treeName`), the tooltip of the tree tab while the text is broken (`fixFirst`), `valid`, `format`,
+   * `invalid(line, column, message)` and `more(count)` ("+2 more" after the first schema problem).
+   */
+  labels?: {
+    text?: string; tree?: string; view?: string; treeName?: string; fixFirst?: string; valid?: string; format?: string;
+    invalid?: ((line: number | null, column: number | null, message: string) => string) | undefined;
+    more?: ((count: number) => string) | undefined;
+  } | undefined;
 }
 
 // the tree view loads with its first use (forms that only need the text view stay small)
@@ -67,6 +81,7 @@ const Tree = lazy(() => import("../tree-editor/index.ts").then((m) => ({ default
 export function JsonEditor(props: JsonEditorProps): unknown {
   const [get, set] = model<unknown>(props, null);
   const id = uid("hm-json");
+  const L = (): NonNullable<JsonEditorProps["labels"]> => props.labels ?? {};
   const modes = (): readonly JsonMode[] => (props.modes?.length ? props.modes : ["text", "tree"]);
   const mode = signal<JsonMode>(untrack(() => (props.mode && modes().includes(props.mode) ? props.mode : modes()[0] ?? "text")));
   const stringify = (v: unknown): string => (v == null ? "" : typeof v === "string" ? v : JSON.stringify(v, null, props.indent ?? 2));
@@ -82,9 +97,9 @@ export function JsonEditor(props: JsonEditorProps): unknown {
     const s = text();
     if (!s.trim()) return { value: null };
     const r = parseJson(s);
-    if (r.error) return { msg: t`Invalid JSON at line ${r.line}, column ${r.column}: ${r.error}` };
+    if (r.error) return { msg: L().invalid?.(r.line, r.column, r.error) ?? t`Invalid JSON at line ${r.line}, column ${r.column}: ${r.error}` };
     const problems = validateJson(r.value, props.schema);
-    if (problems.length) return { value: r.value, msg: `${pointer(problems[0]!.path) || "/"}: ${problems[0]!.message}${problems.length > 1 ? ` ${t`(+${problems.length - 1} more)`}` : ""}`, problems };
+    if (problems.length) return { value: r.value, msg: `${pointer(problems[0]!.path) || "/"}: ${problems[0]!.message}${problems.length > 1 ? ` ${L().more?.(problems.length - 1) ?? t`(+${problems.length - 1} more)`}` : ""}`, problems };
     const custom = props.validate?.(r.value);
     return custom ? { value: r.value, msg: custom } : { value: r.value };
   });
@@ -107,7 +122,7 @@ export function JsonEditor(props: JsonEditorProps): unknown {
   syncValue(area, text);
   const format = (): void => { const st = status.peek(); if (!("value" in st)) return; emit(st.value == null ? "" : JSON.stringify(st.value, null, props.indent ?? 2)); };
 
-  const LABEL: Record<JsonMode, () => string> = { text: () => t`Text`, tree: () => t`Tree` };
+  const LABEL: Record<JsonMode, () => string> = { text: () => L().text ?? t`Text`, tree: () => L().tree ?? t`Tree` };
   const tabs = () => {
     const list = modes();
     if (list.length < 2) return null;
@@ -116,9 +131,9 @@ export function JsonEditor(props: JsonEditorProps): unknown {
       mode.set(m);
       if (focus) globalThis.document?.getElementById(`${id}-tab-${m}`)?.focus();
     };
-    return h("div", { role: "tablist", class: "hm-json-modes", "aria-label": () => t`JSON view` }, list.map((m) => h("button", {
+    return h("div", { role: "tablist", class: "hm-json-modes", "aria-label": () => L().view ?? t`JSON view` }, list.map((m) => h("button", {
       type: "button", role: "tab", id: `${id}-tab-${m}`, class: "hm-json-mode", "aria-selected": () => String(mode() === m), "aria-controls": `${id}-panel`,
-      "aria-disabled": () => (m === "tree" && !parsed() ? "true" : null), title: () => (m === "tree" && !parsed() ? t`Fix the JSON to see the tree` : null),
+      "aria-disabled": () => (m === "tree" && !parsed() ? "true" : null), title: () => (m === "tree" && !parsed() ? L().fixFirst ?? t`Fix the JSON to see the tree` : null),
       tabindex: () => (mode() === m ? "0" : "-1"), onClick: () => pick(m),
       onKeyDown: (e: KeyboardEvent) => {
         const i = list.indexOf(mode.peek()), fwd = untrack(dir) === "rtl" ? "ArrowLeft" : "ArrowRight", back = fwd === "ArrowRight" ? "ArrowLeft" : "ArrowRight";
@@ -128,8 +143,8 @@ export function JsonEditor(props: JsonEditorProps): unknown {
     }, () => LABEL[m]())));
   };
   const bar = h("div", { class: "hm-json-bar" },
-    h("span", { id: msgId, class: () => (status().msg ? "hm-field-error" : "hm-help"), role: "status" }, () => status().msg ?? (text().trim() ? t`Valid JSON` : "")),
-    () => (props.readonly ? null : h("button", { type: "button", class: "hm-btn hm-btn-sm", disabled: () => !parsed(), onClick: format }, t`Format`)));
+    h("span", { id: msgId, class: () => (status().msg ? "hm-field-error" : "hm-help"), role: "status" }, () => status().msg ?? (text().trim() && props.status !== false ? L().valid ?? t`Valid JSON` : "")),
+    () => (props.readonly || props.format === false ? null : h("button", { type: "button", class: "hm-btn hm-btn-sm hm-json-format", disabled: () => !parsed(), onClick: format }, () => L().format ?? t`Format`)));
   // re-drawn only when the view changes (typing keeps the same textarea and caret)
   const showTree = computed(() => mode() === "tree" && parsed());
   const body = () => {
@@ -137,7 +152,7 @@ export function JsonEditor(props: JsonEditorProps): unknown {
     return untrack(() => h(Tree, {
       value: status.peek().value, onChange: (v: unknown) => { const s = JSON.stringify(v, null, props.indent ?? 2); text.set(s); lastEmitted = v; set(v); },
       // live: switching read-only or disabled reaches the tree at once
-      schema: reactive(() => props.schema), readonly: reactive(() => props.readonly), disabled: reactive(() => props.disabled), expand: props.expand, label: t`JSON tree`,
+      schema: reactive(() => props.schema), readonly: reactive(() => props.readonly), disabled: reactive(() => props.disabled), expand: props.expand, label: L().treeName ?? t`JSON tree`,
       validate: props.validate ? (v: unknown) => { const m = props.validate!(v); return m ? [{ path: [], message: m }] : []; } : undefined,
     }));
   };

@@ -13,6 +13,8 @@ export interface MinimapProps {
   flow: FlowStore;
   /** Canvas size in pixels. */
   size: () => { w: number; h: number };
+  /** Accessible name (default "Minimap: click to move the view"). */
+  label?: (() => string | undefined) | undefined;
 }
 
 const MW = 168, MH = 112;
@@ -45,7 +47,7 @@ export function Minimap(props: MinimapProps): Element {
   });
   return h("svg", {
     class: "hm-flow-minimap", width: String(MW), height: String(MH), viewBox: `0 0 ${MW} ${MH}`, role: "img", tabindex: "0",
-    "aria-label": () => t`Minimap: click to move the view`,
+    "aria-label": () => props.label?.() ?? t`Minimap: click to move the view`,
     onPointerdown: (e: PointerEvent) => {
       e.stopPropagation();
       const svg = e.currentTarget as SVGSVGElement;

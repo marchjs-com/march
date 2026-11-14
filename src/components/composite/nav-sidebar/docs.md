@@ -31,6 +31,7 @@ featured items at the top, a collapsible icon rail and a resizable width, all re
 | `headings` | boolean | `true` | the "Recent" and "Categories" headings |
 | `expandAll` | boolean | `true` | the "Expand all / Collapse all" button |
 | `groupCounts` | boolean | `true` | the item count beside each category name |
+| `nestedSubs` | boolean | `false` | nested items (a page under a page) show their `sub` line too |
 | `labels` | object | `t` texts | `search`, `clearSearch`, `noMatches`, `results`, `recent`, `categories`, `expandAll`, `collapseAll`, `menu`, `expandSidebar`, `collapseSidebar`, `resize` (strings or accessors), `showUnder(label)`, `hideUnder(label)` |
 | `width`, `onResize` | px / CSS length, `(px) => void` | 17.5rem | starting width; called while resizing |
 | `groupIcons` | `{ [group]: icon }` | — | icons beside category names |

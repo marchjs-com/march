@@ -98,6 +98,8 @@ export interface NavSidebarProps {
   expandAll?: boolean;
   /** The item count beside each category name (default true). */
   groupCounts?: boolean;
+  /** Nested items (a page under a page) also show their `sub` line (default false: only the label). */
+  nestedSubs?: boolean;
   /** Own texts (strings or accessors); defaults are the translated ones. `showUnder` / `hideUnder` name the fold button of a parent item. */
   labels?: {
     search?: MaybeFn<string>; clearSearch?: MaybeFn<string>; noMatches?: MaybeFn<string>; results?: MaybeFn<string>;
@@ -388,7 +390,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
       onEnd: () => { globalThis.document.documentElement.classList.remove("hm-sb-resizing"); resizing.set(false); },
     }),
   });
-  return h("div", { class: () => cx("hm-nav-wrap", "hm-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--hm-sb-w", w); } },
+  return h("div", { class: () => cx("hm-nav-wrap", "hm-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", props.nestedSubs && "is-nested-subs", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--hm-sb-w", w); } },
     h("button", { type: "button", class: "hm-icon-btn hm-nav-burger", "aria-controls": navId, "aria-expanded": () => String(drawer()), "aria-label": () => L("menu", t`Menu`), onClick: () => drawer.update((x) => !x) }, glyph(menu)),
     h("div", { class: "hm-nav-scrim", "aria-hidden": "true", onClick: () => drawer.set(false) }),
     h("nav", { class: "hm-nav hm-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },

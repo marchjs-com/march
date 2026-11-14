@@ -22,6 +22,21 @@ flow.load(JSON.parse(text), "Import")             // validated (validateFlow); o
 | `tool` | `select` `pan` | `select` | dragging the empty canvas draws a selection box or moves the view |
 | `fields` | boolean | `true` | form controls inside the nodes |
 | `label` | string | "Flow editor" | accessible name |
+| `controls` | boolean / `("zoom" \| "fit" \| "layout")[]` | `true` | the zoom bar: off, or only the listed parts |
+| `menu` | boolean / `(items, target) => items` | `true` | the context menu: off, or your own list built from the built-in items |
+| `motion` | boolean | `true` | draw-in, moving dots, glow / shake / pop, view and layout tweens |
+| `labels` | object | — | own texts: `editor`, `node`, `menu`, `minimap`, `zoomIn`, `zoomOut`, `fit`, `layout`, `copy`, `cut`, `duplicate`, `group`, `ungroup`, `delete`, `paste`, `selectAll`, `add(type)`, `input(port)`, `output(port)`, `connection(from, to)`, `values(count)`, `connected`, `cannotConnect`, `choosePort`, `arranged(n)`, `copied(n)`, `pasted(n)`, `deleted(n)`, `selected(n)` |
+| `class` | class value | — | on the canvas (`hm-flow`) |
+
+```tsx
+<FlowCanvas flow={flow} controls={["zoom", "fit"]} minimap={false} motion={false}
+  menu={(items) => [...items, "-", { label: "Export", onSelect: exportFlow }]}
+  labels={{ zoomIn: "Closer", zoomOut: "Further", add: (type) => `New ${type}`, deleted: (n) => `${n} removed` }} />
+<FlowCanvas flow={flow} controls={false} menu={false} />   // a bare canvas: your own toolbar drives flow.view.peek()
+```
+
+The node, edge and group parts carry stable classes (`hm-flow-node`, `hm-flow-head`, `hm-flow-port`, `hm-flow-pill`,
+`hm-flow-group`, `hm-flow-zoom`, `hm-flow-minimap`); a node's icon, colour, ports and fields come from its type.
 
 ## Model
 

@@ -11,7 +11,7 @@ import { h } from "../../../dom/h.ts";
 import { lazy } from "../../../dom/lazy.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, uid, val, type ClassProp } from "../../../core/util.ts";
-import { glyph } from "../../../ui/util.ts";
+import { glyph, icon } from "../../../ui/util.ts";
 import { model, ctl, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { Toolbar } from "../../../ui/stack.ts";
 import { IconButton } from "../../../ui/button.ts";
@@ -45,8 +45,22 @@ export interface MarkdownEditorProps extends ControlProps<string> {
   views?: readonly MarkdownView[] | undefined;
   /** Older form of `view`: "tab" (write / preview tabs) or "split". */
   preview?: "tab" | "split" | undefined;
-  /** Formatting toolbar over the source (default true). */
-  toolbar?: boolean | undefined;
+  /** Formatting toolbar over the source: true (default), false, or the tools to show in order ("|" is a separator). */
+  toolbar?: boolean | readonly (MarkdownTool | "|")[] | undefined;
+  /** Own icons for tools: an icon, a string or a node each. */
+  icons?: Partial<Record<MarkdownTool, unknown>> | undefined;
+  /** The Markdown syntax reminder at the end of the footer (default true). */
+  hint?: boolean | undefined;
+  /**
+   * Own texts; each falls back to the built-in one: the views (`write`, `preview`, `split`, `rich`), the switcher's
+   * name (`view`), the toolbar's name (`formatting`), `tools` (a name per tool), `source`, `resize`, `hint`,
+   * `words(count)` and `minutes(count)`.
+   */
+  labels?: {
+    write?: string; preview?: string; split?: string; rich?: string; view?: string; formatting?: string; source?: string; resize?: string; hint?: string;
+    tools?: Partial<Record<MarkdownTool, string>> | undefined;
+    words?: ((count: number) => string) | undefined; minutes?: ((count: number) => string) | undefined;
+  } | undefined;
   /** Source and preview scroll together in the split view (default true). */
   syncScroll?: boolean | undefined;
   /** Words and reading time under the editor (default true). */
@@ -70,8 +84,9 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
   const c = ctl(props);
   const ro = (): boolean => !!(props.readonly || props.disabled);
   let syncing = false;
+  const L = (): NonNullable<MarkdownEditorProps["labels"]> => props.labels ?? {};
 
-  const LABEL: Record<MarkdownView, () => string> = { write: () => t`Write`, preview: () => t`Preview`, split: () => t`Split`, rich: () => t`Rich text` };
+  const LABEL: Record<MarkdownView, () => string> = { write: () => L().write ?? t`Write`, preview: () => L().preview ?? t`Preview`, split: () => L().split ?? t`Split`, rich: () => L().rich ?? t`Rich text` };
   const TOOL_LABEL: Record<MarkdownTool, () => string> = {
     h2: () => t`Heading 2`, h3: () => t`Heading 3`, bold: () => t`Bold`, italic: () => t`Italic`, strike: () => t`Strikethrough`, code: () => t`Inline code`,
     link: () => t`Link`, ul: () => t`Bulleted list`, ol: () => t`Numbered list`, task: () => t`Task list`, quote: () => t`Quote`, codeblock: () => t`Code block`,
@@ -80,7 +95,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
 
   const area = h("textarea", {
     ...c, class: "hm-input hm-mde-source", rows: () => props.rows ?? 10, placeholder: () => props.placeholder ?? null, spellcheck: "true",
-    readonly: () => !!props.readonly, "aria-multiline": "true", "aria-label": () => c["aria-label"]() ?? t`Markdown source`,
+    readonly: () => !!props.readonly, "aria-multiline": "true", "aria-label": () => c["aria-label"]() ?? L().source ?? t`Markdown source`,
     onInput: (e: Event) => set((e.target as HTMLTextAreaElement).value),
     onKeyDown: (e: KeyboardEvent) => keydown(e),
     onPaste: (e: ClipboardEvent) => paste(e),
@@ -89,7 +104,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
   syncValue(area, get);
 
   const preview = h("div", {
-    id: `${id}-preview`, class: "hm-markdown hm-mde-preview", role: "region", tabindex: "0", "aria-label": () => t`Preview`,
+    id: `${id}-preview`, class: "hm-markdown hm-mde-preview", role: "region", tabindex: "0", "aria-label": () => L().preview ?? t`Preview`,
     onScroll: () => sync(preview, area),
   }, () => markdownNodes(get())) as HTMLElement;
 
@@ -164,7 +179,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
     const list = views();
     if (list.length < 2) return null;
     const pick = (v: MarkdownView, focus = false): void => { view.set(v); if (focus) globalThis.document?.getElementById(`${id}-tab-${v}`)?.focus(); };
-    return h("div", { role: "tablist", class: "hm-mde-views", "aria-label": () => t`Editor view` }, list.map((v) => h("button", {
+    return h("div", { role: "tablist", class: "hm-mde-views", "aria-label": () => L().view ?? t`Editor view` }, list.map((v) => h("button", {
       type: "button", role: "tab", id: `${id}-tab-${v}`, class: "hm-mde-view", "aria-selected": () => String(view() === v), "aria-controls": `${id}-body`,
       tabindex: () => (view() === v ? "0" : "-1"), onClick: () => pick(v),
       onKeyDown: (e: KeyboardEvent) => {
@@ -175,9 +190,9 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
     }, () => LABEL[v]())));
   };
   const toolbar = () => (props.toolbar === false || view() === "preview" || view() === "rich" ? null : h(Toolbar, {
-    label: () => t`Formatting`, class: "hm-mde-toolbar",
-    children: TOOLS.map((tool) => (tool === "|" ? h("span", { class: "hm-mde-sep", role: "separator", "aria-orientation": "vertical" }) : h(IconButton, {
-      icon: glyph(ICON[tool]), label: TOOL_LABEL[tool], size: "sm", class: cx("hm-mde-tool", (tool === "h2" || tool === "h3") && `hm-mde-tool-${tool}`), disabled: ro,
+    label: () => L().formatting ?? t`Formatting`, class: "hm-mde-toolbar",
+    children: (Array.isArray(props.toolbar) ? props.toolbar as readonly (MarkdownTool | "|")[] : TOOLS).map((tool) => (tool === "|" ? h("span", { class: "hm-mde-sep", role: "separator", "aria-orientation": "vertical" }) : h(IconButton, {
+      icon: props.icons?.[tool] !== undefined ? icon(props.icons[tool]) : glyph(ICON[tool]), label: () => L().tools?.[tool] ?? TOOL_LABEL[tool](), size: "sm", class: cx("hm-mde-tool", (tool === "h2" || tool === "h3") && `hm-mde-tool-${tool}`), disabled: ro,
       onMouseDown: (e: MouseEvent) => e.preventDefault(), onClick: () => exec(tool),
     }))),
   }));
@@ -186,7 +201,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
     return untrack(() => {
       if (v === "write") return area;
       if (v === "preview") return preview;
-      if (v === "split") return h(Splitter, { start: area, end: preview, initial: props.split ?? 0.5, min: 0.2, label: t`Resize the panes`, class: "hm-mde-split" });
+      if (v === "split") return h(Splitter, { start: area, end: preview, initial: props.split ?? 0.5, min: 0.2, label: L().resize ?? t`Resize the panes`, class: "hm-mde-split" });
       return h(RichView, { value: get(), onChange: (x: string) => set(x), readonly: reactive(() => props.readonly), disabled: reactive(() => props.disabled), rows: props.rows ?? 10, toolbar: undefined, counter: false });
     });
   };
@@ -195,6 +210,6 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
     h("div", { class: "hm-mde-head" }, toolbar, tabs),
     h("div", { id: `${id}-body`, class: "hm-mde-body", role: () => (views().length > 1 ? "tabpanel" : null), "aria-labelledby": () => (views().length > 1 ? `${id}-tab-${view()}` : null) }, body),
     () => (props.stats === false ? null : h("div", { class: "hm-mde-foot" },
-      h("span", null, () => t`${counts().words} words`), h("span", { "aria-hidden": "true" }, "·"), h("span", null, () => t`${counts().minutes} min read`),
-      h("span", { class: "hm-mde-hint" }, () => (view() === "rich" ? "" : t`Markdown: **bold**, _italic_, # heading, - list`)))));
+      h("span", null, () => L().words?.(counts().words) ?? t`${counts().words} words`), h("span", { "aria-hidden": "true" }, "·"), h("span", null, () => L().minutes?.(counts().minutes) ?? t`${counts().minutes} min read`),
+      () => (props.hint === false ? null : h("span", { class: "hm-mde-hint" }, () => (view() === "rich" ? "" : L().hint ?? t`Markdown: **bold**, _italic_, # heading, - list`))))));
 }

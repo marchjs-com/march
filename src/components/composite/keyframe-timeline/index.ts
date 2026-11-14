@@ -38,6 +38,26 @@ export interface KeyframeTimelineProps extends ControlProps<M.TimelineModel> {
   loop?: boolean | undefined;
   /** Preview stage over the lanes (default true). */
   stage?: boolean | undefined;
+  /** The playback bar: true (default), false, or the parts to keep. Space still plays and pauses. */
+  transport?: boolean | readonly ("play" | "start" | "loop" | "time" | "speed")[] | undefined;
+  /** Speed choices (default 0.25, 0.5, 1, 2). */
+  speeds?: readonly number[] | undefined;
+  /** The keyframe inspector under the lanes: time, value, delete, easing (default true). */
+  inspector?: boolean | undefined;
+  /** The text shown in the inspector's place while no keyframe is selected (default true). */
+  hint?: boolean | undefined;
+  /** The value curve drawn in every lane (default true). */
+  curves?: boolean | undefined;
+  /**
+   * Own texts; each falls back to the built-in one: `timeline`, `playback`, `play`, `pause`, `start`, `loop`, `speed`,
+   * `playhead`, `hint`, `time`, `value`, `remove`, `easing`, `keyframe(number, target, prop)`, `lane(target, prop)`.
+   */
+  labels?: {
+    timeline?: string; playback?: string; play?: string; pause?: string; start?: string; loop?: string; speed?: string; playhead?: string;
+    hint?: string; time?: string; value?: string; remove?: string; easing?: string;
+    keyframe?: ((number: number, target: string, prop: string) => string) | undefined;
+    lane?: ((target: string, prop: string) => string) | undefined;
+  } | undefined;
   class?: ClassProp;
 }
 
@@ -51,6 +71,9 @@ export function KeyframeTimeline(props: KeyframeTimelineProps): unknown {
   const id = uid("hm-kt");
   const c = ctl(props);
   const ro = (): boolean => !!(props.readonly || props.disabled);
+  const L = (): NonNullable<KeyframeTimelineProps["labels"]> => props.labels ?? {};
+  const keyName = (n: number, target: string, prop: string): string => L().keyframe?.(n, target, prop) ?? t`Keyframe ${n} of ${target} ${prop}`;
+  const bar = (k: "play" | "start" | "loop" | "time" | "speed"): boolean => { const p = props.transport; return p == null || p === true || (p !== false && p.includes(k)); };
   const now = signal(0);
   const playing = signal(false);
   const loop = signal(untrack(() => props.loop !== false));
@@ -125,7 +148,7 @@ export function KeyframeTimeline(props: KeyframeTimelineProps): unknown {
   }, k.major ? `${k.at / 1000}s` : null))) as HTMLElement;
   track(ruler, { onStart: () => { if (playing.peek()) toggle(); }, onMove: (p) => seek(snapMs(p.x * D.peek(), p.event.altKey || !(props.snap ?? 50))) });
   const head = h("div", {
-    class: "hm-kt-head", role: "slider", tabindex: "0", "aria-label": () => t`Playhead`, "aria-valuemin": "0", "aria-valuemax": () => String(D()),
+    class: "hm-kt-head", role: "slider", tabindex: "0", "aria-label": () => L().playhead ?? t`Playhead`, "aria-valuemin": "0", "aria-valuemax": () => String(D()),
     "aria-valuenow": () => String(Math.round(now())), "aria-valuetext": () => fmt(now()),
     onKeyDown: (e: KeyboardEvent) => { const st = arrowStep(e); if (!st) return; e.preventDefault(); seek(st.home ? 0 : st.end ? D.peek() : now.peek() + (st.dx || -st.dy) * (e.shiftKey ? 10 : 1000 / 60)); },
   }, h("span", { class: "hm-kt-head-grip", "aria-hidden": "true" })) as HTMLElement;
@@ -137,7 +160,7 @@ export function KeyframeTimeline(props: KeyframeTimelineProps): unknown {
     const el = h("button", {
       type: "button", class: () => cx("hm-kt-key", isSel() && "is-selected", Math.abs((key()?.at ?? -1e9) - now()) < 1000 / 60 && "is-hit"), role: "slider",
       style: () => ({ "--hm-kt-at": `${((key()?.at ?? 0) / D()) * 100}%` }), tabindex: () => (isSel() || (!selected() && ti === 0 && ki === 0) ? "0" : "-1"),
-      "aria-label": () => t`Keyframe ${ki + 1} of ${get().tracks[ti]?.target ?? ""} ${get().tracks[ti]?.prop ?? ""}`, "aria-valuemin": "0", "aria-valuemax": () => String(D()),
+      "aria-label": () => keyName(ki + 1, get().tracks[ti]?.target ?? "", get().tracks[ti]?.prop ?? ""), "aria-valuemin": "0", "aria-valuemax": () => String(D()),
       "aria-valuenow": () => String(Math.round(key()?.at ?? 0)), "aria-valuetext": () => `${fmt(key()?.at ?? 0)}, ${key()?.value ?? ""}`, disabled: ro,
       onFocus: () => selected.set({ track: ti, key: ki }),
       onKeyDown: (e: KeyboardEvent) => {
@@ -172,25 +195,26 @@ export function KeyframeTimeline(props: KeyframeTimelineProps): unknown {
     return untrack(() => get().tracks.map((tk, ti) => h("div", { class: "hm-kt-row", "data-hm-color": colorOf(ti, tk) },
       h("div", { class: "hm-kt-label" }, h("span", { class: "hm-kt-dot", "aria-hidden": "true" }), h("b", null, tk.target), h("span", { class: "hm-kt-prop" }, () => `${get().tracks[ti]?.prop ?? ""}`)),
       h("div", {
-        class: "hm-kt-lane", role: "group", "aria-label": () => t`${tk.target} ${tk.prop}: double-click to add a keyframe`,
+        class: "hm-kt-lane", role: "group", "aria-label": () => L().lane?.(tk.target, tk.prop) ?? t`${tk.target} ${tk.prop}: double-click to add a keyframe`,
         onDblClick: (e: MouseEvent) => { if (ro() || (e.target as Element).closest(".hm-kt-key")) return; const r = (e.currentTarget as HTMLElement).getBoundingClientRect(); addKey(ti, snapMs(((e.clientX - r.left) / r.width) * D.peek(), e.altKey)); },
-      }, spark(ti), tk.keys.map((_, ki) => diamond(ti, ki))))));
+      }, props.curves === false ? null : spark(ti), tk.keys.map((_, ki) => diamond(ti, ki))))));
   };
 
   // ------------------------------------------------------------------ inspector
   const inspector = () => {
+    if (props.inspector === false) return null;
     const s = selected();
-    if (!s) return h("p", { class: "hm-kt-empty" }, () => t`Select a keyframe to edit its time, value and easing. Double-click a lane to add one.`);
+    if (!s) return props.hint === false ? null : h("p", { class: "hm-kt-empty" }, () => L().hint ?? t`Select a keyframe to edit its time, value and easing. Double-click a lane to add one.`);
     return untrack(() => {
       const tk = get().tracks[s.track], k = tk?.keys[s.key];
       if (!tk || !k) return null;
       const [lo, hi] = M.PROP_RANGE[tk.prop];
-      return h("div", { class: "hm-kt-inspector", role: "group", "aria-label": () => t`Keyframe ${s.key + 1} of ${tk.target} ${tk.prop}` },
+      return h("div", { class: "hm-kt-inspector", role: "group", "aria-label": () => keyName(s.key + 1, tk.target, tk.prop) },
         h("div", { class: "hm-kt-fields" },
-          h("label", { class: "hm-kt-field" }, h("span", null, () => t`Time (ms)`), h("input", { type: "number", class: "hm-input", min: "0", max: () => String(D()), step: () => String(props.snap || 10), value: () => String(get().tracks[s.track]?.keys[s.key]?.at ?? 0), readonly: () => !!props.readonly, onInput: (e: Event) => { const n = Number((e.target as HTMLInputElement).value); if (Number.isFinite(n)) setKey(s.track, s.key, { at: clamp(n, 0, D.peek()) }); } })),
-          h("label", { class: "hm-kt-field" }, h("span", null, () => `${t`Value`} (${tk.prop}${M.PROP_UNIT[tk.prop] ? `, ${M.PROP_UNIT[tk.prop]}` : ""})`), h("input", { type: "number", class: "hm-input", min: String(lo), max: String(hi), step: tk.prop === "opacity" || tk.prop === "scale" ? "0.05" : "1", value: () => String(get().tracks[s.track]?.keys[s.key]?.value ?? 0), readonly: () => !!props.readonly, onInput: (e: Event) => { const n = Number((e.target as HTMLInputElement).value); if (Number.isFinite(n)) setKey(s.track, s.key, { value: clamp(n, lo, hi) }); } })),
-          ro() ? null : h(IconButton, { icon: glyph(trash), label: () => t`Delete keyframe`, size: "sm", variant: "danger", disabled: () => (get().tracks[s.track]?.keys.length ?? 0) <= 1, onClick: () => removeKey(s.track, s.key) })),
-        h(EasingCurveEditor, { value: k.easing ?? "in-out", onChange: (v: string) => setKey(s.track, s.key, { easing: v }), preview: "none", duration: 600, compact: true, readonly: reactive(() => props.readonly), class: "hm-kt-ease", "aria-label": t`Easing into this keyframe` }));
+          h("label", { class: "hm-kt-field" }, h("span", null, () => L().time ?? t`Time (ms)`), h("input", { type: "number", class: "hm-input", min: "0", max: () => String(D()), step: () => String(props.snap || 10), value: () => String(get().tracks[s.track]?.keys[s.key]?.at ?? 0), readonly: () => !!props.readonly, onInput: (e: Event) => { const n = Number((e.target as HTMLInputElement).value); if (Number.isFinite(n)) setKey(s.track, s.key, { at: clamp(n, 0, D.peek()) }); } })),
+          h("label", { class: "hm-kt-field" }, h("span", null, () => `${L().value ?? t`Value`} (${tk.prop}${M.PROP_UNIT[tk.prop] ? `, ${M.PROP_UNIT[tk.prop]}` : ""})`), h("input", { type: "number", class: "hm-input", min: String(lo), max: String(hi), step: tk.prop === "opacity" || tk.prop === "scale" ? "0.05" : "1", value: () => String(get().tracks[s.track]?.keys[s.key]?.value ?? 0), readonly: () => !!props.readonly, onInput: (e: Event) => { const n = Number((e.target as HTMLInputElement).value); if (Number.isFinite(n)) setKey(s.track, s.key, { value: clamp(n, lo, hi) }); } })),
+          ro() ? null : h(IconButton, { icon: glyph(trash), label: () => L().remove ?? t`Delete keyframe`, size: "sm", variant: "danger", disabled: () => (get().tracks[s.track]?.keys.length ?? 0) <= 1, onClick: () => removeKey(s.track, s.key) })),
+        h(EasingCurveEditor, { value: k.easing ?? "in-out", onChange: (v: string) => setKey(s.track, s.key, { easing: v }), preview: "none", duration: 600, compact: true, readonly: reactive(() => props.readonly), class: "hm-kt-ease", "aria-label": L().easing ?? t`Easing into this keyframe` }));
     });
   };
 
@@ -203,15 +227,15 @@ export function KeyframeTimeline(props: KeyframeTimelineProps): unknown {
     queueMicrotask(() => paint(now.peek()));
     return el;
   })));
-  const transport = h("div", { class: "hm-kt-transport", role: "toolbar", "aria-label": () => t`Playback` },
-    h(IconButton, { label: () => (playing() ? t`Pause` : t`Play`), class: "hm-kt-play", "aria-keyshortcuts": "Space", onClick: toggle, children: () => glyph(playing() ? pauseIcon : playIcon) }),
-    h(IconButton, { icon: glyph(skipBack), label: () => t`Back to start`, size: "sm", onClick: () => seek(0) }),
-    h(IconButton, { icon: glyph(repeat), label: () => t`Loop`, size: "sm", class: () => cx("hm-kt-loop", loop() && "is-on"), "aria-pressed": () => String(loop()), onClick: () => loop.set(!loop.peek()) }),
-    h("span", { class: "hm-kt-time", "aria-live": "off" }, h("b", null, () => fmt(now())), " / ", () => fmt(D())),
-    h(Segmented, { class: "hm-kt-speed", "aria-label": t`Speed`, options: SPEEDS.map((s) => ({ value: s, label: `${s}×` })), value: 1, onChange: (s: number | null) => { if (s) speed.set(s); } }));
+  const transport = props.transport === false ? null : h("div", { class: "hm-kt-transport", role: "toolbar", "aria-label": () => L().playback ?? t`Playback` },
+    bar("play") && h(IconButton, { label: () => (playing() ? L().pause ?? t`Pause` : L().play ?? t`Play`), class: "hm-kt-play", "aria-keyshortcuts": "Space", onClick: toggle, children: () => glyph(playing() ? pauseIcon : playIcon) }),
+    bar("start") && h(IconButton, { icon: glyph(skipBack), label: () => L().start ?? t`Back to start`, size: "sm", class: "hm-kt-start", onClick: () => seek(0) }),
+    bar("loop") && h(IconButton, { icon: glyph(repeat), label: () => L().loop ?? t`Loop`, size: "sm", class: () => cx("hm-kt-loop", loop() && "is-on"), "aria-pressed": () => String(loop()), onClick: () => loop.set(!loop.peek()) }),
+    bar("time") && h("span", { class: "hm-kt-time", "aria-live": "off" }, h("b", null, () => fmt(now())), " / ", () => fmt(D())),
+    bar("speed") && h(Segmented, { class: "hm-kt-speed", "aria-label": L().speed ?? t`Speed`, options: (props.speeds ?? SPEEDS).map((s) => ({ value: s, label: `${s}×` })), value: 1, onChange: (s: number | null) => { if (s) speed.set(s); } }));
 
   return h("div", {
-    class: () => cx("hm-kt", playing() && "is-playing", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? t`Keyframe timeline`, id,
+    class: () => cx("hm-kt", playing() && "is-playing", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? L().timeline ?? t`Keyframe timeline`, id,
     ref: (el: HTMLElement) => { root = el; },
     onKeyDown: (e: KeyboardEvent) => { if (e.key === " " && !(e.target as Element).closest("input, textarea, button, [role=slider]")) { e.preventDefault(); toggle(); } },
   },

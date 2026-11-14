@@ -43,6 +43,8 @@
 .hm-dock-btn:hover { background: color-mix(in srgb, var(--hm-text) 8%, transparent); color: var(--hm-text); }
 .hm-dock-btn[aria-pressed="true"] { color: var(--hm-primary); }
 .hm-dock-btn .hm-svg { width: .875rem; height: .875rem; }
+/* an own icon (the `icons` prop): text or a node, centred in the button */
+.hm-dock-own { display: inline-grid; place-items: center; font-size: var(--hm-text-sm); line-height: 1; }
 
 /* maximized: the group covers the layout */
 .hm-dock-group.is-maximized { position: absolute; inset: 3px; z-index: 8; margin: 0; box-shadow: var(--hm-shadow-3); }

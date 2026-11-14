@@ -135,3 +135,42 @@ test("DockLayout: panels removed from the list leave the layout", async () => {
   assert.equal(m.el.querySelectorAll("[role=tab]").length, 1);
   m.dispose();
 });
+
+test("DockLayout: group buttons off or chosen, own icons and texts, no tray, own empty state", async () => {
+  const mk = () => ["a", "b"].map((id) => ({ id, title: id.toUpperCase(), content: () => h("p", {}, id) }));
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const apis = [];
+  const dispose = render(() => [
+    h(DockLayout, { panels: mk(), commands: false, class: "one", actions: ["maximize"], icons: { close: "×", maximize: () => h("i", { class: "own-max" }) },
+      labels: { workspace: "desk", maximize: "Full size", close: "Shut", panels: "Tabs", group: (title) => `Group ${title}` } }),
+    h(DockLayout, { panels: mk(), commands: false, class: "two", actions: false, tray: false, motion: false, api: (a) => apis.push(a),
+      empty: (reset) => h("button", { class: "own-empty", onClick: reset }, "Back") }),
+    h(DockLayout, { panels: mk(), commands: false, class: "three", empty: false, api: (a) => apis.push(a), labels: { tray: "Parked", restore: "Wake" } }),
+  ], host);
+  const one = host.querySelector(".hm-dock.one"), two = host.querySelector(".hm-dock.two"), three = host.querySelector(".hm-dock.three");
+  assert.equal(one.getAttribute("aria-roledescription"), "desk");
+  assert.deepEqual([...one.querySelectorAll(".hm-dock-btn")].map((x) => x.getAttribute("aria-label")), ["Full size"]);
+  assert.ok(one.querySelector(".hm-dock-btn .own-max"));
+  assert.equal(one.querySelector(".hm-dock-x").getAttribute("title"), "Shut");
+  assert.equal(one.querySelector(".hm-dock-x").textContent, "×");
+  assert.equal(one.querySelector("[data-dock-group]").getAttribute("aria-label"), "Group A");
+  assert.equal(one.querySelector("[role=tablist]").getAttribute("aria-label"), "Tabs");
+  assert.equal(two.querySelector(".hm-dock-actions"), null);
+  assert.equal(three.querySelectorAll(".hm-dock-btn").length, 3, "the default buttons stay");
+  const [api2, api3] = apis;
+  api2.minimize("a");
+  api3.minimize("a");
+  await tick();
+  assert.equal(two.querySelector(".hm-dock-tray"), null, "tray={false}: no tray");
+  assert.equal(three.querySelector(".hm-dock-tray").getAttribute("aria-label"), "Parked");
+  assert.equal(three.querySelector(".hm-dock-tray-btn").getAttribute("title"), "Wake");
+  api2.minimize("b");
+  api3.minimize("b");
+  await tick();
+  assert.ok(two.querySelector(".hm-dock-empty .own-empty"), "own empty state");
+  assert.equal(three.querySelector(".hm-dock-empty").textContent, "", "empty={false}: nothing");
+  two.querySelector(".own-empty").click();
+  await tick();
+  assert.equal(two.querySelectorAll("[role=tab]").length, 2, "the own node's reset brings the panels back");
+  dispose();
+});

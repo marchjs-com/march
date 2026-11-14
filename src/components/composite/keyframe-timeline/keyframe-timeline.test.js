@@ -49,3 +49,33 @@ test("KeyframeTimeline: lanes with keyframe sliders, keyboard moves and deletes,
   assert.equal(el.querySelectorAll(".hm-kt-actor").length, 2, "one preview target per target name");
   dispose();
 });
+
+test("KeyframeTimeline: playback bar in parts or off, no curves, no inspector, own texts and speeds", () => {
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  const dispose = render(() => [
+    h(KeyframeTimeline, { value: structuredClone(MODEL), class: "mine", transport: ["play", "speed"], speeds: [1, 3], curves: false,
+      labels: { timeline: "Motion", play: "Start", playhead: "Needle", hint: "Pick a key", keyframe: (n, target, prop) => `${target}.${prop} #${n}`, lane: (target, prop) => `${target}.${prop}` } }),
+    h(KeyframeTimeline, { value: structuredClone(MODEL), transport: false, inspector: false }),
+    h(KeyframeTimeline, { value: structuredClone(MODEL), hint: false }),
+  ], el);
+  const [a, b, c] = el.querySelectorAll(".hm-kt");
+  assert.ok(a.classList.contains("mine"));
+  assert.equal(a.getAttribute("aria-label"), "Motion");
+  assert.deepEqual(a.querySelectorAll(".hm-kt-transport button").map((x) => x.getAttribute("aria-label")).filter(Boolean), ["Start"]);
+  assert.equal(a.querySelector(".hm-kt-time"), null);
+  assert.deepEqual(a.querySelectorAll(".hm-kt-speed [role=radio]").map((x) => x.textContent), ["1×", "3×"]);
+  assert.equal(a.querySelector(".hm-kt-spark"), null);
+  assert.equal(a.querySelector(".hm-kt-head").getAttribute("aria-label"), "Needle");
+  assert.equal(a.querySelector(".hm-kt-key").getAttribute("aria-label"), "logo.x #1");
+  assert.equal(a.querySelector(".hm-kt-lane").getAttribute("aria-label"), "logo.x");
+  assert.equal(a.querySelector(".hm-kt-empty").textContent, "Pick a key");
+  assert.equal(b.querySelector(".hm-kt-transport"), null);
+  assert.equal(b.querySelector(".hm-kt-empty"), null);
+  assert.ok(b.querySelector(".hm-kt-spark"), "the default parts stay");
+  b.querySelector(".hm-kt-key").dispatchEvent(new globalThis.Event("focus"));
+  assert.equal(b.querySelector(".hm-kt-inspector"), null);
+  assert.equal(c.querySelector(".hm-kt-empty"), null);
+  assert.equal(c.querySelectorAll(".hm-kt-transport button").length >= 3, true);
+  dispose();
+});

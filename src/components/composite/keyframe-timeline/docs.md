@@ -21,7 +21,20 @@ speed, "Stop all" and reduced motion apply; `timelineCode(model)` writes the sam
 | `autoplay` | boolean | `false` | |
 | `stage` | boolean | `true` | preview of the targets over the lanes |
 | `renderTarget` | `(name) => Element` | labelled pill | the preview element of a target (moved with CSS variables) |
+| `transport` | boolean / `("play" \| "start" \| "loop" \| "time" \| "speed")[]` | `true` | the playback bar, or only the listed parts (Space still plays) |
+| `speeds` | number[] | `[0.25, 0.5, 1, 2]` | speed choices |
+| `inspector` | boolean | `true` | time, value, delete and easing of the selected keyframe |
+| `hint` | boolean | `true` | the text in the inspector's place while nothing is selected |
+| `curves` | boolean | `true` | the value curve drawn in every lane |
+| `labels` | object | — | own texts: `timeline`, `playback`, `play`, `pause`, `start`, `loop`, `speed`, `playhead`, `hint`, `time`, `value`, `remove`, `easing`, `keyframe(number, target, prop)`, `lane(target, prop)` |
 | `readonly`, `disabled` | | | |
+| `class` | class value | — | on the root (`hm-kt`) |
+
+```tsx
+<KeyframeTimeline bind:value={$timeline} transport={["play", "time"]} curves={false} hint={false}
+  labels={{ play: "Start", time: "At (ms)", keyframe: (n, target, prop) => `${target} ${prop}, key ${n}` }} />
+<KeyframeTimeline value={$timeline} transport={false} inspector={false} stage={false} readonly />   // lanes only
+```
 
 Helpers: `sample(model, t)`, `sampleTrack(track, t)`, `targetVars(values)`, `timelineCode(model)`.
 

@@ -124,7 +124,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Pagination | stable | Numbered pages with ellipses and Previous / Next; the current page is marked for screen readers. | — |
 | Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | [Steps](#steps), [Button](#button) |
 | Steps | stable | Progress through stages: done, current and upcoming steps with titles and descriptions; clickable when onSelect is given; horizontal or vertical. | — |
-| Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), badges, disabled and hidden tabs, the active tab optionally kept in the URL. | — |
+| Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), badges, disabled and hidden tabs, the active tab optionally kept in the URL. | [Badge](#badge) |
 
 ### Media — `hadi-march/media`
 
@@ -166,7 +166,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | [Button](#button), [Card](#card), [Dialog](#dialog), [Toggle](#toggle) |
 | DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | [Splitter](#splitter), [Tabs](#tabs), Portal |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), [Skeleton](#skeleton) |
-| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), [IconButton](#iconbutton), [OverflowText](#overflowtext), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Select](#select), [Toggle](#toggle) |
+| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), [IconButton](#iconbutton), [OverflowText](#overflowtext), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Select](#select), [Toggle](#toggle), [Button](#button), [FlowControls](#flowcontrols), [FlowPalette](#flowpalette), [Tabs](#tabs), [Textarea](#textarea) |
 | FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | [Button](#button), [IconButton](#iconbutton), [Segmented](#segmented), [Chip](#chip), [OverflowText](#overflowtext) |
 | FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, [OverflowText](#overflowtext) |
 | GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | [ColorPicker](#colorpicker), [Segmented](#segmented), [IconButton](#iconbutton) |
@@ -181,7 +181,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, [IconButton](#iconbutton), Avatar |
 | StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | [Dialog](#dialog), Avatar, [StoryProgress](#storyprogress), [LikeButton](#likebutton) |
 | Terminal | experimental | Extensible command line: typed commands, sub-commands and async handlers (Ctrl+C), ANSI colors, tables, JSON, progress; history, completion, themable colors. | [JsonView](#jsonview), [Window](#window) |
-| ThemeEditor | experimental | Theme builder: color tokens for light and dark with a WCAG audit, type, shape and motion, a live scoped preview, code / CSS / JSON out. | [ColorPicker](#colorpicker), [EasingCurveEditor](#easingcurveeditor), [Tabs](#tabs), [Segmented](#segmented), [Slider](#slider), [Select](#select), [TextInput](#textinput), [Textarea](#textarea), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton), [CopyButton](#copybutton), [Badge](#badge), ThemeSwatch, [CodeView](#codeview) |
+| ThemeEditor | experimental | Theme builder: color tokens for light and dark with a WCAG audit, type, shape and motion, a live scoped preview, code / CSS / JSON out. | [ColorPicker](#colorpicker), [EasingCurveEditor](#easingcurveeditor), [Tabs](#tabs), [Segmented](#segmented), [Slider](#slider), [Select](#select), [TextInput](#textinput), [Textarea](#textarea), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton), [CopyButton](#copybutton), [Badge](#badge), ThemeSwatch, [CodeView](#codeview), [Alert](#alert), [Card](#card), [Checkbox](#checkbox), [Chip](#chip), [Progress](#progress) |
 | ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, [OverflowText](#overflowtext) |
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | [Badge](#badge), [IconButton](#iconbutton), [Toggle](#toggle) |
 | Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | [Steps](#steps), [Progress](#progress) |
@@ -293,18 +293,20 @@ A before / after comparison: two layers on top of each other and a divider betwe
 <BeforeAfter before={<img src="old.png" alt="" />} after={<img src="new.png" alt="" />} beforeLabel="Before" afterLabel="After" />
 <BeforeAfter orientation="vertical" follow ratio="4 / 3" before={…} after={…} />
 <BeforeAfter value={$pos} onChange={(v) => $pos.set(v)} before={…} after={…} />
+<BeforeAfter grip={<Icon of={heart} />} step={5} valueText={(v) => `${v} percent of the old design`} before={…} after={…} />
+<BeforeAfter grip={false} hint={false} before={…} after={…} />   // the line only, no sway
 ```
 
 Full page: src/components/landing/before-after/docs.md
 
 ## BottomNav
 
-
+The mobile tab bar: a colored bubble slides to the active tab, tabs carry count or dot badges, and an optional raised Create button in the middle wears a slowly turning ring of the four HADİ colors (Heyecan, Aktivite, Dostluk, İletişim).
 
 Composed of: [Badge](#badge), [OverflowText](#overflowtext)
 
 ```tsx
-
+<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />
 ```
 
 Full page: src/components/composite/bottom-nav/docs.md
@@ -333,6 +335,12 @@ A choose-your-own-path story. Every passage ends in choices; the reader's path c
   explore: { body: "…", choices: [{ label: "The run", to: "friends" }] },
   friends: { title: "New friends", body: "…", ending: "Social butterfly" },
 }} />
+<BranchingStory start="intro" passages={…} transition="slide" keys={false}
+  labels={{ start: "Home", restart: "Once more", endings: (found, total) => `${found} of ${total} endings` }}
+  renderChoice={(choice, i) => <b>{i + 1}. {choice.label}</b>} />
+<BranchingStory start="intro" passages={…} restart={false} trail={false} transition={(side) => ({
+  leave: { opacity: [1, 0], transform: ["scale(1)", "scale(.9)"] },
+  enter: { opacity: [0, 1], transform: [`translateY(${40 * side}px)`, "translateY(0px)"] }, duration: 500 })} />
 ```
 
 Full page: src/components/landing/branching-story/docs.md
@@ -362,6 +370,8 @@ The button. Five variants (`primary` is the theme's orange fill, `secondary` the
 <Button loading={$saving} on:click={save}>Save</Button>
 <Button href="/docs" iconEnd={arrowRight}>Docs</Button>
 <ActionButton action={remove} args={[row]} />
+<Button loading={$saving} spinner={false} icon={save}>Save</Button>   // no spinner: the icon stays
+<Button loading={$saving} spinner={<MyDots />}>Save</Button>          // your own busy mark
 ```
 
 Full page: src/components/actions/button/docs.md
@@ -477,6 +487,9 @@ Composed of: [OverflowText](#overflowtext)
 <Chip>Design</Chip>
 <Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>
 <Chip tone="primary" onRemove={() => remove(tag)}>{tag}</Chip>
+<Chip icon={tag} selected={$on} selectedIcon={false} onClick={toggle}>Design</Chip>   // no tick: the icon stays
+<Chip selected={$on} selectedIcon={heart} onClick={toggle}>Liked</Chip>              // your own mark
+<Chip onRemove={drop} removeIcon={trash} removeLabel="Delete tag">{tag}</Chip>
 ```
 
 Full page: src/components/actions/chip/docs.md
@@ -601,6 +614,8 @@ Copies text to the clipboard. The button says "Copied" (or swaps its icon for a 
 ```tsx
 <CopyButton text="npm i hadi-march" />
 <CopyButton text={() => token} iconOnly label="Copy key" />
+<CopyButton text={link} icon={share} label="Copy link" copiedLabel="Link copied" copiedIcon={heart} copiedColor="brand-blue" duration={3000} />
+<CopyButton text={code} errorText={false} onError={report} />   // no toast: you handle the failure
 ```
 
 Full page: src/components/actions/copy-button/docs.md
@@ -624,6 +639,8 @@ An animated number. It counts up when it scrolls into view and glides to every n
 <Counter value={12840} />
 <Counter value={$price} mode="roll" format={{ style: "currency", currency: "EUR" }} />
 <Counter value={0.98} format={{ style: "percent" }} />
+<Counter value={$n} mode="none" />                       // no motion: the value just changes
+<Counter value={12840} duration={3000} easing="bounce" />
 ```
 
 Full page: src/components/landing/counter/docs.md
@@ -637,6 +654,8 @@ Composed of: [SiteSection](#sitesection), [Overlay](#overlay), [Reveal](#reveal)
 ```tsx
 <CtaBand variant="gradient" title="Start today" lead="…"
   actions={[{ label: "Try free", href: "/start", iconEnd: arrowRight }, { label: "Talk to sales" }]} note="14 days free" />
+<CtaBand title="Start today" reveal="up" />                     // another entrance
+<CtaBand title="Start today" backdrop={false} reveal="none" class="my-band" />   // a bare panel, no motion: style it yourself
 ```
 
 Full page: src/components/landing/cta-band/docs.md
@@ -808,6 +827,8 @@ Composed of: [Accordion](#accordion), SearchBox, [Reveal](#reveal)
 ```tsx
 <Faq layout="split" search title="Questions" lead="…" contact={<Button variant="secondary">Write to us</Button>}
   items={[{ q: "Is it free?", a: "Yes, MIT licensed." }, …]} />
+<Faq search items={…} count={false} reveal="none"
+  labels={{ search: "Type a word", empty: "Nothing found. Write to us.", count: (shown, total) => `${shown} / ${total}` }} />
 ```
 
 Full page: src/components/landing/faq/docs.md
@@ -825,6 +846,8 @@ Composed of: [Grid](#grid), [Card](#card), IconTile, [Reveal](#reveal)
   { icon: globe, title: "Every language", body: "…", span: "wide" },
 ]} />
 <FeatureGrid variant="cards" cols={3} items={features} />
+<FeatureGrid items={features} spotlight={false} reveal="none" />     // no pointer light, no entrance
+<FeatureGrid items={features} reveal={{ from: { opacity: 0, transform: "rotate(-4deg) scale(.9)" }, to: { opacity: 1, transform: "rotate(0deg) scale(1)" } }} />
 ```
 
 Full page: src/components/landing/feature-grid/docs.md
@@ -858,7 +881,7 @@ Full page: src/components/forms/file-upload/docs.md
 
 A node editor on an endless canvas: pan and zoom, snap to the grid, nodes with ports and form fields, bezier edges, values flowing along the edges as moving dots, box and multi selection, copy / paste, undo, a minimap, layered auto layout, groups, a context menu and full keyboard use. The flow lives in a store (`createFlow`) that FlowPalette adds to and FlowControls runs; it reads and writes a readable JSON schema (`march.flow/v1`).
 
-Composed of: [ContextMenu](#contextmenu), [IconButton](#iconbutton), [OverflowText](#overflowtext), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Select](#select), [Toggle](#toggle)
+Composed of: [ContextMenu](#contextmenu), [IconButton](#iconbutton), [OverflowText](#overflowtext), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Select](#select), [Toggle](#toggle), [Button](#button), [FlowControls](#flowcontrols), [FlowPalette](#flowpalette), [Tabs](#tabs), [Textarea](#textarea)
 
 ```tsx
 const flow = createFlow({ types, doc })          // types: [{ type, label, icon, color, inputs, outputs, fields, run }]
@@ -956,6 +979,10 @@ Composed of: [Reveal](#reveal), [Overlay](#overlay), [Button](#button), [Badge](
   lead="…" note="No card needed" actions={[{ label: "Start free", href: "/start", iconEnd: arrowRight }, { label: "Watch demo" }]} />
 <Hero variant="product" media={{ src: "/screen.png", alt: "Dashboard", width: 1600, height: 1000 }} … />
 <Hero variant="video" video={{ src: "/clip.webm", poster: "/clip.jpg" }} … />
+<Hero variant="mesh" title="…" backdrop={false} reveal="none" />              // no decorative layers, no entrance
+<Hero variant="product" title="…" media={…} frameBar={false} tilt={false} reveal="blur" />
+<Hero eyebrow="New" eyebrowHref="/news" eyebrowArrow={<Icon of={arrowRight} />} title="…"
+  reveal={{ from: { opacity: 0, transform: "scale(.9)" }, to: { opacity: 1, transform: "scale(1)" } }} />
 ```
 
 Full page: src/components/landing/hero/docs.md
@@ -972,6 +999,9 @@ A comparison table that also shows where the product is behind. A cell is `true`
     { label: "Ticketing", values: { us: false, events: true }, note: "Not planned: HADİ is for free meetups." },
     { label: "Price", values: { us: "Free", events: "Fee per ticket" } },
   ]} />
+<HonestCompare columns={…} rows={…} color="brand-green" tags={false} filter={false}
+  labels={{ partly: "Half", behind: "We lose", counts: (c) => `${c.ahead} wins, ${c.behind} losses` }}
+  renderCell={(value, { us }) => (value === true && us ? "✓✓" : undefined)} />   // undefined keeps the default mark
 ```
 
 Full page: src/components/landing/honest-compare/docs.md
@@ -984,6 +1014,8 @@ A pinned section whose panels move sideways while the page scrolls down: the ver
 <HorizontalScroll label="Case studies" panel="26rem">
   {cases.map((c) => <Card>…</Card>)}
 </HorizontalScroll>
+<HorizontalScroll progress={false}>…</HorizontalScroll>   // no progress line
+<HorizontalScroll pinned={false}>…</HorizontalScroll>     // never pins: a sideways scroller with snap points
 ```
 
 Full page: src/components/landing/horizontal-scroll/docs.md
@@ -995,6 +1027,7 @@ A button that shows only an icon. `label` is required: it becomes the accessible
 ```tsx
 <IconButton icon={heart} label="Like" on:click={like} />
 <IconButton icon={trash} label="Delete" variant="danger" size="sm" />
+<IconButton icon={star} label="Star" color="brand-gold" title={false} />   // coloured, no native tooltip
 ```
 
 Full page: src/components/actions/icon-button/docs.md
@@ -1163,6 +1196,9 @@ A living wall: new activity slides in at the top (rows) or pops into the first c
 <LiveFeed items={$events} variant="wall" live="polite" />
 <LiveFeed next={next} enter="drop" leave="fall" glow={false} />
 <LiveFeed next={next} enter={{ keyframes: { opacity: [0, 1], transform: ["rotate(-6deg) scale(.8)", "none"] }, duration: 500 }} />
+<LiveFeed next={next} pauseLabel="On air · stop" resumeLabel="Stopped · go on" pulse={false} pauseOnHover={false}
+  renderItem={(item) => <><b>{item.title}</b> <small>{item.meta}</small></>} />   // own rows, own button texts
+<LiveFeed next={next} enter="none" leave="none" glow={false} move={false} />        // no motion at all
 ```
 
 Full page: src/components/landing/live-feed/docs.md
@@ -1188,6 +1224,7 @@ Composed of: Marquee, [Grid](#grid), [Reveal](#reveal)
   { name: "HADİ", src: "/logos/hadi.svg", width: 120, height: 32 },
   { name: "Northwind", node: <NorthwindLogo /> },
 ]} />
+<LogoCloud logos={logos} reveal="up" />     // grid: another entrance; reveal="none": the logos are simply there
 ```
 
 Full page: src/components/landing/logo-cloud/docs.md
@@ -1200,6 +1237,9 @@ An optional credit line: "Developed with March and 💗", with "March" as a link
 <MadeWithMarch />
 <MadeWithMarch variant="badge" />
 <MadeWithMarch variant="small" />
+<MadeWithMarch heart="☕" heartLabel="Coffee" />              // your own mark
+<MadeWithMarch heart={false} />                              // "Developed with March"
+<MadeWithMarch text={(link, heart) => <>Built on {link} {heart}</>} link="March UI" />
 ```
 
 Full page: src/components/actions/made-with-march/docs.md
@@ -1282,12 +1322,15 @@ Full page: src/components/navigation/nav-menu/docs.md
 
 ## NavSidebar
 
-
+The app's side menu: categories that open and close, a typo-tolerant search over every item, recent visits and featured items at the top, a collapsible icon rail and a resizable width, all remembered per user. Items are links (router `Link`), so the current page is marked and the menu follows navigation.
 
 Composed of: [OverflowText](#overflowtext), Link
 
 ```tsx
-
+<NavSidebar title="HADİ" items={[
+  { id: "/orders", label: "Orders", href: "/orders", group: "Sales", icon: cart, badge: () => $open },
+  { id: "/users", label: "Users", href: "/users", group: "Admin", can: "users.read" },
+]} collapsible resizable groupOrder={["Sales", "Admin"]} />
 ```
 
 Full page: src/components/composite/nav-sidebar/docs.md
@@ -1301,6 +1344,8 @@ Composed of: [TextInput](#textinput), [Button](#button)
 ```tsx
 <Newsletter title="Stay in the loop" lead="One email a month."
   onSubmit={(email) => api.subscribe(email)} note="Unsubscribe any time." />
+<Newsletter onSubmit={save} button="Join" done="You are in." doneIcon={<Icon of={heart} />} motion={false}
+  labels={{ email: "Your email", invalid: "That does not look like an email.", error: "Could not save. Try again." }} />
 ```
 
 Full page: src/components/landing/newsletter/docs.md
@@ -1313,6 +1358,9 @@ The anti-landing block: it says plainly who the product is **not** for, and opti
 <NotForYou check items={[{ text: "You run a 1,000-seat conference", detail: "No ticketing; an event platform fits better." }]}
   forYou={[{ text: "You want to do something tonight" }]} />
 <NotForYou variant="list" items={…} verdict={(n, total) => `${n}/${total}`} />
+<NotForYou check items={…} meLabel="Sounds like me" hint="Tap if not" markedHint="Welcome"
+  mark={(state) => (state === "not" ? "🙅" : state === "marked" ? "🎉" : "👍")} />   // own marks and texts
+<NotForYou check items={…} mark={false} meLabel={false} hint={false} markedHint={false} verdict={false} title={false} />
 ```
 
 Full page: src/components/landing/not-for-you/docs.md
@@ -1354,6 +1402,9 @@ Composed of: [Menu](#menu), [Tooltip](#tooltip)
   { id: "split", label: "Split", icon: columns, pressed: () => $split, onSelect: () => $split = !$split },
   { id: "delete", label: "Delete", icon: trash, danger: true },
 ]} />
+<OverflowToolbar label="Document" items={items} moreLabel="Other tools" moreIcon={menu} tooltips={false}
+  motion="fade" color="brand-purple" />
+<OverflowToolbar label="Document" items={items} motion={(el) => animate(el, { opacity: [0, 1], y: [-8, 0] }, { duration: 240 })} />
 ```
 
 Full page: src/components/actions/overflow-toolbar/docs.md
@@ -1684,6 +1735,9 @@ import { ScrollToTop } from "hadi-march/ui";
 <ScrollToTop />                          // once; shows after 320 px
 <ScrollToTop threshold={600} order={-1} />
 <ScrollToTop inline target={box} />      // in place, for a scrolling box
+<ScrollToTop icon={chevronUp} color="brand-blue" motion="fade" label="Up" class="my-top" />
+<ScrollToTop motion={(el, shown) => animate(el, { opacity: shown ? [0, 1] : [1, 0], rotate: shown ? [-90, 0] : [0, 90] }, { duration: 300, fill: "forwards" })} />
+<ScrollToTop motion="none" smooth={false} />   // no animation at all
 ```
 
 Full page: src/components/actions/scroll-to-top/docs.md
@@ -1907,6 +1961,8 @@ Full page: src/components/composite/story-viewer/docs.md
 
 Tabbed panels. Give `tabs` as data or write `<Tab>` children; only the active panel exists (switching disposes the old one). Arrow keys move between tabs with automatic activation, mirrored in RTL. Tabs can carry a count badge, be disabled or hidden, and `query="tab"` keeps the active tab in the URL (`?tab=id`) so a reload or a shared link opens it.
 
+Composed of: [Badge](#badge)
+
 ```tsx
 <Tabs value={$tab} onChange={(id) => $tab = id} tabs={[
   { id: "general", label: "General", content: () => <General /> },
@@ -1918,12 +1974,29 @@ Full page: src/components/navigation/tabs/docs.md
 
 ## Terminal
 
-
+An extensible command line in the page — for a playground, a dev console, an admin panel or a product demo.
 
 Composed of: [JsonView](#jsonview), [Window](#window)
 
 ```tsx
+import { Terminal, defineTerminalCommands, ansi } from "hadi-march/components/composite/terminal";
 
+<Terminal prompt="hadi$ " welcome="[info] help yaz" persist="demo" scheme="auto" cursor="block" commands={{
+  echo: (a, io) => io.print(a.rest.join(" ")),
+  deploy: {
+    desc: "Yayınla",
+    args: [{ name: "env", required: true, choices: ["staging", "prod"] }],
+    options: { force: { alias: "f", desc: "Onay sorma" } },
+    run: async (a, io) => {
+      const p = io.progress(`${a.args.env} yükleniyor`)
+      for (let i = 1; i <= 10; i++) { if (io.signal.aborted) return; await wait(120); p.set(i / 10) }
+      p.done(); io.success("Yayında")
+    },
+  },
+  user: { desc: "Kullanıcılar", sub: { list: (_a, io) => io.table(users), add: { args: [{ name: "name", required: true }], run: … } } },
+}} ref={(t) => t.exec("help")} />
+
+defineTerminalCommands({ ping: (_a, io) => io.print(ansi.green("pong")) })   // every terminal on the page
 ```
 
 Full page: src/components/composite/terminal/docs.md
@@ -1969,7 +2042,7 @@ Full page: src/components/forms/textarea/docs.md
 
 Make a whole theme and watch it live. Start from a built-in theme (HADİ, Classic Cream, Night Blue, Neon, Indigo, Minimal, High Contrast) or from scratch with one accent color; edit every color token for light and dark with a full ColorPicker (accent, surfaces, text, border, status, HADİ brand colors, the categorical palette), pick tones from an automatic tone scale, and fix contrast with the WCAG audit. Type (font families, scale ratio, line heights, weights), shape (radius scale, spacing, density, shadows, border width) and motion (durations, three easing curves) are tokens too. The preview is a small app screen of real components scoped to the editor (`data-hm-theme` + the draft's variables) in light or dark, LTR or RTL, with or without motion; "Apply to the app" switches the whole app to it. Out come the defineTheme module, the stylesheet (themeCss) and JSON; in go pasted JSON, CSS or a share link.
 
-Composed of: [ColorPicker](#colorpicker), [EasingCurveEditor](#easingcurveeditor), [Tabs](#tabs), [Segmented](#segmented), [Slider](#slider), [Select](#select), [TextInput](#textinput), [Textarea](#textarea), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton), [CopyButton](#copybutton), [Badge](#badge), ThemeSwatch, [CodeView](#codeview)
+Composed of: [ColorPicker](#colorpicker), [EasingCurveEditor](#easingcurveeditor), [Tabs](#tabs), [Segmented](#segmented), [Slider](#slider), [Select](#select), [TextInput](#textinput), [Textarea](#textarea), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton), [CopyButton](#copybutton), [Badge](#badge), ThemeSwatch, [CodeView](#codeview), [Alert](#alert), [Card](#card), [Checkbox](#checkbox), [Chip](#chip), [Progress](#progress)
 
 ```tsx
 <ThemeEditor />
@@ -1987,6 +2060,8 @@ Composed of: Dropdown, ThemeSwatch, [OverflowText](#overflowtext)
 ```tsx
 <ThemeMenu />
 <ThemeMenu themes={false} accents={["primary", "brand-orange", "brand-blue"]} />
+<ThemeMenu icon={sun} modes={false} headings={false} />                       // own icon, no light / dark row, no headings
+<ThemeMenu icon={false} label="Look" labels={{ theme: "Palette", accent: "Highlight" }} panelClass="my-panel" />
 ```
 
 Full page: src/components/composite/theme-menu/docs.md

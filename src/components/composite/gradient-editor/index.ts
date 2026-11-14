@@ -30,6 +30,27 @@ export interface GradientEditorProps extends ControlProps<string> {
   presets?: readonly GradientPreset[] | false | undefined;
   /** The CSS output with a copy button (default true). */
   output?: boolean | undefined;
+  /** The large preview on top (default true). */
+  preview?: boolean | undefined;
+  /** The angle dial (default true). */
+  dial?: boolean | undefined;
+  /** Quick angle buttons: default 0 to 315 in steps of 45; your own list; false hides them. */
+  angles?: readonly number[] | false | undefined;
+  /** The hint under the stop bar (default true). */
+  hint?: boolean | undefined;
+  /** The position field beside the color picker of the selected stop (default true). */
+  position?: boolean | undefined;
+  /**
+   * Own texts; each falls back to the built-in one: `editor`, `preview(css)`, `type`, `linear`, `radial`, `conic`,
+   * `angle`, `degrees(n)`, `quickAngles`, `stops`, `stop(number, color)`, `hint`, `position`, `presets`,
+   * `preset(name)`, `copy`, `copied`.
+   */
+  labels?: {
+    editor?: string; type?: string; linear?: string; radial?: string; conic?: string; angle?: string; quickAngles?: string;
+    stops?: string; hint?: string; position?: string; presets?: string; copy?: string; copied?: string;
+    preview?: ((css: string) => string) | undefined; degrees?: ((angle: number) => string) | undefined;
+    stop?: ((number: number, color: string) => string) | undefined; preset?: ((name: string) => string) | undefined;
+  } | undefined;
   class?: ClassProp;
 }
 
@@ -42,6 +63,8 @@ export function GradientEditor(props: GradientEditorProps): unknown {
   const id = uid("hm-ge");
   const c = ctl(props);
   const ro = (): boolean => !!(props.readonly || props.disabled);
+  const L = (): NonNullable<GradientEditorProps["labels"]> => props.labels ?? {};
+  const degrees = (a: number): string => L().degrees?.(a) ?? t`${a} degrees`;
   const grad = signal<G.Gradient>(G.parseGradient(untrack(get) ?? DEFAULT) ?? G.parseGradient(DEFAULT)!);
   const sel = signal(0);
   const removing = signal<number | null>(null);
@@ -74,7 +97,7 @@ export function GradientEditor(props: GradientEditorProps): unknown {
   const handle = (i: number): Element => {
     const el = h("button", {
       type: "button", class: () => cx("hm-ge-stop", sel() === i && "is-selected", removing() === i && "is-removing"), role: "slider",
-      "aria-label": () => t`Stop ${i + 1}: ${grad().stops[i]?.color ?? ""}`, "aria-valuemin": "0", "aria-valuemax": "100",
+      "aria-label": () => L().stop?.(i + 1, grad().stops[i]?.color ?? "") ?? t`Stop ${i + 1}: ${grad().stops[i]?.color ?? ""}`, "aria-valuemin": "0", "aria-valuemax": "100",
       "aria-valuenow": () => String(Math.round(grad().stops[i]?.at ?? 0)), "aria-valuetext": () => `${Math.round(grad().stops[i]?.at ?? 0)}%`,
       tabindex: () => (sel() === i ? "0" : "-1"), disabled: ro,
       onFocus: () => sel.set(i),
@@ -98,7 +121,7 @@ export function GradientEditor(props: GradientEditorProps): unknown {
   };
   const focusStop = (i: number): void => { queueMicrotask(() => bar?.querySelectorAll<HTMLElement>(".hm-ge-stop")[i]?.focus()); };
   bar = h("div", {
-    class: "hm-ge-bar", "aria-label": () => t`Color stops`, role: "group",
+    class: "hm-ge-bar", "aria-label": () => L().stops ?? t`Color stops`, role: "group",
     onPointerDown: (e: PointerEvent) => {
       if (ro() || (e.target as Element).closest(".hm-ge-stop")) return;
       const r = bar.getBoundingClientRect();
@@ -110,8 +133,8 @@ export function GradientEditor(props: GradientEditorProps): unknown {
   // ------------------------------------------------------------------ angle dial
   const dial = h("div", { class: "hm-ge-dial" },
     h("div", {
-      class: "hm-ge-dial-knob", role: "slider", tabindex: () => (props.disabled ? "-1" : "0"), "aria-label": () => t`Angle`,
-      "aria-valuemin": "0", "aria-valuemax": "359", "aria-valuenow": () => String(Math.round(grad().angle)), "aria-valuetext": () => t`${Math.round(grad().angle)} degrees`,
+      class: "hm-ge-dial-knob", role: "slider", tabindex: () => (props.disabled ? "-1" : "0"), "aria-label": () => L().angle ?? t`Angle`,
+      "aria-valuemin": "0", "aria-valuemax": "359", "aria-valuenow": () => String(Math.round(grad().angle)), "aria-valuetext": () => degrees(Math.round(grad().angle)),
       onKeyDown: (e: KeyboardEvent) => {
         const st = arrowStep(e, untrack(dir) === "rtl");
         if (!st || ro()) return;
@@ -144,7 +167,7 @@ export function GradientEditor(props: GradientEditorProps): unknown {
     return G.gradientCss({ type: grad.peek().type, angle: grad.peek().angle, stops: list.map((col, i) => ({ color: resolveColor(col, root), at: (i * 100) / Math.max(1, list.length - 1) })) });
   };
   const presetButton = (p: GradientPreset): Element => {
-    const b = h("button", { type: "button", class: "hm-ge-preset", "aria-label": () => t`Preset: ${p.label}`, title: p.label, disabled: ro, onClick: () => { const g = G.parseGradient(presetCss(p)); if (g) { update(g); sel.set(0); } } }) as HTMLElement;
+    const b = h("button", { type: "button", class: "hm-ge-preset", "aria-label": () => L().preset?.(p.label) ?? t`Preset: ${p.label}`, title: p.label, disabled: ro, onClick: () => { const g = G.parseGradient(presetCss(p)); if (g) { update(g); sel.set(0); } } }) as HTMLElement;
     queueMicrotask(() => setStyle(b, { "--hm-ge-p": presetCss(p) }));
     return b;
   };
@@ -153,29 +176,30 @@ export function GradientEditor(props: GradientEditorProps): unknown {
   };
 
   const types = (): readonly G.GradientType[] => props.types?.length ? props.types : ["linear", "radial", "conic"];
-  const TYPE_LABEL: Record<G.GradientType, () => string> = { linear: () => t`Linear`, radial: () => t`Radial`, conic: () => t`Conic` };
-  return h("div", { class: () => cx("hm-ge", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? t`Gradient editor`, ref: (el: HTMLElement) => { root = el; untrack(paint); } },
-    h("div", { class: "hm-ge-preview", role: "img", "aria-label": () => t`Gradient preview: ${css()}` }),
+  const TYPE_LABEL: Record<G.GradientType, () => string> = { linear: () => L().linear ?? t`Linear`, radial: () => L().radial ?? t`Radial`, conic: () => L().conic ?? t`Conic` };
+  const angles = (): readonly number[] => (props.angles === false ? [] : props.angles ?? ANGLES);
+  return h("div", { class: () => cx("hm-ge", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? L().editor ?? t`Gradient editor`, ref: (el: HTMLElement) => { root = el; untrack(paint); } },
+    () => (props.preview === false ? null : h("div", { class: "hm-ge-preview", role: "img", "aria-label": () => L().preview?.(css()) ?? t`Gradient preview: ${css()}` })),
     h("div", { class: "hm-ge-row" },
-      () => (types().length > 1 ? h(Segmented, { class: "hm-ge-types", "aria-label": t`Gradient type`, options: types().map((x) => ({ value: x, label: TYPE_LABEL[x]() })), value: grad.peek().type, onChange: (x: G.GradientType | null) => { if (x) update({ ...grad.peek(), type: x }); } }) : null),
-      () => (grad().type === "radial" ? null : h("div", { class: "hm-ge-angle" },
-        dial,
-        h("div", { class: "hm-ge-angles", role: "group", "aria-label": () => t`Quick angles` }, ANGLES.map((a) => h("button", {
-          type: "button", class: () => cx("hm-ge-angle-btn", Math.round(grad().angle) === a && "is-on"), "aria-label": t`${a} degrees`, disabled: ro,
+      () => (types().length > 1 ? h(Segmented, { class: "hm-ge-types", "aria-label": L().type ?? t`Gradient type`, options: types().map((x) => ({ value: x, label: TYPE_LABEL[x]() })), value: grad.peek().type, onChange: (x: G.GradientType | null) => { if (x) update({ ...grad.peek(), type: x }); } }) : null),
+      () => (grad().type === "radial" || (props.dial === false && !angles().length) ? null : h("div", { class: "hm-ge-angle" },
+        props.dial === false ? null : dial,
+        angles().length ? h("div", { class: "hm-ge-angles", role: "group", "aria-label": () => L().quickAngles ?? t`Quick angles` }, angles().map((a) => h("button", {
+          type: "button", class: () => cx("hm-ge-angle-btn", Math.round(grad().angle) === a && "is-on"), "aria-label": () => degrees(a), disabled: ro,
           style: { "--hm-ge-a": `${a}deg` }, onClick: () => update({ ...grad.peek(), angle: a }),
-        }, h("span", { "aria-hidden": "true" })))))),
+        }, h("span", { "aria-hidden": "true" })))) : null)),
     ),
-    h("div", { class: "hm-ge-stops" }, bar, h("p", { class: "hm-ge-hint" }, () => t`Click the bar to add a stop; drag a stop down or press Delete to remove it.`)),
+    h("div", { class: "hm-ge-stops" }, bar, () => (props.hint === false ? null : h("p", { class: "hm-ge-hint" }, () => L().hint ?? t`Click the bar to add a stop; drag a stop down or press Delete to remove it.`))),
     () => {
       const i = sel(), s = untrack(() => grad().stops[i]);
       if (!s) return null;
-      return h("div", { class: "hm-ge-stop-editor", role: "group", "aria-label": t`Stop ${i + 1}` },
+      return h("div", { class: "hm-ge-stop-editor", role: "group", "aria-label": L().stop?.(i + 1, s.color) ?? t`Stop ${i + 1}` },
         h(ColorPicker, { value: untrack(() => resolveColor(s.color, root)), onChange: (v: string) => setStop(i, { color: v }), palettes: undefined, contrast: false, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly), class: "hm-ge-picker" }),
-        h("label", { class: "hm-ge-pos" }, h("span", null, () => t`Position`),
+        props.position === false ? null : h("label", { class: "hm-ge-pos" }, h("span", null, () => L().position ?? t`Position`),
           h("input", { type: "number", class: "hm-input hm-ge-pos-input", min: "0", max: "100", step: "1", value: () => String(Math.round(grad().stops[i]?.at ?? 0)), readonly: () => !!props.readonly, onInput: (e: Event) => { const n = Number((e.target as HTMLInputElement).value); if (Number.isFinite(n)) setStop(i, { at: clamp(n, 0, 100) }); } }), "%"));
     },
-    () => (presets().length ? h("div", { class: "hm-ge-presets", role: "group", "aria-label": () => t`Presets` }, presets().map(presetButton)) : null),
+    () => (presets().length ? h("div", { class: "hm-ge-presets", role: "group", "aria-label": () => L().presets ?? t`Presets` }, presets().map(presetButton)) : null),
     () => (props.output === false ? null : h("div", { class: "hm-ge-output" },
       h("code", { class: "hm-ge-css", id: `${id}-css` }, () => `background: ${css()};`),
-      h(IconButton, { children: () => glyph(copied() ? check : copy), label: () => (copied() ? t`Copied` : t`Copy CSS`), size: "sm", class: () => cx("hm-ge-copy", copied() && "is-done"), onClick: copyCss }))));
+      h(IconButton, { children: () => glyph(copied() ? check : copy), label: () => (copied() ? L().copied ?? t`Copied` : L().copy ?? t`Copy CSS`), size: "sm", class: () => cx("hm-ge-copy", copied() && "is-done"), onClick: copyCss }))));
 }

@@ -23,7 +23,20 @@ const blob = await cropper.toBlob("image/webp", 0.9, 512)
 | `maxZoom` | number | `4` | |
 | `preview` | boolean | `true` | live result with its size |
 | `api` | `(api) => void` | — | `toCanvas(width?)`, `toBlob(type?, quality?, width?)`, `reset()` |
+| `grid` | boolean | `true` | the rule-of-thirds grid inside the frame |
+| `hint` | boolean | `true` | the key hint under the crop area (`false`: screen readers only) |
+| `tools` | boolean / `("rotateLeft" \| "rotateRight" \| "mirror" \| "reset")[]` | `true` | the buttons, or only the listed ones |
+| `sliders` | boolean / `("zoom" \| "angle")[]` | `true` | the sliders, or only the listed ones |
+| `size` | boolean | `true` | the "640 × 480 px" caption under the preview |
+| `labels` | `{ cropper, area, role, hint, free, aspect, rotateLeft, rotateRight, mirror, reset, zoom, angle, result }` | — | own texts (each falls back to the built-in one) |
 | `readonly`, `disabled` | | | |
+| `class` | class value | — | on the root (`hm-crop`) |
+
+```tsx
+<ImageCropper src={url} aspect={1} grid={false} hint={false} tools={["mirror", "reset"]} sliders={["zoom"]}
+  labels={{ zoom: "Size", reset: "Start over" }} />
+<ImageCropper src={url} tools={false} sliders={false} preview={false} api={(c) => cropper = c} />   // only the crop area
+```
 
 Helpers: `coverScale`, `clampPan`, `frameSize`, `cropToCanvas`.
 

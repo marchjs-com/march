@@ -7,7 +7,7 @@ import { computed, effect, untrack, onCleanup } from "../../../core/reactive.ts"
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, clamp, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, glyph, icon, clamp, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Button, IconButton } from "../../../ui/button.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
 import { Segmented } from "../../../forms/inputs.ts";
@@ -23,17 +23,34 @@ import type { FlowRunner, RunState, TimelineEntry } from "./runner.ts";
 export * from "./runner.ts";
 
 const seconds = (ms: number): string => `${(ms / 1000).toFixed(ms < 10000 ? 2 : 1)} s`;
-const stateText = (s: RunState): string => ({ idle: t`Ready`, running: t`Running`, paused: t`Paused`, done: t`Finished`, error: t`Finished with errors` })[s];
 const stateTone = (s: RunState): "neutral" | "primary" | "warn" | "success" | "danger" => ({ idle: "neutral", running: "primary", paused: "warn", done: "success", error: "danger" } as const)[s];
 
 export interface FlowControlsProps {
   runner: FlowRunner;
   /** The flow (for the node counter). */
   flow?: FlowStore;
-  /** Speed choices. Default [0.5, 1, 2, 4]. */
-  speeds?: readonly number[];
+  /** Speed choices. Default [0.5, 1, 2, 4]; false hides the speed switch. */
+  speeds?: readonly number[] | false;
   /** Show FlowTimeline under the buttons. Default false. */
   timeline?: MaybeFn<boolean | undefined>;
+  /** The Step button (default true). */
+  step?: MaybeFn<boolean | undefined>;
+  /** The Reset button (default true). */
+  reset?: MaybeFn<boolean | undefined>;
+  /** The state chip: "Ready", "Running" … (default true). */
+  status?: MaybeFn<boolean | undefined>;
+  /** The clock (default true). */
+  clock?: MaybeFn<boolean | undefined>;
+  /** The "n / m nodes" counter (default true; needs `flow`). */
+  count?: MaybeFn<boolean | undefined>;
+  /** Own icons for the buttons: an icon, a string or a node each. */
+  icons?: { run?: unknown; pause?: unknown; step?: unknown; reset?: unknown } | undefined;
+  /** Own texts: the toolbar name, the buttons, the speed switch, the five states and the counter. */
+  labels?: {
+    toolbar?: string; run?: string; pause?: string; resume?: string; step?: string; reset?: string; speed?: string;
+    ready?: string; running?: string; paused?: string; finished?: string; failed?: string;
+    count?: ((done: number, total: number) => string) | undefined;
+  } | undefined;
   class?: ClassProp;
 }
 
@@ -48,23 +65,30 @@ export function FlowControls(props: FlowControlsProps): Element {
     else void r.run();
   };
   const done = computed(() => { let n = 0; for (const s of props.flow?.status().values() ?? []) if (s === "done") n++; return n; });
+  const L = (): NonNullable<FlowControlsProps["labels"]> => props.labels ?? {};
+  const ic = (k: "run" | "pause" | "step" | "reset", def: Parameters<typeof glyph>[0]): unknown => (props.icons?.[k] !== undefined ? icon(props.icons[k]) : glyph(def));
+  const stateText = (s: RunState): string => ({
+    idle: L().ready ?? t`Ready`, running: L().running ?? t`Running`, paused: L().paused ?? t`Paused`, done: L().finished ?? t`Finished`, error: L().failed ?? t`Finished with errors`,
+  })[s];
+  const on = (v: MaybeFn<boolean | undefined>): boolean => val(v) !== false;
+
   return h("div", { class: () => cx("hm-flowctl", val(props.class)) },
-    h("div", { class: "hm-flowctl-bar", role: "toolbar", "aria-label": () => t`Run controls` },
+    h("div", { class: "hm-flowctl-bar", role: "toolbar", "aria-label": () => L().toolbar ?? t`Run controls` },
       h(Button, {
-        variant: "primary", class: "hm-flowctl-run", icon: () => glyph(busy() ? pause : play), onClick: primary,
+        variant: "primary", class: "hm-flowctl-run", icon: () => (busy() ? ic("pause", pause) : ic("run", play)), onClick: primary,
         "aria-keyshortcuts": "Space",
-      }, () => (busy() ? t`Pause` : r.state() === "paused" ? t`Resume` : t`Run`)),
-      h(IconButton, { icon: glyph(stepForward), label: () => t`Step`, onClick: () => r.step(), disabled: () => r.state() === "running" }),
-      h(IconButton, { icon: glyph(refresh), label: () => t`Reset`, onClick: () => r.reset(), disabled: () => r.state() === "idle" }),
-      h("span", { class: "hm-flowctl-speed" },
+      }, () => (busy() ? L().pause ?? t`Pause` : r.state() === "paused" ? L().resume ?? t`Resume` : L().run ?? t`Run`)),
+      () => (on(props.step) ? h(IconButton, { icon: ic("step", stepForward), class: "hm-flowctl-step", label: () => L().step ?? t`Step`, onClick: () => r.step(), disabled: () => r.state() === "running" }) : null),
+      () => (on(props.reset) ? h(IconButton, { icon: ic("reset", refresh), class: "hm-flowctl-reset", label: () => L().reset ?? t`Reset`, onClick: () => r.reset(), disabled: () => r.state() === "idle" }) : null),
+      () => { const speeds = props.speeds; return speeds === false ? null : h("span", { class: "hm-flowctl-speed" },
         h(Segmented, {
-          "aria-label": t`Speed`, options: (props.speeds ?? [0.5, 1, 2, 4]).map((v) => ({ value: v, label: `${v}×` })),
+          "aria-label": L().speed ?? t`Speed`, options: (speeds ?? [0.5, 1, 2, 4]).map((v) => ({ value: v, label: `${v}×` })),
           get value() { return r.speed(); }, onChange: (v: number | null) => r.speed.set(v ?? 1),
-        } as never)),
+        } as never)); },
       h("span", { class: "hm-flowctl-status", role: "status" },
-        () => h(Chip, { tone: stateTone(r.state()), size: "sm" }, stateText(r.state())),
-        h("span", { class: "hm-flowctl-clock" }, () => seconds(r.elapsed())),
-        props.flow && h("span", { class: "hm-flowctl-count" }, () => t`${done()} / ${props.flow!.nodes().length} nodes`))),
+        () => (on(props.status) ? h(Chip, { tone: stateTone(r.state()), size: "sm" }, stateText(r.state())) : null),
+        () => (on(props.clock) ? h("span", { class: "hm-flowctl-clock" }, () => seconds(r.elapsed())) : null),
+        () => (props.flow && on(props.count) ? h("span", { class: "hm-flowctl-count" }, () => L().count?.(done(), props.flow!.nodes().length) ?? t`${done()} / ${props.flow!.nodes().length} nodes`) : null))),
     () => (val(props.timeline) ? h(FlowTimeline, { runner: r, ...(props.flow ? { flow: props.flow } : {}) }) : null),
   ) as Element;
 }
@@ -73,12 +97,21 @@ export interface FlowTimelineProps {
   runner: FlowRunner;
   /** Clicking a row focuses that node on the canvas. */
   flow?: FlowStore;
+  /** The time axis with its ticks and playhead (default true). */
+  axis?: MaybeFn<boolean | undefined>;
+  /** What is shown before the first run: true (default text), false (nothing) or your own node. */
+  empty?: boolean | Node | undefined;
+  /** Rows fade in and the running bar breathes (default true). */
+  motion?: boolean | undefined;
+  /** Own texts: the region name, the text before the first run, and what a row says after its node's name. */
+  labels?: { region?: string; empty?: string; row?: ((start: string, duration: string) => string) | undefined } | undefined;
   class?: ClassProp;
 }
 
 /** `<FlowTimeline runner={runner} flow={flow} />` — the run record: when each node started and how long it took. */
 export function FlowTimeline(props: FlowTimelineProps): Element {
   const r = props.runner;
+  const still = (): boolean => props.motion === false || reducedMotion();
   const span = computed(() => {
     const ends = r.timeline().map((e) => e.end ?? r.elapsed());
     return Math.max(1500, r.elapsed(), ...ends) * 1.08;
@@ -96,7 +129,7 @@ export function FlowTimeline(props: FlowTimelineProps): Element {
     const el = h("li", { class: () => cx("hm-flowtl-row", `is-${e().status}`) },
       h("button", {
         type: "button", class: "hm-flowtl-label", disabled: !props.flow,
-        "aria-label": () => `${e().label}: ${t`${seconds(e().start)} start, ${seconds(end() - e().start)}`}${e().error ? ` · ${e().error}` : ""}`,
+        "aria-label": () => `${e().label}: ${props.labels?.row?.(seconds(e().start), seconds(end() - e().start)) ?? t`${seconds(e().start)} start, ${seconds(end() - e().start)}`}${e().error ? ` · ${e().error}` : ""}`,
         onClick: () => props.flow?.view.peek()?.focusNode(e().node),
       }, h("span", { class: "hm-flowtl-idx", "aria-hidden": "true" }, () => String(index() + 1)), h(OverflowText, {}, () => e().label),
         h("span", { class: "hm-flowtl-dur", "aria-hidden": "true" }, () => (e().status === "skipped" ? "—" : seconds(end() - e().start)))),
@@ -105,24 +138,25 @@ export function FlowTimeline(props: FlowTimelineProps): Element {
           class: "hm-flowtl-bar", ref: (x: HTMLElement) => { bar = x; },
           style: () => ({ "inset-inline-start": pct(e().start), "inline-size": `max(4px, calc(${pct(end())} - ${pct(e().start)}))` }),
         })) ) as HTMLElement;
-    if (!reducedMotion()) animate(el, [{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "out" });
+    if (!still()) animate(el, [{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "out" });
     // a soft breathing bar while the node runs
     let breath: { cancel(): void } | null = null;
     effect(() => {
       const running = e().status === "running";
-      untrack(() => { breath?.cancel(); breath = running && !reducedMotion() ? animate(bar, [{ opacity: 1 }, { opacity: 0.55 }, { opacity: 1 }], { duration: 900, iterations: Infinity }) : null; });
+      untrack(() => { breath?.cancel(); breath = running && !still() ? animate(bar, [{ opacity: 1 }, { opacity: 0.55 }, { opacity: 1 }], { duration: 900, iterations: Infinity }) : null; });
     });
     onCleanup(() => breath?.cancel());
     return el;
   };
-  return h("div", { class: () => cx("hm-flowtl", val(props.class)), role: "region", "aria-label": () => t`Run timeline` },
-    h("div", { class: "hm-flowtl-axis", "aria-hidden": "true" },
+  return h("div", { class: () => cx("hm-flowtl", val(props.class)), role: "region", "aria-label": () => props.labels?.region ?? t`Run timeline` },
+    () => (val(props.axis) === false ? null : h("div", { class: "hm-flowtl-axis", "aria-hidden": "true" },
       h("span"),
       h("span", { class: "hm-flowtl-ticks" },
         h(For, { each: ticks, children: (ms: () => number) => h("span", { class: "hm-flowtl-tick", style: () => ({ "inset-inline-start": pct(ms()) }) }, () => `${ms() / 1000}s`) }),
-        () => (r.state() === "idle" ? null : h("span", { class: "hm-flowtl-head", style: () => ({ "inset-inline-start": pct(r.elapsed()) }) })))),
+        () => (r.state() === "idle" ? null : h("span", { class: "hm-flowtl-head", style: () => ({ "inset-inline-start": pct(r.elapsed()) }) }))))),
     () => (r.timeline().length
       ? h("ol", { class: "hm-flowtl-rows" }, h(For, { each: r.timeline, key: (x: TimelineEntry) => `${x.node}`, children: row }))
-      : h("p", { class: "hm-flowtl-empty" }, t`Run the flow to record its timeline.`)),
+      : props.empty === false ? null
+      : h("p", { class: "hm-flowtl-empty" }, props.empty && props.empty !== true ? props.empty : props.labels?.empty ?? t`Run the flow to record its timeline.`)),
   ) as Element;
 }

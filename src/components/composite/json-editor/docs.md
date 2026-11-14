@@ -22,7 +22,16 @@ lists the first problem with its path, the tree marks every invalid row.
 | `expand` | number | `2` | tree levels open at start |
 | `indent` | number | `2` | Format indent |
 | `tabIndent` | boolean | `true` | Tab inserts two spaces in the text view |
+| `format` | boolean | `true` | the Format button under the text |
+| `status` | boolean | `true` | the "Valid JSON" confirmation (problems are shown either way) |
+| `labels` | `{ text, tree, view, treeName, fixFirst, valid, format, invalid(line, column, message), more(count) }` | — | own texts (each falls back to the built-in one) |
 | `rows`, `readonly`, `disabled` | | | |
+| `class` | class value | — | on the root (`hm-json-editor`) |
+
+```tsx
+<JsonEditor bind:value={$config} format={false} status={false}
+  labels={{ text: "Source", tree: "Outline", invalid: (line, column) => `Check line ${line}, column ${column}` }} />
+```
 
 `parseJson(text)` returns `{ value }` or `{ error, line, column }`.
 

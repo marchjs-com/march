@@ -19,7 +19,21 @@ const flow = createFlow({ types })
 | `types` | `FlowNodeType[]` | all of `flow.types` | the types to offer |
 | `snap` | number | `16` | grid step used when dropping (match the canvas) |
 | `search` | boolean | `true` | show the search box |
+| `categories` | boolean | `true` | the category titles |
+| `descriptions` | boolean | `true` | the description line of a card |
+| `grip` | boolean | `true` | the grip dots at the end of a card |
+| `renderCard` | `(type) => node` | — | own card content; the card stays a button (drag, click, Enter) |
+| `empty` | boolean / node | `true` | what a search without a match shows |
+| `motion` | boolean | `true` | tilt, melt and fly-back of the dragged card |
+| `labels` | `{ region, search, hint, empty }` | — | own texts (each falls back to the built-in one) |
 | `onAdd` | `(id, type) => void` | — | after a node is added |
+| `class` | class value | — | on the root (`hm-flowpal`) |
+
+```tsx
+<FlowPalette flow={flow} grip={false} descriptions={false} categories={false}
+  labels={{ search: "Find a step", empty: "Nothing here" }}
+  renderCard={(type) => <b>{type.label}</b>} />
+```
 
 ## Accessibility
 

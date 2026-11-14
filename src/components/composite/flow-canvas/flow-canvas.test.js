@@ -80,3 +80,29 @@ test("FlowCanvas: keyboard connect (Enter on two ports) and run state classes", 
   assert.equal(pay.querySelector(".hm-flow-error").textContent, "Declined");
   m.dispose();
 });
+
+test("FlowCanvas: zoom bar off or in parts, own texts, own menu, no menu", () => {
+  const flow = createFlow({ types: sampleTypes, doc: sampleDoc(), undo: false });
+  let got = null;
+  const m = mount(() => [
+    h(FlowCanvas, { flow, class: "a", controls: ["zoom"], minimap: false, labels: { editor: "diagram", zoomIn: "Closer", input: (p) => `In: ${p}`, node: "step" } }),
+    h(FlowCanvas, { flow, class: "b", controls: false, menu: false, motion: false, labels: { minimap: "Map" } }),
+    h(FlowCanvas, { flow, class: "c", minimap: false, menu: (items) => { got = items; return [{ label: "Mine", onSelect() {} }]; } }),
+  ]);
+  const a = m.el.querySelector(".hm-flow.a"), b = m.el.querySelector(".hm-flow.b"), c = m.el.querySelector(".hm-flow.c");
+  assert.equal(a.getAttribute("aria-roledescription"), "diagram");
+  const names = [...a.querySelectorAll(".hm-flow-zoom button")].map((x) => x.getAttribute("aria-label"));
+  assert.equal(names.length, 2, "only − and +");
+  assert.ok(names.includes("Closer"));
+  assert.match(a.querySelector('[data-ref="customer.in"]').getAttribute("aria-label"), /^In: /);
+  assert.equal(a.querySelector(".hm-flow-node").getAttribute("aria-roledescription"), "step");
+  assert.equal(b.querySelector(".hm-flow-zoom"), null);
+  assert.equal(b.querySelector(".hm-flow-minimap").getAttribute("aria-label"), "Map");
+  assert.equal(c.querySelectorAll(".hm-flow-zoom button").length, 4, "the default bar is whole");
+  c.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 5, clientY: 5 }));
+  assert.ok(Array.isArray(got) && got.length > 3, "the own menu function gets the built-in items");
+  got = null;
+  b.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 5, clientY: 5 }));
+  assert.equal(got, null);
+  m.dispose();
+});

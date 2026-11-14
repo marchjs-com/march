@@ -119,6 +119,7 @@ html.hm-sb-resizing .hm-nav { transition: none; }
 .hm-sb-sublist { min-block-size: 0; overflow: hidden; margin-inline-start: .875rem; padding-inline-start: .5rem; border-inline-start: 1px solid var(--hm-border-subtle); }
 .hm-sb-sublist .hm-sb-row { min-height: 1.875rem; padding-block: .2rem; font-size: var(--hm-text-sm); }
 .hm-sb-sublist .hm-sb-sub { display: none; }
+.hm-sb-wrap.is-nested-subs .hm-sb-sublist .hm-sb-sub { display: block; }
 .hm-sb-wrap.is-rail .hm-sb-kids, .hm-sb-wrap.is-rail .hm-sb-kids-btn { display: none; }
 @media (prefers-reduced-motion: reduce) { .hm-sb-kids, .hm-sb-kids-btn { transition: none; } }
 /* the parent of the current page: marked too, a step quieter than the page itself */

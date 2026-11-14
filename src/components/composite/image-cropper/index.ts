@@ -45,10 +45,26 @@ export interface ImageCropperProps extends ControlProps<G.CropState> {
   preview?: boolean | undefined;
   /** Receives the cropper API. */
   api?: ((api: ImageCropperApi) => void) | undefined;
+  /** The rule-of-thirds grid inside the frame (default true). */
+  grid?: boolean | undefined;
+  /** The key hint under the crop area (default true); when false it stays readable for screen readers. */
+  hint?: boolean | undefined;
+  /** The buttons: true (default), false, or the ones to keep. */
+  tools?: boolean | readonly ("rotateLeft" | "rotateRight" | "mirror" | "reset")[] | undefined;
+  /** The sliders: true (default), false, or the ones to keep. */
+  sliders?: boolean | readonly ("zoom" | "angle")[] | undefined;
+  /** The "640 × 480 px" caption under the preview (default true). */
+  size?: boolean | undefined;
+  /** Own texts; each falls back to the built-in one. `role` is the crop area's role description, `hint` the key hint. */
+  labels?: {
+    cropper?: string; area?: string; role?: string; hint?: string; free?: string; aspect?: string;
+    rotateLeft?: string; rotateRight?: string; mirror?: string; reset?: string; zoom?: string; angle?: string; result?: string;
+  } | undefined;
   class?: ClassProp;
 }
 
-const ASPECTS = (): AspectOption[] => [{ label: t`Free`, value: null }, { label: "1:1", value: 1 }, { label: "4:3", value: 4 / 3 }, { label: "16:9", value: 16 / 9 }, { label: "3:4", value: 3 / 4 }, { label: "9:16", value: 9 / 16 }];
+const has = <K extends string>(p: boolean | readonly K[] | undefined, k: K): boolean => p == null || p === true || (p !== false && p.includes(k));
+const ASPECTS = (free?: string): AspectOption[] => [{ label: free ?? t`Free`, value: null }, { label: "1:1", value: 1 }, { label: "4:3", value: 4 / 3 }, { label: "16:9", value: 16 / 9 }, { label: "3:4", value: 3 / 4 }, { label: "9:16", value: 9 / 16 }];
 
 /** Image cropper: `<ImageCropper src={url} bind:value={$crop} />`. */
 export function ImageCropper(props: ImageCropperProps): unknown {
@@ -56,6 +72,7 @@ export function ImageCropper(props: ImageCropperProps): unknown {
   const id = uid("hm-crop");
   const c = ctl(props);
   const ro = (): boolean => !!(props.readonly || props.disabled);
+  const L = (): NonNullable<ImageCropperProps["labels"]> => props.labels ?? {};
   const st = signal<G.CropState>({ ...G.DEFAULT_CROP, ...untrack(get), ...(untrack(() => props.aspect) !== undefined ? { aspect: untrack(() => props.aspect) ?? null } : {}) });
   const nat = signal<[number, number]>([0, 0]);
   const view = signal<[number, number]>([0, 0]);
@@ -114,7 +131,7 @@ export function ImageCropper(props: ImageCropperProps): unknown {
   };
   viewport = h("div", {
     class: () => cx("hm-crop-view", busy() && "is-busy"), tabindex: () => (props.disabled ? "-1" : "0"), role: "group",
-    "aria-label": () => t`Crop area${props.alt ? `: ${props.alt}` : ""}`, "aria-describedby": `${id}-keys`, "aria-roledescription": () => t`cropper`,
+    "aria-label": () => (L().area != null ? `${L().area}${props.alt ? `: ${props.alt}` : ""}` : t`Crop area${props.alt ? `: ${props.alt}` : ""}`), "aria-describedby": `${id}-keys`, "aria-roledescription": () => L().role ?? t`cropper`,
     onKeyDown: (e: KeyboardEvent) => {
       if (ro()) return;
       const s = st.peek(), step = e.shiftKey ? 0.05 : 0.01;
@@ -129,7 +146,7 @@ export function ImageCropper(props: ImageCropperProps): unknown {
     },
   },
   h("div", { class: "hm-crop-stage" }, img),
-  h("div", { class: "hm-crop-frame" }, h("span", { class: "hm-crop-grid", "aria-hidden": "true" }), corner(-1, -1), corner(1, -1), corner(-1, 1), corner(1, 1))) as HTMLElement;
+  h("div", { class: "hm-crop-frame" }, props.grid === false ? null : h("span", { class: "hm-crop-grid", "aria-hidden": "true" }), corner(-1, -1), corner(1, -1), corner(-1, 1), corner(1, 1))) as HTMLElement;
   let panFrom: G.CropState | null = null;
   track(viewport, {
     clamp: false,
@@ -144,7 +161,7 @@ export function ImageCropper(props: ImageCropperProps): unknown {
   if (RO) { const ro2 = new RO(measure); queueMicrotask(() => ro2.observe(viewport)); onCleanup(() => ro2.disconnect()); } else queueMicrotask(measure);
 
   // ------------------------------------------------------------------ controls
-  const aspects = (): readonly AspectOption[] => (props.aspects === false || props.aspect !== undefined ? [] : props.aspects ?? ASPECTS());
+  const aspects = (): readonly AspectOption[] => (props.aspects === false || props.aspect !== undefined ? [] : props.aspects ?? ASPECTS(L().free));
   const toCanvas = (width?: number): HTMLCanvasElement | null => (nat.peek()[0] ? G.cropToCanvas(img, st.peek(), { width: view.peek()[0], height: view.peek()[1] }, width ? { width } : {}) : null);
   const api: ImageCropperApi = {
     toCanvas,
@@ -160,21 +177,22 @@ export function ImageCropper(props: ImageCropperProps): unknown {
   const quarter = (d: number): number => Math.round((d - Math.sign(d) * 1e-6) / 90) * 90;
   effect(() => { const z = Math.round(st().zoom * 100) / 100, d = deg(); untrack(() => batch(() => { zoomView.set(z); fineView.set(clamp(d - quarter(d), -45, 45)); })); });
 
-  return h("div", { class: () => cx("hm-crop", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? t`Image cropper` },
+  const tools = props.tools, sliders = props.sliders;
+  return h("div", { class: () => cx("hm-crop", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? L().cropper ?? t`Image cropper` },
     viewport,
-    h("p", { id: `${id}-keys`, class: "hm-crop-keys" }, () => t`Drag to move, wheel or + − to zoom, [ ] to turn by 1°, R by 90°, F to mirror.`),
+    h("p", { id: `${id}-keys`, class: cx("hm-crop-keys", props.hint === false && "hm-sr-only") }, () => L().hint ?? t`Drag to move, wheel or + − to zoom, [ ] to turn by 1°, R by 90°, F to mirror.`),
     h("div", { class: "hm-crop-controls" },
-      () => (aspects().length ? h(Segmented, { class: "hm-crop-aspects", "aria-label": t`Aspect ratio`, options: aspects().map((a) => ({ value: a.value ?? "free", label: a.label })), value: st.peek().aspect ?? "free", onChange: (v: number | string | null) => change({ aspect: typeof v === "number" ? v : null }) }) : null),
-      h("div", { class: "hm-crop-row" },
-        h(IconButton, { icon: glyph(rotateCcw), label: () => t`Rotate left`, size: "sm", disabled: ro, onClick: () => change({ rotate: st.peek().rotate - 90 }) }),
-        h(IconButton, { icon: glyph(rotateCw), label: () => t`Rotate right`, size: "sm", disabled: ro, onClick: () => change({ rotate: st.peek().rotate + 90 }) }),
-        h(IconButton, { icon: glyph(flipHorizontal), label: () => t`Mirror`, size: "sm", disabled: ro, class: () => cx(st().flip && "is-on"), "aria-pressed": () => String(st().flip), onClick: () => change({ flip: !st.peek().flip }) }),
-        h(IconButton, { icon: glyph(refresh), label: () => t`Reset`, size: "sm", disabled: ro, onClick: api.reset })),
-      h("label", { class: "hm-crop-slider" }, h("span", null, () => t`Zoom`),
+      () => (aspects().length ? h(Segmented, { class: "hm-crop-aspects", "aria-label": L().aspect ?? t`Aspect ratio`, options: aspects().map((a) => ({ value: a.value ?? "free", label: a.label })), value: st.peek().aspect ?? "free", onChange: (v: number | string | null) => change({ aspect: typeof v === "number" ? v : null }) }) : null),
+      tools === false || (tools && tools !== true && !tools.length) ? null : h("div", { class: "hm-crop-row" },
+        has(tools, "rotateLeft") && h(IconButton, { icon: glyph(rotateCcw), label: () => L().rotateLeft ?? t`Rotate left`, size: "sm", disabled: ro, onClick: () => change({ rotate: st.peek().rotate - 90 }) }),
+        has(tools, "rotateRight") && h(IconButton, { icon: glyph(rotateCw), label: () => L().rotateRight ?? t`Rotate right`, size: "sm", disabled: ro, onClick: () => change({ rotate: st.peek().rotate + 90 }) }),
+        has(tools, "mirror") && h(IconButton, { icon: glyph(flipHorizontal), label: () => L().mirror ?? t`Mirror`, size: "sm", disabled: ro, class: () => cx(st().flip && "is-on"), "aria-pressed": () => String(st().flip), onClick: () => change({ flip: !st.peek().flip }) }),
+        has(tools, "reset") && h(IconButton, { icon: glyph(refresh), label: () => L().reset ?? t`Reset`, size: "sm", disabled: ro, onClick: api.reset })),
+      has(sliders, "zoom") && h("label", { class: "hm-crop-slider hm-crop-zoom" }, h("span", null, () => L().zoom ?? t`Zoom`),
         h(Slider, { min: 1, max: maxZoom(), step: 0.01, value: zoomView, onChange: (v: number) => change({ zoom: v }), format: (v: number) => `${Math.round(v * 100)}%`, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly) })),
-      h("label", { class: "hm-crop-slider" }, h("span", null, () => t`Angle`),
+      has(sliders, "angle") && h("label", { class: "hm-crop-slider hm-crop-angle" }, h("span", null, () => L().angle ?? t`Angle`),
         h(Slider, { min: -45, max: 45, step: 0.5, value: fineView, onChange: (v: number) => change({ rotate: quarter(st.peek().rotate) + v }), format: (v: number) => `${v}°`, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly) }))),
     () => (props.preview === false ? null : h("figure", { class: "hm-crop-out" },
-      h("canvas", { class: "hm-crop-canvas", role: "img", "aria-label": () => t`Cropped result`, ref: (el: HTMLCanvasElement) => { out = el; drawPreview(); } }),
-      h("figcaption", null, () => { const [fw, fh] = frame(), S = scale(); return `${Math.round(fw / S)} × ${Math.round(fh / S)} px`; }))));
+      h("canvas", { class: "hm-crop-canvas", role: "img", "aria-label": () => L().result ?? t`Cropped result`, ref: (el: HTMLCanvasElement) => { out = el; drawPreview(); } }),
+      props.size === false ? null : h("figcaption", null, () => { const [fw, fh] = frame(), S = scale(); return `${Math.round(fw / S)} × ${Math.round(fh / S)} px`; }))));
 }

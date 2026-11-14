@@ -51,6 +51,30 @@ export interface FlowCanvasProps {
   fields?: MaybeFn<boolean | undefined>;
   /** Accessible name. */
   label?: MaybeFn<string | undefined>;
+  /** The zoom bar: true (default), false, or the parts to keep: "zoom" (− % +), "fit", "layout". */
+  controls?: MaybeFn<boolean | readonly ("zoom" | "fit" | "layout")[] | undefined>;
+  /** The context menu: true (default), false, or a function that gets the built-in items and returns the ones to show. */
+  menu?: boolean | ((items: MenuItem[], target: Element) => readonly MenuItem[]) | undefined;
+  /** Draw-in of edges, moving dots, glow / shake / pop of nodes, the view and layout tweens (default true). */
+  motion?: MaybeFn<boolean | undefined>;
+  /**
+   * Own texts; each falls back to the built-in one. Names: `editor` and `node` (role descriptions), `menu`, `minimap`,
+   * the zoom bar (`zoomIn`, `zoomOut`, `fit`, `layout`), the menu items (`copy`, `cut`, `duplicate`, `group`,
+   * `ungroup`, `delete`, `paste`, `selectAll`, `add(type)`), ports and edges (`input(port)`, `output(port)`,
+   * `connection(from, to)`, `values(count)`) and what is announced (`connected`, `cannotConnect`, `choosePort`,
+   * `arranged(n)`, `copied(n)`, `pasted(n)`, `deleted(n)`, `selected(n)`).
+   */
+  labels?: {
+    editor?: string; node?: string; menu?: string; minimap?: string;
+    zoomIn?: string; zoomOut?: string; fit?: string; layout?: string;
+    copy?: string; cut?: string; duplicate?: string; group?: string; ungroup?: string; delete?: string; paste?: string; selectAll?: string;
+    add?: ((type: string) => string) | undefined;
+    input?: ((port: string) => string) | undefined; output?: ((port: string) => string) | undefined;
+    connection?: ((from: string, to: string) => string) | undefined; values?: ((count: number) => string) | undefined;
+    connected?: string; cannotConnect?: string; choosePort?: string;
+    arranged?: ((count: number) => string) | undefined; copied?: ((count: number) => string) | undefined; pasted?: ((count: number) => string) | undefined;
+    deleted?: ((count: number) => string) | undefined; selected?: ((count: number) => string) | undefined;
+  } | undefined;
   class?: ClassProp;
 }
 
@@ -68,6 +92,9 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   const marquee = signal<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
   const live = signal("");
   const say = (msg: string): void => { live.set(""); queueMicrotask(() => live.set(msg)); };
+  const L = (): NonNullable<FlowCanvasProps["labels"]> => props.labels ?? {};
+  const still = (): boolean => val(props.motion) === false || reducedMotion();
+  const part = (k: "zoom" | "fit" | "layout"): boolean => { const c = val(props.controls); return c == null || c === true || (c !== false && c.includes(k)); };
   let root!: HTMLElement;
   let space = false;
   /** The user moved the view (no more automatic framing). */
@@ -92,7 +119,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   };
   const tweenView = (to: { x: number; y: number; zoom: number }): void => {
     const from = vp.peek();
-    if (reducedMotion()) { vp.set(to); return; }
+    if (still()) { vp.set(to); return; }
     animateValue([from.x, from.y, from.zoom], [to.x, to.y, to.zoom], { duration: 420, easing: "out", onUpdate: ((v: number[]) => { vp.set({ x: v[0]!, y: v[1]!, zoom: v[2]! }); }) as never });
   };
   const size = (): { w: number; h: number } => ({ w: root?.clientWidth || 800, h: root?.clientHeight || 480 });
@@ -127,9 +154,9 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
         batch(() => { for (const [id, p] of from) { const n = flow.node(id); n?.x.set(p.x); n?.y.set(p.y); } });
         flow.change(t`Auto layout`, () => { for (const [id, p] of to) { const n = flow.node(id); n?.x.set(p.x); n?.y.set(p.y); } });
         view.fit();
-        say(t`Arranged ${to.size} nodes`);
+        say(L().arranged?.(to.size) ?? t`Arranged ${to.size} nodes`);
       };
-      if (reducedMotion()) { commit(); return; }
+      if (still()) { commit(); return; }
       animateValue(0, 1, {
         duration: 620, easing: "inOut",
         onUpdate: (k: number) => batch(() => { for (const [id, p] of to) { const a = from.get(id)!, n = flow.node(id); n?.x.set(lerp(a.x, p.x, k)); n?.y.set(lerp(a.y, p.y, k)); } }),
@@ -152,18 +179,18 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     const text = flow.copy();
     buffer = text;
     void clipboardManager().then((m) => m.clipboard().copy(text));
-    say(t`Copied ${selectedNodes().length} nodes`);
+    say(L().copied?.(selectedNodes().length) ?? t`Copied ${selectedNodes().length} nodes`);
   };
   let buffer = "";
   const paste = (text = buffer, at?: { x: number; y: number }): void => {
     const ids = flow.paste(text, at);
-    if (ids.length) say(t`Pasted ${ids.length} nodes`);
+    if (ids.length) say(L().pasted?.(ids.length) ?? t`Pasted ${ids.length} nodes`);
   };
   const remove = (): void => {
     const n = sel.peek().size;
     if (!n) return;
     flow.remove(sel.peek());
-    say(t`Deleted ${n} items`);
+    say(L().deleted?.(n) ?? t`Deleted ${n} items`);
   };
   const duplicate = (): void => { if (sel.peek().size) paste(flow.copy()); };
   const selectAll = (): void => { sel.set(new Set(flow.nodes.peek().map((n) => n.id))); };
@@ -240,7 +267,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
           const hit = flow.nodes.peek().filter((n) => n.x.peek() < x1 && n.x.peek() + NODE_W > x0 && n.y.peek() < y1 && n.y.peek() + n.h.peek() > y0).map((n) => n.id);
           sel.set(new Set([...(ev.shiftKey || isMod(ev) ? sel.peek() : []), ...hit]));
           marquee.set(null);
-          if (hit.length) say(t`${hit.length} selected`);
+          if (hit.length) say(L().selected?.(hit.length) ?? t`${hit.length} selected`);
         } else if (!moved && !ev.shiftKey) sel.set(new Set());
       },
       pointercancel: (ev: PointerEvent) => { pointers.delete(ev.pointerId); off(); marquee.set(null); },
@@ -270,12 +297,12 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   function finishConnect(ref: string, side: "in" | "out", other: string): void {
     const [from, to] = side === "out" ? [ref, other] : [other, ref];
     const id = flow.connect(from, to);
-    say(id ? t`Connected` : t`These ports cannot be connected`);
+    say(id ? L().connected ?? t`Connected` : L().cannotConnect ?? t`These ports cannot be connected`);
   }
   /** Keyboard / click connecting: Enter on one port, then Enter on another. */
   function portActivate(ref: string, side: "in" | "out"): void {
     const p = pending.peek();
-    if (!p) { pending.set({ ref, side }); say(t`Choose a port to connect to, Escape to cancel`); return; }
+    if (!p) { pending.set({ ref, side }); say(L().choosePort ?? t`Choose a port to connect to, Escape to cancel`); return; }
     pending.set(null);
     if (p.side !== side) finishConnect(p.ref, p.side, ref);
   }
@@ -316,8 +343,8 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   onCleanup(flow.onPulse((edgeId, ms) => {
     const path = paths.get(edgeId), g = dotsLayer.get(edgeId);
     const pill = root?.querySelector<HTMLElement>(`[data-edge-pill="${CSS.escape(edgeId)}"]`);
-    if (pill && !reducedMotion()) animate(pill, [{ scale: "1" }, { scale: "1.4" }, { scale: "1" }], { duration: 360, easing: "out" });
-    if (!path || !g || reducedMotion() || typeof path.getTotalLength !== "function") return;
+    if (pill && !still()) animate(pill, [{ scale: "1" }, { scale: "1.4" }, { scale: "1" }], { duration: 360, easing: "out" });
+    if (!path || !g || still() || typeof path.getTotalLength !== "function") return;
     const len = path.getTotalLength();
     const doc = globalThis.document;
     // a comet: a bright head and two fading followers
@@ -353,7 +380,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       h("button", {
         type: "button", class: () => cx("hm-flow-port", connected() && "is-connected", pending()?.ref === ref && "is-pending"),
         "data-ref": ref, "data-side": side,
-        "aria-label": () => (side === "in" ? t`Input ${val(port.label) ?? port.id}` : t`Output ${val(port.label) ?? port.id}`),
+        "aria-label": () => { const name = val(port.label) ?? port.id; return side === "in" ? L().input?.(name) ?? t`Input ${name}` : L().output?.(name) ?? t`Output ${name}`; },
         "aria-pressed": () => String(pending()?.ref === ref),
         onPointerdown: (e: PointerEvent) => startConnect(e, ref, side),
         onKeydown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); portActivate(ref, side); } },
@@ -386,7 +413,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       ref: (x: HTMLElement) => { el = x; },
       class: () => cx("hm-flow-node", isSel() && "is-selected", `is-${status()}`),
       "data-node": n.id, "data-hm-color": colorAttr(ty?.color), tabindex: "0", role: "group",
-      "aria-roledescription": () => t`node`,
+      "aria-roledescription": () => L().node ?? t`node`,
       "aria-label": () => `${title()}${status() !== "idle" ? ` · ${statusText(status())}` : ""}`,
       "aria-selected": () => String(isSel()),
       style: () => ({ "inset-inline-start": `${n.x()}px`, "inset-block-start": `${n.y()}px` }),
@@ -419,7 +446,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       const s = status();
       untrack(() => {
         pulse?.cancel(); pulse = null;
-        if (reducedMotion()) return;
+        if (still()) return;
         if (s === "running") pulse = animate(glow, [{ opacity: 0.35, transform: "scale(1)" }, { opacity: 1, transform: "scale(1.035)" }, { opacity: 0.35, transform: "scale(1)" }], { duration: 900, iterations: Infinity, easing: "inOut" });
         else if (s === "error") animate(el, [{ translate: "0" }, { translate: "-7px" }, { translate: "6px" }, { translate: "-4px" }, { translate: "3px" }, { translate: "0" }], { duration: 420, easing: "out" });
         else if (s === "done") animate(el, [{ scale: "1" }, { scale: "1.03" }, { scale: "1" }], { duration: 280, easing: "out" });
@@ -449,7 +476,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     onCleanup(() => { paths.delete(e.id); dotsLayer.delete(e.id); });
     // drawn in once it is in the document (SVG length needs layout)
     queueMicrotask(() => {
-      if (reducedMotion() || typeof path.getTotalLength !== "function" || !path.isConnected) return;
+      if (still() || typeof path.getTotalLength !== "function" || !path.isConnected) return;
       const len = path.getTotalLength();
       animate(path, [{ strokeDasharray: `${len}`, strokeDashoffset: `${len}` }, { strokeDasharray: `${len}`, strokeDashoffset: "0" }], { duration: 520, easing: "out" });
     });
@@ -459,7 +486,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       const on = liveFlow();
       untrack(() => {
         march?.cancel(); march = null;
-        if (on && !reducedMotion()) march = animate(flowPath, [{ strokeDashoffset: "24" }, { strokeDashoffset: "0" }], { duration: 640, iterations: Infinity, easing: "linear" });
+        if (on && !still()) march = animate(flowPath, [{ strokeDashoffset: "24" }, { strokeDashoffset: "0" }], { duration: 640, iterations: Infinity, easing: "linear" });
       });
     });
     onCleanup(() => march?.cancel());
@@ -476,12 +503,12 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       const [a] = endOf(e.from), [b] = endOf(e.to);
       const ta = flow.node(a), tb = flow.node(b);
       const nm = (n: NodeState | undefined): string => (n ? n.label() || val(flow.typeOf(n.type)?.label) || n.id : "?");
-      return t`Connection ${nm(ta)} → ${nm(tb)}`;
+      return L().connection?.(nm(ta), nm(tb)) ?? t`Connection ${nm(ta)} → ${nm(tb)}`;
     };
     return h("button", {
       type: "button", class: () => cx("hm-flow-pill", count() > 0 && "is-counting", sel().has(e.id) && "is-selected"),
       "data-edge-pill": e.id,
-      "aria-label": () => (count() ? `${name()} · ${t`${count()} values`}` : name()),
+      "aria-label": () => (count() ? `${name()} · ${L().values?.(count()) ?? t`${count()} values`}` : name()),
       "aria-pressed": () => String(sel().has(e.id)),
       style: () => ({ "inset-inline-start": `${mid().x}px`, "inset-block-start": `${mid().y}px` }),
       onPointerdown: (ev: PointerEvent) => ev.stopPropagation(),
@@ -518,24 +545,24 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     if (pillEl && !sel.peek().has(pillEl.dataset.edgePill!)) sel.set(new Set([pillEl.dataset.edgePill!]));
     const has = sel.peek().size > 0 && !!(nodeEl || pillEl || groupEl);
     const inGroup = flow.groups.peek().some((g) => sel.peek().has(g.id) || g.nodes.some((n) => sel.peek().has(n)));
-    const at = toWorld(point.x, point.y);
+    const at = toWorld(point.x, point.y), l = L();
     if (has) return [
-      { label: t`Copy`, shortcut: "mod+c", onSelect: copy, hidden: !!pillEl },
-      { label: t`Cut`, shortcut: "mod+x", onSelect: () => { copy(); remove(); }, hidden: !!pillEl },
-      { label: t`Duplicate`, shortcut: "mod+d", onSelect: duplicate, hidden: !!pillEl },
-      { label: t`Group selection`, shortcut: "mod+g", onSelect: () => flow.group(selectedNodes()), hidden: !!pillEl },
-      { label: t`Ungroup`, shortcut: "mod+shift+g", onSelect: () => flow.ungroup(sel.peek()), hidden: !inGroup },
+      { label: l.copy ?? t`Copy`, shortcut: "mod+c", onSelect: copy, hidden: !!pillEl },
+      { label: l.cut ?? t`Cut`, shortcut: "mod+x", onSelect: () => { copy(); remove(); }, hidden: !!pillEl },
+      { label: l.duplicate ?? t`Duplicate`, shortcut: "mod+d", onSelect: duplicate, hidden: !!pillEl },
+      { label: l.group ?? t`Group selection`, shortcut: "mod+g", onSelect: () => flow.group(selectedNodes()), hidden: !!pillEl },
+      { label: l.ungroup ?? t`Ungroup`, shortcut: "mod+shift+g", onSelect: () => flow.ungroup(sel.peek()), hidden: !inGroup },
       "-",
-      { label: t`Delete`, shortcut: "Delete", danger: true, onSelect: remove },
+      { label: l.delete ?? t`Delete`, shortcut: "Delete", danger: true, onSelect: remove },
     ];
     return [
-      { label: t`Paste`, shortcut: "mod+v", disabled: !buffer, onSelect: () => paste(buffer, { x: snapTo(at.x), y: snapTo(at.y) }) },
-      { label: t`Select all`, shortcut: "mod+a", onSelect: selectAll },
+      { label: l.paste ?? t`Paste`, shortcut: "mod+v", disabled: !buffer, onSelect: () => paste(buffer, { x: snapTo(at.x), y: snapTo(at.y) }) },
+      { label: l.selectAll ?? t`Select all`, shortcut: "mod+a", onSelect: selectAll },
       "-",
-      ...flow.types.slice(0, 8).map((ty) => ({ label: t`Add ${val(ty.label)}`, icon: ty.icon, onSelect: () => { flow.addNode(ty.type, snapTo(at.x), snapTo(at.y)); } })),
+      ...flow.types.slice(0, 8).map((ty) => ({ label: l.add?.(val(ty.label)) ?? t`Add ${val(ty.label)}`, icon: ty.icon, onSelect: () => { flow.addNode(ty.type, snapTo(at.x), snapTo(at.y)); } })),
       "-",
-      { label: t`Auto layout`, shortcut: "shift+l", onSelect: () => view.layout() },
-      { label: t`Fit to view`, shortcut: "0", onSelect: () => view.fit() },
+      { label: l.layout ?? t`Auto layout`, shortcut: "shift+l", onSelect: () => view.layout() },
+      { label: l.fit ?? t`Fit to view`, shortcut: "0", onSelect: () => view.fit() },
     ];
   }
 
@@ -559,7 +586,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     ref: (x: HTMLElement) => { root = x; },
     class: () => cx("hm-flow", val(props.tool) === "pan" && "is-hand", pending() && "is-connecting", grid() <= 0 && "is-free", val(props.class)),
     tabindex: "0", role: "application",
-    "aria-roledescription": () => t`flow editor`,
+    "aria-roledescription": () => L().editor ?? t`flow editor`,
     "aria-label": () => val(props.label) ?? t`Flow editor`,
     style: () => { const v = vp(), g = Math.max(4, (grid() || 16) * v.zoom); return { "--hm-flow-gs": `${g}px`, "--hm-flow-gx": `${v.x % g}px`, "--hm-flow-gy": `${v.y % g}px` }; },
     onPointerdown: (e: PointerEvent) => onBackgroundDown(e),
@@ -574,13 +601,14 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   },
     world,
     () => { const m = marquee(); return m ? h("div", { class: "hm-flow-marquee", style: { "inset-inline-start": `${Math.min(m.x0, m.x1)}px`, "inset-block-start": `${Math.min(m.y0, m.y1)}px`, width: `${Math.abs(m.x1 - m.x0)}px`, height: `${Math.abs(m.y1 - m.y0)}px` } }) : null; },
-    h("div", { class: "hm-flow-zoom", onPointerdown: (e: PointerEvent) => e.stopPropagation() },
-      h(IconButton, { icon: glyph(minus), label: () => t`Zoom out`, size: "sm", onClick: () => view.zoomBy(1 / 1.2) }),
-      h("span", { class: "hm-flow-zoomval", "aria-live": "off" }, () => `${Math.round(vp().zoom * 100)}%`),
-      h(IconButton, { icon: glyph(plus), label: () => t`Zoom in`, size: "sm", onClick: () => view.zoomBy(1.2) }),
-      h(IconButton, { icon: glyph(fitIcon), label: () => t`Fit to view`, size: "sm", onClick: () => view.fit() }),
-      h(IconButton, { icon: glyph(layoutIcon), label: () => t`Auto layout`, size: "sm", onClick: () => view.layout() })),
-    () => ((val(props.minimap) ?? true) ? h(Minimap, { flow, size }) : null),
+    () => (val(props.controls) === false ? null : h("div", { class: "hm-flow-zoom", onPointerdown: (e: PointerEvent) => e.stopPropagation() },
+      part("zoom") && [
+        h(IconButton, { icon: glyph(minus), label: () => L().zoomOut ?? t`Zoom out`, size: "sm", onClick: () => view.zoomBy(1 / 1.2) }),
+        h("span", { class: "hm-flow-zoomval", "aria-live": "off" }, () => `${Math.round(vp().zoom * 100)}%`),
+        h(IconButton, { icon: glyph(plus), label: () => L().zoomIn ?? t`Zoom in`, size: "sm", onClick: () => view.zoomBy(1.2) })],
+      part("fit") && h(IconButton, { icon: glyph(fitIcon), label: () => L().fit ?? t`Fit to view`, size: "sm", onClick: () => view.fit() }),
+      part("layout") && h(IconButton, { icon: glyph(layoutIcon), label: () => L().layout ?? t`Auto layout`, size: "sm", onClick: () => view.layout() }))),
+    () => ((val(props.minimap) ?? true) ? h(Minimap, { flow, size, label: () => L().minimap }) : null),
     h("div", { class: "hm-sr-only", "aria-live": "polite" }, live),
   ) as HTMLElement;
 
@@ -600,7 +628,9 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   const stopAuto = (): void => { touched = true; };
   listen(canvas, { wheel: stopAuto, keydown: stopAuto, pointerdown: stopAuto }, { capture: true, passive: true });
 
-  return h(ContextMenu, { items: menuFor, label: () => t`Flow actions`, children: canvas }) as Element;
+  const menu = props.menu;
+  if (menu === false) return canvas;
+  return h(ContextMenu, { items: typeof menu === "function" ? (target, point) => menu(menuFor(target, point), target) : menuFor, label: () => L().menu ?? t`Flow actions`, children: canvas }) as Element;
 }
 
 /** Localised label of a node run state ("running", "failed" …), as the canvas and FlowControls show it. */

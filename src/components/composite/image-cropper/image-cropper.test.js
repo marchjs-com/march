@@ -70,3 +70,37 @@ test("crop geometry: at every angle and aspect the image covers the frame, and t
     }
   }
 });
+
+test("ImageCropper: grid, hint, buttons, sliders and caption off or chosen; own texts", () => {
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  const dispose = render(() => [
+    h(ImageCropper, { src: "data:,", class: "mine", grid: false, hint: false, tools: ["mirror"], sliders: ["zoom"], size: false,
+      labels: { cropper: "Photo", area: "Frame", role: "frame tool", hint: "Drag it", free: "Any", mirror: "Flip", zoom: "Size", result: "Outcome" } }),
+    h(ImageCropper, { src: "data:,", alt: "Hills", tools: false, sliders: false }),
+    h(ImageCropper, { src: "data:," }),
+  ], el);
+  const [a, b, c] = el.querySelectorAll(".hm-crop");
+  assert.ok(a.classList.contains("mine"));
+  assert.equal(a.getAttribute("aria-label"), "Photo");
+  assert.equal(a.querySelector(".hm-crop-view").getAttribute("aria-label"), "Frame");
+  assert.equal(a.querySelector(".hm-crop-view").getAttribute("aria-roledescription"), "frame tool");
+  assert.equal(a.querySelector(".hm-crop-grid"), null);
+  const keys = a.querySelector(".hm-crop-keys");
+  assert.ok(keys.classList.contains("hm-sr-only"), "a hidden hint still describes the area");
+  assert.equal(keys.textContent, "Drag it");
+  assert.deepEqual([...a.querySelectorAll(".hm-crop-row button")].map((x) => x.getAttribute("aria-label")), ["Flip"]);
+  assert.equal(a.querySelectorAll(".hm-crop-slider").length, 1);
+  assert.match(a.querySelector(".hm-crop-zoom").textContent, /Size/);
+  assert.match(a.querySelector(".hm-crop-aspects").textContent, /Any/);
+  assert.equal(a.querySelector(".hm-crop-canvas").getAttribute("aria-label"), "Outcome");
+  assert.equal(a.querySelector("figcaption"), null);
+  assert.equal(b.querySelector(".hm-crop-row"), null);
+  assert.equal(b.querySelector(".hm-crop-slider"), null);
+  assert.equal(b.querySelector(".hm-crop-view").getAttribute("aria-label"), "Crop area: Hills");
+  assert.ok(b.querySelector(".hm-crop-grid") && b.querySelector("figcaption"));
+  assert.equal(c.querySelectorAll(".hm-crop-row button").length, 4);
+  assert.equal(c.querySelectorAll(".hm-crop-slider").length, 2);
+  assert.ok(!c.querySelector(".hm-crop-keys").classList.contains("hm-sr-only"));
+  dispose();
+});

@@ -24,13 +24,15 @@ const START = [
   "```",
 ].join("\n")
 
-export default function MarkdownEditorDemo(props: { values: { view: string; toolbar: boolean; sync: boolean; stats: boolean; rich: boolean; readonly: boolean } }) {
+export default function MarkdownEditorDemo(props: { values: { view: string; toolbar: boolean; sync: boolean; stats: boolean; rich: boolean; readonly: boolean; tools: string; hint: boolean; labels: boolean } }) {
   let $md = START
   return <div class="sc-ed-one">
     {() => {
       const views: MarkdownView[] = props.values.rich || props.values.view === "rich" ? ["write", "preview", "split", "rich"] : ["write", "preview", "split"]
-      return <MarkdownEditor value={untrack(() => $md)} onChange={(v: string) => { $md = v }} view={props.values.view as MarkdownView} views={views} toolbar={props.values.toolbar}
-        syncScroll={props.values.sync} stats={props.values.stats} readonly={props.values.readonly} rows={14} />
+      return <MarkdownEditor value={untrack(() => $md)} onChange={(v: string) => { $md = v }} view={props.values.view as MarkdownView} views={views}
+        toolbar={props.values.toolbar && props.values.tools === "short" ? ["bold", "italic", "|", "link", "ul"] : props.values.toolbar}
+        syncScroll={props.values.sync} stats={props.values.stats} readonly={props.values.readonly} rows={14} hint={props.values.hint}
+        labels={props.values.labels ? { write: "Taslak", preview: "Oku", split: "Yan yana", rich: "Biçimli", words: (n) => `${n} sözcük`, minutes: (n) => `${n} dakikada okunur` } : undefined} />
     }}
   </div>
 }

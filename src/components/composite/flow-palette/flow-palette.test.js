@@ -27,3 +27,29 @@ test("FlowPalette: categories, named cards, Enter adds a node, search filters", 
   assert.ok(names.length >= 1 && names.every((n) => /Ödeme/i.test(n)), names.join(" | "));
   dispose();
 });
+
+test("FlowPalette: parts off, own card, own texts, own empty state", async () => {
+  const flow = createFlow({ types: sampleTypes, undo: false });
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const dispose = render(() => [
+    h(FlowPalette, { flow, class: "mine", categories: false, descriptions: false, grip: false, labels: { region: "Steps", search: "Find a step", hint: "Press Enter", empty: "Nothing" } }),
+    h(FlowPalette, { flow, renderCard: (ty) => h("b", { class: "own" }, ty.type), empty: false }),
+  ], host);
+  const [a, b] = host.querySelectorAll(".hm-flowpal");
+  assert.ok(a.classList.contains("mine"));
+  assert.equal(a.getAttribute("aria-label"), "Steps");
+  assert.equal(a.querySelector("input").getAttribute("placeholder"), "Find a step");
+  assert.equal(a.querySelector(".hm-sr-only").textContent, "Press Enter");
+  assert.equal(a.querySelector(".hm-flowpal-cattitle"), null);
+  assert.equal(a.querySelector(".hm-flowpal-desc"), null);
+  assert.equal(a.querySelector(".hm-flowpal-grip"), null);
+  assert.ok(a.querySelector(".hm-flowpal-name"));
+  assert.equal(b.querySelectorAll(".hm-flowpal-own .own").length, sampleTypes.length);
+  assert.equal(b.querySelector(".hm-flowpal-name"), null);
+  assert.ok(b.querySelector(".hm-flowpal-grip"), "the default parts stay unless turned off");
+  for (const p of [a, b]) { const input = p.querySelector("input"); input.value = "zzzzqq"; input.dispatchEvent(new Event("input", { bubbles: true })); }
+  await new Promise((r) => setTimeout(r, 5));
+  assert.equal(a.querySelector(".hm-flowpal-empty").textContent, "Nothing");
+  assert.equal(b.querySelector(".hm-flowpal-empty"), null);
+  dispose();
+});

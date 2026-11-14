@@ -7,9 +7,12 @@ export const code = `const flow = createFlow({ types, doc })
 <FlowCanvas flow={flow} snap={16} minimap tool="select" />
 flow.toJSON()   // { schema: "march.flow/v1", nodes, edges: [{ from: "hook.out", to: "customer.in" }] }`
 
-export default function FlowCanvasDemo(props: { values: { snap: number; minimap: boolean; tool: string; fields: boolean } }) {
+const CONTROLS: Record<string, boolean | ("zoom" | "fit" | "layout")[]> = { all: true, zoom: ["zoom"], none: false }
+
+export default function FlowCanvasDemo(props: { values: { snap: number; minimap: boolean; tool: string; fields: boolean; controls: string; motion: boolean } }) {
   const flow = createFlow({ types: sampleTypes, doc: sampleDoc() })
   return <div class="sc-flow-stage">
-    <FlowCanvas flow={flow} snap={() => props.values.snap} minimap={() => props.values.minimap} tool={() => props.values.tool as "select"} fields={() => props.values.fields} />
+    <FlowCanvas flow={flow} snap={() => props.values.snap} minimap={() => props.values.minimap} tool={() => props.values.tool as "select"} fields={() => props.values.fields}
+      controls={() => CONTROLS[props.values.controls] ?? true} motion={() => props.values.motion} />
   </div>
 }

@@ -60,3 +60,27 @@ test("MarkdownEditor: views as tabs, split shows both panes, preview renders, le
   assert.equal(second.querySelectorAll("[role=tab]")[1].getAttribute("aria-selected"), "true");
   dispose();
 });
+
+test("MarkdownEditor: chosen tools, own icons and texts, no syntax hint", () => {
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  const dispose = render(() => [
+    h(MarkdownEditor, { value: "one two", class: "mine", toolbar: ["bold", "|", "link"], hint: false, icons: { bold: h("i", { class: "own-b" }) },
+      labels: { write: "Draft", view: "Views", formatting: "Format", source: "Text", tools: { bold: "Strong" }, words: (n) => `${n} w`, minutes: (n) => `${n} m` } }),
+    h(MarkdownEditor, { value: "one", labels: { hint: "Use **stars**" } }),
+  ], el);
+  const [a, b] = el.querySelectorAll(".hm-mde");
+  assert.ok(a.classList.contains("mine"));
+  assert.deepEqual([...a.querySelectorAll(".hm-mde-tool")].map((x) => x.getAttribute("aria-label")), ["Strong", "Link"]);
+  assert.equal(a.querySelectorAll(".hm-mde-sep").length, 1);
+  assert.ok(a.querySelector(".hm-mde-tool .own-b"));
+  assert.equal(a.querySelector("[role=tablist]").getAttribute("aria-label"), "Views");
+  assert.equal(a.querySelector("[role=tab]").textContent, "Draft");
+  assert.equal(a.querySelector(".hm-mde-toolbar").getAttribute("aria-label"), "Format");
+  assert.equal(a.querySelector("textarea").getAttribute("aria-label"), "Text");
+  assert.equal(a.querySelector(".hm-mde-hint"), null);
+  assert.match(a.querySelector(".hm-mde-foot").textContent, /2 w/);
+  assert.equal(b.querySelectorAll(".hm-mde-tool").length, 12);
+  assert.equal(b.querySelector(".hm-mde-hint").textContent, "Use **stars**");
+  dispose();
+});

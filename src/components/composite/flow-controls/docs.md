@@ -17,10 +17,30 @@ await runner.run()        // "done" | "error"; runner.pause() / resume() / step(
 |---|---|---|---|
 | `runner` | `FlowRunner` | — | from `createFlowRunner(flow, { nodeMs?, travelMs? })` |
 | `flow` | `FlowStore` | — | for the "n / m nodes" counter |
-| `speeds` | number[] | `[0.5, 1, 2, 4]` | speed choices |
+| `speeds` | number[] / `false` | `[0.5, 1, 2, 4]` | speed choices; `false` hides the switch |
 | `timeline` | boolean | `false` | show FlowTimeline under the buttons |
+| `step`, `reset` | boolean | `true` | the Step and the Reset button |
+| `status`, `clock`, `count` | boolean | `true` | the state chip, the clock, the "n / m nodes" counter |
+| `icons` | `{ run, pause, step, reset }` | — | own icon for a button (an icon, a string or a node) |
+| `labels` | `{ toolbar, run, pause, resume, step, reset, speed, ready, running, paused, finished, failed, count(done, total) }` | — | own texts (each falls back to the built-in one) |
+| `class` | class value | — | on the root (`hm-flowctl`) |
 
-`FlowTimeline` takes `runner` and `flow` (a row click focuses that node on the canvas).
+```tsx
+<FlowControls runner={runner} flow={flow} step={false} speeds={false} clock={false}
+  labels={{ run: "Start", finished: "All done", count: (done, total) => `${done} of ${total}` }} />
+```
+
+### FlowTimeline
+
+| Prop | Type | Default | |
+|---|---|---|---|
+| `runner` | `FlowRunner` | — | |
+| `flow` | `FlowStore` | — | a row click focuses that node on the canvas |
+| `axis` | boolean | `true` | the time axis with ticks and playhead |
+| `empty` | boolean / node | `true` | what is shown before the first run |
+| `motion` | boolean | `true` | rows fade in, the running bar breathes |
+| `labels` | `{ region, empty, row(start, duration) }` | — | own texts |
+| `class` | class value | — | on the root (`hm-flowtl`) |
 
 ## Runner
 

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
-const { FlowControls, createFlowRunner } = await import("./index.ts");
+const { FlowControls, FlowTimeline, createFlowRunner } = await import("./index.ts");
 const { createFlow, emit, FLOW_SCHEMA } = await import("../flow-canvas/index.ts");
 const { manualClock, step } = await import("../../../motion/engine/clock.ts");
 
@@ -78,4 +78,39 @@ test("FlowControls + FlowTimeline: toolbar, state, rows", async () => {
   assert.match(host.querySelector(".hm-flowctl-count").textContent, /5 \/ 6/);
   dispose();
   manualClock(false);
+});
+
+test("FlowControls: parts off, own texts and icons; FlowTimeline: no axis, own empty text", () => {
+  const flow = createFlow({ types, doc: doc(false), undo: false });
+  const r = createFlowRunner(flow, { nodeMs: 100, travelMs: 100 });
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const dispose = render(() => [
+    h(FlowControls, { runner: r, flow, class: "mine", step: false, reset: false, speeds: false, clock: false,
+      icons: { run: h("i", { class: "own-run" }) }, labels: { toolbar: "Runner", run: "Start", ready: "Waiting", count: (d, n) => `${d} of ${n}` } }),
+    h(FlowControls, { runner: r, flow, status: false, count: false, labels: { step: "One step" } }),
+    h(FlowTimeline, { runner: r, axis: false, labels: { region: "Record", empty: "Nothing ran yet" } }),
+    h(FlowTimeline, { runner: r, empty: false }),
+  ], host);
+  const [a, b] = host.querySelectorAll(".hm-flowctl");
+  assert.ok(a.classList.contains("mine"));
+  assert.equal(a.querySelector("[role=toolbar]").getAttribute("aria-label"), "Runner");
+  assert.match(a.querySelector(".hm-flowctl-run").textContent, /Start/);
+  assert.ok(a.querySelector(".hm-flowctl-run .own-run"));
+  assert.equal(a.querySelector(".hm-flowctl-step"), null);
+  assert.equal(a.querySelector(".hm-flowctl-reset"), null);
+  assert.equal(a.querySelector(".hm-flowctl-speed"), null);
+  assert.equal(a.querySelector(".hm-flowctl-clock"), null);
+  assert.match(a.querySelector(".hm-flowctl-status").textContent, /Waiting/);
+  assert.equal(a.querySelector(".hm-flowctl-count").textContent, "0 of 6");
+  assert.equal(b.querySelector(".hm-flowctl-step").getAttribute("aria-label"), "One step");
+  assert.ok(b.querySelector(".hm-flowctl-reset") && b.querySelector(".hm-flowctl-speed") && b.querySelector(".hm-flowctl-clock"));
+  assert.equal(b.querySelector(".hm-flowctl-count"), null);
+  assert.equal(b.querySelector(".hm-chip2"), null);
+  const [t1, t2] = host.querySelectorAll(".hm-flowtl");
+  assert.equal(t1.getAttribute("aria-label"), "Record");
+  assert.equal(t1.querySelector(".hm-flowtl-axis"), null);
+  assert.equal(t1.querySelector(".hm-flowtl-empty").textContent, "Nothing ran yet");
+  assert.ok(t2.querySelector(".hm-flowtl-axis"));
+  assert.equal(t2.querySelector(".hm-flowtl-empty"), null);
+  dispose();
 });

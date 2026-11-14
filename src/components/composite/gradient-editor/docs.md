@@ -18,7 +18,19 @@ the HADİ colors and the theme palette; the CSS is ready to copy.
 | `types` | `GradientType[]` | all three | types offered |
 | `presets` | `GradientPreset[]` or `false` | HADİ + theme | `{ label, value }`: a CSS gradient or a list of colors / tokens |
 | `output` | boolean | `true` | CSS with a copy button |
+| `preview` | boolean | `true` | the large preview on top |
+| `dial` | boolean | `true` | the angle dial |
+| `angles` | number[] or `false` | 0 … 315 by 45 | quick angle buttons |
+| `hint` | boolean | `true` | the hint under the stop bar |
+| `position` | boolean | `true` | the position field of the selected stop |
+| `labels` | object | — | own texts: `editor`, `preview(css)`, `type`, `linear`, `radial`, `conic`, `angle`, `degrees(n)`, `quickAngles`, `stops`, `stop(number, color)`, `hint`, `position`, `presets`, `preset(name)`, `copy`, `copied` |
 | `readonly`, `disabled` | | | |
+| `class` | class value | — | on the root (`hm-ge`) |
+
+```tsx
+<GradientEditor bind:value={$bg} preview={false} hint={false} angles={[0, 90, 180, 270]}
+  labels={{ linear: "Straight", copy: "Copy the CSS", stop: (n, color) => `Color ${n} (${color})` }} />
+```
 
 Helpers: `gradientCss(g)`, `parseGradient(css)`, `colorAt(g, at)`.
 

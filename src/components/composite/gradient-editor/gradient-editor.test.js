@@ -44,3 +44,29 @@ test("GradientEditor: stops as sliders, keyboard moves and removes, type and ang
   assert.ok(el.querySelector(".hm-cp"), "the selected stop has a ColorPicker");
   dispose();
 });
+
+test("GradientEditor: parts off, own angles, own texts", () => {
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  const dispose = render(() => [
+    h(GradientEditor, { value: "linear-gradient(90deg, #f2801f 0%, #a3338c 100%)", class: "mine", preview: false, hint: false, position: false, dial: false, angles: [0, 90],
+      labels: { editor: "Fill", stops: "Colors", linear: "Straight", degrees: (a) => `${a} deg`, stop: (n) => `Color ${n}`, copy: "Copy it" } }),
+    h(GradientEditor, { value: "linear-gradient(90deg, #f2801f 0%, #a3338c 100%)", dial: false, angles: false, presets: false, labels: { hint: "Click to add" } }),
+  ], el);
+  const [a, b] = el.querySelectorAll(".hm-ge");
+  assert.ok(a.classList.contains("mine"));
+  assert.equal(a.getAttribute("aria-label"), "Fill");
+  assert.equal(a.querySelector(".hm-ge-preview"), null);
+  assert.equal(a.querySelector(".hm-ge-hint"), null);
+  assert.equal(a.querySelector(".hm-ge-pos"), null);
+  assert.equal(a.querySelector(".hm-ge-dial"), null);
+  assert.deepEqual([...a.querySelectorAll(".hm-ge-angle-btn")].map((x) => x.getAttribute("aria-label")), ["0 deg", "90 deg"]);
+  assert.equal(a.querySelector(".hm-ge-bar").getAttribute("aria-label"), "Colors");
+  assert.equal(a.querySelector(".hm-ge-stop").getAttribute("aria-label"), "Color 1");
+  assert.match(a.querySelector(".hm-ge-types").textContent, /Straight/);
+  assert.equal(a.querySelector(".hm-ge-copy").getAttribute("aria-label"), "Copy it");
+  assert.ok(b.querySelector(".hm-ge-preview") && b.querySelector(".hm-ge-pos"), "the default parts stay");
+  assert.equal(b.querySelector(".hm-ge-angle"), null, "no dial and no quick angles: no angle block");
+  assert.equal(b.querySelector(".hm-ge-hint").textContent, "Click to add");
+  dispose();
+});

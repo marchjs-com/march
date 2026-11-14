@@ -23,6 +23,20 @@ export interface FlowPaletteProps {
   snap?: number;
   /** Show the search box. Default true. */
   search?: MaybeFn<boolean | undefined>;
+  /** The category titles (default true). */
+  categories?: MaybeFn<boolean | undefined>;
+  /** The description line of a card (default true). */
+  descriptions?: MaybeFn<boolean | undefined>;
+  /** The grip dots at the end of a card (default true). */
+  grip?: MaybeFn<boolean | undefined>;
+  /** Own card content: `(type) => node`. The card stays a button: drag, click and Enter work as before. */
+  renderCard?: ((type: FlowNodeType) => unknown) | undefined;
+  /** What a search without a match shows: true (default text), false (nothing) or your own node. */
+  empty?: boolean | Node | undefined;
+  /** The tilt of a dragged card, its melt into the canvas and its fly-back (default true). */
+  motion?: boolean | undefined;
+  /** Own texts: the region name, the search box, the screen reader hint of a card, the "no match" text. */
+  labels?: { region?: string; search?: string; hint?: string; empty?: string } | undefined;
   /** Called after a node is added. */
   onAdd?: (id: string, type: FlowNodeType) => void;
   class?: ClassProp;
@@ -42,6 +56,7 @@ export function FlowPalette(props: FlowPaletteProps): Element {
     return [...cats];
   });
   const snap = (v: number): number => { const g = props.snap ?? 16; return g > 0 ? Math.round(v / g) * g : v; };
+  const still = (): boolean => props.motion === false || reducedMotion();
   let added = 0;
   const add = (ty: FlowNodeType, at?: { x: number; y: number }): void => {
     const view = flow.view.peek();
@@ -70,7 +85,7 @@ export function FlowPalette(props: FlowPaletteProps): Element {
           ghost.removeAttribute("id");
           setStyle(ghost, { width: `${r.width}px` });
           close = openLayer("drag", ghost);
-          if (!reducedMotion()) animate(ghost, [{ transform: "scale(1) rotate(0deg)" }, { transform: "scale(1.04) rotate(-2deg)" }], { duration: 160, easing: "out", fill: "forwards" });
+          if (!still()) animate(ghost, [{ transform: "scale(1) rotate(0deg)" }, { transform: "scale(1.04) rotate(-2deg)" }], { duration: 160, easing: "out", fill: "forwards" });
           card.classList.add("is-dragging");
         }
         place(ev.clientX, ev.clientY);
@@ -85,7 +100,7 @@ export function FlowPalette(props: FlowPaletteProps): Element {
         const inside = !!flow.view.peek()?.toWorld(ev.clientX, ev.clientY);
         const g = ghost, done = close;
         if (inside && p) add(ty, { x: p.x, y: p.y });
-        if (reducedMotion()) { done?.(); return; }
+        if (still()) { done?.(); return; }
         // dropped: melt into the canvas; missed: fly back to the palette
         const back = inside ? [{ opacity: 1, transform: "scale(1.04)" }, { opacity: 0, transform: "scale(.9)" }] : [{ opacity: 1, translate: "0 0" }, { opacity: .2, translate: `${x0 - ev.clientX}px ${y0 - ev.clientY}px` }];
         animate(g, back, { duration: inside ? 180 : 280, easing: "out", fill: "forwards" }).finished.then(() => done?.());
@@ -102,21 +117,22 @@ export function FlowPalette(props: FlowPaletteProps): Element {
       onPointerdown: (e: PointerEvent) => { e.preventDefault(); el.focus(); drag(e, ty, el); },
       onKeydown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); add(ty); } },
     },
-      h("span", { class: "hm-flowpal-icon", "aria-hidden": "true" }, icon(ty.icon)),
-      h("span", { class: "hm-flowpal-text" },
-        h(OverflowText, { class: "hm-flowpal-name" }, () => val(ty.label)),
-        ty.description != null && h(OverflowText, { class: "hm-flowpal-desc" }, () => val(ty.description))),
-      h("span", { class: "hm-flowpal-grip", "aria-hidden": "true" })));
+      props.renderCard ? h("span", { class: "hm-flowpal-text hm-flowpal-own" }, props.renderCard(ty)) : [
+        h("span", { class: "hm-flowpal-icon", "aria-hidden": "true" }, icon(ty.icon)),
+        h("span", { class: "hm-flowpal-text" },
+          h(OverflowText, { class: "hm-flowpal-name" }, () => val(ty.label)),
+          ty.description != null && val(props.descriptions) !== false && h(OverflowText, { class: "hm-flowpal-desc" }, () => val(ty.description)))],
+      val(props.grip) === false ? null : h("span", { class: "hm-flowpal-grip", "aria-hidden": "true" })));
   };
 
-  return h("div", { class: () => cx("hm-flowpal", val(props.class)), role: "region", "aria-label": () => t`Node types` },
-    () => ((val(props.search) ?? true) ? h(SearchBox, { value: q, debounce: 0, placeholder: () => t`Search nodes`, label: () => t`Search nodes` }) : null),
-    h("p", { class: "hm-sr-only", id: hint }, () => t`Drag onto the canvas, or press Enter to add it in the middle.`),
+  return h("div", { class: () => cx("hm-flowpal", val(props.class)), role: "region", "aria-label": () => props.labels?.region ?? t`Node types` },
+    () => ((val(props.search) ?? true) ? h(SearchBox, { value: q, debounce: 0, placeholder: () => props.labels?.search ?? t`Search nodes`, label: () => props.labels?.search ?? t`Search nodes` }) : null),
+    h("p", { class: "hm-sr-only", id: hint }, () => props.labels?.hint ?? t`Drag onto the canvas, or press Enter to add it in the middle.`),
     () => {
       const groups = shown();
-      if (!groups.length) return h("p", { class: "hm-flowpal-empty" }, t`No node type matches.`);
+      if (!groups.length) return props.empty === false ? null : h("p", { class: "hm-flowpal-empty" }, props.empty && props.empty !== true ? props.empty : props.labels?.empty ?? t`No node type matches.`);
       return groups.map(([cat, list]) => h("section", { class: "hm-flowpal-cat" },
-        cat && h("h3", { class: "hm-flowpal-cattitle" }, cat),
+        cat && val(props.categories) !== false && h("h3", { class: "hm-flowpal-cattitle" }, cat),
         h("ul", { class: "hm-flowpal-list" }, list.map(card))));
     });
 }

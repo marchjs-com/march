@@ -27,6 +27,23 @@ as plain JSON. Each panel's content is rendered once and moves between groups wi
 | `onChange` | `(state) => void` | — | after every change (also share and window moves) |
 | `onClose` | `(panel) => boolean \| Promise` | — | return `false` to keep the panel (ask about unsaved changes) |
 | `label` | string | "Workspace" | accessible name |
+| `actions` | boolean / `("maximize" \| "float" \| "minimize")[]` | `true` | the buttons of a group, or only the listed ones (keyboard and `api` stay) |
+| `tray` | boolean | `true` | the tray of minimized panels; with `false` bring them back with `api.restore(panel)` |
+| `empty` | boolean / `(reset) => node` | `true` | what a layout without panels shows |
+| `icons` | `{ close, maximize, restore, float, dock, minimize }` | — | own icons: an icon, a string or `() => node` |
+| `motion` | boolean | `true` | the pop after a drop, the maximize transition, the ghost fade (the drop preview always follows the pointer) |
+| `labels` | object | — | own texts: `workspace`, `panels`, `tray`, `close`, `maximize`, `restore`, `float`, `dock`, `minimize`, `moveWindow`, `resizeWindow`, `unsaved`, `empty`, `reset`, `layoutReset`, `group(title)`, `moved(title, zone)`, `minimized(title)`, `closed(title)` |
+| `class` | class value | — | on the root (`hm-dock`) |
+
+```tsx
+<DockLayout panels={panels} actions={["maximize"]} tray={false} motion={false}
+  icons={{ close: "×", minimize: () => <MyIcon /> }}
+  labels={{ maximize: "Full size", closed: (title) => `${title} is gone` }}
+  empty={(reset) => <Button onClick={reset}>Bring the panels back</Button>} />
+```
+
+The command titles of the palette come from the command manager's texts; `commands={false}` registers none. A tab's
+icon, title, badge, dirty dot and close button are set per panel (`icon`, `title`, `badge`, `dirty`, `closable`).
 
 `DockState` is `{ version: 1, root, floating, minimized, maximized }`: save it with `api.state()` and give it back with
 `api.load(state)`; unknown panels are dropped when loading.
