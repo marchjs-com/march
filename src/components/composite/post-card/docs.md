@@ -23,6 +23,20 @@ and shares; the caption folds to three lines with a "more" button.
 | `variant` | `card` `flat` | `card` | flat: no frame, a divider below |
 | `clamp` | number | 3 | caption lines before "more" (0 = never fold) |
 | `doubleTapLike` | boolean | true | |
+| `labels` | `PostCardLabels` | built-in texts | `{ post(author), verified, options, like, comments(n), share(n), more, viewAll(n) }` |
+| `avatar` | boolean | true | the author's avatar |
+| `time` | boolean or `(time) => content` | true (relative) | the time in the header: off, or your own format |
+| `verifiedIcon` `placeIcon` `commentIcon` `shareIcon` `menuIcon` | icon, text or node | built-in | own icons; `false` hides the verified mark or the place pin |
+| `bigHeart` | node or `false` | heart | the large heart of a double tap; `false`: the post is liked without it |
+| `likeColor` | color token | `brand-pink` | heart color while liked |
+| `viewAll` | boolean | true | the "View all N comments" line |
+| `class` | | | on the article |
+
+```tsx
+import { star, zap } from "hadi-march/icons"
+<PostCard post={post} avatar={false} time={(t) => new Date(t).toLocaleDateString()} commentIcon={zap} bigHeart={<Icon of={star} />}
+  likeColor="brand-orange" viewAll={false} labels={{ more: "read on", comments: (n) => `${n} answers` }} />
+```
 
 ## Accessibility
 

@@ -26,3 +26,25 @@ test("CommandPalette: the old ui path is the same module; the button opens it; a
   assert.doesNotMatch(document.querySelector(".hm-pal-list")?.textContent ?? "", /Merhaba komutu/, "unregistered");
   P.closePalette(); m.dispose();
 });
+
+test("CommandPalette: own texts, empty state and hint; the button's icon and shortcut hint are optional", async () => {
+  const m = mount(() => [
+    h(P.CommandPalette, { shortcut: false, class: "mine", hint: false, labels: { dialog: "Find", search: "Type here", empty: "Nothing" } }),
+    h(P.PaletteButton, { label: "Ara", icon: false, kbd: false }),
+    h(P.PaletteButton, { label: "Ara", icon: "🔎" }),
+  ]);
+  const [bare, own] = m.el.querySelectorAll(".hm-pal-trigger");
+  assert.equal(bare.querySelector(".hm-pal-trigger-icon"), null);
+  assert.equal(bare.querySelector("kbd"), null);
+  assert.equal(own.querySelector(".hm-pal-trigger-icon").textContent, "🔎");
+  assert.ok(own.querySelector("kbd"));
+  bare.click();
+  await P.preloadPalette(); await tick();
+  const input = document.querySelector(".hm-pal-input");
+  assert.equal(input.getAttribute("aria-label"), "Type here");
+  assert.ok(document.querySelector(".hm-palette.mine"));
+  assert.equal(document.querySelector(".hm-pal-hint"), null);
+  input.value = "zzzzqqqq"; input.dispatchEvent(new globalThis.Event("input", { bubbles: true })); await tick(20);
+  assert.equal(document.querySelector(".hm-pal-empty").textContent, "Nothing");
+  P.closePalette(); m.dispose();
+});

@@ -10,7 +10,8 @@ import { signal, untrack, onCleanup, createRoot, effect } from "../../../core/re
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { key, formatKey } from "../../../ui/keys.ts";
-import { val, cx, glyph, type MaybeFn } from "../../../ui/util.ts";
+import { val, cx, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { isIconDef } from "../../../icons/svg.ts";
 import { search as searchIcon } from "../../../icons/glyphs/search.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
 import { isOpen } from "./state.ts";
@@ -51,6 +52,25 @@ export const closePalette = (): void => { isOpen.set(false); };
 /** Is the command palette open (reactive)? */
 export const paletteOpen = (): boolean => isOpen();
 
+/** The texts CommandPalette writes itself; every one is optional (default: the built-in text). */
+export interface CommandPaletteLabels {
+  /** Name of the dialog. */
+  dialog?: string;
+  /** Name of the search field. */
+  search?: string;
+  results?: string;
+  /** Shown when nothing matches. */
+  empty?: string;
+  /** The key hint under the list. */
+  hint?: string;
+  /** Heading above the `ask` suggestions. */
+  suggested?: string;
+  asking?: string;
+  askFailed?: string;
+  /** The "Ask" row. */
+  ask?: (query: string) => string;
+}
+
 export interface CommandPaletteProps {
   /** Optional intent search: resolves ids of commands/pages/actions (or hrefs) with a reason. */
   ask?: (query: string) => Promise<{ results?: readonly AskResult[] | null } | null | undefined>;
@@ -64,6 +84,16 @@ export interface CommandPaletteProps {
   /** Extra commands for this palette only. */
   commands?: readonly Command[] | null | undefined;
   onRun?: (entry: PaletteEntry) => void;
+  /** Own texts (dialog and field names, empty state, key hint, the Ask row). */
+  labels?: MaybeFn<CommandPaletteLabels | undefined>;
+  /** The key hint under the list: true (default), false, or your own content. */
+  hint?: unknown;
+  /** Own content for "no results" (default: the `labels.empty` text). */
+  empty?: unknown;
+  /** Icon of the Ask row (default: sparkles); false: none. */
+  askIcon?: unknown;
+  /** Extra class on the dialog. */
+  class?: ClassProp;
 }
 
 /**
@@ -81,11 +111,19 @@ export function CommandPalette(props: CommandPaletteProps): unknown {
   return () => { const V = view(); return V ? untrack(() => V(props)) : null; };
 }
 
-export interface PaletteButtonProps { label?: MaybeFn<string | undefined>; shortcut?: string; class?: string }
+export interface PaletteButtonProps {
+  label?: MaybeFn<string | undefined>;
+  shortcut?: string;
+  /** The search icon: default, false (none), or your own (an icon of hadi-march/icons, text or a node). */
+  icon?: unknown;
+  /** The shortcut hint (Ctrl+K / ⌘K) at the end. Default true. */
+  kbd?: boolean | undefined;
+  class?: string;
+}
 /** A search-field-looking button that opens the command palette: `<PaletteButton label="Search…" />` (shows Ctrl+K / ⌘K). */
 export function PaletteButton(props: PaletteButtonProps = {}): Element {
   return h("button", { type: "button", class: cx("hm-pal-trigger", props.class), onClick: openPalette, onPointerenter: () => void preloadPalette(), onFocus: () => void preloadPalette(), "aria-keyshortcuts": "Control+K Meta+K" },
-    glyph(searchIcon, "hm-svg hm-pal-trigger-icon"),
+    props.icon === false ? null : props.icon == null ? glyph(searchIcon, "hm-svg hm-pal-trigger-icon") : isIconDef(props.icon) ? glyph(props.icon, "hm-svg hm-pal-trigger-icon") : icon(props.icon, "hm-icon hm-pal-trigger-icon"),
     h(OverflowText, { class: "hm-pal-trigger-label" }, () => val(props.label) ?? t`Search…`),
-    h("kbd", { class: "hm-kbd hm-pal-trigger-kbd", "aria-hidden": "true" }, formatKey(props.shortcut ?? "mod+k")));
+    props.kbd === false ? null : h("kbd", { class: "hm-kbd hm-pal-trigger-kbd", "aria-hidden": "true" }, formatKey(props.shortcut ?? "mod+k")));
 }

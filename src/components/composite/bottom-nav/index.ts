@@ -7,7 +7,7 @@ import { t } from "../../../core/i18n.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { colorAttr, tokenColor, COLOR_TOKENS, type ColorToken } from "../../../theme/colors.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
@@ -43,14 +43,20 @@ export interface BottomNavProps {
   createActions?: MaybeFn<readonly BottomNavAction[] | null | undefined>;
   /** Look of the Create menu: "fan" (round buttons on an arc, default), "stack" (pills above the button) or "sheet" (a list from the bottom). */
   createMenu?: MaybeFn<CreateMenuLook | undefined>;
-  /** Title of the Create menu (the sheet's heading and the menu's name). */
-  createTitle?: MaybeFn<string | undefined>;
+  /** Title of the Create menu (the sheet's heading and the menu's name). `false`: no heading (the menu keeps its name). */
+  createTitle?: MaybeFn<string | false | undefined>;
+  /** The grab handle on top of the "sheet" menu. Default true. */
+  createHandle?: boolean | undefined;
   /** Called with the action a person picked (after its own `run`). */
   onAction?: ((id: string) => void) | undefined;
   createLabel?: MaybeFn<string | undefined>;
   createIcon?: unknown;
-  /** Ring colors of the Create button (CSS colors). Default: the four HADİ colors (a theme's brand tokens first). */
-  ring?: readonly string[] | undefined;
+  /** Ring colors of the Create button: color tokens ("brand-orange", "primary" …) or CSS colors; `false`: no ring. Default: the four HADİ colors (a theme's brand tokens first). */
+  ring?: readonly string[] | false | undefined;
+  /** The colored bubble behind the active tab. Default true; `false`: the active tab is marked by its color only. */
+  bubble?: MaybeFn<boolean | undefined>;
+  /** Motion (bubble slide, icon pop, button bounce, ring turn, menu fly-out). Default true; `false`: everything changes at once. */
+  motion?: MaybeFn<boolean | undefined>;
   /** Show labels under the icons. Default true (the label stays the accessible name either way). */
   labels?: MaybeFn<boolean | undefined>;
   /** floating: a rounded bar with room around it · flat: edge to edge. Default floating. */
@@ -77,6 +83,8 @@ export function BottomNav(props: BottomNavProps): Element {
   const activeIndex = (): number => items.findIndex((it) => it.id === val(props.value));
   const brand = (): boolean => (val(props.tint) ?? "brand") === "brand";
   const labels = (): boolean => val(props.labels) ?? true;
+  const moves = (): boolean => val(props.motion) !== false;
+  const bubbleOn = (): boolean => val(props.bubble) !== false;
   let bubble!: HTMLElement, ring: HTMLElement | undefined, core: HTMLElement | undefined;
   const icons: HTMLElement[] = [];
 
@@ -103,13 +111,14 @@ export function BottomNav(props: BottomNavProps): Element {
     return it.href ? h("a", { ...attrs, href: it.href }, body) : h("button", { ...attrs, type: "button" }, body);
   };
 
-  const ringColors = props.ring?.length ? props.ring : HADI_RING;
+  const ringOn = props.ring !== false;
+  const ringColors = (props.ring && props.ring.length ? props.ring : HADI_RING).map((c) => ((COLOR_TOKENS as readonly string[]).includes(c) ? tokenColor(c) : c));
   const actions = (): readonly BottomNavAction[] => val(props.createActions) ?? [];
   const menuOpen = signal(false);
   let closeMenu: (() => void) | null = null, held = false, timer: ReturnType<typeof setTimeout> | undefined;
   const bounce = (): void => {
-    const btn = ring?.parentElement;
-    if (btn) animate(btn, [{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }], { duration: 420, fill: "none" });
+    const btn = core?.parentElement;
+    if (btn && moves()) animate(btn, [{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }], { duration: 420, fill: "none" });
   };
   const press = (e: MouseEvent): void => {
     if (held) { held = false; return; } // a long press already ran the default action
@@ -118,13 +127,13 @@ export function BottomNav(props: BottomNavProps): Element {
       bounce();
       menuOpen.set(true);
       closeMenu = openCreateMenu(e.currentTarget as HTMLElement, actions(), {
-        look: val(props.createMenu) ?? "fan", title: val(props.createTitle),
+        look: val(props.createMenu) ?? "fan", title: val(props.createTitle), handle: props.createHandle, motion: moves(),
         onPick: (a) => { a.run?.(); props.onAction?.(a.id); },
         onClose: () => { closeMenu = null; menuOpen.set(false); },
       });
       return;
     }
-    if (core) animate(core, [{ transform: "rotate(0deg)" }, { transform: "rotate(90deg)" }, { transform: "rotate(0deg)" }], { duration: 420, easing: "easeOutBack", fill: "none" });
+    if (core && moves()) animate(core, [{ transform: "rotate(0deg)" }, { transform: "rotate(90deg)" }, { transform: "rotate(0deg)" }], { duration: 420, easing: "easeOutBack", fill: "none" });
     bounce();
     props.onCreate?.();
   };
@@ -143,19 +152,19 @@ export function BottomNav(props: BottomNavProps): Element {
       onPointerDown: hold, onPointerUp: release, onPointerLeave: release, onPointerCancel: release,
       onContextMenu: (e: Event) => { if (actions().length && props.onCreate) e.preventDefault(); },
     },
-      h("span", { class: "hm-bnav-ring", "aria-hidden": "true", ref: (x: HTMLElement) => { ring = x; setStyle(x, { "--hm-bnav-ring": `conic-gradient(${[...ringColors, ringColors[0]].join(", ")})` }); } }),
+      ringOn && h("span", { class: "hm-bnav-ring", "aria-hidden": "true", ref: (x: HTMLElement) => { ring = x; setStyle(x, { "--hm-bnav-ring": `conic-gradient(${[...ringColors, ringColors[0]].join(", ")})` }); } }),
       h("span", { class: "hm-bnav-core", ref: (x: HTMLElement) => { core = x; } }, props.createIcon != null ? icon(props.createIcon, "hm-bnav-glyph") : glyph(plus, "hm-svg hm-bnav-glyph"))));
 
   const cells: unknown[] = items.map(tab);
   if (createSlot) cells.splice(createAt, 0, createSlot);
 
   const root = h("nav", {
-    class: () => cx("hm-bnav", `hm-bnav-${val(props.variant) ?? "floating"}`, !labels() && "hm-bnav-nolabels", val(props.class)),
+    class: () => cx("hm-bnav", `hm-bnav-${val(props.variant) ?? "floating"}`, !labels() && "hm-bnav-nolabels", !bubbleOn() && "hm-bnav-nobubble", val(props.class)),
     "aria-label": () => val(props.label) ?? t`Main`,
   },
   h("div", { class: "hm-bnav-bar", ref: (x: HTMLElement) => { setStyle(x, { "--hm-bnav-n": String(slots) }); } },
     h("span", {
-      class: () => cx("hm-bnav-bubble", activeIndex() < 0 && "is-hidden"), "aria-hidden": "true",
+      class: () => cx("hm-bnav-bubble", (activeIndex() < 0 || !bubbleOn()) && "is-hidden"), "aria-hidden": "true",
       "data-hm-color": () => { const i = activeIndex(); return brand() && i >= 0 ? colorAttr(colorOf(items[i]!, i)) : null; },
       ref: (x: HTMLElement) => { bubble = x; },
     }),
@@ -169,7 +178,7 @@ export function BottomNav(props: BottomNavProps): Element {
       if (i < 0) { prev = -1; return; }
       const before = prev >= 0 && bubble.isConnected ? bubble.getBoundingClientRect().left : null;
       setStyle(bubble, { "--hm-bnav-i": String(slotOf(i)) });
-      if (before != null && prev !== i) {
+      if (before != null && prev !== i && moves()) {
         const dx = before - bubble.getBoundingClientRect().left;
         if (dx) animate(bubble, [{ transform: `translate3d(${dx}px, 0, 0)` }, { transform: "translate3d(0, 0, 0)" }], { duration: 420, easing: "easeOutBack", fill: "none" });
         const ic = icons[i];
@@ -181,7 +190,7 @@ export function BottomNav(props: BottomNavProps): Element {
 
   // ring: a slow turn on the motion engine; decorative, so reduced motion keeps it still
   let spin: { cancel(): void } | null = null, alive = true;
-  if (create) queueMicrotask(() => { if (ring && alive) spin = animate(ring, [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 12000, iterations: Infinity, easing: "linear" }); });
+  if (create) queueMicrotask(() => { if (ring && alive && moves()) spin = animate(ring, [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 12000, iterations: Infinity, easing: "linear" }); });
   onCleanup(() => { alive = false; spin?.cancel(); });
   return root;
 }

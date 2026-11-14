@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { variant: string; delay: number; pages: number; empty: boolean }
+interface Values { variant: string; delay: number; pages: number; empty: boolean; end: string; newColor: string }
 
 export default definePlayground<Values>({
   options: [
@@ -8,5 +8,7 @@ export default definePlayground<Values>({
     { key: "delay", label: "Ağ gecikmesi", default: 900, options: [{ value: 300, label: "hızlı" }, { value: 900, label: "orta" }, { value: 2500, label: "yavaş" }] },
     { key: "pages", label: "Sayfa sayısı", default: 3, options: [{ value: 1, label: "1" }, { value: 3, label: "3" }, { value: 50, label: "50" }] },
     { key: "empty", label: "Boş akış", default: false },
+    { key: "end", label: "Bitiş işareti (son sayfada)", default: "on", options: [{ value: "on", label: "hazır" }, { value: "own", label: "kendi içeriğim" }, { value: "off", label: "yok" }] },
+    { key: "newColor", label: "Yeni gönderi hapı rengi", default: "brand-blue", options: [{ value: "brand-blue", label: "mavi" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "primary", label: "tema vurgusu" }] },
   ],
 });

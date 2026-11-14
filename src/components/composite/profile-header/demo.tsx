@@ -9,7 +9,7 @@ export const code = `<ProfileHeader user={club} follow={$follow} onFollow={(s) =
   onMessage={openChat} onStat={(which) => openList(which)} onAvatar={openStories}
   menu={[{ label: "Bağlantıyı kopyala", icon: link, onSelect: copy }]} />`
 
-export default function ProfileHeaderDemo(props: { values: { self: boolean; cover: string; story: string; photo: boolean } }) {
+export default function ProfileHeaderDemo(props: { values: { self: boolean; cover: string; story: string; photo: boolean; stats: string; wording: string } }) {
   let $follow: FollowState = "follow"
   let $log = ""
   const user = (): ProfileUser => ({
@@ -20,6 +20,8 @@ export default function ProfileHeaderDemo(props: { values: { self: boolean; cove
   })
   return <div class="sc-social-profile">
     <ProfileHeader user={user} self={() => props.values.self} cover={() => props.values.cover as "md"} follow={() => $follow}
+      stats={() => (props.values.stats === "off" ? false : props.values.stats === "two" ? ["followers", "following"] as const : true)}
+      labels={() => (props.values.wording === "own" ? { message: "Yaz", edit: "Kulübü düzenle", posts: "Paylaşım", followers: "Üye", following: "Dost kulüp" } : undefined)}
       onFollow={(s) => { $follow = s }} onMessage={() => { $log = "Sohbet açılır" }} onEdit={() => { $log = "Profil düzenleme açılır" }}
       onStat={(w) => { $log = `${({ posts: "Gönderiler", followers: "Takipçiler", following: "Takip edilenler" })[w]} listesi açılır` }}
       onAvatar={() => { $log = "Hikâyeler açılır" }}

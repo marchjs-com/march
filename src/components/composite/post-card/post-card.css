@@ -30,6 +30,7 @@ button.hm-post-who:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-
 .hm-post-act:hover:not(:disabled) { background: var(--hm-surface-2); color: var(--hm-text); }
 .hm-post-act:disabled { cursor: default; }
 .hm-post-act:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-primary)); outline-offset: 2px; }
+.hm-post-act .hm-icon, .hm-post-big .hm-icon { display: inline-grid; place-items: center; }
 .hm-post-act .hm-svg { width: 1.375rem; height: 1.375rem; }
 .hm-post-body { padding-inline: var(--hm-space-4); min-width: 0; }
 .hm-post-text { margin: 0; font-size: var(--hm-text-md); line-height: 1.45; overflow-wrap: anywhere; }

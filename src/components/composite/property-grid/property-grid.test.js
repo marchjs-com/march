@@ -113,3 +113,30 @@ test("PropertyGrid: a slider being dragged stays the same node in the same group
   assert.equal(document.activeElement, slider);
   m.dispose();
 });
+
+test("PropertyGrid: history buttons, reset buttons, change marks and the footer can be turned off; texts are yours", async () => {
+  const value = signal({ name: "HADİ", width: 320, visible: true, radius: 8 });
+  const bare = mount(() => h(PropertyGrid, { properties: PROPS, value, id: "pg-bare", dirty: false, onSave: () => {}, class: "mine",
+    historyButtons: false, resetButtons: false, changeMarks: false, footer: false }));
+  await tick();
+  type(bare.el.querySelector("#pg-bare-width"), "500"); await tick();
+  assert.ok(bare.el.querySelector(".hm-pg.mine"));
+  assert.ok(bare.el.querySelector('[data-key="width"]').className.includes("is-changed"));
+  for (const part of [".hm-pg-history", ".hm-pg-reset", ".hm-pg-dot", ".hm-pg-count", ".hm-pg-foot"]) assert.equal(bare.el.querySelector(part), null, part);
+  bare.dispose();
+
+  const v2 = signal({ name: "HADİ", width: 320, visible: true, radius: 8 });
+  const own = mount(() => h(PropertyGrid, { properties: PROPS, value: v2, id: "pg-own", dirty: false, onSave: () => {},
+    labels: { search: "Find a setting", save: "Publish", revert: "Discard", unsaved: (n) => `${n} edits`, reset: (l) => `Restore ${l}`, noMatch: (q) => `Nothing for ${q}`, undo: "Step back" } }));
+  await tick();
+  assert.equal(own.el.querySelector(".hm-pg-search-input, .hm-pg-search input").getAttribute("placeholder"), "Find a setting");
+  assert.equal(own.el.querySelector(".hm-pg-save").textContent, "Publish");
+  assert.ok(own.el.querySelector(".hm-pg-history button").getAttribute("aria-label").startsWith("Step back"));
+  type(own.el.querySelector("#pg-own-width"), "500"); await tick();
+  assert.equal(own.el.querySelector(".hm-pg-changes").textContent, "1 edits");
+  assert.equal(own.el.querySelector(".hm-pg-revert").textContent, "Discard");
+  assert.equal(own.el.querySelector('[data-key="width"] .hm-pg-reset').getAttribute("aria-label"), "Restore Width");
+  type(own.el.querySelector(".hm-pg-search input"), "qqqq"); await tick();
+  assert.equal(own.el.querySelector(".hm-pg-empty").textContent, "Nothing for qqqq");
+  own.dispose();
+});

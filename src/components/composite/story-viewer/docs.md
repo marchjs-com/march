@@ -21,6 +21,18 @@ and focus returns to the ring that opened it.
 | `onSeen` | `(group, item) => void` | — | each story shown |
 | `onReply` | `(group, item, text) => void` | — | shows the reply field |
 | `onLike` / `liked` | `(group, item, on)` / `(group, item) => boolean` | — | shows the heart |
+| `progress` | boolean | `true` | the progress bars on top |
+| `avatar`, `time` | boolean | `true` | the person's avatar and the story's relative time in the header |
+| `pauseButton`, `closeButton` | boolean | `true` | the header buttons (Space / hold still pause; Esc and dragging down still close) |
+| `arrows` | boolean | `true` | the previous / next buttons (taps, swipes and ← → still move) |
+| `sentNote` | boolean | `true` | the "Sent" note after a reply |
+| `labels` | object | `t` texts | `dialog`, `play`, `pause`, `close`, `previous`, `next`, `like`, `send`, `sent`, `reply(group)`, `replyPlaceholder(group)`, `status(group, index, total)` |
+| `class` | class | — | on the dialog; parts: `hm-story-stage`, `-top`, `-head`, `-who`, `-time`, `-pause`, `-close`, `-caption`, `-prev`, `-next`, `-bar`, `-input`, `-send`, `-sent` |
+
+```tsx
+<StoryViewer open={$open} onClose={close} groups={stories} arrows={false} pauseButton={false} time={false}
+  labels={{ close: "Leave", replyPlaceholder: (g) => `Say something to ${g.name}…`, sent: "Delivered" }} class="my-stories" />
+```
 
 ## Accessibility
 

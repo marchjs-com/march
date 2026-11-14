@@ -26,6 +26,15 @@ Undo / redo use an UndoManager history of the editor's own (typing merges into o
 | `counter` | boolean | `true` | words · characters under the text |
 | `readonly` / `disabled` | boolean | — | |
 | `api` | `(api) => void` | — | `focus`, `markdown()`, `setMarkdown`, `insert(md)`, `exec(tool)`, `undo`, `redo`, `history` |
+| `hint` | boolean | `true` | the "Type @ to mention, : for emoji" hint in the foot |
+| `toolIcons` | `{ [tool]: node }` | built-in glyphs | own icon (node or short text) per toolbar button |
+| `labels` | object | `t` texts | `editor`, `toolbar`, `tools: { bold: "…" }`, `link`, `linkAddress`, `linkHelp`, `apply`, `removeLink`, `suggestions`, `noMatches`, `keepTyping`, `hint`, `count(words, characters)` |
+| `class` | class | — | on the root (`hm-rte`); parts: `hm-rte-bar`, `-toolbar`, `-tool`, `-sep`, `-content`, `-foot`, `-hint`, `-count`, `-link`, `-sug`, `-sug-item` |
+
+```tsx
+<RichTextEditor bind:value={$md} toolbar={["bold", "italic", "link"]} toolIcons={{ bold: "B", italic: "I" }} hint={false}
+  labels={{ tools: { bold: "Strong" }, count: (w, c) => `${c} / 500`, linkAddress: "Where should it go?" }} />
+```
 
 Shortcuts: Ctrl/⌘ + B, I, E (code), K (link), Shift+X (strike), Shift+7 / 8 (lists), Shift+9 (quote), Alt+0 / 2 / 3
 (paragraph, headings), Z / Shift+Z / Y (undo, redo). Enter splits a block (an empty list item leaves the list),

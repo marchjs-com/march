@@ -27,3 +27,29 @@ test("ProfileHeader: heading, stats, follow bumps followers, self shows Edit", (
   assert.match(sec.querySelector(".hm-prof-actions").textContent, /Edit profile/);
   m.dispose();
 });
+
+test("ProfileHeader: own texts and icons; stats can be chosen or turned off; the verified mark and Message icon are optional", () => {
+  const stats = signal(["followers", "following"]);
+  const m = mount(() => h(ProfileHeader, {
+    user: { name: "HADİ", verified: true, posts: 3, followers: 10, following: 2 }, onMessage: () => {}, class: "mine", stats, verifiedIcon: false, messageIcon: false, messageColor: "brand-blue",
+    labels: { profile: (n) => `${n} club`, message: "Write", followers: "Members" },
+  }));
+  const sec = m.el.querySelector("section.hm-prof");
+  assert.ok(sec.classList.contains("mine"));
+  assert.equal(sec.getAttribute("aria-label"), "HADİ club");
+  assert.equal(sec.querySelector(".hm-prof-verified"), null);
+  const msg = sec.querySelector(".hm-prof-msg");
+  assert.equal(msg.textContent, "Write");
+  assert.equal(msg.querySelector("svg"), null);
+  assert.equal(msg.getAttribute("data-hm-color"), "brand-blue");
+  assert.equal(sec.querySelector(".hm-prof-stats").getAttribute("data-n"), "2");
+  assert.deepEqual([...sec.querySelectorAll(".hm-prof-stat")].map((x) => x.lastElementChild.textContent), ["Members", "Following"]);
+  stats.set(false);
+  assert.equal(sec.querySelector(".hm-prof-stats"), null);
+  m.dispose();
+  const own = mount(() => h(ProfileHeader, { user: { name: "HADİ", verified: true }, onMessage: () => {}, verifiedIcon: "✔", messageIcon: "✉" }));
+  assert.equal(own.el.querySelector(".hm-prof-verified").textContent, "✔");
+  assert.match(own.el.querySelector(".hm-prof-msg").textContent, /✉/);
+  assert.equal(own.el.querySelectorAll(".hm-prof-stat").length, 3);
+  own.dispose();
+});

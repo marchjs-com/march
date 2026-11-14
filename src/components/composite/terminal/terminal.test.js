@@ -96,3 +96,21 @@ test("scheme and background are live: switching replaces the variables the previ
   assert.match(root.getAttribute("class"), /is-custom-bg/);
   m.dispose();
 });
+
+test("builtins off, a steady cursor and own texts", async () => {
+  const m = mount({ commands: { hi: (_a, io) => io.print("hello") }, builtins: false, blink: false, class: "mine",
+    labels: { command: "Shell input", notFound: (name) => `no ${name} here` } });
+  assert.ok(m.host.querySelector(".hm-term.mine"));
+  assert.equal(m.host.querySelector(".hm-term-input").getAttribute("aria-label"), "Shell input");
+  assert.ok(!m.host.querySelector(".hm-term-caret").classList.contains("is-blinking"), "blink={false}");
+  await m.api.exec("help");
+  assert.ok(rows(m.host).some((r) => r.includes("no help here")), `no built-in help; own not-found text: ${JSON.stringify(rows(m.host))}`);
+  assert.equal(m.host.querySelector(".hm-term-table"), null);
+  await m.api.exec("hi");
+  assert.ok(rows(m.host).some((r) => r === "hello"));
+  m.dispose();
+  const d = mount({});
+  assert.ok(d.host.querySelector(".hm-term-caret").classList.contains("is-blinking"));
+  assert.equal(d.host.querySelector(".hm-term-input").getAttribute("aria-label"), "Command");
+  d.dispose();
+});

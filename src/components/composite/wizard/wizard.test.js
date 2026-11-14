@@ -46,3 +46,25 @@ test("Wizard: steps, layout and color are live props (the showcase Playground dr
   color.set("brand-purple");
   assert.equal(el.querySelector("form.hm-wizard").getAttribute("data-hm-color"), "brand-purple", "color follows");
 });
+
+test("Wizard: parts can be turned off and the texts replaced", () => {
+  const steps = [{ schema: schema({ a: { type: "text" } }) }, { title: "B", schema: schema({ b: { type: "text" } }) }];
+  const el = mount(() => h(Wizard, { steps, class: "mine", labels: { back: "Prev", next: "Go on", step: (i) => `Part ${i + 1}`, count: (i, n) => `${i + 1}/${n}` } }));
+  assert.ok(el.querySelector("form.hm-wizard.mine"));
+  assert.equal(el.querySelector(".hm-wizard-title").textContent, "Part 1");
+  assert.equal(el.querySelector(".hm-step2-title").textContent, "Part 1");
+  assert.equal(el.querySelector(".hm-wizard-count").textContent, "1/2");
+  assert.equal(el.querySelector(".hm-wizard-back").textContent, "Prev");
+  assert.equal(el.querySelector(".hm-wizard-next").textContent, "Go on");
+  el.querySelector("form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+  assert.equal(el.querySelector(".hm-wizard-count").textContent, "2/2");
+  assert.equal(el.querySelector(".hm-wizard-next").textContent, "Finish");
+
+  const bare = mount(() => h(Wizard, { steps, stepper: false, progress: false, count: false, backButton: false }));
+  assert.equal(bare.querySelector(".hm-wizard-steps"), null);
+  assert.equal(bare.querySelector(".hm-wizard-progress"), null);
+  assert.equal(bare.querySelector(".hm-wizard-count"), null);
+  assert.equal(bare.querySelector(".hm-wizard-back"), null);
+  assert.equal(bare.querySelector(".hm-wizard-title").textContent, "Step 1");
+  assert.equal(bare.querySelector(".hm-wizard-next").textContent, "Next");
+});

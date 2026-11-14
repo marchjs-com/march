@@ -83,6 +83,17 @@ export interface RichTextEditorProps extends ControlProps<string> {
   counter?: boolean | undefined;
   /** Receives the editor API once mounted. */
   api?: ((api: RichTextApi) => void) | undefined;
+  /** The "Type @ to mention, : for emoji" hint under the text (default true; `counter={false}` removes the whole foot). */
+  hint?: boolean | undefined;
+  /** Own icon (any node or text) for a toolbar button: `{ bold: "B", link: <Icon of={chain} /> }`. */
+  toolIcons?: Partial<Record<Exclude<ToolName, "|">, unknown>> | undefined;
+  /** Own texts; defaults are the translated ones. `tools` names the toolbar buttons, `count` writes the counter. */
+  labels?: {
+    editor?: string; toolbar?: string; tools?: Partial<Record<Exclude<ToolName, "|">, string>>;
+    link?: string; linkAddress?: string; linkHelp?: string; apply?: string; removeLink?: string;
+    suggestions?: string; noMatches?: string; keepTyping?: string; hint?: string;
+    count?: (words: number, characters: number) => string;
+  } | undefined;
   class?: ClassProp;
 }
 
@@ -126,6 +137,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   const linkText = signal("");
   const ro = (): boolean => !!(props.readonly || props.disabled);
   const c = ctl(props);
+  const L = (): NonNullable<RichTextEditorProps["labels"]> => props.labels ?? {};
   let last: string | null = null;
   let snap: ops.Snapshot = { nodes: [], sel: null };
   let lastSel: ops.Sel | null = null;
@@ -135,7 +147,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   const root = h("div", {
     id: c.id, class: () => cx("hm-rte-content", isEmpty() && "is-empty"), role: "textbox", "aria-multiline": "true",
     contenteditable: () => (ro() ? "false" : "true"), spellcheck: "true", translate: "no", tabindex: () => (props.disabled ? "-1" : "0"),
-    "aria-label": () => c["aria-label"]() ?? t`Rich text editor`, "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"],
+    "aria-label": () => c["aria-label"]() ?? L().editor ?? t`Rich text editor`, "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"],
     "aria-readonly": () => (props.readonly ? "true" : null), "aria-disabled": () => (props.disabled ? "true" : null),
     "aria-placeholder": () => props.placeholder ?? null, "data-placeholder": () => props.placeholder ?? "",
     "aria-autocomplete": "list", "aria-haspopup": "listbox", "aria-expanded": () => String(!!sug()),
@@ -454,7 +466,8 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   const toolButton = (tool: Exclude<ToolName, "|">, i: number): Element => {
     const toggle = tool !== "undo" && tool !== "redo" && tool !== "link" && tool !== "emoji";
     const btn = h(IconButton, {
-      icon: tool === "emoji" ? h("span", { class: "hm-rte-tool-emoji", "aria-hidden": "true" }, "☺") : glyph(ICON[tool]), label: LABEL[tool], size: "sm", class: () => cx("hm-rte-tool", pressed(tool) && "is-on", (tool === "h2" || tool === "h3") && `hm-rte-tool-${tool}`),
+      icon: props.toolIcons?.[tool] != null ? h("span", { class: "hm-rte-tool-own", "aria-hidden": "true" }, props.toolIcons[tool]) : tool === "emoji" ? h("span", { class: "hm-rte-tool-emoji", "aria-hidden": "true" }, "☺") : glyph(ICON[tool]),
+      label: () => L().tools?.[tool] ?? LABEL[tool](), size: "sm", class: () => cx("hm-rte-tool", pressed(tool) && "is-on", (tool === "h2" || tool === "h3") && `hm-rte-tool-${tool}`),
       "aria-pressed": toggle ? () => String(pressed(tool)) : null, "aria-keyshortcuts": KEYS[tool] ?? null, tabindex: i === 0 ? "0" : "-1",
       "aria-haspopup": tool === "link" ? "dialog" : tool === "emoji" ? "listbox" : null,
       "aria-expanded": tool === "link" ? () => String(linkOpen()) : tool === "emoji" ? () => String(!!sug()?.button) : null,
@@ -485,7 +498,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     if (!list.length) return null;
     let n = 0;
     return h("div", { class: "hm-rte-bar", onKeyDown: toolbarKeys },
-      h(Toolbar, { label: () => t`Formatting`, class: "hm-rte-toolbar", children: list.map((tool) => (tool === "|" ? h("span", { class: "hm-rte-sep", role: "separator", "aria-orientation": "vertical" }) : toolButton(tool, n++))) }));
+      h(Toolbar, { label: () => L().toolbar ?? t`Formatting`, class: "hm-rte-toolbar", children: list.map((tool) => (tool === "|" ? h("span", { class: "hm-rte-sep", role: "separator", "aria-orientation": "vertical" }) : toolButton(tool, n++))) }));
   };
 
   // the link panel opens under the selected text (the toolbar may have scrolled away); without a selection, under the button
@@ -498,10 +511,10 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     closest: (sel: string) => root.closest(sel),
   } as unknown as Element;
   const linkPanel = () => (linkOpen() ? floating({
-    anchor: selAnchor, placement: "bottom-start", class: "hm-dropdown hm-rte-link", role: "dialog", attrs: { "aria-label": t`Link` },
+    anchor: selAnchor, placement: "bottom-start", class: "hm-dropdown hm-rte-link", role: "dialog", attrs: { "aria-label": L().link ?? t`Link` },
     onClose: (refocus) => closeLink(!!refocus),
     children: [
-      h("label", { class: "hm-rte-link-label", for: `${id}-href` }, () => t`Link address`),
+      h("label", { class: "hm-rte-link-label", for: `${id}-href` }, () => L().linkAddress ?? t`Link address`),
       h("div", { class: "hm-rte-link-row" },
         h("input", {
           id: `${id}-href`, class: () => cx("hm-input hm-rte-link-input", linkText().trim() && !isSafeLink(linkText().trim()) && "is-invalid"), type: "url", inputmode: "url", autocomplete: "off", spellcheck: "false",
@@ -510,9 +523,9 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
           onInput: (e: Event) => linkText.set((e.target as HTMLInputElement).value),
           onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); applyLink(); } },
         }),
-        h(IconButton, { icon: glyph(check), label: () => t`Apply`, size: "sm", class: "hm-rte-link-ok", disabled: () => !linkText().trim() || !isSafeLink(linkText().trim()), onClick: applyLink }),
-        () => (marks().a ? h(IconButton, { icon: glyph(trash), label: () => t`Remove link`, size: "sm", variant: "danger", onClick: unlink }) : null)),
-      h("p", { id: `${id}-href-help`, class: () => cx("hm-rte-link-help", linkText().trim() && !isSafeLink(linkText().trim()) && "is-error") }, () => t`Only http(s), mailto, tel and relative links`),
+        h(IconButton, { icon: glyph(check), label: () => L().apply ?? t`Apply`, size: "sm", class: "hm-rte-link-ok", disabled: () => !linkText().trim() || !isSafeLink(linkText().trim()), onClick: applyLink }),
+        () => (marks().a ? h(IconButton, { icon: glyph(trash), label: () => L().removeLink ?? t`Remove link`, size: "sm", variant: "danger", onClick: unlink }) : null)),
+      h("p", { id: `${id}-href-help`, class: () => cx("hm-rte-link-help", linkText().trim() && !isSafeLink(linkText().trim()) && "is-error") }, () => L().linkHelp ?? t`Only http(s), mailto, tel and relative links`),
     ],
   }) : null);
 
@@ -521,14 +534,14 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     if (!st) return null;
     return floating({
       anchor: caretAnchor, placement: "bottom-start", class: cx("hm-menu hm-rte-sug", st.kind === ":" && "hm-rte-sug-emoji"), role: "listbox", id: `${id}-sug`,
-      attrs: { "aria-label": t`Suggestions` }, onClose: () => sug.set(null),
+      attrs: { "aria-label": L().suggestions ?? t`Suggestions` }, onClose: () => sug.set(null),
       children: st.items.length ? st.items.map((it, i) => h("div", {
         id: `${id}-sug-${i}`, role: "option", class: () => cx("hm-menu-item hm-rte-sug-item", sug()?.active === i && "is-active"), "aria-selected": () => String(sug()?.active === i),
         onMouseDown: (e: MouseEvent) => { e.preventDefault(); pick(i); }, onMouseMove: () => { const cur = sug.peek(); if (cur && cur.active !== i) sug.set({ ...cur, active: i }); },
       },
       st.kind === "@" ? h(Avatar, { name: it.label, src: it.avatar ?? null, size: "sm" }) : h("span", { class: "hm-rte-sug-emoji-glyph", "aria-hidden": "true" }, it.label),
       h("span", { class: "hm-rte-sug-label" }, st.kind === "@" ? it.label : it.hint),
-      st.kind === "@" && it.hint ? h("span", { class: "hm-rte-sug-hint" }, it.hint) : null)).concat(st.kind === ":" && !st.query && !st.button ? [h("div", { class: "hm-rte-sug-more", "aria-hidden": "true" }, () => t`Keep typing to search`)] : []) : h("div", { class: "hm-rte-sug-empty" }, () => t`No matches`),
+      st.kind === "@" && it.hint ? h("span", { class: "hm-rte-sug-hint" }, it.hint) : null)).concat(st.kind === ":" && !st.query && !st.button ? [h("div", { class: "hm-rte-sug-more", "aria-hidden": "true" }, () => L().keepTyping ?? t`Keep typing to search`)] : []) : h("div", { class: "hm-rte-sug-empty" }, () => L().noMatches ?? t`No matches`),
     });
   };
 
@@ -558,8 +571,8 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   bar,
   root,
   () => (props.counter === false ? null : h("div", { class: "hm-rte-foot", "aria-live": "off" },
-    h("span", { class: "hm-rte-hint" }, () => (props.mentions && props.emoji !== false ? t`Type @ to mention, : for emoji` : props.mentions ? t`Type @ to mention` : props.emoji !== false ? t`Type : for emoji` : "")),
-    h("span", { class: "hm-rte-count" }, () => `${t`${stats()[0]} words`} · ${t`${stats()[1]} characters`}`))),
+    h("span", { class: "hm-rte-hint" }, () => (props.hint === false ? "" : L().hint != null ? L().hint : props.mentions && props.emoji !== false ? t`Type @ to mention, : for emoji` : props.mentions ? t`Type @ to mention` : props.emoji !== false ? t`Type : for emoji` : "")),
+    h("span", { class: "hm-rte-count" }, () => L().count?.(stats()[0], stats()[1]) ?? `${t`${stats()[0]} words`} · ${t`${stats()[1]} characters`}`))),
   linkPanel,
   suggestPanel);
 }

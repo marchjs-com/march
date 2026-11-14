@@ -37,3 +37,24 @@ test("StoryViewer: opens at the start person, arrows move through stories and pe
   assert.equal(closed, 1);
   m.dispose();
 });
+
+test("StoryViewer: parts can be turned off, texts replaced, class on the dialog", () => {
+  const open = signal(true);
+  const m = mount(() => h(StoryViewer, { open, onClose: () => open.set(false), groups, onReply: () => {}, onLike: () => {}, class: "mine",
+    progress: false, avatar: false, time: false, pauseButton: false, arrows: false,
+    labels: { dialog: "Moments", close: "Leave", send: "Post", like: "Heart", reply: (g) => `Answer ${g.name}`, replyPlaceholder: (g) => `Write to ${g.name}`, status: (g, i, n) => `${g.name} ${i + 1}/${n}` } }));
+  const dlg = [...document.querySelectorAll(".hm-story-dlg")].at(-1);
+  assert.ok(dlg.classList.contains("mine"));
+  assert.equal(dlg.getAttribute("aria-label"), "Moments");
+  assert.equal(dlg.querySelector("[role=progressbar]"), null, "progress={false}");
+  assert.equal(dlg.querySelector(".hm-avatar"), null);
+  assert.equal(dlg.querySelector(".hm-story-time"), null);
+  assert.equal(dlg.querySelector(".hm-story-pause"), null);
+  assert.equal(dlg.querySelector(".hm-story-nav"), null);
+  assert.equal(dlg.querySelector(".hm-story-close").getAttribute("aria-label"), "Leave");
+  assert.equal(dlg.querySelector(".hm-story-send").getAttribute("aria-label"), "Post");
+  assert.equal(dlg.querySelector(".hm-story-input").getAttribute("aria-label"), "Answer HADİ");
+  assert.equal(dlg.querySelector(".hm-story-input").getAttribute("placeholder"), "Write to HADİ");
+  assert.equal(dlg.querySelector("[aria-live=polite].hm-sr-only").textContent, "HADİ 1/2");
+  m.dispose();
+});

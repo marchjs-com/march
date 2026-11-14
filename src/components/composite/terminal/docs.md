@@ -46,6 +46,17 @@ defineTerminalCommands({ ping: (_a, io) => io.print(ansi.green("pong")) })   // 
 | `font`, `height` | Font family and height (CSS). |
 | `maxLines` | Oldest lines are dropped past this many (default 2000). |
 | `label` | Accessible name of the output log. |
+| `blink` | The cursor blinks (default `true`); `false` keeps it lit. |
+| `builtins` | The built-in `help`, `clear`, `history` (default `true`); `false` leaves only your commands. A command of yours with the same name replaces one of them. |
+| `labels` | Own texts: `{ command, historySearch, notFound(name) }` (the input's accessible name, the Ctrl+R prompt, the "command not found" line). |
+| `class` | On the root (`hm-term`); parts: `hm-term-out`, `-row`, `-echo`, `-line`, `-prompt`, `-input`, `-caret`, `-table`, `-bar`, `-spin`, `-link`. |
+
+```tsx
+<Terminal commands={cmds} builtins={false} blink={false} prompt="› "
+  labels={{ notFound: (name) => `"${name}" is not a command here`, command: "Shell input" }} />
+```
+
+`TerminalWindow` takes the same props plus the window's (`title`, `icon`, `chrome`, `closable`, `minimizable`…).
 | `ref` | Receives the terminal API. |
 
 ## Accessibility

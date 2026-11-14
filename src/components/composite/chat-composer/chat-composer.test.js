@@ -31,3 +31,31 @@ test("ChatComposer: mic when empty, send when typed, Enter sends and clears, emo
   assert.equal(m.el.querySelector(".hm-compose-reply"), null);
   m.dispose();
 });
+
+test("ChatComposer: own texts, icons and colors; waveform, dot and motion can be turned off", async () => {
+  const mark = document.createElement("i"); mark.className = "own-send";
+  const m = mount(() => h(ChatComposer, {
+    onSend: () => {}, onVoice: () => {}, class: "mine", motion: false, wave: false, recordingDot: false, micColor: "brand-purple", sendColor: "brand-green", sendIcon: mark, micIcon: "REC",
+    labels: { message: "Write", record: "Talk", send: "Go", emoji: "Faces", recording: "On air", replyingTo: (n) => `To ${n}` }, replyTo: { name: "HADİ", text: "x" },
+  }));
+  assert.ok(m.el.querySelector("form.hm-compose").classList.contains("mine"));
+  const act = m.el.querySelector(".hm-compose-act");
+  assert.equal(act.getAttribute("aria-label"), "Talk");
+  assert.equal(act.getAttribute("data-hm-color"), "brand-purple");
+  assert.equal(act.textContent, "REC");
+  assert.match(m.el.querySelector(".hm-compose-reply").textContent, /To HADİ/);
+  assert.equal(m.el.querySelector(".hm-compose-emoji-btn").getAttribute("aria-label"), "Faces");
+  const ta = m.el.querySelector("textarea");
+  assert.equal(ta.getAttribute("aria-label"), "Write");
+  ta.value = "hi"; ta.dispatchEvent(new globalThis.Event("input", { bubbles: true }));
+  assert.equal(act.getAttribute("aria-label"), "Go");
+  assert.equal(act.getAttribute("data-hm-color"), "brand-green");
+  assert.ok(act.querySelector(".own-send"));
+  ta.value = ""; ta.dispatchEvent(new globalThis.Event("input", { bubbles: true }));
+  act.click(); // record
+  await wait();
+  assert.match(m.el.querySelector(".hm-compose-rec").textContent, /On air/);
+  assert.equal(m.el.querySelector(".hm-compose-wave"), null);
+  assert.equal(m.el.querySelector(".hm-compose-dot"), null);
+  m.dispose();
+});

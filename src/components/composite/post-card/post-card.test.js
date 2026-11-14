@@ -36,3 +36,28 @@ test("PostCard: no media, no share count, no menu → those parts are absent", (
   assert.equal(m.el.querySelectorAll(".hm-post-act").length, 1, "comments shown read-only, shares hidden at 0");
   m.dispose();
 });
+
+test("PostCard: own texts and icons; avatar, time, verified mark, large heart and the comments line can be turned off", () => {
+  const mark = document.createElement("i"); mark.className = "own-comment";
+  const m = mount(() => h(PostCard, {
+    post: { ...base, place: "Shore" }, onComment: () => {}, class: "mine", avatar: false, time: false, verifiedIcon: false, placeIcon: false, bigHeart: false, viewAll: false,
+    commentIcon: mark, likeColor: "brand-orange", labels: { post: (a) => `From ${a}`, comments: (n) => `${n} answers` },
+  }));
+  const art = m.el.querySelector("article.hm-post");
+  assert.ok(art.classList.contains("mine"));
+  assert.equal(art.getAttribute("aria-label"), "From HADİ Club");
+  assert.equal(art.querySelector(".hm-avatar"), null);
+  assert.equal(art.querySelector("time"), null);
+  assert.equal(art.querySelector(".hm-post-verified"), null);
+  assert.equal(art.querySelector(".hm-post-place svg"), null);
+  assert.equal(art.querySelector(".hm-post-big"), null);
+  assert.equal(art.querySelector(".hm-post-all"), null);
+  const c = art.querySelector(".hm-post-act");
+  assert.equal(c.getAttribute("aria-label"), "3 answers");
+  assert.ok(c.querySelector(".own-comment"));
+  m.dispose();
+  const own = mount(() => h(PostCard, { post: base, time: () => "just now", bigHeart: "★" }));
+  assert.equal(own.el.querySelector("time").textContent, "just now");
+  assert.equal(own.el.querySelector(".hm-post-big").textContent, "★");
+  own.dispose();
+});

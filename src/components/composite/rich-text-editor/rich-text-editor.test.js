@@ -119,3 +119,21 @@ test("suggestions open after a space or a line start, never inside a word", () =
   assert.deepEqual(ops.suggestTrigger("selam @De"), { kind: "@", query: "De" });
   for (const s of ["saat 10:30", "http:", "https://hadisosyal.com", "Not:", "a@b", "e-posta: x@y", "Merhaba :sm "]) assert.equal(ops.suggestTrigger(s), null, s);
 });
+
+test("RichTextEditor: own tool icons, own texts, no hint", async () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(RichTextEditor, { value: "one two", mentions: [{ id: "a", label: "Ada" }], class: "mine", hint: false, toolbar: ["bold", "italic"],
+    toolIcons: { bold: "B" }, labels: { editor: "Note", toolbar: "Format", tools: { bold: "Strong" }, count: (w, c) => `${w}w ${c}c` } }), el);
+  await new Promise((r) => setTimeout(r, 0));
+  assert.ok(el.querySelector(".hm-rte.mine"));
+  assert.equal(el.querySelector(".hm-rte-content").getAttribute("aria-label"), "Note");
+  assert.equal(el.querySelector("[role=toolbar]").getAttribute("aria-label"), "Format");
+  const [b, i] = el.querySelectorAll(".hm-rte-tool");
+  assert.equal(b.getAttribute("aria-label"), "Strong");
+  assert.equal(b.querySelector(".hm-rte-tool-own").textContent, "B");
+  assert.equal(i.getAttribute("aria-label"), "Italic");
+  assert.ok(i.querySelector("svg"), "other tools keep their glyph");
+  assert.equal(el.querySelector(".hm-rte-hint").textContent, "", "hint={false}");
+  assert.equal(el.querySelector(".hm-rte-count").textContent, "2w 7c");
+  dispose();
+});

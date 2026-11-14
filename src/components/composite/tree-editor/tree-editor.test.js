@@ -101,3 +101,32 @@ test("TreeEditor: a switch flips in place (same row element, no redraw); read-on
   assert.match(el.querySelector(".hm-tre-wrap").getAttribute("class"), /is-readonly/);
   dispose();
 });
+
+test("TreeEditor: status, type badges and row actions can be turned off; texts are yours", async () => {
+  const bare = mount(() => h(TreeEditor, { value: signal({ a: 1, list: [1, 2] }), class: "mine", status: false, typeBadges: false, actions: ["add"] }));
+  await tick();
+  assert.ok(bare.el.querySelector(".hm-tre-wrap.mine"));
+  assert.equal(bare.el.querySelector(".hm-tre-status"), null, "status={false}");
+  assert.equal(bare.el.querySelector(".hm-tre-type"), null, "typeBadges={false}");
+  assert.ok(bare.el.querySelector(".hm-tre-add"));
+  assert.equal(bare.el.querySelector(".hm-tre-dup, .hm-tre-del"), null, "only the listed actions");
+  bare.dispose();
+
+  const none = mount(() => h(TreeEditor, { value: signal({ a: 1 }), actions: false, search: false, status: false, history: false }));
+  await tick();
+  assert.equal(none.el.querySelector(".hm-tre-actions"), null, "actions={false}");
+  assert.equal(none.el.querySelector(".hm-tre-bar"), null, "nothing left for the bar");
+  none.dispose();
+
+  const own = mount(() => h(TreeEditor, { value: signal({ a: "", list: [1, 2] }), schema: { type: "object", properties: { a: { type: "number" } } },
+    labels: { root: "settings", search: "Find", problems: (n) => `${n} to fix`, items: (n) => `${n} rows`, emptyText: "blank", duplicate: "Clone", kinds: { string: "words" } } }));
+  await tick();
+  assert.equal(own.el.querySelector(".hm-tre-root").textContent, "settings");
+  assert.equal(own.el.querySelector(".hm-tre-search-input").getAttribute("placeholder"), "Find");
+  assert.equal(own.el.querySelector(".hm-tre-status").textContent, "1 to fix");
+  assert.equal(own.el.querySelector(".hm-tre-row.is-array .hm-tre-summary").textContent, "2 rows");
+  assert.equal(own.el.querySelector(".hm-tre-empty").textContent, "blank");
+  assert.equal(own.el.querySelector(".hm-tre-dup").getAttribute("aria-label"), "Clone");
+  assert.match(own.el.querySelector(".hm-tre-row.is-string .hm-tre-type").getAttribute("aria-label"), /words/);
+  own.dispose();
+});

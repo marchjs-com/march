@@ -4,7 +4,9 @@
 // bumps the follower count, so the number rolls with the button.
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { isIconDef, type IconDef } from "../../../icons/svg.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { badgeCheck } from "../../../icons/glyphs/badgeCheck.ts";
 import { message } from "../../../icons/glyphs/message.ts";
 import { moreVertical } from "../../../icons/glyphs/moreVertical.ts";
@@ -30,6 +32,14 @@ export interface ProfileUser {
   private?: boolean | undefined;
 }
 
+/** The texts ProfileHeader writes itself; every one is optional (default: the built-in text). */
+export interface ProfileHeaderLabels {
+  /** Name of the section. */
+  profile?: (name: string) => string;
+  edit?: string; message?: string; more?: string; verified?: string; posts?: string; followers?: string; following?: string;
+}
+type Stat = "posts" | "followers" | "following";
+
 export interface ProfileHeaderProps {
   user: MaybeFn<ProfileUser>;
   /** Your own profile: no follow / message, an Edit button instead (onEdit). */
@@ -43,37 +53,57 @@ export interface ProfileHeaderProps {
   menu?: readonly MenuItem[] | undefined;
   /** Cover height: sm 120 · md 168 · lg 216 px. Default md. */
   cover?: MaybeFn<"sm" | "md" | "lg" | "none" | undefined>;
+  /** Own texts (section name, Edit profile, Message, the stat names …). */
+  labels?: MaybeFn<ProfileHeaderLabels | undefined>;
+  /** The stats row: true (default: all three), false, or the ones to show in order (`["followers", "following"]`). */
+  stats?: MaybeFn<boolean | readonly ("posts" | "followers" | "following")[] | undefined>;
+  /** Own icons (an icon of hadi-march/icons, text or a node); `false` hides the verified mark or the Message icon. */
+  verifiedIcon?: unknown;
+  messageIcon?: unknown;
+  menuIcon?: unknown;
+  /** Color of the Message button (default: a neutral surface). */
+  messageColor?: ColorToken | undefined;
   class?: ClassProp;
 }
+
+const ALL: readonly Stat[] = ["posts", "followers", "following"];
+// an own icon (IconDef, text or node) or the built-in glyph
+const own = (x: unknown, def: IconDef): unknown => (x == null ? glyph(def) : isIconDef(x) ? glyph(x) : icon(x));
 
 /** `<ProfileHeader user={u} follow={$f} onFollow={(s) => $f = s} onMessage={openChat} onStat={openList} />` */
 export function ProfileHeader(props: ProfileHeaderProps): Element {
   const u = (): ProfileUser => val(props.user);
+  const L = (): ProfileHeaderLabels => val(props.labels) ?? {};
+  const shown = (): readonly Stat[] => { const s = val(props.stats); return s === false ? [] : Array.isArray(s) ? s as readonly Stat[] : ALL; };
   // following adds you to the followers: the count rolls together with the button
   const followers = (): number => (u().followers ?? 0) + (val(props.follow) === "following" ? 1 : 0);
-  const stat = (which: "posts" | "followers" | "following", n: () => number, label: () => string): Element =>
+  const stat = (which: Stat, n: () => number, label: () => string): Element =>
     h(props.onStat ? "button" : "div", { ...(props.onStat ? { type: "button", onClick: () => props.onStat?.(which) } : {}), class: "hm-prof-stat" },
       h("b", null, h(CountRoll, { value: n })), h("span", null, label));
-  return h("section", { class: () => cx("hm-prof", `hm-prof-cover-${val(props.cover) ?? "md"}`, val(props.class)), "aria-label": () => t`Profile of ${u().name}` },
+  return h("section", { class: () => cx("hm-prof", `hm-prof-cover-${val(props.cover) ?? "md"}`, val(props.class)), "aria-label": () => L().profile?.(u().name) ?? t`Profile of ${u().name}` },
     () => (val(props.cover) === "none" ? null : h("div", { class: "hm-prof-cover", "aria-hidden": "true" },
       () => { const c = u().cover; return c ? h("img", { src: c, alt: "", decoding: "async" }) : h("span", { class: "hm-prof-cover-art" }, h("i"), h("i"), h("i"), h("i")); })),
     h("div", { class: "hm-prof-top" },
       h(StoryRing, { name: () => u().name, src: () => u().avatar, size: "lg", state: () => u().story ?? "none", onClick: props.onAvatar, class: "hm-prof-avatar" }),
       h("div", { class: "hm-prof-actions" },
         () => (val(props.self)
-          ? (props.onEdit ? h(Button, { variant: "secondary", onClick: () => props.onEdit?.() }, t`Edit profile`) : null)
+          ? (props.onEdit ? h(Button, { variant: "secondary", onClick: () => props.onEdit?.() }, () => L().edit ?? t`Edit profile`) : null)
           : [
             props.onFollow ? h(FollowButton, { state: () => val(props.follow) ?? "follow", name: () => u().name, private: () => !!u().private, onChange: (s: FollowState) => props.onFollow?.(s) }) : null,
-            props.onMessage ? h("button", { type: "button", class: "hm-prof-msg", onClick: () => props.onMessage?.() }, glyph(message), h("span", null, t`Message`)) : null,
+            props.onMessage ? h("button", { type: "button", class: "hm-prof-msg", "data-hm-color": colorAttr(props.messageColor), onClick: () => props.onMessage?.() },
+              props.messageIcon === false ? null : own(props.messageIcon, message), h("span", null, () => L().message ?? t`Message`)) : null,
           ]),
-        props.menu?.length ? h(Menu, { icon: moreVertical, label: () => t`More`, variant: "ghost", items: props.menu, class: "hm-prof-more" }) : null)),
+        props.menu?.length ? h(Menu, { icon: props.menuIcon ?? moreVertical, label: () => L().more ?? t`More`, variant: "ghost", items: props.menu, class: "hm-prof-more" }) : null)),
     h("div", { class: "hm-prof-id" },
       h("h2", { class: "hm-prof-name" }, h("span", null, () => u().name),
-        () => (u().verified ? h("span", { class: "hm-prof-verified", role: "img", "aria-label": () => t`Verified` }, glyph(badgeCheck)) : null)),
+        () => (u().verified && props.verifiedIcon !== false ? h("span", { class: "hm-prof-verified", role: "img", "aria-label": () => L().verified ?? t`Verified` }, own(props.verifiedIcon, badgeCheck)) : null)),
       () => (u().handle ? h("span", { class: "hm-prof-handle" }, `@${u().handle}`) : null),
       () => (u().bio ? h("p", { class: "hm-prof-bio" }, u().bio) : null)),
-    h("div", { class: "hm-prof-stats" },
-      stat("posts", () => u().posts ?? 0, () => t`Posts`),
-      stat("followers", followers, () => t`Followers`),
-      stat("following", () => u().following ?? 0, () => t`Following`)));
+    () => {
+      const list = shown();
+      if (!list.length) return null;
+      return h("div", { class: "hm-prof-stats", "data-n": String(list.length) }, list.map((w) => (w === "posts" ? stat(w, () => u().posts ?? 0, () => L().posts ?? t`Posts`)
+        : w === "followers" ? stat(w, followers, () => L().followers ?? t`Followers`)
+        : stat(w, () => u().following ?? 0, () => L().following ?? t`Following`))));
+    });
 }

@@ -31,7 +31,7 @@ const CYCLE: ColorToken[] = ["brand-orange", "brand-blue", "brand-green", "brand
 
 /** Open the Create menu above `button`; returns the function that closes it. */
 export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavAction[], o: {
-  look: CreateMenuLook; title?: string | undefined; onPick: (a: BottomNavAction) => void; onClose: () => void;
+  look: CreateMenuLook; title?: string | false | undefined; handle?: boolean | undefined; motion?: boolean | undefined; onPick: (a: BottomNavAction) => void; onClose: () => void;
 }): () => void {
   const list = actions.filter((a) => !val(a.hidden));
   const scope = overlayScopeFor(button);
@@ -49,6 +49,7 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
   const finish = (): void => {
     if (closing) return;
     closing = true;
+    if (o.motion === false) { close(); o.onClose(); return; }
     const els = [...panel.querySelectorAll<HTMLElement>(".hm-bnav-action")];
     animate(scrim, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: "forwards" });
     const out = o.look === "sheet" ? animate(panel, [{ transform: "translateY(0)" }, { transform: "translateY(100%)" }], { duration: 200, easing: "easeInCubic", fill: "forwards" })
@@ -75,7 +76,7 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
 
   const items = list.map(item);
   const panel = h("div", {
-    class: cx("hm-bnav-actions", `is-${o.look}`), role: "menu", "aria-label": o.title ?? t`Create`, "aria-orientation": o.look === "fan" ? "horizontal" : "vertical",
+    class: cx("hm-bnav-actions", `is-${o.look}`), role: "menu", "aria-label": o.title || t`Create`, "aria-orientation": o.look === "fan" ? "horizontal" : "vertical",
     onKeyDown: (e: KeyboardEvent) => {
       const enabled = items.filter((x) => !(x as HTMLButtonElement).disabled), i = enabled.indexOf(globalThis.document.activeElement as HTMLElement);
       const go = (j: number): void => { e.preventDefault(); enabled[(j + enabled.length) % enabled.length]?.focus(); };
@@ -87,7 +88,7 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
       else if (e.key === "Tab") go(e.shiftKey ? i - 1 : i + 1);
     },
   },
-  o.look === "sheet" ? [h("span", { class: "hm-bnav-sheet-handle", "aria-hidden": "true" }), h("strong", { class: "hm-bnav-sheet-title" }, o.title ?? t`Create`)] : null,
+  o.look === "sheet" ? [o.handle === false ? null : h("span", { class: "hm-bnav-sheet-handle", "aria-hidden": "true" }), o.title === false ? null : h("strong", { class: "hm-bnav-sheet-title" }, o.title ?? t`Create`)] : null,
   items) as HTMLElement;
   // fan and stack sit above the button; the sheet takes the bottom edge
   if (o.look !== "sheet") setStyle(panel, { left: `${cx0}px`, bottom: `${gapFromBottom + (o.look === "fan" ? 8 : 0)}px` });
@@ -95,6 +96,7 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
   const root = h("div", { class: cx("hm-bnav-menu", `is-${o.look}`) }, scrim, panel) as HTMLElement;
   close = openLayer("menu", root, scope);
 
+  if (o.motion === false) { queueMicrotask(() => (items.find((x) => !(x as HTMLButtonElement).disabled) ?? panel).focus()); return finish; }
   // in: the scrim fades, the sheet rises, the round buttons fly out of the Create button one after another
   animate(scrim, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, fill: "none" });
   if (o.look === "sheet") animate(panel, [{ transform: "translateY(100%)" }, { transform: "translateY(0)" }], { duration: 280, easing: "easeOutCubic", fill: "none" });

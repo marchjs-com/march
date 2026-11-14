@@ -84,3 +84,4 @@
 .hm-rte-sug-empty { padding: var(--hm-space-2) var(--hm-space-3); color: var(--hm-faint); font-size: var(--hm-text-sm); }
 .hm-rte-sug-more { padding: var(--hm-space-1) var(--hm-space-3) var(--hm-space-2); color: var(--hm-faint); font-size: var(--hm-text-xs); border-block-start: 1px solid var(--hm-border); margin-block-start: var(--hm-space-1); }
 .hm-rte-tool-emoji { font-size: 1.15em; line-height: 1; }
+.hm-rte-tool-own { display: inline-grid; place-items: center; font-weight: var(--hm-weight-semibold); line-height: 1; }

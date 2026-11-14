@@ -20,6 +20,8 @@
   background: var(--hm-brand-blue, var(--hm-primary)); color: var(--hm-on-brand-blue, var(--hm-on-primary-fill)); box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hm-brand-blue, var(--hm-primary)) 60%, transparent);
   transition: background-color var(--hm-dur) var(--hm-ease); }
 .hm-compose-act.is-mic { background: var(--hm-brand-orange, var(--hm-primary)); color: var(--hm-on-brand-orange, var(--hm-on-primary-fill)); box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hm-brand-orange, var(--hm-primary)) 60%, transparent); }
+.hm-compose-act[data-hm-color] { background: var(--hm-accent); color: var(--hm-on-accent); box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hm-accent) 60%, transparent); }
+.hm-compose-act .hm-icon, .hm-compose-icon .hm-icon { display: inline-grid; place-items: center; }
 .hm-compose-act .hm-svg { width: 1.25rem; height: 1.25rem; }
 .hm-compose-act.is-send .hm-svg { margin-inline-start: -2px; }
 :dir(rtl) .hm-compose-act.is-send .hm-svg { transform: scaleX(-1); }

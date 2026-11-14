@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { format: string; alpha: boolean; palettes: boolean; contrast: boolean; eyedropper: boolean; readonly: boolean }
+interface Values { format: string; alpha: boolean; palettes: boolean; contrast: boolean; eyedropper: boolean; readonly: boolean; preview: boolean; formats: boolean; input: boolean }
 
 export default definePlayground<Values>({
   options: [
@@ -9,6 +9,9 @@ export default definePlayground<Values>({
     { key: "palettes", label: "Paletler", default: true },
     { key: "contrast", label: "Kontrast", default: true },
     { key: "eyedropper", label: "Göz damlası (tarayıcı destekliyorsa)", default: true },
+    { key: "preview", label: "Eski / yeni önizleme", default: true },
+    { key: "formats", label: "Biçim değiştirici", default: true },
+    { key: "input", label: "Değer alanı", default: true },
     { key: "readonly", label: "Salt okunur", default: false },
   ],
 });

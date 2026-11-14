@@ -7,6 +7,8 @@ one menu or the separate pickers and they always match. Choices are remembered.
 ```tsx
 <ThemeMenu />
 <ThemeMenu themes={false} accents={["primary", "brand-orange", "brand-blue"]} />
+<ThemeMenu icon={sun} modes={false} headings={false} />                       // own icon, no light / dark row, no headings
+<ThemeMenu icon={false} label="Look" labels={{ theme: "Palette", accent: "Highlight" }} panelClass="my-panel" />
 ```
 
 ## Props
@@ -17,7 +19,12 @@ one menu or the separate pickers and they always match. Choices are remembered.
 | `themes` | boolean | `true` | show the color themes |
 | `accents` | `ColorToken[]` or `false` | `ACCENT_CHOICES` | accent choices; `false` hides the section |
 | `placement` | `"bottom-end"` … | `"bottom-end"` | where the panel opens |
+| `icon` | icon / `false` | palette | the button's icon; `false` = text only |
+| `modes` | boolean | `true` | the light / dark / system row |
+| `headings` | boolean | `true` | the section headings |
+| `labels` | `{ theme, accent }` | `Theme`, `Accent` | heading texts (strings or accessors) |
 | `class` | class | — | on the button |
+| `panelClass` | string | — | on the opened panel (`hm-theme-menu`) |
 
 ## Accessibility
 

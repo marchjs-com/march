@@ -23,13 +23,15 @@ Bu sürümde **karanlık tema**, *daha hızlı* arama ve yeni [belgeler](https:/
 
 > Seçin, araç çubuğunu kullanın ya da \`# \`, \`- \`, \`1. \`, \`> \` yazarak başlayın.`
 
-export default function RichTextEditorDemo(props: { values: { toolbar: string; mentions: boolean; emoji: boolean; counter: boolean; readonly: boolean; rows: number; output: boolean } }) {
+export default function RichTextEditorDemo(props: { values: { toolbar: string; mentions: boolean; emoji: boolean; counter: boolean; readonly: boolean; rows: number; output: boolean; hint: boolean; ownIcons: boolean; ownLabels: boolean } }) {
   let $md = START
   const MINIMAL = ["bold", "italic", "link", "|", "ul", "ol", "|", "undo", "redo"] as const
   return <div class={props.values.output ? "sc-ed-split" : "sc-ed-one"}>
     <RichTextEditor bind:value={$md} placeholder="Bir şeyler yazın…"
       toolbar={props.values.toolbar === "none" ? false : props.values.toolbar === "minimal" ? MINIMAL : undefined}
       mentions={props.values.mentions ? TEAM : undefined} emoji={props.values.emoji} counter={props.values.counter}
+      hint={props.values.hint} toolIcons={props.values.ownIcons ? { bold: "B", italic: "I", strike: "S" } : undefined}
+      labels={props.values.ownLabels ? { count: (w: number, c: number) => `${c} / 2000 karakter · ${w} sözcük` } : undefined}
       readonly={props.values.readonly} rows={props.values.rows} />
     {() => (props.values.output ? <pre class="sc-ed-out" aria-label="Markdown çıktısı">{$md}</pre> : null)}
   </div>

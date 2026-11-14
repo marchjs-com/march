@@ -125,3 +125,25 @@ test("registerDraft: the theme picker offers a runtime theme that applies itself
   setColorTheme("hadi");
   assert.equal(root.style.getPropertyValue("--hm-primary"), "", "switching away removes its variables");
 });
+
+test("ThemeEditor: frame parts can be turned off and its texts replaced", async () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const opts = { storageKey: false, warnUnsaved: false, share: false };
+  const dispose = render(() => [
+    h("div", { class: "bare" }, h(ThemeEditor, { ...opts, class: "mine", presets: false, nameField: false, historyButtons: false, applyButton: false, previewControls: false })),
+    h("div", { class: "own" }, h(ThemeEditor, { ...opts, tabs: ["colors", "type"], labels: { editor: "Look maker", tabs: { colors: "Palette" }, apply: "Try it", startFrom: "Based on", light: "Day" } })),
+  ], el);
+  for (let i = 0; i < 20 && !el.querySelector(".own .hm-te"); i++) await new Promise((r) => setTimeout(r, 5));
+  const bare = el.querySelector(".bare .hm-te");
+  assert.ok(bare.classList.contains("mine"));
+  for (const part of [".hm-te-bases", ".hm-te-title", ".hm-te-undo", ".hm-te-redo", ".hm-te-apply", ".hm-te-stage-bar"]) assert.equal(bare.querySelector(part), null, part);
+  assert.ok(bare.querySelector(".hm-te-scope"), "the preview itself stays");
+  const own = el.querySelector(".own .hm-te");
+  assert.equal(own.getAttribute("aria-label"), "Look maker");
+  assert.deepEqual([...own.querySelector(".hm-te-panel [role=tablist]").querySelectorAll("[role=tab]")].map((x) => x.textContent), ["Palette", "Typography"]);
+  assert.equal(own.querySelector(".hm-te-apply").textContent, "Try it");
+  assert.equal(own.querySelector(".hm-te-bases-label").textContent, "Based on");
+  assert.ok([...own.querySelectorAll(".hm-te-stage-bar .hm-segment")].some((b) => b.textContent === "Day"));
+  assert.ok(own.querySelector(".hm-te-undo"));
+  dispose();
+});

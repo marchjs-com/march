@@ -21,6 +21,17 @@ count rolls together with the button's morph. On your own profile an Edit button
 | `onAvatar` | `() => void` | — | the ring opens the stories |
 | `menu` | `MenuItem[]` | — | ⋯ |
 | `cover` | `none` `sm` `md` `lg` | `md` | |
+| `labels` | `ProfileHeaderLabels` | built-in texts | `{ profile(name), edit, message, more, verified, posts, followers, following }` |
+| `stats` | boolean or `("posts" \| "followers" \| "following")[]` | true | the stats row: off, or the ones to show in order |
+| `verifiedIcon` `messageIcon` `menuIcon` | icon, text or node | built-in | own icons; `false` hides the verified mark or the Message icon |
+| `messageColor` | color token | neutral | color of the Message button |
+| `class` | | | on the section |
+
+```tsx
+<ProfileHeader user={club} stats={["followers", "following"]} messageColor="brand-blue" messageIcon={mail}
+  labels={{ message: "Write", followers: "Members", profile: (name) => `${name} club` }} />
+<ProfileHeader user={me} self stats={false} verifiedIcon={false} cover="none" />
+```
 
 ## Accessibility
 

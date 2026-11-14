@@ -93,6 +93,12 @@ export interface TerminalProps {
   /** Height of the terminal (CSS length, default 22rem). */
   height?: string;
   label?: string;
+  /** The cursor blinks (default true); false keeps it lit. */
+  blink?: boolean;
+  /** The built-in `help`, `clear` and `history` commands (default true); false leaves only yours (same names in `commands` replace them one by one). */
+  builtins?: boolean;
+  /** Own texts: the input's accessible name, the Ctrl+R prompt and the "command not found" line. */
+  labels?: { command?: string; historySearch?: string; notFound?: (name: string) => string } | undefined;
   class?: ClassProp;
   ref?: (api: TerminalApi) => void;
 }
@@ -117,7 +123,9 @@ const TONE: Record<Tone, string> = { success: "ok", warn: "warn", error: "err", 
 /** An extensible command line: commands with typed arguments, colored output, history, completion, themable colors. */
 export function Terminal(props: TerminalProps): Element {
   const own = new Map<string, Command>(Object.entries(props.commands ?? {}));
-  const all = (): Map<string, Command> => new Map([...BUILTIN, ...GLOBAL, ...own]);
+  const all = (): Map<string, Command> => new Map([...(props.builtins === false ? [] : BUILTIN), ...GLOBAL, ...own]);
+  const blink = props.blink !== false;
+  const searchText = (): string => props.labels?.historySearch ?? t`history search`;
   const max = props.maxLines ?? 2000;
   const key = props.persist ? `hm.term.${props.persist}` : "";
   let hist: string[] = [];
@@ -128,11 +136,11 @@ export function Terminal(props: TerminalProps): Element {
   let search: { q: string; hit: number } | null = null;
 
   const out = h("div", { class: "hm-term-out", role: "log", "aria-live": "polite", "aria-label": () => props.label ?? t`Terminal output` }) as HTMLElement;
-  const input = h("input", { class: "hm-term-input", type: "text", spellcheck: "false", autocomplete: "off", autocapitalize: "off", "aria-label": () => t`Command` }) as HTMLInputElement;
-  const promptEl = h("span", { class: "hm-term-prompt", "aria-hidden": "true" }, () => (search ? `(${t`history search`}) ` : val(props.prompt) ?? "$ ")) as HTMLElement;
+  const input = h("input", { class: "hm-term-input", type: "text", spellcheck: "false", autocomplete: "off", autocapitalize: "off", "aria-label": () => props.labels?.command ?? t`Command` }) as HTMLInputElement;
+  const promptEl = h("span", { class: "hm-term-prompt", "aria-hidden": "true" }, () => (search ? `(${searchText()}) ` : val(props.prompt) ?? "$ ")) as HTMLElement;
   // our own cursor: the browser's caret shows only while the input has focus; this one blinks always (solid while typing)
   const measure = h("span", { class: "hm-term-measure", "aria-hidden": "true" }) as HTMLElement;
-  const caret = h("span", { class: "hm-term-caret is-blinking", "aria-hidden": "true" }) as HTMLElement;
+  const caret = h("span", { class: cx("hm-term-caret", blink && "is-blinking"), "aria-hidden": "true" }) as HTMLElement;
   const field = h("span", { class: "hm-term-field" }, input, measure, caret) as HTMLElement;
   const line = h("div", { class: "hm-term-line", "data-busy": () => (busy() ? "" : null) }, promptEl, field) as HTMLElement;
   let caretTimer: ReturnType<typeof setTimeout> | undefined;
@@ -145,7 +153,7 @@ export function Terminal(props: TerminalProps): Element {
       caret.textContent = input.value.charAt(at) || " ";
       caret.style.insetInlineStart = `${measure.offsetWidth - input.scrollLeft}px`;
       // typing restarts the blink: the cursor stays lit while keys come
-      caret.classList.remove("is-blinking"); void caret.offsetWidth; caret.classList.add("is-blinking");
+      if (blink) { caret.classList.remove("is-blinking"); void caret.offsetWidth; caret.classList.add("is-blinking"); }
     }, 0);
   };
   for (const ev of ["keydown", "keyup", "input", "pointerup", "focus", "blur", "select", "scroll"]) input.addEventListener(ev, syncCaret);
@@ -231,7 +239,7 @@ export function Terminal(props: TerminalProps): Element {
     at = hist.length;
     const words = tokenizeCommand(lineText);
     const found = resolve(words);
-    if (!found) { print(t`command not found: ${words[0]} (try help)`, { tone: "error" }); return; }
+    if (!found) { print(props.labels?.notFound?.(words[0] ?? "") ?? (props.builtins === false && !all().has("help") ? t`command not found: ${words[0]}` : t`command not found: ${words[0]} (try help)`), { tone: "error" }); return; }
     const { spec, path, rest } = found;
     if (!spec.run) { print(`${usageOf(path.join(" "), spec.args, spec.options)}`, { tone: "muted" }); if (spec.sub) print(`  ${Object.keys(spec.sub).join("  ")}`); return; }
     let parsed: Parsed;
@@ -274,14 +282,14 @@ export function Terminal(props: TerminalProps): Element {
     if (e.ctrlKey && e.key === "c") { if (ctl) { e.preventDefault(); ctl.abort(); } else if (!globalThis.getSelection?.()?.toString()) { e.preventDefault(); append(h("span", {}, h("span", { class: "hm-term-prompt" }, val(props.prompt) ?? "$ "), input.value, "^C") as Node, "hm-term-echo"); input.value = ""; } return; }
     if (e.ctrlKey && e.key === "l") { e.preventDefault(); out.replaceChildren(); return; }
     if (e.ctrlKey && e.key === "u") { e.preventDefault(); input.value = ""; return; }
-    if (e.ctrlKey && e.key === "r") { e.preventDefault(); draft = input.value; search = { q: "", hit: hist.length }; promptEl.textContent = `(${t`history search`}) `; input.value = ""; return; }
+    if (e.ctrlKey && e.key === "r") { e.preventDefault(); draft = input.value; search = { q: "", hit: hist.length }; promptEl.textContent = `(${searchText()}) `; input.value = ""; return; }
     if (e.key === "Tab") { e.preventDefault(); complete(); return; }
     if (e.key === "ArrowUp") { e.preventDefault(); if (at === hist.length) draft = input.value; if (at > 0) { at--; input.value = hist[at]!; } return; }
     if (e.key === "ArrowDown") { e.preventDefault(); if (at < hist.length) { at++; input.value = at === hist.length ? draft : hist[at]!; } return; }
     if (e.key === "Enter") { e.preventDefault(); if (busy()) return; const v = input.value; input.value = ""; void exec(v); }
   };
   input.addEventListener("keydown", onKey);
-  input.addEventListener("input", () => { if (search) { search.q = input.value; const i = findHistory(search.q, hist.length - 1); search.hit = i; if (i >= 0) promptEl.textContent = `(${t`history search`}) ${hist[i]} ← `; } });
+  input.addEventListener("input", () => { if (search) { search.q = input.value; const i = findHistory(search.q, hist.length - 1); search.hit = i; if (i >= 0) promptEl.textContent = `(${searchText()}) ${hist[i]} ← `; } });
   // a pasted block of lines runs one by one
   input.addEventListener("paste", (e: ClipboardEvent) => {
     const text = e.clipboardData?.getData("text") ?? "";

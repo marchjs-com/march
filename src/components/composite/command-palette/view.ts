@@ -14,7 +14,7 @@ import { val, cx, uid, icon, glyph, debounce, type MaybeFn } from "../../../ui/u
 import { sparkles } from "../../../icons/glyphs/sparkles.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
 import { isOpen } from "./state.ts";
-import type { PaletteEntry, CommandPaletteProps } from "./index.ts";
+import type { PaletteEntry, CommandPaletteProps, CommandPaletteLabels } from "./index.ts";
 import { listNav } from "../../../behaviors/list-nav/index.ts";
 
 type Row =
@@ -44,6 +44,8 @@ function entries(extra: MaybeFn<readonly Command[] | null | undefined>): Palette
 /** The palette dialog (see CommandPalette in palette.ts for the props). */
 export function PaletteView(props: CommandPaletteProps): unknown {
   const base = uid("hm-pal");
+  const L = (): CommandPaletteLabels => val(props.labels) ?? {};
+  const hint = props.hint;
   const q = signal("");
   const sel = signal(0);
   const ask = signal<AskState>({ status: "idle", q: "", results: [] });
@@ -109,7 +111,7 @@ export function PaletteView(props: CommandPaletteProps): unknown {
   const rowEl = (r: Row, i: number, prev: Row | undefined): unknown[] => {
     const id = `${base}-o-${i}`;
     const on = (): boolean => sel() === i;
-    const heading = r.kind === "item" && r.item.group !== prev?.item?.group ? r.item.group : r.kind === "ai" && prev?.kind !== "ai" ? t`Suggested` : null;
+    const heading = r.kind === "item" && r.item.group !== prev?.item?.group ? r.item.group : r.kind === "ai" && prev?.kind !== "ai" ? L().suggested ?? t`Suggested` : null;
     return [
       heading && h("li", { role: "presentation", class: "hm-pal-heading" }, heading),
       h("li", {
@@ -117,7 +119,8 @@ export function PaletteView(props: CommandPaletteProps): unknown {
         "data-id": r.item?.id ?? null, onClick: () => activate(r), onMousemove: () => { if (!on()) sel.set(i); },
       },
       r.kind === "ask"
-        ? [h("span", { class: "hm-icon hm-pal-icon", "aria-hidden": "true" }, glyph(sparkles)), h("span", { class: "hm-pal-title" }, () => (r.status === "loading" ? t`Asking…` : r.status === "error" ? t`Ask failed — press Enter to retry` : t`Ask: “${q()}”`))]
+        ? [props.askIcon === false ? null : props.askIcon != null ? icon(props.askIcon, "hm-icon hm-pal-icon") : h("span", { class: "hm-icon hm-pal-icon", "aria-hidden": "true" }, glyph(sparkles)),
+          h("span", { class: "hm-pal-title" }, () => (r.status === "loading" ? L().asking ?? t`Asking…` : r.status === "error" ? L().askFailed ?? t`Ask failed — press Enter to retry` : L().ask?.(q()) ?? t`Ask: “${q()}”`))]
         : [icon(r.item.icon), h(OverflowText, { class: "hm-pal-title" }, r.item.title),
           r.reason && h(OverflowText, { class: "hm-pal-reason" }, r.reason),
           r.item.sub && h("span", { class: "hm-pal-sub" }, r.item.sub),
@@ -126,17 +129,18 @@ export function PaletteView(props: CommandPaletteProps): unknown {
   };
 
   return h(Dialog, {
-    open: () => isOpen(), onClose: () => isOpen.set(false), label: t`Command palette`, size: "md", class: "hm-palette",
+    open: () => isOpen(), onClose: () => isOpen.set(false), label: L().dialog ?? t`Command palette`, size: "md", class: cx("hm-palette", val(props.class)),
     children: [
       h("input", {
         type: "text", class: "hm-input hm-pal-input", "data-autofocus": "", ref: (x: HTMLInputElement) => { input = x; }, role: "combobox", "aria-expanded": "true", "aria-controls": `${base}-list`,
         "aria-autocomplete": "list", "aria-activedescendant": () => (rows().length ? `${base}-o-${sel()}` : null),
-        placeholder: () => val(props.placeholder) ?? t`Search pages and commands…`, "aria-label": () => t`Search pages and commands`,
+        placeholder: () => val(props.placeholder) ?? t`Search pages and commands…`, "aria-label": () => L().search ?? t`Search pages and commands`,
         autocomplete: "off", spellcheck: "false", onInput: (e: Event) => q.set((e.target as HTMLInputElement).value), onKeydown: onKey,
       }),
-      h("ul", { id: `${base}-list`, role: "listbox", class: "hm-pal-list", "aria-label": () => t`Results` },
-        () => { const list = rows(); return untrack(() => list.length ? list.map((r, i) => rowEl(r, i, list[i - 1])) : h("li", { class: "hm-pal-empty", role: "presentation" }, t`No results`)); }),
-      h("div", { class: "hm-pal-hint", "aria-hidden": "true" }, () => t`↑↓ to move · Enter to open · Esc to close`),
+      h("ul", { id: `${base}-list`, role: "listbox", class: "hm-pal-list", "aria-label": () => L().results ?? t`Results` },
+        () => { const list = rows(); return untrack(() => list.length ? list.map((r, i) => rowEl(r, i, list[i - 1])) : h("li", { class: "hm-pal-empty", role: "presentation" }, props.empty ?? L().empty ?? t`No results`)); }),
+      hint === false ? null : hint != null && hint !== true ? h("div", { class: "hm-pal-hint" }, hint)
+        : h("div", { class: "hm-pal-hint", "aria-hidden": "true" }, () => L().hint ?? t`↑↓ to move · Enter to open · Esc to close`),
     ],
   });
 }

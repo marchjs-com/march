@@ -22,9 +22,20 @@ registerCommands([{ id: "doc.new", title: "New document", group: "Document", sho
 | `limit` | number | `50` | most local results |
 | `commands` | `Command[]` | — | extra commands for this palette only |
 | `onRun` | `(entry) => void` | — | called with the entry that ran |
+| `labels` | `CommandPaletteLabels` | `t` texts | `{ dialog, search, results, empty, hint, suggested, asking, askFailed, ask(query) }` |
+| `hint` | boolean or content | `true` | the key hint under the list: off, or your own content |
+| `empty` | content | "No results" | own empty state |
+| `askIcon` | icon, node or `false` | sparkles | icon of the Ask row |
+| `class` | | | extra class on the dialog |
 
 Functions: `openPalette()`, `closePalette()`, `paletteOpen()`, `preloadPalette()`, `registerCommands(list)` and
-`registerPages(list)` (both return an unregister function). `PaletteButton` takes `label`, `shortcut`, `class`.
+`registerPages(list)` (both return an unregister function). `PaletteButton` takes `label`, `shortcut`, `class`,
+`icon` (own icon, or `false` for none) and `kbd` (`false` hides the shortcut hint).
+
+```tsx
+<CommandPalette labels={{ empty: "Nothing here", ask: (q) => `Ask the assistant: ${q}` }} hint={false} empty={<EmptyState />} />
+<PaletteButton label="Search…" icon={command} kbd={false} />
+```
 
 ## Accessibility
 

@@ -15,6 +15,7 @@
   background: var(--hm-accent, var(--hm-primary)); box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 45%, transparent);
   transition: background-color var(--hm-dur-slow) var(--hm-ease), box-shadow var(--hm-dur-slow) var(--hm-ease); }
 .hm-bnav-bubble.is-hidden { opacity: 0; }
+.hm-bnav-nobubble .hm-bnav-item.is-active { color: var(--hm-accent-text, var(--hm-primary-text)); }
 
 /* tabs */
 .hm-bnav-item { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem;

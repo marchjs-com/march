@@ -89,3 +89,29 @@ test("BottomNav: the Create menu opens on the layer stack, picks an action, Esca
   assert.deepEqual(picked, ["post"]);
   assert.deepEqual(ran, ["post"]);
 });
+
+test("BottomNav: bubble, ring and motion can be turned off; ring takes color tokens; the sheet heading and handle are optional", async () => {
+  const tab = signal("home");
+  const m = mount(() => h(BottomNav, { items: ITEMS, value: tab, onCreate: () => {}, bubble: false, ring: false, motion: false, class: "mine" }));
+  const nav = m.el.querySelector("nav.hm-bnav");
+  assert.ok(nav.classList.contains("mine") && nav.classList.contains("hm-bnav-nobubble"));
+  assert.ok(nav.querySelector(".hm-bnav-bubble").classList.contains("is-hidden"));
+  assert.equal(nav.querySelector(".hm-bnav-ring"), null);
+  assert.ok(nav.querySelector(".hm-bnav-core"));
+  m.dispose();
+  const r = mount(() => h(BottomNav, { items: ITEMS, value: tab, onCreate: () => {}, ring: ["primary", "#123456"] }));
+  const paint = r.el.querySelector(".hm-bnav-ring").style.getPropertyValue("--hm-bnav-ring");
+  assert.match(paint, /var\(--hm-primary\)/);
+  assert.match(paint, /#123456/);
+  r.dispose();
+  const s = mount(() => h(BottomNav, { items: ITEMS, value: tab, createActions: [{ id: "a", label: "A" }], createMenu: "sheet", createTitle: false, createHandle: false, motion: false }));
+  s.el.querySelector(".hm-bnav-create").click();
+  const menu = document.querySelector(".hm-bnav-actions.is-sheet");
+  assert.ok(menu);
+  assert.equal(menu.getAttribute("aria-label"), "Create");
+  assert.equal(menu.querySelector(".hm-bnav-sheet-title"), null);
+  assert.equal(menu.querySelector(".hm-bnav-sheet-handle"), null);
+  menu.querySelector(".hm-bnav-action").click();
+  assert.equal(document.querySelector(".hm-bnav-actions"), null, "without motion the menu closes at once");
+  s.dispose();
+});

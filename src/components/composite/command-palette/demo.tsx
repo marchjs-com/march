@@ -8,6 +8,7 @@ import { download } from "../../../icons/glyphs/download.ts";
 import { copy } from "../../../icons/glyphs/copy.ts";
 import { users } from "../../../icons/glyphs/users.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
+import { command } from "../../../icons/glyphs/command.ts";
 
 export const code = `registerCommands([
   { id: "doc.new", title: "Yeni belge", group: "Belge", icon: fileText, shortcut: "mod+alt+n", run: create },
@@ -29,10 +30,11 @@ const SETS: Record<string, Command[]> = {
   ],
 }
 
-export default function CommandPaletteDemo(props: { values: { group: string; label: string } }) {
+export default function CommandPaletteDemo(props: { values: { group: string; label: string; icon: string; kbd: boolean } }) {
   onCleanup(registerCommands(() => SETS[props.values.group] ?? []))
   return <div class="sc-row">
-    <PaletteButton label={() => props.values.label} />
+    {() => <PaletteButton label={() => props.values.label} kbd={props.values.kbd}
+      icon={props.values.icon === "off" ? false : props.values.icon === "own" ? command : undefined} />}
     <span class="hm-muted">Açın ve "{() => (props.values.group === "team" ? "davet" : "pdf")}" yazın</span>
   </div>
 }

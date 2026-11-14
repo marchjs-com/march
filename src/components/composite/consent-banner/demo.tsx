@@ -19,10 +19,11 @@ const TEXT: Record<string, string> = {
   long: "Gerekli çerezler her zaman açık. Analitik ve üçüncü taraf içerik (video, harita) yalnız izninizle yüklenir; tercihinizi her zaman değiştirebilirsiniz.",
 }
 
-export default function ConsentBannerDemo(props: { values: { wording: string; gate: boolean } }) {
+export default function ConsentBannerDemo(props: { values: { wording: string; gate: boolean; buttons: string; customize: boolean } }) {
   return <div class="hm-stack" style={{ gap: "var(--hm-space-3)" }}>
-    {() => <ConsentBanner inline always title="Çerezler" text={TEXT[props.values.wording] ?? TEXT["short"]!} />}
-    {() => (props.values.gate ? <ConsentGate category="thirdParty"><p>Üçüncü taraf içerik yüklendi.</p></ConsentGate> : null)}
+    {() => <ConsentBanner inline always title="Çerezler" text={TEXT[props.values.wording] ?? TEXT["short"]!} customize={props.values.customize}
+      labels={props.values.buttons === "own" ? { reject: "Hayır, teşekkürler", customize: "Kendim seçeyim", accept: "Tamam, olur" } : undefined} />}
+    {() => (props.values.gate ? <ConsentGate category="thirdParty" labels={props.values.buttons === "own" ? { allow: "İçeriği göster", preferences: "Ayarlar" } : undefined}><p>Üçüncü taraf içerik yüklendi.</p></ConsentGate> : null)}
     <div><Button size="sm" variant="ghost" on:click={showConsentBanner}>Şeridi yeniden göster</Button></div>
   </div>
 }

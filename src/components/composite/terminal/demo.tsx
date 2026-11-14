@@ -34,20 +34,22 @@ const COMMANDS: Record<string, Command> = {
 const SCHEMES: Record<string, ColorScheme> = { auto: "auto", surface: "surface", dark: "dark", light: "light",
   hadi: { bg: "#13233a", fg: "#f3f6fb", cursor: "#f2801f", colors: ["#13233a", "#ff6b6b", "#78be3a", "#f2801f", "#1d9ad6", "#a3338c", "#4cc3e0", "#d8e0ec", "#7d8ba3", "#ff8e8e", "#9bd468", "#ffa04d", "#53b8e6", "#c95db2", "#7fd6ea", "#ffffff"] } }
 
-export default function TerminalDemo(props: { values: { window: string; scheme: string; background: string; cursor: string; prompt: string } }) {
+export default function TerminalDemo(props: { values: { window: string; scheme: string; background: string; cursor: string; prompt: string; blink: boolean; builtins: boolean; ownLabels: boolean } }) {
   const v = props.values
   const welcome = ["[info] March terminali: help yaz, Tab ile tamamla, ↑ geçmiş, Ctrl+R ara, Ctrl+C iptal", "Dene: deploy staging · user list · fetch · colors"]
   const open = signal(true)
+  // read where the terminal is built: a change of one of these draws it again
+  const parts = () => ({ blink: v.blink, builtins: v.builtins, labels: v.ownLabels ? { notFound: (name: string) => `“${name}” diye bir komut yok. Şunları dene: deploy, user, fetch` } : undefined })
   return <div class="sc-term-demo">
     {() => v.window === "none"
       ? <Terminal scheme={() => SCHEMES[v.scheme] ?? "auto"} background={() => v.background || undefined} cursor={v.cursor as "bar"} prompt={v.prompt}
-          persist="showcase" commands={COMMANDS} welcome={welcome} />
+          persist="showcase" commands={COMMANDS} welcome={welcome} {...parts()} />
       // in a window: drag the title bar, drop it on an edge to dock, double click to fill; the area is this box
       : <div class="sc-term-desk">
           <TerminalWindow chrome={() => v.window as "hadi"} title="hadi@march: ~" x={16} y={16} width={560} windowHeight={300}
             open={() => open()} onClose={() => open.set(false)}
             scheme={() => SCHEMES[v.scheme] ?? "auto"} background={() => v.background || undefined} cursor={v.cursor as "bar"} prompt={v.prompt}
-            persist="showcase" commands={COMMANDS} welcome={welcome} />
+            persist="showcase" commands={COMMANDS} welcome={welcome} {...parts()} />
           {() => (open() ? null : <button type="button" class="hm-btn hm-btn-sm sc-term-reopen" onClick={() => open.set(true)}>Terminali yeniden aç</button>)}
         </div>}
   </div>

@@ -28,6 +28,19 @@ one. The footer counts the changes and offers Revert and Save.
 | `search` | boolean | `true` | the search field (label, key, group, keywords, description; Turkish-aware folding) |
 | `layout` | `auto` `stacked` | `auto` | label beside the editor (stacked in narrow panels) or always above |
 | `api` | `(api) => void` | — | `changes()`, `save()`, `revert()`, `markSaved()`, `focus(key)` |
+| `label` | string / accessor | `Properties` | accessible name, DirtyState and undo label |
+| `historyButtons` | boolean | `true` | the Undo / Redo buttons (Ctrl+Z of the app's history still works) |
+| `resetButtons` | boolean | `true` | the "reset to saved" button of each row |
+| `changeMarks` | boolean | `true` | the dot on a changed row and the changed count of a group |
+| `footer` | boolean | `true` | the change count with Revert and Save (`api.save()` / `api.revert()` stay) |
+| `labels` | object | `t` texts | `search`, `general`, `empty`, `noMatch(query)`, `changed`, `changedCount(n)`, `unsaved(n)`, `noChanges`, `revert`, `save`, `undo`, `redo`, `reset(label)`, `resetTitle` |
+| `class` | class | — | on the section (`hm-pg`); parts: `hm-pg-head`, `-search`, `-history`, `-group`, `-row`, `-name`, `-dot`, `-desc`, `-editor`, `-error`, `-reset`, `-empty`, `-foot`, `-changes`, `-revert`, `-save` |
+
+```tsx
+<PropertyGrid properties={specs} bind:value={$card} search={false} historyButtons={false} resetButtons={false} footer={false} />
+<PropertyGrid properties={specs} bind:value={$card} onSave={save}
+  labels={{ save: "Publish", revert: "Discard", unsaved: (n) => `${n} edits not published`, search: "Find a setting" }} />
+```
 
 Types: `text`, `textarea`, `number`, `int`, `slider`, `switch`, `select`, `segmented`, `color` (TextInput, Textarea,
 NumberInput, Slider, Toggle, Select, Segmented, ColorInput). `control` takes any component: it gets `value` (a getter),

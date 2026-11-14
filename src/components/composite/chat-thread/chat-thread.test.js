@@ -40,3 +40,39 @@ test("ChatThread: log, runs, day separator, typing, keyed updates, reaction pick
   assert.equal(dayLabel(new Date(now.getTime() - 86_400_000), now), "Yesterday");
   m.dispose();
 });
+
+test("ChatThread: day separators off or in own words; class on the log", () => {
+  const list = [{ id: "1", senderId: "a", text: "one", time: at(10) }];
+  const off = mount(() => h(ChatThread, { messages: list, days: false, class: "mine", motion: false }));
+  assert.ok(off.el.querySelector(".hm-chat").classList.contains("mine"));
+  assert.equal(off.el.querySelector(".hm-chat-day"), null);
+  assert.equal(off.el.querySelectorAll(".hm-chat-row").length, 1);
+  off.dispose();
+  const own = mount(() => h(ChatThread, { messages: list, days: (d) => `day ${d.getFullYear()}` }));
+  assert.equal(own.el.querySelector(".hm-chat-day").textContent, `day ${at(10).getFullYear()}`);
+  own.dispose();
+});
+
+test("ChatThread: the jump button can be replaced, colored or turned off", async () => {
+  const run = async (extra) => {
+    const msgs = signal([{ id: "1", senderId: "a", text: "one", time: at(10) }]);
+    const m = mount(() => h(ChatThread, { messages: msgs, ...extra }));
+    await wait(60);
+    const log = m.el.querySelector(".hm-chat");
+    // scrolled up: the log is taller than its box
+    Object.defineProperty(log, "scrollHeight", { value: 1000, configurable: true });
+    Object.defineProperty(log, "clientHeight", { value: 200, configurable: true });
+    log.scrollTop = 0; log.dispatchEvent(new globalThis.Event("scroll"));
+    msgs.set([...msgs(), { id: "2", senderId: "a", text: "two", time: at(0) }]);
+    await wait(60);
+    return m;
+  };
+  const a = await run({ jump: (n) => `${n} unread`, jumpColor: "brand-purple" });
+  const btn = a.el.querySelector(".hm-chat-jump");
+  assert.equal(btn.textContent, "1 unread");
+  assert.equal(btn.getAttribute("data-hm-color"), "brand-purple");
+  a.dispose();
+  const b = await run({ jump: false });
+  assert.equal(b.el.querySelector(".hm-chat-jump"), null);
+  b.dispose();
+});

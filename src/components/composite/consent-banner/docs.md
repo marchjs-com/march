@@ -19,8 +19,18 @@ can allow it in place. The module is lazy on purpose: load it with
 | `policyLabel` | string or function | `t` text | label of the policy link (shown when `configureConsent({ policyHref })` is set) |
 | `always` | boolean | `false` | show even when a decision is stored (demos); a choice still closes it |
 | `inline` | boolean | `false` | render in the page flow instead of the bottom layer |
+| `labels` | `ConsentLabels` | `t` texts | `{ reject, customize, accept, save, lead, alwaysOn, withdraw, saved(date, version), allow, preferences }`: every button and panel text |
+| `customize` | boolean | `true` | the Customize button; Reject and Accept always stay side by side |
+| `class` | | | on the banner |
 
-`ConsentGate`: `category`, `children`, optional placeholder texts. Functions: `openConsentPreferences(texts)` (resolves
+```tsx
+<ConsentBanner labels={{ reject: "No thanks", accept: "Fine by me", customize: "Let me choose" }} />
+<ConsentBanner customize={false} class="my-banner" />
+<ConsentGate category="thirdParty" labels={{ allow: "Show the video" }} preferences={false}>…</ConsentGate>
+```
+
+`ConsentGate`: `category`, `children`, `label` (the placeholder text), `labels` (`allow`, `preferences`),
+`preferences` (`false` hides that button), `class`. Functions: `openConsentPreferences(texts)` (resolves
 true when saved), `showConsentBanner()`, `hideConsentBanner()`.
 
 ## Accessibility

@@ -10,8 +10,16 @@ import { Skeleton } from "../../../ui/feedback.ts";
 import { PullToRefresh } from "../../feedback/pull-to-refresh/index.ts";
 import { VirtualList } from "../../data/virtual-list/index.ts";
 import { PostCard, type Post, type PostCardProps } from "../post-card/index.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./feed.css";
+
+/** The texts Feed writes itself; every one is optional (default: the built-in text). */
+export interface FeedLabels {
+  loading?: string; loadingMore?: string; empty?: string; end?: string;
+  /** Text of the new-posts pill. */
+  newPosts?: (count: number) => string;
+}
 
 export interface FeedProps extends Pick<PostCardProps, "onLike" | "onComment" | "onShare" | "onOpenMedia" | "onAuthor" | "menu" | "clamp"> {
   posts: MaybeFn<readonly Post[]>;
@@ -32,6 +40,22 @@ export interface FeedProps extends Pick<PostCardProps, "onLike" | "onComment" | 
   /** Shown when there are no posts and nothing loads. */
   empty?: unknown;
   label?: MaybeFn<string | undefined>;
+  /** Own texts (loading names, empty and end texts, the pill). */
+  labels?: MaybeFn<FeedLabels | undefined>;
+  /** The end mark: true (default: four dots and a text), false, or your own content. */
+  end?: unknown;
+  /** The new-posts pill: true (default), false, or `(count) => content`. */
+  newPill?: boolean | ((count: number) => unknown) | undefined;
+  /** Color of the pill (default: Aktivite blue). */
+  newColor?: ColorToken | undefined;
+  /** Skeleton posts while the first page loads. Default 3. */
+  skeletons?: number | undefined;
+  /** Draw a post yourself instead of the PostCard: `(post) => node` (`post` is an accessor). */
+  renderPost?: ((post: () => Post) => unknown) | undefined;
+  /** More PostCard props for every post (labels, icons, avatar, time …). */
+  postProps?: Partial<Omit<PostCardProps, "post">> | undefined;
+  /** Motion of the pill. Default true. */
+  motion?: MaybeFn<boolean | undefined>;
   class?: ClassProp;
 }
 
@@ -47,6 +71,8 @@ export function PostSkeleton(props: { media?: boolean; variant?: "card" | "flat"
 export function Feed(props: FeedProps): Element {
   const more = signal(false);
   let root!: HTMLElement;
+  const L = (): FeedLabels => val(props.labels) ?? {};
+  const renderPost = props.renderPost, newPill = props.newPill;
   // what the scroll area shows; the list itself is built once and follows the posts
   const state = computed((): "loading" | "empty" | "list" => (val(props.loading) ? "loading" : val(props.posts).length ? "list" : "empty"));
   const loadMore = async (): Promise<void> => {
@@ -61,24 +87,27 @@ export function Feed(props: FeedProps): Element {
   const variant = (): "card" | "flat" => val(props.variant) ?? "card";
   const list = (): unknown => {
     const st = state();
-    if (st === "loading") return h("div", { class: "hm-feed-list", "aria-busy": "true", "aria-label": () => t`Loading posts` }, [0, 1, 2].map((i) => h(PostSkeleton, { media: i !== 1, variant: variant() })));
-    if (st === "empty") return props.empty ?? h("p", { class: "hm-feed-empty" }, t`No posts yet.`);
+    if (st === "loading") return h("div", { class: "hm-feed-list", "aria-busy": "true", "aria-label": () => L().loading ?? t`Loading posts` }, Array.from({ length: props.skeletons ?? 3 }, (_, i) => h(PostSkeleton, { media: i !== 1, variant: variant() })));
+    if (st === "empty") return props.empty ?? h("p", { class: "hm-feed-empty" }, L().empty ?? t`No posts yet.`);
     return h(VirtualList, {
       items: props.posts, key: (p: Post) => p.id, estimate: 520, gap: variant() === "card" ? 12 : 0, scroll: "parent" as const, label: () => val(props.label) ?? t`Feed`,
       onEndReached: () => { void loadMore(); },
-      render: (p: () => Post) => h(PostCard, {
-        post: p, variant: variant(), clamp: props.clamp, menu: props.menu,
+      render: (p: () => Post) => renderPost ? renderPost(p) : h(PostCard, {
+        ...props.postProps, post: p, variant: variant(), clamp: props.clamp, menu: props.menu,
         onLike: props.onLike, onComment: props.onComment, onShare: props.onShare, onOpenMedia: props.onOpenMedia, onAuthor: props.onAuthor,
       }),
-      footer: () => (more() ? h("div", { class: "hm-feed-more", role: "status", "aria-label": () => t`Loading more posts` }, h(PostSkeleton, { variant: variant() }))
-        : val(props.hasMore) === false ? h("p", { class: "hm-feed-end" }, h("span", { class: "hm-feed-end-dots", "aria-hidden": "true" }, h("i"), h("i"), h("i"), h("i")), t`You're all caught up`) : null),
+      footer: () => { const end = props.end; return (more() ? h("div", { class: "hm-feed-more", role: "status", "aria-label": () => L().loadingMore ?? t`Loading more posts` }, h(PostSkeleton, { variant: variant() }))
+        : val(props.hasMore) !== false || end === false ? null
+        : end != null && end !== true ? h("div", { class: "hm-feed-end" }, end)
+        : h("p", { class: "hm-feed-end" }, h("span", { class: "hm-feed-end-dots", "aria-hidden": "true" }, h("i"), h("i"), h("i"), h("i")), L().end ?? t`You're all caught up`)); },
     });
   };
   const pill = (): unknown => {
     const n = val(props.newCount) ?? 0;
-    if (!n) return null;
-    const b = h("button", { type: "button", class: "hm-feed-new", onClick: showNew }, glyph(arrowUp), t`${n} new posts`) as HTMLElement;
-    animate(b, [{ transform: "translateY(-120%) scale(.9)", opacity: 0 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutBack" });
+    if (!n || newPill === false) return null;
+    const b = h("button", { type: "button", class: "hm-feed-new", "data-hm-color": colorAttr(props.newColor), onClick: showNew },
+      typeof newPill === "function" ? newPill(n) : [glyph(arrowUp), L().newPosts?.(n) ?? t`${n} new posts`]) as HTMLElement;
+    if (val(props.motion) !== false) animate(b, [{ transform: "translateY(-120%) scale(.9)", opacity: 0 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutBack" });
     return b;
   };
   return h("div", { class: () => cx("hm-feed", `hm-feed-${variant()}`, val(props.class)), ref: (x: HTMLElement) => { root = x; } },

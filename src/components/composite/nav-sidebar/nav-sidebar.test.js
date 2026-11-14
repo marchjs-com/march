@@ -221,3 +221,29 @@ test("NavSidebar: nesting goes deeper than one level; ancestors of the current p
   }
   m.dispose();
 });
+
+test("NavSidebar: search, headings, expand-all and counts can be turned off; texts are yours", async () => {
+  localStorage.clear();
+  const bare = mount(() => h(U.NavSidebar, { items: ITEMS, storageKey: "t.sb.bare", palette: false, search: false, headings: false, groupCounts: false, class: "mine" }));
+  await tick();
+  assert.ok(bare.el.querySelector(".hm-sb-wrap.mine"));
+  assert.equal(bare.el.querySelector(".hm-sb-search"), null, "search={false}");
+  assert.equal(bare.el.querySelector(".hm-sb-section"), null, "headings={false}");
+  assert.equal(bare.el.querySelector(".hm-sb-all"), null);
+  assert.equal(bare.el.querySelector(".hm-sb-count"), null, "groupCounts={false}");
+  assert.equal(bare.el.querySelectorAll(".hm-sb-gbtn").length, 2, "the categories stay");
+  bare.dispose();
+
+  const own = mount(() => h(U.NavSidebar, { items: ITEMS, storageKey: "t.sb.own", palette: false, hotkey: false, collapsible: true, expandAll: false,
+    labels: { categories: "Sections", search: "Find a page", noMatches: () => "Nothing here", menu: "Open menu", collapseSidebar: "Fold" } }));
+  await tick();
+  assert.ok([...own.el.querySelectorAll(".hm-sb-section-label")].some((x) => x.textContent === "Sections"));
+  assert.equal(own.el.querySelector(".hm-sb-all"), null, "expandAll={false}");
+  assert.equal(own.el.querySelector(".hm-sb-input").getAttribute("aria-label"), "Find a page");
+  assert.equal(own.el.querySelector(".hm-nav-burger").getAttribute("aria-label"), "Open menu");
+  assert.equal(own.el.querySelector(".hm-nav-rail-btn").getAttribute("aria-label"), "Fold");
+  const input = own.el.querySelector(".hm-sb-input");
+  input.value = "zzzz"; input.dispatchEvent(new Event("input", { bubbles: true })); await tick();
+  assert.equal(own.el.querySelector(".hm-sb-none").textContent, "Nothing here");
+  own.dispose();
+});

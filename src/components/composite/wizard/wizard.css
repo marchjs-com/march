@@ -3,3 +3,5 @@
 .hm-wizard-title { margin: 0 0 var(--hm-space-2); font-size: var(--hm-text-lg); }
 .hm-wizard-title:focus { outline: none; }
 .hm-wizard-count { margin-inline-end: auto; color: var(--hm-muted); font-size: var(--hm-text-sm); }
+/* without the count text the buttons still sit at the end */
+.hm-wizard-nav > .hm-btn:first-child { margin-inline-start: auto; }

@@ -32,7 +32,7 @@ const ALL = [
   { id: "me", label: "Profil", icon: user },
 ]
 
-export default function BottomNavDemo(props: { values: { count: number; create: boolean; menu: string; labels: boolean; variant: string; tint: string; badges: boolean } }) {
+export default function BottomNavDemo(props: { values: { count: number; create: boolean; menu: string; labels: boolean; variant: string; tint: string; badges: boolean; bubble: boolean; ring: string; motion: boolean } }) {
   let $tab = "home"
   let $unread = 3
   let $created = 0
@@ -53,7 +53,8 @@ export default function BottomNavDemo(props: { values: { count: number; create: 
         onCreate={v.create ? () => { $created = $created + 1; $unread = $unread + 1; $last = "" } : undefined}
         createActions={v.create && v.menu !== "none" ? ACTIONS : undefined} createMenu={v.menu as "fan"} createTitle="Oluştur"
         onAction={(id) => { $last = ACTIONS.find((a) => a.id === id)?.label ?? id }}
-        labels={v.labels} variant={v.variant as "floating"} tint={v.tint as "brand"} />
+        labels={v.labels} variant={v.variant as "floating"} tint={v.tint as "brand"}
+        bubble={v.bubble} motion={v.motion} ring={v.ring === "off" ? false : v.ring === "accent" ? ["primary", "neutral"] : undefined} />
     }}
   </OverlayScope>
 }

@@ -23,6 +23,19 @@ preview with an orange bar sits above.
 | `onTyping` | `() => void` | — | at most once a second while typing |
 | `placeholder` | string | "Message" | |
 | `disabled` | boolean | — | |
+| `labels` | `ChatComposerLabels` | built-in texts | `{ message, emoji, attach, send, record, sendVoice, cancelRecording, cancelReply, recording, replyingTo(name) }`: own names for the field and the buttons, the reply line and the recording status |
+| `attachIcon` `emojiIcon` `sendIcon` `micIcon` | icon, text or node | plus, smile, arrow, microphone | own icons |
+| `sendColor` / `micColor` | color token | `brand-blue` / `brand-orange` | color of the round button in each state |
+| `wave` | boolean | true | the live waveform while recording |
+| `recordingDot` | boolean | true | the pulsing dot while recording |
+| `motion` | boolean | true | `false`: no morph, reply slide, waveform or pulse |
+| `class` | | | on the form |
+
+```tsx
+import { arrowUp } from "hadi-march/icons"
+<ChatComposer onSend={send} sendIcon={arrowUp} sendColor="brand-green" micColor="brand-purple"
+  labels={{ message: "Write to the club", replyingTo: (name) => `Answer to ${name}` }} wave={false} motion={false} />
+```
 
 ## Accessibility
 

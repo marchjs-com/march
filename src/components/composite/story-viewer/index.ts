@@ -5,7 +5,7 @@
 import { signal, effect, computed, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, setStyle, clamp, type MaybeFn } from "../../../ui/util.ts";
+import { val, cx, glyph, setStyle, clamp, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { applyPipe } from "../../../core/pipes.ts";
 import { Dialog } from "../../../ui/dialog.ts";
 import { Avatar } from "../../../ui/avatar.ts";
@@ -38,13 +38,36 @@ export interface StoryViewerProps {
   onLike?: ((group: StoryGroup, item: StoryItem, liked: boolean) => void) | undefined;
   /** Liked state of a story. */
   liked?: ((group: StoryGroup, item: StoryItem) => boolean) | undefined;
+  /** The progress bars on top: default true. */
+  progress?: boolean | undefined;
+  /** The person's avatar in the header: default true. */
+  avatar?: boolean | undefined;
+  /** The story's relative time in the header: default true. */
+  time?: boolean | undefined;
+  /** The pause / play button: default true (Space and press-and-hold still pause). */
+  pauseButton?: boolean | undefined;
+  /** The close button: default true (Esc and dragging down still close). */
+  closeButton?: boolean | undefined;
+  /** The previous / next arrow buttons: default true (taps, swipes and ← → still move). */
+  arrows?: boolean | undefined;
+  /** The "Sent" note after a reply: default true. */
+  sentNote?: boolean | undefined;
+  /** Own texts (defaults are the translated ones). `status` is what screen readers hear on every story (index is 0-based). */
+  labels?: {
+    dialog?: string; play?: string; pause?: string; close?: string; previous?: string; next?: string; like?: string; send?: string; sent?: string;
+    reply?: (group: StoryGroup) => string;
+    replyPlaceholder?: (group: StoryGroup) => string;
+    status?: (group: StoryGroup, index: number, total: number) => string;
+  } | undefined;
+  /** Class on the dialog (`hm-story-dlg`). */
+  class?: ClassProp;
 }
 
 const CLOSE_AT = 120, HOLD = 180;
 
 /** `<StoryViewer open={$open} onClose={() => $open = false} groups={stories} start={tappedId} onSeen={markSeen} onReply={send} />` */
 export function StoryViewer(props: StoryViewerProps): () => unknown {
-  return h(Dialog, { open: props.open, onClose: props.onClose, size: "full", label: t`Stories`, class: "hm-story-dlg", children: () => body(props) }) as () => unknown;
+  return h(Dialog, { open: props.open, onClose: props.onClose, size: "full", label: props.labels?.dialog ?? t`Stories`, class: cx("hm-story-dlg", val(props.class)), children: () => body(props) }) as () => unknown;
 }
 
 function body(props: StoryViewerProps): Element {
@@ -56,6 +79,8 @@ function body(props: StoryViewerProps): Element {
   const item = computed(() => group()?.items[ii()] as StoryItem);
   const paused = (): boolean => hold() || manual() || typing();
   let root!: HTMLElement, stage!: HTMLElement, input!: HTMLInputElement;
+  const L = (): NonNullable<StoryViewerProps["labels"]> => props.labels ?? {};
+  const replyName = (): string => (group() && L().reply?.(group())) || t`Reply to ${group()?.name ?? ""}`;
 
   const rtl = (): boolean => isRtl(root);
   const slide = (dir: 1 | -1): void => {
@@ -142,7 +167,8 @@ function body(props: StoryViewerProps): Element {
     if (!text || !props.onReply) return;
     props.onReply(group(), item(), text);
     input.value = ""; input.blur();
-    const sent = h("span", { class: "hm-story-sent", role: "status" }, t`Sent`) as HTMLElement;
+    if (props.sentNote === false) return;
+    const sent = h("span", { class: "hm-story-sent", role: "status" }, L().sent ?? t`Sent`) as HTMLElement;
     root.append(sent);
     void animate(sent, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)", offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: 1400 }).finished.then(() => sent.remove());
   };
@@ -152,23 +178,23 @@ function body(props: StoryViewerProps): Element {
       () => { const it = item(); return it ? h("img", { class: "hm-story-media", src: it.src, alt: it.alt ?? "", draggable: "false", decoding: "async" }) : null; },
       h("div", { class: "hm-story-scrim", "aria-hidden": "true" }),
       h("div", { class: "hm-story-top" },
-        h(StoryProgress, { count: () => group()?.items.length ?? 1, index: ii, run: () => `${gi()}:${item()?.id}`, paused, duration: () => item()?.duration ?? val(props.duration) ?? 6000, onDone: next }),
+        props.progress === false ? null : h(StoryProgress, { count: () => group()?.items.length ?? 1, index: ii, run: () => `${gi()}:${item()?.id}`, paused, duration: () => item()?.duration ?? val(props.duration) ?? 6000, onDone: next }),
         h("div", { class: "hm-story-head" },
-          () => h(Avatar, { name: group()?.name, src: group()?.avatar, size: "sm" }),
+          props.avatar === false ? null : () => h(Avatar, { name: group()?.name, src: group()?.avatar, size: "sm" }),
           h("span", { class: "hm-story-who" },
             h("b", null, () => group()?.name ?? ""),
-            h("span", null, () => (item()?.time ? applyPipe("relative", item()!.time) : ""))),
-          h("button", { type: "button", class: "hm-story-btn", "aria-pressed": () => String(manual()), "aria-label": () => (manual() ? t`Play` : t`Pause`), onClick: () => manual.set(!manual()) },
+            props.time === false ? null : h("span", { class: "hm-story-time" }, () => (item()?.time ? applyPipe("relative", item()!.time) : ""))),
+          props.pauseButton === false ? null : h("button", { type: "button", class: "hm-story-btn hm-story-pause", "aria-pressed": () => String(manual()), "aria-label": () => (manual() ? L().play ?? t`Play` : L().pause ?? t`Pause`), onClick: () => manual.set(!manual()) },
             h("span", { class: () => cx("hm-story-pp", manual() && "is-play"), "aria-hidden": "true" }, h("i"), h("i"))),
-          h("button", { type: "button", class: "hm-story-btn", "aria-label": () => t`Close`, onClick: () => { void close(); } }, glyph(xIcon)))),
+          props.closeButton === false ? null : h("button", { type: "button", class: "hm-story-btn hm-story-close", "aria-label": () => L().close ?? t`Close`, onClick: () => { void close(); } }, glyph(xIcon)))),
       () => { const c = item()?.caption; return c ? h("p", { class: "hm-story-caption" }, c) : null; },
-      h("button", { type: "button", class: "hm-story-nav hm-story-prev", "aria-label": () => t`Previous story`, onClick: prev }, glyph(chevronLeft)),
-      h("button", { type: "button", class: "hm-story-nav hm-story-next", "aria-label": () => t`Next story`, onClick: next }, glyph(chevronRight))),
+      props.arrows === false ? null : h("button", { type: "button", class: "hm-story-nav hm-story-prev", "aria-label": () => L().previous ?? t`Previous story`, onClick: prev }, glyph(chevronLeft)),
+      props.arrows === false ? null : h("button", { type: "button", class: "hm-story-nav hm-story-next", "aria-label": () => L().next ?? t`Next story`, onClick: next }, glyph(chevronRight))),
     props.onReply || props.onLike ? h("form", { class: "hm-story-bar", onSubmit: reply },
       props.onReply ? h("input", { class: "hm-story-input", type: "text", enterkeyhint: "send", autocomplete: "off", ref: (x: HTMLInputElement) => { input = x; },
-        placeholder: () => t`Reply to ${group()?.name ?? ""}…`, "aria-label": () => t`Reply to ${group()?.name ?? ""}`,
+        placeholder: () => (group() && L().replyPlaceholder?.(group())) || t`Reply to ${group()?.name ?? ""}…`, "aria-label": replyName,
         onFocus: () => typing.set(true), onBlur: () => typing.set(false) }) : null,
-      props.onLike ? h(LikeButton, { liked, size: "lg", label: () => t`Like story`, onToggle: (on: boolean) => { liked.set(on); props.onLike?.(group(), item(), on); } }) : null,
-      props.onReply ? h("button", { type: "submit", class: "hm-story-btn hm-story-send", "aria-label": () => t`Send` }, glyph(send)) : null) : null,
-    h("p", { class: "hm-sr-only", "aria-live": "polite" }, () => (group() ? t`${group().name}: story ${ii() + 1} of ${group().items.length}` : "")));
+      props.onLike ? h(LikeButton, { liked, size: "lg", label: () => L().like ?? t`Like story`, onToggle: (on: boolean) => { liked.set(on); props.onLike?.(group(), item(), on); } }) : null,
+      props.onReply ? h("button", { type: "submit", class: "hm-story-btn hm-story-send", "aria-label": () => L().send ?? t`Send` }, glyph(send)) : null) : null,
+    h("p", { class: "hm-sr-only", "aria-live": "polite" }, () => (group() ? L().status?.(group(), ii(), group().items.length) ?? t`${group().name}: story ${ii() + 1} of ${group().items.length}` : "")));
 }

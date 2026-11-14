@@ -20,7 +20,7 @@ const START: ChatMessage[] = [
 ]
 const ANSWERS = [["a", "HADİ Koşu Kulübü", "Harika, listeye ekledim ✅"], ["b", "Kitap Kulübü", "Ben de geliyorum!"], ["a", "HADİ Koşu Kulübü", "Su ve rahat ayakkabı unutmayın 👟"]] as const
 
-export default function ChatThreadDemo(props: { values: { group: boolean; replyDelay: number } }) {
+export default function ChatThreadDemo(props: { values: { group: boolean; replyDelay: number; days: string; motion: boolean } }) {
   let $messages: ChatMessage[] = START
   let $typing: string[] = []
   let $reply: ChatMessage | null = null
@@ -45,8 +45,14 @@ export default function ChatThreadDemo(props: { values: { group: boolean; replyD
     setTimeout(() => { $typing = []; $messages = [...$messages, { id: `r${n}`, senderId: sid, senderName: name, text: answer, time: new Date() }] }, 1300 + props.values.replyDelay)
   }
   return <div class="sc-social-phone sc-social-chat">
-    <ChatThread messages={() => $messages} typing={() => $typing} group={() => props.values.group} label="Pazar Koşusu grubu"
-      onReact={react} onReply={(m) => { $reply = m }} onRetry={(m) => patch(m.id, { status: "sent" })} />
+    {() => {
+      // `days` is read once by the thread: a new choice builds the thread again (the messages live here)
+      const d = props.values.days
+      return <ChatThread messages={() => $messages} typing={() => $typing} group={() => props.values.group} label="Pazar Koşusu grubu"
+        days={d === "off" ? false : d === "own" ? (date: Date) => date.toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" }) : true}
+        motion={() => props.values.motion}
+        onReact={react} onReply={(m) => { $reply = m }} onRetry={(m) => patch(m.id, { status: "sent" })} />
+    }}
     <ChatComposer onSend={(t) => send(t)} onVoice={(ms) => send("", ms)} replyTo={() => ($reply ? { name: $reply.mine ? "Siz" : $reply.senderName ?? "", text: $reply.text ?? "Fotoğraf" } : null)}
       onCancelReply={() => { $reply = null }} placeholder="Mesaj yazın" />
   </div>

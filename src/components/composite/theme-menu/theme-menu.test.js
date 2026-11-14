@@ -28,3 +28,20 @@ test("ThemeMenu: one panel with appearance, themes and accents; sections follow 
   U.setAccent("primary"); U.setTheme("system");
   m.dispose();
 });
+
+test("ThemeMenu: icon, modes, headings and heading texts are yours", async () => {
+  const m = mount(() => [h(ThemeMenu, { class: "a", labels: { theme: "Palette", accent: () => "Highlight" }, panelClass: "mine" }), h(ThemeMenu, { class: "b", icon: false, modes: false, headings: false })]);
+  assert.ok(m.el.querySelector(".a svg"), "palette icon by default");
+  assert.equal(m.el.querySelector(".b svg"), null, "icon={false}: text only");
+  m.el.querySelector(".a").click(); await tick();
+  let p = [...document.querySelectorAll(".hm-theme-menu")].at(-1);
+  assert.ok(p.classList.contains("mine"));
+  assert.deepEqual([...p.querySelectorAll(".hm-theme-menu-heading")].map((x) => x.textContent), ["Palette", "Highlight"]);
+  document.dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); await tick();
+  m.el.querySelector(".b").click(); await tick();
+  p = [...document.querySelectorAll(".hm-theme-menu")].at(-1);
+  assert.equal(p.querySelector(".hm-theme-modes"), null, "modes={false}");
+  assert.equal(p.querySelector(".hm-theme-menu-heading"), null, "headings={false}");
+  assert.ok(p.querySelector(".hm-theme-list"));
+  m.dispose();
+});

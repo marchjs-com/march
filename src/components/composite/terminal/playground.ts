@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { window: string; scheme: string; background: string; cursor: string; prompt: string }
+interface Values { window: string; scheme: string; background: string; cursor: string; prompt: string; blink: boolean; builtins: boolean; ownLabels: boolean }
 
 export default definePlayground<Values>({
   options: [
@@ -9,5 +9,8 @@ export default definePlayground<Values>({
     { key: "background", label: "Arka plan", default: "", options: [{ value: "", label: "takımdan" }, { value: "#0b1d33", label: "gece mavisi" }, { value: "#1f1330", label: "mor" }, { value: "#0f2a1d", label: "orman" }, { value: "#000000", label: "siyah" }, { value: "#f4ecd8", label: "kâğıt" }] },
     { key: "cursor", label: "İmleç", default: "bar", options: [{ value: "bar", label: "çizgi" }, { value: "block", label: "blok" }, { value: "underline", label: "alt çizgi" }] },
     { key: "prompt", label: "İstem", default: "hadi$ ", options: [{ value: "hadi$ ", label: "hadi$" }, { value: "❯ ", label: "❯" }, { value: "march › ", label: "march ›" }] },
+    { key: "blink", label: "İmleç yanıp sönsün", default: true },
+    { key: "builtins", label: "Hazır komutlar (help, clear, history)", default: true },
+    { key: "ownLabels", label: "Kendi “komut bulunamadı” metnim", default: false },
   ],
 });

@@ -24,6 +24,24 @@ export interface ThemeEditorProps {
   /** Called with the theme when it is saved. */
   onSave?: ((d: M.ThemeDraft) => void) | undefined;
   readonly?: boolean | undefined;
+  /** The "Start from" row of base themes (default true). */
+  presets?: boolean | undefined;
+  /** The theme name field with its id line (default true). */
+  nameField?: boolean | undefined;
+  /** The undo / redo buttons (default true; Ctrl+Z still works). */
+  historyButtons?: boolean | undefined;
+  /** The "Apply to the app" button (default true). */
+  applyButton?: boolean | undefined;
+  /** The light / dark, LTR / RTL and reduced-motion switches above the preview (default true). */
+  previewControls?: boolean | undefined;
+  /** Own texts of the editor frame (defaults: the translated ones). The texts inside the tabs follow the locale pack:
+   *  change them with `messages(locale, { "English text": "yours" })`. */
+  labels?: {
+    editor?: string; name?: string; undo?: string; redo?: string; unsaved?: string; saved?: string; save?: string;
+    apply?: string; applied?: string; startFrom?: string; scratch?: string; sections?: string;
+    tabs?: Partial<Record<ThemeEditorTab, string>>;
+    preview?: string; previewMode?: string; light?: string; dark?: string; previewDirection?: string; reducedMotion?: string;
+  } | undefined;
   class?: ClassProp;
 }
 

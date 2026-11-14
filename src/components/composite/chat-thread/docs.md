@@ -22,6 +22,17 @@ Rows are keyed, so an edit, a status or a reaction updates one bubble.
 | `onRetry` | `(m) => void` | — | failed messages |
 | `runMinutes` | number | 5 | |
 | `label` | string | "Messages" | |
+| `days` | boolean or `(date) => content` | true | day separators: off, or your own wording |
+| `jump` | boolean or `(count) => content` | true | the "N new" button while scrolled up: off, or your own content |
+| `jumpColor` | color token | `brand-blue` | color of that button |
+| `motion` | boolean | true | `false`: new messages appear at once, no smooth scroll |
+| `class` | | | on the log |
+
+```tsx
+<ChatThread messages={$messages} days={(d) => d.toLocaleDateString("en", { weekday: "long" })}
+  jump={(n) => `${n} unread`} jumpColor="brand-purple" motion={false} />
+<ChatThread messages={$messages} days={false} jump={false} />
+```
 
 `dayLabel(date)` gives the separator text.
 

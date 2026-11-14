@@ -30,6 +30,21 @@ barrel). The Colors tab, the preview, saving and the other tabs (one chunk) load
 | `warnUnsaved` | boolean | `true` | DirtyState asks before the page is left with unsaved changes |
 | `onSave` | `(d) => void` | | called with the saved draft |
 | `readonly` | boolean | | look, do not change |
+| `presets` | boolean | `true` | the "Start from" row of base themes |
+| `nameField` | boolean | `true` | the theme name field and its id line |
+| `historyButtons` | boolean | `true` | the undo / redo buttons (Ctrl/Cmd+Z stays) |
+| `applyButton` | boolean | `true` | the "Apply to the app" button |
+| `previewControls` | boolean | `true` | the light / dark, LTR / RTL and reduced-motion switches above the preview |
+| `labels` | object | `t` texts | texts of the frame: `editor`, `name`, `undo`, `redo`, `unsaved`, `saved`, `save`, `apply`, `applied`, `startFrom`, `scratch`, `sections`, `tabs: { colors, type, shape, motion, export }`, `preview`, `previewMode`, `light`, `dark`, `previewDirection`, `reducedMotion` |
+| `class` | class | — | on the root (`hm-te`); parts: `hm-te-bar`, `-title`, `-name`, `-actions`, `-undo`, `-redo`, `-save`, `-apply`, `-bases`, `-base`, `-body`, `-panel`, `-stage`, `-stage-bar`, `-scope` |
+
+```tsx
+<ThemeEditor tabs={["colors", "shape"]} presets={false} applyButton={false} previewControls={false} storageKey={false} />
+<ThemeEditor labels={{ tabs: { colors: "Palette", type: "Fonts" }, apply: "Try it on the app", startFrom: "Based on" }} />
+```
+
+The texts inside the tabs and the preview are ordinary `t` texts: the locale pack translates them, and
+`messages(locale(), { "Contrast": "Readability" })` (hadi-march/i18n) replaces any of them by its English source.
 
 ## Theme draft and tokens
 

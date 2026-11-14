@@ -92,6 +92,20 @@ export interface PropertyGridProps {
   /** "auto" (default): label beside the editor, stacked when narrow; "stacked": always above. */
   layout?: "auto" | "stacked" | undefined;
   api?: (api: PropertyGridApi) => void;
+  /** The Undo / Redo buttons in the header (default true; the history itself is `history`). */
+  historyButtons?: boolean | undefined;
+  /** The "reset to saved" button of each row (default true). */
+  resetButtons?: boolean | undefined;
+  /** The dot beside a changed row's name and the changed count of a group (default true). */
+  changeMarks?: boolean | undefined;
+  /** The footer with the change count, Revert and Save (default true). */
+  footer?: boolean | undefined;
+  /** Own texts; defaults are the translated ones. */
+  labels?: {
+    search?: string; general?: string; empty?: string; noMatch?: (query: string) => string;
+    changed?: string; changedCount?: (n: number) => string; unsaved?: (n: number) => string; noChanges?: string;
+    revert?: unknown; save?: unknown; undo?: string; redo?: string; reset?: (label: string) => string; resetTitle?: string;
+  } | undefined;
   class?: ClassProp;
 }
 
@@ -115,6 +129,8 @@ export function PropertyGrid(props: PropertyGridProps): Element {
   const changes = computed(() => { const v = get(), s = saved(); return list().filter((p) => !deepEqual(v[p.key], s[p.key])).map((p) => p.key); });
   const labelOf = (p: PropertySpec): string => val(p.label) ?? p.key;
   const title = (): string => val(props.label) ?? t`Properties`;
+  const L = (): NonNullable<PropertyGridProps["labels"]> => props.labels ?? {};
+  const resetName = (p: PropertySpec): string => L().reset?.(labelOf(p)) ?? t`Reset ${labelOf(p)}`;
 
   // write one key; an undo step unless replaying (typing in one field within a second merges into one step)
   const write = (key: string, v: unknown): void => { set({ ...untrack(get), [key]: v }); };
@@ -159,13 +175,13 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     return h("div", { class: () => cx("hm-pg-row", changed() && "is-changed", errors()[p.key] && "is-invalid"), "data-key": p.key },
       h("div", { class: "hm-pg-label" },
         h("label", { id: labelId, for: id, class: "hm-pg-name", title: () => labelOf(p) }, () => labelOf(p)),
-        () => (changed() ? h("span", { class: "hm-pg-dot", title: t`Changed`, "aria-label": t`changed` }) : null),
+        props.changeMarks === false ? null : () => (changed() ? h("span", { class: "hm-pg-dot", title: L().changed ?? t`Changed`, "aria-label": L().changed ?? t`changed` }) : null),
         p.description && h("span", { id: descId, class: "hm-pg-desc" }, p.description)),
       h("div", { class: "hm-pg-editor" }, control,
         () => (errors()[p.key] ? h("span", { id: errId, class: "hm-pg-error", role: "alert" }, errors()[p.key]) : null)),
-      h("button", {
+      props.resetButtons === false ? null : h("button", {
         type: "button", class: "hm-pg-reset", tabindex: () => (changed() ? "0" : "-1"), "aria-hidden": () => (changed() ? null : "true"),
-        "aria-label": () => t`Reset ${labelOf(p)}`, title: () => t`Reset to saved`, onClick: () => resetKeys([p.key], t`Reset ${labelOf(p)}`),
+        "aria-label": () => resetName(p), title: () => L().resetTitle ?? t`Reset to saved`, onClick: () => resetKeys([p.key], resetName(p)),
       }, glyph(resetIcon)));
   };
   // rows are built once and kept; search and `hidden` only show / hide them
@@ -186,8 +202,8 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     const items = g.items.map((p) => { const el = rowOf(p); return () => (matches().has(p.key) ? el : null); });
     const shown = computed((): boolean => g.items.some((p) => matches().has(p.key)));
     const changedIn = (): number => g.items.filter((p) => changes().includes(p.key)).length;
-    const head = [h("span", { class: "hm-pg-group-name" }, g.name || t`General`),
-      () => (changedIn() ? h("span", { class: "hm-pg-count", "aria-label": t`${changedIn()} changed` }, String(changedIn())) : null)];
+    const head = [h("span", { class: "hm-pg-group-name" }, g.name || (L().general ?? t`General`)),
+      props.changeMarks === false ? null : () => (changedIn() ? h("span", { class: "hm-pg-count", "aria-label": L().changedCount?.(changedIn()) ?? t`${changedIn()} changed` }, String(changedIn())) : null)];
     const content = h("div", { class: "hm-pg-rows" }, items);
     // the group box is built once (body runs again when the groups change): rows are never moved while they are used
     const box = g.name || grouped().length > 1 ? h(Disclosure, { title: head, open: () => { query(); return true; }, class: "hm-pg-group", children: content }) : content;
@@ -204,15 +220,15 @@ export function PropertyGrid(props: PropertyGridProps): Element {
   return h("section", { class: () => cx("hm-pg", props.layout === "stacked" && "hm-pg-stacked", val(props.class)), "aria-label": title },
     h("div", { class: "hm-pg-head" },
       props.search === false ? null : h("div", { class: "hm-pg-search" }, glyph(searchIcon, "hm-svg hm-pg-search-icon"),
-        TextInput({ type: "search", ariaLabel: t`Search properties`, placeholder: t`Search properties`, get value() { return query(); }, setValue: (v: string) => query.set(v), class: "hm-pg-search-input" } as never)),
-      history && h("div", { class: "hm-pg-history" },
-        btn(() => (lastUndo() ? t`Undo: ${lastUndo()}` : t`Undo`), undoIcon, () => void history.undo(), () => !history.canUndo()),
-        btn(() => (nextRedo() ? t`Redo: ${nextRedo()}` : t`Redo`), redoIcon, () => void history.redo(), () => !history.canRedo()))),
+        TextInput({ type: "search", ariaLabel: L().search ?? t`Search properties`, placeholder: L().search ?? t`Search properties`, get value() { return query(); }, setValue: (v: string) => query.set(v), class: "hm-pg-search-input" } as never)),
+      history && props.historyButtons !== false && h("div", { class: "hm-pg-history" },
+        btn(() => (L().undo ? [L().undo, lastUndo()].filter(Boolean).join(": ") : lastUndo() ? t`Undo: ${lastUndo()}` : t`Undo`), undoIcon, () => void history.undo(), () => !history.canUndo()),
+        btn(() => (L().redo ? [L().redo, nextRedo()].filter(Boolean).join(": ") : nextRedo() ? t`Redo: ${nextRedo()}` : t`Redo`), redoIcon, () => void history.redo(), () => !history.canRedo()))),
     h("div", { class: "hm-pg-body" }, body,
-      () => (matches().size ? null : h("p", { class: "hm-pg-empty", role: "status" }, () => (query() ? t`No property matches “${query()}”` : t`No properties`)))),
+      () => (matches().size ? null : h("p", { class: "hm-pg-empty", role: "status" }, () => (query() ? L().noMatch?.(query()) ?? t`No property matches “${query()}”` : L().empty ?? t`No properties`)))),
     // the footer: while something changed, or always when there is a Save (disabled with nothing to save)
-    () => (changes().length || props.onSave ? untrack(() => h("div", { class: () => cx("hm-pg-foot", changes().length > 0 && "is-dirty"), role: "status" },
-      h("span", { class: "hm-pg-changes" }, () => (changes().length ? t`${changes().length} unsaved changes` : t`No changes`)),
-      () => (changes().length ? h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", onClick: revert }, t`Revert`) : null),
-      props.onSave && h("button", { type: "button", class: "hm-btn hm-btn-primary hm-btn-sm", disabled: () => !changes().length, onClick: () => void save() }, t`Save`))) : null));
+    () => (props.footer !== false && (changes().length || props.onSave) ? untrack(() => h("div", { class: () => cx("hm-pg-foot", changes().length > 0 && "is-dirty"), role: "status" },
+      h("span", { class: "hm-pg-changes" }, () => (changes().length ? L().unsaved?.(changes().length) ?? t`${changes().length} unsaved changes` : L().noChanges ?? t`No changes`)),
+      () => (changes().length ? h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm hm-pg-revert", onClick: revert }, L().revert ?? t`Revert`) : null),
+      props.onSave && h("button", { type: "button", class: "hm-btn hm-btn-primary hm-btn-sm hm-pg-save", disabled: () => !changes().length, onClick: () => void save() }, L().save ?? t`Save`))) : null));
 }

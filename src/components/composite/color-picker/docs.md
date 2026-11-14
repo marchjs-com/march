@@ -21,7 +21,16 @@ recent picks. Theme colors are read from the tokens at the moment they are picke
 | `recent` | number | `8` | recent picks kept (0 hides them) |
 | `eyedropper` | boolean | `true` | shown only where `EyeDropper` exists |
 | `contrast` | boolean | `true` | contrast ratio and grade on white and black |
-| `readonly`, `disabled` | | | |
+| `preview` | boolean | `true` | the old / new preview |
+| `formats` | boolean | `true` | the HEX / RGB / HSL switcher |
+| `input` | boolean | `true` | the text field with the value |
+| `eyedropperIcon` | icon, text or node | pipette | own eyedropper icon |
+| `labels` | `ColorPickerLabels` | built-in texts | `{ picker, area, hue, opacity, eyedropper, value, format, contrast, onWhite, onBlack, hadiColors, theme, recent }` |
+| `readonly`, `disabled`, `class` | | | |
+
+```tsx
+<ColorPicker bind:value={$c} preview={false} formats={false} contrast={false} labels={{ hue: "Tone", theme: "Our palette" }} />
+```
 
 The color math is exported: `parse`, `format`, `hsvToRgb`, `rgbToHsv`, `contrastOf`, `mix`, `resolveColor`.
 

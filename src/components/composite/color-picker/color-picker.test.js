@@ -58,3 +58,23 @@ test("ColorPicker: keyboard on the hue slider, no alpha when alpha={false}", () 
   assert.equal(el.querySelector(".hm-cp-palette"), null);
   dispose();
 });
+
+test("ColorPicker: preview, format switcher and text field can be turned off; own texts and class", () => {
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const off = render(() => h(ColorPicker, { value: "#1d9ad6", preview: false, formats: false, input: false, class: "mine", labels: { picker: "Paint", hue: "Tone", theme: "Ours" } }), host);
+  const root = host.querySelector(".hm-cp");
+  assert.ok(root.classList.contains("mine"));
+  assert.equal(root.getAttribute("aria-label"), "Paint");
+  assert.equal(root.querySelector(".hm-cp-preview"), null);
+  assert.equal(root.querySelector(".hm-cp-formats"), null);
+  assert.equal(root.querySelector(".hm-cp-text"), null);
+  assert.equal(root.querySelector(".hm-cp-input-row"), null);
+  assert.equal(root.querySelector(".hm-cp-hue [role=slider]").getAttribute("aria-label"), "Tone");
+  assert.ok([...root.querySelectorAll(".hm-cp-palette-label")].some((x) => x.textContent === "Ours"));
+  off(); host.remove();
+  const host2 = document.createElement("div"); document.body.appendChild(host2);
+  const on = render(() => h(ColorPicker, { value: "#1d9ad6", formats: false }), host2);
+  assert.ok(host2.querySelector(".hm-cp-preview") && host2.querySelector(".hm-cp-text"));
+  assert.equal(host2.querySelector(".hm-cp-formats"), null);
+  on(); host2.remove();
+});

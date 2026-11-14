@@ -47,6 +47,7 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
   const draft = signal<M.ThemeDraft>(start);
   const hist = undoHistory({ mergeMs: 700 });
   const ro = (): boolean => !!props.readonly;
+  const L = (): NonNullable<ThemeEditorProps["labels"]> => props.labels ?? {};
   const mode = signal<M.DraftMode>(untrack(appMode) === "dark" ? "dark" : "light");
   const pdir = signal<"ltr" | "rtl">(untrack(docDir) === "rtl" ? "rtl" : "ltr");
   const reduced = signal(false);
@@ -81,7 +82,7 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
     if (gone) return;
     const found = given ? null : p.startDraft(props.share !== false, key);
     if (found && !hist.canUndo()) { draft.set(found); set(found); }
-    if (props.warnUnsaved !== false) off = p.trackDirty(id, dirty, t`Theme editor`, save);
+    if (props.warnUnsaved !== false) off = p.trackDirty(id, dirty, L().editor ?? t`Theme editor`, save);
   });
   const toggleApply = (): void => {
     if (applied.peek()) { applied.set(false); setColorTheme(previous || "hadi"); return; }
@@ -93,24 +94,24 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
 
   // ------------------------------------------------------------------ top bar: name, history, save, apply
   const bar = h("div", { class: "hm-te-bar" },
-    h("div", { class: "hm-te-title" },
+    props.nameField === false ? null : h("div", { class: "hm-te-title" },
       h(TextInput, {
-        class: "hm-te-name", "aria-label": t`Theme name`, get readonly() { return ro(); },
+        class: "hm-te-name", "aria-label": L().name ?? t`Theme name`, get readonly() { return ro(); },
         get value() { return draft().name; },
         onChange: (v: string) => change(t`Rename`, (d) => ({ ...d, name: v, id: M.slug(v || "theme") }), "name"),
       }),
       h("code", { class: "hm-te-id", "aria-label": () => t`Theme id: ${draft().id}` }, () => `data-hm-theme="${draft().id}"`)),
     h("div", { class: "hm-te-actions" },
-      h(IconButton, { icon: undoIcon, label: () => { const l = hist.past()[0]; return l ? t`Undo: ${l}` : t`Undo`; }, disabled: () => !hist.canUndo(), onClick: () => void hist.undo() }),
-      h(IconButton, { icon: redoIcon, label: () => { const l = hist.future()[0]; return l ? t`Redo: ${l}` : t`Redo`; }, disabled: () => !hist.canRedo(), onClick: () => void hist.redo() }),
-      () => (dirty() ? h(Badge, { tone: "warn", dot: true }, t`Unsaved`) : savedAt() ? h(Badge, { tone: "success", dot: true }, t`Saved`) : null),
-      key ? h(Button, { variant: "secondary", size: "sm", disabled: () => !dirty() || ro(), onClick: save }, t`Save`) : null,
-      h(Button, { variant: () => (applied() ? "secondary" : "primary"), size: "sm", icon: () => (applied() ? check : null), "aria-pressed": () => String(applied()), onClick: toggleApply },
-        () => (applied() ? t`Applied to the app` : t`Apply to the app`))));
+      props.historyButtons === false ? null : h(IconButton, { class: "hm-te-undo", icon: undoIcon, label: () => { const l = hist.past()[0], u = L().undo; return u ? (l ? `${u}: ${l}` : u) : l ? t`Undo: ${l}` : t`Undo`; }, disabled: () => !hist.canUndo(), onClick: () => void hist.undo() }),
+      props.historyButtons === false ? null : h(IconButton, { class: "hm-te-redo", icon: redoIcon, label: () => { const l = hist.future()[0], r = L().redo; return r ? (l ? `${r}: ${l}` : r) : l ? t`Redo: ${l}` : t`Redo`; }, disabled: () => !hist.canRedo(), onClick: () => void hist.redo() }),
+      () => (dirty() ? h(Badge, { tone: "warn", dot: true }, L().unsaved ?? t`Unsaved`) : savedAt() ? h(Badge, { tone: "success", dot: true }, L().saved ?? t`Saved`) : null),
+      key ? h(Button, { class: "hm-te-save", variant: "secondary", size: "sm", disabled: () => !dirty() || ro(), onClick: save }, L().save ?? t`Save`) : null,
+      props.applyButton === false ? null : h(Button, { class: "hm-te-apply", variant: () => (applied() ? "secondary" : "primary"), size: "sm", icon: () => (applied() ? check : null), "aria-pressed": () => String(applied()), onClick: toggleApply },
+        () => (applied() ? L().applied ?? t`Applied to the app` : L().apply ?? t`Apply to the app`))));
 
   // ------------------------------------------------------------------ base presets
-  const bases = h("div", { class: "hm-te-bases", role: "group", "aria-label": t`Start from` },
-    h("span", { class: "hm-te-bases-label" }, t`Start from`),
+  const bases = props.presets === false ? null : h("div", { class: "hm-te-bases", role: "group", "aria-label": L().startFrom ?? t`Start from` },
+    h("span", { class: "hm-te-bases-label" }, L().startFrom ?? t`Start from`),
     PRESETS.map((p) => h("button", {
       type: "button", class: () => cx("hm-te-base", draft().base === p.id && "is-active"), "aria-pressed": () => String(draft().base === p.id), disabled: ro,
       onClick: () => change(t`Base: ${t(p.name)}`, (d) => { const n = presetCopy(p.id); return d.base === null || d.name === t`${t(presetDraft(d.base ?? "hadi").name)} (copy)` ? n : { ...n, id: d.id, name: d.name }; }),
@@ -118,14 +119,14 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
     h("button", {
       type: "button", class: () => cx("hm-te-base", "hm-te-scratch", draft().base === null && "is-active"), "aria-pressed": () => String(draft().base === null), disabled: ro,
       onClick: () => change(t`From scratch`, (d) => ({ ...M.draftFromColor(d.light.primary, d.name), id: d.id })),
-    }, glyph(sparkles), h("span", {}, t`From scratch`)));
+    }, glyph(sparkles), h("span", {}, L().scratch ?? t`From scratch`)));
 
   const tabsAll: { id: ThemeEditorTab; label: () => string; content: () => unknown }[] = [
-    { id: "colors", label: () => t`Colors`, content: () => h(ColorsPanel, { ctx }) },
-    { id: "type", label: () => t`Typography`, content: () => h(TypePanel, { ctx }) },
-    { id: "shape", label: () => t`Shape`, content: () => h(ShapePanel, { ctx }) },
-    { id: "motion", label: () => t`Motion`, content: () => h(MotionPanel, { ctx }) },
-    { id: "export", label: () => t`Export`, content: () => h(ExportPanel, { ctx }) },
+    { id: "colors", label: () => L().tabs?.colors ?? t`Colors`, content: () => h(ColorsPanel, { ctx }) },
+    { id: "type", label: () => L().tabs?.type ?? t`Typography`, content: () => h(TypePanel, { ctx }) },
+    { id: "shape", label: () => L().tabs?.shape ?? t`Shape`, content: () => h(ShapePanel, { ctx }) },
+    { id: "motion", label: () => L().tabs?.motion ?? t`Motion`, content: () => h(MotionPanel, { ctx }) },
+    { id: "export", label: () => L().tabs?.export ?? t`Export`, content: () => h(ExportPanel, { ctx }) },
   ];
   const tabs = tabsAll.filter((x) => !props.tabs || props.tabs.includes(x.id));
   const tab = signal<string>(tabs[0]?.id ?? "colors");
@@ -133,7 +134,7 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
   // ------------------------------------------------------------------ preview stage (the draft's variables, scoped)
   const scope = h("div", {
     class: () => cx("hm-te-scope", reduced() && "is-reduced"), "data-hm-theme": () => draft().id, dir: pdir,
-    role: "region", "aria-label": t`Theme preview`,
+    role: "region", "aria-label": L().preview ?? t`Theme preview`,
   }, h(Preview, { ctx })) as HTMLElement;
   let shown: string[] = [];
   effect(() => {
@@ -144,10 +145,10 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
     shown = Object.keys(vars);
   });
   const stage = props.preview === false ? null : h("div", { class: "hm-te-stage" },
-    h("div", { class: "hm-te-stage-bar" },
-      h(Segmented, { "aria-label": t`Preview mode`, get value() { return mode(); }, onChange: (v: M.DraftMode | null) => { if (v) mode.set(v); }, options: [{ value: "light", label: t`Light` }, { value: "dark", label: t`Dark` }] }),
-      h(Segmented, { "aria-label": t`Preview direction`, get value() { return pdir(); }, onChange: (v: "ltr" | "rtl" | null) => { if (v) pdir.set(v); }, options: [{ value: "ltr", label: "LTR" }, { value: "rtl", label: "RTL" }] }),
-      h(Toggle, { get value() { return reduced(); }, onChange: (v: boolean) => reduced.set(v), label: t`Reduced motion` })),
+    props.previewControls === false ? null : h("div", { class: "hm-te-stage-bar" },
+      h(Segmented, { "aria-label": L().previewMode ?? t`Preview mode`, get value() { return mode(); }, onChange: (v: M.DraftMode | null) => { if (v) mode.set(v); }, options: [{ value: "light", label: L().light ?? t`Light` }, { value: "dark", label: L().dark ?? t`Dark` }] }),
+      h(Segmented, { "aria-label": L().previewDirection ?? t`Preview direction`, get value() { return pdir(); }, onChange: (v: "ltr" | "rtl" | null) => { if (v) pdir.set(v); }, options: [{ value: "ltr", label: "LTR" }, { value: "rtl", label: "RTL" }] }),
+      h(Toggle, { get value() { return reduced(); }, onChange: (v: boolean) => reduced.set(v), label: L().reducedMotion ?? t`Reduced motion` })),
     scope);
 
   const onKeyDown = (e: KeyboardEvent): void => {
@@ -157,9 +158,9 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
     e.preventDefault();
     void (e.shiftKey ? hist.redo() : hist.undo());
   };
-  return h("div", { class: () => cx("hm-te", props.preview === false && "hm-te-solo", props.class), role: "group", "aria-label": t`Theme editor`, onKeyDown },
+  return h("div", { class: () => cx("hm-te", props.preview === false && "hm-te-solo", props.class), role: "group", "aria-label": L().editor ?? t`Theme editor`, onKeyDown },
     bar, bases,
     h("div", { class: "hm-te-body" },
-      h("div", { class: "hm-te-panel" }, h(Tabs, { tabs, label: t`Theme sections`, get value() { return tab(); }, onChange: (v: string) => tab.set(v) })),
+      h("div", { class: "hm-te-panel" }, h(Tabs, { tabs, label: L().sections ?? t`Theme sections`, get value() { return tab(); }, onChange: (v: string) => tab.set(v) })),
       stage)) as Element;
 }

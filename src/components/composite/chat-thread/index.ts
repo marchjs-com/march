@@ -18,6 +18,7 @@ import { animate } from "../../../motion/animate.ts";
 import { measure } from "../../../motion/engine/clock.ts";
 import "./chat-thread.css";
 import { isRtl } from "../../../core/util.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { dismiss } from "../../../behaviors/dismiss/index.ts";
 
 export interface ChatMessage {
@@ -49,10 +50,18 @@ export interface ChatThreadProps {
   /** Messages closer than this (minutes) join a run. Default 5. */
   runMinutes?: number | undefined;
   label?: MaybeFn<string | undefined>;
+  /** Day separators: true (default: "Today", "Yesterday", a date), false, or `(date) => content` for your own wording. */
+  days?: boolean | ((date: Date) => unknown) | undefined;
+  /** The "N new" button shown while scrolled up: true (default), false, or `(count) => content`. */
+  jump?: boolean | ((count: number) => unknown) | undefined;
+  /** Color of the "N new" button (default: Aktivite blue). */
+  jumpColor?: ColorToken | undefined;
+  /** Motion (new messages rise / slide in, smooth scroll to the bottom). Default true. */
+  motion?: MaybeFn<boolean | undefined>;
   class?: ClassProp;
 }
 
-type Entry = { key: string; day?: string; m?: ChatMessage; pos?: "single" | "first" | "middle" | "last"; sender?: boolean; avatar?: boolean; color?: number };
+type Entry = { key: string; day?: string; date?: Date; m?: ChatMessage; pos?: "single" | "first" | "middle" | "last"; sender?: boolean; avatar?: boolean; color?: number };
 
 const dayKey = (d: Date): string => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 /** "Today", "Yesterday" or the date. */
@@ -65,6 +74,8 @@ const colorOf = (id: string): number => { let x = 0; for (const c of id) x = (x 
 /** `<ChatThread messages={$messages} typing={$typing} onReact={react} onReply={(m) => $replyTo = m} />` */
 export function ChatThread(props: ChatThreadProps): Element {
   const run = (props.runMinutes ?? 5) * 60_000;
+  const days = props.days, jump = props.jump;
+  const moves = (): boolean => val(props.motion) !== false;
   const picking = signal<string | null>(null);
   const unseen = signal(0);
   const seen = new Set<string>();
@@ -75,7 +86,8 @@ export function ChatThread(props: ChatThreadProps): Element {
     let lastDay = "";
     list.forEach((m, i) => {
       const d = new Date(m.time), dk = dayKey(d);
-      if (dk !== lastDay) { out.push({ key: `day:${dk}`, day: dayLabel(d) }); lastDay = dk; }
+      if (dk !== lastDay && days !== false) out.push({ key: `day:${dk}`, day: dayLabel(d), date: d });
+      lastDay = dk;
       const who = (x?: ChatMessage): string => (x ? (x.mine ? "\u0000me" : x.senderId ?? x.senderName ?? "?") : "");
       const prev = list[i - 1], next = list[i + 1];
       const joinPrev = !!prev && who(prev) === who(m) && dayKey(new Date(prev.time)) === dk && d.getTime() - new Date(prev.time).getTime() < run;
@@ -86,7 +98,7 @@ export function ChatThread(props: ChatThreadProps): Element {
     return out;
   });
 
-  const toBottom = (smooth: boolean): void => { root?.scrollTo?.({ top: root.scrollHeight, behavior: smooth ? "smooth" : "auto" }); unseen.set(0); };
+  const toBottom = (smooth: boolean): void => { root?.scrollTo?.({ top: root.scrollHeight, behavior: smooth && moves() ? "smooth" : "auto" }); unseen.set(0); };
   const enter = (el: HTMLElement, mine: boolean): void => {
     if (mine) animate(el, [{ transform: "translateY(28px) scale(.9)", opacity: 0 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { duration: 340, easing: "easeOutBack" });
     else {
@@ -97,7 +109,7 @@ export function ChatThread(props: ChatThreadProps): Element {
 
   const row = (e: () => Entry): unknown => {
     const first = untrack(e);
-    if (first.day !== undefined) return h("div", { class: "hm-chat-day", role: "separator" }, h("span", null, () => e().day ?? ""));
+    if (first.day !== undefined) return h("div", { class: "hm-chat-day", role: "separator" }, h("span", null, typeof days === "function" ? days(first.date as Date) : () => e().day ?? ""));
     const m = (): ChatMessage => e().m as ChatMessage;
     const fresh = ready && !seen.has(first.key);
     seen.add(first.key);
@@ -117,7 +129,7 @@ export function ChatThread(props: ChatThreadProps): Element {
           selected: () => m().reactions?.find((r) => r.mine)?.emoji,
           onPick: (emoji: string) => { picking.set(null); props.onReact?.(m(), emoji); },
         })) : null))) as HTMLElement;
-    if (fresh) queueMicrotask(() => enter(el, !!first.m?.mine));
+    if (fresh && moves()) queueMicrotask(() => enter(el, !!first.m?.mine));
     return el;
   };
 
@@ -148,6 +160,7 @@ export function ChatThread(props: ChatThreadProps): Element {
   },
   h(For as never, { each: entries, key: "key", children: (e: () => Entry) => row(e) }),
   h("div", { class: "hm-chat-typing" }, h(TypingIndicator, { names: () => val(props.typing) ?? [] })),
-  () => (unseen() ? h("button", { type: "button", class: "hm-chat-jump", onClick: () => toBottom(true) }, glyph(arrowDown), t`${unseen()} new`) : null)) as HTMLElement;
+  () => (unseen() && jump !== false ? h("button", { type: "button", class: "hm-chat-jump", "data-hm-color": colorAttr(props.jumpColor), onClick: () => toBottom(true) },
+    typeof jump === "function" ? jump(unseen()) : [glyph(arrowDown), t`${unseen()} new`]) : null)) as HTMLElement;
   return root;
 }

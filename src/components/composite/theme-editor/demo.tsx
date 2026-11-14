@@ -7,6 +7,8 @@ export const code = `import { ThemeEditor, registerDraft, applyDraft, presetCopy
 
 <ThemeEditor />                                    // HADİ copy, a share link (?theme=…) or the saved draft
 <ThemeEditor bind:value={$draft} base="night" tabs={["colors", "type"]} storageKey={false} onSave={(d) => api.save(d)} />
+<ThemeEditor tabs={["colors", "shape"]} presets={false} applyButton={false} previewControls={false}
+  labels={{ tabs: { colors: "Palet" }, startFrom: "Temel al" }} />
 registerDraft(draft)    // ThemePicker / ThemeMenu offer it (a runtime theme, no stylesheet)
 applyDraft(draft)       // … and switch the whole app to it
 
@@ -28,7 +30,7 @@ PRESETS.map((p) => p.name)`
 
 const TABS: Record<string, readonly ThemeEditorTab[] | undefined> = { all: undefined, colors: ["colors"], noexport: ["colors", "type", "shape", "motion"] }
 
-export default function ThemeEditorDemo(props: { values: { base: string; preview: boolean; tabs: string; readonly: boolean } }) {
+export default function ThemeEditorDemo(props: { values: { base: string; preview: boolean; tabs: string; readonly: boolean; presets: boolean; nameField: boolean; historyButtons: boolean; applyButton: boolean; previewControls: boolean; ownLabels: boolean } }) {
   // the draft outlives a redraw (preview, sections, read-only); a new start choice replaces it
   let $draft: ThemeDraft | null = null
   let lastBase = ""
@@ -37,6 +39,9 @@ export default function ThemeEditorDemo(props: { values: { base: string; preview
     if (lastBase && base !== lastBase) $draft = base === "scratch" ? draftFromColor("#0e7490", "HADİ") : presetCopy(base)
     lastBase = base
     return <ThemeEditor base={base} value={untrack(() => $draft)} onChange={(v: ThemeDraft) => { $draft = v }}
-      tabs={TABS[props.values.tabs]} preview={props.values.preview} readonly={props.values.readonly} />
+      tabs={TABS[props.values.tabs]} preview={props.values.preview} readonly={props.values.readonly}
+      presets={props.values.presets} nameField={props.values.nameField} historyButtons={props.values.historyButtons}
+      applyButton={props.values.applyButton} previewControls={props.values.previewControls}
+      labels={props.values.ownLabels ? { tabs: { colors: "Palet", type: "Yazı", shape: "Biçim", motion: "Devinim", export: "Dışa aktar" }, apply: "Uygulamada dene", applied: "Uygulamada deneniyor", startFrom: "Temel al" } : undefined} />
   }}</div>
 }

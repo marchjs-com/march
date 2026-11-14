@@ -28,6 +28,17 @@ A new `steps` list builds the form again from the first step, keeping the values
 | `onStep`, `onReady` | functions | — | step changes; the form and `{ index, next, back, go }` |
 | `form` | `FormController` | new `useForm` | share a form built elsewhere |
 | `color` | `ColorToken` | primary | accent of the current stage |
+| `stepper` | boolean | `true` | the stage list on top |
+| `progress` | boolean | `true` | the bar under it |
+| `count` | boolean | `true` | the "Step 2 of 3" text beside the buttons |
+| `backButton` | boolean | `true` | the Back button (`onReady`'s `back()` still works) |
+| `labels` | `{ back, next, step(i), count(i, total) }` | `t` texts | button texts (nodes), the title of an untitled step, the count text; `i` is 0-based |
+| `class` | class | — | on the form (`hm-wizard`); parts: `hm-wizard-steps`, `-progress`, `-step`, `-title`, `-nav`, `-count`, `-back`, `-next` |
+
+```tsx
+<Wizard steps={steps} stepper={false} count={false}
+  labels={{ back: "Previous", next: <>Continue <Icon of={arrowRight} /></>, count: (i, n) => `${i + 1} / ${n}` }} />
+```
 
 ## Accessibility
 

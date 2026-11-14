@@ -23,3 +23,23 @@ test("ConsentBanner: the managers/consent/ui subpath is this module; own wording
   assert.equal(consent.has("analytics"), true);
   off(); host.remove();
 });
+
+test("ConsentBanner: own button texts, Customize can be turned off, class; the gate's texts and Preferences button", () => {
+  configureConsent({ storageKey: "t.consent.banner2", version: "1", policyHref: null });
+  consent.withdraw();
+  const host = document.createElement("div");
+  document.body.appendChild(host);
+  const off = render(() => [
+    h(C.ConsentBanner, { inline: true, always: true, customize: false, class: "mine", labels: { reject: "No", accept: "Yes" } }),
+    h(C.ConsentGate, { category: "thirdParty", class: "gate", preferences: false, labels: { allow: "Show" } }, "inside"),
+  ], host);
+  assert.ok(host.querySelector(".hm-consent").classList.contains("mine"));
+  const btns = [...host.querySelectorAll(".hm-consent .hm-consent-actions button")].map((b) => b.textContent);
+  assert.deepEqual(btns, ["No", "Yes"]);
+  const gate = host.querySelector(".hm-consent-gate.gate");
+  assert.deepEqual([...gate.querySelectorAll("button")].map((b) => b.textContent), ["Show"]);
+  gate.querySelector("button").click();
+  assert.equal(host.querySelector(".hm-consent-gate"), null);
+  assert.match(host.textContent, /inside/);
+  off(); host.remove();
+});

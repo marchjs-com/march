@@ -90,6 +90,21 @@ export interface NavSidebarProps {
   /** false: do not register the items with the command palette. */
   palette?: boolean;
   label?: MaybeFn<string | undefined>;
+  /** The search box (default true); false also drops its shortcut. */
+  search?: boolean;
+  /** The "Recent" and "Categories" headings (default true); false also drops the expand / collapse all button. */
+  headings?: boolean;
+  /** The "Expand all" / "Collapse all" button beside the Categories heading (default true). */
+  expandAll?: boolean;
+  /** The item count beside each category name (default true). */
+  groupCounts?: boolean;
+  /** Own texts (strings or accessors); defaults are the translated ones. `showUnder` / `hideUnder` name the fold button of a parent item. */
+  labels?: {
+    search?: MaybeFn<string>; clearSearch?: MaybeFn<string>; noMatches?: MaybeFn<string>; results?: MaybeFn<string>;
+    recent?: MaybeFn<string>; categories?: MaybeFn<string>; expandAll?: MaybeFn<string>; collapseAll?: MaybeFn<string>;
+    menu?: MaybeFn<string>; expandSidebar?: MaybeFn<string>; collapseSidebar?: MaybeFn<string>; resize?: MaybeFn<string>;
+    showUnder?: (label: string) => string; hideUnder?: (label: string) => string;
+  } | undefined;
   class?: ClassProp;
 }
 
@@ -125,6 +140,9 @@ export function NavSidebar(props: NavSidebarProps): Element {
     if (keepWidth && widthKey) save(widthKey, width.peek());
   };
   const navId = uid("hm-sb");
+  type TextKey = Exclude<keyof NonNullable<NavSidebarProps["labels"]>, "showUnder" | "hideUnder">;
+  const L = (k: TextKey, d: string): string => val(props.labels?.[k]) ?? d;
+  const hasSearch = props.search !== false;
   let searchEl: HTMLInputElement | undefined, navEl: HTMLElement | undefined;
 
   // nested items: children by their parent's id (a parent that is not in the list leaves its children at the top)
@@ -208,9 +226,9 @@ export function NavSidebar(props: NavSidebarProps): Element {
     });
   });
   if (props.palette !== false) registerPages(() => items().filter((x) => x.href).map((x) => ({ id: x.id, title: text(x.label), href: x.href as Href, group: x.group, keywords: x.keywords, icon: x.icon })));
-  const hk = props.hotkey ?? "focus";
+  const hk = hasSearch ? props.hotkey ?? "focus" : false;
   // "focus": the shortcut focuses this search box. "palette": the <CommandPalette> owns the shortcut; the box only shows the hint
-  if (hk === "focus") hotkey(props.shortcut ?? "mod+k", () => { if (rail.peek()) { rail.set(false); persist(); } drawer.set(true); queueMicrotask(() => searchEl?.focus()); }, { inInputs: true, description: () => t`Search the menu` });
+  if (hk === "focus") hotkey(props.shortcut ?? "mod+k", () => { if (rail.peek()) { rail.set(false); persist(); } drawer.set(true); queueMicrotask(() => searchEl?.focus()); }, { inInputs: true, description: () => L("search", t`Search the menu`) });
   on<KeyboardEvent>(globalThis.document, "keydown", (e) => { if (e.key === "Escape" && drawer.peek()) drawer.set(false); });
 
   const toggle = (g: string, to?: boolean): void => {
@@ -249,12 +267,12 @@ export function NavSidebar(props: NavSidebarProps): Element {
     return h("li", { class: () => cx("hm-sb-li", "is-parent", kidsOpen(x.id) && "is-kids-open") },
       el,
       h("button", { type: "button", class: "hm-sb-kids-btn", tabindex: "-1", "aria-expanded": () => String(kidsOpen(x.id)), "aria-controls": kid,
-        "aria-label": () => (kidsOpen(x.id) ? t`Hide pages under ${text(x.label)}` : t`Show pages under ${text(x.label)}`), onClick: () => toggleKids(x.id) },
+        "aria-label": () => (kidsOpen(x.id) ? props.labels?.hideUnder?.(text(x.label)) ?? t`Hide pages under ${text(x.label)}` : props.labels?.showUnder?.(text(x.label)) ?? t`Show pages under ${text(x.label)}`), onClick: () => toggleKids(x.id) },
         glyph(chevronRight)),
       h("div", { class: "hm-sb-kids", id: kid, inert: () => !kidsOpen(x.id) },
         h("ul", { class: "hm-sb-list hm-sb-sublist" }, kids.map((k) => row(k, "child")))));
   };
-  const sectionHead = (label: () => string, ic: unknown, extra?: unknown): Element =>
+  const sectionHead = (label: () => string, ic: unknown, extra?: unknown): Element | null => props.headings === false ? null :
     h("div", { class: "hm-sb-section" }, icon(ic, "hm-icon hm-sb-section-icon"), h("span", { class: "hm-sb-section-label" }, label), extra ?? null);
 
   const queryText = computed(() => q().trim()); // spaces alone do not rebuild the menu
@@ -262,8 +280,8 @@ export function NavSidebar(props: NavSidebarProps): Element {
     const query = queryText();
     if (query) {
       const hits = untrack(() => rank(query, items(), (x) => ({ title: text(x.label), keywords: [x.keywords, x.group, text(x.sub)].filter(Boolean).join(" ") })));
-      if (!hits.length) return h("p", { class: "hm-sb-none" }, () => t`No matches`);
-      return untrack(() => h("ul", { class: "hm-sb-list", "aria-label": t`Results` }, hits.map((r) => row(r.item, "search", () => r.item.group ?? text(r.item.sub)))));
+      if (!hits.length) return h("p", { class: "hm-sb-none" }, () => L("noMatches", t`No matches`));
+      return untrack(() => h("ul", { class: "hm-sb-list", "aria-label": L("results", t`Results`) }, hits.map((r) => row(r.item, "search", () => r.item.group ?? text(r.item.sub)))));
     }
     // Each block is its own reactive region: a navigation changes `recent` (and `active`), which rebuilds only the
     // recent block, never the categories (a rebuilt menu loses its scroll position and looks reloaded).
@@ -271,7 +289,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
       const f = featured(), m = byId();
       const rec = recent().map((id) => m.get(id)).filter((x): x is NavSidebarItem => !!x && !f.some((y) => y.id === x.id)).slice(0, maxRecent);
       return untrack(() => rec.length > 0 && h("div", { class: "hm-sb-block hm-sb-recent" },
-        sectionHead(() => t`Recent`, clock),
+        sectionHead(() => L("recent", t`Recent`), clock),
         h("ul", { class: "hm-sb-list" }, rec.map((x) => row(x, "recent", () => x.group ?? text(x.sub))))));
     };
     return [
@@ -279,7 +297,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
       () => { const ls = loose(); return untrack(() => ls.length > 0 && h("ul", { class: "hm-sb-list hm-sb-loose" }, ls.map((x) => row(x, "main")))); },
       maxRecent > 0 && recentBlock,
       () => { const gs = groups(); return untrack(() => gs.length > 0 && h("div", { class: "hm-sb-block hm-sb-cats" },
-        sectionHead(() => t`Categories`, null, h("button", { type: "button", class: "hm-sb-all", onClick: () => setAll(!allOpen()) }, () => (allOpen() ? t`Collapse all` : t`Expand all`))),
+        sectionHead(() => L("categories", t`Categories`), null, props.expandAll === false ? null : h("button", { type: "button", class: "hm-sb-all", onClick: () => setAll(!allOpen()) }, () => (allOpen() ? L("collapseAll", t`Collapse all`) : L("expandAll", t`Expand all`)))),
         h("ul", { class: "hm-sb-list hm-sb-groups" }, gs.map((g) => {
           const gid = uid("hm-sbg");
           const isOpen = (): boolean => rail() || open().has(g.name);
@@ -288,7 +306,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
               h("span", { class: "hm-sb-chev", "aria-hidden": "true" }, glyph(chevronRight)),
               icon(props.groupIcons?.[g.name], "hm-icon hm-sb-gicon"),
               h(OverflowText, { class: "hm-sb-gname", mode: "loop" }, g.name),
-              h("span", { class: "hm-sb-count" }, String(g.items.length))),
+              props.groupCounts === false ? null : h("span", { class: "hm-sb-count" }, String(g.items.length))),
             h("div", { class: "hm-sb-gpanel", id: gid, inert: () => !isOpen() },
               h("ul", { class: "hm-sb-list hm-sb-gitems" }, g.items.map((x) => row(x, "group")))));
         })))); },
@@ -359,7 +377,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
     onCleanup(() => ro.disconnect());
   }
   const grip = (): unknown => !props.resizable ? null : h("div", {
-    class: () => cx("hm-sb-resize", resizing() && "is-dragging"), "aria-controls": navId, "aria-label": () => t`Resize sidebar`,
+    class: () => cx("hm-sb-resize", resizing() && "is-dragging"), "aria-controls": navId, "aria-label": () => L("resize", t`Resize sidebar`),
     // drag / arrows (RTL mirrored) / Home / End / Enter or double click resets: the resize-handle behavior. The range
     // goes below minW when the sidebar can fold to its rail (setWidth folds it under collapseBelow).
     ref: (x: HTMLElement) => resizeHandle(x, {
@@ -371,23 +389,23 @@ export function NavSidebar(props: NavSidebarProps): Element {
     }),
   });
   return h("div", { class: () => cx("hm-nav-wrap", "hm-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--hm-sb-w", w); } },
-    h("button", { type: "button", class: "hm-icon-btn hm-nav-burger", "aria-controls": navId, "aria-expanded": () => String(drawer()), "aria-label": () => t`Menu`, onClick: () => drawer.update((x) => !x) }, glyph(menu)),
+    h("button", { type: "button", class: "hm-icon-btn hm-nav-burger", "aria-controls": navId, "aria-expanded": () => String(drawer()), "aria-label": () => L("menu", t`Menu`), onClick: () => drawer.update((x) => !x) }, glyph(menu)),
     h("div", { class: "hm-nav-scrim", "aria-hidden": "true", onClick: () => drawer.set(false) }),
     h("nav", { class: "hm-nav hm-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },
       h("div", { class: "hm-sb-head" },
         h("div", { class: "hm-sb-titlebar" },
           props.title != null && h("div", { class: "hm-sb-title" }, h("span", { class: "hm-sb-title-main" }, props.title), props.subtitle != null && h("span", { class: "hm-sb-title-sub" }, props.subtitle)),
           props.collapsible && h("button", { type: "button", class: "hm-icon-btn hm-btn-sm hm-nav-rail-btn", "aria-pressed": () => String(rail()),
-            "aria-label": () => (rail() ? t`Expand sidebar` : t`Collapse sidebar`), title: () => (rail() ? t`Expand sidebar` : t`Collapse sidebar`),
+            "aria-label": () => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`)), title: () => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`)),
             onClick: () => { rail.update((x) => !x); persist(); } }, glyph(panelLeft))),
-        h("div", { class: "hm-sb-search", role: "search" },
+        hasSearch && h("div", { class: "hm-sb-search", role: "search" },
           h("span", { class: "hm-sb-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
           h("input", {
             type: "search", class: "hm-sb-input", ref: (x: HTMLInputElement) => { searchEl = x; }, autocomplete: "off", spellcheck: "false",
-            placeholder: () => val(props.placeholder) ?? t`Search or ask…`, "aria-label": () => val(props.placeholder) ?? t`Search the menu`,
+            placeholder: () => val(props.placeholder) ?? t`Search or ask…`, "aria-label": () => val(props.labels?.search) ?? val(props.placeholder) ?? t`Search the menu`,
             "aria-keyshortcuts": hk ? "Control+K Meta+K" : null, onInput: (e: Event) => q.set((e.target as HTMLInputElement).value),
           }),
-          () => (q() ? h("button", { type: "button", class: "hm-sb-clear", "aria-label": () => t`Clear search`, onClick: () => { q.set(""); if (searchEl) { searchEl.value = ""; searchEl.focus(); } } }, glyph(xIcon))
+          () => (q() ? h("button", { type: "button", class: "hm-sb-clear", "aria-label": () => L("clearSearch", t`Clear search`), onClick: () => { q.set(""); if (searchEl) { searchEl.value = ""; searchEl.focus(); } } }, glyph(xIcon))
             : hk ? h("kbd", { class: "hm-kbd hm-sb-kbd", "aria-hidden": "true" }, formatKey(kbd)) : null))),
       h("div", { class: "hm-sb-scroll" }, body),
       props.footer != null && h("div", { class: "hm-nav-foot hm-sb-foot" }, props.footer),

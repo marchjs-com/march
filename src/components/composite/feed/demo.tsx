@@ -4,6 +4,7 @@ import { Feed } from "./index.ts";
 import type { Post } from "../post-card/index.ts";
 import { Button } from "../../../ui/button.ts";
 import { PHOTOS, USERS, minutesAgo } from "../../social/demo-data.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<Feed posts={$posts} loading={$first} hasMore={$more}
   onRefresh={() => api.get("/feed").then((p) => $posts = p)}
@@ -26,7 +27,7 @@ const make = (n: number, ago = 0): Post[] => Array.from({ length: n }, (_, i) =>
 })
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-export default function FeedDemo(props: { values: { variant: string; delay: number; pages: number; empty: boolean } }) {
+export default function FeedDemo(props: { values: { variant: string; delay: number; pages: number; empty: boolean; end: string; newColor: string } }) {
   let $posts: Post[] = []
   let $first = true
   let $page = 1
@@ -39,11 +40,16 @@ export default function FeedDemo(props: { values: { variant: string; delay: numb
       <span class="sc-strip-label">{() => `${$posts.length} gönderi · sayfa ${$page}/${props.values.pages}`}</span>
     </div>
     <div class="sc-social-phone">
-      <Feed posts={() => (props.values.empty ? [] : $posts)} loading={() => $first} hasMore={() => $page < props.values.pages} variant={() => props.values.variant as "card"}
+      {() => {
+        // the end mark and the pill color are read once by the feed: a new choice builds it again (the posts live here)
+        const end = props.values.end, color = props.values.newColor as ColorToken
+        return <Feed end={end === "off" ? false : end === "own" ? <b>Bugünlük bu kadar 🎉 Yarın yeni etkinlikler var.</b> : true} newColor={color}
+        posts={() => (props.values.empty ? [] : $posts)} loading={() => $first} hasMore={() => $page < props.values.pages} variant={() => props.values.variant as "card"}
         newCount={() => $waiting.length} onShowNew={() => { $posts = [...$waiting, ...$posts]; $waiting = [] }}
         onRefresh={() => wait(props.values.delay).then(() => { seq = 0; $posts = make(6); $page = 1 })}
         onLoadMore={() => wait(props.values.delay).then(() => { $posts = [...$posts, ...make(6, $posts.length * 40)]; $page = $page + 1 })}
         onLike={(on, p) => update(p, { liked: on, likes: p.likes + (on ? 1 : -1) })} />
+      }}
     </div>
   </div>
 }

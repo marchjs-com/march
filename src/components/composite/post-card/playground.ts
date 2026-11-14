@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { photos: number; variant: string; clamp: number; menu: boolean; doubleTapLike: boolean; place: boolean }
+interface Values { photos: number; variant: string; clamp: number; menu: boolean; doubleTapLike: boolean; place: boolean; avatar: boolean; time: string; icons: boolean; likeColor: string }
 
 export default definePlayground<Values>({
   options: [
@@ -10,5 +10,9 @@ export default definePlayground<Values>({
     { key: "doubleTapLike", label: "Çift dokunuşla beğen", default: true, visibleWhen: (v) => v.photos > 0 },
     { key: "menu", label: "⋯ menüsü", default: true },
     { key: "place", label: "Konum", default: true },
+    { key: "avatar", label: "Avatar", default: true },
+    { key: "time", label: "Zaman", default: "relative", options: [{ value: "relative", label: "göreli (18 dk önce)" }, { value: "own", label: "kendi biçimim (saat)" }, { value: "off", label: "yok" }] },
+    { key: "icons", label: "Kendi ikonlarım", default: false },
+    { key: "likeColor", label: "Beğeni rengi", default: "brand-pink", options: [{ value: "brand-pink", label: "pembe" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "danger", label: "kırmızı" }] },
   ],
 });

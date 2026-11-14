@@ -36,3 +36,32 @@ test("Feed: new posts pill and empty state", () => {
   assert.equal(m.el.querySelector(".hm-feed-new"), null);
   m.dispose();
 });
+
+test("Feed: own end mark, own post renderer, skeleton count, own texts and pill", async () => {
+  const posts = signal([post(1)]);
+  const m = mount(() => h(Feed, { posts, hasMore: false, class: "mine", end: "The end", renderPost: (p) => h("div", { class: "own-post" }, () => p().id), newCount: 2, newPill: (n) => `${n} fresh`, newColor: "brand-purple", motion: false }));
+  await wait();
+  assert.ok(m.el.querySelector(".hm-feed").classList.contains("mine"));
+  assert.equal(m.el.querySelector(".own-post").textContent, "p1");
+  assert.equal(m.el.querySelector("article.hm-post"), null);
+  assert.equal(m.el.querySelector(".hm-feed-end").textContent, "The end");
+  assert.equal(m.el.querySelector(".hm-feed-end-dots"), null);
+  const pill = m.el.querySelector(".hm-feed-new");
+  assert.equal(pill.textContent, "2 fresh");
+  assert.equal(pill.getAttribute("data-hm-color"), "brand-purple");
+  m.dispose();
+  const off = mount(() => h(Feed, { posts, hasMore: false, end: false, newCount: 2, newPill: false, postProps: { avatar: false } }));
+  await wait();
+  assert.equal(off.el.querySelector(".hm-feed-end"), null);
+  assert.equal(off.el.querySelector(".hm-feed-new"), null);
+  assert.ok(off.el.querySelector("article.hm-post"));
+  assert.equal(off.el.querySelector("article.hm-post .hm-avatar"), null);
+  off.dispose();
+  const load = mount(() => h(Feed, { posts: [], loading: true, skeletons: 1, labels: { loading: "Wait" } }));
+  assert.equal(load.el.querySelectorAll(".hm-feed-skel").length, 1);
+  assert.equal(load.el.querySelector(".hm-feed-list").getAttribute("aria-label"), "Wait");
+  load.dispose();
+  const none = mount(() => h(Feed, { posts: [], labels: { empty: "Quiet here" } }));
+  assert.equal(none.el.querySelector(".hm-feed-empty").textContent, "Quiet here");
+  none.dispose();
+});

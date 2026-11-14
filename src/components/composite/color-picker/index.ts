@@ -22,6 +22,12 @@ export * from "./color.ts";
 /** A palette: a name and colors (CSS colors or theme tokens such as "brand-orange"). */
 export interface ColorPalette { label: string; colors: readonly string[] }
 
+/** The texts ColorPicker writes itself; every one is optional (default: the built-in text). */
+export interface ColorPickerLabels {
+  picker?: string; area?: string; hue?: string; opacity?: string; eyedropper?: string; value?: string; format?: string;
+  contrast?: string; onWhite?: string; onBlack?: string; hadiColors?: string; theme?: string; recent?: string;
+}
+
 export interface ColorPickerProps extends ControlProps<string> {
   /** Alpha slider and alpha in the value (default true). */
   alpha?: boolean | undefined;
@@ -35,6 +41,16 @@ export interface ColorPickerProps extends ControlProps<string> {
   eyedropper?: boolean | undefined;
   /** Contrast against white and black (default true). */
   contrast?: boolean | undefined;
+  /** The old / new preview next to the sliders (default true). */
+  preview?: boolean | undefined;
+  /** The HEX / RGB / HSL switcher (default true). */
+  formats?: boolean | undefined;
+  /** The text field with the value (default true). */
+  input?: boolean | undefined;
+  /** Own eyedropper icon (an icon of hadi-march/icons, text or a node). */
+  eyedropperIcon?: unknown;
+  /** Own texts: names of the sliders, the buttons and the default palettes. */
+  labels?: ColorPickerLabels | undefined;
   class?: ClassProp;
 }
 
@@ -49,6 +65,7 @@ export function ColorPicker(props: ColorPickerProps): unknown {
   const id = uid("hm-cp");
   const c = ctl(props);
   const ro = (): boolean => !!(props.readonly || props.disabled);
+  const L = (): ColorPickerLabels => props.labels ?? {};
   const useAlpha = (): boolean => props.alpha !== false;
   const fmt = signal<C.ColorFormat>(untrack(() => props.format ?? "hex"));
   const hsva = signal<C.Hsva>({ h: 24, s: 0.87, v: 0.95, a: 1 });
@@ -100,7 +117,7 @@ export function ColorPicker(props: ColorPickerProps): unknown {
   // ------------------------------------------------------------------ area, hue, alpha
   const area = h("div", { class: "hm-cp-area" },
     h("div", {
-      class: "hm-cp-thumb hm-cp-area-thumb", role: "slider", tabindex: () => (props.disabled ? "-1" : "0"), "aria-label": () => t`Saturation and brightness`,
+      class: "hm-cp-thumb hm-cp-area-thumb", role: "slider", tabindex: () => (props.disabled ? "-1" : "0"), "aria-label": () => L().area ?? t`Saturation and brightness`,
       "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": () => String(Math.round(hsva().s * 100)),
       "aria-valuetext": () => t`Saturation ${Math.round(hsva().s * 100)}%, brightness ${Math.round(hsva().v * 100)}%`,
       "aria-disabled": () => (ro() ? "true" : null),
@@ -119,7 +136,7 @@ export function ColorPicker(props: ColorPickerProps): unknown {
     const el = h("div", { class: cx("hm-cp-track", `hm-cp-${kind}`) },
       h("div", {
         class: "hm-cp-thumb hm-cp-track-thumb", role: "slider", tabindex: () => (props.disabled ? "-1" : "0"),
-        "aria-label": () => (isHue ? t`Hue` : t`Opacity`), "aria-orientation": "horizontal",
+        "aria-label": () => (isHue ? L().hue ?? t`Hue` : L().opacity ?? t`Opacity`), "aria-orientation": "horizontal",
         "aria-valuemin": "0", "aria-valuemax": isHue ? "360" : "100", "aria-valuenow": () => String(Math.round(isHue ? hsva().h : hsva().a * 100)),
         "aria-valuetext": () => (isHue ? t`${Math.round(hsva().h)} degrees` : `${Math.round(hsva().a * 100)}%`), "aria-disabled": () => (ro() ? "true" : null),
         onKeyDown: (e: KeyboardEvent) => {
@@ -138,7 +155,7 @@ export function ColorPicker(props: ColorPickerProps): unknown {
   // ------------------------------------------------------------------ eyedropper, preview, text
   const Dropper = (globalThis as { EyeDropper?: EyeDropperCtor }).EyeDropper;
   const dropper = (): unknown => (props.eyedropper === false || !Dropper ? null : h(IconButton, {
-    icon: glyph(pipette), label: () => t`Pick a color from the screen`, size: "sm", class: "hm-cp-dropper", disabled: ro,
+    icon: props.eyedropperIcon ?? glyph(pipette), label: () => L().eyedropper ?? t`Pick a color from the screen`, size: "sm", class: "hm-cp-dropper", disabled: ro,
     onClick: async () => { try { const r = await new Dropper().open(); pick(r.sRGBHex); } catch { /* cancelled */ } },
   }));
   const preview = h("div", { class: "hm-cp-preview", role: "img", "aria-label": () => t`New color ${out()}, was ${original() || "—"}` },
@@ -147,7 +164,7 @@ export function ColorPicker(props: ColorPickerProps): unknown {
   effect(() => { const o = C.parse(original()); const el = preview.firstChild as HTMLElement; if (o) setStyle(el, { "--hm-cp-old": C.format(o, "rgb") }); });
 
   const text = h("input", {
-    ...c, class: "hm-input hm-cp-text", type: "text", spellcheck: "false", autocomplete: "off", "aria-label": () => c["aria-label"]() ?? t`Color value`,
+    ...c, class: "hm-input hm-cp-text", type: "text", spellcheck: "false", autocomplete: "off", "aria-label": () => c["aria-label"]() ?? L().value ?? t`Color value`,
     value: () => draft() ?? out({ ...hsva() }), readonly: () => !!props.readonly,
     "aria-invalid": () => (draft() != null && !C.parse(draft()!) ? "true" : c["aria-invalid"]()),
     onInput: (e: Event) => { const v = (e.target as HTMLInputElement).value; draft.set(v); const p = C.parse(v); if (p) { last = v; hsva.set(C.rgbToHsv(p, hsva.peek().h)); set(out()); } },
@@ -155,7 +172,7 @@ export function ColorPicker(props: ColorPickerProps): unknown {
     onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { draft.set(null); remember(); } },
   }) as HTMLInputElement;
   const formats = h(Segmented, {
-    class: "hm-cp-formats", "aria-label": t`Color format`,
+    class: "hm-cp-formats", "aria-label": L().format ?? t`Color format`,
     options: [{ value: "hex", label: "HEX" }, { value: "rgb", label: "RGB" }, { value: "hsl", label: "HSL" }],
     value: fmt.peek(), onChange: (f: C.ColorFormat | null) => { if (!f) return; fmt.set(f); if (!ro()) { last = out(); set(last); } },
   });
@@ -164,9 +181,9 @@ export function ColorPicker(props: ColorPickerProps): unknown {
   const resolve = (token: string): string => C.resolveColor(token, root);
   const palettes = (): readonly ColorPalette[] => {
     if (props.palettes === false) return [];
-    const own = props.palettes ?? [{ label: t`HADİ colors`, colors: HADI }, { label: t`Theme`, colors: THEME }];
+    const own = props.palettes ?? [{ label: L().hadiColors ?? t`HADİ colors`, colors: HADI }, { label: L().theme ?? t`Theme`, colors: THEME }];
     const r = recent();
-    return r.length && (props.recent ?? 8) ? [...own, { label: t`Recent`, colors: r }] : own;
+    return r.length && (props.recent ?? 8) ? [...own, { label: L().recent ?? t`Recent`, colors: r }] : own;
   };
   const swatch = (color: string, label: string): Element => {
     const isToken = !C.parse(color);
@@ -185,17 +202,17 @@ export function ColorPicker(props: ColorPickerProps): unknown {
       return h("span", { class: cx("hm-cp-contrast", r >= 4.5 ? "is-pass" : r >= 3 ? "is-large" : "is-fail"), title: r >= 3 && r < 4.5 ? t`Enough for large text only` : null },
         h("span", { class: cx("hm-cp-contrast-chip", bg === WHITE ? "is-light" : "is-dark"), "aria-hidden": "true" }, "Aa"), `${name()} ${r.toFixed(2)} `, h("b", null, grade));
     };
-    return h("div", { class: "hm-cp-contrasts", "aria-label": () => t`Contrast`, role: "group" }, () => [on(WHITE, () => t`on white`), on(BLACK, () => t`on black`)]);
+    return h("div", { class: "hm-cp-contrasts", "aria-label": () => L().contrast ?? t`Contrast`, role: "group" }, () => [on(WHITE, () => L().onWhite ?? t`on white`), on(BLACK, () => L().onBlack ?? t`on black`)]);
   };
   const swatchName = (token: string): string => ({ "brand-orange": t`Excitement orange`, "brand-blue": t`Activity blue`, "brand-green": t`Friendship green`, "brand-purple": t`Communication purple` } as Record<string, string>)[token] ?? token;
 
   return h("div", {
     class: () => cx("hm-cp", ro() && "is-readonly", props.disabled && "is-disabled", val(props.class)), role: "group", "aria-labelledby": null,
-    "aria-label": () => c["aria-label"]() ?? t`Color picker`, "data-hm-color": c["data-hm-color"], ref: (el: HTMLElement) => { root = el; untrack(paint); },
+    "aria-label": () => c["aria-label"]() ?? L().picker ?? t`Color picker`, "data-hm-color": c["data-hm-color"], ref: (el: HTMLElement) => { root = el; untrack(paint); },
   },
   area,
-  h("div", { class: "hm-cp-row" }, preview, h("div", { class: "hm-cp-sliders" }, slider("hue"), () => (useAlpha() ? slider("alpha") : null)), dropper),
-  h("div", { class: "hm-cp-row hm-cp-input-row" }, formats, text),
+  h("div", { class: "hm-cp-row" }, props.preview === false ? null : preview, h("div", { class: "hm-cp-sliders" }, slider("hue"), () => (useAlpha() ? slider("alpha") : null)), dropper),
+  props.formats === false && props.input === false ? null : h("div", { class: "hm-cp-row hm-cp-input-row" }, props.formats === false ? null : formats, props.input === false ? null : text),
   contrastRow,
   () => palettes().map((p) => h("div", { class: "hm-cp-palette", role: "group", "aria-label": p.label },
     h("span", { class: "hm-cp-palette-label", id: `${id}-${p.label}` }, p.label),

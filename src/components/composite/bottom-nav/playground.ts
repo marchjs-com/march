@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { count: number; create: boolean; menu: string; labels: boolean; variant: string; tint: string; badges: boolean }
+interface Values { count: number; create: boolean; menu: string; labels: boolean; variant: string; tint: string; badges: boolean; bubble: boolean; ring: string; motion: boolean }
 
 export default definePlayground<Values>({
   options: [
@@ -11,5 +11,8 @@ export default definePlayground<Values>({
     { key: "badges", label: "Rozetler", default: true },
     { key: "variant", label: "Görünüm", default: "floating", kind: "cards", options: [{ value: "floating", label: "yüzen" }, { value: "flat", label: "düz" }] },
     { key: "tint", label: "Baloncuk rengi", default: "brand", kind: "cards", options: [{ value: "brand", label: "sekme rengi" }, { value: "accent", label: "tema vurgusu" }] },
+    { key: "bubble", label: "Aktif sekme baloncuğu", default: true },
+    { key: "ring", label: "Oluştur düğmesi halkası", default: "hadi", visibleWhen: (v) => v.create, options: [{ value: "hadi", label: "dört HADİ rengi" }, { value: "accent", label: "tema vurgusu" }, { value: "off", label: "yok" }] },
+    { key: "motion", label: "Hareket", default: true },
   ],
 });

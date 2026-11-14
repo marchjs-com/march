@@ -15,14 +15,25 @@ The mobile tab bar: a colored bubble slides to the active tab, tabs carry count 
 | `onCreate` | `() => void` | | shows the Create button in the middle slot; with `createActions` it runs on a long press |
 | `createActions` | `BottomNavAction[]` (live) | | the Create button opens a menu: `{ id, label, icon, desc, color, badge, disabled, hidden, run }` |
 | `createMenu` | `"fan" \| "stack" \| "sheet"` | `"fan"` | round buttons on an arc · pills above the button · a list from the bottom |
-| `createTitle` | `string` | "Create" | the menu's name (the sheet's heading) |
+| `createTitle` | `string` or `false` | "Create" | the menu's name (the sheet's heading); `false`: no heading |
+| `createHandle` | `boolean` | `true` | the grab handle on top of the sheet menu |
 | `onAction` | `(id) => void` | | called with the picked action (after its `run`) |
 | `createLabel`, `createIcon` | | "Create", plus | |
-| `ring` | CSS colors | the four HADİ colors | ring of the Create button (a theme's brand tokens win) |
+| `ring` | color tokens / CSS colors, or `false` | the four HADİ colors | ring of the Create button (a theme's brand tokens win); `false`: no ring |
+| `bubble` | `boolean` | `true` | the colored bubble behind the active tab; `false`: the active tab keeps its color only |
+| `motion` | `boolean` | `true` | `false`: no bubble slide, icon pop, bounce, ring turn or menu fly-out |
 | `labels` | `boolean` | `true` | hidden labels stay the accessible name; very narrow bars hide them too |
 | `variant` | `floating` `flat` | `floating` | flat runs edge to edge and keeps the safe area |
 | `tint` | `brand` `accent` | `brand` | brand: each tab's own color (the four HADİ colors in turn) |
 | `label`, `class` | | "Main" | landmark name |
+
+Every part can be turned off or replaced: icons come from the items (`icon`, `activeIcon`), the Create button from
+`createIcon` / `createLabel`.
+
+```tsx
+<BottomNav items={tabs} value={$tab} onCreate={compose} ring={["primary", "brand-gold"]} bubble={false} motion={false} />
+<BottomNav items={tabs} value={$tab} createActions={actions} createMenu="sheet" createTitle={false} createHandle={false} ring={false} />
+```
 
 ## Accessibility
 

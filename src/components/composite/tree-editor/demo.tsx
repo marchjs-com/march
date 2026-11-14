@@ -29,12 +29,15 @@ const DATA: Record<string, { value: unknown; schema: JsonSchema }> = {
   },
 }
 
-export default function TreeEditorDemo(props: { values: { data: string; schema: boolean; search: boolean; expand: number; readonly: boolean } }) {
+export default function TreeEditorDemo(props: { values: { data: string; schema: boolean; search: boolean; expand: number; readonly: boolean; status: boolean; typeBadges: boolean; actions: string; ownLabels: boolean } }) {
   return <div class="sc-ed-one">
     {() => {
       const d = DATA[props.values.data] ?? DATA.config!
       const value = signal(d.value)
-      return <TreeEditor value={value} schema={props.values.schema ? d.schema : undefined} search={props.values.search} expand={props.values.expand} readonly={props.values.readonly} label="HADİ verisi" />
+      const v = props.values
+      const parts = { status: v.status, typeBadges: v.typeBadges, actions: v.actions === "none" ? false : v.actions === "add" ? ["add"] as const : true }
+      const labels = v.ownLabels ? { valid: "Her şey yolunda", problems: (n: number) => `${n} düzeltilecek yer`, search: "Ayarlarda ara", items: (n: number) => `${n} kayıt`, fields: (n: number) => `${n} ayar` } : undefined
+      return <TreeEditor value={value} schema={v.schema ? d.schema : undefined} search={v.search} expand={v.expand} readonly={v.readonly} label="HADİ verisi" {...parts} labels={labels} />
     }}
   </div>
 }

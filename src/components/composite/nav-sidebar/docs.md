@@ -27,6 +27,20 @@ featured items at the top, a collapsible icon rail and a resizable width, all re
 | `resizable`, `minWidth`, `maxWidth`, `collapseBelow` | boolean, px | `false`, 200, 480 | drag grip; narrower than `collapseBelow` switches to the rail |
 | `storageKey`, `persist` | string, boolean | `"hm.sidebar"` | where open categories, recents and width are kept |
 | `placeholder`, `label` | string | `t` texts | search placeholder, landmark name |
+| `search` | boolean | `true` | the search box (`false` also drops its shortcut) |
+| `headings` | boolean | `true` | the "Recent" and "Categories" headings |
+| `expandAll` | boolean | `true` | the "Expand all / Collapse all" button |
+| `groupCounts` | boolean | `true` | the item count beside each category name |
+| `labels` | object | `t` texts | `search`, `clearSearch`, `noMatches`, `results`, `recent`, `categories`, `expandAll`, `collapseAll`, `menu`, `expandSidebar`, `collapseSidebar`, `resize` (strings or accessors), `showUnder(label)`, `hideUnder(label)` |
+| `width`, `onResize` | px / CSS length, `(px) => void` | 17.5rem | starting width; called while resizing |
+| `groupIcons` | `{ [group]: icon }` | — | icons beside category names |
+| `shortcut`, `palette` | string, boolean | `"mod+k"`, `true` | the search shortcut; `false` keeps the items out of the command palette |
+| `class` | class | — | on the wrapper (`hm-sb-wrap`); parts: `hm-sb-head`, `-title`, `-search`, `-section`, `-all`, `-group`, `-gbtn`, `-count`, `-item`, `-badge`, `-foot`, `-resize` |
+
+```tsx
+<NavSidebar items={items} search={false} headings={false} groupCounts={false} />     // a plain list of categories
+<NavSidebar items={items} labels={{ recent: "Last opened", categories: "Sections", expandAll: "Open all", noMatches: "Nothing here" }} />
+```
 
 ### Nested items
 
