@@ -33,3 +33,14 @@ test("EasingCurveEditor: handles as sliders, keyboard edits, presets, registers 
   assert.equal(el.querySelector(".hm-ec-css").textContent, "cubic-bezier(0, 0, 1, 1)");
   dispose();
 });
+
+test("name: both placeholders filled, even inside literal braces", async () => {
+  const { format } = await import("../../../core/i18n.ts");
+  assert.equal(format('a "{0}" { b: "{1}" }', { 0: "x", 1: "y" }), 'a "x" { b: "y" }');
+  const host = document.createElement("div");
+  const dispose = render(() => h(EasingCurveEditor, { value: "ease-out", name: "snap" }), host);
+  const p = host.querySelector(".hm-ec-name");
+  assert.ok(p && !p.textContent.includes("{1}"), p?.textContent);
+  assert.match(p.textContent, /easing: "snap"/);
+  dispose();
+});

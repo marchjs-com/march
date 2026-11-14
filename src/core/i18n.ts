@@ -109,10 +109,10 @@ export function format(msg: string, vals: Record<string, unknown>, loc: string =
     if (c !== "{") { out += c; continue; }
     const e = close(msg, i);
     if (e < 0) { out += msg.slice(i); break; }
-    const inner = msg.slice(i + 1, e);
+    // not a placeholder (a literal brace): keep it and read on, so placeholders inside are still filled
+    const m = /^\s*([\w.]+)\s*(?:,\s*(\w+)\s*(?:,\s*([\s\S]*))?)?$/.exec(msg.slice(i + 1, e));
+    if (!m) { out += c; continue; }
     i = e;
-    const m = /^\s*([\w.]+)\s*(?:,\s*(\w+)\s*(?:,\s*([\s\S]*))?)?$/.exec(inner);
-    if (!m) { out += `{${inner}}`; continue; }
     const [, name = "", type, rest = ""] = m;
     const v = vals[name];
     if (!type) { out += v === undefined ? `{${name}}` : String(v); continue; }
