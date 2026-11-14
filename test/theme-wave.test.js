@@ -30,6 +30,20 @@ test("setRestyleTransition: wraps setTheme / setColorTheme / setAccent; apply ru
   U.setTheme("system"); U.setAccent("primary");
 });
 
+test("setRestyleTransition prepare: runs before a setter changes anything (the old choice still in place), only for a new value", () => {
+  const seen = [];
+  const off = U.setRestyleTransition((apply) => apply(), () => seen.push([U.theme.peek(), U.colorTheme(), root.getAttribute("data-theme")]));
+  U.setTheme("dark");
+  assert.deepEqual(seen, [["system", seen[0][1], null]], "prepared while the old mode was still set");
+  U.setTheme("dark");
+  assert.equal(seen.length, 1, "the same value again: nothing to prepare");
+  U.setAccent("brand-blue");
+  assert.equal(seen.length, 2);
+  off();
+  U.setTheme("system"); U.setAccent("primary");
+  assert.equal(seen.length, 2, "removed with its transition");
+});
+
 test("themeWave: without View Transitions the change lands at once; with them it runs inside one, marked on <html>", async () => {
   let ran = 0;
   await M.themeWave(() => { ran++; });
@@ -124,7 +138,7 @@ test("painted wave: a live veil over the live page; the page takes the new look 
   globalThis.CSS = { supports: () => true };
   globalThis.getComputedStyle = () => ({ length: 1, 0: "--m-bg", colorScheme: "light", backgroundColor: "#fff", getPropertyValue: () => "#fff" });
   let observed = null;
-  globalThis.MutationObserver = class { constructor(cb) { observed = cb; } observe() {} disconnect() {} };
+  globalThis.MutationObserver = class { constructor(cb) { observed = cb; } observe() {} disconnect() {} takeRecords() { return []; } };
   const main = document.createElement("main"); main.id = "m";
   const para = document.createElement("p"); para.className = "t"; para.textContent = "old";
   main.appendChild(para); document.body.appendChild(main);
@@ -142,10 +156,13 @@ test("painted wave: a live veil over the live page; the page takes the new look 
   assert.equal(veil.querySelector("[id]"), null, "no duplicate ids in the copy");
   assert.equal(veil.querySelector(".t")?.textContent, "old");
   assert.equal(veil.style.getPropertyValue("--m-bg"), "#fff", "the old look's tokens are on the veil");
-  // live: a change of the page shows in the copy
+  // live: a change of the page shows in the copy (after the first moments, which belong to the theme change itself)
+  observed([{ type: "attributes", target: para, attributeName: "class" }]);
+  await tick(150);
   para.setAttribute("class", "t is-on");
   observed([{ type: "attributes", target: para, attributeName: "class" }]);
   assert.equal(veil.querySelector(".t").getAttribute("class"), "t is-on", "the copy follows the page");
+  // (the theme change's own update a moment ago was not copied: the first observation was dropped)
   const run = anims.find((a) => a.o?.duration === 2200);
   assert.ok(run, "the pour runs for 2200 ms");
   run.done(); await wave;

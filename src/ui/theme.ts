@@ -19,7 +19,7 @@ import { Segmented } from "../components/forms/segmented/index.ts";
 import { Select } from "../components/forms/select/index.ts";
 import { OptionList } from "../components/forms/option-list/index.ts";
 import { Alert } from "../components/feedback/alert/index.ts";
-import { restyleInstantly } from "./restyle.ts";
+import { restyleInstantly, restyleAhead } from "./restyle.ts";
 
 // a live prop for h(Component, …): it becomes a getter
 const live = reactive as <T>(fn: () => T) => T;
@@ -35,7 +35,7 @@ const readTheme = (): ThemeMode => { const v = stored(THEME_KEY); return isMode(
 const mode = signal<ThemeMode>(readTheme(), { name: "theme" });
 
 // a page-wide restyle lands in one step (restyle.ts); a transition such as the theme wave can be put around it
-export { restyleInstantly, setRestyleTransition, type RestyleTransition } from "./restyle.ts";
+export { restyleInstantly, setRestyleTransition, restyleAhead, type RestyleTransition } from "./restyle.ts";
 
 function apply(v: ThemeMode): void {
   const root = globalThis.document?.documentElement;
@@ -56,6 +56,7 @@ export const theme: Theme = Object.assign((): ThemeMode => mode(), {
   peek: (): ThemeMode => mode.peek(),
   set: (v: ThemeMode): ThemeMode => {
     if (!isMode(v)) throw new Error(`March: theme must be one of ${MODES.join(", ")}.`);
+    if (v !== mode.peek()) restyleAhead();
     mode.set(v);
     store(THEME_KEY, v);
     apply(v);
@@ -117,6 +118,7 @@ applyName(themeName.peek());
 export const colorTheme = (): string => themeName();
 /** Switch the color theme (persisted under localStorage "m.colorTheme"); its stylesheet is loaded on demand. */
 export function setColorTheme(id: string): string {
+  if (id !== themeName.peek()) restyleAhead();
   themeName.set(id);
   store(THEME_NAME_KEY, id);
   applyName(id);

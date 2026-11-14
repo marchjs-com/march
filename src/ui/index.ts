@@ -34,7 +34,7 @@ export { Overlay, quietMedia } from "./overlay.ts";
 export type { OverlayProps, OverlayEffect, OverlayFit, DrawFn, DrawContext } from "./overlay.ts";
 export { accent, setAccent, AccentPicker, ACCENT_CHOICES } from "./accent.ts";
 export type { AccentPickerProps } from "./accent.ts";
-export { theme, setTheme, resolvedTheme, ThemeToggle, LocaleSelect, UpdateBanner, colorTheme, setColorTheme, colorThemes, registerThemes, loadTheme, setThemeBase, ThemePicker, ThemeSwatch, ThemePreview, setRestyleTransition, type RestyleTransition } from "./theme.ts";
+export { theme, setTheme, resolvedTheme, ThemeToggle, LocaleSelect, UpdateBanner, colorTheme, setColorTheme, colorThemes, registerThemes, loadTheme, setThemeBase, ThemePicker, ThemeSwatch, ThemePreview, setRestyleTransition, restyleAhead, type RestyleTransition } from "./theme.ts";
 export type { ThemeInfo, ThemePickerProps, Theme, ThemeMode, ThemeToggleProps, LocaleSelectProps, LocaleOption, UpdateBannerProps } from "./theme.ts";
 export { fold, score, rank, distance } from "./fold.ts";
 export type { Keywords, RankFields, Ranked } from "./fold.ts";

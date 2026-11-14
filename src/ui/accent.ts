@@ -13,6 +13,7 @@ import { COLOR_TOKENS, type ColorToken } from "../theme/colors.ts";
 import { OptionList } from "../components/forms/option-list/index.ts";
 import { Swatch } from "../components/forms/swatch/index.ts";
 import { ThemeSwatch, colorTheme, restyleInstantly } from "./theme.ts";
+import { restyleAhead } from "./restyle.ts";
 
 const KEY = "m.accent";
 /** The current app accent ("primary" = the theme's own). */
@@ -21,6 +22,7 @@ export const accent = signal<ColorToken>((load<string | null>(KEY, null) as Colo
 /** Recolor the app: a color token, or "primary" / null for the theme's own primary. Remembered across visits. */
 export function setAccent(token: ColorToken | null | undefined): ColorToken {
   const next = (token && (COLOR_TOKENS as readonly string[]).includes(token) ? token : "primary") as ColorToken;
+  if (next !== accent.peek()) restyleAhead();
   accent.set(next);
   save(KEY, next === "primary" ? null : next);
   const html = globalThis.document?.documentElement;

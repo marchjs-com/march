@@ -155,16 +155,16 @@ export function dripState(w: number, h: number, rnd: Rnd = Math.random): DripSta
   const pour = w * (0.25 + 0.5 * rnd());
   const points = Array.from({ length: k + 1 }, (_, j) => {
     const x = -pad + j * dx + (j && j < k ? (rnd() - 0.5) * dx * 0.3 : 0), far = Math.abs(x - pour) / w;
-    const start = 0.02 + far * 0.4 + 0.04 * rnd();
-    return { x, start, end: Math.min(0.92, start + 0.32 + far * 0.3 + 0.08 * rnd()) };
+    const start = 0.03 + far * 0.3 + 0.04 * rnd();
+    return { x, start, end: Math.min(0.95, start + 0.55 + far * 0.2 + 0.06 * rnd()) };
   });
   // the drips sit between edge points (the segment index), each with its own reach and pace; the pour itself is the
   // first: a thick stream that runs down fast from the top
   const dripsAt: number[] = [], drips: { seg: number; reach: number; from: number; grow: number; neck: number; drop: number; shift: number }[] = [];
   const at = Math.max(0, points.findIndex((p, j) => j < k && points[j + 1]!.x > pour));
   const a = points[at]!.x, b = points[at + 1]!.x;
-  const thick = dx * (0.42 + 0.12 * rnd());
-  drips.push({ seg: at, reach: h * 1.05, from: 0, grow: 0.3, neck: thick, drop: thick * 1.35, shift: (pour - a) / (b - a) - 0.5 });
+  const thick = dx * (0.36 + 0.1 * rnd());
+  drips.push({ seg: at, reach: h * 1.05, from: 0, grow: 0.62, neck: thick, drop: thick * 1.35, shift: clamp((pour - a) / (b - a) - 0.5, -0.15, 0.15) });
   dripsAt.push(at);
   for (let j = 0; j < k; j++) {
     if (j === at || rnd() < 0.4) continue;
@@ -174,17 +174,19 @@ export function dripState(w: number, h: number, rnd: Rnd = Math.random): DripSta
   }
   const reach = h + pad + Math.max(0, ...drips.map((d) => d.drop * 2));
   // fast at first, slowing as the paint runs out (an ease out)
-  const level = (p: { start: number; end: number }, t: number): number => -pad + (reach + pad) * (1 - (1 - clamp((t - p.start) / (p.end - p.start), 0, 1)) ** 2.2);
+  const level = (p: { start: number; end: number }, t: number): number => -pad + (reach + pad) * (1 - (1 - clamp((t - p.start) / (p.end - p.start), 0, 1)) ** 1.6);
   return {
     w, h, dripsAt,
     at: (t) => {
       const edge = points.map((p) => [p.x, level(p, t)] as const);
+      // (the drips read the edge where they leave it)
       return {
         edge,
         drips: drips.map((d) => {
           const a = edge[d.seg]!, b = edge[d.seg + 1]!, f = 0.5 + d.shift;
-          const run = 1 - (1 - clamp((t - d.from) / d.grow, 0, 1)) ** 2;
-          return { x: a[0] + (b[0] - a[0]) * f, y: a[1] + (b[1] - a[1]) * f, length: d.reach * run, neck: d.neck * (0.6 + 0.4 * run), drop: d.drop * clamp(run * 3, 0, 1) };
+          // a drip gathers, runs, and slows as it thins (smooth at both ends); it leaves the edge, never above the page
+          const p = clamp((t - d.from) / d.grow, 0, 1), run = p * p * (3 - 2 * p);
+          return { x: a[0] + (b[0] - a[0]) * f, y: Math.max(0, a[1] + (b[1] - a[1]) * f), length: d.reach * run, neck: d.neck * (0.6 + 0.4 * run), drop: d.drop * clamp(run * 3, 0, 1) };
         }),
       };
     },
@@ -194,28 +196,34 @@ export function dripState(w: number, h: number, rnd: Rnd = Math.random): DripSta
 const n1 = (v: number): string => String(Math.round(v * 10) / 10);
 
 /**
- * The paint's outline at a moment as a path: the top (above the screen), down the right side, then the lower edge from
- * right to left in smooth curves (flat tangents at each point: rounded lobes), through every drip on the way (a curve
- * into the neck, down to the drop, round it, up the neck, a curve out), up the left side. Always the same commands,
- * so the browser tweens it between keyframes. `dx`, `dy` move it, `by` grows it (the shine's and shadow's copies).
+ * The paint's outline at a moment as a path: the top (above the screen), then its lower edge from right to left
+ * through every point of the edge and, on the way, every drip (out of the edge in a soft shoulder, down the neck,
+ * round the drop, up the neck, back in), all as one smooth curve through those points (a Catmull-Rom spline: no
+ * corner anywhere, a liquid has none). Always the same commands, so the browser tweens it between keyframes. `dx`,
+ * `dy` move it (the shine's copy).
  */
-export function liquidPath(s: DripState, t: number, dx = 0, dy = 0, by = 0): string {
+export function liquidPath(s: DripState, t: number, dx = 0, dy = 0): string {
   const { edge, drips } = s.at(t);
-  const X = (v: number): string => n1(v + dx), Y = (v: number): string => n1(v + dy + by);
-  const top = -60;
-  let d = `M${X(edge[0]![0])} ${n1(top)}L${X(edge[edge.length - 1]![0])} ${n1(top)}L${X(edge[edge.length - 1]![0])} ${Y(edge[edge.length - 1]![1])}`;
-  for (let j = edge.length - 1; j > 0; j--) {
-    const [x1, y1] = edge[j]!, [x0, y0] = edge[j - 1]!, third = (x1 - x0) / 3;
-    const di = s.dripsAt.indexOf(j - 1);
-    if (di < 0) { d += `C${X(x1 - third)} ${Y(y1)} ${X(x0 + third)} ${Y(y0)} ${X(x0)} ${Y(y0)}`; continue; }
-    const q = drips[di]!, half = q.neck / 2 + by, fillet = Math.min(q.neck * 1.2, third), r = q.drop / 2 + by;
-    const bottom = q.y + q.length;
-    // into the neck (right side), down to the drop, round the drop, up the neck (left side), out to the next point
-    d += `C${X(x1 - third)} ${Y(y1)} ${X(q.x + half + fillet)} ${Y(q.y)} ${X(q.x + half)} ${Y(q.y + fillet)}`;
-    d += `C${X(q.x + half)} ${Y(q.y + q.length * 0.5)} ${X(q.x + half * 0.8)} ${Y(bottom - r * 1.2)} ${X(q.x + r)} ${Y(bottom)}`;
-    d += `C${X(q.x + r)} ${Y(bottom + r * 1.4)} ${X(q.x - r)} ${Y(bottom + r * 1.4)} ${X(q.x - r)} ${Y(bottom)}`;
-    d += `C${X(q.x - half * 0.8)} ${Y(bottom - r * 1.2)} ${X(q.x - half)} ${Y(q.y + q.length * 0.5)} ${X(q.x - half)} ${Y(q.y + fillet)}`;
-    d += `C${X(q.x - half - fillet)} ${Y(q.y)} ${X(x0 + third)} ${Y(y0)} ${X(x0)} ${Y(y0)}`;
+  const pts: [number, number][] = [];
+  for (let j = edge.length - 1; j >= 0; j--) {
+    pts.push([edge[j]![0], edge[j]![1]]);
+    const di = j > 0 ? s.dripsAt.indexOf(j - 1) : -1;
+    if (di < 0) continue;
+    // the drip stays within its stretch of the edge (wider, the outline would fold over itself)
+    const q = drips[di]!, room = Math.max(0, Math.min(q.x - edge[j - 1]![0], edge[j]![0] - q.x) * 0.9);
+    const n = Math.min(q.neck / 2, room * 0.6), f = Math.min(q.neck * 0.9, room - n), r = Math.min(Math.max(n, q.drop / 2), room), L = q.length, y = q.y;
+    // grows from nothing: a drip that has not started is all at one point of the edge
+    const k = L > 0 ? 1 : 0;
+    pts.push([q.x + (n + f) * k, y], [q.x + n * k, y + L * 0.45], [q.x + r * k, y + L], [q.x + r * 0.7 * k, y + L + r * 0.75 * k],
+      [q.x, y + L + r * k], [q.x - r * 0.7 * k, y + L + r * 0.75 * k], [q.x - r * k, y + L], [q.x - n * k, y + L * 0.45], [q.x - (n + f) * k, y]);
+  }
+  const P = (i: number): [number, number] => pts[clamp(i, 0, pts.length - 1)]!;
+  const X = (v: number): string => n1(v + dx), Y = (v: number): string => n1(v + dy);
+  const first = pts[0]!, last = pts[pts.length - 1]!;
+  let d = `M${X(last[0])} -60L${X(first[0])} -60L${X(first[0])} ${Y(first[1])}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
+    d += `C${X(p1[0] + (p2[0] - p0[0]) / 6)} ${Y(p1[1] + (p2[1] - p0[1]) / 6)} ${X(p2[0] - (p3[0] - p1[0]) / 6)} ${Y(p2[1] - (p3[1] - p1[1]) / 6)} ${X(p2[0])} ${Y(p2[1])}`;
   }
   return `${d}Z`;
 }
@@ -299,13 +307,22 @@ function masked(el: HTMLElement, layers: readonly Layer[], full: boolean): void 
   el.style.setProperty("mask-composite", m.composite);
 }
 
-/** Runs a painted wave: the veil goes up, the page takes the new look under it, the paint eats the veil away. */
-export async function paintWave(doc: Document, change: () => void, o: PaintOptions): Promise<void> {
+/** A copy of the page in the old look, taken before the look changes (captureVeil), waiting for its wave. */
+export interface Captured { veil: HTMLElement; w: number; h: number; release(after: number): void; stop(): void; seal(): void }
+
+/**
+ * Takes the old look now: the veil goes up over the page (still whole: it looks exactly like the page) with a live
+ * copy of it. Taken before a theme setter changes anything on the page (hadi-march/ui calls the restyle transition's
+ * prepare first), so even the controls that show the choice are in their old state on the copy. Changes of the page
+ * are not copied until the wave runs (`release`): they belong to the new look. Null when the page's styles are not
+ * ready yet (the wave then takes its copy when it runs). A copy nobody runs is taken down after a few seconds.
+ */
+export function captureVeil(doc: Document): Captured | null {
   const root = doc.documentElement, body = doc.body;
   const win = globalThis as unknown as Window;
-  if (!body || typeof win.getComputedStyle !== "function" || !(globalThis as { CSS?: { supports?: (p: string, v: string) => boolean } }).CSS?.supports?.("mask-composite", "subtract")) { change(); return Promise.resolve(); }
-  // the page's styles for the copy (made once per sheet; installThemeWave makes them ahead)
-  const sheets = typeof doc.body.attachShadow === "function" ? await shadowSheets(doc) : null;
+  if (!body || typeof win.getComputedStyle !== "function" || !(globalThis as { CSS?: { supports?: (p: string, v: string) => boolean } }).CSS?.supports?.("mask-composite", "subtract")) return null;
+  const sheets = typeof body.attachShadow === "function" ? shadowSheetsNow(doc) : [];
+  if (!sheets) return null;
   veil?.remove();
   const w = win.innerWidth || root.clientWidth, h = win.innerHeight || root.clientHeight;
   // the old look: every custom property of the root as it is now, its colour scheme and background
@@ -318,18 +335,47 @@ export async function paintWave(doc: Document, change: () => void, o: PaintOptio
   v.classList.add("m-wave-veil");
   v.setAttribute("aria-hidden", "true");
   v.inert = true;
-  for (let i = 0; i < cs.length; i++) { const n = cs[i]!; if (n.startsWith("--")) v.style.setProperty(n, cs.getPropertyValue(n)); }
+  const had = new Set<string>();
+  for (let i = 0; i < cs.length; i++) { const n = cs[i]!; if (n.startsWith("--")) { had.add(n); v.style.setProperty(n, cs.getPropertyValue(n)); } }
   v.style.setProperty("color-scheme", cs.colorScheme);
   v.style.setProperty("background-color", cs.backgroundColor);
   // (without shadow trees the copy sits in the veil itself, dressed by the new look's root rules)
   let shadow: ShadowRoot | HTMLElement = v;
-  if (sheets) { shadow = v.attachShadow({ mode: "open" }); shadow.adoptedStyleSheets = sheets; }
+  if (typeof v.attachShadow === "function" && sheets.length) { shadow = v.attachShadow({ mode: "open" }); shadow.adoptedStyleSheets = [...sheets, still()]; }
   const later: (() => void)[] = [], twins: Twins = new WeakMap();
   const page = copyPage(body, w, h, twins, later);
   // the page's own box (the viewport less its scrollbar) where it is scrolled to, so every line breaks where it does
   const box = body.getBoundingClientRect();
   for (const [k, val] of [["position", "absolute"], ["margin", "0"], ["overflow", "hidden"], ["top", px(-win.scrollY)], ["left", px(-win.scrollX)], ["width", px(box.width)], ["height", px(box.height)]] as const) page.style.setProperty(k, val);
   shadow.append(page);
+  root.append(v);
+  veil = v;
+  for (const f of later) f();
+  syncAnimations(doc, twins);
+  const live = mirror(body, page, twins);
+  // nobody ran it (the look did not change after all): taken down
+  const idle = setTimeout(() => cap.stop(), 4000);
+  const cap: Captured = {
+    veil: v, w, h,
+    release: (after) => { clearTimeout(idle); live.release(after); },
+    // a property the new look defines and the old one did not would reach the copy from the real root: unset here
+    seal: () => { const now = win.getComputedStyle(root); for (let i = 0; i < now.length; i++) { const n = now[i]!; if (n.startsWith("--") && !had.has(n)) v.style.setProperty(n, "initial"); } },
+    stop: () => { clearTimeout(idle); live.stop(); if (veil === v) veil = null; v.remove(); },
+  };
+  return cap;
+}
+
+/** Runs a painted wave: the veil goes up (or was taken already), the page takes the new look under it, the paint
+ *  eats the veil away. */
+export async function paintWave(doc: Document, change: () => void, o: PaintOptions, taken?: Captured | null): Promise<void> {
+  let cap = taken && taken.veil.isConnected ? taken : null;
+  if (!cap) {
+    // the page's styles for the copy (made once per sheet; installThemeWave makes them ahead)
+    if (typeof doc.body?.attachShadow === "function") await shadowSheets(doc);
+    cap = captureVeil(doc);
+  }
+  if (!cap) { change(); return; }
+  const { veil: v, w, h } = cap;
   const runs: [Element, Keyframe[]][] = [];
   let gloss: Element | null = null;
   if (o.shape === "drip") {
@@ -342,19 +388,18 @@ export async function paintWave(doc: Document, change: () => void, o: PaintOptio
     masked(v, layers, true);
     runs.push([v, paintFrames(layers)]);
   }
-  root.append(v);
-  if (gloss) root.append(gloss);
-  veil = v;
-  for (const f of later) f();
-  syncAnimations(doc, twins);
-  const stop = mirror(body, page, twins);
-  // the page takes the new look under the veil at once
+  if (gloss) doc.documentElement.append(gloss);
+  // the page takes the new look under the veil at once; what the change itself does to the page in its first moments
+  // stays off the copy, which follows the page from then on
   change();
+  cap.seal();
+  cap.release(120);
   // the pour takes its time (thick paint); the sprays are quicker
   const timing = { duration: o.duration ?? (o.shape === "drip" ? 2200 : 1600), easing: "linear", fill: "forwards" as const };
   const anims = runs.map(([el, frames]) => animateEl(el, frames, timing));
+  const done = cap;
   return new Promise<void>((resolve) => {
-    const end = (): void => { stop(); if (veil === v) veil = null; v.remove(); gloss?.remove(); resolve(); };
+    const end = (): void => { done.stop(); gloss?.remove(); resolve(); };
     const lead = anims[0];
     if (lead) { lead.addEventListener("finish", end); lead.addEventListener("cancel", end); } else end();
   });
@@ -367,6 +412,7 @@ export async function paintWave(doc: Document, change: () => void, o: PaintOptio
  * not at hand, or no longer matches its rules (rules added by script), is written from its rules instead.
  */
 const shadowCopies = new WeakMap<CSSStyleSheet, Promise<CSSStyleSheet | null>>();
+const readyCopies = new WeakMap<CSSStyleSheet, CSSStyleSheet | null>();
 function shadowCopy(sheet: CSSStyleSheet): Promise<CSSStyleSheet | null> {
   let made = shadowCopies.get(sheet);
   if (made) return made;
@@ -381,7 +427,7 @@ function shadowCopy(sheet: CSSStyleSheet): Promise<CSSStyleSheet | null> {
     if (t != null) { copy.replaceSync(absoluteUrls(hostCss(t), sheet.href ?? globalThis.location?.href ?? "")); if (copy.cssRules.length === rules) return copy; }
     copy.replaceSync(ruleText(sheet.cssRules));
     return copy;
-  }).catch(() => null);
+  }).catch(() => null).then((c) => { readyCopies.set(sheet, c); return c; });
   shadowCopies.set(sheet, made);
   return made;
 }
@@ -393,9 +439,44 @@ async function shadowSheets(doc: Document): Promise<CSSStyleSheet[]> {
   return [...copies.filter((x): x is CSSStyleSheet => !!x), ...(doc.adoptedStyleSheets ?? [])];
 }
 
-/** Makes the veil's style sheets ahead, so the first wave does not wait for them. */
+/** The copy shows each value at once: a CSS transition would slide it in from another (the page's running ones are
+ *  copied as animations on their own clock, syncAnimations). */
+let stillSheet: CSSStyleSheet | null = null;
+const still = (): CSSStyleSheet => { if (!stillSheet) { stillSheet = new CSSStyleSheet(); stillSheet.replaceSync("*, *::before, *::after { transition: none !important; }"); } return stillSheet; };
+
+/** The copies, now (a sheet not made yet is written from its rules meanwhile). */
+function shadowSheetsNow(doc: Document): CSSStyleSheet[] | null {
+  const out: CSSStyleSheet[] = [];
+  for (const sheet of doc.styleSheets ?? []) {
+    if (sheet.disabled) continue;
+    if (!readyCopies.has(sheet)) {
+      // not made yet (a sheet that came late): written from its rules for now, made properly for the next time
+      void shadowCopy(sheet);
+      try { const quick = new CSSStyleSheet(sheet.media?.mediaText ? { media: sheet.media.mediaText } : {}); quick.replaceSync(ruleText(sheet.cssRules)); out.push(quick); } catch { /* another origin */ }
+      continue;
+    }
+    const c = readyCopies.get(sheet);
+    if (c) out.push(c);
+  }
+  return [...out, ...(doc.adoptedStyleSheets ?? [])];
+}
+
+/** Makes the veil's style sheets ahead, so no wave waits for them, also for the sheets that come later (a colour
+ *  theme's stylesheet, a page's lazy styles). */
+let watching = false;
 export function prepareVeil(doc: Document): void {
-  if (typeof doc.body?.attachShadow === "function") void shadowSheets(doc);
+  if (typeof doc.body?.attachShadow !== "function") return;
+  void shadowSheets(doc);
+  const MO = (globalThis as { MutationObserver?: typeof MutationObserver }).MutationObserver;
+  if (watching || !MO) return;
+  watching = true;
+  new MO((list) => {
+    for (const m of list) for (const n of m.addedNodes) {
+      const el = n as HTMLLinkElement | HTMLStyleElement;
+      if (el.tagName === "STYLE" && el.sheet) void shadowCopy(el.sheet);
+      else if (el.tagName === "LINK") { const go = (): void => { if (el.sheet) void shadowCopy(el.sheet); }; if (el.sheet) go(); else el.addEventListener("load", go, { once: true }); }
+    }
+  }).observe(doc.documentElement, { childList: true, subtree: true });
 }
 
 /** Rules about the root made about the veil, in a sheet's text. */
@@ -544,11 +625,12 @@ function pair(s: Node, d: Node, twins: Twins): void {
  * motion engine's animations too, nodes coming and going, field values, scroll places) is made on its twin, and the
  * pictures of canvases are copied every frame (the central clock). Returns the function that stops it.
  */
-function mirror(body: HTMLElement, page: HTMLElement, twins: Twins): () => void {
+function mirror(body: HTMLElement, page: HTMLElement, twins: Twins): { release(after: number): void; stop(): void } {
   const win = globalThis as unknown as Window;
   const MO = (globalThis as { MutationObserver?: typeof MutationObserver }).MutationObserver;
-  if (!MO) return () => undefined;
+  if (!MO) return { release: () => undefined, stop: () => undefined };
   const mo = new MO((list) => {
+    if (settling) return;
     for (const m of list) {
       const t = twins.get(m.target);
       if (!t) continue;
@@ -569,6 +651,9 @@ function mirror(body: HTMLElement, page: HTMLElement, twins: Twins): () => void 
     }
   });
   mo.observe(body, { subtree: true, childList: true, attributes: true, characterData: true });
+  // nothing is copied until the wave runs and its change has settled (those updates belong to the new look)
+  let settling = true, settled: ReturnType<typeof setTimeout> | undefined;
+  const release = (after: number): void => { mo.takeRecords(); settled = setTimeout(() => { mo.takeRecords(); settling = false; }, after); };
   const onValue = (e: Event): void => { const s = e.target as Element, d = twins.get(s); if (d instanceof Element) copyValue(s, d); };
   const onScroll = (e: Event): void => {
     const s = e.target;
@@ -599,5 +684,5 @@ function mirror(body: HTMLElement, page: HTMLElement, twins: Twins): () => void 
       try { g.drawImage(c, 0, 0); } catch { /* tainted or lost */ }
     }
   }, { phase: "render" as never }) : () => undefined;
-  return () => { offFrame(); for (const f of stops) f(); mo.disconnect(); win.removeEventListener("input", onValue, true); win.removeEventListener("change", onValue, true); win.removeEventListener("scroll", onScroll, true); };
+  return { release, stop: () => { clearTimeout(settled); offFrame(); for (const f of stops) f(); mo.disconnect(); win.removeEventListener("input", onValue, true); win.removeEventListener("change", onValue, true); win.removeEventListener("scroll", onScroll, true); } };
 }

@@ -34,7 +34,7 @@ let running = 0;
 const paint = (): Promise<typeof import("./theme-paint.ts")> => import("./theme-paint.ts");
 
 /** Run a restyle as a wave of the new look. Resolves when the wave is over. */
-export function themeWave(change: () => void, o: ThemeWaveOptions = {}): Promise<void> {
+export function themeWave(change: () => void, o: ThemeWaveOptions = {}, taken?: unknown): Promise<void> {
   const doc = globalThis.document as (Document & { startViewTransition?: (cb: () => void) => VT }) | undefined;
   const root = doc?.documentElement;
   if (!doc || !root || reducedNow() || pausedNow()) { change(); return Promise.resolve(); }
@@ -44,7 +44,7 @@ export function themeWave(change: () => void, o: ThemeWaveOptions = {}): Promise
   if (from && "getBoundingClientRect" in from) { const r = from.getBoundingClientRect(); x = r.left + r.width / 2; y = r.top + r.height / 2; }
   else if (from) { x = from.x; y = from.y; }
   const shape = o.shape ?? "circle";
-  if (shape !== "circle") return paint().then((m) => m.paintWave(doc, change, { shape, origin: { x, y }, duration: o.duration }), () => { change(); });
+  if (shape !== "circle") return paint().then((m) => m.paintWave(doc, change, { shape, origin: { x, y }, duration: o.duration }, taken as Parameters<typeof m.paintWave>[3]), () => { change(); });
   if (typeof doc.startViewTransition !== "function") { change(); return Promise.resolve(); }
   // far enough to reach the farthest corner
   const reach = Math.hypot(Math.max(x, w - x), Math.max(y, h - y));
@@ -67,7 +67,12 @@ export function themeWave(change: () => void, o: ThemeWaveOptions = {}): Promise
 export function installThemeWave(o: Omit<ThemeWaveOptions, "origin"> = {}): () => void {
   const view = globalThis.document;
   if (!view) return () => undefined;
-  if (o.shape && o.shape !== "circle") void paint().then((m) => m.prepareVeil(view), () => undefined);
+  // a painted shape: its part and the copy's styles are made ahead; the copy of the old look is taken before a setter
+  // changes anything (prepare), so the controls showing the choice keep their old state on it
+  const painted = !!o.shape && o.shape !== "circle";
+  let part: Awaited<ReturnType<typeof paint>> | null = null, taken: { stop(): void } | null = null;
+  if (painted) void paint().then((m) => { part = m; m.prepareVeil(view); }, () => undefined);
+  const prepare = (): void => { if (!part || reducedNow() || pausedNow()) return; taken?.stop(); taken = part.captureVeil(view); };
   let last: { x: number; y: number; at: number } | null = null;
   const press = (e: Event): void => { const p = e as PointerEvent; last = { x: p.clientX, y: p.clientY, at: Date.now() }; };
   const key = (e: Event): void => {
@@ -79,6 +84,6 @@ export function installThemeWave(o: Omit<ThemeWaveOptions, "origin"> = {}): () =
   view.addEventListener("pointerdown", press, { capture: true, passive: true });
   view.addEventListener("keydown", key, { capture: true, passive: true });
   // a press counts for a while: a theme's stylesheet may still be loading when the choice is made
-  const off = setRestyleTransition((apply) => { void themeWave(apply, { ...o, origin: last && Date.now() - last.at < 5000 ? last : null }); });
+  const off = setRestyleTransition((apply) => { const t = taken; taken = null; void themeWave(apply, { ...o, origin: last && Date.now() - last.at < 5000 ? last : null }, t); }, painted ? prepare : undefined);
   return () => { off(); view.removeEventListener("pointerdown", press, { capture: true }); view.removeEventListener("keydown", key, { capture: true }); };
 }
