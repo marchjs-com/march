@@ -750,6 +750,10 @@
   "Particles": "İsteğe bağlı bağlantı çizgileri ve imleç çekimi olan yüzen parçacıklar. `<Particles count={80} links={120} speed={0.3} color=\"var(--m-primary)\" interactive class=\"m-fx-fill\" />`",
   "spotlight": "Bir öğe üzerinde imleci izleyen radyal ışık (--m-spot-x/--m-spot-y ayarlar). `use:spotlight`"
  },
+ "hadi-march/props": {
+  "mProps": "Ortak (`m:`) prop'ları elle uygular: `mProps(h(Card, props), { \"user-select\": true })`. Öğeye ya da bileşenin kök öğelerine yazar; değer fonksiyon olabilir (canlı).",
+  "registerMProp": "Yeni bir ortak prop ekler: `registerMProp(\"tone\", (el, v) => …)` ile `m:tone` her öğede ve bileşende çalışır."
+ },
  "hadi-march/store": {
   "derive": "Türetilmiş değer (computed): `const total = derive(() => app.cart.items.reduce(…))`.",
   "history": "Bir depo düğümü için geri al/yinele (değişiklik grubu başına anlık görüntü).",

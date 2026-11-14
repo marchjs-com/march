@@ -34,6 +34,7 @@
     "./fx": "./src/fx/index.ts",
     "./fx/fx.css": "./src/fx/fx.css",
     "./store": "./src/store/index.ts",
+    "./props": "./src/props/index.ts",
     "./channel": "./src/channel/index.ts",
     "./behaviors/drag": "./src/behaviors/drag/index.ts",
     "./behaviors/roving-focus": "./src/behaviors/roving-focus/index.ts",
@@ -164,6 +165,7 @@
     "./src/errors/index.ts",
     "./src/managers/*/index.ts",
     "./src/managers/*/ui.ts",
-    "./src/icons/packs.ts"
+    "./src/icons/packs.ts",
+    "./src/props/index.ts"
   ]
 }

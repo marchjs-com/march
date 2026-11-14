@@ -32,6 +32,10 @@ interface MarchDomAttributes {
   [key: `consent:${string}`]: Reactive<boolean> | undefined;
   /** CommandManager id: click runs it; disabled / hidden / aria-busy follow it. Value: true or the arguments. */
   [key: `command:${string}`]: unknown;
+  /** Common prop: the element and everything inside it cannot be selected (`={false}`: selectable again inside a blocked subtree). */
+  "m:user-select"?: Reactive<boolean | null | undefined>;
+  /** Common props (work on every element and component; add one with registerMProp). */
+  [key: `m:${string}`]: unknown;
   [key: `data-${string}`]: unknown;
   [key: `aria-${string}`]: unknown;
   [attr: string]: unknown;
@@ -47,6 +51,10 @@ declare global {
       [key: `bind:${string}`]: unknown;
       [key: `use:${string}`]: unknown;
       [key: `transition:${string}`]: unknown;
+      /** Common prop: the component's root and everything inside it cannot be selected. */
+      "m:user-select"?: Reactive<boolean | null | undefined>;
+      /** Common props (work on every element and component; add one with registerMProp). */
+      [key: `m:${string}`]: unknown;
     }
     type IntrinsicElements = { [K in keyof HTMLElementTagNameMap]: MarchDomAttributes } & { [K in keyof SVGElementTagNameMap]: MarchDomAttributes };
   }

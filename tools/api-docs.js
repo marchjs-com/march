@@ -21,7 +21,7 @@ export const MD_PENDING = new Set([
   "hadi-march", "hadi-march/base", "hadi-march/icons/packs", "hadi-march/landing", "hadi-march/seo/hydrate", "hadi-march/router", "hadi-march/data", "hadi-march/schema", "hadi-march/ui",
   "hadi-march/components/registry.gen.ts", "hadi-march/table", "hadi-march/charts", "hadi-march/crud",
   "hadi-march/lazy", "hadi-march/sw", "hadi-march/motion", "hadi-march/motion/text", "hadi-march/motion/text/meta",
-  "hadi-march/fx", "hadi-march/store", "hadi-march/channel", "hadi-march/behaviors/drag",
+  "hadi-march/fx", "hadi-march/store", "hadi-march/props", "hadi-march/channel", "hadi-march/behaviors/drag",
   "hadi-march/behaviors/roving-focus", "hadi-march/behaviors/resize-handle", "hadi-march/behaviors/list-nav",
   "hadi-march/behaviors/dropzone", "hadi-march/behaviors/swipe", "hadi-march/behaviors/dismiss", "hadi-march/i18n",
   "hadi-march/icons", "hadi-march/icons/catalog", "hadi-march/theme", "hadi-march/net", "hadi-march/net/mock",

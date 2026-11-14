@@ -1,0 +1,7 @@
+/* March — `m:` common props (props that work on every element and component). */
+
+/* m:user-select: the element and everything inside it cannot be selected, form controls included. The nearest
+   m:user-select wins: ={false} inside a blocked subtree brings selection back for its own subtree. */
+[data-m-user-select] * { -webkit-user-select: var(--m-user-select) !important; user-select: var(--m-user-select) !important; }
+[data-m-user-select] { --m-user-select: none; -webkit-user-select: none !important; user-select: none !important; }
+[data-m-user-select="false"] { --m-user-select: auto; -webkit-user-select: text !important; user-select: text !important; }

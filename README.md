@@ -73,6 +73,7 @@ Runtime names and your `src/components/*` are auto-imported. Without the compile
 | Import | What |
 |---|---|
 | `hadi-march` | signals, store basics, JSX runtime, control flow, pipes, `t`, `define()` |
+| `hadi-march/props` | `m:` common props for every element and component (`m:user-select`), `mProps`, `registerMProp` |
 | `hadi-march/store` | `subscribe`, `on(store, "users.*.name")`, `persist`, `history`, `readonly`, `snapshot`, `derive` |
 | `hadi-march/i18n` | ICU `format`, `loadLocale`, `dir`, `typed<Catalog>()`; `hadi-march/i18n/tr` Turkish pack |
 | `hadi-march/router` | file routes, `_layout` files, redirects, guards, `beforeLeave`, preload, `setMeta`, typed `Href` |

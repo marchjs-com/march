@@ -10,6 +10,7 @@ const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const MODULES = [
   ["hadi-march", "src/index.ts"],
   ["hadi-march/store", "src/store/index.ts"],
+  ["hadi-march/props", "src/props/index.ts"],
   ["hadi-march/i18n", "src/i18n/index.ts"],
   ["hadi-march/ui", "src/ui/index.ts"],
   ["hadi-march/data", "src/data/index.ts"],

@@ -24,6 +24,21 @@ const TPL_PROP_ATTRS = new Set(["value", "checked", "selected", "indeterminate",
 /** A literal attribute that can live in the template as a plain attribute (no runtime meaning). */
 const staticAttr = (name) => /^[A-Za-z][\w-]*$/.test(name) && !/^on/i.test(name) && !TPL_URL_ATTRS.has(name) && !TPL_PROP_ATTRS.has(name) && name !== "className" && name !== "htmlFor";
 const NO_WRAP = /^(on[A-Z]|on:|ref$|use:|bind:|key$)/;
+/**
+ * `m:` common props (work on every native element and every component). A name listed here with a constant value on
+ * a native element becomes this plain attribute at build time (no runtime code; the CSS rule does the work). Anything
+ * else (a live value, a component, a name registered at runtime with registerMProp) goes through mProps().
+ * Add an entry to teach the compiler a new attribute-only prop.
+ */
+export const M_ATTRS = { "user-select": "data-m-user-select" };
+const M_HELPER = "_$m";
+/** The constant boolean of an `m:` attribute (bare, {true}, {false}, "false"), or undefined when it is not constant. */
+function mConst(a) {
+  if (a.literal !== undefined) return a.literal !== "false";
+  if (a.raw === undefined) return a.code === "true" ? true : undefined;
+  const r = a.raw.trim();
+  return r === "true" ? true : r === "false" ? false : undefined;
+}
 const ASSIGN_OPS = ["**=", "??=", "||=", "&&=", "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "|=", "^="];
 
 /**
@@ -121,6 +136,9 @@ class Transformer {
       if (spec.endsWith("#default")) { for (const n of names) lines.push(`import ${n} from ${JSON.stringify(spec.slice(0, -8))};`); continue; }
       lines.push(`import { ${names.sort().join(", ")} } from ${JSON.stringify(spec)};`);
     }
+    const mp = this.opts.props ?? "hadi-march/props";
+    if (this.mHelper) lines.push(`import { mProps as ${M_HELPER} } from ${JSON.stringify(mp)};`);
+    else if (this.mCss) lines.push(`import ${JSON.stringify(this.opts.propsCss ?? "hadi-march/css/props.css")};`);
     for (const [name, spec] of tpls) lines.push(`const ${name} = ${H.tpl}(${spec});`);
     return lines.join(" ");
   }
@@ -696,6 +714,22 @@ class Transformer {
       const i = kids.findIndex((k) => this.elseCodes?.has(k.code));
       if (i >= 0) { elseKids = this.elseCodes.get(kids[i].code); kids = kids.filter((_, j) => j !== i); }
     }
+    // m: common props: a constant on a native element is a plain attribute; the rest is applied by mProps() to the
+    // element / the component's root elements (typecheck mode keeps them as props so their types are checked)
+    const mDyn = [];
+    if (!this.opts.typecheck && attrs.some((a) => a.name?.startsWith("m:"))) {
+      attrs = attrs.flatMap((a) => {
+        if (!a.name?.startsWith("m:")) return [a];
+        const name = a.name.slice(2);
+        if (!/^[a-z][a-z0-9-]*$/.test(name)) throw fail(this.src, this.pos, `invalid common prop ${a.name}`);
+        const v = !isComp && M_ATTRS[name] ? mConst(a) : undefined;
+        if (v === undefined) { mDyn.push(`${JSON.stringify(name)}: ${a.dynamic ? `() => (${a.code})` : a.code}`); return []; }
+        this.mCss = true;
+        const literal = v ? "" : "false";
+        return [{ name: M_ATTRS[name], code: JSON.stringify(literal), dynamic: false, literal }];
+      });
+    }
+    const mWrap = (code) => { if (!mDyn.length) return code; this.mHelper = true; return `${M_HELPER}(${code}, {${mDyn.join(", ")}})`; };
     for (const a of attrs) {
       if (a.spread) { props.push(`...${a.spread}`); continue; }
       const key = /^[A-Za-z_$][\w$]*$/.test(a.name) ? a.name : JSON.stringify(a.name);
@@ -728,13 +762,14 @@ class Transformer {
       const tn = this.opts.typecheck || this.opts.templates === false ? null : this.tnode(tag, attrs, kids, childCode);
       if (tn) {
         code = this.emitTemplate(tn);
+        if (mDyn.length) return mWrap(code);
         (this.tnodes ??= new Map()).set(code, tn);
         return code;
       }
       code = `${h}(${tagCode}, ${props.length ? `{${props.join(", ")}}` : "null"}${kids.map((k) => `, ${childCode(k)}`).join("")})`;
     }
     if (tag === "Else") { this.elseCodes ??= new Map(); this.elseCodes.set(code, kids.map(childCode).join(", ")); }
-    return code;
+    return mWrap(code);
   }
 }
 
@@ -751,6 +786,7 @@ export function isStaticCode(code) {
   if (/^(async\s*)?(\([^()]*(\([^()]*\)[^()]*)*\)|[A-Za-z_$][\w$]*)\s*=>/.test(c)) return true;
   if (c.startsWith(`${H.h}(`) && balancedCall(c)) return true;
   if (/^_\$t\d+\(/.test(c) && balancedCall(c)) return true; // a template clone
+  if (c.startsWith(`${M_HELPER}(`) && balancedCall(c)) return true; // an element / component with m: props
   return false;
 }
 function balancedCall(c) {
