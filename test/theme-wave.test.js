@@ -71,6 +71,33 @@ test("themeWave: without View Transitions the change lands at once; with them it
   delete document.startViewTransition; delete root.animate;
 });
 
+test("themeWave shape spray: the new snapshot is masked by patches that start at the press and end as a full mask", async () => {
+  const W = await import("../src/motion/theme-wave.ts");
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const frames = W.sprayFrames(100, 40, 800, 600, rnd);
+  assert.equal(frames.length, 31);
+  assert.equal(frames[0].offset, 0);
+  assert.match(frames[0].maskImage, /^linear-gradient\(transparent/, "nothing painted yet");
+  assert.match(frames[3].maskImage, /radial-gradient\(circle at 100px 40px/, "the first burst is where the press was");
+  const count = (f) => (f.maskImage.match(/radial-gradient/g) ?? []).length;
+  assert.ok(count(frames[20]) > count(frames[5]), "the paint spreads");
+  assert.equal(frames.at(-1).maskImage, "linear-gradient(#000, #000)", "it ends covering the screen");
+  assert.equal(frames.at(-1).webkitMaskImage, frames.at(-1).maskImage);
+
+  const anims = [];
+  let finish;
+  document.startViewTransition = (cb) => { const done = new Promise((r) => { finish = () => { cb(); r(); }; }); return { ready: Promise.resolve(), finished: done }; };
+  root.animate = (kf, o) => { anims.push([kf, o]); return { cancel() {}, pause() {}, play() {}, addEventListener() {}, effect: { getTiming: () => ({}) }, updatePlaybackRate() {} }; };
+  const wave = M.themeWave(() => {}, { origin: { x: 10, y: 10 }, shape: "spray" });
+  await tick();
+  assert.equal(anims.length, 1);
+  assert.equal(anims[0][0].length, 31);
+  assert.equal(anims[0][1].pseudoElement, "::view-transition-new(root)");
+  assert.equal(anims[0][1].duration, 1100);
+  finish(); await wave;
+  delete document.startViewTransition; delete root.animate;
+});
+
 test("spotlight: every card near the pointer is lit from the pointer's place (also from the gap between two)", async () => {
   const host = document.createElement("div");
   document.body.appendChild(host);

@@ -89,7 +89,9 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
 - `themeWave(change, { origin, duration, easing })` runs a page-wide restyle as a circle of the new look that grows
   from `origin` (a viewport point or an element): a View Transition whose new snapshot is clipped by an engine
   animation (`:root[data-m-wave]` turns the browser's cross-fade off, motion.css). Without View Transitions, with
-  reduced motion or while paused the change lands at once.
+  reduced motion or while paused the change lands at once. `shape: "spray"` paints the new look on instead: soft
+  patches on a jittered grid (with fine drops around them) start nearest the press and spread until the screen is
+  covered (a run of mask keyframes on the new snapshot, `sprayFrames`; default 1100 ms). The showcase uses it.
 - `installThemeWave()` puts it around every `setTheme` / `setColorTheme` / `setAccent` (through `setRestyleTransition`
   of hadi-march/ui), so ThemeMenu, ThemePicker, ThemeToggle and AccentPicker all spread from the pressed point (the
   focused control for a key press). It returns the function that turns it off.

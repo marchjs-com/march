@@ -1,4 +1,5 @@
 // Showcase stage for TextInput (and EmailInput / UrlInput): the Playground picks the kind, the prefix and the state.
+import { untrack } from "../../../core/reactive.ts";
 import { TextInput, EmailInput, UrlInput } from "./index.ts";
 import { Field } from "../../../forms/field.ts";
 import { Icon, search, globe } from "../../../icons/index.ts";
@@ -18,7 +19,8 @@ export default function TextInputDemo(props: { values: { kind: string; prefix: s
       // error: the text shows under the input while it is empty; onPaste: the pasted text is caught and shown below
       const error = v.error ? () => ($text ? "" : "Bu alan boş bırakılamaz.") : undefined
       const onPaste = v.paste ? (e: ClipboardEvent) => { e.preventDefault(); $pasted = e.clipboardData?.getData("text") ?? "" } : undefined
-      const common = { value: $text, onChange: (x: string) => { $text = x }, prefix, disabled: v.disabled, onPaste, ...(error ? { error } : {}) }
+      // read once, untracked: a tracked read here would redraw the input (and drop its focus) on every keystroke
+      const common = { value: untrack(() => $text), onChange: (x: string) => { $text = x }, prefix, disabled: v.disabled, onPaste, ...(error ? { error } : {}) }
       if (v.kind === "email") return <Field label="E-posta"><EmailInput {...common} placeholder="ad@hadisosyal.com" /></Field>
       if (v.kind === "url") return <Field label="Web adresi"><UrlInput {...common} /></Field>
       return <Field label="Ara"><TextInput {...common} placeholder="Üye, sipariş, etiket…" /></Field>
