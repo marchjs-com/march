@@ -7,10 +7,10 @@ const { locale } = await import("../../../core/i18n.ts");
 locale.set("en");
 const { NotForYou, notForYouVerdict } = await import("./index.ts");
 
-test("notForYouVerdict: none, some, most", () => {
-  assert.match(notForYouVerdict(0, 4), /None/);
-  assert.match(notForYouVerdict(1, 4), /1 of 4 apply\. Worth/);
-  assert.match(notForYouVerdict(2, 4), /2 of 4 apply\. You may be happier/);
+test("notForYouVerdict: prompt, some still apply, none of these is you", () => {
+  assert.match(notForYouVerdict(0, 4), /Strike out/);
+  assert.match(notForYouVerdict(1, 4), /3 of 4 still apply/);
+  assert.match(notForYouVerdict(4, 4), /None of these is you/);
 });
 
 test("NotForYou: lines toggle, the verdict follows, onCheck gets the indexes", () => {
@@ -22,13 +22,17 @@ test("NotForYou: lines toggle, the verdict follows, onCheck gets the indexes", (
   assert.equal(boxes.length, 3);
   assert.equal(el.querySelectorAll(".hm-nfy-for [role=checkbox]").length, 0, "the for-you list is not checkable");
   const verdict = el.querySelector('[role="status"]');
-  assert.match(verdict.textContent, /None/);
+  assert.match(verdict.textContent, /Strike out/);
   boxes[2].click(); boxes[0].click();
   assert.equal(boxes[0].getAttribute("aria-checked"), "true");
-  assert.match(verdict.textContent, /2 of 3/);
-  assert.ok(verdict.classList.contains("is-out"));
+  assert.match(boxes[0].textContent, /Not me!/);
+  assert.match(verdict.textContent, /1 of 3 still apply/);
+  assert.ok(verdict.classList.contains("is-some"));
+  boxes[1].click();
+  assert.ok(verdict.classList.contains("is-in"));
+  boxes[1].click();
   boxes[0].click();
-  assert.deepEqual(seen, [[2], [0, 2], [2]]);
+  assert.deepEqual(seen, [[2], [0, 2], [0, 1, 2], [0, 2], [2]]);
   dispose();
 });
 

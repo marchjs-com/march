@@ -1261,7 +1261,7 @@ Full page: src/components/landing/newsletter/docs.md
 
 ## NotForYou
 
-The anti-landing block: it says plainly who the product is **not** for, and optionally who it is for. With `check`, every "not for you" line is a toggle the visitor can mark ("This is me"); a verdict under the list sums it up honestly.
+The anti-landing block: it says plainly who the product is **not** for, and optionally who it is for. With `check`, every "not for you" line is a toggle: the visitor strikes out the lines that are not them ("Not me!"), and a verdict under the list says how many still apply.
 
 ```tsx
 <NotForYou check items={[{ text: "You run a 1,000-seat conference", detail: "No ticketing; an event platform fits better." }]}

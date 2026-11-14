@@ -1,6 +1,6 @@
 // NotForYou (hadi-march/landing): the anti-landing block. It says plainly who the product is NOT for (and, optionally,
-// who it is for). With `check` every line is a toggle the visitor can mark ("this is me"); a verdict line under the
-// list sums it up honestly, e.g. "2 of 4 apply: you may be happier elsewhere". The verdict is announced politely.
+// who it is for). With `check` every line is a toggle: the visitor strikes out the lines that are not them ("Not me!");
+// a verdict line under the list sums it up honestly, e.g. "2 of 4 still apply". The verdict is announced politely.
 import "./not-for-you.css";
 import { h } from "../../../dom/h.ts";
 import { signal, computed } from "../../../core/reactive.ts";
@@ -27,22 +27,22 @@ export interface NotForYouProps {
   title?: unknown | undefined;
   /** Heading of the "for you" list (default "For you if…"). */
   forYouTitle?: unknown | undefined;
-  /** Let the visitor mark the lines that apply and show a verdict. */
+  /** Let the visitor strike out the lines that are not them, and show a verdict. */
   check?: boolean | undefined;
-  /** The verdict text for `n` of `total` marked lines (default: an honest sentence for 0, some, most). */
+  /** The verdict text for `n` struck-out lines of `total` (default: a prompt, then how many still apply). */
   verdict?: ((n: number, total: number) => unknown) | undefined;
   /** `cards` (default) · `list`: plain lines with a rule between them. */
   variant?: "cards" | "list" | undefined;
-  /** Called with the marked indexes. */
+  /** Called with the indexes of the struck-out lines. */
   onCheck?: ((marked: number[]) => void) | undefined;
   class?: ClassProp | undefined;
 }
 
-/** Default verdict: none marked, fewer than half, half or more. */
+/** Default verdict for `n` struck-out lines of `total`: a prompt, all ruled out, or how many still apply. */
 export function notForYouVerdict(n: number, total: number): string {
-  if (!n) return t`None of these is you. Good: read on.`;
-  if (n * 2 < total) return t`${n} of ${total} apply. Worth a closer look before you decide.`;
-  return t`${n} of ${total} apply. You may be happier with something else, and that is fine.`;
+  if (!n) return t`Strike out the lines that are not you.`;
+  if (n >= total) return t`None of these is you. Good: read on.`;
+  return t`${total - n} of ${total} still apply. Worth a closer look before you decide.`;
 }
 
 /** `<NotForYou check items={[{ text: "You need offline sync", detail: "…" }]} forYou={[…]} />` */
@@ -67,7 +67,7 @@ export function NotForYou(props: NotForYouProps): Element {
         h("button", {
           type: "button", class: () => cx("hm-nfy-toggle", marked().has(i) && "is-on"), role: "checkbox",
           "aria-checked": () => String(marked().has(i)), onClick: () => toggle(i),
-        }, ...body, h("span", { class: "hm-nfy-me", "aria-hidden": "true" }, () => (marked().has(i) ? t`This is me` : t`Me?`))));
+        }, ...body, h("span", { class: "hm-nfy-me", "aria-hidden": "true" }, () => (marked().has(i) ? t`Not me!` : t`Me?`))));
     }
     return h("li", { class: "hm-nfy-item" }, h("div", { class: "hm-nfy-row" }, ...body));
   };
@@ -80,6 +80,6 @@ export function NotForYou(props: NotForYouProps): Element {
     h("div", { class: "hm-nfy-cols" },
       list(props.title ?? t`Not for you if…`, props.items, "not"),
       props.forYou?.length ? list(props.forYouTitle ?? t`For you if…`, props.forYou, "for") : null),
-    props.check ? h("p", { class: () => cx("hm-nfy-verdict", count() * 2 >= total && count() > 0 && "is-out", count() === 0 && "is-in"), role: "status", "aria-live": "polite" },
+    props.check ? h("p", { class: () => cx("hm-nfy-verdict", count() >= total && "is-in", count() > 0 && count() < total && "is-some"), role: "status", "aria-live": "polite" },
       () => (props.verdict ?? notForYouVerdict)(count(), total)) : null);
 }
