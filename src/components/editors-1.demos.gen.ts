@@ -3,6 +3,4 @@ import * as d0 from "./composite/color-picker/demo.tsx";
 import * as p0 from "./composite/color-picker/playground.ts";
 import * as d1 from "./motion/easing-curve-editor/demo.tsx";
 import * as p1 from "./motion/easing-curve-editor/playground.ts";
-import * as d2 from "./composite/editor-frame/demo.tsx";
-import * as p2 from "./composite/editor-frame/playground.ts";
-export { d0, p0, d1, p1, d2, p2 };
+export { d0, p0, d1, p1 };

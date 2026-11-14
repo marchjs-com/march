@@ -7,6 +7,7 @@
 import { signal, effect, untrack, onCleanup, createRoot, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { val, cx, listen, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { clamp } from "../../../core/util.ts";
 import { measure } from "../../../motion/engine/clock.ts";
 import "./virtual-list.css";
 
@@ -33,7 +34,19 @@ export interface VirtualListProps<T> {
   /** After the rows: a loader, "no more" … */
   footer?: unknown;
   label?: MaybeFn<string | undefined>;
+  /** Role of the rows' container (default "list"). With another role ("listbox", "menu") the rows are yours: the row wrappers become presentational and what `render` returns carries the role, the state and `aria-posinset` / `aria-setsize`. */
+  role?: string | undefined;
+  /** Id of the rows' container (a field's `aria-controls`). */
+  id?: string | undefined;
+  /** Receives the list's handle once: `scrollToIndex(i)` brings a row into view (keyboard movement in a picker). */
+  api?: ((api: VirtualListApi) => void) | undefined;
   class?: ClassProp;
+}
+
+/** Handle of a VirtualList (`api` prop). */
+export interface VirtualListApi {
+  /** Scroll so row `index` is in view: "nearest" (default: only as far as needed), "start" or "center". */
+  scrollToIndex(index: number, align?: "nearest" | "start" | "center"): void;
 }
 
 interface Row<T> { el: HTMLElement; item: Signal<T>; index: Signal<number>; dispose: () => void }
@@ -49,6 +62,7 @@ const scrollParent = (el: HTMLElement): HTMLElement => {
 /** `<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />` */
 export function VirtualList<T>(props: VirtualListProps<T>): Element {
   const estimate = props.estimate ?? 120, overscan = props.overscan ?? 600, gap = props.gap ?? 0;
+  const plain = !props.role || props.role === "list";
   const keyOf = (it: T, i: number): string | number => (props.key ? props.key(it, i) : i);
   const heights = new Map<string | number, number>();
   const rows = new Map<string | number, Row<T>>();
@@ -112,15 +126,14 @@ export function VirtualList<T>(props: VirtualListProps<T>): Element {
       if (!r) {
         r = createRoot((dispose) => {
           const item = signal(it), index = signal(i);
-          const el = h("div", { class: "m-vlist-row", role: "listitem" }, props.render(() => item(), i)) as HTMLElement;
+          const el = h("div", { class: "m-vlist-row", role: plain ? "listitem" : "presentation" }, props.render(() => item(), i)) as HTMLElement;
           return { el, item, index, dispose };
         });
         (r.el as unknown as { mKey: string | number }).mKey = k;
         rows.set(k, r);
         ro?.observe(r.el);
       } else { r.item.set(it); r.index.set(i); }
-      r.el.setAttribute("aria-posinset", String(i + 1));
-      r.el.setAttribute("aria-setsize", String(items.length));
+      if (plain) { r.el.setAttribute("aria-posinset", String(i + 1)); r.el.setAttribute("aria-setsize", String(items.length)); }
       nodes.push(r.el);
     }
     for (const [k, r] of rows) if (!keep.has(k)) { ro?.unobserve(r.el); r.dispose(); rows.delete(k); }
@@ -136,7 +149,8 @@ export function VirtualList<T>(props: VirtualListProps<T>): Element {
   }, props.header ?? null, h("div", { class: "m-vlist-win", ref: (x: HTMLElement) => { win = x; } }), props.footer ?? null) as HTMLElement;
   // the root is a list for its rows only: header and footer sit outside it
   root.removeAttribute("role");
-  win.setAttribute("role", "list");
+  win.setAttribute("role", props.role ?? "list");
+  if (props.id) win.id = props.id;
   const lbl = val(props.label); if (lbl) win.setAttribute("aria-label", lbl);
 
   effect(() => {
@@ -155,6 +169,20 @@ export function VirtualList<T>(props: VirtualListProps<T>): Element {
     listen(target, { scroll: schedule }, { passive: true });
     ro?.observe(scroller === document.documentElement ? document.body : scroller);
     update();
+  });
+  props.api?.({
+    scrollToIndex: (index, align = "nearest") => {
+      const sc = scroller ?? root;
+      if (!items.length) return;
+      const i = clamp(index, 0, items.length - 1);
+      if (props.scroll === "parent") { rows.get(keyOf(items[i] as T, i))?.el.scrollIntoView?.({ block: align }); return; }
+      dirty = true; layout();
+      const n = (x: unknown): number => (typeof x === "number" && Number.isFinite(x) ? x : 0);
+      const top = (tops[i] as number) + n(win.offsetTop), size = heights.get(keyOf(items[i] as T, i)) ?? estimate, now = n(sc.scrollTop);
+      const view = sc.clientHeight || (typeof innerHeight === "number" ? innerHeight : 800);
+      const at = Math.max(0, align === "start" ? top : align === "center" ? top - (view - size) / 2 : top < now ? top : top + size > now + view ? top + size - view : now);
+      if (at !== now) { sc.scrollTop = at; schedule(); }
+    },
   });
   onCleanup(() => { cancel?.(); ro?.disconnect(); for (const r of rows.values()) r.dispose(); rows.clear(); });
   return root;

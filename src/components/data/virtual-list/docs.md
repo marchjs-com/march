@@ -24,6 +24,9 @@ to their item, so an updated item (a like, an edit) updates its row instead of r
 | `endDistance` | px | 800 | |
 | `header` / `footer` | node | — | before / after the rows, inside the scroll area |
 | `label` | string | — | accessible name of the list |
+| `role` | string | `list` | role of the rows' container; with another role (`listbox`, `menu`) the row wrappers are presentational and your rows carry the role, the state and `aria-setsize` |
+| `id` | string | — | id of the rows' container (a field's `aria-controls`) |
+| `api` | `(api) => void` | — | receives the handle once: `api.scrollToIndex(i, "nearest" \| "start" \| "center")` brings a row into view |
 
 Reads and writes are batched on the motion engine's frame (`measure`), never per scroll event.
 

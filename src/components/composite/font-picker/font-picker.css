@@ -1,0 +1,91 @@
+/* March — FontPicker. Imported by its component module; tokens.css provides the variables.
+   A name is drawn dimmed in the page's type until its own font has arrived (is-typed), then settles in: no half-drawn text. */
+.m-fp { display: inline-flex; min-width: 0; max-inline-size: 100%; }
+.m-fp-inline { display: block; container-type: inline-size; border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface); overflow: hidden; }
+.m-fp-inline.is-disabled { opacity: .6; pointer-events: none; }
+
+/* the button: a small "Aa" mark and the name in its own type */
+.m-fp-trigger { max-inline-size: 100%; }
+.m-fp-trigger-aa { flex: none; display: inline-grid; place-items: center; inline-size: 1.5rem; block-size: 1.5rem; border-radius: var(--m-radius-1);
+  background: color-mix(in srgb, var(--m-accent, var(--m-primary)) 14%, transparent); color: var(--m-accent-text, var(--m-primary-text, var(--m-primary))); font-size: var(--m-text-xs); font-weight: var(--m-weight-bold); }
+.m-fp-trigger-name { min-inline-size: 5rem; max-inline-size: 16rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: start; font-size: var(--m-text-lg); line-height: 1.2; }
+
+/* the panel in its three homes */
+.m-popover-panel.m-fp-pop { inline-size: min(27rem, calc(100vw - 16px)); max-block-size: min(86vh, 41rem); }
+.m-fp-pop .m-popover-inner, .m-fp-pop .m-popover-body { display: flex; flex-direction: column; min-block-size: 0; flex: 1; }
+.m-fp-panel { display: grid; grid-template-columns: minmax(0, 1fr); min-block-size: 0; min-inline-size: 0; inline-size: 100%; }
+/* the popover: one column on a narrow screen (the list first, a compact specimen under it), two columns on a wide one */
+.m-fp-in-popover { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
+.m-fp-in-popover .m-fp-browse { flex: 1 0 auto; }
+.m-fp-in-popover .m-fp-list { block-size: min(17rem, 38vh); }
+.m-fp-in-popover .m-fp-specimen { flex: none; }
+@media (max-width: 59.99rem) {
+  .m-fp-in-popover .m-fp-spec-head, .m-fp-in-popover .m-fp-css { display: none; }
+  .m-fp-in-popover .m-fp-specimen { gap: var(--m-space-2); padding: var(--m-space-3); }
+  .m-fp-in-popover .m-fp-specimen { max-block-size: 11rem; }
+}
+@media (min-width: 60rem) {
+  .m-popover-panel.m-fp-pop:has(.m-fp-specimen) { inline-size: min(47rem, calc(100vw - 16px)); }
+  .m-fp-in-popover:not(.is-plain) { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); overflow: hidden; }
+  .m-fp-in-popover .m-fp-list { block-size: min(21rem, 48vh); }
+  .m-fp-in-popover .m-fp-specimen { border-block-start: 0; border-inline-start: 1px solid var(--m-border); }
+}
+.m-fp-in-dialog .m-fp-list { block-size: min(52vh, 27rem); }
+.m-fp-in-inline .m-fp-list { block-size: 21rem; }
+@media (min-width: 52rem) {
+  .m-fp-in-dialog:not(.is-plain) { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+  .m-fp-in-dialog .m-fp-specimen { border-block-start: 0; border-inline-start: 1px solid var(--m-border); }
+}
+@container (min-width: 44rem) {
+  .m-fp-in-inline:not(.is-plain) { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+  .m-fp-in-inline .m-fp-specimen { border-block-start: 0; border-inline-start: 1px solid var(--m-border); }
+}
+.m-fp-dialog .m-fp-panel { margin: calc(var(--m-space-4) * -1); inline-size: auto; }
+
+/* search, categories, order · subset · favourites · count */
+.m-fp-browse { display: flex; flex-direction: column; min-block-size: 0; min-inline-size: 0; overflow: hidden; }
+.m-fp-tools { display: flex; flex-direction: column; gap: var(--m-space-2); padding: var(--m-space-3); border-block-end: 1px solid var(--m-border); }
+.m-fp-find { display: flex; align-items: center; gap: var(--m-space-3); min-inline-size: 0; }
+.m-fp-find:empty { display: none; }
+.m-fp-search { flex: 1; min-inline-size: 0; }
+.m-fp-cats.m-segmented { align-self: stretch; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.m-fp-cats .m-segment { flex: 1 0 auto; padding-inline: var(--m-space-2); }
+.m-fp-sorts.m-segmented { flex: none; flex-wrap: nowrap; }
+.m-fp-filters { display: flex; align-items: center; flex-wrap: wrap; gap: var(--m-space-2); min-inline-size: 0; }
+.m-fp-subset { flex: 1 1 5rem; min-inline-size: 5rem; }
+.m-fp-only.is-pressed { color: var(--m-brand-gold, var(--m-warn)); }
+.m-fp-count { flex: none; margin-inline-start: auto; color: var(--m-muted); font-size: var(--m-text-xs); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* the list */
+.m-fp-list { padding: var(--m-space-1) var(--m-space-2) var(--m-space-2); scroll-padding-block: var(--m-space-2); }
+.m-fp-group { padding: var(--m-space-3) var(--m-space-2) var(--m-space-1); }
+.m-fp-row { min-block-size: 3.25rem; border-radius: var(--m-radius-2); cursor: pointer; }
+.m-fp-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--m-text-xl); line-height: 1.35; opacity: .5;
+  transition: opacity var(--m-dur-slow) var(--m-ease); }
+.m-fp-name.is-typed, .m-fp-trigger-name, .m-fp-spec-name { opacity: 1; }
+.m-fp-row .m-listrow-sub:empty { display: none; }
+.m-fp-tick { display: inline-flex; color: var(--m-accent, var(--m-primary)); }
+.m-fp-star { opacity: 0; transition: opacity var(--m-dur) var(--m-ease), scale var(--m-dur) var(--m-ease-spring); }
+.m-fp-star.is-on, .m-fp-star:focus-visible, .m-fp-row:hover .m-fp-star, .m-fp-spec-head .m-fp-star { opacity: 1; }
+.m-fp-star.is-on { scale: 1.08; }
+@media (hover: none) { .m-fp-star { opacity: .7; } }
+.m-fp-consent { margin: var(--m-space-2) var(--m-space-3) 0; }
+.m-fp-note { margin: 0; padding: var(--m-space-4) var(--m-space-2); color: var(--m-muted); font-size: var(--m-text-sm); text-align: center; }
+
+/* the specimen: the chosen font with your own words */
+.m-fp-specimen { display: flex; flex-direction: column; gap: var(--m-space-3); min-inline-size: 0; padding: var(--m-space-3) var(--m-space-4);
+  border-block-start: 1px solid var(--m-border); background: var(--m-surface-2); overflow-y: auto; }
+.m-fp-spec-head { display: flex; align-items: center; gap: var(--m-space-2); min-inline-size: 0; }
+.m-fp-spec-title { display: flex; flex-direction: column; min-inline-size: 0; flex: 1; }
+.m-fp-spec-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--m-text-xl); line-height: 1.25; }
+.m-fp-spec-meta { color: var(--m-muted); font-size: var(--m-text-xs); }
+.m-fp-sample, .m-fp-sample textarea { inline-size: 100%; box-sizing: border-box; border: 0; border-radius: var(--m-radius-2); padding: var(--m-space-1) 0; background: transparent; box-shadow: none; color: var(--m-text);
+  font-size: var(--m-fp-size, 30px); line-height: 1.22; resize: none; overflow: hidden; flex: none; transition: opacity var(--m-dur-slow) var(--m-ease); }
+.m-fp-sample:focus-visible, .m-fp-sample textarea:focus-visible { outline: 2px solid var(--m-focus); outline-offset: 4px; }
+
+.m-fp-controls { display: flex; align-items: center; flex-wrap: wrap; gap: var(--m-space-2) var(--m-space-3); min-inline-size: 0; }
+.m-fp-size { flex: 1 1 9rem; min-inline-size: 0; }
+.m-fp-weight { flex: 0 1 10rem; min-inline-size: 0; }
+.m-fp-css { display: flex; align-items: center; gap: var(--m-space-2); min-inline-size: 0; padding: var(--m-space-1) var(--m-space-1) var(--m-space-1) var(--m-space-3);
+  border: 1px solid var(--m-border); border-radius: var(--m-radius-2); background: var(--m-surface); }
+.m-fp-css code { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--m-font-mono); font-size: var(--m-text-xs); color: var(--m-text-2); }

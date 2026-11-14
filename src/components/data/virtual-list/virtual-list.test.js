@@ -37,3 +37,20 @@ test("VirtualList: onEndReached once per item count near the end", async () => {
   assert.equal(calls, 2);
   m.dispose();
 });
+
+test("VirtualList: another role makes the wrappers presentational; scrollToIndex brings a row into range", async () => {
+  const items = Array.from({ length: 400 }, (_, i) => i);
+  let api;
+  const m = mount(() => h(VirtualList, { items, estimate: 50, overscan: 50, role: "listbox", id: "pick", api: (a) => { api = a; }, render: (it) => h("div", { role: "option", id: () => `o-${it()}` }, () => `row ${it()}`) }));
+  await wait();
+  const box = m.el.querySelector("[role=listbox]");
+  assert.equal(box.id, "pick");
+  assert.equal(m.el.querySelector("[role=listitem]"), null);
+  assert.equal(box.querySelector(".m-vlist-row").getAttribute("role"), "presentation");
+  assert.equal(box.querySelector(".m-vlist-row").getAttribute("aria-posinset"), null, "the option carries its own position");
+  assert.equal(m.el.querySelector("#o-300"), null);
+  api.scrollToIndex(300, "start");
+  await wait();
+  assert.ok(m.el.querySelector("#o-300"), "row 300 is rendered after the jump");
+  m.dispose();
+});

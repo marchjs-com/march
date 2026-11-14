@@ -13,7 +13,9 @@ export interface PlacedStyle { top: string; left: string; "min-width"?: string |
 
 /** Compute a fixed position for `panel` next to `anchor`. */
 export function place(anchor: Element, panel: Element | null | undefined, placement: Placement = "bottom-start", gap = 6): PlacedStyle {
-  const p = panel?.getBoundingClientRect?.() ?? { width: 0, height: 0 };
+  // the laid-out size: an entrance that scales the panel must not shrink the box it is placed by
+  const box = panel?.getBoundingClientRect?.() ?? { width: 0, height: 0 }, own = panel as HTMLElement | null | undefined;
+  const p = { width: own?.offsetWidth || box.width, height: own?.offsetHeight || box.height };
   // inside an <OverlayScope> (a preview, a panel) the panel is placed by the scope's box: its fixed position is
   // relative to the scope, and it stays inside it
   const scope = (panel ?? anchor).closest?.(".m-overlay-scope")?.getBoundingClientRect();

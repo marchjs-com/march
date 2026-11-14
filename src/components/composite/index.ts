@@ -8,6 +8,7 @@ export * from "./command-palette/index.ts";
 export * from "./dock-layout/index.ts";
 export * from "./editor-frame/index.ts";
 export * from "./feed/index.ts";
+export * from "./font-picker/index.ts";
 export * from "./format-toolbar/index.ts";
 export * from "./gradient-editor/index.ts";
 export * from "./image-cropper/index.ts";

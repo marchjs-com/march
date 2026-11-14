@@ -4,6 +4,17 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
+### FontPicker (later in 0.1.0)
+- New component `FontPicker` (`hadi-march/ui`): device fonts and a web font catalog (Google Fonts by default, about
+  1,900 open-licensed families) in one searchable list; each name in its own type (only the letters shown are
+  requested, only for the rows in view), a specimen with editable sample text, size, weight and italic, filters by
+  category, subset and order, favourites and recent picks; `view="popover" | "dialog" | "inline"`.
+- Privacy and CSP: `askConsent` (no request before the visitor allows it), `source` (Google, your own server that
+  answers `/css2`, a function, or `false`), `catalog` (your own families). Helpers: `loadFont`, `fontUrl`, `fontStack`,
+  `filterFonts`, `googleFonts`. The catalog is a lazy part made by `tools/gen-font-catalog.mjs`.
+- VirtualList: `role` (a listbox or menu of your own rows), `id`, and `api` with `scrollToIndex(i, align)`.
+- Popovers are placed by their laid-out size, so a scaling entrance no longer shifts a panel near the screen edge.
+
 ### Common props: `m:no-select` (later in 0.1.0)
 - A new namespace, `m:`, for props that work on every native element and every component. First member:
   `m:no-select` (boolean): the element and its whole subtree cannot be selected (the text typed into inputs and editors stays selectable);

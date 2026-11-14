@@ -197,6 +197,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), [IconButton](#iconbutton), Toolbar, [OverflowText](#overflowtext), [IconTile](#icontile), [StatusDot](#statusdot), [CheckMark](#checkmark), [Alert](#alert), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Select](#select), [Toggle](#toggle), [Button](#button), [CopyButton](#copybutton), [UndoRedo](#undoredo), [JsonEditor](#jsoneditor), [FlowControls](#flowcontrols), [FlowPalette](#flowpalette), [Tabs](#tabs) |
 | FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | [Button](#button), [IconButton](#iconbutton), [Segmented](#segmented), [Chip](#chip), [Card](#card), [TimeRuler](#timeruler), [ListRow](#listrow), [Badge](#badge), [Empty](#empty) |
 | FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | [SearchBox](#searchbox), [OverflowText](#overflowtext), [ListRow](#listrow), [IconTile](#icontile), [SectionLabel](#sectionlabel), [Empty](#empty) |
+| FontPicker | experimental | Font picker: device fonts and the Google Fonts catalog in one searchable list, each name in its own type, a specimen with your sample text, category / subset / order filters, favourites and recent picks; popover, dialog or inline. | [Popover](#popover), [Dialog](#dialog), [SearchBox](#searchbox), [Segmented](#segmented), [Select](#select), [VirtualList](#virtuallist), [ListRow](#listrow), [SectionLabel](#sectionlabel), [IconButton](#iconbutton), [Button](#button), [Textarea](#textarea), [Slider](#slider), [Toggle](#toggle), [CopyButton](#copybutton), [Alert](#alert), [Empty](#empty) |
 | FormatToolbar | experimental | The formatting bar of a text editor: tools in your order (bold, italic, headings, lists, link, undo…), toggle state, shortcut hints, own names and icons; one Tab stop. | Toolbar, [IconButton](#iconbutton), Divider |
 | GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | [ColorPicker](#colorpicker), [Card](#card), [Stack](#stack), [Segmented](#segmented), [IconButton](#iconbutton), [Swatch](#swatch), [NumberInput](#numberinput), [CopyButton](#copybutton) |
 | ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | [Card](#card), [Segmented](#segmented), [Slider](#slider), [IconButton](#iconbutton) |
@@ -1097,6 +1098,21 @@ Composed of: [Button](#button)
 ```
 
 Full page: src/components/social/follow-button/docs.md
+
+## FontPicker
+
+Choose a typeface. The fonts of the device and a web font catalog (Google Fonts by default: about 1,900 open-licensed families) sit in one searchable list. Each name is drawn in its own type, a specimen shows your own sample text with size, weight and italic, and the list narrows by category, subset, order and favourites. It opens as a popover by its button, as a dialog, or sits inline in a settings page. The value is the family name; `onPick` hands over the CSS to use it.
+
+Composed of: [Popover](#popover), [Dialog](#dialog), [SearchBox](#searchbox), [Segmented](#segmented), [Select](#select), [VirtualList](#virtuallist), [ListRow](#listrow), [SectionLabel](#sectionlabel), [IconButton](#iconbutton), [Button](#button), [Textarea](#textarea), [Slider](#slider), [Toggle](#toggle), [CopyButton](#copybutton), [Alert](#alert), [Empty](#empty)
+
+```tsx
+<FontPicker bind:value={$font} onPick={(f) => setStyle(page, { "font-family": f.stack, "font-weight": f.weight })} />
+<FontPicker view="dialog" askConsent preview="sample" sample="Hello world" bind:value={$font} />
+<FontPicker view="inline" source="/fonts" category="serif" favorites={false} bind:value={$font} />
+<FontPicker catalog={ownFamilies} source={(r) => `/fonts/${r.family}.css`} system={false} bind:value={$font} />
+```
+
+Full page: src/components/composite/font-picker/docs.md
 
 ## FormatToolbar
 

@@ -48,6 +48,7 @@ export * from "./feedback/error-box/index.ts";
 export * from "./composite/feed/index.ts";
 export * from "./forms/file-upload/index.ts";
 export * from "./social/follow-button/index.ts";
+export * from "./composite/font-picker/index.ts";
 export * from "./composite/format-toolbar/index.ts";
 export * from "./composite/gradient-editor/index.ts";
 export * from "./layout/grid/index.ts";
