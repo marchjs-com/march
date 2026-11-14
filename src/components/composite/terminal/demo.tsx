@@ -1,7 +1,7 @@
 // Showcase stage for Terminal: a few commands that show typed arguments, sub-commands, async work with Ctrl+C,
 // colored output, tables, JSON and progress. Try: help, deploy staging, user list, theme hadi, motion, fetch, colors.
-import { Terminal, TerminalWindow, ansi, type Command, type ColorScheme } from "./index.ts";
-import { signal } from "../../../core/reactive.ts";
+import { Terminal, TerminalWindow, ansi, type Command, type ColorScheme, type TerminalApi } from "./index.ts";
+import { signal, untrack, computed } from "../../../core/reactive.ts";
 import { setColorTheme, colorThemes } from "../../../ui/theme.ts";
 
 export const code = `<Terminal prompt="hadi$ " persist="demo" welcome="[info] help yaz, Tab ile tamamla" commands={{
@@ -38,19 +38,30 @@ export default function TerminalDemo(props: { values: { window: string; scheme: 
   const v = props.values
   const welcome = ["[info] March terminali: help yaz, Tab ile tamamla, ↑ geçmiş, Ctrl+R ara, Ctrl+C iptal", "Dene: deploy staging · user list · fetch · colors"]
   const open = signal(true)
-  // read where the terminal is built: a change of one of these draws it again
+  // read where the terminal is built: only a change of one of these (or putting it in a window) draws it again; the
+  // scheme, background, cursor, prompt and the window's look stay live, so the output is kept
+  const once = computed(() => [v.window === "none", v.blink, v.builtins, v.ownLabels].join("|"))
   const parts = () => ({ blink: v.blink, builtins: v.builtins, labels: v.ownLabels ? { notFound: (name: string) => `“${name}” diye bir komut yok. Şunları dene: deploy, user, fetch` } : undefined })
+  // these two show only when a command runs: after one of them changes, the new terminal runs the command that shows it
+  // (help lists the ready-made commands; an unknown word gets the "not found" text)
+  let last = untrack(() => ({ builtins: v.builtins, ownLabels: v.ownLabels }))
+  const showChange = (t: TerminalApi) => {
+    const now = untrack(() => ({ builtins: v.builtins, ownLabels: v.ownLabels }))
+    const line = now.builtins !== last.builtins ? "help" : now.ownLabels !== last.ownLabels ? "selam" : null
+    last = now
+    if (line) void t.exec(line)
+  }
   return <div class="sc-term-demo">
-    {() => v.window === "none"
+    {() => { once(); return untrack(() => v.window === "none"
       ? <Terminal scheme={() => SCHEMES[v.scheme] ?? "auto"} background={() => v.background || undefined} cursor={v.cursor as "bar"} prompt={v.prompt}
-          persist="showcase" commands={COMMANDS} welcome={welcome} {...parts()} />
+          persist="showcase" commands={COMMANDS} welcome={welcome} ref={showChange} {...parts()} />
       // in a window: drag the title bar, drop it on an edge to dock, double click to fill; the area is this box
       : <div class="sc-term-desk">
           <TerminalWindow chrome={() => v.window as "hadi"} title="hadi@march: ~" x={16} y={16} width={560} windowHeight={300}
             open={() => open()} onClose={() => open.set(false)}
             scheme={() => SCHEMES[v.scheme] ?? "auto"} background={() => v.background || undefined} cursor={v.cursor as "bar"} prompt={v.prompt}
-            persist="showcase" commands={COMMANDS} welcome={welcome} {...parts()} />
+            persist="showcase" commands={COMMANDS} welcome={welcome} ref={showChange} {...parts()} />
           {() => (open() ? null : <button type="button" class="hm-btn hm-btn-sm sc-term-reopen" onClick={() => open.set(true)}>Terminali yeniden aç</button>)}
-        </div>}
+        </div>) }}
   </div>
 }

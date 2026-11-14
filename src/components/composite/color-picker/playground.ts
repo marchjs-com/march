@@ -8,7 +8,8 @@ export default definePlayground<Values>({
     { key: "alpha", label: "Saydamlık", default: true },
     { key: "palettes", label: "Paletler", default: true },
     { key: "contrast", label: "Kontrast", default: true },
-    { key: "eyedropper", label: "Göz damlası (tarayıcı destekliyorsa)", default: true },
+    // only where the browser has the EyeDropper API (the picker draws no button elsewhere)
+    { key: "eyedropper", label: "Göz damlası", default: true, visibleWhen: () => "EyeDropper" in globalThis },
     { key: "preview", label: "Eski / yeni önizleme", default: true },
     { key: "formats", label: "Biçim değiştirici", default: true },
     { key: "input", label: "Değer alanı", default: true },

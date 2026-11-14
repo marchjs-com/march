@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
-const { h, render, signal } = await import("../../../index.ts");
+const { h, render, signal, reactive } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
 locale.set("en");
 const G = await import("./crop.ts");
@@ -102,5 +102,31 @@ test("ImageCropper: grid, hint, buttons, sliders and caption off or chosen; own 
   assert.equal(c.querySelectorAll(".hm-crop-row button").length, 4);
   assert.equal(c.querySelectorAll(".hm-crop-slider").length, 2);
   assert.ok(!c.querySelector(".hm-crop-keys").classList.contains("hm-sr-only"));
+  dispose();
+});
+
+test("ImageCropper: maxZoom is live (the zoom slider follows it, a lower limit pulls the zoom back)", async () => {
+  const max = signal(4), v = signal({ ...G.DEFAULT_CROP, zoom: 3 });
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  const dispose = render(() => h(ImageCropper, { src: "/x.png", "bind:value": v, preview: false, maxZoom: reactive(() => max()) }), el);
+  const zoom = el.querySelector(".hm-crop-zoom input[type=range]");
+  assert.equal(zoom.getAttribute("max"), "4");
+  max.set(8);
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(zoom.getAttribute("max"), "8");
+  max.set(2);
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(zoom.getAttribute("max"), "2");
+  assert.equal(Number(zoom.value), 2, "the zoom is pulled back inside the new limit");
+  dispose();
+});
+
+test("ImageCropper: can be built with a fixed aspect from the start", () => {
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  const dispose = render(() => h(ImageCropper, { src: "/x.png", aspect: 1, preview: false }), el);
+  assert.ok(el.querySelector(".hm-crop-view"));
+  assert.equal(el.querySelector(".hm-crop-aspects"), null, "a fixed aspect has no choices");
   dispose();
 });

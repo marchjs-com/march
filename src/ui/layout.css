@@ -27,10 +27,3 @@
 .hm-pager { display: flex; align-items: center; flex-wrap: wrap; gap: var(--hm-space-3); font-size: var(--hm-text-sm); color: var(--hm-muted); font-variant-numeric: tabular-nums; }
 .hm-pager-info { margin-inline-end: auto; }
 .hm-pager-btns { display: flex; align-items: center; gap: var(--hm-space-2); }
-.hm-search { position: relative; display: flex; align-items: center; min-width: 12rem; }
-.hm-search-icon { position: absolute; inset-inline-start: .6875rem; display: inline-flex; color: var(--hm-faint); pointer-events: none; }
-.hm-search .hm-search-input { padding-inline: 2.125rem 2.25rem; }
-.hm-search-input::-webkit-search-cancel-button { display: none; }
-.hm-search-clear { position: absolute; inset-inline-end: 3px; width: 1.875rem; height: 1.875rem; }
-.hm-search-kbd { position: absolute; inset-inline-end: var(--hm-space-2); pointer-events: none; }
-.hm-search-clear ~ .hm-search-kbd, .hm-search:focus-within .hm-search-kbd { display: none; }

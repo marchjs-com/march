@@ -4,7 +4,7 @@
 .hm-progress2-head { display: flex; justify-content: space-between; gap: var(--hm-space-2); font-size: var(--hm-text-sm); }
 .hm-progress2-label { color: var(--hm-text-2); font-weight: 500; }
 .hm-progress2-value { color: var(--hm-muted); font-variant-numeric: tabular-nums; }
-.hm-progress2-track { position: relative; display: block; height: .5rem; border-radius: var(--hm-radius-full); background: var(--hm-surface-3); overflow: hidden; }
+.hm-progress2-track { position: relative; display: block; height: var(--hm-progress-h, .5rem); border-radius: var(--hm-radius-full); background: var(--hm-surface-3); overflow: hidden; }
 .hm-progress2-sm .hm-progress2-track { height: .3125rem; } .hm-progress2-lg .hm-progress2-track { height: .75rem; }
 /* the fill is clipped, not scaled: a multicolor paint stays put along the track (orange at the start, purple at the end) */
 .hm-progress2-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--hm-progress-c, var(--hm-accent, var(--hm-progress-fill, var(--hm-primary))));
@@ -21,3 +21,30 @@
 .hm-progress2.is-indeterminate .hm-progress2-fill:dir(rtl) { animation-name: hm-indet-rtl; }
 .hm-progress2.is-indeterminate.hm-paint-cycle .hm-progress2-fill { width: auto; inset: 0; animation: none; }
 @media (prefers-reduced-motion: reduce) { .hm-paint-cycle .hm-progress2-fill::before, .hm-progress2.is-indeterminate .hm-progress2-fill { animation: none; } }
+/* bare: no track behind the fill · inverse: white on a translucent track, over media (`color` still paints the fill) */
+.hm-progress2-bare .hm-progress2-track, .hm-progress2-bare .hm-progress2-seg { background: none; }
+.hm-progress2-inverse { --hm-progress-track: color-mix(in srgb, var(--hm-on-scrim) 32%, transparent); }
+.hm-progress2-inverse:not([data-hm-color]) { --hm-progress-c: var(--hm-on-scrim); }
+.hm-progress2-inverse .hm-progress2-track { background: var(--hm-progress-track); }
+/* line: a thin track; the fill is scaled from the start edge, so an outside driver (scroll, animation) can write its transform */
+.hm-progress2-line .hm-progress2-track { height: var(--hm-progress-h, 3px); background: var(--hm-progress-track, var(--hm-border)); }
+.hm-progress2-line.hm-progress2-sm { --hm-progress-h: 2px; } .hm-progress2-line.hm-progress2-lg { --hm-progress-h: 4px; }
+.hm-progress2-line .hm-progress2-fill { clip-path: none; border-radius: 0; transform: scaleX(var(--hm-progress, 0)); transform-origin: 0 50%; transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
+.hm-progress2-line .hm-progress2-fill:dir(rtl) { clip-path: none; transform-origin: 100% 50%; }
+.hm-progress2-line.is-indeterminate .hm-progress2-fill { transition: none; }
+/* vertical: the track stands and fills from the top */
+.hm-progress2-vertical { block-size: 100%; inline-size: var(--hm-progress-h, .5rem); } .hm-progress2-vertical.hm-progress2-line { inline-size: var(--hm-progress-h, 3px); }
+.hm-progress2-vertical .hm-progress2-track { flex: 1; height: auto; }
+.hm-progress2-vertical .hm-progress2-fill, .hm-progress2-vertical .hm-progress2-fill:dir(rtl) { clip-path: inset(0 0 calc((1 - var(--hm-progress, 0)) * 100%) 0 round 999px); }
+.hm-progress2-vertical.hm-progress2-line .hm-progress2-fill, .hm-progress2-vertical.hm-progress2-line .hm-progress2-fill:dir(rtl) { clip-path: none; transform: scaleY(var(--hm-progress, 0)); transform-origin: 50% 0; }
+/* segments: equal parts, each with its own scaled fill */
+.hm-progress2 .hm-progress2-segs { display: flex; gap: var(--hm-progress-gap, 2px); background: none; overflow: visible; border-radius: 0; }
+.hm-progress2-vertical .hm-progress2-segs { flex-direction: column; }
+.hm-progress2-seg { position: relative; flex: 1; border-radius: var(--hm-radius-full); overflow: hidden; background: var(--hm-progress-track, var(--hm-surface-3)); }
+.hm-progress2-line .hm-progress2-seg { background: var(--hm-progress-track, var(--hm-border)); }
+.hm-progress2-seg-fill { position: absolute; inset: 0; background: var(--hm-progress-c, var(--hm-accent, var(--hm-progress-fill, var(--hm-primary)))); transform: scaleX(var(--hm-progress, 0)); transform-origin: 0 50%; transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
+.hm-progress2-seg-fill:dir(rtl) { transform-origin: 100% 50%; }
+.hm-progress2-vertical .hm-progress2-seg-fill, .hm-progress2-vertical .hm-progress2-seg-fill:dir(rtl) { transform: scaleY(var(--hm-progress, 0)); transform-origin: 50% 0; }
+/* instant: the value is followed at once (driven every frame, or a timed fill owns the transform) */
+.hm-progress2.is-instant .hm-progress2-fill, .hm-progress2.is-instant .hm-progress2-seg-fill { transition: none; }
+@media (prefers-reduced-motion: reduce) { .hm-progress2-line .hm-progress2-fill, .hm-progress2-seg-fill { transition: none; } }

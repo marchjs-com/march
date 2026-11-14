@@ -4,7 +4,7 @@ import { Disclosure } from "./index.ts";
 import { settings } from "../../../icons/glyphs/settings.ts";
 import { Icon } from "../../../icons/index.ts";
 
-export const code = `<Disclosure title="Gelişmiş ayarlar" open={$open} onToggle={(o) => $open = o}>…</Disclosure>
+export const code = `<Disclosure title={<span>Gelişmiş ayarlar</span>} open={$open} onToggle={(o) => $open = o}>…</Disclosure>
 <Disclosure title="Gelişmiş ayarlar" marker={<Icon of={settings} />}>…</Disclosure>   // marker={false}: işaretsiz`
 
 export default function DisclosureDemo(props: { values: { open: boolean; marker: string } }) {

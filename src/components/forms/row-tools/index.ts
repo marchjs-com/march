@@ -1,0 +1,62 @@
+// RowTools (hadi-march/forms): the tools of one row in an editable list: move up, move down, remove. Built from
+// IconButton. Give the row's `index` and the list's `count` and the arrows switch off at the ends. Which tools show
+// (`actions`), their names, icons, size and colour are yours.
+import "./row-tools.css";
+import { h } from "../../../dom/h.ts";
+import { t, messages } from "../../../core/i18n.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { IconButton, type IconButtonSize } from "../../actions/icon-button/index.ts";
+import { arrowUp } from "../../../icons/glyphs/arrowUp.ts";
+import { arrowDown } from "../../../icons/glyphs/arrowDown.ts";
+import { x as xIcon } from "../../../icons/glyphs/x.ts";
+import tr from "./tr.ts";
+
+messages("tr", tr);
+
+export type RowAction = "up" | "down" | "remove";
+const ALL: readonly RowAction[] = ["up", "down", "remove"];
+
+export interface RowToolsProps {
+  /** Which tools, in this order (default: up, down, remove). */
+  actions?: readonly RowAction[] | undefined;
+  onUp?: (() => void) | undefined;
+  onDown?: (() => void) | undefined;
+  onRemove?: (() => void) | undefined;
+  /** One handler for every tool (called besides onUp / onDown / onRemove). */
+  onAction?: ((action: RowAction) => void) | undefined;
+  /** Position of the row: "up" is off on the first row. */
+  index?: MaybeFn<number | undefined>;
+  /** Rows in the list: "down" is off on the last row. */
+  count?: MaybeFn<number | undefined>;
+  /** Switch all tools off, or some: `{ remove: () => list().length <= 1 }`. */
+  disabled?: MaybeFn<boolean | undefined> | Partial<Record<RowAction, MaybeFn<boolean | undefined>>>;
+  /** Own names (default "Move up", "Move down", "Remove", group "Row tools"; translated). */
+  labels?: Partial<Record<RowAction | "group", MaybeFn<string | undefined>>> | undefined;
+  /** Own icons. */
+  icons?: Partial<Record<RowAction, unknown>> | undefined;
+  size?: MaybeFn<IconButtonSize | undefined>;
+  /** Theme colour token of the icons. */
+  color?: ColorToken | undefined;
+  /** The remove tool in the danger colour. */
+  danger?: boolean | undefined;
+  class?: ClassProp;
+}
+
+/** `<RowTools index={i} count={() => list().length} onUp={…} onDown={…} onRemove={…} />`, `<RowTools actions={["remove"]} onRemove={…} />` */
+export function RowTools(props: RowToolsProps): Element {
+  const ICON: Record<RowAction, unknown> = { up: arrowUp, down: arrowDown, remove: xIcon };
+  const name = (a: RowAction): string => val(props.labels?.[a]) ?? (a === "up" ? t`Move up` : a === "down" ? t`Move down` : t`Remove`);
+  const off = (a: RowAction): boolean => {
+    const d = props.disabled;
+    if (d != null && typeof d === "object" ? val(d[a]) : val(d as MaybeFn<boolean | undefined>)) return true;
+    const i = val(props.index), n = val(props.count);
+    return a === "up" ? i != null && i <= 0 : a === "down" ? i != null && n != null && i >= n - 1 : false;
+  };
+  const run = (a: RowAction): void => { (a === "up" ? props.onUp : a === "down" ? props.onDown : props.onRemove)?.(); props.onAction?.(a); };
+  return h("span", { class: () => cx("hm-row-tools", val(props.class)), role: "group", "aria-label": () => val(props.labels?.group) ?? t`Row tools` },
+    (props.actions ?? ALL).map((a) => h(IconButton, {
+      class: `hm-row-tool hm-row-tool-${a}`, icon: props.icons?.[a] ?? ICON[a], label: () => name(a), size: props.size, color: props.color,
+      variant: a === "remove" && props.danger ? "danger" : undefined, disabled: () => off(a), onClick: () => run(a),
+    })));
+}

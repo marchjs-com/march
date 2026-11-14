@@ -25,3 +25,36 @@ test("Segmented: radios with aria-checked, roving tabindex, arrows select", () =
   btns()[0].click();
   assert.equal(v(), "a");
 });
+
+test("Segmented: option icon and title, an icon-only segment is named by its title", () => {
+  const { el } = mount(() => h(Segmented, { value: "list", "aria-label": "View", options: [
+    { value: "list", label: "List", icon: "≡" }, { value: "grid", label: "", icon: "▦", title: "Grid" }, { value: "map", label: "Map", disabled: true, title: "No places yet" },
+  ] }));
+  const [list, grid, map] = el.querySelectorAll("[role=radio]");
+  assert.equal(list.querySelector(".hm-segment-icon").textContent, "≡");
+  assert.match(list.getAttribute("class"), /hm-segment-has-icon/);
+  assert.equal(list.getAttribute("title"), null);
+  assert.equal(grid.getAttribute("aria-label"), "Grid");
+  assert.equal(grid.getAttribute("title"), "Grid");
+  assert.equal(map.getAttribute("title"), "No places yet");
+  assert.equal(map.getAttribute("aria-label"), null);
+  assert.equal(map.disabled, true);
+  assert.doesNotMatch(map.getAttribute("class"), /hm-segment-has-icon/);
+});
+
+test("Segmented: indicator=\"slide\" adds one decorative thumb that follows the choice; the default has none", async () => {
+  const v = signal(null);
+  const { el } = mount(() => [h(Segmented, { "bind:value": v, options: ["a", "b"], indicator: "slide" }), h(Segmented, { options: ["a", "b"] })]);
+  const [slide, plain] = el.querySelectorAll("[role=radiogroup]");
+  assert.match(slide.getAttribute("class"), /hm-segmented-slide/);
+  const thumb = slide.querySelector(".hm-segment-thumb");
+  assert.equal(thumb.getAttribute("aria-hidden"), "true");
+  assert.equal(slide.querySelectorAll("[role=radio]").length, 2);
+  assert.equal(plain.querySelector(".hm-segment-thumb"), null);
+  await Promise.resolve();
+  assert.doesNotMatch(thumb.getAttribute("class"), /is-on/, "nothing chosen: the thumb is hidden");
+  slide.querySelectorAll("[role=radio]")[1].click();
+  await Promise.resolve();
+  assert.equal(v(), "b");
+  assert.match(thumb.getAttribute("class"), /is-on/);
+});

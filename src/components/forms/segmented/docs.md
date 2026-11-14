@@ -12,10 +12,18 @@ periods). Arrow keys move and select; only the chosen button is in the Tab order
 | Prop | Type | Default | |
 |---|---|---|---|
 | `value` / `bind:value` | option value | `null` | |
-| `options` | `[value]` or `[{ value, label, disabled }]` | — | |
+| `options` | `[value]` or `[{ value, label, icon, title, disabled }]` | — | `icon`: before the text; `title`: a tooltip (why it is disabled); `label: ""` with an icon: an icon-only segment named by `title` |
+| `indicator` | `"fill"` `"slide"` | `"fill"` | `"slide"`: one thumb glides to the chosen segment |
 | `color` | ColorToken | — | tints the chosen segment |
 | `disabled`, `readonly` | boolean | — | |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
+
+```tsx
+<Segmented bind:value={$theme} indicator="slide" aria-label="Theme" options={[
+  { value: "light", label: "Light", icon: sun }, { value: "dark", label: "Dark", icon: moon },
+  { value: "system", label: "", icon: monitor, title: "Follow the system" },
+]} />
+```
 
 ## Accessibility
 

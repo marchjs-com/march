@@ -5,7 +5,10 @@ export type ColorToken = (typeof COLOR_TOKENS)[number];
 /** `data-hm-color` attribute value for a `color` prop (null when unset). */
 export const colorAttr = (c: unknown): string | null => (typeof c === "string" && c ? c : null);
 
-const BRAND = ["orange", "blue", "green", "purple"];
+/** The four HADİ brand colors in their order (orange, blue, green, purple): the one list every "brand" option uses. */
+export const BRAND_COLORS = ["brand-orange", "brand-blue", "brand-green", "brand-purple"] as const satisfies readonly ColorToken[];
+/** The six brand colors: the four above plus pink and gold. */
+export const BRAND_COLORS_ALL = ["brand-orange", "brand-blue", "brand-green", "brand-purple", "brand-pink", "brand-gold"] as const satisfies readonly ColorToken[];
 const BRAND_CAT: Record<string, number> = { orange: 1, blue: 2, green: 3, purple: 4, pink: 5, gold: 6 };
 /** The CSS color expression of a token (theme variables only), e.g. "brand-blue" → var(--hm-brand-blue, var(--hm-cat-2)). */
 export function tokenColor(token: string): string {
@@ -19,7 +22,7 @@ export function tokenColor(token: string): string {
 /** Several colors: "brand" = the four HADİ colors (orange, blue, green, purple), or a list of tokens. */
 export type MultiColors = "single" | "brand" | readonly ColorToken[];
 export const colorList = (c: MultiColors | undefined): string[] | null =>
-  !c || c === "single" ? null : c === "brand" ? BRAND.map((x) => `brand-${x}`) : c.length ? [...c] : null;
+  !c || c === "single" ? null : c === "brand" ? [...BRAND_COLORS] : c.length ? [...c] : null;
 /**
  * A paint for several colors. gradient: smooth; segments: equal hard-edged parts; the angle is "90deg" for bars and a
  * conic start ("from -90deg") for rings. `closed` repeats the first color at the end (a seamless loop).

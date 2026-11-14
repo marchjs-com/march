@@ -6,6 +6,8 @@
 .hm-marquee.is-running .hm-marquee-track { max-width: none; width: max-content; will-change: transform; }
 .hm-marquee.is-running .hm-marquee-item { flex: none; overflow: visible; }
 .hm-marquee-sep { flex: none; padding-inline: 1em; opacity: .6; }
+/* duplicate: the content and its copies, side by side */
+.hm-marquee-unit { display: inline-flex; flex: none; align-items: center; vertical-align: top; }
 
 /* Fade only where text is hidden. --hm-mq-fs / --hm-mq-fe are the start / end fade widths (logical: :dir(rtl) flips the
    gradient). At rest an overflowing text fades at its end only; while it scrolls marquee.ts animates both properties with

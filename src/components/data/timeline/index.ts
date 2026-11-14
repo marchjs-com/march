@@ -23,7 +23,9 @@ export function Timeline(props: TimelineProps): Element {
   const fmt = (v: unknown): unknown => (typeof v === "string" && !toDate(v) ? v : v instanceof Date || typeof v === "number" || toDate(v) ? applyPipe("datetime", v) : v);
   const time = (v: unknown): unknown => (props.formatTime ? props.formatTime(v) : fmt(v));
   return h("ol", { class: () => cx("hm-timeline", props.line === false && "hm-timeline-no-line", val(props.class)) },
-    () => (val(props.items) ?? []).map((x, i) => h("li", { class: cx("hm-tl-item", x.tone && `hm-tl-${x.tone}`) },
+    () => (val(props.items) ?? []).map((x, i, all) => h("li", { class: cx("hm-tl-item", x.tone && `hm-tl-${x.tone}`) },
+      // the connecting line: an element of its own (not a pseudo-element), down to the next item; live with `line`
+      i < all.length - 1 ? () => (props.line === false ? null : h("span", { class: "hm-tl-line", "aria-hidden": "true" })) : null,
       props.dot === false ? null : typeof props.dot === "function" ? h("span", { class: "hm-tl-dot is-own", "aria-hidden": "true" }, props.dot(x, i))
         : h("span", { class: "hm-tl-dot", "aria-hidden": "true", "data-hm-color": colorAttr(x.color) }, icon(x.icon)),
       h("div", { class: "hm-tl-main" },

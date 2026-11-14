@@ -1,6 +1,6 @@
 // Showcase stage for CommandPalette: the app's palette (mounted once by the shell) with this card's commands added while
 // the card is on screen; the trigger button opens it. Playground values swap the commands and the button text.
-import { onCleanup } from "../../../core/reactive.ts";
+import { computed, onCleanup } from "../../../core/reactive.ts";
 import { PaletteButton, registerCommands, type Command } from "./index.ts";
 import { toast } from "../../../ui/toast.ts";
 import { fileText } from "../../../icons/glyphs/fileText.ts";
@@ -32,9 +32,13 @@ const SETS: Record<string, Command[]> = {
 
 export default function CommandPaletteDemo(props: { values: { group: string; label: string; icon: string; kbd: boolean } }) {
   onCleanup(registerCommands(() => SETS[props.values.group] ?? []))
+  // the icon and the shortcut hint are read once by the button: a new choice of these builds it again (the label stays live)
+  const iconOf = computed(() => props.values.icon), kbdOf = computed(() => props.values.kbd)
   return <div class="sc-row">
-    {() => <PaletteButton label={() => props.values.label} kbd={props.values.kbd}
-      icon={props.values.icon === "off" ? false : props.values.icon === "own" ? command : undefined} />}
+    {() => {
+      const icon = iconOf(), kbd = kbdOf()
+      return <PaletteButton label={() => props.values.label} kbd={kbd} icon={icon === "off" ? false : icon === "own" ? command : undefined} />
+    }}
     <span class="hm-muted">Açın ve "{() => (props.values.group === "team" ? "davet" : "pdf")}" yazın</span>
   </div>
 }

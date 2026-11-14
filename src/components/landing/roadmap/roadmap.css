@@ -3,7 +3,7 @@
 .hm-rm-rail { position: absolute; inset-inline-start: calc(.5rem - 1px); inset-block: .5rem 1.5rem; width: 3px; border-radius: 3px; background: var(--hm-border); overflow: hidden; }
 .hm-rm-fill { position: absolute; inset: 0; transform-origin: 50% 0; transform: scaleY(0); background: var(--hm-brand-gradient); }
 .hm-rm:not(.is-scroll) .hm-rm-fill { transform: none; }
-.hm-rm-tl .hm-tl-item::before { display: none; }
+.hm-rm-tl .hm-tl-line { display: none; }
 .hm-rm-tl .hm-tl-item { padding-block-end: var(--hm-space-6); }
 .hm-rm-tl .hm-tl-dot { position: relative; z-index: 1; background: var(--hm-bg); border: 2px solid var(--hm-border-strong); transition: border-color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease-spring, var(--hm-ease)); }
 .hm-rm-tl .hm-tl-item.is-passed .hm-tl-dot { border-color: var(--hm-accent, var(--hm-primary)); background: var(--hm-accent, var(--hm-primary)); transform: scale(1.15); }

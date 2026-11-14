@@ -1,5 +1,7 @@
 // Showcase stage for ChatThread: a working chat in a phone frame. Send a message; the others start typing and answer.
-// React from a bubble's smile button, reply by dragging a bubble or its reply button.
+// React from a bubble's smile button, reply by dragging a bubble or its reply button. A new answer speed or motion
+// choice sends a sample message, so the choice is seen at once (how the message comes in, when the answer arrives).
+import { computed, effect, untrack } from "../../../core/reactive.ts";
 import { ChatThread, type ChatMessage } from "./index.ts";
 import { ChatComposer } from "../chat-composer/index.ts";
 import type { Reaction } from "../../social/chat-bubble/index.ts";
@@ -44,10 +46,18 @@ export default function ChatThreadDemo(props: { values: { group: boolean; replyD
     setTimeout(() => { patch(id, { status: "read" }); $typing = [name] }, 1300)
     setTimeout(() => { $typing = []; $messages = [...$messages, { id: `r${n}`, senderId: sid, senderName: name, text: answer, time: new Date() }] }, 1300 + props.values.replyDelay)
   }
+  const sample = computed(() => `${props.values.replyDelay} ${props.values.motion}`), daysOf = computed(() => props.values.days)
+  let shown = false
+  effect(() => {
+    sample()
+    const delay = untrack(() => props.values.replyDelay), motion = untrack(() => props.values.motion)
+    if (shown) untrack(() => send(`Deneme mesajı: ${delay ? `yanıt ${delay < 1000 ? "hızlı" : "orta hızda"} gelir` : "yanıt gelmez"}, giriş hareketi ${motion ? "açık" : "kapalı"}`))
+    shown = true
+  })
   return <div class="sc-social-phone sc-social-chat">
     {() => {
       // `days` is read once by the thread: a new choice builds the thread again (the messages live here)
-      const d = props.values.days
+      const d = daysOf()
       return <ChatThread messages={() => $messages} typing={() => $typing} group={() => props.values.group} label="Pazar Koşusu grubu"
         days={d === "off" ? false : d === "own" ? (date: Date) => date.toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" }) : true}
         motion={() => props.values.motion}

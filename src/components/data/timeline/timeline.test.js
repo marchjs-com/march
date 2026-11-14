@@ -27,6 +27,8 @@ test("Timeline: colour token, own dot, no dot, no line, own time text", () => {
   const [a, b, c] = m.el.querySelectorAll("ol.hm-timeline");
   assert.equal(a.querySelector(".hm-tl-dot").getAttribute("data-hm-color"), "brand-purple");
   assert.ok(!a.className.includes("hm-timeline-no-line"));
+  assert.equal(a.querySelectorAll(".hm-tl-line").length, 1, "a line from each item to the next (none after the last)");
+  assert.equal(b.querySelectorAll(".hm-tl-line").length, 0, "line={false}: no line element");
   assert.equal(b.querySelector(".hm-tl-dot"), null);
   assert.ok(b.className.includes("hm-timeline-no-line"));
   assert.equal(b.querySelector("time").textContent, "t5");

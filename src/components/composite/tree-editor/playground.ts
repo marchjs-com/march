@@ -7,7 +7,8 @@ export default definePlayground<Values>({
     { key: "data", label: "Veri", default: "config", kind: "segmented", options: [{ value: "config", label: "ayarlar" }, { value: "order", label: "sipariş" }, { value: "list", label: "liste" }] },
     { key: "schema", label: "Şema doğrulaması", default: true },
     { key: "search", label: "Arama kutusu", default: true },
-    { key: "expand", label: "Açık seviye", default: 2, min: 0, max: 4, step: 1 },
+    // 3 opens the deepest container of the sample data: a higher level would change nothing
+    { key: "expand", label: "Açık seviye", default: 2, min: 0, max: 3, step: 1 },
     { key: "readonly", label: "Salt okunur", default: false },
     { key: "status", label: "Durum yazısı (Geçerli / N sorun)", default: true },
     { key: "typeBadges", label: "Tür rozetleri", default: true },

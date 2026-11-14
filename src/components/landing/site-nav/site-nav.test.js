@@ -43,3 +43,18 @@ test("SiteNav: no pill / coloured pill, own menu icon and names, no menu button"
   assert.ok(two.querySelector(".hm-snav-menu .mine"));
   dispose();
 });
+
+test("SiteNav: source — shrink and hide follow the given scroll container, not the page", async () => {
+  const box = document.createElement("div"); document.body.appendChild(box);
+  const dispose = render(() => h(SiteNav, { brand: { name: "A" }, hide: true, source: () => box }), box);
+  const nav = box.querySelector("header.hm-snav");
+  await new Promise((r) => setTimeout(r, 30));
+  assert.ok(!nav.className.includes("is-scrolled"));
+  box.scrollTop = 240; box.dispatchEvent(new Event("scroll"));
+  await new Promise((r) => setTimeout(r, 60));
+  assert.ok(nav.className.includes("is-scrolled") && nav.className.includes("is-hidden"), nav.className);
+  box.scrollTop = 0; box.dispatchEvent(new Event("scroll"));
+  await new Promise((r) => setTimeout(r, 60));
+  assert.ok(!nav.className.includes("is-scrolled") && !nav.className.includes("is-hidden"), nav.className);
+  dispose();
+});

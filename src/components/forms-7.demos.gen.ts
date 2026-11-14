@@ -4,6 +4,6 @@ import * as d0 from "./forms/radio-group/demo.tsx";
 import * as p0 from "./forms/radio-group/playground.ts";
 import * as d1 from "./forms/rating/demo.tsx";
 import * as p1 from "./forms/rating/playground.ts";
-import * as d2 from "./forms/segmented/demo.tsx";
-import * as p2 from "./forms/segmented/playground.ts";
+import * as d2 from "./forms/row-tools/demo.tsx";
+import * as p2 from "./forms/row-tools/playground.ts";
 export { d0, p0, d1, p1, d2, p2 };

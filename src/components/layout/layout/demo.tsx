@@ -15,7 +15,8 @@ const myFeature = (api) => { const off = api.add("bottom-start", <HelpButton />)
 export default function LayoutDemo(props: { values: { header: boolean; nav: boolean; aside: boolean; footer: boolean } }) {
   return <div class="sc-layout-demo">
     {() => {
-      const v = props.values
+      // every value is read here (a value only passed on as a prop is read once): the frame is drawn again when a region goes
+      const v = { ...props.values }
       return <Layout features={[]}
         header={v.header ? <div class="sc-ld-box">Üst bilgi</div> : undefined}
         nav={v.nav ? <div class="sc-ld-box">Gezinme</div> : undefined}

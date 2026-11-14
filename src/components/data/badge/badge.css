@@ -12,3 +12,16 @@
 .hm-badge-dot::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: currentColor; }
 .hm-badge-dot-mark { flex: none; width: .375rem; height: .375rem; border-radius: 50%; background: var(--hm-accent, currentColor); }
 .hm-badge-dot-own { display: inline-flex; flex: none; }
+/* xs: the mini badge on the corner of an icon button, a tab, a rail item */
+.hm-badge-xs { gap: .1875rem; min-height: 1rem; padding: 0 .25rem; font-size: .625rem; line-height: 1rem; }
+.hm-badge-xs.hm-badge-count { min-width: 1rem; padding: 0 .25rem; }
+/* a pulsing dot (StatusDot) takes the badge's text colour unless `dotColor` names one */
+.hm-badge .hm-badge-dot-pulse:not([data-hm-color]) { --hm-status-dot-c: currentColor; }
+.hm-badge .hm-badge-dot-pulse.is-pulse-ring { margin-inline: .125rem; }
+/* clickable: a button with the badge look */
+.hm-badge-btn { margin: 0; font-family: inherit; cursor: pointer; appearance: none; transition: border-color var(--hm-dur-fast) var(--hm-ease), box-shadow var(--hm-dur-fast) var(--hm-ease); }
+.hm-badge-btn:hover:not(:disabled) { border-color: currentColor; }
+.hm-badge-btn:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: 2px; }
+.hm-badge-btn.is-pressed { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+.hm-badge-btn:disabled { cursor: default; opacity: .6; }
+@media (prefers-reduced-motion: reduce) { .hm-badge-btn { transition: none; } }

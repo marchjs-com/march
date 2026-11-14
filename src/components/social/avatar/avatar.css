@@ -1,0 +1,21 @@
+/* Avatar. Theme tokens only, logical properties, no @keyframes (motion core). */
+.hm-avatar { display: inline-flex; align-items: center; justify-content: center; flex: none; overflow: hidden; border-radius: 50%; font-weight: 600; color: var(--hm-on-scrim); background: var(--hm-primary-solid);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-scrim) 6%, transparent); letter-spacing: .01em; }
+.hm-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.hm-avatar-xs { width: 1.25rem; height: 1.25rem; font-size: .5625rem; }
+.hm-avatar-sm { width: 1.75rem; height: 1.75rem; font-size: .6875rem; } .hm-avatar-md { width: 2.25rem; height: 2.25rem; font-size: .8125rem; } .hm-avatar-lg { width: 3.5rem; height: 3.5rem; font-size: 1.125rem; }
+.hm-avatar-xl { width: 5rem; height: 5rem; font-size: 1.5rem; }
+.hm-avatar-square { border-radius: 28%; }
+.hm-avatar-icon { display: inline-flex; }
+.hm-avatar-icon .hm-svg { width: 55%; height: 55%; min-width: .75rem; min-height: .75rem; }
+.hm-avatar-c0 { --hm-av: var(--hm-cat-1); }
+.hm-avatar-c1 { --hm-av: var(--hm-cat-2); }
+.hm-avatar-c2 { --hm-av: var(--hm-cat-3); }
+.hm-avatar-c3 { --hm-av: var(--hm-cat-4); }
+.hm-avatar-c4 { --hm-av: var(--hm-cat-5); }
+.hm-avatar-c5 { --hm-av: var(--hm-cat-6); }
+.hm-avatar-c6 { --hm-av: var(--hm-cat-7); }
+.hm-avatar-c7 { --hm-av: var(--hm-cat-8); }
+.hm-avatar[class*="hm-avatar-c"] { background: linear-gradient(135deg, var(--hm-av), color-mix(in srgb, var(--hm-av) 70%, var(--hm-text))); text-shadow: 0 1px 1px color-mix(in srgb, var(--hm-scrim) 20%, transparent); }
+/* color prop: one theme colour instead of the colour taken from the name */
+.hm-avatar[data-hm-color] { color: var(--hm-on-accent); background: linear-gradient(135deg, var(--hm-accent), color-mix(in srgb, var(--hm-accent) 70%, var(--hm-text))); }

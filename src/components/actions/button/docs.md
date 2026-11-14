@@ -1,11 +1,13 @@
 # Button
 
-The button. Five variants (`primary` is the theme's orange fill, `secondary` the default, `ghost`, `danger`, `dark`
-ink fill), three sizes, a leading or trailing icon, `loading` (locks the button and shows a spinner instead of the
-icon), `block` width, and `href` (renders a router link styled as a button).
+The button. Six variants (`primary` is the theme's orange fill, `secondary` the default, `ghost`, `danger`, `dark`
+ink fill, `link` text that reads as a link and flows inline), three sizes, a leading or trailing icon, `loading` (locks
+the button and shows a spinner instead of the icon), `block` width, `shape="pill"`, `pressed` (a toggle button) and
+`href` (renders a router link styled as a button).
 
 `ActionButton` draws an `action()`: it is hidden when the user may not run it, disabled and busy while it runs, and the
-action handles confirmation, the reason prompt and the success / error toasts.
+action handles confirmation, the reason prompt and the success / error toasts. It also draws a plain
+`{ label, run, visible?, disabled?, busy?, opts? }` object, the shape of a table's row and bulk actions.
 
 ```tsx
 <Button variant="primary" icon={plus}>New project</Button>
@@ -14,13 +16,17 @@ action handles confirmation, the reason prompt and the success / error toasts.
 <ActionButton action={remove} args={[row]} />
 <Button loading={$saving} spinner={false} icon={save}>Save</Button>   // no spinner: the icon stays
 <Button loading={$saving} spinner={<MyDots />}>Save</Button>          // your own busy mark
+<p>3 comments. <Button variant="link" on:click={showAll}>View all</Button></p>   // inline text button
+<Button variant="ghost" pressed={$wrap} on:click={() => { $wrap = !$wrap }}>Wrap</Button>   // toggle: aria-pressed + pressed look
+<Button variant="primary" shape="pill" icon={arrowUp}>12 new posts</Button>
+<ActionButton action={{ label: "Archive", run: archive }} args={[row]} role="menuitem" />   // a plain action; other attributes go to the button
 ```
 
 ## Props
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `variant` | `primary` `secondary` `ghost` `danger` `dark` | `secondary` | |
+| `variant` | `primary` `secondary` `ghost` `danger` `dark` `link` | `secondary` | `link`: no fill or padding, inherits the font of the text around it; `color` tints it |
 | `size` | `sm` `md` `lg` | `md` | |
 | `color` | ColorToken | theme primary | accent of the primary variant |
 | `icon` / `iconEnd` | icon | — | leading / trailing icon |
@@ -28,17 +34,21 @@ action handles confirmation, the reason prompt and the success / error toasts.
 | `spinner` | boolean / node / icon | `true` | the loading spinner: `false` keeps the icon, a node or icon replaces it |
 | `disabled` | boolean / accessor | — | |
 | `block` | boolean | `false` | full width |
-| `href` | Href | — | router link |
+| `shape` | `pill` | — | fully rounded ends |
+| `pressed` | boolean / accessor | — | toggle button: `aria-pressed` and the pressed look (`is-pressed`: tinted on `secondary` / `ghost`, pressed in on the filled variants, bolder on `link`); unset: a plain button |
+| `href` | Href | — | router link; an external address (`https://…`, `mailto:`) is a plain link |
 | `type` | `button` `submit` `reset` | `button` | |
 | `class` | class | — | extra classes on the button |
 | `children` | node | — | the label (`.hm-btn-label`) |
 
 Other attributes (`onClick`, `title`, `aria-*`, `data-*`) go to the `<button>` / `<a>`.
 
-ActionButton: `action`, `args`, `variant`, `size`, `color`, `spinner`, `icon`, `iconOnly`, `class`, `onDone`, `onError`,
-`children` (replaces the action's label).
+ActionButton: `action` (an `action()` or a plain `{ label, run }`), `args`, `run` (runs instead of `action.run`),
+`variant`, `size`, `color`, `spinner`, `icon`, `iconOnly`, `shape`, `block`, `class`, `onDone`, `onError`, `children`
+(replaces the action's label). Other attributes (`role`, `title`, `onClick`, `data-*`) go to the button.
 
 ## Accessibility
 
-A real `<button>` (or `<a>` with `href`); focus ring on keyboard focus; `aria-busy` while loading. An icon-only
+A real `<button>` (or `<a>` with `href`); focus ring on keyboard focus; `aria-busy` while loading; `aria-pressed`
+when `pressed` is given (not on a link). An icon-only
 ActionButton uses the action's label as its accessible name; a keyboard shortcut of the action shows in the title.

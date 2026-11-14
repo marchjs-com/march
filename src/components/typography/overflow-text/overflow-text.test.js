@@ -34,11 +34,11 @@ test("marquee.css: logical fade (RTL flips), reduced motion falls back", () => {
 
 test("one-line labels scroll instead of ending in an ellipsis", () => {
   const read = (f) => readFileSync(new URL(`../../../${f}`, import.meta.url), "utf8");
-  const uses = { "components/composite/nav-sidebar/index.ts": ["hm-sb-label", "hm-sb-sub", "hm-sb-gname"], "components/navigation/nav-menu/index.ts": ["hm-nav-label"], "ui/app.ts": ["hm-link-card-title", "hm-user-name"],
+  const uses = { "components/composite/nav-sidebar/index.ts": ["hm-sb-label", "hm-sb-sub", "hm-sb-gname"], "components/navigation/nav-menu/index.ts": ["hm-nav-label"], "ui/app.ts": ["hm-user-name"], "components/navigation/link-card/index.ts": ["hm-link-card-title"],
     "components/actions/chip/index.ts": ["hm-chip2-label"], "components/composite/command-palette/view.ts": ["hm-pal-title"], "components/data/tree/index.ts": ["hm-tree-label"], "components/forms/combobox/index.ts": ["hm-chip-label"], "components/forms/file-upload/index.ts": ["hm-file-name"] };
   for (const [f, list] of Object.entries(uses)) for (const c of list) assert.ok(read(f).includes(`h(OverflowText, { class: "${c}"`), `${f} ${c}`);
   assert.match(read("components/composite/nav-sidebar/index.ts"), /class: "hm-sb-sub", mode: "loop", play: \(\) => active\(\) === x\.id/, "loops; the selected item keeps scrolling");
-  assert.doesNotMatch(read("ui/app.css"), /line-clamp/, "LinkCard description is not clamped");
+  assert.doesNotMatch(read("components/navigation/link-card/link-card.css"), /line-clamp/, "LinkCard description is not clamped");
 });
 
 test("OverflowText: disabled, easing and separator are props, not attributes", () => {
@@ -48,4 +48,20 @@ test("OverflowText: disabled, easing and separator are props, not attributes", (
   assert.equal(el.getAttribute("separator"), null);
   assert.equal(el.getAttribute("data-x"), "1");
   assert.match(el.getAttribute("class"), /\bmine\b/);
+});
+
+test("Marquee duplicate: the content is a unit and its copies are hidden and inert; off by default", () => {
+  const one = h(U.Marquee, { duplicate: true, separator: false }, h("a", { href: "/x" }, "Logo"));
+  const units = one.querySelectorAll(".hm-marquee-item .hm-marquee-unit");
+  assert.equal(units.length, 2, "the content and one copy until the width is known");
+  assert.equal(units[0].getAttribute("aria-hidden"), null);
+  assert.equal(units[1].getAttribute("aria-hidden"), "true");
+  assert.ok(units[1].hasAttribute("inert"));
+  assert.equal(units[1].textContent, "Logo");
+  assert.equal(one.getAttribute("duplicate"), null, "a prop, not an attribute");
+  const three = h(U.Marquee, { duplicate: 3, text: "A" });
+  assert.equal(three.querySelectorAll(".hm-marquee-unit").length, 4);
+  assert.equal(three.querySelectorAll(".hm-marquee-unit[aria-hidden=true]").length, 3);
+  assert.equal(h(U.Marquee, { text: "A" }).querySelector(".hm-marquee-unit"), null);
+  assert.match(css, /\.hm-marquee-unit/);
 });

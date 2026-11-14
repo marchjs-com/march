@@ -6,7 +6,7 @@ export default defineMeta({
   category: "composite",
   since: "0.1.0",
   summary: "Theme builder: color tokens for light and dark with a WCAG audit, type, shape and motion, a live scoped preview, code / CSS / JSON out.",
-  composedOf: ["ColorPicker", "EasingCurveEditor", "Tabs", "Segmented", "Slider", "Select", "TextInput", "Textarea", "Toggle", "Button", "IconButton", "CopyButton", "Badge", "ThemeSwatch", "CodeView", "Alert", "Card", "Checkbox", "Chip", "Progress"],
+  composedOf: ["ColorPicker", "EasingCurveEditor", "Tabs", "Segmented", "Slider", "Select", "TextInput", "Textarea", "Toggle", "Button", "IconButton", "CopyButton", "Badge", "ThemeSwatch", "CodeView", "Alert", "Card", "Checkbox", "Chip", "Progress", "Avatar"],
   behaviors: [],
   hubs: [],
   showcase: "/themes",

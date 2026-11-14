@@ -8,6 +8,6 @@ export default definePlayground<Values>({
     { key: "slides", label: "Slayt sayısı", default: 6, min: 3, max: 10, step: 1 },
     { key: "arrows", label: "Oklar", default: "on", kind: "segmented", options: [{ value: "on", label: "hazır" }, { value: "own", label: "kendi ikonlarım" }, { value: "off", label: "yok" }] },
     { key: "dots", label: "Noktalar", default: "on", kind: "segmented", options: [{ value: "on", label: "hazır" }, { value: "own", label: "numaralı" }, { value: "off", label: "yok" }] },
-    { key: "color", label: "Etkin nokta rengi", default: "primary", kind: "chips", options: [{ value: "primary", label: "birincil" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "brand-green", label: "yeşil" }], visibleWhen: (v) => v.dots !== "off" },
+    { key: "color", label: "Etkin nokta rengi", default: "primary", kind: "chips", options: [{ value: "primary", label: "birincil" }, { value: "brand-blue", label: "mavi" }, { value: "brand-purple", label: "mor" }, { value: "brand-green", label: "yeşil" }], visibleWhen: (v) => v.dots !== "off" },
   ],
 });

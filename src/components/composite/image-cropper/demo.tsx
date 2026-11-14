@@ -1,7 +1,7 @@
 // Showcase stage for ImageCropper: a picture drawn on a canvas with the theme's HADİ colors (a blob: URL, so the cropper
 // can read it back), for the Playground values (playground.ts).
 import { signal } from "../../../core/reactive.ts";
-import { ImageCropper } from "./index.ts";
+import { ImageCropper, DEFAULT_CROP, type CropState } from "./index.ts";
 
 const token = (name: string): string => globalThis.getComputedStyle?.(globalThis.document.documentElement).getPropertyValue(name).trim() || "gray"
 
@@ -35,14 +35,17 @@ const SLIDERS: Record<string, boolean | ("zoom" | "angle")[]> = { all: true, zoo
 
 export default function ImageCropperDemo(props: { values: { aspect: string; maxZoom: number; preview: boolean; readonly: boolean; grid: boolean; hint: boolean; tools: string; sliders: string; labels: boolean } }) {
   const src = signal("")
+  // starts at 2×: the zoom slider is part way, so a new zoom limit moves it; the state outlives a rebuilt cropper
+  let $crop: CropState = { ...DEFAULT_CROP, zoom: 2 }
   void scene().then((u) => src.set(u))
   return <div class="sc-ed-one">
     {() => {
       // the parts are chosen when the cropper is made: it is made again when one of them changes
       const parts = { grid: props.values.grid, hint: props.values.hint, tools: TOOLS[props.values.tools], sliders: SLIDERS[props.values.sliders] }
       const labels = props.values.labels ? { zoom: "Büyüklük", angle: "Eğim", free: "Dilediğin gibi", hint: "Sürükle, tekerlekle yaklaş; R döndürür, F aynalar." } : undefined
-      return src() ? <ImageCropper src={src()} alt="Tepeler ve güneş" aspect={props.values.aspect === "choices" ? undefined : Number(props.values.aspect)}
+      return src() ? <ImageCropper src={src()} alt="Tepeler ve güneş" value={$crop} onChange={(c: CropState) => { $crop = c }} aspect={props.values.aspect === "choices" ? undefined : Number(props.values.aspect)}
         maxZoom={props.values.maxZoom} preview={props.values.preview} readonly={props.values.readonly} {...parts} labels={labels} /> : null
     }}
+    {() => (SLIDERS[props.values.sliders] === false ? null : <p class="hm-muted">{`Yakınlaştırma kaydırıcısı %100 ile %${props.values.maxZoom * 100} arasında.`}</p>)}
   </div>
 }

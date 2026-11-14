@@ -2,7 +2,9 @@
 // Navigation: Tabs, breadcrumbs, pagination, menus, bottom bars. Import: hadi-march/navigation
 export * from "./activity-bar/index.ts";
 export * from "./breadcrumbs/index.ts";
+export * from "./link-card/index.ts";
 export * from "./nav-menu/index.ts";
+export * from "./page-dots/index.ts";
 export * from "./pagination/index.ts";
 export * from "./stepper/index.ts";
 export * from "./steps/index.ts";

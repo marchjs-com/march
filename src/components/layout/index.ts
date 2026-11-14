@@ -8,6 +8,8 @@ export * from "./disclosure/index.ts";
 export * from "./grid/index.ts";
 export * from "./layout/index.ts";
 export * from "./overlay-scope/index.ts";
+export * from "./panel-header/index.ts";
+export * from "./resize-handle/index.ts";
 export * from "./spacer/index.ts";
 export * from "./splitter/index.ts";
 export * from "./stack/index.ts";

@@ -14,5 +14,8 @@
 .hm-menu-item.is-danger, .hm-menu-item.is-danger .hm-icon { color: var(--hm-danger-text); }
 .hm-menu-label { flex: 1; }
 .hm-menu-kbd { margin-inline-start: auto; }
+/* a checked choice (menuitemcheckbox / menuitemradio): the mark keeps its place, shown only while checked */
+.hm-menu-check { display: inline-flex; flex: none; color: var(--hm-accent, var(--hm-primary)); visibility: hidden; }
+.hm-menu-item[aria-checked="true"] .hm-menu-check { visibility: visible; }
 .hm-menu-sep { height: 1px; margin: var(--hm-space-1) calc(-1 * var(--hm-space-1)); background: var(--hm-border); }
 .hm-pop::-webkit-scrollbar-track { margin-block: var(--hm-radius-2); }

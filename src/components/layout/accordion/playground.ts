@@ -9,6 +9,6 @@ export default definePlayground<Values>({
     { key: "icons", label: "İkonlar", default: true },
     { key: "chevron", label: "Ok", default: "arrow", options: [{ value: "arrow", label: "ok" }, { value: "plus", label: "artı / eksi (kendi işaretim)" }, { value: "off", label: "yok" }] },
     { key: "animated", label: "Açılma hareketi", default: true },
-    { key: "color", label: "İkon rengi", default: "primary", options: [{ value: "primary", label: "vurgu" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "success", label: "yeşil" }], visibleWhen: (v) => v.icons },
+    { key: "color", label: "İkon rengi", default: "primary", options: [{ value: "primary", label: "vurgu" }, { value: "brand-blue", label: "mavi" }, { value: "brand-purple", label: "mor" }, { value: "success", label: "yeşil" }], visibleWhen: (v) => v.icons },
   ],
 });

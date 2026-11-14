@@ -2,7 +2,7 @@
 // Shared by OverflowToolbar, StatusBar and Breadcrumbs (one measuring rule, no copies).
 //   const shown = fitItems(widths, priorities, available, moreWidth)   pure: true = visible
 //   observeWidth(el, (w) => …)                                          ResizeObserver, removed with the owner
-import { getOwner, onCleanup } from "../core/reactive.ts";
+import { observeSize } from "./observe.ts";
 
 /**
  * Which items fit in `available` px. Items drop lowest `priority` first (ties: the last one first); while any item is
@@ -22,11 +22,4 @@ export function fitItems(widths: readonly number[], priorities: readonly number[
 }
 
 /** Call `fn` with the element's content width now and whenever it changes. Returns stop (also run with the owner). */
-export function observeWidth(el: Element, fn: (width: number) => void): () => void {
-  if (typeof ResizeObserver !== "function") { fn((el as HTMLElement).clientWidth ?? 0); return () => {}; }
-  const ro = new ResizeObserver((entries) => { for (const e of entries) fn(e.contentRect.width); });
-  ro.observe(el);
-  const stop = (): void => ro.disconnect();
-  if (getOwner()) onCleanup(stop);
-  return stop;
-}
+export const observeWidth = (el: Element, fn: (width: number) => void): (() => void) => observeSize(el, (s) => fn(s.width));

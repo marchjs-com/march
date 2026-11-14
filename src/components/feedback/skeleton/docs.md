@@ -12,7 +12,8 @@ Grey (or brand-tinted) shapes standing in for content that is loading: a few tex
 |---|---|---|---|
 | `lines` | `number` | `3` | text lines; the last one is shorter |
 | `block` | `boolean` | `false` | one block instead of lines |
-| `height` | `sm` `md` `lg` | `md` | block height |
+| `height` | `sm` `md` `lg` | `md` | block height, or the size of the circle |
+| `shape` | `circle` | | one round shape (an avatar on its way); `--hm-skel-size` sets another size |
 | `colors` | `"brand"` / `"single"` | the theme's | brand: a four-colour shimmer; single: neutral even in a multicolour theme |
 | `shimmer` | `boolean` | `true` | `false`: still shapes, no moving light |
 | `shortLast` | `boolean` | `true` | `false`: every line has the full width |
@@ -21,11 +22,12 @@ Grey (or brand-tinted) shapes standing in for content that is loading: a few tex
 
 ```tsx
 <Skeleton lines={4} shimmer={false} shortLast={false} label="Loading the profile" />
+<Skeleton shape="circle" height="lg" />
 ```
 
 ## Accessibility
 
-The lines carry `aria-busy="true"` and the label "Loading" (translated); a block is `aria-hidden` (decorative, the
+The lines carry `aria-busy="true"` and the label "Loading" (translated); a block and a circle are `aria-hidden` (decorative, the
 region around it says it is loading). The shimmer stops with reduced motion.
 
 ## Composed of

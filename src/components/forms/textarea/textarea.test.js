@@ -21,3 +21,25 @@ test("Textarea: rows, value both ways, autosize sets a height", () => {
   assert.equal(v(), "one\ntwo");
   assert.ok(ta.className.includes("hm-textarea"));
 });
+
+test("Textarea: mono, tabIndent (Tab indents, Shift+Tab and Escape-then-Tab leave), onKeyDown", () => {
+  const v = signal("ab"), keys = [];
+  const { el } = mount(() => [h(Textarea, { "bind:value": v, mono: true, tabIndent: true, onKeyDown: (e) => keys.push(e.key) }), h(Textarea, { value: "x" }), h(Textarea, { value: "x", tabIndent: 4 })]);
+  const [ta, plain, four] = el.querySelectorAll("textarea");
+  assert.ok(ta.className.includes("hm-mono"));
+  assert.equal(plain.className.includes("hm-mono"), false);
+  ta.selectionStart = ta.selectionEnd = 1;
+  const e = key(ta, "Tab");
+  assert.equal(e.defaultPrevented, true);
+  assert.equal(v(), "a  b");
+  assert.equal(ta.selectionStart, 3);
+  assert.equal(key(ta, "Tab", { shiftKey: true }).defaultPrevented, false, "Shift+Tab leaves");
+  key(ta, "Escape");
+  assert.equal(key(ta, "Tab").defaultPrevented, false, "Escape, then Tab, leaves");
+  assert.equal(v(), "a  b");
+  assert.deepEqual(keys, ["Tab", "Tab", "Escape", "Tab"]);
+  assert.equal(key(plain, "Tab").defaultPrevented, false, "no tabIndent: Tab moves on");
+  four.selectionStart = four.selectionEnd = 0;
+  key(four, "Tab");
+  assert.equal(four.value, "    x");
+});

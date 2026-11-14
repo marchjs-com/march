@@ -36,3 +36,25 @@ test("Alert: own dismiss label and icon, a colour token, no icon", () => {
   assert.equal(x.querySelector("svg"), null);
   m.dispose();
 });
+
+test("Alert: action sits beside the text before the dismiss button, or below the text; action() objects become buttons", async () => {
+  const { action } = await import("../../../ui/action.ts");
+  let ran = 0;
+  const retry = action("Retry", async () => { ran++; });
+  const m = mountD(() => [
+    h(Alert, { tone: "danger", dismissable: true, action: h("button", { class: "go" }, "Reload"), class: "a" }, "New version"),
+    h(Alert, { actionPlacement: "below", action: [retry], class: "b" }, "Failed"),
+    h(Alert, { class: "c" }, "Plain"),
+  ]);
+  const a = m.el.querySelector(".a"), b = m.el.querySelector(".b");
+  const order = [...a.children].map((x) => x.className.split(" ").pop());
+  assert.deepEqual(order.slice(-3), ["hm-alert-main", "hm-alert-action", "hm-alert-x"]);
+  assert.equal(a.querySelector(".hm-alert-action .go").parentElement.parentElement, a);
+  const below = b.querySelector(".hm-alert-main .hm-alert-action-below");
+  assert.equal(below.querySelector("button").textContent, "Retry");
+  below.querySelector("button").click();
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(ran, 1);
+  assert.equal(m.el.querySelector(".c .hm-alert-action"), null);
+  m.dispose();
+});

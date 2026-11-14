@@ -1,26 +1,34 @@
-// Showcase stage for IconButton: size, colour and the danger tone follow the Playground values (playground.ts).
+// Showcase stage for IconButton: size, variant, shape, pressed, the look on a dark ground and colour follow the Playground values (playground.ts).
 import { IconButton } from "./index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { heart } from "../../../icons/glyphs/heart.ts";
 import { star } from "../../../icons/glyphs/star.ts";
 import { bell } from "../../../icons/glyphs/bell.ts";
 import { trash } from "../../../icons/glyphs/trash.ts";
+import { globe } from "../../../icons/glyphs/globe.ts";
 
-export const code = `<IconButton icon={heart} label="Beğen" on:click={like} />
+export const code = `<IconButton icon={heart} label="Beğen" pressed={$liked} on:click={like} />   // toggle: aria-pressed + pressed look
 <IconButton icon={trash} label="Sil" variant="danger" size="sm" />   // label is required (aria-label + title)
-<IconButton icon={star} label="Yıldızla" color="brand-orange" title={false} />   // colour token; no native tooltip`
+<IconButton icon={star} label="Yıldızla" color="brand-orange" title={false} />   // colour token; no native tooltip
+<IconButton icon={send} label="Gönder" variant="solid" shape="round" />          // filled circle; "raised": floating
+<IconButton icon={x} label="Kapat" inverse />                                    // on a photo / video
+<IconButton icon={globe} label="Site" href="https://example.com" />              // a link`
 
-export default function IconButtonDemo(props: { values: { size: string; danger: boolean; color: string } }) {
+export default function IconButtonDemo(props: { values: { size: string; variant: string; shape: string; pressed: boolean; inverse: boolean; color: string } }) {
   let $liked = false
   return <div class="sc-row">
     {() => {
       const v = props.values, size = v.size as "md", color = (v.color || undefined) as ColorToken | undefined
-      return [
-        <IconButton icon={heart} label={() => ($liked ? "Beğenmekten vazgeç" : "Beğen")} size={size} color={color} aria-pressed={() => String($liked)} on:click={() => { $liked = !$liked }} />,
-        <IconButton icon={star} label="Yıldızla" size={size} color={color} />,
-        <IconButton icon={bell} label="Bildirimler" size={size} color={color} />,
-        <IconButton icon={trash} label="Sil" size={size} variant={v.danger ? "danger" : undefined} />,
-      ]
+      const variant = v.variant || undefined, shape = v.shape === "round" ? "round" as const : undefined
+      const pressed = v.pressed ? true : undefined
+      return <div class={v.inverse ? "sc-row sc-on-dark" : "sc-row"}>
+        <IconButton icon={heart} label={() => ($liked ? "Beğenmekten vazgeç" : "Beğen")} size={size} variant={variant} shape={shape} inverse={v.inverse} color={color}
+          pressed={() => $liked || v.pressed} on:click={() => { $liked = !$liked }} />
+        <IconButton icon={star} label="Yıldızla" size={size} variant={variant} shape={shape} inverse={v.inverse} color={color} pressed={pressed} />
+        <IconButton icon={bell} label="Bildirimler" size={size} variant={variant} shape={shape} inverse={v.inverse} color={color} pressed={pressed} />
+        <IconButton icon={globe} label="Site (bağlantı)" href="https://example.com" target="_blank" rel="noopener" size={size} variant={variant} shape={shape} inverse={v.inverse} color={color} />
+        <IconButton icon={trash} label="Sil" size={size} variant={variant ?? "danger"} shape={shape} inverse={v.inverse} />
+      </div>
     }}
     <span class="hm-muted">{() => ($liked ? "Beğenildi" : "")}</span>
   </div>

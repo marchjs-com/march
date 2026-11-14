@@ -68,6 +68,7 @@ export function DateRangePicker(props: DateRangePickerProps): unknown {
     }) : null),
     () => (active() === "custom" || !presets().length ? h("div", { class: "hm-daterange-custom" },
       h(DatePicker, { color: props.color, ...props.picker, "aria-label": live(() => props.labels?.from ?? t`From`), value: live(() => get()?.from ?? null), setValue: (v) => range("from", v), min: live(() => props.min), max: live(() => get()?.to ?? props.max), disabled: live(() => props.disabled), firstDay: props.firstDay }),
-      props.separator === false || props.separator === null ? null : h("span", { class: "hm-daterange-sep", "aria-hidden": "true" }, ownPart(props.separator, () => "–")),
+      // live: the sign can change (or go) while the pair is shown
+      () => (props.separator === false || props.separator === null ? null : h("span", { class: "hm-daterange-sep", "aria-hidden": "true" }, ownPart(props.separator, () => "–"))),
       h(DatePicker, { color: props.color, ...props.picker, "aria-label": live(() => props.labels?.to ?? t`To`), value: live(() => get()?.to ?? null), setValue: (v) => range("to", v), min: live(() => get()?.from ?? props.min), max: live(() => props.max), disabled: live(() => props.disabled), firstDay: props.firstDay })) : null));
 }

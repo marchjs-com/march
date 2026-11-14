@@ -104,3 +104,26 @@ export function shortcuts(): ShortcutInfo[] {
     description: typeof s.description === "function" ? s.description() : (s.description as string),
   }));
 }
+
+/** True while the primary modifier is held: Ctrl or ⌘ (keyboard and pointer events). */
+export const isMod = (e: { ctrlKey: boolean; metaKey: boolean }): boolean => e.ctrlKey || e.metaKey;
+
+/** A label with its shortcut for a tooltip: `labelWithKey("Save", "mod+s")` → "Save (Ctrl+S)"; no shortcut → the label. */
+export const labelWithKey = (label: string, combo?: string | null): string => (combo ? `${label} (${formatKey(combo)})` : label);
+
+/** What undoKeys() drives: an undo stack, or any object with the two steps. */
+export interface UndoTarget { undo(): unknown; redo(): unknown }
+/**
+ * The undo / redo keys of an editor: mod+Z undoes, mod+Shift+Z and mod+Y redo. Call it from a keydown handler;
+ * returns true when the key was one of them (the event is then prevented), so the handler can stop there.
+ * `if (undoKeys(e, stack)) return;`
+ */
+export function undoKeys(e: KeyboardEvent, stack: UndoTarget | null | undefined): boolean {
+  if (!isMod(e) || e.altKey) return false;
+  const k = String(e.key ?? "").toLowerCase();
+  const undo = k === "z" && !e.shiftKey, redo = (k === "z" && e.shiftKey) || (k === "y" && !e.shiftKey);
+  if (!undo && !redo) return false;
+  e.preventDefault();
+  if (stack) void (redo ? stack.redo() : stack.undo());
+  return true;
+}

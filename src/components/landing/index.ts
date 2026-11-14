@@ -23,6 +23,7 @@ export * from "./reveal/index.ts";
 export * from "./roadmap/index.ts";
 export * from "./scroll-progress/index.ts";
 export * from "./scroll-story/index.ts";
+export * from "./section-head/index.ts";
 export * from "./site-footer/index.ts";
 export * from "./site-nav/index.ts";
 export * from "./site-section/index.ts";

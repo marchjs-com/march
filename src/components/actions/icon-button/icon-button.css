@@ -7,7 +7,21 @@
 .hm-icon-btn .hm-svg { width: 1.0625rem; height: 1.0625rem; }
 .hm-icon-btn.hm-btn-sm { width: var(--hm-control-h-sm); height: var(--hm-control-h-sm); font-size: var(--hm-text-md); }
 .hm-icon-btn.hm-btn-sm .hm-svg { width: .9375rem; height: .9375rem; }
+.hm-icon-btn.hm-btn-lg { width: var(--hm-control-h-lg); height: var(--hm-control-h-lg); padding: 0; }
+.hm-icon-btn.hm-btn-lg .hm-svg { width: 1.375rem; height: 1.375rem; }
+.hm-icon-btn.hm-btn-xs { width: 1.5rem; height: 1.5rem; font-size: var(--hm-text-sm); border-radius: var(--hm-radius-1); }
+.hm-icon-btn.hm-btn-xs .hm-svg { width: .8125rem; height: .8125rem; }
+.hm-icon-btn.hm-icon-btn-round { border-radius: var(--hm-radius-full); }
 .hm-icon-btn-danger { color: var(--hm-danger); }
+.hm-icon-btn-solid, .hm-icon-btn-solid[data-hm-color] { background: var(--hm-accent, var(--hm-primary-solid)); color: var(--hm-on-accent, var(--hm-on-primary)); }
+.hm-icon-btn-solid:hover { background: var(--hm-accent-hover, color-mix(in srgb, var(--hm-accent, var(--hm-primary-solid)) 88%, var(--hm-text))); color: var(--hm-on-accent, var(--hm-on-primary)); }
+.hm-icon-btn-raised { border: var(--hm-border-w, 1px) solid var(--hm-border); background: var(--hm-surface); color: var(--hm-text); box-shadow: var(--hm-shadow-2); }
+.hm-icon-btn-raised:hover { background: var(--hm-surface); border-color: var(--hm-accent, var(--hm-border-strong)); }
+.hm-icon-btn-inverse { color: var(--hm-on-scrim); }
+.hm-icon-btn-inverse:hover, .hm-icon-btn-inverse:active, .hm-icon-btn-inverse.is-pressed { background: color-mix(in srgb, var(--hm-on-scrim) 16%, transparent); color: var(--hm-on-scrim); }
+.hm-icon-btn-inverse:focus-visible { outline-color: var(--hm-on-scrim); }
+.hm-icon-btn-inverse.hm-icon-btn-raised { border-color: transparent; background: color-mix(in srgb, var(--hm-on-scrim) 82%, transparent); color: var(--hm-scrim); }
+.hm-icon-btn-inverse.hm-icon-btn-raised:hover { background: var(--hm-on-scrim); color: var(--hm-scrim); }
 .hm-icon-btn[data-hm-color] { color: var(--hm-accent-text, var(--hm-accent)); }
 .hm-icon-btn { position: relative; }
 .hm-icon-btn > .hm-badge-count { position: absolute; top: 2px; inset-inline-end: 0; min-width: 1rem; min-height: 1rem; padding: 0 .25rem; font-size: .625rem; line-height: 1rem;

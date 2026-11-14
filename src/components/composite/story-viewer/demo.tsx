@@ -1,4 +1,5 @@
 // Showcase stage for StoryViewer: a story tray (StoryRing); a ring opens the viewer at that person, seen rings turn grey.
+// The viewer reads the Playground values each time it opens: "Hikâyeleri baştan aç" shows a new choice.
 import { StoryViewer, type StoryGroup } from "./index.ts";
 import { StoryRing } from "../../social/story-ring/index.ts";
 import { PHOTO, USERS, minutesAgo } from "../../social/demo-data.ts";
@@ -26,7 +27,8 @@ export default function StoryViewerDemo(props: { values: { duration: number; rep
     <div class="sc-social-tray" role="list" aria-label="Hikâyeler">
       {GROUPS.map((g) => <div role="listitem"><StoryRing name={g.name} label={USERS.find((u) => u.id === g.id)?.handle} state={() => (allSeen(g) ? "seen" : "new")} onClick={() => { $who = g.id; $open = true }} /></div>)}
     </div>
-    <button type="button" class="sc-social-link" onClick={() => { $who = props.values.start; $open = true }}>Hikâyeleri baştan aç</button>
+    <button type="button" class="sc-social-link" data-audit-try onClick={() => { $who = props.values.start; $open = true }}>Hikâyeleri baştan aç</button>
+    <p class="sc-strip-label">{() => `Açılınca ${props.values.start === "u3" ? "üçüncü" : "ilk"} kişiden başlar; her hikâye ${props.values.duration / 1000} sn sürer.${props.values.reply && props.values.ownLabels ? " Yanıt alanı “… için bir şey yaz…” der, gönderince “İletildi ✓” yazar." : ""}`}</p>
     <p class="sc-strip-label" aria-live="polite">{() => $log}</p>
     {() => <StoryViewer open={() => $open} onClose={() => { $open = false }} groups={GROUPS} start={() => $who} duration={props.values.duration}
       progress={props.values.progress} avatar={props.values.header} time={props.values.header} pauseButton={props.values.buttons} closeButton={props.values.buttons} arrows={props.values.arrows}

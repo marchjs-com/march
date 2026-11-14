@@ -98,36 +98,7 @@ export function UserMenu(props: UserMenuProps): unknown {
   });
 }
 
-export type IconTone = "primary" | "neutral" | "success" | "warn" | "danger" | "info" | "violet" | "pink" | "teal";
-export interface IconTileProps { icon: unknown; tone?: MaybeFn<IconTone | undefined>; size?: "sm" | "md" | "lg"; class?: ClassProp }
-/** An icon in a tinted rounded square: `<IconTile icon={users} tone="primary" />` */
-export function IconTile(props: IconTileProps): Element {
-  return h("span", { class: () => cx("hm-icon-tile", `hm-tile-${val(props.tone) ?? "primary"}`, `hm-icon-tile-${props.size ?? "md"}`, val(props.class)), "aria-hidden": "true" }, icon(props.icon, "hm-icon"));
-}
-
-export interface LinkCardProps {
-  href: Href;
-  title: MaybeFn<unknown>;
-  description?: MaybeFn<unknown>;
-  icon?: unknown;
-  tone?: MaybeFn<IconTone | undefined>;
-  /** Small text on the right (a count, a status). */
-  meta?: MaybeFn<unknown>;
-  class?: ClassProp;
-}
-/** A navigational card: `<LinkCard href="/users" icon={users} title="Members" description="Search and manage" />` */
-export function LinkCard(props: LinkCardProps): Element {
-  return h(Link, {
-    href: props.href, class: () => cx("hm-link-card", val(props.class)),
-    children: [
-      props.icon != null && h(IconTile, { icon: props.icon, tone: props.tone }),
-      h("span", { class: "hm-link-card-text" },
-        h(OverflowText, { class: "hm-link-card-title" }, () => val(props.title)),
-        props.description != null && h("span", { class: "hm-link-card-desc" }, () => val(props.description))),
-      props.meta != null && h("span", { class: "hm-link-card-meta" }, () => val(props.meta)),
-      h("span", { class: "hm-link-card-arrow", "aria-hidden": "true" }, glyph(arrowUpRight)),
-    ],
-  }) as Element;
-}
-
+// IconTile and LinkCard moved to their component folders; this path keeps working for existing imports.
+export { IconTile, type IconTileProps, type IconTone } from "../components/data/icon-tile/index.ts";
+export { LinkCard, type LinkCardProps } from "../components/navigation/link-card/index.ts";
 export { Spacer } from "./spacer.ts";

@@ -9,7 +9,7 @@ const TreeEditor = lazy<TreeEditorProps>(() => import("./index.ts").then((m) => 
 
 const DATA: Record<string, { value: unknown; schema: JsonSchema }> = {
   config: {
-    value: { name: "hadi-api", port: 80, mode: "staging", debug: false, regions: ["eu-west", "us-east"], limits: { rps: 120, burst: 40 }, owner: null },
+    value: { name: "hadi-api", port: 80, mode: "staging", debug: false, regions: ["eu-west", "us-east"], limits: { rps: 120, burst: 40, hours: { from: 9, to: 18 } }, owner: null },
     schema: { type: "object", required: ["name", "port"], properties: {
       name: { type: "string", minLength: 1 }, port: { type: "integer", minimum: 1024, maximum: 65535, description: "1024–65535" }, mode: { enum: ["dev", "staging-eu", "prod"] },
       debug: { type: "boolean" }, regions: { type: "array", items: { type: "string" }, minItems: 1 }, limits: { type: "object", properties: { rps: { type: "integer", minimum: 1 }, burst: { type: "integer", maximum: 30 } } },

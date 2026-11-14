@@ -5,7 +5,7 @@
 import { effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { applyPipe } from "../../../core/pipes.ts";
+import { formatCount } from "../../../ui/format.ts";
 import { drawDigits, rollDigits } from "../../../motion/digits.ts";
 import "./count-roll.css";
 
@@ -26,10 +26,7 @@ export interface CountRollProps {
   class?: ClassProp;
 }
 
-/** The text a count shows: `formatCount(1234)` → "1,2 B" (tr) / "1.2K" (en). */
-export function formatCount(n: number, format: "compact" | "full" = "compact"): string {
-  return format === "full" || Math.abs(n) < 1000 ? applyPipe("number", n, 0) : applyPipe("compact", n);
-}
+export { formatCount };
 
 /** `<CountRoll value={$likes} />` */
 export function CountRoll(props: CountRollProps): Element {

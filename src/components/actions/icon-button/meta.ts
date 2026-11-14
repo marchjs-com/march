@@ -4,7 +4,7 @@ export default defineMeta({
   name: "IconButton",
   status: "stable",
   since: "0.1.0",
-  summary: "Icon-only button: the label is required and becomes its accessible name and title; sizes and a danger tone.",
+  summary: "Icon-only button: the label is required and becomes its accessible name and title; four sizes, danger / solid / raised variants, round shape, a pressed toggle state, an inverse look for dark media, and href to draw a link.",
   category: "actions",
   composedOf: [],
   behaviors: [],

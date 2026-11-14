@@ -1,22 +1,19 @@
-// Page scaffolding: Page, Section, ListDetail, Pager, SearchBox.
+// Page scaffolding: Page, Section, ListDetail, Pager (SearchBox is re-exported from its component folder).
 import "./crumbs.css";
 import "./layout.css";
 import "./field.css";
 import "./button.css";
-import { signal, computed, untrack, effect, onCleanup, type Signal } from "../core/reactive.ts";
+import { untrack, effect, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { Link, back as historyBack, type Href } from "../router/router.ts";
 import { actionsOf } from "./display-base.ts";
 import { type ActionsProp } from "./display.ts";
 import { Tabs, type TabSpec } from "./tabs.ts";
-import { key } from "./keys.ts";
-import { val, cx, rest, debounce, glyph, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, rest, glyph, type MaybeFn, type ClassProp } from "./util.ts";
 import { Layout, useLayout, addControls, resolveFeatures, type LayoutProps, type SlotName } from "../components/layout/layout/index.ts";
 import { CORNERS } from "../components/layout/bottom-right-controls/index.ts";
 import { arrowLeft } from "../icons/glyphs/arrowLeft.ts";
-import { search as searchIcon } from "../icons/glyphs/search.ts";
-import { x as xIcon } from "../icons/glyphs/x.ts";
 import { chevronLeft } from "../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 
@@ -176,52 +173,7 @@ export function Pager(props: PagerProps): Element {
       h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", "data-next": "", disabled: () => !nextOk(), onClick: () => (cursor ? props.onNext?.() : go(page() + 1)) }, () => t`Next`, glyph(chevronRight))));
 }
 
-export interface SearchBoxProps {
-  /** A signal (two-way), or a value / accessor to follow. `bind:value` works too. */
-  value?: Signal<string> | MaybeFn<string | null | undefined>;
-  setValue?: (v: string) => void;
-  onSearch?: (q: string) => void;
-  onEnter?: (q: string) => void;
-  /** ms (default 250). */
-  debounce?: number;
-  /** `true`: "/" focuses the box; or another combo. */
-  shortcut?: boolean | string;
-  placeholder?: MaybeFn<string | undefined>;
-  label?: MaybeFn<string | undefined>;
-  class?: ClassProp;
-}
-const isSignal = (v: unknown): v is Signal<string> => typeof v === "function" && (v as Partial<Signal<string>>).signal === true;
-/**
- * Debounced search input with a clear button. `<SearchBox bind:value={$q} onSearch={(q) => …} debounce={250} shortcut />`
- * `shortcut`: pressing "/" anywhere focuses it.
- */
-export function SearchBox(props: SearchBoxProps): Element {
-  let input: HTMLInputElement | undefined;
-  const sig = isSignal(props.value) ? props.value : null;
-  const plain = (): string | null | undefined => val(props.value as MaybeFn<string | null | undefined>);
-  const current = signal(String((sig ? sig.peek() : untrack(plain)) ?? ""));
-  const write = (v: string): void => { if (sig) sig.set(v); props.setValue?.(v); };
-  const emit = debounce((v: string) => { write(v); props.onSearch?.(v); }, props.debounce ?? 250);
-  onCleanup(emit.cancel);
-  // follow outside changes of a controlled value
-  if (props.value !== undefined) effect(() => { const v = String((sig ? sig() : plain()) ?? ""); if (v !== untrack(current)) { current.set(v); if (input && input.value !== v) input.value = v; } });
-  if (props.shortcut) key(props.shortcut === true ? "/" : props.shortcut, () => input?.focus(), { description: () => t`Focus search` });
-  const filled = computed(() => current() !== "");
-  const clear = (): void => { current.set(""); if (input) input.value = ""; emit.cancel(); write(""); props.onSearch?.(""); input?.focus(); };
-  return h("div", { class: () => cx("hm-search", val(props.class)), role: "search" },
-    h("span", { class: "hm-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
-    h("input", {
-      type: "search", class: "hm-input hm-search-input", ref: (x: HTMLInputElement) => { input = x; }, value: current.peek(),
-      placeholder: () => val(props.placeholder) ?? t`Search…`, "aria-label": () => val(props.label) ?? val(props.placeholder) ?? t`Search`,
-      autocomplete: "off", spellcheck: "false",
-      onInput: (e: Event) => { const v = (e.target as HTMLInputElement).value; current.set(v); emit(v); },
-      onKeydown: (e: KeyboardEvent) => {
-        if (e.key === "Escape" && current.peek()) { e.preventDefault(); e.stopPropagation(); clear(); }
-        else if (e.key === "Enter") { emit.cancel(); write(current.peek()); props.onSearch?.(current.peek()); props.onEnter?.(current.peek()); }
-      },
-    }),
-    () => filled() && h("button", { type: "button", class: "hm-icon-btn hm-search-clear", "aria-label": () => t`Clear search`, onClick: clear }, glyph(xIcon)),
-    props.shortcut && h("kbd", { class: "hm-kbd hm-search-kbd", "aria-hidden": "true" }, props.shortcut === true ? "/" : props.shortcut));
-}
+// SearchBox lives in its own component folder; this module keeps exporting it.
+export { SearchBox, type SearchBoxProps } from "../components/forms/search-box/index.ts";
 
 export { AppShell, type AppShellProps } from "./app-shell.ts";

@@ -22,8 +22,12 @@ const turnIn = (incoming: HTMLElement, outgoing: HTMLElement | undefined, dir: 1
   if (outgoing) animate(outgoing, { opacity: [1, 0] }, { duration: 300, easing: "out" })
 }
 
+// the visual changes while the page scrolls past a step: the stage says how it will come in
+const TRANSITIONS: Record<string, string> = { rise: "yükselerek gelir", fade: "solarak gelir", own: "dönerek gelir (kendi geçişim)", none: "hareketsiz değişir" }
+
 export default function ScrollStoryDemo(props: { values: { side: string; theme: boolean; dots: boolean; numbers: string; transition: string } }) {
   return <div>
+    <p class="hm-muted">{() => `Sayfayı kaydır: adım değişince görsel ${TRANSITIONS[props.values.transition]}.`}</p>
     {() => {
       const v = { ...props.values }
       return <ScrollStory steps={STORY} side={v.side as "end"} theme={v.theme} dots={v.dots}

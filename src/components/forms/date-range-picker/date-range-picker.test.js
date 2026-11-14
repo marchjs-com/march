@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
-const { h, render, signal } = await import("../../../index.ts");
+const { h, render, signal, reactive } = await import("../../../index.ts");
 const { DateRangePicker, rangePresets } = await import("./index.ts");
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
@@ -49,4 +49,17 @@ test("DateRangePicker: texts, the Custom option, the separator and the pickers a
   assert.equal(c.el.querySelectorAll(".hm-date-input").length, 2);
   assert.equal(c.el.querySelector(".hm-daterange-sep"), null);
   c.dispose();
+});
+
+test("DateRangePicker: the separator is live (it changes or goes while the pair is shown)", async () => {
+  const sep = signal("–");
+  const a = mount(() => h(DateRangePicker, { value: null, presets: false, separator: reactive(() => sep()) }));
+  assert.equal(a.el.querySelector(".hm-daterange-sep").textContent, "–");
+  sep.set("→");
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(a.el.querySelector(".hm-daterange-sep").textContent, "→");
+  sep.set(false);
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(a.el.querySelector(".hm-daterange-sep"), null);
+  a.dispose();
 });

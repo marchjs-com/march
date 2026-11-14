@@ -8,6 +8,7 @@ import { h } from "../../../dom/h.ts";
 import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
 import { locale } from "../../../core/i18n.ts";
 import { cx, val, onVisible, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { formatCount } from "../../../ui/format.ts";
 import { drawDigits, rollDigits } from "../../../motion/digits.ts";
 import { animateValue } from "../../../motion/engine/value.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
@@ -33,11 +34,7 @@ export interface CounterProps {
   class?: ClassProp | undefined;
 }
 
-/** Format a number the way Counter shows it. */
-export function formatCount(n: number, o: Pick<CounterProps, "format" | "decimals"> = {}, loc = untrack(locale)): string {
-  const d = o.decimals;
-  return new Intl.NumberFormat(loc, { ...(d != null ? { minimumFractionDigits: d, maximumFractionDigits: d } : { maximumFractionDigits: 0 }), ...o.format }).format(n);
-}
+export { formatCount };
 
 
 /** `<Counter value={12500} />`, `<Counter value={$price} mode="roll" format={EUR} />` (format: Intl.NumberFormat options) */

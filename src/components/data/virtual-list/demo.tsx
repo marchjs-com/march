@@ -20,8 +20,12 @@ export default function VirtualListDemo(props: { values: { count: number; height
   return <div class="sc-social-vlist-wrap">
     <p class="sc-strip-label" aria-live="off">{() => `${props.values.count.toLocaleString("tr-TR")} satır · DOM'da ${$inDom}`}</p>
     <div class="sc-social-vlist" ref={(x: Element) => { box = x as HTMLElement }}>
-      {() => <VirtualList items={rows()} key={(r) => r.id} estimate={56} gap={props.values.gap} overscan={props.values.overscan} label="Buluşmalar"
-        render={(r) => <div class={() => `sc-social-vrow sc-social-vrow-c${(r().id % 4) + 1}`}><b>{() => r().title}</b>{() => (r().long ? <span>{LONG}</span> : null)}</div>} />}
+      {() => {
+        // the gap and the overscan are read once by the list: a new choice builds it again (as a new row set does)
+        const gap = props.values.gap, overscan = props.values.overscan
+        return <VirtualList items={rows()} key={(r) => r.id} estimate={56} gap={gap} overscan={overscan} label="Buluşmalar"
+          render={(r) => <div class={() => `sc-social-vrow sc-social-vrow-c${(r().id % 4) + 1}`}><b>{() => r().title}</b>{() => (r().long ? <span>{LONG}</span> : null)}</div>} />
+      }}
     </div>
   </div>
 }

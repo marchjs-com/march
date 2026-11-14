@@ -8,10 +8,11 @@ export const code = `<Field label="Rapor dönemi" group><DateRangePicker bind:va
 <DateRangePicker bind:value={$range} presets={false} />
 <DateRangePicker bind:value={$range} labels={{ custom: "Özel", from: "Başlangıç", to: "Bitiş" }} separator="→" picker={{ icon: false }} />`
 
-const NO_RANGE: Maybe<DateRange> = null
+// a range no preset matches: the from / to pair (and the sign between them) is shown from the start
+const START_RANGE: Maybe<DateRange> = { from: "2026-03-02", to: "2026-03-14" }
 
 export default function DateRangePickerDemo(props: { values: { presets: boolean; custom: boolean; separator: string } }) {
-  let $range = NO_RANGE
+  let $range = START_RANGE
   return <div class="sc-stack">
     {() => <Field label="Rapor dönemi" group><DateRangePicker value={$range} onChange={(v: Maybe<DateRange>) => { $range = v }} presets={props.values.presets ? undefined : false} custom={props.values.custom}
       separator={props.values.separator === "off" ? false : props.values.separator === "arrow" ? "→" : undefined} labels={{ range: "Tarih aralığı", custom: "Özel", from: "Başlangıç", to: "Bitiş" }} /></Field>}

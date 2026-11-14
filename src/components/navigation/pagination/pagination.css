@@ -8,3 +8,9 @@
 .hm-page-btn:disabled { opacity: .4; cursor: not-allowed; }
 .hm-page-gap { display: inline-grid; place-items: center; width: 1.5rem; color: var(--hm-faint); }
 .hm-pagination[data-hm-color] .hm-page-btn.is-active { border-color: var(--hm-accent); color: var(--hm-accent-text, var(--hm-accent)); }
+/* simple: the range text, a rows-per-page select, Previous / Next around the page status */
+.hm-pagination-simple { display: flex; gap: var(--hm-space-3); font-size: var(--hm-text-sm); color: var(--hm-muted); font-variant-numeric: tabular-nums; }
+.hm-page-info { margin-inline-end: auto; }
+.hm-page-info:empty { display: none; }
+.hm-page-steps { display: flex; align-items: center; gap: var(--hm-space-2); }
+.hm-page-sizes { width: auto; min-height: 2rem; padding-block: 0; }

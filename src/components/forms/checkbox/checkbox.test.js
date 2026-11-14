@@ -24,3 +24,21 @@ test("Checkbox: a real input under a drawn box; Space / click toggles; indetermi
   const m = mount(() => h(Checkbox, { value: true, indeterminate: true, label: "Some" }));
   assert.equal(m.el.querySelector("input").indeterminate, true);
 });
+
+test("Checkbox: onClick gets the click with its modifier keys; without a label only the box is drawn", () => {
+  const clicks = [];
+  const { el } = mount(() => [h(Checkbox, { "aria-label": "Select row", tabIndex: -1, onClick: (e) => clicks.push(!!e.shiftKey) }), h(Checkbox, { label: "Named" })]);
+  const [bare, named] = el.querySelectorAll(".hm-choice");
+  const input = bare.querySelector("input");
+  assert.ok(bare.className.includes("hm-choice-bare"));
+  assert.equal(bare.querySelector(".hm-check-label"), null);
+  assert.ok(bare.querySelector(".hm-check-box"));
+  assert.equal(input.getAttribute("aria-label"), "Select row");
+  assert.equal(input.getAttribute("tabindex"), "-1");
+  fire(input, "click", { shiftKey: true });
+  fire(input, "click");
+  assert.deepEqual(clicks, [true, false]);
+  assert.equal(named.className.includes("hm-choice-bare"), false);
+  assert.ok(named.querySelector(".hm-check-label"));
+  assert.equal(named.querySelector("input").getAttribute("tabindex"), null);
+});

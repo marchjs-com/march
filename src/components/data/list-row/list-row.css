@@ -1,0 +1,31 @@
+/* ListRow (classes hm-listrow-*: hm-list-row is a ListEditor line). lead · text (title + sub) · trail; --hm-listrow-c is the tint of the active / selected row (data-hm-color sets --hm-accent). */
+.hm-listrow { --hm-listrow-c: var(--hm-accent, var(--hm-primary)); position: relative; display: flex; align-items: center; gap: var(--hm-space-3); box-sizing: border-box; inline-size: 100%; min-inline-size: 0; min-block-size: 2.5rem; margin: 0; padding: .375rem var(--hm-space-3);
+  border: 0; border-radius: var(--hm-radius-2); background: none; color: var(--hm-text); font: inherit; font-size: var(--hm-text-md); line-height: 1.3; text-align: start; text-decoration: none; list-style: none; }
+.hm-listrow.is-top { align-items: flex-start; }
+.hm-listrow-lead { display: inline-grid; place-items: center; flex: none; color: var(--hm-muted); }
+.hm-listrow-text { display: flex; flex-direction: column; flex: 1; min-inline-size: 0; }
+.hm-listrow-title { min-inline-size: 0; max-inline-size: 100%; }
+.hm-listrow-sub { min-inline-size: 0; max-inline-size: 100%; color: var(--hm-muted); font-size: var(--hm-text-xs); }
+.hm-listrow.is-ellipsis :is(.hm-listrow-title, .hm-listrow-sub) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-listrow.is-wrap :is(.hm-listrow-title, .hm-listrow-sub) { overflow-wrap: anywhere; }
+.hm-listrow-trail, .hm-listrow-actions { display: inline-flex; align-items: center; gap: var(--hm-space-2); flex: none; margin-inline-start: auto; color: var(--hm-muted); font-size: var(--hm-text-xs); }
+.hm-listrow-trail + .hm-listrow-actions { margin-inline-start: 0; }
+/* sizes */
+.hm-listrow-sm { gap: var(--hm-space-2); min-block-size: 2rem; padding: .25rem var(--hm-space-2); font-size: var(--hm-text-sm); }
+.hm-listrow-lg { min-block-size: 3.25rem; padding: .625rem var(--hm-space-4); }
+/* link, button, or a plain row whose host handles the click */
+.hm-listrow.is-action { cursor: pointer; transition: background-color var(--hm-dur-fast) var(--hm-ease), color var(--hm-dur-fast) var(--hm-ease); }
+.hm-listrow.is-action:hover { background: var(--hm-surface-2); }
+.hm-listrow:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: -2px; }
+.hm-listrow.is-selected { background: color-mix(in srgb, var(--hm-listrow-c) 10%, transparent); font-weight: 600; }
+.hm-listrow.is-active { background: var(--hm-accent-soft, var(--hm-primary-soft)); color: var(--hm-accent-text, var(--hm-primary-text)); }
+.hm-listrow:is(.is-active, .is-selected) .hm-listrow-lead { color: var(--hm-listrow-c); }
+.hm-listrow.is-active .hm-listrow-sub { color: inherit; opacity: .8; }
+.hm-listrow.is-barred.is-active::before { content: ""; position: absolute; inset-inline-start: .125rem; inset-block: 25%; inline-size: 3px; border-radius: 3px; background: var(--hm-listrow-c); }
+.hm-listrow.is-disabled { opacity: .5; cursor: not-allowed; }
+.hm-listrow.is-disabled.is-action:hover { background: none; }
+/* a link / button row with controls beside it */
+.hm-listrow-wrap { display: flex; align-items: center; gap: var(--hm-space-1); min-inline-size: 0; }
+.hm-listrow-wrap > .hm-listrow { flex: 1; inline-size: auto; }
+.hm-listrow-wrap > .hm-listrow-actions { margin-inline-start: 0; }
+@media (prefers-reduced-motion: reduce) { .hm-listrow.is-action { transition: none; } }

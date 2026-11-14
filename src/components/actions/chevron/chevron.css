@@ -1,0 +1,24 @@
+/* Chevron. One glyph (pointing to the inline end) turned by variables: --hm-chevron-from (closed angle) and
+   --hm-chevron-turn (added when open). --hm-chevron-open is 0 / 1: set by the arrow itself (is-open / is-closed) or
+   inherited from the nearest ancestor that carries the state (is-auto). */
+[aria-expanded="true"], details[open] > summary { --hm-chevron-open: 1; }
+[aria-expanded="false"], details:not([open]) > summary { --hm-chevron-open: 0; }
+.hm-chevron { --hm-chevron-from: 0deg; --hm-chevron-turn: 90deg; display: inline-grid; place-items: center; flex: none; inline-size: .875rem; block-size: .875rem; line-height: 1;
+  transform: rotate(calc(var(--hm-chevron-from) + var(--hm-chevron-open, 0) * var(--hm-chevron-turn))); transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
+.hm-chevron.is-open { --hm-chevron-open: 1; }
+.hm-chevron.is-closed { --hm-chevron-open: 0; }
+.hm-chevron .hm-svg, .hm-chevron-own { inline-size: 100%; block-size: 100%; }
+.hm-chevron-own { display: inline-grid; place-items: center; }
+.hm-chevron-xs { inline-size: .75rem; block-size: .75rem; }
+.hm-chevron-md { inline-size: 1rem; block-size: 1rem; }
+.hm-chevron-lg { inline-size: 1.25rem; block-size: 1.25rem; }
+/* directions; right-to-left mirrors end and start */
+.hm-chevron-end:dir(rtl), .hm-chevron-start { --hm-chevron-from: 180deg; --hm-chevron-turn: -90deg; }
+.hm-chevron-start:dir(rtl) { --hm-chevron-from: 0deg; --hm-chevron-turn: 90deg; }
+.hm-chevron-down { --hm-chevron-from: 90deg; --hm-chevron-turn: 180deg; }
+.hm-chevron-up { --hm-chevron-from: -90deg; --hm-chevron-turn: 180deg; }
+.hm-chevron.is-spring { transition: transform var(--hm-dur) var(--hm-ease-spring); }
+.hm-chevron.is-still { transition: none; }
+.hm-chevron.is-leaf { visibility: hidden; }
+.hm-chevron[data-hm-color] { color: var(--hm-accent); }
+@media (prefers-reduced-motion: reduce) { .hm-chevron { transition: none; } }

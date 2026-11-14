@@ -3,6 +3,7 @@ import "./slider.css";
 import { h } from "../../../dom/h.ts";
 import { model, ctl, cx, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { inputOf } from "../../../forms/affix.ts";
+import { colorAttr } from "../../../theme/colors.ts";
 
 export interface SliderProps extends ControlProps<number> {
   min?: number | undefined;
@@ -12,15 +13,29 @@ export interface SliderProps extends ControlProps<number> {
   format?: ((v: number) => unknown) | undefined;
   /** The value shown next to the slider: `false` removes it. */
   showValue?: boolean | undefined;
+  /**
+   * Your own track under a drawn thumb, instead of the browser's: `true` (a ramp in the control's color), a class name
+   * (the track is yours: a gradient from your CSS) or a node drawn as the track. Thumb fill: `--hm-slider-thumb`.
+   */
+  track?: unknown;
+  /** Spoken value (`aria-valuetext`), e.g. `(v) => v + " degrees"`. */
+  valueText?: ((v: number) => string) | undefined;
+  /** Called once when a change is finished (pointer released, key pressed), after `onChange`. */
+  onCommit?: ((v: number) => void) | undefined;
 }
 
-/** Range slider with the current value shown. Props: min, max, step, format(v). */
+/** Range slider with the current value shown. Props: min, max, step, format(v), track (your own track). */
 export function Slider(props: SliderProps): unknown {
   const [get, set] = model(props, props.min ?? 0);
+  const track = props.track != null && props.track !== false ? props.track : null;
   const el = h("input", {
-    ...ctl(props), type: "range", class: "hm-slider", min: () => props.min ?? 0, max: () => props.max ?? 100, step: () => props.step ?? 1,
+    ...ctl(props), type: "range", class: cx("hm-slider", track != null && "hm-slider-own"), min: () => props.min ?? 0, max: () => props.max ?? 100, step: () => props.step ?? 1,
+    "aria-valuetext": () => (props.valueText ? props.valueText(get()) : null),
     disabled: () => !!(props.disabled || props.readonly), onInput: (e: Event) => set(Number(inputOf(e).value)),
+    onChange: (e: Event) => props.onCommit?.(Number(inputOf(e).value)),
   }) as HTMLInputElement;
   syncValue(el, get);
-  return h("span", { class: () => cx("hm-slider-wrap", props.class) }, el, props.showValue === false ? null : h("output", { class: "hm-slider-value", for: () => el.id || null }, () => (props.format ? props.format(get()) : String(get() ?? ""))));
+  const rail = track == null ? el : h("span", { class: "hm-slider-rail", "data-hm-color": () => colorAttr(props.color) },
+    h("span", { class: cx("hm-slider-track", track === true ? "hm-slider-ramp" : typeof track === "string" && track), "aria-hidden": "true" }, track === true || typeof track === "string" ? null : track), el);
+  return h("span", { class: () => cx("hm-slider-wrap", props.class) }, rail, props.showValue === false ? null : h("output", { class: "hm-slider-value", for: () => el.id || null }, () => (props.format ? props.format(get()) : String(get() ?? ""))));
 }

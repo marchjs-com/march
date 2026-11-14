@@ -2,6 +2,8 @@
 export * from "./feedback.kit.gen.ts";
 import * as d0 from "./feedback/alert/demo.tsx";
 import * as p0 from "./feedback/alert/playground.ts";
-import * as d1 from "./feedback/empty/demo.tsx";
-import * as p1 from "./feedback/empty/playground.ts";
-export { d0, p0, d1, p1 };
+import * as d1 from "./feedback/check-mark/demo.tsx";
+import * as p1 from "./feedback/check-mark/playground.ts";
+import * as d2 from "./feedback/empty/demo.tsx";
+import * as p2 from "./feedback/empty/playground.ts";
+export { d0, p0, d1, p1, d2, p2 };

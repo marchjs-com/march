@@ -19,14 +19,22 @@ with the right keyboard, autocomplete and trimming.
 | `placeholder`, `autocomplete`, `inputmode`, `maxLength`, `minLength`, `spellcheck` | | | passed to the input |
 | `prefix`, `suffix` | node | — | text or an icon around the input |
 | `transform` | `(v) => string` | — | rewrites typed text (e.g. upper-case) |
+| `onKeyDown`, `onPaste` | `(e) => void` | — | key and paste handlers of the input (`preventDefault()` on a paste keeps the text out) |
+| `error` | string / accessor | — | error text of an input without a `<Field>`: the input turns invalid and the text shows under it |
 | `readonly`, `disabled`, `autofocus` | boolean | — | |
 | `color` | ColorToken | primary | focus ring, caret and selection |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
+```tsx
+<TextInput bind:value={$email} type="email" aria-label="Email" error={$problem} />                 // no Field: its own error text
+<TextInput bind:value={$draft} onPaste={(e) => { const lines = e.clipboardData?.getData("text").split("\n") ?? []; if (lines.length > 1) { e.preventDefault(); addAll(lines); } }} />
+```
+
 ## Accessibility
 
 A native `<input>`: its label comes from `<Field>` (`<label for>`) or `aria-label`; errors are linked with
-`aria-describedby` and `aria-invalid`. Prefix and suffix are plain text next to the input, so they are read with it.
+`aria-describedby` and `aria-invalid` (the `error` prop does the same for an input without a Field, and its text is a
+`role="alert"`). Prefix and suffix are plain text next to the input, so they are read with it.
 
 ## Composed of
 

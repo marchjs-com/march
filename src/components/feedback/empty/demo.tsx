@@ -6,14 +6,15 @@ import { plus } from "../../../icons/glyphs/plus.ts";
 
 export const code = `<Empty icon={inbox} title="Gelen kutusu boş" action={[<Button variant="primary" icon={plus}>Yeni mesaj</Button>]}>
   Yeni bir konuşma başlatın ya da bir ekip arkadaşını davet edin.
-</Empty>`
+</Empty>
+<Empty size="sm" title="Eşleşme yok" />                      // panel, liste, açılır pencere içi`
 
-export default function EmptyDemo(props: { values: { icon: boolean; title: boolean; text: boolean; action: boolean } }) {
+export default function EmptyDemo(props: { values: { size: string; icon: boolean; title: boolean; text: boolean; action: boolean } }) {
   let $made = 0
   return <div class="sc-col">
     {() => {
       const v = props.values
-      return <Empty icon={v.icon ? inbox : undefined} title={v.title ? () => ($made ? `${$made} taslak oluşturuldu` : "Gelen kutusu boş") : false}
+      return <Empty size={v.size as "md"} icon={v.icon ? inbox : undefined} title={v.title ? () => ($made ? `${$made} taslak oluşturuldu` : "Gelen kutusu boş") : false}
         action={v.action ? [<Button variant="primary" icon={plus} on:click={() => { $made++ }}>Yeni mesaj</Button>] : undefined}>
         {v.text ? "Yeni bir konuşma başlatın ya da bir ekip arkadaşını davet edin." : null}
       </Empty>

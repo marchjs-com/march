@@ -1,2 +1,4 @@
 /* March — Checkbox. Imported by its component module; tokens.css provides the variables (shared text-control rules: ui/field.css). */
 .hm-choice-card.hm-choice-single { display: block; }
+/* no label: the box alone, sized like an inline control (table and grid cells) */
+.hm-choice-bare { display: inline-flex; vertical-align: middle; }

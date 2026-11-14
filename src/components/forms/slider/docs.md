@@ -16,9 +16,21 @@ percentage, a label).
 | `format` | `(v) => node` | the number | text of the shown value |
 | `color` | ColorToken | primary | |
 | `showValue` | boolean | `true` | `false` removes the value next to the slider |
+| `track` | `true` / class name / node | — | your own track under a drawn thumb: `true` a ramp in the control's color, a class (your gradient) or a node |
+| `valueText` | `(v) => string` | — | spoken value (`aria-valuetext`) |
+| `onCommit` | `(v) => void` | — | called once when a change is finished (pointer released), after `onChange` |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
 `<Slider bind:value={$v} showValue={false} />` leaves only the track; `format` changes the text of the value.
+
+```tsx
+<Slider bind:value={$level} track />                                        // a ramp in the control's color
+<Slider bind:value={$hue} max={360} track="my-hue-strip" showValue={false}  // .my-hue-strip { background: linear-gradient(…) }
+  valueText={(v) => `${v} degrees`} onCommit={remember} aria-label="Hue" />
+```
+
+With `track` the input stays a native range (keyboard, forms, screen readers); only its track is cleared and the thumb
+drawn. `--hm-slider-thumb` on the control (or an ancestor) fills the thumb, e.g. with the picked colour.
 
 ## Accessibility
 

@@ -1,0 +1,16 @@
+/* CheckMark (classes hm-checkmark-*: hm-check-mark is the tick of Checkbox). The value sets three colours (line, text, soft fill); data-hm-color (which sets --hm-accent) replaces them. */
+.hm-checkmark { --hm-checkmark-c: var(--hm-success); --hm-checkmark-t: var(--hm-success-text); --hm-checkmark-soft: var(--hm-success-soft, var(--hm-surface-2));
+  display: inline-flex; align-items: center; gap: .3em; vertical-align: middle; color: var(--hm-checkmark-t); }
+.hm-checkmark.is-no { --hm-checkmark-c: var(--hm-danger); --hm-checkmark-t: var(--hm-danger-text); --hm-checkmark-soft: var(--hm-danger-soft, var(--hm-surface-2)); }
+.hm-checkmark.is-partial { --hm-checkmark-c: var(--hm-warn); --hm-checkmark-t: var(--hm-warn-text); --hm-checkmark-soft: var(--hm-warn-soft, var(--hm-surface-2)); }
+.hm-checkmark[data-hm-color] { --hm-checkmark-c: var(--hm-accent); --hm-checkmark-t: var(--hm-accent-text, var(--hm-accent)); --hm-checkmark-soft: var(--hm-accent-soft, color-mix(in srgb, var(--hm-accent) 16%, var(--hm-bg))); }
+.hm-checkmark-icon { display: inline-grid; place-items: center; flex: none; inline-size: 1rem; block-size: 1rem; line-height: 1; }
+.hm-checkmark-icon .hm-svg { inline-size: 100%; block-size: 100%; }
+.hm-checkmark-own { display: inline-grid; place-items: center; }
+.hm-checkmark-sm .hm-checkmark-icon { inline-size: .875rem; block-size: .875rem; }
+.hm-checkmark-lg .hm-checkmark-icon { inline-size: 1.25rem; block-size: 1.25rem; }
+.hm-checkmark-text { font-size: var(--hm-text-xs); }
+/* discs: the glyph keeps its size, the disc adds room around it */
+.hm-checkmark-soft .hm-checkmark-icon, .hm-checkmark-solid .hm-checkmark-icon { box-sizing: content-box; padding: .375rem; border-radius: var(--hm-radius-full); background: var(--hm-checkmark-soft); }
+.hm-checkmark-solid .hm-checkmark-icon { background: var(--hm-checkmark-c); color: var(--hm-on-status, var(--hm-on-scrim)); }
+.hm-checkmark-sm:is(.hm-checkmark-soft, .hm-checkmark-solid) .hm-checkmark-icon { padding: .25rem; }

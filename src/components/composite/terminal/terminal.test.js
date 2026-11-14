@@ -114,3 +114,20 @@ test("builtins off, a steady cursor and own texts", async () => {
   assert.equal(d.host.querySelector(".hm-term-input").getAttribute("aria-label"), "Command");
   d.dispose();
 });
+
+test("TerminalWindow: the terminal's props stay live through the window (prompt, cursor)", async () => {
+  const { TerminalWindow } = await import("./index.ts");
+  const { reactive } = await import("../../../index.ts");
+  const prompt = signal("$ "), cursor = signal("bar");
+  const host = document.createElement("div");
+  document.body.appendChild(host);
+  const dispose = render(() => h(TerminalWindow, { title: "t", prompt: reactive(() => prompt()), cursor: reactive(() => cursor()) }), host);
+  const term = document.querySelector(".hm-term-window .hm-term");
+  assert.ok(term);
+  assert.equal(term.querySelector(".hm-term-line .hm-term-prompt").textContent, "$ ");
+  prompt.set("march › "); cursor.set("underline");
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(term.querySelector(".hm-term-line .hm-term-prompt").textContent, "march › ");
+  assert.ok(term.classList.contains("hm-term-cursor-underline"));
+  dispose();
+});

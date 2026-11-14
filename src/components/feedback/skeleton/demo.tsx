@@ -4,6 +4,7 @@ import { Button } from "../../../ui/button.ts";
 
 export const code = `<Skeleton lines={3} />
 <Skeleton block height="lg" />
+<Skeleton shape="circle" />                       // avatar yer tutucusu
 <Skeleton lines={4} shimmer={false} shortLast={false} label="Profil yükleniyor" />
 {() => (loading() ? <Skeleton lines={2} colors="brand" /> : <Profile />)}`
 
@@ -17,6 +18,7 @@ export default function SkeletonDemo(props: { values: { mode: string; lines: num
       if (!$loading) return <div class="sc-skel-real"><strong>HADİ</strong><p class="hm-muted">Veri geldi; iskelet aynı düzenin yerini aldı ve hiçbir şey zıplamadı.</p></div>
       const shimmer = v.shimmer, shortLast = v.shortLast
       if (v.mode === "lines") return <Skeleton lines={v.lines} colors={colors} shimmer={shimmer} shortLast={shortLast} />
+      if (v.mode === "profile") return <div class="sc-row"><Skeleton shape="circle" height={v.height as "md"} colors={colors} shimmer={shimmer} /><div class="sc-grow"><Skeleton lines={v.lines} colors={colors} shimmer={shimmer} shortLast={shortLast} /></div></div>
       if (v.mode === "block") return <Skeleton block height={v.height as "md"} colors={colors} shimmer={shimmer} />
       return <div class="sc-skel-card"><Skeleton block height={v.height as "md"} colors={colors} shimmer={shimmer} /><Skeleton lines={v.lines} colors={colors} shimmer={shimmer} shortLast={shortLast} /></div>
     }}

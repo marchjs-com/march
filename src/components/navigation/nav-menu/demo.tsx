@@ -8,6 +8,7 @@ import { barChart } from "../../../icons/glyphs/barChart.ts";
 import { settings } from "../../../icons/glyphs/settings.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import type { Href } from "../../../router/router.ts";
+import { load, save } from "../../../core/util.ts";
 
 export const code = `<NavMenu brand="HADİ" filter collapsible items={[
   { id: "inbox", title: "Gelen kutusu", href: "/inbox", icon: inbox, badge: () => $unread },
@@ -36,7 +37,10 @@ export default function NavMenuDemo(props: { values: { filter: boolean; groupsCo
       // read here so the menu is drawn again when an option changes (it reads its props once)
       const { filter, groupsCollapsed, collapsible } = { filter: props.values.filter, groupsCollapsed: props.values.groupsCollapsed, collapsible: props.values.collapsible }
       const pins = props.values.pins, chevron = props.values.chevron, texts = props.values.texts
-      return <NavMenu items={ITEMS} brand={<strong>HADİ</strong>} label="Örnek menü" palette={false} storageKey={`sc.navmenu.${groupsCollapsed}`}
+      // first visit: one pinned page, so the pinned block (and its heading) shows before anything is starred
+      const storageKey = `sc.navmenu.${groupsCollapsed}`
+      if (load<unknown>(storageKey, null) == null) save(storageKey, { pins: ["reports"] })
+      return <NavMenu items={ITEMS} brand={<strong>HADİ</strong>} label="Örnek menü" palette={false} storageKey={storageKey}
         filter={filter} groupsCollapsed={groupsCollapsed} collapsible={collapsible} groupIcons={{ "Yönetim": users, "Finans": wallet }}
         pins={pins} icons={chevron === "plus" ? { chevron: plus } : chevron === "off" ? { chevron: false } : undefined}
         labels={texts ? { filterPlaceholder: "Sayfa bul…", filter: "Sayfalarda ara", noMatches: "Böyle bir sayfa yok", pinned: "Sık kullandıklarım", recent: "Son baktıklarım" } : undefined} />

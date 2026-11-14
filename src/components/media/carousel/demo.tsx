@@ -15,7 +15,8 @@ const NAMES = ["Heyecan", "Aktivite", "Dostluk", "İletişim"]
 export default function CarouselDemo(props: { values: { perView: number; slides: number; arrows: string; dots: string; color: string } }) {
   return <div class="sc-col">
     {() => {
-      const v = props.values
+      // every value is read here (a value only passed on as a prop is read once): the carousel is drawn again on a change
+      const v = { ...props.values }
       const own = v.arrows === "own"
       return <Carousel perView={v.perView as 1} label="HADİ koleksiyonu" arrows={v.arrows !== "off"} prevIcon={own ? arrowLeft : undefined} nextIcon={own ? arrowRight : undefined}
         dots={v.dots === "off" ? false : v.dots === "own" ? (i: number) => String(i + 1) : true} color={v.color === "primary" ? undefined : (v.color as "brand-orange")}

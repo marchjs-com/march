@@ -4,6 +4,7 @@ import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import type { Tone } from "../../../ui/display-base.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { StatusDot } from "../../feedback/status-dot/index.ts";
 
 /** Format a count for badges: 120 → "99+". */
 export const countLabel = (n: number, max = 99): string => (n > max ? `${max}+` : String(n));
@@ -12,6 +13,8 @@ export interface BadgeProps {
   /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
   color?: ColorToken | undefined;
   tone?: MaybeFn<Tone | undefined>;
+  /** "md" (default) or "xs": the mini badge on the corner of an icon button, a tab, a rail item. */
+  size?: "xs" | "md" | undefined;
   /** Count badge: hidden at 0 unless `showZero`; above `max` shows "99+". */
   count?: MaybeFn<number | null | undefined>;
   max?: number;
@@ -22,23 +25,44 @@ export interface BadgeProps {
   dot?: boolean | Node | undefined;
   /** Colour of the built-in dot (default: the text colour of the tone). */
   dotColor?: ColorToken | undefined;
+  /** The built-in dot pulses (a StatusDot): `true` / "ring" (a breathing ring) or "blink"; it draws the dot by itself. */
+  pulse?: boolean | "ring" | "blink" | undefined;
   /** Count badges: your own text for the number (default `countLabel`: 120 → "99+"). */
   format?: ((n: number, max: number) => unknown) | undefined;
+  /** A badge that can be pressed: it is drawn as a `<button>` (keyboard, focus ring, hover). */
+  onClick?: ((e: MouseEvent) => void) | undefined;
+  /** Clickable badge: a toggle (`aria-pressed` and the pressed look). */
+  pressed?: MaybeFn<boolean | null | undefined>;
+  /** Clickable badge: cannot be pressed. */
+  disabled?: MaybeFn<boolean | null | undefined>;
+  /** Accessible name when the text alone does not say it (a clickable badge with a short code). */
+  ariaLabel?: MaybeFn<string | undefined>;
   class?: ClassProp;
   children?: unknown;
 }
-/** `<Badge tone="success">Active</Badge>`, `<Badge count={n} />` (hidden at 0 unless showZero; 120 → "99+"). */
+/**
+ * `<Badge tone="success">Active</Badge>`, `<Badge count={n} />` (hidden at 0 unless showZero; 120 → "99+"),
+ * `<Badge pulse>Live</Badge>`, `<Badge size="xs" count={n} />`, `<Badge onClick={open}>v2</Badge>` (a button).
+ */
 export function Badge(props: BadgeProps): unknown {
+  // a clickable badge is a button; the look is the same element with one more class
+  const click = props.onClick;
+  const pressed = (): boolean | null => { const p = val(props.pressed); return p == null ? null : !!p; };
+  const tag = click ? "button" : "span";
+  const own = click ? { type: "button", onClick: click, disabled: () => !!val(props.disabled), "aria-pressed": () => { const p = pressed(); return p == null ? null : String(p); } } : {};
+  const extra = (): string => cx(props.size === "xs" && "hm-badge-xs", click && "hm-badge-btn", click && pressed() && "is-pressed", val(props.class));
   if (props.count !== undefined) {
     return () => {
       const n = Number(val(props.count)) || 0;
       if (!n && !props.showZero) return null;
-      return h("span", { "data-hm-color": () => colorAttr(props.color), class: cx("hm-badge", "hm-badge-count", `hm-badge-${val(props.tone) ?? "danger"}`, val(props.class)), "aria-label": props.label ? `${n} ${val(props.label)}` : null }, props.format ? props.format(n, props.max ?? 99) : countLabel(n, props.max ?? 99));
+      return h(tag, { ...own, "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-badge", "hm-badge-count", `hm-badge-${val(props.tone) ?? "danger"}`, extra()), "aria-label": val(props.ariaLabel) ?? (props.label ? `${n} ${val(props.label)}` : null) }, props.format ? props.format(n, props.max ?? 99) : countLabel(n, props.max ?? 99));
     };
   }
-  // the dot: the built-in one (a pseudo-element, or a coloured mark with `dotColor`) or the caller's node
-  const own = props.dot && props.dot !== true, mark = props.dot === true && !!props.dotColor;
-  return h("span", { "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-badge", `hm-badge-${val(props.tone) ?? "neutral"}`, props.dot === true && !mark && "hm-badge-dot", val(props.class)) },
-    own ? h("span", { class: "hm-badge-dot-own", "aria-hidden": "true" }, props.dot) : mark ? h("span", { class: "hm-badge-dot-mark", "aria-hidden": "true", "data-hm-color": colorAttr(props.dotColor) }) : null,
+  // the dot: the built-in one (a pseudo-element, a coloured mark with `dotColor`, a StatusDot when it pulses) or the caller's node
+  const node = props.dot && props.dot !== true, pulse = !node && props.pulse ? props.pulse : false, builtIn = props.dot === true || !!pulse, mark = builtIn && !pulse && !!props.dotColor;
+  return h(tag, { ...own, "data-hm-color": () => colorAttr(props.color), "aria-label": () => val(props.ariaLabel) ?? null, class: () => cx("hm-badge", `hm-badge-${val(props.tone) ?? "neutral"}`, builtIn && !mark && !pulse && "hm-badge-dot", extra()) },
+    node ? h("span", { class: "hm-badge-dot-own", "aria-hidden": "true" }, props.dot)
+      : pulse ? h(StatusDot, { size: "xs", pulse, color: props.dotColor, class: "hm-badge-dot-pulse" })
+      : mark ? h("span", { class: "hm-badge-dot-mark", "aria-hidden": "true", "data-hm-color": colorAttr(props.dotColor) }) : null,
     props.children);
 }

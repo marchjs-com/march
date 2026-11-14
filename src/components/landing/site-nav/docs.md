@@ -22,6 +22,7 @@ Below 860 px the links move into a Drawer.
 | `shrink` | boolean | `true` | lower once scrolled |
 | `hide` | boolean | `false` | hide while scrolling down |
 | `threshold` | px | `12` | scroll that counts as scrolled |
+| `source` | Element \| () => Element | the page | the scrolling element `shrink`, `hide` and `transparent` follow |
 | `sticky` | boolean | `true` | |
 | `onNavigate` | `(href) => void` | — | link chosen |
 | `pill` | boolean | `true` | the pill under the hovered / current link |

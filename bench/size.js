@@ -77,8 +77,9 @@ render(() => <App />, document.body);
 `;
 // buttonCss 5.25 KB: includes the color tokens every themable component reads (src/css/colors.css), the text / on-fill
 // tones and the HADİ theme's multicolor defaults (progress, spinner)
-// typicalJs 7.5 KB: TYPICAL_APP measured 7.42 KB (h.ts is most of it: every prop kind setProp knows ships with it)
-export const APP_BUDGET = { buttonJs: 6.5 * 1024, buttonCss: 5.25 * 1024, typicalJs: 7.5 * 1024 };
+// typicalJs 7.75 KB: TYPICAL_APP measured 7.64 KB (h.ts is most of it: every prop kind setProp knows ships with it; Button
+// carries its own spinner part, the link variant, pressed, pill and external links: about 0.2 KB)
+export const APP_BUDGET = { buttonJs: 6.5 * 1024, buttonCss: 5.25 * 1024, typicalJs: 7.75 * 1024 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const s = await sizes();

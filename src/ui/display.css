@@ -1,20 +1,6 @@
-/* March — display components (Avatar) and layout helpers. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — page helpers and layout helpers (Avatar: src/components/social/avatar). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- display */
 .hm-page-actions, .hm-section-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
-.hm-avatar { display: inline-flex; align-items: center; justify-content: center; flex: none; overflow: hidden; border-radius: 50%; font-weight: 600; color: #fff; background: var(--hm-primary-solid);
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / .06); letter-spacing: .01em; }
-.hm-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.hm-avatar-sm { width: 1.75rem; height: 1.75rem; font-size: .6875rem; } .hm-avatar-md { width: 2.25rem; height: 2.25rem; font-size: .8125rem; } .hm-avatar-lg { width: 3.5rem; height: 3.5rem; font-size: 1.125rem; }
-.hm-avatar-c0 { --hm-av: var(--hm-cat-1); }
-.hm-avatar-c1 { --hm-av: var(--hm-cat-2); }
-.hm-avatar-c2 { --hm-av: var(--hm-cat-3); }
-.hm-avatar-c3 { --hm-av: var(--hm-cat-4); }
-.hm-avatar-c4 { --hm-av: var(--hm-cat-5); }
-.hm-avatar-c5 { --hm-av: var(--hm-cat-6); }
-.hm-avatar-c6 { --hm-av: var(--hm-cat-7); }
-.hm-avatar-c7 { --hm-av: var(--hm-cat-8); }
-.hm-avatar[class*="hm-avatar-c"] { background: linear-gradient(135deg, var(--hm-av), color-mix(in srgb, var(--hm-av) 70%, var(--hm-text))); text-shadow: 0 1px 1px rgb(0 0 0 / .2); }
-
 /* ---------- layout helpers */
 .hm-stack { display: flex; flex-direction: column; min-width: 0; }
 .hm-stack-row { flex-direction: row; align-items: center; }

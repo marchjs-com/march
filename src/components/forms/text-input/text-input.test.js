@@ -38,3 +38,33 @@ test("EmailInput / UrlInput: keyboard, autocomplete, trimming", () => {
   assert.equal(m(), "a@b.co");
   assert.equal(u(), "https://hadisosyal.com");
 });
+
+test("TextInput: onPaste gets the paste event and can keep the text out", () => {
+  const seen = [];
+  const { el } = mount(() => h(TextInput, { onPaste: (e) => { seen.push(e.clipboardData.getData("text")); e.preventDefault(); } }));
+  const e = fire(el.querySelector("input"), "paste", { clipboardData: { getData: () => "a\nb" } });
+  assert.deepEqual(seen, ["a\nb"]);
+  assert.equal(e.defaultPrevented, true);
+});
+
+test("TextInput: error marks the input invalid and shows a linked alert; without the prop nothing is added", () => {
+  const err = signal("");
+  const { el } = mount(() => [h(TextInput, { id: "mail", error: err, describedby: "note" }), h(TextInput, { id: "plain" })]);
+  const [input, plain] = el.querySelectorAll("input");
+  const msg = el.querySelector(".hm-input-error");
+  assert.equal(el.querySelectorAll(".hm-input-error").length, 1);
+  assert.equal(msg.id, "mail-err");
+  assert.equal(msg.getAttribute("role"), "alert");
+  assert.equal(msg.hidden, true);
+  assert.equal(input.getAttribute("aria-invalid"), null);
+  assert.equal(input.getAttribute("aria-describedby"), "note");
+  err.set("Enter a valid address");
+  assert.equal(input.getAttribute("aria-invalid"), "true");
+  assert.equal(input.getAttribute("aria-describedby"), "note mail-err");
+  assert.equal(msg.hidden, false);
+  assert.equal(msg.textContent, "Enter a valid address");
+  err.set("");
+  assert.equal(input.getAttribute("aria-invalid"), null);
+  assert.equal(msg.hidden, true);
+  assert.equal(plain.getAttribute("aria-describedby"), null);
+});

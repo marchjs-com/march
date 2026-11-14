@@ -1,0 +1,5 @@
+/* ClampText. Theme tokens only, logical properties, no @keyframes (motion core). */
+.hm-clamp { min-inline-size: 0; }
+.hm-clamp-text { margin: 0; overflow-wrap: anywhere; }
+.hm-clamp-text.is-clamped { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--hm-clamp-lines, 3); line-clamp: var(--hm-clamp-lines, 3); overflow: hidden; }
+.hm-clamp-toggle { margin-block-start: var(--hm-space-1); font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); }

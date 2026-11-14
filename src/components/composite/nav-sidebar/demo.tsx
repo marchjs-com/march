@@ -5,6 +5,7 @@ import { users } from "../../../icons/glyphs/users.ts";
 import { settings } from "../../../icons/glyphs/settings.ts";
 import { barChart } from "../../../icons/glyphs/barChart.ts";
 import type { Href } from "../../../router/router.ts";
+import { load, save } from "../../../core/util.ts";
 
 export const code = `<NavSidebar title="HADİ" items={items} groupOrder="none" defaultOpen="all" collapsible recent={3} />
 <NavSidebar items={items} search={false} headings={false} groupCounts={false} />
@@ -23,7 +24,11 @@ export default function NavSidebarDemo(props: { values: { groupOrder: string; de
   return <div class="sc-sb-frame">{() => { const { groupOrder, defaultOpen, collapsible, recent } = { groupOrder: props.values.groupOrder, defaultOpen: props.values.defaultOpen, collapsible: props.values.collapsible, recent: props.values.recent }
     const parts = { search: props.values.search, headings: props.values.headings, expandAll: props.values.expandAll, groupCounts: props.values.groupCounts }
     const labels = props.values.ownLabels ? { recent: "Son açtıkların", categories: "Bölümler", expandAll: "Hepsini aç", collapseAll: "Hepsini kapat" } : undefined
-    return <NavSidebar title="HADİ" items={ITEMS} storageKey={`sc.sb.pg.${defaultOpen}`}
+    // a few visits to start with (the demo links stay on this page, so none would ever be recorded): the recent block
+    // and how many it keeps show at once
+    const storageKey = `sc.sb.pg.${defaultOpen}`, seen = load<{ recent?: unknown } | null>(storageKey, null), visits = seen?.recent
+    if (!Array.isArray(visits) || !visits.length) save(storageKey, { ...seen, recent: ITEMS.map((x) => x.id) })
+    return <NavSidebar title="HADİ" items={ITEMS} storageKey={storageKey}
       groupOrder={groupOrder === "alpha" ? "alpha" : "none"} defaultOpen={defaultOpen as "all"}
       collapsible={collapsible} recent={recent} {...parts} labels={labels} hotkey={false} palette={false} label="Playground kenar çubuğu" /> }}</div>
 }

@@ -14,7 +14,8 @@ const PLANS = [
 ]
 
 export default function CheckboxGroupDemo(props: { values: { variant: string; brand: boolean; inline: boolean } }) {
-  let $days = ["mon", "fri"]
+  // Tuesday and Thursday: with colors="brand" the first option is orange, the theme primary, so it would look unchanged
+  let $days = ["tue", "thu"]
   let $plans = ["team"]
   return <div>{() => {
     const v = props.values, card = v.variant === "card"

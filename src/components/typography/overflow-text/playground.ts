@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { trigger: string; mode: string; speed: number; disabled: boolean; ticker: boolean; separator: string }
+interface Values { duplicate: boolean; trigger: string; mode: string; speed: number; disabled: boolean; ticker: boolean; separator: string }
 
 export default definePlayground<Values>({
   options: [
@@ -9,6 +9,7 @@ export default definePlayground<Values>({
     { key: "speed", label: "Hız", default: 40, min: 10, max: 120, step: 10, unit: "px/s" },
     { key: "disabled", label: "Kaydırma kapalı", default: false },
     { key: "ticker", label: "Marquee şeridi", default: true },
+    { key: "duplicate", label: "Kısa içeriği çoğalt (sonsuz şerit)", default: true, visibleWhen: (v) => v.ticker },
     { key: "separator", label: "Şerit ayracı", default: "star", kind: "segmented", options: [{ value: "star", label: "✦" }, { value: "icon", label: "kendi ikonum" }, { value: "off", label: "yok" }], visibleWhen: (v) => v.ticker },
   ],
 });

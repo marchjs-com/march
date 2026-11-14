@@ -1,0 +1,15 @@
+/* Popover. The panel is .hm-pop (frame, shadow, entrance); here: its inner layout, widths and the motion choices. */
+.hm-popover { display: inline-flex; vertical-align: middle; max-inline-size: 100%; }
+.hm-popover-bare { display: contents; }
+.hm-popover-panel { display: flex; flex-direction: column; max-inline-size: calc(100vw - 16px); max-block-size: min(70vh, 34rem); overflow: hidden; outline: none; }
+.hm-popover-inner { display: flex; flex-direction: column; min-block-size: 0; flex: 1 1 auto; }
+.hm-popover-body { flex: 1 1 auto; min-block-size: 0; overflow: auto; padding: var(--hm-space-3); }
+.hm-popover-panel.is-flush .hm-popover-body { padding: 0; }
+.hm-popover-w-sm { inline-size: 14rem; }
+.hm-popover-w-md { inline-size: 20rem; }
+.hm-popover-w-lg { inline-size: 28rem; }
+/* entrance: the frame's own is the scale; these pick another one or none */
+.hm-popover-m-fade { animation-name: hm-fade-in; }
+.hm-popover-m-rise { animation-name: hm-rise-in; }
+.hm-popover-m-none { animation: none; }
+@media (prefers-reduced-motion: reduce) { .hm-popover-panel { animation: none; } }

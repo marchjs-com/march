@@ -2,8 +2,8 @@
 export * from "./data.kit.gen.ts";
 import * as d0 from "./typography/code-view/demo.tsx";
 import * as p0 from "./typography/code-view/playground.ts";
-import * as d1 from "./data/json-view/demo.tsx";
-import * as p1 from "./data/json-view/playground.ts";
-import * as d2 from "./data/kanban/demo.tsx";
-import * as p2 from "./data/kanban/playground.ts";
+import * as d1 from "./data/icon-tile/demo.tsx";
+import * as p1 from "./data/icon-tile/playground.ts";
+import * as d2 from "./data/json-view/demo.tsx";
+import * as p2 from "./data/json-view/playground.ts";
 export { d0, p0, d1, p1, d2, p2 };

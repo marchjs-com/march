@@ -27,6 +27,10 @@ const PROPS: PropertySpec[] = [
 
 export default function PropertyGridDemo(props: { values: { layout: string; search: boolean; save: boolean; historyButtons: boolean; resetButtons: boolean; changeMarks: boolean; footer: boolean; ownLabels: boolean } }) {
   const card = signal<Record<string, unknown>>({ title: "HADİ bülteni", body: "Haftalık özet", width: 300, align: "start", elevated: true, radius: 12, tone: "light", accent: "#1d9ad6" })
+  // an edit without typing: the change marks (row dot, group count), the reset button and the footer show what an edit does
+  const RADII = [20, 4, 16]
+  let edits = 0
+  const edit = (): void => { card.set({ ...card(), radius: RADII[edits++ % RADII.length] }) }
   return <div class="sc-pg-stage">
     <div class="sc-pg-preview" aria-hidden="true">
       {() => {
@@ -43,5 +47,6 @@ export default function PropertyGridDemo(props: { values: { layout: string; sear
         labels={props.values.ownLabels ? { search: "Bir ayar bul", save: "Yayınla", revert: "Vazgeç", unsaved: (n) => `${n} düzenleme yayınlanmadı`, noChanges: "Her şey yayında" } : undefined}
         onSave={props.values.save ? () => { toast("Kaydedildi", { kind: "success" }) } : undefined} />}
     </div>
+    <div class="sc-row"><button type="button" class="hm-btn hm-btn-secondary hm-btn-sm" data-audit-try on:click={edit}>Örnek bir değişiklik yap (köşe yarıçapı)</button></div>
   </div>
 }

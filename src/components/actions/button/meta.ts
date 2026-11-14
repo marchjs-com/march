@@ -4,7 +4,7 @@ export default defineMeta({
   name: "Button",
   status: "stable",
   since: "0.1.0",
-  summary: "Button in five variants and three sizes with icons, loading (locks and spins), router links (href) and block width; ActionButton draws an action() with its guard, confirm and toasts.",
+  summary: "Button in six variants (one a link-like text button) and three sizes with icons, loading (locks and spins), a pressed toggle state, pill shape, router links (href) and block width; ActionButton draws an action() or a plain { label, run } with its guard, confirm and toasts.",
   category: "actions",
   composedOf: [],
   behaviors: ["action"],

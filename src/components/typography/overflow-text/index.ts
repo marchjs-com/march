@@ -30,6 +30,12 @@ export interface OverflowTextProps {
   separator?: unknown;
   /** Easing of each travel in bounce / once (default "ease-in-out"); the loop is always linear. */
   easing?: string;
+  /**
+   * An endless strip (logos, quotes): the content is repeated so the strip is wider than its box and always loops.
+   * `true`: as many copies as fill the width (at least one); a number: that many copies. Copies are hidden from
+   * assistive technology and inert; each unit is a `.hm-marquee-unit`.
+   */
+  duplicate?: boolean | number;
   /** Never scroll (the text stays clipped with its fade or ellipsis): `disabled={() => !settings.motion}`. */
   disabled?: MaybeFn<boolean | undefined>;
   /** Fade the clipped edges (default true); false shows an ellipsis instead. */
@@ -57,9 +63,21 @@ export function OverflowText(props: OverflowTextProps): Element {
   const running = signal(false);
   const label = signal("");
 
-  const item = h("span", { class: "hm-marquee-item" }, props.text != null ? () => val(props.text) ?? "" : props.children) as HTMLElement;
+  const content = props.text != null ? () => val(props.text) ?? "" : props.children;
+  // duplicate: the content sits in a unit and its copies follow it inside the item (a fixed count, or enough to fill the width)
+  const fill = props.duplicate === true, fixed = fill ? 0 : Math.max(0, Math.floor(Number(props.duplicate) || 0));
+  const unit = fill || fixed ? h("span", { class: "hm-marquee-unit" }, content) as HTMLElement : null;
+  const item = h("span", { class: "hm-marquee-item" }, unit ?? content) as HTMLElement;
+  const twins: HTMLElement[] = [];
+  const rev = signal(0); // bumped when the copies are rebuilt: a running loop starts over with the new content
+  const twin = (n: number): void => {
+    if (!unit) return;
+    while (twins.length > n) twins.pop()?.remove();
+    while (twins.length < n) { const c = unit.cloneNode(true) as HTMLElement; c.setAttribute("aria-hidden", "true"); c.setAttribute("inert", ""); item.append(c); twins.push(c); }
+  };
+  twin(fill ? 1 : fixed);
   const track = h("span", { class: "hm-marquee-track" }, item) as HTMLElement;
-  const { text: _t, children: _c, trigger: _tr, mode: _m, speed: _s, pause: _p, delay: _d, separator: _sep, fade: _f, host: _h, play: _pl, class: _cl, easing: _e, disabled: _dis, ...attrs } = props;
+  const { text: _t, children: _c, trigger: _tr, mode: _m, speed: _s, pause: _p, delay: _d, separator: _sep, fade: _f, host: _h, play: _pl, class: _cl, easing: _e, disabled: _dis, duplicate: _dup, ...attrs } = props;
   const root = h("span", {
     dir: "auto", ...attrs,
     class: () => cx("hm-marquee", props.fade === false ? "hm-marquee-ellipsis" : "hm-marquee-fade", dist() > 0 && "is-overflow", running() && "is-running", val(props.class)),
@@ -68,10 +86,11 @@ export function OverflowText(props: OverflowTextProps): Element {
   }, track) as HTMLElement;
 
   const measure = (): void => {
+    if (fill && unit) { const w = unit.getBoundingClientRect().width; if (w > 0) twin(Math.min(24, Math.max(1, Math.ceil(root.clientWidth / w)))); }
     const d = Math.max(0, Math.ceil(item.scrollWidth - root.clientWidth));
     const next = d > 1 ? d : 0;
     if (Math.abs(next - dist.peek()) > 1 || (next === 0) !== (dist.peek() === 0)) dist.set(next);
-    label.set(item.textContent ?? "");
+    label.set((unit ?? item).textContent ?? "");
   };
 
   const engaged = computed(() => (!!val(props.play) || triggers.has("always") || triggers.has("visible") || (triggers.has("hover") && hovered()) || (triggers.has("focus") && focused())) && visible());
@@ -137,7 +156,7 @@ export function OverflowText(props: OverflowTextProps): Element {
 
   effect(() => {
     const go = wanted();
-    dist(); // restart when the size changes
+    dist(); rev(); // restart when the size or the copied content changes
     stop();
     if (go) timer = setTimeout(() => { timer = null; start(); }, Math.max(0, props.delay ?? 250));
   });
@@ -152,7 +171,11 @@ export function OverflowText(props: OverflowTextProps): Element {
     if (triggers.has("focus")) offs.push(on(host, "focusin", () => focused.set(true)), on(host, "focusout", () => focused.set(false)));
     const RO = globalThis.ResizeObserver;
     if (RO) { const ro = new RO(measure); ro.observe(root); ro.observe(item); offs.push(() => ro.disconnect()); }
-    if (globalThis.MutationObserver) { const mo = new MutationObserver(measure); mo.observe(item, { childList: true, characterData: true, subtree: true }); offs.push(() => mo.disconnect()); }
+    if (globalThis.MutationObserver) {
+      // content that changes inside the unit: its copies are made again
+      const mo = new MutationObserver((recs) => { if (unit && recs.some((r) => unit.contains(r.target))) { const n = twins.length; twin(0); twin(n); rev.set(rev.peek() + 1); } measure(); });
+      mo.observe(item, { childList: true, characterData: true, subtree: true }); offs.push(() => mo.disconnect());
+    }
     const IO = globalThis.IntersectionObserver;
     if (triggers.has("visible") && IO) { const io = new IO((es) => visible.set(es.some((e) => e.isIntersecting))); io.observe(root); offs.push(() => io.disconnect()); }
     else if (triggers.has("visible")) visible.set(true);
@@ -163,7 +186,7 @@ export function OverflowText(props: OverflowTextProps): Element {
   return root;
 }
 
-/** A ticker: `<Marquee text="…" />` = OverflowText that loops whenever it is on screen. */
+/** A ticker: `<Marquee text="…" />` = OverflowText that loops whenever it is on screen; `<Marquee duplicate separator={false}>{logos}</Marquee>` is an endless strip. */
 export function Marquee(props: OverflowTextProps): Element {
   return OverflowText({ trigger: "visible", mode: "loop", ...props });
 }

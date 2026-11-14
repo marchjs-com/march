@@ -1,0 +1,25 @@
+/* CornerMark. Theme tokens only, logical properties, durations from --hm-dur tokens, no @keyframes (motion core). */
+.hm-corner-mark { --hm-cm-size: 1.75rem; --hm-cm-inset: .5rem; position: absolute; display: inline-grid; place-items: center; box-sizing: border-box; width: var(--hm-cm-size); height: var(--hm-cm-size); border-radius: 50%;
+  font-size: var(--hm-text-xs); font-weight: var(--hm-weight-semibold); line-height: 1; pointer-events: none; }
+.hm-corner-mark .hm-svg { width: 57%; height: 57%; }
+.hm-corner-mark-icon { display: inline-grid; place-items: center; width: 100%; height: 100%; }
+.hm-corner-mark-sm { --hm-cm-size: 1.25rem; --hm-cm-inset: .25rem; }
+.hm-corner-mark-lg { --hm-cm-size: 2.25rem; --hm-cm-inset: .75rem; }
+.hm-corner-mark-top-start { inset-block-start: var(--hm-cm-inset); inset-inline-start: var(--hm-cm-inset); }
+.hm-corner-mark-top-end { inset-block-start: var(--hm-cm-inset); inset-inline-end: var(--hm-cm-inset); }
+.hm-corner-mark-bottom-start { inset-block-end: var(--hm-cm-inset); inset-inline-start: var(--hm-cm-inset); }
+.hm-corner-mark-bottom-end { inset-block-end: var(--hm-cm-inset); inset-inline-end: var(--hm-cm-inset); }
+/* overlap: half outside the corner (a badge on an avatar) */
+.hm-corner-mark.is-overlap { --hm-cm-inset: calc(var(--hm-cm-size) * -.18); }
+/* looks */
+.hm-corner-mark-scrim { background: color-mix(in srgb, var(--hm-scrim) 54%, transparent); color: var(--hm-on-scrim); }
+.hm-corner-mark-scrim[data-hm-color] { color: color-mix(in srgb, var(--hm-accent) 55%, var(--hm-on-scrim)); }
+.hm-corner-mark-surface { background: var(--hm-surface); color: var(--hm-text); box-shadow: var(--hm-shadow-2); }
+.hm-corner-mark-surface[data-hm-color] { color: var(--hm-accent-text); }
+.hm-corner-mark-solid { background: var(--hm-accent, var(--hm-primary)); color: var(--hm-on-accent, var(--hm-on-primary-fill)); }
+.hm-corner-mark.is-ringed { box-shadow: 0 0 0 2px var(--hm-surface); }
+/* show="hover": appears while the host (class hm-corner-host) is hovered or holds focus */
+.hm-corner-mark.is-hover { opacity: 0; transform: translateY(6px) scale(.9); transition: opacity var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease-spring, var(--hm-ease)); }
+.hm-corner-host:hover .hm-corner-mark.is-hover, .hm-corner-host:focus-within .hm-corner-mark.is-hover { opacity: 1; transform: none; }
+@media (hover: none) { .hm-corner-mark.is-hover { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .hm-corner-mark.is-hover { transition: none; transform: none; } }

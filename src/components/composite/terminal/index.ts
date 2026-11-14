@@ -350,7 +350,12 @@ const WINDOW_KEYS = new Set(["title", "icon", "chrome", "x", "y", "width", "wind
 export function TerminalWindow(props: TerminalWindowProps): unknown {
   // forward each prop as a getter, so live props (scheme, prompt, chrome, open…) stay live on both sides
   const term: Record<string, unknown> = {}, win: Record<string, unknown> = {};
-  for (const k of Object.keys(props)) Object.defineProperty(WINDOW_KEYS.has(k) ? win : term, k, { get: () => (props as Record<string, unknown>)[k], enumerable: true });
+  // (a terminal prop goes on as a reactive thunk: h() turns that into a live prop; a plain getter would be read once)
+  for (const k of Object.keys(props)) {
+    const get = (): unknown => (props as Record<string, unknown>)[k];
+    if (WINDOW_KEYS.has(k)) Object.defineProperty(win, k, { get, enumerable: true });
+    else term[k] = /^on[A-Z:]/.test(k) ? get() : reactive(get);
+  }
   const p = props as Record<string, unknown>;
   return h(Window, {
     title: reactive(() => (p["title"] as string | undefined) ?? "Terminal"), icon: props.icon ?? glyph(terminalIcon), chrome: reactive(() => val(props.chrome)),

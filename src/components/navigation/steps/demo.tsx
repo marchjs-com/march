@@ -27,6 +27,7 @@ export default function StepsDemo(props: { values: { vertical: boolean; clickabl
         renderDot={done === "own" ? (i: number, state: string) => (state === "done" ? "✓" : "ABCD"[i]) : undefined}
         {...(clickable ? { onSelect: (i: number) => { step.set(i) } } : {})} />
     }}
+    <p class="hm-muted">{() => (props.values.connector ? "Adımlar bir çizgiyle bağlı; biten adımların çizgisi renklenir." : "Bağlantı çizgisi yok: adımlar yalnız noktalarıyla durur.")}</p>
     <div class="sc-steps-nav">
       <button type="button" class="hm-btn hm-btn-sm" disabled={() => step() === 0} onClick={() => step.set(step() - 1)}>Geri</button>
       <button type="button" class="hm-btn hm-btn-sm hm-btn-primary" disabled={() => step() === STEPS.length} onClick={() => step.set(step() + 1)}>{() => (step() >= STEPS.length - 1 ? "Bitir" : "İleri")}</button>

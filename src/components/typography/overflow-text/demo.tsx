@@ -10,7 +10,8 @@ export const code = `<OverflowText text={title} play={() => selected()} /> // th
 <OverflowText trigger="always" mode="once" speed={60} pause={800} />
 <Marquee text="Duyuru · …" separator="✦" />          // trigger=visible, mode=loop
 <Marquee text="Duyuru · …" separator={<Icon of={heart} />} />   // own separator; separator={false}: none
-<OverflowText text={title} disabled={() => !prefs.motion} />   // never scrolls`
+<OverflowText text={title} disabled={() => !prefs.motion} />   // never scrolls
+<Marquee duplicate separator={false}>{logos}</Marquee>         // endless strip: short content is repeated`
 
 const HINT: Record<string, string> = {
   hover: "Satırın üzerine gelin: sığmayan metin kayar.",
@@ -27,7 +28,7 @@ const SAMPLES = [
   ["Kısa", "Sığan metin kaymaz"],
 ] as const
 
-export default function OverflowTextDemo(props: { values: { trigger: string; mode: string; speed: number; disabled: boolean; ticker: boolean; separator: string } }) {
+export default function OverflowTextDemo(props: { values: { duplicate: boolean; trigger: string; mode: string; speed: number; disabled: boolean; ticker: boolean; separator: string } }) {
   return <div class="sc-mq-demo">
     {() => { const trigger = props.values.trigger as MarqueeTrigger, mode = props.values.mode as MarqueeMode, speed = props.values.speed, disabled = props.values.disabled; return <div class="sc-mq-list">
       <p class="hm-muted">{disabled ? "Kaydırma kapalı: sığmayan metin kırpılmış kalır." : `${HINT[trigger]} İlk satır seçili satır gibi hep kayar (play).`}</p>
@@ -36,7 +37,11 @@ export default function OverflowTextDemo(props: { values: { trigger: string; mod
     {() => {
       if (!props.values.ticker) return null
       const sep = props.values.separator, speed = props.values.speed, disabled = props.values.disabled
-      return <div class="sc-mq-ticker"><Marquee text="Yeni: koyu tema · daha hızlı arama · tam RTL · dört resmi renk" separator={sep === "off" ? false : sep === "icon" ? <Icon of={heart} /> : "✦"} speed={speed} disabled={disabled} /></div>
+      const mark = sep === "off" ? false : sep === "icon" ? <Icon of={heart} /> : "✦"
+      // a short strip: it fits, so it only loops when `duplicate` repeats it to fill the box
+      return [<div class="sc-mq-ticker"><Marquee text="Yeni: koyu tema · daha hızlı arama · tam RTL · dört resmi renk" separator={mark} speed={speed} disabled={disabled} /></div>,
+        <div class="sc-mq-ticker"><Marquee duplicate={props.values.duplicate} pause={0} separator={mark} speed={speed} disabled={disabled}><span class="sc-row">{["HADİ", "Globex", "Initech", "Umbrella"].map((n) => <strong>{n}</strong>)}</span></Marquee></div>,
+        <span class="hm-muted">{props.values.duplicate ? "İkinci şerit: dört ad kutuyu doldurana kadar çoğaltılır ve durmadan döner." : "İkinci şerit: içerik sığdığı için kaymaz (duplicate kapalı)."}</span>]
     }}
   </div>
 }

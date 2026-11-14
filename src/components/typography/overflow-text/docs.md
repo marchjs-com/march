@@ -23,6 +23,7 @@ the tooltip. `Marquee` is the endless ticker preset (`trigger="visible"`, `mode=
 | `delay` | ms | `250` | wait after the trigger |
 | `separator` | text / node / `false` | `"•"` | loop separator; `false`: nothing between the copies |
 | `easing` | CSS easing | `"ease-in-out"` | each travel in bounce / once (the loop is linear) |
+| `duplicate` | boolean / number | `false` | an endless strip: the content is repeated (`true`: enough copies to fill the width; a number: that many) |
 | `disabled` | boolean / accessor | `false` | never scroll: the text stays clipped with its fade or ellipsis |
 | `fade` | boolean | `true` | fade the clipped edges; `false` shows an ellipsis |
 | `play` | accessor | — | extra condition that keeps it scrolling |
@@ -32,11 +33,16 @@ the tooltip. `Marquee` is the endless ticker preset (`trigger="visible"`, `mode=
 ```tsx
 <Marquee text={news} separator={<Icon of={star} />} />
 <OverflowText text={title} easing="linear" disabled={() => !prefs.motion} />
+<Marquee duplicate separator={false} pause={0}>{logos.map((l) => <Logo {...l} />)}</Marquee>
 ```
+
+With `duplicate` a short content (a row of logos, a few quotes) still fills the box and loops: the content is a
+`.hm-marquee-unit` and its copies follow it (space them with a gap and an end padding on that class). The copies are
+`aria-hidden` and `inert`, so links and buttons in them are neither read nor focused.
 
 ## Accessibility
 
-`dir="auto"` so mixed scripts read correctly; one readable copy (loop copies are `aria-hidden`); no movement under
+`dir="auto"` so mixed scripts read correctly; one readable copy (loop and `duplicate` copies are `aria-hidden` and inert); no movement under
 reduced motion; the motion engine's global speed and "stop all" apply.
 
 ## Composed of

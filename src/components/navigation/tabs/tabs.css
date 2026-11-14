@@ -15,3 +15,34 @@
 .hm-tabs-panel { padding-top: var(--hm-space-5); outline: none; animation: hm-rise-in var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-tabs-plain .hm-tab::after { display: none; }
 .hm-tabs-still > .hm-tabs-panel { animation: none; }
+/* parts of a tab: icon, the "changed" dot, the close mark (shown on hover, focus and the active tab) */
+.hm-tab-icon { display: inline-flex; flex: none; }
+.hm-tab-icon .hm-svg { width: 1em; height: 1em; }
+.hm-tab-dirty { flex: none; width: .4375rem; height: .4375rem; border-radius: 50%; background: var(--hm-accent, var(--hm-primary)); }
+.hm-tab-close { display: inline-grid; place-items: center; flex: none; width: 1.125rem; height: 1.125rem; margin-inline-end: -.25rem; border-radius: var(--hm-radius-1); color: var(--hm-muted); opacity: 0;
+  transition: opacity var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease); }
+.hm-tab-close .hm-svg { width: .75rem; height: .75rem; }
+.hm-tab:hover .hm-tab-close, .hm-tab.is-active .hm-tab-close, .hm-tab:focus-visible .hm-tab-close { opacity: 1; }
+.hm-tab-close:hover { background: color-mix(in srgb, currentColor 14%, transparent); color: var(--hm-text); }
+@media (hover: none) { .hm-tab-close { opacity: 1; } }
+/* actions at the end of the bar: outside the tab list, the line runs under both */
+.hm-tabs-head { display: flex; align-items: stretch; min-width: 0; }
+.hm-tabs-head > .hm-tabs-bar { flex: 1; min-width: 0; }
+.hm-tabs-actions { display: flex; flex: none; align-items: center; gap: var(--hm-space-1); padding-inline-start: var(--hm-space-2); border-bottom: 1px solid var(--hm-border); }
+/* pill: a rounded switch, the active tab raised */
+.hm-tabs-bar-pill { width: fit-content; max-width: 100%; gap: 2px; padding: 2px; border-bottom: 0; border-radius: var(--hm-radius-full); background: var(--hm-surface-3); }
+.hm-tabs-bar-pill .hm-tab { min-height: 1.75rem; margin: 0; padding: 0 .85rem; border-radius: var(--hm-radius-full); color: var(--hm-text-2); font-size: var(--hm-text-sm);
+  transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-tabs-bar-pill .hm-tab::after { display: none; }
+.hm-tabs-bar-pill .hm-tab:hover { color: var(--hm-text); }
+.hm-tabs-bar-pill .hm-tab.is-active { background: var(--hm-surface); color: var(--hm-accent-text, var(--hm-primary-text)); box-shadow: var(--hm-shadow-1); }
+.hm-tabs-bar-pill .hm-tab:focus-visible { outline-offset: 1px; }
+.hm-tabs-head > .hm-tabs-bar-pill { flex: 0 1 auto; }
+.hm-tabs-bar-pill + .hm-tabs-actions { margin-inline-start: auto; border-bottom: 0; }
+/* a vertical strip (TabList): tabs stacked, the mark on the inline-end edge */
+.hm-tabs-bar[aria-orientation="vertical"] { flex-direction: column; align-items: stretch; border-bottom: 0; overflow: visible; }
+.hm-tabs-bar[aria-orientation="vertical"] .hm-tab { margin: 0; border-radius: var(--hm-radius-1); }
+.hm-tabs-bar[aria-orientation="vertical"] .hm-tab::after { inset-inline: auto 0; inset-block: .375rem; width: 2px; height: auto; transform: scaleY(0); }
+.hm-tabs-bar[aria-orientation="vertical"] .hm-tab.is-active::after { transform: scaleY(1); }
+.hm-tabs-bar-pill[aria-orientation="vertical"] { border-radius: var(--hm-radius-2); }
+.hm-tabs-bar-pill[aria-orientation="vertical"] .hm-tab { border-radius: var(--hm-radius); }

@@ -1,0 +1,22 @@
+/* PageDots. Theme tokens only, logical properties, durations from --hm-dur tokens, no @keyframes (motion core). */
+.hm-page-dots { --hm-pd-size: 6px; --hm-pd-long: 20px; display: flex; justify-content: center; align-items: center; margin: 0; padding: 0; }
+.hm-page-dots-sm { --hm-pd-size: 4px; --hm-pd-long: 14px; }
+.hm-page-dots-lg { --hm-pd-size: 8px; --hm-pd-long: 26px; }
+.hm-page-dots-vertical { flex-direction: column; }
+/* the dot is the ::before; the element around it is the (larger) target */
+.hm-page-dot { display: inline-flex; align-items: center; justify-content: center; flex: none; padding: calc(var(--hm-pd-size) / 2); border: 0; border-radius: var(--hm-radius-full); background: none; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-xs); line-height: 1.4; }
+button.hm-page-dot { padding-block: var(--hm-pd-size); cursor: pointer; }
+button.hm-page-dot:disabled { cursor: default; opacity: .5; }
+button.hm-page-dot:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: -1px; }
+.hm-page-dots-vertical button.hm-page-dot { padding: calc(var(--hm-pd-size) / 2) var(--hm-pd-size); }
+.hm-page-dot::before { content: ""; display: block; inline-size: var(--hm-pd-size); block-size: var(--hm-pd-size); border-radius: var(--hm-radius-full); background: var(--hm-border-strong);
+  transition: inline-size var(--hm-dur-slow) var(--hm-ease-out), block-size var(--hm-dur-slow) var(--hm-ease-out), background-color var(--hm-dur) var(--hm-ease); }
+button.hm-page-dot:hover:not(:disabled)::before { background: var(--hm-muted); }
+.hm-page-dot.is-active::before, button.hm-page-dot.is-active:hover::before { inline-size: var(--hm-pd-long); background: var(--hm-accent, var(--hm-primary)); }
+.hm-page-dots-vertical .hm-page-dot.is-active::before { inline-size: var(--hm-pd-size); block-size: var(--hm-pd-long); }
+.hm-page-dots-even .hm-page-dot.is-active::before { inline-size: var(--hm-pd-size); block-size: var(--hm-pd-size); }
+/* own dot content (dot={(i, active) => …}): the dot takes the size of what you draw */
+.hm-page-dot.is-own::before { content: none; }
+.hm-page-dot.is-own { min-inline-size: 1.5rem; padding: .125rem .375rem; }
+.hm-page-dot.is-own.is-active { color: var(--hm-accent-text, var(--hm-primary-text)); font-weight: var(--hm-weight-semibold); }
+@media (prefers-reduced-motion: reduce) { .hm-page-dot::before { transition: none; } }

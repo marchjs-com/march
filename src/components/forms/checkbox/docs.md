@@ -21,9 +21,18 @@ when pressed) while the real `<input>` stays for the keyboard, forms and screen 
 | `size` | `sm` `md` `lg` | `md` | |
 | `shape` | `square` `rounded` `circle` | per variant | |
 | `indeterminate` | boolean | — | the dash state |
+| `onClick` | `(e: MouseEvent) => void` | — | the click on the input with its modifier keys (`e.shiftKey`: range selection) |
+| `tabIndex` | number | — | tab order of the input (`-1` in a grid that moves focus with the arrow keys) |
 | `icon` | icon | — | drawn instead of the tick |
 | `color` | ColorToken | primary | |
 | `animate` | boolean | `true` | off: no motion (reduced motion is always respected) |
+
+Without a label only the box is drawn, for a selection cell of a table or a grid; name it with `aria-label`:
+
+```tsx
+<Checkbox value={$selected.has(row.id)} aria-label="Select row" onClick={(e) => toggle(row, { range: e.shiftKey })} />
+<Checkbox value={$all} indeterminate={$some && !$all} aria-label="Select all rows" onChange={(on) => selectAll(on)} />
+```
 
 ## Accessibility
 

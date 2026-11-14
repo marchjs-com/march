@@ -2,6 +2,7 @@
 // option changes; the text is kept.
 import { untrack } from "../../../core/reactive.ts";
 import { MarkdownEditor, type MarkdownView } from "./index.ts";
+import { Button } from "../../../ui/button.ts";
 
 const START = [
   "## HADİ ekip toplantısı",
@@ -26,7 +27,13 @@ const START = [
 
 export default function MarkdownEditorDemo(props: { values: { view: string; toolbar: boolean; sync: boolean; stats: boolean; rich: boolean; readonly: boolean; tools: string; hint: boolean; labels: boolean } }) {
   let $md = START
-  return <div class="sc-ed-one">
+  let host: HTMLElement | undefined
+  // scrolls the source to its end (or back to the top): with synced scrolling the preview follows, without it stays
+  const scrollSource = () => {
+    const source = host?.querySelector<HTMLTextAreaElement>(".hm-mde-source")
+    if (source) source.scrollTop = source.scrollTop > 0 ? 0 : source.scrollHeight
+  }
+  return <div class="sc-ed-one" ref={(x: HTMLElement) => { host = x }}>
     {() => {
       const views: MarkdownView[] = props.values.rich || props.values.view === "rich" ? ["write", "preview", "split", "rich"] : ["write", "preview", "split"]
       return <MarkdownEditor value={untrack(() => $md)} onChange={(v: string) => { $md = v }} view={props.values.view as MarkdownView} views={views}
@@ -34,5 +41,6 @@ export default function MarkdownEditorDemo(props: { values: { view: string; tool
         syncScroll={props.values.sync} stats={props.values.stats} readonly={props.values.readonly} rows={14} hint={props.values.hint}
         labels={props.values.labels ? { write: "Taslak", preview: "Oku", split: "Yan yana", rich: "Biçimli", words: (n) => `${n} sözcük`, minutes: (n) => `${n} dakikada okunur` } : undefined} />
     }}
+    {() => (props.values.view === "split" ? <div class="sc-row"><Button size="sm" variant="secondary" data-audit-try="toggle" on:click={scrollSource}>Yazıyı sona / başa kaydır</Button></div> : null)}
   </div>
 }

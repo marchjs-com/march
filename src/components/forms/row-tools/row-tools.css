@@ -1,0 +1,2 @@
+/* RowTools. Theme tokens only, logical properties, no @keyframes (motion core). */
+.hm-row-tools { display: inline-flex; align-items: center; flex: none; gap: var(--hm-space-1); }

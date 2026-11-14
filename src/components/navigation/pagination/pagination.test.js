@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { installDom } from "../../../testing/dom.ts";
+import { installDom, Event } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const mount = (fn) => { const host = document.createElement("div"); document.body.appendChild(host); const dispose = render(fn, host); return { host, dispose }; };
@@ -41,5 +41,65 @@ test("Pagination: own texts and names, own Previous / Next and gap, color; contr
   assert.equal(bare.querySelector(".hm-page-gap"), null);
   assert.equal(bare.getAttribute("data-hm-color"), null);
   assert.equal(bare.querySelector('[aria-current="page"]').textContent, "10");
+  dispose();
+});
+
+test("Pagination simple: page count from total + size, range and status texts, sizes select, own texts", () => {
+  const page = signal(2), sizes = [];
+  const { host, dispose } = mount(() => [
+    h(Pagination, { variant: "simple", page, total: 134, size: 20, sizes: [20, 50], onSize: (n) => sizes.push(n), setPage: (p) => page.set(p) }),
+    h(Pagination, { variant: "simple", page: 1, pages: 3, info: false, status: (p, n) => `${p}/${n}`, prev: "Back", next: "More", labels: { previous: "Previous slide", next: "Next slide" } }),
+    h(Pagination, { variant: "simple", page: 1, total: 40, info: (r) => `${r.from}..${r.to} / ${r.total}`, status: false, controls: false }),
+  ]);
+  const [full, deck, bare] = host.querySelectorAll("nav");
+  assert.match(full.getAttribute("class"), /hm-pagination-simple/);
+  assert.match(full.querySelector(".hm-page-info").textContent, /21.40.*134/);
+  assert.match(full.querySelector(".hm-page-status").textContent, /2.*7/);
+  const [prev, next] = full.querySelectorAll(".hm-page-nav");
+  assert.equal(prev.tagName, "BUTTON");
+  assert.ok(prev.textContent.length > 0, "the default content names the button");
+  assert.equal(prev.getAttribute("aria-label"), null);
+  assert.equal(prev.disabled, false);
+  next.click();
+  assert.equal(page(), 3);
+  assert.match(full.querySelector(".hm-page-info").textContent, /41.60/);
+  page.set(7);
+  assert.equal(full.querySelectorAll(".hm-page-nav")[1].disabled, true);
+  assert.match(full.querySelector(".hm-page-info").textContent, /121.134/);
+  const select = full.querySelector("select");
+  assert.ok(select.getAttribute("aria-label"));
+  select.value = "1"; select.dispatchEvent(new Event("change", { bubbles: true }));
+  assert.deepEqual(sizes, [50]);
+  assert.equal(deck.querySelector(".hm-page-info"), null);
+  assert.equal(deck.querySelector(".hm-page-status").textContent, "1/3");
+  const [back, more] = deck.querySelectorAll(".hm-page-nav");
+  assert.equal(back.textContent, "Back");
+  assert.equal(back.getAttribute("aria-label"), "Previous slide");
+  assert.equal(more.getAttribute("aria-label"), "Next slide");
+  assert.equal(back.disabled, true);
+  assert.equal(bare.querySelector(".hm-page-info").textContent, "1..20 / 40");
+  assert.equal(bare.querySelector(".hm-page-status"), null);
+  assert.equal(bare.querySelectorAll(".hm-page-nav").length, 0);
+  dispose();
+});
+
+test("Pagination simple: cursor mode (no page count) follows hasPrev / hasNext and calls onPrev / onNext", () => {
+  const hasNext = signal(true), calls = [];
+  const { host, dispose } = mount(() => h(Pagination, { variant: "simple", hasPrev: false, hasNext, onPrev: () => calls.push("prev"), onNext: () => calls.push("next") }));
+  const [prev, next] = host.querySelectorAll(".hm-page-nav");
+  assert.equal(host.querySelector(".hm-page-status"), null);
+  assert.equal(host.querySelector(".hm-page-info").textContent, "");
+  assert.equal(prev.disabled, true);
+  assert.equal(next.disabled, false);
+  next.click();
+  assert.deepEqual(calls, ["next"]);
+  hasNext.set(false);
+  assert.equal(next.disabled, true);
+  dispose();
+});
+
+test("Pagination: numbers work from total + size too", () => {
+  const { host, dispose } = mount(() => h(Pagination, { page: 3, total: 45, size: 10 }));
+  assert.equal([...host.querySelectorAll(".hm-page-btn")].filter((b) => !b.getAttribute("class").includes("hm-page-nav")).map((b) => b.textContent).join(","), "1,2,3,4,5");
   dispose();
 });

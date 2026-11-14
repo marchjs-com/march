@@ -9,6 +9,6 @@ export default definePlayground<Values>({
     { key: "collapsible", label: "İkon rayına daraltma", default: true },
     { key: "pins", label: "Sabitleme yıldızı", default: true },
     { key: "chevron", label: "Grup oku", default: "chevron", options: [{ value: "chevron", label: "ok" }, { value: "plus", label: "kendi ikonum (artı)" }, { value: "off", label: "yok" }] },
-    { key: "texts", label: "Kendi metinlerim (süzme kutusu, boş sonuç)", default: false },
+    { key: "texts", label: "Kendi metinlerim (süzme kutusu, boş sonuç, bölüm başlıkları)", default: false },
   ],
 });

@@ -1,0 +1,27 @@
+/* Stat (value + label tile). Classes are hm-stat-tile-*: hm-stat-* belongs to the KPI box of hadi-march/charts. */
+.hm-stat-tile { display: flex; flex-direction: column; align-items: center; gap: .125rem; min-inline-size: 0; margin: 0; padding: 0; border: 0; background: none; color: var(--hm-text); font: inherit; text-align: center; text-decoration: none; }
+.hm-stat-tile.is-start { align-items: flex-start; text-align: start; }
+.hm-stat-tile.is-end { align-items: flex-end; text-align: end; }
+.hm-stat-tile-value { order: 1; margin: 0; max-inline-size: 100%; font-size: var(--hm-text-lg); font-weight: 800; line-height: 1.15; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.hm-stat-tile-label { order: 2; max-inline-size: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--hm-text-2); font-size: var(--hm-text-xs); }
+.hm-stat-tile-hint { order: 3; margin: 0; max-inline-size: 100%; color: var(--hm-muted); font-size: var(--hm-text-2xs, var(--hm-text-xs)); }
+.hm-stat-tile.is-label-first .hm-stat-tile-label { order: 0; }
+.hm-stat-tile[data-hm-color] .hm-stat-tile-value { color: var(--hm-accent-text, var(--hm-accent)); }
+/* sizes */
+.hm-stat-tile-sm .hm-stat-tile-value { font-size: var(--hm-text-md); }
+.hm-stat-tile-lg { gap: var(--hm-space-1); } .hm-stat-tile-lg .hm-stat-tile-value { font-size: var(--hm-text-2xl); letter-spacing: -.02em; } .hm-stat-tile-lg .hm-stat-tile-label { font-size: var(--hm-text-sm); }
+.hm-stat-tile-xl { gap: var(--hm-space-1); } .hm-stat-tile-xl .hm-stat-tile-value { font-size: var(--hm-text-4xl); line-height: 1.05; letter-spacing: -.035em; } .hm-stat-tile-xl .hm-stat-tile-label { font-size: var(--hm-text-md); }
+.hm-stat-tile-xl .hm-stat-tile-hint, .hm-stat-tile-lg .hm-stat-tile-hint { font-size: var(--hm-text-xs); }
+/* looks */
+.hm-stat-tile-tile { padding: .5rem .625rem; border-radius: var(--hm-radius-3); background: var(--hm-surface-2); }
+.hm-stat-tile-card { padding: var(--hm-space-4); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-4); background: var(--hm-surface); }
+/* button / link */
+.hm-stat-tile.is-action { cursor: pointer; border-radius: var(--hm-radius-3); transition: background-color var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease-spring); }
+.hm-stat-tile-plain.is-action { padding: .25rem .5rem; }
+.hm-stat-tile-card.is-action { border-radius: var(--hm-radius-4); }
+.hm-stat-tile.is-action:hover { background: var(--hm-accent-soft, var(--hm-surface-3)); }
+.hm-stat-tile-plain.is-action:hover { background: var(--hm-surface-2); }
+.hm-stat-tile.is-action:active { transform: scale(.97); }
+.hm-stat-tile.is-action:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-focus)); outline-offset: 2px; }
+.hm-stat-tile.is-disabled { opacity: .55; cursor: default; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .hm-stat-tile.is-action { transition: none; } }

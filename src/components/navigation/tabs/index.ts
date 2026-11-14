@@ -1,12 +1,15 @@
 // Tabs: `<Tabs tabs={[{ id, label, badge, content: () => node }]} query="tab" />` or `<Tabs><Tab id label>…</Tab></Tabs>`.
+// TabList is the strip alone (tablist + roving focus + selection); Tabs adds the panel.
 // Roving focus with ← → Home End (automatic activation). With `query="tab"` the active tab is kept in the URL (?tab=id).
 import "./tabs.css";
-import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { query as routeQuery, setQuery } from "../../../router/router.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { roving } from "../../../ui/focus.ts";
-import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { t } from "../../../core/i18n.ts";
+import { val, cx, uid, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
@@ -19,23 +22,107 @@ export interface TabSpec {
   badge?: MaybeFn<number | null | undefined>;
   disabled?: MaybeFn<boolean | undefined>;
   hidden?: MaybeFn<boolean | undefined>;
+  /** An icon before the label (an icon definition, a short text or a node). */
+  icon?: unknown;
+  /** Tooltip of the tab (e.g. why it is disabled). */
+  title?: MaybeFn<string | null | undefined>;
+  /** A close mark on the tab; the Delete key closes too. Both call `onClose(id)`. */
+  closable?: MaybeFn<boolean | undefined>;
+  /** The "changed" dot (unsaved work). */
+  dirty?: MaybeFn<boolean | undefined>;
   content?: unknown;
 }
 /** What <Tab> returns (a descriptor read by <Tabs>). */
 export interface TabDescriptor extends TabSpec { readonly __tab: true; content: () => unknown }
-export interface TabProps { id: string; label: MaybeFn<unknown>; badge?: MaybeFn<number | null | undefined>; disabled?: MaybeFn<boolean | undefined>; hidden?: MaybeFn<boolean | undefined>; children?: unknown }
+export interface TabProps extends Omit<TabSpec, "content"> { children?: unknown }
 
 /** Tab descriptor for `<Tabs>` children. */
 export function Tab(props: TabProps): TabDescriptor {
   const d = { __tab: true } as TabDescriptor;
-  for (const k of ["id", "label", "badge", "disabled", "hidden"] as const) Object.defineProperty(d, k, { get: () => props[k], enumerable: true });
+  for (const k of ["id", "label", "badge", "disabled", "hidden", "icon", "title", "closable", "dirty"] as const) Object.defineProperty(d, k, { get: () => props[k], enumerable: true });
   d.content = () => props.children;
   return d;
 }
 
-export interface TabsProps {
+/** What the tab strip and `<Tabs>` share. */
+export interface TabListLook {
   /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
   color?: ColorToken | undefined;
+  /** Accessible name of the tab list. */
+  label?: MaybeFn<string | undefined>;
+  /** "line" (default): underlined tabs; "pill": a rounded switch; "none" (TabList): no look, your own classes through `tabProps`. */
+  variant?: MaybeFn<"line" | "pill" | "none" | undefined>;
+  /** "auto" (default): the arrow keys select; "manual": they only move focus (Enter / Space select). */
+  activation?: "auto" | "manual" | undefined;
+  /** Called by the close mark of a `closable` tab and by the Delete key. */
+  onClose?: ((id: string) => void) | undefined;
+  /** Your own close mark (an icon or a short text). */
+  closeIcon?: unknown;
+  /** Texts: tooltip of the close mark, accessible name of the "changed" dot. */
+  labels?: { close?: MaybeFn<string | undefined>; dirty?: MaybeFn<string | undefined> } | undefined;
+  /** Extra attributes and events of a tab's button (`onPointerdown` for dragging, `onContextmenu`, `class`, `aria-*` …). */
+  tabProps?: ((tab: TabSpec) => Record<string, unknown>) | undefined;
+}
+
+export interface TabListProps extends TabListLook {
+  tabs: MaybeFn<readonly TabSpec[] | null | undefined>;
+  /** The active tab id (a value or an accessor). */
+  value: MaybeFn<string | null | undefined>;
+  onSelect: (id: string) => void;
+  orientation?: MaybeFn<"horizontal" | "vertical" | undefined>;
+  /** DOM id of a tab's button (default: generated). */
+  tabId?: ((id: string) => string) | undefined;
+  /** id of the panel the tabs control (`aria-controls`). */
+  controls?: string | undefined;
+  /** Wrap a tab's button (e.g. in a Tooltip). */
+  wrap?: ((button: Element, tab: TabSpec) => unknown) | undefined;
+  class?: ClassProp;
+}
+
+/**
+ * The tab strip alone: `role="tablist"`, roving focus, selection, icons, badges, the "changed" dot and close marks.
+ * `<Tabs>` is this plus the panel; use it directly for a strip that drives something else.
+ */
+export function TabList(props: TabListProps): Element {
+  const base = uid("hm-tab");
+  const idOf = props.tabId ?? ((id: string) => `${base}-${id}`);
+  const list = computed(() => (val(props.tabs) ?? []).filter((x) => x && !val(x.hidden)));
+  const vertical = (): boolean => val(props.orientation) === "vertical";
+  const look = (): boolean => val(props.variant) !== "none";
+  let bar: HTMLElement | undefined;
+  type TabButton = HTMLButtonElement;
+  const tabEls = (): TabButton[] => (bar ? Array.from(bar.querySelectorAll<TabButton>('[role="tab"]')).filter((x) => !x.disabled) : []);
+  const closes = (x: TabSpec | undefined): boolean => !!x && !!val(x.closable) && !val(x.disabled);
+  return h("div", { "data-hm-color": () => colorAttr(props.color),
+    class: () => cx(look() && "hm-tabs-bar", val(props.variant) === "pill" && "hm-tabs-bar-pill", val(props.class)), role: "tablist",
+    "aria-orientation": () => (vertical() ? "vertical" : null), "aria-label": () => val(props.label) ?? null, ref: (x: HTMLElement) => { bar = x; },
+    onKeydown: (e: KeyboardEvent) => {
+      const id = (e.target as HTMLElement).dataset?.["tab"];
+      if (e.key === "Delete" && id != null && closes(untrack(list).find((x) => x.id === id))) { e.preventDefault(); props.onClose?.(id); return; }
+      const el = roving(e, tabEls(), { horizontal: !vertical() });
+      if (el && props.activation !== "manual") props.onSelect(el.dataset["tab"]!);
+    },
+  }, () => list().map((x) => untrack(() => {
+    const on = (): boolean => val(props.value) === x.id;
+    // no active tab: the first enabled one is the Tab stop
+    const stop = (): boolean => on() || (!list().some((y) => y.id === val(props.value)) && list().find((y) => !val(y.disabled)) === x);
+    const { class: own, ...attrs } = props.tabProps?.(x) ?? {};
+    const btn = h("button", {
+      ...attrs, type: "button", role: "tab", id: idOf(x.id), "data-tab": x.id, "aria-controls": props.controls ?? null,
+      "aria-selected": () => String(on()), tabindex: () => (stop() ? "0" : "-1"), disabled: () => !!val(x.disabled), title: () => val(x.title) ?? null,
+      "aria-keyshortcuts": () => (closes(x) ? "Delete" : null),
+      class: () => cx(look() && "hm-tab", on() && "is-active", val(own as ClassProp)), onClick: () => props.onSelect(x.id),
+    }, icon(x.icon, "hm-tab-icon"), () => val(x.label), x.badge !== undefined && h(Badge, { count: () => val(x.badge), tone: "neutral" }),
+    x.dirty !== undefined && (() => (val(x.dirty) ? h("span", { class: "hm-tab-dirty", role: "img", "aria-label": () => val(props.labels?.dirty) ?? t`unsaved changes` }) : null)),
+    x.closable !== undefined && (() => (closes(x) ? h("span", {
+      class: "hm-tab-close", "aria-hidden": "true", title: () => val(props.labels?.close) ?? t`Close`,
+      onPointerdown: (e: Event) => e.stopPropagation(), onClick: (e: Event) => { e.stopPropagation(); props.onClose?.(x.id); },
+    }, props.closeIcon == null ? glyph(xIcon) : icon(props.closeIcon, "hm-tab-close-own")) : null)));
+    return props.wrap ? props.wrap(btn, x) : btn;
+  })));
+}
+
+export interface TabsProps extends TabListLook {
   tabs?: MaybeFn<readonly TabSpec[] | null | undefined>;
   /** Controlled active id (`bind:value` works). */
   value?: MaybeFn<string | null | undefined>;
@@ -43,12 +130,13 @@ export interface TabsProps {
   setValue?: (id: string) => void;
   /** Keep the active tab in this query parameter. */
   query?: string | undefined;
-  label?: MaybeFn<string | undefined>;
   class?: ClassProp;
   /** <Tab> children (when `tabs` is not given). */
   children?: unknown;
   /** false: render only the tab bar. */
   panel?: boolean;
+  /** Content at the end of the tab bar (buttons, a menu): outside the tab list, stays put while the tabs scroll. */
+  actions?: unknown;
   /** The underline of the active tab (default true). */
   indicator?: boolean | undefined;
   /**
@@ -59,6 +147,8 @@ export interface TabsProps {
   motion?: "none" | "fade" | "rise" | "slide" | ((panel: HTMLElement, dir: 1 | -1) => void) | undefined;
 }
 
+// a live prop for h(Component, …): it becomes a getter
+const live = reactive as <T>(fn: () => T) => T;
 const PANEL_FRAMES = {
   fade: () => [{ opacity: 0 }, { opacity: 1 }],
   rise: () => [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }],
@@ -85,20 +175,11 @@ export function Tabs(props: TabsProps): Element {
     props.setValue?.(id);
     if (props.query) { try { void setQuery({ [props.query]: id }); } catch { /* no router: local state only */ } }
   };
-  let bar: HTMLElement | undefined;
-  type TabButton = HTMLButtonElement;
-  const tabEls = (): TabButton[] => (bar ? Array.from(bar.querySelectorAll<TabButton>('[role="tab"]')).filter((x) => !x.disabled) : []);
-  const nav = h("div", { "data-hm-color": () => colorAttr(props.color),
-    class: "hm-tabs-bar", role: "tablist", "aria-label": () => val(props.label) ?? null, ref: (x: HTMLElement) => { bar = x; },
-    onKeydown: (e: KeyboardEvent) => { const el = roving(e, tabEls(), { horizontal: true }); if (el) select(el.dataset["tab"]); },
-  }, () => list().map((x) => untrack(() => {
-    const on = (): boolean => current() === x.id;
-    return h("button", {
-      type: "button", role: "tab", id: `${base}-t-${x.id}`, "data-tab": x.id, "aria-controls": `${base}-p`,
-      "aria-selected": () => String(on()), tabindex: () => (on() ? "0" : "-1"), disabled: () => !!val(x.disabled),
-      class: () => cx("hm-tab", on() && "is-active"), onClick: () => select(x.id),
-    }, () => val(x.label), x.badge !== undefined && h(Badge, { count: () => val(x.badge), tone: "neutral" }));
-  })));
+  const nav = h(TabList, {
+    tabs: list, value: current, onSelect: select, controls: `${base}-p`, tabId: (id: string) => `${base}-t-${id}`,
+    color: live(() => props.color), label: () => val(props.label), variant: () => val(props.variant), labels: live(() => props.labels),
+    activation: props.activation, onClose: (id: string) => props.onClose?.(id), closeIcon: props.closeIcon, tabProps: props.tabProps,
+  });
   // Only the active panel exists; switching disposes the old one.
   const panel = h("div", { class: "hm-tabs-panel", role: "tabpanel", id: `${base}-p`, tabindex: "0", "aria-labelledby": () => `${base}-t-${current()}` },
     () => {
@@ -122,5 +203,6 @@ export function Tabs(props: TabsProps): Element {
       });
     });
   }
-  return h("div", { class: () => cx("hm-tabs", props.indicator === false && "hm-tabs-plain", motion && "hm-tabs-still", val(props.class)) }, nav, props.panel === false ? null : panel);
+  return h("div", { class: () => cx("hm-tabs", props.indicator === false && "hm-tabs-plain", motion && "hm-tabs-still", val(props.class)) },
+    props.actions == null || props.actions === false ? nav : h("div", { class: "hm-tabs-head" }, nav, h("div", { class: "hm-tabs-actions" }, props.actions)), props.panel === false ? null : panel);
 }

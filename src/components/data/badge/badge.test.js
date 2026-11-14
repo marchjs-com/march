@@ -32,3 +32,43 @@ test("Badge: coloured dot, own dot node, own count text", () => {
   assert.equal(d.textContent, "7 new");
   m.dispose();
 });
+
+test("Badge: size xs; pulse draws a pulsing StatusDot in the text colour or dotColor", () => {
+  const m = mount(() => [h(Badge, { size: "xs", count: 3 }), h(Badge, { tone: "danger", pulse: true }, "Live"), h(Badge, { dot: true, pulse: "blink", dotColor: "brand-orange" }, "On air"), h(Badge, {}, "Plain")]);
+  const [a, b, c, d] = m.el.querySelectorAll(".hm-badge");
+  assert.ok(a.classList.contains("hm-badge-xs") && a.classList.contains("hm-badge-count"));
+  const dot = b.querySelector(".hm-status-dot.hm-badge-dot-pulse");
+  assert.ok(dot.classList.contains("is-pulse-ring"));
+  assert.equal(dot.getAttribute("aria-hidden"), "true");
+  assert.ok(!b.classList.contains("hm-badge-dot"), "no second (pseudo) dot");
+  assert.ok(c.querySelector(".hm-status-dot").classList.contains("is-pulse-blink"));
+  assert.equal(c.querySelector(".hm-status-dot").getAttribute("data-hm-color"), "brand-orange");
+  assert.equal(d.tagName, "SPAN");
+  assert.ok(!d.classList.contains("hm-badge-xs") && !d.classList.contains("hm-badge-btn"));
+  m.dispose();
+});
+
+test("Badge: onClick draws a button (text and count); pressed, disabled and the accessible name", () => {
+  const on = signal(false), off = signal(false);
+  let hits = 0;
+  const m = mount(() => [
+    h(Badge, { tone: "info", onClick: () => { hits++; on.set(!on()); }, pressed: on, disabled: off, ariaLabel: "Type: string" }, "str"),
+    h(Badge, { count: 4, label: "hidden", onClick: () => { hits += 10; } }),
+  ]);
+  const [a, b] = m.el.querySelectorAll("button.hm-badge");
+  assert.equal(a.getAttribute("type"), "button");
+  assert.ok(a.classList.contains("hm-badge-btn") && a.classList.contains("hm-badge-info"));
+  assert.equal(a.getAttribute("aria-label"), "Type: string");
+  assert.equal(a.getAttribute("aria-pressed"), "false");
+  a.click();
+  assert.equal(hits, 1);
+  assert.equal(a.getAttribute("aria-pressed"), "true");
+  assert.ok(a.classList.contains("is-pressed"));
+  off.set(true);
+  assert.equal(a.disabled, true);
+  assert.equal(b.getAttribute("aria-label"), "4 hidden");
+  assert.equal(b.getAttribute("aria-pressed"), null);
+  b.click();
+  assert.equal(hits, 11);
+  m.dispose();
+});

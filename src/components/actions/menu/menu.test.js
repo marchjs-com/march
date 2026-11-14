@@ -54,3 +54,40 @@ test("Menu / Dropdown: the trigger takes a colour token, a class and its own con
   assert.equal(b.getAttribute("data-hm-color"), null);
   m.dispose();
 });
+
+test("Menu: a checked item is a menuitemcheckbox / menuitemradio with aria-checked and a mark; roving focus includes it", async () => {
+  const sort = signal("name");
+  let hidden = false;
+  const m = mount(() => h(Menu, { label: "View", items: [
+    { label: "Plain" },
+    { label: "Name", radio: true, checked: () => sort() === "name", onSelect: () => sort.set("name") },
+    { label: "Date", radio: true, checked: () => sort() === "date", onSelect: () => sort.set("date") },
+    { label: "Hidden files", checked: () => hidden, onSelect: () => { hidden = !hidden; } },
+  ] }));
+  const trigger = m.el.querySelector("button");
+  trigger.click();
+  await tick();
+  let panel = document.getElementById(trigger.getAttribute("aria-controls"));
+  const radios = panel.querySelectorAll("[role=menuitemradio]");
+  assert.equal(radios.length, 2);
+  assert.equal(radios[0].getAttribute("aria-checked"), "true");
+  assert.equal(radios[1].getAttribute("aria-checked"), "false");
+  assert.equal(radios[0].querySelector(".hm-menu-check").getAttribute("aria-hidden"), "true");
+  const box = panel.querySelector("[role=menuitemcheckbox]");
+  assert.equal(box.getAttribute("aria-checked"), "false");
+  const plain = panel.querySelector("[role=menuitem]");
+  assert.equal(plain.getAttribute("aria-checked"), null);
+  assert.equal(plain.querySelector(".hm-menu-check"), null);
+  // arrow keys walk over every kind of item
+  plain.focus();
+  panel.dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+  assert.equal(document.activeElement, radios[0]);
+  radios[1].click();
+  assert.equal(sort(), "date");
+  assert.equal(trigger.getAttribute("aria-expanded"), "false");
+  trigger.click();
+  await tick();
+  panel = document.getElementById(trigger.getAttribute("aria-controls"));
+  assert.equal(panel.querySelectorAll("[role=menuitemradio]")[1].getAttribute("aria-checked"), "true");
+  m.dispose();
+});

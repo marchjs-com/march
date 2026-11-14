@@ -66,11 +66,15 @@ const OWN_TURN = (side: 1 | -1) => ({
   enter: { opacity: [0, 1], transform: [`translateY(${48 * side}px) scale(.96)`, "translateY(0px) scale(1)"] }, duration: 560,
 })
 
+// the transition plays when a choice is made (and on the way back): the stage says which one will play
+const TURNS: Record<string, string> = { turn: "sayfa çevrilir", slide: "sayfa kayar", fade: "sayfa solarak değişir", own: "eski sayfa küçülür, yenisi yükselir (kendi hareketim)", none: "sayfa hareketsiz değişir" }
+
 export default function BranchingStoryDemo(props: { values: { trail: boolean; endings: boolean; transition: string; keys: boolean; choice: string; texts: boolean } }) {
   return <div>
     {() => { const v = { ...props.values }; return <BranchingStory start="intro" passages={SATURDAY} trail={v.trail} endings={v.endings} label="HADİ'de bir cumartesi"
       keys={v.keys} transition={v.transition === "own" ? OWN_TURN : v.transition as "turn"}
       labels={v.texts ? { start: "Sabah", restart: "Bir daha oyna", endings: (n: number, total: number) => `${total} sondan ${n} tanesini buldun` } : undefined}
       renderChoice={v.choice === "own" ? (c, i) => <span class="sc-bs-own">{`${"ABC"[i] ?? i + 1}) `}<b>{c.label}</b></span> : undefined} /> }}
+    <p class="hm-muted">{() => `Bir seçenek seçince ${TURNS[props.values.transition]}.`}</p>
   </div>
 }

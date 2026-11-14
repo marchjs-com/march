@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../src/testing/dom.ts";
 const { document } = installDom();
-const { render, signal, h } = await import("../src/index.ts");
+const { render, signal, h, setLocale } = await import("../src/index.ts");
+setLocale("en"); // the labels below are the English source texts
 const { schema } = await import("../src/schema/index.ts");
 const F = await import("../src/forms/index.ts");
 

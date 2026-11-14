@@ -32,3 +32,39 @@ test("IconButton: colour token; the tooltip can be replaced or turned off", () =
   assert.equal(b.getAttribute("data-hm-color"), null);
   m.dispose();
 });
+
+test("IconButton: xs size, solid / raised, round, inverse, pressed", () => {
+  const on = signal(false);
+  const m = mount(() => [
+    h(IconButton, { icon: "x", label: "Remove", size: "xs", pressed: on }),
+    h(IconButton, { icon: ">", label: "Send", variant: "solid", shape: "round", color: "brand-blue", size: "lg" }),
+    h(IconButton, { icon: "^", label: "Top", variant: "raised", shape: "round", inverse: true }),
+  ]);
+  const [a, b, c] = m.el.querySelectorAll("button");
+  assert.ok(a.className.includes("hm-btn-xs"));
+  assert.equal(a.getAttribute("aria-pressed"), "false");
+  on.set(true);
+  assert.equal(a.getAttribute("aria-pressed"), "true");
+  assert.ok(a.className.includes("is-pressed"));
+  for (const k of ["hm-icon-btn-solid", "hm-icon-btn-round", "hm-btn-lg"]) assert.ok(b.className.includes(k), k);
+  assert.equal(b.hasAttribute("aria-pressed"), false);
+  for (const k of ["hm-icon-btn-raised", "hm-icon-btn-round", "hm-icon-btn-inverse"]) assert.ok(c.className.includes(k), k);
+  for (const k of ["shape", "inverse", "pressed"]) assert.equal(c.hasAttribute(k), false, k);
+  m.dispose();
+});
+
+test("IconButton: href draws a link; children follow the icon", () => {
+  const m = mount(() => [
+    h(IconButton, { icon: "@", label: "Profile", href: "https://example.com/me", shape: "round" }),
+    h(IconButton, { icon: "b", label: "Inbox" }, h("span", { class: "hm-badge-count" }, "3")),
+  ]);
+  const a = m.el.querySelector("a");
+  assert.equal(a.getAttribute("href"), "https://example.com/me");
+  assert.equal(a.getAttribute("aria-label"), "Profile");
+  assert.equal(a.hasAttribute("type"), false);
+  assert.ok(a.className.includes("hm-icon-btn"));
+  const b = m.el.querySelector("button");
+  assert.equal(b.querySelector(".hm-icon").textContent, "b");
+  assert.equal(b.querySelector(".hm-badge-count").textContent, "3");
+  m.dispose();
+});

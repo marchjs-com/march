@@ -1,0 +1,19 @@
+/* SearchBox. The field itself is .hm-input (ui/field.css); here: the icon, the clear button, the shortcut hint, sm and plain. */
+.hm-search { position: relative; display: flex; align-items: center; min-width: 12rem; }
+.hm-search-icon { position: absolute; inset-inline-start: .6875rem; display: inline-flex; color: var(--hm-faint); pointer-events: none; }
+.hm-search .hm-search-input { padding-inline: 2.125rem 2.25rem; }
+.hm-search-no-icon .hm-search-input { padding-inline-start: var(--hm-space-3); }
+.hm-search-input::-webkit-search-cancel-button { display: none; }
+.hm-search-clear { position: absolute; inset-inline-end: 3px; width: 1.875rem; height: 1.875rem; }
+.hm-search-kbd { position: absolute; inset-inline-end: var(--hm-space-2); display: inline-flex; pointer-events: none; }
+.hm-search-clear ~ .hm-search-kbd, .hm-search:focus-within .hm-search-kbd { display: none; }
+.hm-search[data-hm-color] .hm-search-input:focus { border-color: var(--hm-accent); }
+/* sm: toolbars and side panels */
+.hm-search-sm { min-width: 9rem; }
+.hm-search-sm .hm-search-input { min-height: var(--hm-control-h-sm); padding-block: 0; padding-inline: 1.875rem 1.875rem; font-size: var(--hm-text-sm); border-radius: var(--hm-radius-1); }
+.hm-search-sm.hm-search-no-icon .hm-search-input { padding-inline-start: var(--hm-space-2); }
+.hm-search-sm .hm-search-icon { inset-inline-start: .5rem; }
+.hm-search-sm .hm-search-icon .hm-svg { width: .875rem; height: .875rem; }
+.hm-search-sm .hm-search-clear { inset-inline-end: 2px; width: 1.5rem; height: 1.5rem; }
+/* plain: the input of a palette or a panel header (the panel draws the frame) */
+.hm-search-plain .hm-search-input, .hm-search-plain .hm-search-input:hover:not(:focus):not(:disabled), .hm-search-plain .hm-search-input:focus { border-color: transparent; background: transparent; box-shadow: none; }

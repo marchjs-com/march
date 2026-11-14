@@ -19,15 +19,24 @@ export default function PullToRefreshDemo(props: { values: { threshold: number; 
   let $phase = "idle"
   const PHASES: Record<string, string> = { idle: "Hazır", pull: "Çekiliyor", ready: "Bırakınca yenilenir", refreshing: "Yenileniyor…" }
   const items = () => Array.from({ length: 14 }, (_, i) => `${NAMES[(i + $round) % NAMES.length]} · ${$round ? `${$round}. yenileme` : "ilk liste"}`)
-  return <div class="sc-ptr-wrap">
-    <span class="sc-strip-label" aria-live="polite">{() => `Durum: ${props.values.disabled ? "kapalı, çekmek yenilemez" : PHASES[$phase]} · eşik ${props.values.threshold}px`}</span>
-    {() => <PullToRefresh threshold={props.values.threshold} disabled={props.values.disabled} onPhase={(p) => { $phase = p }}
-      indicator={props.values.indicator === "off" ? false : props.values.indicator === "own" ? (p: PullPhase) => <Icon of={p === "refreshing" ? hourglass : p === "ready" ? arrowUp : arrowDown} /> : true}
-      icon={props.values.indicator === "icon" ? sparkles : undefined} color={props.values.color === "primary" ? undefined : (props.values.color as "success")}
-      settle={props.values.settle ? undefined : false} labels={{ refresh: "Listeyi yenile" }}
-      onRefresh={() => new Promise((r) => setTimeout(r, props.values.delay)).then(() => { $round = $round + 1 })}
-      class="sc-ptr-demo">
-      <ul class="sc-ptr-list">{() => items().map((x) => <li>{x}</li>)}</ul>
-    </PullToRefresh>}
+  let wrap: HTMLElement | undefined
+  // a refresh without pulling (the component's own keyboard button): the indicator, its icon and color show while it spins
+  const refreshNow = (): void => { wrap?.querySelector<HTMLButtonElement>(".hm-ptr-kbd")?.click() }
+  return <div class="sc-ptr-wrap" ref={(x: HTMLElement) => { wrap = x }}>
+    <span class="sc-strip-label" aria-live="polite">{() => `Durum: ${props.values.disabled ? "kapalı, çekmek yenilemez" : PHASES[$phase]} · eşik ${props.values.threshold}px · yenileme ${props.values.delay} ms · ${props.values.settle ? "bırakınca yaylanarak döner" : "bırakınca anında döner"}`}</span>
+    <div class="sc-row"><button type="button" class="hm-btn hm-btn-sm hm-btn-secondary" data-audit-try disabled={() => props.values.disabled || $phase === "refreshing"} on:click={refreshNow}>Çekmeden yenile</button></div>
+    {() => {
+      // threshold, indicator, icon, color and settle are read once by the component: it is drawn again when one changes
+      const threshold = props.values.threshold, indicator = props.values.indicator, color = props.values.color, settle = props.values.settle
+      $phase = "idle"
+      return <PullToRefresh threshold={threshold} disabled={() => props.values.disabled} onPhase={(p) => { $phase = p }}
+        indicator={indicator === "off" ? false : indicator === "own" ? (p: PullPhase) => <Icon of={p === "refreshing" ? hourglass : p === "ready" ? arrowUp : arrowDown} /> : true}
+        icon={indicator === "icon" ? sparkles : undefined} color={color === "primary" ? undefined : (color as "success")}
+        settle={settle ? undefined : false} labels={{ refresh: "Listeyi yenile" }}
+        onRefresh={() => new Promise((r) => setTimeout(r, props.values.delay)).then(() => { $round = $round + 1 })}
+        class="sc-ptr-demo">
+        <ul class="sc-ptr-list">{() => items().map((x) => <li>{x}</li>)}</ul>
+      </PullToRefresh>
+    }}
   </div>
 }

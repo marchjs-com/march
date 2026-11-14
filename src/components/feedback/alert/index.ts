@@ -9,7 +9,7 @@ import { info } from "../../../icons/glyphs/info.ts";
 import { checkCircle } from "../../../icons/glyphs/checkCircle.ts";
 import { alertTriangle } from "../../../icons/glyphs/alertTriangle.ts";
 import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
-import type { Tone } from "../../../ui/display-base.ts";
+import { actionsOf, type ActionsProp, type Tone } from "../../../ui/display-base.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface AlertProps {
@@ -17,6 +17,10 @@ export interface AlertProps {
   title?: unknown;
   icon?: unknown;
   body?: unknown;
+  /** The next step: a node, a list of nodes or `action()` objects (drawn as small buttons). */
+  action?: ActionsProp;
+  /** Where the actions sit: "end" (default: beside the text, before the dismiss button) or "below" the text. */
+  actionPlacement?: "end" | "below" | undefined;
   dismissable?: boolean;
   /** Accessible name of the dismiss button (default "Dismiss", translated). */
   dismissLabel?: MaybeFn<string | undefined>;
@@ -28,16 +32,20 @@ export interface AlertProps {
   class?: ClassProp;
   children?: unknown;
 }
-/** `<Alert tone="warn" title="Heads up" dismissable onDismiss={…}>Body</Alert>` (alias Notice). */
+/** `<Alert tone="warn" title="Heads up" dismissable onDismiss={…}>Body</Alert>`, `<Alert tone="danger" action={<Button size="sm">Retry</Button>}>…</Alert>` (alias Notice). */
 export function Alert(props: AlertProps): () => unknown {
   const shown = signal(true);
   return () => shown() && untrack(() => {
     const tone = val(props.tone) ?? "info";
+    const below = props.actionPlacement === "below";
+    const actions = props.action != null && h("div", { class: cx("hm-alert-action", below && "hm-alert-action-below") }, actionsOf(() => props.action));
     return h("div", { class: () => cx("hm-alert", `hm-alert-${val(props.tone) ?? "info"}`, val(props.class)), role: tone === "danger" || tone === "warn" ? "alert" : "status", "data-hm-color": () => colorAttr(props.color) },
       icon(props.icon === undefined ? TONE_ICON[tone] ?? info : props.icon, "hm-alert-icon"),
       h("div", { class: "hm-alert-main" },
         props.title != null && h("strong", { class: "hm-alert-title" }, () => val(props.title)),
-        h("div", { class: "hm-alert-body" }, props.body ?? props.children)),
+        h("div", { class: "hm-alert-body" }, props.body ?? props.children),
+        below && actions),
+      !below && actions,
       props.dismissable && h("button", { type: "button", class: "hm-icon-btn hm-alert-x", "aria-label": () => val(props.dismissLabel) ?? t`Dismiss`, onClick: () => { shown.set(false); props.onDismiss?.(); } }, props.dismissIcon === undefined ? glyph(xIcon) : icon(props.dismissIcon, "hm-alert-x-icon")));
   });
 }

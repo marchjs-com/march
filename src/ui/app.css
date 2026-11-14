@@ -1,4 +1,4 @@
-/* March — Brand, AuthLayout, UserMenu, IconTile, LinkCard (Spacer: src/components/layout/spacer). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Brand, AuthLayout, UserMenu (Spacer, IconTile, LinkCard: their folders in src/components). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- application chrome (src/ui/app.ts) */
 .hm-brand { display: inline-flex; align-items: center; gap: .625rem; min-width: 0; color: var(--hm-text); text-decoration: none; }
 .hm-brand-mark { position: relative; display: grid; place-items: center; flex: none; width: 1.75rem; height: 1.75rem; border-radius: calc(var(--hm-radius-1) + 1px); color: var(--hm-on-mark);
@@ -13,32 +13,6 @@
 .hm-brand-lg .hm-brand-name { font-size: var(--hm-text-lg); }
 @media (min-width: 901px) { .hm-nav-wrap.is-rail .hm-brand-text { display: none; } }
 
-.hm-icon-tile { display: inline-grid; place-items: center; flex: none; width: 2.25rem; height: 2.25rem; border-radius: var(--hm-radius-2); color: var(--hm-tile-fg); background: var(--hm-tile-bg);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-tile-fg) 16%, transparent); }
-.hm-icon-tile .hm-svg { width: 1.0625rem; height: 1.0625rem; }
-.hm-icon-tile-sm { width: 1.75rem; height: 1.75rem; border-radius: .5rem; } .hm-icon-tile-sm .hm-svg { width: .875rem; height: .875rem; }
-.hm-icon-tile-lg { width: 3rem; height: 3rem; border-radius: .875rem; } .hm-icon-tile-lg .hm-svg { width: 1.375rem; height: 1.375rem; }
-.hm-tile-primary { --hm-tile-fg: var(--hm-primary); --hm-tile-bg: var(--hm-primary-soft); }
-.hm-tile-neutral { --hm-tile-fg: var(--hm-text-2); --hm-tile-bg: var(--hm-surface-2); }
-.hm-tile-success { --hm-tile-fg: var(--hm-success); --hm-tile-bg: var(--hm-success-soft); }
-.hm-tile-warn { --hm-tile-fg: var(--hm-warn); --hm-tile-bg: var(--hm-warn-soft); }
-.hm-tile-danger { --hm-tile-fg: var(--hm-danger); --hm-tile-bg: var(--hm-danger-soft); }
-.hm-tile-info { --hm-tile-fg: var(--hm-info); --hm-tile-bg: var(--hm-info-soft); }
-.hm-tile-violet { --hm-tile-fg: var(--hm-cat-4); --hm-tile-bg: color-mix(in srgb, var(--hm-cat-4) 13%, var(--hm-surface)); }
-.hm-tile-pink { --hm-tile-fg: var(--hm-cat-5); --hm-tile-bg: color-mix(in srgb, var(--hm-cat-5) 13%, var(--hm-surface)); }
-.hm-tile-teal { --hm-tile-fg: var(--hm-cat-8); --hm-tile-bg: color-mix(in srgb, var(--hm-cat-8) 13%, var(--hm-surface)); }
-
-.hm-link-card { position: relative; display: flex; align-items: flex-start; gap: var(--hm-space-3); min-width: 0; padding: .875rem var(--hm-space-4); border: 1px solid var(--hm-border);
-  border-radius: var(--hm-radius-3); background: var(--hm-surface); color: var(--hm-text); text-decoration: none; box-shadow: var(--hm-shadow-1);
-  transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur-slow) var(--hm-ease), transform var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-link-card:hover { border-color: var(--hm-border-strong); box-shadow: var(--hm-shadow-2); transform: translateY(-1px); }
-.hm-link-card-text { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: .125rem; }
-.hm-link-card-title { font-weight: var(--hm-weight-semibold); font-size: var(--hm-text-md); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hm-link-card-desc { color: var(--hm-muted); font-size: var(--hm-text-sm); overflow-wrap: break-word; line-height: 1.45; }
-.hm-link-card-meta { flex: none; color: var(--hm-muted); font-size: var(--hm-text-sm); font-variant-numeric: tabular-nums; }
-.hm-link-card-arrow { flex: none; display: inline-flex; color: var(--hm-faint); opacity: 0; transform: translate(-3px, 3px); transition: opacity var(--hm-dur) var(--hm-ease), transform var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-link-card-arrow .hm-svg { width: .875rem; height: .875rem; }
-.hm-link-card:hover .hm-link-card-arrow, .hm-link-card:focus-visible .hm-link-card-arrow { opacity: 1; transform: none; }
 
 .hm-user-btn { width: 100%; justify-content: flex-start; gap: .625rem; min-height: 2.75rem; padding: 0 .5rem; text-align: start; font-weight: 400; }
 .hm-user-btn-compact { width: auto; min-height: 2.25rem; padding: 0 .25rem; }

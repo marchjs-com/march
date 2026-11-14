@@ -27,3 +27,14 @@ test("Spinner: one colour token paints a single-colour ring", () => {
   assert.ok(!b.classList.contains("hm-spin-single"));
   m.dispose();
 });
+
+test("Spinner: decorative is hidden from assistive technology; size=\"em\" follows the text", () => {
+  const el = mount(() => [h(Spinner, { decorative: true, size: "em", label: "ignored" }), h(Spinner, {})]);
+  const [a, b] = el.querySelectorAll(".hm-loading");
+  assert.equal(a.getAttribute("aria-hidden"), "true");
+  assert.equal(a.getAttribute("role"), null);
+  assert.equal(a.getAttribute("aria-label"), null);
+  assert.ok(a.classList.contains("hm-spin-em"));
+  assert.equal(b.getAttribute("role"), "status");
+  assert.equal(b.getAttribute("aria-hidden"), null);
+});

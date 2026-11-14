@@ -27,3 +27,12 @@ test("Skeleton: still shapes, full-width last line, own label and class", () => 
   assert.ok(m.el.querySelector(".hm-skel-block").classList.contains("is-still"));
   m.dispose();
 });
+
+test("Skeleton: shape=\"circle\" is one round decorative shape in three sizes", () => {
+  const el = mount(() => [h(Skeleton, { shape: "circle", class: "a" }), h(Skeleton, { shape: "circle", height: "lg", shimmer: false, class: "b" })]);
+  const a = el.querySelector(".a"), b = el.querySelector(".b");
+  assert.ok(a.classList.contains("hm-skel") && a.classList.contains("hm-skel-circle"));
+  assert.equal(a.getAttribute("aria-hidden"), "true");
+  assert.ok(!a.classList.contains("hm-skel-md") && !a.classList.contains("hm-skel-block"));
+  assert.ok(b.classList.contains("hm-skel-circle-lg") && b.classList.contains("is-still") && !b.classList.contains("hm-skel-lg"));
+});

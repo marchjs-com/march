@@ -81,7 +81,6 @@ export function ImageCropper(props: ImageCropperProps): unknown {
   let img!: HTMLImageElement, viewport!: HTMLElement, out: HTMLCanvasElement | null = null;
 
   effect(() => { const v = get(); if (v && v !== untrack(st)) untrack(() => st.set({ ...st.peek(), ...v })); });
-  effect(() => { if (props.aspect !== undefined) untrack(() => change({ aspect: props.aspect ?? null })); });
   const frame = computed(() => G.frameSize(st(), view()[0], view()[1]));
   const scale = computed(() => { const [iw, ih] = nat(), [fw, fh] = frame(); return iw && ih ? G.coverScale(iw, ih, fw, fh, st().rotate) * st().zoom : 1; });
 
@@ -98,6 +97,10 @@ export function ImageCropper(props: ImageCropperProps): unknown {
     st.set(next);
     if (emit) set(next);
   };
+  // (after `change`: an effect runs as soon as it is made)
+  effect(() => { if (props.aspect !== undefined) untrack(() => change({ aspect: props.aspect ?? null })); });
+  // a lower maxZoom pulls the zoom back inside it
+  effect(() => { const m = maxZoom(); untrack(() => { if (st.peek().zoom > m) change({ zoom: m }, !ro()); }); });
   // view → CSS variables (CSSOM)
   effect(() => {
     const s = st(), [fw, fh] = frame(), S = scale(), [iw, ih] = nat();
@@ -189,7 +192,7 @@ export function ImageCropper(props: ImageCropperProps): unknown {
         has(tools, "mirror") && h(IconButton, { icon: glyph(flipHorizontal), label: () => L().mirror ?? t`Mirror`, size: "sm", disabled: ro, class: () => cx(st().flip && "is-on"), "aria-pressed": () => String(st().flip), onClick: () => change({ flip: !st.peek().flip }) }),
         has(tools, "reset") && h(IconButton, { icon: glyph(refresh), label: () => L().reset ?? t`Reset`, size: "sm", disabled: ro, onClick: api.reset })),
       has(sliders, "zoom") && h("label", { class: "hm-crop-slider hm-crop-zoom" }, h("span", null, () => L().zoom ?? t`Zoom`),
-        h(Slider, { min: 1, max: maxZoom(), step: 0.01, value: zoomView, onChange: (v: number) => change({ zoom: v }), format: (v: number) => `${Math.round(v * 100)}%`, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly) })),
+        h(Slider, { min: 1, max: reactive(() => maxZoom()), step: 0.01, value: zoomView, onChange: (v: number) => change({ zoom: v }), format: (v: number) => `${Math.round(v * 100)}%`, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly) })),
       has(sliders, "angle") && h("label", { class: "hm-crop-slider hm-crop-angle" }, h("span", null, () => L().angle ?? t`Angle`),
         h(Slider, { min: -45, max: 45, step: 0.5, value: fineView, onChange: (v: number) => change({ rotate: quarter(st.peek().rotate) + v }), format: (v: number) => `${v}°`, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly) }))),
     () => (props.preview === false ? null : h("figure", { class: "hm-crop-out" },

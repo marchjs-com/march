@@ -29,3 +29,34 @@ test("Slider: the value next to it can go", () => {
   assert.ok(a.el.querySelector("input[type=range]"));
   a.dispose();
 });
+
+test("Slider: track (ramp, own class, own node) draws a decorative track under the real input; the default has none", () => {
+  const { el } = mount(() => [
+    h(Slider, { value: 10, track: true, color: "brand-blue" }), h(Slider, { value: 10, track: "my-hue" }),
+    h(Slider, { value: 10, track: h("i", { class: "own" }) }), h(Slider, { value: 10 }),
+  ]);
+  const [ramp, cls, node, plain] = el.querySelectorAll(".hm-slider-wrap");
+  assert.match(ramp.querySelector(".hm-slider-track").getAttribute("class"), /hm-slider-ramp/);
+  assert.equal(ramp.querySelector(".hm-slider-rail").getAttribute("data-hm-color"), "brand-blue");
+  assert.equal(ramp.querySelector(".hm-slider-track").getAttribute("aria-hidden"), "true");
+  assert.match(ramp.querySelector("input").getAttribute("class"), /hm-slider-own/);
+  assert.equal(ramp.querySelector("input").getAttribute("type"), "range");
+  assert.match(cls.querySelector(".hm-slider-track").getAttribute("class"), /my-hue/);
+  assert.doesNotMatch(cls.querySelector(".hm-slider-track").getAttribute("class"), /hm-slider-ramp/);
+  assert.ok(node.querySelector(".hm-slider-track .own"));
+  assert.equal(plain.querySelector(".hm-slider-rail"), null);
+  assert.doesNotMatch(plain.querySelector("input").getAttribute("class"), /hm-slider-own/);
+});
+
+test("Slider: valueText is spoken, onCommit runs when the change is finished", () => {
+  const commits = [], changes = [];
+  const { el } = mount(() => h(Slider, { value: 90, max: 360, valueText: (v) => `${v} degrees`, onChange: (v) => changes.push(v), onCommit: (v) => commits.push(v) }));
+  const input = el.querySelector("input");
+  assert.equal(input.getAttribute("aria-valuetext"), "90 degrees");
+  type(input, "120");
+  assert.deepEqual(changes, [120]);
+  assert.deepEqual(commits, []);
+  assert.equal(input.getAttribute("aria-valuetext"), "120 degrees");
+  fire(input, "change");
+  assert.deepEqual(commits, [120]);
+});

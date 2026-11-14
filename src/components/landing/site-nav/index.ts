@@ -31,6 +31,8 @@ export interface SiteNavProps {
   hide?: boolean | undefined;
   /** Pixels of scroll before it counts as scrolled (default 12). */
   threshold?: number | undefined;
+  /** The scrolling element that shrink / hide / transparent follow (default: the page). A function is read once mounted. */
+  source?: Element | (() => Element | null | undefined) | null | undefined;
   /** Sticky (default) or static. */
   sticky?: boolean | undefined;
   /** Called when a link is chosen (desktop or drawer). */
@@ -116,13 +118,19 @@ export function SiteNav(props: SiteNavProps): Element {
   };
 
   const threshold = props.threshold ?? 12;
-  let lastY = 0;
-  const offScroll = onScrollProgress({}, () => {
-    const y = globalThis.scrollY ?? 0;
-    scrolled.set(y > threshold);
-    if (props.hide) { const down = y > lastY; if (Math.abs(y - lastY) > 4) hidden.set(down && y > 120); }
-    lastY = y;
-  });
+  let lastY = 0, offScroll = (): void => {}, gone = false;
+  const watch = (box: Element | null): void => {
+    if (gone) return;
+    offScroll = onScrollProgress(box ? { source: box } : {}, () => {
+      const y = (box ? box.scrollTop : globalThis.scrollY) || 0;
+      scrolled.set(y > threshold);
+      if (props.hide) { const down = y > lastY; if (Math.abs(y - lastY) > 4) hidden.set(down && y > 120); }
+      lastY = y;
+    });
+  };
+  // a scroll container given as a function (a ref of an element around the bar) exists only once the bar is placed
+  const source = props.source;
+  if (typeof source === "function") queueMicrotask(() => watch(source() ?? null)); else watch(source ?? null);
   const mode = props.mode ?? "solid";
   const nav = h("header", {
     class: () => cx("hm-snav", `hm-snav-${mode}`, props.sticky !== false && "is-sticky", props.shrink !== false && "hm-snav-shrinks", scrolled() && "is-scrolled", hidden() && "is-hidden", val(props.class)),
@@ -134,6 +142,6 @@ export function SiteNav(props: SiteNavProps): Element {
     links.length && props.menu !== false ? h(IconButton, { class: "hm-snav-menu", label: () => L.openMenu ?? t`Open menu`, onClick: openMenu }, props.menuIcon != null ? icon(props.menuIcon) : glyph(menu)) : null)) as HTMLElement;
   // rest on the current link once laid out
   queueMicrotask(() => { if (nav.isConnected) moveTo(current()); });
-  if (getOwner()) onCleanup(() => { offList(); offScroll(); });
+  if (getOwner()) onCleanup(() => { gone = true; offList(); offScroll(); });
   return nav;
 }

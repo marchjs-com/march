@@ -2,5 +2,6 @@
 // Overlays: Dialogs, drawers, popovers, tooltips, toasts. Import: hadi-march/overlays
 export * from "./dialog/index.ts";
 export * from "./drawer/index.ts";
+export * from "./popover/index.ts";
 export * from "./toast/index.ts";
 export * from "./tooltip/index.ts";

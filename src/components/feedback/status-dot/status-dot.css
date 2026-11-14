@@ -1,0 +1,16 @@
+/* StatusDot. A dot in a tone (--hm-status-dot-c) or a theme colour (data-hm-color sets --hm-accent); the pulse reuses hm-fade-in. */
+.hm-status-dot { --hm-status-dot-c: var(--hm-success); position: relative; display: inline-block; flex: none; inline-size: .5rem; block-size: .5rem; border-radius: 50%; background: var(--hm-status-dot-c); vertical-align: middle; }
+.hm-status-dot-xs { inline-size: .375rem; block-size: .375rem; }
+.hm-status-dot-sm { inline-size: .4375rem; block-size: .4375rem; }
+.hm-status-dot-lg { inline-size: .65rem; block-size: .65rem; }
+.hm-status-dot.is-neutral { --hm-status-dot-c: var(--hm-muted); }
+.hm-status-dot.is-primary { --hm-status-dot-c: var(--hm-accent, var(--hm-primary)); }
+.hm-status-dot.is-info { --hm-status-dot-c: var(--hm-info); }
+.hm-status-dot.is-warn { --hm-status-dot-c: var(--hm-warn); }
+.hm-status-dot.is-danger { --hm-status-dot-c: var(--hm-danger); }
+.hm-status-dot[data-hm-color] { --hm-status-dot-c: var(--hm-accent); }
+/* ring: a border around the dot that breathes · blink: the dot itself fades */
+.hm-status-dot.is-pulse-ring::after { content: ""; position: absolute; inset: -.25rem; border-radius: 50%; border: 2px solid var(--hm-status-dot-c); opacity: .35; animation: hm-fade-in var(--hm-dur-slow) var(--hm-ease) infinite alternate; }
+.hm-status-dot-lg.is-pulse-ring::after { inset: -.3125rem; }
+.hm-status-dot.is-pulse-blink { animation: hm-fade-in calc(var(--hm-dur-slow) * 2) var(--hm-ease) infinite alternate-reverse; }
+@media (prefers-reduced-motion: reduce) { .hm-status-dot.is-pulse-ring::after, .hm-status-dot.is-pulse-blink { animation: none; } }

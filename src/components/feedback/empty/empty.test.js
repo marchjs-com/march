@@ -24,3 +24,10 @@ test("Empty: title={false} leaves the title out", () => {
   assert.equal(e.querySelector(".hm-empty-text").textContent, "Only text");
   m.dispose();
 });
+
+test("Empty: size=\"sm\" is the compact one; md stays as it was", () => {
+  const el = mount(() => [h(Empty, { size: "sm", title: "No matches", class: "s" }), h(Empty, { class: "m" })]);
+  assert.ok(el.querySelector(".s").classList.contains("hm-empty-sm"));
+  assert.equal(el.querySelector(".s .hm-empty-title").textContent, "No matches");
+  assert.ok(!el.querySelector(".m").classList.contains("hm-empty-sm"));
+});

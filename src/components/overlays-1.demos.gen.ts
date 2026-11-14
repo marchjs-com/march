@@ -4,4 +4,6 @@ import * as d0 from "./composite/command-palette/demo.tsx";
 import * as p0 from "./composite/command-palette/playground.ts";
 import * as d1 from "./overlays/dialog/demo.tsx";
 import * as p1 from "./overlays/dialog/playground.ts";
-export { d0, p0, d1, p1 };
+import * as d2 from "./overlays/drawer/demo.tsx";
+import * as p2 from "./overlays/drawer/playground.ts";
+export { d0, p0, d1, p1, d2, p2 };

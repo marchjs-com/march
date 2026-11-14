@@ -2,9 +2,13 @@
 // Data display: Tables, trees, lists, charts, key-value views. Import: hadi-march/data
 export * from "./badge/index.ts";
 export * from "./card/index.ts";
+export * from "./icon-tile/index.ts";
 export * from "./json-view/index.ts";
 export * from "./kanban/index.ts";
 export * from "./key-value/index.ts";
+export * from "./list-row/index.ts";
+export * from "./stat-tile/index.ts";
+export * from "./time-ruler/index.ts";
 export * from "./timeline/index.ts";
 export * from "./tree/index.ts";
 export * from "./virtual-list/index.ts";

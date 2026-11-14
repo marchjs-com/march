@@ -19,6 +19,8 @@ export const code = `<ActivityBar value={$view} onChange={(v) => $view = v} cont
 <ActivityBar items={views} value={$view} onChange={(v) => $view = v} indicator={false} />`
 
 const TITLES: Record<string, string> = { files: "Dosyalar", search: "Ara", git: "Kaynak denetimi", debug: "Hata ayıkla" }
+// the indicator's motion shows only while the view changes: the stage says which one is on
+const MOTIONS: Record<string, string> = { glide: "Çizgi etkin simgeye kayarak gider", fade: "Çizgi etkin simgede yerinde belirir", none: "Çizgi hareketsiz yer değiştirir", off: "Çizgi yok" }
 
 export default function ActivityBarDemo(props: { values: { orientation: string; badges: boolean; indicator: string; color: string; tooltips: boolean } }) {
   const view = signal<string | null>("files")
@@ -37,6 +39,9 @@ export default function ActivityBarDemo(props: { values: { orientation: string; 
         { id: "settings", label: "Ayarlar", icon: settings, position: "end", onSelect: () => view.set(null) },
       ]} />
     }}
-    <div id="sc-ab-view" class="sc-ab-view" role="tabpanel">{() => (view() ? <strong>{TITLES[view()!]}</strong> : <span class="hm-muted">Yan görünüm kapalı: bir simgeye bas.</span>)}</div>
+    <div id="sc-ab-view" class="sc-ab-view" role="tabpanel">
+      {() => (view() ? <strong>{TITLES[view()!]}</strong> : <span class="hm-muted">Yan görünüm kapalı: bir simgeye bas.</span>)}
+      <small class="hm-muted">{() => MOTIONS[props.values.indicator]}: başka bir simgeye basınca görünür.</small>
+    </div>
   </div>
 }

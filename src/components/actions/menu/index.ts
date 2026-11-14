@@ -12,7 +12,8 @@ import { isAction, type Action } from "../../../ui/action.ts";
 import { floating, type Placement } from "../../../ui/popover.ts";
 import { roving } from "../../../ui/focus.ts";
 import { formatKey } from "../../../ui/keys.ts";
-import { val, cx, uid, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, uid, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { check } from "../../../icons/glyphs/check.ts";
 import { buttonSizeClass, type ButtonVariant, type ButtonSize } from "../button/index.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
@@ -31,6 +32,10 @@ export interface MenuItemSpec {
   hidden?: MaybeFn<boolean>;
   can?: PermCheck;
   shortcut?: string;
+  /** A choice that is on or off: the item becomes a `menuitemcheckbox` (`menuitemradio` with `radio`) with a check mark. */
+  checked?: MaybeFn<boolean | undefined>;
+  /** With `checked`: one of a group where only one is on (`role="menuitemradio"`). */
+  radio?: boolean;
   separator?: false;
 }
 /** A menu entry: a plain item, an action(), or a separator ("-" or `{ separator: true }`). */
@@ -45,8 +50,8 @@ export const itemVisible = (it: MenuItem, args: unknown[]): boolean => {
   return !val(it.hidden) && can(it.can);
 };
 type Disableable = HTMLElement & { disabled?: boolean };
-/** The enabled `role="menuitem"` elements of a menu panel, in order (roving focus moves among them). */
-export const menuItems = (panel: HTMLElement | undefined): HTMLElement[] => (panel ? Array.from(panel.querySelectorAll<Disableable>('[role="menuitem"]')).filter((x) => !x.disabled) : []);
+/** The enabled item elements of a menu panel (`menuitem`, `menuitemcheckbox`, `menuitemradio`), in order (roving focus moves among them). */
+export const menuItems = (panel: HTMLElement | undefined): HTMLElement[] => (panel ? Array.from(panel.querySelectorAll<Disableable>('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')).filter((x) => !x.disabled) : []);
 
 /** Draw one menu entry: a separator, an action() button, a router link or a plain button. ContextMenu reuses it. */
 export function renderItem(it: MenuItem, args: unknown[], close: (refocus: boolean) => void): unknown {
@@ -57,10 +62,11 @@ export function renderItem(it: MenuItem, args: unknown[], close: (refocus: boole
       onClick: () => { close(true); it.run(...args).catch(() => {}); },
     }, icon(it.opts.icon), h("span", { class: "hm-menu-label" }, () => it.label()), it.opts.key && h("kbd", { class: "hm-kbd hm-menu-kbd" }, formatKey(it.opts.key)));
   }
-  const body = [icon(it.icon), h("span", { class: "hm-menu-label" }, () => val(it.label)), it.shortcut && h("kbd", { class: "hm-kbd hm-menu-kbd" }, formatKey(it.shortcut))];
+  const choice = it.checked !== undefined;
+  const body = [icon(it.icon), h("span", { class: "hm-menu-label" }, () => val(it.label)), choice && h("span", { class: "hm-menu-check", "aria-hidden": "true" }, glyph(check)), it.shortcut && h("kbd", { class: "hm-kbd hm-menu-kbd" }, formatKey(it.shortcut))];
   const cls = cx("hm-menu-item", it.danger && "is-danger");
   if (it.href) return h(Link, { href: it.href, role: "menuitem", tabindex: "-1", class: cls, "on:click": () => close(false), children: body });
-  return h("button", { type: "button", role: "menuitem", tabindex: "-1", class: cls, disabled: () => !!val(it.disabled), onClick: () => { close(true); it.onSelect?.(...args); } }, body);
+  return h("button", { type: "button", role: choice ? (it.radio ? "menuitemradio" : "menuitemcheckbox") : "menuitem", "aria-checked": choice ? () => String(!!val(it.checked)) : null, tabindex: "-1", class: cls, disabled: () => !!val(it.disabled), onClick: () => { close(true); it.onSelect?.(...args); } }, body);
 }
 
 /** Props shared by <Menu> and <Dropdown> (the trigger button and its panel). */
@@ -115,7 +121,7 @@ export interface MenuProps extends PopoverButtonProps {
   args?: Args<unknown[]>;
 }
 /**
- * Dropdown menu. items: [{ label, onSelect, icon, href, danger, disabled, hidden, can, shortcut } | action | "-"].
+ * Dropdown menu. items: [{ label, onSelect, icon, href, danger, disabled, hidden, can, shortcut, checked, radio } | action | "-"].
  * `<Menu label="Row actions" icon="⋯" items={[edit, remove, "-", { label: "Open", href: "/x" }]} args={[row]} />`
  * Keyboard: ↓/↑ on the trigger opens, ↑ ↓ Home End move, Enter activates, Esc closes, Tab leaves.
  */
