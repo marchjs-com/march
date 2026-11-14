@@ -39,11 +39,27 @@ export function mountCanvas(root: HTMLElement, draw: DrawFn, animate: boolean): 
   if (!ctx) return;
   // the engine's clock drives the loop: global speed, "pause all" and off-screen stop reach the canvas too
   let w = 0, h = 0, dpr = 1, visible = true, time = 0, stop: (() => void) | null = null;
-  const paint = (): void => {
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-    draw(ctx, { width: w, height: h, dpr, time, theme: themeColors(root), pointer: (root as HTMLElement & { mPointer?: { x: number; y: number } | null }).mPointer ?? null });
+  // a twin: the copy of this canvas in a painted theme wave's veil (hadi-march/motion themeWave), drawn by the same
+  // function at the same moment, in the colours where it sits (the old look), until the wave is over
+  let twin: CanvasRenderingContext2D | null = null;
+  const pointer = (): { x: number; y: number } | null => (root as HTMLElement & { mPointer?: { x: number; y: number } | null }).mPointer ?? null;
+  const paintOn = (g: CanvasRenderingContext2D, colorsOf: HTMLElement): void => {
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, w, h);
+    draw(g, { width: w, height: h, dpr, time, theme: themeColors(colorsOf), pointer: pointer() });
   };
+  const paint = (): void => {
+    paintOn(ctx, root);
+    if (twin) paintOn(twin, (twin.canvas.parentElement ?? root));
+  };
+  c.addEventListener("m-wave-twin", (e) => {
+    const d = (e as CustomEvent<{ copy: HTMLCanvasElement; claimed: boolean; stop?: () => void }>).detail;
+    d.copy.width = c.width; d.copy.height = c.height;
+    twin = d.copy.getContext("2d");
+    d.claimed = !!twin;
+    d.stop = () => { twin = null; };
+    if (twin) paintOn(twin, d.copy.parentElement ?? root);
+  });
   const run = (): void => {
     if (stop || !animate || !visible || !root.isConnected) return;
     stop = frameLoop((dt) => {

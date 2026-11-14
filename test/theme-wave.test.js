@@ -71,7 +71,7 @@ test("themeWave: without View Transitions the change lands at once; with them it
   delete document.startViewTransition; delete root.animate;
 });
 
-test("painted theme waves (drip, spray, sweep, splat): no place left bare at the end; nothing painted at the start; layers that tween", async () => {
+test("painted theme waves (spray, sweep, splat): no place left bare at the end; nothing painted at the start; layers that tween", async () => {
   const P = await import("../src/motion/theme-paint.ts");
   // how much paint a layer puts on a point (the pictures' gradient stops) at a moment of the wave
   const dot = (q) => (q < 0.38 ? 1 : q < 0.58 ? 1 - (q - 0.38) / 0.2 * 0.3 : q < 0.78 ? 0.7 - (q - 0.58) / 0.2 * 0.42 : q < 1 ? 0.28 * (1 - (q - 0.78) / 0.22) : 0);
@@ -80,10 +80,10 @@ test("painted theme waves (drip, spray, sweep, splat): no place left bare at the
     if (bw <= 0 || bh <= 0) return 0;
     if (l.kind === "dot") return dot(Math.hypot((x - bx - bw / 2) / (bw / 2), (y - by - bh / 2) / (bh / 2)));
     if (x < bx || x > bx + bw || y < by || y > by + bh) return 0;
-    if (l.kind === "band") { const f = (x - bx) / bw; return f < 0.28 ? f / 0.28 : f > 0.72 ? (1 - f) / 0.28 : 1; }
-    const g = (y - by) / bh; return g < 0.55 ? 1 : (1 - g) / 0.45;
+    if (l.kind === "blob") return Math.hypot((x - bx - bw / 2) / (bw / 2), (y - by - bh / 2) / (bh / 2)) <= 1 ? 1 : 0;
+    return x >= bx && x <= bx + bw && y >= by && y <= by + bh ? 1 : 0;
   };
-  for (const shape of ["drip", "spray", "sweep", "splat"]) {
+  for (const shape of ["spray", "sweep", "splat"]) {
     let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
     const layers = P.paintLayers(shape, 900, 600, { x: 100, y: 40 }, rnd);
     for (let x = 0; x <= 900; x += 15) for (let y = 0; y <= 600; y += 15) {
@@ -99,14 +99,25 @@ test("painted theme waves (drip, spray, sweep, splat): no place left bare at the
     assert.equal(mask.composite.split(", ")[0], "subtract");
     assert.equal(mask.image.split("gradient(").length - 1, layers.length + 1);
   }
-  // drip: streams (bands led by drops, no chains of circles) from the top; some reach the bottom much sooner
+});
+
+test("drip: one outline of paint from the top, its edge waving, drips running ahead; the same path commands in every keyframe", async () => {
+  const P = await import("../src/motion/theme-paint.ts");
   let seed = 3; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  const drip = P.dripLayers(900, 600, rnd);
-  assert.equal(drip[0].kind, "pool");
-  const bands = drip.filter((l, i) => l.kind === "band" && drip[i + 1]?.kind === "band");
-  assert.ok(bands.length >= 6 && bands.every((l) => l.box(0.5)[1] === 0), "every stream runs from the top");
-  const down = bands.map((l) => { for (let t = 0; t <= 1; t += 0.01) if (l.box(t)[3] >= 600) return t; return 1; });
-  assert.ok(Math.max(...down) - Math.min(...down) > 0.2, "some streams are faster than others");
+  const st = P.dripState(900, 600, rnd);
+  assert.ok(st.at(0).edge.every(([, y]) => y <= 0), "nothing painted at the start");
+  assert.ok(st.at(1).edge.every(([, y]) => y >= 600), "the screen is covered at the end");
+  const mid = st.at(0.4).edge.map(([, y]) => y);
+  assert.ok(Math.max(...mid) - Math.min(...mid) > 40, "the edge waves: its points come down at their own pace");
+  assert.ok(st.dripsAt.length >= 2 && st.at(0.7).drips.some((d) => d.length > 30), "drips run ahead of the edge");
+  // when each drip has run 60 px: not all at once
+  const when = st.dripsAt.map((_, i) => { for (let t = 0; t <= 1; t += 0.01) if (st.at(t).drips[i].length >= 60) return t; return 1; });
+  assert.ok(Math.max(...when) - Math.min(...when) > 0.1, "some drips are faster than others");
+  const frames = P.liquidFrames(st, false);
+  const shape = (f) => f.clipPath.replace(/-?[\d.]+/g, "");
+  assert.ok(frames.every((f) => shape(f) === shape(frames[0])), "the same commands in every keyframe: the outline tweens");
+  assert.match(frames[0].clipPath, /^path\(evenodd, "M-100 -100/, "the veil: the screen with the paint as a hole");
+  assert.match(P.liquidFrames(st, true)[5].clipPath, /^path\("M/, "the paint itself (shine, shadow)");
 });
 
 test("painted wave: a live veil over the live page; the page takes the new look at once; the part loads lazily", async () => {
@@ -135,8 +146,8 @@ test("painted wave: a live veil over the live page; the page takes the new look 
   para.setAttribute("class", "t is-on");
   observed([{ type: "attributes", target: para, attributeName: "class" }]);
   assert.equal(veil.querySelector(".t").getAttribute("class"), "t is-on", "the copy follows the page");
-  const run = anims.find((a) => a.o?.duration === 1600);
-  assert.ok(run, "the paint runs for 1600 ms");
+  const run = anims.find((a) => a.o?.duration === 2200);
+  assert.ok(run, "the pour runs for 2200 ms");
   run.done(); await wave;
   assert.equal(document.documentElement.querySelector(".m-wave-veil"), null, "the veil is gone at the end");
   proto.animate = before; delete globalThis.CSS; delete globalThis.getComputedStyle; delete globalThis.MutationObserver;

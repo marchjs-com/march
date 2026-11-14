@@ -22,7 +22,7 @@ export interface ThemeWaveOptions {
   origin?: { x: number; y: number } | Element | null | undefined;
   /** How the new look arrives (default "circle"); every other shape paints it on and loads its part lazily. */
   shape?: ThemeWaveShape | undefined;
-  /** ms (default 700 for the circle, 1600 for the painted shapes). */
+  /** ms (default 700 for the circle, 2200 for the drip, 1600 for the other painted shapes). */
   duration?: number | undefined;
   /** CSS easing of the circle (default a fast start with a soft landing). */
   easing?: string | undefined;
@@ -67,7 +67,7 @@ export function themeWave(change: () => void, o: ThemeWaveOptions = {}): Promise
 export function installThemeWave(o: Omit<ThemeWaveOptions, "origin"> = {}): () => void {
   const view = globalThis.document;
   if (!view) return () => undefined;
-  if (o.shape && o.shape !== "circle") void paint().catch(() => undefined);
+  if (o.shape && o.shape !== "circle") void paint().then((m) => m.prepareVeil(view), () => undefined);
   let last: { x: number; y: number; at: number } | null = null;
   const press = (e: Event): void => { const p = e as PointerEvent; last = { x: p.clientX, y: p.clientY, at: Date.now() }; };
   const key = (e: Event): void => {

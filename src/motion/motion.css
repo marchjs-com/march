@@ -28,7 +28,9 @@
 /* themeWave({ shape: "spray" }): the passive veil over the live page, a copy of the page in the old look that the
    spray eats away (its mask is set and animated by the helper); it never takes the pointer */
 .m-wave-veil { position: fixed; inset: 0; z-index: 2147483000; overflow: hidden; contain: strict; pointer-events: none; mask-repeat: no-repeat; }
-.m-wave-veil > body { position: absolute; margin: 0; overflow: hidden; }
+/* the drip's shine: an SVG above the veil drawing it along the paint's edge (paths animated by the helper); it never
+   takes the pointer */
+.m-wave-gloss { position: fixed; inset: 0; inline-size: 100%; block-size: 100%; z-index: 2147483001; overflow: visible; pointer-events: none; }
 
 /* spotlight(): the light of a card near the pointer. --m-spot-x / --m-spot-y are the pointer's place inside the card;
    a soft glow over the card and a brighter ring on its border. Own colour: --m-spot-color; strength: --m-spot-glow. */
