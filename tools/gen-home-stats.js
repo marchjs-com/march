@@ -6,6 +6,7 @@
 //   animations               text animations (src/motion/text/meta.ts) + page transition effects (src/motion/page-fx.ts)
 //   runtime dependencies     package.json dependencies
 //   managers                 src/managers/<name>/index.ts
+//   themes                   src/css/themes/<id>.css (the ready themes)
 //   tests                    test( / it( calls in test/ and src/**/*.test.js
 //   budgets                  examples/showcase/march.config.js (entry, start-up, route, part floor)
 // Measured sizes (entry and start-up KB) are not here: the home page reads them from march-report.json, which every
@@ -47,6 +48,8 @@ export async function homeStats(root = ROOT) {
 
   const managers = readdirSync(join(root, "src/managers")).filter((n) => existsSync(join(root, "src/managers", n, "index.ts"))).length;
 
+  const themes = readdirSync(join(root, "src/css/themes")).filter((n) => n.endsWith(".css")).length;
+
   const testFiles = [...walk(join(root, "test")), ...walk(join(root, "src"))].filter((p) => /\.test\.(js|ts|mjs)$/.test(p));
   const tests = testFiles.reduce((s, p) => s + [...readFileSync(p, "utf8").matchAll(/(?:^|[^\w.$])(?:test|it)\(\s*["'`]/g)].length, 0);
 
@@ -65,6 +68,7 @@ export async function homeStats(root = ROOT) {
     icons: { total: builtIn + packs.reduce((s, p) => s + (p.count ?? 0), 0), builtIn, packs: packs.length },
     animations: { total: text + pageFx, text, pageFx },
     managers,
+    themes,
     tests,
     testFiles: testFiles.length,
     budget: { entry: b.entry ?? 0, boot: b.bootLimit ?? 0, route: b.route ?? 0, partFloor: cfg.chunks?.minSize ?? 0 },
