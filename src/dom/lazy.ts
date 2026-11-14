@@ -2,7 +2,9 @@
 // The component's place is reserved at its final size (no layout shift), a themed skeleton of its kind shows only if
 // loading takes longer than 100 ms (a cached chunk appears without any flicker), a thin progress line after 300 ms; when
 // it arrives it fades in and its children stagger in. `when` decides the moment: idle (default, after the first paint),
-// visible (near the viewport), interaction (hover / focus / touch) or immediate. Errors show a retry in place.
+// visible (near the viewport), interaction (hover / focus / touch) or immediate. A failed load is tried again on its
+// own (after 0.4 s, 1.2 s, 3.6 s) while the skeleton stays; if it still fails (often a chunk of an older build that a new
+// deploy removed) the page reloads once (not again within 30 s), and only then does the part show a retry in place.
 // Motion is transform / opacity only and honours prefers-reduced-motion.
 import "./lazy.css";
 import { signal, getOwner, runWithOwner, untrack, onCleanup } from "../core/reactive.ts";
@@ -28,9 +30,10 @@ export interface LazyOptions<P> {
   aspect?: string;
   /** Named export to use instead of `default`: `lazy(() => import("hadi-march/charts"), { pick: "LineChart" })`. */
   pick?: string;
+  /** Automatic retries after a failed load, with growing pauses (default 3; 0 shows the error at once). */
+  retries?: number;
 }
 
-export type LazyComponent<P> = Comp<P> & { preload(): Promise<Comp<P>>; readonly loaded: boolean };
 
 /** A skeleton of a given kind: one element, the shape (lines, rows, bars, fields) is drawn by CSS (lazy.css). */
 export const skeleton = (kind: LazyPlaceholder = "block"): Element => h("div", { class: `hm-lazy-skel hm-lazy-skel-${kind}`, "aria-hidden": "true" });
@@ -50,7 +53,15 @@ export function lazy<P = Record<string, unknown>>(load: () => Promise<Loaded<P>>
   const preload = (): Promise<Comp<P>> => {
     if (comp) return Promise.resolve(comp);
     if (!pending) {
-      pending = runLoad(load, { kind: "part", key: "" }).then((m) => (comp = pick(m)), (e: unknown) => { pending = null; throw e; });
+      const tries = opts.retries ?? 3;
+      const attempt = (n: number): Promise<Comp<P>> => runLoad(load, { kind: "part", key: "" }).then((m) => (comp = pick(m)),
+        (e: unknown) => (n < tries ? new Promise((r) => setTimeout(r, 400 * 3 ** n)).then(() => attempt(n + 1)) : Promise.reject(e)));
+      pending = attempt(0).catch((e: unknown) => {
+        pending = null;
+        // still failing: reload once to pick up a new build (a chunk of the old one is gone); never twice in 30 s
+        try { const k = "hm-lazy-reload"; if (tries && Date.now() - +(sessionStorage.getItem(k) ?? 0) > 3e4) { sessionStorage.setItem(k, `${Date.now()}`); location.reload(); return new Promise<Comp<P>>(() => {}); } } catch { /* no storage */ }
+        throw e;
+      });
     }
     return pending;
   };

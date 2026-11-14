@@ -105,7 +105,7 @@ test("lazy(): when=interaction waits for hover/focus; errors show a retry in pla
   assert.equal(calls, 1);
   assert.equal(el.querySelector("i")?.textContent, "x");
   let fail = true;
-  const Flaky = L.lazy(() => (fail ? Promise.reject(new Error("offline")) : Promise.resolve({ default: () => h("u", {}, "ok") })));
+  const Flaky = L.lazy(() => (fail ? Promise.reject(new Error("offline")) : Promise.resolve({ default: () => h("u", {}, "ok") })), { retries: 0 });
   const el2 = document.createElement("div");
   const { createRoot } = await import("../src/index.ts");
   createRoot(() => { render(() => h(Flaky, {}), el2); });
@@ -532,4 +532,17 @@ test("budget.maxFiles: every file of the output counts (pages, chunks, public fi
 test("showcase: the published file budget is set under the host's 512 files per version", async () => {
   const cfg = (await import("../examples/showcase/march.config.js")).default;
   assert.ok(cfg.budget.maxFiles && cfg.budget.maxFiles <= 480, "budget.maxFiles leaves room under 512");
+});
+
+test("lazy(): a failed load is retried on its own while the skeleton stays", async () => {
+  let calls = 0;
+  const Shaky = L.lazy(() => (++calls < 3 ? Promise.reject(new Error("offline")) : Promise.resolve({ default: () => h("s", {}, "back") })), { retries: 3 });
+  const el = document.createElement("div");
+  render(() => h(Shaky, {}), el);
+  await new Promise((r) => setTimeout(r, 50));
+  assert.equal(el.querySelector(".hm-lazy-error"), null, "no error while it retries");
+  assert.equal(el.querySelector(".hm-lazy-slot").getAttribute("aria-busy"), "true");
+  await new Promise((r) => setTimeout(r, 1800));
+  assert.equal(calls, 3);
+  assert.equal(el.querySelector("s")?.textContent, "back");
 });
