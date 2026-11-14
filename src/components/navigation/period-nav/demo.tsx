@@ -1,6 +1,7 @@
 // Showcase stage for PeriodNav: the arrows step a month, the today button returns to this month. Every Playground
 // value changes the group: title, today button, arrows, icons, attached, size, colour, limits and texts.
 import { PeriodNav } from "./index.ts";
+import { computed, effect, untrack } from "../../../core/reactive.ts";
 import { arrowLeft } from "../../../icons/glyphs/arrowLeft.ts";
 import { arrowRight } from "../../../icons/glyphs/arrowRight.ts";
 
@@ -18,6 +19,9 @@ export default function PeriodNavDemo(props: { values: Values }) {
   let $offset = 0
   const first = -THIS.getMonth(), last = 11 - THIS.getMonth()
   const move = (d: number): void => { $offset = $offset + d }
+  // the limit shows at an end of the year: turning it on goes to the last month, where the next arrow is closed
+  const limit = computed(() => props.values.limit && props.values.arrows)
+  effect(() => { if (limit()) untrack(() => { $offset = last }) })
   return <div class="sc-col">
     {() => {
       const v = { ...props.values }
@@ -31,6 +35,6 @@ export default function PeriodNavDemo(props: { values: Values }) {
         size={v.size as "md"} color={color} labels={labels}
         prevDisabled={() => v.limit && $offset <= first} nextDisabled={() => v.limit && $offset >= last} />
     }}
-    <p class="sc-demo-call">{() => `${name($offset)} (${$offset >= 0 ? "+" : ""}${$offset} ay)`}</p>
+    <p class="sc-demo-call">{() => `${name($offset)} (${$offset >= 0 ? "+" : ""}${$offset} ay)${limit() ? ` · sınır: ${name(first)} – ${name(last)}` : ""}`}</p>
   </div>
 }

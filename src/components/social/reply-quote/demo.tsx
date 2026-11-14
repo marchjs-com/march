@@ -15,7 +15,8 @@ const TEXT = "Cumartesi sabahı sahil koşusu için buluşma yerini değiştirdi
 export default function ReplyQuoteDemo(props: { values: { place: string; lines: number; color: string; bar: boolean; close: string; click: boolean } }) {
   let $shown = true
   let $log = ""
-  return <div class="sc-col">
+  // a narrow column, as a message field is: the text takes more lines than the limit, so the line count shows
+  return <div class="sc-col sc-clamp-box">
     {() => {
       const v = { ...props.values }
       const bubble = v.place === "bubble"

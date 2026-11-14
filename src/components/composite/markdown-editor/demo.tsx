@@ -23,6 +23,26 @@ const START = [
   "```bash",
   "npm create march@latest hadi",
   "```",
+  "",
+  // long enough for both panes to scroll at any width: synced scrolling needs somewhere to go
+  "### Katılımcılar",
+  "",
+  "- Ürün ekibi",
+  "- Tasarım ekibi",
+  "- Mühendislik ekibi",
+  "- Topluluk ekibi",
+  "",
+  "### Hazırlık",
+  "",
+  "1. Sunumu bir gün önce paylaşın",
+  "2. Demo hesabını sıfırlayın",
+  "3. Soruları ortak belgeye yazın",
+  "",
+  "### Sonraki adımlar",
+  "",
+  "Toplantı notları aynı gün **ortak klasöre** eklenir; kararlar bir hafta içinde görev listesine girer.",
+  "",
+  "> Katılamayanlar için kayıt ertesi gün paylaşılır.",
 ].join("\n")
 
 export default function MarkdownEditorDemo(props: { values: { view: string; toolbar: boolean; sync: boolean; stats: boolean; rich: boolean; readonly: boolean; tools: string; hint: boolean; labels: boolean } }) {

@@ -21,6 +21,6 @@ export default function LiveStatusDemo(props: { values: { visible: boolean; help
       const help = v.help === "off" ? false : v.help === "own" ? <span>Seçmek için <Kbd keys="space" /> tuşuna basın</span> : "Satır seçmek için düğmeye basın."
       return <LiveStatus text={text} visible={v.visible} politeness={v.politeness as "polite"} as={v.as as "span"} help={help} helpId="sc-live-status-help" />
     }}
-    <p class="sc-demo-call">{() => (props.values.visible ? `role="status" · görünür: "${text()}"` : `role="status" · yalnız ekran okuyucu: "${text()}"`)}</p>
+    <p class="sc-demo-call">{() => `role="status" · aria-live="${props.values.politeness}" (${props.values.politeness === "assertive" ? "okunanı keser, hemen söyler" : "okunan bitince söyler"}) · ${props.values.visible ? "görünür" : "yalnız ekran okuyucu"}: "${text()}"`}</p>
   </div>
 }

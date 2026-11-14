@@ -66,8 +66,9 @@ const SETUP = `(() => {
         + "|" + (el.getAnimations?.() ?? []).map((x) => { const t = x.effect?.getTiming?.() ?? {}; return [t.duration, t.iterations, t.direction, t.easing, t.delay, x.playbackRate].join("/"); }).join(";")
         // parts drawn by ::before / ::after (a line, an arrow, a dot, a mark) are seen too: what they paint and their size
         + "|" + ["::before", "::after"].map((ps) => { const p = getComputedStyle(el, ps); return p.content === "none" || p.display === "none" ? "" : [p.content, ...PSEUDO.map((k) => p.getPropertyValue(k))].join(";"); }).join("~")
-        // a placeholder is text the user reads; a range input paints its thumb and track from the accent
-        + "|" + (el.placeholder ?? "") + "|" + (el.matches("input[type=range], progress, meter") ? cs.getPropertyValue("accent-color") + cs.getPropertyValue("--hm-accent") : ""));
+        // a placeholder is text the user reads; a native box draws its tick / dash from checked / indeterminate; a range input
+        // paints its thumb and track from the accent
+        + "|" + (el.placeholder ?? "") + "|" + (el.matches("input[type=checkbox], input[type=radio]") ? (el.checked ? "c" : "") + (el.indeterminate ? "i" : "") : "") + "|" + (el.matches("input[type=range], progress, meter") ? cs.getPropertyValue("accent-color") + cs.getPropertyValue("--hm-accent") : ""));
       for (const n of el.childNodes) if (n.nodeType === 3) { const t = n.textContent.trim(); if (t) parts.push("#" + t); } else walk(n);
     };
     walk(root());

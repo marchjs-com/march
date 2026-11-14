@@ -14,10 +14,16 @@ import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 /** The overlay scope around this code (an <OverlayScope>). */
 export const OverlayScopeContext = context<HTMLElement | null>(null);
 
+const scopeAround = (el: unknown): HTMLElement | null => ((el as Element | null | undefined)?.closest?.(".hm-overlay-scope") as HTMLElement | null | undefined) ?? null;
+
 /** The scope a layer opened now belongs in: the <OverlayScope> around the calling component, else the one around
- *  `from` (or the focused element: a click handler runs outside any component), else the page (null). */
+ *  `from`; without `from` (a click handler runs outside any component) the one around the element the event being
+ *  handled came from (a pressed button need not take the focus), else around the focused element, else the page (null). */
 export function overlayScopeFor(from?: Element | null): HTMLElement | null {
-  return useContext(OverlayScopeContext) ?? ((from ?? globalThis.document?.activeElement)?.closest?.(".hm-overlay-scope") as HTMLElement | null) ?? null;
+  const inside = useContext(OverlayScopeContext);
+  if (inside) return inside;
+  if (from) return scopeAround(from);
+  return scopeAround((globalThis as { event?: Event | undefined }).event?.target) ?? scopeAround(globalThis.document?.activeElement);
 }
 // <Portal layer> and the layer stack ask this when a layer opens
 _setScopeOf(() => overlayScopeFor());

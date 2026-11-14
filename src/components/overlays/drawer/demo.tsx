@@ -10,12 +10,15 @@ export const code = `<Drawer open={$open} onClose={() => $open = false} side="bo
 const SNAPS: Record<string, number[] | undefined> = { none: undefined, two: [0.4, 0.9], three: [0.25, 0.55, 0.9] }
 const MOTIONS: Record<string, boolean | { duration: number; exit: number; easing: string }> = { default: true, bouncy: { duration: 620, exit: 380, easing: "easeOutBack" }, off: false }
 
+// the motion is seen only while the drawer opens or closes: the stage says which one the next opening uses
+const MOTION_SAYS: Record<string, string> = { default: "Hareket: hazır, 0,3 sn kayar", bouncy: "Hareket: 0,62 sn, yaylı gelir", off: "Hareket yok: anında açılır" }
+
 export default function DrawerDemo(props: { values: { side: string; modal: boolean; snap: string; size: string; dragToClose: boolean; content: string; handle: boolean; closeButton: boolean; motion: string } }) {
   let $open = false
   let $snap = 0
   return <div class="sc-row">
     <Button variant="primary" data-audit-try="toggle" on:click={() => { $open = !$open }}>{() => ($open ? "Çekmeceyi kapat" : "Çekmeceyi aç")}</Button>
-    <span class="sc-strip-label" aria-live="polite">{() => (SNAPS[props.values.snap] && $open ? `Durma noktası: ${$snap + 1}` : "")}</span>
+    <span class="sc-strip-label" aria-live="polite">{() => `${MOTION_SAYS[props.values.motion] ?? ""}${SNAPS[props.values.snap] && $open ? ` · Durma noktası: ${$snap + 1}` : ""}`}</span>
     {() => {
       const v = props.values
       const snaps = SNAPS[v.snap]

@@ -13,7 +13,8 @@ export default function EmptyDemo(props: { values: { size: string; icon: boolean
   let $made = 0
   return <div class="sc-col">
     {() => {
-      const v = props.values
+      // read here: Empty reads its icon and size once, so the stage is drawn again when an option changes
+      const v = { ...props.values }
       return <Empty size={v.size as "md"} icon={v.icon ? inbox : undefined} title={v.title ? () => ($made ? `${$made} taslak oluşturuldu` : "Gelen kutusu boş") : false}
         action={v.action ? [<Button variant="primary" icon={plus} on:click={() => { $made++ }}>Yeni mesaj</Button>] : undefined}>
         {v.text ? "Yeni bir konuşma başlatın ya da bir ekip arkadaşını davet edin." : null}

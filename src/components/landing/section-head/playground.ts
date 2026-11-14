@@ -7,7 +7,7 @@ export default definePlayground<Values>({
     { key: "size", label: "Ölçek", default: "md", options: [{ value: "sm", label: "sm (kart)" }, { value: "md", label: "md (bölüm)" }, { value: "lg", label: "lg (çağrı)" }, { value: "xl", label: "xl (hero)" }] },
     { key: "align", label: "Hizalama", default: "center", options: [{ value: "start", label: "başa" }, { value: "center", label: "ortaya" }, { value: "end", label: "sona" }] },
     { key: "eyebrow", label: "Üst etiket", default: "text", options: [{ value: "text", label: "metin" }, { value: "badge", label: "kendi rozetim" }, { value: "off", label: "yok" }] },
-    { key: "color", label: "Etiket rengi", default: "default", options: [{ value: "default", label: "aksan" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "success", label: "yeşil" }], visibleWhen: (v) => v.eyebrow === "text" },
+    { key: "color", label: "Etiket rengi", default: "default", options: [{ value: "default", label: "aksan" }, { value: "brand-blue", label: "mavi" }, { value: "brand-purple", label: "mor" }, { value: "success", label: "yeşil" }], visibleWhen: (v) => v.eyebrow === "text" },
     { key: "lead", label: "Açıklama", default: true },
     { key: "actions", label: "Eylemler", default: true },
     { key: "note", label: "Not", default: true },

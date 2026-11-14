@@ -4,6 +4,7 @@ import { untrack } from "../../../core/reactive.ts";
 import { EditorFrame } from "./index.ts";
 import { FormatToolbar } from "../format-toolbar/index.ts";
 import { Badge } from "../../../ui/badge.ts";
+import { Button } from "../../../ui/button.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<EditorFrame head={<FormatToolbar onTool={exec} />} actions={<Badge>{$words} kelime</Badge>}
@@ -16,7 +17,10 @@ export default function EditorFrameDemo(props: { values: { head: boolean; action
   let $text = "HADİ koşu kulübü cumartesi sabahı sahilde buluşuyor.\nYeni katılanlar için tempo yavaş tutulacak."
   let $last = ""
   const words = () => $text.trim().split(/\s+/).filter(Boolean).length
-  return <div class="sc-col">
+  let host: HTMLElement | undefined
+  // the ring and its colour show only while something inside has focus: the button puts the focus in the note
+  const focusNote = () => host?.querySelector<HTMLTextAreaElement>(".hm-editor-area")?.focus()
+  return <div class="sc-col" ref={(x: Element) => { host = x as HTMLElement }}>
     {() => {
       const v = { ...props.values }
       const color = (v.color || undefined) as ColorToken | undefined
@@ -32,5 +36,6 @@ export default function EditorFrameDemo(props: { values: { head: boolean; action
           value={untrack(() => $text)} on:input={(e: Event) => { $text = (e.target as HTMLTextAreaElement).value }} />
       </EditorFrame>
     }}
+    {() => (props.values.state === "disabled" ? null : <div class="sc-row"><Button size="sm" variant="secondary" data-audit-try on:click={focusNote}>Notu odakla (halkayı göster)</Button></div>)}
   </div>
 }

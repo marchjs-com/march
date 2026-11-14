@@ -15,6 +15,8 @@ export default function FormatToolbarDemo(props: { values: { tools: string; hint
   let $italic = false
   let $strike = false
   let $last = ""
+  // the names and the shortcut hint live in the tooltips: the line under the bar reads them from the real buttons
+  let $tips = ""
   const exec = (tool: FormatTool) => {
     if (tool === "bold") $bold = !$bold
     else if (tool === "italic") $italic = !$italic
@@ -28,8 +30,10 @@ export default function FormatToolbarDemo(props: { values: { tools: string; hint
       const color = (v.color || undefined) as ColorToken | undefined
       const icons = v.icons === "letters" ? { bold: "B", italic: "I", strike: "S" } : undefined
       const labels = v.labels ? { bold: "Vurgula", italic: "Eğik yaz", link: "Adres ekle" } : undefined
-      return <FormatToolbar tools={tools} onTool={exec} hints={v.hints} size={v.size as "sm"} color={color} icons={icons} labels={labels} disabled={v.disabled}
-        pressed={{ bold: () => $bold, italic: () => $italic, strike: () => $strike }} />
+      const bar = <FormatToolbar tools={tools} onTool={exec} hints={v.hints} size={v.size as "sm"} color={color} icons={icons} labels={labels} disabled={v.disabled}
+        pressed={{ bold: () => $bold, italic: () => $italic, strike: () => $strike }} /> as Element
+      $tips = [...bar.querySelectorAll("button[aria-keyshortcuts]")].filter((b) => /^Control\+[bik]$/i.test(b.getAttribute("aria-keyshortcuts") ?? "")).map((b) => b.getAttribute("title") || b.getAttribute("aria-label")).join(" · ")
+      return bar
     }}
     <p>{() => {
       let line: unknown = "HADİ ile bu akşam sahilde koşuya çıkıyoruz."
@@ -38,6 +42,7 @@ export default function FormatToolbarDemo(props: { values: { tools: string; hint
       if ($strike) line = <s>{line}</s>
       return line
     }}</p>
+    <p class="hm-muted">İpuçları (düğmenin üstüne gelince): {() => $tips}</p>
     <p class="hm-muted" aria-live="polite">{() => ($last ? `Son araç: ${$last}` : "Bir araca basın: kalın, italik ve üstü çizili örnek satırı değiştirir.")}</p>
   </div>
 }

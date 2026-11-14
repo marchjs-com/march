@@ -13,6 +13,6 @@ export default definePlayground<Values>({
     { key: "groups", label: "Grup başlıkları", default: false },
     { key: "check", label: "Seçim işareti", default: "on", options: [{ value: "on", label: "tik" }, { value: "own", label: "kendi ikonum" }, { value: "off", label: "yok" }], visibleWhen: (v) => v.field || v.mode !== "menu" },
     { key: "size", label: "Boyut", default: "md", options: ["sm", "md"] },
-    { key: "color", label: "Renk", default: "default", options: [{ value: "default", label: "aksan" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "success", label: "yeşil" }], visibleWhen: (v) => v.field || v.mode !== "menu" },
+    { key: "color", label: "Renk", default: "default", options: [{ value: "default", label: "aksan" }, { value: "brand-blue", label: "mavi" }, { value: "brand-purple", label: "mor" }, { value: "success", label: "yeşil" }], visibleWhen: (v) => v.field || v.mode !== "menu" },
   ],
 });

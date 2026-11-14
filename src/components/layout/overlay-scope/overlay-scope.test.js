@@ -30,6 +30,13 @@ test("openDialog: target page opens on the page even from inside a scope; the fo
   const opener = host.querySelector(".opener");
   opener.focus();
   assert.equal(overlayScopeFor(), box, "a click handler runs outside components: the focus tells the scope");
+  // a pressed button need not take the focus (Safari, a scripted click): the event being handled tells the scope
+  opener.blur();
+  assert.equal(overlayScopeFor(), null, "no focus, no event: the page");
+  globalThis.event = { target: opener };
+  assert.equal(overlayScopeFor(), box, "the event's target tells the scope");
+  delete globalThis.event;
+  opener.focus();
   let close;
   void openDialog((c) => { close = c; return "hi"; });
   await tick();

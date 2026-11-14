@@ -8,7 +8,7 @@ export default definePlayground<Values>({
     { key: "interactive", label: "Tıklanabilir (onChange)", default: true },
     { key: "variant", label: "Görünüm", default: "pill", options: [{ value: "pill", label: "etkin olan uzun" }, { value: "dot", label: "eşit noktalar" }], visibleWhen: (v) => v.dot === "default" },
     { key: "size", label: "Boyut", default: "md", options: ["sm", "md", "lg"], visibleWhen: (v) => v.dot === "default" },
-    { key: "color", label: "Renk", default: "primary", options: [{ value: "primary", label: "ana renk" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }, { value: "neutral", label: "nötr" }] },
+    { key: "color", label: "Renk", default: "primary", options: [{ value: "primary", label: "ana renk" }, { value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "neutral", label: "nötr" }] },
     { key: "dot", label: "Nokta içeriği", default: "default", options: [{ value: "default", label: "nokta" }, { value: "own", label: "kendi içeriğim (sayı)" }] },
     { key: "orientation", label: "Yön", default: "horizontal", options: [{ value: "horizontal", label: "yatay" }, { value: "vertical", label: "dikey" }] },
   ],

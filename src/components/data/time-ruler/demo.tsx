@@ -23,7 +23,7 @@ export default function TimeRulerDemo(props: { values: { duration: number; seeka
   return <div class="sc-col">
     {() => {
       const v = { ...props.values }
-      const color = v.color === "primary" ? undefined : v.color as "brand-orange"
+      const color = v.color === "primary" ? undefined : v.color as "brand-blue"
       const head = v.head === "off" ? false : v.head === "own" ? <span class="sc-ruler-own" aria-hidden="true">▼</span> as Node : true
       const onSeek = v.seekable ? (ms: number) => { $now = ms } : undefined
       return <div class="sc-ruler-box">

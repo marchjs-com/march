@@ -8,7 +8,7 @@ export default definePlayground<Values>({
     { key: "expandable", label: "\"devamı\" düğmesi", default: true },
     { key: "collapsible", label: "Açılınca \"daha az\"", default: true, visibleWhen: (v) => v.expandable },
     { key: "labels", label: "Düğme metni", default: "default", options: [{ value: "default", label: "devamı / daha az" }, { value: "own", label: "kendi metnim" }], visibleWhen: (v) => v.expandable },
-    { key: "color", label: "Düğme rengi", default: "primary", options: [{ value: "primary", label: "ana renk" }, { value: "brand-orange", label: "turuncu" }, { value: "neutral", label: "nötr" }], visibleWhen: (v) => v.expandable },
+    { key: "color", label: "Düğme rengi", default: "primary", options: [{ value: "primary", label: "tema" }, { value: "brand-blue", label: "mavi" }, { value: "brand-purple", label: "mor" }, { value: "neutral", label: "nötr" }], visibleWhen: (v) => v.expandable },
     { key: "short", label: "Kısa metin (sığar, düğme çıkmaz)", default: false },
   ],
 });

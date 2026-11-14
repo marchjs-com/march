@@ -24,6 +24,9 @@ const BASE = [
   { value: "contrast", label: "Yüksek karşıtlık", icon: sun, hint: "Yakında", group: "Kendi", disabled: true },
 ]
 
+// the role is what a screen reader says: the look of a radio group and a list box is the same, so the stage names it
+const ROLE: Record<string, string> = { radio: 'role="radiogroup" › radio', listbox: 'role="listbox" › option', multi: 'role="listbox" (aria-multiselectable) › option', menu: 'role="menu" › menuitem' }
+
 export default function OptionListDemo(props: { values: Values }) {
   let $one = "dark"
   let $many = ["light", "system"]
@@ -53,6 +56,6 @@ export default function OptionListDemo(props: { values: Values }) {
       if (v.mode === "multi") return <OptionList {...shared} multiple options={opts} bind:value={$many} />
       return <OptionList {...shared} mode={v.mode as "radio"} options={opts} bind:value={$one} />
     }}
-    <p class="sc-demo-call">{() => `tek: ${$one} · çoklu: ${$many.join(", ") || "—"} · son seçilen: ${$last}`}</p>
+    <p class="sc-demo-call">{() => `${ROLE[props.values.field ? "listbox" : props.values.mode] ?? ""} · tek: ${$one} · çoklu: ${$many.join(", ") || "—"} · son seçilen: ${$last}`}</p>
   </div>
 }
