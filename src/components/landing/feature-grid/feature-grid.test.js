@@ -28,3 +28,14 @@ test("FeatureGrid bento: span classes and media; plain has no cards", () => {
   assert.equal(b.el.querySelectorAll("article.hm-fg-item").length, 3);
   b.dispose();
 });
+
+test("FeatureGrid: entrance and pointer light can be switched off", () => {
+  const a = mount({ items, variant: "cards" });
+  assert.ok(a.el.querySelector(".hm-fg").classList.contains("hm-reveal"), "the default entrance");
+  a.dispose();
+  const b = mount({ items, variant: "cards", reveal: "none", spotlight: false, class: "mine" });
+  const root = b.el.querySelector(".hm-fg.mine");
+  assert.equal(root.classList.contains("hm-reveal"), false);
+  assert.equal(root.classList.contains("is-spotlight"), false);
+  b.dispose();
+});

@@ -20,6 +20,7 @@
 .hm-lf-wall .hm-lf-list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: var(--hm-space-3); }
 .hm-lf-wall .hm-lf-item { grid-template-columns: auto minmax(0, 1fr); align-content: start; block-size: 7.25rem; box-sizing: border-box; overflow: hidden; }
 .hm-lf-wall .hm-lf-meta { grid-column: 2; }
+.hm-lf-item.hm-lf-own { grid-template-columns: minmax(0, 1fr); }
 .hm-lf-wall .hm-lf-title, .hm-lf-wall .hm-lf-body { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
 .hm-lf-wall .hm-lf-body { -webkit-line-clamp: 1; line-clamp: 1; }
 @media (prefers-reduced-motion: reduce) { .hm-lf-pulse::after { animation: none; } }

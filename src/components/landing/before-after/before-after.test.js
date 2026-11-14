@@ -39,3 +39,21 @@ test("BeforeAfter: vertical orientation, labels hidden from screen readers", () 
   assert.equal(root.querySelector('[role="slider"]').getAttribute("aria-valuenow"), "51");
   dispose();
 });
+
+test("BeforeAfter: no grip, an own grip, keyboard step and own value text", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => [
+    h(BeforeAfter, { before: "a", after: "b", grip: false, hint: false }),
+    h(BeforeAfter, { before: "a", after: "b", grip: h("i", { class: "mine" }), step: 5, valueText: (v) => `at ${v}`, hint: false }),
+  ], el);
+  const [plain, own] = el.querySelectorAll(".hm-ba");
+  assert.equal(plain.querySelector(".hm-ba-grip"), null, "the line only");
+  assert.ok(plain.querySelector('[role="slider"]'), "the handle stays for the keyboard");
+  assert.ok(own.querySelector(".hm-ba-grip-own .mine"));
+  const handle = own.querySelector('[role="slider"]');
+  assert.equal(handle.getAttribute("aria-valuetext"), "at 50");
+  key(handle, "ArrowRight"); assert.equal(handle.getAttribute("aria-valuenow"), "55");
+  key(handle, "ArrowLeft", true); assert.equal(handle.getAttribute("aria-valuenow"), "5");
+  assert.equal(handle.getAttribute("aria-valuetext"), "at 5");
+  dispose();
+});

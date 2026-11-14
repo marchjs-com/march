@@ -11,6 +11,10 @@ and spotlight), `split` (media at the end), `video` (VideoBackground), `mesh` (g
   lead="…" note="No card needed" actions={[{ label: "Start free", href: "/start", iconEnd: arrowRight }, { label: "Watch demo" }]} />
 <Hero variant="product" media={{ src: "/screen.png", alt: "Dashboard", width: 1600, height: 1000 }} … />
 <Hero variant="video" video={{ src: "/clip.webm", poster: "/clip.jpg" }} … />
+<Hero variant="mesh" title="…" backdrop={false} reveal="none" />              // no decorative layers, no entrance
+<Hero variant="product" title="…" media={…} frameBar={false} tilt={false} reveal="blur" />
+<Hero eyebrow="New" eyebrowHref="/news" eyebrowArrow={<Icon of={arrowRight} />} title="…"
+  reveal={{ from: { opacity: 0, transform: "scale(.9)" }, to: { opacity: 1, transform: "scale(1)" } }} />
 ```
 
 ## Props
@@ -29,6 +33,13 @@ and spotlight), `split` (media at the end), `video` (VideoBackground), `mesh` (g
 | `align` | `center` `start` | by variant | |
 | `size` | `md` `lg` `screen` | `lg` | minimum height |
 | `level` | 1 2 | 1 | heading level of the title (2 when the hero is not the page's top) |
+| `eyebrowArrow` | boolean / node | `true` | the arrow after a linked eyebrow, or your own |
+| `backdrop` | boolean | `true` | the decorative layers of the variant (grid, mesh, aurora, dots, pointer light, grain) |
+| `reveal` | Reveal effect / `{ from, to }` / `none` | `up` | entrance of the copy (and of the split media; `none` switches both off) |
+| `frameBar` | boolean | `true` | product: the window bar with three dots |
+| `tilt` | boolean | `true` | product: the frame starts tilted and flattens with the scroll |
+| `class` | string | — | extra class on the section (`.hm-hero`; parts: `.hm-hero-copy`, `.hm-hero-eyebrow`, `.hm-hero-title`, `.hm-hero-hl`, `.hm-hero-lead`, `.hm-hero-actions`, `.hm-hero-note`, `.hm-hero-frame`) |
+| children | node | — | extra content under the note |
 
 ## Accessibility
 

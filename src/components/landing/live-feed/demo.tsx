@@ -4,7 +4,9 @@ import { LiveFeed, type FeedItem } from "./index.ts";
 
 export const code = `<LiveFeed next={() => nextActivity()} every={2400} max={5} enter="drop" leave="fall" />
 <LiveFeed items={$events} variant="wall" live="polite" />   // newest first, pushed from a socket
-<LiveFeed next={next} enter={{ keyframes: { opacity: [0, 1], transform: ["rotate(-6deg) scale(.8)", "none"] }, duration: 500 }} />`
+<LiveFeed next={next} enter={{ keyframes: { opacity: [0, 1], transform: ["rotate(-6deg) scale(.8)", "none"] }, duration: 500 }} />
+<LiveFeed next={next} pauseLabel="Yayında · durdur" resumeLabel="Durdu · sürdür" pulse={false}
+  renderItem={(item) => <><b>{item.title}</b> <small>{item.meta}</small></>} />   // own rows and button texts; enter="none" leave="none": no motion`
 
 const PEOPLE = ["Elif", "Mert", "Zeynep", "Can", "Deniz", "Ece", "Arda", "Selin", "Bora", "Leyla", "Kerem", "Defne"]
 const CITIES = ["Kadıköy", "Beşiktaş", "Çankaya", "Karşıyaka", "Nilüfer", "Muratpaşa", "Ortahisar", "Tepebaşı"]
@@ -30,8 +32,10 @@ export function activitySource(from = 0): () => FeedItem {
 }
 
 let round = 0
-export default function LiveFeedDemo(props: { values: { variant: string; enter: string; leave: string; glow: boolean; every: number; max: number } }) {
+export default function LiveFeedDemo(props: { values: { variant: string; enter: string; leave: string; glow: boolean; item: string; button: string; every: number; max: number } }) {
   return <div class="sc-lf-stage">
-    {() => { const v = { ...props.values }; return <LiveFeed variant={v.variant as "list" | "wall"} enter={v.enter as "flip"} leave={v.leave as "blur"} glow={v.glow} every={v.every} first={600} max={v.max} next={activitySource(round++ * 7)} label="HADİ'de şimdi" /> }}
+    {() => { const v = { ...props.values }; return <LiveFeed variant={v.variant as "list" | "wall"} enter={v.enter as "flip"} leave={v.leave as "blur"} glow={v.glow} every={v.every} first={600} max={v.max} next={activitySource(round++ * 7)} label="HADİ'de şimdi"
+      pausable={v.button !== "off"} pauseLabel={v.button === "own" ? "Yayında · durdur" : undefined} resumeLabel={v.button === "own" ? "Durdu · sürdür" : undefined} pulse={v.button !== "own"}
+      renderItem={v.item === "own" ? (it) => <span class="sc-lf-own"><b>{it.title}</b> <small>{it.body}</small></span> : undefined} /> }}
   </div>
 }

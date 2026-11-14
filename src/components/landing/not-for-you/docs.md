@@ -9,6 +9,9 @@ the list says how many still apply.
 <NotForYou check items={[{ text: "You run a 1,000-seat conference", detail: "No ticketing; an event platform fits better." }]}
   forYou={[{ text: "You want to do something tonight" }]} />
 <NotForYou variant="list" items={…} verdict={(n, total) => `${n}/${total}`} />
+<NotForYou check items={…} meLabel="Sounds like me" hint="Tap if not" markedHint="Welcome"
+  mark={(state) => (state === "not" ? "🙅" : state === "marked" ? "🎉" : "👍")} />   // own marks and texts
+<NotForYou check items={…} mark={false} meLabel={false} hint={false} markedHint={false} verdict={false} title={false} />
 ```
 
 ## Props
@@ -17,13 +20,15 @@ the list says how many still apply.
 |---|---|---|---|
 | `items` | `{ text, detail?, instead? }[]` | — | who it is not for; `instead`: the positive side, shown once struck out |
 | `forYou` | `{ text, detail? }[]` | — | who it is for (second column) |
-| `title`, `forYouTitle` | node | "Not for you if…", "For you if…" | column headings |
+| `title`, `forYouTitle` | node / `false` | "Not for you if…", "For you if…" | column headings; `false`: none |
 | `check` | boolean | `false` | lines become toggles (strike out "not me"), a verdict appears |
-| `verdict` | `(n, total) => node` | `notForYouVerdict` | the verdict text; `n` = struck-out lines |
+| `verdict` | `(n, total) => node` / `false` | `notForYouVerdict` | the verdict text; `n` = struck-out lines; `false`: no verdict line |
 | `variant` | `cards` `list` | `cards` | boxes, or lines with a rule |
 | `onCheck` | `(marked: number[]) => void` | — | indexes of the struck-out lines |
-| `meLabel` | node | "That's me" | label on every checkable card |
-| `hint`, `markedHint` | node | "Not you? Tap it!", "Not you" | small text under the label, before / after a tap |
+| `meLabel` | node / `false` | "That's me" | label on every checkable card; `false`: none |
+| `hint`, `markedHint` | node / `false` | "Not you? Tap it!", "Not you" | small text under the label, before / after a tap; `false`: none |
+| `mark` | boolean / `(state, item, index) => node` | `true` | the round marks (cross / tick); `false`: none; a function draws your own for `state` `"not"`, `"marked"` (struck out) or `"for"` |
+| `class` | string | — | extra class on the root (`.hm-nfy`; parts: `.hm-nfy-title`, `.hm-nfy-toggle`, `.hm-nfy-mark`, `.hm-nfy-me`, `.hm-nfy-verdict`) |
 
 `notForYouVerdict(n, total)` is the default verdict: a prompt, "none of these is you", or how many still apply.
 

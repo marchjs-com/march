@@ -8,6 +8,8 @@ digit like an odometer (only the digits that change move). Formatting follows th
 <Counter value={12840} />
 <Counter value={$price} mode="roll" format={{ style: "currency", currency: "EUR" }} />
 <Counter value={0.98} format={{ style: "percent" }} />
+<Counter value={$n} mode="none" />                       // no motion: the value just changes
+<Counter value={12840} duration={3000} easing="bounce" />
 ```
 
 ## Props
@@ -19,9 +21,11 @@ digit like an odometer (only the digits that change move). Formatting follows th
 | `format` | Intl.NumberFormatOptions | — | currency, percent, compact … |
 | `decimals` | number | `0` | fixed decimals |
 | `prefix`, `suffix` | node | — | around the number |
-| `mode` | `count` `roll` | `count` | count up, or odometer digits |
+| `mode` | `count` `roll` `none` | `count` | count up, odometer digits, or no motion |
 | `duration` | ms | `1600` / `900` | |
+| `easing` | easing name | `expo` | easing of the count (`out`, `spring`, `bounce`, `linear` …) |
 | `start` | `visible` `now` | `visible` | |
+| `class` | string | — | extra class on the root (`.hm-counter`; parts: `.hm-counter-view`, `.hm-counter-affix`) |
 
 `formatCount(n, { format, decimals })` formats like the counter.
 

@@ -34,3 +34,23 @@ test("Hero: product frame, split media with a reserved image size, video stage",
   assert.ok(c.el.querySelector(".hm-vbg .hm-hero-title"));
   c.dispose();
 });
+
+test("Hero: no backdrop, no entrance, own eyebrow arrow or none, product frame without bar", () => {
+  const a = mount({ variant: "mesh", title: "T", backdrop: false, reveal: "none", eyebrow: "New", eyebrowHref: "/n", eyebrowArrow: h("i", { class: "mine" }) });
+  assert.equal(a.el.querySelector("[class*=hm-ov-fx]"), null, "no decorative layer");
+  assert.equal(a.el.querySelector(".hm-hero-copy").classList.contains("hm-reveal-box"), false, "a plain block, not a Reveal");
+  assert.ok(a.el.querySelector(".hm-hero-eyebrow-arrow .mine"));
+  assert.equal(a.el.querySelector("h1").textContent, "T");
+  a.dispose();
+  const b = mount({ variant: "centered", title: "T", eyebrow: "New", eyebrowHref: "/n", eyebrowArrow: false });
+  assert.equal(b.el.querySelector(".hm-hero-eyebrow-arrow"), null);
+  assert.ok(b.el.querySelector(".hm-hero-copy.hm-reveal-box"), "the default entrance stays");
+  b.dispose();
+  const c = mount({ variant: "product", title: "T", media: h("div", { class: "x" }), frameBar: false, tilt: false });
+  assert.ok(c.el.querySelector(".hm-hero-frame .x"));
+  assert.equal(c.el.querySelector(".hm-hero-frame-bar"), null);
+  c.dispose();
+  const d = mount({ variant: "split", title: "T", media: h("div", { class: "x" }), reveal: "none" });
+  assert.equal(d.el.querySelector(".hm-hero-media-wrap").classList.contains("hm-reveal-box"), false);
+  d.dispose();
+});

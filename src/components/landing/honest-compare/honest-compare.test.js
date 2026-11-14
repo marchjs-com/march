@@ -38,3 +38,39 @@ test("HonestCompare: table semantics, summary, behind filter", () => {
   assert.equal([...el.querySelectorAll("tbody tr")].filter((r) => !r.hidden).length, 5);
   dispose();
 });
+
+test("HonestCompare: own texts, own cells, no tags, no filter, own colour", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const seen = [];
+  const dispose = render(() => h(HonestCompare, {
+    columns: COLS, rows: ROWS, tags: false, filter: false, color: "brand-green",
+    labels: { partly: "Half", region: "Table", counts: (c) => `${c.ahead}-${c.even}-${c.behind}` },
+    renderCell: (v, info) => { seen.push([info.row.label, info.column.id, info.us, info.verdict]); return v === true ? h("b", { class: "own" }, "Y") : undefined; },
+  }), el);
+  assert.equal(el.querySelector(".hm-hc").getAttribute("data-hm-color"), "brand-green");
+  assert.equal(el.querySelector(".hm-hc-tag"), null);
+  assert.equal(el.querySelector(".hm-hc-filter"), null);
+  assert.equal(el.querySelector(".hm-hc-counts").textContent, "1-1-1");
+  assert.equal(el.querySelector(".hm-hc-scroll").getAttribute("aria-label"), "Table");
+  assert.equal(el.querySelectorAll("tbody .own").length, 5, "every yes cell is drawn by renderCell");
+  assert.equal(el.querySelector(".hm-hc-yes"), null);
+  assert.equal(el.querySelector(".hm-hc-part-text").textContent, "Half", "undefined keeps the default mark, with the own text");
+  assert.ok(el.querySelector(".hm-hc-no"));
+  assert.deepEqual(seen[0], ["one", "us", true, 1]);
+  assert.deepEqual(seen[4], ["two", "a", false, -1]);
+  dispose();
+});
+
+test("HonestCompare: tag and filter texts can be changed", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(HonestCompare, { columns: COLS, rows: ROWS, labels: { ahead: "Win", behind: "Lose", onlyBehind: "Losses", showAll: "All", yes: "Has", no: "Lacks" } }), el);
+  assert.equal(el.querySelector(".hm-hc-tag.is-ahead").textContent, "Win");
+  assert.equal(el.querySelector(".hm-hc-tag.is-behind").textContent, "Lose");
+  const btn = el.querySelector(".hm-hc-filter");
+  assert.equal(btn.textContent, "Losses");
+  btn.click();
+  assert.equal(btn.textContent, "All");
+  assert.match(el.querySelector("tbody").textContent, /Has/);
+  assert.match(el.querySelector("tbody").textContent, /Lacks/);
+  dispose();
+});

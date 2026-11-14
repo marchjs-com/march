@@ -13,6 +13,9 @@ and a toggle shows only the rows where the product loses.
     { label: "Ticketing", values: { us: false, events: true }, note: "Not planned: HADİ is for free meetups." },
     { label: "Price", values: { us: "Free", events: "Fee per ticket" } },
   ]} />
+<HonestCompare columns={…} rows={…} color="brand-green" tags={false} filter={false}
+  labels={{ partly: "Half", behind: "We lose", counts: (c) => `${c.ahead} wins, ${c.behind} losses` }}
+  renderCell={(value, { us }) => (value === true && us ? "✓✓" : undefined)} />   // undefined keeps the default mark
 ```
 
 ## Props
@@ -25,6 +28,12 @@ and a toggle shows only the rows where the product loses.
 | `caption` | node | "Comparison" | table caption |
 | `showCaption` | boolean | `false` | caption visible (otherwise for screen readers only) |
 | `summary` | boolean | `true` | counts and the "only where we are behind" toggle |
+| `filter` | boolean | `true` | the "only where we are behind" toggle (the counts stay) |
+| `tags` | boolean | `true` | the "Ahead" / "Behind" tags beside the row labels |
+| `labels` | `{ yes, no, partly, ahead, behind, region, counts, onlyBehind, showAll }` | translated | every text the table writes; `counts`: `({ ahead, even, behind }) => node` |
+| `renderCell` | `(value, { row, column, us, verdict }) => node` | — | draw a cell yourself; `undefined` keeps the default mark |
+| `color` | color token | accent | colour of the product's own column |
+| `class` | string | — | extra class on the root (`.hm-hc`; parts: `.hm-hc-summary`, `.hm-hc-filter`, `.hm-hc-table`, `.hm-hc-us`, `.hm-hc-tag`, `.hm-hc-note`) |
 
 `compareRow(row, us)` returns 1 (ahead), 0 (even), -1 (behind) or null (not scored).
 

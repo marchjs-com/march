@@ -9,6 +9,7 @@ default and show their colour on hover.
   { name: "HADİ", src: "/logos/hadi.svg", width: 120, height: 32 },
   { name: "Northwind", node: <NorthwindLogo /> },
 ]} />
+<LogoCloud logos={logos} reveal="up" />     // grid: another entrance; reveal="none": the logos are simply there
 ```
 
 ## Props
@@ -20,6 +21,8 @@ default and show their colour on hover.
 | `title` | node | — | small heading |
 | `mono` | boolean | `true` | one muted tone, colour on hover |
 | `speed` | px/s | `40` | marquee |
+| `reveal` | Reveal effect / `{ from, to }` / `none` | `fade` | grid: entrance of the cells |
+| `class` | string | — | extra class on the root (`.hm-logos`; parts: `.hm-logos-title`, `.hm-logos-cell`, `.hm-logo`, `.hm-logo-img`) |
 
 ## Accessibility
 

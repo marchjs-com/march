@@ -15,3 +15,16 @@ test("HorizontalScroll: labelled region, panels in a track, panel width variable
   assert.equal(root.querySelectorAll(".hm-hs-track > article, .hm-hs-track article").length, 2);
   dispose();
 });
+
+test("HorizontalScroll: no progress line; not pinned is the native scroller", async () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => [
+    h(HorizontalScroll, { class: "a" }, h("article", {}, "1")),
+    h(HorizontalScroll, { class: "b", progress: false, pinned: false }, h("article", {}, "1")),
+  ], el);
+  await new Promise((r) => setTimeout(r, 0));
+  assert.ok(el.querySelector(".hm-hs.a .hm-hs-bar"));
+  assert.equal(el.querySelector(".hm-hs.b .hm-hs-bar"), null);
+  assert.ok(el.querySelector(".hm-hs.b").classList.contains("is-native"));
+  dispose();
+});

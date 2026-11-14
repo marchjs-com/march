@@ -21,6 +21,8 @@ layers get room to travel so no edge shows.
 | `layers` | `{ src?, alt?, content?, speed?, depth?, bleed?, opacity?, blend? }[]` | — | first = farthest |
 | `pointer` | number | `0` | mouse strength (0 = off) |
 | `height` | CSS length | `26rem` | minimum height |
+| `class` | string | — | extra class on the root (`.hm-plx`; parts: `.hm-plx-layer`, `.hm-plx-content`); every layer takes its own `class` too |
+| children | node | — | content in front of the layers |
 
 `speed`: 0 stays with the section, positive is slower than the page (far away), negative faster (near).
 

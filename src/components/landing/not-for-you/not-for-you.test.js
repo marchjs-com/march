@@ -51,3 +51,28 @@ test("NotForYou: without check, plain list items and no verdict", () => {
   assert.ok(el.querySelector(".hm-nfy").classList.contains("hm-nfy-v-list"));
   dispose();
 });
+
+test("NotForYou: own marks, no marks, texts changed or left out, no verdict", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const items = [{ text: "A" }, { text: "B" }];
+  const dispose = render(() => [
+    h(NotForYou, { check: true, items, forYou: [{ text: "D" }], mark: (state, it, i) => `${state}:${it.text}${i}`, meLabel: "Me!", hint: "tap", markedHint: "gone", title: "Not", forYouTitle: false }),
+    h(NotForYou, { check: true, items, mark: false, meLabel: false, hint: false, markedHint: false, verdict: false, title: false }),
+  ], el);
+  const [own, bare] = el.querySelectorAll(".hm-nfy");
+  const box = own.querySelector("[role=checkbox]");
+  assert.equal(box.querySelector(".hm-nfy-mark-x").textContent, "not:A0");
+  assert.equal(box.querySelector(".hm-nfy-mark-ok").textContent, "marked:A0");
+  assert.equal(own.querySelector(".hm-nfy-for .hm-nfy-mark").textContent, "for:D0");
+  assert.equal(own.querySelector(".hm-nfy-not .hm-nfy-title").textContent, "Not");
+  assert.equal(own.querySelector(".hm-nfy-for .hm-nfy-title"), null);
+  assert.match(box.textContent, /Me!tap$/);
+  box.click();
+  assert.match(box.textContent, /Me!gone$/);
+  assert.equal(bare.querySelector(".hm-nfy-mark"), null);
+  assert.equal(bare.querySelector(".hm-nfy-me"), null);
+  assert.equal(bare.querySelector(".hm-nfy-title"), null);
+  assert.equal(bare.querySelector("[role=status]"), null);
+  assert.equal(bare.querySelectorAll("[role=checkbox]").length, 2, "still checkable");
+  dispose();
+});

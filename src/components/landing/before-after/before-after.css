@@ -15,6 +15,7 @@
 .hm-ba:dir(rtl) .hm-ba-grip { translate: 50% -50%; }
 .hm-ba-grip i { inline-size: 0; block-size: 0; border-block: .32rem solid transparent; border-inline-end: .42rem solid currentColor; }
 .hm-ba-grip i + i { border-inline-end: 0; border-inline-start: .42rem solid currentColor; }
+.hm-ba-grip-own .hm-svg { inline-size: 1.15rem; block-size: 1.15rem; }
 .hm-ba-vertical .hm-ba-grip { flex-direction: column; }
 .hm-ba-vertical .hm-ba-grip i { border-block: 0; border-inline: .32rem solid transparent; border-block-end: .42rem solid currentColor; }
 .hm-ba-vertical .hm-ba-grip i + i { border-block-end: 0; border-block-start: .42rem solid currentColor; }

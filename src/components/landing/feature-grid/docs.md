@@ -11,6 +11,8 @@ media). Items enter one after another; tiles in a row share one height; on phone
   { icon: globe, title: "Every language", body: "…", span: "wide" },
 ]} />
 <FeatureGrid variant="cards" cols={3} items={features} />
+<FeatureGrid items={features} spotlight={false} reveal="none" />     // no pointer light, no entrance
+<FeatureGrid items={features} reveal={{ from: { opacity: 0, transform: "rotate(-4deg) scale(.9)" }, to: { opacity: 1, transform: "rotate(0deg) scale(1)" } }} />
 ```
 
 ## Props
@@ -21,7 +23,8 @@ media). Items enter one after another; tiles in a row share one height; on phone
 | `variant` | `cards` `plain` `list` `bento` | `cards` | |
 | `cols` | 2 3 4 | 3 | cards / plain |
 | `spotlight` | boolean | `true` | pointer light (cards, bento) |
-| `reveal` | Reveal effect or `none` | `up` | entrance |
+| `reveal` | Reveal effect / `{ from, to }` / `none` | `up` | entrance of the tiles |
+| `class` | string | — | extra class on the root (`.hm-fg`; parts: `.hm-fg-item`, `.hm-fg-title`, `.hm-fg-body`, `.hm-fg-media`) |
 
 ## Accessibility
 

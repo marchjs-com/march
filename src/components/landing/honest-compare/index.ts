@@ -8,6 +8,7 @@ import { h } from "../../../dom/h.ts";
 import { signal, computed } from "../../../core/reactive.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, val, glyph, type ClassProp } from "../../../ui/util.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { check as checkIcon } from "../../../icons/glyphs/check.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { minus as minusIcon } from "../../../icons/glyphs/minus.ts";
@@ -36,6 +37,25 @@ export interface HonestCompareProps {
   showCaption?: boolean | undefined;
   /** Show the ahead / even / behind summary and the "only where we are behind" toggle (default true). */
   summary?: boolean | undefined;
+  /** The "only where we are behind" toggle in the summary (default true). */
+  filter?: boolean | undefined;
+  /** The "Ahead" / "Behind" tags beside the row labels (default true). */
+  tags?: boolean | undefined;
+  /** Every text the table writes itself; the defaults are translated. `counts` gets the three numbers. */
+  labels?: {
+    yes?: unknown; no?: unknown; partly?: unknown; ahead?: unknown; behind?: unknown;
+    /** Accessible name of the scrolling region (default "Comparison table"). */
+    region?: string;
+    counts?: (counts: { ahead: number; even: number; behind: number }) => unknown;
+    onlyBehind?: unknown; showAll?: unknown;
+  } | undefined;
+  /**
+   * Draw a cell yourself: return content, or undefined to keep the default mark. `info.us`: the product's own column;
+   * `info.verdict`: how the row scores (1 ahead, 0 even, -1 behind, null not scored).
+   */
+  renderCell?: ((value: CompareValue, info: { row: CompareRow; column: CompareColumn; us: boolean; verdict: 1 | 0 | -1 | null }) => unknown) | undefined;
+  /** Colour of the product's own column (default: the accent). */
+  color?: ColorToken | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -57,21 +77,26 @@ export function HonestCompare(props: HonestCompareProps): Element {
   const onlyBehind = signal(false);
   const counts = computed(() => ({ ahead: verdicts.filter((v) => v === 1).length, even: verdicts.filter((v) => v === 0).length, behind: verdicts.filter((v) => v === -1).length }));
 
-  const cell = (v: CompareValue): unknown => {
-    if (v === true) return [glyph(checkIcon, "hm-svg hm-hc-yes"), h("span", { class: "hm-sr-only" }, t`Yes`)];
-    if (v === false) return [glyph(xIcon, "hm-svg hm-hc-no"), h("span", { class: "hm-sr-only" }, t`No`)];
-    if (v === "partial") return [glyph(minusIcon, "hm-svg hm-hc-part"), h("span", { class: "hm-hc-part-text" }, t`Partly`)];
+  const L = props.labels ?? {};
+  const own = props.renderCell;
+  const cell = (v: CompareValue, row: CompareRow, column: CompareColumn, verdict: 1 | 0 | -1 | null): unknown => {
+    const mine = own?.(v, { row, column, us: column.id === us, verdict });
+    if (mine !== undefined) return mine;
+    if (v === true) return [glyph(checkIcon, "hm-svg hm-hc-yes"), h("span", { class: "hm-sr-only" }, L.yes ?? t`Yes`)];
+    if (v === false) return [glyph(xIcon, "hm-svg hm-hc-no"), h("span", { class: "hm-sr-only" }, L.no ?? t`No`)];
+    if (v === "partial") return [glyph(minusIcon, "hm-svg hm-hc-part"), h("span", { class: "hm-hc-part-text" }, L.partly ?? t`Partly`)];
     return v == null ? h("span", { class: "hm-hc-none" }, "—") : v;
   };
   const tag = (v: 1 | 0 | -1 | null): Element | null =>
-    v === -1 ? h("span", { class: "hm-hc-tag is-behind" }, t`Behind`) : v === 1 ? h("span", { class: "hm-hc-tag is-ahead" }, t`Ahead`) : null;
+    props.tags === false ? null
+      : v === -1 ? h("span", { class: "hm-hc-tag is-behind" }, L.behind ?? t`Behind`) : v === 1 ? h("span", { class: "hm-hc-tag is-ahead" }, L.ahead ?? t`Ahead`) : null;
 
   const body = h("tbody", null, ...props.rows.flatMap((r, i) => {
     const v = verdicts[i]!;
     const hidden = (): boolean => onlyBehind() && v !== -1;
     const line = h("tr", { class: () => cx("hm-hc-row", v === -1 && "is-behind", v === 1 && "is-ahead", hidden() && "is-hidden"), hidden: hidden },
       h("th", { scope: "row", class: "hm-hc-label" }, h("span", null, r.label), tag(v)),
-      ...props.columns.map((c) => h("td", { class: cx("hm-hc-cell", c.id === us && "hm-hc-us") }, cell(r.values[c.id]))));
+      ...props.columns.map((c) => h("td", { class: cx("hm-hc-cell", c.id === us && "hm-hc-us") }, cell(r.values[c.id], r, c, v))));
     const note = r.note != null
       ? h("tr", { class: () => cx("hm-hc-note-row", v === -1 && "is-behind"), hidden: hidden },
         h("td", { colspan: String(props.columns.length + 1), class: "hm-hc-note" }, r.note))
@@ -88,10 +113,10 @@ export function HonestCompare(props: HonestCompareProps): Element {
 
   const summary = props.summary === false ? null : h("div", { class: "hm-hc-summary" },
     h("p", { class: "hm-hc-counts" },
-      () => t`Ahead in ${counts().ahead}, even in ${counts().even}, behind in ${counts().behind}.`),
-    counts().behind ? h("button", {
+      () => (L.counts ? L.counts(counts()) : t`Ahead in ${counts().ahead}, even in ${counts().even}, behind in ${counts().behind}.`)),
+    counts().behind && props.filter !== false ? h("button", {
       type: "button", class: "hm-hc-filter", "aria-pressed": () => String(onlyBehind()), onClick: () => onlyBehind.set(!onlyBehind.peek()),
-    }, () => (onlyBehind() ? t`Show all rows` : t`Only where we are behind`)) : null);
+    }, () => (onlyBehind() ? L.showAll ?? t`Show all rows` : L.onlyBehind ?? t`Only where we are behind`)) : null);
 
-  return h("div", { class: () => cx("hm-hc", val(props.class)) }, summary, h("div", { class: "hm-hc-scroll", tabindex: "0", role: "region", "aria-label": () => t`Comparison table` }, table));
+  return h("div", { class: () => cx("hm-hc", val(props.class)), "data-hm-color": colorAttr(props.color) }, summary, h("div", { class: "hm-hc-scroll", tabindex: "0", role: "region", "aria-label": () => L.region ?? t`Comparison table` }, table));
 }

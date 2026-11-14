@@ -7,6 +7,8 @@ case-insensitive, typo tolerant) and announces how many questions match.
 ```tsx
 <Faq layout="split" search title="Questions" lead="…" contact={<Button variant="secondary">Write to us</Button>}
   items={[{ q: "Is it free?", a: "Yes, MIT licensed." }, …]} />
+<Faq search items={…} count={false} reveal="none"
+  labels={{ search: "Type a word", empty: "Nothing found. Write to us.", count: (shown, total) => `${shown} / ${total}` }} />
 ```
 
 ## Props
@@ -18,6 +20,10 @@ case-insensitive, typo tolerant) and announces how many questions match.
 | `title`, `lead`, `contact` | node | — | split layout |
 | `search` | boolean | `false` | search box |
 | `multiple` | boolean | `false` | several open at once |
+| `labels` | `{ search, count, empty }` | translated | search placeholder and name, the count line (`(shown, total) => node`), the no-match text |
+| `count` | boolean | `true` | the "3 of 12 questions" line under the search box |
+| `reveal` | Reveal effect / `{ from, to }` / `none` | `up` | entrance of the heading column (split) |
+| `class` | string | — | extra class on the root (`.hm-faq`; parts: `.hm-faq-aside`, `.hm-faq-title`, `.hm-faq-search`, `.hm-faq-count`, `.hm-faq-empty`) |
 
 ## Accessibility
 

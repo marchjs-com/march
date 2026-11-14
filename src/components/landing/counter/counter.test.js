@@ -23,3 +23,14 @@ test("Counter: the final value is announced; roll mode draws a column per digit"
   assert.match(b.querySelector(".hm-sr-only").textContent, /98.?765/);
   dispose();
 });
+
+test("Counter: mode none shows every value at once", () => {
+  const v = signal(10);
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(Counter, { value: v, mode: "none", start: "now", class: "mine" }), el);
+  const view = el.querySelector(".hm-counter.mine .hm-counter-view");
+  assert.equal(view.textContent, "10");
+  v.set(250);
+  assert.equal(view.textContent, "250", "no tween: the text is the new value in the same tick");
+  dispose();
+});

@@ -7,13 +7,17 @@ import { appUrl } from "../../../base/index.ts";
 export const code = `<Hero variant="mesh" eyebrow="Yeni: tanışma yemekleri" title="Yakınındaki insanlarla bugün buluş" highlight="bugün buluş"
   lead="…" note="Ücretsiz" actions={[{ label: "HADİ'ye katıl", href: "/join", iconEnd: arrowRight }, { label: "Etkinliklere göz at" }]} />
 <Hero variant="product" media={<img src="/screen.png" alt="…" width={1600} height={1000} />} … />
-<Hero variant="video" video={{ src: "/clip.webm", poster: "/clip.jpg" }} … />`
+<Hero variant="video" video={{ src: "/clip.webm", poster: "/clip.jpg" }} … />
+<Hero variant="product" backdrop={false} frameBar={false} tilt={false} reveal="blur" … />   // every part can be left out
+<Hero reveal={{ from: { opacity: 0, transform: "scale(.8) rotate(-3deg)" }, to: { opacity: 1, transform: "scale(1) rotate(0deg)" } }} … />`
 
-export default function HeroDemo(props: { values: { variant: string; size: string; eyebrow: boolean; note: boolean } }) {
+export default function HeroDemo(props: { values: { variant: string; size: string; eyebrow: boolean; note: boolean; backdrop: boolean; reveal: string; frameBar: boolean; tilt: boolean } }) {
   return <div class="sc-site-frame sc-hero-frame">
     {() => {
       const v = props.values, variant = v.variant as HeroVariant
       return <Hero level={2} variant={variant} size={v.size as "md"} eyebrow={v.eyebrow ? "Yeni: tanışma yemekleri" : undefined} eyebrowHref={v.eyebrow ? "#" : undefined}
+        backdrop={v.backdrop} frameBar={v.frameBar} tilt={v.tilt}
+        reveal={v.reveal === "own" ? { from: { opacity: 0, transform: "scale(.8) rotate(-3deg)" }, to: { opacity: 1, transform: "scale(1) rotate(0deg)" } } : v.reveal as "up"}
         title="Yakınındaki insanlarla bugün buluş" highlight="bugün buluş"
         lead="Sosyal ağ, sohbet ve etkinlikler tek uygulamada. Ne yapmak istediğini seç; gerisini HADİ halleder."
         note={v.note ? "Ücretsiz · telefonda ve tarayıcıda" : undefined}

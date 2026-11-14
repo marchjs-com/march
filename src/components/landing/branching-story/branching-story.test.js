@@ -44,3 +44,49 @@ test("BranchingStory: choose, trail rewinds, endings counted, keys pick", async 
   dispose();
   manualClock(false);
 });
+
+test("BranchingStory: own texts, no keys, own choice content, no restart", async () => {
+  manualClock(true);
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(BranchingStory, {
+    passages: { ...P, c: { body: "end c" } }, start: "a", keys: false, restart: false, transition: "none",
+    labels: { path: "Trail", start: "Home", end: "Fin", endings: (n, total) => `${n}|${total}` },
+    renderChoice: (c, i) => h("b", { class: "own" }, `${i}:${c.to}`),
+  }), el);
+  assert.equal(el.querySelector(".hm-bs-trail").getAttribute("aria-label"), "Trail");
+  assert.equal(el.querySelector("[aria-current=step]").textContent, "Home");
+  assert.equal(el.querySelector(".hm-bs-found").textContent, "0|2");
+  assert.equal(el.querySelector(".hm-bs-key"), null);
+  assert.deepEqual([...el.querySelectorAll(".hm-bs-choice .own")].map((x) => x.textContent), ["0:b", "1:c"]);
+  el.querySelector("section").dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "1", bubbles: true }));
+  await settle();
+  assert.equal(title(el), "A", "number keys are off");
+  el.querySelectorAll(".hm-bs-choice")[1].click();
+  assert.equal(title(el), "Fin", "transition none: the passage changes at once");
+  assert.equal(el.querySelectorAll(".hm-bs-passage").length, 1);
+  assert.equal(el.querySelector(".hm-bs-end"), null, "no restart button, no action: no end row");
+  assert.equal(el.querySelector(".hm-bs-found").textContent, "1|2");
+  dispose();
+  manualClock(false);
+});
+
+test("BranchingStory: ready-made and own transitions, restart text", async () => {
+  manualClock(true);
+  const sides = [];
+  for (const transition of ["slide", "fade", (side) => { sides.push(side); return { leave: { opacity: [1, 0] }, enter: { opacity: [0, 1] }, duration: 100 }; }]) {
+    const el = document.createElement("div"); document.body.appendChild(el);
+    const dispose = render(() => h(BranchingStory, { passages: P, start: "a", transition, labels: { restart: "Again", endingPrefix: "End: " } }), el);
+    el.querySelectorAll(".hm-bs-choice")[1].click();
+    await settle(); await settle();
+    assert.equal(title(el), "C");
+    assert.equal(el.querySelectorAll(".hm-bs-passage").length, 1, "the old passage is gone after the transition");
+    assert.equal(el.querySelector(".hm-bs-restart").textContent, "Again");
+    assert.equal(el.querySelector(".hm-bs-ending").textContent, "End: Short");
+    el.querySelector(".hm-bs-restart").click();
+    await settle();
+    assert.equal(title(el), "A");
+    dispose();
+  }
+  assert.deepEqual(sides, [1, -1], "forward, then back");
+  manualClock(false);
+});

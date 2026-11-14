@@ -9,7 +9,7 @@ import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Accordion } from "../../../ui/accordion.ts";
 import { SearchBox } from "../../../ui/layout.ts";
 import { rank } from "../../../ui/fold.ts";
-import { Reveal } from "../reveal/index.ts";
+import { Reveal, type RevealOptions } from "../reveal/index.ts";
 
 export interface FaqItem { q: string; a: unknown; /** Extra words for search. */ keywords?: string | undefined }
 export interface FaqProps {
@@ -23,6 +23,18 @@ export interface FaqProps {
   search?: boolean | undefined;
   /** Several open at once (default false). */
   multiple?: boolean | undefined;
+  /** Every text the block writes itself; the defaults are translated. `count` gets the shown and the total number. */
+  labels?: {
+    /** Placeholder and accessible name of the search box (default "Search questions"). */
+    search?: string;
+    count?: (shown: number, total: number) => unknown;
+    /** Shown when no question matches. */
+    empty?: unknown;
+  } | undefined;
+  /** The "3 of 12 questions" line under the search box (default true). */
+  count?: boolean | undefined;
+  /** split: entrance of the heading column (default "up"): a Reveal effect, your own `{ from, to }`, or "none". */
+  reveal?: RevealOptions["effect"];
   class?: ClassProp | undefined;
 }
 
@@ -33,20 +45,25 @@ export function Faq(props: FaqProps): Element {
     const s = q().trim();
     return s ? rank(s, props.items, (x) => ({ title: x.q, keywords: [x.keywords ?? "", typeof x.a === "string" ? x.a : ""] })).map((r) => r.item) : props.items;
   });
+  const L = props.labels ?? {};
   const list = h("div", { class: "hm-faq-list" },
     props.search ? h("div", { class: "hm-faq-search" },
-      h(SearchBox, { value: q, debounce: 120, placeholder: t`Search questions`, "aria-label": t`Search questions` }),
-      h("p", { class: "hm-faq-count", "aria-live": "polite" }, () => (q().trim() ? t`${shown().length} of ${props.items.length} questions` : ""))) : null,
+      h(SearchBox, { value: q, debounce: 120, placeholder: L.search ?? t`Search questions`, "aria-label": L.search ?? t`Search questions` }),
+      props.count === false ? null : h("p", { class: "hm-faq-count", "aria-live": "polite" },
+        () => (q().trim() ? (L.count ? L.count(shown().length, props.items.length) : t`${shown().length} of ${props.items.length} questions`) : ""))) : null,
     () => {
       const items = shown();
-      if (!items.length) return h("p", { class: "hm-faq-empty" }, t`No question matches. Try other words.`);
+      if (!items.length) return h("p", { class: "hm-faq-empty" }, L.empty ?? t`No question matches. Try other words.`);
       return h(Accordion, { variant: "separated", multiple: !!props.multiple, items: items.map((x) => ({ id: x.q, title: x.q, content: x.a })) });
     });
   const split = props.layout === "split";
+  const head = (): unknown[] => [
+    props.title != null && h("h2", { class: "hm-faq-title" }, () => val(props.title)),
+    props.lead != null && h("p", { class: "hm-faq-lead" }, () => val(props.lead)),
+    props.contact != null && h("div", { class: "hm-faq-contact" }, props.contact)];
+  const aside = !split ? null : props.reveal === "none" ? h("div", { class: "hm-faq-aside" }, head())
+    : h(Reveal, { class: "hm-faq-aside", effect: props.reveal ?? "up", stagger: 80 }, head());
   return h("div", { class: cx("hm-faq", split && "hm-faq-split", val(props.class)) },
-    split ? h(Reveal, { class: "hm-faq-aside", effect: "up", stagger: 80 },
-      props.title != null && h("h2", { class: "hm-faq-title" }, () => val(props.title)),
-      props.lead != null && h("p", { class: "hm-faq-lead" }, () => val(props.lead)),
-      props.contact != null && h("div", { class: "hm-faq-contact" }, props.contact)) : null,
+    split ? aside : null,
     list) as Element;
 }

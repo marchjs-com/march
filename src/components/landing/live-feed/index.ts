@@ -52,10 +52,20 @@ export interface LiveFeedProps {
   live?: "off" | "polite" | undefined;
   /** Show the pause button (default true). */
   pausable?: boolean | undefined;
-  /** How a new item arrives: flip (default), slide, fade, pop, drop, zoom, blur, swing, unfold, glide, spin, or your own keyframes. */
-  enter?: FeedEnter | FeedMotion | undefined;
-  /** How the oldest item leaves: blur (default), fade, shrink, fall, slide, dissolve, fold, or your own keyframes. */
-  leave?: FeedLeave | FeedMotion | undefined;
+  /** Text of the pause button while the feed runs (default "Live · pause"). */
+  pauseLabel?: unknown | undefined;
+  /** Text of the pause button while the feed is paused (default "Paused · resume"). */
+  resumeLabel?: unknown | undefined;
+  /** The pulsing dot in the pause button (default true). */
+  pulse?: boolean | undefined;
+  /** Pause while the pointer or keyboard focus is inside the feed (default true). */
+  pauseOnHover?: boolean | undefined;
+  /** Draw an item yourself: the content of its row / card (the feed keeps the list item, its motion and the glow). */
+  renderItem?: ((item: FeedItem) => unknown) | undefined;
+  /** How a new item arrives: flip (default), slide, fade, pop, drop, zoom, blur, swing, unfold, glide, spin, "none", or your own keyframes. */
+  enter?: FeedEnter | "none" | FeedMotion | undefined;
+  /** How the oldest item leaves: blur (default), fade, shrink, fall, slide, dissolve, fold, "none", or your own keyframes. */
+  leave?: FeedLeave | "none" | FeedMotion | undefined;
   /** Accent ring that glows around a new item and fades (default true). */
   glow?: boolean | undefined;
   /** The others glide to their new place (default true); false: they jump. */
@@ -71,7 +81,10 @@ export function LiveFeed(props: LiveFeedProps): Element {
   const nodes = new Map<FeedItem["id"], HTMLElement>();
   const wall = (): boolean => props.variant === "wall";
 
-  const card = (it: FeedItem): HTMLElement => h("li", { class: "hm-lf-item", "data-hm-color": colorAttr(it.color) },
+  const render = props.renderItem;
+  const card = (it: FeedItem): HTMLElement => render
+    ? h("li", { class: "hm-lf-item hm-lf-own", "data-hm-color": colorAttr(it.color) }, render(it), h("span", { class: "hm-lf-glow", "aria-hidden": "true" })) as HTMLElement
+    : h("li", { class: "hm-lf-item", "data-hm-color": colorAttr(it.color) },
     it.avatar != null ? h("span", { class: "hm-lf-avatar", "aria-hidden": "true" }, it.avatar) : h("span", { class: "hm-lf-dot", "aria-hidden": "true" }),
     h("span", { class: "hm-lf-text" }, h("span", { class: "hm-lf-title" }, it.title), it.body != null ? h("span", { class: "hm-lf-body" }, it.body) : null),
     it.meta != null ? h("span", { class: "hm-lf-meta" }, it.meta) : null,
@@ -96,7 +109,7 @@ export function LiveFeed(props: LiveFeedProps): Element {
       shown.unshift(it); nodes.set(it.id, el); list.prepend(el);
       for (let i = 0; i < drop; i++) nodes.delete(shown.pop()!.id);
       leaving.forEach((old, k) => {
-        if (!motion || !at) { old.remove(); return; }
+        if (!motion || !at || props.leave === "none") { old.remove(); return; }
         const b = boxes[k]!;
         old.classList.add("is-leaving");
         setStyle(old, { top: `${b.top - at.top}px`, left: `${b.left - at.left}px`, width: `${b.width}px`, height: `${b.height}px` });
@@ -106,11 +119,15 @@ export function LiveFeed(props: LiveFeedProps): Element {
     if (props.move === false) mutate(); else flip(staying, mutate, { enter: false, duration: 680, easing: "expo" });
     flip([el], () => {}, { enter: false });
     const ctx = { wall: wall(), rtl: untrack(dir) === "rtl" };
-    const inn = feedMotion(FEED_ENTER, props.enter, "flip", ctx), out = feedMotion(FEED_LEAVE, props.leave, "blur", ctx);
-    animate(el, inn.keyframes as never, { duration: inn.duration ?? 700, easing: inn.easing ?? "out" });
     const glow = el.querySelector(".hm-lf-glow"), avatar = el.querySelector(".hm-lf-avatar, .hm-lf-dot");
+    if (props.enter !== "none") {
+      const inn = feedMotion(FEED_ENTER, props.enter, "flip", ctx);
+      animate(el, inn.keyframes as never, { duration: inn.duration ?? 700, easing: inn.easing ?? "out" });
+      if (avatar) animate(avatar, { transform: ["scale(0) rotate(-40deg)", "scale(1.18) rotate(8deg)", "scale(1) rotate(0deg)"] }, { duration: 760, delay: 160, easing: "out" });
+    }
     if (glow && props.glow !== false) animate(glow, { opacity: [0, 1, 0], transform: ["scale(.96)", "scale(1.02)", "scale(1)"] }, { duration: 2200, easing: "out" });
-    if (avatar) animate(avatar, { transform: ["scale(0) rotate(-40deg)", "scale(1.18) rotate(8deg)", "scale(1) rotate(0deg)"] }, { duration: 760, delay: 160, easing: "out" });
+    if (props.leave === "none") return;
+    const out = feedMotion(FEED_LEAVE, props.leave, "blur", ctx);
     for (const old of leaving) {
       void animate(old, out.keyframes as never, { duration: out.duration ?? 450, easing: out.easing ?? "in", fill: "forwards" })
         .finished.then(() => old.remove());
@@ -150,12 +167,13 @@ export function LiveFeed(props: LiveFeedProps): Element {
 
   const pause = props.pausable === false ? null : h("button", {
     type: "button", class: "hm-lf-pause", "aria-pressed": () => String(paused()), onClick: () => paused.set(!paused.peek()),
-  }, h("span", { class: () => cx("hm-lf-pulse", paused() && "is-off"), "aria-hidden": "true" }), () => (paused() ? t`Paused · resume` : t`Live · pause`));
+  }, props.pulse === false ? null : h("span", { class: () => cx("hm-lf-pulse", paused() && "is-off"), "aria-hidden": "true" }),
+  () => (paused() ? props.resumeLabel ?? t`Paused · resume` : props.pauseLabel ?? t`Live · pause`));
 
   const root = h("section", { class: () => cx("hm-lf", wall() ? "hm-lf-wall" : "hm-lf-rows", val(props.class)), "aria-label": () => props.label ?? t`Live activity` },
     pause, list) as HTMLElement;
 
-  listen(root, {
+  if (props.pauseOnHover !== false) listen(root, {
     pointerenter: () => hovering.set(true), pointerleave: () => hovering.set(false),
     focusin: () => hovering.set(true), focusout: (e: FocusEvent) => { if (!root.contains(e.relatedTarget as Node | null)) hovering.set(false); },
   });

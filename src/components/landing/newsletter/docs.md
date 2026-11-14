@@ -7,6 +7,8 @@ is announced.
 ```tsx
 <Newsletter title="Stay in the loop" lead="One email a month."
   onSubmit={(email) => api.subscribe(email)} note="Unsubscribe any time." />
+<Newsletter onSubmit={save} button="Join" done="You are in." doneIcon={<Icon of={heart} />} motion={false}
+  labels={{ email: "Your email", invalid: "That does not look like an email.", error: "Could not save. Try again." }} />
 ```
 
 ## Props
@@ -19,6 +21,10 @@ is announced.
 | `button` | node | `Subscribe` | |
 | `done` | node | `Thanks! Check your inbox.` | success line |
 | `layout` | `inline` `stacked` | `inline` | |
+| `labels` | `{ email, invalid, error }` | translated | the field's accessible name, the invalid-address message, the fallback error message |
+| `doneIcon` | boolean / node | `true` | the check mark of the success line, or your own |
+| `motion` | boolean | `true` | the shake on an error and the fold / pop on success |
+| `class` | string | — | extra class on the root (`.hm-nl`; parts: `.hm-nl-title`, `.hm-nl-form`, `.hm-nl-field`, `.hm-nl-btn`, `.hm-nl-done`, `.hm-nl-msg`, `.hm-nl-note`) |
 
 ## Accessibility
 

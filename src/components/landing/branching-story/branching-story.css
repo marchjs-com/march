@@ -33,6 +33,7 @@
 .hm-bs-choice:dir(rtl):hover { translate: -4px 0; }
 .hm-bs-choice:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: 2px; }
 .hm-bs-key { display: grid; place-items: center; inline-size: 1.75rem; block-size: 1.75rem; border-radius: var(--hm-radius-2); background: var(--hm-surface-2); font: inherit; font-size: var(--hm-text-xs); font-weight: var(--hm-weight-semibold); color: var(--hm-muted); }
+.hm-bs-choice:not(:has(> .hm-bs-key)) { grid-template-columns: minmax(0, 1fr); }
 .hm-bs-choice-text { display: grid; gap: .1em; font-weight: var(--hm-weight-semibold); }
 .hm-bs-choice-text small { color: var(--hm-muted); font-weight: normal; font-size: var(--hm-text-xs); }
 .hm-bs-choices.is-deciding .hm-bs-choice:not(.is-picked) { opacity: .35; }

@@ -10,6 +10,9 @@ lifted out of the flow while it fades and wall cards share one height, so the pa
 <LiveFeed items={$events} variant="wall" live="polite" />
 <LiveFeed next={next} enter="drop" leave="fall" glow={false} />
 <LiveFeed next={next} enter={{ keyframes: { opacity: [0, 1], transform: ["rotate(-6deg) scale(.8)", "none"] }, duration: 500 }} />
+<LiveFeed next={next} pauseLabel="On air · stop" resumeLabel="Stopped · go on" pulse={false} pauseOnHover={false}
+  renderItem={(item) => <><b>{item.title}</b> <small>{item.meta}</small></>} />   // own rows, own button texts
+<LiveFeed next={next} enter="none" leave="none" glow={false} move={false} />        // no motion at all
 ```
 
 ## Props
@@ -25,10 +28,15 @@ lifted out of the flow while it fades and wall cards share one height, so the pa
 | `label` | string | "Live activity" | accessible name |
 | `live` | `off` `polite` | `off` | announce new items |
 | `pausable` | boolean | `true` | the Live · pause button |
-| `enter` | preset / `{ keyframes, duration?, easing? }` | `flip` | how a new item arrives |
-| `leave` | preset / `{ keyframes, duration?, easing? }` | `blur` | how the oldest leaves |
+| `pauseLabel`, `resumeLabel` | node | "Live · pause", "Paused · resume" | text of the pause button, running / paused |
+| `pulse` | boolean | `true` | the pulsing dot in the pause button |
+| `pauseOnHover` | boolean | `true` | pause while the pointer or focus is inside |
+| `renderItem` | `(item) => node` | — | draw an item yourself (the content of its row / card) |
+| `enter` | preset / `"none"` / `{ keyframes, duration?, easing? }` | `flip` | how a new item arrives |
+| `leave` | preset / `"none"` / `{ keyframes, duration?, easing? }` | `blur` | how the oldest leaves |
 | `glow` | boolean | `true` | accent ring around a new item |
 | `move` | boolean | `true` | the others glide to their new place (FLIP) |
+| `class` | string | — | extra class on the root (`.hm-lf`; parts: `.hm-lf-pause`, `.hm-lf-list`, `.hm-lf-item`, `.hm-lf-avatar`, `.hm-lf-title`, `.hm-lf-meta`) |
 
 `enter` presets: `flip` (3D swing out of a blur), `slide`, `fade`, `pop` (overshoot), `drop` (falls and bounces),
 `zoom` (from in front), `blur` (sharpens out of a glow), `swing` (hangs and swings), `unfold` (blind), `glide` (from
@@ -40,7 +48,7 @@ light), `fold`. The tables are exported as `FEED_ENTER` and `FEED_LEAVE`.
 ## Accessibility
 
 A labelled `section` with a list. Moving content can be stopped (WCAG 2.2.2): the feed pauses while the pointer or
-keyboard focus is inside it, and the Live · pause button (`aria-pressed`) stops it until pressed again. New items are
+keyboard focus is inside it (keep `pauseOnHover` on unless the page has another way to stop it), and the Live · pause button (`aria-pressed`) stops it until pressed again. New items are
 not announced by default (a busy feed would talk over the page); `live="polite"` announces them, never while paused.
 The feed only pulls while on screen and runs on the motion clock, so the global motion pause stops it too. Reduced
 motion: items appear without sliding.

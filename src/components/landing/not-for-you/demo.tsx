@@ -2,7 +2,9 @@
 import { NotForYou, type NotForYouItem } from "./index.ts";
 
 export const code = `<NotForYou check items={[{ text: "Hep aynı beş arkadaşla buluşuyorsun", detail: "…" }]}
-  forYou={[{ text: "Yeni insanlarla tanışmak istiyorsun" }]} />`
+  forYou={[{ text: "Yeni insanlarla tanışmak istiyorsun" }]} />
+<NotForYou check items={…} mark={(state) => (state === "not" ? "🙅" : state === "marked" ? "🎉" : "👍")}
+  meLabel={false} hint={false} markedHint={false} verdict={false} />   // own marks; every text can be changed or left out`
 
 export const NOT_FOR_YOU: NotForYouItem[] = [
   { text: "Hep aynı beş arkadaşla buluşuyorsun", detail: "Yeni biri gelmesin istiyorsan bir mesaj grubu sana yeter.", instead: "Yeni yüzlere açıksın: HADİ'de her hafta yeni insanlarla tanışırsın." },
@@ -16,8 +18,12 @@ export const FOR_YOU: NotForYouItem[] = [
   { text: "Sohbet, akış ve etkinlik tek yerde olsun", detail: "Ayrı ayrı uygulama yerine tek bir HADİ." },
 ]
 
-export default function NotForYouDemo(props: { values: { variant: string; check: boolean; both: boolean } }) {
+const OWN_MARKS = { not: "🙅", marked: "🎉", for: "👍" }
+
+export default function NotForYouDemo(props: { values: { variant: string; check: boolean; both: boolean; mark: string; me: boolean; verdict: boolean } }) {
   return <div>
-    {() => { const v = { ...props.values }; return <NotForYou variant={v.variant as "cards" | "list"} check={v.check} markedHint="Sen bir HADİ'lisin" items={NOT_FOR_YOU} forYou={v.both ? FOR_YOU : undefined} /> }}
+    {() => { const v = { ...props.values }; return <NotForYou variant={v.variant as "cards" | "list"} check={v.check} markedHint={v.me ? "Sen bir HADİ'lisin" : false}
+      mark={v.mark === "off" ? false : v.mark === "own" ? (state) => OWN_MARKS[state] : true} meLabel={v.me ? undefined : false} hint={v.me ? undefined : false} verdict={v.verdict ? undefined : false}
+      items={NOT_FOR_YOU} forYou={v.both ? FOR_YOU : undefined} /> }}
   </div>
 }

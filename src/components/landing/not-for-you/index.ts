@@ -26,24 +26,29 @@ export interface NotForYouProps {
   items: NotForYouItem[];
   /** Who it is for (shown beside, with check marks). */
   forYou?: NotForYouItem[] | undefined;
-  /** Heading of the "not for you" list (default "Not for you if…"). */
+  /** Heading of the "not for you" list (default "Not for you if…"); false: no heading. */
   title?: unknown | undefined;
-  /** Heading of the "for you" list (default "For you if…"). */
+  /** Heading of the "for you" list (default "For you if…"); false: no heading. */
   forYouTitle?: unknown | undefined;
   /** Let the visitor strike out the lines that are not them, and show a verdict. */
   check?: boolean | undefined;
-  /** The verdict text for `n` struck-out lines of `total` (default: a prompt, then how many still apply). */
-  verdict?: ((n: number, total: number) => unknown) | undefined;
+  /** The verdict text for `n` struck-out lines of `total` (default: a prompt, then how many still apply); false: no verdict line. */
+  verdict?: ((n: number, total: number) => unknown) | false | undefined;
   /** `cards` (default) · `list`: plain lines with a rule between them. */
   variant?: "cards" | "list" | undefined;
   /** Called with the indexes of the struck-out lines. */
   onCheck?: ((marked: number[]) => void) | undefined;
-  /** The label on every checkable card (default "That's me"). */
+  /** The label on every checkable card (default "That's me"); false: no label. */
   meLabel?: unknown | undefined;
-  /** Small text under the label before a tap (default "Not you? Tap it!"). */
+  /** Small text under the label before a tap (default "Not you? Tap it!"); false: none. */
   hint?: unknown | undefined;
-  /** Small text under the label after a tap (default "Not you"): e.g. "You belong here". */
+  /** Small text under the label after a tap (default "Not you"): e.g. "You belong here"; false: none. */
   markedHint?: unknown | undefined;
+  /**
+   * The round marks: true (default: a cross, a tick on the "for you" lines and on a struck-out line), false (none), or
+   * `(state, item, index) => content` with state "not" (applies), "marked" (struck out) or "for" (the for-you list).
+   */
+  mark?: boolean | ((state: "not" | "marked" | "for", item: NotForYouItem, index: number) => unknown) | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -66,37 +71,41 @@ export function NotForYou(props: NotForYouProps): Element {
   };
   const count = computed(() => marked().size);
 
+  const own = typeof props.mark === "function" ? props.mark : null;
   const line = (it: NotForYouItem, i: number, kind: "not" | "for"): Element => {
     const body = [
       // a checkable line has both marks: the cross turns into a tick once it is struck out
-      h("span", { class: "hm-nfy-mark", "aria-hidden": "true" }, kind === "not" && props.check
-        ? [glyph(xIcon, "hm-svg hm-nfy-mark-x"), glyph(checkIcon, "hm-svg hm-nfy-mark-ok")]
-        : glyph(kind === "not" ? xIcon : checkIcon)),
+      props.mark === false ? null : h("span", { class: cx("hm-nfy-mark", own && "is-own"), "aria-hidden": "true" }, kind === "not" && props.check
+        ? own
+          ? [h("span", { class: "hm-nfy-mark-x" }, own("not", it, i)), h("span", { class: "hm-nfy-mark-ok" }, own("marked", it, i))]
+          : [glyph(xIcon, "hm-svg hm-nfy-mark-x"), glyph(checkIcon, "hm-svg hm-nfy-mark-ok")]
+        : own ? own(kind, it, i) : glyph(kind === "not" ? xIcon : checkIcon)),
       h("span", { class: "hm-nfy-text" }, h("strong", null, it.text), it.detail != null ? h("span", { class: "hm-nfy-detail" }, it.detail) : null,
         kind === "not" && props.check && it.instead != null
           ? h("span", { class: "hm-nfy-instead", "aria-hidden": () => String(!marked().has(i)) }, h("span", { class: "hm-nfy-instead-in" }, it.instead))
           : null),
     ];
     if (kind === "not" && props.check) {
+      const me = props.meLabel === false ? null : h("span", { class: "hm-nfy-me-label" }, () => props.meLabel ?? t`That's me`);
+      const hint = props.hint === false && props.markedHint === false ? null
+        : h("small", { class: "hm-nfy-me-hint" }, () => { const x = marked().has(i) ? props.markedHint ?? t`Not you` : props.hint ?? t`Not you? Tap it!`; return x === false ? null : x; });
       return h("li", { class: "hm-nfy-item" },
         h("button", {
           type: "button", class: () => cx("hm-nfy-toggle", marked().has(i) && "is-on"), role: "checkbox",
           "aria-checked": () => String(marked().has(i)), onClick: () => toggle(i),
-        }, ...body, h("span", { class: "hm-nfy-me", "aria-hidden": "true" },
-          h("span", { class: "hm-nfy-me-label" }, () => props.meLabel ?? t`That's me`),
-          h("small", { class: "hm-nfy-me-hint" }, () => (marked().has(i) ? props.markedHint ?? t`Not you` : props.hint ?? t`Not you? Tap it!`)))));
+        }, ...body, me || hint ? h("span", { class: "hm-nfy-me", "aria-hidden": "true" }, me, hint) : null));
     }
     return h("li", { class: "hm-nfy-item" }, h("div", { class: "hm-nfy-row" }, ...body));
   };
   const list = (title: unknown, items: NotForYouItem[], kind: "not" | "for"): Element =>
     h("section", { class: cx("hm-nfy-col", `hm-nfy-${kind}`) },
-      h("h3", { class: "hm-nfy-title" }, title),
+      title === false ? null : h("h3", { class: "hm-nfy-title" }, title),
       h("ul", { class: "hm-nfy-list", role: "list" }, ...items.map((it, i) => line(it, i, kind))));
 
   return h("div", { class: () => cx("hm-nfy", `hm-nfy-v-${props.variant ?? "cards"}`, props.forYou?.length && "hm-nfy-both", val(props.class)) },
     h("div", { class: "hm-nfy-cols" },
       list(props.title ?? t`Not for you if…`, props.items, "not"),
       props.forYou?.length ? list(props.forYouTitle ?? t`For you if…`, props.forYou, "for") : null),
-    props.check ? h("p", { class: () => cx("hm-nfy-verdict", count() >= total && "is-in", count() > 0 && count() < total && "is-some"), role: "status", "aria-live": "polite" },
-      () => (props.verdict ?? notForYouVerdict)(count(), total)) : null);
+    props.check && props.verdict !== false ? h("p", { class: () => cx("hm-nfy-verdict", count() >= total && "is-in", count() > 0 && count() < total && "is-some"), role: "status", "aria-live": "polite" },
+      () => (props.verdict || notForYouVerdict)(count(), total)) : null);
 }

@@ -13,8 +13,8 @@
 .hm-hc-corner, .hm-hc-label { position: sticky; inset-inline-start: 0; z-index: 1; background: var(--hm-surface); }
 .hm-hc-label { text-align: start !important; font-weight: var(--hm-weight-medium, 500); }
 .hm-hc-label > span:first-child { margin-inline-end: var(--hm-space-2); }
-.hm-hc-us { background: color-mix(in srgb, var(--hm-primary) 8%, transparent); }
-.hm-hc-head.hm-hc-us { color: var(--hm-primary); box-shadow: inset 0 3px 0 var(--hm-primary); }
+.hm-hc-us { background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 8%, transparent); }
+.hm-hc-head.hm-hc-us { color: var(--hm-accent-text, var(--hm-primary)); box-shadow: inset 0 3px 0 var(--hm-accent, var(--hm-primary)); }
 .hm-hc-cell .hm-svg { inline-size: 1.15rem; block-size: 1.15rem; vertical-align: middle; }
 .hm-hc-yes { color: var(--hm-success-text); }
 .hm-hc-no { color: var(--hm-danger-text); }

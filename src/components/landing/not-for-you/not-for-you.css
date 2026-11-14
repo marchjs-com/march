@@ -14,10 +14,13 @@
 .hm-nfy-toggle:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: 2px; }
 .hm-nfy-toggle.is-on { border-color: var(--hm-success); background: var(--hm-success-soft, var(--hm-surface-2)); }
 .hm-nfy-row { grid-template-columns: auto minmax(0, 1fr); }
+.hm-nfy-row:not(:has(> .hm-nfy-mark)) { grid-template-columns: minmax(0, 1fr); }
+.hm-nfy-toggle:not(:has(> .hm-nfy-mark)) { grid-template-columns: minmax(0, 1fr) auto; }
 .hm-nfy-mark { display: grid; place-items: center; inline-size: 1.75rem; block-size: 1.75rem; border-radius: var(--hm-radius-full); }
 .hm-nfy-mark { position: relative; transition: background var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }
 .hm-nfy-mark .hm-svg { inline-size: 1rem; block-size: 1rem; transition: opacity var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease-spring); }
 .hm-nfy-mark .hm-nfy-mark-ok { position: absolute; opacity: 0; transform: scale(.3) rotate(-90deg); }
+.hm-nfy-mark.is-own > span { display: grid; place-items: center; transition: opacity var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease-spring); }
 .hm-nfy-toggle.is-on .hm-nfy-mark-x { opacity: 0; transform: scale(.3) rotate(90deg); }
 .hm-nfy-toggle.is-on .hm-nfy-mark-ok { opacity: 1; transform: none; }
 .hm-nfy-not .hm-nfy-mark { background: var(--hm-danger-soft, var(--hm-surface-2)); color: var(--hm-danger-text); }
@@ -43,4 +46,4 @@
 .hm-nfy-verdict { margin: 0; padding: var(--hm-space-3) var(--hm-space-4); border-radius: var(--hm-radius-3); background: var(--hm-surface-2); font-weight: var(--hm-weight-semibold); transition: background var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }
 .hm-nfy-verdict.is-in { background: var(--hm-success-soft, var(--hm-surface-2)); color: var(--hm-success-text); }
 .hm-nfy-verdict.is-some { background: var(--hm-warn-soft, var(--hm-surface-2)); color: var(--hm-warn-text); }
-@media (prefers-reduced-motion: reduce) { .hm-nfy-toggle, .hm-nfy-verdict, .hm-nfy-instead, .hm-nfy-mark, .hm-nfy-mark .hm-svg { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .hm-nfy-toggle, .hm-nfy-verdict, .hm-nfy-instead, .hm-nfy-mark, .hm-nfy-mark .hm-svg, .hm-nfy-mark.is-own > span { transition: none; } }

@@ -77,3 +77,39 @@ test("LiveFeed: every enter / leave preset gives keyframes; a custom motion and 
   dispose();
   manualClock(false);
 });
+
+test("LiveFeed: own button texts, no pulse dot, own item content, hover does not pause when switched off", () => {
+  manualClock(true);
+  let k = 0;
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(LiveFeed, {
+    next: () => ({ id: k, title: `n${k++}` }), every: 100, max: 3, pauseLabel: "On air", resumeLabel: "Stopped", pulse: false, pauseOnHover: false,
+    renderItem: (it) => h("b", { class: "own" }, `#${it.title}`),
+  }), el);
+  const own = () => [...el.querySelectorAll(".hm-lf-item")].filter((x) => !x.classList.contains("is-leaving")).map((x) => x.querySelector(".own").textContent);
+  assert.deepEqual(own(), ["#n2", "#n1", "#n0"]);
+  assert.equal(el.querySelector(".hm-lf-title"), null, "the default row parts are not drawn");
+  assert.ok(el.querySelector(".hm-lf-item .hm-lf-glow"), "the glow stays");
+  const btn = el.querySelector(".hm-lf-pause");
+  assert.equal(btn.textContent, "On air");
+  assert.equal(btn.querySelector(".hm-lf-pulse"), null);
+  el.querySelector("section").dispatchEvent(new globalThis.Event("pointerenter"));
+  for (let i = 0; i < 7; i++) step(16);
+  assert.equal(own()[0], "#n3", "still pulling while hovered");
+  btn.click();
+  assert.equal(btn.textContent, "Stopped");
+  dispose();
+  manualClock(false);
+});
+
+test("LiveFeed: enter and leave can be switched off", () => {
+  manualClock(true);
+  let k = 0;
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(LiveFeed, { next: () => ({ id: k, title: `q${k++}` }), every: 50, max: 2, enter: "none", leave: "none" }), el);
+  for (let i = 0; i < 10; i++) step(16);
+  assert.equal(titles(el)[0], "q3");
+  assert.equal(el.querySelectorAll(".hm-lf-item").length, 2, "the oldest is removed at once, nothing lingers");
+  dispose();
+  manualClock(false);
+});

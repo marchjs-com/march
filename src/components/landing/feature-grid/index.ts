@@ -12,7 +12,7 @@ import { Grid } from "../../../ui/stack.ts";
 import { Card } from "../../../ui/card.ts";
 import { IconTile, type IconTone } from "../../../ui/app.ts";
 import { measure, mutate } from "../../../motion/engine/clock.ts";
-import { revealOnScroll, type RevealEffect } from "../reveal/index.ts";
+import { revealOnScroll, type RevealOptions } from "../reveal/index.ts";
 
 export interface FeatureItem {
   icon?: unknown | undefined;
@@ -33,8 +33,8 @@ export interface FeatureGridProps {
   cols?: 2 | 3 | 4 | undefined;
   /** Pointer light on cards and bento tiles (default true). */
   spotlight?: boolean | undefined;
-  /** Entrance (default "up"; "none" to switch it off). */
-  reveal?: RevealEffect | "none" | undefined;
+  /** Entrance (default "up"): a Reveal effect, your own `{ from, to }`, or "none" to switch it off. */
+  reveal?: RevealOptions["effect"];
   class?: ClassProp | undefined;
 }
 

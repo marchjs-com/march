@@ -19,7 +19,7 @@ import { Aurora } from "../../../fx/index.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { scrollTimeline } from "../../../motion/scroll-fx.ts";
 import { onCleanup, getOwner } from "../../../core/reactive.ts";
-import { Reveal } from "../reveal/index.ts";
+import { Reveal, type RevealOptions } from "../reveal/index.ts";
 import { VideoBackground } from "../video-background/index.ts";
 import { Parallax, type ParallaxLayer } from "../parallax/index.ts";
 
@@ -33,6 +33,8 @@ export interface HeroProps {
   eyebrow?: MaybeFn<unknown> | undefined;
   /** Makes the eyebrow a link. */
   eyebrowHref?: string | undefined;
+  /** The arrow after a linked eyebrow: true (default "→"), false, or your own node. */
+  eyebrowArrow?: boolean | Node | undefined;
   title: MaybeFn<unknown>;
   /** Part of a string title drawn with the brand gradient. */
   highlight?: string | undefined;
@@ -53,6 +55,14 @@ export interface HeroProps {
   size?: "md" | "lg" | "screen" | undefined;
   /** Heading level of the title (default 1: the page title; 2 when the hero is not the top of the page). */
   level?: 1 | 2 | undefined;
+  /** The decorative layers of the variant (grid, mesh, aurora, dots, pointer light, grain): default true; false: none. */
+  backdrop?: boolean | undefined;
+  /** Entrance of the copy (default "up") and of the split media: a Reveal effect, your own `{ from, to }`, or "none". */
+  reveal?: RevealOptions["effect"];
+  /** product: the window bar with three dots on the frame (default true). */
+  frameBar?: boolean | undefined;
+  /** product: the frame starts tilted and flattens as you scroll (default true). */
+  tilt?: boolean | undefined;
   class?: ClassProp | undefined;
   children?: unknown | undefined;
 }
@@ -84,37 +94,44 @@ function mediaNode(m: HeroImage | Node | undefined, cls: string): unknown {
 export function Hero(props: HeroProps): Element {
   const variant = props.variant ?? "centered";
   const align = props.align ?? (variant === "split" ? "start" : "center");
-  const copy = h(Reveal, { class: cx("hm-hero-copy", `hm-hero-copy-${align}`), effect: "up", stagger: 90, duration: 900 },
+  const still = props.reveal === "none";
+  const arrow = props.eyebrowArrow === false ? null
+    : h("span", { class: "hm-hero-eyebrow-arrow", "aria-hidden": "true" }, props.eyebrowArrow && props.eyebrowArrow !== true ? props.eyebrowArrow : "→");
+  const copyClass = cx("hm-hero-copy", `hm-hero-copy-${align}`);
+  const parts = [
     props.eyebrow != null && (props.eyebrowHref
-      ? h("a", { class: "hm-hero-eyebrow", href: props.eyebrowHref }, h(Badge, { tone: "primary" }, () => val(props.eyebrow)), h("span", { class: "hm-hero-eyebrow-arrow", "aria-hidden": "true" }, "→"))
+      ? h("a", { class: "hm-hero-eyebrow", href: props.eyebrowHref }, h(Badge, { tone: "primary" }, () => val(props.eyebrow)), arrow)
       : h("p", { class: "hm-hero-eyebrow" }, h(Badge, { tone: "primary" }, () => val(props.eyebrow)))),
     h(`h${props.level ?? 1}`, { class: "hm-hero-title" }, () => titleNode(val(props.title), props.highlight)),
     props.lead != null && h("p", { class: "hm-hero-lead" }, () => val(props.lead)),
     props.actions?.length ? h("div", { class: "hm-hero-actions" }, actionButtons(props.actions)) : null,
     props.note != null && h("p", { class: "hm-hero-note" }, () => val(props.note)),
-    props.children ?? null);
+    props.children ?? null];
+  const copy = still ? h("div", { class: copyClass }, parts) : h(Reveal, { class: copyClass, effect: props.reveal ?? "up", stagger: 90, duration: 900 }, parts);
 
   const cls = cx("hm-hero", `hm-hero-v-${variant}`, `hm-hero-size-${props.size ?? "lg"}`, val(props.class));
   if (variant === "video" && props.video) return h("section", { class: cls }, h(VideoBackground, { src: props.video.src, poster: props.video.poster, tint: "dark", class: "hm-hero-stage" }, h("div", { class: "hm-hero-inner" }, copy)));
   if (variant === "parallax") return h("section", { class: cls }, h(Parallax, { layers: props.layers ?? [], pointer: 1, class: "hm-hero-stage", height: "100%" }, h("div", { class: "hm-hero-inner" }, copy)));
 
   const bg: unknown[] = [];
-  if (variant === "centered") bg.push(h(Overlay, { effect: "grid", opacity: 0.7 }), h(Overlay, { effect: "spotlight" }));
-  if (variant === "mesh") bg.push(h(Overlay, { effect: "mesh" }), h(Overlay, { effect: "grid", opacity: 0.35 }), h(Overlay, { effect: "spotlight" }), h(Overlay, { effect: "noise", opacity: 0.5 }));
-  if (variant === "aurora") bg.push(h(Aurora, { colors: props.colors ?? ["var(--hm-brand-orange, var(--hm-cat-1))", "var(--hm-brand-blue, var(--hm-cat-2))", "var(--hm-brand-green, var(--hm-cat-3))", "var(--hm-brand-purple, var(--hm-cat-4))"] }), h(Overlay, { effect: "noise", opacity: 0.45 }));
-  if (variant === "product" || variant === "split") bg.push(h(Overlay, { effect: "dots", opacity: 0.5, class: "hm-hero-dots" }));
+  if (props.backdrop === false) { /* no decorative layers */ }
+  else if (variant === "centered") bg.push(h(Overlay, { effect: "grid", opacity: 0.7 }), h(Overlay, { effect: "spotlight" }));
+  else if (variant === "mesh") bg.push(h(Overlay, { effect: "mesh" }), h(Overlay, { effect: "grid", opacity: 0.35 }), h(Overlay, { effect: "spotlight" }), h(Overlay, { effect: "noise", opacity: 0.5 }));
+  else if (variant === "aurora") bg.push(h(Aurora, { colors: props.colors ?? ["var(--hm-brand-orange, var(--hm-cat-1))", "var(--hm-brand-blue, var(--hm-cat-2))", "var(--hm-brand-green, var(--hm-cat-3))", "var(--hm-brand-purple, var(--hm-cat-4))"] }), h(Overlay, { effect: "noise", opacity: 0.45 }));
+  else if (variant === "product" || variant === "split") bg.push(h(Overlay, { effect: "dots", opacity: 0.5, class: "hm-hero-dots" }));
 
   let stage: unknown = null;
-  if (variant === "split") stage = h(Reveal, { class: "hm-hero-media-wrap", effect: "scale", self: true, delay: 200, duration: 1000 }, mediaNode(props.media, "hm-hero-media"));
+  if (variant === "split") stage = still ? h("div", { class: "hm-hero-media-wrap" }, mediaNode(props.media, "hm-hero-media"))
+    : h(Reveal, { class: "hm-hero-media-wrap", effect: "scale", self: true, delay: 200, duration: 1000 }, mediaNode(props.media, "hm-hero-media"));
   if (variant === "product") {
     const frame = h("div", { class: "hm-hero-frame" },
       h(Overlay, { effect: "glass", front: true, class: "hm-hero-frame-glass" }),
-      h("div", { class: "hm-hero-frame-bar", "aria-hidden": "true" }, h("i", {}), h("i", {}), h("i", {})),
+      props.frameBar === false ? null : h("div", { class: "hm-hero-frame-bar", "aria-hidden": "true" }, h("i", {}), h("i", {}), h("i", {})),
       mediaNode(props.media, "hm-hero-frame-body")) as HTMLElement;
     const wrap = h("div", { class: "hm-hero-product" }, frame) as HTMLElement;
     // tilted at first, flat once the frame is well into the viewport (Linear / Apple style)
     // (the motion core's scrollTimeline seeks the tilt by the frame's passage; reduced motion keeps it flat)
-    if (!reducedMotion()) {
+    if (!reducedMotion() && props.tilt !== false) {
       const stop = scrollTimeline(frame, { transform: ["perspective(1400px) rotateX(22deg) scale(.9) translate3d(0, 40px, 0)", "perspective(1400px) rotateX(0deg) scale(1) translate3d(0, 0, 0)"] }, { track: wrap, range: [0, 0.5], easing: "out" });
       if (getOwner()) onCleanup(stop);
     }

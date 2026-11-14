@@ -5,7 +5,10 @@ export const code = `<BranchingStory start="intro" passages={{
   intro: { title: "Cumartesi sabahı", body: "…", choices: [{ label: "Etkinliklere bak", to: "explore" }, { label: "Kendi buluşmamı kur", to: "host" }] },
   explore: { body: "…", choices: [ … ] },
   friends: { title: "Yeni arkadaşlar", body: "…", ending: "Sosyal kelebek" },
-}} action={<Button>HADİ'ye katıl</Button>} />`
+}} action={<Button>HADİ'ye katıl</Button>} />
+<BranchingStory start="intro" passages={…} transition="slide" keys={false}        // "turn" | "slide" | "fade" | "none" | (side) => keyframes
+  labels={{ start: "Sabah", restart: "Bir daha", endings: (n, total) => \`\${n} / \${total} son\` }}
+  renderChoice={(choice) => <b>{choice.label}</b>} />`
 
 const Scene = (props: { kind: string; label: string }) => <div class={`sc-bs-scene sc-bs-${props.kind}`} aria-hidden="true"><i /><i /><i /><span>{props.label}</span></div>
 
@@ -57,8 +60,17 @@ export const SATURDAY: Record<string, StoryPassage> = {
     body: <p>Atölyenin on iki bileti bir günde bitti; bekleme listesine yedi kişi yazıldı.</p> },
 }
 
-export default function BranchingStoryDemo(props: { values: { trail: boolean; endings: boolean } }) {
+// an own transition: the old passage shrinks away, the new one rises (or drops, when going back)
+const OWN_TURN = (side: 1 | -1) => ({
+  leave: { opacity: [1, 0], transform: ["scale(1)", "scale(.88)"] },
+  enter: { opacity: [0, 1], transform: [`translateY(${48 * side}px) scale(.96)`, "translateY(0px) scale(1)"] }, duration: 560,
+})
+
+export default function BranchingStoryDemo(props: { values: { trail: boolean; endings: boolean; transition: string; keys: boolean; choice: string; texts: boolean } }) {
   return <div>
-    {() => { const v = { ...props.values }; return <BranchingStory start="intro" passages={SATURDAY} trail={v.trail} endings={v.endings} label="HADİ'de bir cumartesi" /> }}
+    {() => { const v = { ...props.values }; return <BranchingStory start="intro" passages={SATURDAY} trail={v.trail} endings={v.endings} label="HADİ'de bir cumartesi"
+      keys={v.keys} transition={v.transition === "own" ? OWN_TURN : v.transition as "turn"}
+      labels={v.texts ? { start: "Sabah", restart: "Bir daha oyna", endings: (n: number, total: number) => `${total} sondan ${n} tanesini buldun` } : undefined}
+      renderChoice={v.choice === "own" ? (c, i) => <span class="sc-bs-own">{`${"ABC"[i] ?? i + 1}) `}<b>{c.label}</b></span> : undefined} /> }}
   </div>
 }

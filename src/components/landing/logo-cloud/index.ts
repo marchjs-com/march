@@ -7,7 +7,7 @@ import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Marquee } from "../../../ui/marquee.ts";
 import { Grid } from "../../../ui/stack.ts";
-import { revealOnScroll } from "../reveal/index.ts"; // Reveal: the grid cells fade in one after another
+import { revealOnScroll, type RevealOptions } from "../reveal/index.ts"; // Reveal: the grid cells fade in one after another
 
 export interface Logo {
   /** Accessible name (company). */
@@ -29,6 +29,8 @@ export interface LogoCloudProps {
   mono?: boolean | undefined;
   /** Marquee speed, px/s (default 40). */
   speed?: number | undefined;
+  /** grid: entrance of the cells (default "fade"): a Reveal effect, your own `{ from, to }`, or "none". */
+  reveal?: RevealOptions["effect"];
   class?: ClassProp | undefined;
 }
 
@@ -49,6 +51,6 @@ export function LogoCloud(props: LogoCloudProps): Element {
   const root = h("div", { class: cx("hm-logos", `hm-logos-v-${variant}`, props.mono !== false && "is-mono", val(props.class)) },
     props.title != null && h("p", { class: "hm-logos-title" }, () => val(props.title)),
     body) as HTMLElement;
-  if (variant === "grid") { const stop = revealOnScroll(root, { effect: "fade", select: ".hm-logos-cell", stagger: 50 }); if (getOwner()) onCleanup(stop); }
+  if (variant === "grid" && props.reveal !== "none") { const stop = revealOnScroll(root, { effect: props.reveal ?? "fade", select: ".hm-logos-cell", stagger: 50 }); if (getOwner()) onCleanup(stop); }
   return root;
 }

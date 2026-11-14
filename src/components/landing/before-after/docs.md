@@ -9,6 +9,8 @@ scrolls into view the divider sways once, so it reads as something to move.
 <BeforeAfter before={<img src="old.png" alt="" />} after={<img src="new.png" alt="" />} beforeLabel="Before" afterLabel="After" />
 <BeforeAfter orientation="vertical" follow ratio="4 / 3" before={…} after={…} />
 <BeforeAfter value={$pos} onChange={(v) => $pos.set(v)} before={…} after={…} />
+<BeforeAfter grip={<Icon of={heart} />} step={5} valueText={(v) => `${v} percent of the old design`} before={…} after={…} />
+<BeforeAfter grip={false} hint={false} before={…} after={…} />   // the line only, no sway
 ```
 
 ## Props
@@ -24,6 +26,10 @@ scrolls into view the divider sways once, so it reads as something to move.
 | `hint` | boolean | `true` | sway once when first visible |
 | `ratio` | string | — | CSS aspect-ratio of the area |
 | `label` | string | "Before and after" | accessible name |
+| `grip` | boolean / node | `true` | the round grip on the divider: off (the line only) or your own content |
+| `step` | number | `1` | keyboard step in percent (Shift and Page keys: 10 steps) |
+| `valueText` | `(value) => string` | "40% before, 60% after" | the slider's value text for screen readers |
+| `class` | string | — | extra class on the root (`.hm-ba`; parts: `.hm-ba-handle`, `.hm-ba-grip`, `.hm-ba-label`) |
 
 ## Accessibility
 

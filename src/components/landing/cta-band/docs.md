@@ -7,6 +7,8 @@ scales in when it scrolls into view.
 ```tsx
 <CtaBand variant="gradient" title="Start today" lead="…"
   actions={[{ label: "Try free", href: "/start", iconEnd: arrowRight }, { label: "Talk to sales" }]} note="14 days free" />
+<CtaBand title="Start today" reveal="up" />                     // another entrance
+<CtaBand title="Start today" backdrop={false} reveal="none" class="my-band" />   // a bare panel, no motion: style it yourself
 ```
 
 ## Props
@@ -18,6 +20,9 @@ scales in when it scrolls into view.
 | `variant` | `gradient` `mesh` `glass` `plain` `video` | `gradient` | |
 | `video` | `{ src, poster? }` | — | video variant |
 | `align` | `center` `start` | `center` | |
+| `backdrop` | boolean | `true` | the decorative layers of the variant (gradient, mesh, glass, grid, pointer light) |
+| `reveal` | Reveal effect / `{ from, to }` / `none` | `scale` | entrance of the panel |
+| `class` | string | — | extra class on the section (`.hm-cta`; parts: `.hm-cta-panel`, `.hm-cta-title`, `.hm-cta-lead`, `.hm-cta-actions`, `.hm-cta-note`) |
 
 ## Accessibility
 

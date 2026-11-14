@@ -22,10 +22,12 @@ export interface CounterProps {
   decimals?: number | undefined;
   prefix?: unknown | undefined;
   suffix?: unknown | undefined;
-  /** `count`: the number counts (default) · `roll`: each digit rolls like an odometer. */
-  mode?: "count" | "roll" | undefined;
+  /** `count`: the number counts (default) · `roll`: each digit rolls like an odometer · `none`: the value just changes. */
+  mode?: "count" | "roll" | "none" | undefined;
   /** ms (default 1600 for count, 900 for roll). */
   duration?: number | undefined;
+  /** Easing of the count (a motion easing name or token, default "expo"). */
+  easing?: string | undefined;
   /** Start when visible (default) or at once. */
   start?: "visible" | "now" | undefined;
   class?: ClassProp | undefined;
@@ -65,8 +67,8 @@ export function Counter(props: CounterProps): Element {
     tween?.cancel(); tween = null;
     if (props.mode === "roll") { roll(to); current = to; return; }
     if (!shown.firstChild) shown.append(text);
-    if (reducedMotion() || current === to) { current = to; text.data = fmt(to); return; }
-    tween = animateValue(current, to, { duration: props.duration ?? 1600, easing: "expo", onUpdate: (v) => { current = v; text.data = fmt(v); } });
+    if (reducedMotion() || current === to || props.mode === "none") { current = to; text.data = fmt(to); return; }
+    tween = animateValue(current, to, { duration: props.duration ?? 1600, easing: props.easing ?? "expo", onUpdate: (v) => { current = v; text.data = fmt(v); } });
   };
 
   // first paint: the start value (count) or the start digits (roll) so the width is reserved before it moves

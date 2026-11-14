@@ -26,3 +26,13 @@ test("LogoCloud marquee: inside a Marquee, the second copy is hidden from screen
   assert.ok(el.querySelector(".hm-logos").className.includes("is-mono"));
   dispose();
 });
+
+test("LogoCloud grid: the entrance can be switched off", () => {
+  const a = mount({ logos });
+  assert.ok(a.el.querySelector(".hm-logos").classList.contains("hm-reveal"), "the default entrance");
+  a.dispose();
+  const b = mount({ logos, reveal: "none", class: "mine" });
+  assert.equal(b.el.querySelector(".hm-logos.mine").classList.contains("hm-reveal"), false);
+  assert.equal(b.el.querySelector(".hm-reveal-item"), null, "no cell waits hidden");
+  b.dispose();
+});

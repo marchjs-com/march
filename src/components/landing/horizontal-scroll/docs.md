@@ -8,6 +8,8 @@ screens and with reduced motion it is a native horizontal scroller with snap poi
 <HorizontalScroll label="Case studies" panel="26rem">
   {cases.map((c) => <Card>…</Card>)}
 </HorizontalScroll>
+<HorizontalScroll progress={false}>…</HorizontalScroll>   // no progress line
+<HorizontalScroll pinned={false}>…</HorizontalScroll>     // never pins: a sideways scroller with snap points
 ```
 
 ## Props
@@ -16,6 +18,10 @@ screens and with reduced motion it is a native horizontal scroller with snap poi
 |---|---|---|---|
 | `panel` | CSS length | `min(80vw, 32rem)` | width of every child |
 | `label` | string | — | names the region |
+| `progress` | boolean | `true` | the progress line under the panels |
+| `pinned` | boolean | `true` | pin and move with the page scroll; `false`: always the native sideways scroller |
+| `class` | string | — | extra class on the section (`.hm-hs`; parts: `.hm-hs-track`, `.hm-hs-bar`, `.hm-hs-bar-fill`) |
+| children | nodes | — | the panels |
 
 ## Accessibility
 

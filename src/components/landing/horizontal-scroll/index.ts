@@ -14,6 +14,10 @@ export interface HorizontalScrollProps {
   panel?: string | undefined;
   /** Accessible name of the region. */
   label?: string | undefined;
+  /** The progress line under the panels (default true). */
+  progress?: boolean | undefined;
+  /** Pin the section and move the panels with the page scroll (default true); false: always a native sideways scroller with snap points. */
+  pinned?: boolean | undefined;
   class?: ClassProp | undefined;
   children?: unknown;
 }
@@ -24,13 +28,13 @@ const native = (): boolean => reducedMotion() || !!globalThis.matchMedia?.("(hov
 export function HorizontalScroll(props: HorizontalScrollProps): Element {
   const track = h("div", { class: "hm-hs-track" }, props.children) as HTMLElement;
   const bar = h("span", { class: "hm-hs-bar-fill" }) as HTMLElement;
-  const pin = h("div", { class: "hm-hs-pin" }, h("div", { class: "hm-hs-view" }, track), h("span", { class: "hm-hs-bar", "aria-hidden": "true" }, bar)) as HTMLElement;
+  const pin = h("div", { class: "hm-hs-pin" }, h("div", { class: "hm-hs-view" }, track), props.progress === false ? null : h("span", { class: "hm-hs-bar", "aria-hidden": "true" }, bar)) as HTMLElement;
   const root = h("section", { class: cx("hm-hs", val(props.class)), "aria-label": props.label ?? null, role: props.label ? "region" : null }, pin) as HTMLElement;
   if (props.panel) setStyle(root, { "--hm-hs-panel": props.panel });
 
   let overflow = 0;
   const size = (): void => {
-    const nat = native();
+    const nat = props.pinned === false || native();
     root.classList.toggle("is-native", nat);
     overflow = nat ? 0 : Math.max(0, track.scrollWidth - pin.clientWidth);
     // the section is as tall as the sideways distance plus one screen
@@ -41,7 +45,7 @@ export function HorizontalScroll(props: HorizontalScrollProps): Element {
   queueMicrotask(size);
   // the pinned passage (section top at the viewport top → section end at the viewport bottom) from the motion scroll core
   const offScroll = onScrollProgress({ track: root }, () => {
-    if (native() || !overflow) { setStyle(track, { transform: null }); setStyle(bar, { transform: null }); return; }
+    if (props.pinned === false || native() || !overflow) { setStyle(track, { transform: null }); setStyle(bar, { transform: null }); return; }
     const r = root.getBoundingClientRect(), vh = globalThis.innerHeight || 1;
     const pin = clamp(-r.top / Math.max(1, r.height - vh), 0, 1);
     const rtl = globalThis.getComputedStyle?.(root).direction === "rtl";

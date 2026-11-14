@@ -34,6 +34,12 @@ export interface BeforeAfterProps {
   ratio?: string | undefined;
   /** Accessible name of the handle (default "Before and after"). */
   label?: string | undefined;
+  /** The round grip on the divider: true (default, two arrows), false (the line only), or your own node. */
+  grip?: boolean | Node | undefined;
+  /** Keyboard step of the arrow keys, in percent (default 1; Shift and Page keys move 10 steps). */
+  step?: number | undefined;
+  /** The handle's value text for screen readers (default "40% before, 60% after"). */
+  valueText?: ((value: number) => string) | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -57,15 +63,17 @@ export function BeforeAfter(props: BeforeAfterProps): Element {
     "aria-label": () => props.label ?? t`Before and after`,
     "aria-orientation": () => (vertical() ? "vertical" : "horizontal"),
     "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": () => String(Math.round(pos())),
-    "aria-valuetext": () => t`${Math.round(pos())}% before, ${100 - Math.round(pos())}% after`,
+    "aria-valuetext": () => (props.valueText ? props.valueText(Math.round(pos())) : t`${Math.round(pos())}% before, ${100 - Math.round(pos())}% after`),
     onKeyDown: (e: KeyboardEvent) => {
       const st = arrowStep(e, untrack(dir) === "rtl");
       if (!st) return;
       e.preventDefault();
       const p = pos.peek();
-      set(st.home ? 0 : st.end ? 100 : p + (vertical() ? st.dy || st.dx : st.dx || -st.dy));
+      set(st.home ? 0 : st.end ? 100 : p + (vertical() ? st.dy || st.dx : st.dx || -st.dy) * (props.step ?? 1));
     },
-  }, h("span", { class: "hm-ba-grip", "aria-hidden": "true" }, h("i"), h("i")));
+  }, props.grip === false ? null
+    : props.grip && props.grip !== true ? h("span", { class: "hm-ba-grip hm-ba-grip-own", "aria-hidden": "true" }, props.grip)
+    : h("span", { class: "hm-ba-grip", "aria-hidden": "true" }, h("i"), h("i")));
 
   const label = (x: unknown, side: "before" | "after"): Element | null =>
     x == null ? null : h("span", { class: () => cx("hm-ba-label", `hm-ba-label-${side}`, (side === "before" ? pos() < 14 : pos() > 86) && "is-hidden"), "aria-hidden": "true" }, x);

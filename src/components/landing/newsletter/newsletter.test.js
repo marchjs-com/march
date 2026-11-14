@@ -37,3 +37,24 @@ test("Newsletter: a rejected submit shows its message", async () => {
   assert.equal(el.querySelector(".hm-nl-msg").textContent, "Taken");
   dispose();
 });
+
+test("Newsletter: own texts, own done mark or none, no motion", async () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => [
+    h(Newsletter, { class: "a", onSubmit: () => {}, motion: false, doneIcon: h("i", { class: "mine" }), labels: { email: "Mail", invalid: "Bad" } }),
+    h(Newsletter, { class: "b", onSubmit: () => Promise.reject(new Error("")), motion: false, doneIcon: false, labels: { error: "Failed" } }),
+    h(Newsletter, { class: "c", onSubmit: () => {}, motion: false, doneIcon: false }),
+  ], el);
+  const send = (root, v) => { type(root.querySelector("input"), v); root.querySelector("form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })); };
+  const [a, b, c] = ["a", "b", "c"].map((k) => el.querySelector(`.hm-nl.${k}`));
+  assert.equal(a.querySelector("input").getAttribute("aria-label"), "Mail");
+  send(a, "nope");
+  assert.equal(a.querySelector(".hm-nl-msg").textContent, "Bad");
+  send(a, "ada@example.com"); send(b, "ada@example.com"); send(c, "ada@example.com");
+  for (let i = 0; i < 5; i++) await tick();
+  assert.ok(a.querySelector(".hm-nl-done .hm-nl-check .mine"), "done at once (no fold), with the own mark");
+  assert.equal(b.querySelector(".hm-nl-msg").textContent, "Failed");
+  assert.ok(c.querySelector(".hm-nl-done"));
+  assert.equal(c.querySelector(".hm-nl-check"), null);
+  dispose();
+});

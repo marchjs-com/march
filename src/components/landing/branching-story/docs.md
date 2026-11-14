@@ -11,6 +11,12 @@ mirrored in right-to-left text. Keys 1–9 pick a choice.
   explore: { body: "…", choices: [{ label: "The run", to: "friends" }] },
   friends: { title: "New friends", body: "…", ending: "Social butterfly" },
 }} />
+<BranchingStory start="intro" passages={…} transition="slide" keys={false}
+  labels={{ start: "Home", restart: "Once more", endings: (found, total) => `${found} of ${total} endings` }}
+  renderChoice={(choice, i) => <b>{i + 1}. {choice.label}</b>} />
+<BranchingStory start="intro" passages={…} restart={false} trail={false} transition={(side) => ({
+  leave: { opacity: [1, 0], transform: ["scale(1)", "scale(.9)"] },
+  enter: { opacity: [0, 1], transform: [`translateY(${40 * side}px)`, "translateY(0px)"] }, duration: 500 })} />
 ```
 
 ## Props
@@ -26,13 +32,19 @@ mirrored in right-to-left text. Keys 1–9 pick a choice.
 | `action` | node | — | next to "Start again" at an ending |
 | `minHeight` | CSS length | `20rem` | the stage keeps it, so the page does not jump |
 | `label` | string | "Story" | accessible name |
+| `labels` | `{ path, start, endings, missing, end, endingPrefix, restart }` | translated | every text the story writes; `endings`: `(found, total) => node` |
+| `restart` | boolean | `true` | the "Start again" button at an ending |
+| `keys` | boolean | `true` | number keys 1–9 pick a choice; each choice shows its number |
+| `renderChoice` | `(choice, index) => node` | — | draw the content of a choice button yourself |
+| `transition` | `turn` `slide` `fade` `none` / `(side) => { leave, enter, duration?, easing? }` | `turn` | how the page changes; a function gives keyframes for the leaving and the entering passage (`side`: 1 forward, -1 back) |
+| `class` | string | — | extra class on the root (`.hm-bs`; parts: `.hm-bs-trail`, `.hm-bs-step`, `.hm-bs-found`, `.hm-bs-passage`, `.hm-bs-choice`, `.hm-bs-key`, `.hm-bs-end`) |
 
 A choice is `{ label, to, note? }`. `storyEndings(passages, start)` lists every reachable ending.
 
 ## Accessibility
 
 A labelled `section`. The trail is a `nav` with an ordered list; the current step has `aria-current="step"`, earlier
-steps are buttons. Choices are buttons in an ordered list; the number keys 1–9 press them. After a choice, focus moves
+steps are buttons. Choices are buttons in an ordered list; the number keys 1–9 press them (unless `keys={false}`). After a choice, focus moves
 to the new passage's heading, so screen readers read the new passage. Reduced motion swaps passages without the turn.
 
 ## Composed of

@@ -15,3 +15,13 @@ test("CtaBand: section with h2, actions, gradient layers", () => {
   assert.ok(el.querySelector(".hm-cta-panel .hm-ov-fx-gradient"));
   dispose();
 });
+
+test("CtaBand: no backdrop layers, no entrance", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(CtaBand, { title: "Ready?", backdrop: false, reveal: "none", class: "mine" }), el);
+  assert.ok(el.querySelector("section.hm-cta.mine"));
+  assert.equal(el.querySelector(".hm-cta-panel [class*=hm-ov]"), null, "no overlay in the panel");
+  assert.equal(el.querySelector(".hm-reveal-box"), null, "the panel is not wrapped in a Reveal");
+  assert.equal(el.querySelector(".hm-cta-panel h2").textContent, "Ready?");
+  dispose();
+});

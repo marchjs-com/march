@@ -51,8 +51,49 @@ export interface BranchingStoryProps {
   minHeight?: string | undefined;
   /** Accessible name (default "Story"). */
   label?: string | undefined;
+  /** Every text the story writes itself; the defaults are translated. `endings` gets the found and the total count. */
+  labels?: {
+    /** Accessible name of the trail (default "Your path"). */
+    path?: string;
+    /** First step of the trail (default "Start"). */
+    start?: unknown;
+    endings?: (found: number, total: number) => unknown;
+    /** Body of a passage id that does not exist. */
+    missing?: unknown;
+    /** Heading of an ending without a title or a name (default "The end"). */
+    end?: unknown;
+    /** Before the ending's name in its badge (default "Ending: "). */
+    endingPrefix?: unknown;
+    /** The button at an ending (default "Start again"). */
+    restart?: unknown;
+  } | undefined;
+  /** The "Start again" button at an ending (default true). */
+  restart?: boolean | undefined;
+  /** Number keys 1–9 pick a choice, and each choice shows its number (default true). */
+  keys?: boolean | undefined;
+  /** Draw the content of a choice button yourself (the button, its key and its motion stay). */
+  renderChoice?: ((choice: StoryChoice, index: number) => unknown) | undefined;
+  /**
+   * How the page changes: "turn" (default: a 3D page turn), "slide", "fade", "none", or your own keyframes for the
+   * leaving and the entering passage; `side` is 1 forward and -1 back (already mirrored in RTL).
+   */
+  transition?: "turn" | "slide" | "fade" | "none"
+    | ((side: 1 | -1) => { leave: Record<string, unknown[]>; enter: Record<string, unknown[]>; duration?: number; easing?: string }) | undefined;
   class?: ClassProp | undefined;
 }
+
+type Turn = { leave: Record<string, unknown[]>; enter: Record<string, unknown[]>; duration?: number; easing?: string };
+const TURNS: Record<"turn" | "slide" | "fade", (s: number) => Turn> = {
+  turn: (s) => ({
+    leave: { opacity: [1, 0], transform: ["perspective(1200px) rotateY(0deg) translateX(0px)", `perspective(1200px) rotateY(${18 * s}deg) translateX(${-60 * s}px)`], filter: ["blur(0px)", "blur(6px)"] },
+    enter: { opacity: [0, 1], transform: [`perspective(1200px) rotateY(${-22 * s}deg) translateX(${70 * s}px)`, "perspective(1200px) rotateY(0deg) translateX(0px)"], filter: ["blur(8px)", "blur(0px)"] },
+  }),
+  slide: (s) => ({
+    leave: { opacity: [1, 0], transform: ["translateX(0px)", `translateX(${-80 * s}px)`] },
+    enter: { opacity: [0, 1], transform: [`translateX(${80 * s}px)`, "translateX(0px)"] }, duration: 520,
+  }),
+  fade: () => ({ leave: { opacity: [1, 0] }, enter: { opacity: [0, 1] }, duration: 420, easing: "out" }),
+};
 
 /** Every ending reachable from `start` (passages without choices), in reading order. */
 export function storyEndings(passages: Record<string, StoryPassage>, start: string): string[] {
@@ -85,44 +126,47 @@ export function BranchingStory(props: BranchingStoryProps): Element {
   };
 
   // the trail: one step per choice made, labelled with the choice; a step rewinds the story to it
-  const trail = props.trail === false ? null : h("nav", { class: "hm-bs-trail", "aria-label": () => t`Your path` },
+  const L = props.labels ?? {};
+  const trail = props.trail === false ? null : h("nav", { class: "hm-bs-trail", "aria-label": () => L.path ?? t`Your path` },
     h("ol", { class: "hm-bs-steps" }, () => path().map((id, i, p) => {
       const prev = i ? props.passages[p[i - 1]!] : null;
-      const via = prev?.choices?.find((c) => c.to === id)?.label ?? t`Start`;
+      const via = prev?.choices?.find((c) => c.to === id)?.label ?? L.start ?? t`Start`;
       const last = i === p.length - 1;
       return h("li", { class: cx("hm-bs-step", last && "is-current") },
         last ? h("span", { "aria-current": "step" }, via) : h("button", { type: "button", onClick: () => go(p.slice(0, i + 1)) }, via));
     })),
-    props.endings === false || !all.length ? null : h("span", { class: "hm-bs-found" }, () => t`Endings found: ${found().size} / ${all.length}`));
+    props.endings === false || !all.length ? null : h("span", { class: "hm-bs-found" }, () => (L.endings ? L.endings(found().size, all.length) : t`Endings found: ${found().size} / ${all.length}`)));
 
   const stage = h("div", { class: "hm-bs-stage" }) as HTMLElement;
   setStyle(stage, { "--hm-bs-min": props.minHeight ?? "20rem" });
 
   const pick = (btn: HTMLElement, to: string): void => {
     const done = (): void => go([...path.peek(), to]);
-    if (reducedMotion()) { done(); return; }
+    if (reducedMotion() || props.transition === "none") { done(); return; }
     btn.classList.add("is-picked");
     btn.closest(".hm-bs-choices")?.classList.add("is-deciding");
     void animate(btn, { transform: ["scale(1)", "scale(1.04)", "scale(1)"] }, { duration: 320, easing: "out" }).finished.then(done);
   };
 
   const passage = (id: string): HTMLElement => {
-    const p = props.passages[id] ?? { body: t`This part of the story is missing.` };
+    const p = props.passages[id] ?? { body: L.missing ?? t`This part of the story is missing.` };
     const choices = p.choices ?? [];
-    const heading = h("h3", { class: "hm-bs-title", tabindex: "-1" }, p.title ?? (choices.length ? "" : p.ending ?? t`The end`));
+    const heading = h("h3", { class: "hm-bs-title", tabindex: "-1" }, p.title ?? (choices.length ? "" : p.ending ?? L.end ?? t`The end`));
     return h("article", { class: cx("hm-bs-passage", !choices.length && "is-ending"), "data-hm-color": colorAttr(p.color) },
       p.media != null ? h("div", { class: "hm-bs-media" }, p.media) : null,
       h("div", { class: "hm-bs-copy" },
-        !choices.length && p.ending != null && p.title != null ? h("span", { class: "hm-bs-ending" }, t`Ending: `, p.ending) : null,
+        !choices.length && p.ending != null && p.title != null ? h("span", { class: "hm-bs-ending" }, L.endingPrefix ?? t`Ending: `, p.ending) : null,
         heading,
         h("div", { class: "hm-bs-body" }, p.body),
         choices.length
           ? h("ol", { class: "hm-bs-choices" }, ...choices.map((c, i) => h("li", null, h("button", {
             type: "button", class: "hm-bs-choice", "data-key": String(i + 1),
             onClick: (e: MouseEvent) => pick(e.currentTarget as HTMLElement, c.to),
-          }, h("kbd", { class: "hm-bs-key", "aria-hidden": "true" }, String(i + 1)), h("span", { class: "hm-bs-choice-text" }, c.label, c.note != null ? h("small", null, c.note) : null)))))
-          : h("div", { class: "hm-bs-end" },
-            h("button", { type: "button", class: "hm-btn hm-btn-secondary", onClick: () => go([props.start]) }, () => t`Start again`),
+          }, props.keys === false ? null : h("kbd", { class: "hm-bs-key", "aria-hidden": "true" }, String(i + 1)),
+          props.renderChoice ? h("span", { class: "hm-bs-choice-own" }, props.renderChoice(c, i))
+            : h("span", { class: "hm-bs-choice-text" }, c.label, c.note != null ? h("small", null, c.note) : null)))))
+          : props.restart === false && props.action == null ? null : h("div", { class: "hm-bs-end" },
+            props.restart === false ? null : h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-bs-restart", onClick: () => go([props.start]) }, () => L.restart ?? t`Start again`),
             props.action ?? null))) as HTMLElement;
   };
 
@@ -134,16 +178,18 @@ export function BranchingStory(props: BranchingStoryProps): Element {
       const next = passage(id), old = shown;
       shown = next;
       stage.append(next);
-      const motion = !first && !reducedMotion();
+      const kind = props.transition ?? "turn";
+      const motion = !first && !reducedMotion() && kind !== "none";
       if (!first) next.querySelector<HTMLElement>(".hm-bs-title")?.focus({ preventScroll: true });
       first = false;
       if (!old) return;
       if (!motion) { old.remove(); return; }
-      const s = (forward ? 1 : -1) * (untrack(dir) === "rtl" ? -1 : 1);
+      const s = ((forward ? 1 : -1) * (untrack(dir) === "rtl" ? -1 : 1)) as 1 | -1;
+      const turn: Turn = typeof kind === "function" ? kind(s) : TURNS[kind as "turn"](s);
       old.classList.add("is-leaving");
-      void animate(old, { opacity: [1, 0], transform: ["perspective(1200px) rotateY(0deg) translateX(0px)", `perspective(1200px) rotateY(${18 * s}deg) translateX(${-60 * s}px)`], filter: ["blur(0px)", "blur(6px)"] }, { duration: 420, easing: "in", fill: "forwards" })
+      void animate(old, turn.leave as never, { duration: 420, easing: "in", fill: "forwards" })
         .finished.then(() => old.remove());
-      animate(next, { opacity: [0, 1], transform: [`perspective(1200px) rotateY(${-22 * s}deg) translateX(${70 * s}px)`, "perspective(1200px) rotateY(0deg) translateX(0px)"], filter: ["blur(8px)", "blur(0px)"] }, { duration: 760, delay: 120, easing: "expo" });
+      animate(next, turn.enter as never, { duration: turn.duration ?? 760, delay: 120, easing: turn.easing ?? "expo" });
       const items = next.querySelectorAll(".hm-bs-choices > li");
       items.forEach((li, i) => animate(li, { opacity: [0, 1], transform: ["translateY(14px)", "translateY(0px)"] }, { duration: 460, delay: 380 + i * 90, easing: "out" }));
     });
@@ -151,7 +197,7 @@ export function BranchingStory(props: BranchingStoryProps): Element {
 
   const root = h("section", { class: () => cx("hm-bs", val(props.class)), "aria-label": () => props.label ?? t`Story` }, trail, stage) as HTMLElement;
   // keys 1–9 pick a choice of the current passage (not while typing)
-  listen(root, {
+  if (props.keys !== false) listen(root, {
     keydown: (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey || !/^[1-9]$/.test(e.key)) return;
       const btn = shown?.querySelector<HTMLElement>(`.hm-bs-choice[data-key="${e.key}"]`);
