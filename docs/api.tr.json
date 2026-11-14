@@ -607,7 +607,7 @@
   "frameMonitor": "Kare hızı izleyici: fps, düşen kareler ve uzun görevler sinyal olarak.",
   "getKeyframes": "Anahtar kareleri veya ön ayarı adıyla bulur (ön ayarlar, birleştirilmiş zamanlamayla anahtar karelerine çözülür).",
   "goo": "Yapışkan metaball'lar: öğenin çocukları buluştukları yerde erir. Kaldıran bir işlev döndürür.",
-  "hoverParallax": "Eylem: `data-depth=\"0.2…1\"` işaretli çocuklar işaretçiyle kayar (derindekiler daha çok); kapsayıcı eğilebilir. `hold`: işaretçi çıkınca duruş korunur, geri girdiği yere oradan süzülür; `layerTilt`: her katman kendi ekseninde de eğilir; `glare`: parıltı için işaretçinin katmandaki yeri `--m-glare-x` / `--m-glare-y` olarak yazılır.",
+  "hoverParallax": "Eylem: `data-depth=\"0.2…1\"` işaretli çocuklar işaretçiyle kayar (derindekiler daha çok); kapsayıcı eğilebilir. `hold`: işaretçi çıkınca duruş korunur; `layerTilt`: katmanlar da eğilir; `glare`: parıltı için işaretçinin yeri yazılır.",
   "installFlip": "`<For animate>` yeniden sıralama animasyonlarını etkinleştirir (hareket motorunda FLIP).",
   "installThemeWave": "Bundan sonra sayfa genelindeki her yeniden boyama (setTheme, setColorTheme, setAccent; yani ThemeMenu, ThemePicker, ThemeToggle, AccentPicker ve kendi çağrıların) son basılan noktadan yayılır. Kapatan işlevi döndürür.",
   "installPresets": "Yerleşik anahtar kareleri (fadeUp, pop, shake, spin…) adıyla oynatılabilmeleri için kaydeder.",

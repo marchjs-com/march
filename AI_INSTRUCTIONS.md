@@ -481,6 +481,7 @@ usePageTransitions(circle, cube, wipe);                             // then meta
 ```tsx
 <button use:ripple use:press={{ scale: 0.92, easing: "spring-wobbly" }}>…</button>   // magnet, tilt: gestures
 <div use:hoverParallax={{ depth: 16, tilt: 8 }}><img data-depth="0.4" /></div>
+<div use:hoverParallax={{ depth: -26, layerTilt: 6, hold: true, glare: true }}>…</div>   // glass cards: the pose stays when the pointer leaves
 stateMorph(btn, "loading"); stateMorph(btn, ok ? "success" : "error", { confetti: true }); stateMorph(btn, "idle");
 scrollTimeline(card, fadeUp, { range: [0, 0.4] }); parallaxLayers(hero); stickyReveal(section); scrollIndicator(bar);
 const off = animateList(ul, { enter: "pop", exit: "scale" });  // any renderer: enter, exit ghost, FLIP moves
