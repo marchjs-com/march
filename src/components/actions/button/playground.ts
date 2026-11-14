@@ -3,6 +3,7 @@ import { definePlayground } from "../../meta.ts";
 interface Values { variant: string; size: string; shape: string; pressed: boolean; icon: boolean; loading: boolean; spinner: string; disabled: boolean; block: boolean }
 
 export default definePlayground<Values>({
+  stage: "center",
   options: [
     { key: "variant", label: "Varyant", default: "primary", options: ["primary", "secondary", "ghost", "danger", "dark", "link"] },
     { key: "size", label: "Boyut", default: "md", options: ["sm", "md", "lg"] },
