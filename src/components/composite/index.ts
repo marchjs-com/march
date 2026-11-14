@@ -3,6 +3,7 @@
 export * from "./bottom-nav/index.ts";
 export * from "./chat-composer/index.ts";
 export * from "./chat-thread/index.ts";
+export * from "./code-editor/index.ts";
 export * from "./color-picker/index.ts";
 export * from "./command-palette/index.ts";
 export * from "./dock-layout/index.ts";

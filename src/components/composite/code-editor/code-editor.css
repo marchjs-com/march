@@ -1,0 +1,21 @@
+/* CodeEditor: a transparent text field over its coloured copy (same font, same wrapping), inside an EditorFrame.
+   The colours are the CodeView tokens (.m-tok-*). */
+.m-ced { --m-ced-pad: var(--m-space-3) var(--m-space-4); }
+.m-ced-area { position: relative; display: grid; min-inline-size: 0; font: var(--m-text-sm) / 1.7 var(--m-font-mono); }
+.m-ced-paint, .m-ced-input { grid-area: 1 / 1; box-sizing: border-box; margin: 0; padding: var(--m-ced-pad); border: 0; background: none; font: inherit; letter-spacing: 0; tab-size: 2; white-space: pre-wrap; overflow-wrap: anywhere; }
+.m-ced-paint { pointer-events: none; color: var(--m-text); min-inline-size: 0; }
+.m-ced-paint > code { font: inherit; }
+.m-ced-input { inline-size: 100%; block-size: 100%; color: transparent; caret-color: var(--m-text); resize: none; outline: none; overflow: hidden; }
+.m-ced-input::selection { background: color-mix(in srgb, var(--m-editor-accent) 30%, transparent); }
+.m-ced.is-disabled .m-ced-input { cursor: not-allowed; }
+/* marks: a flash lights up once (the glow fades on the motion engine), an error stays underlined */
+.m-ced-mark { position: relative; background: none; color: inherit; border-radius: var(--m-radius-1); }
+.m-ced-mark.is-error { text-decoration: underline wavy var(--m-danger); text-underline-offset: .25em; }
+.m-ced-glow { position: absolute; inset: -1px -2px; border-radius: inherit; background: color-mix(in srgb, var(--m-editor-accent) 32%, transparent); opacity: 0; pointer-events: none; }
+/* the foot line: what the owner says, the shortcut hint, the copy button */
+.m-panel-header.m-ced-foot { align-items: center; padding-block: var(--m-space-1); }
+.m-ced-msg { display: inline-flex; align-items: center; gap: var(--m-space-2); min-inline-size: 0; color: var(--m-muted); }
+.m-ced-msg.is-error { color: var(--m-warn-text); }
+.m-ced-msg-text { min-inline-size: 0; }
+.m-ced-hint { display: inline-flex; align-items: center; gap: var(--m-space-1); white-space: nowrap; }
+.m-ced-list { min-inline-size: 14rem; max-inline-size: min(26rem, 90vw); font-family: var(--m-font-mono); }

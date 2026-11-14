@@ -15,7 +15,7 @@ const remove = action("Sil", api.remove, { icon: trash, danger: true, confirm: "
 <Button variant="link" on:click={showAll}>Tümünü gör</Button>           // inline text button
 <Button variant="ghost" pressed={$wrap} shape="pill">Kaydır</Button>    // toggle: aria-pressed + pressed look`
 
-export default function ButtonDemo(props: { values: { variant: string; size: string; shape: string; pressed: boolean; icon: boolean; loading: boolean; spinner: string; disabled: boolean; block: boolean } }) {
+export default function ButtonDemo(props: { values: { label: string; variant: string; size: string; shape: string; pressed: boolean; icon: boolean; loading: boolean; spinner: string; disabled: boolean; block: boolean } }) {
   let $clicks = 0
   const remove = action("Taslağı sil", async () => { await new Promise((r) => setTimeout(r, 600)) }, { icon: trash, danger: true, confirm: "Taslak silinsin mi?", success: "Taslak silindi" })
   return <div class="sc-col">
@@ -26,7 +26,7 @@ export default function ButtonDemo(props: { values: { variant: string; size: str
       const pressed = v.pressed ? true : undefined
       return <div class="sc-row">
         <Button variant={v.variant as "primary"} size={v.size as "md"} shape={shape} pressed={pressed} icon={v.icon ? plus : undefined} loading={v.loading} spinner={spinner} disabled={v.disabled} block={v.block}
-          on:click={() => { $clicks++ }}>{() => ($clicks ? `Yeni proje (${$clicks})` : "Yeni proje")}</Button>
+          on:click={() => { $clicks++ }}>{() => ($clicks ? `${v.label} (${$clicks})` : v.label)}</Button>
         {v.block ? null : <Button variant="ghost" size={v.size as "md"} shape={shape} pressed={pressed} iconEnd={arrowRight}>Devam</Button>}
       </div>
     }}

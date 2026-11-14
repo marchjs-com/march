@@ -1,11 +1,13 @@
 import { definePlayground } from "../../meta.ts";
 
 export default definePlayground<{ kind: string; prefix: string; disabled: boolean; error: boolean; paste: boolean }>({
+  code: { tag: (v) => (v.kind === "email" ? "EmailInput" : v.kind === "url" ? "UrlInput" : "TextInput"), props: { "bind:value": "{$text}" }, root: "input" },
   options: [
-    { key: "kind", label: "Tür", default: "text", options: [{ value: "text", label: "metin" }, { value: "email", label: "e-posta" }, { value: "url", label: "web adresi" }] },
-    { key: "prefix", label: "Ön ek", default: "icon", options: [{ value: "none", label: "yok" }, { value: "icon", label: "ikon" }, { value: "text", label: "metin" }] },
+    { key: "kind", label: "Tür", default: "text", options: [{ value: "text", label: "metin" }, { value: "email", label: "e-posta" }, { value: "url", label: "web adresi" }], prop: false },
+    { key: "prefix", label: "Ön ek", default: "icon", options: [{ value: "none", label: "yok" }, { value: "icon", label: "ikon" }, { value: "text", label: "metin" }],
+      toCode: (p, v) => (p === "none" ? null : p === "icon" ? `{<Icon of={${v.kind === "url" ? "globe" : "search"}} />}` : v.kind === "url" ? '"www"' : '"@"') },
     { key: "disabled", label: "Devre dışı", default: false },
-    { key: "error", label: "Hata metni (error)", default: false },
-    { key: "paste", label: "Yapıştırmayı yakala (onPaste)", default: false },
+    { key: "error", label: "Hata metni (error)", default: false, toCode: { true: '"Bu alan boş bırakılamaz."', false: null } },
+    { key: "paste", label: "Yapıştırmayı yakala (onPaste)", default: false, prop: "onPaste", toCode: { true: "{catchPaste}", false: null } },
   ],
 });

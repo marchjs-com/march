@@ -44,6 +44,8 @@ export interface DevicePreviewProps {
   touch?: MaybeFn<boolean | undefined>;
   /** Scale down to fit the width of its place (default true). */
   fit?: boolean;
+  /** The most height the fitted device may take, in px (default: the window's height − 160, at least 480). */
+  fitHeight?: MaybeFn<number | undefined>;
   /** Show this address in the device (an iframe: real viewport, real scrolling, real media queries) instead of children. */
   src?: MaybeFn<string | undefined>;
   /** Accessible name of the device (default "<device> preview"). */
@@ -124,7 +126,7 @@ export function DevicePreview(props: DevicePreviewProps): Element {
     observeSize(outer, () => {
       if (!outer.clientWidth) return; // not laid out (hidden, or no layout engine)
       const s = spec(), w = land() ? s.height : s.width, hh = land() ? s.width : s.height;
-      const room = outer.clientWidth - 32, tall = Math.max(480, (globalThis.innerHeight ?? 900) - 160);
+      const room = outer.clientWidth - 32, tall = val(props.fitHeight) ?? Math.max(480, (globalThis.innerHeight ?? 900) - 160);
       scale.set(Math.min(1, room / (w + 28), tall / (hh + 28)));
     });
   }

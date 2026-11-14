@@ -46,7 +46,11 @@ $items.peek()                            // read without tracking (explicit API 
   set). Use it for interface chrome (toolbars, drag surfaces, tabs), NEVER on content people may copy (codes,
   addresses, errors): keyboard selection and select-to-speak stop working too. Do not write `user-select` CSS or a
   `selectstart` handler for this. By hand: `mProps(h(Card, props), { "no-select": true })` from `hadi-march/props`;
-  a new member: `registerMProp(name, (el, value) => …)`. Content in a portal (dialog, menu) is outside the root: put
+  a new member: `registerMProp(name, (el, value) => …)`. `m:parts={{ Avatar: { size: "lg" }, LikeButton: { color: "brand-blue" } }}`
+  gives props to the components drawn INSIDE (keys: component names in scope; they win over what the parent gave;
+  the nearest scope wins; by hand `withParts(new Map([[Avatar, {…}]]), () => h(PostCard, props))`). Never add a
+  `parts` / `avatarProps` prop to a composite for this; inside a library component draw parts with `h(Comp, …)`,
+  never by calling the component function, or `m:parts` cannot reach them. Content in a portal (dialog, menu) is outside the root: put
   the prop on that content.
 - Async component: `async function Page() { const data = await api(); return <View data={data} /> }` — wrap in
   `<Try loading={…} fallback={(e, retry) => …}>` (or rely on the default spinner / error box).
@@ -603,6 +607,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | BottomRightControls | stable | One fixed page corner (bottom, end side; mirrors in RTL) that page-wide controls put themselves into, in order, instead of overlapping. | — |
 | DevicePreview | experimental | Content as on a real phone or tablet: device body, notch, status bar, home indicator, real screen size, rotation; the mouse acts as a finger (drag to scroll, fling, long press). | OverlayScope |
 | Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | Chevron |
+| ExplodedView | experimental | Takes its content apart like an exploded drawing and puts it back: the same elements tilt and rise as plates with name tags (chosen parts), or one element opens into its shadow, surface, content and focus ring. | — |
 | Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
 | Layout | stable | The frame all pages of an app share: content plus the page corner (BottomRightControls) with its back-to-top button; Page builds on it. | Button, Badge, Progress, ScrollToTop |
 | OverlayScope | stable | A box that keeps the layers opened inside it (drawers, dialogs, menus, toasts) inside it: previews, device frames, panels, demos. | — |
@@ -779,6 +784,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText, ListRow, Drawer |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, ReactionPicker, IconButton, StatusDot, ReplyQuote |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | ChatBubble, TypingIndicator, ReactionPicker, Avatar, Button, Picture |
+| CodeEditor | experimental | A small code field: coloured as it is typed, a suggestion list at the caret (prop names and values of a JSX tag, or your own), marked ranges that flash or underline, a foot line with a status and a copy button. | EditorFrame, Popover, OptionList, CopyButton, Kbd, StatusDot |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented, Badge, SectionLabel, Slider, Swatch, TextInput |
 | CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, SearchBox, ListRow, SectionLabel, Empty, Kbd, OverflowText |
 | ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, Dialog, Toggle, Stack, Empty |

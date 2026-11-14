@@ -12,6 +12,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | BottomRightControls | stable | One fixed page corner (bottom, end side; mirrors in RTL) that page-wide controls put themselves into, in order, instead of overlapping. | — |
 | DevicePreview | experimental | Content as on a real phone or tablet: device body, notch, status bar, home indicator, real screen size, rotation; the mouse acts as a finger (drag to scroll, fling, long press). | [OverlayScope](#overlayscope) |
 | Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | [Chevron](#chevron) |
+| ExplodedView | experimental | Takes its content apart like an exploded drawing and puts it back: the same elements tilt and rise as plates with name tags (chosen parts), or one element opens into its shadow, surface, content and focus ring. | — |
 | Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
 | Layout | stable | The frame all pages of an app share: content plus the page corner (BottomRightControls) with its back-to-top button; Page builds on it. | [Button](#button), [Badge](#badge), [Progress](#progress), [ScrollToTop](#scrolltotop) |
 | OverlayScope | stable | A box that keeps the layers opened inside it (drawers, dialogs, menus, toasts) inside it: previews, device frames, panels, demos. | — |
@@ -188,6 +189,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | [Badge](#badge), [OverflowText](#overflowtext), [ListRow](#listrow), [Drawer](#drawer) |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | [Menu](#menu), [Textarea](#textarea), [ReactionPicker](#reactionpicker), [IconButton](#iconbutton), [StatusDot](#statusdot), [ReplyQuote](#replyquote) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), [Avatar](#avatar), [Button](#button), [Picture](#picture) |
+| CodeEditor | experimental | A small code field: coloured as it is typed, a suggestion list at the caret (prop names and values of a JSX tag, or your own), marked ranges that flash or underline, a foot line with a status and a copy button. | [EditorFrame](#editorframe), [Popover](#popover), [OptionList](#optionlist), [CopyButton](#copybutton), [Kbd](#kbd), [StatusDot](#statusdot) |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | [IconButton](#iconbutton), [Segmented](#segmented), [Badge](#badge), [SectionLabel](#sectionlabel), [Slider](#slider), [Swatch](#swatch), [TextInput](#textinput) |
 | CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | [Dialog](#dialog), [SearchBox](#searchbox), [ListRow](#listrow), [SectionLabel](#sectionlabel), [Empty](#empty), [Kbd](#kbd), [OverflowText](#overflowtext) |
 | ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | [Button](#button), [Card](#card), [Dialog](#dialog), [Toggle](#toggle), [Stack](#stack), [Empty](#empty) |
@@ -631,6 +633,28 @@ Composed of: [Button](#button)
 
 Full page: src/components/typography/clamp-text/docs.md
 
+## CodeEditor
+
+A small code field for one snippet: the text is coloured while it is typed (the CodeView colours; unfinished code too), a suggestion list opens at the caret, ranges can be marked (a flash for "this just changed", an underline for "this is wrong") and a foot line says what the owner thinks of the code. It does **not** run or compile anything: the owner reads `value` and decides what it means (the showcase reads a component's props from it).
+
+Composed of: [EditorFrame](#editorframe), [Popover](#popover), [OptionList](#optionlist), [CopyButton](#copybutton), [Kbd](#kbd), [StatusDot](#statusdot)
+
+```tsx
+import { CodeEditor, jsxCompleter } from "hadi-march/ui";
+
+<CodeEditor bind:value={$code} lang="tsx" message={$note} status={$bad ? "error" : "ok"}
+  complete={jsxCompleter({ tag: "Button", props: [
+    { name: "variant", hint: "look", values: ["primary", "secondary", "ghost"] },   // variant="…": values inside the quotes
+    { name: "icon", hint: "icon", value: "={plus}" },                              // written as icon={plus}
+    { name: "disabled" },                                                          // a bare prop
+  ] })}
+  marks={[{ from: 8, to: 23, kind: "flash" }]} />
+<CodeEditor value={$css} onChange={save} lang="css" complete={(ctx) => ({ from: ctx.caret, items: [{ label: "color" }] })} />
+<CodeEditor bind:value={$one} multiline={false} message={false} copy={false} />   // one bare line
+```
+
+Full page: src/components/composite/code-editor/docs.md
+
 ## CodeInput
 
 One-time code and PIN boxes. Typing moves forward, Backspace back, ← → move, a paste fills from the box (extra characters are cut) and `onComplete` fires once when every box is filled. In the HADİ theme each box takes the next HADİ color and the display font, as in the HADİ apps; boxes shrink on narrow screens instead of overflowing.
@@ -984,6 +1008,23 @@ Composed of: [Alert](#alert), [Button](#button)
 ```
 
 Full page: src/components/feedback/error-box/docs.md
+
+## ExplodedView
+
+Takes what it holds apart, like an exploded drawing, and puts it back. Nothing is drawn again: the **same** elements tilt and rise (their state, focus and listeners stay), so what comes apart is exactly what was on screen.
+
+```tsx
+import { ExplodedView } from "hadi-march/ui";
+
+<ExplodedView bind:open={$apart} onPick={(id) => $picked = id} active={$picked}
+  parts={[{ selector: ".m-avatar", label: "Avatar" }, { selector: ".m-like", label: "LikeButton", level: 2 }]}>
+  <PostCard post={post} />
+</ExplodedView>
+<ExplodedView open={$apart}><Button icon={plus}>New project</Button></ExplodedView>     // the layers of the button
+<ExplodedView open layers={{ ring: false, surface: "Background" }} gap={32} tilt={{ x: 46, z: -24 }} motion="spring" tags={false} fit={false} />
+```
+
+Full page: src/components/layout/exploded-view/docs.md
 
 ## Faq
 

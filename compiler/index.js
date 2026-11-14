@@ -33,6 +33,35 @@ const NO_WRAP = /^(on[A-Z]|on:|ref$|use:|bind:|key$)/;
  */
 export const M_ATTRS = { "no-select": "data-m-no-select" };
 const M_HELPER = "_$m";
+const PARTS_HELPER = "_$mp";
+/**
+ * The entries of an object literal `{ A: x, "B": y }` as [key, value code]; null when the code is not a plain object
+ * literal of `Name: value` entries (a spread, a shorthand, a computed key, any other expression).
+ */
+function objectEntries(code) {
+  const c = code.trim();
+  if (c[0] !== "{" || c[c.length - 1] !== "}") return null;
+  const out = [];
+  let depth = 0, str = "", from = 1;
+  const push = (to) => {
+    const part = c.slice(from, to).trim();
+    if (!part) return true;
+    const m = /^(?:([A-Za-z_$][\w$]*)|"([^"]+)"|'([^']+)')\s*:([\s\S]+)$/.exec(part);
+    if (!m) return false;
+    out.push([m[1] ?? m[2] ?? m[3], m[4].trim()]);
+    return true;
+  };
+  for (let i = 1; i < c.length - 1; i++) {
+    const ch = c[i];
+    if (str) { if (ch === "\\") i++; else if (ch === str) str = ""; continue; }
+    if (ch === '"' || ch === "'" || ch === "`") str = ch;
+    else if (ch === "{" || ch === "[" || ch === "(") depth++;
+    else if (ch === "}" || ch === "]" || ch === ")") { if (--depth < 0) return null; }
+    else if (ch === "," && depth === 0) { if (!push(i)) return null; from = i + 1; }
+  }
+  if (depth !== 0 || str || !push(c.length - 1)) return null;
+  return out;
+}
 /** The constant boolean of an `m:` attribute (bare, {true}, {false}, "false"), or undefined when it is not constant. */
 function mConst(a) {
   if (a.literal !== undefined) return a.literal !== "false";
@@ -138,6 +167,11 @@ class Transformer {
       lines.push(`import { ${names.sort().join(", ")} } from ${JSON.stringify(spec)};`);
     }
     const mp = this.opts.props ?? "hadi-march/props";
+    // m:parts names components: each must be in scope (declared here or auto-imported)
+    for (const [name, at] of this.partNames ?? []) {
+      if (!this.declared.has(name) && !Object.prototype.hasOwnProperty.call(auto, name)) throw fail(this.src, at, `m:parts: "${name}" is not a component in scope (import it, or pass a Map of components)`);
+    }
+    if (this.mParts) lines.push(`import { withParts as ${PARTS_HELPER} } from ${JSON.stringify(mp)};`);
     if (this.mHelper) lines.push(`import { mProps as ${M_HELPER} } from ${JSON.stringify(mp)};`);
     else if (this.mCss) lines.push(`import ${JSON.stringify(this.opts.propsCss ?? "hadi-march/css/props.css")};`);
     for (const [name, spec] of tpls) lines.push(`const ${name} = ${H.tpl}(${spec});`);
@@ -718,10 +752,30 @@ class Transformer {
     // m: common props: a constant on a native element is a plain attribute; the rest is applied by mProps() to the
     // element / the component's root elements (typecheck mode keeps them as props so their types are checked)
     const mDyn = [];
+    // m:parts={{ Avatar: { size: "lg" } }}: props for the components drawn inside this one, by component. The names
+    // become the components themselves (a Map): names do not survive minifying. Any other expression is passed as it
+    // is (a Map of components, or an accessor of one). The element is created inside the scope: withParts(parts, () => …)
+    let parts = null;
     if (!this.opts.typecheck && attrs.some((a) => a.name?.startsWith("m:"))) {
       attrs = attrs.flatMap((a) => {
         if (!a.name?.startsWith("m:")) return [a];
         const name = a.name.slice(2);
+        if (name === "parts") {
+          if (a.literal !== undefined || (a.code === "true" && !a.raw)) throw fail(this.src, this.pos, "m:parts needs a value: m:parts={{ Avatar: { size: \"lg\" } }}");
+          const entries = a.code.trim().startsWith("{") ? objectEntries(a.code) : undefined;
+          if (entries === null) throw fail(this.src, this.pos, "m:parts: write { Name: { … } } entries (no spread, no shorthand), or pass a Map of components");
+          let code = a.code;
+          if (entries) {
+            for (const [k] of entries) {
+              if (!/^[A-Z][\w$]*$/.test(k)) throw fail(this.src, this.pos, `m:parts: "${k}" is not a component name`);
+              this.used.add(k);
+              (this.partNames ??= []).push([k, this.pos]);
+            }
+            code = `new Map([${entries.map(([k, v]) => `[${k}, ${v}]`).join(", ")}])`;
+          }
+          parts = a.dynamic ? `() => (${code})` : code;
+          return [];
+        }
         if (!/^[a-z][a-z0-9-]*$/.test(name)) throw fail(this.src, this.pos, `invalid common prop ${a.name}`);
         const v = !isComp && M_ATTRS[name] ? mConst(a) : undefined;
         if (v === undefined) { mDyn.push(`${JSON.stringify(name)}: ${a.dynamic ? `() => (${a.code})` : a.code}`); return []; }
@@ -730,7 +784,11 @@ class Transformer {
         return [{ name: M_ATTRS[name], code: JSON.stringify(literal), dynamic: false, literal }];
       });
     }
-    const mWrap = (code) => { if (!mDyn.length) return code; this.mHelper = true; return `${M_HELPER}(${code}, {${mDyn.join(", ")}})`; };
+    const mWrap = (code) => {
+      if (mDyn.length) { this.mHelper = true; code = `${M_HELPER}(${code}, {${mDyn.join(", ")}})`; }
+      if (parts) { this.mParts = true; code = `${PARTS_HELPER}(${parts}, () => ${code})`; }
+      return code;
+    };
     for (const a of attrs) {
       if (a.spread) { props.push(`...${a.spread}`); continue; }
       const key = /^[A-Za-z_$][\w$]*$/.test(a.name) ? a.name : JSON.stringify(a.name);
@@ -763,7 +821,7 @@ class Transformer {
       const tn = this.opts.typecheck || this.opts.templates === false ? null : this.tnode(tag, attrs, kids, childCode);
       if (tn) {
         code = this.emitTemplate(tn);
-        if (mDyn.length) return mWrap(code);
+        if (mDyn.length || parts) return mWrap(code);
         (this.tnodes ??= new Map()).set(code, tn);
         return code;
       }
@@ -788,6 +846,7 @@ export function isStaticCode(code) {
   if (c.startsWith(`${H.h}(`) && balancedCall(c)) return true;
   if (/^_\$t\d+\(/.test(c) && balancedCall(c)) return true; // a template clone
   if (c.startsWith(`${M_HELPER}(`) && balancedCall(c)) return true; // an element / component with m: props
+  if (c.startsWith(`${PARTS_HELPER}(`) && balancedCall(c)) return true; // … inside an m:parts scope
   return false;
 }
 function balancedCall(c) {

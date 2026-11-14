@@ -52,6 +52,21 @@ own props. The list is open; the first member is `m:no-select`.
   inside its root and is not covered: put the prop on that content.
 - By hand: `mProps(h(Card, props), { "no-select": true })`; on a native element `h("div", { "m:no-select": true })`
   also works once `hadi-march/props` is imported.
+- `m:parts` (props for the parts): gives props to the components drawn **inside** the element or component, by
+  component, whatever draws them. No component needs a prop of its own for this.
+  ```jsx
+  <PostCard post={post} m:parts={{ Avatar: { size: "lg", shape: "square" }, LikeButton: { color: "brand-blue" } }} />
+  <section m:parts={{ Button: { size: "sm" } }}>…every Button in the section…</section>
+  ```
+  The keys are component names in scope (imported or auto-imported); the compiler turns them into the components
+  themselves, so the names survive minifying: `withParts(new Map([[Avatar, {…}]]), () => h(PostCard, {…}))`. A name
+  that is not in scope is a compile error. Any other expression is passed as it is: a `Map` of components, or an
+  accessor of one (`m:parts={$chosen}`). Every component of that kind created inside the scope gets the props, now
+  or later (a list row, a branch that opens); they win over what its parent gave it; the nearest scope wins over an
+  outer one for the same component. Values stay live for the props that were named when a part was created (a prop
+  added to the object later reaches parts drawn after that). All parts of one kind get the same props (the three
+  IconButtons of a card). A component that is called as a plain function instead of through JSX / `h()` is not
+  reached. By hand: `withParts(map, () => h(PostCard, props))` from `hadi-march/props`.
 - A new member: `registerMProp("tone", (el, value) => { … })` makes `m:tone` work everywhere (called again when a live
   value changes). An attribute-only prop can also be added to the compiler's `M_ATTRS` table (`hadi-march/compiler`) so
   constants cost nothing at runtime.

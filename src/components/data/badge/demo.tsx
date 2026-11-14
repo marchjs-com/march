@@ -1,5 +1,6 @@
 // Showcase stage for Badge: kind, tone, size, dot motion, the clickable form and the count follow the Playground values (playground.ts).
 import { Badge } from "./index.ts";
+import { LABEL } from "./playground.ts";
 import { Icon } from "../../../icons/index.ts";
 import { heart } from "../../../icons/glyphs/heart.ts";
 
@@ -11,7 +12,6 @@ export const code = `<Badge tone="success">Etkin</Badge>
 <Badge size="xs" count={$unread} />                  // the mini badge on a corner
 <Badge onClick={() => open()} pressed={$on}>v2</Badge> // clickable: a <button>`
 
-const LABEL: Record<string, string> = { neutral: "Taslak", primary: "Yeni", info: "Davetli", success: "Etkin", warn: "Bekliyor", danger: "Askıda" }
 
 export default function BadgeDemo(props: { values: { mode: string; tone: string; size: string; dot: string; pulse: string; clickable: boolean; count: number; showZero: boolean; format: string } }) {
   let $clicks = 0

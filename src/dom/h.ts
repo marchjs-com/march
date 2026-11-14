@@ -86,7 +86,13 @@ export function _prop(el: Element, tag: string, key: string, value: unknown): vo
 /** Mark a thunk as lazily evaluated children (compiler output for component children). */
 export function lazyChildren<F extends () => unknown>(fn: F): F { (fn as unknown as Record<symbol, boolean>)[CHILDREN] = true; return fn; }
 
+/** The props hook of hadi-march/props (`m:parts`): may replace the props a component is created with. */
+let partsHook: ((Comp: Component<Props>, raw: Props) => Props) | undefined;
+/** Not for direct use: hadi-march/props installs the `m:parts` hook with it. */
+export const _partsHook = (fn: typeof partsHook): void => { partsHook = fn; };
+
 function createComponent(Comp: Component<Props>, raw: Props, children: unknown[]): unknown {
+  if (partsHook) raw = partsHook(Comp, raw);
   const props: Props = {};
   for (const key of Object.keys(raw)) {
     const v = raw[key];
