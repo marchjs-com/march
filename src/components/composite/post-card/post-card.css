@@ -1,8 +1,10 @@
 /* March — PostCard. Flat card with a soft accent shadow (HADİ feed), header 38px avatar, 26px action icons. */
-.hm-post { display: flex; flex-direction: column; gap: var(--hm-space-2); min-width: 0; padding-block: var(--hm-space-3); color: var(--hm-text); }
-.hm-post-card { background: var(--hm-surface); border: 1px solid var(--hm-border-subtle, var(--hm-border)); border-radius: var(--hm-radius-4);
+/* the frame is a Card (flush; `plain` in the flat look); here its softer border, rounder corners and the accent shadow */
+.hm-post { color: var(--hm-text); }
+.hm-post.hm-card > .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-2); padding-block: var(--hm-space-3); }
+.hm-post-card.hm-card { border-color: var(--hm-border-subtle, var(--hm-border)); border-radius: var(--hm-radius-4);
   box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 22%, transparent); }
-.hm-post-flat { border-block-end: 1px solid var(--hm-border-subtle, var(--hm-border)); }
+.hm-post-flat.hm-card { border-block-end: 1px solid var(--hm-border-subtle, var(--hm-border)); }
 .hm-post-head { display: flex; align-items: center; gap: var(--hm-space-2); padding-inline: var(--hm-space-3) var(--hm-space-2); min-width: 0; }
 /* who: a ListRow without its own padding or hover fill */
 .hm-post-who.hm-listrow { flex: 1 1 auto; gap: .625rem; inline-size: auto; min-block-size: 0; padding: 0; color: inherit; }

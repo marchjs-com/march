@@ -1,0 +1,14 @@
+/* ReplyQuote: the quoted message behind a coloured bar (in a bubble, above a message field). data-hm-color sets the
+   bar and the name (--hm-accent); the inverse look takes the text colour of the bubble it sits in. */
+.hm-reply-quote { display: flex; align-items: center; gap: .5rem; box-sizing: border-box; min-inline-size: 0; padding: .375rem .625rem; border-radius: .625rem;
+  border-inline-start: 3px solid var(--hm-accent, var(--hm-primary)); background: var(--hm-surface-2); font-size: var(--hm-text-sm); }
+.hm-reply-quote.is-barless { border-inline-start: 0; }
+.hm-reply-quote-main { display: flex; flex-direction: column; gap: .0625rem; flex: 1; min-inline-size: 0; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: start; }
+button.hm-reply-quote-main { cursor: pointer; border-radius: var(--hm-radius-1); }
+button.hm-reply-quote-main:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: 2px; }
+.hm-reply-quote-name { font-size: var(--hm-text-xs); color: var(--hm-accent-text, var(--hm-primary-text)); }
+.hm-reply-quote-text { opacity: .9; }
+.hm-reply-quote-close { flex: none; }
+/* inside a coloured bubble */
+.hm-reply-quote-inverse { background: color-mix(in srgb, var(--hm-scrim) 16%, transparent); border-inline-start-color: currentColor; }
+.hm-reply-quote-inverse .hm-reply-quote-name { color: inherit; }

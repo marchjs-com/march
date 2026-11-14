@@ -8,10 +8,11 @@ import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Menu, Tooltip, type MenuItem } from "../../../ui/menu.ts";
 import { formatKey } from "../../../ui/keys.ts";
-import { fitItems, observeWidth } from "../../../ui/fit.ts";
+import { overflowFit } from "../../../ui/fit.ts";
 import { commandBinding } from "../../../managers/command/ui.ts";
 import { animate } from "../../../motion/animate.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
+import { PlainListRow } from "../../data/list-row/core.ts";
 import { more } from "../../../icons/glyphs/more.ts";
 
 messages("tr", { "Status bar": "Durum çubuğu", "More status": "Diğer durum bilgileri" });
@@ -55,25 +56,14 @@ export interface StatusBarProps {
 export function StatusBar(props: StatusBarProps): Element {
   const list = computed(() => val(props.items) ?? []);
   const ordered = computed(() => [...list().filter((x) => x.side !== "end"), ...list().filter((x) => x.side === "end")]);
-  const shown = signal<boolean[]>([]);
   const said = signal("");
-  let bar: HTMLElement | undefined, moreEl: HTMLElement | undefined, widths: number[] = [], avail = 0;
-
-  const refit = (): void => {
-    const items = untrack(ordered);
-    if (!bar || props.overflow === false || widths.length !== items.length) return;
-    const next = fitItems(widths.map((w) => w + 2), items.map((x) => x.priority ?? 0), avail, (moreEl?.offsetWidth || 28) + 2);
-    const before = untrack(shown);
-    if (next.length !== before.length || next.some((v, i) => v !== before[i])) shown.set(next);
-  };
-  effect(() => {
-    ordered();
-    untrack(() => {
-      shown.set([]);
-      queueMicrotask(() => { if (!bar) return; widths = [...bar.querySelectorAll<HTMLElement>(".hm-sbar-item")].map((c) => c.offsetWidth || 0); refit(); });
-    });
+  let bar: HTMLElement | undefined, moreEl: HTMLElement | undefined;
+  const fit = overflowFit({
+    items: ordered, enabled: () => props.overflow !== false, reserve: () => (moreEl?.offsetWidth || 28) + 2,
+    measure: () => (bar ? [...bar.querySelectorAll<HTMLElement>(".hm-sbar-item")].map((c) => (c.offsetWidth || 0) + 2) : null),
+    priority: (i) => untrack(ordered)[i]?.priority ?? 0,
   });
-  const isShown = (i: number): boolean => shown()[i] !== false;
+  const { isShown } = fit;
 
   const item = (x: StatusItem, i: number): Element => {
     const b = x.command || x.onSelect ? commandBinding({ command: x.command, label: x.text, icon: x.icon, onSelect: x.onSelect }) : null;
@@ -90,12 +80,13 @@ export function StatusBar(props: StatusBarProps): Element {
         effect(() => { run?.cancel(); run = busy() ? animate(el, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0.35, transform: "scale(.6)" }, { opacity: 1, transform: "scale(1)" }], { duration: 1100, iterations: Infinity }) : null; });
         onCleanup(() => run?.cancel());
       } }, ownDot(tone, x));
-    const body = [() => icon(b ? b.icon() : x.icon, "hm-sbar-icon"), x.icon || b?.icon() ? null : dot, h("span", { class: "hm-sbar-text" }, text)];
     if (x.live) { let first = true; effect(() => { const v = text(); if (first) { first = false; return; } untrack(() => said.set(v)); }); }
     const cls = (): string => cx("hm-sbar-item", `is-${tone()}`, b && "is-button");
+    // an item is the smallest ListRow (the plain one): the icon or the tone dot leads, the text is the title; a button when it runs something
+    const row = { size: "xs" as const, class: cls, hidden: () => !isShown(i), lead: () => icon(b ? b.icon() : x.icon, "hm-sbar-icon") ?? dot, title: text };
     const el = b
-      ? h("button", { type: "button", class: cls, hidden: () => !isShown(i), disabled: () => b.disabled(), "aria-description": () => val(x.title) ?? null, onClick: () => b.run() }, body)
-      : h("span", { class: cls, hidden: () => !isShown(i) }, body);
+      ? h(PlainListRow, { ...row, disabled: () => b.disabled(), "aria-description": () => val(x.title) ?? null, onClick: () => b.run() }) as Element
+      : h(PlainListRow, { ...row, as: "span" }) as Element;
     return tip() ? (h(Tooltip, { text: tip, placement: "top", children: el }) as unknown as Element) : el;
   };
   const overflow = computed((): MenuItem[] => ordered().flatMap((x, i): MenuItem[] => (isShown(i) ? [] : [{
@@ -104,7 +95,7 @@ export function StatusBar(props: StatusBarProps): Element {
     disabled: !(x.command || x.onSelect),
   }])));
 
-  return h("div", { class: () => cx("hm-sbar", val(props.class)), role: "region", "aria-label": () => val(props.label) ?? t`Status bar`, ref: (x: HTMLElement) => { bar = x; observeWidth(x, (w) => { avail = w; refit(); }); } },
+  return h("div", { class: () => cx("hm-sbar", val(props.class)), role: "region", "aria-label": () => val(props.label) ?? t`Status bar`, ref: (x: HTMLElement) => { bar = x; fit.observe(x); } },
     h("div", { class: "hm-sbar-side" }, () => ordered().map((x, i) => (x.side === "end" ? null : untrack(() => item(x, i))))),
     h("div", { class: "hm-sbar-more", hidden: () => overflow().length === 0, ref: (x: HTMLElement) => { moreEl = x; } },
       h(Menu, { label: () => val(props.moreLabel) ?? t`More status`, icon: props.moreIcon ?? more, items: () => overflow(), placement: "top-start" })),

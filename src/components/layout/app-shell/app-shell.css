@@ -24,10 +24,9 @@
   .hm-shell-has-header .hm-shell-header { padding-inline: 3.25rem var(--hm-space-3); gap: var(--hm-space-1); }
 }
 @media (max-width: 640px) {
-  .hm-shell-header .hm-crumbs li:not(:last-child) { display: none; }
-  .hm-shell-header .hm-crumbs li + li::before { content: none; }
-  .hm-shell-header .hm-crumbs { min-width: 0; font-weight: 600; color: var(--hm-text); }
-  .hm-shell-header .hm-crumbs ol { flex-wrap: nowrap; overflow: hidden; white-space: nowrap; }
+  /* a narrow header shows the current page alone (the trail is a Breadcrumbs) */
+  .hm-shell-header .hm-bc-li:not(:last-child) { display: none; }
+  .hm-shell-header .hm-bc { font-weight: 600; }
   .hm-shell-header .hm-pal-trigger { width: var(--hm-control-h); height: var(--hm-control-h); padding: 0; justify-content: center; border-color: transparent; box-shadow: none; background: transparent; color: var(--hm-muted); }
   .hm-shell-header .hm-pal-trigger-label, .hm-shell-header .hm-pal-trigger-kbd { display: none; }
   .hm-shell-header .hm-pal-trigger-icon { width: 1.0625rem; height: 1.0625rem; }

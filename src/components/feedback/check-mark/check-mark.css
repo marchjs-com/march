@@ -15,6 +15,9 @@
 .hm-checkmark-sm .hm-checkmark-icon { inline-size: .875rem; block-size: .875rem; }
 .hm-checkmark-lg .hm-checkmark-icon { inline-size: 1.25rem; block-size: 1.25rem; }
 .hm-checkmark-text { font-size: var(--hm-text-xs); }
+/* bare: the mark of another component (a step dot): its colour and its text size */
+.hm-checkmark-bare { color: inherit; }
+.hm-checkmark-bare .hm-checkmark-icon { inline-size: 1em; block-size: 1em; }
 /* discs: the glyph keeps its size, the disc adds room around it */
 .hm-checkmark-soft .hm-checkmark-icon, .hm-checkmark-solid .hm-checkmark-icon { box-sizing: content-box; padding: .375rem; border-radius: var(--hm-radius-full); background: var(--hm-checkmark-soft); }
 .hm-checkmark-solid .hm-checkmark-icon { background: var(--hm-checkmark-c); color: var(--hm-on-status, var(--hm-on-scrim)); }

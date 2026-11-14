@@ -1,0 +1,3 @@
+/* PeriodNav. The buttons are IconButton / Button in a ButtonGroup; here only the row with a title between the arrows. */
+.hm-period-nav.is-titled { display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; }
+.hm-period-nav-title { flex: 1 1 auto; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; text-align: center; }

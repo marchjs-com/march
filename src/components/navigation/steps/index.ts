@@ -2,8 +2,7 @@
 import "./steps.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { ownIcon } from "../../../ui/parts.ts";
-import { check } from "../../../icons/glyphs/check.ts";
+import { CheckMark } from "../../feedback/check-mark/index.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface StepItem { title: unknown; description?: unknown; icon?: unknown }
@@ -31,7 +30,7 @@ export function Steps(props: StepsProps): Element {
       const st = state();
       if (renderDot) return renderDot(i, st, s);
       const done = props.doneIcon;
-      if (st === "done" && done !== false) return ownIcon(done ?? undefined, check);
+      if (st === "done" && done !== false) return h(CheckMark, { variant: "bare", label: false, icons: { yes: done ?? undefined } }); // the step's own text says it
       return s.icon != null ? icon(s.icon) : String(i + 1);
     };
     const inner = [

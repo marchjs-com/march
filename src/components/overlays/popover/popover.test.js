@@ -106,3 +106,28 @@ test("Popover: own state with defaultOpen; a function trigger wires itself", () 
   assert.equal(panelOf(), null);
   m.dispose();
 });
+
+test("Popover: id names the panel; panelProps add attributes, listeners and a ref to it", () => {
+  let got = null, keys = 0;
+  const m = mount(() => h(Popover, { defaultOpen: true, id: "my-panel", role: "menu", label: "More", panelProps: { ref: (x) => { got = x; }, onKeydown: () => { keys++; }, "data-kind": "menu" } }, "Body"));
+  const panel = panelOf();
+  assert.equal(panel.id, "my-panel");
+  assert.equal(got, panel);
+  assert.equal(panel.getAttribute("data-kind"), "menu");
+  panel.dispatchEvent(new Event("keydown", { bubbles: true }));
+  assert.equal(keys, 1);
+  m.dispose();
+});
+
+test("PopoverPanel: the panel alone on an anchor; nothing is left in the page beside it", async () => {
+  const { PopoverPanel } = await import("./index.ts");
+  const open = signal(false), field = document.createElement("input");
+  document.body.appendChild(field);
+  const m = mount(() => h(PopoverPanel, { open, anchor: () => field, role: "menu", autoFocus: false }, "items"));
+  assert.equal(m.el.children.length, 0, "no wrapper element");
+  open.set(true);
+  assert.equal(panelOf().getAttribute("role"), "menu");
+  esc(document.body);
+  assert.equal(open(), false);
+  m.dispose();
+});

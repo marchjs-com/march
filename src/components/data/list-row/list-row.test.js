@@ -109,3 +109,38 @@ test("ListRow: as=\"button\" is a button without onClick; the host's listeners p
   assert.equal(downs, 1);
   dispose();
 });
+
+test("ListRow: a tile: direction=\"column\", titleAs / subAs, as=\"article\"", () => {
+  const dir = signal("column");
+  const [el, dispose] = mount(() => [
+    h(ListRow, { as: "article", direction: dir, align: "center", titleAs: "h3", subAs: "p", title: "Fast", sub: "Every route is a lazy chunk.", lead: home }),
+    h(ListRow, { title: "Plain", sub: "Row" }),
+  ]);
+  const [tile, row] = el.querySelectorAll(".hm-listrow");
+  assert.equal(tile.tagName.toLowerCase(), "article");
+  assert.ok(tile.classList.contains("is-column") && tile.classList.contains("is-centered"));
+  assert.equal(tile.querySelector("h3.hm-listrow-title").textContent, "Fast");
+  assert.equal(tile.querySelector("p.hm-listrow-sub").textContent, "Every route is a lazy chunk.");
+  assert.equal(tile.querySelector(".hm-listrow-text").tagName.toLowerCase(), "div", "headings and paragraphs sit in a block");
+  dir.set("row");
+  assert.ok(!tile.classList.contains("is-column") && !tile.classList.contains("is-centered"));
+  assert.ok(!row.classList.contains("is-column"));
+  assert.equal(row.querySelector(".hm-listrow-text").tagName.toLowerCase(), "span");
+  dispose();
+});
+
+test("PlainListRow (core.ts): the same row without the scrolling text; plain titles are cut", async () => {
+  const { PlainListRow } = await import("./core.ts");
+  const [el, dispose] = mount(() => h(PlainListRow, { title: "A long title", sub: "Sub", lead: home, onClick: () => {} }));
+  const r = el.querySelector("button.hm-listrow");
+  assert.ok(r.classList.contains("is-ellipsis") && r.classList.contains("is-action"));
+  assert.equal(r.querySelector(".hm-overflow-text, .hm-ot"), null);
+  assert.equal(r.querySelector(".hm-listrow-title").textContent, "A long title");
+  dispose();
+});
+
+test("ListRow: size xs", () => {
+  const [el, dispose] = mount(() => h(ListRow, { size: "xs", title: "main" }));
+  assert.ok(el.querySelector(".hm-listrow").classList.contains("hm-listrow-xs"));
+  dispose();
+});

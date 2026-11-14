@@ -46,4 +46,4 @@ the state. Keyboard activation of a photo opens it at once.
 
 ## Composed of
 
-Avatar, Menu, MediaGrid, LikeButton, CountRoll, Button, ClampText, ListRow, VerifiedMark.
+Card (the frame: `as="article"`, `flush`; `plain` in the flat look), Avatar, Menu, MediaGrid, LikeButton, CountRoll, Button, ClampText, ListRow, VerifiedMark.

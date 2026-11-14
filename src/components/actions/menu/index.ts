@@ -6,15 +6,16 @@ import { h } from "../../../dom/h.ts";
 import type { Href } from "../../../router/router.ts";
 import { can, type PermCheck } from "../../../access/index.ts";
 import { isAction, type Action } from "../../../ui/action.ts";
-import { floating, type Placement } from "../../../ui/popover.ts";
+import type { Placement } from "../../../ui/popover.ts";
+import { PopoverPanel } from "../../overlays/popover/index.ts";
 import { roving } from "../../../ui/focus.ts";
-import { val, cx, uid, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { check } from "../../../icons/glyphs/check.ts";
+import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { CheckMark } from "../../feedback/check-mark/index.ts";
 import { Button, argsOf, type Args, type ButtonVariant, type ButtonSize } from "../button/index.ts";
 import { IconButton } from "../icon-button/index.ts";
 import { Kbd } from "../../typography/kbd/index.ts";
 import { Divider } from "../../layout/stack/index.ts";
-import { ListRow } from "../../data/list-row/index.ts";
+import { PlainListRow } from "../../data/list-row/core.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 
 // ------------------------------------------------------------------ menus
@@ -61,10 +62,10 @@ export function renderItem(it: MenuItem, args: unknown[], close: (refocus: boole
   if (isSep(it)) { const sep = h(Divider, { class: "hm-menu-sep" }) as Element; sep.setAttribute("role", "separator"); return sep; }
   const x = isAction(it) ? specOf(it, args) : it;
   const choice = x.checked !== undefined;
-  const trail = choice || x.shortcut ? [choice && h("span", { class: "hm-menu-check", "aria-hidden": "true" }, glyph(check)), x.shortcut && h(Kbd, { keys: x.shortcut, class: "hm-menu-kbd" })] : undefined;
+  const trail = choice || x.shortcut ? [choice && h(CheckMark, { variant: "bare", label: false, class: "hm-menu-check" }), x.shortcut && h(Kbd, { keys: x.shortcut, class: "hm-menu-kbd" })] : undefined;
   const row = { size: "sm" as const, overflow: "wrap" as const, tabindex: "-1", class: cx("hm-menu-item", x.danger && "is-danger"), lead: x.icon, title: () => val(x.label), trail };
-  if (x.href) return h(ListRow, { ...row, href: x.href, role: "menuitem", "on:click": () => close(false) });
-  return h(ListRow, {
+  if (x.href) return h(PlainListRow, { ...row, href: x.href, role: "menuitem", "on:click": () => close(false) });
+  return h(PlainListRow, {
     ...row, role: choice ? (x.radio ? "menuitemradio" : "menuitemcheckbox") : "menuitem", "aria-checked": choice ? () => String(!!val(x.checked)) : null,
     disabled: () => !!val(x.disabled), onClick: () => { close(true); x.onSelect?.(...args); },
   });
@@ -88,14 +89,43 @@ export interface PopoverButtonProps {
   disabled?: MaybeFn<boolean | null | undefined>;
 }
 
-// Shared trigger + floating panel.
-function popButton(props: PopoverButtonProps, role: "menu" | "dialog", panelChildren: (close: (refocus?: boolean) => void) => unknown,
-  panelKeys?: (e: KeyboardEvent, panel: HTMLElement | undefined, close: (refocus?: boolean) => void) => void): unknown[] {
+/** What the shared menu panel needs: where it hangs, when it is open, what it lists. */
+export interface MenuPanelOptions {
+  /** The element the panel is placed by (the trigger, or a point for a context menu). */
+  anchor: () => Element | undefined;
+  open: () => boolean;
+  /** Called when the panel wants to close; `refocus`: focus goes back to where it came from (Escape, a choice). */
+  close: (refocus?: boolean) => void;
+  /** The entries of this opening (already filtered by `itemVisible`). */
+  items: () => readonly MenuItem[];
+  args?: () => unknown[];
+  label?: MaybeFn<string | null | undefined>;
+  id?: string;
+  class?: string | undefined;
+  placement?: Placement | undefined;
+  ref?: (panel: HTMLElement) => void;
+}
+/**
+ * The floating panel of a menu, drawn once for Menu and ContextMenu: a Popover panel with `role="menu"`, the entries
+ * (renderItem), arrow keys / Home / End among them, Tab closes.
+ */
+export function menuPanel(o: MenuPanelOptions): unknown {
+  let panel: HTMLElement | undefined;
+  return h(PopoverPanel, {
+    anchor: o.anchor, open: o.open, onOpenChange: (on: boolean, why: string) => { if (!on) o.close(why === "escape"); },
+    role: "menu", ...(o.id ? { id: o.id } : {}), label: () => val(o.label) ?? undefined, placement: o.placement, flush: true, autoFocus: false, panelClass: cx("hm-menu", o.class),
+    panelProps: { ref: (x: HTMLElement) => { panel = x; o.ref?.(x); }, onKeydown: (e: KeyboardEvent) => { if (e.key === "Tab") o.close(false); else roving(e, menuItems(panel)); } },
+    children: () => { const args = o.args?.() ?? []; const items = o.items(); return untrack(() => items.map((it) => renderItem(it, args, (refocus) => o.close(refocus)))); },
+  });
+}
+
+// Shared trigger (Button / IconButton) of Menu and Dropdown: the ARIA of a popup button; `panel` draws what it opens.
+function popButton(props: PopoverButtonProps, role: "menu" | "dialog", panel: (p: { anchor: () => HTMLElement | undefined; open: () => boolean; close: (refocus?: boolean) => void; id: string; ref: (x: HTMLElement) => void }) => unknown): unknown[] {
   const open = signal(false);
   const id = uid("hm-pop");
-  let trigger: HTMLElement | undefined, panel: HTMLElement | undefined;
+  let trigger: HTMLElement | undefined, panelEl: HTMLElement | undefined;
   const close = (refocus?: boolean): void => { open.set(false); if (refocus) trigger?.focus(); };
-  const focusIn = (i: number): void => queueMicrotask(() => { const els = role === "menu" ? menuItems(panel) : []; (i < 0 ? els[els.length - 1] : els[i])?.focus(); });
+  const focusIn = (i: number): void => queueMicrotask(() => { const els = role === "menu" ? menuItems(panelEl) : []; (i < 0 ? els[els.length - 1] : els[i])?.focus(); });
   const show = (i = 0): void => { open.set(true); focusIn(i); };
   // the trigger is an IconButton (icon only) or a Button; its own content goes in unwrapped (Button's icon slot passes nodes through)
   const iconOnly = !!props.icon && props.trigger == null;
@@ -112,12 +142,7 @@ function popButton(props: PopoverButtonProps, role: "menu" | "dialog", panelChil
   };
   const btn = iconOnly ? h(IconButton, { ...attrs, icon: props.icon })
     : h(Button, { ...attrs, variant: () => val(props.variant), ...(own ? { icon: props.trigger } : { children: props.trigger ?? (() => val(props.label)) }) });
-  return [btn, () => open() && untrack(() => floating({
-    anchor: trigger, placement: props.placement ?? "bottom-start", role: role === "menu" ? "menu" : null, id,
-    class: cx(role === "menu" ? "hm-menu" : "hm-dropdown", props.panelClass), onClose: close, ref: (x) => { panel = x; },
-    attrs: { "aria-label": role === "menu" ? () => val(props.label) ?? null : null, onKeydown: (e: KeyboardEvent) => panelKeys?.(e, panel, close) },
-    children: panelChildren(close),
-  }))];
+  return [btn, panel({ anchor: () => trigger, open: () => open(), close, id, ref: (x) => { panelEl = x; } })];
 }
 
 /** Props of <Menu>. `args` are passed to actions and `onSelect`. */
@@ -131,19 +156,19 @@ export interface MenuProps extends PopoverButtonProps {
  * Keyboard: ↓/↑ on the trigger opens, ↑ ↓ Home End move, Enter activates, Esc closes, Tab leaves.
  */
 export function Menu(props: MenuProps): unknown[] {
-  return popButton(props, "menu", (close) => () => {
-    const args = argsOf(props);
-    const items = (val(props.items) ?? []).filter((it) => itemVisible(it, args));
-    return untrack(() => items.map((it) => renderItem(it, args, close)));
-  }, (e, panel, close) => {
-    if (e.key === "Tab") close(false);
-    else roving(e, menuItems(panel));
-  });
+  return popButton(props, "menu", (p) => menuPanel({
+    ...p, label: () => val(props.label), class: props.panelClass, placement: props.placement, args: () => argsOf(props),
+    items: () => { const args = argsOf(props); return (val(props.items) ?? []).filter((it) => itemVisible(it, args)); },
+  }));
 }
 
 /** Props of <Dropdown>: children may be a function of `close`. */
 export interface DropdownProps extends PopoverButtonProps { children?: unknown }
-/** Trigger with arbitrary floating content: `<Dropdown label="Filters">{(close) => …}</Dropdown>` */
+/** Trigger with arbitrary floating content (a Popover on a button): `<Dropdown label="Filters">{(close) => …}</Dropdown>` */
 export function Dropdown(props: DropdownProps): unknown[] {
-  return popButton(props, "dialog", (close) => (typeof props.children === "function" && props.children.length ? (props.children as (close: (refocus?: boolean) => void) => unknown)(close) : props.children));
+  return popButton(props, "dialog", (p) => h(PopoverPanel, {
+    anchor: p.anchor, open: p.open, onOpenChange: (on: boolean, why: string) => { if (!on) p.close(why === "escape"); },
+    role: null, id: p.id, placement: props.placement, autoFocus: false, panelClass: cx("hm-dropdown", props.panelClass), panelProps: { ref: p.ref },
+    children: () => (typeof props.children === "function" && props.children.length ? (props.children as (close: (refocus?: boolean) => void) => unknown)(p.close) : props.children),
+  }));
 }

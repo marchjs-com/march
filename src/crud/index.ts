@@ -9,7 +9,8 @@ import type { Schema } from "../schema/index.ts";
 import type { PermCheck } from "../access/index.ts";
 import { createTable, Table, type TableProps, type ColumnInput, type RowAction, type BulkAction } from "../table/index.ts";
 import { Form } from "../forms/index.ts";
-import { deepEqual, CANCELLED } from "../forms/form.ts";
+import { CANCELLED } from "../forms/form.ts";
+import { changedFields } from "../forms/edit-form.ts";
 import { openDialog, askReason } from "../ui/dialog.ts";
 import { Button } from "../ui/button.ts";
 import { action } from "../ui/action.ts";
@@ -78,7 +79,7 @@ export function crud<R extends Row = Row>(source: CrudSource<R>, opts: CrudOptio
   const edit = source.update && action(L.edit, async (row: R) => {
     const initial = source.get ? await source.get(row[key]) : row;
     const r = await editor(L.edit, initial, async (values) => {
-      const changed = Object.fromEntries(Object.entries(values).filter(([k, v]) => !deepEqual(v, (initial as Row | undefined)?.[k]))) as Partial<R>;
+      const changed = changedFields(values, (initial as Row | undefined) ?? {}) as Partial<R>;
       let reason: string | undefined;
       if (opts.reason?.save) {
         const r = await askReason({ title: L.edit, min: opts.reason.save });

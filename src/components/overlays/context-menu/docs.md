@@ -31,4 +31,4 @@ returns focus to where it was. Shift+F10 and the Menu key open it at the focused
 
 ## Composed of
 
-The Menu item renderer and roving focus (shared with `Menu`), the floating panel and positioning engine (Portal layer).
+Menu (`menuPanel()`: the same panel, entries and keys), which is a Popover (floating panel, positioning, Portal layer).

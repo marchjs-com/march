@@ -7,6 +7,12 @@
 .hm-stat-tile-hint { order: 3; margin: 0; max-inline-size: 100%; color: var(--hm-muted); font-size: var(--hm-text-2xs, var(--hm-text-xs)); }
 .hm-stat-tile.is-label-first .hm-stat-tile-label { order: 0; }
 .hm-stat-tile[data-hm-color] .hm-stat-tile-value { color: var(--hm-accent-text, var(--hm-accent)); }
+.hm-stat-tile-value > .hm-stat-tile-hint { display: block; margin-block-start: .125rem; font-weight: 400; letter-spacing: normal; }
+/* the value as body text (a details list): medium weight, wraps; the label is the quiet line */
+.hm-stat-tile.is-text { gap: .1875rem; }
+.hm-stat-tile.is-text .hm-stat-tile-value { overflow-wrap: break-word; font-size: var(--hm-text-md); font-weight: var(--hm-weight-medium); line-height: inherit; letter-spacing: normal; }
+.hm-stat-tile.is-text .hm-stat-tile-label { overflow: visible; white-space: normal; color: var(--hm-muted); font-weight: var(--hm-weight-medium); }
+.hm-stat-tile.is-text .hm-stat-tile-hint { font-size: var(--hm-text-xs); }
 /* sizes */
 .hm-stat-tile-sm .hm-stat-tile-value { font-size: var(--hm-text-md); }
 .hm-stat-tile-lg { gap: var(--hm-space-1); } .hm-stat-tile-lg .hm-stat-tile-value { font-size: var(--hm-text-2xl); letter-spacing: -.02em; } .hm-stat-tile-lg .hm-stat-tile-label { font-size: var(--hm-text-sm); }

@@ -5,6 +5,7 @@ import { h } from "../../../dom/h.ts";
 import { cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { ListRow } from "../list-row/index.ts";
 import { Chevron } from "../../actions/chevron/index.ts";
+import { moveCursor } from "../../../behaviors/list-nav/index.ts";
 
 /** Parts of a tree row. Everything else in `attrs` goes to the ListRow (class, role, aria-*, data-*, listeners, active, selected, disabled). */
 export interface TreeRowParts {
@@ -24,6 +25,8 @@ export interface TreeRowParts {
   /** The icon node after the arrow. */
   icon?: unknown;
   label: unknown;
+  /** A second line under the label (a problem, a path): a node or an accessor. */
+  sub?: unknown;
   /** Between the label and the meta: a spinner, a retry button. */
   tools?: unknown;
   /** Trailing text (size, count…). */
@@ -39,7 +42,7 @@ export function treeRow(p: TreeRowParts, attrs: Record<string, unknown> = {}): E
   });
   const lead = [arrow, p.icon].filter((x) => x != null && x !== false);
   const trail = [p.tools, p.meta != null ? h("span", { class: `${p.prefix}-meta` }, p.meta) : null].flat().filter((x) => x != null && x !== false);
-  return h(ListRow, { as: "div", ...attrs, class: (attrs["class"] as ClassProp | undefined) ?? `${p.prefix}-row`, lead: lead.length ? lead : undefined, title: p.label, trail: trail.length ? trail : undefined }) as Element;
+  return h(ListRow, { as: "div", ...attrs, class: (attrs["class"] as ClassProp | undefined) ?? `${p.prefix}-row`, lead: lead.length ? lead : undefined, title: p.label, ...(p.sub != null ? { sub: p.sub } : null), trail: trail.length ? trail : undefined }) as Element;
 }
 
 /** What a key asks of a tree row. */
@@ -54,4 +57,17 @@ export function treeKey(key: string, row: { kids: boolean; open: boolean }, rtl 
   if (key === (rtl ? "ArrowLeft" : "ArrowRight")) return row.kids && !row.open ? "open" : row.open ? "child" : null;
   if (key === (rtl ? "ArrowRight" : "ArrowLeft")) return row.open ? "close" : "parent";
   return key === "Enter" ? "activate" : key === " " ? "select" : null;
+}
+
+/**
+ * Every key of a flat list of tree rows (TreeEditor, any tree drawn as one list): ↑ ↓ Home End PageUp PageDown move
+ * (the list-nav cursor), → ← open / close and step to the first child / the parent (treeKey). Returns the row index to
+ * go to, an action for the host ("open", "close", "activate", "select"), or null for a key that is not a tree key.
+ * `parent`: index of the row's parent (-1 for a root).
+ */
+export function treeListKey(key: string, at: { index: number; count: number; kids: boolean; open: boolean; parent: number }, rtl = false): number | Exclude<TreeKeyAction, "child" | "parent"> | null {
+  const k = treeKey(key, at, rtl);
+  if (k === "child") return Math.min(at.count - 1, at.index + 1);
+  if (k === "parent") return at.parent < 0 ? at.index : at.parent;
+  return k ?? moveCursor({ key, index: at.index, count: at.count });
 }

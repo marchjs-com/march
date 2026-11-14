@@ -5,6 +5,7 @@ import { t, messages } from "../../core/i18n.ts";
 import { Button } from "../../ui/button.ts";
 import { openDialog } from "../../ui/dialog.ts";
 import { Toggle, Segmented, Slider } from "../../forms/inputs.ts";
+import { live } from "../../forms/util.ts";
 import { Field } from "../../forms/field.ts";
 import { a11y, type A11yPrefs, type MotionPref } from "./index.ts";
 import tr from "./tr.ts";
@@ -12,7 +13,7 @@ import tr from "./tr.ts";
 messages("tr", tr);
 
 const toggle = (key: "contrast" | "underlineLinks" | "textSpacing" | "strongFocus", label: string): unknown =>
-  h(Toggle, { get value() { return a11y.prefs()[key]; }, setValue: (v: boolean) => a11y.set({ [key]: v } as Partial<A11yPrefs>), label: () => t(label) });
+  h(Toggle, { value: live(() => a11y.prefs()[key]), setValue: (v: boolean) => a11y.set({ [key]: v } as Partial<A11yPrefs>), label: () => t(label) });
 
 /** Every preference, applied as it changes. */
 export function AccessibilitySettings(): unknown {

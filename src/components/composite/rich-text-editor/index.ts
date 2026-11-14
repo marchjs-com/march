@@ -3,10 +3,9 @@
 // Toolbar (paragraph / headings, bold, italic, strike, code, link, lists, quote, code block, undo / redo), @mentions and
 // :emoji suggestions, Markdown shortcuts while typing ("# ", "- ", "1. ", "> ", "``` "), paste cleaned through the safe
 // content core (dom/safe.ts: no HTML parser, allowlist only), its own undo history (managers/undo › undoHistory).
-// Built from PanelHeader (head, foot), the formatting toolbar shared with MarkdownEditor (editor-parts/format-toolbar.ts:
-// Toolbar + IconButton + Divider), Popover + Field + TextInput (link panel) and Popover + OptionList (suggestions).
+// Built from EditorFrame (border, focus ring, head and foot bars), FormatToolbar, Popover + Field + TextInput (link
+// panel) and Popover + OptionList (suggestions).
 import "./rich-text-editor.css";
-import "../../../ui/editor-parts/frame.css";
 import { signal, computed, effect, untrack, batch } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
@@ -20,15 +19,16 @@ import { UrlInput } from "../../forms/text-input/index.ts";
 import { OptionList } from "../../forms/option-list/index.ts";
 import { IconButton } from "../../../ui/button.ts";
 import { Avatar } from "../../../ui/avatar.ts";
-import { PanelHeader } from "../../layout/panel-header/index.ts";
+import { EditorFrame } from "../editor-frame/index.ts";
 import { Popover } from "../../overlays/popover/index.ts";
+import { virtualAnchor } from "../../../ui/popover.ts";
 import { markdownNodes } from "../../../dom/markdown.ts";
 import { toMarkdown } from "../../../dom/to-markdown.ts";
 import { parseHtml, sanitizeNode, normalizeBlocks, isSafeLink } from "../../../dom/sanitize.ts";
 import { undoHistory, type UndoStack } from "../../../managers/undo/history.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { trash } from "../../../icons/glyphs/trash.ts";
-import { FormatToolbar, formatToolName, formatShortcut } from "../../../ui/editor-parts/format-toolbar.ts";
+import { FormatToolbar, formatToolName, formatShortcut } from "../format-toolbar/index.ts";
 import * as ops from "./ops.ts";
 import { EMOJI, POPULAR_EMOJI, type EmojiEntry } from "./emoji.ts";
 import tr from "./tr.ts";
@@ -327,16 +327,10 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
       return ops.insertFragment(root, at, fragOf([node, d.createTextNode(" ")]));
     });
   };
-  /** A rectangle that stands in for an anchor element (the caret, the selected text); `fallback` when it is empty. */
-  const virtualAnchor = (rect: () => DOMRect | null | undefined, fallback: () => Element = () => root): Element => ({
-    getBoundingClientRect: (): DOMRect => { const r = rect(); return r && (r.width || r.height) ? r : fallback().getBoundingClientRect(); },
-    contains: (n: Node | null) => root.contains(n) || (fallback() !== root && fallback().contains(n)),
-    closest: (sel: string) => root.closest(sel),
-  }) as unknown as Element;
   const caretAnchor = virtualAnchor(() => {
     const r = globalThis.document.getSelection?.()?.rangeCount ? globalThis.document.getSelection()!.getRangeAt(0) : null;
     return r?.getClientRects?.()[0] ?? r?.getBoundingClientRect?.();
-  });
+  }, () => root);
 
   // ------------------------------------------------------------------ task items: the box at the item's start toggles it
   const taskClick = (e: MouseEvent): void => {
@@ -453,15 +447,14 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     : tool === "emoji" ? { "aria-haspopup": "listbox", "aria-expanded": () => String(!!sug()?.button) } : {});
   const bar = () => {
     const list = tools();
-    if (!list.length) return null;
-    return h(PanelHeader, { as: "div", size: "sm", tone: "muted", divider: true, sticky: true, class: "hm-editor-head hm-rte-bar", children: h(FormatToolbar<Tool>, {
-      tools: list, prefix: "hm-rte", label: () => L().toolbar ?? t`Formatting`, name: (tool: Tool) => L().tools?.[tool], icons: props.toolIcons, onTool: exec, pressed: toggles, keys: KEYS, attrs: toolAttrs,
+    return !list.length ? null : h(FormatToolbar<Tool>, {
+      tools: list, prefix: "hm-rte", label: () => L().toolbar, name: (tool: Tool) => L().tools?.[tool], icons: props.toolIcons, onTool: exec, pressed: toggles, keys: KEYS, attrs: toolAttrs,
       disabled: (tool: Tool) => ro() || (tool === "undo" && !history.canUndo()) || (tool === "redo" && !history.canRedo()),
-    }) });
+    });
   };
 
   // the link panel opens under the selected text (the toolbar may have scrolled away); without a selection, under the button
-  const selAnchor = virtualAnchor(() => (lastSel ? ops.rangeOf(root, lastSel).getBoundingClientRect() : null), () => linkBtn ?? root);
+  const selAnchor = virtualAnchor(() => (lastSel ? ops.rangeOf(root, lastSel).getBoundingClientRect() : null), () => root, () => linkBtn);
   const badLink = (): boolean => { const v = linkText().trim(); return !!v && !isSafeLink(v); };
   const linkHelp = (): string => L().linkHelp ?? t`Only http(s), mailto, tel and relative links`;
   const hrefId = `${id}-href`;
@@ -513,15 +506,14 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   queueMicrotask(() => props.api?.(api));
 
   const rows = (): number => Math.max(2, props.rows ?? 6);
-  return h("div", {
-    class: () => cx("hm-editor-frame hm-rte", props.disabled && "is-disabled", props.readonly && "is-readonly", val(props.class)), "data-hm-color": c["data-hm-color"],
+  return h(EditorFrame, {
+    class: () => cx("hm-rte", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly, "data-hm-color": c["data-hm-color"],
     style: () => ({ "--hm-rte-rows": String(rows()) }),
-  },
-  bar,
-  root,
-  () => (props.counter === false ? null : h(PanelHeader, { as: "footer", size: "sm", class: "hm-editor-foot hm-rte-foot", "aria-live": "off", children: [
-    h("span", { class: "hm-rte-hint" }, () => (props.hint === false ? "" : L().hint != null ? L().hint : props.mentions && props.emoji !== false ? t`Type @ to mention, : for emoji` : props.mentions ? t`Type @ to mention` : props.emoji !== false ? t`Type : for emoji` : "")),
-    h("span", { class: "hm-rte-count" }, () => L().count?.(stats()[0], stats()[1]) ?? `${t`${stats()[0]} words`} · ${t`${stats()[1]} characters`}`)] })),
-  linkPanel,
-  suggestPanel);
+    head: bar, showHead: () => tools().length > 0, headProps: { sticky: true, class: "hm-rte-bar" },
+    showFoot: () => props.counter !== false, footProps: { class: "hm-rte-foot", "aria-live": "off" },
+    foot: [
+      h("span", { class: "hm-rte-hint" }, () => (props.hint === false ? "" : L().hint != null ? L().hint : props.mentions && props.emoji !== false ? t`Type @ to mention, : for emoji` : props.mentions ? t`Type @ to mention` : props.emoji !== false ? t`Type : for emoji` : "")),
+      h("span", { class: "hm-rte-count" }, () => L().count?.(stats()[0], stats()[1]) ?? `${t`${stats()[0]} words`} · ${t`${stats()[1]} characters`}`)],
+    children: [root, linkPanel, suggestPanel],
+  });
 }

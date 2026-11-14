@@ -3,7 +3,7 @@
 // from the command, so the palette, menus and this toolbar show the same thing). Toggle items (aria-pressed),
 // separators, roving focus with the arrow keys (mirrored in RTL), tooltips with the shortcut.
 import "./overflow-toolbar.css";
-import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
+import { computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -14,7 +14,7 @@ import { IconButton } from "../icon-button/index.ts";
 import { Divider } from "../../layout/stack/index.ts";
 import { labelWithKey } from "../../../ui/keys.ts";
 import { rovingFocus } from "../../../behaviors/roving-focus/index.ts";
-import { fitItems, observeWidth } from "../../../ui/fit.ts";
+import { overflowFit } from "../../../ui/fit.ts";
 import { commandBinding, type CommandBinding } from "../../../managers/command/ui.ts";
 import { animate } from "../../../motion/animate.ts";
 import { still, motionPreset } from "../../../motion/engine/parts.ts";
@@ -66,45 +66,33 @@ export interface OverflowToolbarProps {
 /** `<OverflowToolbar label="Editor" items={[{ id: "save", command: "doc.save", priority: 10 }, { id: "s", separator: true }, …]} />` */
 export function OverflowToolbar(props: OverflowToolbarProps): Element {
   const list = computed(() => val(props.items) ?? []);
-  const shown = signal<boolean[]>([]);
   let row: HTMLElement | undefined, moreEl: HTMLElement | undefined;
-  let widths: number[] = [];
-  let avail = 0;
 
   // one binding per item (command or plain); a hidden command (no permission) is left out everywhere
   const bound = computed(() => list().map((it) => ({ it, b: it.separator ? null : commandBinding(it) })));
   const present = computed(() => bound().filter((x) => !x.b?.hidden()));
 
-  const refit = (): void => {
-    if (!row) return;
-    const items = untrack(present);
-    if (widths.length !== items.length) return;
-    const gap = parseFloat(globalThis.getComputedStyle?.(row).columnGap ?? "0") || 0;
-    const prio = items.map((x, i) => (x.it.separator ? (items[i - 1]?.it.priority ?? 0) : (x.it.priority ?? 0)));
-    const next = fitItems(widths.map((w) => w + gap), prio, avail, (moreEl?.offsetWidth || 32) + gap);
+  const gap = (): number => (row ? parseFloat(globalThis.getComputedStyle?.(row).columnGap ?? "0") || 0 : 0);
+  const fit = overflowFit({
+    items: present,
+    measure: () => (row ? [...row.children].map((c) => ((c as HTMLElement).offsetWidth || 0) + gap()) : null),
+    priority: (i) => { const items = untrack(present); return (items[i]!.it.separator ? items[i - 1]?.it.priority : items[i]!.it.priority) ?? 0; },
+    reserve: () => (moreEl?.offsetWidth || 32) + gap(),
+    room: (w) => w + (moreEl && !moreEl.hidden ? moreEl.offsetWidth + 2 : 0),
     // a separator next to a hidden item (or at an edge) is not useful
-    next.forEach((v, i) => { if (v && items[i]!.it.separator && (!next[i - 1] || !next.slice(i + 1).some(Boolean))) next[i] = false; });
-    const before = untrack(shown);
-    if (next.length === before.length && next.every((v, i) => v === before[i])) return;
-    shown.set(next);
+    adjust: (next) => { const items = untrack(present); next.forEach((v, i) => { if (v && items[i]!.it.separator && (!next[i - 1] || !next.slice(i + 1).some(Boolean))) next[i] = false; }); },
     // items coming back slide in (motion engine), or the way `motion` says
-    const enter = props.motion ?? "pop";
-    if (!still(enter)) queueMicrotask(() => next.forEach((v, i) => {
-      const el = v && before[i] === false ? row?.children[i] : null;
-      if (!el) return;
-      if (typeof enter === "function") enter(el);
-      else animate(el, motionPreset(enter === "fade" ? "fade" : "pop"), { duration: 180, easing: "easeOutCubic" });
-    }));
-  };
-  // measure every item while all are shown (on start and when the list changes), then fit on every resize
-  effect(() => {
-    present();
-    untrack(() => {
-      shown.set([]);
-      queueMicrotask(() => { if (!row) return; widths = [...row.children].map((c) => (c as HTMLElement).offsetWidth || 0); shown.set(widths.map(() => true)); refit(); });
-    });
+    onChange: (next, before) => {
+      const enter = props.motion ?? "pop";
+      if (!still(enter)) queueMicrotask(() => next.forEach((v, i) => {
+        const el = v && before[i] === false ? row?.children[i] : null;
+        if (!el) return;
+        if (typeof enter === "function") enter(el);
+        else animate(el, motionPreset(enter === "fade" ? "fade" : "pop"), { duration: 180, easing: "easeOutCubic" });
+      }));
+    },
   });
-  const isShown = (i: number): boolean => shown()[i] !== false;
+  const { shown, isShown } = fit;
 
   const SEL = ".hm-otb-btn, .hm-otb-more > button";
   const button = (it: ToolbarItem, b: CommandBinding): unknown => {
@@ -139,7 +127,7 @@ export function OverflowToolbar(props: OverflowToolbarProps): Element {
 
   return h("div", { class: () => cx("hm-otb", props.size === "md" ? "hm-otb-md" : "hm-otb-sm", val(props.class)), role: "toolbar", "aria-label": () => val(props.label), "data-hm-color": () => colorAttr(props.color),
     ref: (x: HTMLElement) => { onCleanup(rovingFocus(x, { orientation: "horizontal", selector: SEL })); } },
-    h("div", { class: "hm-otb-items", ref: (x: HTMLElement) => { row = x; observeWidth(x, (w) => { avail = w + (moreEl && !moreEl.hidden ? moreEl.offsetWidth + 2 : 0); refit(); }); } }, items),
+    h("div", { class: "hm-otb-items", ref: (x: HTMLElement) => { row = x; fit.observe(x); } }, items),
     h("div", { class: "hm-otb-more", hidden: () => overflow().length === 0, ref: (x: HTMLElement) => { moreEl = x; } },
       h(Menu, { label: () => val(props.moreLabel) ?? t`More actions`, icon: ownIcon(props.moreIcon === false ? undefined : props.moreIcon ?? undefined, more), items: () => overflow(), size: "sm", variant: "ghost", placement: "bottom-end" })),
     props.end != null && h("div", { class: "hm-otb-end" }, props.end));

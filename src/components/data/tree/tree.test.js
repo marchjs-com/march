@@ -57,6 +57,26 @@ test("Tree: rows are ListRows with a Chevron; → enters an open node, ← leave
   m.dispose();
 });
 
+test("treeRow `sub` and treeListKey: a tree drawn as one flat list (TreeEditor)", async () => {
+  const { treeRow, treeListKey } = await import("./row.ts");
+  const { el, dispose } = mount(() => treeRow({ prefix: "hm-x", kids: true, open: true, label: "name", sub: "a problem" }, { role: "treeitem" }));
+  assert.equal(el.querySelector(".hm-x-row .hm-listrow-sub").textContent, "a problem");
+  dispose();
+  const at = { index: 2, count: 5, kids: true, open: false, parent: 0 };
+  assert.equal(treeListKey("ArrowDown", at), 3);
+  assert.equal(treeListKey("Home", at), 0);
+  assert.equal(treeListKey("End", at), 4);
+  assert.equal(treeListKey("ArrowRight", at), "open");
+  assert.equal(treeListKey("ArrowRight", { ...at, open: true }), 3, "an open node: its first child");
+  assert.equal(treeListKey("ArrowLeft", { ...at, open: true }), "close");
+  assert.equal(treeListKey("ArrowLeft", at), 0, "a closed node: its parent");
+  assert.equal(treeListKey("ArrowLeft", { ...at, parent: -1 }), 2, "a root stays");
+  assert.equal(treeListKey("ArrowLeft", at, true), "open", "right-to-left swaps the arrows");
+  assert.equal(treeListKey("Enter", at), "activate");
+  assert.equal(treeListKey(" ", at), "select");
+  assert.equal(treeListKey("x", at), null);
+});
+
 test("treeKey: the keys Tree and TreeView share (mirrored in right-to-left)", async () => {
   const { treeKey } = await import("./row.ts");
   assert.equal(treeKey("ArrowRight", { kids: true, open: false }), "open");

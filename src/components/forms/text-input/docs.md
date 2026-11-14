@@ -21,6 +21,7 @@ with the right keyboard, autocomplete and trimming.
 | `transform` | `(v) => string` | — | rewrites typed text (e.g. upper-case) |
 | `onKeyDown`, `onPaste` | `(e) => void` | — | key and paste handlers of the input (`preventDefault()` on a paste keeps the text out) |
 | `error` | string / accessor | — | error text of an input without a `<Field>`: the input turns invalid and the text shows under it |
+| `errorSpace` | boolean | `false` | with `error`: the error line keeps its height while empty (nothing moves when an error appears) |
 | `readonly`, `disabled`, `autofocus` | boolean | — | |
 | `color` | ColorToken | primary | focus ring, caret and selection |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |

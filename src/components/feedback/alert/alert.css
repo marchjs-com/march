@@ -10,6 +10,8 @@
 .hm-alert-neutral { background: var(--hm-surface-2); border-color: var(--hm-border); } .hm-alert-neutral .hm-alert-icon { color: var(--hm-muted); }
 /* color prop: a theme color token instead of the tone colours */
 .hm-alert[data-hm-color] { background: var(--hm-accent-soft); border-color: color-mix(in srgb, var(--hm-accent) 22%, transparent); } .hm-alert[data-hm-color] .hm-alert-icon { color: var(--hm-accent-text); }
+/* raised: a floating message (a toast): the surface of a layer and a shadow; the tone (or the color token) colours the icon alone */
+.hm-alert.hm-alert-raised { background: var(--hm-surface-raised); border-color: var(--hm-border); color: var(--hm-text); box-shadow: var(--hm-shadow-3); }
 .hm-alert-x-icon { display: inline-flex; }
 .hm-alert-main { flex: 1; min-width: 0; }
 .hm-alert-title { display: block; margin-bottom: .125rem; color: var(--hm-text); font-weight: var(--hm-weight-semibold); }

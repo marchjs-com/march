@@ -4,4 +4,6 @@ import * as d0 from "./social/like-button/demo.tsx";
 import * as p0 from "./social/like-button/playground.ts";
 import * as d1 from "./social/media-grid/demo.tsx";
 import * as p1 from "./social/media-grid/playground.ts";
-export { d0, p0, d1, p1 };
+import * as d2 from "./composite/post-card/demo.tsx";
+import * as p2 from "./composite/post-card/playground.ts";
+export { d0, p0, d1, p1, d2, p2 };

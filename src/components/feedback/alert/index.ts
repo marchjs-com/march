@@ -32,6 +32,12 @@ export interface AlertProps {
   /** Theme color token instead of the tone's colours ("brand-purple", "cat-3"…); the role still follows `tone`. */
   color?: ColorToken | undefined;
   onDismiss?: () => void;
+  /** "soft" (default: the tone's tinted fill) or "raised": a floating message (a toast) on the surface of a layer with a shadow; the tone colours the icon alone. */
+  variant?: "soft" | "raised" | undefined;
+  /** The ARIA role instead of the tone's ("alert" for danger and warn, "status" otherwise). */
+  role?: string | undefined;
+  /** Extra classes of the parts (the host's own hooks): the icon, the body, the dismiss button. */
+  partClass?: { icon?: string; body?: string; dismiss?: string } | undefined;
   class?: ClassProp;
   children?: unknown;
 }
@@ -46,14 +52,15 @@ export function Alert(props: AlertProps): () => unknown {
     const tone = val(props.tone) ?? "info";
     const below = props.actionPlacement === "below";
     const actions = props.action != null && h("div", { class: cx("hm-alert-action", below && "hm-alert-action-below") }, actionsOf(() => props.action));
-    return h("div", { class: () => cx("hm-alert", `hm-alert-${val(props.tone) ?? "info"}`, val(props.class)), role: tone === "danger" || tone === "warn" ? "alert" : "status", "data-hm-color": () => colorAttr(props.color) },
-      icon(props.icon === undefined ? toneIcon(tone) : props.icon, "hm-alert-icon"),
+    const part = props.partClass ?? {};
+    return h("div", { class: () => cx("hm-alert", `hm-alert-${val(props.tone) ?? "info"}`, props.variant === "raised" && "hm-alert-raised", val(props.class)), role: props.role ?? (tone === "danger" || tone === "warn" ? "alert" : "status"), "data-hm-color": () => colorAttr(props.color) },
+      icon(props.icon === undefined ? toneIcon(tone) : props.icon, cx("hm-alert-icon", part.icon)),
       h("div", { class: "hm-alert-main" },
         props.title != null && h("strong", { class: "hm-alert-title" }, () => val(props.title)),
-        h("div", { class: "hm-alert-body" }, props.body ?? props.children),
+        h("div", { class: cx("hm-alert-body", part.body) }, props.body ?? props.children),
         below && actions),
       !below && actions,
-      props.dismissable && h(IconButton, { size: "sm", class: "hm-alert-x", title: false, label: () => val(props.dismissLabel) ?? t`Dismiss`, onClick: () => { shown.set(false); props.onDismiss?.(); }, icon: ownIcon(props.dismissIcon, xIcon, "hm-alert-x-icon") }));
+      props.dismissable && h(IconButton, { size: "sm", class: cx("hm-alert-x", part.dismiss), title: false, label: () => val(props.dismissLabel) ?? t`Dismiss`, onClick: () => { shown.set(false); props.onDismiss?.(); }, icon: ownIcon(props.dismissIcon, xIcon, "hm-alert-x-icon") }));
   });
 }
 /** Alias of Alert. */

@@ -58,3 +58,13 @@ test("Alert: action sits beside the text before the dismiss button, or below the
   assert.equal(m.el.querySelector(".c .hm-alert-action"), null);
   m.dispose();
 });
+
+test("Alert: variant raised, own role and part classes (what a toast is made of)", () => {
+  const m = mountD(() => h(Alert, { tone: "warn", variant: "raised", role: "status", dismissable: true, partClass: { icon: "my-icon", body: "my-body", dismiss: "my-x" } }, "Saved"));
+  const a = m.el.querySelector(".hm-alert");
+  assert.ok(a.classList.contains("hm-alert-raised") && a.classList.contains("hm-alert-warn"));
+  assert.equal(a.getAttribute("role"), "status");
+  assert.ok(a.querySelector(".hm-alert-icon.my-icon") && a.querySelector(".hm-alert-x.my-x"));
+  assert.equal(a.querySelector(".hm-alert-body.my-body").textContent, "Saved");
+  m.dispose();
+});

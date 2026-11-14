@@ -2,6 +2,8 @@
 export * from "./navigation.kit.gen.ts";
 import * as d0 from "./navigation/pagination/demo.tsx";
 import * as p0 from "./navigation/pagination/playground.ts";
-import * as d1 from "./feedback/pull-to-refresh/demo.tsx";
-import * as p1 from "./feedback/pull-to-refresh/playground.ts";
-export { d0, p0, d1, p1 };
+import * as d1 from "./navigation/period-nav/demo.tsx";
+import * as p1 from "./navigation/period-nav/playground.ts";
+import * as d2 from "./feedback/pull-to-refresh/demo.tsx";
+import * as p2 from "./feedback/pull-to-refresh/playground.ts";
+export { d0, p0, d1, p1, d2, p2 };

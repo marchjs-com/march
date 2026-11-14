@@ -2,7 +2,8 @@
 // suggestions under a field. Rows are a lead (icon, swatch, avatar), a label, a hint, a trailing part and a tick on
 // the chosen one. Three roles: "radio" (one choice, default), "listbox" (one or many), "menu" (commands). Keys come
 // from the list-nav behavior: arrows / Home / End move focus among the rows, or — with `keysFrom` — the keys of a
-// field move a highlight (aria-activedescendant) while focus stays in the field.
+// field move a highlight (aria-activedescendant) while focus stays in the field. `keys={false}`: the owner drives the
+// list (a combobox with its own open / close keys): rows are highlighted from `active`, no listener is added.
 import "./option-list.css";
 import { signal, effect, untrack, onCleanup, getOwner, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
@@ -46,6 +47,13 @@ export interface OptionListProps<T = string> {
   keysFrom?: Element | (() => Element | null | undefined) | undefined;
   /** The highlighted row with `keysFrom` (your own signal when you need to read or reset it). */
   active?: Signal<number> | undefined;
+  /**
+   * `false`: the list listens to no keys and touches no field. Rows are options with the ids `<id>-<index>`, the
+   * highlight is your `active` signal (the row scrolls into view); you handle the keys and aria-activedescendant.
+   */
+  keys?: boolean | undefined;
+  /** A label that does not fit: "ellipsis" (default) cuts it, "wrap" breaks it into lines. */
+  overflow?: "ellipsis" | "wrap" | undefined;
   /** Accessible name of the list. */
   label?: MaybeFn<string | undefined>;
   id?: string | undefined;
@@ -71,7 +79,8 @@ const ROLES = { radio: ["radiogroup", "radio"], listbox: ["listbox", "option"], 
 /** `<OptionList bind:value={$theme} label="Theme" options={[{ value: "light", label: "Light", icon: sun }, { value: "dark", label: "Dark", icon: moon }]} />` */
 export function OptionList<T = string>(props: OptionListProps<T>): Element {
   const id = props.id ?? uid("hm-ol");
-  const byField = props.keysFrom != null;
+  const driven = props.keys === false;
+  const byField = driven || props.keysFrom != null;
   const mode = byField ? "listbox" : props.mode ?? (props.multiple ? "listbox" : "radio");
   const [listRole, baseRowRole] = ROLES[mode];
   const hasValue = props.value !== undefined || props.setValue != null;
@@ -106,7 +115,7 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
       : h("span", { class: "hm-option-list-check", "aria-hidden": "true" }, props.check != null && props.check !== true ? icon(typeof props.check === "function" ? (props.check as () => unknown)() : props.check, "hm-option-list-own-check") : glyph(checkIcon));
     const trail = it.trailing != null || tick ? [it.trailing ?? null, tick] : undefined;
     return h(ListRow, {
-      as: byField ? "div" : "button", role: rowRole, "data-index": String(i), interactive: true, overflow: "ellipsis",
+      as: byField ? "div" : "button", role: rowRole, "data-index": String(i), interactive: true, overflow: props.overflow ?? "ellipsis",
       class: () => cx("hm-option-list-row", byField && isActive() && "is-active"),
       size: () => (val(props.size) === "sm" ? "sm" : "md"), disabled: !!it.disabled, onClick: (e: MouseEvent) => pick(i, e),
       // ListRow says the choice by the role: aria-checked (radio, menuitemradio) or aria-selected (option); a command has no state
@@ -153,7 +162,9 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
     },
   }, content) as HTMLElement;
 
-  if (byField) {
+  // driven from outside: only keep the highlighted row in view
+  if (driven) effect(() => { const i = active(); if (i >= 0) untrack(() => root?.querySelector<HTMLElement>(`[data-index="${i}"]`)?.scrollIntoView?.({ block: "nearest" })); });
+  else if (byField) {
     // the field's keys move the highlight; the field points at the highlighted row
     const count = (): number => untrack(items).length;
     const keys = listNav({ count, active, onPick: (i) => pick(i, null), onMove: (i) => root?.querySelector<HTMLElement>(`[data-index="${i}"]`)?.scrollIntoView?.({ block: "nearest" }) });

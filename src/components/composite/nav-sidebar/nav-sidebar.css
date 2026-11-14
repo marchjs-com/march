@@ -33,7 +33,6 @@ html.hm-sb-resizing .hm-nav { transition: none; }
 .hm-sb-item.is-active .hm-listrow-sub { font-weight: 500; }
 .hm-sb-item.hm-listrow.is-barred.is-active::before { inset-inline-start: -.5rem; inset-block: .5rem; border-start-start-radius: 0; border-end-start-radius: 0; }
 .hm-sb-badge.hm-badge { font-weight: 700; }
-.hm-sb-badge.hm-badge-primary { background: var(--hm-primary); color: var(--hm-on-primary-fill); }
 
 /* featured: a card-like row */
 .hm-sb-featured { gap: var(--hm-space-1); padding-top: var(--hm-space-1); }
@@ -71,7 +70,10 @@ html.hm-sb-resizing .hm-nav { transition: none; }
   .hm-sb-wrap.is-rail .hm-sb-gitems { padding: 0; }
   .hm-sb-wrap.is-rail .hm-sb-group + .hm-sb-group { border-top: 1px solid var(--hm-border-subtle); padding-top: 2px; }
 }
-@media (max-width: 900px) { .hm-nav.hm-sb { width: min(21rem, 88vw); } .hm-sb-search.hm-search .hm-search-input { font-size: 1rem; } .hm-sb-resize { display: none; } }
+/* narrow screens: the menu is in a Drawer (nav-menu/drawer.ts) */
+.hm-drawer.hm-sb-sheet { --hm-sheet-size: min(21rem, 88vw); }
+.hm-sb-sheet .hm-nav.hm-sb { inline-size: auto; }
+@media (max-width: 900px) { .hm-sb-search.hm-search .hm-search-input { font-size: 1rem; } .hm-sb-resize { display: none; } }
 
 /* nested items: children indented under their parent, folding with it; a chevron at the end of the parent row */
 .hm-sb-li.is-parent { position: relative; }
@@ -82,7 +84,7 @@ html.hm-sb-resizing .hm-nav { transition: none; }
 .hm-sb-sublist { min-block-size: 0; overflow: hidden; margin-inline-start: .875rem; padding-inline-start: .5rem; border-inline-start: 1px solid var(--hm-border-subtle); }
 .hm-sb-sublist .hm-sb-row.hm-listrow { min-block-size: 1.875rem; padding-block: .2rem; font-size: var(--hm-text-sm); }
 .hm-sb-sublist .hm-listrow-sub { display: none; }
-.hm-sb-wrap.is-nested-subs .hm-sb-sublist .hm-listrow-sub { display: block; }
+:is(.hm-sb-wrap, .hm-sb-sheet).is-nested-subs .hm-sb-sublist .hm-listrow-sub { display: block; }
 .hm-sb-wrap.is-rail .hm-sb-kids, .hm-sb-wrap.is-rail .hm-sb-kids-btn { display: none; }
 @media (prefers-reduced-motion: reduce) { .hm-sb-kids { transition: none; } }
 /* the parent of the current page: marked too, a step quieter than the page itself */

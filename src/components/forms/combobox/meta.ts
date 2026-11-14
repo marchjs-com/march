@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Typeahead over static options or an async search (debounced, keyboard, aria-activedescendant).",
   category: "forms",
-  composedOf: ["Chip", "ListRow"],
+  composedOf: ["Chip", "OptionList"],
   behaviors: [],
   hubs: [],
   showcase: "/forms",

@@ -8,13 +8,14 @@ import "./live-feed.css";
 import { h } from "../../../dom/h.ts";
 import { signal, effect, untrack, createRoot, getOwner } from "../../../core/reactive.ts";
 import { t, dir, messages } from "../../../core/i18n.ts";
-import { cx, val, listen, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { owned, whenVisible } from "../../../ui/observe.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { Avatar } from "../../social/avatar/index.ts";
 import { Button } from "../../actions/button/index.ts";
+import { pauseOnHover } from "../../../behaviors/pause-on-hover/index.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { flip } from "../../../motion/flip.ts";
@@ -191,10 +192,7 @@ export function LiveFeed(props: LiveFeedProps): Element {
   const root = h("section", { class: () => cx("hm-lf", wall() ? "hm-lf-wall" : "hm-lf-rows", val(props.class)), "aria-label": () => props.label ?? t`Live activity` },
     pause, list) as HTMLElement;
 
-  if (props.pauseOnHover !== false) listen(root, {
-    pointerenter: () => hovering.set(true), pointerleave: () => hovering.set(false),
-    focusin: () => hovering.set(true), focusout: (e: FocusEvent) => { if (!root.contains(e.relatedTarget as Node | null)) hovering.set(false); },
-  });
+  if (props.pauseOnHover !== false) pauseOnHover(root, (held) => hovering.set(held));
   whenVisible(root, (v) => visible.set(v));
   return root;
 }

@@ -3,9 +3,7 @@
 // anchored to a point instead of a button. `items` may depend on what was clicked: it receives the event target.
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { floating } from "../../../ui/popover.ts";
-import { roving } from "../../../ui/focus.ts";
-import { renderItem, itemVisible, menuItems, type MenuItem } from "../../../ui/menu.ts";
+import { menuPanel, itemVisible, menuItems, type MenuItem } from "../../actions/menu/index.ts";
 import "./context-menu.css";
 import { cx, uid, setStyle, val, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 
@@ -51,16 +49,8 @@ export function ContextMenu(props: ContextMenuProps): Element {
       e.preventDefault();
       show(r ? r.left + Math.min(24, r.width / 2) : 0, r ? r.top + Math.min(24, r.height / 2) : 0, tg);
     },
-  }, props.children, anchor, () => {
-    const o = open();
-    if (!o) return null;
-    return untrack(() => {
-      const items = props.items(o.target, { x: o.x, y: o.y }).filter((it) => itemVisible(it, []));
-      return floating({
-        anchor, placement: "bottom-start", role: "menu", id, class: cx("hm-menu", val(props.menuClass)), onClose: close, ref: (x) => { panel = x; },
-        attrs: { "aria-label": () => val(props.label) ?? null, onKeydown: (e: KeyboardEvent) => { if (e.key === "Tab") close(false); else roving(e, menuItems(panel)); } },
-        children: items.map((it) => renderItem(it, [], close)),
-      });
-    });
-  });
+  }, props.children, anchor, menuPanel({
+    anchor: () => anchor, open: () => !!open(), close, id, label: () => val(props.label), class: cx(val(props.menuClass)), ref: (x) => { panel = x; },
+    items: () => { const o = open(); return o ? untrack(() => props.items(o.target, { x: o.x, y: o.y }).filter((it) => itemVisible(it, []))) : []; },
+  }));
 }

@@ -40,4 +40,4 @@ unfollow", "Follow request sent to HADİ, press to cancel".
 
 ## Composed of
 
-Button. It borrows heartBurst from LikeButton for the follow burst.
+Button. The follow burst is `heartBurst` (motion/burst.ts), the one LikeButton uses.

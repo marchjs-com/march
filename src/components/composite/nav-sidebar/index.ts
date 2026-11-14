@@ -15,7 +15,7 @@ import { registerPages } from "../../../ui/registry.ts";
 import { key as hotkey } from "../../../ui/keys.ts";
 import { roving } from "../../../ui/focus.ts";
 import { scrollIntoArea } from "../../../ui/observe.ts";
-import { val, cx, uid, icon, load, save, on, arr, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, uid, icon, load, save, arr, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { menu } from "../../../icons/glyphs/menu.ts";
 import { clock } from "../../../icons/glyphs/clock.ts";
 import { panelLeft } from "../../../icons/glyphs/panelLeft.ts";
@@ -31,6 +31,7 @@ import { SearchBox } from "../../forms/search-box/index.ts";
 import { PanelHeader } from "../../layout/panel-header/index.ts";
 import { ResizeHandle } from "../../layout/resize-handle/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
+import { navDrawer } from "../../navigation/nav-menu/drawer.ts";
 
 /** One NavSidebar entry. `href` navigates (router Link); `onSelect` runs instead. */
 export interface NavSidebarItem {
@@ -138,7 +139,6 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const savedW = keepWidth ? Number(widthKey ? load<unknown>(widthKey, null) : saved.width) : NaN;
   const width = signal<number | null>(Number.isFinite(savedW) && savedW > 0 ? clamp(savedW, minW, maxW) : null);
   const resizing = signal(false);
-  const drawer = signal(false);
   const q = signal("");
   const chosen = signal<string | null>(null); // last onSelect item (items without href): active and remembered as a visit
   const persist = (): void => {
@@ -148,6 +148,10 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const navId = uid("hm-sb");
   type TextKey = Exclude<keyof NonNullable<NavSidebarProps["labels"]>, "showUnder" | "hideUnder">;
   const L = (k: TextKey, d: string): string => val(props.labels?.[k]) ?? d;
+  // narrow screens: the menu opens in a Drawer from the menu button; the current row comes into view there too
+  let showActive: (() => void) | undefined;
+  const sheet = navDrawer({ id: navId, label: () => val(props.label) ?? t`Main`, menuLabel: () => L("menu", t`Menu`), icon: menu, class: () => cx("hm-sb-sheet", props.nestedSubs && "is-nested-subs"), onShow: () => showActive?.() });
+  const drawer = sheet.open;
   const hasSearch = props.search !== false;
   let searchEl: HTMLInputElement | undefined, navEl: HTMLElement | undefined;
 
@@ -218,19 +222,20 @@ export function NavSidebar(props: NavSidebarProps): Element {
   effect(() => {
     const id = active();
     if (id == null) return;
-    const smooth = revealed && !reducedMotion();
+    const move = revealed && !reducedMotion();
     revealed = true;
-    queueMicrotask(() => {
+    const show = (smooth: boolean): void => {
       const all = [...(navEl?.querySelectorAll<HTMLElement>(".hm-sb-scroll .hm-sb-item") ?? [])].filter((r) => r.dataset["id"] === id && !r.closest("[inert]"));
       const el = all.find((r) => r.dataset["where"] !== "recent") ?? all[0];
       scrollIntoArea(el, el?.closest<HTMLElement>(".hm-sb-scroll"), { smooth });
-    });
+    };
+    showActive = () => show(false);
+    queueMicrotask(() => show(move));
   });
   if (props.palette !== false) registerPages(() => items().filter((x) => x.href).map((x) => ({ id: x.id, title: text(x.label), href: x.href as Href, group: x.group, keywords: x.keywords, icon: x.icon })));
   const hk = hasSearch ? props.hotkey ?? "focus" : false;
   // "focus": the shortcut focuses this search box. "palette": the <CommandPalette> owns the shortcut; the box only shows the hint
   if (hk === "focus") hotkey(props.shortcut ?? "mod+k", () => { if (rail.peek()) { rail.set(false); persist(); } drawer.set(true); queueMicrotask(() => searchEl?.focus()); }, { inInputs: true, description: () => L("search", t`Search the menu`) });
-  on<KeyboardEvent>(globalThis.document, "keydown", (e) => { if (e.key === "Escape" && drawer.peek()) drawer.set(false); });
 
   const toggle = (g: string, to?: boolean): void => {
     open.update((s) => { const n = new Set(s); if (to ?? !n.has(g)) n.add(g); else n.delete(g); return n; });
@@ -244,7 +249,8 @@ export function NavSidebar(props: NavSidebarProps): Element {
     const b = val(x.badge);
     if (b == null || b === 0 || b === "") return null;
     const tone = x.badgeTone ?? (typeof b === "number" ? "danger" : "neutral");
-    return typeof b === "number" ? h(Badge, { class: "hm-sb-badge", count: b, tone }) : h(Badge, { class: "hm-sb-badge", tone }, b);
+    const look = { class: "hm-sb-badge", tone, variant: tone === "primary" ? "solid" as const : undefined };
+    return typeof b === "number" ? h(Badge, { ...look, count: b }) : h(Badge, look, b);
   };
   const row = (x: NavSidebarItem, where: string, sub?: () => string): Element => {
     const el = h(ListRow, {
@@ -369,9 +375,8 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const title = props.title; // read once: a node prop is built when it is read
   const railLabel = (): string => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`));
   return h("div", { class: () => cx("hm-nav-wrap", "hm-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", props.nestedSubs && "is-nested-subs", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--hm-sb-w", w); } },
-    h(IconButton, { class: "hm-nav-burger", icon: menu, title: false, "aria-controls": navId, "aria-expanded": () => String(drawer()), label: () => L("menu", t`Menu`), onClick: () => drawer.update((x) => !x) }),
-    h("div", { class: "hm-nav-scrim", "aria-hidden": "true", onClick: () => drawer.set(false) }),
-    h("nav", { class: "hm-nav hm-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },
+    sheet.burger,
+    sheet.place(h("nav", { class: "hm-nav hm-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },
       h("div", { class: "hm-sb-head" },
         (title != null || props.collapsible) && h(PanelHeader, { as: "div", class: "hm-sb-titlebar", title: title ?? undefined, titleAs: "span", subtitle: props.subtitle ?? undefined,
           actions: props.collapsible ? h(IconButton, { class: "hm-nav-rail-btn", size: "sm", icon: panelLeft, "aria-pressed": () => String(rail()), label: railLabel, onClick: () => { rail.update((x) => !x); persist(); } }) : undefined }),
@@ -382,5 +387,5 @@ export function NavSidebar(props: NavSidebarProps): Element {
         })),
       h("div", { class: "hm-sb-scroll" }, body),
       props.footer != null && h("div", { class: "hm-nav-foot hm-sb-foot" }, props.footer),
-      grip()));
+      grip())));
 }

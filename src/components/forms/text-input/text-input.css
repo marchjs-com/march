@@ -2,3 +2,4 @@
 .hm-affix-text > .hm-svg { inline-size: 1rem; block-size: 1rem; }
 .hm-input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
 .hm-input-error { margin-block-start: var(--hm-space-1); }
+.hm-input-error.is-kept { min-block-size: 1.25em; }

@@ -1,5 +1,6 @@
 // Showcase stage for OverlayScope: a small "app" whose drawer and dialog open inside its box, or on the page.
 import { OverlayScope } from "./index.ts";
+import { Button } from "../../actions/button/index.ts";
 import { openDrawer, openDialog } from "../../overlays/dialog/index.ts";
 
 export const code = `<OverlayScope class="app">
@@ -11,8 +12,8 @@ export default function OverlayScopeDemo(props: { values: { target: string } }) 
   const target = (): "page" | "nearest" => (props.values.target === "page" ? "page" : "nearest")
   return <OverlayScope class="sc-scope-demo">
     <div class="sc-scope-bar"><strong>HADİ panel</strong>
-      <button type="button" class="hm-btn hm-btn-sm" data-audit-try onClick={() => void openDrawer(() => <ul class="sc-scope-list"><li>Özet</li><li>Raporlar</li><li>Ayarlar</li></ul>, { title: "Menü", side: "end", target: target() })}>Çekmece</button>
-      <button type="button" class="hm-btn hm-btn-sm hm-btn-primary" onClick={() => void openDialog(() => <p>Bu pencere yalnız bu kutuyu örter; sayfanın geri kalanı çalışmaya devam eder.</p>, { title: "Kutu içi pencere", target: target() })}>Pencere</button>
+      <Button size="sm" data-audit-try onClick={() => void openDrawer(() => <ul class="sc-scope-list"><li>Özet</li><li>Raporlar</li><li>Ayarlar</li></ul>, { title: "Menü", side: "end", target: target() })}>Çekmece</Button>
+      <Button size="sm" variant="primary" onClick={() => void openDialog(() => <p>Bu pencere yalnız bu kutuyu örter; sayfanın geri kalanı çalışmaya devam eder.</p>, { title: "Kutu içi pencere", target: target() })}>Pencere</Button>
     </div>
     <p class="hm-muted sc-scope-body">Çekmece ve pencere bu kutunun içinde açılır; "sayfada" seçilirse bütün sayfayı örter.</p>
   </OverlayScope>

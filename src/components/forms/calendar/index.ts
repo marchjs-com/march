@@ -2,36 +2,16 @@
 // (core/date.ts, shared with Scheduler and Gantt) so DST never shifts a day.
 import "./calendar.css";
 import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
-import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
-import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { model, cx, uid, type ControlProps } from "../../../forms/util.ts";
-import { ownPart } from "../../../ui/parts.ts";
 import { colorAttr } from "../../../theme/colors.ts";
-import { utcDate as utc, isIso, todayIso, addDays, addMonths, dayOfWeek as dow, firstDayOf, monthGrid, weekdayNames, dateFormat as dtf, type IsoDate } from "../../../core/date.ts";
-import { IconButton } from "../../actions/icon-button/index.ts";
+import { utcDate as utc, isIso, todayIso, addMonths, firstDayOf, monthGrid, weekdayNames, dateFormat as dtf, type IsoDate } from "../../../core/date.ts";
+import { dayGridKey } from "../../../ui/date-grid.ts";
+import { PeriodNav } from "../../navigation/period-nav/index.ts";
 export type { IsoDate };
-
-/**
- * The day a key moves to in a grid of days (a month view): arrows ±1 day / ±1 week, Home / End the ends of the week,
- * PageUp / PageDown ±1 month (with Shift: ±1 year). null when the key is not a move. `forward` is -1 where the
- * columns run right to left. Shared by Calendar and any other day grid (Scheduler's month view).
- */
-export function dayGridKey(e: { key: string; shiftKey?: boolean }, iso: IsoDate, firstDay: number, forward: 1 | -1 = 1): IsoDate | null {
-  const col = (dow(iso) - firstDay + 7) % 7;
-  switch (e.key) {
-    case "ArrowLeft": return addDays(iso, -forward);
-    case "ArrowRight": return addDays(iso, forward);
-    case "ArrowUp": return addDays(iso, -7);
-    case "ArrowDown": return addDays(iso, 7);
-    case "Home": return addDays(iso, -col);
-    case "End": return addDays(iso, 6 - col);
-    case "PageUp": return addMonths(iso, e.shiftKey ? -12 : -1);
-    case "PageDown": return addMonths(iso, e.shiftKey ? 12 : 1);
-    default: return null;
-  }
-}
+// the keys of a day grid live in a module of their own (ui/date-grid.ts); the name stays exported from here
+export { dayGridKey };
 
 /** Keep an ISO date inside min / max. */
 export const clampIso = (iso: string, min: string | null | undefined, max: string | null | undefined) => (min && iso < min ? min : max && iso > max ? max : iso);
@@ -125,10 +105,12 @@ export function Calendar(props: CalendarProps): unknown {
     });
   });
   if (props.autoFocus) { const id = setTimeout(() => body.querySelector<HTMLElement>(`[data-date="${focus.peek()}"]`)?.focus(), 0); onCleanup(() => clearTimeout(id)); }
-  const nav = (n: number, label: () => string) => (props.nav === false ? null : h(IconButton, {
-    class: cx("hm-cal-nav", n < 0 ? "hm-cal-prev" : "hm-cal-next"), size: "sm", label, onClick: () => go(addMonths(focus.peek(), n), false),
-    icon: () => ownPart(n < 0 ? props.prevIcon : props.nextIcon, () => (n < 0 ? chevronLeft : chevronRight)),
-  }));
+  // the month row is a PeriodNav: the arrows around the (live) month name
+  const step = (n: number) => () => go(addMonths(focus.peek(), n), false);
   return h("div", { class: () => cx("hm-cal", props.class), "data-hm-color": () => colorAttr(props.color) },
-    h("div", { class: "hm-cal-header" }, nav(-1, () => props.labels?.prevMonth ?? t`Previous month`), title, nav(1, () => props.labels?.nextMonth ?? t`Next month`)), grid);
+    h(PeriodNav, {
+      class: "hm-cal-header", size: "sm", arrows: props.nav !== false, onPrev: step(-1), onNext: step(1), prevIcon: props.prevIcon, nextIcon: props.nextIcon,
+      labels: { previous: () => props.labels?.prevMonth ?? t`Previous month`, next: () => props.labels?.nextMonth ?? t`Next month` },
+      partClass: { prev: "hm-cal-nav hm-cal-prev", next: "hm-cal-nav hm-cal-next" },
+    }, title), grid);
 }

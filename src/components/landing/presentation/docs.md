@@ -31,7 +31,7 @@ let $slide = Number(queryParam("slide")() ?? 0)
 | `fullscreen` | boolean | `true` | the full screen button and the `F` key |
 | `timer` | boolean | `true` | the timer of the speaker view |
 | `icons` | `{ previous?, next?, speaker?, fullscreen? }` | built-in | own icons for the buttons |
-| `labels` | `{ previous?, next?, speaker?, fullscreen?, counter?(index, total), deck?, speakerView?, upNext?, end?, notes?, noNotes?, elapsed? }` | built-in texts | any text the deck writes itself |
+| `labels` | `{ previous?, next?, pages?, speaker?, fullscreen?, counter?(index, total), deck?, speakerView?, upNext?, end?, notes?, noNotes?, elapsed? }` | built-in texts | any text the deck writes itself |
 | `class` | class | — | on the deck |
 
 ```tsx
@@ -55,4 +55,4 @@ without movement. Type scales with the stage, so zoom and projectors keep the la
 
 ## Composed of
 
-IconButton, Toolbar (the control row), Progress (the line); `swapTransition` and the motion engine, `swipe`, `channel` (cross-tab), `formatDuration`.
+Pagination (`variant="simple"`: previous / counter / next, stepping through fragments), IconButton, Toolbar (the control row), Progress (the line); `swapTransition` and the motion engine, `swipe`, `channel` (cross-tab), `formatDuration`.

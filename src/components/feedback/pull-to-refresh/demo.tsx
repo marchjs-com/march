@@ -1,5 +1,6 @@
 // Showcase stage for PullToRefresh: a short feed in a fixed-height scroll area (playground.ts sets threshold, delay).
 import { PullToRefresh, type PullPhase } from "./index.ts";
+import { Button } from "../../actions/button/index.ts";
 import { Icon } from "../../../icons/index.ts";
 import { sparkles } from "../../../icons/glyphs/sparkles.ts";
 import { arrowDown } from "../../../icons/glyphs/arrowDown.ts";
@@ -22,9 +23,9 @@ export default function PullToRefreshDemo(props: { values: { threshold: number; 
   let wrap: HTMLElement | undefined
   // a refresh without pulling (the component's own keyboard button): the indicator, its icon and color show while it spins
   const refreshNow = (): void => { wrap?.querySelector<HTMLButtonElement>(".hm-ptr-kbd")?.click() }
-  return <div class="sc-ptr-wrap" ref={(x: HTMLElement) => { wrap = x }}>
+  return <div class="sc-ptr-wrap" ref={(x: Element) => { wrap = x as HTMLElement }}>
     <span class="sc-strip-label" aria-live="polite">{() => `Durum: ${props.values.disabled ? "kapalı, çekmek yenilemez" : PHASES[$phase]} · eşik ${props.values.threshold}px · yenileme ${props.values.delay} ms · ${props.values.settle ? "bırakınca yaylanarak döner" : "bırakınca anında döner"}`}</span>
-    <div class="sc-row"><button type="button" class="hm-btn hm-btn-sm hm-btn-secondary" data-audit-try disabled={() => props.values.disabled || $phase === "refreshing"} on:click={refreshNow}>Çekmeden yenile</button></div>
+    <div class="sc-row"><Button size="sm" data-audit-try disabled={() => props.values.disabled || $phase === "refreshing"} on:click={refreshNow}>Çekmeden yenile</Button></div>
     {() => {
       // threshold, indicator, icon, color and settle are read once by the component: it is drawn again when one changes
       const threshold = props.values.threshold, indicator = props.values.indicator, color = props.values.color, settle = props.values.settle

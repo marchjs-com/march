@@ -2,7 +2,6 @@
 // sticky header, scrolling main; the sidebar becomes a drawer on narrow screens). Everything Layout has comes with it:
 // aside and footer regions, page corners, features (back-to-top, route focus by default). Its own module so an app's
 // entry does not pull in Page, tabs or search (layout.ts) just to draw the frame.
-import "../../../ui/crumbs.css";
 import { Layout, type LayoutProps, type LayoutComponent } from "../layout/index.ts";
 
 export type AppShellProps = LayoutProps;

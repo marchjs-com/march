@@ -9,6 +9,7 @@ sidebars, command palettes, trees and file lists all build their rows from it.
 <ListRow lead={<Avatar name="Deniz Kaya" size="sm" decorative />} title="Deniz Kaya" sub="online" onClick={open} />
 <ListRow as="li" role="option" aria-selected={on} interactive active={on} title={cmd.title} trail={<Kbd keys="mod+k" />} />
 <ListRow title={file.name} sub="2.4 MB" actions={<IconButton icon={trash} label="Remove" onClick={remove} />} />
+<ListRow as="article" direction="column" overflow="wrap" lead={<IconTile icon={zap} />} title="Fast" titleAs="h3" sub="Every route is a lazy chunk." subAs="p" />
 ```
 
 ## Props
@@ -22,12 +23,15 @@ sidebars, command palettes, trees and file lists all build their rows from it.
 | `actions` | node | — | controls for the row; beside a link / button row, at the end of a plain row |
 | `href` | string | — | makes it a link |
 | `onClick` | function | — | makes it a button (with `as`: a click listener on that element) |
-| `as` | `div` `li` `span` `label` `button` | `div` | element of a row that is not a link or a button; `button`: a button whose host adds its own listeners (drag, keys) instead of `onClick` |
+| `as` | `div` `li` `span` `label` `button` `article` | `div` | element of a row that is not a link or a button; `button`: a button whose host adds its own listeners (drag, keys) instead of `onClick` |
+| `titleAs` | `h2`…`h6` `p` `div` `span` | `span` | element of the title; a heading wraps instead of scrolling |
+| `subAs` | `p` `div` `span` | `span` | element of the sub text |
+| `direction` | `row` `column` | `row` | `column`: a tile, lead above the text (`align="center"` centres it) |
 | `active` | boolean / accessor | `false` | the current row; a link gets `aria-current="page"` |
 | `selected` | boolean / accessor | — | a chosen row; `aria-pressed` on a button, `aria-checked` / `aria-selected` with a matching `role` |
 | `disabled` | boolean / accessor | `false` | |
 | `interactive` | boolean | `false` | hover look for a plain row whose host handles the click |
-| `size` | `sm` `md` `lg` | `md` | |
+| `size` | `xs` `sm` `md` `lg` | `md` | `xs`: a status bar item, a dense strip |
 | `color` | color token | accent | tint of the active / selected row |
 | `align` | `center` `start` | `center` | where lead and trail sit beside tall text |
 | `overflow` | `scroll` `ellipsis` `wrap` | `scroll` | text that does not fit |
@@ -48,3 +52,9 @@ nothing. The focus ring is drawn inside the row. Scrolling text is read once and
 ## Composed of
 
 OverflowText (titles and sub texts that do not fit).
+
+## Light form
+
+`PlainListRow` (`src/components/data/list-row/core.ts`, internal) is the same row without the scrolling text: light
+components (Accordion header, Menu entry, Toast, StatusBar item) build on it so they never load OverflowText;
+`overflow="scroll"` is cut like `"ellipsis"` there.

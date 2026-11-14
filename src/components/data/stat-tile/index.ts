@@ -33,6 +33,10 @@ export interface StatTileProps {
   disabled?: MaybeFn<boolean | undefined>;
   /** Render `<dt>` (label) and `<dd>` (value, hint) for a `<dl>` parent; ignored for a button or a link. */
   term?: boolean | undefined;
+  /** Where the hint goes: "tile" (default: its own line, last) or "value" (inside the value element: one `<dd>` per term). */
+  hintIn?: "tile" | "value" | undefined;
+  /** "figure" (default): the value is a heavy number · "text": the value reads as body text that wraps (a details list). */
+  emphasis?: "figure" | "text" | undefined;
   /** An extra class on a part, for a host that keeps its own class names (the KPI box of hadi-march/charts): `{ value, label, hint }`. */
   partClass?: Partial<Record<"value" | "label" | "hint", string>> | undefined;
   class?: ClassProp;
@@ -44,16 +48,17 @@ export interface StatTileProps {
 export function StatTile(props: StatTileProps): Element {
   const kind = props.href != null ? "a" : props.onClick ? "button" : "div";
   const term = kind === "div" && !!props.term;
-  const part = (tag: string, name: string, v: MaybeFn<unknown>): Element | null =>
-    (v == null ? null : h(tag, { class: cx(`hm-stat-tile-${name}`, props.partClass?.[name as "value" | "label" | "hint"]) }, () => val(v)) as Element);
-  const value = part(term ? "dd" : "span", "value", props.value), label = part(term ? "dt" : "span", "label", props.label);
+  const part = (tag: string, name: string, v: MaybeFn<unknown>, more?: unknown): Element | null =>
+    (v == null ? null : h(tag, { class: cx(`hm-stat-tile-${name}`, props.partClass?.[name as "value" | "label" | "hint"]) }, () => val(v), more) as Element);
+  const inValue = props.hintIn === "value" && props.value != null;
+  const value = part(term ? "dd" : "span", "value", props.value, inValue ? part("span", "hint", props.hint) : null), label = part(term ? "dt" : "span", "label", props.label);
   // a <dl> needs the term first; the look (value above the label) comes from CSS order either way
-  const body = [...(term ? [label, value] : [value, label]), part(term ? "dd" : "span", "hint", props.hint)];
+  const body = [...(term ? [label, value] : [value, label]), inValue ? null : part(term ? "dd" : "span", "hint", props.hint)];
   const off = (): boolean => !!val(props.disabled);
   const attrs = {
-    ...rest(props, ["value", "label", "hint", "color", "align", "size", "variant", "order", "onClick", "href", "disabled", "term", "partClass"]),
+    ...rest(props, ["value", "label", "hint", "color", "align", "size", "variant", "order", "onClick", "href", "disabled", "term", "partClass", "hintIn", "emphasis"]),
     class: () => cx("hm-stat-tile", `hm-stat-tile-${val(props.variant) ?? "plain"}`, `hm-stat-tile-${val(props.size) ?? "md"}`, `is-${val(props.align) ?? "center"}`,
-      val(props.order) === "label" && "is-label-first", kind !== "div" && "is-action", off() && "is-disabled", val(props.class)),
+      val(props.order) === "label" && "is-label-first", props.emphasis === "text" && "is-text", kind !== "div" && "is-action", off() && "is-disabled", val(props.class)),
     "data-hm-color": () => colorAttr(val(props.color)),
   };
   if (kind === "button") return h("button", { ...attrs, type: "button", disabled: off, onClick: props.onClick }, body) as Element;

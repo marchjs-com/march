@@ -2,9 +2,12 @@
 .hm-fg { min-width: 0; container-type: inline-size; }
 .hm-fg-item { position: relative; min-width: 0; }
 .hm-fg-item .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-3); height: 100%; }
-.hm-fg-text { display: flex; flex-direction: column; gap: var(--hm-space-2); min-width: 0; }
-.hm-fg-title { margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); line-height: 1.3; overflow-wrap: break-word; hyphens: auto; }
-.hm-fg-body { margin: 0; color: var(--hm-muted); line-height: 1.6; overflow-wrap: break-word; hyphens: auto; }
+/* a tile is a ListRow (column; a row in the list look): here only its measures as a marketing tile */
+.hm-listrow.hm-fg-row { min-block-size: 0; padding: 0; border-radius: 0; color: inherit; font-size: inherit; line-height: inherit; }
+.hm-card .hm-listrow.hm-fg-row { position: static; }
+.hm-fg-row > .hm-listrow-text { gap: var(--hm-space-2); }
+.hm-fg-row .hm-listrow-title { font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); line-height: 1.3; overflow-wrap: break-word; hyphens: auto; }
+.hm-fg-row .hm-listrow-sub { color: var(--hm-muted); font-size: inherit; line-height: 1.6; overflow-wrap: break-word; hyphens: auto; }
 .hm-fg-link { color: inherit; text-decoration: none; }
 .hm-fg-link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
 .hm-fg-link:focus-visible { outline: none; }
@@ -22,9 +25,7 @@
 .is-spotlight:hover .hm-fg-item.hm-card::before, .is-spotlight:hover .hm-fg-item.hm-card::after { opacity: 1; }
 
 /* plain and list */
-.hm-fg-v-plain .hm-fg-item { display: flex; flex-direction: column; gap: var(--hm-space-3); }
-.hm-fg-v-list .hm-fg-item { display: flex; gap: var(--hm-space-3); align-items: flex-start; }
-.hm-fg-v-list .hm-fg-title { font-size: var(--hm-text-md); }
+.hm-fg-v-list .hm-fg-row .hm-listrow-title { font-size: var(--hm-text-md); }
 
 /* bento: 4 columns, tiles span by size; 2 columns on tablets, 1 on phones */
 .hm-fg-bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(12rem, auto); gap: var(--hm-space-4); grid-auto-flow: dense; }

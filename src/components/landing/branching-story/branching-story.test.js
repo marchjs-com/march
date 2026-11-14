@@ -32,13 +32,13 @@ test("BranchingStory: choose, trail rewinds, endings counted, keys pick", async 
   choices()[0].click();
   await settle();
   assert.equal(title(el), "B");
-  assert.equal(el.querySelector("[aria-current=step]").textContent, "to B");
+  assert.equal(el.querySelector(".hm-bs-trail [aria-current]").textContent, "to B");
   el.querySelector("section").dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "1", bubbles: true }));
   await settle();
   assert.equal(title(el), "D");
   assert.match(el.querySelector(".hm-bs-found").textContent, /1 \/ 2/);
   assert.match(el.querySelector(".hm-bs-end").textContent, /Start again/);
-  el.querySelector(".hm-bs-steps button").click();
+  el.querySelector(".hm-bs-trail button").click();
   assert.equal(title(el), "A", "the first trail step rewinds to the start");
   assert.deepEqual(seen, ["a>b", "a>b>d", "a"]);
   dispose();
@@ -54,7 +54,7 @@ test("BranchingStory: own texts, no keys, own choice content, no restart", async
     renderChoice: (c, i) => h("b", { class: "own" }, `${i}:${c.to}`),
   }), el);
   assert.equal(el.querySelector(".hm-bs-trail").getAttribute("aria-label"), "Trail");
-  assert.equal(el.querySelector("[aria-current=step]").textContent, "Home");
+  assert.equal(el.querySelector(".hm-bs-trail [aria-current]").textContent, "Home");
   assert.equal(el.querySelector(".hm-bs-found").textContent, "0|2");
   assert.equal(el.querySelector(".hm-bs-key"), null);
   assert.deepEqual([...el.querySelectorAll(".hm-bs-choice .own")].map((x) => x.textContent), ["0:b", "1:c"]);

@@ -25,6 +25,7 @@ import { Badge } from "../badge/index.ts";
 import { Checkbox } from "../../forms/checkbox/index.ts";
 import { SearchBox } from "../../forms/search-box/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
+import { LiveStatus } from "../../feedback/live-status/index.ts";
 import { ResizeHandle } from "../../layout/resize-handle/index.ts";
 import { glyph } from "../../../ui/util.ts";
 import { moreVertical } from "../../../icons/glyphs/moreVertical.ts";
@@ -640,7 +641,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
       tool("filters") ? h(Button, { size: "sm", variant: () => (filtersOpen() ? "primary" : "secondary"), icon: filterIcon, "aria-pressed": () => String(filtersOpen()), onClick: () => filtersOpen.set(!filtersOpen()) },
         () => (table.activeFilters().length ? lb("filtersActive")(table.activeFilters().length) : lb("filters"))) : null,
       tool("csv") ? h(Button, { size: "sm", icon: download, onClick: () => void table.exportCSV({ download: true, filename: `${props.filename ?? "data"}.csv` }) }, lb("csv")) : null,
-      tool("count") ? h("span", { class: "hm-dg-total", role: "status" }, () => lb("rows")(num(table.rows().length)), () => (table.selectedCount() ? h("b", {}, ` · ${lb("selected")(num(table.selectedCount()))}`) : null)) : null);
+      tool("count") ? h(LiveStatus, { class: "hm-dg-total" }, () => lb("rows")(num(table.rows().length)), () => (table.selectedCount() ? h("b", {}, ` · ${lb("selected")(num(table.selectedCount()))}`) : null)) : null);
   }
 
   const root = h("div", { class: () => cx("hm-dg", val(props.class)) }, toolbar, scroller) as HTMLElement;

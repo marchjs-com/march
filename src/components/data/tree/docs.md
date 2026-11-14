@@ -34,4 +34,4 @@ on the motion engine's duration tokens and the indent uses logical properties (R
 
 ## Composed of
 
-ListRow (the row), Chevron (the arrow) and OverflowText (long labels). The row and the keys are shared with TreeView (`tree/row.ts`).
+ListRow (the row), Chevron (the arrow) and OverflowText (long labels). The row and the keys are shared with TreeView and TreeEditor (`tree/row.ts`: `treeRow`, `treeKey`, and `treeListKey` for a tree drawn as one flat list).

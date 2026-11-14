@@ -61,3 +61,13 @@ test("StatTile: partClass adds a host's own class to a part", () => {
   assert.equal(el.querySelector(".hm-stat-tile").hasAttribute("partClass"), false);
   dispose();
 });
+
+test("StatTile: hintIn=\"value\" puts the hint inside the value; emphasis=\"text\" marks a text value", () => {
+  const [el, dispose] = mount(() => h("dl", null, h(StatTile, { term: true, value: "ada@example.com", label: "Email", hint: "verified", hintIn: "value", emphasis: "text" })));
+  const tile = el.querySelector(".hm-stat-tile");
+  assert.deepEqual([...tile.children].map((c) => c.tagName), ["DT", "DD"]);
+  assert.equal(tile.querySelector("dd span.hm-stat-tile-hint").textContent, "verified");
+  assert.ok(tile.classList.contains("is-text"));
+  assert.equal(tile.hasAttribute("hintIn") || tile.hasAttribute("emphasis"), false);
+  dispose();
+});

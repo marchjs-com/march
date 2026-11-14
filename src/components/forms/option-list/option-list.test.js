@@ -124,3 +124,23 @@ test("OptionList: keysFrom — the field's keys move the highlight (aria-actived
   m.dispose();
   assert.equal(input.getAttribute("aria-activedescendant"), null);
 });
+
+test("OptionList: keys={false} — the owner drives the highlight, no listener, no field attributes; overflow", () => {
+  const active = signal(1), picked = [];
+  const m = mount(() => h(OptionList, { id: "own", keys: false, active, overflow: "wrap", options: [{ value: "a", label: "A" }, { value: "b", label: "B" }], onPick: (v) => picked.push(v) }));
+  const root = m.el.querySelector("#own");
+  assert.equal(root.getAttribute("role"), "listbox");
+  const rows = root.querySelectorAll("div.hm-option-list-row");
+  assert.deepEqual(rows.map((r) => r.id), ["own-0", "own-1"]);
+  assert.equal(rows[0].getAttribute("tabindex"), null, "rows are not focusable");
+  assert.ok(rows[1].classList.contains("is-active") && !rows[0].classList.contains("is-active"));
+  assert.ok(rows[0].classList.contains("is-wrap"));
+  active.set(0);
+  assert.ok(rows[0].classList.contains("is-active"));
+  const e = key(root, "ArrowDown");
+  assert.ok(!e.defaultPrevented, "keys are the owner's");
+  assert.equal(active(), 0);
+  rows[1].click();
+  assert.deepEqual(picked, ["b"]);
+  m.dispose();
+});

@@ -3,6 +3,7 @@ export * from "./feedback/alert/index.ts";
 export * from "./feedback/check-mark/index.ts";
 export * from "./feedback/empty/index.ts";
 export * from "./feedback/error-box/index.ts";
+export * from "./feedback/live-status/index.ts";
 export * from "./feedback/loader/index.ts";
 export * from "./feedback/progress/index.ts";
 export * from "./feedback/skeleton/index.ts";

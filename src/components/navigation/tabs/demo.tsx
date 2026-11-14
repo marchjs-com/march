@@ -1,5 +1,6 @@
 // Showcase stage for Tabs: panels with a count badge, icons, closable tabs and an action (Playground values in playground.ts).
 import { signal } from "../../../core/reactive.ts";
+import { Button } from "../../actions/button/index.ts";
 import { Tabs, type TabsProps } from "./index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { animate } from "../../../motion/animate.ts";
@@ -29,11 +30,11 @@ export default function TabsDemo(props: { values: { variant: string; icons: bool
       { id: "overview", label: "Genel bakış", icon: v.icons ? home : undefined, content: () => <p>HADİ web sitesi: 12 görev açık, son sürüm dün yayımlandı.</p> },
       { id: "members", label: "Üyeler", icon: v.icons ? users : undefined, closable: v.closable, hidden: gone("members"), badge: () => (badges ? pending() : null), content: () => <div>
         <p>{() => (pending() ? `${pending()} davet onay bekliyor.` : "Bekleyen davet yok.")}</p>
-        <button type="button" class="hm-btn hm-btn-sm" disabled={() => !pending()} onClick={() => pending.set(pending() - 1)}>Birini onayla</button>
+        <Button size="sm" disabled={() => !pending()} onClick={() => pending.set(pending() - 1)}>Birini onayla</Button>
       </div> },
       { id: "settings", label: "Ayarlar", icon: v.icons ? settings : undefined, closable: v.closable, hidden: gone("settings"), dirty: () => v.closable && changed(), content: () => <div>
         <p>{() => (changed() ? "Bildirim ayarında kaydedilmemiş değişiklik var." : "Bildirimler açık; haftalık özet pazartesi gelir.")}</p>
-        <button type="button" class="hm-btn hm-btn-sm" onClick={() => changed.set(!changed())}>{() => (changed() ? "Kaydet" : "Bir ayarı değiştir")}</button>
+        <Button size="sm" onClick={() => changed.set(!changed())}>{() => (changed() ? "Kaydet" : "Bir ayarı değiştir")}</Button>
       </div> },
       { id: "billing", label: "Faturalama", icon: v.icons ? creditCard : undefined, disabled: off, title: off ? "Ücretsiz planda kapalı" : undefined, content: () => <p>Ücretsiz plan: 3 proje sınırı.</p> },
     ]} /> }}

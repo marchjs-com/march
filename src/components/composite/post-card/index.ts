@@ -1,7 +1,7 @@
 // PostCard (hadi-march/ui): one post in a social feed. Header (Avatar, name with a verified mark, relative time and
 // place, a ⋯ Menu), MediaGrid, an action row (LikeButton, comments and shares as rolling counts) and a caption that
 // folds to three lines. A double tap on the photos likes the post: a large heart pops over the photo and bursts in the
-// four HADİ colors (heartPop / heartBurst from LikeButton, motion engine).
+// four HADİ colors (heartPop / heartBurst: motion/burst.ts).
 import { signal, computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
@@ -12,6 +12,7 @@ import { ownIcon } from "../../../ui/parts.ts";
 import { Avatar } from "../../social/avatar/index.ts";
 import { VerifiedMark } from "../../social/verified-mark/index.ts";
 import { Button } from "../../actions/button/index.ts";
+import { Card } from "../../data/card/index.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import { ClampText } from "../../typography/clamp-text/index.ts";
 import { Menu, type MenuItem } from "../../../ui/menu.ts";
@@ -21,7 +22,8 @@ import { send } from "../../../icons/glyphs/send.ts";
 import { mapPin } from "../../../icons/glyphs/mapPin.ts";
 import { moreVertical } from "../../../icons/glyphs/moreVertical.ts";
 import { MediaGrid, type MediaItem } from "../../social/media-grid/index.ts";
-import { LikeButton, heartBurst, heartPop } from "../../social/like-button/index.ts";
+import { LikeButton } from "../../social/like-button/index.ts";
+import { heartBurst, heartPop } from "../../../motion/burst.ts";
 import { CountRoll } from "../../social/count-roll/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./post-card.css";
@@ -127,7 +129,9 @@ export function PostCard(props: PostCardProps): Element {
     return h("span", { class: "hm-post-name" }, h("span", { class: "hm-post-name-text" }, a.name),
       a.verified && props.verifiedIcon !== false ? h(VerifiedMark, { class: "hm-post-verified", label: () => L().verified ?? t`Verified`, icon: props.verifiedIcon }) : null);
   };
-  return h("article", {
+  // the frame is a Card (an article, no body padding); the flat look is the same Card without its frame
+  return h(Card, {
+    as: "article", flush: true, plain: () => val(props.variant) === "flat",
     class: () => cx("hm-post", `hm-post-${val(props.variant) ?? "card"}`, val(props.class)),
     "aria-label": () => L().post?.(post().author.name) ?? t`Post by ${post().author.name}`,
   },
@@ -169,5 +173,5 @@ export function PostCard(props: PostCardProps): Element {
       class: "hm-post-body", lines: () => val(props.clamp) ?? 3, collapsible: false, open, onOpenChange: (v: boolean) => open.set(v), labels: { more: L().more ?? t`more` },
     }, h("b", { class: "hm-post-handle" }, handle), " ", text);
   },
-  () => (props.onComment && post().comments && props.viewAll !== false ? h(Button, { variant: "link", class: "hm-post-all", onClick: () => props.onComment?.(post()) }, L().viewAll?.(post().comments ?? 0) ?? t`View all ${post().comments} comments`) : null));
+  () => (props.onComment && post().comments && props.viewAll !== false ? h(Button, { variant: "link", class: "hm-post-all", onClick: () => props.onComment?.(post()) }, L().viewAll?.(post().comments ?? 0) ?? t`View all ${post().comments} comments`) : null)) as Element;
 }

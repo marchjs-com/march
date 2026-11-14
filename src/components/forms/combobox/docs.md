@@ -34,10 +34,11 @@ labels={{ noResults: "Sonuç yok", typeToSearch: "Aramak için yaz", remove: (l)
 ## Accessibility
 
 The WAI-ARIA combobox pattern: focus stays in the input (`role="combobox"`, `aria-expanded`, `aria-controls`), the
-active option is announced through `aria-activedescendant`, the popup is a `role="listbox"` placed by the shared
+active option is announced through `aria-activedescendant`, the options are a `role="listbox"` in a popup placed by the shared
 positioning engine; loading, empty and error states are `role="status"`.
 
 ## Composed of
 
-Chip (the chosen values with `multiple`) and ListRow (the options); the list popup is the shared floating panel
-(ui/popover.ts) and keyboard handling is the shared list navigation (forms/util.ts › listNav).
+Chip (the chosen values with `multiple`) and OptionList (the options, driven from the input with `keys={false}`); the
+list popup is the shared floating panel (ui/popover.ts, `.hm-pop`) and keyboard handling is the shared list navigation
+(the list-nav behavior).

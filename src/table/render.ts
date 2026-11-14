@@ -31,6 +31,7 @@ import { SearchBox } from "../components/forms/search-box/index.ts";
 import { Skeleton } from "../components/feedback/skeleton/index.ts";
 import { Empty } from "../components/feedback/empty/index.ts";
 import { ErrorBox } from "../components/feedback/error-box/index.ts";
+import { LiveStatus } from "../components/feedback/live-status/index.ts";
 import { Pagination } from "../components/navigation/pagination/index.ts";
 import { ResizeHandle } from "../components/layout/resize-handle/index.ts";
 import type { PopoverProps } from "../components/overlays/popover/index.ts";
@@ -227,7 +228,7 @@ function BulkBar<R>(ctx: Ctx<R>): () => unknown {
   const show = computed(() => table.selectedCount() > 0);
   const actions = props.bulkActions ?? [];
   return () => (show() ? untrack(() => h("div", { class: "hm-table-bulk", role: "region", "aria-label": t`Bulk actions` },
-    h("span", { class: "hm-table-bulk-count", role: "status", "aria-live": "polite" }, () => (table.allMatching() && table.mode === "server" ? t`All ${table.total() ?? ""} selected` : t`${table.selectedCount()} selected`)),
+    h(LiveStatus, { class: "hm-table-bulk-count", text: () => (table.allMatching() && table.mode === "server" ? t`All ${table.total() ?? ""} selected` : t`${table.selectedCount()} selected`) }),
     () => (!table.allMatching() && table.pageSelection() === "all" && (table.total() ?? 0) > table.selectedCount()
       ? untrack(() => h(Button, { variant: "link", class: "hm-table-selectall", onClick: table.selectAllMatching }, t`Select all ${table.total()} matching`)) : null),
     actions.map((a) => h<ActionButtonProps<[R[]]>>(ActionButton, { action: a, args: (): [R[]] => [table.selectedRows()], run: () => table.runBulk(a), class: "hm-table-action" })),
@@ -544,7 +545,7 @@ function Footer<R>(ctx: Ctx<R>): Element {
     return t`${from}–${to} of ${n}`;
   };
   return h("div", { class: "hm-table-footer" },
-    h("span", { class: "hm-table-range", role: "status", "aria-live": "polite" }, range),
+    h(LiveStatus, { class: "hm-table-range", text: range }),
     // rows per page, Previous / Next and "Page 2 of 7"; in cursor mode (or with an unknown total) only the two buttons
     () => (table.isVirtual() ? null : untrack(() => h(Pagination, {
       variant: "simple", class: "hm-table-pager", info: false,

@@ -1,5 +1,6 @@
 // Showcase stage for Steps: a four-stage checkout with Back / Next (Playground values in playground.ts).
 import { signal } from "../../../core/reactive.ts";
+import { Button } from "../../actions/button/index.ts";
 import { Steps } from "./index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { star } from "../../../icons/glyphs/star.ts";
@@ -29,8 +30,8 @@ export default function StepsDemo(props: { values: { vertical: boolean; clickabl
     }}
     <p class="hm-muted">{() => (props.values.connector ? "Adımlar bir çizgiyle bağlı; biten adımların çizgisi renklenir." : "Bağlantı çizgisi yok: adımlar yalnız noktalarıyla durur.")}</p>
     <div class="sc-steps-nav">
-      <button type="button" class="hm-btn hm-btn-sm" disabled={() => step() === 0} onClick={() => step.set(step() - 1)}>Geri</button>
-      <button type="button" class="hm-btn hm-btn-sm hm-btn-primary" disabled={() => step() === STEPS.length} onClick={() => step.set(step() + 1)}>{() => (step() >= STEPS.length - 1 ? "Bitir" : "İleri")}</button>
+      <Button size="sm" disabled={() => step() === 0} onClick={() => step.set(step() - 1)}>Geri</Button>
+      <Button size="sm" variant="primary" disabled={() => step() === STEPS.length} onClick={() => step.set(step() + 1)}>{() => (step() >= STEPS.length - 1 ? "Bitir" : "İleri")}</Button>
     </div>
   </div>
 }

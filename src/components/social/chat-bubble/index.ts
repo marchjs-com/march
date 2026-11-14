@@ -17,6 +17,7 @@ import { animate } from "../../../motion/animate.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
+import { ReplyQuote } from "../reply-quote/index.ts";
 import "./chat-bubble.css";
 import { isRtl } from "../../../core/util.ts";
 import { swipeable } from "../../../behaviors/swipe/index.ts";
@@ -122,7 +123,7 @@ export function ChatBubble(props: ChatBubbleProps): Element {
   h("div", { class: "hm-msg-col" },
     h("div", { class: "hm-msg-bubble", ref: (x: HTMLElement) => { bub = x; } },
       () => { const s = val(props.sender); return s && !mine() ? h("span", { class: `hm-msg-sender hm-msg-c${((val(props.senderColor) ?? 0) % 4) + 1}` }, s) : null; },
-      () => { const r = val(props.reply); return r ? h("span", { class: "hm-msg-quote" }, h("b", null, r.name), h("span", null, r.text)) : null; },
+      () => { const r = val(props.reply); return r ? h(ReplyQuote, { class: "hm-msg-quote", name: r.name, text: r.text, variant: () => (mine() ? "inverse" : "soft") }) : null; },
       props.children ?? null,
       () => (text() ? h("span", { class: "hm-msg-text" }, text()) : null),
       h("span", { class: "hm-msg-meta" },

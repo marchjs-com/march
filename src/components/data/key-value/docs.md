@@ -22,3 +22,7 @@ Parts carry stable classes: `hm-kv-row`, `hm-kv-label`, `hm-kv-value`, `hm-kv-hi
 ## Accessibility
 
 A real `<dl>` with `<dt>` / `<dd>`: screen readers announce each pair. Long values wrap instead of overflowing.
+
+## Composed of
+
+StatTile (every row: `term`, `emphasis="text"`, the hint inside the value).

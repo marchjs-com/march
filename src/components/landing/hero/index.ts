@@ -24,6 +24,7 @@ import { Reveal, type RevealOptions } from "../reveal/index.ts";
 import { SectionHead, sectionActions, type SectionAction } from "../section-head/index.ts";
 import { VideoBackground } from "../video-background/index.ts";
 import { Parallax, type ParallaxLayer } from "../parallax/index.ts";
+import { backdrop, type BackdropLayer } from "../backdrop.ts";
 
 export type HeroVariant = "centered" | "split" | "video" | "mesh" | "aurora" | "product" | "parallax";
 /** A call to action (the SectionAction of SectionHead). */
@@ -70,6 +71,13 @@ export interface HeroProps {
   children?: unknown | undefined;
 }
 
+const BACKDROPS: Partial<Record<HeroVariant, readonly BackdropLayer[]>> = {
+  centered: [["grid", 0.7], "spotlight"],
+  mesh: ["mesh", ["grid", 0.35], "spotlight", ["noise", 0.5]],
+  product: [["dots", 0.5, "hm-hero-dots"]],
+  split: [["dots", 0.5, "hm-hero-dots"]],
+};
+
 function titleNode(title: unknown, highlight?: string): unknown {
   if (typeof title !== "string" || !highlight || !title.includes(highlight)) return title;
   const [a, ...b] = title.split(highlight);
@@ -104,12 +112,10 @@ export function Hero(props: HeroProps): Element {
   if (variant === "video" && props.video) return h("section", { class: cls }, h(VideoBackground, { src: props.video.src, poster: props.video.poster, tint: "dark", class: "hm-hero-stage" }, h("div", { class: "hm-hero-inner" }, copy)));
   if (variant === "parallax") return h("section", { class: cls }, h(Parallax, { layers: props.layers ?? [], pointer: 1, class: "hm-hero-stage", height: "100%" }, h("div", { class: "hm-hero-inner" }, copy)));
 
-  const bg: unknown[] = [];
-  if (props.backdrop === false) { /* no decorative layers */ }
-  else if (variant === "centered") bg.push(h(Overlay, { effect: "grid", opacity: 0.7 }), h(Overlay, { effect: "spotlight" }));
-  else if (variant === "mesh") bg.push(h(Overlay, { effect: "mesh" }), h(Overlay, { effect: "grid", opacity: 0.35 }), h(Overlay, { effect: "spotlight" }), h(Overlay, { effect: "noise", opacity: 0.5 }));
-  else if (variant === "aurora") bg.push(h(Aurora, { colors: props.colors ?? BRAND_COLORS.map(tokenColor) }), h(Overlay, { effect: "noise", opacity: 0.45 }));
-  else if (variant === "product" || variant === "split") bg.push(h(Overlay, { effect: "dots", opacity: 0.5, class: "hm-hero-dots" }));
+  // the decorative layers of the variant: a recipe for the shared backdrop builder (landing/backdrop.ts)
+  const bg = backdrop(props.backdrop === false ? false
+    : variant === "aurora" ? [h(Aurora, { colors: props.colors ?? BRAND_COLORS.map(tokenColor) }) as Node, ["noise", 0.45]]
+      : BACKDROPS[variant]);
 
   let stage: unknown = null;
   if (variant === "split") stage = plain ? h("div", { class: "hm-hero-media-wrap" }, mediaNode(props.media, "hm-hero-media"))

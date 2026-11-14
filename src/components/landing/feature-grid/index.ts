@@ -4,6 +4,7 @@
 //   list   icon beside the text, two columns (a checklist of benefits)
 //   bento  tiles of different sizes (wide, tall, big) with optional media: an asymmetric showcase grid
 // Items enter one after another (Reveal). Every tile in a row has the same height; on phones everything stacks.
+// A tile is a ListRow (icon in the lead, the title as an h3, the text as a paragraph), in a Card for cards and bento.
 import "./feature-grid.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, listen, setStyle, type ClassProp } from "../../../ui/util.ts";
@@ -11,6 +12,7 @@ import { owned } from "../../../ui/observe.ts";
 import { Grid } from "../../../ui/stack.ts";
 import { Card } from "../../../ui/card.ts";
 import { IconTile, type IconTone } from "../../../ui/app.ts";
+import { ListRow } from "../../data/list-row/index.ts";
 import { measure, mutate } from "../../../motion/engine/clock.ts";
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts";
 
@@ -44,16 +46,15 @@ const TONES: IconTone[] = ["primary", "info", "success", "violet", "warn", "pink
 export function FeatureGrid(props: FeatureGridProps): Element {
   const variant = props.variant ?? "cards";
   const tile = (it: FeatureItem, i: number): Element => {
-    const head = [
-      it.icon != null && h(IconTile, { icon: it.icon, tone: it.tone ?? (variant === "plain" || variant === "list" ? "primary" : TONES[i % TONES.length]), size: variant === "list" ? "sm" : "md" }),
-      h("div", { class: "hm-fg-text" },
-        h("h3", { class: "hm-fg-title" }, it.href ? h("a", { href: it.href, class: "hm-fg-link" }, it.title) : it.title),
-        it.body != null && h("p", { class: "hm-fg-body" }, it.body)),
-    ];
+    const row = (as: "article" | "div", cls: string): Element => h(ListRow, {
+      as, class: cls, direction: variant === "list" ? "row" : "column", align: "start", overflow: "wrap", titleAs: "h3", subAs: "p",
+      lead: it.icon != null ? h(IconTile, { icon: it.icon, tone: it.tone ?? (variant === "plain" || variant === "list" ? "primary" : TONES[i % TONES.length]), size: variant === "list" ? "sm" : "md" }) : undefined,
+      title: it.href ? h("a", { href: it.href, class: "hm-fg-link" }, it.title) : it.title, sub: it.body ?? undefined,
+    }) as Element;
     const media = variant === "bento" && it.media != null ? h("div", { class: "hm-fg-media" }, it.media) : null;
     const cls = cx("hm-fg-item", variant === "bento" && `hm-fg-span-${it.span ?? "normal"}`, it.href && "is-link");
-    if (variant === "cards" || variant === "bento") return h(Card, { as: "article", class: cls }, head, media) as Element;
-    return h("article", { class: cls }, head);
+    if (variant === "cards" || variant === "bento") return h(Card, { as: "article", class: cls }, row("div", "hm-fg-row"), media) as Element;
+    return row("article", cx("hm-fg-row", cls));
   };
   const grid = variant === "bento"
     ? h("div", { class: "hm-fg-bento" }, props.items.map(tile))

@@ -1,0 +1,8 @@
+/* March — heartBurst (motion/burst.ts). The colour is the local accent (data-hm-color). */
+/* burst: a zero-size layer at the host's center; dots and a ring fly out (motion engine) */
+.hm-burst { position: absolute; inset-inline-start: 50%; inset-block-start: 50%; width: 0; height: 0; pointer-events: none; z-index: 1; }
+.hm-burst-ring { position: absolute; inset-inline-start: -1.1em; inset-block-start: -1.1em; width: 2.2em; height: 2.2em; box-sizing: border-box; border-radius: 50%; border: 3px solid var(--hm-accent); opacity: 0; }
+.hm-burst-dot { position: absolute; inset-inline-start: -3.5px; inset-block-start: -3.5px; width: 7px; height: 7px; border-radius: 50%; background: var(--hm-accent); opacity: 0; }
+.hm-burst-sm { width: 5px; height: 5px; inset-inline-start: -2.5px; inset-block-start: -2.5px; }
+.hm-burst-c1 { background: var(--hm-brand-orange, var(--hm-cat-1)); } .hm-burst-c2 { background: var(--hm-brand-blue, var(--hm-cat-2)); }
+.hm-burst-c3 { background: var(--hm-brand-green, var(--hm-cat-3)); } .hm-burst-c4 { background: var(--hm-brand-purple, var(--hm-cat-4)); }

@@ -16,6 +16,9 @@ A message that stays on the page: a tone (`info`, `success`, `warn`, `danger`, `
 | `body` / children | node | | the message |
 | `action` | node / list / `action()` objects | | the next step; actions render as small buttons |
 | `actionPlacement` | `end` `below` | `end` | beside the text (before the × button) or under it |
+| `variant` | `soft` `raised` | `soft` | `raised`: a floating message (Toast) on a layer surface with a shadow; the tone colours the icon alone |
+| `role` | string | by tone | the ARIA role instead of the tone's (`alert` for danger / warn, `status` otherwise) |
+| `partClass` | `{ icon, body, dismiss }` | | extra classes of the parts (a host's own hooks) |
 | `dismissable` | `boolean` | `false` | adds a × button |
 | `dismissLabel` | `string` / accessor | "Dismiss" (translated) | accessible name of the × button |
 | `dismissIcon` | node / glyph | the × glyph | what the dismiss button shows |

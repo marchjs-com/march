@@ -36,7 +36,9 @@ const SETUP = `(() => {
     "box-shadow", "outline-style", "filter", "font-size", "font-weight", "border-top-left-radius", "translate", "scale",
     "animation-name", "text-decoration-line", "cursor", "font-family", "letter-spacing", "object-fit", "object-position",
     "mix-blend-mode", "background-size", "background-position", "background-blend-mode", "border-top-style", "text-align", "z-index",
-    "fill", "stroke"];
+    "fill", "stroke", "accent-color"];
+  const PSEUDO = ["visibility", "opacity", "transform", "color", "background-color", "background-image", "border-top-color", "border-top-style",
+    "border-top-width", "width", "height", "box-shadow", "rotate", "scale", "translate", "inset-inline-start", "inset-block-start"];
   // layout (display, width, flex-direction, grid-template…) is not compared as style: it counts only when a box really
   // moves or resizes (getBoundingClientRect). A class that says "horizontal" while the bar stays vertical is no effect.
   const SEL = '[role=switch], input[type=checkbox], input[type=radio], input[type=range], [role=radio], [role=tab], [role=option], .hm-chip[aria-pressed], button[aria-pressed]';
@@ -60,7 +62,11 @@ const SETUP = `(() => {
       parts.push(el.tagName + "|" + (el.value ?? "") + "|" + PROPS.map((p) => cs.getPropertyValue(p)).join(";") + "|" + [q(r.left - o.left), q(r.top - o.top), q(r.width), q(r.height)].join(",")
         // a running animation (every animation goes through the motion engine: WAAPI) counts by its timing — speed, easing,
         // repeat — not by the frame it happens to be on
-        + "|" + (el.getAnimations?.() ?? []).map((x) => { const t = x.effect?.getTiming?.() ?? {}; return [t.duration, t.iterations, t.direction, t.easing, t.delay, x.playbackRate].join("/"); }).join(";"));
+        + "|" + (el.getAnimations?.() ?? []).map((x) => { const t = x.effect?.getTiming?.() ?? {}; return [t.duration, t.iterations, t.direction, t.easing, t.delay, x.playbackRate].join("/"); }).join(";")
+        // parts drawn by ::before / ::after (a line, an arrow, a dot, a mark) are seen too: what they paint and their size
+        + "|" + ["::before", "::after"].map((ps) => { const p = getComputedStyle(el, ps); return p.content === "none" || p.display === "none" ? "" : [p.content, ...PSEUDO.map((k) => p.getPropertyValue(k))].join(";"); }).join("~")
+        // a placeholder is text the user reads; a range input paints its thumb and track from the accent
+        + "|" + (el.placeholder ?? "") + "|" + (el.matches("input[type=range], progress, meter") ? cs.getPropertyValue("accent-color") + cs.getPropertyValue("--hm-accent") : ""));
       for (const n of el.childNodes) if (n.nodeType === 3) { const t = n.textContent.trim(); if (t) parts.push("#" + t); } else walk(n);
     };
     walk(root());
@@ -70,7 +76,13 @@ const SETUP = `(() => {
   };
   const picked = (x) => x.getAttribute("aria-checked") === "true" || x.getAttribute("aria-selected") === "true" || x.checked === true;
   const choice = (c) => c.matches("[role=radio], [role=tab], [role=option], input[type=radio]");
-  const name = (c) => (c.getAttribute("aria-label") || (c.closest(".sc-play-opt, .hm-field") ?? own(c)).textContent || c.tagName).trim().replace(/\\s+/g, " ").slice(0, 60) + (choice(c) ? " → " + (c.textContent.trim() || c.value || "").slice(0, 20) : "");
+  // the name of a control: its aria-label, the element aria-labelledby points at, its option row, its own text, or the
+  // text of the row it sits in (a switch whose label stands beside it); a choice adds its own label (a radio input's is
+  // its <label>: the value alone is the same for every choice of some groups)
+  const byId = (c) => (c.getAttribute("aria-labelledby") ?? "").split(" ").map((id) => document.getElementById(id)?.textContent ?? "").join(" ").trim();
+  const beside = (c) => { let el = own(c); for (let i = 0; i < 3 && el; i++, el = el.parentElement) { const t = el.textContent.trim(); if (t) return t; } return ""; };
+  const name = (c) => (c.getAttribute("aria-label") || byId(c) || (c.closest(".sc-play-opt, .hm-field") ?? own(c)).textContent.trim() || beside(c) || c.tagName).trim().replace(/\\s+/g, " ").slice(0, 60)
+    + (choice(c) ? " → " + ((c.matches("input") ? c.closest("label")?.textContent.trim() || c.getAttribute("aria-label") : c.textContent.trim()) || c.value || "").slice(0, 20) : "");
   const where = (c) => (c.closest(".sc-demo")?.querySelector(".sc-demo-title")?.textContent ?? c.closest(".hm-card")?.querySelector(".hm-card-title")?.textContent ?? "").trim();
   // use: flip a switch / checkbox, pick another option of a group, move a slider; returns an undo
   const fire = (c) => { c.dispatchEvent(new Event("input", { bubbles: true })); c.dispatchEvent(new Event("change", { bubbles: true })); };

@@ -23,7 +23,9 @@ default, a listbox (one or many) or a menu of commands; a field can drive it wit
 | `multiple` | boolean | `false` | several values (listbox) |
 | `mode` | `radio` `listbox` `menu` | `radio` | `menu` without a value: commands, nothing stays chosen |
 | `keysFrom` | element / accessor | — | the field whose arrow keys / Enter drive the list (focus stays in the field) |
-| `active` | signal (index) | own | the highlighted row with `keysFrom` |
+| `active` | signal (index) | own | the highlighted row with `keysFrom` / `keys={false}` |
+| `keys` | boolean | `true` | `false`: no key listener, no field attributes; rows are options `<id>-<index>` highlighted from `active` (the owner handles keys: Combobox) |
+| `overflow` | `ellipsis` `wrap` | `ellipsis` | a label that does not fit is cut or wrapped |
 | `label` | string | — | accessible name of the list |
 | `id` | string | generated | rows are `<id>-<index>` |
 | `check` | boolean / icon / `() => node` | `true` | the tick on a chosen row |

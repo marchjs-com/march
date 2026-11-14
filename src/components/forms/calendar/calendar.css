@@ -1,6 +1,6 @@
 /* March — Calendar (month grid). Imported by its component module; tokens.css provides the variables. */
 .hm-cal { display: inline-flex; flex-direction: column; gap: var(--hm-space-2); user-select: none; }
-.hm-cal-header { display: flex; align-items: center; justify-content: space-between; gap: var(--hm-space-2); }
+/* the month row is a PeriodNav (class hm-cal-header): arrows around the month name */
 .hm-cal-title { font-weight: 600; text-transform: capitalize; }
 .hm-cal-row { display: grid; grid-template-columns: repeat(7, 2.25rem); gap: 2px; }
 .hm-cal-wd { text-align: center; font-size: var(--hm-text-xs); color: var(--hm-muted); padding-block: var(--hm-space-1); }

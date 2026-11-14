@@ -48,3 +48,22 @@ test("NavMenu: pins off, own texts and icons, chevron and search icon off", () =
   assert.equal(b.host.querySelector(".hm-nav-pinned .hm-nav-heading").textContent, "Favourites");
   b.dispose();
 });
+
+test("NavMenu: under the breakpoint the menu leaves the page and opens in a Drawer from the menu button", async () => {
+  const mm = globalThis.matchMedia;
+  globalThis.matchMedia = (q) => ({ matches: q.includes("max-width: 900px"), media: q, addEventListener() {}, removeEventListener() {} });
+  const a = mount(() => h(NavMenu, { items: [{ id: "a", title: "Alpha", href: "/a" }], palette: false, storageKey: "t.nav-narrow", label: "Main", pins: false }));
+  globalThis.matchMedia = mm;
+  assert.equal(document.querySelector(".hm-nav"), null, "not in the page while closed");
+  const burger = a.host.querySelector(".hm-nav-burger");
+  assert.equal(burger.getAttribute("aria-expanded"), "false");
+  burger.click();
+  for (let i = 0; i < 50 && !document.querySelector(".hm-drawer .hm-nav"); i++) await new Promise((r) => setTimeout(r, 10));
+  const panel = document.querySelector(".hm-drawer.hm-nav-sheet");
+  assert.ok(panel, "the Drawer panel");
+  assert.ok(panel.classList.contains("hm-nav-nopins"), "state classes go with the menu");
+  assert.equal(panel.getAttribute("aria-label"), "Main");
+  assert.match(panel.querySelector(".hm-nav").textContent, /Alpha/);
+  assert.equal(burger.getAttribute("aria-expanded"), "true");
+  a.dispose();
+});

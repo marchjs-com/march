@@ -68,3 +68,15 @@ test("TextInput: error marks the input invalid and shows a linked alert; without
   assert.equal(msg.hidden, true);
   assert.equal(plain.getAttribute("aria-describedby"), null);
 });
+
+test("TextInput: errorSpace keeps the error line in place while there is no error", () => {
+  const err = signal("");
+  const { el } = mount(() => h(TextInput, { id: "kept", error: err, errorSpace: true }));
+  const msg = el.querySelector(".hm-input-error");
+  assert.ok(msg.classList.contains("is-kept"));
+  assert.equal(msg.hidden, false);
+  assert.equal(msg.textContent, "");
+  err.set("Required");
+  assert.equal(msg.textContent, "Required");
+  assert.equal(el.querySelector("input").getAttribute("aria-describedby"), "kept-err");
+});

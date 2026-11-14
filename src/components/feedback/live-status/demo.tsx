@@ -1,0 +1,26 @@
+// Showcase stage for LiveStatus: the buttons change a selection count; the status line says it. With "Görünür metin"
+// off the line is only read, so the stage prints what a screen reader hears.
+import { LiveStatus } from "./index.ts";
+import { Button } from "../../actions/button/index.ts";
+import { Kbd } from "../../typography/kbd/index.ts";
+
+export const code = `<LiveStatus text={() => \`\${$count} satır seçildi\`} />                       // görünür, kibarca okunur
+<LiveStatus visible={false} text={$moved} help="Taşımak için sürükleyin" helpId="plan-help" />   // ipucu + yalnız okunan durum
+<section aria-describedby="plan-help">…</section>`
+
+export default function LiveStatusDemo(props: { values: { visible: boolean; help: string; politeness: string; as: string } }) {
+  let $count = 2
+  const text = (): string => ($count ? `${$count} satır seçildi` : "Seçim yok")
+  return <div class="sc-col">
+    <div class="sc-row">
+      <Button size="sm" on:click={() => { $count = $count + 1 }}>Bir satır seç</Button>
+      <Button size="sm" variant="ghost" on:click={() => { $count = 0 }}>Seçimi temizle</Button>
+    </div>
+    {() => {
+      const v = { ...props.values }
+      const help = v.help === "off" ? false : v.help === "own" ? <span>Seçmek için <Kbd keys="space" /> tuşuna basın</span> : "Satır seçmek için düğmeye basın."
+      return <LiveStatus text={text} visible={v.visible} politeness={v.politeness as "polite"} as={v.as as "span"} help={help} helpId="sc-live-status-help" />
+    }}
+    <p class="sc-demo-call">{() => (props.values.visible ? `role="status" · görünür: "${text()}"` : `role="status" · yalnız ekran okuyucu: "${text()}"`)}</p>
+  </div>
+}

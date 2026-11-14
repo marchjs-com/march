@@ -89,3 +89,12 @@ test("CheckMark: motion plays a transition between two values (the old glyph lea
   assert.equal(flip.querySelector(".is-arriving"), null);
   dispose();
 });
+
+test("CheckMark: variant bare is the glyph alone (the colour and text size of its host)", () => {
+  const [el, dispose] = mount(() => h(CheckMark, { variant: "bare", label: false }));
+  const m = el.querySelector(".hm-checkmark");
+  assert.ok(m.classList.contains("hm-checkmark-bare"));
+  assert.equal(m.getAttribute("aria-hidden"), "true");
+  assert.ok(m.querySelector(".hm-checkmark-icon svg"));
+  dispose();
+});

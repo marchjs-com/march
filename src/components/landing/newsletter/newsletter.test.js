@@ -17,7 +17,7 @@ test("Newsletter: invalid address shows an alert, valid one calls onSubmit and s
   type(input, "nope");
   el.querySelector("form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
   await tick();
-  assert.equal(el.querySelector(".hm-nl-msg").textContent, "Enter a valid email address.");
+  assert.equal(el.querySelector(".hm-input-error").textContent, "Enter a valid email address.");
   assert.equal(sent.length, 0);
   type(el.querySelector("input"), "ada@example.com");
   el.querySelector("form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
@@ -34,7 +34,7 @@ test("Newsletter: a rejected submit shows its message", async () => {
   type(el.querySelector("input"), "a@b.io");
   el.querySelector("form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
   for (let i = 0; i < 5; i++) await tick();
-  assert.equal(el.querySelector(".hm-nl-msg").textContent, "Taken");
+  assert.equal(el.querySelector(".hm-input-error").textContent, "Taken");
   dispose();
 });
 
@@ -49,11 +49,11 @@ test("Newsletter: own texts, own done mark or none, no motion", async () => {
   const [a, b, c] = ["a", "b", "c"].map((k) => el.querySelector(`.hm-nl.${k}`));
   assert.equal(a.querySelector("input").getAttribute("aria-label"), "Mail");
   send(a, "nope");
-  assert.equal(a.querySelector(".hm-nl-msg").textContent, "Bad");
+  assert.equal(a.querySelector(".hm-input-error").textContent, "Bad");
   send(a, "ada@example.com"); send(b, "ada@example.com"); send(c, "ada@example.com");
   for (let i = 0; i < 5; i++) await tick();
   assert.ok(a.querySelector(".hm-nl-done .hm-nl-check .mine"), "done at once (no fold), with the own mark");
-  assert.equal(b.querySelector(".hm-nl-msg").textContent, "Failed");
+  assert.equal(b.querySelector(".hm-input-error").textContent, "Failed");
   assert.ok(c.querySelector(".hm-nl-done"));
   assert.equal(c.querySelector(".hm-nl-check"), null);
   dispose();

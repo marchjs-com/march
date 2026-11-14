@@ -6,12 +6,11 @@
 .hm-accordion-separated .hm-acc-item.is-open { box-shadow: var(--hm-shadow-2); }
 .hm-accordion-contained .hm-acc-item + .hm-acc-item { border-top: 1px solid var(--hm-border); }
 .hm-acc-head { margin: 0; font: inherit; }
-.hm-acc-btn { display: flex; align-items: center; gap: var(--hm-space-3); width: 100%; padding: .875rem var(--hm-space-4); border: 0; background: none; color: var(--hm-text); font: inherit; text-align: start; cursor: pointer; border-radius: inherit; }
-.hm-acc-btn:hover { background: color-mix(in srgb, var(--hm-surface-2) 60%, transparent); }
-.hm-acc-icon { color: var(--hm-accent, var(--hm-primary)); }
-.hm-acc-titles { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-.hm-acc-title { font-weight: 600; } .hm-acc-sub { color: var(--hm-muted); font-size: var(--hm-text-sm); }
-.hm-acc-chev { color: var(--hm-muted); }
+/* the header is a ListRow button: the accordion keeps its padding, text size, the corner of its item and a quieter hover */
+.hm-listrow.hm-acc-btn { padding: .875rem var(--hm-space-4); border-radius: inherit; font-size: inherit; line-height: inherit; }
+.hm-listrow.hm-acc-btn:hover { background: color-mix(in srgb, var(--hm-surface-2) 60%, transparent); }
+.hm-acc-btn > .hm-listrow-lead { color: var(--hm-accent, var(--hm-primary)); }
+.hm-acc-title { font-weight: 600; } .hm-acc-btn .hm-listrow-sub { font-size: var(--hm-text-sm); }
 .hm-acc-chev.is-own { --hm-chevron-from: 0deg; inline-size: auto; block-size: auto; }
 .hm-acc-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-acc-item.is-open .hm-acc-panel { grid-template-rows: 1fr; }

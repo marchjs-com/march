@@ -35,7 +35,7 @@
 
 /* the progress line is a Progress (brand gradient unless a colour is given); the control row is a Toolbar */
 .hm-deck-bar:not([data-hm-color]) { --hm-progress-c: var(--hm-brand-gradient); }
-:dir(rtl) .hm-deck-prev .hm-svg, :dir(rtl) .hm-deck-fwd .hm-svg { transform: scaleX(-1); }
+:dir(rtl) .hm-deck-pages .hm-page-nav .hm-svg { transform: scaleX(-1); }
 .hm-deck .hm-deck-controls, .hm-deck .hm-deck-controls > * { gap: var(--hm-space-1); flex-wrap: nowrap; }
 .hm-deck-count { font-size: var(--hm-text-sm); color: var(--hm-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 

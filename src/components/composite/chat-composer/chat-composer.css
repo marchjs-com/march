@@ -24,10 +24,8 @@
 .hm-compose-act.is-send .hm-svg { margin-inline-start: -2px; }
 :dir(rtl) .hm-compose-act.is-send .hm-svg { transform: scaleX(-1); }
 .hm-compose-act:disabled { opacity: .5; cursor: default; }
-.hm-compose-reply { display: flex; align-items: center; gap: .5rem; padding: .375rem .25rem .375rem .75rem; border-radius: .75rem; background: var(--hm-surface-2); border-inline-start: 3px solid var(--hm-brand-orange, var(--hm-primary)); min-width: 0; }
-.hm-compose-reply-text { display: flex; flex-direction: column; flex: 1; min-width: 0; font-size: var(--hm-text-sm); }
-.hm-compose-reply-text b { font-size: var(--hm-text-xs); color: var(--hm-brand-orange-text, var(--hm-primary-text)); }
-.hm-compose-reply-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--hm-text-2); }
+/* the reply preview is a ReplyQuote; here only the room for its cancel button */
+.hm-reply-quote.hm-compose-reply { padding-inline: .75rem .25rem; border-radius: .75rem; }
 .hm-compose-emoji .hm-react-grid { border: 0; background: var(--hm-surface-2); }
 .hm-compose-rec { display: flex; align-items: center; gap: .625rem; flex: 1; min-width: 0; height: 2.75rem; padding: 0 1rem; border-radius: 1.5rem; background: var(--hm-surface-2); overflow: hidden; }
 .hm-compose-time { flex: none; font-variant-numeric: tabular-nums; font-weight: 800; font-size: var(--hm-text-sm); min-width: 2.75rem; }

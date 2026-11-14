@@ -18,9 +18,9 @@ import { Button } from "../../actions/button/index.ts";
 import { Segmented } from "../../forms/segmented/index.ts";
 import { PanelHeader } from "../../layout/panel-header/index.ts";
 import { ResizeHandle } from "../../layout/resize-handle/index.ts";
-import { dayGridKey } from "../../forms/calendar/index.ts";
-import { PeriodNav } from "./period-nav.ts";
-import { chartHint } from "./hint.ts";
+import { dayGridKey } from "../../../ui/date-grid.ts";
+import { PeriodNav } from "../../navigation/period-nav/index.ts";
+import { LiveStatus } from "../../feedback/live-status/index.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface SchedulerEvent {
@@ -487,7 +487,8 @@ export function Scheduler(props: SchedulerProps): Element {
       if ((e.target as Element).closest(".hm-sch-ev")) return;
       if (e.key === "PageUp" || e.key === "PageDown") { e.preventDefault(); shift(e.key === "PageUp" ? -1 : 1); }
     },
-  }, toolbar, body, chartHint({ id, prefix: "hm-sch", help: props.help, text: () => (editable() ? lb("help") : ""), status })) as HTMLElement;
+  }, toolbar, body, // the hint under the calendar and the (hidden) live region its changes are said in
+    h(LiveStatus, { class: "hm-sch-status", visible: false, as: "div", text: status, helpId: `${id}-help`, helpClass: "hm-sch-help", help: props.help == null || props.help === true ? () => (editable() ? lb("help") : "") : props.help })) as HTMLElement;
   onCleanup(() => { scrollBox = null; });
   return root;
 }

@@ -21,7 +21,7 @@ screen reader reads. The text is visually hidden unless `text` shows it; every g
 | `label` | string / `false` | — | text for the current value; `false`: no text, the mark is decorative |
 | `text` | boolean | `false` | show the text beside the mark |
 | `icons` | `{ yes, no, partial }` | check / x / minus | own glyph per value (icon, text or node); `false` draws none |
-| `variant` | `plain` `soft` `solid` | `plain` | the glyph alone, on a tinted disc or on a filled disc |
+| `variant` | `plain` `soft` `solid` `bare` | `plain` | the glyph alone, on a tinted disc, on a filled disc; `bare`: the glyph in the colour and at the text size of what it sits in (a step dot) |
 | `size` | `sm` `md` `lg` | `md` | |
 | `color` | color token | by value | success / danger / warn unless a token is given |
 | `motion` | `flip` `fade` `pop` `draw` / `none` `false` / `(next, prev, change) => …` | `none` | the transition when the value changes: the glyphs turn into each other (`flip`), cross-fade, pop, or the new stroke is drawn; your own function gets the arriving and the leaving glyph and `{ from, to }` (return a promise: the leaving glyph is removed when it settles). Runs on the motion engine; with reduced motion the glyph changes at once |

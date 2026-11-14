@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Month grid with full keyboard support, min / max, disabled days and range highlight.",
   category: "forms",
-  composedOf: ["IconButton"],
+  composedOf: ["PeriodNav"],
   behaviors: [],
   hubs: [],
   showcase: "/forms",

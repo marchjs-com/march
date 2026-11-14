@@ -4,7 +4,8 @@
 //   whenVisible(el, (visible) => …)     IntersectionObserver: run while on screen
 //   stickToBottom(scroller, { … })      a log / chat that follows its last line until the reader scrolls up
 //   scrollIntoArea(row, scroller)       bring the active row into its own scroll area (the page never scrolls)
-import { getOwner, onCleanup } from "../core/reactive.ts";
+//   whenMedia("(max-width: 900px)")     a media query as a live boolean (a component's breakpoint without the Viewport manager)
+import { getOwner, onCleanup, signal } from "../core/reactive.ts";
 
 /** Register a cleanup with the current owner when there is one; returns the same function (call it to stop earlier). */
 export function owned<F extends () => void>(stop: F): F {
@@ -94,4 +95,16 @@ export function scrollIntoArea(el: Element | null | undefined, scroller: HTMLEle
   if (typeof scroller.scrollTo === "function") scroller.scrollTo({ top: scroller.scrollTop + d, behavior: o.smooth ? "smooth" : "auto" });
   else scroller.scrollTop += d;
   return true;
+}
+
+/** A media query as a live boolean: `const narrow = whenMedia("(max-width: 900px)")`, read `narrow()`. Stops with the owner; false where there is no matchMedia. */
+export function whenMedia(query: string): () => boolean {
+  const mm = globalThis.matchMedia?.(query);
+  const on = signal(!!mm?.matches);
+  if (mm?.addEventListener) {
+    const change = (e: MediaQueryListEvent): void => { on.set(!!e.matches); };
+    mm.addEventListener("change", change);
+    owned(() => mm.removeEventListener("change", change));
+  }
+  return on;
 }

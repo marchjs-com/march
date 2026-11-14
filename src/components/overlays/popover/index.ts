@@ -59,6 +59,10 @@ export interface PopoverProps {
   class?: ClassProp | undefined;
   /** Class of the floating panel. */
   panelClass?: string | undefined;
+  /** Id of the panel (default: generated), e.g. for your own trigger's `aria-controls`. */
+  id?: string | undefined;
+  /** More attributes and listeners of the panel (`onKeydown`, `ref`, `data-*`): a menu's arrow keys. */
+  panelProps?: Record<string, unknown> | undefined;
   /** The panel content, or `(close, api) => content`. */
   children?: unknown | ((close: (refocus?: boolean) => void, api: PopoverApi) => unknown) | undefined;
 }
@@ -67,7 +71,23 @@ const isSignal = (v: unknown): v is Signal<boolean> => typeof v === "function" &
 
 /** `<Popover trigger={<Button>Filters</Button>} title="Filters" placement="bottom-end">{(close) => <FilterForm onDone={close} />}</Popover>` */
 export function Popover(props: PopoverProps): Element {
-  const id = uid("hm-popover");
+  const p = popover(props);
+  const root = h("span", { class: () => cx("hm-popover", p.trigger == null && "hm-popover-bare", untrack(p.isOpen) && "is-open", val(props.class)) }, p.trigger, p.region) as HTMLElement;
+  p.host(root);
+  return root;
+}
+
+/**
+ * The floating panel alone, hung on the `anchor` you give: no element is left in the page beside it (a Menu next to
+ * its own trigger button, a context menu at a point). The props of Popover without `trigger` and `class`.
+ */
+export function PopoverPanel(props: Omit<PopoverProps, "trigger" | "class">): () => unknown {
+  return popover(props).region;
+}
+
+// State, trigger wiring and the panel of a popover; `host(el)` names the wrapper (fallback anchor, `is-open` class).
+function popover(props: PopoverProps): { trigger: unknown; region: () => unknown; isOpen: () => boolean; host(el: HTMLElement): void } {
+  const id = props.id ?? uid("hm-popover");
   const sig = isSignal(props.open) ? props.open : null;
   const controlled = props.open !== undefined;
   const own = signal(!!props.defaultOpen);
@@ -109,11 +129,12 @@ export function Popover(props: PopoverProps): Element {
   };
   const view = (): unknown => {
     const titleId = `${id}-title`;
+    const { ref: panelRef, ...panelProps } = (props.panelProps ?? {}) as { ref?: (el: HTMLElement) => void };
     const el = floating({
       anchor: anchor(), placement: props.placement ?? "bottom-start", id, role: props.role === undefined ? "dialog" : props.role,
       class: cx("hm-popover-panel", `hm-popover-m-${props.motion ?? "scale"}`, props.width && props.width !== "auto" && `hm-popover-w-${props.width}`, props.flush && "is-flush", props.panelClass),
-      attrs: { tabindex: "-1", "aria-labelledby": props.title != null ? titleId : null, "aria-label": props.title == null ? () => val(props.label) ?? null : null },
-      ref: (x) => { panel = x; },
+      attrs: { ...panelProps, tabindex: "-1", "aria-labelledby": props.title != null ? titleId : null, "aria-label": props.title == null ? () => val(props.label) ?? null : null },
+      ref: (x) => { panel = x; panelRef?.(x); },
       onClose: (refocus) => {
         if (refocus ? props.closeOnEscape === false : props.closeOnOutside === false) return;
         close(refocus, refocus ? "escape" : "outside");
@@ -127,13 +148,11 @@ export function Popover(props: PopoverProps): Element {
     return el;
   };
 
-  root = h("span", { class: () => cx("hm-popover", trigger == null && "hm-popover-bare", untrack(isOpen) && "is-open", val(props.class)) },
-    trigger,
-    () => {
-      const on = isOpen();
-      if (triggerEl) triggerEl.setAttribute("aria-expanded", String(on));
-      root?.classList.toggle("is-open", on);
-      return on ? untrack(view) : null;
-    }) as HTMLElement;
-  return root;
+  const region = (): unknown => {
+    const on = isOpen();
+    if (triggerEl) triggerEl.setAttribute("aria-expanded", String(on));
+    root?.classList.toggle("is-open", on);
+    return on ? untrack(view) : null;
+  };
+  return { trigger, region, isOpen, host: (el) => { root = el; } };
 }

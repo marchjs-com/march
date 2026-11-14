@@ -7,6 +7,7 @@ export * from "./social/follow-button/index.ts";
 export * from "./social/like-button/index.ts";
 export * from "./social/media-grid/index.ts";
 export * from "./social/reaction-picker/index.ts";
+export * from "./social/reply-quote/index.ts";
 export * from "./social/story-progress/index.ts";
 export * from "./social/story-ring/index.ts";
 export * from "./social/typing-indicator/index.ts";

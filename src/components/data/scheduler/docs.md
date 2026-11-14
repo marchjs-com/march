@@ -64,4 +64,5 @@ dropped events settle with a spring, all on the motion engine (reduced motion an
 
 ## Composed of
 
-PanelHeader (the bar), Button, IconButton and ButtonGroup (the period buttons, `period-nav.ts`), Segmented (view switch), ResizeHandle (the ends of an event) and Button (the "+N more" link).
+PanelHeader (the bar), PeriodNav (the period buttons), Segmented (view switch), ResizeHandle (the ends of an event), Button
+(the "+N more" link) and LiveStatus (the hint under the calendar and the hidden status region).

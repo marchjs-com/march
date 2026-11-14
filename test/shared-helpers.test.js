@@ -419,3 +419,49 @@ test("dragGhost: lives in the drag layer, follows the pointer, is removed by clo
   await g4.leave([{ opacity: 1 }, { opacity: 0 }], { duration: 1 });
   assert.equal(n4.closest("[data-layer]")?.isConnected ?? false, false);
 });
+
+test("overflowFit: measures once, hides the lowest priority first, refits when the room changes, a new list is measured again", async () => {
+  const { overflowFit } = await import("../src/ui/fit.ts");
+  const { signal } = await import("../src/core/reactive.ts");
+  const RO = globalThis.ResizeObserver;
+  let report = null;
+  globalThis.ResizeObserver = class { constructor(fn) { report = (w) => fn([{ contentRect: { width: w, height: 10 } }]); } observe() {} disconnect() {} };
+  const items = signal(["a", "b", "c"]);
+  let fit, changes = 0;
+  const dispose = createRoot((d) => {
+    fit = overflowFit({ items, measure: () => items().map(() => 50), priority: (i) => (i === 0 ? 9 : i), reserve: () => 20, adjust: (next) => { if (next.length === 2) next[1] = true; }, onChange: () => { changes++; } });
+    fit.observe(div());
+    return d;
+  });
+  assert.equal(fit.isShown(1), true, "everything is shown until measured");
+  await Promise.resolve();
+  report?.(200);
+  assert.deepEqual(fit.shown(), [true, true, true]);
+  report?.(125);
+  assert.deepEqual(fit.shown(), [true, false, true], "the lowest priority leaves; room is kept for the More button");
+  assert.equal(fit.isShown(1), false);
+  assert.ok(changes >= 2);
+  items.set(["a", "b"]);
+  await Promise.resolve();
+  assert.deepEqual(fit.shown(), [true, true], "a new list is measured again (adjust has the last word)");
+  dispose();
+  globalThis.ResizeObserver = RO;
+});
+
+test("whenMedia: a media query as a live boolean; false without matchMedia", async () => {
+  const { whenMedia } = await import("../src/ui/observe.ts");
+  const mm = globalThis.matchMedia;
+  let change = null, removed = 0;
+  globalThis.matchMedia = (q) => ({ matches: q === "(max-width: 900px)", media: q, addEventListener: (_n, fn) => { change = fn; }, removeEventListener: () => { removed++; } });
+  let narrow, wide;
+  const dispose = createRoot((d) => { narrow = whenMedia("(max-width: 900px)"); wide = whenMedia("(min-width: 2000px)"); return d; });
+  assert.equal(narrow(), true);
+  assert.equal(wide(), false);
+  change({ matches: true });
+  assert.equal(wide(), true);
+  dispose();
+  assert.equal(removed, 2, "listeners leave with the owner");
+  globalThis.matchMedia = undefined;
+  assert.equal(whenMedia("(max-width: 1px)")(), false);
+  globalThis.matchMedia = mm;
+});

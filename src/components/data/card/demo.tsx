@@ -10,14 +10,14 @@ export const code = `<Card title="HADİ" subtitle="Kurumsal plan" actions={[<But
 </Card>
 <Card flush>…</Card>                                   // body without padding (tables, lists)`
 
-export default function CardDemo(props: { values: { head: boolean; actions: boolean; footer: boolean; flush: boolean } }) {
+export default function CardDemo(props: { values: { head: boolean; actions: boolean; footer: boolean; flush: boolean; plain: boolean } }) {
   let $edits = 0
   return <div class="sc-col">
     {() => {
-      const p = props.values, v = { head: p.head, actions: p.actions, footer: p.footer, flush: p.flush }
+      const p = props.values, v = { head: p.head, actions: p.actions, footer: p.footer, flush: p.flush, plain: p.plain }
       return <Card title={v.head ? "HADİ" : undefined} subtitle={v.head ? "Kurumsal plan" : undefined}
         actions={v.head && v.actions ? [<Button size="sm" icon={edit} on:click={() => { $edits++ }}>Düzenle</Button>] : undefined}
-        footer={v.footer ? <span class="hm-muted">{() => ($edits ? `${$edits} düzenleme yapıldı` : "Son güncelleme: bugün")}</span> : undefined} flush={v.flush}>
+        footer={v.footer ? <span class="hm-muted">{() => ($edits ? `${$edits} düzenleme yapıldı` : "Son güncelleme: bugün")}</span> : undefined} flush={v.flush} plain={v.plain}>
         <KeyValue columns={2} items={[{ label: "Kullanıcı", value: "48" }, { label: "Depolama", value: "12,4 GB" }]} />
       </Card>
     }}

@@ -12,7 +12,7 @@ import { clock } from "../../../icons/glyphs/clock.ts";
 import { animate } from "../../../motion/animate.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
-import { heartBurst } from "../like-button/index.ts";
+import { heartBurst } from "../../../motion/burst.ts";
 import "./follow-button.css";
 
 export type FollowState = "follow" | "following" | "requested";

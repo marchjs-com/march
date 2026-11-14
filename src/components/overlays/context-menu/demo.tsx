@@ -1,5 +1,6 @@
 // Showcase stage for ContextMenu: right-click (or Shift+F10) a card. Code is shown in the Code tab.
 import { ContextMenu } from "./index.ts";
+import { Button } from "../../actions/button/index.ts";
 import type { MenuItem } from "../../../ui/menu.ts";
 
 export const code = `<ContextMenu items={(target) => [
@@ -24,7 +25,7 @@ export default function ContextMenuDemo(props: { values: { danger: boolean; shor
   }
   return <div class="sc-flow-stack">
     <ContextMenu items={items} label="Dosya işlemleri">
-      <div class="sc-row">{() => $cards.map((c, i) => <button type="button" class="hm-btn hm-btn-secondary" data-card={c} data-audit-try={i === 0 ? "contextmenu" : undefined}>{c}</button>)}</div>
+      <div class="sc-row">{() => $cards.map((c, i) => <Button data-card={c} data-audit-try={i === 0 ? "contextmenu" : undefined}>{c}</Button>)}</div>
     </ContextMenu>
     <p class="sc-flow-muted" role="status">{() => $last}</p>
   </div>

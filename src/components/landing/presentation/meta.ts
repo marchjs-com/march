@@ -6,7 +6,7 @@ export default defineMeta({
   category: "landing",
   since: "0.1.0",
   summary: "Slides: keys, wheel, swipe, step-by-step fragments, slide / fade / zoom, full screen, URL index, speaker window (cross-tab), print.",
-  composedOf: ["IconButton", "Progress", "Toolbar"],
+  composedOf: ["IconButton", "Pagination", "Progress", "Toolbar"],
   behaviors: ["motion engine", "swipe", "channel (crossTab)"],
   showcase: "/web",
   demoGroup: "talk",

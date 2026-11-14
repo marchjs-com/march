@@ -66,4 +66,5 @@ labels scroll with OverflowText instead of being cut.
 ListRow (every row: icon, label, sub line, badge; a router link that marks the current page; long labels scroll),
 SearchBox (the search field with its clear button and shortcut hint), PanelHeader (title bar), SectionLabel (headings),
 IconButton (menu, rail and fold buttons), Button (expand / collapse all), Badge (counts), Chevron (the turning arrows),
-Empty (no matches), ResizeHandle (the width grip).
+Empty (no matches), ResizeHandle (the width grip), Drawer (the narrow-screen menu: loaded on the first open,
+shared with NavMenu through `navigation/nav-menu/drawer.ts`).

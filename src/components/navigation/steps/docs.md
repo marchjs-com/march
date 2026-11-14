@@ -33,4 +33,4 @@ An ordered list; the current step has `aria-current="step"`; with `onSelect` eac
 
 ## Composed of
 
-No other component.
+CheckMark (the tick of a done step: `variant="bare"`, decorative).

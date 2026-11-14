@@ -8,7 +8,6 @@
 .hm-pg-group > .hm-disclosure-summary { display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem; }
 .hm-pg-group-name.hm-section-label { color: var(--hm-muted); }
 .hm-pg-group > .hm-disclosure-body { padding: 0 0 .375rem; }
-.hm-pg-count.hm-badge { background: var(--hm-primary); color: var(--hm-on-primary, var(--hm-surface)); }
 .hm-pg-rows { display: grid; }
 .hm-pg-row { position: relative; display: grid; grid-template-columns: minmax(6rem, 38%) minmax(0, 1fr) 1.75rem; align-items: center; gap: .25rem .5rem; padding: .25rem .5rem .25rem .75rem;
   transition: background-color var(--hm-dur) var(--hm-ease); }

@@ -10,6 +10,7 @@ import { ownIcon } from "../../../ui/parts.ts";
 import { message } from "../../../icons/glyphs/message.ts";
 import { moreVertical } from "../../../icons/glyphs/moreVertical.ts";
 import { Button } from "../../actions/button/index.ts";
+import { Card } from "../../data/card/index.ts";
 import { StatTile } from "../../data/stat-tile/index.ts";
 import { Picture } from "../../media/picture/index.ts";
 import { VerifiedMark } from "../../social/verified-mark/index.ts";
@@ -80,7 +81,8 @@ export function ProfileHeader(props: ProfileHeaderProps): Element {
   // a soft StatTile whose figure rolls; a button when the list behind it can be opened
   const stat = (which: Stat, n: () => number, label: () => string): Element =>
     h(StatTile, { class: "hm-prof-stat", variant: "tile", value: h(CountRoll, { value: n }), label, onClick: props.onStat && (() => props.onStat?.(which)) }) as Element;
-  return h("section", { class: () => cx("hm-prof", `hm-prof-cover-${val(props.cover) ?? "md"}`, val(props.class)), "aria-label": () => L().profile?.(u().name) ?? t`Profile of ${u().name}` },
+  // the frame is a Card (a section, no body padding)
+  return h(Card, { flush: true, class: () => cx("hm-prof", `hm-prof-cover-${val(props.cover) ?? "md"}`, val(props.class)), "aria-label": () => L().profile?.(u().name) ?? t`Profile of ${u().name}` },
     () => (val(props.cover) === "none" ? null : h("div", { class: "hm-prof-cover", "aria-hidden": "true" },
       () => { const c = u().cover; return c ? h(Picture, { src: c, alt: "", fit: "cover", loading: "eager" }) : h("span", { class: "hm-prof-cover-art" }, h("i"), h("i"), h("i"), h("i")); })),
     h("div", { class: "hm-prof-top" },
@@ -105,5 +107,5 @@ export function ProfileHeader(props: ProfileHeaderProps): Element {
       return h("div", { class: "hm-prof-stats", "data-n": String(list.length) }, list.map((w) => (w === "posts" ? stat(w, () => u().posts ?? 0, () => L().posts ?? t`Posts`)
         : w === "followers" ? stat(w, followers, () => L().followers ?? t`Followers`)
         : stat(w, () => u().following ?? 0, () => L().following ?? t`Following`))));
-    });
+    }) as Element;
 }

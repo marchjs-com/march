@@ -53,4 +53,4 @@ itself is decorative); shortcuts are shown with Kbd styling and the platform's m
 
 ## Composed of
 
-Button / IconButton (the trigger), ListRow (an entry), Kbd (its shortcut), Divider (a separator). The panel is `floating()` (ui/popover), like Popover's.
+Button / IconButton (the trigger), ListRow (an entry), CheckMark (the tick of a checked entry), Kbd (its shortcut), Divider (a separator). The panel is a Popover (`menuPanel()`: one panel for Menu and ContextMenu); Dropdown is a Popover on the same trigger.

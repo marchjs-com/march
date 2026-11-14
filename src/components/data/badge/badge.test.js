@@ -72,3 +72,12 @@ test("Badge: onClick draws a button (text and count); pressed, disabled and the 
   assert.equal(hits, 11);
   m.dispose();
 });
+
+test("Badge: variant solid adds the filled look to a text badge and a count", () => {
+  const m = mount(() => [h(Badge, { tone: "primary", variant: "solid" }, "New"), h(Badge, { tone: "primary", variant: "solid", count: 3 }), h(Badge, { tone: "primary" }, "Soft")]);
+  const [a, b, c] = m.el.querySelectorAll(".hm-badge");
+  assert.ok(a.classList.contains("hm-badge-solid") && a.classList.contains("hm-badge-primary"));
+  assert.ok(b.classList.contains("hm-badge-solid") && b.classList.contains("hm-badge-count"));
+  assert.ok(!c.classList.contains("hm-badge-solid"));
+  m.dispose();
+});

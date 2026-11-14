@@ -2,14 +2,16 @@
 .hm-nl { display: flex; flex-direction: column; gap: var(--hm-space-2); min-width: 0; max-width: 32rem; }
 /* title and lead are a SectionHead (sm); the form keeps its own smaller title */
 .hm-nl .hm-nl-head .hm-section-head-title { font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); letter-spacing: normal; }
-.hm-nl-form { display: flex; gap: var(--hm-space-2); min-width: 0; }
-.hm-nl-field { flex: 1 1 12rem; min-width: 0; }
-.hm-nl-field input { width: 100%; }
-.hm-nl-btn { flex: none; }
-.hm-nl-stacked .hm-nl-form { flex-direction: column; }
-.hm-nl-stacked .hm-nl-field { flex-basis: auto; }
-.hm-nl-msg { margin: 0; min-height: 1.25em; font-size: var(--hm-text-sm); color: var(--hm-danger-text, var(--hm-danger)); }
+/* field · button on one row, the field's own error line (TextInput error, its place kept) under both */
+.hm-nl-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--hm-space-2); min-width: 0; }
+.hm-nl-field { grid-area: 1 / 1; inline-size: 100%; min-width: 0; }
+.hm-nl-btn { grid-area: 1 / 2; }
+.hm-nl-form .hm-input-error { grid-area: 2 / 1 / auto / -1; margin: 0; font-size: var(--hm-text-sm); }
+.hm-nl-stacked .hm-nl-form { grid-template-columns: minmax(0, 1fr); }
+.hm-nl-stacked .hm-nl-btn { grid-area: 2 / 1; }
+.hm-nl-stacked .hm-input-error { grid-row: 3; }
 .hm-nl-note { margin: 0; font-size: var(--hm-text-xs); color: var(--hm-muted); }
-.hm-nl-done { display: flex; align-items: center; gap: var(--hm-space-2); margin: 0; min-height: var(--hm-control-h); font-weight: var(--hm-weight-medium); }
-@media (max-width: 420px) { .hm-nl-inline .hm-nl-form { flex-direction: column; } .hm-nl-inline .hm-nl-field { flex-basis: auto; } }
-@container hm-site (max-width: 420px) { .hm-nl-inline .hm-nl-form { flex-direction: column; } .hm-nl-inline .hm-nl-field { flex-basis: auto; } }
+/* the success line stands where the form stood (row + message line): the note under it does not move */
+.hm-nl-done { display: flex; align-items: center; gap: var(--hm-space-2); margin: 0 0 calc(var(--hm-space-2) + 1.25 * var(--hm-text-sm)); min-height: var(--hm-control-h); font-weight: var(--hm-weight-medium); }
+@media (max-width: 420px) { .hm-nl-inline .hm-nl-form { grid-template-columns: minmax(0, 1fr); } .hm-nl-inline .hm-nl-btn { grid-area: 2 / 1; } .hm-nl-inline .hm-input-error { grid-row: 3; } }
+@container hm-site (max-width: 420px) { .hm-nl-inline .hm-nl-form { grid-template-columns: minmax(0, 1fr); } .hm-nl-inline .hm-nl-btn { grid-area: 2 / 1; } .hm-nl-inline .hm-input-error { grid-row: 3; } }

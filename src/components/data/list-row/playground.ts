@@ -1,6 +1,6 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { kind: string; lead: string; sub: boolean; trail: string; size: string; color: string; overflow: string; indicator: boolean; disabled: boolean }
+interface Values { kind: string; lead: string; sub: boolean; trail: string; size: string; color: string; overflow: string; indicator: boolean; disabled: boolean; direction: string; heading: boolean }
 
 export default definePlayground<Values>({
   options: [
@@ -11,6 +11,8 @@ export default definePlayground<Values>({
     { key: "size", label: "Boyut", default: "md", options: ["sm", "md", "lg"] },
     { key: "color", label: "Etkin rengi", default: "", options: [{ value: "", label: "vurgu" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }] },
     { key: "overflow", label: "Sığmayan metin", default: "scroll", options: [{ value: "scroll", label: "kayar" }, { value: "ellipsis", label: "üç nokta" }, { value: "wrap", label: "alt satıra geçer" }] },
+    { key: "direction", label: "Yön", default: "row", options: [{ value: "row", label: "satır" }, { value: "column", label: "karo (dikey)" }, { value: "center", label: "karo, ortalı" }] },
+    { key: "heading", label: "Başlık h3, alt metin p öğesi", default: false },
     { key: "indicator", label: "Etkin çubuğu", default: false },
     { key: "disabled", label: "Üçüncü satır devre dışı", default: false },
   ],

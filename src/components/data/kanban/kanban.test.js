@@ -36,3 +36,33 @@ test("Kanban: colour token, own dot and count, parts off, no entrance", () => {
   assert.equal(c.querySelector(".hm-kanban-count").textContent, "1 / 5");
   m.dispose();
 });
+
+test("Kanban: a card is dragged with the drag behavior (a copy follows, the column under the pointer is marked, drop moves)", () => {
+  const moves = [];
+  const cols = [{ id: "a", title: "A", items: [{ id: "1" }] }, { id: "b", title: "B", items: [] }];
+  const m = mount(() => h(Kanban, { columns: cols, itemKey: (x) => x.id, card: (x) => `card ${x.id}`, onMove: (it, from, to) => moves.push([it.id, from, to]) }));
+  const [a, b] = m.el.querySelectorAll(".hm-kanban-col");
+  const card = a.querySelector(".hm-kanban-card");
+  assert.equal(card.getAttribute("draggable"), null, "no HTML5 drag and drop");
+  let under = a;
+  document.elementFromPoint = () => under;
+  const ptr = (type, x, y) => Object.assign(new globalThis.Event(type, { bubbles: true, cancelable: true }), { clientX: x, clientY: y, pointerId: 1, pointerType: "mouse", button: 0 });
+  card.dispatchEvent(ptr("pointerdown", 10, 10));
+  document.dispatchEvent(ptr("pointermove", 40, 10));
+  assert.ok(card.classList.contains("is-dragging"));
+  assert.ok(document.querySelector(".hm-kanban-ghost"), "the copy is in the drag layer");
+  assert.ok(a.classList.contains("is-over"));
+  under = b;
+  document.dispatchEvent(ptr("pointermove", 300, 10));
+  assert.ok(b.classList.contains("is-over") && !a.classList.contains("is-over"));
+  document.dispatchEvent(ptr("pointerup", 300, 10));
+  assert.deepEqual(moves, [["1", "a", "b"]]);
+  assert.ok(!card.classList.contains("is-dragging") && !b.classList.contains("is-over"));
+  assert.equal(document.querySelector(".hm-kanban-ghost"), null);
+  card.dispatchEvent(ptr("pointerdown", 10, 10));
+  document.dispatchEvent(ptr("pointermove", 40, 10));
+  document.dispatchEvent(Object.assign(new globalThis.Event("keydown", { bubbles: true, cancelable: true }), { key: "Escape" }));
+  assert.equal(moves.length, 1, "Escape cancels");
+  delete document.elementFromPoint;
+  m.dispose();
+});

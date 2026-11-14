@@ -31,4 +31,4 @@ so the contrast holds.
 
 ## Composed of
 
-SiteSection, SectionHead (title, lead, actions, note), Overlay, Reveal, VideoBackground.
+SiteSection, SectionHead (title, lead, actions, note), Reveal, VideoBackground; the Overlay layers come from the backdrop builder Hero uses too (`landing/backdrop.ts`).

@@ -2,6 +2,7 @@
 // Scheduler events, Gantt bars, TreeView and FileManager items). Movement threshold (a click stays a click), pointer
 // capture, Escape cancels, and edge auto-scroll of a scroll container driven by the motion clock (onFrame), so global
 // pause and speed apply. Deltas include the container's scroll change: positions stay right while it scrolls.
+// `hold`: on touch the drag starts after a long press, so a finger that moves at once still scrolls the page.
 import { onFrame } from "../../motion/engine/clock.ts";
 import { listen, isRtl } from "../../core/util.ts";
 
@@ -18,6 +19,11 @@ export interface DragPoint {
 export interface PointerDragOptions {
   /** Px before the drag starts (default 4); below it pointerup is a click. */
   threshold?: number | undefined;
+  /**
+   * Touch only: ms the finger must rest before the drag starts (cards in a scrolling board). A finger that moves
+   * earlier leaves the gesture to the page (it scrolls); mouse and pen drag at once.
+   */
+  hold?: number | undefined;
   /** Container to auto-scroll when the pointer nears its edges. */
   scroll?: HTMLElement | null | undefined;
   /** Edge size in px that triggers auto-scroll (default 48). */
@@ -37,7 +43,10 @@ export function pointerDrag(down: PointerEvent, o: PointerDragOptions = {}): () 
   const threshold = o.threshold ?? 4, edge = o.edge ?? 48;
   let started = false, done = false, cx = x0, cy = y0, last: PointerEvent | null = down;
   const target = down.target as Element | null;
-  try { (target as HTMLElement | null)?.setPointerCapture?.(down.pointerId); } catch { /* synthetic event */ }
+  const capture = (): void => { try { (target as HTMLElement | null)?.setPointerCapture?.(down.pointerId); } catch { /* synthetic event */ } };
+  const hold = down.pointerType === "touch" ? o.hold ?? 0 : 0;
+  let waiting = hold > 0;
+  if (!waiting) capture();
   const rtl = !!target && isRtl(target);
   const point = (): DragPoint => {
     const dx = cx - x0 + (sc ? Math.abs(sc.scrollLeft) - sl0 : 0) * (sc && sc.scrollLeft < 0 ? -1 : 1);
@@ -55,19 +64,22 @@ export function pointerDrag(down: PointerEvent, o: PointerDragOptions = {}): () 
     sc.scrollTop += vy; sc.scrollLeft += vx;
     if (sc.scrollTop !== bt || sc.scrollLeft !== bl) o.onMove?.(point());
   }) : () => {};
+  const quit = (): void => { done = true; clearTimeout(timer); off(); stopFrames(); };
   const finish = (cancelled: boolean): void => {
     if (done) return;
-    done = true;
-    off(); stopFrames();
+    quit();
     if (started) o.onEnd?.(point(), cancelled);
   };
+  const begin = (): void => { started = true; o.onStart?.(point()); };
+  // long press: the drag starts where the finger rests
+  const timer = waiting ? setTimeout(() => { waiting = false; if (!done) { capture(); begin(); o.onMove?.(point()); } }, hold) : undefined;
   const move = (e: PointerEvent): void => {
     if (e.pointerId !== down.pointerId) return;
     cx = e.clientX; cy = e.clientY; last = e;
+    if (waiting) { if (Math.hypot(cx - x0, cy - y0) >= threshold) quit(); return; } // moved before the hold: the page scrolls
     if (!started) {
       if (Math.hypot(cx - x0, cy - y0) < threshold) return;
-      started = true;
-      o.onStart?.(point());
+      begin();
     }
     e.preventDefault();
     o.onMove?.(point());
@@ -75,13 +87,16 @@ export function pointerDrag(down: PointerEvent, o: PointerDragOptions = {}): () 
   const up = (e: PointerEvent): void => {
     if (e.pointerId !== down.pointerId) return;
     last = e;
-    if (!started) { done = true; off(); stopFrames(); o.onClick?.(e); return; }
+    if (!started) { quit(); o.onClick?.(e); return; }
     finish(false);
   };
   const doc = (target?.ownerDocument ?? globalThis.document) as Document;
-  const off = listen(doc, {
+  const offKeys = listen(doc, {
     pointermove: move, pointerup: up, pointercancel: () => finish(true),
     keydown: (e: KeyboardEvent) => { if (e.key === "Escape" && started) { e.preventDefault(); finish(true); } },
   });
+  // a held drag keeps the page still and the long-press menu closed
+  const offTouch = hold > 0 ? listen(doc, { touchmove: (e: Event) => { if (started) e.preventDefault(); }, contextmenu: (e: Event) => e.preventDefault() }, { passive: false }) : null;
+  const off = (): void => { offKeys(); offTouch?.(); };
   return () => finish(true);
 }

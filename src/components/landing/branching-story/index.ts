@@ -13,6 +13,7 @@ import { animate } from "../../../motion/engine/playback.ts";
 import { still, swapTransition } from "../../../motion/engine/parts.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import { Badge } from "../../data/badge/index.ts";
+import { Breadcrumbs, type Crumb } from "../../navigation/breadcrumbs/index.ts";
 import { Button } from "../../actions/button/index.ts";
 import { Kbd } from "../../typography/kbd/index.ts";
 import tr from "./tr.ts";
@@ -122,15 +123,16 @@ export function BranchingStory(props: BranchingStoryProps): Element {
 
   // the trail: one step per choice made, labelled with the choice; a step rewinds the story to it
   const L = props.labels ?? {};
-  const trail = props.trail === false ? null : h("nav", { class: "hm-bs-trail", "aria-label": () => L.path ?? t`Your path` },
-    h("ol", { class: "hm-bs-steps" }, () => path().map((id, i, p) => {
-      const prev = i ? props.passages[p[i - 1]!] : null;
-      const via = prev?.choices?.find((c) => c.to === id)?.label ?? L.start ?? t`Start`;
-      const last = i === p.length - 1;
-      // a step is a Badge: the current one filled, an earlier one a button that rewinds the story to it
-      return h("li", { class: cx("hm-bs-step", last && "is-current"), "aria-current": last ? "step" : null },
-        last ? h(Badge, { tone: "primary" }, via) : h(Badge, { onClick: () => go(p.slice(0, i + 1)) }, via));
-    })),
+  // (Breadcrumbs in a pill look: the current step filled, an earlier one a button; a long path folds into its "…" menu)
+  const trail = props.trail === false ? null : h("div", { class: "hm-bs-top" },
+    h(Breadcrumbs, {
+      class: "hm-bs-trail", label: () => L.path ?? t`Your path`,
+      items: () => path().map((id, i, p): Crumb => {
+        const prev = i ? props.passages[p[i - 1]!] : null;
+        const via = prev?.choices?.find((c) => c.to === id)?.label ?? L.start ?? t`Start`;
+        return { id: `${i}:${id}`, label: via as string, onSelect: () => go(p.slice(0, i + 1)) };
+      }),
+    }),
     props.endings === false || !all.length ? null : h("span", { class: "hm-bs-found" }, () => (L.endings ? L.endings(found().size, all.length) : t`Endings found: ${found().size} / ${all.length}`)));
 
   const stage = h("div", { class: "hm-bs-stage" }) as HTMLElement;

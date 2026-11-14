@@ -48,7 +48,7 @@ export function Newsletter(props: NewsletterProps): Element {
   const email = signal(""), state = signal<"idle" | "pending" | "done" | "error">("idle"), error = signal("");
   const id = uid("hm-nl");
   const done = computed(() => state() === "done");
-  let field: HTMLElement | null = null;
+  let field: HTMLElement | null = null; // the input: it shakes on an error
   const fail = (msg: string): void => {
     error.set(msg); state.set("error");
     if (field && props.motion !== false) animate(field, { transform: ["translateX(0px)", "translateX(-7px)", "translateX(7px)", "translateX(-4px)", "translateX(4px)", "translateX(0px)"] }, { duration: 420, easing: "linear" });
@@ -73,12 +73,12 @@ export function Newsletter(props: NewsletterProps): Element {
     () => (done()
       ? h("p", { class: "hm-nl-done", role: "status" }, props.doneIcon === false ? null : h(CheckMark, { class: "hm-nl-check", variant: "solid", label: false, icons: { yes: props.doneIcon } }), () => val(props.done) ?? t`Thanks! Check your inbox.`)
       : h("form", { class: "hm-nl-form", novalidate: true, "aria-labelledby": props.title != null ? `${id}-t` : null, onSubmit: submit },
-        (field = h("div", { class: "hm-nl-field" }, h(TextInput, {
-          value: email, type: "email", autocomplete: "email", inputmode: "email", required: true, id: `${id}-e`,
-          placeholder: props.placeholder ?? t`you@example.com`, "aria-label": props.labels?.email ?? t`Email address`, get invalid() { return state() === "error"; }, describedby: `${id}-m`,
-        })) as HTMLElement),
+        // the message is the input's own error line; its place is kept, so nothing moves when it appears
+        h(TextInput, {
+          class: "hm-nl-field", value: email, type: "email", autocomplete: "email", inputmode: "email", required: true, id: `${id}-e`, ref: (el: HTMLInputElement) => { field = el; },
+          placeholder: props.placeholder ?? t`you@example.com`, "aria-label": props.labels?.email ?? t`Email address`, error: () => (state() === "error" ? error() : ""), errorSpace: true,
+        }),
         h(Button, { type: "submit", loading: () => state() === "pending", class: "hm-nl-btn" }, () => val(props.button) ?? t`Subscribe`))),
-    h("p", { class: "hm-nl-msg", id: `${id}-m`, role: "alert" }, () => (state() === "error" ? error() : "")),
     props.note != null && h("p", { class: "hm-nl-note" }, () => val(props.note))) as HTMLElement;
   return root;
 }

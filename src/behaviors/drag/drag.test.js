@@ -50,6 +50,32 @@ test("draggable: Escape cancels; right button and disabled do not start", () => 
   el.remove();
 });
 
+test("pointerDrag: hold — touch starts after a long press, an early move leaves the gesture to the page, mouse drags at once", async () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const log = [];
+  const opts = { hold: 20, onStart: () => log.push("start"), onMove: (p) => log.push(`move ${p.dx}`), onEnd: (_p, c) => log.push(`end ${c}`), onClick: () => log.push("click") };
+  const touch = { pointerType: "touch" };
+  el.addEventListener("pointerdown", (e) => D.pointerDrag(e, opts));
+  el.dispatchEvent(ptr("pointerdown", 0, 0, touch)); document.dispatchEvent(ptr("pointermove", 30, 0, touch));
+  await new Promise((r) => setTimeout(r, 40));
+  document.dispatchEvent(ptr("pointermove", 60, 0, touch)); document.dispatchEvent(ptr("pointerup", 60, 0, touch));
+  assert.deepEqual(log, [], "moved before the hold: a scroll, not a drag");
+  el.dispatchEvent(ptr("pointerdown", 0, 0, touch));
+  await new Promise((r) => setTimeout(r, 40));
+  const tm = new Event("touchmove", { bubbles: true, cancelable: true }); document.dispatchEvent(tm);
+  assert.ok(tm.defaultPrevented, "the page stays still while dragging");
+  document.dispatchEvent(ptr("pointermove", 25, 0, touch)); document.dispatchEvent(ptr("pointerup", 25, 0, touch));
+  assert.deepEqual(log, ["start", "move 0", "move 25", "end false"]);
+  log.length = 0;
+  el.dispatchEvent(ptr("pointerdown", 0, 0, touch)); document.dispatchEvent(ptr("pointerup", 0, 0, touch));
+  await new Promise((r) => setTimeout(r, 40));
+  assert.deepEqual(log, ["click"], "a tap stays a tap");
+  log.length = 0;
+  el.dispatchEvent(ptr("pointerdown", 0, 0)); document.dispatchEvent(ptr("pointermove", 10, 0)); document.dispatchEvent(ptr("pointerup", 10, 0));
+  assert.deepEqual(log, ["start", "move 10", "end false"], "the mouse does not wait");
+  el.remove();
+});
+
 test("track: fractions of the area from the press on, RTL mirror, clamped, ends on release or Escape", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
   el.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100, right: 200, bottom: 100, x: 0, y: 0 });

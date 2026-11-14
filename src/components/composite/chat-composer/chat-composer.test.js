@@ -59,3 +59,15 @@ test("ChatComposer: own texts, icons and colors; waveform, dot and motion can be
   assert.equal(m.el.querySelector(".hm-compose-dot"), null);
   m.dispose();
 });
+
+test("ChatComposer: disabled and placeholder stay live on the field", () => {
+  const off = signal(false), ph = signal("Say hi");
+  const m = mount(() => h(ChatComposer, { onSend() {}, disabled: off, placeholder: ph }));
+  const field = m.el.querySelector("textarea");
+  assert.equal(field.disabled, false);
+  assert.equal(field.getAttribute("placeholder"), "Say hi");
+  off.set(true); ph.set("Later");
+  assert.equal(field.disabled, true);
+  assert.equal(field.getAttribute("placeholder"), "Later");
+  m.dispose();
+});

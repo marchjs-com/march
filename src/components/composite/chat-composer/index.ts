@@ -13,7 +13,6 @@ import { plus } from "../../../icons/glyphs/plus.ts";
 import { smile } from "../../../icons/glyphs/smile.ts";
 import { mic } from "../../../icons/glyphs/mic.ts";
 import { send } from "../../../icons/glyphs/send.ts";
-import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { trash } from "../../../icons/glyphs/trash.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { ownIcon } from "../../../ui/parts.ts";
@@ -22,6 +21,7 @@ import { formatDuration } from "../../../ui/format.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { ReactionPicker } from "../../social/reaction-picker/index.ts";
+import { ReplyQuote } from "../../social/reply-quote/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import "./chat-composer.css";
@@ -137,9 +137,10 @@ export function ChatComposer(props: ChatComposerProps): Element {
   () => {
     const r = val(props.replyTo);
     if (!r) return null;
-    const box = h("div", { class: "hm-compose-reply" },
-      h("span", { class: "hm-compose-reply-text" }, h("b", null, L().replyingTo?.(r.name) ?? t`Replying to ${r.name}`), h("span", null, r.text)),
-      props.onCancelReply ? h(IconButton, { class: "hm-compose-icon", size: "sm", shape: "round", title: false, icon: xIcon, label: () => L().cancelReply ?? t`Cancel reply`, onClick: () => props.onCancelReply?.() }) : null) as HTMLElement;
+    const box = h(ReplyQuote, {
+      class: "hm-compose-reply", name: L().replyingTo?.(r.name) ?? t`Replying to ${r.name}`, text: r.text, lines: 1,
+      onClose: props.onCancelReply ? () => props.onCancelReply?.() : undefined, closeLabel: () => L().cancelReply,
+    }) as HTMLElement;
     if (moves()) animate(box, [{ transform: "translateY(10px)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }], { duration: 200, easing: "easeOutCubic" });
     queueMicrotask(() => field?.focus());
     return box;
@@ -157,10 +158,10 @@ export function ChatComposer(props: ChatComposerProps): Element {
       : h("div", { class: "hm-compose-field" },
         h(Textarea, {
           value: text, onChange: typed, rows: 1, class: "hm-compose-input",
-          // getters: Textarea reads these inside its own accessors, so they stay live
-          get disabled() { return !!val(props.disabled); },
-          get placeholder() { return val(props.placeholder) ?? t`Message`; },
-          get "aria-label"() { return L().message ?? t`Message`; },
+          // live(): h() reads a plain object getter once; a live prop stays a getter on the Textarea's props
+          disabled: live(() => !!val(props.disabled)),
+          placeholder: live(() => val(props.placeholder) ?? t`Message`),
+          "aria-label": live(() => L().message ?? t`Message`),
           ref: (x: HTMLTextAreaElement) => { field = x; listen(x, { keydown: key }); },
         }),
         val(props.emoji) === false ? null : h(IconButton, {

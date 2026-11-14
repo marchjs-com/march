@@ -11,6 +11,7 @@ import { Button } from "../../../ui/button.ts";
 import { Card } from "../../../ui/card.ts";
 import { openDialog } from "../../../ui/dialog.ts";
 import { Toggle } from "../../../forms/inputs.ts";
+import { live } from "../../../forms/util.ts";
 import { Empty } from "../../feedback/empty/index.ts";
 import { Stack } from "../../layout/stack/index.ts";
 import { consent, type CategoryInfo } from "../../../managers/consent/index.ts";
@@ -95,7 +96,7 @@ export function ConsentBanner(props: ConsentBannerProps = {}): unknown {
 function categoryCard(c: CategoryInfo, value: () => boolean, set: (v: boolean) => void, l?: ConsentLabels): unknown {
   return h(Card, {
     class: "hm-consent-cat", title: () => t(c.title),
-    actions: [h(Toggle, { get value() { return value(); }, setValue: set, disabled: !!c.required, "aria-label": t(c.title) })],
+    actions: [h(Toggle, { value: live(value), setValue: set, disabled: !!c.required, "aria-label": t(c.title) })],
   }, h("p", { class: "hm-consent-desc" }, () => t(c.description)), c.required ? h("p", { class: "hm-consent-always" }, () => txt(l?.alwaysOn, "Always on")) : null);
 }
 

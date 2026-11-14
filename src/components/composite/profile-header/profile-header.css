@@ -1,5 +1,7 @@
 /* March — ProfileHeader. Cover with a bottom dim, an 88px StoryRing overlapping it, stats as soft tiles. */
-.hm-prof { display: flex; flex-direction: column; min-width: 0; background: var(--hm-surface); border-radius: var(--hm-radius-4); overflow: hidden; border: 1px solid var(--hm-border-subtle, var(--hm-border)); }
+/* the frame is a Card (flush); here its softer border, rounder corners, no shadow, and the cover clipped to the corners */
+.hm-prof.hm-card { border-color: var(--hm-border-subtle, var(--hm-border)); border-radius: var(--hm-radius-4); box-shadow: none; overflow: hidden; }
+.hm-prof.hm-card > .hm-card-body { display: flex; flex-direction: column; }
 .hm-prof-cover { position: relative; height: 10.5rem; overflow: hidden; background: var(--hm-surface-2); }
 .hm-prof-cover-sm .hm-prof-cover { height: 7.5rem; } .hm-prof-cover-lg .hm-prof-cover { height: 13.5rem; }
 .hm-prof-cover img { position: absolute; inset: 0; max-width: none; }

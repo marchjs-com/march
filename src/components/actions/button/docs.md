@@ -52,3 +52,7 @@ ActionButton: `action` (an `action()` or a plain `{ label, run }`), `args`, `run
 A real `<button>` (or `<a>` with `href`); focus ring on keyboard focus; `aria-busy` while loading; `aria-pressed`
 when `pressed` is given (not on a link). An icon-only
 ActionButton uses the action's label as its accessible name; a keyboard shortcut of the action shows in the title.
+
+## Composed of
+
+Spinner (its ring alone, `spinnerRing` from `feedback/spinner/core.ts`: no texts, no colour lists).

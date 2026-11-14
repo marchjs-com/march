@@ -37,4 +37,5 @@ The board scrolls sideways on narrow screens instead of crushing columns.
 
 ## Composed of
 
-PanelHeader (the column head), StatusDot (the dot) and Badge (the count).
+PanelHeader (the column head), StatusDot (the dot) and Badge (the count). Dragging is the drag behavior (pointer
+drag with a ghost copy in the drag layer; on touch a long press starts it, so the board still scrolls; Escape cancels).

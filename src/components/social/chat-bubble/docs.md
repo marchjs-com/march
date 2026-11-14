@@ -57,4 +57,4 @@ buttons appear on hover and keyboard focus, so drag-to-reply is never the only w
 
 ## Composed of
 
-Button, IconButton. ChatThread groups and draws these.
+Button, IconButton, ReplyQuote (the quote over an answer). ChatThread groups and draws these.

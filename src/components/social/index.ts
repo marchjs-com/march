@@ -8,6 +8,7 @@ export * from "./follow-button/index.ts";
 export * from "./like-button/index.ts";
 export * from "./media-grid/index.ts";
 export * from "./reaction-picker/index.ts";
+export * from "./reply-quote/index.ts";
 export * from "./story-progress/index.ts";
 export * from "./story-ring/index.ts";
 export * from "./typing-indicator/index.ts";

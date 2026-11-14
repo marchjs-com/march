@@ -27,6 +27,8 @@ or a node (a Counter that rolls), a hint line is optional, and the tile becomes 
 | `href` | string | — | makes it a link |
 | `disabled` | boolean | `false` | |
 | `term` | boolean | `false` | `<dt>` + `<dd>` for a `<dl>` parent (static stats only) |
+| `hintIn` | `tile` `value` | `tile` | `value`: the hint sits inside the value element (with `term`: one `<dd>` per term) |
+| `emphasis` | `figure` `text` | `figure` | `text`: the value reads as body text that wraps (a details list: KeyValue) |
 | `partClass` | `{ value, label, hint }` | — | an extra class on a part (a host that keeps its own class names) |
 | `class` | class | — | |
 | other attributes | | | `data-*`, `aria-*`, `title`, `id` go to the root |

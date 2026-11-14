@@ -63,3 +63,18 @@ export function floating(o: FloatingOptions): unknown {
   on(globalThis.window, "scroll", update, true);
   return h(Portal, { layer: o.role === "tooltip" ? "tooltip" : o.role === "menu" || o.role === "listbox" ? "menu" : "popover", children: el });
 }
+
+/**
+ * A rectangle that stands in for an anchor element: the caret, the selected text, a point. `rect` is read on every
+ * placement; while it is empty the box of `fallback()` (else of the host) is used. `host` is the element the
+ * rectangle lives in: presses inside it (or inside the fallback) count as "inside the anchor".
+ * `<Popover anchor={() => virtualAnchor(() => range.getBoundingClientRect(), () => editor)} … />`
+ */
+export function virtualAnchor(rect: () => DOMRect | null | undefined, host: () => Element, fallback?: () => Element | null | undefined): Element {
+  const other = (): Element => fallback?.() ?? host();
+  return {
+    getBoundingClientRect: (): DOMRect => { const r = rect(); return r && (r.width || r.height) ? r : other().getBoundingClientRect(); },
+    contains: (n: Node | null) => host().contains(n) || other().contains(n),
+    closest: (sel: string) => host().closest(sel),
+  } as unknown as Element;
+}

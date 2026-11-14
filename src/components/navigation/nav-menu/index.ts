@@ -1,5 +1,5 @@
 // NavMenu: sidebar navigation for big apps — groups (collapsible), pinned and recently used items, filter, active item from
-// the router path, and a drawer with a hamburger button on small screens. UI state persists in localStorage.
+// the router path, and a Drawer with a hamburger button on small screens (drawer.ts, shared with NavSidebar). UI state persists in localStorage.
 import "./nav-menu.css";
 import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
@@ -23,7 +23,7 @@ import { ListRow } from "../../data/list-row/index.ts";
 import { SearchBox } from "../../forms/search-box/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
-import { dismiss } from "../../../behaviors/dismiss/index.ts";
+import { navDrawer } from "./drawer.ts";
 
 /** A NavMenu entry. */
 export interface NavItem {
@@ -100,7 +100,6 @@ export function NavMenu(props: NavMenuProps): Element {
   const recent = signal(arr<string>(saved.recent));
   const persist = (): void => save(storeKey, { [startClosed ? "opened" : "collapsed"]: [...collapsed.peek()], pins: pins.peek(), recent: recent.peek(), ...(props.collapsible ? { rail: rail.peek() } : {}) });
   const q = signal("");
-  const open = signal(false);
   const navId = uid("hm-nav");
   const pinsOn = props.pins !== false;
   type TextKey = Exclude<keyof NonNullable<NavMenuProps["labels"]>, "pin" | "unpin">;
@@ -108,6 +107,9 @@ export function NavMenu(props: NavMenuProps): Element {
   type IconKey = keyof NonNullable<NavMenuProps["icons"]>;
   // a built-in mark, or the developer's own (an IconDef is drawn like the built-in one)
   const mark = (k: IconKey, d: IconDef): unknown => { const x = props.icons?.[k]; return ownIcon(x == null || x === false ? undefined : x, d, null); };
+  // narrow screens: the menu opens in a Drawer from the menu button
+  const sheet = navDrawer({ id: navId, label: () => val(props.label) ?? t`Main`, menuLabel: () => L("menu", t`Menu`), icon: mark("menu", menu), class: () => !pinsOn && "hm-nav-nopins" });
+  const open = sheet.open;
   const items = computed(() => arr<NavItem | null | undefined | false>(val(props.items)).filter((x): x is NavItem => !!x && !val(x.hidden) && can(x.can)));
   const byId = computed(() => new Map(items().map((x) => [x.id, x])));
   const cmp = computed(() => sorter(props.sort, locale()));
@@ -144,9 +146,6 @@ export function NavMenu(props: NavMenuProps): Element {
     });
   });
   if (props.palette !== false) registerPages(() => items().filter((x) => x.href).map((x) => ({ id: x.id, title: titleOf(x), href: x.href, group: x.group, keywords: x.keywords, icon: x.icon })));
-  // the narrow-screen drawer: Escape or a press outside closes it (the dismiss behavior, only while it is open)
-  let navEl: HTMLElement | undefined, burgerEl: HTMLElement | undefined;
-  effect(() => { if (open()) dismiss(() => navEl, { inside: () => [burgerEl], onDismiss: () => open.set(false) }); });
 
   const isPinned = (id: string): boolean => pins().includes(id);
   const togglePin = (id: string): void => {
@@ -209,9 +208,8 @@ export function NavMenu(props: NavMenuProps): Element {
   const toggleRail = (): void => { rail.update((x) => !x); persist(); };
   const railName = (): string => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`));
   return h("div", { class: () => cx("hm-nav-wrap", open() && "is-open", rail() && "is-rail", !pinsOn && "hm-nav-nopins", val(props.class)) },
-    h(IconButton, { class: "hm-nav-burger", ref: (x: HTMLElement) => { burgerEl = x; }, "aria-controls": navId, "aria-expanded": () => String(open()), label: () => L("menu", t`Menu`), title: false, onClick: () => open.update((x) => !x), icon: mark("menu", menu) }),
-    h("div", { class: "hm-nav-scrim", "aria-hidden": "true", onClick: () => open.set(false) }),
-    h("nav", { class: "hm-nav", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main` },
+    sheet.burger,
+    sheet.place(h("nav", { class: "hm-nav", id: navId, "aria-label": () => val(props.label) ?? t`Main` },
       (props.brand != null || props.collapsible) && h("div", { class: "hm-nav-brand" },
         props.brand != null && h("div", { class: "hm-nav-brand-main" }, props.brand),
         props.collapsible && h(IconButton, { size: "sm", class: "hm-nav-rail-btn", pressed: rail, label: railName, onClick: toggleRail, icon: mark("rail", panelLeft) })),
@@ -227,5 +225,5 @@ export function NavMenu(props: NavMenuProps): Element {
           },
         })),
       h("div", { class: "hm-nav-scroll" }, body),
-      props.footer != null && h("div", { class: "hm-nav-foot" }, props.footer)));
+      props.footer != null && h("div", { class: "hm-nav-foot" }, props.footer))));
 }

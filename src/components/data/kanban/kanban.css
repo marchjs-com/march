@@ -10,6 +10,9 @@
 .hm-kanban-card { padding: var(--hm-space-3); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-2); background: var(--hm-surface); box-shadow: var(--hm-shadow-1); cursor: grab;
   transition: box-shadow var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease), opacity var(--hm-dur) var(--hm-ease); animation: hm-scale-in var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-kanban-card:hover { box-shadow: var(--hm-shadow-2); transform: translateY(-1px); }
-.hm-kanban-card.is-dragging { opacity: .45; transform: rotate(-1.5deg); }
+.hm-kanban-card { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.hm-kanban-card.is-dragging { opacity: .45; }
+/* the copy that follows the pointer (drag layer) */
+.hm-kanban-ghost { position: fixed; inset: 0 auto auto 0; margin: 0; pointer-events: none; cursor: grabbing; box-shadow: var(--hm-shadow-3); rotate: -1.5deg; animation: none; }
 .hm-kanban-dot-own { display: inline-flex; flex: none; }
 .hm-kanban.is-still .hm-kanban-card { animation: none; }

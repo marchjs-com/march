@@ -6,6 +6,7 @@ footer. `action()` objects in `actions` render as buttons that run, confirm and 
 ```tsx
 <Card title="HADİ" subtitle="Business plan" actions={[edit]} footer={<span>Updated today</span>}>…</Card>
 <Card flush>…</Card>
+<Card as="article" plain>…</Card>
 ```
 
 ## Props
@@ -17,7 +18,8 @@ footer. `action()` objects in `actions` render as buttons that run, confirm and 
 | `actions` | action() / nodes | — | header actions |
 | `footer` | node | — | footer row |
 | `flush` | boolean | `false` | no body padding (tables, lists) |
-| `as` | tag | `section` | root element |
+| `plain` | boolean / accessor | `false` | no frame (background, border, radius, shadow) |
+| `as` | tag | `section` | root element (`article` for a post, a product) |
 
 Other attributes go to the root element.
 

@@ -9,6 +9,7 @@ span.hm-step2-hit { cursor: default; }
 .hm-step2-dot { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; border: 2px solid var(--hm-border-strong); background: var(--hm-surface); color: var(--hm-muted);
   font-weight: 700; font-size: var(--hm-text-sm); transition: all var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-step2-dot .hm-svg { width: .9375rem; height: .9375rem; stroke-width: 2.4; }
+.hm-step2-dot .hm-checkmark-icon { inline-size: .9375rem; block-size: .9375rem; }
 .hm-step2.is-done .hm-step2-dot { background: var(--hm-accent, var(--hm-primary)); border-color: var(--hm-accent, var(--hm-primary)); color: var(--hm-on-accent, var(--hm-on-primary-fill)); }
 .hm-step2.is-current .hm-step2-dot { border-color: var(--hm-accent, var(--hm-primary)); color: var(--hm-accent, var(--hm-primary)); box-shadow: 0 0 0 4px var(--hm-accent-soft, var(--hm-primary-soft)); }
 .hm-step2-text { display: flex; flex-direction: column; }

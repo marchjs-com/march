@@ -24,7 +24,7 @@ media). Items enter one after another; tiles in a row share one height; on phone
 | `cols` | 2 3 4 | 3 | cards / plain |
 | `spotlight` | boolean | `true` | pointer light (cards, bento) |
 | `reveal` | Reveal effect / `{ from, to }` / `none` | `up` | entrance of the tiles |
-| `class` | string | — | extra class on the root (`.hm-fg`; parts: `.hm-fg-item`, `.hm-fg-title`, `.hm-fg-body`, `.hm-fg-media`) |
+| `class` | string | — | extra class on the root (`.hm-fg`; parts: `.hm-fg-item`, the ListRow parts `.hm-listrow-title` and `.hm-listrow-sub`, `.hm-fg-media`) |
 
 ## Accessibility
 
@@ -33,4 +33,4 @@ tab stop, focus ring on the tile). Icons are decorative.
 
 ## Composed of
 
-Grid, Card, IconTile, Reveal.
+Grid, Card, ListRow (the tile: `direction="column"`, `titleAs="h3"`, `subAs="p"`), IconTile, Reveal.

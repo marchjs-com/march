@@ -38,4 +38,4 @@ their header and inert while closed. ↑ ↓ Home End move between headers (each
 
 ## Composed of
 
-Chevron (the arrow of a header); the roving focus helper.
+ListRow (a header: icon, title, subtitle; its plain form, so no scrolling text is loaded), Chevron (the arrow of a header); the roving focus helper.

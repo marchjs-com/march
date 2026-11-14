@@ -60,9 +60,9 @@ test("Presentation: parts off, own counter, own labels and icons, coloured progr
   assert.equal(one.querySelector(".hm-deck-count").textContent, "1/2");
   assert.equal(one.querySelector(".hm-deck-bar").getAttribute("data-hm-color"), "brand-orange");
   assert.equal(one.querySelector(".hm-deck-full"), null);
-  assert.equal(one.querySelector(".hm-deck-prev").getAttribute("aria-label"), "Back");
-  assert.equal(one.querySelector(".hm-deck-fwd").getAttribute("aria-label"), "Forward");
-  assert.ok(one.querySelector(".hm-deck-fwd .mine"));
+  assert.equal(one.querySelector(".hm-deck-pages .hm-page-prev").getAttribute("aria-label"), "Back");
+  assert.equal(one.querySelector(".hm-deck-pages .hm-page-next").getAttribute("aria-label"), "Forward");
+  assert.ok(one.querySelector(".hm-deck-pages .hm-page-next .mine"));
   key(one, "ArrowRight");
   assert.equal(one.querySelector(".hm-deck-count").textContent, "2/2");
   assert.deepEqual(seen, [["B", "A", 1]], "the own transition gets the incoming and the outgoing slide");

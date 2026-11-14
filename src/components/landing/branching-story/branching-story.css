@@ -1,13 +1,10 @@
 /* BranchingStory. A trail of steps on top, a stage with one passage (the leaving one lies over it while it turns away). */
 .hm-bs { display: grid; gap: var(--hm-space-4); }
-.hm-bs-trail { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--hm-space-2) var(--hm-space-4); }
-.hm-bs-steps { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-1); margin: 0; padding: 0; list-style: none; font-size: var(--hm-text-sm); }
-.hm-bs-step { display: inline-flex; align-items: center; gap: var(--hm-space-1); }
-.hm-bs-step + .hm-bs-step::before { content: "›"; color: var(--hm-muted); }
-.hm-bs-step:dir(rtl) + .hm-bs-step::before { content: "‹"; }
-/* steps are Badges (an earlier one is a button); the current one is filled */
-.hm-bs-step .hm-badge { font-size: inherit; }
-.hm-bs-step.is-current .hm-badge { background: var(--hm-primary); border-color: transparent; color: var(--hm-on-primary, var(--hm-bg)); font-weight: var(--hm-weight-semibold); }
+.hm-bs-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--hm-space-2) var(--hm-space-4); }
+/* the trail is a Breadcrumbs in a pill look: an earlier step is a button, the current one is filled */
+.hm-bs-trail { flex: 1 1 12rem; min-inline-size: 0; }
+.hm-bc.hm-bs-trail .hm-bc-item { padding-inline: var(--hm-space-2); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-full); font-size: var(--hm-text-sm); }
+.hm-bc.hm-bs-trail .hm-bc-item.is-current { background: var(--hm-primary); border-color: transparent; color: var(--hm-on-primary, var(--hm-bg)); font-weight: var(--hm-weight-semibold); }
 .hm-bs-found { font-size: var(--hm-text-xs); color: var(--hm-muted); white-space: nowrap; }
 
 .hm-bs-stage { position: relative; display: grid; min-block-size: var(--hm-bs-min, 20rem); }

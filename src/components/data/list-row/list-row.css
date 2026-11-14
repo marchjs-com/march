@@ -10,7 +10,14 @@
 .hm-listrow.is-wrap :is(.hm-listrow-title, .hm-listrow-sub) { overflow-wrap: anywhere; }
 .hm-listrow-trail, .hm-listrow-actions { display: inline-flex; align-items: center; gap: var(--hm-space-2); flex: none; margin-inline-start: auto; color: var(--hm-muted); font-size: var(--hm-text-xs); }
 .hm-listrow-trail + .hm-listrow-actions { margin-inline-start: 0; }
+/* a tile: lead above the text, the trail under it */
+.hm-listrow.is-column { flex-direction: column; align-items: flex-start; }
+.hm-listrow.is-column.is-centered { align-items: center; text-align: center; }
+.hm-listrow.is-column > .hm-listrow-text { flex: 0 1 auto; max-inline-size: 100%; }
+.hm-listrow.is-column > :is(.hm-listrow-trail, .hm-listrow-actions) { margin-inline-start: 0; }
+:is(h2, h3, h4, h5, h6, p).hm-listrow-title, p.hm-listrow-sub { margin: 0; }
 /* sizes */
+.hm-listrow-xs { gap: .3125rem; min-block-size: 1.375rem; padding: 0 .5rem; border-radius: var(--hm-radius-1); font-size: var(--hm-text-xs); }
 .hm-listrow-sm { gap: var(--hm-space-2); min-block-size: 2rem; padding: .25rem var(--hm-space-2); font-size: var(--hm-text-sm); }
 .hm-listrow-lg { min-block-size: 3.25rem; padding: .625rem var(--hm-space-4); }
 /* link, button, or a plain row whose host handles the click */

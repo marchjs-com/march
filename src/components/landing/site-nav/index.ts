@@ -15,6 +15,7 @@ import { menu } from "../../../icons/glyphs/menu.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { slidingIndicator } from "../../../motion/engine/parts.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
+import { scrollHider } from "../../../behaviors/hide-on-scroll/index.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface SiteNavLink { label: unknown; href: string; active?: MaybeFn<boolean | undefined> }
@@ -107,14 +108,14 @@ export function SiteNav(props: SiteNavProps): Element {
   };
 
   const threshold = props.threshold ?? 12;
-  let lastY = 0, offScroll = (): void => {}, gone = false;
+  let offScroll = (): void => {}, gone = false;
+  const hider = props.hide ? scrollHider() : null; // behaviors/hide-on-scroll: the rule the app header uses too
   const watch = (box: Element | null): void => {
     if (gone) return;
     offScroll = onScrollProgress(box ? { source: box } : {}, () => {
       const y = (box ? box.scrollTop : globalThis.scrollY) || 0;
       scrolled.set(y > threshold);
-      if (props.hide) { const down = y > lastY; if (Math.abs(y - lastY) > 4) hidden.set(down && y > 120); }
-      lastY = y;
+      if (hider) hidden.set(hider(y));
     });
   };
   // a scroll container given as a function (a ref of an element around the bar) exists only once the bar is placed

@@ -1,6 +1,7 @@
 // Showcase stage for Window: a small desk with two windows. Drag a title bar, drop it on an edge to dock, double
 // click to fill, drag an edge to resize; the buttons minimize, fill / restore and close.
 import { signal } from "../../../core/reactive.ts";
+import { Button } from "../../actions/button/index.ts";
 import { Window } from "./index.ts";
 import { fileText } from "../../../icons/glyphs/fileText.ts";
 import { Icon } from "../../../icons/index.ts";
@@ -30,6 +31,6 @@ export default function WindowDemo(props: { values: { chrome: string; snap: bool
         </Window>
       </>
     }}
-    {() => (notes() && order() ? null : <button type="button" class="hm-btn hm-btn-sm sc-win-reopen" onClick={() => { notes.set(true); order.set(true) }}>Pencereleri yeniden aç</button>)}
+    {() => (notes() && order() ? null : <Button size="sm" class="sc-win-reopen" onClick={() => { notes.set(true); order.set(true) }}>Pencereleri yeniden aç</Button>)}
   </div>
 }

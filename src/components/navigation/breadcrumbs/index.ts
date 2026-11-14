@@ -2,7 +2,7 @@
 // a menu of the items next to it (jump to another file in the same folder). When the path does not fit, the middle
 // crumbs collapse into a "…" menu (the first and the last stay). Separators point the reading direction (RTL mirrored).
 import "./breadcrumbs.css";
-import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
+import { computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -11,7 +11,7 @@ import { Button } from "../../actions/button/index.ts";
 import { OverflowText } from "../../typography/overflow-text/index.ts";
 import { Menu, type MenuItemSpec } from "../../../ui/menu.ts";
 import type { Href } from "../../../router/router.ts";
-import { fitItems, observeWidth } from "../../../ui/fit.ts";
+import { overflowFit } from "../../../ui/fit.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 
 messages("tr", { "Path": "Yol", "Hidden path parts": "Gizli yol parçaları", "{0}: go to": "{0}: şuraya git" });
@@ -42,20 +42,14 @@ export interface BreadcrumbsProps {
 /** `<Breadcrumbs items={[{ id: "src", label: "src", siblings: folders }, { id: "app", label: "app.ts", icon: fileText }]} />` */
 export function Breadcrumbs(props: BreadcrumbsProps): Element {
   const list = computed(() => val(props.items) ?? []);
-  const shown = signal<boolean[]>([]);
-  let ol: HTMLElement | undefined, widths: number[] = [], avail = 0;
-
-  const refit = (): void => {
-    const n = untrack(list).length;
-    if (!ol || widths.length !== n || props.collapse === false) return;
+  let ol: HTMLElement | undefined;
+  const fit = overflowFit({
+    items: list, enabled: () => props.collapse !== false, reserve: () => 36,
+    measure: () => (ol ? [...ol.querySelectorAll<HTMLElement>(":scope > .hm-bc-li:not(.hm-bc-more)")].map((c) => c.offsetWidth || 0) : null),
     // the last crumb matters most, then the first, then the ones nearer the end
-    const prio = widths.map((_, i) => (i === n - 1 ? 1e6 : i === 0 ? 1e5 : i));
-    const next = fitItems(widths, prio, avail, 36);
-    const before = untrack(shown);
-    if (next.length !== before.length || next.some((v, i) => v !== before[i])) shown.set(next);
-  };
-  effect(() => { list(); untrack(() => { shown.set([]); queueMicrotask(() => { if (!ol) return; widths = [...ol.querySelectorAll<HTMLElement>(":scope > .hm-bc-li:not(.hm-bc-more)")].map((c) => c.offsetWidth || 0); refit(); }); }); });
-  const isShown = (i: number): boolean => shown()[i] !== false;
+    priority: (i, n) => (i === n - 1 ? 1e6 : i === 0 ? 1e5 : i),
+  });
+  const { isShown } = fit;
   const hidden = computed(() => list().filter((_, i) => !isShown(i)));
 
   const own = props.separator, goTo = props.labels?.goTo;
@@ -69,7 +63,7 @@ export function Breadcrumbs(props: BreadcrumbsProps): Element {
     return h("span", { class: cx("hm-bc-item", last && "is-current"), "aria-current": last ? "page" : null }, body);
   };
 
-  return h("nav", { class: () => cx("hm-bc", val(props.class)), "aria-label": () => val(props.label) ?? t`Path`, ref: (x: HTMLElement) => { observeWidth(x, (w) => { avail = w; refit(); }); } },
+  return h("nav", { class: () => cx("hm-bc", val(props.class)), "aria-label": () => val(props.label) ?? t`Path`, ref: (x: HTMLElement) => { fit.observe(x); } },
     h("ol", { class: "hm-bc-ol", ref: (x: HTMLElement) => { ol = x; } }, () => {
       const items = list();
       return untrack(() => items.map((c, i) => [

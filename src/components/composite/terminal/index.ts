@@ -62,7 +62,10 @@ export interface CommandSpec {
   /** Left out of help (still runs). */
   hidden?: boolean;
 }
-export type Command = CommandFn | CommandSpec;
+/** A terminal command: a function or a spec with sub-commands. */
+export type TerminalCommand = CommandFn | CommandSpec;
+/** The old name of TerminalCommand (kept for imports from this module; in the barrels `Command` is the command palette's). */
+export type Command = TerminalCommand;
 
 export interface TerminalApi {
   exec(line: string): Promise<void>;

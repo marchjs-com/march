@@ -40,4 +40,5 @@ today is `aria-current="date"`, picked days are `aria-selected`, unavailable one
 
 ## Composed of
 
-IconButton (previous / next month). Calendar math lives in core/date.ts (shared with Scheduler and Gantt); the keys of the day grid are `dayGridKey`, exported for other day grids.
+PeriodNav (the month row: previous / next month around the month name). Calendar math lives in core/date.ts (shared with
+Scheduler and Gantt); the keys of the day grid are `dayGridKey` (ui/date-grid.ts), exported for other day grids.

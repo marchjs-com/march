@@ -4,11 +4,11 @@
 import "./cta-band.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { Overlay } from "../../../ui/overlay.ts";
 import { Reveal, type RevealOptions } from "../reveal/index.ts";
 import { SiteSection } from "../site-section/index.ts";
 import { VideoBackground } from "../video-background/index.ts";
 import { SectionHead, type SectionAction } from "../section-head/index.ts";
+import { backdrop, type BackdropLayer } from "../backdrop.ts";
 
 export interface CtaBandProps {
   title: MaybeFn<unknown>;
@@ -25,6 +25,13 @@ export interface CtaBandProps {
   class?: ClassProp | undefined;
 }
 
+const BACKDROPS: Record<string, readonly BackdropLayer[]> = {
+  gradient: ["gradient", ["noise", 0.5], ["spotlight", undefined, "hm-cta-light"]],
+  mesh: ["mesh", "spotlight"],
+  glass: [["dots", 0.6], "glass", "spotlight"],
+  plain: [["grid", 0.6]],
+};
+
 /** `<CtaBand title="Ready to build?" lead="…" actions={[{ label: "Start free", href: "/start" }]} variant="gradient" />` */
 export function CtaBand(props: CtaBandProps): Element {
   const variant = props.variant ?? "gradient";
@@ -32,11 +39,8 @@ export function CtaBand(props: CtaBandProps): Element {
     class: "hm-cta-copy", size: "lg", align: props.align ?? "center", title: () => val(props.title),
     lead: props.lead != null ? () => val(props.lead) : undefined, actions: props.actions, note: props.note != null ? () => val(props.note) : undefined,
   });
-  const layers = props.backdrop === false ? []
-    : variant === "gradient" ? [h(Overlay, { effect: "gradient" }), h(Overlay, { effect: "noise", opacity: 0.5 }), h(Overlay, { effect: "spotlight", class: "hm-cta-light" })]
-    : variant === "mesh" ? [h(Overlay, { effect: "mesh" }), h(Overlay, { effect: "spotlight" })]
-      : variant === "glass" ? [h(Overlay, { effect: "dots", opacity: 0.6 }), h(Overlay, { effect: "glass" }), h(Overlay, { effect: "spotlight" })]
-        : variant === "plain" ? [h(Overlay, { effect: "grid", opacity: 0.6 })] : [];
+  // the decorative layers of the variant: a recipe for the shared backdrop builder (landing/backdrop.ts)
+  const layers = backdrop(props.backdrop === false ? false : BACKDROPS[variant]);
   const panel = variant === "video" && props.video
     ? h(VideoBackground, { src: props.video.src, poster: props.video.poster, tint: "brand", class: "hm-cta-panel" }, copy)
     : h("div", { class: "hm-cta-panel" }, ...layers, copy);

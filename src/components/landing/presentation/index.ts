@@ -8,13 +8,14 @@
 import "./presentation.css";
 import { h } from "../../../dom/h.ts";
 import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
-import { t } from "../../../core/i18n.ts";
+import { t, messages } from "../../../core/i18n.ts";
 import { cx, val, listen, clamp, isRtl, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { owned } from "../../../ui/observe.ts";
 import { formatDuration } from "../../../ui/format.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { Toolbar } from "../../layout/stack/index.ts";
+import { Pagination } from "../../navigation/pagination/index.ts";
 import { Progress } from "../../feedback/progress/index.ts";
 import { channel } from "../../../channel/index.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
@@ -24,6 +25,8 @@ import { maximize } from "../../../icons/glyphs/maximize.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { still, swapTransition } from "../../../motion/engine/parts.ts";
 import { swipe } from "../../../motion/gestures.ts";
+
+messages("tr", { "Slides": "Slaytlar" });
 
 export interface SlideProps {
   /** Speaker notes (shown in the speaker view). */
@@ -80,6 +83,8 @@ export interface PresentationProps {
   /** Own texts; every one defaults to the built-in translated text. */
   labels?: {
     previous?: string | undefined; next?: string | undefined; speaker?: string | undefined; fullscreen?: string | undefined;
+    /** Accessible name of the previous / counter / next group (default "Slides"). */
+    pages?: string | undefined;
     /** Text of the counter (index is 0-based). */
     counter?: ((index: number, total: number) => string) | undefined;
     /** aria-roledescription of the deck ("slide deck"). */
@@ -154,6 +159,14 @@ export function Presentation(props: PresentationProps): Element {
   const ownCount = typeof props.counter === "function" ? props.counter : null;
   const counter = props.counter === false ? null
     : h("span", { class: "hm-deck-count", "aria-live": "polite" }, () => (ownCount ? ownCount(index(), n) : L.counter ? L.counter(index(), n) : t`Slide ${index() + 1} of ${n}`));
+  // previous / counter / next: the simple Pagination, stepping through fragments too (cursor mode: hasPrev / hasNext)
+  const pager = h(Pagination, {
+    variant: "simple", class: "hm-deck-pages", label: () => L.pages ?? t`Slides`, page: () => index() + 1, pages: n, info: false,
+    status: counter ? () => counter : false,
+    hasPrev: () => !(pos().i === 0 && pos().s === 0), hasNext: () => !(pos().i === n - 1 && pos().s >= steps(list[n - 1]).length), onPrev: prev, onNext: next,
+    labels: { previous: () => L.previous ?? t`Previous slide`, next: () => L.next ?? t`Next slide` },
+    prev: props.icons?.previous ?? chevronLeft, next: props.icons?.next ?? chevronRight,
+  });
   const btn = (cls: string, own: unknown, def: unknown, label: () => string, onClick: () => void, disabled?: () => boolean): unknown =>
     h(IconButton, { class: cls, size: "sm", icon: own ?? def, label, onClick, ...(disabled ? { disabled } : {}) });
   const controls = props.controls === false ? null : h(Toolbar, {
@@ -162,9 +175,7 @@ export function Presentation(props: PresentationProps): Element {
       props.presenterUrl && !props.presenter ? btn("hm-deck-speaker-btn", props.icons?.speaker, monitor, () => L.speaker ?? t`Open speaker view`, openSpeaker) : null,
       props.fullscreen !== false ? btn("hm-deck-full", props.icons?.fullscreen, maximize, () => L.fullscreen ?? t`Full screen`, fullscreen) : null],
   },
-  btn("hm-deck-prev", props.icons?.previous, chevronLeft, () => L.previous ?? t`Previous slide`, prev, () => pos().i === 0 && pos().s === 0),
-  counter,
-  btn("hm-deck-fwd", props.icons?.next, chevronRight, () => L.next ?? t`Next slide`, next, () => pos().i === n - 1 && pos().s >= steps(list[n - 1]).length));
+  pager);
 
   // speaker view: the next slide (a clone, inert), notes and a timer
   const started = Date.now();

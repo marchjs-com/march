@@ -6,13 +6,10 @@ import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { Portal } from "../../../dom/portal.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { isIconDef } from "../../../icons/svg.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
-import { x as xIcon } from "../../../icons/glyphs/x.ts";
-import { toneIcon } from "../../feedback/alert/index.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { Alert } from "../../feedback/alert/index.ts";
 import { Button } from "../../actions/button/index.ts";
-import { IconButton } from "../../actions/icon-button/index.ts";
 
 export type ToastKind = "info" | "success" | "warn" | "danger";
 export interface ToastAction {
@@ -90,12 +87,16 @@ export function ToastHost(props: {
       const x = item.peek();
       const act = x.action;
       const own = x.icon;
-      return h("div", { class: cx(`hm-toast hm-toast-${x.kind}`, x.motion === "fade" && "hm-toast-fade", x.motion === "none" && "hm-toast-still", x.class), role: x.kind === "danger" ? "alert" : "status", "data-hm-color": colorAttr(x.color) },
-        own !== false && h("span", { class: "hm-toast-icon", "aria-hidden": "true" }, own == null || own === true ? glyph(toneIcon(x.kind)) : isIconDef(own) ? glyph(own) : own),
-        h("div", { class: "hm-toast-msg" }, () => val(x.message)),
-        act && h(Button, { variant: "ghost", size: "sm", class: "hm-toast-action",
+      // a toast is a raised Alert: the kind's icon, the message, one action, the close button
+      return h(Alert, {
+        tone: x.kind, variant: "raised", role: x.kind === "danger" ? "alert" : "status", color: x.color,
+        class: cx(`hm-toast hm-toast-${x.kind}`, x.motion === "fade" && "hm-toast-fade", x.motion === "none" && "hm-toast-still", x.class),
+        partClass: { icon: "hm-toast-icon", body: "hm-toast-msg", dismiss: "hm-toast-close" },
+        icon: own === false ? null : own == null || own === true ? undefined : own, body: () => val(x.message),
+        action: act ? h(Button, { variant: "ghost", size: "sm", class: "hm-toast-action",
           onClick: async () => { toast.dismiss(x.id); try { await act.run(); } catch (e) { toast((e as { message?: string } | null)?.message || val(act.error) || t`Something went wrong.`, { kind: "danger" }); } } },
-          () => val(act.label)),
-        x.closable !== false && h(IconButton, { size: "xs", class: "hm-toast-close", icon: xIcon, label: () => val(x.closeLabel) ?? t`Dismiss`, title: false, onClick: () => toast.dismiss(x.id) }));
+          () => val(act.label)) : undefined,
+        dismissable: x.closable !== false, dismissLabel: () => val(x.closeLabel) ?? t`Dismiss`, onDismiss: () => toast.dismiss(x.id),
+      });
     } }));
 }

@@ -6,7 +6,9 @@ import { h } from "../../../dom/h.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
-export type Corner = "top-start" | "top-end" | "bottom-start" | "bottom-end";
+import type { Corner } from "../../layout/bottom-right-controls/index.ts";
+// one definition of the corner names (shared with the corner controls), re-exported under the same name
+export type { Corner } from "../../layout/bottom-right-controls/index.ts";
 export interface CornerMarkProps {
   /** Which corner (logical: "end" is the right side in left-to-right text). Default "top-end". */
   corner?: MaybeFn<Corner | undefined>;

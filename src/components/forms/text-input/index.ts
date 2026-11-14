@@ -18,10 +18,12 @@ export interface TextInputProps extends ControlProps<string>, TextAttrProps, Aff
    * text is shown under it (`role="alert"`, linked with `aria-describedby`). Pass `null` / `""` while there is no error.
    */
   error?: MaybeFn<string | null | undefined>;
+  /** With `error`: the error line keeps its height while there is no error, so nothing moves when one appears. */
+  errorSpace?: boolean | undefined;
   ref?: ((el: HTMLInputElement) => void) | undefined;
 }
 
-/** Single-line text. Props: type, placeholder, readonly, autocomplete, inputmode, maxLength, prefix, suffix, transform(v), onPaste, error. */
+/** Single-line text. Props: type, placeholder, readonly, autocomplete, inputmode, maxLength, prefix, suffix, transform(v), onPaste, error, errorSpace. */
 export function TextInput(props: TextInputProps): unknown {
   const [get, set] = model(props, "");
   const c = ctl(props);
@@ -37,7 +39,7 @@ export function TextInput(props: TextInputProps): unknown {
   syncValue(el, get);
   props.ref?.(el);
   const control = affix(props, el);
-  return errId ? [control, h("div", { class: "hm-field-error hm-input-error", id: errId, role: "alert", hidden: () => !error() }, error)] : control;
+  return errId ? [control, h("div", { class: cx("hm-field-error hm-input-error", props.errorSpace && "is-kept"), id: errId, role: "alert", hidden: props.errorSpace ? null : () => !error() }, error)] : control;
 }
 
 /** Text input for an e-mail address (email keyboard, trimmed, lower-cased). */

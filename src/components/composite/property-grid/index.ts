@@ -209,7 +209,7 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     const shown = computed((): boolean => g.items.some((p) => matches().has(p.key)));
     const changedIn = (): number => g.items.filter((p) => changes().includes(p.key)).length;
     const head = [h(SectionLabel, { as: "span", size: "md", class: "hm-pg-group-name" }, g.name || (L().general ?? t`General`)),
-      props.changeMarks === false ? null : () => (changedIn() ? h(Badge, { class: "hm-pg-count", size: "xs", tone: "primary", count: changedIn(), ariaLabel: L().changedCount?.(changedIn()) ?? t`${changedIn()} changed` }) : null)];
+      props.changeMarks === false ? null : () => (changedIn() ? h(Badge, { class: "hm-pg-count", size: "xs", tone: "primary", variant: "solid", count: changedIn(), ariaLabel: L().changedCount?.(changedIn()) ?? t`${changedIn()} changed` }) : null)];
     const content = h("div", { class: "hm-pg-rows" }, items);
     // the group box is built once (body runs again when the groups change): rows are never moved while they are used
     const box = g.name || grouped().length > 1 ? h(Disclosure, { title: head, open: () => { query(); return true; }, class: "hm-pg-group", children: content }) : content;

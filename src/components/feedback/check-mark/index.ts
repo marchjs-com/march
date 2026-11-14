@@ -39,8 +39,8 @@ export interface CheckMarkProps {
   text?: MaybeFn<boolean | undefined>;
   /** Own glyphs per value. */
   icons?: CheckMarkIcons | undefined;
-  /** plain (default: the glyph alone) · soft (a tinted disc) · solid (a filled disc). */
-  variant?: MaybeFn<"plain" | "soft" | "solid" | undefined>;
+  /** plain (default: the glyph alone) · soft (a tinted disc) · solid (a filled disc) · bare (the glyph alone in the colour and at the text size of what it sits in: a step dot, a button). */
+  variant?: MaybeFn<"plain" | "soft" | "solid" | "bare" | undefined>;
   /** sm · md (default) · lg. */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
   /** Theme colour token instead of the colour of the value (yes: success, no: danger, partly: warn). */

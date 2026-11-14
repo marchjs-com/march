@@ -7,6 +7,7 @@ import { routerLink } from "../../../dom/link.ts";
 import type { Action } from "../../../ui/action.ts";
 import { labelWithKey } from "../../../ui/keys.ts";
 import { val, cx, rest, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { spinnerRing } from "../../feedback/spinner/core.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "dark" | "link";
@@ -66,7 +67,7 @@ export function Button(props: ButtonProps): unknown {
   const cls = (): string => cx("hm-btn", `hm-btn-${val(props.variant) ?? "secondary"}`, buttonSizeClass(val(props.size)), val(props.shape) === "pill" && "hm-btn-pill", props.block && "hm-btn-block", loading() && "is-loading", val(props.pressed) && "is-pressed", val(props.class));
   const body = [
     () => (!loading() || props.spinner === false ? icon(val(props.icon))
-      : props.spinner == null || props.spinner === true ? h("span", { class: "hm-loading hm-btn-spin", "aria-hidden": "true" }) // not <Spinner>: its texts and colour lists would more than double a Button-only page
+      : props.spinner == null || props.spinner === true ? spinnerRing("em", "hm-btn-spin") // the Spinner's ring without its texts and colour lists
       : h("span", { class: "hm-btn-spin-own", "aria-hidden": "true" }, icon(props.spinner))),
     props.children != null && h("span", { class: "hm-btn-label" }, props.children),
     props.iconEnd != null && icon(props.iconEnd),

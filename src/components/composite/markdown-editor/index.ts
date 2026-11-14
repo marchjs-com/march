@@ -3,8 +3,8 @@
 // Views: write, preview, split (resizable, scrolls in sync) and rich (the same value in a RichTextEditor, loaded on
 // first use). The toolbar and shortcuts write Markdown syntax as native undo steps; Enter continues lists, Tab indents
 // them; pasted HTML (web pages, office suites) becomes Markdown through the safe content core.
-// Built from the pill strip of Tabs (TabList), PanelHeader (head, foot), Splitter and the formatting toolbar shared with
-// RichTextEditor (editor-parts/format-toolbar.ts: Toolbar + IconButton + Divider).
+// Built from EditorFrame (border, focus ring, head and foot bars), FormatToolbar, the pill strip of Tabs (TabList)
+// and Splitter.
 import "./markdown-editor.css";
 import "../../../forms/editors.css";
 import "../../../ui/field.css";
@@ -17,10 +17,9 @@ import { isMod } from "../../../ui/keys.ts";
 import { model, ctl, live, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { TabList } from "../../../ui/tabs.ts";
 import { Splitter } from "../../../ui/splitter.ts";
-import { PanelHeader } from "../../layout/panel-header/index.ts";
+import { EditorFrame } from "../editor-frame/index.ts";
 import { markdownNodes } from "../../../dom/markdown.ts";
-import "../../../ui/editor-parts/frame.css";
-import { FormatToolbar, formatShortcut } from "../../../ui/editor-parts/format-toolbar.ts";
+import { FormatToolbar, formatShortcut } from "../format-toolbar/index.ts";
 import * as md from "./md-ops.ts";
 import tr from "./tr.ts";
 
@@ -168,7 +167,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
     tabs: views().map((v) => ({ id: v, label: LABEL[v] })), tabProps: () => ({ class: "hm-mde-view" }), onSelect: (v: string) => view.set(v as MarkdownView),
   }));
   const toolbar = () => (props.toolbar === false || view() === "preview" || view() === "rich" ? null : h(FormatToolbar<MarkdownTool>, {
-    tools: Array.isArray(props.toolbar) ? props.toolbar as readonly (MarkdownTool | "|")[] : TOOLS, prefix: "hm-mde", label: () => L().formatting ?? t`Formatting`,
+    tools: Array.isArray(props.toolbar) ? props.toolbar as readonly (MarkdownTool | "|")[] : TOOLS, prefix: "hm-mde", label: () => L().formatting,
     name: (tool: MarkdownTool) => L().tools?.[tool], icons: props.icons, disabled: ro, onTool: exec,
   }));
   const body = () => {
@@ -181,10 +180,12 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
     });
   };
   const counts = () => md.stats(get());
-  return h("div", { class: () => cx("hm-editor-frame hm-mde", `is-${view()}`, props.disabled && "is-disabled", val(props.class)), "data-hm-color": c["data-hm-color"] },
-    h(PanelHeader, { as: "div", size: "sm", tone: "muted", divider: true, class: "hm-editor-head hm-mde-head", children: toolbar, actions: tabs }),
-    h("div", { id: `${id}-body`, class: "hm-mde-body", role: () => (views().length > 1 ? "tabpanel" : null), "aria-labelledby": () => (views().length > 1 ? `${id}-tab-${view()}` : null) }, body),
-    () => (props.stats === false ? null : h(PanelHeader, { as: "footer", size: "sm", divider: true, class: "hm-editor-foot hm-mde-foot", children: [
+  return h(EditorFrame, {
+    class: () => cx("hm-mde", `is-${view()}`, val(props.class)), disabled: () => !!props.disabled, "data-hm-color": c["data-hm-color"],
+    head: toolbar, actions: tabs, headProps: { class: "hm-mde-head" }, showFoot: () => props.stats !== false, footProps: { divider: true, class: "hm-mde-foot" },
+    foot: [
       h("span", null, () => L().words?.(counts().words) ?? t`${counts().words} words`), h("span", { "aria-hidden": "true" }, "·"), h("span", null, () => L().minutes?.(counts().minutes) ?? t`${counts().minutes} min read`),
-      () => (props.hint === false ? null : h("span", { class: "hm-mde-hint" }, () => (view() === "rich" ? "" : L().hint ?? t`Markdown: **bold**, _italic_, # heading, - list`)))] })));
+      () => (props.hint === false ? null : h("span", { class: "hm-mde-hint" }, () => (view() === "rich" ? "" : L().hint ?? t`Markdown: **bold**, _italic_, # heading, - list`)))],
+    children: h("div", { id: `${id}-body`, class: "hm-mde-body", role: () => (views().length > 1 ? "tabpanel" : null), "aria-labelledby": () => (views().length > 1 ? `${id}-tab-${view()}` : null) }, body),
+  });
 }

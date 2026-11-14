@@ -1,4 +1,5 @@
-/* March — the formatting toolbar MarkdownEditor and RichTextEditor share. Buttons are IconButtons, separators Dividers. */
+/* FormatToolbar: the formatting bar of the editors. Buttons are IconButtons, separators Dividers. */
+.hm-format-toolbar[data-hm-color] { --hm-editor-accent: var(--hm-accent, var(--hm-primary)); }
 .hm-format-toolbar, .hm-format-toolbar .hm-toolbar-start { gap: 2px; }
 .hm-format-sep.hm-divider-v { align-self: center; block-size: 1.125rem; margin-inline: var(--hm-space-1); }
 .hm-format-tool { position: relative; color: var(--hm-text-2); border-radius: var(--hm-radius-2);

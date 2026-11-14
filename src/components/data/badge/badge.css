@@ -9,6 +9,13 @@
 .hm-badge-primary { background: var(--hm-accent-soft, var(--hm-primary-soft)); color: var(--hm-accent-text, var(--hm-primary-text)); border-color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 18%, transparent); }
 .hm-badge-count { min-width: 1.25rem; justify-content: center; padding: 0 .3125rem; font-weight: 600; }
 .hm-badge-count.hm-badge-danger { background: var(--hm-danger-solid); color: var(--hm-on-status, var(--hm-on-scrim)); border-color: transparent; }
+/* solid: the tone's full colour with the text on it */
+.hm-badge-solid { --hm-badge-fill: var(--hm-text-2); --hm-badge-on: var(--hm-surface); background: var(--hm-badge-fill); color: var(--hm-badge-on); border-color: transparent; font-weight: 700; }
+.hm-badge-solid.hm-badge-primary { --hm-badge-fill: var(--hm-accent, var(--hm-primary)); --hm-badge-on: var(--hm-on-accent, var(--hm-on-primary-fill)); }
+.hm-badge-solid.hm-badge-info { --hm-badge-fill: var(--hm-info); --hm-badge-on: var(--hm-on-info-fill); }
+.hm-badge-solid.hm-badge-success { --hm-badge-fill: var(--hm-success); --hm-badge-on: var(--hm-on-success-fill); }
+.hm-badge-solid.hm-badge-warn { --hm-badge-fill: var(--hm-warn); --hm-badge-on: var(--hm-on-warn-fill); }
+.hm-badge-solid.hm-badge-danger { --hm-badge-fill: var(--hm-danger-solid); --hm-badge-on: var(--hm-on-status, var(--hm-on-scrim)); }
 .hm-badge-dot-own { display: inline-flex; flex: none; }
 /* xs: the mini badge on the corner of an icon button, a tab, a rail item */
 .hm-badge-xs { gap: .1875rem; min-height: 1rem; padding: 0 .25rem; font-size: .625rem; line-height: 1rem; }

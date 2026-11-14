@@ -12,7 +12,7 @@ import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { ListRow } from "../list-row/index.ts";
 import { Badge } from "../badge/index.ts";
 import { ResizeHandle } from "../../layout/resize-handle/index.ts";
-import { chartHint } from "../scheduler/hint.ts";
+import { LiveStatus } from "../../feedback/live-status/index.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface GanttTask {
@@ -344,5 +344,6 @@ export function Gantt(props: GanttProps): Element {
     }, 0);
   });
   return h("div", { class: () => cx("hm-gantt", val(props.class)) }, scroller,
-    chartHint({ id, prefix: "hm-gantt", help: props.help, text: () => (editable() ? lb("help") : lb("helpReadonly")), status }));
+    // the hint under the chart and the (hidden) live region its changes are said in
+    h(LiveStatus, { class: "hm-gantt-status", visible: false, as: "div", text: status, helpId: `${id}-help`, helpClass: "hm-gantt-help", help: props.help == null || props.help === true ? () => (editable() ? lb("help") : lb("helpReadonly")) : props.help }));
 }

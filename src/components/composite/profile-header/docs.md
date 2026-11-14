@@ -40,4 +40,4 @@ names; the cover is decorative.
 
 ## Composed of
 
-StoryRing, FollowButton, CountRoll, Button, Menu, Picture, StatTile, VerifiedMark.
+Card (the frame, `flush`), StoryRing, FollowButton, CountRoll, Button, Menu, Picture, StatTile, VerifiedMark.

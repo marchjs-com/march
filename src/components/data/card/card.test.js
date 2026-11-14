@@ -11,8 +11,10 @@ test("Card: header, actions, body, footer and flush", () => {
   const m = mount(() => [
     h(Card, { title: "HADİ", subtitle: "Plan", actions: [action("Edit", () => {})], footer: "Updated", "data-x": "1" }, "Body"),
     h(Card, { flush: true, as: "article" }, "Bare"),
+    h(Card, { plain: true }, "No frame"),
   ]);
-  const [a, b] = m.el.children;
+  const [a, b, c] = m.el.children;
+  assert.ok(c.classList.contains("hm-card-plain") && !a.classList.contains("hm-card-plain"), "plain: no frame");
   assert.equal(a.tagName, "SECTION");
   assert.equal(a.getAttribute("data-x"), "1");
   assert.equal(a.querySelector(".hm-card-title").textContent, "HADİ");

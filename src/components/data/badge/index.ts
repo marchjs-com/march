@@ -13,6 +13,8 @@ export interface BadgeProps {
   /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
   color?: ColorToken | undefined;
   tone?: MaybeFn<Tone | undefined>;
+  /** "soft" (default: a tinted fill) or "solid": the tone's full colour with the text on it (a count that must stand out). */
+  variant?: "soft" | "solid" | undefined;
   /** "md" (default) or "xs": the mini badge on the corner of an icon button, a tab, a rail item. */
   size?: "xs" | "md" | undefined;
   /** Count badge: hidden at 0 unless `showZero`; above `max` shows "99+". */
@@ -42,7 +44,7 @@ export interface BadgeProps {
 }
 /**
  * `<Badge tone="success">Active</Badge>`, `<Badge count={n} />` (hidden at 0 unless showZero; 120 → "99+"),
- * `<Badge pulse>Live</Badge>`, `<Badge size="xs" count={n} />`, `<Badge onClick={open}>v2</Badge>` (a button).
+ * `<Badge tone="primary" variant="solid" count={n} />` (a filled count), `<Badge pulse>Live</Badge>`, `<Badge size="xs" count={n} />`, `<Badge onClick={open}>v2</Badge>` (a button).
  */
 export function Badge(props: BadgeProps): unknown {
   // a clickable badge is a button; the look is the same element with one more class
@@ -50,7 +52,7 @@ export function Badge(props: BadgeProps): unknown {
   const pressed = (): boolean | null => { const p = val(props.pressed); return p == null ? null : !!p; };
   const tag = click ? "button" : "span";
   const own = click ? { type: "button", onClick: click, disabled: () => !!val(props.disabled), "aria-pressed": () => { const p = pressed(); return p == null ? null : String(p); } } : {};
-  const extra = (): string => cx(props.size === "xs" && "hm-badge-xs", click && "hm-badge-btn", click && pressed() && "is-pressed", val(props.class));
+  const extra = (): string => cx(props.size === "xs" && "hm-badge-xs", props.variant === "solid" && "hm-badge-solid", click && "hm-badge-btn", click && pressed() && "is-pressed", val(props.class));
   if (props.count !== undefined) {
     return () => {
       const n = Number(val(props.count)) || 0;

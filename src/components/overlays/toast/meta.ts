@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Short, non-blocking messages: toast(message, { kind, action, timeout }) returns an id; undo actions, up to five stacked, a host mounts itself.",
   category: "overlays",
-  composedOf: ["Portal", "Button", "IconButton"],
+  composedOf: ["Portal", "Alert", "Button"],
   behaviors: [],
   hubs: [],
   showcase: "/overlays",

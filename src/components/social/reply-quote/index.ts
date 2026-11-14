@@ -1,0 +1,67 @@
+// ReplyQuote (hadi-march/social): the small box that shows which message is being answered — who said it and a cut of
+// what was said, behind a coloured bar. Inside a message bubble it is the quote over the answer; above a message field
+// it is the "replying to" preview with a cancel button. The lines kept, the colour, the bar, the cancel button and
+// every text are yours.
+import "./reply-quote.css";
+import { h } from "../../../dom/h.ts";
+import { t, messages } from "../../../core/i18n.ts";
+import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { ClampText } from "../../typography/clamp-text/index.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { x as xIcon } from "../../../icons/glyphs/x.ts";
+import tr from "./tr.ts";
+
+messages("tr", tr);
+
+export interface ReplyQuoteProps {
+  /** The first line: who is quoted ("Deniz"), or your own line ("Replying to Deniz"). */
+  name?: MaybeFn<unknown>;
+  /** The quoted text. */
+  text?: MaybeFn<unknown>;
+  /** Lines of the text kept (default 2; 1 for a preview above a field; 0 shows all). */
+  lines?: MaybeFn<number | undefined>;
+  /** "soft" (default: a tinted box) or "inverse" (inside a coloured bubble: darker box, bar and name in the text colour). */
+  variant?: MaybeFn<"soft" | "inverse" | undefined>;
+  /** Theme colour token of the bar and the name (default brand-orange). */
+  color?: MaybeFn<ColorToken | undefined>;
+  /** The bar at the start edge (default true). */
+  bar?: MaybeFn<boolean | undefined>;
+  /** Shows the cancel button and runs on it. */
+  onClose?: (() => void) | undefined;
+  /** The cancel button: shown when `onClose` is given (default), false for none, or your own icon for it. */
+  close?: boolean | unknown | undefined;
+  /** Accessible name of the cancel button (default "Cancel reply"). */
+  closeLabel?: MaybeFn<string | undefined>;
+  /** After the text, before the cancel button: a thumbnail of a quoted photo, your own control. */
+  trail?: unknown;
+  /** Makes the quote a button (jump to the quoted message). */
+  onClick?: ((e: MouseEvent) => void) | undefined;
+  class?: ClassProp;
+  /** Other attributes (`id`, `data-*`, `ref`, `aria-*`) go to the box. */
+  [attr: string]: unknown;
+}
+
+/** `<ReplyQuote name="Deniz" text="See you at 8?" />`, `<ReplyQuote name="Replying to Deniz" text={m.text} lines={1} onClose={cancel} />` */
+export function ReplyQuote(props: ReplyQuoteProps): Element {
+  const body = [
+    props.name != null ? h("b", { class: "hm-reply-quote-name" }, () => val(props.name)) : null,
+    props.text != null ? h(ClampText, { class: "hm-reply-quote-text", as: "span", expandable: false, lines: () => val(props.lines) ?? 2, text: () => val(props.text) }) : null,
+  ];
+  const showClose = props.close !== false && props.onClose != null;
+  const main = props.onClick
+    ? h("button", { type: "button", class: "hm-reply-quote-main", onClick: props.onClick }, body)
+    : h("span", { class: "hm-reply-quote-main" }, body);
+  return h("div", {
+    ...rest(props, ["name", "text", "lines", "variant", "color", "bar", "onClose", "close", "closeLabel", "trail", "onClick"]),
+    class: () => cx("hm-reply-quote", val(props.variant) === "inverse" && "hm-reply-quote-inverse", val(props.bar) === false && "is-barless", val(props.class)),
+    "data-hm-color": () => colorAttr(val(props.color)) ?? "brand-orange",
+  },
+  main,
+  props.trail ?? null,
+  showClose ? h(IconButton, {
+    class: "hm-reply-quote-close", size: "sm", shape: "round", title: false, icon: ownIcon(props.close === true ? undefined : props.close, xIcon),
+    label: () => val(props.closeLabel) ?? t`Cancel reply`, onClick: () => props.onClose?.(),
+  }) : null);
+}

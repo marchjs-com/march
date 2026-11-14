@@ -31,7 +31,7 @@ global speed, "pause all" and reduced motion apply (reduced motion keeps only th
   pop={false} burstOptions={{ count: 16, ring: false }} countFormat="full" />
 ```
 
-`heartBurst(el, { count, radius, colors, ring })` and `heartPop(el, on)` are the same effects for any element: a
+`heartBurst(el, { count, radius, colors, ring })` and `heartPop(el, on)` (motion/burst.ts, re-exported here) are the same effects for any element: a
 double-tap on a photo (PostCard), a comment, a story.
 
 ## Accessibility

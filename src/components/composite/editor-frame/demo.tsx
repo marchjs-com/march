@@ -1,0 +1,36 @@
+// Showcase stage for EditorFrame: a small note editor built from the frame, a FormatToolbar in its head and a word
+// count in its foot, drawn for the Playground values (playground.ts). The text is kept while the options change.
+import { untrack } from "../../../core/reactive.ts";
+import { EditorFrame } from "./index.ts";
+import { FormatToolbar } from "../format-toolbar/index.ts";
+import { Badge } from "../../../ui/badge.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+
+export const code = `<EditorFrame head={<FormatToolbar onTool={exec} />} actions={<Badge>{$words} kelime</Badge>}
+  foot={<span>Markdown desteklenir</span>} color="brand-green">
+  <textarea class="hm-editor-area" bind:value={$text} />
+</EditorFrame>
+<EditorFrame showHead={() => $tools.length > 0} headProps={{ sticky: true }} footProps={{ divider: true }} ring={false} … />`
+
+export default function EditorFrameDemo(props: { values: { head: boolean; actions: boolean; foot: boolean; sticky: boolean; ring: boolean; color: string; state: string } }) {
+  let $text = "HADİ koşu kulübü cumartesi sabahı sahilde buluşuyor.\nYeni katılanlar için tempo yavaş tutulacak."
+  let $last = ""
+  const words = () => $text.trim().split(/\s+/).filter(Boolean).length
+  return <div class="sc-col">
+    {() => {
+      const v = { ...props.values }
+      const color = (v.color || undefined) as ColorToken | undefined
+      const off = v.state !== "normal"
+      return <EditorFrame
+        head={v.head ? <FormatToolbar tools={["bold", "italic", "|", "link", "ul"]} disabled={off} onTool={(tool) => { $last = tool }} /> : undefined}
+        actions={v.head && v.actions ? <Badge tone="neutral">{() => `${words()} kelime`}</Badge> : undefined}
+        headProps={{ sticky: v.sticky }}
+        foot={v.foot ? <span>{() => ($last ? `Son araç: ${$last}` : "Çerçevenin içine tıklayın: kenar ve halka odakla renklenir.")}</span> : undefined}
+        footProps={{ divider: true }}
+        ring={v.ring} color={color} disabled={v.state === "disabled"} readonly={v.state === "readonly"}>
+        <textarea class="hm-editor-area" rows={4} aria-label="Not" readonly={v.state === "readonly"} disabled={v.state === "disabled"}
+          value={untrack(() => $text)} on:input={(e: Event) => { $text = (e.target as HTMLTextAreaElement).value }} />
+      </EditorFrame>
+    }}
+  </div>
+}

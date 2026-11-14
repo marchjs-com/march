@@ -1,4 +1,4 @@
-// Turkish names of the formatting tools (shared by MarkdownEditor and RichTextEditor). English source → Turkish.
+// Turkish texts of FormatToolbar: the names of the formatting tools. English source → Turkish.
 const tr: Record<string, string> = {
   "Paragraph": "Paragraf",
   "Heading 2": "Başlık 2",
@@ -16,5 +16,6 @@ const tr: Record<string, string> = {
   "Code block": "Kod bloğu",
   "Undo": "Geri al",
   "Redo": "Yinele",
+  "Formatting": "Biçimlendirme",
 };
 export default tr;

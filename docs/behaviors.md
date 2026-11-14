@@ -23,6 +23,7 @@ el.addEventListener("pointerdown", (e) => pointerDrag(e, { threshold: 0, onMove:
 | Option | | |
 |---|---|---|
 | `threshold` | px, default 4 | below it, pointerup is a click (`onClick`) and no drag starts |
+| `hold` | ms | touch only: the drag starts after a long press; a finger that moves earlier scrolls the page (mouse and pen drag at once) |
 | `scroll`, `edge` | element, px (48) | edge auto-scroll of that container on the motion clock (pause and speed apply) |
 | `onStart`, `onMove`, `onEnd(p, cancelled)`, `onClick(e)` | | `cancelled`: Escape, pointercancel or the returned `stop()` |
 | `handle`, `ignore` | selectors | `draggable` only: the part that starts a drag; parts that never do (form fields, links, buttons) |

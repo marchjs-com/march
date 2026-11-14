@@ -55,8 +55,8 @@ relative links are accepted.
 
 ## Composed of
 
-PanelHeader (head and foot bars), Popover + Field + TextInput (`UrlInput`: the link panel), Popover + OptionList + Avatar
-(suggestions; the keys stay in the text: `keysFrom`), IconButton; the formatting toolbar shared with MarkdownEditor
-(`composite/editor-parts/format-toolbar.ts`: Toolbar, IconButton `pressed`, Divider, roving focus) and the shared editor
-frame (`composite/editor-parts/frame.css`); `undoKeys`, UndoManager (`undoHistory`), the safe content core
+EditorFrame (frame, head and foot bars), FormatToolbar (the formatting bar, shared with MarkdownEditor), Popover + Field
++ TextInput (`UrlInput`: the link panel), Popover + OptionList + Avatar (suggestions; the keys stay in the text:
+`keysFrom`; the panels follow the caret / the selection through `virtualAnchor`), IconButton; `undoKeys`, UndoManager
+(`undoHistory`), the safe content core
 (`dom/safe.ts`, `dom/sanitize.ts`, `dom/markdown.ts`, `dom/to-markdown.ts`).

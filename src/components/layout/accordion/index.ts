@@ -2,8 +2,9 @@
 import "./accordion.css";
 import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { val, cx, uid, icon, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, uid, type ClassProp } from "../../../ui/util.ts";
 import { Chevron } from "../../actions/chevron/index.ts";
+import { PlainListRow } from "../../data/list-row/core.ts";
 import { roving } from "../../../ui/focus.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
@@ -46,10 +47,9 @@ export function Accordion(props: AccordionProps): Element {
       const k = keyOf(it, i), isOpen = (): boolean => open().has(k), id = `${base}-${i}`;
       return h("div", { class: () => cx("hm-acc-item", isOpen() && "is-open") },
         h("h3", { class: "hm-acc-head", "data-hm-color": colorAttr(props.color) },
-          h("button", { type: "button", class: "hm-acc-btn", id: `${id}-b`, "aria-expanded": () => String(isOpen()), "aria-controls": `${id}-p`, disabled: it.disabled, onClick: () => toggle(k) },
-            icon(it.icon, "hm-acc-icon"),
-            h("span", { class: "hm-acc-titles" }, h("span", { class: "hm-acc-title" }, it.title), it.subtitle != null && h("span", { class: "hm-acc-sub" }, it.subtitle)),
-            chev(isOpen, it))),
+          // the header is a ListRow button (the plain one: titles wrap, no scrolling text is loaded)
+          h(PlainListRow, { class: "hm-acc-btn", id: `${id}-b`, "aria-expanded": () => String(isOpen()), "aria-controls": `${id}-p`, disabled: it.disabled, onClick: () => toggle(k), overflow: "wrap",
+            lead: it.icon, title: h("span", { class: "hm-acc-title" }, it.title), sub: it.subtitle, trail: chev(isOpen, it) })),
         h("div", { class: "hm-acc-panel", id: `${id}-p`, role: "region", "aria-labelledby": `${id}-b`, inert: () => !isOpen() },
           h("div", { class: "hm-acc-inner" }, h("div", { class: "hm-acc-body" }, it.content))));
     }));

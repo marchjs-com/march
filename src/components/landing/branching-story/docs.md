@@ -37,16 +37,16 @@ mirrored in right-to-left text. Keys 1–9 pick a choice.
 | `keys` | boolean | `true` | number keys 1–9 pick a choice; each choice shows its number |
 | `renderChoice` | `(choice, index) => node` | — | draw the content of a choice button yourself |
 | `transition` | `turn` `slide` `fade` `none` / `(side) => { leave, enter, duration?, easing? }` | `turn` | how the page changes; a function gives keyframes for the leaving and the entering passage (`side`: 1 forward, -1 back) |
-| `class` | string | — | extra class on the root (`.hm-bs`; parts: `.hm-bs-trail`, `.hm-bs-step`, `.hm-bs-found`, `.hm-bs-passage`, `.hm-bs-choice`, `.hm-bs-key`, `.hm-bs-end`) |
+| `class` | string | — | extra class on the root (`.hm-bs`; parts: `.hm-bs-trail` (a Breadcrumbs: steps are `.hm-bc-item`), `.hm-bs-found`, `.hm-bs-passage`, `.hm-bs-choice`, `.hm-bs-key`, `.hm-bs-end`) |
 
 A choice is `{ label, to, note? }`. `storyEndings(passages, start)` lists every reachable ending.
 
 ## Accessibility
 
-A labelled `section`. The trail is a `nav` with an ordered list; the current step has `aria-current="step"`, earlier
+A labelled `section`. The trail is a `nav` with an ordered list (Breadcrumbs); the current step has `aria-current`, earlier
 steps are buttons. Choices are buttons in an ordered list; the number keys 1–9 press them (unless `keys={false}`). After a choice, focus moves
 to the new passage's heading, so screen readers read the new passage. Reduced motion swaps passages without the turn.
 
 ## Composed of
 
-ListRow (a choice: key, label, note), Kbd, Badge (trail steps, ending), Button (start again); `swapTransition` and the motion engine, `storyEndings`.
+ListRow (a choice: key, label, note), Kbd, Breadcrumbs (the trail, in a pill look), Badge (ending), Button (start again); `swapTransition` and the motion engine, `storyEndings`.

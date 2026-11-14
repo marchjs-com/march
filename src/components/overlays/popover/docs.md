@@ -40,7 +40,14 @@ focus when it opens and gives it back to the trigger. The open state is its own 
 | `color` | color token | the trigger's | theme colour inside the panel |
 | `class` | class value | — | the wrapper around the trigger |
 | `panelClass` | string | — | the floating panel |
+| `id` | string | generated | id of the panel (your own trigger's `aria-controls`) |
+| `panelProps` | attributes | — | more attributes and listeners of the panel (`onKeydown`, `ref`): Menu's arrow keys |
 | `children` | node / `(close, api) => node` | — | the content; `close(true)` also returns focus |
+
+## PopoverPanel
+
+`PopoverPanel` is the floating panel alone, hung on the `anchor` you give (the props of Popover without `trigger` and
+`class`): no wrapper element is left in the page. Menu, Dropdown and ContextMenu open their panel with it.
 
 ## Accessibility
 

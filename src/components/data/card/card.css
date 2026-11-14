@@ -8,5 +8,6 @@
 .hm-card-head .hm-card-actions { flex-wrap: wrap; flex-shrink: 1; gap: var(--hm-space-2); }
 .hm-card-body { flex: 1 1 auto; min-width: 0; padding: var(--hm-space-4) var(--hm-space-5) var(--hm-space-5); }
 .hm-card-flush .hm-card-body { padding: 0; }
+.hm-card-plain { background: none; border: 0; border-radius: 0; box-shadow: none; }
 .hm-card-flush .hm-card-head.hm-panel-header { padding-block-end: var(--hm-space-4); }
 .hm-card-foot { padding: var(--hm-space-3) var(--hm-space-5); border-top: 1px solid var(--hm-border-subtle); background: var(--hm-bg-subtle); border-radius: 0 0 var(--hm-radius-3) var(--hm-radius-3); }

@@ -7,7 +7,7 @@ export default defineMeta({
   summary: "Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→.",
   category: "data",
   composedOf: ["PanelHeader", "StatusDot", "Badge"],
-  behaviors: [],
+  behaviors: ["drag"],
   hubs: [],
   showcase: "/data",
 });

@@ -1,5 +1,6 @@
 // Combobox: typeahead over static options or an async `search` (chips with `multiple`). WAI-ARIA combobox pattern:
 // focus stays in the input, the active option is announced with aria-activedescendant.
+import "../../actions/menu/menu.css";
 import "./combobox.css";
 import "../../../ui/field.css";
 import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
@@ -10,7 +11,7 @@ import { model, ctl, cx, uid, debounce, listNav, fold, same, normOptions, type C
 import { ownPart } from "../../../ui/parts.ts";
 import { errorText } from "../../../ui/format.ts";
 import { Chip } from "../../actions/chip/index.ts";
-import { ListRow } from "../../data/list-row/index.ts";
+import { OptionList, type OptionItem } from "../option-list/index.ts";
 
 export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]> {
   /** Static options: [value] or [{ value, label, hint, disabled }]. */
@@ -138,26 +139,24 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
     onClick: () => openList(),
   }) as HTMLInputElement;
   effect(() => { const l = multi ? "" : labelOf(get()); untrack(() => { if (!editing && input.value !== l) input.value = l; }); });
-  effect(() => { const i = active(); if (open() && i >= 0) untrack(() => globalThis.document?.getElementById(`${listId}-${i}`)?.scrollIntoView?.({ block: "nearest" })); });
-  const status = (text: unknown) => h("div", { class: "hm-listbox-status", role: "status" }, text);
+  // loading, empty and error states: the list's "empty" part, said as a status
+  const status = (): unknown => {
+    const lb = props.labels;
+    return h("div", { class: "hm-listbox-status", role: "status" },
+      error() ? (lb?.searchFailed ? lb.searchFailed(error()!) : t`Search failed: ${error()}`)
+        : loading() ? lb?.searching ?? t`Searching…`
+          : props.search && remote() == null ? lb?.typeToSearch ?? t`Type to search` : lb?.noResults ?? t`No results`);
+  };
+  const rows = computed(() => items().map((o): OptionItem<Option> => ({ value: o, label: o.label, trailing: o.hint || undefined, disabled: !!o.disabled })));
+  const chosen = computed(() => { const on = items().filter((o) => isSel(o.value)); return multi ? on : on[0] ?? null; });
+  // the options are an OptionList driven from here: focus stays in the input, `active` is the highlight
   const panel = () => floating({
-    anchor: wrap, class: "hm-listbox", role: "listbox", id: listId, onClose: () => { close(); restore(); },
-    attrs: { "aria-multiselectable": multi ? "true" : null, "aria-label": props["aria-label"] ?? null },
-    children: () => {
-      const list = items();
-      const lb = props.labels;
-      if (error()) return status(lb?.searchFailed ? lb.searchFailed(error()!) : t`Search failed: ${error()}`);
-      if (loading() && !list.length) return status(lb?.searching ?? t`Searching…`);
-      if (props.search && remote() == null) return status(lb?.typeToSearch ?? t`Type to search`);
-      if (!list.length) return status(lb?.noResults ?? t`No results`);
-      // an option is a ListRow (label + hint at the end, or your own drawing); focus stays in the input
-      return list.map((o, i) => h(ListRow, {
-        as: "div", role: "option", id: `${listId}-${i}`, class: () => cx("hm-option", active() === i && "hm-active"), overflow: "wrap",
-        "aria-selected": () => String(isSel(o.value)), disabled: !!o.disabled,
-        onMouseDown: (e: MouseEvent) => e.preventDefault(), onMouseMove: () => { if (active.peek() !== i) active.set(i); }, onClick: () => pick(i),
-        ...(props.renderOption ? { children: props.renderOption(o) } : { title: o.label, trail: o.hint || undefined }),
-      }));
-    },
+    anchor: wrap, class: "hm-listbox", role: null, onClose: () => { close(); restore(); },
+    children: h(OptionList<Option>, {
+      id: listId, keys: false, active, multiple: multi, check: false, overflow: "wrap", label: () => props["aria-label"] ?? undefined,
+      options: rows, value: chosen, empty: status, onPick: (o) => pick(items.peek().indexOf(o)),
+      ...(props.renderOption ? { renderOption: (it: OptionItem<Option>) => props.renderOption!(it.value) } : null),
+    }),
   });
   wrap = h("div", { class: () => cx("hm-combo", multi && "hm-multi", props.class), "class:hm-disabled": () => !!props.disabled, onClick: (e: MouseEvent) => { if (e.target === wrap) input.focus(); } },
     multi ? () => (getList() ?? []).map((v) => {
