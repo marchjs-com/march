@@ -41,3 +41,16 @@ test("Dropdown: dialog panel with a close function", async () => {
   assert.equal(trigger.getAttribute("aria-expanded"), "false");
   m.dispose();
 });
+
+test("Menu / Dropdown: the trigger takes a colour token, a class and its own content", () => {
+  const m = mount(() => [
+    h(Menu, { label: "Actions", variant: "primary", color: "brand-purple", class: "mine", trigger: h("b", {}, "Me"), items: [] }),
+    h(Dropdown, { label: "Filters" }, "body"),
+  ]);
+  const [a, b] = m.el.querySelectorAll("button");
+  assert.equal(a.getAttribute("data-hm-color"), "brand-purple");
+  assert.ok(a.className.includes("hm-btn-primary") && a.className.includes("mine"));
+  assert.equal(a.querySelector("b").textContent, "Me");
+  assert.equal(b.getAttribute("data-hm-color"), null);
+  m.dispose();
+});

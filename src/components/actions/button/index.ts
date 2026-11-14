@@ -22,6 +22,8 @@ export interface ButtonProps {
   variant?: MaybeFn<ButtonVariant | undefined>;
   size?: MaybeFn<ButtonSize | undefined>;
   loading?: MaybeFn<boolean | null | undefined>;
+  /** The loading spinner: true (default), false (the icon stays while loading), or your own node / icon. */
+  spinner?: unknown;
   icon?: unknown;
   iconEnd?: unknown;
   block?: boolean;
@@ -42,11 +44,13 @@ export function Button(props: ButtonProps): unknown {
   const loading = (): boolean => !!val(props.loading);
   const cls = (): string => cx("hm-btn", `hm-btn-${val(props.variant) ?? "secondary"}`, buttonSizeClass(val(props.size)), props.block && "hm-btn-block", loading() && "is-loading", val(props.class));
   const body = [
-    () => (loading() ? h("span", { class: "hm-loading hm-btn-spin", "aria-hidden": "true" }) : icon(val(props.icon))),
+    () => (!loading() || props.spinner === false ? icon(val(props.icon))
+      : props.spinner == null || props.spinner === true ? h("span", { class: "hm-loading hm-btn-spin", "aria-hidden": "true" })
+      : h("span", { class: "hm-btn-spin-own", "aria-hidden": "true" }, icon(props.spinner))),
     props.children != null && h("span", { class: "hm-btn-label" }, props.children),
     props.iconEnd != null && icon(props.iconEnd),
   ];
-  const attrs = { ...rest(props, ["variant", "size", "loading", "icon", "iconEnd", "block", "href", "disabled", "type", "color"]), "data-hm-color": () => colorAttr(props.color) };
+  const attrs = { ...rest(props, ["variant", "size", "loading", "spinner", "icon", "iconEnd", "block", "href", "disabled", "type", "color"]), "data-hm-color": () => colorAttr(props.color) };
   if (props.href != null) {
     const href = (): Href => val(props.href as MaybeFn<Href>);
     const L = routerLink(); // the router's Link when the app has a router; otherwise a plain link
@@ -67,6 +71,10 @@ export interface ActionButtonProps<A extends unknown[] = unknown[], R = unknown>
   args?: Args<A>;
   variant?: MaybeFn<ButtonVariant | undefined>;
   size?: MaybeFn<ButtonSize | undefined>;
+  /** Theme color token of the button (see Button). */
+  color?: ColorToken | undefined;
+  /** The busy spinner: true (default), false, or your own node / icon (see Button). */
+  spinner?: unknown;
   icon?: unknown;
   class?: ClassProp;
   /** Only the icon; the label becomes the aria-label. */
@@ -87,7 +95,7 @@ export function ActionButton<A extends unknown[], R>(props: ActionButtonProps<A,
     const args = argsOf(props);
     if (!a.visible(...args)) return null;
     return untrack(() => h(Button, {
-      variant: props.variant ?? (a.opts.danger ? "danger" : "secondary"), size: props.size, icon: props.icon ?? a.opts.icon, class: props.class,
+      variant: props.variant ?? (a.opts.danger ? "danger" : "secondary"), size: props.size, icon: props.icon ?? a.opts.icon, class: props.class, color: props.color, spinner: props.spinner,
       loading: () => a.busy(), disabled: () => a.disabled(...argsOf(props)),
       title: a.opts.key ? `${a.label()} (${formatKey(a.opts.key)})` : null,
       onClick: async () => {

@@ -24,4 +24,5 @@
 .hm-btn-lg { min-height: var(--hm-control-h-lg); padding: 0 var(--hm-space-5); font-size: var(--hm-text-lg); }
 .hm-btn-block { display: flex; width: 100%; }
 .hm-btn.is-loading { cursor: progress; }
+.hm-btn-spin-own { display: inline-flex; align-items: center; }
 .hm-btn-spin { width: 1em; height: 1em; border-width: 2px; border-top-color: currentColor; }

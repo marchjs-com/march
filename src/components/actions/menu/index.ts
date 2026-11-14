@@ -14,6 +14,7 @@ import { roving } from "../../../ui/focus.ts";
 import { formatKey } from "../../../ui/keys.ts";
 import { val, cx, uid, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { buttonSizeClass, type ButtonVariant, type ButtonSize } from "../button/index.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 type Args<A extends readonly unknown[]> = A | (() => A) | null | undefined;
 const argsOf = <A extends readonly unknown[]>(props: { args?: Args<A> }): A => ((typeof props.args === "function" ? props.args() : props.args) ?? []) as A;
@@ -72,6 +73,8 @@ export interface PopoverButtonProps {
   trigger?: unknown;
   variant?: MaybeFn<ButtonVariant | undefined>;
   size?: MaybeFn<ButtonSize | undefined>;
+  /** Theme color token of the trigger (the primary variant's fill, an icon trigger's icon). */
+  color?: ColorToken | undefined;
   class?: ClassProp;
   panelClass?: string;
   placement?: Placement;
@@ -91,7 +94,7 @@ function popButton(props: PopoverButtonProps, role: "menu" | "dialog", panelChil
     type: "button", ref: (x: HTMLElement) => { trigger = x; },
     class: () => cx(props.icon && props.trigger == null ? "hm-icon-btn" : `hm-btn hm-btn-${val(props.variant) ?? "secondary"}`, buttonSizeClass(val(props.size)), val(props.class)),
     "aria-haspopup": role === "menu" ? "menu" : "dialog", "aria-expanded": () => String(open()), "aria-controls": id,
-    "aria-label": () => val(props.label) ?? null, disabled: () => !!val(props.disabled),
+    "aria-label": () => val(props.label) ?? null, disabled: () => !!val(props.disabled), "data-hm-color": () => colorAttr(props.color),
     onClick: () => (open.peek() ? close(false) : show(0)),
     onKeydown: (e: KeyboardEvent) => {
       if (role !== "menu") return;

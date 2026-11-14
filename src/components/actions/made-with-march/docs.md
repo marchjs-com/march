@@ -7,6 +7,9 @@ requirement: the licence stays MIT and nothing here is needed to use March.
 <MadeWithMarch />
 <MadeWithMarch variant="badge" />
 <MadeWithMarch variant="small" />
+<MadeWithMarch heart="☕" heartLabel="Coffee" />              // your own mark
+<MadeWithMarch heart={false} />                              // "Developed with March"
+<MadeWithMarch text={(link, heart) => <>Built on {link} {heart}</>} link="March UI" />
 ```
 
 ## Props
@@ -14,6 +17,11 @@ requirement: the licence stays MIT and nothing here is needed to use March.
 | Prop | Type | Default | |
 |---|---|---|---|
 | `variant` | `text` `badge` `small` | `text` | plain line, bordered pill, compact muted line |
+| `heart` | boolean / node | `true` (💗) | the heart: `false` ends the sentence at the link, a node or text replaces it |
+| `heartLabel` | string / accessor | "Love" | accessible name of the heart |
+| `link` | node | "March" | text of the link |
+| `href` | string | `MARCH_URL` | where the link points |
+| `text` | `(link, heart) => node` | — | your own sentence around the two parts |
 | `class` | class | — | extra classes |
 
 ## Link

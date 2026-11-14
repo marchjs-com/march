@@ -15,6 +15,7 @@ import { commandBinding, type CommandBinding } from "../../../managers/command/u
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { more } from "../../../icons/glyphs/more.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 messages("tr", { "More": "Daha fazla", "More actions": "Diğer eylemler" });
 
@@ -45,8 +46,20 @@ export interface OverflowToolbarProps {
   size?: "sm" | "md";
   /** Content after the items that never overflows (a search field, a status). */
   end?: unknown;
+  /** Accessible name of the More button and its menu (default: "More actions", translated). */
+  moreLabel?: MaybeFn<string | undefined>;
+  /** Icon of the More button (default: three dots): your own node / icon. */
+  moreIcon?: unknown;
+  /** Tooltips of icon-only buttons (default true); false: none (the buttons keep their accessible names). */
+  tooltips?: boolean | undefined;
+  /** How an item comes back from the More menu: "pop" (default), "fade", "none" / false, or `(el) => …` (your own animation). */
+  motion?: "pop" | "fade" | "none" | false | ((el: Element) => unknown) | undefined;
+  /** Theme color token of pressed toggles and the focus ring (default: the theme's primary). */
+  color?: ColorToken | undefined;
   class?: ClassProp;
 }
+
+const ENTER = { pop: [{ opacity: 0, transform: "scale(.85)" }, { opacity: 1, transform: "none" }], fade: [{ opacity: 0 }, { opacity: 1 }] };
 
 /** `<OverflowToolbar label="Editor" items={[{ id: "save", command: "doc.save", priority: 10 }, { id: "s", separator: true }, …]} />` */
 export function OverflowToolbar(props: OverflowToolbarProps): Element {
@@ -72,8 +85,14 @@ export function OverflowToolbar(props: OverflowToolbarProps): Element {
     const before = untrack(shown);
     if (next.length === before.length && next.every((v, i) => v === before[i])) return;
     shown.set(next);
-    // items coming back slide in (motion engine)
-    if (!reducedMotion()) queueMicrotask(() => next.forEach((v, i) => { if (v && before[i] === false) { const el = row?.children[i]; if (el) animate(el, [{ opacity: 0, transform: "scale(.85)" }, { opacity: 1, transform: "none" }], { duration: 180, easing: "easeOutCubic" }); } }));
+    // items coming back slide in (motion engine), or the way `motion` says
+    const enter = props.motion ?? "pop";
+    if (enter !== "none" && enter !== false && !reducedMotion()) queueMicrotask(() => next.forEach((v, i) => {
+      const el = v && before[i] === false ? row?.children[i] : null;
+      if (!el) return;
+      if (typeof enter === "function") enter(el);
+      else animate(el, ENTER[enter] ?? ENTER.pop, { duration: 180, easing: "easeOutCubic" });
+    }));
   };
   // measure every item while all are shown (on start and when the list changes), then fit on every resize
   effect(() => {
@@ -94,7 +113,7 @@ export function OverflowToolbar(props: OverflowToolbarProps): Element {
       "aria-label": iconOnly ? tip : null, "aria-keyshortcuts": () => b.shortcut() ?? null,
       disabled: () => b.disabled(), onClick: () => b.run(),
     }, () => icon(b.icon(), "hm-otb-icon"), iconOnly ? null : h("span", { class: "hm-otb-label" }, () => b.label()));
-    return iconOnly ? h(Tooltip, { text: tip, placement: "bottom", children: btn }) : btn;
+    return iconOnly && props.tooltips !== false ? h(Tooltip, { text: tip, placement: "bottom", children: btn }) : btn;
   };
   const items = (): unknown => present().map((x, i) => untrack(() => h("div", { class: "hm-otb-item", hidden: () => !isShown(i) },
     x.it.separator ? h("span", { class: "hm-otb-sep", role: "separator", "aria-orientation": "vertical" }) : button(x.it, x.b!))));
@@ -119,9 +138,9 @@ export function OverflowToolbar(props: OverflowToolbarProps): Element {
   };
   const onFocusin = (e: FocusEvent): void => { const t0 = e.target as HTMLElement; if (t0.matches?.(".hm-otb-btn, .hm-otb-more > button")) for (const b of buttons()) b.tabIndex = b === t0 ? 0 : -1; };
 
-  return h("div", { class: () => cx("hm-otb", props.size === "md" ? "hm-otb-md" : "hm-otb-sm", val(props.class)), role: "toolbar", "aria-label": () => val(props.label), onKeydown, onFocusin },
+  return h("div", { class: () => cx("hm-otb", props.size === "md" ? "hm-otb-md" : "hm-otb-sm", val(props.class)), role: "toolbar", "aria-label": () => val(props.label), "data-hm-color": () => colorAttr(props.color), onKeydown, onFocusin },
     h("div", { class: "hm-otb-items", ref: (x: HTMLElement) => { row = x; observeWidth(x, (w) => { avail = w + (moreEl && !moreEl.hidden ? moreEl.offsetWidth + 2 : 0); refit(); }); } }, items),
     h("div", { class: "hm-otb-more", hidden: () => overflow().length === 0, ref: (x: HTMLElement) => { moreEl = x; } },
-      h(Menu, { label: () => t`More actions`, icon: more, items: () => overflow(), size: "sm", variant: "ghost", placement: "bottom-end" })),
+      h(Menu, { label: () => val(props.moreLabel) ?? t`More actions`, icon: props.moreIcon == null || props.moreIcon === true || props.moreIcon === false ? more : props.moreIcon, items: () => overflow(), size: "sm", variant: "ghost", placement: "bottom-end" })),
     props.end != null && h("div", { class: "hm-otb-end" }, props.end));
 }

@@ -21,9 +21,19 @@ separators (`"-"`). `args` are passed to every action and `onSelect`.
 | `icon` | icon | — | icon-only trigger |
 | `trigger` | node | — | custom trigger content |
 | `variant` / `size` | Button variants / sizes | `secondary` / `md` | trigger look |
+| `color` | color token | theme primary | accent of the trigger (primary fill, icon trigger) |
+| `class` | class | — | extra classes on the trigger |
 | `placement` | Placement | `bottom-start` | panel side (flips when there is no room) |
 | `panelClass` | string | — | class on the panel |
 | `disabled` | boolean / accessor | — | |
+| `children` | node / `(close) => node` | — | Dropdown: the panel content |
+
+Every part of the trigger is yours: `trigger` replaces its content, `icon` and `label` are optional, and an item draws
+an icon, a shortcut or a separator only when you give one.
+
+```tsx
+<Menu label="Actions" variant="primary" color="brand-purple" trigger={<><Avatar name={user.name} /> {user.name}</>} items={items} />
+```
 
 ## Accessibility
 

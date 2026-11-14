@@ -13,10 +13,10 @@
 .hm-otb-btn:hover:not(:disabled) { background: color-mix(in srgb, var(--hm-text) 8%, transparent); color: var(--hm-text); }
 .hm-otb-btn:active:not(:disabled) { scale: .94; }
 .hm-otb-btn:disabled { opacity: .4; cursor: default; }
-.hm-otb-btn.is-pressed { background: var(--hm-primary-soft); color: var(--hm-primary-text, var(--hm-primary)); }
+.hm-otb-btn.is-pressed { background: var(--hm-accent-soft, var(--hm-primary-soft)); color: var(--hm-accent-text, var(--hm-primary-text, var(--hm-primary))); }
 .hm-otb-btn.is-danger { color: var(--hm-danger-text, var(--hm-danger)); }
 .hm-otb-btn.is-busy { cursor: progress; opacity: .7; }
-.hm-otb-btn:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: -2px; }
+.hm-otb-btn:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-primary)); outline-offset: -2px; }
 .hm-otb-icon { display: inline-flex; } .hm-otb-icon .hm-svg { width: 1rem; height: 1rem; }
 .hm-otb-sep { width: 1px; height: 1.125rem; margin-inline: .25rem; background: var(--hm-border); }
 .hm-otb-more .hm-icon-btn { width: 1.875rem; height: 1.875rem; }

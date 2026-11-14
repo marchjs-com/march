@@ -8,5 +8,6 @@
   background: var(--hm-surface);
   color: var(--hm-text);
 }
-.hm-icon-btn.hm-to-top:hover { color: var(--hm-primary); border-color: var(--hm-primary); }
+.hm-icon-btn.hm-to-top[data-hm-color] { color: var(--hm-accent-text, var(--hm-accent)); border-color: color-mix(in srgb, var(--hm-accent) 45%, var(--hm-border)); }
+.hm-icon-btn.hm-to-top:hover { color: var(--hm-accent, var(--hm-primary)); border-color: var(--hm-accent, var(--hm-primary)); }
 .hm-to-top[data-shown="false"] { opacity: 0; pointer-events: none; }

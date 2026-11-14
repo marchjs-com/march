@@ -6,6 +6,8 @@ when the clipboard is not available a toast reports the failure.
 ```tsx
 <CopyButton text="npm i hadi-march" />
 <CopyButton text={() => token} iconOnly label="Copy key" />
+<CopyButton text={link} icon={share} label="Copy link" copiedLabel="Link copied" copiedIcon={heart} copiedColor="brand-blue" duration={3000} />
+<CopyButton text={code} errorText={false} onError={report} />   // no toast: you handle the failure
 ```
 
 ## Props
@@ -14,8 +16,16 @@ when the clipboard is not available a toast reports the failure.
 |---|---|---|---|
 | `text` | string / number / accessor | — | what is copied (read at click time) |
 | `label` | string / accessor | "Copy" | button text, or accessible name when icon-only |
+| `copiedLabel` | string / accessor | "Copied" | the text (or name) after a copy |
 | `iconOnly` | boolean | `false` | icon button |
+| `icon` | node / icon / `true` | copy glyph when icon-only | the copy icon; a text button shows one only when given |
+| `copiedIcon` | node / icon / `false` | tick | the icon after a copy; `false` keeps the copy icon |
+| `copiedColor` | color token | `success` | colour after a copy |
+| `duration` | number (ms) | `1500` | how long the copied state stays |
+| `errorText` | string / accessor / `false` | "Could not copy to the clipboard." | failure toast; `false`: no toast |
 | `onCopy` | `() => void` | — | after a successful copy |
+| `onError` | `(error) => void` | — | the clipboard refused |
+| `class` | class | — | extra classes on the button |
 
 ## Accessibility
 

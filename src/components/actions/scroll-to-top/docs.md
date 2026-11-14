@@ -11,6 +11,9 @@ import { ScrollToTop } from "hadi-march/ui";
 <ScrollToTop />                          // once; shows after 320 px
 <ScrollToTop threshold={600} order={-1} />
 <ScrollToTop inline target={box} />      // in place, for a scrolling box
+<ScrollToTop icon={chevronUp} color="brand-blue" motion="fade" label="Up" class="my-top" />
+<ScrollToTop motion={(el, shown) => animate(el, { opacity: shown ? [0, 1] : [1, 0], rotate: shown ? [-90, 0] : [0, 90] }, { duration: 300, fill: "forwards" })} />
+<ScrollToTop motion="none" smooth={false} />   // no animation at all
 ```
 
 ## Props
@@ -21,7 +24,12 @@ import { ScrollToTop } from "hadi-march/ui";
 | `order` | Place in the corner (lower = nearer the edge). |
 | `inline` | Render where it is written instead of the corner. |
 | `target` | What to scroll; default: what the user last scrolled. |
-| `label` | Accessible name; default "Back to top" (translated). |
+| `label` | Accessible name and tooltip (string or accessor); default "Back to top" (translated). |
+| `icon` | The icon (a node or an icon); default: an up arrow. |
+| `color` | Color token of the icon and border; default: text colour, the theme's primary on hover. |
+| `motion` | How it appears and leaves: `pop` (default), `fade`, `slide`, `none` / `false`, or `(el, shown) => …` for your own animation. |
+| `smooth` | Scroll back smoothly (default `true`); `false` jumps at once. |
+| `class` | Extra classes on the button (`.hm-to-top`). |
 
 ## Accessibility
 

@@ -7,6 +7,9 @@ with `aria-pressed`), and a **removable** tag (`onRemove`, an ×-button with an 
 <Chip>Design</Chip>
 <Chip selected={$on} onClick={() => $on = !$on}>Open</Chip>
 <Chip tone="primary" onRemove={() => remove(tag)}>{tag}</Chip>
+<Chip icon={tag} selected={$on} selectedIcon={false} onClick={toggle}>Design</Chip>   // no tick: the icon stays
+<Chip selected={$on} selectedIcon={heart} onClick={toggle}>Liked</Chip>              // your own mark
+<Chip onRemove={drop} removeIcon={trash} removeLabel="Delete tag">{tag}</Chip>
 ```
 
 ## Props
@@ -19,7 +22,12 @@ with `aria-pressed`), and a **removable** tag (`onRemove`, an ×-button with an 
 | `icon` | icon | — | leading icon (a tick replaces it while selected) |
 | `selected` | boolean / accessor | — | makes it a toggle button |
 | `onClick` | `(e) => void` | — | makes it a toggle button |
+| `selectedIcon` | boolean / node / icon | `true` | the tick of a selected chip: `false` keeps `icon`, a node or icon replaces the tick |
 | `onRemove` | `() => void` | — | adds the remove button |
+| `removeLabel` | string / accessor | "Remove" | accessible name of the remove button |
+| `removeIcon` | node / icon | × | icon of the remove button |
+| `class` | class | — | extra classes on the chip |
+| `children` | node | — | the label |
 
 ## Accessibility
 

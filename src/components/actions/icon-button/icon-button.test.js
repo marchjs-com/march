@@ -17,3 +17,18 @@ test("IconButton: named, sized, toned; a label is required", () => {
   m.dispose();
   assert.throws(() => mount(() => h(IconButton, { icon: "x" })), /needs a label/);
 });
+
+test("IconButton: colour token; the tooltip can be replaced or turned off", () => {
+  const m = mount(() => [
+    h(IconButton, { icon: "x", label: "Close", color: "brand-blue", title: false }),
+    h(IconButton, { icon: "x", label: "Close", title: "Close the panel" }),
+  ]);
+  const [a, b] = m.el.querySelectorAll("button");
+  assert.equal(a.getAttribute("data-hm-color"), "brand-blue");
+  assert.equal(a.hasAttribute("title"), false);
+  assert.equal(a.hasAttribute("color"), false);
+  assert.equal(a.getAttribute("aria-label"), "Close");
+  assert.equal(b.getAttribute("title"), "Close the panel");
+  assert.equal(b.getAttribute("data-hm-color"), null);
+  m.dispose();
+});

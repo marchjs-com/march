@@ -15,8 +15,14 @@ export interface ChipProps {
   icon?: unknown;
   /** Toggle chip (filters): pressed state. */
   selected?: MaybeFn<boolean | undefined>;
+  /** The tick of a selected chip: true (default), false (the chip's own icon stays), or your own node / icon. */
+  selectedIcon?: unknown;
   onClick?: (e: MouseEvent) => void;
   onRemove?: () => void;
+  /** Accessible name of the remove button (default: "Remove", translated). */
+  removeLabel?: MaybeFn<string | undefined>;
+  /** Icon of the remove button (default: ×): your own node / icon. */
+  removeIcon?: unknown;
   size?: "sm" | "md";
   class?: ClassProp;
   children?: unknown;
@@ -26,10 +32,13 @@ export function Chip(props: ChipProps): Element {
   const toggle = props.selected !== undefined || props.onClick != null;
   const cls = (): string => cx("hm-chip2", `hm-chip2-${val(props.tone) ?? "neutral"}`, props.size === "sm" && "hm-chip2-sm", toggle && "hm-chip2-btn", val(props.selected) && "is-selected", val(props.class));
   const body = [
-    () => (toggle && val(props.selected) ? h("span", { class: "hm-chip2-icon" }, glyph(check)) : icon(props.icon, "hm-chip2-icon")),
+    () => (!toggle || !val(props.selected) || props.selectedIcon === false ? icon(props.icon, "hm-chip2-icon")
+      : props.selectedIcon == null || props.selectedIcon === true ? h("span", { class: "hm-chip2-icon" }, glyph(check))
+      : h("span", { class: "hm-chip2-icon", "aria-hidden": "true" }, icon(props.selectedIcon, "hm-chip2-own"))),
     h(OverflowText, { class: "hm-chip2-label" }, props.children),
   ];
-  const remove = props.onRemove && h("button", { type: "button", class: "hm-chip2-x", "aria-label": () => t`Remove`, onClick: (e: Event) => { e.stopPropagation(); props.onRemove?.(); } }, glyph(xIcon));
+  const remove = props.onRemove && h("button", { type: "button", class: "hm-chip2-x", "aria-label": () => val(props.removeLabel) ?? t`Remove`, onClick: (e: Event) => { e.stopPropagation(); props.onRemove?.(); } },
+    props.removeIcon == null || props.removeIcon === true ? glyph(xIcon) : icon(props.removeIcon, "hm-chip2-own"));
   if (toggle) return h("span", { "data-hm-color": () => colorAttr(props.color), class: cls }, h("button", { type: "button", class: "hm-chip2-hit", "aria-pressed": () => (props.selected !== undefined ? String(!!val(props.selected)) : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, body), remove);
   return h("span", { "data-hm-color": () => colorAttr(props.color), class: cls }, body, remove);
 }

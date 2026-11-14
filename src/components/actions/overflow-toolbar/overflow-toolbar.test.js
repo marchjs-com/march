@@ -46,3 +46,36 @@ test("OverflowToolbar: toolbar role, command items, toggles, separators, one tab
   m.dispose();
   save.dispose();
 });
+
+test("OverflowToolbar: More label and icon, tooltips off, colour token, your own return motion", async () => {
+  // a measurable row: every item 40 px wide, the width given by a ResizeObserver stand-in
+  let resize = null;
+  const RO = globalThis.ResizeObserver;
+  globalThis.ResizeObserver = class { constructor(cb) { resize = cb; } observe() {} disconnect() {} };
+  const proto = document.createElement("div").constructor.prototype;
+  const had = Object.getOwnPropertyDescriptor(proto, "offsetWidth");
+  Object.defineProperty(proto, "offsetWidth", { get() { return 40; }, configurable: true });
+  const back = [];
+  const m = mount(() => h(OverflowToolbar, { label: "Editor", moreLabel: "Other tools", moreIcon: "+", tooltips: false, color: "brand-blue", motion: (el) => back.push(el),
+    items: [{ id: "a", label: "A", icon: "a", priority: 2 }, { id: "b", label: "B", icon: "b", priority: 1 }, { id: "c", label: "C", icon: "c" }] }));
+  await tick(); await tick();
+  const bar = m.el.querySelector('[role="toolbar"]');
+  assert.equal(bar.getAttribute("data-hm-color"), "brand-blue");
+  assert.equal(bar.querySelector(".hm-tip-anchor"), null, "no tooltips");
+  assert.equal(bar.querySelector(".hm-otb-btn").getAttribute("aria-label"), "A", "still named");
+  const moreBtn = bar.querySelector(".hm-otb-more").querySelector("button");
+  assert.equal(moreBtn.getAttribute("aria-label"), "Other tools");
+  assert.equal(moreBtn.textContent, "+");
+  resize([{ contentRect: { width: 20 } }]);
+  await tick();
+  const hidden = () => [...bar.querySelectorAll(".hm-otb-item")].filter((x) => x.hidden).length;
+  assert.ok(hidden() > 0, "narrow: items moved to More");
+  assert.equal(back.length, 0);
+  resize([{ contentRect: { width: 900 } }]);
+  await tick();
+  assert.equal(hidden(), 0);
+  assert.ok(back.length > 0 && back.every((el) => el.className === "hm-otb-item"), "the returning items got the custom motion");
+  m.dispose();
+  if (had) Object.defineProperty(proto, "offsetWidth", had); else delete proto.offsetWidth;
+  if (RO) globalThis.ResizeObserver = RO; else delete globalThis.ResizeObserver;
+});

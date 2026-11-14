@@ -8,6 +8,7 @@
 .hm-icon-btn.hm-btn-sm { width: var(--hm-control-h-sm); height: var(--hm-control-h-sm); font-size: var(--hm-text-md); }
 .hm-icon-btn.hm-btn-sm .hm-svg { width: .9375rem; height: .9375rem; }
 .hm-icon-btn-danger { color: var(--hm-danger); }
+.hm-icon-btn[data-hm-color] { color: var(--hm-accent-text, var(--hm-accent)); }
 .hm-icon-btn { position: relative; }
 .hm-icon-btn > .hm-badge-count { position: absolute; top: 2px; inset-inline-end: 0; min-width: 1rem; min-height: 1rem; padding: 0 .25rem; font-size: .625rem; line-height: 1rem;
   box-shadow: 0 0 0 2px var(--hm-bg); animation: hm-scale-in var(--hm-dur-slow) var(--hm-ease-spring); }

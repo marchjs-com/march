@@ -3,6 +3,7 @@
   background: var(--hm-surface); color: var(--hm-text-2); font-size: var(--hm-text-sm); font-weight: 500; white-space: nowrap; transition: background-color var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }
 .hm-chip2-sm { min-height: 1.375rem; padding: 0 .5rem; font-size: var(--hm-text-xs); }
 .hm-chip2-icon { display: inline-flex; } .hm-chip2-icon .hm-svg { width: .8125rem; height: .8125rem; }
+.hm-chip2-own { display: inline-flex; }
 .hm-chip2-label { overflow: hidden; text-overflow: ellipsis; }
 .hm-chip2-primary { --hm-chip-c: var(--hm-accent, var(--hm-primary)); } .hm-chip2-success { --hm-chip-c: var(--hm-success); } .hm-chip2-warn { --hm-chip-c: var(--hm-warn); }
 .hm-chip2-danger { --hm-chip-c: var(--hm-danger); } .hm-chip2-info { --hm-chip-c: var(--hm-info); }

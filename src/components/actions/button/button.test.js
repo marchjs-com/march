@@ -26,6 +26,23 @@ test("Button: variant, size, loading locks it, block", () => {
   m.dispose();
 });
 
+test("Button: the spinner can be turned off or replaced", () => {
+  const m = mount(() => [
+    h(Button, { loading: true, spinner: false, icon: "+" }, "A"),
+    h(Button, { loading: true, spinner: "~" }, "B"),
+    h(Button, { loading: true, icon: "+" }, "C"),
+  ]);
+  const [a, b, c] = m.el.querySelectorAll("button");
+  assert.equal(a.querySelector(".hm-btn-spin"), null);
+  assert.equal(a.querySelector(".hm-icon").textContent, "+", "the icon stays");
+  assert.equal(a.disabled, true, "still locked");
+  assert.equal(b.querySelector(".hm-btn-spin"), null);
+  assert.equal(b.querySelector(".hm-btn-spin-own").textContent, "~");
+  assert.ok(c.querySelector(".hm-btn-spin") && !c.querySelector(".hm-icon"));
+  assert.equal(a.hasAttribute("spinner"), false);
+  m.dispose();
+});
+
 test("ActionButton: hidden when not allowed, runs the action", async () => {
   let ran = 0;
   const ok = action("Run", async () => { ran++; });

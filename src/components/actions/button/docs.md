@@ -12,6 +12,8 @@ action handles confirmation, the reason prompt and the success / error toasts.
 <Button loading={$saving} on:click={save}>Save</Button>
 <Button href="/docs" iconEnd={arrowRight}>Docs</Button>
 <ActionButton action={remove} args={[row]} />
+<Button loading={$saving} spinner={false} icon={save}>Save</Button>   // no spinner: the icon stays
+<Button loading={$saving} spinner={<MyDots />}>Save</Button>          // your own busy mark
 ```
 
 ## Props
@@ -23,12 +25,18 @@ action handles confirmation, the reason prompt and the success / error toasts.
 | `color` | ColorToken | theme primary | accent of the primary variant |
 | `icon` / `iconEnd` | icon | — | leading / trailing icon |
 | `loading` | boolean / accessor | — | spinner, `aria-busy`, disabled |
+| `spinner` | boolean / node / icon | `true` | the loading spinner: `false` keeps the icon, a node or icon replaces it |
 | `disabled` | boolean / accessor | — | |
 | `block` | boolean | `false` | full width |
 | `href` | Href | — | router link |
 | `type` | `button` `submit` `reset` | `button` | |
+| `class` | class | — | extra classes on the button |
+| `children` | node | — | the label (`.hm-btn-label`) |
 
-ActionButton: `action`, `args`, `variant`, `size`, `icon`, `iconOnly`, `onDone`, `onError`.
+Other attributes (`onClick`, `title`, `aria-*`, `data-*`) go to the `<button>` / `<a>`.
+
+ActionButton: `action`, `args`, `variant`, `size`, `color`, `spinner`, `icon`, `iconOnly`, `class`, `onDone`, `onError`,
+`children` (replaces the action's label).
 
 ## Accessibility
 

@@ -24,3 +24,33 @@ test("CopyButton: writes the text, confirms, then resets; icon-only is named", a
   assert.ok(a.className.includes("is-copied"));
   m.dispose();
 });
+
+test("CopyButton: your own texts, icons, colour; the failure toast can be turned off", async () => {
+  Object.defineProperty(globalThis.navigator, "clipboard", { value: { writeText: async () => {} }, configurable: true });
+  const m = mount(() => [
+    h(CopyButton, { text: "x", icon: "@", copiedIcon: "♥", copiedLabel: "Got it", copiedColor: "brand-blue" }),
+    h(CopyButton, { text: "x", iconOnly: true, icon: "@", copiedIcon: false, copiedLabel: "Got it" }),
+  ]);
+  const [a, b] = m.el.querySelectorAll("button");
+  assert.equal(a.textContent, "@Copy");
+  assert.equal(a.getAttribute("data-hm-color"), null);
+  a.click(); b.click();
+  await tick();
+  assert.equal(a.textContent, "♥Got it");
+  assert.equal(a.getAttribute("data-hm-color"), "brand-blue");
+  assert.equal(b.textContent, "@", "copiedIcon false: the icon does not change");
+  assert.equal(b.getAttribute("aria-label"), "Got it");
+  m.dispose();
+
+  Object.defineProperty(globalThis.navigator, "clipboard", { value: { writeText: async () => { throw new Error("denied"); } }, configurable: true });
+  let failed = null;
+  const toasts = () => document.querySelectorAll(".hm-toast").length;
+  const before = toasts();
+  const n = mount(() => h(CopyButton, { text: "x", errorText: false, onError: (e) => { failed = e; } }));
+  n.el.querySelector("button").click();
+  await tick();
+  assert.equal(failed.message, "denied");
+  assert.equal(toasts(), before, "no toast");
+  assert.equal(n.el.querySelector("button").textContent, "Copy");
+  n.dispose();
+});

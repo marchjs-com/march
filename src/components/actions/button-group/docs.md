@@ -15,6 +15,8 @@ has `role="group"` and a label, so screen readers announce what the buttons belo
 |---|---|---|---|
 | `label` | string / accessor | — | accessible name of the group |
 | `attached` | boolean | `false` | one strip, no gaps |
+| `class` | class | — | extra classes on the group |
+| `children` | nodes | — | the buttons |
 
 ## Accessibility
 

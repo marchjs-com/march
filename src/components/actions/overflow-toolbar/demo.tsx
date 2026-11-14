@@ -1,4 +1,5 @@
-// Showcase stage for OverflowToolbar: narrow the bar with the Playground width and watch items move to More.
+// Showcase stage for OverflowToolbar: narrow the bar with the Playground width and watch items move to More; widen it
+// to see them come back with the chosen motion. The More icon and the colour of pressed toggles follow the options.
 import { signal } from "../../../core/reactive.ts";
 import { OverflowToolbar, type ToolbarItem } from "./index.ts";
 import { command } from "../../../managers/command/index.ts";
@@ -13,6 +14,9 @@ import { download } from "../../../icons/glyphs/download.ts";
 import { send as share } from "../../../icons/glyphs/send.ts";
 import { undo } from "../../../icons/glyphs/undo.ts";
 import { redo } from "../../../icons/glyphs/redo.ts";
+import { menu } from "../../../icons/glyphs/menu.ts";
+import { animate } from "../../../motion/animate.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<OverflowToolbar label="Belge" items={[
   { id: "new", label: "Yeni", icon: plus, onSelect: create, priority: 10 },
@@ -20,9 +24,9 @@ export const code = `<OverflowToolbar label="Belge" items={[
   { id: "s1", separator: true },
   { id: "split", label: "Böl", icon: columns, pressed: () => $split, onSelect: () => $split = !$split },
   { id: "delete", label: "Sil", icon: trash, danger: true },  // sığmayan "Daha fazla" menüsüne gider
-]} />`
+]} moreIcon={menu} moreLabel="Diğer araçlar" motion="fade" color="brand-purple" />   // motion: pop | fade | none | (el) => …`
 
-export default function OverflowToolbarDemo(props: { values: { width: number; size: string; labels: boolean } }) {
+export default function OverflowToolbarDemo(props: { values: { width: number; size: string; labels: boolean; motion: string; moreIcon: string; color: string } }) {
   const split = signal(false), preview = signal(true)
   const say = (m: string) => () => { toast(m) }
   command({ id: "demo.export", title: "Dışa aktar", icon: download, shortcut: "mod+e", group: "Belge", run: say("Dışa aktarıldı") })
@@ -44,6 +48,11 @@ export default function OverflowToolbarDemo(props: { values: { width: number; si
     ]
   }
   return <div class="sc-otb-stage" style={{ "--sc-otb-w": `${props.values.width}px` }}>
-    {() => <OverflowToolbar label="Belge araçları" items={items} size={props.values.size as "sm"} />}
+    {() => {
+      const v = props.values
+      const motion = v.motion === "own" ? (el: Element) => animate(el, [{ opacity: 0, transform: "translateY(-10px)" }, { opacity: 1, transform: "none" }], { duration: 320, easing: "easeOutBack" }) : v.motion as "pop"
+      return <OverflowToolbar label="Belge araçları" items={items} size={v.size as "sm"} motion={motion}
+        moreIcon={v.moreIcon === "menu" ? menu : v.moreIcon === "plus" ? plus : undefined} color={(v.color || undefined) as ColorToken | undefined} />
+    }}
   </div>
 }

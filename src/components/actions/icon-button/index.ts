@@ -3,12 +3,17 @@ import "./icon-button.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, rest, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { buttonSizeClass, type ButtonSize } from "../button/index.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 /** Props of <IconButton>. `label` (or aria-label) is required. */
 export interface IconButtonProps {
   icon?: unknown;
   label?: MaybeFn<string>;
   "aria-label"?: MaybeFn<string>;
+  /** The native tooltip: the label by default, your own text, or false for none. */
+  title?: MaybeFn<string | undefined> | false;
+  /** Theme color token of the icon (default: muted text). */
+  color?: ColorToken | undefined;
   variant?: string | undefined;
   size?: MaybeFn<ButtonSize | undefined>;
   class?: ClassProp;
@@ -18,9 +23,10 @@ export interface IconButtonProps {
 /** Icon-only button. `label` is required (aria-label + tooltip title). `<IconButton icon="✕" label="Close" onClick={…}/>` */
 export function IconButton(props: IconButtonProps): Element {
   if (props.label == null && props["aria-label"] == null) throw new Error("March: <IconButton> needs a label (accessible name).");
-  const attrs = rest(props, ["icon", "label", "variant", "size"]);
+  const attrs = rest(props, ["icon", "label", "variant", "size", "title", "color"]);
   return h("button", {
     type: "button", ...attrs, class: () => cx("hm-icon-btn", props.variant && `hm-icon-btn-${props.variant}`, buttonSizeClass(val(props.size)), val(props.class)),
-    "aria-label": () => val(props.label) ?? val(props["aria-label"]), title: () => val(props.label),
+    "aria-label": () => val(props.label) ?? val(props["aria-label"]), title: () => (props.title === false ? null : val(props.title) ?? val(props.label)),
+    "data-hm-color": () => colorAttr(props.color),
   }, icon(val(props.icon)) ?? props.children);
 }

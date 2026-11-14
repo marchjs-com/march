@@ -13,6 +13,9 @@ always agree.
   { id: "split", label: "Split", icon: columns, pressed: () => $split, onSelect: () => $split = !$split },
   { id: "delete", label: "Delete", icon: trash, danger: true },
 ]} />
+<OverflowToolbar label="Document" items={items} moreLabel="Other tools" moreIcon={menu} tooltips={false}
+  motion="fade" color="brand-purple" />
+<OverflowToolbar label="Document" items={items} motion={(el) => animate(el, { opacity: [0, 1], y: [-8, 0] }, { duration: 240 })} />
 ```
 
 ## Props
@@ -23,6 +26,12 @@ always agree.
 | `label` | string | — | accessible name (required) |
 | `size` | `sm` `md` | `sm` | |
 | `end` | node | — | content after the items that never overflows |
+| `moreLabel` | string / accessor | "More actions" | name of the More button and its menu |
+| `moreIcon` | node / icon | three dots | icon of the More button |
+| `tooltips` | boolean | `true` | tooltips of icon-only buttons (`false`: names only) |
+| `motion` | `pop` `fade` `none` / `false` / `(el) => …` | `pop` | how an item comes back from the More menu; a function runs your own animation |
+| `color` | color token | theme primary | pressed toggles and the focus ring |
+| `class` | class | — | extra classes on the toolbar |
 
 With an icon, an item is icon-only (the label becomes its name and tooltip, with the shortcut) unless `showLabel`.
 Separators next to a hidden item disappear; in the More menu they become menu separators.

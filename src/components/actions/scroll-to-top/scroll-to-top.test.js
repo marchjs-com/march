@@ -45,3 +45,30 @@ test("ScrollToTop: the page button follows the page (window or an app's scrollin
   assert.equal(btn.getAttribute("data-shown"), "true", "an app shell's scrolling main is the page");
   dispose(); inner.remove(); main.remove();
 });
+
+test("ScrollToTop: your own icon, class, colour and motion (a function, or none)", () => {
+  const box = document.createElement("div"); document.body.appendChild(box);
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const calls = [];
+  const dispose = render(() => [
+    h(ScrollToTop, { inline: true, target: box, threshold: 100, icon: "^", class: "mine", color: "brand-blue", label: () => "Up", motion: (el, shown) => calls.push([el, shown]) }),
+    h(ScrollToTop, { inline: true, target: box, threshold: 100, motion: "none", smooth: false }),
+  ], host);
+  const [a, b] = host.querySelectorAll(".hm-to-top");
+  assert.ok(a.className.includes("mine"));
+  assert.equal(a.textContent, "^");
+  assert.equal(a.querySelector("svg"), null);
+  assert.equal(a.getAttribute("data-hm-color"), "brand-blue");
+  assert.equal(a.getAttribute("aria-label"), "Up");
+  assert.ok(b.querySelector("svg"), "the default arrow");
+  box.scrollTop = 250;
+  box.dispatchEvent(new Event("scroll"));
+  assert.deepEqual(calls, [[a, true]]);
+  assert.equal(b.getAttribute("data-shown"), "true");
+  assert.equal(b.inert, false);
+  b.click();
+  assert.equal(box.scrollTop, 0, "smooth={false}: jumps at once");
+  box.dispatchEvent(new Event("scroll"));
+  assert.deepEqual(calls.map((c) => c[1]), [true, false]);
+  dispose(); box.remove();
+});

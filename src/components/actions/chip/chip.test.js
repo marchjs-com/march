@@ -27,3 +27,20 @@ test("Chip: static, toggle (aria-pressed) and removable", () => {
   assert.equal(c.querySelector(".hm-chip2-x").getAttribute("aria-label"), "Remove");
   m.dispose();
 });
+
+test("Chip: the tick and the remove button are yours (off, own icon, own name)", () => {
+  const m = mount(() => [
+    h(Chip, { selected: true, selectedIcon: false, icon: "#" }, "Keep"),
+    h(Chip, { selected: true, selectedIcon: "♥" }, "Own"),
+    h(Chip, { onRemove: () => {}, removeLabel: "Delete tag", removeIcon: "–" }, "Tag"),
+  ]);
+  const [a, b, c] = m.el.querySelectorAll(".hm-chip2");
+  assert.equal(a.querySelector(".hm-chip2-icon").textContent, "#", "no tick: the chip's icon stays");
+  assert.equal(a.querySelector("svg"), null);
+  assert.equal(b.querySelector(".hm-chip2-icon").textContent, "♥");
+  assert.equal(b.querySelector("svg"), null);
+  const x = c.querySelector(".hm-chip2-x");
+  assert.equal(x.getAttribute("aria-label"), "Delete tag");
+  assert.equal(x.textContent, "–");
+  m.dispose();
+});
