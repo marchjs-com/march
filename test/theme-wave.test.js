@@ -71,31 +71,76 @@ test("themeWave: without View Transitions the change lands at once; with them it
   delete document.startViewTransition; delete root.animate;
 });
 
-test("themeWave shape spray: the new snapshot is masked by patches that start at the press and end as a full mask", async () => {
-  const W = await import("../src/motion/theme-wave.ts");
-  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  const frames = W.sprayFrames(100, 40, 800, 600, rnd);
-  assert.equal(frames.length, 31);
-  assert.equal(frames[0].offset, 0);
-  assert.match(frames[0].maskImage, /^linear-gradient\(transparent/, "nothing painted yet");
-  assert.match(frames[3].maskImage, /radial-gradient\(circle at 100px 40px/, "the first burst is where the press was");
-  const count = (f) => (f.maskImage.match(/radial-gradient/g) ?? []).length;
-  assert.ok(count(frames[20]) > count(frames[5]), "the paint spreads");
-  assert.equal(frames.at(-1).maskImage, "linear-gradient(#000, #000)", "it ends covering the screen");
-  assert.equal(frames.at(-1).webkitMaskImage, frames.at(-1).maskImage);
+test("painted theme waves (drip, spray, sweep, splat): no place left bare at the end; nothing painted at the start; layers that tween", async () => {
+  const P = await import("../src/motion/theme-paint.ts");
+  // how much paint a layer puts on a point (the pictures' gradient stops) at a moment of the wave
+  const dot = (q) => (q < 0.38 ? 1 : q < 0.58 ? 1 - (q - 0.38) / 0.2 * 0.3 : q < 0.78 ? 0.7 - (q - 0.58) / 0.2 * 0.42 : q < 1 ? 0.28 * (1 - (q - 0.78) / 0.22) : 0);
+  const ink = (l, t, x, y) => {
+    const [bx, by, bw, bh] = l.box(t);
+    if (bw <= 0 || bh <= 0) return 0;
+    if (l.kind === "dot") return dot(Math.hypot((x - bx - bw / 2) / (bw / 2), (y - by - bh / 2) / (bh / 2)));
+    if (x < bx || x > bx + bw || y < by || y > by + bh) return 0;
+    if (l.kind === "band") { const f = (x - bx) / bw; return f < 0.28 ? f / 0.28 : f > 0.72 ? (1 - f) / 0.28 : 1; }
+    const g = (y - by) / bh; return g < 0.55 ? 1 : (1 - g) / 0.45;
+  };
+  for (const shape of ["drip", "spray", "sweep", "splat"]) {
+    let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const layers = P.paintLayers(shape, 900, 600, { x: 100, y: 40 }, rnd);
+    for (let x = 0; x <= 900; x += 15) for (let y = 0; y <= 600; y += 15) {
+      const sum = layers.reduce((a, l) => a + ink(l, 1, x, y), 0);
+      assert.ok(sum >= 0.95, `${shape}: bare at ${x},${y}: ${sum.toFixed(2)}`);
+    }
+    const area = (t) => layers.reduce((a, l) => { const [, , bw, bh] = l.box(t); return a + Math.max(0, bw) * Math.max(0, bh); }, 0);
+    assert.ok(area(0) < 900 * 600 * 0.02, `${shape}: next to nothing painted at the start`);
+    const frames = P.paintFrames(layers);
+    assert.equal(frames.length, 17);
+    assert.ok(frames.every((f) => f.maskSize.split(", ").length === layers.length + 1 && f.maskPosition.split(", ").length === layers.length + 1), `${shape}: the same layers in every keyframe`);
+    const mask = P.paintMask(layers);
+    assert.equal(mask.composite.split(", ")[0], "subtract");
+    assert.equal(mask.image.split("gradient(").length - 1, layers.length + 1);
+  }
+  // drip: streams (bands led by drops, no chains of circles) from the top; some reach the bottom much sooner
+  let seed = 3; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const drip = P.dripLayers(900, 600, rnd);
+  assert.equal(drip[0].kind, "pool");
+  const bands = drip.filter((l, i) => l.kind === "band" && drip[i + 1]?.kind === "band");
+  assert.ok(bands.length >= 6 && bands.every((l) => l.box(0.5)[1] === 0), "every stream runs from the top");
+  const down = bands.map((l) => { for (let t = 0; t <= 1; t += 0.01) if (l.box(t)[3] >= 600) return t; return 1; });
+  assert.ok(Math.max(...down) - Math.min(...down) > 0.2, "some streams are faster than others");
+});
 
+test("painted wave: a live veil over the live page; the page takes the new look at once; the part loads lazily", async () => {
+  globalThis.CSS = { supports: () => true };
+  globalThis.getComputedStyle = () => ({ length: 1, 0: "--m-bg", colorScheme: "light", backgroundColor: "#fff", getPropertyValue: () => "#fff" });
+  let observed = null;
+  globalThis.MutationObserver = class { constructor(cb) { observed = cb; } observe() {} disconnect() {} };
+  const main = document.createElement("main"); main.id = "m";
+  const para = document.createElement("p"); para.className = "t"; para.textContent = "old";
+  main.appendChild(para); document.body.appendChild(main);
   const anims = [];
-  let finish;
-  document.startViewTransition = (cb) => { const done = new Promise((r) => { finish = () => { cb(); r(); }; }); return { ready: Promise.resolve(), finished: done }; };
-  root.animate = (kf, o) => { anims.push([kf, o]); return { cancel() {}, pause() {}, play() {}, addEventListener() {}, effect: { getTiming: () => ({}) }, updatePlaybackRate() {} }; };
-  const wave = M.themeWave(() => {}, { origin: { x: 10, y: 10 }, shape: "spray" });
-  await tick();
-  assert.equal(anims.length, 1);
-  assert.equal(anims[0][0].length, 31);
-  assert.equal(anims[0][1].pseudoElement, "::view-transition-new(root)");
-  assert.equal(anims[0][1].duration, 1100);
-  finish(); await wave;
-  delete document.startViewTransition; delete root.animate;
+  const proto = Object.getPrototypeOf(document.body);
+  const before = proto.animate;
+  proto.animate = function (kf, o) { const a = { kf, o, cancel() {}, pause() {}, play() {}, addEventListener(type, fn) { if (type === "finish") a.done = fn; }, effect: { getTiming: () => ({}) } }; anims.push(a); return a; };
+  let changed = 0;
+  const wave = M.themeWave(() => { changed++; }, { shape: "drip" });
+  for (let i = 0; i < 20 && !anims.length; i++) await tick(5);
+  const veil = document.documentElement.querySelector(".m-wave-veil");
+  assert.ok(veil, "the veil is up");
+  assert.equal(changed, 1, "the page took the new look at once (no waiting)");
+  assert.equal(veil.getAttribute("aria-hidden"), "true");
+  assert.equal(veil.querySelector("[id]"), null, "no duplicate ids in the copy");
+  assert.equal(veil.querySelector(".t")?.textContent, "old");
+  assert.equal(veil.style.getPropertyValue("--m-bg"), "#fff", "the old look's tokens are on the veil");
+  // live: a change of the page shows in the copy
+  para.setAttribute("class", "t is-on");
+  observed([{ type: "attributes", target: para, attributeName: "class" }]);
+  assert.equal(veil.querySelector(".t").getAttribute("class"), "t is-on", "the copy follows the page");
+  const run = anims.find((a) => a.o?.duration === 1600);
+  assert.ok(run, "the paint runs for 1600 ms");
+  run.done(); await wave;
+  assert.equal(document.documentElement.querySelector(".m-wave-veil"), null, "the veil is gone at the end");
+  proto.animate = before; delete globalThis.CSS; delete globalThis.getComputedStyle; delete globalThis.MutationObserver;
+  main.remove();
 });
 
 test("spotlight: every card near the pointer is lit from the pointer's place (also from the gap between two)", async () => {

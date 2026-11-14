@@ -89,9 +89,21 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
 - `themeWave(change, { origin, duration, easing })` runs a page-wide restyle as a circle of the new look that grows
   from `origin` (a viewport point or an element): a View Transition whose new snapshot is clipped by an engine
   animation (`:root[data-m-wave]` turns the browser's cross-fade off, motion.css). Without View Transitions, with
-  reduced motion or while paused the change lands at once. `shape: "spray"` paints the new look on instead: soft
-  patches on a jittered grid (with fine drops around them) start nearest the press and spread until the screen is
-  covered (a run of mask keyframes on the new snapshot, `sprayFrames`; default 1100 ms). The showcase uses it.
+  reduced motion or while paused the change lands at once. Painted shapes (`shape: "drip" | "spray" | "sweep" | "splat"`, src/motion/theme-paint.ts: a lazy part,
+  loaded the first time one runs; `installThemeWave` with a painted shape loads it ahead) bring the new look in with no
+  snapshot and no waiting: the page takes the new look at once and stays live and usable (every press and key reaches
+  it, its animations run on); above it a passive veil (`.m-wave-veil`: no pointer, inert, hidden from assistive tech)
+  holds a live copy of the page in the old look (the root's custom properties as they were; cut to what is near the
+  screen; no ids, frames or media; kept in step with the page while it is up: text, attributes, inline styles, nodes,
+  field values, scroll places, canvas pictures every frame, every running animation and transition at the page's own
+  time), and paint eats the veil away. The paint is mask layers subtracted from a full layer, whose sizes and places
+  tween between keyframes (`paintLayers`, `paintFrames`, `paintMask`; default 1600 ms):
+  - `drip`: paint gathers along the top and runs down in streams (soft-sided bands led by a round drop, thicker near
+    the top), each at its own speed, thickening into each other until nothing is bare. The showcase uses it.
+  - `spray`: one nozzle from a random place paints a dense core and a mist of drops, in strokes of changing
+    direction, each heading for a bare part.
+  - `sweep`: the nozzle sweeps its row from a random place, then the rows below and above in turn.
+  - `splat`: patches burst out from the pressed point, specks flying ahead.
 - `installThemeWave()` puts it around every `setTheme` / `setColorTheme` / `setAccent` (through `setRestyleTransition`
   of hadi-march/ui), so ThemeMenu, ThemePicker, ThemeToggle and AccentPicker all spread from the pressed point (the
   focused control for a key press). It returns the function that turns it off.

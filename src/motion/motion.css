@@ -25,6 +25,10 @@
    so the browser's own cross-fade is off while a wave runs */
 :root[data-m-wave]::view-transition-old(root), :root[data-m-wave]::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 :root[data-m-wave]::view-transition-new(root) { z-index: 2; }
+/* themeWave({ shape: "spray" }): the passive veil over the live page, a copy of the page in the old look that the
+   spray eats away (its mask is set and animated by the helper); it never takes the pointer */
+.m-wave-veil { position: fixed; inset: 0; z-index: 2147483000; overflow: hidden; contain: strict; pointer-events: none; mask-repeat: no-repeat; }
+.m-wave-veil > body { position: absolute; margin: 0; overflow: hidden; }
 
 /* spotlight(): the light of a card near the pointer. --m-spot-x / --m-spot-y are the pointer's place inside the card;
    a soft glow over the card and a brighter ring on its border. Own colour: --m-spot-color; strength: --m-spot-glow. */
