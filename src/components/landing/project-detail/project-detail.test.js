@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { ProjectDetail } = await import("./index.ts");
@@ -30,8 +31,8 @@ test("ProjectDetail: own texts, parts off, colour, no reveal", () => {
     cover: h("div", {}), gallery: [{ src: "/g.jpg", alt: "G", width: 800, height: 600 }] };
   const next = { project: { id: "b", title: "B", cover: h("div", {}) }, onOpen: () => {} };
   const dispose = render(() => [
-    h(ProjectDetail, { project, next, onBack: () => {}, class: "one", color: "brand-orange", nextIcon: h("i", { class: "mine" }),
-      labels: { back: "Back", next: "Up next", role: "Job", services: "Did", openImage: (n) => `Photo ${n}` } }),
+    mProps(h(ProjectDetail, { project, next, onBack: () => {}, class: "one", nextIcon: h("i", { class: "mine" }),
+      labels: { back: "Back", next: "Up next", role: "Job", services: "Did", openImage: (n) => `Photo ${n}` } }), { color: "brand-orange" }),
     h(ProjectDetail, { project: { ...project, cover: h("div", {}) }, next: { ...next, project: { ...next.project, cover: h("div", {}) } }, onBack: () => {}, class: "two", facts: false, eyebrow: false, backIcon: false, nextIcon: false, reveal: false }),
   ], el);
   const one = el.querySelector(".one");

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { TreeView } = await import("./index.ts");
@@ -109,7 +110,7 @@ test("TreeView: a lazy folder that starts open loads its children at once", asyn
 
 test("TreeView: own texts, own / no chevron, empty state off or own, selection colour", async () => {
   const m = mount(() => [
-    h(TreeView, { nodes: nodes(), search: "zzz", labels: { noMatch: (q) => `none for ${q}`, retry: "Again" }, chevron: false, color: "brand-purple", animate: false, load: async () => { throw new Error("x"); } }),
+    mProps(h(TreeView, { nodes: nodes(), search: "zzz", labels: { noMatch: (q) => `none for ${q}`, retry: "Again" }, chevron: false, animate: false, load: async () => { throw new Error("x"); } }), { color: "brand-purple" }),
     h(TreeView, { nodes: nodes(), expanded: ["src"], chevron: (n, open) => h("b", { class: "own-chev" }, open ? "-" : "+") }),
     h(TreeView, { nodes: [], empty: false }),
     h(TreeView, { nodes: [], empty: h("i", { class: "own-empty" }, "nothing") }),

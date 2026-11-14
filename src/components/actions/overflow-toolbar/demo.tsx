@@ -24,7 +24,7 @@ export const code = `<OverflowToolbar label="Belge" items={[
   { id: "s1", separator: true },
   { id: "split", label: "Böl", icon: columns, pressed: () => $split, onSelect: () => $split = !$split },
   { id: "delete", label: "Sil", icon: trash, danger: true },  // sığmayan "Daha fazla" menüsüne gider
-]} moreIcon={menu} moreLabel="Diğer araçlar" motion="fade" color="brand-purple" />   // motion: pop | fade | none | (el) => …`
+]} moreIcon={menu} moreLabel="Diğer araçlar" motion="fade" m:color="brand-purple" />   // motion: pop | fade | none | (el) => …`
 
 export default function OverflowToolbarDemo(props: { values: { width: number; size: string; labels: boolean; motion: string; moreIcon: string; color: string } }) {
   const split = signal(false), preview = signal(true)
@@ -52,7 +52,7 @@ export default function OverflowToolbarDemo(props: { values: { width: number; si
       const v = props.values
       const motion = v.motion === "own" ? (el: Element) => animate(el, [{ opacity: 0, transform: "translateY(-10px)" }, { opacity: 1, transform: "none" }], { duration: 320, easing: "easeOutBack" }) : v.motion as "pop"
       return <OverflowToolbar label="Belge araçları" items={items} size={v.size as "sm"} motion={motion}
-        moreIcon={v.moreIcon === "menu" ? menu : v.moreIcon === "plus" ? plus : undefined} color={(v.color || undefined) as never} />
+        moreIcon={v.moreIcon === "menu" ? menu : v.moreIcon === "plus" ? plus : undefined} m:color={(v.color || undefined) as never} />
     }}
   </div>
 }

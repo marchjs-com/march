@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -25,7 +26,7 @@ test("timeTicks / timePercent: steps picked for the duration, or given", () => {
 
 test("TimeRuler: read-only ticks, labels and a head that follows the value", () => {
   const now = signal(500), duration = signal(2000);
-  const [el, dispose] = mount(() => h(TimeRuler, { duration, value: now, step: 500, major: 1000, color: "brand-orange" }));
+  const [el, dispose] = mount(() => mProps(h(TimeRuler, { duration, value: now, step: 500, major: 1000 }), { color: "brand-orange" }));
   const root = el.querySelector(".m-time-ruler");
   assert.equal(root.getAttribute("aria-hidden"), "true");
   assert.equal(root.getAttribute("data-m-color"), "brand-orange");

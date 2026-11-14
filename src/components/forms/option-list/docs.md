@@ -34,7 +34,7 @@ default, a listbox (one or many) or a menu of commands; a field can drive it wit
 | `inline` | boolean | `false` | hint beside the label |
 | `empty` | text / node / false | "No results" | shown when there are no options |
 | `renderOption` | `(item, { selected, active, index }) => node` | — | draw the inside of a row yourself |
-| `color` | color token | accent | colour of the chosen row |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `class` | class value | — | |
 
 Rows with the same `group` follow one SectionLabel heading.

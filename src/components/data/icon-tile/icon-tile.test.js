@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { IconTile } = await import("./index.ts");
@@ -22,7 +23,7 @@ test("IconTile: tone, size, decorative by default", () => {
 
 test("IconTile: color token, variant, shape, label, own content", () => {
   const [el, dispose] = mount(() => [
-    h(IconTile, { icon: users, color: "brand-orange", variant: "solid", shape: "round", label: "Members", class: "one" }),
+    mProps(h(IconTile, { icon: users, variant: "solid", shape: "round", label: "Members", class: "one" }), { color: "brand-orange" }),
     h(IconTile, { class: "two" }, h("b", { class: "own" }, "7")),
   ]);
   const one = el.querySelector(".one");

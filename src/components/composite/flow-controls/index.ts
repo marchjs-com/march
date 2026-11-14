@@ -28,6 +28,7 @@ import { stepForward } from "../../../icons/glyphs/stepForward.ts";
 import { refresh } from "../../../icons/glyphs/refresh.ts";
 import type { FlowStore } from "../flow-canvas/model.ts";
 import type { FlowRunner, RunState, TimelineEntry } from "./runner.ts";
+import { withColor } from "../../../theme/colors.ts";
 export * from "./runner.ts";
 
 const stateTone = (s: RunState): "neutral" | "primary" | "warn" | "success" | "danger" => ({ idle: "neutral", running: "primary", paused: "warn", done: "success", error: "danger" } as const)[s];
@@ -160,7 +161,7 @@ export function FlowTimeline(props: FlowTimelineProps): Element {
   return h(Card, { as: "div", class: () => cx("m-flowtl", val(props.class)), role: "region", "aria-label": () => props.labels?.region ?? t`Run timeline` },
     () => (val(props.axis) === false ? null : h("div", { class: "m-flowtl-axis", "aria-hidden": "true" },
       h("span"),
-      h(TimeRuler, { class: "m-flowtl-ticks", duration: span, value: () => (r.state() === "idle" ? null : r.elapsed()), ticks, color: "brand-orange" }))),
+      withColor(h(TimeRuler, { class: "m-flowtl-ticks", duration: span, value: () => (r.state() === "idle" ? null : r.elapsed()), ticks }), "brand-orange"))),
     () => (r.timeline().length
       ? h("ol", { class: "m-flowtl-rows" }, h(For, { each: r.timeline, key: (x: TimelineEntry) => `${x.node}`, children: row }))
       : props.empty === false ? null

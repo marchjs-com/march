@@ -17,7 +17,7 @@ bar. ChatBubble draws it over an answer; ChatComposer draws it above the field a
 | `text` | text / node / accessor | — | the quoted text |
 | `lines` | number | `2` | lines of the text kept; `0` shows all |
 | `variant` | `soft` `inverse` | `soft` | `inverse`: inside a coloured bubble (bar and name in the text colour) |
-| `color` | color token | `brand-orange` | bar and name |
+| `m:color` | color token | `brand-orange` | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `bar` | boolean | `true` | the bar at the start edge |
 | `onClose` | function | — | shows the cancel button and runs on it |
 | `close` | boolean / icon | shown with `onClose` | `false`: no button; an icon: your own |

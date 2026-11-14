@@ -14,7 +14,7 @@ import { listen } from "../../../core/util.ts";
 import { IconButton } from "../../../ui/button.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
-import { type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken, withColor } from "../../../theme/colors.ts";
 import { arrowUp } from "../../../icons/glyphs/arrowUp.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
@@ -80,8 +80,8 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
     s.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const btn = h(IconButton, { class: () => cx("m-to-top", val(props.class)), variant: "raised", shape: "round", size: "lg", color: props.color, label: () => val(props.label) ?? t`Back to top`, onClick: toTop,
-    icon: ownIcon(props.icon === false || props.icon == null ? undefined : props.icon, arrowUp) }) as HTMLElement;
+  const btn = withColor(h(IconButton, { class: () => cx("m-to-top", val(props.class)), variant: "raised", shape: "round", size: "lg", label: () => val(props.label) ?? t`Back to top`, onClick: toTop,
+    icon: ownIcon(props.icon === false || props.icon == null ? undefined : props.icon, arrowUp) }), props.color) as HTMLElement;
   btn.setAttribute("data-shown", "false");
   btn.inert = true;
   effect(() => {

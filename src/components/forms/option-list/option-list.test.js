@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -69,7 +70,7 @@ test("OptionList: menu of commands, groups with a SectionLabel, grid, empty text
   const opts = signal([{ value: "h1", label: "Heading", group: "Blocks" }, { value: "p", label: "Paragraph", group: "Blocks" }, { value: "img", label: "Image", group: "Media" }]);
   const ran = [];
   const m = mount(() => [
-    h(OptionList, { mode: "menu", options: opts, onPick: (v) => ran.push(v), columns: 2, size: "sm", color: "brand-orange", class: "mine" }),
+    mProps(h(OptionList, { mode: "menu", options: opts, onPick: (v) => ran.push(v), columns: 2, size: "sm", class: "mine" }), { color: "brand-orange" }),
     h(OptionList, { options: [], empty: "Nothing here" }),
     h(OptionList, { options: [], empty: false }),
     h(OptionList, { options: [{ value: "x", label: "X" }], renderOption: (it, s) => h("b", { class: "own-row" }, `${it.label}#${s.index}`) }),

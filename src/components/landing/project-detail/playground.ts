@@ -7,7 +7,7 @@ export default definePlayground<Values>({
     { key: "gallery", label: "Galeri", default: true },
     { key: "next", label: "Sonraki proje", default: true },
     { key: "facts", label: "Künye (rol, müşteri, yıl)", default: true },
-    { key: "color", label: "Kategori satırı rengi", default: "default", options: [{ value: "default", label: "vurgu rengi" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "brand-green", label: "yeşil" }] },
+    { key: "color", label: "Kategori satırı rengi", default: "default", options: [{ value: "default", label: "vurgu rengi" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "brand-green", label: "yeşil" }], prop: "m:color" },
     { key: "reveal", label: "Giriş hareketi", default: "up", options: [{ value: "up", label: "yukarı" }, { value: "blur", label: "bulanık" }, { value: "scale", label: "ölçek" }, { value: "off", label: "yok" }] },
   ],
 });

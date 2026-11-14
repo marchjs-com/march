@@ -9,6 +9,7 @@ import type { ColorToken } from "../../../theme/colors.ts";
 import { arrowUpRight } from "../../../icons/glyphs/arrowUpRight.ts";
 import { OverflowText } from "../../typography/overflow-text/index.ts";
 import { IconTile, type IconTone } from "../../data/icon-tile/index.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 export interface LinkCardProps {
   href: Href;
@@ -33,7 +34,7 @@ export function LinkCard(props: LinkCardProps): Element {
     ...rest(props, ["href", "title", "description", "icon", "tone", "color", "lead", "meta", "arrow", "class"]),
     href: props.href, class: () => cx("m-link-card", val(props.class)),
     children: [
-      props.lead != null ? h("span", { class: "m-link-card-lead" }, props.lead) : props.icon != null && h(IconTile, { icon: props.icon, tone: props.tone, color: props.color }),
+      props.lead != null ? h("span", { class: "m-link-card-lead" }, props.lead) : props.icon != null && withColor(h(IconTile, { icon: props.icon, tone: props.tone }), props.color),
       h("span", { class: "m-link-card-text" },
         h(OverflowText, { class: "m-link-card-title" }, () => val(props.title)),
         props.description != null && h("span", { class: "m-link-card-desc" }, () => val(props.description))),

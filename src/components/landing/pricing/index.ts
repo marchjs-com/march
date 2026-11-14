@@ -16,7 +16,7 @@ import { minus } from "../../../icons/glyphs/minus.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { locale } from "../../../core/i18n.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
 import { Counter, formatCount } from "../counter/index.ts";
 // Reveal: entries enter one after another
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts";
@@ -99,7 +99,7 @@ export function Pricing(props: PricingProps): Element {
         mark === false ? null
           : typeof mark === "function" ? h("span", { class: "m-price-feat-own", "aria-hidden": "true" }, mark(x.included !== false))
           // a tick on a soft disc, or a dash for a feature the plan does not have (the line itself says "not included")
-          : h(CheckMark, { class: "m-price-feat-icon", variant: "soft", size: "sm", label: false, value: x.included !== false, icons: { no: minus }, color: x.included === false ? undefined : props.featureColor }),
+          : withColor(h(CheckMark, { class: "m-price-feat-icon", variant: "soft", size: "sm", label: false, value: x.included !== false, icons: { no: minus } }), x.included === false ? undefined : props.featureColor),
         h("span", {}, x.label, x.included === false ? h("span", { class: "m-sr-only" }, ` (${L.notIncluded ?? t`not included`})`) : null),
         x.hint != null ? h("span", { class: "m-price-feat-hint" }, x.hint) : null);
     });

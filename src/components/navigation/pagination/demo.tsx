@@ -4,7 +4,7 @@ import { Pagination } from "./index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<Pagination bind:page={$page} pages={20} siblings={1} />
-<Pagination bind:page={$page} pages={20} prev="‹ Geri" next="İleri ›" gap="·" color="brand-blue" />   // kendi metnin, işaretin, rengin
+<Pagination bind:page={$page} pages={20} prev="‹ Geri" next="İleri ›" gap="·" m:color="brand-blue" />   // kendi metnin, işaretin, rengin
 <Pagination bind:page={$page} pages={5} controls={false} gap={false} />                               // yalnız numaralar
 <Pagination variant="simple" bind:page={$page} total={200} size={$size} sizes={[10, 20, 50]} onSize={(n) => $size = n} />
 <Pagination variant="simple" hasPrev={$before != null} hasNext={$after != null} onPrev={older} onNext={newer} />   // imleç kipi`
@@ -24,7 +24,7 @@ export default function PaginationDemo(props: { values: { variant: string; pages
         controls={c !== "off"} prev={prev} next={next} />
       if (v.variant === "simple") return <Pagination variant="simple" page={clamp} total={() => props.values.pages * size()} size={size} setPage={(p: number) => page.set(p)}
         sizes={v.sizes ? [10, 20, 50] : undefined} onSize={(n: number) => size.set(n)} info={v.info} status={v.status} controls={c !== "off"} prev={prev} next={next} />
-      return <Pagination page={clamp} pages={() => props.values.pages} siblings={v.siblings} setPage={(p: number) => page.set(p)} color={color}
+      return <Pagination page={clamp} pages={() => props.values.pages} siblings={v.siblings} setPage={(p: number) => page.set(p)} m:color={color}
         controls={c !== "off"} prev={prev} next={next}
         gap={g === "off" ? false : g === "own" ? "·" : undefined} />
     }}

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { Overlay, quietMedia } = await import("./index.ts");
@@ -33,7 +34,7 @@ test("Overlay: a live front / opacity prop restacks and refades the layer", asyn
 });
 
 test("Overlay: a colour token and an own class", () => {
-  const m = mountD(() => h("div", null, h(Overlay, { effect: "spotlight", color: "brand-orange", class: "mine" }), h(Overlay, { effect: "dots" })));
+  const m = mountD(() => h("div", null, mProps(h(Overlay, { effect: "spotlight", class: "mine" }), { color: "brand-orange" }), h(Overlay, { effect: "dots" })));
   const [a, b] = m.el.querySelectorAll(".m-ov");
   assert.equal(a.getAttribute("data-m-color"), "brand-orange");
   assert.ok(a.classList.contains("mine") && a.classList.contains("m-ov-fx-spotlight"));

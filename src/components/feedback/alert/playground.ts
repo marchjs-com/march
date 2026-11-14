@@ -16,7 +16,7 @@ export default definePlayground<Values>({
   code: { children: (v) => text(v.tone)[1] },
   options: [
     { key: "tone", label: "Ton", default: "info", kind: "cards", options: [{ value: "info", label: "bilgi" }, { value: "success", label: "başarı" }, { value: "warn", label: "uyarı" }, { value: "danger", label: "tehlike" }, { value: "neutral", label: "nötr" }] },
-    { key: "color", label: "Renk", default: "tone", kind: "chips", options: [{ value: "tone", label: "tonun rengi" }, { value: "brand-purple", label: "mor" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }], toCode: { tone: null } },
+    { key: "color", label: "Renk", default: "tone", kind: "chips", options: [{ value: "tone", label: "tonun rengi" }, { value: "brand-purple", label: "mor" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }], toCode: { tone: null }, prop: "m:color" },
     { key: "icon", label: "İkon", default: "tone", kind: "segmented", options: [{ value: "tone", label: "tonun ikonu" }, { value: "own", label: "kendi ikonum" }, { value: "off", label: "yok" }], toCode: { tone: null, own: "{sparkles}", off: "{null}" } },
     { key: "title", label: "Başlık", default: true, toCode: (on, v) => (on ? JSON.stringify(text(v.tone)[0]) : null), fromCode: (a) => "title" in a },
     { key: "action", label: "Eylem düğmesi", default: "end", kind: "segmented", options: [{ value: "off", label: "yok" }, { value: "end", label: "metnin yanında" }, { value: "below", label: "metnin altında" }],

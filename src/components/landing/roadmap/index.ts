@@ -12,7 +12,7 @@ import { t } from "../../../core/i18n.ts";
 import { scrollIndicator, onScrollProgress } from "../../../motion/scroll-fx.ts";
 // Reveal: entries enter one after another
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export type RoadmapStatus = "done" | "now" | "next";
 export interface RoadmapItem { time?: unknown; title: unknown; body?: unknown; status?: RoadmapStatus | undefined; icon?: unknown }
@@ -24,8 +24,6 @@ export interface RoadmapProps {
   scroll?: boolean | undefined;
   /** The line with its fill (default true); false leaves the dots only. */
   rail?: boolean | undefined;
-  /** Colour of the fill and of the dots it has passed (default: the brand gradient and the accent). */
-  color?: ColorToken | undefined;
   /** Texts of the statuses (defaults: "Done", "In progress", "Planned"). */
   labels?: Partial<Record<RoadmapStatus, unknown>> | undefined;
   /** Entrance of the entries: Reveal options, or false for none (default: from the start, one after another). */
@@ -49,7 +47,7 @@ export function Roadmap(props: RoadmapProps): Element {
   const rail = props.rail !== false, scroll = props.scroll !== false;
   // the rail is a vertical Progress line over the Timeline: the scroll drives its fill (full without `scroll`)
   let fill: HTMLElement | null = null;
-  const root = h("div", { class: cx("m-rm", scroll && "is-scroll", val(props.class)), "data-m-color": colorAttr(props.color) },
+  const root = h("div", { class: cx("m-rm", scroll && "is-scroll", val(props.class)) },
     rail ? h(Progress, { variant: "line", orientation: "vertical", decorative: true, smooth: false, class: "m-rm-rail", ...(scroll ? { fillRef: (x: HTMLElement) => { fill = x; } } : { value: 100 }) }) : null, tl) as HTMLElement;
   if (scroll) {
     // the motion core's scrollIndicator fills the line (an indicator: it keeps working with reduced motion); the dots

@@ -7,7 +7,7 @@ import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
 import { Button } from "../../actions/button/index.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { refresh as refreshIcon } from "../../../icons/glyphs/refresh.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
@@ -30,8 +30,6 @@ export interface PullToRefreshProps {
   indicator?: boolean | ((phase: PullPhase) => unknown) | undefined;
   /** Glyph or node that turns inside the indicator (default: the refresh glyph). */
   icon?: unknown;
-  /** Theme color of the indicator when ready and while refreshing (default: primary). */
-  color?: ColorToken | undefined;
   /** Settle (spring back) duration in ms; false or 0 snaps. Default 260. */
   settle?: number | false | undefined;
   /** The keyboard "Refresh" button that appears on focus (default true). */
@@ -114,7 +112,7 @@ export function PullToRefresh(props: PullToRefreshProps): Element {
     ref: (x: HTMLElement) => { root = x; gesture(x); queueMicrotask(touchPolicy); },
     onScroll: touchPolicy,
   },
-  props.indicator !== false && h("div", { class: cx("m-ptr-ind", own && "is-own"), "aria-hidden": "true", "data-m-color": colorAttr(props.color), ref: (x: HTMLElement) => { ind = x; } },
+  props.indicator !== false && h("div", { class: cx("m-ptr-ind", own && "is-own"), "aria-hidden": "true", ref: (x: HTMLElement) => { ind = x; } },
     own ? () => own(phase())
       : h("span", { class: "m-ptr-spin", ref: (x: HTMLElement) => { spin = x; } }, ownIcon(props.icon, refreshIcon, "m-ptr-icon"))),
   props.refreshButton !== false && h(Button, { size: "sm", shape: "pill", class: "m-ptr-kbd", disabled: () => !!val(props.disabled) || phase() === "refreshing", onClick: () => { void run(); } }, () => props.labels?.refresh ?? t`Refresh`),

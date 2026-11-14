@@ -8,7 +8,7 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { cx, val, rest, isRtl, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { resizeHandle, type ResizeHandleOptions } from "../../../behaviors/resize-handle/index.ts";
 
 /** Where the handle sits on its (positioned) parent; "between": in the flow, between two flex items. */
@@ -26,8 +26,6 @@ export interface ResizeHandleProps extends Partial<Omit<ResizeHandleOptions, "va
   line?: MaybeFn<"hover" | "always" | "none" | undefined>;
   /** A visible grip in the middle: true (a short bar), or your own node. */
   grip?: boolean | Node | undefined;
-  /** Theme colour of the active line (default: the accent). */
-  color?: ColorToken | undefined;
   /** No pointer, no focus. */
   disabled?: MaybeFn<boolean | undefined>;
   /** Without `value` + `set`: arrow keys call this with a step in px along x (RTL mirrored) and y; Shift = 4 steps. */
@@ -54,7 +52,6 @@ export function ResizeHandle(props: ResizeHandleProps): Element {
     ...rest(props, USED),
     class: () => cx("m-resize-handle", `m-resize-handle-${edge}`, axis === "block" && "m-resize-handle-block", corner && "m-resize-handle-corner",
       `m-resize-handle-line-${val(props.line) ?? "hover"}`, val(props.disabled) && "is-disabled", val(props.class)),
-    "data-m-color": colorAttr(props.color),
     "aria-label": keys ? () => val(props.label) ?? t`Resize` : null,
     tabindex: keys ? () => (val(props.disabled) ? "-1" : (props.tabindex as string | undefined) ?? "0") : (props.tabindex as string | undefined) ?? null,
   },

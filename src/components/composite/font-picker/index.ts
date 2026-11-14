@@ -39,6 +39,7 @@ import {
   type FontCategory, type FontFamily, type FontSort, type FontSource,
 } from "./fonts.ts";
 import tr from "./tr.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 messages("tr", tr);
 
@@ -336,11 +337,10 @@ export function FontPicker(props: FontPickerProps): unknown {
       title: own ? () => own(font, { selected: selected(), favorite: fav() }) : name,
       sub: () => (own || props.meta === false ? null : meta()),
       trail: () => (selected() ? h(Icon, { of: check, class: "m-fp-tick" }) : null),
-      actions: () => (props.favorites === false ? null : h(IconButton, {
-        class: cx("m-fp-star", fav() && "is-on"), size: "sm", icon: fav() ? starFilled : star, pressed: fav(), color: fav() ? "brand-gold" : undefined,
+      actions: () => (props.favorites === false ? null : withColor(h(IconButton, {
+        class: cx("m-fp-star", fav() && "is-on"), size: "sm", icon: fav() ? starFilled : star, pressed: fav(),
         label: fav() ? L().removeFavorite ?? t`Remove ${font.family} from favorites` : L().addFavorite ?? t`Add ${font.family} to favorites`,
-        onClick: (e: MouseEvent) => { e.stopPropagation(); toggleFav(font.family); },
-      })),
+        onClick: (e: MouseEvent) => { e.stopPropagation(); toggleFav(font.family); } }), fav() ? "brand-gold" : undefined)),
       onClick: () => choose(font),
     });
   };
@@ -402,10 +402,9 @@ export function FontPicker(props: FontPickerProps): unknown {
       h("div", { class: "m-fp-spec-head" },
         h("div", { class: "m-fp-spec-title" }, title,
           h("span", { class: "m-fp-spec-meta" }, () => { const f = current(); return f ? `${categoryName(f.category)} · ${f.source === "system" ? L().system ?? t`System` : L().web ?? t`Web font`}` : ""; })),
-        () => { const f = current(); return !f || props.favorites === false ? null : h(IconButton, {
-          class: cx("m-fp-star", isFav(f.family) && "is-on"), size: "sm", icon: isFav(f.family) ? starFilled : star, pressed: isFav(f.family), color: isFav(f.family) ? "brand-gold" : undefined,
-          label: isFav(f.family) ? L().removeFavorite ?? t`Remove ${f.family} from favorites` : L().addFavorite ?? t`Add ${f.family} to favorites`, onClick: () => toggleFav(f.family),
-        }); }),
+        () => { const f = current(); return !f || props.favorites === false ? null : withColor(h(IconButton, {
+          class: cx("m-fp-star", isFav(f.family) && "is-on"), size: "sm", icon: isFav(f.family) ? starFilled : star, pressed: isFav(f.family),
+          label: isFav(f.family) ? L().removeFavorite ?? t`Remove ${f.family} from favorites` : L().addFavorite ?? t`Add ${f.family} to favorites`, onClick: () => toggleFav(f.family) }), isFav(f.family) ? "brand-gold" : undefined); }),
       box,
       h("div", { class: "m-fp-controls" },
         () => (props.sizeControl === false ? null : h(Slider, {

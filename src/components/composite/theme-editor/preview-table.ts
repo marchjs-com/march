@@ -8,6 +8,7 @@ import { Alert } from "../../../ui/feedback.ts";
 import { Chip } from "../../actions/chip/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import type { ThemeEditorContext } from "./types.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 const ROWS: readonly [string, string, string, number][] = [["HADİ", "Design", "success", 92], ["Globex", "Product", "warn", 64], ["Initech", "Support", "danger", 31]];
 
@@ -36,6 +37,6 @@ export function PreviewTable({ ctx }: { ctx: ThemeEditorContext }): Element {
           h("td", {}, name), h("td", {}, t(team)), h("td", {}, h(Badge, { tone, dot: true }, tone === "success" ? t`On track` : tone === "warn" ? t`At risk` : t`Late`)),
           h("td", { class: "m-tnum" }, String(score))))))),
     h("div", { class: "m-te-foot" },
-      h("div", { class: "m-te-chips" }, h(Chip, { tone: "primary" }, t`Design`), h(Chip, {}, t`Product`), h(Chip, { color: "brand-blue" }, t`Activity`), h(Chip, { color: "brand-green" }, t`Friendship`)),
+      h("div", { class: "m-te-chips" }, h(Chip, { tone: "primary" }, t`Design`), h(Chip, {}, t`Product`), withColor(h(Chip, {}, t`Activity`), "brand-blue"), withColor(h(Chip, {}, t`Friendship`), "brand-green")),
       h("div", { class: "m-te-motion" }, dots, h(Button, { size: "sm", variant: "ghost", onClick: playMotion }, t`Play motion`))));
 }

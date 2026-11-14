@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { PullToRefresh } = await import("./index.ts");
@@ -67,7 +68,7 @@ test("PullToRefresh: keyboard button refreshes; disabled ignores pulls", async (
 test("PullToRefresh: own labels, icon and colour; an own indicator; no indicator, no button, no settle", async () => {
   const seen = [];
   const m = mount(() => [
-    h(PullToRefresh, { threshold: 40, onRefresh: () => {}, labels: { release: "Let go", refresh: "Reload" }, icon: h("i", { class: "mine" }), color: "brand-orange" }, h("p", null, "a")),
+    mProps(h(PullToRefresh, { threshold: 40, onRefresh: () => {}, labels: { release: "Let go", refresh: "Reload" }, icon: h("i", { class: "mine" }) }, h("p", null, "a")), { color: "brand-orange" }),
     h(PullToRefresh, { onRefresh: () => {}, indicator: (p) => { seen.push(p); return h("b", { class: "own" }, p); } }, "b"),
     h(PullToRefresh, { threshold: 40, onRefresh: () => {}, indicator: false, refreshButton: false, settle: false }, h("p", null, "c")),
   ]);
@@ -75,7 +76,7 @@ test("PullToRefresh: own labels, icon and colour; an own indicator; no indicator
   assert.equal(a.querySelector(".m-ptr-kbd").textContent, "Reload");
   assert.ok(a.querySelector(".m-ptr-spin .mine"));
   assert.equal(a.querySelector(".m-ptr-spin svg"), null);
-  assert.equal(a.querySelector(".m-ptr-ind").getAttribute("data-m-color"), "brand-orange");
+  assert.equal(a.querySelector(".m-ptr-ind").closest("[data-m-color]")?.getAttribute("data-m-color"), "brand-orange", "the indicator is in the colour scope (m:color on the root)");
   const p = a.querySelector("p");
   p.dispatchEvent(ev("pointerdown", 10, 0));
   p.dispatchEvent(ev("pointermove", 10, 140));

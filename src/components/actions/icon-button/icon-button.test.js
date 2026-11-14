@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
@@ -20,7 +21,7 @@ test("IconButton: named, sized, toned; a label is required", () => {
 
 test("IconButton: colour token; the tooltip can be replaced or turned off", () => {
   const m = mount(() => [
-    h(IconButton, { icon: "x", label: "Close", color: "brand-blue", title: false }),
+    mProps(h(IconButton, { icon: "x", label: "Close", title: false }), { color: "brand-blue" }),
     h(IconButton, { icon: "x", label: "Close", title: "Close the panel" }),
   ]);
   const [a, b] = m.el.querySelectorAll("button");
@@ -37,7 +38,7 @@ test("IconButton: xs size, solid / raised, round, inverse, pressed", () => {
   const on = signal(false);
   const m = mount(() => [
     h(IconButton, { icon: "x", label: "Remove", size: "xs", pressed: on }),
-    h(IconButton, { icon: ">", label: "Send", variant: "solid", shape: "round", color: "brand-blue", size: "lg" }),
+    mProps(h(IconButton, { icon: ">", label: "Send", variant: "solid", shape: "round", size: "lg" }), { color: "brand-blue" }),
     h(IconButton, { icon: "^", label: "Top", variant: "raised", shape: "round", inverse: true }),
   ]);
   const [a, b, c] = m.el.querySelectorAll("button");

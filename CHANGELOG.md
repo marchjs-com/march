@@ -4,6 +4,16 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
+### Common props: m:color, m:theme, m:dir, m:lang, m:tip, m:reveal, m:can, m:test (later in 0.1.0)
+- New common props (`hadi-march/props`, every element and component): `m:color` (colour scope), `m:theme` (a subtree
+  in another colour theme), `m:dir`, `m:lang`, `m:tip` (a hint without a Tooltip wrapper), `m:reveal` (entrance once
+  in view), `m:can` (hidden, or disabled with `{ allow, else: "disable" }`), `m:test` (`data-testid`). A text constant
+  on a native element compiles to the attribute itself.
+- **Breaking:** the components whose `color` prop only coloured their own root take `m:color` instead (their `color`
+  prop is gone): Accordion, Alert, ChatBubble, CheckMark, Chevron, Chip, ClampText, CornerMark, EditorFrame, ExplodedView, HonestCompare, IconButton, IconTile, OptionList, OverflowToolbar, Overlay, PageDots, Pagination, PanelHeader, ProjectDetail, PullToRefresh, Rating, ReactionPicker, ReplyQuote, ResizeHandle, Roadmap, SearchBox, SectionHead, SectionLabel, StatTile, StatsBand, StatusDot, Stepper, Steps, TimeRuler, Tree, TreeView, VerifiedMark, Wizard. Write `<Chip m:color="brand-blue">`; by hand `mProps(h(Chip, props), { color: "brand-blue" })`.
+  Inside the library the same is done by `withColor(node, color)` (src/theme/colors.ts, internal). The components that use their colour for more
+  than their root (a default, an inner part, a series) keep their `color` prop for now.
+
 ### m:parts, CodeEditor, ExplodedView (later in 0.1.0)
 - `m:parts` (common prop): `<PostCard m:parts={{ Avatar: { size: "lg" }, LikeButton: { color: "brand-blue" } }} />`
   gives props to the components drawn inside any element or component, by component; no composite needs a prop of

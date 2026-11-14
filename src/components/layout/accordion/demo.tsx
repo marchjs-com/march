@@ -11,7 +11,7 @@ export const code = `<Accordion multiple open={[0]} items={[
   { title: "Kargo", subtitle: "2–3 iş günü", content: <Shipping /> },
   { title: "İade", content: <Returns /> },
 ]} />
-<Accordion items={faq} chevron={(open) => <Icon of={open() ? minus : plus} />} color="brand-orange" animated={false} />`
+<Accordion items={faq} chevron={(open) => <Icon of={open() ? minus : plus} />} m:color="brand-orange" animated={false} />`
 
 export default function AccordionDemo(props: { values: { multiple: boolean; variant: string; icons: boolean; chevron: string; animated: boolean; color: string } }) {
   const items = () => [
@@ -26,7 +26,7 @@ export default function AccordionDemo(props: { values: { multiple: boolean; vari
       const animated = props.values.animated, color = props.values.color as "primary"
       const chevron = props.values.chevron === "off" ? false : props.values.chevron === "plus" ? (open: () => boolean) => <span>{() => <Icon of={open() ? minus : plus} />}</span> : true
       // with several allowed, two start open (the difference shows at once)
-      return <Accordion items={list} multiple={multiple} open={multiple ? [0, 1] : [0]} variant={variant} chevron={chevron} animated={animated} color={color} />
+      return <Accordion items={list} multiple={multiple} open={multiple ? [0, 1] : [0]} variant={variant} chevron={chevron} animated={animated} m:color={color} />
     }}
     <p class="m-muted">{() => (props.values.animated ? "Bölümler yüksekliği kayarak açılır ve kapanır" : "Bölümler hareketsiz, anında açılır ve kapanır")}: bir başlığa basınca görünür.</p>
   </div>

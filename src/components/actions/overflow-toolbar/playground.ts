@@ -9,6 +9,6 @@ export default definePlayground<Values>({
     { key: "labels", label: "Etiketleri göster", default: false },
     { key: "motion", label: "Geri gelme hareketi", default: "pop", options: [{ value: "pop", label: "büyüyerek" }, { value: "fade", label: "belirerek" }, { value: "own", label: "kendi hareketim (yukarıdan)" }, { value: "none", label: "yok" }] },
     { key: "moreIcon", label: "Daha fazla ikonu", default: "more", options: [{ value: "more", label: "üç nokta" }, { value: "menu", label: "menü" }, { value: "plus", label: "artı" }] },
-    { key: "color", label: "Basılı düğme rengi", default: "", options: [{ value: "", label: "tema" }, { value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }] },
+    { key: "color", label: "Basılı düğme rengi", default: "", options: [{ value: "", label: "tema" }, { value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }] , prop: "m:color"},
   ],
 });

@@ -23,7 +23,7 @@ const open = (p, cover) => sharedTransition(`project-${p.id}`, cover, () => { $o
 | `facts` | boolean | `true` | the facts list (role, client, year, category) |
 | `backIcon` | icon / `false` | arrow | icon of the back button |
 | `nextIcon` | icon, node / `false` | arrow | icon after the next project's title |
-| `color` | color token | accent | colour of the category line |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `reveal` | Reveal options / `false` | `{ effect: "up" }` | entrance of the heading and the story |
 | `labels` | `{ back?, next?, role?, client?, year?, category?, services?, openImage?(n) }` | built-in texts | any text the page writes itself |
 | `class` | class | — | on the article |

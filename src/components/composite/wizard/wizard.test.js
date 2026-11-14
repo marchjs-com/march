@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { schema } = await import("../../../schema/index.ts");
@@ -33,7 +34,7 @@ test("Wizard: steps, layout and color are live props (the showcase Playground dr
   const { signal, reactive } = await import("../../../core/reactive.ts");
   const n = signal(2), layout = signal("stack"), color = signal("primary");
   const all = ["A", "B", "C", "D"].map((t) => ({ title: t, schema: schema({ [t.toLowerCase()]: { type: "text" }, [t.toLowerCase() + "2"]: { type: "text" } }) }));
-  const el = mount(() => h(Wizard, { steps: reactive(() => all.slice(0, n())), layout: reactive(() => layout()), cols: 2, color: reactive(() => color()) }));
+  const el = mount(() => mProps(h(Wizard, { steps: reactive(() => all.slice(0, n())), layout: reactive(() => layout()), cols: 2 }), { color: () => color() }));
   assert.equal(el.querySelectorAll(".m-step2").length, 2);
   type(el.querySelector("[name=a]"), "kept");
   n.set(4);

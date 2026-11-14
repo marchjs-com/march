@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
@@ -35,8 +36,8 @@ test("ChatBubble: mine/theirs, run position, ticks, reply quote, reaction chips,
 
 test("ChatBubble: own texts, color, ticks off / own, time format, no hint, no tools, own icons", () => {
   const m = mount(() => [
-    h(ChatBubble, { mine: true, text: "Hi", status: "read", edited: true, color: "brand-purple", time: new Date(2026, 0, 1, 9, 5), formatTime: (d) => `at ${d.getHours()}`,
-      labels: { read: "Seen", edited: "changed", reply: "Answer" }, ticks: (s) => h("b", { class: "own-tick" }, s), replyIcon: h("i", { class: "own-reply" }), onReply: () => {} }),
+    mProps(h(ChatBubble, { mine: true, text: "Hi", status: "read", edited: true, time: new Date(2026, 0, 1, 9, 5), formatTime: (d) => `at ${d.getHours()}`,
+      labels: { read: "Seen", edited: "changed", reply: "Answer" }, ticks: (s) => h("b", { class: "own-tick" }, s), replyIcon: h("i", { class: "own-reply" }), onReply: () => {} }), { color: "brand-purple" }),
     h(ChatBubble, { mine: true, text: "Yo", status: "failed", ticks: false, replyHint: false, tools: false, labels: { retry: "Again" }, onReply: () => {}, onRetry: () => {} }),
   ]);
   const [a, b] = m.el.querySelectorAll(".m-msg");

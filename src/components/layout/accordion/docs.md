@@ -21,7 +21,7 @@ icon and a subtitle; `variant="contained"` draws one framed list instead of sepa
 | `variant` | `"separated"` / `"contained"` | `"separated"` | look |
 | `chevron` | boolean / icon / text / `(open, item) => node` | `true` | the arrow at the end of a header: off, your own mark, or drawn per section (`open()` is live) |
 | `animated` | boolean | `true` | `false`: panels open at once and the arrow does not turn |
-| `color` | color token | accent | colour of the header icons |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `onToggle` | `(key, open) => void` | — | a section opened or closed (key: its `id`, else its index) |
 | `class` | class | — | added to the root (`.m-accordion`); parts: `.m-acc-item`, `.m-acc-btn`, `.m-acc-icon`, `.m-acc-title`, `.m-acc-sub`, `.m-acc-chev`, `.m-acc-body` |
 

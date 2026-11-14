@@ -17,7 +17,7 @@ export default function StatsBandDemo(props: { values: { variant: string; mode: 
   return <div>
     {() => {
       const v = { ...props.values }
-      return <StatsBand variant={v.variant as "plain"} mode={v.mode as "count"} items={STATS} color={v.color === "default" ? undefined : v.color as "brand-orange"}
+      return <StatsBand variant={v.variant as "plain"} mode={v.mode as "count"} items={STATS} m:color={v.color === "default" ? undefined : v.color as "brand-orange"}
         reveal={v.reveal === "off" ? false : { effect: v.reveal as "up" }} />
     }}
   </div>

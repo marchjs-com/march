@@ -7,7 +7,7 @@ export default definePlayground<Values>({
     { key: "kind", label: "Yer", default: "header", options: [{ value: "header", label: "üst çubuk" }, { value: "footer", label: "alt çubuk" }] },
     { key: "size", label: "Boyut", default: "md", options: ["sm", "md", "lg"] },
     { key: "icon", label: "İkon", default: true },
-    { key: "color", label: "İkon rengi", default: "none", options: [{ value: "none", label: "soluk" }, { value: "primary", label: "aksan" }, { value: "brand-orange", label: "turuncu" }, { value: "success", label: "yeşil" }], visibleWhen: (v) => v.icon },
+    { key: "color", label: "İkon rengi", default: "none", options: [{ value: "none", label: "soluk" }, { value: "primary", label: "aksan" }, { value: "brand-orange", label: "turuncu" }, { value: "success", label: "yeşil" }], visibleWhen: (v) => v.icon, prop: "m:color" },
     { key: "subtitle", label: "Alt başlık", default: true },
     { key: "meta", label: "Sayı rozeti", default: false },
     { key: "actions", label: "Eylemler", default: true },

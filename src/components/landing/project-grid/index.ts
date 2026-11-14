@@ -18,7 +18,7 @@ import { flip } from "../../../motion/flip.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts"; // Reveal: the cards enter one after another
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
 
 export interface ProjectCover extends PictureSource { alt: string; width: number; height: number }
 export interface Project {
@@ -96,8 +96,8 @@ export function ProjectGrid(props: ProjectGridProps): Element {
   };
   const chips = props.filters !== false && cats.length > 1
     ? h("div", { class: "m-pg-filters", role: "group", "aria-label": props.filtersLabel ?? t`Filter projects` },
-      h(Chip, { color: props.color, selected: () => filter() === null, onClick: () => choose(null) }, () => val(props.allLabel) ?? t`All`),
-      cats.map((c) => h(Chip, { color: props.color, selected: () => filter() === c, onClick: () => choose(c) }, c)))
+      withColor(h(Chip, { selected: () => filter() === null, onClick: () => choose(null) }, () => val(props.allLabel) ?? t`All`), props.color),
+      cats.map((c) => withColor(h(Chip, { selected: () => filter() === c, onClick: () => choose(c) }, c), props.color)))
     : null;
   if (props.reveal !== false) owned(revealOnScroll(grid, { effect: "up", stagger: 70, ...props.reveal, select: ".m-pg-card" }));
   return h("div", { class: cx("m-pg", val(props.class)), "data-m-color": colorAttr(props.color) }, chips, grid) as Element;

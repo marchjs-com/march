@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -42,11 +43,11 @@ test("HonestCompare: table semantics, summary, behind filter", () => {
 test("HonestCompare: own texts, own cells, no tags, no filter, own colour", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
   const seen = [];
-  const dispose = render(() => h(HonestCompare, {
-    columns: COLS, rows: ROWS, tags: false, filter: false, color: "brand-green",
+  const dispose = render(() => mProps(h(HonestCompare, {
+    columns: COLS, rows: ROWS, tags: false, filter: false,
     labels: { partly: "Half", region: "Table", counts: (c) => `${c.ahead}-${c.even}-${c.behind}` },
     renderCell: (v, info) => { seen.push([info.row.label, info.column.id, info.us, info.verdict]); return v === true ? h("b", { class: "own" }, "Y") : undefined; },
-  }), el);
+  }), { color: "brand-green" }), el);
   assert.equal(el.querySelector(".m-hc").getAttribute("data-m-color"), "brand-green");
   assert.equal(el.querySelector(".m-hc-tag"), null);
   assert.equal(el.querySelector(".m-hc-filter"), null);

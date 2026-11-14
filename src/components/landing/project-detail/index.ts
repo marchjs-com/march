@@ -15,7 +15,7 @@ import { arrowLeft } from "../../../icons/glyphs/arrowLeft.ts";
 import { arrowRight } from "../../../icons/glyphs/arrowRight.ts";
 import { Reveal, type RevealOptions } from "../reveal/index.ts";
 import { SectionHead } from "../section-head/index.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import type { Project, ProjectCover } from "../project-grid/index.ts";
 
 export interface ProjectDetails extends Project {
@@ -43,8 +43,6 @@ export interface ProjectDetailProps {
   backIcon?: unknown | undefined;
   /** Icon after the next project's title: an icon or a node, or false for none (default: an arrow). */
   nextIcon?: unknown | undefined;
-  /** Colour of the category line (default: the accent). */
-  color?: ColorToken | undefined;
   /** Entrance of the heading and the story: Reveal options, or false for none. */
   reveal?: RevealOptions | false | undefined;
   /** Own texts; every one defaults to the built-in translated text. */
@@ -76,7 +74,7 @@ export function ProjectDetail(props: ProjectDetailProps): Element {
     (props.reveal === false ? h("div", { class: cls }, kids) : h(Reveal, { class: cls, ...opts, ...props.reveal }, kids));
   const nextIcon = ownIcon(props.nextIcon, arrowRight);
   const nextCover = props.next ? h("div", { class: "m-pd-next-cover", "data-m-shared": `project-${props.next.project.id}` }, coverNode(props.next.project.cover)) as HTMLElement : null;
-  return h("article", { class: cx("m-pd", val(props.class)), "data-m-color": colorAttr(props.color) },
+  return h("article", { class: cx("m-pd", val(props.class)) },
     props.onBack ? h(Button, { variant: "ghost", size: "sm", class: "m-pd-back", icon: props.backIcon === false ? undefined : props.backIcon ?? arrowLeft, onClick: () => props.onBack?.() }, L.back ?? t`All projects`) : null,
     h(SectionHead, {
       class: "m-pd-head", size: "xl", align: "start", as: "h1", eyebrow: p.category != null && props.eyebrow !== false ? p.category : undefined,

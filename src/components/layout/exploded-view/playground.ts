@@ -11,6 +11,6 @@ export default definePlayground<Values>({
     { key: "ring", label: "Odak halkası katmanı", default: true, visibleWhen: (v) => v.mode === "layers" },
     { key: "gap", label: "Plakalar arası", default: 26, min: 12, max: 48, step: 2, unit: " px" },
     { key: "motion", label: "Hareket", default: "smooth", options: [{ value: "smooth", label: "yumuşak" }, { value: "spring", label: "yaylı" }, { value: "none", label: "yok" }] },
-    { key: "color", label: "Renk", default: "", options: [{ value: "", label: "vurgu" }, { value: "brand-blue", label: "mavi" }, { value: "brand-purple", label: "mor" }] },
+    { key: "color", label: "Renk", default: "", options: [{ value: "", label: "vurgu" }, { value: "brand-blue", label: "mavi" }, { value: "brand-purple", label: "mor" }], prop: "m:color" },
   ],
 });

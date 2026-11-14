@@ -4,7 +4,7 @@ import "./stats-band.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, type ClassProp } from "../../../ui/util.ts";
 import { locale } from "../../../core/i18n.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { Counter, formatCount } from "../counter/index.ts";
 import { Reveal, type RevealOptions } from "../reveal/index.ts";
 import { StatTile } from "../../data/stat-tile/index.ts";
@@ -23,8 +23,6 @@ export interface StatsBandProps {
   variant?: "plain" | "divided" | "cards" | undefined;
   /** Counter style (default count); "none" writes the number without counting. */
   mode?: "count" | "roll" | "none" | undefined;
-  /** Colour of the numbers (default: the text colour). */
-  color?: ColorToken | undefined;
   /** Entrance of the items: Reveal options, or false for none (default: up, one after another). */
   reveal?: RevealOptions | false | undefined;
   class?: ClassProp | undefined;
@@ -33,7 +31,7 @@ export interface StatsBandProps {
 /** `<StatsBand items={[{ value: 12000, label: "teams", format: { notation: "compact" } }, { value: 99.9, decimals: 1, suffix: "%", label: "uptime" }]} />` */
 export function StatsBand(props: StatsBandProps): Element {
   const mode = props.mode;
-  return h(Reveal, { class: cx("m-stats", `m-stats-${props.variant ?? "divided"}`, val(props.class)), "data-m-color": colorAttr(props.color), effect: "up", stagger: 90, ...(props.reveal === false ? { effect: "none" } : props.reveal), as: "dl" },
+  return h(Reveal, { class: cx("m-stats", `m-stats-${props.variant ?? "divided"}`, val(props.class)), effect: "up", stagger: 90, ...(props.reveal === false ? { effect: "none" } : props.reveal), as: "dl" },
     // each item is a StatTile (dt / dd inside the dl): the figure is a Counter, or plain text with mode "none"
     props.items.map((s) => h(StatTile, {
       term: true, size: "xl", variant: props.variant === "cards" ? "card" : "plain", class: "m-stats-item", label: s.label, hint: s.note ?? undefined,

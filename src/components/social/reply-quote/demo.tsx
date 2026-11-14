@@ -22,7 +22,7 @@ export default function ReplyQuoteDemo(props: { values: { place: string; lines: 
       const bubble = v.place === "bubble"
       const color = (v.color || undefined) as ColorToken | undefined
       const jump = v.click ? () => { $log = "Alıntılanan mesaja gidildi" } : undefined
-      const quote = () => <ReplyQuote name={bubble ? "Deniz Kaya" : "Deniz Kaya'ya yanıt"} text={TEXT} lines={v.lines} bar={v.bar} color={bubble ? undefined : color}
+      const quote = () => <ReplyQuote name={bubble ? "Deniz Kaya" : "Deniz Kaya'ya yanıt"} text={TEXT} lines={v.lines} bar={v.bar} m:color={bubble ? undefined : color}
         variant={bubble ? "inverse" : "soft"} onClick={jump}
         onClose={bubble || v.close === "off" ? undefined : () => { $shown = false; $log = "Yanıttan vazgeçildi" }} close={v.close === "own" ? trash : undefined} closeLabel="Yanıttan vazgeç" />
       return bubble

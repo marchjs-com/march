@@ -13,7 +13,7 @@ import { checkCircle } from "../../../icons/glyphs/checkCircle.ts";
 import { alertTriangle } from "../../../icons/glyphs/alertTriangle.ts";
 import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
 import { actionsOf, type ActionsProp, type Tone } from "../../../ui/display-base.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface AlertProps {
   tone?: MaybeFn<Tone | undefined>;
@@ -29,8 +29,6 @@ export interface AlertProps {
   dismissLabel?: MaybeFn<string | undefined>;
   /** Glyph or node inside the dismiss button (default: the × glyph). */
   dismissIcon?: unknown;
-  /** Theme color token instead of the tone's colours ("brand-purple", "cat-3"…); the role still follows `tone`. */
-  color?: ColorToken | undefined;
   onDismiss?: () => void;
   /** "soft" (default: the tone's tinted fill) or "raised": a floating message (a toast) on the surface of a layer with a shadow; the tone colours the icon alone. */
   variant?: "soft" | "raised" | undefined;
@@ -53,7 +51,7 @@ export function Alert(props: AlertProps): () => unknown {
     const below = props.actionPlacement === "below";
     const actions = props.action != null && h("div", { class: cx("m-alert-action", below && "m-alert-action-below") }, actionsOf(() => props.action));
     const part = props.partClass ?? {};
-    return h("div", { class: () => cx("m-alert", `m-alert-${val(props.tone) ?? "info"}`, props.variant === "raised" && "m-alert-raised", val(props.class)), role: props.role ?? (tone === "danger" || tone === "warn" ? "alert" : "status"), "data-m-color": () => colorAttr(props.color) },
+    return h("div", { class: () => cx("m-alert", `m-alert-${val(props.tone) ?? "info"}`, props.variant === "raised" && "m-alert-raised", val(props.class)), role: props.role ?? (tone === "danger" || tone === "warn" ? "alert" : "status") },
       icon(props.icon === undefined ? toneIcon(tone) : props.icon, cx("m-alert-icon", part.icon)),
       h("div", { class: "m-alert-main" },
         props.title != null && h("strong", { class: "m-alert-title" }, () => val(props.title)),

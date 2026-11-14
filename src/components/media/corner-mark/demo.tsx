@@ -13,7 +13,7 @@ export const code = `<div class="tile">                                   {/* po
   <CornerMark icon={video} />                          // top-end, dark glass
 </div>
 <a class="card m-corner-host" href={p.href}>…<CornerMark icon={arrowUpRight} variant="surface" show="hover" /></a>
-<span class="who"><Avatar name="Siz" /><CornerMark corner="bottom-end" icon={plus} variant="solid" color="brand-orange" size="sm" ring overlap /></span>`
+<span class="who"><Avatar name="Siz" /><CornerMark corner="bottom-end" icon={plus} variant="solid" m:color="brand-orange" size="sm" ring overlap /></span>`
 
 const ICONS: Record<string, unknown> = { video, arrow: arrowUpRight, plus, text: "4K" }
 
@@ -21,15 +21,15 @@ export default function CornerMarkDemo(props: { values: { corner: string; icon: 
   return <div class="sc-row">
     {() => {
       const v = { ...props.values }
-      const shared = { corner: v.corner as Corner, icon: ICONS[v.icon], variant: v.variant as "scrim", color: v.color === "none" ? undefined : v.color as "success", show: v.show as "always" }
+      const shared = { corner: v.corner as Corner, icon: ICONS[v.icon], variant: v.variant as "scrim", show: v.show as "always" }
       return <>
         <div class="sc-pic-box m-corner-host" tabindex="0" role="img" aria-label="Gün batımında tepeler">
           <Picture src={appUrl("media/dusk.jpg")} alt="" fit="cover" />
-          <CornerMark {...shared} size={v.size as "md"} />
+          <CornerMark m:color={v.color === "none" ? undefined : v.color} {...shared} size={v.size as "md"} />
         </div>
         <span class="sc-pic-who m-corner-host" tabindex="0">
           <Avatar name="Koşu Kulübü" size="xl" />
-          <CornerMark {...shared} size={v.size as "md"} ring={v.ring} overlap />
+          <CornerMark m:color={v.color === "none" ? undefined : v.color} {...shared} size={v.size as "md"} ring={v.ring} overlap />
         </span>
       </>
     }}

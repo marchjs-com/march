@@ -21,6 +21,7 @@ import { CopyButton } from "../../actions/copy-button/index.ts";
 import { Kbd } from "../../typography/kbd/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 export { jsxCompleter, type JsxProp } from "./jsx.ts";
 
@@ -214,10 +215,9 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const foot = props.message === false ? undefined : h("span", { class: () => cx("m-ced-msg", status() === "error" && "is-error"), id: `${id}-msg`, role: "status", "aria-live": "polite" },
     () => (status() === false ? null : h(StatusDot, { tone: untrack(status) === "error" ? "warn" : "success", size: "sm" })),
     h("span", { class: "m-ced-msg-text" }, () => val(props.message)));
-  return h(EditorFrame, {
-    class: () => cx("m-ced", val(props.class)), color: props.color, disabled: () => !!props.disabled, readonly: () => !!props.readonly,
+  return withColor(h(EditorFrame, {
+    class: () => cx("m-ced", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly,
     foot, showFoot: props.message !== false,
     footProps: { class: "m-ced-foot", divider: true, actions: [hint, props.copy !== false && h(CopyButton, { text: get, ...(props.copyLabel != null ? { label: props.copyLabel } : {}) })] },
-    children: [h("div", { class: "m-ced-area" }, pre, input), list],
-  }) as Element;
+    children: [h("div", { class: "m-ced-area" }, pre, input), list] }), props.color) as Element;
 }

@@ -15,7 +15,7 @@ Stars to give or show a score. Editable it is a radio group: click or use the ar
 | `max` | `number` | `5` | |
 | `readonly` | `boolean` | `false` | shows the value, no input |
 | `size` | `sm` `md` `lg` | `md` | |
-| `color` | colour token | the theme's primary | |
+| `m:color` | colour token | the theme's primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `label` | `string` / accessor | "Rating" (translated) | |
 | `class` | class value | | |
 | `icon` | icon or `(n) => node` | star outline | the empty mark |

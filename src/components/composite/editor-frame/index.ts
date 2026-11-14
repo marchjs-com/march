@@ -5,7 +5,7 @@
 import "./editor-frame.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { PanelHeader, type PanelHeaderProps } from "../../layout/panel-header/index.ts";
 
 export interface EditorFrameProps {
@@ -29,8 +29,6 @@ export interface EditorFrameProps {
   readonly?: MaybeFn<boolean | undefined>;
   /** The focus ring around the frame while something inside has focus (default true). */
   ring?: MaybeFn<boolean | undefined>;
-  /** Theme colour token of the focus ring and the marks inside (default: the accent). */
-  color?: MaybeFn<ColorToken | undefined>;
   class?: ClassProp;
   /** The editing area (and anything after it: panels, pop-ups). */
   children?: unknown;
@@ -49,7 +47,6 @@ export function EditorFrame(props: EditorFrameProps): Element {
   const foot = (): unknown => (val(props.showFoot) === false || (props.foot == null && props.showFoot == null) ? null
     : bar("footer", "m-editor-foot", props.footProps, { children: props.foot }));
   return h("div", {
-    "data-m-color": () => colorAttr(val(props.color)),
     ...rest(props, USED),
     class: () => cx("m-editor-frame", val(props.disabled) && "is-disabled", val(props.readonly) && "is-readonly", val(props.ring) === false && "is-plain", val(props.class)),
   }, head, props.children, foot);

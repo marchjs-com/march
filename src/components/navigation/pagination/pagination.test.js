@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const mount = (fn) => { const host = document.createElement("div"); document.body.appendChild(host); const dispose = render(fn, host); return { host, dispose }; };
@@ -24,7 +25,7 @@ test("Pagination: ends stay, the middle collapses, Previous / Next and the curre
 
 test("Pagination: own texts and names, own Previous / Next and gap, color; controls and gap off", () => {
   const { host, dispose } = mount(() => [
-    h(Pagination, { page: 10, pages: 20, prev: "Back", next: "More", gap: "·", color: "brand-blue", label: "Result pages", labels: { previous: "Previous page", next: "Next page", page: (n) => `Page ${n}` } }),
+    mProps(h(Pagination, { page: 10, pages: 20, prev: "Back", next: "More", gap: "·", label: "Result pages", labels: { previous: "Previous page", next: "Next page", page: (n) => `Page ${n}` } }), { color: "brand-blue" }),
     h(Pagination, { page: 10, pages: 20, controls: false, gap: false }),
   ]);
   const [own, bare] = host.querySelectorAll("nav");

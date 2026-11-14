@@ -22,7 +22,7 @@ export default function PanelHeaderDemo(props: { values: Values }) {
       const v = { ...props.values }
       const foot = v.kind === "footer"
       const bar = <PanelHeader as={foot ? "footer" : "header"} size={v.size as "md"} divider={v.divider} tone={v.tone as "plain"}
-        color={v.color === "none" ? undefined : v.color as "primary"}
+        m:color={v.color === "none" ? undefined : v.color as "primary"}
         icon={v.icon ? settings : undefined}
         title={foot ? "3 değişiklik kaydedilmedi" : "Ayarlar"}
         subtitle={v.subtitle ? "Çalışma alanı · herkese açık" : undefined}

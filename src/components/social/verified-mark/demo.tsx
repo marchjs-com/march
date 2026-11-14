@@ -5,7 +5,7 @@ import type { ColorToken } from "../../../theme/colors.ts";
 import { shieldCheck } from "../../../icons/glyphs/shieldCheck.ts";
 
 export const code = `<b>Deniz Kaya</b> <VerifiedMark />                       // role="img", read as "Onaylı hesap"
-<h2>HADİ Koşu Kulübü <VerifiedMark size="md" label="Onaylı topluluk" color="brand-green" /></h2>
+<h2>HADİ Koşu Kulübü <VerifiedMark size="md" label="Onaylı topluluk" m:color="brand-green" /></h2>
 <VerifiedMark icon={shieldCheck} label={false} />          // own icon, decorative`
 
 export default function VerifiedMarkDemo(props: { values: { size: string; color: string; icon: string; label: string } }) {
@@ -18,7 +18,7 @@ export default function VerifiedMarkDemo(props: { values: { size: string; color:
       const note = v.label === "off" ? `aria-hidden="true" (süs)` : `role="img" aria-label="${label ?? "Onaylı hesap"}"`
       return <>
         <strong>HADİ Koşu Kulübü</strong>
-        <VerifiedMark size={v.size as "md"} color={color} icon={icon} label={label} />
+        <VerifiedMark size={v.size as "md"} m:color={color} icon={icon} label={label} />
         <span class="m-muted">{note}</span>
       </>
     }}

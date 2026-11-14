@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -45,7 +46,7 @@ test("CheckMark: own texts, visible text, decorative", () => {
 
 test("CheckMark: look, size, colour and own glyphs", () => {
   const [el, dispose] = mount(() => [
-    h(CheckMark, { value: true, variant: "soft", size: "lg", color: "brand-purple", class: "mine" }),
+    mProps(h(CheckMark, { value: true, variant: "soft", size: "lg", class: "mine" }), { color: "brand-purple" }),
     h(CheckMark, { value: false, icons: { no: "👎", yes: false } }),
     h(CheckMark, { value: true, icons: { no: "👎", yes: false } }),
   ]);

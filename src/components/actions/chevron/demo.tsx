@@ -11,7 +11,7 @@ const MOTION_NOTE: Record<string, string> = { smooth: "yumuşak dönüş", sprin
 export const code = `<Chevron open={$open} />                                  // end → down (mirrored in RTL)
 <Chevron open={$open} direction="down" motion="spring" />  // down → up
 <button aria-expanded={$open}>Ayrıntılar <Chevron direction="down" /></button>   // follows the button
-<Chevron open={$open} icon={arrowRight} color="primary" size="lg" />
+<Chevron open={$open} icon={arrowRight} m:color="primary" size="lg" />
 <Chevron leaf />                                           // keeps the space, draws nothing`
 
 export default function ChevronDemo(props: { values: { open: boolean; direction: string; size: string; motion: string; icon: string; color: string } }) {
@@ -37,13 +37,13 @@ export default function ChevronDemo(props: { values: { open: boolean; direction:
     <div class="sc-row">
       {() => {
         const icon = props.values.icon === "arrow" ? arrowRight : props.values.icon === "text" ? "›" : undefined
-        return <Chevron open={open} direction={direction} size={size} motion={motion} color={color} icon={icon} />
+        return <Chevron open={open} direction={direction} size={size} motion={motion} m:color={color} icon={icon} />
       }}
       <span class="m-muted">{() => (props.values.open ? "open: ok döndü" : "open={false}")} · {() => MOTION_NOTE[props.values.motion] ?? ""}</span>
     </div>
     <div class="sc-row">
       <Button variant="ghost" aria-expanded={() => String($mine !== $play)} onClick={() => { $mine = !$mine }}>
-        Ayrıntılar <Chevron direction={direction} size={size} motion={motion} color={color} />
+        Ayrıntılar <Chevron direction={direction} size={size} motion={motion} m:color={color} />
       </Button>
       <span class="m-muted">{() => ($mine ? "Düğme açık: ok onu izledi (open verilmedi)." : "Düğmeye bas: ok aria-expanded'ı izler.")}</span>
     </div>

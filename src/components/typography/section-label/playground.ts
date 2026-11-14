@@ -10,6 +10,6 @@ export default definePlayground<Values>({
     { key: "actions", label: "Eylem düğmesi", default: true },
     { key: "rule", label: "Çizgi", default: false },
     { key: "size", label: "Boyut", default: "sm", options: ["sm", "md"] },
-    { key: "color", label: "Renk", default: "none", options: [{ value: "none", label: "soluk" }, { value: "primary", label: "aksan" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }] },
+    { key: "color", label: "Renk", default: "none", options: [{ value: "none", label: "soluk" }, { value: "primary", label: "aksan" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }], prop: "m:color" },
   ],
 });

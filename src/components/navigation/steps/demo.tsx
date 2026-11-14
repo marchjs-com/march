@@ -23,7 +23,7 @@ export default function StepsDemo(props: { values: { vertical: boolean; clickabl
     {() => {
       const vertical = props.values.vertical, color = (props.values.color || undefined) as ColorToken, clickable = props.values.clickable
       const done = props.values.done, connector = props.values.connector
-      return <Steps steps={STEPS} current={step} vertical={vertical} color={color} connector={connector}
+      return <Steps steps={STEPS} current={step} vertical={vertical} m:color={color} connector={connector}
         doneIcon={done === "star" ? star : done === "number" ? false : undefined}
         renderDot={done === "own" ? (i: number, state: string) => (state === "done" ? "✓" : "ABCD"[i]) : undefined}
         {...(clickable ? { onSelect: (i: number) => { step.set(i) } } : {})} />

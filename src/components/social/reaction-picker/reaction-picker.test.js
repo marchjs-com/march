@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
@@ -32,7 +33,7 @@ test("ReactionPicker: grid layout lists the emoji set", () => {
 
 test("ReactionPicker: own names, own + content, color", () => {
   const m = mount(() => [
-    h(ReactionPicker, { onPick: () => {}, onMore: () => {}, pop: false, color: "brand-orange", emojis: ["❤️", "👍"], emojiLabel: (e) => (e === "❤️" ? "Heart" : "Thumb"), moreLabel: "All", moreIcon: h("i", { class: "own-more" }), class: "mine" }),
+    mProps(h(ReactionPicker, { onPick: () => {}, onMore: () => {}, pop: false, emojis: ["❤️", "👍"], emojiLabel: (e) => (e === "❤️" ? "Heart" : "Thumb"), moreLabel: "All", moreIcon: h("i", { class: "own-more" }), class: "mine" }), { color: "brand-orange" }),
     h(ReactionPicker, { onPick: () => {}, onMore: () => {}, pop: false }),
   ]);
   const [a, b] = m.el.querySelectorAll(".m-react");

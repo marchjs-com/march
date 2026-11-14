@@ -4,6 +4,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { installDom } from "../src/testing/dom.ts";
+const { mProps } = await import("../src/props/index.ts");
 
 installDom();
 const { h, render } = await import("../src/index.ts");
@@ -133,10 +134,10 @@ test("a color prop stays live: a new value reaches data-m-color (the showcase Pl
   const { Stepper } = await import("../src/components/navigation/stepper/index.ts");
   const color = signal("brand-blue");
   const cases = [
-    ["Steps", (c) => h(U.Steps, { steps: [{ title: "A" }, { title: "B" }], current: 0, color: c })],
+    ["Steps (m:color)", (c) => mProps(h(U.Steps, { steps: [{ title: "A" }, { title: "B" }], current: 0 }), { color: c })],
     ["Progress", (c) => h(U.Progress, { value: 1, max: 2, color: c })],
     ["Badge", (c) => h(U.Badge, { color: c }, "x")],
-    ["Stepper", (c) => h(Stepper, { steps: [{ title: "A" }, { title: "B" }], color: c })],
+    ["Stepper (m:color)", (c) => mProps(h(Stepper, { steps: [{ title: "A" }, { title: "B" }] }), { color: c })],
   ];
   for (const [name, make] of cases) {
     const el = document.createElement("div"); document.body.appendChild(el);

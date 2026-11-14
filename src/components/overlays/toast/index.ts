@@ -88,8 +88,10 @@ export function ToastHost(props: {
       const act = x.action;
       const own = x.icon;
       // a toast is a raised Alert: the kind's icon, the message, one action, the close button
-      return h(Alert, {
-        tone: x.kind, variant: "raised", role: x.kind === "danger" ? "alert" : "status", color: x.color,
+      // the toast's colour token: a scope around the Alert that takes no box (its module of common props stays out of
+      // start-up)
+      const alert = h(Alert, {
+        tone: x.kind, variant: "raised", role: x.kind === "danger" ? "alert" : "status",
         class: cx(`m-toast m-toast-${x.kind}`, x.motion === "fade" && "m-toast-fade", x.motion === "none" && "m-toast-still", x.class),
         partClass: { icon: "m-toast-icon", body: "m-toast-msg", dismiss: "m-toast-close" },
         icon: own === false ? null : own == null || own === true ? undefined : own, body: () => val(x.message),
@@ -98,5 +100,6 @@ export function ToastHost(props: {
           () => val(act.label)) : undefined,
         dismissable: x.closable !== false, dismissLabel: () => val(x.closeLabel) ?? t`Dismiss`, onDismiss: () => toast.dismiss(x.id),
       });
+      return x.color ? h("div", { class: "m-toast-scope", "data-m-color": x.color }, alert) : alert;
     } }));
 }

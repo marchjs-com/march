@@ -7,7 +7,7 @@ export const code = `<TreeView nodes={files} selection="multiple" draggable sear
   load={(node) => api.children(node.id)}
   onSelect={(ids) => $selected = ids}
   onMove={(ids, target, position) => api.move(ids, target, position)} />
-// chevron={false | (node, open) => …} color="brand-purple" animate={false}
+// chevron={false | (node, open) => …} m:color="brand-purple" animate={false}
 // labels={{ retry, empty, noMatch: (q) => … }} ghost={(nodes) => …} empty={<EmptyState />}`
 
 const AREAS = ["web", "mobil", "api", "tasarım", "belgeler", "araçlar"];
@@ -52,7 +52,7 @@ export default function TreeViewDemo(props: { values: { selection: string; dragg
         picked.set(props.values.selection === "none" ? [] : props.values.selection === "single" ? [first[0]!.id] : [first[0]!.id, first[1]!.id])
         return <TreeView nodes={nodes} expanded={["web", "web/bileşenler", "web/bileşenler/eski"]} height={380} label="Proje dosyaları"
       selected={[first[0]!.id, first[1]!.id]} selection={props.values.selection as "multiple"} draggable={() => props.values.draggable} icons={() => props.values.icons}
-      color={tint} animate={animate}
+      m:color={tint} animate={animate}
       chevron={chevron === "off" ? false : chevron === "own" ? (_n: TreeViewNode, open: boolean) => <b>{open ? "−" : "+"}</b> : true}
       labels={own ? { retry: "Yeniden dene", empty: "Henüz dosya yok", noMatch: (q: string) => `“${q}” adında dosya yok, başka bir şey deneyin` } : undefined}
       ghost={own ? (list: TreeViewNode[]) => <b>{`${list.length} dosya taşınıyor`}</b> : undefined}

@@ -10,7 +10,7 @@ import { hourglass } from "../../../icons/glyphs/hourglass.ts";
 export const code = `<PullToRefresh onRefresh={() => api.get("/feed").then((x) => $items = x)} threshold={72}>
   <For each={$items}>{(it) => <FeedRow item={it} />}</For>
 </PullToRefresh>
-<PullToRefresh onRefresh={load} icon={sparkles} color="brand-orange" labels={{ refresh: "Yeni etkinlikleri getir" }} settle={false}>…</PullToRefresh>
+<PullToRefresh onRefresh={load} icon={sparkles} m:color="brand-orange" labels={{ refresh: "Yeni etkinlikleri getir" }} settle={false}>…</PullToRefresh>
 <PullToRefresh onRefresh={load} indicator={(phase) => <Icon of={phase === "ready" ? arrowUp : arrowDown} />}>…</PullToRefresh>`
 
 const NAMES = ["Kadıköy koşu grubu", "Moda sahili buluşması", "Akşam yemeği", "Kitap kulübü", "Bisiklet turu", "Fotoğraf yürüyüşü", "Masa oyunları", "Kahve sohbeti"]
@@ -32,7 +32,7 @@ export default function PullToRefreshDemo(props: { values: { threshold: number; 
       $phase = "idle"
       return <PullToRefresh threshold={threshold} disabled={() => props.values.disabled} onPhase={(p) => { $phase = p }}
         indicator={indicator === "off" ? false : indicator === "own" ? (p: PullPhase) => <Icon of={p === "refreshing" ? hourglass : p === "ready" ? arrowUp : arrowDown} /> : true}
-        icon={indicator === "icon" ? sparkles : undefined} color={color === "primary" ? undefined : (color as "success")}
+        icon={indicator === "icon" ? sparkles : undefined} m:color={color === "primary" ? undefined : (color as "success")}
         settle={settle ? undefined : false} labels={{ refresh: "Listeyi yenile" }}
         onRefresh={() => new Promise((r) => setTimeout(r, props.values.delay)).then(() => { $round = $round + 1 })}
         class="sc-ptr-demo">

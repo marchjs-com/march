@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { CornerMark } = await import("./index.ts");
@@ -22,7 +23,7 @@ test("CornerMark: defaults (top-end, md, scrim, decorative) with an icon", () =>
 });
 
 test("CornerMark: colour, size, look, ring, hover, overlap, label, own content", () => {
-  const [el, dispose] = mount(() => h(CornerMark, { corner: "bottom-end", color: "brand-orange", size: "sm", variant: "solid", ring: true, show: "hover", overlap: true, label: "Add story" }, h("b", { class: "own" }, "+")));
+  const [el, dispose] = mount(() => mProps(h(CornerMark, { corner: "bottom-end", size: "sm", variant: "solid", ring: true, show: "hover", overlap: true, label: "Add story" }, h("b", { class: "own" }, "+")), { color: "brand-orange" }));
   const m = el.querySelector(".m-corner-mark");
   for (const c of ["m-corner-mark-bottom-end", "m-corner-mark-sm", "m-corner-mark-solid", "is-ringed", "is-hover", "is-overlap"]) assert.ok(m.classList.contains(c), c);
   assert.equal(m.getAttribute("data-m-color"), "brand-orange");

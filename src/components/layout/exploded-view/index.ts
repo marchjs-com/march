@@ -12,7 +12,7 @@ import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { model } from "../../../forms/util.ts";
 import { observeSize } from "../../../ui/observe.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 messages("tr", { "Shadow": "Gölge", "Surface": "Zemin", "Content": "İçerik", "Focus ring": "Odak halkası", "Exploded view": "Parçalarına ayrılmış görünüm" });
 
@@ -54,8 +54,6 @@ export interface ExplodedViewProps {
   onPick?: ((id: string, el: Element) => void) | undefined;
   /** The plate shown as chosen (reactive): an `id`. */
   active?: MaybeFn<string | null | undefined>;
-  /** Theme colour of the plate outlines, the chosen plate and the ring (default: the accent). */
-  color?: ColorToken | undefined;
   /** Accessible name of the group while apart (default "Exploded view", translated). */
   label?: MaybeFn<string | undefined>;
   class?: ClassProp;
@@ -190,7 +188,6 @@ export function ExplodedView(props: ExplodedViewProps): Element {
   const root = h("div", {
     class: () => cx("m-xv", moving() && "is-moving", shown() && "is-open", val(props.parts)?.length ? "m-xv-parts" : "m-xv-layers", `m-xv-${motion()}`, val(props.class)),
     role: () => (isOpen() ? "group" : null), "aria-label": () => (isOpen() ? val(props.label) ?? t`Exploded view` : null),
-    "data-m-color": () => colorAttr(props.color),
     style: () => { const [top, bottom, side] = room(); return { "--m-xv-gap": `${gap()}px`, "--m-xv-scale": String(scale()), "--m-xv-rx": `${rx()}deg`, "--m-xv-rz": `${rz()}deg`, "--m-xv-top": `${Math.round(top)}px`, "--m-xv-bottom": `${Math.round(bottom)}px`, "--m-xv-side": `${Math.round(side)}px` }; },
     "on:click|capture": pick, "on:pointerdown|capture": (e: Event) => { if (untrack(isOpen)) e.stopPropagation(); },
   }, tilt) as HTMLElement;

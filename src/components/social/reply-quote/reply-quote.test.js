@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -27,7 +28,7 @@ test("ReplyQuote: name and text behind an orange bar, two lines kept", () => {
 test("ReplyQuote: cancel button, own icon and name, click, lines, colour, variant, bar", () => {
   const log = [];
   const [el, dispose] = mount(() => [
-    h(ReplyQuote, { name: "Replying to Deniz", text: "Hi", lines: 0, onClose: () => log.push("close"), onClick: () => log.push("jump"), color: "brand-green", class: "mine" }),
+    mProps(h(ReplyQuote, { name: "Replying to Deniz", text: "Hi", lines: 0, onClose: () => log.push("close"), onClick: () => log.push("jump"), class: "mine" }), { color: "brand-green" }),
     h(ReplyQuote, { name: "A", text: "B", onClose: () => {}, close: "✕", closeLabel: "Drop", variant: "inverse", bar: false }),
     h(ReplyQuote, { name: "A", text: "B", onClose: () => {}, close: false }),
   ]);

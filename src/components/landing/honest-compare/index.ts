@@ -8,7 +8,7 @@ import { h } from "../../../dom/h.ts";
 import { signal, computed } from "../../../core/reactive.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, val, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { CheckMark } from "../../feedback/check-mark/index.ts";
 import { Badge } from "../../data/badge/index.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -54,8 +54,6 @@ export interface HonestCompareProps {
    * `info.verdict`: how the row scores (1 ahead, 0 even, -1 behind, null not scored).
    */
   renderCell?: ((value: CompareValue, info: { row: CompareRow; column: CompareColumn; us: boolean; verdict: 1 | 0 | -1 | null }) => unknown) | undefined;
-  /** Colour of the product's own column (default: the accent). */
-  color?: ColorToken | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -120,5 +118,5 @@ export function HonestCompare(props: HonestCompareProps): Element {
       class: "m-hc-filter", size: "sm", shape: "pill", color: "warn", pressed: () => onlyBehind(), onClick: () => onlyBehind.set(!onlyBehind.peek()),
     }, () => (onlyBehind() ? L.showAll ?? t`Show all rows` : L.onlyBehind ?? t`Only where we are behind`)) : null);
 
-  return h("div", { class: () => cx("m-hc", val(props.class)), "data-m-color": colorAttr(props.color) }, summary, h("div", { class: "m-hc-scroll", tabindex: "0", role: "region", "aria-label": () => L.region ?? t`Comparison table` }, table));
+  return h("div", { class: () => cx("m-hc", val(props.class)) }, summary, h("div", { class: "m-hc-scroll", tabindex: "0", role: "region", "aria-label": () => L.region ?? t`Comparison table` }, table));
 }

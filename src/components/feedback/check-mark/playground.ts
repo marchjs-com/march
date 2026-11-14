@@ -10,6 +10,6 @@ export default definePlayground<Values>({
     { key: "size", label: "Boyut", default: "md", options: ["sm", "md", "lg"] },
     { key: "text", label: "Metni göster", default: false },
     { key: "icons", label: "İşaretler", default: "default", options: [{ value: "default", label: "hazır" }, { value: "own", label: "kendi ikonlarım" }, { value: "emoji", label: "metin (👍 👎 ~)" }] },
-    { key: "color", label: "Renk", default: "", options: [{ value: "", label: "değere göre" }, { value: "primary", label: "vurgu" }, { value: "brand-purple", label: "mor" }, { value: "neutral", label: "nötr" }] },
+    { key: "color", label: "Renk", default: "", options: [{ value: "", label: "değere göre" }, { value: "primary", label: "vurgu" }, { value: "brand-purple", label: "mor" }, { value: "neutral", label: "nötr" }], prop: "m:color" },
   ],
 });

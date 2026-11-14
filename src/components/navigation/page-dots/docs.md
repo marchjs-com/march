@@ -17,7 +17,7 @@ onboarding flow. With `onChange` (or `bind:value`) the dots are buttons; without
 | `value` | `number` / accessor | `0` | current page, 0-based |
 | `onChange` | `(index) => void` | | makes the dots buttons (`bind:value` works too) |
 | `labels` | `{ group?, page?(n), status?(n, count) }` | "Pages", "Page n", "Page n of N" (translated) | accessible names |
-| `color` | color token | accent | colour of the current dot |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `size` | `sm` `md` `lg` | `md` | |
 | `variant` | `pill` `dot` | `pill` | `dot`: every dot the same size |
 | `orientation` | `horizontal` `vertical` | `horizontal` | |

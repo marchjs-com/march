@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { Roadmap } = await import("./index.ts");
@@ -21,7 +22,7 @@ test("Roadmap: own status texts, own badge, no rail, colour, no reveal", async (
   const el = document.createElement("div"); document.body.appendChild(el);
   const items = [{ title: "A", status: "done" }, { title: "B", status: "now" }];
   const dispose = render(() => [
-    h(Roadmap, { items, class: "one", color: "brand-purple", labels: { done: "Shipped" } }),
+    mProps(h(Roadmap, { items, class: "one", labels: { done: "Shipped" } }), { color: "brand-purple" }),
     h(Roadmap, { items, class: "two", rail: false, reveal: false, badges: (s, text) => h("em", { class: "mine" }, `${s}:${text}`) }),
   ], el);
   await Promise.resolve();

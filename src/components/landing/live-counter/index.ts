@@ -17,6 +17,7 @@ import { onFrame } from "../../../motion/engine/clock.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { Counter, formatCount } from "../counter/index.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 /** A text animation of hadi-march/motion/text (`scramble`, `splitFlap`, `odometer`, `pop`…): `(el, options) => { stop }`. */
 export type LiveCounterEffect = (el: HTMLElement, options?: never) => { stop(): void };
@@ -69,7 +70,7 @@ export function LiveCounter(props: LiveCounterProps): Element {
     : h(Counter, { value: n, mode: "roll", start: "now", format: props.format, prefix: props.prefix, suffix: props.suffix });
   const dot = props.dot === false ? null
     : props.dot && props.dot !== true ? h("span", { class: "m-lc-dot-own", "aria-hidden": "true" }, props.dot)
-    : h(StatusDot, { class: "m-lc-dot", size: "lg", pulse: true, color: props.dotColor });
+    : withColor(h(StatusDot, { class: "m-lc-dot", size: "lg", pulse: true }), props.dotColor);
 
   const root = h("div", { class: () => cx("m-lc", val(props.class)) },
     dot,

@@ -38,7 +38,7 @@ drives a list of options. Every part can be turned off or replaced.
 | `expanded` | boolean / accessor | `true` | combobox: whether the list is shown |
 | `disabled` | boolean | `false` | |
 | `id` | string | — | id of the input |
-| `color` | color token | accent | colour of the focus ring |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `class` | class value | — | |
 
 ## Accessibility

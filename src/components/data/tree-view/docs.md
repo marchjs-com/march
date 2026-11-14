@@ -38,7 +38,7 @@ import { TreeView } from "hadi-march/components/data/tree-view";
 | `ghost` | `(nodes) => node` | first label + count | content of the drag ghost |
 | `labels` | `{ loading?, retry?, empty?, noMatch? }` | built-in texts | your own texts; `loading(label)` and `noMatch(query)` are functions |
 | `animate` | boolean | `true` | opening, landing and ghost animations |
-| `color` | ColorToken | the accent | colour of selected rows |
+| `m:color` | ColorToken | the accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `label` | string | "Tree" | accessible name |
 | `class` | class | — | extra class on the tree |
 

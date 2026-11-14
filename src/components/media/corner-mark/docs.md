@@ -15,7 +15,7 @@ appears on a project cover, the "+" badge on a story ring. The parent must be po
 |---|---|---|---|
 | `corner` | `top-start` `top-end` `bottom-start` `bottom-end` | `top-end` | logical: "end" mirrors in right-to-left text |
 | `icon` | icon / text / node | | children work too |
-| `color` | color token | | fills the mark (`solid`) or colours the icon |
+| `m:color` | color token | | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `size` | `sm` `md` `lg` | `md` | |
 | `variant` | `scrim` `surface` `solid` | `scrim` | dark glass for photos, card colour with a shadow, or filled |
 | `ring` | `boolean` | `false` | a ring in the surface colour (cuts the mark out of an avatar) |

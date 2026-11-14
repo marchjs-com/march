@@ -9,6 +9,6 @@ export default definePlayground<Values>({
     { key: "shape", label: "Biçim", default: "", options: [{ value: "", label: "köşeli" }, { value: "round", label: "yuvarlak" }] },
     { key: "pressed", label: "Basılı (aç/kapa)", default: false },
     { key: "inverse", label: "Koyu zemin üstünde", default: false },
-    { key: "color", label: "Renk", default: "", options: [{ value: "", label: "tema" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }] },
+    { key: "color", label: "Renk", default: "", options: [{ value: "", label: "tema" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }], prop: "m:color" },
   ],
 });

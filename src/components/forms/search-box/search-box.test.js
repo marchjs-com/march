@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -64,7 +65,7 @@ test("SearchBox: debounce 0 writes at once; onInput, inputRef and onKeyDown (pre
 
 test("SearchBox: size, plain look, own icon / no icon, own clear / no clear, labels, color, class", () => {
   const m = mount(() => [
-    h(SearchBox, { size: "sm", variant: "plain", icon: false, clear: false, value: "abc", placeholder: "Find", color: "brand-orange", class: "mine", id: "s1", disabled: true }),
+    mProps(h(SearchBox, { size: "sm", variant: "plain", icon: false, clear: false, value: "abc", placeholder: "Find", class: "mine", id: "s1", disabled: true }), { color: "brand-orange" }),
     h(SearchBox, { icon: h("i", { class: "own-icon" }), clear: h("i", { class: "own-clear" }), clearLabel: "Empty it", label: "Search files", value: "abc" }),
   ]);
   const [a, b] = m.el.querySelectorAll(".m-search");

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -83,7 +84,7 @@ test("ResizeHandle: line, grip (default and own), color, disabled, class, ref", 
   const off = signal(false);
   let got = null;
   const m = mount(() => [
-    h(ResizeHandle, { value: () => 1, set: () => {}, line: "always", grip: true, color: "brand-orange", disabled: off, class: "mine", ref: (el) => { got = el; } }),
+    mProps(h(ResizeHandle, { value: () => 1, set: () => {}, line: "always", grip: true, disabled: off, class: "mine", ref: (el) => { got = el; } }), { color: "brand-orange" }),
     h(ResizeHandle, { line: "none", grip: h("i", { class: "dots" }) }),
   ]);
   const [a, b] = m.el.querySelectorAll(".m-resize-handle");

@@ -6,7 +6,7 @@ import { onFrame } from "../../../motion/engine/clock.ts";
 import { onCleanup } from "../../../core/reactive.ts";
 
 export const code = `<TimeRuler duration={2000} value={$now} onSeek={(ms) => playback.seek(ms)} onSeekStart={pause} snap={(ms) => Math.round(ms / 50) * 50} />
-<TimeRuler duration={() => span()} value={() => runner.elapsed()} minor={false} color="brand-orange" />   // read-only
+<TimeRuler duration={() => span()} value={() => runner.elapsed()} minor={false} m:color="brand-orange" />   // read-only
 <span style={{ "inset-inline-start": timePercent(entry.start, span()) }} />                             // rows share the scale`
 
 const clock = (ms: number): string => { const s = Math.floor(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}` }
@@ -28,7 +28,7 @@ export default function TimeRulerDemo(props: { values: { duration: number; seeka
       const onSeek = v.seekable ? (ms: number) => { $now = ms } : undefined
       return <div class="sc-ruler-box">
         <TimeRuler duration={v.duration} value={() => Math.min($now, v.duration)} onSeek={onSeek} onSeekStart={() => play(false)} minor={v.minor}
-          major={v.major === "auto" ? undefined : Number(v.major)} head={head} color={color} format={v.format === "clock" ? clock : undefined}
+          major={v.major === "auto" ? undefined : Number(v.major)} head={head} m:color={color} format={v.format === "clock" ? clock : undefined}
           snap={(ms: number) => Math.round(ms / 50) * 50} />
         <div class="sc-ruler-row"><span class="sc-ruler-bar" style={{ "inset-inline-start": timePercent(v.duration * 0.1, v.duration), "inline-size": "35%" }} /></div>
         <div class="sc-ruler-row"><span class="sc-ruler-bar" style={{ "inset-inline-start": timePercent(v.duration * 0.5, v.duration), "inline-size": "40%" }} /></div>

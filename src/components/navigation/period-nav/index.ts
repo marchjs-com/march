@@ -12,6 +12,7 @@ import { IconButton } from "../../actions/icon-button/index.ts";
 import { ButtonGroup } from "../../actions/button-group/index.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 /** Texts of a PeriodNav (each a string or an accessor). */
 export interface PeriodNavLabels {
@@ -59,12 +60,11 @@ export function PeriodNav(props: PeriodNavProps): Element {
   const rtl = (): boolean => val(props.rtl) ?? dir() === "rtl";
   const L = props.labels ?? {}, pc = props.partClass ?? {};
   const title = props.title ?? props.children;
-  const arrow = (n: -1 | 1): unknown => (props.arrows === false ? null : h(IconButton, {
-    class: cx("m-period-nav-arrow", n < 0 ? pc.prev : pc.next), size: props.size, color: props.color,
+  const arrow = (n: -1 | 1): unknown => (props.arrows === false ? null : withColor(h(IconButton, {
+    class: cx("m-period-nav-arrow", n < 0 ? pc.prev : pc.next), size: props.size,
     icon: () => ownPart(n < 0 ? props.prevIcon : props.nextIcon, () => ((n < 0) !== rtl() ? chevronLeft : chevronRight)),
     label: () => val(n < 0 ? L.previous : L.next) ?? (n < 0 ? t`Previous` : t`Next`),
-    disabled: () => !!val(n < 0 ? props.prevDisabled : props.nextDisabled), onClick: n < 0 ? props.onPrev : props.onNext,
-  }));
+    disabled: () => !!val(n < 0 ? props.prevDisabled : props.nextDisabled), onClick: n < 0 ? props.onPrev : props.onNext }), props.color));
   const today = !props.onToday || props.today === false ? null
     : h(Button, { class: cx("m-period-nav-today", pc.today), variant: "secondary", size: "sm", color: props.color, onClick: props.onToday }, () => ownPart(props.today, () => val(L.today) ?? t`Today`));
   return h(ButtonGroup, { label: () => val(L.group) ?? t`Period`, attached: props.attached ?? title == null, class: () => cx("m-period-nav", title != null && "is-titled", val(props.class)) },

@@ -27,7 +27,7 @@ A new `steps` list builds the form again from the first step, keeping the values
 | `validateOn` | `"blur"` `"change"` `"submit"` | `"blur"` | when a field shows its error |
 | `onStep`, `onReady` | functions | — | step changes; the form and `{ index, next, back, go }` |
 | `form` | `FormController` | new `useForm` | share a form built elsewhere |
-| `color` | `ColorToken` | primary | accent of the current stage |
+| `m:color` | `ColorToken` | primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `stepper` | boolean | `true` | the stage list on top |
 | `progress` | boolean | `true` | the bar under it |
 | `count` | boolean | `true` | the "Step 2 of 3" text beside the buttons |

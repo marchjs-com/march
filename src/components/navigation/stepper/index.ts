@@ -9,7 +9,7 @@ import { t } from "../../../core/i18n.ts";
 import { val, cx, uid, clamp, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Steps, type StepItem } from "../steps/index.ts";
 import { Button } from "../../../ui/button.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { nextFrame } from "../../../motion/engine/index.ts";
@@ -32,8 +32,6 @@ export interface StepperProps {
   vertical?: MaybeFn<boolean | undefined>;
   /** Morph between steps (default true): the highlight stretches and the panels blur into each other; false = at once. */
   morph?: MaybeFn<boolean | undefined>;
-  /** Theme color token. */
-  color?: ColorToken | undefined;
   /** The liquid highlight around the current step (default true). */
   highlight?: boolean | undefined;
   /** The "2 / 4" counter between Back and Next: true (default), false, or `(i, n) => content` (i is 0-based). */
@@ -111,7 +109,7 @@ export function Stepper(props: StepperProps): Element {
   const withNav = props.nav ?? (!!props.panels && !!props.onSelect);
   const go = (i: number): void => props.onSelect?.(clamp(i, 0, n - 1));
   const counter = props.counter, stepName = props.labels?.step;
-  const el = h("div", { ref: (x: HTMLElement) => { root = x; }, class: () => cx("m-stepper", vertical() && "m-stepper-v", val(props.class)), "data-m-color": () => colorAttr(props.color) },
+  const el = h("div", { ref: (x: HTMLElement) => { root = x; }, class: () => cx("m-stepper", vertical() && "m-stepper-v", val(props.class)) },
     props.highlight !== false && h("span", { class: "m-stepper-blob", "aria-hidden": "true", ref: (x: HTMLElement) => { blob = x; } }),
     h(Steps, { steps: props.steps, current: cur, ...(props.onSelect ? { onSelect: props.onSelect } : {}), vertical: reactive(vertical) as never,
       doneIcon: props.doneIcon, renderDot: props.renderDot, connector: props.connector }),

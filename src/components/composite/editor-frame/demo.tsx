@@ -8,7 +8,7 @@ import { Button } from "../../../ui/button.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<EditorFrame head={<FormatToolbar onTool={exec} />} actions={<Badge>{$words} kelime</Badge>}
-  foot={<span>Markdown desteklenir</span>} color="brand-green">
+  foot={<span>Markdown desteklenir</span>} m:color="brand-green">
   <textarea class="m-editor-area" bind:value={$text} />
 </EditorFrame>
 <EditorFrame showHead={() => $tools.length > 0} headProps={{ sticky: true }} footProps={{ divider: true }} ring={false} … />`
@@ -31,7 +31,7 @@ export default function EditorFrameDemo(props: { values: { head: boolean; action
         headProps={{ sticky: v.sticky }}
         foot={v.foot ? <span>{() => ($last ? `Son araç: ${$last}` : "Çerçevenin içine tıklayın: kenar ve halka odakla renklenir.")}</span> : undefined}
         footProps={{ divider: true }}
-        ring={v.ring} color={color} disabled={v.state === "disabled"} readonly={v.state === "readonly"}>
+        ring={v.ring} m:color={color} disabled={v.state === "disabled"} readonly={v.state === "readonly"}>
         <textarea class="m-editor-area" rows={4} aria-label="Not" readonly={v.state === "readonly"} disabled={v.state === "disabled"}
           value={untrack(() => $text)} on:input={(e: Event) => { $text = (e.target as HTMLTextAreaElement).value }} />
       </EditorFrame>

@@ -6,7 +6,7 @@ import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reac
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
 import tr from "./tr.ts";
 
@@ -28,8 +28,6 @@ export interface ClampTextProps {
   onOpenChange?: ((open: boolean) => void) | undefined;
   /** Own texts of the switch (default "more" / "less", translated); a node works too. */
   labels?: { more?: unknown; less?: unknown } | undefined;
-  /** Theme colour token of the switch (default: the accent). */
-  color?: MaybeFn<ColorToken | undefined>;
   /** Element of the text: "p" (default), "div" or "span". */
   as?: "p" | "div" | "span" | undefined;
   class?: ClassProp;
@@ -60,7 +58,7 @@ export function ClampText(props: ClampTextProps): Element {
       if (getOwner()) onCleanup(() => ro.disconnect());
     }
   }
-  return h("div", { class: () => cx("m-clamp", val(props.class)), "data-m-color": () => colorAttr(val(props.color)) },
+  return h("div", { class: () => cx("m-clamp", val(props.class)) },
     text,
     () => {
       if (props.expandable === false || !lines() || !overflows()) return null;

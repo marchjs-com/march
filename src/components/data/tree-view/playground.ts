@@ -9,7 +9,7 @@ export default definePlayground<Values>({
     { key: "draggable", label: "Sürükle-bırak", default: true },
     { key: "icons", label: "İkonlar", default: true },
     { key: "chevron", label: "Açma oku", default: "on", options: [{ value: "on", label: "ok" }, { value: "own", label: "kendi işaretim (+ / −)" }, { value: "off", label: "yok" }] },
-    { key: "color", label: "Seçim rengi", default: "", options: [{ value: "", label: "vurgu rengi" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "success", label: "yeşil" }] },
+    { key: "color", label: "Seçim rengi", default: "", options: [{ value: "", label: "vurgu rengi" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "success", label: "yeşil" }], prop: "m:color" },
     { key: "animate", label: "Açılma hareketi", default: true },
     { key: "labels", label: "Kendi metinlerim (boş arama, yeniden dene)", default: false },
   ],

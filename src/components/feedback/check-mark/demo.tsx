@@ -12,7 +12,7 @@ import { more } from "../../../icons/glyphs/more.ts";
 export const code = `<CheckMark value={row.included} />                       // ✓ / ✕, read as "Evet" / "Hayır"
 <CheckMark value="partial" text />                        // – Kısmen (visible text)
 <CheckMark value={false} variant="soft" label={false} />  // decorative: the line says it
-<CheckMark value labels={{ yes: "Dahil" }} icons={{ yes: heart }} color="primary" />
+<CheckMark value labels={{ yes: "Dahil" }} icons={{ yes: heart }} m:color="primary" />
 <CheckMark value={$done} variant="soft" motion="flip" />  // ✕ döner, ✓ olur (fade, pop, draw, kendi fonksiyonun)`
 
 const VALUES: Record<string, CheckMarkValue> = { yes: true, no: false, partial: "partial" }
@@ -39,20 +39,19 @@ export default function CheckMarkDemo(props: { values: Values }) {
       const shared = {
         variant: v.variant as "plain", size: v.size as "md", text: v.text, labels: LABELS,
         icons: v.icons === "own" ? OWN : v.icons === "emoji" ? EMOJI : undefined,
-        color: (v.color || undefined) as ColorToken | undefined,
         motion: v.motion === "own" ? slide : v.motion as "flip",
       }
       return <>
         <div class="sc-row">
-          <CheckMark value={VALUES[props.values.value] ?? true} {...shared} />
+          <CheckMark m:color={v.color || undefined} value={VALUES[props.values.value] ?? true} {...shared} />
           <span class="m-muted">{`ekran okuyucu: "${LABELS[props.values.value as "yes"] ?? "Evet"}"`}</span>
         </div>
         <div class="sc-row">
-          <CheckMark value={$flag} {...shared} variant="soft" />
+          <CheckMark m:color={v.color || undefined} value={$flag} {...shared} variant="soft" />
           <Button size="sm" variant="secondary" on:click={() => $flag = !$flag}>Değiştir (✕ ↔ ✓)</Button>
           <span class="m-muted">{`motion="${v.motion}"`}</span>
         </div>
-        {ROWS.map(([name, value]) => <div class="sc-row"><CheckMark value={value} {...shared} /><span>{name}</span></div>)}
+        {ROWS.map(([name, value]) => <div class="sc-row"><CheckMark m:color={v.color || undefined} value={value} {...shared} /><span>{name}</span></div>)}
       </>
     }}
   </div>

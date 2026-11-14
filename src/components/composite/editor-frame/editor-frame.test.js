@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { EditorFrame } = await import("./index.ts");
@@ -27,10 +28,10 @@ test("EditorFrame: head, area and foot in order; bars are left out when they hav
 
 test("EditorFrame: showHead / showFoot, bar props, states, ring, colour", () => {
   const show = signal(true), off = signal(false), color = signal("brand-green");
-  const [el, dispose] = mount(() => h(EditorFrame, {
+  const [el, dispose] = mount(() => mProps(h(EditorFrame, {
     head: "tools", showHead: show, headProps: { sticky: true, class: "my-head" }, foot: "count", showFoot: () => !off(), footProps: { divider: true, "aria-live": "off" },
-    disabled: off, readonly: true, ring: false, color,
-  }, "body"));
+    disabled: off, readonly: true, ring: false,
+  }, "body"), { color }));
   const frame = el.querySelector(".m-editor-frame");
   assert.ok(frame.querySelector(".m-editor-head.my-head.is-sticky"));
   assert.ok(frame.querySelector(".m-editor-foot.is-divided"));

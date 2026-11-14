@@ -6,7 +6,7 @@ import { t } from "../../../core/i18n.ts";
 import { schema as makeSchema, type Schema, type SchemaSpec, type Values } from "../../../schema/index.ts";
 import { scoped, cx, uid, type ClassProp } from "../../../forms/util.ts";
 import { useForm, renderFields, FormContext, type FormController, type FieldName, type ValidateOn } from "../../../forms/form.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { Progress } from "../../../ui/progress.ts";
 import { Steps } from "../../../ui/steps.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -33,8 +33,6 @@ export interface WizardApi { index: () => number; next: () => void; back: () => 
 
 /** Props of <Wizard>. */
 export interface WizardProps<V = Values> {
-  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
-  color?: ColorToken | undefined;
   steps: readonly WizardStep<V>[];
   /** Optional when every step has its own schema. */
   schema?: Schema<V> | undefined;
@@ -115,8 +113,7 @@ function build(props: WizardProps, steps: readonly WizardStep[], carried: Values
     const current = computed(() => index());
     const titleOf = (s: WizardStep, i: number): string => s.title ?? props.labels?.step?.(i) ?? t`Step ${i + 1}`;
     const countText = (): string => props.labels?.count?.(index(), steps.length) ?? t`Step ${index() + 1} of ${steps.length}`;
-    return h("form", { "data-m-color": () => colorAttr(props.color),
-      class: cx("m-wizard", props.class), novalidate: true, "aria-busy": () => (form.submitting() ? "true" : null),
+    return h("form", { class: cx("m-wizard", props.class), novalidate: true, "aria-busy": () => (form.submitting() ? "true" : null),
       onSubmit: (e: Event) => { e.preventDefault(); next(); },
     },
     // the stage list is the Steps component: a later step is reachable once every step before it validates

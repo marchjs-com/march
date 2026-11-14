@@ -17,7 +17,7 @@ A decorative layer that lives inside its container: an image, a muted looping vi
 | `svg` | node | | inline SVG |
 | `draw` / `animate` | `(ctx, info) => void` / `boolean` | | canvas drawing; every frame while visible |
 | `effect` | see above | | CSS effect |
-| `color` | colour token | the theme's | colour of `spotlight`, `dots`, `grid` and `vignette`, and of an inline SVG's `currentColor` |
+| `m:color` | colour token | the theme's | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `fit`, `position` | object-fit, object-position | `cover`, `center` | |
 | `inset`, `top`, `bottom`, `start`, `end`, `left`, `right` | space step or CSS length | `0` | `start` / `end` follow the text direction |
 | `opacity`, `blend` | `number`, mix-blend-mode | `1`, `normal` | |

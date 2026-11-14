@@ -20,6 +20,7 @@ import { Button } from "../../../ui/button.ts";
 // Reveal: entries enter one after another
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 export interface Testimonial { quote: unknown; name: string; role?: unknown; avatar?: string | undefined; rating?: number | undefined }
 export interface TestimonialsProps {
@@ -54,7 +55,7 @@ export interface TestimonialsProps {
 
 function quoteCard(it: Testimonial, props: TestimonialsProps): Element {
   return h(Card, { as: "figure", class: "m-tm-card" },
-    it.rating != null && props.rating !== false ? h(Rating, { value: it.rating, readonly: true, size: "sm", class: "m-tm-rating", color: props.ratingColor, label: props.labels?.rating ? props.labels.rating(it.rating) : t`${it.rating} out of 5` }) : null,
+    it.rating != null && props.rating !== false ? withColor(h(Rating, { value: it.rating, readonly: true, size: "sm", class: "m-tm-rating", label: props.labels?.rating ? props.labels.rating(it.rating) : t`${it.rating} out of 5` }), props.ratingColor) : null,
     h("blockquote", { class: "m-tm-quote" }, h("p", {}, it.quote)),
     // who said it: a ListRow (avatar, name, role)
     h("figcaption", { class: "m-tm-who" }, h(ListRow, {

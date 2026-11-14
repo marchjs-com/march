@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { ExplodedView } = await import("./index.ts");
@@ -54,8 +55,8 @@ test("ExplodedView: together it leaves the content alone; apart the same element
 test("ExplodedView: without parts one element opens into its layers; names and layers are yours", () => {
   const [el, dispose] = mount(() => [
     h(ExplodedView, { open: true }, h("button", { class: "btn" }, "Tamam")),
-    h(ExplodedView, { open: true, layers: { ring: false, surface: "Arka plan" }, target: ".second", tags: false, gap: 40, tilt: { x: 40, z: -20 }, motion: "spring", color: "brand-blue", class: "mine", label: "Düğmenin katmanları" },
-      h("span", { class: "first" }, "a"), h("button", { class: "second" }, "b")),
+    mProps(h(ExplodedView, { open: true, layers: { ring: false, surface: "Arka plan" }, target: ".second", tags: false, gap: 40, tilt: { x: 40, z: -20 }, motion: "spring", class: "mine", label: "Düğmenin katmanları" },
+      h("span", { class: "first" }, "a"), h("button", { class: "second" }, "b")), { color: "brand-blue" }),
   ]);
   const [a, b] = el.querySelectorAll(".m-xv");
   assert.ok(a.classList.contains("m-xv-layers") && a.classList.contains("m-xv-smooth"));

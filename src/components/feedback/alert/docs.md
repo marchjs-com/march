@@ -22,7 +22,7 @@ A message that stays on the page: a tone (`info`, `success`, `warn`, `danger`, `
 | `dismissable` | `boolean` | `false` | adds a × button |
 | `dismissLabel` | `string` / accessor | "Dismiss" (translated) | accessible name of the × button |
 | `dismissIcon` | node / glyph | the × glyph | what the dismiss button shows |
-| `color` | colour token | the tone's | paints the alert with a theme colour (`brand-purple`, `cat-3`…); the role still follows `tone` |
+| `m:color` | colour token | the tone's | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `onDismiss` | `() => void` | | after it is hidden |
 | `class` | class value | | |
 

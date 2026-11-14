@@ -7,7 +7,6 @@ import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { ClampText } from "../../typography/clamp-text/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
@@ -24,8 +23,6 @@ export interface ReplyQuoteProps {
   lines?: MaybeFn<number | undefined>;
   /** "soft" (default: a tinted box) or "inverse" (inside a coloured bubble: darker box, bar and name in the text colour). */
   variant?: MaybeFn<"soft" | "inverse" | undefined>;
-  /** Theme colour token of the bar and the name (default brand-orange). */
-  color?: MaybeFn<ColorToken | undefined>;
   /** The bar at the start edge (default true). */
   bar?: MaybeFn<boolean | undefined>;
   /** Shows the cancel button and runs on it. */
@@ -56,7 +53,8 @@ export function ReplyQuote(props: ReplyQuoteProps): Element {
   return h("div", {
     ...rest(props, ["name", "text", "lines", "variant", "color", "bar", "onClose", "close", "closeLabel", "trail", "onClick"]),
     class: () => cx("m-reply-quote", val(props.variant) === "inverse" && "m-reply-quote-inverse", val(props.bar) === false && "is-barless", val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)) ?? "brand-orange",
+    // brand orange unless m:color gives another (the common prop is applied after, on this root)
+    "data-m-color": "brand-orange",
   },
   main,
   props.trail ?? null,

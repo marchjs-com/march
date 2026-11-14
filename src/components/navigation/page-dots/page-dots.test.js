@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -45,7 +46,7 @@ test("PageDots: arrow keys, Home, End stay inside the range", () => {
 test("PageDots: read-only position, decorative, colour, size, look, own dots and names", () => {
   const page = signal(2);
   const [el, dispose] = mount(() => [
-    h(PageDots, { count: 5, value: page, color: "brand-orange", size: "lg", variant: "dot", orientation: "vertical", class: "one" }),
+    mProps(h(PageDots, { count: 5, value: page, size: "lg", variant: "dot", orientation: "vertical", class: "one" }), { color: "brand-orange" }),
     h(PageDots, { count: 3, decorative: true, class: "two" }),
     h(PageDots, { count: 3, value: 1, onChange: () => {}, dot: (i, active) => h("b", { class: () => (active() ? "on" : "off") }, String(i + 1)), labels: { group: "Cards", page: (n) => `Card ${n}` }, class: "three" }),
   ]);

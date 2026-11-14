@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { StatusDot } = await import("./index.ts");
@@ -22,7 +23,7 @@ test("StatusDot: decorative by default, an image with a label", () => {
 
 test("StatusDot: tone, colour, size and pulse follow their props", () => {
   const tone = signal("warn"), pulse = signal(true);
-  const [el, dispose] = mount(() => h(StatusDot, { tone, pulse, size: "lg", color: "brand-orange", class: "mine" }));
+  const [el, dispose] = mount(() => mProps(h(StatusDot, { tone, pulse, size: "lg", class: "mine" }), { color: "brand-orange" }));
   const d = el.querySelector(".m-status-dot");
   assert.ok(d.classList.contains("is-warn") && d.classList.contains("m-status-dot-lg") && d.classList.contains("mine"));
   assert.ok(d.classList.contains("is-pulse-ring"), "true is the ring");

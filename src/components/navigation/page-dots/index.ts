@@ -6,7 +6,7 @@ import { untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, clamp, isRtl, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import tr from "./tr.ts";
 
 messages("tr", tr);
@@ -21,8 +21,6 @@ export interface PageDotsProps {
   setValue?: ((index: number) => void) | undefined;
   /** Own names: the group, a dot (`page(n)`, n from 1) and the position text of read-only dots. */
   labels?: { group?: string | undefined; page?: ((n: number) => string) | undefined; status?: ((n: number, count: number) => string) | undefined } | undefined;
-  /** Theme colour token of the current dot (default: the accent). */
-  color?: MaybeFn<ColorToken | undefined>;
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
   /** "pill" (default: the current dot is longer) or "dot" (same size, only the colour changes). */
   variant?: MaybeFn<"pill" | "dot" | undefined>;
@@ -57,7 +55,6 @@ export function PageDots(props: PageDotsProps): Element {
   const cls = (i: number): string => cx("m-page-dot", props.dot && "is-own", value() === i && "is-active");
   return h("div", {
     class: () => cx("m-page-dots", `m-page-dots-${val(props.size) ?? "md"}`, val(props.variant) === "dot" && "m-page-dots-even", val(props.orientation) === "vertical" && "m-page-dots-vertical", val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)),
     role: interactive ? "group" : props.decorative ? null : "img", "aria-hidden": !interactive && props.decorative ? "true" : null,
     "aria-label": () => (interactive ? props.labels?.group ?? t`Pages` : props.decorative ? null : props.labels?.status?.(value() + 1, count()) ?? t`Page ${value() + 1} of ${count()}`),
     onKeyDown: interactive ? onKeyDown : null,

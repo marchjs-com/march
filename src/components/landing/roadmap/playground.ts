@@ -8,6 +8,6 @@ export default definePlayground<Values>({
     { key: "badges", label: "Durum rozetleri", default: true },
     { key: "labels", label: "Rozet metinleri benim (Yayında / Yapılıyor / Sırada)", default: false, visibleWhen: (v) => v.badges },
     { key: "rail", label: "Çizgi", default: true },
-    { key: "color", label: "Dolgu rengi", default: "default", options: [{ value: "default", label: "marka geçişi" }, { value: "brand-purple", label: "mor" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }] },
+    { key: "color", label: "Dolgu rengi", default: "default", options: [{ value: "default", label: "marka geçişi" }, { value: "brand-purple", label: "mor" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }], prop: "m:color" },
   ],
 });

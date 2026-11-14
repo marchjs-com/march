@@ -28,13 +28,13 @@ export default function ResizeHandleDemo(props: { values: Values }) {
       {() => {
         const v = { ...props.values }
         const shared = {
-          line: v.line as "hover", color: v.color === "default" ? undefined : v.color as "primary", disabled: v.disabled,
+          line: v.line as "hover", disabled: v.disabled,
           grip: v.grip === "off" ? false : v.grip === "own" ? <Icon of={moreVertical} /> as Node : true,
         }
-        if (v.edge === "bottom-end") return <ResizeHandle edge="bottom-end" {...shared} label="Paneli boyutlandır" onPointerDown={corner}
+        if (v.edge === "bottom-end") return <ResizeHandle m:color={v.color === "default" ? undefined : v.color} edge="bottom-end" {...shared} label="Paneli boyutlandır" onPointerDown={corner}
           onStep={(dx, dy) => { $w = fit($w + dx, 160, 480); $h = fit($h + dy, 100, 260) }} />
-        if (v.edge === "bottom") return <ResizeHandle edge="bottom" {...shared} label="Panel yüksekliği" value={() => $h} set={(x) => $h = x} min={100} max={260} reset={() => $h = 150} />
-        return <ResizeHandle edge={v.edge as "end"} {...shared} label="Panel genişliği" value={() => $w} set={(x) => $w = x} min={160} max={480} reset={() => $w = 260} />
+        if (v.edge === "bottom") return <ResizeHandle m:color={v.color === "default" ? undefined : v.color} edge="bottom" {...shared} label="Panel yüksekliği" value={() => $h} set={(x) => $h = x} min={100} max={260} reset={() => $h = 150} />
+        return <ResizeHandle m:color={v.color === "default" ? undefined : v.color} edge={v.edge as "end"} {...shared} label="Panel genişliği" value={() => $w} set={(x) => $w = x} min={160} max={480} reset={() => $w = 260} />
       }}
     </div>
   </div>

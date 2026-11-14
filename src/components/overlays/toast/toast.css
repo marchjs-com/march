@@ -15,3 +15,6 @@
   .m-toasts-bottom-start, .m-toasts-top-start { inset-inline: var(--m-space-4) auto; }
   .m-toasts-bottom-center, .m-toasts-top-center { inset-inline: 0; margin-inline: auto; }
 }
+
+/* the colour scope of a toast with its own colour token: no box of its own */
+.m-toast-scope { display: contents; }

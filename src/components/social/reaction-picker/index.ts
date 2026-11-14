@@ -7,7 +7,7 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { roving } from "../../../ui/focus.ts";
 import { animate } from "../../../motion/animate.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { moveCursor } from "../../../behaviors/list-nav/index.ts";
 import "./reaction-picker.css";
@@ -36,8 +36,6 @@ export interface ReactionPickerProps {
   moreLabel?: MaybeFn<string | undefined>;
   /** Your own content for the "+" button. */
   moreIcon?: unknown;
-  /** Color of the picked emoji's circle and the focus ring. Default brand-blue. */
-  color?: MaybeFn<ColorToken | undefined>;
   class?: ClassProp;
 }
 
@@ -57,7 +55,6 @@ export function ReactionPicker(props: ReactionPickerProps): Element {
   };
   root = h("div", {
     class: () => cx("m-react", `m-react-${val(props.layout) ?? "row"}`, val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)),
     role: "toolbar", "aria-label": () => val(props.label) ?? t`Reactions`, onKeydown: key,
   }, () => {
     const list = val(props.emojis) ?? (val(props.layout) === "grid" ? EMOJI_SET : QUICK_REACTIONS);

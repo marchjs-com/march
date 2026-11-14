@@ -4,7 +4,7 @@
 import "./corner-mark.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 import type { Corner } from "../../layout/bottom-right-controls/index.ts";
 // one definition of the corner names (shared with the corner controls), re-exported under the same name
@@ -14,8 +14,6 @@ export interface CornerMarkProps {
   corner?: MaybeFn<Corner | undefined>;
   /** The icon (an icon, text or a node); children work too. */
   icon?: unknown;
-  /** Theme colour token: fills the mark ("solid") or colours the icon (other looks). */
-  color?: MaybeFn<ColorToken | undefined>;
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
   /** "scrim" (default: dark glass, for photos), "surface" (card colour with a shadow) or "solid" (filled with the colour). */
   variant?: MaybeFn<"scrim" | "surface" | "solid" | undefined>;
@@ -37,7 +35,6 @@ export function CornerMark(props: CornerMarkProps): Element {
   return h("span", {
     class: () => cx("m-corner-mark", `m-corner-mark-${val(props.corner) ?? "top-end"}`, `m-corner-mark-${val(props.size) ?? "md"}`, `m-corner-mark-${val(props.variant) ?? "scrim"}`,
       val(props.ring) && "is-ringed", val(props.overlap) && "is-overlap", val(props.show) === "hover" && "is-hover", val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)),
     role: () => (val(props.label) ? "img" : null), "aria-label": () => val(props.label) ?? null, "aria-hidden": () => (val(props.label) ? null : "true"),
   }, own);
 }

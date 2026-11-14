@@ -26,7 +26,7 @@ visible, the rest collapse into a gap. Previous / Next buttons are disabled at t
 | `controls` | boolean | `true` | the Previous / Next buttons |
 | `prev` / `next` | icon / short text | chevrons | content of the Previous / Next buttons |
 | `gap` | icon / short text / `false` | dots | the mark where pages are left out; `false`: no mark |
-| `color` | ColorToken | neutral | colour of the current page |
+| `m:color` | ColorToken | neutral | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `label` | string | "Pagination" | accessible name of the nav |
 | `labels` | `{ previous?, next?, page?: (n) => string, sizes? }` | "Previous", "Next", the number, "Rows per page" | accessible names of the buttons and the select |
 | `class` | ClassProp | — | extra class on the nav |

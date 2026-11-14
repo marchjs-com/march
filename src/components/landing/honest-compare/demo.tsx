@@ -3,7 +3,7 @@ import { HonestCompare, type CompareColumn, type CompareRow } from "./index.ts";
 
 export const code = `<HonestCompare columns={[{ id: "us", name: "HADİ" }, { id: "group", name: "Küçük etkinlik grubu" }]}
   rows={[{ label: "Sade: tek sohbet", values: { us: false, group: true }, note: "HADİ çok şey yapar." }]} />
-<HonestCompare columns={…} rows={…} color="brand-green" tags={false} filter={false} labels={{ partly: "Yarım" }}
+<HonestCompare columns={…} rows={…} m:color="brand-green" tags={false} filter={false} labels={{ partly: "Yarım" }}
   renderCell={(value) => (value === true ? "Var" : value === false ? "Yok" : undefined)} />   // undefined: the default mark`
 
 export const COMPARE_COLUMNS: CompareColumn[] = [
@@ -23,7 +23,7 @@ export const COMPARE_ROWS: CompareRow[] = [
 
 export default function HonestCompareDemo(props: { values: { summary: boolean; caption: boolean; filter: boolean; tags: boolean; cells: string; color: string } }) {
   return <div>
-    {() => { const v = { ...props.values }; return <HonestCompare columns={COMPARE_COLUMNS} rows={COMPARE_ROWS} summary={v.summary} filter={v.filter} tags={v.tags} color={v.color === "accent" ? undefined : v.color as "brand-green"}
+    {() => { const v = { ...props.values }; return <HonestCompare columns={COMPARE_COLUMNS} rows={COMPARE_ROWS} summary={v.summary} filter={v.filter} tags={v.tags} m:color={v.color === "accent" ? undefined : v.color as "brand-green"}
       renderCell={v.cells === "words" ? (value) => (value === true ? <b>Var</b> : value === false ? "Yok" : value === "partial" ? "Kısmen" : undefined) : undefined}
       showCaption={v.caption} caption="HADİ ve küçük bir etkinlik grubu" /> }}
   </div>

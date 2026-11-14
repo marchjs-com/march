@@ -31,7 +31,7 @@ test("toast: own icon and color, no icon, no close button, own close name, motio
   await tick();
   const [a, b, c] = document.querySelectorAll(".m-toast");
   assert.equal(a.querySelector(".m-toast-icon").textContent, "🎉");
-  assert.equal(a.getAttribute("data-m-color"), "brand-purple");
+  assert.equal(a.closest("[data-m-color]")?.getAttribute("data-m-color"), "brand-purple", "the toast is in its colour scope");
   assert.equal(a.querySelector(".m-toast-close"), null);
   assert.ok(a.classList.contains("m-toast-still") && a.classList.contains("mine"));
   assert.equal(b.querySelector(".m-toast-icon"), null);

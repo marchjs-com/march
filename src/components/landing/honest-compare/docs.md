@@ -32,7 +32,7 @@ and a toggle shows only the rows where the product loses.
 | `tags` | boolean | `true` | the "Ahead" / "Behind" tags beside the row labels |
 | `labels` | `{ yes, no, partly, ahead, behind, region, counts, onlyBehind, showAll }` | translated | every text the table writes; `counts`: `({ ahead, even, behind }) => node` |
 | `renderCell` | `(value, { row, column, us, verdict }) => node` | — | draw a cell yourself; `undefined` keeps the default mark |
-| `color` | color token | accent | colour of the product's own column |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `class` | string | — | extra class on the root (`.m-hc`; parts: `.m-hc-summary`, `.m-hc-filter`, `.m-hc-table`, `.m-hc-us`, `.m-hc-tag`, `.m-hc-note`) |
 
 `compareRow(row, us)` returns 1 (ahead), 0 (even), -1 (behind) or null (not scored).

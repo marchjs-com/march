@@ -4,14 +4,12 @@
 import "./icon-tile.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export type IconTone = "primary" | "neutral" | "success" | "warn" | "danger" | "info" | "violet" | "pink" | "teal";
 export interface IconTileProps {
   icon?: unknown;
   tone?: MaybeFn<IconTone | undefined>;
-  /** A theme colour token instead of a tone (`color="brand-orange"`, `cat-3`…). */
-  color?: MaybeFn<ColorToken | undefined>;
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
   /** "soft" (default: tinted ground), "outline" (framed, plain ground) or "solid" (filled). */
   variant?: MaybeFn<"soft" | "outline" | "solid" | undefined>;
@@ -28,7 +26,6 @@ export function IconTile(props: IconTileProps): Element {
   const variant = (): string => val(props.variant) ?? "soft";
   return h("span", {
     class: () => cx("m-icon-tile", `m-tile-${val(props.tone) ?? "primary"}`, `m-icon-tile-${val(props.size) ?? "md"}`, variant() !== "soft" && `m-icon-tile-${variant()}`, val(props.shape) === "round" && "m-icon-tile-round", val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)),
     role: () => (val(props.label) ? "img" : null), "aria-label": () => val(props.label) ?? null, "aria-hidden": () => (val(props.label) ? null : "true"),
   }, props.icon != null ? icon(props.icon, "m-icon") : props.children);
 }

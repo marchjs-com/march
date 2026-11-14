@@ -3,7 +3,7 @@ import "./badge.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import type { Tone } from "../../../ui/display-base.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 
 /** Format a count for badges: 120 → "99+". */
@@ -64,6 +64,6 @@ export function Badge(props: BadgeProps): unknown {
   const node = props.dot && props.dot !== true, pulse = !node && props.pulse ? props.pulse : false, builtIn = props.dot === true || !!pulse, mark = builtIn && !pulse && !!props.dotColor;
   return h(tag, { ...own, "data-m-color": () => colorAttr(props.color), "aria-label": () => val(props.ariaLabel) ?? null, class: () => cx("m-badge", `m-badge-${val(props.tone) ?? "neutral"}`, builtIn && !mark && !pulse && "m-badge-dot", extra()) },
     node ? h("span", { class: "m-badge-dot-own", "aria-hidden": "true" }, props.dot)
-      : builtIn ? h(StatusDot, { size: "xs", pulse, color: props.dotColor, class: pulse ? "m-badge-dot-pulse" : mark ? "m-badge-dot-mark" : null }) : null,
+      : builtIn ? withColor(h(StatusDot, { size: "xs", pulse, class: pulse ? "m-badge-dot-pulse" : mark ? "m-badge-dot-mark" : null }), props.dotColor) : null,
     props.children);
 }

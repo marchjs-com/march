@@ -35,7 +35,7 @@ export default function ProjectDetailDemo(props: { values: { gallery: boolean; n
       const d = details(p), n = PROJECTS[(PROJECTS.indexOf(p) + 1) % PROJECTS.length]!
       return <ProjectDetail project={v.gallery ? d : { ...d, gallery: undefined }} onBack={() => back(p)}
         next={v.next ? { project: n, onOpen: open } : undefined} facts={v.facts}
-        color={v.color === "default" ? undefined : v.color as "brand-orange"}
+        m:color={v.color === "default" ? undefined : v.color as "brand-orange"}
         reveal={v.reveal === "off" ? false : { effect: v.reveal as "up" }} />
     }}
   </div>

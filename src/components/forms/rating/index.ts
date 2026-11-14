@@ -6,14 +6,12 @@ import { t } from "../../../core/i18n.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { star } from "../../../icons/glyphs/star.ts";
 import { starFilled } from "../../../icons/glyphs/starFilled.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { roving } from "../../../ui/focus.ts";
 import type { IconDef } from "../../../icons/svg.ts";
 import { isRtl } from "../../../core/util.ts";
 
 export interface RatingProps {
-  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
-  color?: ColorToken | undefined;
   value?: MaybeFn<number | null | undefined>;
   setValue?: (v: number) => void;
   onChange?: (v: number) => void;
@@ -48,8 +46,7 @@ export function Rating(props: RatingProps): Element {
       onClick: () => set(n), onMouseenter: () => !props.readonly && hover.set(n),
     }, h("span", { class: "m-rating-off" }, mark(props.icon, star, n)), h("span", { class: "m-rating-on" }, mark(props.iconOn ?? props.icon, starFilled, n)));
   });
-  return h("span", { "data-m-color": () => colorAttr(props.color),
-    class: () => cx("m-rating", `m-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", props.animate === false && "is-still", hover() != null && "is-hovering", val(props.class)), role: "radiogroup",
+  return h("span", { class: () => cx("m-rating", `m-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", props.animate === false && "is-still", hover() != null && "is-hovering", val(props.class)), role: "radiogroup",
     "aria-label": () => val(props.label) ?? t`Rating`, onMouseleave: () => hover.set(null),
     // radio group keys: arrows (RTL mirrored), Home / End, no wrap; the value follows focus
     onKeydown: (e: KeyboardEvent) => {

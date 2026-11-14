@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const mount = (fn) => { const host = document.createElement("div"); document.body.appendChild(host); const dispose = render(fn, host); return { host, dispose }; };
@@ -28,10 +29,10 @@ test("Accordion: one open at a time by default; multiple keeps several; disabled
 
 test("Accordion: chevron off or your own, animated off, icon colour, onToggle", () => {
   const items = [{ id: "a", title: "A", content: "a", icon: "★" }, { title: "B", content: "b" }];
-  const off = mount(() => h(Accordion, { items, chevron: false, animated: false, color: "brand-orange" }));
+  const off = mount(() => mProps(h(Accordion, { items, chevron: false, animated: false }), { color: "brand-orange" }));
   assert.equal(off.host.querySelector(".m-acc-chev"), null);
   assert.match(off.host.querySelector(".m-accordion").getAttribute("class"), /is-static/);
-  assert.equal(off.host.querySelector(".m-acc-head").getAttribute("data-m-color"), "brand-orange");
+  assert.equal(off.host.querySelector(".m-acc-head").closest("[data-m-color]")?.getAttribute("data-m-color"), "brand-orange", "the heads are in the colour scope (m:color on the root)");
   off.dispose();
   const seen = [];
   const own = mount(() => h(Accordion, { items, onToggle: (k, o) => seen.push([k, o]), chevron: (open) => h("b", {}, () => (open() ? "-" : "+")) }));

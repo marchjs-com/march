@@ -9,6 +9,6 @@ export default definePlayground<Values>({
     { key: "caption", label: "Başlığı göster", default: false },
     { key: "tags", label: "Öndeyiz / Gerideyiz etiketleri", default: true },
     { key: "cells", label: "Hücreler", default: "icons", options: [{ value: "icons", label: "simgeler" }, { value: "words", label: "kendi çizimim (yazı)" }] },
-    { key: "color", label: "Kendi sütunumuzun rengi", default: "accent", options: [{ value: "accent", label: "vurgu" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }] },
+    { key: "color", label: "Kendi sütunumuzun rengi", default: "accent", options: [{ value: "accent", label: "vurgu" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }], prop: "m:color" },
   ],
 });

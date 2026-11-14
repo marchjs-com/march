@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { Alert, Notice } = await import("./index.ts");
@@ -26,7 +27,7 @@ test("Alert: dismiss hides it and calls onDismiss; Notice is Alert", () => {
 });
 
 test("Alert: own dismiss label and icon, a colour token, no icon", () => {
-  const m = mountD(() => h(Alert, { dismissable: true, dismissLabel: "Close it", dismissIcon: h("i", { class: "mine" }), color: "brand-purple", icon: null }, "Hi"));
+  const m = mountD(() => mProps(h(Alert, { dismissable: true, dismissLabel: "Close it", dismissIcon: h("i", { class: "mine" }), icon: null }, "Hi"), { color: "brand-purple" }));
   const a = m.el.querySelector(".m-alert");
   assert.equal(a.getAttribute("data-m-color"), "brand-purple");
   assert.equal(a.querySelector(".m-alert-icon"), null);

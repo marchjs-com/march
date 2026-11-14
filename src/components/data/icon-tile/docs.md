@@ -14,7 +14,7 @@ nine named tones or any theme colour token.
 |---|---|---|---|
 | `icon` | icon / text / node | | |
 | `tone` | `primary` `neutral` `success` `warn` `danger` `info` `violet` `pink` `teal` | `primary` | |
-| `color` | color token | | any theme colour (`brand-orange`, `cat-3`…); wins over `tone` |
+| `m:color` | color token | | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `size` | `sm` `md` `lg` | `md` | |
 | `variant` | `soft` `outline` `solid` | `soft` | tinted ground, framed plain ground, or filled |
 | `shape` | `square` `round` | `square` | |

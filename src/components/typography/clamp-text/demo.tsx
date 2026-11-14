@@ -7,7 +7,7 @@ import { Button } from "../../actions/button/index.ts";
 export const code = `<ClampText lines={3}>{post.text}</ClampText>                    // "devamı" appears only when it does not fit
 <ClampText text={bio} lines={2} open={$open} onOpenChange={(v) => $open = v} />   // controlled
 <ClampText lines={2} expandable={false}>{title}</ClampText>     // the fold only
-<ClampText lines={4} collapsible={false} labels={{ more: "tamamını oku" }} color="brand-orange">{text}</ClampText>`
+<ClampText lines={4} collapsible={false} labels={{ more: "tamamını oku" }} m:color="brand-orange">{text}</ClampText>`
 
 const LONG = "Cumartesi sabahı Moda sahilinde buluşuyoruz: önce on dakikalık ısınma, ardından sahil boyunca beş kilometrelik rahat tempolu koşu. Bitişte çay ocağında kahvaltı var, yeni katılanlarla tanışmak için en iyi an. Yağmur yağarsa rota değişmez, yalnızca yanınıza ince bir yağmurluk alın. Köpeğiyle gelmek isteyenler için kısa bir yürüyüş grubu da olacak."
 const SHORT = "Cumartesi 09.00, Moda sahili."
@@ -19,7 +19,7 @@ export default function ClampTextDemo(props: { values: { lines: number; expandab
       const v = { ...props.values }
       const labels = v.labels === "own" ? { more: "tamamını oku", less: "kısalt" } : undefined
       const color = v.color === "primary" ? undefined : v.color as "neutral"
-      return <ClampText lines={v.lines} expandable={v.expandable} collapsible={v.collapsible} labels={labels} color={color}
+      return <ClampText lines={v.lines} expandable={v.expandable} collapsible={v.collapsible} labels={labels} m:color={color}
         open={() => $open} onOpenChange={(o: boolean) => { $open = o }} text={v.short ? SHORT : LONG} />
     }}
     <div class="sc-row">

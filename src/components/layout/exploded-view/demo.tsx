@@ -25,14 +25,14 @@ export default function ExplodedViewDemo(props: { values: { open: boolean; mode:
       const color: ColorToken | undefined = v.color ? v.color as ColorToken : undefined
       const pick = (id: string): void => { $picked = id }
       return v.mode === "parts"
-        ? <ExplodedView open={v.open} parts={PARTS} tags={v.tags} gap={v.gap} motion={v.motion as "smooth"} color={color} onPick={pick} active={$picked}>
+        ? <ExplodedView open={v.open} parts={PARTS} tags={v.tags} gap={v.gap} motion={v.motion as "smooth"} m:color={color} onPick={pick} active={$picked}>
           <Card style={{ inlineSize: "19rem", maxInlineSize: "100%" }}>
             <div class="sc-row"><Avatar name="Elif Arslan" /><strong>Elif Arslan</strong><Badge tone="success">Etkin</Badge></div>
             <p class="m-muted">Tasarım ekibi · 12 proje</p>
             <div class="sc-row"><Button size="sm" icon={plus}>Projeye ekle</Button><Button size="sm" variant="ghost">Profil</Button></div>
           </Card>
         </ExplodedView>
-        : <ExplodedView open={v.open} tags={v.tags} gap={v.gap} motion={v.motion as "smooth"} color={color} layers={{ ring: v.ring ? undefined : false }} onPick={pick} active={$picked}>
+        : <ExplodedView open={v.open} tags={v.tags} gap={v.gap} motion={v.motion as "smooth"} m:color={color} layers={{ ring: v.ring ? undefined : false }} onPick={pick} active={$picked}>
           <Button icon={plus}>Yeni proje</Button>
         </ExplodedView>
     }}

@@ -40,7 +40,7 @@ export default function OptionListDemo(props: { values: Values }) {
         group: v.groups ? o.group : undefined, trailing: v.trailing && o.value === "system" ? <Kbd>S</Kbd> : undefined,
       }))
       const shared = {
-        size: v.size as "md", color: v.color === "default" ? undefined : v.color as "primary", columns: v.columns, label: "Tema",
+        size: v.size as "md", columns: v.columns, label: "Tema",
         check: v.check === "off" ? false : v.check === "own" ? () => <Icon of={star} /> : true,
         onPick: (x: string) => { $last = x },
       }
@@ -49,12 +49,12 @@ export default function OptionListDemo(props: { values: Values }) {
         const found = (): OptionItem[] => opts.filter((o) => String(o.label).toLocaleLowerCase("tr").includes($q.toLocaleLowerCase("tr")))
         return <>
           <div class="sc-a6-pad"><SearchBox size="sm" debounce={0} bind:value={$q} placeholder="Tema ara… (↑ ↓ Enter)" inputRef={(el) => { input = el }} /></div>
-          <OptionList {...shared} keysFrom={() => input} options={found} bind:value={$one} empty="Eşleşen tema yok" />
+          <OptionList m:color={v.color === "default" ? undefined : v.color} {...shared} keysFrom={() => input} options={found} bind:value={$one} empty="Eşleşen tema yok" />
         </>
       }
-      if (v.mode === "menu") return <OptionList {...shared} mode="menu" options={opts} />
-      if (v.mode === "multi") return <OptionList {...shared} multiple options={opts} bind:value={$many} />
-      return <OptionList {...shared} mode={v.mode as "radio"} options={opts} bind:value={$one} />
+      if (v.mode === "menu") return <OptionList m:color={v.color === "default" ? undefined : v.color} {...shared} mode="menu" options={opts} />
+      if (v.mode === "multi") return <OptionList m:color={v.color === "default" ? undefined : v.color} {...shared} multiple options={opts} bind:value={$many} />
+      return <OptionList m:color={v.color === "default" ? undefined : v.color} {...shared} mode={v.mode as "radio"} options={opts} bind:value={$one} />
     }}
     <p class="sc-demo-call">{() => `${ROLE[props.values.field ? "listbox" : props.values.mode] ?? ""} · tek: ${$one} · çoklu: ${$many.join(", ") || "—"} · son seçilen: ${$last}`}</p>
   </div>

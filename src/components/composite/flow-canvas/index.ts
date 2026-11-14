@@ -14,7 +14,7 @@ import { hasPart } from "../../../ui/parts.ts";
 import { isMod } from "../../../ui/keys.ts";
 import { snap } from "../../../ui/format.ts";
 import { observeSize } from "../../../ui/observe.ts";
-import { colorAttr } from "../../../theme/colors.ts";
+import { colorAttr, withColor } from "../../../theme/colors.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { OverflowText } from "../../typography/overflow-text/index.ts";
 import { IconTile } from "../../data/icon-tile/index.ts";
@@ -436,7 +436,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     },
       h("span", { class: "m-flow-glow", "aria-hidden": "true", ref: (x: HTMLElement) => { glow = x; } }),
       h("div", { class: "m-flow-head" },
-        h(IconTile, { class: "m-flow-icon", size: "sm", icon: ty?.icon ?? null, color: ty?.color }),
+        withColor(h(IconTile, { class: "m-flow-icon", size: "sm", icon: ty?.icon ?? null }), ty?.color),
         h(OverflowText, { class: "m-flow-title" }, title),
         h("span", { class: "m-flow-state", "aria-hidden": "true" }, () => {
           const s = status();

@@ -14,7 +14,7 @@ import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
 import { smile } from "../../../icons/glyphs/smile.ts";
 import { arrowLeft } from "../../../icons/glyphs/arrowLeft.ts";
 import { animate } from "../../../motion/animate.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { ReplyQuote } from "../reply-quote/index.ts";
@@ -48,8 +48,6 @@ export interface ChatBubbleProps {
   onRetry?: (() => void) | undefined;
   /** Your own words for the texts the bubble writes: the tick names, "edited", the retry line, the React / Reply buttons. */
   labels?: MaybeFn<Partial<Record<MessageStatus | "edited" | "retry" | "react" | "reply", string>> | undefined>;
-  /** Color of my bubble, the armed reply arrow and my reaction chips. Default brand-blue. */
-  color?: MaybeFn<ColorToken | undefined>;
   /** Delivery ticks: true (default), false, or `(status) => node` for your own mark. */
   ticks?: boolean | ((status: MessageStatus) => unknown) | undefined;
   /** The time text: `(date) => "09:05"`. Default: the short time of the active locale. */
@@ -115,7 +113,6 @@ export function ChatBubble(props: ChatBubbleProps): Element {
   const big = (): boolean => EMOJI_ONLY.test(text().trim()) && !val(props.reply);
   row = h("div", {
     class: () => cx("m-msg", mine() ? "m-msg-mine" : "m-msg-theirs", `m-msg-${val(props.position) ?? "single"}`, big() && "is-emoji", armed() && "is-armed", val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)),
     ref: (x: HTMLElement) => gesture(x),
   },
   props.replyHint === false ? null

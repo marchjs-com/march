@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { SectionHead, sectionActions } = await import("./index.ts");
@@ -31,7 +32,7 @@ test("SectionHead: eyebrow, title, lead, actions, note in order; live text", () 
 test("SectionHead: every part is optional; level, align, size, width, color, class; own eyebrow node and link", () => {
   const align = signal("start");
   const m = mount(() => [
-    h(SectionHead, { title: "Only a title", as: "h3", align, size: "sm", width: "full", color: "brand-purple", class: "mine" }),
+    mProps(h(SectionHead, { title: "Only a title", as: "h3", align, size: "sm", width: "full", class: "mine" }), { color: "brand-purple" }),
     h(SectionHead, { eyebrow: h("b", { class: "pill" }, "New"), eyebrowHref: "/news", title: "Linked" }),
   ]);
   const [a, b] = m.el.querySelectorAll(".m-section-head");

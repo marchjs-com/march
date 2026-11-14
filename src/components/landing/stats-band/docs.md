@@ -17,7 +17,7 @@ Plain, divided by lines, or as cards.
 | `items` | `{ value, label, note?, format?, decimals?, prefix?, suffix? }[]` | — | |
 | `variant` | `plain` `divided` `cards` | `divided` | |
 | `mode` | `count` `roll` `none` | `count` | Counter style; `none` writes the number without counting |
-| `color` | color token | text colour | colour of the numbers |
+| `m:color` | color token | text colour | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `reveal` | Reveal options / `false` | `{ effect: "up", stagger: 90 }` | entrance of the items |
 | `class` | class | — | on the list |
 

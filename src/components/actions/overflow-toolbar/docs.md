@@ -30,7 +30,7 @@ always agree.
 | `moreIcon` | node / icon | three dots | icon of the More button |
 | `tooltips` | boolean | `true` | tooltips of icon-only buttons (`false`: names only) |
 | `motion` | `pop` `fade` `none` / `false` / `(el) => …` | `pop` | how an item comes back from the More menu; a function runs your own animation |
-| `color` | color token | theme primary | pressed toggles and the focus ring |
+| `m:color` | color token | theme primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `class` | class | — | extra classes on the toolbar |
 
 With an icon, an item is icon-only (the label becomes its name and tooltip, with the shortcut) unless `showLabel`.

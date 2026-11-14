@@ -8,7 +8,7 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { key } from "../../../ui/keys.ts";
 import { val, cx, debounce, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { Kbd } from "../../typography/kbd/index.ts";
 import { search as searchIcon } from "../../../icons/glyphs/search.ts";
@@ -56,8 +56,6 @@ export interface SearchBoxProps {
   expanded?: MaybeFn<boolean | undefined>;
   disabled?: MaybeFn<boolean | undefined>;
   id?: string | undefined;
-  /** Theme colour of the focus ring. */
-  color?: ColorToken | undefined;
   class?: ClassProp;
 }
 const isSignal = (v: unknown): v is Signal<string> => typeof v === "function" && (v as Partial<Signal<string>>).signal === true;
@@ -89,8 +87,7 @@ export function SearchBox(props: SearchBoxProps): Element {
   const combobox = props.controls != null;
   return h("div", {
     class: () => cx("m-search", val(props.size) === "sm" && "m-search-sm", val(props.variant) === "plain" && "m-search-plain", props.icon === false && "m-search-no-icon", val(props.class)),
-    role: "search", "data-m-color": colorAttr(props.color),
-  },
+    role: "search", },
   props.icon === false ? null : ownIcon ? icon(props.icon, "m-search-icon") : h("span", { class: "m-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
   h("input", {
     type: "search", id: props.id, class: () => cx("m-input m-search-input", val(props.size) === "sm" && "m-input-sm", props.inputClass), ref: (x: HTMLInputElement) => { input = x; props.inputRef?.(x); }, value: current.peek(),

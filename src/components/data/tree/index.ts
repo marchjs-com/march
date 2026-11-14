@@ -7,7 +7,7 @@ import { val, cx, icon, isRtl, type MaybeFn, type ClassProp } from "../../../ui/
 import { OverflowText } from "../../../ui/marquee.ts";
 import { roving } from "../../../ui/focus.ts";
 import { treeRow, treeKey } from "./row.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface TreeNode { id: string; label: unknown; icon?: unknown; meta?: unknown; children?: readonly TreeNode[] | undefined }
 export interface TreeProps {
@@ -19,8 +19,6 @@ export interface TreeProps {
   label?: string;
   /** The open / close arrow: true (default), false, or `(node, open) => node` (`open()` is live; yours does not turn by itself). */
   chevron?: boolean | ((node: TreeNode, open: () => boolean) => unknown) | undefined;
-  /** Colour of the selected row (theme token; default: the accent). */
-  color?: ColorToken | undefined;
   class?: ClassProp;
 }
 /** Expandable tree (role=tree; ↑ ↓ move, → opens then enters, ← closes then leaves, Enter selects): `<Tree nodes={files} onSelect={…} />` */
@@ -53,7 +51,7 @@ export function Tree(props: TreeProps): Element {
       }),
       has && h("ul", { role: "group", class: "m-tree-group", hidden: () => !isOpen() }, node.children?.map((c) => row(c, level + 1))));
   };
-  const root = h("ul", { role: "tree", class: () => cx("m-tree", val(props.class)), "aria-label": props.label ?? t`Tree`, "data-m-color": () => colorAttr(props.color) }, props.nodes.map((n) => row(n, 1)));
+  const root = h("ul", { role: "tree", class: () => cx("m-tree", val(props.class)), "aria-label": props.label ?? t`Tree` }, props.nodes.map((n) => row(n, 1)));
   queueMicrotask(() => { const first = (root as HTMLElement).querySelector<HTMLElement>(".m-tree-row"); if (first) first.tabIndex = 0; });
   return root;
 }

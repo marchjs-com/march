@@ -3,7 +3,7 @@ import { StatusDot, type StatusDotTone } from "./index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<StatusDot tone="success" pulse label="Canlı" />        // role="img", read as "Canlı"
-<StatusDot color="brand-orange" size="xs" />            // decorative (aria-hidden)
+<StatusDot m:color="brand-orange" size="xs" />            // decorative (aria-hidden)
 <StatusDot tone="warn" pulse="blink" /> Kaydedilmedi`
 
 const STATES: [StatusDotTone, string][] = [["success", "Çevrimiçi"], ["warn", "Meşgul"], ["danger", "Bağlantı yok"], ["neutral", "Çevrimdışı"]]
@@ -18,7 +18,7 @@ export default function StatusDotDemo(props: { values: { tone: string; color: st
       const note = v.label ? `role="img" aria-label="Canlı"` : `aria-hidden="true" (süs)`
       return <>
         <div class="sc-row">
-          <StatusDot tone={tone} color={color} pulse={pulse} size={size} label={label} />
+          <StatusDot tone={tone} m:color={color} pulse={pulse} size={size} label={label} />
           <span>Canlı yayın</span>
           <span class="m-muted">{note}</span>
         </div>

@@ -5,7 +5,7 @@ import "./section-head.css";
 import { h } from "../../../dom/h.ts";
 import { untrack } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { Button, type ButtonVariant } from "../../actions/button/index.ts";
 import { Reveal, type RevealOptions } from "../reveal/index.ts";
 
@@ -34,8 +34,6 @@ export interface SectionHeadProps {
   size?: MaybeFn<"sm" | "md" | "lg" | "xl" | undefined>;
   /** Width of the block: "text" (a readable measure, default) or "full". */
   width?: MaybeFn<"text" | "full" | undefined>;
-  /** Colour of the eyebrow (default: the accent). */
-  color?: ColorToken | undefined;
   /** Entrance when the block scrolls into view: true (parts rise one after another), Reveal options, or false (default). */
   reveal?: boolean | RevealOptions | undefined;
   class?: ClassProp | undefined;
@@ -70,7 +68,7 @@ export function SectionHead(props: SectionHeadProps): Element {
     acts.length ? h("div", { class: "m-section-head-actions" }, acts) : null,
     props.note != null ? h("p", { class: "m-section-head-note" }, () => val(props.note)) : null,
     props.children ?? null];
-  const attrs = { class: cls, "data-m-color": colorAttr(props.color) };
+  const attrs = { class: cls };
   if (!props.reveal) return h("div", attrs, parts);
   return h(Reveal, { ...attrs, effect: "up", stagger: 90, ...(props.reveal === true ? {} : props.reveal) }, parts) as Element;
 }

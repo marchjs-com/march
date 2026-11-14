@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { SectionLabel } = await import("./index.ts");
@@ -22,7 +23,7 @@ test("SectionLabel: text, icon, live count and actions", () => {
 test("SectionLabel: element, label prop, plain case, rule, size, color, class and attributes", () => {
   const upper = signal(false), rule = signal(true);
   const m = mount(() => [
-    h(SectionLabel, { as: "h3", label: () => "Colors", upper, rule, size: "md", color: "brand-orange", class: "mine", id: "grp" }),
+    mProps(h(SectionLabel, { as: "h3", label: () => "Colors", upper, rule, size: "md", class: "mine", id: "grp" }), { color: "brand-orange" }),
     h(SectionLabel, { as: "li", role: "presentation" }, "Recent"),
   ]);
   const [a, b] = m.el.querySelectorAll(".m-section-label");

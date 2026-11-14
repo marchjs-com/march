@@ -3,7 +3,7 @@ import { Wizard, type WizardStep } from "./index.ts";
 import { schema } from "../../../schema/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 
-export const code = `<Wizard color="primary" layout="stack" submitLabel="Bitir" onSubmit={save} steps={[
+export const code = `<Wizard m:color="primary" layout="stack" submitLabel="Bitir" onSubmit={save} steps={[
   { title: "Hesap", schema: schema({ email: { type: "email", label: "E-posta", required: true } }) },
   { title: "Profil", schema: schema({ name: { type: "text", label: "Görünen ad", required: true } }) },
   { title: "Tercihler", schema: schema({ news: { type: "bool", label: "Haber bülteni", control: "switch" } }) },
@@ -25,6 +25,6 @@ export default function WizardDemo(props: { values: { steps: number; layout: str
     const parts = { stepper: v.stepper, progress: v.progress, count: v.count, backButton: v.backButton }
     return <Wizard steps={ALL.slice(0, props.values.steps - 1).concat(ALL[3]!)} submitLabel={own ? "Hesabı aç" : "Bitir"} {...parts}
       labels={own ? { back: "← Önceki", next: "Devam et →", count: (i: number, n: number) => `${i + 1} / ${n}` } : undefined}
-      layout={props.values.layout as "stack"} cols={2} color={props.values.color as ColorToken} />
+      layout={props.values.layout as "stack"} cols={2} m:color={props.values.color as ColorToken} />
   }}</>
 }

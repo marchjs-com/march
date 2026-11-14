@@ -8,6 +8,7 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { clamp, setStyle } from "../../../core/util.ts";
 import { ResizeHandle } from "../resize-handle/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 export interface SplitterProps {
   start: unknown;
@@ -45,12 +46,11 @@ export function Splitter(props: SplitterProps): Element {
     props.handle === false
       ? h(ResizeHandle, { edge: "between", axis, line: "always", class: "m-split-handle is-fixed", role: "separator", "aria-orientation": vertical ? "horizontal" : "vertical", "aria-hidden": null })
       // drag, arrows (RTL mirrored), Home / End, Enter resets: ResizeHandle between the panes; the value is a percent
-      : h(ResizeHandle, {
-        edge: "between", axis, line: "always", class: "m-split-handle", label: props.label ?? t`Resize`, color: props.color,
+      : withColor(h(ResizeHandle, {
+        edge: "between", axis, line: "always", class: "m-split-handle", label: props.label ?? t`Resize`,
         value: () => share.peek() * 100, set: (v: number) => setShare(v / 100), min: min * 100, max: 100 - min * 100, step: 5,
         scale: () => 100 / size(), reset: () => setShare(props.initial ?? 0.5),
         onStart: () => root?.classList.add("is-dragging"), onEnd: () => root?.classList.remove("is-dragging"),
-        grip: props.handle != null && props.handle !== true ? h("span", { class: "m-split-grip" }, props.handle) as Node : undefined,
-      }),
+        grip: props.handle != null && props.handle !== true ? h("span", { class: "m-split-grip" }, props.handle) as Node : undefined }), props.color),
     h("div", { class: "m-split-pane" }, props.end));
 }

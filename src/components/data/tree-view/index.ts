@@ -23,7 +23,7 @@ import { icon, glyph } from "../../../ui/util.ts";
 import { folder } from "../../../icons/glyphs/folder.ts";
 import { fileText } from "../../../icons/glyphs/fileText.ts";
 import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface TreeViewNode {
   id: string;
@@ -92,8 +92,6 @@ export interface TreeViewProps {
   labels?: Partial<TreeViewLabels> | undefined;
   /** Opening, landing and ghost animations (default true). */
   animate?: boolean | undefined;
-  /** Colour of selected rows (theme token; default: the accent). */
-  color?: ColorToken | undefined;
   label?: MaybeFn<string | undefined>;
   class?: ClassProp;
 }
@@ -273,8 +271,7 @@ export function TreeView(props: TreeViewProps): Element {
   const ownEmpty = props.empty != null && props.empty !== true;
   const empty = props.empty === false ? null : (): unknown => (flat().length > 0 ? null : untrack(() => h(Empty, { size: "sm", class: "m-tv-empty", title: ownEmpty ? false : () => (query() ? lb("noMatch")(query()) : lb("empty")) }, ownEmpty ? props.empty : undefined)));
   const scroller = h("div", {
-    role: "tree", class: () => cx("m-tv", canDrag() && "is-draggable", val(props.class)), tabindex: "0", "aria-label": () => val(props.label) ?? t`Tree`, "data-m-color": () => colorAttr(props.color),
-    "aria-multiselectable": () => (sel.mode() === "multiple" ? "true" : null),
+    role: "tree", class: () => cx("m-tv", canDrag() && "is-draggable", val(props.class)), tabindex: "0", "aria-label": () => val(props.label) ?? t`Tree`, "aria-multiselectable": () => (sel.mode() === "multiple" ? "true" : null),
   }, canvas, dropLine, empty) as HTMLElement;
   setStyle(scroller, { height: `${props.height ?? 360}px` });
 

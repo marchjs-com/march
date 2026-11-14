@@ -4,7 +4,7 @@
 import "./status-dot.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 /** Meaning of a StatusDot. */
 export type StatusDotTone = "neutral" | "primary" | "info" | "success" | "warn" | "danger";
@@ -14,8 +14,6 @@ export type StatusDotPulse = boolean | "ring" | "blink";
 export interface StatusDotProps {
   /** Meaning: neutral, primary, info, success (default), warn, danger. */
   tone?: MaybeFn<StatusDotTone | undefined>;
-  /** A theme colour token instead of the tone ("brand-orange", "cat-3"…). */
-  color?: MaybeFn<ColorToken | undefined>;
   /** Motion: `true` / "ring" (a breathing ring), "blink" (the dot fades), `false` (default, still). */
   pulse?: MaybeFn<StatusDotPulse | undefined>;
   /** xs · sm · md (default) · lg. */
@@ -38,7 +36,6 @@ export function StatusDot(props: StatusDotProps): Element {
   return h("span", {
     ...rest(props, ["tone", "color", "pulse", "size", "label", "hollow"]),
     class: () => cx("m-status-dot", `m-status-dot-${val(props.size) ?? "md"}`, `is-${val(props.tone) ?? "success"}`, pulse() && `is-pulse-${pulse()}`, val(props.hollow) && "m-status-dot-hollow", val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)),
     role: () => (label() ? "img" : null), "aria-label": label, "aria-hidden": () => (label() ? null : "true"),
   }, props.children);
 }

@@ -7,7 +7,7 @@ import "./panel-header.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { cx, val, rest, icon, glyph, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 
@@ -48,8 +48,6 @@ export interface PanelHeaderProps {
   drag?: MaybeFn<boolean | undefined>;
   /** Titles at the top of a tall bar (default: centred). */
   align?: MaybeFn<"center" | "start" | undefined>;
-  /** Theme colour of the icon. */
-  color?: ColorToken | undefined;
   /** Called with the root element (drag behaviors attach here). */
   ref?: ((el: HTMLElement) => void) | undefined;
   class?: ClassProp | undefined;
@@ -73,7 +71,6 @@ export function PanelHeader(props: PanelHeaderProps): Element {
     ...rest(props, USED),
     class: () => cx("m-panel-header", `m-panel-header-${val(props.size) ?? "md"}`, foot && "m-panel-header-foot", val(props.sticky) && "is-sticky", val(props.divider) && "is-divided",
       val(props.tone) === "muted" && "m-panel-header-muted", val(props.drag) && "is-drag", val(props.align) === "start" && "m-panel-header-top", val(props.class)),
-    "data-m-color": colorAttr(props.color),
     ref: (el: HTMLElement) => props.ref?.(el),
   },
   props.lead != null ? h("span", { class: "m-panel-header-lead" }, props.lead) : null,

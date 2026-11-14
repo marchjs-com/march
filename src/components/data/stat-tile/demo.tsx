@@ -6,7 +6,7 @@ import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<StatTile value="128" label="Gönderi" />
 <StatTile value={<Counter value={$followers} mode="roll" />} label="Takipçi" variant="tile" onClick={openFollowers} />
-<StatTile value="₺4.250" label="Bu ay" hint="geçen aydan %12 fazla" align="start" size="lg" color="success" />
+<StatTile value="₺4.250" label="Bu ay" hint="geçen aydan %12 fazla" align="start" size="lg" m:color="success" />
 <dl><StatTile term value="42" label="Etkinlik" /></dl>            // dt + dd`
 
 const ITEMS = [{ id: "posts", label: "Gönderi", hint: "bu yıl 31" }, { id: "followers", label: "Takipçi", hint: "son 30 günde +212" }, { id: "following", label: "Takip", hint: "12 ortak" }]
@@ -23,7 +23,7 @@ export default function StatDemo(props: { values: { variant: string; size: strin
           const value = v.counter ? <Counter value={() => $n[it.id] ?? 0} mode="roll" start="now" /> : () => ($n[it.id] ?? 0).toLocaleString("tr")
           const onClick = v.clickable ? () => { $n = { ...$n, [it.id]: ($n[it.id] ?? 0) + 1 }; $last = it.label } : undefined
           return <StatTile value={value} label={it.label} hint={v.hint ? it.hint : undefined} variant={v.variant as "tile"} size={v.size as "md"}
-            align={v.align as "center"} order={v.order as "value"} color={color} onClick={onClick} />
+            align={v.align as "center"} order={v.order as "value"} m:color={color} onClick={onClick} />
         })}
       </div>
     }}

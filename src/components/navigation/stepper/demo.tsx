@@ -30,7 +30,7 @@ export default function StepperDemo(props: { values: { vertical: boolean; morph:
     {() => {
       const highlight = props.values.highlight, counter = props.values.counter, done = props.values.done
       return <Stepper steps={steps} current={() => $step} onSelect={(i) => { $step = i; $done = false }} vertical={() => props.values.vertical}
-        morph={() => props.values.morph} color={color()} panels={panels} nav onFinish={() => { $done = true }} finishLabel="Bitir"
+        morph={() => props.values.morph} m:color={color()} panels={panels} nav onFinish={() => { $done = true }} finishLabel="Bitir"
         highlight={highlight} doneIcon={done === "number" ? false : undefined}
         counter={counter === "off" ? false : counter === "own" ? (i: number, n: number) => (n - i - 1 ? `${n - i - 1} adım kaldı` : "son adım") : true} />
     }}

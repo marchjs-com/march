@@ -9,6 +9,6 @@ export default definePlayground<Values>({
     { key: "readonly", label: "Salt okunur (yarım yıldız)", default: false },
     { key: "mark", label: "İşaret", default: "star", options: [{ value: "star", label: "yıldız" }, { value: "heart", label: "kalp" }, { value: "number", label: "sayı (kendi çizimim)" }] },
     { key: "animate", label: "Hareket (büyüme, geçiş)", default: true },
-    { key: "color", label: "Renk", default: "primary", kind: "chips", options: [{ value: "primary", label: "tema" }, { value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }, { value: "brand-pink", label: "pembe" }] },
+    { key: "color", label: "Renk", default: "primary", kind: "chips", options: [{ value: "primary", label: "tema" }, { value: "brand-blue", label: "mavi" }, { value: "brand-green", label: "yeşil" }, { value: "brand-purple", label: "mor" }, { value: "brand-pink", label: "pembe" }] , prop: "m:color"},
   ],
 });

@@ -9,7 +9,7 @@ import { globe } from "../../../icons/glyphs/globe.ts";
 
 export const code = `<IconButton icon={heart} label="Beğen" pressed={$liked} on:click={like} />   // toggle: aria-pressed + pressed look
 <IconButton icon={trash} label="Sil" variant="danger" size="sm" />   // label is required (aria-label + title)
-<IconButton icon={star} label="Yıldızla" color="brand-orange" title={false} />   // colour token; no native tooltip
+<IconButton icon={star} label="Yıldızla" m:color="brand-orange" title={false} />   // colour token; no native tooltip
 <IconButton icon={send} label="Gönder" variant="solid" shape="round" />          // filled circle; "raised": floating
 <IconButton icon={x} label="Kapat" inverse />                                    // on a photo / video
 <IconButton icon={globe} label="Site" href="https://example.com" />              // a link`
@@ -22,11 +22,11 @@ export default function IconButtonDemo(props: { values: { size: string; variant:
       const variant = v.variant || undefined, shape = v.shape === "round" ? "round" as const : undefined
       const pressed = v.pressed ? true : undefined
       return <div class={v.inverse ? "sc-row sc-on-dark" : "sc-row"}>
-        <IconButton icon={heart} label={() => ($liked ? "Beğenmekten vazgeç" : "Beğen")} size={size} variant={variant} shape={shape} inverse={v.inverse} color={color}
+        <IconButton icon={heart} label={() => ($liked ? "Beğenmekten vazgeç" : "Beğen")} size={size} variant={variant} shape={shape} inverse={v.inverse} m:color={color}
           pressed={() => $liked || v.pressed} on:click={() => { $liked = !$liked }} />
-        <IconButton icon={star} label="Yıldızla" size={size} variant={variant} shape={shape} inverse={v.inverse} color={color} pressed={pressed} />
-        <IconButton icon={bell} label="Bildirimler" size={size} variant={variant} shape={shape} inverse={v.inverse} color={color} pressed={pressed} />
-        <IconButton icon={globe} label="Site (bağlantı)" href="https://example.com" target="_blank" rel="noopener" size={size} variant={variant} shape={shape} inverse={v.inverse} color={color} />
+        <IconButton icon={star} label="Yıldızla" size={size} variant={variant} shape={shape} inverse={v.inverse} m:color={color} pressed={pressed} />
+        <IconButton icon={bell} label="Bildirimler" size={size} variant={variant} shape={shape} inverse={v.inverse} m:color={color} pressed={pressed} />
+        <IconButton icon={globe} label="Site (bağlantı)" href="https://example.com" target="_blank" rel="noopener" size={size} variant={variant} shape={shape} inverse={v.inverse} m:color={color} />
         <IconButton icon={trash} label="Sil" size={size} variant={variant ?? "danger"} shape={shape} inverse={v.inverse} />
       </div>
     }}

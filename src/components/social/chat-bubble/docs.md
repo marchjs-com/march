@@ -30,7 +30,7 @@ you let go while the bubble springs back on the motion engine.
 | `onRetry` | `() => void` | — | on a failed message |
 | `children` | node | — | an image or a voice note above the text |
 | `labels` | `{ sending, sent, delivered, read, failed, edited, retry, react, reply }` | built-in texts | your own words; any subset |
-| `color` | ColorToken | `brand-blue` | my bubble, the armed reply arrow, my reaction chips |
+| `m:color` | ColorToken | `brand-blue` | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `ticks` | boolean / `(status) => node` | `true` | delivery ticks: off, or your own mark |
 | `formatTime` | `(date) => string` | locale short time | the time text |
 | `replyHint` | boolean / node | `true` | the arrow shown while dragging |

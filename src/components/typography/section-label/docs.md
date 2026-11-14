@@ -23,7 +23,7 @@ Small, uppercase and faint, with an optional icon, a count and an actions slot a
 | `upper` | boolean | `true` | uppercase with wide tracking; `false` keeps the text as written |
 | `size` | `sm` `md` | `sm` | |
 | `rule` | boolean | `false` | a thin rule that fills the row after the text |
-| `color` | color token | faint | colour of the text |
+| `m:color` | color token | faint | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `class` | class value | — | |
 | other | — | — | `id`, `role`, `aria-*`, events go to the root |
 

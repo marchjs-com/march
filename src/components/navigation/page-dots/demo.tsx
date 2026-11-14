@@ -4,7 +4,7 @@ import { PageDots } from "./index.ts";
 import { Button } from "../../actions/button/index.ts";
 
 export const code = `<PageDots count={5} bind:value={$page} />                        // buttons: click, arrow keys, Home / End
-<PageDots count={steps.length} value={$active} color="brand-orange" />   // read-only: shows the position
+<PageDots count={steps.length} value={$active} m:color="brand-orange" />   // read-only: shows the position
 <PageDots count={4} value={$i} onChange={(i) => $i = i} dot={(i) => i + 1} labels={{ page: (n) => \`\${n}. kart\` }} />`
 
 export default function PageDotsDemo(props: { values: { count: number; interactive: boolean; variant: string; size: string; color: string; dot: string; orientation: string } }) {
@@ -16,7 +16,7 @@ export default function PageDotsDemo(props: { values: { count: number; interacti
       const color = v.color === "primary" ? undefined : v.color as "neutral"
       const dot = v.dot === "own" ? (i: number) => String(i + 1) : undefined
       const onChange = v.interactive ? (i: number) => { $page = i } : undefined
-      return <PageDots count={v.count} value={() => $page} onChange={onChange} variant={v.variant as "pill"} size={v.size as "md"} color={color} dot={dot}
+      return <PageDots count={v.count} value={() => $page} onChange={onChange} variant={v.variant as "pill"} size={v.size as "md"} m:color={color} dot={dot}
         orientation={v.orientation as "horizontal"} labels={{ page: (n) => `${n}. sayfa` }} />
     }}
     <div class="sc-row sc-row-center">

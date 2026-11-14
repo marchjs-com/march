@@ -17,7 +17,7 @@ A scroll area that refreshes when its top is pulled down past a threshold, by to
 | `labels` | `{ pull, release, refreshing, refresh }` | translated texts | the three announced states and the keyboard button |
 | `indicator` | `boolean` / `(phase) => node` | `true` | `false`: no indicator; a function draws its own content inside it for every phase |
 | `icon` | node / glyph | the refresh glyph | what turns inside the indicator |
-| `color` | colour token | `primary` | the indicator when ready and while refreshing |
+| `m:color` | colour token | `primary` | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `settle` | `number` (ms) / `false` | `260` | how long the spring back takes; `false` snaps |
 | `refreshButton` | `boolean` | `true` | the keyboard "Refresh" button shown on focus |
 | `class`, `children` | | | the element itself is the scroll area: give it a height |

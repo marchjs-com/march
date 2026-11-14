@@ -11,6 +11,7 @@ import { IconButton } from "../../actions/icon-button/index.ts";
 import { PageDots } from "../../navigation/page-dots/index.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 export interface CarouselProps {
   label?: MaybeFn<string | undefined>; /** Slides per view on wide screens. */ perView?: 1 | 2 | 3 | 4; class?: ClassProp; children?: unknown;
@@ -51,6 +52,6 @@ export function Carousel(props: CarouselProps): Element {
     h("div", { class: "m-carousel-track", ref: (el: HTMLElement) => { track = el; }, onScroll: update, tabindex: "0" }, props.children),
     props.arrows !== false && arrow("prev", props.prevIcon, chevronLeft, () => props.labels?.previous ?? t`Previous`, () => index() <= 0, () => index() - 1),
     props.arrows !== false && arrow("next", props.nextIcon, chevronRight, () => props.labels?.next ?? t`Next`, () => index() >= last(), () => index() + 1),
-    props.dots !== false && h(PageDots, { class: "m-carousel-dots", count: () => Math.max(0, last() + 1), value: index, onChange: goTo, color: props.color,
-      labels: { page: (n: number) => props.labels?.slide?.(n) ?? t`Slide ${n}` }, ...(ownDot ? { dot: ownDot } : {}) }));
+    props.dots !== false && withColor(h(PageDots, { class: "m-carousel-dots", count: () => Math.max(0, last() + 1), value: index, onChange: goTo,
+      labels: { page: (n: number) => props.labels?.slide?.(n) ?? t`Slide ${n}` }, ...(ownDot ? { dot: ownDot } : {}) }), props.color));
 }

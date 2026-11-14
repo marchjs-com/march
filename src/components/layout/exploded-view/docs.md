@@ -34,7 +34,7 @@ import { ExplodedView } from "hadi-march/ui";
 | `motion` | `smooth` `spring` `none` / `false` | `smooth` | |
 | `onPick` | `(id, el) => void` | — | a plate was pressed while apart (`id`: the part's id / label, or `shadow` `surface` `content` `ring`) |
 | `active` | id / accessor | — | the plate shown as chosen |
-| `color` | color token | accent | outlines, the chosen plate, the ring |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `label` | string / accessor | "Exploded view" | accessible name of the group while apart |
 | `class` | class | — | |
 

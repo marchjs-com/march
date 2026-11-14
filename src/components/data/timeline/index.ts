@@ -6,6 +6,7 @@ import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts
 import type { Tone } from "../../../ui/display-base.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { StatusDot, type StatusDotTone } from "../../feedback/status-dot/index.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 const TONES: readonly StatusDotTone[] = ["primary", "info", "success", "warn", "danger"];
 
@@ -30,7 +31,7 @@ export function Timeline(props: TimelineProps): Element {
       // the connecting line: an element of its own (not a pseudo-element), down to the next item; live with `line`
       i < all.length - 1 ? () => (props.line === false ? null : h("span", { class: "m-tl-line", "aria-hidden": "true" })) : null,
       props.dot === false ? null : typeof props.dot === "function" ? h("span", { class: "m-tl-dot is-own", "aria-hidden": "true" }, props.dot(x, i))
-        : h(StatusDot, { class: "m-tl-dot", hollow: true, tone: TONES.includes(x.tone as StatusDotTone) ? x.tone as StatusDotTone : "neutral", color: x.color }, icon(x.icon)),
+        : withColor(h(StatusDot, { class: "m-tl-dot", hollow: true, tone: TONES.includes(x.tone as StatusDotTone) ? x.tone as StatusDotTone : "neutral" }, icon(x.icon)), x.color),
       h("div", { class: "m-tl-main" },
         x.time != null && h("time", { class: "m-tl-time", datetime: toDate(x.time)?.toISOString?.() ?? null }, () => time(val(x.time))),
         x.title != null && h("div", { class: "m-tl-title" }, () => val(x.title)),

@@ -15,7 +15,7 @@ accessible name; the icon, the text, the colour and the size can be changed.
 |---|---|---|---|
 | `label` | string / `false` | "Verified" | accessible name; `false` makes the badge decorative |
 | `icon` | icon / text / node | badge with a tick | own mark |
-| `color` | color token | brand blue | |
+| `m:color` | color token | brand blue | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `size` | `sm` `md` `lg` | `sm` | `sm` beside body text, `md` beside a heading |
 | `class` | class | — | |
 | other attributes | | | `data-*`, `title`, `id` go to the mark |

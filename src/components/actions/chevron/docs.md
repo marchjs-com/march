@@ -20,7 +20,7 @@ out and the arrow follows the nearest ancestor with `aria-expanded` (or the summ
 | `size` | `xs` `sm` `md` `lg` | `sm` | |
 | `motion` | `"smooth"` `"spring"` `false` | `"smooth"` | how it turns; `false` jumps |
 | `icon` | icon / text / node | chevron | own mark, drawn pointing to the inline end |
-| `color` | color token | — | default: the surrounding text colour |
+| `m:color` | color token | — | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `leaf` | boolean | `false` | keeps the box, draws nothing (tree leaves line up) |
 | `class` | class | — | |
 | other attributes | | | `data-*`, `id` go to the arrow |

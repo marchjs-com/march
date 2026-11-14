@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { Chevron } = await import("./index.ts");
@@ -25,7 +26,7 @@ test("Chevron: decorative, follows `open`, automatic without it", () => {
 test("Chevron: direction, size, motion, colour, own icon, leaf", () => {
   const leaf = signal(false);
   const [el, dispose] = mount(() => [
-    h(Chevron, { direction: "down", size: "lg", motion: "spring", color: "primary", class: "mine", leaf }),
+    mProps(h(Chevron, { direction: "down", size: "lg", motion: "spring", class: "mine", leaf }), { color: "primary" }),
     h(Chevron, { motion: false, icon: "›" }),
     h(Chevron, { icon: arrowRight }),
   ]);

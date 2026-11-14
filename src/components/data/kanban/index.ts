@@ -12,6 +12,7 @@ import type { ColorToken } from "../../../theme/colors.ts";
 import { PanelHeader } from "../../layout/panel-header/index.ts";
 import { StatusDot, type StatusDotTone } from "../../feedback/status-dot/index.ts";
 import { Badge } from "../badge/index.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 export interface KanbanColumn<T> {
   id: string;
@@ -55,7 +56,7 @@ export function Kanban<T>(props: KanbanProps<T>): Element {
     h(PanelHeader, {
       class: "m-kanban-head", size: "sm", title: col.title, titleAs: "span", partClass: { title: "m-kanban-title" },
       lead: props.dot === false ? undefined : typeof props.dot === "function" ? h("span", { class: "m-kanban-dot-own", "aria-hidden": "true" }, props.dot(col))
-        : h(StatusDot, { class: cx("m-kanban-dot", col.tone && `m-kanban-dot-${col.tone}`), tone: (col.tone as StatusDotTone | undefined) ?? "neutral", color: col.color }),
+        : withColor(h(StatusDot, { class: cx("m-kanban-dot", col.tone && `m-kanban-dot-${col.tone}`), tone: (col.tone as StatusDotTone | undefined) ?? "neutral" }), col.color),
       meta: props.count === false ? undefined : h(Badge, { class: cx("m-kanban-count", typeof props.count === "function" && "is-own") }, typeof props.count === "function" ? props.count(col) : String(col.items.length)),
     }),
     h("div", { class: "m-kanban-list" }, col.items.map((it) => h("article", {

@@ -11,7 +11,7 @@ import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { t } from "../../../core/i18n.ts";
 import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { x as cross } from "../../../icons/glyphs/x.ts";
 import { minus } from "../../../icons/glyphs/minus.ts";
@@ -43,8 +43,6 @@ export interface CheckMarkProps {
   variant?: MaybeFn<"plain" | "soft" | "solid" | "bare" | undefined>;
   /** sm · md (default) · lg. */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
-  /** Theme colour token instead of the colour of the value (yes: success, no: danger, partly: warn). */
-  color?: MaybeFn<ColorToken | undefined>;
   /**
    * The transition when the value changes: "flip" (the glyphs turn into each other), "fade", "pop", "draw" (the new
    * stroke is drawn), your own `(next, prev, change) => …`, or "none" / `false` (default: the glyph changes at once).
@@ -112,7 +110,7 @@ export function CheckMark(props: CheckMarkProps): Element {
   return h("span", {
     ...rest(props, ["value", "labels", "label", "text", "icons", "variant", "size", "color", "motion"]),
     class: () => cx("m-checkmark", `m-checkmark-${val(props.variant) ?? "plain"}`, `m-checkmark-${val(props.size) ?? "md"}`, `is-${kind()}`, moves() && "m-checkmark-moves", val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)), "aria-hidden": () => (label() == null ? "true" : null),
+    "aria-hidden": () => (label() == null ? "true" : null),
   },
   holder,
   () => (label() == null ? null : h("span", { class: () => (val(props.text) ? "m-checkmark-text" : "m-sr-only") }, label)));

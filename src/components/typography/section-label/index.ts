@@ -4,7 +4,7 @@
 import "./section-label.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, rest, icon, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 /** Props of <SectionLabel>. Unknown props (`id`, `role`, `aria-*`, events) go to the root element. */
 export interface SectionLabelProps {
@@ -24,8 +24,6 @@ export interface SectionLabelProps {
   size?: MaybeFn<"sm" | "md" | undefined>;
   /** A thin rule after the text that fills the row. */
   rule?: MaybeFn<boolean | undefined>;
-  /** Theme colour of the text (default: faint). */
-  color?: ColorToken | undefined;
   class?: ClassProp | undefined;
   children?: unknown | undefined;
   [attr: string]: unknown;
@@ -38,8 +36,7 @@ export function SectionLabel(props: SectionLabelProps): Element {
   return h(props.as ?? "div", {
     ...rest(props, USED),
     class: () => cx("m-section-label", `m-section-label-${val(props.size) ?? "sm"}`, val(props.upper) === false && "is-plain", val(props.class)),
-    "data-m-color": colorAttr(props.color),
-  },
+    },
   props.icon != null && props.icon !== false ? icon(props.icon, "m-section-label-icon") : null,
   h("span", { class: "m-section-label-text" }, props.label != null ? () => val(props.label) : props.children),
   props.count != null ? h("span", { class: "m-section-label-count" }, () => val(props.count)) : null,

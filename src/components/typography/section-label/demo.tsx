@@ -18,9 +18,9 @@ export default function SectionLabelDemo(props: { values: Values }) {
       const color = v.color === "none" ? undefined : v.color as "primary"
       const add = v.actions ? <IconButton size="sm" icon={plus} label="Ekle" /> : undefined
       return <>
-        <SectionLabel icon={v.icon ? star : undefined} count={v.count ? 3 : undefined} actions={add} upper={v.upper} rule={v.rule} size={v.size as "sm"} color={color}>Sık kullanılanlar</SectionLabel>
+        <SectionLabel icon={v.icon ? star : undefined} count={v.count ? 3 : undefined} actions={add} upper={v.upper} rule={v.rule} size={v.size as "sm"} m:color={color}>Sık kullanılanlar</SectionLabel>
         <ul class="sc-a6-list"><li>Gösterge paneli</li><li>Üyeler</li><li>Etkinlikler</li></ul>
-        <SectionLabel icon={v.icon ? clock : undefined} count={v.count ? 2 : undefined} upper={v.upper} rule={v.rule} size={v.size as "sm"} color={color}>Son açılanlar</SectionLabel>
+        <SectionLabel icon={v.icon ? clock : undefined} count={v.count ? 2 : undefined} upper={v.upper} rule={v.rule} size={v.size as "sm"} m:color={color}>Son açılanlar</SectionLabel>
         <ul class="sc-a6-list"><li>Ayarlar</li><li>Raporlar</li></ul>
       </>
     }}

@@ -25,6 +25,7 @@ import { ReplyQuote } from "../../social/reply-quote/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import "./chat-composer.css";
+import { withColor } from "../../../theme/colors.ts";
 
 /** The texts ChatComposer writes itself; every one is optional (default: the built-in text). */
 export interface ChatComposerLabels {
@@ -169,15 +170,13 @@ export function ChatComposer(props: ChatComposerProps): Element {
           icon: ownIcon(props.emojiIcon, smile, null), onClick: () => emojiOpen.set(!emojiOpen()),
         }))),
     // one round solid IconButton that is the microphone or the send arrow
-    h(IconButton, {
+    withColor(h(IconButton, {
       variant: "solid", shape: "round", size: "lg", title: false,
       type: () => (mode() === "send" ? "submit" : "button"),
       class: () => cx("m-compose-act", `is-${mode()}`, rec() && "is-rec"),
       label: () => (rec() ? L().sendVoice ?? t`Send voice message` : mode() === "send" ? L().send ?? t`Send` : L().record ?? t`Record voice message`),
-      color: live(() => (mode() === "mic" ? props.micColor : props.sendColor)),
       disabled: () => !!val(props.disabled),
       ref: (x: HTMLElement) => { action = x; },
       onClick: (e: MouseEvent) => { if (mode() === "mic") { e.preventDefault(); startRec(); } },
-      icon: () => (mode() === "send" ? ownIcon(props.sendIcon, send, null) : ownIcon(props.micIcon, mic, null)),
-    })));
+      icon: () => (mode() === "send" ? ownIcon(props.sendIcon, send, null) : ownIcon(props.micIcon, mic, null)) }), live(() => (mode() === "mic" ? props.micColor : props.sendColor)))));
 }

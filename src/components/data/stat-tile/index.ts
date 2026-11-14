@@ -7,7 +7,7 @@ import "./stat-tile.css";
 import { h } from "../../../dom/h.ts";
 import { routerLink } from "../../../dom/link.ts";
 import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface StatTileProps {
   /** The figure: text, a number or a node (`<Counter value={n} />`). */
@@ -16,8 +16,6 @@ export interface StatTileProps {
   label?: MaybeFn<unknown>;
   /** A small line under them ("last 30 days"). */
   hint?: MaybeFn<unknown>;
-  /** Theme colour token for the value (and the hover / focus of a clickable stat). */
-  color?: MaybeFn<ColorToken | undefined>;
   /** start · center (default) · end. */
   align?: MaybeFn<"start" | "center" | "end" | undefined>;
   /** sm · md (default) · lg · xl. */
@@ -59,8 +57,7 @@ export function StatTile(props: StatTileProps): Element {
     ...rest(props, ["value", "label", "hint", "color", "align", "size", "variant", "order", "onClick", "href", "disabled", "term", "partClass", "hintIn", "emphasis"]),
     class: () => cx("m-stat-tile", `m-stat-tile-${val(props.variant) ?? "plain"}`, `m-stat-tile-${val(props.size) ?? "md"}`, `is-${val(props.align) ?? "center"}`,
       val(props.order) === "label" && "is-label-first", props.emphasis === "text" && "is-text", kind !== "div" && "is-action", off() && "is-disabled", val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)),
-  };
+    };
   if (kind === "button") return h("button", { ...attrs, type: "button", disabled: off, onClick: props.onClick }, body) as Element;
   if (kind === "a") {
     const href = (): string | null => (off() ? null : val(props.href) ?? null);

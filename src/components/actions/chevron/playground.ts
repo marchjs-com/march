@@ -9,6 +9,6 @@ export default definePlayground<Values>({
     { key: "size", label: "Boyut", default: "md", options: ["xs", "sm", "md", "lg"] },
     { key: "motion", label: "Dönüş", default: "smooth", options: [{ value: "smooth", label: "yumuşak" }, { value: "spring", label: "yaylı" }, { value: "off", label: "yok" }] },
     { key: "icon", label: "İkon", default: "default", options: [{ value: "default", label: "hazır ok" }, { value: "arrow", label: "kendi ikonum" }, { value: "text", label: "metin (›)" }] },
-    { key: "color", label: "Renk", default: "", options: [{ value: "", label: "metin rengi" }, { value: "primary", label: "vurgu" }, { value: "brand-orange", label: "turuncu" }, { value: "danger", label: "tehlike" }] },
+    { key: "color", label: "Renk", default: "", options: [{ value: "", label: "metin rengi" }, { value: "primary", label: "vurgu" }, { value: "brand-orange", label: "turuncu" }, { value: "danger", label: "tehlike" }], prop: "m:color" },
   ],
 });

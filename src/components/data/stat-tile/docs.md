@@ -18,7 +18,7 @@ or a node (a Counter that rolls), a hint line is optional, and the tile becomes 
 | `value` | text / number / node / accessor | — | the figure |
 | `label` | text / node | — | what it counts |
 | `hint` | text / node | — | a small line under them |
-| `color` | color token | — | colour of the value (and the hover of a clickable stat) |
+| `m:color` | color token | — | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `align` | `start` `center` `end` | `center` | |
 | `size` | `sm` `md` `lg` `xl` | `md` | |
 | `variant` | `plain` `tile` `card` | `plain` | soft background, or border and surface |

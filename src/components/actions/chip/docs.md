@@ -17,7 +17,7 @@ with `aria-pressed`), and a **removable** tag (`onRemove`, an ×-button with an 
 | Prop | Type | Default | |
 |---|---|---|---|
 | `tone` | `neutral` `primary` `success` `warn` `danger` `info` | `neutral` | colour family |
-| `color` | ColorToken | theme primary | accent of a selected filter and of the primary tone |
+| `m:color` | ColorToken | theme primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `size` | `sm` `md` | `md` | |
 | `icon` | icon | — | leading icon (a tick replaces it while selected) |
 | `selected` | boolean / accessor | — | makes it a toggle button |

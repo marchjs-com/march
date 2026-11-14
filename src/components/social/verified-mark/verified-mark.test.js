@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -22,7 +23,7 @@ test("VerifiedMark: an image named Verified, with the built-in badge", () => {
 
 test("VerifiedMark: own label, icon, colour, size; decorative with label={false}", () => {
   const label = signal("Verified organiser");
-  const [el, dispose] = mount(() => [h(VerifiedMark, { label, icon: "✔", color: "brand-green", size: "lg", class: "mine" }), h(VerifiedMark, { label: false })]);
+  const [el, dispose] = mount(() => [mProps(h(VerifiedMark, { label, icon: "✔", size: "lg", class: "mine" }), { color: "brand-green" }), h(VerifiedMark, { label: false })]);
   const [a, b] = el.querySelectorAll(".m-verified-mark");
   assert.equal(a.getAttribute("aria-label"), "Verified organiser");
   assert.equal(a.textContent, "✔");

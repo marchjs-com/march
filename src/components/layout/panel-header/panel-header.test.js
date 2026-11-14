@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom, Event } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -48,7 +49,7 @@ test("PanelHeader: parts are optional; close off, own close icon and label", () 
 test("PanelHeader: drag handle (ref and events on the root, close is not a drag), footer, sticky, tone, color, class", () => {
   let got = null, downs = 0;
   const m = mount(() => [
-    h(PanelHeader, { title: "Window", drag: true, ref: (el) => { got = el; }, onPointerDown: () => downs++, onClose: () => {}, role: "toolbar", tabindex: "0", sticky: true, tone: "muted", color: "brand-orange", class: "mine" }),
+    mProps(h(PanelHeader, { title: "Window", drag: true, ref: (el) => { got = el; }, onPointerDown: () => downs++, onClose: () => {}, role: "toolbar", tabindex: "0", sticky: true, tone: "muted", class: "mine" }), { color: "brand-orange" }),
     h(PanelHeader, { as: "footer", title: "3 changes", actions: h("button", {}, "Save"), divider: true }),
   ]);
   const [bar, foot] = m.el.querySelectorAll(".m-panel-header");

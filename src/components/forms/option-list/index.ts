@@ -9,7 +9,7 @@ import { signal, effect, untrack, onCleanup, getOwner, type Signal } from "../..
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { cx, val, uid, icon, glyph, isRtl, listen, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { moveCursor, listNav } from "../../../behaviors/list-nav/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
 import { ListRow } from "../../data/list-row/index.ts";
@@ -68,8 +68,6 @@ export interface OptionListProps<T = string> {
   empty?: unknown | undefined;
   /** Draw the inside of a row yourself. */
   renderOption?: ((item: OptionItem<T>, state: OptionState) => unknown) | undefined;
-  /** Theme colour of the chosen row. */
-  color?: ColorToken | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -147,8 +145,7 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
   const cols = Math.max(1, props.columns ?? 1);
   root = h("div", {
     id, role: listRole, "aria-label": () => val(props.label) ?? null, "aria-multiselectable": props.multiple && listRole === "listbox" ? "true" : null,
-    "aria-orientation": listRole === "menu" || cols > 1 ? null : "vertical", "data-m-color": colorAttr(props.color),
-    class: () => cx("m-option-list", val(props.size) === "sm" && "m-option-list-sm", cols > 1 && "m-option-list-grid", cols > 1 && `m-option-list-cols-${Math.min(cols, 6)}`, props.inline && "m-option-list-inline", val(props.class)),
+    "aria-orientation": listRole === "menu" || cols > 1 ? null : "vertical", class: () => cx("m-option-list", val(props.size) === "sm" && "m-option-list-sm", cols > 1 && "m-option-list-grid", cols > 1 && `m-option-list-cols-${Math.min(cols, 6)}`, props.inline && "m-option-list-inline", val(props.class)),
     onKeydown: byField ? null : (e: KeyboardEvent) => {
       // list-nav gives the next index; rows that are disabled are stepped over
       const list = rows(), from = list.indexOf(e.target as HTMLElement);

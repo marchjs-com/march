@@ -11,7 +11,7 @@ import { home } from "../../../icons/glyphs/home.ts";
 import { settings } from "../../../icons/glyphs/settings.ts";
 
 export const code = `<IconTile icon={users} tone="primary" />
-<IconTile icon={bell} color="brand-orange" variant="solid" shape="round" size="lg" />
+<IconTile icon={bell} m:color="brand-orange" variant="solid" shape="round" size="lg" />
 <IconTile icon={check} tone="success" label="Tamamlandı" />   // with a label it is an image, not decoration`
 
 const TILES: readonly [IconTone, unknown][] = [["primary", users], ["neutral", settings], ["success", check], ["warn", star], ["danger", trash], ["info", bell], ["violet", calendar], ["pink", heart], ["teal", home]]
@@ -21,7 +21,7 @@ export default function IconTileDemo(props: { values: { size: string; variant: s
     {() => {
       const v = { ...props.values }
       const color = v.color === "tones" ? undefined : v.color as "brand-orange"
-      return TILES.map(([tone, icon]) => <IconTile icon={icon} tone={tone} color={color} size={v.size as "md"} variant={v.variant as "soft"} shape={v.shape as "square"} />)
+      return TILES.map(([tone, icon]) => <IconTile icon={icon} tone={tone} m:color={color} size={v.size as "md"} variant={v.variant as "soft"} shape={v.shape as "square"} />)
     }}
   </div>
 }

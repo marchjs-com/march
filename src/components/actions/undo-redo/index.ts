@@ -12,6 +12,7 @@ import { IconButton, type IconButtonSize } from "../icon-button/index.ts";
 import { undo as undoIcon } from "../../../icons/glyphs/undo.ts";
 import { redo as redoIcon } from "../../../icons/glyphs/redo.ts";
 import tr from "./tr.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 messages("tr", tr);
 
@@ -71,9 +72,8 @@ export function UndoRedo(props: UndoRedoProps): Element {
   const combo = (a: UndoRedoAction): string | null => (props.shortcuts === false ? null : (typeof props.shortcuts === "object" ? props.shortcuts[a] : undefined) ?? KEYS[a]);
   const ICON: Record<UndoRedoAction, unknown> = { undo: undoIcon, redo: redoIcon };
   return h("span", { class: () => cx("m-undo-redo", val(props.class)), role: "group", "aria-label": () => val(props.labels?.group) ?? t`History` },
-    (props.actions ?? (["undo", "redo"] as const)).map((a) => h(IconButton, {
-      class: cx("m-undo-redo-btn", `m-undo-redo-${a}`, props.partClass?.[a]), icon: props.icons?.[a] ?? ICON[a], size: props.size, color: props.color,
+    (props.actions ?? (["undo", "redo"] as const)).map((a) => withColor(h(IconButton, {
+      class: cx("m-undo-redo-btn", `m-undo-redo-${a}`, props.partClass?.[a]), icon: props.icons?.[a] ?? ICON[a], size: props.size,
       label: () => name(a), title: () => labelWithKey(name(a), combo(a)),
-      disabled: () => !can(a), onClick: () => run(a),
-    })));
+      disabled: () => !can(a), onClick: () => run(a) }), props.color)));
 }

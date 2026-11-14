@@ -19,7 +19,7 @@ import { commandBinding, type CommandBinding } from "../../../managers/command/u
 import { animate } from "../../../motion/animate.ts";
 import { still, motionPreset } from "../../../motion/engine/parts.ts";
 import { more } from "../../../icons/glyphs/more.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 messages("tr", { "More": "Daha fazla", "More actions": "Diğer eylemler" });
 
@@ -58,8 +58,6 @@ export interface OverflowToolbarProps {
   tooltips?: boolean | undefined;
   /** How an item comes back from the More menu: "pop" (default), "fade", "none" / false, or `(el) => …` (your own animation). */
   motion?: "pop" | "fade" | "none" | false | ((el: Element) => unknown) | undefined;
-  /** Theme color token of pressed toggles and the focus ring (default: the theme's primary). */
-  color?: ColorToken | undefined;
   class?: ClassProp;
 }
 
@@ -125,8 +123,7 @@ export function OverflowToolbar(props: OverflowToolbarProps): Element {
   // one tab stop: the first enabled button (the roving-focus behavior moves it with the arrow keys and on focus)
   effect(() => { shown(); present(); queueMicrotask(() => { const bs = buttons(); if (bs.length && !bs.some((b) => b.tabIndex === 0)) bs[0]!.tabIndex = 0; }); });
 
-  return h("div", { class: () => cx("m-otb", props.size === "md" ? "m-otb-md" : "m-otb-sm", val(props.class)), role: "toolbar", "aria-label": () => val(props.label), "data-m-color": () => colorAttr(props.color),
-    ref: (x: HTMLElement) => { onCleanup(rovingFocus(x, { orientation: "horizontal", selector: SEL })); } },
+  return h("div", { class: () => cx("m-otb", props.size === "md" ? "m-otb-md" : "m-otb-sm", val(props.class)), role: "toolbar", "aria-label": () => val(props.label), ref: (x: HTMLElement) => { onCleanup(rovingFocus(x, { orientation: "horizontal", selector: SEL })); } },
     h("div", { class: "m-otb-items", ref: (x: HTMLElement) => { row = x; fit.observe(x); } }, items),
     h("div", { class: "m-otb-more", hidden: () => overflow().length === 0, ref: (x: HTMLElement) => { moreEl = x; } },
       h(Menu, { label: () => val(props.moreLabel) ?? t`More actions`, icon: ownIcon(props.moreIcon === false ? undefined : props.moreIcon ?? undefined, more), items: () => overflow(), size: "sm", variant: "ghost", placement: "bottom-end" })),

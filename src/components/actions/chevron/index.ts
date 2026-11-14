@@ -7,7 +7,7 @@ import "./chevron.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 
 /** Where a Chevron points while closed. */
@@ -24,8 +24,6 @@ export interface ChevronProps {
   motion?: MaybeFn<"smooth" | "spring" | false | undefined>;
   /** Own icon drawn pointing to the inline end (an icon of hadi-march/icons, text or a node); it turns the same way. */
   icon?: unknown;
-  /** Theme colour token; default: the text colour around it. */
-  color?: MaybeFn<ColorToken | undefined>;
   /** Keeps the box but draws nothing (a tree leaf lines up with its siblings). */
   leaf?: MaybeFn<boolean | undefined>;
   class?: ClassProp;
@@ -40,6 +38,6 @@ export function Chevron(props: ChevronProps): Element {
   return h("span", {
     ...rest(props, ["open", "direction", "size", "motion", "icon", "color", "leaf"]),
     class: () => cx("m-chevron", `m-chevron-${val(props.direction) ?? "end"}`, `m-chevron-${val(props.size) ?? "sm"}`, state(), motion(), val(props.leaf) && "is-leaf", val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)), "aria-hidden": "true",
+    "aria-hidden": "true",
   }, () => (val(props.leaf) ? null : ownIcon(props.icon, chevronRight, "m-chevron-own")));
 }

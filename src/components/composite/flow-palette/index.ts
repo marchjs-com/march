@@ -17,6 +17,7 @@ import { Empty } from "../../feedback/empty/index.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
 import { NODE_W, type FlowStore, type FlowNodeType } from "../flow-canvas/model.ts";
+import { withColor } from "../../../theme/colors.ts";
 export interface FlowPaletteProps {
   flow: FlowStore;
   /** Types to offer. Default: every type of the flow. */
@@ -112,7 +113,7 @@ export function FlowPalette(props: FlowPaletteProps): Element {
       onPointerdown: (e: PointerEvent) => { e.preventDefault(); el.focus(); drag(e, ty, el); },
       onKeydown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); add(ty); } },
       ...(props.renderCard ? { title: h("span", { class: "m-flowpal-own" }, props.renderCard(ty)) } : {
-        lead: h(IconTile, { class: "m-flowpal-icon", icon: ty.icon, color: ty.color }),
+        lead: withColor(h(IconTile, { class: "m-flowpal-icon", icon: ty.icon }), ty.color),
         title: h(OverflowText, { class: "m-flowpal-name" }, () => val(ty.label)),
         sub: ty.description != null && val(props.descriptions) !== false ? h(OverflowText, { class: "m-flowpal-desc" }, () => val(ty.description)) : undefined,
       }),

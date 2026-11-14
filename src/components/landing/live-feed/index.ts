@@ -10,7 +10,7 @@ import { signal, effect, untrack, createRoot, getOwner } from "../../../core/rea
 import { t, dir, messages } from "../../../core/i18n.ts";
 import { cx, val, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { owned, whenVisible } from "../../../ui/observe.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { Avatar } from "../../social/avatar/index.ts";
@@ -101,7 +101,7 @@ export function LiveFeed(props: LiveFeedProps): Element {
         as: "li", class: "m-lf-item", color: it.color, overflow: "ellipsis", title: it.title, sub: it.body ?? undefined, trail: it.meta ?? undefined,
         lead: it.avatar != null
           ? h(Avatar, { class: "m-lf-avatar", decorative: true, color: it.color ?? "primary", ...(typeof it.avatar === "string" ? { text: it.avatar } : {}) }, typeof it.avatar === "string" ? undefined : it.avatar)
-          : h(StatusDot, { class: "m-lf-dot", size: "lg", tone: "primary", color: it.color }),
+          : withColor(h(StatusDot, { class: "m-lf-dot", size: "lg", tone: "primary" }), it.color),
       })) as HTMLElement;
     el.append(h("span", { class: "m-lf-glow", "aria-hidden": "true" }) as Node);
     scopes.set(el, dispose);

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { locale } = await import("../../../core/i18n.ts");
@@ -25,7 +26,7 @@ test("ClampText: folds to the line count; no switch while the text fits", async 
 
 test("ClampText: the switch opens and folds (uncontrolled), with aria and own texts", () => {
   const seen = [];
-  const [el, dispose] = mount(() => h(ClampText, { lines: 3, expandable: "always", text: "Long text", labels: { more: "read on" }, onOpenChange: (o) => seen.push(o), color: "brand-orange", as: "div" }));
+  const [el, dispose] = mount(() => mProps(h(ClampText, { lines: 3, expandable: "always", text: "Long text", labels: { more: "read on" }, onOpenChange: (o) => seen.push(o), as: "div" }), { color: "brand-orange" }));
   const text = el.querySelector("div.m-clamp-text");
   let btn = el.querySelector("button.m-clamp-toggle");
   assert.equal(btn.textContent, "read on");

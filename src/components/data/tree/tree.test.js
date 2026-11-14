@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { Tree } = await import("./index.ts");
@@ -31,7 +32,7 @@ test("Tree: ARIA, expand / collapse with keys and clicks, selection", () => {
 
 test("Tree: no chevron, own chevron that follows open, selection colour", () => {
   const nodes = [{ id: "a", label: "a", children: [{ id: "a1", label: "a1" }] }];
-  const m = mount(() => [h(Tree, { nodes, chevron: false, color: "brand-purple" }), h(Tree, { nodes, chevron: (_n, open) => h("b", {}, () => (open() ? "-" : "+")) }), h(Tree, { nodes })]);
+  const m = mount(() => [mProps(h(Tree, { nodes, chevron: false }), { color: "brand-purple" }), h(Tree, { nodes, chevron: (_n, open) => h("b", {}, () => (open() ? "-" : "+")) }), h(Tree, { nodes })]);
   const [a, b, c] = m.el.querySelectorAll("[role=tree]");
   assert.equal(a.querySelector(".m-tree-chev"), null);
   assert.equal(a.getAttribute("data-m-color"), "brand-purple");

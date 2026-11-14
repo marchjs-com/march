@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render } = await import("../../../index.ts");
 const { StatsBand } = await import("./index.ts");
@@ -20,7 +21,7 @@ test("StatsBand: dl with dt label and dd counter per item", () => {
 
 test("StatsBand: own colour, plain numbers, no entrance", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
-  const dispose = render(() => h(StatsBand, { items: [{ value: 1200, label: "events", suffix: "+" }], color: "brand-orange", mode: "none", reveal: false, class: "mine" }), el);
+  const dispose = render(() => mProps(h(StatsBand, { items: [{ value: 1200, label: "events", suffix: "+" }], mode: "none", reveal: false, class: "mine" }), { color: "brand-orange" }), el);
   const dl = el.querySelector("dl.m-stats.mine");
   assert.equal(dl.getAttribute("data-m-color"), "brand-orange");
   assert.equal(dl.querySelector(".m-counter"), null);

@@ -16,7 +16,7 @@ with their descriptions. Stepper and Wizard are built on it.
 | `current` | number / accessor | — | current step (0-based) |
 | `onSelect` | `(i) => void` | — | makes each step a button |
 | `vertical` | boolean | `false` | vertical list |
-| `color` | ColorToken | theme primary | accent of done and current steps |
+| `m:color` | ColorToken | theme primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `doneIcon` | icon / string / `false` | check | mark of a done step; `false` keeps the number (or the step's icon) |
 | `renderDot` | `(i, state, step) => node` | — | your own dot content; `state` is `done`, `current` or `todo` |
 | `connector` | boolean | `true` | the line between the steps |

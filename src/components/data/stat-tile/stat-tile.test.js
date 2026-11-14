@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { StatTile } = await import("./index.ts");
@@ -25,7 +26,7 @@ test("StatTile: value, label and hint; live value; a node as value", () => {
 });
 
 test("StatTile: looks and layout options", () => {
-  const [el, dispose] = mount(() => h(StatTile, { value: "1", label: "x", variant: "card", size: "xl", align: "start", order: "label", color: "brand-blue", class: "mine" }));
+  const [el, dispose] = mount(() => mProps(h(StatTile, { value: "1", label: "x", variant: "card", size: "xl", align: "start", order: "label", class: "mine" }), { color: "brand-blue" }));
   const a = el.querySelector(".m-stat-tile");
   for (const k of ["m-stat-tile-card", "m-stat-tile-xl", "is-start", "is-label-first", "mine"]) assert.ok(a.classList.contains(k), k);
   assert.equal(a.getAttribute("data-m-color"), "brand-blue");

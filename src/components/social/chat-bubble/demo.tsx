@@ -20,13 +20,13 @@ export default function ChatBubbleDemo(props: { values: { mine: boolean; status:
       const mine = props.values.mine, v = props.values
       // the same choices on every bubble of the run: color, the delivery mark (ticks, own text, none), the hover buttons
       const own = {
-        color: v.color as ColorToken, tools: v.tools,
+        tools: v.tools,
         ticks: v.ticks === "off" ? false : v.ticks === "own" ? (s: MessageStatus) => <span>{OWN_TICK[s]}</span> : true,
       }
       return [
-        <ChatBubble {...own} mine={mine} position="first" text="Pazar sabahı rotayı değiştirdik 🌲" time={minutesAgo(12)} status={v.status as MessageStatus} sender={v.group ? "HADİ Koşu Kulübü" : undefined} senderColor={0} onReply={() => { $log = "Yanıt: 1. mesaj" }} />,
-        <ChatBubble {...own} mine={mine} position="middle" text="Orman yolu 8 km, tempo herkes için uygun." time={minutesAgo(11)} status={v.status as MessageStatus} onReply={() => { $log = "Yanıt: 2. mesaj" }} />,
-        <ChatBubble {...own} mine={mine} position="last" text="Buluşma 7:00'de giriş kapısında. Kim geliyor?" time={minutesAgo(10)} status={v.status as MessageStatus}
+        <ChatBubble {...own} m:color={v.color as ColorToken} mine={mine} position="first" text="Pazar sabahı rotayı değiştirdik 🌲" time={minutesAgo(12)} status={v.status as MessageStatus} sender={v.group ? "HADİ Koşu Kulübü" : undefined} senderColor={0} onReply={() => { $log = "Yanıt: 1. mesaj" }} />,
+        <ChatBubble {...own} m:color={v.color as ColorToken} mine={mine} position="middle" text="Orman yolu 8 km, tempo herkes için uygun." time={minutesAgo(11)} status={v.status as MessageStatus} onReply={() => { $log = "Yanıt: 2. mesaj" }} />,
+        <ChatBubble {...own} m:color={v.color as ColorToken} mine={mine} position="last" text="Buluşma 7:00'de giriş kapısında. Kim geliyor?" time={minutesAgo(10)} status={v.status as MessageStatus}
           reply={v.reply ? { name: "Kitap Kulübü", text: "Bu hafta rota nerede olacak?" } : undefined}
           reactions={v.reactions ? () => $reacts : undefined} onReact={toggle} onRetry={() => { $log = "Yeniden gönderiliyor" }} onReply={() => { $log = "Yanıt: 3. mesaj" }} />,
         <ChatBubble mine={!mine} text="🏃‍♀️🔥" time={minutesAgo(9)} position="single" />,

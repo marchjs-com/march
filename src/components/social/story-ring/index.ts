@@ -8,7 +8,7 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { Avatar } from "../avatar/index.ts";
 import { animate } from "../../../motion/animate.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
 import { CornerMark } from "../../media/corner-mark/index.ts";
 import "./story-ring.css";
 
@@ -48,7 +48,7 @@ export function StoryRing(props: StoryRingProps): Element {
     h("span", { class: "m-sring-frame" },
       h("span", { class: "m-sring-ring", "aria-hidden": "true", ref: (x: HTMLElement) => { ring = x; } }),
       h("span", { class: "m-sring-av" }, props.avatar ?? h(Avatar, { name: props.name, src: props.src, size: () => (val(props.size) === "sm" ? "sm" : "lg") })),
-      () => (val(props.add) ? h(CornerMark, { class: "m-sring-add", corner: "bottom-end", variant: "solid", color: "brand-orange", ring: true, size: () => (val(props.size) === "lg" ? "md" : "sm"), icon: props.addIcon ?? plus }) : null)),
+      () => (val(props.add) ? withColor(h(CornerMark, { class: "m-sring-add", corner: "bottom-end", variant: "solid", ring: true, size: () => (val(props.size) === "lg" ? "md" : "sm"), icon: props.addIcon ?? plus }), "brand-orange") : null)),
     () => { const l = val(props.label); return l ? h("span", { class: "m-sring-label" }, l) : null; },
   ];
   effect(() => {

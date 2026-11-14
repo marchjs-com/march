@@ -12,7 +12,7 @@ import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, val, uid, clamp, load, save, type ClassProp, type MaybeFn } from "../../../core/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
 import { observeSize } from "../../../ui/observe.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
 import type { IconDef } from "../../../icons/svg.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { PanelHeader } from "../panel-header/index.ts";
@@ -213,8 +213,8 @@ export function Window(props: WindowProps): unknown {
   // the chrome's CSS sizes and shapes the buttons (square, traffic lights, round)
   const btn = (cls: string, label: () => string, icon: () => unknown, onClick: () => void): unknown =>
     h(IconButton, { class: `m-win-btn ${cls}`, label, icon: h("span", { class: "m-win-glyph", "aria-hidden": "true" }, icon), onClick: (e: MouseEvent) => { e.stopPropagation(); onClick(); } });
-  bar = h(PanelHeader, {
-    as: "div", size: "sm", drag: true, class: "m-win-bar", tabindex: "0", role: "toolbar", "aria-label": () => props.labels?.move ?? t`Move window`, color: props.color,
+  bar = withColor(h(PanelHeader, {
+    as: "div", size: "sm", drag: true, class: "m-win-bar", tabindex: "0", role: "toolbar", "aria-label": () => props.labels?.move ?? t`Move window`,
     "aria-description": () => props.labels?.moveHint ?? t`Arrows move the window, Shift and arrows resize it, Enter fills the area`,
     onDblClick: (e: MouseEvent) => { if (!(e.target as Element).closest(".m-win-btn") && props.maximizable !== false) toggleMax(); },
     onKeyDown: onKey, ref: (el: HTMLElement) => moveTitle(el),
@@ -224,8 +224,7 @@ export function Window(props: WindowProps): unknown {
       props.closable === false ? null : btn("m-win-close", () => props.labels?.close ?? t`Close`, () => pic("close", xIcon), close),
       props.minimizable === false ? null : btn("m-win-min", () => (state() === "minimized" ? restoreText() : props.labels?.minimize ?? t`Minimize`), () => pic("minimize", minus), () => setState(state.peek() === "minimized" ? "normal" : "minimized")),
       props.maximizable === false ? null : btn("m-win-max", () => (state() === "normal" ? props.labels?.maximize ?? t`Fill the area` : restoreText()), () => (state() === "normal" || state() === "minimized" ? pic("maximize", maximize) : pic("restore", copy)), toggleMax),
-    ],
-  }) as HTMLElement;
+    ] }), props.color) as HTMLElement;
 
   // where a drop would dock, drawn inside the frame but placed in area coordinates
   const snapRect = (s: WindowState, b: { w: number; h: number }): Geo =>

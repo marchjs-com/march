@@ -6,7 +6,7 @@ import { val, cx, uid, type ClassProp } from "../../../ui/util.ts";
 import { Chevron } from "../../actions/chevron/index.ts";
 import { PlainListRow } from "../../data/list-row/core.ts";
 import { roving } from "../../../ui/focus.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface AccordionItem { id?: string; title: unknown; subtitle?: unknown; icon?: unknown; content: unknown; disabled?: boolean }
 export interface AccordionProps {
@@ -18,8 +18,6 @@ export interface AccordionProps {
   chevron?: boolean | unknown | ((open: () => boolean, item: AccordionItem) => unknown);
   /** false: panels open and close at once, the arrow does not turn (default true). */
   animated?: boolean;
-  /** Colour of the header icons (default: the accent). */
-  color?: ColorToken;
   /** Called when a section opens or closes. */
   onToggle?: (key: string | number, open: boolean) => void;
   class?: ClassProp;
@@ -46,7 +44,7 @@ export function Accordion(props: AccordionProps): Element {
     props.items.map((it, i) => {
       const k = keyOf(it, i), isOpen = (): boolean => open().has(k), id = `${base}-${i}`;
       return h("div", { class: () => cx("m-acc-item", isOpen() && "is-open") },
-        h("h3", { class: "m-acc-head", "data-m-color": colorAttr(props.color) },
+        h("h3", { class: "m-acc-head" },
           // the header is a ListRow button (the plain one: titles wrap, no scrolling text is loaded)
           h(PlainListRow, { class: "m-acc-btn", id: `${id}-b`, "aria-expanded": () => String(isOpen()), "aria-controls": `${id}-p`, disabled: it.disabled, onClick: () => toggle(k), overflow: "wrap",
             lead: it.icon, title: h("span", { class: "m-acc-title" }, it.title), sub: it.subtitle, trail: chev(isOpen, it) })),

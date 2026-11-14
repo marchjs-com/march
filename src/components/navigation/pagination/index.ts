@@ -6,7 +6,7 @@ import { t } from "../../../core/i18n.ts";
 import { val, cx, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
 import type { IconDef } from "../../../icons/svg.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { Select } from "../../forms/select/index.ts";
@@ -59,8 +59,6 @@ export interface PaginationProps {
   next?: unknown;
   /** The mark where pages are left out: the dots (default), your own icon or short text, or false for none. */
   gap?: unknown;
-  /** Theme color token of the current page (default: neutral). */
-  color?: ColorToken | undefined;
   class?: ClassProp;
 }
 /**
@@ -81,7 +79,7 @@ export function Pagination(props: PaginationProps): Element {
   const own = (x: unknown, fallback: IconDef): unknown => ownIcon(x ?? undefined, fallback, "m-page-own");
   const arrow = (dir: "prev" | "next", content: unknown, fallback: IconDef, off: () => boolean, name: () => string, act: () => void): unknown =>
     h(IconButton, { class: `m-page-nav m-page-${dir}`, label: name, title: false, disabled: off, onClick: act, icon: own(content, fallback) });
-  const attrs = { class: () => cx("m-pagination", props.variant === "simple" && "m-pagination-simple", val(props.class)), "aria-label": () => val(props.label) ?? t`Pagination`, "data-m-color": () => colorAttr(props.color) };
+  const attrs = { class: () => cx("m-pagination", props.variant === "simple" && "m-pagination-simple", val(props.class)), "aria-label": () => val(props.label) ?? t`Pagination` };
 
   if (props.variant === "simple") {
     const nf = (n: number): string => n.toLocaleString();

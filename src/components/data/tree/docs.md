@@ -18,7 +18,7 @@ children or drag and drop use TreeView.
 | `onSelect` | `(node) => void` | — | click / Enter / Space |
 | `label` | string | "Tree" | accessible name |
 | `chevron` | boolean / `(node, open) => node` | `true` | the open / close arrow, off, or your own (`open()` is live) |
-| `color` | ColorToken | the accent | colour of the selected row |
+| `m:color` | ColorToken | the accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `class` | class | — | extra class on the tree |
 
 ```tsx

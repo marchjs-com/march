@@ -12,6 +12,7 @@ import { arrowDown } from "../../../icons/glyphs/arrowDown.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { ownPart } from "../../../ui/parts.ts";
 import tr from "./tr.ts";
+import { withColor } from "../../../theme/colors.ts";
 
 messages("tr", tr);
 
@@ -56,8 +57,7 @@ export function RowTools(props: RowToolsProps): Element {
   };
   const run = (a: RowAction): void => { (a === "up" ? props.onUp : a === "down" ? props.onDown : props.onRemove)?.(); props.onAction?.(a); };
   return h("span", { class: () => cx("m-row-tools", val(props.class)), role: "group", "aria-label": () => val(props.labels?.group) ?? t`Row tools` },
-    (props.actions ?? ALL).map((a) => h(IconButton, {
-      class: `m-row-tool m-row-tool-${a}`, icon: () => ownPart(props.icons?.[a], () => ICON[a]), label: () => name(a), size: props.size, color: props.color,
-      variant: a === "remove" && props.danger ? "danger" : undefined, disabled: () => off(a), onClick: () => run(a),
-    })));
+    (props.actions ?? ALL).map((a) => withColor(h(IconButton, {
+      class: `m-row-tool m-row-tool-${a}`, icon: () => ownPart(props.icons?.[a], () => ICON[a]), label: () => name(a), size: props.size,
+      variant: a === "remove" && props.danger ? "danger" : undefined, disabled: () => off(a), onClick: () => run(a) }), props.color)));
 }

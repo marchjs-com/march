@@ -35,7 +35,7 @@ owner that runs its own gesture (a window corner, the end of a calendar event).
 | `label` | string | "Resize" | accessible name |
 | `line` | `hover` `always` `none` | `hover` | the line |
 | `grip` | boolean / node | `false` | a visible grip in the middle: a short bar, or your own node |
-| `color` | color token | accent | colour of the active line and grip |
+| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `disabled` | boolean | `false` | no pointer, no focus |
 | `ref` | `(el) => void` | — | the element |
 | `class` | class value | — | |

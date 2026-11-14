@@ -3,12 +3,10 @@ import "./steps.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { CheckMark } from "../../feedback/check-mark/index.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface StepItem { title: unknown; description?: unknown; icon?: unknown }
 export interface StepsProps {
-  /** Theme color token. */
-  color?: ColorToken | undefined;
   steps: readonly StepItem[];
   current: MaybeFn<number>;
   onSelect?: (i: number) => void;
@@ -24,7 +22,7 @@ export interface StepsProps {
 /** Progress through stages: `<Steps steps={[{ title: "Account" }, …]} current={$step} onSelect={(i) => $step = i} />` */
 export function Steps(props: StepsProps): Element {
   const renderDot = props.renderDot;
-  return h("ol", { "data-m-color": () => colorAttr(props.color), class: () => cx("m-steps2", props.vertical && "m-steps2-v", props.connector === false && "m-steps2-bare", val(props.class)) }, props.steps.map((s, i) => {
+  return h("ol", { class: () => cx("m-steps2", props.vertical && "m-steps2-v", props.connector === false && "m-steps2-bare", val(props.class)) }, props.steps.map((s, i) => {
     const state = (): "done" | "current" | "todo" => { const c = val(props.current); return i < c ? "done" : i === c ? "current" : "todo"; };
     const dot = (): unknown => {
       const st = state();

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+const { mProps } = await import("../../../props/index.ts");
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { OverflowToolbar } = await import("./index.ts");
@@ -56,8 +57,8 @@ test("OverflowToolbar: More label and icon, tooltips off, colour token, your own
   const had = Object.getOwnPropertyDescriptor(proto, "offsetWidth");
   Object.defineProperty(proto, "offsetWidth", { get() { return 40; }, configurable: true });
   const back = [];
-  const m = mount(() => h(OverflowToolbar, { label: "Editor", moreLabel: "Other tools", moreIcon: "+", tooltips: false, color: "brand-blue", motion: (el) => back.push(el),
-    items: [{ id: "a", label: "A", icon: "a", priority: 2 }, { id: "b", label: "B", icon: "b", priority: 1 }, { id: "c", label: "C", icon: "c" }] }));
+  const m = mount(() => mProps(h(OverflowToolbar, { label: "Editor", moreLabel: "Other tools", moreIcon: "+", tooltips: false, motion: (el) => back.push(el),
+    items: [{ id: "a", label: "A", icon: "a", priority: 2 }, { id: "b", label: "B", icon: "b", priority: 1 }, { id: "c", label: "C", icon: "c" }] }), { color: "brand-blue" }));
   await tick(); await tick();
   const bar = m.el.querySelector('[role="toolbar"]');
   assert.equal(bar.getAttribute("data-m-color"), "brand-blue");

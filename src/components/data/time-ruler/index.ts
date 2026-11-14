@@ -7,7 +7,7 @@ import { computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, clamp, isRtl, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { type ColorToken } from "../../../theme/colors.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import tr from "./tr.ts";
 
@@ -65,8 +65,6 @@ export interface TimeRulerProps {
   head?: boolean | Node | undefined;
   /** Extra class of the playhead (a host that styles or finds it by its own name). */
   headClass?: string | undefined;
-  /** Theme colour token of the playhead (default: the accent). */
-  color?: MaybeFn<ColorToken | undefined>;
   /** Own names: the ruler and the playhead. */
   labels?: { ruler?: string | undefined; playhead?: string | undefined } | undefined;
   class?: ClassProp;
@@ -110,8 +108,7 @@ export function TimeRuler(props: TimeRulerProps): Element {
     });
   };
   const root = h("div", {
-    class: () => cx("m-time-ruler", seekable && "is-seekable", val(props.class)), "data-m-color": () => colorAttr(val(props.color)),
-    role: seekable ? "group" : null, "aria-label": seekable ? () => props.labels?.ruler ?? t`Time ruler` : null, "aria-hidden": seekable ? null : "true",
+    class: () => cx("m-time-ruler", seekable && "is-seekable", val(props.class)), role: seekable ? "group" : null, "aria-label": seekable ? () => props.labels?.ruler ?? t`Time ruler` : null, "aria-hidden": seekable ? null : "true",
   }, rail, head) as HTMLElement;
   // a press anywhere on the rail jumps there; dragging the rail or the head scrubs
   function drag(el: Element): void {
