@@ -32,7 +32,8 @@ turns it off). Inside a `render()` tree mounted in the document, `onClick`, `onD
 
 ## Common props: `m:`
 Props in the `m:` namespace work on **every native element and every component**, whatever the component does with its
-own props. The list is open; the first member is `m:no-select`.
+own props. The list is open: `m:no-select`, `m:parts`, `m:color`, `m:theme`, `m:dir`, `m:lang`, `m:tip`, `m:reveal`,
+`m:can`, `m:test`.
 
 ```jsx
 <section m:no-select>…</section>          // nothing in the section can be selected
@@ -67,6 +68,24 @@ own props. The list is open; the first member is `m:no-select`.
   added to the object later reaches parts drawn after that). All parts of one kind get the same props (the three
   IconButtons of a card). A component that is called as a plain function instead of through JSX / `h()` is not
   reached. By hand: `withParts(map, () => h(PostCard, props))` from `hadi-march/props`.
+- `m:color="brand-blue"` (a colour token): the colour scope of the element and everything in it (`data-m-color`; the
+  components read `--m-accent`). `m:theme="night"` (a colour theme id): the subtree drawn in that theme (`data-m-theme`;
+  the theme's stylesheet is loaded on first use, the subtree takes the theme's text colour). `m:dir="rtl"` and
+  `m:lang="ar"`: writing direction and language of the subtree. `m:test="save"`: a stable handle for tests
+  (`data-testid`). A text constant of these on a native element compiles to the attribute itself (no runtime;
+  `m:theme` excepted: it loads its stylesheet). `null` / `undefined` / `false` remove it.
+  ```jsx
+  <Card m:color="brand-blue" m:theme="night" m:dir="rtl" m:lang="ar">…</Card>
+  ```
+- `m:tip="Copy link"`: a hint on hover (after 300 ms) and at once on keyboard focus, linked with `aria-describedby`;
+  Escape hides it. Tooltip's bubble on the element itself: no wrapper element (the bubble's code is loaded on first
+  use). An empty text shows nothing; the text may be live.
+- `m:reveal`: the element fades and rises in once it comes into view: `true`, a delay in ms (`m:reveal={120}`) or
+  `{ delay, duration, frames }`. Hidden at once until then; already in place with reduced motion (the motion code is
+  loaded on first use). Set up once per element.
+- `m:can={allowed}`: what the user may not use is not there (`hidden`); `m:can={{ allow, else: "disable" }}` shows it
+  disabled instead (`inert`, `aria-disabled`, dimmed: `data-m-can="disable"`). `true` / `undefined`: as it is. It only
+  shows or hides: checking the right itself stays on the server.
 - A new member: `registerMProp("tone", (el, value) => { … })` makes `m:tone` work everywhere (called again when a live
   value changes). An attribute-only prop can also be added to the compiler's `M_ATTRS` table (`hadi-march/compiler`) so
   constants cost nothing at runtime.

@@ -34,6 +34,24 @@ interface MarchDomAttributes {
   [key: `command:${string}`]: unknown;
   /** Common prop: the element and everything inside it cannot be selected (`={false}`: selectable again inside a blocked subtree). */
   "m:no-select"?: Reactive<boolean | null | undefined>;
+  /** Common prop: the colour token of the element and everything in it ("brand-blue", "success", "cat-3"…). */
+  "m:color"?: Reactive<string | null | undefined>;
+  /** Common prop: the subtree drawn in another colour theme ("night"…; its stylesheet loads on first use). */
+  "m:theme"?: Reactive<string | null | undefined>;
+  /** Common prop: writing direction of the subtree. */
+  "m:dir"?: Reactive<"ltr" | "rtl" | "auto" | null | undefined>;
+  /** Common prop: language of the subtree ("tr", "ar"…). */
+  "m:lang"?: Reactive<string | null | undefined>;
+  /** Common prop: a hint on hover and keyboard focus (no wrapper element). */
+  "m:tip"?: Reactive<string | null | undefined>;
+  /** Common prop: fades and rises in once in view (true), after a delay (ms) or as described. */
+  "m:reveal"?: boolean | number | { delay?: number; duration?: number; frames?: Keyframe[] };
+  /** Common prop: false hides it; `{ allow: false, else: "disable" }` shows it disabled. */
+  "m:can"?: Reactive<boolean | null | undefined | { allow: boolean | null | undefined; else?: "hide" | "disable" }>;
+  /** Common prop: a stable handle for tests (data-testid). */
+  "m:test"?: Reactive<string | null | undefined>;
+  /** Common prop: props for the components drawn inside, by component: `m:parts={{ Avatar: { size: "lg" } }}`. */
+  "m:parts"?: unknown;
   /** Common props (work on every element and component; add one with registerMProp). */
   [key: `m:${string}`]: unknown;
   [key: `data-${string}`]: unknown;
@@ -51,8 +69,26 @@ declare global {
       [key: `bind:${string}`]: unknown;
       [key: `use:${string}`]: unknown;
       [key: `transition:${string}`]: unknown;
-      /** Common prop: the component's root and everything inside it cannot be selected. */
+      /** Common prop: the element and everything inside it cannot be selected (`={false}`: selectable again inside a blocked subtree). */
       "m:no-select"?: Reactive<boolean | null | undefined>;
+      /** Common prop: the colour token of the element and everything in it ("brand-blue", "success", "cat-3"…). */
+      "m:color"?: Reactive<string | null | undefined>;
+      /** Common prop: the subtree drawn in another colour theme ("night"…; its stylesheet loads on first use). */
+      "m:theme"?: Reactive<string | null | undefined>;
+      /** Common prop: writing direction of the subtree. */
+      "m:dir"?: Reactive<"ltr" | "rtl" | "auto" | null | undefined>;
+      /** Common prop: language of the subtree ("tr", "ar"…). */
+      "m:lang"?: Reactive<string | null | undefined>;
+      /** Common prop: a hint on hover and keyboard focus (no wrapper element). */
+      "m:tip"?: Reactive<string | null | undefined>;
+      /** Common prop: fades and rises in once in view (true), after a delay (ms) or as described. */
+      "m:reveal"?: boolean | number | { delay?: number; duration?: number; frames?: Keyframe[] };
+      /** Common prop: false hides it; `{ allow: false, else: "disable" }` shows it disabled. */
+      "m:can"?: Reactive<boolean | null | undefined | { allow: boolean | null | undefined; else?: "hide" | "disable" }>;
+      /** Common prop: a stable handle for tests (data-testid). */
+      "m:test"?: Reactive<string | null | undefined>;
+      /** Common prop: props for the components drawn inside, by component: `m:parts={{ Avatar: { size: "lg" } }}`. */
+      "m:parts"?: unknown;
       /** Common props (work on every element and component; add one with registerMProp). */
       [key: `m:${string}`]: unknown;
     }

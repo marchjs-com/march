@@ -2,7 +2,7 @@
 // component does with its own props. The compiler turns `<Card m:no-select>` into `mProps(h(Card, …), {…})`;
 // a constant on a native element becomes a plain attribute at build time and only the CSS file is loaded.
 // New members are added with registerMProp(); the list is open.
-import { effect, computed, untrack, getOwner, reactive, isReactive, context, provide, useContext } from "../core/reactive.ts";
+import { effect, computed, untrack, getOwner, runWithOwner, onCleanup, signal, reactive, isReactive, context, provide, useContext } from "../core/reactive.ts";
 import { registerNamespace, _partsHook } from "../dom/h.ts";
 import "../css/props.css";
 
@@ -44,6 +44,69 @@ const NO_SELECT = "data-m-no-select";
 registerMProp("no-select", (el, v) => {
   if (v == null) el.removeAttribute(NO_SELECT);
   else el.setAttribute(NO_SELECT, v === false ? "false" : "");
+});
+
+// ------------------------------------------------------------------ the attribute props
+/** A prop that is one attribute: the value as it is, null / undefined / false remove it. */
+const attr = (name: string): MProp => (el, v) => { if (v == null || v === false) el.removeAttribute(name); else el.setAttribute(name, String(v)); };
+// m:color="brand-blue": the colour token of the element and everything in it (the components read --m-accent)
+registerMProp("color", attr("data-m-color"));
+// m:dir="rtl" / m:lang="ar": writing direction and language of a subtree
+registerMProp("dir", attr("dir"));
+registerMProp("lang", attr("lang"));
+// m:test="save": a stable handle for tests (data-testid)
+registerMProp("test", attr("data-testid"));
+// m:theme="night": the subtree drawn in another colour theme (its stylesheet is loaded on first use)
+registerMProp("theme", (el, v) => {
+  attr("data-m-theme")(el, v);
+  if (typeof v === "string" && v) void import("../ui/theme.ts").then((m) => m.loadTheme(v));
+});
+
+// ------------------------------------------------------------------ m:can
+const CAN = "data-m-can";
+/**
+ * m:can={allowed}: what the user may not use is not there (hidden); m:can={{ allow, else: "disable" }} shows it
+ * disabled instead (inert, aria-disabled, dimmed). true / undefined: as it is.
+ */
+registerMProp("can", (el, v) => {
+  const o = v && typeof v === "object" ? (v as { allow?: unknown; else?: "hide" | "disable" }) : { allow: v };
+  const no = o.allow === false || o.allow === null || (o.allow === undefined && v === false);
+  const mode = no ? (o.else === "disable" ? "disable" : "hide") : null;
+  const h = el as HTMLElement;
+  if (mode) el.setAttribute(CAN, mode); else el.removeAttribute(CAN);
+  h.hidden = mode === "hide";
+  h.inert = mode === "disable";
+  if (mode === "disable") el.setAttribute("aria-disabled", "true"); else el.removeAttribute("aria-disabled");
+});
+
+// ------------------------------------------------------------------ m:tip
+type Tip = { text: ReturnType<typeof signal<string>> };
+const tips = new WeakMap<Element, Tip>();
+/** m:tip="Copy link": a hint on hover and keyboard focus (Tooltip's bubble, loaded on first use), no wrapper element. */
+registerMProp("tip", (el, v) => {
+  const text = v == null || v === false ? "" : String(v);
+  const known = tips.get(el);
+  if (known) { known.text.set(text); return; }
+  const t: Tip = { text: signal(text) };
+  tips.set(el, t);
+  const owner = getOwner();
+  void import("../components/overlays/tooltip/tip.ts").then((m) => runWithOwner(owner, () => m.tip(el, () => t.text())));
+});
+
+// ------------------------------------------------------------------ m:reveal
+const revealed = new WeakSet<Element>();
+/**
+ * m:reveal: the element fades and rises in once when it comes into view (true), after a delay (a number, ms) or as
+ * described ({ delay, duration, frames }). Already in place with reduced motion.
+ */
+registerMProp("reveal", (el, v) => {
+  if (!v || revealed.has(el)) return;
+  revealed.add(el);
+  const calm = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  if (!calm) (el as HTMLElement).style?.setProperty("opacity", "0");
+  const o = typeof v === "number" ? { delay: v } : v === true ? undefined : v;
+  const owner = getOwner();
+  void import("../motion/scroll.ts").then((m) => runWithOwner(owner, () => { const off = m.reveal(el, o); if (owner) onCleanup(off); }));
 });
 
 // h() by hand on a native element: h("div", { "m:no-select": true })

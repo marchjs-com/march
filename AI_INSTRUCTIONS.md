@@ -45,7 +45,12 @@ $items.peek()                            // read without tracking (explicit API 
   into inputs and editors stays selectable (`={false}` inside a blocked subtree makes that part selectable again; the nearest one wins; `null` = not
   set). Use it for interface chrome (toolbars, drag surfaces, tabs), NEVER on content people may copy (codes,
   addresses, errors): keyboard selection and select-to-speak stop working too. Do not write `user-select` CSS or a
-  `selectstart` handler for this. By hand: `mProps(h(Card, props), { "no-select": true })` from `hadi-march/props`;
+  `selectstart` handler for this. `m:color="brand-blue"` (colour scope), `m:theme="night"` (subtree in another colour
+  theme), `m:dir="rtl"` / `m:lang="ar"`, `m:tip="Copy link"` (hint without a Tooltip wrapper), `m:reveal` (`true` /
+  delay ms / options: entrance once in view), `m:can={allowed}` (hidden when false; `{ allow, else: "disable" }`
+  disables), `m:test="id"` (data-testid): use these instead of writing the same thing per component (no own
+  `data-m-color` line, no Tooltip wrapper for a plain hint, no reveal action for a plain entrance).
+  By hand: `mProps(h(Card, props), { "no-select": true })` from `hadi-march/props`;
   a new member: `registerMProp(name, (el, value) => …)`. `m:parts={{ Avatar: { size: "lg" }, LikeButton: { color: "brand-blue" } }}`
   gives props to the components drawn INSIDE (keys: component names in scope; they win over what the parent gave;
   the nearest scope wins; by hand `withParts(new Map([[Avatar, {…}]]), () => h(PostCard, props))`). Never add a

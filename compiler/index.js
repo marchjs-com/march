@@ -32,6 +32,8 @@ const NO_WRAP = /^(on[A-Z]|on:|ref$|use:|bind:|key$)/;
  * Add an entry to teach the compiler a new attribute-only prop.
  */
 export const M_ATTRS = { "no-select": "data-m-no-select" };
+/** m: props that are one attribute with a text value: a constant on a native element is written as that attribute. */
+export const M_TEXT = { color: "data-m-color", dir: "dir", lang: "lang", test: "data-testid", theme: "data-m-theme" };
 const M_HELPER = "_$m";
 const PARTS_HELPER = "_$mp";
 /**
@@ -777,6 +779,8 @@ class Transformer {
           return [];
         }
         if (!/^[a-z][a-z0-9-]*$/.test(name)) throw fail(this.src, this.pos, `invalid common prop ${a.name}`);
+        // a text constant on a native element: the attribute itself (m:theme still needs its stylesheet: runtime)
+        if (!isComp && M_TEXT[name] && name !== "theme" && !a.dynamic && typeof a.literal === "string" && a.literal) return [{ name: M_TEXT[name], code: JSON.stringify(a.literal), dynamic: false, literal: a.literal }];
         const v = !isComp && M_ATTRS[name] ? mConst(a) : undefined;
         if (v === undefined) { mDyn.push(`${JSON.stringify(name)}: ${a.dynamic ? `() => (${a.code})` : a.code}`); return []; }
         this.mCss = true;

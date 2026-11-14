@@ -7,3 +7,10 @@
 [data-m-no-select] { --m-select: none; -webkit-user-select: none !important; user-select: none !important; }
 [data-m-no-select="false"] { --m-select: auto; -webkit-user-select: text !important; user-select: text !important; }
 [data-m-no-select] :is(input, textarea, [contenteditable]:not([contenteditable="false"]), [contenteditable]:not([contenteditable="false"]) *) { -webkit-user-select: text !important; user-select: text !important; }
+
+/* m:can={{ allow: false, else: "disable" }}: shown, but out of reach (inert) and dimmed */
+[data-m-can="disable"] { opacity: .45; cursor: not-allowed; }
+
+/* m:theme="night": a subtree in another colour theme takes that theme's text colour too (its tokens come from the
+   theme's own [data-m-theme] rule; the inherited colour would still be the page's) */
+:where([data-m-theme]:not(:root)) { color: var(--m-text); }
