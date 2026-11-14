@@ -2,6 +2,7 @@
 import { ScrollStory, type StoryStep } from "./index.ts";
 import { MockApp } from "../demo-kit.tsx";
 import { Counter } from "../counter/index.ts";
+import { animate } from "../../../motion/engine/playback.ts";
 
 export const code = `<ScrollStory steps={[
   { title: "Keşfet", body: "…", media: <Map />, color: "brand-orange" },
@@ -15,8 +16,19 @@ export const STORY: StoryStep[] = [
   { title: "Paylaş", body: "Anıları akışta ve hikâyelerde paylaş; yeni arkadaşlarını listene ekle.", media: <div class="sc-story-num"><Counter value={48} suffix=" anı" /></div>, color: "brand-purple" },
 ]
 
-export default function ScrollStoryDemo(props: { values: { side: string; theme: boolean } }) {
+// an own picture change: the new picture turns in
+const turnIn = (incoming: HTMLElement, outgoing: HTMLElement | undefined, dir: 1 | -1): void => {
+  animate(incoming, { opacity: [0, 1], transform: [`rotate(${10 * dir}deg) scale(.7)`, "rotate(0deg) scale(1)"] }, { duration: 620, easing: "expo" })
+  if (outgoing) animate(outgoing, { opacity: [1, 0] }, { duration: 300, easing: "out" })
+}
+
+export default function ScrollStoryDemo(props: { values: { side: string; theme: boolean; dots: boolean; numbers: string; transition: string } }) {
   return <div>
-    {() => { const v = { ...props.values }; return <ScrollStory steps={STORY} side={v.side as "end"} theme={v.theme} /> }}
+    {() => {
+      const v = { ...props.values }
+      return <ScrollStory steps={STORY} side={v.side as "end"} theme={v.theme} dots={v.dots}
+        numbers={v.numbers === "off" ? false : v.numbers === "own" ? (i: number) => `Adım ${i + 1}` : true}
+        transition={v.transition === "own" ? turnIn : v.transition as "rise"} />
+    }}
   </div>
 }

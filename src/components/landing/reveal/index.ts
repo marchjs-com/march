@@ -13,7 +13,10 @@ import { scrollTimeline } from "../../../motion/scroll-fx.ts";
 export type RevealEffect = "fade" | "up" | "down" | "start" | "end" | "scale" | "blur" | "flip";
 
 export interface RevealOptions {
-  effect?: RevealEffect | undefined;
+  /** A ready effect, "none" (the content is simply there), or your own start and end state: `{ from: { opacity: 0, transform: "rotate(-8deg)" }, to: { opacity: 1, transform: "rotate(0deg)" } }`. */
+  effect?: RevealEffect | "none" | { from: Record<string, string | number>; to: Record<string, string | number> } | undefined;
+  /** Easing of the entrance (a motion engine easing name or a CSS easing; default "expo"). */
+  easing?: string | undefined;
   /** Delay between children, ms (0 = the whole block at once). Default 70. */
   stagger?: number | undefined;
   delay?: number | undefined;
@@ -67,13 +70,16 @@ export function revealOnScroll(el: Element, raw?: unknown): () => void {
   const o: RevealOptions = raw && typeof raw === "object" ? (raw as RevealOptions) : {};
   const effect = o.effect ?? "up", dist = o.distance ?? 28;
   el.classList.add("hm-reveal");
+  // no effect: nothing is hidden, nothing moves
+  if (effect === "none") { el.classList.add("is-revealed"); return () => {}; }
+  const framesOf = (): ReturnType<typeof revealFrames> => (typeof effect === "object" ? effect : revealFrames(effect, dist, rtl(el)));
   if (o.scrub) {
     el.classList.add("is-scrub");
     // the motion core's scroll timeline: the entrance is seeked by the block's passage (fully in at 45 %), the children
     // a little after one another; reduced motion leaves the content as it is
     if (reducedMotion()) return () => {};
     const list = targets(el, o.self, o.select);
-    const { from, to } = revealFrames(effect, dist, rtl(el));
+    const { from, to } = framesOf();
     const frames: Record<string, unknown[]> = {};
     for (const k of Object.keys(from)) frames[k] = [from[k], to[k]];
     return scrollTimeline(list, frames as never, { track: el, range: [0, 0.45], easing: "out", stagger: o.self ? 0 : 60 });
@@ -83,11 +89,11 @@ export function revealOnScroll(el: Element, raw?: unknown): () => void {
   if (o.select) for (const t of targets(el, false, o.select)) t.classList.add("hm-reveal-item");
   const go = (): void => {
     const list = targets(el, o.self, o.select);
-    const { from, to } = revealFrames(effect, dist, rtl(el));
+    const { from, to } = framesOf();
     if (!reducedMotion() && list.length) {
       const frames: Record<string, unknown[]> = {};
       for (const k of Object.keys(from)) frames[k] = [from[k], to[k]];
-      animate(list, frames as never, { duration: o.duration ?? 720, delay: o.delay ?? 0, easing: "expo", fill: "backwards", stagger: o.self ? 0 : staggerFn(o.stagger ?? 70) });
+      animate(list, frames as never, { duration: o.duration ?? 720, delay: o.delay ?? 0, easing: (o.easing ?? "expo") as never, fill: "backwards", stagger: o.self ? 0 : staggerFn(o.stagger ?? 70) });
     }
     el.classList.remove("is-pending");
     el.classList.add("is-revealed");
@@ -97,9 +103,9 @@ export function revealOnScroll(el: Element, raw?: unknown): () => void {
 
 /** `<Reveal effect="up" stagger={80}><Card/><Card/><Card/></Reveal>` */
 export function Reveal(props: RevealProps): Element {
-  const { as, class: c, children, effect, stagger, delay, duration, distance, scrub, self, select, ...attrs } = props;
+  const { as, class: c, children, effect, easing, stagger, delay, duration, distance, scrub, self, select, ...attrs } = props;
   const el = h(as ?? "div", { ...attrs, class: cx("hm-reveal-box", val(c as MaybeFn<unknown>)) }, children) as HTMLElement;
-  const opts: RevealOptions = { effect, stagger, delay, duration, distance, scrub, self, select } as RevealOptions;
+  const opts: RevealOptions = { effect, easing, stagger, delay, duration, distance, scrub, self, select } as RevealOptions;
   const stop = revealOnScroll(el, opts);
   if (getOwner()) onCleanup(stop);
   return el;

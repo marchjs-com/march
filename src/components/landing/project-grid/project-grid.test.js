@@ -27,3 +27,20 @@ test("ProjectGrid: chips per category, filtering hides others, onOpen gets the c
   assert.deepEqual(opened, [["b", "b"]]);
   dispose();
 });
+
+test("ProjectGrid: no arrow / own arrow, chip colour, own group name, instant filter, no reveal", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => [
+    h(ProjectGrid, { projects, class: "one", arrow: false, motion: false, reveal: false, color: "brand-purple", filtersLabel: "Pick" }),
+    h(ProjectGrid, { projects, class: "two", arrow: (p) => h("b", { class: "mine" }, p.id) }),
+  ], el);
+  const one = el.querySelector(".one");
+  assert.equal(one.querySelector(".hm-pg-go"), null);
+  assert.equal(one.querySelector(".hm-pg-filters").getAttribute("aria-label"), "Pick");
+  assert.equal(one.querySelector(".hm-pg-filters .hm-chip2").getAttribute("data-hm-color"), "brand-purple");
+  assert.ok(!one.querySelector(".hm-pg-grid").classList.contains("hm-reveal"));
+  one.querySelectorAll(".hm-pg-filters .hm-chip2-hit")[2].click(); // Brand: no animation, hidden at once
+  assert.deepEqual([...one.querySelectorAll(".hm-pg-card")].map((c) => !!c.hidden), [true, false, true]);
+  assert.deepEqual([...el.querySelectorAll(".two .hm-pg-go.is-own .mine")].map((b) => b.textContent), ["a", "b", "c"]);
+  dispose();
+});

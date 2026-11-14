@@ -36,7 +36,8 @@
 .hm-deck-bar { display: block; height: 3px; border-radius: 3px; background: var(--hm-border); overflow: hidden; }
 .hm-deck-bar-fill { display: block; height: 100%; background: var(--hm-brand-gradient); transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
 :dir(rtl) .hm-deck-bar-fill { transform-origin: 100% 50%; }
-:dir(rtl) .hm-deck-controls .hm-icon-btn:first-child .hm-svg, :dir(rtl) .hm-deck-controls .hm-icon-btn:nth-child(3) .hm-svg { transform: scaleX(-1); }
+:dir(rtl) .hm-deck-prev .hm-svg, :dir(rtl) .hm-deck-fwd .hm-svg { transform: scaleX(-1); }
+.hm-deck-bar-fill[data-hm-color] { background: var(--hm-accent); }
 .hm-deck-controls { display: flex; align-items: center; gap: var(--hm-space-1); min-width: 0; }
 .hm-deck-count { font-size: var(--hm-text-sm); color: var(--hm-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hm-deck-spacer { flex: 1 1 auto; }

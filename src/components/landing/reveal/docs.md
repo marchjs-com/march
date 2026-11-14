@@ -16,7 +16,8 @@ scale, blur or a 3D flip, one after another. `scrub` ties the effect to the scro
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `effect` | `fade` `up` `down` `start` `end` `scale` `blur` `flip` | `up` | entrance |
+| `effect` | `fade` `up` `down` `start` `end` `scale` `blur` `flip` `none` / `{ from, to }` | `up` | entrance: a ready one, none (the content is simply there), or your own start and end state |
+| `easing` | easing name / CSS easing | `expo` | easing of the entrance |
 | `stagger` | ms | `70` | delay between children |
 | `delay`, `duration` | ms | `0`, `720` | |
 | `distance` | px | `28` | travel of up / down / start / end |
@@ -24,6 +25,13 @@ scale, blur or a 3D flip, one after another. `scrub` ties the effect to the scro
 | `self` | boolean | `false` | animate the element, not its children |
 | `select` | CSS selector | — | animate these descendants instead (cards inside a Grid) |
 | `as` | tag | `div` | |
+| `class` | class | — | on the element; other attributes pass through |
+
+```tsx
+<Reveal effect={{ from: { opacity: 0, transform: "rotate(-8deg) scale(.6)" }, to: { opacity: 1, transform: "rotate(0deg) scale(1)" } }}
+  easing="spring" duration={900}>…</Reveal>
+<Reveal effect="none">…</Reveal>
+```
 
 `revealOnScroll(el, options)` is the same as an action (`use:revealOnScroll`); `revealFrames(effect, distance, rtl)`
 gives the start and end state.

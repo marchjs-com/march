@@ -51,3 +51,5 @@
 @media (max-width: 520px) { .hm-snav-actions > :not(:last-child) { display: none; } }
 @container hm-site (max-width: 520px) { .hm-snav-actions > :not(:last-child) { display: none; } }
 @media (prefers-reduced-motion: reduce) { .hm-snav, .hm-snav-bar { transition: none; } }
+/* own pill colour (data-hm-color sets --hm-accent) */
+.hm-snav-pill[data-hm-color] { background: color-mix(in srgb, var(--hm-accent) 18%, transparent); }

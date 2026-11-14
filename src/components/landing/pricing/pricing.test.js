@@ -30,3 +30,30 @@ test("Pricing: cards, featured badge, custom price, not-included feature, radio 
   assert.equal(cards[1].querySelector(".hm-price-billed").textContent, "billed yearly");
   dispose();
 });
+
+test("Pricing: own texts, colour, own feature mark, no per line, plain price, no reveal", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => [
+    h(Pricing, { plans, class: "one", color: "brand-purple", featureColor: "brand-blue", priceEffect: "none", per: false, reveal: false,
+      labels: { monthly: "Pay monthly", yearly: "Pay yearly", custom: "Talk", notIncluded: "missing", billingPeriod: "Period" } }),
+    h(Pricing, { plans, class: "two", featureIcon: (on) => h("b", { class: "mine" }, on ? "+" : "-"), labels: { perMonth: "per seat", billedMonthly: "each month" } }),
+    h(Pricing, { plans, class: "three", featureIcon: false, toggle: false }),
+  ], el);
+  const one = el.querySelector(".one");
+  assert.equal(one.getAttribute("data-hm-color"), "brand-purple");
+  assert.deepEqual([...one.querySelectorAll('.hm-price-seg [role="radio"]')].map((r) => r.textContent), ["Pay monthly", "Pay yearly"]);
+  assert.equal(one.querySelector(".hm-price-custom").textContent, "Talk");
+  assert.equal(one.querySelector(".hm-price-feat.is-off .hm-sr-only").textContent, " (missing)");
+  assert.equal(one.querySelector(".hm-price-feat-icon").getAttribute("data-hm-color"), "brand-blue");
+  assert.equal(one.querySelector(".hm-price-per"), null);
+  assert.equal(one.querySelector(".hm-counter"), null);
+  assert.match(one.querySelectorAll(".hm-price-card")[1].querySelector(".hm-price-plain").textContent, /29/);
+  assert.ok(!one.querySelector(".hm-price-row").classList.contains("hm-reveal"));
+  const two = el.querySelector(".two");
+  assert.deepEqual([...two.querySelectorAll(".hm-price-feat-own .mine")].map((b) => b.textContent), ["+", "-"]);
+  assert.equal(two.querySelector(".hm-price-per").textContent, "per seateach month");
+  const three = el.querySelector(".three");
+  assert.equal(three.querySelector(".hm-price-feat-icon"), null);
+  assert.equal(three.querySelector(".hm-price-feat-own"), null);
+  dispose();
+});

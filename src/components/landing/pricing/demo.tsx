@@ -12,12 +12,14 @@ export const PLANS: PricingPlan[] = [
   { name: "HADİ Premium", description: "Daha fazlasını isteyenler için. Yıllık ödemede 7.999 TL.", price: { monthly: 999, yearly: 7999 / 12 }, featured: true, badge: "Premium", features: ["Reklamsız", "Öne çıkan profil", "Gelişmiş filtreler", "Etkinliklerde öncelik"], cta: { label: "Premium'a geç" } },
 ]
 
-export default function PricingDemo(props: { values: { plans: number; currency: string; saving: boolean } }) {
+export default function PricingDemo(props: { values: { plans: number; currency: string; saving: boolean; color: string; featureIcon: string; priceEffect: string } }) {
   return <div>
     {() => {
       const v = { ...props.values }
       const plans = v.plans === 1 ? [PLANS[1]!] : PLANS
-      return <Pricing plans={plans} currency={v.currency} saving={v.saving ? "4 ay bedava" : undefined} />
+      return <Pricing plans={plans} currency={v.currency} saving={v.saving ? "4 ay bedava" : undefined}
+        color={v.color === "default" ? undefined : v.color as "brand-purple"} priceEffect={v.priceEffect as "roll"}
+        featureIcon={v.featureIcon === "off" ? false : v.featureIcon === "own" ? (on: boolean) => <span class="hm-muted">{on ? "+" : "–"}</span> : true} />
     }}
   </div>
 }

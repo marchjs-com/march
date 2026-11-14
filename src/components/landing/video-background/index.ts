@@ -5,7 +5,7 @@ import "./video-background.css";
 import { h } from "../../../dom/h.ts";
 import { signal } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, val, glyph, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, glyph, icon, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Overlay, quietMedia, type OverlayProps } from "../../../ui/overlay.ts";
 import { IconButton } from "../../../ui/button.ts";
 import { defineIcon } from "../../../icons/svg.ts";
@@ -26,6 +26,10 @@ export interface VideoBackgroundProps {
   position?: string | undefined;
   /** Show the pause button (default true). */
   controls?: boolean | undefined;
+  /** Own icons of the pause button (an icon or a node each). */
+  icons?: { play?: unknown; pause?: unknown } | undefined;
+  /** Accessible names of the pause button (defaults: "Play background video", "Pause background video"). */
+  labels?: { play?: string | undefined; pause?: string | undefined } | undefined;
   class?: ClassProp | undefined;
   children?: unknown | undefined;
 }
@@ -47,8 +51,8 @@ export function VideoBackground(props: VideoBackgroundProps): Element {
     };
     root.append(h(IconButton, {
       class: "hm-vbg-toggle", size: "sm", variant: "ghost", onClick: toggle,
-      label: () => (paused() ? t`Play background video` : t`Pause background video`),
-    }, () => glyph(paused() ? PLAY : PAUSE)) as Node);
+      label: () => (paused() ? props.labels?.play ?? t`Play background video` : props.labels?.pause ?? t`Pause background video`),
+    }, () => { const own = paused() ? props.icons?.play : props.icons?.pause; return own != null ? icon(own) : glyph(paused() ? PLAY : PAUSE); }) as Node);
   }
   return root;
 }

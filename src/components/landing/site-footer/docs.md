@@ -21,10 +21,17 @@ optional big wordmark fills the last line.
 | `columns` | `{ title, links: { label, href }[] }[]` | — | |
 | `social` | `{ label, href, icon }[]` | — | icon links (label is the accessible name) |
 | `newsletter` | Newsletter props | — | adds the sign-up form |
-| `copyright` | node | `© year name` | |
+| `copyright` | node / `false` | `© year name` | bottom line, or none |
 | `legal` | `{ label, href }[]` | — | bottom links |
-| `wordmark` | string | — | big decorative word |
+| `wordmark` | string / node | — | big decorative word |
 | `toTop` | boolean | `true` | back-to-top button |
+| `toTopIcon` | icon / node | arrow up | icon of that button |
+| `toTopLabel` | string | `Back to top` | its accessible name |
+| `class` | class | — | on the footer |
+
+```tsx
+<SiteFooter brand={brand} copyright={false} toTopIcon={chevronUp} toTopLabel="To the top" />
+```
 
 ## Accessibility
 

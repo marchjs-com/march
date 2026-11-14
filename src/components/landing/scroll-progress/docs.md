@@ -16,6 +16,13 @@ The fill is a transform written in the scroll scene's write phase; in RTL it fil
 | `position` | `fixed` `inline` | `fixed` | |
 | `paint` | `gradient` `accent` | `gradient` | |
 | `size` | px | `3` | height |
+| `color` | color token | — | colour of the fill; wins over `paint` |
+| `label` | string | `Reading progress` | accessible name |
+| `class` | class | — | on the bar |
+
+```tsx
+<ScrollProgress color="brand-orange" label="How far you have read" />
+```
 
 ## Accessibility
 

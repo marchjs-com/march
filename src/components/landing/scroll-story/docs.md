@@ -19,6 +19,16 @@ colour. On phones the pinned media sits at the top and the steps flow under it.
 | `side` | `start` `end` | `end` | media column side |
 | `theme` | boolean | `true` | tint the section with the active colour |
 | `onStep` | `(index) => void` | — | active step changed |
+| `dots` | boolean | `true` | the dots under the pinned picture |
+| `numbers` | boolean / `(index) => node` | `true` | the step number above each title ("01"), or your own |
+| `transition` | `rise` `fade` `none` / `(incoming, outgoing, direction) => void` | `rise` | how the pinned picture changes |
+| `class` | class | — | on the section |
+
+```tsx
+<ScrollStory steps={steps} numbers={(i) => `Step ${i + 1}`} dots={false} transition="fade" />
+<ScrollStory steps={steps} numbers={false}
+  transition={(incoming, outgoing, dir) => animate(incoming, { opacity: [0, 1], transform: [`rotate(${6 * dir}deg)`, "rotate(0deg)"] }, { duration: 600 })} />
+```
 
 ## Accessibility
 

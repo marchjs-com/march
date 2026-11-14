@@ -14,3 +14,5 @@
 .hm-rm-title { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
 .hm-rm-tl .hm-tl-item.is-next .hm-tl-title { color: var(--hm-muted); }
 @media (prefers-reduced-motion: reduce) { .hm-rm-tl .hm-tl-dot { transition: none; } }
+/* own colour (data-hm-color sets --hm-accent): the fill takes it; passed dots already follow the accent */
+.hm-rm[data-hm-color] .hm-rm-fill { background: var(--hm-accent); }

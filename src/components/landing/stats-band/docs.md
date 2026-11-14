@@ -16,7 +16,15 @@ Plain, divided by lines, or as cards.
 |---|---|---|---|
 | `items` | `{ value, label, note?, format?, decimals?, prefix?, suffix? }[]` | — | |
 | `variant` | `plain` `divided` `cards` | `divided` | |
-| `mode` | `count` `roll` | `count` | Counter style |
+| `mode` | `count` `roll` `none` | `count` | Counter style; `none` writes the number without counting |
+| `color` | color token | text colour | colour of the numbers |
+| `reveal` | Reveal options / `false` | `{ effect: "up", stagger: 90 }` | entrance of the items |
+| `class` | class | — | on the list |
+
+```tsx
+<StatsBand items={stats} color="brand-orange" reveal={{ effect: "scale", stagger: 140 }} />
+<StatsBand items={stats} mode="none" reveal={false} />
+```
 
 ## Accessibility
 

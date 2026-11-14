@@ -28,3 +28,18 @@ test("VideoBackground: no tint layer with tint none, no button with controls fal
   assert.equal(el.querySelector(".hm-vbg-toggle"), null);
   dispose();
 });
+
+test("VideoBackground: own names and icons on the pause button", () => {
+  const quiet = globalThis.matchMedia;
+  // the test DOM has no media playback: give its elements a silent play / pause
+  const proto = Object.getPrototypeOf(document.createElement("video"));
+  proto.play ??= () => Promise.resolve(); proto.pause ??= () => {};
+  globalThis.matchMedia = (q) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} });
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(VideoBackground, { src: "/v.webm", class: "mine", labels: { pause: "Stop the waves" }, icons: { pause: h("i", { class: "own" }) } }), el);
+  const btn = el.querySelector(".hm-vbg.mine .hm-vbg-toggle");
+  assert.equal(btn.getAttribute("aria-label"), "Stop the waves");
+  assert.ok(btn.querySelector(".own"));
+  dispose();
+  globalThis.matchMedia = quiet;
+});

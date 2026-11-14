@@ -19,13 +19,17 @@ export interface SiteFooterProps {
   columns?: readonly FooterColumn[] | undefined;
   social?: readonly FooterSocial[] | undefined;
   newsletter?: NewsletterProps | undefined;
-  /** Bottom start (default "© <year> <brand name>"). */
-  copyright?: MaybeFn<unknown> | undefined;
+  /** Bottom start (default "© <year> <brand name>"); false for none. */
+  copyright?: MaybeFn<unknown> | false | undefined;
   legal?: readonly FooterLink[] | undefined;
-  /** A large wordmark across the bottom. */
-  wordmark?: string | undefined;
+  /** A large wordmark across the bottom (text or your own node). */
+  wordmark?: unknown | undefined;
   /** "Back to top" button (default true). */
   toTop?: boolean | undefined;
+  /** Icon of the "back to top" button (default: an arrow up). */
+  toTopIcon?: unknown | undefined;
+  /** Accessible name of the "back to top" button (default "Back to top"). */
+  toTopLabel?: string | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -46,8 +50,8 @@ export function SiteFooter(props: SiteFooterProps): Element {
           h("ul", {}, c.links.map((l) => h("li", {}, h("a", { href: l.href, class: "hm-sfoot-link" }, l.label)))))),
         props.newsletter ? h("div", { class: "hm-sfoot-news" }, h(Newsletter, { layout: "stacked", ...props.newsletter })) : null),
       h("div", { class: "hm-sfoot-bottom" },
-        h("p", { class: "hm-sfoot-copy" }, () => val(props.copyright) ?? `© ${year} ${name}`.trim()),
+        props.copyright !== false && h("p", { class: "hm-sfoot-copy" }, () => val(props.copyright) ?? `© ${year} ${name}`.trim()),
         props.legal?.length ? h("ul", { class: "hm-sfoot-legal" }, props.legal.map((l) => h("li", {}, h("a", { href: l.href, class: "hm-sfoot-link" }, l.label)))) : null,
-        props.toTop !== false && h(IconButton, { class: "hm-sfoot-top-btn", variant: "ghost", size: "sm", label: () => t`Back to top`, onClick: () => globalThis.scrollTo?.({ top: 0, behavior: globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }) }, glyph(arrowUp))),
+        props.toTop !== false && h(IconButton, { class: "hm-sfoot-top-btn", variant: "ghost", size: "sm", label: () => props.toTopLabel ?? t`Back to top`, onClick: () => globalThis.scrollTo?.({ top: 0, behavior: globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }) }, props.toTopIcon != null ? icon(props.toTopIcon) : glyph(arrowUp))),
       props.wordmark ? h("p", { class: "hm-sfoot-mark", "aria-hidden": "true" }, props.wordmark) : null));
 }

@@ -23,3 +23,32 @@ test("ProjectDetail: h1, facts, services, shared cover, gallery buttons, back an
   assert.deepEqual(opened, ["b"]);
   dispose();
 });
+
+test("ProjectDetail: own texts, parts off, colour, no reveal", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const project = { id: "a", title: "T", category: "Web", year: 2026, role: "Design", services: ["Brand"], body: "Story",
+    cover: h("div", {}), gallery: [{ src: "/g.jpg", alt: "G", width: 800, height: 600 }] };
+  const next = { project: { id: "b", title: "B", cover: h("div", {}) }, onOpen: () => {} };
+  const dispose = render(() => [
+    h(ProjectDetail, { project, next, onBack: () => {}, class: "one", color: "brand-orange", nextIcon: h("i", { class: "mine" }),
+      labels: { back: "Back", next: "Up next", role: "Job", services: "Did", openImage: (n) => `Photo ${n}` } }),
+    h(ProjectDetail, { project: { ...project, cover: h("div", {}) }, next: { ...next, project: { ...next.project, cover: h("div", {}) } }, onBack: () => {}, class: "two", facts: false, eyebrow: false, backIcon: false, nextIcon: false, reveal: false }),
+  ], el);
+  const one = el.querySelector(".one");
+  assert.equal(one.getAttribute("data-hm-color"), "brand-orange");
+  assert.equal(one.querySelector(".hm-pd-back").textContent, "Back");
+  assert.equal(one.querySelector(".hm-pd-next-label").textContent, "Up next");
+  assert.ok(one.querySelector(".hm-pd-next-title .mine"));
+  assert.equal(one.querySelector("dl.hm-kv dt").textContent, "Job");
+  assert.equal(one.querySelector(".hm-pd-services").getAttribute("aria-label"), "Did");
+  assert.equal(one.querySelector(".hm-pd-shot").getAttribute("aria-label"), "Photo 1");
+  assert.ok(one.querySelector(".hm-pd-head").classList.contains("hm-reveal"));
+  const two = el.querySelector(".two");
+  assert.equal(two.querySelector("dl.hm-kv"), null);
+  assert.equal(two.querySelector(".hm-pd-eyebrow"), null);
+  assert.equal(two.querySelector(".hm-pd-back svg"), null);
+  assert.equal(two.querySelector(".hm-pd-next-title svg"), null);
+  assert.ok(!two.querySelector(".hm-pd-head").classList.contains("hm-reveal"));
+  assert.equal(two.querySelector(".hm-pd-body").textContent, "Story");
+  dispose();
+});

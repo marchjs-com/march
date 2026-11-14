@@ -30,3 +30,5 @@
 /* slider */
 .hm-tm-slide { min-width: 0; height: 100%; display: flex; }
 .hm-tm-slide .hm-tm-card { width: 100%; }
+/* quotes={false}: no quotation marks */
+.hm-tm-plain .hm-tm-quote p::before, .hm-tm-plain .hm-tm-quote p::after { content: none; }

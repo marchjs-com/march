@@ -29,3 +29,4 @@
 .hm-pd-next-cover > img, .hm-pd-next-cover > :first-child { display: block; width: 100%; height: 100%; object-fit: cover; }
 @container (max-width: 700px) { .hm-pd-grid { grid-template-columns: minmax(0, 1fr); } .hm-pd-facts { position: static; } .hm-pd-gallery { grid-template-columns: minmax(0, 1fr); } .hm-pd-next { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .hm-pd-shot:hover > :first-child, .hm-pd-next:hover { transform: none; } }
+.hm-pd[data-hm-color] .hm-pd-eyebrow { color: var(--hm-accent-text, var(--hm-accent)); }

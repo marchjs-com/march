@@ -8,6 +8,7 @@ import { t } from "../../../core/i18n.ts";
 import { cx, val, setStyle, type ClassProp } from "../../../ui/util.ts";
 import { scrollIndicator, onScrollProgress, type ScrollSource } from "../../../motion/scroll-fx.ts";
 import { onCleanup, getOwner, runWithOwner } from "../../../core/reactive.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface ScrollProgressProps {
   /** Measure this element (an article) instead of the whole page. */
@@ -18,6 +19,10 @@ export interface ScrollProgressProps {
   paint?: "gradient" | "accent" | undefined;
   /** Bar height in px (default 3). */
   size?: number | undefined;
+  /** Colour of the fill (a theme token); wins over `paint`. */
+  color?: ColorToken | undefined;
+  /** Accessible name (default "Reading progress"). */
+  label?: string | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -27,7 +32,8 @@ export function ScrollProgress(props: ScrollProgressProps): Element {
   const fill = h("span", { class: "hm-sprog-fill" }) as HTMLElement;
   const root = h("div", {
     class: cx("hm-sprog", `hm-sprog-${props.position ?? "fixed"}`, `hm-sprog-${props.paint ?? "gradient"}`, val(props.class)),
-    role: "progressbar", "aria-label": t`Reading progress`, "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": () => String(pct()),
+    "data-hm-color": colorAttr(props.color),
+    role: "progressbar", "aria-label": props.label ?? t`Reading progress`, "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": () => String(pct()),
   }, fill) as HTMLElement;
   if (props.size) setStyle(root, { "--hm-sprog-h": `${props.size}px` });
   let el: Element | null = null;

@@ -4,14 +4,15 @@
 import "./project-detail.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, val, glyph, type ClassProp } from "../../../ui/util.ts";
+import { cx, val, glyph, icon, type ClassProp } from "../../../ui/util.ts";
 import { Button } from "../../../ui/button.ts";
 import { KeyValue } from "../../../ui/key-value.ts";
 import { Chip } from "../../actions/chip/index.ts";
 import { openMedia } from "../../../ui/media.ts";
 import { arrowLeft } from "../../../icons/glyphs/arrowLeft.ts";
 import { arrowRight } from "../../../icons/glyphs/arrowRight.ts";
-import { Reveal } from "../reveal/index.ts";
+import { Reveal, type RevealOptions } from "../reveal/index.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import type { Project, ProjectCover } from "../project-grid/index.ts";
 
 export interface ProjectDetails extends Project {
@@ -31,6 +32,26 @@ export interface ProjectDetailProps {
   next?: { project: Project; onOpen: (p: Project, cover: Element) => void } | undefined;
   /** Shared element name of the cover (default `project-<id>`, the name ProjectGrid gives its covers). */
   shared?: string | undefined;
+  /** The category line above the title (default true). */
+  eyebrow?: boolean | undefined;
+  /** The facts list (role, client, year, category; default true). */
+  facts?: boolean | undefined;
+  /** Icon of the back button: an icon, or false for none (default: an arrow). */
+  backIcon?: unknown | undefined;
+  /** Icon after the next project's title: an icon or a node, or false for none (default: an arrow). */
+  nextIcon?: unknown | undefined;
+  /** Colour of the category line (default: the accent). */
+  color?: ColorToken | undefined;
+  /** Entrance of the heading and the story: Reveal options, or false for none. */
+  reveal?: RevealOptions | false | undefined;
+  /** Own texts; every one defaults to the built-in translated text. */
+  labels?: {
+    back?: unknown; next?: unknown; role?: unknown; client?: unknown; year?: unknown; category?: unknown;
+    /** Accessible name of the services list. */
+    services?: string | undefined;
+    /** Accessible name of a gallery image (n starts at 1). */
+    openImage?: ((n: number) => string) | undefined;
+  } | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -42,30 +63,35 @@ const coverNode = (c: ProjectCover | Node, eager = false): unknown => (isCover(c
 /** `<ProjectDetail project={p} onBack={() => $open = null} next={{ project: n, onOpen }} />` */
 export function ProjectDetail(props: ProjectDetailProps): Element {
   const p = props.project;
-  const facts = [
-    p.role != null && { label: t`Role`, value: p.role },
-    p.client != null && { label: t`Client`, value: p.client },
-    p.year != null && { label: t`Year`, value: p.year },
-    p.category != null && { label: t`Category`, value: p.category },
-  ].filter(Boolean) as { label: string; value: unknown }[];
+  const L = props.labels ?? {};
+  const facts = (props.facts === false ? [] : [
+    p.role != null && { label: L.role ?? t`Role`, value: p.role },
+    p.client != null && { label: L.client ?? t`Client`, value: p.client },
+    p.year != null && { label: L.year ?? t`Year`, value: p.year },
+    p.category != null && { label: L.category ?? t`Category`, value: p.category },
+  ]).filter(Boolean) as { label: string; value: unknown }[];
+  // a block that enters with Reveal, or a plain one with `reveal={false}`
+  const box = (cls: string, opts: RevealOptions, ...kids: unknown[]): unknown =>
+    (props.reveal === false ? h("div", { class: cls }, kids) : h(Reveal, { class: cls, ...opts, ...props.reveal }, kids));
+  const nextIcon = props.nextIcon === false ? null : props.nextIcon != null ? icon(props.nextIcon) : glyph(arrowRight);
   const nextCover = props.next ? h("div", { class: "hm-pd-next-cover", "data-hm-shared": `project-${props.next.project.id}` }, coverNode(props.next.project.cover)) as HTMLElement : null;
-  return h("article", { class: cx("hm-pd", val(props.class)) },
-    props.onBack ? h(Button, { variant: "ghost", size: "sm", class: "hm-pd-back", icon: arrowLeft, onClick: () => props.onBack?.() }, t`All projects`) : null,
-    h(Reveal, { class: "hm-pd-head", effect: "up", stagger: 80 },
-      p.category != null ? h("p", { class: "hm-pd-eyebrow" }, p.category) : null,
+  return h("article", { class: cx("hm-pd", val(props.class)), "data-hm-color": colorAttr(props.color) },
+    props.onBack ? h(Button, { variant: "ghost", size: "sm", class: "hm-pd-back", icon: props.backIcon === false ? undefined : props.backIcon ?? arrowLeft, onClick: () => props.onBack?.() }, L.back ?? t`All projects`) : null,
+    box("hm-pd-head", { effect: "up", stagger: 80 },
+      p.category != null && props.eyebrow !== false ? h("p", { class: "hm-pd-eyebrow" }, p.category) : null,
       h("h1", { class: "hm-pd-title" }, p.title),
       p.summary != null ? h("p", { class: "hm-pd-lead" }, p.summary) : null),
     h("div", { class: "hm-pd-cover", "data-hm-shared": props.shared ?? `project-${p.id}` }, coverNode(p.cover, true)),
     h("div", { class: "hm-pd-grid" },
       h("aside", { class: "hm-pd-facts" },
         facts.length ? h(KeyValue, { items: facts }) : null,
-        p.services?.length ? h("div", { class: "hm-pd-services", "aria-label": t`Services`, role: "list" }, p.services.map((s) => h("span", { role: "listitem" }, h(Chip, { size: "sm" }, s)))) : null,
+        p.services?.length ? h("div", { class: "hm-pd-services", "aria-label": L.services ?? t`Services`, role: "list" }, p.services.map((s) => h("span", { role: "listitem" }, h(Chip, { size: "sm" }, s)))) : null,
         p.links?.length ? h("div", { class: "hm-pd-links" }, p.links.map((l) => h(Button, { variant: "secondary", size: "sm", href: l.href as never, iconEnd: arrowRight }, l.label))) : null),
-      p.body != null ? h(Reveal, { class: "hm-pd-body", effect: "up" }, p.body) : null),
+      p.body != null ? box("hm-pd-body", { effect: "up" }, p.body) : null),
     p.gallery?.length ? h("div", { class: "hm-pd-gallery" }, p.gallery.map((g, i) => isCover(g)
-      ? h("button", { type: "button", class: "hm-pd-shot", "aria-label": () => t`Open image ${i + 1}`, onClick: () => void openMedia(g.src, { alt: g.alt }) }, coverNode(g))
+      ? h("button", { type: "button", class: "hm-pd-shot", "aria-label": () => (L.openImage ? L.openImage(i + 1) : t`Open image ${i + 1}`), onClick: () => void openMedia(g.src, { alt: g.alt }) }, coverNode(g))
       : h("div", { class: "hm-pd-shot" }, g))) : null,
     props.next ? h("a", { class: "hm-pd-next", href: props.next.project.href ?? `#${props.next.project.id}`, onClick: (e: Event) => { e.preventDefault(); props.next?.onOpen(props.next.project, nextCover as Element); } },
-      h("span", { class: "hm-pd-next-text" }, h("span", { class: "hm-pd-next-label" }, t`Next project`), h("span", { class: "hm-pd-next-title" }, props.next.project.title, " ", glyph(arrowRight))),
+      h("span", { class: "hm-pd-next-text" }, h("span", { class: "hm-pd-next-label" }, L.next ?? t`Next project`), h("span", { class: "hm-pd-next-title" }, props.next.project.title, " ", nextIcon)),
       nextCover) : null) as Element;
 }

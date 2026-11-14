@@ -19,14 +19,33 @@ let $slide = Number(queryParam("slide")() ?? 0)
 | Prop | Type | Default | |
 |---|---|---|---|
 | `index`, `setIndex` | number | `0` | current slide; `bind:index` to keep it in the URL |
-| `transition` | `slide` `fade` `zoom` `none` | `slide` | |
+| `transition` | `slide` `fade` `zoom` `none` / `(incoming, outgoing, direction) => void` | `slide` | a ready transition, none, or your own (animate the two slides yourself) |
 | `presenter` | boolean | `false` | speaker view (next slide, notes, timer) |
 | `sync` | string or `false` | `deck` | windows with the same name stay in step (cross-tab channel) |
 | `presenterUrl` | string | — | the speaker button / `P` opens it in a new window |
 | `label` | string | `Presentation` | accessible name |
+| `controls` | boolean | `true` | the control row under the stage |
+| `counter` | boolean / `(index, total) => node` | `true` | the "Slide 3 of 12" counter, or your own content |
+| `progress` | boolean | `true` | the progress line |
+| `progressColor` | color token | brand gradient | colour of the progress line |
+| `fullscreen` | boolean | `true` | the full screen button and the `F` key |
+| `timer` | boolean | `true` | the timer of the speaker view |
+| `icons` | `{ previous?, next?, speaker?, fullscreen? }` | built-in | own icons for the buttons |
+| `labels` | `{ previous?, next?, speaker?, fullscreen?, counter?(index, total), deck?, speakerView?, upNext?, end?, notes?, noNotes?, elapsed? }` | built-in texts | any text the deck writes itself |
+| `class` | class | — | on the deck |
+
+```tsx
+import { animate } from "hadi-march/motion"
+<Presentation progressColor="brand-orange" counter={(i, n) => `${i + 1} / ${n}`} fullscreen={false}
+  labels={{ previous: "Back", next: "Forward" }} icons={{ next: arrowRight }}
+  transition={(incoming, outgoing, dir) => animate(incoming, { opacity: [0, 1], transform: [`rotate(${8 * dir}deg)`, "rotate(0deg)"] }, { duration: 600 })}>
+  …
+</Presentation>
+<Presentation controls={false} progress={false}>…</Presentation>   // the bare stage: keys, wheel and swipes still work
+```
 
 `<Slide layout="title|content|split|center|image" tone="plain|inverse|brand" notes="…" background={<Overlay …/>}>`,
-`<Appear as="ul|ol|div" effect="up|fade|scale">` (each child is a step).
+`<Appear as="ul|ol|div" effect="up|fade|scale|none">` (each child is a step; `effect` is how a step enters). Both take `class`.
 
 ## Accessibility
 

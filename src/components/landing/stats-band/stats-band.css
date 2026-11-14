@@ -9,3 +9,6 @@
 .hm-stats-cards .hm-stats-item { border: 1px solid var(--hm-border); border-radius: var(--hm-radius-4); background: var(--hm-surface); padding: var(--hm-space-5); box-shadow: var(--hm-shadow-1); }
 @media (max-width: 640px) { .hm-stats-divided .hm-stats-item + .hm-stats-item { border-inline-start: 0; border-block-start: 1px solid var(--hm-border); } }
 @container hm-site (max-width: 640px) { .hm-stats-divided .hm-stats-item + .hm-stats-item { border-inline-start: 0; border-block-start: 1px solid var(--hm-border); } }
+/* own colour (data-hm-color sets --hm-accent): the numbers take it */
+.hm-stats[data-hm-color] .hm-stats-value { background-image: linear-gradient(180deg, var(--hm-accent), color-mix(in srgb, var(--hm-accent) 62%, transparent)); }
+.hm-stats-plain { font-variant-numeric: tabular-nums; white-space: nowrap; }

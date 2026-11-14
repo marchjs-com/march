@@ -16,7 +16,7 @@ export const details = (p: Project): ProjectDetails => ({
   gallery: [<Cover n={(PROJECTS.indexOf(p) + 1) % 6} /> as Node, <Cover n={(PROJECTS.indexOf(p) + 2) % 6} /> as Node, <Cover n={(PROJECTS.indexOf(p) + 3) % 6} /> as Node],
 })
 
-export default function ProjectDetailDemo(props: { values: { gallery: boolean; next: boolean } }) {
+export default function ProjectDetailDemo(props: { values: { gallery: boolean; next: boolean; facts: boolean; color: string; reveal: string } }) {
   let $open: Project | null = null
   // the cover morphs both ways: the card cover and the detail cover share the name project-<id>
   const open = (p: Project, cover: Element) => { void sharedTransition(`project-${p.id}`, cover, () => { $open = p }) }
@@ -34,7 +34,9 @@ export default function ProjectDetailDemo(props: { values: { gallery: boolean; n
       if (!p) return <ProjectGrid projects={PROJECTS} onOpen={open} allLabel="Tümü" />
       const d = details(p), n = PROJECTS[(PROJECTS.indexOf(p) + 1) % PROJECTS.length]!
       return <ProjectDetail project={v.gallery ? d : { ...d, gallery: undefined }} onBack={() => back(p)}
-        next={v.next ? { project: n, onOpen: open } : undefined} />
+        next={v.next ? { project: n, onOpen: open } : undefined} facts={v.facts}
+        color={v.color === "default" ? undefined : v.color as "brand-orange"}
+        reveal={v.reveal === "off" ? false : { effect: v.reveal as "up" }} />
     }}
   </div>
 }

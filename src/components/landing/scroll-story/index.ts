@@ -28,6 +28,12 @@ export interface ScrollStoryProps {
   theme?: boolean | undefined;
   /** Called when the active step changes. */
   onStep?: ((index: number) => void) | undefined;
+  /** The dots under the pinned picture (default true). */
+  dots?: boolean | undefined;
+  /** The step number above each title: true (default: "01"), false, or `(index) => node`. */
+  numbers?: boolean | ((index: number) => unknown) | undefined;
+  /** How the pinned picture changes: "rise" (default), "fade", "none", or your own `(incoming, outgoing, direction) => void` (direction 1 = scrolling down). */
+  transition?: "rise" | "fade" | "none" | ((incoming: HTMLElement, outgoing: HTMLElement | undefined, direction: 1 | -1) => void) | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -39,10 +45,10 @@ export function ScrollStory(props: ScrollStoryProps): Element {
   const slots = props.steps.map(() => h("div", { class: "hm-story-inline" }) as HTMLElement);
   const steps = props.steps.map((s, i) => h("article", { class: () => cx("hm-story-step", active() === i && "is-active") },
     slots[i],
-    h("span", { class: "hm-story-num", "aria-hidden": "true" }, String(i + 1).padStart(2, "0")),
+    props.numbers === false ? null : h("span", { class: "hm-story-num", "aria-hidden": "true" }, typeof props.numbers === "function" ? props.numbers(i) : String(i + 1).padStart(2, "0")),
     h("h3", { class: "hm-story-title" }, s.title),
     s.body != null ? h("p", { class: "hm-story-body" }, s.body) : null) as HTMLElement);
-  const dots = h("ol", { class: "hm-story-dots", "aria-hidden": "true" }, props.steps.map((_, i) => h("li", { class: () => cx("hm-story-dot", active() === i && "is-active") })));
+  const dots = props.dots === false ? null : h("ol", { class: "hm-story-dots", "aria-hidden": "true" }, props.steps.map((_, i) => h("li", { class: () => cx("hm-story-dot", active() === i && "is-active") })));
   const root = h("section", {
     class: cx("hm-story", props.side === "start" && "hm-story-media-start", props.theme !== false && "is-themed", val(props.class)),
     "data-hm-color": () => (props.theme !== false ? colorAttr(props.steps[active()]?.color) : null),
@@ -77,9 +83,17 @@ export function ScrollStory(props: ScrollStoryProps): Element {
     untrack(() => {
       props.onStep?.(i);
       // stacked: every picture is shown in its own card, nothing cross-fades
-      if (i === prev || reducedMotion() || stacked.peek()) { prev = i; return; }
+      const tr = props.transition ?? "rise";
+      if (i === prev || reducedMotion() || stacked.peek() || tr === "none") { prev = i; return; }
       const dir = i > prev ? 1 : -1;
       const inEl = media[i], outEl = media[prev];
+      prev = i;
+      if (typeof tr === "function") { if (inEl) tr(inEl, outEl, dir); return; }
+      if (tr === "fade") {
+        if (inEl) animate(inEl, { opacity: [0, 1] }, { duration: 520, easing: "out" });
+        if (outEl) animate(outEl, { opacity: [1, 0] }, { duration: 420, easing: "out" });
+        return;
+      }
       if (inEl) animate(inEl, { opacity: [0, 1], transform: [`translate3d(0, ${24 * dir}px, 0) scale(.97)`, "translate3d(0, 0, 0) scale(1)"] }, { duration: 620, easing: "expo" });
       if (outEl) animate(outEl, { opacity: [1, 0], transform: ["scale(1)", `translate3d(0, ${-16 * dir}px, 0) scale(.98)`] }, { duration: 420, easing: "out" });
       prev = i;

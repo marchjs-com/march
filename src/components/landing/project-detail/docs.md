@@ -19,6 +19,20 @@ const open = (p, cover) => sharedTransition(`project-${p.id}`, cover, () => { $o
 | `onBack` | `() => void` | — | shows the back button |
 | `next` | `{ project, onOpen }` | — | next-project card (its cover morphs too) |
 | `shared` | string | `project-<id>` | shared element name of the cover (ProjectGrid uses the same) |
+| `eyebrow` | boolean | `true` | the category line above the title |
+| `facts` | boolean | `true` | the facts list (role, client, year, category) |
+| `backIcon` | icon / `false` | arrow | icon of the back button |
+| `nextIcon` | icon, node / `false` | arrow | icon after the next project's title |
+| `color` | color token | accent | colour of the category line |
+| `reveal` | Reveal options / `false` | `{ effect: "up" }` | entrance of the heading and the story |
+| `labels` | `{ back?, next?, role?, client?, year?, category?, services?, openImage?(n) }` | built-in texts | any text the page writes itself |
+| `class` | class | — | on the article |
+
+```tsx
+<ProjectDetail project={p} onBack={back} color="brand-orange" reveal={{ effect: "blur" }}
+  labels={{ back: "Back to work", next: "Up next", client: "For", openImage: (n) => `Photo ${n}` }} />
+<ProjectDetail project={p} facts={false} eyebrow={false} backIcon={false} nextIcon={false} reveal={false} />
+```
 
 ## Accessibility
 

@@ -32,3 +32,8 @@
 @media (max-width: 700px) { .hm-price-card.is-featured { order: -1; transform: none; } }
 @container hm-site (max-width: 700px) { .hm-price-card.is-featured { order: -1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .hm-price-saving { transition: none; } }
+/* own colours (data-hm-color sets --hm-accent): the featured border takes the colour; own feature marks keep their own look */
+.hm-pricing[data-hm-color] .hm-price-card.is-featured { background: linear-gradient(var(--hm-surface), var(--hm-surface)) padding-box, linear-gradient(var(--hm-accent), var(--hm-accent)) border-box; }
+.hm-price-feat-icon[data-hm-color] { background: color-mix(in srgb, var(--hm-accent) 16%, var(--hm-bg)); color: var(--hm-accent-text, var(--hm-accent)); }
+.hm-price-feat-own { display: inline-grid; place-items: center; flex: none; min-width: 1.25rem; height: 1.25rem; margin-block-start: .1rem; }
+.hm-price-plain { font-variant-numeric: tabular-nums; }

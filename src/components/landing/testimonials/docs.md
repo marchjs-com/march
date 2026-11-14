@@ -18,6 +18,20 @@ the quote, an optional star rating, an Avatar, the name and the role.
 | `items` | `{ quote, name, role?, avatar?, rating? }[]` | — | |
 | `variant` | `grid` `marquee` `wall` `slider` | `grid` | |
 | `cols` | 1 2 3 | 3 | grid / slider |
+| `rating` | boolean | `true` | the stars of a card |
+| `ratingColor` | color token | accent | colour of the stars |
+| `avatar` | boolean | `true` | the avatar next to the name |
+| `quotes` | boolean | `true` | the quotation marks around the quote |
+| `more` | boolean | `true` | wall: the "Show more" button (false: the whole wall) |
+| `speed` | `[row1, row2]` px/s | `[28, 20]` | marquee: speed of the two rows |
+| `reveal` | Reveal options / `false` | `{ effect: "up", stagger: 60 }` | entrance of the cards (grid, wall) |
+| `labels` | `{ more?, less?, slider?, rating?(value) }` | built-in texts | any text Testimonials writes itself |
+| `class` | class | — | on the root |
+
+```tsx
+<Testimonials variant="wall" items={quotes} ratingColor="brand-gold" labels={{ more: "Read more stories", less: "Fold" }} />
+<Testimonials variant="marquee" items={quotes} avatar={false} rating={false} quotes={false} speed={[60, 40]} />
+```
 
 ## Accessibility
 

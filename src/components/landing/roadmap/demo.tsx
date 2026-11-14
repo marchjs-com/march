@@ -15,8 +15,12 @@ export const ROADMAP: RoadmapItem[] = [
   { time: "Sırada", title: "Yeni şehirler", body: "Etkinlikler her ilde, her hafta.", status: "next" },
 ]
 
-export default function RoadmapDemo(props: { values: { badges: boolean; scroll: boolean } }) {
+export default function RoadmapDemo(props: { values: { badges: boolean; scroll: boolean; rail: boolean; color: string; labels: boolean } }) {
   return <div class="sc-rm-demo">
-    {() => { const v = { ...props.values }; return <Roadmap items={ROADMAP} badges={v.badges} scroll={v.scroll} /> }}
+    {() => {
+      const v = { ...props.values }
+      return <Roadmap items={ROADMAP} badges={v.badges} scroll={v.scroll} rail={v.rail} color={v.color === "default" ? undefined : v.color as "brand-purple"}
+        labels={v.labels ? { done: "Yayında", now: "Yapılıyor", next: "Sırada" } : undefined} />
+    }}
   </div>
 }

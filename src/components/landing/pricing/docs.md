@@ -22,6 +22,20 @@ let $period = "monthly"
 | `toggle` | boolean | `true` | show the switch |
 | `currency` | ISO code | `EUR` | Intl currency format for the locale |
 | `saving` | node | — | badge next to the switch, bright on yearly |
+| `color` | color token | brand gradient + accent | colour of the featured plan (border, glow, button, badge) |
+| `featureIcon` | boolean / `(included) => node` | `true` | the tick / dash in front of a feature, or your own mark |
+| `featureColor` | color token | `success` | colour of the tick |
+| `per` | boolean | `true` | the "/ month · billed yearly" lines |
+| `priceEffect` | `roll` `count` `none` | `roll` | how a price changes with the period |
+| `reveal` | Reveal options / `false` | `{ effect: "up", stagger: 90 }` | entrance of the cards |
+| `labels` | `{ monthly?, yearly?, perMonth?, billedMonthly?, billedYearly?, custom?, billingPeriod?, notIncluded? }` | built-in texts | any text Pricing writes itself |
+| `class` | class | — | on the root |
+
+```tsx
+<Pricing plans={plans} color="brand-purple" featureColor="brand-purple" priceEffect="count" reveal={{ effect: "scale" }}
+  labels={{ monthly: "Pay monthly", yearly: "Pay yearly", perMonth: "per seat", custom: "Let's talk" }} />
+<Pricing plans={plans} featureIcon={(included) => (included ? "+" : "–")} per={false} reveal={false} />
+```
 
 A feature is a node or `{ label, included?, hint? }`; `included: false` shows a dash and says "not included" to screen
 readers.

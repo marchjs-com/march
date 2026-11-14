@@ -8,6 +8,9 @@ export const code = `<Reveal effect="up" stagger={80}>
 <ul use:revealOnScroll={{ effect: "start" }}>…</ul>     // action form
 <Reveal effect="blur" scrub>…</Reveal>                  // follows the scroll`
 
+// an own effect: any start and end state (transform / opacity / filter)
+const TURN = { from: { opacity: 0, transform: "rotate(-10deg) scale(.6)" }, to: { opacity: 1, transform: "rotate(0deg) scale(1)" } }
+
 export default function RevealDemo(props: { values: { effect: string; stagger: number; scrub: boolean } }) {
   let $run = 0
   return <div class="sc-web-col">
@@ -15,7 +18,7 @@ export default function RevealDemo(props: { values: { effect: string; stagger: n
     {() => {
       $run
       const v = { ...props.values }
-      return <Reveal class="sc-reveal-row" effect={v.effect as RevealEffect} stagger={v.stagger} scrub={v.scrub}>
+      return <Reveal class="sc-reveal-row" effect={v.effect === "own" ? TURN : v.effect as RevealEffect} stagger={v.stagger} scrub={v.scrub}>
         {["Hızlı", "Erişilebilir", "Temalı", "Küçük"].map((t, i) => <div class="sc-reveal-card"><strong>{t}</strong><span class="hm-muted">Kart {i + 1}</span></div>)}
       </Reveal>
     }}

@@ -17,14 +17,14 @@ export const FOOTER_COLUMNS = [
   { title: "Destek", links: [{ label: "Yardım merkezi", href: "#" }, { label: "Topluluk kuralları", href: "#" }, { label: "Güvenlik", href: "#" }] },
 ]
 
-export default function SiteFooterDemo(props: { values: { newsletter: boolean; wordmark: boolean; social: boolean } }) {
+export default function SiteFooterDemo(props: { values: { newsletter: boolean; wordmark: boolean; social: boolean; toTop: boolean; copyright: boolean } }) {
   return <div class="sc-site-frame">
     {() => {
       const v = { ...props.values }
       return <SiteFooter brand={{ name: "HADİ", mark: sparkles }} about="Sosyal ağ, sohbet ve etkinlikler tek yerde. hadisosyal.com" columns={FOOTER_COLUMNS}
         social={v.social ? [{ label: "Web", href: "#", icon: globe }, { label: "Topluluk", href: "#", icon: message }, { label: "E-posta", href: "#", icon: mail }] : undefined}
         newsletter={v.newsletter ? { title: "Bülten", lead: "Ayda bir, yalnız yenilikler.", onSubmit: () => new Promise((r) => setTimeout(r, 700)) } : undefined}
-        legal={[{ label: "Gizlilik", href: "#" }, { label: "Koşullar", href: "#" }]} wordmark={v.wordmark ? "HADİ" : undefined} />
+        legal={[{ label: "Gizlilik", href: "#" }, { label: "Koşullar", href: "#" }]} wordmark={v.wordmark ? "HADİ" : undefined} toTop={v.toTop} copyright={v.copyright ? undefined : false} />
     }}
   </div>
 }

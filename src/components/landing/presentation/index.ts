@@ -9,7 +9,8 @@ import "./presentation.css";
 import { h } from "../../../dom/h.ts";
 import { signal, computed, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, val, glyph, listen, setStyle, clamp, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, glyph, icon, listen, setStyle, clamp, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { IconButton } from "../../../ui/button.ts";
 import { channel } from "../../../channel/index.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
@@ -41,8 +42,8 @@ export function Slide(props: SlideProps): Element {
     h("div", { class: "hm-slide-body" }, props.children)) as Element;
 }
 
-/** Fragments: every child appears on its own step. `<Appear><li>One</li><li>Two</li></Appear>` (renders a list). */
-export function Appear(props: { as?: string | undefined; effect?: "up" | "fade" | "scale" | undefined; class?: ClassProp | undefined; children?: unknown }): Element {
+/** Fragments: every child appears on its own step. `<Appear><li>One</li><li>Two</li></Appear>` (renders a list); `effect="none"` shows a step without movement. */
+export function Appear(props: { as?: string | undefined; effect?: "up" | "fade" | "scale" | "none" | undefined; class?: ClassProp | undefined; children?: unknown }): Element {
   return h(props.as ?? "ul", { class: cx("hm-appear", `hm-appear-${props.effect ?? "up"}`, val(props.class)) }, props.children) as Element;
 }
 
@@ -50,7 +51,8 @@ export interface PresentationProps {
   /** Current slide, 0-based. With `setIndex` it is controlled (`bind:index`, e.g. a URL query parameter). */
   index?: MaybeFn<number | undefined>;
   setIndex?: ((i: number) => void) | undefined;
-  transition?: "slide" | "fade" | "zoom" | "none" | undefined;
+  /** How slides change: a ready one, "none", or your own `(incoming, outgoing, direction) => void` (direction 1 = forward; RTL already applied). */
+  transition?: "slide" | "fade" | "zoom" | "none" | ((incoming: HTMLElement, outgoing: HTMLElement | undefined, direction: 1 | -1) => void) | undefined;
   /** Show the speaker view (current, next, notes, timer). */
   presenter?: boolean | undefined;
   /** Keep windows of this deck in step (the speaker window and the audience). Default "deck". */
@@ -59,6 +61,29 @@ export interface PresentationProps {
   presenterUrl?: string | undefined;
   /** Accessible name of the deck. */
   label?: string | undefined;
+  /** The control row under the stage (default true). */
+  controls?: boolean | undefined;
+  /** The "Slide 3 of 12" counter: true (default), false, or `(index, total) => content` (index is 0-based). */
+  counter?: boolean | ((index: number, total: number) => unknown) | undefined;
+  /** The progress line under the stage (default true). */
+  progress?: boolean | undefined;
+  /** Colour of the progress line (default: the brand gradient). */
+  progressColor?: ColorToken | undefined;
+  /** The full screen button and the `F` key (default true). */
+  fullscreen?: boolean | undefined;
+  /** The timer of the speaker view (default true). */
+  timer?: boolean | undefined;
+  /** Own icons for the buttons (an icon definition or a node). */
+  icons?: { previous?: unknown; next?: unknown; speaker?: unknown; fullscreen?: unknown } | undefined;
+  /** Own texts; every one defaults to the built-in translated text. */
+  labels?: {
+    previous?: string | undefined; next?: string | undefined; speaker?: string | undefined; fullscreen?: string | undefined;
+    /** Text of the counter (index is 0-based). */
+    counter?: ((index: number, total: number) => string) | undefined;
+    /** aria-roledescription of the deck ("slide deck"). */
+    deck?: string | undefined;
+    speakerView?: string | undefined; upNext?: string | undefined; end?: string | undefined; notes?: string | undefined; noNotes?: string | undefined; elapsed?: string | undefined;
+  } | undefined;
   class?: ClassProp | undefined;
   children?: unknown;
 }
@@ -91,7 +116,9 @@ export function Presentation(props: PresentationProps): Element {
   const prev = (): void => { const p = pos.peek(); if (p.s > 0) go({ i: p.i, s: p.s - 1 }); else if (p.i > 0) go({ i: p.i - 1, s: steps(list[p.i - 1]).length }); };
   if (sync) sync.on((p, from) => { if (from !== "tab") return; remote = true; go(p); remote = false; });
 
-  const bar = h("span", { class: "hm-deck-bar-fill" }) as HTMLElement;
+  const bar = h("span", { class: "hm-deck-bar-fill", "data-hm-color": colorAttr(props.progressColor) }) as HTMLElement;
+  const setBar = (i: number): void => setStyle(bar, { transform: `scaleX(${n > 1 ? (i / (n - 1)).toFixed(4) : "1"})` });
+  const L = props.labels ?? {};
   // the visible slide and its steps; the change animates (direction-aware, mirrored in RTL)
   let shown = -1;
   let root: HTMLElement | null = null;
@@ -101,20 +128,25 @@ export function Presentation(props: PresentationProps): Element {
       list.forEach((el, k) => { const on = k === i; el.classList.toggle("is-current", on); el.toggleAttribute("inert", !on); el.setAttribute("aria-hidden", on ? "false" : "true"); });
       steps(list[i]).forEach((el, k) => {
         const vis = k < s;
-        if (vis && !el.classList.contains("is-shown") && shown === i && !reducedMotion()) animate(el, { opacity: [0, 1], transform: ["translate3d(0, .6em, 0)", "translate3d(0, 0, 0)"] }, { duration: 420, easing: "expo" });
+        if (vis && !el.classList.contains("is-shown") && shown === i && !reducedMotion()) {
+          // the step enters the way its <Appear effect> says
+          const fx = el.parentElement?.classList;
+          if (!fx?.contains("hm-appear-none")) animate(el, fx?.contains("hm-appear-fade") ? { opacity: [0, 1] } : fx?.contains("hm-appear-scale") ? { opacity: [0, 1], transform: ["scale(.8)", "scale(1)"] } : { opacity: [0, 1], transform: ["translate3d(0, .6em, 0)", "translate3d(0, 0, 0)"] }, { duration: 420, easing: "expo" });
+        }
         el.classList.toggle("is-shown", vis);
       });
       if (shown >= 0 && shown !== i && !reducedMotion() && props.transition !== "none") {
         const dir = (i > shown ? 1 : -1) * ((root && globalThis.getComputedStyle?.(root).direction === "rtl") ? -1 : 1);
         const inEl = list[i], outEl = list[shown];
         const tr = props.transition ?? "slide";
+        if (typeof tr === "function") { if (inEl) tr(inEl, outEl, dir as 1 | -1); shown = i; setBar(i); return; }
         const fin = tr === "fade" ? { opacity: [0, 1] } : tr === "zoom" ? { opacity: [0, 1], transform: ["scale(.9)", "scale(1)"] } : { opacity: [0, 1], transform: [`translate3d(${8 * dir}%, 0, 0)`, "translate3d(0, 0, 0)"] };
         const fout = tr === "fade" ? { opacity: [1, 0] } : tr === "zoom" ? { opacity: [1, 0], transform: ["scale(1)", "scale(1.06)"] } : { opacity: [1, 0], transform: ["translate3d(0, 0, 0)", `translate3d(${-8 * dir}%, 0, 0)`] };
         if (outEl) { outEl.classList.add("is-leaving"); void animate(outEl, fout, { duration: 420, easing: "in-out" }).finished.then(() => outEl.classList.remove("is-leaving")); }
         if (inEl) animate(inEl, fin, { duration: 520, easing: "expo" });
       }
       shown = i;
-      setStyle(bar, { transform: `scaleX(${n > 1 ? (i / (n - 1)).toFixed(4) : "1"})` });
+      setBar(i);
     });
   });
 
@@ -125,41 +157,45 @@ export function Presentation(props: PresentationProps): Element {
   };
   const openSpeaker = (): void => { if (props.presenterUrl) globalThis.open?.(props.presenterUrl, "hm-deck-speaker", "popup,width=1100,height=720"); };
 
-  const counter = h("span", { class: "hm-deck-count", "aria-live": "polite" }, () => t`Slide ${index() + 1} of ${n}`) as HTMLElement;
-  const controls = h("div", { class: "hm-deck-controls" },
-    h(IconButton, { label: () => t`Previous slide`, variant: "ghost", size: "sm", onClick: prev, disabled: () => pos().i === 0 && pos().s === 0 }, glyph(chevronLeft)),
+  const ownCount = typeof props.counter === "function" ? props.counter : null;
+  const counter = props.counter === false ? null
+    : h("span", { class: "hm-deck-count", "aria-live": "polite" }, () => (ownCount ? ownCount(index(), n) : L.counter ? L.counter(index(), n) : t`Slide ${index() + 1} of ${n}`));
+  const ic = (own: unknown, def: Parameters<typeof glyph>[0]): unknown => (own != null ? icon(own) : glyph(def));
+  const controls = props.controls === false ? null : h("div", { class: "hm-deck-controls" },
+    h(IconButton, { class: "hm-deck-prev", label: () => L.previous ?? t`Previous slide`, variant: "ghost", size: "sm", onClick: prev, disabled: () => pos().i === 0 && pos().s === 0 }, ic(props.icons?.previous, chevronLeft)),
     counter,
-    h(IconButton, { label: () => t`Next slide`, variant: "ghost", size: "sm", onClick: next, disabled: () => pos().i === n - 1 && pos().s >= steps(list[n - 1]).length }, glyph(chevronRight)),
+    h(IconButton, { class: "hm-deck-fwd", label: () => L.next ?? t`Next slide`, variant: "ghost", size: "sm", onClick: next, disabled: () => pos().i === n - 1 && pos().s >= steps(list[n - 1]).length }, ic(props.icons?.next, chevronRight)),
     h("span", { class: "hm-deck-spacer" }),
-    props.presenterUrl && !props.presenter ? h(IconButton, { label: () => t`Open speaker view`, variant: "ghost", size: "sm", onClick: openSpeaker }, glyph(monitor)) : null,
-    h(IconButton, { label: () => t`Full screen`, variant: "ghost", size: "sm", onClick: fullscreen }, glyph(EXPAND)));
+    props.presenterUrl && !props.presenter ? h(IconButton, { class: "hm-deck-speaker-btn", label: () => L.speaker ?? t`Open speaker view`, variant: "ghost", size: "sm", onClick: openSpeaker }, ic(props.icons?.speaker, monitor)) : null,
+    props.fullscreen !== false ? h(IconButton, { class: "hm-deck-full", label: () => L.fullscreen ?? t`Full screen`, variant: "ghost", size: "sm", onClick: fullscreen }, ic(props.icons?.fullscreen, EXPAND)) : null);
 
   // speaker view: the next slide (a clone, inert), notes and a timer
   const started = Date.now();
   const clock = signal(0);
   let speaker: unknown = null;
   if (props.presenter) {
-    const timer = setInterval(() => clock.set(Date.now() - started), 1000) as unknown as { unref?: () => void };
-    timer.unref?.(); // never keeps a test process (or a server render) alive
-    if (getOwner()) onCleanup(() => clearInterval(timer as never));
+    const timed = props.timer !== false;
+    const timer = timed ? setInterval(() => clock.set(Date.now() - started), 1000) as unknown as { unref?: () => void } : null;
+    timer?.unref?.(); // never keeps a test process (or a server render) alive
+    if (timer && getOwner()) onCleanup(() => clearInterval(timer as never));
     const fmt = (ms: number): string => { const s = Math.floor(ms / 1000); return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; };
-    speaker = h("aside", { class: "hm-deck-speaker", "aria-label": t`Speaker view` },
-      h("div", { class: "hm-deck-next" }, h("p", { class: "hm-deck-cap" }, t`Next`), () => {
+    speaker = h("aside", { class: "hm-deck-speaker", "aria-label": L.speakerView ?? t`Speaker view` },
+      h("div", { class: "hm-deck-next" }, h("p", { class: "hm-deck-cap" }, L.upNext ?? t`Next`), () => {
         const nx = list[index() + 1];
-        if (!nx) return h("p", { class: "hm-deck-end" }, t`End of the deck`);
+        if (!nx) return h("p", { class: "hm-deck-end" }, L.end ?? t`End of the deck`);
         const c = nx.cloneNode(true) as HTMLElement;
         c.classList.add("is-current", "is-preview"); c.removeAttribute("inert"); c.setAttribute("aria-hidden", "true");
         for (const x of steps(c)) x.classList.add("is-shown");
         return h("div", { class: "hm-deck-preview", inert: "" }, c);
       }),
-      h("div", { class: "hm-deck-notes" }, h("p", { class: "hm-deck-cap" }, t`Notes`), h("p", { class: "hm-deck-note" }, () => list[index()]?.getAttribute("data-notes") || t`No notes for this slide.`)),
-      h("p", { class: "hm-deck-timer", role: "timer", "aria-label": t`Elapsed time` }, () => fmt(clock())));
+      h("div", { class: "hm-deck-notes" }, h("p", { class: "hm-deck-cap" }, L.notes ?? t`Notes`), h("p", { class: "hm-deck-note" }, () => list[index()]?.getAttribute("data-notes") || (L.noNotes ?? t`No notes for this slide.`))),
+      timed ? h("p", { class: "hm-deck-timer", role: "timer", "aria-label": L.elapsed ?? t`Elapsed time` }, () => fmt(clock())) : null);
   }
 
   root = h("div", {
     class: cx("hm-deck", props.presenter && "is-presenter", val(props.class)), tabindex: "0", role: "region",
-    "aria-roledescription": t`slide deck`, "aria-label": props.label ?? t`Presentation`,
-  }, h("div", { class: "hm-deck-main" }, stage, h("span", { class: "hm-deck-bar", "aria-hidden": "true" }, bar), controls), speaker) as HTMLElement;
+    "aria-roledescription": L.deck ?? t`slide deck`, "aria-label": props.label ?? t`Presentation`,
+  }, h("div", { class: "hm-deck-main" }, stage, props.progress !== false ? h("span", { class: "hm-deck-bar", "aria-hidden": "true" }, bar) : null, controls), speaker) as HTMLElement;
   const deck = root;
 
   // keyboard (on the deck, and on the page while it is full screen), wheel, swipe
@@ -171,7 +207,7 @@ export function Presentation(props: PresentationProps): Element {
     else if (k === "ArrowLeft" || k === "ArrowUp" || k === "PageUp") { e.preventDefault(); (globalThis.getComputedStyle?.(deck).direction === "rtl" && k === "ArrowLeft") ? next() : prev(); }
     else if (k === "Home") { e.preventDefault(); go({ i: 0, s: 0 }); }
     else if (k === "End") { e.preventDefault(); go({ i: n - 1, s: steps(list[n - 1]).length }); }
-    else if (k === "f" || k === "F") fullscreen();
+    else if ((k === "f" || k === "F") && props.fullscreen !== false) fullscreen();
     else if ((k === "p" || k === "P") && props.presenterUrl) openSpeaker();
   };
   const offs = [

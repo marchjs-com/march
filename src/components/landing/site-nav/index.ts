@@ -6,7 +6,7 @@ import "./site-nav.css";
 import { h } from "../../../dom/h.ts";
 import { signal, onCleanup, getOwner } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, val, glyph, listen, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, glyph, icon, listen, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Brand, type BrandProps } from "../../../ui/app.ts";
 import { IconButton } from "../../../ui/button.ts";
 import { openDrawer } from "../../../ui/dialog.ts";
@@ -14,6 +14,7 @@ import { menu } from "../../../icons/glyphs/menu.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface SiteNavLink { label: unknown; href: string; active?: MaybeFn<boolean | undefined> }
 export interface SiteNavProps {
@@ -34,6 +35,18 @@ export interface SiteNavProps {
   sticky?: boolean | undefined;
   /** Called when a link is chosen (desktop or drawer). */
   onNavigate?: (href: string) => void | undefined;
+  /** The pill that slides under the hovered link and rests on the current one (default true). */
+  pill?: boolean | undefined;
+  /** Colour of the pill (default: a soft neutral). */
+  pillColor?: ColorToken | undefined;
+  /** The menu button of narrow screens (default true); false when you open your own menu. */
+  menu?: boolean | undefined;
+  /** Icon of the menu button (default: three lines). */
+  menuIcon?: unknown | undefined;
+  /** Side the drawer opens from (default "right"). */
+  drawerSide?: "left" | "right" | undefined;
+  /** Own texts: accessible name of the navigation ("Main"), name of the menu button ("Open menu"), title of the drawer ("Menu"). */
+  labels?: { main?: string | undefined; openMenu?: string | undefined; menu?: string | undefined } | undefined;
   class?: ClassProp | undefined;
 }
 
@@ -64,9 +77,10 @@ function toSection(e: Event, href: string): boolean {
 export function SiteNav(props: SiteNavProps): Element {
   const scrolled = signal(false), hidden = signal(false);
   const links = props.links ?? [];
-  const pill = h("span", { class: "hm-snav-pill", "aria-hidden": "true" }) as HTMLElement;
+  const L = props.labels ?? {};
+  const pill = h("span", { class: "hm-snav-pill", "aria-hidden": "true", "data-hm-color": colorAttr(props.pillColor) }) as HTMLElement;
   const anchors: HTMLElement[] = [];
-  const list = h("ul", { class: "hm-snav-links" }, pill, links.map((l) => {
+  const list = h("ul", { class: "hm-snav-links" }, props.pill === false ? null : pill, links.map((l) => {
     const a = h("a", { class: "hm-snav-link", href: l.href, "aria-current": () => (val(l.active) ? "page" : null), onClick: (e: Event) => { toSection(e, l.href); props.onNavigate?.(l.href); } }, l.label) as HTMLElement;
     anchors.push(a);
     return h("li", {}, a);
@@ -75,6 +89,7 @@ export function SiteNav(props: SiteNavProps): Element {
   // the sliding pill: final place set at once, the motion engine plays the move from the old place (FLIP)
   let shown = false, last = { x: 0, w: 0 };
   const moveTo = (a: HTMLElement | null): void => {
+    if (props.pill === false) return;
     if (!a) { if (shown) { animate(pill, { opacity: [1, 0] }, { duration: 160, easing: "out" }); setStyle(pill, { opacity: "0" }); shown = false; } return; }
     const r = list.getBoundingClientRect(), b = a.getBoundingClientRect();
     const rtl = globalThis.getComputedStyle?.(list).direction === "rtl";
@@ -95,9 +110,9 @@ export function SiteNav(props: SiteNavProps): Element {
   });
 
   const openMenu = (): void => {
-    void openDrawer((close) => h("nav", { class: "hm-snav-drawer", "aria-label": t`Main` },
+    void openDrawer((close) => h("nav", { class: "hm-snav-drawer", "aria-label": L.main ?? t`Main` },
       h("ul", {}, links.map((l) => h("li", {}, h("a", { class: "hm-snav-drawer-link", href: l.href, "aria-current": () => (val(l.active) ? "page" : null), onClick: (e: Event) => { close(undefined); toSection(e, l.href); props.onNavigate?.(l.href); } }, l.label)))),
-      props.actions != null && h("div", { class: "hm-snav-drawer-actions" }, props.actions)), { side: "right", title: t`Menu` });
+      props.actions != null && h("div", { class: "hm-snav-drawer-actions" }, props.actions)), { side: props.drawerSide ?? "right", title: L.menu ?? t`Menu` });
   };
 
   const threshold = props.threshold ?? 12;
@@ -114,9 +129,9 @@ export function SiteNav(props: SiteNavProps): Element {
   },
   h("div", { class: "hm-snav-bar" },
     h("div", { class: "hm-snav-brand" }, brandNode(props.brand)),
-    links.length ? h("nav", { class: "hm-snav-nav", "aria-label": t`Main` }, list) : null,
+    links.length ? h("nav", { class: "hm-snav-nav", "aria-label": L.main ?? t`Main` }, list) : null,
     h("div", { class: "hm-snav-actions" }, props.actions ?? null),
-    links.length ? h(IconButton, { class: "hm-snav-menu", label: () => t`Open menu`, onClick: openMenu }, glyph(menu)) : null)) as HTMLElement;
+    links.length && props.menu !== false ? h(IconButton, { class: "hm-snav-menu", label: () => L.openMenu ?? t`Open menu`, onClick: openMenu }, props.menuIcon != null ? icon(props.menuIcon) : glyph(menu)) : null)) as HTMLElement;
   // rest on the current link once laid out
   queueMicrotask(() => { if (nav.isConnected) moveTo(current()); });
   if (getOwner()) onCleanup(() => { offList(); offScroll(); });

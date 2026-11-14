@@ -20,6 +20,13 @@ A tint keeps text readable and a small button pauses the motion.
 | `tintOpacity` | 0–1 | `.45` | |
 | `position` | string | `center` | object-position |
 | `controls` | boolean | `true` | pause / play button |
+| `icons` | `{ play?, pause? }` | built-in | own icons of that button |
+| `labels` | `{ play?, pause? }` | `Play background video` `Pause background video` | its accessible names |
+| `class` | class | — | on the root |
+
+```tsx
+<VideoBackground src="/clip.webm" poster="/clip.jpg" labels={{ pause: "Stop the waves", play: "Start the waves" }} icons={{ pause: square }} />
+```
 
 ## Accessibility
 

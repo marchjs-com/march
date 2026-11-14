@@ -16,3 +16,22 @@ test("Roadmap: timeline items with status classes and badges, rail fill", async 
   assert.ok(el.querySelector(".hm-rm-rail .hm-rm-fill"));
   dispose();
 });
+
+test("Roadmap: own status texts, own badge, no rail, colour, no reveal", async () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const items = [{ title: "A", status: "done" }, { title: "B", status: "now" }];
+  const dispose = render(() => [
+    h(Roadmap, { items, class: "one", color: "brand-purple", labels: { done: "Shipped" } }),
+    h(Roadmap, { items, class: "two", rail: false, reveal: false, badges: (s, text) => h("em", { class: "mine" }, `${s}:${text}`) }),
+  ], el);
+  await Promise.resolve();
+  const one = el.querySelector(".one");
+  assert.equal(one.getAttribute("data-hm-color"), "brand-purple");
+  assert.deepEqual([...one.querySelectorAll(".hm-rm-badge")].map((b) => b.textContent), ["Shipped", "In progress"]);
+  const two = el.querySelector(".two");
+  assert.equal(two.querySelector(".hm-rm-rail"), null);
+  assert.equal(two.querySelector(".hm-rm-badge"), null);
+  assert.deepEqual([...two.querySelectorAll(".mine")].map((b) => b.textContent), ["done:Done", "now:In progress"]);
+  assert.ok(!two.querySelector(".hm-rm-tl").classList.contains("hm-reveal"));
+  dispose();
+});

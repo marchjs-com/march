@@ -16,3 +16,16 @@ test("SiteSection: labelled by its title, tone and width classes", () => {
   assert.ok(s.textContent.includes("body"));
   dispose();
 });
+
+test("SiteSection: own colour, heading without the entrance", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(SiteSection, { title: "T", color: "brand-purple", reveal: false, class: "mine" }), el);
+  const s = el.querySelector("section.hm-ss");
+  assert.equal(s.getAttribute("data-hm-color"), "brand-purple");
+  assert.equal(s.getAttribute("reveal"), null);
+  assert.equal(s.getAttribute("color"), null);
+  assert.ok(s.classList.contains("mine"));
+  const head = s.querySelector(".hm-ss-head");
+  assert.ok(head.classList.contains("is-revealed") && !head.classList.contains("is-pending"));
+  dispose();
+});

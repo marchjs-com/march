@@ -30,3 +30,24 @@ test("Testimonials wall: Show more toggles aria-expanded; marquee copies are hid
   assert.ok(b.el.querySelector('.hm-tm-strip[aria-hidden="true"] figure'));
   b.dispose();
 });
+
+test("Testimonials: parts off, own texts, star colour, open wall, no entrance", () => {
+  const a = mount({ items, variant: "grid", rating: false, avatar: false, quotes: false, reveal: false });
+  assert.equal(a.el.querySelector(".hm-tm-rating"), null);
+  assert.equal(a.el.querySelector(".hm-avatar"), null);
+  assert.ok(a.el.querySelector(".hm-tm").classList.contains("hm-tm-plain"));
+  assert.ok(!a.el.querySelector(".hm-tm-list").classList.contains("hm-reveal"));
+  a.dispose();
+  const b = mount({ items, variant: "wall", ratingColor: "brand-gold", labels: { more: "More stories", less: "Fold", rating: (n) => `${n} stars` } });
+  const btn = b.el.querySelector(".hm-tm-more button");
+  assert.equal(btn.textContent, "More stories");
+  btn.click();
+  assert.equal(btn.textContent, "Fold");
+  assert.equal(b.el.querySelector(".hm-tm-rating").getAttribute("data-hm-color"), "brand-gold");
+  assert.ok(b.el.querySelector(".hm-tm-rating").outerHTML.includes("5 stars"));
+  b.dispose();
+  const c = mount({ items, variant: "wall", more: false });
+  assert.equal(c.el.querySelector(".hm-tm-more"), null);
+  assert.ok(!c.el.querySelector(".hm-tm-list").className.includes("is-closed"));
+  c.dispose();
+});

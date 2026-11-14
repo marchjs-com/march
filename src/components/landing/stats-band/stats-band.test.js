@@ -17,3 +17,14 @@ test("StatsBand: dl with dt label and dd counter per item", () => {
   assert.equal(items[1].querySelector(".hm-stats-note").textContent, "12 mo");
   dispose();
 });
+
+test("StatsBand: own colour, plain numbers, no entrance", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(StatsBand, { items: [{ value: 1200, label: "events", suffix: "+" }], color: "brand-orange", mode: "none", reveal: false, class: "mine" }), el);
+  const dl = el.querySelector("dl.hm-stats.mine");
+  assert.equal(dl.getAttribute("data-hm-color"), "brand-orange");
+  assert.equal(dl.querySelector(".hm-counter"), null);
+  assert.match(dl.querySelector(".hm-stats-plain").textContent, /^1.?200\+$/);
+  assert.ok(dl.classList.contains("is-revealed") && !dl.classList.contains("is-pending"));
+  dispose();
+});

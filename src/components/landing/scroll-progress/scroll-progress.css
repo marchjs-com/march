@@ -6,3 +6,4 @@
 :dir(rtl) .hm-sprog-fill { transform-origin: 100% 50%; }
 .hm-sprog-gradient .hm-sprog-fill { background: var(--hm-brand-gradient); }
 .hm-sprog-accent .hm-sprog-fill { background: var(--hm-accent, var(--hm-primary)); }
+.hm-sprog[data-hm-color] .hm-sprog-fill { background: var(--hm-accent); }

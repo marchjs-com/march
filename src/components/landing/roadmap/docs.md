@@ -17,8 +17,18 @@ is a transform written in the scroll scene's write phase.
 | Prop | Type | Default | |
 |---|---|---|---|
 | `items` | `{ time?, title, body?, status?, icon? }[]` | — | |
-| `badges` | boolean | `true` | status badge next to each title |
+| `badges` | boolean / `(status, text) => node` | `true` | status badge next to each title, or your own mark |
 | `scroll` | boolean | `true` | fill with the scroll (off: full line) |
+| `rail` | boolean | `true` | the line and its fill (off: dots only) |
+| `color` | color token | brand gradient + accent | colour of the fill and of the passed dots |
+| `labels` | `{ done?, now?, next? }` | `Done` `In progress` `Planned` | texts of the statuses |
+| `reveal` | Reveal options / `false` | `{ effect: "start", stagger: 90 }` | entrance of the entries |
+| `class` | class | — | on the root |
+
+```tsx
+<Roadmap items={items} color="brand-purple" labels={{ done: "Shipped", now: "Building", next: "Later" }} reveal={{ effect: "up" }} />
+<Roadmap items={items} badges={(status, text) => <em>{text}</em>} rail={false} reveal={false} />
+```
 
 ## Accessibility
 

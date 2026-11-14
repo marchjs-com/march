@@ -22,3 +22,17 @@ test("SiteFooter: columns as labelled navs, social names, newsletter, copyright,
   assert.equal(f.querySelector(".hm-sfoot-top-btn").getAttribute("aria-label"), "Back to top");
   dispose();
 });
+
+test("SiteFooter: no copyright, own back-to-top icon and name, no button", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => [
+    h(SiteFooter, { brand: { name: "A" }, class: "one", copyright: false, toTopIcon: h("i", { class: "mine" }), toTopLabel: "Up" }),
+    h(SiteFooter, { brand: { name: "B" }, class: "two", toTop: false }),
+  ], el);
+  const one = el.querySelector(".one");
+  assert.equal(one.querySelector(".hm-sfoot-copy"), null);
+  assert.equal(one.querySelector(".hm-sfoot-top-btn").getAttribute("aria-label"), "Up");
+  assert.ok(one.querySelector(".hm-sfoot-top-btn .mine"));
+  assert.equal(el.querySelector(".two .hm-sfoot-top-btn"), null);
+  dispose();
+});

@@ -24,6 +24,19 @@ Below 860 px the links move into a Drawer.
 | `threshold` | px | `12` | scroll that counts as scrolled |
 | `sticky` | boolean | `true` | |
 | `onNavigate` | `(href) => void` | — | link chosen |
+| `pill` | boolean | `true` | the pill under the hovered / current link |
+| `pillColor` | color token | soft neutral | colour of the pill |
+| `menu` | boolean | `true` | the menu button of narrow screens |
+| `menuIcon` | icon / node | three lines | icon of the menu button |
+| `drawerSide` | `left` `right` | `right` | side the drawer opens from |
+| `labels` | `{ main?, openMenu?, menu? }` | `Main` `Open menu` `Menu` | name of the navigation, of the menu button, title of the drawer |
+| `class` | class | — | on the header |
+
+```tsx
+<SiteNav brand={brand} links={links} pillColor="brand-orange" menuIcon={grid} drawerSide="left"
+  labels={{ main: "Site", openMenu: "Show the menu", menu: "Pages" }} />
+<SiteNav brand={brand} links={links} pill={false} menu={false} />
+```
 
 Set `--hm-site-nav-top` when the page already has a sticky bar above it. In-page links (`#pricing`) scroll to their section
 themselves, so they also work under a hash router; give sections a `scroll-margin-top` for the bar.

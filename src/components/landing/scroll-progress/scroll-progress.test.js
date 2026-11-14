@@ -16,3 +16,13 @@ test("ScrollProgress: a named progressbar with a fill, classes by position and p
   assert.ok(bar.querySelector(".hm-sprog-fill"));
   dispose();
 });
+
+test("ScrollProgress: own colour and own name", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(ScrollProgress, { position: "inline", color: "brand-orange", label: "Read so far", class: "mine" }), el);
+  const bar = el.querySelector('[role="progressbar"]');
+  assert.equal(bar.getAttribute("data-hm-color"), "brand-orange");
+  assert.equal(bar.getAttribute("aria-label"), "Read so far");
+  assert.ok(bar.classList.contains("mine"));
+  dispose();
+});

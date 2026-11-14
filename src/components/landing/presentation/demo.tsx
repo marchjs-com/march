@@ -4,6 +4,7 @@ import { Overlay } from "../../../ui/overlay.ts";
 import { Counter } from "../counter/index.ts";
 import { MockApp } from "../demo-kit.tsx";
 import { effect, untrack } from "../../../core/reactive.ts";
+import { animate } from "../../../motion/engine/playback.ts";
 
 export const code = `let $slide = Number(queryParam("slide")() ?? 0)
 <Presentation bind:index={$slide} transition="slide" presenterUrl="#/sites/slides?presenter=1">
@@ -41,7 +42,12 @@ export function DemoSlides() {
   ]
 }
 
-export default function PresentationDemo(props: { values: { transition: string; presenter: boolean } }) {
+// an own transition: the new slide turns in (any function of the two slides and the direction)
+const turnIn = (incoming: HTMLElement, _outgoing: HTMLElement | undefined, dir: 1 | -1): void => {
+  animate(incoming, { opacity: [0, 1], transform: [`rotate(${8 * dir}deg) scale(.7)`, "rotate(0deg) scale(1)"] }, { duration: 620, easing: "expo" })
+}
+
+export default function PresentationDemo(props: { values: { transition: string; presenter: boolean; progress: string; counter: string; controls: boolean } }) {
   // the transition plays when the slide changes: choosing one moves to the next slide, so it is seen at once (the deck
   // reads the transition live, it is not rebuilt for it)
   let $slide = 0
@@ -53,8 +59,10 @@ export default function PresentationDemo(props: { values: { transition: string; 
   })
   return <div>
     {() => {
-      const presenter = props.values.presenter
-      return <Presentation bind:index={$slide} transition={props.values.transition as "slide"} presenter={presenter} sync="demo" label="Örnek sunum"><DemoSlides /></Presentation>
+      const presenter = props.values.presenter, progress = props.values.progress, counter = props.values.counter, controls = props.values.controls
+      return <Presentation bind:index={$slide} transition={props.values.transition === "own" ? turnIn : props.values.transition as "slide"} presenter={presenter} sync="demo" label="Örnek sunum"
+        controls={controls} progress={progress !== "off"} progressColor={progress === "off" || progress === "gradient" ? undefined : progress as "brand-orange"}
+        counter={counter === "off" ? false : counter === "own" ? (i: number, n: number) => `${i + 1} / ${n}` : true}><DemoSlides /></Presentation>
     }}
   </div>
 }

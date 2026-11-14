@@ -39,3 +39,19 @@ test("ScrollStory: narrow (its own width) stacks — every picture moves into it
   assert.equal(root.querySelector(".hm-story-stage").children.length, 2, "wide: back in the pinned stage");
   dispose(); globalThis.ResizeObserver = RO; void installDom;
 });
+
+test("ScrollStory: no dots, no numbers / own numbers", () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const steps = () => [{ title: "A", media: "1" }, { title: "B", media: "2" }];
+  const dispose = render(() => [
+    h(ScrollStory, { steps: steps(), class: "one", dots: false, numbers: false, transition: "none" }),
+    h(ScrollStory, { steps: steps(), class: "two", numbers: (i) => `Step ${i + 1}`, transition: () => {} }),
+  ], el);
+  const one = el.querySelector(".one");
+  assert.equal(one.querySelector(".hm-story-dots"), null);
+  assert.equal(one.querySelector(".hm-story-num"), null);
+  const two = el.querySelector(".two");
+  assert.ok(two.querySelector(".hm-story-dots"));
+  assert.deepEqual([...two.querySelectorAll(".hm-story-num")].map((n) => n.textContent), ["Step 1", "Step 2"]);
+  dispose();
+});
