@@ -32,4 +32,5 @@ Home and End through the shared focus helper.
 
 ## Composed of
 
-Nothing: buttons with roving focus (ui/focus.ts).
+Nothing: buttons with roving focus (ui/focus.ts); the `slide` thumb is moved by the shared sliding indicator
+(motion/engine/parts.ts).

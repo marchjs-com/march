@@ -1,25 +1,26 @@
 // Pricing (hadi-march/landing): plans side by side with a monthly / yearly switch. Switching morphs every price: the
 // digits roll to the new amount (Counter, odometer mode), the "per month" line and the yearly saving cross-fade, and
-// the switch's own thumb slides. The featured plan is lifted with a glowing brand border. Plans are Cards in an
+// the thumb of the switch slides (Segmented, sliding indicator). The featured plan is lifted with a glowing brand border. Plans are Cards in an
 // equal-height row; on phones they stack with the featured plan first.
 import "./pricing.css";
 import { h } from "../../../dom/h.ts";
-import { signal, effect, onCleanup, getOwner, untrack } from "../../../core/reactive.ts";
+import { signal, effect, untrack } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, val, glyph, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
 import { Card } from "../../../ui/card.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { Segmented } from "../../../forms/inputs.ts";
-import { check } from "../../../icons/glyphs/check.ts";
+import { CheckMark } from "../../feedback/check-mark/index.ts";
 import { minus } from "../../../icons/glyphs/minus.ts";
 import { animate } from "../../../motion/engine/playback.ts";
-import { reducedMotion } from "../../../motion/engine/prefs.ts";
+import { still } from "../../../motion/engine/parts.ts";
 import { locale } from "../../../core/i18n.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { Counter, formatCount } from "../counter/index.ts";
 // Reveal: entries enter one after another
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts";
-import { actionButtons, type HeroAction } from "../hero/index.ts";
+import { sectionActions, type SectionAction } from "../section-head/index.ts";
 
 export type BillingPeriod = "monthly" | "yearly";
 export interface PricingFeature { label: unknown; included?: boolean | undefined; hint?: unknown }
@@ -29,7 +30,7 @@ export interface PricingPlan {
   /** Price per month for each period (yearly: the monthly equivalent). null = custom ("Contact us"). */
   price: { monthly: number | null; yearly: number | null } | number | null;
   features?: readonly (unknown | PricingFeature)[] | undefined;
-  cta?: HeroAction | undefined;
+  cta?: SectionAction | undefined;
   /** Lifted, with a glowing border and the badge. */
   featured?: boolean | undefined;
   badge?: unknown;
@@ -86,7 +87,7 @@ export function Pricing(props: PricingProps): Element {
   effect(() => { const p = period(); if (sel.peek() !== p) sel.set(p); });
 
   const toggle = props.toggle === false ? null : h("div", { class: "hm-price-switch" },
-    h(Segmented, { value: sel, options: [{ value: "monthly", label: L.monthly ?? t`Monthly` }, { value: "yearly", label: L.yearly ?? t`Yearly` }] as never, onChange: (v: unknown) => setPeriod(v as BillingPeriod), "aria-label": L.billingPeriod ?? t`Billing period`, class: "hm-price-seg" }),
+    h(Segmented, { indicator: "slide" as const, value: sel, options: [{ value: "monthly", label: L.monthly ?? t`Monthly` }, { value: "yearly", label: L.yearly ?? t`Yearly` }] as never, onChange: (v: unknown) => setPeriod(v as BillingPeriod), "aria-label": L.billingPeriod ?? t`Billing period`, class: "hm-price-seg" }),
     props.saving != null && h(Badge, { tone: "success", class: () => cx("hm-price-saving", period() === "yearly" && "is-on") }, () => val(props.saving)));
 
   const cards = props.plans.map((p) => {
@@ -97,7 +98,8 @@ export function Pricing(props: PricingProps): Element {
       return h("li", { class: cx("hm-price-feat", x.included === false && "is-off") },
         mark === false ? null
           : typeof mark === "function" ? h("span", { class: "hm-price-feat-own", "aria-hidden": "true" }, mark(x.included !== false))
-          : h("span", { class: "hm-price-feat-icon", "aria-hidden": "true", "data-hm-color": x.included === false ? null : colorAttr(props.featureColor) }, glyph(x.included === false ? minus : check)),
+          // a tick on a soft disc, or a dash for a feature the plan does not have (the line itself says "not included")
+          : h(CheckMark, { class: "hm-price-feat-icon", variant: "soft", size: "sm", label: false, value: x.included !== false, icons: { no: minus }, color: x.included === false ? undefined : props.featureColor }),
         h("span", {}, x.label, x.included === false ? h("span", { class: "hm-sr-only" }, ` (${L.notIncluded ?? t`not included`})`) : null),
         x.hint != null ? h("span", { class: "hm-price-feat-hint" }, x.hint) : null);
     });
@@ -111,35 +113,19 @@ export function Pricing(props: PricingProps): Element {
           : [props.priceEffect === "none" ? h("span", { class: "hm-price-num hm-price-plain" }, () => formatCount(amount(), { format: money(cur) }, locale()))
             : h(Counter, { value: amount, mode: props.priceEffect ?? "roll", start: "now", format: money(cur), class: "hm-price-num" }),
             props.per !== false ? h("span", { class: "hm-price-per" }, h("span", {}, L.perMonth ?? t`/ month`), h("span", { class: "hm-price-billed" }, () => (period() === "yearly" ? L.billedYearly ?? t`billed yearly` : L.billedMonthly ?? t`billed monthly`))) : null]),
-      p.cta ? h("div", { class: "hm-price-cta" }, actionButtons([{ variant: p.featured ? "primary" : "secondary", ...p.cta }], "md")) : null,
+      p.cta ? h("div", { class: "hm-price-cta" }, sectionActions([{ variant: p.featured ? "primary" : "secondary", ...p.cta }], "md")) : null,
       feats.length ? h("ul", { class: "hm-price-feats" }, feats) : null) as HTMLElement;
   });
   const row = h("div", { class: "hm-price-row" }, cards) as HTMLElement;
   const root = h("div", { class: cx("hm-pricing", val(props.class)), "data-hm-color": colorAttr(props.color) }, toggle, row) as HTMLElement;
 
-  // the switch thumb slides between the two options; the "billed" lines cross-fade
-  if (toggle) {
-    const seg = toggle.querySelector(".hm-segmented") as HTMLElement | null;
-    const thumb = h("span", { class: "hm-price-thumb", "aria-hidden": "true" }) as HTMLElement;
-    seg?.prepend(thumb);
-    let first = true;
-    const place = (): void => {
-      const on = seg?.querySelector<HTMLElement>('[aria-checked="true"]');
-      if (!seg || !on) return;
-      const x = on.offsetLeft, w = on.offsetWidth;
-      const from = thumb.style.getPropertyValue("transform"), fromW = Number.parseFloat(thumb.style.getPropertyValue("width")) || w;
-      setStyle(thumb, { width: `${w}px`, transform: `translateX(${x}px)` });
-      if (!first && !reducedMotion() && from) animate(thumb, { transform: [`${from} scaleX(${(fromW / w).toFixed(3)})`, `translateX(${x}px) scaleX(1)`] }, { duration: 420, easing: "spring" });
-      first = false;
-      for (const b of root.querySelectorAll<HTMLElement>(".hm-price-billed")) if (!reducedMotion()) animate(b, { opacity: [0, 1], transform: ["translateY(6px)", "translateY(0px)"] }, { duration: 320, easing: "out" });
-    };
-    effect(() => { period(); queueMicrotask(place); });
-    const RO = globalThis.ResizeObserver;
-    if (RO && seg) { const ro = new RO(() => { first = true; place(); }); ro.observe(seg); if (getOwner()) onCleanup(() => ro.disconnect()); }
-  }
-  if (props.reveal !== false) {
-    const stop = revealOnScroll(row, { effect: "up", stagger: 90, ...props.reveal, select: ".hm-price-card" });
-    if (getOwner()) onCleanup(stop);
-  }
+  // on a period change the "billed" lines cross-fade (the thumb of the switch is Segmented's own sliding indicator)
+  let first = true;
+  effect(() => {
+    period();
+    if (first) { first = false; return; }
+    untrack(() => { if (!still()) for (const b of root.querySelectorAll<HTMLElement>(".hm-price-billed")) animate(b, { opacity: [0, 1], transform: ["translateY(6px)", "translateY(0px)"] }, { duration: 320, easing: "out" }); });
+  });
+  if (props.reveal !== false) owned(revealOnScroll(row, { effect: "up", stagger: 90, ...props.reveal, select: ".hm-price-card" }));
   return root;
 }

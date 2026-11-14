@@ -5,10 +5,9 @@
 .hm-sfoot-about { display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; }
 .hm-sfoot-text { margin: 0; max-width: 22rem; color: var(--hm-muted); line-height: 1.6; }
 .hm-sfoot-social { display: flex; flex-wrap: wrap; gap: var(--hm-space-1); margin: 0; padding: 0; list-style: none; }
-.hm-sfoot-social-link { display: inline-grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: var(--hm-radius-full); color: var(--hm-muted);
-  transition: color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease); }
-.hm-sfoot-social-link:hover { color: var(--hm-text); background: var(--hm-surface-2); transform: translateY(-2px); }
-.hm-sfoot-social-link .hm-icon, .hm-sfoot-social-link svg { width: 1.125rem; height: 1.125rem; }
+/* social links are round IconButtons that lift on hover */
+.hm-sfoot .hm-sfoot-social-link { transition: color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease); }
+.hm-sfoot-social-link:hover { transform: translateY(-2px); }
 .hm-sfoot-col { min-width: 0; }
 .hm-sfoot-col-title { margin: 0 0 var(--hm-space-3); font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); }
 .hm-sfoot-col ul, .hm-sfoot-legal { display: flex; flex-direction: column; gap: var(--hm-space-2); margin: 0; padding: 0; list-style: none; }

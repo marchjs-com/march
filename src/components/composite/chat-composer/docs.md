@@ -44,4 +44,4 @@ message), the emoji button has `aria-expanded`, the attach menu is a Menu. "Reco
 
 ## Composed of
 
-Menu, Textarea, ReactionPicker.
+Menu, Textarea, ReactionPicker, IconButton, StatusDot.

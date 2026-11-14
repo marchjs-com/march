@@ -47,3 +47,27 @@ test("Calendar: month buttons, weekday row, labels, icons, day content and color
   assert.equal(m.el.querySelector('[data-date="2026-03-14"]').textContent, "14");
   m.dispose();
 });
+
+test("dayGridKey: the day a key moves to in a grid of days (shared with other day grids)", async () => {
+  const { dayGridKey } = await import("./index.ts");
+  const d = "2026-03-11"; // a Wednesday
+  assert.equal(dayGridKey({ key: "ArrowLeft" }, d, 1), "2026-03-10");
+  assert.equal(dayGridKey({ key: "ArrowLeft" }, d, 1, -1), "2026-03-12", "right-to-left columns");
+  assert.equal(dayGridKey({ key: "ArrowDown" }, d, 1), "2026-03-18");
+  assert.equal(dayGridKey({ key: "Home" }, d, 1), "2026-03-09");
+  assert.equal(dayGridKey({ key: "End" }, d, 1), "2026-03-15");
+  assert.equal(dayGridKey({ key: "End" }, d, 0), "2026-03-14", "week starting on Sunday");
+  assert.equal(dayGridKey({ key: "PageDown" }, d, 1), "2026-04-11");
+  assert.equal(dayGridKey({ key: "PageUp", shiftKey: true }, d, 1), "2025-03-11");
+  assert.equal(dayGridKey({ key: "Enter" }, d, 1), null);
+});
+
+test("Calendar: the month buttons are IconButtons with their names", () => {
+  const { el, dispose } = mount(() => h(Calendar, { value: "2026-03-14", labels: { prevMonth: "Back" } }));
+  const [prev, next] = el.querySelectorAll(".hm-cal-nav.hm-icon-btn");
+  assert.equal(prev.getAttribute("aria-label"), "Back");
+  assert.ok(next.classList.contains("hm-cal-next"));
+  next.click();
+  assert.match(el.querySelector(".hm-cal-title").textContent, /2026/);
+  dispose();
+});

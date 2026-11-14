@@ -41,4 +41,5 @@ category title as its name, and required categories are on and disabled. The gat
 
 ## Composed of
 
-Button (banner and panel actions), Card (one per category), Dialog (the preferences panel), Toggle (a category on or off).
+Button (banner and panel actions, the "Withdraw consent" link), Stack (the button rows), Card (one per category), Dialog
+(the preferences panel), Toggle (a category on or off), Empty (the placeholder of ConsentGate).

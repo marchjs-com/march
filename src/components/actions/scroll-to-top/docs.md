@@ -37,4 +37,4 @@ An icon button with a translated name; while hidden it is `inert` (out of the ta
 
 ## Composed of
 
-IconButton; BottomRightControls (the corner).
+IconButton (`variant="raised"`, `shape="round"`, `size="lg"`); BottomRightControls (the corner). Appear presets come from `motionPreset` (motion engine).

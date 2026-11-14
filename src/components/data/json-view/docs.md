@@ -28,3 +28,7 @@ and a circular reference is marked instead of looping.
 
 `role="tree"` with nested groups; every object and array is a button with `aria-expanded`, so Tab and Enter / Space
 open and close it.
+
+## Composed of
+
+Chevron (the open / close arrow).

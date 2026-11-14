@@ -26,6 +26,9 @@ import { renderLine, ansi } from "./ansi.ts";
 import { Window, type WindowProps } from "../../layout/window/index.ts";
 import { terminal as terminalIcon } from "../../../icons/glyphs/terminal.ts";
 import { glyph } from "../../../ui/util.ts";
+import { stickToBottom } from "../../../ui/observe.ts";
+import { Progress } from "../../feedback/progress/index.ts";
+import { Spinner } from "../../feedback/spinner/index.ts";
 
 export { ansi, tokenizeCommand, parseArgs, usageOf };
 export type { ArgSpec, OptionSpec, Parsed };
@@ -120,6 +123,9 @@ export const TERMINAL_SCHEMES = {
 const specOf = (c: Command): CommandSpec => (typeof c === "function" ? { run: c } : c);
 const TONE: Record<Tone, string> = { success: "ok", warn: "warn", error: "err", info: "info", muted: "" };
 
+/** The filled part of an io.progress bar, 0–1 (made here: inside the terminal `signal` names the abort signal of a command). */
+const fraction = (): ReturnType<typeof signal<number>> => signal(0);
+
 /** An extensible command line: commands with typed arguments, colored output, history, completion, themable colors. */
 export function Terminal(props: TerminalProps): Element {
   const own = new Map<string, Command>(Object.entries(props.commands ?? {}));
@@ -162,14 +168,8 @@ export function Terminal(props: TerminalProps): Element {
 
   // pinned to the bottom: every answer (also one that grows later — a table, a progress bar, a JSON tree) keeps the
   // last line in view; scrolling up to read unpins it until the reader comes back down or runs a command
-  let pinned = true;
-  const scrollDown = (): void => { pinned = true; scroller.scrollTop = scroller.scrollHeight; };
-  scroller.addEventListener("scroll", () => { pinned = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 8; }, { passive: true });
-  if (globalThis.ResizeObserver) {
-    const ro = new ResizeObserver(() => { if (pinned) scroller.scrollTop = scroller.scrollHeight; });
-    ro.observe(out);
-    onCleanup(() => ro.disconnect());
-  }
+  const stick = stickToBottom(scroller, { follow: out });
+  const scrollDown = (): void => stick.toBottom();
   const append = (node: Node, cls = ""): HTMLElement => {
     const row = h("div", { class: cx("hm-term-row", cls) }) as HTMLElement;
     row.appendChild(node);
@@ -208,14 +208,15 @@ export function Terminal(props: TerminalProps): Element {
       void import("../../data/json-view/index.ts").then((m) => slot.replaceChildren(m.JsonView({ value, open }) as Node));
     },
     progress: (label) => {
-      const bar = h("span", { class: "hm-term-bar" }, h("span", { class: "hm-term-bar-fill" })) as HTMLElement;
+      // the bar is decoration: the percent text beside it is what the log reads out
+      const part = fraction();
       const pct = h("span", { class: "hm-term-dim" }, " 0%") as HTMLElement;
-      const row = append(h("span", {}, `${label} `, bar, pct) as Node);
-      const set = (f: number): void => { const p = clamp(f, 0, 1); (bar.firstChild as HTMLElement).style.inlineSize = `${p * 100}%`; pct.textContent = ` ${Math.round(p * 100)}%`; };
+      const row = append(h("span", {}, `${label} `, h(Progress, { class: "hm-term-bar", value: part, max: 1, decorative: true }), pct) as Node);
+      const set = (f: number): void => { const p = clamp(f, 0, 1); part.set(p); pct.textContent = ` ${Math.round(p * 100)}%`; };
       return { set, done: (s) => { set(1); row.replaceChildren(textNode(s ?? label, { tone: "success" })); }, fail: (s) => { row.replaceChildren(textNode(s ?? label, { tone: "error" })); } };
     },
     spinner: (label) => {
-      const row = append(h("span", {}, h("span", { class: "hm-term-spin", "aria-hidden": "true" }), ` ${label}`) as Node);
+      const row = append(h("span", {}, h(Spinner, { class: "hm-term-spin", size: "em", decorative: true }), ` ${label}`) as Node);
       return { done: (s) => row.replaceChildren(textNode(s ?? label, { tone: "success" })), fail: (s) => row.replaceChildren(textNode(s ?? label, { tone: "error" })) };
     },
     clear: () => out.replaceChildren(),

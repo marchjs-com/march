@@ -50,4 +50,4 @@ badge is a real `<button>`: Tab reaches it, Enter and Space press it, it shows t
 
 ## Composed of
 
-StatusDot (the pulsing dot).
+StatusDot (the built-in dot, still or pulsing).

@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Numbered pages with ellipses and Previous / Next (the current page marked for screen readers), or a simple Previous / Next pager that also works without a page count.",
   category: "navigation",
-  composedOf: ["Button", "Select"],
+  composedOf: ["Button", "IconButton", "Select"],
   behaviors: [],
   showcase: "/navigation",
 });

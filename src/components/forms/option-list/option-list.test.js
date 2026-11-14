@@ -23,9 +23,9 @@ test("OptionList: radio rows, value signal, click picks, arrows move focus over 
   assert.deepEqual(rows.map((r) => r.getAttribute("aria-checked")), ["false", "true", "false", "false"]);
   assert.deepEqual(rows.map((r) => r.getAttribute("tabindex")), ["-1", "0", "-1", "-1"], "the chosen row is the Tab stop");
   assert.ok(rows[1].classList.contains("is-selected"));
-  assert.equal(rows[0].querySelector(".hm-option-list-hint").textContent, "Bright");
-  assert.ok(rows[1].querySelector(".hm-option-list-lead"));
-  assert.equal(rows[3].querySelector(".hm-option-list-trailing").textContent, "new");
+  assert.equal(rows[0].querySelector(".hm-listrow-sub").textContent, "Bright");
+  assert.ok(rows[1].querySelector(".hm-listrow-lead"));
+  assert.equal(rows[3].querySelector(".hm-listrow-trail").textContent, "new");
   assert.equal(rows[2].disabled, true);
   rows[0].click();
   assert.equal(v(), "light");

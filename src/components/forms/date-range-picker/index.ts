@@ -7,7 +7,7 @@ import { model, cx, useField, live, type ControlProps, type CommonProps } from "
 import { todayIso, addDays, type IsoDate } from "../../../core/date.ts";
 import { Segmented } from "../segmented/index.ts";
 import { DatePicker, type DatePickerProps } from "../date-picker/index.ts";
-import { ownPart } from "../../../forms/rows.ts";
+import { ownPart } from "../../../ui/parts.ts";
 
 /** A date range; either end may be open (null). */
 export interface DateRange { from: IsoDate | null; to: IsoDate | null }

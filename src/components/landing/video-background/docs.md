@@ -35,4 +35,4 @@ way to stop it: the pause button (labelled "Pause background video") does that. 
 
 ## Composed of
 
-Overlay (video, poster, vignette), IconButton.
+Overlay (video, poster, vignette), IconButton; icons `play`, `pause`.

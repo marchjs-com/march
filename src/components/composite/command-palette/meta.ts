@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open.",
   category: "composite",
-  composedOf: ["Dialog", "OverflowText"],
+  composedOf: ["Dialog", "SearchBox", "ListRow", "SectionLabel", "Empty", "Kbd", "OverflowText"],
   behaviors: ["list-nav"],
   hubs: [],
   showcase: "/overlays",

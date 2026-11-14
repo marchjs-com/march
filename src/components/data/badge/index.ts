@@ -21,11 +21,11 @@ export interface BadgeProps {
   showZero?: boolean;
   /** Count badges: accessible label after the number ("3 unread"). */
   label?: MaybeFn<string>;
-  /** Dot before the text: `true` draws the built-in dot, a node is your own mark. */
+  /** Dot before the text: `true` draws the built-in dot (a StatusDot), a node is your own mark. */
   dot?: boolean | Node | undefined;
   /** Colour of the built-in dot (default: the text colour of the tone). */
   dotColor?: ColorToken | undefined;
-  /** The built-in dot pulses (a StatusDot): `true` / "ring" (a breathing ring) or "blink"; it draws the dot by itself. */
+  /** The built-in dot pulses: `true` / "ring" (a breathing ring) or "blink"; it draws the dot by itself. */
   pulse?: boolean | "ring" | "blink" | undefined;
   /** Count badges: your own text for the number (default `countLabel`: 120 → "99+"). */
   format?: ((n: number, max: number) => unknown) | undefined;
@@ -58,11 +58,10 @@ export function Badge(props: BadgeProps): unknown {
       return h(tag, { ...own, "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-badge", "hm-badge-count", `hm-badge-${val(props.tone) ?? "danger"}`, extra()), "aria-label": val(props.ariaLabel) ?? (props.label ? `${n} ${val(props.label)}` : null) }, props.format ? props.format(n, props.max ?? 99) : countLabel(n, props.max ?? 99));
     };
   }
-  // the dot: the built-in one (a pseudo-element, a coloured mark with `dotColor`, a StatusDot when it pulses) or the caller's node
+  // the dot: the built-in one (a StatusDot in the text colour or `dotColor`, still or pulsing) or the caller's node
   const node = props.dot && props.dot !== true, pulse = !node && props.pulse ? props.pulse : false, builtIn = props.dot === true || !!pulse, mark = builtIn && !pulse && !!props.dotColor;
   return h(tag, { ...own, "data-hm-color": () => colorAttr(props.color), "aria-label": () => val(props.ariaLabel) ?? null, class: () => cx("hm-badge", `hm-badge-${val(props.tone) ?? "neutral"}`, builtIn && !mark && !pulse && "hm-badge-dot", extra()) },
     node ? h("span", { class: "hm-badge-dot-own", "aria-hidden": "true" }, props.dot)
-      : pulse ? h(StatusDot, { size: "xs", pulse, color: props.dotColor, class: "hm-badge-dot-pulse" })
-      : mark ? h("span", { class: "hm-badge-dot-mark", "aria-hidden": "true", "data-hm-color": colorAttr(props.dotColor) }) : null,
+      : builtIn ? h(StatusDot, { size: "xs", pulse, color: props.dotColor, class: pulse ? "hm-badge-dot-pulse" : mark ? "hm-badge-dot-mark" : null }) : null,
     props.children);
 }

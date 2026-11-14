@@ -6,9 +6,11 @@
 // Every card: quote, optional star Rating, Avatar, name and role.
 import "./testimonials.css";
 import { h } from "../../../dom/h.ts";
-import { signal, onCleanup, getOwner } from "../../../core/reactive.ts";
+import { signal } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
 import { cx, val, type ClassProp } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
+import { ListRow } from "../../data/list-row/index.ts";
 import { Card } from "../../../ui/card.ts";
 import { Avatar } from "../../../ui/avatar.ts";
 import { Rating } from "../../../ui/rating.ts";
@@ -50,13 +52,15 @@ export interface TestimonialsProps {
   class?: ClassProp | undefined;
 }
 
-function quoteCard(it: Testimonial, props: TestimonialsProps, hidden = false): Element {
-  return h(Card, { as: "figure", class: "hm-tm-card", "aria-hidden": hidden ? "true" : null },
+function quoteCard(it: Testimonial, props: TestimonialsProps): Element {
+  return h(Card, { as: "figure", class: "hm-tm-card" },
     it.rating != null && props.rating !== false ? h(Rating, { value: it.rating, readonly: true, size: "sm", class: "hm-tm-rating", color: props.ratingColor, label: props.labels?.rating ? props.labels.rating(it.rating) : t`${it.rating} out of 5` }) : null,
     h("blockquote", { class: "hm-tm-quote" }, h("p", {}, it.quote)),
-    h("figcaption", { class: "hm-tm-who" },
-      props.avatar !== false ? h(Avatar, { name: it.name, src: it.avatar, size: "md" }) : null,
-      h("span", { class: "hm-tm-id" }, h("cite", { class: "hm-tm-name" }, it.name), it.role != null ? h("span", { class: "hm-tm-role" }, it.role) : null))) as Element;
+    // who said it: a ListRow (avatar, name, role)
+    h("figcaption", { class: "hm-tm-who" }, h(ListRow, {
+      overflow: "ellipsis", lead: props.avatar !== false ? h(Avatar, { name: it.name, src: it.avatar, size: "md" }) : undefined,
+      title: h("cite", { class: "hm-tm-name" }, it.name), sub: it.role ?? undefined,
+    }))) as Element;
 }
 
 /** `<Testimonials variant="wall" items={[{ quote: "…", name: "Ada", role: "CTO, HADİ", rating: 5 }]} />` */
@@ -66,8 +70,9 @@ export function Testimonials(props: TestimonialsProps): Element {
   const L = props.labels ?? {};
   if (variant === "marquee") {
     const half = Math.ceil(props.items.length / 2);
-    const row = (list: readonly Testimonial[], speed: number): unknown => h(Marquee, { speed, pause: 0, separator: "", class: "hm-tm-row" },
-      h("span", { class: "hm-tm-strip" }, list.map((x) => quoteCard(x, props)), h("span", { class: "hm-tm-strip", "aria-hidden": "true", inert: "" }, list.map((x) => quoteCard(x, props, true)))));
+    // Marquee repeats the strip until it is wider than the screen (the copies are hidden from screen readers)
+    const row = (list: readonly Testimonial[], speed: number): unknown => h(Marquee, { speed, pause: 0, separator: false, duplicate: true, class: "hm-tm-row" },
+      h("span", { class: "hm-tm-strip" }, list.map((x) => quoteCard(x, props))));
     return h("div", { class: cls }, row(props.items.slice(0, half), props.speed?.[0] ?? 28), row(props.items.slice(half), props.speed?.[1] ?? 20)) as Element;
   }
   if (variant === "slider") return h("div", { class: cls }, h(Carousel, { perView: props.cols ?? 1, label: L.slider ?? t`Testimonials` }, props.items.map((x) => h("div", { class: "hm-tm-slide" }, quoteCard(x, props))))) as Element;
@@ -75,9 +80,6 @@ export function Testimonials(props: TestimonialsProps): Element {
   const list = h("div", { class: () => cx("hm-tm-list", variant === "grid" && `hm-tm-cols-${props.cols ?? 3}`, variant === "wall" && !open() && "is-closed") }, props.items.map((x) => quoteCard(x, props))) as HTMLElement;
   const root = h("div", { class: cls }, list,
     variant === "wall" && props.more !== false && props.items.length > 6 ? h("div", { class: () => cx("hm-tm-more", open() && "is-open") }, h(Button, { variant: "secondary", onClick: () => open.set(!open()), "aria-expanded": () => String(open()) }, () => (open() ? L.less ?? t`Show less` : L.more ?? t`Show more`))) : null) as Element;
-  if (props.reveal !== false) {
-    const stop = revealOnScroll(list, { effect: "up", stagger: 60, ...props.reveal, select: ".hm-tm-card" });
-    if (getOwner()) onCleanup(stop);
-  }
+  if (props.reveal !== false) owned(revealOnScroll(list, { effect: "up", stagger: 60, ...props.reveal, select: ".hm-tm-card" }));
   return root;
 }

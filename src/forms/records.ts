@@ -8,12 +8,7 @@
 // Validation (schema type `records`): every row is validated with the sub-schema; the first problem is reported as
 // "Row N: <field label>: <message>".
 import "./records.css";
-import "../ui/button.css";
 import { computed, untrack, type Accessor } from "../core/reactive.ts";
-import { svgIcon, type IconDef } from "../icons/svg.ts";
-import { arrowUp } from "../icons/glyphs/arrowUp.ts";
-import { arrowDown } from "../icons/glyphs/arrowDown.ts";
-import { x as xIcon } from "../icons/glyphs/x.ts";
 import { h } from "../dom/h.ts";
 import { For } from "../dom/for.ts";
 import { t } from "../core/i18n.ts";
@@ -21,6 +16,9 @@ import { schema as makeSchema, fieldType, options as schemaOptions, type Schema,
 import { model, cx, labelledBy, extend, live, type ControlProps } from "./util.ts";
 import { inputFor, registerInput, INLINE_LABEL, type InputComponent } from "./registry.ts";
 import { Field } from "./form.ts";
+import { rowList, rowToolsProps } from "./rows.ts";
+import { Button } from "../components/actions/button/index.ts";
+import { RowTools } from "../components/forms/row-tools/index.ts";
 
 const SKIP = new Set(["name", "label", "type", "help", "when", "validate", "default", "column", "format", "hidden", "control", "props",
   "requiredMessage", "pattern", "patternMessage", "span", "readonly", "disabled", "options", "value", "minLength", "section", "variant", "fields", "blank"]);
@@ -58,9 +56,6 @@ fieldType("records", {
   check: (v: Values[], f) => validateRecords(v, schemaOf(f)),
 });
 
-const GLYPH: Record<string, IconDef> = { "↑": arrowUp, "↓": arrowDown, "×": xIcon };
-const iconBtn = (label: string, text: string, onClick: () => void, disabled?: () => boolean) => h("button", { type: "button", class: "hm-icon-btn", "aria-label": label, title: label, onClick, disabled }, GLYPH[text] ? svgIcon(GLYPH[text] as IconDef) : text);
-
 export interface RecordListEditorProps extends ControlProps<Values[]> {
   /** Sub-schema: a spec object or a schema. */
   fields?: RecordFields | undefined;
@@ -81,12 +76,10 @@ export function RecordListEditor(props: RecordListEditorProps): unknown {
   const [get, set] = model<Values[]>(props, []);
   const list = () => get() ?? [];
   const sch = computed(() => subSchema(props.fields));
-  const idx = computed(() => list().map((_, i) => i), { equals: (a, b) => a?.length === b?.length });
-  const ro = () => !!(props.disabled || props.readonly);
-  const full = () => props.max != null && list().length >= props.max;
+  const rows = rowList(list, set, props);
+  const { idx, ro, full } = rows;
   const blank = () => { const b = typeof props.blank === "function" ? props.blank() : props.blank; return { ...untrack(() => sch().defaults()), ...(b ?? {}) }; };
   const edit = (i: number, name: string, v: unknown) => { const cur = [...untrack(list)]; cur[i] = { ...cur[i], [name]: v }; set(cur); };
-  const move = (i: number, d: number) => { const cur = [...untrack(list)]; const j = i + d; if (j < 0 || j >= cur.length) return; [cur[i], cur[j]] = [cur[j]!, cur[i]!]; set(cur); };
   const cols = () => Math.min(6, Math.max(1, props.cols ?? sch().fields.filter((f) => !f.hidden && f.type !== "hidden").length));
 
   const control = (f: SchemaField, i: Accessor<number>) => {
@@ -120,14 +113,8 @@ export function RecordListEditor(props: RecordListEditorProps): unknown {
         const err = error(i, f);
         return () => (on() ? untrack(() => h(Field, { label: INLINE_LABEL.has(inputFor(f)!) ? null : f.label, required: f.required, compact: true, error: live(() => err()) }, control(f, i))) : null);
       })),
-      () => (ro() ? null : h("div", { class: "hm-records-tools" },
-        props.sortable === false ? null : [
-          iconBtn(t`Move up`, "↑", () => move(i.peek(), -1), () => i() === 0),
-          iconBtn(t`Move down`, "↓", () => move(i.peek(), 1), () => i() === list().length - 1),
-        ],
-        props.removable === false ? null : iconBtn(t`Remove`, "×", () => set(untrack(list).filter((_, j) => j !== i.peek())))))) })),
-    () => (ro() ? null : h("button", { type: "button", class: "hm-btn hm-records-add", disabled: () => full(), onClick: () => set([...untrack(list), blank()]) },
-      () => props.addLabel ?? t`Add row`)));
+      () => (ro() || (props.sortable === false && props.removable === false) ? null : h(RowTools, rowToolsProps(rows, i, { sortable: props.sortable, removable: props.removable, class: "hm-records-tools" })))) })),
+    () => (ro() ? null : h(Button, { class: "hm-records-add", disabled: full, onClick: () => set([...untrack(list), blank()]) }, () => props.addLabel ?? t`Add row`)));
 }
 
 registerInput("records", RecordListEditor);

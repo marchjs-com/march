@@ -40,4 +40,4 @@ unfollow", "Follow request sent to HADİ, press to cancel".
 
 ## Composed of
 
-Nothing: it borrows heartBurst from LikeButton for the follow burst.
+Button. It borrows heartBurst from LikeButton for the follow burst.

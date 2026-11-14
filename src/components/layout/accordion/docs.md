@@ -38,4 +38,4 @@ their header and inert while closed. ↑ ↓ Home End move between headers (each
 
 ## Composed of
 
-No other component; the roving focus helper.
+Chevron (the arrow of a header); the roving focus helper.

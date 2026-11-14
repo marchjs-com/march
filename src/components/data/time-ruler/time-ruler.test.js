@@ -52,6 +52,7 @@ test("TimeRuler: seekable: a slider head with keys; own format, ticks, head and 
     h(TimeRuler, { class: "one", duration: 2000, value: now, onSeek: (ms) => { seen.push(ms); now.set(ms); }, onSeekStart: () => seen.push("start"), keyStep: 50, valueText: (ms) => `${ms} ms` }),
     h(TimeRuler, { class: "two", duration: 1000, value: 0, onSeek: () => {}, ticks: () => [{ at: 0, major: true, label: "start" }, { at: 1000, major: true }], format: (ms) => `${ms}ms`, head: h("i", { class: "own" }), labels: { ruler: "Scrub", playhead: "Now" } }),
     h(TimeRuler, { class: "three", duration: 1000, value: 0, head: false }),
+    h(TimeRuler, { class: "four", duration: 1000, value: 0, headClass: "my-head" }),
   ]);
   const one = el.querySelector(".one"), head = one.querySelector(".hm-time-ruler-head");
   assert.equal(one.getAttribute("role"), "group");
@@ -72,6 +73,7 @@ test("TimeRuler: seekable: a slider head with keys; own format, ticks, head and 
   const two = el.querySelector(".two");
   assert.deepEqual([...two.querySelectorAll(".hm-time-ruler-tick")].map((k) => k.textContent), ["start", "1000ms"]);
   assert.ok(two.querySelector(".hm-time-ruler-head .own"));
+  assert.ok(el.querySelector(".four .hm-time-ruler-head.my-head"), "headClass: an extra class on the playhead");
   assert.equal(two.getAttribute("aria-label"), "Scrub");
   assert.equal(two.querySelector(".hm-time-ruler-head").getAttribute("aria-label"), "Now");
   assert.equal(el.querySelector(".three .hm-time-ruler-head"), null);

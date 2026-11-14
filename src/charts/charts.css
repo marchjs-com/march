@@ -131,18 +131,20 @@
 
 /* stat */
 .hm-stat { display: flex; flex-direction: column; gap: 6px; min-width: 0; color: var(--hm-chart-text); }
-.hm-stat-label { display: flex; align-items: center; gap: 8px; color: var(--hm-chart-muted); font-size: var(--hm-text-sm, 13px); font-weight: 500; }
+/* label over value is a StatTile (hadi-march/data) at the KPI box's own measure */
+.hm-stat > .hm-stat-tile.is-start { align-items: stretch; gap: 6px; color: inherit; }
+.hm-stat .hm-stat-label { display: flex; align-items: center; gap: 8px; overflow: visible; white-space: normal; color: var(--hm-chart-muted); font-size: var(--hm-text-sm, 13px); font-weight: 500; }
 .hm-stat-icon { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; color: var(--hm-primary, #4f46e5);
   background: var(--hm-primary-soft, #eef0ff); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-primary, #4f46e5) 14%, transparent); }
 .hm-stat-icon .hm-svg { width: 14px; height: 14px; }
-.hm-stat-value { font-family: var(--hm-font-display, inherit); font-size: 28px; font-weight: var(--hm-display-weight, 650); line-height: 1.1; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
+.hm-stat .hm-stat-value { font-family: var(--hm-font-display, inherit); font-size: 28px; font-weight: var(--hm-display-weight, 650); line-height: 1.1; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
 .hm-stat-delta { display: inline-flex; align-self: flex-start; align-items: center; gap: 3px; padding: 1px 7px; border-radius: 999px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .hm-stat-good.hm-stat-delta { background: var(--hm-success-soft, #ecfbf1); }
 .hm-stat-bad.hm-stat-delta { background: var(--hm-danger-soft, #fdf0f0); }
 .hm-stat-neutral.hm-stat-delta { background: var(--hm-surface-2, #f5f5f7); }
 .hm-stat .hm-sparkline { width: 100%; height: 40px; margin-top: 4px; }
 @media (max-width: 640px) {
-  .hm-stat-value { font-size: 22px; }
+  .hm-stat .hm-stat-value { font-size: 22px; }
   .hm-stat-hint { display: none; }
   .hm-stat .hm-sparkline { height: 32px; }
 }

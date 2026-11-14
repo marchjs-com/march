@@ -133,7 +133,7 @@ test("PropertyGrid: history buttons, reset buttons, change marks and the footer 
   assert.equal(own.el.querySelector(".hm-pg-save").textContent, "Publish");
   assert.ok(own.el.querySelector(".hm-pg-history button").getAttribute("aria-label").startsWith("Step back"));
   type(own.el.querySelector("#pg-own-width"), "500"); await tick();
-  assert.equal(own.el.querySelector(".hm-pg-changes").textContent, "1 edits");
+  assert.equal(own.el.querySelector(".hm-pg-foot .hm-panel-header-title").textContent, "1 edits");
   assert.equal(own.el.querySelector(".hm-pg-revert").textContent, "Discard");
   assert.equal(own.el.querySelector('[data-key="width"] .hm-pg-reset').getAttribute("aria-label"), "Restore Width");
   type(own.el.querySelector(".hm-pg-search input"), "qqqq"); await tick();

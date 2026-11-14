@@ -31,6 +31,7 @@ drives a list of options. Every part can be turned off or replaced.
 | `shortcut` | `true` / combo | — | `true`: "/" focuses the box from anywhere |
 | `shortcutHint` | boolean / combo | the shortcut | the key hint at the end; `false`: the key works without a hint |
 | `inputRef` | `(el) => void` | — | the input element |
+| `inputClass` | string | — | extra class on the input element |
 | `onKeyDown` | `(e) => void` | — | runs first; `preventDefault()` skips the box's own Escape / Enter |
 | `controls` | id | — | combobox: the list this box filters (`role="combobox"`, `aria-controls`) |
 | `activeDescendant` | id / accessor | — | combobox: the highlighted option |

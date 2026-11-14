@@ -55,4 +55,4 @@ motion and the global pause apply.
 
 ## Composed of
 
-Its own parts only (bars, arrows, header); dates and drags come from the shared engines above.
+ListRow (the task names), ResizeHandle (the ends of a bar) and Badge (the label of the today line). The hint and the status region are the ones Scheduler uses (`scheduler/hint.ts`); dates and drags come from the shared engines above.

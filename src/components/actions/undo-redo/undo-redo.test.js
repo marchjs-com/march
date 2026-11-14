@@ -58,3 +58,11 @@ test("UndoRedo: four props, subset, own names / icons / steps, no shortcut, disa
   assert.deepEqual([...el.querySelectorAll(".three button")].map((b) => b.disabled), [true, true]);
   dispose();
 });
+
+test("UndoRedo: partClass adds the host's class to a button", () => {
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const dispose = render(() => h(UndoRedo, { canUndo: true, canRedo: false, partClass: { undo: "my-undo" } }), host);
+  assert.ok(host.querySelector(".hm-undo-redo-undo.my-undo"));
+  assert.equal(host.querySelector(".hm-undo-redo-redo").className.includes("my-"), false);
+  dispose();
+});

@@ -1,0 +1,2 @@
+/* The hint under a time chart (Scheduler, Gantt). The status region beside it is .hm-sr-only (tokens.css). */
+.hm-chart-hint { margin: 0; color: var(--hm-text-2); font-size: var(--hm-text-xs); }

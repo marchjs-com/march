@@ -47,5 +47,7 @@ status ("Valid" / "N problems") is a live region.
 
 ## Composed of
 
-Badge (type badges), IconButton (row actions, history), Toggle (true / false values); floating (type menu),
-UndoManager (`undoHistory`).
+PanelHeader (the bar), SearchBox, Badge (status; type badges: a clickable Badge), UndoRedo (history buttons; keys through
+`undoKeys`), Chevron (open / close arrow), Popover + OptionList (type menu, `mode="menu"`), TextInput (inline editing),
+Toggle (true / false values), IconButton (row actions), Empty (no matches); the shared editor frame
+(`composite/editor-parts/frame.css`), UndoManager (`undoHistory`).

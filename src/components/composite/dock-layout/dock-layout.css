@@ -9,16 +9,17 @@
 .hm-dock .hm-dock-split { min-height: 0; height: 100%; border: 0; border-radius: 0; background: transparent; overflow: visible; }
 .hm-dock .hm-dock-split > .hm-split-pane { display: grid; overflow: visible; min-height: 0; min-width: 0; }
 .hm-dock .hm-dock-split > .hm-split-pane > * { min-height: 0; min-width: 0; }
-.hm-dock .hm-dock-split > .hm-split-handle::before { background: transparent; }
-.hm-dock .hm-dock-split > .hm-split-handle:hover::before, .hm-dock .hm-dock-split > .hm-split-handle:focus-visible::before,
-.hm-dock .hm-dock-split.is-dragging > .hm-split-handle::before { background: var(--hm-primary); }
+.hm-dock .hm-dock-split > .hm-split-handle { --hm-rh-rest: transparent; }
 
 /* a group: the Tabs, compact, with its actions at the end of the tab bar */
 .hm-dock-group { position: relative; display: grid; min-height: 0; min-width: 0; margin: 2px; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-2);
   background: var(--hm-surface); overflow: hidden; transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
 .hm-dock-group.is-focused { border-color: color-mix(in srgb, var(--hm-primary) 45%, var(--hm-border)); }
 .hm-dock-tabs { display: grid; grid-template-rows: var(--hm-dock-bar) minmax(0, 1fr); min-height: 0; min-width: 0; }
-.hm-dock-tabs > .hm-tabs-bar { gap: 0; padding-inline-end: 5.5rem; background: var(--hm-surface-2); border-bottom: 1px solid var(--hm-border); }
+.hm-dock-tabs > .hm-tabs-head { min-height: 0; background: var(--hm-surface-2); }
+.hm-dock-tabs .hm-tabs-bar { gap: 0; }
+.hm-dock-tabs > .hm-tabs-bar { background: var(--hm-surface-2); }
+.hm-dock-tabs .hm-tabs-actions { gap: 1px; padding-inline: .25rem; }
 .hm-dock-tabs .hm-tab { gap: .375rem; padding: 0 .5rem 0 .75rem; height: var(--hm-dock-bar); margin: 0; border-radius: 0; font-size: var(--hm-text-sm); user-select: none; touch-action: none;
   border-inline-end: 1px solid color-mix(in srgb, var(--hm-border) 60%, transparent); }
 .hm-dock-tabs .hm-tab.is-active { background: var(--hm-surface); }
@@ -26,23 +27,15 @@
 .hm-dock-group:not(.is-focused) .hm-dock-tabs .hm-tab::after { background: var(--hm-border-strong); }
 .hm-dock-tabs > .hm-tabs-panel { padding: 0; min-height: 0; overflow: auto; }
 .hm-dock-host { display: block; height: 100%; min-height: 0; }
-.hm-dock-tab-icon { display: inline-flex; color: var(--hm-muted); } .hm-dock-tab-icon .hm-svg { width: .875rem; height: .875rem; }
-.hm-tab.is-active .hm-dock-tab-icon { color: var(--hm-primary); }
-.hm-dock-tab-title { max-width: 12rem; overflow: hidden; text-overflow: ellipsis; }
-.hm-dock-dirty { width: .4375rem; height: .4375rem; border-radius: 50%; background: var(--hm-primary); flex: none; }
-.hm-dock-x { display: inline-grid; place-items: center; width: 1.125rem; height: 1.125rem; border-radius: var(--hm-radius-1); color: var(--hm-muted); opacity: 0;
-  transition: opacity var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease); }
-.hm-dock-x .hm-svg { width: .75rem; height: .75rem; }
-.hm-tab:hover .hm-dock-x, .hm-tab.is-active .hm-dock-x, .hm-tab:focus-visible .hm-dock-x { opacity: 1; }
-.hm-dock-x:hover { background: color-mix(in srgb, currentColor 14%, transparent); color: var(--hm-text); }
-.hm-dock-actions { position: absolute; inset-block-start: 0; inset-inline-end: 0; display: flex; align-items: center; gap: 1px; height: var(--hm-dock-bar); padding-inline: .5rem .25rem;
-  background: linear-gradient(to var(--hm-dock-fade, right), transparent, var(--hm-surface-2) .5rem); }
-.hm-dock:dir(rtl) .hm-dock-actions { --hm-dock-fade: left; }
-.hm-dock-btn { display: inline-grid; place-items: center; width: 1.625rem; height: 1.625rem; padding: 0; border: 0; border-radius: var(--hm-radius-1); background: none; color: var(--hm-muted); cursor: pointer;
-  transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }
-.hm-dock-btn:hover { background: color-mix(in srgb, var(--hm-text) 8%, transparent); color: var(--hm-text); }
-.hm-dock-btn[aria-pressed="true"] { color: var(--hm-primary); }
-.hm-dock-btn .hm-svg { width: .875rem; height: .875rem; }
+/* the parts Tabs draws (icon, title, close mark), at the size of a compact tab; the ghost shows the same icon */
+.hm-dock-tab-icon, .hm-dock-tabs .hm-tab-icon { display: inline-flex; color: var(--hm-muted); } .hm-dock-tab-icon .hm-svg, .hm-dock-tabs .hm-tab-icon .hm-svg { width: .875rem; height: .875rem; }
+.hm-dock-tabs .hm-tab.is-active .hm-tab-icon { color: var(--hm-primary); }
+.hm-dock-tab-title { max-width: 12rem; }
+.hm-dock-tabs .hm-tab-close { margin-inline-end: 0; }
+/* the group buttons: IconButton, a step smaller than xs's neighbour sizes, visible on the bar's surface */
+.hm-dock-btn.hm-icon-btn { width: 1.625rem; height: 1.625rem; }
+.hm-dock-btn.hm-icon-btn:hover { background: color-mix(in srgb, var(--hm-text) 8%, transparent); }
+.hm-dock-btn.hm-icon-btn .hm-svg { width: .875rem; height: .875rem; }
 /* an own icon (the `icons` prop): text or a node, centred in the button */
 .hm-dock-own { display: inline-grid; place-items: center; font-size: var(--hm-text-sm); line-height: 1; }
 
@@ -55,26 +48,22 @@
 .hm-dock-grip::before { content: ""; position: absolute; inset-block-start: .3125rem; inset-inline-start: calc(50% - 1rem); width: 2rem; height: .25rem; border-radius: var(--hm-radius-full); background: var(--hm-border-strong);
   transition: background-color var(--hm-dur) var(--hm-ease); }
 .hm-dock-grip:hover::before, .hm-dock-grip:focus-visible::before { background: var(--hm-primary); }
-.hm-dock-grip:focus-visible, .hm-dock-resize:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: -2px; }
-.hm-dock-resize { position: absolute; inset-block-end: 0; inset-inline-end: 0; width: 1rem; height: 1rem; padding: 0; border: 0; background: none; cursor: nwse-resize; touch-action: none; z-index: 1; }
-.hm-dock-resize:dir(rtl) { cursor: nesw-resize; }
-.hm-dock-resize::before { content: ""; position: absolute; inset: .25rem; border-block-end: 2px solid var(--hm-border-strong); border-inline-end: 2px solid var(--hm-border-strong); border-end-end-radius: 3px; }
+.hm-dock-grip:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: -2px; }
+/* the corner: ResizeHandle, inside the window's frame */
+.hm-dock-resize.hm-resize-handle { --hm-rh-out: 0px; --hm-rh-rest: var(--hm-border-strong); z-index: 1; }
 
 /* the minimized tray */
-.hm-dock-tray { display: flex; flex-wrap: wrap; gap: .375rem; padding: .375rem .5rem; border-block-start: 1px solid var(--hm-border); }
-.hm-dock-tray-btn { display: inline-flex; align-items: center; gap: .375rem; min-height: 1.75rem; max-width: 100%; padding: 0 .625rem; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-full);
-  background: var(--hm-surface); color: var(--hm-text-2); font: inherit; font-size: var(--hm-text-xs); cursor: pointer; transition: border-color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease); }
-.hm-dock-tray-btn:hover { border-color: var(--hm-primary); background: var(--hm-primary-soft); }
-.hm-dock-tray-btn > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-dock-tray { gap: .375rem; padding: .375rem .5rem; border-block-start: 1px solid var(--hm-border); }
+.hm-dock-tray-btn.hm-btn { min-height: 1.75rem; max-width: 100%; font-size: var(--hm-text-xs); font-weight: 400; }
 
 /* drop preview (moved by the motion engine: translate + scale of a layout-sized box) and the drag ghost */
 .hm-dock-preview { position: absolute; inset: 0; z-index: 30; pointer-events: none; opacity: 0; transform-origin: 0 0; border-radius: var(--hm-radius-2);
   background: color-mix(in srgb, var(--hm-primary) 16%, transparent); box-shadow: inset 0 0 0 2px var(--hm-primary); }
 .hm-dock-preview.is-tab { background: var(--hm-primary); box-shadow: none; }
-.hm-dock-ghost { position: absolute; inset: 0 auto auto 0; display: inline-flex; align-items: center; gap: .375rem; padding: .375rem .75rem; pointer-events: none; white-space: nowrap;
+.hm-dock-ghost { position: fixed; inset: 0 auto auto 0; display: inline-flex; align-items: center; gap: .375rem; padding: .375rem .75rem; pointer-events: none; white-space: nowrap;
   border-radius: var(--hm-radius-2); background: var(--hm-surface); color: var(--hm-text); font-size: var(--hm-text-sm); box-shadow: var(--hm-shadow-3);
   border: 1px solid color-mix(in srgb, var(--hm-primary) 50%, var(--hm-border)); }
 
-.hm-dock-empty { display: grid; place-content: center; justify-items: center; gap: .75rem; color: var(--hm-muted); text-align: center; }
+.hm-dock-empty { display: grid; place-content: center; }
 
 @container (max-width: 34rem) { .hm-dock-tab-title { max-width: 7rem; } }

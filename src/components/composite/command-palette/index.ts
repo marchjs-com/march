@@ -4,16 +4,15 @@
 // The view (search, ranking, dialog) is a separate chunk loaded on first open; hovering or focusing the button, or an
 // idle moment after start, fetches it ahead of time.
 import "./command-palette.css";
-import "../../../ui/field.css";
-import "../../../ui/display.css";
 import { signal, untrack, onCleanup, createRoot, effect } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { key, formatKey } from "../../../ui/keys.ts";
+import { key } from "../../../ui/keys.ts";
 import { val, cx, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { isIconDef } from "../../../icons/svg.ts";
 import { search as searchIcon } from "../../../icons/glyphs/search.ts";
-import { OverflowText } from "../../../ui/marquee.ts";
+import { OverflowText } from "../../typography/overflow-text/index.ts";
+import { Kbd } from "../../typography/kbd/index.ts";
 import { isOpen } from "./state.ts";
 import type { Command } from "../../../ui/registry.ts";
 
@@ -125,5 +124,5 @@ export function PaletteButton(props: PaletteButtonProps = {}): Element {
   return h("button", { type: "button", class: cx("hm-pal-trigger", props.class), onClick: openPalette, onPointerenter: () => void preloadPalette(), onFocus: () => void preloadPalette(), "aria-keyshortcuts": "Control+K Meta+K" },
     props.icon === false ? null : props.icon == null ? glyph(searchIcon, "hm-svg hm-pal-trigger-icon") : isIconDef(props.icon) ? glyph(props.icon, "hm-svg hm-pal-trigger-icon") : icon(props.icon, "hm-icon hm-pal-trigger-icon"),
     h(OverflowText, { class: "hm-pal-trigger-label" }, () => val(props.label) ?? t`Search…`),
-    props.kbd === false ? null : h("kbd", { class: "hm-kbd hm-pal-trigger-kbd", "aria-hidden": "true" }, formatKey(props.shortcut ?? "mod+k")));
+    props.kbd === false ? null : h("span", { class: "hm-pal-trigger-kbd", "aria-hidden": "true" }, h(Kbd, { keys: props.shortcut ?? "mod+k" })));
 }

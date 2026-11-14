@@ -3,15 +3,21 @@
 // The frame stays centered (drag its corners to resize it, or pick an aspect); drag the image to pan, wheel / slider /
 // + − to zoom, 90° buttons and a fine angle slider to rotate, a button to mirror. The image always covers the frame.
 import "./image-cropper.css";
-import { signal, computed, effect, untrack, batch, onCleanup, reactive } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, batch } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { track } from "../../../behaviors/drag/index.ts";
+import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, uid, val, clamp, setStyle, on, debounce, type ClassProp, isRtl } from "../../../core/util.ts";
 import { glyph } from "../../../ui/util.ts";
-import { model, ctl, type ControlProps } from "../../../forms/util.ts";
+import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
+import { hasPart as has } from "../../../ui/parts.ts";
+import { observeSize } from "../../../ui/observe.ts";
 import { IconButton } from "../../../ui/button.ts";
 import { Segmented, Slider } from "../../../forms/inputs.ts";
+import { Field } from "../../../forms/field.ts";
+import { Card } from "../../data/card/index.ts";
+import { CHECKER } from "../../forms/swatch/index.ts";
+import { Toolbar } from "../../layout/stack/index.ts";
 import { rotateCw } from "../../../icons/glyphs/rotateCw.ts";
 import { rotateCcw } from "../../../icons/glyphs/rotateCcw.ts";
 import { flipHorizontal } from "../../../icons/glyphs/flipHorizontal.ts";
@@ -63,7 +69,6 @@ export interface ImageCropperProps extends ControlProps<G.CropState> {
   class?: ClassProp;
 }
 
-const has = <K extends string>(p: boolean | readonly K[] | undefined, k: K): boolean => p == null || p === true || (p !== false && p.includes(k));
 const ASPECTS = (free?: string): AspectOption[] => [{ label: free ?? t`Free`, value: null }, { label: "1:1", value: 1 }, { label: "4:3", value: 4 / 3 }, { label: "16:9", value: 16 / 9 }, { label: "3:4", value: 3 / 4 }, { label: "9:16", value: 9 / 16 }];
 
 /** Image cropper: `<ImageCropper src={url} bind:value={$crop} />`. */
@@ -133,13 +138,15 @@ export function ImageCropper(props: ImageCropperProps): unknown {
     return el;
   };
   viewport = h("div", {
-    class: () => cx("hm-crop-view", busy() && "is-busy"), tabindex: () => (props.disabled ? "-1" : "0"), role: "group",
+    class: () => cx("hm-crop-view", CHECKER, busy() && "is-busy"), tabindex: () => (props.disabled ? "-1" : "0"), role: "group",
     "aria-label": () => (L().area != null ? `${L().area}${props.alt ? `: ${props.alt}` : ""}` : t`Crop area${props.alt ? `: ${props.alt}` : ""}`), "aria-describedby": `${id}-keys`, "aria-roledescription": () => L().role ?? t`cropper`,
     onKeyDown: (e: KeyboardEvent) => {
       if (ro()) return;
-      const s = st.peek(), step = e.shiftKey ? 0.05 : 0.01;
+      const s = st.peek();
+      // arrows pan by 1% of the frame (Shift: 5%)
+      const pan = e.key.startsWith("Arrow") ? arrowStep(e) : null;
+      if (pan) { const unit = e.shiftKey ? 0.005 : 0.01; e.preventDefault(); change({ x: s.x + pan.dx * unit, y: s.y + pan.dy * unit }); return; }
       const map: Record<string, () => void> = {
-        ArrowLeft: () => change({ x: s.x - step }), ArrowRight: () => change({ x: s.x + step }), ArrowUp: () => change({ y: s.y - step }), ArrowDown: () => change({ y: s.y + step }),
         "+": () => change({ zoom: s.zoom * 1.1 }), "=": () => change({ zoom: s.zoom * 1.1 }), "-": () => change({ zoom: s.zoom / 1.1 }),
         "[": () => change({ rotate: s.rotate - 1 }), "]": () => change({ rotate: s.rotate + 1 }), r: () => change({ rotate: s.rotate + 90 }), R: () => change({ rotate: s.rotate - 90 }),
         f: () => change({ flip: !s.flip }), F: () => change({ flip: !s.flip }),
@@ -160,8 +167,7 @@ export function ImageCropper(props: ImageCropperProps): unknown {
   on<WheelEvent>(viewport, "wheel", (e) => { if (ro()) return; e.preventDefault(); change({ zoom: st.peek().zoom * Math.exp(-e.deltaY / 400) }); }, { passive: false });
   // the view's size (the frame is a share of it)
   function measure(): void { const r = viewport.getBoundingClientRect(); if (r.width && r.height && (r.width !== view.peek()[0] || r.height !== view.peek()[1])) { view.set([r.width, r.height]); change({}, false); } }
-  const RO = globalThis.ResizeObserver;
-  if (RO) { const ro2 = new RO(measure); queueMicrotask(() => ro2.observe(viewport)); onCleanup(() => ro2.disconnect()); } else queueMicrotask(measure);
+  observeSize(viewport, measure);
 
   // ------------------------------------------------------------------ controls
   const aspects = (): readonly AspectOption[] => (props.aspects === false || props.aspect !== undefined ? [] : props.aspects ?? ASPECTS(L().free));
@@ -181,21 +187,21 @@ export function ImageCropper(props: ImageCropperProps): unknown {
   effect(() => { const z = Math.round(st().zoom * 100) / 100, d = deg(); untrack(() => batch(() => { zoomView.set(z); fineView.set(clamp(d - quarter(d), -45, 45)); })); });
 
   const tools = props.tools, sliders = props.sliders;
-  return h("div", { class: () => cx("hm-crop", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? L().cropper ?? t`Image cropper` },
+  return h(Card, { as: "div", class: () => cx("hm-crop", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? L().cropper ?? t`Image cropper` },
     viewport,
     h("p", { id: `${id}-keys`, class: cx("hm-crop-keys", props.hint === false && "hm-sr-only") }, () => L().hint ?? t`Drag to move, wheel or + − to zoom, [ ] to turn by 1°, R by 90°, F to mirror.`),
     h("div", { class: "hm-crop-controls" },
       () => (aspects().length ? h(Segmented, { class: "hm-crop-aspects", "aria-label": L().aspect ?? t`Aspect ratio`, options: aspects().map((a) => ({ value: a.value ?? "free", label: a.label })), value: st.peek().aspect ?? "free", onChange: (v: number | string | null) => change({ aspect: typeof v === "number" ? v : null }) }) : null),
-      tools === false || (tools && tools !== true && !tools.length) ? null : h("div", { class: "hm-crop-row" },
+      tools === false || (tools && tools !== true && !tools.length) ? null : h(Toolbar, { class: "hm-crop-row" },
         has(tools, "rotateLeft") && h(IconButton, { icon: glyph(rotateCcw), label: () => L().rotateLeft ?? t`Rotate left`, size: "sm", disabled: ro, onClick: () => change({ rotate: st.peek().rotate - 90 }) }),
         has(tools, "rotateRight") && h(IconButton, { icon: glyph(rotateCw), label: () => L().rotateRight ?? t`Rotate right`, size: "sm", disabled: ro, onClick: () => change({ rotate: st.peek().rotate + 90 }) }),
-        has(tools, "mirror") && h(IconButton, { icon: glyph(flipHorizontal), label: () => L().mirror ?? t`Mirror`, size: "sm", disabled: ro, class: () => cx(st().flip && "is-on"), "aria-pressed": () => String(st().flip), onClick: () => change({ flip: !st.peek().flip }) }),
+        has(tools, "mirror") && h(IconButton, { icon: glyph(flipHorizontal), label: () => L().mirror ?? t`Mirror`, size: "sm", disabled: ro, pressed: () => st().flip, onClick: () => change({ flip: !st.peek().flip }) }),
         has(tools, "reset") && h(IconButton, { icon: glyph(refresh), label: () => L().reset ?? t`Reset`, size: "sm", disabled: ro, onClick: api.reset })),
-      has(sliders, "zoom") && h("label", { class: "hm-crop-slider hm-crop-zoom" }, h("span", null, () => L().zoom ?? t`Zoom`),
-        h(Slider, { min: 1, max: reactive(() => maxZoom()), step: 0.01, value: zoomView, onChange: (v: number) => change({ zoom: v }), format: (v: number) => `${Math.round(v * 100)}%`, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly) })),
-      has(sliders, "angle") && h("label", { class: "hm-crop-slider hm-crop-angle" }, h("span", null, () => L().angle ?? t`Angle`),
-        h(Slider, { min: -45, max: 45, step: 0.5, value: fineView, onChange: (v: number) => change({ rotate: quarter(st.peek().rotate) + v }), format: (v: number) => `${v}°`, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly) }))),
+      has(sliders, "zoom") && h(Field, { id: `${id}-zoom`, inline: true, compact: true, class: "hm-crop-slider hm-crop-zoom", label: () => L().zoom ?? t`Zoom` },
+        h(Slider, { id: `${id}-zoom`, min: 1, max: live(() => maxZoom()), step: 0.01, value: zoomView, onChange: (v: number) => change({ zoom: v }), format: (v: number) => `${Math.round(v * 100)}%`, disabled: live(() => props.disabled), readonly: live(() => props.readonly) })),
+      has(sliders, "angle") && h(Field, { id: `${id}-angle`, inline: true, compact: true, class: "hm-crop-slider hm-crop-angle", label: () => L().angle ?? t`Angle` },
+        h(Slider, { id: `${id}-angle`, min: -45, max: 45, step: 0.5, value: fineView, onChange: (v: number) => change({ rotate: quarter(st.peek().rotate) + v }), format: (v: number) => `${v}°`, disabled: live(() => props.disabled), readonly: live(() => props.readonly) }))),
     () => (props.preview === false ? null : h("figure", { class: "hm-crop-out" },
-      h("canvas", { class: "hm-crop-canvas", role: "img", "aria-label": () => L().result ?? t`Cropped result`, ref: (el: HTMLCanvasElement) => { out = el; drawPreview(); } }),
+      h("canvas", { class: cx("hm-crop-canvas", CHECKER), role: "img", "aria-label": () => L().result ?? t`Cropped result`, ref: (el: HTMLCanvasElement) => { out = el; drawPreview(); } }),
       props.size === false ? null : h("figcaption", null, () => { const [fw, fh] = frame(), S = scale(); return `${Math.round(fw / S)} × ${Math.round(fh / S)} px`; }))));
 }

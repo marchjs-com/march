@@ -22,10 +22,11 @@ test("Timeline: ordered items, tones, text and machine-readable times", () => {
 });
 
 test("Timeline: colour token, own dot, no dot, no line, own time text", () => {
-  const items = [{ time: 5, title: "A", color: "brand-purple" }, { title: "B" }];
+  const items = [{ time: 5, title: "A", color: "brand-purple", class: "is-mine" }, { title: "B" }];
   const m = mount(() => [h(Timeline, { items }), h(Timeline, { items, dot: false, line: false, formatTime: (v) => `t${v}` }), h(Timeline, { items, dot: (_x, i) => h("b", {}, String(i + 1)) })]);
   const [a, b, c] = m.el.querySelectorAll("ol.hm-timeline");
   assert.equal(a.querySelector(".hm-tl-dot").getAttribute("data-hm-color"), "brand-purple");
+  assert.ok(a.querySelector(".hm-tl-item").classList.contains("is-mine"), "an item's own class");
   assert.ok(!a.className.includes("hm-timeline-no-line"));
   assert.equal(a.querySelectorAll(".hm-tl-line").length, 1, "a line from each item to the next (none after the last)");
   assert.equal(b.querySelectorAll(".hm-tl-line").length, 0, "line={false}: no line element");

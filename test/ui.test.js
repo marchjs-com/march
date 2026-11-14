@@ -61,7 +61,7 @@ test("askReason enforces min length; purposes variant returns { category, text }
   input(top().querySelector("textarea"), "customer asked");
   top().querySelector("[data-ok]").click();
   assert.equal(U.openDialogs(), 1, "purpose required");
-  sel.value = "audit";
+  sel.value = "1"; // the list is a <Select>: an option's value is its index ("audit" is the second purpose)
   sel.dispatchEvent(new Event("change", { bubbles: true }));
   top().querySelector("[data-ok]").click();
   assert.deepEqual(await p, { category: "audit", text: "customer asked" });
@@ -353,7 +353,7 @@ test("theme persists in localStorage and sets data-theme", () => {
   m.dispose();
 });
 
-test("Page renders title, breadcrumbs and allowed actions only", () => {
+test("Page renders title, breadcrumbs and allowed actions only", async () => {
   A.setAccess({ user: { id: 1 }, perms: ["a"] });
   const ok = U.action("Invite", () => {}, { can: "a" }), no = U.action("Purge", () => {}, { can: "b" });
   const m = mount(() => h(U.Page, { title: "Users", subtitle: "All members", breadcrumbs: [{ label: "Admin", href: "/admin" }, { label: "Users" }], actions: [ok, no, h("span", { class: "extra" }, "x")] }, h("p", {}, "content")));
@@ -361,6 +361,8 @@ test("Page renders title, breadcrumbs and allowed actions only", () => {
   const btns = m.el.querySelectorAll(".hm-page-actions button").map((b) => b.textContent);
   assert.deepEqual(btns, ["Invite"]);
   assert.ok(m.el.querySelector(".hm-page-actions .extra"));
+  // the trail is the Breadcrumbs component, loaded in its own chunk
+  for (let i = 0; i < 200 && !m.el.querySelector('[aria-current="page"]'); i++) await new Promise((r) => setTimeout(r, 0));
   assert.equal(m.el.querySelector('[aria-current="page"]').textContent, "Users");
   m.dispose();
   A.setAccess(null);

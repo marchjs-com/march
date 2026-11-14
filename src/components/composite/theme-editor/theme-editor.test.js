@@ -147,3 +147,28 @@ test("ThemeEditor: frame parts can be turned off and its texts replaced", async 
   assert.ok(own.querySelector(".hm-te-undo"));
   dispose();
 });
+
+test("ThemeEditor: the section tabs switch; rows are Fields; undo keys and the name field follow the history", async () => {
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(ThemeEditor, { storageKey: false, warnUnsaved: false, share: false }), el);
+  const wait = async (sel) => { for (let i = 0; i < 100 && !el.querySelector(sel); i++) await new Promise((r) => setTimeout(r, 10)); return el.querySelector(sel); };
+  await wait(".hm-te-token");
+  el.querySelectorAll(".hm-te-panel .hm-tab")[1].click();
+  const field = await wait(".hm-te-field");
+  assert.ok(field, "the typography tab opens");
+  assert.equal(el.querySelectorAll(".hm-te-panel .hm-tab")[1].getAttribute("aria-selected"), "true");
+  const select = field.querySelector("select");
+  assert.equal(field.querySelector("label").getAttribute("for"), select.id, "a native control is named by its label");
+  el.querySelectorAll(".hm-te-panel .hm-tab")[0].click();
+  await wait(".hm-te-tone");
+  el.querySelectorAll(".hm-te-tone")[2].click();
+  const undo = el.querySelector(".hm-te-undo");
+  assert.equal(undo.disabled, false);
+  el.querySelector(".hm-te").dispatchEvent(new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true }));
+  await new Promise((r) => setTimeout(r, 10));
+  assert.equal(undo.disabled, true, "mod+Z undoes");
+  el.querySelector(".hm-te").dispatchEvent(new KeyboardEvent("keydown", { key: "y", ctrlKey: true, bubbles: true }));
+  await new Promise((r) => setTimeout(r, 10));
+  assert.equal(undo.disabled, false, "mod+Y redoes");
+  dispose();
+});

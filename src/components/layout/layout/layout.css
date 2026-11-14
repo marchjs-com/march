@@ -13,11 +13,10 @@
 .hm-shell-header { transition: transform var(--hm-dur) var(--hm-ease); }
 .hm-shell-header[data-hidden] { transform: translateY(-100%); }
 /* readingProgress */
-.hm-reading-progress { position: fixed; inset-block-start: 0; inset-inline: 0; block-size: var(--hm-rp-h, 3px); z-index: calc(var(--hm-z-sticky, 40) + 2);
-  background: var(--hm-rp-c, var(--hm-accent, var(--hm-primary))); transform: scaleX(0); pointer-events: none; }
-/* connection */
-.hm-offline { padding: var(--hm-space-1) var(--hm-space-3); border-radius: 999px; background: var(--hm-warn-bg, var(--hm-surface)); color: var(--hm-warn-fg, var(--hm-text));
-  border: 1px solid var(--hm-border); box-shadow: var(--hm-shadow-2); font-size: var(--hm-text-sm); }
+/* the place of the bar (a Progress line inside); --hm-rp-c: a CSS colour given instead of a theme token */
+.hm-reading-progress { position: fixed; inset-block-start: 0; inset-inline: 0; z-index: calc(var(--hm-z-sticky, 40) + 2); --hm-progress-c: var(--hm-rp-c); pointer-events: none; }
+/* connection: a Badge in a live region */
+.hm-offline > .hm-badge { box-shadow: var(--hm-shadow-2); }
 .hm-offline[hidden] { display: none; }
 .hm-layout-feedback { box-shadow: var(--hm-shadow-2); }
 /* devOverlay (Alt+Shift+L) */

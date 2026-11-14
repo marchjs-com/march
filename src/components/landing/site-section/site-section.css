@@ -7,9 +7,7 @@
 .hm-ss-muted { background: var(--hm-surface-2); }
 .hm-ss-inverse { background: var(--hm-inverse-bg); color: var(--hm-inverse-text); --hm-text: var(--hm-inverse-text); --hm-muted: color-mix(in srgb, var(--hm-inverse-text) 68%, transparent); --hm-border: color-mix(in srgb, var(--hm-inverse-text) 16%, transparent); }
 .hm-ss-brand { background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 9%, var(--hm-bg)); }
-.hm-ss-head { display: flex; flex-direction: column; align-items: center; gap: var(--hm-space-3); max-width: 46rem; margin-inline: auto; margin-block-end: clamp(2rem, 5cqi, 3.5rem); text-align: center; }
-.hm-ss-head-start { align-items: flex-start; margin-inline: 0; text-align: start; }
-.hm-ss-eyebrow { margin: 0; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); letter-spacing: var(--hm-tracking-caps, .08em); text-transform: uppercase; color: var(--hm-accent-text, var(--hm-primary-text)); }
-.hm-ss-inverse .hm-ss-eyebrow { color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 70%, var(--hm-inverse-text)); }
-.hm-ss-title { margin: 0; font-size: clamp(1.75rem, 1.1rem + 2.6cqi, var(--hm-text-4xl)); line-height: 1.1; letter-spacing: var(--hm-tracking-tighter, -.02em); font-weight: var(--hm-weight-bold); text-wrap: balance; }
-.hm-ss-lead { margin: 0; font-size: clamp(var(--hm-text-md), .9rem + .5cqi, var(--hm-text-lg)); line-height: 1.6; color: var(--hm-muted); text-wrap: pretty; }
+/* the heading group is a SectionHead: only the room under it and the inverse eyebrow are set here */
+.hm-ss-head { margin-block-end: clamp(2rem, 5cqi, 3.5rem); }
+.hm-ss-head .hm-section-head-lead { max-inline-size: none; }
+.hm-ss-inverse .hm-section-head-caps { color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 70%, var(--hm-inverse-text)); }

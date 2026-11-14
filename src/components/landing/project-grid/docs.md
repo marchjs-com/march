@@ -42,4 +42,4 @@ lazily.
 
 ## Composed of
 
-Card, Chip, openMedia (Lightbox), Reveal; `flip` and the motion engine.
+Card, Chip, Picture, CornerMark (the arrow), openMedia (Lightbox), Reveal; `flip` and the motion engine.

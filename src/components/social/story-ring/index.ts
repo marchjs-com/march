@@ -4,11 +4,12 @@
 import { effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
-import { Avatar } from "../../../ui/avatar.ts";
+import { Avatar } from "../avatar/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { CornerMark } from "../../media/corner-mark/index.ts";
 import "./story-ring.css";
 
 export type StoryRingState = "new" | "seen" | "close" | "none";
@@ -47,7 +48,7 @@ export function StoryRing(props: StoryRingProps): Element {
     h("span", { class: "hm-sring-frame" },
       h("span", { class: "hm-sring-ring", "aria-hidden": "true", ref: (x: HTMLElement) => { ring = x; } }),
       h("span", { class: "hm-sring-av" }, props.avatar ?? h(Avatar, { name: props.name, src: props.src, size: () => (val(props.size) === "sm" ? "sm" : "lg") })),
-      () => (val(props.add) ? h("span", { class: "hm-sring-add", "aria-hidden": "true" }, props.addIcon ?? glyph(plus)) : null)),
+      () => (val(props.add) ? h(CornerMark, { class: "hm-sring-add", corner: "bottom-end", variant: "solid", color: "brand-orange", ring: true, size: () => (val(props.size) === "lg" ? "md" : "sm"), icon: props.addIcon ?? plus }) : null)),
     () => { const l = val(props.label); return l ? h("span", { class: "hm-sring-label" }, l) : null; },
   ];
   effect(() => {

@@ -1,13 +1,14 @@
 // CopyButton (hadi-march/ui): copies text to the clipboard and says so. Folder: src/components/actions/copy-button/.
 import "./copy-button.css";
-import "../button/button.css";
-import "../icon-button/icon-button.css";
-import { signal } from "../../../core/reactive.ts";
+import { signal, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { toast } from "../../overlays/toast/index.ts";
-import { val, cx, glyph, icon, later, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { val, cx, later, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { Button } from "../button/index.ts";
+import { IconButton } from "../icon-button/index.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { copy as copyIcon } from "../../../icons/glyphs/copy.ts";
 
@@ -32,6 +33,9 @@ export interface CopyButtonProps {
   /** The clipboard refused (no permission, insecure page). */
   onError?: (error: unknown) => void;
 }
+// a live prop for h(Component, …): it becomes a getter
+const live = reactive as <T>(fn: () => T) => T;
+
 /** Copy text to the clipboard: `<CopyButton text={() => token} label="Copy" />` */
 export function CopyButton(props: CopyButtonProps): Element {
   const copied = signal(false);
@@ -46,16 +50,15 @@ export function CopyButton(props: CopyButtonProps): Element {
       props.onError?.(e);
     }
   };
-  const own = (x: unknown, def: typeof check): unknown => (x == null || x === true ? glyph(def) : icon(x, "hm-copy-icon"));
   // icon-only always has an icon; a text button only when `icon` is given
   const mark = (): unknown => {
     if (!props.iconOnly && (props.icon == null || props.icon === false)) return null;
-    return copied() && props.copiedIcon !== false ? own(props.copiedIcon, check) : own(props.icon === false ? null : props.icon, copyIcon);
+    return copied() && props.copiedIcon !== false ? ownIcon(props.copiedIcon ?? undefined, check, "hm-copy-icon") : ownIcon(props.icon === false || props.icon == null ? undefined : props.icon, copyIcon, "hm-copy-icon");
   };
   const text = (): string => (copied() ? val(props.copiedLabel) ?? t`Copied` : val(props.label) ?? t`Copy`);
-  return h("button", {
-    type: "button", class: () => cx(props.iconOnly ? "hm-icon-btn" : "hm-btn hm-btn-ghost hm-btn-sm", "hm-copy", copied() && "is-copied", val(props.class)),
-    onClick: copy, "aria-live": "polite", "data-hm-color": () => (copied() ? colorAttr(props.copiedColor) : null),
-    "aria-label": () => (props.iconOnly ? text() : null),
-  }, () => { const m = mark(); return props.iconOnly ? m : m ? [m, text()] : text(); });
+  const shared = {
+    class: () => cx("hm-copy", copied() && "is-copied", val(props.class)), onClick: copy, "aria-live": "polite", icon: mark,
+    color: live(() => (copied() ? props.copiedColor : undefined)),
+  };
+  return (props.iconOnly ? h(IconButton, { ...shared, label: text, title: false }) : h(Button, { ...shared, variant: "ghost", size: "sm" }, text)) as Element;
 }

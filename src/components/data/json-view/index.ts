@@ -4,6 +4,7 @@ import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { Chevron } from "../../actions/chevron/index.ts";
 
 /** Texts JsonView writes itself. */
 export interface JsonViewLabels {
@@ -34,7 +35,8 @@ function jsonNode(key: string | number | null, value: unknown, depth: number, o:
   const kids = (): Element[] => untrack(() => entries.map(([k, v]) => jsonNode(k, v, depth + 1, o, new Set(seen))));
   return h("li", { class: "hm-json-row" },
     h("button", { type: "button", class: cx("hm-json-toggle", o.arrow === false && "is-plain", typeof o.arrow === "function" && "is-own"), "aria-expanded": () => String(open()), onClick: () => open.update((x) => !x) },
-      typeof o.arrow === "function" ? h("span", { class: "hm-json-arrow", "aria-hidden": "true" }, o.arrow(open)) : null,
+      // the arrow: a Chevron that follows the button's aria-expanded; an own one is drawn for the state it reads
+      o.arrow === false ? null : typeof o.arrow === "function" ? h(Chevron, { class: "hm-json-arrow", open: false, motion: false, icon: () => (o.arrow as (open: () => boolean) => unknown)(open) }) : h(Chevron, { class: "hm-json-chev" }),
       keyEl, h("span", { class: "hm-json-punct" }, ob),
       () => (open() ? null : h("span", { class: "hm-json-more" }, ` ${entries.length} ${arr ? o.labels?.items ?? t`items` : o.labels?.keys ?? t`keys`} ${cb}`))),
     () => open() && [h("ul", { class: "hm-json-list", role: "group" }, kids()), h("span", { class: "hm-json-punct" }, cb)]);

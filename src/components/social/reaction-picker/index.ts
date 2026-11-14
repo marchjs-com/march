@@ -3,11 +3,13 @@
 // them (mirrored in RTL). The same piece is the composer's emoji panel (layout="grid").
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { roving } from "../../../ui/focus.ts";
 import { animate } from "../../../motion/animate.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { moveCursor } from "../../../behaviors/list-nav/index.ts";
 import "./reaction-picker.css";
 import { isRtl } from "../../../core/util.ts";
 
@@ -43,18 +45,15 @@ export interface ReactionPickerProps {
 export function ReactionPicker(props: ReactionPickerProps): Element {
   let root!: HTMLElement;
   const items = (): HTMLButtonElement[] => [...root.querySelectorAll<HTMLButtonElement>("button")];
+  // row: roving focus (mirrored in RTL) · grid: the shared cursor moves by column and row
   const key = (e: KeyboardEvent): void => {
-    const rtl = isRtl(root);
-    const grid = val(props.layout) === "grid";
-    let k = e.key;
-    if (rtl && (k === "ArrowLeft" || k === "ArrowRight")) k = k === "ArrowLeft" ? "ArrowRight" : "ArrowLeft";
-    if (grid && (k === "ArrowUp" || k === "ArrowDown")) {
-      const list = items(), i = list.indexOf(document.activeElement as HTMLButtonElement), cols = Math.max(1, Math.round(root.clientWidth / Math.max(1, list[0]?.offsetWidth ?? 1)));
-      const j = i + (k === "ArrowDown" ? cols : -cols);
-      if (list[j]) { e.preventDefault(); list[j].focus(); }
-      return;
-    }
-    roving({ key: k, target: e.target, preventDefault: () => e.preventDefault() } as unknown as KeyboardEvent, items(), { horizontal: true });
+    const list = items();
+    if (val(props.layout) !== "grid") { roving(e, list, { horizontal: true }); return; }
+    const columns = Math.max(1, Math.round(root.clientWidth / Math.max(1, list[0]?.offsetWidth ?? 1)));
+    const j = moveCursor({ key: e.key, index: list.indexOf(document.activeElement as HTMLButtonElement), count: list.length, columns, rtl: isRtl(root) });
+    if (j == null) return;
+    e.preventDefault();
+    list[j]?.focus();
   };
   root = h("div", {
     class: () => cx("hm-react", `hm-react-${val(props.layout) ?? "row"}`, val(props.class)),
@@ -67,7 +66,7 @@ export function ReactionPicker(props: ReactionPickerProps): Element {
       type: "button", class: cx("hm-react-e", sel === e && "is-on"), "aria-pressed": sel === e ? "true" : "false", "aria-label": props.emojiLabel ? props.emojiLabel(e) : e,
       tabindex: i === Math.max(0, list.indexOf(sel ?? "")) ? "0" : "-1", onClick: () => props.onPick(e),
     }, h("span", { "aria-hidden": "true" }, e)));
-    if (props.onMore && val(props.layout) !== "grid") btns.push(h("button", { type: "button", class: "hm-react-more", tabindex: "-1", "aria-label": () => val(props.moreLabel) ?? t`More emoji`, onClick: () => props.onMore?.() }, props.moreIcon ?? glyph(plus)));
+    if (props.onMore && val(props.layout) !== "grid") btns.push(h(IconButton, { class: "hm-react-more", size: "sm", shape: "round", tabindex: "-1", icon: props.moreIcon ?? plus, label: () => val(props.moreLabel) ?? t`More emoji`, onClick: () => props.onMore?.() }) as HTMLButtonElement);
     return btns;
   }) as HTMLElement;
   if (props.pop !== false) queueMicrotask(() => {

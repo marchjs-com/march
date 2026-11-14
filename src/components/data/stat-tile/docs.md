@@ -27,6 +27,7 @@ or a node (a Counter that rolls), a hint line is optional, and the tile becomes 
 | `href` | string | — | makes it a link |
 | `disabled` | boolean | `false` | |
 | `term` | boolean | `false` | `<dt>` + `<dd>` for a `<dl>` parent (static stats only) |
+| `partClass` | `{ value, label, hint }` | — | an extra class on a part (a host that keeps its own class names) |
 | `class` | class | — | |
 | other attributes | | | `data-*`, `aria-*`, `title`, `id` go to the root |
 

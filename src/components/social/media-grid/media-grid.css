@@ -14,7 +14,7 @@
 .hm-mgrid-tile { position: relative; display: block; min-width: 0; min-height: 0; padding: 0; margin: 0; border: 0; overflow: hidden; background: var(--hm-surface-2);
   cursor: zoom-in; -webkit-tap-highlight-color: transparent; }
 .hm-mgrid-gap-gap .hm-mgrid-tile { border-radius: var(--hm-radius-2); }
-.hm-mgrid-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.02);
+.hm-mgrid-tile img { position: absolute; inset: 0; max-width: none; opacity: 0; transform: scale(1.02);
   transition: opacity var(--hm-dur-slow) var(--hm-ease), transform var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-mgrid-tile.is-loaded img { opacity: 1; transform: none; }
 .hm-mgrid-tile:hover img { transform: scale(1.025); }
@@ -22,8 +22,5 @@
 .hm-mgrid-tile:focus-visible { outline: 3px solid var(--hm-accent, var(--hm-primary)); outline-offset: -3px; z-index: 1; }
 .hm-mgrid-skel { position: absolute; inset: 0; height: 100%; border-radius: 0; }
 .hm-mgrid-skel-own { display: grid; place-items: center; }
-.hm-mgrid-kind { position: absolute; inset-block-start: .5rem; inset-inline-end: .5rem; display: inline-grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%;
-  background: color-mix(in srgb, var(--hm-scrim) 54%, transparent); color: var(--hm-on-scrim); }
-.hm-mgrid-kind .hm-svg { width: 1rem; height: 1rem; }
 .hm-mgrid-more { position: absolute; inset: 0; display: grid; place-items: center; background: color-mix(in srgb, var(--hm-scrim) 48%, transparent);
   color: var(--hm-on-scrim); font-size: clamp(1.25rem, 6vw, 2rem); font-weight: 800; letter-spacing: -.02em; }

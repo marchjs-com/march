@@ -53,3 +53,11 @@ test("StatTile: a button with onClick, a link with href, dt / dd with term", () 
   assert.equal(term.querySelector("dt").textContent, "Places");
   dispose();
 });
+
+test("StatTile: partClass adds a host's own class to a part", () => {
+  const [el, dispose] = mount(() => h(StatTile, { value: "1", label: "L", hint: "H", partClass: { value: "my-v", label: "my-l", hint: "my-h" } }));
+  assert.equal(el.querySelector(".hm-stat-tile-value.my-v").textContent, "1");
+  assert.ok(el.querySelector(".hm-stat-tile-label.my-l") && el.querySelector(".hm-stat-tile-hint.my-h"));
+  assert.equal(el.querySelector(".hm-stat-tile").hasAttribute("partClass"), false);
+  dispose();
+});

@@ -6,7 +6,7 @@ export default defineMeta({
   category: "social",
   since: "0.1.0",
   summary: "Three dots lifting in turn (motion engine) and an optional \"… is typing\" line; a polite status for screen readers.",
-  composedOf: [],
+  composedOf: ["StatusDot"],
   behaviors: ["motion engine"],
   showcase: "/social",
 });

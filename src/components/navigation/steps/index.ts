@@ -1,7 +1,8 @@
 // Steps (hadi-march/ui).
 import "./steps.css";
 import { h } from "../../../dom/h.ts";
-import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
@@ -30,7 +31,7 @@ export function Steps(props: StepsProps): Element {
       const st = state();
       if (renderDot) return renderDot(i, st, s);
       const done = props.doneIcon;
-      if (st === "done" && done !== false) return done == null || done === true ? glyph(check) : icon(done);
+      if (st === "done" && done !== false) return ownIcon(done ?? undefined, check);
       return s.icon != null ? icon(s.icon) : String(i + 1);
     };
     const inner = [

@@ -1,10 +1,12 @@
 // The live flow editor of the showcase page: controls, palette / JSON, canvas, timeline on one sample order flow.
 import { effect, untrack, onCleanup } from "../../../core/reactive.ts";
-import { Button } from "../../../ui/button.ts";
+import { Button } from "../../actions/button/index.ts";
+import { CopyButton } from "../../actions/copy-button/index.ts";
+import { UndoRedo } from "../../actions/undo-redo/index.ts";
 import { Tabs } from "../../../ui/tabs.ts";
-import { Toggle, Textarea } from "../../../forms/inputs.ts";
+import { Toggle } from "../../../forms/inputs.ts";
 import { undoStack } from "../../../managers/undo/index.ts";
-import { clipboard } from "../../../managers/clipboard/index.ts";
+import { JsonEditor } from "../json-editor/index.ts";
 import { FlowCanvas, createFlow, validateFlow, type FlowDoc } from "./index.ts";
 import { FlowPalette } from "../flow-palette/index.ts";
 import { FlowControls, FlowTimeline, createFlowRunner } from "../flow-controls/index.ts";
@@ -16,7 +18,8 @@ export function FlowEditorStage() {
   const runner = createFlowRunner(flow)
   const u = undoStack()
   let $loop = false
-  let $text = JSON.stringify(flow.toJSON(), null, 2)
+  // the JSON view edits the document as a value: the parsed JSON, or the raw text while it cannot be parsed
+  let $doc: unknown = flow.toJSON()
   let $msg = ""
   // continuous mode: start again a moment after a run ends
   effect(() => {
@@ -25,17 +28,15 @@ export function FlowEditorStage() {
     const id = setTimeout(() => { if (untrack(() => $loop)) void runner.run() }, 1400)
     onCleanup(() => clearTimeout(id))
   })
-  // live check of the text: JSON syntax first, then the flow schema (validateFlow)
-  const parsed = (): { doc?: FlowDoc; problem?: string } => {
-    try { const doc = JSON.parse($text) as FlowDoc; const p = validateFlow(doc, sampleTypes); return p.length ? { problem: p[0]! } : { doc } }
-    catch (e) { return { problem: `JSON okunamadı: ${(e as Error).message}` } }
-  }
-  const refresh = () => { $text = JSON.stringify(flow.toJSON(), null, 2); $msg = "" }
+  // JsonEditor checks the syntax; the flow schema (validateFlow) is its extra check
+  const problem = (v: unknown): string | null => validateFlow(v as FlowDoc, sampleTypes)[0] ?? null
+  const refresh = () => { $doc = flow.toJSON(); $msg = "" }
   const apply = () => {
-    const r = parsed()
-    if (!r.doc) { $msg = r.problem!; return }
+    const doc = $doc
+    const bad = typeof doc === "string" ? "JSON okunamadı." : problem(doc)
+    if (bad) { $msg = bad; return }
     runner.reset()
-    flow.load(r.doc, "JSON içe aktar")
+    flow.load(doc as FlowDoc, "JSON içe aktar")
     flow.view.peek()?.fit()
     $msg = "İçe aktarıldı. Geri almak için Ctrl+Z."
   }
@@ -45,8 +46,7 @@ export function FlowEditorStage() {
       <FlowControls runner={runner} flow={flow} />
       <div class="sc-row">
         <Toggle bind:value={$loop}>Sürekli çalıştır</Toggle>
-        <Button size="sm" variant="secondary" disabled={() => !u.canUndo()} on:click={() => u.undo()}>{() => (u.past()[0] ? `Geri al: ${u.past()[0]}` : "Geri al")}</Button>
-        <Button size="sm" variant="ghost" disabled={() => !u.canRedo()} on:click={() => u.redo()}>Yinele</Button>
+        <UndoRedo history={u} />
       </div>
     </div>
     <div class="sc-flow-main">
@@ -54,12 +54,11 @@ export function FlowEditorStage() {
         <Tabs label="Akış araçları" tabs={[
           { id: "palette", label: "Palet", content: () => panel(<FlowPalette flow={flow} />) },
           { id: "json", label: "JSON", content: () => panel(<div class="sc-flow-stack">
-            <Textarea bind:value={$text} rows={14} autosize={false} spellcheck={false} class="sc-flow-json" aria-label="Akış JSON" />
-            <p class={() => (parsed().problem ? "sc-flow-check is-bad" : "sc-flow-check")}>{() => parsed().problem ?? "Geçerli: march.flow/v1"}</p>
+            <JsonEditor bind:value={$doc} rows={14} validate={problem} class="sc-flow-json" aria-label="Akış JSON" labels={{ valid: "Geçerli: march.flow/v1" }} />
             <div class="sc-row">
               <Button size="sm" variant="primary" on:click={apply}>İçe aktar</Button>
               <Button size="sm" variant="secondary" on:click={refresh}>Tuvalden al</Button>
-              <Button size="sm" variant="ghost" on:click={() => clipboard().copy(JSON.stringify(flow.toJSON(), null, 2))}>{() => (clipboard().copied() ? "Kopyalandı ✓" : "Kopyala")}</Button>
+              <CopyButton text={() => JSON.stringify(flow.toJSON(), null, 2)} label="Kopyala" />
             </div>
             <p class="sc-flow-muted" role="status">{() => $msg}</p>
           </div>) },

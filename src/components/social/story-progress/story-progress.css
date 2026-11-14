@@ -1,7 +1,2 @@
-/* March — StoryProgress. 3px bars, 2px apart: a light track and a fill that grows from the start edge (RTL too). */
-.hm-sprog { display: flex; gap: 2px; width: 100%; }
-.hm-sprog-seg { position: relative; flex: 1; height: 3px; border-radius: var(--hm-radius-full); overflow: hidden; background: color-mix(in srgb, var(--hm-on-scrim) 32%, transparent); }
-.hm-sprog-fill { position: absolute; inset: 0; background: var(--hm-on-scrim); transform: scaleX(0); transform-origin: left center; border-radius: inherit; }
-:dir(rtl) .hm-sprog-fill { transform-origin: right center; }
-/* own color: data-hm-color sets --hm-accent for the fill */
-.hm-sprog[data-hm-color] .hm-sprog-fill { background: var(--hm-accent); }
+/* March — StoryProgress. A segmented line Progress (3px bars, 2px apart) that spans its container. */
+.hm-story-progress { inline-size: 100%; }

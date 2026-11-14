@@ -36,4 +36,4 @@ wrap: OverflowText scrolls them on hover and focus (still on reduced motion: the
 
 ## Composed of
 
-OverflowText. Uses the variant scale (hub d) for `size` and `tone`.
+OverflowText (the label), IconButton (`size="xs"`: the remove button). Uses the variant scale (hub d) for `size` and `tone`.

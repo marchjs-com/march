@@ -46,4 +46,4 @@ closes with Escape or the scrim.
 
 ## Composed of
 
-Badge (item counts), OverflowText (long labels scroll on hover); the router, fold search and storage helpers.
+ListRow (a page row, a group heading), IconButton (menu, rail and pin buttons), SearchBox (the filter), Badge (item counts), Chevron (a group's arrow), SectionLabel (Pinned / Recent), Empty (no matches); the dismiss behavior closes the narrow-screen drawer; the router, fold search and storage helpers.

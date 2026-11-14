@@ -1,10 +1,10 @@
 // Loader and the boot loader. (hadi-march/ui; split from display.ts so each component is its own module and chunk).
 import "./loader.css";
-import "../spinner/spinner.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { Spinner } from "../spinner/index.ts";
 
 export interface LoaderProps {
   text?: MaybeFn<string> | undefined; overlay?: boolean; class?: ClassProp;
@@ -22,7 +22,7 @@ export function Loader(props: LoaderProps = {}): Element {
   const own = props.spinner;
   const spinner = own === false ? null
     : own && own !== true ? h("span", { class: "hm-loader-spinner", "aria-hidden": "true" }, own)
-    : h("span", { class: cx("hm-loading hm-spin-lg", props.color && "hm-spin-single"), "aria-hidden": "true", "data-hm-color": colorAttr(props.color) });
+    : h(Spinner, { size: "lg", decorative: true, color: props.color });
   return h("div", { class: () => cx("hm-loader", props.overlay && "hm-loader-overlay", props.fade === false && "is-still", val(props.class)), role: "status", "aria-live": "polite" },
     spinner,
     h("span", { class: props.text != null ? "hm-loader-text" : "hm-sr-only" }, () => val(props.text) ?? val(props.label) ?? t`Loading`));

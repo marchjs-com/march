@@ -3,6 +3,7 @@ import { signal } from "../../../core/reactive.ts";
 import { PropertyGrid, type PropertySpec } from "./index.ts";
 import { toast } from "../../../ui/toast.ts";
 import { cx } from "../../../ui/util.ts";
+import { Button } from "../../actions/button/index.ts";
 
 export const code = `<PropertyGrid label="Kart" bind:value={$card} onSave={(v) => api.save(v)} properties={[
   { key: "title", label: "Başlık", group: "İçerik" },
@@ -47,6 +48,6 @@ export default function PropertyGridDemo(props: { values: { layout: string; sear
         labels={props.values.ownLabels ? { search: "Bir ayar bul", save: "Yayınla", revert: "Vazgeç", unsaved: (n) => `${n} düzenleme yayınlanmadı`, noChanges: "Her şey yayında" } : undefined}
         onSave={props.values.save ? () => { toast("Kaydedildi", { kind: "success" }) } : undefined} />}
     </div>
-    <div class="sc-row"><button type="button" class="hm-btn hm-btn-secondary hm-btn-sm" data-audit-try on:click={edit}>Örnek bir değişiklik yap (köşe yarıçapı)</button></div>
+    <div class="sc-row"><Button size="sm" data-audit-try onClick={edit}>Örnek bir değişiklik yap (köşe yarıçapı)</Button></div>
   </div>
 }

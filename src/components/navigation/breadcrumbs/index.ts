@@ -5,12 +5,14 @@ import "./breadcrumbs.css";
 import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import { Button } from "../../actions/button/index.ts";
+import { OverflowText } from "../../typography/overflow-text/index.ts";
 import { Menu, type MenuItemSpec } from "../../../ui/menu.ts";
-import { Link, type Href } from "../../../router/router.ts";
+import type { Href } from "../../../router/router.ts";
 import { fitItems, observeWidth } from "../../../ui/fit.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
-import { isIconDef } from "../../../icons/svg.ts";
 
 messages("tr", { "Path": "Yol", "Hidden path parts": "Gizli yol parçaları", "{0}: go to": "{0}: şuraya git" });
 
@@ -57,14 +59,13 @@ export function Breadcrumbs(props: BreadcrumbsProps): Element {
   const hidden = computed(() => list().filter((_, i) => !isShown(i)));
 
   const own = props.separator, goTo = props.labels?.goTo;
-  const sep = (): Element | null => (own === false ? null : h("span", { class: "hm-bc-sep", "aria-hidden": "true" },
-    own == null || own === true ? glyph(chevronRight) : isIconDef(own) ? glyph(own) : typeof own === "function" ? (own as () => unknown)() : own));
+  const sep = (): Element | null => (own === false ? null : h("span", { class: "hm-bc-sep", "aria-hidden": "true" }, ownIcon(own ?? undefined, chevronRight, null)));
   const crumb = (c: Crumb, last: boolean): unknown => {
-    const body = [icon(c.icon, "hm-bc-icon"), h("span", { class: "hm-bc-label" }, () => val(c.label))];
+    const body = [icon(c.icon, "hm-bc-icon"), h(OverflowText, { class: "hm-bc-label", fade: false }, () => val(c.label))];
     const sib = (): MenuItemSpec[] => (val(c.siblings) ?? []).map((s) => ({ label: s.label, icon: s.icon, onSelect: s.onSelect }));
     if (c.siblings) return h(Menu, { trigger: body, label: () => (goTo ? goTo(val(c.label)) : t`${val(c.label)}: go to`), items: sib, variant: "ghost", size: "sm", class: cx("hm-bc-item", last && "is-current"), placement: "bottom-start" });
-    if (c.href && !last) return h(Link, { href: c.href, class: "hm-bc-item", children: body });
-    if (c.onSelect && !last) return h("button", { type: "button", class: "hm-bc-item", onClick: () => void c.onSelect?.() }, body);
+    // a link or a button crumb: a ghost Button in the crumb's look (the content goes in unwrapped, like a Menu trigger's)
+    if ((c.href || c.onSelect) && !last) return h(Button, { variant: "ghost", size: "sm", class: "hm-bc-item", icon: body, ...(c.href ? { href: c.href } : { onClick: () => void c.onSelect?.() }) });
     return h("span", { class: cx("hm-bc-item", last && "is-current"), "aria-current": last ? "page" : null }, body);
   };
 

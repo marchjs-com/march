@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Edit a list of strings: add, edit, reorder, remove; pasted lines become items.",
   category: "forms",
-  composedOf: [],
+  composedOf: ["TextInput", "RowTools", "Button"],
   behaviors: [],
   hubs: [],
   showcase: "/forms",

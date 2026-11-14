@@ -5,17 +5,20 @@
 import { signal, computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { isIconDef, type IconDef } from "../../../icons/svg.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { applyPipe } from "../../../core/pipes.ts";
-import { Avatar } from "../../../ui/avatar.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import { Avatar } from "../../social/avatar/index.ts";
+import { VerifiedMark } from "../../social/verified-mark/index.ts";
+import { Button } from "../../actions/button/index.ts";
+import { ListRow } from "../../data/list-row/index.ts";
+import { ClampText } from "../../typography/clamp-text/index.ts";
 import { Menu, type MenuItem } from "../../../ui/menu.ts";
 import { heart } from "../../../icons/glyphs/heart.ts";
 import { message } from "../../../icons/glyphs/message.ts";
 import { send } from "../../../icons/glyphs/send.ts";
 import { mapPin } from "../../../icons/glyphs/mapPin.ts";
-import { badgeCheck } from "../../../icons/glyphs/badgeCheck.ts";
 import { moreVertical } from "../../../icons/glyphs/moreVertical.ts";
 import { MediaGrid, type MediaItem } from "../../social/media-grid/index.ts";
 import { LikeButton, heartBurst, heartPop } from "../../social/like-button/index.ts";
@@ -89,8 +92,8 @@ export interface PostCardProps {
   class?: ClassProp;
 }
 
-// an own icon (IconDef, text or node) or the built-in glyph
-const own = (x: unknown, def: IconDef): unknown => (x == null ? glyph(def) : isIconDef(x) ? glyph(x) : icon(x));
+// an own icon (IconDef, text or node) or the built-in glyph, drawn bare
+const own = (x: unknown, def: Parameters<typeof ownIcon>[1]): unknown => ownIcon(x ?? undefined, def, null);
 
 /** `<PostCard post={p} onLike={(on) => like(p, on)} onComment={openComments} onOpenMedia={(i, el) => lightbox(p.media, i, el)} />` */
 export function PostCard(props: PostCardProps): Element {
@@ -113,16 +116,16 @@ export function PostCard(props: PostCardProps): Element {
     heartBurst(stage, { count: 14, radius: 70 });
     void animate(big, [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 900, easing: "linear" }).finished.then(() => { if (big) big.hidden = true; });
   };
-  // a count button: shown while it has a handler or a count; the button stays while the number changes (it rolls)
+  // a count button (a ghost pill Button): shown while it has a handler or a count; it stays while the number changes (it rolls)
   const counter = (mark: () => unknown, n: () => number | undefined, label: () => string, fn?: () => void): (() => Element | null) => {
     const shown = computed(() => !!fn || !!n());
-    return () => (shown() ? untrack(() => h("button", { type: "button", class: "hm-post-act", "aria-label": label, onClick: () => fn?.(), disabled: !fn },
-      mark(), h(CountRoll, { value: () => n() ?? 0, hideZero: true }))) : null);
+    return () => (shown() ? untrack(() => h(Button, { variant: "ghost", shape: "pill", class: "hm-post-act", "aria-label": label, onClick: () => fn?.(), disabled: !fn, icon: mark() },
+      h(CountRoll, { value: () => n() ?? 0, hideZero: true })) as Element) : null);
   };
   const author = (): Element => {
     const a = untrack(post).author;
     return h("span", { class: "hm-post-name" }, h("span", { class: "hm-post-name-text" }, a.name),
-      a.verified && props.verifiedIcon !== false ? h("span", { class: "hm-post-verified", role: "img", "aria-label": () => L().verified ?? t`Verified` }, own(props.verifiedIcon, badgeCheck)) : null);
+      a.verified && props.verifiedIcon !== false ? h(VerifiedMark, { class: "hm-post-verified", label: () => L().verified ?? t`Verified`, icon: props.verifiedIcon }) : null);
   };
   return h("article", {
     class: () => cx("hm-post", `hm-post-${val(props.variant) ?? "card"}`, val(props.class)),
@@ -132,14 +135,15 @@ export function PostCard(props: PostCardProps): Element {
     () => {
       head();
       const a = untrack(post).author;
-      const inner = [
-        props.avatar === false ? null : h(Avatar, { name: a.name, src: a.avatar, size: "md" }),
-        h("span", { class: "hm-post-id" }, author(),
-          h("span", { class: "hm-post-meta" },
-            props.time === false ? null : h("time", { dateTime: new Date(untrack(post).time).toISOString() }, typeof props.time === "function" ? props.time(untrack(post).time) : applyPipe("relative", untrack(post).time)),
-            untrack(post).place ? h("span", { class: "hm-post-place" }, props.placeIcon === false ? null : own(props.placeIcon, mapPin), untrack(post).place) : null)),
-      ];
-      return props.onAuthor ? h("button", { type: "button", class: "hm-post-who", onClick: () => props.onAuthor?.(post()) }, inner) : h("span", { class: "hm-post-who" }, inner);
+      // who: a ListRow (avatar · name · time and place), a button when the author can be opened
+      return h(ListRow, {
+        class: "hm-post-who", ...(props.onAuthor ? { onClick: () => props.onAuthor?.(post()) } : { as: "span" as const }),
+        lead: props.avatar === false ? null : h(Avatar, { name: a.name, src: a.avatar, size: "md" }),
+        title: author(),
+        sub: h("span", { class: "hm-post-meta" },
+          props.time === false ? null : h("time", { dateTime: new Date(untrack(post).time).toISOString() }, typeof props.time === "function" ? props.time(untrack(post).time) : applyPipe("relative", untrack(post).time)),
+          untrack(post).place ? h("span", { class: "hm-post-place" }, props.placeIcon === false ? null : own(props.placeIcon, mapPin), untrack(post).place) : null),
+      });
     },
     props.menu?.length ? h(Menu, { icon: props.menuIcon ?? moreVertical, label: () => L().options ?? t`Post options`, variant: "ghost", size: "sm", class: "hm-post-more", items: props.menu, args: [post()] }) : null),
   () => {
@@ -160,14 +164,10 @@ export function PostCard(props: PostCardProps): Element {
   () => {
     const [handle, text] = caption().split("\u0000") as [string, string];
     if (!text) return null;
-    const lines = val(props.clamp) ?? 3;
-    let p!: HTMLElement;
-    const more = signal(false);
-    queueMicrotask(() => { if (p && lines && p.scrollHeight > p.clientHeight + 1) more.set(true); });
-    return h("div", { class: "hm-post-body" },
-      h("p", { class: () => cx("hm-post-text", lines && !open() && "is-clamped"), "data-lines": String(lines), ref: (x: HTMLElement) => { p = x; } },
-        h("b", { class: "hm-post-handle" }, handle), " ", text),
-      () => (more() && !open() ? h("button", { type: "button", class: "hm-post-more-text", "aria-expanded": "false", onClick: () => open.set(true) }, L().more ?? t`more`) : null));
+    // folds to `clamp` lines; "more" opens it for good (the state outlives a redraw of the caption)
+    return h(ClampText, {
+      class: "hm-post-body", lines: () => val(props.clamp) ?? 3, collapsible: false, open, onOpenChange: (v: boolean) => open.set(v), labels: { more: L().more ?? t`more` },
+    }, h("b", { class: "hm-post-handle" }, handle), " ", text);
   },
-  () => (props.onComment && post().comments && props.viewAll !== false ? h("button", { type: "button", class: "hm-post-all", onClick: () => props.onComment?.(post()) }, L().viewAll?.(post().comments ?? 0) ?? t`View all ${post().comments} comments`) : null));
+  () => (props.onComment && post().comments && props.viewAll !== false ? h(Button, { variant: "link", class: "hm-post-all", onClick: () => props.onComment?.(post()) }, L().viewAll?.(post().comments ?? 0) ?? t`View all ${post().comments} comments`) : null));
 }

@@ -2,8 +2,8 @@
 import "./accordion.css";
 import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { val, cx, uid, icon, glyph, type ClassProp } from "../../../ui/util.ts";
-import { chevronDown } from "../../../icons/glyphs/chevronDown.ts";
+import { val, cx, uid, icon, type ClassProp } from "../../../ui/util.ts";
+import { Chevron } from "../../actions/chevron/index.ts";
 import { roving } from "../../../ui/focus.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
@@ -38,7 +38,8 @@ export function Accordion(props: AccordionProps): Element {
     if (c === false) return null;
     const own = typeof c === "function" ? (c as (open: () => boolean, item: AccordionItem) => unknown)(isOpen, it) : c;
     const mine = own != null && own !== true;
-    return h("span", { class: cx("hm-acc-chev", mine && "is-own"), "aria-hidden": "true" }, mine ? icon(own, "hm-acc-chev-own") : glyph(chevronDown));
+    // follows the header button's aria-expanded; an own mark is drawn as given and turns half way round
+    return h(Chevron, { direction: "down", size: "md", class: cx("hm-acc-chev", mine && "is-own"), motion: props.animated === false ? false : undefined, icon: mine ? own : undefined });
   };
   return h("div", { class: () => cx("hm-accordion", `hm-accordion-${props.variant ?? "separated"}`, props.animated === false && "is-static", val(props.class)), onKeydown: nav },
     props.items.map((it, i) => {

@@ -7,6 +7,8 @@ const mount = (fn) => { const host = document.createElement("div"); document.bod
 const L = await import("./index.ts");
 const { Layout, defineLayout, defineLayoutFeature, useLayout } = L;
 const { cornerControls } = await import("../bottom-right-controls/index.ts");
+// the corner Button, the offline Badge and the reading Progress come in their own chunks: wait until they are drawn
+const until = async (ok) => { for (let i = 0; i < 200 && !ok(); i++) await new Promise((r) => setTimeout(r, 0)); return ok(); };
 
 test("Layout: without regions it adds no frame; with regions it draws header, nav, main, aside, footer", () => {
   const a = mount(() => h(Layout, { features: [] }, "PAGE"));
@@ -58,7 +60,7 @@ test("Layout.extend: regions override, features merge by name", () => {
   m.dispose();
 });
 
-test("Layout API: corners, slot content swapped while a part is shown, features listed and disabled by name", () => {
+test("Layout API: corners, slot content swapped while a part is shown, features listed and disabled by name", async () => {
   let api;
   const show = signal(true);
   const Part = () => { const a = useLayout(); a.set("aside", "FILTERS"); a.add("bottom-start", Object.assign(document.createElement("i"), { textContent: "c" })); return "part"; };
@@ -68,7 +70,7 @@ test("Layout API: corners, slot content swapped while a part is shown, features 
   assert.equal(aside.textContent, "FILTERS");
   assert.equal(cornerControls("top-end").textContent, "S");
   assert.ok(cornerControls("bottom-start").querySelector("i"), "the part's corner control");
-  assert.ok(cornerControls("bottom-start").querySelector(".hm-layout-aside-btn"), "an aside brings its narrow-screen sheet button");
+  assert.ok(await until(() => cornerControls("bottom-start").querySelector(".hm-layout-aside-btn")), "an aside brings its narrow-screen sheet button");
   show.set(false);
   assert.equal(aside.textContent, "TOC", "restored when the part goes away");
   assert.equal(cornerControls("bottom-start").querySelector("i"), null);
@@ -108,7 +110,7 @@ test("Layout: a nested Layout does not start the page-wide features its outer La
   m.dispose();
 });
 
-test("Layout features: connection badge while offline, aside sheet toggles, dev overlay on Alt+Shift+L, feedback button", () => {
+test("Layout features: connection badge while offline, aside sheet toggles, dev overlay on Alt+Shift+L, feedback button", async () => {
   const { connectionFeature: connection, devOverlayFeature: devOverlay, feedbackFeature: feedback } = L;
   const nav = globalThis.navigator;
   const desc = Object.getOwnPropertyDescriptor(nav, "onLine");
@@ -117,7 +119,8 @@ test("Layout features: connection badge while offline, aside sheet toggles, dev 
   const badge = cornerControls("top-end").querySelector(".hm-offline");
   assert.ok(badge && !badge.hasAttribute("hidden"), "offline badge shown");
   assert.equal(badge.getAttribute("role"), "status");
-  const btn = cornerControls("bottom-start").querySelector(".hm-layout-aside-btn");
+  assert.ok(await until(() => badge.querySelector(".hm-badge.hm-badge-warn")), "the badge is a Badge");
+  const btn = await until(() => cornerControls("bottom-start").querySelector("button.hm-layout-aside-btn"));
   const aside = m.host.querySelector(".hm-layout-aside");
   btn.click();
   assert.ok(aside.hasAttribute("data-open"));
@@ -127,13 +130,13 @@ test("Layout features: connection badge while offline, aside sheet toggles, dev 
   globalThis.dispatchEvent(new KeyboardEvent("keydown", { key: "L", altKey: true, shiftKey: true }));
   assert.ok(document.documentElement.hasAttribute("data-hm-layout-debug"));
   assert.match(document.querySelector(".hm-layout-dev").textContent, /connection/);
-  assert.ok([...cornerControls("bottom-end").querySelectorAll(".hm-layout-feedback")].some((b) => b.textContent === "Görüş"));
+  assert.ok(await until(() => [...cornerControls("bottom-end").querySelectorAll("button.hm-layout-feedback")].some((b) => b.textContent === "Görüş")));
   m.dispose();
   assert.ok(!document.documentElement.hasAttribute("data-hm-layout-debug"));
   if (desc) Object.defineProperty(nav, "onLine", desc); else delete nav.onLine;
 });
 
-test("Layout: its own texts and parts — labels, skip link off, aside button off, feature texts and colour token", () => {
+test("Layout: its own texts and parts — labels, skip link off, aside button off, feature texts and colour token", async () => {
   const { connectionFeature: connection, readingProgressFeature: readingProgress } = L;
   const nav = globalThis.navigator;
   const desc = Object.getOwnPropertyDescriptor(nav, "onLine");
@@ -141,10 +144,10 @@ test("Layout: its own texts and parts — labels, skip link off, aside button of
   const m = mount(() => h(Layout, { features: [connection({ label: "No connection" }), readingProgress({ color: "brand-orange", label: "Article progress" })],
     aside: "TOC", labels: { skip: "Jump", panel: () => "Contents" } }, "x"));
   assert.equal(m.host.querySelector(".hm-skip").textContent, "Jump");
-  assert.equal(cornerControls("bottom-start").querySelector(".hm-layout-aside-btn").textContent, "Contents");
-  assert.equal(cornerControls("top-end").querySelector(".hm-offline").textContent, "No connection");
+  assert.equal((await until(() => cornerControls("bottom-start").querySelector(".hm-layout-aside-btn"))).textContent, "Contents");
+  assert.ok(await until(() => cornerControls("top-end").querySelector(".hm-offline").textContent === "No connection"));
   const bar = document.querySelector(".hm-reading-progress");
-  assert.equal(bar.getAttribute("aria-label"), "Article progress");
+  assert.equal((await until(() => bar.querySelector(".hm-progress2-line [role=progressbar]"))).getAttribute("aria-label"), "Article progress");
   assert.equal(bar.getAttribute("data-hm-color"), "brand-orange");
   assert.equal(bar.style.getPropertyValue("--hm-rp-c"), "");
   m.dispose();
@@ -155,6 +158,7 @@ test("Layout: its own texts and parts — labels, skip link off, aside button of
   raw.dispose();
   const Quiet = Layout.extend({ skipLink: false, asideToggle: false });
   const q = mount(() => h(Quiet, { features: [], aside: "TOC" }, "x"));
+  await new Promise((r) => setTimeout(r, 20));
   assert.equal(q.host.querySelector(".hm-skip"), null);
   assert.equal(cornerControls("bottom-start").querySelector(".hm-layout-aside-btn"), null);
   assert.ok(q.host.querySelector(".hm-layout-aside"));

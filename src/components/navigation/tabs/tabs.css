@@ -18,7 +18,6 @@
 /* parts of a tab: icon, the "changed" dot, the close mark (shown on hover, focus and the active tab) */
 .hm-tab-icon { display: inline-flex; flex: none; }
 .hm-tab-icon .hm-svg { width: 1em; height: 1em; }
-.hm-tab-dirty { flex: none; width: .4375rem; height: .4375rem; border-radius: 50%; background: var(--hm-accent, var(--hm-primary)); }
 .hm-tab-close { display: inline-grid; place-items: center; flex: none; width: 1.125rem; height: 1.125rem; margin-inline-end: -.25rem; border-radius: var(--hm-radius-1); color: var(--hm-muted); opacity: 0;
   transition: opacity var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease); }
 .hm-tab-close .hm-svg { width: .75rem; height: .75rem; }

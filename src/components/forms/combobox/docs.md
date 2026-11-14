@@ -39,5 +39,5 @@ positioning engine; loading, empty and error states are `role="status"`.
 
 ## Composed of
 
-OverflowText (long chip labels); the list popup is the shared floating panel (ui/popover.ts) and keyboard handling is
-the shared list navigation (forms/util.ts › listNav).
+Chip (the chosen values with `multiple`) and ListRow (the options); the list popup is the shared floating panel
+(ui/popover.ts) and keyboard handling is the shared list navigation (forms/util.ts › listNav).

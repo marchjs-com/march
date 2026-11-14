@@ -41,4 +41,4 @@ image n" that open the Lightbox dialog (focus returns on close). The hero cover 
 
 ## Composed of
 
-Button, KeyValue, Chip, openMedia (Lightbox), Reveal; `sharedTransition` (hadi-march/motion).
+SectionHead (the heading), Picture, Button, KeyValue, Chip, openMedia (Lightbox), Reveal; `sharedTransition` (hadi-march/motion).

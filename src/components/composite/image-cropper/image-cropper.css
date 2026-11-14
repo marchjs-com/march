@@ -1,10 +1,9 @@
 /* March — ImageCropper. Imported by its component module; tokens.css provides the variables. */
-.hm-crop { --hm-crop-accent: var(--hm-accent, var(--hm-primary)); display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%;
-  padding: var(--hm-space-3); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
+.hm-crop { --hm-crop-accent: var(--hm-accent, var(--hm-primary)); --hm-checker-b: var(--hm-surface-2); max-width: 100%; }
+.hm-crop > .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-3); padding: var(--hm-space-3); }
 
 /* view: the image under a centered frame; outside the frame is dimmed */
-.hm-crop-view { position: relative; aspect-ratio: 4 / 3; max-block-size: 26rem; overflow: hidden; border-radius: var(--hm-radius-2); cursor: grab; touch-action: none; user-select: none;
-  background: repeating-conic-gradient(var(--hm-surface-3) 0 25%, var(--hm-surface-2) 0 50%) 0 0 / 1rem 1rem; outline: none; }
+.hm-crop-view { --hm-checker-size: 1rem; position: relative; aspect-ratio: 4 / 3; max-block-size: 26rem; overflow: hidden; border-radius: var(--hm-radius-2); cursor: grab; touch-action: none; user-select: none; outline: none; }
 .hm-crop-view:focus-visible { box-shadow: 0 0 0 3px var(--hm-focus); }
 .hm-crop-view.is-busy { cursor: grabbing; }
 .hm-crop-stage { position: absolute; inset: 0; pointer-events: none; }
@@ -35,11 +34,9 @@
 
 /* controls and result */
 .hm-crop-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2) var(--hm-space-4); }
-.hm-crop-row { display: inline-flex; gap: 2px; }
-.hm-crop-row .is-on { color: var(--hm-accent-text, var(--hm-primary-text)); background: var(--hm-accent-soft, var(--hm-primary-soft)); }
-.hm-crop-slider { display: flex; align-items: center; gap: var(--hm-space-2); flex: 1 1 12rem; min-width: 0; color: var(--hm-text-2); font-size: var(--hm-text-sm); }
-.hm-crop-slider .hm-slider-wrap { flex: 1; min-width: 0; }
+.hm-crop-row .hm-toolbar-start { gap: 2px; }
+.hm-crop-slider.hm-field-inline { flex: 1 1 12rem; flex-direction: row; align-items: center; gap: var(--hm-space-2); }
+.hm-crop-slider > .hm-label { flex: none; font-weight: inherit; }
 .hm-crop-out { display: flex; align-items: center; gap: var(--hm-space-3); margin: 0; }
-.hm-crop-canvas { max-inline-size: 7.5rem; max-block-size: 7.5rem; border-radius: var(--hm-radius-2); box-shadow: var(--hm-shadow-2);
-  background: repeating-conic-gradient(var(--hm-surface-3) 0 25%, var(--hm-surface-2) 0 50%) 0 0 / .75rem .75rem; }
+.hm-crop-canvas { --hm-checker-size: .75rem; max-inline-size: 7.5rem; max-block-size: 7.5rem; border-radius: var(--hm-radius-2); box-shadow: var(--hm-shadow-2); }
 .hm-crop-out figcaption { color: var(--hm-faint); font-family: var(--hm-font-mono); font-size: var(--hm-text-xs); }

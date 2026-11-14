@@ -3,8 +3,9 @@
 // still, screen readers read each name once). Logos are muted to one tone by default so no brand shouts.
 import "./logo-cloud.css";
 import { h } from "../../../dom/h.ts";
-import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
+import { Picture } from "../../media/picture/index.ts";
 import { Marquee } from "../../../ui/marquee.ts";
 import { Grid } from "../../../ui/stack.ts";
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts"; // Reveal: the grid cells fade in one after another
@@ -36,7 +37,7 @@ export interface LogoCloudProps {
 
 function logoNode(l: Logo): Element {
   const inner = l.node != null ? h("span", { class: "hm-logo-node" }, l.node)
-    : h("img", { src: l.src ?? "", alt: l.name, width: l.width ?? null, height: l.height ?? null, loading: "lazy", decoding: "async", class: "hm-logo-img" });
+    : h(Picture, { src: l.src ?? "", alt: l.name, width: l.width, height: l.height, class: "hm-logo-img" });
   return l.href ? h("a", { class: "hm-logo", href: l.href, "aria-label": l.node != null ? l.name : null }, inner) as Element : h("span", { class: "hm-logo" }, inner) as Element;
 }
 
@@ -44,13 +45,12 @@ function logoNode(l: Logo): Element {
 export function LogoCloud(props: LogoCloudProps): Element {
   const variant = props.variant ?? "grid";
   const body = variant === "marquee"
-    // two copies in the item so the strip is wider than the screen; Marquee adds the seamless loop copy
-    ? h(Marquee, { class: "hm-logos-marquee", speed: props.speed ?? 40, pause: 0, separator: "" },
-      h("span", { class: "hm-logos-row" }, props.logos.map(logoNode), h("span", { class: "hm-logos-row-copy", "aria-hidden": "true", inert: "" }, props.logos.map(logoNode))))
+    // Marquee repeats the row until the strip is wider than the screen (the copies are hidden from screen readers)
+    ? h(Marquee, { class: "hm-logos-marquee", speed: props.speed ?? 40, pause: 0, separator: false, duplicate: true }, h("span", { class: "hm-logos-row" }, props.logos.map(logoNode)))
     : h(Grid, { min: "9rem", gap: 3, class: "hm-logos-cells" }, props.logos.map((l) => h("div", { class: "hm-logos-cell" }, logoNode(l))));
   const root = h("div", { class: cx("hm-logos", `hm-logos-v-${variant}`, props.mono !== false && "is-mono", val(props.class)) },
     props.title != null && h("p", { class: "hm-logos-title" }, () => val(props.title)),
     body) as HTMLElement;
-  if (variant === "grid" && props.reveal !== "none") { const stop = revealOnScroll(root, { effect: props.reveal ?? "fade", select: ".hm-logos-cell", stagger: 50 }); if (getOwner()) onCleanup(stop); }
+  if (variant === "grid" && props.reveal !== "none") owned(revealOnScroll(root, { effect: props.reveal ?? "fade", select: ".hm-logos-cell", stagger: 50 }));
   return root;
 }

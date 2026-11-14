@@ -6,6 +6,7 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { model, ctl, cx, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { textAttrs, inputOf, type TextAttrProps } from "../../../forms/affix.ts";
+import { Button } from "../../actions/button/index.ts";
 
 export interface PasswordInputProps extends ControlProps<string>, TextAttrProps {
   /** The show / hide button: `false` removes it; a function draws its content (`(shown) => <Icon of={shown ? eyeOff : eye} />`). */
@@ -25,7 +26,11 @@ export function PasswordInput(props: PasswordInputProps): unknown {
   syncValue(el, get);
   const draw = typeof props.toggle === "function" ? props.toggle : null;
   return h("span", { class: () => cx("hm-affix hm-password", props.class) }, el,
-    props.toggle === false ? null : h("button", { type: "button", class: cx("hm-affix-btn hm-password-toggle", draw && "is-own"), "aria-pressed": () => String(show()),
+    // a quiet text button ("Show" / "Hide"), or your own drawing as its icon
+    props.toggle === false ? null : h(Button, {
+      variant: "ghost", size: "sm", class: cx("hm-password-toggle", draw && "is-own"), "aria-pressed": () => String(show()),
       "aria-label": () => (show() ? props.labels?.hidePassword ?? t`Hide password` : props.labels?.showPassword ?? t`Show password`),
-      disabled: () => !!props.disabled, onClick: () => show.set(!show.peek()) }, () => (draw ? draw(show()) : show() ? props.labels?.hide ?? t`Hide` : props.labels?.show ?? t`Show`)));
+      disabled: () => !!props.disabled, onClick: () => show.set(!show.peek()),
+      ...(draw ? { icon: () => draw(show()) } : { children: () => (show() ? props.labels?.hide ?? t`Hide` : props.labels?.show ?? t`Show`) }),
+    }));
 }

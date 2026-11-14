@@ -9,26 +9,36 @@ import { signal, computed, effect, untrack, batch, onCleanup, getOwner, runWithO
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, uid, icon, glyph, clamp, lerp, listen, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, uid, glyph, clamp, lerp, listen, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { hasPart } from "../../../ui/parts.ts";
+import { isMod } from "../../../ui/keys.ts";
+import { snap } from "../../../ui/format.ts";
+import { observeSize } from "../../../ui/observe.ts";
 import { colorAttr } from "../../../theme/colors.ts";
-import { IconButton } from "../../../ui/button.ts";
-import { OverflowText } from "../../../ui/marquee.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { OverflowText } from "../../typography/overflow-text/index.ts";
+import { IconTile } from "../../data/icon-tile/index.ts";
+import { StatusDot } from "../../feedback/status-dot/index.ts";
+import { CheckMark } from "../../feedback/check-mark/index.ts";
+import { Alert } from "../../feedback/alert/index.ts";
+import { Toolbar } from "../../layout/stack/index.ts";
 import { TextInput, NumberInput, Select, Toggle } from "../../../forms/inputs.ts";
 import { Field } from "../../../forms/field.ts";
+import { live } from "../../../forms/util.ts";
 import { ContextMenu } from "../../overlays/context-menu/index.ts";
 import type { MenuItem } from "../../../ui/menu.ts";
-// ClipboardManager and UndoManager load when first used (the component barrel stays free of side effects)
+// ClipboardManager, UndoManager and the announcer load when first used (the component barrel stays free of side effects)
 const clipboardManager = () => import("../../../managers/clipboard/index.ts");
 const undoManager = () => import("../../../managers/undo/index.ts");
+const announcer = () => import("../../../managers/announcer/index.ts");
 import { animate } from "../../../motion/animate.ts";
 import { animateValue, onFrame, nextFrame } from "../../../motion/engine/index.ts";
-import { reducedMotion } from "../../../motion/env.ts";
+import { still as motionOff } from "../../../motion/engine/parts.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { minus } from "../../../icons/glyphs/minus.ts";
 import { target as fitIcon } from "../../../icons/glyphs/target.ts";
 import { layers as layoutIcon } from "../../../icons/glyphs/layers.ts";
 import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
-import { check } from "../../../icons/glyphs/check.ts";
 import {
   NODE_W, NODE_HEAD, PORT_ROW, endOf, portPoint, edgePath, layeredLayout, boundsOf,
   type FlowStore, type NodeState, type FlowEdge, type FlowGroup, type FlowField, type FlowView,
@@ -59,13 +69,13 @@ export interface FlowCanvasProps {
   motion?: MaybeFn<boolean | undefined>;
   /**
    * Own texts; each falls back to the built-in one. Names: `editor` and `node` (role descriptions), `menu`, `minimap`,
-   * the zoom bar (`zoomIn`, `zoomOut`, `fit`, `layout`), the menu items (`copy`, `cut`, `duplicate`, `group`,
+   * the zoom bar (`view`: its name, `zoomIn`, `zoomOut`, `fit`, `layout`), the menu items (`copy`, `cut`, `duplicate`, `group`,
    * `ungroup`, `delete`, `paste`, `selectAll`, `add(type)`), ports and edges (`input(port)`, `output(port)`,
    * `connection(from, to)`, `values(count)`) and what is announced (`connected`, `cannotConnect`, `choosePort`,
    * `arranged(n)`, `copied(n)`, `pasted(n)`, `deleted(n)`, `selected(n)`).
    */
   labels?: {
-    editor?: string; node?: string; menu?: string; minimap?: string;
+    editor?: string; node?: string; menu?: string; minimap?: string; view?: string;
     zoomIn?: string; zoomOut?: string; fit?: string; layout?: string;
     copy?: string; cut?: string; duplicate?: string; group?: string; ungroup?: string; delete?: string; paste?: string; selectAll?: string;
     add?: ((type: string) => string) | undefined;
@@ -80,7 +90,6 @@ export interface FlowCanvasProps {
 
 const ZOOM_MIN = 0.25, ZOOM_MAX = 2.5;
 const editable = (el: EventTarget | null): boolean => !!(el as Element | null)?.closest?.("input, select, textarea, [contenteditable=true], .hm-flow-fields");
-const isMod = (e: KeyboardEvent | MouseEvent): boolean => e.ctrlKey || e.metaKey;
 
 /** `<FlowCanvas flow={createFlow({ types, doc })} snap={16} minimap />` */
 export function FlowCanvas(props: FlowCanvasProps): Element {
@@ -90,11 +99,10 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   const sel = flow.selection;
   const draft = signal<{ from: { x: number; y: number }; to: { x: number; y: number }; ref: string; side: "in" | "out" } | null>(null);
   const marquee = signal<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
-  const live = signal("");
-  const say = (msg: string): void => { live.set(""); queueMicrotask(() => live.set(msg)); };
+  const say = (msg: string): void => { void announcer().then((m) => m.announce(msg)); };
   const L = (): NonNullable<FlowCanvasProps["labels"]> => props.labels ?? {};
-  const still = (): boolean => val(props.motion) === false || reducedMotion();
-  const part = (k: "zoom" | "fit" | "layout"): boolean => { const c = val(props.controls); return c == null || c === true || (c !== false && c.includes(k)); };
+  const still = (): boolean => motionOff(props.motion);
+  const part = (k: "zoom" | "fit" | "layout"): boolean => hasPart(props.controls, k);
   let root!: HTMLElement;
   let space = false;
   /** The user moved the view (no more automatic framing). */
@@ -112,7 +120,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     const p = local(cx0, cy0), v = vp.peek();
     return { x: (p.x - v.x) / v.zoom, y: (p.y - v.y) / v.zoom };
   };
-  const snapTo = (v: number): number => { const g = grid(); return g > 0 ? Math.round(v / g) * g : v; };
+  const snapTo = (v: number): number => snap(v, grid());
   const zoomAround = (lx: number, ly: number, z: number): void => {
     const v = vp.peek(), nz = clamp(z, ZOOM_MIN, ZOOM_MAX);
     vp.set({ zoom: nz, x: lx - ((lx - v.x) * nz) / v.zoom, y: ly - ((ly - v.y) * nz) / v.zoom });
@@ -228,7 +236,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   // (two pointers at once for pinch: the one multi-pointer gesture, so it keeps its own pointer map)
   const pointers = new Map<number, { x: number; y: number }>();
   function onBackgroundDown(e: PointerEvent): void {
-    if (e.button === 2) return;
+    if (e.button === 2 || (e.target as Element).closest?.(".hm-flow-zoom")) return;
     root.focus({ preventScroll: true });
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     root.setPointerCapture?.(e.pointerId);
@@ -385,7 +393,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
         onPointerdown: (e: PointerEvent) => startConnect(e, ref, side),
         onKeydown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); portActivate(ref, side); } },
       }),
-      port.label != null && h("span", { class: "hm-flow-portlabel" }, () => val(port.label)));
+      port.label != null && h(OverflowText, { class: "hm-flow-portlabel", fade: false }, () => val(port.label)));
   }
 
   function control(n: NodeState, f: FlowField, id: string): unknown {
@@ -394,7 +402,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       if (untrack(() => n.data()[f.key]) === v) return;
       flow.change(t`Edit ${val(f.label)}`, () => n.data.set({ ...n.data.peek(), [f.key]: v }));
     };
-    const common = { id, get value() { return get(); }, onChange: set };
+    const common = { id, value: live(get), onChange: set }; // live: an undo or a loaded document reaches the control
     if (f.kind === "number") return h(NumberInput, { ...common, min: f.min ?? null, max: f.max ?? null } as never);
     if (f.kind === "select") return h(Select, { ...common, options: f.options } as never);
     if (f.kind === "toggle") return h(Toggle, common as never);
@@ -428,18 +436,20 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     },
       h("span", { class: "hm-flow-glow", "aria-hidden": "true", ref: (x: HTMLElement) => { glow = x; } }),
       h("div", { class: "hm-flow-head" },
-        h("span", { class: "hm-flow-icon", "aria-hidden": "true" }, icon(ty?.icon)),
+        h(IconTile, { class: "hm-flow-icon", size: "sm", icon: ty?.icon ?? null, color: ty?.color }),
         h(OverflowText, { class: "hm-flow-title" }, title),
-        h("span", { class: "hm-flow-state", "aria-hidden": "true" }, () => (status() === "done" ? glyph(check) : status() === "error" ? glyph(alertCircle) : null))),
+        h("span", { class: "hm-flow-state", "aria-hidden": "true" }, () => {
+          const s = status();
+          return s === "done" || s === "error" ? h(CheckMark, { value: s === "done", variant: "solid", size: "sm", label: false, icons: { no: alertCircle } })
+            : s === "running" || s === "queued" ? h(StatusDot, { tone: s === "running" ? "primary" : "neutral", size: "lg" }) : null;
+        })),
       rows > 0 && h("div", { class: "hm-flow-ports" }, Array.from({ length: rows }, (_, i) => h("div", { class: "hm-flow-portline" },
         ins[i] ? Port(n, ins[i]!, "in") : h("span"), outs[i] ? Port(n, outs[i]!, "out") : h("span")))),
       () => (val(props.fields) ?? true) && ty?.fields?.length ? h("div", { class: "hm-flow-fields" }, ty.fields.map((f) => { const id = uid("hm-flow-f"); return h(Field, { id, label: () => val(f.label), compact: true }, control(n, f, id)); })) : null,
-      () => { const err = flow.errors().get(n.id); return err ? h("div", { class: "hm-flow-error", role: "status" }, err) : null; },
+      () => { const err = flow.errors().get(n.id); return err ? h(Alert, { class: "hm-flow-error", tone: "danger", icon: null }, err) : null; },
     ) as HTMLElement;
     // measured height feeds layout, minimap and the box selection
-    const ro = typeof ResizeObserver === "function" ? new ResizeObserver(() => n.h.set(el.offsetHeight || n.h.peek())) : null;
-    ro?.observe(el);
-    onCleanup(() => ro?.disconnect());
+    if (typeof ResizeObserver === "function") observeSize(el, () => n.h.set(el.offsetHeight || n.h.peek()));
     // run state: glow while running, a shake on error, a pop when done (all on the motion engine)
     let pulse: { cancel(): void } | null = null;
     effect(() => {
@@ -601,7 +611,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   },
     world,
     () => { const m = marquee(); return m ? h("div", { class: "hm-flow-marquee", style: { "inset-inline-start": `${Math.min(m.x0, m.x1)}px`, "inset-block-start": `${Math.min(m.y0, m.y1)}px`, width: `${Math.abs(m.x1 - m.x0)}px`, height: `${Math.abs(m.y1 - m.y0)}px` } }) : null; },
-    () => (val(props.controls) === false ? null : h("div", { class: "hm-flow-zoom", onPointerdown: (e: PointerEvent) => e.stopPropagation() },
+    () => (val(props.controls) === false ? null : h(Toolbar, { class: "hm-flow-zoom", label: () => L().view ?? t`View` },
       part("zoom") && [
         h(IconButton, { icon: glyph(minus), label: () => L().zoomOut ?? t`Zoom out`, size: "sm", onClick: () => view.zoomBy(1 / 1.2) }),
         h("span", { class: "hm-flow-zoomval", "aria-live": "off" }, () => `${Math.round(vp().zoom * 100)}%`),
@@ -609,7 +619,6 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       part("fit") && h(IconButton, { icon: glyph(fitIcon), label: () => L().fit ?? t`Fit to view`, size: "sm", onClick: () => view.fit() }),
       part("layout") && h(IconButton, { icon: glyph(layoutIcon), label: () => L().layout ?? t`Auto layout`, size: "sm", onClick: () => view.layout() }))),
     () => ((val(props.minimap) ?? true) ? h(Minimap, { flow, size, label: () => L().minimap }) : null),
-    h("div", { class: "hm-sr-only", "aria-live": "polite" }, live),
   ) as HTMLElement;
 
   const owner = getOwner();
@@ -622,9 +631,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   // first frame: the direction is known and nodes are measured; frame the drawing. Until the user moves the view, the
   // drawing is framed again whenever the canvas gets its real size (a lazy page or a tab lays it out later).
   nextFrame(() => { dirTick.set(1); if (root?.isConnected) view.fit(false); }, "write");
-  const ro = typeof ResizeObserver === "function" ? new ResizeObserver(() => { if (!touched && root.clientWidth > 0) nextFrame(() => { if (!touched) view.fit(false); }, "write"); }) : null;
-  ro?.observe(canvas);
-  onCleanup(() => ro?.disconnect());
+  if (typeof ResizeObserver === "function") observeSize(canvas, () => { if (!touched && root.clientWidth > 0) nextFrame(() => { if (!touched) view.fit(false); }, "write"); });
   const stopAuto = (): void => { touched = true; };
   listen(canvas, { wheel: stopAuto, keydown: stopAuto, pointerdown: stopAuto }, { capture: true, passive: true });
 

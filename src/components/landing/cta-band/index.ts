@@ -8,12 +8,12 @@ import { Overlay } from "../../../ui/overlay.ts";
 import { Reveal, type RevealOptions } from "../reveal/index.ts";
 import { SiteSection } from "../site-section/index.ts";
 import { VideoBackground } from "../video-background/index.ts";
-import { actionButtons, type HeroAction } from "../hero/index.ts";
+import { SectionHead, type SectionAction } from "../section-head/index.ts";
 
 export interface CtaBandProps {
   title: MaybeFn<unknown>;
   lead?: MaybeFn<unknown> | undefined;
-  actions?: readonly (HeroAction | Node)[] | undefined;
+  actions?: readonly (SectionAction | Node)[] | undefined;
   note?: MaybeFn<unknown> | undefined;
   variant?: "gradient" | "mesh" | "glass" | "plain" | "video" | undefined;
   video?: { src: string; poster?: string | undefined } | undefined;
@@ -28,11 +28,10 @@ export interface CtaBandProps {
 /** `<CtaBand title="Ready to build?" lead="…" actions={[{ label: "Start free", href: "/start" }]} variant="gradient" />` */
 export function CtaBand(props: CtaBandProps): Element {
   const variant = props.variant ?? "gradient";
-  const copy = h("div", { class: cx("hm-cta-copy", props.align === "start" && "hm-cta-start") },
-    h("h2", { class: "hm-cta-title" }, () => val(props.title)),
-    props.lead != null && h("p", { class: "hm-cta-lead" }, () => val(props.lead)),
-    props.actions?.length ? h("div", { class: "hm-cta-actions" }, actionButtons(props.actions)) : null,
-    props.note != null && h("p", { class: "hm-cta-note" }, () => val(props.note)));
+  const copy = h(SectionHead, {
+    class: "hm-cta-copy", size: "lg", align: props.align ?? "center", title: () => val(props.title),
+    lead: props.lead != null ? () => val(props.lead) : undefined, actions: props.actions, note: props.note != null ? () => val(props.note) : undefined,
+  });
   const layers = props.backdrop === false ? []
     : variant === "gradient" ? [h(Overlay, { effect: "gradient" }), h(Overlay, { effect: "noise", opacity: 0.5 }), h(Overlay, { effect: "spotlight", class: "hm-cta-light" })]
     : variant === "mesh" ? [h(Overlay, { effect: "mesh" }), h(Overlay, { effect: "spotlight" })]

@@ -9,7 +9,11 @@ import { h } from "../../../dom/h.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, uid, val, clamp, setStyle, type ClassProp } from "../../../core/util.ts";
-import { model, ctl, type ControlProps } from "../../../forms/util.ts";
+import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
+import { Field } from "../../../forms/field.ts";
+import { Button } from "../../actions/button/index.ts";
+import { Card } from "../../data/card/index.ts";
+import { NumberInput } from "../../forms/number-input/index.ts";
 import { ease, defineEasing } from "../../../motion/engine/ease.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { reducedNow } from "../../../motion/engine/prefs.ts";
@@ -195,22 +199,22 @@ export function EasingCurveEditor(props: EasingCurveEditorProps): unknown {
 
   // ------------------------------------------------------------------ inputs and presets
   const LABELS = ["x1", "y1", "x2", "y2"];
-  const inputs = h("div", { class: "hm-ec-inputs" }, LABELS.map((l, i) => h("label", { class: "hm-ec-field" },
-    h("span", null, l),
-    h("input", {
-      type: "number", class: "hm-input hm-ec-num", step: "0.01", min: i % 2 ? "-0.6" : "0", max: i % 2 ? "1.6" : "1", readonly: () => !!props.readonly, disabled: () => !!props.disabled,
-      value: () => String(bz()[i]), "aria-label": () => (props.labels?.controlPoint ? props.labels.controlPoint(l) : t`Control point ${l}`),
-      onInput: (e: Event) => { const n = Number((e.target as HTMLInputElement).value); if (Number.isFinite(n)) { const b = [...bz.peek()] as Bezier; b[i] = n; commit(b); } },
+  // CSS numbers: always written with a dot
+  const inputs = h("div", { class: "hm-ec-inputs" }, LABELS.map((l, i) => h(Field, { id: `${id}-${l}`, compact: true, class: "hm-ec-field", label: l },
+    h(NumberInput, {
+      id: `${id}-${l}`, class: "hm-ec-num", locale: "en", step: 0.01, decimals: 3, min: i % 2 ? -0.6 : 0, max: i % 2 ? 1.6 : 1, readonly: live(() => !!props.readonly), disabled: live(() => !!props.disabled),
+      value: live(() => bz()[i]!), "aria-label": live(() => (props.labels?.controlPoint ? props.labels.controlPoint(l) : t`Control point ${l}`)),
+      onChange: (n: number | null) => { if (n != null) { const b = [...bz.peek()] as Bezier; b[i] = n; commit(b); } },
     }))));
   const presets = (): readonly EasingPreset[] => (props.presets === false ? [] : props.presets ?? EASING_PRESETS);
   const same = (b: Bezier): boolean => b.every((v, i) => Math.abs(v - bz()[i]!) < 0.005);
-  const presetRow = () => (presets().length ? h("div", { class: "hm-ec-presets", role: "group", "aria-label": () => props.labels?.presets ?? t`Presets` }, presets().map((p) => h("button", {
-    type: "button", class: () => cx("hm-ec-preset", same(p.value) && "is-on"), "aria-pressed": () => String(same(p.value)), disabled: ro, title: p.label ?? p.name,
-    onClick: () => commit([...p.value] as Bezier),
-  }, h("svg", { ...NS, viewBox: "-4 -140 108 180", class: "hm-ec-thumb", "aria-hidden": "true" }, h("path", { d: curvePath(p.value) })), h("span", null, p.label ?? p.name)))) : null);
+  const presetRow = () => (presets().length ? h("div", { class: "hm-ec-presets", role: "group", "aria-label": () => props.labels?.presets ?? t`Presets` }, presets().map((p) => h(Button, {
+    class: "hm-ec-preset", pressed: () => same(p.value), disabled: ro, title: p.label ?? p.name, onClick: () => commit([...p.value] as Bezier),
+    icon: h("svg", { ...NS, viewBox: "-4 -140 108 180", class: "hm-ec-thumb", "aria-hidden": "true" }, h("path", { d: curvePath(p.value) })),
+  }, p.label ?? p.name))) : null);
 
-  return h("div", {
-    class: () => cx("hm-ec", props.compact && "hm-ec-compact", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? t`Easing curve editor`, "data-hm-color": c["data-hm-color"],
+  return h(Card, {
+    as: "div", class: () => cx("hm-ec", props.compact && "hm-ec-compact", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? t`Easing curve editor`, "data-hm-color": c["data-hm-color"],
     ref: (el: HTMLElement) => {
       root = el;
       // own handle colors: theme tokens → the two CSS variables the handles read

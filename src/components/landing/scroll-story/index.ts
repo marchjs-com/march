@@ -5,11 +5,12 @@
 // with its own picture above its text, so the picture and its words are always seen together.
 import "./scroll-story.css";
 import { h } from "../../../dom/h.ts";
-import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
+import { signal, effect, untrack } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
-import { animate } from "../../../motion/engine/playback.ts";
-import { reducedMotion } from "../../../motion/engine/prefs.ts";
+import { owned, observeSize } from "../../../ui/observe.ts";
+import { swapTransition } from "../../../motion/engine/parts.ts";
+import { PageDots } from "../../navigation/page-dots/index.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
 
 export interface StoryStep {
@@ -48,7 +49,7 @@ export function ScrollStory(props: ScrollStoryProps): Element {
     props.numbers === false ? null : h("span", { class: "hm-story-num", "aria-hidden": "true" }, typeof props.numbers === "function" ? props.numbers(i) : String(i + 1).padStart(2, "0")),
     h("h3", { class: "hm-story-title" }, s.title),
     s.body != null ? h("p", { class: "hm-story-body" }, s.body) : null) as HTMLElement);
-  const dots = props.dots === false ? null : h("ol", { class: "hm-story-dots", "aria-hidden": "true" }, props.steps.map((_, i) => h("li", { class: () => cx("hm-story-dot", active() === i && "is-active") })));
+  const dots = props.dots === false ? null : h(PageDots, { class: "hm-story-dots", count: props.steps.length, value: active, decorative: true });
   const root = h("section", {
     class: cx("hm-story", props.side === "start" && "hm-story-media-start", props.theme !== false && "is-themed", val(props.class)),
     "data-hm-color": () => (props.theme !== false ? colorAttr(props.steps[active()]?.color) : null),
@@ -58,11 +59,7 @@ export function ScrollStory(props: ScrollStoryProps): Element {
 
   // narrow (by the section's own width): each picture moves into its step card; wide: back into the pinned stage
   const stage = root.querySelector(".hm-story-stage") as HTMLElement;
-  if (globalThis.ResizeObserver) {
-    const ro = new ResizeObserver(() => { const n = root.clientWidth > 0 && root.clientWidth < 820; if (n !== stacked.peek()) stacked.set(n); });
-    ro.observe(root);
-    if (getOwner()) onCleanup(() => ro.disconnect());
-  }
+  observeSize(root, () => { const n = root.clientWidth > 0 && root.clientWidth < 820; if (n !== stacked.peek()) stacked.set(n); });
   effect(() => {
     const n = stacked();
     root.classList.toggle("is-stacked", n);
@@ -70,33 +67,23 @@ export function ScrollStory(props: ScrollStoryProps): Element {
   });
 
   // the active step: the one whose middle is nearest the viewport middle
-  const offScroll = onScrollProgress({ track: root }, () => {
+  owned(onScrollProgress({ track: root }, () => {
     const mid = (globalThis.innerHeight || 800) / 2;
     let best = 0, dist = Infinity;
     steps.forEach((el, i) => { const r = el.getBoundingClientRect(); const d = Math.abs(r.top + r.height / 2 - mid); if (d < dist) { dist = d; best = i; } });
     if (best !== active.peek()) active.set(best);
-  });
-  if (getOwner()) onCleanup(offScroll);
+  }));
   let prev = 0;
   effect(() => {
     const i = active();
     untrack(() => {
       props.onStep?.(i);
+      const from = prev;
+      prev = i;
       // stacked: every picture is shown in its own card, nothing cross-fades
-      const tr = props.transition ?? "rise";
-      if (i === prev || reducedMotion() || stacked.peek() || tr === "none") { prev = i; return; }
-      const dir = i > prev ? 1 : -1;
-      const inEl = media[i], outEl = media[prev];
-      prev = i;
-      if (typeof tr === "function") { if (inEl) tr(inEl, outEl, dir); return; }
-      if (tr === "fade") {
-        if (inEl) animate(inEl, { opacity: [0, 1] }, { duration: 520, easing: "out" });
-        if (outEl) animate(outEl, { opacity: [1, 0] }, { duration: 420, easing: "out" });
-        return;
-      }
-      if (inEl) animate(inEl, { opacity: [0, 1], transform: [`translate3d(0, ${24 * dir}px, 0) scale(.97)`, "translate3d(0, 0, 0) scale(1)"] }, { duration: 620, easing: "expo" });
-      if (outEl) animate(outEl, { opacity: [1, 0], transform: ["scale(1)", `translate3d(0, ${-16 * dir}px, 0) scale(.98)`] }, { duration: 420, easing: "out" });
-      prev = i;
+      if (i === from || stacked.peek()) return;
+      const tr = props.transition ?? "rise", fade = tr === "fade";
+      void swapTransition(media[i], media[from], tr, { dir: i > from ? 1 : -1, duration: fade ? 520 : 620, easing: fade ? "out" : "expo", leaveDuration: 420, leaveEasing: "out", leavingClass: false });
     });
   });
   return root;

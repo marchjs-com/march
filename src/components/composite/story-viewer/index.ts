@@ -2,13 +2,18 @@
 // start third goes back and anywhere else forward (mirrored in RTL); pressing and holding pauses; a horizontal swipe
 // changes person with a slide; dragging down shrinks the story and closes it past a threshold. A reply field and a
 // LikeButton sit at the bottom (typing pauses). Keyboard: ← → move, Space pauses, Esc closes (Dialog).
-import { signal, effect, computed, untrack, onCleanup } from "../../../core/reactive.ts";
+import { signal, effect, computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, setStyle, clamp, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, setStyle, clamp, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { applyPipe } from "../../../core/pipes.ts";
 import { Dialog } from "../../../ui/dialog.ts";
-import { Avatar } from "../../../ui/avatar.ts";
+import { Avatar } from "../../social/avatar/index.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { ListRow } from "../../data/list-row/index.ts";
+import { TextInput } from "../../forms/text-input/index.ts";
+import { live } from "../../../forms/util.ts";
+import { Picture } from "../../media/picture/index.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { send } from "../../../icons/glyphs/send.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
@@ -78,6 +83,7 @@ function body(props: StoryViewerProps): Element {
   const group = computed(() => groups()[gi()] as StoryGroup);
   const item = computed(() => group()?.items[ii()] as StoryItem);
   const paused = (): boolean => hold() || manual() || typing();
+  const draft = signal("");
   let root!: HTMLElement, stage!: HTMLElement, input!: HTMLInputElement;
   const L = (): NonNullable<StoryViewerProps["labels"]> => props.labels ?? {};
   const replyName = (): string => (group() && L().reply?.(group())) || t`Reply to ${group()?.name ?? ""}`;
@@ -163,10 +169,10 @@ function body(props: StoryViewerProps): Element {
 
   const reply = (e: Event): void => {
     e.preventDefault();
-    const text = input.value.trim();
+    const text = draft().trim();
     if (!text || !props.onReply) return;
     props.onReply(group(), item(), text);
-    input.value = ""; input.blur();
+    draft.set(""); input.blur();
     if (props.sentNote === false) return;
     const sent = h("span", { class: "hm-story-sent", role: "status" }, L().sent ?? t`Sent`) as HTMLElement;
     root.append(sent);
@@ -175,26 +181,31 @@ function body(props: StoryViewerProps): Element {
 
   return h("div", { class: () => cx("hm-story", paused() && "is-paused"), ref: (x: HTMLElement) => { root = x; }, onKeydown: key },
     h("div", { class: "hm-story-stage", ref: (x: HTMLElement) => { stage = x; gesture(x); }, onContextmenu: (e: Event) => e.preventDefault() },
-      () => { const it = item(); return it ? h("img", { class: "hm-story-media", src: it.src, alt: it.alt ?? "", draggable: "false", decoding: "async" }) : null; },
+      () => { const it = item(); return it ? h(Picture, { class: "hm-story-media", src: it.src, alt: it.alt ?? "", fit: "cover", loading: "eager", draggable: "false" }) : null; },
       h("div", { class: "hm-story-scrim", "aria-hidden": "true" }),
       h("div", { class: "hm-story-top" },
         props.progress === false ? null : h(StoryProgress, { count: () => group()?.items.length ?? 1, index: ii, run: () => `${gi()}:${item()?.id}`, paused, duration: () => item()?.duration ?? val(props.duration) ?? 6000, onDone: next }),
-        h("div", { class: "hm-story-head" },
-          props.avatar === false ? null : () => h(Avatar, { name: group()?.name, src: group()?.avatar, size: "sm" }),
-          h("span", { class: "hm-story-who" },
+        // who: a ListRow (avatar · name and time · the pause and close buttons)
+        h(ListRow, {
+          class: "hm-story-head", overflow: "ellipsis",
+          lead: props.avatar === false ? null : () => h(Avatar, { name: group()?.name, src: group()?.avatar, size: "sm" }),
+          title: h("span", { class: "hm-story-who" },
             h("b", null, () => group()?.name ?? ""),
             props.time === false ? null : h("span", { class: "hm-story-time" }, () => (item()?.time ? applyPipe("relative", item()!.time) : ""))),
-          props.pauseButton === false ? null : h("button", { type: "button", class: "hm-story-btn hm-story-pause", "aria-pressed": () => String(manual()), "aria-label": () => (manual() ? L().play ?? t`Play` : L().pause ?? t`Pause`), onClick: () => manual.set(!manual()) },
-            h("span", { class: () => cx("hm-story-pp", manual() && "is-play"), "aria-hidden": "true" }, h("i"), h("i"))),
-          props.closeButton === false ? null : h("button", { type: "button", class: "hm-story-btn hm-story-close", "aria-label": () => L().close ?? t`Close`, onClick: () => { void close(); } }, glyph(xIcon)))),
+          actions: props.pauseButton === false && props.closeButton === false ? null : [
+            props.pauseButton === false ? null : h(IconButton, { class: "hm-story-btn hm-story-pause", inverse: true, shape: "round", title: false, pressed: manual, label: () => (manual() ? L().play ?? t`Play` : L().pause ?? t`Pause`), onClick: () => manual.set(!manual()),
+              icon: h("span", { class: () => cx("hm-story-pp", manual() && "is-play"), "aria-hidden": "true" }, h("i"), h("i")) }),
+            props.closeButton === false ? null : h(IconButton, { class: "hm-story-btn hm-story-close", inverse: true, shape: "round", title: false, icon: xIcon, label: () => L().close ?? t`Close`, onClick: () => { void close(); } }),
+          ],
+        })),
       () => { const c = item()?.caption; return c ? h("p", { class: "hm-story-caption" }, c) : null; },
-      props.arrows === false ? null : h("button", { type: "button", class: "hm-story-nav hm-story-prev", "aria-label": () => L().previous ?? t`Previous story`, onClick: prev }, glyph(chevronLeft)),
-      props.arrows === false ? null : h("button", { type: "button", class: "hm-story-nav hm-story-next", "aria-label": () => L().next ?? t`Next story`, onClick: next }, glyph(chevronRight))),
+      props.arrows === false ? null : h(IconButton, { class: "hm-story-nav hm-story-prev", inverse: true, variant: "raised", shape: "round", title: false, icon: chevronLeft, label: () => L().previous ?? t`Previous story`, onClick: prev }),
+      props.arrows === false ? null : h(IconButton, { class: "hm-story-nav hm-story-next", inverse: true, variant: "raised", shape: "round", title: false, icon: chevronRight, label: () => L().next ?? t`Next story`, onClick: next })),
     props.onReply || props.onLike ? h("form", { class: "hm-story-bar", onSubmit: reply },
-      props.onReply ? h("input", { class: "hm-story-input", type: "text", enterkeyhint: "send", autocomplete: "off", ref: (x: HTMLInputElement) => { input = x; },
-        placeholder: () => (group() && L().replyPlaceholder?.(group())) || t`Reply to ${group()?.name ?? ""}…`, "aria-label": replyName,
+      props.onReply ? h(TextInput, { class: "hm-story-input", value: draft, autocomplete: "off", ref: (x: HTMLInputElement) => { input = x; x.setAttribute("enterkeyhint", "send"); },
+        placeholder: live(() => (group() && L().replyPlaceholder?.(group())) || t`Reply to ${group()?.name ?? ""}…`), "aria-label": live(replyName),
         onFocus: () => typing.set(true), onBlur: () => typing.set(false) }) : null,
       props.onLike ? h(LikeButton, { liked, size: "lg", label: () => L().like ?? t`Like story`, onToggle: (on: boolean) => { liked.set(on); props.onLike?.(group(), item(), on); } }) : null,
-      props.onReply ? h("button", { type: "submit", class: "hm-story-btn hm-story-send", "aria-label": () => L().send ?? t`Send` }, glyph(send)) : null) : null,
+      props.onReply ? h(IconButton, { type: "submit", class: "hm-story-btn hm-story-send", inverse: true, shape: "round", title: false, icon: send, label: () => L().send ?? t`Send` }) : null) : null,
     h("p", { class: "hm-sr-only", "aria-live": "polite" }, () => (group() ? L().status?.(group(), ii(), group().items.length) ?? t`${group().name}: story ${ii() + 1} of ${group().items.length}` : "")));
 }

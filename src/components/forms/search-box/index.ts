@@ -42,6 +42,8 @@ export interface SearchBoxProps {
   clear?: boolean | unknown | undefined;
   /** Accessible name of the clear button (default "Clear search"). */
   clearLabel?: MaybeFn<string | undefined>;
+  /** Extra class on the input element (the host's own hook for it). */
+  inputClass?: string | undefined;
   /** Called with the input element (focus it, measure it). */
   inputRef?: ((el: HTMLInputElement) => void) | undefined;
   /** Keys of the input, before the box's own Escape / Enter; `preventDefault()` skips those. */
@@ -91,7 +93,7 @@ export function SearchBox(props: SearchBoxProps): Element {
   },
   props.icon === false ? null : ownIcon ? icon(props.icon, "hm-search-icon") : h("span", { class: "hm-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
   h("input", {
-    type: "search", id: props.id, class: () => cx("hm-input hm-search-input", val(props.size) === "sm" && "hm-input-sm"), ref: (x: HTMLInputElement) => { input = x; props.inputRef?.(x); }, value: current.peek(),
+    type: "search", id: props.id, class: () => cx("hm-input hm-search-input", val(props.size) === "sm" && "hm-input-sm", props.inputClass), ref: (x: HTMLInputElement) => { input = x; props.inputRef?.(x); }, value: current.peek(),
     placeholder: () => val(props.placeholder) ?? t`Search…`, "aria-label": () => val(props.label) ?? val(props.placeholder) ?? t`Search`,
     autocomplete: "off", spellcheck: "false", disabled: () => !!val(props.disabled),
     role: combobox ? "combobox" : null, "aria-autocomplete": combobox ? "list" : null, "aria-controls": props.controls ?? null,

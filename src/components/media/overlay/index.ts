@@ -9,6 +9,7 @@ import { signal, getOwner, effect } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { listen } from "../../../core/util.ts";
+import { mediaKind } from "../media/kind.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export type OverlayEffect = "glass" | "gradient" | "mesh" | "noise" | "vignette" | "spotlight" | "grid" | "dots";
@@ -64,7 +65,6 @@ export interface OverlayProps {
   class?: ClassProp;
 }
 
-const VIDEO = /\.(mp4|webm|ogv|mov|m4v)(\?|#|$)/i;
 const SVG = /\.svg(\?|#|$)/i;
 const len = (v: OverlayLength | undefined): string | null => (v == null ? null : typeof v === "number" ? `var(--hm-space-${v}, ${v * 4}px)` : v);
 let seq = 0;
@@ -82,7 +82,7 @@ export const quietMedia = (): boolean => {
 export function Overlay(props: OverlayProps): Element {
   const order = props.layer ?? ++seq;
   const kind = props.draw ? "canvas" : props.effect && !props.src && !props.svg ? "effect" : props.svg ? "svg"
-    : props.type ?? (VIDEO.test(String(val(props.src) ?? "")) ? "video" : SVG.test(String(val(props.src) ?? "")) ? "svg" : "image");
+    : props.type ?? (mediaKind(val(props.src)) === "video" ? "video" : SVG.test(String(val(props.src) ?? "")) ? "svg" : "image");
   const meaningful = kind === "image" && !!props.alt;
   // physical sides on request (left / right): part of the class list, so a class change keeps it
   const physical = props.left != null || props.right != null;

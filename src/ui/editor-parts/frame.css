@@ -1,0 +1,10 @@
+/* March — the frame the editors share (MarkdownEditor, RichTextEditor, TreeEditor): border, focus ring, and the look of
+   their head and foot bars (PanelHeader). One definition; the editors add only what is their own. */
+.hm-editor-frame { --hm-editor-accent: var(--hm-accent, var(--hm-primary)); display: flex; flex-direction: column; min-inline-size: 0; max-inline-size: 100%;
+  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); color: var(--hm-text);
+  transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
+.hm-editor-frame:focus-within { border-color: var(--hm-editor-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-editor-accent) 16%, transparent); }
+.hm-editor-frame.is-disabled { opacity: .6; }
+.hm-panel-header.hm-editor-head { --hm-ph-pad: var(--hm-space-2); flex-wrap: wrap; border-start-start-radius: inherit; border-start-end-radius: inherit; }
+.hm-panel-header.hm-editor-foot { --hm-ph-pad: var(--hm-space-4); min-block-size: 0; padding-block: var(--hm-space-1) var(--hm-space-2); color: var(--hm-faint); font-size: var(--hm-text-xs); font-variant-numeric: tabular-nums; }
+.hm-editor-foot > .hm-panel-header-body { flex-wrap: wrap; gap: var(--hm-space-1) var(--hm-space-2); }

@@ -2,16 +2,36 @@
 // (core/date.ts, shared with Scheduler and Gantt) so DST never shifts a day.
 import "./calendar.css";
 import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
-import { svgIcon } from "../../../icons/svg.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { model, cx, uid, type ControlProps } from "../../../forms/util.ts";
-import { ownPart } from "../../../forms/rows.ts";
+import { ownPart } from "../../../ui/parts.ts";
 import { colorAttr } from "../../../theme/colors.ts";
-import { utcDate as utc, isIso, todayIso, addDays, addMonths, dayOfWeek as dow, firstDayOf, dateFormat as dtf, type IsoDate } from "../../../core/date.ts";
+import { utcDate as utc, isIso, todayIso, addDays, addMonths, dayOfWeek as dow, firstDayOf, monthGrid, weekdayNames, dateFormat as dtf, type IsoDate } from "../../../core/date.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
 export type { IsoDate };
+
+/**
+ * The day a key moves to in a grid of days (a month view): arrows ±1 day / ±1 week, Home / End the ends of the week,
+ * PageUp / PageDown ±1 month (with Shift: ±1 year). null when the key is not a move. `forward` is -1 where the
+ * columns run right to left. Shared by Calendar and any other day grid (Scheduler's month view).
+ */
+export function dayGridKey(e: { key: string; shiftKey?: boolean }, iso: IsoDate, firstDay: number, forward: 1 | -1 = 1): IsoDate | null {
+  const col = (dow(iso) - firstDay + 7) % 7;
+  switch (e.key) {
+    case "ArrowLeft": return addDays(iso, -forward);
+    case "ArrowRight": return addDays(iso, forward);
+    case "ArrowUp": return addDays(iso, -7);
+    case "ArrowDown": return addDays(iso, 7);
+    case "Home": return addDays(iso, -col);
+    case "End": return addDays(iso, 6 - col);
+    case "PageUp": return addMonths(iso, e.shiftKey ? -12 : -1);
+    case "PageDown": return addMonths(iso, e.shiftKey ? 12 : 1);
+    default: return null;
+  }
+}
 
 /** Keep an ISO date inside min / max. */
 export const clampIso = (iso: string, min: string | null | undefined, max: string | null | undefined) => (min && iso < min ? min : max && iso > max ? max : iso);
@@ -62,22 +82,11 @@ export function Calendar(props: CalendarProps): unknown {
   const go = (iso: string, keyboard: boolean) => { moveFocus = keyboard; focus.set(clampIso(iso, props.min, props.max)); };
   const pick = (iso: string) => { if (disabled(iso)) return; set(iso); props.onPick?.(iso); };
   const onKeyDown = (e: KeyboardEvent) => {
-    const f = focus.peek(), fd = props.firstDay ?? firstDayOf(loc());
-    const k = e.key;
-    let next: string | null = null;
-    if (k === "ArrowLeft") next = addDays(f, -1);
-    else if (k === "ArrowRight") next = addDays(f, 1);
-    else if (k === "ArrowUp") next = addDays(f, -7);
-    else if (k === "ArrowDown") next = addDays(f, 7);
-    else if (k === "PageUp") next = addMonths(f, e.shiftKey ? -12 : -1);
-    else if (k === "PageDown") next = addMonths(f, e.shiftKey ? 12 : 1);
-    else if (k === "Home") next = addDays(f, -((dow(f) - fd + 7) % 7));
-    else if (k === "End") next = addDays(f, 6 - ((dow(f) - fd + 7) % 7));
-    else if (k === "Enter" || k === " ") { e.preventDefault(); pick(f); return; }
-    else if (k === "Escape" && props.onEscape) { e.preventDefault(); props.onEscape(); return; }
-    else return;
-    e.preventDefault();
-    go(next, true);
+    const f = focus.peek(), k = e.key;
+    const next = dayGridKey(e, f, props.firstDay ?? firstDayOf(loc()));
+    if (next != null) { e.preventDefault(); go(next, true); }
+    else if (k === "Enter" || k === " ") { e.preventDefault(); pick(f); }
+    else if (k === "Escape" && props.onEscape) { e.preventDefault(); props.onEscape(); }
   };
   const grid = h("div", {
     role: "grid", class: "hm-cal-grid", "aria-labelledby": titleId, onKeyDown,
@@ -90,14 +99,13 @@ export function Calendar(props: CalendarProps): unknown {
       if (key !== shown) {
         shown = key;
         title.textContent = dtf(l, { month: "long", year: "numeric" }).format(utc(`${f.slice(0, 7)}-01`));
-        const wk = dtf(l, { weekday: "short" }), wl = dtf(l, { weekday: "long" });
-        head.replaceChildren(...Array.from({ length: 7 }, (_, i) => { const d = new Date(Date.UTC(2023, 0, 1 + ((fd + i) % 7))); return h("span", { role: "columnheader", class: "hm-cal-wd", title: wl.format(d) }, wk.format(d)); }));
-        const first = `${f.slice(0, 7)}-01`;
-        const start = addDays(first, -((dow(first) - fd + 7) % 7));
+        const wl = dtf(l, { weekday: "long" }), long = weekdayNames(l, fd, "long");
+        head.replaceChildren(...weekdayNames(l, fd, "short").map((name, i) => h("span", { role: "columnheader", class: "hm-cal-wd", title: long[i] }, name)));
+        const days = monthGrid(f, fd);
         const rows: Element[] = [];
         for (let r = 0; r < 6; r++) {
           rows.push(h("div", { role: "row", class: "hm-cal-row" }, Array.from({ length: 7 }, (_, c) => {
-            const iso = addDays(start, r * 7 + c);
+            const iso = days[r * 7 + c]!;
             return h("button", { type: "button", role: "gridcell", class: cx("hm-cal-day", iso.slice(0, 7) !== f.slice(0, 7) && "hm-cal-out"), "data-date": iso, "aria-label": wl.format(utc(iso)) + " " + dtf(l, { dateStyle: "long" }).format(utc(iso)) }, props.renderDay ? props.renderDay(iso, +iso.slice(8)) : String(+iso.slice(8)));
           })));
         }
@@ -117,8 +125,10 @@ export function Calendar(props: CalendarProps): unknown {
     });
   });
   if (props.autoFocus) { const id = setTimeout(() => body.querySelector<HTMLElement>(`[data-date="${focus.peek()}"]`)?.focus(), 0); onCleanup(() => clearTimeout(id)); }
-  const nav = (n: number, label: () => string) => (props.nav === false ? null : h("button", { type: "button", class: cx("hm-cal-nav", n < 0 ? "hm-cal-prev" : "hm-cal-next"), "aria-label": label, onClick: () => go(addMonths(focus.peek(), n), false) },
-    ownPart(n < 0 ? props.prevIcon : props.nextIcon, () => svgIcon(n < 0 ? chevronLeft : chevronRight))));
+  const nav = (n: number, label: () => string) => (props.nav === false ? null : h(IconButton, {
+    class: cx("hm-cal-nav", n < 0 ? "hm-cal-prev" : "hm-cal-next"), size: "sm", label, onClick: () => go(addMonths(focus.peek(), n), false),
+    icon: () => ownPart(n < 0 ? props.prevIcon : props.nextIcon, () => (n < 0 ? chevronLeft : chevronRight)),
+  }));
   return h("div", { class: () => cx("hm-cal", props.class), "data-hm-color": () => colorAttr(props.color) },
     h("div", { class: "hm-cal-header" }, nav(-1, () => props.labels?.prevMonth ?? t`Previous month`), title, nav(1, () => props.labels?.nextMonth ?? t`Next month`)), grid);
 }

@@ -1,13 +1,15 @@
 // KeyValueEditor: edit an object of key → value rows (order kept, duplicate keys flagged).
 import "./key-value-editor.css";
 import "../../../ui/field.css";
-import "../../../ui/button.css";
-import { signal, computed, effect, untrack, type Accessor } from "../../../core/reactive.ts";
+import { signal, effect, untrack, type Accessor } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
-import { model, cx, useField, syncValue, labelledBy, type ControlProps } from "../../../forms/util.ts";
-import { iconBtn, sameLength } from "../../../forms/rows.ts";
+import { model, cx, live, useField, labelledBy, type ControlProps } from "../../../forms/util.ts";
+import { rowList, rowToolsProps, outsideField } from "../../../forms/rows.ts";
+import { Button } from "../../actions/button/index.ts";
+import { RowTools } from "../row-tools/index.ts";
+import { TextInput } from "../text-input/index.ts";
 
 export interface KeyValueEditorProps extends ControlProps<Record<string, string | number>> {
   keyPlaceholder?: string | undefined;
@@ -40,20 +42,21 @@ export function KeyValueEditor(props: KeyValueEditorProps): unknown {
   };
   const emit = (rs: Row[]) => { rows.set(rs); const o = toObj(rs); last = JSON.stringify(o); set(o); };
   effect(() => { const v = get() ?? {}; const s = JSON.stringify(v); if (s !== last) { last = s; untrack(() => rows.set(Object.entries(v).map(([k, x]): Row => [k, x == null ? "" : String(x)]))); } });
-  const idx = computed(() => rows().map((_, i) => i), { equals: sameLength });
+  const list = rowList(rows, emit, props);
+  const { idx, ro } = list;
   const dup = (i: number) => { const rs = rows(); const k = rs[i]?.[0].trim(); return !!k && rs.findIndex((r) => r[0].trim() === k) !== i; };
-  const ro = () => !!(props.disabled || props.readonly);
   const field = useField();
   const edit = (i: number, col: 0 | 1, v: string) => { const rs = rows.peek().map((r): Row => [...r]); rs[i]![col] = v; emit(rs); };
+  const cell = (i: Accessor<number>, col: 0 | 1, name: () => string, placeholder: () => string) => outsideField(() => h(TextInput, {
+    // the first key is the field's control (the <label for> of the enclosing Field points at it)
+    id: col === 0 && i.peek() === 0 ? props.id ?? field?.id : undefined, "aria-label": live(name), placeholder: live(placeholder), readonly: live(ro),
+    invalid: live(() => col === 0 && dup(i())), value: live(() => rows()[i()]?.[col] ?? ""), setValue: (v: string) => edit(i.peek(), col, v), onBlur: props.onBlur,
+  }));
   return h("div", { class: () => cx("hm-kv-editor", props.class), role: "group", "aria-labelledby": labelledBy(props) },
-    h(For, { each: idx, children: (i: Accessor<number>) => {
-      const k = h("input", { type: "text", class: "hm-input", id: () => (i() === 0 ? props.id ?? field?.id : null), "aria-label": () => props.labels?.key ?? t`Key`, placeholder: () => props.keyPlaceholder ?? props.labels?.key ?? t`Key`, readonly: ro, "aria-invalid": () => (dup(i()) ? "true" : null), onInput: (e: Event) => edit(i.peek(), 0, (e.target as HTMLInputElement).value), onBlur: props.onBlur }) as HTMLInputElement;
-      const v = h("input", { type: "text", class: "hm-input", "aria-label": () => props.labels?.value ?? t`Value`, placeholder: () => props.valuePlaceholder ?? props.labels?.value ?? t`Value`, readonly: ro, onInput: (e: Event) => edit(i.peek(), 1, (e.target as HTMLInputElement).value), onBlur: props.onBlur }) as HTMLInputElement;
-      syncValue(k, () => rows()[i()]?.[0]);
-      syncValue(v, () => rows()[i()]?.[1]);
-      return h("div", { class: "hm-kv-row" }, k, v,
-        () => (ro() || props.removable === false ? null : iconBtn(props.labels?.remove ?? t`Remove`, "×", () => emit(rows.peek().filter((_, j) => j !== i.peek())), undefined, props.removeIcon)),
-        () => (dup(i()) ? h("span", { class: "hm-field-error", role: "alert" }, props.labels?.duplicate ?? t`Duplicate key`) : null));
-    } }),
-    () => (ro() || props.addable === false ? null : h("button", { type: "button", class: "hm-btn hm-kv-add", onClick: () => { rows.set([...rows.peek(), ["", ""]]); } }, props.labels?.add ?? t`Add row`)));
+    h(For, { each: idx, children: (i: Accessor<number>) => h("div", { class: "hm-kv-row" },
+      cell(i, 0, () => props.labels?.key ?? t`Key`, () => props.keyPlaceholder ?? props.labels?.key ?? t`Key`),
+      cell(i, 1, () => props.labels?.value ?? t`Value`, () => props.valuePlaceholder ?? props.labels?.value ?? t`Value`),
+      () => (ro() || props.removable === false ? null : h(RowTools, rowToolsProps(list, i, { sortable: false, labels: { remove: props.labels?.remove }, icons: { remove: props.removeIcon } }))),
+      () => (dup(i()) ? h("span", { class: "hm-field-error", role: "alert" }, props.labels?.duplicate ?? t`Duplicate key`) : null)) }),
+    () => (ro() || props.addable === false ? null : h(Button, { class: "hm-kv-add", onClick: () => { rows.set([...rows.peek(), ["", ""]]); } }, props.labels?.add ?? t`Add row`)));
 }

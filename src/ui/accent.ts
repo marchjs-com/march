@@ -7,10 +7,11 @@ import { signal, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import { Dropdown } from "./menu.ts";
-import { val, cx, glyph, load, save, type MaybeFn, type ClassProp } from "./util.ts";
-import { check } from "../icons/glyphs/check.ts";
+import { val, load, save, type MaybeFn, type ClassProp } from "./util.ts";
 import { droplet } from "../icons/glyphs/droplet.ts";
-import { COLOR_TOKENS, tokenColor, type ColorToken } from "../theme/colors.ts";
+import { COLOR_TOKENS, type ColorToken } from "../theme/colors.ts";
+import { OptionList } from "../components/forms/option-list/index.ts";
+import { Swatch } from "../components/forms/swatch/index.ts";
 import { ThemeSwatch, colorTheme, restyleInstantly } from "./theme.ts";
 
 const KEY = "hm.accent";
@@ -36,13 +37,12 @@ const LABELS: Record<string, string> = { primary: "Theme", "brand-orange": "Oran
 export interface AccentPickerProps { label?: MaybeFn<string | undefined>; choices?: readonly ColorToken[]; class?: ClassProp; placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end" }
 /** The accent color choices of a theme menu (AccentPicker, ThemeMenu). */
 export function accentList(choices: readonly ColorToken[] = ACCENT_CHOICES): Element {
-  // "primary" = the theme's own colors (a swatch scoped to the theme, untouched by the accent)
-  const dot = (c: ColorToken): unknown => { if (c === "primary") return () => h(ThemeSwatch, { id: colorTheme() }); const s = h("span", { class: "hm-accent-dot", "aria-hidden": "true" }) as HTMLElement; s.style.setProperty("--hm-dot", tokenColor(c)); return s; };
-  return h("div", { class: "hm-accent-list", role: "radiogroup", "aria-label": () => t`Accent` },
-    choices.map((c) => h("button", {
-      type: "button", role: "radio", class: () => cx("hm-accent-opt", accent() === c && "is-active"), "aria-checked": () => String(accent() === c),
-      onClick: () => setAccent(c),
-    }, dot(c), h("span", { class: "hm-accent-name" }, () => t(LABELS[c] ?? c)), h("span", { class: "hm-theme-opt-check", "aria-hidden": "true" }, glyph(check))))) as Element;
+  // "primary" = the theme's own colors (a swatch scoped to the theme, untouched by the accent); the others a Swatch of the token
+  const dot = (c: ColorToken): unknown => (c === "primary" ? () => h(ThemeSwatch, { id: colorTheme() }) : h(Swatch, { color: c, size: "xs", shape: "circle", checker: false }));
+  return h(OptionList<ColorToken>, {
+    class: "hm-accent-list", label: () => t`Accent`, columns: 2, size: "sm", value: () => accent(), onPick: (c: ColorToken) => { setAccent(c); },
+    options: choices.map((c) => ({ value: c, label: () => t(LABELS[c] ?? c), icon: dot(c) })),
+  }) as Element;
 }
 
 /** Accent menu for a top bar: `<AccentPicker />` next to `<ThemePicker />`. */

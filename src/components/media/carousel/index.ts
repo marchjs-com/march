@@ -3,8 +3,12 @@ import "./carousel.css";
 import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import type { IconDef } from "../../../icons/svg.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { PageDots } from "../../navigation/page-dots/index.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 
@@ -38,13 +42,15 @@ export function Carousel(props: CarouselProps): Element {
   };
   const goTo = (i: number): void => { const s = track?.children[i] as HTMLElement | undefined; if (s && track) track.scrollTo({ left: s.offsetLeft - track.offsetLeft, behavior: props.smooth === false ? "auto" : "smooth" }); };
   const ownDot = typeof props.dots === "function" ? props.dots : null;
-  const arrow = (own: unknown, def: typeof chevronLeft): unknown => (own === undefined ? glyph(def) : icon(own, "hm-carousel-icon"));
+  const last = (): number => count() - (props.perView ?? 1);
+  // previous / next: raised round IconButtons at the sides
+  const arrow = (dir: "prev" | "next", own: unknown, def: IconDef, name: () => string, off: () => boolean, to: () => number): unknown =>
+    h(IconButton, { variant: "raised", shape: "round", class: `hm-carousel-btn hm-carousel-${dir}`, label: name, title: false, disabled: off, onClick: () => goTo(to()), icon: ownIcon(own, def, "hm-carousel-icon") });
   queueMicrotask(update);
   return h("section", { class: () => cx("hm-carousel", `hm-carousel-${props.perView ?? 1}`, props.smooth === false && "is-instant", val(props.class)), "aria-roledescription": "carousel", "aria-label": () => val(props.label) ?? t`Carousel` },
     h("div", { class: "hm-carousel-track", ref: (el: HTMLElement) => { track = el; }, onScroll: update, tabindex: "0" }, props.children),
-    props.arrows !== false && h("button", { type: "button", class: "hm-carousel-btn hm-carousel-prev", "aria-label": () => props.labels?.previous ?? t`Previous`, disabled: () => index() <= 0, onClick: () => goTo(index() - 1) }, arrow(props.prevIcon, chevronLeft)),
-    props.arrows !== false && h("button", { type: "button", class: "hm-carousel-btn hm-carousel-next", "aria-label": () => props.labels?.next ?? t`Next`, disabled: () => index() >= count() - (props.perView ?? 1), onClick: () => goTo(index() + 1) }, arrow(props.nextIcon, chevronRight)),
-    props.dots !== false && h("div", { class: "hm-carousel-dots", "data-hm-color": colorAttr(props.color) }, () => Array.from({ length: Math.max(0, count() - (props.perView ?? 1) + 1) }, (_, i) =>
-      h("button", { type: "button", class: () => cx("hm-carousel-dot", ownDot && "is-own", index() === i && "is-active"), "aria-label": () => props.labels?.slide?.(i + 1) ?? t`Slide ${i + 1}`, onClick: () => goTo(i) },
-        ownDot ? ownDot(i, () => index() === i) : null))));
+    props.arrows !== false && arrow("prev", props.prevIcon, chevronLeft, () => props.labels?.previous ?? t`Previous`, () => index() <= 0, () => index() - 1),
+    props.arrows !== false && arrow("next", props.nextIcon, chevronRight, () => props.labels?.next ?? t`Next`, () => index() >= last(), () => index() + 1),
+    props.dots !== false && h(PageDots, { class: "hm-carousel-dots", count: () => Math.max(0, last() + 1), value: index, onChange: goTo, color: props.color,
+      labels: { page: (n: number) => props.labels?.slide?.(n) ?? t`Slide ${n}` }, ...(ownDot ? { dot: ownDot } : {}) }));
 }

@@ -10,6 +10,7 @@ import { themeModes, themeList } from "../../../ui/theme.ts";
 import { accentList } from "../../../ui/accent.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { palette as paletteIcon } from "../../../icons/glyphs/palette.ts";
+import { SectionLabel } from "../../typography/section-label/index.ts";
 
 /** Props of <ThemeMenu>. */
 export interface ThemeMenuProps {
@@ -37,7 +38,7 @@ export interface ThemeMenuProps {
 /** One menu for appearance, color theme and accent: `<ThemeMenu />` (or `<ThemeMenu themes={false} accents={["primary", "brand-blue"]} />`). */
 export function ThemeMenu(props: ThemeMenuProps = {}): unknown {
   const heading = (text: () => string): Element | null => props.headings === false ? null
-    : h("p", { class: "hm-theme-menu-heading", "aria-hidden": "true" }, text) as Element;
+    : h(SectionLabel, { as: "p", class: "hm-theme-menu-heading", "aria-hidden": "true", label: text }) as Element;
   return h(Dropdown, {
     icon: props.icon === false ? undefined : props.icon ?? paletteIcon, label: () => val(props.label) ?? t`Appearance`, placement: props.placement ?? "bottom-end", class: props.class,
     panelClass: cx("hm-theme-panel hm-theme-menu", props.panelClass),

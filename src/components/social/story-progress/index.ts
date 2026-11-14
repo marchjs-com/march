@@ -1,12 +1,13 @@
-// StoryProgress (hadi-march/ui): the segmented bars on top of a story. Earlier segments are full, later ones empty and
-// the current one fills over `duration` on the motion engine (an essential animation: it keeps time with reduced
-// motion too, and "pause all" / the global speed apply). Pausing holds the fill; onDone fires when it is full.
-import { effect, untrack, onCleanup } from "../../../core/reactive.ts";
+// StoryProgress (hadi-march/ui): the segmented bars on top of a story: a line Progress in segments. Earlier segments are
+// full, later ones empty and the current one fills over `duration` on the motion engine (an essential animation: it
+// keeps time with reduced motion too, and "pause all" / the global speed apply). Pausing holds the fill; onDone fires
+// when it is full.
+import { live } from "../../../forms/util.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { animate } from "../../../motion/animate.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { Progress } from "../../feedback/progress/index.ts";
 import "./story-progress.css";
 
 export interface StoryProgressProps {
@@ -28,34 +29,12 @@ export interface StoryProgressProps {
 
 /** `<StoryProgress count={items.length} index={$i} run={item.id} paused={$hold} onDone={next} />` */
 export function StoryProgress(props: StoryProgressProps): Element {
-  let bars!: HTMLElement;
-  let play: ReturnType<typeof animate> | null = null;
-  const el = h("div", {
-    class: () => cx("hm-sprog", val(props.class)), role: "progressbar",
-    "aria-valuemin": "1", "aria-valuemax": () => String(val(props.count)), "aria-valuenow": () => String(val(props.index) + 1),
-    "aria-valuetext": () => (props.label ? props.label(val(props.index), val(props.count)) : t`Story ${val(props.index) + 1} of ${val(props.count)}`),
-    "data-hm-color": () => colorAttr(val(props.color)),
-    ref: (x: HTMLElement) => { bars = x; },
-  });
-  effect(() => {
-    const n = Math.max(1, val(props.count)), i = val(props.index), dur = val(props.duration) ?? 6000;
-    val(props.run);
-    untrack(() => {
-      play?.cancel(); play = null;
-      const segs = [...bars.children] as HTMLElement[];
-      while (segs.length < n) { const s = h("span", { class: "hm-sprog-seg" }, h("span", { class: "hm-sprog-fill" })) as HTMLElement; bars.append(s); segs.push(s); }
-      while (segs.length > n) segs.pop()?.remove();
-      segs.forEach((s, k) => { s.classList.toggle("is-done", k < i); s.classList.toggle("is-now", k === i); setStyle(s.firstElementChild as HTMLElement, { transform: k < i ? "scaleX(1)" : "scaleX(0)" }); });
-      const fill = segs[i]?.firstElementChild as HTMLElement | undefined;
-      if (!fill) return;
-      // onDone only for a fill that really ran (an environment without animation finishes at once: no timing there)
-      let p: ReturnType<typeof animate> | null = null;
-      p = animate(fill, [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], { duration: dur, easing: "linear", fill: "forwards", essential: true, onComplete: () => { if (p && play === p) props.onDone?.(); } });
-      play = p;
-      if (val(props.paused)) play.pause();
-    });
-  });
-  effect(() => { const p = !!val(props.paused); untrack(() => { if (!play) return; if (p) play.pause(); else play.play(); }); });
-  onCleanup(() => play?.cancel());
-  return el;
+  // a segmented line Progress over media: the part at `index` fills over `duration`
+  return h(Progress, {
+    variant: "line", inverse: true, class: () => cx("hm-story-progress", val(props.class)),
+    segments: () => val(props.count), value: () => val(props.index), duration: () => val(props.duration) ?? 6000,
+    paused: () => val(props.paused), run: () => val(props.run), onDone: () => props.onDone?.(),
+    valueText: (index: number, count: number) => (props.label ? props.label(index, count) : t`Story ${index + 1} of ${count}`),
+    ariaLabel: () => t`Stories`, color: live(() => val(props.color)),
+  }) as Element;
 }

@@ -39,7 +39,7 @@ test("DateRangePicker: texts, the Custom option, the separator and the pickers a
   assert.equal(dates[0].getAttribute("aria-label"), "Start");
   assert.equal(dates[1].getAttribute("aria-label"), "End");
   assert.equal(a.el.querySelector(".hm-daterange-sep").textContent, "→");
-  assert.equal(a.el.querySelector(".hm-affix-btn"), null);
+  assert.equal(a.el.querySelector(".hm-date-btn"), null);
   a.dispose();
   const b = mount(() => h(DateRangePicker, { value: { from: "2020-01-01", to: "2020-01-05" }, today: "2026-03-14", custom: false }));
   assert.equal(b.el.querySelectorAll("[role=radio]").length, 5);

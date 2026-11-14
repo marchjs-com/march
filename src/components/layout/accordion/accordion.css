@@ -11,11 +11,11 @@
 .hm-acc-icon { color: var(--hm-accent, var(--hm-primary)); }
 .hm-acc-titles { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .hm-acc-title { font-weight: 600; } .hm-acc-sub { color: var(--hm-muted); font-size: var(--hm-text-sm); }
-.hm-acc-chev { display: inline-flex; color: var(--hm-muted); transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-acc-item.is-open .hm-acc-chev { transform: rotate(180deg); }
+.hm-acc-chev { color: var(--hm-muted); }
+.hm-acc-chev.is-own { --hm-chevron-from: 0deg; inline-size: auto; block-size: auto; }
 .hm-acc-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-acc-item.is-open .hm-acc-panel { grid-template-rows: 1fr; }
 .hm-acc-inner { overflow: hidden; }
 .hm-acc-body { padding: 0 var(--hm-space-4) var(--hm-space-4); color: var(--hm-text-2); line-height: 1.6; }
-/* animated={false}: no height animation, no turning arrow */
-.hm-accordion.is-static :is(.hm-acc-item, .hm-acc-panel, .hm-acc-chev) { transition: none; }
+/* animated={false}: no height animation (the arrow gets motion={false}) */
+.hm-accordion.is-static :is(.hm-acc-item, .hm-acc-panel) { transition: none; }

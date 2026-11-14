@@ -23,7 +23,8 @@
 .hm-ba.is-dragging .hm-ba-grip, .hm-ba-handle:hover .hm-ba-grip { scale: 1.08; }
 .hm-ba-follow .hm-ba-grip { inline-size: 2.25rem; block-size: 2.25rem; }
 
-.hm-ba-label { position: absolute; inset-block-start: var(--hm-space-3); z-index: 1; padding: .3em .7em; border-radius: var(--hm-radius-full); background: var(--hm-bg); color: var(--hm-text); font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); box-shadow: var(--hm-shadow-1); pointer-events: none; transition: opacity var(--hm-dur) var(--hm-ease); }
+.hm-ba-label { position: absolute; inset-block-start: var(--hm-space-3); z-index: 1; display: inline-flex; pointer-events: none; transition: opacity var(--hm-dur) var(--hm-ease); }
+.hm-ba-label .hm-badge { background: var(--hm-bg); color: var(--hm-text); font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); box-shadow: var(--hm-shadow-1); }
 .hm-ba-label-before { inset-inline-start: var(--hm-space-3); }
 .hm-ba-label-after { inset-inline-end: var(--hm-space-3); }
 .hm-ba-vertical .hm-ba-label-after { inset-block-start: auto; inset-block-end: var(--hm-space-3); inset-inline-end: auto; inset-inline-start: var(--hm-space-3); }

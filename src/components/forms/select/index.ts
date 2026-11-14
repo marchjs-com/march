@@ -8,7 +8,8 @@ import { model, ctl, cx, normOptions, same, type ControlProps, type OptionsProp 
 export interface SelectProps<T = unknown> extends ControlProps<T | null> {
   /** [value] or [{ value, label, disabled }]; may be live. */
   options?: OptionsProp;
-  placeholder?: string | undefined;
+  /** Text of the empty first option; false: no empty option (a choice that is never empty, e.g. a language). */
+  placeholder?: string | false | undefined;
 }
 
 /** Native select. Props: options ([value] or [{value,label,disabled}], may be live), placeholder. Values keep their type. */
@@ -18,7 +19,7 @@ export function Select<T = unknown>(props: SelectProps<T>): unknown {
   const el = h("select", {
     ...ctl(props), class: cx("hm-select hm-select-field", props.class), disabled: () => !!(props.disabled || props.readonly),
     onChange: (e: Event) => { const i = (e.target as HTMLSelectElement).value; set(i === "" ? null : (opts()[+i]?.value as T | undefined) ?? null); },
-  }, () => [h("option", { value: "" }, props.placeholder ?? ""), ...opts().map((o, i) => h("option", { value: String(i), disabled: !!o.disabled }, o.label))]) as HTMLSelectElement;
+  }, () => [props.placeholder === false ? null : h("option", { value: "" }, props.placeholder ?? ""), ...opts().map((o, i) => h("option", { value: String(i), disabled: !!o.disabled }, o.label))]) as HTMLSelectElement;
   effect(() => { const i = opts().findIndex((o) => same(o.value, get())); el.value = i < 0 ? "" : String(i); });
   return el;
 }

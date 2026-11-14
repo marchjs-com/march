@@ -38,4 +38,5 @@ or "Remove …".
 
 ## Composed of
 
-Progress (upload bars), OverflowText (long file names) and the dropzone behavior (drag over, drop, accept check).
+ListRow (a file line), Progress (upload bars), IconButton (remove), Button (cancel), Badge ("Uploaded") and the dropzone
+behavior (drag over, drop, accept check).

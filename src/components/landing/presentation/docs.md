@@ -55,4 +55,4 @@ without movement. Type scales with the stage, so zoom and projectors keep the la
 
 ## Composed of
 
-IconButton; motion engine, `swipe`, `channel` (cross-tab).
+IconButton, Toolbar (the control row), Progress (the line); `swapTransition` and the motion engine, `swipe`, `channel` (cross-tab), `formatDuration`.

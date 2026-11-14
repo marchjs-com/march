@@ -6,7 +6,7 @@ export default defineMeta({
   category: "landing",
   since: "0.1.0",
   summary: "Anti-landing block: who the product is not for (and who it is for); the visitor can mark the lines that apply and gets an honest verdict.",
-  composedOf: [],
+  composedOf: ["CheckMark", "ListRow"],
   behaviors: ["role=checkbox", "aria-live verdict"],
   showcase: "/web",
   demoGroup: "sell",

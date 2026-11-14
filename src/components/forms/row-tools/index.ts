@@ -10,6 +10,7 @@ import { IconButton, type IconButtonSize } from "../../actions/icon-button/index
 import { arrowUp } from "../../../icons/glyphs/arrowUp.ts";
 import { arrowDown } from "../../../icons/glyphs/arrowDown.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
+import { ownPart } from "../../../ui/parts.ts";
 import tr from "./tr.ts";
 
 messages("tr", tr);
@@ -33,7 +34,7 @@ export interface RowToolsProps {
   disabled?: MaybeFn<boolean | undefined> | Partial<Record<RowAction, MaybeFn<boolean | undefined>>>;
   /** Own names (default "Move up", "Move down", "Remove", group "Row tools"; translated). */
   labels?: Partial<Record<RowAction | "group", MaybeFn<string | undefined>>> | undefined;
-  /** Own icons. */
+  /** Own icons: an icon, text, a node or `() => node` each (a node is copied for every row). */
   icons?: Partial<Record<RowAction, unknown>> | undefined;
   size?: MaybeFn<IconButtonSize | undefined>;
   /** Theme colour token of the icons. */
@@ -56,7 +57,7 @@ export function RowTools(props: RowToolsProps): Element {
   const run = (a: RowAction): void => { (a === "up" ? props.onUp : a === "down" ? props.onDown : props.onRemove)?.(); props.onAction?.(a); };
   return h("span", { class: () => cx("hm-row-tools", val(props.class)), role: "group", "aria-label": () => val(props.labels?.group) ?? t`Row tools` },
     (props.actions ?? ALL).map((a) => h(IconButton, {
-      class: `hm-row-tool hm-row-tool-${a}`, icon: props.icons?.[a] ?? ICON[a], label: () => name(a), size: props.size, color: props.color,
+      class: `hm-row-tool hm-row-tool-${a}`, icon: () => ownPart(props.icons?.[a], () => ICON[a]), label: () => name(a), size: props.size, color: props.color,
       variant: a === "remove" && props.danger ? "danger" : undefined, disabled: () => off(a), onClick: () => run(a),
     })));
 }

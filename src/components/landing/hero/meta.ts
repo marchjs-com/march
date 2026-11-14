@@ -6,7 +6,7 @@ export default defineMeta({
   category: "landing",
   since: "0.1.0",
   summary: "First screen in seven looks (centered, split, video, mesh, aurora, product, parallax): eyebrow, gradient-highlight title, lead, actions.",
-  composedOf: ["Reveal", "Overlay", "Button", "Badge", "VideoBackground", "Parallax"],
+  composedOf: ["Reveal", "Overlay", "Badge", "VideoBackground", "Parallax", "Picture", "SectionHead"],
   behaviors: ["scrollTimeline"],
   showcase: "/web",
   demoGroup: "hero",

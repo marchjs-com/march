@@ -41,5 +41,4 @@ change without animation, no bubble or beat, the dot stops pulsing.
 
 ## Composed of
 
-Counter (roll mode), a text animation of hadi-march/motion/text when given, the motion engine (`onFrame`, `animate`),
-`IntersectionObserver`.
+Counter (roll mode), StatusDot (the live dot), Badge (the "+N" bubble), a text animation of hadi-march/motion/text when given, the motion engine (`onFrame`, `animate`), `whenVisible`.

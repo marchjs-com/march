@@ -4,15 +4,16 @@
 // (motion engine, mirrored in RTL) and rests on the current one. On narrow screens the links move into a Drawer.
 import "./site-nav.css";
 import { h } from "../../../dom/h.ts";
-import { signal, onCleanup, getOwner } from "../../../core/reactive.ts";
+import { signal } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, val, glyph, icon, listen, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, listen, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
 import { Brand, type BrandProps } from "../../../ui/app.ts";
-import { IconButton } from "../../../ui/button.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
 import { openDrawer } from "../../../ui/dialog.ts";
 import { menu } from "../../../icons/glyphs/menu.ts";
-import { animate } from "../../../motion/engine/playback.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
+import { slidingIndicator } from "../../../motion/engine/parts.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
@@ -62,7 +63,7 @@ function toSection(e: Event, href: string): boolean {
   if (!href.startsWith("#") || href.length < 2) return false;
   e.preventDefault();
   const id = decodeURIComponent(href.slice(1));
-  const smooth = !globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const smooth = !reducedMotion();
   let tries = 0;
   const go = (): void => {
     const target = globalThis.document?.getElementById(id);
@@ -88,21 +89,9 @@ export function SiteNav(props: SiteNavProps): Element {
     return h("li", {}, a);
   })) as HTMLElement;
 
-  // the sliding pill: final place set at once, the motion engine plays the move from the old place (FLIP)
-  let shown = false, last = { x: 0, w: 0 };
-  const moveTo = (a: HTMLElement | null): void => {
-    if (props.pill === false) return;
-    if (!a) { if (shown) { animate(pill, { opacity: [1, 0] }, { duration: 160, easing: "out" }); setStyle(pill, { opacity: "0" }); shown = false; } return; }
-    const r = list.getBoundingClientRect(), b = a.getBoundingClientRect();
-    const rtl = globalThis.getComputedStyle?.(list).direction === "rtl";
-    const x = rtl ? b.right - r.right : b.left - r.left, w = b.width;
-    setStyle(pill, { width: `${w}px`, transform: `translateX(${x}px)`, opacity: "1" });
-    if (!reducedMotion()) {
-      if (shown && last.w) animate(pill, { transform: [`translateX(${last.x}px) scaleX(${(last.w / w).toFixed(4)})`, `translateX(${x}px) scaleX(1)`] }, { duration: 320, easing: "expo" });
-      else animate(pill, { opacity: [0, 1], transform: [`translateX(${x}px) scale(.9)`, `translateX(${x}px) scale(1)`] }, { duration: 200, easing: "out" });
-    }
-    shown = true; last = { x, w };
-  };
+  // the sliding pill: the shared sliding indicator (final place set at once, the move played from the old place; RTL mirrored)
+  const slide = slidingIndicator(pill, list, { enter: "pop" });
+  const moveTo = (a: HTMLElement | null): void => { if (props.pill !== false) slide.moveTo(a); };
   const current = (): HTMLElement | null => anchors.find((_, i) => val(links[i]?.active)) ?? null;
   const offList = listen(list, {
     pointerover: (e: PointerEvent) => { const a = (e.target as Element).closest?.(".hm-snav-link") as HTMLElement | null; if (a) moveTo(a); },
@@ -139,9 +128,9 @@ export function SiteNav(props: SiteNavProps): Element {
     h("div", { class: "hm-snav-brand" }, brandNode(props.brand)),
     links.length ? h("nav", { class: "hm-snav-nav", "aria-label": L.main ?? t`Main` }, list) : null,
     h("div", { class: "hm-snav-actions" }, props.actions ?? null),
-    links.length && props.menu !== false ? h(IconButton, { class: "hm-snav-menu", label: () => L.openMenu ?? t`Open menu`, onClick: openMenu }, props.menuIcon != null ? icon(props.menuIcon) : glyph(menu)) : null)) as HTMLElement;
+    links.length && props.menu !== false ? h(IconButton, { class: "hm-snav-menu", icon: props.menuIcon ?? menu, label: () => L.openMenu ?? t`Open menu`, onClick: openMenu }) : null)) as HTMLElement;
   // rest on the current link once laid out
   queueMicrotask(() => { if (nav.isConnected) moveTo(current()); });
-  if (getOwner()) onCleanup(() => { gone = true; offList(); offScroll(); });
+  owned(() => { gone = true; offList(); offScroll(); });
   return nav;
 }

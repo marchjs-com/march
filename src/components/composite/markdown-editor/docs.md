@@ -42,9 +42,13 @@ The text edits are pure functions in `md-ops.ts` (`toggleWrap`, `toggleLines`, `
 
 The views are a `tablist` (← → Home End, mirrored in RTL) controlling one `tabpanel`; the source is a labelled
 textarea; the preview is a focusable `region` named "Preview"; the split handle is a `separator` with ← → keys. Tab
-moves focus as usual except on list lines, where it indents (Shift+Tab outdents). Toolbar buttons keep the text
-selection and name their action.
+moves focus as usual except on list lines, where it indents (Shift+Tab outdents). The toolbar is a `role="toolbar"` with one tab
+stop (arrow keys, Home and End move between the buttons, mirrored in RTL); its buttons keep the text selection, name
+their action and announce their shortcut (`aria-keyshortcuts`).
 
 ## Composed of
 
-Splitter, Toolbar, IconButton, RichTextEditor (rich view, lazy); `markdownNodes` from the safe content core.
+Tabs (the view switcher: `TabList`, `variant="pill"`), PanelHeader (head and foot bars), Splitter, RichTextEditor (rich
+view, lazy); the formatting toolbar shared with RichTextEditor (`composite/editor-parts/format-toolbar.ts`: Toolbar,
+IconButton, Divider, roving focus) and the shared editor frame (`composite/editor-parts/frame.css`); `markdownNodes` from
+the safe content core.

@@ -81,4 +81,4 @@ motion engine, so reduced motion and the global pause apply.
 
 ## Composed of
 
-Chip (grouping chips), Menu (column menu), FilterControl and CellEditor (from the table engine).
+SearchBox (search), Button (toolbar buttons), Chip (grouping chips), Menu (column menu), Checkbox (row selection), Chevron and Badge (group rows: arrow and count), ResizeHandle (column width), Empty (empty state), FilterControl, CellEditor and the sort mark (from the table engine).

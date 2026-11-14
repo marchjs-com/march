@@ -6,8 +6,8 @@ export default defineMeta({
   category: "composite",
   since: "0.1.0",
   summary: "IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL.",
-  composedOf: ["Splitter", "Tabs", "Portal"],
-  behaviors: ["motion engine", "command manager", "storage (get / set)"],
+  composedOf: ["Splitter", "Tabs", "IconButton", "Button", "Empty", "Toolbar", "ResizeHandle", "OverflowText", "Portal"],
+  behaviors: ["drag (pointerDrag, dragGhost, arrowStep)", "announcer", "motion engine", "command manager", "storage (get / set)"],
   hubs: [],
   showcase: "/ide",
 });

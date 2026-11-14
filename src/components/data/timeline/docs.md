@@ -14,7 +14,7 @@ milliseconds or an ISO string is formatted for the current locale; other text is
 
 | Prop | Type | |
 |---|---|---|
-| `items` | `{ time?, title?, body?, tone?, color?, icon? }[]` / accessor | events in order |
+| `items` | `{ time?, title?, body?, tone?, color?, icon?, class? }[]` / accessor | events in order; an item's `class` goes on its `<li>` |
 | `dot` | boolean / `(item, index) => node` | the dot of every item (default `true`), off, or your own mark |
 | `line` | boolean | the connecting line (default `true`) |
 | `formatTime` | `(value) => node` | your own text for a time (default: dates are formatted, text stays) |
@@ -32,3 +32,7 @@ may be a node or a function that returns one.
 
 An `<ol>`: the order is announced. Times are `<time datetime="…">` with a machine-readable value. The connecting line
 uses logical properties and mirrors in RTL.
+
+## Composed of
+
+StatusDot (the point of an entry).

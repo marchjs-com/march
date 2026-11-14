@@ -47,4 +47,4 @@ and a status ("Loading more posts"); the pill is a button. Pull to refresh annou
 
 ## Composed of
 
-PullToRefresh, VirtualList, PostCard, Skeleton.
+PullToRefresh, VirtualList, PostCard, Skeleton, Button, Empty, StatusDot.

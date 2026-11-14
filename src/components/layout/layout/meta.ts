@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "The frame all pages of an app share: content plus the page corner (BottomRightControls) with its back-to-top button; Page builds on it.",
   category: "layout",
-  composedOf: [],
+  composedOf: ["Button", "Badge", "Progress", "ScrollToTop"],
   behaviors: [],
   showcase: "/layout",
 });

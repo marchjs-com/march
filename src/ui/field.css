@@ -13,7 +13,6 @@
 .hm-help, .hm-hint { color: var(--hm-muted); font-size: var(--hm-text-xs); }
 .hm-hint { margin-inline-start: var(--hm-space-2); }
 .hm-field-error { color: var(--hm-danger-text); font-size: var(--hm-text-xs); }
-.hm-form-error { color: var(--hm-danger-text); background: var(--hm-danger-soft); border: 1px solid color-mix(in srgb, var(--hm-danger) 22%, transparent); border-radius: var(--hm-radius); padding: var(--hm-space-2) var(--hm-space-3); font-size: var(--hm-text-sm); }
 
 /* text controls */
 .hm-input, .hm-select {
@@ -45,8 +44,5 @@
 .hm-affix-text:has(> .hm-svg) { background: transparent; border: 0; padding-inline: .75rem 0; color: var(--hm-faint); }
 .hm-affix-prefix { border-inline-end: 1px solid var(--hm-border); border-radius: var(--hm-radius) 0 0 var(--hm-radius); }
 .hm-affix-suffix { border-inline-start: 1px solid var(--hm-border); border-radius: 0 var(--hm-radius) var(--hm-radius) 0; }
-.hm-affix-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--hm-space-1); min-width: 2.25rem; padding: 0 var(--hm-space-2); border: 0; background: transparent; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-sm); cursor: pointer; border-radius: var(--hm-radius); }
-.hm-affix-btn:hover { color: var(--hm-text); background: var(--hm-surface-2); }
-.hm-affix-btn .hm-svg { width: 1rem; height: 1rem; }
-.hm-icon-btn:disabled, .hm-affix-btn:disabled { opacity: .45; cursor: not-allowed; }
+.hm-icon-btn:disabled { opacity: .45; cursor: not-allowed; }
 .hm-icon { flex: none; }

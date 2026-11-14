@@ -36,11 +36,14 @@ The color math is exported: `parse`, `format`, `hsvToRgb`, `rgbToHsv`, `contrast
 
 ## Accessibility
 
-The area and the sliders are `role="slider"` with values in words ("Saturation 87%, brightness 95%"); arrows move by 1,
-Shift by 10, Home / End jump (mirrored in RTL). Swatches are buttons named after their color with `aria-pressed`.
+The area is a `role="slider"` with its value in words ("Saturation 87%, brightness 95%"): arrows move by 1, Shift by
+10, Home / End jump (mirrored in RTL). Hue and opacity are range Sliders ("199 degrees", "80%") with the keys of a
+native range input. Swatches are buttons named after their color with `aria-pressed`.
 The text field has `aria-invalid` while it does not parse. The preview names the new and the old color.
 
 ## Composed of
 
-IconButton (eyedropper), Segmented (format); the drag behavior (`hadi-march/behaviors/drag`) for dragging, the motion engine's color parser, the theme's
-contrast helper.
+IconButton (eyedropper), Segmented (format), Slider (hue and opacity, each over its own track), TextInput (the value),
+Swatch (palette colors, the contrast marks, the shared checkerboard), Badge (contrast), SectionLabel (palette names);
+the drag behavior (`hadi-march/behaviors/drag`) for the area, the motion engine's color parser, the theme's contrast
+helper.

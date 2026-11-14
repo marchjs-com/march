@@ -7,16 +7,17 @@ import { h } from "../../../dom/h.ts";
 import { lazy } from "../../../dom/lazy.ts";
 import { t, messages, dir as docDir } from "../../../core/i18n.ts";
 import { cx, uid, setStyle } from "../../../core/util.ts";
-import { glyph } from "../../../ui/util.ts";
-import { model } from "../../../forms/util.ts";
+import { model, live } from "../../../forms/util.ts";
 import { Segmented, TextInput, Toggle } from "../../../forms/inputs.ts";
-import { Button, IconButton } from "../../../ui/button.ts";
+import { Button } from "../../actions/button/index.ts";
+import { UndoRedo } from "../../actions/undo-redo/index.ts";
 import { Badge } from "../../../ui/badge.ts";
+import { PanelHeader } from "../../layout/panel-header/index.ts";
+import { SectionLabel } from "../../typography/section-label/index.ts";
+import { undoKeys } from "../../../ui/keys.ts";
 import { Tabs } from "../../../ui/tabs.ts";
 import { ThemeSwatch, setColorTheme, colorTheme, theme as appMode } from "../../../ui/theme.ts";
 import { undoHistory } from "../../../managers/undo/history.ts";
-import { undo as undoIcon } from "../../../icons/glyphs/undo.ts";
-import { redo as redoIcon } from "../../../icons/glyphs/redo.ts";
 import { sparkles } from "../../../icons/glyphs/sparkles.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import * as M from "./model.ts";
@@ -93,33 +94,35 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
   const ctx: ThemeEditorContext = { draft, change, mode, dir: pdir, reduced, readonly: ro };
 
   // ------------------------------------------------------------------ top bar: name, history, save, apply
-  const bar = h("div", { class: "hm-te-bar" },
-    props.nameField === false ? null : h("div", { class: "hm-te-title" },
-      h(TextInput, {
-        class: "hm-te-name", "aria-label": L().name ?? t`Theme name`, get readonly() { return ro(); },
-        get value() { return draft().name; },
-        onChange: (v: string) => change(t`Rename`, (d) => ({ ...d, name: v, id: M.slug(v || "theme") }), "name"),
-      }),
-      h("code", { class: "hm-te-id", "aria-label": () => t`Theme id: ${draft().id}` }, () => `data-hm-theme="${draft().id}"`)),
-    h("div", { class: "hm-te-actions" },
-      props.historyButtons === false ? null : h(IconButton, { class: "hm-te-undo", icon: undoIcon, label: () => { const l = hist.past()[0], u = L().undo; return u ? (l ? `${u}: ${l}` : u) : l ? t`Undo: ${l}` : t`Undo`; }, disabled: () => !hist.canUndo(), onClick: () => void hist.undo() }),
-      props.historyButtons === false ? null : h(IconButton, { class: "hm-te-redo", icon: redoIcon, label: () => { const l = hist.future()[0], r = L().redo; return r ? (l ? `${r}: ${l}` : r) : l ? t`Redo: ${l}` : t`Redo`; }, disabled: () => !hist.canRedo(), onClick: () => void hist.redo() }),
+  const title = props.nameField === false ? null : h("div", { class: "hm-te-title" },
+    h(TextInput, {
+      class: "hm-te-name", "aria-label": L().name ?? t`Theme name`, readonly: live(() => ro()),
+      value: live(() => draft().name),
+      onChange: (v: string) => change(t`Rename`, (d) => ({ ...d, name: v, id: M.slug(v || "theme") }), "name"),
+    }),
+    h("code", { class: "hm-te-id", "aria-label": () => t`Theme id: ${draft().id}` }, () => `data-hm-theme="${draft().id}"`));
+  const bar = h(PanelHeader, {
+    as: "div", class: "hm-te-bar", partClass: { actions: "hm-te-actions" }, ...(title ? { children: title } : {}),
+    actions: [
+      props.historyButtons === false ? null : h(UndoRedo, { history: hist, labels: { undo: () => L().undo, redo: () => L().redo }, partClass: { undo: "hm-te-undo", redo: "hm-te-redo" } }),
       () => (dirty() ? h(Badge, { tone: "warn", dot: true }, L().unsaved ?? t`Unsaved`) : savedAt() ? h(Badge, { tone: "success", dot: true }, L().saved ?? t`Saved`) : null),
       key ? h(Button, { class: "hm-te-save", variant: "secondary", size: "sm", disabled: () => !dirty() || ro(), onClick: save }, L().save ?? t`Save`) : null,
-      props.applyButton === false ? null : h(Button, { class: "hm-te-apply", variant: () => (applied() ? "secondary" : "primary"), size: "sm", icon: () => (applied() ? check : null), "aria-pressed": () => String(applied()), onClick: toggleApply },
-        () => (applied() ? L().applied ?? t`Applied to the app` : L().apply ?? t`Apply to the app`))));
+      props.applyButton === false ? null : h(Button, { class: "hm-te-apply", variant: () => (applied() ? "secondary" : "primary"), size: "sm", icon: () => (applied() ? check : null), pressed: applied, onClick: toggleApply },
+        () => (applied() ? L().applied ?? t`Applied to the app` : L().apply ?? t`Apply to the app`)),
+    ],
+  });
 
   // ------------------------------------------------------------------ base presets
   const bases = props.presets === false ? null : h("div", { class: "hm-te-bases", role: "group", "aria-label": L().startFrom ?? t`Start from` },
-    h("span", { class: "hm-te-bases-label" }, L().startFrom ?? t`Start from`),
-    PRESETS.map((p) => h("button", {
-      type: "button", class: () => cx("hm-te-base", draft().base === p.id && "is-active"), "aria-pressed": () => String(draft().base === p.id), disabled: ro,
+    h(SectionLabel, { as: "span", size: "md", class: "hm-te-bases-label" }, L().startFrom ?? t`Start from`),
+    PRESETS.map((p) => h(Button, {
+      class: "hm-te-base", size: "sm", shape: "pill", icon: h(ThemeSwatch, { id: p.id }), pressed: () => draft().base === p.id, disabled: ro,
       onClick: () => change(t`Base: ${t(p.name)}`, (d) => { const n = presetCopy(p.id); return d.base === null || d.name === t`${t(presetDraft(d.base ?? "hadi").name)} (copy)` ? n : { ...n, id: d.id, name: d.name }; }),
-    }, h(ThemeSwatch, { id: p.id }), h("span", {}, () => t(p.name)))),
-    h("button", {
-      type: "button", class: () => cx("hm-te-base", "hm-te-scratch", draft().base === null && "is-active"), "aria-pressed": () => String(draft().base === null), disabled: ro,
+    }, () => t(p.name))),
+    h(Button, {
+      class: "hm-te-base hm-te-scratch", size: "sm", shape: "pill", icon: sparkles, pressed: () => draft().base === null, disabled: ro,
       onClick: () => change(t`From scratch`, (d) => ({ ...M.draftFromColor(d.light.primary, d.name), id: d.id })),
-    }, glyph(sparkles), h("span", {}, L().scratch ?? t`From scratch`)));
+    }, L().scratch ?? t`From scratch`));
 
   const tabsAll: { id: ThemeEditorTab; label: () => string; content: () => unknown }[] = [
     { id: "colors", label: () => L().tabs?.colors ?? t`Colors`, content: () => h(ColorsPanel, { ctx }) },
@@ -146,21 +149,19 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
   });
   const stage = props.preview === false ? null : h("div", { class: "hm-te-stage" },
     props.previewControls === false ? null : h("div", { class: "hm-te-stage-bar" },
-      h(Segmented, { "aria-label": L().previewMode ?? t`Preview mode`, get value() { return mode(); }, onChange: (v: M.DraftMode | null) => { if (v) mode.set(v); }, options: [{ value: "light", label: L().light ?? t`Light` }, { value: "dark", label: L().dark ?? t`Dark` }] }),
-      h(Segmented, { "aria-label": L().previewDirection ?? t`Preview direction`, get value() { return pdir(); }, onChange: (v: "ltr" | "rtl" | null) => { if (v) pdir.set(v); }, options: [{ value: "ltr", label: "LTR" }, { value: "rtl", label: "RTL" }] }),
-      h(Toggle, { get value() { return reduced(); }, onChange: (v: boolean) => reduced.set(v), label: L().reducedMotion ?? t`Reduced motion` })),
+      h(Segmented, { "aria-label": L().previewMode ?? t`Preview mode`, value: live(() => mode()), onChange: (v: M.DraftMode | null) => { if (v) mode.set(v); }, options: [{ value: "light", label: L().light ?? t`Light` }, { value: "dark", label: L().dark ?? t`Dark` }] }),
+      h(Segmented, { "aria-label": L().previewDirection ?? t`Preview direction`, value: live(() => pdir()), onChange: (v: "ltr" | "rtl" | null) => { if (v) pdir.set(v); }, options: [{ value: "ltr", label: "LTR" }, { value: "rtl", label: "RTL" }] }),
+      h(Toggle, { value: live(() => reduced()), onChange: (v: boolean) => reduced.set(v), label: L().reducedMotion ?? t`Reduced motion` })),
     scope);
 
   const onKeyDown = (e: KeyboardEvent): void => {
-    if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== "z") return;
-    const el = e.target as HTMLElement;
-    if (el.closest("input[type=text], input:not([type]), textarea, [contenteditable]")) return;
-    e.preventDefault();
-    void (e.shiftKey ? hist.redo() : hist.undo());
+    // text fields keep their own undo
+    if ((e.target as HTMLElement).closest("input[type=text], input:not([type]), textarea, [contenteditable]")) return;
+    undoKeys(e, hist);
   };
   return h("div", { class: () => cx("hm-te", props.preview === false && "hm-te-solo", props.class), role: "group", "aria-label": L().editor ?? t`Theme editor`, onKeyDown },
     bar, bases,
     h("div", { class: "hm-te-body" },
-      h("div", { class: "hm-te-panel" }, h(Tabs, { tabs, label: L().sections ?? t`Theme sections`, get value() { return tab(); }, onChange: (v: string) => tab.set(v) })),
+      h("div", { class: "hm-te-panel" }, h(Tabs, { tabs, label: L().sections ?? t`Theme sections`, value: live(() => tab()), onChange: (v: string) => tab.set(v) })),
       stage)) as Element;
 }

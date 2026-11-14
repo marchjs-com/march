@@ -32,4 +32,4 @@ button is a native button in the reading order.
 
 ## Composed of
 
-Nothing: a block with a native button.
+Alert (`tone="danger"`, no icon, the action below the text) and Button (Retry).

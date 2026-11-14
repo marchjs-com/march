@@ -54,4 +54,4 @@ that follows the state ("Fill the area" / "Restore"). Reduced motion turns the s
 
 ## Composed of
 
-No other component; it uses the drag behavior (track).
+PanelHeader (the title bar: drag bar, icon, title, buttons), IconButton (close, minimize, fill), ResizeHandle (the edge and corner grips). It uses the drag behavior (track, arrowStep) and observeSize.

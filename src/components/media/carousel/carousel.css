@@ -8,18 +8,10 @@
 .hm-carousel-track::-webkit-scrollbar { display: none; }
 .hm-carousel-track > * { scroll-snap-align: start; min-width: 0; }
 @media (max-width: 640px) { .hm-carousel { --hm-per: 1.15; } }
-.hm-carousel-btn { position: absolute; top: calc(50% - 1.5rem); display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border: 1px solid var(--hm-border); border-radius: 50%;
-  background: color-mix(in srgb, var(--hm-surface) 88%, transparent); backdrop-filter: blur(8px); color: var(--hm-text); box-shadow: var(--hm-shadow-2); cursor: pointer; transition: opacity var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease); }
+/* previous / next: raised round IconButtons; here only their place and how they leave */
+.hm-icon-btn.hm-carousel-btn { position: absolute; top: calc(50% - 1.5rem); transition: opacity var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease); }
 .hm-carousel-btn:disabled { opacity: 0; pointer-events: none; }
 .hm-carousel-btn:hover { transform: scale(1.06); }
 .hm-carousel-prev { inset-inline-start: -.75rem; } .hm-carousel-next { inset-inline-end: -.75rem; }
-.hm-carousel-dots { display: flex; justify-content: center; gap: 6px; margin-top: var(--hm-space-3); }
-.hm-carousel-dot { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 999px; background: var(--hm-border-strong); cursor: pointer; transition: width var(--hm-dur-slow) var(--hm-ease-out), background-color var(--hm-dur) var(--hm-ease); }
-.hm-carousel-dot.is-active { width: 20px; background: var(--hm-primary); }
+.hm-carousel-dots { margin-top: var(--hm-space-3); }
 .hm-carousel-icon { display: inline-flex; }
-/* color prop: the token sits on the dots only, so the slides keep their own colours */
-.hm-carousel-dots[data-hm-color] .hm-carousel-dot.is-active { background: var(--hm-accent); }
-/* own dot content (dots={(i, active) => …}): the button takes the size of what you draw */
-.hm-carousel-dot.is-own, .hm-carousel-dot.is-own.is-active { width: auto; height: auto; min-width: 1.5rem; padding: .125rem .375rem; background: none; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-xs); line-height: 1.4; }
-.hm-carousel-dot.is-own.is-active { color: var(--hm-primary-text); font-weight: var(--hm-weight-semibold); }
-.hm-carousel-dots[data-hm-color] .hm-carousel-dot.is-own.is-active { background: none; color: var(--hm-accent-text); }

@@ -10,9 +10,14 @@ import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, val, uid, clamp, load, save, type ClassProp, type MaybeFn } from "../../../core/util.ts";
-import { glyph, icon as iconOf } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import { observeSize } from "../../../ui/observe.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
-import { track } from "../../../behaviors/drag/index.ts";
+import type { IconDef } from "../../../icons/svg.ts";
+import { track, arrowStep } from "../../../behaviors/drag/index.ts";
+import { PanelHeader } from "../panel-header/index.ts";
+import { ResizeHandle, type ResizeEdge } from "../resize-handle/index.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
 import { minus } from "../../../icons/glyphs/minus.ts";
 import { maximize } from "../../../icons/glyphs/maximize.ts";
 import { copy } from "../../../icons/glyphs/copy.ts";
@@ -75,7 +80,7 @@ export interface WindowProps {
 
 interface Geo { x: number; y: number; w: number; h: number }
 const EDGE = 18;
-const EDGES = ["n", "s", "start", "end", "n-start", "n-end", "s-start", "s-end"] as const;
+const EDGES = ["top", "bottom", "start", "end", "top-start", "top-end", "bottom-start", "bottom-end"] as const satisfies readonly ResizeEdge[];
 type Edge = (typeof EDGES)[number];
 let front = 1;
 
@@ -165,10 +170,10 @@ export function Window(props: WindowProps): unknown {
   };
 
   // ------------------------------------------------------------------ resizing (edges and corners)
-  const grip = (edge: Edge): Element => {
-    const el = h("div", { class: `hm-win-rz hm-win-rz-${edge}`, "aria-hidden": "true" }) as HTMLElement;
+  const grip = (edge: Edge): unknown => {
     let from: Geo = { x: 0, y: 0, w: 0, h: 0 };
-    track(el, {
+    // the bare grip of ResizeHandle (the frame's own border is the line); the window runs the two-axis gesture
+    return h(ResizeHandle, { edge, line: "none", class: "hm-win-rz", ref: (el: HTMLElement) => track(el, {
       clamp: false, area,
       onStart: () => { raise(); from = geo.peek()!; moving.set(true); },
       onMove: (p) => {
@@ -176,13 +181,12 @@ export function Window(props: WindowProps): unknown {
         let { x, y, w, h: hh } = from;
         if (edge.includes("end")) w = clamp(from.w + dx, minW, b.w - from.x);
         if (edge.includes("start")) { const nw = clamp(from.w - dx, minW, from.x + from.w); x = from.x + from.w - nw; w = nw; }
-        if (edge.startsWith("s")) hh = clamp(from.h + p.dy, minH, b.h - from.y);
-        if (edge.startsWith("n")) { const nh = clamp(from.h - p.dy, minH, from.y + from.h); y = from.y + from.h - nh; hh = nh; }
+        if (edge.startsWith("bottom")) hh = clamp(from.h + p.dy, minH, b.h - from.y);
+        if (edge.startsWith("top")) { const nh = clamp(from.h - p.dy, minH, from.y + from.h); y = from.y + from.h - nh; hh = nh; }
         geo.set({ x, y, w, h: hh });
       },
       onEnd: () => { moving.set(false); keep(); },
-    });
-    return el;
+    }) });
   };
 
   // ------------------------------------------------------------------ keyboard on the title bar
@@ -190,13 +194,13 @@ export function Window(props: WindowProps): unknown {
     if (e.target !== bar) return;
     if (e.key === "Enter") { e.preventDefault(); toggleMax(); return; }
     if (e.key === "Escape" && state.peek() !== "normal") { e.preventDefault(); setState("normal"); return; }
-    const step = e.altKey ? 1 : 16, d: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
-    const m = d[e.key];
-    if (!m || props.movable === false) return;
+    const a = e.key.startsWith("Arrow") ? arrowStep(e, rtl()) : null;
+    if (!a || props.movable === false) return;
     e.preventDefault();
     if (state.peek() !== "normal") setState("normal");
-    const g = geo.peek()!, dx = rtl() ? -m[0] : m[0];
-    geo.set(fit(e.shiftKey && props.resizable !== false ? { ...g, w: Math.max(minW, g.w + dx), h: Math.max(minH, g.h + m[1]) } : { ...g, x: g.x + dx, y: g.y + m[1] }));
+    // 16 px a press, 1 px with Alt (Shift is "resize" here, not arrowStep's ×10)
+    const k = (e.altKey ? 1 : 16) / (e.shiftKey ? 10 : 1), g = geo.peek()!, dx = a.dx * k, dy = a.dy * k;
+    geo.set(fit(e.shiftKey && props.resizable !== false ? { ...g, w: Math.max(minW, g.w + dx), h: Math.max(minH, g.h + dy) } : { ...g, x: g.x + dx, y: g.y + dy }));
     keep();
   };
 
@@ -204,24 +208,24 @@ export function Window(props: WindowProps): unknown {
   const chrome = (): WindowChrome => val(props.chrome) ?? "hadi";
   type IconKey = "close" | "minimize" | "maximize" | "restore";
   // a given icon (icon, text or node) replaces the built-in glyph
-  const pic = (k: IconKey, def: Parameters<typeof glyph>[0]): unknown => (props.icons?.[k] != null ? iconOf(props.icons[k], "hm-win-glyph-own") : glyph(def));
+  const pic = (k: IconKey, def: IconDef): unknown => ownIcon(props.icons?.[k] ?? undefined, def, "hm-win-glyph-own");
   const restoreText = (): string => props.labels?.restore ?? t`Restore`;
-  const btn = (cls: string, label: () => string, icon: () => unknown, onClick: () => void): Element =>
-    h("button", { type: "button", class: `hm-win-btn ${cls}`, "aria-label": label, title: label, onClick: (e: MouseEvent) => { e.stopPropagation(); onClick(); } },
-      h("span", { class: "hm-win-glyph", "aria-hidden": "true" }, icon));
-  const buttons = h("div", { class: "hm-win-buttons" },
-    props.closable === false ? null : btn("hm-win-close", () => props.labels?.close ?? t`Close`, () => pic("close", xIcon), close),
-    props.minimizable === false ? null : btn("hm-win-min", () => (state() === "minimized" ? restoreText() : props.labels?.minimize ?? t`Minimize`), () => pic("minimize", minus), () => setState(state.peek() === "minimized" ? "normal" : "minimized")),
-    props.maximizable === false ? null : btn("hm-win-max", () => (state() === "normal" ? props.labels?.maximize ?? t`Fill the area` : restoreText()), () => (state() === "normal" || state() === "minimized" ? pic("maximize", maximize) : pic("restore", copy)), toggleMax));
-  bar = h("div", {
-    class: "hm-win-bar", tabindex: "0", role: "toolbar", "aria-label": () => props.labels?.move ?? t`Move window`, "data-hm-color": colorAttr(props.color),
+  // the chrome's CSS sizes and shapes the buttons (square, traffic lights, round)
+  const btn = (cls: string, label: () => string, icon: () => unknown, onClick: () => void): unknown =>
+    h(IconButton, { class: `hm-win-btn ${cls}`, label, icon: h("span", { class: "hm-win-glyph", "aria-hidden": "true" }, icon), onClick: (e: MouseEvent) => { e.stopPropagation(); onClick(); } });
+  bar = h(PanelHeader, {
+    as: "div", size: "sm", drag: true, class: "hm-win-bar", tabindex: "0", role: "toolbar", "aria-label": () => props.labels?.move ?? t`Move window`, color: props.color,
     "aria-description": () => props.labels?.moveHint ?? t`Arrows move the window, Shift and arrows resize it, Enter fills the area`,
     onDblClick: (e: MouseEvent) => { if (!(e.target as Element).closest(".hm-win-btn") && props.maximizable !== false) toggleMax(); },
     onKeyDown: onKey, ref: (el: HTMLElement) => moveTitle(el),
-  },
-  props.icon != null ? h("span", { class: "hm-win-icon", "aria-hidden": "true" }, props.icon) : null,
-  h("span", { class: "hm-win-title", id: `${id}-title` }, () => val(props.title) ?? ""),
-  buttons) as HTMLElement;
+    icon: props.icon != null ? h("span", { class: "hm-panel-header-icon hm-win-icon", "aria-hidden": "true" }, props.icon) : null,
+    title: () => val(props.title) ?? "", titleAs: "span", titleId: `${id}-title`, partClass: { title: "hm-win-title", actions: "hm-win-buttons" },
+    actions: [
+      props.closable === false ? null : btn("hm-win-close", () => props.labels?.close ?? t`Close`, () => pic("close", xIcon), close),
+      props.minimizable === false ? null : btn("hm-win-min", () => (state() === "minimized" ? restoreText() : props.labels?.minimize ?? t`Minimize`), () => pic("minimize", minus), () => setState(state.peek() === "minimized" ? "normal" : "minimized")),
+      props.maximizable === false ? null : btn("hm-win-max", () => (state() === "normal" ? props.labels?.maximize ?? t`Fill the area` : restoreText()), () => (state() === "normal" || state() === "minimized" ? pic("maximize", maximize) : pic("restore", copy)), toggleMax),
+    ],
+  }) as HTMLElement;
 
   // where a drop would dock, drawn inside the frame but placed in area coordinates
   const snapRect = (s: WindowState, b: { w: number; h: number }): Geo =>
@@ -246,11 +250,9 @@ export function Window(props: WindowProps): unknown {
 
   // measure once the frame is in its area, and keep it inside when the area changes size
   queueMicrotask(() => { if (root?.isConnected) place(); });
-  if (globalThis.ResizeObserver) {
-    let ro: ResizeObserver | null = null;
-    queueMicrotask(() => { const a = area(); if (!a) return; ro = new ResizeObserver(() => { if (geo.peek()) geo.set(fit(geo.peek()!)); }); ro.observe(a); });
-    onCleanup(() => ro?.disconnect());
-  }
+  let unobserve: (() => void) | null = null;
+  queueMicrotask(() => { const a = area(); if (a) unobserve = observeSize(a, () => { if (geo.peek()) geo.set(fit(geo.peek()!)); }); });
+  onCleanup(() => unobserve?.());
   untrack(() => props.ref?.(api));
   return frame;
 }

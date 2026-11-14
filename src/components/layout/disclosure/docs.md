@@ -33,4 +33,4 @@ Space toggle.
 
 ## Composed of
 
-No other component.
+Chevron (the turning arrow).

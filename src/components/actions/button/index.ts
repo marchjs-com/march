@@ -5,7 +5,7 @@ import { h } from "../../../dom/h.ts";
 import type { Href } from "../../../router/router.ts";
 import { routerLink } from "../../../dom/link.ts";
 import type { Action } from "../../../ui/action.ts";
-import { formatKey } from "../../../ui/keys.ts";
+import { labelWithKey } from "../../../ui/keys.ts";
 import { val, cx, rest, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
@@ -66,7 +66,7 @@ export function Button(props: ButtonProps): unknown {
   const cls = (): string => cx("hm-btn", `hm-btn-${val(props.variant) ?? "secondary"}`, buttonSizeClass(val(props.size)), val(props.shape) === "pill" && "hm-btn-pill", props.block && "hm-btn-block", loading() && "is-loading", val(props.pressed) && "is-pressed", val(props.class));
   const body = [
     () => (!loading() || props.spinner === false ? icon(val(props.icon))
-      : props.spinner == null || props.spinner === true ? h("span", { class: "hm-loading hm-btn-spin", "aria-hidden": "true" })
+      : props.spinner == null || props.spinner === true ? h("span", { class: "hm-loading hm-btn-spin", "aria-hidden": "true" }) // not <Spinner>: its texts and colour lists would more than double a Button-only page
       : h("span", { class: "hm-btn-spin-own", "aria-hidden": "true" }, icon(props.spinner))),
     props.children != null && h("span", { class: "hm-btn-label" }, props.children),
     props.iconEnd != null && icon(props.iconEnd),
@@ -80,8 +80,10 @@ export function Button(props: ButtonProps): unknown {
   }, body);
 }
 
-type Args<A extends readonly unknown[]> = A | (() => A) | null | undefined;
-const argsOf = <A extends readonly unknown[]>(props: { args?: Args<A> }): A => ((typeof props.args === "function" ? props.args() : props.args) ?? []) as A;
+/** The arguments an action gets: a list, or an accessor for it (shared with Menu). */
+export type Args<A extends readonly unknown[]> = A | (() => A) | null | undefined;
+/** Read the `args` prop of a component that runs actions (ActionButton, Menu). */
+export const argsOf = <A extends readonly unknown[]>(props: { args?: Args<A> }): A => ((typeof props.args === "function" ? props.args() : props.args) ?? []) as A;
 
 /** A plain action for ActionButton: `{ label, run }` with optional `visible` / `disabled` / `busy` and `opts` (a table's row and bulk actions have this shape). */
 export interface PlainAction<A extends unknown[] = unknown[]> {
@@ -136,7 +138,7 @@ export function ActionButton<A extends unknown[], R>(props: ActionButtonProps<A,
       ...rest(props, ["action", "args", "variant", "size", "color", "spinner", "icon", "iconOnly", "run", "onDone", "onError", "children", "onClick"]),
       variant: props.variant ?? (o.danger ? "danger" : "secondary"), size: props.size, icon: props.icon ?? o.icon, class: props.class, color: props.color, spinner: props.spinner,
       loading: () => !!a.busy?.(), disabled: () => !!a.disabled?.(...argsOf(props)),
-      title: props["title"] ?? (o.key ? `${label()} (${formatKey(o.key)})` : null),
+      title: props["title"] ?? (o.key ? labelWithKey(label(), o.key) : null),
       onClick: async (e: Event) => {
         (props["onClick"] as ((e: Event) => void) | undefined)?.(e); // e.g. close the menu the button sits in
         try { const r = await (props.run ?? a.run.bind(a))(...argsOf(props)); props.onDone?.(r as R | undefined); } catch (e) { props.onError?.(e); } // errors were toasted by the action

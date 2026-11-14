@@ -18,6 +18,7 @@ either an image with a name (`label`) or decoration next to text that already sa
 | `pulse` | boolean / `"ring"` / `"blink"` | `false` | `true` and `"ring"`: a breathing ring; `"blink"`: the dot fades |
 | `size` | `xs` `sm` `md` `lg` | `md` | |
 | `label` | string | — | accessible name; without it the dot is `aria-hidden` |
+| `hollow` | boolean | `false` | a ring instead of a filled dot (a timeline point); children (an icon) sit inside |
 | `class` | class | — | |
 | other attributes | | | `data-*`, `title`, `id` go to the dot |
 

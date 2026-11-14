@@ -40,4 +40,4 @@ today is `aria-current="date"`, picked days are `aria-selected`, unavailable one
 
 ## Composed of
 
-Nothing: calendar math lives in core/date.ts (shared with Scheduler and Gantt).
+IconButton (previous / next month). Calendar math lives in core/date.ts (shared with Scheduler and Gantt); the keys of the day grid are `dayGridKey`, exported for other day grids.

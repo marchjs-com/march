@@ -12,22 +12,25 @@ import { createAxis, createViewport } from "../../../core/virtual.ts";
 import { moveCursor } from "../../../core/selection.ts";
 import { applyPipe } from "../../../core/pipes.ts";
 import { createTable, formatValue, type TableState, type TableOptions } from "../../../table/state.ts";
-import { FilterControl, CellEditor } from "../../../table/controls.ts";
+import { FilterControl, CellEditor, SortMark, ariaSort } from "../../../table/controls.ts";
 import { valueOf, type Column, type TableColumn, type Row } from "../../../table/filters.ts";
 import { groupRows, aggregates, type Aggregate, type GroupItem, type GroupHeader, type GroupRow, type GroupAggregate } from "../../../data/group.ts";
 import { animate, stagger } from "../../../motion/animate.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
-import { resizeHandle } from "../../../behaviors/resize-handle/index.ts";
 import { Menu, type MenuItem } from "../../../ui/menu.ts";
 import { Chip } from "../../actions/chip/index.ts";
+import { Button } from "../../actions/button/index.ts";
+import { Chevron } from "../../actions/chevron/index.ts";
+import { Badge } from "../badge/index.ts";
+import { Checkbox } from "../../forms/checkbox/index.ts";
+import { SearchBox } from "../../forms/search-box/index.ts";
+import { Empty } from "../../feedback/empty/index.ts";
+import { ResizeHandle } from "../../layout/resize-handle/index.ts";
 import { glyph } from "../../../ui/util.ts";
-import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
-import { arrowUp } from "../../../icons/glyphs/arrowUp.ts";
 import { moreVertical } from "../../../icons/glyphs/moreVertical.ts";
 import { download } from "../../../icons/glyphs/download.ts";
 import { filter as filterIcon } from "../../../icons/glyphs/filter.ts";
 import { layers } from "../../../icons/glyphs/layers.ts";
-import { search as searchIcon } from "../../../icons/glyphs/search.ts";
 
 /** A DataGrid column: a table column plus an aggregate (group rows and the totals footer). */
 export interface DataGridColumn<R = Row> extends Column<R> {
@@ -263,14 +266,6 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   };
 
   // ------------------------------------------------------------------ cells
-  const sortMark = (key: string): Element | null => {
-    const d = table.sortDir(key);
-    if (!d) return null;
-    const multi = table.sort().length > 1;
-    return h("span", { class: cx("hm-dg-sort", d === "desc" && "is-desc"), "aria-hidden": "true" }, glyph(arrowUp), multi ? h("small", {}, String(table.sortIndex(key) + 1)) : null);
-  };
-  const ariaSort = (key: string): string | null => { const d = table.sortDir(key); return d === "asc" ? "ascending" : d === "desc" ? "descending" : null; };
-
   const headerCell = (col: TableColumn<R>, c: number, pin: string | null): HTMLElement => {
     const key = String(col.key);
     const grouped = groupKeys().includes(key);
@@ -288,17 +283,14 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     ];
     const el = h("div", {
       role: "columnheader", class: cx("hm-dg-cell", "hm-dg-th", `hm-align-${col.align}`, col.sortable && "is-sortable", table.sortDir(key) && "is-sorted"),
-      "aria-colindex": String(c + 1 + (props.selectable ? 1 : 0)), "aria-sort": ariaSort(key), "data-key": key, "data-c": String(c),
+      "aria-colindex": String(c + 1 + (props.selectable ? 1 : 0)), "aria-sort": table.sortDir(key) ? ariaSort(table, key) : null, "data-key": key, "data-c": String(c),
     },
-    h("span", { class: "hm-dg-th-label", title: col.label }, col.label), sortMark(key),
+    h("span", { class: "hm-dg-th-label", title: col.label }, col.label), SortMark(table, key),
     props.columnMenu === false ? null : h("span", { class: "hm-dg-th-menu", "data-no-drag": "" }, h(Menu, { label: () => lb("columnMenu")(col.label), icon: moreVertical, size: "sm", variant: "ghost", items })),
-    col.resizable === false ? null : h("span", {
-      class: "hm-dg-resize", tabindex: "-1", "aria-label": lb("resize")(col.label), "data-no-drag": "",
-      // drag / arrows (RTL mirrored) / double click autosizes: the resize-handle behavior
-      ref: (x: HTMLElement) => resizeHandle(x, {
-        value: () => widthOf(col), set: (w) => table.setWidth(key, w), min: col.minWidth, reset: () => autosize(col),
-        onStart: () => el.classList.add("is-resizing"), onEnd: () => el.classList.remove("is-resizing"),
-      }),
+    // drag / arrows (RTL mirrored) / double click autosizes: the resize handle
+    col.resizable === false ? null : h(ResizeHandle, {
+      class: "hm-dg-resize", tabindex: "-1", label: lb("resize")(col.label), "data-no-drag": "",
+      value: () => widthOf(col), set: (w: number) => table.setWidth(key, w), min: col.minWidth, reset: () => autosize(col),
     })) as HTMLElement;
     setStyle(el, { width: `${widthOf(col)}px` });
     el.addEventListener("pointerdown", (e) => headerDown(e, col, el));
@@ -404,9 +396,9 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     const bar = h("div", {
       role: "gridcell", id: cellId(r, 0), class: "hm-dg-cell hm-dg-group-label", "data-c": "0", "aria-colindex": "1", "aria-colspan": String(cols().nav.length + (props.selectable ? 1 : 0)),
     },
-    h("span", { class: cx("hm-dg-chev", it.open && "is-open"), "aria-hidden": "true" }, glyph(chevronRight)),
+    h(Chevron, { class: "hm-dg-chev", open: it.open, motion: "spring" }),
     h("span", { class: "hm-dg-group-name" }, `${lvl?.label ?? it.level}: `, h("b", {}, String(lvl ? formatValue(it.rows[0] as R, lvl) : it.value ?? "") || lb("emptyGroup"))),
-    h("span", { class: "hm-dg-count" }, num(it.count)),
+    h(Badge, { class: "hm-dg-count", tone: "primary" }, num(it.count)),
     h("span", { class: "hm-dg-group-aggs" }, aggList().map((a) => { const col = table.column(a.key) as TableColumn<R>; return h("span", { class: "hm-dg-group-agg" }, h("small", {}, col.label), aggText(col, it.aggregates[a.key])); }))) as HTMLElement;
     setStyle(bar, { width: `${Math.max(240, vp.width() - 2)}px` });
     return bar;
@@ -449,8 +441,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     return frag;
   };
   const checkCell = (checked: boolean | "mixed", label: string, onToggle: (e: MouseEvent) => void, role = "gridcell"): HTMLElement => {
-    const box = h("input", { type: "checkbox", class: "hm-table-check", tabindex: "-1", "aria-label": label, onClick: (e: MouseEvent) => { e.stopPropagation(); onToggle(e); } }) as HTMLInputElement;
-    box.checked = checked === true; box.indeterminate = checked === "mixed";
+    const box = h(Checkbox, { class: "hm-table-check", tabIndex: -1, "aria-label": label, value: checked === true, indeterminate: checked === "mixed", onClick: (e: MouseEvent) => { e.stopPropagation(); onToggle(e); } });
     const cell = h("div", { role, class: "hm-dg-cell hm-dg-check", "aria-colindex": "1" }, box) as HTMLElement;
     setStyle(cell, { width: `${SEL_W}px` });
     return cell;
@@ -464,7 +455,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   const foot = h("div", { role: "rowgroup", class: "hm-dg-foot", hidden: () => !showFooter() }, footRow) as HTMLElement;
   const canvas = h("div", { class: "hm-dg-canvas" }, head, rowsEl, foot) as HTMLElement;
   const empty = props.empty === false ? null : h("div", { class: "hm-dg-empty", hidden: () => count() > 0 || table.loading() },
-    props.empty != null && props.empty !== true ? props.empty : () => (table.activeFilters().length || table.search() ? lb("noMatch") : lb("noRows"))) as HTMLElement;
+    props.empty != null && props.empty !== true ? props.empty : h(Empty, { size: "sm", title: () => (table.activeFilters().length || table.search() ? lb("noMatch") : lb("noRows")) })) as HTMLElement;
 
   const filterRow = (): Element => {
     const r = h("div", { role: "row", class: "hm-dg-row hm-dg-filter-row" }) as HTMLElement;
@@ -637,22 +628,18 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
 
   const toolbar = props.toolbar === false ? null : Toolbar();
   function Toolbar(): Element {
-    const searchBox = h("input", {
-      type: "search", class: "hm-table-input hm-dg-search", placeholder: () => lb("search"), "aria-label": () => lb("search"),
-      value: () => table.search(), onInput: (e: Event) => table.setSearch((e.target as HTMLInputElement).value),
-    });
     return h("div", { class: "hm-dg-toolbar", role: "toolbar", "aria-label": () => lb("tools") },
-      tool("search") ? h("label", { class: "hm-dg-searchwrap" }, h("span", { class: "hm-dg-search-icon", "aria-hidden": "true" }, glyph(searchIcon)), searchBox) : null,
+      tool("search") ? h(SearchBox, { class: "hm-dg-search", debounce: 0, value: () => table.search(), onSearch: (q: string) => table.setSearch(q), placeholder: () => lb("search"), label: () => lb("search") }) : null,
       tool("groups") ? h("div", { class: "hm-dg-groups", "aria-label": () => lb("grouping") },
         h("span", { class: "hm-dg-groups-icon", "aria-hidden": "true" }, glyph(layers)),
         () => (groupKeys().length
           ? groupKeys().map((k) => h(Chip, { size: "sm", tone: "primary", onRemove: () => setGroups(groupKeys().filter((x) => x !== k)) }, table.column(k)?.label ?? k))
           : h("span", { class: "hm-dg-hint" }, lb("groupHint")))) : null,
       h("span", { class: "hm-dg-spacer" }),
-      () => (table.visibleColumns().length < table.allColumns().length ? h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", onClick: () => { for (const c of table.allColumns()) table.setHidden(String(c.key), false); } }, lb("showAll")) : null),
-      tool("filters") ? h("button", { type: "button", class: () => cx("hm-btn hm-btn-sm", filtersOpen() ? "hm-btn-primary" : "hm-btn-secondary"), "aria-pressed": () => String(filtersOpen()), onClick: () => filtersOpen.set(!filtersOpen()) },
-        glyph(filterIcon), () => (table.activeFilters().length ? lb("filtersActive")(table.activeFilters().length) : lb("filters"))) : null,
-      tool("csv") ? h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", onClick: () => void table.exportCSV({ download: true, filename: `${props.filename ?? "data"}.csv` }) }, glyph(download), lb("csv")) : null,
+      () => (table.visibleColumns().length < table.allColumns().length ? h(Button, { variant: "ghost", size: "sm", onClick: () => { for (const c of table.allColumns()) table.setHidden(String(c.key), false); } }, lb("showAll")) : null),
+      tool("filters") ? h(Button, { size: "sm", variant: () => (filtersOpen() ? "primary" : "secondary"), icon: filterIcon, "aria-pressed": () => String(filtersOpen()), onClick: () => filtersOpen.set(!filtersOpen()) },
+        () => (table.activeFilters().length ? lb("filtersActive")(table.activeFilters().length) : lb("filters"))) : null,
+      tool("csv") ? h(Button, { size: "sm", icon: download, onClick: () => void table.exportCSV({ download: true, filename: `${props.filename ?? "data"}.csv` }) }, lb("csv")) : null,
       tool("count") ? h("span", { class: "hm-dg-total", role: "status" }, () => lb("rows")(num(table.rows().length)), () => (table.selectedCount() ? h("b", {}, ` · ${lb("selected")(num(table.selectedCount()))}`) : null)) : null);
   }
 

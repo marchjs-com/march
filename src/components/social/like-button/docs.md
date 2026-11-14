@@ -41,4 +41,4 @@ decorative (`aria-hidden`).
 
 ## Composed of
 
-CountRoll.
+CountRoll, Button.

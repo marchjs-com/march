@@ -5,10 +5,11 @@ import "./newsletter.css";
 import { h } from "../../../dom/h.ts";
 import { signal, computed } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, val, uid, glyph, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, uid, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { TextInput } from "../../../forms/inputs.ts";
 import { Button } from "../../../ui/button.ts";
-import { check } from "../../../icons/glyphs/check.ts";
+import { CheckMark } from "../../feedback/check-mark/index.ts";
+import { SectionHead } from "../section-head/index.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 
 export interface NewsletterProps {
@@ -65,10 +66,12 @@ export function Newsletter(props: NewsletterProps): Element {
     if (ok && props.motion !== false) animate(ok, { opacity: [0, 1], transform: ["scale(.85)", "scale(1)"] }, { duration: 520, easing: "spring-wobbly" });
   };
   const root = h("div", { class: () => cx("hm-nl", `hm-nl-${props.layout ?? "inline"}`, `is-${state()}`, val(props.class)) },
-    props.title != null && h("h3", { class: "hm-nl-title", id: `${id}-t` }, () => val(props.title)),
-    props.lead != null && h("p", { class: "hm-nl-lead" }, () => val(props.lead)),
+    props.title != null || props.lead != null ? h(SectionHead, {
+      class: "hm-nl-head", size: "sm", align: "start", width: "full", as: "h3", titleId: `${id}-t`,
+      title: props.title != null ? () => val(props.title) : undefined, lead: props.lead != null ? () => val(props.lead) : undefined,
+    }) : null,
     () => (done()
-      ? h("p", { class: "hm-nl-done", role: "status" }, props.doneIcon === false ? null : h("span", { class: "hm-nl-check", "aria-hidden": "true" }, props.doneIcon && props.doneIcon !== true ? props.doneIcon : glyph(check)), () => val(props.done) ?? t`Thanks! Check your inbox.`)
+      ? h("p", { class: "hm-nl-done", role: "status" }, props.doneIcon === false ? null : h(CheckMark, { class: "hm-nl-check", variant: "solid", label: false, icons: { yes: props.doneIcon } }), () => val(props.done) ?? t`Thanks! Check your inbox.`)
       : h("form", { class: "hm-nl-form", novalidate: true, "aria-labelledby": props.title != null ? `${id}-t` : null, onSubmit: submit },
         (field = h("div", { class: "hm-nl-field" }, h(TextInput, {
           value: email, type: "email", autocomplete: "email", inputmode: "email", required: true, id: `${id}-e`,

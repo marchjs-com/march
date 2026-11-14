@@ -41,4 +41,4 @@ Tones are never colour alone: the text says the state.
 
 ## Composed of
 
-Menu (the … menu), Tooltip. Fitting from ui/fit, commands from `commandBinding`, the busy dot on the motion engine.
+Menu (the … menu), Tooltip, StatusDot (the tone dot; it blinks while busy). Fitting from ui/fit, commands from `commandBinding`; your own dot mark breathes on the motion engine.

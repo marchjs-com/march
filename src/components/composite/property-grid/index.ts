@@ -7,7 +7,7 @@ import "./property-grid.css";
 import { signal, computed, untrack, onCleanup, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { val, cx, uid, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { deepEqual } from "../../../core/equal.ts";
 import { score } from "../../../ui/fold.ts";
 import { Disclosure } from "../../../ui/disclosure.ts";
@@ -15,10 +15,16 @@ import { TextInput, Textarea, NumberInput, Slider, Toggle, Select, Segmented, Co
 import { model, type OptionsProp } from "../../../forms/util.ts";
 import { undoStack, type UndoStack } from "../../../managers/undo/index.ts";
 import { dirtyState, type DirtyState } from "../../../managers/dirty/index.ts";
-import { search as searchIcon } from "../../../icons/glyphs/search.ts";
 import { history as resetIcon } from "../../../icons/glyphs/history.ts";
-import { undo as undoIcon } from "../../../icons/glyphs/undo.ts";
-import { redo as redoIcon } from "../../../icons/glyphs/redo.ts";
+import { Button } from "../../actions/button/index.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { UndoRedo } from "../../actions/undo-redo/index.ts";
+import { Badge } from "../../data/badge/index.ts";
+import { Empty } from "../../feedback/empty/index.ts";
+import { StatusDot } from "../../feedback/status-dot/index.ts";
+import { SearchBox } from "../../forms/search-box/index.ts";
+import { PanelHeader } from "../../layout/panel-header/index.ts";
+import { SectionLabel } from "../../typography/section-label/index.ts";
 import tr from "./tr.ts";
 
 messages("tr", tr);
@@ -175,14 +181,14 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     return h("div", { class: () => cx("hm-pg-row", changed() && "is-changed", errors()[p.key] && "is-invalid"), "data-key": p.key },
       h("div", { class: "hm-pg-label" },
         h("label", { id: labelId, for: id, class: "hm-pg-name", title: () => labelOf(p) }, () => labelOf(p)),
-        props.changeMarks === false ? null : () => (changed() ? h("span", { class: "hm-pg-dot", title: L().changed ?? t`Changed`, "aria-label": L().changed ?? t`changed` }) : null),
+        props.changeMarks === false ? null : () => (changed() ? h(StatusDot, { class: "hm-pg-dot", tone: "primary", size: "xs", title: L().changed ?? t`Changed`, label: L().changed ?? t`changed` }) : null),
         p.description && h("span", { id: descId, class: "hm-pg-desc" }, p.description)),
       h("div", { class: "hm-pg-editor" }, control,
         () => (errors()[p.key] ? h("span", { id: errId, class: "hm-pg-error", role: "alert" }, errors()[p.key]) : null)),
-      props.resetButtons === false ? null : h("button", {
-        type: "button", class: "hm-pg-reset", tabindex: () => (changed() ? "0" : "-1"), "aria-hidden": () => (changed() ? null : "true"),
-        "aria-label": () => resetName(p), title: () => L().resetTitle ?? t`Reset to saved`, onClick: () => resetKeys([p.key], resetName(p)),
-      }, glyph(resetIcon)));
+      props.resetButtons === false ? null : h(IconButton, {
+        class: "hm-pg-reset", size: "xs", icon: resetIcon, tabindex: () => (changed() ? "0" : "-1"), "aria-hidden": () => (changed() ? null : "true"),
+        label: () => resetName(p), title: () => L().resetTitle ?? t`Reset to saved`, onClick: () => resetKeys([p.key], resetName(p)),
+      }));
   };
   // rows are built once and kept; search and `hidden` only show / hide them
   const rows = new Map<string, Element>();
@@ -202,33 +208,28 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     const items = g.items.map((p) => { const el = rowOf(p); return () => (matches().has(p.key) ? el : null); });
     const shown = computed((): boolean => g.items.some((p) => matches().has(p.key)));
     const changedIn = (): number => g.items.filter((p) => changes().includes(p.key)).length;
-    const head = [h("span", { class: "hm-pg-group-name" }, g.name || (L().general ?? t`General`)),
-      props.changeMarks === false ? null : () => (changedIn() ? h("span", { class: "hm-pg-count", "aria-label": L().changedCount?.(changedIn()) ?? t`${changedIn()} changed` }, String(changedIn())) : null)];
+    const head = [h(SectionLabel, { as: "span", size: "md", class: "hm-pg-group-name" }, g.name || (L().general ?? t`General`)),
+      props.changeMarks === false ? null : () => (changedIn() ? h(Badge, { class: "hm-pg-count", size: "xs", tone: "primary", count: changedIn(), ariaLabel: L().changedCount?.(changedIn()) ?? t`${changedIn()} changed` }) : null)];
     const content = h("div", { class: "hm-pg-rows" }, items);
     // the group box is built once (body runs again when the groups change): rows are never moved while they are used
     const box = g.name || grouped().length > 1 ? h(Disclosure, { title: head, open: () => { query(); return true; }, class: "hm-pg-group", children: content }) : content;
     return () => (shown() ? box : null);
   }));
 
-  const btn = (label: () => string, ic: Parameters<typeof glyph>[0], onClick: () => void, disabled: () => boolean, cls = "hm-pg-btn"): Element =>
-    h("button", { type: "button", class: cls, "aria-label": label, title: label, disabled, onClick }, glyph(ic));
-  const lastUndo = (): string => history?.past()[0] ?? "";
-  const nextRedo = (): string => history?.future()[0] ?? "";
-
   props.api?.({ changes: () => changes(), save, revert, markSaved, focus: (k) => (globalThis.document?.getElementById(`${base}-${k}`) as HTMLElement | null)?.focus() });
 
   return h("section", { class: () => cx("hm-pg", props.layout === "stacked" && "hm-pg-stacked", val(props.class)), "aria-label": title },
-    h("div", { class: "hm-pg-head" },
-      props.search === false ? null : h("div", { class: "hm-pg-search" }, glyph(searchIcon, "hm-svg hm-pg-search-icon"),
-        TextInput({ type: "search", ariaLabel: L().search ?? t`Search properties`, placeholder: L().search ?? t`Search properties`, get value() { return query(); }, setValue: (v: string) => query.set(v), class: "hm-pg-search-input" } as never)),
-      history && props.historyButtons !== false && h("div", { class: "hm-pg-history" },
-        btn(() => (L().undo ? [L().undo, lastUndo()].filter(Boolean).join(": ") : lastUndo() ? t`Undo: ${lastUndo()}` : t`Undo`), undoIcon, () => void history.undo(), () => !history.canUndo()),
-        btn(() => (L().redo ? [L().redo, nextRedo()].filter(Boolean).join(": ") : nextRedo() ? t`Redo: ${nextRedo()}` : t`Redo`), redoIcon, () => void history.redo(), () => !history.canRedo()))),
+    h(PanelHeader, { as: "div", size: "sm", divider: true, class: "hm-pg-head",
+      actions: history && props.historyButtons !== false ? h(UndoRedo, { class: "hm-pg-history", history, size: "sm", shortcuts: false, labels: { undo: () => L().undo, redo: () => L().redo } }) : undefined,
+      children: props.search === false ? undefined : h(SearchBox, { class: "hm-pg-search", inputClass: "hm-pg-search-input", size: "sm", debounce: 0, value: query,
+        label: () => L().search ?? t`Search properties`, placeholder: () => L().search ?? t`Search properties` }) }),
     h("div", { class: "hm-pg-body" }, body,
-      () => (matches().size ? null : h("p", { class: "hm-pg-empty", role: "status" }, () => (query() ? L().noMatch?.(query()) ?? t`No property matches “${query()}”` : L().empty ?? t`No properties`)))),
+      () => (matches().size ? null : h("div", { class: "hm-pg-empty", role: "status" }, h(Empty, { size: "sm", title: () => (query() ? L().noMatch?.(query()) ?? t`No property matches “${query()}”` : L().empty ?? t`No properties`) })))),
     // the footer: while something changed, or always when there is a Save (disabled with nothing to save)
-    () => (props.footer !== false && (changes().length || props.onSave) ? untrack(() => h("div", { class: () => cx("hm-pg-foot", changes().length > 0 && "is-dirty"), role: "status" },
-      h("span", { class: "hm-pg-changes" }, () => (changes().length ? L().unsaved?.(changes().length) ?? t`${changes().length} unsaved changes` : L().noChanges ?? t`No changes`)),
-      () => (changes().length ? h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm hm-pg-revert", onClick: revert }, L().revert ?? t`Revert`) : null),
-      props.onSave && h("button", { type: "button", class: "hm-btn hm-btn-primary hm-btn-sm hm-pg-save", disabled: () => !changes().length, onClick: () => void save() }, L().save ?? t`Save`))) : null));
+    () => (props.footer !== false && (changes().length || props.onSave) ? untrack(() => h(PanelHeader, { as: "footer", size: "sm", divider: true, class: () => cx("hm-pg-foot", changes().length > 0 && "is-dirty"), role: "status",
+      title: () => (changes().length ? L().unsaved?.(changes().length) ?? t`${changes().length} unsaved changes` : L().noChanges ?? t`No changes`),
+      actions: [
+        () => (changes().length ? h(Button, { variant: "ghost", size: "sm", class: "hm-pg-revert", onClick: revert }, L().revert ?? t`Revert`) : null),
+        props.onSave && h(Button, { variant: "primary", size: "sm", class: "hm-pg-save", disabled: () => !changes().length, onClick: () => void save() }, L().save ?? t`Save`)],
+    })) : null));
 }

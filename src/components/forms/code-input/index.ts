@@ -4,11 +4,11 @@ import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { animateEl, reducedMotion } from "../../../motion/env.ts";
 import { t } from "../../../core/i18n.ts";
-import { model, ctl, cx, uid, syncValue, labelledBy, useField, type ControlProps } from "../../../forms/util.ts";
+import { model, ctl, cx, uid, syncValue, labelledBy, useField, itemColor, type ControlProps } from "../../../forms/util.ts";
 import { inputOf } from "../../../forms/affix.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { clamp } from "../../../core/util.ts";
-import { ownPart } from "../../../forms/rows.ts";
+import { ownPart } from "../../../ui/parts.ts";
 
 export interface CodeInputProps extends ControlProps<string> {
   /** Number of boxes, 3–12 (default 6). */
@@ -94,10 +94,7 @@ export function CodeInput(props: CodeInputProps): unknown {
     const v = clean(get());
     if (v !== cells.peek().join("")) cells.set(Array.from({ length: n }, (_, i) => v[i] ?? ""));
   });
-  const colorOf = (i: number): string | null => {
-    const list = props.colors === "brand" ? ["brand-orange", "brand-blue", "brand-green", "brand-purple"] : props.colors === "palette" ? PALETTE : Array.isArray(props.colors) ? props.colors : null;
-    return list && list.length ? (list[i % list.length] as string) : null;
-  };
+  const colorOf = (i: number): string | null => itemColor(props.colors === "palette" ? PALETTE : props.colors === "brand" || Array.isArray(props.colors) ? props.colors : null, i);
   for (let i = 0; i < n; i++) {
     const el = h("input", {
       type: () => (masked() ? "password" : "text"), class: () => cx("hm-otp-box", `hm-otp-b${(i % 4) + 1}`, cells()[i] && "is-filled"), id: i ? `${baseId}-${i}` : baseId,

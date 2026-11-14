@@ -13,8 +13,8 @@ test("Hero: one h1 with the gradient highlight, lead, actions (first primary), n
   const { el, dispose } = mount({ variant: "mesh", title: "Build sites fast", highlight: "fast", lead: "Lead", note: "No card", actions: [{ label: "Start" }, { label: "Demo" }] });
   assert.equal(el.querySelectorAll("h1").length, 1);
   assert.equal(el.querySelector("h1 .hm-hero-hl").textContent, "fast");
-  assert.equal(el.querySelector(".hm-hero-lead").textContent, "Lead");
-  const btns = el.querySelectorAll(".hm-hero-actions .hm-btn");
+  assert.equal(el.querySelector(".hm-section-head-lead").textContent, "Lead");
+  const btns = el.querySelectorAll(".hm-section-head-actions .hm-btn");
   assert.equal(btns.length, 2);
   assert.ok(btns[0].className.includes("primary"));
   assert.ok(el.querySelector(".hm-ov-fx-mesh"));
@@ -31,7 +31,7 @@ test("Hero: product frame, split media with a reserved image size, video stage",
   assert.ok(b.el.querySelector(".hm-hero-media .x"));
   b.dispose();
   const c = mount({ variant: "video", title: "T", video: { src: "/v.webm", poster: "/p.jpg" } });
-  assert.ok(c.el.querySelector(".hm-vbg .hm-hero-title"));
+  assert.ok(c.el.querySelector(".hm-vbg .hm-section-head-title"));
   c.dispose();
 });
 

@@ -1,4 +1,10 @@
 /* March — ColorInput. Imported by its component module; tokens.css provides the variables. */
 .hm-color { display: flex; gap: var(--hm-space-2); align-items: center; }
-.hm-color-swatch { width: var(--hm-control-h); height: var(--hm-control-h); padding: 2px; border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); background: var(--hm-surface); cursor: pointer; }
+/* the sample (Swatch) is as tall as a control; the native picker covers it, invisible */
+.hm-color-sample.hm-sample { inline-size: var(--hm-control-h); block-size: var(--hm-control-h); border-radius: var(--hm-radius); }
+.hm-color-sample > .hm-sample-body { position: static; }
+.hm-color-swatch { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer; }
+.hm-color-swatch:disabled { cursor: not-allowed; }
+.hm-color-sample:has(.hm-color-swatch:disabled) { opacity: .5; }
+.hm-color-sample:has(.hm-color-swatch:focus-visible) { outline: 2px solid var(--hm-accent, var(--hm-focus)); outline-offset: 2px; }
 .hm-color-text { max-width: 9rem; font-family: var(--hm-font-mono); }

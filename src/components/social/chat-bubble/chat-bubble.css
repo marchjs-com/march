@@ -41,19 +41,20 @@
 .hm-msg.is-emoji .hm-msg-tick.is-read { color: var(--hm-brand-blue, var(--hm-info)); }
 .hm-msg-tick.is-failed { color: var(--hm-danger); }
 .hm-msg-reacts { display: flex; flex-wrap: wrap; gap: .25rem; margin-block-start: -.375rem; padding-inline: .5rem; position: relative; z-index: 1; }
-.hm-msg-react { display: inline-flex; align-items: center; gap: .1875rem; padding: .125rem .4375rem; border-radius: var(--hm-radius-full); border: 1px solid var(--hm-border-subtle, var(--hm-border));
-  background: var(--hm-surface); color: var(--hm-text); font: inherit; font-size: var(--hm-text-sm); cursor: pointer; box-shadow: 0 2px 6px -3px color-mix(in srgb, var(--hm-text) 20%, transparent);
-  transition: transform var(--hm-dur) var(--hm-ease-spring); }
-.hm-msg-react:hover { transform: scale(1.08); }
-.hm-msg-react.is-mine { background: var(--hm-brand-blue-soft, var(--hm-info-soft)); border: 1.4px solid var(--hm-brand-blue, var(--hm-info)); }
+/* reaction chips: small pill Buttons (pressed = mine) · retry: a link Button */
+.hm-msg-react.hm-btn { min-height: 0; padding: .125rem .4375rem; border-color: var(--hm-border-subtle, var(--hm-border)); background: var(--hm-surface); color: var(--hm-text); font-weight: inherit;
+  box-shadow: 0 2px 6px -3px color-mix(in srgb, var(--hm-text) 20%, transparent); transition: transform var(--hm-dur) var(--hm-ease-spring); }
+.hm-msg-react .hm-btn-label { display: inline-flex; align-items: center; gap: .1875rem; }
+.hm-msg-react.hm-btn:hover { transform: scale(1.08); }
+.hm-msg-react.hm-btn.is-mine { background: var(--hm-brand-blue-soft, var(--hm-info-soft)); border: 1.4px solid var(--hm-brand-blue, var(--hm-info)); color: var(--hm-text); }
 .hm-msg-react-n { font-size: var(--hm-text-xs); font-weight: 800; }
 .hm-msg-react:focus-visible, .hm-msg-tool:focus-visible, .hm-msg-retry:focus-visible { outline: 2px solid var(--hm-brand-blue, var(--hm-primary)); outline-offset: 1px; }
-.hm-msg-retry { align-self: flex-end; margin-block-start: .25rem; padding: 0; border: 0; background: none; color: var(--hm-danger-text, var(--hm-danger)); font: inherit; font-size: var(--hm-text-xs); font-weight: 700; cursor: pointer; }
+.hm-msg-retry.hm-btn { align-self: flex-end; margin-block-start: .25rem; color: var(--hm-danger-text, var(--hm-danger)); font-size: var(--hm-text-xs); font-weight: 700; }
 .hm-msg-tools { display: flex; gap: .125rem; align-self: center; opacity: 0; transition: opacity var(--hm-dur) var(--hm-ease); }
 .hm-msg:hover .hm-msg-tools, .hm-msg:focus-within .hm-msg-tools { opacity: 1; }
 @media (hover: none) { .hm-msg-tools:not(:focus-within) { opacity: 0; } }
-.hm-msg-tool { display: inline-grid; place-items: center; width: 1.75rem; height: 1.75rem; padding: 0; border: 0; border-radius: 50%; background: var(--hm-surface-2); color: var(--hm-text-2); cursor: pointer; }
-.hm-msg-tool .hm-svg { width: 1rem; height: 1rem; }
+.hm-msg-tool.hm-icon-btn { inline-size: 1.75rem; block-size: 1.75rem; background: var(--hm-surface-2); color: var(--hm-text-2); }
+.hm-msg-tool.hm-icon-btn .hm-svg { width: 1rem; height: 1rem; }
 .hm-msg-mine .hm-msg-tool .hm-svg, .hm-msg-hint .hm-svg { transform: scaleX(-1); }
 :dir(rtl) .hm-msg-tool .hm-svg { transform: scaleX(-1); } :dir(rtl) .hm-msg-mine .hm-msg-tool .hm-svg { transform: none; }
 .hm-msg-hint { position: absolute; inset-block-end: .5rem; inset-inline-start: .25rem; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%;
@@ -64,6 +65,6 @@
 /* own color: data-hm-color sets --hm-accent for my bubble and the armed arrow */
 .hm-msg[data-hm-color] { --hm-msg-blue: var(--hm-accent); }
 .hm-msg[data-hm-color].is-armed .hm-msg-hint { background: var(--hm-accent); }
-.hm-msg[data-hm-color] .hm-msg-react.is-mine { border-color: var(--hm-accent); background: color-mix(in srgb, var(--hm-accent) 14%, var(--hm-surface)); }
+.hm-msg[data-hm-color] .hm-msg-react.hm-btn.is-mine { border-color: var(--hm-accent); background: color-mix(in srgb, var(--hm-accent) 14%, var(--hm-surface)); }
 .hm-msg-mine[data-hm-color]:not(.is-emoji) .hm-msg-bubble, .hm-msg[data-hm-color].is-armed .hm-msg-hint { color: var(--hm-on-accent); }
 .hm-msg-hint.is-own .hm-svg { transform: none; }

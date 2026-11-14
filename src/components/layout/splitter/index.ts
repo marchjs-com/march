@@ -6,8 +6,8 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { clamp, setStyle } from "../../../core/util.ts";
-import { resizeHandle } from "../../../behaviors/resize-handle/index.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { ResizeHandle } from "../resize-handle/index.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
 
 export interface SplitterProps {
   start: unknown;
@@ -32,7 +32,7 @@ export interface SplitterProps {
 /** Two resizable panes (drag the handle, or the arrow keys / Home / End on it; Enter resets). */
 export function Splitter(props: SplitterProps): Element {
   const vertical = props.orientation === "vertical";
-  const min = props.min ?? 0.15;
+  const min = props.min ?? 0.15, axis = vertical ? "block" : "inline";
   // the first share keeps to the limits too (an initial 35 % with min 40 % starts at 40 %)
   const share = signal(clamp(untrack(() => val(props.value)) ?? props.initial ?? 0.5, min, 1 - min));
   let root: HTMLElement | undefined;
@@ -43,15 +43,14 @@ export function Splitter(props: SplitterProps): Element {
   return h("div", { class: () => cx("hm-splitter", vertical && "hm-splitter-v", val(props.class)), ref: (x: HTMLElement) => { root = x; queueMicrotask(apply); } },
     h("div", { class: "hm-split-pane" }, props.start),
     props.handle === false
-      ? h("div", { class: "hm-split-handle is-fixed", role: "separator", "aria-orientation": vertical ? "horizontal" : "vertical" })
-      : h("div", {
-        class: "hm-split-handle", "aria-label": props.label ?? t`Resize`, "data-hm-color": colorAttr(props.color),
-        // drag, arrows (RTL mirrored), Home / End, Enter resets: the resize-handle behavior; the value is a percent
-        ref: (x: HTMLElement) => resizeHandle(x, {
-          value: () => share.peek() * 100, set: (v) => setShare(v / 100), min: min * 100, max: 100 - min * 100, step: 5,
-          axis: vertical ? "block" : "inline", scale: () => 100 / size(), reset: () => setShare(props.initial ?? 0.5),
-          onStart: () => root?.classList.add("is-dragging"), onEnd: () => root?.classList.remove("is-dragging"),
-        }),
-      }, props.handle != null && props.handle !== true ? h("span", { class: "hm-split-grip", "aria-hidden": "true" }, props.handle) : null),
+      ? h(ResizeHandle, { edge: "between", axis, line: "always", class: "hm-split-handle is-fixed", role: "separator", "aria-orientation": vertical ? "horizontal" : "vertical", "aria-hidden": null })
+      // drag, arrows (RTL mirrored), Home / End, Enter resets: ResizeHandle between the panes; the value is a percent
+      : h(ResizeHandle, {
+        edge: "between", axis, line: "always", class: "hm-split-handle", label: props.label ?? t`Resize`, color: props.color,
+        value: () => share.peek() * 100, set: (v: number) => setShare(v / 100), min: min * 100, max: 100 - min * 100, step: 5,
+        scale: () => 100 / size(), reset: () => setShare(props.initial ?? 0.5),
+        onStart: () => root?.classList.add("is-dragging"), onEnd: () => root?.classList.remove("is-dragging"),
+        grip: props.handle != null && props.handle !== true ? h("span", { class: "hm-split-grip" }, props.handle) as Node : undefined,
+      }),
     h("div", { class: "hm-split-pane" }, props.end));
 }

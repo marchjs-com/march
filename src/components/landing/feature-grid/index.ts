@@ -6,8 +6,8 @@
 // Items enter one after another (Reveal). Every tile in a row has the same height; on phones everything stacks.
 import "./feature-grid.css";
 import { h } from "../../../dom/h.ts";
-import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { cx, val, listen, setStyle, type ClassProp } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
 import { Grid } from "../../../ui/stack.ts";
 import { Card } from "../../../ui/card.ts";
 import { IconTile, type IconTone } from "../../../ui/app.ts";
@@ -60,11 +60,11 @@ export function FeatureGrid(props: FeatureGridProps): Element {
     : h(Grid, { cols: variant === "list" ? 2 : props.cols ?? 3, gap: variant === "plain" ? 6 : 4, equal: variant === "cards" }, props.items.map(tile));
   const root = h("div", { class: cx("hm-fg", `hm-fg-v-${variant}`, props.spotlight !== false && (variant === "cards" || variant === "bento") && "is-spotlight", val(props.class)) }, grid) as HTMLElement;
 
-  if (props.reveal !== "none") { const stop = revealOnScroll(root, { effect: props.reveal ?? "up", select: ".hm-fg-item", stagger: 70 }); if (getOwner()) onCleanup(stop); }
+  if (props.reveal !== "none") owned(revealOnScroll(root, { effect: props.reveal ?? "up", select: ".hm-fg-item", stagger: 70 }));
   if (props.spotlight !== false && (variant === "cards" || variant === "bento")) {
     // one listener for the grid; every tile gets the pointer position relative to itself (its glow and border light)
     let pending = false, px = 0, py = 0;
-    const off = listen(root, {
+    owned(listen(root, {
       pointermove: (e: PointerEvent) => {
         px = e.clientX; py = e.clientY;
         if (pending) return;
@@ -74,8 +74,7 @@ export function FeatureGrid(props: FeatureGridProps): Element {
           mutate(() => { pending = false; tiles.forEach((t, i) => setStyle(t, { "--hm-fg-x": `${px - rects[i]!.left}px`, "--hm-fg-y": `${py - rects[i]!.top}px` })); });
         });
       },
-    });
-    if (getOwner()) onCleanup(off);
+    }));
   }
   return root;
 }

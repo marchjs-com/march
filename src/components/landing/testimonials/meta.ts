@@ -6,7 +6,7 @@ export default defineMeta({
   category: "landing",
   since: "0.1.0",
   summary: "Customer quotes as a grid, two drifting Marquee rows, a masonry wall with Show more, or a Carousel; Avatar and Rating.",
-  composedOf: ["Card", "Avatar", "Rating", "Marquee", "Carousel", "Button", "Reveal"],
+  composedOf: ["Card", "Avatar", "Rating", "Marquee", "Carousel", "Button", "ListRow", "Reveal"],
   showcase: "/web",
   demoGroup: "proof",
 });

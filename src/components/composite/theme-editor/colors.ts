@@ -2,11 +2,17 @@
 // selected one, a dark mode made from the light one and the WCAG contrast audit with fixes.
 import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
+import { live } from "../../../forms/util.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, uid, setStyle } from "../../../core/util.ts";
+import { cx, setStyle } from "../../../core/util.ts";
 import { Segmented } from "../../../forms/inputs.ts";
-import { Button } from "../../../ui/button.ts";
+import { Button } from "../../actions/button/index.ts";
 import { Badge } from "../../../ui/badge.ts";
+import { Card } from "../../data/card/index.ts";
+import { ListRow } from "../../data/list-row/index.ts";
+import { Swatch } from "../../forms/swatch/index.ts";
+import { Stack } from "../../layout/stack/index.ts";
+import { SectionLabel } from "../../typography/section-label/index.ts";
 import { ColorPicker } from "../color-picker/index.ts";
 import * as M from "./model.ts";
 import type { ThemeEditorContext } from "./types.ts";
@@ -36,7 +42,6 @@ const CHECK_LABEL: Record<string, () => string> = {
 export function ColorsPanel({ ctx }: { ctx: ThemeEditorContext }): Element {
   const { draft, mode, change } = ctx;
   const ro = ctx.readonly;
-  const id = uid("hm-te-c");
   const selected = signal<M.ColorKey>("primary");
   const colorNow = (): string => M.colorOf(draft()[mode()], selected());
   const setColor = (k: M.ColorKey, v: string, merge = true): void => {
@@ -53,41 +58,46 @@ export function ColorsPanel({ ctx }: { ctx: ThemeEditorContext }): Element {
       return { ...d, [m]: c };
     });
   };
-  const chip = (color: () => string, cls = "hm-te-chip"): Element => { const el = h("span", { class: cls, "aria-hidden": "true" }) as HTMLElement; effect(() => setStyle(el, { "--hm-te-c": color() })); return el; };
-  const tokenButton = (k: M.ColorKey): Element => h("button", {
-    type: "button", class: () => cx("hm-te-token", selected() === k && "is-selected"), "aria-pressed": () => String(selected() === k),
+  // a colour sample (an opaque theme colour: no checkerboard under it)
+  const chip = (color: () => string, size: "md" | "lg" = "md"): Element => h(Swatch, { class: "hm-te-chip", color, size, checker: false }) as Element;
+  // a token: a selectable ListRow (sample, name, hex)
+  const tokenButton = (k: M.ColorKey): Element => h(ListRow, {
+    class: "hm-te-token", size: "sm", overflow: "ellipsis", selected: () => selected() === k,
     "aria-label": () => `${keyLabel(k)}: ${M.colorOf(draft()[mode()], k)}`, onClick: () => selected.set(k),
-  }, chip(() => M.colorOf(draft()[mode()], k)), h("span", { class: "hm-te-token-name" }, () => keyLabel(k)), h("code", { class: "hm-te-token-hex" }, () => M.hex(M.colorOf(draft()[mode()], k))));
+    lead: chip(() => M.colorOf(draft()[mode()], k)), title: () => keyLabel(k), sub: h("code", { class: "hm-te-token-hex" }, () => M.hex(M.colorOf(draft()[mode()], k))),
+  }) as Element;
   const checkRow = (c: M.ContrastCheck): Element => {
-    const sample = h("span", { class: "hm-te-sample", "aria-hidden": "true" }, "Aa") as HTMLElement;
     const vals = (): M.DraftColors => draft()[mode()];
-    effect(() => setStyle(sample, { "--hm-te-fg": vals()[c.fg], "--hm-te-bg": vals()[c.bg] }));
-    return h("li", { class: cx("hm-te-check", c.ok ? "is-ok" : "is-bad") }, sample,
-      h("span", { class: "hm-te-check-text" }, h("span", {}, CHECK_LABEL[c.label]?.() ?? c.label), h("small", { class: "hm-muted" }, `${keyLabel(c.fg)} / ${keyLabel(c.bg)}`)),
-      h("b", { class: "hm-te-ratio" }, `${c.ratio.toFixed(2)}:1`),
-      h(Badge, { tone: c.ok ? "success" : "danger" }, c.ok ? (c.min >= 4.5 ? "AA" : t`AA UI`) : t`Below ${c.min}:1`),
-      c.fix ? h(Button, { size: "sm", variant: "ghost", disabled: ro, onClick: () => fix(c), "aria-label": t`Fix: ${CHECK_LABEL[c.label]?.() ?? c.label}` }, t`Fix`) : null);
+    const sample = h(Swatch, { class: "hm-te-sample", size: "md", checker: false, color: () => vals()[c.bg] }, "Aa") as HTMLElement;
+    effect(() => setStyle(sample, { "--hm-te-fg": vals()[c.fg] }));
+    return h(ListRow, {
+      as: "li", class: cx("hm-te-check", c.ok ? "is-ok" : "is-bad"), size: "sm", overflow: "ellipsis", lead: sample,
+      title: CHECK_LABEL[c.label]?.() ?? c.label, sub: `${keyLabel(c.fg)} / ${keyLabel(c.bg)}`,
+      trail: [h("b", { class: "hm-te-ratio" }, `${c.ratio.toFixed(2)}:1`), h(Badge, { tone: c.ok ? "success" : "danger" }, c.ok ? (c.min >= 4.5 ? "AA" : t`AA UI`) : t`Below ${c.min}:1`)],
+      actions: c.fix ? h(Button, { size: "sm", variant: "ghost", disabled: ro, onClick: () => fix(c), "aria-label": t`Fix: ${CHECK_LABEL[c.label]?.() ?? c.label}` }, t`Fix`) : undefined,
+    }) as Element;
   };
   const colorsPanel = (): Element => h("div", { class: "hm-te-colors" },
-    h("div", { class: "hm-te-row" },
-      h(Segmented, { "aria-label": t`Mode`, get value() { return mode(); }, onChange: (v: M.DraftMode | null) => { if (v) mode.set(v); }, options: [{ value: "light", label: t`Light` }, { value: "dark", label: t`Dark` }] }),
+    h(Stack, { direction: "row", wrap: true },
+      h(Segmented, { "aria-label": t`Mode`, value: live(() => mode()), onChange: (v: M.DraftMode | null) => { if (v) mode.set(v); }, options: [{ value: "light", label: t`Light` }, { value: "dark", label: t`Dark` }] }),
       h(Button, { size: "sm", variant: "ghost", disabled: ro, onClick: () => { change(t`Dark from light`, (d) => ({ ...d, dark: M.deriveDark(d.light) })); mode.set("dark"); } }, t`Make dark from light`)),
     h("div", { class: "hm-te-colors-grid" },
-      h("div", { class: "hm-te-groups" }, GROUPS.map(([label, keys]) => h("fieldset", { class: "hm-te-group" }, h("legend", {}, label), h("div", { class: "hm-te-tokens" }, keys.map(tokenButton))))),
+      h("div", { class: "hm-te-groups" }, GROUPS.map(([label, keys]) => h("fieldset", { class: "hm-te-group" }, h(SectionLabel, { as: "legend", size: "md", label }), h("div", { class: "hm-te-tokens" }, keys.map(tokenButton))))),
       h("div", { class: "hm-te-edit" },
-        h("div", { class: "hm-te-edit-head" }, chip(colorNow, "hm-te-chip hm-te-chip-lg"),
+        h("div", { class: "hm-te-edit-head" }, chip(colorNow, "lg"),
           h("span", {}, h("strong", {}, () => keyLabel(selected())), h("code", {}, () => `--hm-${selected() === "solid" ? "primary-solid" : selected() === "onSolid" ? "on-primary" : selected() === "raised" ? "surface-raised" : selected()}`))),
-        h(ColorPicker, { alpha: false, recent: 6, get readonly() { return ro(); }, get value() { return colorNow(); }, onChange: (v: string) => setColor(untrack(selected), v) }),
+        h(ColorPicker, { alpha: false, recent: 6, readonly: live(() => ro()), value: live(() => colorNow()), onChange: (v: string) => setColor(untrack(selected), v) }),
         h("div", { class: "hm-te-scale", role: "group", "aria-label": () => t`Tone scale of ${keyLabel(selected())}` },
-          () => M.toneScale(colorNow()).map((s) => h("button", {
-            type: "button", class: () => cx("hm-te-tone", M.hex(colorNow()) === s.color && "is-current"), "aria-label": t`Tone ${s.step}: ${s.color}`, disabled: ro,
-            onClick: () => setColor(untrack(selected), s.color, false),
-          }, chip(() => s.color, "hm-te-tone-chip"), h("span", {}, String(s.step))))))),
-    h("section", { class: "hm-te-audit", "aria-labelledby": `${id}-audit` },
-      h("div", { class: "hm-te-row" },
-        h("h4", { id: `${id}-audit`, class: "hm-te-h" }, t`Contrast (WCAG)`),
+          () => M.toneScale(colorNow()).map((s) => h("span", { class: "hm-te-tone-cell" },
+            h(Swatch, {
+              class: "hm-te-tone", color: s.color, shape: "square", checker: false, selected: () => M.hex(colorNow()) === s.color, label: t`Tone ${s.step}: ${s.color}`, disabled: ro,
+              onClick: () => setColor(untrack(selected), s.color, false),
+            }), h("span", { class: "hm-te-tone-step", "aria-hidden": "true" }, String(s.step))))))),
+    h(Card, {
+      class: "hm-te-audit", title: t`Contrast (WCAG)`,
+      actions: [
         h("span", { class: "hm-muted hm-te-audit-sum", "aria-live": "polite" }, () => { const a = audit(); return t`${a.filter((x) => x.ok).length} of ${a.length} pass`; }),
-        h(Button, { size: "sm", variant: "secondary", disabled: () => ro() || audit().every((x) => x.ok), onClick: fixAll }, t`Fix all`)),
-      h("ul", { class: "hm-te-checks" }, () => audit().map(checkRow))));
+        h(Button, { size: "sm", variant: "secondary", disabled: () => ro() || audit().every((x) => x.ok), onClick: fixAll }, t`Fix all`)],
+    }, h("ul", { class: "hm-te-checks" }, () => audit().map(checkRow))));
   return colorsPanel();
 }

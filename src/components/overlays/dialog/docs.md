@@ -48,6 +48,11 @@ await askReason({ min: 20, counter: false, labels: { reason: "Why?", tooShort: (
 inside, Escape closes the topmost one (a popover inside closes first), focus returns to the opener. The page behind
 is scroll-locked. On phones the panel rises from the bottom edge; drawers mirror in right-to-left layouts.
 
+`openDrawer()` (and `openDialog(render, { kind: "drawer", side })`) opens the `<Drawer>` component: one drawer, with its
+grab handle, drag to close and logical sides. Its module is loaded when the first one opens.
+
 ## Composed of
 
-Portal (the dialog layer).
+Portal (the dialog layer), PanelHeader (the head with the title and the ×, and the foot bar), IconButton (the ×),
+Button (the buttons of confirm / prompt / askReason), Field with TextInput / Textarea (prompt, the reason) and Select
+(the purposes of askReason), Drawer (openDrawer).

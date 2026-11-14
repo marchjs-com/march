@@ -1,10 +1,12 @@
 // CountRoll (hadi-march/ui): a number that rolls when it changes. Only the digits that changed move, upward when the
 // value grows and downward when it shrinks (an odometer), on the motion engine. Compact by default (1,2 B / 12K) in the
-// active locale; screen readers get the full value once, never the moving pieces. The rolling is motion/digits.ts
-// (shared with the landing Counter).
+// active locale; screen readers get the full value once, never the moving pieces. This is the one odometer: the
+// landing Counter's `mode="roll"` draws through it (the digits themselves are motion/digits.ts).
 import { effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
+import { locale } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { still } from "../../../motion/engine/parts.ts";
 import { formatCount } from "../../../ui/format.ts";
 import { drawDigits, rollDigits } from "../../../motion/digits.ts";
 import "./count-roll.css";
@@ -19,7 +21,9 @@ export interface CountRollProps {
   duration?: number | undefined;
   /** Your own visible text for a value: `(n) => "1.2k likes"` (screen readers still get the full number). */
   formatter?: ((n: number) => string) | undefined;
-  /** Roll on change. Default true; false swaps the digits at once. */
+  /** Your own text for screen readers: `(n) => "1,234 likes"` (default: the full grouped number). */
+  spoken?: ((n: number) => string) | undefined;
+  /** Roll on change. Default true; false swaps the digits at once (as reduced motion does). */
   roll?: MaybeFn<boolean | undefined>;
   /** Delay between neighbouring digits (ms). Default 24. */
   stagger?: number | undefined;
@@ -35,14 +39,14 @@ export function CountRoll(props: CountRollProps): Element {
   const text = (n: number): string => (n === 0 && val(props.hideZero) ? "" : props.formatter ? props.formatter(n) : formatCount(n, val(props.format) ?? "compact"));
   const root = h("span", { class: () => cx("hm-roll", val(props.class)) },
     h("span", { class: "hm-roll-vis", "aria-hidden": "true", ref: (x: HTMLElement) => { box = x; } }),
-    h("span", { class: "hm-sr-only" }, () => { const n = val(props.value); return n == null || (n === 0 && val(props.hideZero)) ? "" : formatCount(n, "full"); })) as HTMLElement;
+    h("span", { class: "hm-sr-only" }, () => { const n = val(props.value); return n == null || (n === 0 && val(props.hideZero)) ? "" : props.spoken ? props.spoken(n) : formatCount(n, "full"); })) as HTMLElement;
   effect(() => {
     const n = Number(val(props.value) ?? 0);
-    val(props.format); val(props.hideZero);
+    val(props.format); val(props.hideZero); locale(); // a new format or language redraws the same value
     untrack(() => {
       const next = text(n);
-      // first paint, a detached box, `roll={false}` or a new format of the same value: draw; a new value: roll
-      if (prev === null || !box.isConnected || val(props.roll) === false || n === prev) { if (prev === null || shown !== next) drawDigits(box, next); }
+      // first paint, a detached box, `roll={false}` (or reduced motion) or a new format of the same value: draw; a new value: roll
+      if (prev === null || !box.isConnected || still(props.roll) || n === prev) { if (prev === null || shown !== next) drawDigits(box, next); }
       else if (shown !== next) rollDigits(box, shown, next, { up: n >= prev, duration: props.duration ?? 320, ...(props.stagger != null ? { stagger: props.stagger } : {}) });
       prev = n; shown = next;
     });

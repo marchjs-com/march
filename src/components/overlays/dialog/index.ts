@@ -2,20 +2,26 @@
 // Imperative helpers return promises: confirm() → boolean, prompt() → string|null, askReason() → string|{category,text}|null,
 // openDialog((close) => content) → whatever close(value) received (undefined when dismissed).
 import "./dialog.css";
-import "../../../ui/button.css";
-import "../../../ui/field.css";
 import { signal, createRoot, onCleanup, untrack, type Signal } from "../../../core/reactive.ts";
-import { h } from "../../../dom/h.ts";
+import { h, lazyChildren } from "../../../dom/h.ts";
 import { Portal, openLayer } from "../../../dom/portal.ts";
 import { overlayScopeFor } from "../../layout/overlay-scope/index.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, uid, glyph, type MaybeFn } from "../../../ui/util.ts";
+import { val, cx, uid, type MaybeFn } from "../../../ui/util.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { trapTab, focusables } from "../../../ui/focus.ts";
-import { isIconDef } from "../../../icons/svg.ts";
+import { PanelHeader } from "../../layout/panel-header/index.ts";
+import { Button, type ButtonVariant } from "../../actions/button/index.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { Field } from "../../../forms/field.ts";
+import { live } from "../../../forms/util.ts";
+import { TextInput } from "../../forms/text-input/index.ts";
+import { Textarea } from "../../forms/textarea/index.ts";
+import { Select } from "../../forms/select/index.ts";
 
 export type DialogSize = "sm" | "md" | "lg" | "full";
-export type DrawerSide = "left" | "right" | "bottom";
+/** Edge a drawer comes from (`start` / `end` follow the writing direction; `left` / `right` are aliases of them). */
+export type DrawerSide = "start" | "end" | "top" | "bottom" | "left" | "right";
 /** Entrance of a dialog panel: "scale" (default), "fade", "rise" or "none" (the scrim then appears at once too). */
 export type DialogMotion = "scale" | "fade" | "rise" | "none";
 /** Text shown in a dialog: a string or an accessor. */
@@ -45,8 +51,8 @@ export interface FrameOptions {
   size?: MaybeFn<DialogSize | undefined>;
   dismissable?: MaybeFn<boolean | undefined>;
   onClose: () => void;
+  /** "drawer": the panel of a <Drawer> (it adds its own classes and movement). */
   kind?: "dialog" | "drawer";
-  side?: DrawerSide | undefined;
   class?: string | undefined;
   role?: string | undefined;
   footer?: unknown;
@@ -82,17 +88,20 @@ export function frame(o: FrameOptions): HTMLElement {
   },
   h("div", {
     ref: (x: HTMLElement) => { panel = x; },
-    class: cx(drawer ? `hm-drawer hm-drawer-${o.side ?? "right"}` : `hm-dialog hm-dialog-${val(o.size) ?? "md"}`, o.motion && o.motion !== "scale" && `hm-motion-${o.motion}`, o.class),
+    class: cx(drawer ? "hm-drawer" : `hm-dialog hm-dialog-${val(o.size) ?? "md"}`, o.motion && o.motion !== "scale" && `hm-motion-${o.motion}`, o.class),
     role: o.role ?? "dialog", "aria-modal": modal ? "true" : null, tabindex: "-1",
     "aria-labelledby": o.title != null ? titleId : null, "aria-label": o.title == null ? o.label ?? null : null,
     onKeydown: (e: KeyboardEvent) => { if (panel && modal) trapTab(panel)(e); },
   },
-  o.title != null && h("div", { class: "hm-dialog-head" },
-    h("h2", { id: titleId, class: "hm-dialog-title" }, () => val(o.title)),
-    () => dismissable() && o.closeButton !== false && h("button", { type: "button", class: "hm-icon-btn hm-dialog-x", "aria-label": () => val(o.closeLabel) ?? t`Close`, onClick: () => o.onClose() },
-      o.closeButton == null || o.closeButton === true ? glyph(xIcon) : isIconDef(o.closeButton) ? glyph(o.closeButton) : o.closeButton)),
+  o.title != null && h(PanelHeader, {
+    class: "hm-dialog-head", size: "lg", title: () => val(o.title), titleAs: "h2", titleId,
+    // the × follows `dismissable` (it may change while open), so it sits in the actions slot
+    actions: () => dismissable() && o.closeButton !== false && h(IconButton, {
+      class: "hm-dialog-x", icon: o.closeButton == null || o.closeButton === true ? xIcon : o.closeButton, label: () => val(o.closeLabel) ?? t`Close`, title: false, onClick: () => o.onClose(),
+    }),
+  }),
   h("div", { class: "hm-dialog-body", ref: (x: HTMLElement) => { body = x; } }, o.children),
-  o.footer != null && h("div", { class: "hm-dialog-foot" }, o.footer))) as HTMLElement;
+  o.footer != null && h(PanelHeader, { as: "footer", class: "hm-dialog-foot" }, o.footer))) as HTMLElement;
   queueMicrotask(() => {
     if (!panel?.isConnected) return;
     (panel.querySelector<HTMLElement>("[data-autofocus]") ?? (body && focusables(body)[0]) ?? focusables(panel)[0] ?? panel).focus();
@@ -112,6 +121,7 @@ export interface DialogOptions<T = unknown> {
   size?: MaybeFn<DialogSize | undefined>;
   dismissable?: boolean;
   footer?: (close: (value: T) => void) => unknown;
+  /** "drawer": opens a <Drawer> from `side` instead (what openDrawer() does). */
   kind?: "dialog" | "drawer";
   side?: DrawerSide;
   class?: string;
@@ -137,25 +147,27 @@ export function openDialog<T = unknown>(render: (close: (value?: T) => void) => 
 export function openDialog(render: (close: (value?: unknown) => void) => unknown, opts: DialogOptions = {}): Promise<unknown> {
   // where it opens: the caller's <OverlayScope> (a preview, a panel), else the page; target overrides
   const t = opts.target, scope = t === "page" ? null : t instanceof HTMLElement ? t : overlayScopeFor();
+  // one drawer: the <Drawer> component, loaded when the first one opens (a dialog does not carry its gestures)
+  if (opts.kind === "drawer") return import("../drawer/index.ts").then((m) => m.openSheet(render, opts, scope));
   return new Promise((resolve) => {
     createRoot((dispose) => {
       let done = false;
       const close = (v?: unknown): void => { if (done) return; done = true; dispose(); resolve(v); };
       const node = untrack(() => frame({ ...opts, onClose: () => close(opts.dismissValue), children: render(close), footer: opts.footer?.(close) }));
-      onCleanup(openLayer(opts.kind === "drawer" ? "drawer" : "dialog", node, scope));
+      onCleanup(openLayer("dialog", node, scope));
     }, null);
   });
 }
 
-/** Open a side sheet imperatively (same contract as openDialog). */
+/** Open a side sheet imperatively (same contract as openDialog): a `<Drawer>` from `side`. */
 export function openDrawer<T>(render: (close: (value: T) => void) => unknown, opts: DialogOptions<T> & { dismissValue: T }): Promise<T>;
 export function openDrawer<T = unknown>(render: (close: (value?: T) => void) => unknown, opts?: DialogOptions<T | undefined>): Promise<T | undefined>;
 export function openDrawer(render: (close: (value?: unknown) => void) => unknown, opts: DialogOptions = {}): Promise<unknown> {
   return openDialog(render, { ...opts, kind: "drawer" });
 }
 
-const btn = (label: Label, cls: string, onClick: () => void, extra: Record<string, unknown> = {}): Element =>
-  h("button", { type: "button", class: `hm-btn ${cls}`, onClick, ...extra }, () => val(label));
+const btn = (label: Label, variant: ButtonVariant, onClick: () => void, extra: Record<string, unknown> = {}): unknown =>
+  h(Button, { variant, onClick, ...extra }, () => val(label));
 
 export interface ConfirmOptions {
   title?: Label | undefined;
@@ -171,28 +183,25 @@ export function confirm({ title, message, danger = false, ok, cancel, dialog }: 
   return openDialog<boolean>(() => message != null && h("p", { class: "hm-dialog-msg" }, () => val(message)), {
     size: "sm", ...dialog, title: title ?? (() => t`Are you sure?`), role: "alertdialog", dismissValue: false,
     footer: (close) => [
-      btn(cancel ?? (() => t`Cancel`), "hm-btn-secondary", () => close(false), { "data-cancel": "", "data-autofocus": danger ? "" : null }),
-      btn(ok ?? (() => t`OK`), danger ? "hm-btn-danger" : "hm-btn-primary", () => close(true), { "data-ok": "", "data-autofocus": danger ? null : "" }),
+      btn(cancel ?? (() => t`Cancel`), "secondary", () => close(false), { "data-cancel": "", "data-autofocus": danger ? "" : null }),
+      btn(ok ?? (() => t`OK`), danger ? "danger" : "primary", () => close(true), { "data-ok": "", "data-autofocus": danger ? null : "" }),
     ],
   });
 }
 
 interface FieldOptions {
-  id: string; label?: Label | undefined; value: string; multiline: boolean; placeholder?: string | undefined; error: Signal<string | null>;
-  onInput: (v: string) => void; onEnter: () => void; rows?: number;
+  id: string; label?: Label | undefined; value: string; multiline: boolean; placeholder?: string | undefined; error: () => string | null;
+  onInput: (v: string) => void; onEnter: () => void; rows?: number; help?: (() => string | null) | undefined;
 }
 // Shared body for prompt/askReason: a labelled field with an error line.
-function field({ id, label, value, multiline, placeholder, error, onInput, onEnter, rows = 3 }: FieldOptions): Element {
-  const errId = `${id}-err`;
-  const input = h(multiline ? "textarea" : "input", {
-    id, class: multiline ? "hm-textarea" : "hm-input", value, placeholder: placeholder ?? null, rows: multiline ? rows : null, "data-autofocus": "",
-    "aria-invalid": () => (error() ? "true" : null), "aria-describedby": errId,
-    onInput: (e: Event) => onInput((e.target as HTMLInputElement).value),
-    onKeydown: (e: KeyboardEvent) => { if (e.key === "Enter" && (!multiline || e.ctrlKey || e.metaKey)) { e.preventDefault(); onEnter(); } },
-  });
-  return h("div", { class: "hm-field" },
-    label != null && h("label", { class: "hm-label", for: id }, () => val(label)), input,
-    h("div", { id: errId, class: "hm-field-error", role: "alert" }, () => error() ?? ""));
+function field({ id, label, value, multiline, placeholder, error, onInput, onEnter, rows = 3, help }: FieldOptions): unknown {
+  const control = {
+    id, value, placeholder, onChange: onInput, ref: (el: HTMLElement) => el.setAttribute("data-autofocus", ""),
+    onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter" && (!multiline || e.ctrlKey || e.metaKey)) { e.preventDefault(); onEnter(); } },
+  };
+  // the control is created inside the Field (it reads the field's id, error state and description)
+  return h(Field, { id, label: live(() => (label == null ? null : val(label))), error: live(error), help: live(() => help?.() ?? null) },
+    lazyChildren(() => (multiline ? h(Textarea, { ...control, rows, autosize: false }) : h(TextInput, control))));
 }
 
 export interface PromptOptions {
@@ -219,7 +228,7 @@ export function prompt({ title, message, label, value = "", placeholder, validat
       field({ id: uid("hm-prompt"), label, value: text.peek(), multiline, placeholder, error, onInput: (v) => { text.set(v); error.set(null); }, onEnter: () => submit() })];
   }, {
     size: "sm", ...dialog, title: title ?? (() => t`Enter a value`), dismissValue: null,
-    footer: (close) => [btn(cancel ?? (() => t`Cancel`), "hm-btn-secondary", () => close(null), { "data-cancel": "" }), btn(ok ?? (() => t`OK`), "hm-btn-primary", () => submit(), { "data-ok": "" })],
+    footer: (close) => [btn(cancel ?? (() => t`Cancel`), "secondary", () => close(null), { "data-cancel": "" }), btn(ok ?? (() => t`OK`), "primary", () => submit(), { "data-ok": "" })],
   });
 }
 
@@ -254,28 +263,29 @@ export function askReason(opts: AskReasonOptions & { purposes: readonly Purpose[
 export function askReason(opts?: AskReasonOptions & { purposes?: undefined }): Promise<string | null>;
 export function askReason(opts?: AskReasonOptions): Promise<string | ReasonWithPurpose | null>;
 export function askReason({ title, message, min = 10, danger = false, ok, purposes, cancel, labels, counter, dialog }: AskReasonOptions = {}): Promise<string | ReasonWithPurpose | null> {
-  const text = signal(""), cat = signal(""), error = signal<string | null>(null);
+  const text = signal(""), cat = signal(""), error = signal<string | null>(null), catError = signal<string | null>(null);
   let submit = (): void => {};
   return openDialog<string | ReasonWithPurpose | null>((close) => {
     submit = () => {
       const v = text.peek().trim();
-      if (purposes?.length && !cat.peek()) { error.set(labels?.choosePurpose != null ? val(labels.choosePurpose) : t`Choose a purpose.`); return; }
+      if (purposes?.length && !cat.peek()) { catError.set(labels?.choosePurpose != null ? val(labels.choosePurpose) : t`Choose a purpose.`); return; }
       if (v.length < min) { error.set(labels?.tooShort ? labels.tooShort(min) : t`Please write at least ${min} characters.`); return; }
       close(purposes?.length ? { category: cat.peek(), text: v } : v);
     };
     const selId = uid("hm-purpose");
     return [message != null && h("p", { class: "hm-dialog-msg" }, () => val(message)),
-      purposes?.length && h("div", { class: "hm-field" },
-        h("label", { class: "hm-label", for: selId }, () => (labels?.purpose != null ? val(labels.purpose) : t`Purpose`)),
-        h("select", { id: selId, class: "hm-select", onChange: (e: Event) => { cat.set((e.target as HTMLSelectElement).value); error.set(null); } },
-          h("option", { value: "" }, () => (labels?.choose != null ? val(labels.choose) : t`Choose…`)),
-          purposes.map((p) => h("option", { value: p.value }, () => val(p.label))))),
-      field({ id: uid("hm-reason"), label: () => (labels?.reason != null ? val(labels.reason) : t`Reason`), value: "", multiline: true, error, onInput: (v) => { text.set(v); error.set(null); }, onEnter: () => submit() }),
-      counter !== false && h("div", { class: "hm-field-hint", "aria-live": "polite" }, () => `${text().trim().length} / ${min}`)];
+      purposes?.length && h(Field, { id: selId, label: live(() => (labels?.purpose != null ? val(labels.purpose) : t`Purpose`)), error: live(catError) },
+        lazyChildren(() => h(Select<string>, {
+          options: live(() => purposes.map((p) => ({ value: p.value, label: val(p.label) }))),
+          placeholder: live(() => (labels?.choose != null ? val(labels.choose) : t`Choose…`)),
+          onChange: (v: string | null) => { cat.set(v ?? ""); catError.set(null); },
+        }))),
+      field({ id: uid("hm-reason"), label: () => (labels?.reason != null ? val(labels.reason) : t`Reason`), value: "", multiline: true, error, onInput: (v) => { text.set(v); error.set(null); }, onEnter: () => submit(),
+        help: counter !== false ? () => `${text().trim().length} / ${min}` : undefined })];
   }, {
     size: "sm", ...dialog, title: title ?? (() => t`Reason`), dismissValue: null,
-    footer: (close) => [btn(cancel ?? (() => t`Cancel`), "hm-btn-secondary", () => close(null), { "data-cancel": "" }),
-      btn(ok ?? (() => t`Continue`), danger ? "hm-btn-danger" : "hm-btn-primary", () => submit(), { "data-ok": "" })],
+    footer: (close) => [btn(cancel ?? (() => t`Cancel`), "secondary", () => close(null), { "data-cancel": "" }),
+      btn(ok ?? (() => t`Continue`), danger ? "danger" : "primary", () => submit(), { "data-ok": "" })],
   });
 }
 
@@ -304,18 +314,18 @@ export interface DialogProps {
   motion?: DialogMotion | undefined;
 }
 
-function sheet(kind: "dialog" | "drawer"): (props: DialogProps) => () => unknown {
-  return (props) => () => {
+/** Declarative dialog: `<Dialog open={$open} onClose={() => $open = false} title="…" size="md" footer={…}>…</Dialog>` */
+export function Dialog(props: DialogProps): () => unknown {
+  return () => {
     if (!val(props.open)) return null;
     // a non-modal panel sits in a layer that leaves the page usable
-    return h(Portal, { layer: props.modal === false ? "popover" : kind, children: untrack(() => frame({
-      kind, side: props.side, title: props.title === undefined ? undefined : () => val(props.title), size: () => val(props.size),
+    return h(Portal, { layer: props.modal === false ? "popover" : "dialog", children: untrack(() => frame({
+      title: props.title === undefined ? undefined : () => val(props.title), size: () => val(props.size),
       dismissable: () => props.dismissable, class: props.class, label: props.label,
       modal: props.modal, closeButton: props.closeButton, closeLabel: () => val(props.closeLabel), motion: props.motion,
       onClose: () => props.onClose?.(), footer: props.footer, children: props.children,
     })) });
   };
 }
-/** Declarative dialog: `<Dialog open={$open} onClose={() => $open = false} title="…" size="md" footer={…}>…</Dialog>` */
-export const Dialog: (props: DialogProps) => () => unknown = sheet("dialog");
-// <Drawer> lives in src/components/overlays/drawer/ (4 sides, drag to close, snap points, non-modal); it reuses frame().
+// <Drawer> lives in src/components/overlays/drawer/ (4 sides, drag to close, snap points, non-modal); it reuses frame(),
+// and openDrawer() opens one.

@@ -54,7 +54,7 @@ test("HonestCompare: own texts, own cells, no tags, no filter, own colour", () =
   assert.equal(el.querySelector(".hm-hc-scroll").getAttribute("aria-label"), "Table");
   assert.equal(el.querySelectorAll("tbody .own").length, 5, "every yes cell is drawn by renderCell");
   assert.equal(el.querySelector(".hm-hc-yes"), null);
-  assert.equal(el.querySelector(".hm-hc-part-text").textContent, "Half", "undefined keeps the default mark, with the own text");
+  assert.equal(el.querySelector(".hm-hc-part .hm-checkmark-text").textContent, "Half", "undefined keeps the default mark, with the own text");
   assert.ok(el.querySelector(".hm-hc-no"));
   assert.deepEqual(seen[0], ["one", "us", true, 1]);
   assert.deepEqual(seen[4], ["two", "a", false, -1]);

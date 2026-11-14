@@ -48,4 +48,4 @@ presentational. Give the list a `label`.
 
 ## Composed of
 
-SectionLabel (group headings), the list-nav behavior.
+ListRow (every row), SectionLabel (group headings), the list-nav behavior.

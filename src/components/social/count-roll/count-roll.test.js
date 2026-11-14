@@ -29,10 +29,11 @@ test("CountRoll: hideZero shows nothing at 0", () => {
 
 test("CountRoll: own formatter, roll off", () => {
   const n = signal(7);
-  const m = mount(() => [h(CountRoll, { value: n, formatter: (v) => `${v} likes`, class: "mine" }), h(CountRoll, { value: n, roll: false })]);
+  const m = mount(() => [h(CountRoll, { value: n, formatter: (v) => `${v} likes`, spoken: (v) => `${v} people like this`, class: "mine" }), h(CountRoll, { value: n, roll: false })]);
   const [a, b] = m.el.querySelectorAll(".hm-roll-vis");
   assert.ok(m.el.querySelector(".hm-roll.mine"));
   assert.equal(a.textContent, "7 likes");
+  assert.equal(m.el.querySelector(".hm-roll.mine .hm-sr-only").textContent, "7 people like this", "own text for screen readers");
   n.set(8);
   assert.ok(a.querySelector(".hm-roll-slot"), "rolls by default");
   assert.equal(b.querySelector(".hm-roll-slot"), null, "roll={false}: no moving slot");

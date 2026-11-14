@@ -43,4 +43,5 @@ text view's message is a `status` region and is the textarea's description while
 
 ## Composed of
 
-TreeEditor (tree view, lazy); `validateJson` from its json-path helpers.
+Textarea (text view: `mono`, `tabIndent`), Tabs (the view switcher: `TabList`, `variant="pill"`), Button (Format), TreeEditor
+(tree view, lazy); `validateJson` from its json-path helpers.

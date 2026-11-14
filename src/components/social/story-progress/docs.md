@@ -21,7 +21,7 @@ where it is; `onDone` fires when it is full. In RTL the bars fill from the right
 | `onDone` | `() => void` | — | the current segment is full |
 | `label` | `(index, count) => string` | "Story 2 of 5" | your own screen-reader text |
 | `color` | ColorToken | white | fill color |
-| `class` | string | — | on the root (`hm-sprog`; parts: `hm-sprog-seg`, `hm-sprog-fill`) |
+| `class` | string | — | on the root (`hm-story-progress`, a line Progress; parts: `hm-progress2-seg`, `hm-progress2-seg-fill`) |
 
 ```tsx
 <StoryProgress count={5} index={$i} color="brand-orange" label={(i, n) => `Slide ${i + 1} / ${n}`} />
@@ -29,9 +29,9 @@ where it is; `onDone` fires when it is full. In RTL the bars fill from the right
 
 ## Accessibility
 
-A `progressbar` with `aria-valuenow` / `aria-valuemax` and the text "Story 2 of 5". The moving fill itself is not
-announced.
+A `progressbar` named "Stories" whose value is read as the text "Story 2 of 5" (`aria-valuetext`; `aria-valuenow`
+counts the finished segments, `aria-valuemax` all of them). The moving fill itself is not announced.
 
 ## Composed of
 
-Nothing: StoryViewer uses it.
+Progress. StoryViewer uses it.

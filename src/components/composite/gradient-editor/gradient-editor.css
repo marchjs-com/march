@@ -1,9 +1,10 @@
 /* March — GradientEditor. Imported by its component module; tokens.css provides the variables. */
-.hm-ge { --hm-ge-check: var(--hm-surface-3); display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%; padding: var(--hm-space-3);
-  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
-.hm-ge-preview { block-size: 7.5rem; border-radius: var(--hm-radius-3); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 10%, transparent);
-  background: var(--hm-ge-bg), repeating-conic-gradient(var(--hm-ge-check) 0 25%, var(--hm-surface) 0 50%) 0 0 / .75rem .75rem; }
-.hm-ge-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--hm-space-3); }
+.hm-ge { --hm-ge-check: var(--hm-surface-3); --hm-checker-a: var(--hm-ge-check); max-width: 100%; }
+.hm-ge > .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-3); padding: var(--hm-space-3); }
+/* the gradient is a layer over the shared checkerboard (.hm-checker) */
+.hm-ge-preview { --hm-checker-size: .75rem; position: relative; block-size: 7.5rem; border-radius: var(--hm-radius-3); }
+.hm-ge-preview::before, .hm-ge-bar::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+.hm-ge-preview::before { background: var(--hm-ge-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 10%, transparent); }
 
 /* angle: a dial and eight quick angles */
 .hm-ge-angle { display: flex; align-items: center; gap: var(--hm-space-3); }
@@ -17,17 +18,15 @@
   background: var(--hm-surface); border: 2px solid var(--hm-text); box-shadow: var(--hm-shadow-1); }
 .hm-ge-dial-value { position: absolute; inset: 0; display: grid; place-items: center; font-size: var(--hm-text-xs); font-weight: var(--hm-weight-semibold); font-variant-numeric: tabular-nums; pointer-events: none; }
 .hm-ge-angles { display: grid; grid-template-columns: repeat(4, 1.5rem); gap: .25rem; }
-.hm-ge-angle-btn { display: grid; place-items: center; inline-size: 1.5rem; block-size: 1.5rem; padding: 0; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-1); background: var(--hm-surface); cursor: pointer;
-  transition: background-color var(--hm-dur-fast) var(--hm-ease), border-color var(--hm-dur-fast) var(--hm-ease); }
-.hm-ge-angle-btn span { inline-size: 2px; block-size: .7rem; border-radius: 2px; background: var(--hm-text-2); rotate: var(--hm-ge-a); translate: 0 -2px; transform-origin: 50% 90%; }
-.hm-ge-angle-btn:hover { border-color: var(--hm-border-strong); }
-.hm-ge-angle-btn.is-on { border-color: var(--hm-accent, var(--hm-primary)); background: var(--hm-accent-soft, var(--hm-primary-soft)); }
-.hm-ge-angle-btn.is-on span { background: var(--hm-accent-text, var(--hm-primary-text)); }
+.hm-ge-angle-btn.hm-icon-btn { border: 1px solid var(--hm-border); border-radius: var(--hm-radius-1); }
+.hm-ge-angle-btn.hm-icon-btn:hover { border-color: var(--hm-border-strong); }
+.hm-ge-angle-btn.hm-icon-btn.is-pressed { border-color: var(--hm-accent, var(--hm-primary)); }
+.hm-ge-angle-hand { inline-size: 2px; block-size: .7rem; border-radius: 2px; background: currentColor; rotate: var(--hm-ge-a); translate: 0 -2px; transform-origin: 50% 90%; }
 
 /* stop bar: the gradient line runs left to right in every writing direction (it is the CSS gradient's own axis) */
 .hm-ge-stops { display: flex; flex-direction: column; gap: var(--hm-space-1); padding-inline: .75rem; }
-.hm-ge-bar { direction: ltr; position: relative; block-size: 1.5rem; margin-block: .25rem 1.125rem; border-radius: var(--hm-radius-2); cursor: copy; touch-action: none;
-  background: var(--hm-ge-bar), repeating-conic-gradient(var(--hm-ge-check) 0 25%, var(--hm-surface) 0 50%) 0 0 / .5rem .5rem; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 12%, transparent); }
+.hm-ge-bar { direction: ltr; position: relative; block-size: 1.5rem; margin-block: .25rem 1.125rem; border-radius: var(--hm-radius-2); cursor: copy; touch-action: none; }
+.hm-ge-bar::before { background: var(--hm-ge-bar); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 12%, transparent); }
 .hm-ge-stop { position: absolute; inset-block-start: 100%; inset-inline-start: var(--hm-ge-at); inline-size: 1.25rem; block-size: 1.5rem; padding: 0; translate: -50% -.375rem; border: 0; background: none; cursor: grab;
   transition: translate var(--hm-dur) var(--hm-ease-spring), opacity var(--hm-dur) var(--hm-ease), scale var(--hm-dur-fast) var(--hm-ease-spring); }
 .hm-ge-stop::before { content: ""; position: absolute; inset-inline-start: 50%; inset-block-start: -.375rem; inline-size: 2px; block-size: .625rem; margin-inline-start: -1px; background: var(--hm-text); opacity: .55; }
@@ -44,15 +43,11 @@
 /* selected stop */
 .hm-ge-stop-editor { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--hm-space-3); }
 .hm-ge-picker { flex: 1 1 16rem; }
-.hm-ge-pos { display: inline-flex; align-items: center; gap: var(--hm-space-1); color: var(--hm-text-2); font-size: var(--hm-text-sm); }
-.hm-ge-pos-input { inline-size: 4.5rem; }
+.hm-ge-pos { flex: none; }
+.hm-ge-pos-input { inline-size: 5.5rem; }
 
 /* presets and output */
 .hm-ge-presets { display: flex; flex-wrap: wrap; gap: var(--hm-space-2); }
-.hm-ge-preset { inline-size: 3rem; block-size: 2rem; padding: 0; border: 0; border-radius: var(--hm-radius-2); background: var(--hm-ge-p); cursor: pointer;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 12%, transparent); transition: transform var(--hm-dur-fast) var(--hm-ease-spring); }
-.hm-ge-preset:hover:not(:disabled) { transform: translateY(-2px) scale(1.06); }
-.hm-ge-preset:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-focus); }
+.hm-ge-preset.hm-sample { inline-size: 3rem; block-size: 2rem; }
 .hm-ge-output { display: flex; align-items: center; gap: var(--hm-space-2); padding: var(--hm-space-2) var(--hm-space-2) var(--hm-space-2) var(--hm-space-3); border-radius: var(--hm-radius-2); background: var(--hm-surface-2); }
 .hm-ge-css { flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--hm-font-mono); font-size: var(--hm-text-xs); color: var(--hm-text-2); }
-.hm-ge-copy.is-done { color: var(--hm-success-text, var(--hm-success)); }

@@ -38,4 +38,4 @@ the stack spans the width.
 
 ## Composed of
 
-Portal (the toast layer).
+Portal (the toast layer), Button (the action), IconButton (the × button). The icon of each tone is the shared `toneIcon` table (the one Alert uses).

@@ -7,6 +7,11 @@
 .hm-checkmark-icon { display: inline-grid; place-items: center; flex: none; inline-size: 1rem; block-size: 1rem; line-height: 1; }
 .hm-checkmark-icon .hm-svg { inline-size: 100%; block-size: 100%; }
 .hm-checkmark-own { display: inline-grid; place-items: center; }
+/* the glyph fills the icon box; during a transition (motion) the leaving and the arriving glyph share the one cell */
+.hm-checkmark-glyph { grid-area: 1 / 1; display: grid; place-items: center; inline-size: 100%; block-size: 100%; }
+.hm-checkmark-glyph.is-arriving { opacity: 0; }
+.hm-checkmark-moves, .hm-checkmark-moves .hm-checkmark-icon { transition: color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease); }
+@media (prefers-reduced-motion: reduce) { .hm-checkmark-moves, .hm-checkmark-moves .hm-checkmark-icon { transition: none; } }
 .hm-checkmark-sm .hm-checkmark-icon { inline-size: .875rem; block-size: .875rem; }
 .hm-checkmark-lg .hm-checkmark-icon { inline-size: 1.25rem; block-size: 1.25rem; }
 .hm-checkmark-text { font-size: var(--hm-text-xs); }

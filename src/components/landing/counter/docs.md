@@ -36,4 +36,4 @@ the width steady. Reduced motion shows the value at once.
 
 ## Composed of
 
-Motion engine (`animateValue`), `rollDigits` (motion/digits.ts, shared with CountRoll), `onVisible`.
+CountRoll (roll mode: the one odometer); motion engine (`animateValue`), `onVisible`.

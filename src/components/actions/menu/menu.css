@@ -12,10 +12,15 @@
 .hm-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--hm-focus); outline: none; }
 .hm-menu-item:disabled { opacity: .5; cursor: not-allowed; }
 .hm-menu-item.is-danger, .hm-menu-item.is-danger .hm-icon { color: var(--hm-danger-text); }
+/* a Menu entry is a ListRow: the menu keeps its own row height, padding and corner */
+.hm-listrow.hm-menu-item { gap: var(--hm-space-2); min-block-size: 2rem; padding: 0 .625rem; border-radius: max(.25rem, calc(var(--hm-radius-3) - var(--hm-pop-pad, .3125rem))); font-size: var(--hm-text-md); }
+.hm-listrow.hm-menu-item.is-danger { color: var(--hm-danger-text); }
+.hm-menu-item > .hm-listrow-trail { font-size: inherit; }
+/* rows drawn by hand elsewhere (editors) */
 .hm-menu-label { flex: 1; }
 .hm-menu-kbd { margin-inline-start: auto; }
 /* a checked choice (menuitemcheckbox / menuitemradio): the mark keeps its place, shown only while checked */
 .hm-menu-check { display: inline-flex; flex: none; color: var(--hm-accent, var(--hm-primary)); visibility: hidden; }
 .hm-menu-item[aria-checked="true"] .hm-menu-check { visibility: visible; }
-.hm-menu-sep { height: 1px; margin: var(--hm-space-1) calc(-1 * var(--hm-space-1)); background: var(--hm-border); }
+.hm-divider.hm-menu-sep { margin: var(--hm-space-1) calc(-1 * var(--hm-space-1)); }
 .hm-pop::-webkit-scrollbar-track { margin-block: var(--hm-radius-2); }

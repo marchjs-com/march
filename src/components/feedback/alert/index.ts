@@ -3,7 +3,10 @@ import "./alert.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import type { IconDef } from "../../../icons/svg.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { info } from "../../../icons/glyphs/info.ts";
 import { checkCircle } from "../../../icons/glyphs/checkCircle.ts";
@@ -32,6 +35,10 @@ export interface AlertProps {
   class?: ClassProp;
   children?: unknown;
 }
+const TONE_ICON: Record<string, IconDef> = { info, success: checkCircle, warn: alertTriangle, danger: alertCircle, neutral: info };
+/** The icon of a tone (info, success, warn, danger, neutral), shared by everything that shows a message in a tone (Alert, Toast). */
+export const toneIcon = (tone: string | null | undefined): IconDef => TONE_ICON[tone ?? "info"] ?? info;
+
 /** `<Alert tone="warn" title="Heads up" dismissable onDismiss={…}>Body</Alert>`, `<Alert tone="danger" action={<Button size="sm">Retry</Button>}>…</Alert>` (alias Notice). */
 export function Alert(props: AlertProps): () => unknown {
   const shown = signal(true);
@@ -40,15 +47,14 @@ export function Alert(props: AlertProps): () => unknown {
     const below = props.actionPlacement === "below";
     const actions = props.action != null && h("div", { class: cx("hm-alert-action", below && "hm-alert-action-below") }, actionsOf(() => props.action));
     return h("div", { class: () => cx("hm-alert", `hm-alert-${val(props.tone) ?? "info"}`, val(props.class)), role: tone === "danger" || tone === "warn" ? "alert" : "status", "data-hm-color": () => colorAttr(props.color) },
-      icon(props.icon === undefined ? TONE_ICON[tone] ?? info : props.icon, "hm-alert-icon"),
+      icon(props.icon === undefined ? toneIcon(tone) : props.icon, "hm-alert-icon"),
       h("div", { class: "hm-alert-main" },
         props.title != null && h("strong", { class: "hm-alert-title" }, () => val(props.title)),
         h("div", { class: "hm-alert-body" }, props.body ?? props.children),
         below && actions),
       !below && actions,
-      props.dismissable && h("button", { type: "button", class: "hm-icon-btn hm-alert-x", "aria-label": () => val(props.dismissLabel) ?? t`Dismiss`, onClick: () => { shown.set(false); props.onDismiss?.(); } }, props.dismissIcon === undefined ? glyph(xIcon) : icon(props.dismissIcon, "hm-alert-x-icon")));
+      props.dismissable && h(IconButton, { size: "sm", class: "hm-alert-x", title: false, label: () => val(props.dismissLabel) ?? t`Dismiss`, onClick: () => { shown.set(false); props.onDismiss?.(); }, icon: ownIcon(props.dismissIcon, xIcon, "hm-alert-x-icon") }));
   });
 }
 /** Alias of Alert. */
 export const Notice = Alert;
-const TONE_ICON: Record<string, typeof info> = { info, success: checkCircle, warn: alertTriangle, danger: alertCircle, neutral: info };

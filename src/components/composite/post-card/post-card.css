@@ -4,18 +4,17 @@
   box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 22%, transparent); }
 .hm-post-flat { border-block-end: 1px solid var(--hm-border-subtle, var(--hm-border)); }
 .hm-post-head { display: flex; align-items: center; gap: var(--hm-space-2); padding-inline: var(--hm-space-3) var(--hm-space-2); min-width: 0; }
-.hm-post-id { display: flex; flex-direction: column; min-width: 0; gap: .0625rem; }
-.hm-post-who { display: inline-flex; align-items: center; gap: .625rem; min-width: 0; flex: 1 1 auto; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: start; }
-button.hm-post-who { cursor: pointer; border-radius: var(--hm-radius-2); }
-button.hm-post-who:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-primary)); outline-offset: 2px; }
+/* who: a ListRow without its own padding or hover fill */
+.hm-post-who.hm-listrow { flex: 1 1 auto; gap: .625rem; inline-size: auto; min-block-size: 0; padding: 0; color: inherit; }
+.hm-post-who.hm-listrow.is-action:hover { background: none; }
+.hm-post-who.hm-listrow:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-primary)); outline-offset: 2px; }
+.hm-post-who .hm-listrow-text { gap: .0625rem; }
 .hm-post-name { display: inline-flex; align-items: center; gap: .25rem; min-width: 0; font-weight: 800; font-size: var(--hm-text-md); }
 .hm-post-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hm-post-verified { display: inline-grid; flex: none; color: var(--hm-brand-blue, var(--hm-info)); } .hm-post-verified .hm-svg { width: 1rem; height: 1rem; }
 .hm-post-meta { display: flex; align-items: center; gap: .375rem; min-width: 0; color: var(--hm-text-3, var(--hm-muted)); font-size: var(--hm-text-xs); font-weight: 500; white-space: nowrap; overflow: hidden; }
 .hm-post-place { display: inline-flex; align-items: center; gap: .1875rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .hm-post-place::before { content: "·"; margin-inline-end: .1875rem; }
 .hm-post-place .hm-svg { width: .8125rem; height: .8125rem; flex: none; color: var(--hm-brand-orange, var(--hm-primary)); }
-.hm-post-who .hm-avatar { flex: none; }
 .hm-post-head > :not(.hm-post-who) { flex: none; }
 .hm-post-media { position: relative; margin-inline: var(--hm-space-2); }
 .hm-post-flat .hm-post-media { margin-inline: 0; }
@@ -25,20 +24,15 @@ button.hm-post-who:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-
 .hm-post-big .hm-svg { width: 100%; height: 100%; fill: currentColor; stroke: none; }
 .hm-post-media .hm-burst { z-index: 3; }
 .hm-post-actions { display: flex; align-items: center; gap: var(--hm-space-1); padding-inline: var(--hm-space-2); }
-.hm-post-act { display: inline-flex; align-items: center; gap: .375rem; min-height: 2.25rem; padding: 0 .5rem; border: 0; border-radius: var(--hm-radius-full); background: none;
-  color: var(--hm-text-2); font: inherit; font-size: var(--hm-text-sm); font-weight: 800; cursor: pointer; transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }
-.hm-post-act:hover:not(:disabled) { background: var(--hm-surface-2); color: var(--hm-text); }
-.hm-post-act:disabled { cursor: default; }
-.hm-post-act:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-primary)); outline-offset: 2px; }
+/* count buttons: ghost pill Buttons; without a handler the count is only shown */
+.hm-post-act.hm-btn { gap: .375rem; padding: 0 .5rem; font-size: var(--hm-text-sm); font-weight: 800; }
+.hm-post-act.hm-btn:disabled { opacity: 1; cursor: default; background: none; color: var(--hm-text-2); }
 .hm-post-act .hm-icon, .hm-post-big .hm-icon { display: inline-grid; place-items: center; }
-.hm-post-act .hm-svg { width: 1.375rem; height: 1.375rem; }
+.hm-post-act.hm-btn .hm-svg { width: 1.375rem; height: 1.375rem; }
 .hm-post-body { padding-inline: var(--hm-space-4); min-width: 0; }
-.hm-post-text { margin: 0; font-size: var(--hm-text-md); line-height: 1.45; overflow-wrap: anywhere; }
-.hm-post-text.is-clamped { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
-.hm-post-text.is-clamped[data-lines="1"] { -webkit-line-clamp: 1; } .hm-post-text.is-clamped[data-lines="2"] { -webkit-line-clamp: 2; }
-.hm-post-text.is-clamped[data-lines="4"] { -webkit-line-clamp: 4; } .hm-post-text.is-clamped[data-lines="5"] { -webkit-line-clamp: 5; }
+.hm-post-body .hm-clamp-text { font-size: var(--hm-text-md); line-height: 1.45; }
 .hm-post-handle { font-weight: 800; }
-.hm-post-more-text, .hm-post-all { padding: 0; border: 0; background: none; font: inherit; font-size: var(--hm-text-sm); font-weight: 700; color: var(--hm-text-3, var(--hm-muted)); cursor: pointer; }
-.hm-post-all { align-self: flex-start; margin-inline: var(--hm-space-4); }
-.hm-post-more-text:hover, .hm-post-all:hover { color: var(--hm-text); }
-.hm-post-more-text:focus-visible, .hm-post-all:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-primary)); outline-offset: 2px; border-radius: var(--hm-radius-1); }
+/* "more" and "View all N comments": link Buttons in the quiet text color */
+.hm-post-body .hm-clamp-toggle, .hm-post-all.hm-btn { margin-block-start: 0; font-size: var(--hm-text-sm); font-weight: 700; color: var(--hm-text-3, var(--hm-muted)); }
+.hm-post-all.hm-btn { align-self: flex-start; margin-inline: var(--hm-space-4); }
+.hm-post-body .hm-clamp-toggle:hover, .hm-post-all.hm-btn:hover { color: var(--hm-text); text-decoration: none; }

@@ -108,13 +108,13 @@ export function resolveFeatures(def: FeaturesProp | undefined, own: FeaturesProp
     for (const name in c) {
       const v = c[name];
       if (v == null || v === false) continue;
-      if (typeof v === "function") { out.push(Object.assign(v, { featureName: v.featureName ?? name })); continue; }
+      if (typeof v === "function") { const f = v as LayoutFeature; out.push(Object.assign(f, { featureName: f.featureName ?? name })); continue; }
       const make = REGISTRY.get(name);
       if (make) out.push(make(v === true ? {} : (v as Record<string, unknown>)));
     }
     return out;
   };
-  const base = def == null ? [] : typeof def === "function" ? def([]) : Array.isArray(def) ? [...def] : fromConfig(def as FeatureConfig);
+  const base = def == null ? [] : typeof def === "function" ? [...def([])] : Array.isArray(def) ? [...(def as readonly LayoutFeature[])] : fromConfig(def as FeatureConfig);
   if (own == null) return base;
   if (typeof own === "function") return [...own(base)];
   if (Array.isArray(own)) return [...own];
@@ -156,7 +156,7 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
   for (const s of SLOTS) content.set(s, signal<unknown>(pick(s)));
   const running = new Map<string, () => void>();
   const runningNames = signal<readonly string[]>([]);
-  const sync = (): void => runningNames.set([...running.keys()]);
+  const sync = (): void => { runningNames.set([...running.keys()]); };
 
   const api: LayoutApi = {
     add: (region, node, order = 0) => {
@@ -172,7 +172,7 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
       const s = content.get(slot)!;
       const prev = s();
       s.set(value);
-      const restore = (): void => s.set(prev);
+      const restore = (): void => { s.set(prev); };
       onCleanup(restore);
       return restore;
     },
@@ -224,11 +224,16 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
   const asideEl = els.get("aside");
   if (asideEl && pick("asideToggle") !== false) {
     asideEl.id ||= `${mainId}-aside`;
-    const set = (open: boolean): void => { asideEl.toggleAttribute("data-open", open); btn.setAttribute("aria-expanded", String(open)); };
-    const btn = h("button", { type: "button", class: "hm-btn hm-btn-sm hm-layout-aside-btn", "aria-controls": asideEl.id, "aria-expanded": "false",
-      onClick: () => set(!asideEl.hasAttribute("data-open")) }, () => val(pick("labels")?.panel) ?? t`Panel`) as HTMLElement;
-    api.add("bottom-start", btn, -10);
-    const esc = (e: KeyboardEvent): void => { if (e.key === "Escape" && asideEl.hasAttribute("data-open")) { set(false); btn.focus(); } };
+    const open = signal(false);
+    let btn: HTMLElement | undefined;
+    const set = (v: boolean): void => { asideEl.toggleAttribute("data-open", v); open.set(v); };
+    // the Button comes in its own chunk, like the features
+    onCleanup(lazyMount(api, "bottom-start", -10, async () => {
+      const { Button } = await import("../../actions/button/index.ts");
+      return () => h(Button, { size: "sm", class: "hm-layout-aside-btn", "aria-controls": asideEl.id, "aria-expanded": () => String(open()), ref: (el: HTMLElement) => { btn = el; },
+        onClick: () => set(!open.peek()) }, () => val(pick("labels")?.panel) ?? t`Panel`);
+    }));
+    const esc = (e: KeyboardEvent): void => { if (e.key === "Escape" && open.peek()) { set(false); btn?.focus(); } };
     globalThis.addEventListener?.("keydown", esc);
     onCleanup(() => globalThis.removeEventListener?.("keydown", esc));
   }
@@ -244,28 +249,21 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
 // Each is small here; what it needs (motion engine, router) comes in its own chunk when it starts.
 
 /** Back-to-top button in a corner (default bottom-end): shows after scrolling down, scrolls back on the motion engine. */
-export const scrollToTopFeature = defineLayoutFeature("scrollToTop", (opts: { threshold?: number; corner?: Corner; order?: number; label?: string }) => (api) => {
-  const wrap = h("span", { class: "hm-layout-ctl" }) as HTMLElement;
-  const off = api.add(opts.corner ?? "bottom-end", wrap, opts.order ?? 0);
-  let gone = false;
-  let dispose: (() => void) | undefined;
-  void Promise.all([import("../../actions/scroll-to-top/index.ts"), import("../../../dom/render.ts")]).then(([m, r]) => {
-    if (!gone) dispose = r.render(() => m.ScrollToTop({ ...opts, inline: true }), wrap);
-  });
-  return () => { gone = true; dispose?.(); off(); };
-});
+export const scrollToTopFeature = defineLayoutFeature("scrollToTop", (opts: { threshold?: number; corner?: Corner; order?: number; label?: string }) => (api) =>
+  lazyMount(api, opts.corner ?? "bottom-end", opts.order ?? 0, async () => { const m = await import("../../actions/scroll-to-top/index.ts"); return () => m.ScrollToTop({ ...opts, inline: true }); }));
 
 /** A thin bar at the top that fills as the page is read (keeps working with reduced motion: it is information). */
-export const readingProgressFeature = defineLayoutFeature("readingProgress", (opts: { color?: string; height?: number; label?: string } = {}) => () => {
+export const readingProgressFeature = defineLayoutFeature("readingProgress", (opts: { color?: string; height?: number; label?: string } = {}) => (api) => {
   // `color`: a theme token ("brand-orange"); any other value is used as a CSS color, as before
   const token = !!opts.color && (COLOR_TOKENS as readonly string[]).includes(opts.color);
-  const bar = h("div", { class: "hm-reading-progress", role: "progressbar", "aria-label": () => opts.label ?? t`Reading progress`, "data-hm-color": token ? opts.color : null,
-    style: { "--hm-rp-h": `${opts.height ?? 3}px`, ...(opts.color && !token ? { "--hm-rp-c": opts.color } : {}) } }) as HTMLElement;
-  const closeBar = openLayer("fx", bar);
+  // the place (fixed to the top) and the colour; the bar itself is a Progress line whose fill the scroll drives
+  const bar = h("div", { class: "hm-reading-progress", "data-hm-color": token ? opts.color : null, style: opts.color && !token ? { "--hm-rp-c": opts.color } : {} }) as HTMLElement;
   let stop: (() => void) | undefined;
-  let gone = false;
-  void import("../../../motion/scroll-fx.ts").then((m) => { if (!gone) stop = m.scrollIndicator(bar); });
-  return () => { gone = true; stop?.(); closeBar(); };
+  const off = lazyMount(api, "body", 0, async () => {
+    const [P, S] = await Promise.all([import("../../feedback/progress/index.ts"), import("../../../motion/scroll-fx.ts")]);
+    return () => h(P.Progress, { variant: "line", track: false, smooth: false, size: opts.height ?? 3, ariaLabel: () => opts.label ?? t`Reading progress`, fillRef: (fill: HTMLElement) => { stop = S.scrollIndicator(fill); } });
+  }, bar);
+  return () => { stop?.(); off(); };
 });
 
 /** After a route change: focus moves to the page (main) and the new title is read out; nothing moves on first load. */
@@ -306,9 +304,9 @@ export const autoHideHeaderFeature = defineLayoutFeature("autoHideHeader", (opts
   return () => { globalThis.document.removeEventListener("scroll", onScroll, { capture: true }); header.removeAttribute("data-hidden"); };
 });
 
-/** Draw a lazily loaded component into a region (or the end of <body>); stops cleanly if the layout goes first. */
-function lazyMount(api: LayoutApi, where: LayoutRegion | "body", order: number, load: () => Promise<() => unknown>): () => void {
-  const wrap = h("span", { class: "hm-layout-ctl" }) as HTMLElement;
+/** Draw a lazily loaded component into a region (or the end of <body>), inside `wrap` (default: a box that adds no
+ *  layout); stops cleanly if the layout goes first. */
+function lazyMount(api: LayoutApi, where: LayoutRegion | "body", order: number, load: () => Promise<() => unknown>, wrap: HTMLElement = h("span", { class: "hm-layout-ctl" }) as HTMLElement): () => void {
   const off = where === "body" ? openLayer("fx", wrap) : api.add(where, wrap, order);
   let gone = false;
   let dispose: (() => void) | undefined;
@@ -341,10 +339,14 @@ export const creditFeature = defineLayoutFeature("credit", (opts: { variant?: "t
 /** A badge in a corner while the browser is offline (announced politely). */
 export const connectionFeature = defineLayoutFeature("connection", (opts: { corner?: Corner; label?: string } = {}) => (api) => {
   const nav = globalThis.navigator as Navigator | undefined;
-  const badge = h("span", { class: "hm-offline", role: "status", "aria-live": "polite" }) as HTMLElement;
-  const update = (): void => { const off = nav?.onLine === false; badge.toggleAttribute("hidden", !off); badge.textContent = off ? opts.label ?? t`You are offline` : ""; };
-  update();
-  const out = api.add(opts.corner ?? "top-end", badge, -10);
+  const offline = signal(nav?.onLine === false);
+  const update = (): void => { offline.set(nav?.onLine === false); };
+  // the live region is there from the start (so going offline is announced); the Badge in it comes in its own chunk
+  const host = h("span", { class: "hm-offline", role: "status", "aria-live": "polite", hidden: () => !offline() }) as HTMLElement;
+  const out = lazyMount(api, opts.corner ?? "top-end", -10, async () => {
+    const { Badge } = await import("../../data/badge/index.ts");
+    return () => (offline() ? h(Badge, { tone: "warn", dot: true }, opts.label ?? t`You are offline`) : null);
+  }, host);
   globalThis.addEventListener?.("online", update);
   globalThis.addEventListener?.("offline", update);
   return () => { globalThis.removeEventListener?.("online", update); globalThis.removeEventListener?.("offline", update); out(); };
@@ -361,8 +363,10 @@ export const feedbackFeature = defineLayoutFeature("feedback", (opts: { onSubmit
     const { toast } = await import("../../overlays/toast/index.ts");
     toast(opts.thanks ?? t`Thanks for your feedback!`, { kind: "success" });
   };
-  const btn = h("button", { type: "button", class: "hm-btn hm-btn-sm hm-layout-feedback", onClick: () => void open() }, () => opts.label ?? t`Feedback`) as Node;
-  return api.add(opts.corner ?? "bottom-end", btn, 10);
+  return lazyMount(api, opts.corner ?? "bottom-end", 10, async () => {
+    const { Button } = await import("../../actions/button/index.ts");
+    return () => h(Button, { size: "sm", class: "hm-layout-feedback", onClick: () => void open() }, () => opts.label ?? t`Feedback`);
+  });
 });
 
 /** Development aid: Alt+Shift+L outlines the regions and lists the running features. */

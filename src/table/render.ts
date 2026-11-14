@@ -1,14 +1,11 @@
 /// <reference path="../css.d.ts" />
 // <Table>: renders createTable() state as an accessible grid (or cards on small screens).
 import "../css/table.css";
-import "../ui/button.css";
-import { signal, computed, effect, untrack, onCleanup, type Accessor } from "../core/reactive.ts";
-import { svgIcon } from "../icons/svg.ts";
+import { signal, computed, untrack, onCleanup, type Accessor } from "../core/reactive.ts";
 import { arrowUp } from "../icons/glyphs/arrowUp.ts";
 import { arrowDown } from "../icons/glyphs/arrowDown.ts";
 import { x as xIcon } from "../icons/glyphs/x.ts";
 import { moreVertical } from "../icons/glyphs/moreVertical.ts";
-import { chevronRight } from "../icons/glyphs/chevronRight.ts";
 import { star } from "../icons/glyphs/star.ts";
 import { starFilled } from "../icons/glyphs/starFilled.ts";
 import { h } from "../dom/h.ts";
@@ -17,14 +14,31 @@ import { t } from "../core/i18n.ts";
 import { createTable, type TableOptions, type TableState, type TableAction, type RowAction, type BulkAction } from "./state.ts";
 import type { Row as DefaultRow, TableColumn } from "./filters.ts";
 import { createVirtual, type Virtual } from "./virtual.ts";
-import { clamp, uid, debounce } from "../core/util.ts";
-import { dismiss } from "../behaviors/dismiss/index.ts";
-import { FilterControl, CellEditor } from "./controls.ts";
-import { resizeHandle } from "../behaviors/resize-handle/index.ts";
+import { clamp, uid, isRtl } from "../core/util.ts";
+import { lazy } from "../dom/lazy.ts";
+import { live } from "../forms/util.ts";
+import { draggable } from "../behaviors/drag/index.ts";
+import { moveCursor } from "../behaviors/list-nav/index.ts";
+import { FilterControl, CellEditor, SortMark, ariaSort } from "./controls.ts";
+import { Button, ActionButton, type ActionButtonProps } from "../components/actions/button/index.ts";
+import { IconButton } from "../components/actions/icon-button/index.ts";
+import { Chip } from "../components/actions/chip/index.ts";
+import { Chevron } from "../components/actions/chevron/index.ts";
+import { Checkbox } from "../components/forms/checkbox/index.ts";
+import { Select, type SelectProps } from "../components/forms/select/index.ts";
+import { TextInput } from "../components/forms/text-input/index.ts";
+import { SearchBox } from "../components/forms/search-box/index.ts";
+import { Skeleton } from "../components/feedback/skeleton/index.ts";
+import { Empty } from "../components/feedback/empty/index.ts";
+import { ErrorBox } from "../components/feedback/error-box/index.ts";
+import { Pagination } from "../components/navigation/pagination/index.ts";
+import { ResizeHandle } from "../components/layout/resize-handle/index.ts";
+import type { PopoverProps } from "../components/overlays/popover/index.ts";
 export { FilterControl, CellEditor };
 
-const INTERACTIVE = "button,input,select,textarea,a,label,summary,details,[data-no-row-click]";
-const labelOf = (a: { label: string | (() => string) }): string => (typeof a.label === "function" ? a.label() : a.label);
+const INTERACTIVE = "button,input,select,textarea,a,label,[data-no-row-click]";
+// the floating panel of the toolbar and row menus loads the first time one opens (or is about to: hover, focus)
+const Popover = lazy<PopoverProps>(() => import("../components/overlays/popover/index.ts"), { pick: "Popover", placeholder: "none" });
 const each = <T>(props: ForProps<T>): unknown => h<ForProps<T>>(For, props);
 
 /** <Table> props: every createTable() option (or a ready `table`) plus rendering options. */
@@ -73,20 +87,6 @@ interface Ctx<R> {
 }
 interface GridCtx<R> extends Ctx<R> { virtual: Virtual | null; offset: () => number; rowOf: WeakMap<Element, Accessor<R>> }
 
-/** Run an action object (or `{ label, run }`); errors are already reported by the action, so they are swallowed here. */
-function runAction<A extends unknown[]>(a: TableAction<A>, args: A): Promise<unknown> { return Promise.resolve().then(() => a.run(...args)).catch(() => undefined); }
-
-function ActionButton<A extends unknown[]>(a: TableAction<A>, args: () => A, onRun: () => unknown, extra: Record<string, unknown> = {}): Element {
-  return h("button", {
-    type: "button", ...extra,
-    class: ["hm-btn", "hm-table-action", a.opts?.danger && "hm-btn-danger", extra["class"]],
-    hidden: () => (a.visible ? !a.visible(...args()) : false),
-    disabled: () => !!a.disabled?.(...args()),
-    "aria-busy": () => (a.busy?.() ? "true" : null),
-    onClick: (e: Event) => { (e.currentTarget as Element | null)?.closest?.("details")?.removeAttribute("open"); onRun(); },
-  }, () => labelOf(a));
-}
-
 function useLayout<R>(props: TableProps<R>): () => "cards" | "table" {
   const forced = props.layout;
   if (forced === "cards" || forced === "table") return () => forced;
@@ -100,15 +100,6 @@ function useLayout<R>(props: TableProps<R>): () => "cards" | "table" {
     onCleanup(() => mm.removeEventListener("change", on));
   }
   return () => (small() ? "cards" : "table");
-}
-
-/** Close open menus of this table when clicking elsewhere. */
-function closeMenusOnOutsideClick(root: Element): void {
-  // each open menu: a click outside it closes it, Escape closes all of them (the dismiss behavior)
-  dismiss(null, {
-    on: "click", inside: () => [], escape: false,
-    onDismiss: (_why, e) => { for (const d of root.querySelectorAll("details[open]")) if (!d.contains(e.target as Node | null)) d.removeAttribute("open"); },
-  });
 }
 
 /**
@@ -141,36 +132,51 @@ export function Table<R = DefaultRow>(props: TableProps<R>): Element {
   ctx.selectable ? BulkBar(ctx) : null,
   () => { const l = layout(), v = table.isVirtual(); return untrack(() => (l === "cards" ? Cards(ctx) : Grid(ctx, v))); },
   table.paged ? Footer(ctx) : null);
-  closeMenusOnOutsideClick(root);
   return root;
 }
 
 // ------------------------------------------------------------------ toolbar
-function Menu(cls: string, label: unknown, ...body: unknown[]): Element {
-  return h("details", { class: ["hm-table-menu", cls] },
-    h("summary", { class: "hm-btn hm-table-menu-btn" }, label),
-    h("div", { class: "hm-table-menu-panel" }, ...body));
+interface MenuSpec {
+  class: string;
+  /** Trigger text (a Button), or with `icon` the accessible name of an IconButton. */
+  label: string | (() => string);
+  icon?: unknown;
+  role?: "menu";
+  body: (close: () => void) => unknown;
+}
+/** A trigger button with a floating panel (Popover). The trigger is drawn at once; the panel's code loads on first use. */
+function Menu(o: MenuSpec): Element {
+  const open = signal(false), used = signal(false);
+  const warm = (): void => { void Popover.preload().catch(() => undefined); };
+  const attrs = {
+    "aria-haspopup": o.role ?? "dialog", "aria-expanded": () => String(open()),
+    onPointerEnter: warm, onFocus: warm, onClick: () => { used.set(true); open.set(!open.peek()); },
+  };
+  const btn = (o.icon ? h(IconButton, { ...attrs, size: "sm", icon: o.icon, label: o.label }) : h(Button, { ...attrs, class: "hm-table-menu-btn" }, o.label)) as HTMLElement;
+  return h("span", { class: ["hm-table-menu", o.class] }, btn,
+    () => (used() ? untrack(() => h(Popover, {
+      anchor: btn, open, placement: "bottom-end", role: o.role ?? "dialog", label: o.label, flush: true,
+      onOpenChange: (on: boolean, why: string) => { if (!on && why === "escape") btn.focus(); },
+      children: (close: () => void) => h("div", { class: ["hm-table-menu-body", o.role && "hm-table-menu-list"] }, o.body(close)),
+    })) : null));
 }
 
 function Toolbar<R>(ctx: Ctx<R>): Element {
   const { table, props } = ctx;
-  const delay = props.searchDelay ?? (table.mode === "server" ? 300 : 120);
-  const search = debounce((v: string) => table.setSearch(v), delay);
-  onCleanup(search.cancel);
   const filterCols = (): TableColumn<R>[] => table.allColumns().filter((c) => c.filter);
   return h("div", { class: "hm-table-toolbar" },
-    props.search !== false ? h("input", {
-      type: "search", class: "hm-table-search", placeholder: t`Search…`, "aria-label": t`Search`,
-      "aria-controls": ctx.id,
-      value: () => table.search(),
-      onInput: (e: Event) => { const v = (e.target as HTMLInputElement).value; if (delay) search(v); else table.setSearch(v); },
+    props.search !== false ? h(SearchBox, {
+      class: "hm-table-search", label: t`Search`, debounce: props.searchDelay ?? (table.mode === "server" ? 300 : 120),
+      value: () => table.search(), onSearch: (v: string) => table.setSearch(v),
+      inputRef: (el: HTMLInputElement) => el.setAttribute("aria-controls", ctx.id),
     }) : null,
-    () => (filterCols().length ? untrack(() => Menu("hm-table-filters", t`Filters`, ...filterCols().map((c) => FilterControl(table, c)))) : null),
-    Menu("hm-table-columns", t`Columns`, ColumnsPanel(ctx)),
-    props.storageKey ? Menu("hm-table-views", () => table.activeView() ?? t`Views`, ViewsPanel(ctx)) : null,
-    props.exportable !== false ? Menu("hm-table-export", t`Export`,
-      h("button", { type: "button", class: "hm-btn", onClick: () => table.exportCSV() }, t`CSV`),
-      h("button", { type: "button", class: "hm-btn", onClick: () => table.exportJSON() }, t`JSON`)) : null,
+    () => (filterCols().length ? untrack(() => Menu({ class: "hm-table-filters", label: t`Filters`, body: () => filterCols().map((c) => FilterControl(table, c)) })) : null),
+    Menu({ class: "hm-table-columns", label: t`Columns`, body: () => ColumnsPanel(ctx) }),
+    props.storageKey ? Menu({ class: "hm-table-views", label: () => table.activeView() ?? t`Views`, body: () => ViewsPanel(ctx) }) : null,
+    props.exportable !== false ? Menu({ class: "hm-table-export", label: t`Export`, body: (close) => [
+      h(Button, { onClick: () => { close(); void table.exportCSV(); } }, t`CSV`),
+      h(Button, { onClick: () => { close(); void table.exportJSON(); } }, t`JSON`),
+    ] }) : null,
     props.toolbarEnd ?? null);
 }
 
@@ -179,45 +185,41 @@ function ColumnsPanel<R>(ctx: Ctx<R>): Element {
   return h("ul", { class: "hm-table-colmenu", role: "list" }, each<TableColumn<R>>({ each: table.columns, key: "key", children: (col) => {
     const c = col(), key = c.key as string;
     return h("li", { class: "hm-table-colitem", "data-col": c.key },
-      h("label", {}, h("input", { type: "checkbox", checked: () => !table.isHidden(key), onChange: () => table.toggleColumn(key) }), c.label),
-      h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Move ${c.label} up`, onClick: () => table.moveColumn(key, -1) }, svgIcon(arrowUp)),
-      h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Move ${c.label} down`, onClick: () => table.moveColumn(key, 1) }, svgIcon(arrowDown)),
-      (() => {
-        const sel = h("select", { class: "hm-table-input hm-table-pin", "aria-label": t`Pin ${c.label}`, onChange: (e: Event) => table.pin(key, (e.target as HTMLSelectElement).value || null) },
-          h("option", { value: "" }, t`Not pinned`), h("option", { value: "left" }, t`Pin start`), h("option", { value: "right" }, t`Pin end`)) as HTMLSelectElement;
-        effect(() => { sel.value = table.pinOf(key) ?? ""; });
-        return sel;
-      })());
-  } }), h("li", {}, h("button", { type: "button", class: "hm-btn", onClick: table.resetColumns }, t`Reset columns`)));
+      h(Checkbox, { class: "hm-table-colshow", label: c.label, value: live(() => !table.isHidden(key)), onChange: () => table.toggleColumn(key) }),
+      h(IconButton, { size: "sm", icon: arrowUp, label: t`Move ${c.label} up`, onClick: () => table.moveColumn(key, -1) }),
+      h(IconButton, { size: "sm", icon: arrowDown, label: t`Move ${c.label} down`, onClick: () => table.moveColumn(key, 1) }),
+      h<SelectProps<"left" | "right">>(Select, {
+        class: "hm-table-pin", "aria-label": t`Pin ${c.label}`, placeholder: t`Not pinned`, options: [{ value: "left", label: t`Pin start` }, { value: "right", label: t`Pin end` }],
+        value: live(() => table.pinOf(key)), onChange: (v) => table.pin(key, v ?? null),
+      }));
+  } }), h("li", {}, h(Button, { onClick: table.resetColumns }, t`Reset columns`)));
 }
 
 function ViewsPanel<R>(ctx: Ctx<R>): unknown[] {
   const { table } = ctx;
-  const name = h("input", { type: "text", class: "hm-table-input", placeholder: t`View name`, "aria-label": t`View name` }) as HTMLInputElement;
-  const save = (): void => { table.saveView(name.value); name.value = ""; };
+  const name = signal("");
+  const save = (): void => { table.saveView(name.peek()); name.set(""); };
   return [
-    h("ul", { class: "hm-table-viewlist", role: "list" }, each<{ name: string }>({ each: table.views, key: "name", fallback: () => h("li", { class: "hm-table-muted" }, t`No saved views`), children: (v) => {
+    h("ul", { class: "hm-table-viewlist", role: "list" }, each<{ name: string }>({ each: table.views, key: "name", fallback: () => h("li", {}, h(Empty, { size: "sm", title: t`No saved views` })), children: (v) => {
       const n = v().name;
-      return h("li", { class: () => ["hm-table-view", table.activeView() === n && "is-active"] },
-        h("button", { type: "button", class: "hm-table-linkbtn", "aria-pressed": () => String(table.activeView() === n), onClick: () => table.applyView(n) }, n),
-        h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Make ${n} the default view`, "aria-pressed": () => String(table.defaultView() === n), onClick: () => table.setDefaultView(untrack(table.defaultView) === n ? null : n) }, svgIcon(table.defaultView() === n ? starFilled : star)),
-        h("button", { type: "button", class: "hm-table-icon", "aria-label": t`Delete view ${n}`, onClick: () => table.deleteView(n) }, svgIcon(xIcon)));
+      const isDefault = computed(() => table.defaultView() === n);
+      return h("li", { class: "hm-table-view" },
+        h(Button, { variant: "link", pressed: live(() => table.activeView() === n), onClick: () => table.applyView(n) }, n),
+        h(IconButton, { size: "sm", icon: () => (isDefault() ? starFilled : star), label: t`Make ${n} the default view`, pressed: isDefault, onClick: () => table.setDefaultView(isDefault.peek() ? null : n) }),
+        h(IconButton, { size: "sm", icon: xIcon, label: t`Delete view ${n}`, onClick: () => table.deleteView(n) }));
     } })),
-    h("div", { class: "hm-table-viewsave" }, name, h("button", { type: "button", class: "hm-btn", onClick: save }, t`Save view`)),
+    h("div", { class: "hm-table-viewsave" }, h(TextInput, { value: name, placeholder: t`View name`, "aria-label": t`View name` }), h(Button, { onClick: save }, t`Save view`)),
   ];
 }
 
 function Chips<R>(ctx: Ctx<R>): () => unknown {
   const { table } = ctx;
   const any = computed(() => table.activeFilters().length > 0 || !!table.search());
+  const chip = (label: string, text: unknown, clear: () => void): unknown => h(Chip, { class: "hm-table-chip", tone: "primary", onRemove: clear, removeLabel: t`Remove filter ${label}` }, label, ": ", text);
   return () => (any() ? untrack(() => h("div", { class: "hm-table-chips", role: "group", "aria-label": t`Active filters` },
-    () => table.search() ? untrack(() => Chip(t`Search`, `“${table.search()}”`, () => table.setSearch(""))) : null,
-    each<{ key: string; label: string; text: string }>({ each: table.activeFilters, key: "key", children: (f) => Chip(f().label, () => f().text, () => table.clearFilter(f().key)) }),
-    h("button", { type: "button", class: "hm-table-linkbtn hm-table-clear", onClick: table.clearFilters }, t`Clear all`))) : null);
-}
-function Chip(label: string, text: unknown, clear: () => void): Element {
-  return h("span", { class: "hm-table-chip" }, h("span", {}, label, ": ", text),
-    h("button", { type: "button", class: "hm-table-chip-x", "aria-label": t`Remove filter ${label}`, onClick: clear }, svgIcon(xIcon)));
+    () => table.search() ? untrack(() => chip(t`Search`, `“${table.search()}”`, () => table.setSearch(""))) : null,
+    each<{ key: string; label: string; text: string }>({ each: table.activeFilters, key: "key", children: (f) => chip(f().label, () => f().text, () => table.clearFilter(f().key)) }),
+    h(Button, { variant: "link", class: "hm-table-clear", onClick: table.clearFilters }, t`Clear all`))) : null);
 }
 
 function BulkBar<R>(ctx: Ctx<R>): () => unknown {
@@ -227,9 +229,9 @@ function BulkBar<R>(ctx: Ctx<R>): () => unknown {
   return () => (show() ? untrack(() => h("div", { class: "hm-table-bulk", role: "region", "aria-label": t`Bulk actions` },
     h("span", { class: "hm-table-bulk-count", role: "status", "aria-live": "polite" }, () => (table.allMatching() && table.mode === "server" ? t`All ${table.total() ?? ""} selected` : t`${table.selectedCount()} selected`)),
     () => (!table.allMatching() && table.pageSelection() === "all" && (table.total() ?? 0) > table.selectedCount()
-      ? untrack(() => h("button", { type: "button", class: "hm-table-linkbtn hm-table-selectall", onClick: table.selectAllMatching }, t`Select all ${table.total()} matching`)) : null),
-    actions.map((a) => ActionButton(a, (): [R[]] => [table.selectedRows()], () => table.runBulk(a))),
-    h("button", { type: "button", class: "hm-table-linkbtn", onClick: table.clearSelection }, t`Clear selection`))) : null);
+      ? untrack(() => h(Button, { variant: "link", class: "hm-table-selectall", onClick: table.selectAllMatching }, t`Select all ${table.total()} matching`)) : null),
+    actions.map((a) => h<ActionButtonProps<[R[]]>>(ActionButton, { action: a, args: (): [R[]] => [table.selectedRows()], run: () => table.runBulk(a), class: "hm-table-action" })),
+    h(Button, { variant: "link", onClick: table.clearSelection }, t`Clear selection`))) : null);
 }
 
 // ------------------------------------------------------------------ grid
@@ -273,7 +275,7 @@ function Grid<R>(base: Ctx<R>, virtual: boolean): Element {
     const st = table.status();
     return untrack(() => {
       if (st === "loading") return Array.from({ length: props.skeletonRows ?? Math.min(table.size(), 5) }, () => h("tr", { class: "hm-table-skeleton", "aria-hidden": "true" },
-        Array.from({ length: ctx.colCount() }, () => h("td", {}, h("span", { class: "hm-table-skel" })))));
+        Array.from({ length: ctx.colCount() }, () => h("td", {}, h(Skeleton, { lines: 1 })))));
       if (st === "error") return h("tr", { class: "hm-table-state" }, h("td", { colspan: ctx.colCount }, ErrorState(ctx)));
       if (st === "empty") return h("tr", { class: "hm-table-state" }, h("td", { colspan: ctx.colCount }, EmptyState(ctx)));
       return [
@@ -302,9 +304,9 @@ function HeaderRow<R>(ctx: Ctx<R>): Element {
   const { table } = ctx;
   const lead: Element[] = [];
   if (ctx.selectable) {
-    const box = h("input", {
-      type: "checkbox", class: "hm-table-check", "aria-label": t`Select all rows on this page`,
-      checked: () => table.pageSelection() === "all", indeterminate: () => table.pageSelection() === "some",
+    const box = h(Checkbox, {
+      class: "hm-table-check", "aria-label": t`Select all rows on this page`,
+      value: live(() => table.pageSelection() === "all"), indeterminate: live(() => table.pageSelection() === "some"),
       onClick: () => table.selectPage(untrack(table.pageSelection) !== "all"),
     });
     lead.push(h("th", { class: "hm-table-lead hm-table-select", scope: "col", "data-cell": "", tabindex: "0" }, box));
@@ -319,37 +321,49 @@ function HeaderCell<R>(ctx: Ctx<R>, col: TableColumn<R>, i: number, first: boole
   const { table, props } = ctx;
   const key = col.key as string;
   const pin = pinAttrs(table, col, i);
-  const dir = (): string | null => table.sortDir(key);
-  const multi = (): boolean => table.sort().length > 1;
   const label = col.headerRender ? col.headerRender() : col.label;
   const reorder = props.reorderable !== false;
-  return h("th", {
+  // a press that became a column drag must not sort when it is released over the sort button
+  let dragged = false;
+  const th = h("th", {
     scope: "col", "data-cell": "", "data-col": col.key, tabindex: first ? "0" : "-1",
-    class: ["hm-table-th", `hm-align-${col.align}`, pin.class, col.headerClass],
+    class: ["hm-table-th", `hm-align-${col.align}`, pin.class, col.headerClass, reorder && "is-movable"],
     style: pin.style,
-    "aria-sort": col.sortable ? () => (dir() === "asc" ? "ascending" : dir() === "desc" ? "descending" : "none") : null,
-    draggable: reorder ? "true" : null,
-    "on:dragstart": reorder ? (e: DragEvent) => { e.dataTransfer?.setData("text/x-hm-col", key); if (e.dataTransfer) e.dataTransfer.effectAllowed = "move"; } : null,
-    "on:dragover": reorder ? (e: DragEvent) => { if (e.dataTransfer?.types?.includes?.("text/x-hm-col")) e.preventDefault(); } : null,
-    "on:drop": reorder ? (e: DragEvent) => { const k = e.dataTransfer?.getData("text/x-hm-col"); if (k && k !== col.key) { e.preventDefault(); table.moveColumnTo(k, key); } } : null,
+    "aria-sort": col.sortable ? () => ariaSort(table, key) : null,
   },
   col.sortable
-    ? h("button", { type: "button", class: "hm-table-sort", title: t`Sort (Shift: add to sort)`, onClick: (e: MouseEvent) => table.toggleSort(key, !!e.shiftKey) },
-      label,
-      h("span", { class: "hm-table-sort-icon", "aria-hidden": "true" }, () => (dir() === "asc" ? svgIcon(arrowUp) : dir() === "desc" ? svgIcon(arrowDown) : "")),
-      () => (multi() && dir() ? untrack(() => h("span", { class: "hm-table-sort-n", "aria-hidden": "true" }, () => String(table.sortIndex(key) + 1))) : null))
+    ? h("button", { type: "button", class: "hm-table-sort", title: t`Sort (Shift: add to sort)`, onClick: (e: MouseEvent) => { if (dragged) dragged = false; else table.toggleSort(key, !!e.shiftKey); } },
+      label, SortMark(table, key))
     : h("span", { class: "hm-table-thlabel" }, label),
-  props.resizable !== false && col.resizable !== false ? ResizeHandle(table, col) : null);
+  props.resizable !== false && col.resizable !== false ? ColumnResize(table, col) : null) as HTMLElement;
+  if (reorder) {
+    // drag a header onto another one to move the column there: the drag behavior (threshold, Escape cancels)
+    let over: HTMLElement | null = null;
+    const mark = (x: HTMLElement | null): void => { if (x === over) return; over?.classList.remove("is-drop"); over = x; x?.classList.add("is-drop"); };
+    onCleanup(draggable(th, {
+      ignore: ".hm-resize-handle",
+      onStart: () => { dragged = true; th.classList.add("is-dragging"); },
+      onMove: (p) => { const x = th.ownerDocument.elementFromPoint?.(p.clientX, p.clientY)?.closest<HTMLElement>("th[data-col]"); mark(x && x !== th && x.parentNode === th.parentNode ? x : null); },
+      onEnd: (_p, cancelled) => {
+        const to = over?.getAttribute("data-col");
+        th.classList.remove("is-dragging"); mark(null);
+        // the click that may follow the release comes right after; a release elsewhere sends none
+        setTimeout(() => { dragged = false; }, 0);
+        if (!cancelled && to) table.moveColumnTo(key, to);
+      },
+    }));
+  }
+  return th;
 }
 
-function ResizeHandle<R>(table: TableState<R>, col: TableColumn<R>): Element {
+function ColumnResize<R>(table: TableState<R>, col: TableColumn<R>): unknown {
   const key = col.key as string;
-  const cur = (): number | null => table.widthOf(key);
-  const startW = (el: Element): number => untrack(cur) ?? (el.closest("th")?.getBoundingClientRect().width || 160);
-  // drag / arrows (RTL mirrored, Shift ×5) / Home: the resize-handle behavior
-  return h("span", {
-    class: "hm-table-resize", "aria-label": t`Resize ${col.label}`,
-    ref: (el: HTMLElement) => resizeHandle(el, { value: () => startW(el), set: (w) => table.setWidth(key, w), min: col.minWidth, step: 10, bigStep: 50 }),
+  let el: HTMLElement | undefined;
+  // drag / arrows (RTL mirrored, Shift ×5) / Home: the resize handle; a column without a set width starts from its drawn width
+  return h(ResizeHandle, {
+    class: "hm-table-resize", label: t`Resize ${col.label}`, ref: (x: HTMLElement) => { el = x; },
+    value: () => untrack(() => table.widthOf(key)) ?? (el?.closest("th")?.getBoundingClientRect().width || 160),
+    set: (w: number) => table.setWidth(key, w), min: col.minWidth, step: 10, bigStep: 50,
   });
 }
 
@@ -361,9 +375,9 @@ function Row<R>(ctx: GridCtx<R>, item: Accessor<R>, index: Accessor<number>): un
   const open = expand ? computed(() => table.isExpanded(rid)) : null;
   const lead: Element[] = [];
   if (ctx.selectable) lead.push(h("td", { class: "hm-table-lead hm-table-select", "data-cell": "", tabindex: "-1" },
-    h("input", { type: "checkbox", class: "hm-table-check", "aria-label": t`Select row`, checked: sel, onClick: (e: MouseEvent) => table.toggle(item(), { range: !!e.shiftKey }) })));
+    SelectBox(ctx, item, sel)));
   if (expand) lead.push(h("td", { class: "hm-table-lead hm-table-expand", "data-cell": "", tabindex: "-1" },
-    h("button", { type: "button", class: "hm-table-icon hm-table-expander", "aria-expanded": () => String(open?.()), "aria-label": t`Show details`, onClick: () => table.toggleExpand(item()) }, svgIcon(chevronRight))));
+    h(IconButton, { class: "hm-table-expander", size: "sm", icon: h(Chevron, {}), label: t`Show details`, title: false, "aria-expanded": () => String(open?.()), onClick: () => table.toggleExpand(item()) })));
   const tr = h("tr", {
     class: () => ["hm-table-row", sel?.() && "is-selected", open?.() && "is-expanded", props.rowClass?.(item()), props.onRowClick && "is-clickable"],
     "data-row": "", "aria-selected": sel ? () => String(sel()) : null,
@@ -375,6 +389,11 @@ function Row<R>(ctx: GridCtx<R>, item: Accessor<R>, index: Accessor<number>): un
   ctx.rowOf.set(tr, item);
   if (!expand) return tr;
   return [tr, () => (open?.() ? untrack(() => h("tr", { class: "hm-table-expansion" }, h("td", { colspan: ctx.colCount }, expand(item())))) : null)];
+}
+
+/** The selection checkbox of a row or a card (Shift + click selects the range). */
+function SelectBox<R>(ctx: Ctx<R>, item: Accessor<R>, sel: Accessor<boolean> | null): unknown {
+  return h(Checkbox, { class: "hm-table-check", "aria-label": t`Select row`, value: live(() => !!sel?.()), onClick: (e: MouseEvent) => ctx.table.toggle(item(), { range: !!e.shiftKey }) });
 }
 
 function rowActivate<R>(ctx: Ctx<R>, row: R, e: Event): void {
@@ -409,26 +428,23 @@ function RowActions<R>(ctx: Ctx<R>, acts: readonly RowAction<R>[], item: Accesso
   const { props } = ctx;
   const args = (): [R] => [item()];
   const inline = props.rowActionsInline ?? acts.length <= 2;
-  if (inline) return h("span", { class: "hm-table-rowactions" }, acts.map((a) => ActionButton(a, args, () => runAction(a, untrack(args)))));
-  return h("details", { class: "hm-table-menu hm-table-kebab" },
-    h("summary", { class: "hm-table-icon", "aria-label": t`Row actions`, "aria-haspopup": "menu" }, svgIcon(moreVertical)),
-    h("div", { class: "hm-table-menu-panel", role: "menu" }, acts.map((a) => ActionButton(a, args, () => runAction(a, untrack(args)), { role: "menuitem" }))));
+  if (inline) return h("span", { class: "hm-table-rowactions" }, acts.map((a) => h<ActionButtonProps<[R]>>(ActionButton, { action: a, args, class: "hm-table-action" })));
+  return Menu({ class: "hm-table-kebab", label: t`Row actions`, icon: moreVertical, role: "menu",
+    body: (close) => acts.map((a) => h<ActionButtonProps<[R]>>(ActionButton, { action: a, args, variant: "ghost", role: "menuitem", class: "hm-table-action", onClick: close })) });
 }
 
-function EmptyState<R>(ctx: Ctx<R>): Element {
+function EmptyState<R>(ctx: Ctx<R>): unknown {
   const { table, props } = ctx;
   const filtered = table.activeFilters().length > 0 || !!table.search();
-  if (filtered) return h("div", { class: "hm-empty hm-table-empty" }, h("p", {}, t`No matching rows.`), h("button", { type: "button", class: "hm-btn", onClick: table.clearFilters }, t`Clear filters`));
+  if (filtered) return h(Empty, { class: "hm-table-empty", size: "sm", title: t`No matching rows.`, action: h(Button, { onClick: table.clearFilters }, t`Clear filters`) });
   const e = props.empty;
-  if (e != null) return h("div", { class: "hm-empty hm-table-empty" }, typeof e === "function" ? (e as () => unknown)() : e);
-  return h("div", { class: "hm-empty hm-table-empty" }, t`No data yet.`);
+  if (e != null) return h(Empty, { class: "hm-table-empty", size: "sm", title: false }, typeof e === "function" ? (e as () => unknown)() : e);
+  return h(Empty, { class: "hm-table-empty", size: "sm", title: t`No data yet.` });
 }
 
-function ErrorState<R>(ctx: Ctx<R>): Element {
+function ErrorState<R>(ctx: Ctx<R>): unknown {
   const { table } = ctx;
-  return h("div", { class: "hm-error hm-table-error", role: "alert" },
-    h("p", {}, () => { const err = table.error(); return String((err as { message?: unknown } | null | undefined)?.message ?? err ?? t`Something went wrong.`); }),
-    table.mode === "server" ? h("button", { type: "button", class: "hm-btn", onClick: () => table.refetch() }, t`Retry`) : null);
+  return h(ErrorBox, { class: "hm-table-error", error: () => table.error(), retry: table.mode === "server" ? () => table.refetch() : undefined });
 }
 
 // ------------------------------------------------------------------ keyboard
@@ -460,17 +476,15 @@ function onGridKey<R>(e: KeyboardEvent, ctx: GridCtx<R>): void {
     next.focus();
     next.scrollIntoView?.({ block: "nearest", inline: "nearest" });
   };
-  const last = cellsOf(tr).length - 1;
-  switch (e.key) {
-    case "ArrowRight": return go(ri, ci + 1);
-    case "ArrowLeft": return go(ri, ci - 1);
-    case "ArrowDown": return go(ri + 1, ci);
-    case "ArrowUp": return go(ri - 1, ci);
-    case "Home": return go(e.ctrlKey ? 0 : ri, 0);
-    case "End": return go(e.ctrlKey ? rows.length - 1 : ri, last);
-    case "PageDown": return go(Math.min(rows.length - 1, ri + 10), ci);
-    case "PageUp": return go(Math.max(0, ri - 10), ci);
+  // arrows, Home / End, Page Up / Down: the list-nav behavior (RTL mirrored); a virtual grid scrolls past its window
+  const count = cellsOf(tr).length, ctrl = e.ctrlKey || e.metaKey, edge = e.key === "Home" || e.key === "End";
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight" || (edge && !ctrl)) {
+    const c = moveCursor({ key: e.key, index: ci, count, columns: count, rtl: isRtl(grid) });
+    if (c != null) go(ri, c);
+    return;
   }
+  const r = vt && e.key === "ArrowDown" && ri === rows.length - 1 ? rows.length : vt && e.key === "ArrowUp" && ri === 0 ? -1 : moveCursor({ key: e.key, index: ri, count: rows.length, ctrl });
+  if (r != null) return go(r, edge ? (e.key === "Home" ? 0 : count - 1) : ci);
   if (!onCell || !tr.hasAttribute("data-row")) return;
   const item = ctx.rowOf.get(tr);
   if (!item) return;
@@ -485,7 +499,7 @@ function Cards<R>(ctx: Ctx<R>): Element {
   return h("div", { class: "hm-table-cards", role: "list", "aria-label": props.label ?? props.caption ?? null }, () => {
     const st = table.status();
     return untrack(() => {
-      if (st === "loading") return Array.from({ length: 3 }, () => h("div", { class: "hm-table-card hm-table-skeleton", "aria-hidden": "true" }, h("span", { class: "hm-table-skel" }), h("span", { class: "hm-table-skel" })));
+      if (st === "loading") return Array.from({ length: 3 }, () => h("div", { class: "hm-table-card hm-table-skeleton", "aria-hidden": "true" }, h(Skeleton, { lines: 2 })));
       if (st === "error") return ErrorState(ctx);
       if (st === "empty") return EmptyState(ctx);
       return each<R>({ each: table.rows, key: table.idOf, children: (item) => Card(ctx, item) });
@@ -504,7 +518,7 @@ function Card<R>(ctx: Ctx<R>, item: Accessor<R>): Element {
     onClick: (e: MouseEvent) => { if ((e.target as Element).closest?.(INTERACTIVE)) return; rowActivate(ctx, item(), e); },
   },
   ctx.selectable || ctx.actions ? h("div", { class: "hm-table-card-head" },
-    ctx.selectable ? h("input", { type: "checkbox", class: "hm-table-check", "aria-label": t`Select row`, checked: sel, onClick: (e: MouseEvent) => table.toggle(item(), { range: !!e.shiftKey }) }) : null,
+    ctx.selectable ? SelectBox(ctx, item, sel) : null,
     ctx.actions ? RowActions(ctx, ctx.actions, item) : null) : null,
   h("dl", { class: "hm-table-card-fields" }, () => {
     const cols = table.visibleColumns();
@@ -512,7 +526,7 @@ function Card<R>(ctx: Ctx<R>, item: Accessor<R>): Element {
       h("dt", {}, c.label), h("dd", { class: `hm-align-${c.align}` }, render ? () => render.call(c, item()) : () => table.format(item(), c))); }));
   }),
   expand ? [
-    h("button", { type: "button", class: "hm-table-linkbtn", "aria-expanded": () => String(open?.()), onClick: () => table.toggleExpand(item()) }, () => (open?.() ? t`Hide details` : t`Show details`)),
+    h(Button, { variant: "link", class: "hm-table-card-more", "aria-expanded": () => String(open?.()), onClick: () => table.toggleExpand(item()) }, () => (open?.() ? t`Hide details` : t`Show details`)),
     () => (open?.() ? untrack(() => h("div", { class: "hm-table-card-expansion" }, expand(item()))) : null),
   ] : null);
 }
@@ -520,10 +534,7 @@ function Card<R>(ctx: Ctx<R>, item: Accessor<R>): Element {
 // ------------------------------------------------------------------ footer
 function Footer<R>(ctx: Ctx<R>): Element {
   const { table, props } = ctx;
-  const sizes = props.pageSizes ?? [10, 25, 50, 100];
-  const sizeSel = h("select", { class: "hm-table-input hm-table-size", "aria-label": t`Rows per page`, onChange: (e: Event) => table.setSize(Number((e.target as HTMLSelectElement).value)) },
-    [...new Set([...sizes, untrack(table.size)])].sort((a, b) => a - b).map((n) => h("option", { value: String(n) }, String(n)))) as HTMLSelectElement;
-  effect(() => { sizeSel.value = String(table.size()); });
+  const sizes = [...new Set([...(props.pageSizes ?? [10, 25, 50, 100]), untrack(table.size)])].sort((a, b) => a - b);
   const range = (): string => {
     const n = table.total();
     if (table.isVirtual()) return t`${n} rows`;
@@ -534,11 +545,11 @@ function Footer<R>(ctx: Ctx<R>): Element {
   };
   return h("div", { class: "hm-table-footer" },
     h("span", { class: "hm-table-range", role: "status", "aria-live": "polite" }, range),
-    () => (table.isVirtual() ? null : untrack(() => [
-      h("label", { class: "hm-table-sizefield" }, h("span", {}, t`Rows per page`), sizeSel),
-      h("nav", { class: "hm-table-pager", "aria-label": t`Pagination` },
-        h("button", { type: "button", class: "hm-btn hm-table-prev", disabled: () => !table.hasPrev(), onClick: table.prev }, t`Previous`),
-        h("span", { class: "hm-table-pageinfo" }, () => (table.pageCount() != null && !table.cursorMode ? t`Page ${table.page()} of ${table.pageCount()}` : t`Page ${table.page()}`)),
-        h("button", { type: "button", class: "hm-btn hm-table-next", disabled: () => !table.hasNext(), onClick: table.next }, t`Next`)),
-    ])));
+    // rows per page, Previous / Next and "Page 2 of 7"; in cursor mode (or with an unknown total) only the two buttons
+    () => (table.isVirtual() ? null : untrack(() => h(Pagination, {
+      variant: "simple", class: "hm-table-pager", info: false,
+      page: () => table.page(), pages: () => (table.cursorMode ? null : table.pageCount()),
+      hasPrev: () => table.hasPrev(), hasNext: () => table.hasNext(), onPrev: table.prev, onNext: table.next,
+      size: () => table.size(), sizes, onSize: (n: number) => table.setSize(n),
+    }))));
 }

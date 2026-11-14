@@ -1,12 +1,9 @@
 /* March — Scheduler. Imported by its component module; tokens.css provides the variables. Logical properties only (RTL). */
 .hm-sch { display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%; }
-.hm-sch-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2) var(--hm-space-3); min-width: 0; }
-.hm-sch-title { flex: 1 1 10rem; min-width: 0; margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); letter-spacing: var(--hm-tracking-tight);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hm-sch-views { flex: none; }
+/* the bar is a PanelHeader (lg) without its padding: it lines up with the calendar and wraps on narrow screens */
+.hm-sch-toolbar.hm-panel-header { flex-wrap: wrap; gap: var(--hm-space-2) var(--hm-space-3); min-block-size: 0; padding: 0; }
+.hm-sch-toolbar > .hm-panel-header-titles { flex: 1 1 10rem; }
 .hm-sch-body { min-width: 0; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); box-shadow: var(--hm-shadow-1); overflow: hidden; }
-.hm-sch-help { margin: 0; color: var(--hm-text-2); font-size: var(--hm-text-xs); }
-.hm-sch-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* ---- events ---- */
 .hm-sch-ev { --hm-sch-c: var(--hm-accent, var(--hm-primary)); position: relative; display: flex; align-items: center; gap: .375rem; min-width: 0; margin: 0; padding: 0 .375rem;
@@ -21,14 +18,11 @@
 .hm-sch-ev.is-dragging { z-index: 6; box-shadow: var(--hm-shadow-3), inset 3px 0 0 var(--hm-sch-c); opacity: .92; cursor: grabbing; }
 .hm-sch-ev-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: var(--hm-weight-semibold); }
 .hm-sch-ev-time, .hm-sch-ev-loc { color: var(--hm-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
-.hm-sch-handle { position: absolute; z-index: 1; }
-.hm-sch-bar .hm-sch-handle-end { inset-block: 0; inset-inline-end: 0; width: 8px; cursor: ew-resize; }
-.hm-sch-block .hm-sch-handle-end { inset-inline: 0; inset-block-end: 0; height: 7px; cursor: ns-resize; }
-.hm-sch-block .hm-sch-handle-start { inset-inline: 0; inset-block-start: 0; height: 5px; cursor: ns-resize; }
-.hm-sch-handle::after { content: ""; position: absolute; inset: 0; margin: auto; border-radius: 2px; background: var(--hm-sch-c); opacity: 0; transition: opacity var(--hm-dur-fast) var(--hm-ease); }
-.hm-sch-bar .hm-sch-handle::after { width: 3px; height: 60%; }
-.hm-sch-block .hm-sch-handle::after { width: 1.5rem; height: 3px; }
-.hm-sch-ev:hover .hm-sch-handle::after { opacity: .7; }
+/* the ends are ResizeHandle grips inside the event: the grip (in the event colour) shows while the event is hovered */
+.hm-sch-handle.hm-resize-handle { --hm-rh-hit: 8px; --hm-rh-out: 0px; --hm-rh-grip: var(--hm-sch-c); z-index: 1; }
+.hm-sch-block > .hm-sch-handle.hm-resize-handle { --hm-rh-hit: 6px; }
+.hm-sch-handle > .hm-resize-handle-grip { opacity: 0; transition: opacity var(--hm-dur-fast) var(--hm-ease); }
+.hm-sch-ev:hover .hm-sch-handle > .hm-resize-handle-grip { opacity: .7; }
 .hm-sch-bar { height: 1.375rem; align-self: start; margin-inline: 2px; }
 .hm-sch-bar.is-cut-start { border-start-start-radius: 0; border-end-start-radius: 0; margin-inline-start: 0; }
 .hm-sch-bar.is-cut-end { border-start-end-radius: 0; border-end-end-radius: 0; margin-inline-end: 0; }
@@ -55,9 +49,8 @@
 .hm-sch-daynum:hover { background: var(--hm-surface-3); }
 .hm-sch-daynum:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: 1px; }
 .hm-sch-day.is-today .hm-sch-daynum { background: var(--hm-primary); color: var(--hm-on-primary-fill, var(--hm-inverse-text)); }
-.hm-sch-more { align-self: stretch; margin: 0; padding: 0 .375rem; border: 0; border-radius: var(--hm-radius-1); background: none; color: var(--hm-text-2); font: inherit; font-size: var(--hm-text-xs);
-  text-align: start; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hm-sch-more:hover { background: var(--hm-surface-2); color: var(--hm-text); }
+.hm-sch-day > .hm-sch-more.hm-btn { display: block; align-self: stretch; padding: 0 .375rem; color: var(--hm-text-2); font-size: var(--hm-text-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hm-sch-day > .hm-sch-more.hm-btn:hover { color: var(--hm-text); }
 .hm-sch-week > .hm-sch-bar { z-index: 1; margin-block: 1px; }
 
 /* ---- week / day ---- */

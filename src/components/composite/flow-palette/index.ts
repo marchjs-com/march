@@ -1,19 +1,21 @@
 // FlowPalette (hadi-march/ui): the node types of a flow, by category, with a search box. Drag one onto a FlowCanvas
 // to place it where you drop it (snapped to the grid), or press Enter / click to add it in the middle of the view.
-// The dragged card floats in the "drag" layer and settles into place on the motion engine.
+// The dragged card floats in the "drag" layer (dragGhost) and settles into place on the motion engine.
 import "./flow-palette.css";
 import { signal, computed } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { openLayer } from "../../../dom/portal.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, uid, icon, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr } from "../../../theme/colors.ts";
-import { SearchBox } from "../../../ui/layout.ts";
-import { OverflowText } from "../../../ui/marquee.ts";
+import { val, cx, uid, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { snap } from "../../../ui/format.ts";
 import { score } from "../../../ui/fold.ts";
-import { animate } from "../../../motion/animate.ts";
-import { reducedMotion } from "../../../motion/env.ts";
+import { SearchBox } from "../../forms/search-box/index.ts";
+import { OverflowText } from "../../typography/overflow-text/index.ts";
+import { SectionLabel } from "../../typography/section-label/index.ts";
+import { ListRow } from "../../data/list-row/index.ts";
+import { IconTile } from "../../data/icon-tile/index.ts";
+import { Empty } from "../../feedback/empty/index.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
+import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
 import { NODE_W, type FlowStore, type FlowNodeType } from "../flow-canvas/model.ts";
 export interface FlowPaletteProps {
   flow: FlowStore;
@@ -55,15 +57,14 @@ export function FlowPalette(props: FlowPaletteProps): Element {
     for (const ty of list) { const c = val(ty.category) ?? ""; cats.set(c, [...(cats.get(c) ?? []), ty]); }
     return [...cats];
   });
-  const snap = (v: number): number => { const g = props.snap ?? 16; return g > 0 ? Math.round(v / g) * g : v; };
-  const still = (): boolean => props.motion === false || reducedMotion();
+  const grid = (v: number): number => snap(v, props.snap ?? 16);
   let added = 0;
   const add = (ty: FlowNodeType, at?: { x: number; y: number }): void => {
     const view = flow.view.peek();
     const c = at ?? view?.center() ?? { x: 0, y: 0 };
     // keyboard adds fan out a little so repeated adds do not stack exactly
     const off = at ? 0 : (added++ % 5) * 24;
-    const id = flow.addNode(ty.type, snap(c.x - (at ? 0 : NODE_W / 2) + off), snap(c.y - (at ? 0 : 40) + off));
+    const id = flow.addNode(ty.type, grid(c.x - (at ? 0 : NODE_W / 2) + off), grid(c.y - (at ? 0 : 40) + off));
     props.onAdd?.(id, ty);
   };
 
@@ -71,58 +72,52 @@ export function FlowPalette(props: FlowPaletteProps): Element {
     if (e.button !== 0) return;
     const r = card.getBoundingClientRect();
     const dx = e.clientX - r.left, dy = e.clientY - r.top;
-    let ghost: HTMLElement | null = null, close: (() => void) | null = null;
     const x0 = e.clientX, y0 = e.clientY;
-    const place = (x: number, y: number): void => setStyle(ghost, { left: `${x - dx}px`, top: `${y - dy}px` });
+    let ghost: DragGhost | null = null;
     pointerDrag(e, {
       threshold: 5,
       onClick: () => add(ty),
       onMove: (q) => {
-        const ev = { clientX: q.clientX, clientY: q.clientY };
         if (!ghost) {
-          ghost = card.cloneNode(true) as HTMLElement;
-          ghost.classList.add("hm-flowpal-ghost");
-          ghost.removeAttribute("id");
-          setStyle(ghost, { width: `${r.width}px` });
-          close = openLayer("drag", ghost);
-          if (!still()) animate(ghost, [{ transform: "scale(1) rotate(0deg)" }, { transform: "scale(1.04) rotate(-2deg)" }], { duration: 160, easing: "out", fill: "forwards" });
+          const copy = card.cloneNode(true) as HTMLElement;
+          copy.classList.add("hm-flowpal-ghost");
+          setStyle(copy, { width: `${r.width}px` });
+          ghost = dragGhost(copy, { offset: { x: -dx, y: -dy }, motion: () => props.motion,
+            enter: [{ transform: "scale(1) rotate(0deg)" }, { transform: "scale(1.04) rotate(-2deg)" }], timing: { duration: 160, easing: "out", fill: "forwards" } });
           card.classList.add("is-dragging");
         }
-        place(ev.clientX, ev.clientY);
-        const over = !!flow.view.peek()?.toWorld(ev.clientX, ev.clientY);
-        ghost.classList.toggle("is-over", over);
+        ghost.move(q.clientX, q.clientY);
+        ghost.el.classList.toggle("is-over", !!flow.view.peek()?.toWorld(q.clientX, q.clientY));
       },
       onEnd: (q, cancelled) => {
         card.classList.remove("is-dragging");
-        if (cancelled || !ghost) { close?.(); return; }
-        const ev = { clientX: q.clientX, clientY: q.clientY };
-        const p = flow.view.peek()?.toWorld(ev.clientX - dx, ev.clientY - dy);
-        const inside = !!flow.view.peek()?.toWorld(ev.clientX, ev.clientY);
-        const g = ghost, done = close;
+        if (cancelled || !ghost) { ghost?.close(); return; }
+        const p = flow.view.peek()?.toWorld(q.clientX - dx, q.clientY - dy);
+        const inside = !!flow.view.peek()?.toWorld(q.clientX, q.clientY);
         if (inside && p) add(ty, { x: p.x, y: p.y });
-        if (still()) { done?.(); return; }
         // dropped: melt into the canvas; missed: fly back to the palette
-        const back = inside ? [{ opacity: 1, transform: "scale(1.04)" }, { opacity: 0, transform: "scale(.9)" }] : [{ opacity: 1, translate: "0 0" }, { opacity: .2, translate: `${x0 - ev.clientX}px ${y0 - ev.clientY}px` }];
-        animate(g, back, { duration: inside ? 180 : 280, easing: "out", fill: "forwards" }).finished.then(() => done?.());
+        void ghost.leave(inside ? [{ opacity: 1, transform: "scale(1.04)" }, { opacity: 0, transform: "scale(.9)" }] : [{ opacity: 1, translate: "0 0" }, { opacity: .2, translate: `${x0 - q.clientX}px ${y0 - q.clientY}px` }],
+          { duration: inside ? 180 : 280 });
       },
     });
   }
 
+  // the card is a ListRow that is a button: type icon, name + description, grip
   const card = (ty: FlowNodeType): Element => {
     let el!: HTMLElement;
-    return h("li", { class: "hm-flowpal-item" }, h("button", {
-      type: "button", class: "hm-flowpal-card", "data-hm-color": colorAttr(ty.color), ref: (x: HTMLElement) => { el = x; },
+    return h("li", { class: "hm-flowpal-item" }, h(ListRow, {
+      as: "button", class: "hm-flowpal-card", color: ty.color, ref: (x: HTMLElement) => { el = x; },
       "aria-label": () => `${val(ty.label)}${ty.description ? `. ${val(ty.description)}` : ""}`,
       "aria-describedby": hint,
       onPointerdown: (e: PointerEvent) => { e.preventDefault(); el.focus(); drag(e, ty, el); },
       onKeydown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); add(ty); } },
-    },
-      props.renderCard ? h("span", { class: "hm-flowpal-text hm-flowpal-own" }, props.renderCard(ty)) : [
-        h("span", { class: "hm-flowpal-icon", "aria-hidden": "true" }, icon(ty.icon)),
-        h("span", { class: "hm-flowpal-text" },
-          h(OverflowText, { class: "hm-flowpal-name" }, () => val(ty.label)),
-          ty.description != null && val(props.descriptions) !== false && h(OverflowText, { class: "hm-flowpal-desc" }, () => val(ty.description)))],
-      val(props.grip) === false ? null : h("span", { class: "hm-flowpal-grip", "aria-hidden": "true" })));
+      ...(props.renderCard ? { title: h("span", { class: "hm-flowpal-own" }, props.renderCard(ty)) } : {
+        lead: h(IconTile, { class: "hm-flowpal-icon", icon: ty.icon, color: ty.color }),
+        title: h(OverflowText, { class: "hm-flowpal-name" }, () => val(ty.label)),
+        sub: ty.description != null && val(props.descriptions) !== false ? h(OverflowText, { class: "hm-flowpal-desc" }, () => val(ty.description)) : undefined,
+      }),
+      trail: val(props.grip) === false ? undefined : h("span", { class: "hm-flowpal-grip", "aria-hidden": "true" }),
+    }));
   };
 
   return h("div", { class: () => cx("hm-flowpal", val(props.class)), role: "region", "aria-label": () => props.labels?.region ?? t`Node types` },
@@ -130,9 +125,13 @@ export function FlowPalette(props: FlowPaletteProps): Element {
     h("p", { class: "hm-sr-only", id: hint }, () => props.labels?.hint ?? t`Drag onto the canvas, or press Enter to add it in the middle.`),
     () => {
       const groups = shown();
-      if (!groups.length) return props.empty === false ? null : h("p", { class: "hm-flowpal-empty" }, props.empty && props.empty !== true ? props.empty : props.labels?.empty ?? t`No node type matches.`);
+      if (!groups.length) {
+        if (props.empty === false) return null;
+        const own = props.empty && props.empty !== true ? props.empty : null;
+        return h(Empty, { size: "sm", class: "hm-flowpal-empty", title: own ? false : props.labels?.empty ?? t`No node type matches.` }, own);
+      }
       return groups.map(([cat, list]) => h("section", { class: "hm-flowpal-cat" },
-        cat && val(props.categories) !== false && h("h3", { class: "hm-flowpal-cattitle" }, cat),
+        cat && val(props.categories) !== false && h(SectionLabel, { as: "h3", size: "md", class: "hm-flowpal-cattitle" }, cat),
         h("ul", { class: "hm-flowpal-list" }, list.map(card))));
     });
 }

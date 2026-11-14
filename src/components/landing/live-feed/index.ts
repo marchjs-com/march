@@ -6,10 +6,15 @@
 // it does not pull. New items are not announced by default (a busy feed would talk over everything): `live="polite"`.
 import "./live-feed.css";
 import { h } from "../../../dom/h.ts";
-import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
+import { signal, effect, untrack, createRoot, getOwner } from "../../../core/reactive.ts";
 import { t, dir, messages } from "../../../core/i18n.ts";
 import { cx, val, listen, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { owned, whenVisible } from "../../../ui/observe.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { ListRow } from "../../data/list-row/index.ts";
+import { StatusDot } from "../../feedback/status-dot/index.ts";
+import { Avatar } from "../../social/avatar/index.ts";
+import { Button } from "../../actions/button/index.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { flip } from "../../../motion/flip.ts";
@@ -82,13 +87,25 @@ export function LiveFeed(props: LiveFeedProps): Element {
   const wall = (): boolean => props.variant === "wall";
 
   const render = props.renderItem;
-  const card = (it: FeedItem): HTMLElement => render
-    ? h("li", { class: "hm-lf-item hm-lf-own", "data-hm-color": colorAttr(it.color) }, render(it), h("span", { class: "hm-lf-glow", "aria-hidden": "true" })) as HTMLElement
-    : h("li", { class: "hm-lf-item", "data-hm-color": colorAttr(it.color) },
-    it.avatar != null ? h("span", { class: "hm-lf-avatar", "aria-hidden": "true" }, it.avatar) : h("span", { class: "hm-lf-dot", "aria-hidden": "true" }),
-    h("span", { class: "hm-lf-text" }, h("span", { class: "hm-lf-title" }, it.title), it.body != null ? h("span", { class: "hm-lf-body" }, it.body) : null),
-    it.meta != null ? h("span", { class: "hm-lf-meta" }, it.meta) : null,
-    h("span", { class: "hm-lf-glow", "aria-hidden": "true" })) as HTMLElement;
+  // an item is a ListRow (round badge or dot, title, body, meta) or your own content; the glow ring lies over either
+  // each item lives in its own scope under the feed (not under the effect or the clock tick that added it) and is
+  // disposed when it leaves
+  const owner = getOwner();
+  const scopes = new WeakMap<HTMLElement, () => void>();
+  const gone = (el: HTMLElement): void => { el.remove(); scopes.get(el)?.(); };
+  const card = (it: FeedItem): HTMLElement => createRoot((dispose) => {
+    const el = (render
+      ? h("li", { class: "hm-lf-item hm-lf-own", "data-hm-color": colorAttr(it.color) }, render(it))
+      : h(ListRow, {
+        as: "li", class: "hm-lf-item", color: it.color, overflow: "ellipsis", title: it.title, sub: it.body ?? undefined, trail: it.meta ?? undefined,
+        lead: it.avatar != null
+          ? h(Avatar, { class: "hm-lf-avatar", decorative: true, color: it.color ?? "primary", ...(typeof it.avatar === "string" ? { text: it.avatar } : {}) }, typeof it.avatar === "string" ? undefined : it.avatar)
+          : h(StatusDot, { class: "hm-lf-dot", size: "lg", tone: "primary", color: it.color }),
+      })) as HTMLElement;
+    el.append(h("span", { class: "hm-lf-glow", "aria-hidden": "true" }) as Node);
+    scopes.set(el, dispose);
+    return el;
+  }, owner);
 
   const list = h("ul", { class: "hm-lf-list", role: "list", "aria-live": () => (props.live === "polite" && !paused() ? "polite" : "off"), "aria-relevant": "additions" }) as HTMLElement;
 
@@ -109,7 +126,7 @@ export function LiveFeed(props: LiveFeedProps): Element {
       shown.unshift(it); nodes.set(it.id, el); list.prepend(el);
       for (let i = 0; i < drop; i++) nodes.delete(shown.pop()!.id);
       leaving.forEach((old, k) => {
-        if (!motion || !at || props.leave === "none") { old.remove(); return; }
+        if (!motion || !at || props.leave === "none") { gone(old); return; }
         const b = boxes[k]!;
         old.classList.add("is-leaving");
         setStyle(old, { top: `${b.top - at.top}px`, left: `${b.left - at.left}px`, width: `${b.width}px`, height: `${b.height}px` });
@@ -130,7 +147,7 @@ export function LiveFeed(props: LiveFeedProps): Element {
     const out = feedMotion(FEED_LEAVE, props.leave, "blur", ctx);
     for (const old of leaving) {
       void animate(old, out.keyframes as never, { duration: out.duration ?? 450, easing: out.easing ?? "in", fill: "forwards" })
-        .finished.then(() => old.remove());
+        .finished.then(() => gone(old));
     }
   };
 
@@ -162,13 +179,14 @@ export function LiveFeed(props: LiveFeedProps): Element {
       if (run && !stop) stop = onFrame((_t, dt) => { acc += dt; if (acc >= (props.every ?? 2400)) { acc = 0; pull(); } });
       else if (!run && stop) { stop(); stop = null; }
     });
-    if (getOwner()) onCleanup(() => stop?.());
+    owned(() => stop?.());
   }
 
-  const pause = props.pausable === false ? null : h("button", {
-    type: "button", class: "hm-lf-pause", "aria-pressed": () => String(paused()), onClick: () => paused.set(!paused.peek()),
-  }, props.pulse === false ? null : h("span", { class: () => cx("hm-lf-pulse", paused() && "is-off"), "aria-hidden": "true" }),
-  () => (paused() ? props.resumeLabel ?? t`Paused · resume` : props.pauseLabel ?? t`Live · pause`));
+  // the pause toggle: a pill Button whose dot pulses while the feed is live
+  const pause = props.pausable === false ? null : h(Button, {
+    class: "hm-lf-pause", size: "sm", shape: "pill", pressed: () => paused(), onClick: () => paused.set(!paused.peek()),
+    icon: props.pulse === false ? undefined : h(StatusDot, { class: "hm-lf-pulse", tone: () => (paused() ? "neutral" : "success"), pulse: () => !paused() }),
+  }, () => (paused() ? props.resumeLabel ?? t`Paused · resume` : props.pauseLabel ?? t`Live · pause`));
 
   const root = h("section", { class: () => cx("hm-lf", wall() ? "hm-lf-wall" : "hm-lf-rows", val(props.class)), "aria-label": () => props.label ?? t`Live activity` },
     pause, list) as HTMLElement;
@@ -177,11 +195,6 @@ export function LiveFeed(props: LiveFeedProps): Element {
     pointerenter: () => hovering.set(true), pointerleave: () => hovering.set(false),
     focusin: () => hovering.set(true), focusout: (e: FocusEvent) => { if (!root.contains(e.relatedTarget as Node | null)) hovering.set(false); },
   });
-  const IO = globalThis.IntersectionObserver;
-  if (IO) {
-    const io = new IO((es) => visible.set(es.some((e) => e.isIntersecting)));
-    io.observe(root);
-    if (getOwner()) onCleanup(() => io.disconnect());
-  } else visible.set(true);
+  whenVisible(root, (v) => visible.set(v));
   return root;
 }

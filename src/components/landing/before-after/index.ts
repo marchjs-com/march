@@ -4,9 +4,11 @@
 // When it first scrolls into view the divider sways once to show it can move (not with reduced motion).
 import "./before-after.css";
 import { h } from "../../../dom/h.ts";
-import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
+import { signal, effect, untrack } from "../../../core/reactive.ts";
 import { t, dir, messages } from "../../../core/i18n.ts";
 import { cx, val, clamp, setStyle, listen, onVisible, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
+import { Badge } from "../../data/badge/index.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { animateValue } from "../../../motion/engine/value.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
@@ -75,8 +77,9 @@ export function BeforeAfter(props: BeforeAfterProps): Element {
     : props.grip && props.grip !== true ? h("span", { class: "hm-ba-grip hm-ba-grip-own", "aria-hidden": "true" }, props.grip)
     : h("span", { class: "hm-ba-grip", "aria-hidden": "true" }, h("i"), h("i")));
 
+  // a corner label: a Badge that fades out when the divider reaches its side
   const label = (x: unknown, side: "before" | "after"): Element | null =>
-    x == null ? null : h("span", { class: () => cx("hm-ba-label", `hm-ba-label-${side}`, (side === "before" ? pos() < 14 : pos() > 86) && "is-hidden"), "aria-hidden": "true" }, x);
+    x == null ? null : h("span", { class: () => cx("hm-ba-label", `hm-ba-label-${side}`, (side === "before" ? pos() < 14 : pos() > 86) && "is-hidden"), "aria-hidden": "true" }, h(Badge, {}, x));
 
   const root = h("div", {
     class: () => cx("hm-ba", vertical() && "hm-ba-vertical", props.follow && "hm-ba-follow", val(props.class)),
@@ -116,6 +119,6 @@ export function BeforeAfter(props: BeforeAfterProps): Element {
       hint = animateValue(0, 1, { duration: 1400, easing: "linear", onUpdate: (k) => set(base + Math.sin(k * Math.PI * 2) * 14 * (1 - k), false) });
     }, { threshold: 0.5 });
   }
-  if (getOwner()) onCleanup(() => hint?.cancel());
+  owned(() => hint?.cancel());
   return root;
 }

@@ -6,7 +6,7 @@ export default defineMeta({
   category: "feedback",
   since: "0.1.0",
   summary: "Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status.",
-  composedOf: [],
+  composedOf: ["Button"],
   behaviors: ["motion engine", "swipe"],
   hubs: ["d"],
   showcase: "/navigation",

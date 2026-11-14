@@ -1,17 +1,18 @@
 // Counter (hadi-march/landing): an animated number. It counts up when it scrolls into view and glides to every new
-// value; `roll` turns each digit like an odometer (the digits that change roll, the rest stay; the same odometer as
-// CountRoll: motion/digits.ts). Formatted with
+// value; `roll` turns each digit like an odometer (the digits that change roll, the rest stay): that mode is drawn by
+// CountRoll, the one odometer. Formatted with
 // Intl.NumberFormat for the current locale (grouping, decimals, currency, percent, compact). Screen readers get the
 // final value once; the moving digits are hidden from them.
 import "./counter.css";
 import { h } from "../../../dom/h.ts";
-import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
+import { signal, effect, untrack } from "../../../core/reactive.ts";
 import { locale } from "../../../core/i18n.ts";
 import { cx, val, onVisible, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
 import { formatCount } from "../../../ui/format.ts";
-import { drawDigits, rollDigits } from "../../../motion/digits.ts";
 import { animateValue } from "../../../motion/engine/value.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
+import { CountRoll } from "../../social/count-roll/index.ts";
 
 export interface CounterProps {
   value: MaybeFn<number>;
@@ -40,36 +41,30 @@ export { formatCount };
 /** `<Counter value={12500} />`, `<Counter value={$price} mode="roll" format={EUR} />` (format: Intl.NumberFormat options) */
 export function Counter(props: CounterProps): Element {
   const fmt = (n: number): string => formatCount(n, props, locale());
-  const shown = h("span", { class: "hm-counter-view", "aria-hidden": "true" }) as HTMLElement;
+  const rolls = props.mode === "roll";
   const final = signal("");
-  const root = h("span", { class: () => cx("hm-counter", props.mode === "roll" && "hm-counter-roll", val(props.class)) },
+  let current = props.from ?? 0, started = props.start === "now", tween: { cancel(): void } | null = null;
+  // roll mode: CountRoll draws and rolls the digits of `live` (the start value until the counter starts), with this
+  // counter's format and its announced final value
+  const live = signal(current);
+  const text = globalThis.document.createTextNode(fmt(current));
+  const shown = rolls
+    ? h(CountRoll, { class: "hm-counter-view", value: live, formatter: fmt, spoken: () => final(), duration: props.duration ?? 520, stagger: 45 }) as HTMLElement
+    : h("span", { class: "hm-counter-view", "aria-hidden": "true" }, text) as HTMLElement;
+  const root = h("span", { class: () => cx("hm-counter", rolls && "hm-counter-roll", val(props.class)) },
     props.prefix != null ? h("span", { class: "hm-counter-affix" }, props.prefix) : null,
     shown,
-    h("span", { class: "hm-sr-only" }, () => final()),
+    rolls ? null : h("span", { class: "hm-sr-only" }, () => final()),
     props.suffix != null ? h("span", { class: "hm-counter-affix" }, props.suffix) : null) as HTMLElement;
-
-  let current = props.from ?? 0, started = props.start === "now", tween: { cancel(): void } | null = null;
-  const text = globalThis.document.createTextNode(fmt(current));
-
-  // roll mode: the shared odometer (motion/digits.ts, also behind CountRoll): only the changed digits roll
-  let shownText = fmt(current);
-  const roll = (to: number): void => {
-    const next = fmt(to);
-    if (next !== shownText) { if (reducedMotion()) drawDigits(shown, next); else rollDigits(shown, shownText, next, { up: to >= current, duration: props.duration ?? 520, stagger: 45 }); }
-    shownText = next;
-  };
 
   const go = (to: number): void => {
     final.set(fmt(to));
     tween?.cancel(); tween = null;
-    if (props.mode === "roll") { roll(to); current = to; return; }
-    if (!shown.firstChild) shown.append(text);
+    if (rolls) { current = to; live.set(to); return; }
     if (reducedMotion() || current === to || props.mode === "none") { current = to; text.data = fmt(to); return; }
     tween = animateValue(current, to, { duration: props.duration ?? 1600, easing: props.easing ?? "expo", onUpdate: (v) => { current = v; text.data = fmt(v); } });
   };
 
-  // first paint: the start value (count) or the start digits (roll) so the width is reserved before it moves
-  if (props.mode === "roll") drawDigits(shown, shownText); else shown.append(text);
   final.set(fmt(untrack(() => val(props.value))));
   effect(() => {
     const to = val(props.value);
@@ -77,6 +72,6 @@ export function Counter(props: CounterProps): Element {
     if (started) untrack(() => go(to));
   });
   if (!started) onVisible(root, () => { started = true; go(untrack(() => val(props.value))); }, { threshold: 0.4 });
-  if (getOwner()) onCleanup(() => tween?.cancel());
+  owned(() => tween?.cancel());
   return root;
 }

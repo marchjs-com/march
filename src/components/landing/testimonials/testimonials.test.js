@@ -27,7 +27,7 @@ test("Testimonials wall: Show more toggles aria-expanded; marquee copies are hid
   a.dispose();
   const b = mount({ items, variant: "marquee" });
   assert.equal(b.el.querySelectorAll(".hm-marquee").length, 2);
-  assert.ok(b.el.querySelector('.hm-tm-strip[aria-hidden="true"] figure'));
+  assert.ok(b.el.querySelector('.hm-marquee-unit[aria-hidden="true"] figure'));
   b.dispose();
 });
 

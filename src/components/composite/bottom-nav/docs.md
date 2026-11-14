@@ -54,5 +54,6 @@ stack, so inside an OverlayScope (a device preview) it stays in that box. A long
 
 ## Composed of
 
-Badge (count and dot), OverflowText (long labels scroll instead of overflowing), the motion engine (bubble FLIP,
-icon pop, ring turn).
+Badge (count and dot, also on the Create actions), OverflowText (long labels scroll instead of overflowing), Drawer
+(the "sheet" Create menu; loaded when the first sheet opens) with ListRow actions, the motion engine (bubble FLIP, icon
+pop, ring turn).

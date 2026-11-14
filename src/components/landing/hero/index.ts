@@ -12,20 +12,23 @@
 import "./hero.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
 import { Overlay } from "../../../ui/overlay.ts";
-import { Button, type ButtonVariant } from "../../../ui/button.ts";
 import { Badge } from "../../../ui/badge.ts";
+import { Picture, type PictureSource } from "../../media/picture/index.ts";
 import { Aurora } from "../../../fx/index.ts";
-import { reducedMotion } from "../../../motion/engine/prefs.ts";
+import { BRAND_COLORS, tokenColor } from "../../../theme/colors.ts";
+import { still } from "../../../motion/engine/parts.ts";
 import { scrollTimeline } from "../../../motion/scroll-fx.ts";
-import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { Reveal, type RevealOptions } from "../reveal/index.ts";
+import { SectionHead, sectionActions, type SectionAction } from "../section-head/index.ts";
 import { VideoBackground } from "../video-background/index.ts";
 import { Parallax, type ParallaxLayer } from "../parallax/index.ts";
 
 export type HeroVariant = "centered" | "split" | "video" | "mesh" | "aurora" | "product" | "parallax";
-export interface HeroAction { label: unknown; href?: string | undefined; onClick?: (e: MouseEvent) => void | undefined; variant?: ButtonVariant | undefined; icon?: unknown | undefined; iconEnd?: unknown | undefined }
-export interface HeroImage { src: string; alt: string; width: number; height: number; srcset?: string | undefined; sizes?: string | undefined }
+/** A call to action (the SectionAction of SectionHead). */
+export type HeroAction = SectionAction;
+export interface HeroImage extends PictureSource { alt: string; width: number; height: number }
 
 export interface HeroProps {
   variant?: HeroVariant | undefined;
@@ -67,47 +70,35 @@ export interface HeroProps {
   children?: unknown | undefined;
 }
 
-const isImage = (m: unknown): m is HeroImage => !!m && typeof m === "object" && typeof (m as HeroImage).src === "string" && !(m as Node).nodeType;
-
 function titleNode(title: unknown, highlight?: string): unknown {
   if (typeof title !== "string" || !highlight || !title.includes(highlight)) return title;
   const [a, ...b] = title.split(highlight);
   return [a, h("span", { class: "hm-hero-hl" }, highlight), b.join(highlight)];
 }
 
-/** Buttons for a list of actions (the first is primary): shared by Hero, CtaBand, Pricing. */
-export function actionButtons(actions: readonly (HeroAction | Node)[] | undefined, size: "md" | "lg" = "lg"): unknown[] {
-  return (actions ?? []).map((a, i) => {
-    if ((a as Node).nodeType) return a;
-    const x = a as HeroAction;
-    return h(Button, { variant: x.variant ?? (i === 0 ? "primary" : "secondary"), size, href: x.href as never, onClick: x.onClick, icon: x.icon, iconEnd: x.iconEnd }, x.label);
-  });
-}
+/** Buttons for a list of actions (the first is primary): `sectionActions` of SectionHead with the hero's size. */
+export const actionButtons = (actions: readonly (HeroAction | Node)[] | undefined, size: "md" | "lg" = "lg"): unknown[] => sectionActions(actions, size);
 
-function mediaNode(m: HeroImage | Node | undefined, cls: string): unknown {
-  if (!m) return null;
-  if (!isImage(m)) return h("div", { class: cls }, m);
-  return h("div", { class: cls }, h("img", { src: m.src, alt: m.alt, width: m.width, height: m.height, srcset: m.srcset ?? null, sizes: m.sizes ?? null, decoding: "async", fetchpriority: "high", class: "hm-hero-img" }));
-}
+// hero media is on the first screen: it loads eagerly, with its size reserved
+const mediaNode = (m: HeroImage | Node | undefined, cls: string): unknown => (m ? h("div", { class: cls }, h(Picture, { source: m, loading: "eager", class: "hm-hero-img" })) : null);
 
 /** `<Hero variant="mesh" eyebrow="New" title="Build faster" highlight="faster" lead="…" actions={[{ label: "Start", href: "/start" }]} />` */
 export function Hero(props: HeroProps): Element {
   const variant = props.variant ?? "centered";
   const align = props.align ?? (variant === "split" ? "start" : "center");
-  const still = props.reveal === "none";
+  const plain = props.reveal === "none";
   const arrow = props.eyebrowArrow === false ? null
     : h("span", { class: "hm-hero-eyebrow-arrow", "aria-hidden": "true" }, props.eyebrowArrow && props.eyebrowArrow !== true ? props.eyebrowArrow : "→");
-  const copyClass = cx("hm-hero-copy", `hm-hero-copy-${align}`);
-  const parts = [
-    props.eyebrow != null && (props.eyebrowHref
-      ? h("a", { class: "hm-hero-eyebrow", href: props.eyebrowHref }, h(Badge, { tone: "primary" }, () => val(props.eyebrow)), arrow)
-      : h("p", { class: "hm-hero-eyebrow" }, h(Badge, { tone: "primary" }, () => val(props.eyebrow)))),
-    h(`h${props.level ?? 1}`, { class: "hm-hero-title" }, () => titleNode(val(props.title), props.highlight)),
-    props.lead != null && h("p", { class: "hm-hero-lead" }, () => val(props.lead)),
-    props.actions?.length ? h("div", { class: "hm-hero-actions" }, actionButtons(props.actions)) : null,
-    props.note != null && h("p", { class: "hm-hero-note" }, () => val(props.note)),
-    props.children ?? null];
-  const copy = still ? h("div", { class: copyClass }, parts) : h(Reveal, { class: copyClass, effect: props.reveal ?? "up", stagger: 90, duration: 900 }, parts);
+  const pill = (): unknown => h(Badge, { tone: "primary" }, () => val(props.eyebrow));
+  // the copy is the shared SectionHead at its largest scale; the eyebrow is a Badge pill (with an arrow when linked)
+  const copy = h(SectionHead, {
+    class: cx("hm-hero-copy", `hm-hero-copy-${align}`), size: "xl", width: "full", align, as: `h${props.level ?? 1}` as "h1",
+    eyebrow: props.eyebrow != null ? (props.eyebrowHref ? [pill(), arrow] : pill()) : undefined, eyebrowHref: props.eyebrowHref,
+    title: () => titleNode(val(props.title), props.highlight),
+    lead: props.lead != null ? () => val(props.lead) : undefined,
+    actions: props.actions, note: props.note != null ? () => val(props.note) : undefined,
+    reveal: plain ? false : { effect: props.reveal ?? "up", stagger: 90, duration: 900 },
+  }, props.children ?? null);
 
   const cls = cx("hm-hero", `hm-hero-v-${variant}`, `hm-hero-size-${props.size ?? "lg"}`, val(props.class));
   if (variant === "video" && props.video) return h("section", { class: cls }, h(VideoBackground, { src: props.video.src, poster: props.video.poster, tint: "dark", class: "hm-hero-stage" }, h("div", { class: "hm-hero-inner" }, copy)));
@@ -117,11 +108,11 @@ export function Hero(props: HeroProps): Element {
   if (props.backdrop === false) { /* no decorative layers */ }
   else if (variant === "centered") bg.push(h(Overlay, { effect: "grid", opacity: 0.7 }), h(Overlay, { effect: "spotlight" }));
   else if (variant === "mesh") bg.push(h(Overlay, { effect: "mesh" }), h(Overlay, { effect: "grid", opacity: 0.35 }), h(Overlay, { effect: "spotlight" }), h(Overlay, { effect: "noise", opacity: 0.5 }));
-  else if (variant === "aurora") bg.push(h(Aurora, { colors: props.colors ?? ["var(--hm-brand-orange, var(--hm-cat-1))", "var(--hm-brand-blue, var(--hm-cat-2))", "var(--hm-brand-green, var(--hm-cat-3))", "var(--hm-brand-purple, var(--hm-cat-4))"] }), h(Overlay, { effect: "noise", opacity: 0.45 }));
+  else if (variant === "aurora") bg.push(h(Aurora, { colors: props.colors ?? BRAND_COLORS.map(tokenColor) }), h(Overlay, { effect: "noise", opacity: 0.45 }));
   else if (variant === "product" || variant === "split") bg.push(h(Overlay, { effect: "dots", opacity: 0.5, class: "hm-hero-dots" }));
 
   let stage: unknown = null;
-  if (variant === "split") stage = still ? h("div", { class: "hm-hero-media-wrap" }, mediaNode(props.media, "hm-hero-media"))
+  if (variant === "split") stage = plain ? h("div", { class: "hm-hero-media-wrap" }, mediaNode(props.media, "hm-hero-media"))
     : h(Reveal, { class: "hm-hero-media-wrap", effect: "scale", self: true, delay: 200, duration: 1000 }, mediaNode(props.media, "hm-hero-media"));
   if (variant === "product") {
     const frame = h("div", { class: "hm-hero-frame" },
@@ -131,9 +122,8 @@ export function Hero(props: HeroProps): Element {
     const wrap = h("div", { class: "hm-hero-product" }, frame) as HTMLElement;
     // tilted at first, flat once the frame is well into the viewport (Linear / Apple style)
     // (the motion core's scrollTimeline seeks the tilt by the frame's passage; reduced motion keeps it flat)
-    if (!reducedMotion() && props.tilt !== false) {
-      const stop = scrollTimeline(frame, { transform: ["perspective(1400px) rotateX(22deg) scale(.9) translate3d(0, 40px, 0)", "perspective(1400px) rotateX(0deg) scale(1) translate3d(0, 0, 0)"] }, { track: wrap, range: [0, 0.5], easing: "out" });
-      if (getOwner()) onCleanup(stop);
+    if (!still(props.tilt)) {
+      owned(scrollTimeline(frame, { transform: ["perspective(1400px) rotateX(22deg) scale(.9) translate3d(0, 40px, 0)", "perspective(1400px) rotateX(0deg) scale(1) translate3d(0, 0, 0)"] }, { track: wrap, range: [0, 0.5], easing: "out" }));
     }
     stage = wrap;
   }

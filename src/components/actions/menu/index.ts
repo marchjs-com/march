@@ -1,24 +1,21 @@
 // Menu and Dropdown (hadi-march/ui): a trigger button with a floating menu of items / actions, or any floating content.
 // Folder: src/components/actions/menu/.
 import "./menu.css";
-import "../button/button.css";
-import "../icon-button/icon-button.css";
-import "../../typography/kbd/kbd.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { Link, type Href } from "../../../router/router.ts";
+import type { Href } from "../../../router/router.ts";
 import { can, type PermCheck } from "../../../access/index.ts";
 import { isAction, type Action } from "../../../ui/action.ts";
 import { floating, type Placement } from "../../../ui/popover.ts";
 import { roving } from "../../../ui/focus.ts";
-import { formatKey } from "../../../ui/keys.ts";
-import { val, cx, uid, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, uid, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { check } from "../../../icons/glyphs/check.ts";
-import { buttonSizeClass, type ButtonVariant, type ButtonSize } from "../button/index.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
-
-type Args<A extends readonly unknown[]> = A | (() => A) | null | undefined;
-const argsOf = <A extends readonly unknown[]>(props: { args?: Args<A> }): A => ((typeof props.args === "function" ? props.args() : props.args) ?? []) as A;
+import { Button, argsOf, type Args, type ButtonVariant, type ButtonSize } from "../button/index.ts";
+import { IconButton } from "../icon-button/index.ts";
+import { Kbd } from "../../typography/kbd/index.ts";
+import { Divider } from "../../layout/stack/index.ts";
+import { ListRow } from "../../data/list-row/index.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
 
 // ------------------------------------------------------------------ menus
 /** A plain menu entry. `onSelect` receives the menu's `args`. */
@@ -53,20 +50,24 @@ type Disableable = HTMLElement & { disabled?: boolean };
 /** The enabled item elements of a menu panel (`menuitem`, `menuitemcheckbox`, `menuitemradio`), in order (roving focus moves among them). */
 export const menuItems = (panel: HTMLElement | undefined): HTMLElement[] => (panel ? Array.from(panel.querySelectorAll<Disableable>('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]')).filter((x) => !x.disabled) : []);
 
-/** Draw one menu entry: a separator, an action() button, a router link or a plain button. ContextMenu reuses it. */
+/** An action() as a plain entry: one row drawer for both kinds. */
+const specOf = (it: Action, args: unknown[]): MenuItemSpec => ({
+  label: () => it.label(), icon: it.opts.icon, disabled: () => it.disabled(...args), onSelect: () => { it.run(...args).catch(() => {}); },
+  ...(it.opts.danger ? { danger: true } : {}), ...(it.opts.key ? { shortcut: it.opts.key } : {}),
+});
+
+/** Draw one menu entry: a separator (Divider) or a ListRow (a router link with `href`, a button otherwise). ContextMenu reuses it. */
 export function renderItem(it: MenuItem, args: unknown[], close: (refocus: boolean) => void): unknown {
-  if (isSep(it)) return h("div", { role: "separator", class: "hm-menu-sep" });
-  if (isAction(it)) {
-    return h("button", {
-      type: "button", role: "menuitem", tabindex: "-1", class: cx("hm-menu-item", it.opts.danger && "is-danger"), disabled: () => it.disabled(...args),
-      onClick: () => { close(true); it.run(...args).catch(() => {}); },
-    }, icon(it.opts.icon), h("span", { class: "hm-menu-label" }, () => it.label()), it.opts.key && h("kbd", { class: "hm-kbd hm-menu-kbd" }, formatKey(it.opts.key)));
-  }
-  const choice = it.checked !== undefined;
-  const body = [icon(it.icon), h("span", { class: "hm-menu-label" }, () => val(it.label)), choice && h("span", { class: "hm-menu-check", "aria-hidden": "true" }, glyph(check)), it.shortcut && h("kbd", { class: "hm-kbd hm-menu-kbd" }, formatKey(it.shortcut))];
-  const cls = cx("hm-menu-item", it.danger && "is-danger");
-  if (it.href) return h(Link, { href: it.href, role: "menuitem", tabindex: "-1", class: cls, "on:click": () => close(false), children: body });
-  return h("button", { type: "button", role: choice ? (it.radio ? "menuitemradio" : "menuitemcheckbox") : "menuitem", "aria-checked": choice ? () => String(!!val(it.checked)) : null, tabindex: "-1", class: cls, disabled: () => !!val(it.disabled), onClick: () => { close(true); it.onSelect?.(...args); } }, body);
+  if (isSep(it)) { const sep = h(Divider, { class: "hm-menu-sep" }) as Element; sep.setAttribute("role", "separator"); return sep; }
+  const x = isAction(it) ? specOf(it, args) : it;
+  const choice = x.checked !== undefined;
+  const trail = choice || x.shortcut ? [choice && h("span", { class: "hm-menu-check", "aria-hidden": "true" }, glyph(check)), x.shortcut && h(Kbd, { keys: x.shortcut, class: "hm-menu-kbd" })] : undefined;
+  const row = { size: "sm" as const, overflow: "wrap" as const, tabindex: "-1", class: cx("hm-menu-item", x.danger && "is-danger"), lead: x.icon, title: () => val(x.label), trail };
+  if (x.href) return h(ListRow, { ...row, href: x.href, role: "menuitem", "on:click": () => close(false) });
+  return h(ListRow, {
+    ...row, role: choice ? (x.radio ? "menuitemradio" : "menuitemcheckbox") : "menuitem", "aria-checked": choice ? () => String(!!val(x.checked)) : null,
+    disabled: () => !!val(x.disabled), onClick: () => { close(true); x.onSelect?.(...args); },
+  });
 }
 
 /** Props shared by <Menu> and <Dropdown> (the trigger button and its panel). */
@@ -96,17 +97,21 @@ function popButton(props: PopoverButtonProps, role: "menu" | "dialog", panelChil
   const close = (refocus?: boolean): void => { open.set(false); if (refocus) trigger?.focus(); };
   const focusIn = (i: number): void => queueMicrotask(() => { const els = role === "menu" ? menuItems(panel) : []; (i < 0 ? els[els.length - 1] : els[i])?.focus(); });
   const show = (i = 0): void => { open.set(true); focusIn(i); };
-  const btn = h("button", {
-    type: "button", ref: (x: HTMLElement) => { trigger = x; },
-    class: () => cx(props.icon && props.trigger == null ? "hm-icon-btn" : `hm-btn hm-btn-${val(props.variant) ?? "secondary"}`, buttonSizeClass(val(props.size)), val(props.class)),
+  // the trigger is an IconButton (icon only) or a Button; its own content goes in unwrapped (Button's icon slot passes nodes through)
+  const iconOnly = !!props.icon && props.trigger == null;
+  const own = props.trigger != null && typeof props.trigger !== "string";
+  const attrs = {
+    ref: (x: HTMLElement) => { trigger = x; }, class: () => val(props.class), size: () => val(props.size), color: props.color,
     "aria-haspopup": role === "menu" ? "menu" : "dialog", "aria-expanded": () => String(open()), "aria-controls": id,
-    "aria-label": () => val(props.label) ?? null, disabled: () => !!val(props.disabled), "data-hm-color": () => colorAttr(props.color),
+    "aria-label": (() => val(props.label) ?? null) as () => string, disabled: () => !!val(props.disabled),
     onClick: () => (open.peek() ? close(false) : show(0)),
     onKeydown: (e: KeyboardEvent) => {
       if (role !== "menu") return;
       if (e.key === "ArrowDown") { e.preventDefault(); show(0); } else if (e.key === "ArrowUp") { e.preventDefault(); show(-1); }
     },
-  }, props.trigger ?? icon(props.icon) ?? (() => val(props.label)));
+  };
+  const btn = iconOnly ? h(IconButton, { ...attrs, icon: props.icon })
+    : h(Button, { ...attrs, variant: () => val(props.variant), ...(own ? { icon: props.trigger } : { children: props.trigger ?? (() => val(props.label)) }) });
   return [btn, () => open() && untrack(() => floating({
     anchor: trigger, placement: props.placement ?? "bottom-start", role: role === "menu" ? "menu" : null, id,
     class: cx(role === "menu" ? "hm-menu" : "hm-dropdown", props.panelClass), onClose: close, ref: (x) => { panel = x; },

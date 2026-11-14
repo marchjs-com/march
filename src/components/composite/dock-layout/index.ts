@@ -4,22 +4,34 @@
 // Storage manager's areas fit). Keyboard: F6 between groups, Alt+Shift+arrows dock the focused tab to a side,
 // Alt+Shift+Enter maximize, Alt+Shift+F float, Alt+Shift+M minimize, Delete close. Right-to-left aware throughout.
 //
-// Built from Splitter (every split), Tabs (every group) and Portal: each panel's content renders once into a Portal
+// Built from Splitter (every split), Tabs (every group: icon, title, badge, "changed" dot, close mark, actions),
+// IconButton, ResizeHandle, Toolbar, Button, Empty, the drag behavior (pointerDrag, dragGhost, arrowStep) and Portal: each panel's content renders once into a Portal
 // and moves between groups without being rebuilt, so editors keep their state while the layout changes.
 import "./dock-layout.css";
-import { signal, computed, effect, untrack, createRoot, getOwner, onCleanup } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, createRoot, getOwner, onCleanup, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { Portal, PortalTarget, openLayer } from "../../../dom/portal.ts";
+import { Portal, PortalTarget } from "../../../dom/portal.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { val, cx, uid, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { clamp, listen, setStyle, debounce, load, save, doc } from "../../../core/util.ts";
+import { val, cx, uid, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { clamp, setStyle, debounce, load, save, doc } from "../../../core/util.ts";
+import { ownIcon, hasPart } from "../../../ui/parts.ts";
+import { observeSize } from "../../../ui/observe.ts";
 import { isRtl } from "../../../ui/focus.ts";
 import { Splitter } from "../../../ui/splitter.ts";
-import { Tabs } from "../../../ui/tabs.ts";
+import { Tabs, type TabSpec, type TabsProps } from "../../navigation/tabs/index.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { Button } from "../../actions/button/index.ts";
+import { Empty } from "../../feedback/empty/index.ts";
+import { Toolbar } from "../../layout/stack/index.ts";
+import { ResizeHandle } from "../../layout/resize-handle/index.ts";
+import { OverflowText } from "../../typography/overflow-text/index.ts";
+import { pointerDrag, arrowStep } from "../../../behaviors/drag/index.ts";
+import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
+import { announce } from "../../../managers/announcer/index.ts";
 import { animate } from "../../../motion/animate.ts";
-import { reducedMotion } from "../../../motion/env.ts";
+import { still as motionOff } from "../../../motion/engine/parts.ts";
+import type { IconDef } from "../../../icons/svg.ts";
 import { command } from "../../../managers/command/index.ts";
-import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { maximize as maxIcon } from "../../../icons/glyphs/maximize.ts";
 import { minimize as restoreIcon } from "../../../icons/glyphs/minimize.ts";
 import { minus } from "../../../icons/glyphs/minus.ts";
@@ -139,14 +151,13 @@ export function DockLayout(props: DockLayoutProps): Element {
   const focused = signal<string | null>(null);
   // narrow (a phone): side-by-side splits stack, so nothing is squeezed
   const narrow = signal(false);
-  const live = signal("");
   let root: HTMLElement | undefined;
   const owner = getOwner();
   const L = (): NonNullable<DockLayoutProps["labels"]> => props.labels ?? {};
-  const still = (): boolean => props.motion === false || reducedMotion();
-  const shows = (k: "maximize" | "float" | "minimize"): boolean => { const a = props.actions; return a == null || a === true || (a !== false && a.includes(k)); };
+  const still = (): boolean => motionOff(() => props.motion);
+  const shows = (k: "maximize" | "float" | "minimize"): boolean => hasPart(props.actions, k);
   type IconKey = keyof NonNullable<DockLayoutProps["icons"]>;
-  const ico = (k: IconKey, def: Parameters<typeof glyph>[0]): unknown => { const own = props.icons?.[k]; return own === undefined ? glyph(def) : icon(typeof own === "function" ? (own as () => unknown)() : own, "hm-dock-own"); };
+  const ico = (k: IconKey, def: IconDef): unknown => ownIcon(props.icons?.[k], def, "hm-dock-own");
 
   // ---------------------------------------------------------------- persistence
   const storage: DockStorage | null = props.persist ? (props.storage ?? { get: (k) => load<unknown>(k, null), set: (k, v) => save(k, v) }) : null;
@@ -175,7 +186,7 @@ export function DockLayout(props: DockLayoutProps): Element {
   // ---------------------------------------------------------------- operations
   const groupEl = (gid: string): HTMLElement | null => root?.querySelector<HTMLElement>(`[data-dock-group="${gid}"]`) ?? null;
   const tabEl = (pid: string): HTMLElement | null => root?.querySelector<HTMLElement>(`[data-dock-group] [role="tab"][data-tab="${globalThis.CSS?.escape?.(pid) ?? pid}"]`) ?? null;
-  const say = (msg: string): void => { live.set(""); queueMicrotask(() => live.set(msg)); };
+  const say = (msg: string): void => announce(msg);
   const titleOf = (pid: string): string => val(panel(pid)?.title) ?? pid;
   const afterRender = (fn: () => void): void => { queueMicrotask(() => queueMicrotask(fn)); };
   const pop = (pid: string, focus = false): void => afterRender(() => {
@@ -254,33 +265,33 @@ export function DockLayout(props: DockLayoutProps): Element {
     if (i < 0 || i === s.floating.length - 1) return;
     const f = s.floating.splice(i, 1)[0]!; s.floating.push(f); state.set(s);
   };
-  // move or resize a floating window: pointer, or the arrow keys on its grip (Shift: 40 px)
+  // move or resize a floating window: pointer, or the arrow keys on its grip / corner (10 px, Shift: 40 px)
+  type Rect = { x: number; y: number; w: number; h: number };
+  const setRect = (gid: string, next: (r: Rect) => Rect, from?: Rect): void => {
+    const f = untrack(state).floating.find((x) => x.group.id === gid);
+    if (!f) return;
+    Object.assign(f, clampRect(next(from ?? { x: f.x, y: f.y, w: f.w, h: f.h })));
+    state.set(untrack(state));
+  };
+  const nudge = (mode: "move" | "size", dx: number, dy: number) => (r: Rect): Rect =>
+    (mode === "move" ? { ...r, x: r.x + dx, y: r.y + dy } : { ...r, w: r.w + dx, h: r.h + dy });
   const winDrag = (gid: string, mode: "move" | "size") => (e: PointerEvent): void => {
     if (e.button !== 0) return;
     e.preventDefault();
     const f = untrack(state).floating.find((x) => x.group.id === gid);
     if (!f) return;
     raise(gid);
-    const start = { ...f }, x0 = e.clientX, y0 = e.clientY, dir = isRtl(root) ? -1 : 1;
-    const off = listen(doc(), {
-      pointermove: (ev: PointerEvent) => {
-        const dx = (ev.clientX - x0) * dir, dy = ev.clientY - y0;
-        Object.assign(f, clampRect(mode === "move" ? { ...start, x: start.x + dx, y: start.y + dy } : { ...start, w: start.w + dx, h: start.h + dy }));
-        state.set(untrack(state));
-      },
-      pointerup: () => { off(); touch(); },
-      pointercancel: () => { off(); touch(); },
-    });
+    const start: Rect = { x: f.x, y: f.y, w: f.w, h: f.h };
+    pointerDrag(e, { threshold: 0, onMove: (p) => setRect(gid, nudge(mode, p.di, p.dy), start), onEnd: touch });
   };
-  const winKey = (gid: string, mode: "move" | "size") => (e: KeyboardEvent): void => {
-    const f = untrack(state).floating.find((x) => x.group.id === gid);
-    if (!f) return;
-    const step = e.shiftKey ? 40 : 10, dir = isRtl(root) ? -1 : 1;
-    const d = { ArrowLeft: [-step * dir, 0], ArrowRight: [step * dir, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
-    if (!d) return;
+  const winStep = (gid: string, mode: "move" | "size", dx: number, dy: number): void => { setRect(gid, nudge(mode, dx, dy)); touch(); };
+  const winKey = (gid: string) => (e: KeyboardEvent): void => {
+    // arrowStep is mirrored in RTL like the window's inline axis; it gives 1 (10 with Shift): 10 px, 40 px
+    const a = e.key.startsWith("Arrow") ? arrowStep(e, isRtl(root)) : null;
+    if (!a) return;
     e.preventDefault(); e.stopPropagation();
-    Object.assign(f, clampRect(mode === "move" ? { ...f, x: f.x + d[0]!, y: f.y + d[1]! } : { ...f, w: f.w + d[0]!, h: f.h + d[1]! }));
-    state.set(untrack(state)); touch();
+    const k = e.shiftKey ? 4 : 10;
+    winStep(gid, "move", a.dx * k, a.dy * k);
   };
 
   // ---------------------------------------------------------------- drag a tab
@@ -342,42 +353,30 @@ export function DockLayout(props: DockLayoutProps): Element {
     return { target: gid, zone: "bottom", rect: { ...rel(r), y: r.top - box.top + r.height / 2, h: r.height / 2 } };
   };
   const startDrag = (e: PointerEvent, pid: string): void => {
-    const x0 = e.clientX, y0 = e.clientY;
-    let ghost: HTMLElement | null = null, closeGhost: (() => void) | null = null, drop: Drop | null = null;
-    const end = (apply: boolean): void => {
-      off();
-      root?.classList.remove("is-dragging");
-      closeGhost?.();
-      showPreview(null);
-      if (!apply || !ghost || !drop) return;
-      const s = untrack(state);
-      if (drop.zone === "float") {
-        const box = root!.getBoundingClientRect();
-        float(pid, { x: isRtl(root) ? box.width - drop.rect.x - 320 : drop.rect.x, y: drop.rect.y, w: 320, h: 220 });
-        return;
-      }
-      let index = drop.index;
-      const from = groupOf(s, pid);
-      if (index != null && from?.id === drop.target && from.panels.indexOf(pid) < index) index--;
-      move(pid, drop.target, drop.zone, index, true);
-    };
-    const off = listen(doc(), {
-      pointermove: (ev: PointerEvent) => {
-        if (!ghost) {
-          if (Math.hypot(ev.clientX - x0, ev.clientY - y0) < 6) return;
-          const p = panel(pid);
-          ghost = h("div", { class: "hm-dock-ghost", "aria-hidden": "true" }, icon(p?.icon, "hm-dock-tab-icon"), h("span", {}, titleOf(pid))) as HTMLElement;
-          closeGhost = openLayer("drag", ghost);
-          root?.classList.add("is-dragging");
-          if (!still()) animate(ghost, [{ opacity: 0, scale: ".9" }, { opacity: 1, scale: "1" }], { duration: 140, easing: "easeOutCubic" });
-        }
-        setStyle(ghost, { transform: `translate(${ev.clientX + 12}px, ${ev.clientY + 10}px)` });
-        drop = hit(ev.clientX, ev.clientY);
-        showPreview(drop);
+    let ghost: DragGhost | null = null, drop: Drop | null = null;
+    pointerDrag(e, {
+      threshold: 6,
+      onStart: () => {
+        ghost = dragGhost(h("div", { class: "hm-dock-ghost" }, icon(panel(pid)?.icon, "hm-dock-tab-icon"), h("span", {}, titleOf(pid))) as HTMLElement, { motion: () => props.motion });
+        root?.classList.add("is-dragging");
       },
-      pointerup: () => end(true),
-      pointercancel: () => end(false),
-      keydown: (ev: KeyboardEvent) => { if (ev.key === "Escape") { ev.preventDefault(); end(false); } },
+      onMove: (p) => { ghost?.move(p.clientX, p.clientY); drop = hit(p.clientX, p.clientY); showPreview(drop); },
+      onEnd: (_p, cancelled) => {
+        root?.classList.remove("is-dragging");
+        ghost?.close();
+        showPreview(null);
+        if (cancelled || !drop) return;
+        const s = untrack(state);
+        if (drop.zone === "float") {
+          const box = root!.getBoundingClientRect();
+          float(pid, { x: isRtl(root) ? box.width - drop.rect.x - 320 : drop.rect.x, y: drop.rect.y, w: 320, h: 220 });
+          return;
+        }
+        let index = drop.index;
+        const from = groupOf(s, pid);
+        if (index != null && from?.id === drop.target && from.panels.indexOf(pid) < index) index--;
+        move(pid, drop.target, drop.zone, index, true);
+      },
     });
   };
 
@@ -396,7 +395,6 @@ export function DockLayout(props: DockLayoutProps): Element {
     const tab = (e.target as HTMLElement).closest?.<HTMLElement>('[role="tab"]');
     const pid = tab?.dataset["tab"];
     if (!tab || !pid || !root?.contains(tab)) return;
-    if (e.key === "Delete") { e.preventDefault(); void close(pid); return; }
     if (!(e.altKey && e.shiftKey)) return;
     const rtl = isRtl(root);
     const side = ({ ArrowLeft: rtl ? "end" : "start", ArrowRight: rtl ? "start" : "end", ArrowUp: "top", ArrowDown: "bottom" } as Record<string, DockSide>)[e.key];
@@ -431,43 +429,42 @@ export function DockLayout(props: DockLayoutProps): Element {
   };
 
   // ---------------------------------------------------------------- rendering
-  const tabLabel = (pid: string): unknown => {
+  // a tab: Tabs draws the icon, the badge, the "changed" dot and the close mark (Delete closes too)
+  const tabOf = (pid: string): TabSpec => {
     const p = panel(pid);
-    return [icon(p?.icon, "hm-dock-tab-icon"),
-      h("span", { class: "hm-dock-tab-title" }, () => val(p?.title) ?? pid),
-      () => (val(p?.dirty) ? h("span", { class: "hm-dock-dirty", "aria-label": L().unsaved ?? t`unsaved changes` }) : null),
-      p?.closable === false ? null : h("span", { class: "hm-dock-x", "aria-hidden": "true", title: L().close ?? t`Close`, onPointerdown: (e: Event) => e.stopPropagation(), onClick: (e: Event) => { e.stopPropagation(); void close(pid); } }, ico("close", xIcon))];
+    return {
+      id: pid, icon: p?.icon, label: h(OverflowText, { class: "hm-dock-tab-title", text: () => val(p?.title) ?? pid, fade: false }),
+      closable: p?.closable !== false, ...(p?.badge !== undefined ? { badge: p.badge } : null), ...(p?.dirty !== undefined ? { dirty: () => !!val(p.dirty) } : null),
+      content: () => { ensureHost(pid); return h(PortalTarget, { name: target(pid), class: "hm-dock-host" }); },
+    };
   };
   const iconBtn = (label: () => string, ic: () => unknown, onClick: () => void, extra: Record<string, unknown> = {}): Element =>
-    h("button", { type: "button", class: "hm-dock-btn", "aria-label": label, title: label, onClick, ...extra }, ic);
+    h(IconButton, { class: "hm-dock-btn", size: "xs", label, icon: ic, onClick, ...extra }) as Element;
 
   const renderGroup = (g: DockGroupNode, floating: boolean): Element => {
     const gid = g.id;
     const liveGroup = (): DockGroupNode | undefined => findGroup(state(), gid);
     const maxed = (): boolean => state().maximized === gid;
     const act = (): string | null => liveGroup()?.active ?? null;
-    const tabs = g.panels.map((pid) => ({
-      id: pid, label: () => tabLabel(pid), badge: panel(pid)?.badge,
-      content: () => { ensureHost(pid); return h(PortalTarget, { name: target(pid), class: "hm-dock-host" }); },
-    }));
-    const actions = props.actions === false ? null : h("div", { class: "hm-dock-actions" },
-      floating || !shows("maximize") ? null : iconBtn(() => (maxed() ? L().restore ?? t`Restore` : L().maximize ?? t`Maximize`), () => (maxed() ? ico("restore", restoreIcon) : ico("maximize", maxIcon)), () => toggleMaximize(act() ?? undefined), { "aria-pressed": () => String(maxed()), "aria-keyshortcuts": "Alt+Shift+Enter" }),
+    const actions = !hasPart(props.actions) ? null : [
+      floating || !shows("maximize") ? null : iconBtn(() => (maxed() ? L().restore ?? t`Restore` : L().maximize ?? t`Maximize`), () => (maxed() ? ico("restore", restoreIcon) : ico("maximize", maxIcon)), () => toggleMaximize(act() ?? undefined), { pressed: maxed, "aria-keyshortcuts": "Alt+Shift+Enter" }),
       shows("float") ? iconBtn(() => (floating ? L().dock ?? t`Dock` : L().float ?? t`Float`), () => (floating ? ico("dock", layers) : ico("float", appWindow)), () => { const a = act(); if (a) (floating ? dockBack(a) : float(a)); }, { "aria-keyshortcuts": "Alt+Shift+F" }) : null,
-      shows("minimize") ? iconBtn(() => L().minimize ?? t`Minimize`, () => ico("minimize", minus), () => { const a = act(); if (a) minimize(a); }, { "aria-keyshortcuts": "Alt+Shift+M" }) : null);
+      shows("minimize") ? iconBtn(() => L().minimize ?? t`Minimize`, () => ico("minimize", minus), () => { const a = act(); if (a) minimize(a); }, { "aria-keyshortcuts": "Alt+Shift+M" }) : null];
+    const tabLabels = reactive(() => ({ close: L().close, dirty: L().unsaved })) as unknown as TabsProps["labels"];
     const el = h("section", {
       class: () => cx("hm-dock-group", floating && "hm-dock-float", maxed() && "is-maximized", focused() === gid && "is-focused"),
       "data-dock-group": gid, "aria-label": () => { const title = act() ? titleOf(act()!) : ""; return L().group?.(title) ?? t`Panel group: ${title}`; },
       onFocusin: () => focused.set(gid),
-      onPointerdown: (e: PointerEvent) => {
-        if (floating) raise(gid);
-        const tab = (e.target as HTMLElement).closest<HTMLElement>('[role="tab"]');
-        if (tab?.dataset["tab"] && e.button === 0 && !(e.target as HTMLElement).closest(".hm-dock-x")) startDrag(e, tab.dataset["tab"]);
-      },
+      onPointerdown: () => { if (floating) raise(gid); },
     },
-    h(Tabs, { tabs, value: act, onChange: (id: string) => commit(activate(untrack(state), id)), label: () => L().panels ?? t`Panels`, class: "hm-dock-tabs" }),
-    actions,
-    floating && h("button", { type: "button", class: "hm-dock-grip", "aria-label": () => L().moveWindow ?? t`Move window`, title: () => L().moveWindow ?? t`Move window`, onPointerdown: winDrag(gid, "move"), onKeydown: winKey(gid, "move") }),
-    floating && h("button", { type: "button", class: "hm-dock-resize", "aria-label": () => L().resizeWindow ?? t`Resize window`, title: () => L().resizeWindow ?? t`Resize window`, onPointerdown: winDrag(gid, "size"), onKeydown: winKey(gid, "size") }));
+    h(Tabs, {
+      tabs: g.panels.map(tabOf), value: act, onChange: (id: string) => commit(activate(untrack(state), id)), label: () => L().panels ?? t`Panels`, class: "hm-dock-tabs",
+      actions, onClose: (id: string) => void close(id), closeIcon: props.icons?.close, labels: tabLabels,
+      tabProps: (tab: TabSpec) => ({ onPointerdown: (e: PointerEvent) => { if (e.button === 0) startDrag(e, tab.id); } }),
+    }),
+    floating && h("button", { type: "button", class: "hm-dock-grip", "aria-label": () => L().moveWindow ?? t`Move window`, title: () => L().moveWindow ?? t`Move window`, onPointerdown: winDrag(gid, "move"), onKeydown: winKey(gid) }),
+    floating && h(ResizeHandle, { edge: "bottom-end", line: "always", class: "hm-dock-resize", step: 10, label: () => L().resizeWindow ?? t`Resize window`, title: () => L().resizeWindow ?? t`Resize window`,
+      onPointerdown: winDrag(gid, "size"), onStep: (dx: number, dy: number) => winStep(gid, "size", dx, dy) }));
     return el;
   };
 
@@ -488,7 +485,7 @@ export function DockLayout(props: DockLayoutProps): Element {
       const s = state();
       const own = props.empty;
       const docked = s.root ? renderNode(s.root, "") : h("div", { class: "hm-dock-empty" }, own === false ? null : typeof own === "function" ? own(reset)
-        : [h("p", {}, L().empty ?? t`No panels open`), h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", onClick: reset }, L().reset ?? t`Reset layout`)]);
+        : h(Empty, { size: "sm", title: L().empty ?? t`No panels open`, action: h(Button, { variant: "secondary", size: "sm", onClick: reset }, L().reset ?? t`Reset layout`) }));
       const floats = s.floating.map((f) => {
         const gid = f.group.id;
         const el = renderGroup(f.group, true) as HTMLElement;
@@ -505,9 +502,9 @@ export function DockLayout(props: DockLayoutProps): Element {
   const tray = (): unknown => {
     const m = state().minimized;
     if (!m.length || props.tray === false) return null;
-    return untrack(() => h("div", { class: "hm-dock-tray", role: "toolbar", "aria-label": L().tray ?? t`Minimized panels` },
-      m.map((x) => h("button", { type: "button", class: "hm-dock-tray-btn", onClick: () => restore(x.panel), title: L().restore ?? t`Restore` },
-        icon(panel(x.panel)?.icon, "hm-dock-tab-icon"), h("span", {}, () => titleOf(x.panel))))));
+    return untrack(() => h(Toolbar, { class: "hm-dock-tray", label: L().tray ?? t`Minimized panels`,
+      children: m.map((x) => h(Button, { class: "hm-dock-tray-btn", variant: "secondary", size: "sm", shape: "pill", icon: panel(x.panel)?.icon, onClick: () => restore(x.panel), title: L().restore ?? t`Restore` },
+        () => titleOf(x.panel))) }));
   };
 
   // ---------------------------------------------------------------- commands (palette, menus, toolbars)
@@ -538,12 +535,11 @@ export function DockLayout(props: DockLayoutProps): Element {
     "aria-roledescription": () => L().workspace ?? t`workspace`, "aria-label": () => val(props.label) ?? t`Workspace`,
     ref: (x: HTMLElement) => {
       root = x;
-      if (typeof ResizeObserver === "function") { const ro = new ResizeObserver(() => narrow.set(x.clientWidth > 0 && x.clientWidth < 544)); ro.observe(x); onCleanup(() => ro.disconnect()); }
+      observeSize(x, () => narrow.set(x.clientWidth > 0 && x.clientWidth < 544));
     }, onKeydown,
   },
   h("div", { class: "hm-dock-main" }, tree),
   tray,
-  h("div", { class: "hm-dock-preview", "aria-hidden": "true", ref: (x: HTMLElement) => { preview = x; } }),
-  h("div", { class: "hm-sr-only", role: "status", "aria-live": "polite" }, () => live()));
+  h("div", { class: "hm-dock-preview", "aria-hidden": "true", ref: (x: HTMLElement) => { preview = x; } }));
 }
 

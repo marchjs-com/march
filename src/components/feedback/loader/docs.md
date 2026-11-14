@@ -33,4 +33,4 @@ The fade-in waits a moment, so a fast load never flashes a spinner.
 
 ## Composed of
 
-Spinner's look (its stylesheet), not the Spinner component: the status is the Loader itself.
+Spinner (`size="lg"`, decorative: the status is the Loader itself).

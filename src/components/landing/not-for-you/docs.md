@@ -40,4 +40,4 @@ list is which. Two columns stack on narrow screens.
 
 ## Composed of
 
-Markup only; icons `x` and `check`.
+ListRow (a line), CheckMark (the round mark; its `motion` turns the cross into a tick).

@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Password field with a show / hide button (aria-pressed).",
   category: "forms",
-  composedOf: [],
+  composedOf: ["Button"],
   behaviors: [],
   hubs: [],
   showcase: "/forms",

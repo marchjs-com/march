@@ -35,7 +35,7 @@ export default function FileUploadDemo(props: { values: { multiple: boolean; acc
   // these four are read when the control is built or when a file is added: the control is built again only when one of
   // them changes (the list starts over with the sample file); what is accepted and the hint stay live
   const once = computed(() => [props.values.multiple, props.values.upload, props.values.preview, props.values.remove].join("|"))
-  return <div class="sc-stack" ref={(x: HTMLElement) => { host = x }}>
+  return <div class="sc-stack" ref={(x: Element) => { host = x as HTMLElement }}>
     {() => {
       once()
       queueMicrotask(addSample)

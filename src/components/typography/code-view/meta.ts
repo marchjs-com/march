@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Read-only code block: line numbers, syntax colours (js/ts/jsx/tsx, css, html, json, sh), wrap toggle and a copy button.",
   category: "typography",
-  composedOf: ["CopyButton"],
+  composedOf: ["CopyButton", "Button", "PanelHeader"],
   behaviors: [],
   hubs: [],
   showcase: "/data",

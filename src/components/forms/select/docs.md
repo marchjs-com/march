@@ -13,7 +13,7 @@ object stays the same object. For a handful of values prefer ChoicePicker or Seg
 |---|---|---|---|
 | `value` / `bind:value` | option value | `null` | |
 | `options` | `[value]` or `[{ value, label, disabled }]` | — | may be live |
-| `placeholder` | string | `""` | the empty first option |
+| `placeholder` | string / `false` | `""` | the empty first option; `false`: no empty option |
 | `disabled`, `readonly` | boolean | — | readonly disables the select |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 

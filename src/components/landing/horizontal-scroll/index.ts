@@ -4,8 +4,10 @@
 // horizontal scroller with snap points (no pinning).
 import "./horizontal-scroll.css";
 import { h } from "../../../dom/h.ts";
-import { onCleanup, getOwner } from "../../../core/reactive.ts";
-import { cx, val, setStyle, clamp, type ClassProp } from "../../../ui/util.ts";
+import { signal } from "../../../core/reactive.ts";
+import { cx, val, setStyle, clamp, isRtl, type ClassProp } from "../../../ui/util.ts";
+import { owned, observeSize } from "../../../ui/observe.ts";
+import { Progress } from "../../feedback/progress/index.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
 
@@ -27,8 +29,9 @@ const native = (): boolean => reducedMotion() || !!globalThis.matchMedia?.("(hov
 /** `<HorizontalScroll label="Case studies"><Card/><Card/><Card/></HorizontalScroll>` */
 export function HorizontalScroll(props: HorizontalScrollProps): Element {
   const track = h("div", { class: "hm-hs-track" }, props.children) as HTMLElement;
-  const bar = h("span", { class: "hm-hs-bar-fill" }) as HTMLElement;
-  const pin = h("div", { class: "hm-hs-pin" }, h("div", { class: "hm-hs-view" }, track), props.progress === false ? null : h("span", { class: "hm-hs-bar", "aria-hidden": "true" }, bar)) as HTMLElement;
+  const done = signal(0); // 0..1 of the pinned passage: the Progress line under the panels shows it
+  const pin = h("div", { class: "hm-hs-pin" }, h("div", { class: "hm-hs-view" }, track),
+    props.progress === false ? null : h(Progress, { variant: "line", decorative: true, smooth: false, value: done, max: 1, class: "hm-hs-bar" })) as HTMLElement;
   const root = h("section", { class: cx("hm-hs", val(props.class)), "aria-label": props.label ?? null, role: props.label ? "region" : null }, pin) as HTMLElement;
   if (props.panel) setStyle(root, { "--hm-hs-panel": props.panel });
 
@@ -40,18 +43,15 @@ export function HorizontalScroll(props: HorizontalScrollProps): Element {
     // the section is as tall as the sideways distance plus one screen
     setStyle(root, { "--hm-hs-extra": `${overflow}px` });
   };
-  const RO = globalThis.ResizeObserver;
-  if (RO) { const ro = new RO(size); ro.observe(track); ro.observe(pin); if (getOwner()) onCleanup(() => ro.disconnect()); }
+  if (globalThis.ResizeObserver) { observeSize(track, size); observeSize(pin, size); }
   queueMicrotask(size);
   // the pinned passage (section top at the viewport top → section end at the viewport bottom) from the motion scroll core
-  const offScroll = onScrollProgress({ track: root }, () => {
-    if (props.pinned === false || native() || !overflow) { setStyle(track, { transform: null }); setStyle(bar, { transform: null }); return; }
+  owned(onScrollProgress({ track: root }, () => {
+    if (props.pinned === false || native() || !overflow) { setStyle(track, { transform: null }); done.set(0); return; }
     const r = root.getBoundingClientRect(), vh = globalThis.innerHeight || 1;
-    const pin = clamp(-r.top / Math.max(1, r.height - vh), 0, 1);
-    const rtl = globalThis.getComputedStyle?.(root).direction === "rtl";
-    setStyle(track, { transform: `translate3d(${(pin * overflow * (rtl ? 1 : -1)).toFixed(1)}px, 0, 0)` });
-    setStyle(bar, { transform: `scaleX(${pin.toFixed(4)})` });
-  });
-  if (getOwner()) onCleanup(offScroll);
+    const at = clamp(-r.top / Math.max(1, r.height - vh), 0, 1);
+    setStyle(track, { transform: `translate3d(${(at * overflow * (isRtl(root) ? 1 : -1)).toFixed(1)}px, 0, 0)` });
+    done.set(at);
+  }));
   return root;
 }

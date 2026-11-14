@@ -44,5 +44,5 @@ on hover and focus. Hidden items leave the tab order and appear as menu items.
 
 ## Composed of
 
-Menu (the More menu), Tooltip (icon buttons). Fitting is the shared `fitItems` / `observeWidth` (ui/fit), commands come
+Button (ghost, with a label) / IconButton (icon only) with `pressed` for toggles, Divider (vertical separators), Menu (the More menu), Tooltip (icon buttons). One Tab stop comes from the roving-focus behavior; fitting is the shared `fitItems` / `observeWidth` (ui/fit), commands come
 from `commandBinding` (managers/command/ui), roving focus from ui/focus.

@@ -6,8 +6,8 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state.",
   category: "composite",
-  composedOf: ["OverflowText", "Link"],
-  behaviors: ["resize-handle"],
+  composedOf: ["ListRow", "SearchBox", "PanelHeader", "SectionLabel", "IconButton", "Button", "Badge", "Chevron", "Empty", "ResizeHandle"],
+  behaviors: ["roving keys (ui/focus)", "scrollIntoArea"],
   hubs: [],
   showcase: "/navigation",
 });

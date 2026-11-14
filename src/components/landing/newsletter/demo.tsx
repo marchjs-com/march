@@ -25,7 +25,7 @@ export default function NewsletterDemo(props: { values: { layout: string; outcom
     quick = true
     form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }))
   }
-  return <div class="sc-demo-stack" ref={(x: HTMLElement) => { wrap = x }}>
+  return <div class="sc-demo-stack" ref={(x: Element) => { wrap = x as HTMLElement }}>
     {() => {
       const layout = props.values.layout, texts = props.values.texts
       void $run

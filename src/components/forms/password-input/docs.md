@@ -29,4 +29,4 @@ password"); spellcheck is off so the password never reaches a spelling service.
 
 ## Composed of
 
-Nothing: a native input and a button, wrapped like the other affixed inputs.
+Button (the show / hide toggle) beside a native input, wrapped like the other affixed inputs.

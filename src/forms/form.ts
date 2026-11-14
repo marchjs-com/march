@@ -2,7 +2,6 @@
 // help, error with the right aria wiring) and <EditForm> (load → edit → save with reason, toast and reload).
 import "./form.css";
 import "../ui/field.css";
-import "../ui/button.css";
 import { signal, computed, effect, batch, untrack, onCleanup, useContext, provide, type Accessor } from "../core/reactive.ts";
 import { store, unwrap } from "../core/store.ts";
 import { h } from "../dom/h.ts";
@@ -14,6 +13,9 @@ import { Field, FormContext, setControlBuilder, type FieldProps, type BuiltContr
 export { Field, FormContext, type FieldProps } from "./field.ts";
 import { colorAttr, type ColorToken } from "../theme/colors.ts";
 import { isPlain, deepEqual } from "../core/equal.ts";
+import { errorText } from "../ui/format.ts";
+import { Button } from "../components/actions/button/index.ts";
+import { Alert } from "../components/feedback/alert/index.ts";
 
 /** When fields validate: on blur (default), on every change, or only on submit. */
 export type ValidateOn = "blur" | "change" | "submit";
@@ -208,7 +210,7 @@ export function useForm(spec?: Schema | SchemaSpec | null, initial?: Initial<Val
           batch(() => Object.assign(errors, known));
           if (other.length) submitError.set(other.join(" "));
           focusFirst(known);
-        } else submitError.set(ex?.message ?? String(err));
+        } else submitError.set(errorText(err));
         return false;
       } finally { submitting.set(false); }
     },
@@ -294,12 +296,12 @@ export function FormActions(props: FormActionsProps): unknown {
   const form = (props.form ?? useFormContext())!;
   const cancel = props.cancel;
   return h("div", { class: cx("hm-form-actions", props.class) },
-    () => (form.submitError() ? h("div", { class: "hm-form-error", role: "alert" }, form.submitError()) : null),
+    () => (form.submitError() ? h(Alert, { tone: "danger", class: "hm-form-error" }, form.submitError()) : null),
     h("div", { class: "hm-form-buttons" },
       props.extra ?? null,
-      cancel ? h("button", { type: "button", class: "hm-btn", disabled: () => form.submitting(), onClick: () => (typeof cancel === "function" ? cancel(form) : form.reset()) }, () => props.cancelLabel ?? t`Cancel`) : null,
-      h("button", { type: "submit", class: "hm-btn hm-btn-primary", disabled: () => form.submitting() || !!(props.requireDirty && !form.dirty()), "aria-busy": () => (form.submitting() ? "true" : null) },
-        () => (form.submitting() ? [h("span", { class: "hm-loading hm-loading-sm", "aria-hidden": "true" }), " ", props.busyLabel ?? t`Saving…`] : props.submitLabel ?? t`Save`))));
+      cancel ? h(Button, { disabled: () => form.submitting(), onClick: () => (typeof cancel === "function" ? cancel(form) : form.reset()) }, () => props.cancelLabel ?? t`Cancel`) : null,
+      h(Button, { type: "submit", variant: "primary", loading: () => form.submitting(), disabled: () => !!(props.requireDirty && !form.dirty()) },
+        () => (form.submitting() ? props.busyLabel ?? t`Saving…` : props.submitLabel ?? t`Save`))));
 }
 
 /** Warn before leaving the page while the form has unsaved changes. */

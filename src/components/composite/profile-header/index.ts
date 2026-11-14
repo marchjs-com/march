@@ -4,13 +4,15 @@
 // bumps the follower count, so the number rolls with the button.
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { isIconDef, type IconDef } from "../../../icons/svg.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
-import { badgeCheck } from "../../../icons/glyphs/badgeCheck.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { ownIcon } from "../../../ui/parts.ts";
 import { message } from "../../../icons/glyphs/message.ts";
 import { moreVertical } from "../../../icons/glyphs/moreVertical.ts";
-import { Button } from "../../../ui/button.ts";
+import { Button } from "../../actions/button/index.ts";
+import { StatTile } from "../../data/stat-tile/index.ts";
+import { Picture } from "../../media/picture/index.ts";
+import { VerifiedMark } from "../../social/verified-mark/index.ts";
 import { Menu, type MenuItem } from "../../../ui/menu.ts";
 import { StoryRing, type StoryRingState } from "../../social/story-ring/index.ts";
 import { FollowButton, type FollowState } from "../../social/follow-button/index.ts";
@@ -67,8 +69,6 @@ export interface ProfileHeaderProps {
 }
 
 const ALL: readonly Stat[] = ["posts", "followers", "following"];
-// an own icon (IconDef, text or node) or the built-in glyph
-const own = (x: unknown, def: IconDef): unknown => (x == null ? glyph(def) : isIconDef(x) ? glyph(x) : icon(x));
 
 /** `<ProfileHeader user={u} follow={$f} onFollow={(s) => $f = s} onMessage={openChat} onStat={openList} />` */
 export function ProfileHeader(props: ProfileHeaderProps): Element {
@@ -77,12 +77,12 @@ export function ProfileHeader(props: ProfileHeaderProps): Element {
   const shown = (): readonly Stat[] => { const s = val(props.stats); return s === false ? [] : Array.isArray(s) ? s as readonly Stat[] : ALL; };
   // following adds you to the followers: the count rolls together with the button
   const followers = (): number => (u().followers ?? 0) + (val(props.follow) === "following" ? 1 : 0);
+  // a soft StatTile whose figure rolls; a button when the list behind it can be opened
   const stat = (which: Stat, n: () => number, label: () => string): Element =>
-    h(props.onStat ? "button" : "div", { ...(props.onStat ? { type: "button", onClick: () => props.onStat?.(which) } : {}), class: "hm-prof-stat" },
-      h("b", null, h(CountRoll, { value: n })), h("span", null, label));
+    h(StatTile, { class: "hm-prof-stat", variant: "tile", value: h(CountRoll, { value: n }), label, onClick: props.onStat && (() => props.onStat?.(which)) }) as Element;
   return h("section", { class: () => cx("hm-prof", `hm-prof-cover-${val(props.cover) ?? "md"}`, val(props.class)), "aria-label": () => L().profile?.(u().name) ?? t`Profile of ${u().name}` },
     () => (val(props.cover) === "none" ? null : h("div", { class: "hm-prof-cover", "aria-hidden": "true" },
-      () => { const c = u().cover; return c ? h("img", { src: c, alt: "", decoding: "async" }) : h("span", { class: "hm-prof-cover-art" }, h("i"), h("i"), h("i"), h("i")); })),
+      () => { const c = u().cover; return c ? h(Picture, { src: c, alt: "", fit: "cover", loading: "eager" }) : h("span", { class: "hm-prof-cover-art" }, h("i"), h("i"), h("i"), h("i")); })),
     h("div", { class: "hm-prof-top" },
       h(StoryRing, { name: () => u().name, src: () => u().avatar, size: "lg", state: () => u().story ?? "none", onClick: props.onAvatar, class: "hm-prof-avatar" }),
       h("div", { class: "hm-prof-actions" },
@@ -90,13 +90,13 @@ export function ProfileHeader(props: ProfileHeaderProps): Element {
           ? (props.onEdit ? h(Button, { variant: "secondary", onClick: () => props.onEdit?.() }, () => L().edit ?? t`Edit profile`) : null)
           : [
             props.onFollow ? h(FollowButton, { state: () => val(props.follow) ?? "follow", name: () => u().name, private: () => !!u().private, onChange: (s: FollowState) => props.onFollow?.(s) }) : null,
-            props.onMessage ? h("button", { type: "button", class: "hm-prof-msg", "data-hm-color": colorAttr(props.messageColor), onClick: () => props.onMessage?.() },
-              props.messageIcon === false ? null : own(props.messageIcon, message), h("span", null, () => L().message ?? t`Message`)) : null,
+            props.onMessage ? h(Button, { class: "hm-prof-msg", variant: props.messageColor ? "primary" : "secondary", color: props.messageColor, icon: ownIcon(props.messageIcon, message, null), onClick: () => props.onMessage?.() },
+              () => L().message ?? t`Message`) : null,
           ]),
         props.menu?.length ? h(Menu, { icon: props.menuIcon ?? moreVertical, label: () => L().more ?? t`More`, variant: "ghost", items: props.menu, class: "hm-prof-more" }) : null)),
     h("div", { class: "hm-prof-id" },
       h("h2", { class: "hm-prof-name" }, h("span", null, () => u().name),
-        () => (u().verified && props.verifiedIcon !== false ? h("span", { class: "hm-prof-verified", role: "img", "aria-label": () => L().verified ?? t`Verified` }, own(props.verifiedIcon, badgeCheck)) : null)),
+        () => (u().verified && props.verifiedIcon !== false ? h(VerifiedMark, { class: "hm-prof-verified", size: "md", label: () => L().verified ?? t`Verified`, icon: props.verifiedIcon }) : null)),
       () => (u().handle ? h("span", { class: "hm-prof-handle" }, `@${u().handle}`) : null),
       () => (u().bio ? h("p", { class: "hm-prof-bio" }, u().bio) : null)),
     () => {

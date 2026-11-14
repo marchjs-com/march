@@ -6,7 +6,7 @@ export default defineMeta({
   category: "composite",
   since: "0.1.0",
   summary: "Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a \"N new\" jump.",
-  composedOf: ["ChatBubble", "TypingIndicator", "ReactionPicker", "Avatar"],
+  composedOf: ["ChatBubble", "TypingIndicator", "ReactionPicker", "Avatar", "Button", "Picture"],
   behaviors: ["motion engine", "For (keyed)"],
   showcase: "/social",
 });

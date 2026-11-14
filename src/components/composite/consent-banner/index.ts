@@ -11,6 +11,8 @@ import { Button } from "../../../ui/button.ts";
 import { Card } from "../../../ui/card.ts";
 import { openDialog } from "../../../ui/dialog.ts";
 import { Toggle } from "../../../forms/inputs.ts";
+import { Empty } from "../../feedback/empty/index.ts";
+import { Stack } from "../../layout/stack/index.ts";
 import { consent, type CategoryInfo } from "../../../managers/consent/index.ts";
 import tr from "./tr.ts";
 
@@ -67,12 +69,15 @@ const policyLink = (p: ConsentTexts): unknown => {
   return href ? h("a", { class: "hm-consent-link", href, target: "_blank", rel: "noopener" }, () => txt(p.policyLabel, "Privacy policy")) : null;
 };
 
+/** A row of buttons that wraps and sits at the end (the banner, the panel footer, the placeholder). */
+const ACTIONS = { class: "hm-consent-actions", direction: "row", wrap: true, gap: 2, justify: "end" } as const;
+
 /** The three equal choices: refusing is as easy as accepting. */
 function choices(after: () => void, more?: (() => void) | null, l?: ConsentLabels): Element {
-  return h("div", { class: "hm-consent-actions" },
+  return h(Stack, ACTIONS,
     h(Button, { variant: "secondary", "on:click": () => { consent.rejectAll(); after(); } }, () => txt(l?.reject, "Reject all")),
     more ? h(Button, { variant: "ghost", "on:click": more }, () => txt(l?.customize, "Customize")) : null,
-    h(Button, { variant: "primary", "on:click": () => { consent.acceptAll(); after(); } }, () => txt(l?.accept, "Accept all")));
+    h(Button, { variant: "primary", "on:click": () => { consent.acceptAll(); after(); } }, () => txt(l?.accept, "Accept all"))) as Element;
 }
 
 /** Bottom banner, shown while there is no valid decision for the current policy version. */
@@ -107,11 +112,11 @@ export async function openConsentPreferences(p: ConsentTexts = {}): Promise<bool
       h("p", { class: "hm-consent-lead" }, () => txt(l?.lead, "Choose which cookies and data uses you allow. Strictly necessary ones are always on."), " ", policyLink(p)),
       untrack(() => consent.categories()).map((c) => categoryCard(c, () => !!c.required || !!draft()[c.id], (v) => draft.update((d) => ({ ...d, [c.id]: v })), l)),
       rec ? h("p", { class: "hm-consent-meta" }, () => l?.saved?.(new Date(rec.date).toLocaleString(), String(rec.version)) ?? t("Saved on {0} (policy version {1}).", { 0: new Date(rec.date).toLocaleString(), 1: rec.version }), " ",
-        h("button", { type: "button", class: "hm-consent-withdraw", onClick: () => { consent.withdraw(); close(true); } }, () => txt(l?.withdraw, "Withdraw consent"))) : null);
+        h(Button, { variant: "link", color: "danger", class: "hm-consent-withdraw", onClick: () => { consent.withdraw(); close(true); } }, () => txt(l?.withdraw, "Withdraw consent"))) : null);
   }, {
     title: () => txt(p.title, "Privacy preferences"), size: "md", dismissValue: false,
     ...(mobile ? { kind: "drawer" as const, side: "bottom" as const } : {}),
-    footer: (close) => h("div", { class: "hm-consent-actions" },
+    footer: (close) => h(Stack, ACTIONS,
       h(Button, { variant: "secondary", "on:click": () => { consent.rejectAll(); close(true); } }, () => txt(l?.reject, "Reject all")),
       h(Button, { variant: "ghost", "on:click": () => { consent.save(untrack(draft)); close(true); } }, () => txt(l?.save, "Save choices")),
       h(Button, { variant: "primary", "on:click": () => { consent.acceptAll(); close(true); } }, () => txt(l?.accept, "Accept all"))),
@@ -135,8 +140,8 @@ export function ConsentGate(props: ConsentGateProps): unknown {
   return () => (consent.has(props.category)
     ? props.children
     : h("div", { class: () => cx("hm-consent-gate", val(props.class)), role: "note" },
-      h("p", {}, () => txt(props.label, "This content is from another provider and stays off until you allow it.")),
-      h("div", { class: "hm-consent-actions" },
+      h(Empty, { size: "sm", title: false, action: [
         h(Button, { size: "sm", variant: "primary", "on:click": () => consent.save({ ...untrack(() => consent.choices()), [props.category]: true }) }, () => txt(props.labels?.allow, "Allow")),
-        props.preferences === false ? null : h(Button, { size: "sm", variant: "ghost", "on:click": () => { void openConsentPreferences({ labels: props.labels }); } }, () => txt(props.labels?.preferences, "Preferences")))));
+        props.preferences === false ? null : h(Button, { size: "sm", variant: "ghost", "on:click": () => { void openConsentPreferences({ labels: props.labels }); } }, () => txt(props.labels?.preferences, "Preferences"))],
+      }, () => txt(props.label, "This content is from another provider and stays off until you allow it."))));
 }

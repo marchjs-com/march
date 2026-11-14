@@ -1,21 +1,27 @@
 // Page scaffolding: Page, Section, ListDetail, Pager (SearchBox is re-exported from its component folder).
-import "./crumbs.css";
 import "./layout.css";
 import "./field.css";
-import "./button.css";
 import { untrack, effect, onCleanup } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
+import { lazy } from "../dom/lazy.ts";
 import { t } from "../core/i18n.ts";
-import { Link, back as historyBack, type Href } from "../router/router.ts";
+import { back as historyBack, type Href } from "../router/router.ts";
 import { actionsOf } from "./display-base.ts";
 import { type ActionsProp } from "./display.ts";
 import { Tabs, type TabSpec } from "./tabs.ts";
-import { val, cx, rest, glyph, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, rest, type MaybeFn, type ClassProp } from "./util.ts";
 import { Layout, useLayout, addControls, resolveFeatures, type LayoutProps, type SlotName } from "../components/layout/layout/index.ts";
 import { CORNERS } from "../components/layout/bottom-right-controls/index.ts";
+import { PanelHeader } from "../components/layout/panel-header/index.ts";
+import { Button } from "../components/actions/button/index.ts";
+import { IconButton } from "../components/actions/icon-button/index.ts";
+import { Empty } from "../components/feedback/empty/index.ts";
+import { Pagination, type PaginationProps } from "../components/navigation/pagination/index.ts";
+import type { BreadcrumbsProps } from "../components/navigation/breadcrumbs/index.ts";
 import { arrowLeft } from "../icons/glyphs/arrowLeft.ts";
-import { chevronLeft } from "../icons/glyphs/chevronLeft.ts";
-import { chevronRight } from "../icons/glyphs/chevronRight.ts";
+
+// The trail of a page is the Breadcrumbs component (menus, overflow): it comes in its own chunk, only for pages with a trail.
+const Crumbs = /* @__PURE__ */ lazy<BreadcrumbsProps>(() => import("../components/navigation/breadcrumbs/index.ts"), { pick: "Breadcrumbs", placeholder: "none", height: "1.875rem" });
 
 /** A breadcrumb; the last one is the current page. */
 export interface Breadcrumb { label: MaybeFn<string>; href?: Href }
@@ -50,7 +56,7 @@ export interface PageProps extends Pick<LayoutProps, "corners" | "features"> {
 export function Page(props: PageProps): Element {
   const layout = useLayout();
   // on its own: the same Page again, under a Layout (the props object is passed on as it is: getters stay live)
-  if (!layout) return h(Layout, { children: () => Page(props) });
+  if (!layout) return h(Layout, { children: () => Page(props) }) as Element;
   for (const c of CORNERS) if (props.corners?.[c] != null) addControls(layout, c, props.corners[c], 20);
   for (const f of resolveFeatures(undefined, props.features)) layout.use(f);
   for (const [slot, content] of Object.entries(props.layout ?? {})) if (content !== undefined) layout.set(slot as SlotName, content);
@@ -62,16 +68,16 @@ export function Page(props: PageProps): Element {
   const crumbs = (): readonly Breadcrumb[] => val(props.breadcrumbs) ?? [];
   return h("div", { ...rest(props, ["title", "subtitle", "actions", "breadcrumbs", "back", "tabs", "tabsQuery", "narrow", "corners", "features", "layout", "documentTitle"]), class: () => cx("hm-page", props.narrow && "hm-page-narrow", val(props.class)) },
     h("header", { class: "hm-page-head" },
-      () => crumbs().length > 0 && h("nav", { class: "hm-crumbs", "aria-label": t`Breadcrumb` },
-        h("ol", {}, crumbs().map((c, i, a) => h("li", {}, c.href && i < a.length - 1 ? h(Link, { href: c.href, children: () => val(c.label) }) : h("span", { "aria-current": i === a.length - 1 ? "page" : null }, () => val(c.label)))))),
-      h("div", { class: "hm-page-titlebar" },
-        props.back != null && (typeof props.back === "string"
-          ? h(Link, { href: props.back, class: "hm-icon-btn hm-page-back", "aria-label": t`Back`, children: glyph(arrowLeft) })
-          : h("button", { type: "button", class: "hm-icon-btn hm-page-back", "aria-label": () => t`Back`, onClick: () => (typeof props.back === "function" ? props.back() : historyBack()) }, glyph(arrowLeft))),
-        h("div", { class: "hm-page-titles" },
-          h("h1", { class: "hm-page-title" }, () => val(props.title)),
-          props.subtitle != null && h("p", { class: "hm-page-sub" }, () => val(props.subtitle))),
-        props.actions != null && h("div", { class: "hm-page-actions" }, actionsOf(() => props.actions)))),
+      () => crumbs().length > 0 && untrack(() => h(Crumbs, { class: "hm-page-crumbs", separator: "/", label: () => t`Breadcrumb`, items: () => crumbs().map((c, i) => ({ id: String(i), label: c.label, ...(c.href ? { href: c.href } : {}) })) })),
+      h(PanelHeader, {
+        as: "div", class: "hm-page-titlebar", size: "lg", titleAs: "h1", title: () => val(props.title), subtitle: props.subtitle != null ? () => val(props.subtitle) : undefined,
+        partClass: { titles: "hm-page-titles", title: "hm-page-title", subtitle: "hm-page-sub", actions: "hm-page-actions" },
+        lead: props.back != null ? h(IconButton, {
+          class: "hm-page-back", variant: "raised", icon: arrowLeft, label: () => t`Back`, title: false,
+          ...(typeof props.back === "string" ? { href: props.back } : { onClick: () => (typeof props.back === "function" ? props.back() : historyBack()) }),
+        }) : undefined,
+        actions: props.actions != null ? actionsOf(() => props.actions) : undefined,
+      })),
     h("div", { class: "hm-page-body" },
       props.children,
       props.tabs != null && h(Tabs, { tabs: () => val(props.tabs), query: props.tabsQuery, label: () => val(props.title) as string })));
@@ -95,11 +101,12 @@ export interface SectionProps { title?: MaybeFn<unknown>; description?: MaybeFn<
 /** Titled block inside a page: `<Section title="Security" description="…" actions={[…]}>…</Section>` */
 export function Section(props: SectionProps): Element {
   return h("section", { class: () => cx("hm-section", val(props.class)) },
-    (props.title != null || props.actions != null) && h("div", { class: "hm-section-head" },
-      h("div", {},
-        props.title != null && h("h2", { class: "hm-section-title" }, () => val(props.title)),
-        props.description != null && h("p", { class: "hm-section-desc" }, () => val(props.description))),
-      props.actions != null && h("div", { class: "hm-section-actions" }, actionsOf(() => props.actions))),
+    (props.title != null || props.actions != null) && h(PanelHeader, {
+      as: "div", class: "hm-section-head", titleAs: "h2", title: props.title != null ? () => val(props.title) : undefined,
+      subtitle: props.description != null ? () => val(props.description) : undefined,
+      partClass: { title: "hm-section-title", subtitle: "hm-section-desc", actions: "hm-section-actions" },
+      actions: props.actions != null ? actionsOf(() => props.actions) : undefined,
+    }),
     props.children);
 }
 
@@ -125,9 +132,9 @@ export function ListDetail(props: ListDetailProps): Element {
     h("div", { class: "hm-ld-list", "aria-label": () => val(props.listLabel) ?? null }, props.list),
     h("div", { class: "hm-ld-detail", role: "region", "aria-label": () => val(props.detailLabel) ?? t`Details` },
       () => (has()
-        ? [props.onBack && h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm hm-ld-back", onClick: () => props.onBack?.() }, glyph(arrowLeft), () => t`Back`),
+        ? [props.onBack && h(Button, { variant: "ghost", size: "sm", class: "hm-ld-back", icon: arrowLeft, onClick: () => props.onBack?.() }, () => t`Back`),
           untrack(() => (typeof props.detail === "function" && !props.detail.length ? (props.detail as () => unknown)() : props.detail))]
-        : props.empty ?? h("p", { class: "hm-empty" }, () => t`Select an item to see its details.`))));
+        : props.empty ?? h(Empty, { size: "sm", title: () => t`Select an item to see its details.` }))));
 }
 
 export interface PagerProps {
@@ -148,29 +155,21 @@ export interface PagerProps {
   class?: ClassProp;
 }
 /**
- * Pagination. Offset mode: `<Pager page={$page} total={n} size={20} onPage={(p) => $page = p} sizes={[20, 50]} onSize={…} />`
+ * `<Pagination variant="simple">` under its older name. Offset mode: `<Pager page={$page} total={n} size={20} onPage={(p) => $page = p} sizes={[20, 50]} onSize={…} />`
  * (page is 1-based). Cursor mode: `<Pager hasPrev={…} hasNext={…} onPrev={…} onNext={…} />`.
  */
 export function Pager(props: PagerProps): Element {
-  const cursor = props.total === undefined && (props.onNext || props.hasNext !== undefined);
-  const page = (): number => Number(val(props.page) ?? 1), size = (): number => Number(val(props.size) ?? 20), total = (): number => Number(val(props.total) ?? 0);
-  const pages = (): number => Math.max(1, Math.ceil(total() / size()));
-  const go = (p: number): void => { props.onPage?.(p); props.setPage?.(p); };
-  const prevOk = (): boolean => (cursor ? !!val(props.hasPrev) : page() > 1), nextOk = (): boolean => (cursor ? !!val(props.hasNext) : page() < pages());
-  const nf = (n: number): string => n.toLocaleString();
-  return h("nav", { class: () => cx("hm-pager", val(props.class)), "aria-label": () => t`Pagination` },
-    !cursor && h("span", { class: "hm-pager-info", "aria-live": "polite" }, () => {
-      const n = total();
-      if (!n) return t`No results`;
-      const from = (page() - 1) * size() + 1, to = Math.min(n, page() * size());
-      return t`${nf(from)}–${nf(to)} of ${nf(n)}`;
-    }),
-    props.sizes && !cursor && h("select", { class: "hm-select hm-select-sm", "aria-label": () => t`Rows per page`, onChange: (e: Event) => props.onSize?.(Number((e.target as HTMLSelectElement).value)) },
-      props.sizes.map((s) => h("option", { value: String(s), selected: () => size() === s }, String(s)))),
-    h("div", { class: "hm-pager-btns" },
-      h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", "data-prev": "", disabled: () => !prevOk(), onClick: () => (cursor ? props.onPrev?.() : go(page() - 1)) }, glyph(chevronLeft), () => t`Previous`),
-      !cursor && h("span", { class: "hm-pager-page" }, () => t`Page ${page()} of ${pages()}`),
-      h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", "data-next": "", disabled: () => !nextOk(), onClick: () => (cursor ? props.onNext?.() : go(page() + 1)) }, () => t`Next`, glyph(chevronRight))));
+  // the props as they are (getters stay live), as the simple variant, with the old class on the root
+  const own: PaginationProps = { variant: "simple" };
+  for (const k of Object.keys(props)) if (k !== "class") Object.defineProperty(own, k, Object.getOwnPropertyDescriptor(props, k)!);
+  Object.defineProperty(own, "class", { get: () => cx("hm-pager", val(props.class)), enumerable: true });
+  const el = Pagination(own);
+  // the hooks apps knew: .hm-pager, .hm-pager-info, [data-prev], [data-next]
+  el.querySelector(".hm-page-info")?.classList.add("hm-pager-info");
+  const steps = el.querySelectorAll("button");
+  steps[0]?.setAttribute("data-prev", "");
+  steps[steps.length - 1]?.setAttribute("data-next", "");
+  return el;
 }
 
 // SearchBox lives in its own component folder; this module keeps exporting it.

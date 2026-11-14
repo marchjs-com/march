@@ -13,12 +13,12 @@ const panel = () => document.querySelector(".hm-theme-menu");
 test("ThemeMenu: one panel with appearance, themes and accents; sections follow the props; choices apply", async () => {
   const m = mount(() => [h(ThemeMenu, {}), h(ThemeMenu, { themes: false, accents: ["primary", "brand-blue"], class: "two" })]);
   m.el.querySelector("button").click(); await tick();
-  assert.ok(panel().querySelector(".hm-theme-modes [aria-pressed]"));
+  assert.ok(panel().querySelector(".hm-theme-modes [role=radio]"));
   assert.ok(panel().querySelector(".hm-theme-list [role=radio]"), "color themes");
   assert.equal(panel().querySelectorAll(".hm-accent-list [role=radio]").length, U.ACCENT_CHOICES.length);
-  [...panel().querySelectorAll(".hm-theme-mode")][1].click();
+  [...panel().querySelectorAll(".hm-theme-modes [role=radio]")][1].click();
   assert.equal(U.theme(), "dark");
-  [...panel().querySelectorAll(".hm-accent-opt")].find((b) => b.getAttribute("aria-checked") === "false").click();
+  [...panel().querySelectorAll(".hm-accent-list [role=radio]")].find((b) => b.getAttribute("aria-checked") === "false").click();
   assert.notEqual(U.accent(), "primary");
   document.dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); await tick();
   m.el.querySelector(".two").click(); await tick();

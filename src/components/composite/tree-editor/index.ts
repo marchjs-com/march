@@ -4,27 +4,33 @@
 // switch for booleans, a count for containers) and actions (add, duplicate, delete). Schema problems mark their rows;
 // search filters the tree; every change is one step of the editor's own undo history (Ctrl+Z / Ctrl+Shift+Z).
 import "./tree-editor.css";
-import "../../../ui/menu.css";
+import "../../../ui/editor-parts/frame.css";
 import "../../../ui/field.css";
-import { signal, computed, untrack, reactive } from "../../../core/reactive.ts";
+import { signal, computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { t, dir } from "../../../core/i18n.ts";
 import { cx, uid, val, later, type ClassProp } from "../../../core/util.ts";
+import { fold } from "../../../core/text.ts";
 import { glyph } from "../../../ui/util.ts";
-import { model, ctl, type ControlProps } from "../../../forms/util.ts";
+import { hasPart } from "../../../ui/parts.ts";
+import { isMod, undoKeys } from "../../../ui/keys.ts";
+import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
 import { Toggle } from "../../../forms/inputs.ts";
+import { TextInput } from "../../forms/text-input/index.ts";
+import { SearchBox } from "../../forms/search-box/index.ts";
+import { OptionList } from "../../forms/option-list/index.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { IconButton } from "../../../ui/button.ts";
-import { floating } from "../../../ui/popover.ts";
+import { Chevron } from "../../actions/chevron/index.ts";
+import { UndoRedo } from "../../actions/undo-redo/index.ts";
+import { Empty } from "../../feedback/empty/index.ts";
+import { PanelHeader } from "../../layout/panel-header/index.ts";
+import { Popover } from "../../overlays/popover/index.ts";
 import { undoHistory, type UndoStack } from "../../../managers/undo/history.ts";
-import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { copy } from "../../../icons/glyphs/copy.ts";
 import { trash } from "../../../icons/glyphs/trash.ts";
-import { search as searchIcon } from "../../../icons/glyphs/search.ts";
-import { undo as undoIcon } from "../../../icons/glyphs/undo.ts";
-import { redo as redoIcon } from "../../../icons/glyphs/redo.ts";
 import * as J from "./json-path.ts";
 export * from "./json-path.ts";
 
@@ -77,7 +83,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
   const c = ctl(props);
   const ro = (): boolean => !!(props.readonly || props.disabled);
   const L = (): NonNullable<TreeEditorProps["labels"]> => props.labels ?? {};
-  const can = (a: "add" | "duplicate" | "delete"): boolean => props.actions === undefined || props.actions === true || (Array.isArray(props.actions) && props.actions.includes(a));
+  const can = (a: "add" | "duplicate" | "delete"): boolean => hasPart(props.actions, a);
   const rootName = (): string => props.label ?? L().root ?? t`root`;
   const valueName = (r: Row): string => { const k = String(r.key ?? rootName()); return L().valueName?.(k) ?? t`Value of ${k}`; };
   const stack: UndoStack | null = props.history === false ? null : props.history && typeof props.history === "object" ? props.history : undoHistory({ mergeMs: 600 });
@@ -91,7 +97,6 @@ export function TreeEditor(props: TreeEditorProps): unknown {
   const closed = signal(new Set<string>());
   const isOpen = (ptr: string, depth: number): boolean => open().has(ptr) || (!closed().has(ptr) && depth < (props.expand ?? 2));
   let tree: HTMLElement | undefined;
-  const anchors = new Map<string, Element>();
 
   /** Replace the value, as one undo step. */
   const change = (label: string, next: unknown, focus?: string): void => {
@@ -114,7 +119,6 @@ export function TreeEditor(props: TreeEditorProps): unknown {
   });
   const errorAt = computed(() => { const m = new Map<string, string>(); for (const e of errors()) { const p = J.pointer(e.path); if (!m.has(p)) m.set(p, e.message); } return m; });
 
-  const fold = (s: unknown): string => String(s).toLocaleLowerCase();
   const rows = computed((): Row[] => {
     const out: Row[] = [];
     const q = fold(query().trim());
@@ -209,8 +213,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
     const fwd = untrack(dir) === "rtl" ? "ArrowLeft" : "ArrowRight", back = fwd === "ArrowRight" ? "ArrowLeft" : "ArrowRight";
     const go = (x: Row | undefined): void => { if (x) { e.preventDefault(); focusRow(x.ptr); } };
     const container = r.kind === "object" || r.kind === "array";
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); void (e.shiftKey ? stack?.redo() : stack?.undo()); return; }
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") { e.preventDefault(); void stack?.redo(); return; }
+    if (undoKeys(e, stack)) return;
     switch (e.key) {
       case "ArrowDown": go(list[i + 1]); break;
       case "ArrowUp": go(list[i - 1]); break;
@@ -229,12 +232,12 @@ export function TreeEditor(props: TreeEditorProps): unknown {
       case " ": if (r.kind === "boolean" && !ro()) { e.preventDefault(); change(t`Edit value`, J.updateAt(untrack(get), r.path, (v) => !v), r.ptr); } break;
       case "Delete": if (!ro() && r.path.length && can("delete")) { e.preventDefault(); remove(r); } break;
       case "Insert": case "+": if (!ro() && can("add")) { e.preventDefault(); add(r); } break;
-      case "t": case "T": if (!ro() && !e.ctrlKey && !e.metaKey) { e.preventDefault(); typeMenu.set(r.ptr); } break;
+      case "t": case "T": if (!ro() && !isMod(e)) { e.preventDefault(); typeMenu.set(r.ptr); } break;
     }
   };
 
   // ------------------------------------------------------------------ view
-  const field = (r: Row, which: "key" | "value"): Element => {
+  const field = (r: Row, which: "key" | "value"): unknown => {
     const initial = which === "key" ? String(r.key) : r.kind === "string" ? (r.value as string) : String(r.value);
     let done = false;
     const finish = (commit: boolean, el: HTMLInputElement): void => {
@@ -244,9 +247,9 @@ export function TreeEditor(props: TreeEditorProps): unknown {
       if (commit) { if (which === "key") setKey(r, el.value.trim()); else setValue(r, el.value); }
       else focusRow(r.ptr);
     };
-    return h("input", {
-      class: cx("hm-input hm-tre-input", which === "key" ? "hm-tre-input-key" : `hm-tre-input-${r.kind}`), value: initial, type: "text",
-      inputmode: r.kind === "number" && which === "value" ? "decimal" : null, spellcheck: "false", autocomplete: "off",
+    return h(TextInput, {
+      class: cx("hm-tre-input", which === "key" ? "hm-tre-input-key" : `hm-tre-input-${r.kind}`), value: initial,
+      inputmode: r.kind === "number" && which === "value" ? "decimal" : undefined, spellcheck: "false", autocomplete: "off",
       "aria-label": which === "key" ? L().key ?? t`Key` : valueName(r),
       ref: (el: HTMLInputElement) => queueMicrotask(() => { el.focus(); el.select?.(); }),
       onKeyDown: (e: KeyboardEvent) => { e.stopPropagation(); if (e.key === "Enter") { e.preventDefault(); finish(true, e.target as HTMLInputElement); } else if (e.key === "Escape") { e.preventDefault(); finish(false, e.target as HTMLInputElement); } },
@@ -261,21 +264,33 @@ export function TreeEditor(props: TreeEditorProps): unknown {
   };
   const valueCell = (r: Row, cur: () => Row): unknown => {
     if (r.kind === "object" || r.kind === "array") return h("span", { class: "hm-tre-summary" }, r.kind === "array" ? L().items?.(r.size) ?? t`${r.size} items` : L().fields?.(r.size) ?? t`${r.size} fields`);
-    if (r.kind === "boolean") return h(Toggle, { value: reactive(() => cur().value as boolean), disabled: ro(), "aria-label": valueName(r), class: "hm-tre-switch", onChange: (v: boolean) => change(t`Edit value`, J.updateAt(untrack(get), r.path, () => v), r.ptr) });
+    if (r.kind === "boolean") return h(Toggle, { value: live(() => cur().value as boolean), disabled: ro(), "aria-label": valueName(r), class: "hm-tre-switch", onChange: (v: boolean) => change(t`Edit value`, J.updateAt(untrack(get), r.path, () => v), r.ptr) });
     if (r.kind === "null") return h("span", { class: "hm-tre-value hm-tre-null" }, "null");
     const sch = J.schemaAt(props.schema, r.path);
     return () => (editing()?.ptr === r.ptr && editing()?.field === "value" ? field(r, "value")
       : h("span", { class: cx("hm-tre-value", `hm-tre-${r.kind}`), title: sch?.description ?? null, onDblClick: () => { if (!ro()) editing.set({ ptr: r.ptr, field: "value" }); } },
         r.kind === "string" ? (r.value as string) || h("span", { class: "hm-tre-empty" }, () => L().emptyText ?? t`empty text`) : String(r.value)));
   };
-  const typeBadge = (r: Row): Element => {
-    const btn = h("button", {
-      type: "button", class: cx("hm-tre-type", `hm-tre-type-${r.kind}`), tabindex: "-1", disabled: ro(),
-      "aria-label": L().typeOf?.(kindName(r.kind)) ?? t`Type: ${kindName(r.kind)}. Change`, "aria-haspopup": "menu", "aria-expanded": () => String(typeMenu() === r.ptr),
-      onClick: (e: MouseEvent) => { e.stopPropagation(); typeMenu.set(typeMenu.peek() === r.ptr ? null : r.ptr); },
-    }, h(Badge, { color: COLOR[r.kind], tone: COLOR[r.kind] ? "primary" : "neutral", class: "hm-tre-badge" }, GLYPH[r.kind])) as Element;
-    anchors.set(r.ptr, btn);
-    return btn;
+  const kindBadge = (k: Kind, more?: Record<string, unknown>): unknown => h(Badge, { ...more, color: COLOR[k], tone: COLOR[k] ? "primary" : "neutral", class: cx("hm-tre-badge", more && `hm-tre-type hm-tre-type-${k}`) }, GLYPH[k]);
+  // the type of a row: a clickable badge that opens the type menu (also the T key). Without badges the menu opens by the row.
+  const typeMenuOf = (r: Row): unknown => {
+    const badge = props.typeBadges === false ? null : kindBadge(r.kind, { disabled: ro(), ariaLabel: L().typeOf?.(kindName(r.kind)) ?? t`Type: ${kindName(r.kind)}. Change`, onClick: (e: MouseEvent) => e.stopPropagation() }) as HTMLElement;
+    const pop = h(Popover, {
+      trigger: badge ?? undefined, anchor: badge ? undefined : () => rowEl(r.ptr), open: () => typeMenu() === r.ptr, role: null, flush: true, autoFocus: false, panelClass: "hm-tre-menu",
+      setOpen: (open: boolean) => typeMenu.set(open ? r.ptr : null), onOpenChange: (open: boolean, why: string) => { if (!open && why === "escape") focusRow(r.ptr); },
+      children: (_close: unknown) => {
+        const list = h(OptionList<Kind>, {
+          mode: "menu", size: "sm", label: L().changeType ?? t`Change type`, value: r.kind, onPick: (k: Kind) => setKind(r, k),
+          options: KINDS.map((k) => ({ value: k, label: kindName(k), icon: kindBadge(k) })),
+        }) as Element;
+        // the current type takes focus (the arrows move from there)
+        queueMicrotask(() => list.querySelector<HTMLElement>('[aria-checked="true"]')?.focus());
+        return list;
+      },
+    });
+    // the badge is not a Tab stop (the row is); it opens a menu
+    if (badge) { badge.setAttribute("tabindex", "-1"); badge.setAttribute("aria-haspopup", "menu"); }
+    return pop;
   };
   const row = (r: Row, cur: () => Row = () => r): Element => {
     const err = (): string | undefined => errorAt().get(r.ptr);
@@ -288,51 +303,30 @@ export function TreeEditor(props: TreeEditorProps): unknown {
       onKeyDown: (e: KeyboardEvent) => keydown(e, r), onFocus: () => active.set(r.ptr),
     },
     h("span", { class: "hm-tre-guides", "aria-hidden": "true" }),
-    container ? h("button", { type: "button", class: cx("hm-tre-chev", r.open && "is-open"), tabindex: "-1", "aria-hidden": "true", onClick: () => toggleOpen(r) }, glyph(chevronRight)) : h("span", { class: "hm-tre-chev-space" }),
+    h(Chevron, { open: r.open, leaf: !container, motion: "spring", class: "hm-tre-chev", onClick: container ? () => toggleOpen(r) : null }),
     keyCell(r),
-    props.typeBadges === false ? null : typeBadge(r),
+    typeMenuOf(r),
     valueCell(r, cur),
     () => (err() ? h("span", { class: "hm-tre-error", id: `${id}-e${r.ptr}` }, err()) : null),
-    ro() || props.actions === false || (Array.isArray(props.actions) && !props.actions.length) ? null : h("span", { class: "hm-tre-actions" },
+    ro() || !hasPart(props.actions) ? null : h("span", { class: "hm-tre-actions" },
       can("add") ? h(IconButton, { icon: glyph(plus), size: "sm", tabindex: "-1", class: "hm-tre-add", label: container ? L().addInside ?? t`Add inside` : L().addAfter ?? t`Add after`, onClick: () => add(r) }) : null,
       r.path.length && can("duplicate") ? h(IconButton, { icon: glyph(copy), size: "sm", tabindex: "-1", class: "hm-tre-dup", label: L().duplicate ?? t`Duplicate`, onClick: () => duplicate(r) }) : null,
       r.path.length && can("delete") ? h(IconButton, { icon: glyph(trash), size: "sm", tabindex: "-1", class: "hm-tre-del", label: L().delete ?? t`Delete`, variant: "danger", onClick: () => remove(r) }) : null));
   };
   const kindName = (k: Kind): string => L().kinds?.[k] ?? ({ string: t`text`, number: t`number`, boolean: t`true / false`, null: t`empty`, object: t`object`, array: t`list` })[k];
-  const menu = () => {
-    const ptr = typeMenu();
-    const r = ptr == null ? null : rows().find((x) => x.ptr === ptr);
-    const anchor = ptr == null ? undefined : anchors.get(ptr) ?? rowEl(ptr)?.querySelector(".hm-tre-type") ?? undefined;
-    if (!r || !anchor) return null;
-    return floating({
-      anchor, placement: "bottom-start", class: "hm-menu hm-tre-menu", role: "menu", attrs: { "aria-label": L().changeType ?? t`Change type` }, onClose: (refocus) => { typeMenu.set(null); if (refocus) focusRow(r.ptr); },
-      children: KINDS.map((k) => h("button", {
-        type: "button", role: "menuitemradio", class: cx("hm-menu-item hm-tre-menu-item", `hm-tre-type-${k}`), "aria-checked": String(k === r.kind),
-        ref: (el: HTMLElement) => { if (k === r.kind) queueMicrotask(() => el.focus()); },
-        onKeyDown: (e: KeyboardEvent) => {
-          const items = Array.from((e.currentTarget as Element).parentElement?.querySelectorAll<HTMLElement>("[role=menuitemradio]") ?? []);
-          const i = items.indexOf(e.currentTarget as HTMLElement);
-          if (e.key === "ArrowDown") { e.preventDefault(); items[(i + 1) % items.length]?.focus(); }
-          if (e.key === "ArrowUp") { e.preventDefault(); items[(i - 1 + items.length) % items.length]?.focus(); }
-        },
-        onClick: () => setKind(r, k),
-      }, h(Badge, { color: COLOR[k], tone: COLOR[k] ? "primary" : "neutral", class: "hm-tre-badge" }, GLYPH[k]), h("span", { class: "hm-menu-label" }, kindName(k)))),
-    });
-  };
 
-  const bar = () => (props.search === false && (!stack || (props.status === false && ro())) ? null : h("div", { class: "hm-tre-bar" },
-    props.search === false ? null : h("label", { class: "hm-tre-search" },
-      h("span", { class: "hm-tre-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
-      h("input", { type: "search", class: "hm-input hm-tre-search-input", placeholder: () => L().search ?? t`Search keys and values`, "aria-label": () => L().search ?? t`Search keys and values`, "aria-controls": `${id}-tree`, value: untrack(query), onInput: (e: Event) => query.set((e.target as HTMLInputElement).value) })),
-    props.status === false ? null : () => {
-      const n = errors().length;
-      return h("span", { class: cx("hm-tre-status", n ? "is-error" : "is-ok"), role: "status" }, n ? L().problems?.(n) ?? t`${n} problems` : L().valid ?? t`Valid`);
-    },
-    () => stack && !ro() ? h("span", { class: "hm-tre-history" },
-      h(IconButton, { icon: glyph(undoIcon), size: "sm", label: () => L().undo ?? t`Undo`, disabled: () => !stack.canUndo(), onClick: () => void stack.undo() }),
-      h(IconButton, { icon: glyph(redoIcon), size: "sm", label: () => L().redo ?? t`Redo`, disabled: () => !stack.canRedo(), onClick: () => void stack.redo() })) : null));
+  const bar = () => (props.search === false && (!stack || (props.status === false && ro())) ? null : h(PanelHeader, {
+    as: "div", size: "sm", tone: "muted", divider: true, class: "hm-editor-head hm-tre-bar",
+    children: props.search === false ? undefined : h(SearchBox, { value: query, debounce: 0, size: "sm", class: "hm-tre-search", inputClass: "hm-tre-search-input", placeholder: () => L().search ?? t`Search keys and values` }),
+    actions: [
+      props.status === false ? null : h("span", { role: "status" }, () => {
+        const n = errors().length;
+        return h(Badge, { tone: n ? "danger" : "success", dot: true, class: cx("hm-tre-status", n ? "is-error" : "is-ok") }, n ? L().problems?.(n) ?? t`${n} problems` : L().valid ?? t`Valid`);
+      }),
+      () => (stack && !ro() ? h(UndoRedo, { history: stack, size: "sm", steps: false, class: "hm-tre-history", labels: { undo: () => L().undo, redo: () => L().redo } }) : null)],
+  }));
 
-  return h("div", { class: () => cx("hm-tre-wrap", ro() && "is-readonly", val(props.class)), "data-hm-color": c["data-hm-color"] },
+  return h("div", { class: () => cx("hm-editor-frame hm-tre-wrap", ro() && "is-readonly", val(props.class)), "data-hm-color": c["data-hm-color"] },
     bar,
     h("div", {
       id: `${id}-tree`, role: "tree", class: "hm-tre", "aria-label": () => c["aria-label"]() ?? props.label ?? t`JSON tree`, "aria-describedby": c["aria-describedby"],
@@ -340,8 +334,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
     },
     // keyed rows: a change redraws only the rows it touched (a switch flips in place, no flash of the whole tree);
     // a true/false row keeps its element when its value changes, read-only redraws all
-    () => { ro(); anchors.clear(); return h(For, { each: rows, key: rowKey, fallback: h("div", { class: "hm-tre-none" }, () => L().noMatches ?? t`No matches`), children: (item: () => Row) => row(untrack(item), item) }); }),
-    menu);
+    () => { ro(); return h(For, { each: rows, key: rowKey, fallback: h(Empty, { size: "sm", class: "hm-tre-none", title: () => L().noMatches ?? t`No matches` }), children: (item: () => Row) => row(untrack(item), item) }); }));
 }
 
 /** What a row shows, except a true/false value (its switch follows the value itself). */

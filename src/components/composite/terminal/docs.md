@@ -66,4 +66,5 @@ from the keyboard. The terminal is always left-to-right (`dir="ltr"`), as comman
 
 ## Composed of
 
-JsonView (for `io.json`, loaded when first used).
+JsonView (for `io.json`, loaded when first used), Progress (`io.progress`), Spinner (`io.spinner`), Window
+(`TerminalWindow`).

@@ -39,4 +39,4 @@ contrast in every theme.
 
 ## Composed of
 
-Nothing: an icon and text; `action()` objects become ActionButtons.
+IconButton (the dismiss button); `action()` objects become ActionButtons. `toneIcon(tone)` is the shared tone → icon table.

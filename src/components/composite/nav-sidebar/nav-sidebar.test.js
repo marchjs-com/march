@@ -37,7 +37,7 @@ test("NavSidebar: categories with counts, auto-open active category, recent list
   assert.deepEqual(groups()[0], ["Ekonomi", "3", "true"], "the category of the current page opens");
   assert.ok(m.el.querySelector('.hm-sb-group.is-active-group [data-id="refunds"]').classList.contains("is-active"));
   R.navigate("/members"); await tick();
-  const recent = [...m.el.querySelectorAll('[data-where="recent"]')].map((a) => [a.dataset.id, a.querySelector(".hm-sb-sub").textContent]);
+  const recent = [...m.el.querySelectorAll('[data-where="recent"]')].map((a) => [a.dataset.id, a.querySelector(".hm-listrow-sub").textContent]);
   assert.deepEqual(recent, [["members", "Üyeler ve roller"], ["refunds", "Ekonomi"]]);
 
   // both categories were opened by the visits above, so the link reads "Collapse all"
@@ -64,7 +64,7 @@ test("NavSidebar: typing filters across categories; keyboard moves, opens and cl
   input.value = "iade"; input.dispatchEvent(new Event("input", { bubbles: true })); await tick();
   const hits = [...m.el.querySelectorAll('[data-where="search"]')];
   assert.deepEqual(hits.map((a) => a.dataset.id), ["refunds"]);
-  assert.equal(hits[0].querySelector(".hm-sb-sub").textContent, "Ekonomi");
+  assert.equal(hits[0].querySelector(".hm-listrow-sub").textContent, "Ekonomi");
   key(input, "Escape"); await tick();
   assert.equal(m.el.querySelectorAll('[data-where="search"]').length, 0);
 
@@ -237,7 +237,7 @@ test("NavSidebar: search, headings, expand-all and counts can be turned off; tex
   const own = mount(() => h(U.NavSidebar, { items: ITEMS, storageKey: "t.sb.own", palette: false, hotkey: false, collapsible: true, expandAll: false,
     labels: { categories: "Sections", search: "Find a page", noMatches: () => "Nothing here", menu: "Open menu", collapseSidebar: "Fold" } }));
   await tick();
-  assert.ok([...own.el.querySelectorAll(".hm-sb-section-label")].some((x) => x.textContent === "Sections"));
+  assert.ok([...own.el.querySelectorAll(".hm-sb-section .hm-section-label-text")].some((x) => x.textContent === "Sections"));
   assert.equal(own.el.querySelector(".hm-sb-all"), null, "expandAll={false}");
   assert.equal(own.el.querySelector(".hm-sb-input").getAttribute("aria-label"), "Find a page");
   assert.equal(own.el.querySelector(".hm-nav-burger").getAttribute("aria-label"), "Open menu");

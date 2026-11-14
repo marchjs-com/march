@@ -7,6 +7,7 @@ import { locale } from "../../../core/i18n.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { Counter, formatCount } from "../counter/index.ts";
 import { Reveal, type RevealOptions } from "../reveal/index.ts";
+import { StatTile } from "../../data/stat-tile/index.ts";
 
 export interface StatItem {
   value: number;
@@ -33,10 +34,11 @@ export interface StatsBandProps {
 export function StatsBand(props: StatsBandProps): Element {
   const mode = props.mode;
   return h(Reveal, { class: cx("hm-stats", `hm-stats-${props.variant ?? "divided"}`, val(props.class)), "data-hm-color": colorAttr(props.color), effect: "up", stagger: 90, ...(props.reveal === false ? { effect: "none" } : props.reveal), as: "dl" },
-    props.items.map((s) => h("div", { class: "hm-stats-item" },
-      h("dt", { class: "hm-stats-label" }, s.label),
-      h("dd", { class: "hm-stats-value" }, mode === "none"
+    // each item is a StatTile (dt / dd inside the dl): the figure is a Counter, or plain text with mode "none"
+    props.items.map((s) => h(StatTile, {
+      term: true, size: "xl", variant: props.variant === "cards" ? "card" : "plain", class: "hm-stats-item", label: s.label, hint: s.note ?? undefined,
+      value: mode === "none"
         ? h("span", { class: "hm-stats-plain" }, s.prefix ?? null, () => formatCount(s.value, s, locale()), s.suffix ?? null)
-        : h(Counter, { value: s.value, format: s.format, decimals: s.decimals, prefix: s.prefix, suffix: s.suffix, mode })),
-      s.note != null ? h("dd", { class: "hm-stats-note" }, s.note) : null))) as Element;
+        : h(Counter, { value: s.value, format: s.format, decimals: s.decimals, prefix: s.prefix, suffix: s.suffix, mode }),
+    }))) as Element;
 }

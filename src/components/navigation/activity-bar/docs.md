@@ -42,4 +42,4 @@ A tablist (`aria-orientation`) of tabs with names, tooltips and `aria-keyshortcu
 
 ## Composed of
 
-Badge (counts), Tooltip (names on hover and focus). Roving focus from ui/focus, the indicator on the motion engine.
+Tabs (its TabList: the vertical tab strip with roving focus and selection), Badge (`size="xs"` counts), Tooltip (names on hover and focus). The indicator is the shared `slidingIndicator` (motion engine).

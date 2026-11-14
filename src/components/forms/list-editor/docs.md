@@ -34,4 +34,5 @@ down", "Remove"); the add field takes the Field's id.
 
 ## Composed of
 
-Nothing: inputs and icon buttons shared with KeyValueEditor (forms/rows.ts).
+TextInput (the rows and the draft line), RowTools (move up / down, remove) and Button (add); the row logic is shared
+with KeyValueEditor and RecordListEditor (forms/rows.ts).

@@ -39,4 +39,4 @@ the content snaps back without a slide.
 
 ## Composed of
 
-The refresh glyph, the motion engine (`animate`: settle and spin, transform only) and pointer events.
+Button (the keyboard Refresh button). The swipe behavior (`swipeable`, `rubberBand`), the refresh glyph and the motion engine (`animate`: settle and spin, transform only).

@@ -4,9 +4,7 @@
 .hm-hs-view { overflow: hidden; padding-block: var(--hm-space-3); }
 .hm-hs-track { display: flex; gap: var(--hm-space-4); width: max-content; padding-inline: clamp(1rem, 6cqi, 5rem); will-change: transform; }
 .hm-hs-track > * { flex: none; width: var(--hm-hs-panel); min-width: 0; }
-.hm-hs-bar { display: block; height: 3px; margin-inline: clamp(1rem, 6cqi, 5rem); border-radius: 3px; background: var(--hm-border); overflow: hidden; }
-.hm-hs-bar-fill { display: block; height: 100%; background: var(--hm-brand-gradient); transform: scaleX(0); transform-origin: 0 50%; }
-:dir(rtl) .hm-hs-bar-fill { transform-origin: 100% 50%; }
+.hm-hs-bar { --hm-progress-c: var(--hm-brand-gradient); margin-inline: clamp(1rem, 6cqi, 5rem); }
 /* native: a normal horizontal scroller with snap points */
 .hm-hs.is-native { height: auto; }
 .hm-hs.is-native .hm-hs-pin { position: static; height: auto; }

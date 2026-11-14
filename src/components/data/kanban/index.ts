@@ -3,7 +3,10 @@ import "./kanban.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { PanelHeader } from "../../layout/panel-header/index.ts";
+import { StatusDot, type StatusDotTone } from "../../feedback/status-dot/index.ts";
+import { Badge } from "../badge/index.ts";
 
 export interface KanbanColumn<T> {
   id: string;
@@ -41,11 +44,13 @@ export function Kanban<T>(props: KanbanProps<T>): Element {
       onDragleave: () => over.set(null),
       onDrop: (e: DragEvent) => { e.preventDefault(); over.set(null); if (dragging && dragging.from !== col.id) props.onMove?.(dragging.item, dragging.from, col.id); dragging = null; },
     },
-    h("header", { class: "hm-kanban-head" },
-      props.dot === false ? null : typeof props.dot === "function" ? h("span", { class: "hm-kanban-dot-own", "aria-hidden": "true" }, props.dot(col))
-        : h("span", { class: cx("hm-kanban-dot", col.tone && `hm-kanban-dot-${col.tone}`), "data-hm-color": colorAttr(col.color) }),
-      h("span", { class: "hm-kanban-title" }, col.title),
-      props.count === false ? null : h("span", { class: cx("hm-kanban-count", typeof props.count === "function" && "is-own") }, typeof props.count === "function" ? props.count(col) : String(col.items.length))),
+    // column head: one PanelHeader (dot · title · count)
+    h(PanelHeader, {
+      class: "hm-kanban-head", size: "sm", title: col.title, titleAs: "span", partClass: { title: "hm-kanban-title" },
+      lead: props.dot === false ? undefined : typeof props.dot === "function" ? h("span", { class: "hm-kanban-dot-own", "aria-hidden": "true" }, props.dot(col))
+        : h(StatusDot, { class: cx("hm-kanban-dot", col.tone && `hm-kanban-dot-${col.tone}`), tone: (col.tone as StatusDotTone | undefined) ?? "neutral", color: col.color }),
+      meta: props.count === false ? undefined : h(Badge, { class: cx("hm-kanban-count", typeof props.count === "function" && "is-own") }, typeof props.count === "function" ? props.count(col) : String(col.items.length)),
+    }),
     h("div", { class: "hm-kanban-list" }, col.items.map((it) => h("article", {
       class: "hm-kanban-card", draggable: "true", tabindex: "0", "data-key": props.itemKey(it),
       onDragstart: (e: DragEvent) => { dragging = { item: it, from: col.id }; e.dataTransfer?.setData("text/plain", props.itemKey(it)); (e.currentTarget as HTMLElement).classList.add("is-dragging"); },

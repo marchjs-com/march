@@ -1,15 +1,13 @@
 /* March — Empty. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 .hm-empty { display: flex; flex-direction: column; align-items: center; }
-.hm-empty-icon { display: grid; place-items: center; width: 3rem; height: 3rem; margin-bottom: var(--hm-space-4); border-radius: var(--hm-radius-3); font-size: 1.5rem;
-  color: var(--hm-muted); background: var(--hm-surface); border: 1px solid var(--hm-border); box-shadow: var(--hm-shadow-2), var(--hm-highlight); }
-.hm-empty-icon .hm-svg { width: 1.375rem; height: 1.375rem; }
+/* the icon is an IconTile (outline); here its distance to the title and the size of an emoji */
+.hm-icon-tile.hm-empty-icon { margin-bottom: var(--hm-space-4); font-size: 1.5rem; color: var(--hm-muted); }
 .hm-empty-title { margin: 0; font-family: var(--hm-font-display); font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); color: var(--hm-text); letter-spacing: var(--hm-tracking-tight); }
 .hm-empty-text { margin-top: var(--hm-space-1); max-width: 28rem; font-size: var(--hm-text-md); line-height: 1.55; }
 .hm-empty-action { margin-top: var(--hm-space-5); display: flex; justify-content: center; flex-wrap: wrap; gap: var(--hm-space-2); }
 /* sm: the empty state of a panel, a list or a popup (less room, plain type, a flat icon tile) */
 .hm-empty.hm-empty-sm { padding: var(--hm-space-4) var(--hm-space-3); }
-.hm-empty-sm .hm-empty-icon { width: 2rem; height: 2rem; margin-bottom: var(--hm-space-2); border-radius: var(--hm-radius-2); font-size: 1rem; box-shadow: none; }
-.hm-empty-sm .hm-empty-icon .hm-svg { width: 1rem; height: 1rem; }
+.hm-empty-sm .hm-icon-tile.hm-empty-icon { margin-bottom: var(--hm-space-2); font-size: 1rem; }
 .hm-empty-sm .hm-empty-title { font-family: inherit; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-medium); color: var(--hm-text-2); letter-spacing: normal; }
 .hm-empty-sm .hm-empty-text { max-width: 20rem; font-size: var(--hm-text-sm); line-height: 1.45; }
 .hm-empty-sm .hm-empty-action { margin-top: var(--hm-space-3); }

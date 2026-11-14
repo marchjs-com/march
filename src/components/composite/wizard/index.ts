@@ -1,6 +1,5 @@
 // Wizard (composite: Steps, Progress): one form split into steps. Each step validates its own fields (and an optional validate fn) before Next.
 import "./wizard.css";
-import "../../../ui/button.css";
 import { signal, computed, untrack, provide, effect } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
@@ -10,6 +9,8 @@ import { useForm, renderFields, FormContext, type FormController, type FieldName
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { Progress } from "../../../ui/progress.ts";
 import { Steps } from "../../../ui/steps.ts";
+import { Button } from "../../actions/button/index.ts";
+import { Alert } from "../../feedback/alert/index.ts";
 
 const specOf = (s: Schema): SchemaSpec => Object.fromEntries(s.fields.map((f) => [f.name, f]));
 
@@ -132,11 +133,11 @@ function build(props: WizardProps, steps: readonly WizardStep[], carried: Values
         s.description ? h("p", { class: "hm-section-desc" }, s.description) : null,
         s.render ? s.render(form) : renderFields(form, namesOf(s), { layout, cols })));
     },
-    () => (stepError() ? h("div", { class: "hm-form-error", role: "alert" }, stepError()) : null),
-    () => (form.submitError() ? h("div", { class: "hm-form-error", role: "alert" }, form.submitError()) : null),
+    () => (stepError() ? h(Alert, { tone: "danger", class: "hm-form-error" }, stepError()) : null),
+    () => (form.submitError() ? h(Alert, { tone: "danger", class: "hm-form-error" }, form.submitError()) : null),
     h("div", { class: "hm-form-buttons hm-wizard-nav" },
       props.count === false ? null : h("span", { class: "hm-wizard-count" }, countText),
-      props.backButton === false ? null : h("button", { type: "button", class: "hm-btn hm-wizard-back", disabled: () => index() === 0 || form.submitting(), onClick: back }, () => props.labels?.back ?? t`Back`),
-      h("button", { type: "submit", class: "hm-btn hm-btn-primary hm-wizard-next", disabled: () => form.submitting() }, () => (last() ? props.submitLabel ?? t`Finish` : props.labels?.next ?? t`Next`))));
+      props.backButton === false ? null : h(Button, { class: "hm-wizard-back", disabled: () => index() === 0 || form.submitting(), onClick: back }, () => props.labels?.back ?? t`Back`),
+      h(Button, { type: "submit", variant: "primary", class: "hm-wizard-next", loading: () => form.submitting() }, () => (last() ? props.submitLabel ?? t`Finish` : props.labels?.next ?? t`Next`))));
   });
 }

@@ -47,4 +47,4 @@ price is read once as its final value (the rolling digits are hidden from screen
 
 ## Composed of
 
-Card, Badge, Segmented, Counter, Reveal; buttons from Hero's `actionButtons`.
+Card, Badge, Segmented (sliding indicator), Counter, CheckMark (feature marks), Reveal; buttons from SectionHead's `sectionActions`.

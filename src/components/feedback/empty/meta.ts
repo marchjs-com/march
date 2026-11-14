@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Empty state: an icon, a title, a line of text and the next step (actions), so an empty screen says what to do.",
   category: "feedback",
-  composedOf: [],
+  composedOf: ["IconTile"],
   behaviors: [],
   hubs: [],
   showcase: "/feedback",

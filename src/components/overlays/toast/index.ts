@@ -1,7 +1,6 @@
 // Toasts: short, non-blocking messages. `toast(msg, { kind, action, timeout })` returns an id; `toast.dismiss(id)`.
 // A <ToastHost/> is mounted automatically into document.body on first use when the app did not render one.
 import "./toast.css";
-import "../../../ui/button.css";
 import { signal, createRoot, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
@@ -11,11 +10,9 @@ import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.t
 import { isIconDef } from "../../../icons/svg.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
-import { info } from "../../../icons/glyphs/info.ts";
-import { checkCircle } from "../../../icons/glyphs/checkCircle.ts";
-import { alertTriangle } from "../../../icons/glyphs/alertTriangle.ts";
-import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
-const KIND_ICON = { info, success: checkCircle, warn: alertTriangle, danger: alertCircle } as const;
+import { toneIcon } from "../../feedback/alert/index.ts";
+import { Button } from "../../actions/button/index.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
 
 export type ToastKind = "info" | "success" | "warn" | "danger";
 export interface ToastAction {
@@ -94,11 +91,11 @@ export function ToastHost(props: {
       const act = x.action;
       const own = x.icon;
       return h("div", { class: cx(`hm-toast hm-toast-${x.kind}`, x.motion === "fade" && "hm-toast-fade", x.motion === "none" && "hm-toast-still", x.class), role: x.kind === "danger" ? "alert" : "status", "data-hm-color": colorAttr(x.color) },
-        own !== false && h("span", { class: "hm-toast-icon", "aria-hidden": "true" }, own == null || own === true ? glyph(KIND_ICON[x.kind as keyof typeof KIND_ICON] ?? info) : isIconDef(own) ? glyph(own) : own),
+        own !== false && h("span", { class: "hm-toast-icon", "aria-hidden": "true" }, own == null || own === true ? glyph(toneIcon(x.kind)) : isIconDef(own) ? glyph(own) : own),
         h("div", { class: "hm-toast-msg" }, () => val(x.message)),
-        act && h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm hm-toast-action",
+        act && h(Button, { variant: "ghost", size: "sm", class: "hm-toast-action",
           onClick: async () => { toast.dismiss(x.id); try { await act.run(); } catch (e) { toast((e as { message?: string } | null)?.message || val(act.error) || t`Something went wrong.`, { kind: "danger" }); } } },
           () => val(act.label)),
-        x.closable !== false && h("button", { type: "button", class: "hm-toast-close", "aria-label": () => val(x.closeLabel) ?? t`Dismiss`, onClick: () => toast.dismiss(x.id) }, glyph(xIcon)));
+        x.closable !== false && h(IconButton, { size: "xs", class: "hm-toast-close", icon: xIcon, label: () => val(x.closeLabel) ?? t`Dismiss`, title: false, onClick: () => toast.dismiss(x.id) }));
     } }));
 }

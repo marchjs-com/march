@@ -50,3 +50,7 @@ The trigger has `aria-haspopup`, `aria-expanded` and `aria-controls`. ↓ / ↑ 
 item; ↑ ↓ Home End move (roving focus), Enter activates, Esc closes and returns focus to the trigger, Tab leaves.
 Items are `role="menuitem"` (`menuitemcheckbox` / `menuitemradio` with `aria-checked` for a `checked` item; the mark
 itself is decorative); shortcuts are shown with Kbd styling and the platform's modifier names.
+
+## Composed of
+
+Button / IconButton (the trigger), ListRow (an entry), Kbd (its shortcut), Divider (a separator). The panel is `floating()` (ui/popover), like Popover's.

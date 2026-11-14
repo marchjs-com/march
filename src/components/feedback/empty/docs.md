@@ -29,4 +29,4 @@ reachable with Tab. Tables and the router use the same `hm-empty` look for their
 
 ## Composed of
 
-Nothing; `action()` objects become ActionButtons.
+IconTile (the framed icon; your own node is placed as it is). `action()` objects become ActionButtons.

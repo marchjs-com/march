@@ -48,4 +48,4 @@ text ("Previous", "Next"), your own content gets the accessible name, and the ra
 
 ## Composed of
 
-Button and Select (the simple variant: Previous / Next and the rows-per-page select); the numbered pages are plain buttons.
+IconButton (Previous / Next of the numbered pages), Button and Select (the simple variant: Previous / Next and the rows-per-page select); the page numbers are plain buttons.

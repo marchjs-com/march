@@ -31,4 +31,4 @@ ticker copies are `aria-hidden` and inert, so every name is read once. Images lo
 
 ## Composed of
 
-Marquee, Grid, Reveal.
+Marquee (`duplicate`), Grid, Picture, Reveal.

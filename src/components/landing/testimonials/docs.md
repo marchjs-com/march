@@ -40,4 +40,4 @@ Each card is a `<figure>` with a `<blockquote>` and a `<figcaption>` (`<cite>` f
 
 ## Composed of
 
-Card, Avatar, Rating, Marquee, Carousel, Button, Reveal.
+Card, ListRow (who said it), Avatar, Rating, Marquee (`duplicate`), Carousel, Button, Reveal.

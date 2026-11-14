@@ -8,7 +8,10 @@ import { query as routeQuery, setQuery } from "../../../router/router.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { roving } from "../../../ui/focus.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, uid, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, uid, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import { StatusDot } from "../../feedback/status-dot/index.ts";
+import { motionPreset } from "../../../motion/engine/parts.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
@@ -76,6 +79,8 @@ export interface TabListProps extends TabListLook {
   controls?: string | undefined;
   /** Wrap a tab's button (e.g. in a Tooltip). */
   wrap?: ((button: Element, tab: TabSpec) => unknown) | undefined;
+  /** Extra content inside the strip, before the tabs (a sliding indicator). */
+  children?: unknown;
   class?: ClassProp;
 }
 
@@ -95,14 +100,14 @@ export function TabList(props: TabListProps): Element {
   const closes = (x: TabSpec | undefined): boolean => !!x && !!val(x.closable) && !val(x.disabled);
   return h("div", { "data-hm-color": () => colorAttr(props.color),
     class: () => cx(look() && "hm-tabs-bar", val(props.variant) === "pill" && "hm-tabs-bar-pill", val(props.class)), role: "tablist",
-    "aria-orientation": () => (vertical() ? "vertical" : null), "aria-label": () => val(props.label) ?? null, ref: (x: HTMLElement) => { bar = x; },
+    "aria-orientation": () => (vertical() ? "vertical" : props.orientation !== undefined ? "horizontal" : null), "aria-label": () => val(props.label) ?? null, ref: (x: HTMLElement) => { bar = x; },
     onKeydown: (e: KeyboardEvent) => {
       const id = (e.target as HTMLElement).dataset?.["tab"];
       if (e.key === "Delete" && id != null && closes(untrack(list).find((x) => x.id === id))) { e.preventDefault(); props.onClose?.(id); return; }
       const el = roving(e, tabEls(), { horizontal: !vertical() });
       if (el && props.activation !== "manual") props.onSelect(el.dataset["tab"]!);
     },
-  }, () => list().map((x) => untrack(() => {
+  }, props.children, () => list().map((x) => untrack(() => {
     const on = (): boolean => val(props.value) === x.id;
     // no active tab: the first enabled one is the Tab stop
     const stop = (): boolean => on() || (!list().some((y) => y.id === val(props.value)) && list().find((y) => !val(y.disabled)) === x);
@@ -110,14 +115,14 @@ export function TabList(props: TabListProps): Element {
     const btn = h("button", {
       ...attrs, type: "button", role: "tab", id: idOf(x.id), "data-tab": x.id, "aria-controls": props.controls ?? null,
       "aria-selected": () => String(on()), tabindex: () => (stop() ? "0" : "-1"), disabled: () => !!val(x.disabled), title: () => val(x.title) ?? null,
-      "aria-keyshortcuts": () => (closes(x) ? "Delete" : null),
+      "aria-keyshortcuts": () => (closes(x) ? "Delete" : (attrs["aria-keyshortcuts"] as string | null | undefined) ?? null),
       class: () => cx(look() && "hm-tab", on() && "is-active", val(own as ClassProp)), onClick: () => props.onSelect(x.id),
     }, icon(x.icon, "hm-tab-icon"), () => val(x.label), x.badge !== undefined && h(Badge, { count: () => val(x.badge), tone: "neutral" }),
-    x.dirty !== undefined && (() => (val(x.dirty) ? h("span", { class: "hm-tab-dirty", role: "img", "aria-label": () => val(props.labels?.dirty) ?? t`unsaved changes` }) : null)),
+    x.dirty !== undefined && (() => (val(x.dirty) ? h(StatusDot, { class: "hm-tab-dirty", tone: "primary", size: "sm", label: () => val(props.labels?.dirty) ?? t`unsaved changes` }) : null)),
     x.closable !== undefined && (() => (closes(x) ? h("span", {
       class: "hm-tab-close", "aria-hidden": "true", title: () => val(props.labels?.close) ?? t`Close`,
       onPointerdown: (e: Event) => e.stopPropagation(), onClick: (e: Event) => { e.stopPropagation(); props.onClose?.(x.id); },
-    }, props.closeIcon == null ? glyph(xIcon) : icon(props.closeIcon, "hm-tab-close-own")) : null)));
+    }, ownIcon(props.closeIcon ?? undefined, xIcon, "hm-tab-close-own")) : null)));
     return props.wrap ? props.wrap(btn, x) : btn;
   })));
 }
@@ -149,11 +154,6 @@ export interface TabsProps extends TabListLook {
 
 // a live prop for h(Component, …): it becomes a getter
 const live = reactive as <T>(fn: () => T) => T;
-const PANEL_FRAMES = {
-  fade: () => [{ opacity: 0 }, { opacity: 1 }],
-  rise: () => [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }],
-  slide: (d: number) => [{ opacity: 0, transform: `translateX(${d * 24}px)` }, { opacity: 1, transform: "translateX(0)" }],
-};
 
 /** `value` + `onChange` make it controlled (`bind:value` works). */
 export function Tabs(props: TabsProps): Element {
@@ -199,7 +199,7 @@ export function Tabs(props: TabsProps): Element {
         if (prev == null || id == null || prev === id || reducedMotion()) return;
         const dir = ids.indexOf(id) > ids.indexOf(prev) ? 1 : -1;
         if (typeof motion === "function") motion(panel as HTMLElement, dir);
-        else animate(panel as HTMLElement, PANEL_FRAMES[motion](dir * (isRtl(panel as HTMLElement) ? -1 : 1)), { duration: 240, easing: "out" });
+        else animate(panel as HTMLElement, motion === "slide" ? motionPreset("slide", { x: dir * (isRtl(panel as HTMLElement) ? -1 : 1) * 24, y: 0 }) : motionPreset(motion), { duration: 240, easing: "out" });
       });
     });
   }

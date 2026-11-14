@@ -37,4 +37,4 @@ A `toolbar` of buttons with `aria-pressed`; one tab stop (roving focus), each em
 
 ## Composed of
 
-Nothing: ChatThread opens it under a message, ChatComposer uses the grid as its emoji panel.
+IconButton. ChatThread opens it under a message, ChatComposer uses the grid as its emoji panel.

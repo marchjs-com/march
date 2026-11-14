@@ -6,7 +6,7 @@ export default defineMeta({
   category: "composite",
   since: "0.1.0",
   summary: "Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast.",
-  composedOf: ["IconButton", "Segmented"],
+  composedOf: ["IconButton", "Segmented", "Badge", "SectionLabel", "Slider", "Swatch", "TextInput"],
   behaviors: ["drag", "motion engine color parser", "theme contrast"],
   hubs: [],
   showcase: "/editors",

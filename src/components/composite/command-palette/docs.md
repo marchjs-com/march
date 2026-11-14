@@ -45,4 +45,5 @@ OverflowText. The trigger button announces its shortcut with `aria-keyshortcuts`
 
 ## Composed of
 
-Dialog (the modal frame and focus handling), OverflowText (long titles and the trigger label).
+Dialog (the modal frame and focus handling), SearchBox (the field, as a combobox), ListRow (result rows), SectionLabel
+(group headings), Empty (no results), Kbd (shortcuts), OverflowText (the trigger label and long reasons).

@@ -4,28 +4,33 @@
 // Remembers open categories and recent visits (localStorage); icon rail mode; drawer with a menu button on small screens.
 import "./nav-sidebar.css";
 import "../../navigation/nav-menu/nav-menu.css";
-import "../../../ui/button.css";
-import "../../../ui/display.css";
-import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { Link, path, navigate, type Href } from "../../../router/router.ts";
+import { path, navigate, type Href } from "../../../router/router.ts";
 import { can, type PermCheck } from "../../../access/index.ts";
 import { rank } from "../../../ui/fold.ts";
-import { OverflowText } from "../../../ui/marquee.ts";
 import { compareText } from "../../../core/text.ts";
 import { registerPages } from "../../../ui/registry.ts";
-import { key as hotkey, formatKey } from "../../../ui/keys.ts";
-import { val, cx, uid, icon, glyph, load, save, on, arr, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { key as hotkey } from "../../../ui/keys.ts";
+import { roving } from "../../../ui/focus.ts";
+import { scrollIntoArea } from "../../../ui/observe.ts";
+import { val, cx, uid, icon, load, save, on, arr, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { menu } from "../../../icons/glyphs/menu.ts";
-import { search as searchIcon } from "../../../icons/glyphs/search.ts";
-import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { clock } from "../../../icons/glyphs/clock.ts";
 import { panelLeft } from "../../../icons/glyphs/panelLeft.ts";
-import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { clamp } from "../../../core/util.ts";
-import { resizeHandle } from "../../../behaviors/resize-handle/index.ts";
 import { reducedMotion } from "../../../motion/env.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { Button } from "../../actions/button/index.ts";
+import { Chevron } from "../../actions/chevron/index.ts";
+import { Badge } from "../../data/badge/index.ts";
+import { ListRow } from "../../data/list-row/index.ts";
+import { Empty } from "../../feedback/empty/index.ts";
+import { SearchBox } from "../../forms/search-box/index.ts";
+import { PanelHeader } from "../../layout/panel-header/index.ts";
+import { ResizeHandle } from "../../layout/resize-handle/index.ts";
+import { SectionLabel } from "../../typography/section-label/index.ts";
 
 /** One NavSidebar entry. `href` navigates (router Link); `onSelect` runs instead. */
 export interface NavSidebarItem {
@@ -133,7 +138,6 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const savedW = keepWidth ? Number(widthKey ? load<unknown>(widthKey, null) : saved.width) : NaN;
   const width = signal<number | null>(Number.isFinite(savedW) && savedW > 0 ? clamp(savedW, minW, maxW) : null);
   const resizing = signal(false);
-  const shownWidth = signal(0); // rendered width (aria-valuenow when no width was set)
   const drawer = signal(false);
   const q = signal("");
   const chosen = signal<string | null>(null); // last onSelect item (items without href): active and remembered as a visit
@@ -219,12 +223,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
     queueMicrotask(() => {
       const all = [...(navEl?.querySelectorAll<HTMLElement>(".hm-sb-scroll .hm-sb-item") ?? [])].filter((r) => r.dataset["id"] === id && !r.closest("[inert]"));
       const el = all.find((r) => r.dataset["where"] !== "recent") ?? all[0];
-      const sc = el?.closest<HTMLElement>(".hm-sb-scroll");
-      if (!el || !sc) return;
-      const r = el.getBoundingClientRect(), c = sc.getBoundingClientRect();
-      if (!c.height) return;
-      const d = r.top < c.top ? r.top - c.top : r.bottom > c.bottom ? Math.min(r.bottom - c.bottom, r.top - c.top) : 0;
-      if (d) sc.scrollTo?.({ top: sc.scrollTop + d, behavior: smooth ? "smooth" : "auto" });
+      scrollIntoArea(el, el?.closest<HTMLElement>(".hm-sb-scroll"), { smooth });
     });
   });
   if (props.palette !== false) registerPages(() => items().filter((x) => x.href).map((x) => ({ id: x.id, title: text(x.label), href: x.href as Href, group: x.group, keywords: x.keywords, icon: x.icon })));
@@ -241,48 +240,39 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const setAll = (on: boolean): void => { open.set(on ? new Set(groups.peek().map((g) => g.name)) : new Set()); persist(); };
 
   // ---- rows
-  const badge = (x: NavSidebarItem): unknown => x.badge !== undefined && (() => {
+  const badge = (x: NavSidebarItem): unknown => {
     const b = val(x.badge);
     if (b == null || b === 0 || b === "") return null;
-    const n = typeof b === "number" ? (b > 99 ? "99+" : String(b)) : b;
-    return h("span", { class: cx("hm-sb-badge", `hm-sb-badge-${x.badgeTone ?? (typeof b === "number" ? "danger" : "neutral")}`) }, n);
-  });
+    const tone = x.badgeTone ?? (typeof b === "number" ? "danger" : "neutral");
+    return typeof b === "number" ? h(Badge, { class: "hm-sb-badge", count: b, tone }) : h(Badge, { class: "hm-sb-badge", tone }, b);
+  };
   const row = (x: NavSidebarItem, where: string, sub?: () => string): Element => {
-    const iconOf = x.icon ?? (x.group ? props.groupIcons?.[x.group] : undefined);
-    const body = [
-      icon(iconOf, "hm-icon hm-sb-icon"),
-      h("span", { class: "hm-sb-text" },
-        h(OverflowText, { class: "hm-sb-label", mode: "loop", text: () => text(x.label), play: () => active() === x.id }),
-        () => { const s = sub ? sub() : text(x.sub); return s ? h(OverflowText, { class: "hm-sb-sub", mode: "loop", play: () => active() === x.id }, s) : null; }),
-      badge(x),
-    ];
-    const common = {
-      class: () => cx("hm-sb-row", "hm-sb-item", active() === x.id && "is-active", active() !== x.id && !!active() && under(x.id, active()!) && "is-active-parent"), "data-id": x.id, "data-where": where,
-      title: () => (rail() ? text(x.label) : null), "aria-current": () => (active() === x.id ? "page" : null),
-    };
-    const el = x.href && !x.onSelect
-      ? h(Link, { ...common, href: x.href, children: body })
-      : h("button", { ...common, type: "button", onClick: () => { if (!x.href) chosen.set(x.id); x.onSelect?.(); if (x.href) void navigate(x.href); } }, body);
+    const el = h(ListRow, {
+      class: () => cx("hm-sb-row", "hm-sb-item", active() !== x.id && !!active() && under(x.id, active()!) && "is-active-parent"), "data-id": x.id, "data-where": where,
+      lead: x.icon ?? (x.group ? props.groupIcons?.[x.group] : undefined), title: () => text(x.label), sub: sub ?? (x.sub !== undefined ? () => text(x.sub) : undefined),
+      trail: x.badge !== undefined ? () => badge(x) : undefined, marquee: { mode: "loop" }, active: () => active() === x.id, indicator: where !== "featured",
+      tooltip: () => (rail() ? text(x.label) : null), "aria-current": () => (active() === x.id ? "page" : null),
+      ...(x.href && !x.onSelect ? { href: x.href } : { onClick: () => { if (!x.href) chosen.set(x.id); x.onSelect?.(); if (x.href) void navigate(x.href); } }),
+    });
     const kids = where === "group" || where === "main" || where === "child" ? kidsOf().get(x.id) : undefined;
     if (!kids?.length) return h("li", { class: "hm-sb-li" }, el);
     const kid = uid("hm-sbk");
     return h("li", { class: () => cx("hm-sb-li", "is-parent", kidsOpen(x.id) && "is-kids-open") },
       el,
-      h("button", { type: "button", class: "hm-sb-kids-btn", tabindex: "-1", "aria-expanded": () => String(kidsOpen(x.id)), "aria-controls": kid,
-        "aria-label": () => (kidsOpen(x.id) ? props.labels?.hideUnder?.(text(x.label)) ?? t`Hide pages under ${text(x.label)}` : props.labels?.showUnder?.(text(x.label)) ?? t`Show pages under ${text(x.label)}`), onClick: () => toggleKids(x.id) },
-        glyph(chevronRight)),
+      h(IconButton, { class: "hm-sb-kids-btn", size: "xs", icon: h(Chevron, {}), title: false, tabindex: "-1", "aria-expanded": () => String(kidsOpen(x.id)), "aria-controls": kid,
+        label: () => (kidsOpen(x.id) ? props.labels?.hideUnder?.(text(x.label)) ?? t`Hide pages under ${text(x.label)}` : props.labels?.showUnder?.(text(x.label)) ?? t`Show pages under ${text(x.label)}`), onClick: () => toggleKids(x.id) }),
       h("div", { class: "hm-sb-kids", id: kid, inert: () => !kidsOpen(x.id) },
         h("ul", { class: "hm-sb-list hm-sb-sublist" }, kids.map((k) => row(k, "child")))));
   };
   const sectionHead = (label: () => string, ic: unknown, extra?: unknown): Element | null => props.headings === false ? null :
-    h("div", { class: "hm-sb-section" }, icon(ic, "hm-icon hm-sb-section-icon"), h("span", { class: "hm-sb-section-label" }, label), extra ?? null);
+    h(SectionLabel, { class: "hm-sb-section", icon: ic, label, actions: extra ?? undefined }) as Element;
 
   const queryText = computed(() => q().trim()); // spaces alone do not rebuild the menu
   const body = (): unknown => {
     const query = queryText();
     if (query) {
       const hits = untrack(() => rank(query, items(), (x) => ({ title: text(x.label), keywords: [x.keywords, x.group, text(x.sub)].filter(Boolean).join(" ") })));
-      if (!hits.length) return h("p", { class: "hm-sb-none" }, () => L("noMatches", t`No matches`));
+      if (!hits.length) return h(Empty, { size: "sm", class: "hm-sb-none", title: () => L("noMatches", t`No matches`) });
       return untrack(() => h("ul", { class: "hm-sb-list", "aria-label": L("results", t`Results`) }, hits.map((r) => row(r.item, "search", () => r.item.group ?? text(r.item.sub)))));
     }
     // Each block is its own reactive region: a navigation changes `recent` (and `active`), which rebuilds only the
@@ -299,16 +289,14 @@ export function NavSidebar(props: NavSidebarProps): Element {
       () => { const ls = loose(); return untrack(() => ls.length > 0 && h("ul", { class: "hm-sb-list hm-sb-loose" }, ls.map((x) => row(x, "main")))); },
       maxRecent > 0 && recentBlock,
       () => { const gs = groups(); return untrack(() => gs.length > 0 && h("div", { class: "hm-sb-block hm-sb-cats" },
-        sectionHead(() => L("categories", t`Categories`), null, props.expandAll === false ? null : h("button", { type: "button", class: "hm-sb-all", onClick: () => setAll(!allOpen()) }, () => (allOpen() ? L("collapseAll", t`Collapse all`) : L("expandAll", t`Expand all`)))),
+        sectionHead(() => L("categories", t`Categories`), null, props.expandAll === false ? null : h(Button, { variant: "link", class: "hm-sb-all", onClick: () => setAll(!allOpen()) }, () => (allOpen() ? L("collapseAll", t`Collapse all`) : L("expandAll", t`Expand all`)))),
         h("ul", { class: "hm-sb-list hm-sb-groups" }, gs.map((g) => {
           const gid = uid("hm-sbg");
           const isOpen = (): boolean => rail() || open().has(g.name);
           return h("li", { class: () => cx("hm-sb-group", isOpen() && "is-open", activeGroup() === g.name && "is-active-group") },
-            h("button", { type: "button", class: "hm-sb-row hm-sb-gbtn", "data-group": g.name, "aria-expanded": () => String(isOpen()), "aria-controls": gid, onClick: () => toggle(g.name) },
-              h("span", { class: "hm-sb-chev", "aria-hidden": "true" }, glyph(chevronRight)),
-              icon(props.groupIcons?.[g.name], "hm-icon hm-sb-gicon"),
-              h(OverflowText, { class: "hm-sb-gname", mode: "loop" }, g.name),
-              props.groupCounts === false ? null : h("span", { class: "hm-sb-count" }, String(g.items.length))),
+            h(ListRow, { class: "hm-sb-row hm-sb-gbtn", "data-group": g.name, "aria-expanded": () => String(isOpen()), "aria-controls": gid, onClick: () => toggle(g.name),
+              lead: [h(Chevron, { class: "hm-sb-chev" }), icon(props.groupIcons?.[g.name], "hm-icon hm-sb-gicon")], title: g.name, marquee: { mode: "loop" },
+              trail: props.groupCounts === false ? undefined : h("span", { class: "hm-sb-count" }, String(g.items.length)) }),
             h("div", { class: "hm-sb-gpanel", id: gid, inert: () => !isOpen() },
               h("ul", { class: "hm-sb-list hm-sb-gitems" }, g.items.map((x) => row(x, "group")))));
         })))); },
@@ -317,24 +305,21 @@ export function NavSidebar(props: NavSidebarProps): Element {
 
   // ---- keyboard: roving focus over visible rows
   const rows = (): HTMLElement[] => [...(navEl?.querySelectorAll<HTMLElement>(".hm-sb-row") ?? [])].filter((r) => !r.closest("[inert]"));
+  // keys of the search box (its own Escape clears the query)
+  const onSearchKey = (e: KeyboardEvent): void => {
+    if (e.key === "ArrowDown") { e.preventDefault(); rows()[0]?.focus(); }
+    else if (e.key === "Enter" && q.peek().trim()) { e.preventDefault(); rows()[0]?.click(); }
+  };
   const onKey = (e: KeyboardEvent): void => {
     if (e.defaultPrevented) return; // handled once (nested handlers / delegation)
     const target = e.target as HTMLElement;
-    if (target === searchEl) {
-      if (e.key === "ArrowDown") { e.preventDefault(); rows()[0]?.focus(); }
-      else if (e.key === "Escape" && q.peek()) { e.preventDefault(); e.stopPropagation(); q.set(""); if (searchEl) searchEl.value = ""; }
-      else if (e.key === "Enter" && q.peek().trim()) { e.preventDefault(); rows()[0]?.click(); }
-      return;
-    }
     if (!target.classList.contains("hm-sb-row")) return;
     const list = rows(), i = list.indexOf(target);
-    const go = (j: number): void => { e.preventDefault(); list[clamp(j, 0, list.length - 1)]?.focus(); };
-    if (e.key === "ArrowDown") go(i + 1);
-    else if (e.key === "ArrowUp") { if (i === 0) { e.preventDefault(); searchEl?.focus(); } else go(i - 1); }
-    else if (e.key === "Home") go(0);
-    else if (e.key === "End") go(list.length - 1);
+    // ↑ on the first row goes back to the search box; ↑ ↓ Home End otherwise move among the rows
+    if (e.key === "ArrowUp" && i === 0) { e.preventDefault(); searchEl?.focus(); return; }
+    if (roving(e, list, { wrap: false })) return;
     // nested items: → opens a parent's children, ← closes them, or goes from a child back to its parent
-    else if ((e.key === "ArrowRight" || e.key === "ArrowLeft") && target.closest(".is-parent, .hm-sb-sublist")) {
+    if ((e.key === "ArrowRight" || e.key === "ArrowLeft") && target.closest(".is-parent, .hm-sb-sublist")) {
       const li = target.parentElement, id = target.dataset["id"] ?? "";
       if (li?.classList.contains("is-parent") && target.dataset["where"] !== "child") {
         if (e.key === "ArrowRight") { e.preventDefault(); if (!kidsOpen(id)) toggleKids(id); else list[i + 1]?.focus(); return; }
@@ -356,8 +341,6 @@ export function NavSidebar(props: NavSidebarProps): Element {
     }
   };
 
-  const kbd = props.shortcut ?? "mod+k";
-
   // ---- width: a CSS variable on the wrapper (CSSOM, no inline style attribute)
   let wrapEl: HTMLElement | undefined;
   const cssWidth = (): string | null => { const w = width(); return w != null ? `${w}px` : props.width == null ? null : typeof props.width === "number" ? `${props.width}px` : props.width; };
@@ -373,42 +356,30 @@ export function NavSidebar(props: NavSidebarProps): Element {
     props.onResize?.(w);
     if (done) persist();
   };
-  if (props.resizable && typeof globalThis.ResizeObserver === "function") {
-    const ro = new ResizeObserver(() => { if (navEl) shownWidth.set(Math.round(navEl.getBoundingClientRect().width)); });
-    queueMicrotask(() => { if (navEl) ro.observe(navEl); });
-    onCleanup(() => ro.disconnect());
-  }
-  const grip = (): unknown => !props.resizable ? null : h("div", {
-    class: () => cx("hm-sb-resize", resizing() && "is-dragging"), "aria-controls": navId, "aria-label": () => L("resize", t`Resize sidebar`),
-    // drag / arrows (RTL mirrored) / Home / End / Enter or double click resets: the resize-handle behavior. The range
-    // goes below minW when the sidebar can fold to its rail (setWidth folds it under collapseBelow).
-    ref: (x: HTMLElement) => resizeHandle(x, {
-      value: currentPx, min: props.collapseBelow != null ? 0 : minW, max: maxW, step: 16,
-      set: (to, done) => { if (rail.peek() && to > currentPx()) rail.set(false); setWidth(to, done); },
-      reset: () => { width.set(null); if (rail.peek() && props.collapseBelow != null) rail.set(false); persist(); props.onResize?.(currentPx()); },
-      onStart: () => { globalThis.document.documentElement.classList.add("hm-sb-resizing"); resizing.set(true); },
-      onEnd: () => { globalThis.document.documentElement.classList.remove("hm-sb-resizing"); resizing.set(false); },
-    }),
+  // drag / arrows (RTL mirrored) / Home / End / Enter or double click resets: ResizeHandle. The range goes below minW
+  // when the sidebar can fold to its rail (setWidth folds it under collapseBelow).
+  const grip = (): unknown => !props.resizable ? null : h(ResizeHandle, {
+    class: () => cx("hm-sb-resize", resizing() && "is-dragging"), "aria-controls": navId, label: () => L("resize", t`Resize sidebar`),
+    value: currentPx, min: props.collapseBelow != null ? 0 : minW, max: maxW, step: 16,
+    set: (to: number, done?: boolean) => { if (rail.peek() && to > currentPx()) rail.set(false); setWidth(to, done); },
+    reset: () => { width.set(null); if (rail.peek() && props.collapseBelow != null) rail.set(false); persist(); props.onResize?.(currentPx()); },
+    onStart: () => { globalThis.document.documentElement.classList.add("hm-sb-resizing"); resizing.set(true); },
+    onEnd: () => { globalThis.document.documentElement.classList.remove("hm-sb-resizing"); resizing.set(false); },
   });
+  const title = props.title; // read once: a node prop is built when it is read
+  const railLabel = (): string => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`));
   return h("div", { class: () => cx("hm-nav-wrap", "hm-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", props.nestedSubs && "is-nested-subs", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--hm-sb-w", w); } },
-    h("button", { type: "button", class: "hm-icon-btn hm-nav-burger", "aria-controls": navId, "aria-expanded": () => String(drawer()), "aria-label": () => L("menu", t`Menu`), onClick: () => drawer.update((x) => !x) }, glyph(menu)),
+    h(IconButton, { class: "hm-nav-burger", icon: menu, title: false, "aria-controls": navId, "aria-expanded": () => String(drawer()), label: () => L("menu", t`Menu`), onClick: () => drawer.update((x) => !x) }),
     h("div", { class: "hm-nav-scrim", "aria-hidden": "true", onClick: () => drawer.set(false) }),
     h("nav", { class: "hm-nav hm-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },
       h("div", { class: "hm-sb-head" },
-        h("div", { class: "hm-sb-titlebar" },
-          props.title != null && h("div", { class: "hm-sb-title" }, h("span", { class: "hm-sb-title-main" }, props.title), props.subtitle != null && h("span", { class: "hm-sb-title-sub" }, props.subtitle)),
-          props.collapsible && h("button", { type: "button", class: "hm-icon-btn hm-btn-sm hm-nav-rail-btn", "aria-pressed": () => String(rail()),
-            "aria-label": () => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`)), title: () => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`)),
-            onClick: () => { rail.update((x) => !x); persist(); } }, glyph(panelLeft))),
-        hasSearch && h("div", { class: "hm-sb-search", role: "search" },
-          h("span", { class: "hm-sb-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
-          h("input", {
-            type: "search", class: "hm-sb-input", ref: (x: HTMLInputElement) => { searchEl = x; }, autocomplete: "off", spellcheck: "false",
-            placeholder: () => val(props.placeholder) ?? t`Search or ask…`, "aria-label": () => val(props.labels?.search) ?? val(props.placeholder) ?? t`Search the menu`,
-            "aria-keyshortcuts": hk ? "Control+K Meta+K" : null, onInput: (e: Event) => q.set((e.target as HTMLInputElement).value),
-          }),
-          () => (q() ? h("button", { type: "button", class: "hm-sb-clear", "aria-label": () => L("clearSearch", t`Clear search`), onClick: () => { q.set(""); if (searchEl) { searchEl.value = ""; searchEl.focus(); } } }, glyph(xIcon))
-            : hk ? h("kbd", { class: "hm-kbd hm-sb-kbd", "aria-hidden": "true" }, formatKey(kbd)) : null))),
+        (title != null || props.collapsible) && h(PanelHeader, { as: "div", class: "hm-sb-titlebar", title: title ?? undefined, titleAs: "span", subtitle: props.subtitle ?? undefined,
+          actions: props.collapsible ? h(IconButton, { class: "hm-nav-rail-btn", size: "sm", icon: panelLeft, "aria-pressed": () => String(rail()), label: railLabel, onClick: () => { rail.update((x) => !x); persist(); } }) : undefined }),
+        hasSearch && h(SearchBox, {
+          class: "hm-sb-search", inputClass: "hm-sb-input", value: q, debounce: 0, inputRef: (x: HTMLInputElement) => { searchEl = x; if (hk) x.setAttribute("aria-keyshortcuts", "Control+K Meta+K"); },
+          placeholder: () => val(props.placeholder) ?? t`Search or ask…`, label: () => val(props.labels?.search) ?? val(props.placeholder) ?? t`Search the menu`,
+          clearLabel: () => L("clearSearch", t`Clear search`), shortcutHint: hk ? props.shortcut ?? "mod+k" : false, onKeyDown: onSearchKey,
+        })),
       h("div", { class: "hm-sb-scroll" }, body),
       props.footer != null && h("div", { class: "hm-nav-foot hm-sb-foot" }, props.footer),
       grip()));

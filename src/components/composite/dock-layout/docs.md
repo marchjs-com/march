@@ -65,11 +65,15 @@ icon, title, badge, dirty dot and close button are set per panel (`icon`, `title
 
 A region with its own name; every group is a `section` named after its active panel and holds a Tabs tablist. Every
 pointer action has a keyboard path (table above) and the group buttons have names and `aria-keyshortcuts`. Moves,
-minimizing and closing are announced in a polite live region. Start and end follow the writing direction: in RTL the
+minimizing and closing are announced through the announcer (polite). Start and end follow the writing direction: in RTL the
 start side is on the right, the arrows and the drop zones are mirrored. Narrow layouts stack side-by-side splits.
 
 ## Composed of
 
-Splitter (every split; horizontal or vertical, RTL aware), Tabs (every group), Portal (each panel's content lives in a
-Portal and moves between PortalTargets; the drag ghost is a drag layer). Motion engine for the drop preview, the drop
-and the maximize FLIP; command manager for the palette.
+Splitter (every split; horizontal or vertical, RTL aware), Tabs (every group: the tab icon, title, badge, "changed" dot
+and close mark, the Delete key, and the group buttons in its `actions` slot), IconButton (group buttons; maximize is a
+`pressed` toggle), OverflowText (a long tab title), ResizeHandle (the corner of a floating window), Toolbar + Button
+(the tray), Empty + Button (the empty state), Portal (each panel's content lives in a Portal and moves between
+PortalTargets). The drag behavior runs every pointer gesture (`pointerDrag`, `dragGhost` in the drag layer,
+`arrowStep`), the announcer speaks the changes, the motion engine plays the drop preview, the drop and the maximize
+FLIP, and the command manager feeds the palette.

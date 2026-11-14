@@ -2,16 +2,19 @@
 //   <JsonEditor bind:value={$config} mode="tree" schema={schema} />
 // Text: live parse errors with line / column, Format, Tab indents. Tree: TreeEditor (loaded the first time it is shown)
 // with type badges, inline editing and its own undo history. Both views check the same schema and `validate`.
+// Built from Textarea (text view), the pill strip of Tabs (TabList: the view switcher), Button and TreeEditor.
 import "../../../forms/editors.css";
 import "../../../ui/field.css";
-import "../../../ui/button.css";
 import "./json-editor.css";
-import { signal, computed, effect, untrack, reactive } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { lazy } from "../../../dom/lazy.ts";
-import { t, messages, dir } from "../../../core/i18n.ts";
+import { t, messages } from "../../../core/i18n.ts";
 import { cx, uid } from "../../../core/util.ts";
-import { model, ctl, syncValue, type ControlProps } from "../../../forms/util.ts";
+import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
+import { Textarea } from "../../forms/textarea/index.ts";
+import { Button } from "../../../ui/button.ts";
+import { TabList, type TabSpec } from "../../../ui/tabs.ts";
 import { validateJson, pointer, type JsonSchema, type JsonError } from "../tree-editor/json-path.ts";
 import tr from "./tr.ts";
 
@@ -112,39 +115,27 @@ export function JsonEditor(props: JsonEditorProps): unknown {
   };
   const c = ctl(props);
   const parsed = (): boolean => "value" in status();
-  const area = h("textarea", {
-    ...c, class: "hm-input hm-textarea hm-mono hm-json", rows: props.rows ?? 8, spellcheck: "false", autocomplete: "off", readonly: () => !!props.readonly,
-    "aria-invalid": () => (status().msg || c["aria-invalid"]() ? "true" : null),
-    "aria-describedby": () => [status().msg ? msgId : null, c["aria-describedby"]()].filter(Boolean).join(" ") || null,
-    onInput: (e: Event) => emit((e.target as HTMLTextAreaElement).value),
-    onKeyDown: (e: KeyboardEvent) => { if (e.key === "Tab" && !e.shiftKey && props.tabIndent !== false) { e.preventDefault(); const el = e.target as HTMLTextAreaElement, a = el.selectionStart ?? el.value.length, b = el.selectionEnd ?? a; el.value = el.value.slice(0, a) + "  " + el.value.slice(b); el.selectionStart = el.selectionEnd = a + 2; emit(el.value); } },
-  }) as HTMLTextAreaElement;
-  syncValue(area, text);
+  // the text view is a Textarea (mono, Tab indents); the parse / schema message joins the field's own description
+  const area = h(Textarea, {
+    id: c.id, name: props.name, value: text, onChange: emit, class: "hm-json", mono: true, autosize: false, rows: props.rows ?? 8, spellcheck: "false", autocomplete: "off",
+    tabIndent: live(() => props.tabIndent !== false), readonly: live(() => props.readonly), disabled: live(() => props.disabled), required: live(() => props.required),
+    invalid: live(() => !!status().msg || c["aria-invalid"]() === "true"), describedby: live(() => [status().msg ? msgId : null, c["aria-describedby"]()].filter(Boolean).join(" ") || null),
+    "aria-label": live(() => c["aria-label"]()), color: props.color, onBlur: props.onBlur, onFocus: props.onFocus,
+  });
   const format = (): void => { const st = status.peek(); if (!("value" in st)) return; emit(st.value == null ? "" : JSON.stringify(st.value, null, props.indent ?? 2)); };
 
   const LABEL: Record<JsonMode, () => string> = { text: () => L().text ?? t`Text`, tree: () => L().tree ?? t`Tree` };
-  const tabs = () => {
-    const list = modes();
-    if (list.length < 2) return null;
-    const pick = (m: JsonMode, focus = false): void => {
-      if (m === "tree" && !parsed()) return;
-      mode.set(m);
-      if (focus) globalThis.document?.getElementById(`${id}-tab-${m}`)?.focus();
-    };
-    return h("div", { role: "tablist", class: "hm-json-modes", "aria-label": () => L().view ?? t`JSON view` }, list.map((m) => h("button", {
-      type: "button", role: "tab", id: `${id}-tab-${m}`, class: "hm-json-mode", "aria-selected": () => String(mode() === m), "aria-controls": `${id}-panel`,
-      "aria-disabled": () => (m === "tree" && !parsed() ? "true" : null), title: () => (m === "tree" && !parsed() ? L().fixFirst ?? t`Fix the JSON to see the tree` : null),
-      tabindex: () => (mode() === m ? "0" : "-1"), onClick: () => pick(m),
-      onKeyDown: (e: KeyboardEvent) => {
-        const i = list.indexOf(mode.peek()), fwd = untrack(dir) === "rtl" ? "ArrowLeft" : "ArrowRight", back = fwd === "ArrowRight" ? "ArrowLeft" : "ArrowRight";
-        const j = e.key === fwd ? (i + 1) % list.length : e.key === back ? (i - 1 + list.length) % list.length : -1;
-        if (j >= 0) { e.preventDefault(); pick(list[j]!, true); }
-      },
-    }, () => LABEL[m]())));
-  };
+  // the view switcher: the pill tab strip; the tree tab stays reachable (it explains itself) but does nothing while the text is broken
+  const broken = (m: JsonMode): boolean => m === "tree" && !parsed();
+  const tabs = () => (modes().length < 2 ? null : h(TabList, {
+    variant: "pill", class: "hm-json-modes", label: () => L().view ?? t`JSON view`, value: mode, controls: `${id}-panel`, tabId: (m: string) => `${id}-tab-${m}`,
+    tabs: modes().map((m) => ({ id: m, label: LABEL[m], title: () => (broken(m) ? L().fixFirst ?? t`Fix the JSON to see the tree` : null) })),
+    tabProps: (tab: TabSpec) => ({ class: "hm-json-mode", "aria-disabled": () => (broken(tab.id as JsonMode) ? "true" : null) }),
+    onSelect: (m: string) => { if (!broken(m as JsonMode)) mode.set(m as JsonMode); },
+  }));
   const bar = h("div", { class: "hm-json-bar" },
     h("span", { id: msgId, class: () => (status().msg ? "hm-field-error" : "hm-help"), role: "status" }, () => status().msg ?? (text().trim() && props.status !== false ? L().valid ?? t`Valid JSON` : "")),
-    () => (props.readonly || props.format === false ? null : h("button", { type: "button", class: "hm-btn hm-btn-sm hm-json-format", disabled: () => !parsed(), onClick: format }, () => L().format ?? t`Format`)));
+    () => (props.readonly || props.format === false ? null : h(Button, { size: "sm", class: "hm-json-format", disabled: () => !parsed(), onClick: format }, () => L().format ?? t`Format`)));
   // re-drawn only when the view changes (typing keeps the same textarea and caret)
   const showTree = computed(() => mode() === "tree" && parsed());
   const body = () => {
@@ -152,7 +143,7 @@ export function JsonEditor(props: JsonEditorProps): unknown {
     return untrack(() => h(Tree, {
       value: status.peek().value, onChange: (v: unknown) => { const s = JSON.stringify(v, null, props.indent ?? 2); text.set(s); lastEmitted = v; set(v); },
       // live: switching read-only or disabled reaches the tree at once
-      schema: reactive(() => props.schema), readonly: reactive(() => props.readonly), disabled: reactive(() => props.disabled), expand: props.expand, label: L().treeName ?? t`JSON tree`,
+      schema: live(() => props.schema), readonly: live(() => props.readonly), disabled: live(() => props.disabled), expand: props.expand, label: L().treeName ?? t`JSON tree`,
       validate: props.validate ? (v: unknown) => { const m = props.validate!(v); return m ? [{ path: [], message: m }] : []; } : undefined,
     }));
   };

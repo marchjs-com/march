@@ -49,4 +49,5 @@ as a label. Time runs left to right in every writing direction.
 
 ## Composed of
 
-Built on the motion engine (`ease`, `defineEasing`, `onFrame`) and the drag behavior (`hadi-march/behaviors/drag`).
+Card (the frame), Field with NumberInput (the four numbers), Button (presets). Built on the motion engine (`ease`,
+`defineEasing`, `onFrame`) and the drag behavior (`hadi-march/behaviors/drag`).

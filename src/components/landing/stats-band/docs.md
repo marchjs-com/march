@@ -33,4 +33,4 @@ with CSS order only, so the reading order stays label → value.
 
 ## Composed of
 
-Counter, Reveal.
+StatTile (each item), Counter, Reveal.

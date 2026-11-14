@@ -108,3 +108,20 @@ test("Scheduler: own texts, parts off (toolbar, today, views, now line, hint), o
   assert.ok(d.querySelector(".hm-sch-toolbar") && !d.querySelector(".hm-segment"));
   m.dispose();
 });
+
+test("PeriodNav: previous / today / next, own texts; no today button without onToday", async () => {
+  const { PeriodNav } = await import("./period-nav.ts");
+  const log = [];
+  const m = mount(() => [
+    h(PeriodNav, { onPrev: () => log.push("p"), onNext: () => log.push("n"), onToday: () => log.push("t"), labels: { group: "Month", previous: "Back", today: "Now", next: "On" } }),
+    h(PeriodNav, { onPrev: () => {}, onNext: () => {} }),
+  ]);
+  const [a, b] = m.el.querySelectorAll("[role=group]");
+  assert.equal(a.getAttribute("aria-label"), "Month");
+  const btns = [...a.querySelectorAll("button")];
+  assert.deepEqual(btns.map((x) => x.getAttribute("aria-label") ?? x.textContent), ["Back", "Now", "On"]);
+  for (const x of btns) x.click();
+  assert.deepEqual(log, ["p", "t", "n"]);
+  assert.equal(b.querySelectorAll("button").length, 2);
+  m.dispose();
+});

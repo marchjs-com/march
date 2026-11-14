@@ -1,9 +1,6 @@
-/* ScrollProgress. One transformed fill; logical origin (RTL fills from the inline start too). */
-.hm-sprog { --hm-sprog-h: 3px; height: var(--hm-sprog-h); overflow: hidden; pointer-events: none; }
-.hm-sprog-fixed { position: fixed; inset-inline: 0; inset-block-start: var(--hm-site-nav-top, 0); z-index: calc(var(--hm-z-sticky) + 1); }
-.hm-sprog-inline { position: relative; border-radius: var(--hm-radius-full); background: var(--hm-surface-2); }
-.hm-sprog-fill { display: block; height: 100%; transform: scaleX(0); transform-origin: 0 50%; will-change: transform; }
-:dir(rtl) .hm-sprog-fill { transform-origin: 100% 50%; }
-.hm-sprog-gradient .hm-sprog-fill { background: var(--hm-brand-gradient); }
-.hm-sprog-accent .hm-sprog-fill { background: var(--hm-accent, var(--hm-primary)); }
-.hm-sprog[data-hm-color] .hm-sprog-fill { background: var(--hm-accent); }
+/* ScrollProgress. A Progress line: only its place (fixed / inline) and its paint are set here. */
+.hm-scroll-progress { pointer-events: none; }
+.hm-scroll-progress-fixed { position: fixed; inset-inline: 0; inset-block-start: var(--hm-site-nav-top, 0); z-index: calc(var(--hm-z-sticky) + 1); }
+.hm-scroll-progress-fixed .hm-progress2-track { border-radius: 0; }
+.hm-scroll-progress-inline { --hm-progress-track: var(--hm-surface-2); }
+.hm-scroll-progress-gradient:not([data-hm-color]) { --hm-progress-c: var(--hm-brand-gradient); }

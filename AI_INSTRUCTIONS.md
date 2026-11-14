@@ -584,28 +584,28 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| Accordion | stable | Stacked sections that open one at a time or several together: animated height, ↑ ↓ Home End between headers, separated or contained look. | — |
+| Accordion | stable | Stacked sections that open one at a time or several together: animated height, ↑ ↓ Home End between headers, separated or contained look. | Chevron |
 | AppShell | stable | The application frame: a sidebar column and the main area with optional banner and sticky header; a skip link; full width on narrow screens. | Layout |
 | BottomRightControls | stable | One fixed page corner (bottom, end side; mirrors in RTL) that page-wide controls put themselves into, in order, instead of overlapping. | — |
 | DevicePreview | experimental | Content as on a real phone or tablet: device body, notch, status bar, home indicator, real screen size, rotation; the mouse acts as a finger (drag to scroll, fling, long press). | OverlayScope |
-| Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | — |
+| Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | Chevron |
 | Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
-| Layout | stable | The frame all pages of an app share: content plus the page corner (BottomRightControls) with its back-to-top button; Page builds on it. | — |
+| Layout | stable | The frame all pages of an app share: content plus the page corner (BottomRightControls) with its back-to-top button; Page builds on it. | Button, Badge, Progress, ScrollToTop |
 | OverlayScope | stable | A box that keeps the layers opened inside it (drawers, dialogs, menus, toasts) inside it: previews, device frames, panels, demos. | — |
 | PanelHeader | experimental | The bar on top of (or under) a panel: lead, icon, title, subtitle, count, actions and a close button; sizes, divider, sticky, muted tone; usable as a drag handle. | IconButton |
 | ResizeHandle | experimental | The ready element of the resize-handle behavior: a strip on an edge or corner with one look (line, grip, colour); full separator with value + set, or a bare grip for an own gesture. | — |
 | Spacer | stable | A flexible gap in a row that pushes the following items to the end. | — |
-| Splitter | stable | Two resizable panes: drag the handle or use the arrow keys (mirrored in RTL), Home / End, Enter resets. | — |
+| Splitter | stable | Two resizable panes: drag the handle or use the arrow keys (mirrored in RTL), Home / End, Enter resets. | ResizeHandle |
 | Stack | stable | Layout primitives: Stack (a row or column with token gaps and alignment), Toolbar (a labelled bar of controls), Divider (a rule, labelled or vertical). | — |
-| StatusBar | experimental | Bottom strip of an editor or app: start / end items, text or buttons (actions or command ids), tones with a breathing busy dot, live announcements, low-priority items to a … menu when narrow. | Menu, Tooltip |
-| Window | stable | A movable, resizable window inside its area: dock to an edge, minimize, fill, close; Windows, Mac or HADİ look. | — |
+| StatusBar | experimental | Bottom strip of an editor or app: start / end items, text or buttons (actions or command ids), tones with a breathing busy dot, live announcements, low-priority items to a … menu when narrow. | Menu, Tooltip, StatusDot |
+| Window | stable | A movable, resizable window inside its area: dock to an edge, minimize, fill, close; Windows, Mac or HADİ look. | PanelHeader, IconButton, ResizeHandle |
 
 ### Typography — `hadi-march/typography`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | ClampText | experimental | Text folded to N lines with a "more" / "less" switch shown only when it does not fit; controlled or not, own texts, fold only. | Button |
-| CodeView | stable | Read-only code block: line numbers, syntax colours (js/ts/jsx/tsx, css, html, json, sh), wrap toggle and a copy button. | CopyButton |
+| CodeView | stable | Read-only code block: line numbers, syntax colours (js/ts/jsx/tsx, css, html, json, sh), wrap toggle and a copy button. | CopyButton, Button, PanelHeader |
 | Kbd | stable | Keyboard key: text, or a shortcut string (mod+k) written for the platform (Ctrl+K, ⌘K). | — |
 | OverflowText | stable | Text that scrolls only when it does not fit: hover, focus, always or while visible; bounce, loop or once; RTL-aware fade; Marquee is the endless ticker. | — |
 | SectionLabel | experimental | The small heading of a group inside a panel (menu, palette, sidebar, property grid): uppercase and faint, with an icon, a count and an actions slot. | — |
@@ -617,12 +617,12 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Button | stable | Button in six variants (one a link-like text button) and three sizes with icons, loading (locks and spins), a pressed toggle state, pill shape, router links (href) and block width; ActionButton draws an action() or a plain { label, run } with its guard, confirm and toasts. | — |
 | ButtonGroup | stable | Groups related buttons (role=group with a label), spaced or attached into one segmented strip; RTL keeps the rounded ends outside. | — |
 | Chevron | experimental | The arrow that turns when something opens: four directions, mirrored in RTL, follows the nearest aria-expanded ancestor or an `open` prop; own icon, smooth / spring / no motion. | — |
-| Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText |
-| CopyButton | stable | Copies text to the clipboard: a text or icon-only button that confirms (Copied) for a moment and reports failure with a toast. | — |
+| Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | OverflowText, IconButton |
+| CopyButton | stable | Copies text to the clipboard: a text or icon-only button that confirms (Copied) for a moment and reports failure with a toast. | Button, IconButton |
 | IconButton | stable | Icon-only button: the label is required and becomes its accessible name and title; four sizes, danger / solid / raised variants, round shape, a pressed toggle state, an inverse look for dark media, and href to draw a link. | — |
 | MadeWithMarch | stable | Optional credit line "Developed with March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
-| Menu | stable | Trigger button with a floating menu of items, links and action()s (separators, shortcuts, danger, permissions) and the full menu keyboard model; Dropdown floats any content. | — |
-| OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Menu, Tooltip |
+| Menu | stable | Trigger button with a floating menu of items, links and action()s (separators, shortcuts, danger, permissions) and the full menu keyboard model; Dropdown floats any content. | Button, IconButton, ListRow, Kbd, Divider |
+| OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | Button, IconButton, Divider, Menu, Tooltip |
 | ScrollToTop | stable | Back-to-top button: shows after the page is scrolled down, scrolls back on the motion engine; puts itself into BottomRightControls. | IconButton, BottomRightControls |
 | UndoRedo | experimental | The undo / redo button pair of an editor (IconButtons): fed by an undo stack or four props; the tooltip names the step and the shortcut. | IconButton |
 
@@ -630,23 +630,23 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| Calendar | stable | Month grid with full keyboard support, min / max, disabled days and range highlight. | — |
+| Calendar | stable | Month grid with full keyboard support, min / max, disabled days and range highlight. | IconButton |
 | Checkbox | stable | One drawn checkbox with its label: classic, soft, chip, card or toggle look, indeterminate state. | — |
 | CheckboxGroup | stable | Several checkboxes as one value (an array); any Checkbox look, per-option HADİ colors. | — |
 | ChoicePicker | stable | Single choice that picks its own look: segmented, chips, preview cards or a combobox, never a drop-down for a few values. | Segmented, RadioGroup, Combobox |
 | CodeInput | stable | One-time code / PIN boxes: typing advances, paste fills, HADİ colors and display font in the HADİ theme. | — |
-| ColorInput | stable | Native color swatch plus a #RRGGBB text field, kept in sync. | — |
-| Combobox | stable | Typeahead over static options or an async search (debounced, keyboard, aria-activedescendant). | OverflowText |
-| DatePicker | stable | Typed date in the locale's order with a Calendar popover; ISO value, never an invalid date. | Calendar |
+| ColorInput | stable | Native color swatch plus a #RRGGBB text field, kept in sync. | Swatch, TextInput |
+| Combobox | stable | Typeahead over static options or an async search (debounced, keyboard, aria-activedescendant). | Chip, ListRow |
+| DatePicker | stable | Typed date in the locale's order with a Calendar popover; ISO value, never an invalid date. | Calendar, IconButton, Popover |
 | DateRangePicker | stable | Date range { from, to } with presets (Segmented) and a custom pair of DatePickers. | Segmented, DatePicker |
 | DateTimeInput | stable | A DatePicker and a TimeInput editing one ISO timestamp in local time. | DatePicker, TimeInput |
-| FileUpload | stable | Drop zone or click; accept / size checks, image and audio previews, upload progress and cancel. | Progress, OverflowText |
-| KeyValueEditor | stable | Edit key → value rows as an object; order kept, duplicate keys flagged, numbers on request. | — |
-| ListEditor | stable | Edit a list of strings: add, edit, reorder, remove; pasted lines become items. | — |
+| FileUpload | stable | Drop zone or click; accept / size checks, image and audio previews, upload progress and cancel. | Progress, ListRow, IconButton, Button, Badge |
+| KeyValueEditor | stable | Edit key → value rows as an object; order kept, duplicate keys flagged, numbers on request. | TextInput, RowTools, Button |
+| ListEditor | stable | Edit a list of strings: add, edit, reorder, remove; pasted lines become items. | TextInput, RowTools, Button |
 | MultiSelect | stable | Several values as removable chips: a Combobox with multiple (static options or async search). | Combobox |
 | NumberInput | stable | Locale-aware number (never NaN) with IntInput, MoneyInput (currency side and decimals) and PercentInput. | — |
-| OptionList | experimental | A list of choices inside a panel: radio group, listbox (one or many) or command menu; rows with lead, label, hint, trailing part and tick; arrow keys, or driven by a field (aria-activedescendant). | SectionLabel |
-| PasswordInput | stable | Password field with a show / hide button (aria-pressed). | — |
+| OptionList | experimental | A list of choices inside a panel: radio group, listbox (one or many) or command menu; rows with lead, label, hint, trailing part and tick; arrow keys, or driven by a field (aria-activedescendant). | ListRow, SectionLabel |
+| PasswordInput | stable | Password field with a show / hide button (aria-pressed). | Button |
 | PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | — |
 | RadioGroup | stable | Radio buttons for one value; classic, soft, chip, card or segmented look. | — |
 | Rating | stable | Star rating as a radio group: arrow keys (RTL mirrored), hover preview, half stars when read-only, any colour token. | — |
@@ -666,33 +666,33 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Badge | stable | Small status label in a tone, a dot badge, or a count badge (hidden at 0, 120 → 99+) with an accessible label; a pulsing dot, a mini size and a clickable (button) form. | StatusDot |
-| Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | — |
-| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | Chip, Menu, FilterControl, CellEditor |
-| Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | — |
+| Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | PanelHeader |
+| DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | SearchBox, Button, Chip, Menu, Checkbox, Chevron, Badge, ResizeHandle, Empty, FilterControl, CellEditor |
+| Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | ListRow, ResizeHandle, Badge |
 | IconTile | stable | An icon in a tinted rounded square: a tone or any theme colour token; soft, outline or solid; square or round. | — |
-| JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | — |
-| Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | — |
+| JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | Chevron |
+| Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | PanelHeader, StatusDot, Badge |
 | KeyValue | stable | Definition list for detail views: label / value rows in 1–4 columns, hints, hidden rows and a placeholder for empty values. | — |
 | ListRow | experimental | The row lists are made of: lead (icon, avatar, dot, thumbnail) + title + sub text + trail and actions; a link, a button or a plain element that takes any role, ARIA and tabindex; active, selected, disabled; long text scrolls, is cut or wraps. | OverflowText |
-| Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | Button, IconButton, ButtonGroup, Segmented |
+| Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | PanelHeader, Button, IconButton, ButtonGroup, Segmented, ResizeHandle |
 | StatTile | experimental | A value with its label and an optional hint: plain, soft tile or card; a button with onClick, a link with href, dt / dd inside a dl; the value may be a node (a rolling Counter). | — |
 | TimeRuler | experimental | The ruler above a timeline: ticks, time labels and a playhead; read-only, or draggable with a slider playhead (onSeek). Own tick distances, labels, head and colour. | — |
-| Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | — |
-| Tree | stable | Expandable tree (role=tree) with icons, trailing meta, selection and the full keyboard model; long labels scroll with OverflowText. | OverflowText |
-| TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | Spinner |
+| Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | StatusDot |
+| Tree | stable | Expandable tree (role=tree) with icons, trailing meta, selection and the full keyboard model; long labels scroll with OverflowText. | ListRow, Chevron, OverflowText |
+| TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | ListRow, Chevron, Spinner, Button, Badge, Empty |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
 ### Feedback — `hadi-march/feedback`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| Alert | stable | A message in one of five tones (info, success, warn, danger, neutral) with an optional title, icon and dismiss button; Notice is an alias. | — |
-| CheckMark | experimental | The yes / no / partly mark (✓ ✕ –) with its accessible text: plain, soft or solid disc, own glyphs and texts, colour from the value or a token. | — |
-| Empty | stable | Empty state: an icon, a title, a line of text and the next step (actions), so an empty screen says what to do. | — |
-| ErrorBox | stable | What went wrong, in words (an Error, a message or any value), with an optional title and a retry button. | — |
-| Loader | stable | A full-area loading state (a large spinner and a line of text), inline or over its container; bootLoader hides the static boot screen. | — |
+| Alert | stable | A message in one of five tones (info, success, warn, danger, neutral) with an optional title, icon and dismiss button; Notice is an alias. | IconButton |
+| CheckMark | experimental | The yes / no / partly mark (✓ ✕ –) with its accessible text: plain, soft or solid disc, own glyphs and texts, colour from the value or a token, and a transition when the value changes (flip, fade, pop, draw or your own). | — |
+| Empty | stable | Empty state: an icon, a title, a line of text and the next step (actions), so an empty screen says what to do. | IconTile |
+| ErrorBox | stable | What went wrong, in words (an Error, a message or any value), with an optional title and a retry button. | Alert, Button |
+| Loader | stable | A full-area loading state (a large spinner and a line of text), inline or over its container; bootLoader hides the static boot screen. | Spinner |
 | Progress | stable | A progress bar: a value or indeterminate, tones, three sizes, a label with the percentage; brand colours as a gradient, segments or a flowing cycle; a thin line driven from outside, and equal parts with a timed fill. | — |
-| PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | — |
+| PullToRefresh | experimental | Pull a scroll area down (touch or mouse) past a threshold to run an async refresh; spinning indicator, keyboard button, live status. | Button |
 | Skeleton | stable | Placeholder lines or a block in the shape of the content on its way, so nothing jumps when it arrives; brand or single-colour shimmer. | — |
 | Spinner | stable | A turning ring while something loads: three sizes, one colour or the theme's several (brand), an accessible label. | — |
 | StatusDot | experimental | A small dot in a tone or theme colour, still or pulsing (ring / blink); an image with a label, decoration without one. | — |
@@ -702,31 +702,31 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | ContextMenu | experimental | Right-click / Shift+F10 menu anchored to the pointer: the same items, actions and keyboard as Menu, chosen per target. | — |
-| Dialog | stable | Modal dialog: declarative <Dialog open> or openDialog() / openDrawer() returning a promise, plus confirm, prompt and askReason; focus trap, Escape, stacking. | Portal |
+| Dialog | stable | Modal dialog: declarative <Dialog open> or openDialog() / openDrawer() returning a promise, plus confirm, prompt and askReason; focus trap, Escape, stacking. | Portal, PanelHeader, IconButton, Button, Field, TextInput, Textarea, Select, Drawer |
 | Drawer | experimental | Sheet from start / end / top / bottom (RTL-aware): drag to close, snap points, modal or non-modal; motion-engine animation. | Portal, Dialog |
 | Popover | experimental | A trigger and a floating panel: placed beside the trigger, closed by an outside press or Escape, focus in and back; own or controlled open state, title bar, footer, entrance choices. | PanelHeader, Button |
-| Toast | stable | Short, non-blocking messages: toast(message, { kind, action, timeout }) returns an id; undo actions, up to five stacked, a host mounts itself. | Portal |
+| Toast | stable | Short, non-blocking messages: toast(message, { kind, action, timeout }) returns an id; undo actions, up to five stacked, a host mounts itself. | Portal, Button, IconButton |
 | Tooltip | stable | Short hint on hover (after a delay) and on keyboard focus, positioned by the popover engine and linked with aria-describedby; Esc hides it. | — |
 
 ### Navigation — `hadi-march/navigation`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| ActivityBar | experimental | Editor icon bar that switches the side view: a tablist with a gliding indicator, count badges, end items, collapse by choosing the active view again; vertical or horizontal, RTL aware. | Badge, Tooltip |
-| Breadcrumbs | experimental | Path bar: links, buttons or sibling menus per crumb; the middle collapses into a … menu when narrow; separators mirrored in RTL. | Menu |
+| ActivityBar | experimental | Editor icon bar that switches the side view: a tablist with a gliding indicator, count badges, end items, collapse by choosing the active view again; vertical or horizontal, RTL aware. | Tabs, Badge, Tooltip |
+| Breadcrumbs | experimental | Path bar: links, buttons or sibling menus per crumb; the middle collapses into a … menu when narrow; separators mirrored in RTL. | Button, Menu, OverflowText |
 | LinkCard | stable | A card that is one link: icon tile (or own lead), title, description, a small text at the end and an arrow on hover. | IconTile, OverflowText, Link |
-| NavMenu | stable | Sidebar navigation for apps: collapsible groups, pinned and recent items, a filter box, the active item from the router; a drawer on narrow screens. | Badge, OverflowText |
+| NavMenu | stable | Sidebar navigation for apps: collapsible groups, pinned and recent items, a filter box, the active item from the router; a drawer on narrow screens. | ListRow, IconButton, SearchBox, Badge, Chevron, SectionLabel, Empty |
 | PageDots | experimental | One dot per page, the current one longer and coloured: buttons with arrow keys when it has onChange, a position sign otherwise; own names, colour, size and dot content. | — |
-| Pagination | stable | Numbered pages with ellipses and Previous / Next (the current page marked for screen readers), or a simple Previous / Next pager that also works without a page count. | Button, Select |
+| Pagination | stable | Numbered pages with ellipses and Previous / Next (the current page marked for screen readers), or a simple Previous / Next pager that also works without a page count. | Button, IconButton, Select |
 | Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
 | Steps | stable | Progress through stages: done, current and upcoming steps with titles and descriptions; clickable when onSelect is given; horizontal or vertical. | — |
-| Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), icons, badges, closable and changed tabs, an actions slot, a line or pill look, the active tab optionally kept in the URL. | Badge |
+| Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), icons, badges, closable and changed tabs, an actions slot, a line or pill look, the active tab optionally kept in the URL. | Badge, StatusDot |
 
 ### Media — `hadi-march/media`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| Carousel | stable | Scroll-snap carousel: one to four slides per view, previous / next buttons and dots, swipe on touch, one slide on phones. | — |
+| Carousel | stable | Scroll-snap carousel: one to four slides per view, previous / next buttons and dots, swipe on touch, one slide on phones. | IconButton, PageDots |
 | CornerMark | experimental | A small round mark in a corner of a picture, card or avatar (video sign, open arrow, add badge): corner, icon, colour, size, look, shown always or on hover. | — |
 | Media | stable | An image, video or audio element that fits its container (kind from the extension), a text fallback when loading fails; openMedia() shows it in a dialog. | Dialog |
 | Overlay | stable | A decorative layer inside its container: an image, a muted looping video, an SVG, a canvas drawing or a CSS effect (glass, mesh, noise …); never takes input. | — |
@@ -736,7 +736,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| EasingCurveEditor | experimental | Cubic-bezier easing editor: draggable handles, the engine's named curves as presets, live preview on the motion engine clock, registers the curve by name (defineEasing). | — |
+| EasingCurveEditor | experimental | Cubic-bezier easing editor: draggable handles, the engine's named curves as presets, live preview on the motion engine clock, registers the curve by name (defineEasing). | Card, Button, NumberInput |
 
 ### Social — `hadi-march/social`
 
@@ -744,81 +744,81 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 |---|---|---|---|
 | Avatar | stable | A person's picture, or initials on a colour taken from the name when there is no image; own text, icon, colour, shape and accessible name. | — |
 | AvatarGroup | stable | Overlapping avatars with a "+N" bubble for the people that do not fit; own bubble, spacing, colour and shape. | Avatar |
-| ChatBubble | experimental | Chat message: Aktivite gradient (mine) or card (theirs), run corners with a tail, sender color, reply quote, emoji-only size, time and ticks, reaction chips, drag to reply. | — |
+| ChatBubble | experimental | Chat message: Aktivite gradient (mine) or card (theirs), run corners with a tail, sender color, reply quote, emoji-only size, time and ticks, reaction chips, drag to reply. | Button, IconButton |
 | CountRoll | experimental | Odometer number: only the changed digits roll (up when it grows, down when it shrinks), compact in the active locale. | — |
-| FollowButton | experimental | Follow → Following / Requested with a morph: the pill's width springs, fill turns into outline, + turns into a tick, a four-color burst on follow; red hover before unfollow. | — |
-| LikeButton | experimental | Heart toggle: spring pop, ring and a four-color HADİ particle burst on the motion engine; rolling count; heartBurst() for any element. | CountRoll |
-| MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton |
-| ReactionPicker | experimental | Emoji row (reactions) or grid (emoji panel): pop-in with staggered emoji, picked one on a soft circle, arrow keys (RTL mirrored), optional +. | — |
-| StoryProgress | experimental | Segmented story bars: done, current filling over its duration on the motion engine (pause holds it), onDone when full; RTL fills from the right. | — |
-| StoryRing | experimental | Avatar in a story ring: new (four HADİ colors), seen, close friends, none; + badge, turning ring while loading, label for story trays. | Avatar |
-| TypingIndicator | experimental | Three dots lifting in turn (motion engine) and an optional "… is typing" line; a polite status for screen readers. | — |
+| FollowButton | experimental | Follow → Following / Requested with a morph: the pill's width springs, fill turns into outline, + turns into a tick, a four-color burst on follow; red hover before unfollow. | Button |
+| LikeButton | experimental | Heart toggle: spring pop, ring and a four-color HADİ particle burst on the motion engine; rolling count; heartBurst() for any element. | CountRoll, Button |
+| MediaGrid | experimental | Post photos: 1 at its own shape, 2 side by side, 3 big + stacked, 4 as 2×2, more with +N; Skeleton until loaded; tap opens, double tap likes. | Skeleton, CornerMark, Picture |
+| ReactionPicker | experimental | Emoji row (reactions) or grid (emoji panel): pop-in with staggered emoji, picked one on a soft circle, arrow keys (RTL mirrored), optional +. | IconButton |
+| StoryProgress | experimental | Segmented story bars (a line Progress): done, current filling over its duration on the motion engine (pause holds it), onDone when full; RTL fills from the right. | Progress |
+| StoryRing | experimental | Avatar in a story ring: new (four HADİ colors), seen, close friends, none; + badge, turning ring while loading, label for story trays. | Avatar, CornerMark |
+| TypingIndicator | experimental | Three dots lifting in turn (motion engine) and an optional "… is typing" line; a polite status for screen readers. | StatusDot |
 | VerifiedMark | experimental | The verified-account badge beside a name: an image with an accessible name; own icon, text, colour and size. | — |
 
 ### Composite — `hadi-march/composite`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText |
-| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, ReactionPicker |
-| ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | ChatBubble, TypingIndicator, ReactionPicker, Avatar |
-| ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented |
-| CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, OverflowText |
-| ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, Dialog, Toggle |
-| DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, Portal |
-| Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | PullToRefresh, VirtualList, PostCard, Skeleton |
-| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | ContextMenu, IconButton, OverflowText, Field, TextInput, NumberInput, Select, Toggle, Button, FlowControls, FlowPalette, Tabs, Textarea |
-| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, Chip, OverflowText |
-| FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, OverflowText |
-| GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | ColorPicker, Segmented, IconButton |
-| ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | Segmented, Slider, IconButton |
-| JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | TreeEditor |
-| KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | EasingCurveEditor, IconButton, Segmented |
-| MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Toolbar, IconButton, RichTextEditor |
-| NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | OverflowText, Link |
-| PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, MediaGrid, LikeButton, CountRoll |
-| ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | StoryRing, FollowButton, CountRoll, Button, Menu |
-| PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
-| RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar |
-| StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, StoryProgress, LikeButton |
-| Terminal | experimental | Extensible command line: typed commands, sub-commands and async handlers (Ctrl+C), ANSI colors, tables, JSON, progress; history, completion, themable colors. | JsonView, Window |
-| ThemeEditor | experimental | Theme builder: color tokens for light and dark with a WCAG audit, type, shape and motion, a live scoped preview, code / CSS / JSON out. | ColorPicker, EasingCurveEditor, Tabs, Segmented, Slider, Select, TextInput, Textarea, Toggle, Button, IconButton, CopyButton, Badge, ThemeSwatch, CodeView, Alert, Card, Checkbox, Chip, Progress, Avatar |
-| ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText |
-| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle |
-| Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress |
+| BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText, ListRow, Drawer |
+| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, ReactionPicker, IconButton, StatusDot |
+| ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | ChatBubble, TypingIndicator, ReactionPicker, Avatar, Button, Picture |
+| ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented, Badge, SectionLabel, Slider, Swatch, TextInput |
+| CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | Dialog, SearchBox, ListRow, SectionLabel, Empty, Kbd, OverflowText |
+| ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | Button, Card, Dialog, Toggle, Stack, Empty |
+| DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | Splitter, Tabs, IconButton, Button, Empty, Toolbar, ResizeHandle, OverflowText, Portal |
+| Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | PullToRefresh, VirtualList, PostCard, Skeleton, Button, Empty, StatusDot |
+| FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | ContextMenu, IconButton, Toolbar, OverflowText, IconTile, StatusDot, CheckMark, Alert, Field, TextInput, NumberInput, Select, Toggle, Button, CopyButton, UndoRedo, JsonEditor, FlowControls, FlowPalette, Tabs |
+| FlowControls | experimental | Run / pause / step / reset a flow with speed and state; runner (createFlowRunner) drives glow, shake and edge counters; FlowTimeline records the run. | Button, IconButton, Segmented, Chip, Card, TimeRuler, ListRow, Badge, Empty |
+| FlowPalette | experimental | Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add. | SearchBox, OverflowText, ListRow, IconTile, SectionLabel, Empty |
+| GradientEditor | experimental | CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy. | ColorPicker, Card, Stack, Segmented, IconButton, Swatch, NumberInput, CopyButton |
+| ImageCropper | experimental | Image cropper: centered resizable frame, pan, zoom (wheel, slider, keys), 90° and fine rotation, mirror, aspect ratios; the image always covers the frame; canvas / Blob output. | Card, Segmented, Slider, IconButton |
+| JsonEditor | experimental | JSON as text (parse errors with line / column, Format) or as a tree (TreeEditor, loaded on first use); one schema checks both views. | TreeEditor, Textarea, Button, Tabs |
+| KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | EasingCurveEditor, Card, TimeRuler, ListRow, StatusDot, IconButton, Segmented, NumberInput |
+| MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | Splitter, Tabs, PanelHeader, Toolbar, IconButton, RichTextEditor |
+| NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | ListRow, SearchBox, PanelHeader, SectionLabel, IconButton, Button, Badge, Chevron, Empty, ResizeHandle |
+| PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | Avatar, Menu, MediaGrid, LikeButton, CountRoll, Button, ClampText, ListRow, VerifiedMark |
+| ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | StoryRing, FollowButton, CountRoll, Button, Menu, Picture, StatTile, VerifiedMark |
+| PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | Disclosure, SearchBox, PanelHeader, UndoRedo, IconButton, Button, Badge, StatusDot, SectionLabel, Empty, TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea |
+| RichTextEditor | experimental | Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history. | Toolbar, IconButton, Avatar, PanelHeader, Popover, OptionList, Field, TextInput |
+| StoryViewer | experimental | Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton. | Dialog, Avatar, StoryProgress, LikeButton, IconButton, ListRow, Picture, TextInput |
+| Terminal | experimental | Extensible command line: typed commands, sub-commands and async handlers (Ctrl+C), ANSI colors, tables, JSON, progress; history, completion, themable colors. | JsonView, Window, Progress, Spinner |
+| ThemeEditor | experimental | Theme builder: color tokens for light and dark with a WCAG audit, type, shape and motion, a live scoped preview, code / CSS / JSON out. | ColorPicker, EasingCurveEditor, Tabs, Segmented, Slider, Select, TextInput, Textarea, Toggle, Field, Button, UndoRedo, CopyButton, Badge, PanelHeader, SectionLabel, ListRow, Swatch, Stack, ThemeSwatch, CodeView, Alert, Card, Checkbox, Chip, Progress, Avatar |
+| ThemeMenu | stable | One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color. | Dropdown, ThemeSwatch, OverflowText, SectionLabel |
+| TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle, TextInput, SearchBox, OptionList, Chevron, UndoRedo, Empty, PanelHeader, Popover |
+| Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress, Button, Alert |
 
 ### Landing — `hadi-march/landing`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| BeforeAfter | experimental | Before / after comparison: two layers and a divider you drag, press, follow with the pointer or move with the keyboard; vertical or horizontal, RTL mirrored. | — |
-| BranchingStory | experimental | Choose-your-own-path story: passages with choices, a trail that rewinds, endings found counter, 3D page turns, keys 1–9. | — |
-| Counter | experimental | Animated number: counts up when visible, glides to new values, or rolls each digit like an odometer; Intl formatted. | — |
-| CtaBand | experimental | Call-to-action panel: title, lead, actions over gradient, mesh, glass, plain or video; pointer light; scales in. | SiteSection, Overlay, Reveal, VideoBackground |
-| Faq | experimental | Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking. | Accordion, SearchBox, Reveal |
+| BeforeAfter | experimental | Before / after comparison: two layers and a divider you drag, press, follow with the pointer or move with the keyboard; vertical or horizontal, RTL mirrored. | Badge |
+| BranchingStory | experimental | Choose-your-own-path story: passages with choices, a trail that rewinds, endings found counter, 3D page turns, keys 1–9. | Badge, Button, Kbd, ListRow |
+| Counter | experimental | Animated number: counts up when visible, glides to new values, or rolls each digit like an odometer; Intl formatted. | CountRoll |
+| CtaBand | experimental | Call-to-action panel: title, lead, actions over gradient, mesh, glass, plain or video; pointer light; scales in. | SiteSection, Overlay, Reveal, VideoBackground, SectionHead |
+| Faq | experimental | Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking. | Accordion, SearchBox, Empty, SectionHead |
 | FeatureGrid | experimental | Product features as cards (pointer light), plain, a two-column list or a bento grid of mixed tile sizes; staggered entrance. | Grid, Card, IconTile, Reveal |
-| Hero | experimental | First screen in seven looks (centered, split, video, mesh, aurora, product, parallax): eyebrow, gradient-highlight title, lead, actions. | Reveal, Overlay, Button, Badge, VideoBackground, Parallax |
-| HonestCompare | experimental | Comparison table that also shows where the product is behind: scored rows, ahead / even / behind summary, a filter for the losing rows and visible notes. | — |
-| HorizontalScroll | experimental | Pinned section whose panels slide sideways while the page scrolls down; progress line; native snap scroller on touch. | — |
-| LiveCounter | experimental | A number that grows while you watch: fed by a signal or simulated with a rate per minute on the motion clock (only while visible); odometer digits and a live dot. | Counter |
-| LiveFeed | experimental | Living wall: new activity slides in, the oldest leaves; pulls from next() on the motion clock while visible, pauses on hover, focus or the Pause button. | — |
-| LogoCloud | experimental | Trusted-by logos as an equal grid or an endless Marquee ticker; one muted tone, full colour on hover. | Marquee, Grid, Reveal |
-| Newsletter | experimental | Email sign-up, inline or stacked: validation, busy button, success check that pops in, error shake and announcement. | TextInput, Button |
-| NotForYou | experimental | Anti-landing block: who the product is not for (and who it is for); the visitor can mark the lines that apply and gets an honest verdict. | — |
+| Hero | experimental | First screen in seven looks (centered, split, video, mesh, aurora, product, parallax): eyebrow, gradient-highlight title, lead, actions. | Reveal, Overlay, Badge, VideoBackground, Parallax, Picture, SectionHead |
+| HonestCompare | experimental | Comparison table that also shows where the product is behind: scored rows, ahead / even / behind summary, a filter for the losing rows and visible notes. | Badge, Button, CheckMark |
+| HorizontalScroll | experimental | Pinned section whose panels slide sideways while the page scrolls down; progress line; native snap scroller on touch. | Progress |
+| LiveCounter | experimental | A number that grows while you watch: fed by a signal or simulated with a rate per minute on the motion clock (only while visible); odometer digits and a live dot. | Counter, Badge, StatusDot |
+| LiveFeed | experimental | Living wall: new activity slides in, the oldest leaves; pulls from next() on the motion clock while visible, pauses on hover, focus or the Pause button. | Avatar, Button, ListRow, StatusDot |
+| LogoCloud | experimental | Trusted-by logos as an equal grid or an endless Marquee ticker; one muted tone, full colour on hover. | Marquee, Grid, Picture, Reveal |
+| Newsletter | experimental | Email sign-up, inline or stacked: validation, busy button, success check that pops in, error shake and announcement. | TextInput, Button, CheckMark, SectionHead |
+| NotForYou | experimental | Anti-landing block: who the product is not for (and who it is for); the visitor can mark the lines that apply and gets an honest verdict. | CheckMark, ListRow |
 | Parallax | experimental | Layered depth: every layer (image or node) moves at its own scroll speed and, optionally, with the mouse; transform only. | Overlay |
-| Presentation | experimental | Slides: keys, wheel, swipe, step-by-step fragments, slide / fade / zoom, full screen, URL index, speaker window (cross-tab), print. | IconButton |
-| Pricing | experimental | Plans with a monthly / yearly switch: prices roll like an odometer, the switch thumb slides, the featured plan glows. | Card, Badge, Segmented, Counter, Reveal |
-| ProjectDetail | experimental | One project: title, facts (KeyValue, service Chips), shared-element cover, story, Lightbox gallery, next project. | Button, KeyValue, Chip, openMedia, Reveal |
-| ProjectGrid | experimental | Portfolio covers with filter Chips: FLIP re-layout on filter, open into ProjectDetail (shared element) or the Lightbox. | Card, Chip, openMedia, Reveal |
+| Presentation | experimental | Slides: keys, wheel, swipe, step-by-step fragments, slide / fade / zoom, full screen, URL index, speaker window (cross-tab), print. | IconButton, Progress, Toolbar |
+| Pricing | experimental | Plans with a monthly / yearly switch: prices roll like an odometer, the switch thumb slides, the featured plan glows. | Card, Badge, Segmented, Counter, CheckMark, Reveal |
+| ProjectDetail | experimental | One project: title, facts (KeyValue, service Chips), shared-element cover, story, Lightbox gallery, next project. | Button, KeyValue, Chip, openMedia, Reveal, Picture, SectionHead |
+| ProjectGrid | experimental | Portfolio covers with filter Chips: FLIP re-layout on filter, open into ProjectDetail (shared element) or the Lightbox. | Card, Chip, openMedia, CornerMark, Picture, Reveal |
 | Reveal | experimental | Scroll entrance for any block: fade, rise, slide (RTL mirrored), scale, blur, flip; stagger; scrub follows the scroll. | — |
-| Roadmap | experimental | Timeline whose line fills with the scroll: done / now / next statuses, passed dots light up; roadmaps, stories, work history. | Timeline, Badge, Reveal |
-| ScrollProgress | experimental | Reading progress bar for the page or one article: fixed or inline, brand gradient or accent, RTL aware, a progressbar. | — |
-| ScrollStory | experimental | Scrollytelling: pinned media column, steps scroll past, the active step's media cross-fades and the section takes its colour. | — |
+| Roadmap | experimental | Timeline whose line fills with the scroll: done / now / next statuses, passed dots light up; roadmaps, stories, work history. | Timeline, Badge, Progress, Reveal |
+| ScrollProgress | experimental | Reading progress bar for the page or one article: fixed or inline, brand gradient or accent, RTL aware, a progressbar. | Progress |
+| ScrollStory | experimental | Scrollytelling: pinned media column, steps scroll past, the active step's media cross-fades and the section takes its colour. | PageDots |
 | SectionHead | experimental | The heading group of a page section: eyebrow, title, lead, actions and a note; alignment, title level and scale, optional entrance on scroll. | Button, Reveal |
 | SiteFooter | experimental | Website footer: brand and about line, link columns, social links, optional Newsletter, legal row, back-to-top, big wordmark. | Brand, Newsletter, IconButton |
 | SiteNav | experimental | Website top bar: sticky, transparent-to-glass or floating pill, shrinks and hides on scroll, sliding link pill, Drawer menu on phones. | Brand, IconButton, openDrawer |
-| SiteSection | experimental | Frame of every website block: width, rhythm, tone (plain, muted, inverse, brand) and an eyebrow / title / lead heading that reveals. | Reveal |
-| StatsBand | experimental | Row of big numbers that count up (or roll) when visible, with labels and notes; plain, divided or cards. | Counter, Reveal |
-| Testimonials | experimental | Customer quotes as a grid, two drifting Marquee rows, a masonry wall with Show more, or a Carousel; Avatar and Rating. | Card, Avatar, Rating, Marquee, Carousel, Button, Reveal |
+| SiteSection | experimental | Frame of every website block: width, rhythm, tone (plain, muted, inverse, brand) and an eyebrow / title / lead heading that reveals. | SectionHead |
+| StatsBand | experimental | Row of big numbers that count up (or roll) when visible, with labels and notes; plain, divided or cards. | Counter, Reveal, StatTile |
+| Testimonials | experimental | Customer quotes as a grid, two drifting Marquee rows, a masonry wall with Show more, or a Carousel; Avatar and Rating. | Card, Avatar, Rating, Marquee, Carousel, Button, ListRow, Reveal |
 | VideoBackground | experimental | Muted looping video behind content: poster first (and on save-data / reduced motion), plays only while visible, readable tint, pause button. | Overlay, IconButton |
 <!-- components:end -->

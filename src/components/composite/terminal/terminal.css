@@ -43,9 +43,10 @@
 .hm-term-table { border-collapse: collapse; margin-block: .2em; }
 .hm-term-table th, .hm-term-table td { padding: 0 1.4em 0 0; text-align: start; vertical-align: top; }
 .hm-term-table th { color: var(--hm-term-c8); font-weight: 600; }
-.hm-term-bar { display: inline-block; inline-size: 12em; block-size: .6em; border-radius: 999px; background: color-mix(in srgb, var(--hm-term-fg) 15%, transparent); vertical-align: middle; overflow: hidden; }
-.hm-term-bar-fill { display: block; block-size: 100%; inline-size: 0; background: var(--hm-term-c2); transition: inline-size var(--hm-dur) var(--hm-ease); }
-.hm-term-spin { display: inline-block; inline-size: .8em; block-size: .8em; border: 2px solid currentColor; border-inline-end-color: transparent; border-radius: 50%; vertical-align: -.1em; animation: hm-spin var(--hm-dur-slow) linear infinite; }
+/* io.progress / io.spinner: Progress and Spinner inside a line, in the terminal's colours */
+.hm-term-bar.hm-progress2 { --hm-progress-h: .6em; --hm-progress-c: var(--hm-term-c2); display: inline-flex; inline-size: 12em; vertical-align: middle; }
+.hm-term-bar .hm-progress2-track { background: color-mix(in srgb, var(--hm-term-fg) 15%, transparent); }
+.hm-term-spin.hm-loading { inline-size: .8em; block-size: .8em; vertical-align: -.1em; }
 .hm-term .hm-json { font-size: inherit; }
 /* palette */
 .hm-term-fg-0 { color: var(--hm-term-c0); } .hm-term-fg-1 { color: var(--hm-term-c1); } .hm-term-fg-2 { color: var(--hm-term-c2); } .hm-term-fg-3 { color: var(--hm-term-c3); }
@@ -56,7 +57,7 @@
 .hm-term-bg-4 { background: var(--hm-term-c4); } .hm-term-bg-5 { background: var(--hm-term-c5); } .hm-term-bg-6 { background: var(--hm-term-c6); } .hm-term-bg-7 { background: var(--hm-term-c7); }
 .hm-term-bg-8 { background: var(--hm-term-c8); } .hm-term-bg-9 { background: var(--hm-term-c9); } .hm-term-bg-10 { background: var(--hm-term-c10); } .hm-term-bg-11 { background: var(--hm-term-c11); }
 .hm-term-bg-12 { background: var(--hm-term-c12); } .hm-term-bg-13 { background: var(--hm-term-c13); } .hm-term-bg-14 { background: var(--hm-term-c14); } .hm-term-bg-15 { background: var(--hm-term-c15); }
-@media (prefers-reduced-motion: reduce) { .hm-term-caret.is-blinking { animation: none; } .hm-term-spin { animation-duration: calc(var(--hm-dur-slow) * 3); } .hm-term-bar-fill { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .hm-term-caret.is-blinking { animation: none; } }
 
 /* auto: charcoal with a hint of the theme color, light text, a palette lifted for a dark ground */
 .hm-term-auto {

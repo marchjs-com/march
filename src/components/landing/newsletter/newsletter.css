@@ -1,7 +1,7 @@
 /* Newsletter. Inline: one row that wraps on narrow screens; the success line replaces the form. */
 .hm-nl { display: flex; flex-direction: column; gap: var(--hm-space-2); min-width: 0; max-width: 32rem; }
-.hm-nl-title { margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); }
-.hm-nl-lead { margin: 0; color: var(--hm-muted); line-height: 1.55; }
+/* title and lead are a SectionHead (sm); the form keeps its own smaller title */
+.hm-nl .hm-nl-head .hm-section-head-title { font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); letter-spacing: normal; }
 .hm-nl-form { display: flex; gap: var(--hm-space-2); min-width: 0; }
 .hm-nl-field { flex: 1 1 12rem; min-width: 0; }
 .hm-nl-field input { width: 100%; }
@@ -11,7 +11,5 @@
 .hm-nl-msg { margin: 0; min-height: 1.25em; font-size: var(--hm-text-sm); color: var(--hm-danger-text, var(--hm-danger)); }
 .hm-nl-note { margin: 0; font-size: var(--hm-text-xs); color: var(--hm-muted); }
 .hm-nl-done { display: flex; align-items: center; gap: var(--hm-space-2); margin: 0; min-height: var(--hm-control-h); font-weight: var(--hm-weight-medium); }
-.hm-nl-check { display: inline-grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--hm-success); color: var(--hm-on-success-fill, var(--hm-inverse-text)); flex: none; }
-.hm-nl-check .hm-svg { width: 1rem; height: 1rem; }
 @media (max-width: 420px) { .hm-nl-inline .hm-nl-form { flex-direction: column; } .hm-nl-inline .hm-nl-field { flex-basis: auto; } }
 @container hm-site (max-width: 420px) { .hm-nl-inline .hm-nl-form { flex-direction: column; } .hm-nl-inline .hm-nl-field { flex-basis: auto; } }

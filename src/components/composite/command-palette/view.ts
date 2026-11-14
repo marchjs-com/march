@@ -7,12 +7,16 @@ import { navigate, type Href } from "../../../router/router.ts";
 import { can } from "../../../access/index.ts";
 import { isAction } from "../../../ui/action.ts";
 import { Dialog } from "../../../ui/dialog.ts";
-import { formatKey } from "../../../ui/keys.ts";
 import { rank } from "../../../ui/fold.ts";
 import { pages, commands, type Command } from "../../../ui/registry.ts";
-import { val, cx, uid, icon, glyph, debounce, type MaybeFn } from "../../../ui/util.ts";
+import { val, cx, uid, debounce, type MaybeFn } from "../../../ui/util.ts";
 import { sparkles } from "../../../icons/glyphs/sparkles.ts";
-import { OverflowText } from "../../../ui/marquee.ts";
+import { ListRow } from "../../data/list-row/index.ts";
+import { Empty } from "../../feedback/empty/index.ts";
+import { SearchBox } from "../../forms/search-box/index.ts";
+import { Kbd } from "../../typography/kbd/index.ts";
+import { OverflowText } from "../../typography/overflow-text/index.ts";
+import { SectionLabel } from "../../typography/section-label/index.ts";
 import { isOpen } from "./state.ts";
 import type { PaletteEntry, CommandPaletteProps, CommandPaletteLabels } from "./index.ts";
 import { listNav } from "../../../behaviors/list-nav/index.ts";
@@ -104,41 +108,43 @@ export function PaletteView(props: CommandPaletteProps): unknown {
     onPick: (i) => activate(untrack(rows)[i]),
     onMove: (i) => globalThis.document.getElementById(`${base}-o-${i}`)?.scrollIntoView?.({ block: "nearest" }),
   });
-  // reset the query each time it opens
-  let input: HTMLInputElement | undefined;
-  effect(() => { if (isOpen()) untrack(() => { q.set(""); sel.set(0); if (input) input.value = ""; }); });
+  // reset the query each time it opens (the SearchBox follows `q`)
+  effect(() => { if (isOpen()) untrack(() => { q.set(""); sel.set(0); }); });
+  // Escape closes the palette at once (the box's own Escape would first clear the text)
+  const onInputKey = (e: KeyboardEvent): void => { if (e.key === "Escape") { e.preventDefault(); isOpen.set(false); } else onKey(e); };
 
   const rowEl = (r: Row, i: number, prev: Row | undefined): unknown[] => {
     const id = `${base}-o-${i}`;
     const on = (): boolean => sel() === i;
     const heading = r.kind === "item" && r.item.group !== prev?.item?.group ? r.item.group : r.kind === "ai" && prev?.kind !== "ai" ? L().suggested ?? t`Suggested` : null;
+    const ask = r.kind === "ask";
     return [
-      heading && h("li", { role: "presentation", class: "hm-pal-heading" }, heading),
-      h("li", {
-        id, role: "option", "aria-selected": () => String(on()), class: () => cx("hm-pal-row", `hm-pal-${r.kind}`, on() && "is-active"),
+      heading && h(SectionLabel, { as: "li", role: "presentation", class: "hm-pal-heading" }, heading),
+      h(ListRow, {
+        as: "li", id, role: "option", "aria-selected": () => String(on()), class: `hm-pal-row hm-pal-${r.kind}`, active: on, indicator: true,
         "data-id": r.item?.id ?? null, onClick: () => activate(r), onMousemove: () => { if (!on()) sel.set(i); },
-      },
-      r.kind === "ask"
-        ? [props.askIcon === false ? null : props.askIcon != null ? icon(props.askIcon, "hm-icon hm-pal-icon") : h("span", { class: "hm-icon hm-pal-icon", "aria-hidden": "true" }, glyph(sparkles)),
-          h("span", { class: "hm-pal-title" }, () => (r.status === "loading" ? L().asking ?? t`Asking…` : r.status === "error" ? L().askFailed ?? t`Ask failed — press Enter to retry` : L().ask?.(q()) ?? t`Ask: “${q()}”`))]
-        : [icon(r.item.icon), h(OverflowText, { class: "hm-pal-title" }, r.item.title),
+        lead: ask ? (props.askIcon === false ? undefined : props.askIcon ?? sparkles) : r.item.icon,
+        title: ask ? () => (r.status === "loading" ? L().asking ?? t`Asking…` : r.status === "error" ? L().askFailed ?? t`Ask failed — press Enter to retry` : L().ask?.(q()) ?? t`Ask: “${q()}”`) : r.item.title,
+        trail: ask || !(r.reason || r.item.sub || r.item.shortcut) ? undefined : [
           r.reason && h(OverflowText, { class: "hm-pal-reason" }, r.reason),
           r.item.sub && h("span", { class: "hm-pal-sub" }, r.item.sub),
-          r.item.shortcut && h("kbd", { class: "hm-kbd" }, formatKey(r.item.shortcut))]),
+          r.item.shortcut && h(Kbd, { keys: r.item.shortcut })],
+      }),
     ];
   };
 
+  const ownEmpty = props.empty;
   return h(Dialog, {
     open: () => isOpen(), onClose: () => isOpen.set(false), label: L().dialog ?? t`Command palette`, size: "md", class: cx("hm-palette", val(props.class)),
     children: [
-      h("input", {
-        type: "text", class: "hm-input hm-pal-input", "data-autofocus": "", ref: (x: HTMLInputElement) => { input = x; }, role: "combobox", "aria-expanded": "true", "aria-controls": `${base}-list`,
-        "aria-autocomplete": "list", "aria-activedescendant": () => (rows().length ? `${base}-o-${sel()}` : null),
-        placeholder: () => val(props.placeholder) ?? t`Search pages and commands…`, "aria-label": () => L().search ?? t`Search pages and commands`,
-        autocomplete: "off", spellcheck: "false", onInput: (e: Event) => q.set((e.target as HTMLInputElement).value), onKeydown: onKey,
+      h(SearchBox, {
+        class: "hm-pal-search", inputClass: "hm-pal-input", variant: "plain", icon: false, clear: false, debounce: 0, value: q, inputRef: (x: HTMLInputElement) => x.setAttribute("data-autofocus", ""),
+        controls: `${base}-list`, activeDescendant: () => (rows().length ? `${base}-o-${sel()}` : null), onKeyDown: onInputKey,
+        placeholder: () => val(props.placeholder) ?? t`Search pages and commands…`, label: () => L().search ?? t`Search pages and commands`,
       }),
       h("ul", { id: `${base}-list`, role: "listbox", class: "hm-pal-list", "aria-label": () => L().results ?? t`Results` },
-        () => { const list = rows(); return untrack(() => list.length ? list.map((r, i) => rowEl(r, i, list[i - 1])) : h("li", { class: "hm-pal-empty", role: "presentation" }, props.empty ?? L().empty ?? t`No results`)); }),
+        () => { const list = rows(); return untrack(() => list.length ? list.map((r, i) => rowEl(r, i, list[i - 1]))
+          : h("li", { class: "hm-pal-empty", role: "presentation" }, h(Empty, { size: "sm", title: ownEmpty != null ? false : L().empty ?? t`No results` }, ownEmpty))); }),
       hint === false ? null : hint != null && hint !== true ? h("div", { class: "hm-pal-hint" }, hint)
         : h("div", { class: "hm-pal-hint", "aria-hidden": "true" }, () => L().hint ?? t`↑↓ to move · Enter to open · Esc to close`),
     ],

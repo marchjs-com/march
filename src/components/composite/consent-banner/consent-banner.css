@@ -9,14 +9,15 @@
 .hm-consent-text { flex: 1 1 22rem; min-width: 0; }
 .hm-consent-text p { margin: 0; color: var(--hm-muted); font-size: var(--hm-text-sm); overflow-wrap: anywhere; }
 .hm-consent-title { margin: 0 0 var(--hm-space-1); font-size: var(--hm-text-md); font-weight: var(--hm-weight-semibold); }
-.hm-consent-actions { display: flex; flex-wrap: wrap; gap: var(--hm-space-2); justify-content: flex-end; }
 .hm-consent-link { color: var(--hm-accent-text, var(--hm-primary-text)); }
 .hm-consent-panel { display: grid; gap: var(--hm-space-3); }
 .hm-consent-lead, .hm-consent-desc, .hm-consent-meta, .hm-consent-always { margin: 0; color: var(--hm-muted); font-size: var(--hm-text-sm); }
 .hm-consent-always { margin-block-start: var(--hm-space-1); font-weight: var(--hm-weight-semibold); }
 .hm-consent-cat .hm-card-body { padding-block-start: var(--hm-space-2); }
-.hm-consent-withdraw { padding: 0; border: 0; background: none; color: var(--hm-danger-text, var(--hm-danger)); font: inherit; text-decoration: underline; cursor: pointer; }
-.hm-consent-gate { display: grid; gap: var(--hm-space-3); place-items: center; text-align: center; padding: var(--hm-space-5);
+.hm-consent-withdraw.hm-btn-link { text-decoration: underline; }
+/* the placeholder: a dashed frame around an Empty (text + buttons) */
+.hm-consent-gate { padding: var(--hm-space-5); text-align: center; color: var(--hm-muted);
   border: 1px dashed var(--hm-border-strong, var(--hm-border)); border-radius: var(--hm-radius-3); background: var(--hm-surface-sunken, var(--hm-surface)); }
-.hm-consent-gate p { margin: 0; color: var(--hm-muted); max-width: 32rem; }
+.hm-consent-gate .hm-empty { padding: 0; }
+.hm-consent-gate .hm-empty-text { max-width: 32rem; font-size: inherit; }
 @media (max-width: 40rem) { .hm-consent-actions > * { flex: 1 1 auto; } }

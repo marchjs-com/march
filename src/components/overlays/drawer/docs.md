@@ -23,6 +23,7 @@ A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left 
 | `motion` | `boolean` / `{ duration, exit, easing }` | `true` (300 ms in, 220 ms out, `easeOutCubic`) | `false`: it appears and leaves at once; an object sets your own timing and motion engine easing |
 | `closeButton`, `closeLabel` | | | the × in the head, as in Dialog (`false`: none; an icon or node: your own) |
 | `title`, `label`, `footer`, `dismissable`, `class` | | | as in Dialog |
+| `target` | `"nearest"` `"page"` element | `"nearest"` | where it opens: the nearest `<OverlayScope>`, the whole page, or a scope element |
 
 ```tsx
 <Drawer open={$open} onClose={close} side="bottom" handle={false} closeButton={false} title="Filters">…</Drawer>
@@ -42,5 +43,5 @@ on the body scrolls it first; at its top, dragging down moves the sheet (and clo
 
 ## Composed of
 
-Dialog's frame (focus trap, Escape stack, scroll lock, head / body / foot) inside a Portal layer (`drawer` when modal,
+Dialog's frame (focus trap, Escape stack, scroll lock, PanelHeader head / body / foot) inside a Portal layer (`drawer` when modal,
 `popover` otherwise); movement through the motion engine (`animate`, transform only).

@@ -11,11 +11,12 @@
 .hm-segment-has-icon { display: inline-flex; align-items: center; justify-content: center; gap: .375rem; }
 .hm-segment-icon { display: inline-flex; flex: none; }
 .hm-segment-icon .hm-svg { width: 1em; height: 1em; }
-/* indicator="slide": one thumb under the segments, placed on the chosen one by the component (it glides there) */
+/* indicator="slide": one thumb under the segments, placed on the chosen one by the shared sliding indicator (it glides there;
+   measured from the border edge of the control, so the thumb starts one border width before the padding edge) */
 .hm-segmented-slide { position: relative; }
 .hm-segmented-slide .hm-segment { position: relative; z-index: 1; }
 .hm-segmented.hm-segmented-slide .hm-segment[aria-checked="true"] { background: transparent; box-shadow: none; }
-.hm-segment-thumb { position: absolute; z-index: 0; inset-block-start: 0; inset-inline-start: 0; width: 0; border-radius: calc(var(--hm-radius) - 1px); background: var(--hm-surface);
+.hm-segment-thumb { position: absolute; z-index: 0; inset-block-start: 0; inset-inline-start: -1px; width: 0; border-radius: calc(var(--hm-radius) - 1px); background: var(--hm-surface);
   box-shadow: var(--hm-shadow-1), 0 0 0 1px var(--hm-border); transform-origin: 0 50%; opacity: 0; pointer-events: none; }
 .hm-segment-thumb.is-on { opacity: 1; }
 :dir(rtl) .hm-segment-thumb { transform-origin: 100% 50%; }

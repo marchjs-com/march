@@ -44,6 +44,8 @@ export interface UndoRedoProps {
   /** Shortcut shown in the tooltip: true (default: mod+z, mod+shift+z), false, or your own combos. */
   shortcuts?: boolean | Partial<Record<UndoRedoAction, string>> | undefined;
   icons?: Partial<Record<UndoRedoAction, unknown>> | undefined;
+  /** An extra class on a button, for a host that keeps its own class names: `{ undo, redo }`. */
+  partClass?: Partial<Record<UndoRedoAction, string>> | undefined;
   size?: MaybeFn<IconButtonSize | undefined>;
   /** Theme colour token of the icons. */
   color?: ColorToken | undefined;
@@ -70,7 +72,7 @@ export function UndoRedo(props: UndoRedoProps): Element {
   const ICON: Record<UndoRedoAction, unknown> = { undo: undoIcon, redo: redoIcon };
   return h("span", { class: () => cx("hm-undo-redo", val(props.class)), role: "group", "aria-label": () => val(props.labels?.group) ?? t`History` },
     (props.actions ?? (["undo", "redo"] as const)).map((a) => h(IconButton, {
-      class: `hm-undo-redo-btn hm-undo-redo-${a}`, icon: props.icons?.[a] ?? ICON[a], size: props.size, color: props.color,
+      class: cx("hm-undo-redo-btn", `hm-undo-redo-${a}`, props.partClass?.[a]), icon: props.icons?.[a] ?? ICON[a], size: props.size, color: props.color,
       label: () => name(a), title: () => labelWithKey(name(a), combo(a)),
       disabled: () => !can(a), onClick: () => run(a),
     })));

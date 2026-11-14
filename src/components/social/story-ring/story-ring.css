@@ -21,8 +21,8 @@ button.hm-sring:active .hm-sring-frame { transform: scale(.94); }
 .hm-sring-av { display: grid; place-items: center; width: calc(var(--hm-sring-size) - 2 * (var(--hm-sring-band) + var(--hm-sring-gap))); aspect-ratio: 1; border-radius: 50%; overflow: hidden; }
 .hm-sring.is-none .hm-sring-av { width: 100%; }
 .hm-sring-av .hm-avatar { width: 100%; height: 100%; font-size: calc(var(--hm-sring-size) * .3); }
-.hm-sring-add { position: absolute; inset-block-end: 0; inset-inline-end: 0; display: grid; place-items: center; width: 28%; aspect-ratio: 1; min-width: 1.1rem; border-radius: 50%;
-  background: var(--hm-brand-orange, var(--hm-primary)); color: var(--hm-on-brand-orange, var(--hm-on-primary-fill)); border: 2.5px solid var(--hm-surface); box-sizing: content-box; }
-.hm-sring-add .hm-svg { width: 70%; height: 70%; }
+/* the + badge is a CornerMark sitting on the frame's corner, ringed in the surface color */
+.hm-sring-add.hm-corner-mark { --hm-cm-inset: 0px; }
+.hm-sring-add.hm-corner-mark .hm-svg { width: 70%; height: 70%; }
 .hm-sring-label { max-width: calc(var(--hm-sring-size) + 1.25rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--hm-text-xs); font-weight: 800; color: var(--hm-text); }
 .hm-sring.is-seen .hm-sring-label { font-weight: 500; color: var(--hm-text-2); }

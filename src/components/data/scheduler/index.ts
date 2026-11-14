@@ -1,7 +1,7 @@
 // Scheduler (hadi-march/components/data/scheduler): month / week / day calendar of events. Drag an event to move it
 // (snapped to `step` minutes or whole days), drag its edge to resize, drag on an empty slot to create one; every date
 // and time is formatted with Intl in the current locale (first day of week, month and weekday names, 12/24 h).
-// Calendar math lives in core/date (shared with the date inputs and Gantt), drags in motion/pointerDrag.
+// Calendar math lives in core/date (shared with the date inputs and Gantt), drags in behaviors/drag.
 import "./scheduler.css";
 import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
@@ -12,12 +12,16 @@ import {
   splitDateTime, joinDateTime, snapMinutes, isWeekend, localeDir, type IsoDate,
 } from "../../../core/date.ts";
 import { animate } from "../../../motion/animate.ts";
-import { pointerDrag } from "../../../motion/pointer.ts";
-import { Button, IconButton, ButtonGroup } from "../../../ui/button.ts";
-import { Segmented } from "../../../forms/inputs.ts";
+import { pointerDrag } from "../../../behaviors/drag/index.ts";
+import { announce } from "../../../managers/announcer/index.ts";
+import { Button } from "../../actions/button/index.ts";
+import { Segmented } from "../../forms/segmented/index.ts";
+import { PanelHeader } from "../../layout/panel-header/index.ts";
+import { ResizeHandle } from "../../layout/resize-handle/index.ts";
+import { dayGridKey } from "../../forms/calendar/index.ts";
+import { PeriodNav } from "./period-nav.ts";
+import { chartHint } from "./hint.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
-import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
-import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 
 export interface SchedulerEvent {
   id: string;
@@ -183,7 +187,7 @@ export function Scheduler(props: SchedulerProps): Element {
     const x = dirn * (rtl() ? -1 : 1) * 28;
     void animate(body, [{ opacity: 0, transform: `translateX(${x}px)` }, { opacity: 1, transform: "none" }], { duration: 260, easing: "easeOutCubic" });
   };
-  const go = (d: IsoDate, dirn = 0): void => { cur.set(d); props.onDate?.(d); if (dirn) slide(dirn); };
+  const go = (d: IsoDate, dirn = 0): void => { cur.set(d); props.onDate?.(d); if (dirn) slide(dirn); announce(untrack(title)); };
   const shift = (n: number): void => {
     const v = view(), d = cur();
     go(v === "month" ? addMonths(d, n) : addDays(d, n * (v === "week" ? 7 : 1)), n);
@@ -193,6 +197,7 @@ export function Scheduler(props: SchedulerProps): Element {
     scrolledOnce = false;
     view.set(v);
     props.onView?.(v);
+    announce(untrack(title));
     if (body && motion) void animate(body, [{ opacity: 0, transform: "scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "easeOutCubic" });
   };
 
@@ -230,7 +235,9 @@ export function Scheduler(props: SchedulerProps): Element {
   };
 
   // ------------------------------------------------------------------ an event element (bar in month / all-day lanes, block in the time grid)
+  const handleOf = (e: Event): "start" | "end" | undefined => (e.target as Element).closest<HTMLElement>("[data-handle]")?.dataset["handle"] as "start" | "end" | undefined;
   const evEl = (n: Norm, cls: string, extra: Record<string, unknown> = {}, handles = true): HTMLElement => {
+    const block = cls === "hm-sch-block";
     const el = h("button", {
       type: "button", class: cx("hm-sch-ev", cls, n.allDay && "is-allday"), "data-hm-color": colorAttr(n.ev.color ?? "primary"), "data-ev": n.ev.id,
       "aria-label": evLabel(n), title: evLabel(n), onKeydown: evKeys(n), ...extra,
@@ -239,8 +246,9 @@ export function Scheduler(props: SchedulerProps): Element {
       h("span", { class: "hm-sch-ev-title" }, n.ev.title),
       !n.allDay && cls === "hm-sch-block" ? h("span", { class: "hm-sch-ev-time" }, timeText(n)) : null,
       n.ev.location && cls === "hm-sch-block" ? h("span", { class: "hm-sch-ev-loc" }, n.ev.location) : null]),
-    handles && editable() ? h("span", { class: "hm-sch-handle hm-sch-handle-end", "data-handle": "end", "aria-hidden": "true" }) : null,
-    handles && editable() && cls === "hm-sch-block" ? h("span", { class: "hm-sch-handle hm-sch-handle-start", "data-handle": "start", "aria-hidden": "true" }) : null) as HTMLElement;
+    // the ends are bare ResizeHandle grips: the event runs the gesture (pointer) and the keys (Alt+Shift+arrows)
+    handles && editable() ? h(ResizeHandle, { edge: block ? "bottom" : "end", class: "hm-sch-handle hm-sch-handle-end", "data-handle": "end", line: "none", grip: true }) : null,
+    handles && editable() && block ? h(ResizeHandle, { edge: "top", class: "hm-sch-handle hm-sch-handle-start", "data-handle": "start", line: "none", grip: true }) : null) as HTMLElement;
     el.addEventListener("click", () => { if (!dragged) props.onSelect?.(n.ev); });
     return el;
   };
@@ -306,17 +314,16 @@ export function Scheduler(props: SchedulerProps): Element {
             type: "button", class: "hm-sch-daynum", tabindex: d === fdOn ? "0" : "-1", "data-focus": d, "aria-label": dayText(d),
             onClick: () => setView("day", d),
             onKeydown: (e: KeyboardEvent) => {
-              const fwd = rtl() ? -1 : 1, mv: Record<string, number> = { ArrowLeft: -fwd, ArrowRight: fwd, ArrowUp: -7, ArrowDown: 7 };
-              const k = mv[e.key];
-              if (k == null) return;
+              // arrows, Home / End: the day-grid keys Calendar uses (PageUp / PageDown change the period at the root)
+              const nd = e.key.startsWith("Page") ? null : dayGridKey(e, d, fd(), rtl() ? -1 : 1);
+              if (nd == null) return;
               e.preventDefault();
-              const nd = addDays(d, k);
               focusDay.set(nd);
-              if (nd.slice(0, 7) !== month) go(nd, k > 0 ? 1 : -1);
+              if (nd.slice(0, 7) !== month) go(nd, nd > d ? 1 : -1);
               later(() => body?.querySelector<HTMLElement>(`[data-focus="${nd}"]`)?.focus(), 0);
             },
           }, String(Number(d.slice(8)))),
-          more ? h("button", { type: "button", class: "hm-sch-more", onClick: () => setView("day", d) }, lb("more")(more)) : null);
+          more ? h(Button, { variant: "link", class: "hm-sch-more", onClick: () => setView("day", d) }, lb("more")(more)) : null);
         if (editable() && props.onCreate) cell.addEventListener("dblclick", (e) => { if (e.target === cell) props.onCreate?.({ start: d, end: d, allDay: true }); });
         setStyle(cell as HTMLElement, { "grid-column": String(i + 1) });
         row.append(cell);
@@ -325,7 +332,7 @@ export function Scheduler(props: SchedulerProps): Element {
         const el = evEl(s.n, "hm-sch-bar", {}, !s.cutEnd);
         el.classList.toggle("is-cut-start", s.cutStart); el.classList.toggle("is-cut-end", s.cutEnd);
         setStyle(el, { "grid-column": `${s.from + 1} / ${s.to + 2}`, "grid-row": String(s.lane + 2) });
-        if (editable()) el.addEventListener("pointerdown", (e) => { if (e.button) return; const hd = (e.target as HTMLElement).dataset["handle"] as "end" | undefined; dayDrag(e, s.n, grid, 7, () => ds, hd ?? "move"); });
+        if (editable()) el.addEventListener("pointerdown", (e) => { if (e.button) return; dayDrag(e, s.n, grid, 7, () => ds, handleOf(e) ?? "move"); });
         row.append(el);
       }
       setStyle(row, { "grid-row": String(w + 2) });
@@ -374,7 +381,7 @@ export function Scheduler(props: SchedulerProps): Element {
       const el = evEl(s.n, "hm-sch-bar", {}, !s.cutEnd);
       el.classList.toggle("is-cut-start", s.cutStart); el.classList.toggle("is-cut-end", s.cutEnd);
       setStyle(el, { "grid-column": `${s.from + 1} / ${s.to + 2}`, "grid-row": String(s.lane + 1) });
-      if (editable()) el.addEventListener("pointerdown", (e) => { if (e.button) return; const hd = (e.target as HTMLElement).dataset["handle"] as "end" | undefined; dayDrag(e, s.n, alldayGrid, n, () => ds, hd ?? "move"); });
+      if (editable()) el.addEventListener("pointerdown", (e) => { if (e.button) return; dayDrag(e, s.n, alldayGrid, n, () => ds, handleOf(e) ?? "move"); });
       alldayGrid.append(el);
     }
     const allday = h("div", { class: "hm-sch-allday", role: "row" }, h("div", { class: "hm-sch-corner hm-sch-allday-label" }, lb("allDay")), alldayGrid);
@@ -417,7 +424,7 @@ export function Scheduler(props: SchedulerProps): Element {
   // move / resize a timed block: minutes snap to `step`, columns are days (mirrored in RTL)
   const timeDrag = (e: PointerEvent, n: Norm, el: HTMLElement, colW: () => number, ci: number, ds: IsoDate[]): void => {
     if (e.button) return;
-    const which = ((e.target as HTMLElement).dataset["handle"] as "start" | "end" | undefined) ?? "move";
+    const which = handleOf(e) ?? "move";
     const H = hourH(), st = step();
     let dd = 0, dm = 0;
     const label = el.querySelector<HTMLElement>(".hm-sch-ev-time");
@@ -464,13 +471,15 @@ export function Scheduler(props: SchedulerProps): Element {
 
   // ------------------------------------------------------------------ frame
   const viewList = props.views === false ? [] : props.views ?? VIEWS;
-  const toolbar = props.toolbar === false ? null : h("div", { class: "hm-sch-toolbar" },
-    h(ButtonGroup, { label: () => lb("period"), attached: true },
-      h(IconButton, { icon: () => (rtl() ? chevronRight : chevronLeft), label: () => lb("previous"), variant: "ghost", onClick: () => shift(-1) }),
-      props.todayButton === false ? null : h(Button, { variant: "secondary", size: "sm", onClick: () => go(today(), cur() < today() ? 1 : -1) }, () => lb("today")),
-      h(IconButton, { icon: () => (rtl() ? chevronLeft : chevronRight), label: () => lb("next"), variant: "ghost", onClick: () => shift(1) })),
-    h("h3", { class: "hm-sch-title", id: `${id}-title`, "aria-live": "polite" }, title),
-    viewList.length < 2 ? null : h(Segmented, { class: "hm-sch-views", "aria-label": lb("view"), value: view, onChange: (v: unknown) => setView(v as SchedulerView), options: () => viewList.map((v) => ({ value: v, label: lb(v) })) }));
+  // the bar: a PanelHeader with the period buttons in front, the title, and the view switch at the end
+  const toolbar = props.toolbar === false ? null : h(PanelHeader, {
+    as: "div", class: "hm-sch-toolbar", size: "lg", title, titleId: `${id}-title`, partClass: { title: "hm-sch-title" },
+    lead: h(PeriodNav, {
+      rtl, onPrev: () => shift(-1), onNext: () => shift(1), onToday: props.todayButton === false ? undefined : () => go(today(), cur() < today() ? 1 : -1),
+      labels: { group: () => lb("period"), previous: () => lb("previous"), today: () => lb("today"), next: () => lb("next") },
+    }),
+    actions: viewList.length < 2 ? undefined : h(Segmented, { class: "hm-sch-views", "aria-label": lb("view"), value: view, onChange: (v: unknown) => setView(v as SchedulerView), options: () => viewList.map((v) => ({ value: v, label: lb(v) })) }),
+  });
   body = h("div", { class: "hm-sch-body" }, () => (view() === "month" ? Month() : TimeGrid())) as HTMLElement;
   const root = h("section", {
     class: () => cx("hm-sch", val(props.class)), lang: () => val(props.locale) ?? null, dir: () => (val(props.locale) ? (rtl() ? "rtl" : "ltr") : null), "aria-label": () => val(props.label) ?? t`Calendar`, "aria-describedby": props.help === false ? null : `${id}-help`,
@@ -478,9 +487,7 @@ export function Scheduler(props: SchedulerProps): Element {
       if ((e.target as Element).closest(".hm-sch-ev")) return;
       if (e.key === "PageUp" || e.key === "PageDown") { e.preventDefault(); shift(e.key === "PageUp" ? -1 : 1); }
     },
-  }, toolbar, body,
-  props.help === false ? null : h("p", { class: "hm-sch-help", id: `${id}-help` }, props.help != null && props.help !== true ? props.help : () => (editable() ? lb("help") : "")),
-  h("div", { class: "hm-sch-status", role: "status", "aria-live": "polite" }, status)) as HTMLElement;
+  }, toolbar, body, chartHint({ id, prefix: "hm-sch", help: props.help, text: () => (editable() ? lb("help") : ""), status })) as HTMLElement;
   onCleanup(() => { scrollBox = null; });
   return root;
 }

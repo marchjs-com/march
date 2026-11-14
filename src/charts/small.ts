@@ -5,6 +5,7 @@ import { lttb } from "./lttb.ts";
 import { svgIcon, isIconDef } from "../icons/svg.ts";
 import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, attr, each, type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, f1 } from "./util.ts";
 import { OverflowText } from "../ui/marquee.ts";
+import { StatTile } from "../components/data/stat-tile/index.ts";
 import { colorAttr, colorList, paintOf, type ColorToken, type MultiColors } from "../theme/colors.ts";
 import { cx } from "../ui/util.ts";
 import { clamp } from "../core/util.ts";
@@ -138,10 +139,12 @@ export function Stat<D>(props: StatProps<D>): Element {
   const hasSpark = computed(() => !!read(props.spark as MaybeReactive<unknown>));
   const tone = (): string => { const d = dir(); if (!d || d === "flat") return "hm-stat-neutral"; return (d === "up") !== !!read(props.invert) ? "hm-stat-good" : "hm-stat-bad"; };
   return h("div", { class: () => ["hm-stat", read(props.class)].filter(Boolean).join(" ") },
-    h("div", { class: "hm-stat-label" },
-      isIconDef(props.icon) ? h("span", { class: "hm-stat-icon", "aria-hidden": "true" }, svgIcon(props.icon)) : null,
-      h("span", {}, () => read(props.label) ?? "")),
-    h("div", { class: "hm-stat-value" }, () => { const v = read(props.value); return v == null ? (read(props.empty) ?? "—") : fmt()(v); }),
+    // label over value: the StatTile of hadi-march/data (one drawing of the tile); the delta pill and the sparkline are the chart's own
+    h(StatTile, {
+      align: "start", order: "label", partClass: { label: "hm-stat-label", value: "hm-stat-value" },
+      label: [isIconDef(props.icon) ? h("span", { class: "hm-stat-icon", "aria-hidden": "true" }, svgIcon(props.icon)) : null, h("span", {}, () => read(props.label) ?? "")],
+      value: () => { const v = read(props.value); return v == null ? (read(props.empty) ?? "—") : fmt()(v); },
+    }),
     () => (dir() ? h("div", { class: () => `hm-stat-delta hm-stat-${dir()} ${tone()}` },
       h("span", { class: "hm-stat-arrow", "aria-hidden": "true" }, () => ARROWS[dir() as Dir]),
       h("span", { class: "hm-sr-only" }, () => SAY[dir() as Dir]),

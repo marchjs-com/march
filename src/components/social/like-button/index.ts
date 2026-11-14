@@ -2,11 +2,13 @@
 // burst of particles in the four HADİ colors (motion engine: global speed, pause and reduced motion apply; with
 // reduced motion only the fill changes). heartBurst() / heartPop() are the same effects for any element (a double-tap
 // on a photo, a comment, a story).
+import { live } from "../../../forms/util.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { heart } from "../../../icons/glyphs/heart.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { Button } from "../../actions/button/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { CountRoll } from "../count-roll/index.ts";
@@ -90,15 +92,14 @@ export function LikeButton(props: LikeButtonProps): Element {
     if (next && val(props.burst) !== false) heartBurst(hit, { colors: val(props.colors) ?? "brand", radius: size === "lg" ? 34 : size === "sm" ? 20 : 26, ...props.burstOptions });
   };
   const own = props.icon;
-  return h("button", {
-    type: "button",
+  // a ghost pill Button with a pressed state; the count rolls in its label
+  return h(Button, {
+    variant: "ghost", shape: "pill", pressed: () => !!val(props.liked), color: live((): ColorToken => props.color ?? "brand-pink"),
     class: () => cx("hm-like", `hm-like-${val(props.size) ?? "md"}`, val(props.liked) && "is-liked", val(props.class)),
-    "data-hm-color": () => colorAttr(props.color ?? "brand-pink"),
-    "aria-pressed": () => String(!!val(props.liked)),
     "aria-label": () => val(props.label) ?? t`Like`,
     onClick: toggle,
-  },
-  h("span", { class: "hm-like-hit", ref: (x: HTMLElement) => { hit = x; } },
-    h("span", { class: "hm-like-heart", ref: (x: HTMLElement) => { icon = x; } }, typeof own === "function" ? () => own(!!val(props.liked)) : own ?? glyph(heart))),
-  props.count !== undefined ? h(CountRoll, { value: () => val(props.count) ?? 0, hideZero: true, format: () => val(props.countFormat), class: "hm-like-count" }) : null);
+    icon: h("span", { class: "hm-like-hit", ref: (x: HTMLElement) => { hit = x; } },
+      h("span", { class: "hm-like-heart", ref: (x: HTMLElement) => { icon = x; } }, typeof own === "function" ? () => own(!!val(props.liked)) : own ?? glyph(heart))),
+    children: props.count !== undefined ? h(CountRoll, { value: () => val(props.count) ?? 0, hideZero: true, format: () => val(props.countFormat), class: "hm-like-count" }) : null,
+  }) as Element;
 }

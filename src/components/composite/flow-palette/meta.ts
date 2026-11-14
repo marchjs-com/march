@@ -7,7 +7,7 @@ export default defineMeta({
   entry: "hadi-march/flow",
   since: "0.1.0",
   summary: "Node types of a flow by category with search; drag onto a FlowCanvas (snapped where dropped) or press Enter to add.",
-  composedOf: ["SearchBox", "OverflowText"],
+  composedOf: ["SearchBox", "OverflowText", "ListRow", "IconTile", "SectionLabel", "Empty"],
   behaviors: ["motion engine", "drag", "drag layer", "fold search"],
   hubs: ["h"],
   showcase: "/flow",

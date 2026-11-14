@@ -6,10 +6,13 @@
 // the small beat of the number. Screen readers read the label and the value; moving digits and bubbles are hidden.
 import "./live-counter.css";
 import { h } from "../../../dom/h.ts";
-import { signal, effect, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
+import { signal, effect, untrack, createRoot, getOwner } from "../../../core/reactive.ts";
 import { locale } from "../../../core/i18n.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { owned, whenVisible } from "../../../ui/observe.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { StatusDot } from "../../feedback/status-dot/index.ts";
+import { Badge } from "../../data/badge/index.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
@@ -66,7 +69,7 @@ export function LiveCounter(props: LiveCounterProps): Element {
     : h(Counter, { value: n, mode: "roll", start: "now", format: props.format, prefix: props.prefix, suffix: props.suffix });
   const dot = props.dot === false ? null
     : props.dot && props.dot !== true ? h("span", { class: "hm-lc-dot-own", "aria-hidden": "true" }, props.dot)
-    : h("span", { class: "hm-lc-dot", "aria-hidden": "true", "data-hm-color": colorAttr(props.dotColor) });
+    : h(StatusDot, { class: "hm-lc-dot", size: "lg", pulse: true, color: props.dotColor });
 
   const root = h("div", { class: () => cx("hm-lc", val(props.class)) },
     dot,
@@ -88,17 +91,12 @@ export function LiveCounter(props: LiveCounterProps): Element {
       });
       else if (!on && stop) { stop(); stop = null; }
     };
-    const IO = globalThis.IntersectionObserver;
-    if (IO) {
-      const io = new IO((es) => run(es.some((e) => e.isIntersecting)));
-      io.observe(root);
-      if (getOwner()) onCleanup(() => io.disconnect());
-    } else run(true);
-    if (getOwner()) onCleanup(() => run(false));
+    whenVisible(root, run); // only while on screen (stops with the owner)
   }
 
   // every change: the text animation (if any) redraws the digits; on an increase the bubble rises and the number beats
   let last = n.peek(), anim: { stop(): void } | null = null;
+  const owner = getOwner();
   effect(() => {
     const v = n();
     untrack(() => {
@@ -112,15 +110,19 @@ export function LiveCounter(props: LiveCounterProps): Element {
       const num = root.querySelector<HTMLElement>(".hm-lc-num"), box = root.querySelector(".hm-lc-bubbles");
       if (num && box && props.bubble !== false) {
         const label = `+${fmt(d)}`;
-        const b = h("span", { class: cx("hm-lc-bubble", typeof props.bubble === "function" && "is-own"), "data-hm-color": colorAttr(props.bubbleColor) },
-          typeof props.bubble === "function" ? props.bubble(d, label) : label) as HTMLElement;
-        box.append(b);
-        void animate(b, { opacity: [0, 1, 1, 0], transform: ["translateY(10px) scale(.6)", "translateY(-6px) scale(1.1)", "translateY(-22px) scale(1)", "translateY(-40px) scale(.9)"] }, { duration: 1500, easing: "out" })
-          .finished.then(() => b.remove());
+        // the default bubble is a Badge; your own content gets a bare box. Each bubble has its own scope (not the
+        // effect's: the next change must not dispose a bubble that is still rising)
+        createRoot((dispose) => {
+          const b = (typeof props.bubble === "function" ? h("span", { class: "hm-lc-bubble is-own" }, props.bubble(d, label))
+            : h(Badge, { class: "hm-lc-bubble", tone: props.bubbleColor ? "primary" : "success", color: props.bubbleColor }, label)) as HTMLElement;
+          box.append(b);
+          void animate(b, { opacity: [0, 1, 1, 0], transform: ["translateY(10px) scale(.6)", "translateY(-6px) scale(1.1)", "translateY(-22px) scale(1)", "translateY(-40px) scale(.9)"] }, { duration: 1500, easing: "out" })
+            .finished.then(() => { b.remove(); dispose(); });
+        }, owner);
       }
       if (num && props.beat !== false) animate(num, { transform: ["scale(1)", "scale(1.06)", "scale(1)"] }, { duration: 520, easing: "out" });
     });
   });
-  if (getOwner()) onCleanup(() => anim?.stop());
+  owned(() => anim?.stop());
   return root;
 }

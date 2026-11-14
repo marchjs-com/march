@@ -28,9 +28,10 @@ test("ColorPicker: sliders with values, text input in the chosen format, palette
   const el = document.createElement("div");
   document.body.appendChild(el);
   const dispose = render(() => h(ColorPicker, { "bind:value": v }), el);
-  const sliders = el.querySelectorAll("[role=slider]");
+  const sliders = el.querySelectorAll("[role=slider], input[type=range]");
   assert.deepEqual(sliders.map((s) => s.getAttribute("aria-label")), ["Saturation and brightness", "Hue", "Opacity"]);
-  assert.equal(sliders[1].getAttribute("aria-valuenow"), "199");
+  assert.equal(sliders[1].value, "199");
+  assert.equal(sliders[1].getAttribute("aria-valuetext"), "199 degrees");
   const text = el.querySelector(".hm-cp-text");
   assert.equal(text.value, "#1d9ad6");
   text.value = "rgb(120 190 58)";
@@ -46,15 +47,16 @@ test("ColorPicker: sliders with values, text input in the chosen format, palette
   dispose();
 });
 
-test("ColorPicker: keyboard on the hue slider, no alpha when alpha={false}", () => {
+test("ColorPicker: the hue slider changes the value, no alpha when alpha={false}", () => {
   const v = signal("#ff0000");
   const el = document.createElement("div");
   document.body.appendChild(el);
   const dispose = render(() => h(ColorPicker, { "bind:value": v, alpha: false, palettes: false, contrast: false }), el);
-  const hue = el.querySelectorAll("[role=slider]").find((s) => s.getAttribute("aria-label") === "Hue");
-  hue.dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "ArrowRight", shiftKey: true, bubbles: true }));
-  assert.equal(hue.getAttribute("aria-valuenow"), "10");
-  assert.equal(el.querySelectorAll("[role=slider]").length, 2);
+  const hue = el.querySelectorAll("input[type=range]").find((s) => s.getAttribute("aria-label") === "Hue");
+  hue.value = "10"; hue.dispatchEvent(new globalThis.Event("input", { bubbles: true }));
+  assert.equal(hue.value, "10");
+  assert.match(v(), /^#ff2[ab]00$/, "hue 10 of a pure red");
+  assert.equal(el.querySelectorAll("[role=slider], input[type=range]").length, 2);
   assert.equal(el.querySelector(".hm-cp-palette"), null);
   dispose();
 });
@@ -69,7 +71,7 @@ test("ColorPicker: preview, format switcher and text field can be turned off; ow
   assert.equal(root.querySelector(".hm-cp-formats"), null);
   assert.equal(root.querySelector(".hm-cp-text"), null);
   assert.equal(root.querySelector(".hm-cp-input-row"), null);
-  assert.equal(root.querySelector(".hm-cp-hue [role=slider]").getAttribute("aria-label"), "Tone");
+  assert.equal(root.querySelector(".hm-cp-slider-hue input").getAttribute("aria-label"), "Tone");
   assert.ok([...root.querySelectorAll(".hm-cp-palette-label")].some((x) => x.textContent === "Ours"));
   off(); host.remove();
   const host2 = document.createElement("div"); document.body.appendChild(host2);

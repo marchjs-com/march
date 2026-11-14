@@ -10,6 +10,7 @@ import { h } from "../dom/h.ts";
 import { cx, glyph } from "../ui/util.ts";
 import { svgIcon, type IconDef } from "../icons/svg.ts";
 import type { MaybeFn } from "../ui/util.ts";
+import { itemColor } from "./util.ts";
 
 export type ChoiceVariant = "classic" | "soft" | "chip" | "card" | "toggle" | "segmented";
 export type ChoiceSize = "sm" | "md" | "lg";
@@ -70,11 +71,7 @@ export function choiceText(label: unknown, hint: unknown, icon: unknown, variant
   return h("span", { class: "hm-check-label" }, label as MaybeFn<unknown>, hint != null ? h("small", { class: "hm-hint" }, hint as MaybeFn<unknown>) : null);
 }
 
-/** `colors="brand"`: the four HADİ colors in turn (orange, blue, green, purple), or a list of tokens. */
-export function itemColor(colors: "brand" | readonly string[] | undefined, i: number): string | null {
-  const list = colors === "brand" ? ["brand-orange", "brand-blue", "brand-green", "brand-purple"] : colors;
-  return list && list.length ? (list[i % list.length] as string) : null;
-}
+export { itemColor };
 
 /** Look of a group of choices: every option takes it; `colors="brand"` gives each option the next HADİ color. */
 export interface ChoiceGroupLook extends ChoiceLook {

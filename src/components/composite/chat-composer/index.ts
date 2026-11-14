@@ -6,7 +6,7 @@
 import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, icon, listen, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, listen, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Menu, type MenuItem } from "../../../ui/menu.ts";
 import { Textarea } from "../../../forms/inputs.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
@@ -15,8 +15,12 @@ import { mic } from "../../../icons/glyphs/mic.ts";
 import { send } from "../../../icons/glyphs/send.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { trash } from "../../../icons/glyphs/trash.ts";
-import { isIconDef, type IconDef } from "../../../icons/svg.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import { live } from "../../../forms/util.ts";
+import { formatDuration } from "../../../ui/format.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { ReactionPicker } from "../../social/reaction-picker/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
@@ -62,10 +66,6 @@ export interface ChatComposerProps {
   motion?: MaybeFn<boolean | undefined>;
   class?: ClassProp;
 }
-
-// an own icon (IconDef, text or node) or the built-in glyph
-const own = (x: unknown, def: IconDef): unknown => (x == null ? glyph(def) : isIconDef(x) ? glyph(x) : icon(x));
-const mmss = (ms: number): string => { const s = Math.floor(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
 
 /** `<ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />` */
 export function ChatComposer(props: ChatComposerProps): Element {
@@ -139,19 +139,19 @@ export function ChatComposer(props: ChatComposerProps): Element {
     if (!r) return null;
     const box = h("div", { class: "hm-compose-reply" },
       h("span", { class: "hm-compose-reply-text" }, h("b", null, L().replyingTo?.(r.name) ?? t`Replying to ${r.name}`), h("span", null, r.text)),
-      props.onCancelReply ? h("button", { type: "button", class: "hm-compose-icon", "aria-label": () => L().cancelReply ?? t`Cancel reply`, onClick: () => props.onCancelReply?.() }, glyph(xIcon)) : null) as HTMLElement;
+      props.onCancelReply ? h(IconButton, { class: "hm-compose-icon", size: "sm", shape: "round", title: false, icon: xIcon, label: () => L().cancelReply ?? t`Cancel reply`, onClick: () => props.onCancelReply?.() }) : null) as HTMLElement;
     if (moves()) animate(box, [{ transform: "translateY(10px)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }], { duration: 200, easing: "easeOutCubic" });
     queueMicrotask(() => field?.focus());
     return box;
   },
   () => (emojiOpen() ? h("div", { class: "hm-compose-emoji" }, h(ReactionPicker, { layout: "grid", onPick: insert, label: () => L().emoji ?? t`Emoji` })) : null),
   h("div", { class: "hm-compose-row" },
-    () => (rec() ? h("button", { type: "button", class: "hm-compose-icon hm-compose-cancel", "aria-label": () => L().cancelRecording ?? t`Cancel recording`, onClick: () => stopRec(false) }, glyph(trash))
+    () => (rec() ? h(IconButton, { class: "hm-compose-icon hm-compose-cancel", variant: "danger", size: "lg", shape: "round", title: false, icon: trash, label: () => L().cancelRecording ?? t`Cancel recording`, onClick: () => stopRec(false) })
       : props.attachments?.length ? h(Menu, { icon: props.attachIcon ?? plus, label: () => L().attach ?? t`Attach`, variant: "ghost", class: "hm-compose-attach", items: props.attachments }) : null),
     () => (rec()
       ? h("div", { class: "hm-compose-rec", role: "status", "aria-live": "off" },
-        props.recordingDot === false ? null : h("span", { class: "hm-compose-dot", "aria-hidden": "true", ref: (x: HTMLElement) => { if (moves()) runs.push(animate(x, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0.35, transform: "scale(.8)" }], { duration: 650, iterations: Infinity, direction: "alternate" })); } }),
-        h("span", { class: "hm-compose-time" }, () => mmss(elapsed())),
+        props.recordingDot === false ? null : h(StatusDot, { class: "hm-compose-dot", tone: "danger", size: "lg", pulse: () => (moves() ? "blink" : false) }),
+        h("span", { class: "hm-compose-time" }, () => formatDuration(elapsed())),
         props.wave === false ? null : h("span", { class: "hm-compose-wave", "aria-hidden": "true", ref: (x: HTMLElement) => { bars = x; } }, Array.from({ length: 24 }, () => h("i"))),
         h("span", { class: "hm-sr-only" }, L().recording ?? t`Recording`))
       : h("div", { class: "hm-compose-field" },
@@ -163,17 +163,20 @@ export function ChatComposer(props: ChatComposerProps): Element {
           get "aria-label"() { return L().message ?? t`Message`; },
           ref: (x: HTMLTextAreaElement) => { field = x; listen(x, { keydown: key }); },
         }),
-        val(props.emoji) === false ? null : h("button", {
-          type: "button", class: () => cx("hm-compose-icon hm-compose-emoji-btn", emojiOpen() && "is-on"), "aria-expanded": () => String(emojiOpen()), "aria-label": () => L().emoji ?? t`Emoji`,
-          onClick: () => emojiOpen.set(!emojiOpen()),
-        }, own(props.emojiIcon, smile)))),
-    h("button", {
+        val(props.emoji) === false ? null : h(IconButton, {
+          class: () => cx("hm-compose-icon hm-compose-emoji-btn", emojiOpen() && "is-pressed"), size: "lg", shape: "round", title: false, "aria-expanded": () => String(emojiOpen()), label: () => L().emoji ?? t`Emoji`,
+          icon: ownIcon(props.emojiIcon, smile, null), onClick: () => emojiOpen.set(!emojiOpen()),
+        }))),
+    // one round solid IconButton that is the microphone or the send arrow
+    h(IconButton, {
+      variant: "solid", shape: "round", size: "lg", title: false,
       type: () => (mode() === "send" ? "submit" : "button"),
       class: () => cx("hm-compose-act", `is-${mode()}`, rec() && "is-rec"),
-      "aria-label": () => (rec() ? L().sendVoice ?? t`Send voice message` : mode() === "send" ? L().send ?? t`Send` : L().record ?? t`Record voice message`),
-      "data-hm-color": () => colorAttr(mode() === "mic" ? props.micColor : props.sendColor),
+      label: () => (rec() ? L().sendVoice ?? t`Send voice message` : mode() === "send" ? L().send ?? t`Send` : L().record ?? t`Record voice message`),
+      color: live(() => (mode() === "mic" ? props.micColor : props.sendColor)),
       disabled: () => !!val(props.disabled),
       ref: (x: HTMLElement) => { action = x; },
       onClick: (e: MouseEvent) => { if (mode() === "mic") { e.preventDefault(); startRec(); } },
-    }, () => (mode() === "send" ? own(props.sendIcon, send) : own(props.micIcon, mic)))));
+      icon: () => (mode() === "send" ? ownIcon(props.sendIcon, send, null) : ownIcon(props.micIcon, mic, null)),
+    })));
 }

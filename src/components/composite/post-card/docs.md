@@ -46,4 +46,4 @@ the state. Keyboard activation of a photo opens it at once.
 
 ## Composed of
 
-Avatar, Menu, MediaGrid, LikeButton, CountRoll.
+Avatar, Menu, MediaGrid, LikeButton, CountRoll, Button, ClampText, ListRow, VerifiedMark.

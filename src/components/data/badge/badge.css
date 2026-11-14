@@ -9,14 +9,12 @@
 .hm-badge-primary { background: var(--hm-accent-soft, var(--hm-primary-soft)); color: var(--hm-accent-text, var(--hm-primary-text)); border-color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 18%, transparent); }
 .hm-badge-count { min-width: 1.25rem; justify-content: center; padding: 0 .3125rem; font-weight: 600; }
 .hm-badge-count.hm-badge-danger { background: var(--hm-danger-solid); color: var(--hm-on-status, var(--hm-on-scrim)); border-color: transparent; }
-.hm-badge-dot::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: currentColor; }
-.hm-badge-dot-mark { flex: none; width: .375rem; height: .375rem; border-radius: 50%; background: var(--hm-accent, currentColor); }
 .hm-badge-dot-own { display: inline-flex; flex: none; }
 /* xs: the mini badge on the corner of an icon button, a tab, a rail item */
 .hm-badge-xs { gap: .1875rem; min-height: 1rem; padding: 0 .25rem; font-size: .625rem; line-height: 1rem; }
 .hm-badge-xs.hm-badge-count { min-width: 1rem; padding: 0 .25rem; }
-/* a pulsing dot (StatusDot) takes the badge's text colour unless `dotColor` names one */
-.hm-badge .hm-badge-dot-pulse:not([data-hm-color]) { --hm-status-dot-c: currentColor; }
+/* the built-in dot (a StatusDot) takes the badge's text colour unless `dotColor` names one */
+.hm-badge > .hm-status-dot:not([data-hm-color]) { --hm-status-dot-c: currentColor; }
 .hm-badge .hm-badge-dot-pulse.is-pulse-ring { margin-inline: .125rem; }
 /* clickable: a button with the badge look */
 .hm-badge-btn { margin: 0; font-family: inherit; cursor: pointer; appearance: none; transition: border-color var(--hm-dur-fast) var(--hm-ease), box-shadow var(--hm-dur-fast) var(--hm-ease); }

@@ -8,7 +8,7 @@ locale.set("en");
 const { manualClock, step } = await import("../../../motion/engine/clock.ts");
 const { LiveFeed, FEED_ENTER, FEED_LEAVE } = await import("./index.ts");
 
-const titles = (el) => [...el.querySelectorAll(".hm-lf-item")].filter((x) => !x.classList.contains("is-leaving")).map((x) => x.querySelector(".hm-lf-title").textContent);
+const titles = (el) => [...el.querySelectorAll(".hm-lf-item")].filter((x) => !x.classList.contains("is-leaving")).map((x) => x.querySelector(".hm-listrow-title").textContent);
 
 test("LiveFeed: controlled items, newest on top, at most max", () => {
   const items = signal([{ id: 2, title: "two" }, { id: 1, title: "one" }]);
@@ -88,7 +88,7 @@ test("LiveFeed: own button texts, no pulse dot, own item content, hover does not
   }), el);
   const own = () => [...el.querySelectorAll(".hm-lf-item")].filter((x) => !x.classList.contains("is-leaving")).map((x) => x.querySelector(".own").textContent);
   assert.deepEqual(own(), ["#n2", "#n1", "#n0"]);
-  assert.equal(el.querySelector(".hm-lf-title"), null, "the default row parts are not drawn");
+  assert.equal(el.querySelector(".hm-listrow-title"), null, "the default row parts are not drawn");
   assert.ok(el.querySelector(".hm-lf-item .hm-lf-glow"), "the glow stays");
   const btn = el.querySelector(".hm-lf-pause");
   assert.equal(btn.textContent, "On air");

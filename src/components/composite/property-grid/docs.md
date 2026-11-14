@@ -55,5 +55,8 @@ while there is nothing to reset. Undo / Redo buttons name the step they will und
 
 ## Composed of
 
-Disclosure (groups), TextInput (search and text), NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea.
+Disclosure (groups), SectionLabel (group names), SearchBox (search), PanelHeader (the head and the footer bar),
+UndoRedo (history buttons), IconButton (row reset), Button (Revert, Save), Badge (changed count of a group), StatusDot
+(the changed mark of a row), Empty (no match); editors: TextInput, NumberInput, Slider, Toggle, Select, Segmented,
+ColorInput, Textarea.
 Undo manager (history), DirtyState manager (unsaved changes), fold search (ui/fold).

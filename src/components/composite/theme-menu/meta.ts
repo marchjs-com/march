@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "One top-bar menu for the whole look: light / dark / system, the color theme with live swatches and the accent color.",
   category: "composite",
-  composedOf: ["Dropdown", "ThemeSwatch", "OverflowText"],
+  composedOf: ["Dropdown", "ThemeSwatch", "OverflowText", "SectionLabel"],
   behaviors: [],
   hubs: [],
   showcase: "/themes",

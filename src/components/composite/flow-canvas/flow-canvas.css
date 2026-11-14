@@ -49,26 +49,20 @@
 .hm-flow-node.is-done { border-color: color-mix(in srgb, var(--hm-success) 60%, var(--hm-border)); }
 .hm-flow-node.is-error { border-color: var(--hm-danger); }
 .hm-flow-node.is-skipped { opacity: .55; }
-.hm-flow-node.is-queued .hm-flow-state { background: var(--hm-surface-3); }
 .hm-flow-glow { position: absolute; inset: -7px; border-radius: 20px; pointer-events: none; opacity: 0;
   box-shadow: 0 0 0 2px var(--hm-accent, var(--hm-primary)), 0 0 28px 4px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 55%, transparent); }
 .hm-flow-node.is-running .hm-flow-glow { opacity: .6; }
 .hm-flow-head { display: flex; align-items: center; gap: .5rem; block-size: var(--hm-flow-head); padding-inline: .625rem .5rem; border-block-end: 1px solid var(--hm-border-subtle); }
-.hm-flow-icon { display: inline-grid; place-items: center; flex: none; inline-size: 1.75rem; block-size: 1.75rem; border-radius: .5rem;
-  background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 14%, var(--hm-surface)); color: var(--hm-accent-text, var(--hm-primary-text)); }
-.hm-flow-icon .hm-svg { inline-size: .9375rem; block-size: .9375rem; }
 .hm-flow-title { flex: 1; min-inline-size: 0; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); }
-.hm-flow-state { display: inline-grid; place-items: center; flex: none; inline-size: 1.25rem; block-size: 1.25rem; border-radius: 50%; }
-.hm-flow-node.is-done .hm-flow-state { background: var(--hm-success); color: var(--hm-on-success-fill); }
-.hm-flow-node.is-error .hm-flow-state { background: var(--hm-danger); color: var(--hm-on-danger-fill); }
-.hm-flow-node.is-running .hm-flow-state { background: var(--hm-accent, var(--hm-primary)); box-shadow: 0 0 0 4px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 25%, transparent); inline-size: .625rem; block-size: .625rem; margin-inline: .3125rem; }
-.hm-flow-state .hm-svg { inline-size: .75rem; block-size: .75rem; }
+/* run state: a CheckMark disc (done / failed) or a StatusDot (running: with a ring; queued) */
+.hm-flow-state { display: inline-grid; place-items: center; flex: none; min-inline-size: 1.25rem; }
+.hm-flow-state .hm-status-dot.is-primary { box-shadow: 0 0 0 4px color-mix(in srgb, var(--hm-status-dot-c) 25%, transparent); }
 .hm-flow-ports { padding-block: 0; }
 .hm-flow-portline { display: grid; grid-template-columns: 1fr 1fr; block-size: var(--hm-flow-row); }
 .hm-flow-portrow { position: relative; display: flex; align-items: center; min-inline-size: 0; font-size: var(--hm-text-xs); color: var(--hm-text-2); }
 .hm-flow-portrow.is-in { padding-inline-start: .75rem; }
 .hm-flow-portrow.is-out { justify-content: flex-end; padding-inline-end: .75rem; }
-.hm-flow-portlabel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-flow-portlabel { min-inline-size: 0; }
 .hm-flow-port { position: absolute; inset-block-start: 50%; inline-size: 14px; block-size: 14px; margin-block-start: -7px; padding: 0; border-radius: 50%; cursor: crosshair;
   border: 2px solid var(--hm-flow-line); background: var(--hm-surface); transition: transform var(--hm-dur-fast) var(--hm-ease), background-color var(--hm-dur-fast) var(--hm-ease), border-color var(--hm-dur-fast) var(--hm-ease); }
 .hm-flow-portrow.is-in .hm-flow-port { inset-inline-start: -8px; }
@@ -80,7 +74,7 @@
 .hm-flow-fields { display: grid; gap: .375rem; padding: .5rem .625rem .625rem; border-block-start: 1px solid var(--hm-border-subtle); cursor: default; user-select: text; }
 .hm-flow-fields .hm-label { font-size: var(--hm-text-xs); }
 .hm-flow-fields .hm-input, .hm-flow-fields select { min-block-size: var(--hm-control-h-sm); font-size: var(--hm-text-sm); }
-.hm-flow-error { margin: 0 .625rem .625rem; padding: .375rem .5rem; border-radius: var(--hm-radius-1); background: var(--hm-danger-soft); color: var(--hm-danger-text); font-size: var(--hm-text-xs); }
+.hm-flow-error.hm-alert { margin: 0 .625rem .625rem; padding: .375rem .5rem; border-radius: var(--hm-radius-1); color: var(--hm-danger-text); font-size: var(--hm-text-xs); }
 
 /* groups */
 .hm-flow-group { position: absolute; border: 1.5px dashed color-mix(in srgb, var(--hm-accent, var(--hm-special)) 55%, transparent); border-radius: 22px;
@@ -92,7 +86,8 @@
 
 /* selection box, zoom bar, minimap */
 .hm-flow-marquee { position: absolute; border: 1.5px solid var(--hm-primary); border-radius: 4px; background: color-mix(in srgb, var(--hm-primary) 10%, transparent); pointer-events: none; }
-.hm-flow-zoom { position: absolute; inset-block-end: .75rem; inset-inline-start: .75rem; display: flex; align-items: center; gap: .125rem; padding: .25rem;
+.hm-flow-zoom, .hm-flow-zoom .hm-toolbar-start { flex-wrap: nowrap; gap: .125rem; }
+.hm-flow-zoom { position: absolute; inset-block-end: .75rem; inset-inline-start: .75rem; padding: .25rem;
   border: 1px solid var(--hm-border); border-radius: var(--hm-radius-full); background: color-mix(in srgb, var(--hm-surface) 92%, transparent); box-shadow: var(--hm-shadow-2); }
 .hm-flow-zoomval { min-inline-size: 2.75rem; text-align: center; font: 500 var(--hm-text-xs)/1 var(--hm-font-mono, inherit); color: var(--hm-text-2); font-variant-numeric: tabular-nums; }
 .hm-flow-minimap { position: absolute; inset-block-end: .75rem; inset-inline-end: .75rem; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-2);

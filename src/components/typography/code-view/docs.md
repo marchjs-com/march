@@ -41,4 +41,4 @@ stay readable in every theme.
 
 ## Composed of
 
-CopyButton.
+PanelHeader (the bar), Button (`pressed`: Wrap), CopyButton.

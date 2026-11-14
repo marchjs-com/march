@@ -33,7 +33,7 @@ export default function MarkdownEditorDemo(props: { values: { view: string; tool
     const source = host?.querySelector<HTMLTextAreaElement>(".hm-mde-source")
     if (source) source.scrollTop = source.scrollTop > 0 ? 0 : source.scrollHeight
   }
-  return <div class="sc-ed-one" ref={(x: HTMLElement) => { host = x }}>
+  return <div class="sc-ed-one" ref={(x: Element) => { host = x as HTMLElement }}>
     {() => {
       const views: MarkdownView[] = props.values.rich || props.values.view === "rich" ? ["write", "preview", "split", "rich"] : ["write", "preview", "split"]
       return <MarkdownEditor value={untrack(() => $md)} onChange={(v: string) => { $md = v }} view={props.values.view as MarkdownView} views={views}

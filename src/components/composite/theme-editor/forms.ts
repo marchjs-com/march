@@ -1,24 +1,29 @@
 // ThemeEditor typography and shape tabs (their own chunk), and the labelled slider rows the motion tab shares.
 import { computed, effect } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
+import { live } from "../../../forms/util.ts";
 import { t } from "../../../core/i18n.ts";
 import { cx, uid, setStyle } from "../../../core/util.ts";
 import { Segmented, Slider, Select } from "../../../forms/inputs.ts";
+import { Field } from "../../../forms/field.ts";
 import * as M from "./model.ts";
 import type { ThemeEditorContext } from "./types.ts";
 
 export type Ctx = { ctx: ThemeEditorContext };
 
-/** A labelled control row: the label names the control (aria-labelledby). */
-export function row(label: () => string, control: (labelId: string) => unknown, hint?: () => string): Element {
+/**
+ * A labelled control row (a Field). Group controls (slider, segmented) are named through `aria-labelledby` (the first
+ * argument of `control`); a single native control takes the row's `id` (the second) and `native: true` makes the label a `<label for>`.
+ */
+export function row(label: () => string, control: (labelId: string, id: string) => unknown, hint?: () => string, native = false): Element {
   const id = uid("hm-te-l");
-  return h("div", { class: "hm-te-field" }, h("span", { id, class: "hm-te-label" }, label), control(id), hint ? h("span", { class: "hm-te-hint" }, hint) : null);
+  return h(Field, { id, group: !native, class: "hm-te-field", label: live(() => label()), help: live(() => hint?.()) }, control(`${id}-label`, id)) as Element;
 }
 /** A slider bound to one number of the draft. */
 export function num<K extends "type" | "shape" | "motion">(ctx: ThemeEditorContext, part: K, key: keyof M.ThemeDraft[K] & string, label: () => string, o: { min: number; max: number; step: number; format: (v: number) => string }): Element {
   return row(label, (labelledby) => h(Slider, {
-    labelledby, min: o.min, max: o.max, step: o.step, format: o.format, get readonly() { return ctx.readonly(); },
-    get value() { return ctx.draft()[part][key] as number; },
+    labelledby, min: o.min, max: o.max, step: o.step, format: o.format, readonly: live(() => ctx.readonly()),
+    value: live(() => ctx.draft()[part][key] as number),
     onChange: (v: number) => ctx.change(label(), (d) => ({ ...d, [part]: { ...d[part], [key]: v } }), `${part}.${key}`),
   }));
 }
@@ -39,11 +44,11 @@ const ratioName = (r: number): string => { const n = RATIOS.find(([x]) => Math.a
 function fontRow(ctx: ThemeEditorContext, key: "body" | "display" | "mono", label: () => string, list: readonly { value: string; label: string }[]): Element {
   // the current stack is offered even when it is not in the list (imported or preset fonts)
   const options = computed(() => { const cur = ctx.draft().type[key]; return list.some((f) => f.value === cur) ? list : [{ value: cur, label: cur.split(",")[0]!.replace(/"/g, "") }, ...list]; });
-  return row(label, (labelledby) => h(Select, {
-    labelledby, options, get readonly() { return ctx.readonly(); },
-    get value() { return ctx.draft().type[key]; },
+  return row(label, (_labelId, id) => h(Select, {
+    id, options, readonly: live(() => ctx.readonly()),
+    value: live(() => ctx.draft().type[key]),
     onChange: (v: string | null) => { if (v) ctx.change(label(), (d) => ({ ...d, type: { ...d.type, [key]: v } })); },
-  }));
+  }), undefined, true);
 }
 
 /** Font families, scale ratio, base size, line heights and weights, with the type ramp they make. */
@@ -90,8 +95,8 @@ export function ShapePanel({ ctx }: Ctx): Element {
       num(ctx, "shape", "spread", () => t`Radius scale`, { min: 0, max: 2, step: 0.1, format: times }),
       num(ctx, "shape", "space", () => t`Spacing unit`, { min: 2, max: 6, step: 0.5, format: px }),
       row(() => t`Density`, (labelledby) => h(Segmented, {
-        labelledby, get readonly() { return ctx.readonly(); }, options: [{ value: "compact", label: t`Compact` }, { value: "normal", label: t`Normal` }, { value: "comfortable", label: t`Comfortable` }],
-        get value() { return ctx.draft().shape.density; },
+        labelledby, readonly: live(() => ctx.readonly()), options: [{ value: "compact", label: t`Compact` }, { value: "normal", label: t`Normal` }, { value: "comfortable", label: t`Comfortable` }],
+        value: live(() => ctx.draft().shape.density),
         onChange: (v: M.Density | null) => v && ctx.change(t`Density`, (d) => ({ ...d, shape: { ...d.shape, density: v } })),
       })),
       num(ctx, "shape", "shadow", () => t`Shadow strength`, { min: 0, max: 2, step: 0.1, format: (v) => (v ? times(v) : t`None`) }),

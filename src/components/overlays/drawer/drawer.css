@@ -6,10 +6,8 @@
 .hm-sheet-at-top, .hm-sheet-at-bottom { flex-direction: column; }
 .hm-sheet-at-top { justify-content: flex-start; }
 .hm-sheet-at-bottom { justify-content: flex-end; }
-.hm-overlay.is-modeless { background: none; backdrop-filter: none; pointer-events: none; animation: none; }
-.hm-overlay.is-modeless > .hm-sheet { pointer-events: auto; }
 
-.hm-drawer.hm-sheet { position: relative; animation: none; margin: 0; max-width: 100vw; max-height: 100vh; overflow: hidden; will-change: transform; }
+.hm-drawer.hm-sheet { position: relative; margin: 0; max-width: 100vw; max-height: 100vh; overflow: hidden; will-change: transform; }
 .hm-drawer.hm-sheet-start, .hm-drawer.hm-sheet-end { height: 100%; width: var(--hm-sheet-size, min(30rem, 100vw)); }
 .hm-drawer.hm-sheet-start { border-inline-start: 0; border-inline-end: 1px solid var(--hm-border); }
 /* top / bottom: as tall as the content up to the size (then the body scrolls; handle and head stay) */
@@ -29,7 +27,6 @@
 .hm-sheet-top.hm-sheet-sm, .hm-sheet-bottom.hm-sheet-sm { --hm-sheet-size: 30vh; }
 .hm-sheet-top.hm-sheet-lg, .hm-sheet-bottom.hm-sheet-lg { --hm-sheet-size: 70vh; }
 .hm-sheet-top.hm-sheet-full, .hm-sheet-bottom.hm-sheet-full { --hm-sheet-size: 100vh; }
-.hm-drawer.hm-sheet .hm-dialog-body { overscroll-behavior: contain; }
 .hm-drawer.hm-sheet .hm-dialog-body { flex: 1; min-height: 0; }
 .hm-drawer.hm-sheet.is-dragging { user-select: none; }
 

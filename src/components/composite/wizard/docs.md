@@ -48,4 +48,5 @@ Progress bar carries "Step 2 of 3" as its label, and step-level errors are `role
 
 ## Composed of
 
-Steps (the stage list), Progress (the bar under it); fields come from the form engine (`renderFields`).
+Steps (the stage list), Progress (the bar under it), Button (Back, Next / Finish: busy while the form submits), Alert (a step or submit error); fields come
+from the form engine (`renderFields`).

@@ -56,3 +56,36 @@ test("CheckMark: look, size, colour and own glyphs", () => {
   assert.equal(c.querySelector(".hm-checkmark-icon").childNodes.length === 0 || c.querySelector(".hm-checkmark-icon").textContent === "", true, "false draws no glyph");
   dispose();
 });
+
+test("CheckMark: motion plays a transition between two values (the old glyph leaves, the new one arrives); none by default", async () => {
+  const a = signal(false), b = signal(false), c = signal(true), d = signal(true);
+  const seen = [];
+  const [el, dispose] = mount(() => [
+    h(CheckMark, { value: a }),
+    h(CheckMark, { value: b, motion: "flip", variant: "soft" }),
+    h(CheckMark, { value: c, motion: (next, prev, change) => { seen.push([next.isConnected, prev.isConnected, change.from, change.to]); } }),
+    h(CheckMark, { value: d, motion: "none" }),
+  ]);
+  const [plain, flip, own, none] = el.querySelectorAll(".hm-checkmark");
+  assert.ok(!plain.classList.contains("hm-checkmark-moves") && !none.classList.contains("hm-checkmark-moves"));
+  assert.ok(flip.classList.contains("hm-checkmark-moves") && own.classList.contains("hm-checkmark-moves"));
+  assert.equal(flip.querySelectorAll(".hm-checkmark-glyph").length, 1, "nothing plays on the first draw");
+  a.set(true); d.set(false);
+  assert.equal(plain.querySelectorAll(".hm-checkmark-glyph").length, 1, "no motion: the glyph changes at once");
+  assert.equal(none.querySelectorAll(".hm-checkmark-glyph").length, 1);
+  b.set(true);
+  assert.ok(flip.classList.contains("is-yes"), "the value shows at once");
+  const glyphs = flip.querySelectorAll(".hm-checkmark-glyph");
+  if (glyphs.length === 2) assert.ok(glyphs[0].classList.contains("is-leaving") && !glyphs[1].classList.contains("is-leaving"));
+  c.set("partial");
+  assert.deepEqual(seen, [[true, true, true, "partial"]], "your own function gets both glyphs and the change");
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(own.querySelectorAll(".hm-checkmark-glyph").length, 1, "the leaving glyph is removed when your motion settles");
+  // a quick second change never leaves more than one glyph behind
+  b.set(false); b.set("partial");
+  assert.ok(flip.querySelectorAll(".hm-checkmark-glyph").length <= 2);
+  assert.ok(flip.classList.contains("is-partial"));
+  await new Promise((r) => setTimeout(r, 30)); // the motion engine arrives: the transition starts, nothing waits unseen
+  assert.equal(flip.querySelector(".is-arriving"), null);
+  dispose();
+});

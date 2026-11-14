@@ -38,4 +38,4 @@ ring and the badge are decorative.
 
 ## Composed of
 
-Avatar.
+Avatar, CornerMark.

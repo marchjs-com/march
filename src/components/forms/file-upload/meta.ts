@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Drop zone or click; accept / size checks, image and audio previews, upload progress and cancel.",
   category: "forms",
-  composedOf: ["Progress","OverflowText"],
+  composedOf: ["Progress", "ListRow", "IconButton", "Button", "Badge"],
   behaviors: ["dropzone"],
   hubs: [],
   showcase: "/forms",

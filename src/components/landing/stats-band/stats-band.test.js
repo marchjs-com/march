@@ -14,7 +14,7 @@ test("StatsBand: dl with dt label and dd counter per item", () => {
   assert.equal(items.length, 2);
   assert.equal(items[0].querySelector("dt").textContent, "teams");
   assert.ok(items[1].querySelector("dd .hm-counter"));
-  assert.equal(items[1].querySelector(".hm-stats-note").textContent, "12 mo");
+  assert.equal(items[1].querySelector(".hm-stat-tile-hint").textContent, "12 mo");
   dispose();
 });
 

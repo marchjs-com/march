@@ -28,7 +28,7 @@ test("NotForYou: lines toggle, the verdict follows, onCheck gets the indexes", (
   assert.equal(instead.getAttribute("aria-hidden"), "true", "hidden until struck out");
   boxes[2].click(); boxes[0].click();
   assert.equal(instead.getAttribute("aria-hidden"), "false");
-  assert.ok(boxes[0].querySelector(".hm-nfy-mark-x") && boxes[0].querySelector(".hm-nfy-mark-ok"), "cross and tick, swapped by state");
+  assert.ok(boxes[0].querySelector(".hm-nfy-mark.hm-checkmark.is-yes") && boxes[1].querySelector(".hm-nfy-mark.hm-checkmark.is-no"), "a cross that turns into a tick once struck out");
   assert.equal(boxes[0].getAttribute("aria-checked"), "true");
   assert.match(boxes[0].textContent, /That's me/);
   assert.match(boxes[0].textContent, /Not you$/);
@@ -61,13 +61,13 @@ test("NotForYou: own marks, no marks, texts changed or left out, no verdict", ()
   ], el);
   const [own, bare] = el.querySelectorAll(".hm-nfy");
   const box = own.querySelector("[role=checkbox]");
-  assert.equal(box.querySelector(".hm-nfy-mark-x").textContent, "not:A0");
-  assert.equal(box.querySelector(".hm-nfy-mark-ok").textContent, "marked:A0");
+  assert.equal(box.querySelector(".hm-nfy-mark").textContent, "not:A0");
   assert.equal(own.querySelector(".hm-nfy-for .hm-nfy-mark").textContent, "for:D0");
   assert.equal(own.querySelector(".hm-nfy-not .hm-nfy-title").textContent, "Not");
   assert.equal(own.querySelector(".hm-nfy-for .hm-nfy-title"), null);
   assert.match(box.textContent, /Me!tap$/);
   box.click();
+  assert.equal([...box.querySelectorAll(".hm-nfy-mark .hm-checkmark-glyph")].pop().textContent, "marked:A0", "the arriving mark (the old one is leaving)");
   assert.match(box.textContent, /Me!gone$/);
   assert.equal(bare.querySelector(".hm-nfy-mark"), null);
   assert.equal(bare.querySelector(".hm-nfy-me"), null);

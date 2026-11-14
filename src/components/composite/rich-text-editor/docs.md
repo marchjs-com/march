@@ -29,7 +29,7 @@ Undo / redo use an UndoManager history of the editor's own (typing merges into o
 | `hint` | boolean | `true` | the "Type @ to mention, : for emoji" hint in the foot |
 | `toolIcons` | `{ [tool]: node }` | built-in glyphs | own icon (node or short text) per toolbar button |
 | `labels` | object | `t` texts | `editor`, `toolbar`, `tools: { bold: "…" }`, `link`, `linkAddress`, `linkHelp`, `apply`, `removeLink`, `suggestions`, `noMatches`, `keepTyping`, `hint`, `count(words, characters)` |
-| `class` | class | — | on the root (`hm-rte`); parts: `hm-rte-bar`, `-toolbar`, `-tool`, `-sep`, `-content`, `-foot`, `-hint`, `-count`, `-link`, `-sug`, `-sug-item` |
+| `class` | class | — | on the root (`hm-rte`); parts: `hm-rte-bar`, `-toolbar`, `-tool`, `-sep`, `-content`, `-foot`, `-hint`, `-count`, `-link`, `-sug` (the rows are OptionList rows: `.hm-rte-sug .hm-option-list-row`) |
 
 ```tsx
 <RichTextEditor bind:value={$md} toolbar={["bold", "italic", "link"]} toolIcons={{ bold: "B", italic: "I" }} hint={false}
@@ -55,5 +55,8 @@ relative links are accepted.
 
 ## Composed of
 
-Toolbar, IconButton, Avatar (mention suggestions); floating panels (popover), UndoManager (`undoHistory`), the safe
-content core (`dom/safe.ts`, `dom/sanitize.ts`, `dom/markdown.ts`, `dom/to-markdown.ts`).
+PanelHeader (head and foot bars), Popover + Field + TextInput (`UrlInput`: the link panel), Popover + OptionList + Avatar
+(suggestions; the keys stay in the text: `keysFrom`), IconButton; the formatting toolbar shared with MarkdownEditor
+(`composite/editor-parts/format-toolbar.ts`: Toolbar, IconButton `pressed`, Divider, roving focus) and the shared editor
+frame (`composite/editor-parts/frame.css`); `undoKeys`, UndoManager (`undoHistory`), the safe content core
+(`dom/safe.ts`, `dom/sanitize.ts`, `dom/markdown.ts`, `dom/to-markdown.ts`).

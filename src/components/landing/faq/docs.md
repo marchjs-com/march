@@ -23,7 +23,7 @@ case-insensitive, typo tolerant) and announces how many questions match.
 | `labels` | `{ search, count, empty }` | translated | search placeholder and name, the count line (`(shown, total) => node`), the no-match text |
 | `count` | boolean | `true` | the "3 of 12 questions" line under the search box |
 | `reveal` | Reveal effect / `{ from, to }` / `none` | `up` | entrance of the heading column (split) |
-| `class` | string | — | extra class on the root (`.hm-faq`; parts: `.hm-faq-aside`, `.hm-faq-title`, `.hm-faq-search`, `.hm-faq-count`, `.hm-faq-empty`) |
+| `class` | string | — | extra class on the root (`.hm-faq`; parts: `.hm-faq-aside` (a SectionHead: `.hm-section-head-title`, `-lead`), `.hm-faq-search`, `.hm-faq-count`, `.hm-faq-empty`) |
 
 ## Accessibility
 
@@ -32,4 +32,4 @@ live region; the search box has an accessible name.
 
 ## Composed of
 
-Accordion, SearchBox, Reveal; `rank` (shared fuzzy search).
+Accordion, SearchBox, SectionHead (the split heading, with Reveal), Empty; `rank` (shared fuzzy search).

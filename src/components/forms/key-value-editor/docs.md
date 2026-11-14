@@ -32,4 +32,5 @@ its row.
 
 ## Composed of
 
-Nothing: inputs and the icon buttons shared with ListEditor (forms/rows.ts).
+TextInput (key and value), RowTools (remove) and Button (add row); the row logic is shared with ListEditor and
+RecordListEditor (forms/rows.ts).

@@ -14,8 +14,6 @@
 /* color prop: the token sits on the indicator only, so the content keeps its own colours */
 .hm-ptr.is-ready .hm-ptr-ind[data-hm-color], .hm-ptr.is-refreshing .hm-ptr-ind[data-hm-color] { color: var(--hm-accent); border-color: var(--hm-accent); }
 /* keyboard: a Refresh button that appears only while focused */
-.hm-ptr-kbd { position: absolute; z-index: 2; inset-block-start: var(--hm-space-2); inset-inline-start: 50%; translate: -50% 0; padding: var(--hm-space-1) var(--hm-space-3);
-  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-full); background: var(--hm-surface-raised); color: var(--hm-text); font: inherit;
-  font-size: var(--hm-text-sm); cursor: pointer; opacity: 0; pointer-events: none; }
-.hm-ptr-kbd:focus-visible { opacity: 1; pointer-events: auto; outline: 2px solid var(--hm-focus); outline-offset: 2px; }
+.hm-btn.hm-ptr-kbd { position: absolute; z-index: 2; inset-block-start: var(--hm-space-2); inset-inline-start: 50%; translate: -50% 0; opacity: 0; pointer-events: none; }
+.hm-btn.hm-ptr-kbd:focus-visible { opacity: 1; pointer-events: auto; }
 [dir="rtl"] .hm-ptr-kbd { translate: 50% 0; }

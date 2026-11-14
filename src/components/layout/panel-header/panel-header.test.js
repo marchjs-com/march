@@ -66,3 +66,11 @@ test("PanelHeader: drag handle (ref and events on the root, close is not a drag)
   assert.equal(foot.querySelector(".hm-panel-header-title").tagName, "SPAN");
   m.dispose();
 });
+
+test("PanelHeader: partClass adds a host's own class to a part", () => {
+  const { el, dispose } = mount(() => h(PanelHeader, { title: "T", subtitle: "S", meta: "3", actions: "a", partClass: { title: "my-title", subtitle: "my-sub", meta: "my-meta", actions: "my-actions", titles: "my-titles" } }));
+  assert.equal(el.querySelector(".hm-panel-header-title.my-title").textContent, "T");
+  assert.ok(el.querySelector(".hm-panel-header-sub.my-sub") && el.querySelector(".hm-panel-header-meta.my-meta") && el.querySelector(".hm-panel-header-actions.my-actions") && el.querySelector(".hm-panel-header-titles.my-titles"));
+  assert.equal(el.querySelector(".hm-panel-header").hasAttribute("partClass"), false);
+  dispose();
+});

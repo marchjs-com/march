@@ -6,9 +6,9 @@ import "./not-for-you.css";
 import { h } from "../../../dom/h.ts";
 import { signal, computed } from "../../../core/reactive.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { cx, val, glyph, type ClassProp } from "../../../ui/util.ts";
-import { x as xIcon } from "../../../icons/glyphs/x.ts";
-import { check as checkIcon } from "../../../icons/glyphs/check.ts";
+import { cx, val, type ClassProp } from "../../../ui/util.ts";
+import { ListRow } from "../../data/list-row/index.ts";
+import { CheckMark } from "../../feedback/check-mark/index.ts";
 import tr from "./tr.ts";
 
 messages("tr", tr);
@@ -73,29 +73,30 @@ export function NotForYou(props: NotForYouProps): Element {
 
   const own = typeof props.mark === "function" ? props.mark : null;
   const line = (it: NotForYouItem, i: number, kind: "not" | "for"): Element => {
-    const body = [
-      // a checkable line has both marks: the cross turns into a tick once it is struck out
-      props.mark === false ? null : h("span", { class: cx("hm-nfy-mark", own && "is-own"), "aria-hidden": "true" }, kind === "not" && props.check
-        ? own
-          ? [h("span", { class: "hm-nfy-mark-x" }, own("not", it, i)), h("span", { class: "hm-nfy-mark-ok" }, own("marked", it, i))]
-          : [glyph(xIcon, "hm-svg hm-nfy-mark-x"), glyph(checkIcon, "hm-svg hm-nfy-mark-ok")]
-        : own ? own(kind, it, i) : glyph(kind === "not" ? xIcon : checkIcon)),
-      h("span", { class: "hm-nfy-text" }, h("strong", null, it.text), it.detail != null ? h("span", { class: "hm-nfy-detail" }, it.detail) : null,
-        kind === "not" && props.check && it.instead != null
-          ? h("span", { class: "hm-nfy-instead", "aria-hidden": () => String(!marked().has(i)) }, h("span", { class: "hm-nfy-instead-in" }, it.instead))
-          : null),
-    ];
-    if (kind === "not" && props.check) {
+    const checkable = kind === "not" && !!props.check;
+    const on = (): boolean => marked().has(i);
+    // the round mark is a CheckMark: a cross on a "not" line, a tick on a "for" line; on a checkable line its own
+    // motion turns the cross into a tick once the line is struck out
+    const mark = props.mark === false ? undefined : h(CheckMark, {
+      class: "hm-nfy-mark", variant: "soft", label: false, value: checkable ? on : kind === "for", ...(checkable ? { motion: "flip" } : {}),
+      ...(own ? { icons: { no: () => own("not", it, i), yes: () => own(checkable ? "marked" : "for", it, i) } } : {}),
+    });
+    const more = [
+      it.detail != null ? h("span", { class: "hm-nfy-detail" }, it.detail) : null,
+      checkable && it.instead != null ? h("span", { class: "hm-nfy-instead", "aria-hidden": () => String(!on()) }, h("span", { class: "hm-nfy-instead-in" }, it.instead)) : null,
+    ].filter(Boolean);
+    // the line itself is a ListRow: mark, text with its detail, and (checkable) the "That's me" label at the end
+    const row = (extra: Record<string, unknown>): Element => h(ListRow, { align: "start", overflow: "wrap", lead: mark, title: h("strong", null, it.text), sub: more.length ? more : undefined, ...extra }) as Element;
+    if (checkable) {
       const me = props.meLabel === false ? null : h("span", { class: "hm-nfy-me-label" }, () => props.meLabel ?? t`That's me`);
       const hint = props.hint === false && props.markedHint === false ? null
-        : h("small", { class: "hm-nfy-me-hint" }, () => { const x = marked().has(i) ? props.markedHint ?? t`Not you` : props.hint ?? t`Not you? Tap it!`; return x === false ? null : x; });
+        : h("small", { class: "hm-nfy-me-hint" }, () => { const x = on() ? props.markedHint ?? t`Not you` : props.hint ?? t`Not you? Tap it!`; return x === false ? null : x; });
+      // the whole card is the checkbox
       return h("li", { class: "hm-nfy-item" },
-        h("button", {
-          type: "button", class: () => cx("hm-nfy-toggle", marked().has(i) && "is-on"), role: "checkbox",
-          "aria-checked": () => String(marked().has(i)), onClick: () => toggle(i),
-        }, ...body, me || hint ? h("span", { class: "hm-nfy-me", "aria-hidden": "true" }, me, hint) : null));
+        h("button", { type: "button", class: () => cx("hm-nfy-toggle", on() && "is-on"), role: "checkbox", "aria-checked": () => String(on()), onClick: () => toggle(i) },
+          row({ as: "span", trail: me || hint ? h("span", { class: "hm-nfy-me", "aria-hidden": "true" }, me, hint) : undefined })));
     }
-    return h("li", { class: "hm-nfy-item" }, h("div", { class: "hm-nfy-row" }, ...body));
+    return h("li", { class: "hm-nfy-item" }, row({ class: "hm-nfy-row" }));
   };
   const list = (title: unknown, items: NotForYouItem[], kind: "not" | "for"): Element =>
     h("section", { class: cx("hm-nfy-col", `hm-nfy-${kind}`) },

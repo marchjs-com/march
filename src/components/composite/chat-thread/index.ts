@@ -7,10 +7,14 @@ import { signal, computed, effect, untrack, onCleanup } from "../../../core/reac
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { applyPipe } from "../../../core/pipes.ts";
 import { arrowDown } from "../../../icons/glyphs/arrowDown.ts";
-import { Avatar } from "../../../ui/avatar.ts";
+import { Avatar } from "../../social/avatar/index.ts";
+import { Button } from "../../actions/button/index.ts";
+import { Picture } from "../../media/picture/index.ts";
+import { hashString } from "../../../ui/format.ts";
+import { stickToBottom, type StickControls } from "../../../ui/observe.ts";
 import { ChatBubble, type MessageStatus, type Reaction } from "../../social/chat-bubble/index.ts";
 import { TypingIndicator } from "../../social/typing-indicator/index.ts";
 import { ReactionPicker } from "../../social/reaction-picker/index.ts";
@@ -18,7 +22,7 @@ import { animate } from "../../../motion/animate.ts";
 import { measure } from "../../../motion/engine/clock.ts";
 import "./chat-thread.css";
 import { isRtl } from "../../../core/util.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
 import { dismiss } from "../../../behaviors/dismiss/index.ts";
 
 export interface ChatMessage {
@@ -69,7 +73,6 @@ export function dayLabel(v: Date | string | number, now = new Date()): string {
   const d = new Date(v), y = new Date(now); y.setDate(y.getDate() - 1);
   return dayKey(d) === dayKey(now) ? t`Today` : dayKey(d) === dayKey(y) ? t`Yesterday` : applyPipe("date", d, "medium");
 }
-const colorOf = (id: string): number => { let x = 0; for (const c of id) x = (x * 31 + (c.codePointAt(0) ?? 0)) >>> 0; return x % 4; };
 
 /** `<ChatThread messages={$messages} typing={$typing} onReact={react} onReply={(m) => $replyTo = m} />` */
 export function ChatThread(props: ChatThreadProps): Element {
@@ -79,7 +82,7 @@ export function ChatThread(props: ChatThreadProps): Element {
   const picking = signal<string | null>(null);
   const unseen = signal(0);
   const seen = new Set<string>();
-  let ready = false, root!: HTMLElement, atBottom = true;
+  let ready = false, root!: HTMLElement, stick: StickControls | null = null;
 
   const entries = computed((): Entry[] => {
     const list = val(props.messages), group = !!val(props.group), out: Entry[] = [];
@@ -93,12 +96,12 @@ export function ChatThread(props: ChatThreadProps): Element {
       const joinPrev = !!prev && who(prev) === who(m) && dayKey(new Date(prev.time)) === dk && d.getTime() - new Date(prev.time).getTime() < run;
       const joinNext = !!next && who(next) === who(m) && dayKey(new Date(next.time)) === dk && new Date(next.time).getTime() - d.getTime() < run;
       const pos = joinPrev ? (joinNext ? "middle" : "last") : joinNext ? "first" : "single";
-      out.push({ key: m.id, m, pos, sender: group && !m.mine && !joinPrev, avatar: group && !m.mine && !joinNext, color: colorOf(who(m)) });
+      out.push({ key: m.id, m, pos, sender: group && !m.mine && !joinPrev, avatar: group && !m.mine && !joinNext, color: hashString(who(m)) % 4 });
     });
     return out;
   });
 
-  const toBottom = (smooth: boolean): void => { root?.scrollTo?.({ top: root.scrollHeight, behavior: smooth && moves() ? "smooth" : "auto" }); unseen.set(0); };
+  const toBottom = (smooth: boolean): void => { stick?.toBottom(smooth && moves()); unseen.set(0); };
   const enter = (el: HTMLElement, mine: boolean): void => {
     if (mine) animate(el, [{ transform: "translateY(28px) scale(.9)", opacity: 0 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { duration: 340, easing: "easeOutBack" });
     else {
@@ -123,7 +126,7 @@ export function ChatThread(props: ChatThreadProps): Element {
           onReactMenu: props.onReact && (() => picking.set(picking.peek() === first.key ? null : first.key)),
           onReply: props.onReply && (() => props.onReply?.(m())),
           onRetry: props.onRetry && (() => props.onRetry?.(m())),
-          children: () => { const im = m().image; return im ? h("img", { class: "hm-chat-img", src: im.src, alt: im.alt ?? "", loading: "lazy", decoding: "async" }) : null; },
+          children: () => { const im = m().image; return im ? h(Picture, { class: "hm-chat-img", src: im.src, alt: im.alt ?? "" }) : null; },
         }),
         () => (picking() === first.key ? h("div", { class: "hm-chat-pick" }, h(ReactionPicker, {
           selected: () => m().reactions?.find((r) => r.mine)?.emoji,
@@ -142,7 +145,7 @@ export function ChatThread(props: ChatThreadProps): Element {
       lastLen = list.length;
       measure(() => {
         if (!ready) { toBottom(false); ready = true; return; }
-        if (atBottom || (added > 0 && mineLast)) toBottom(true);
+        if (stick?.pinned() !== false || (added > 0 && mineLast)) toBottom(true);
         else if (added > 0) unseen.set(unseen.peek() + added);
       });
     });
@@ -156,11 +159,14 @@ export function ChatThread(props: ChatThreadProps): Element {
 
   root = h("div", {
     class: () => cx("hm-chat", val(props.class)), role: "log", "aria-label": () => val(props.label) ?? t`Messages`, tabindex: "0",
-    onScroll: () => { atBottom = root.scrollHeight - root.scrollTop - root.clientHeight < 80; if (atBottom) unseen.set(0); },
   },
   h(For as never, { each: entries, key: "key", children: (e: () => Entry) => row(e) }),
   h("div", { class: "hm-chat-typing" }, h(TypingIndicator, { names: () => val(props.typing) ?? [] })),
-  () => (unseen() && jump !== false ? h("button", { type: "button", class: "hm-chat-jump", "data-hm-color": colorAttr(props.jumpColor), onClick: () => toBottom(true) },
-    typeof jump === "function" ? jump(unseen()) : [glyph(arrowDown), t`${unseen()} new`]) : null)) as HTMLElement;
+  // "N new": a pill Button that floats over the end of the log
+  () => (unseen() && jump !== false ? h(Button, {
+    variant: "primary", shape: "pill", color: props.jumpColor ?? "brand-blue", class: "hm-chat-jump", icon: typeof jump === "function" ? null : arrowDown, onClick: () => toBottom(true),
+  }, typeof jump === "function" ? jump(unseen()) : t`${unseen()} new`) : null)) as HTMLElement;
+  // pinned to the end until the reader scrolls up (80px of slack); back at the end nothing is unseen
+  stick = stickToBottom(root, { threshold: 80, onChange: (pinned) => { if (pinned) unseen.set(0); } });
   return root;
 }

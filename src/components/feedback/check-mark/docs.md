@@ -8,6 +8,8 @@ screen reader reads. The text is visually hidden unless `text` shows it; every g
 <CheckMark value="partial" text />
 <CheckMark value={false} variant="soft" label={false} />
 <CheckMark value labels={{ yes: "Included" }} icons={{ yes: heart }} color="primary" size="lg" />
+<CheckMark value={$done} variant="soft" motion="flip" />          // ✕ turns into ✓ when $done changes
+<CheckMark value={$ok} motion={(next, prev) => animate(next, { opacity: [0, 1], transform: ["translateY(6px)", "none"] }, { duration: 240 }).finished} />
 ```
 
 ## Props
@@ -22,6 +24,7 @@ screen reader reads. The text is visually hidden unless `text` shows it; every g
 | `variant` | `plain` `soft` `solid` | `plain` | the glyph alone, on a tinted disc or on a filled disc |
 | `size` | `sm` `md` `lg` | `md` | |
 | `color` | color token | by value | success / danger / warn unless a token is given |
+| `motion` | `flip` `fade` `pop` `draw` / `none` `false` / `(next, prev, change) => …` | `none` | the transition when the value changes: the glyphs turn into each other (`flip`), cross-fade, pop, or the new stroke is drawn; your own function gets the arriving and the leaving glyph and `{ from, to }` (return a promise: the leaving glyph is removed when it settles). Runs on the motion engine; with reduced motion the glyph changes at once |
 | `class` | class | — | |
 | other attributes | | | `data-*`, `title`, `id` go to the root |
 

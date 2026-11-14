@@ -5,7 +5,6 @@
 import "./tree-view.css";
 import { signal, computed, effect, untrack, batch, createRoot, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { openLayer } from "../../../dom/portal.ts";
 import { t, dir } from "../../../core/i18n.ts";
 import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp } from "../../../core/util.ts";
 import { fold } from "../../../core/text.ts";
@@ -13,10 +12,14 @@ import { createAxis, createViewport } from "../../../core/virtual.ts";
 import { createSelection, moveCursor, type SelectionMode } from "../../../core/selection.ts";
 import { animate, stagger } from "../../../motion/animate.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
+import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
 import { markText } from "../../../ui/mark.ts";
-import { Spinner } from "../../../ui/feedback.ts";
+import { Spinner } from "../../feedback/spinner/index.ts";
+import { Button } from "../../actions/button/index.ts";
+import { Empty } from "../../feedback/empty/index.ts";
+import { Badge } from "../badge/index.ts";
+import { treeRow, treeKey } from "../tree/row.ts";
 import { icon, glyph } from "../../../ui/util.ts";
-import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { folder } from "../../../icons/glyphs/folder.ts";
 import { fileText } from "../../../icons/glyphs/fileText.ts";
 import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
@@ -242,28 +245,33 @@ export function TreeView(props: TreeViewProps): Element {
   const rowEl = (r: Row, i: number): HTMLElement => {
     const n = r.node, isSel = sel.has(n.id), q = query(), isLoading = loading().has(n.id), err = failed().get(n.id);
     const def = val(props.icons) === false ? null : hasKids(n) ? folder : fileText;
-    const el = h("div", {
-      role: "treeitem", id: `${id}-${i}`, class: cx("hm-tv-row", isSel && "is-selected", n.disabled && "is-disabled", dragging().has(n.id) && "is-dragging"),
+    const own = props.chevron;
+    // the row both trees share (a ListRow: Chevron + icon · label · tools + meta); the Chevron is the pointer target that only opens / closes
+    const el = treeRow({
+      prefix: "hm-tv", kids: r.kids, open: r.open, turn: "spring", chevronSize: "sm", chevronAttrs: { "data-chev": "" },
+      chevron: typeof own === "function" ? () => own(n, r.open) : own,
+      icon: n.icon != null ? icon(n.icon, "hm-tv-icon") : def ? h("span", { class: cx("hm-tv-icon", r.kids && "is-folder"), "aria-hidden": "true" }, glyph(def)) : null,
+      label: q ? markText(n.label, q) : n.label,
+      tools: [
+        isLoading ? h(Spinner, { size: "sm", label: lb("loading")(n.label) }) : null,
+        err ? h(Button, { variant: "ghost", size: "sm", color: "danger", icon: alertCircle, class: "hm-tv-retry", "data-chev": "", onClick: (e: Event) => { e.stopPropagation(); void loadKids(n); } }, lb("retry")) : null,
+      ],
+      meta: n.meta,
+    }, {
+      role: "treeitem", id: `${id}-${i}`, class: cx("hm-tv-row", dragging().has(n.id) && "is-dragging"), overflow: "ellipsis", interactive: true,
+      selected: sel.mode() === "none" ? undefined : isSel, disabled: !!n.disabled,
       "aria-level": String(r.depth + 1), "aria-setsize": String(r.size), "aria-posinset": String(r.pos),
-      "aria-expanded": r.kids ? String(r.open) : null, "aria-selected": sel.mode() === "none" ? null : String(isSel), "aria-disabled": n.disabled ? "true" : null,
-      "aria-busy": isLoading ? "true" : null, "data-i": String(i), "data-id": n.id,
-    },
-    props.chevron === false ? null : typeof props.chevron === "function"
-      ? h("span", { class: cx("hm-tv-chev is-own", !r.kids && "is-leaf"), "data-chev": "", "aria-hidden": "true" }, r.kids ? props.chevron(n, r.open) : null)
-      : h("span", { class: cx("hm-tv-chev", !r.kids && "is-leaf", r.open && "is-open"), "data-chev": "", "aria-hidden": "true" }, r.kids ? glyph(chevronRight) : null),
-    n.icon != null ? icon(n.icon, "hm-tv-icon") : def ? h("span", { class: cx("hm-tv-icon", r.kids && "is-folder"), "aria-hidden": "true" }, glyph(def)) : null,
-    h("span", { class: "hm-tv-label" }, q ? markText(n.label, q) : n.label),
-    isLoading ? h(Spinner, { size: "sm", label: lb("loading")(n.label) }) : null,
-    err ? h("button", { type: "button", class: "hm-tv-retry", "data-chev": "", onClick: (e: Event) => { e.stopPropagation(); void loadKids(n); } }, glyph(alertCircle), lb("retry")) : null,
-    n.meta != null ? h("span", { class: "hm-tv-meta" }, n.meta) : null) as HTMLElement;
+      "aria-expanded": r.kids ? String(r.open) : null, "aria-busy": isLoading ? "true" : null, "data-i": String(i), "data-id": n.id,
+    }) as HTMLElement;
     setStyle(el, { height: `${rowH}px`, transform: `translateY(${i * rowH}px)`, "--hm-tv-depth": String(r.depth) });
     return el;
   };
 
   const canvas = h("div", { class: "hm-tv-canvas", role: "none" }) as HTMLElement;
   const dropLine = h("div", { class: "hm-tv-drop", "aria-hidden": "true" }) as HTMLElement;
-  const empty = props.empty === false ? null : h("div", { class: "hm-tv-empty", hidden: () => flat().length > 0 },
-    props.empty != null && props.empty !== true ? props.empty : () => (query() ? lb("noMatch")(query()) : lb("empty"))) as HTMLElement;
+  // the empty state is the compact Empty: the tree's own text, or the host's node
+  const ownEmpty = props.empty != null && props.empty !== true;
+  const empty = props.empty === false ? null : (): unknown => (flat().length > 0 ? null : untrack(() => h(Empty, { size: "sm", class: "hm-tv-empty", title: ownEmpty ? false : () => (query() ? lb("noMatch")(query()) : lb("empty")) }, ownEmpty ? props.empty : undefined)));
   const scroller = h("div", {
     role: "tree", class: () => cx("hm-tv", canDrag() && "is-draggable", val(props.class)), tabindex: "0", "aria-label": () => val(props.label) ?? t`Tree`, "data-hm-color": () => colorAttr(props.color),
     "aria-multiselectable": () => (sel.mode() === "multiple" ? "true" : null),
@@ -343,7 +351,6 @@ export function TreeView(props: TreeViewProps): Element {
     const list = flat(), i = untrack(cursor), r = list[i];
     if (!r) return;
     const multi = sel.mode() === "multiple", ctrl = e.ctrlKey || e.metaKey;
-    const fwd = rtl() ? "ArrowLeft" : "ArrowRight", back = rtl() ? "ArrowRight" : "ArrowLeft";
     if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown") && canDrag()) { e.preventDefault(); siblingMove(r, e.key === "ArrowUp" ? -1 : 1); return; }
     const page = Math.max(1, Math.floor(scroller.clientHeight / rowH) - 1);
     const ni = moveCursor({ key: e.key, index: i, count: list.length, page, ctrl });
@@ -356,10 +363,15 @@ export function TreeView(props: TreeViewProps): Element {
       else if (!multi && sel.mode() === "single") sel.pick(target.node.id);
       return;
     }
-    if (e.key === fwd) { e.preventDefault(); if (r.kids && !r.open) setOpen(r.node, true); else if (r.open) focusRow(i + 1); }
-    else if (e.key === back) { e.preventDefault(); if (r.open) setOpen(r.node, false); else if (r.parent) focusRow(untrack(rowIndex).get(r.parent) ?? i); }
-    else if (e.key === "Enter") { e.preventDefault(); if (!r.node.disabled) sel.pick(r.node.id, multi ? { ctrlKey: ctrl, shiftKey: e.shiftKey } : {}); if (r.kids) setOpen(r.node, !r.open); else props.onActivate?.(r.node); }
-    else if (e.key === " ") { e.preventDefault(); if (!r.node.disabled) { if (multi) sel.toggle(r.node.id); else sel.pick(r.node.id); } }
+    // → ← Enter Space: the keys both trees share
+    const k = treeKey(e.key, r, rtl());
+    if (k || e.key === "ArrowLeft" || e.key === "ArrowRight") e.preventDefault();
+    if (k === "open" || k === "close") setOpen(r.node, k === "open");
+    else if (k === "child") focusRow(i + 1);
+    else if (k === "parent") { if (r.parent) focusRow(untrack(rowIndex).get(r.parent) ?? i); }
+    else if (k === "activate") { if (!r.node.disabled) sel.pick(r.node.id, multi ? { ctrlKey: ctrl, shiftKey: e.shiftKey } : {}); if (r.kids) setOpen(r.node, !r.open); else props.onActivate?.(r.node); }
+    else if (k === "select") { if (!r.node.disabled) { if (multi) sel.toggle(r.node.id); else sel.pick(r.node.id); } }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowRight") return;
     else if (e.key === "*") { e.preventDefault(); for (const x of list) if (x.parent === r.parent && x.kids) setOpen(x.node, true); }
     else if (multi && ctrl && e.key.toLowerCase() === "a") { e.preventDefault(); sel.selectAll(); }
     else if (e.key === "Escape" && multi) sel.clear();
@@ -386,7 +398,7 @@ export function TreeView(props: TreeViewProps): Element {
     if (e.button !== 0 || !canDrag() || (e.target as Element).closest("[data-chev]")) return;
     const i = rowAt(e), r = i == null ? null : untrack(flat)[i];
     if (!r || r.node.disabled) return;
-    let ids: string[] = [], ghost: HTMLElement | null = null, closeGhost = (): void => {}, hover: { id: string; at: ReturnType<typeof later> } | null = null;
+    let ids: string[] = [], ghost: DragGhost | null = null, hover: { id: string; at: ReturnType<typeof later> } | null = null;
     pointerDrag(e, {
       scroll: scroller,
       onStart: () => {
@@ -394,15 +406,13 @@ export function TreeView(props: TreeViewProps): Element {
         ids = s.filter((k) => !s.some((o) => o !== k && isInside(k, o)));
         dragging.set(new Set(ids));
         const byId = untrack(index).byId;
-        ghost = (props.ghost
+        ghost = dragGhost((props.ghost
           ? h("div", { class: "hm-tv-ghost is-own" }, props.ghost(ids.map((k) => byId.get(k)).filter((x): x is TreeViewNode => !!x)))
-          : h("div", { class: "hm-tv-ghost" }, h("span", { class: "hm-tv-ghost-label" }, r.node.label), ids.length > 1 ? h("b", { class: "hm-tv-ghost-count" }, String(ids.length)) : null)) as HTMLElement;
-        setStyle(ghost, { left: "0", top: "0" }); // viewport coordinates of the pointer, the same in RTL
-        closeGhost = openLayer("drag", ghost);
-        if (motion) void animate(ghost, [{ opacity: 0, scale: ".9" }, { opacity: 1, scale: "1" }], { duration: 160, easing: "easeOutCubic" });
+          : h("div", { class: "hm-tv-ghost" }, h("span", { class: "hm-tv-ghost-label" }, r.node.label), ids.length > 1 ? h(Badge, { class: "hm-tv-ghost-count", tone: "primary", count: ids.length }) : null)) as HTMLElement,
+        { offset: { x: 14, y: 10 }, motion, timing: { duration: 160 } });
       },
       onMove: (p) => {
-        setStyle(ghost, { transform: `translate(${p.clientX + 14}px, ${p.clientY + 10}px)` });
+        ghost?.move(p.clientX, p.clientY);
         const box = scroller.getBoundingClientRect(), y = p.clientY - box.top + scroller.scrollTop;
         const list = untrack(flat), ti = Math.floor(y / rowH), tr = list[ti];
         if (!tr || y < 0) { drop.set(null); return; }
@@ -419,8 +429,7 @@ export function TreeView(props: TreeViewProps): Element {
         if (hover) clearTimeout(hover.at);
         const d = untrack(drop);
         batch(() => { drop.set(null); dragging.set(new Set()); });
-        const g = ghost as HTMLElement | null;
-        if (g && motion) void animate(g, [{ opacity: 1 }, { opacity: 0, scale: ".9" }], { duration: 140 }).finished.then(closeGhost); else closeGhost();
+        void (ghost as DragGhost | null)?.leave([{ opacity: 1 }, { opacity: 0, scale: ".9" }], { duration: 140 });
         if (!cancelled && d?.ok) move(ids, d.id, d.pos);
       },
     });

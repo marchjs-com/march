@@ -5,12 +5,17 @@ import "./color-picker.css";
 import { signal, computed, effect, untrack, batch } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
+import { BRAND_COLORS } from "../../../theme/colors.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, uid, val, clamp, setStyle, type ClassProp } from "../../../core/util.ts";
-import { glyph } from "../../../ui/util.ts";
-import { model, ctl, type ControlProps } from "../../../forms/util.ts";
-import { IconButton } from "../../../ui/button.ts";
-import { Segmented } from "../../../forms/inputs.ts";
+import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { Badge } from "../../data/badge/index.ts";
+import { Segmented } from "../../forms/segmented/index.ts";
+import { Slider } from "../../forms/slider/index.ts";
+import { Swatch, CHECKER } from "../../forms/swatch/index.ts";
+import { TextInput } from "../../forms/text-input/index.ts";
+import { SectionLabel } from "../../typography/section-label/index.ts";
 import { pipette } from "../../../icons/glyphs/pipette.ts";
 import * as C from "./color.ts";
 import tr from "./tr.ts";
@@ -54,7 +59,6 @@ export interface ColorPickerProps extends ControlProps<string> {
   class?: ClassProp;
 }
 
-const HADI = ["brand-orange", "brand-blue", "brand-green", "brand-purple"];
 const THEME = ["primary", "cat-5", "cat-6", "cat-7", "cat-8", "success", "warn", "danger", "info", "neutral"];
 const WHITE: C.Rgba = { r: 255, g: 255, b: 255, a: 1 }, BLACK: C.Rgba = { r: 0, g: 0, b: 0, a: 1 };
 type EyeDropperCtor = new () => { open(): Promise<{ sRGBHex: string }> };
@@ -91,7 +95,7 @@ export function ColorPicker(props: ColorPickerProps): unknown {
   // model → CSS variables (CSSOM); also run when the root is attached
   const paint = (): void => {
     const x = hsva(), col = rgba();
-    if (root) setStyle(root, { "--hm-cp-hue": `hsl(${x.h} 100% 50%)`, "--hm-cp-color": css(), "--hm-cp-solid": `rgb(${col.r} ${col.g} ${col.b})`, "--hm-cp-x": `${x.s * 100}%`, "--hm-cp-y": `${(1 - x.v) * 100}%`, "--hm-cp-h": `${(x.h / 360) * 100}%`, "--hm-cp-a": `${x.a * 100}%` });
+    if (root) setStyle(root, { "--hm-cp-hue": `hsl(${x.h} 100% 50%)`, "--hm-cp-color": css(), "--hm-cp-solid": `rgb(${col.r} ${col.g} ${col.b})`, "--hm-cp-x": `${x.s * 100}%`, "--hm-cp-y": `${(1 - x.v) * 100}%` });
   };
   effect(paint);
   const commit = (next: C.Hsva): void => {
@@ -131,46 +135,42 @@ export function ColorPicker(props: ColorPickerProps): unknown {
     })) as HTMLElement;
   track(area, { rtl, onStart: () => !ro(), onMove: (p) => { commit({ ...hsva.peek(), s: p.x, v: 1 - p.y }); (area.firstChild as HTMLElement).focus({ preventScroll: true }); }, onEnd: remember });
 
-  const slider = (kind: "hue" | "alpha"): Element => {
+  // hue and opacity: Sliders over their own track (the hue circle; the color over the checkerboard)
+  const slider = (kind: "hue" | "alpha"): unknown => {
     const isHue = kind === "hue";
-    const el = h("div", { class: cx("hm-cp-track", `hm-cp-${kind}`) },
-      h("div", {
-        class: "hm-cp-thumb hm-cp-track-thumb", role: "slider", tabindex: () => (props.disabled ? "-1" : "0"),
-        "aria-label": () => (isHue ? L().hue ?? t`Hue` : L().opacity ?? t`Opacity`), "aria-orientation": "horizontal",
-        "aria-valuemin": "0", "aria-valuemax": isHue ? "360" : "100", "aria-valuenow": () => String(Math.round(isHue ? hsva().h : hsva().a * 100)),
-        "aria-valuetext": () => (isHue ? t`${Math.round(hsva().h)} degrees` : `${Math.round(hsva().a * 100)}%`), "aria-disabled": () => (ro() ? "true" : null),
-        onKeyDown: (e: KeyboardEvent) => {
-          const st = arrowStep(e, rtl());
-          if (!st || ro()) return;
-          e.preventDefault();
-          const x = hsva.peek(), d = st.dx || -st.dy;
-          if (isHue) commit({ ...x, h: st.home ? 0 : st.end ? 359.9 : (x.h + d + 360) % 360 });
-          else commit({ ...x, a: st.home ? 0 : st.end ? 1 : clamp(x.a + d / 100, 0, 1) });
-        },
-      })) as HTMLElement;
-    track(el, { rtl, onStart: () => !ro(), onMove: (p) => { const x = hsva.peek(); commit(isHue ? { ...x, h: Math.min(359.9, p.x * 360) } : { ...x, a: Math.round(p.x * 100) / 100 }); (el.firstChild as HTMLElement).focus({ preventScroll: true }); }, onEnd: remember });
-    return el;
+    return h(Slider, {
+      id: `${id}-${kind}`, class: `hm-cp-slider hm-cp-slider-${kind}`, track: isHue ? "hm-cp-hue" : `hm-cp-alpha ${CHECKER}`, showValue: false, max: isHue ? 360 : 100,
+      value: live(() => Math.round(isHue ? hsva().h : hsva().a * 100)),
+      onChange: (v: number) => { const x = hsva.peek(); commit(isHue ? { ...x, h: Math.min(359.9, v) } : { ...x, a: v / 100 }); },
+      onCommit: remember,
+      "aria-label": live(() => (isHue ? L().hue ?? t`Hue` : L().opacity ?? t`Opacity`)),
+      valueText: (v: number) => (isHue ? t`${v} degrees` : `${v}%`),
+      disabled: live(() => !!props.disabled), readonly: live(() => !!props.readonly),
+    });
   };
 
   // ------------------------------------------------------------------ eyedropper, preview, text
   const Dropper = (globalThis as { EyeDropper?: EyeDropperCtor }).EyeDropper;
   const dropper = (): unknown => (props.eyedropper === false || !Dropper ? null : h(IconButton, {
-    icon: props.eyedropperIcon ?? glyph(pipette), label: () => L().eyedropper ?? t`Pick a color from the screen`, size: "sm", class: "hm-cp-dropper", disabled: ro,
+    icon: props.eyedropperIcon ?? pipette, label: () => L().eyedropper ?? t`Pick a color from the screen`, size: "sm", class: "hm-cp-dropper", disabled: ro,
     onClick: async () => { try { const r = await new Dropper().open(); pick(r.sRGBHex); } catch { /* cancelled */ } },
   }));
-  const preview = h("div", { class: "hm-cp-preview", role: "img", "aria-label": () => t`New color ${out()}, was ${original() || "—"}` },
+  const preview = h("div", { class: `hm-cp-preview ${CHECKER}`, role: "img", "aria-label": () => t`New color ${out()}, was ${original() || "—"}` },
     h("button", { type: "button", class: "hm-cp-preview-old", tabindex: "-1", "aria-hidden": "true", title: () => t`Back to ${original()}`, onClick: () => { if (original.peek()) pick(original.peek()); } }),
     h("span", { class: "hm-cp-preview-new" }));
   effect(() => { const o = C.parse(original()); const el = preview.firstChild as HTMLElement; if (o) setStyle(el, { "--hm-cp-old": C.format(o, "rgb") }); });
 
-  const text = h("input", {
-    ...c, class: "hm-input hm-cp-text", type: "text", spellcheck: "false", autocomplete: "off", "aria-label": () => c["aria-label"]() ?? L().value ?? t`Color value`,
-    value: () => draft() ?? out({ ...hsva() }), readonly: () => !!props.readonly,
-    "aria-invalid": () => (draft() != null && !C.parse(draft()!) ? "true" : c["aria-invalid"]()),
-    onInput: (e: Event) => { const v = (e.target as HTMLInputElement).value; draft.set(v); const p = C.parse(v); if (p) { last = v; hsva.set(C.rgbToHsv(p, hsva.peek().h)); set(out()); } },
-    onBlur: () => { if (draft.peek() != null) { draft.set(null); remember(); } },
+  const bad = (): boolean => draft() != null && !C.parse(draft()!);
+  const text = h(TextInput, {
+    id: props.id, name: props.name, class: "hm-cp-text", spellcheck: "false", autocomplete: "off",
+    "aria-label": live(() => c["aria-label"]() ?? L().value ?? t`Color value`),
+    value: live(() => draft() ?? out({ ...hsva() })), readonly: live(() => !!props.readonly), disabled: live(() => !!props.disabled), required: live(() => !!props.required),
+    invalid: live(() => (bad() ? true : props.invalid)),
+    onChange: (v: string) => { draft.set(v); const p = C.parse(v); if (p) { last = v; hsva.set(C.rgbToHsv(p, hsva.peek().h)); set(out()); } },
+    onBlur: (e: FocusEvent) => { if (draft.peek() != null) { draft.set(null); remember(); } props.onBlur?.(e); },
+    onFocus: props.onFocus,
     onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { draft.set(null); remember(); } },
-  }) as HTMLInputElement;
+  });
   const formats = h(Segmented, {
     class: "hm-cp-formats", "aria-label": L().format ?? t`Color format`,
     options: [{ value: "hex", label: "HEX" }, { value: "rgb", label: "RGB" }, { value: "hsl", label: "HSL" }],
@@ -181,26 +181,22 @@ export function ColorPicker(props: ColorPickerProps): unknown {
   const resolve = (token: string): string => C.resolveColor(token, root);
   const palettes = (): readonly ColorPalette[] => {
     if (props.palettes === false) return [];
-    const own = props.palettes ?? [{ label: L().hadiColors ?? t`HADİ colors`, colors: HADI }, { label: L().theme ?? t`Theme`, colors: THEME }];
+    const own = props.palettes ?? [{ label: L().hadiColors ?? t`HADİ colors`, colors: BRAND_COLORS }, { label: L().theme ?? t`Theme`, colors: THEME }];
     const r = recent();
     return r.length && (props.recent ?? 8) ? [...own, { label: L().recent ?? t`Recent`, colors: r }] : own;
   };
-  const swatch = (color: string, label: string): Element => {
-    const isToken = !C.parse(color);
-    const b = h("button", {
-      type: "button", class: () => cx("hm-cp-swatch", same(color) && "is-selected"), "aria-label": label, title: label, "aria-pressed": () => String(same(color)), disabled: ro,
-      "data-hm-color": isToken ? color : null, onClick: () => pick(resolve(color)),
-    }) as HTMLElement;
-    if (!isToken) setStyle(b, { "--hm-cp-sw": color });
-    return b;
-  };
+  const swatch = (color: string, label: string): Element =>
+    h(Swatch, { class: "hm-cp-swatch", color, label, selected: () => same(color), disabled: ro, onClick: () => pick(resolve(color)) }) as Element;
   const same = (color: string): boolean => { const a = C.parse(resolve(color)), b = rgba(); return !!a && Math.abs(a.r - b.r) < 1.5 && Math.abs(a.g - b.g) < 1.5 && Math.abs(a.b - b.b) < 1.5 && Math.abs(a.a - b.a) < 0.02; };
   const contrastRow = (): unknown => {
     if (props.contrast === false) return null;
-    const on = (bg: C.Rgba, name: () => string): Element => {
+    // a Badge per ground: the color written on a white / black Swatch, the ratio and its WCAG grade
+    const on = (bg: C.Rgba, name: () => string): unknown => {
       const r = C.contrastOf(rgba(), bg), grade = r >= 7 ? "AAA" : r >= 4.5 ? "AA" : r >= 3 ? "AA+" : "—";
-      return h("span", { class: cx("hm-cp-contrast", r >= 4.5 ? "is-pass" : r >= 3 ? "is-large" : "is-fail"), title: r >= 3 && r < 4.5 ? t`Enough for large text only` : null },
-        h("span", { class: cx("hm-cp-contrast-chip", bg === WHITE ? "is-light" : "is-dark"), "aria-hidden": "true" }, "Aa"), `${name()} ${r.toFixed(2)} `, h("b", null, grade));
+      return h(Badge, {
+        class: cx("hm-cp-contrast", r >= 4.5 ? "is-pass" : r >= 3 ? "is-large" : "is-fail"),
+        dot: h(Swatch, { class: "hm-cp-contrast-chip", color: bg === WHITE ? "white" : "black", size: "sm", shape: "circle", checker: false }, "Aa") as Node,
+      }, `${name()} ${r.toFixed(2)} `, h("b", { title: r >= 3 && r < 4.5 ? t`Enough for large text only` : null }, grade));
     };
     return h("div", { class: "hm-cp-contrasts", "aria-label": () => L().contrast ?? t`Contrast`, role: "group" }, () => [on(WHITE, () => L().onWhite ?? t`on white`), on(BLACK, () => L().onBlack ?? t`on black`)]);
   };
@@ -215,6 +211,6 @@ export function ColorPicker(props: ColorPickerProps): unknown {
   props.formats === false && props.input === false ? null : h("div", { class: "hm-cp-row hm-cp-input-row" }, props.formats === false ? null : formats, props.input === false ? null : text),
   contrastRow,
   () => palettes().map((p) => h("div", { class: "hm-cp-palette", role: "group", "aria-label": p.label },
-    h("span", { class: "hm-cp-palette-label", id: `${id}-${p.label}` }, p.label),
+    h(SectionLabel, { as: "span", size: "md", class: "hm-cp-palette-label", id: `${id}-${p.label}` }, p.label),
     h("div", { class: "hm-cp-swatches" }, p.colors.map((col) => swatch(col, swatchName(col)))))));
 }

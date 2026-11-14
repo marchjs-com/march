@@ -3,10 +3,9 @@ import "./segmented.css";
 import { effect } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { roving } from "../../../ui/focus.ts";
-import { icon, isRtl, setStyle } from "../../../ui/util.ts";
+import { icon, setStyle } from "../../../ui/util.ts";
 import { observeSize } from "../../../ui/observe.ts";
-import { animate } from "../../../motion/animate.ts";
-import { reducedMotion } from "../../../motion/env.ts";
+import { slidingIndicator } from "../../../motion/engine/parts.ts";
 import { model, ctl, cx, normOptions, same, labelledBy, useField, type ControlProps, type OptionsProp } from "../../../forms/util.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 
@@ -52,17 +51,12 @@ export function Segmented<T = unknown>(props: SegmentedProps<T>): unknown {
       }, icon(o["icon"], "hm-segment-icon"), o.label));
     }) as HTMLElement;
   if (thumb) {
-    // the thumb takes the place of the chosen segment at once; the motion engine plays the move from the old place
-    let last: { x: number; y: number; w: number } | null = null;
+    // the shared sliding indicator glides the thumb along the row; its line (segments may wrap) and height are set here
+    const ind = slidingIndicator(thumb, root);
     const place = (move: boolean): void => {
       const on = root.querySelector<HTMLElement>('[aria-checked="true"]');
-      thumb.classList.toggle("is-on", !!on);
-      if (!on) { last = null; return; }
-      const w = on.offsetWidth, x = isRtl(root) ? on.offsetLeft + w - root.clientWidth : on.offsetLeft, y = on.offsetTop;
-      const to = `translate(${x}px, ${y}px)`;
-      setStyle(thumb, { width: `${w}px`, height: `${on.offsetHeight}px`, transform: to });
-      if (move && last && w && (last.x !== x || last.y !== y) && !reducedMotion()) animate(thumb, { transform: [`translate(${last.x}px, ${last.y}px) scaleX(${(last.w / w).toFixed(3)})`, `${to} scaleX(1)`] }, { duration: 320, easing: "expo" });
-      last = { x, y, w };
+      if (on) setStyle(thumb, { top: `${on.offsetTop}px`, height: `${on.offsetHeight}px` });
+      ind.moveTo(on, !move);
     };
     effect(() => { get(); normOptions(props.options); queueMicrotask(() => place(true)); });
     observeSize(root, () => place(false));

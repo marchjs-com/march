@@ -10,6 +10,5 @@
 .hm-logos-cell { display: grid; place-items: center; min-height: 5rem; padding: var(--hm-space-3); border-radius: var(--hm-radius-3); border: 1px solid var(--hm-border); background: var(--hm-surface); }
 .hm-logos-cell:hover .hm-logo { transform: scale(1.06); }
 .hm-logos-marquee { display: block; width: 100%; }
-.hm-logos-row, .hm-logos-row-copy { display: inline-flex; align-items: center; gap: clamp(2rem, 5cqi, 4rem); padding-inline-end: clamp(2rem, 5cqi, 4rem); }
-.hm-logos-marquee .hm-marquee-sep { display: none; }
+.hm-logos-row { display: inline-flex; align-items: center; gap: clamp(2rem, 5cqi, 4rem); padding-inline-end: clamp(2rem, 5cqi, 4rem); }
 @media (prefers-reduced-motion: reduce) { .hm-logos-cell:hover .hm-logo { transform: none; } }

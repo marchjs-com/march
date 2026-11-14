@@ -9,6 +9,12 @@ import { toast } from "../ui/toast.ts";
 import { scoped, cx, live, type ClassProp } from "./util.ts";
 import { FormContext } from "./field.ts";
 import { useForm, Form, deepEqual, CANCELLED, type FormController, type FormSection, type FieldsLayout, type ValidateOn } from "./form.ts";
+import { errorText } from "../ui/format.ts";
+import { Button } from "../components/actions/button/index.ts";
+import { Badge } from "../components/data/badge/index.ts";
+import { Skeleton } from "../components/feedback/skeleton/index.ts";
+import { ErrorBox } from "../components/feedback/error-box/index.ts";
+import { PanelHeader } from "../components/layout/panel-header/index.ts";
 
 /** A reason from the reason prompt: the text, or `{ category, text }` when purposes are offered. */
 export type ReasonValue = string | { category: string; text: string };
@@ -58,6 +64,13 @@ export interface EditFormProps<V = Values> extends FieldsLayout {
   class?: ClassProp;
 }
 
+/** Only the fields of `values` that differ (deeply) from `before`: what a save sends as "changed". */
+export function changedFields<V extends Values>(values: V, before: Values): Partial<V> {
+  const changed: Values = {};
+  for (const k of Object.keys(values)) if (!deepEqual(values[k], before[k])) changed[k] = values[k];
+  return changed as Partial<V>;
+}
+
 /**
  * Load → edit → save. Props: schema, load() → Promise<values>, save(values, { reason, changed }) → Promise<any>,
  * reason (min length number or { min, title, message, purposes, danger }), title, description, sections, layout, cols,
@@ -85,7 +98,7 @@ export function EditForm(props: EditFormProps): unknown {
         state.set("ready");
       } catch (e) {
         if (id !== seq) return;
-        loadError.set((e as Error | null)?.message ?? String(e));
+        loadError.set(errorText(e));
         if (!quiet) state.set("error");
       }
     }
@@ -96,10 +109,7 @@ export function EditForm(props: EditFormProps): unknown {
         reason = await ask({ title: r.title ?? t`Reason for this change`, message: r.message, min: r.min ?? 10, purposes: r.purposes, danger: r.danger, ok: props.submitLabel ?? t`Save` });
         if (reason == null || reason === "") throw CANCELLED;
       }
-      const before = form.schema.parse(form.initial());
-      const changed: Values = {};
-      for (const k of Object.keys(values)) if (!deepEqual(values[k], before[k])) changed[k] = values[k];
-      const res = await props.save(values, { reason: reason ?? undefined, changed });
+      const res = await props.save(values, { reason: reason ?? undefined, changed: changedFields(values, form.schema.parse(form.initial())) });
       if (props.successMessage !== false) notify(props.successMessage ?? t`Saved`, { kind: "success" });
       if (props.useResult && res && typeof res === "object") form.reset(res as Values);
       else if (!!props.load) await load(true);
@@ -108,18 +118,21 @@ export function EditForm(props: EditFormProps): unknown {
     }
     provide(FormContext, form);
     load();
+    // one label line + one input block per field (at most six)
     const skeleton = () => h("div", { class: "hm-form-skeleton", role: "status", "aria-label": t`Loading` },
-      Array.from({ length: Math.min(6, form.schema.fields.length || 3) }, () => h("div", { class: "hm-skeleton-field" }, h("div", { class: "hm-skeleton hm-skeleton-label" }), h("div", { class: "hm-skeleton hm-skeleton-input" }))));
+      Array.from({ length: Math.min(6, form.schema.fields.length || 3) }, () => h("div", { class: "hm-skeleton-field" }, h(Skeleton, { block: true, class: "hm-skeleton-label" }), h(Skeleton, { block: true, class: "hm-skeleton-input" }))));
     return h("section", { class: cx("hm-edit-form", props.class), "aria-busy": () => (state() === "loading" ? "true" : null) },
-      props.title || props.description || !!props.load ? h("header", { class: "hm-edit-head" },
-        h("div", null, props.title ? h("h2", { class: "hm-edit-title" }, props.title) : null, props.description ? h("p", { class: "hm-section-desc" }, props.description) : null),
-        h("div", { class: "hm-edit-tools" },
-          () => (state() === "ready" && form.dirty() ? h("span", { class: "hm-badge hm-dirty" }, t`Unsaved changes`) : null),
-          h("button", { type: "button", class: "hm-btn hm-btn-sm", disabled: () => state() === "loading" || form.submitting(), onClick: () => load() }, t`Reload`))) : null,
+      props.title || props.description || !!props.load ? h(PanelHeader, {
+        class: "hm-edit-head", size: "lg", align: "start", title: props.title || undefined, titleAs: "h2", subtitle: props.description || undefined,
+        actions: [
+          () => (state() === "ready" && form.dirty() ? h(Badge, { tone: "warn" }, t`Unsaved changes`) : null),
+          h(Button, { size: "sm", disabled: () => state() === "loading" || form.submitting(), onClick: () => load() }, t`Reload`),
+        ],
+      }) : null,
       () => {
         const s = state();
         if (s === "loading") return skeleton();
-        if (s === "error") return h("div", { class: "hm-error", role: "alert" }, h("p", null, loadError()), h("button", { type: "button", class: "hm-btn", onClick: () => load() }, t`Retry`));
+        if (s === "error") return h(ErrorBox, { message: loadError, retry: () => load() });
         return untrack(() => h(Form, {
           form, sections: props.sections, layout: props.layout, cols: props.cols, submitLabel: props.submitLabel, confirmLeave: props.confirmLeave,
           readonly: live(() => props.readonly), cancel: () => form.reset(), cancelLabel: t`Reset`, requireDirty: true,

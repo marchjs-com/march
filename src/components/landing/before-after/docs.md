@@ -39,4 +39,4 @@ layers show and are hidden from screen readers; give the images their own `alt`.
 
 ## Composed of
 
-`track` and `arrowStep` (behaviors/drag), the motion engine (`animateValue`) for the sway, `onVisible`.
+Badge (corner labels); `track` and `arrowStep` (behaviors/drag), the motion engine (`animateValue`) for the sway, `onVisible`.

@@ -11,6 +11,7 @@ import { cx, val, uid, icon, glyph, isRtl, listen, type ClassProp, type MaybeFn 
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { moveCursor, listNav } from "../../../behaviors/list-nav/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
+import { ListRow } from "../../data/list-row/index.ts";
 import { check as checkIcon } from "../../../icons/glyphs/check.ts";
 
 /** One choice. */
@@ -98,25 +99,22 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
     props.onPick?.(it.value, it, e);
   };
 
-  // the one place a row is drawn (lead + label + hint + trailing + tick)
+  // the one place a row is drawn: a ListRow (lead + label + hint + trailing) with the tick at its end
   const row = (it: OptionItem<T>, i: number): Element => {
     const selected = (): boolean => isSel(it.value), isActive = (): boolean => active() === i;
     const tick = props.check === false || !stateful ? null
       : h("span", { class: "hm-option-list-check", "aria-hidden": "true" }, props.check != null && props.check !== true ? icon(typeof props.check === "function" ? (props.check as () => unknown)() : props.check, "hm-option-list-own-check") : glyph(checkIcon));
-    const inner = props.renderOption ? props.renderOption(it, { selected, active: isActive, index: i }) : [
-      it.icon != null ? icon(it.icon, "hm-option-list-lead") : null,
-      h("span", { class: "hm-option-list-text" },
-        h("span", { class: "hm-option-list-label" }, it.label),
-        it.hint != null ? h("span", { class: "hm-option-list-hint" }, it.hint) : null),
-      it.trailing != null ? h("span", { class: "hm-option-list-trailing" }, it.trailing) : null];
-    const state = rowRole === "option" ? { "aria-selected": () => String(selected()) } : rowRole === "menuitem" ? {} : { "aria-checked": () => String(selected()) };
-    const common = {
-      role: rowRole, ...state, "aria-disabled": it.disabled ? "true" : null, "data-index": String(i),
-      class: () => cx("hm-option-list-row", selected() && "is-selected", byField && isActive() && "is-active", it.disabled && "is-disabled"),
-    };
-    if (byField) return h("div", { ...common, id: `${id}-${i}`, onPointerMove: () => { if (!it.disabled && active.peek() !== i) active.set(i); },
-      onMouseDown: (e: Event) => e.preventDefault(), onClick: (e: Event) => pick(i, e) }, inner, tick);
-    return h("button", { ...common, type: "button", disabled: !!it.disabled, tabindex: () => (tabStop() === i ? "0" : "-1"), onClick: (e: Event) => pick(i, e) }, inner, tick);
+    const trail = it.trailing != null || tick ? [it.trailing ?? null, tick] : undefined;
+    return h(ListRow, {
+      as: byField ? "div" : "button", role: rowRole, "data-index": String(i), interactive: true, overflow: "ellipsis",
+      class: () => cx("hm-option-list-row", byField && isActive() && "is-active"),
+      size: () => (val(props.size) === "sm" ? "sm" : "md"), disabled: !!it.disabled, onClick: (e: MouseEvent) => pick(i, e),
+      // ListRow says the choice by the role: aria-checked (radio, menuitemradio) or aria-selected (option); a command has no state
+      ...(rowRole === "menuitem" ? {} : { selected }),
+      ...(byField ? { id: `${id}-${i}`, onPointerMove: () => { if (!it.disabled && active.peek() !== i) active.set(i); }, onMouseDown: (e: Event) => e.preventDefault() }
+        : { tabindex: () => (tabStop() === i ? "0" : "-1") }),
+      ...(props.renderOption ? { children: props.renderOption(it, { selected, active: isActive, index: i }), trail: tick ?? undefined } : { lead: it.icon ?? undefined, title: it.label, sub: it.hint ?? undefined, trail }),
+    }) as Element;
   };
   // focus mode: the Tab stop is the chosen row, else the first enabled one
   const tabStop = (): number => {

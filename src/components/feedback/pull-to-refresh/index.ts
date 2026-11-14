@@ -4,12 +4,14 @@
 import { signal, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import { Button } from "../../actions/button/index.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { refresh as refreshIcon } from "../../../icons/glyphs/refresh.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
-import { swipeable } from "../../../behaviors/swipe/index.ts";
+import { swipeable, rubberBand } from "../../../behaviors/swipe/index.ts";
 import "./pull-to-refresh.css";
 
 export type PullPhase = "idle" | "pull" | "ready" | "refreshing";
@@ -42,7 +44,6 @@ export interface PullToRefreshProps {
 /** `<PullToRefresh onRefresh={() => load()}>…long list…</PullToRefresh>` — the element itself is the scroll area. */
 export function PullToRefresh(props: PullToRefreshProps): Element {
   const threshold = Math.max(24, props.threshold ?? 72);
-  const max = threshold * 1.8;
   const phase = signal<PullPhase>("idle");
   const setPhase = (p: PullPhase): void => { if (p !== phase.peek()) { phase.set(p); props.onPhase?.(p); } };
   const SETTLE = props.settle === false ? 0 : Math.max(0, props.settle ?? 260);
@@ -92,8 +93,8 @@ export function PullToRefresh(props: PullToRefreshProps): Element {
       onStart: () => { settle?.cancel(); },
       onMove: (p) => {
         const d = Math.max(0, p.dy);
-        // resistance: 1:2 up to the threshold, then softer up to max
-        const r = d / 2 <= threshold ? d / 2 : threshold + (max - threshold) * (1 - Math.exp(-(d / 2 - threshold) / (max - threshold)));
+        // resistance: 1:2 up to the threshold, then the rubber band
+        const r = d / 2 <= threshold ? d / 2 : threshold + rubberBand(d / 2 - threshold);
         paint(r);
         setPhase(r >= threshold ? "ready" : "pull");
       },
@@ -115,8 +116,8 @@ export function PullToRefresh(props: PullToRefreshProps): Element {
   },
   props.indicator !== false && h("div", { class: cx("hm-ptr-ind", own && "is-own"), "aria-hidden": "true", "data-hm-color": colorAttr(props.color), ref: (x: HTMLElement) => { ind = x; } },
     own ? () => own(phase())
-      : h("span", { class: "hm-ptr-spin", ref: (x: HTMLElement) => { spin = x; } }, props.icon === undefined ? glyph(refreshIcon) : icon(props.icon, "hm-ptr-icon"))),
-  props.refreshButton !== false && h("button", { type: "button", class: "hm-ptr-kbd", disabled: () => !!val(props.disabled) || phase() === "refreshing", onClick: () => { void run(); } }, () => props.labels?.refresh ?? t`Refresh`),
+      : h("span", { class: "hm-ptr-spin", ref: (x: HTMLElement) => { spin = x; } }, ownIcon(props.icon, refreshIcon, "hm-ptr-icon"))),
+  props.refreshButton !== false && h(Button, { size: "sm", shape: "pill", class: "hm-ptr-kbd", disabled: () => !!val(props.disabled) || phase() === "refreshing", onClick: () => { void run(); } }, () => props.labels?.refresh ?? t`Refresh`),
   h("div", { class: "hm-sr-only", role: "status", "aria-live": "polite" }, status),
   h("div", { class: "hm-ptr-content", ref: (x: HTMLElement) => { content = x; } }, props.children));
 }

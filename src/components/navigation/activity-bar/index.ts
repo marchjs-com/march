@@ -7,14 +7,12 @@ import { computed, effect, untrack, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, icon, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { setStyle } from "../../../core/util.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { Tooltip } from "../../../ui/menu.ts";
-import { roving, isRtl } from "../../../ui/focus.ts";
-import { formatKey } from "../../../ui/keys.ts";
-import { animate } from "../../../motion/animate.ts";
-import { reducedMotion } from "../../../motion/env.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { TabList, type TabSpec } from "../tabs/index.ts";
+import { labelWithKey } from "../../../ui/keys.ts";
+import { slidingIndicator } from "../../../motion/engine/parts.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
 
 messages("tr", { "Views": "Görünümler" });
 
@@ -58,58 +56,46 @@ export function ActivityBar(props: ActivityBarProps): Element {
   const horizontal = (): boolean => val(props.orientation) === "horizontal";
   const list = computed(() => val(props.items) ?? []);
   const current = (): string | null => val(props.value) ?? null;
-  let root: HTMLElement | undefined, ind: HTMLElement | undefined;
-  let lastAt: string | null = null;
   const motion = props.motion ?? "glide";
+  // start items first, then the ones at the far end; one tab strip (the TabList of Tabs: tablist, roving focus, selection)
+  const ordered = computed(() => { const l = list(); return [...l.filter((x) => x.position !== "end"), ...l.filter((x) => x.position === "end")]; });
+  const byId = (id: string): ActivityItem | undefined => untrack(list).find((x) => x.id === id);
+  const name = (it: ActivityItem): string => labelWithKey(val(it.label), it.shortcut);
 
-  const choose = (it: ActivityItem): void => {
+  const choose = (it: ActivityItem | undefined): void => {
+    if (!it) return;
     if (it.onSelect) { void it.onSelect(); return; }
     props.onChange(current() === it.id && props.collapsible !== false ? null : it.id);
   };
-  // the indicator glides from the old view to the new one
-  if (props.indicator !== false) effect(() => {
-    const id = current();
-    list();
-    const hz = horizontal();
-    queueMicrotask(() => {
-      const el = id ? root?.querySelector<HTMLElement>(`[data-view="${id}"]`) : null;
-      if (!ind || !root) return;
-      if (!el) { ind.classList.remove("is-on"); lastAt = null; return; }
-      const box = root.getBoundingClientRect(), r = el.getBoundingClientRect();
-      const to = hz ? `translateX(${(isRtl(root) ? r.right - box.right : r.left - box.left)}px)` : `translateY(${r.top - box.top}px)`;
-      const size = hz ? r.width : r.height;
-      setStyle(ind, { "--hm-ab-size": `${size}px` });
-      // a turned bar starts the indicator afresh (a glide from the other axis would cross the bar)
-      const from = lastAt && lastAt.startsWith(hz ? "translateX" : "translateY") ? lastAt : null;
-      lastAt = to;
-      ind.classList.add("is-on");
-      if (motion === "none") setStyle(ind, { transform: to });
-      else if (motion === "glide" && from && from !== to && !reducedMotion()) animate(ind, [{ transform: from }, { transform: to }], { duration: 260, easing: "easeOutBack", fill: "forwards" });
-      else animate(ind, [{ transform: to, opacity: 0 }, { transform: to, opacity: 1 }], { duration: 160, fill: "forwards" });
+  // the indicator glides from the old view to the new one (a turned bar starts it afresh)
+  const ind = props.indicator !== false ? h("span", { class: "hm-ab-ind", "aria-hidden": "true" }) as HTMLElement : null;
+  if (ind) {
+    let slide: ReturnType<typeof slidingIndicator> | undefined;
+    effect(() => {
+      const id = current();
+      list(); horizontal();
+      queueMicrotask(() => {
+        const root = ind.parentElement;
+        if (!root) return;
+        slide ??= slidingIndicator(ind, root, { axis: () => (horizontal() ? "x" : "y"), sizeVar: "--hm-ab-size", duration: 260, easing: "easeOutBack", motion: () => motion !== "none" });
+        if (motion === "fade") slide.reset(); // appears in place
+        slide.moveTo(id ? root.querySelector<HTMLElement>(`[data-view="${id}"]`) : null);
+      });
     });
-  });
+  }
 
-  const tabs = (): HTMLElement[] => (root ? [...root.querySelectorAll<HTMLElement>('[role="tab"]')] : []);
-  const button = (it: ActivityItem): unknown => {
-    const on = (): boolean => !it.onSelect && current() === it.id;
-    const name = (): string => { const l = val(it.label); return it.shortcut ? `${l} (${formatKey(it.shortcut)})` : l; };
-    const btn = h("button", {
-      type: "button", role: "tab", id: `${base}-${it.id}`, "data-view": it.id, class: () => cx("hm-ab-btn", on() && "is-active"),
-      "aria-selected": () => String(on()), "aria-controls": props.controls ?? null, "aria-label": name, "aria-keyshortcuts": it.shortcut ?? null,
-      tabindex: () => (on() || (!current() && untrack(list).find((x) => !x.onSelect)?.id === it.id) ? "0" : "-1"),
-      onClick: () => choose(it),
-    }, icon(it.icon, "hm-ab-icon"),
-    it.badge !== undefined && h("span", { class: "hm-ab-badge" }, h(Badge, { count: () => val(it.badge), tone: "primary" })));
-    if (props.tooltips === false) return btn;
-    return h(Tooltip, { text: name, placement: reactive(() => (horizontal() ? "top" : "bottom-start")) as never, children: btn });
-  };
-  const onKeydown = (e: KeyboardEvent): void => { roving(e, tabs(), { horizontal: horizontal() }); };
-
-  return h("div", {
-    class: () => cx("hm-ab", horizontal() ? "hm-ab-h" : "hm-ab-v", val(props.class)), role: "tablist", "aria-orientation": () => (horizontal() ? "horizontal" : "vertical"),
-    "aria-label": () => val(props.label) ?? t`Views`, "data-hm-color": () => colorAttr(props.color), ref: (x: HTMLElement) => { root = x; }, onKeydown,
-  },
-  props.indicator !== false && h("span", { class: "hm-ab-ind", "aria-hidden": "true", ref: (x: HTMLElement) => { ind = x; } }),
-  h("div", { class: "hm-ab-group" }, () => list().filter((x) => x.position !== "end").map((x) => untrack(() => button(x)))),
-  h("div", { class: "hm-ab-group hm-ab-end" }, () => list().filter((x) => x.position === "end").map((x) => untrack(() => button(x)))));
+  const tabs = computed((): TabSpec[] => ordered().map((it) => ({
+    id: it.id,
+    label: [icon(it.icon, "hm-ab-icon"), it.badge !== undefined && h("span", { class: "hm-ab-badge" }, h(Badge, { count: () => val(it.badge), tone: "primary", size: "xs" }))],
+  })));
+  // an action is never the selected view
+  const selected = (): string | null => { const id = current(); return id != null && !byId(id)?.onSelect ? id : null; };
+  return h(TabList, {
+    tabs, value: selected, onSelect: (id: string) => choose(byId(id)), orientation: reactive(() => (horizontal() ? "horizontal" : "vertical")) as never,
+    activation: "manual", variant: "none", controls: props.controls, tabId: (id: string) => `${base}-${id}`,
+    class: () => cx("hm-ab", horizontal() ? "hm-ab-h" : "hm-ab-v", val(props.class)), label: () => val(props.label) ?? t`Views`, color: reactive(() => props.color) as never,
+    tabProps: (tab: TabSpec) => { const it = byId(tab.id)!; return { class: cx("hm-ab-btn", it.position === "end" && "hm-ab-end"), "data-view": it.id, "aria-label": () => name(it), "aria-keyshortcuts": it.shortcut ?? null }; },
+    wrap: (btn: Element, tab: TabSpec) => (props.tooltips === false ? btn : h(Tooltip, { text: () => name(byId(tab.id)!), placement: reactive(() => (horizontal() ? "top" : "bottom-start")) as never, children: btn })),
+    children: ind,
+  }) as Element;
 }

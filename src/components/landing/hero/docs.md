@@ -38,7 +38,7 @@ and spotlight), `split` (media at the end), `video` (VideoBackground), `mesh` (g
 | `reveal` | Reveal effect / `{ from, to }` / `none` | `up` | entrance of the copy (and of the split media; `none` switches both off) |
 | `frameBar` | boolean | `true` | product: the window bar with three dots |
 | `tilt` | boolean | `true` | product: the frame starts tilted and flattens with the scroll |
-| `class` | string | — | extra class on the section (`.hm-hero`; parts: `.hm-hero-copy`, `.hm-hero-eyebrow`, `.hm-hero-title`, `.hm-hero-hl`, `.hm-hero-lead`, `.hm-hero-actions`, `.hm-hero-note`, `.hm-hero-frame`) |
+| `class` | string | — | extra class on the section (`.hm-hero`; parts: `.hm-hero-copy` (a SectionHead: `.hm-section-head-eyebrow`, `-title`, `-lead`, `-actions`, `-note`), `.hm-hero-hl`, `.hm-hero-frame`) |
 | children | node | — | extra content under the note |
 
 ## Accessibility
@@ -49,4 +49,4 @@ frame flat and the layers still.
 
 ## Composed of
 
-Reveal, Overlay, Button, Badge, Aurora (hadi-march/fx), VideoBackground, Parallax; `scrollTimeline` (motion scroll core).
+SectionHead (the copy, with Reveal), Badge, Picture, Reveal, Overlay, Aurora (hadi-march/fx), VideoBackground, Parallax; `scrollTimeline` (motion scroll core).

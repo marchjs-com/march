@@ -142,3 +142,22 @@ test("Drawer: handle and × off, own handle name, own × name; motion off leaves
   assert.equal(document.querySelector(".d-c"), null);
   dispose();
 });
+
+test("openDrawer: opens a <Drawer> (one drawer), resolves with close(value) and with dismissValue on Escape", async () => {
+  const { openDrawer, openDialog } = await import("../dialog/index.ts");
+  const wait = async (ok) => { for (let i = 0; i < 50 && !ok(); i++) await tick(); };
+  const p = openDrawer((close) => h("button", { class: "pick", onClick: () => close(7) }, "Pick"), { title: "Menu", side: "left", class: "od-a" });
+  await wait(() => document.querySelector(".od-a"));
+  const a = document.querySelector(".od-a");
+  assert.ok(a.classList.contains("hm-sheet") && a.classList.contains("hm-sheet-start"), "the Drawer component's sheet");
+  assert.equal(a.querySelector(".hm-panel-header-title").textContent, "Menu");
+  a.querySelector(".pick").click();
+  assert.equal(await p, 7);
+  await wait(() => !document.querySelector(".od-a"));
+  assert.equal(document.querySelector(".od-a"), null);
+  const q = openDialog(() => "x", { kind: "drawer", side: "bottom", class: "od-b", dismissValue: "no", motion: "none" });
+  await wait(() => document.querySelector(".od-b"));
+  assert.ok(document.querySelector(".od-b").classList.contains("hm-sheet-bottom"));
+  document.dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+  assert.equal(await q, "no");
+});

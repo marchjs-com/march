@@ -6,7 +6,7 @@ export default defineMeta({
   category: "landing",
   since: "0.1.0",
   summary: "Reading progress bar for the page or one article: fixed or inline, brand gradient or accent, RTL aware, a progressbar.",
-  composedOf: [],
+  composedOf: ["Progress"],
   behaviors: ["scrollIndicator", "onScrollProgress"],
   showcase: "/web",
   demoGroup: "scroll",

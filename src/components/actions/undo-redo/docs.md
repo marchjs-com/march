@@ -22,6 +22,7 @@ tooltip names the step and the shortcut ("Undo: Rename (Ctrl+Z)"). Or drive it w
 | `steps` | `{ undo?, redo? }` / `false` | from `history.past` / `future` | step named after the label ("Undo: Rename"); `false`: never |
 | `shortcuts` | `boolean` / `{ undo?, redo? }` | `true` (`mod+z`, `mod+shift+z`) | shortcut text in the tooltip |
 | `icons` | `{ undo?, redo? }` | | |
+| `partClass` | `{ undo?, redo? }` | | an extra class on a button (a host that keeps its own class names) |
 | `size` | `xs` `sm` `md` `lg` | IconButton default | |
 | `color` | color token | | colour of the icons |
 | `disabled` | `boolean` / accessor | `false` | both buttons off (read-only editors) |

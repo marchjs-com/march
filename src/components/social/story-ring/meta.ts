@@ -6,7 +6,7 @@ export default defineMeta({
   category: "social",
   since: "0.1.0",
   summary: "Avatar in a story ring: new (four HADİ colors), seen, close friends, none; + badge, turning ring while loading, label for story trays.",
-  composedOf: ["Avatar"],
+  composedOf: ["Avatar", "CornerMark"],
   behaviors: ["motion engine"],
   showcase: "/social",
 });

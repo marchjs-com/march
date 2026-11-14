@@ -22,8 +22,9 @@ test("OverflowText: dir=auto, one readable copy, fade or ellipsis", () => {
 test("Marquee defaults to a visible loop; NavSidebar labels use OverflowText", () => {
   const m = h(U.Marquee, { text: "Duyuru" });
   assert.match(m.getAttribute("class"), /hm-marquee/);
-  const src = readFileSync(new URL("../../composite/nav-sidebar/index.ts", import.meta.url), "utf8");
-  assert.match(src, /h\(OverflowText, \{ class: "hm-sb-label"/);
+  // NavSidebar rows are ListRow, whose text lines are OverflowText
+  assert.match(readFileSync(new URL("../../composite/nav-sidebar/index.ts", import.meta.url), "utf8"), /h\(ListRow, \{/);
+  assert.match(readFileSync(new URL("../../data/list-row/index.ts", import.meta.url), "utf8"), /h\(OverflowText, \{ class: cls/);
 });
 
 test("marquee.css: logical fade (RTL flips), reduced motion falls back", () => {
@@ -34,10 +35,13 @@ test("marquee.css: logical fade (RTL flips), reduced motion falls back", () => {
 
 test("one-line labels scroll instead of ending in an ellipsis", () => {
   const read = (f) => readFileSync(new URL(`../../../${f}`, import.meta.url), "utf8");
-  const uses = { "components/composite/nav-sidebar/index.ts": ["hm-sb-label", "hm-sb-sub", "hm-sb-gname"], "components/navigation/nav-menu/index.ts": ["hm-nav-label"], "ui/app.ts": ["hm-user-name"], "components/navigation/link-card/index.ts": ["hm-link-card-title"],
-    "components/actions/chip/index.ts": ["hm-chip2-label"], "components/composite/command-palette/view.ts": ["hm-pal-title"], "components/data/tree/index.ts": ["hm-tree-label"], "components/forms/combobox/index.ts": ["hm-chip-label"], "components/forms/file-upload/index.ts": ["hm-file-name"] };
+  const uses = { "ui/app.ts": ["hm-user-name"], "components/navigation/link-card/index.ts": ["hm-link-card-title"],
+    "components/actions/chip/index.ts": ["hm-chip2-label"], };
+  // rows and chips built from ListRow / Chip get their scrolling title from those components
+  for (const [f, part] of [["components/data/tree/row.ts", "ListRow"], ["components/forms/combobox/index.ts", "Chip"], ["components/forms/file-upload/index.ts", "ListRow"]]) assert.ok(read(f).includes(`h(${part}`), `${f} draws ${part}`);
   for (const [f, list] of Object.entries(uses)) for (const c of list) assert.ok(read(f).includes(`h(OverflowText, { class: "${c}"`), `${f} ${c}`);
-  assert.match(read("components/composite/nav-sidebar/index.ts"), /class: "hm-sb-sub", mode: "loop", play: \(\) => active\(\) === x\.id/, "loops; the selected item keeps scrolling");
+  assert.match(read("components/navigation/nav-menu/index.ts"), /h\(ListRow, \{\s*href: x\.href/, "NavMenu rows are ListRows (their title is an OverflowText)");
+  assert.match(read("components/composite/nav-sidebar/index.ts"), /marquee: \{ mode: "loop" \}, active: \(\) => active\(\) === x\.id/, "loops; the selected item keeps scrolling (ListRow plays the active row)");
   assert.doesNotMatch(read("components/navigation/link-card/link-card.css"), /line-clamp/, "LinkCard description is not clamped");
 });
 

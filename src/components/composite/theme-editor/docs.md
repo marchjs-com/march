@@ -78,5 +78,8 @@ durations to 0. Layout uses logical properties throughout.
 ## Composed of
 
 ColorPicker (each color), EasingCurveEditor (easing tokens), Tabs, Segmented, Slider, Select, TextInput, Textarea,
-Toggle, Button, IconButton, CopyButton, Badge, ThemeSwatch, CodeView; the managers undo (`undoHistory`), DirtyState and
-StorageManager. The preview draws Button, Card, Tabs, Alert, Avatar, Progress, Checkbox, Toggle, Slider, Select, Chip and BarChart.
+Toggle, Field (labelled rows), Button, UndoRedo (history buttons; keys through `undoKeys`), CopyButton, Badge,
+PanelHeader (top bar), SectionLabel (small group labels), ListRow (color tokens, contrast checks), Swatch (color
+samples, tone scale), Card (contrast audit, export steps), Stack, Alert, ThemeSwatch, CodeView; the managers undo
+(`undoHistory`), DirtyState and StorageManager. The preview draws Button, Card, Tabs, Alert, Avatar, Progress, Field,
+Checkbox, Toggle, Slider, Select, Chip and BarChart.

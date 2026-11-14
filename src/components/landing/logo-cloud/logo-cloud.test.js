@@ -22,7 +22,7 @@ test("LogoCloud grid: one cell per logo, alt text, reserved size, lazy", () => {
 test("LogoCloud marquee: inside a Marquee, the second copy is hidden from screen readers", () => {
   const { el, dispose } = mount({ logos, variant: "marquee" });
   assert.ok(el.querySelector(".hm-marquee .hm-logos-row"));
-  assert.equal(el.querySelector(".hm-logos-row-copy").getAttribute("aria-hidden"), "true");
+  assert.equal(el.querySelectorAll(".hm-marquee-unit")[1].getAttribute("aria-hidden"), "true");
   assert.ok(el.querySelector(".hm-logos").className.includes("is-mono"));
   dispose();
 });

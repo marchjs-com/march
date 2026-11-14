@@ -22,7 +22,11 @@ export interface StatusDotProps {
   size?: MaybeFn<"xs" | "sm" | "md" | "lg" | undefined>;
   /** Accessible name ("Online"). Without it the dot is decorative. */
   label?: MaybeFn<string | null | undefined>;
+  /** A ring instead of a filled dot (the point of a timeline entry): the ground shows through; children (an icon) sit inside. */
+  hollow?: MaybeFn<boolean | undefined>;
   class?: ClassProp;
+  /** With `hollow`: a small mark inside the ring. */
+  children?: unknown;
   /** Other attributes (`data-*`, `title`, `id`) go to the dot. */
   [attr: string]: unknown;
 }
@@ -32,9 +36,9 @@ export function StatusDot(props: StatusDotProps): Element {
   const label = (): string | null => val(props.label) || null;
   const pulse = (): string | false => { const p = val(props.pulse); return p === true ? "ring" : p || false; };
   return h("span", {
-    ...rest(props, ["tone", "color", "pulse", "size", "label"]),
-    class: () => cx("hm-status-dot", `hm-status-dot-${val(props.size) ?? "md"}`, `is-${val(props.tone) ?? "success"}`, pulse() && `is-pulse-${pulse()}`, val(props.class)),
+    ...rest(props, ["tone", "color", "pulse", "size", "label", "hollow"]),
+    class: () => cx("hm-status-dot", `hm-status-dot-${val(props.size) ?? "md"}`, `is-${val(props.tone) ?? "success"}`, pulse() && `is-pulse-${pulse()}`, val(props.hollow) && "hm-status-dot-hollow", val(props.class)),
     "data-hm-color": () => colorAttr(val(props.color)),
     role: () => (label() ? "img" : null), "aria-label": label, "aria-hidden": () => (label() ? null : "true"),
-  });
+  }, props.children);
 }

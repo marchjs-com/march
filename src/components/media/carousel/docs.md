@@ -34,4 +34,4 @@ is marked. The buttons sit at the inline edges and mirror in right-to-left layou
 
 ## Composed of
 
-Nothing: native scroll snapping.
+IconButton (`variant="raised"`, `shape="round"`: previous / next), PageDots (the dots); native scroll snapping.

@@ -74,6 +74,8 @@ test("BottomNav: the Create menu opens on the layer stack, picks an action, Esca
     assert.equal(btn.getAttribute("aria-expanded"), "false");
     btn.click();
     assert.equal(btn.getAttribute("aria-expanded"), "true");
+    // the sheet is a Drawer, loaded when the first one opens
+    for (let i = 0; i < 100 && !document.querySelector(`.hm-bnav-actions.is-${look}`); i++) await new Promise((r) => setTimeout(r, 20));
     const menu = document.querySelector(`.hm-bnav-actions.is-${look}`);
     assert.ok(menu, `${look}: the menu opened`);
     assert.equal(menu.getAttribute("role"), "menu");
@@ -81,7 +83,7 @@ test("BottomNav: the Create menu opens on the layer stack, picks an action, Esca
     assert.ok(!m.el.contains(menu), "the menu is on the layer stack, not inside the bar");
     if (look === "fan") menu.querySelector("[role=menuitem]").click();
     else menu.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-    await new Promise((r) => setTimeout(r, 220));
+    await new Promise((r) => setTimeout(r, look === "sheet" ? 400 : 220));
     assert.equal(document.querySelector(`.hm-bnav-actions.is-${look}`), null, `${look}: closed`);
     assert.equal(btn.getAttribute("aria-expanded"), "false");
     m.dispose();
@@ -106,12 +108,16 @@ test("BottomNav: bubble, ring and motion can be turned off; ring takes color tok
   r.dispose();
   const s = mount(() => h(BottomNav, { items: ITEMS, value: tab, createActions: [{ id: "a", label: "A" }], createMenu: "sheet", createTitle: false, createHandle: false, motion: false }));
   s.el.querySelector(".hm-bnav-create").click();
+  for (let i = 0; i < 100 && !document.querySelector(".hm-bnav-actions.is-sheet"); i++) await new Promise((r) => setTimeout(r, 20));
   const menu = document.querySelector(".hm-bnav-actions.is-sheet");
   assert.ok(menu);
   assert.equal(menu.getAttribute("aria-label"), "Create");
-  assert.equal(menu.querySelector(".hm-bnav-sheet-title"), null);
-  assert.equal(menu.querySelector(".hm-bnav-sheet-handle"), null);
+  const sheet = menu.closest(".hm-bnav-sheet");
+  assert.ok(sheet, "the sheet is a Drawer");
+  assert.equal(sheet.querySelector(".hm-dialog-title"), null, "createTitle={false}");
+  assert.equal(sheet.querySelector(".hm-sheet-handle"), null, "createHandle={false}");
   menu.querySelector(".hm-bnav-action").click();
+  await new Promise((r) => setTimeout(r, 20));
   assert.equal(document.querySelector(".hm-bnav-actions"), null, "without motion the menu closes at once");
   s.dispose();
 });

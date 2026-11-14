@@ -49,4 +49,4 @@ to the new passage's heading, so screen readers read the new passage. Reduced mo
 
 ## Composed of
 
-Motion engine (`animate`), `storyEndings`.
+ListRow (a choice: key, label, note), Kbd, Badge (trail steps, ending), Button (start again); `swapTransition` and the motion engine, `storyEndings`.

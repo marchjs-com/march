@@ -49,10 +49,11 @@ test("SearchBox: debounced value, Enter searches now, Escape and the clear butto
 test("SearchBox: debounce 0 writes at once; onInput, inputRef and onKeyDown (preventDefault skips the box's keys)", () => {
   const seen = [], typed = [], keys = [];
   let ref = null;
-  const m = mount(() => h(SearchBox, { debounce: 0, onSearch: (v) => seen.push(v), onInput: (v) => typed.push(v), inputRef: (el) => { ref = el; }, onEnter: () => keys.push("enter!"),
+  const m = mount(() => h(SearchBox, { debounce: 0, onSearch: (v) => seen.push(v), onInput: (v) => typed.push(v), inputRef: (el) => { ref = el; }, inputClass: "mine-input", onEnter: () => keys.push("enter!"),
     onKeyDown: (e) => { keys.push(e.key); if (e.key === "Enter" || e.key === "ArrowDown") e.preventDefault(); } }));
   const input = m.el.querySelector("input");
   assert.equal(ref, input);
+  assert.ok(input.classList.contains("mine-input") && input.classList.contains("hm-search-input"), "inputClass adds to the input's classes");
   type(input, "a");
   assert.deepEqual(seen, ["a"]);
   assert.deepEqual(typed, ["a"]);

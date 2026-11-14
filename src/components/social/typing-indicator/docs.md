@@ -34,4 +34,4 @@ readers hear the sentence once even when it is not shown. With no names it hides
 
 ## Composed of
 
-Nothing: ChatThread shows it under the last message.
+StatusDot. ChatThread shows it under the last message.

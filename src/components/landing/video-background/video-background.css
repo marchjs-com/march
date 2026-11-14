@@ -9,6 +9,6 @@
 :is(.hm-vbg-tint-dark, .hm-vbg-tint-brand) .hm-btn-secondary:hover { background: color-mix(in srgb, currentColor 22%, transparent); }
 .hm-vbg-tint-brand .hm-vbg-tint { background: linear-gradient(135deg, color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 75%, transparent), color-mix(in srgb, var(--hm-inverse-bg) 80%, transparent)); }
 .hm-vbg-content { position: relative; z-index: 1; min-width: 0; }
-.hm-vbg-toggle { position: absolute; z-index: 2; inset-block-end: var(--hm-space-3); inset-inline-end: var(--hm-space-3); color: inherit;
-  background: color-mix(in srgb, var(--hm-inverse-bg) 35%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--hm-radius-full); }
-.hm-vbg-toggle:hover { background: color-mix(in srgb, var(--hm-inverse-bg) 55%, transparent); }
+/* the pause button: a round IconButton (inverse) on dark glass, at the end corner */
+.hm-vbg > .hm-vbg-toggle { position: absolute; z-index: 2; inset-block-end: var(--hm-space-3); inset-inline-end: var(--hm-space-3); background: color-mix(in srgb, var(--hm-inverse-bg) 35%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.hm-vbg > .hm-vbg-toggle:hover { background: color-mix(in srgb, var(--hm-inverse-bg) 55%, transparent); }

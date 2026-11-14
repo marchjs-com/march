@@ -13,6 +13,7 @@ import { signal, onCleanup, effect } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { OverlayScope } from "../overlay-scope/index.ts";
 import { animateValue } from "../../../motion/engine/value.ts";
+import { observeSize } from "../../../ui/observe.ts";
 
 export interface DeviceSpec {
   name: string;
@@ -119,14 +120,13 @@ export function DevicePreview(props: DevicePreviewProps): Element {
   const outer = h("div", { class: "hm-device-stage" }, body) as HTMLElement;
 
   // fit: scale the device down to the width (and a sensible height) of its place
-  if (props.fit !== false && globalThis.ResizeObserver) {
-    const ro = new ResizeObserver(() => {
+  if (props.fit !== false) {
+    observeSize(outer, () => {
+      if (!outer.clientWidth) return; // not laid out (hidden, or no layout engine)
       const s = spec(), w = land() ? s.height : s.width, hh = land() ? s.width : s.height;
       const room = outer.clientWidth - 32, tall = Math.max(480, (globalThis.innerHeight ?? 900) - 160);
       scale.set(Math.min(1, room / (w + 28), tall / (hh + 28)));
     });
-    ro.observe(outer);
-    onCleanup(() => ro.disconnect());
   }
 
   // touch: the mouse acts like a finger — on the screen, or inside the iframe (same origin) on every page it loads

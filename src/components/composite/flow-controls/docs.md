@@ -56,4 +56,5 @@ region with one button per row naming the node, its start and its duration (and 
 
 ## Composed of
 
-Button, IconButton, Segmented, Chip, OverflowText; the motion engine clock.
+FlowControls: Toolbar, Button, IconButton, Segmented, Chip. FlowTimeline: Card (the frame), TimeRuler (axis and
+playhead), ListRow with a Badge (row labels), Empty (before the first run). The motion engine clock.

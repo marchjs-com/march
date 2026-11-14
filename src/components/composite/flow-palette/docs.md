@@ -43,4 +43,5 @@ no tilt or fly-back, the node simply appears.
 
 ## Composed of
 
-SearchBox, OverflowText; FlowCanvas's store and view (`flow.view`), the Portal drag layer and the motion engine.
+SearchBox, ListRow (a card), IconTile (type icon), OverflowText, SectionLabel (category title), Empty; FlowCanvas's store
+and view (`flow.view`), the drag behavior with its ghost (`dragGhost`) and the motion engine.

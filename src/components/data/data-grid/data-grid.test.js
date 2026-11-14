@@ -127,11 +127,11 @@ test("DataGrid: own texts, single tools off, no column menu, empty state off or 
     h(DataGrid, { rows: [], columns, labels: { noRows: "No orders" } }),
   ]);
   const [a, b, c, d, e] = m.el.querySelectorAll(".hm-dg");
-  assert.equal(a.querySelector(".hm-dg-search").getAttribute("placeholder"), "Find");
+  assert.equal(a.querySelector(".hm-dg-search input").getAttribute("placeholder"), "Find");
   assert.equal(a.querySelector(".hm-dg-total").textContent, "20 orders");
   assert.match(a.querySelector(".hm-dg-toolbar").textContent, /Export/);
   assert.equal(a.querySelector(".hm-dg-foot-row b").textContent, "Sum of all");
-  assert.equal(a.querySelector(".hm-dg-head .hm-table-check").getAttribute("aria-label"), "All of them");
+  assert.equal(a.querySelector(".hm-dg-head .hm-table-check input").getAttribute("aria-label"), "All of them");
   assert.ok(a.querySelector(".hm-dg-th-menu"));
   assert.ok(b.className.includes("mine"));
   assert.ok(b.querySelector(".hm-dg-search") && b.querySelector(".hm-dg-total"));

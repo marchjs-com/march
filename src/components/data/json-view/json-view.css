@@ -3,9 +3,7 @@
 .hm-json-list { list-style: none; margin: 0; padding-inline-start: 1.25rem; }
 .hm-json-root { padding: 0; }
 .hm-json-toggle { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: start; }
-.hm-json-toggle::before { content: "▸"; display: inline-block; width: 1em; color: var(--hm-muted); transition: transform var(--hm-dur) var(--hm-ease); }
-.hm-json-toggle[aria-expanded="true"]::before { transform: rotate(90deg); }
+.hm-json-toggle > .hm-chevron { color: var(--hm-muted); vertical-align: middle; }
 .hm-json-key { color: var(--hm-primary-text); } .hm-json-string { color: var(--hm-success-text); } .hm-json-number, .hm-json-bigint { color: var(--hm-info-text); }
 .hm-json-boolean { color: var(--hm-warn-text); } .hm-json-null, .hm-json-undefined, .hm-json-more, .hm-json-punct { color: var(--hm-muted); }
-.hm-json-toggle.is-plain::before, .hm-json-toggle.is-own::before { content: none; }
-.hm-json-arrow { display: inline-block; min-width: 1em; color: var(--hm-muted); }
+.hm-json-arrow.hm-chevron { inline-size: auto; min-inline-size: 1em; block-size: auto; }

@@ -18,7 +18,8 @@ The text is compact in the active locale (`1,2 B`, `12K`); `format="full"` group
 | `hideZero` | boolean | false | nothing at 0 (a count next to an icon) |
 | `duration` | ms | 320 | roll time |
 | `formatter` | `(n) => string` | — | your own visible text (wins over `format`) |
-| `roll` | boolean | true | `false`: digits change at once |
+| `spoken` | `(n) => string` | — | your own text for screen readers (default: the full grouped number) |
+| `roll` | boolean | true | `false`: digits change at once (as with reduced motion) |
 | `stagger` | ms | 24 | delay between neighbouring digits |
 | `class` | string | — | on the root (`hm-roll`) |
 
@@ -36,4 +37,4 @@ the count becomes part of the button's name.
 
 ## Composed of
 
-Nothing: it is the count piece the social components share (LikeButton, PostCard, ProfileHeader, CommentThread).
+Nothing: it is the count piece the social components share (LikeButton, PostCard, ProfileHeader, CommentThread) and the odometer behind the landing Counter's `mode="roll"`.

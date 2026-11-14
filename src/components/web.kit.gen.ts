@@ -3,6 +3,7 @@ export * from "./landing/counter/index.ts";
 export * from "./landing/newsletter/index.ts";
 export * from "./landing/parallax/index.ts";
 export * from "./landing/reveal/index.ts";
+export * from "./landing/section-head/index.ts";
 export * from "./landing/site-section/index.ts";
 export * from "./landing/video-background/index.ts";
 export * from "./landing/demo-kit.tsx";

@@ -65,4 +65,4 @@ global pause apply).
 
 ## Composed of
 
-Spinner (loading rows).
+ListRow (the row) and Chevron (the arrow), built by the row Tree and TreeView share (`tree/row.ts`: one row, one set of keys); Spinner (loading rows), Button (retry), Empty (no nodes / no match) and Badge (the count on the drag ghost). The ghost is the shared `dragGhost`.

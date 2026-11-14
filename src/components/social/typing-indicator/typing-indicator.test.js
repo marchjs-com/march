@@ -33,7 +33,7 @@ test("TypingIndicator: own sentence, no dots, own dots, motion none", () => {
   assert.equal(a.querySelector(".hm-typing-text").textContent, "2 writing");
   assert.equal(a.querySelector(".hm-typing-dots"), null);
   assert.ok(b.querySelector(".hm-typing-dots.is-own .own-dots"));
-  assert.equal(b.querySelectorAll(".hm-typing-dots i").length, 0);
-  assert.equal(c.querySelectorAll(".hm-typing-dots i").length, 3);
+  assert.equal(b.querySelectorAll(".hm-typing-dots .hm-status-dot").length, 0);
+  assert.equal(c.querySelectorAll(".hm-typing-dots .hm-status-dot").length, 3);
   m.dispose();
 });

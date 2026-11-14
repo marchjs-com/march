@@ -6,7 +6,7 @@ export default defineMeta({
   category: "composite",
   since: "0.1.0",
   summary: "CSS gradient builder: linear / radial / conic, angle dial, draggable color stops, ColorPicker for the selected stop, HADİ presets, CSS to copy.",
-  composedOf: ["ColorPicker", "Segmented", "IconButton"],
+  composedOf: ["ColorPicker", "Card", "Stack", "Segmented", "IconButton", "Swatch", "NumberInput", "CopyButton"],
   behaviors: ["drag"],
   hubs: [],
   showcase: "/editors",

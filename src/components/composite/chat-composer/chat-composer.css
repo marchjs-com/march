@@ -8,21 +8,19 @@
 .hm-compose-input.hm-input, .hm-compose-input { min-height: 2.75rem; max-height: 8.5rem; padding: .6875rem 1rem; border: 0; border-radius: 1.5rem; background: none; box-shadow: none; resize: none;
   font-size: var(--hm-text-md); line-height: 1.4; overflow-y: auto; }
 .hm-compose-input:focus { outline: none; box-shadow: none; }
-.hm-compose-icon { display: inline-grid; place-items: center; flex: none; width: 2.75rem; height: 2.75rem; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--hm-text-2); cursor: pointer;
-  transition: color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease); }
-.hm-compose-icon:hover, .hm-compose-icon.is-on { color: var(--hm-brand-blue, var(--hm-primary)); }
-.hm-compose-icon .hm-svg { width: 1.375rem; height: 1.375rem; }
+/* icon buttons are round IconButtons; hover and the open emoji panel tint them in Aktivite */
+.hm-compose-icon.hm-icon-btn { color: var(--hm-text-2); }
+.hm-compose-icon.hm-icon-btn:hover, .hm-compose-icon.hm-icon-btn.is-pressed { background: none; color: var(--hm-brand-blue, var(--hm-primary)); }
 .hm-compose-icon:focus-visible, .hm-compose-act:focus-visible { outline: 2px solid var(--hm-brand-blue, var(--hm-primary)); outline-offset: 2px; }
 .hm-compose-attach.hm-btn, .hm-compose .hm-compose-attach { width: 2.75rem; height: 2.75rem; min-height: 2.75rem; padding: 0; border-radius: 50%; color: var(--hm-brand-blue, var(--hm-primary)); flex: none; }
 .hm-compose-attach .hm-svg { width: 1.625rem; height: 1.625rem; transition: transform var(--hm-dur-slow) var(--hm-ease-spring); }
 .hm-compose-attach[aria-expanded="true"] .hm-svg { transform: rotate(45deg); }
-.hm-compose-act { display: inline-grid; place-items: center; flex: none; width: 2.75rem; height: 2.75rem; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
-  background: var(--hm-brand-blue, var(--hm-primary)); color: var(--hm-on-brand-blue, var(--hm-on-primary-fill)); box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hm-brand-blue, var(--hm-primary)) 60%, transparent);
-  transition: background-color var(--hm-dur) var(--hm-ease); }
-.hm-compose-act.is-mic { background: var(--hm-brand-orange, var(--hm-primary)); color: var(--hm-on-brand-orange, var(--hm-on-primary-fill)); box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hm-brand-orange, var(--hm-primary)) 60%, transparent); }
-.hm-compose-act[data-hm-color] { background: var(--hm-accent); color: var(--hm-on-accent); box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hm-accent) 60%, transparent); }
+/* the round action: a solid IconButton, Aktivite (send) or Heyecan (mic) unless a color is given */
+.hm-compose-act.hm-icon-btn { box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hm-accent, var(--hm-brand-blue, var(--hm-primary))) 60%, transparent); }
+.hm-compose-act.hm-icon-btn:not([data-hm-color]) { background: var(--hm-brand-blue, var(--hm-primary)); color: var(--hm-on-brand-blue, var(--hm-on-primary-fill)); }
+.hm-compose-act.hm-icon-btn.is-mic:not([data-hm-color]) { background: var(--hm-brand-orange, var(--hm-primary)); color: var(--hm-on-brand-orange, var(--hm-on-primary-fill)); box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hm-brand-orange, var(--hm-primary)) 60%, transparent); }
 .hm-compose-act .hm-icon, .hm-compose-icon .hm-icon { display: inline-grid; place-items: center; }
-.hm-compose-act .hm-svg { width: 1.25rem; height: 1.25rem; }
+.hm-compose-act.hm-icon-btn .hm-svg { width: 1.25rem; height: 1.25rem; }
 .hm-compose-act.is-send .hm-svg { margin-inline-start: -2px; }
 :dir(rtl) .hm-compose-act.is-send .hm-svg { transform: scaleX(-1); }
 .hm-compose-act:disabled { opacity: .5; cursor: default; }
@@ -30,12 +28,10 @@
 .hm-compose-reply-text { display: flex; flex-direction: column; flex: 1; min-width: 0; font-size: var(--hm-text-sm); }
 .hm-compose-reply-text b { font-size: var(--hm-text-xs); color: var(--hm-brand-orange-text, var(--hm-primary-text)); }
 .hm-compose-reply-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--hm-text-2); }
-.hm-compose-reply .hm-compose-icon { width: 2rem; height: 2rem; } .hm-compose-reply .hm-compose-icon .hm-svg { width: 1rem; height: 1rem; }
 .hm-compose-emoji .hm-react-grid { border: 0; background: var(--hm-surface-2); }
 .hm-compose-rec { display: flex; align-items: center; gap: .625rem; flex: 1; min-width: 0; height: 2.75rem; padding: 0 1rem; border-radius: 1.5rem; background: var(--hm-surface-2); overflow: hidden; }
-.hm-compose-dot { flex: none; width: .625rem; height: .625rem; border-radius: 50%; background: var(--hm-danger); }
 .hm-compose-time { flex: none; font-variant-numeric: tabular-nums; font-weight: 800; font-size: var(--hm-text-sm); min-width: 2.75rem; }
 .hm-compose-wave { display: flex; align-items: center; gap: 3px; flex: 1; min-width: 0; height: 1.5rem; overflow: hidden; }
 .hm-compose-wave i { flex: none; width: 3px; height: 100%; border-radius: 2px; background: var(--hm-brand-orange, var(--hm-primary)); transform: scaleY(.3); }
-.hm-compose-cancel { color: var(--hm-danger); }
-.hm-compose-cancel:hover { color: var(--hm-danger); background: var(--hm-danger-soft); }
+.hm-compose-cancel.hm-icon-btn, .hm-compose-cancel.hm-icon-btn:hover { color: var(--hm-danger); }
+.hm-compose-cancel.hm-icon-btn:hover { background: var(--hm-danger-soft); }

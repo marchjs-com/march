@@ -26,6 +26,7 @@ ruler use the same scale with `timePercent(ms, duration)`.
 | `snap` | `(ms, pointerEvent) => ms` | | round a dragged time |
 | `keyStep` | `number` (ms) | `100` | one arrow key press (Shift: ten times) |
 | `head` | `boolean` / node | `true` | the playhead, or your own grip |
+| `headClass` | `string` | | extra class of the playhead |
 | `color` | color token | accent | colour of the playhead |
 | `labels` | `{ ruler?, playhead? }` | "Time ruler", "Playhead" (translated) | |
 | `class` | class value | | |

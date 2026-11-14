@@ -7,7 +7,7 @@ import { t } from "../../../core/i18n.ts";
 import { val, cx, icon, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
-import { colorAttr, tokenColor, COLOR_TOKENS, type ColorToken } from "../../../theme/colors.ts";
+import { colorAttr, tokenColor, COLOR_TOKENS, BRAND_COLORS, type ColorToken } from "../../../theme/colors.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
@@ -68,7 +68,6 @@ export interface BottomNavProps {
   class?: ClassProp;
 }
 
-const CYCLE: ColorToken[] = ["brand-orange", "brand-blue", "brand-green", "brand-purple"];
 /** The four HADİ colors: Heyecan, Aktivite, Dostluk, İletişim (a theme that defines its brand tokens wins). */
 export const HADI_RING: readonly string[] = ["var(--hm-brand-orange, #F2801F)", "var(--hm-brand-blue, #1D9AD6)", "var(--hm-brand-green, #78BE3A)", "var(--hm-brand-purple, #A3338C)"];
 
@@ -79,7 +78,7 @@ export function BottomNav(props: BottomNavProps): Element {
   const createAt = create ? Math.floor(items.length / 2) : -1;
   const slots = items.length + (create ? 1 : 0);
   const slotOf = (i: number): number => (create && i >= createAt ? i + 1 : i);
-  const colorOf = (it: BottomNavItem, i: number): ColorToken => it.color ?? CYCLE[i % CYCLE.length]!;
+  const colorOf = (it: BottomNavItem, i: number): ColorToken => it.color ?? BRAND_COLORS[i % BRAND_COLORS.length]!;
   const activeIndex = (): number => items.findIndex((it) => it.id === val(props.value));
   const brand = (): boolean => (val(props.tint) ?? "brand") === "brand";
   const labels = (): boolean => val(props.labels) ?? true;

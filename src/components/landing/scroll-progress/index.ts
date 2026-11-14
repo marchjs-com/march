@@ -1,14 +1,14 @@
 // ScrollProgress (hadi-march/landing): a thin bar that fills as the page (or one article) is read. Fixed to the top or
-// placed inline; brand gradient or the accent; drawn by the motion core's scrollIndicator. RTL fills
-// from the right. It is a progressbar for assistive technology, with the percentage as its value.
+// placed inline; brand gradient or the accent; a Progress line whose fill the motion core's scrollIndicator drives. RTL
+// fills from the right. It is a progressbar for assistive technology, with the percentage as its value.
 import "./scroll-progress.css";
 import { h } from "../../../dom/h.ts";
-import { signal } from "../../../core/reactive.ts";
+import { signal, onCleanup, getOwner, runWithOwner } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, val, setStyle, type ClassProp } from "../../../ui/util.ts";
+import { cx, val, type ClassProp } from "../../../ui/util.ts";
 import { scrollIndicator, onScrollProgress, type ScrollSource } from "../../../motion/scroll-fx.ts";
-import { onCleanup, getOwner, runWithOwner } from "../../../core/reactive.ts";
-import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import type { ColorToken } from "../../../theme/colors.ts";
+import { Progress } from "../../feedback/progress/index.ts";
 
 export interface ScrollProgressProps {
   /** Measure this element (an article) instead of the whole page. */
@@ -29,13 +29,13 @@ export interface ScrollProgressProps {
 /** `<ScrollProgress />` (page), `<ScrollProgress target={() => article} position="inline" />` */
 export function ScrollProgress(props: ScrollProgressProps): Element {
   const pct = signal(0);
-  const fill = h("span", { class: "hm-sprog-fill" }) as HTMLElement;
-  const root = h("div", {
-    class: cx("hm-sprog", `hm-sprog-${props.position ?? "fixed"}`, `hm-sprog-${props.paint ?? "gradient"}`, val(props.class)),
-    "data-hm-color": colorAttr(props.color),
-    role: "progressbar", "aria-label": props.label ?? t`Reading progress`, "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": () => String(pct()),
-  }, fill) as HTMLElement;
-  if (props.size) setStyle(root, { "--hm-sprog-h": `${props.size}px` });
+  let fill!: HTMLElement;
+  // the line is a Progress (variant "line") whose fill the scroll drives; the percentage feeds its ARIA value
+  const root = h(Progress, {
+    variant: "line", smooth: false, track: props.position === "inline", value: pct, ariaLabel: props.label ?? t`Reading progress`,
+    color: props.color, ...(props.size ? { size: props.size } : {}), fillRef: (x: HTMLElement) => { fill = x; },
+    class: cx("hm-scroll-progress", `hm-scroll-progress-${props.position ?? "fixed"}`, `hm-scroll-progress-${props.paint ?? "gradient"}`, val(props.class)),
+  }) as HTMLElement;
   let el: Element | null = null;
   const owner = getOwner();
   queueMicrotask(() => {

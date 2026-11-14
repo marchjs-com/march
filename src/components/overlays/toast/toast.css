@@ -12,9 +12,6 @@
 .hm-toast-danger .hm-toast-icon { color: var(--hm-danger); }
 .hm-toast-msg { flex: 1; font-size: var(--hm-text-md); line-height: 1.45; padding-top: .0625rem; }
 .hm-toast-action { margin-block: -.25rem; }
-.hm-toast-close { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; flex: none; border: 0; border-radius: var(--hm-radius-1);
-  background: none; color: var(--hm-muted); cursor: pointer; padding: 0; }
-.hm-toast-close:hover { background: var(--hm-surface-2); color: var(--hm-text); }
 @media (max-width: 640px) { .hm-toasts { inset-inline: var(--hm-space-3); width: auto; } }
 /* per-toast choices: own icon color, entrance */
 .hm-toast[data-hm-color] .hm-toast-icon { color: var(--hm-accent); }

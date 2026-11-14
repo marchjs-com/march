@@ -45,4 +45,4 @@ visually hidden "Yes" / "No"; "partly" is written out. The filter is a toggle bu
 
 ## Composed of
 
-Markup only; icons `check`, `x`, `minus`.
+CheckMark (yes / no / partly), Badge (ahead / behind), Button (the filter toggle).

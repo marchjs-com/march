@@ -19,7 +19,7 @@ list's `count` and the arrows switch off on the first and the last row.
 | `count` | `number` / accessor | | "down" is off on the last row |
 | `disabled` | `boolean` / accessor / `{ up?, down?, remove? }` | `false` | all tools, or some |
 | `labels` | `{ up?, down?, remove?, group? }` | "Move up", "Move down", "Remove", "Row tools" (translated) | accessible names and tooltips |
-| `icons` | `{ up?, down?, remove? }` | arrows and a cross | |
+| `icons` | `{ up?, down?, remove? }` | arrows and a cross | each an icon, text, a node or `() => node`; a node is copied for every row |
 | `size` | `xs` `sm` `md` `lg` | IconButton default | |
 | `color` | color token | | colour of the icons |
 | `danger` | `boolean` | `false` | the remove tool in the danger colour |

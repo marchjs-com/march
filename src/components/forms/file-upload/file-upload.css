@@ -6,10 +6,8 @@
 .hm-drop[aria-invalid="true"] { border-color: var(--hm-danger); }
 .hm-drop[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
 .hm-files, .hm-upload-errors { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--hm-space-1); }
-.hm-file { display: flex; align-items: center; flex-wrap: wrap; gap: var(--hm-space-2); padding: var(--hm-space-2); border: 1px solid var(--hm-border); border-radius: var(--hm-radius); background: var(--hm-surface); }
-.hm-file-error { border-color: var(--hm-danger); }
-.hm-file-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* a file line is a ListRow in a bordered box */
+.hm-file.hm-listrow { padding: var(--hm-space-2); border: 1px solid var(--hm-border); border-radius: var(--hm-radius); background: var(--hm-surface); }
+.hm-file-error.hm-listrow { border-color: var(--hm-danger); }
 .hm-file-thumb { width: 2.5rem; height: 2.5rem; object-fit: cover; border-radius: var(--hm-radius-1); }
 .hm-file-audio { max-width: 14rem; height: 2rem; }
-.hm-file-ok { color: var(--hm-success-text); font-size: var(--hm-text-xs); }
-.hm-file-progress { flex-basis: 100%; }

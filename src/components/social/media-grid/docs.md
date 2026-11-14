@@ -38,4 +38,4 @@ at once (no double-tap wait). The video mark and "+N" are decorative; "+N" is pa
 
 ## Composed of
 
-Skeleton.
+Skeleton, CornerMark, Picture.

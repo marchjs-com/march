@@ -1,4 +1,4 @@
-/* SiteNav. Height, background and blur change with .is-scrolled (token durations); the pill gets its place from JS. */
+/* SiteNav. Height, background and blur change with .is-scrolled (token durations); the pill is placed by the shared sliding indicator. */
 .hm-snav { --hm-snav-h: 4.25rem; position: relative; z-index: var(--hm-z-sticky); inset-inline: 0; color: var(--hm-text);
   transition: transform var(--hm-dur-slow) var(--hm-ease-out), background-color var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
 .hm-snav.is-sticky { position: sticky; inset-block-start: var(--hm-site-nav-top, 0); }
@@ -18,7 +18,7 @@
 :dir(rtl) .hm-snav-pill { transform-origin: 100% 50%; }
 .hm-snav-actions { flex: none; display: flex; align-items: center; gap: var(--hm-space-2); margin-inline-start: auto; }
 .hm-snav-nav + .hm-snav-actions { margin-inline-start: 0; }
-.hm-snav-menu { display: none; }
+.hm-snav .hm-snav-menu { display: none; }
 
 /* looks */
 .hm-snav-solid { background: color-mix(in srgb, var(--hm-bg) 82%, transparent); -webkit-backdrop-filter: saturate(160%) blur(14px); backdrop-filter: saturate(160%) blur(14px); border-block-end: 1px solid var(--hm-border); }
@@ -40,12 +40,12 @@
 
 @media (max-width: 860px) {
   .hm-snav-nav { display: none; }
-  .hm-snav-menu { display: inline-flex; }
+  .hm-snav .hm-snav-menu { display: inline-flex; }
   .hm-snav-bar .hm-snav-actions { margin-inline-start: auto; }
 }
 @container hm-site (max-width: 860px) {
   .hm-snav-nav { display: none; }
-  .hm-snav-menu { display: inline-flex; }
+  .hm-snav .hm-snav-menu { display: inline-flex; }
   .hm-snav-bar .hm-snav-actions { margin-inline-start: auto; }
 }
 @media (max-width: 520px) { .hm-snav-actions > :not(:last-child) { display: none; } }

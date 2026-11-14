@@ -34,4 +34,4 @@ closes it and returns focus to the field.
 
 ## Composed of
 
-Calendar (in the popover, placed by the shared floating panel).
+Calendar in a Popover (anchored to the whole control), IconButton (the calendar button).

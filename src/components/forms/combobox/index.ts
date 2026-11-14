@@ -7,8 +7,10 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { floating } from "../../../ui/popover.ts";
 import { model, ctl, cx, uid, debounce, listNav, fold, same, normOptions, type ControlProps, type Option, type OptionsProp } from "../../../forms/util.ts";
-import { OverflowText } from "../../../ui/marquee.ts";
-import { ownPart } from "../../../forms/rows.ts";
+import { ownPart } from "../../../ui/parts.ts";
+import { errorText } from "../../../ui/format.ts";
+import { Chip } from "../../actions/chip/index.ts";
+import { ListRow } from "../../data/list-row/index.ts";
 
 export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]> {
   /** Static options: [value] or [{ value, label, hint, disabled }]. */
@@ -72,7 +74,7 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
     try {
       const r = normOptions(await props.search!(text));
       if (id === reqId) { remote.set(r); active.set(r.length ? 0 : -1); }
-    } catch (e) { if (id === reqId) { remote.set([]); error.set((e as Error | null)?.message ?? String(e)); } }
+    } catch (e) { if (id === reqId) { remote.set([]); error.set(errorText(e)); } }
     finally { if (id === reqId) loading.set(false); }
   }, props.debounce ?? 250);
   onCleanup(() => { run.cancel(); reqId++; });
@@ -148,18 +150,23 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
       if (loading() && !list.length) return status(lb?.searching ?? t`Searching…`);
       if (props.search && remote() == null) return status(lb?.typeToSearch ?? t`Type to search`);
       if (!list.length) return status(lb?.noResults ?? t`No results`);
-      return list.map((o, i) => h("div", {
-        role: "option", id: `${listId}-${i}`, class: "hm-option", "class:hm-active": () => active() === i,
-        "aria-selected": () => String(isSel(o.value)), "aria-disabled": o.disabled ? "true" : null,
+      // an option is a ListRow (label + hint at the end, or your own drawing); focus stays in the input
+      return list.map((o, i) => h(ListRow, {
+        as: "div", role: "option", id: `${listId}-${i}`, class: () => cx("hm-option", active() === i && "hm-active"), overflow: "wrap",
+        "aria-selected": () => String(isSel(o.value)), disabled: !!o.disabled,
         onMouseDown: (e: MouseEvent) => e.preventDefault(), onMouseMove: () => { if (active.peek() !== i) active.set(i); }, onClick: () => pick(i),
-      }, props.renderOption ? props.renderOption(o) : [h("span", { class: "hm-option-label" }, o.label), o.hint ? h("small", { class: "hm-hint" }, o.hint) : null]));
+        ...(props.renderOption ? { children: props.renderOption(o) } : { title: o.label, trail: o.hint || undefined }),
+      }));
     },
   });
   wrap = h("div", { class: () => cx("hm-combo", multi && "hm-multi", props.class), "class:hm-disabled": () => !!props.disabled, onClick: (e: MouseEvent) => { if (e.target === wrap) input.focus(); } },
     multi ? () => (getList() ?? []).map((v) => {
       const label = labelOf(v);
-      return h("span", { class: "hm-chip" }, h(OverflowText, { class: "hm-chip-label" }, label),
-        props.readonly || props.disabled || props.removeIcon === false ? null : h("button", { type: "button", class: "hm-chip-x", "aria-label": props.labels?.remove?.(label) ?? t`Remove ${label}`, onClick: () => { removeAt(v); input.focus(); } }, ownPart(props.removeIcon, () => "×")));
+      const fixed = props.readonly || props.disabled || props.removeIcon === false;
+      return h(Chip, {
+        class: "hm-chip", removeLabel: props.labels?.remove?.(label) ?? t`Remove ${label}`, removeIcon: ownPart(props.removeIcon, () => undefined),
+        ...(fixed ? null : { onRemove: () => { removeAt(v); input.focus(); } }),
+      }, label);
     }) : null,
     input,
     () => (open() ? panel() : null));

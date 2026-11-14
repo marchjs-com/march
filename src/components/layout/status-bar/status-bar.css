@@ -12,11 +12,11 @@
 .hm-sbar-item.is-button:hover:not(:disabled) { background: color-mix(in srgb, var(--hm-text) 9%, transparent); color: var(--hm-text); }
 .hm-sbar-item.is-button:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: -2px; }
 .hm-sbar-icon { display: inline-flex; } .hm-sbar-icon .hm-svg { width: .8125rem; height: .8125rem; }
-.hm-sbar-dot { display: none; width: .4375rem; height: .4375rem; border-radius: 50%; background: currentColor; }
+/* the tone dot is a StatusDot; a neutral item shows none */
+.hm-sbar-item.is-neutral .hm-sbar-dot { display: none; }
 .hm-sbar-item.is-info, .hm-sbar-item.is-success, .hm-sbar-item.is-warn, .hm-sbar-item.is-danger, .hm-sbar-item.is-busy { --hm-sbar-c: var(--hm-info); }
 .hm-sbar-item.is-success { --hm-sbar-c: var(--hm-success); } .hm-sbar-item.is-warn { --hm-sbar-c: var(--hm-warn); }
 .hm-sbar-item.is-danger { --hm-sbar-c: var(--hm-danger); } .hm-sbar-item.is-busy { --hm-sbar-c: var(--hm-primary); }
-.hm-sbar-item:is(.is-info, .is-success, .is-warn, .is-danger, .is-busy) .hm-sbar-dot { display: inline-block; background: var(--hm-sbar-c); }
 .hm-sbar-item:is(.is-info, .is-success, .is-warn, .is-danger, .is-busy) .hm-sbar-icon { color: var(--hm-sbar-c); }
 .hm-sbar-item.is-danger { color: var(--hm-danger-text, var(--hm-danger)); }
 /* dot={(tone, item) => node}: your own mark, shown (in the tone colour) where the dot would be */

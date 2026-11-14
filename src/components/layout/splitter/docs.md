@@ -34,4 +34,4 @@ behavior; keyboard: arrows, Home / End, Enter.
 
 ## Composed of
 
-No other component; the resize-handle behavior.
+ResizeHandle (the handle between the panes).

@@ -221,13 +221,13 @@ test("Combobox static filtering and MultiSelect chips", () => {
   assert.equal(v(), "Berlin");
   const tags = signal(["a"]);
   const m = mount(() => h(F.MultiSelect, { "bind:value": tags, options: [{ value: "a", label: "Alpha" }, { value: "b", label: "Beta" }] }));
-  assert.equal(m.el.querySelector(".hm-chip-label").textContent, "Alpha");
+  assert.equal(m.el.querySelector(".hm-chip2-label").textContent, "Alpha");
   const mi = m.el.querySelector("input");
   type(mi, "be"); key(mi, "Enter");
   assert.deepEqual(tags(), ["a", "b"]);
   key(mi, "Backspace");
   assert.deepEqual(tags(), ["a"]);
-  m.el.querySelector(".hm-chip-x").click();
+  m.el.querySelector(".hm-chip2-x").click();
   assert.deepEqual(tags(), []);
 });
 

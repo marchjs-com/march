@@ -22,7 +22,7 @@ sidebars, command palettes, trees and file lists all build their rows from it.
 | `actions` | node | — | controls for the row; beside a link / button row, at the end of a plain row |
 | `href` | string | — | makes it a link |
 | `onClick` | function | — | makes it a button (with `as`: a click listener on that element) |
-| `as` | `div` `li` `span` `label` | `div` | element of a row that is not a link or a button |
+| `as` | `div` `li` `span` `label` `button` | `div` | element of a row that is not a link or a button; `button`: a button whose host adds its own listeners (drag, keys) instead of `onClick` |
 | `active` | boolean / accessor | `false` | the current row; a link gets `aria-current="page"` |
 | `selected` | boolean / accessor | — | a chosen row; `aria-pressed` on a button, `aria-checked` / `aria-selected` with a matching `role` |
 | `disabled` | boolean / accessor | `false` | |

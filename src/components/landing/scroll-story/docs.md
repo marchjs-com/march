@@ -37,4 +37,4 @@ Steps are articles with headings in reading order; only the active picture is ex
 
 ## Composed of
 
-`onScrollProgress` (motion scroll core), motion engine, theme colour tokens (`data-hm-color`).
+PageDots; `onScrollProgress` (motion scroll core), `swapTransition`, `observeSize`, theme colour tokens (`data-hm-color`).

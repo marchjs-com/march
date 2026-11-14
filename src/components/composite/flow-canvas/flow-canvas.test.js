@@ -106,3 +106,17 @@ test("FlowCanvas: zoom bar off or in parts, own texts, own menu, no menu", () =>
   assert.equal(got, null);
   m.dispose();
 });
+
+test("FlowCanvas: what changed is announced through the announcer (no live region of its own)", async () => {
+  const { announcer } = await import("../../../managers/announcer/index.ts");
+  const flow = createFlow({ types: sampleTypes, doc: sampleDoc(), undo: false });
+  const m = mount(() => h(FlowCanvas, { flow, labels: { deleted: (n) => `Removed ${n}` } }));
+  assert.equal(m.el.querySelector(".hm-sr-only"), null);
+  assert.equal(m.el.querySelector(".hm-flow-zoom").getAttribute("role"), "toolbar");
+  flow.selection.set(new Set(["save"]));
+  m.el.querySelector(".hm-flow").dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
+  await new Promise((r) => setTimeout(r, 5));
+  assert.equal(announcer.history()[0].text, "Removed 1");
+  m.dispose();
+  announcer.dispose();
+});

@@ -1,17 +1,11 @@
 /* LiveCounter. A big rolling number with a live dot and a label under it. */
 .hm-lc { display: inline-grid; grid-template-columns: auto auto; align-items: center; justify-content: start; gap: 0 var(--hm-space-3); }
-.hm-lc-dot { position: relative; inline-size: .65rem; block-size: .65rem; border-radius: 50%; background: var(--hm-success); }
-.hm-lc-dot::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid var(--hm-success); opacity: .35; animation: hm-fade-in var(--hm-dur-slow) var(--hm-ease) infinite alternate; }
 .hm-lc-num { position: relative; display: inline-block; transform-origin: 0 50%; font-size: var(--hm-text-4xl); font-weight: var(--hm-weight-bold, 700); line-height: 1.1; letter-spacing: -.02em; }
 .hm-lc-bubbles { position: absolute; inset-block-start: 0; inset-inline-start: 100%; pointer-events: none; }
-.hm-lc-bubble { position: absolute; inset-block-start: 0; inset-inline-start: var(--hm-space-2); padding: .1em .5em; border-radius: var(--hm-radius-full); background: var(--hm-success-soft, var(--hm-surface-2)); color: var(--hm-success-text); font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); letter-spacing: 0; white-space: nowrap; opacity: 0; }
+/* the "+N" bubble (a Badge) rises beside the number: only its place and type size are set here */
+.hm-lc-bubble { position: absolute; inset-block-start: 0; inset-inline-start: var(--hm-space-2); letter-spacing: 0; white-space: nowrap; opacity: 0; }
+.hm-lc .hm-lc-bubble.hm-badge { font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); }
 .hm-lc-label { grid-column: 1 / -1; color: var(--hm-muted); font-size: var(--hm-text-sm); }
 .hm-lc:has(.hm-lc-dot) .hm-lc-label { grid-column: 2; }
-@media (prefers-reduced-motion: reduce) { .hm-lc-dot::after { animation: none; } }
-/* own colours: data-hm-color sets --hm-accent */
-.hm-lc-dot[data-hm-color] { background: var(--hm-accent); }
-.hm-lc-dot[data-hm-color]::after { border-color: var(--hm-accent); }
-.hm-lc-bubble[data-hm-color] { background: color-mix(in srgb, var(--hm-accent) 18%, var(--hm-bg)); color: var(--hm-accent-text, var(--hm-text)); }
-.hm-lc-bubble.is-own { padding: 0; background: none; }
 .hm-lc-plain { display: inline-flex; align-items: baseline; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hm-lc-dot-own { display: inline-grid; place-items: center; }

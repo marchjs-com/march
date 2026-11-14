@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Modal dialog: declarative <Dialog open> or openDialog() / openDrawer() returning a promise, plus confirm, prompt and askReason; focus trap, Escape, stacking.",
   category: "overlays",
-  composedOf: ["Portal"],
+  composedOf: ["Portal", "PanelHeader", "IconButton", "Button", "Field", "TextInput", "Textarea", "Select", "Drawer"],
   behaviors: ["focus trap", "layer stack"],
   hubs: [],
   showcase: "/overlays",

@@ -9,6 +9,7 @@ import type { Schema } from "../schema/index.ts";
 import type { PermCheck } from "../access/index.ts";
 import { createTable, Table, type TableProps, type ColumnInput, type RowAction, type BulkAction } from "../table/index.ts";
 import { Form } from "../forms/index.ts";
+import { deepEqual, CANCELLED } from "../forms/form.ts";
 import { openDialog, askReason } from "../ui/dialog.ts";
 import { Button } from "../ui/button.ts";
 import { action } from "../ui/action.ts";
@@ -77,11 +78,11 @@ export function crud<R extends Row = Row>(source: CrudSource<R>, opts: CrudOptio
   const edit = source.update && action(L.edit, async (row: R) => {
     const initial = source.get ? await source.get(row[key]) : row;
     const r = await editor(L.edit, initial, async (values) => {
-      const changed = Object.fromEntries(Object.entries(values).filter(([k, v]) => JSON.stringify(v) !== JSON.stringify((initial as Row | undefined)?.[k]))) as Partial<R>;
+      const changed = Object.fromEntries(Object.entries(values).filter(([k, v]) => !deepEqual(v, (initial as Row | undefined)?.[k]))) as Partial<R>;
       let reason: string | undefined;
       if (opts.reason?.save) {
         const r = await askReason({ title: L.edit, min: opts.reason.save });
-        if (r == null) throw Object.assign(new Error(t`Cancelled`), { code: "cancelled" });
+        if (r == null) throw CANCELLED; // the form stays open, without an error
         reason = r;
       }
       return (source.update as NonNullable<CrudSource<R>["update"]>)(row[key], values, { changed, reason });

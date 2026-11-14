@@ -2,10 +2,10 @@
 .hm-pd { container-type: inline-size; display: flex; flex-direction: column; gap: clamp(1.5rem, 4cqi, 2.5rem); min-width: 0; }
 .hm-pd-back { align-self: flex-start; }
 :dir(rtl) .hm-pd-back .hm-svg { transform: scaleX(-1); }
-.hm-pd-head { display: flex; flex-direction: column; gap: var(--hm-space-3); max-width: 48rem; }
-.hm-pd-eyebrow { margin: 0; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); text-transform: uppercase; letter-spacing: var(--hm-tracking-caps, .08em); color: var(--hm-accent-text, var(--hm-primary-text)); }
-.hm-pd-title { margin: 0; font-size: clamp(2.25rem, 1.2rem + 4cqi, 4.5rem); line-height: 1.02; letter-spacing: -.035em; font-weight: 800; text-wrap: balance; overflow-wrap: break-word; hyphens: auto; }
-.hm-pd-lead { margin: 0; font-size: clamp(1.05rem, .95rem + .5cqi, 1.3rem); line-height: 1.6; color: var(--hm-muted); }
+/* the heading is a SectionHead (xl, start): a narrower measure and a slightly smaller title than a hero */
+.hm-pd-head.hm-section-head { gap: var(--hm-space-3); max-inline-size: 48rem; }
+.hm-pd .hm-pd-head .hm-section-head-title { font-size: clamp(2.25rem, 1.2rem + 4cqi, 4.5rem); }
+.hm-pd-head .hm-section-head-lead { max-inline-size: none; }
 .hm-pd-cover { position: relative; aspect-ratio: 16 / 9; border-radius: var(--hm-radius-4); overflow: hidden; background: var(--hm-surface-2); box-shadow: var(--hm-shadow-3); }
 .hm-pd-cover > img, .hm-pd-cover > :first-child { display: block; width: 100%; height: 100%; object-fit: cover; }
 .hm-pd-grid { display: grid; grid-template-columns: minmax(12rem, .7fr) minmax(0, 1.6fr); gap: clamp(1.5rem, 5cqi, 4rem); align-items: start; }
@@ -29,4 +29,3 @@
 .hm-pd-next-cover > img, .hm-pd-next-cover > :first-child { display: block; width: 100%; height: 100%; object-fit: cover; }
 @container (max-width: 700px) { .hm-pd-grid { grid-template-columns: minmax(0, 1fr); } .hm-pd-facts { position: static; } .hm-pd-gallery { grid-template-columns: minmax(0, 1fr); } .hm-pd-next { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .hm-pd-shot:hover > :first-child, .hm-pd-next:hover { transform: none; } }
-.hm-pd[data-hm-color] .hm-pd-eyebrow { color: var(--hm-accent-text, var(--hm-accent)); }

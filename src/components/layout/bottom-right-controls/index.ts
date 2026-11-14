@@ -8,7 +8,8 @@
 import "./bottom-right-controls.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { onCleanup, getOwner } from "../../../core/reactive.ts";
+import { onCleanup } from "../../../core/reactive.ts";
+import { owned } from "../../../ui/observe.ts";
 import { openLayer } from "../../../dom/portal.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../core/util.ts";
 
@@ -50,9 +51,7 @@ export function addCornerControl(corner: Corner, node: Node, order = 0): () => v
   let before: Node | null = null;
   for (let c = el.firstChild; c; c = c.nextSibling) if ((orders.get(c) ?? 0) > order) { before = c; break; }
   el.insertBefore(node, before);
-  const off = (): void => { node.parentNode?.removeChild(node); };
-  if (getOwner()) onCleanup(off);
-  return off;
+  return owned((): void => { node.parentNode?.removeChild(node); });
 }
 
 /** Renders a corner in place; controls added to it go in here (a corner made earlier hands its controls over). */

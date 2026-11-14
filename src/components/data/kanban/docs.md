@@ -34,3 +34,7 @@ and wins over `tone`.
 
 Columns are labelled sections; cards are focusable and move with Alt+← / Alt+→, so the board works without a pointer.
 The board scrolls sideways on narrow screens instead of crushing columns.
+
+## Composed of
+
+PanelHeader (the column head), StatusDot (the dot) and Badge (the count).

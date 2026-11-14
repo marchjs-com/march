@@ -1,11 +1,11 @@
 // Drawer (hadi-march/ui): a sheet from any edge — start / end (logical: mirrored in RTL), top, bottom. Drag to close,
 // snap points, modal or non-modal. Reuses the Dialog frame (focus, Escape, stacking, aria) inside a Portal layer;
 // every movement runs on the motion engine (transform only), the gesture only feeds it offsets.
-import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
+import { signal, effect, untrack, onCleanup, createRoot } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { Portal } from "../../../dom/portal.ts";
+import { Portal, type PortalProps } from "../../../dom/portal.ts";
 import { t } from "../../../core/i18n.ts";
-import { frame, type DialogProps } from "../../../ui/dialog.ts";
+import { frame, type DialogProps, type DialogOptions } from "../../../ui/dialog.ts";
 import { val, cx, clamp, type MaybeFn } from "../../../ui/util.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
@@ -39,6 +39,8 @@ export interface DrawerProps extends Omit<DialogProps, "side" | "size" | "motion
    * `{ duration, exit, easing }` (ms; easing: a motion engine easing such as "easeOutBack").
    */
   motion?: boolean | { duration?: number | undefined; exit?: number | undefined; easing?: string | undefined } | undefined;
+  /** Where it opens: the nearest <OverlayScope> (default), the whole page ("page") or a scope element. */
+  target?: PortalProps["target"];
 }
 
 type Edge = "start" | "end" | "top" | "bottom";
@@ -53,16 +55,42 @@ interface Controls { exit(done: () => void): void; reopen(): void }
  * Closing animates out before the panel leaves the document.
  */
 export function Drawer(props: DrawerProps): () => unknown {
+  return drawer(props);
+}
+
+// `gone` runs when the panel has left the document (after its exit).
+function drawer(props: DrawerProps, gone?: () => void): () => unknown {
   const shown = signal(false);
+  const hide = (): void => { shown.set(false); gone?.(); };
   let ctl: Controls | null = null;
   effect(() => {
     const open = !!val(props.open);
     untrack(() => {
       if (open) { if (shown.peek()) ctl?.reopen(); else shown.set(true); }
-      else if (shown.peek()) { if (ctl) ctl.exit(() => { if (!val(props.open)) shown.set(false); }); else shown.set(false); }
+      else if (shown.peek()) { if (ctl) ctl.exit(() => { if (!val(props.open)) hide(); }); else hide(); }
     });
   });
   return () => (shown() ? untrack(() => sheet(props, (c) => { ctl = c; onCleanup(() => { if (ctl === c) ctl = null; }); })) : null);
+}
+
+/**
+ * @internal What openDrawer() and openDialog({ kind: "drawer" }) of the dialog module run: the same promise contract
+ * on a <Drawer> (`scope`: the overlay scope it opens in, null for the page).
+ */
+export function openSheet(render: (close: (value?: unknown) => void) => unknown, opts: DialogOptions, scope: HTMLElement | null): Promise<unknown> {
+  return new Promise((resolve) => {
+    createRoot((dispose) => {
+      const open = signal(true);
+      let done = false;
+      const close = (v?: unknown): void => { if (done) return; done = true; open.set(false); resolve(v); };
+      const view = drawer({
+        open, side: opts.side, size: opts.size, title: opts.title, dismissable: opts.dismissable, class: opts.class, target: scope ?? "page",
+        closeButton: opts.closeButton, closeLabel: opts.closeLabel, motion: opts.motion !== "none",
+        onClose: () => close(opts.dismissValue), footer: opts.footer?.(close), get children() { return render(close); },
+      } as DrawerProps, () => queueMicrotask(dispose));
+      effect(() => { view(); });
+    }, null);
+  });
 }
 
 function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
@@ -213,5 +241,5 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
     },
     reopen() { fade?.cancel(); fade = null; setStyle(root, { opacity: null }); void to(rest()); },
   });
-  return h(Portal, { layer: modal ? "drawer" : "popover", children: root });
+  return h(Portal, { layer: modal ? "drawer" : "popover", ...(props.target ? { target: props.target } : null), children: root });
 }

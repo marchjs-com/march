@@ -3,18 +3,21 @@
 // Type (linear, radial, conic), an angle dial, a stop bar (click to add, drag to move, drag down or Delete to remove),
 // a ColorPicker for the selected stop, presets (the HADİ gradient first) and the CSS to copy.
 import "./gradient-editor.css";
-import { signal, computed, effect, untrack, reactive } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, uid, val, clamp, setStyle, type ClassProp } from "../../../core/util.ts";
-import { glyph } from "../../../ui/util.ts";
-import { model, ctl, type ControlProps } from "../../../forms/util.ts";
+import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
 import { Segmented } from "../../../forms/inputs.ts";
+import { Field } from "../../../forms/field.ts";
 import { IconButton } from "../../../ui/button.ts";
+import { CopyButton } from "../../actions/copy-button/index.ts";
+import { Card } from "../../data/card/index.ts";
+import { NumberInput } from "../../forms/number-input/index.ts";
+import { Swatch, CHECKER } from "../../forms/swatch/index.ts";
+import { Stack } from "../../layout/stack/index.ts";
 import { ColorPicker, resolveColor } from "../color-picker/index.ts";
-import { copy } from "../../../icons/glyphs/copy.ts";
-import { check } from "../../../icons/glyphs/check.ts";
 import * as G from "./gradient.ts";
 import tr from "./tr.ts";
 
@@ -68,7 +71,6 @@ export function GradientEditor(props: GradientEditorProps): unknown {
   const grad = signal<G.Gradient>(G.parseGradient(untrack(get) ?? DEFAULT) ?? G.parseGradient(DEFAULT)!);
   const sel = signal(0);
   const removing = signal<number | null>(null);
-  const copied = signal(false);
   let root: HTMLElement | undefined;
   let last = "";
   const css = computed(() => G.gradientCss(grad()));
@@ -121,7 +123,7 @@ export function GradientEditor(props: GradientEditorProps): unknown {
   };
   const focusStop = (i: number): void => { queueMicrotask(() => bar?.querySelectorAll<HTMLElement>(".hm-ge-stop")[i]?.focus()); };
   bar = h("div", {
-    class: "hm-ge-bar", "aria-label": () => L().stops ?? t`Color stops`, role: "group",
+    class: cx("hm-ge-bar", CHECKER), "aria-label": () => L().stops ?? t`Color stops`, role: "group",
     onPointerDown: (e: PointerEvent) => {
       if (ro() || (e.target as Element).closest(".hm-ge-stop")) return;
       const r = bar.getBoundingClientRect();
@@ -167,39 +169,38 @@ export function GradientEditor(props: GradientEditorProps): unknown {
     return G.gradientCss({ type: grad.peek().type, angle: grad.peek().angle, stops: list.map((col, i) => ({ color: resolveColor(col, root), at: (i * 100) / Math.max(1, list.length - 1) })) });
   };
   const presetButton = (p: GradientPreset): Element => {
-    const b = h("button", { type: "button", class: "hm-ge-preset", "aria-label": () => L().preset?.(p.label) ?? t`Preset: ${p.label}`, title: p.label, disabled: ro, onClick: () => { const g = G.parseGradient(presetCss(p)); if (g) { update(g); sel.set(0); } } }) as HTMLElement;
-    queueMicrotask(() => setStyle(b, { "--hm-ge-p": presetCss(p) }));
-    return b;
-  };
-  const copyCss = async (): Promise<void> => {
-    try { await globalThis.navigator?.clipboard?.writeText(`background: ${css.peek()};`); copied.set(true); setTimeout(() => copied.set(false), 1600); } catch { /* not allowed */ }
+    // theme tokens resolve against the editor's own element: painted once it is in place
+    const fill = signal<string | null>(null);
+    queueMicrotask(() => fill.set(presetCss(p)));
+    return h(Swatch, { class: "hm-ge-preset", color: fill, label: () => L().preset?.(p.label) ?? t`Preset: ${p.label}`, title: p.label, disabled: ro, onClick: () => { const g = G.parseGradient(presetCss(p)); if (g) { update(g); sel.set(0); } } }) as Element;
   };
 
   const types = (): readonly G.GradientType[] => props.types?.length ? props.types : ["linear", "radial", "conic"];
   const TYPE_LABEL: Record<G.GradientType, () => string> = { linear: () => L().linear ?? t`Linear`, radial: () => L().radial ?? t`Radial`, conic: () => L().conic ?? t`Conic` };
   const angles = (): readonly number[] => (props.angles === false ? [] : props.angles ?? ANGLES);
-  return h("div", { class: () => cx("hm-ge", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? L().editor ?? t`Gradient editor`, ref: (el: HTMLElement) => { root = el; untrack(paint); } },
-    () => (props.preview === false ? null : h("div", { class: "hm-ge-preview", role: "img", "aria-label": () => L().preview?.(css()) ?? t`Gradient preview: ${css()}` })),
-    h("div", { class: "hm-ge-row" },
+  return h(Card, { as: "div", class: () => cx("hm-ge", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? L().editor ?? t`Gradient editor`, ref: (el: HTMLElement) => { root = el; untrack(paint); } },
+    () => (props.preview === false ? null : h("div", { class: cx("hm-ge-preview", CHECKER), role: "img", "aria-label": () => L().preview?.(css()) ?? t`Gradient preview: ${css()}` })),
+    h(Stack, { class: "hm-ge-row", direction: "row", wrap: true, align: "center", justify: "between", gap: 3 },
       () => (types().length > 1 ? h(Segmented, { class: "hm-ge-types", "aria-label": L().type ?? t`Gradient type`, options: types().map((x) => ({ value: x, label: TYPE_LABEL[x]() })), value: grad.peek().type, onChange: (x: G.GradientType | null) => { if (x) update({ ...grad.peek(), type: x }); } }) : null),
       () => (grad().type === "radial" || (props.dial === false && !angles().length) ? null : h("div", { class: "hm-ge-angle" },
         props.dial === false ? null : dial,
-        angles().length ? h("div", { class: "hm-ge-angles", role: "group", "aria-label": () => L().quickAngles ?? t`Quick angles` }, angles().map((a) => h("button", {
-          type: "button", class: () => cx("hm-ge-angle-btn", Math.round(grad().angle) === a && "is-on"), "aria-label": () => degrees(a), disabled: ro,
+        angles().length ? h("div", { class: "hm-ge-angles", role: "group", "aria-label": () => L().quickAngles ?? t`Quick angles` }, angles().map((a) => h(IconButton, {
+          class: "hm-ge-angle-btn", size: "xs", label: () => degrees(a), pressed: () => Math.round(grad().angle) === a, disabled: ro,
           style: { "--hm-ge-a": `${a}deg` }, onClick: () => update({ ...grad.peek(), angle: a }),
-        }, h("span", { "aria-hidden": "true" })))) : null)),
+          icon: h("span", { class: "hm-ge-angle-hand", "aria-hidden": "true" }),
+        }))) : null)),
     ),
     h("div", { class: "hm-ge-stops" }, bar, () => (props.hint === false ? null : h("p", { class: "hm-ge-hint" }, () => L().hint ?? t`Click the bar to add a stop; drag a stop down or press Delete to remove it.`))),
     () => {
       const i = sel(), s = untrack(() => grad().stops[i]);
       if (!s) return null;
       return h("div", { class: "hm-ge-stop-editor", role: "group", "aria-label": L().stop?.(i + 1, s.color) ?? t`Stop ${i + 1}` },
-        h(ColorPicker, { value: untrack(() => resolveColor(s.color, root)), onChange: (v: string) => setStop(i, { color: v }), palettes: undefined, contrast: false, disabled: reactive(() => props.disabled), readonly: reactive(() => props.readonly), class: "hm-ge-picker" }),
-        props.position === false ? null : h("label", { class: "hm-ge-pos" }, h("span", null, () => L().position ?? t`Position`),
-          h("input", { type: "number", class: "hm-input hm-ge-pos-input", min: "0", max: "100", step: "1", value: () => String(Math.round(grad().stops[i]?.at ?? 0)), readonly: () => !!props.readonly, onInput: (e: Event) => { const n = Number((e.target as HTMLInputElement).value); if (Number.isFinite(n)) setStop(i, { at: clamp(n, 0, 100) }); } }), "%"));
+        h(ColorPicker, { value: untrack(() => resolveColor(s.color, root)), onChange: (v: string) => setStop(i, { color: v }), palettes: undefined, contrast: false, disabled: live(() => props.disabled), readonly: live(() => props.readonly), class: "hm-ge-picker" }),
+        props.position === false ? null : h(Field, { id: `${id}-pos`, inline: true, compact: true, class: "hm-ge-pos", label: () => L().position ?? t`Position` },
+          h(NumberInput, { id: `${id}-pos`, class: "hm-ge-pos-input", min: 0, max: 100, step: 1, suffix: "%", value: live(() => Math.round(grad().stops[i]?.at ?? 0)), readonly: live(() => !!props.readonly), disabled: live(() => !!props.disabled), onChange: (n: number | null) => { if (n != null) setStop(i, { at: clamp(n, 0, 100) }); } })));
     },
     () => (presets().length ? h("div", { class: "hm-ge-presets", role: "group", "aria-label": () => L().presets ?? t`Presets` }, presets().map(presetButton)) : null),
     () => (props.output === false ? null : h("div", { class: "hm-ge-output" },
       h("code", { class: "hm-ge-css", id: `${id}-css` }, () => `background: ${css()};`),
-      h(IconButton, { children: () => glyph(copied() ? check : copy), label: () => (copied() ? L().copied ?? t`Copied` : L().copy ?? t`Copy CSS`), size: "sm", class: () => cx("hm-ge-copy", copied() && "is-done"), onClick: copyCss }))));
+      h(CopyButton, { iconOnly: true, class: "hm-ge-copy hm-btn-sm", text: () => `background: ${css()};`, label: () => L().copy ?? t`Copy CSS`, copiedLabel: () => L().copied ?? t`Copied` }))));
 }

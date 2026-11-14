@@ -4,7 +4,8 @@
 import "./site-section.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, uid, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { Reveal, type RevealOptions } from "../reveal/index.ts";
+import type { RevealOptions } from "../reveal/index.ts";
+import { SectionHead } from "../section-head/index.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export type SectionTone = "plain" | "muted" | "inverse" | "brand";
@@ -35,11 +36,9 @@ export interface SiteSectionProps {
 export function SiteSection(props: SiteSectionProps): Element {
   const { eyebrow, title, lead, align, tone, width, space, level, color, reveal, class: c, children, ...attrs } = props;
   const hid = title != null ? uid("hm-ss") : null;
+  // the heading group is the shared SectionHead (it enters with Reveal; `reveal={false}` keeps it still)
   const head = title != null || eyebrow != null || lead != null
-    ? h(Reveal, { class: cx("hm-ss-head", align === "start" && "hm-ss-head-start"), effect: "up", stagger: 90, ...(reveal === false ? { effect: "none" } : reveal) },
-      eyebrow != null && h("p", { class: "hm-ss-eyebrow" }, () => val(eyebrow)),
-      title != null && h(`h${level ?? 2}`, { class: "hm-ss-title", id: hid }, () => val(title)),
-      lead != null && h("p", { class: "hm-ss-lead" }, () => val(lead)))
+    ? h(SectionHead, { class: "hm-ss-head", eyebrow, title, as: `h${level ?? 2}` as "h2", titleId: hid ?? undefined, lead, align: align ?? "center", reveal: reveal === false ? { effect: "none" } : reveal ?? true })
     : null;
   return h("section", { ...attrs, "aria-labelledby": hid, "data-hm-color": colorAttr(color), class: () => cx("hm-ss", `hm-ss-${tone ?? "plain"}`, `hm-ss-w-${width ?? "default"}`, `hm-ss-s-${space ?? "md"}`, val(c)) },
     h("div", { class: "hm-ss-inner" }, head, children));

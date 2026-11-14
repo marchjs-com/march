@@ -30,4 +30,4 @@ The swatch has its own name ("Pick a color"); the text field takes the Field lab
 
 ## Composed of
 
-Nothing: two native inputs.
+Swatch (the colour sample; the native picker lies over it) and TextInput (the #RRGGBB field).

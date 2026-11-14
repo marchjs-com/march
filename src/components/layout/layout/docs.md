@@ -81,4 +81,4 @@ reads the new title in a polite live region. The reading bar is a `progressbar` 
 
 ## Composed of
 
-Uses the page corners (`addCornerControl`) and loads ScrollToTop lazily; no component copied.
+Uses the page corners (`addCornerControl`). Its parts come in their own chunks: Button (the aside button, Feedback), Badge (offline), Progress (the reading line), ScrollToTop.

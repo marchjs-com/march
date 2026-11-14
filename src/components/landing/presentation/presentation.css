@@ -33,14 +33,11 @@
 .hm-appear > .is-shown { opacity: 1; }
 .hm-appear > li::marker { color: var(--hm-accent, var(--hm-primary)); }
 
-.hm-deck-bar { display: block; height: 3px; border-radius: 3px; background: var(--hm-border); overflow: hidden; }
-.hm-deck-bar-fill { display: block; height: 100%; background: var(--hm-brand-gradient); transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
-:dir(rtl) .hm-deck-bar-fill { transform-origin: 100% 50%; }
+/* the progress line is a Progress (brand gradient unless a colour is given); the control row is a Toolbar */
+.hm-deck-bar:not([data-hm-color]) { --hm-progress-c: var(--hm-brand-gradient); }
 :dir(rtl) .hm-deck-prev .hm-svg, :dir(rtl) .hm-deck-fwd .hm-svg { transform: scaleX(-1); }
-.hm-deck-bar-fill[data-hm-color] { background: var(--hm-accent); }
-.hm-deck-controls { display: flex; align-items: center; gap: var(--hm-space-1); min-width: 0; }
+.hm-deck .hm-deck-controls, .hm-deck .hm-deck-controls > * { gap: var(--hm-space-1); flex-wrap: nowrap; }
 .hm-deck-count { font-size: var(--hm-text-sm); color: var(--hm-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.hm-deck-spacer { flex: 1 1 auto; }
 
 /* speaker view */
 .hm-deck-speaker { display: flex; flex-direction: column; gap: var(--hm-space-4); min-width: 0; }
@@ -54,9 +51,8 @@
 
 @media print {
   .hm-deck { display: block; }
-  .hm-deck-controls, .hm-deck-bar, .hm-deck-speaker { display: none; }
+  .hm-deck .hm-deck-controls, .hm-deck .hm-deck-bar, .hm-deck-speaker { display: none; }
   .hm-deck-stage { aspect-ratio: auto; overflow: visible; border: 0; box-shadow: none; border-radius: 0; container-type: normal; }
   .hm-slide { position: relative; visibility: visible; aspect-ratio: 16 / 9; width: 100%; break-after: page; font-size: 2.2cqi; opacity: 1; transform: none; }
   .hm-appear > * { opacity: 1; }
 }
-@media (prefers-reduced-motion: reduce) { .hm-deck-bar-fill { transition: none; } }

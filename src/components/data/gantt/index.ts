@@ -1,6 +1,6 @@
 // Gantt (hadi-march/components/data/gantt): tasks on a time axis with dependency arrows (finish → start), drag to move
 // or resize a bar, drag its knob to set progress, a today line and day / week / month scales. Successors that would
-// start before their predecessor ends are pushed later (`cascade`). Dates via core/date + Intl, drags via pointerDrag.
+// start before their predecessor ends are pushed later (`cascade`). Dates via core/date + Intl, drags via behaviors/drag.
 import "./gantt.css";
 import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
@@ -8,7 +8,11 @@ import { t, locale, dir } from "../../../core/i18n.ts";
 import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp } from "../../../core/util.ts";
 import { todayIso, addDays, diffDays, dateFormat, utcDate, startOfWeek, firstDayOf, startOfMonth, addMonths, type IsoDate } from "../../../core/date.ts";
 import { animate, stagger } from "../../../motion/animate.ts";
-import { pointerDrag } from "../../../motion/pointer.ts";
+import { pointerDrag } from "../../../behaviors/drag/index.ts";
+import { ListRow } from "../list-row/index.ts";
+import { Badge } from "../badge/index.ts";
+import { ResizeHandle } from "../../layout/resize-handle/index.ts";
+import { chartHint } from "../scheduler/hint.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface GanttTask {
@@ -245,14 +249,15 @@ export function Gantt(props: GanttProps): Element {
       "data-task": task.id, "data-hm-color": colorAttr(task.color ?? "primary"), "aria-label": () => barLabel(live()), title: () => barLabel(live()),
       tabindex: row === 0 ? "0" : "-1",
       onKeydown: barKeys(task), onClick: () => { if (!dragging) props.onSelect?.(task); },
-      onPointerdown: (e: PointerEvent) => barDrag(e, task, ((e.target as HTMLElement).dataset["handle"] as "start" | "end" | "progress" | undefined) ?? "move", el),
+      onPointerdown: (e: PointerEvent) => barDrag(e, task, ((e.target as Element).closest<HTMLElement>("[data-handle]")?.dataset["handle"] as "start" | "end" | "progress" | undefined) ?? "move", el),
       onPointerenter: () => hot.set(task.id), onPointerleave: () => hot.set(null), onFocus: () => hot.set(task.id), onBlur: () => hot.set(null),
     },
     task.milestone ? null : h("span", { class: "hm-gantt-fill", "aria-hidden": "true" }),
     h("span", { class: "hm-gantt-bar-label" }, task.milestone ? null : props.barLabel ? props.barLabel(task) : task.name),
     task.milestone || !editable() ? null : [
-      h("span", { class: "hm-gantt-handle hm-gantt-handle-start", "data-handle": "start", "aria-hidden": "true" }),
-      h("span", { class: "hm-gantt-handle hm-gantt-handle-end", "data-handle": "end", "aria-hidden": "true" }),
+      // the ends are bare ResizeHandle grips: the bar runs the gesture (pointer) and the keys (Alt+Shift+arrows)
+      h(ResizeHandle, { edge: "start", class: "hm-gantt-handle hm-gantt-handle-start", "data-handle": "start" }),
+      h(ResizeHandle, { edge: "end", class: "hm-gantt-handle hm-gantt-handle-end", "data-handle": "end" }),
       h("span", { class: "hm-gantt-knob", "data-handle": "progress", "aria-hidden": "true" }),
     ]) as HTMLElement;
     effect(() => {
@@ -303,14 +308,16 @@ export function Gantt(props: GanttProps): Element {
 
   // ------------------------------------------------------------------ frame
   const names = h("div", { class: "hm-gantt-names", role: "rowgroup" },
-    () => tasks().map((task, i) => h("div", { role: "row", class: cx("hm-gantt-name", hot() === task.id && "is-hot"), "aria-rowindex": String(i + 1) },
-      h("span", { role: "rowheader", class: "hm-gantt-name-text", title: task.name }, task.name),
-      h("span", { class: "hm-gantt-name-meta" }, () => { const x = view(task); return lb("days")(diffDays(x.start, x.end) + 1); }))));
+    () => tasks().map((task, i) => untrack(() => h(ListRow, {
+      role: "row", class: () => cx("hm-gantt-name", hot() === task.id && "is-hot"), "aria-rowindex": String(i + 1), overflow: "ellipsis",
+      title: h("span", { role: "rowheader", class: "hm-gantt-name-text", title: task.name }, task.name),
+      trail: h("span", { class: "hm-gantt-name-meta" }, () => { const x = view(task); return lb("days")(diffDays(x.start, x.end) + 1); }),
+    }))));
   const canvas = h("div", { class: "hm-gantt-canvas" },
     () => header(),
     h("div", { class: "hm-gantt-rows" },
       () => { const n = tasks().length; return Array.from({ length: n }, (_, i) => { const r = h("div", { class: "hm-gantt-row" }) as HTMLElement; setStyle(r, { top: `${i * rowH}px`, height: `${rowH}px` }); return r; }); },
-      () => { if (val(props.todayLine) === false) return null; const x = xOf(today); const el = h("div", { class: "hm-gantt-today" }, h("span", {}, lb("today"))) as HTMLElement; setStyle(el, { "inset-inline-start": `${x + px() / 2}px` }); return el; },
+      () => { if (val(props.todayLine) === false) return null; const x = xOf(today); const el = h("div", { class: "hm-gantt-today" }, h(Badge, { size: "xs", tone: "primary" }, lb("today"))) as HTMLElement; setStyle(el, { "inset-inline-start": `${x + px() / 2}px` }); return el; },
       () => (val(props.arrows) ?? true ? arrows() : null),
       () => tasks().map((task, i) => bar(task, i)))) as HTMLElement;
   effect(() => { setStyle(canvas, { width: `${width()}px`, "--hm-gantt-rows": `${tasks().length * rowH}px`, "--hm-gantt-row": `${rowH}px`, "--hm-gantt-px": `${px()}px` }); });
@@ -337,6 +344,5 @@ export function Gantt(props: GanttProps): Element {
     }, 0);
   });
   return h("div", { class: () => cx("hm-gantt", val(props.class)) }, scroller,
-    props.help === false ? null : h("p", { class: "hm-gantt-help", id: `${id}-help` }, props.help != null && props.help !== true ? props.help : () => (editable() ? lb("help") : lb("helpReadonly"))),
-    h("div", { class: "hm-gantt-status", role: "status", "aria-live": "polite" }, status));
+    chartHint({ id, prefix: "hm-gantt", help: props.help, text: () => (editable() ? lb("help") : lb("helpReadonly")), status }));
 }

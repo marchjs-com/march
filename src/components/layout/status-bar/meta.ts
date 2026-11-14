@@ -6,7 +6,7 @@ export default defineMeta({
   category: "layout",
   since: "0.1.0",
   summary: "Bottom strip of an editor or app: start / end items, text or buttons (actions or command ids), tones with a breathing busy dot, live announcements, low-priority items to a … menu when narrow.",
-  composedOf: ["Menu", "Tooltip"],
+  composedOf: ["Menu", "Tooltip", "StatusDot"],
   behaviors: ["command manager", "fit (ui/fit)", "motion engine"],
   hubs: [],
   showcase: "/ide",

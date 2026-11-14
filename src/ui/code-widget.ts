@@ -6,7 +6,7 @@ import { signal } from "../core/reactive.ts";
 import { t } from "../core/i18n.ts";
 import { widgetPoint, Widget, type WidgetContext, type WidgetProvider } from "../widget/index.ts";
 import { CodeView } from "./code-view.ts";
-import { CopyButton } from "./button.ts";
+import { CopyButton, Button } from "./button.ts";
 import { openDialog } from "../components/overlays/dialog/index.ts";
 
 /** One file of a multi-file example. */
@@ -31,9 +31,7 @@ export function CodeViewer(input: CodeViewInput, ctx?: WidgetContext<CodeViewInp
   const current = signal(0);
   const file = (): CodeFile => files[current()] ?? files[0]!;
   const switcher = files.length > 1 && h("div", { class: "hm-code-files", role: "group", "aria-label": () => t`Files` },
-    files.map((f, i) => h("button", {
-      type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", "aria-pressed": () => String(current() === i), onClick: () => current.set(i),
-    }, f.name || t`Example`)));
+    files.map((f, i) => h(Button, { variant: "ghost", size: "sm", pressed: () => current() === i, onClick: () => current.set(i) }, f.name || t`Example`)));
   return h("div", { class: input.expanded ? "hm-code-widget is-expanded" : "hm-code-widget" },
     () => { const f = file(); return h(CodeView, { code: f.source, lang: f.lang ?? input.lang, copy: false, tools: [switcher, ctx?.actions()] }); });
 }
@@ -42,8 +40,8 @@ const viewer: WidgetProvider<CodeViewInput> = { id: "viewer", render: (input, ct
 const copy: WidgetProvider<CodeViewInput> = { id: "copy", slot: "action", order: 10, render: (input) => h(CopyButton, { text: input.source }) };
 const fullscreen: WidgetProvider<CodeViewInput> = {
   id: "fullscreen", slot: "action", order: 20, when: (input) => !input.expanded,
-  render: (input) => h("button", {
-    type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", "aria-haspopup": "dialog",
+  render: (input) => h(Button, {
+    variant: "ghost", size: "sm", "aria-haspopup": "dialog",
     onClick: () => { void openDialog(() => h(Widget<CodeViewInput>, { sources: [codeView], input: { ...input, expanded: true } }), { size: "full", title: input.lang.toUpperCase(), class: "hm-code-full" }); },
   }, () => t`Fullscreen`),
 };

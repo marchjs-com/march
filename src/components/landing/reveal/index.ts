@@ -4,8 +4,8 @@
 // the content at once. Before it is revealed the content is hidden by CSS, so nothing flashes.
 import "./reveal.css";
 import { h } from "../../../dom/h.ts";
-import { onCleanup, getOwner } from "../../../core/reactive.ts";
-import { cx, val, onVisible, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, onVisible, isRtl as rtl, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
 import { animate, stagger as staggerFn } from "../../../motion/engine/playback.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { scrollTimeline } from "../../../motion/scroll-fx.ts";
@@ -36,8 +36,6 @@ export interface RevealProps extends RevealOptions {
   children?: unknown | undefined;
   [attr: string]: unknown;
 }
-
-const rtl = (el: Element): boolean => globalThis.getComputedStyle?.(el).direction === "rtl";
 
 /** Start and end state of an effect (transform strings, opacity, filter). */
 export function revealFrames(effect: RevealEffect, distance: number, isRtl: boolean): { from: Record<string, string | number>; to: Record<string, string | number> } {
@@ -106,7 +104,6 @@ export function Reveal(props: RevealProps): Element {
   const { as, class: c, children, effect, easing, stagger, delay, duration, distance, scrub, self, select, ...attrs } = props;
   const el = h(as ?? "div", { ...attrs, class: cx("hm-reveal-box", val(c as MaybeFn<unknown>)) }, children) as HTMLElement;
   const opts: RevealOptions = { effect, easing, stagger, delay, duration, distance, scrub, self, select } as RevealOptions;
-  const stop = revealOnScroll(el, opts);
-  if (getOwner()) onCleanup(stop);
+  owned(revealOnScroll(el, opts));
   return el;
 }

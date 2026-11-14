@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Sidebar navigation for apps: collapsible groups, pinned and recent items, a filter box, the active item from the router; a drawer on narrow screens.",
   category: "navigation",
-  composedOf: ["Badge", "OverflowText"],
+  composedOf: ["ListRow", "IconButton", "SearchBox", "Badge", "Chevron", "SectionLabel", "Empty"],
   behaviors: ["router", "fold search", "storage"],
   showcase: "/navigation",
 });

@@ -40,6 +40,7 @@ and yours to replace. `as="footer"` draws the same bar under a panel (status tex
 | `color` | color token | — | colour of the icon |
 | `ref` | `(el) => void` | — | the root element; attach a drag behavior here |
 | `class` | class value | — | |
+| `partClass` | `{ titles, title, subtitle, meta, actions }` | — | an extra class on a part (a host that keeps its own class names) |
 | other | — | — | events, `role`, `tabindex`, `aria-*`, `id` go to the root |
 
 ## Accessibility

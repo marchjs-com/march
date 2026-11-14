@@ -63,4 +63,7 @@ labels scroll with OverflowText instead of being cut.
 
 ## Composed of
 
-OverflowText (long labels and sub lines), Link (router links that mark the current page).
+ListRow (every row: icon, label, sub line, badge; a router link that marks the current page; long labels scroll),
+SearchBox (the search field with its clear button and shortcut hint), PanelHeader (title bar), SectionLabel (headings),
+IconButton (menu, rail and fold buttons), Button (expand / collapse all), Badge (counts), Chevron (the turning arrows),
+Empty (no matches), ResizeHandle (the width grip).

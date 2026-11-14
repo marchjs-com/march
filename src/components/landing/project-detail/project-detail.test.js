@@ -45,7 +45,7 @@ test("ProjectDetail: own texts, parts off, colour, no reveal", () => {
   assert.ok(one.querySelector(".hm-pd-head").classList.contains("hm-reveal"));
   const two = el.querySelector(".two");
   assert.equal(two.querySelector("dl.hm-kv"), null);
-  assert.equal(two.querySelector(".hm-pd-eyebrow"), null);
+  assert.equal(two.querySelector(".hm-section-head-eyebrow"), null);
   assert.equal(two.querySelector(".hm-pd-back svg"), null);
   assert.equal(two.querySelector(".hm-pd-next-title svg"), null);
   assert.ok(!two.querySelector(".hm-pd-head").classList.contains("hm-reveal"));

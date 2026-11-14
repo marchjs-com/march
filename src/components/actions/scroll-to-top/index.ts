@@ -12,11 +12,13 @@ import { t } from "../../../core/i18n.ts";
 import { signal, effect, onCleanup } from "../../../core/reactive.ts";
 import { listen } from "../../../core/util.ts";
 import { IconButton } from "../../../ui/button.ts";
-import { glyph, icon, cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { arrowUp } from "../../../icons/glyphs/arrowUp.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
+import { motionPreset } from "../../../motion/engine/parts.ts";
 import { addBottomRightControl } from "../../layout/bottom-right-controls/index.ts";
 
 export interface ScrollToTopProps {
@@ -42,8 +44,8 @@ export interface ScrollToTopProps {
   class?: ClassProp;
 }
 
-const SHOWN = { opacity: 1, transform: "none" };
-const HIDDEN = { pop: { opacity: 0, transform: "translateY(12px) scale(0.85)" }, fade: { opacity: 0, transform: "none" }, slide: { opacity: 0, transform: "translateY(12px)" } };
+// pop comes up from 12px below while it grows
+const FROM = { pop: { y: 12 }, fade: {}, slide: {} };
 
 type Scroller = Element | Window;
 const topOf = (s: Scroller): number => (s instanceof Element ? s.scrollTop : (s as Window).scrollY ?? 0);
@@ -78,8 +80,8 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
     s.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const btn = h(IconButton, { class: () => cx("hm-to-top", val(props.class)), variant: "secondary", color: props.color, label: () => val(props.label) ?? t`Back to top`, onClick: toTop },
-    props.icon == null || props.icon === true || props.icon === false ? glyph(arrowUp) : icon(props.icon)) as HTMLElement;
+  const btn = h(IconButton, { class: () => cx("hm-to-top", val(props.class)), variant: "raised", shape: "round", size: "lg", color: props.color, label: () => val(props.label) ?? t`Back to top`, onClick: toTop,
+    icon: ownIcon(props.icon === false || props.icon == null ? undefined : props.icon, arrowUp) }) as HTMLElement;
   btn.setAttribute("data-shown", "false");
   btn.inert = true;
   effect(() => {
@@ -90,7 +92,7 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
     const motion = props.motion ?? "pop";
     if (typeof motion === "function") { motion(btn, on); return; }
     if (motion === "none" || motion === false) return; // the stylesheet shows and hides it at once
-    const off = HIDDEN[motion] ?? HIDDEN.pop;
+    const [off, SHOWN] = motionPreset(motion, FROM[motion]);
     animate(btn, on ? [off, SHOWN] : [SHOWN, off], { duration: on ? 260 : 180, easing: on ? "easeOutBack" : "easeInCubic", fill: "forwards" });
   });
   read();

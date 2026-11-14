@@ -58,7 +58,7 @@ test("Presentation: parts off, own counter, own labels and icons, coloured progr
   ], el);
   const one = el.querySelector(".one");
   assert.equal(one.querySelector(".hm-deck-count").textContent, "1/2");
-  assert.equal(one.querySelector(".hm-deck-bar-fill").getAttribute("data-hm-color"), "brand-orange");
+  assert.equal(one.querySelector(".hm-deck-bar").getAttribute("data-hm-color"), "brand-orange");
   assert.equal(one.querySelector(".hm-deck-full"), null);
   assert.equal(one.querySelector(".hm-deck-prev").getAttribute("aria-label"), "Back");
   assert.equal(one.querySelector(".hm-deck-fwd").getAttribute("aria-label"), "Forward");

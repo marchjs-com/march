@@ -9,7 +9,9 @@ import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Accordion } from "../../../ui/accordion.ts";
 import { SearchBox } from "../../../ui/layout.ts";
 import { rank } from "../../../ui/fold.ts";
-import { Reveal, type RevealOptions } from "../reveal/index.ts";
+import { Empty } from "../../feedback/empty/index.ts";
+import type { RevealOptions } from "../reveal/index.ts";
+import { SectionHead } from "../section-head/index.ts";
 
 export interface FaqItem { q: string; a: unknown; /** Extra words for search. */ keywords?: string | undefined }
 export interface FaqProps {
@@ -53,17 +55,17 @@ export function Faq(props: FaqProps): Element {
         () => (q().trim() ? (L.count ? L.count(shown().length, props.items.length) : t`${shown().length} of ${props.items.length} questions`) : ""))) : null,
     () => {
       const items = shown();
-      if (!items.length) return h("p", { class: "hm-faq-empty" }, L.empty ?? t`No question matches. Try other words.`);
+      if (!items.length) return h(Empty, { size: "sm", title: false, class: "hm-faq-empty" }, L.empty ?? t`No question matches. Try other words.`);
       return h(Accordion, { variant: "separated", multiple: !!props.multiple, items: items.map((x) => ({ id: x.q, title: x.q, content: x.a })) });
     });
   const split = props.layout === "split";
-  const head = (): unknown[] => [
-    props.title != null && h("h2", { class: "hm-faq-title" }, () => val(props.title)),
-    props.lead != null && h("p", { class: "hm-faq-lead" }, () => val(props.lead)),
-    props.contact != null && h("div", { class: "hm-faq-contact" }, props.contact)];
-  const aside = !split ? null : props.reveal === "none" ? h("div", { class: "hm-faq-aside" }, head())
-    : h(Reveal, { class: "hm-faq-aside", effect: props.reveal ?? "up", stagger: 80 }, head());
+  // split: the heading column is a SectionHead (start aligned) with the contact line under it
+  const aside = !split ? null : h(SectionHead, {
+    class: "hm-faq-aside", align: "start", width: "full",
+    title: props.title != null ? () => val(props.title) : undefined, lead: props.lead != null ? () => val(props.lead) : undefined,
+    reveal: props.reveal === "none" ? false : { effect: props.reveal ?? "up", stagger: 80 },
+  }, props.contact != null ? h("div", { class: "hm-faq-contact" }, props.contact) : null);
   return h("div", { class: cx("hm-faq", split && "hm-faq-split", val(props.class)) },
-    split ? aside : null,
+    aside,
     list) as Element;
 }

@@ -1,7 +1,7 @@
 /* March — EasingCurveEditor. Imported by its component module; tokens.css provides the variables. */
 .hm-ec { --hm-ec-accent: var(--hm-accent, var(--hm-primary)); --hm-ec-h1: var(--hm-brand-orange, var(--hm-cat-1)); --hm-ec-h2: var(--hm-brand-blue, var(--hm-cat-2));
-  display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; max-width: 100%; padding: var(--hm-space-3);
-  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
+  max-width: 100%; }
+.hm-ec > .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-3); padding: var(--hm-space-3); }
 /* the plot fills its cell: it shows only the value range the curve uses and stretches to the box; lines and handles
    keep their pixel size (non-scaling strokes; a handle is a zero-length round-capped line) */
 .hm-ec-main { display: grid; grid-template-columns: minmax(8rem, 2fr) minmax(0, 3fr); gap: var(--hm-space-4); align-items: stretch; }
@@ -49,22 +49,21 @@
 
 /* numbers, output, presets */
 .hm-ec-inputs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--hm-space-2); }
-.hm-ec-field { display: flex; flex-direction: column; gap: .125rem; color: var(--hm-faint); font-size: var(--hm-text-xs); font-family: var(--hm-font-mono); }
+.hm-ec-field .hm-label { color: var(--hm-faint); font: var(--hm-text-xs) var(--hm-font-mono); }
 .hm-ec-num { min-width: 0; padding-inline: .375rem; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); }
 .hm-ec-css { padding: var(--hm-space-2) var(--hm-space-3); border-radius: var(--hm-radius-2); background: var(--hm-surface-2); font-family: var(--hm-font-mono); font-size: var(--hm-text-xs); overflow-wrap: anywhere; }
 .hm-ec-name { margin: 0; color: var(--hm-text-2); font-size: var(--hm-text-xs); }
 .hm-ec-presets { display: flex; flex-wrap: wrap; gap: var(--hm-space-2); }
-.hm-ec-preset { display: inline-flex; flex-direction: column; align-items: center; gap: .125rem; padding: .375rem .5rem .25rem; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-2);
-  background: var(--hm-surface); color: var(--hm-text-2); font: inherit; font-size: .6875rem; cursor: pointer;
-  transition: border-color var(--hm-dur-fast) var(--hm-ease), background-color var(--hm-dur-fast) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease-spring); }
-.hm-ec-preset:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--hm-border-strong); }
-.hm-ec-preset.is-on { border-color: var(--hm-ec-accent); background: var(--hm-accent-soft, var(--hm-primary-soft)); color: var(--hm-accent-text, var(--hm-primary-text)); }
+/* a preset is a Button with its curve above its name */
+.hm-ec-preset.hm-btn { flex-direction: column; gap: .125rem; block-size: auto; min-block-size: 0; padding: .375rem .5rem .25rem; border-color: var(--hm-border); border-radius: var(--hm-radius-2); box-shadow: none; color: var(--hm-text-2); font-size: .6875rem; }
+.hm-ec-preset.hm-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--hm-border-strong); }
+.hm-ec-preset.hm-btn.is-pressed { border-color: var(--hm-ec-accent); color: var(--hm-accent-text, var(--hm-primary-text)); }
 .hm-ec-thumb { inline-size: 2.25rem; block-size: 2.25rem; }
 .hm-ec-thumb path { fill: none; stroke: currentColor; stroke-width: 8; stroke-linecap: round; }
 .hm-ec-stage.is-none { display: none; }
 
 /* compact (an inspector): a small curve beside the numbers, presets in one scrolling row */
-.hm-ec-compact { gap: var(--hm-space-2); padding: var(--hm-space-2); }
+.hm-ec-compact > .hm-card-body { gap: var(--hm-space-2); padding: var(--hm-space-2); }
 .hm-ec-compact .hm-ec-main { gap: var(--hm-space-3); grid-template-columns: minmax(0, 1fr) auto; }
 /* the curve takes all the room the numbers leave */
 .hm-ec-compact .hm-ec-plot { min-block-size: 10rem; max-block-size: 14rem; }
@@ -73,7 +72,7 @@
 /* number boxes about 7 characters wide plus the stepper ("-0.354" fits) */
 .hm-ec-compact .hm-ec-num { inline-size: calc(7ch + 2rem + 2px); }
 .hm-ec-compact .hm-ec-presets { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; padding-block-end: 2px; }
-.hm-ec-compact .hm-ec-preset { flex: none; padding: .25rem .375rem .125rem; }
+.hm-ec-compact .hm-ec-preset.hm-btn { flex: none; padding: .25rem .375rem .125rem; }
 .hm-ec-compact .hm-ec-thumb { inline-size: 1.75rem; block-size: 1.75rem; }
 /* narrow (a phone): the curve above the numbers */
 @container (max-width: 22rem) { .hm-ec-compact .hm-ec-main { grid-template-columns: minmax(0, 1fr); } .hm-ec-compact .hm-ec-side { justify-self: center; } .hm-ec-compact .hm-ec-plot { block-size: 10rem; } }

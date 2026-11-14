@@ -5,22 +5,19 @@
 .hm-option-list-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .hm-option-list-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .hm-option-list-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-.hm-option-list-row { display: flex; align-items: center; gap: var(--hm-space-3); inline-size: 100%; min-inline-size: 0; min-block-size: 2.25rem; margin: 0; padding: var(--hm-space-1) var(--hm-space-2); border: 0;
-  border-radius: max(.25rem, calc(var(--hm-radius-3) - var(--hm-ol-pad))); background: none; color: var(--hm-text); font: inherit; font-size: var(--hm-text-md); text-align: start; cursor: pointer;
-  transition: background-color var(--hm-dur-fast, var(--hm-dur)) var(--hm-ease); }
-.hm-option-list-sm .hm-option-list-row { gap: var(--hm-space-2); min-block-size: 1.875rem; font-size: var(--hm-text-sm); }
-.hm-option-list-row:hover, .hm-option-list-row.is-active { background: var(--hm-surface-2); }
-.hm-option-list-row:focus-visible { outline: 2px solid var(--hm-focus, var(--hm-primary)); outline-offset: -2px; }
-.hm-option-list-row.is-selected { background: var(--hm-accent-soft, var(--hm-primary-soft)); }
+/* a row is a ListRow: here its size inside the list and the looks of the list's own states (the highlight of the
+   field's keys is neutral, the chosen row is tinted, never bold) */
+.hm-option-list .hm-option-list-row { min-block-size: 2.25rem; padding: var(--hm-space-1) var(--hm-space-2); border-radius: max(.25rem, calc(var(--hm-radius-3) - var(--hm-ol-pad))); }
+.hm-option-list-sm .hm-option-list-row { min-block-size: 1.875rem; }
+.hm-option-list .hm-option-list-row.is-active { background: var(--hm-surface-2); color: var(--hm-text); }
+.hm-option-list .hm-option-list-row.is-selected { background: var(--hm-accent-soft, var(--hm-primary-soft)); font-weight: inherit; }
 .hm-option-list[data-hm-color] .hm-option-list-row.is-selected { background: color-mix(in srgb, var(--hm-accent) 14%, var(--hm-surface)); }
-.hm-option-list-row.is-selected.is-active { background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 20%, var(--hm-surface)); }
-.hm-option-list-row.is-disabled, .hm-option-list-row:disabled { opacity: .5; cursor: not-allowed; background: none; }
-.hm-option-list-lead { display: inline-flex; flex: none; color: var(--hm-muted); }
-.hm-option-list-text { display: flex; flex-direction: column; flex: 1 1 auto; min-inline-size: 0; line-height: 1.3; }
-.hm-option-list-inline .hm-option-list-text { flex-direction: row; align-items: baseline; gap: var(--hm-space-2); }
-.hm-option-list-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hm-option-list-hint { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--hm-muted); font-size: var(--hm-text-xs); }
-.hm-option-list-trailing { display: inline-flex; align-items: center; flex: none; color: var(--hm-muted); font-size: var(--hm-text-sm); }
+.hm-option-list .hm-option-list-row.is-selected.is-active { background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 20%, var(--hm-surface)); }
+.hm-option-list .hm-option-list-row.is-disabled { background: none; }
+.hm-option-list-row:is(.is-active, .is-selected) .hm-listrow-lead { color: var(--hm-muted); }
+.hm-option-list-inline .hm-listrow-text { flex-direction: row; align-items: baseline; gap: var(--hm-space-2); }
+.hm-option-list-inline .hm-listrow-title { flex: none; }
+.hm-option-list-row .hm-listrow-trail { font-size: var(--hm-text-sm); }
 .hm-option-list-check { display: inline-flex; flex: none; color: var(--hm-accent, var(--hm-primary)); opacity: 0; }
 .hm-option-list-check .hm-svg { inline-size: 1rem; block-size: 1rem; }
 .hm-option-list-row.is-selected .hm-option-list-check { opacity: 1; }

@@ -26,3 +26,9 @@ test("Select: typed values, placeholder option, live options", () => {
   opts.set([...opts(), { value: 3, label: "Three" }]);
   assert.equal(el.querySelectorAll("option").length, 4);
 });
+
+test("Select: placeholder={false} draws no empty option", () => {
+  const { el } = mount(() => h(Select, { value: "b", options: ["a", "b"], placeholder: false }));
+  assert.deepEqual([...el.querySelectorAll("option")].map((o) => o.textContent), ["a", "b"]);
+  assert.equal(el.querySelector("select").value, "1");
+});

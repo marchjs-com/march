@@ -13,7 +13,7 @@ test("Roadmap: timeline items with status classes and badges, rail fill", async 
   assert.equal(lis.length, 3);
   assert.ok(lis[0].classList.contains("is-done") && lis[1].classList.contains("is-now") && lis[2].classList.contains("is-next"));
   assert.equal(lis[0].querySelector(".hm-rm-badge").textContent, "Done");
-  assert.ok(el.querySelector(".hm-rm-rail .hm-rm-fill"));
+  assert.ok(el.querySelector(".hm-rm-rail .hm-progress2-fill"));
   dispose();
 });
 

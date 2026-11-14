@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Native color swatch plus a #RRGGBB text field, kept in sync.",
   category: "forms",
-  composedOf: [],
+  composedOf: ["Swatch", "TextInput"],
   behaviors: [],
   hubs: [],
   showcase: "/forms",

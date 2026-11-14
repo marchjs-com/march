@@ -4,8 +4,11 @@ import { computed, untrack, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import type { IconDef } from "../../../icons/svg.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
 import { Select } from "../../forms/select/index.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
@@ -75,7 +78,9 @@ export function Pagination(props: PaginationProps): Element {
   const back = (): void => (props.onPrev ? props.onPrev() : go(page() - 1)), forth = (): void => (props.onNext ? props.onNext() : go(page() + 1));
   const prevName = (): string => val(props.labels?.previous) ?? t`Previous`, nextName = (): string => val(props.labels?.next) ?? t`Next`;
   const controls = props.controls !== false, pageName = props.labels?.page;
-  const own = (x: unknown, fallback: Parameters<typeof glyph>[0]): unknown => (x == null || x === true ? glyph(fallback) : icon(x, "hm-page-own"));
+  const own = (x: unknown, fallback: IconDef): unknown => ownIcon(x ?? undefined, fallback, "hm-page-own");
+  const arrow = (dir: "prev" | "next", content: unknown, fallback: IconDef, off: () => boolean, name: () => string, act: () => void): unknown =>
+    h(IconButton, { class: `hm-page-nav hm-page-${dir}`, label: name, title: false, disabled: off, onClick: act, icon: own(content, fallback) });
   const attrs = { class: () => cx("hm-pagination", props.variant === "simple" && "hm-pagination-simple", val(props.class)), "aria-label": () => val(props.label) ?? t`Pagination`, "data-hm-color": () => colorAttr(props.color) };
 
   if (props.variant === "simple") {
@@ -114,10 +119,10 @@ export function Pagination(props: PaginationProps): Element {
     return out;
   });
   return h("nav", attrs,
-    controls && h("button", { type: "button", class: "hm-page-btn hm-page-nav hm-page-prev", "aria-label": prevName, disabled: noPrev, onClick: back }, own(props.prev, chevronLeft)),
+    controls && arrow("prev", props.prev, chevronLeft, noPrev, prevName, back),
     () => items().map((it) => untrack(() => (it === "…"
       ? props.gap !== false && h("span", { class: "hm-page-gap", "aria-hidden": "true" }, own(props.gap, more))
       : h("button", { type: "button", class: () => cx("hm-page-btn", page() === it && "is-active"), "aria-current": () => (page() === it ? "page" : null),
         "aria-label": pageName ? pageName(it) : null, onClick: () => go(it) }, String(it))))),
-    controls && h("button", { type: "button", class: "hm-page-btn hm-page-nav hm-page-next", "aria-label": nextName, disabled: noNext, onClick: forth }, own(props.next, chevronRight)));
+    controls && arrow("next", props.next, chevronRight, noNext, nextName, forth));
 }

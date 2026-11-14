@@ -3,12 +3,12 @@
 // current one pulses. The fill is the motion core's scrollIndicator (scaleY).
 import "./roadmap.css";
 import { h } from "../../../dom/h.ts";
-import { onCleanup, getOwner } from "../../../core/reactive.ts";
-import { cx, val, setStyle, clamp, type ClassProp } from "../../../ui/util.ts";
+import { cx, val, type ClassProp } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
+import { Progress } from "../../feedback/progress/index.ts";
 import { Timeline, type TimelineItem } from "../../../ui/timeline.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { t } from "../../../core/i18n.ts";
-import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { scrollIndicator, onScrollProgress } from "../../../motion/scroll-fx.ts";
 // Reveal: entries enter one after another
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts";
@@ -40,30 +40,27 @@ export function Roadmap(props: RoadmapProps): Element {
   const label = (s: RoadmapStatus): unknown => props.labels?.[s] ?? (s === "done" ? t`Done` : s === "now" ? t`In progress` : t`Planned`);
   const own = typeof props.badges === "function" ? props.badges : null;
   const items = props.items.map((x) => ({
-    time: x.time, icon: x.icon, tone: TONE[x.status ?? "next"],
+    time: x.time, icon: x.icon, tone: TONE[x.status ?? "next"], class: `is-${x.status ?? "next"}`, // the status styles the dot (colour, pulse)
     title: props.badges !== false && x.status ? h("span", { class: "hm-rm-title" }, x.title,
       own ? own(x.status, label(x.status)) : h(Badge, { tone: x.status === "done" ? "success" : x.status === "now" ? "info" : "neutral", class: "hm-rm-badge" }, label(x.status))) : x.title,
     body: x.body,
   })) as TimelineItem[];
-  const fill = h("span", { class: "hm-rm-fill", "aria-hidden": "true" }) as HTMLElement;
-  const tl = h(Timeline, { items, class: "hm-rm-tl" }) as HTMLElement;
-  const rail = props.rail !== false;
-  const root = h("div", { class: cx("hm-rm", props.scroll !== false && "is-scroll", val(props.class)), "data-hm-color": colorAttr(props.color) }, rail ? h("span", { class: "hm-rm-rail", "aria-hidden": "true" }, fill) : null, tl) as HTMLElement;
-  // statuses on the list items (dot colours, pulse)
-  queueMicrotask(() => [...tl.children].forEach((li, i) => li.classList.add(`is-${props.items[i]?.status ?? "next"}`)));
-  if (props.scroll !== false) {
-    // the motion core's scrollTimeline fills the line (an indicator: it keeps working with reduced motion); the dots
+  const tl = h(Timeline, { items, line: false, class: "hm-rm-tl" }) as HTMLElement;
+  const rail = props.rail !== false, scroll = props.scroll !== false;
+  // the rail is a vertical Progress line over the Timeline: the scroll drives its fill (full without `scroll`)
+  let fill: HTMLElement | null = null;
+  const root = h("div", { class: cx("hm-rm", scroll && "is-scroll", val(props.class)), "data-hm-color": colorAttr(props.color) },
+    rail ? h(Progress, { variant: "line", orientation: "vertical", decorative: true, smooth: false, class: "hm-rm-rail", ...(scroll ? { fillRef: (x: HTMLElement) => { fill = x; } } : { value: 100 }) }) : null, tl) as HTMLElement;
+  if (scroll) {
+    // the motion core's scrollIndicator fills the line (an indicator: it keeps working with reduced motion); the dots
     // the fill has passed light up
     const range: [number, number] = [0.2, 0.75];
-    const offs = [rail ? scrollIndicator(fill, { track: root, range, vertical: true }) : () => {}, onScrollProgress({ track: root, range }, (p) => {
+    if (fill) owned(scrollIndicator(fill, { track: root, range, vertical: true }));
+    owned(onScrollProgress({ track: root, range }, (p) => {
       const r = root.getBoundingClientRect(), edge = r.top + p * r.height;
       for (const li of tl.children as HTMLCollectionOf<HTMLElement>) li.classList.toggle("is-passed", li.getBoundingClientRect().top + 10 <= edge);
-    })];
-    if (getOwner()) onCleanup(() => offs.forEach((f) => f()));
+    }));
   }
-  if (props.reveal !== false) {
-    const stop = revealOnScroll(tl, { effect: "start", stagger: 90, distance: 20, ...props.reveal });
-    if (getOwner()) onCleanup(stop);
-  }
+  if (props.reveal !== false) owned(revealOnScroll(tl, { effect: "start", stagger: 90, distance: 20, ...props.reveal }));
   return root;
 }

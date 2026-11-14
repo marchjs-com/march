@@ -78,11 +78,13 @@ test("prompt and askReason: every text is replaceable; the counter and the × ca
   assert.equal(rd.querySelector(".hm-field-hint"), null);
   assert.equal(rd.querySelector("[data-cancel]").textContent, "Back");
   rd.querySelector("[data-ok]").click();
-  assert.equal(rd.querySelector(".hm-field-error").textContent, "Pick a kind first.");
+  // each error sits under its own field (the purpose list, then the reason)
+  const errors = () => [...rd.querySelectorAll(".hm-field-error")].map((e) => e.textContent);
+  assert.deepEqual(errors(), ["Pick a kind first.", ""]);
   const sel = rd.querySelector("select");
-  sel.value = "x"; sel.dispatchEvent(new globalThis.Event("change", { bubbles: true }));
+  sel.value = "0"; sel.dispatchEvent(new globalThis.Event("change", { bubbles: true })); // <Select>: the option's index
   rd.querySelector("[data-ok]").click();
-  assert.equal(rd.querySelector(".hm-field-error").textContent, "Min 5.");
+  assert.deepEqual(errors(), ["", "Min 5."]);
   closeAll();
   assert.equal(await r, null);
 });

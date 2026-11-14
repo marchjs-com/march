@@ -15,7 +15,7 @@ export default function SiteNavDemo(props: { values: { mode: string; shrink: boo
   let $down = false
   const scrollFrame = (): void => { if (frame) frame.scrollTop = frame.scrollTop > 0 ? 0 : 240 }
   return <div class="sc-demo-stack">
-    <div class="sc-site-frame sc-nav-frame" ref={(x: HTMLElement) => { frame = x }} on:scroll={() => { $down = (frame?.scrollTop ?? 0) > 0 }}>
+    <div class="sc-site-frame sc-nav-frame" ref={(x: Element) => { frame = x as HTMLElement }} on:scroll={() => { $down = (frame?.scrollTop ?? 0) > 0 }}>
     {() => {
       const v = { ...props.values }
       return <div class="sc-nav-stage">

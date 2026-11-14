@@ -6,7 +6,7 @@ export default defineMeta({
   category: "landing",
   since: "0.1.0",
   summary: "Email sign-up, inline or stacked: validation, busy button, success check that pops in, error shake and announcement.",
-  composedOf: ["TextInput", "Button"],
+  composedOf: ["TextInput", "Button", "CheckMark", "SectionHead"],
   behaviors: ["motion engine"],
   showcase: "/web",
   demoGroup: "frame",

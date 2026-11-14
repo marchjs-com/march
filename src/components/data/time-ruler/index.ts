@@ -63,6 +63,8 @@ export interface TimeRulerProps {
   keyStep?: number | undefined;
   /** The playhead: true (default, when `value` is given), false, or your own grip node. */
   head?: boolean | Node | undefined;
+  /** Extra class of the playhead (a host that styles or finds it by its own name). */
+  headClass?: string | undefined;
   /** Theme colour token of the playhead (default: the accent). */
   color?: MaybeFn<ColorToken | undefined>;
   /** Own names: the ruler and the playhead. */
@@ -90,7 +92,7 @@ export function TimeRuler(props: TimeRulerProps): Element {
     if (!shown()) return null;
     return untrack(() => {
       const el = h("div", {
-        class: "hm-time-ruler-head", style: () => ({ "--hm-time-ruler-at": timePercent(now() ?? 0, D()) }),
+        class: cx("hm-time-ruler-head", props.headClass), style: () => ({ "--hm-time-ruler-at": timePercent(now() ?? 0, D()) }),
         ...(seekable ? {
           role: "slider", tabindex: "0", "aria-label": () => props.labels?.playhead ?? t`Playhead`, "aria-valuemin": "0", "aria-valuemax": () => String(Math.round(D())),
           "aria-valuenow": () => String(Math.round(now() ?? 0)), "aria-valuetext": () => (props.valueText ? props.valueText(now() ?? 0) : `${((now() ?? 0) / 1000).toFixed(2)} s`),

@@ -7,11 +7,11 @@ import "./honest-compare.css";
 import { h } from "../../../dom/h.ts";
 import { signal, computed } from "../../../core/reactive.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { cx, val, glyph, type ClassProp } from "../../../ui/util.ts";
+import { cx, val, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
-import { check as checkIcon } from "../../../icons/glyphs/check.ts";
-import { x as xIcon } from "../../../icons/glyphs/x.ts";
-import { minus as minusIcon } from "../../../icons/glyphs/minus.ts";
+import { CheckMark } from "../../feedback/check-mark/index.ts";
+import { Badge } from "../../data/badge/index.ts";
+import { Button } from "../../actions/button/index.ts";
 import tr from "./tr.ts";
 
 messages("tr", tr);
@@ -82,14 +82,16 @@ export function HonestCompare(props: HonestCompareProps): Element {
   const cell = (v: CompareValue, row: CompareRow, column: CompareColumn, verdict: 1 | 0 | -1 | null): unknown => {
     const mine = own?.(v, { row, column, us: column.id === us, verdict });
     if (mine !== undefined) return mine;
-    if (v === true) return [glyph(checkIcon, "hm-svg hm-hc-yes"), h("span", { class: "hm-sr-only" }, L.yes ?? t`Yes`)];
-    if (v === false) return [glyph(xIcon, "hm-svg hm-hc-no"), h("span", { class: "hm-sr-only" }, L.no ?? t`No`)];
-    if (v === "partial") return [glyph(minusIcon, "hm-svg hm-hc-part"), h("span", { class: "hm-hc-part-text" }, L.partly ?? t`Partly`)];
+    // yes / no / partly: the shared CheckMark (the text is read by screen readers; "partly" also shows it)
+    if (v === true || v === false || v === "partial") return h(CheckMark, {
+      value: v, size: "lg", text: v === "partial", class: v === true ? "hm-hc-yes" : v === false ? "hm-hc-no" : "hm-hc-part",
+      label: (v === true ? L.yes ?? t`Yes` : v === false ? L.no ?? t`No` : L.partly ?? t`Partly`) as string,
+    });
     return v == null ? h("span", { class: "hm-hc-none" }, "—") : v;
   };
-  const tag = (v: 1 | 0 | -1 | null): Element | null =>
+  const tag = (v: 1 | 0 | -1 | null): unknown =>
     props.tags === false ? null
-      : v === -1 ? h("span", { class: "hm-hc-tag is-behind" }, L.behind ?? t`Behind`) : v === 1 ? h("span", { class: "hm-hc-tag is-ahead" }, L.ahead ?? t`Ahead`) : null;
+      : v === -1 ? h(Badge, { tone: "warn", class: "hm-hc-tag is-behind" }, L.behind ?? t`Behind`) : v === 1 ? h(Badge, { tone: "success", class: "hm-hc-tag is-ahead" }, L.ahead ?? t`Ahead`) : null;
 
   const body = h("tbody", null, ...props.rows.flatMap((r, i) => {
     const v = verdicts[i]!;
@@ -114,8 +116,8 @@ export function HonestCompare(props: HonestCompareProps): Element {
   const summary = props.summary === false ? null : h("div", { class: "hm-hc-summary" },
     h("p", { class: "hm-hc-counts" },
       () => (L.counts ? L.counts(counts()) : t`Ahead in ${counts().ahead}, even in ${counts().even}, behind in ${counts().behind}.`)),
-    counts().behind && props.filter !== false ? h("button", {
-      type: "button", class: "hm-hc-filter", "aria-pressed": () => String(onlyBehind()), onClick: () => onlyBehind.set(!onlyBehind.peek()),
+    counts().behind && props.filter !== false ? h(Button, {
+      class: "hm-hc-filter", size: "sm", shape: "pill", color: "warn", pressed: () => onlyBehind(), onClick: () => onlyBehind.set(!onlyBehind.peek()),
     }, () => (onlyBehind() ? L.showAll ?? t`Show all rows` : L.onlyBehind ?? t`Only where we are behind`)) : null);
 
   return h("div", { class: () => cx("hm-hc", val(props.class)), "data-hm-color": colorAttr(props.color) }, summary, h("div", { class: "hm-hc-scroll", tabindex: "0", role: "region", "aria-label": () => L.region ?? t`Comparison table` }, table));

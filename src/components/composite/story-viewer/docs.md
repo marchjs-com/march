@@ -42,4 +42,4 @@ appear on hover and on keyboard focus, the pause button has `aria-pressed`. A po
 
 ## Composed of
 
-Dialog, Avatar, StoryProgress, LikeButton.
+Dialog, Avatar, StoryProgress, LikeButton, IconButton, ListRow, Picture, TextInput.

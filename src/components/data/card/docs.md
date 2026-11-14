@@ -25,3 +25,7 @@ Other attributes go to the root element.
 
 The title is a heading, so the card is reachable with heading navigation. The card never overflows its column: the
 body is `min-width: 0` and the header wraps.
+
+## Composed of
+
+PanelHeader (the header: title, subtitle, actions).

@@ -44,3 +44,15 @@ test("RowTools: subset, own names and icons, danger, disabled map and all", () =
   assert.deepEqual([...el.querySelectorAll(".three button")].map((x) => x.disabled), [true, true, true]);
   dispose();
 });
+
+test("RowTools: an own icon may be a function, text or a node (a node already placed is copied for the next row)", () => {
+  const node = h("i", { class: "own-node" });
+  const [el, dispose] = mount(() => h("div", null,
+    h(RowTools, { class: "a", icons: { up: () => h("i", { class: "own-fn" }), down: "v", remove: node } }),
+    h(RowTools, { class: "b", actions: ["remove"], icons: { remove: node } })));
+  assert.ok(el.querySelector(".a .hm-row-tool-up .own-fn"));
+  assert.equal(el.querySelector(".a .hm-row-tool-down").textContent, "v");
+  assert.ok(el.querySelector(".a .hm-row-tool-remove .own-node"));
+  assert.ok(el.querySelector(".b .hm-row-tool-remove .own-node"), "the second row has its own copy");
+  dispose();
+});

@@ -98,3 +98,14 @@ test("ListRow: node title and lead node pass through", () => {
   assert.ok(r.querySelector(".hm-listrow-sub em"));
   dispose();
 });
+
+test("ListRow: as=\"button\" is a button without onClick; the host's listeners pass through", () => {
+  let downs = 0;
+  const [el, dispose] = mount(() => h(ListRow, { as: "button", title: "Drag me", onPointerdown: () => downs++ }));
+  const r = el.querySelector("button.hm-listrow");
+  assert.equal(r.getAttribute("type"), "button");
+  assert.ok(r.classList.contains("is-action"));
+  r.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+  assert.equal(downs, 1);
+  dispose();
+});

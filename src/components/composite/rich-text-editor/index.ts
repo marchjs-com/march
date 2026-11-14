@@ -3,37 +3,32 @@
 // Toolbar (paragraph / headings, bold, italic, strike, code, link, lists, quote, code block, undo / redo), @mentions and
 // :emoji suggestions, Markdown shortcuts while typing ("# ", "- ", "1. ", "> ", "``` "), paste cleaned through the safe
 // content core (dom/safe.ts: no HTML parser, allowlist only), its own undo history (managers/undo › undoHistory).
+// Built from PanelHeader (head, foot), the formatting toolbar shared with MarkdownEditor (editor-parts/format-toolbar.ts:
+// Toolbar + IconButton + Divider), Popover + Field + TextInput (link panel) and Popover + OptionList (suggestions).
 import "./rich-text-editor.css";
-import "../../../ui/menu.css";
-import { signal, effect, untrack, batch } from "../../../core/reactive.ts";
+import "../../../ui/editor-parts/frame.css";
+import { signal, computed, effect, untrack, batch } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, uid, on, val, type ClassProp } from "../../../core/util.ts";
+import { fold } from "../../../core/text.ts";
 import { glyph } from "../../../ui/util.ts";
-import { model, ctl, type ControlProps } from "../../../forms/util.ts";
-import { Toolbar } from "../../../ui/stack.ts";
+import { isMod, undoKeys } from "../../../ui/keys.ts";
+import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
+import { Field } from "../../../forms/field.ts";
+import { UrlInput } from "../../forms/text-input/index.ts";
+import { OptionList } from "../../forms/option-list/index.ts";
 import { IconButton } from "../../../ui/button.ts";
 import { Avatar } from "../../../ui/avatar.ts";
-import { floating } from "../../../ui/popover.ts";
+import { PanelHeader } from "../../layout/panel-header/index.ts";
+import { Popover } from "../../overlays/popover/index.ts";
 import { markdownNodes } from "../../../dom/markdown.ts";
 import { toMarkdown } from "../../../dom/to-markdown.ts";
 import { parseHtml, sanitizeNode, normalizeBlocks, isSafeLink } from "../../../dom/sanitize.ts";
 import { undoHistory, type UndoStack } from "../../../managers/undo/history.ts";
-import { bold } from "../../../icons/glyphs/bold.ts";
-import { italic } from "../../../icons/glyphs/italic.ts";
-import { strikethrough } from "../../../icons/glyphs/strikethrough.ts";
-import { code as codeIcon } from "../../../icons/glyphs/code.ts";
-import { link as linkIcon } from "../../../icons/glyphs/link.ts";
-import { list as listIcon } from "../../../icons/glyphs/list.ts";
-import { listOrdered } from "../../../icons/glyphs/listOrdered.ts";
-import { quote } from "../../../icons/glyphs/quote.ts";
-import { pilcrow } from "../../../icons/glyphs/pilcrow.ts";
-import { heading } from "../../../icons/glyphs/heading.ts";
-import { terminal } from "../../../icons/glyphs/terminal.ts";
-import { undo as undoIcon } from "../../../icons/glyphs/undo.ts";
-import { redo as redoIcon } from "../../../icons/glyphs/redo.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { trash } from "../../../icons/glyphs/trash.ts";
+import { FormatToolbar, formatToolName, formatShortcut } from "../../../ui/editor-parts/format-toolbar.ts";
 import * as ops from "./ops.ts";
 import { EMOJI, POPULAR_EMOJI, type EmojiEntry } from "./emoji.ts";
 import tr from "./tr.ts";
@@ -97,9 +92,9 @@ export interface RichTextEditorProps extends ControlProps<string> {
   class?: ClassProp;
 }
 
-interface Suggest { kind: "@" | ":"; query: string; button?: boolean; items: { id: string; label: string; hint?: string | undefined; avatar?: string | undefined; insert: string }[]; active: number }
+interface Suggest { kind: "@" | ":"; query: string; button?: boolean; items: { id: string; label: string; hint?: string | undefined; avatar?: string | undefined; insert: string }[] }
+type Tool = Exclude<ToolName, "|">;
 
-const mod = (e: KeyboardEvent): boolean => e.ctrlKey || e.metaKey;
 const fragOf = (nodes: readonly Node[]): DocumentFragment => { const f = globalThis.document.createDocumentFragment(); for (const n of nodes) f.appendChild(n); return f; };
 /** Markdown → clean editor nodes (through the schema: the renderer's extras such as rel / target / checkboxes go away). */
 const mdFragment = (md: string): DocumentFragment => {
@@ -133,6 +128,9 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   const isEmpty = signal(true);
   const stats = signal<[number, number]>([0, 0]);
   const sug = signal<Suggest | null>(null);
+  // the highlighted suggestion (the list moves it: OptionList `keysFrom`)
+  const sugActive = signal(0);
+  const suggest = (s: Suggest): void => batch(() => { sugActive.set(0); sug.set(s); });
   const linkOpen = signal(false);
   const linkText = signal("");
   const ro = (): boolean => !!(props.readonly || props.disabled);
@@ -151,7 +149,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     "aria-readonly": () => (props.readonly ? "true" : null), "aria-disabled": () => (props.disabled ? "true" : null),
     "aria-placeholder": () => props.placeholder ?? null, "data-placeholder": () => props.placeholder ?? "",
     "aria-autocomplete": "list", "aria-haspopup": "listbox", "aria-expanded": () => String(!!sug()),
-    "aria-controls": () => (sug() ? `${id}-sug` : null), "aria-activedescendant": () => (sug()?.items.length ? `${id}-sug-${sug()!.active}` : null),
+    "aria-controls": () => (sug() ? `${id}-sug` : null), "aria-activedescendant": () => (sug()?.items.length ? `${id}-sug-${sugActive()}` : null),
     onKeyDown: (e: KeyboardEvent) => keydown(e), onBeforeInput: (e: InputEvent) => beforeInput(e), onInput: (e: InputEvent) => input(e),
     onPaste: (e: ClipboardEvent) => paste(e), onFocus: props.onFocus, onBlur: (e: FocusEvent) => { props.onBlur?.(e); },
     onMouseUp: () => refresh(), onKeyUp: () => refresh(), onMouseDown: (e: MouseEvent) => taskClick(e),
@@ -236,17 +234,12 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     while (b < text.length && WORD.test(text[b]!)) b++;
     return a === b ? s : [s[0] - (o - a), s[0] + (b - o)];
   };
-  const LABEL: Record<Exclude<ToolName, "|">, () => string> = {
-    paragraph: () => t`Paragraph`, h2: () => t`Heading 2`, h3: () => t`Heading 3`, bold: () => t`Bold`, italic: () => t`Italic`, strike: () => t`Strikethrough`,
-    code: () => t`Inline code`, link: () => t`Link`, ul: () => t`Bulleted list`, ol: () => t`Numbered list`, quote: () => t`Quote`, codeblock: () => t`Code block`,
-    emoji: () => t`Emoji`, undo: () => t`Undo`, redo: () => t`Redo`,
-  };
   const MARK_OF: Partial<Record<ToolName, ops.Mark>> = { bold: "strong", italic: "em", strike: "s", code: "code" };
   const BLOCK_OF: Partial<Record<ToolName, ops.BlockType>> = { paragraph: "p", h2: "h2", h3: "h3", ul: "ul", ol: "ol", quote: "blockquote", codeblock: "pre" };
-  const exec = (tool: Exclude<ToolName, "|">): void => {
+  const exec = (tool: Tool): void => {
     const m = MARK_OF[tool], b = BLOCK_OF[tool];
-    if (m) run(LABEL[tool](), (s) => { const w = wordSel(s); ops.toggleMark(root, w, m); return s[0] === s[1] ? s : w; });
-    else if (b) run(LABEL[tool](), (s) => { ops.setBlocks(root, ops.blocksBetween(root, s), b); return s; });
+    if (m) run(formatToolName(tool), (s) => { const w = wordSel(s); ops.toggleMark(root, w, m); return s[0] === s[1] ? s : w; });
+    else if (b) run(formatToolName(tool), (s) => { ops.setBlocks(root, ops.blocksBetween(root, s), b); return s; });
     else if (tool === "link") openLink();
     else if (tool === "emoji") openEmoji();
     else if (tool === "undo") void history.undo();
@@ -261,7 +254,6 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     linkText.set(s ? ops.linkAt(root, s)?.getAttribute("href") ?? "" : "");
     linkOpen.set(true);
   };
-  const closeLink = (refocus = true): void => { linkOpen.set(false); if (refocus) { root.focus({ preventScroll: true }); ops.restoreSel(root, lastSel); } };
   const applyLink = (): void => {
     const href = linkText.peek().trim();
     if (!href || !isSafeLink(href)) return;
@@ -288,13 +280,12 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     root.focus({ preventScroll: true });
     if (!ops.saveSel(root)) ops.restoreSel(root, lastSel ?? [1, 1]);
     if (sug.peek()?.button) { sug.set(null); return; }
-    sug.set({ kind: ":", query: "", items: commonEmoji(), active: 0, button: true });
+    suggest({ kind: ":", query: "", items: commonEmoji(), button: true });
   };
   const unlink = (): void => { linkOpen.set(false); run(t`Remove link`, (s) => { ops.removeLinks(root, s); return s; }); };
 
   // ------------------------------------------------------------------ suggestions (@mentions, :emoji)
   const emojiList = (): readonly EmojiEntry[] => (Array.isArray(props.emoji) ? (props.emoji as readonly EmojiEntry[]) : EMOJI);
-  const fold = (s: string): string => s.toLocaleLowerCase(untrack(dir) === "rtl" ? undefined : "tr").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ı/g, "i");
   const commonEmoji = (): Suggest["items"] => {
     const list = emojiList(), common = Array.isArray(props.emoji) ? list.slice(0, 10) : POPULAR_EMOJI.map((n) => list.find((e) => e[1] === n)!).filter(Boolean);
     return common.map(([e, name]) => ({ id: name, label: e, hint: `:${name}:`, insert: e }));
@@ -320,7 +311,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
     } else { sug.set(null); return; }
     if (seq !== sugSeq) return;
     if (kind === ":" && !items.length) { sug.set(null); return; }
-    sug.set({ kind, query, items, active: 0 });
+    suggest({ kind, query, items });
   };
   const pick = (i: number): void => {
     const st = sug.peek();
@@ -336,15 +327,16 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
       return ops.insertFragment(root, at, fragOf([node, d.createTextNode(" ")]));
     });
   };
-  const caretAnchor = {
-    getBoundingClientRect: (): DOMRect => {
-      const r = globalThis.document.getSelection?.()?.rangeCount ? globalThis.document.getSelection()!.getRangeAt(0) : null;
-      const rect = r?.getClientRects?.()[0] ?? r?.getBoundingClientRect?.();
-      return rect && (rect.width || rect.height) ? rect : root.getBoundingClientRect();
-    },
-    contains: (n: Node | null) => root.contains(n),
+  /** A rectangle that stands in for an anchor element (the caret, the selected text); `fallback` when it is empty. */
+  const virtualAnchor = (rect: () => DOMRect | null | undefined, fallback: () => Element = () => root): Element => ({
+    getBoundingClientRect: (): DOMRect => { const r = rect(); return r && (r.width || r.height) ? r : fallback().getBoundingClientRect(); },
+    contains: (n: Node | null) => root.contains(n) || (fallback() !== root && fallback().contains(n)),
     closest: (sel: string) => root.closest(sel),
-  } as unknown as Element;
+  }) as unknown as Element;
+  const caretAnchor = virtualAnchor(() => {
+    const r = globalThis.document.getSelection?.()?.rangeCount ? globalThis.document.getSelection()!.getRangeAt(0) : null;
+    return r?.getClientRects?.()[0] ?? r?.getBoundingClientRect?.();
+  });
 
   // ------------------------------------------------------------------ task items: the box at the item's start toggles it
   const taskClick = (e: MouseEvent): void => {
@@ -361,19 +353,16 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   const keydown = (e: KeyboardEvent): void => {
     const st = sug.peek();
     if (st && st.items.length) {
-      const n = st.items.length;
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); sug.set({ ...st, active: (st.active + (e.key === "ArrowDown" ? 1 : n - 1)) % n }); return; }
-      if (e.key === "Enter" || e.key === "Tab") { e.preventDefault(); pick(st.active); return; }
+      // the arrows and Enter belong to the suggestion list (OptionList listens on this field); Tab picks too
+      if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter") return;
+      if (e.key === "Tab") { e.preventDefault(); pick(sugActive.peek()); return; }
       if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); sug.set(null); return; }
     }
-    if (mod(e) && !e.altKey) {
-      const k = e.key.toLowerCase();
-      const map: Record<string, Exclude<ToolName, "|">> = e.shiftKey ? { x: "strike", "7": "ol", "8": "ul", "9": "quote", z: "redo", "&": "ol", "*": "ul", "(": "quote" } : { b: "bold", i: "italic", e: "code", k: "link", z: "undo", y: "redo" };
-      const tool = map[k] ?? (e.shiftKey ? map[e.code.replace(/^Digit/, "")] : undefined);
-      if (tool) { e.preventDefault(); exec(tool); return; }
-    }
-    if (mod(e) && e.altKey && /^Digit[023]$/.test(e.code)) { e.preventDefault(); exec(e.code === "Digit0" ? "paragraph" : e.code === "Digit2" ? "h2" : "h3"); return; }
-    if (e.key === "Backspace" && !mod(e) && !ro()) {
+    if (undoKeys(e, history)) return;
+    const tool = formatShortcut(e) as Tool | undefined;
+    if (tool) { e.preventDefault(); exec(tool); return; }
+    if (isMod(e) && e.altKey && /^Digit[023]$/.test(e.code)) { e.preventDefault(); exec(e.code === "Digit0" ? "paragraph" : e.code === "Digit2" ? "h2" : "h3"); return; }
+    if (e.key === "Backspace" && !isMod(e) && !ro()) {
       const s = ops.saveSel(root);
       if (s && s[0] === s[1] && ops.textBefore(root, s) === "") {
         const b = ops.blockOf(root, ops.pointOf(root, s[0])[0]);
@@ -428,7 +417,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
         const type = BLOCK_RULE[m[1]!] ?? "ol";
         const at = ops.deleteBefore(root, s, before.length);
         const b = ops.blockOf(root, ops.pointOf(root, at[0])[0]);
-        if (b && ops.blockType(b) !== type) { ops.setBlocks(root, [b], type); ops.restoreSel(root, at); record(LABEL[type === "blockquote" ? "quote" : type === "pre" ? "codeblock" : type === "p" ? "paragraph" : type](), undefined); refresh(); return; }
+        if (b && ops.blockType(b) !== type) { ops.setBlocks(root, [b], type); ops.restoreSel(root, at); record(formatToolName(type === "blockquote" ? "quote" : type === "pre" ? "codeblock" : type === "p" ? "paragraph" : type), undefined); refresh(); return; }
         ops.restoreSel(root, s);
       }
     }
@@ -455,95 +444,55 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
 
   // ------------------------------------------------------------------ view
   const tools = (): readonly ToolName[] => (props.toolbar === false ? [] : Array.isArray(props.toolbar) ? (props.toolbar as readonly ToolName[]) : DEFAULT_TOOLS).filter((x) => x !== "emoji" || props.emoji !== false);
-  const ICON: Record<Exclude<ToolName, "|" | "emoji">, Parameters<typeof glyph>[0]> = { paragraph: pilcrow, h2: heading, h3: heading, bold, italic, strike: strikethrough, code: codeIcon, link: linkIcon, ul: listIcon, ol: listOrdered, quote, codeblock: terminal, undo: undoIcon, redo: redoIcon };
-  const pressed = (tool: ToolName): boolean => {
-    const m = MARK_OF[tool];
-    if (m) return !!marks()[m];
-    if (tool === "link") return !!marks().a;
-    const b = BLOCK_OF[tool];
-    return !!b && block() === b;
-  };
-  const toolButton = (tool: Exclude<ToolName, "|">, i: number): Element => {
-    const toggle = tool !== "undo" && tool !== "redo" && tool !== "link" && tool !== "emoji";
-    const btn = h(IconButton, {
-      icon: props.toolIcons?.[tool] != null ? h("span", { class: "hm-rte-tool-own", "aria-hidden": "true" }, props.toolIcons[tool]) : tool === "emoji" ? h("span", { class: "hm-rte-tool-emoji", "aria-hidden": "true" }, "☺") : glyph(ICON[tool]),
-      label: () => L().tools?.[tool] ?? LABEL[tool](), size: "sm", class: () => cx("hm-rte-tool", pressed(tool) && "is-on", (tool === "h2" || tool === "h3") && `hm-rte-tool-${tool}`),
-      "aria-pressed": toggle ? () => String(pressed(tool)) : null, "aria-keyshortcuts": KEYS[tool] ?? null, tabindex: i === 0 ? "0" : "-1",
-      "aria-haspopup": tool === "link" ? "dialog" : tool === "emoji" ? "listbox" : null,
-      "aria-expanded": tool === "link" ? () => String(linkOpen()) : tool === "emoji" ? () => String(!!sug()?.button) : null,
-      disabled: () => ro() || (tool === "undo" && !history.canUndo()) || (tool === "redo" && !history.canRedo()),
-      // keep the text selection: the button never takes focus on pointer down
-      onMouseDown: (e: MouseEvent) => e.preventDefault(),
-      onClick: () => exec(tool),
-    }) as Element;
-    if (tool === "link") linkBtn = btn;
-    return btn;
-  };
-  const KEYS: Partial<Record<ToolName, string>> = { bold: "Control+B", italic: "Control+I", strike: "Control+Shift+X", code: "Control+E", link: "Control+K", ol: "Control+Shift+7", ul: "Control+Shift+8", quote: "Control+Shift+9", undo: "Control+Z", redo: "Control+Shift+Z", paragraph: "Control+Alt+0", h2: "Control+Alt+2", h3: "Control+Alt+3" };
-  // toolbar: one tab stop, arrows move between buttons (mirrored in RTL)
-  const toolbarKeys = (e: KeyboardEvent): void => {
-    const btns = Array.from((e.currentTarget as Element).querySelectorAll<HTMLButtonElement>(".hm-rte-tool:not(:disabled)"));
-    const i = btns.indexOf(globalThis.document.activeElement as HTMLButtonElement);
-    if (i < 0) return;
-    const fwd = untrack(dir) === "rtl" ? "ArrowLeft" : "ArrowRight", back = fwd === "ArrowRight" ? "ArrowLeft" : "ArrowRight";
-    const j = e.key === fwd ? (i + 1) % btns.length : e.key === back ? (i - 1 + btns.length) % btns.length : e.key === "Home" ? 0 : e.key === "End" ? btns.length - 1 : -1;
-    if (j < 0) return;
-    e.preventDefault();
-    for (const b of btns) b.tabIndex = -1;
-    btns[j]!.tabIndex = 0;
-    btns[j]!.focus();
-  };
+  // toggle tools: the format at the caret is "on"
+  const toggles: Partial<Record<Tool, () => boolean>> = {};
+  for (const [tool, m] of Object.entries(MARK_OF)) toggles[tool as Tool] = () => !!marks()[m];
+  for (const [tool, b] of Object.entries(BLOCK_OF)) toggles[tool as Tool] = () => block() === b;
+  const KEYS: Partial<Record<Tool, string>> = { undo: "Control+Z", redo: "Control+Shift+Z", paragraph: "Control+Alt+0", h2: "Control+Alt+2", h3: "Control+Alt+3" };
+  const toolAttrs = (tool: Tool): Record<string, unknown> => (tool === "link" ? { class: () => !!marks().a && "is-pressed", "aria-haspopup": "dialog", "aria-expanded": () => String(linkOpen()), ref: (el: Element) => { linkBtn = el; } }
+    : tool === "emoji" ? { "aria-haspopup": "listbox", "aria-expanded": () => String(!!sug()?.button) } : {});
   const bar = () => {
     const list = tools();
     if (!list.length) return null;
-    let n = 0;
-    return h("div", { class: "hm-rte-bar", onKeyDown: toolbarKeys },
-      h(Toolbar, { label: () => L().toolbar ?? t`Formatting`, class: "hm-rte-toolbar", children: list.map((tool) => (tool === "|" ? h("span", { class: "hm-rte-sep", role: "separator", "aria-orientation": "vertical" }) : toolButton(tool, n++))) }));
+    return h(PanelHeader, { as: "div", size: "sm", tone: "muted", divider: true, sticky: true, class: "hm-editor-head hm-rte-bar", children: h(FormatToolbar<Tool>, {
+      tools: list, prefix: "hm-rte", label: () => L().toolbar ?? t`Formatting`, name: (tool: Tool) => L().tools?.[tool], icons: props.toolIcons, onTool: exec, pressed: toggles, keys: KEYS, attrs: toolAttrs,
+      disabled: (tool: Tool) => ro() || (tool === "undo" && !history.canUndo()) || (tool === "redo" && !history.canRedo()),
+    }) });
   };
 
   // the link panel opens under the selected text (the toolbar may have scrolled away); without a selection, under the button
-  const selAnchor = {
-    getBoundingClientRect: (): DOMRect => {
-      const r = lastSel ? ops.rangeOf(root, lastSel).getBoundingClientRect() : null;
-      return r && (r.width || r.height) ? r : (linkBtn ?? root).getBoundingClientRect();
-    },
-    contains: (n: Node | null) => root.contains(n) || !!linkBtn?.contains(n),
-    closest: (sel: string) => root.closest(sel),
-  } as unknown as Element;
-  const linkPanel = () => (linkOpen() ? floating({
-    anchor: selAnchor, placement: "bottom-start", class: "hm-dropdown hm-rte-link", role: "dialog", attrs: { "aria-label": L().link ?? t`Link` },
-    onClose: (refocus) => closeLink(!!refocus),
-    children: [
-      h("label", { class: "hm-rte-link-label", for: `${id}-href` }, () => L().linkAddress ?? t`Link address`),
+  const selAnchor = virtualAnchor(() => (lastSel ? ops.rangeOf(root, lastSel).getBoundingClientRect() : null), () => linkBtn ?? root);
+  const badLink = (): boolean => { const v = linkText().trim(); return !!v && !isSafeLink(v); };
+  const linkHelp = (): string => L().linkHelp ?? t`Only http(s), mailto, tel and relative links`;
+  const hrefId = `${id}-href`;
+  const linkPanel = h(Popover, {
+    anchor: () => selAnchor, open: linkOpen, label: () => L().link ?? t`Link`, panelClass: "hm-rte-link", autoFocus: false,
+    // Escape returns to the text with its selection; a press outside leaves focus where it went
+    onOpenChange: (open: boolean, why: string) => { if (!open && why === "escape") { root.focus({ preventScroll: true }); ops.restoreSel(root, lastSel); } },
+    children: (_close: unknown) => h(Field, { id: hrefId, label: live(() => L().linkAddress ?? t`Link address`), help: live(() => (badLink() ? null : linkHelp())), error: live(() => (badLink() ? linkHelp() : null)) },
       h("div", { class: "hm-rte-link-row" },
-        h("input", {
-          id: `${id}-href`, class: () => cx("hm-input hm-rte-link-input", linkText().trim() && !isSafeLink(linkText().trim()) && "is-invalid"), type: "url", inputmode: "url", autocomplete: "off", spellcheck: "false",
-          placeholder: "https://", value: untrack(linkText), "aria-invalid": () => (linkText().trim() && !isSafeLink(linkText().trim()) ? "true" : null), "aria-describedby": `${id}-href-help`,
+        h(UrlInput, {
+          id: hrefId, value: linkText, class: "hm-rte-link-input", autocomplete: "off", spellcheck: "false", invalid: live(badLink), describedby: live(() => `${hrefId}-${badLink() ? "error" : "help"}`),
           ref: (el: HTMLInputElement) => queueMicrotask(() => { el.focus(); el.select?.(); }),
-          onInput: (e: Event) => linkText.set((e.target as HTMLInputElement).value),
           onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); applyLink(); } },
         }),
-        h(IconButton, { icon: glyph(check), label: () => L().apply ?? t`Apply`, size: "sm", class: "hm-rte-link-ok", disabled: () => !linkText().trim() || !isSafeLink(linkText().trim()), onClick: applyLink }),
-        () => (marks().a ? h(IconButton, { icon: glyph(trash), label: () => L().removeLink ?? t`Remove link`, size: "sm", variant: "danger", onClick: unlink }) : null)),
-      h("p", { id: `${id}-href-help`, class: () => cx("hm-rte-link-help", linkText().trim() && !isSafeLink(linkText().trim()) && "is-error") }, () => L().linkHelp ?? t`Only http(s), mailto, tel and relative links`),
-    ],
-  }) : null);
+        h(IconButton, { icon: glyph(check), label: () => L().apply ?? t`Apply`, size: "sm", class: "hm-rte-link-ok", disabled: () => !linkText().trim() || badLink(), onClick: applyLink }),
+        () => (marks().a ? h(IconButton, { icon: glyph(trash), label: () => L().removeLink ?? t`Remove link`, size: "sm", variant: "danger", onClick: unlink }) : null))),
+  });
 
-  const suggestPanel = () => {
-    const st = sug();
-    if (!st) return null;
-    return floating({
-      anchor: caretAnchor, placement: "bottom-start", class: cx("hm-menu hm-rte-sug", st.kind === ":" && "hm-rte-sug-emoji"), role: "listbox", id: `${id}-sug`,
-      attrs: { "aria-label": L().suggestions ?? t`Suggestions` }, onClose: () => sug.set(null),
-      children: st.items.length ? st.items.map((it, i) => h("div", {
-        id: `${id}-sug-${i}`, role: "option", class: () => cx("hm-menu-item hm-rte-sug-item", sug()?.active === i && "is-active"), "aria-selected": () => String(sug()?.active === i),
-        onMouseDown: (e: MouseEvent) => { e.preventDefault(); pick(i); }, onMouseMove: () => { const cur = sug.peek(); if (cur && cur.active !== i) sug.set({ ...cur, active: i }); },
-      },
-      st.kind === "@" ? h(Avatar, { name: it.label, src: it.avatar ?? null, size: "sm" }) : h("span", { class: "hm-rte-sug-emoji-glyph", "aria-hidden": "true" }, it.label),
-      h("span", { class: "hm-rte-sug-label" }, st.kind === "@" ? it.label : it.hint),
-      st.kind === "@" && it.hint ? h("span", { class: "hm-rte-sug-hint" }, it.hint) : null)).concat(st.kind === ":" && !st.query && !st.button ? [h("div", { class: "hm-rte-sug-more", "aria-hidden": "true" }, () => L().keepTyping ?? t`Keep typing to search`)] : []) : h("div", { class: "hm-rte-sug-empty" }, () => L().noMatches ?? t`No matches`),
-    });
-  };
+  // suggestions: a list under the caret; the keys stay in the text (OptionList `keysFrom`)
+  const sugOpen = computed(() => !!sug());
+  const suggestPanel = h(Popover, {
+    anchor: () => caretAnchor, open: () => sugOpen(), onOpenChange: (open: boolean) => { if (!open) sug.set(null); }, role: null, flush: true, autoFocus: false, panelClass: "hm-rte-sug",
+    children: (_close: unknown) => [
+      h(OptionList<number>, {
+        id: `${id}-sug`, keysFrom: root, active: sugActive, inline: true, check: false, label: () => L().suggestions ?? t`Suggestions`, class: () => sug()?.kind === ":" && "hm-rte-sug-emoji",
+        options: () => { const st = sug(); return (st?.items ?? []).map((it, i) => (st!.kind === "@" ? { value: i, label: it.label, hint: it.hint, icon: h(Avatar, { name: it.label, src: it.avatar ?? null, size: "sm" }) } : { value: i, label: it.hint, icon: it.label })); },
+        empty: () => L().noMatches ?? t`No matches`, onPick: (i: number) => pick(i),
+      }),
+      () => { const st = sug(); return st && st.kind === ":" && !st.query && !st.button && st.items.length ? h("div", { class: "hm-rte-sug-more", "aria-hidden": "true" }, () => L().keepTyping ?? t`Keep typing to search`) : null; },
+    ],
+  });
 
   const api: RichTextApi = {
     focus: () => root.focus(),
@@ -565,14 +514,14 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
 
   const rows = (): number => Math.max(2, props.rows ?? 6);
   return h("div", {
-    class: () => cx("hm-rte", props.disabled && "is-disabled", props.readonly && "is-readonly", val(props.class)), "data-hm-color": c["data-hm-color"],
+    class: () => cx("hm-editor-frame hm-rte", props.disabled && "is-disabled", props.readonly && "is-readonly", val(props.class)), "data-hm-color": c["data-hm-color"],
     style: () => ({ "--hm-rte-rows": String(rows()) }),
   },
   bar,
   root,
-  () => (props.counter === false ? null : h("div", { class: "hm-rte-foot", "aria-live": "off" },
+  () => (props.counter === false ? null : h(PanelHeader, { as: "footer", size: "sm", class: "hm-editor-foot hm-rte-foot", "aria-live": "off", children: [
     h("span", { class: "hm-rte-hint" }, () => (props.hint === false ? "" : L().hint != null ? L().hint : props.mentions && props.emoji !== false ? t`Type @ to mention, : for emoji` : props.mentions ? t`Type @ to mention` : props.emoji !== false ? t`Type : for emoji` : "")),
-    h("span", { class: "hm-rte-count" }, () => L().count?.(stats()[0], stats()[1]) ?? `${t`${stats()[0]} words`} · ${t`${stats()[1]} characters`}`))),
+    h("span", { class: "hm-rte-count" }, () => L().count?.(stats()[0], stats()[1]) ?? `${t`${stats()[0]} words`} · ${t`${stats()[1]} characters`}`)] })),
   linkPanel,
   suggestPanel);
 }

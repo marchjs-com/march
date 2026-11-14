@@ -10,8 +10,8 @@ test("CtaBand: section with h2, actions, gradient layers", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => h(CtaBand, { title: "Ready?", lead: "Go", actions: [{ label: "Start" }, { label: "Sales" }] }), el);
   assert.ok(el.querySelector("section.hm-ss.hm-cta-gradient"));
-  assert.equal(el.querySelector("h2.hm-cta-title").textContent, "Ready?");
-  assert.equal(el.querySelectorAll(".hm-cta-actions .hm-btn").length, 2);
+  assert.equal(el.querySelector(".hm-cta-copy h2").textContent, "Ready?");
+  assert.equal(el.querySelectorAll(".hm-section-head-actions .hm-btn").length, 2);
   assert.ok(el.querySelector(".hm-cta-panel .hm-ov-fx-gradient"));
   dispose();
 });

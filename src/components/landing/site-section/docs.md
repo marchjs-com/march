@@ -34,4 +34,4 @@ A `<section>` labelled by its title (`aria-labelledby`). Use `level={1}` once on
 
 ## Composed of
 
-Reveal.
+SectionHead (eyebrow, title, lead; it enters with Reveal).

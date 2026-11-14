@@ -9,15 +9,8 @@ import { t } from "../../../core/i18n.ts";
 import { openDialog, type DialogSize } from "../../overlays/dialog/index.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 
-export type MediaKind = "image" | "video" | "audio";
-const VIDEO = /\.(mp4|m4v|mov|webm|ogv)(\?|#|$)/i;
-const AUDIO = /\.(mp3|m4a|aac|wav|ogg|oga|opus|flac)(\?|#|$)/i;
-
-/** Guess the kind of a URL from its extension ("image" when unknown). */
-export function mediaKind(src: unknown): MediaKind {
-  const s = String(src ?? "");
-  return VIDEO.test(s) ? "video" : AUDIO.test(s) ? "audio" : "image";
-}
+import { mediaKind, type MediaKind } from "./kind.ts";
+export { mediaKind, type MediaKind };
 
 export interface MediaProps {
   src: MaybeFn<string | null | undefined>;

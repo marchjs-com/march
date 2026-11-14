@@ -5,7 +5,7 @@ import { signal, computed, effect, untrack, useContext, provide, getOwner, react
 import { locale } from "../core/i18n.ts";
 import { cx, uid, on, debounce } from "../ui/util.ts";
 import type { Field } from "../schema/index.ts";
-import { colorAttr, type ColorToken } from "../theme/colors.ts";
+import { colorAttr, BRAND_COLORS, type ColorToken } from "../theme/colors.ts";
 
 export { cx, uid, on, debounce };
 
@@ -217,4 +217,10 @@ export interface Option { value: unknown; label: string; hint?: unknown; disable
 export function normOptions(o: OptionsProp): Option[] {
   const list = typeof o === "function" ? o() : o ?? [];
   return list.map((x): Option => (x && typeof x === "object" ? { ...(x as Option), label: (x as Partial<Option>).label ?? String((x as Option).value) } : { value: x, label: String(x) }));
+}
+
+/** The color token of item `i` of a group: `colors="brand"` gives the four HADİ colors in turn (orange, blue, green, purple), a list its tokens in turn. */
+export function itemColor(colors: "brand" | readonly string[] | null | undefined, i: number): string | null {
+  const list = colors === "brand" ? BRAND_COLORS : colors;
+  return list && list.length ? (list[i % list.length] as string) : null;
 }

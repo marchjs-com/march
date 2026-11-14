@@ -3,8 +3,8 @@
 // (motion hoverParallax). Transform only; layers get room to travel so no edge ever shows. Reduced motion: still layers.
 import "./parallax.css";
 import { h } from "../../../dom/h.ts";
-import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { cx, val, setStyle, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { owned } from "../../../ui/observe.ts";
 import { Overlay, type OverlayProps } from "../../../ui/overlay.ts";
 import { parallaxLayers } from "../../../motion/scroll-fx.ts";
 
@@ -55,6 +55,6 @@ export function Parallax(props: ParallaxProps): Element {
   let live = true;
   // the pointer layer comes with motion/micro (ripple, state morph…): loaded only when a parallax follows the mouse
   if (props.pointer) void import("../../../motion/micro.ts").then((m) => { if (live) offs.push(m.hoverParallax(root, { depth: 60 * (props.pointer ?? 1), selector: ".hm-plx-layer > [data-depth]" })); });
-  if (getOwner()) onCleanup(() => { live = false; offs.forEach((f) => f()); });
+  owned(() => { live = false; offs.forEach((f) => f()); });
   return root;
 }

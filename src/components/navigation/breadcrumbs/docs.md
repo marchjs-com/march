@@ -37,4 +37,4 @@ are items of the "…" menu.
 
 ## Composed of
 
-Menu (sibling menus and the … menu). Fitting from ui/fit.
+Button (a link or button crumb), Menu (sibling menus and the … menu), OverflowText (a long name). Fitting from ui/fit.

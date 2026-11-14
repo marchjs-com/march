@@ -25,7 +25,7 @@ flow.load(JSON.parse(text), "Import")             // validated (validateFlow); o
 | `controls` | boolean / `("zoom" \| "fit" \| "layout")[]` | `true` | the zoom bar: off, or only the listed parts |
 | `menu` | boolean / `(items, target) => items` | `true` | the context menu: off, or your own list built from the built-in items |
 | `motion` | boolean | `true` | draw-in, moving dots, glow / shake / pop, view and layout tweens |
-| `labels` | object | — | own texts: `editor`, `node`, `menu`, `minimap`, `zoomIn`, `zoomOut`, `fit`, `layout`, `copy`, `cut`, `duplicate`, `group`, `ungroup`, `delete`, `paste`, `selectAll`, `add(type)`, `input(port)`, `output(port)`, `connection(from, to)`, `values(count)`, `connected`, `cannotConnect`, `choosePort`, `arranged(n)`, `copied(n)`, `pasted(n)`, `deleted(n)`, `selected(n)` |
+| `labels` | object | — | own texts: `editor`, `node`, `menu`, `minimap`, `view` (name of the zoom bar), `zoomIn`, `zoomOut`, `fit`, `layout`, `copy`, `cut`, `duplicate`, `group`, `ungroup`, `delete`, `paste`, `selectAll`, `add(type)`, `input(port)`, `output(port)`, `connection(from, to)`, `values(count)`, `connected`, `cannotConnect`, `choosePort`, `arranged(n)`, `copied(n)`, `pasted(n)`, `deleted(n)`, `selected(n)` |
 | `class` | class value | — | on the canvas (`hm-flow`) |
 
 ```tsx
@@ -64,5 +64,8 @@ moving dots, no glow; the counters still count.
 
 ## Composed of
 
-ContextMenu (context menu), IconButton (zoom bar), OverflowText (titles), Field + TextInput / NumberInput / Select /
-Toggle (node fields), ClipboardManager and UndoManager, the motion engine (draw-in, dots, glow, shake, layout tween).
+ContextMenu (context menu), Toolbar + IconButton (zoom bar), IconTile (node icon), OverflowText (titles, port names),
+CheckMark and StatusDot (run state), Alert (node error), Field + TextInput / NumberInput / Select / Toggle (node
+fields), ClipboardManager, UndoManager and the announcer (what changed is read out; no live region of its own), the
+drag behavior, the motion engine (draw-in, dots, glow, shake, layout tween). The showcase editor (`editor.tsx`) adds
+Tabs, JsonEditor, CopyButton, UndoRedo, Button, FlowControls and FlowPalette.

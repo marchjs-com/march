@@ -1,10 +1,12 @@
 /* March — ThemeToggle, ThemePicker, UpdateBanner. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- theme, update banner */
-.hm-update { position: fixed; z-index: var(--hm-z-toast); inset-block-start: var(--hm-space-3); inset-inline: 50% auto; transform: translateX(-50%); display: flex; align-items: center; gap: var(--hm-space-3);
-  padding: var(--hm-space-1) var(--hm-space-1) var(--hm-space-1) var(--hm-space-4); max-width: calc(100vw - 2rem); background: var(--hm-inverse-bg); color: var(--hm-inverse-text);
+/* UpdateBanner: an Alert drawn as a floating pill at the top */
+.hm-update.hm-alert.hm-alert-neutral { position: fixed; z-index: var(--hm-z-toast); inset-block-start: var(--hm-space-3); inset-inline: 50% auto; transform: translateX(-50%); align-items: center; flex-wrap: nowrap;
+  padding: var(--hm-space-1) var(--hm-space-1) var(--hm-space-1) var(--hm-space-4); max-width: calc(100vw - 2rem); background: var(--hm-inverse-bg); color: var(--hm-inverse-text); border-color: transparent;
   border-radius: var(--hm-radius-full); box-shadow: var(--hm-shadow-4); font-size: var(--hm-text-sm); }
-.hm-update .hm-icon-btn { color: inherit; width: 2rem; height: 2rem; border-radius: 50%; }
-.hm-update .hm-icon-btn:hover { background: color-mix(in srgb, var(--hm-inverse-text) 14%, transparent); }
+.hm-update.hm-alert.hm-alert-neutral > .hm-alert-main { flex: 0 1 auto; }
+.hm-update .hm-icon-btn.hm-alert-x { color: inherit; width: 2rem; height: 2rem; margin: 0; border-radius: 50%; }
+.hm-update .hm-icon-btn.hm-alert-x:hover { background: color-mix(in srgb, var(--hm-inverse-text) 14%, transparent); }
 .hm-theme-toggle .hm-svg { transition: transform var(--hm-dur-slow) var(--hm-ease-spring); }
 .hm-theme-toggle:active .hm-svg { transform: rotate(-30deg) scale(.9); }
 
@@ -16,32 +18,15 @@
 .hm-swatch-b { background: var(--hm-cat-1); } .hm-swatch-c { background: var(--hm-cat-2); }
 .hm-swatch-d { display: none; }
 .hm-theme-panel { width: min(20rem, calc(100vw - 16px)); padding: var(--hm-space-2); display: flex; flex-direction: column; gap: var(--hm-space-2); }
-.hm-theme-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; border-radius: calc(var(--hm-radius) + 2px); background: var(--hm-surface-2); border: 1px solid var(--hm-border); }
-.hm-theme-mode { display: inline-flex; align-items: center; justify-content: center; gap: .375rem; min-height: 1.875rem; border: 0; border-radius: var(--hm-radius-1); background: none;
-  color: var(--hm-muted); font: inherit; font-size: var(--hm-text-sm); font-weight: 500; cursor: pointer; }
-.hm-theme-mode .hm-svg { width: .875rem; height: .875rem; }
-.hm-theme-mode.is-active { background: var(--hm-surface); color: var(--hm-text); box-shadow: var(--hm-shadow-1), 0 0 0 1px var(--hm-border); }
-.hm-theme-list { display: flex; flex-direction: column; gap: 2px; max-height: 22rem; overflow: auto; }
-.hm-theme-opt { display: flex; align-items: center; gap: var(--hm-space-3); width: 100%; padding: .375rem; border: 0; border-radius: max(.25rem, calc(var(--hm-radius-3) - var(--hm-space-2))); background: none; color: var(--hm-text);
-  font: inherit; text-align: start; cursor: pointer; }
-.hm-theme-opt:hover { background: var(--hm-surface-2); }
-.hm-theme-opt:focus-visible, .hm-theme-mode:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: -2px; }
-.hm-theme-opt-text { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.3; }
-.hm-theme-opt-name { font-weight: 600; font-size: var(--hm-text-md); }
-.hm-theme-opt-desc { color: var(--hm-muted); font-size: var(--hm-text-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hm-theme-opt-check { display: inline-flex; color: var(--hm-primary); opacity: 0; }
-.hm-theme-opt.is-active .hm-theme-opt-check { opacity: 1; }
-.hm-theme-opt.is-active { background: var(--hm-primary-soft); }
+/* the modes are a Segmented across the panel; the themes and accents are OptionLists */
+.hm-theme-modes.hm-segmented { display: grid; grid-template-columns: repeat(3, 1fr); align-self: stretch; }
+.hm-theme-modes .hm-segment { min-height: 1.875rem; padding: 0; font-size: var(--hm-text-sm); }
+.hm-option-list.hm-theme-list { --hm-ol-pad: var(--hm-space-2); padding: 0; gap: 2px; max-height: 22rem; overflow: auto; }
+.hm-option-list.hm-theme-list .hm-option-list-row { padding: .375rem; }
+.hm-theme-list .hm-listrow-title { font-weight: 600; }
 .hm-theme-list::-webkit-scrollbar-track { margin-block: var(--hm-radius-2); }
 /* AccentPicker (accent.ts) */
-.hm-accent-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: var(--hm-space-1); }
-.hm-accent-opt { display: flex; align-items: center; gap: var(--hm-space-2); min-width: 0; padding: .4375rem .5rem; border: 0; border-radius: var(--hm-radius-1); background: none; color: var(--hm-text); font: inherit; font-size: var(--hm-text-sm); text-align: start; cursor: pointer; }
-.hm-accent-opt:hover { background: var(--hm-surface-2); }
-.hm-accent-opt:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: -2px; }
-.hm-accent-dot { flex: none; width: 1rem; height: 1rem; border-radius: 50%; background: var(--hm-dot); box-shadow: inset 0 0 0 1px rgb(0 0 0 / .12); }
-.hm-accent-opt .hm-swatch { flex: none; }
-.hm-accent-name { flex: 1; min-width: 0; }
-.hm-accent-opt .hm-theme-opt-check { opacity: 0; } .hm-accent-opt.is-active .hm-theme-opt-check { opacity: 1; }
+.hm-option-list.hm-accent-list { gap: 2px; }
 
 /* restyleInstantly(): no element transitions for the one style pass that applies a new theme, mode or accent */
 [data-hm-restyling] *, [data-hm-restyling] *::before, [data-hm-restyling] *::after { transition: none !important; }

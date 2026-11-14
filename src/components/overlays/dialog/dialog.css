@@ -7,33 +7,28 @@ html.hm-scroll-lock { overflow: hidden; }
   border: 1px solid var(--hm-border); border-radius: var(--hm-radius-4); box-shadow: var(--hm-shadow-4); outline: none; animation: hm-scale-in var(--hm-dur-slow) var(--hm-ease-out); }
 .hm-dialog-sm { max-width: 26rem; } .hm-dialog-md { max-width: 36rem; } .hm-dialog-lg { max-width: 56rem; }
 .hm-dialog-full { max-width: none; height: 100%; max-height: none; }
-.hm-dialog-head { display: flex; align-items: center; gap: var(--hm-space-2); padding-block: var(--hm-space-4) 0; padding-inline: var(--hm-space-5) var(--hm-space-4); min-height: 3.25rem; }
-.hm-dialog-title { flex: 1; margin: 0; font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); letter-spacing: var(--hm-tracking-tight); }
-.hm-dialog-x { margin-inline-end: calc(-1 * var(--hm-space-1)); width: 2rem; height: 2rem; }
+/* head and foot are PanelHeader bars; only the dialog's own spacing is set here */
+.hm-dialog-head.hm-panel-header { flex: none; gap: var(--hm-space-2); padding-block: var(--hm-space-4) 0; padding-inline: var(--hm-space-5) var(--hm-space-4); }
+.hm-dialog-head .hm-panel-header-title { white-space: normal; line-height: inherit; }
+.hm-dialog-x.hm-icon-btn { margin-inline-end: calc(-1 * var(--hm-space-1)); width: 2rem; height: 2rem; }
 .hm-dialog-body { flex: 1 1 auto; min-height: 0; padding: var(--hm-space-4) var(--hm-space-5); overflow: auto; overscroll-behavior: contain; }
 .hm-dialog-msg { margin: 0 0 var(--hm-space-3); color: var(--hm-text-2); white-space: pre-line; }
-.hm-dialog-foot { display: flex; justify-content: flex-end; margin-block-start: auto; flex-wrap: wrap; gap: var(--hm-space-2); padding: var(--hm-space-3) var(--hm-space-5); border-top: 1px solid var(--hm-border-subtle);
+.hm-dialog-foot.hm-panel-header { flex: none; min-block-size: 0; margin-block-start: auto; padding: var(--hm-space-3) var(--hm-space-5); border-top: 1px solid var(--hm-border-subtle);
   background: var(--hm-bg-subtle); border-radius: 0 0 var(--hm-radius-4) var(--hm-radius-4); }
-.hm-overlay-drawer { padding: 0; justify-content: flex-end; align-items: stretch; }
-.hm-drawer { display: flex; flex-direction: column; width: min(30rem, 100vw); height: 100%; background: var(--hm-surface-raised); color: var(--hm-text); box-shadow: var(--hm-shadow-4); outline: none;
-  border-inline-start: 1px solid var(--hm-border); animation: hm-drawer-in var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-drawer-left { margin-inline-end: auto; animation-name: hm-drawer-in-left; border-inline-start: 0; border-inline-end: 1px solid var(--hm-border); }
-.hm-drawer-bottom { width: 100%; height: auto; max-height: 85vh; margin-top: auto; border-radius: var(--hm-radius-4) var(--hm-radius-4) 0 0; animation-name: hm-drawer-in-bottom; }
-.hm-drawer .hm-dialog-body { flex: 1; }
-.hm-drawer .hm-dialog-foot { border-radius: 0; }
-/* the end edge is on the left in right-to-left layouts */
-.hm-drawer:dir(rtl) { animation-name: hm-drawer-in-left; }
-.hm-drawer-left:dir(rtl) { animation-name: hm-drawer-in; }
+.hm-dialog-foot > .hm-panel-header-body { justify-content: flex-end; flex-wrap: wrap; }
+/* the panel of a <Drawer> (drawer.css places and moves it) */
+.hm-drawer { display: flex; flex-direction: column; background: var(--hm-surface-raised); color: var(--hm-text); box-shadow: var(--hm-shadow-4); outline: none; border-inline-start: 1px solid var(--hm-border); }
+.hm-drawer .hm-dialog-foot.hm-panel-header { border-radius: 0; }
 @media (max-width: 640px) {
   .hm-overlay:not(.hm-overlay-drawer) { align-items: flex-end; padding: 0; }
   .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog:not(.hm-dialog-full) { max-width: none; border-radius: var(--hm-radius-4) var(--hm-radius-4) 0 0; max-height: 92vh; animation-name: hm-drawer-in-bottom; }
-  .hm-dialog-foot { border-radius: 0; }
+  .hm-dialog-foot.hm-panel-header { border-radius: 0; }
 }
 .hm-dialog-body::-webkit-scrollbar-track { margin-block: var(--hm-radius-2); }
 /* a non-modal panel: no scrim, the page behind stays usable */
 .hm-overlay.is-modeless { background: none; backdrop-filter: none; pointer-events: none; animation: none; }
 .hm-overlay.is-modeless > * { pointer-events: auto; }
 /* entrance choices (motion); after the phone rule and as specific, so they hold there too */
-.hm-dialog.hm-motion-fade, .hm-drawer.hm-motion-fade, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-fade:not(.hm-dialog-full) { animation-name: hm-fade-in; }
-.hm-dialog.hm-motion-rise, .hm-drawer.hm-motion-rise, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-rise:not(.hm-dialog-full) { animation-name: hm-rise-in; }
-.hm-dialog.hm-motion-none, .hm-drawer.hm-motion-none, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-none:not(.hm-dialog-full), .hm-overlay.hm-motion-none { animation: none; }
+.hm-dialog.hm-motion-fade, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-fade:not(.hm-dialog-full) { animation-name: hm-fade-in; }
+.hm-dialog.hm-motion-rise, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-rise:not(.hm-dialog-full) { animation-name: hm-rise-in; }
+.hm-dialog.hm-motion-none, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-none:not(.hm-dialog-full), .hm-overlay.hm-motion-none { animation: none; }

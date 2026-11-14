@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked.",
   category: "data",
-  composedOf: [],
+  composedOf: ["Chevron"],
   behaviors: [],
   hubs: [],
   showcase: "/data",

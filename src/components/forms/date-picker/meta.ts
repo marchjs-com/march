@@ -6,7 +6,7 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Typed date in the locale's order with a Calendar popover; ISO value, never an invalid date.",
   category: "forms",
-  composedOf: ["Calendar"],
+  composedOf: ["Calendar", "IconButton", "Popover"],
   behaviors: [],
   hubs: [],
   showcase: "/forms",

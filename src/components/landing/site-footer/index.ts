@@ -4,9 +4,10 @@
 import "./site-footer.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, val, icon, glyph, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Brand, type BrandProps } from "../../../ui/app.ts";
-import { IconButton } from "../../../ui/button.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { arrowUp } from "../../../icons/glyphs/arrowUp.ts";
 import { Newsletter, type NewsletterProps } from "../newsletter/index.ts";
 
@@ -44,7 +45,7 @@ export function SiteFooter(props: SiteFooterProps): Element {
         h("div", { class: "hm-sfoot-about" },
           isNode ? props.brand : h(Brand, props.brand as BrandProps),
           props.about != null && h("p", { class: "hm-sfoot-text" }, () => val(props.about)),
-          props.social?.length ? h("ul", { class: "hm-sfoot-social" }, props.social.map((s) => h("li", {}, h("a", { href: s.href, "aria-label": s.label, title: s.label, class: "hm-sfoot-social-link", rel: "noopener" }, icon(s.icon))))) : null),
+          props.social?.length ? h("ul", { class: "hm-sfoot-social" }, props.social.map((s) => h("li", {}, h(IconButton, { href: s.href as never, label: s.label, icon: s.icon, shape: "round", class: "hm-sfoot-social-link", rel: "noopener" })))) : null),
         (props.columns ?? []).map((c) => h("nav", { class: "hm-sfoot-col", "aria-label": typeof c.title === "string" ? c.title : null },
           h("h3", { class: "hm-sfoot-col-title" }, c.title),
           h("ul", {}, c.links.map((l) => h("li", {}, h("a", { href: l.href, class: "hm-sfoot-link" }, l.label)))))),
@@ -52,6 +53,6 @@ export function SiteFooter(props: SiteFooterProps): Element {
       h("div", { class: "hm-sfoot-bottom" },
         props.copyright !== false && h("p", { class: "hm-sfoot-copy" }, () => val(props.copyright) ?? `© ${year} ${name}`.trim()),
         props.legal?.length ? h("ul", { class: "hm-sfoot-legal" }, props.legal.map((l) => h("li", {}, h("a", { href: l.href, class: "hm-sfoot-link" }, l.label)))) : null,
-        props.toTop !== false && h(IconButton, { class: "hm-sfoot-top-btn", variant: "ghost", size: "sm", label: () => props.toTopLabel ?? t`Back to top`, onClick: () => globalThis.scrollTo?.({ top: 0, behavior: globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }) }, props.toTopIcon != null ? icon(props.toTopIcon) : glyph(arrowUp))),
+        props.toTop !== false && h(IconButton, { class: "hm-sfoot-top-btn", size: "sm", icon: props.toTopIcon ?? arrowUp, label: () => props.toTopLabel ?? t`Back to top`, onClick: () => globalThis.scrollTo?.({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" }) })),
       props.wordmark ? h("p", { class: "hm-sfoot-mark", "aria-hidden": "true" }, props.wordmark) : null));
 }

@@ -14,6 +14,7 @@
 .hm-chip2-btn:hover { border-color: var(--hm-border-strong); background: var(--hm-surface-2); }
 .hm-chip2-btn.is-selected { background: var(--hm-accent-soft, var(--hm-primary-soft)); border-color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 40%, transparent); color: var(--hm-accent-text, var(--hm-primary-text)); }
 .hm-chip2-btn:has(.hm-chip2-x) .hm-chip2-hit { padding-inline-end: .25rem; }
-.hm-chip2-x { display: inline-grid; place-items: center; width: 1.125rem; height: 1.125rem; margin-inline: -.125rem -.25rem; border: 0; border-radius: 50%; background: none; color: inherit; opacity: .7; cursor: pointer; }
-.hm-chip2-x:hover { opacity: 1; background: color-mix(in srgb, currentColor 14%, transparent); }
-.hm-chip2-x .hm-svg { width: .6875rem; height: .6875rem; }
+/* remove: the smallest IconButton, in the chip's own colour */
+.hm-chip2 .hm-icon-btn.hm-chip2-x { width: 1.125rem; height: 1.125rem; margin-inline: -.125rem -.25rem; color: inherit; opacity: .7; }
+.hm-chip2 .hm-icon-btn.hm-chip2-x:hover { opacity: 1; background: color-mix(in srgb, currentColor 14%, transparent); }
+.hm-chip2 .hm-icon-btn.hm-chip2-x .hm-svg { width: .6875rem; height: .6875rem; }

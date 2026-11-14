@@ -9,6 +9,8 @@
 .hm-status-dot.is-warn { --hm-status-dot-c: var(--hm-warn); }
 .hm-status-dot.is-danger { --hm-status-dot-c: var(--hm-danger); }
 .hm-status-dot[data-hm-color] { --hm-status-dot-c: var(--hm-accent); }
+/* hollow: a ring in the tone on the surface, with room for a mark inside */
+.hm-status-dot-hollow { display: inline-grid; place-items: center; box-sizing: border-box; border: 2px solid var(--hm-status-dot-c); background: var(--hm-surface); color: var(--hm-status-dot-c); }
 /* ring: a border around the dot that breathes · blink: the dot itself fades */
 .hm-status-dot.is-pulse-ring::after { content: ""; position: absolute; inset: -.25rem; border-radius: 50%; border: 2px solid var(--hm-status-dot-c); opacity: .35; animation: hm-fade-in var(--hm-dur-slow) var(--hm-ease) infinite alternate; }
 .hm-status-dot-lg.is-pulse-ring::after { inset: -.3125rem; }

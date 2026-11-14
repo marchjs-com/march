@@ -1,10 +1,11 @@
 // CodeView: read-only code block with line numbers, wrap, copy and syntax colours (hadi-march/ui). Folder: src/components/typography/code-view/.
 import "./code-view.css";
-import "../../actions/button/button.css";
-import { signal, untrack } from "../../../core/reactive.ts";
+import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { CopyButton } from "../../actions/copy-button/index.ts";
+import { Button } from "../../actions/button/index.ts";
+import { PanelHeader } from "../../layout/panel-header/index.ts";
 import { tokenLines, type Token } from "../../../ui/highlight.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 
@@ -32,10 +33,13 @@ export function CodeView(props: CodeViewProps): Element {
   const numbers = props.lineNumbers !== false;
   const lang = props.langLabel === false ? null : props.langLabel ?? props.lang;
   return h("div", { class: () => cx("hm-code", wrap() && "is-wrapped", val(props.class)) },
-    props.toolbar !== false && h("div", { class: "hm-code-bar" },
-      lang != null && lang !== "" && h("span", { class: "hm-code-lang" }, lang),
-      props.wrapButton !== false && h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm hm-code-wrap", "aria-pressed": () => String(wrap()), onClick: () => wrap.update((x) => !x) }, () => val(props.wrapLabel) ?? t`Wrap`),
-      props.copy !== false && h(CopyButton, { text: () => val(props.code), ...(props.copyLabel != null ? { label: props.copyLabel } : {}) }), props.tools),
+    props.toolbar !== false && h(PanelHeader, {
+      as: "div", size: "sm", divider: true, class: "hm-code-bar",
+      lead: lang != null && lang !== "" ? h("span", { class: "hm-code-lang" }, lang) : undefined,
+      actions: [
+        props.wrapButton !== false && h(Button, { variant: "ghost", size: "sm", class: "hm-code-wrap", pressed: wrap, onClick: () => wrap.update((x) => !x) }, () => val(props.wrapLabel) ?? t`Wrap`),
+        props.copy !== false && h(CopyButton, { text: () => val(props.code), ...(props.copyLabel != null ? { label: props.copyLabel } : {}) }), props.tools],
+    }),
     h("pre", { class: "hm-code-pre", tabindex: "0", "aria-label": () => val(props.label) ?? t`Code` },
       h("code", {}, () => lines().map((line, i) => h("span", { class: "hm-code-line" },
         numbers && h("span", { class: "hm-code-ln", "aria-hidden": "true" }, String(i + 1)),

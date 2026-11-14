@@ -53,18 +53,21 @@ export interface PanelHeaderProps {
   /** Called with the root element (drag behaviors attach here). */
   ref?: ((el: HTMLElement) => void) | undefined;
   class?: ClassProp | undefined;
+  /** An extra class on a part, for a host that keeps its own class names: `{ titles, title, subtitle, meta, actions }`. */
+  partClass?: Partial<Record<"titles" | "title" | "subtitle" | "meta" | "actions", string>> | undefined;
   /** Free content between the titles and the actions (tabs, a search box). */
   children?: unknown | undefined;
   [attr: string]: unknown;
 }
 
-const USED = ["as", "lead", "icon", "title", "titleAs", "titleId", "subtitle", "meta", "actions", "onClose", "close", "closeLabel", "size", "sticky", "divider", "tone", "drag", "align", "color", "ref"] as const;
+const USED = ["as", "lead", "icon", "title", "titleAs", "titleId", "subtitle", "meta", "actions", "onClose", "close", "closeLabel", "size", "sticky", "divider", "tone", "drag", "align", "color", "ref", "partClass"] as const;
 
 /** `<PanelHeader icon={cog} title="Settings" subtitle="Workspace" actions={<Button size="sm">Save</Button>} onClose={close} divider />` */
 export function PanelHeader(props: PanelHeaderProps): Element {
   const foot = props.as === "footer";
   const hasTitles = props.title != null || props.subtitle != null;
   const own = props.close != null && typeof props.close !== "boolean";
+  const pc = (part: "titles" | "title" | "subtitle" | "meta" | "actions"): string => cx(`hm-panel-header-${part === "subtitle" ? "sub" : part}`, props.partClass?.[part]);
   const showClose = props.close === false ? false : props.onClose != null || props.close === true || own;
   return h(props.as ?? "header", {
     ...rest(props, USED),
@@ -75,12 +78,12 @@ export function PanelHeader(props: PanelHeaderProps): Element {
   },
   props.lead != null ? h("span", { class: "hm-panel-header-lead" }, props.lead) : null,
   props.icon != null && props.icon !== false ? icon(props.icon, "hm-panel-header-icon") : null,
-  hasTitles ? h("div", { class: "hm-panel-header-titles" },
-    props.title != null ? h(props.titleAs ?? (foot ? "span" : "h3"), { class: "hm-panel-header-title", id: props.titleId }, () => val(props.title)) : null,
-    props.subtitle != null ? h("p", { class: "hm-panel-header-sub" }, () => val(props.subtitle)) : null) : null,
-  props.meta != null ? h("span", { class: "hm-panel-header-meta" }, () => val(props.meta)) : null,
+  hasTitles ? h("div", { class: pc("titles") },
+    props.title != null ? h(props.titleAs ?? (foot ? "span" : "h3"), { class: pc("title"), id: props.titleId }, () => val(props.title)) : null,
+    props.subtitle != null ? h("p", { class: pc("subtitle") }, () => val(props.subtitle)) : null) : null,
+  props.meta != null ? h("span", { class: pc("meta") }, () => val(props.meta)) : null,
   props.children != null ? h("div", { class: "hm-panel-header-body" }, props.children) : null,
-  props.actions != null ? h("div", { class: "hm-panel-header-actions" }, () => val(props.actions)) : null,
+  props.actions != null ? h("div", { class: pc("actions") }, () => val(props.actions)) : null,
   showClose ? h(IconButton, {
     class: "hm-panel-header-close", size: () => (val(props.size) === "lg" ? undefined : "sm"), icon: own ? props.close : glyph(xIcon), label: () => val(props.closeLabel) ?? t`Close`,
     onClick: (e: MouseEvent) => { e.stopPropagation(); props.onClose?.(e); }, onPointerDown: (e: Event) => e.stopPropagation(),

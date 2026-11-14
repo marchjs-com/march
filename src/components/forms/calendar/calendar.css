@@ -2,8 +2,6 @@
 .hm-cal { display: inline-flex; flex-direction: column; gap: var(--hm-space-2); user-select: none; }
 .hm-cal-header { display: flex; align-items: center; justify-content: space-between; gap: var(--hm-space-2); }
 .hm-cal-title { font-weight: 600; text-transform: capitalize; }
-.hm-cal-nav { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border: 0; border-radius: var(--hm-radius); background: transparent; color: var(--hm-muted); cursor: pointer; }
-.hm-cal-nav:hover { background: var(--hm-surface-2); }
 .hm-cal-row { display: grid; grid-template-columns: repeat(7, 2.25rem); gap: 2px; }
 .hm-cal-wd { text-align: center; font-size: var(--hm-text-xs); color: var(--hm-muted); padding-block: var(--hm-space-1); }
 .hm-cal-day { height: 2.25rem; border: 0; border-radius: var(--hm-radius); background: transparent; color: var(--hm-text); font: inherit; font-size: var(--hm-text-sm); font-variant-numeric: tabular-nums; cursor: pointer; }

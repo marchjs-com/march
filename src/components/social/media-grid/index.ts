@@ -5,9 +5,11 @@
 import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, clamp, later, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, clamp, later, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { video as videoIcon } from "../../../icons/glyphs/video.ts";
 import { Skeleton } from "../../../ui/feedback.ts";
+import { Picture } from "../../media/picture/index.ts";
+import { CornerMark } from "../../media/corner-mark/index.ts";
 import "./media-grid.css";
 
 export interface MediaItem {
@@ -67,8 +69,8 @@ export function MediaGrid(props: MediaGridProps): Element {
       onClick: (e: MouseEvent) => tap(i, el, e.detail === 0),
     },
     () => (loaded() || sk === false ? null : typeof sk === "function" ? h("span", { class: "hm-mgrid-skel hm-mgrid-skel-own" }, sk()) : h(Skeleton, { block: true, class: "hm-mgrid-skel" })),
-    h("img", { src: it.src, alt: "", loading: "lazy", decoding: "async", draggable: "false", onLoad: () => loaded.set(true), onError: () => loaded.set(true) }),
-    it.kind === "video" && mark !== false ? h("span", { class: "hm-mgrid-kind", "aria-hidden": "true" }, typeof mark === "function" ? mark(it) : glyph(videoIcon)) : null,
+    h(Picture, { src: it.src, alt: "", fit: "cover", draggable: "false", onLoad: () => loaded.set(true), onError: () => loaded.set(true) }),
+    it.kind === "video" && mark !== false ? h(CornerMark, { class: "hm-mgrid-kind", icon: typeof mark === "function" ? mark(it) : videoIcon }) : null,
     more > 0 && own !== false ? h("span", { class: "hm-mgrid-more", "aria-hidden": "true" }, typeof own === "function" ? own(more) : `+${more}`) : null);
   };
   return h("div", {

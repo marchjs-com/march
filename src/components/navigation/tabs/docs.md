@@ -62,4 +62,4 @@ motion: the panel switches without motion.
 
 ## Composed of
 
-Badge (tab counts); the roving focus helper. `Tabs` is `TabList` plus the panel.
+Badge (tab counts), StatusDot (the "changed" dot); the roving focus helper, `motionPreset` for the panel motion. `Tabs` is `TabList` plus the panel.

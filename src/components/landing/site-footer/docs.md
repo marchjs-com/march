@@ -40,4 +40,4 @@ decorative (`aria-hidden`). Back to top scrolls smoothly unless reduced motion i
 
 ## Composed of
 
-Brand, Newsletter, IconButton.
+Brand, Newsletter, IconButton (social links, back to top).

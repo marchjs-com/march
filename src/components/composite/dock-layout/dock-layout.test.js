@@ -6,6 +6,7 @@ const { h, render, signal } = await import("../../../index.ts");
 const { DockLayout } = await import("./index.ts");
 const M = await import("./model.ts");
 const { commands } = await import("../../../managers/command/index.ts");
+const { announcer } = await import("../../../managers/announcer/index.ts");
 const tick = () => new Promise((r) => setTimeout(r, 0));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
 
@@ -73,6 +74,9 @@ test("DockLayout: groups from Tabs + Splitter, content kept across moves, keyboa
   await tick(); await tick();
   assert.ok(!root.querySelector('[role=tab][data-tab="files"]'));
   assert.equal(root.querySelectorAll("[data-dock-group]").length, 2);
+  // what happened is announced through the announcer (no live region of its own)
+  assert.match(announcer.history()[0].text, /^FILES /);
+  assert.equal(root.querySelector("[aria-live]"), null);
   // open() puts it back, reset() returns to the layout prop
   api.open("files");
   await tick(); await tick();
@@ -107,9 +111,10 @@ test("DockLayout: minimize to the tray, float, maximize, persist to a storage", 
   api.toggleMaximize("b");
   await tick();
   assert.ok(root.querySelector('[data-dock-group].is-maximized [data-tab="b"]'));
+  assert.equal(root.querySelector(".is-maximized .hm-dock-btn").getAttribute("aria-pressed"), "true");
   // b is not closable: no × and Delete does nothing
   const b = root.querySelector('[role=tab][data-tab="b"]');
-  assert.ok(!b.querySelector(".hm-dock-x"));
+  assert.ok(!b.querySelector(".hm-tab-close"));
   b.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
   await tick();
   assert.ok(root.querySelector('[role=tab][data-tab="b"]'));
@@ -151,8 +156,8 @@ test("DockLayout: group buttons off or chosen, own icons and texts, no tray, own
   assert.equal(one.getAttribute("aria-roledescription"), "desk");
   assert.deepEqual([...one.querySelectorAll(".hm-dock-btn")].map((x) => x.getAttribute("aria-label")), ["Full size"]);
   assert.ok(one.querySelector(".hm-dock-btn .own-max"));
-  assert.equal(one.querySelector(".hm-dock-x").getAttribute("title"), "Shut");
-  assert.equal(one.querySelector(".hm-dock-x").textContent, "×");
+  assert.equal(one.querySelector(".hm-tab-close").getAttribute("title"), "Shut");
+  assert.equal(one.querySelector(".hm-tab-close").textContent, "×");
   assert.equal(one.querySelector("[data-dock-group]").getAttribute("aria-label"), "Group A");
   assert.equal(one.querySelector("[role=tablist]").getAttribute("aria-label"), "Tabs");
   assert.equal(two.querySelector(".hm-dock-actions"), null);
@@ -174,3 +179,5 @@ test("DockLayout: group buttons off or chosen, own icons and texts, no tray, own
   assert.equal(two.querySelectorAll("[role=tab]").length, 2, "the own node's reset brings the panels back");
   dispose();
 });
+
+test("DockLayout: the announcer is released", () => { announcer.dispose(); });

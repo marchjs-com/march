@@ -33,3 +33,11 @@ test("StatusDot: tone, colour, size and pulse follow their props", () => {
   assert.ok(!/is-pulse/.test(d.className));
   dispose();
 });
+
+test("StatusDot: hollow draws a ring with an optional mark inside", () => {
+  const [el, dispose] = mount(() => [h(StatusDot, { hollow: true, tone: "info" }, h("i", { class: "mark" })), h(StatusDot, {})]);
+  const [a, b] = el.querySelectorAll(".hm-status-dot");
+  assert.ok(a.classList.contains("hm-status-dot-hollow") && a.querySelector(".mark"));
+  assert.ok(!b.classList.contains("hm-status-dot-hollow") && !b.hasAttribute("hollow"));
+  dispose();
+});

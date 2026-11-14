@@ -2,28 +2,35 @@
 // ThemeToggle, LocaleSelect and UpdateBanner (new deploy detection).
 import "./theme.css";
 import "./theme-swatches.css";
-import "./button.css";
-import "./field.css";
-import { signal, computed, untrack, onCleanup } from "../core/reactive.ts";
+import { signal, computed, untrack, onCleanup, reactive } from "../core/reactive.ts";
 import { appUrl } from "../base/index.ts";
 import { h } from "../dom/h.ts";
 import { t, locale, setLocale } from "../core/i18n.ts";
-import { val, cx, on, glyph, type MaybeFn, type ClassProp } from "./util.ts";
+import { val, cx, on, type MaybeFn, type ClassProp } from "./util.ts";
 import { monitor } from "../icons/glyphs/monitor.ts";
 import { sun } from "../icons/glyphs/sun.ts";
 import { moon } from "../icons/glyphs/moon.ts";
-import { x as xIcon } from "../icons/glyphs/x.ts";
-import { check } from "../icons/glyphs/check.ts";
 import { palette as paletteIcon } from "../icons/glyphs/palette.ts";
 import { THEME_NAMES, DEFAULT_THEME } from "../theme/names.ts";
 import { Dropdown } from "./menu.ts";
-import { OverflowText } from "./marquee.ts";
+import { Button } from "../components/actions/button/index.ts";
+import { IconButton } from "../components/actions/icon-button/index.ts";
+import { Segmented } from "../components/forms/segmented/index.ts";
+import { Select } from "../components/forms/select/index.ts";
+import { OptionList } from "../components/forms/option-list/index.ts";
+import { Alert } from "../components/feedback/alert/index.ts";
+
+// a live prop for h(Component, …): it becomes a getter
+const live = reactive as <T>(fn: () => T) => T;
+// The stored values are plain strings ("dark", "neon"): the format apps and boot scripts read, so not load / save (JSON).
+const stored = (key: string): string | null => { try { return globalThis.localStorage?.getItem(key) ?? null; } catch { return null; } };
+const store = (key: string, v: string): void => { try { globalThis.localStorage?.setItem(key, v); } catch { /* storage blocked */ } };
 
 export type ThemeMode = "system" | "light" | "dark";
 const THEME_KEY = "hm.theme";
 const MODES: readonly ThemeMode[] = ["system", "light", "dark"];
 const isMode = (v: unknown): v is ThemeMode => MODES.includes(v as ThemeMode);
-const readTheme = (): ThemeMode => { try { const v = globalThis.localStorage?.getItem(THEME_KEY); return isMode(v) ? v : "system"; } catch { return "system"; } };
+const readTheme = (): ThemeMode => { const v = stored(THEME_KEY); return isMode(v) ? v : "system"; };
 const mode = signal<ThemeMode>(readTheme(), { name: "theme" });
 
 /**
@@ -60,7 +67,7 @@ export const theme: Theme = Object.assign((): ThemeMode => mode(), {
   set: (v: ThemeMode): ThemeMode => {
     if (!isMode(v)) throw new Error(`March: theme must be one of ${MODES.join(", ")}.`);
     mode.set(v);
-    try { globalThis.localStorage?.setItem(THEME_KEY, v); } catch { /* storage blocked */ }
+    store(THEME_KEY, v);
     apply(v);
     return v;
   },
@@ -86,8 +93,7 @@ export interface ThemeInfo {
 }
 const THEME_NAME_KEY = "hm.colorTheme";
 const infos = signal<readonly ThemeInfo[]>(THEME_NAMES.map((x) => ({ ...x })));
-const readName = (): string => { try { return globalThis.localStorage?.getItem(THEME_NAME_KEY) || DEFAULT_THEME; } catch { return DEFAULT_THEME; } };
-const themeName = signal<string>(readName(), { name: "colorTheme" });
+const themeName = signal<string>(stored(THEME_NAME_KEY) || DEFAULT_THEME, { name: "colorTheme" });
 let themeBase: string | null = null;
 /** Where the built-in theme stylesheets live (default "themes/" under the app's root, on any route; `march build` copies them there). */
 export function setThemeBase(url: string): void { themeBase = url.endsWith("/") ? url : `${url}/`; }
@@ -122,7 +128,7 @@ export const colorTheme = (): string => themeName();
 /** Switch the color theme (persisted under localStorage "hm.colorTheme"); its stylesheet is loaded on demand. */
 export function setColorTheme(id: string): string {
   themeName.set(id);
-  try { globalThis.localStorage?.setItem(THEME_NAME_KEY, id); } catch { /* storage blocked */ }
+  store(THEME_NAME_KEY, id);
   applyName(id);
   return id;
 }
@@ -138,25 +144,21 @@ export function ThemeSwatch(props: { id: string; class?: ClassProp }): Element {
 }
 
 export interface ThemePickerProps { label?: MaybeFn<string | undefined>; class?: ClassProp; placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end" }
-/** The light / dark / system buttons of a theme menu (ThemePicker, ThemeMenu). */
+/** The light / dark / system choice of a theme menu (ThemePicker, ThemeMenu): a Segmented with icons. */
 export function themeModes(): Element {
-  const modeBtn = (m: ThemeMode, icon: typeof sun, label: () => string): Element => h("button", {
-    type: "button", class: () => cx("hm-theme-mode", mode() === m && "is-active"), "aria-pressed": () => String(mode() === m), onClick: () => theme.set(m),
-  }, glyph(icon), h("span", {}, label));
-  return h("div", { class: "hm-theme-modes", role: "group", "aria-label": () => t`Appearance` },
-    modeBtn("light", sun, () => t`Light`), modeBtn("dark", moon, () => t`Dark`), modeBtn("system", monitor, () => t`System`)) as Element;
+  return h(Segmented<ThemeMode>, {
+    class: "hm-theme-modes", ariaLabel: live(() => t`Appearance`), value: live(() => mode()), onChange: (m: ThemeMode | null) => { if (m) theme.set(m); },
+    options: live(() => [{ value: "light", label: t`Light`, icon: sun }, { value: "dark", label: t`Dark`, icon: moon }, { value: "system", label: t`System`, icon: monitor }]),
+  }) as Element;
 }
 
-/** The color theme choices (live swatches) of a theme menu (ThemePicker, ThemeMenu). */
+/** The color theme choices (live swatches) of a theme menu (ThemePicker, ThemeMenu): an OptionList. */
 export function themeList(): Element {
-  return h("div", { class: "hm-theme-list", role: "radiogroup", "aria-label": () => t`Theme` },
-    () => infos().map((x) => untrack(() => h("button", {
-      type: "button", role: "radio", class: () => cx("hm-theme-opt", themeName() === x.id && "is-active"), "aria-checked": () => String(themeName() === x.id),
-      onClick: () => setColorTheme(x.id),
-    }, h(ThemeSwatch, { id: x.id }), h("span", { class: "hm-theme-opt-text" }, // theme names and descriptions are English in code; the locale pack translates them
-      h("span", { class: "hm-theme-opt-name" }, () => t(x.name)),
-      x.description ? h(OverflowText, { class: "hm-theme-opt-desc" }, () => t(x.description ?? "")) : null),
-      h("span", { class: "hm-theme-opt-check", "aria-hidden": "true" }, glyph(check)))))) as Element;
+  return h(OptionList<string>, {
+    class: "hm-theme-list", label: () => t`Theme`, value: () => themeName(), onPick: (id: string) => { setColorTheme(id); },
+    // theme names and descriptions are English in code; the locale pack translates them
+    options: () => infos().map((x) => ({ value: x.id, label: () => t(x.name), hint: x.description ? () => t(x.description ?? "") : undefined, icon: h(ThemeSwatch, { id: x.id }) })),
+  }) as Element;
 }
 
 /** Theme menu: color themes (with live swatches) and light / dark / system. `<ThemePicker />` */
@@ -172,11 +174,10 @@ export interface ThemeToggleProps { class?: ClassProp }
 export function ThemeToggle(props: ThemeToggleProps = {}): Element {
   const labels: Record<ThemeMode, () => string> = { system: () => t`System theme`, light: () => t`Light theme`, dark: () => t`Dark theme` };
   const icons = { system: monitor, light: sun, dark: moon } as const;
-  return h("button", {
-    type: "button", class: () => cx("hm-icon-btn", "hm-theme-toggle", val(props.class)),
-    "aria-label": () => `${labels[mode()]()} — ${t`change theme`}`, title: () => labels[mode()](),
+  return h(IconButton, {
+    class: () => cx("hm-theme-toggle", val(props.class)), label: () => `${labels[mode()]()} — ${t`change theme`}`, title: () => labels[mode()](), icon: () => icons[mode()],
     onClick: () => theme.set(MODES[(MODES.indexOf(mode.peek()) + 1) % MODES.length] as ThemeMode),
-  }, () => glyph(icons[mode()]));
+  }) as Element;
 }
 
 export interface LocaleOption { value: string; label: string }
@@ -190,10 +191,10 @@ export interface LocaleSelectProps {
 /** `<LocaleSelect options={[{ value: "en", label: "English" }, { value: "tr", label: "Türkçe" }]} />` (strings allowed) */
 export function LocaleSelect(props: LocaleSelectProps): Element {
   const opts = (): LocaleOption[] => (val(props.options) ?? []).map((o) => (typeof o === "string" ? { value: o, label: o } : o));
-  return h("select", {
-    class: () => cx("hm-select", "hm-select-sm", val(props.class)), "aria-label": () => val(props.label) ?? t`Language`,
-    onChange: (e: Event) => { const v = (e.target as HTMLSelectElement).value; void setLocale(v); props.onChange?.(v); },
-  }, () => opts().map((o) => h("option", { value: o.value, selected: () => locale() === o.value }, o.label)));
+  return h(Select<string>, {
+    class: live(() => cx("hm-select-sm", val(props.class))), ariaLabel: live(() => val(props.label) ?? t`Language`), placeholder: false,
+    options: live(opts), value: live(() => locale()), onChange: (v: string | null) => { if (v == null) return; void setLocale(v); props.onChange?.(v); },
+  }) as Element;
 }
 
 export interface UpdateBannerProps {
@@ -230,8 +231,9 @@ export function UpdateBanner(props: UpdateBannerProps = {}): () => unknown {
   onCleanup(() => { alive = false; clearInterval(id); });
   on(globalThis.document, "visibilitychange", () => { if (globalThis.document.visibilityState !== "hidden") void check(); });
   const show = computed(() => stale() && !hidden());
-  return () => show() && untrack(() => h("div", { class: () => cx("hm-update", val(props.class)), role: "status", "aria-live": "polite" },
-    h("span", {}, () => val(props.text) ?? t`A new version is available`),
-    h("button", { type: "button", class: "hm-btn hm-btn-primary hm-btn-sm", onClick: () => (props.onReload ?? (() => globalThis.location.reload()))() }, () => val(props.reloadText) ?? t`Reload`),
-    h("button", { type: "button", class: "hm-icon-btn", "aria-label": () => t`Dismiss`, onClick: () => hidden.set(true) }, glyph(xIcon))));
+  // an Alert with its action and dismiss button, drawn as the floating pill (theme.css)
+  return () => show() && untrack(() => h(Alert, {
+    tone: "neutral", icon: false, class: () => cx("hm-update", val(props.class)), dismissable: true, onDismiss: () => hidden.set(true),
+    action: h(Button, { variant: "primary", size: "sm", onClick: () => (props.onReload ?? (() => globalThis.location.reload()))() }, () => val(props.reloadText) ?? t`Reload`),
+  }, () => val(props.text) ?? t`A new version is available`));
 }

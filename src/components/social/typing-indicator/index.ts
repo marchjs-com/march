@@ -6,6 +6,7 @@ import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
+import { StatusDot } from "../../feedback/status-dot/index.ts";
 import "./typing-indicator.css";
 
 export interface TypingIndicatorProps {
@@ -45,7 +46,7 @@ export function TypingIndicator(props: TypingIndicatorProps): Element {
   },
   props.dots === false ? null
     : props.dots && props.dots !== true ? h("span", { class: "hm-typing-dots is-own", "aria-hidden": "true" }, props.dots)
-    : h("span", { class: "hm-typing-dots", "aria-hidden": "true" }, [0, 1, 2].map(() => h("i", { ref: (x: HTMLElement) => { dots.push(x); } }))),
+    : h("span", { class: "hm-typing-dots", "aria-hidden": "true" }, [0, 1, 2].map(() => h(StatusDot, { tone: "primary", size: "xs", ref: (x: HTMLElement) => { dots.push(x); } }))),
   h("span", { class: () => cx("hm-typing-text", !(val(props.text) ?? val(props.variant) === "inline") && "hm-sr-only") }, () => { const list = val(props.names) ?? []; return props.label ? props.label(list) : typingText(list); }));
   effect(() => {
     const on = names().length > 0, kind = val(props.motion) ?? "lift";

@@ -34,4 +34,4 @@ of toggle buttons (`aria-pressed`); themes and accents are labelled `radiogroup`
 
 ## Composed of
 
-Dropdown (button and panel), ThemeSwatch (live theme previews), OverflowText (long theme descriptions).
+Dropdown (button and panel), SectionLabel (section headings), ThemeSwatch (live theme previews), OverflowText (long theme descriptions).

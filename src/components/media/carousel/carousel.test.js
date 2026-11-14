@@ -18,7 +18,7 @@ test("Carousel: labelled region, per-view class, labelled buttons; previous disa
   assert.equal(root.querySelector(".hm-carousel-track").children.length, 4);
   assert.ok(root.querySelector(".hm-carousel-prev").disabled);
   assert.equal(root.querySelector(".hm-carousel-next").getAttribute("aria-label"), "Next");
-  assert.equal(root.querySelectorAll(".hm-carousel-dot").length, 3);
+  assert.equal(root.querySelectorAll(".hm-carousel-dots .hm-page-dot").length, 3);
 });
 
 test("Carousel: own labels, icons, dots and colour; arrows and dots can be left out", async () => {
@@ -33,7 +33,7 @@ test("Carousel: own labels, icons, dots and colour; arrows and dots can be left 
   assert.equal(a.querySelector(".hm-carousel-next").getAttribute("aria-label"), "On");
   assert.ok(a.querySelector(".hm-carousel-prev .p") && a.querySelector(".hm-carousel-next .n"));
   assert.equal(a.querySelector(".hm-carousel-btn svg"), null);
-  const dots = a.querySelectorAll(".hm-carousel-dot");
+  const dots = a.querySelectorAll(".hm-carousel-dots .hm-page-dot");
   assert.equal(dots.length, 3);
   assert.equal(dots[1].getAttribute("aria-label"), "Photo 2");
   assert.ok(dots[0].classList.contains("is-own"));

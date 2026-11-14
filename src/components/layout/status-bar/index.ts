@@ -11,6 +11,7 @@ import { formatKey } from "../../../ui/keys.ts";
 import { fitItems, observeWidth } from "../../../ui/fit.ts";
 import { commandBinding } from "../../../managers/command/ui.ts";
 import { animate } from "../../../motion/animate.ts";
+import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { more } from "../../../icons/glyphs/more.ts";
 
 messages("tr", { "Status bar": "Durum çubuğu", "More status": "Diğer durum bilgileri" });
@@ -79,13 +80,16 @@ export function StatusBar(props: StatusBarProps): Element {
     const text = (): string => (b ? b.label() : val(x.text) ?? "");
     const tone = (): StatusTone => val(x.tone) ?? "neutral";
     const tip = (): string => { const s = val(x.title) ?? ""; const k = b?.shortcut(); return k ? `${s || text()} (${formatKey(k)})` : s; };
-    // busy: the dot breathes (motion engine; still under reduced motion)
+    // busy: the dot blinks (StatusDot; still under reduced motion). Your own mark breathes on the motion engine.
     const ownDot = typeof props.dot === "function" ? props.dot : null;
-    const dot = props.dot === false ? null : h("span", { class: ownDot ? "hm-sbar-dot-own" : "hm-sbar-dot", "aria-hidden": "true", ref: (el: HTMLElement) => {
-      let run: { cancel(): void } | null = null;
-      effect(() => { run?.cancel(); run = tone() === "busy" && props.pulse !== false ? animate(el, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0.35, transform: "scale(.6)" }, { opacity: 1, transform: "scale(1)" }], { duration: 1100, iterations: Infinity }) : null; });
-      onCleanup(() => run?.cancel());
-    } }, ownDot ? ownDot(tone, x) : null);
+    const busy = (): boolean => tone() === "busy" && props.pulse !== false;
+    const dot = props.dot === false ? null : !ownDot
+      ? h(StatusDot, { class: "hm-sbar-dot", size: "sm", tone: () => { const v = tone(); return v === "busy" ? "primary" : v; }, pulse: () => (busy() ? "blink" : false) })
+      : h("span", { class: "hm-sbar-dot-own", "aria-hidden": "true", ref: (el: HTMLElement) => {
+        let run: { cancel(): void } | null = null;
+        effect(() => { run?.cancel(); run = busy() ? animate(el, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0.35, transform: "scale(.6)" }, { opacity: 1, transform: "scale(1)" }], { duration: 1100, iterations: Infinity }) : null; });
+        onCleanup(() => run?.cancel());
+      } }, ownDot(tone, x));
     const body = [() => icon(b ? b.icon() : x.icon, "hm-sbar-icon"), x.icon || b?.icon() ? null : dot, h("span", { class: "hm-sbar-text" }, text)];
     if (x.live) { let first = true; effect(() => { const v = text(); if (first) { first = false; return; } untrack(() => said.set(v)); }); }
     const cls = (): string => cx("hm-sbar-item", `is-${tone()}`, b && "is-button");

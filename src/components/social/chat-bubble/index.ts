@@ -15,6 +15,8 @@ import { smile } from "../../../icons/glyphs/smile.ts";
 import { arrowLeft } from "../../../icons/glyphs/arrowLeft.ts";
 import { animate } from "../../../motion/animate.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { Button } from "../../actions/button/index.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
 import "./chat-bubble.css";
 import { isRtl } from "../../../core/util.ts";
 import { swipeable } from "../../../behaviors/swipe/index.ts";
@@ -130,14 +132,14 @@ export function ChatBubble(props: ChatBubbleProps): Element {
     () => {
       const rs = val(props.reactions);
       if (!rs?.length) return null;
-      return h("div", { class: "hm-msg-reacts" }, rs.map((r) => h("button", {
-        type: "button", class: cx("hm-msg-react", r.mine && "is-mine"), "aria-pressed": r.mine ? "true" : "false",
+      return h("div", { class: "hm-msg-reacts" }, rs.map((r) => h(Button, {
+        shape: "pill", size: "sm", pressed: !!r.mine, class: cx("hm-msg-react", r.mine && "is-mine"),
         "aria-label": t`${r.emoji} ${r.count}`, onClick: () => props.onReact?.(r.emoji),
       }, h("span", { "aria-hidden": "true" }, r.emoji), r.count > 1 ? h("span", { class: "hm-msg-react-n", "aria-hidden": "true" }, String(r.count)) : null)));
     },
-    () => (val(props.status) === "failed" && props.onRetry ? h("button", { type: "button", class: "hm-msg-retry", onClick: () => props.onRetry?.() }, L("retry", t`Not sent · Retry`)) : null)),
+    () => (val(props.status) === "failed" && props.onRetry ? h(Button, { variant: "link", class: "hm-msg-retry", onClick: () => props.onRetry?.() }, L("retry", t`Not sent · Retry`)) : null)),
   props.tools === false ? null : h("div", { class: "hm-msg-tools" },
-    props.onReactMenu ? h("button", { type: "button", class: "hm-msg-tool hm-msg-tool-react", "aria-label": () => L("react", t`React`), onClick: (e: MouseEvent) => props.onReactMenu?.(e.currentTarget as HTMLElement) }, props.reactIcon ?? glyph(smile)) : null,
-    props.onReply ? h("button", { type: "button", class: "hm-msg-tool hm-msg-tool-reply", "aria-label": () => L("reply", t`Reply`), onClick: () => props.onReply?.() }, props.replyIcon ?? glyph(arrowLeft)) : null)) as HTMLElement;
+    props.onReactMenu ? h(IconButton, { class: "hm-msg-tool hm-msg-tool-react", size: "sm", shape: "round", icon: props.reactIcon ?? smile, label: () => L("react", t`React`), onClick: (e: MouseEvent) => props.onReactMenu?.(e.currentTarget as HTMLElement) }) : null,
+    props.onReply ? h(IconButton, { class: "hm-msg-tool hm-msg-tool-reply", size: "sm", shape: "round", icon: props.replyIcon ?? arrowLeft, label: () => L("reply", t`Reply`), onClick: () => props.onReply?.() }) : null)) as HTMLElement;
   return row;
 }

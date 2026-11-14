@@ -31,3 +31,7 @@ when the clipboard is not available a toast reports the failure.
 
 `aria-live="polite"`: the change to "Copied" is announced. The icon-only form keeps an accessible name that also
 switches to "Copied".
+
+## Composed of
+
+Button (text) or IconButton (`iconOnly`); `toast` reports a refused clipboard.

@@ -43,3 +43,29 @@ test("Tree: no chevron, own chevron that follows open, selection colour", () => 
   assert.equal(c.getAttribute("data-hm-color"), null);
   m.dispose();
 });
+
+test("Tree: rows are ListRows with a Chevron; → enters an open node, ← leaves to the parent", () => {
+  const nodes = [{ id: "a", label: "a", children: [{ id: "a1", label: "a1" }] }, { id: "b", label: "b" }];
+  const m = mount(() => h(Tree, { nodes, expanded: ["a"] }));
+  const rows = [...m.el.querySelectorAll(".hm-tree-row")];
+  assert.ok(rows[0].classList.contains("hm-listrow") && rows[0].querySelector(".hm-tree-chev.hm-chevron.is-open"));
+  assert.ok(rows[1].querySelector(".hm-tree-chev.is-leaf"), "a leaf keeps the arrow's box");
+  rows[0].focus(); key(rows[0], "ArrowRight");
+  assert.equal(document.activeElement, rows[1], "→ on an open node goes to its first child");
+  key(rows[1], "ArrowLeft");
+  assert.equal(document.activeElement, rows[0], "← on a leaf goes to its parent");
+  m.dispose();
+});
+
+test("treeKey: the keys Tree and TreeView share (mirrored in right-to-left)", async () => {
+  const { treeKey } = await import("./row.ts");
+  assert.equal(treeKey("ArrowRight", { kids: true, open: false }), "open");
+  assert.equal(treeKey("ArrowRight", { kids: true, open: true }), "child");
+  assert.equal(treeKey("ArrowRight", { kids: false, open: false }), null);
+  assert.equal(treeKey("ArrowLeft", { kids: true, open: true }), "close");
+  assert.equal(treeKey("ArrowLeft", { kids: false, open: false }), "parent");
+  assert.equal(treeKey("ArrowLeft", { kids: true, open: false }, true), "open");
+  assert.equal(treeKey("Enter", { kids: false, open: false }), "activate");
+  assert.equal(treeKey(" ", { kids: false, open: false }), "select");
+  assert.equal(treeKey("x", { kids: true, open: true }), null);
+});

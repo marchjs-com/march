@@ -28,8 +28,8 @@ export interface ListRowProps {
   href?: MaybeFn<string | undefined>;
   /** Makes the row a button; with `as`, a click listener on that element. */
   onClick?: ((e: MouseEvent) => void) | undefined;
-  /** Element of a row that is not a link or a button (default "div"): "li" for an option, "span" inside your own button, "label". */
-  as?: "div" | "li" | "span" | "label" | undefined;
+  /** Element of a row that is not a link or a button (default "div"): "li" for an option, "span" inside your own button, "label". "button": a button whose host listens itself (drag handle, pointer and key listeners) instead of `onClick`. */
+  as?: "div" | "li" | "span" | "label" | "button" | undefined;
   /** The current row (this page, the highlighted option): tinted. A link also gets `aria-current="page"`. */
   active?: MaybeFn<boolean | undefined>;
   /** A chosen row. Said as `aria-pressed` on a button, `aria-checked` / `aria-selected` with a matching `role`. */

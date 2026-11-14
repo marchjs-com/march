@@ -1,10 +1,11 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { value: string; variant: string; size: string; text: boolean; icons: string; color: string }
+interface Values { value: string; variant: string; size: string; text: boolean; icons: string; color: string; motion: string }
 
 export default definePlayground<Values>({
   options: [
     { key: "value", label: "Değer", default: "yes", options: [{ value: "yes", label: "evet" }, { value: "no", label: "hayır" }, { value: "partial", label: "kısmen" }] },
+    { key: "motion", label: "Geçiş hareketi (değeri değiştir)", default: "flip", options: [{ value: "none", label: "yok" }, { value: "flip", label: "dönerek" }, { value: "fade", label: "belirerek" }, { value: "pop", label: "zıplayarak" }, { value: "draw", label: "çizilerek" }, { value: "own", label: "kendi hareketim (kayarak)" }] },
     { key: "variant", label: "Görünüm", default: "plain", options: [{ value: "plain", label: "yalın" }, { value: "soft", label: "yumuşak disk" }, { value: "solid", label: "dolu disk" }] },
     { key: "size", label: "Boyut", default: "md", options: ["sm", "md", "lg"] },
     { key: "text", label: "Metni göster", default: false },

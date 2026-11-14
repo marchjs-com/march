@@ -43,4 +43,4 @@ it opens; Esc or a click elsewhere closes it. Day separators are `separator`s.
 
 ## Composed of
 
-ChatBubble, TypingIndicator, ReactionPicker, Avatar.
+ChatBubble, TypingIndicator, ReactionPicker, Avatar, Button, Picture.

@@ -4,6 +4,7 @@
 // nothing here sets a color.
 import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
+import { live } from "../../../forms/util.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { Button } from "../../../ui/button.ts";
 import { Tabs } from "../../../ui/tabs.ts";
@@ -24,7 +25,7 @@ export function ThemePreview({ ctx }: { ctx: ThemeEditorContext }): Element {
     h("header", { class: "hm-te-appbar" },
       h("span", { class: "hm-te-mark", "aria-hidden": "true" }),
       h("strong", { class: "hm-te-appname" }, "HADİ"),
-      h(Tabs, { panel: false, label: t`Sample tabs`, get value() { return tab(); }, onChange: (v: string) => tab.set(v), tabs: [{ id: "overview", label: t`Overview` }, { id: "team", label: t`Team`, badge: 3 }, { id: "settings", label: t`Settings` }] }),
+      h(Tabs, { panel: false, label: t`Sample tabs`, value: live(() => tab()), onChange: (v: string) => tab.set(v), tabs: [{ id: "overview", label: t`Overview` }, { id: "team", label: t`Team`, badge: 3 }, { id: "settings", label: t`Settings` }] }),
       h(Avatar, { name: "Elif Yılmaz", size: "sm" })),
     h("div", { class: "hm-te-screen-body" },
       h("h3", { class: "hm-te-display" }, t`Weekly summary`),
