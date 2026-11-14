@@ -1,4 +1,4 @@
 /* March — CopyButton. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-copy.is-copied { color: var(--hm-success-text); }
-.hm-copy.is-copied[data-hm-color] { color: var(--hm-accent-text, var(--hm-accent)); }
-.hm-copy-icon { display: inline-flex; }
+.m-copy.is-copied { color: var(--m-success-text); }
+.m-copy.is-copied[data-m-color] { color: var(--m-accent-text, var(--m-accent)); }
+.m-copy-icon { display: inline-flex; }

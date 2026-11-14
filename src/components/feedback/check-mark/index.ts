@@ -77,15 +77,15 @@ export function CheckMark(props: CheckMarkProps): Element {
   };
   const moves = (): boolean => props.motion != null && props.motion !== false && props.motion !== "none";
   // the glyph: drawn again when the value (or its own icon) changes; with `motion` the old one leaves while the new one arrives
-  const holder = h("span", { class: "hm-checkmark-icon", "aria-hidden": "true" }) as HTMLElement;
+  const holder = h("span", { class: "m-checkmark-icon", "aria-hidden": "true" }) as HTMLElement;
   let shown: Kind | null = null;
   effect(() => {
     const k = kind(), own = props.icons?.[k];
     untrack(() => {
       const from = shown, prev = from !== null && from !== k ? holder.lastElementChild as HTMLElement | null : null;
       shown = k;
-      const glyph = ownIcon(own, GLYPH[k], "hm-checkmark-own");
-      const next = glyph == null ? null : h("span", { class: "hm-checkmark-glyph" }, glyph) as HTMLElement;
+      const glyph = ownIcon(own, GLYPH[k], "m-checkmark-own");
+      const next = glyph == null ? null : h("span", { class: "m-checkmark-glyph" }, glyph) as HTMLElement;
       const m = props.motion;
       if (!prev || !next || from === null || !moves() || reducedMotion()) { holder.replaceChildren(...(next ? [next] : [])); return; }
       for (const c of [...holder.children]) if (c !== prev) c.remove(); // a glyph still leaving from the change before
@@ -111,9 +111,9 @@ export function CheckMark(props: CheckMarkProps): Element {
   });
   return h("span", {
     ...rest(props, ["value", "labels", "label", "text", "icons", "variant", "size", "color", "motion"]),
-    class: () => cx("hm-checkmark", `hm-checkmark-${val(props.variant) ?? "plain"}`, `hm-checkmark-${val(props.size) ?? "md"}`, `is-${kind()}`, moves() && "hm-checkmark-moves", val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)), "aria-hidden": () => (label() == null ? "true" : null),
+    class: () => cx("m-checkmark", `m-checkmark-${val(props.variant) ?? "plain"}`, `m-checkmark-${val(props.size) ?? "md"}`, `is-${kind()}`, moves() && "m-checkmark-moves", val(props.class)),
+    "data-m-color": () => colorAttr(val(props.color)), "aria-hidden": () => (label() == null ? "true" : null),
   },
   holder,
-  () => (label() == null ? null : h("span", { class: () => (val(props.text) ? "hm-checkmark-text" : "hm-sr-only") }, label)));
+  () => (label() == null ? null : h("span", { class: () => (val(props.text) ? "m-checkmark-text" : "m-sr-only") }, label)));
 }

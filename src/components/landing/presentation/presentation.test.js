@@ -14,15 +14,15 @@ test("Presentation: keys walk slides and fragments, index is controlled, only th
     h(Slide, { layout: "title", notes: "Hi" }, h("h1", {}, "One")),
     h(Slide, {}, h("h2", {}, "Two"), h(Appear, {}, h("li", {}, "a"), h("li", {}, "b"))),
     h(Slide, {}, h("h2", {}, "Three"))), el);
-  const deck = el.querySelector(".hm-deck");
-  const slides = deck.querySelectorAll(".hm-slide");
+  const deck = el.querySelector(".m-deck");
+  const slides = deck.querySelectorAll(".m-slide");
   assert.equal(slides.length, 3);
   assert.ok(slides[0].classList.contains("is-current"));
   assert.equal(slides[1].getAttribute("aria-hidden"), "true");
-  assert.equal(deck.querySelector(".hm-deck-count").textContent, "Slide 1 of 3");
+  assert.equal(deck.querySelector(".m-deck-count").textContent, "Slide 1 of 3");
   key(deck, "ArrowRight");
   assert.equal(idx(), 1);
-  const items = slides[1].querySelectorAll(".hm-appear li");
+  const items = slides[1].querySelectorAll(".m-appear li");
   assert.ok(!items[0].classList.contains("is-shown"));
   key(deck, "ArrowRight"); // first fragment
   assert.ok(items[0].classList.contains("is-shown") && !items[1].classList.contains("is-shown"));
@@ -41,9 +41,9 @@ test("Presentation: keys walk slides and fragments, index is controlled, only th
 test("Presentation: speaker view shows notes and the next slide", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => h(Presentation, { presenter: true, sync: false }, h(Slide, { notes: "Say hello" }, h("h1", {}, "A")), h(Slide, {}, h("h1", {}, "B"))), el);
-  assert.equal(el.querySelector(".hm-deck-note").textContent, "Say hello");
-  assert.equal(el.querySelector(".hm-deck-preview h1").textContent, "B");
-  assert.equal(el.querySelector(".hm-deck-timer").getAttribute("role"), "timer");
+  assert.equal(el.querySelector(".m-deck-note").textContent, "Say hello");
+  assert.equal(el.querySelector(".m-deck-preview h1").textContent, "B");
+  assert.equal(el.querySelector(".m-deck-timer").getAttribute("role"), "timer");
   dispose();
 });
 
@@ -57,22 +57,22 @@ test("Presentation: parts off, own counter, own labels and icons, coloured progr
     h(Presentation, { sync: false, counter: false, presenter: true, timer: false, labels: { notes: "Remarks", noNotes: "Nothing" }, class: "three" }, h(Slide, {}, h("h1", {}, "A"))),
   ], el);
   const one = el.querySelector(".one");
-  assert.equal(one.querySelector(".hm-deck-count").textContent, "1/2");
-  assert.equal(one.querySelector(".hm-deck-bar").getAttribute("data-hm-color"), "brand-orange");
-  assert.equal(one.querySelector(".hm-deck-full"), null);
-  assert.equal(one.querySelector(".hm-deck-pages .hm-page-prev").getAttribute("aria-label"), "Back");
-  assert.equal(one.querySelector(".hm-deck-pages .hm-page-next").getAttribute("aria-label"), "Forward");
-  assert.ok(one.querySelector(".hm-deck-pages .hm-page-next .mine"));
+  assert.equal(one.querySelector(".m-deck-count").textContent, "1/2");
+  assert.equal(one.querySelector(".m-deck-bar").getAttribute("data-m-color"), "brand-orange");
+  assert.equal(one.querySelector(".m-deck-full"), null);
+  assert.equal(one.querySelector(".m-deck-pages .m-page-prev").getAttribute("aria-label"), "Back");
+  assert.equal(one.querySelector(".m-deck-pages .m-page-next").getAttribute("aria-label"), "Forward");
+  assert.ok(one.querySelector(".m-deck-pages .m-page-next .mine"));
   key(one, "ArrowRight");
-  assert.equal(one.querySelector(".hm-deck-count").textContent, "2/2");
+  assert.equal(one.querySelector(".m-deck-count").textContent, "2/2");
   assert.deepEqual(seen, [["B", "A", 1]], "the own transition gets the incoming and the outgoing slide");
   const two = el.querySelector(".two");
-  assert.equal(two.querySelector(".hm-deck-controls"), null);
-  assert.equal(two.querySelector(".hm-deck-bar"), null);
+  assert.equal(two.querySelector(".m-deck-controls"), null);
+  assert.equal(two.querySelector(".m-deck-bar"), null);
   const three = el.querySelector(".three");
-  assert.equal(three.querySelector(".hm-deck-count"), null);
-  assert.equal(three.querySelector(".hm-deck-timer"), null);
-  assert.equal(three.querySelector(".hm-deck-notes .hm-deck-cap").textContent, "Remarks");
-  assert.equal(three.querySelector(".hm-deck-note").textContent, "Nothing");
+  assert.equal(three.querySelector(".m-deck-count"), null);
+  assert.equal(three.querySelector(".m-deck-timer"), null);
+  assert.equal(three.querySelector(".m-deck-notes .m-deck-cap").textContent, "Remarks");
+  assert.equal(three.querySelector(".m-deck-note").textContent, "Nothing");
   dispose();
 });

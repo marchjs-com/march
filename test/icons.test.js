@@ -14,11 +14,11 @@ test("<Icon> follows live props: size, icon and label repaint the same <svg>", (
   // the compiler passes live props as reactive thunks (size={$size} → reactive(() => $size()))
   const el = mount(() => h(I.Icon, { of: reactive(() => of()), size: reactive(() => size()), label: reactive(() => label()) }));
   const svg = el.querySelector("svg");
-  assert.match(svg.getAttribute("class"), /hm-svg-md/);
+  assert.match(svg.getAttribute("class"), /m-svg-md/);
   size.set("xl");
   assert.equal(el.querySelector("svg"), svg, "same element");
-  assert.match(svg.getAttribute("class"), /hm-svg-xl/);
-  assert.doesNotMatch(svg.getAttribute("class"), /hm-svg-md/);
+  assert.match(svg.getAttribute("class"), /m-svg-xl/);
+  assert.doesNotMatch(svg.getAttribute("class"), /m-svg-md/);
   of.set(I.search);
   assert.equal(svg.getAttribute("data-icon"), "search");
   assert.equal(svg.getAttribute("aria-hidden"), "true");
@@ -50,7 +50,7 @@ test("icon packs: icon() and <Icon name> resolve 'pack:name' and plain names (Ma
   assert.equal(svg.childNodes.length, 0, "empty until the pack answers");
   await new Promise((r) => setTimeout(r, 0));
   assert.equal(svg.getAttribute("data-icon"), "hadi-star");
-  assert.match(svg.getAttribute("class"), /hm-svg-lg hm-svg-fill/);
+  assert.match(svg.getAttribute("class"), /m-svg-lg m-svg-fill/);
   assert.equal(svg.querySelector("path").getAttribute("d"), "M12 2 2 22h20z");
   assert.equal(await P.loadIcon("arrow-left").then((d) => d.name), "arrow-left", "no prefix: the March set (its catalog loads on use)");
   assert.equal(await P.loadIcon("hadi:nope"), undefined);
@@ -72,7 +72,7 @@ test("pack icons carry their grid, stroke width, fill, even-odd shapes and RTL m
   const svg = I.svgIcon(d);
   assert.equal(svg.getAttribute("viewBox"), "0 0 16 16");
   assert.equal(svg.querySelector("path").getAttribute("stroke-width"), "2");
-  assert.match(svg.getAttribute("class"), /hm-svg-rtl/);
+  assert.match(svg.getAttribute("class"), /m-svg-rtl/);
   assert.equal(svg.querySelectorAll("path")[0].getAttribute("fill-rule"), null);
   assert.equal(svg.querySelectorAll("path")[1].getAttribute("fill-rule"), "evenodd");
   // repainting with a March icon leaves nothing of the pack behind
@@ -81,7 +81,7 @@ test("pack icons carry their grid, stroke width, fill, even-odd shapes and RTL m
   assert.doesNotMatch(svg.getAttribute("class"), /rtl/);
   assert.equal(svg.querySelector("path, circle").getAttribute("stroke-width"), null);
   const f = I.svgIcon(packIcon("dot", ["o:8,8,4"], { vb: "0 0 16 16", fill: true }));
-  assert.match(f.getAttribute("class"), /hm-svg-fill/);
+  assert.match(f.getAttribute("class"), /m-svg-fill/);
 });
 
 test("march icons: SVG → March shapes, names, RTL rule", async () => {

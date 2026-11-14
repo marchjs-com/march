@@ -9,8 +9,8 @@ export interface AffixProps { prefix?: unknown; suffix?: unknown; class?: ClassP
 /** Wrap a control with prefix / suffix text when given. */
 export function affix(props: AffixProps, el: Node): unknown {
   if (props.prefix == null && props.suffix == null) return el;
-  const part = (k: "prefix" | "suffix") => () => (props[k] != null ? h("span", { class: `hm-affix-text hm-affix-${k}` }, props[k]) : null);
-  return h("span", { class: cx("hm-affix", props.class) }, part("prefix"), el, part("suffix"));
+  const part = (k: "prefix" | "suffix") => () => (props[k] != null ? h("span", { class: `m-affix-text m-affix-${k}` }, props[k]) : null);
+  return h("span", { class: cx("m-affix", props.class) }, part("prefix"), el, part("suffix"));
 }
 
 /** Text attributes shared by the text-like inputs. */

@@ -124,7 +124,7 @@ const CONTROLS: Record<PropertyType, PropertyControl> = {
 
 /** `<PropertyGrid properties={[{ key: "width", label: "Width", type: "number", group: "Layout", unit: "px" }]} bind:value={$props} onSave={save} />` */
 export function PropertyGrid(props: PropertyGridProps): Element {
-  const base = props.id ?? uid("hm-pg");
+  const base = props.id ?? uid("m-pg");
   const [get, set] = model<Values>(props, {});
   const savedLocal = signal<Values>(untrack(() => ({ ...(val(props.saved) ?? get()) })));
   const saved = (): Values => val(props.saved) ?? savedLocal();
@@ -178,15 +178,15 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     Object.defineProperty(cp, "describedby", { get: () => [p.description ? descId : "", errors()[p.key] ? errId : ""].filter(Boolean).join(" ") || null, enumerable: true });
     cp["setValue"] = (v: unknown) => change(p, v);
     const control = untrack(() => Comp(cp));
-    return h("div", { class: () => cx("hm-pg-row", changed() && "is-changed", errors()[p.key] && "is-invalid"), "data-key": p.key },
-      h("div", { class: "hm-pg-label" },
-        h("label", { id: labelId, for: id, class: "hm-pg-name", title: () => labelOf(p) }, () => labelOf(p)),
-        props.changeMarks === false ? null : () => (changed() ? h(StatusDot, { class: "hm-pg-dot", tone: "primary", size: "xs", title: L().changed ?? t`Changed`, label: L().changed ?? t`changed` }) : null),
-        p.description && h("span", { id: descId, class: "hm-pg-desc" }, p.description)),
-      h("div", { class: "hm-pg-editor" }, control,
-        () => (errors()[p.key] ? h("span", { id: errId, class: "hm-pg-error", role: "alert" }, errors()[p.key]) : null)),
+    return h("div", { class: () => cx("m-pg-row", changed() && "is-changed", errors()[p.key] && "is-invalid"), "data-key": p.key },
+      h("div", { class: "m-pg-label" },
+        h("label", { id: labelId, for: id, class: "m-pg-name", title: () => labelOf(p) }, () => labelOf(p)),
+        props.changeMarks === false ? null : () => (changed() ? h(StatusDot, { class: "m-pg-dot", tone: "primary", size: "xs", title: L().changed ?? t`Changed`, label: L().changed ?? t`changed` }) : null),
+        p.description && h("span", { id: descId, class: "m-pg-desc" }, p.description)),
+      h("div", { class: "m-pg-editor" }, control,
+        () => (errors()[p.key] ? h("span", { id: errId, class: "m-pg-error", role: "alert" }, errors()[p.key]) : null)),
       props.resetButtons === false ? null : h(IconButton, {
-        class: "hm-pg-reset", size: "xs", icon: resetIcon, tabindex: () => (changed() ? "0" : "-1"), "aria-hidden": () => (changed() ? null : "true"),
+        class: "m-pg-reset", size: "xs", icon: resetIcon, tabindex: () => (changed() ? "0" : "-1"), "aria-hidden": () => (changed() ? null : "true"),
         label: () => resetName(p), title: () => L().resetTitle ?? t`Reset to saved`, onClick: () => resetKeys([p.key], resetName(p)),
       }));
   };
@@ -208,28 +208,28 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     const items = g.items.map((p) => { const el = rowOf(p); return () => (matches().has(p.key) ? el : null); });
     const shown = computed((): boolean => g.items.some((p) => matches().has(p.key)));
     const changedIn = (): number => g.items.filter((p) => changes().includes(p.key)).length;
-    const head = [h(SectionLabel, { as: "span", size: "md", class: "hm-pg-group-name" }, g.name || (L().general ?? t`General`)),
-      props.changeMarks === false ? null : () => (changedIn() ? h(Badge, { class: "hm-pg-count", size: "xs", tone: "primary", variant: "solid", count: changedIn(), ariaLabel: L().changedCount?.(changedIn()) ?? t`${changedIn()} changed` }) : null)];
-    const content = h("div", { class: "hm-pg-rows" }, items);
+    const head = [h(SectionLabel, { as: "span", size: "md", class: "m-pg-group-name" }, g.name || (L().general ?? t`General`)),
+      props.changeMarks === false ? null : () => (changedIn() ? h(Badge, { class: "m-pg-count", size: "xs", tone: "primary", variant: "solid", count: changedIn(), ariaLabel: L().changedCount?.(changedIn()) ?? t`${changedIn()} changed` }) : null)];
+    const content = h("div", { class: "m-pg-rows" }, items);
     // the group box is built once (body runs again when the groups change): rows are never moved while they are used
-    const box = g.name || grouped().length > 1 ? h(Disclosure, { title: head, open: () => { query(); return true; }, class: "hm-pg-group", children: content }) : content;
+    const box = g.name || grouped().length > 1 ? h(Disclosure, { title: head, open: () => { query(); return true; }, class: "m-pg-group", children: content }) : content;
     return () => (shown() ? box : null);
   }));
 
   props.api?.({ changes: () => changes(), save, revert, markSaved, focus: (k) => (globalThis.document?.getElementById(`${base}-${k}`) as HTMLElement | null)?.focus() });
 
-  return h("section", { class: () => cx("hm-pg", props.layout === "stacked" && "hm-pg-stacked", val(props.class)), "aria-label": title },
-    h(PanelHeader, { as: "div", size: "sm", divider: true, class: "hm-pg-head",
-      actions: history && props.historyButtons !== false ? h(UndoRedo, { class: "hm-pg-history", history, size: "sm", shortcuts: false, labels: { undo: () => L().undo, redo: () => L().redo } }) : undefined,
-      children: props.search === false ? undefined : h(SearchBox, { class: "hm-pg-search", inputClass: "hm-pg-search-input", size: "sm", debounce: 0, value: query,
+  return h("section", { class: () => cx("m-pg", props.layout === "stacked" && "m-pg-stacked", val(props.class)), "aria-label": title },
+    h(PanelHeader, { as: "div", size: "sm", divider: true, class: "m-pg-head",
+      actions: history && props.historyButtons !== false ? h(UndoRedo, { class: "m-pg-history", history, size: "sm", shortcuts: false, labels: { undo: () => L().undo, redo: () => L().redo } }) : undefined,
+      children: props.search === false ? undefined : h(SearchBox, { class: "m-pg-search", inputClass: "m-pg-search-input", size: "sm", debounce: 0, value: query,
         label: () => L().search ?? t`Search properties`, placeholder: () => L().search ?? t`Search properties` }) }),
-    h("div", { class: "hm-pg-body" }, body,
-      () => (matches().size ? null : h("div", { class: "hm-pg-empty", role: "status" }, h(Empty, { size: "sm", title: () => (query() ? L().noMatch?.(query()) ?? t`No property matches “${query()}”` : L().empty ?? t`No properties`) })))),
+    h("div", { class: "m-pg-body" }, body,
+      () => (matches().size ? null : h("div", { class: "m-pg-empty", role: "status" }, h(Empty, { size: "sm", title: () => (query() ? L().noMatch?.(query()) ?? t`No property matches “${query()}”` : L().empty ?? t`No properties`) })))),
     // the footer: while something changed, or always when there is a Save (disabled with nothing to save)
-    () => (props.footer !== false && (changes().length || props.onSave) ? untrack(() => h(PanelHeader, { as: "footer", size: "sm", divider: true, class: () => cx("hm-pg-foot", changes().length > 0 && "is-dirty"), role: "status",
+    () => (props.footer !== false && (changes().length || props.onSave) ? untrack(() => h(PanelHeader, { as: "footer", size: "sm", divider: true, class: () => cx("m-pg-foot", changes().length > 0 && "is-dirty"), role: "status",
       title: () => (changes().length ? L().unsaved?.(changes().length) ?? t`${changes().length} unsaved changes` : L().noChanges ?? t`No changes`),
       actions: [
-        () => (changes().length ? h(Button, { variant: "ghost", size: "sm", class: "hm-pg-revert", onClick: revert }, L().revert ?? t`Revert`) : null),
-        props.onSave && h(Button, { variant: "primary", size: "sm", class: "hm-pg-save", disabled: () => !changes().length, onClick: () => void save() }, L().save ?? t`Save`)],
+        () => (changes().length ? h(Button, { variant: "ghost", size: "sm", class: "m-pg-revert", onClick: revert }, L().revert ?? t`Revert`) : null),
+        props.onSave && h(Button, { variant: "primary", size: "sm", class: "m-pg-save", disabled: () => !changes().length, onClick: () => void save() }, L().save ?? t`Save`)],
     })) : null));
 }

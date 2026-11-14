@@ -26,13 +26,13 @@ export interface CheckboxProps extends ControlProps<boolean>, ChoiceLook {
 export function Checkbox(props: CheckboxProps): unknown {
   const [get, set] = model(props, false);
   const input = h("input", {
-    ...ctl(props), type: "checkbox", class: "hm-check-input", checked: () => !!get(), indeterminate: () => !!props.indeterminate,
+    ...ctl(props), type: "checkbox", class: "m-check-input", checked: () => !!get(), indeterminate: () => !!props.indeterminate,
     // after a change the box shows the model again (a controlled value may not have followed the click)
     disabled: () => !!(props.disabled || props.readonly), onChange: (e: Event) => { const box = inputOf(e); set(box.checked); box.checked = !!get(); },
     onClick: props.onClick, tabindex: props.tabIndex ?? null,
   });
   // no label, no hint: the box alone (a selection cell)
   const bare = props.label == null && props.children == null && props.hint == null;
-  return h("span", { class: () => cx(lookClass(props, "checkbox"), "hm-choice-single", bare && "hm-choice-bare", typeof props.class === "function" ? (props.class as () => unknown)() : props.class), "data-hm-color": () => colorAttr(props.color) },
-    h("label", { class: "hm-check" }, input, choiceBox("checkbox", props), bare ? null : choiceText(() => props.label ?? props.children, props.hint, props.icon && props.variant === "card" ? props.icon : null, props.variant)));
+  return h("span", { class: () => cx(lookClass(props, "checkbox"), "m-choice-single", bare && "m-choice-bare", typeof props.class === "function" ? (props.class as () => unknown)() : props.class), "data-m-color": () => colorAttr(props.color) },
+    h("label", { class: "m-check" }, input, choiceBox("checkbox", props), bare ? null : choiceText(() => props.label ?? props.children, props.hint, props.icon && props.variant === "card" ? props.icon : null, props.variant)));
 }

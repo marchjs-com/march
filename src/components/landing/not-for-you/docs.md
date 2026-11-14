@@ -28,7 +28,7 @@ the list says how many still apply.
 | `meLabel` | node / `false` | "That's me" | label on every checkable card; `false`: none |
 | `hint`, `markedHint` | node / `false` | "Not you? Tap it!", "Not you" | small text under the label, before / after a tap; `false`: none |
 | `mark` | boolean / `(state, item, index) => node` | `true` | the round marks (cross / tick); `false`: none; a function draws your own for `state` `"not"`, `"marked"` (struck out) or `"for"` |
-| `class` | string | — | extra class on the root (`.hm-nfy`; parts: `.hm-nfy-title`, `.hm-nfy-toggle`, `.hm-nfy-mark`, `.hm-nfy-me`, `.hm-nfy-verdict`) |
+| `class` | string | — | extra class on the root (`.m-nfy`; parts: `.m-nfy-title`, `.m-nfy-toggle`, `.m-nfy-mark`, `.m-nfy-me`, `.m-nfy-verdict`) |
 
 `notForYouVerdict(n, total)` is the default verdict: a prompt, "none of these is you", or how many still apply.
 

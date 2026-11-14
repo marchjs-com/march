@@ -1,12 +1,12 @@
 /* Faq. Centered column or split (sticky heading at the start, questions at the end). */
-.hm-faq { max-width: 46rem; margin-inline: auto; min-width: 0; }
-.hm-faq-split { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(2rem, 6cqi, 5rem); max-width: none; align-items: start; }
-.hm-faq-aside { position: sticky; inset-block-start: calc(var(--hm-site-nav-top, 0px) + 6rem); }
-.hm-faq-contact { margin-block-start: var(--hm-space-2); }
-.hm-faq-list { display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; }
-.hm-faq-search { display: flex; flex-direction: column; gap: var(--hm-space-1); }
-.hm-faq-count { margin: 0; min-height: 1.2em; font-size: var(--hm-text-sm); color: var(--hm-muted); }
-.hm-faq-empty { text-align: center; color: var(--hm-muted); border: 1px dashed var(--hm-border); border-radius: var(--hm-radius-3); }
-.hm-faq .hm-acc-title { font-size: var(--hm-text-md); font-weight: var(--hm-weight-semibold); }
-@media (max-width: 820px) { .hm-faq-split { grid-template-columns: minmax(0, 1fr); } .hm-faq-aside { position: static; } }
-@container hm-site (max-width: 820px) { .hm-faq-split { grid-template-columns: minmax(0, 1fr); } .hm-faq-aside { position: static; } }
+.m-faq { max-width: 46rem; margin-inline: auto; min-width: 0; }
+.m-faq-split { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(2rem, 6cqi, 5rem); max-width: none; align-items: start; }
+.m-faq-aside { position: sticky; inset-block-start: calc(var(--m-site-nav-top, 0px) + 6rem); }
+.m-faq-contact { margin-block-start: var(--m-space-2); }
+.m-faq-list { display: flex; flex-direction: column; gap: var(--m-space-3); min-width: 0; }
+.m-faq-search { display: flex; flex-direction: column; gap: var(--m-space-1); }
+.m-faq-count { margin: 0; min-height: 1.2em; font-size: var(--m-text-sm); color: var(--m-muted); }
+.m-faq-empty { text-align: center; color: var(--m-muted); border: 1px dashed var(--m-border); border-radius: var(--m-radius-3); }
+.m-faq .m-acc-title { font-size: var(--m-text-md); font-weight: var(--m-weight-semibold); }
+@media (max-width: 820px) { .m-faq-split { grid-template-columns: minmax(0, 1fr); } .m-faq-aside { position: static; } }
+@container m-site (max-width: 820px) { .m-faq-split { grid-template-columns: minmax(0, 1fr); } .m-faq-aside { position: static; } }

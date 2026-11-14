@@ -19,15 +19,15 @@ test("Textarea: rows, value both ways, autosize sets a height", () => {
   assert.equal(ta.value, "one");
   type(ta, "one\ntwo");
   assert.equal(v(), "one\ntwo");
-  assert.ok(ta.className.includes("hm-textarea"));
+  assert.ok(ta.className.includes("m-textarea"));
 });
 
 test("Textarea: mono, tabIndent (Tab indents, Shift+Tab and Escape-then-Tab leave), onKeyDown", () => {
   const v = signal("ab"), keys = [];
   const { el } = mount(() => [h(Textarea, { "bind:value": v, mono: true, tabIndent: true, onKeyDown: (e) => keys.push(e.key) }), h(Textarea, { value: "x" }), h(Textarea, { value: "x", tabIndent: 4 })]);
   const [ta, plain, four] = el.querySelectorAll("textarea");
-  assert.ok(ta.className.includes("hm-mono"));
-  assert.equal(plain.className.includes("hm-mono"), false);
+  assert.ok(ta.className.includes("m-mono"));
+  assert.equal(plain.className.includes("m-mono"), false);
   ta.selectionStart = ta.selectionEnd = 1;
   const e = key(ta, "Tab");
   assert.equal(e.defaultPrevented, true);

@@ -41,12 +41,12 @@ export function Minimap(props: MinimapProps): Element {
     flow.viewport.set({ ...v, x: -(wx - vis.w / 2) * v.zoom, y: -(wy - vis.h / 2) * v.zoom });
   };
   const rect = (n: NodeState): Element => h("rect", {
-    class: () => `hm-flow-mm-node is-${flow.status().get(n.id) ?? "idle"}`, "data-hm-color": colorAttr(flow.typeOf(n.type)?.color), rx: "3",
+    class: () => `m-flow-mm-node is-${flow.status().get(n.id) ?? "idle"}`, "data-m-color": colorAttr(flow.typeOf(n.type)?.color), rx: "3",
     x: () => (n.x() - box().x0) * box().k, y: () => (n.y() - box().y0) * box().k,
     width: () => NODE_W * box().k, height: () => n.h() * box().k,
   });
   return h("svg", {
-    class: "hm-flow-minimap", width: String(MW), height: String(MH), viewBox: `0 0 ${MW} ${MH}`, role: "img", tabindex: "0",
+    class: "m-flow-minimap", width: String(MW), height: String(MH), viewBox: `0 0 ${MW} ${MH}`, role: "img", tabindex: "0",
     "aria-label": () => props.label?.() ?? t`Minimap: click to move the view`,
     onPointerdown: (e: PointerEvent) => {
       e.stopPropagation();
@@ -56,9 +56,9 @@ export function Minimap(props: MinimapProps): Element {
     },
     onWheel: (e: WheelEvent) => e.stopPropagation(),
   },
-    h("g", { class: "hm-flow-mm-world" }, h(For, { each: flow.nodes, key: "id", children: (n: () => NodeState) => rect(untrack(n)) })),
+    h("g", { class: "m-flow-mm-world" }, h(For, { each: flow.nodes, key: "id", children: (n: () => NodeState) => rect(untrack(n)) })),
     h("rect", {
-      class: "hm-flow-mm-view", rx: "4",
+      class: "m-flow-mm-view", rx: "4",
       x: () => (box().vis.x - box().x0) * box().k, y: () => (box().vis.y - box().y0) * box().k,
       width: () => box().vis.w * box().k, height: () => box().vis.h * box().k,
     }));

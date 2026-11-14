@@ -1,35 +1,35 @@
 /* March — ChatComposer. Mist field (radius 24), round action: mic in Heyecan, send in Aktivite. */
-.hm-compose { display: flex; flex-direction: column; gap: .375rem; padding: .375rem .375rem .5rem; background: var(--hm-surface); border-block-start: 1px solid var(--hm-border-subtle, var(--hm-border)); min-width: 0; }
-.hm-compose-row { display: flex; align-items: flex-end; gap: .25rem; min-width: 0; }
-.hm-compose-field { position: relative; display: flex; align-items: flex-end; flex: 1; min-width: 0; border-radius: 1.5rem; background: var(--hm-surface-2); border: 1.5px solid transparent;
-  transition: border-color var(--hm-dur) var(--hm-ease); }
-.hm-compose-field:focus-within { border-color: var(--hm-brand-blue, var(--hm-primary)); }
-.hm-compose-field .hm-field, .hm-compose-field > *:first-child { flex: 1; min-width: 0; }
-.hm-compose-input.hm-input, .hm-compose-input { min-height: 2.75rem; max-height: 8.5rem; padding: .6875rem 1rem; border: 0; border-radius: 1.5rem; background: none; box-shadow: none; resize: none;
-  font-size: var(--hm-text-md); line-height: 1.4; overflow-y: auto; }
-.hm-compose-input:focus { outline: none; box-shadow: none; }
+.m-compose { display: flex; flex-direction: column; gap: .375rem; padding: .375rem .375rem .5rem; background: var(--m-surface); border-block-start: 1px solid var(--m-border-subtle, var(--m-border)); min-width: 0; }
+.m-compose-row { display: flex; align-items: flex-end; gap: .25rem; min-width: 0; }
+.m-compose-field { position: relative; display: flex; align-items: flex-end; flex: 1; min-width: 0; border-radius: 1.5rem; background: var(--m-surface-2); border: 1.5px solid transparent;
+  transition: border-color var(--m-dur) var(--m-ease); }
+.m-compose-field:focus-within { border-color: var(--m-brand-blue, var(--m-primary)); }
+.m-compose-field .m-field, .m-compose-field > *:first-child { flex: 1; min-width: 0; }
+.m-compose-input.m-input, .m-compose-input { min-height: 2.75rem; max-height: 8.5rem; padding: .6875rem 1rem; border: 0; border-radius: 1.5rem; background: none; box-shadow: none; resize: none;
+  font-size: var(--m-text-md); line-height: 1.4; overflow-y: auto; }
+.m-compose-input:focus { outline: none; box-shadow: none; }
 /* icon buttons are round IconButtons; hover and the open emoji panel tint them in Aktivite */
-.hm-compose-icon.hm-icon-btn { color: var(--hm-text-2); }
-.hm-compose-icon.hm-icon-btn:hover, .hm-compose-icon.hm-icon-btn.is-pressed { background: none; color: var(--hm-brand-blue, var(--hm-primary)); }
-.hm-compose-icon:focus-visible, .hm-compose-act:focus-visible { outline: 2px solid var(--hm-brand-blue, var(--hm-primary)); outline-offset: 2px; }
-.hm-compose-attach.hm-btn, .hm-compose .hm-compose-attach { width: 2.75rem; height: 2.75rem; min-height: 2.75rem; padding: 0; border-radius: 50%; color: var(--hm-brand-blue, var(--hm-primary)); flex: none; }
-.hm-compose-attach .hm-svg { width: 1.625rem; height: 1.625rem; transition: transform var(--hm-dur-slow) var(--hm-ease-spring); }
-.hm-compose-attach[aria-expanded="true"] .hm-svg { transform: rotate(45deg); }
+.m-compose-icon.m-icon-btn { color: var(--m-text-2); }
+.m-compose-icon.m-icon-btn:hover, .m-compose-icon.m-icon-btn.is-pressed { background: none; color: var(--m-brand-blue, var(--m-primary)); }
+.m-compose-icon:focus-visible, .m-compose-act:focus-visible { outline: 2px solid var(--m-brand-blue, var(--m-primary)); outline-offset: 2px; }
+.m-compose-attach.m-btn, .m-compose .m-compose-attach { width: 2.75rem; height: 2.75rem; min-height: 2.75rem; padding: 0; border-radius: 50%; color: var(--m-brand-blue, var(--m-primary)); flex: none; }
+.m-compose-attach .m-svg { width: 1.625rem; height: 1.625rem; transition: transform var(--m-dur-slow) var(--m-ease-spring); }
+.m-compose-attach[aria-expanded="true"] .m-svg { transform: rotate(45deg); }
 /* the round action: a solid IconButton, Aktivite (send) or Heyecan (mic) unless a color is given */
-.hm-compose-act.hm-icon-btn { box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hm-accent, var(--hm-brand-blue, var(--hm-primary))) 60%, transparent); }
-.hm-compose-act.hm-icon-btn:not([data-hm-color]) { background: var(--hm-brand-blue, var(--hm-primary)); color: var(--hm-on-brand-blue, var(--hm-on-primary-fill)); }
-.hm-compose-act.hm-icon-btn.is-mic:not([data-hm-color]) { background: var(--hm-brand-orange, var(--hm-primary)); color: var(--hm-on-brand-orange, var(--hm-on-primary-fill)); box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hm-brand-orange, var(--hm-primary)) 60%, transparent); }
-.hm-compose-act .hm-icon, .hm-compose-icon .hm-icon { display: inline-grid; place-items: center; }
-.hm-compose-act.hm-icon-btn .hm-svg { width: 1.25rem; height: 1.25rem; }
-.hm-compose-act.is-send .hm-svg { margin-inline-start: -2px; }
-:dir(rtl) .hm-compose-act.is-send .hm-svg { transform: scaleX(-1); }
-.hm-compose-act:disabled { opacity: .5; cursor: default; }
+.m-compose-act.m-icon-btn { box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--m-accent, var(--m-brand-blue, var(--m-primary))) 60%, transparent); }
+.m-compose-act.m-icon-btn:not([data-m-color]) { background: var(--m-brand-blue, var(--m-primary)); color: var(--m-on-brand-blue, var(--m-on-primary-fill)); }
+.m-compose-act.m-icon-btn.is-mic:not([data-m-color]) { background: var(--m-brand-orange, var(--m-primary)); color: var(--m-on-brand-orange, var(--m-on-primary-fill)); box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--m-brand-orange, var(--m-primary)) 60%, transparent); }
+.m-compose-act .m-icon, .m-compose-icon .m-icon { display: inline-grid; place-items: center; }
+.m-compose-act.m-icon-btn .m-svg { width: 1.25rem; height: 1.25rem; }
+.m-compose-act.is-send .m-svg { margin-inline-start: -2px; }
+:dir(rtl) .m-compose-act.is-send .m-svg { transform: scaleX(-1); }
+.m-compose-act:disabled { opacity: .5; cursor: default; }
 /* the reply preview is a ReplyQuote; here only the room for its cancel button */
-.hm-reply-quote.hm-compose-reply { padding-inline: .75rem .25rem; border-radius: .75rem; }
-.hm-compose-emoji .hm-react-grid { border: 0; background: var(--hm-surface-2); }
-.hm-compose-rec { display: flex; align-items: center; gap: .625rem; flex: 1; min-width: 0; height: 2.75rem; padding: 0 1rem; border-radius: 1.5rem; background: var(--hm-surface-2); overflow: hidden; }
-.hm-compose-time { flex: none; font-variant-numeric: tabular-nums; font-weight: 800; font-size: var(--hm-text-sm); min-width: 2.75rem; }
-.hm-compose-wave { display: flex; align-items: center; gap: 3px; flex: 1; min-width: 0; height: 1.5rem; overflow: hidden; }
-.hm-compose-wave i { flex: none; width: 3px; height: 100%; border-radius: 2px; background: var(--hm-brand-orange, var(--hm-primary)); transform: scaleY(.3); }
-.hm-compose-cancel.hm-icon-btn, .hm-compose-cancel.hm-icon-btn:hover { color: var(--hm-danger); }
-.hm-compose-cancel.hm-icon-btn:hover { background: var(--hm-danger-soft); }
+.m-reply-quote.m-compose-reply { padding-inline: .75rem .25rem; border-radius: .75rem; }
+.m-compose-emoji .m-react-grid { border: 0; background: var(--m-surface-2); }
+.m-compose-rec { display: flex; align-items: center; gap: .625rem; flex: 1; min-width: 0; height: 2.75rem; padding: 0 1rem; border-radius: 1.5rem; background: var(--m-surface-2); overflow: hidden; }
+.m-compose-time { flex: none; font-variant-numeric: tabular-nums; font-weight: 800; font-size: var(--m-text-sm); min-width: 2.75rem; }
+.m-compose-wave { display: flex; align-items: center; gap: 3px; flex: 1; min-width: 0; height: 1.5rem; overflow: hidden; }
+.m-compose-wave i { flex: none; width: 3px; height: 100%; border-radius: 2px; background: var(--m-brand-orange, var(--m-primary)); transform: scaleY(.3); }
+.m-compose-cancel.m-icon-btn, .m-compose-cancel.m-icon-btn:hover { color: var(--m-danger); }
+.m-compose-cancel.m-icon-btn:hover { background: var(--m-danger-soft); }

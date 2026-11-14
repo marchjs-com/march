@@ -1,34 +1,34 @@
 /* March — Dialog, Drawer, confirm, prompt. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- dialogs and drawers */
-html.hm-scroll-lock { overflow: hidden; }
-.hm-overlay { position: fixed; inset: 0; z-index: var(--hm-z-dialog); display: flex; align-items: center; justify-content: center; padding: var(--hm-space-4);
-  background: var(--hm-overlay); backdrop-filter: blur(3px); animation: hm-fade-in var(--hm-dur-slow) var(--hm-ease); }
-.hm-dialog { display: flex; flex-direction: column; width: 100%; max-height: calc(100vh - 2rem); background: var(--hm-surface-raised); color: var(--hm-text);
-  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-4); box-shadow: var(--hm-shadow-4); outline: none; animation: hm-scale-in var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-dialog-sm { max-width: 26rem; } .hm-dialog-md { max-width: 36rem; } .hm-dialog-lg { max-width: 56rem; }
-.hm-dialog-full { max-width: none; height: 100%; max-height: none; }
+html.m-scroll-lock { overflow: hidden; }
+.m-overlay { position: fixed; inset: 0; z-index: var(--m-z-dialog); display: flex; align-items: center; justify-content: center; padding: var(--m-space-4);
+  background: var(--m-overlay); backdrop-filter: blur(3px); animation: m-fade-in var(--m-dur-slow) var(--m-ease); }
+.m-dialog { display: flex; flex-direction: column; width: 100%; max-height: calc(100vh - 2rem); background: var(--m-surface-raised); color: var(--m-text);
+  border: 1px solid var(--m-border); border-radius: var(--m-radius-4); box-shadow: var(--m-shadow-4); outline: none; animation: m-scale-in var(--m-dur-slow) var(--m-ease-out); }
+.m-dialog-sm { max-width: 26rem; } .m-dialog-md { max-width: 36rem; } .m-dialog-lg { max-width: 56rem; }
+.m-dialog-full { max-width: none; height: 100%; max-height: none; }
 /* head and foot are PanelHeader bars; only the dialog's own spacing is set here */
-.hm-dialog-head.hm-panel-header { flex: none; gap: var(--hm-space-2); padding-block: var(--hm-space-4) 0; padding-inline: var(--hm-space-5) var(--hm-space-4); }
-.hm-dialog-head .hm-panel-header-title { white-space: normal; line-height: inherit; }
-.hm-dialog-x.hm-icon-btn { margin-inline-end: calc(-1 * var(--hm-space-1)); width: 2rem; height: 2rem; }
-.hm-dialog-body { flex: 1 1 auto; min-height: 0; padding: var(--hm-space-4) var(--hm-space-5); overflow: auto; overscroll-behavior: contain; }
-.hm-dialog-msg { margin: 0 0 var(--hm-space-3); color: var(--hm-text-2); white-space: pre-line; }
-.hm-dialog-foot.hm-panel-header { flex: none; min-block-size: 0; margin-block-start: auto; padding: var(--hm-space-3) var(--hm-space-5); border-top: 1px solid var(--hm-border-subtle);
-  background: var(--hm-bg-subtle); border-radius: 0 0 var(--hm-radius-4) var(--hm-radius-4); }
-.hm-dialog-foot > .hm-panel-header-body { justify-content: flex-end; flex-wrap: wrap; }
+.m-dialog-head.m-panel-header { flex: none; gap: var(--m-space-2); padding-block: var(--m-space-4) 0; padding-inline: var(--m-space-5) var(--m-space-4); }
+.m-dialog-head .m-panel-header-title { white-space: normal; line-height: inherit; }
+.m-dialog-x.m-icon-btn { margin-inline-end: calc(-1 * var(--m-space-1)); width: 2rem; height: 2rem; }
+.m-dialog-body { flex: 1 1 auto; min-height: 0; padding: var(--m-space-4) var(--m-space-5); overflow: auto; overscroll-behavior: contain; }
+.m-dialog-msg { margin: 0 0 var(--m-space-3); color: var(--m-text-2); white-space: pre-line; }
+.m-dialog-foot.m-panel-header { flex: none; min-block-size: 0; margin-block-start: auto; padding: var(--m-space-3) var(--m-space-5); border-top: 1px solid var(--m-border-subtle);
+  background: var(--m-bg-subtle); border-radius: 0 0 var(--m-radius-4) var(--m-radius-4); }
+.m-dialog-foot > .m-panel-header-body { justify-content: flex-end; flex-wrap: wrap; }
 /* the panel of a <Drawer> (drawer.css places and moves it) */
-.hm-drawer { display: flex; flex-direction: column; background: var(--hm-surface-raised); color: var(--hm-text); box-shadow: var(--hm-shadow-4); outline: none; border-inline-start: 1px solid var(--hm-border); }
-.hm-drawer .hm-dialog-foot.hm-panel-header { border-radius: 0; }
+.m-drawer { display: flex; flex-direction: column; background: var(--m-surface-raised); color: var(--m-text); box-shadow: var(--m-shadow-4); outline: none; border-inline-start: 1px solid var(--m-border); }
+.m-drawer .m-dialog-foot.m-panel-header { border-radius: 0; }
 @media (max-width: 640px) {
-  .hm-overlay:not(.hm-overlay-drawer) { align-items: flex-end; padding: 0; }
-  .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog:not(.hm-dialog-full) { max-width: none; border-radius: var(--hm-radius-4) var(--hm-radius-4) 0 0; max-height: 92vh; animation-name: hm-drawer-in-bottom; }
-  .hm-dialog-foot.hm-panel-header { border-radius: 0; }
+  .m-overlay:not(.m-overlay-drawer) { align-items: flex-end; padding: 0; }
+  .m-overlay:not(.m-overlay-drawer) > .m-dialog:not(.m-dialog-full) { max-width: none; border-radius: var(--m-radius-4) var(--m-radius-4) 0 0; max-height: 92vh; animation-name: m-drawer-in-bottom; }
+  .m-dialog-foot.m-panel-header { border-radius: 0; }
 }
-.hm-dialog-body::-webkit-scrollbar-track { margin-block: var(--hm-radius-2); }
+.m-dialog-body::-webkit-scrollbar-track { margin-block: var(--m-radius-2); }
 /* a non-modal panel: no scrim, the page behind stays usable */
-.hm-overlay.is-modeless { background: none; backdrop-filter: none; pointer-events: none; animation: none; }
-.hm-overlay.is-modeless > * { pointer-events: auto; }
+.m-overlay.is-modeless { background: none; backdrop-filter: none; pointer-events: none; animation: none; }
+.m-overlay.is-modeless > * { pointer-events: auto; }
 /* entrance choices (motion); after the phone rule and as specific, so they hold there too */
-.hm-dialog.hm-motion-fade, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-fade:not(.hm-dialog-full) { animation-name: hm-fade-in; }
-.hm-dialog.hm-motion-rise, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-rise:not(.hm-dialog-full) { animation-name: hm-rise-in; }
-.hm-dialog.hm-motion-none, .hm-overlay:not(.hm-overlay-drawer) > .hm-dialog.hm-motion-none:not(.hm-dialog-full), .hm-overlay.hm-motion-none { animation: none; }
+.m-dialog.m-motion-fade, .m-overlay:not(.m-overlay-drawer) > .m-dialog.m-motion-fade:not(.m-dialog-full) { animation-name: m-fade-in; }
+.m-dialog.m-motion-rise, .m-overlay:not(.m-overlay-drawer) > .m-dialog.m-motion-rise:not(.m-dialog-full) { animation-name: m-rise-in; }
+.m-dialog.m-motion-none, .m-overlay:not(.m-overlay-drawer) > .m-dialog.m-motion-none:not(.m-dialog-full), .m-overlay.m-motion-none { animation: none; }

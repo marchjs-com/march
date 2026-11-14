@@ -47,7 +47,7 @@ function entries(extra: MaybeFn<readonly Command[] | null | undefined>): Palette
 
 /** The palette dialog (see CommandPalette in palette.ts for the props). */
 export function PaletteView(props: CommandPaletteProps): unknown {
-  const base = uid("hm-pal");
+  const base = uid("m-pal");
   const L = (): CommandPaletteLabels => val(props.labels) ?? {};
   const hint = props.hint;
   const q = signal("");
@@ -119,15 +119,15 @@ export function PaletteView(props: CommandPaletteProps): unknown {
     const heading = r.kind === "item" && r.item.group !== prev?.item?.group ? r.item.group : r.kind === "ai" && prev?.kind !== "ai" ? L().suggested ?? t`Suggested` : null;
     const ask = r.kind === "ask";
     return [
-      heading && h(SectionLabel, { as: "li", role: "presentation", class: "hm-pal-heading" }, heading),
+      heading && h(SectionLabel, { as: "li", role: "presentation", class: "m-pal-heading" }, heading),
       h(ListRow, {
-        as: "li", id, role: "option", "aria-selected": () => String(on()), class: `hm-pal-row hm-pal-${r.kind}`, active: on, indicator: true,
+        as: "li", id, role: "option", "aria-selected": () => String(on()), class: `m-pal-row m-pal-${r.kind}`, active: on, indicator: true,
         "data-id": r.item?.id ?? null, onClick: () => activate(r), onMousemove: () => { if (!on()) sel.set(i); },
         lead: ask ? (props.askIcon === false ? undefined : props.askIcon ?? sparkles) : r.item.icon,
         title: ask ? () => (r.status === "loading" ? L().asking ?? t`Asking…` : r.status === "error" ? L().askFailed ?? t`Ask failed — press Enter to retry` : L().ask?.(q()) ?? t`Ask: “${q()}”`) : r.item.title,
         trail: ask || !(r.reason || r.item.sub || r.item.shortcut) ? undefined : [
-          r.reason && h(OverflowText, { class: "hm-pal-reason" }, r.reason),
-          r.item.sub && h("span", { class: "hm-pal-sub" }, r.item.sub),
+          r.reason && h(OverflowText, { class: "m-pal-reason" }, r.reason),
+          r.item.sub && h("span", { class: "m-pal-sub" }, r.item.sub),
           r.item.shortcut && h(Kbd, { keys: r.item.shortcut })],
       }),
     ];
@@ -135,18 +135,18 @@ export function PaletteView(props: CommandPaletteProps): unknown {
 
   const ownEmpty = props.empty;
   return h(Dialog, {
-    open: () => isOpen(), onClose: () => isOpen.set(false), label: L().dialog ?? t`Command palette`, size: "md", class: cx("hm-palette", val(props.class)),
+    open: () => isOpen(), onClose: () => isOpen.set(false), label: L().dialog ?? t`Command palette`, size: "md", class: cx("m-palette", val(props.class)),
     children: [
       h(SearchBox, {
-        class: "hm-pal-search", inputClass: "hm-pal-input", variant: "plain", icon: false, clear: false, debounce: 0, value: q, inputRef: (x: HTMLInputElement) => x.setAttribute("data-autofocus", ""),
+        class: "m-pal-search", inputClass: "m-pal-input", variant: "plain", icon: false, clear: false, debounce: 0, value: q, inputRef: (x: HTMLInputElement) => x.setAttribute("data-autofocus", ""),
         controls: `${base}-list`, activeDescendant: () => (rows().length ? `${base}-o-${sel()}` : null), onKeyDown: onInputKey,
         placeholder: () => val(props.placeholder) ?? t`Search pages and commands…`, label: () => L().search ?? t`Search pages and commands`,
       }),
-      h("ul", { id: `${base}-list`, role: "listbox", class: "hm-pal-list", "aria-label": () => L().results ?? t`Results` },
+      h("ul", { id: `${base}-list`, role: "listbox", class: "m-pal-list", "aria-label": () => L().results ?? t`Results` },
         () => { const list = rows(); return untrack(() => list.length ? list.map((r, i) => rowEl(r, i, list[i - 1]))
-          : h("li", { class: "hm-pal-empty", role: "presentation" }, h(Empty, { size: "sm", title: ownEmpty != null ? false : L().empty ?? t`No results` }, ownEmpty))); }),
-      hint === false ? null : hint != null && hint !== true ? h("div", { class: "hm-pal-hint" }, hint)
-        : h("div", { class: "hm-pal-hint", "aria-hidden": "true" }, () => L().hint ?? t`↑↓ to move · Enter to open · Esc to close`),
+          : h("li", { class: "m-pal-empty", role: "presentation" }, h(Empty, { size: "sm", title: ownEmpty != null ? false : L().empty ?? t`No results` }, ownEmpty))); }),
+      hint === false ? null : hint != null && hint !== true ? h("div", { class: "m-pal-hint" }, hint)
+        : h("div", { class: "m-pal-hint", "aria-hidden": "true" }, () => L().hint ?? t`↑↓ to move · Enter to open · Esc to close`),
     ],
   });
 }

@@ -34,7 +34,7 @@ function inline(src: string, opts: MarkdownOptions): (Node | string)[] {
       out.push(opts.images !== false && /^https:\/\//i.test(m[2]!) ? h("img", { src: m[2], alt: m[1], loading: "lazy" }) : m[1]!);
       i += m[0].length; continue;
     }
-    if ((m = /^\[(@[^\]]+)\]\(mention:([^)\s]+)\)/.exec(rest))) { flush(); out.push(h("span", { class: "hm-mention", "data-mention": m[2] }, m[1])); i += m[0].length; continue; }
+    if ((m = /^\[(@[^\]]+)\]\(mention:([^)\s]+)\)/.exec(rest))) { flush(); out.push(h("span", { class: "m-mention", "data-mention": m[2] }, m[1])); i += m[0].length; continue; }
     if ((m = /^\[([^\]]+)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/.exec(rest))) {
       flush();
       const kids = inline(m[1]!, opts);
@@ -91,7 +91,7 @@ export function markdownNodes(source: unknown, opts: MarkdownOptions = {}): Elem
       const start = ordered ? parseInt(m[1]!, 10) : null;
       out.push(h(ordered ? "ol" : "ul", { start: start && start !== 1 ? start : null }, items.map((it) => {
         const task = /^\[([ xX])\]\s+(.*)$/.exec(it);
-        return task ? h("li", { class: "hm-task" }, h("input", { type: "checkbox", disabled: true, checked: task[1] !== " " }), " ", inline(task[2]!, opts)) : h("li", null, inline(it, opts));
+        return task ? h("li", { class: "m-task" }, h("input", { type: "checkbox", disabled: true, checked: task[1] !== " " }), " ", inline(task[2]!, opts)) : h("li", null, inline(it, opts));
       })));
       continue;
     }

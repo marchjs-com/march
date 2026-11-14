@@ -40,8 +40,8 @@ export default function ActivityBarDemo(props: { values: { orientation: string; 
       ]} />
     }}
     <div id="sc-ab-view" class="sc-ab-view" role="tabpanel">
-      {() => (view() ? <strong>{TITLES[view()!]}</strong> : <span class="hm-muted">Yan görünüm kapalı: bir simgeye bas.</span>)}
-      <small class="hm-muted">{() => MOTIONS[props.values.indicator]}: başka bir simgeye basınca görünür.</small>
+      {() => (view() ? <strong>{TITLES[view()!]}</strong> : <span class="m-muted">Yan görünüm kapalı: bir simgeye bas.</span>)}
+      <small class="m-muted">{() => MOTIONS[props.values.indicator]}: başka bir simgeye basınca görünür.</small>
     </div>
   </div>
 }

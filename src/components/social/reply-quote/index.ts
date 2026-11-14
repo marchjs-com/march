@@ -46,22 +46,22 @@ export interface ReplyQuoteProps {
 /** `<ReplyQuote name="Deniz" text="See you at 8?" />`, `<ReplyQuote name="Replying to Deniz" text={m.text} lines={1} onClose={cancel} />` */
 export function ReplyQuote(props: ReplyQuoteProps): Element {
   const body = [
-    props.name != null ? h("b", { class: "hm-reply-quote-name" }, () => val(props.name)) : null,
-    props.text != null ? h(ClampText, { class: "hm-reply-quote-text", as: "span", expandable: false, lines: () => val(props.lines) ?? 2, text: () => val(props.text) }) : null,
+    props.name != null ? h("b", { class: "m-reply-quote-name" }, () => val(props.name)) : null,
+    props.text != null ? h(ClampText, { class: "m-reply-quote-text", as: "span", expandable: false, lines: () => val(props.lines) ?? 2, text: () => val(props.text) }) : null,
   ];
   const showClose = props.close !== false && props.onClose != null;
   const main = props.onClick
-    ? h("button", { type: "button", class: "hm-reply-quote-main", onClick: props.onClick }, body)
-    : h("span", { class: "hm-reply-quote-main" }, body);
+    ? h("button", { type: "button", class: "m-reply-quote-main", onClick: props.onClick }, body)
+    : h("span", { class: "m-reply-quote-main" }, body);
   return h("div", {
     ...rest(props, ["name", "text", "lines", "variant", "color", "bar", "onClose", "close", "closeLabel", "trail", "onClick"]),
-    class: () => cx("hm-reply-quote", val(props.variant) === "inverse" && "hm-reply-quote-inverse", val(props.bar) === false && "is-barless", val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)) ?? "brand-orange",
+    class: () => cx("m-reply-quote", val(props.variant) === "inverse" && "m-reply-quote-inverse", val(props.bar) === false && "is-barless", val(props.class)),
+    "data-m-color": () => colorAttr(val(props.color)) ?? "brand-orange",
   },
   main,
   props.trail ?? null,
   showClose ? h(IconButton, {
-    class: "hm-reply-quote-close", size: "sm", shape: "round", title: false, icon: ownIcon(props.close === true ? undefined : props.close, xIcon),
+    class: "m-reply-quote-close", size: "sm", shape: "round", title: false, icon: ownIcon(props.close === true ? undefined : props.close, xIcon),
     label: () => val(props.closeLabel) ?? t`Cancel reply`, onClick: () => props.onClose?.(),
   }) : null);
 }

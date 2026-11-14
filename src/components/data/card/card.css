@@ -1,13 +1,13 @@
 /* March — Card. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-card { position: relative; display: flex; flex-direction: column; background: var(--hm-surface); border: var(--hm-border-w, 1px) solid var(--hm-border); border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-1); min-width: 0; }
+.m-card { position: relative; display: flex; flex-direction: column; background: var(--m-surface); border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-3); box-shadow: var(--m-shadow-1); min-width: 0; }
 /* the head is a PanelHeader (lg); the card keeps its measure: it wraps, long titles break, the body follows closely */
-.hm-card-head.hm-panel-header { flex-wrap: wrap; min-block-size: 0; padding: var(--hm-space-4) var(--hm-space-5) 0; }
-.hm-card-head .hm-card-titles { flex: 1; min-inline-size: min(12rem, 100%); }
-.hm-card-head :is(.hm-card-title, .hm-card-sub) { white-space: normal; line-height: inherit; }
-.hm-card-head .hm-card-sub { margin-block-start: .1875rem; }
-.hm-card-head .hm-card-actions { flex-wrap: wrap; flex-shrink: 1; gap: var(--hm-space-2); }
-.hm-card-body { flex: 1 1 auto; min-width: 0; padding: var(--hm-space-4) var(--hm-space-5) var(--hm-space-5); }
-.hm-card-flush .hm-card-body { padding: 0; }
-.hm-card-plain { background: none; border: 0; border-radius: 0; box-shadow: none; }
-.hm-card-flush .hm-card-head.hm-panel-header { padding-block-end: var(--hm-space-4); }
-.hm-card-foot { padding: var(--hm-space-3) var(--hm-space-5); border-top: 1px solid var(--hm-border-subtle); background: var(--hm-bg-subtle); border-radius: 0 0 var(--hm-radius-3) var(--hm-radius-3); }
+.m-card-head.m-panel-header { flex-wrap: wrap; min-block-size: 0; padding: var(--m-space-4) var(--m-space-5) 0; }
+.m-card-head .m-card-titles { flex: 1; min-inline-size: min(12rem, 100%); }
+.m-card-head :is(.m-card-title, .m-card-sub) { white-space: normal; line-height: inherit; }
+.m-card-head .m-card-sub { margin-block-start: .1875rem; }
+.m-card-head .m-card-actions { flex-wrap: wrap; flex-shrink: 1; gap: var(--m-space-2); }
+.m-card-body { flex: 1 1 auto; min-width: 0; padding: var(--m-space-4) var(--m-space-5) var(--m-space-5); }
+.m-card-flush .m-card-body { padding: 0; }
+.m-card-plain { background: none; border: 0; border-radius: 0; box-shadow: none; }
+.m-card-flush .m-card-head.m-panel-header { padding-block-end: var(--m-space-4); }
+.m-card-foot { padding: var(--m-space-3) var(--m-space-5); border-top: 1px solid var(--m-border-subtle); background: var(--m-bg-subtle); border-radius: 0 0 var(--m-radius-3) var(--m-radius-3); }

@@ -43,23 +43,23 @@ export function Kanban<T>(props: KanbanProps<T>): Element {
   const cards = new WeakMap<Element, { item: T; from: string }>();
   let card: HTMLElement | null = null, ghost: DragGhost | null = null;
   const colAt = (x: number, y: number): string | null => {
-    const col = root.ownerDocument.elementFromPoint?.(x, y)?.closest<HTMLElement>(".hm-kanban-col");
+    const col = root.ownerDocument.elementFromPoint?.(x, y)?.closest<HTMLElement>(".m-kanban-col");
     return col && root.contains(col) ? col.getAttribute("data-col") : null;
   };
-  const root = h("div", { class: () => cx("hm-kanban", props.animate === false && "is-still", val(props.class)) }, () => {
+  const root = h("div", { class: () => cx("m-kanban", props.animate === false && "is-still", val(props.class)) }, () => {
     const cols = val(props.columns);
     return untrack(() => cols.map((col, ci) => h("section", {
-      class: () => cx("hm-kanban-col", over() === col.id && "is-over"), "data-col": col.id, "aria-label": typeof col.title === "string" ? col.title : null,
+      class: () => cx("m-kanban-col", over() === col.id && "is-over"), "data-col": col.id, "aria-label": typeof col.title === "string" ? col.title : null,
     },
     // column head: one PanelHeader (dot · title · count)
     h(PanelHeader, {
-      class: "hm-kanban-head", size: "sm", title: col.title, titleAs: "span", partClass: { title: "hm-kanban-title" },
-      lead: props.dot === false ? undefined : typeof props.dot === "function" ? h("span", { class: "hm-kanban-dot-own", "aria-hidden": "true" }, props.dot(col))
-        : h(StatusDot, { class: cx("hm-kanban-dot", col.tone && `hm-kanban-dot-${col.tone}`), tone: (col.tone as StatusDotTone | undefined) ?? "neutral", color: col.color }),
-      meta: props.count === false ? undefined : h(Badge, { class: cx("hm-kanban-count", typeof props.count === "function" && "is-own") }, typeof props.count === "function" ? props.count(col) : String(col.items.length)),
+      class: "m-kanban-head", size: "sm", title: col.title, titleAs: "span", partClass: { title: "m-kanban-title" },
+      lead: props.dot === false ? undefined : typeof props.dot === "function" ? h("span", { class: "m-kanban-dot-own", "aria-hidden": "true" }, props.dot(col))
+        : h(StatusDot, { class: cx("m-kanban-dot", col.tone && `m-kanban-dot-${col.tone}`), tone: (col.tone as StatusDotTone | undefined) ?? "neutral", color: col.color }),
+      meta: props.count === false ? undefined : h(Badge, { class: cx("m-kanban-count", typeof props.count === "function" && "is-own") }, typeof props.count === "function" ? props.count(col) : String(col.items.length)),
     }),
-    h("div", { class: "hm-kanban-list" }, col.items.map((it) => h("article", {
-      class: "hm-kanban-card", tabindex: "0", "data-key": props.itemKey(it), ref: (el: Element) => { cards.set(el, { item: it, from: col.id }); },
+    h("div", { class: "m-kanban-list" }, col.items.map((it) => h("article", {
+      class: "m-kanban-card", tabindex: "0", "data-key": props.itemKey(it), ref: (el: Element) => { cards.set(el, { item: it, from: col.id }); },
       onKeydown: (e: KeyboardEvent) => {
         if (!e.altKey || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return;
         const to = cols[ci + (e.key === "ArrowRight" ? 1 : -1)];
@@ -69,12 +69,12 @@ export function Kanban<T>(props: KanbanProps<T>): Element {
   }) as HTMLElement;
   // one drag session per press on a card: a copy of the card follows the pointer, the column under it is marked
   owned(draggable(root, {
-    handle: ".hm-kanban-card", hold: 250, scroll: root,
-    onPress: (e) => { card = (e.target as Element).closest<HTMLElement>(".hm-kanban-card"); },
+    handle: ".m-kanban-card", hold: 250, scroll: root,
+    onPress: (e) => { card = (e.target as Element).closest<HTMLElement>(".m-kanban-card"); },
     onStart: (p) => {
       if (!card) return;
       const box = card.getBoundingClientRect(), copy = card.cloneNode(true) as HTMLElement;
-      copy.classList.add("hm-kanban-ghost");
+      copy.classList.add("m-kanban-ghost");
       copy.removeAttribute("tabindex");
       setStyle(copy, { width: `${box.width}px` });
       ghost = dragGhost(copy, { offset: { x: box.left - p.clientX, y: box.top - p.clientY }, motion: props.animate });

@@ -50,8 +50,11 @@ export async function checkComponent(root, folder, { runTests = true } = {}) {
   // CSS: prefix, theme tokens, RTL, motion core
   if (css) {
     const classes = [...css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/\.(-?[_a-zA-Z][\w-]*)/g)].map((m) => m[1]).filter((c) => !/^\d/.test(c));
-    const foreign = [...new Set(classes.filter((c) => !c.startsWith("hm-") && !c.startsWith("is-")))];
-    add("CSS: classes start with hm- (state: is-)", foreign.length === 0, foreign.join(", "));
+    const foreign = [...new Set(classes.filter((c) => !c.startsWith("m-") && !c.startsWith("is-")))];
+    add("CSS: classes start with m- (state: is-)", foreign.length === 0, foreign.join(", "));
+    // m- is short: never a name other libraries use for margin utilities (m-0 … m-5, m-auto, m-px)
+    const margin = [...new Set(classes.filter((c) => /^m-(\d[\d.]*|auto|px)$/.test(c)))];
+    add("CSS: no margin-utility names (m-0, m-auto)", margin.length === 0, margin.join(", "));
     const noComments = css.replace(/\/\*[\s\S]*?\*\//g, "");
     add("CSS: colours from theme tokens (no hex / rgb literals)", !/#[0-9a-fA-F]{3,8}\b|\brgba?\(/.test(noComments));
     add("CSS: logical properties (RTL)", !PHYSICAL.test(noComments), noComments.match(PHYSICAL)?.[1]);

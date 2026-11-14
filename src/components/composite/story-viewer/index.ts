@@ -64,7 +64,7 @@ export interface StoryViewerProps {
     replyPlaceholder?: (group: StoryGroup) => string;
     status?: (group: StoryGroup, index: number, total: number) => string;
   } | undefined;
-  /** Class on the dialog (`hm-story-dlg`). */
+  /** Class on the dialog (`m-story-dlg`). */
   class?: ClassProp;
 }
 
@@ -72,7 +72,7 @@ const CLOSE_AT = 120, HOLD = 180;
 
 /** `<StoryViewer open={$open} onClose={() => $open = false} groups={stories} start={tappedId} onSeen={markSeen} onReply={send} />` */
 export function StoryViewer(props: StoryViewerProps): () => unknown {
-  return h(Dialog, { open: props.open, onClose: props.onClose, size: "full", label: props.labels?.dialog ?? t`Stories`, class: cx("hm-story-dlg", val(props.class)), children: () => body(props) }) as () => unknown;
+  return h(Dialog, { open: props.open, onClose: props.onClose, size: "full", label: props.labels?.dialog ?? t`Stories`, class: cx("m-story-dlg", val(props.class)), children: () => body(props) }) as () => unknown;
 }
 
 function body(props: StoryViewerProps): Element {
@@ -139,7 +139,7 @@ function body(props: StoryViewerProps): Element {
         if (p.axis === "y") {
           const d = Math.max(0, p.dy);
           setStyle(stage, { transform: `translateY(${d}px) scale(${1 - d / 1600})` });
-          setStyle(root, { "--hm-story-dim": String(Math.max(0.3, 1 - d / 500)) });
+          setStyle(root, { "--m-story-dim": String(Math.max(0.3, 1 - d / 500)) });
         } else setStyle(stage, { transform: `translateX(${p.dx * 0.35}px)` });
       },
       onEnd: (p) => {
@@ -147,7 +147,7 @@ function body(props: StoryViewerProps): Element {
           const dy = Math.max(0, p.dy);
           if (dy > CLOSE_AT || p.vy > 0.7) { void close(dy); return; }
           animate(stage, [{ transform: `translateY(${dy}px) scale(${1 - dy / 1600})` }, { transform: "translateY(0) scale(1)" }], { duration: 260, easing: "easeOutBack" });
-          setStyle(stage, { transform: null }); setStyle(root, { "--hm-story-dim": null }); hold.set(false); return;
+          setStyle(stage, { transform: null }); setStyle(root, { "--m-story-dim": null }); hold.set(false); return;
         }
         setStyle(stage, { transform: null }); hold.set(false);
         if (Math.abs(p.dx) > 60 || Math.abs(p.vx) > 0.6) nextGroup((p.dx < 0) !== rtl() ? 1 : -1);
@@ -174,38 +174,38 @@ function body(props: StoryViewerProps): Element {
     props.onReply(group(), item(), text);
     draft.set(""); input.blur();
     if (props.sentNote === false) return;
-    const sent = h("span", { class: "hm-story-sent", role: "status" }, L().sent ?? t`Sent`) as HTMLElement;
+    const sent = h("span", { class: "m-story-sent", role: "status" }, L().sent ?? t`Sent`) as HTMLElement;
     root.append(sent);
     void animate(sent, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)", offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: 1400 }).finished.then(() => sent.remove());
   };
 
-  return h("div", { class: () => cx("hm-story", paused() && "is-paused"), ref: (x: HTMLElement) => { root = x; }, onKeydown: key },
-    h("div", { class: "hm-story-stage", ref: (x: HTMLElement) => { stage = x; gesture(x); }, onContextmenu: (e: Event) => e.preventDefault() },
-      () => { const it = item(); return it ? h(Picture, { class: "hm-story-media", src: it.src, alt: it.alt ?? "", fit: "cover", loading: "eager", draggable: "false" }) : null; },
-      h("div", { class: "hm-story-scrim", "aria-hidden": "true" }),
-      h("div", { class: "hm-story-top" },
+  return h("div", { class: () => cx("m-story", paused() && "is-paused"), ref: (x: HTMLElement) => { root = x; }, onKeydown: key },
+    h("div", { class: "m-story-stage", ref: (x: HTMLElement) => { stage = x; gesture(x); }, onContextmenu: (e: Event) => e.preventDefault() },
+      () => { const it = item(); return it ? h(Picture, { class: "m-story-media", src: it.src, alt: it.alt ?? "", fit: "cover", loading: "eager", draggable: "false" }) : null; },
+      h("div", { class: "m-story-scrim", "aria-hidden": "true" }),
+      h("div", { class: "m-story-top" },
         props.progress === false ? null : h(StoryProgress, { count: () => group()?.items.length ?? 1, index: ii, run: () => `${gi()}:${item()?.id}`, paused, duration: () => item()?.duration ?? val(props.duration) ?? 6000, onDone: next }),
         // who: a ListRow (avatar · name and time · the pause and close buttons)
         h(ListRow, {
-          class: "hm-story-head", overflow: "ellipsis",
+          class: "m-story-head", overflow: "ellipsis",
           lead: props.avatar === false ? null : () => h(Avatar, { name: group()?.name, src: group()?.avatar, size: "sm" }),
-          title: h("span", { class: "hm-story-who" },
+          title: h("span", { class: "m-story-who" },
             h("b", null, () => group()?.name ?? ""),
-            props.time === false ? null : h("span", { class: "hm-story-time" }, () => (item()?.time ? applyPipe("relative", item()!.time) : ""))),
+            props.time === false ? null : h("span", { class: "m-story-time" }, () => (item()?.time ? applyPipe("relative", item()!.time) : ""))),
           actions: props.pauseButton === false && props.closeButton === false ? null : [
-            props.pauseButton === false ? null : h(IconButton, { class: "hm-story-btn hm-story-pause", inverse: true, shape: "round", title: false, pressed: manual, label: () => (manual() ? L().play ?? t`Play` : L().pause ?? t`Pause`), onClick: () => manual.set(!manual()),
-              icon: h("span", { class: () => cx("hm-story-pp", manual() && "is-play"), "aria-hidden": "true" }, h("i"), h("i")) }),
-            props.closeButton === false ? null : h(IconButton, { class: "hm-story-btn hm-story-close", inverse: true, shape: "round", title: false, icon: xIcon, label: () => L().close ?? t`Close`, onClick: () => { void close(); } }),
+            props.pauseButton === false ? null : h(IconButton, { class: "m-story-btn m-story-pause", inverse: true, shape: "round", title: false, pressed: manual, label: () => (manual() ? L().play ?? t`Play` : L().pause ?? t`Pause`), onClick: () => manual.set(!manual()),
+              icon: h("span", { class: () => cx("m-story-pp", manual() && "is-play"), "aria-hidden": "true" }, h("i"), h("i")) }),
+            props.closeButton === false ? null : h(IconButton, { class: "m-story-btn m-story-close", inverse: true, shape: "round", title: false, icon: xIcon, label: () => L().close ?? t`Close`, onClick: () => { void close(); } }),
           ],
         })),
-      () => { const c = item()?.caption; return c ? h("p", { class: "hm-story-caption" }, c) : null; },
-      props.arrows === false ? null : h(IconButton, { class: "hm-story-nav hm-story-prev", inverse: true, variant: "raised", shape: "round", title: false, icon: chevronLeft, label: () => L().previous ?? t`Previous story`, onClick: prev }),
-      props.arrows === false ? null : h(IconButton, { class: "hm-story-nav hm-story-next", inverse: true, variant: "raised", shape: "round", title: false, icon: chevronRight, label: () => L().next ?? t`Next story`, onClick: next })),
-    props.onReply || props.onLike ? h("form", { class: "hm-story-bar", onSubmit: reply },
-      props.onReply ? h(TextInput, { class: "hm-story-input", value: draft, autocomplete: "off", ref: (x: HTMLInputElement) => { input = x; x.setAttribute("enterkeyhint", "send"); },
+      () => { const c = item()?.caption; return c ? h("p", { class: "m-story-caption" }, c) : null; },
+      props.arrows === false ? null : h(IconButton, { class: "m-story-nav m-story-prev", inverse: true, variant: "raised", shape: "round", title: false, icon: chevronLeft, label: () => L().previous ?? t`Previous story`, onClick: prev }),
+      props.arrows === false ? null : h(IconButton, { class: "m-story-nav m-story-next", inverse: true, variant: "raised", shape: "round", title: false, icon: chevronRight, label: () => L().next ?? t`Next story`, onClick: next })),
+    props.onReply || props.onLike ? h("form", { class: "m-story-bar", onSubmit: reply },
+      props.onReply ? h(TextInput, { class: "m-story-input", value: draft, autocomplete: "off", ref: (x: HTMLInputElement) => { input = x; x.setAttribute("enterkeyhint", "send"); },
         placeholder: live(() => (group() && L().replyPlaceholder?.(group())) || t`Reply to ${group()?.name ?? ""}…`), "aria-label": live(replyName),
         onFocus: () => typing.set(true), onBlur: () => typing.set(false) }) : null,
       props.onLike ? h(LikeButton, { liked, size: "lg", label: () => L().like ?? t`Like story`, onToggle: (on: boolean) => { liked.set(on); props.onLike?.(group(), item(), on); } }) : null,
-      props.onReply ? h(IconButton, { type: "submit", class: "hm-story-btn hm-story-send", inverse: true, shape: "round", title: false, icon: send, label: () => L().send ?? t`Send` }) : null) : null,
-    h("p", { class: "hm-sr-only", "aria-live": "polite" }, () => (group() ? L().status?.(group(), ii(), group().items.length) ?? t`${group().name}: story ${ii() + 1} of ${group().items.length}` : "")));
+      props.onReply ? h(IconButton, { type: "submit", class: "m-story-btn m-story-send", inverse: true, shape: "round", title: false, icon: send, label: () => L().send ?? t`Send` }) : null) : null,
+    h("p", { class: "m-sr-only", "aria-live": "polite" }, () => (group() ? L().status?.(group(), ii(), group().items.length) ?? t`${group().name}: story ${ii() + 1} of ${group().items.length}` : "")));
 }

@@ -45,7 +45,7 @@ export interface ConsentConfig {
   /** Policy version. A stored record with another version counts as undecided (the banner shows again). */
   version: string;
   categories: CategoryInfo[];
-  /** Storage key. Default "hm.consent". */
+  /** Storage key. Default "m.consent". */
   storageKey: string;
   /** Where the record lives. Default localStorage; null keeps it in memory only. */
   storage: KeyStore | null | undefined;
@@ -67,7 +67,7 @@ export const DEFAULT_CATEGORIES: CategoryInfo[] = [
 const DEFAULTS: ConsentConfig = {
   version: "1",
   categories: DEFAULT_CATEGORIES,
-  storageKey: "hm.consent",
+  storageKey: "m.consent",
   storage: undefined,
   maxAgeDays: 365,
   policyHref: null,

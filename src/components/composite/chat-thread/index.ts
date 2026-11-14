@@ -112,13 +112,13 @@ export function ChatThread(props: ChatThreadProps): Element {
 
   const row = (e: () => Entry): unknown => {
     const first = untrack(e);
-    if (first.day !== undefined) return h("div", { class: "hm-chat-day", role: "separator" }, h("span", null, typeof days === "function" ? days(first.date as Date) : () => e().day ?? ""));
+    if (first.day !== undefined) return h("div", { class: "m-chat-day", role: "separator" }, h("span", null, typeof days === "function" ? days(first.date as Date) : () => e().day ?? ""));
     const m = (): ChatMessage => e().m as ChatMessage;
     const fresh = ready && !seen.has(first.key);
     seen.add(first.key);
-    const el = h("div", { class: () => cx("hm-chat-row", m().mine ? "is-mine" : "is-theirs", `is-${e().pos}`) },
-      () => (val(props.group) && !untrack(m).mine ? h("span", { class: "hm-chat-av" }, () => (e().avatar ? h(Avatar, { name: m().senderName ?? "", src: m().senderAvatar, size: "sm" }) : null)) : null),
-      h("div", { class: "hm-chat-main" },
+    const el = h("div", { class: () => cx("m-chat-row", m().mine ? "is-mine" : "is-theirs", `is-${e().pos}`) },
+      () => (val(props.group) && !untrack(m).mine ? h("span", { class: "m-chat-av" }, () => (e().avatar ? h(Avatar, { name: m().senderName ?? "", src: m().senderAvatar, size: "sm" }) : null)) : null),
+      h("div", { class: "m-chat-main" },
         h(ChatBubble, {
           text: () => m().text, mine: () => m().mine, position: () => e().pos, time: () => m().time, status: () => m().status, edited: () => m().edited,
           sender: () => (e().sender ? m().senderName : undefined), senderColor: () => e().color, reply: () => m().reply, reactions: () => m().reactions,
@@ -126,9 +126,9 @@ export function ChatThread(props: ChatThreadProps): Element {
           onReactMenu: props.onReact && (() => picking.set(picking.peek() === first.key ? null : first.key)),
           onReply: props.onReply && (() => props.onReply?.(m())),
           onRetry: props.onRetry && (() => props.onRetry?.(m())),
-          children: () => { const im = m().image; return im ? h(Picture, { class: "hm-chat-img", src: im.src, alt: im.alt ?? "" }) : null; },
+          children: () => { const im = m().image; return im ? h(Picture, { class: "m-chat-img", src: im.src, alt: im.alt ?? "" }) : null; },
         }),
-        () => (picking() === first.key ? h("div", { class: "hm-chat-pick" }, h(ReactionPicker, {
+        () => (picking() === first.key ? h("div", { class: "m-chat-pick" }, h(ReactionPicker, {
           selected: () => m().reactions?.find((r) => r.mine)?.emoji,
           onPick: (emoji: string) => { picking.set(null); props.onReact?.(m(), emoji); },
         })) : null))) as HTMLElement;
@@ -153,18 +153,18 @@ export function ChatThread(props: ChatThreadProps): Element {
   // Esc or a click elsewhere closes the picker; focus moves into it when it opens
   effect(() => {
     if (!picking()) return;
-    untrack(() => queueMicrotask(() => root?.querySelector<HTMLElement>(".hm-chat-pick button[tabindex='0']")?.focus()));
-    onCleanup(dismiss(null, { inside: () => [...(root?.querySelectorAll(".hm-chat-pick, .hm-msg-tool") ?? [])], onDismiss: () => picking.set(null) }));
+    untrack(() => queueMicrotask(() => root?.querySelector<HTMLElement>(".m-chat-pick button[tabindex='0']")?.focus()));
+    onCleanup(dismiss(null, { inside: () => [...(root?.querySelectorAll(".m-chat-pick, .m-msg-tool") ?? [])], onDismiss: () => picking.set(null) }));
   });
 
   root = h("div", {
-    class: () => cx("hm-chat", val(props.class)), role: "log", "aria-label": () => val(props.label) ?? t`Messages`, tabindex: "0",
+    class: () => cx("m-chat", val(props.class)), role: "log", "aria-label": () => val(props.label) ?? t`Messages`, tabindex: "0",
   },
   h(For as never, { each: entries, key: "key", children: (e: () => Entry) => row(e) }),
-  h("div", { class: "hm-chat-typing" }, h(TypingIndicator, { names: () => val(props.typing) ?? [] })),
+  h("div", { class: "m-chat-typing" }, h(TypingIndicator, { names: () => val(props.typing) ?? [] })),
   // "N new": a pill Button that floats over the end of the log
   () => (unseen() && jump !== false ? h(Button, {
-    variant: "primary", shape: "pill", color: props.jumpColor ?? "brand-blue", class: "hm-chat-jump", icon: typeof jump === "function" ? null : arrowDown, onClick: () => toBottom(true),
+    variant: "primary", shape: "pill", color: props.jumpColor ?? "brand-blue", class: "m-chat-jump", icon: typeof jump === "function" ? null : arrowDown, onClick: () => toBottom(true),
   }, typeof jump === "function" ? jump(unseen()) : t`${unseen()} new`) : null)) as HTMLElement;
   // pinned to the end until the reader scrolls up (80px of slack); back at the end nothing is unseen
   stick = stickToBottom(root, { threshold: 80, onChange: (pinned) => { if (pinned) unseen.set(0); } });

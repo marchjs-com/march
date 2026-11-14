@@ -22,6 +22,6 @@ export interface IconProps {
 /** `<Icon of={users} size="lg" />` — props may be live (`size={$size}`): the same <svg> repaints in place. */
 export function Icon(props: IconProps): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  effect(() => { paintIcon(svg, props.of, ["hm-svg", `hm-svg-${props.size ?? "md"}`, props.class].filter(Boolean).join(" "), props.label); });
+  effect(() => { paintIcon(svg, props.of, ["m-svg", `m-svg-${props.size ?? "md"}`, props.class].filter(Boolean).join(" "), props.label); });
   return svg;
 }

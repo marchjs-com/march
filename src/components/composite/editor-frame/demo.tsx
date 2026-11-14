@@ -9,7 +9,7 @@ import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<EditorFrame head={<FormatToolbar onTool={exec} />} actions={<Badge>{$words} kelime</Badge>}
   foot={<span>Markdown desteklenir</span>} color="brand-green">
-  <textarea class="hm-editor-area" bind:value={$text} />
+  <textarea class="m-editor-area" bind:value={$text} />
 </EditorFrame>
 <EditorFrame showHead={() => $tools.length > 0} headProps={{ sticky: true }} footProps={{ divider: true }} ring={false} … />`
 
@@ -19,7 +19,7 @@ export default function EditorFrameDemo(props: { values: { head: boolean; action
   const words = () => $text.trim().split(/\s+/).filter(Boolean).length
   let host: HTMLElement | undefined
   // the ring and its colour show only while something inside has focus: the button puts the focus in the note
-  const focusNote = () => host?.querySelector<HTMLTextAreaElement>(".hm-editor-area")?.focus()
+  const focusNote = () => host?.querySelector<HTMLTextAreaElement>(".m-editor-area")?.focus()
   return <div class="sc-col" ref={(x: Element) => { host = x as HTMLElement }}>
     {() => {
       const v = { ...props.values }
@@ -32,7 +32,7 @@ export default function EditorFrameDemo(props: { values: { head: boolean; action
         foot={v.foot ? <span>{() => ($last ? `Son araç: ${$last}` : "Çerçevenin içine tıklayın: kenar ve halka odakla renklenir.")}</span> : undefined}
         footProps={{ divider: true }}
         ring={v.ring} color={color} disabled={v.state === "disabled"} readonly={v.state === "readonly"}>
-        <textarea class="hm-editor-area" rows={4} aria-label="Not" readonly={v.state === "readonly"} disabled={v.state === "disabled"}
+        <textarea class="m-editor-area" rows={4} aria-label="Not" readonly={v.state === "readonly"} disabled={v.state === "disabled"}
           value={untrack(() => $text)} on:input={(e: Event) => { $text = (e.target as HTMLTextAreaElement).value }} />
       </EditorFrame>
     }}

@@ -78,7 +78,7 @@ export interface NavSidebarProps {
   /** Collapse to an icon rail (button in the header; state persists). */
   collapsible?: boolean;
   footer?: unknown;
-  /** localStorage key (default "hm.sidebar"). */
+  /** localStorage key (default "m.sidebar"). */
   storageKey?: string;
   /** Starting width: px (number) or a CSS length ("18rem"). Default 17.5rem. */
   width?: number | string;
@@ -121,7 +121,7 @@ const text = (x: MaybeFn<string | null | undefined> | undefined): string => Stri
 
 /** Side menu: groups, search, recent and featured items, collapsible rail, resizable width, remembered state. */
 export function NavSidebar(props: NavSidebarProps): Element {
-  const storeKey = props.storageKey ?? "hm.sidebar";
+  const storeKey = props.storageKey ?? "m.sidebar";
   const saved = load<Saved | null>(storeKey, {}) ?? {};
   const maxRecent = props.recent ?? 5;
   const items = computed(() => arr<NavSidebarItem | null | undefined | false>(val(props.items)).filter((x): x is NavSidebarItem => !!x && !val(x.hidden) && can(x.can)));
@@ -145,12 +145,12 @@ export function NavSidebar(props: NavSidebarProps): Element {
     save(storeKey, { open: [...open.peek()], recent: recent.peek(), ...(canRail ? { rail: rail.peek() } : {}), ...(keepWidth && !widthKey && width.peek() != null ? { width: width.peek() } : {}) });
     if (keepWidth && widthKey) save(widthKey, width.peek());
   };
-  const navId = uid("hm-sb");
+  const navId = uid("m-sb");
   type TextKey = Exclude<keyof NonNullable<NavSidebarProps["labels"]>, "showUnder" | "hideUnder">;
   const L = (k: TextKey, d: string): string => val(props.labels?.[k]) ?? d;
   // narrow screens: the menu opens in a Drawer from the menu button; the current row comes into view there too
   let showActive: (() => void) | undefined;
-  const sheet = navDrawer({ id: navId, label: () => val(props.label) ?? t`Main`, menuLabel: () => L("menu", t`Menu`), icon: menu, class: () => cx("hm-sb-sheet", props.nestedSubs && "is-nested-subs"), onShow: () => showActive?.() });
+  const sheet = navDrawer({ id: navId, label: () => val(props.label) ?? t`Main`, menuLabel: () => L("menu", t`Menu`), icon: menu, class: () => cx("m-sb-sheet", props.nestedSubs && "is-nested-subs"), onShow: () => showActive?.() });
   const drawer = sheet.open;
   const hasSearch = props.search !== false;
   let searchEl: HTMLInputElement | undefined, navEl: HTMLElement | undefined;
@@ -225,9 +225,9 @@ export function NavSidebar(props: NavSidebarProps): Element {
     const move = revealed && !reducedMotion();
     revealed = true;
     const show = (smooth: boolean): void => {
-      const all = [...(navEl?.querySelectorAll<HTMLElement>(".hm-sb-scroll .hm-sb-item") ?? [])].filter((r) => r.dataset["id"] === id && !r.closest("[inert]"));
+      const all = [...(navEl?.querySelectorAll<HTMLElement>(".m-sb-scroll .m-sb-item") ?? [])].filter((r) => r.dataset["id"] === id && !r.closest("[inert]"));
       const el = all.find((r) => r.dataset["where"] !== "recent") ?? all[0];
-      scrollIntoArea(el, el?.closest<HTMLElement>(".hm-sb-scroll"), { smooth });
+      scrollIntoArea(el, el?.closest<HTMLElement>(".m-sb-scroll"), { smooth });
     };
     showActive = () => show(false);
     queueMicrotask(() => show(move));
@@ -249,68 +249,68 @@ export function NavSidebar(props: NavSidebarProps): Element {
     const b = val(x.badge);
     if (b == null || b === 0 || b === "") return null;
     const tone = x.badgeTone ?? (typeof b === "number" ? "danger" : "neutral");
-    const look = { class: "hm-sb-badge", tone, variant: tone === "primary" ? "solid" as const : undefined };
+    const look = { class: "m-sb-badge", tone, variant: tone === "primary" ? "solid" as const : undefined };
     return typeof b === "number" ? h(Badge, { ...look, count: b }) : h(Badge, look, b);
   };
   const row = (x: NavSidebarItem, where: string, sub?: () => string): Element => {
     const el = h(ListRow, {
-      class: () => cx("hm-sb-row", "hm-sb-item", active() !== x.id && !!active() && under(x.id, active()!) && "is-active-parent"), "data-id": x.id, "data-where": where,
+      class: () => cx("m-sb-row", "m-sb-item", active() !== x.id && !!active() && under(x.id, active()!) && "is-active-parent"), "data-id": x.id, "data-where": where,
       lead: x.icon ?? (x.group ? props.groupIcons?.[x.group] : undefined), title: () => text(x.label), sub: sub ?? (x.sub !== undefined ? () => text(x.sub) : undefined),
       trail: x.badge !== undefined ? () => badge(x) : undefined, marquee: { mode: "loop" }, active: () => active() === x.id, indicator: where !== "featured",
       tooltip: () => (rail() ? text(x.label) : null), "aria-current": () => (active() === x.id ? "page" : null),
       ...(x.href && !x.onSelect ? { href: x.href } : { onClick: () => { if (!x.href) chosen.set(x.id); x.onSelect?.(); if (x.href) void navigate(x.href); } }),
     });
     const kids = where === "group" || where === "main" || where === "child" ? kidsOf().get(x.id) : undefined;
-    if (!kids?.length) return h("li", { class: "hm-sb-li" }, el);
-    const kid = uid("hm-sbk");
-    return h("li", { class: () => cx("hm-sb-li", "is-parent", kidsOpen(x.id) && "is-kids-open") },
+    if (!kids?.length) return h("li", { class: "m-sb-li" }, el);
+    const kid = uid("m-sbk");
+    return h("li", { class: () => cx("m-sb-li", "is-parent", kidsOpen(x.id) && "is-kids-open") },
       el,
-      h(IconButton, { class: "hm-sb-kids-btn", size: "xs", icon: h(Chevron, {}), title: false, tabindex: "-1", "aria-expanded": () => String(kidsOpen(x.id)), "aria-controls": kid,
+      h(IconButton, { class: "m-sb-kids-btn", size: "xs", icon: h(Chevron, {}), title: false, tabindex: "-1", "aria-expanded": () => String(kidsOpen(x.id)), "aria-controls": kid,
         label: () => (kidsOpen(x.id) ? props.labels?.hideUnder?.(text(x.label)) ?? t`Hide pages under ${text(x.label)}` : props.labels?.showUnder?.(text(x.label)) ?? t`Show pages under ${text(x.label)}`), onClick: () => toggleKids(x.id) }),
-      h("div", { class: "hm-sb-kids", id: kid, inert: () => !kidsOpen(x.id) },
-        h("ul", { class: "hm-sb-list hm-sb-sublist" }, kids.map((k) => row(k, "child")))));
+      h("div", { class: "m-sb-kids", id: kid, inert: () => !kidsOpen(x.id) },
+        h("ul", { class: "m-sb-list m-sb-sublist" }, kids.map((k) => row(k, "child")))));
   };
   const sectionHead = (label: () => string, ic: unknown, extra?: unknown): Element | null => props.headings === false ? null :
-    h(SectionLabel, { class: "hm-sb-section", icon: ic, label, actions: extra ?? undefined }) as Element;
+    h(SectionLabel, { class: "m-sb-section", icon: ic, label, actions: extra ?? undefined }) as Element;
 
   const queryText = computed(() => q().trim()); // spaces alone do not rebuild the menu
   const body = (): unknown => {
     const query = queryText();
     if (query) {
       const hits = untrack(() => rank(query, items(), (x) => ({ title: text(x.label), keywords: [x.keywords, x.group, text(x.sub)].filter(Boolean).join(" ") })));
-      if (!hits.length) return h(Empty, { size: "sm", class: "hm-sb-none", title: () => L("noMatches", t`No matches`) });
-      return untrack(() => h("ul", { class: "hm-sb-list", "aria-label": L("results", t`Results`) }, hits.map((r) => row(r.item, "search", () => r.item.group ?? text(r.item.sub)))));
+      if (!hits.length) return h(Empty, { size: "sm", class: "m-sb-none", title: () => L("noMatches", t`No matches`) });
+      return untrack(() => h("ul", { class: "m-sb-list", "aria-label": L("results", t`Results`) }, hits.map((r) => row(r.item, "search", () => r.item.group ?? text(r.item.sub)))));
     }
     // Each block is its own reactive region: a navigation changes `recent` (and `active`), which rebuilds only the
     // recent block, never the categories (a rebuilt menu loses its scroll position and looks reloaded).
     const recentBlock = (): unknown => {
       const f = featured(), m = byId();
       const rec = recent().map((id) => m.get(id)).filter((x): x is NavSidebarItem => !!x && !f.some((y) => y.id === x.id)).slice(0, maxRecent);
-      return untrack(() => rec.length > 0 && h("div", { class: "hm-sb-block hm-sb-recent" },
+      return untrack(() => rec.length > 0 && h("div", { class: "m-sb-block m-sb-recent" },
         sectionHead(() => L("recent", t`Recent`), clock),
-        h("ul", { class: "hm-sb-list" }, rec.map((x) => row(x, "recent", () => x.group ?? text(x.sub))))));
+        h("ul", { class: "m-sb-list" }, rec.map((x) => row(x, "recent", () => x.group ?? text(x.sub))))));
     };
     return [
-      () => { const f = featured(); return untrack(() => f.length > 0 && h("ul", { class: "hm-sb-list hm-sb-featured" }, f.map((x) => row(x, "featured")))); },
-      () => { const ls = loose(); return untrack(() => ls.length > 0 && h("ul", { class: "hm-sb-list hm-sb-loose" }, ls.map((x) => row(x, "main")))); },
+      () => { const f = featured(); return untrack(() => f.length > 0 && h("ul", { class: "m-sb-list m-sb-featured" }, f.map((x) => row(x, "featured")))); },
+      () => { const ls = loose(); return untrack(() => ls.length > 0 && h("ul", { class: "m-sb-list m-sb-loose" }, ls.map((x) => row(x, "main")))); },
       maxRecent > 0 && recentBlock,
-      () => { const gs = groups(); return untrack(() => gs.length > 0 && h("div", { class: "hm-sb-block hm-sb-cats" },
-        sectionHead(() => L("categories", t`Categories`), null, props.expandAll === false ? null : h(Button, { variant: "link", class: "hm-sb-all", onClick: () => setAll(!allOpen()) }, () => (allOpen() ? L("collapseAll", t`Collapse all`) : L("expandAll", t`Expand all`)))),
-        h("ul", { class: "hm-sb-list hm-sb-groups" }, gs.map((g) => {
-          const gid = uid("hm-sbg");
+      () => { const gs = groups(); return untrack(() => gs.length > 0 && h("div", { class: "m-sb-block m-sb-cats" },
+        sectionHead(() => L("categories", t`Categories`), null, props.expandAll === false ? null : h(Button, { variant: "link", class: "m-sb-all", onClick: () => setAll(!allOpen()) }, () => (allOpen() ? L("collapseAll", t`Collapse all`) : L("expandAll", t`Expand all`)))),
+        h("ul", { class: "m-sb-list m-sb-groups" }, gs.map((g) => {
+          const gid = uid("m-sbg");
           const isOpen = (): boolean => rail() || open().has(g.name);
-          return h("li", { class: () => cx("hm-sb-group", isOpen() && "is-open", activeGroup() === g.name && "is-active-group") },
-            h(ListRow, { class: "hm-sb-row hm-sb-gbtn", "data-group": g.name, "aria-expanded": () => String(isOpen()), "aria-controls": gid, onClick: () => toggle(g.name),
-              lead: [h(Chevron, { class: "hm-sb-chev" }), icon(props.groupIcons?.[g.name], "hm-icon hm-sb-gicon")], title: g.name, marquee: { mode: "loop" },
-              trail: props.groupCounts === false ? undefined : h("span", { class: "hm-sb-count" }, String(g.items.length)) }),
-            h("div", { class: "hm-sb-gpanel", id: gid, inert: () => !isOpen() },
-              h("ul", { class: "hm-sb-list hm-sb-gitems" }, g.items.map((x) => row(x, "group")))));
+          return h("li", { class: () => cx("m-sb-group", isOpen() && "is-open", activeGroup() === g.name && "is-active-group") },
+            h(ListRow, { class: "m-sb-row m-sb-gbtn", "data-group": g.name, "aria-expanded": () => String(isOpen()), "aria-controls": gid, onClick: () => toggle(g.name),
+              lead: [h(Chevron, { class: "m-sb-chev" }), icon(props.groupIcons?.[g.name], "m-icon m-sb-gicon")], title: g.name, marquee: { mode: "loop" },
+              trail: props.groupCounts === false ? undefined : h("span", { class: "m-sb-count" }, String(g.items.length)) }),
+            h("div", { class: "m-sb-gpanel", id: gid, inert: () => !isOpen() },
+              h("ul", { class: "m-sb-list m-sb-gitems" }, g.items.map((x) => row(x, "group")))));
         })))); },
     ];
   };
 
   // ---- keyboard: roving focus over visible rows
-  const rows = (): HTMLElement[] => [...(navEl?.querySelectorAll<HTMLElement>(".hm-sb-row") ?? [])].filter((r) => !r.closest("[inert]"));
+  const rows = (): HTMLElement[] => [...(navEl?.querySelectorAll<HTMLElement>(".m-sb-row") ?? [])].filter((r) => !r.closest("[inert]"));
   // keys of the search box (its own Escape clears the query)
   const onSearchKey = (e: KeyboardEvent): void => {
     if (e.key === "ArrowDown") { e.preventDefault(); rows()[0]?.focus(); }
@@ -319,38 +319,38 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const onKey = (e: KeyboardEvent): void => {
     if (e.defaultPrevented) return; // handled once (nested handlers / delegation)
     const target = e.target as HTMLElement;
-    if (!target.classList.contains("hm-sb-row")) return;
+    if (!target.classList.contains("m-sb-row")) return;
     const list = rows(), i = list.indexOf(target);
     // ↑ on the first row goes back to the search box; ↑ ↓ Home End otherwise move among the rows
     if (e.key === "ArrowUp" && i === 0) { e.preventDefault(); searchEl?.focus(); return; }
     if (roving(e, list, { wrap: false })) return;
     // nested items: → opens a parent's children, ← closes them, or goes from a child back to its parent
-    if ((e.key === "ArrowRight" || e.key === "ArrowLeft") && target.closest(".is-parent, .hm-sb-sublist")) {
+    if ((e.key === "ArrowRight" || e.key === "ArrowLeft") && target.closest(".is-parent, .m-sb-sublist")) {
       const li = target.parentElement, id = target.dataset["id"] ?? "";
       if (li?.classList.contains("is-parent") && target.dataset["where"] !== "child") {
         if (e.key === "ArrowRight") { e.preventDefault(); if (!kidsOpen(id)) toggleKids(id); else list[i + 1]?.focus(); return; }
         if (kidsOpen(id)) { e.preventDefault(); toggleKids(id); return; }
       } else if (e.key === "ArrowLeft") {
-        const up = target.closest(".is-parent")?.querySelector<HTMLElement>(":scope > .hm-sb-row");
+        const up = target.closest(".is-parent")?.querySelector<HTMLElement>(":scope > .m-sb-row");
         if (up) { e.preventDefault(); up.focus(); return; }
       }
       if (e.key === "ArrowRight") return;
-      const g = target.closest(".hm-sb-group")?.querySelector<HTMLElement>(".hm-sb-gbtn");
+      const g = target.closest(".m-sb-group")?.querySelector<HTMLElement>(".m-sb-gbtn");
       if (g) { e.preventDefault(); g.focus(); }
     }
     else if (e.key === "ArrowRight" && target.dataset["group"]) { e.preventDefault(); if (!open.peek().has(target.dataset["group"])) toggle(target.dataset["group"], true); else list[i + 1]?.focus(); }
     else if (e.key === "ArrowLeft") {
-      const g = target.dataset["group"] ?? target.closest(".hm-sb-group")?.querySelector<HTMLElement>(".hm-sb-gbtn")?.dataset["group"];
+      const g = target.dataset["group"] ?? target.closest(".m-sb-group")?.querySelector<HTMLElement>(".m-sb-gbtn")?.dataset["group"];
       if (!g) return;
       e.preventDefault();
-      if (target.dataset["group"]) toggle(g, false); else target.closest(".hm-sb-group")?.querySelector<HTMLElement>(".hm-sb-gbtn")?.focus();
+      if (target.dataset["group"]) toggle(g, false); else target.closest(".m-sb-group")?.querySelector<HTMLElement>(".m-sb-gbtn")?.focus();
     }
   };
 
   // ---- width: a CSS variable on the wrapper (CSSOM, no inline style attribute)
   let wrapEl: HTMLElement | undefined;
   const cssWidth = (): string | null => { const w = width(); return w != null ? `${w}px` : props.width == null ? null : typeof props.width === "number" ? `${props.width}px` : props.width; };
-  effect(() => { const w = cssWidth(); if (wrapEl) { if (w) wrapEl.style.setProperty("--hm-sb-w", w); else wrapEl.style.removeProperty("--hm-sb-w"); } });
+  effect(() => { const w = cssWidth(); if (wrapEl) { if (w) wrapEl.style.setProperty("--m-sb-w", w); else wrapEl.style.removeProperty("--m-sb-w"); } });
   const currentPx = (): number => width.peek() ?? Math.round(navEl?.getBoundingClientRect().width || 280);
   const setWidth = (px: number, done = false): void => {
     if (props.collapseBelow != null) {
@@ -365,27 +365,27 @@ export function NavSidebar(props: NavSidebarProps): Element {
   // drag / arrows (RTL mirrored) / Home / End / Enter or double click resets: ResizeHandle. The range goes below minW
   // when the sidebar can fold to its rail (setWidth folds it under collapseBelow).
   const grip = (): unknown => !props.resizable ? null : h(ResizeHandle, {
-    class: () => cx("hm-sb-resize", resizing() && "is-dragging"), "aria-controls": navId, label: () => L("resize", t`Resize sidebar`),
+    class: () => cx("m-sb-resize", resizing() && "is-dragging"), "aria-controls": navId, label: () => L("resize", t`Resize sidebar`),
     value: currentPx, min: props.collapseBelow != null ? 0 : minW, max: maxW, step: 16,
     set: (to: number, done?: boolean) => { if (rail.peek() && to > currentPx()) rail.set(false); setWidth(to, done); },
     reset: () => { width.set(null); if (rail.peek() && props.collapseBelow != null) rail.set(false); persist(); props.onResize?.(currentPx()); },
-    onStart: () => { globalThis.document.documentElement.classList.add("hm-sb-resizing"); resizing.set(true); },
-    onEnd: () => { globalThis.document.documentElement.classList.remove("hm-sb-resizing"); resizing.set(false); },
+    onStart: () => { globalThis.document.documentElement.classList.add("m-sb-resizing"); resizing.set(true); },
+    onEnd: () => { globalThis.document.documentElement.classList.remove("m-sb-resizing"); resizing.set(false); },
   });
   const title = props.title; // read once: a node prop is built when it is read
   const railLabel = (): string => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`));
-  return h("div", { class: () => cx("hm-nav-wrap", "hm-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", props.nestedSubs && "is-nested-subs", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--hm-sb-w", w); } },
+  return h("div", { class: () => cx("m-nav-wrap", "m-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", props.nestedSubs && "is-nested-subs", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--m-sb-w", w); } },
     sheet.burger,
-    sheet.place(h("nav", { class: "hm-nav hm-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },
-      h("div", { class: "hm-sb-head" },
-        (title != null || props.collapsible) && h(PanelHeader, { as: "div", class: "hm-sb-titlebar", title: title ?? undefined, titleAs: "span", subtitle: props.subtitle ?? undefined,
-          actions: props.collapsible ? h(IconButton, { class: "hm-nav-rail-btn", size: "sm", icon: panelLeft, "aria-pressed": () => String(rail()), label: railLabel, onClick: () => { rail.update((x) => !x); persist(); } }) : undefined }),
+    sheet.place(h("nav", { class: "m-nav m-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },
+      h("div", { class: "m-sb-head" },
+        (title != null || props.collapsible) && h(PanelHeader, { as: "div", class: "m-sb-titlebar", title: title ?? undefined, titleAs: "span", subtitle: props.subtitle ?? undefined,
+          actions: props.collapsible ? h(IconButton, { class: "m-nav-rail-btn", size: "sm", icon: panelLeft, "aria-pressed": () => String(rail()), label: railLabel, onClick: () => { rail.update((x) => !x); persist(); } }) : undefined }),
         hasSearch && h(SearchBox, {
-          class: "hm-sb-search", inputClass: "hm-sb-input", value: q, debounce: 0, inputRef: (x: HTMLInputElement) => { searchEl = x; if (hk) x.setAttribute("aria-keyshortcuts", "Control+K Meta+K"); },
+          class: "m-sb-search", inputClass: "m-sb-input", value: q, debounce: 0, inputRef: (x: HTMLInputElement) => { searchEl = x; if (hk) x.setAttribute("aria-keyshortcuts", "Control+K Meta+K"); },
           placeholder: () => val(props.placeholder) ?? t`Search or ask…`, label: () => val(props.labels?.search) ?? val(props.placeholder) ?? t`Search the menu`,
           clearLabel: () => L("clearSearch", t`Clear search`), shortcutHint: hk ? props.shortcut ?? "mod+k" : false, onKeyDown: onSearchKey,
         })),
-      h("div", { class: "hm-sb-scroll" }, body),
-      props.footer != null && h("div", { class: "hm-nav-foot hm-sb-foot" }, props.footer),
+      h("div", { class: "m-sb-scroll" }, body),
+      props.footer != null && h("div", { class: "m-nav-foot m-sb-foot" }, props.footer),
       grip())));
 }

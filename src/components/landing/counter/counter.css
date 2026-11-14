@@ -1,6 +1,6 @@
 /* Counter. Tabular digits keep the width steady while it counts; roll mode draws with CountRoll. */
-.hm-counter { display: inline-flex; align-items: baseline; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.hm-counter-view { display: inline-flex; align-items: baseline; }
+.m-counter { display: inline-flex; align-items: baseline; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.m-counter-view { display: inline-flex; align-items: baseline; }
 /* roll mode: the view is a CountRoll; it keeps the counter's line height */
-.hm-counter .hm-roll { line-height: inherit; }
-.hm-counter-affix { white-space: pre; }
+.m-counter .m-roll { line-height: inherit; }
+.m-counter-affix { white-space: pre; }

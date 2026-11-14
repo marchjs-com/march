@@ -84,7 +84,7 @@ test("Portal layer: renders into the stack and closes with its owner", async () 
   const open = signal(true);
   const a = mount(() => () => (open() ? h(Portal, { layer: "dialog" }, h("b", { class: "in-layer" }, "hi")) : null));
   await tick();
-  assert.equal(document.querySelector(".hm-layer[data-layer=dialog] .in-layer")?.textContent, "hi");
+  assert.equal(document.querySelector(".m-layer[data-layer=dialog] .in-layer")?.textContent, "hi");
   open.set(false); await tick();
   assert.equal(document.querySelector(".in-layer"), null);
   assert.equal(layers().length, 0);

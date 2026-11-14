@@ -17,7 +17,7 @@ export default function SpinnerDemo(props: { values: { size: string; decorative:
       const em = v.size === "em"
       const spinner = <Spinner size={v.size as "lg"} decorative={v.decorative} colors={em ? undefined : COLORS[v.colors]} color={!em && v.colors === "single" && v.color !== "theme" ? (v.color as "success") : undefined} label="Yükleniyor" />
       return [em ? <strong class="sc-row">{spinner} Kaydediliyor…</strong> : spinner,
-        <span class="hm-muted">{v.decorative ? "aria-hidden: yanındaki metin durumu söyler" : "role=\"status\", ad: Yükleniyor"}</span>]
+        <span class="m-muted">{v.decorative ? "aria-hidden: yanındaki metin durumu söyler" : "role=\"status\", ad: Yükleniyor"}</span>]
     }}
   </div>
 }

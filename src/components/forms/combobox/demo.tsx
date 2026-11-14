@@ -15,6 +15,6 @@ export default function ComboboxDemo(props: { values: { source: string; disabled
     {() => props.values.source === "async"
       ? <Field label="Üye (sunucudan arar)"><Combobox value={$pick} onChange={(v: unknown) => { $pick = v }} search={search} debounce={200} placeholder="En az bir harf yaz" disabled={props.values.disabled} /></Field>
       : <Field label="İlçe"><Combobox value={$pick} onChange={(v: unknown) => { $pick = v }} options={TOWNS} placeholder="Yazmaya başla" disabled={props.values.disabled} /></Field>}
-    <p class="hm-muted">{() => `Değer: ${$pick ?? "—"}`}</p>
+    <p class="m-muted">{() => `Değer: ${$pick ?? "—"}`}</p>
   </div>
 }

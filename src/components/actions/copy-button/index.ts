@@ -53,11 +53,11 @@ export function CopyButton(props: CopyButtonProps): Element {
   // icon-only always has an icon; a text button only when `icon` is given
   const mark = (): unknown => {
     if (!props.iconOnly && (props.icon == null || props.icon === false)) return null;
-    return copied() && props.copiedIcon !== false ? ownIcon(props.copiedIcon ?? undefined, check, "hm-copy-icon") : ownIcon(props.icon === false || props.icon == null ? undefined : props.icon, copyIcon, "hm-copy-icon");
+    return copied() && props.copiedIcon !== false ? ownIcon(props.copiedIcon ?? undefined, check, "m-copy-icon") : ownIcon(props.icon === false || props.icon == null ? undefined : props.icon, copyIcon, "m-copy-icon");
   };
   const text = (): string => (copied() ? val(props.copiedLabel) ?? t`Copied` : val(props.label) ?? t`Copy`);
   const shared = {
-    class: () => cx("hm-copy", copied() && "is-copied", val(props.class)), onClick: copy, "aria-live": "polite", icon: mark,
+    class: () => cx("m-copy", copied() && "is-copied", val(props.class)), onClick: copy, "aria-live": "polite", icon: mark,
     color: live(() => (copied() ? props.copiedColor : undefined)),
   };
   return (props.iconOnly ? h(IconButton, { ...shared, label: text, title: false }) : h(Button, { ...shared, variant: "ghost", size: "sm" }, text)) as Element;

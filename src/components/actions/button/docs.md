@@ -39,7 +39,7 @@ action handles confirmation, the reason prompt and the success / error toasts. I
 | `href` | Href | — | router link; an external address (`https://…`, `mailto:`) is a plain link |
 | `type` | `button` `submit` `reset` | `button` | |
 | `class` | class | — | extra classes on the button |
-| `children` | node | — | the label (`.hm-btn-label`) |
+| `children` | node | — | the label (`.m-btn-label`) |
 
 Other attributes (`onClick`, `title`, `aria-*`, `data-*`) go to the `<button>` / `<a>`.
 

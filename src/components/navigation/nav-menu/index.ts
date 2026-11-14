@@ -42,7 +42,7 @@ export type NavSort = "alpha" | "none" | false | ((a: { title: MaybeFn<string> }
 
 export interface NavMenuProps {
   items: MaybeFn<readonly (NavItem | null | undefined | false)[] | null | undefined>;
-  /** localStorage key for pins, recents and collapsed groups (default "hm.nav"). */
+  /** localStorage key for pins, recents and collapsed groups (default "m.nav"). */
   storageKey?: string;
   maxPinned?: number;
   maxRecent?: number;
@@ -89,7 +89,7 @@ interface SavedNav { collapsed?: unknown; opened?: unknown; pins?: unknown; rece
 
 /** items: [{ id, title, href, icon?, group?, badge?: () => number, keywords?, can?, hidden? }] */
 export function NavMenu(props: NavMenuProps): Element {
-  const storeKey = props.storageKey ?? "hm.nav";
+  const storeKey = props.storageKey ?? "m.nav";
   const maxPinned = props.maxPinned ?? 8, maxRecent = props.maxRecent ?? 5;
   const saved = load<SavedNav | null>(storeKey, {}) ?? {};
   const startClosed = !!props.groupsCollapsed;
@@ -100,7 +100,7 @@ export function NavMenu(props: NavMenuProps): Element {
   const recent = signal(arr<string>(saved.recent));
   const persist = (): void => save(storeKey, { [startClosed ? "opened" : "collapsed"]: [...collapsed.peek()], pins: pins.peek(), recent: recent.peek(), ...(props.collapsible ? { rail: rail.peek() } : {}) });
   const q = signal("");
-  const navId = uid("hm-nav");
+  const navId = uid("m-nav");
   const pinsOn = props.pins !== false;
   type TextKey = Exclude<keyof NonNullable<NavMenuProps["labels"]>, "pin" | "unpin">;
   const L = (k: TextKey, d: string): string => val(props.labels?.[k]) ?? d;
@@ -108,7 +108,7 @@ export function NavMenu(props: NavMenuProps): Element {
   // a built-in mark, or the developer's own (an IconDef is drawn like the built-in one)
   const mark = (k: IconKey, d: IconDef): unknown => { const x = props.icons?.[k]; return ownIcon(x == null || x === false ? undefined : x, d, null); };
   // narrow screens: the menu opens in a Drawer from the menu button
-  const sheet = navDrawer({ id: navId, label: () => val(props.label) ?? t`Main`, menuLabel: () => L("menu", t`Menu`), icon: mark("menu", menu), class: () => !pinsOn && "hm-nav-nopins" });
+  const sheet = navDrawer({ id: navId, label: () => val(props.label) ?? t`Main`, menuLabel: () => L("menu", t`Menu`), icon: mark("menu", menu), class: () => !pinsOn && "m-nav-nopins" });
   const open = sheet.open;
   const items = computed(() => arr<NavItem | null | undefined | false>(val(props.items)).filter((x): x is NavItem => !!x && !val(x.hidden) && can(x.can)));
   const byId = computed(() => new Map(items().map((x) => [x.id, x])));
@@ -158,28 +158,28 @@ export function NavMenu(props: NavMenuProps): Element {
   };
 
   // a row: the page link (ListRow) and, beside it, the pin (the smallest IconButton, a toggle)
-  const item = (x: NavItem, where: string): Element => h("li", { class: "hm-nav-li" },
+  const item = (x: NavItem, where: string): Element => h("li", { class: "m-nav-li" },
     h(ListRow, {
-      href: x.href, "data-id": x.id, "data-where": where, size: "sm", class: "hm-nav-item", active: () => active() === x.id, tooltip: () => (rail() ? titleOf(x) : null),
-      lead: icon(x.icon ?? (x.group ? props.groupIcons?.[x.group] : undefined), "hm-icon hm-nav-icon"), title: () => titleOf(x),
+      href: x.href, "data-id": x.id, "data-where": where, size: "sm", class: "m-nav-item", active: () => active() === x.id, tooltip: () => (rail() ? titleOf(x) : null),
+      lead: icon(x.icon ?? (x.group ? props.groupIcons?.[x.group] : undefined), "m-icon m-nav-icon"), title: () => titleOf(x),
       trail: x.badge !== undefined ? h(Badge, { count: () => val(x.badge), max: 99 }) : undefined,
     }),
     pinsOn && h(IconButton, {
-      size: "xs", class: "hm-nav-pin", "data-pin": x.id, pressed: () => isPinned(x.id), title: false,
+      size: "xs", class: "m-nav-pin", "data-pin": x.id, pressed: () => isPinned(x.id), title: false,
       label: () => (isPinned(x.id) ? props.labels?.unpin?.(titleOf(x)) ?? t`Unpin ${titleOf(x)}` : props.labels?.pin?.(titleOf(x)) ?? t`Pin ${titleOf(x)}`),
       onClick: () => togglePin(x.id), icon: () => (isPinned(x.id) ? mark("pinned", starFilled) : mark("pin", star)),
     }));
 
-  const block = (label: () => string, list: NavItem[], where: string, cls: string): Element => h("div", { class: cx("hm-nav-group", cls) },
-    h(SectionLabel, { class: "hm-nav-heading", label }),
-    h("ul", { class: "hm-nav-list" }, list.map((x) => item(x, where))));
+  const block = (label: () => string, list: NavItem[], where: string, cls: string): Element => h("div", { class: cx("m-nav-group", cls) },
+    h(SectionLabel, { class: "m-nav-heading", label }),
+    h("ul", { class: "m-nav-list" }, list.map((x) => item(x, where))));
 
   const body = (): unknown => {
     const query = q();
     if (query.trim()) {
       const hits = untrack(() => rank(query, items(), (x) => ({ title: titleOf(x), keywords: [x.keywords, x.group].filter(Boolean).join(" ") })));
-      if (!hits.length) return h(Empty, { size: "sm", class: "hm-nav-none", title: () => L("noMatches", t`No matches`) });
-      return untrack(() => h("ul", { class: "hm-nav-list hm-nav-results" }, hits.map((r) => item(r.item, "filter"))));
+      if (!hits.length) return h(Empty, { size: "sm", class: "m-nav-none", title: () => L("noMatches", t`No matches`) });
+      return untrack(() => h("ul", { class: "m-nav-list m-nav-results" }, hits.map((r) => item(r.item, "filter"))));
     }
     const m = byId();
     const pinned = pinsOn ? pins().map((id) => m.get(id)).filter((x): x is NavItem => !!x) : [];
@@ -188,32 +188,32 @@ export function NavMenu(props: NavMenuProps): Element {
     const rec = recent().map((id) => m.get(id)).filter((x): x is NavItem => !!x && !!x.group && x.id !== cur);
     const gs = groups();
     return untrack(() => [
-      pinned.length > 0 && block(() => L("pinned", t`Pinned`), pinned, "pinned", "hm-nav-pinned"),
-      rec.length > 0 && block(() => L("recent", t`Recent`), rec, "recent", "hm-nav-recent"),
+      pinned.length > 0 && block(() => L("pinned", t`Pinned`), pinned, "pinned", "m-nav-pinned"),
+      rec.length > 0 && block(() => L("recent", t`Recent`), rec, "recent", "m-nav-recent"),
       gs.map((g) => {
-        if (g.name === "") return h("ul", { class: "hm-nav-list" }, g.items.map((x) => item(x, "main")));
-        const gid = uid("hm-navg");
+        if (g.name === "") return h("ul", { class: "m-nav-list" }, g.items.map((x) => item(x, "main")));
+        const gid = uid("m-navg");
         const isOpen = (): boolean => rail() || (collapsed().has(g.name) === startClosed);
-        return h("div", { class: "hm-nav-group" },
+        return h("div", { class: "m-nav-group" },
           h(ListRow, {
-            size: "sm", class: "hm-nav-gbtn", "data-group": g.name, "aria-expanded": () => String(isOpen()), "aria-controls": gid, onClick: () => toggleGroup(g.name),
-            lead: icon(props.groupIcons?.[g.name], "hm-icon hm-nav-gicon"), title: g.name,
-            trail: props.icons?.chevron !== false ? h(Chevron, { class: "hm-nav-chev", icon: props.icons?.chevron === true ? undefined : props.icons?.chevron }) : undefined,
+            size: "sm", class: "m-nav-gbtn", "data-group": g.name, "aria-expanded": () => String(isOpen()), "aria-controls": gid, onClick: () => toggleGroup(g.name),
+            lead: icon(props.groupIcons?.[g.name], "m-icon m-nav-gicon"), title: g.name,
+            trail: props.icons?.chevron !== false ? h(Chevron, { class: "m-nav-chev", icon: props.icons?.chevron === true ? undefined : props.icons?.chevron }) : undefined,
           }),
-          h("ul", { class: "hm-nav-list", id: gid, hidden: () => !isOpen() }, g.items.map((x) => item(x, "main"))));
+          h("ul", { class: "m-nav-list", id: gid, hidden: () => !isOpen() }, g.items.map((x) => item(x, "main"))));
       }),
     ]);
   };
 
   const toggleRail = (): void => { rail.update((x) => !x); persist(); };
   const railName = (): string => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`));
-  return h("div", { class: () => cx("hm-nav-wrap", open() && "is-open", rail() && "is-rail", !pinsOn && "hm-nav-nopins", val(props.class)) },
+  return h("div", { class: () => cx("m-nav-wrap", open() && "is-open", rail() && "is-rail", !pinsOn && "m-nav-nopins", val(props.class)) },
     sheet.burger,
-    sheet.place(h("nav", { class: "hm-nav", id: navId, "aria-label": () => val(props.label) ?? t`Main` },
-      (props.brand != null || props.collapsible) && h("div", { class: "hm-nav-brand" },
-        props.brand != null && h("div", { class: "hm-nav-brand-main" }, props.brand),
-        props.collapsible && h(IconButton, { size: "sm", class: "hm-nav-rail-btn", pressed: rail, label: railName, onClick: toggleRail, icon: mark("rail", panelLeft) })),
-      props.filter !== false && h("div", { class: "hm-nav-filter" },
+    sheet.place(h("nav", { class: "m-nav", id: navId, "aria-label": () => val(props.label) ?? t`Main` },
+      (props.brand != null || props.collapsible) && h("div", { class: "m-nav-brand" },
+        props.brand != null && h("div", { class: "m-nav-brand-main" }, props.brand),
+        props.collapsible && h(IconButton, { size: "sm", class: "m-nav-rail-btn", pressed: rail, label: railName, onClick: toggleRail, icon: mark("rail", panelLeft) })),
+      props.filter !== false && h("div", { class: "m-nav-filter" },
         h(SearchBox, {
           size: "sm", value: q, debounce: 0, clear: false, icon: props.icons?.search === false ? false : props.icons?.search == null || props.icons.search === true ? true : props.icons.search,
           placeholder: () => L("filterPlaceholder", t`Filter…`), label: () => L("filter", t`Filter menu`),
@@ -224,6 +224,6 @@ export function NavMenu(props: NavMenuProps): Element {
             if (first?.item.href) { try { void navigate(first.item.href); } catch { /* no router */ } }
           },
         })),
-      h("div", { class: "hm-nav-scroll" }, body),
-      props.footer != null && h("div", { class: "hm-nav-foot" }, props.footer))));
+      h("div", { class: "m-nav-scroll" }, body),
+      props.footer != null && h("div", { class: "m-nav-foot" }, props.footer))));
 }

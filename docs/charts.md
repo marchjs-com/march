@@ -50,7 +50,7 @@ Every prop may be a plain value, a signal, or (from JSX) a live expression.
 | `description` | string | — | Rendered as SVG `<desc>`. Both are referenced by `aria-labelledby`. |
 | `format` | pipe \| `[pipe, ...args]` \| fn | `"number"` | Value format for axis, tooltip and table: `"number"`, `["money", "USD"]`, `"percent"`, `"compact"`, `(v) => …`. Uses the active locale. |
 | `xFormat` | pipe \| `[pipe, ...args]` \| fn | auto | x labels, e.g. `"date"`, `["date", "short"]`. Time axes pick a format from the visible span. |
-| `colors` | `string[]` | palette | Per-series color override (set as the `--hm-c` custom property through CSSOM). |
+| `colors` | `string[]` | palette | Per-series color override (set as the `--m-c` custom property through CSSOM). |
 | `legend` | `true` \| `false` \| `"bottom"` \| `"right"` | shown when > 1 series | Legend items are toggle buttons that hide/show a series. |
 | `grid` | `true` \| `false` \| `"both"` | `true` | Horizontal grid lines (`"both"` adds vertical ones). |
 | `tooltip` | `true` \| `false` \| `(point) => node` | `true` | Custom content receives the point object. |
@@ -128,7 +128,7 @@ Props: `data` (numbers or objects), `y`, `width` (120), `height` (32), `area`, `
 | `hint` | Text after the delta, e.g. "vs last week". |
 | `spark`, `sparkY` | Data for an inline sparkline. |
 
-Classes: `hm-stat-up|down|flat` and `hm-stat-good|bad|neutral`. The arrow is `aria-hidden`; screen readers hear "Up" / "Down".
+Classes: `m-stat-up|down|flat` and `m-stat-good|bad|neutral`. The arrow is `aria-hidden`; screen readers hear "Up" / "Down".
 
 ```jsx
 <Stat label="Revenue" value={$revenue} previous={$lastMonth} format={["money", "USD"]} hint="vs last month" spark={$daily} />
@@ -141,7 +141,7 @@ Classes: `hm-stat-up|down|flat` and `hm-stat-good|bad|neutral`. The arrow is `ar
 | `x`, `y`, `value` | `"x"`, `"y"`, `"value"` | Cell keys; duplicates are summed. |
 | `xDomain`, `yDomain` | data order | Order (and completeness) of columns / rows. |
 | `xFormat`, `yFormat` | `String` | Axis labels. |
-| `levels` | 5 | Color levels `hm-heat-0..4` (0 = empty or ≤ 0). |
+| `levels` | 5 | Color levels `m-heat-0..4` (0 = empty or ≤ 0). |
 | `max` | data max | Value of the top level. |
 | `cell` | fits the width (≤ 32) | Fixed cell size in px. |
 | `calendar` | — | `true` or `{ weeks: 12 }`: `x` is a date; columns are weeks, rows Monday…Sunday. |
@@ -157,7 +157,7 @@ Arrow keys move between cells (Up/Down change rows).
 
 ### ProgressRing
 
-Props: `value` (0–`max`), `max` (100), `size` (64), `thickness` (8), `label` (for `aria-label`, default "Score"), `format`, `thresholds` (`[50, 80]` → classes `hm-ring-low|mid|high`).
+Props: `value` (0–`max`), `max` (100), `size` (64), `thickness` (8), `label` (for `aria-label`, default "Score"), `format`, `thresholds` (`[50, 80]` → classes `m-ring-low|mid|high`).
 
 ```jsx
 <ProgressRing value={$score} label="Profile completeness" />
@@ -175,8 +175,8 @@ Props: `data`, `x` (`"label"`), `y` (`"value"`), `format`, `limit` (top N), `sor
 
 - The chart `svg` is focusable (`tabindex="0"`). **Left/Right** (and Up/Down) move between points, bars or slices; **Home/End** jump to the first/last; **PageUp/PageDown** move by 10 %; **Enter/Space** call `onSelect`; **Escape** hides the tooltip (and resets zoom).
 - The tooltip is a `role="status"` live region, so values are announced while navigating.
-- Each chart renders a visually hidden `<table class="hm-sr-only">` with a caption (the title), a header row (x label + series labels) and the formatted values. Up to 1000 rows are rendered; the caption says when it is truncated.
-- Legend items are `<button aria-pressed>`; hidden series get `hm-chart-off`.
+- Each chart renders a visually hidden `<table class="m-sr-only">` with a caption (the title), a header row (x label + series labels) and the formatted values. Up to 1000 rows are rendered; the caption says when it is truncated.
+- Legend items are `<button aria-pressed>`; hidden series get `m-chart-off`.
 - Every mark color has a non-color companion: the legend label, the tooltip label and the table.
 
 ## Theming
@@ -185,23 +185,23 @@ All colors are custom properties on `:root`; override them globally or on any wr
 
 | Token | Use |
 | --- | --- |
-| `--hm-chart-1` … `--hm-chart-8` | Series palette (Okabe–Ito based, colorblind friendly). |
-| `--hm-chart-text`, `--hm-chart-muted` | Text, tick labels. |
-| `--hm-chart-axis`, `--hm-chart-grid` | Axis lines, grid lines. |
-| `--hm-chart-bg` | Background used for slice borders and markers. |
-| `--hm-chart-tooltip-bg`, `--hm-chart-tooltip-text` | Tooltip. |
-| `--hm-chart-focus`, `--hm-chart-brush` | Active mark outline, zoom selection. |
-| `--hm-chart-good`, `--hm-chart-bad` | Stat deltas, ring levels. |
-| `--hm-heat-0` … `--hm-heat-4` | Heatmap levels. |
-| `--hm-ring-low|mid|high` | Progress ring levels. |
-| `--hm-chart-font`, `--hm-chart-font-size` | Typography. |
+| `--m-chart-1` … `--m-chart-8` | Series palette (Okabe–Ito based, colorblind friendly). |
+| `--m-chart-text`, `--m-chart-muted` | Text, tick labels. |
+| `--m-chart-axis`, `--m-chart-grid` | Axis lines, grid lines. |
+| `--m-chart-bg` | Background used for slice borders and markers. |
+| `--m-chart-tooltip-bg`, `--m-chart-tooltip-text` | Tooltip. |
+| `--m-chart-focus`, `--m-chart-brush` | Active mark outline, zoom selection. |
+| `--m-chart-good`, `--m-chart-bad` | Stat deltas, ring levels. |
+| `--m-heat-0` … `--m-heat-4` | Heatmap levels. |
+| `--m-ring-low|mid|high` | Progress ring levels. |
+| `--m-chart-font`, `--m-chart-font-size` | Typography. |
 
 Dark values apply with `:root[data-theme="dark"]`, or automatically under `prefers-color-scheme: dark` unless `:root[data-theme="light"]` is set.
 
-Series classes are `hm-chart-series-0` … `hm-chart-series-7` (they set `--hm-c`). Marks: `hm-chart-line`, `hm-chart-area`, `hm-chart-bar`, `hm-chart-slice`, `hm-heat-cell`, `hm-chart-marker`. Wrappers: `hm-chart` plus `hm-line-chart`, `hm-area-chart`, `hm-bar-chart`, `hm-pie-chart`, `hm-heatmap-chart`.
+Series classes are `m-chart-series-0` … `m-chart-series-7` (they set `--m-c`). Marks: `m-chart-line`, `m-chart-area`, `m-chart-bar`, `m-chart-slice`, `m-heat-cell`, `m-chart-marker`. Wrappers: `m-chart` plus `m-line-chart`, `m-area-chart`, `m-bar-chart`, `m-pie-chart`, `m-heatmap-chart`.
 
 ```css
-.revenue { --hm-chart-1: #7c3aed; --hm-chart-2: #f59e0b; }
+.revenue { --m-chart-1: #7c3aed; --m-chart-2: #f59e0b; }
 ```
 
 ## Performance

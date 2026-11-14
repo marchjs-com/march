@@ -1,6 +1,6 @@
 /* ScrollProgress. A Progress line: only its place (fixed / inline) and its paint are set here. */
-.hm-scroll-progress { pointer-events: none; }
-.hm-scroll-progress-fixed { position: fixed; inset-inline: 0; inset-block-start: var(--hm-site-nav-top, 0); z-index: calc(var(--hm-z-sticky) + 1); }
-.hm-scroll-progress-fixed .hm-progress2-track { border-radius: 0; }
-.hm-scroll-progress-inline { --hm-progress-track: var(--hm-surface-2); }
-.hm-scroll-progress-gradient:not([data-hm-color]) { --hm-progress-c: var(--hm-brand-gradient); }
+.m-scroll-progress { pointer-events: none; }
+.m-scroll-progress-fixed { position: fixed; inset-inline: 0; inset-block-start: var(--m-site-nav-top, 0); z-index: calc(var(--m-z-sticky) + 1); }
+.m-scroll-progress-fixed .m-progress2-track { border-radius: 0; }
+.m-scroll-progress-inline { --m-progress-track: var(--m-surface-2); }
+.m-scroll-progress-gradient:not([data-m-color]) { --m-progress-c: var(--m-brand-gradient); }

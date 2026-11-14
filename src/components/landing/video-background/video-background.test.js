@@ -10,13 +10,13 @@ const { VideoBackground } = await import("./index.ts");
 test("VideoBackground: poster overlay, tint, content above, no video on quiet media", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => h(VideoBackground, { src: "/v.webm", poster: "/p.jpg", tint: "brand" }, h("h1", {}, "Hello")), el);
-  const root = el.querySelector(".hm-vbg");
-  assert.ok(root.className.includes("hm-vbg-tint-brand"));
-  assert.equal(root.querySelector(".hm-ov-video .hm-ov-poster").getAttribute("src"), "/p.jpg");
-  assert.ok(root.querySelector(".hm-vbg-tint"));
-  assert.equal(root.querySelector(".hm-vbg-content h1").textContent, "Hello");
+  const root = el.querySelector(".m-vbg");
+  assert.ok(root.className.includes("m-vbg-tint-brand"));
+  assert.equal(root.querySelector(".m-ov-video .m-ov-poster").getAttribute("src"), "/p.jpg");
+  assert.ok(root.querySelector(".m-vbg-tint"));
+  assert.equal(root.querySelector(".m-vbg-content h1").textContent, "Hello");
   // quiet media (reduced motion here): the poster stays and there is no motion to pause
-  assert.equal(root.querySelector(".hm-vbg-toggle"), null);
+  assert.equal(root.querySelector(".m-vbg-toggle"), null);
   assert.equal(root.querySelector("video"), null);
   dispose();
 });
@@ -24,8 +24,8 @@ test("VideoBackground: poster overlay, tint, content above, no video on quiet me
 test("VideoBackground: no tint layer with tint none, no button with controls false", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => h(VideoBackground, { src: "/v.webm", tint: "none", controls: false }), el);
-  assert.equal(el.querySelector(".hm-vbg-tint"), null);
-  assert.equal(el.querySelector(".hm-vbg-toggle"), null);
+  assert.equal(el.querySelector(".m-vbg-tint"), null);
+  assert.equal(el.querySelector(".m-vbg-toggle"), null);
   dispose();
 });
 
@@ -37,7 +37,7 @@ test("VideoBackground: own names and icons on the pause button", () => {
   globalThis.matchMedia = (q) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} });
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => h(VideoBackground, { src: "/v.webm", class: "mine", labels: { pause: "Stop the waves" }, icons: { pause: h("i", { class: "own" }) } }), el);
-  const btn = el.querySelector(".hm-vbg.mine .hm-vbg-toggle");
+  const btn = el.querySelector(".m-vbg.mine .m-vbg-toggle");
   assert.equal(btn.getAttribute("aria-label"), "Stop the waves");
   assert.ok(btn.querySelector(".own"));
   dispose();

@@ -1,19 +1,19 @@
 /* March — Rating. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- rating */
-.hm-rating { display: inline-flex; gap: 2px; }
-.hm-rating-star { position: relative; display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; padding: 0; border: 0; border-radius: var(--hm-radius-1); background: none; color: var(--hm-border-strong); cursor: pointer;
-  transition: transform var(--hm-dur) var(--hm-ease-spring); }
-.hm-rating-sm .hm-rating-star { width: 1rem; height: 1rem; } .hm-rating-lg .hm-rating-star { width: 2rem; height: 2rem; }
-.hm-rating-star .hm-svg { width: 100%; height: 100%; }
-.hm-rating-star > span { grid-area: 1 / 1; display: inline-flex; width: 100%; height: 100%; }
-.hm-rating-on { color: var(--hm-accent, var(--hm-primary)); opacity: 0; transition: opacity var(--hm-dur) var(--hm-ease); }
-.hm-rating-star.is-on .hm-rating-on { opacity: 1; }
-.hm-rating-star.is-half .hm-rating-on { opacity: 1; clip-path: inset(0 50% 0 0); }
-.hm-rating-star.is-half:dir(rtl) .hm-rating-on { clip-path: inset(0 0 0 50%); }
+.m-rating { display: inline-flex; gap: 2px; }
+.m-rating-star { position: relative; display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; padding: 0; border: 0; border-radius: var(--m-radius-1); background: none; color: var(--m-border-strong); cursor: pointer;
+  transition: transform var(--m-dur) var(--m-ease-spring); }
+.m-rating-sm .m-rating-star { width: 1rem; height: 1rem; } .m-rating-lg .m-rating-star { width: 2rem; height: 2rem; }
+.m-rating-star .m-svg { width: 100%; height: 100%; }
+.m-rating-star > span { grid-area: 1 / 1; display: inline-flex; width: 100%; height: 100%; }
+.m-rating-on { color: var(--m-accent, var(--m-primary)); opacity: 0; transition: opacity var(--m-dur) var(--m-ease); }
+.m-rating-star.is-on .m-rating-on { opacity: 1; }
+.m-rating-star.is-half .m-rating-on { opacity: 1; clip-path: inset(0 50% 0 0); }
+.m-rating-star.is-half:dir(rtl) .m-rating-on { clip-path: inset(0 0 0 50%); }
 /* hover preview: a lighter tone of the color until the click */
-.hm-rating.is-hovering .hm-rating-on { color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 55%, var(--hm-surface)); }
-.hm-rating:not(.is-readonly) .hm-rating-star:hover { transform: scale(1.15); }
-.hm-rating.is-readonly .hm-rating-star { cursor: default; }
+.m-rating.is-hovering .m-rating-on { color: color-mix(in srgb, var(--m-accent, var(--m-primary)) 55%, var(--m-surface)); }
+.m-rating:not(.is-readonly) .m-rating-star:hover { transform: scale(1.15); }
+.m-rating.is-readonly .m-rating-star { cursor: default; }
 /* animate={false}: no growth, no fade */
-.hm-rating.is-still .hm-rating-star, .hm-rating.is-still .hm-rating-on { transition: none; }
-.hm-rating.is-still:not(.is-readonly) .hm-rating-star:hover { transform: none; }
+.m-rating.is-still .m-rating-star, .m-rating.is-still .m-rating-on { transition: none; }
+.m-rating.is-still:not(.is-readonly) .m-rating-star:hover { transform: none; }

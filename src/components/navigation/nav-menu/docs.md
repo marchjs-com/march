@@ -31,7 +31,7 @@ NavSidebar is the richer sidebar built on the same container.
 | `label` | string | "Main" | accessible name of the nav |
 | `class` | ClassProp | — | extra class on the wrapper |
 | `palette` | boolean | `true` | register the pages with the command palette |
-| `storageKey` | string | `"hm.nav"` | localStorage key for pins, recents, groups |
+| `storageKey` | string | `"m.nav"` | localStorage key for pins, recents, groups |
 
 ```tsx
 <NavMenu items={items} pins={false} maxRecent={0} icons={{ chevron: plus, search: false }}

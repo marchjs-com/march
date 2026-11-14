@@ -41,7 +41,7 @@ export function setStyle(el: Element, props: Record<string, string | number | nu
   }
 }
 
-/** Milliseconds from a CSS duration token (e.g. "--hm-dur-2") or a number. */
+/** Milliseconds from a CSS duration token (e.g. "--m-dur-2") or a number. */
 export function ms(v: number | string | undefined, fallback: number): number {
   if (typeof v === "number") return v;
   if (typeof v === "string") {

@@ -37,11 +37,11 @@ export interface ParallaxProps {
 /** `<Parallax layers={[{ src: "/sky.jpg", speed: .5 }, { src: "/hills.png", speed: .25 }, { content: <Logo/>, speed: -.1 }]} pointer={1}>…</Parallax>` */
 export function Parallax(props: ParallaxProps): Element {
   const layerEls = props.layers.map((l, i) => h(Overlay, {
-    ...(l.src ? { src: l.src, alt: l.alt } : { svg: h("div", { class: "hm-plx-node" }, l.content) }),
-    inset: `-${l.bleed ?? "12%"}`, opacity: l.opacity, blend: l.blend, layer: i + 1, class: cx("hm-plx-layer", val(l.class as MaybeFn<unknown>)),
+    ...(l.src ? { src: l.src, alt: l.alt } : { svg: h("div", { class: "m-plx-node" }, l.content) }),
+    inset: `-${l.bleed ?? "12%"}`, opacity: l.opacity, blend: l.blend, layer: i + 1, class: cx("m-plx-layer", val(l.class as MaybeFn<unknown>)),
   } as OverlayProps) as HTMLElement);
-  const root = h("div", { class: cx("hm-plx", val(props.class)) }, layerEls, h("div", { class: "hm-plx-content" }, props.children)) as HTMLElement;
-  if (props.height) setStyle(root, { "--hm-plx-h": props.height });
+  const root = h("div", { class: cx("m-plx", val(props.class)) }, layerEls, h("div", { class: "m-plx-content" }, props.children)) as HTMLElement;
+  if (props.height) setStyle(root, { "--m-plx-h": props.height });
 
   // scroll: the motion core's parallaxLayers seeks each layer by the section's passage (far layers lag: negative depth);
   // pointer: hoverParallax shifts the layer contents by their depth with a spring. Reduced motion: still layers.
@@ -51,10 +51,10 @@ export function Parallax(props: ParallaxProps): Element {
     const inner = el.firstElementChild as HTMLElement | null;
     if (inner) inner.setAttribute("data-depth", String((l.depth ?? (l.speed ?? 0.2) * 60) / 60));
   });
-  const offs = [parallaxLayers(root, { selector: ".hm-plx-layer", strength: 420 })];
+  const offs = [parallaxLayers(root, { selector: ".m-plx-layer", strength: 420 })];
   let live = true;
   // the pointer layer comes with motion/micro (ripple, state morph…): loaded only when a parallax follows the mouse
-  if (props.pointer) void import("../../../motion/micro.ts").then((m) => { if (live) offs.push(m.hoverParallax(root, { depth: 60 * (props.pointer ?? 1), selector: ".hm-plx-layer > [data-depth]" })); });
+  if (props.pointer) void import("../../../motion/micro.ts").then((m) => { if (live) offs.push(m.hoverParallax(root, { depth: 60 * (props.pointer ?? 1), selector: ".m-plx-layer > [data-depth]" })); });
   owned(() => { live = false; offs.forEach((f) => f()); });
   return root;
 }

@@ -49,6 +49,6 @@ test("openMedia opens a dialog with the media", async () => {
 
 test("Media size adds a size class", () => {
   const { el, dispose } = mount(() => h(Media, { src: "https://x.test/a.png", size: "sm" }));
-  assert.ok(el.querySelector("img").getAttribute("class").includes("hm-media-sm"));
+  assert.ok(el.querySelector("img").getAttribute("class").includes("m-media-sm"));
   dispose();
 });

@@ -1,2 +1,2 @@
 /* March — search hit highlight (markText). */
-.hm-mark { padding: 0 .0625rem; border-radius: 2px; background: color-mix(in srgb, var(--hm-primary) 24%, transparent); color: inherit; font-weight: var(--hm-weight-semibold); }
+.m-mark { padding: 0 .0625rem; border-radius: 2px; background: color-mix(in srgb, var(--m-primary) 24%, transparent); color: inherit; font-weight: var(--m-weight-semibold); }

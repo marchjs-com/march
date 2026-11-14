@@ -12,11 +12,11 @@ function scene(): Promise<string> {
   cv.height = 640
   const g = cv.getContext("2d")!
   const sky = g.createLinearGradient(0, 0, 0, 640)
-  sky.addColorStop(0, token("--hm-brand-blue"))
-  sky.addColorStop(1, token("--hm-surface"))
+  sky.addColorStop(0, token("--m-brand-blue"))
+  sky.addColorStop(1, token("--m-surface"))
   g.fillStyle = sky
   g.fillRect(0, 0, 960, 640)
-  g.fillStyle = token("--hm-brand-orange")
+  g.fillStyle = token("--m-brand-orange")
   g.beginPath(); g.arc(690, 190, 80, 0, Math.PI * 2); g.fill()
   const hill = (y: number, amp: number, color: string, phase: number) => {
     g.fillStyle = color
@@ -24,9 +24,9 @@ function scene(): Promise<string> {
     for (let x = 0; x <= 960; x += 16) g.lineTo(x, y + Math.sin(x / 140 + phase) * amp)
     g.lineTo(960, 640); g.closePath(); g.fill()
   }
-  hill(430, 40, token("--hm-brand-purple"), 0.4)
-  hill(500, 34, token("--hm-brand-green"), 2.1)
-  hill(580, 22, token("--hm-text"), 4.2)
+  hill(430, 40, token("--m-brand-purple"), 0.4)
+  hill(500, 34, token("--m-brand-green"), 2.1)
+  hill(580, 22, token("--m-text"), 4.2)
   return new Promise((res) => cv.toBlob((b) => res(b ? URL.createObjectURL(b) : ""), "image/png"))
 }
 
@@ -46,6 +46,6 @@ export default function ImageCropperDemo(props: { values: { aspect: string; maxZ
       return src() ? <ImageCropper src={src()} alt="Tepeler ve güneş" value={$crop} onChange={(c: CropState) => { $crop = c }} aspect={props.values.aspect === "choices" ? undefined : Number(props.values.aspect)}
         maxZoom={props.values.maxZoom} preview={props.values.preview} readonly={props.values.readonly} {...parts} labels={labels} /> : null
     }}
-    {() => (SLIDERS[props.values.sliders] === false ? null : <p class="hm-muted">{`Yakınlaştırma kaydırıcısı %100 ile %${props.values.maxZoom * 100} arasında.`}</p>)}
+    {() => (SLIDERS[props.values.sliders] === false ? null : <p class="m-muted">{`Yakınlaştırma kaydırıcısı %100 ile %${props.values.maxZoom * 100} arasında.`}</p>)}
   </div>
 }

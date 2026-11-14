@@ -7,7 +7,7 @@ import { hourglass } from "../../../icons/glyphs/hourglass.ts";
 export const code = `<Loader text="Panolar hazırlanıyor…" />
 <div class="relative">{content}{() => busy() && <Loader overlay />}</div>
 <Loader color="brand-orange" />  <Loader spinner={<Icon of={hourglass} />} label="Açılıyor" />  <Loader spinner={false} text="Bir saniye…" />
-bootLoader.done()                            // index.html'deki #hm-boot ekranını kaldırır`
+bootLoader.done()                            // index.html'deki #m-boot ekranını kaldırır`
 
 export default function LoaderDemo(props: { values: { text: boolean; overlay: boolean; spinner: string; color: string } }) {
   let $busy = true
@@ -23,7 +23,7 @@ export default function LoaderDemo(props: { values: { text: boolean; overlay: bo
       if (!v.overlay) return $busy ? <Loader text={text} {...part()} /> : <p class="sc-loader-done">Panolar hazır.</p>
       return <div class="sc-loader-box">
         <strong>HADİ satış panosu</strong>
-        <p class="hm-muted">Bu çeyrekte 1.284 sipariş, ortalama sepet 412 ₺.</p>
+        <p class="m-muted">Bu çeyrekte 1.284 sipariş, ortalama sepet 412 ₺.</p>
         {$busy ? <Loader overlay text={text} {...part()} /> : null}
       </div>
     }}

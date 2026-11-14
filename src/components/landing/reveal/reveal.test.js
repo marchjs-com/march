@@ -8,7 +8,7 @@ const { Reveal, revealFrames } = await import("./index.ts");
 test("Reveal: pending until visible, then revealed (no IntersectionObserver = at once)", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => h(Reveal, { effect: "up" }, h("p", {}, "a"), h("p", {}, "b")), el);
-  const box = el.querySelector(".hm-reveal");
+  const box = el.querySelector(".m-reveal");
   assert.ok(box);
   assert.ok(box.classList.contains("is-revealed"));
   assert.ok(!box.classList.contains("is-pending"));
@@ -36,6 +36,6 @@ test("Reveal: effect none hides nothing; own frames and easing are accepted", as
   // "none" with a selector: the picked descendants are never hidden
   const box = document.createElement("div"); box.append(document.createElement("i"));
   revealOnScroll(box, { effect: "none", select: "i" });
-  assert.ok(!box.querySelector("i").classList.contains("hm-reveal-item"));
+  assert.ok(!box.querySelector("i").classList.contains("m-reveal-item"));
   dispose();
 });

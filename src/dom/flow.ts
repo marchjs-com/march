@@ -56,7 +56,7 @@ export function Try(props: TryProps): () => unknown {
   };
 }
 function defaultError(e: unknown, reset: () => unknown): Element {
-  return h("div", { class: "hm-error", role: "alert" },
+  return h("div", { class: "m-error", role: "alert" },
     h("p", {}, String((e as { message?: unknown } | null)?.message ?? e)),
-    h("button", { type: "button", class: "hm-btn", onClick: reset }, "Retry"));
+    h("button", { type: "button", class: "m-btn", onClick: reset }, "Retry"));
 }

@@ -62,7 +62,7 @@ test("LineChart renders one path per series and updates only the changed path", 
   const [tid, did] = svg.getAttribute("aria-labelledby").split(" ");
   assert.equal(el.querySelector(`#${tid}`).textContent, "Sales");
   assert.equal(el.querySelector(`#${did}`).textContent, "Daily");
-  const paths = el.querySelectorAll("path.hm-chart-line");
+  const paths = el.querySelectorAll("path.m-chart-line");
   assert.equal(paths.length, 2);
   assert.match(paths[0].getAttribute("d"), /^M[\d.]+,[\d.]+(L[\d.]+,[\d.]+){3}$/);
   const [inc, exp] = paths;
@@ -70,7 +70,7 @@ test("LineChart renders one path per series and updates only the changed path", 
   for (const p of [inc, exp]) { const orig = p.setAttribute.bind(p); p.setAttribute = (k, v) => { writes.set(p, writes.get(p) + 1); orig(k, v); }; }
   const before = exp.getAttribute("d");
   data.set(sales().map((r, i) => (i === 2 ? { ...r, expense: 8 } : r))); // only "expense" changes; y domain stays [0..20]
-  const after = el.querySelectorAll("path.hm-chart-line");
+  const after = el.querySelectorAll("path.m-chart-line");
   assert.equal(after[0], inc, "same element identity");
   assert.equal(after[1], exp);
   assert.equal(writes.get(inc), 0, "unchanged series path is not touched");
@@ -80,10 +80,10 @@ test("LineChart renders one path per series and updates only the changed path", 
 
 test("AreaChart stacked: upper series sits on the lower one", () => {
   const { el } = mount(() => h(C.AreaChart, { data: [{ x: 0, a: 1, b: 1 }, { x: 1, a: 2, b: 2 }], x: "x", y: ["a", "b"], stacked: true, width: 300, height: 200 }));
-  const areas = el.querySelectorAll("path.hm-chart-area");
+  const areas = el.querySelectorAll("path.m-chart-area");
   assert.equal(areas.length, 2);
   const nums = (d) => d.match(/-?[\d.]+/g).map(Number);
-  const a = nums(el.querySelectorAll("path.hm-chart-line")[0].getAttribute("d"));
+  const a = nums(el.querySelectorAll("path.m-chart-line")[0].getAttribute("d"));
   const bArea = nums(areas[1].getAttribute("d"));
   // the bottom edge of b (last two points, reversed) equals the top line of a
   assert.deepEqual(bArea.slice(-4), [a[2], a[3], a[0], a[1]]);
@@ -92,7 +92,7 @@ test("AreaChart stacked: upper series sits on the lower one", () => {
 test("BarChart grouped and stacked geometry", () => {
   const data = [{ c: "A", x: 2, y: 3 }, { c: "B", x: 4, y: 1 }];
   const g = mount(() => h(C.BarChart, { data, x: "c", y: ["x", "y"], width: 400, height: 200 })).el;
-  const gb = g.querySelectorAll("rect.hm-chart-bar").map((r) => ({ x: +r.getAttribute("x"), y: +r.getAttribute("y"), w: +r.getAttribute("width"), h: +r.getAttribute("height") }));
+  const gb = g.querySelectorAll("rect.m-chart-bar").map((r) => ({ x: +r.getAttribute("x"), y: +r.getAttribute("y"), w: +r.getAttribute("width"), h: +r.getAttribute("height") }));
   assert.equal(gb.length, 4);
   assert.equal(gb[0].w, gb[1].w);
   assert.ok(Math.abs(gb[1].x - (gb[0].x + gb[0].w)) < 0.2, "grouped bars sit side by side");
@@ -100,13 +100,13 @@ test("BarChart grouped and stacked geometry", () => {
   assert.ok(Math.abs(gb[1].h / gb[0].h - 1.5) < 0.01, "heights proportional to values");
 
   const s = mount(() => h(C.BarChart, { data, x: "c", y: ["x", "y"], stacked: true, width: 400, height: 200 })).el;
-  const sb = s.querySelectorAll("rect.hm-chart-bar").map((r) => ({ x: +r.getAttribute("x"), y: +r.getAttribute("y"), w: +r.getAttribute("width"), h: +r.getAttribute("height") }));
+  const sb = s.querySelectorAll("rect.m-chart-bar").map((r) => ({ x: +r.getAttribute("x"), y: +r.getAttribute("y"), w: +r.getAttribute("width"), h: +r.getAttribute("height") }));
   assert.equal(sb[0].x, sb[1].x, "stacked bars share x");
   assert.ok(Math.abs(sb[1].y + sb[1].h - sb[0].y) < 0.2, "second bar sits on the first");
   assert.ok(sb[0].w > gb[0].w, "stacked bars use the whole band");
 
   const hz = mount(() => h(C.BarChart, { data, x: "c", y: "x", horizontal: true, width: 400, height: 200 })).el;
-  const hb = hz.querySelectorAll("rect.hm-chart-bar").map((r) => +r.getAttribute("width"));
+  const hb = hz.querySelectorAll("rect.m-chart-bar").map((r) => +r.getAttribute("width"));
   assert.ok(Math.abs(hb[1] / hb[0] - 2) < 0.01, "horizontal bar lengths follow values");
 });
 
@@ -117,72 +117,72 @@ test("PieChart: slices sum to a full circle; donut shows the total", () => {
   assert.equal(lay[0].start, 0);
   const data = [{ label: "a", value: 1 }, { label: "b", value: 3 }];
   const { el } = mount(() => h(C.PieChart, { data, donut: true, width: 200, height: 200, format: "number" }));
-  assert.equal(el.querySelectorAll("path.hm-chart-slice").length, 2);
-  assert.equal(el.querySelector(".hm-chart-center").textContent, "4");
+  assert.equal(el.querySelectorAll("path.m-chart-slice").length, 2);
+  assert.equal(el.querySelector(".m-chart-center").textContent, "4");
   const one = mount(() => h(C.PieChart, { data: [{ label: "only", value: 5 }], width: 200, height: 200 })).el;
-  assert.match(one.querySelector("path.hm-chart-slice").getAttribute("d"), /A.*A/, "a single slice is a full circle");
+  assert.match(one.querySelector("path.m-chart-slice").getAttribute("d"), /A.*A/, "a single slice is a full circle");
 });
 
 test("Stat: delta sign, arrow and classes", () => {
   const val = signal(120);
   const { el } = mount(() => h(C.Stat, { label: "Revenue", value: val, previous: 100, format: ["money", "USD"] }));
-  const delta = () => el.querySelector(".hm-stat-delta");
-  assert.equal(el.querySelector(".hm-stat-value").textContent, "$120.00");
-  assert.ok(delta().classList.contains("hm-stat-up") && delta().classList.contains("hm-stat-good"));
-  assert.equal(el.querySelector(".hm-stat-delta-value").textContent, "+20%");
-  assert.equal(el.querySelector(".hm-stat-arrow").textContent, "↑");
+  const delta = () => el.querySelector(".m-stat-delta");
+  assert.equal(el.querySelector(".m-stat-value").textContent, "$120.00");
+  assert.ok(delta().classList.contains("m-stat-up") && delta().classList.contains("m-stat-good"));
+  assert.equal(el.querySelector(".m-stat-delta-value").textContent, "+20%");
+  assert.equal(el.querySelector(".m-stat-arrow").textContent, "↑");
   val.set(80);
-  assert.ok(delta().classList.contains("hm-stat-down") && delta().classList.contains("hm-stat-bad"));
-  assert.equal(el.querySelector(".hm-stat-delta-value").textContent, "−20%");
+  assert.ok(delta().classList.contains("m-stat-down") && delta().classList.contains("m-stat-bad"));
+  assert.equal(el.querySelector(".m-stat-delta-value").textContent, "−20%");
   const inv = mount(() => h(C.Stat, { label: "Cost", value: 5, delta: -0.1, invert: true })).el;
-  assert.ok(inv.querySelector(".hm-stat-delta").classList.contains("hm-stat-good"), "invert: down is good");
+  assert.ok(inv.querySelector(".m-stat-delta").classList.contains("m-stat-good"), "invert: down is good");
   const flat = mount(() => h(C.Stat, { label: "Users", value: 5 })).el;
-  assert.equal(flat.querySelector(".hm-stat-delta"), null, "no delta without previous/delta");
+  assert.equal(flat.querySelector(".m-stat-delta"), null, "no delta without previous/delta");
 });
 
 test("Heatmap: cell count and levels; calendar mode; ProgressRing and BarList", () => {
   const data = [];
   for (let d = 0; d < 7; d++) for (let hr = 0; hr < 24; hr++) data.push({ x: hr, y: d, value: (d * hr) % 7 });
   const { el } = mount(() => h(C.Heatmap, { data, width: 600 }));
-  assert.equal(el.querySelectorAll("rect.hm-heat-cell").length, 7 * 24);
+  assert.equal(el.querySelectorAll("rect.m-heat-cell").length, 7 * 24);
   assert.equal(heatLevel(0, 10), 0);
   assert.equal(heatLevel(10, 10), 4);
   assert.equal(heatLevel(1, 10), 1);
   const cal = mount(() => h(C.Heatmap, { data: [{ date: "2026-03-02T12:00:00", n: 3 }], x: "date", value: "n", calendar: { weeks: 12 }, width: 600 })).el;
-  assert.equal(cal.querySelectorAll("rect.hm-heat-cell").length, 12 * 7);
-  assert.equal(cal.querySelectorAll("rect.hm-heat-4").length, 1);
+  assert.equal(cal.querySelectorAll("rect.m-heat-cell").length, 12 * 7);
+  assert.equal(cal.querySelectorAll("rect.m-heat-4").length, 1);
 
   const ring = mount(() => h(C.ProgressRing, { value: 72, label: "Score" })).el.querySelector("svg");
-  assert.ok(ring.classList.contains("hm-ring-mid"));
+  assert.ok(ring.classList.contains("m-ring-mid"));
   assert.equal(ring.getAttribute("aria-label"), "Score: 72 of 100");
 
   const list = mount(() => h(C.BarList, { data: [{ label: "a", value: 5 }, { label: "b", value: 10 }, { label: "c", value: 1 }], limit: 2 })).el;
-  assert.deepEqual(list.querySelectorAll(".hm-barlist-label").map((x) => x.textContent), ["b", "a"]);
+  assert.deepEqual(list.querySelectorAll(".m-barlist-label").map((x) => x.textContent), ["b", "a"]);
   assert.deepEqual(list.querySelectorAll("rect").map((r) => r.getAttribute("width")), ["100%", "50%"]);
 });
 
 test("legend toggle hides and shows a series (keyboard accessible buttons)", () => {
   const { el } = mount(() => h(C.LineChart, { data: sales(), x: "day", y: ["income", "expense"], series: ["Income", "Expense"], width: 400, height: 200 }));
-  const buttons = el.querySelectorAll(".hm-chart-legend-item");
+  const buttons = el.querySelectorAll(".m-chart-legend-item");
   assert.deepEqual(buttons.map((b) => b.tagName), ["BUTTON", "BUTTON"]);
   assert.equal(buttons[1].textContent, "Expense");
   buttons[1].click();
-  assert.equal(el.querySelectorAll("path.hm-chart-line").length, 1);
+  assert.equal(el.querySelectorAll("path.m-chart-line").length, 1);
   assert.equal(buttons[1].getAttribute("aria-pressed"), "false");
-  assert.ok(buttons[1].classList.contains("hm-chart-off"));
+  assert.ok(buttons[1].classList.contains("m-chart-off"));
   buttons[1].click();
-  assert.equal(el.querySelectorAll("path.hm-chart-line").length, 2);
+  assert.equal(el.querySelectorAll("path.m-chart-line").length, 2);
   const pie = mount(() => h(C.PieChart, { data: [{ label: "a", value: 1 }, { label: "b", value: 3 }], width: 200, height: 200 })).el;
-  pie.querySelectorAll(".hm-chart-legend-item")[0].click();
-  assert.equal(pie.querySelectorAll("path.hm-chart-slice").length, 1);
+  pie.querySelectorAll(".m-chart-legend-item")[0].click();
+  assert.equal(pie.querySelectorAll("path.m-chart-slice").length, 1);
 });
 
 test("keyboard navigation moves the focus marker and updates the tooltip; onSelect", () => {
   const picked = [];
   const { el } = mount(() => h(C.LineChart, { data: sales(), x: "day", y: ["income"], format: ["money", "USD"], width: 400, height: 200, onSelect: (p) => picked.push(p) }));
   const svg = el.querySelector("svg");
-  const focus = el.querySelector(".hm-chart-focus");
-  const tip = el.querySelector(".hm-chart-tooltip");
+  const focus = el.querySelector(".m-chart-focus");
+  const tip = el.querySelector(".m-chart-tooltip");
   assert.equal(svg.getAttribute("tabindex"), "0");
   assert.equal(focus.getAttribute("visibility"), "hidden");
   key(svg, "ArrowRight");
@@ -212,30 +212,30 @@ test("keyboard navigation moves the focus marker and updates the tooltip; onSele
 test("zoom: drag selects an x range, double click resets", () => {
   const data = Array.from({ length: 100 }, (_, i) => ({ i, v: i % 10 }));
   const { el } = mount(() => h(C.LineChart, { data, x: "i", y: "v", zoom: true, width: 600, height: 200 }));
-  const overlay = el.querySelector(".hm-chart-overlay");
+  const overlay = el.querySelector(".m-chart-overlay");
   const left = Number(overlay.getAttribute("x")), w = Number(overlay.getAttribute("width"));
   const ptr = (type, frac) => overlay.dispatchEvent(new Event(type, { bubbles: true, clientX: left + w * frac, clientY: 50 }));
-  const ticks = () => el.querySelectorAll(".hm-chart-axis-x .hm-chart-tick text").map((t) => Number(t.textContent));
+  const ticks = () => el.querySelectorAll(".m-chart-axis-x .m-chart-tick text").map((t) => Number(t.textContent));
   ptr("pointerdown", 0.2); ptr("pointermove", 0.5); ptr("pointerup", 0.5);
   assert.ok(Math.min(...ticks()) >= 19 && Math.max(...ticks()) <= 51, `zoomed ticks ${ticks()}`);
-  assert.equal(el.querySelector(".hm-chart-reset").hasAttribute("hidden"), false);
+  assert.equal(el.querySelector(".m-chart-reset").hasAttribute("hidden"), false);
   overlay.dispatchEvent(new Event("dblclick", { bubbles: true }));
   assert.ok(Math.max(...ticks()) >= 80, `reset ticks ${ticks()}`);
 });
 
 test("hidden data table mirrors the data; formats via pipes", () => {
   const { el } = mount(() => h(C.LineChart, { data: sales(), x: "day", y: ["income", "expense"], series: { income: "Income", expense: "Expense" }, format: ["money", "USD"], xFormat: "date", title: "Sales", width: 400, height: 200 }));
-  const table = el.querySelector(".hm-sr-only table");
+  const table = el.querySelector(".m-sr-only table");
   assert.ok(table);
   assert.equal(table.querySelector("caption").textContent, "Sales");
   assert.deepEqual(table.querySelectorAll("thead th").map((t) => t.textContent), ["day", "Income", "Expense"]);
   const rows = table.querySelectorAll("tbody tr");
   assert.equal(rows.length, 4);
   assert.deepEqual(rows[0].childNodes.filter((n) => n.nodeType === 1).map((c) => c.textContent), ["Mar 1, 2026", "$10.00", "$4.00"]);
-  const yLabels = el.querySelectorAll(".hm-chart-axis-y text").map((t) => t.textContent);
+  const yLabels = el.querySelectorAll(".m-chart-axis-y text").map((t) => t.textContent);
   assert.ok(yLabels.every((l) => l.startsWith("$")), `money ticks ${yLabels}`);
   const pct = mount(() => h(C.BarChart, { data: [{ k: "a", v: 0.25 }], x: "k", y: "v", format: "percent", width: 300, height: 150 })).el;
-  assert.ok(pct.querySelectorAll(".hm-chart-axis-y text").some((t) => t.textContent === "20%"));
+  assert.ok(pct.querySelectorAll(".m-chart-axis-y text").some((t) => t.textContent === "20%"));
   const fn = mount(() => h(C.BarChart, { data: [{ k: "a", v: 3 }], x: "k", y: "v", format: (v) => `${v} pts`, width: 300, height: 150 })).el;
   assert.equal(fn.querySelector("tbody td").textContent, "3 pts");
 });
@@ -243,10 +243,10 @@ test("hidden data table mirrors the data; formats via pipes", () => {
 test("large data is downsampled with LTTB (maxPoints)", () => {
   const data = Array.from({ length: 20000 }, (_, i) => ({ t: i, v: Math.sin(i / 100) }));
   const { el } = mount(() => h(C.LineChart, { data, x: "t", y: "v", width: 500, height: 200 }));
-  const segs = el.querySelector("path.hm-chart-line").getAttribute("d").split(/[ML]/).filter(Boolean).length;
+  const segs = el.querySelector("path.m-chart-line").getAttribute("d").split(/[ML]/).filter(Boolean).length;
   assert.ok(segs <= 1000 && segs > 100, `points drawn: ${segs}`);
   const capped = mount(() => h(C.LineChart, { data, x: "t", y: "v", width: 500, height: 200, maxPoints: 50 })).el;
-  assert.equal(capped.querySelector("path.hm-chart-line").getAttribute("d").split(/[ML]/).filter(Boolean).length, 50);
+  assert.equal(capped.querySelector("path.m-chart-line").getAttribute("d").split(/[ML]/).filter(Boolean).length, 50);
 });
 
 test("empty state and CSP: no style attribute anywhere", () => {
@@ -262,10 +262,10 @@ test("empty state and CSP: no style attribute anywhere", () => {
     h(C.BarList, { data: [{ label: "a", value: 1 }], onSelect: () => {} }),
     h(C.Heatmap, { data: [{ x: 1, y: 1, value: 1 }] }),
   ]);
-  assert.equal(el.querySelector(".hm-chart-empty").textContent, "Nothing yet");
+  assert.equal(el.querySelector(".m-chart-empty").textContent, "Nothing yet");
   const nodes = all(el);
   assert.ok(nodes.length > 100);
   for (const n of nodes) assert.equal(n.getAttribute("style"), null, `<${n.localName} class="${n.getAttribute("class")}"> has a style attribute`);
-  const colored = el.querySelectorAll(".hm-chart")[1].querySelector("g.hm-chart-series");
-  assert.equal(colored.style.getPropertyValue("--hm-c"), "#123456", "colors override via CSSOM custom property");
+  const colored = el.querySelectorAll(".m-chart")[1].querySelector("g.m-chart-series");
+  assert.equal(colored.style.getPropertyValue("--m-c"), "#123456", "colors override via CSSOM custom property");
 });

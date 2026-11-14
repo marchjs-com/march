@@ -1,18 +1,18 @@
-/* StatusDot. A dot in a tone (--hm-status-dot-c) or a theme colour (data-hm-color sets --hm-accent); the pulse reuses hm-fade-in. */
-.hm-status-dot { --hm-status-dot-c: var(--hm-success); position: relative; display: inline-block; flex: none; inline-size: .5rem; block-size: .5rem; border-radius: 50%; background: var(--hm-status-dot-c); vertical-align: middle; }
-.hm-status-dot-xs { inline-size: .375rem; block-size: .375rem; }
-.hm-status-dot-sm { inline-size: .4375rem; block-size: .4375rem; }
-.hm-status-dot-lg { inline-size: .65rem; block-size: .65rem; }
-.hm-status-dot.is-neutral { --hm-status-dot-c: var(--hm-muted); }
-.hm-status-dot.is-primary { --hm-status-dot-c: var(--hm-accent, var(--hm-primary)); }
-.hm-status-dot.is-info { --hm-status-dot-c: var(--hm-info); }
-.hm-status-dot.is-warn { --hm-status-dot-c: var(--hm-warn); }
-.hm-status-dot.is-danger { --hm-status-dot-c: var(--hm-danger); }
-.hm-status-dot[data-hm-color] { --hm-status-dot-c: var(--hm-accent); }
+/* StatusDot. A dot in a tone (--m-status-dot-c) or a theme colour (data-m-color sets --m-accent); the pulse reuses m-fade-in. */
+.m-status-dot { --m-status-dot-c: var(--m-success); position: relative; display: inline-block; flex: none; inline-size: .5rem; block-size: .5rem; border-radius: 50%; background: var(--m-status-dot-c); vertical-align: middle; }
+.m-status-dot-xs { inline-size: .375rem; block-size: .375rem; }
+.m-status-dot-sm { inline-size: .4375rem; block-size: .4375rem; }
+.m-status-dot-lg { inline-size: .65rem; block-size: .65rem; }
+.m-status-dot.is-neutral { --m-status-dot-c: var(--m-muted); }
+.m-status-dot.is-primary { --m-status-dot-c: var(--m-accent, var(--m-primary)); }
+.m-status-dot.is-info { --m-status-dot-c: var(--m-info); }
+.m-status-dot.is-warn { --m-status-dot-c: var(--m-warn); }
+.m-status-dot.is-danger { --m-status-dot-c: var(--m-danger); }
+.m-status-dot[data-m-color] { --m-status-dot-c: var(--m-accent); }
 /* hollow: a ring in the tone on the surface, with room for a mark inside */
-.hm-status-dot-hollow { display: inline-grid; place-items: center; box-sizing: border-box; border: 2px solid var(--hm-status-dot-c); background: var(--hm-surface); color: var(--hm-status-dot-c); }
+.m-status-dot-hollow { display: inline-grid; place-items: center; box-sizing: border-box; border: 2px solid var(--m-status-dot-c); background: var(--m-surface); color: var(--m-status-dot-c); }
 /* ring: a border around the dot that breathes · blink: the dot itself fades */
-.hm-status-dot.is-pulse-ring::after { content: ""; position: absolute; inset: -.25rem; border-radius: 50%; border: 2px solid var(--hm-status-dot-c); opacity: .35; animation: hm-fade-in var(--hm-dur-slow) var(--hm-ease) infinite alternate; }
-.hm-status-dot-lg.is-pulse-ring::after { inset: -.3125rem; }
-.hm-status-dot.is-pulse-blink { animation: hm-fade-in calc(var(--hm-dur-slow) * 2) var(--hm-ease) infinite alternate-reverse; }
-@media (prefers-reduced-motion: reduce) { .hm-status-dot.is-pulse-ring::after, .hm-status-dot.is-pulse-blink { animation: none; } }
+.m-status-dot.is-pulse-ring::after { content: ""; position: absolute; inset: -.25rem; border-radius: 50%; border: 2px solid var(--m-status-dot-c); opacity: .35; animation: m-fade-in var(--m-dur-slow) var(--m-ease) infinite alternate; }
+.m-status-dot-lg.is-pulse-ring::after { inset: -.3125rem; }
+.m-status-dot.is-pulse-blink { animation: m-fade-in calc(var(--m-dur-slow) * 2) var(--m-ease) infinite alternate-reverse; }
+@media (prefers-reduced-motion: reduce) { .m-status-dot.is-pulse-ring::after, .m-status-dot.is-pulse-blink { animation: none; } }

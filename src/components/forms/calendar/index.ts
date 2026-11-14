@@ -53,12 +53,12 @@ export function Calendar(props: CalendarProps): unknown {
   const [get, set] = model<IsoDate | null>(props, null);
   const loc = () => props.locale ?? locale();
   const focus = signal(clampIso(isIso(untrack(get)) ? untrack(get)! : props.initial ?? todayIso(), props.min, props.max));
-  const titleId = uid("hm-cal");
+  const titleId = uid("m-cal");
   let moveFocus = false, shown: string | null = null;
   const disabled = (iso: string) => (props.min && iso < props.min) || (props.max && iso > props.max) || !!props.isDisabled?.(iso);
-  const title = h("div", { class: "hm-cal-title", id: titleId, "aria-live": "polite" });
-  const head = h("div", { role: "row", class: "hm-cal-row hm-cal-head" });
-  const body = h("div", { class: "hm-cal-body" });
+  const title = h("div", { class: "m-cal-title", id: titleId, "aria-live": "polite" });
+  const head = h("div", { role: "row", class: "m-cal-row m-cal-head" });
+  const body = h("div", { class: "m-cal-body" });
   const go = (iso: string, keyboard: boolean) => { moveFocus = keyboard; focus.set(clampIso(iso, props.min, props.max)); };
   const pick = (iso: string) => { if (disabled(iso)) return; set(iso); props.onPick?.(iso); };
   const onKeyDown = (e: KeyboardEvent) => {
@@ -69,7 +69,7 @@ export function Calendar(props: CalendarProps): unknown {
     else if (k === "Escape" && props.onEscape) { e.preventDefault(); props.onEscape(); }
   };
   const grid = h("div", {
-    role: "grid", class: "hm-cal-grid", "aria-labelledby": titleId, onKeyDown,
+    role: "grid", class: "m-cal-grid", "aria-labelledby": titleId, onKeyDown,
     onClick: (e: MouseEvent) => { const b = (e.target as Element).closest?.("[data-date]"); if (b) { focus.set(b.getAttribute("data-date")!); pick(b.getAttribute("data-date")!); } },
   }, props.weekdays === false ? null : head, body);
   effect(() => {
@@ -80,13 +80,13 @@ export function Calendar(props: CalendarProps): unknown {
         shown = key;
         title.textContent = dtf(l, { month: "long", year: "numeric" }).format(utc(`${f.slice(0, 7)}-01`));
         const wl = dtf(l, { weekday: "long" }), long = weekdayNames(l, fd, "long");
-        head.replaceChildren(...weekdayNames(l, fd, "short").map((name, i) => h("span", { role: "columnheader", class: "hm-cal-wd", title: long[i] }, name)));
+        head.replaceChildren(...weekdayNames(l, fd, "short").map((name, i) => h("span", { role: "columnheader", class: "m-cal-wd", title: long[i] }, name)));
         const days = monthGrid(f, fd);
         const rows: Element[] = [];
         for (let r = 0; r < 6; r++) {
-          rows.push(h("div", { role: "row", class: "hm-cal-row" }, Array.from({ length: 7 }, (_, c) => {
+          rows.push(h("div", { role: "row", class: "m-cal-row" }, Array.from({ length: 7 }, (_, c) => {
             const iso = days[r * 7 + c]!;
-            return h("button", { type: "button", role: "gridcell", class: cx("hm-cal-day", iso.slice(0, 7) !== f.slice(0, 7) && "hm-cal-out"), "data-date": iso, "aria-label": wl.format(utc(iso)) + " " + dtf(l, { dateStyle: "long" }).format(utc(iso)) }, props.renderDay ? props.renderDay(iso, +iso.slice(8)) : String(+iso.slice(8)));
+            return h("button", { type: "button", role: "gridcell", class: cx("m-cal-day", iso.slice(0, 7) !== f.slice(0, 7) && "m-cal-out"), "data-date": iso, "aria-label": wl.format(utc(iso)) + " " + dtf(l, { dateStyle: "long" }).format(utc(iso)) }, props.renderDay ? props.renderDay(iso, +iso.slice(8)) : String(+iso.slice(8)));
           })));
         }
         body.replaceChildren(...rows);
@@ -98,8 +98,8 @@ export function Calendar(props: CalendarProps): unknown {
         b.setAttribute("aria-selected", String(iso === sel || iso === from || iso === to));
         if (off) b.setAttribute("aria-disabled", "true"); else b.removeAttribute("aria-disabled");
         if (iso === today) b.setAttribute("aria-current", "date"); else b.removeAttribute("aria-current");
-        b.classList.toggle("hm-cal-focus", iso === f);
-        b.classList.toggle("hm-cal-range", !!(from && to && iso > from && iso < to));
+        b.classList.toggle("m-cal-focus", iso === f);
+        b.classList.toggle("m-cal-range", !!(from && to && iso > from && iso < to));
       }
       if (moveFocus) { moveFocus = false; body.querySelector<HTMLElement>(`[data-date="${f}"]`)?.focus(); }
     });
@@ -107,10 +107,10 @@ export function Calendar(props: CalendarProps): unknown {
   if (props.autoFocus) { const id = setTimeout(() => body.querySelector<HTMLElement>(`[data-date="${focus.peek()}"]`)?.focus(), 0); onCleanup(() => clearTimeout(id)); }
   // the month row is a PeriodNav: the arrows around the (live) month name
   const step = (n: number) => () => go(addMonths(focus.peek(), n), false);
-  return h("div", { class: () => cx("hm-cal", props.class), "data-hm-color": () => colorAttr(props.color) },
+  return h("div", { class: () => cx("m-cal", props.class), "data-m-color": () => colorAttr(props.color) },
     h(PeriodNav, {
-      class: "hm-cal-header", size: "sm", arrows: props.nav !== false, onPrev: step(-1), onNext: step(1), prevIcon: props.prevIcon, nextIcon: props.nextIcon,
+      class: "m-cal-header", size: "sm", arrows: props.nav !== false, onPrev: step(-1), onNext: step(1), prevIcon: props.prevIcon, nextIcon: props.nextIcon,
       labels: { previous: () => props.labels?.prevMonth ?? t`Previous month`, next: () => props.labels?.nextMonth ?? t`Next month` },
-      partClass: { prev: "hm-cal-nav hm-cal-prev", next: "hm-cal-nav hm-cal-next" },
+      partClass: { prev: "m-cal-nav m-cal-prev", next: "m-cal-nav m-cal-next" },
     }, title), grid);
 }

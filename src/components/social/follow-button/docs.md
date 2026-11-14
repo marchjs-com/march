@@ -25,7 +25,7 @@ Hovering "Following" turns it red before you unfollow.
 | `color` | ColorToken | `brand-blue` | fill of "Follow" and the focus ring |
 | `burst` | boolean | true | the dots on a new follow |
 | `morph` | boolean | true | the width spring and the icon turn |
-| `class` | string | — | on the button (`hm-follow`; parts: `hm-follow-ico`, `hm-follow-text`) |
+| `class` | string | — | on the button (`m-follow`; parts: `m-follow-ico`, `m-follow-text`) |
 
 ```tsx
 <FollowButton state={$s} onChange={set} labels={{ follow: "Join", following: "Member" }} color="brand-green"

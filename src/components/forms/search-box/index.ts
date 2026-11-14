@@ -88,12 +88,12 @@ export function SearchBox(props: SearchBoxProps): Element {
   const ownClear = props.clear != null && typeof props.clear !== "boolean";
   const combobox = props.controls != null;
   return h("div", {
-    class: () => cx("hm-search", val(props.size) === "sm" && "hm-search-sm", val(props.variant) === "plain" && "hm-search-plain", props.icon === false && "hm-search-no-icon", val(props.class)),
-    role: "search", "data-hm-color": colorAttr(props.color),
+    class: () => cx("m-search", val(props.size) === "sm" && "m-search-sm", val(props.variant) === "plain" && "m-search-plain", props.icon === false && "m-search-no-icon", val(props.class)),
+    role: "search", "data-m-color": colorAttr(props.color),
   },
-  props.icon === false ? null : ownIcon ? icon(props.icon, "hm-search-icon") : h("span", { class: "hm-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
+  props.icon === false ? null : ownIcon ? icon(props.icon, "m-search-icon") : h("span", { class: "m-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
   h("input", {
-    type: "search", id: props.id, class: () => cx("hm-input hm-search-input", val(props.size) === "sm" && "hm-input-sm", props.inputClass), ref: (x: HTMLInputElement) => { input = x; props.inputRef?.(x); }, value: current.peek(),
+    type: "search", id: props.id, class: () => cx("m-input m-search-input", val(props.size) === "sm" && "m-input-sm", props.inputClass), ref: (x: HTMLInputElement) => { input = x; props.inputRef?.(x); }, value: current.peek(),
     placeholder: () => val(props.placeholder) ?? t`Search…`, "aria-label": () => val(props.label) ?? val(props.placeholder) ?? t`Search`,
     autocomplete: "off", spellcheck: "false", disabled: () => !!val(props.disabled),
     role: combobox ? "combobox" : null, "aria-autocomplete": combobox ? "list" : null, "aria-controls": props.controls ?? null,
@@ -107,6 +107,6 @@ export function SearchBox(props: SearchBoxProps): Element {
       else if (e.key === "Enter") { cancel(); send(current.peek()); props.onEnter?.(current.peek()); }
     },
   }),
-  props.clear === false ? null : () => filled() && h(IconButton, { class: "hm-search-clear", title: false, label: () => val(props.clearLabel) ?? t`Clear search`, icon: ownClear ? props.clear : glyph(xIcon), onClick: clear }),
-  hint ? h("span", { class: "hm-search-kbd", "aria-hidden": "true" }, h(Kbd, { keys: hint })) : null);
+  props.clear === false ? null : () => filled() && h(IconButton, { class: "m-search-clear", title: false, label: () => val(props.clearLabel) ?? t`Clear search`, icon: ownClear ? props.clear : glyph(xIcon), onClick: clear }),
+  hint ? h("span", { class: "m-search-kbd", "aria-hidden": "true" }, h(Kbd, { keys: hint })) : null);
 }

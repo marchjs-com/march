@@ -29,7 +29,7 @@ export const rateVital = (name: VitalName, v: number): Rating => {
 export interface PerfConfig {
   /** Measures kept in measures(). Default 50. */
   keep: number;
-  /** Prefix for marks and measures written to the browser timeline. Default "hm:". */
+  /** Prefix for marks and measures written to the browser timeline. Default "m:". */
   prefix: string;
 }
 
@@ -149,7 +149,7 @@ function create(cfg: PerfConfig): Perf {
   };
 }
 
-const manager = defineManager<Perf, PerfConfig>("perf", create, { keep: 50, prefix: "hm:" });
+const manager = defineManager<Perf, PerfConfig>("perf", create, { keep: 50, prefix: "m:" });
 
 /** The performance manager (created on first call; observers start then). */
 export const perf = (): Perf => manager.get();

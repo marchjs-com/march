@@ -1,17 +1,17 @@
 /* March — toast. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- toasts */
-.hm-toasts { position: fixed; z-index: var(--hm-z-toast); inset-block-end: var(--hm-space-4); inset-inline-end: var(--hm-space-4); display: flex; flex-direction: column; gap: var(--hm-space-2);
+.m-toasts { position: fixed; z-index: var(--m-z-toast); inset-block-end: var(--m-space-4); inset-inline-end: var(--m-space-4); display: flex; flex-direction: column; gap: var(--m-space-2);
   width: min(24rem, calc(100vw - 2rem)); pointer-events: none; }
 /* a toast is a raised Alert; here: it takes the pointer inside the click-through stack, and its entrance */
-.hm-alert.hm-toast { pointer-events: auto; animation: hm-toast-in var(--hm-dur-slow) var(--hm-ease-spring); }
-.hm-toast-action { margin-block: -.25rem; }
-@media (max-width: 640px) { .hm-toasts { inset-inline: var(--hm-space-3); width: auto; } }
+.m-alert.m-toast { pointer-events: auto; animation: m-toast-in var(--m-dur-slow) var(--m-ease-spring); }
+.m-toast-action { margin-block: -.25rem; }
+@media (max-width: 640px) { .m-toasts { inset-inline: var(--m-space-3); width: auto; } }
 /* per-toast choices: entrance */
-.hm-toast.hm-toast-fade { animation-name: hm-fade-in; animation-timing-function: var(--hm-ease); }
-.hm-toast.hm-toast-still { animation: none; }
+.m-toast.m-toast-fade { animation-name: m-fade-in; animation-timing-function: var(--m-ease); }
+.m-toast.m-toast-still { animation: none; }
 /* <ToastHost position>: the block edge everywhere, the inline edge where the stack does not span the width */
-.hm-toasts-top-end, .hm-toasts-top-start, .hm-toasts-top-center { inset-block: var(--hm-space-4) auto; }
+.m-toasts-top-end, .m-toasts-top-start, .m-toasts-top-center { inset-block: var(--m-space-4) auto; }
 @media (min-width: 641px) {
-  .hm-toasts-bottom-start, .hm-toasts-top-start { inset-inline: var(--hm-space-4) auto; }
-  .hm-toasts-bottom-center, .hm-toasts-top-center { inset-inline: 0; margin-inline: auto; }
+  .m-toasts-bottom-start, .m-toasts-top-start { inset-inline: var(--m-space-4) auto; }
+  .m-toasts-bottom-center, .m-toasts-top-center { inset-inline: 0; margin-inline: auto; }
 }

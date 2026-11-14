@@ -5,7 +5,7 @@ appears on a project cover, the "+" badge on a story ring. The parent must be po
 
 ```tsx
 <div class="tile"><Picture source={photo} fit="cover" /><CornerMark icon={video} /></div>
-<a class="card hm-corner-host" href={href}>…<CornerMark icon={arrowUpRight} variant="surface" show="hover" /></a>
+<a class="card m-corner-host" href={href}>…<CornerMark icon={arrowUpRight} variant="surface" show="hover" /></a>
 <CornerMark corner="bottom-end" icon={plus} variant="solid" color="brand-orange" size="sm" ring overlap />
 ```
 
@@ -19,7 +19,7 @@ appears on a project cover, the "+" badge on a story ring. The parent must be po
 | `size` | `sm` `md` `lg` | `md` | |
 | `variant` | `scrim` `surface` `solid` | `scrim` | dark glass for photos, card colour with a shadow, or filled |
 | `ring` | `boolean` | `false` | a ring in the surface colour (cuts the mark out of an avatar) |
-| `show` | `always` `hover` | `always` | `hover`: visible while an ancestor with class `hm-corner-host` is hovered or has focus inside (always on touch) |
+| `show` | `always` `hover` | `always` | `hover`: visible while an ancestor with class `m-corner-host` is hovered or has focus inside (always on touch) |
 | `overlap` | `boolean` | `false` | half outside the corner (a badge) |
 | `label` | `string` / accessor | | accessible name; without it the mark is decorative |
 | `class` | class value | | |

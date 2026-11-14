@@ -16,8 +16,8 @@ export type Ctx = { ctx: ThemeEditorContext };
  * argument of `control`); a single native control takes the row's `id` (the second) and `native: true` makes the label a `<label for>`.
  */
 export function row(label: () => string, control: (labelId: string, id: string) => unknown, hint?: () => string, native = false): Element {
-  const id = uid("hm-te-l");
-  return h(Field, { id, group: !native, class: "hm-te-field", label: live(() => label()), help: live(() => hint?.()) }, control(`${id}-label`, id)) as Element;
+  const id = uid("m-te-l");
+  return h(Field, { id, group: !native, class: "m-te-field", label: live(() => label()), help: live(() => hint?.()) }, control(`${id}-label`, id)) as Element;
 }
 /** A slider bound to one number of the draft. */
 export function num<K extends "type" | "shape" | "motion">(ctx: ThemeEditorContext, part: K, key: keyof M.ThemeDraft[K] & string, label: () => string, o: { min: number; max: number; step: number; format: (v: number) => string }): Element {
@@ -54,17 +54,17 @@ function fontRow(ctx: ThemeEditorContext, key: "body" | "display" | "mono", labe
 /** Font families, scale ratio, base size, line heights and weights, with the type ramp they make. */
 export function TypePanel({ ctx }: Ctx): Element {
   const px = (v: number): string => `${v}px`;
-  const ramp = h("ol", { class: "hm-te-ramp", "aria-label": t`Type scale` },
+  const ramp = h("ol", { class: "m-te-ramp", "aria-label": t`Type scale` },
     () => M.typeScale(ctx.draft().type).slice().reverse().map((s) => {
       const big = ["xl", "2xl", "3xl", "4xl", "5xl"].includes(s.name);
-      const el = h("li", { class: cx("hm-te-ramp-row", big && "is-display") },
-        h("span", { class: "hm-te-ramp-name" }, `${s.name} · ${Math.round(s.px)}px`), h("span", { class: "hm-te-ramp-text" }, big ? t`Let's go` : t`The quick brown fox`)) as HTMLElement;
-      setStyle(el, { "--hm-te-size": `${s.px}px` });
+      const el = h("li", { class: cx("m-te-ramp-row", big && "is-display") },
+        h("span", { class: "m-te-ramp-name" }, `${s.name} · ${Math.round(s.px)}px`), h("span", { class: "m-te-ramp-text" }, big ? t`Let's go` : t`The quick brown fox`)) as HTMLElement;
+      setStyle(el, { "--m-te-size": `${s.px}px` });
       return el;
     })) as HTMLElement;
-  effect(() => { const ty = ctx.draft().type; setStyle(ramp, { "--hm-te-body": ty.body, "--hm-te-display": ty.display, "--hm-te-dw": String(ty.displayWeight), "--hm-te-lh": String(ty.leading), "--hm-te-lht": String(ty.leadingTight) }); });
-  return h("div", { class: "hm-te-split" },
-    h("div", { class: "hm-te-form" },
+  effect(() => { const ty = ctx.draft().type; setStyle(ramp, { "--m-te-body": ty.body, "--m-te-display": ty.display, "--m-te-dw": String(ty.displayWeight), "--m-te-lh": String(ty.leading), "--m-te-lht": String(ty.leadingTight) }); });
+  return h("div", { class: "m-te-split" },
+    h("div", { class: "m-te-form" },
       fontRow(ctx, "body", () => t`Body font`, FONTS), fontRow(ctx, "display", () => t`Heading font`, FONTS), fontRow(ctx, "mono", () => t`Code font`, MONOS),
       num(ctx, "type", "base", () => t`Base size`, { min: 12, max: 18, step: 1, format: px }),
       num(ctx, "type", "ratio", () => t`Scale ratio`, { min: 1.067, max: 1.5, step: 0.001, format: ratioName }),
@@ -82,15 +82,15 @@ export function TypePanel({ ctx }: Ctx): Element {
 export function ShapePanel({ ctx }: Ctx): Element {
   const px = (v: number): string => `${v}px`;
   const times = (v: number): string => `×${v.toFixed(1)}`;
-  const samples = h("div", { class: "hm-te-shapes", "aria-hidden": "true" },
-    h("div", { class: "hm-te-shape-row" }, [1, 2, 3, 4].map((i) => h("span", { class: `hm-te-r hm-te-r-${i}` }, `radius-${i}`))),
-    h("div", { class: "hm-te-shape-row" }, [1, 2, 3, 4].map((i) => h("span", { class: `hm-te-sh hm-te-sh-${i}` }, `shadow-${i}`))),
-    h("div", { class: "hm-te-space" }, [1, 2, 3, 4, 5, 6, 7, 8].map((i) => h("span", { class: `hm-te-sp hm-te-sp-${i}` }, h("i", {}), `space-${i}`))),
-    h("div", { class: "hm-te-shape-row" }, h("span", { class: "hm-te-control" }, t`Control height`), h("span", { class: "hm-te-control hm-te-control-sm" }, "sm"))) as HTMLElement;
+  const samples = h("div", { class: "m-te-shapes", "aria-hidden": "true" },
+    h("div", { class: "m-te-shape-row" }, [1, 2, 3, 4].map((i) => h("span", { class: `m-te-r m-te-r-${i}` }, `radius-${i}`))),
+    h("div", { class: "m-te-shape-row" }, [1, 2, 3, 4].map((i) => h("span", { class: `m-te-sh m-te-sh-${i}` }, `shadow-${i}`))),
+    h("div", { class: "m-te-space" }, [1, 2, 3, 4, 5, 6, 7, 8].map((i) => h("span", { class: `m-te-sp m-te-sp-${i}` }, h("i", {}), `space-${i}`))),
+    h("div", { class: "m-te-shape-row" }, h("span", { class: "m-te-control" }, t`Control height`), h("span", { class: "m-te-control m-te-control-sm" }, "sm"))) as HTMLElement;
   // the samples read the draft's tokens (all of them, as in the preview)
-  effect(() => { const v = M.draftTokens(ctx.draft(), true); setStyle(samples, Object.fromEntries(Object.entries(v).map(([k, x]) => [`--hm-${k}`, x]))); });
-  return h("div", { class: "hm-te-split" },
-    h("div", { class: "hm-te-form" },
+  effect(() => { const v = M.draftTokens(ctx.draft(), true); setStyle(samples, Object.fromEntries(Object.entries(v).map(([k, x]) => [`--m-${k}`, x]))); });
+  return h("div", { class: "m-te-split" },
+    h("div", { class: "m-te-form" },
       num(ctx, "shape", "radius", () => t`Corner radius`, { min: 0, max: 24, step: 1, format: px }),
       num(ctx, "shape", "spread", () => t`Radius scale`, { min: 0, max: 2, step: 0.1, format: times }),
       num(ctx, "shape", "space", () => t`Spacing unit`, { min: 2, max: 6, step: 0.5, format: px }),

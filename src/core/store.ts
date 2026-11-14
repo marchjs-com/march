@@ -27,8 +27,8 @@ export type StoreEvent = Change | BatchChange;
 export type Listener = (event: StoreEvent) => void;
 
 // ------------------------------------------------------------------ internals
-const RAW = Symbol("hm.raw");
-const META = Symbol("hm.meta");
+const RAW = Symbol("m.raw");
+const META = Symbol("m.meta");
 interface Root { listeners: Set<{ prefix: string[]; pattern: string[] | null; fn: Listener }>; pending: Change[] | null; log: Change[] | null }
 // one bare cell per key that is read (no per-signal method closures); `version` counts structural changes (keys
 // added or removed, length, array operations) for readers that iterate

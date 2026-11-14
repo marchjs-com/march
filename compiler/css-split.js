@@ -45,9 +45,9 @@ export function setupCssSplit(build) {
     let s = own.get(a.importer);
     if (!s) own.set(a.importer, (s = new Set()));
     s.add(css);
-    return { path: css, namespace: "hm-css-split" };
+    return { path: css, namespace: "m-css-split" };
   });
-  build.onLoad({ filter: /.*/, namespace: "hm-css-split" }, () => ({ contents: "", loader: "js" }));
+  build.onLoad({ filter: /.*/, namespace: "m-css-split" }, () => ({ contents: "", loader: "js" }));
   build.onEnd(async (result) => {
     if (result.errors.length || !result.metafile) return;
     await distribute(result, build, own, minified);
@@ -55,7 +55,7 @@ export function setupCssSplit(build) {
 }
 
 /** The CSS loader put at the top of a chunk (exported: pack-chunks removes it when it merges that CSS elsewhere). */
-export const loaderJs = (file) => `await new Promise((r)=>{if(typeof document==="undefined")return r();const u=new URL(${JSON.stringify(`./${file}`)},import.meta.url).href;if(document.querySelector('link[data-hm-css="'+u+'"]'))return r();const l=document.createElement("link");l.rel="stylesheet";l.href=u;l.dataset.hmCss=u;l.onload=l.onerror=()=>r();document.head.appendChild(l)});\n`;
+export const loaderJs = (file) => `await new Promise((r)=>{if(typeof document==="undefined")return r();const u=new URL(${JSON.stringify(`./${file}`)},import.meta.url).href;if(document.querySelector('link[data-m-css="'+u+'"]'))return r();const l=document.createElement("link");l.rel="stylesheet";l.href=u;l.dataset.mCss=u;l.onload=l.onerror=()=>r();document.head.appendChild(l)});\n`;
 
 async function distribute(result, build, own, minified = new Map()) {
   const o = build.initialOptions;

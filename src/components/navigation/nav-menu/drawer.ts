@@ -28,7 +28,7 @@ export interface NavDrawer {
   /** The drawer is open (only shown under the breakpoint). */
   open: Signal<boolean>;
   narrow: () => boolean;
-  /** The menu button (`.hm-nav-burger`; CSS shows it under the breakpoint). */
+  /** The menu button (`.m-nav-burger`; CSS shows it under the breakpoint). */
   burger: unknown;
   /** Where the menu goes: in place on wide screens, into the Drawer on narrow ones. */
   place(nav: Element): () => unknown;
@@ -42,12 +42,12 @@ export function navDrawer(o: NavDrawerOptions): NavDrawer {
     if (!narrow()) { untrack(() => open.set(false)); return; }
     if (open() && !untrack(sheet)) void import("../../overlays/drawer/index.ts").then((m) => sheet.set({ Drawer: m.Drawer }));
   });
-  const burger = h(IconButton, { class: "hm-nav-burger", "aria-controls": o.id, "aria-expanded": () => String(open()), label: o.menuLabel, title: false, onClick: () => open.update((x) => !x), icon: o.icon });
+  const burger = h(IconButton, { class: "m-nav-burger", "aria-controls": o.id, "aria-expanded": () => String(open()), label: o.menuLabel, title: false, onClick: () => open.update((x) => !x), icon: o.icon });
   const place = (nav: Element) => (): unknown => {
     if (!narrow()) return nav;
     const s = sheet();
     return s ? untrack(() => h(s.Drawer, {
-      open: () => open(), onClose: () => open.set(false), side: "start", closeButton: false, label: reactive(o.label), class: reactive(() => cx("hm-nav-sheet", o.class?.())),
+      open: () => open(), onClose: () => open.set(false), side: "start", closeButton: false, label: reactive(o.label), class: reactive(() => cx("m-nav-sheet", o.class?.())),
     } as unknown as DrawerProps, lazyChildren(() => { if (o.onShow) queueMicrotask(o.onShow); return nav; }))) : null;
   };
   return { open, narrow, burger, place };

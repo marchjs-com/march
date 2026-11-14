@@ -1,6 +1,6 @@
 // Easing: one registry of named easings that work both in JS (a function) and natively (a CSS easing string, so
 // WAAPI and CSS animations run them off the main thread). Springs and bounces become CSS `linear()` curves.
-//   ease("out")  ease("--hm-ease-out")  ease("cubic-bezier(.2,.8,.2,1)")  ease("steps(4, end)")
+//   ease("out")  ease("--m-ease-out")  ease("cubic-bezier(.2,.8,.2,1)")  ease("steps(4, end)")
 //   ease("spring(170, 26)")  ease(springEase({ stiffness: 300, damping: 18 }))  ease((t) => t * t)
 
 export interface Ease {
@@ -144,7 +144,7 @@ function parseLinear(s: string): Ease | null {
   }, s.trim());
 }
 
-// ---- registry: names match the CSS tokens (--hm-ease-out → "out"); the older camelCase names keep working
+// ---- registry: names match the CSS tokens (--m-ease-out → "out"); the older camelCase names keep working
 type Def = Ease | (() => Ease);
 const REG = new Map<string, Def>();
 const cache = new Map<string, Ease>();
@@ -196,7 +196,7 @@ export function ease(input: EaseInput | null | undefined, fallback: EaseInput = 
   if (input == null || input === "") return input === fallback ? linear : ease(fallback, "linear");
   if (isEase(input)) return input;
   if (typeof input === "function") return make(input, null);
-  const raw = input.startsWith("--hm-ease-") ? input.slice(10) : input.startsWith("var(--hm-ease-") ? input.slice(14, -1) : input;
+  const raw = input.startsWith("--m-ease-") ? input.slice(9) : input.startsWith("var(--m-ease-") ? input.slice(13, -1) : input;
   const key = ALIAS[raw] ?? raw;
   const hit = cache.get(key);
   if (hit) return hit;

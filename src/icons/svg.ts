@@ -41,9 +41,9 @@ function shape(spec: string): Element {
 }
 
 /** Draw an icon into an existing <svg> (attributes and shapes replaced): live icons repaint in place. */
-export function paintIcon(svg: SVGSVGElement, def: IconDef, cls = "hm-svg", label?: string): SVGSVGElement {
+export function paintIcon(svg: SVGSVGElement, def: IconDef, cls = "m-svg", label?: string): SVGSVGElement {
   svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("class", def.fill ? `${cls} hm-svg-fill` : cls);
+  svg.setAttribute("class", def.fill ? `${cls} m-svg-fill` : cls);
   svg.setAttribute("data-icon", def.name);
   svg.setAttribute("focusable", "false");
   if (label) { svg.setAttribute("role", "img"); svg.setAttribute("aria-label", label); svg.removeAttribute("aria-hidden"); }
@@ -54,6 +54,6 @@ export function paintIcon(svg: SVGSVGElement, def: IconDef, cls = "hm-svg", labe
 }
 
 /** Render an icon as an <svg> element. Decorative (aria-hidden) unless a label is given. */
-export function svgIcon(def: IconDef, cls = "hm-svg", label?: string): SVGSVGElement {
+export function svgIcon(def: IconDef, cls = "m-svg", label?: string): SVGSVGElement {
   return paintIcon(document.createElementNS(NS, "svg"), def, cls, label);
 }

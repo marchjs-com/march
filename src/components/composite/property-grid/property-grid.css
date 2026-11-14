@@ -1,40 +1,40 @@
 /* March — PropertyGrid. Imported by its component module; tokens.css provides the variables. */
-.hm-pg { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-width: 0; min-height: 0; height: 100%; container-type: inline-size; font-size: var(--hm-text-sm); }
+.m-pg { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-width: 0; min-height: 0; height: 100%; container-type: inline-size; font-size: var(--m-text-sm); }
 /* head: PanelHeader (search + undo / redo) with the grid's tighter padding */
-.hm-pg-head.hm-panel-header { gap: .375rem; padding: .5rem; }
-.hm-pg-search.hm-search { flex: 1; min-width: 0; }
-.hm-pg-body { min-height: 0; overflow: auto; padding-block: .25rem; }
-.hm-pg-group { border: 0; border-block-end: 1px solid var(--hm-border); border-radius: 0; }
-.hm-pg-group > .hm-disclosure-summary { display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem; }
-.hm-pg-group-name.hm-section-label { color: var(--hm-muted); }
-.hm-pg-group > .hm-disclosure-body { padding: 0 0 .375rem; }
-.hm-pg-rows { display: grid; }
-.hm-pg-row { position: relative; display: grid; grid-template-columns: minmax(6rem, 38%) minmax(0, 1fr) 1.75rem; align-items: center; gap: .25rem .5rem; padding: .25rem .5rem .25rem .75rem;
-  transition: background-color var(--hm-dur) var(--hm-ease); }
-.hm-pg-row:hover, .hm-pg-row:focus-within { background: color-mix(in srgb, var(--hm-text) 4%, transparent); }
-.hm-pg-row::before { content: ""; position: absolute; inset-inline-start: 0; inset-block: .375rem; width: 2px; border-radius: 2px; background: var(--hm-primary); transform: scaleY(0); transition: transform var(--hm-dur) var(--hm-ease-out); }
-.hm-pg-row.is-changed::before { transform: scaleY(1); }
-.hm-pg-row.is-invalid::before { background: var(--hm-danger); transform: scaleY(1); }
-.hm-pg-label { display: grid; grid-template-columns: minmax(0, auto) auto; align-items: center; justify-content: start; column-gap: .375rem; min-width: 0; }
-.hm-pg-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--hm-text-2); }
-.hm-pg-row.is-changed .hm-pg-name { color: var(--hm-text); font-weight: 500; }
-.hm-pg-desc { grid-column: 1 / -1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--hm-muted); font-size: var(--hm-text-xs); }
-.hm-pg-editor { display: grid; gap: .125rem; min-width: 0; }
-.hm-pg-editor .hm-input, .hm-pg-editor .hm-select { min-height: 1.875rem; font-size: var(--hm-text-sm); }
-.hm-pg-error { color: var(--hm-danger-text, var(--hm-danger)); font-size: var(--hm-text-xs); }
+.m-pg-head.m-panel-header { gap: .375rem; padding: .5rem; }
+.m-pg-search.m-search { flex: 1; min-width: 0; }
+.m-pg-body { min-height: 0; overflow: auto; padding-block: .25rem; }
+.m-pg-group { border: 0; border-block-end: 1px solid var(--m-border); border-radius: 0; }
+.m-pg-group > .m-disclosure-summary { display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem; }
+.m-pg-group-name.m-section-label { color: var(--m-muted); }
+.m-pg-group > .m-disclosure-body { padding: 0 0 .375rem; }
+.m-pg-rows { display: grid; }
+.m-pg-row { position: relative; display: grid; grid-template-columns: minmax(6rem, 38%) minmax(0, 1fr) 1.75rem; align-items: center; gap: .25rem .5rem; padding: .25rem .5rem .25rem .75rem;
+  transition: background-color var(--m-dur) var(--m-ease); }
+.m-pg-row:hover, .m-pg-row:focus-within { background: color-mix(in srgb, var(--m-text) 4%, transparent); }
+.m-pg-row::before { content: ""; position: absolute; inset-inline-start: 0; inset-block: .375rem; width: 2px; border-radius: 2px; background: var(--m-primary); transform: scaleY(0); transition: transform var(--m-dur) var(--m-ease-out); }
+.m-pg-row.is-changed::before { transform: scaleY(1); }
+.m-pg-row.is-invalid::before { background: var(--m-danger); transform: scaleY(1); }
+.m-pg-label { display: grid; grid-template-columns: minmax(0, auto) auto; align-items: center; justify-content: start; column-gap: .375rem; min-width: 0; }
+.m-pg-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--m-text-2); }
+.m-pg-row.is-changed .m-pg-name { color: var(--m-text); font-weight: 500; }
+.m-pg-desc { grid-column: 1 / -1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--m-muted); font-size: var(--m-text-xs); }
+.m-pg-editor { display: grid; gap: .125rem; min-width: 0; }
+.m-pg-editor .m-input, .m-pg-editor .m-select { min-height: 1.875rem; font-size: var(--m-text-sm); }
+.m-pg-error { color: var(--m-danger-text, var(--m-danger)); font-size: var(--m-text-xs); }
 /* the reset button: IconButton, shown only on a changed row */
-.hm-pg-reset.hm-icon-btn { inline-size: 1.75rem; block-size: 1.75rem; opacity: 0; scale: .8; pointer-events: none; transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease), opacity var(--hm-dur) var(--hm-ease), scale var(--hm-dur) var(--hm-ease); }
-.hm-pg-reset:dir(rtl) .hm-svg, .hm-pg-history:dir(rtl) .hm-svg { scale: -1 1; }
-.hm-pg-row.is-changed .hm-pg-reset { opacity: 1; scale: 1; pointer-events: auto; }
+.m-pg-reset.m-icon-btn { inline-size: 1.75rem; block-size: 1.75rem; opacity: 0; scale: .8; pointer-events: none; transition: background-color var(--m-dur) var(--m-ease), color var(--m-dur) var(--m-ease), opacity var(--m-dur) var(--m-ease), scale var(--m-dur) var(--m-ease); }
+.m-pg-reset:dir(rtl) .m-svg, .m-pg-history:dir(rtl) .m-svg { scale: -1 1; }
+.m-pg-row.is-changed .m-pg-reset { opacity: 1; scale: 1; pointer-events: auto; }
 /* foot: PanelHeader as a footer (change count + Revert / Save); tinted while something is unsaved */
-.hm-pg-foot.hm-panel-header { flex-wrap: wrap; border-block-start-color: var(--hm-border); background: var(--hm-surface-2); transition: background-color var(--hm-dur) var(--hm-ease); }
-.hm-pg-foot.hm-panel-header.is-dirty { background: var(--hm-primary-soft); }
-.hm-pg-foot .hm-panel-header-titles { min-width: 8rem; }
-.hm-pg-foot.is-dirty .hm-panel-header-title { color: var(--hm-primary-text, var(--hm-text)); font-weight: 500; }
+.m-pg-foot.m-panel-header { flex-wrap: wrap; border-block-start-color: var(--m-border); background: var(--m-surface-2); transition: background-color var(--m-dur) var(--m-ease); }
+.m-pg-foot.m-panel-header.is-dirty { background: var(--m-primary-soft); }
+.m-pg-foot .m-panel-header-titles { min-width: 8rem; }
+.m-pg-foot.is-dirty .m-panel-header-title { color: var(--m-primary-text, var(--m-text)); font-weight: 500; }
 /* stacked: label above the editor (narrow panels, or layout="stacked") */
-.hm-pg-stacked .hm-pg-row { grid-template-columns: minmax(0, 1fr) 1.75rem; }
-.hm-pg-stacked .hm-pg-label { grid-column: 1 / -1; }
+.m-pg-stacked .m-pg-row { grid-template-columns: minmax(0, 1fr) 1.75rem; }
+.m-pg-stacked .m-pg-label { grid-column: 1 / -1; }
 @container (max-width: 20rem) {
-  .hm-pg-row { grid-template-columns: minmax(0, 1fr) 1.75rem; }
-  .hm-pg-label { grid-column: 1 / -1; }
+  .m-pg-row { grid-template-columns: minmax(0, 1fr) 1.75rem; }
+  .m-pg-label { grid-column: 1 / -1; }
 }

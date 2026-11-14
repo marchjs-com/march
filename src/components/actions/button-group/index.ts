@@ -7,5 +7,5 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 export interface ButtonGroupProps { label?: MaybeFn<string>; attached?: boolean; class?: ClassProp; children?: unknown }
 /** Group related buttons: `<ButtonGroup label="View">…</ButtonGroup>` */
 export function ButtonGroup(props: ButtonGroupProps): Element {
-  return h("div", { class: () => cx("hm-btn-group", props.attached && "hm-btn-group-attached", val(props.class)), role: "group", "aria-label": () => val(props.label) ?? null }, props.children);
+  return h("div", { class: () => cx("m-btn-group", props.attached && "m-btn-group-attached", val(props.class)), role: "group", "aria-label": () => val(props.label) ?? null }, props.children);
 }

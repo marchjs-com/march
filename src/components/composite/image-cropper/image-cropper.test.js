@@ -26,9 +26,9 @@ test("ImageCropper: labelled area, aspect choices, rotate / mirror / reset butto
   const el = document.createElement("div");
   document.body.appendChild(el);
   const dispose = render(() => h(ImageCropper, { src: "/x.png", alt: "Hills", "bind:value": v, preview: false }), el);
-  const area = el.querySelector(".hm-crop-view");
+  const area = el.querySelector(".m-crop-view");
   assert.equal(area.getAttribute("aria-label"), "Crop area: Hills");
-  assert.deepEqual(el.querySelectorAll(".hm-crop-aspects [role=radio]").map((b) => b.textContent), ["Free", "1:1", "4:3", "16:9", "3:4", "9:16"]);
+  assert.deepEqual(el.querySelectorAll(".m-crop-aspects [role=radio]").map((b) => b.textContent), ["Free", "1:1", "4:3", "16:9", "3:4", "9:16"]);
   const btn = (name) => el.querySelectorAll("button").find((b) => b.getAttribute("aria-label") === name);
   btn("Rotate right").click();
   assert.equal(v().rotate, 90);
@@ -80,28 +80,28 @@ test("ImageCropper: grid, hint, buttons, sliders and caption off or chosen; own 
     h(ImageCropper, { src: "data:,", alt: "Hills", tools: false, sliders: false }),
     h(ImageCropper, { src: "data:," }),
   ], el);
-  const [a, b, c] = el.querySelectorAll(".hm-crop");
+  const [a, b, c] = el.querySelectorAll(".m-crop");
   assert.ok(a.classList.contains("mine"));
   assert.equal(a.getAttribute("aria-label"), "Photo");
-  assert.equal(a.querySelector(".hm-crop-view").getAttribute("aria-label"), "Frame");
-  assert.equal(a.querySelector(".hm-crop-view").getAttribute("aria-roledescription"), "frame tool");
-  assert.equal(a.querySelector(".hm-crop-grid"), null);
-  const keys = a.querySelector(".hm-crop-keys");
-  assert.ok(keys.classList.contains("hm-sr-only"), "a hidden hint still describes the area");
+  assert.equal(a.querySelector(".m-crop-view").getAttribute("aria-label"), "Frame");
+  assert.equal(a.querySelector(".m-crop-view").getAttribute("aria-roledescription"), "frame tool");
+  assert.equal(a.querySelector(".m-crop-grid"), null);
+  const keys = a.querySelector(".m-crop-keys");
+  assert.ok(keys.classList.contains("m-sr-only"), "a hidden hint still describes the area");
   assert.equal(keys.textContent, "Drag it");
-  assert.deepEqual([...a.querySelectorAll(".hm-crop-row button")].map((x) => x.getAttribute("aria-label")), ["Flip"]);
-  assert.equal(a.querySelectorAll(".hm-crop-slider").length, 1);
-  assert.match(a.querySelector(".hm-crop-zoom").textContent, /Size/);
-  assert.match(a.querySelector(".hm-crop-aspects").textContent, /Any/);
-  assert.equal(a.querySelector(".hm-crop-canvas").getAttribute("aria-label"), "Outcome");
+  assert.deepEqual([...a.querySelectorAll(".m-crop-row button")].map((x) => x.getAttribute("aria-label")), ["Flip"]);
+  assert.equal(a.querySelectorAll(".m-crop-slider").length, 1);
+  assert.match(a.querySelector(".m-crop-zoom").textContent, /Size/);
+  assert.match(a.querySelector(".m-crop-aspects").textContent, /Any/);
+  assert.equal(a.querySelector(".m-crop-canvas").getAttribute("aria-label"), "Outcome");
   assert.equal(a.querySelector("figcaption"), null);
-  assert.equal(b.querySelector(".hm-crop-row"), null);
-  assert.equal(b.querySelector(".hm-crop-slider"), null);
-  assert.equal(b.querySelector(".hm-crop-view").getAttribute("aria-label"), "Crop area: Hills");
-  assert.ok(b.querySelector(".hm-crop-grid") && b.querySelector("figcaption"));
-  assert.equal(c.querySelectorAll(".hm-crop-row button").length, 4);
-  assert.equal(c.querySelectorAll(".hm-crop-slider").length, 2);
-  assert.ok(!c.querySelector(".hm-crop-keys").classList.contains("hm-sr-only"));
+  assert.equal(b.querySelector(".m-crop-row"), null);
+  assert.equal(b.querySelector(".m-crop-slider"), null);
+  assert.equal(b.querySelector(".m-crop-view").getAttribute("aria-label"), "Crop area: Hills");
+  assert.ok(b.querySelector(".m-crop-grid") && b.querySelector("figcaption"));
+  assert.equal(c.querySelectorAll(".m-crop-row button").length, 4);
+  assert.equal(c.querySelectorAll(".m-crop-slider").length, 2);
+  assert.ok(!c.querySelector(".m-crop-keys").classList.contains("m-sr-only"));
   dispose();
 });
 
@@ -110,7 +110,7 @@ test("ImageCropper: maxZoom is live (the zoom slider follows it, a lower limit p
   const el = document.createElement("div");
   document.body.appendChild(el);
   const dispose = render(() => h(ImageCropper, { src: "/x.png", "bind:value": v, preview: false, maxZoom: reactive(() => max()) }), el);
-  const zoom = el.querySelector(".hm-crop-zoom input[type=range]");
+  const zoom = el.querySelector(".m-crop-zoom input[type=range]");
   assert.equal(zoom.getAttribute("max"), "4");
   max.set(8);
   await new Promise((r) => setTimeout(r, 0));
@@ -126,7 +126,7 @@ test("ImageCropper: can be built with a fixed aspect from the start", () => {
   const el = document.createElement("div");
   document.body.appendChild(el);
   const dispose = render(() => h(ImageCropper, { src: "/x.png", aspect: 1, preview: false }), el);
-  assert.ok(el.querySelector(".hm-crop-view"));
-  assert.equal(el.querySelector(".hm-crop-aspects"), null, "a fixed aspect has no choices");
+  assert.ok(el.querySelector(".m-crop-view"));
+  assert.equal(el.querySelector(".m-crop-aspects"), null, "a fixed aspect has no choices");
   dispose();
 });

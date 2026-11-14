@@ -13,5 +13,5 @@ export default function ThemeMenuDemo(props: { values: { themes: boolean; accent
   return <div class="sc-row">{() => <ThemeMenu label="Görünüm" placement="bottom-start" themes={props.values.themes}
     modes={props.values.modes} headings={props.values.headings} icon={props.values.icon === "none" ? false : props.values.icon === "sun" ? sun : undefined}
     accents={props.values.accents === "none" ? false : props.values.accents === "brand" ? BRAND : undefined} />}
-    <span class="hm-muted">Seçim bütün vitrine uygulanır</span></div>
+    <span class="m-muted">Seçim bütün vitrine uygulanır</span></div>
 }

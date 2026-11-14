@@ -1,3 +1,3 @@
 /* March — ErrorBox: an Alert in the danger tone; the text keeps the error colour. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-alert.hm-errorbox, .hm-errorbox .hm-alert-title { color: var(--hm-danger-text); }
-.hm-errorbox p { margin: 0; }
+.m-alert.m-errorbox, .m-errorbox .m-alert-title { color: var(--m-danger-text); }
+.m-errorbox p { margin: 0; }

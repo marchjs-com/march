@@ -10,9 +10,9 @@ const ITEMS = [{ id: "home", label: "Home" }, { id: "explore", label: "Explore" 
 test("BottomNav: nav landmark, aria-current, onChange, the bubble follows the active slot", () => {
   const tab = signal("home");
   const m = mount(() => h(BottomNav, { items: ITEMS, value: tab, onChange: (id) => tab.set(id) }));
-  const nav = m.el.querySelector("nav.hm-bnav");
+  const nav = m.el.querySelector("nav.m-bnav");
   assert.equal(nav.getAttribute("aria-label"), "Main");
-  const tabs = nav.querySelectorAll(".hm-bnav-item");
+  const tabs = nav.querySelectorAll(".m-bnav-item");
   assert.equal(tabs.length, 4);
   assert.equal(tabs[0].getAttribute("aria-current"), "page");
   assert.equal(tabs[2].getAttribute("aria-label"), "Chat");
@@ -20,10 +20,10 @@ test("BottomNav: nav landmark, aria-current, onChange, the bubble follows the ac
   assert.equal(tab(), "chat");
   assert.equal(tabs[2].getAttribute("aria-current"), "page");
   assert.equal(tabs[0].getAttribute("aria-current"), null);
-  const bubble = nav.querySelector(".hm-bnav-bubble");
-  assert.equal(bubble.style.getPropertyValue("--hm-bnav-i"), "2");
+  const bubble = nav.querySelector(".m-bnav-bubble");
+  assert.equal(bubble.style.getPropertyValue("--m-bnav-i"), "2");
   // brand tint: the active tab's color (third of the four HADİ colors)
-  assert.equal(bubble.getAttribute("data-hm-color"), "brand-green");
+  assert.equal(bubble.getAttribute("data-m-color"), "brand-green");
   m.dispose();
 });
 
@@ -31,36 +31,36 @@ test("BottomNav: the Create button sits in the middle slot with the four-color r
   let made = 0;
   const tab = signal("me");
   const m = mount(() => h(BottomNav, { items: ITEMS, value: tab, onCreate: () => made++, tint: "accent" }));
-  const bar = m.el.querySelector(".hm-bnav-bar");
-  assert.equal(bar.style.getPropertyValue("--hm-bnav-n"), "5");
-  const kids = [...bar.children].filter((c) => !c.classList.contains("hm-bnav-bubble"));
-  assert.ok(kids[2].classList.contains("hm-bnav-create-slot"));
+  const bar = m.el.querySelector(".m-bnav-bar");
+  assert.equal(bar.style.getPropertyValue("--m-bnav-n"), "5");
+  const kids = [...bar.children].filter((c) => !c.classList.contains("m-bnav-bubble"));
+  assert.ok(kids[2].classList.contains("m-bnav-create-slot"));
   const btn = kids[2].querySelector("button");
   assert.equal(btn.getAttribute("aria-label"), "Create");
   btn.click();
   assert.equal(made, 1);
-  const ring = m.el.querySelector(".hm-bnav-ring").style.getPropertyValue("--hm-bnav-ring");
+  const ring = m.el.querySelector(".m-bnav-ring").style.getPropertyValue("--m-bnav-ring");
   for (const c of ["#F2801F", "#1D9AD6", "#78BE3A", "#A3338C"]) assert.ok(ring.includes(c), c);
   assert.equal(HADI_RING.length, 4);
   // the last tab sits after the Create slot; accent tint: no per-tab color
-  const bubble = m.el.querySelector(".hm-bnav-bubble");
-  assert.equal(bubble.style.getPropertyValue("--hm-bnav-i"), "4");
-  assert.equal(bubble.getAttribute("data-hm-color"), null);
+  const bubble = m.el.querySelector(".m-bnav-bubble");
+  assert.equal(bubble.style.getPropertyValue("--m-bnav-i"), "4");
+  assert.equal(bubble.getAttribute("data-m-color"), null);
   m.dispose();
 });
 
 test("BottomNav: count and dot badges, labels off keep the accessible name, links", () => {
   const unread = signal(120);
   const m = mount(() => h(BottomNav, { labels: false, value: "x", items: [{ id: "a", label: "Inbox", badge: unread, href: "#/inbox" }, { id: "b", label: "Me", dot: true }] }));
-  assert.equal(m.el.querySelector(".hm-bnav-badge").textContent, "99+");
+  assert.equal(m.el.querySelector(".m-bnav-badge").textContent, "99+");
   unread.set(0);
-  assert.equal(m.el.querySelector(".hm-bnav-badge"), null);
-  assert.ok(m.el.querySelector(".hm-bnav-dot"));
-  assert.equal(m.el.querySelector(".hm-bnav-label"), null);
-  const link = m.el.querySelector("a.hm-bnav-item");
+  assert.equal(m.el.querySelector(".m-bnav-badge"), null);
+  assert.ok(m.el.querySelector(".m-bnav-dot"));
+  assert.equal(m.el.querySelector(".m-bnav-label"), null);
+  const link = m.el.querySelector("a.m-bnav-item");
   assert.equal(link.getAttribute("href"), "#/inbox");
   assert.equal(link.getAttribute("aria-label"), "Inbox");
-  assert.ok(m.el.querySelector(".hm-bnav-bubble").classList.contains("is-hidden"));
+  assert.ok(m.el.querySelector(".m-bnav-bubble").classList.contains("is-hidden"));
   m.dispose();
 });
 
@@ -69,14 +69,14 @@ test("BottomNav: the Create menu opens on the layer stack, picks an action, Esca
   const actions = [{ id: "post", label: "Post", run: () => ran.push("post") }, { id: "story", label: "Story" }, { id: "live", label: "Live", disabled: true }];
   for (const look of ["fan", "stack", "sheet"]) {
     const m = mount(() => h(BottomNav, { items: ITEMS, value: "home", createActions: actions, createMenu: look, createTitle: "Create", onAction: (id) => picked.push(id) }));
-    const btn = m.el.querySelector(".hm-bnav-create");
+    const btn = m.el.querySelector(".m-bnav-create");
     assert.equal(btn.getAttribute("aria-haspopup"), "menu");
     assert.equal(btn.getAttribute("aria-expanded"), "false");
     btn.click();
     assert.equal(btn.getAttribute("aria-expanded"), "true");
     // the sheet is a Drawer, loaded when the first one opens
-    for (let i = 0; i < 100 && !document.querySelector(`.hm-bnav-actions.is-${look}`); i++) await new Promise((r) => setTimeout(r, 20));
-    const menu = document.querySelector(`.hm-bnav-actions.is-${look}`);
+    for (let i = 0; i < 100 && !document.querySelector(`.m-bnav-actions.is-${look}`); i++) await new Promise((r) => setTimeout(r, 20));
+    const menu = document.querySelector(`.m-bnav-actions.is-${look}`);
     assert.ok(menu, `${look}: the menu opened`);
     assert.equal(menu.getAttribute("role"), "menu");
     assert.equal(menu.querySelectorAll("[role=menuitem]").length, 3);
@@ -84,7 +84,7 @@ test("BottomNav: the Create menu opens on the layer stack, picks an action, Esca
     if (look === "fan") menu.querySelector("[role=menuitem]").click();
     else menu.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     await new Promise((r) => setTimeout(r, look === "sheet" ? 400 : 220));
-    assert.equal(document.querySelector(`.hm-bnav-actions.is-${look}`), null, `${look}: closed`);
+    assert.equal(document.querySelector(`.m-bnav-actions.is-${look}`), null, `${look}: closed`);
     assert.equal(btn.getAttribute("aria-expanded"), "false");
     m.dispose();
   }
@@ -95,29 +95,29 @@ test("BottomNav: the Create menu opens on the layer stack, picks an action, Esca
 test("BottomNav: bubble, ring and motion can be turned off; ring takes color tokens; the sheet heading and handle are optional", async () => {
   const tab = signal("home");
   const m = mount(() => h(BottomNav, { items: ITEMS, value: tab, onCreate: () => {}, bubble: false, ring: false, motion: false, class: "mine" }));
-  const nav = m.el.querySelector("nav.hm-bnav");
-  assert.ok(nav.classList.contains("mine") && nav.classList.contains("hm-bnav-nobubble"));
-  assert.ok(nav.querySelector(".hm-bnav-bubble").classList.contains("is-hidden"));
-  assert.equal(nav.querySelector(".hm-bnav-ring"), null);
-  assert.ok(nav.querySelector(".hm-bnav-core"));
+  const nav = m.el.querySelector("nav.m-bnav");
+  assert.ok(nav.classList.contains("mine") && nav.classList.contains("m-bnav-nobubble"));
+  assert.ok(nav.querySelector(".m-bnav-bubble").classList.contains("is-hidden"));
+  assert.equal(nav.querySelector(".m-bnav-ring"), null);
+  assert.ok(nav.querySelector(".m-bnav-core"));
   m.dispose();
   const r = mount(() => h(BottomNav, { items: ITEMS, value: tab, onCreate: () => {}, ring: ["primary", "#123456"] }));
-  const paint = r.el.querySelector(".hm-bnav-ring").style.getPropertyValue("--hm-bnav-ring");
-  assert.match(paint, /var\(--hm-primary\)/);
+  const paint = r.el.querySelector(".m-bnav-ring").style.getPropertyValue("--m-bnav-ring");
+  assert.match(paint, /var\(--m-primary\)/);
   assert.match(paint, /#123456/);
   r.dispose();
   const s = mount(() => h(BottomNav, { items: ITEMS, value: tab, createActions: [{ id: "a", label: "A" }], createMenu: "sheet", createTitle: false, createHandle: false, motion: false }));
-  s.el.querySelector(".hm-bnav-create").click();
-  for (let i = 0; i < 100 && !document.querySelector(".hm-bnav-actions.is-sheet"); i++) await new Promise((r) => setTimeout(r, 20));
-  const menu = document.querySelector(".hm-bnav-actions.is-sheet");
+  s.el.querySelector(".m-bnav-create").click();
+  for (let i = 0; i < 100 && !document.querySelector(".m-bnav-actions.is-sheet"); i++) await new Promise((r) => setTimeout(r, 20));
+  const menu = document.querySelector(".m-bnav-actions.is-sheet");
   assert.ok(menu);
   assert.equal(menu.getAttribute("aria-label"), "Create");
-  const sheet = menu.closest(".hm-bnav-sheet");
+  const sheet = menu.closest(".m-bnav-sheet");
   assert.ok(sheet, "the sheet is a Drawer");
-  assert.equal(sheet.querySelector(".hm-dialog-title"), null, "createTitle={false}");
-  assert.equal(sheet.querySelector(".hm-sheet-handle"), null, "createHandle={false}");
-  menu.querySelector(".hm-bnav-action").click();
+  assert.equal(sheet.querySelector(".m-dialog-title"), null, "createTitle={false}");
+  assert.equal(sheet.querySelector(".m-sheet-handle"), null, "createHandle={false}");
+  menu.querySelector(".m-bnav-action").click();
   await new Promise((r) => setTimeout(r, 20));
-  assert.equal(document.querySelector(".hm-bnav-actions"), null, "without motion the menu closes at once");
+  assert.equal(document.querySelector(".m-bnav-actions"), null, "without motion the menu closes at once");
   s.dispose();
 });

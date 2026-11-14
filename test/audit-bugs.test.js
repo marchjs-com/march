@@ -10,16 +10,16 @@ const { schema } = await import("../src/schema/index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 
-test("1: table danger actions use the button's real class (hm-btn-danger)", () => {
+test("1: table danger actions use the button's real class (m-btn-danger)", () => {
   const src = readFileSync(new URL("../src/table/render.ts", import.meta.url), "utf8");
-  assert.ok(!src.includes("hm-btn--danger"));
-  assert.ok(readFileSync(new URL("../src/components/actions/button/button.css", import.meta.url), "utf8").includes(".hm-btn-danger"));
+  assert.ok(!src.includes("m-btn--danger"));
+  assert.ok(readFileSync(new URL("../src/components/actions/button/button.css", import.meta.url), "utf8").includes(".m-btn-danger"));
 });
 
 test("2: Wizard progress is the Progress component (styled by its own CSS)", () => {
   const m = mount(() => h(F.Wizard, { steps: [{ title: "A", schema: schema({ a: { type: "text" } }) }, { title: "B", schema: schema({ b: { type: "text" } }) }] }));
-  const bar = m.el.querySelector(".hm-wizard-progress");
-  assert.ok(bar && bar.className.includes("hm-progress2"));
+  const bar = m.el.querySelector(".m-wizard-progress");
+  assert.ok(bar && bar.className.includes("m-progress2"));
   assert.equal(m.el.querySelector("[role=progressbar]").getAttribute("aria-valuenow"), "1");
   m.dispose();
 });
@@ -42,9 +42,9 @@ test("4: form controls take the same class prop as ui components (array, object,
   m.dispose();
 });
 
-test("per-option colors (colors=\"brand\") reach the drawn box: the derived --hm-ch-* colors are worked out again on the option", () => {
+test("per-option colors (colors=\"brand\") reach the drawn box: the derived --m-ch-* colors are worked out again on the option", () => {
   const css = readFileSync(new URL("../src/forms/choice.css", import.meta.url), "utf8");
-  const rule = css.match(/\.hm-choice \[data-hm-color\] \{([^}]*)\}/);
+  const rule = css.match(/\.m-choice \[data-m-color\] \{([^}]*)\}/);
   assert.ok(rule, "a rule on the option");
-  for (const v of ["--hm-ch-c", "--hm-ch-on", "--hm-ch-soft", "--hm-ch-text"]) assert.match(rule[1], new RegExp(v + ":"));
+  for (const v of ["--m-ch-c", "--m-ch-on", "--m-ch-soft", "--m-ch-text"]) assert.match(rule[1], new RegExp(v + ":"));
 });

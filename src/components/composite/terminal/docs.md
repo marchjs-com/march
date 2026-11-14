@@ -39,7 +39,7 @@ defineTerminalCommands({ ping: (_a, io) => io.print(ansi.green("pong")) })   // 
 | `commands` | `Record<name, Command>` |
 | `prompt` | Prompt text (reactive), default `"$ "`. |
 | `welcome` | Lines printed first. |
-| `persist` | Keep history in localStorage under `hm.term.<persist>`. |
+| `persist` | Keep history in localStorage under `m.term.<persist>`. |
 | `scheme` | `"auto"` (default: very dark charcoal tinted by the theme color), `"surface"` (the page's surfaces), `"dark"`, `"light"` or `{ bg, fg, cursor, selection, colors[16] }`. Live. |
 | `background` | Any CSS color; the text turns light or dark for contrast. Live. |
 | `cursor` | `"bar"`, `"block"`, `"underline"`. |
@@ -49,7 +49,7 @@ defineTerminalCommands({ ping: (_a, io) => io.print(ansi.green("pong")) })   // 
 | `blink` | The cursor blinks (default `true`); `false` keeps it lit. |
 | `builtins` | The built-in `help`, `clear`, `history` (default `true`); `false` leaves only your commands. A command of yours with the same name replaces one of them. |
 | `labels` | Own texts: `{ command, historySearch, notFound(name) }` (the input's accessible name, the Ctrl+R prompt, the "command not found" line). |
-| `class` | On the root (`hm-term`); parts: `hm-term-out`, `-row`, `-echo`, `-line`, `-prompt`, `-input`, `-caret`, `-table`, `-bar`, `-spin`, `-link`. |
+| `class` | On the root (`m-term`); parts: `m-term-out`, `-row`, `-echo`, `-line`, `-prompt`, `-input`, `-caret`, `-table`, `-bar`, `-spin`, `-link`. |
 
 ```tsx
 <Terminal commands={cmds} builtins={false} blink={false} prompt="› "

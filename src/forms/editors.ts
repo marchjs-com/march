@@ -22,7 +22,7 @@ export interface MarkdownProps extends MarkdownOptions {
 
 /** Render Markdown safely. Props: source (or a string child), images (default true, https only), newTab (default true). */
 export function Markdown(props: MarkdownProps): unknown {
-  return h("div", { class: cx("hm-markdown", props.class) }, () => markdownNodes(props.source ?? props.children ?? "", { images: props.images, newTab: props.newTab, headingOffset: props.headingOffset }));
+  return h("div", { class: cx("m-markdown", props.class) }, () => markdownNodes(props.source ?? props.children ?? "", { images: props.images, newTab: props.newTab, headingOffset: props.headingOffset }));
 }
 
 // MarkdownEditor moved to src/components/composite/markdown-editor/ (modular structure); this path keeps working.

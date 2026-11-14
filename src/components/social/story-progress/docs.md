@@ -21,7 +21,7 @@ where it is; `onDone` fires when it is full. In RTL the bars fill from the right
 | `onDone` | `() => void` | — | the current segment is full |
 | `label` | `(index, count) => string` | "Story 2 of 5" | your own screen-reader text |
 | `color` | ColorToken | white | fill color |
-| `class` | string | — | on the root (`hm-story-progress`, a line Progress; parts: `hm-progress2-seg`, `hm-progress2-seg-fill`) |
+| `class` | string | — | on the root (`m-story-progress`, a line Progress; parts: `m-progress2-seg`, `m-progress2-seg-fill`) |
 
 ```tsx
 <StoryProgress count={5} index={$i} color="brand-orange" label={(i, n) => `Slide ${i + 1} / ${n}`} />

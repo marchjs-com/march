@@ -42,20 +42,20 @@ const SETUP = `(() => {
     "border-top-width", "width", "height", "box-shadow", "rotate", "scale", "translate", "inset-inline-start", "inset-block-start"];
   // layout (display, width, flex-direction, grid-template…) is not compared as style: it counts only when a box really
   // moves or resizes (getBoundingClientRect). A class that says "horizontal" while the bar stays vertical is no effect.
-  const SEL = '[role=switch], input[type=checkbox], input[type=radio], input[type=range], [role=radio], [role=tab], [role=option], .hm-chip[aria-pressed], button[aria-pressed]';
-  const skip = (el) => !!el.closest("[data-audit-skip], .hm-layer, .hm-shell-nav, .hm-app-nav, header.hm-topbar, .sc-code, pre");
+  const SEL = '[role=switch], input[type=checkbox], input[type=radio], input[type=range], [role=radio], [role=tab], [role=option], .m-chip[aria-pressed], button[aria-pressed]';
+  const skip = (el) => !!el.closest("[data-audit-skip], .m-layer, .m-shell-nav, .m-app-nav, header.m-topbar, .sc-code, pre");
   const shown = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden" && !el.closest("[hidden], [inert]"); };
   const root = () => document.querySelector("main") ?? document.body;
   const optionRoots = () => [...root().querySelectorAll(".sc-play-panel, .sc-options"),
-    ...[...root().querySelectorAll(".hm-card")].filter((c) => c.querySelector(".hm-card-title")?.textContent.trim() === "Seçenekler")];
+    ...[...root().querySelectorAll(".m-card")].filter((c) => c.querySelector(".m-card-title")?.textContent.trim() === "Seçenekler")];
   // the control's own box (its label, the segmented group) is left out: it always changes when used
-  const own = (c) => c.closest("label, .hm-toggle, .hm-switch, .hm-segmented, [role=radiogroup], [role=tablist], [role=listbox], .hm-choice, .hm-chip") ?? c;
+  const own = (c) => c.closest("label, .m-toggle, .m-switch, .m-segmented, [role=radiogroup], [role=tablist], [role=listbox], .m-choice, .m-chip") ?? c;
   const snap = (c) => {
     // the whole options panel is left out (a label that shows the value, "Son kullanılanlar: 33", is not an effect);
     // in an options row or a "Seçenekler" card, the control's own box
     const box = c.closest(".sc-play-panel") ?? own(c); const parts = [];
     const walk = (el) => {
-      if (el === box || el.nodeType !== 1 || el.matches(".hm-spinner, [data-audit-volatile]")) return;
+      if (el === box || el.nodeType !== 1 || el.matches(".m-spinner, [data-audit-volatile]")) return;
       // only what can be seen counts: a class or aria attribute that changes no style is not an effect
       if (el.namespaceURI === "http://www.w3.org/2000/svg") { parts.push(el.outerHTML); return; }
       const cs = getComputedStyle(el);
@@ -68,12 +68,12 @@ const SETUP = `(() => {
         + "|" + ["::before", "::after"].map((ps) => { const p = getComputedStyle(el, ps); return p.content === "none" || p.display === "none" ? "" : [p.content, ...PSEUDO.map((k) => p.getPropertyValue(k))].join(";"); }).join("~")
         // a placeholder is text the user reads; a native box draws its tick / dash from checked / indeterminate; a range input
         // paints its thumb and track from the accent
-        + "|" + (el.placeholder ?? "") + "|" + (el.matches("input[type=checkbox], input[type=radio]") ? (el.checked ? "c" : "") + (el.indeterminate ? "i" : "") : "") + "|" + (el.matches("input[type=range], progress, meter") ? cs.getPropertyValue("accent-color") + cs.getPropertyValue("--hm-accent") : ""));
+        + "|" + (el.placeholder ?? "") + "|" + (el.matches("input[type=checkbox], input[type=radio]") ? (el.checked ? "c" : "") + (el.indeterminate ? "i" : "") : "") + "|" + (el.matches("input[type=range], progress, meter") ? cs.getPropertyValue("accent-color") + cs.getPropertyValue("--m-accent") : ""));
       for (const n of el.childNodes) if (n.nodeType === 3) { const t = n.textContent.trim(); if (t) parts.push("#" + t); } else walk(n);
     };
     walk(root());
     // open layers (menus, popovers, drawers, dialogs) are drawn outside the page body
-    for (const l of document.querySelectorAll(".hm-layer")) if (!root().contains(l)) walk(l);
+    for (const l of document.querySelectorAll(".m-layer")) if (!root().contains(l)) walk(l);
     return parts.join("\\n");
   };
   const picked = (x) => x.getAttribute("aria-checked") === "true" || x.getAttribute("aria-selected") === "true" || x.checked === true;
@@ -83,9 +83,9 @@ const SETUP = `(() => {
   // its <label>: the value alone is the same for every choice of some groups)
   const byId = (c) => (c.getAttribute("aria-labelledby") ?? "").split(" ").map((id) => document.getElementById(id)?.textContent ?? "").join(" ").trim();
   const beside = (c) => { let el = own(c); for (let i = 0; i < 3 && el; i++, el = el.parentElement) { const t = el.textContent.trim(); if (t) return t; } return ""; };
-  const name = (c) => (c.getAttribute("aria-label") || byId(c) || (c.closest(".sc-play-opt, .hm-field") ?? own(c)).textContent.trim() || beside(c) || c.tagName).trim().replace(/\\s+/g, " ").slice(0, 60)
+  const name = (c) => (c.getAttribute("aria-label") || byId(c) || (c.closest(".sc-play-opt, .m-field") ?? own(c)).textContent.trim() || beside(c) || c.tagName).trim().replace(/\\s+/g, " ").slice(0, 60)
     + (choice(c) ? " → " + ((c.matches("input") ? c.closest("label")?.textContent.trim() || c.getAttribute("aria-label") : c.textContent.trim()) || c.value || "").slice(0, 20) : "");
-  const where = (c) => (c.closest(".sc-demo")?.querySelector(".sc-demo-title")?.textContent ?? c.closest(".hm-card")?.querySelector(".hm-card-title")?.textContent ?? "").trim();
+  const where = (c) => (c.closest(".sc-demo")?.querySelector(".sc-demo-title")?.textContent ?? c.closest(".m-card")?.querySelector(".m-card-title")?.textContent ?? "").trim();
   // use: flip a switch / checkbox, pick another option of a group, move a slider; returns an undo
   const fire = (c) => { c.dispatchEvent(new Event("input", { bubbles: true })); c.dispatchEvent(new Event("change", { bubbles: true })); };
   const use = (c) => {
@@ -113,7 +113,7 @@ const SETUP = `(() => {
   // cards that load lazily: scroll the page through (cards that load when visible) and wait until no slot is waiting
   const settle = async () => {
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-    const busy = () => root().querySelector(".hm-lazy-slot.is-wait");
+    const busy = () => root().querySelector(".m-lazy-slot.is-wait");
     for (let y = 0; y < document.documentElement.scrollHeight; y += Math.max(400, innerHeight * 0.8)) { scrollTo(0, y); await wait(80); }
     for (let i = 0; i < 60 && busy(); i++) await wait(100);
     scrollTo(0, 0); await wait(100);

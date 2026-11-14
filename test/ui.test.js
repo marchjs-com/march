@@ -13,7 +13,7 @@ const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose, html: () => serialize(el) }; };
 const key = (el, k, init = {}) => el.dispatchEvent(new Event("keydown", { key: k, bubbles: true, cancelable: true, ...init }));
 const input = (el, v) => { el.value = v; el.dispatchEvent(new Event("input", { bubbles: true })); };
-const top = () => { const all = document.body.querySelectorAll(".hm-overlay"); return all[all.length - 1]; };
+const top = () => { const all = document.body.querySelectorAll(".m-overlay"); return all[all.length - 1]; };
 
 test("confirm resolves true on OK, false on Cancel and on Escape", async () => {
   let p = U.confirm({ title: "Delete?", message: "Really" });
@@ -27,7 +27,7 @@ test("confirm resolves true on OK, false on Cancel and on Escape", async () => {
   p = U.confirm({ title: "Again" });
   key(top(), "Escape");
   assert.equal(await p, false);
-  assert.equal(document.body.querySelectorAll(".hm-overlay").length, 0);
+  assert.equal(document.body.querySelectorAll(".m-overlay").length, 0);
 });
 
 test("prompt validates and resolves the text; cancel gives null", async () => {
@@ -35,7 +35,7 @@ test("prompt validates and resolves the text; cancel gives null", async () => {
   const inp = top().querySelector("input");
   input(inp, "ab");
   top().querySelector("[data-ok]").click();
-  assert.match(top().querySelector(".hm-field-error").textContent, /Too short/);
+  assert.match(top().querySelector(".m-field-error").textContent, /Too short/);
   assert.equal(inp.getAttribute("aria-invalid"), "true");
   input(inp, "abc");
   key(inp, "Enter");
@@ -51,7 +51,7 @@ test("askReason enforces min length; purposes variant returns { category, text }
   input(ta, "short");
   top().querySelector("[data-ok]").click();
   assert.equal(U.openDialogs(), 1);
-  assert.match(top().querySelector(".hm-field-error").textContent, /10/);
+  assert.match(top().querySelector(".m-field-error").textContent, /10/);
   input(ta, "a long enough reason");
   top().querySelector("[data-ok]").click();
   assert.equal(await p, "a long enough reason");
@@ -110,20 +110,20 @@ test("toast shows, runs its action, dismisses and times out", async () => {
   U.toast.clear();
   let undone = 0;
   const id = U.toast("Saved", { kind: "success", action: { label: "Undo", run: () => undone++ } });
-  const host = document.body.querySelector(".hm-toasts");
+  const host = document.body.querySelector(".m-toasts");
   assert.equal(host.getAttribute("aria-live"), "polite");
   assert.match(host.textContent, /Saved/);
-  host.querySelector(".hm-toast-action").click();
+  host.querySelector(".m-toast-action").click();
   await tick();
   assert.equal(undone, 1);
   assert.doesNotMatch(host.textContent, /Saved/);
   const id2 = U.toast("Bye");
   assert.match(host.textContent, /Bye/);
   U.toast.dismiss(id2);
-  assert.equal(host.querySelectorAll(".hm-toast").length, 0);
+  assert.equal(host.querySelectorAll(".m-toast").length, 0);
   U.toast("Quick", { timeout: 5 });
   await tick(20);
-  assert.equal(host.querySelectorAll(".hm-toast").length, 0);
+  assert.equal(host.querySelectorAll(".m-toast").length, 0);
   assert.ok(id !== id2);
 });
 
@@ -134,7 +134,7 @@ test("Badge count shows 99+ and hides at zero", () => {
   n.set(120);
   assert.equal(m.el.textContent, "99+");
   n.set(0);
-  assert.equal(m.el.querySelector(".hm-badge"), null);
+  assert.equal(m.el.querySelector(".m-badge"), null);
   assert.equal(U.countLabel(1000, 999), "999+");
   m.dispose();
 });
@@ -183,7 +183,7 @@ test("ActionButton hides without permission; runs confirm, then success toast", 
   top().querySelector("[data-ok]").click();
   await tick(); await tick();
   assert.equal(ran, "ada");
-  assert.match(document.body.querySelector(".hm-toasts").textContent, /Deleted/);
+  assert.match(document.body.querySelector(".m-toasts").textContent, /Deleted/);
   m.dispose();
   A.setAccess(null);
 });
@@ -245,7 +245,7 @@ test("NavMenu: groups sort, collapse, pins and recent persist; filter folds and 
   m = mount(nav); // state comes back from storage
   assert.equal(m.el.querySelector('[data-group="People"]').getAttribute("aria-expanded"), "false");
   assert.ok(m.el.querySelector('[data-id="reports"][data-where="pinned"]'));
-  const filter = m.el.querySelector(".hm-nav-filter input");
+  const filter = m.el.querySelector(".m-nav-filter input");
   input(filter, "ıstanbul");
   assert.deepEqual(m.el.querySelectorAll('[data-where="filter"]').map((a) => a.getAttribute("data-id")), ["ist"]);
   input(filter, "uyelr");
@@ -279,12 +279,12 @@ test("CommandPalette: mod+k opens, ranks commands and pages, Enter runs, ask hoo
   assert.equal(U.paletteOpen(), true);
   await U.preloadPalette(); // the dialog is a separate chunk, loaded on first open
   await tick();
-  const inp = top().querySelector(".hm-pal-input");
+  const inp = top().querySelector(".m-pal-input");
   assert.equal(document.activeElement, inp);
   input(inp, "crea");
   let rows = top().querySelectorAll('[role="option"]');
   assert.equal(rows[0].getAttribute("data-id"), "new-user");
-  assert.equal(rows[rows.length - 1].classList.contains("hm-pal-ask"), true, "Ask row is last");
+  assert.equal(rows[rows.length - 1].classList.contains("m-pal-ask"), true, "Ask row is last");
   input(inp, "uyelr");
   rows = top().querySelectorAll('[role="option"]');
   assert.equal(rows[0].getAttribute("data-id"), "members");
@@ -301,7 +301,7 @@ test("CommandPalette: mod+k opens, ranks commands and pages, Enter runs, ask hoo
   // navigation keys
   U.openPalette();
   await tick();
-  const inp2 = top().querySelector(".hm-pal-input");
+  const inp2 = top().querySelector(".m-pal-input");
   input(inp2, "user");
   key(inp2, "ArrowDown");
   assert.equal(top().querySelectorAll('[role="option"]')[1].getAttribute("aria-selected"), "true");
@@ -343,7 +343,7 @@ test("keys: mod+k, ignores inputs unless inInputs, cleanup with owner, shortcuts
 
 test("theme persists in localStorage and sets data-theme", () => {
   U.theme.set("dark");
-  assert.equal(localStorage.getItem("hm.theme"), "dark");
+  assert.equal(localStorage.getItem("m.theme"), "dark");
   assert.equal(document.documentElement.getAttribute("data-theme"), "dark");
   const m = mount(() => h(U.ThemeToggle, {}));
   m.el.querySelector("button").click(); // dark → system
@@ -358,9 +358,9 @@ test("Page renders title, breadcrumbs and allowed actions only", async () => {
   const ok = U.action("Invite", () => {}, { can: "a" }), no = U.action("Purge", () => {}, { can: "b" });
   const m = mount(() => h(U.Page, { title: "Users", subtitle: "All members", breadcrumbs: [{ label: "Admin", href: "/admin" }, { label: "Users" }], actions: [ok, no, h("span", { class: "extra" }, "x")] }, h("p", {}, "content")));
   assert.equal(m.el.querySelector("h1").textContent, "Users");
-  const btns = m.el.querySelectorAll(".hm-page-actions button").map((b) => b.textContent);
+  const btns = m.el.querySelectorAll(".m-page-actions button").map((b) => b.textContent);
   assert.deepEqual(btns, ["Invite"]);
-  assert.ok(m.el.querySelector(".hm-page-actions .extra"));
+  assert.ok(m.el.querySelector(".m-page-actions .extra"));
   // the trail is the Breadcrumbs component, loaded in its own chunk
   for (let i = 0; i < 200 && !m.el.querySelector('[aria-current="page"]'); i++) await new Promise((r) => setTimeout(r, 0));
   assert.equal(m.el.querySelector('[aria-current="page"]').textContent, "Users");
@@ -371,13 +371,13 @@ test("Page renders title, breadcrumbs and allowed actions only", async () => {
 test("ListDetail switches pane state and shows back", () => {
   const sel = signal(null);
   const m = mount(() => h(U.ListDetail, { list: h("ul", {}, "list"), detail: () => h("p", { class: "d" }, "detail"), selected: sel, onBack: () => sel.set(null) }));
-  const root = m.el.querySelector(".hm-ld");
-  assert.equal(root.classList.contains("hm-ld-has-detail"), false);
+  const root = m.el.querySelector(".m-ld");
+  assert.equal(root.classList.contains("m-ld-has-detail"), false);
   assert.equal(m.el.querySelector(".d"), null);
   sel.set(1);
-  assert.ok(root.classList.contains("hm-ld-has-detail"));
+  assert.ok(root.classList.contains("m-ld-has-detail"));
   assert.ok(m.el.querySelector(".d"));
-  m.el.querySelector(".hm-ld-back").click();
+  m.el.querySelector(".m-ld-back").click();
   assert.equal(sel(), null);
   m.dispose();
 });
@@ -387,9 +387,9 @@ test("JsonView and CodeView render untrusted text as text only", () => {
   const m = mount(() => [h(U.JsonView, { value: { name: evil, list: [1, null, true], nested: { deep: 1 } }, open: 1 }), h(U.CodeView, { code: `${evil}\nline 2` })]);
   assert.equal(m.el.querySelector("img"), null);
   assert.ok(m.html().includes("&lt;img"));
-  assert.equal(m.el.querySelectorAll(".hm-code-line").length, 2);
-  assert.equal(m.el.querySelectorAll(".hm-code-ln")[1].textContent, "2");
-  const nested = m.el.querySelectorAll(".hm-json-toggle").find((b) => b.textContent.includes("nested"));
+  assert.equal(m.el.querySelectorAll(".m-code-line").length, 2);
+  assert.equal(m.el.querySelectorAll(".m-code-ln")[1].textContent, "2");
+  const nested = m.el.querySelectorAll(".m-json-toggle").find((b) => b.textContent.includes("nested"));
   assert.equal(nested.getAttribute("aria-expanded"), "false");
   nested.click();
   assert.equal(nested.getAttribute("aria-expanded"), "true");
@@ -408,8 +408,8 @@ test("components never emit style attribute strings", async () => {
   ]);
   assert.doesNotMatch(m.html(), / style=/);
   assert.match(m.html(), /99\+|Ada|AL/);
-  assert.equal(m.el.querySelector(".hm-avatar-text").textContent, "AL");
-  assert.match(m.el.querySelector(".hm-pager-info").textContent, /21.40.*45/);
+  assert.equal(m.el.querySelector(".m-avatar-text").textContent, "AL");
+  assert.match(m.el.querySelector(".m-pager-info").textContent, /21.40.*45/);
   m.dispose();
 });
 
@@ -425,16 +425,16 @@ test("Pager and SearchBox basics", async () => {
   assert.equal(q(), "");
   await tick(20);
   assert.equal(q(), "ada");
-  m.el.querySelector(".hm-search-clear").click();
+  m.el.querySelector(".m-search-clear").click();
   assert.equal(q(), "");
   m.dispose();
 });
 
-test("bootLoader.done removes #hm-boot", async () => {
-  const el = h("div", { id: "hm-boot" });
+test("bootLoader.done removes #m-boot", async () => {
+  const el = h("div", { id: "m-boot" });
   document.body.appendChild(el);
   assert.equal(U.bootLoader.done({ fade: 1 }), true);
-  assert.ok(el.classList.contains("hm-boot-done"));
+  assert.ok(el.classList.contains("m-boot-done"));
   await tick(10);
   assert.equal(el.isConnected, false);
 });
@@ -444,9 +444,9 @@ test("AppShell places the nav and the main area", async () => {
   const { h, render } = await import("../src/index.ts");
   const el = document.createElement("div");
   render(() => h(AppShell, { nav: h("nav", {}, "menu"), top: "banner" }, h("p", {}, "page")), el);
-  assert.equal(el.querySelector(".hm-shell-nav").textContent, "menu");
-  assert.equal(el.querySelector(".hm-shell-top").textContent, "banner");
-  assert.equal(el.querySelector("main.hm-shell-main").textContent, "page");
+  assert.equal(el.querySelector(".m-shell-nav").textContent, "menu");
+  assert.equal(el.querySelector(".m-shell-top").textContent, "banner");
+  assert.equal(el.querySelector("main.m-shell-main").textContent, "page");
 });
 
 test("Disclosure renders details/summary and reports toggles", async () => {
@@ -468,11 +468,11 @@ test("component class names do not collide across stylesheets (tabs vs editor ta
   // the inputs' own stylesheets live in their component folders (src/components/forms/<name>/)
   const folders = readdirSync(new URL("../src/components/forms/", import.meta.url), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => all(`components/forms/${d.name}`));
   const forms = [all("forms"), ...folders].join(String.fromCharCode(10)), ui = all("ui") + all("components/navigation/tabs") + all("components/typography/code-view");
-  // ui.css owns Tabs (.hm-tabs/.hm-tab) and CodeBlock (.hm-code); forms.css must not restyle them
-  for (const cls of ["hm-tabs", "hm-tab", "hm-code"]) {
-    if (cls !== "hm-tabs") assert.match(ui, new RegExp(`^\.${cls} \{`, "m"));
+  // ui.css owns Tabs (.m-tabs/.m-tab) and CodeBlock (.m-code); forms.css must not restyle them
+  for (const cls of ["m-tabs", "m-tab", "m-code"]) {
+    if (cls !== "m-tabs") assert.match(ui, new RegExp(`^\.${cls} \{`, "m"));
     assert.doesNotMatch(forms, new RegExp(`^\.${cls}[ \[{]`, "m"), `.${cls} is defined in forms.css too`);
   }
-  assert.match(forms, /^\.hm-editor-tabs \{/m);
-  assert.match(forms, /^\.hm-otp \{/m);
+  assert.match(forms, /^\.m-editor-tabs \{/m);
+  assert.match(forms, /^\.m-otp \{/m);
 });

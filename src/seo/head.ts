@@ -134,9 +134,9 @@ export function resolveHead(inputs: readonly (HeadInput | null | undefined | fal
 }
 
 const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-/** Tags as HTML text (build time, previews). `mark` adds data-hm-head so the client adopts them. */
+/** Tags as HTML text (build time, previews). `mark` adds data-m-head so the client adopts them. */
 export function headToHtml(tags: readonly Tag[], { mark = false }: { mark?: boolean } = {}): string {
-  const m = mark ? " data-hm-head" : "";
+  const m = mark ? " data-m-head" : "";
   return tags.map((t) => {
     if (t.tag === "title") return `<title>${esc(t.text)}</title>`;
     const a = Object.entries(t.attrs).map(([k, v]) => ` ${k}="${esc(v)}"`).join("");
@@ -151,7 +151,7 @@ let langOrig: string | null | undefined;
 
 const attrsOf = (el: Element): Record<string, string> => { const o: Record<string, string> = {}; for (const n of el.getAttributeNames()) o[n] = el.getAttribute(n) ?? ""; return o; };
 const setAttrs = (el: Element, a: Record<string, string>): void => {
-  for (const n of el.getAttributeNames()) if (!(n in a) && n !== "data-hm-head") el.removeAttribute(n);
+  for (const n of el.getAttributeNames()) if (!(n in a) && n !== "data-m-head") el.removeAttribute(n);
   for (const [k, v] of Object.entries(a)) if (el.getAttribute(k) !== v) el.setAttribute(k, v);
 };
 
@@ -168,12 +168,12 @@ export function applyHead(tags: readonly Tag[], { lang, scripts = true }: { lang
     const v = lang ?? langOrig;
     if (v) html.setAttribute("lang", v); else html.removeAttribute("lang");
   }
-  // what is in <head> now, by key (tags of the static HTML and tags written at build time: data-hm-head)
+  // what is in <head> now, by key (tags of the static HTML and tags written at build time: data-m-head)
   const found = new Map<string, Element>();
   const ldFound: Element[] = [];
   for (const el of Array.from(head.children)) {
     const name = el.localName;
-    if (name === "script" && el.getAttribute("type") === "application/ld+json") { if (scripts && el.hasAttribute("data-hm-head")) ldFound.push(el); continue; }
+    if (name === "script" && el.getAttribute("type") === "application/ld+json") { if (scripts && el.hasAttribute("data-m-head")) ldFound.push(el); continue; }
     const k = tagKey(name, attrsOf(el));
     if (k && !found.has(k)) found.set(k, el);
   }
@@ -186,15 +186,15 @@ export function applyHead(tags: readonly Tag[], { lang, scripts = true }: { lang
     let rec = applied.get(t.key);
     if (!rec) {
       const el = found.get(t.key);
-      rec = el ? { el, orig: el.hasAttribute("data-hm-head") ? null : attrsOf(el), ...(t.tag === "script" ? { text: el.textContent ?? "" } : {}) } : { el: doc.createElement(t.tag), orig: null };
-      if (!el) { rec.el.setAttribute("data-hm-head", ""); head.appendChild(rec.el); }
+      rec = el ? { el, orig: el.hasAttribute("data-m-head") ? null : attrsOf(el), ...(t.tag === "script" ? { text: el.textContent ?? "" } : {}) } : { el: doc.createElement(t.tag), orig: null };
+      if (!el) { rec.el.setAttribute("data-m-head", ""); head.appendChild(rec.el); }
       applied.set(t.key, rec);
     }
     if (t.tag === "script") {
       // a JSON-LD block is replaced, never edited (a new text node in a fresh element)
       if (rec.text !== t.text) {
         const el = doc.createElement("script");
-        setAttrs(el, t.attrs); el.setAttribute("data-hm-head", "");
+        setAttrs(el, t.attrs); el.setAttribute("data-m-head", "");
         el.appendChild(doc.createTextNode(t.text));
         rec.el.parentNode?.insertBefore(el, rec.el);
         rec.el.remove();

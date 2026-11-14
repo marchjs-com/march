@@ -74,7 +74,7 @@ const ASPECTS = (free?: string): AspectOption[] => [{ label: free ?? t`Free`, va
 /** Image cropper: `<ImageCropper src={url} bind:value={$crop} />`. */
 export function ImageCropper(props: ImageCropperProps): unknown {
   const [get, set] = model<G.CropState>(props, { ...G.DEFAULT_CROP });
-  const id = uid("hm-crop");
+  const id = uid("m-crop");
   const c = ctl(props);
   const ro = (): boolean => !!(props.readonly || props.disabled);
   const L = (): NonNullable<ImageCropperProps["labels"]> => props.labels ?? {};
@@ -110,18 +110,18 @@ export function ImageCropper(props: ImageCropperProps): unknown {
   effect(() => {
     const s = st(), [fw, fh] = frame(), S = scale(), [iw, ih] = nat();
     if (!viewport) return;
-    setStyle(viewport, { "--hm-crop-fw": `${fw}px`, "--hm-crop-fh": `${fh}px`, "--hm-crop-tx": `${s.x * fw}px`, "--hm-crop-ty": `${s.y * fh}px`, "--hm-crop-r": `${s.rotate}deg`, "--hm-crop-sx": String(S * (s.flip ? -1 : 1)), "--hm-crop-sy": String(S), "--hm-crop-iw": `${iw}px`, "--hm-crop-ih": `${ih}px` });
+    setStyle(viewport, { "--m-crop-fw": `${fw}px`, "--m-crop-fh": `${fh}px`, "--m-crop-tx": `${s.x * fw}px`, "--m-crop-ty": `${s.y * fh}px`, "--m-crop-r": `${s.rotate}deg`, "--m-crop-sx": String(S * (s.flip ? -1 : 1)), "--m-crop-sy": String(S), "--m-crop-iw": `${iw}px`, "--m-crop-ih": `${ih}px` });
   });
   const drawPreview = debounce(() => { if (out && nat.peek()[0] && view.peek()[0]) G.cropToCanvas(img, st.peek(), { width: view.peek()[0], height: view.peek()[1] }, { width: 240, canvas: out }); }, 60);
   effect(() => { st(); nat(); view(); if (props.preview !== false) drawPreview(); });
 
   // ------------------------------------------------------------------ the view: pan, wheel zoom, keyboard
   img = h("img", {
-    class: "hm-crop-img", src: () => props.src, alt: "", draggable: "false", crossorigin: "anonymous",
+    class: "m-crop-img", src: () => props.src, alt: "", draggable: "false", crossorigin: "anonymous",
     onLoad: () => { batch(() => { nat.set([img.naturalWidth, img.naturalHeight]); }); measure(); change({}, false); },
   }) as HTMLImageElement;
   const corner = (cxn: -1 | 1, cyn: -1 | 1): Element => {
-    const el = h("span", { class: cx("hm-crop-corner", `hm-crop-c${cyn < 0 ? "t" : "b"}${cxn < 0 ? "s" : "e"}`), "aria-hidden": "true" }) as HTMLElement;
+    const el = h("span", { class: cx("m-crop-corner", `m-crop-c${cyn < 0 ? "t" : "b"}${cxn < 0 ? "s" : "e"}`), "aria-hidden": "true" }) as HTMLElement;
     let start: G.CropState | null = null;
     track(el, {
       area: () => viewport, clamp: false,
@@ -138,7 +138,7 @@ export function ImageCropper(props: ImageCropperProps): unknown {
     return el;
   };
   viewport = h("div", {
-    class: () => cx("hm-crop-view", CHECKER, busy() && "is-busy"), tabindex: () => (props.disabled ? "-1" : "0"), role: "group",
+    class: () => cx("m-crop-view", CHECKER, busy() && "is-busy"), tabindex: () => (props.disabled ? "-1" : "0"), role: "group",
     "aria-label": () => (L().area != null ? `${L().area}${props.alt ? `: ${props.alt}` : ""}` : t`Crop area${props.alt ? `: ${props.alt}` : ""}`), "aria-describedby": `${id}-keys`, "aria-roledescription": () => L().role ?? t`cropper`,
     onKeyDown: (e: KeyboardEvent) => {
       if (ro()) return;
@@ -155,12 +155,12 @@ export function ImageCropper(props: ImageCropperProps): unknown {
       if (fn) { e.preventDefault(); fn(); }
     },
   },
-  h("div", { class: "hm-crop-stage" }, img),
-  h("div", { class: "hm-crop-frame" }, props.grid === false ? null : h("span", { class: "hm-crop-grid", "aria-hidden": "true" }), corner(-1, -1), corner(1, -1), corner(-1, 1), corner(1, 1))) as HTMLElement;
+  h("div", { class: "m-crop-stage" }, img),
+  h("div", { class: "m-crop-frame" }, props.grid === false ? null : h("span", { class: "m-crop-grid", "aria-hidden": "true" }), corner(-1, -1), corner(1, -1), corner(-1, 1), corner(1, 1))) as HTMLElement;
   let panFrom: G.CropState | null = null;
   track(viewport, {
     clamp: false,
-    onStart: (p) => { if (ro() || (p.event.target as Element).closest(".hm-crop-corner")) return false; panFrom = { ...st.peek() }; busy.set(true); viewport.focus({ preventScroll: true }); },
+    onStart: (p) => { if (ro() || (p.event.target as Element).closest(".m-crop-corner")) return false; panFrom = { ...st.peek() }; busy.set(true); viewport.focus({ preventScroll: true }); },
     onMove: (p) => { if (!panFrom) return; const [fw, fh] = frame.peek(); change({ x: panFrom.x + p.dx / fw, y: panFrom.y + p.dy / fh }); },
     onEnd: () => { panFrom = null; busy.set(false); },
   });
@@ -187,21 +187,21 @@ export function ImageCropper(props: ImageCropperProps): unknown {
   effect(() => { const z = Math.round(st().zoom * 100) / 100, d = deg(); untrack(() => batch(() => { zoomView.set(z); fineView.set(clamp(d - quarter(d), -45, 45)); })); });
 
   const tools = props.tools, sliders = props.sliders;
-  return h(Card, { as: "div", class: () => cx("hm-crop", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? L().cropper ?? t`Image cropper` },
+  return h(Card, { as: "div", class: () => cx("m-crop", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? L().cropper ?? t`Image cropper` },
     viewport,
-    h("p", { id: `${id}-keys`, class: cx("hm-crop-keys", props.hint === false && "hm-sr-only") }, () => L().hint ?? t`Drag to move, wheel or + − to zoom, [ ] to turn by 1°, R by 90°, F to mirror.`),
-    h("div", { class: "hm-crop-controls" },
-      () => (aspects().length ? h(Segmented, { class: "hm-crop-aspects", "aria-label": L().aspect ?? t`Aspect ratio`, options: aspects().map((a) => ({ value: a.value ?? "free", label: a.label })), value: st.peek().aspect ?? "free", onChange: (v: number | string | null) => change({ aspect: typeof v === "number" ? v : null }) }) : null),
-      tools === false || (tools && tools !== true && !tools.length) ? null : h(Toolbar, { class: "hm-crop-row" },
+    h("p", { id: `${id}-keys`, class: cx("m-crop-keys", props.hint === false && "m-sr-only") }, () => L().hint ?? t`Drag to move, wheel or + − to zoom, [ ] to turn by 1°, R by 90°, F to mirror.`),
+    h("div", { class: "m-crop-controls" },
+      () => (aspects().length ? h(Segmented, { class: "m-crop-aspects", "aria-label": L().aspect ?? t`Aspect ratio`, options: aspects().map((a) => ({ value: a.value ?? "free", label: a.label })), value: st.peek().aspect ?? "free", onChange: (v: number | string | null) => change({ aspect: typeof v === "number" ? v : null }) }) : null),
+      tools === false || (tools && tools !== true && !tools.length) ? null : h(Toolbar, { class: "m-crop-row" },
         has(tools, "rotateLeft") && h(IconButton, { icon: glyph(rotateCcw), label: () => L().rotateLeft ?? t`Rotate left`, size: "sm", disabled: ro, onClick: () => change({ rotate: st.peek().rotate - 90 }) }),
         has(tools, "rotateRight") && h(IconButton, { icon: glyph(rotateCw), label: () => L().rotateRight ?? t`Rotate right`, size: "sm", disabled: ro, onClick: () => change({ rotate: st.peek().rotate + 90 }) }),
         has(tools, "mirror") && h(IconButton, { icon: glyph(flipHorizontal), label: () => L().mirror ?? t`Mirror`, size: "sm", disabled: ro, pressed: () => st().flip, onClick: () => change({ flip: !st.peek().flip }) }),
         has(tools, "reset") && h(IconButton, { icon: glyph(refresh), label: () => L().reset ?? t`Reset`, size: "sm", disabled: ro, onClick: api.reset })),
-      has(sliders, "zoom") && h(Field, { id: `${id}-zoom`, inline: true, compact: true, class: "hm-crop-slider hm-crop-zoom", label: () => L().zoom ?? t`Zoom` },
+      has(sliders, "zoom") && h(Field, { id: `${id}-zoom`, inline: true, compact: true, class: "m-crop-slider m-crop-zoom", label: () => L().zoom ?? t`Zoom` },
         h(Slider, { id: `${id}-zoom`, min: 1, max: live(() => maxZoom()), step: 0.01, value: zoomView, onChange: (v: number) => change({ zoom: v }), format: (v: number) => `${Math.round(v * 100)}%`, disabled: live(() => props.disabled), readonly: live(() => props.readonly) })),
-      has(sliders, "angle") && h(Field, { id: `${id}-angle`, inline: true, compact: true, class: "hm-crop-slider hm-crop-angle", label: () => L().angle ?? t`Angle` },
+      has(sliders, "angle") && h(Field, { id: `${id}-angle`, inline: true, compact: true, class: "m-crop-slider m-crop-angle", label: () => L().angle ?? t`Angle` },
         h(Slider, { id: `${id}-angle`, min: -45, max: 45, step: 0.5, value: fineView, onChange: (v: number) => change({ rotate: quarter(st.peek().rotate) + v }), format: (v: number) => `${v}°`, disabled: live(() => props.disabled), readonly: live(() => props.readonly) }))),
-    () => (props.preview === false ? null : h("figure", { class: "hm-crop-out" },
-      h("canvas", { class: cx("hm-crop-canvas", CHECKER), role: "img", "aria-label": () => L().result ?? t`Cropped result`, ref: (el: HTMLCanvasElement) => { out = el; drawPreview(); } }),
+    () => (props.preview === false ? null : h("figure", { class: "m-crop-out" },
+      h("canvas", { class: cx("m-crop-canvas", CHECKER), role: "img", "aria-label": () => L().result ?? t`Cropped result`, ref: (el: HTMLCanvasElement) => { out = el; drawPreview(); } }),
       props.size === false ? null : h("figcaption", null, () => { const [fw, fh] = frame(), S = scale(); return `${Math.round(fw / S)} × ${Math.round(fh / S)} px`; }))));
 }

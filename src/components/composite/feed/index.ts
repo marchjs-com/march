@@ -64,10 +64,10 @@ export interface FeedProps extends Pick<PostCardProps, "onLike" | "onComment" | 
 
 /** A post-shaped placeholder: avatar, two lines, a photo, an action row. */
 export function PostSkeleton(props: { media?: boolean; variant?: "card" | "flat" | undefined }): Element {
-  return h("div", { class: cx("hm-feed-skel", `hm-post-${props.variant ?? "card"}`), "aria-hidden": "true" },
-    h("div", { class: "hm-feed-skel-head" }, h(Skeleton, { shape: "circle", class: "hm-feed-skel-av" }), h(Skeleton, { lines: 2 })),
-    props.media !== false ? h(Skeleton, { block: true, height: "lg", class: "hm-feed-skel-media", colors: "brand" }) : null,
-    h(Skeleton, { lines: 2, class: "hm-feed-skel-text" }));
+  return h("div", { class: cx("m-feed-skel", `m-post-${props.variant ?? "card"}`), "aria-hidden": "true" },
+    h("div", { class: "m-feed-skel-head" }, h(Skeleton, { shape: "circle", class: "m-feed-skel-av" }), h(Skeleton, { lines: 2 })),
+    props.media !== false ? h(Skeleton, { block: true, height: "lg", class: "m-feed-skel-media", colors: "brand" }) : null,
+    h(Skeleton, { lines: 2, class: "m-feed-skel-text" }));
 }
 
 /** `<Feed posts={$posts} hasMore={$more} onRefresh={reload} onLoadMore={next} onLike={like} onOpenMedia={open} />` */
@@ -85,13 +85,13 @@ export function Feed(props: FeedProps): Element {
   };
   const showNew = (): void => {
     props.onShowNew?.();
-    root.querySelector<HTMLElement>(".hm-feed-scroll")?.scrollTo?.({ top: 0, behavior: "smooth" });
+    root.querySelector<HTMLElement>(".m-feed-scroll")?.scrollTo?.({ top: 0, behavior: "smooth" });
   };
   const variant = (): "card" | "flat" => val(props.variant) ?? "card";
   const list = (): unknown => {
     const st = state();
-    if (st === "loading") return h("div", { class: "hm-feed-list", "aria-busy": "true", "aria-label": () => L().loading ?? t`Loading posts` }, Array.from({ length: props.skeletons ?? 3 }, (_, i) => h(PostSkeleton, { media: i !== 1, variant: variant() })));
-    if (st === "empty") return props.empty ?? h(Empty, { size: "sm", class: "hm-feed-empty", title: L().empty ?? t`No posts yet.` });
+    if (st === "loading") return h("div", { class: "m-feed-list", "aria-busy": "true", "aria-label": () => L().loading ?? t`Loading posts` }, Array.from({ length: props.skeletons ?? 3 }, (_, i) => h(PostSkeleton, { media: i !== 1, variant: variant() })));
+    if (st === "empty") return props.empty ?? h(Empty, { size: "sm", class: "m-feed-empty", title: L().empty ?? t`No posts yet.` });
     return h(VirtualList, {
       items: props.posts, key: (p: Post) => p.id, estimate: 520, gap: variant() === "card" ? 12 : 0, scroll: "parent" as const, label: () => val(props.label) ?? t`Feed`,
       onEndReached: () => { void loadMore(); },
@@ -99,25 +99,25 @@ export function Feed(props: FeedProps): Element {
         ...props.postProps, post: p, variant: variant(), clamp: props.clamp, menu: props.menu,
         onLike: props.onLike, onComment: props.onComment, onShare: props.onShare, onOpenMedia: props.onOpenMedia, onAuthor: props.onAuthor,
       }),
-      footer: () => { const end = props.end; return (more() ? h("div", { class: "hm-feed-more", role: "status", "aria-label": () => L().loadingMore ?? t`Loading more posts` }, h(PostSkeleton, { variant: variant() }))
+      footer: () => { const end = props.end; return (more() ? h("div", { class: "m-feed-more", role: "status", "aria-label": () => L().loadingMore ?? t`Loading more posts` }, h(PostSkeleton, { variant: variant() }))
         : val(props.hasMore) !== false || end === false ? null
-        : end != null && end !== true ? h("div", { class: "hm-feed-end" }, end)
-        : h("p", { class: "hm-feed-end" }, h("span", { class: "hm-feed-end-dots", "aria-hidden": "true" }, BRAND_COLORS.map((color) => h(StatusDot, { color }))), L().end ?? t`You're all caught up`)); },
+        : end != null && end !== true ? h("div", { class: "m-feed-end" }, end)
+        : h("p", { class: "m-feed-end" }, h("span", { class: "m-feed-end-dots", "aria-hidden": "true" }, BRAND_COLORS.map((color) => h(StatusDot, { color }))), L().end ?? t`You're all caught up`)); },
     });
   };
   const pill = (): unknown => {
     const n = val(props.newCount) ?? 0;
     if (!n || newPill === false) return null;
     // a pill Button floating over the top of the feed
-    const b = h(Button, { variant: "primary", shape: "pill", color: props.newColor ?? "brand-blue", class: "hm-feed-new", icon: typeof newPill === "function" ? null : arrowUp, onClick: showNew },
+    const b = h(Button, { variant: "primary", shape: "pill", color: props.newColor ?? "brand-blue", class: "m-feed-new", icon: typeof newPill === "function" ? null : arrowUp, onClick: showNew },
       typeof newPill === "function" ? newPill(n) : L().newPosts?.(n) ?? t`${n} new posts`) as HTMLElement;
     if (val(props.motion) !== false) animate(b, [{ transform: "translateY(-120%) scale(.9)", opacity: 0 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutBack" });
     return b;
   };
-  return h("div", { class: () => cx("hm-feed", `hm-feed-${variant()}`, val(props.class)), ref: (x: HTMLElement) => { root = x; } },
-    h("div", { class: "hm-feed-pill" }, pill),
+  return h("div", { class: () => cx("m-feed", `m-feed-${variant()}`, val(props.class)), ref: (x: HTMLElement) => { root = x; } },
+    h("div", { class: "m-feed-pill" }, pill),
     h(PullToRefresh, {
-      class: "hm-feed-scroll", disabled: () => !props.onRefresh || !!val(props.loading),
+      class: "m-feed-scroll", disabled: () => !props.onRefresh || !!val(props.loading),
       onRefresh: () => props.onRefresh?.(),
     }, list));
 }

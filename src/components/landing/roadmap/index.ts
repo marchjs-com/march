@@ -41,16 +41,16 @@ export function Roadmap(props: RoadmapProps): Element {
   const own = typeof props.badges === "function" ? props.badges : null;
   const items = props.items.map((x) => ({
     time: x.time, icon: x.icon, tone: TONE[x.status ?? "next"], class: `is-${x.status ?? "next"}`, // the status styles the dot (colour, pulse)
-    title: props.badges !== false && x.status ? h("span", { class: "hm-rm-title" }, x.title,
-      own ? own(x.status, label(x.status)) : h(Badge, { tone: x.status === "done" ? "success" : x.status === "now" ? "info" : "neutral", class: "hm-rm-badge" }, label(x.status))) : x.title,
+    title: props.badges !== false && x.status ? h("span", { class: "m-rm-title" }, x.title,
+      own ? own(x.status, label(x.status)) : h(Badge, { tone: x.status === "done" ? "success" : x.status === "now" ? "info" : "neutral", class: "m-rm-badge" }, label(x.status))) : x.title,
     body: x.body,
   })) as TimelineItem[];
-  const tl = h(Timeline, { items, line: false, class: "hm-rm-tl" }) as HTMLElement;
+  const tl = h(Timeline, { items, line: false, class: "m-rm-tl" }) as HTMLElement;
   const rail = props.rail !== false, scroll = props.scroll !== false;
   // the rail is a vertical Progress line over the Timeline: the scroll drives its fill (full without `scroll`)
   let fill: HTMLElement | null = null;
-  const root = h("div", { class: cx("hm-rm", scroll && "is-scroll", val(props.class)), "data-hm-color": colorAttr(props.color) },
-    rail ? h(Progress, { variant: "line", orientation: "vertical", decorative: true, smooth: false, class: "hm-rm-rail", ...(scroll ? { fillRef: (x: HTMLElement) => { fill = x; } } : { value: 100 }) }) : null, tl) as HTMLElement;
+  const root = h("div", { class: cx("m-rm", scroll && "is-scroll", val(props.class)), "data-m-color": colorAttr(props.color) },
+    rail ? h(Progress, { variant: "line", orientation: "vertical", decorative: true, smooth: false, class: "m-rm-rail", ...(scroll ? { fillRef: (x: HTMLElement) => { fill = x; } } : { value: 100 }) }) : null, tl) as HTMLElement;
   if (scroll) {
     // the motion core's scrollIndicator fills the line (an indicator: it keeps working with reduced motion); the dots
     // the fill has passed light up

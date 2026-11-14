@@ -184,12 +184,12 @@ export function ErrorPage(props: { children?: unknown }): unknown {
     const e = errors.page();
     if (!e) return props.children ?? null;
     const retry = e.context["retry"];
-    return h("div", { class: "hm-error hm-error-page", role: "alert" },
-      h("p", { class: "hm-error-title" }, errors.message(e)),
-      h("p", { class: "hm-muted" }, `${e.code}${e.status ? ` · ${e.status}` : ""}`),
-      h("div", { class: "hm-error-actions" },
-        typeof retry === "function" ? h("button", { type: "button", class: "hm-btn hm-btn-primary hm-btn-sm", onClick: () => { errors.clear("page"); (retry as () => void)(); } }, () => t`Try again`) : null,
-        h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", onClick: () => errors.clear("page") }, () => t`Close`)));
+    return h("div", { class: "m-error m-error-page", role: "alert" },
+      h("p", { class: "m-error-title" }, errors.message(e)),
+      h("p", { class: "m-muted" }, `${e.code}${e.status ? ` · ${e.status}` : ""}`),
+      h("div", { class: "m-error-actions" },
+        typeof retry === "function" ? h("button", { type: "button", class: "m-btn m-btn-primary m-btn-sm", onClick: () => { errors.clear("page"); (retry as () => void)(); } }, () => t`Try again`) : null,
+        h("button", { type: "button", class: "m-btn m-btn-secondary m-btn-sm", onClick: () => errors.clear("page") }, () => t`Close`)));
   };
 }
 
@@ -200,22 +200,22 @@ export function ErrorInline(props: { target: string }): unknown {
     const e = s();
     if (!e) return null;
     const fields = e.context["fields"] as Record<string, unknown> | undefined;
-    return h("div", { class: "hm-error hm-error-inline", role: "alert" },
+    return h("div", { class: "m-error m-error-inline", role: "alert" },
       h("span", {}, errors.message(e)),
-      h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", "aria-label": () => t`Close`, onClick: () => s.set(null) }, "×"),
-      fields && typeof fields === "object" ? h("ul", { class: "hm-error-fields" }, Object.entries(fields).map(([k, v]) => h("li", {}, `${k}: ${String(v)}`))) : null);
+      h("button", { type: "button", class: "m-btn m-btn-ghost m-btn-sm", "aria-label": () => t`Close`, onClick: () => s.set(null) }, "×"),
+      fields && typeof fields === "object" ? h("ul", { class: "m-error-fields" }, Object.entries(fields).map(([k, v]) => h("li", {}, `${k}: ${String(v)}`))) : null);
   };
 }
 
 function DevLayer(): unknown {
   const open = signal(false);
-  return h("aside", { class: "hm-errors-dev", "data-open": () => String(open()), "aria-label": () => t`Errors` },
-    h("button", { type: "button", class: "hm-errors-dev-toggle", "aria-expanded": () => String(open()), onClick: () => open.set(!open.peek()) },
+  return h("aside", { class: "m-errors-dev", "data-open": () => String(open()), "aria-label": () => t`Errors` },
+    h("button", { type: "button", class: "m-errors-dev-toggle", "aria-expanded": () => String(open()), onClick: () => open.set(!open.peek()) },
       () => `⚠ ${errors.list().reduce((n, c) => n + c.count, 0)}`),
-    () => open() ? h("div", { class: "hm-errors-dev-panel" },
-      h("div", { class: "hm-errors-dev-head" }, h("strong", {}, () => t`Errors`), h("button", { type: "button", class: "hm-btn hm-btn-ghost hm-btn-sm", onClick: () => errors.clear() }, () => t`Clear`)),
+    () => open() ? h("div", { class: "m-errors-dev-panel" },
+      h("div", { class: "m-errors-dev-head" }, h("strong", {}, () => t`Errors`), h("button", { type: "button", class: "m-btn m-btn-ghost m-btn-sm", onClick: () => errors.clear() }, () => t`Clear`)),
       h("ol", {}, h(For, { each: errors.list, key: "id", children: (c: () => Captured) => h("li", { "data-severity": () => c().error.severity },
-        h("div", { class: "hm-errors-dev-row" }, h("code", {}, () => `${c().error.type}/${c().error.code}`), h("span", {}, () => c().error.source), h("span", {}, () => `×${c().count}`), h("span", {}, () => c().shown)),
+        h("div", { class: "m-errors-dev-row" }, h("code", {}, () => `${c().error.type}/${c().error.code}`), h("span", {}, () => c().error.source), h("span", {}, () => `×${c().count}`), h("span", {}, () => c().shown)),
         h("div", {}, () => c().error.message),
         h("details", {}, h("summary", {}, () => t`Stack`), h("pre", {}, () => (c().error.stack ?? "").split("\n").slice(0, 8).join("\n")))) }))) : null);
 }

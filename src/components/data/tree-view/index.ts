@@ -135,7 +135,7 @@ function insertAt(list: readonly TreeViewNode[], target: string, pos: DropPositi
 
 /** `<TreeView nodes={files} load={(n) => api.children(n.id)} selection="multiple" search={$q} draggable />` */
 export function TreeView(props: TreeViewProps): Element {
-  const id = uid("hm-tv");
+  const id = uid("m-tv");
   const rowH = props.rowHeight ?? 32;
   const roots = signal<readonly TreeViewNode[]>(untrack(() => val(props.nodes)) ?? []);
   if (typeof props.nodes === "function") effect(() => { const n = val(props.nodes); untrack(() => roots.set(n ?? [])); });
@@ -248,32 +248,32 @@ export function TreeView(props: TreeViewProps): Element {
     const own = props.chevron;
     // the row both trees share (a ListRow: Chevron + icon · label · tools + meta); the Chevron is the pointer target that only opens / closes
     const el = treeRow({
-      prefix: "hm-tv", kids: r.kids, open: r.open, turn: "spring", chevronSize: "sm", chevronAttrs: { "data-chev": "" },
+      prefix: "m-tv", kids: r.kids, open: r.open, turn: "spring", chevronSize: "sm", chevronAttrs: { "data-chev": "" },
       chevron: typeof own === "function" ? () => own(n, r.open) : own,
-      icon: n.icon != null ? icon(n.icon, "hm-tv-icon") : def ? h("span", { class: cx("hm-tv-icon", r.kids && "is-folder"), "aria-hidden": "true" }, glyph(def)) : null,
+      icon: n.icon != null ? icon(n.icon, "m-tv-icon") : def ? h("span", { class: cx("m-tv-icon", r.kids && "is-folder"), "aria-hidden": "true" }, glyph(def)) : null,
       label: q ? markText(n.label, q) : n.label,
       tools: [
         isLoading ? h(Spinner, { size: "sm", label: lb("loading")(n.label) }) : null,
-        err ? h(Button, { variant: "ghost", size: "sm", color: "danger", icon: alertCircle, class: "hm-tv-retry", "data-chev": "", onClick: (e: Event) => { e.stopPropagation(); void loadKids(n); } }, lb("retry")) : null,
+        err ? h(Button, { variant: "ghost", size: "sm", color: "danger", icon: alertCircle, class: "m-tv-retry", "data-chev": "", onClick: (e: Event) => { e.stopPropagation(); void loadKids(n); } }, lb("retry")) : null,
       ],
       meta: n.meta,
     }, {
-      role: "treeitem", id: `${id}-${i}`, class: cx("hm-tv-row", dragging().has(n.id) && "is-dragging"), overflow: "ellipsis", interactive: true,
+      role: "treeitem", id: `${id}-${i}`, class: cx("m-tv-row", dragging().has(n.id) && "is-dragging"), overflow: "ellipsis", interactive: true,
       selected: sel.mode() === "none" ? undefined : isSel, disabled: !!n.disabled,
       "aria-level": String(r.depth + 1), "aria-setsize": String(r.size), "aria-posinset": String(r.pos),
       "aria-expanded": r.kids ? String(r.open) : null, "aria-busy": isLoading ? "true" : null, "data-i": String(i), "data-id": n.id,
     }) as HTMLElement;
-    setStyle(el, { height: `${rowH}px`, transform: `translateY(${i * rowH}px)`, "--hm-tv-depth": String(r.depth) });
+    setStyle(el, { height: `${rowH}px`, transform: `translateY(${i * rowH}px)`, "--m-tv-depth": String(r.depth) });
     return el;
   };
 
-  const canvas = h("div", { class: "hm-tv-canvas", role: "none" }) as HTMLElement;
-  const dropLine = h("div", { class: "hm-tv-drop", "aria-hidden": "true" }) as HTMLElement;
+  const canvas = h("div", { class: "m-tv-canvas", role: "none" }) as HTMLElement;
+  const dropLine = h("div", { class: "m-tv-drop", "aria-hidden": "true" }) as HTMLElement;
   // the empty state is the compact Empty: the tree's own text, or the host's node
   const ownEmpty = props.empty != null && props.empty !== true;
-  const empty = props.empty === false ? null : (): unknown => (flat().length > 0 ? null : untrack(() => h(Empty, { size: "sm", class: "hm-tv-empty", title: ownEmpty ? false : () => (query() ? lb("noMatch")(query()) : lb("empty")) }, ownEmpty ? props.empty : undefined)));
+  const empty = props.empty === false ? null : (): unknown => (flat().length > 0 ? null : untrack(() => h(Empty, { size: "sm", class: "m-tv-empty", title: ownEmpty ? false : () => (query() ? lb("noMatch")(query()) : lb("empty")) }, ownEmpty ? props.empty : undefined)));
   const scroller = h("div", {
-    role: "tree", class: () => cx("hm-tv", canDrag() && "is-draggable", val(props.class)), tabindex: "0", "aria-label": () => val(props.label) ?? t`Tree`, "data-hm-color": () => colorAttr(props.color),
+    role: "tree", class: () => cx("m-tv", canDrag() && "is-draggable", val(props.class)), tabindex: "0", "aria-label": () => val(props.label) ?? t`Tree`, "data-m-color": () => colorAttr(props.color),
     "aria-multiselectable": () => (sel.mode() === "multiple" ? "true" : null),
   }, canvas, dropLine, empty) as HTMLElement;
   setStyle(scroller, { height: `${props.height ?? 360}px` });
@@ -313,7 +313,7 @@ export function TreeView(props: TreeViewProps): Element {
       const target = painted.get(d.id)?.el;
       if (d.pos === "inside" || !d.ok) target?.classList.add(d.ok ? "is-drop-inside" : "is-drop-bad");
       const depth = (list[di] as Row).depth;
-      setStyle(dropLine, { opacity: d.ok && d.pos !== "inside" ? "1" : "0", transform: `translateY(${(d.pos === "after" ? di + 1 : di) * rowH - 1}px)`, "--hm-tv-depth": String(depth) });
+      setStyle(dropLine, { opacity: d.ok && d.pos !== "inside" ? "1" : "0", transform: `translateY(${(d.pos === "after" ? di + 1 : di) * rowH - 1}px)`, "--m-tv-depth": String(depth) });
     } else setStyle(dropLine, { opacity: "0" });
     if (fresh.length && motion) {
       const st = stagger(18);
@@ -330,7 +330,7 @@ export function TreeView(props: TreeViewProps): Element {
     cursor.set(next);
     vp.reveal(next);
   };
-  const rowAt = (e: Event): number | null => { const el = (e.target as Element).closest<HTMLElement>(".hm-tv-row"); return el ? Number(el.dataset["i"]) : null; };
+  const rowAt = (e: Event): number | null => { const el = (e.target as Element).closest<HTMLElement>(".m-tv-row"); return el ? Number(el.dataset["i"]) : null; };
   let typed = "", typedAt: ReturnType<typeof later> | undefined;
   const typeahead = (ch: string): void => {
     clearTimeout(typedAt);
@@ -407,8 +407,8 @@ export function TreeView(props: TreeViewProps): Element {
         dragging.set(new Set(ids));
         const byId = untrack(index).byId;
         ghost = dragGhost((props.ghost
-          ? h("div", { class: "hm-tv-ghost is-own" }, props.ghost(ids.map((k) => byId.get(k)).filter((x): x is TreeViewNode => !!x)))
-          : h("div", { class: "hm-tv-ghost" }, h("span", { class: "hm-tv-ghost-label" }, r.node.label), ids.length > 1 ? h(Badge, { class: "hm-tv-ghost-count", tone: "primary", count: ids.length }) : null)) as HTMLElement,
+          ? h("div", { class: "m-tv-ghost is-own" }, props.ghost(ids.map((k) => byId.get(k)).filter((x): x is TreeViewNode => !!x)))
+          : h("div", { class: "m-tv-ghost" }, h("span", { class: "m-tv-ghost-label" }, r.node.label), ids.length > 1 ? h(Badge, { class: "m-tv-ghost-count", tone: "primary", count: ids.length }) : null)) as HTMLElement,
         { offset: { x: 14, y: 10 }, motion, timing: { duration: 160 } });
       },
       onMove: (p) => {

@@ -29,7 +29,7 @@ for (const mode of MODES) {
   const ROUTE_OF = `((u) => /^#\\//.test(u.hash) ? u.hash.slice(1).split("?")[0] : ((u.pathname.startsWith(${JSON.stringify(root)}) ? "/" + u.pathname.slice(${root.length}) : u.pathname).replace(/(\\/index\\.html?)?\\/*$/, "") || "/"))`;
   // what the page shows: its route, a not-found view, the length of its text
   const STATE = `(() => { const m = document.querySelector("main") ?? document.body; const txt = m.innerText;
-    const nf = /Sayfa bulunamadı/.test(txt) || [...m.querySelectorAll(".hm-empty")].some((e) => /^(Not found|Bulunamadı)\\.?$/.test(e.textContent.trim()));
+    const nf = /Sayfa bulunamadı/.test(txt) || [...m.querySelectorAll(".m-empty")].some((e) => /^(Not found|Bulunamadı)\\.?$/.test(e.textContent.trim()));
     return { nf, len: txt.trim().length, route: ${ROUTE_OF}(location), href: location.href } })()`;
   /** Wait until the page shows `route` (twice in a row: the old page can stay on screen while the new one loads). */
   const settle = async (route) => {
@@ -104,25 +104,25 @@ for (const mode of MODES) {
   if (mode === MODES[0]) {
     await b.load("/start");
     let ready = false;
-    for (let i = 0; i < 40 && !ready; i++) { await sleep(250); ready = await b.ev(`!!document.querySelector("nav .hm-sb-scroll .hm-sb-gitems a[href]")`); }
-    const mark = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"); window.__menuNav = sc.closest("nav"); window.__menuScroller = sc;
+    for (let i = 0; i < 40 && !ready; i++) { await sleep(250); ready = await b.ev(`!!document.querySelector("nav .m-sb-scroll .m-sb-gitems a[href]")`); }
+    const mark = await b.ev(`(() => { const sc = document.querySelector(".m-sb-scroll"); window.__menuNav = sc.closest("nav"); window.__menuScroller = sc;
       sc.scrollTop = Math.min(400, sc.scrollHeight - sc.clientHeight); const top = sc.scrollTop, c = sc.getBoundingClientRect();
-      const a = [...sc.querySelectorAll(".hm-sb-gitems a[href]")].find((a) => { const r = a.getBoundingClientRect(); return r.height && r.top >= c.top && r.bottom <= c.bottom && a.getAttribute("aria-current") !== "page" });
+      const a = [...sc.querySelectorAll(".m-sb-gitems a[href]")].find((a) => { const r = a.getBoundingClientRect(); return r.height && r.top >= c.top && r.bottom <= c.bottom && a.getAttribute("aria-current") !== "page" });
       if (!a) return { top, path: null }; const path = new URL(a.getAttribute("href"), location.href).pathname; a.click(); return { top, path } })()`);
     if (!mark.path) check(false, `${tag} menu kept on navigation`, "no link in view");
     else {
       let s;
-      for (let i = 0; i < 40; i++) { await sleep(250); s = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"); return { path: location.pathname, same: sc === window.__menuScroller && sc.closest("nav") === window.__menuNav, top: sc.scrollTop,
-        active: !!sc.querySelector('.hm-sb-gitems a[aria-current="page"]') } })()`); if (s.path === mark.path && s.active) break; }
+      for (let i = 0; i < 40; i++) { await sleep(250); s = await b.ev(`(() => { const sc = document.querySelector(".m-sb-scroll"); return { path: location.pathname, same: sc === window.__menuScroller && sc.closest("nav") === window.__menuNav, top: sc.scrollTop,
+        active: !!sc.querySelector('.m-sb-gitems a[aria-current="page"]') } })()`); if (s.path === mark.path && s.active) break; }
       check(s.same, `${tag} menu kept on navigation: same DOM node`, s.same ? "" : "the menu was rebuilt");
       check(Math.abs(s.top - mark.top) <= 1, `${tag} menu kept on navigation: scroll position`, `${mark.top} → ${s.top}`);
       check(s.active, `${tag} menu kept on navigation: the clicked row is active`);
     }
-    const far = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"); sc.scrollTop = 0; const c = sc.getBoundingClientRect();
-      const a = [...sc.querySelectorAll(".hm-sb-gitems a[href]")].reverse().find((a) => { const r = a.getBoundingClientRect(); return r.height && r.top > c.bottom }); if (!a) return null; a.click(); return a.getAttribute("href") })()`);
+    const far = await b.ev(`(() => { const sc = document.querySelector(".m-sb-scroll"); sc.scrollTop = 0; const c = sc.getBoundingClientRect();
+      const a = [...sc.querySelectorAll(".m-sb-gitems a[href]")].reverse().find((a) => { const r = a.getBoundingClientRect(); return r.height && r.top > c.bottom }); if (!a) return null; a.click(); return a.getAttribute("href") })()`);
     if (far) {
       let seen = false;
-      for (let i = 0; i < 20 && !seen; i++) { await sleep(250); seen = await b.ev(`(() => { const sc = document.querySelector(".hm-sb-scroll"), a = sc.querySelector('.hm-sb-gitems a[aria-current="page"]'); if (!a) return false;
+      for (let i = 0; i < 20 && !seen; i++) { await sleep(250); seen = await b.ev(`(() => { const sc = document.querySelector(".m-sb-scroll"), a = sc.querySelector('.m-sb-gitems a[aria-current="page"]'); if (!a) return false;
         const r = a.getBoundingClientRect(), c = sc.getBoundingClientRect(); return r.top >= c.top - 1 && r.bottom <= c.bottom + 1 })()`); }
       check(seen, `${tag} menu reveals the active row (${far})`);
     }

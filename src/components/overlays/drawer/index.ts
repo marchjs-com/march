@@ -118,23 +118,23 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   const idx = signal(snaps && first != null && snaps[first] != null ? first : 0);
 
   const handle = props.handle !== false && (axis === "y" || snaps) && (snaps
-    ? h("button", { type: "button", class: "hm-sheet-handle", "aria-label": () => val(props.handleLabel) ?? t`Resize panel`, onClick: () => { const i = order.indexOf(idx.peek()); choose(order[(i + 1) % order.length]!); } })
-    : h("div", { class: "hm-sheet-handle", "aria-hidden": "true" })) as HTMLElement | false;
+    ? h("button", { type: "button", class: "m-sheet-handle", "aria-label": () => val(props.handleLabel) ?? t`Resize panel`, onClick: () => { const i = order.indexOf(idx.peek()); choose(order[(i + 1) % order.length]!); } })
+    : h("div", { class: "m-sheet-handle", "aria-hidden": "true" })) as HTMLElement | false;
 
   const root = frame({
     kind: "drawer", modal, title: props.title === undefined ? undefined : () => val(props.title),
     dismissable, label: props.label, footer: props.footer, children: props.children,
     closeButton: props.closeButton, closeLabel: () => val(props.closeLabel),
-    class: cx("hm-sheet", `hm-sheet-${edge}`, !snaps && `hm-sheet-${val(props.size) ?? "md"}`, snaps && "hm-sheet-snap", props.class),
+    class: cx("m-sheet", `m-sheet-${edge}`, !snaps && `m-sheet-${val(props.size) ?? "md"}`, snaps && "m-sheet-snap", props.class),
     onClose: () => props.onClose?.(),
   });
-  root.classList.add("hm-sheet-at", `hm-sheet-at-${edge}`);
+  root.classList.add("m-sheet-at", `m-sheet-at-${edge}`);
   const panel = root.firstElementChild as HTMLElement;
-  const body = panel.querySelector<HTMLElement>(".hm-dialog-body");
+  const body = panel.querySelector<HTMLElement>(".m-dialog-body");
   if (handle) { if (edge === "top") panel.append(handle); else panel.prepend(handle); }
   const fit = (): void => {
-    if (axis === "y" && body) { setStyle(panel, { "--hm-sheet-size": null, "--hm-sheet-off": null }); const n = panel.offsetHeight - body.clientHeight + body.scrollHeight; natural = n > 0 ? n : Infinity; }
-    if (snaps) setStyle(panel, { "--hm-sheet-size": `${Math.ceil(snapPx(largest()))}px` });
+    if (axis === "y" && body) { setStyle(panel, { "--m-sheet-size": null, "--m-sheet-off": null }); const n = panel.offsetHeight - body.clientHeight + body.scrollHeight; natural = n > 0 ? n : Infinity; }
+    if (snaps) setStyle(panel, { "--m-sheet-size": `${Math.ceil(snapPx(largest()))}px` });
   };
 
   // offset: distance from the open position toward the edge (0 = fully open, size = hidden)
@@ -147,7 +147,7 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   const rest = (i = idx.peek()): number => (snaps ? Math.max(0, size - snapPx(i)) : 0);
   // the part pushed past the edge at a smaller snap point is padding: the body fits the visible part and scrolls to its
   // end (past the smallest point, closing, it stays put and slides away whole)
-  const reveal = (o: number): void => { if (snaps) setStyle(panel, { "--hm-sheet-off": `${Math.round(Math.min(Math.max(0, o), rest(smallest())))}px` }); };
+  const reveal = (o: number): void => { if (snaps) setStyle(panel, { "--m-sheet-off": `${Math.round(Math.min(Math.max(0, o), rest(smallest())))}px` }); };
   const to = (o: number, duration = settleMs): Promise<void> => {
     run?.cancel();
     const from = cur;

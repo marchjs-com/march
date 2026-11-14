@@ -55,6 +55,6 @@ export default function ListRowDemo(props: { values: { kind: string; lead: strin
       })
       return option ? <ul class="sc-list-row-box" role="listbox" aria-label="Gezinme">{rows}</ul> : <div class="sc-list-row-box">{rows}</div>
     }}
-    <p class="hm-muted">{() => $said || "Bir satıra bas: etkin satır değişir. Uzun başlık üstüne gelince kayar."}</p>
+    <p class="m-muted">{() => $said || "Bir satıra bas: etkin satır değişir. Uzun başlık üstüne gelince kayar."}</p>
   </div>
 }

@@ -34,7 +34,7 @@ export default function PostCardDemo(props: { values: { photos: number; variant:
     colored = true
   })
   // two quick taps on the first photo (what a double tap is to the card)
-  const doubleTap = (): void => { const tile = wrap.querySelector(".hm-mgrid-tile"); for (let i = 0; i < 2; i++) tile?.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 })) }
+  const doubleTap = (): void => { const tile = wrap.querySelector(".m-mgrid-tile"); for (let i = 0; i < 2; i++) tile?.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 })) }
   return <div class="sc-social-post" ref={(x: Element) => { wrap = x as HTMLElement }}>
     {() => {
       // own icons, the ⋯ menu and the heart color are read once by the card: a new choice of these builds it again (the post lives here)

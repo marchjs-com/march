@@ -31,7 +31,7 @@ export interface StoryProgressProps {
 export function StoryProgress(props: StoryProgressProps): Element {
   // a segmented line Progress over media: the part at `index` fills over `duration`
   return h(Progress, {
-    variant: "line", inverse: true, class: () => cx("hm-story-progress", val(props.class)),
+    variant: "line", inverse: true, class: () => cx("m-story-progress", val(props.class)),
     segments: () => val(props.count), value: () => val(props.index), duration: () => val(props.duration) ?? 6000,
     paused: () => val(props.paused), run: () => val(props.run), onDone: () => props.onDone?.(),
     valueText: (index: number, count: number) => (props.label ? props.label(index, count) : t`Story ${index + 1} of ${count}`),

@@ -8,7 +8,7 @@ locale.set("en");
 const { manualClock, step } = await import("../../../motion/engine/clock.ts");
 const { LiveFeed, FEED_ENTER, FEED_LEAVE } = await import("./index.ts");
 
-const titles = (el) => [...el.querySelectorAll(".hm-lf-item")].filter((x) => !x.classList.contains("is-leaving")).map((x) => x.querySelector(".hm-listrow-title").textContent);
+const titles = (el) => [...el.querySelectorAll(".m-lf-item")].filter((x) => !x.classList.contains("is-leaving")).map((x) => x.querySelector(".m-listrow-title").textContent);
 
 test("LiveFeed: controlled items, newest on top, at most max", () => {
   const items = signal([{ id: 2, title: "two" }, { id: 1, title: "one" }]);
@@ -31,7 +31,7 @@ test("LiveFeed: next() pulls on the clock; hover and the pause button stop it", 
   for (let i = 0; i < 7; i++) step(16);
   assert.equal(titles(el)[0], "n4", "one more after 100 ms of clock time");
   assert.equal(titles(el).length, 4, "never more than max");
-  const btn = el.querySelector(".hm-lf-pause");
+  const btn = el.querySelector(".m-lf-pause");
   btn.click();
   assert.equal(btn.getAttribute("aria-pressed"), "true");
   assert.equal(el.querySelector("ul").getAttribute("aria-live"), "off", "not announced while paused");
@@ -86,13 +86,13 @@ test("LiveFeed: own button texts, no pulse dot, own item content, hover does not
     next: () => ({ id: k, title: `n${k++}` }), every: 100, max: 3, pauseLabel: "On air", resumeLabel: "Stopped", pulse: false, pauseOnHover: false,
     renderItem: (it) => h("b", { class: "own" }, `#${it.title}`),
   }), el);
-  const own = () => [...el.querySelectorAll(".hm-lf-item")].filter((x) => !x.classList.contains("is-leaving")).map((x) => x.querySelector(".own").textContent);
+  const own = () => [...el.querySelectorAll(".m-lf-item")].filter((x) => !x.classList.contains("is-leaving")).map((x) => x.querySelector(".own").textContent);
   assert.deepEqual(own(), ["#n2", "#n1", "#n0"]);
-  assert.equal(el.querySelector(".hm-listrow-title"), null, "the default row parts are not drawn");
-  assert.ok(el.querySelector(".hm-lf-item .hm-lf-glow"), "the glow stays");
-  const btn = el.querySelector(".hm-lf-pause");
+  assert.equal(el.querySelector(".m-listrow-title"), null, "the default row parts are not drawn");
+  assert.ok(el.querySelector(".m-lf-item .m-lf-glow"), "the glow stays");
+  const btn = el.querySelector(".m-lf-pause");
   assert.equal(btn.textContent, "On air");
-  assert.equal(btn.querySelector(".hm-lf-pulse"), null);
+  assert.equal(btn.querySelector(".m-lf-pulse"), null);
   el.querySelector("section").dispatchEvent(new globalThis.Event("pointerenter"));
   for (let i = 0; i < 7; i++) step(16);
   assert.equal(own()[0], "#n3", "still pulling while hovered");
@@ -109,7 +109,7 @@ test("LiveFeed: enter and leave can be switched off", () => {
   const dispose = render(() => h(LiveFeed, { next: () => ({ id: k, title: `q${k++}` }), every: 50, max: 2, enter: "none", leave: "none" }), el);
   for (let i = 0; i < 10; i++) step(16);
   assert.equal(titles(el)[0], "q3");
-  assert.equal(el.querySelectorAll(".hm-lf-item").length, 2, "the oldest is removed at once, nothing lingers");
+  assert.equal(el.querySelectorAll(".m-lf-item").length, 2, "the oldest is removed at once, nothing lingers");
   dispose();
   manualClock(false);
 });

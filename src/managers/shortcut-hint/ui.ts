@@ -16,14 +16,14 @@ messages("tr", tr);
 
 /** Badges for the elements that have a shortcut, placed at their inline-start edge (RTL aware). */
 function badges(): HTMLElement {
-  const box = h("div", { class: "hm-shortcut-badges", "aria-hidden": "true" }) as HTMLElement;
+  const box = h("div", { class: "m-shortcut-badges", "aria-hidden": "true" }) as HTMLElement;
   const w = globalThis.innerWidth ?? 0;
   for (const el of shortcutHints.targets()) {
     const combo = comboOf(el);
     const r = el.getBoundingClientRect();
     if (!combo || (!r.width && !r.height) || r.bottom < 0 || r.top > (globalThis.innerHeight ?? 0)) continue;
     const rtl = isRtl(el);
-    const b = h("span", { class: "hm-shortcut-badge" }, combo.split(/\s+/).map(formatKey).join(" ")) as HTMLElement;
+    const b = h("span", { class: "m-shortcut-badge" }, combo.split(/\s+/).map(formatKey).join(" ")) as HTMLElement;
     b.style.setProperty("top", `${r.top}px`);
     b.style.setProperty("inset-inline-start", `${Math.max(0, rtl ? w - r.right : r.left)}px`);
     box.appendChild(b);
@@ -35,12 +35,12 @@ function badges(): HTMLElement {
 export function ShortcutHelp(): unknown {
   return () => {
     const all = shortcutHints.entries();
-    if (!all.length) return h("p", { class: "hm-muted" }, t("No shortcuts yet."));
+    if (!all.length) return h("p", { class: "m-muted" }, t("No shortcuts yet."));
     const groups = new Map<string, ShortcutEntry[]>();
     for (const e of all) { const g = e.group ?? t("Other"); groups.set(g, [...(groups.get(g) ?? []), e]); }
-    return h("div", { class: "hm-shortcut-help" }, [...groups].map(([g, list]) => h("section", { class: "hm-shortcut-group" },
+    return h("div", { class: "m-shortcut-help" }, [...groups].map(([g, list]) => h("section", { class: "m-shortcut-group" },
       h("h3", {}, g),
-      list.map((e) => h("div", { class: "hm-shortcut-row", "data-inactive": e.active ? null : "", title: e.active ? null : t("Not available here") },
+      list.map((e) => h("div", { class: "m-shortcut-row", "data-inactive": e.active ? null : "", title: e.active ? null : t("Not available here") },
         h("span", {}, e.description),
         h("span", {}, e.combo.split(/\s+/).map((c) => h(Kbd, { keys: c }))))))));
   };

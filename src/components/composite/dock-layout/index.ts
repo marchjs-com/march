@@ -131,7 +131,7 @@ const EDGE = 20;
 
 /** `<DockLayout panels={panels} layout={{ row: [["files"], ["editor"]], share: .25 }} persist="ide" />` */
 export function DockLayout(props: DockLayoutProps): Element {
-  const base = uid("hm-dock");
+  const base = uid("m-dock");
   const prefix = props.commands === false ? null : (props.commands ?? "dock");
   const panelList = computed(() => val(props.panels) ?? []);
   const panelMap = computed(() => new Map(panelList().map((p) => [p.id, p])));
@@ -157,7 +157,7 @@ export function DockLayout(props: DockLayoutProps): Element {
   const still = (): boolean => motionOff(() => props.motion);
   const shows = (k: "maximize" | "float" | "minimize"): boolean => hasPart(props.actions, k);
   type IconKey = keyof NonNullable<DockLayoutProps["icons"]>;
-  const ico = (k: IconKey, def: IconDef): unknown => ownIcon(props.icons?.[k], def, "hm-dock-own");
+  const ico = (k: IconKey, def: IconDef): unknown => ownIcon(props.icons?.[k], def, "m-dock-own");
 
   // ---------------------------------------------------------------- persistence
   const storage: DockStorage | null = props.persist ? (props.storage ?? { get: (k) => load<unknown>(k, null), set: (k, v) => save(k, v) }) : null;
@@ -331,7 +331,7 @@ export function DockLayout(props: DockLayoutProps): Element {
     const gEl = under?.closest<HTMLElement>("[data-dock-group]");
     if (!gEl || !root.contains(gEl)) return null;
     const gid = gEl.dataset["dockGroup"]!;
-    const bar = under?.closest<HTMLElement>(".hm-tabs-bar");
+    const bar = under?.closest<HTMLElement>(".m-tabs-bar");
     if (bar && gEl.contains(bar)) { // between two tabs
       const tabs = [...bar.querySelectorAll<HTMLElement>('[role="tab"]')];
       let index = tabs.length, at = rtl ? bar.getBoundingClientRect().left : bar.getBoundingClientRect().right;
@@ -357,7 +357,7 @@ export function DockLayout(props: DockLayoutProps): Element {
     pointerDrag(e, {
       threshold: 6,
       onStart: () => {
-        ghost = dragGhost(h("div", { class: "hm-dock-ghost" }, icon(panel(pid)?.icon, "hm-dock-tab-icon"), h("span", {}, titleOf(pid))) as HTMLElement, { motion: () => props.motion });
+        ghost = dragGhost(h("div", { class: "m-dock-ghost" }, icon(panel(pid)?.icon, "m-dock-tab-icon"), h("span", {}, titleOf(pid))) as HTMLElement, { motion: () => props.motion });
         root?.classList.add("is-dragging");
       },
       onMove: (p) => { ghost?.move(p.clientX, p.clientY); drop = hit(p.clientX, p.clientY); showPreview(drop); },
@@ -433,13 +433,13 @@ export function DockLayout(props: DockLayoutProps): Element {
   const tabOf = (pid: string): TabSpec => {
     const p = panel(pid);
     return {
-      id: pid, icon: p?.icon, label: h(OverflowText, { class: "hm-dock-tab-title", text: () => val(p?.title) ?? pid, fade: false }),
+      id: pid, icon: p?.icon, label: h(OverflowText, { class: "m-dock-tab-title", text: () => val(p?.title) ?? pid, fade: false }),
       closable: p?.closable !== false, ...(p?.badge !== undefined ? { badge: p.badge } : null), ...(p?.dirty !== undefined ? { dirty: () => !!val(p.dirty) } : null),
-      content: () => { ensureHost(pid); return h(PortalTarget, { name: target(pid), class: "hm-dock-host" }); },
+      content: () => { ensureHost(pid); return h(PortalTarget, { name: target(pid), class: "m-dock-host" }); },
     };
   };
   const iconBtn = (label: () => string, ic: () => unknown, onClick: () => void, extra: Record<string, unknown> = {}): Element =>
-    h(IconButton, { class: "hm-dock-btn", size: "xs", label, icon: ic, onClick, ...extra }) as Element;
+    h(IconButton, { class: "m-dock-btn", size: "xs", label, icon: ic, onClick, ...extra }) as Element;
 
   const renderGroup = (g: DockGroupNode, floating: boolean): Element => {
     const gid = g.id;
@@ -452,18 +452,18 @@ export function DockLayout(props: DockLayoutProps): Element {
       shows("minimize") ? iconBtn(() => L().minimize ?? t`Minimize`, () => ico("minimize", minus), () => { const a = act(); if (a) minimize(a); }, { "aria-keyshortcuts": "Alt+Shift+M" }) : null];
     const tabLabels = reactive(() => ({ close: L().close, dirty: L().unsaved })) as unknown as TabsProps["labels"];
     const el = h("section", {
-      class: () => cx("hm-dock-group", floating && "hm-dock-float", maxed() && "is-maximized", focused() === gid && "is-focused"),
+      class: () => cx("m-dock-group", floating && "m-dock-float", maxed() && "is-maximized", focused() === gid && "is-focused"),
       "data-dock-group": gid, "aria-label": () => { const title = act() ? titleOf(act()!) : ""; return L().group?.(title) ?? t`Panel group: ${title}`; },
       onFocusin: () => focused.set(gid),
       onPointerdown: () => { if (floating) raise(gid); },
     },
     h(Tabs, {
-      tabs: g.panels.map(tabOf), value: act, onChange: (id: string) => commit(activate(untrack(state), id)), label: () => L().panels ?? t`Panels`, class: "hm-dock-tabs",
+      tabs: g.panels.map(tabOf), value: act, onChange: (id: string) => commit(activate(untrack(state), id)), label: () => L().panels ?? t`Panels`, class: "m-dock-tabs",
       actions, onClose: (id: string) => void close(id), closeIcon: props.icons?.close, labels: tabLabels,
       tabProps: (tab: TabSpec) => ({ onPointerdown: (e: PointerEvent) => { if (e.button === 0) startDrag(e, tab.id); } }),
     }),
-    floating && h("button", { type: "button", class: "hm-dock-grip", "aria-label": () => L().moveWindow ?? t`Move window`, title: () => L().moveWindow ?? t`Move window`, onPointerdown: winDrag(gid, "move"), onKeydown: winKey(gid) }),
-    floating && h(ResizeHandle, { edge: "bottom-end", line: "always", class: "hm-dock-resize", step: 10, label: () => L().resizeWindow ?? t`Resize window`, title: () => L().resizeWindow ?? t`Resize window`,
+    floating && h("button", { type: "button", class: "m-dock-grip", "aria-label": () => L().moveWindow ?? t`Move window`, title: () => L().moveWindow ?? t`Move window`, onPointerdown: winDrag(gid, "move"), onKeydown: winKey(gid) }),
+    floating && h(ResizeHandle, { edge: "bottom-end", line: "always", class: "m-dock-resize", step: 10, label: () => L().resizeWindow ?? t`Resize window`, title: () => L().resizeWindow ?? t`Resize window`,
       onPointerdown: winDrag(gid, "size"), onStep: (dx: number, dy: number) => winStep(gid, "size", dx, dy) }));
     return el;
   };
@@ -472,7 +472,7 @@ export function DockLayout(props: DockLayoutProps): Element {
     if (n.type === "group") return renderGroup(n, false);
     const node = (): DockNode | null => { let x: DockNode | null = untrack(state).root; for (const c of path) x = x && x.type === "split" ? (c === "a" ? x.a : x.b) : null; return x; };
     return h(Splitter, {
-      orientation: n.dir === "row" && !narrow() ? "horizontal" : "vertical", class: "hm-dock-split", min: 0.08,
+      orientation: n.dir === "row" && !narrow() ? "horizontal" : "vertical", class: "m-dock-split", min: 0.08,
       value: () => { state(); const x = node(); return x?.type === "split" ? x.share : undefined; },
       onChange: (v: number) => { const x = node(); if (x?.type === "split") { x.share = v; touch(); } },
       start: renderNode(n.a, `${path}a`), end: renderNode(n.b, `${path}b`),
@@ -484,7 +484,7 @@ export function DockLayout(props: DockLayoutProps): Element {
     return untrack(() => {
       const s = state();
       const own = props.empty;
-      const docked = s.root ? renderNode(s.root, "") : h("div", { class: "hm-dock-empty" }, own === false ? null : typeof own === "function" ? own(reset)
+      const docked = s.root ? renderNode(s.root, "") : h("div", { class: "m-dock-empty" }, own === false ? null : typeof own === "function" ? own(reset)
         : h(Empty, { size: "sm", title: L().empty ?? t`No panels open`, action: h(Button, { variant: "secondary", size: "sm", onClick: reset }, L().reset ?? t`Reset layout`) }));
       const floats = s.floating.map((f) => {
         const gid = f.group.id;
@@ -502,8 +502,8 @@ export function DockLayout(props: DockLayoutProps): Element {
   const tray = (): unknown => {
     const m = state().minimized;
     if (!m.length || props.tray === false) return null;
-    return untrack(() => h(Toolbar, { class: "hm-dock-tray", label: L().tray ?? t`Minimized panels`,
-      children: m.map((x) => h(Button, { class: "hm-dock-tray-btn", variant: "secondary", size: "sm", shape: "pill", icon: panel(x.panel)?.icon, onClick: () => restore(x.panel), title: L().restore ?? t`Restore` },
+    return untrack(() => h(Toolbar, { class: "m-dock-tray", label: L().tray ?? t`Minimized panels`,
+      children: m.map((x) => h(Button, { class: "m-dock-tray-btn", variant: "secondary", size: "sm", shape: "pill", icon: panel(x.panel)?.icon, onClick: () => restore(x.panel), title: L().restore ?? t`Restore` },
         () => titleOf(x.panel))) }));
   };
 
@@ -531,15 +531,15 @@ export function DockLayout(props: DockLayoutProps): Element {
   });
 
   return h("div", {
-    class: () => cx("hm-dock", state().maximized && "has-maximized", val(props.class)), role: "region",
+    class: () => cx("m-dock", state().maximized && "has-maximized", val(props.class)), role: "region",
     "aria-roledescription": () => L().workspace ?? t`workspace`, "aria-label": () => val(props.label) ?? t`Workspace`,
     ref: (x: HTMLElement) => {
       root = x;
       observeSize(x, () => narrow.set(x.clientWidth > 0 && x.clientWidth < 544));
     }, onKeydown,
   },
-  h("div", { class: "hm-dock-main" }, tree),
+  h("div", { class: "m-dock-main" }, tree),
   tray,
-  h("div", { class: "hm-dock-preview", "aria-hidden": "true", ref: (x: HTMLElement) => { preview = x; } }));
+  h("div", { class: "m-dock-preview", "aria-hidden": "true", ref: (x: HTMLElement) => { preview = x; } }));
 }
 

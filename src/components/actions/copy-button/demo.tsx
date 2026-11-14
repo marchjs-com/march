@@ -32,6 +32,6 @@ export default function CopyButtonDemo(props: { values: { iconOnly: boolean; ico
       return button
     }}
     <span class="sc-strip-label">{after}</span>
-    <span class="hm-muted">{() => ($copies ? `${$copies} kez kopyalandı` : "")}</span>
+    <span class="m-muted">{() => ($copies ? `${$copies} kez kopyalandı` : "")}</span>
   </div>
 }

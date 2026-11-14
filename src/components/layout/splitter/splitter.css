@@ -1,11 +1,11 @@
 /* March — Splitter. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- splitter */
-.hm-splitter { --hm-split: 50%; display: grid; grid-template-columns: var(--hm-split) auto minmax(0, 1fr); min-height: 12rem; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); overflow: hidden; background: var(--hm-surface); }
-.hm-splitter-v { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--hm-split) auto minmax(0, 1fr); }
-.hm-split-pane { min-width: 0; min-height: 0; overflow: auto; }
+.m-splitter { --m-split: 50%; display: grid; grid-template-columns: var(--m-split) auto minmax(0, 1fr); min-height: 12rem; border: 1px solid var(--m-border); border-radius: var(--m-radius-3); overflow: hidden; background: var(--m-surface); }
+.m-splitter-v { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--m-split) auto minmax(0, 1fr); }
+.m-split-pane { min-width: 0; min-height: 0; overflow: auto; }
 /* the handle is a ResizeHandle between the panes: a hairline at rest (the divider), its 2px line on hover, focus and drag */
-.hm-split-handle.hm-resize-handle:not(:hover, :focus-visible, .is-dragging)::after { inline-size: 1px; inset-inline-start: calc(50% - .5px); }
-.hm-split-handle.hm-resize-handle-block:not(:hover, :focus-visible, .is-dragging)::after { inline-size: auto; inset-inline-start: 0; block-size: 1px; inset-block-start: calc(50% - .5px); }
-.hm-splitter.is-dragging { user-select: none; }
+.m-split-handle.m-resize-handle:not(:hover, :focus-visible, .is-dragging)::after { inline-size: 1px; inset-inline-start: calc(50% - .5px); }
+.m-split-handle.m-resize-handle-block:not(:hover, :focus-visible, .is-dragging)::after { inline-size: auto; inset-inline-start: 0; block-size: 1px; inset-block-start: calc(50% - .5px); }
+.m-splitter.is-dragging { user-select: none; }
 /* handle={false}: a plain divider */
-.hm-split-handle.is-fixed { cursor: default; pointer-events: none; }
+.m-split-handle.is-fixed { cursor: default; pointer-events: none; }

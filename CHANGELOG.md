@@ -4,6 +4,16 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
+### Prefix is `m` (breaking, later in 0.1.0)
+- The framework prefix is `m` everywhere, in place of the earlier two-letter one: classes (`m-btn`), CSS variables
+  (`--m-primary`), data attributes (`data-m-color`), keyframes (`m-fade-in`), ids (`#m-boot`, `uid()` gives `m-1`),
+  the `?m-path=` fallback parameter, `<meta name=m-config>`, performance marks (`m:`), and every storage, channel and
+  symbol key (`m.theme`, `m.colorTheme`, `m.accent`, `m.consent`, `m.nav`, `m.session`, `m.sync` …). History state
+  fields are `mKey`, `mModal`, `mBg`, `mIdx`. Nothing was published under the old names, so there is no migration:
+  rename them in your own stylesheets and selectors.
+- `march check component` and `test/prefix.test.js` keep the rule: classes start with `m-` (state: `is-`), and no
+  class takes a margin-utility name of other libraries (`m-0` … `m-5`, `m-auto`, `m-px`).
+
 ### Fewer files from the chunk packer (later in 0.1.0)
 - `march build`'s packer ends with a forced step: a shared chunk still under the floor joins a host even when a route
   or lazy part it reaches is already over its budget (that row fails either way; a file of its own only adds a request),
@@ -122,8 +132,8 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
   the compiler (auto-import table, `sx`) imports March's sources from a mirror in the OS temp folder, and
   `hadi-march/register` strips March's own `.ts` files with `module.stripTypeScriptTypes`. `types/` (JSX types) is now part of
   the package files. Node >= 22.18.
-- CSS class collisions: the markdown editor mode switch now uses `.hm-editor-tabs`/`.hm-editor-tab` and `CodeInput` uses
-  `.hm-otp`/`.hm-otp-box`, so they no longer restyle `Tabs` (`.hm-tabs`) and `CodeBlock` (`.hm-code`). Regression test added.
+- CSS class collisions: the markdown editor mode switch now uses `.m-editor-tabs`/`.m-editor-tab` and `CodeInput` uses
+  `.m-otp`/`.m-otp-box`, so they no longer restyle `Tabs` (`.m-tabs`) and `CodeBlock` (`.m-code`). Regression test added.
 - `Tabs` bar no longer shows a stray vertical scrollbar (the active tab underline overlapped the bar border).
 
 ### Added (later in 0.1.0)

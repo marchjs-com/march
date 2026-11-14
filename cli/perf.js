@@ -47,7 +47,7 @@ export function chunkManifest(meta, { cwd, outdir, entry }) {
 
 /**
  * The part of the manifest index.html carries: only keys some code can look up. A key is read by its string — a tagged
- * loader's `hm: "src/pages/x.tsx"`, "march:common", or a literal chunksOf("…") — so a key no output file mentions (a
+ * loader's `m: "src/pages/x.tsx"`, "march:common", or a literal chunksOf("…") — so a key no output file mentions (a
  * plain `import()` that is not a bare loader) is never read, and dropping it keeps the start-up HTML small.
  * The size report still uses the whole manifest.
  * @param {Record<string, string[]>} manifest

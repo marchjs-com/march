@@ -51,7 +51,7 @@ sub-page opened from files (`dist/motion/index.html`) shows `/motion`; links ins
   relative to each page's folder (`base: "./"`) or absolute under a fixed base (`base: "/app/"`). A route the build
   could not render still gets the plain app shell there, so it opens directly too.
 - **`404.html` + `march-404.js`** for routes with params (`/users/:id`) and any other address without a file: the host
-  serves 404.html, which sends the address to the app's root (`?hm-path=/users/7`); the router restores
+  serves 404.html, which sends the address to the app's root (`?m-path=/users/7`); the router restores
   `/users/7` on start, without a history entry. With a relative build the page tries each folder depth for
   `march-404.js` (only the app's own copy exists), so it works in any sub-folder. Off with `fallback404: false`.
 - `_headers` (caching; off with `headers: false`) and, with `redirects: true`, `_redirects` for Cloudflare Pages /

@@ -121,47 +121,47 @@ export function PostCard(props: PostCardProps): Element {
   // a count button (a ghost pill Button): shown while it has a handler or a count; it stays while the number changes (it rolls)
   const counter = (mark: () => unknown, n: () => number | undefined, label: () => string, fn?: () => void): (() => Element | null) => {
     const shown = computed(() => !!fn || !!n());
-    return () => (shown() ? untrack(() => h(Button, { variant: "ghost", shape: "pill", class: "hm-post-act", "aria-label": label, onClick: () => fn?.(), disabled: !fn, icon: mark() },
+    return () => (shown() ? untrack(() => h(Button, { variant: "ghost", shape: "pill", class: "m-post-act", "aria-label": label, onClick: () => fn?.(), disabled: !fn, icon: mark() },
       h(CountRoll, { value: () => n() ?? 0, hideZero: true })) as Element) : null);
   };
   const author = (): Element => {
     const a = untrack(post).author;
-    return h("span", { class: "hm-post-name" }, h("span", { class: "hm-post-name-text" }, a.name),
-      a.verified && props.verifiedIcon !== false ? h(VerifiedMark, { class: "hm-post-verified", label: () => L().verified ?? t`Verified`, icon: props.verifiedIcon }) : null);
+    return h("span", { class: "m-post-name" }, h("span", { class: "m-post-name-text" }, a.name),
+      a.verified && props.verifiedIcon !== false ? h(VerifiedMark, { class: "m-post-verified", label: () => L().verified ?? t`Verified`, icon: props.verifiedIcon }) : null);
   };
   // the frame is a Card (an article, no body padding); the flat look is the same Card without its frame
   return h(Card, {
     as: "article", flush: true, plain: () => val(props.variant) === "flat",
-    class: () => cx("hm-post", `hm-post-${val(props.variant) ?? "card"}`, val(props.class)),
+    class: () => cx("m-post", `m-post-${val(props.variant) ?? "card"}`, val(props.class)),
     "aria-label": () => L().post?.(post().author.name) ?? t`Post by ${post().author.name}`,
   },
-  h("header", { class: "hm-post-head" },
+  h("header", { class: "m-post-head" },
     () => {
       head();
       const a = untrack(post).author;
       // who: a ListRow (avatar · name · time and place), a button when the author can be opened
       return h(ListRow, {
-        class: "hm-post-who", ...(props.onAuthor ? { onClick: () => props.onAuthor?.(post()) } : { as: "span" as const }),
+        class: "m-post-who", ...(props.onAuthor ? { onClick: () => props.onAuthor?.(post()) } : { as: "span" as const }),
         lead: props.avatar === false ? null : h(Avatar, { name: a.name, src: a.avatar, size: "md" }),
         title: author(),
-        sub: h("span", { class: "hm-post-meta" },
+        sub: h("span", { class: "m-post-meta" },
           props.time === false ? null : h("time", { dateTime: new Date(untrack(post).time).toISOString() }, typeof props.time === "function" ? props.time(untrack(post).time) : applyPipe("relative", untrack(post).time)),
-          untrack(post).place ? h("span", { class: "hm-post-place" }, props.placeIcon === false ? null : own(props.placeIcon, mapPin), untrack(post).place) : null),
+          untrack(post).place ? h("span", { class: "m-post-place" }, props.placeIcon === false ? null : own(props.placeIcon, mapPin), untrack(post).place) : null),
       });
     },
-    props.menu?.length ? h(Menu, { icon: props.menuIcon ?? moreVertical, label: () => L().options ?? t`Post options`, variant: "ghost", size: "sm", class: "hm-post-more", items: props.menu, args: [post()] }) : null),
+    props.menu?.length ? h(Menu, { icon: props.menuIcon ?? moreVertical, label: () => L().options ?? t`Post options`, variant: "ghost", size: "sm", class: "m-post-more", items: props.menu, args: [post()] }) : null),
   () => {
     const items = media();
     if (!items?.length) return null;
-    return h("div", { class: "hm-post-media", ref: (x: HTMLElement) => { stage = x; } },
+    return h("div", { class: "m-post-media", ref: (x: HTMLElement) => { stage = x; } },
       h(MediaGrid, {
         items, gap: "thin",
         onOpen: (i: number, el: HTMLElement) => props.onOpenMedia?.(i, el, post()),
         onDoubleTap: val(props.doubleTapLike) === false ? undefined : doubleTap,
       }),
-      props.bigHeart === false ? null : h("span", { class: "hm-post-big", hidden: true, "aria-hidden": "true", ref: (x: HTMLElement) => { big = x; } }, own(props.bigHeart, heart)));
+      props.bigHeart === false ? null : h("span", { class: "m-post-big", hidden: true, "aria-hidden": "true", ref: (x: HTMLElement) => { big = x; } }, own(props.bigHeart, heart)));
   },
-  h("div", { class: "hm-post-actions" },
+  h("div", { class: "m-post-actions" },
     h(LikeButton, { liked: () => !!post().liked, count: () => post().likes, onToggle: like, label: () => L().like ?? t`Like`, color: props.likeColor }),
     counter(() => own(props.commentIcon, message), () => post().comments, () => L().comments?.(post().comments ?? 0) ?? t`Comments: ${post().comments ?? 0}`, props.onComment && (() => props.onComment?.(post()))),
     counter(() => own(props.shareIcon, send), () => post().shares, () => L().share?.(post().shares ?? 0) ?? t`Share: ${post().shares ?? 0}`, props.onShare && (() => props.onShare?.(post())))),
@@ -170,8 +170,8 @@ export function PostCard(props: PostCardProps): Element {
     if (!text) return null;
     // folds to `clamp` lines; "more" opens it for good (the state outlives a redraw of the caption)
     return h(ClampText, {
-      class: "hm-post-body", lines: () => val(props.clamp) ?? 3, collapsible: false, open, onOpenChange: (v: boolean) => open.set(v), labels: { more: L().more ?? t`more` },
-    }, h("b", { class: "hm-post-handle" }, handle), " ", text);
+      class: "m-post-body", lines: () => val(props.clamp) ?? 3, collapsible: false, open, onOpenChange: (v: boolean) => open.set(v), labels: { more: L().more ?? t`more` },
+    }, h("b", { class: "m-post-handle" }, handle), " ", text);
   },
-  () => (props.onComment && post().comments && props.viewAll !== false ? h(Button, { variant: "link", class: "hm-post-all", onClick: () => props.onComment?.(post()) }, L().viewAll?.(post().comments ?? 0) ?? t`View all ${post().comments} comments`) : null)) as Element;
+  () => (props.onComment && post().comments && props.viewAll !== false ? h(Button, { variant: "link", class: "m-post-all", onClick: () => props.onComment?.(post()) }, L().viewAll?.(post().comments ?? 0) ?? t`View all ${post().comments} comments`) : null)) as Element;
 }

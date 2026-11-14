@@ -13,15 +13,15 @@ test("Button: variant, size, loading locks it, block", () => {
   let n = 0;
   const m = mount(() => h(Button, { variant: "primary", size: "sm", loading: busy, block: true, onClick: () => n++ }, "Save"));
   const b = m.el.querySelector("button");
-  for (const c of ["hm-btn", "hm-btn-primary", "hm-btn-sm", "hm-btn-block"]) assert.ok(b.className.includes(c), c);
+  for (const c of ["m-btn", "m-btn-primary", "m-btn-sm", "m-btn-block"]) assert.ok(b.className.includes(c), c);
   assert.equal(b.getAttribute("type"), "button");
   b.click();
   assert.equal(n, 1);
   busy.set(true);
   assert.equal(b.disabled, true);
   assert.equal(b.getAttribute("aria-busy"), "true");
-  assert.ok(b.querySelector(".hm-btn-spin"));
-  assert.equal(buttonSizeClass("lg"), "hm-btn-lg");
+  assert.ok(b.querySelector(".m-btn-spin"));
+  assert.equal(buttonSizeClass("lg"), "m-btn-lg");
   assert.equal(buttonSizeClass("md"), undefined);
   m.dispose();
 });
@@ -33,12 +33,12 @@ test("Button: the spinner can be turned off or replaced", () => {
     h(Button, { loading: true, icon: "+" }, "C"),
   ]);
   const [a, b, c] = m.el.querySelectorAll("button");
-  assert.equal(a.querySelector(".hm-btn-spin"), null);
-  assert.equal(a.querySelector(".hm-icon").textContent, "+", "the icon stays");
+  assert.equal(a.querySelector(".m-btn-spin"), null);
+  assert.equal(a.querySelector(".m-icon").textContent, "+", "the icon stays");
   assert.equal(a.disabled, true, "still locked");
-  assert.equal(b.querySelector(".hm-btn-spin"), null);
-  assert.equal(b.querySelector(".hm-btn-spin-own").textContent, "~");
-  assert.ok(c.querySelector(".hm-btn-spin") && !c.querySelector(".hm-icon"));
+  assert.equal(b.querySelector(".m-btn-spin"), null);
+  assert.equal(b.querySelector(".m-btn-spin-own").textContent, "~");
+  assert.ok(c.querySelector(".m-btn-spin") && !c.querySelector(".m-icon"));
   assert.equal(a.hasAttribute("spinner"), false);
   m.dispose();
 });
@@ -65,13 +65,13 @@ test("Button: link variant, pill shape, pressed toggle", () => {
     h(Button, { "aria-pressed": "true" }, "Own"),
   ]);
   const [a, b, c] = m.el.querySelectorAll("button");
-  assert.ok(a.className.includes("hm-btn-link"));
+  assert.ok(a.className.includes("m-btn-link"));
   assert.equal(a.getAttribute("aria-pressed"), "false");
   assert.ok(!a.className.includes("is-pressed"));
   on.set(true);
   assert.equal(a.getAttribute("aria-pressed"), "true");
   assert.ok(a.className.includes("is-pressed"));
-  assert.ok(b.className.includes("hm-btn-pill"));
+  assert.ok(b.className.includes("m-btn-pill"));
   assert.equal(b.hasAttribute("aria-pressed"), false, "a plain button has no pressed state");
   assert.equal(b.hasAttribute("shape"), false);
   assert.equal(c.getAttribute("aria-pressed"), "true", "the caller's own aria-pressed stays");
@@ -93,7 +93,7 @@ test("ActionButton: a plain { label, run }, its own run, extra attributes", asyn
   assert.equal(btns.length, 3, "the hidden one is not drawn");
   assert.equal(btns[0].textContent, "Archive");
   assert.equal(btns[0].getAttribute("role"), "menuitem");
-  for (const c of ["hm-btn-danger", "x-act"]) assert.ok(btns[0].className.includes(c), c);
+  for (const c of ["m-btn-danger", "x-act"]) assert.ok(btns[0].className.includes(c), c);
   assert.equal(btns[1].disabled, true);
   btns[0].click(); btns[2].click();
   await tick();
@@ -112,7 +112,7 @@ test("Button: href uses the router's Link inside the app, a plain link for an ex
   const m = mount(() => [h(Button, { href: "/docs" }, "Docs"), h(Button, { href: "https://example.com/x" }, "Out"), h(Button, { href: "mailto:a@example.com" }, "Mail")]);
   const [a, b, c] = m.el.querySelectorAll("a");
   assert.deepEqual(seen, ["/docs"]);
-  assert.ok(a.hasAttribute("data-router") && a.className.includes("hm-btn"));
+  assert.ok(a.hasAttribute("data-router") && a.className.includes("m-btn"));
   assert.equal(b.hasAttribute("data-router"), false);
   assert.equal(b.getAttribute("href"), "https://example.com/x");
   assert.equal(c.hasAttribute("data-router"), false);

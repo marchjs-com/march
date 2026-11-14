@@ -19,9 +19,9 @@ const bar = (el, id) => el.querySelector(`[data-task="${id}"]`);
 test("Gantt: rows, bars sized by days, links, accessible names", () => {
   locale.set("en-GB");
   const m = mount(() => h(Gantt, { tasks: tasks(), scale: "day" }));
-  assert.equal(m.el.querySelectorAll(".hm-gantt-name").length, 4);
+  assert.equal(m.el.querySelectorAll(".m-gantt-name").length, 4);
   assert.equal(bar(m.el, "a").style.getPropertyValue("width"), "200px"); // 5 days × 40 px
-  assert.equal(m.el.querySelectorAll(".hm-gantt-link").length, 3);
+  assert.equal(m.el.querySelectorAll(".m-gantt-link").length, 3);
   assert.match(bar(m.el, "b").getAttribute("aria-label"), /Build, .*40% done, after Design/);
   assert.ok(bar(m.el, "m").className.includes("is-milestone"));
   m.dispose();
@@ -51,19 +51,19 @@ test("Gantt: own texts, parts off (names, hint, today line), own bar content and
     h(Gantt, { tasks: tasks(), scale: "day", labels: { task: "Work", today: "Now", days: (n) => `${n} days`, done: (p) => `${p} percent` }, barLabel: (t) => `#${t.id}`, help: h("i", { class: "own-help" }, "hint") }),
     h(Gantt, { tasks: tasks(), scale: "day", names: false, help: false, todayLine: false, animate: false, class: "mine" }),
   ]);
-  const [a, b] = m.el.querySelectorAll(".hm-gantt");
-  assert.equal(a.querySelector(".hm-gantt-side-head").textContent, "Work");
-  assert.equal(a.querySelector(".hm-gantt-today").textContent, "Now");
-  assert.equal(a.querySelector(".hm-gantt-name-meta").textContent, "5 days");
+  const [a, b] = m.el.querySelectorAll(".m-gantt");
+  assert.equal(a.querySelector(".m-gantt-side-head").textContent, "Work");
+  assert.equal(a.querySelector(".m-gantt-today").textContent, "Now");
+  assert.equal(a.querySelector(".m-gantt-name-meta").textContent, "5 days");
   assert.match(bar(a, "b").getAttribute("aria-label"), /40 percent/);
-  assert.equal(bar(a, "b").querySelector(".hm-gantt-bar-label").textContent, "#b");
-  assert.ok(a.querySelector(".hm-gantt-help .own-help"));
+  assert.equal(bar(a, "b").querySelector(".m-gantt-bar-label").textContent, "#b");
+  assert.ok(a.querySelector(".m-gantt-help .own-help"));
   assert.ok(b.className.includes("mine"));
-  assert.equal(b.querySelector(".hm-gantt-side, .hm-gantt-help, .hm-gantt-today"), null);
+  assert.equal(b.querySelector(".m-gantt-side, .m-gantt-help, .m-gantt-today"), null);
   assert.equal(b.querySelector("[role=grid]").getAttribute("aria-describedby"), null);
-  assert.equal(b.querySelectorAll(".hm-gantt-bar").length, 4);
+  assert.equal(b.querySelectorAll(".m-gantt-bar").length, 4);
   // edits still work without the names column and without motion
   key(bar(b, "a"), "ArrowRight", { altKey: true });
-  assert.match(b.querySelector(".hm-gantt-status").textContent, /Design/);
+  assert.match(b.querySelector(".m-gantt-status").textContent, /Design/);
   m.dispose();
 });

@@ -29,7 +29,7 @@ export const CHARACTERS: Record<string, Character> = {
   calm: { durationScale: 1.35, easing: "in-out" },
   lively: { durationScale: 0.85, easing: "spring-snappy" },
 };
-const KEY = "hm-motion";
+const KEY = "m-motion";
 
 const num = (v: unknown, d: number, min: number, max: number): number => (typeof v === "number" && Number.isFinite(v) ? Math.min(max, Math.max(min, v)) : d);
 function clean(raw: Partial<MotionSettings>, base: MotionSettings): MotionSettings {

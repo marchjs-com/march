@@ -206,19 +206,19 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
     return el;
   };
   const mainId = pick("mainId") ?? "main";
-  const main = h("main", { class: "hm-shell-main hm-layout-main", id: mainId, tabindex: "-1" }, props.children) as HTMLElement;
+  const main = h("main", { class: "m-shell-main m-layout-main", id: mainId, tabindex: "-1" }, props.children) as HTMLElement;
   els.set("main", main);
 
   const out = framed
-    ? h("div", { class: () => cx("hm-layout hm-shell", has("header") && "hm-shell-has-header", !has("nav") && "hm-layout-no-nav", has("aside") && "hm-layout-has-aside", val(props.class ?? defaults.class)) },
-      pick("skipLink") === false ? null : h("a", { class: "hm-skip", href: `#${mainId}` }, () => val(pick("labels")?.skip) ?? t`Skip to content`),
-      slot("nav", "aside", "hm-shell-nav"),
-      h("div", { class: "hm-shell-body" },
-        slot("top", "div", "hm-shell-top"),
-        slot("header", "header", "hm-shell-header"),
-        h("div", { class: "hm-layout-row" }, main, slot("aside", "aside", "hm-layout-aside")),
-        slot("footer", "footer", "hm-layout-footer")))
-    : h("div", { class: () => cx("hm-layout", val(props.class ?? defaults.class)) }, props.children);
+    ? h("div", { class: () => cx("m-layout m-shell", has("header") && "m-shell-has-header", !has("nav") && "m-layout-no-nav", has("aside") && "m-layout-has-aside", val(props.class ?? defaults.class)) },
+      pick("skipLink") === false ? null : h("a", { class: "m-skip", href: `#${mainId}` }, () => val(pick("labels")?.skip) ?? t`Skip to content`),
+      slot("nav", "aside", "m-shell-nav"),
+      h("div", { class: "m-shell-body" },
+        slot("top", "div", "m-shell-top"),
+        slot("header", "header", "m-shell-header"),
+        h("div", { class: "m-layout-row" }, main, slot("aside", "aside", "m-layout-aside")),
+        slot("footer", "footer", "m-layout-footer")))
+    : h("div", { class: () => cx("m-layout", val(props.class ?? defaults.class)) }, props.children);
 
   // narrow screens: the aside becomes a bottom sheet, opened from a corner button (Esc or the button closes it)
   const asideEl = els.get("aside");
@@ -230,7 +230,7 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
     // the Button comes in its own chunk, like the features
     onCleanup(lazyMount(api, "bottom-start", -10, async () => {
       const { Button } = await import("../../actions/button/index.ts");
-      return () => h(Button, { size: "sm", class: "hm-layout-aside-btn", "aria-controls": asideEl.id, "aria-expanded": () => String(open()), ref: (el: HTMLElement) => { btn = el; },
+      return () => h(Button, { size: "sm", class: "m-layout-aside-btn", "aria-controls": asideEl.id, "aria-expanded": () => String(open()), ref: (el: HTMLElement) => { btn = el; },
         onClick: () => set(!open.peek()) }, () => val(pick("labels")?.panel) ?? t`Panel`);
     }));
     const esc = (e: KeyboardEvent): void => { if (e.key === "Escape" && open.peek()) { set(false); btn?.focus(); } };
@@ -257,7 +257,7 @@ export const readingProgressFeature = defineLayoutFeature("readingProgress", (op
   // `color`: a theme token ("brand-orange"); any other value is used as a CSS color, as before
   const token = !!opts.color && (COLOR_TOKENS as readonly string[]).includes(opts.color);
   // the place (fixed to the top) and the colour; the bar itself is a Progress line whose fill the scroll drives
-  const bar = h("div", { class: "hm-reading-progress", "data-hm-color": token ? opts.color : null, style: opts.color && !token ? { "--hm-rp-c": opts.color } : {} }) as HTMLElement;
+  const bar = h("div", { class: "m-reading-progress", "data-m-color": token ? opts.color : null, style: opts.color && !token ? { "--m-rp-c": opts.color } : {} }) as HTMLElement;
   let stop: (() => void) | undefined;
   const off = lazyMount(api, "body", 0, async () => {
     const [P, S] = await Promise.all([import("../../feedback/progress/index.ts"), import("../../../motion/scroll-fx.ts")]);
@@ -268,7 +268,7 @@ export const readingProgressFeature = defineLayoutFeature("readingProgress", (op
 
 /** After a route change: focus moves to the page (main) and the new title is read out; nothing moves on first load. */
 export const routeFocusFeature = defineLayoutFeature("routeFocus", () => (api) => {
-  const live = h("div", { class: "hm-sr-only", "aria-live": "polite", "aria-atomic": "true" }) as HTMLElement;
+  const live = h("div", { class: "m-sr-only", "aria-live": "polite", "aria-atomic": "true" }) as HTMLElement;
   const closeLive = openLayer("fx", live);
   let stop: (() => void) | undefined;
   let gone = false;
@@ -306,7 +306,7 @@ export const autoHideHeaderFeature = defineLayoutFeature("autoHideHeader", (opts
 
 /** Draw a lazily loaded component into a region (or the end of <body>), inside `wrap` (default: a box that adds no
  *  layout); stops cleanly if the layout goes first. */
-function lazyMount(api: LayoutApi, where: LayoutRegion | "body", order: number, load: () => Promise<() => unknown>, wrap: HTMLElement = h("span", { class: "hm-layout-ctl" }) as HTMLElement): () => void {
+function lazyMount(api: LayoutApi, where: LayoutRegion | "body", order: number, load: () => Promise<() => unknown>, wrap: HTMLElement = h("span", { class: "m-layout-ctl" }) as HTMLElement): () => void {
   const off = where === "body" ? openLayer("fx", wrap) : api.add(where, wrap, order);
   let gone = false;
   let dispose: (() => void) | undefined;
@@ -342,7 +342,7 @@ export const connectionFeature = defineLayoutFeature("connection", (opts: { corn
   const offline = signal(nav?.onLine === false);
   const update = (): void => { offline.set(nav?.onLine === false); };
   // the live region is there from the start (so going offline is announced); the Badge in it comes in its own chunk
-  const host = h("span", { class: "hm-offline", role: "status", "aria-live": "polite", hidden: () => !offline() }) as HTMLElement;
+  const host = h("span", { class: "m-offline", role: "status", "aria-live": "polite", hidden: () => !offline() }) as HTMLElement;
   const out = lazyMount(api, opts.corner ?? "top-end", -10, async () => {
     const { Badge } = await import("../../data/badge/index.ts");
     return () => (offline() ? h(Badge, { tone: "warn", dot: true }, opts.label ?? t`You are offline`) : null);
@@ -365,7 +365,7 @@ export const feedbackFeature = defineLayoutFeature("feedback", (opts: { onSubmit
   };
   return lazyMount(api, opts.corner ?? "bottom-end", 10, async () => {
     const { Button } = await import("../../actions/button/index.ts");
-    return () => h(Button, { size: "sm", class: "hm-layout-feedback", onClick: () => void open() }, () => opts.label ?? t`Feedback`);
+    return () => h(Button, { size: "sm", class: "m-layout-feedback", onClick: () => void open() }, () => opts.label ?? t`Feedback`);
   });
 });
 
@@ -373,7 +373,7 @@ export const feedbackFeature = defineLayoutFeature("feedback", (opts: { onSubmit
 export const devOverlayFeature = defineLayoutFeature("devOverlay", () => (api) => {
   const root = globalThis.document?.documentElement;
   if (!root) return;
-  const panel = h("div", { class: "hm-layout-dev", role: "note", "aria-label": () => t`Layout regions`, hidden: true }) as HTMLElement;
+  const panel = h("div", { class: "m-layout-dev", role: "note", "aria-label": () => t`Layout regions`, hidden: true }) as HTMLElement;
   const closePanel = openLayer("fx", panel);
   const draw = (): void => {
     const regions = (["top", "header", "nav", "main", "aside", "footer"] as const).filter((r) => api.region(r));
@@ -381,13 +381,13 @@ export const devOverlayFeature = defineLayoutFeature("devOverlay", () => (api) =
   };
   const toggle = (e: KeyboardEvent): void => {
     if (!(e.altKey && e.shiftKey && e.key.toLowerCase() === "l")) return;
-    const on = !root.hasAttribute("data-hm-layout-debug");
-    root.toggleAttribute("data-hm-layout-debug", on);
+    const on = !root.hasAttribute("data-m-layout-debug");
+    root.toggleAttribute("data-m-layout-debug", on);
     panel.hidden = !on;
     if (on) draw();
   };
   globalThis.addEventListener("keydown", toggle);
-  return () => { globalThis.removeEventListener("keydown", toggle); root.removeAttribute("data-hm-layout-debug"); closePanel(); };
+  return () => { globalThis.removeEventListener("keydown", toggle); root.removeAttribute("data-m-layout-debug"); closePanel(); };
 });
 
 /** The default Layout: back-to-top and route focus on. `features={{ scrollToTop: false }}` turns one off. */

@@ -8,6 +8,6 @@ const { Spacer } = await import("./index.ts");
 
 test("Spacer: a decorative flexible gap", () => {
   const el = h(Spacer, {});
-  assert.match(el.getAttribute("class"), /hm-spacer/);
+  assert.match(el.getAttribute("class"), /m-spacer/);
   assert.equal(el.getAttribute("aria-hidden"), "true");
 });

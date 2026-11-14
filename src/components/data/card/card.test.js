@@ -14,15 +14,15 @@ test("Card: header, actions, body, footer and flush", () => {
     h(Card, { plain: true }, "No frame"),
   ]);
   const [a, b, c] = m.el.children;
-  assert.ok(c.classList.contains("hm-card-plain") && !a.classList.contains("hm-card-plain"), "plain: no frame");
+  assert.ok(c.classList.contains("m-card-plain") && !a.classList.contains("m-card-plain"), "plain: no frame");
   assert.equal(a.tagName, "SECTION");
   assert.equal(a.getAttribute("data-x"), "1");
-  assert.equal(a.querySelector(".hm-card-title").textContent, "HADİ");
-  assert.equal(a.querySelector(".hm-card-sub").textContent, "Plan");
-  assert.ok(a.querySelector(".hm-card-actions button"), "action() renders as a button");
-  assert.equal(a.querySelector(".hm-card-foot").textContent, "Updated");
+  assert.equal(a.querySelector(".m-card-title").textContent, "HADİ");
+  assert.equal(a.querySelector(".m-card-sub").textContent, "Plan");
+  assert.ok(a.querySelector(".m-card-actions button"), "action() renders as a button");
+  assert.equal(a.querySelector(".m-card-foot").textContent, "Updated");
   assert.equal(b.tagName, "ARTICLE");
-  assert.ok(b.className.includes("hm-card-flush"));
-  assert.equal(b.querySelector(".hm-card-head"), null, "no header without title / actions");
+  assert.ok(b.className.includes("m-card-flush"));
+  assert.equal(b.querySelector(".m-card-head"), null, "no header without title / actions");
   m.dispose();
 });

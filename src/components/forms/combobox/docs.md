@@ -40,5 +40,5 @@ positioning engine; loading, empty and error states are `role="status"`.
 ## Composed of
 
 Chip (the chosen values with `multiple`) and OptionList (the options, driven from the input with `keys={false}`); the
-list popup is the shared floating panel (ui/popover.ts, `.hm-pop`) and keyboard handling is the shared list navigation
+list popup is the shared floating panel (ui/popover.ts, `.m-pop`) and keyboard handling is the shared list navigation
 (the list-nav behavior).

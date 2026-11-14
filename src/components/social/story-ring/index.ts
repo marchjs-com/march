@@ -45,11 +45,11 @@ export function StoryRing(props: StoryRingProps): Element {
   let spin: ReturnType<typeof animate> | null = null;
   const state = (): StoryRingState => val(props.state) ?? "new";
   const inner = [
-    h("span", { class: "hm-sring-frame" },
-      h("span", { class: "hm-sring-ring", "aria-hidden": "true", ref: (x: HTMLElement) => { ring = x; } }),
-      h("span", { class: "hm-sring-av" }, props.avatar ?? h(Avatar, { name: props.name, src: props.src, size: () => (val(props.size) === "sm" ? "sm" : "lg") })),
-      () => (val(props.add) ? h(CornerMark, { class: "hm-sring-add", corner: "bottom-end", variant: "solid", color: "brand-orange", ring: true, size: () => (val(props.size) === "lg" ? "md" : "sm"), icon: props.addIcon ?? plus }) : null)),
-    () => { const l = val(props.label); return l ? h("span", { class: "hm-sring-label" }, l) : null; },
+    h("span", { class: "m-sring-frame" },
+      h("span", { class: "m-sring-ring", "aria-hidden": "true", ref: (x: HTMLElement) => { ring = x; } }),
+      h("span", { class: "m-sring-av" }, props.avatar ?? h(Avatar, { name: props.name, src: props.src, size: () => (val(props.size) === "sm" ? "sm" : "lg") })),
+      () => (val(props.add) ? h(CornerMark, { class: "m-sring-add", corner: "bottom-end", variant: "solid", color: "brand-orange", ring: true, size: () => (val(props.size) === "lg" ? "md" : "sm"), icon: props.addIcon ?? plus }) : null)),
+    () => { const l = val(props.label); return l ? h("span", { class: "m-sring-label" }, l) : null; },
   ];
   effect(() => {
     const on = !!val(props.loading);
@@ -59,9 +59,9 @@ export function StoryRing(props: StoryRingProps): Element {
     });
   });
   onCleanup(() => spin?.cancel());
-  const cls = (): string => cx("hm-sring", `hm-sring-${val(props.size) ?? "md"}`, `is-${state()}`, val(props.loading) && "is-loading", val(props.class));
+  const cls = (): string => cx("m-sring", `m-sring-${val(props.size) ?? "md"}`, `is-${state()}`, val(props.loading) && "is-loading", val(props.class));
   const name = (): string => { const own = val(props.ariaLabel); if (own != null) return own; const s = state(); const n = val(props.name); return s === "new" || s === "close" ? t`${n}, new story` : s === "seen" ? t`${n}, story seen` : n; };
   const color = (): string | null => colorAttr(val(props.color));
-  if (props.onClick) return h("button", { type: "button", class: cls, "data-hm-color": color, "aria-label": name, "aria-busy": () => (val(props.loading) ? "true" : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, inner);
-  return h("span", { class: cls, "data-hm-color": color, role: "img", "aria-label": name }, inner);
+  if (props.onClick) return h("button", { type: "button", class: cls, "data-m-color": color, "aria-label": name, "aria-busy": () => (val(props.loading) ? "true" : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, inner);
+  return h("span", { class: cls, "data-m-color": color, role: "img", "aria-label": name }, inner);
 }

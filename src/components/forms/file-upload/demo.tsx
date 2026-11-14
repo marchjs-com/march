@@ -30,7 +30,7 @@ export default function FileUploadDemo(props: { values: { multiple: boolean; acc
   let lastRemove: string | undefined
   // the same path as a real drop: the zone checks type and size, lists the file and starts the upload
   const addSample = () => {
-    const zone = host?.querySelector(".hm-drop")
+    const zone = host?.querySelector(".m-drop")
     if (!zone) return
     const drop = new Event("drop", { bubbles: true, cancelable: true })
     Object.defineProperty(drop, "dataTransfer", { value: { files: [sample(props.values.accept)], types: ["Files"] } })

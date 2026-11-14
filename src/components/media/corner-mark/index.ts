@@ -21,7 +21,7 @@ export interface CornerMarkProps {
   variant?: MaybeFn<"scrim" | "surface" | "solid" | undefined>;
   /** A ring in the surface colour around the mark (cuts it out of an avatar). */
   ring?: MaybeFn<boolean | undefined>;
-  /** "always" (default) or "hover": shown while an ancestor with class `hm-corner-host` is hovered or has focus inside. */
+  /** "always" (default) or "hover": shown while an ancestor with class `m-corner-host` is hovered or has focus inside. */
   show?: MaybeFn<"always" | "hover" | undefined>;
   /** Sits half outside the corner (a badge on an avatar) instead of inside it. */
   overlap?: MaybeFn<boolean | undefined>;
@@ -33,11 +33,11 @@ export interface CornerMarkProps {
 
 /** `<CornerMark icon={video} />`, `<CornerMark corner="bottom-end" icon={plus} variant="solid" color="brand-orange" ring overlap />` */
 export function CornerMark(props: CornerMarkProps): Element {
-  const own = props.icon != null ? icon(props.icon, "hm-corner-mark-icon") : props.children;
+  const own = props.icon != null ? icon(props.icon, "m-corner-mark-icon") : props.children;
   return h("span", {
-    class: () => cx("hm-corner-mark", `hm-corner-mark-${val(props.corner) ?? "top-end"}`, `hm-corner-mark-${val(props.size) ?? "md"}`, `hm-corner-mark-${val(props.variant) ?? "scrim"}`,
+    class: () => cx("m-corner-mark", `m-corner-mark-${val(props.corner) ?? "top-end"}`, `m-corner-mark-${val(props.size) ?? "md"}`, `m-corner-mark-${val(props.variant) ?? "scrim"}`,
       val(props.ring) && "is-ringed", val(props.overlap) && "is-overlap", val(props.show) === "hover" && "is-hover", val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)),
+    "data-m-color": () => colorAttr(val(props.color)),
     role: () => (val(props.label) ? "img" : null), "aria-label": () => val(props.label) ?? null, "aria-hidden": () => (val(props.label) ? null : "true"),
   }, own);
 }

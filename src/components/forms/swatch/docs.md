@@ -16,7 +16,7 @@ over a checkerboard.
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `color` | CSS colour / gradient / color token | — | set as a custom property through the CSSOM (no style string); a token goes through `data-hm-color` |
+| `color` | CSS colour / gradient / color token | — | set as a custom property through the CSSOM (no style string); a token goes through `data-m-color` |
 | `selected` | boolean / accessor | — | ring around it; said as `aria-pressed` (or `aria-checked` / `aria-selected` with a matching `role`) |
 | `label` | string | — | accessible name; tooltip of a clickable swatch |
 | `size` | `xs` `sm` `md` `lg` | `md` | |
@@ -29,7 +29,7 @@ over a checkerboard.
 | `class` | class | — | |
 | other attributes | | | `role`, `aria-*`, `data-*`, `tabindex`, `title`, `id` go to the swatch |
 
-`CHECKER` is the class of the shared checkerboard (`--hm-checker-size`, `--hm-checker-a`, `--hm-checker-b` tune it):
+`CHECKER` is the class of the shared checkerboard (`--m-checker-size`, `--m-checker-a`, `--m-checker-b` tune it):
 put it on any element that shows transparency (an alpha track, an image stage).
 
 ## Accessibility

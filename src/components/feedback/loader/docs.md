@@ -1,6 +1,6 @@
 # Loader
 
-A loading state that fills an area: a large spinner with a line of text under it (or only for screen readers). Inline it takes the place of the content; with `overlay` it covers its positioned container with a translucent scrim. `bootLoader.done()` fades out the static `#hm-boot` screen of `index.html` once the app has rendered.
+A loading state that fills an area: a large spinner with a line of text under it (or only for screen readers). Inline it takes the place of the content; with `overlay` it covers its positioned container with a translucent scrim. `bootLoader.done()` fades out the static `#m-boot` screen of `index.html` once the app has rendered.
 
 ```tsx
 <Loader text="Preparing dashboards…" />
@@ -24,7 +24,7 @@ A loading state that fills an area: a large spinner with a line of text under it
 <Loader spinner={false} text="One moment…" />
 ```
 
-`bootLoader.done({ id = "hm-boot", fade = 250 })` returns false when there is no boot element.
+`bootLoader.done({ id = "m-boot", fade = 250 })` returns false when there is no boot element.
 
 ## Accessibility
 

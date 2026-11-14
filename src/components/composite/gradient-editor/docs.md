@@ -25,7 +25,7 @@ the HADİ colors and the theme palette; the CSS is ready to copy.
 | `position` | boolean | `true` | the position field of the selected stop |
 | `labels` | object | — | own texts: `editor`, `preview(css)`, `type`, `linear`, `radial`, `conic`, `angle`, `degrees(n)`, `quickAngles`, `stops`, `stop(number, color)`, `hint`, `position`, `presets`, `preset(name)`, `copy`, `copied` |
 | `readonly`, `disabled` | | | |
-| `class` | class value | — | on the root (`hm-ge`) |
+| `class` | class value | — | on the root (`m-ge`) |
 
 ```tsx
 <GradientEditor bind:value={$bg} preview={false} hint={false} angles={[0, 90, 180, 270]}

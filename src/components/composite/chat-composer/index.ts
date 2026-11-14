@@ -130,7 +130,7 @@ export function ChatComposer(props: ChatComposerProps): Element {
   };
 
   return h("form", {
-    class: () => cx("hm-compose", rec() && "is-recording", val(props.class)),
+    class: () => cx("m-compose", rec() && "is-recording", val(props.class)),
     onSubmit: (e: Event) => { e.preventDefault(); submit(); },
     onKeydown: (e: KeyboardEvent) => { if (e.key === "Escape" && rec()) { e.preventDefault(); stopRec(false); } },
   },
@@ -138,26 +138,26 @@ export function ChatComposer(props: ChatComposerProps): Element {
     const r = val(props.replyTo);
     if (!r) return null;
     const box = h(ReplyQuote, {
-      class: "hm-compose-reply", name: L().replyingTo?.(r.name) ?? t`Replying to ${r.name}`, text: r.text, lines: 1,
+      class: "m-compose-reply", name: L().replyingTo?.(r.name) ?? t`Replying to ${r.name}`, text: r.text, lines: 1,
       onClose: props.onCancelReply ? () => props.onCancelReply?.() : undefined, closeLabel: () => L().cancelReply,
     }) as HTMLElement;
     if (moves()) animate(box, [{ transform: "translateY(10px)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }], { duration: 200, easing: "easeOutCubic" });
     queueMicrotask(() => field?.focus());
     return box;
   },
-  () => (emojiOpen() ? h("div", { class: "hm-compose-emoji" }, h(ReactionPicker, { layout: "grid", onPick: insert, label: () => L().emoji ?? t`Emoji` })) : null),
-  h("div", { class: "hm-compose-row" },
-    () => (rec() ? h(IconButton, { class: "hm-compose-icon hm-compose-cancel", variant: "danger", size: "lg", shape: "round", title: false, icon: trash, label: () => L().cancelRecording ?? t`Cancel recording`, onClick: () => stopRec(false) })
-      : props.attachments?.length ? h(Menu, { icon: props.attachIcon ?? plus, label: () => L().attach ?? t`Attach`, variant: "ghost", class: "hm-compose-attach", items: props.attachments }) : null),
+  () => (emojiOpen() ? h("div", { class: "m-compose-emoji" }, h(ReactionPicker, { layout: "grid", onPick: insert, label: () => L().emoji ?? t`Emoji` })) : null),
+  h("div", { class: "m-compose-row" },
+    () => (rec() ? h(IconButton, { class: "m-compose-icon m-compose-cancel", variant: "danger", size: "lg", shape: "round", title: false, icon: trash, label: () => L().cancelRecording ?? t`Cancel recording`, onClick: () => stopRec(false) })
+      : props.attachments?.length ? h(Menu, { icon: props.attachIcon ?? plus, label: () => L().attach ?? t`Attach`, variant: "ghost", class: "m-compose-attach", items: props.attachments }) : null),
     () => (rec()
-      ? h("div", { class: "hm-compose-rec", role: "status", "aria-live": "off" },
-        props.recordingDot === false ? null : h(StatusDot, { class: "hm-compose-dot", tone: "danger", size: "lg", pulse: () => (moves() ? "blink" : false) }),
-        h("span", { class: "hm-compose-time" }, () => formatDuration(elapsed())),
-        props.wave === false ? null : h("span", { class: "hm-compose-wave", "aria-hidden": "true", ref: (x: HTMLElement) => { bars = x; } }, Array.from({ length: 24 }, () => h("i"))),
-        h("span", { class: "hm-sr-only" }, L().recording ?? t`Recording`))
-      : h("div", { class: "hm-compose-field" },
+      ? h("div", { class: "m-compose-rec", role: "status", "aria-live": "off" },
+        props.recordingDot === false ? null : h(StatusDot, { class: "m-compose-dot", tone: "danger", size: "lg", pulse: () => (moves() ? "blink" : false) }),
+        h("span", { class: "m-compose-time" }, () => formatDuration(elapsed())),
+        props.wave === false ? null : h("span", { class: "m-compose-wave", "aria-hidden": "true", ref: (x: HTMLElement) => { bars = x; } }, Array.from({ length: 24 }, () => h("i"))),
+        h("span", { class: "m-sr-only" }, L().recording ?? t`Recording`))
+      : h("div", { class: "m-compose-field" },
         h(Textarea, {
-          value: text, onChange: typed, rows: 1, class: "hm-compose-input",
+          value: text, onChange: typed, rows: 1, class: "m-compose-input",
           // live(): h() reads a plain object getter once; a live prop stays a getter on the Textarea's props
           disabled: live(() => !!val(props.disabled)),
           placeholder: live(() => val(props.placeholder) ?? t`Message`),
@@ -165,14 +165,14 @@ export function ChatComposer(props: ChatComposerProps): Element {
           ref: (x: HTMLTextAreaElement) => { field = x; listen(x, { keydown: key }); },
         }),
         val(props.emoji) === false ? null : h(IconButton, {
-          class: () => cx("hm-compose-icon hm-compose-emoji-btn", emojiOpen() && "is-pressed"), size: "lg", shape: "round", title: false, "aria-expanded": () => String(emojiOpen()), label: () => L().emoji ?? t`Emoji`,
+          class: () => cx("m-compose-icon m-compose-emoji-btn", emojiOpen() && "is-pressed"), size: "lg", shape: "round", title: false, "aria-expanded": () => String(emojiOpen()), label: () => L().emoji ?? t`Emoji`,
           icon: ownIcon(props.emojiIcon, smile, null), onClick: () => emojiOpen.set(!emojiOpen()),
         }))),
     // one round solid IconButton that is the microphone or the send arrow
     h(IconButton, {
       variant: "solid", shape: "round", size: "lg", title: false,
       type: () => (mode() === "send" ? "submit" : "button"),
-      class: () => cx("hm-compose-act", `is-${mode()}`, rec() && "is-rec"),
+      class: () => cx("m-compose-act", `is-${mode()}`, rec() && "is-rec"),
       label: () => (rec() ? L().sendVoice ?? t`Send voice message` : mode() === "send" ? L().send ?? t`Send` : L().record ?? t`Record voice message`),
       color: live(() => (mode() === "mic" ? props.micColor : props.sendColor)),
       disabled: () => !!val(props.disabled),

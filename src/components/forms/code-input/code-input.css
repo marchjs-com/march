@@ -1,24 +1,24 @@
 /* March — CodeInput. Imported by its component module; tokens.css provides the variables. */
-/* CodeInput: boxes shrink to fit (never overflow); per-box color --hm-box-c: own color token > theme multicolor (HADİ) > accent */
-.hm-otp { --hm-otp-w: 3rem; --hm-otp-h: 3.75rem; --hm-otp-r: .875rem; --hm-otp-fs: var(--hm-text-2xl); display: flex; align-items: center; gap: var(--hm-space-2); max-width: 100%; }
-.hm-otp-sm { --hm-otp-w: 2.25rem; --hm-otp-h: 2.75rem; --hm-otp-r: .625rem; --hm-otp-fs: var(--hm-text-lg); gap: .375rem; }
-.hm-otp-lg { --hm-otp-w: 3.5rem; --hm-otp-h: 4.25rem; --hm-otp-r: 1rem; --hm-otp-fs: var(--hm-text-3xl); }
-.hm-otp-box { --hm-box-c: var(--hm-accent, var(--hm-primary)); flex: 1 1 0; min-width: 0; max-width: var(--hm-otp-w); height: var(--hm-otp-h); padding: 0; text-align: center;
-  font: 600 var(--hm-otp-fs)/1 var(--hm-otp-font, var(--hm-font)); font-variant-numeric: tabular-nums; color: var(--hm-text); caret-color: var(--hm-box-c);
-  background: var(--hm-surface); border: 1.4px solid var(--hm-border-strong); border-radius: var(--hm-otp-r);
-  transition: border-color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
-.hm-otp-b1 { --hm-box-c: var(--hm-otp-1, var(--hm-accent, var(--hm-primary))); } .hm-otp-b2 { --hm-box-c: var(--hm-otp-2, var(--hm-accent, var(--hm-primary))); }
-.hm-otp-b3 { --hm-box-c: var(--hm-otp-3, var(--hm-accent, var(--hm-primary))); } .hm-otp-b4 { --hm-box-c: var(--hm-otp-4, var(--hm-accent, var(--hm-primary))); }
-.hm-otp-single .hm-otp-box, .hm-otp-box[data-hm-color] { --hm-box-c: var(--hm-accent, var(--hm-primary)); }
-.hm-otp-box.is-filled { border-color: var(--hm-box-c); background: color-mix(in srgb, var(--hm-box-c) 12%, var(--hm-surface)); }
-.hm-otp-box:focus { outline: none; border-color: var(--hm-box-c); border-width: 2.2px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-box-c) 20%, transparent); }
-.hm-otp-filled .hm-otp-box { border-color: transparent; background: var(--hm-surface-2); }
-.hm-otp-filled .hm-otp-box.is-filled { background: color-mix(in srgb, var(--hm-box-c) 14%, var(--hm-surface)); }
-.hm-otp-underline .hm-otp-box { border-width: 0 0 2px; border-radius: 0; background: none; }
-.hm-otp-underline .hm-otp-box:focus { border-width: 0 0 3px; box-shadow: none; }
-.hm-otp-font-display { --hm-otp-font: var(--hm-font-display); } .hm-otp-font-mono { --hm-otp-font: var(--hm-font-mono); } .hm-otp-font-body { --hm-otp-font: var(--hm-font); }
-.hm-otp-sep { flex: none; width: .5rem; height: 2px; border-radius: 2px; background: var(--hm-border-strong); }
+/* CodeInput: boxes shrink to fit (never overflow); per-box color --m-box-c: own color token > theme multicolor (HADİ) > accent */
+.m-otp { --m-otp-w: 3rem; --m-otp-h: 3.75rem; --m-otp-r: .875rem; --m-otp-fs: var(--m-text-2xl); display: flex; align-items: center; gap: var(--m-space-2); max-width: 100%; }
+.m-otp-sm { --m-otp-w: 2.25rem; --m-otp-h: 2.75rem; --m-otp-r: .625rem; --m-otp-fs: var(--m-text-lg); gap: .375rem; }
+.m-otp-lg { --m-otp-w: 3.5rem; --m-otp-h: 4.25rem; --m-otp-r: 1rem; --m-otp-fs: var(--m-text-3xl); }
+.m-otp-box { --m-box-c: var(--m-accent, var(--m-primary)); flex: 1 1 0; min-width: 0; max-width: var(--m-otp-w); height: var(--m-otp-h); padding: 0; text-align: center;
+  font: 600 var(--m-otp-fs)/1 var(--m-otp-font, var(--m-font)); font-variant-numeric: tabular-nums; color: var(--m-text); caret-color: var(--m-box-c);
+  background: var(--m-surface); border: 1.4px solid var(--m-border-strong); border-radius: var(--m-otp-r);
+  transition: border-color var(--m-dur) var(--m-ease), background-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease); }
+.m-otp-b1 { --m-box-c: var(--m-otp-1, var(--m-accent, var(--m-primary))); } .m-otp-b2 { --m-box-c: var(--m-otp-2, var(--m-accent, var(--m-primary))); }
+.m-otp-b3 { --m-box-c: var(--m-otp-3, var(--m-accent, var(--m-primary))); } .m-otp-b4 { --m-box-c: var(--m-otp-4, var(--m-accent, var(--m-primary))); }
+.m-otp-single .m-otp-box, .m-otp-box[data-m-color] { --m-box-c: var(--m-accent, var(--m-primary)); }
+.m-otp-box.is-filled { border-color: var(--m-box-c); background: color-mix(in srgb, var(--m-box-c) 12%, var(--m-surface)); }
+.m-otp-box:focus { outline: none; border-color: var(--m-box-c); border-width: 2.2px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-box-c) 20%, transparent); }
+.m-otp-filled .m-otp-box { border-color: transparent; background: var(--m-surface-2); }
+.m-otp-filled .m-otp-box.is-filled { background: color-mix(in srgb, var(--m-box-c) 14%, var(--m-surface)); }
+.m-otp-underline .m-otp-box { border-width: 0 0 2px; border-radius: 0; background: none; }
+.m-otp-underline .m-otp-box:focus { border-width: 0 0 3px; box-shadow: none; }
+.m-otp-font-display { --m-otp-font: var(--m-font-display); } .m-otp-font-mono { --m-otp-font: var(--m-font-mono); } .m-otp-font-body { --m-otp-font: var(--m-font); }
+.m-otp-sep { flex: none; width: .5rem; height: 2px; border-radius: 2px; background: var(--m-border-strong); }
 /* errors win over every color */
-.hm-otp-box[aria-invalid="true"], [aria-invalid="true"] .hm-otp-box { --hm-box-c: var(--hm-danger); border-color: var(--hm-danger); }
+.m-otp-box[aria-invalid="true"], [aria-invalid="true"] .m-otp-box { --m-box-c: var(--m-danger); border-color: var(--m-danger); }
 /* your own separator (`separator` prop): content instead of the drawn dash */
-.hm-otp-sep-own { flex: none; display: inline-flex; align-items: center; color: var(--hm-muted); }
+.m-otp-sep-own { flex: none; display: inline-flex; align-items: center; color: var(--m-muted); }

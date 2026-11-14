@@ -1,29 +1,29 @@
 /* March — Page, Section, ListDetail, Pager, SearchBox (AppShell: src/components/layout/app-shell). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- page scaffolding */
-.hm-page { display: flex; flex-direction: column; gap: var(--hm-space-5); padding: var(--hm-space-6) var(--hm-space-6) var(--hm-space-7); max-width: 92rem; margin: 0 auto; width: 100%;
-  animation: hm-rise-in var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-page-narrow { max-width: 52rem; }
-.hm-page-head { display: flex; flex-direction: column; gap: var(--hm-space-2); }
+.m-page { display: flex; flex-direction: column; gap: var(--m-space-5); padding: var(--m-space-6) var(--m-space-6) var(--m-space-7); max-width: 92rem; margin: 0 auto; width: 100%;
+  animation: m-rise-in var(--m-dur-slow) var(--m-ease-out); }
+.m-page-narrow { max-width: 52rem; }
+.m-page-head { display: flex; flex-direction: column; gap: var(--m-space-2); }
 /* the title bar and a section's head are PanelHeader bars: no padding of their own, titles wrap, the page's own type */
-.hm-page-titlebar.hm-panel-header, .hm-section-head.hm-panel-header { min-block-size: 0; padding: 0; flex-wrap: wrap; }
-.hm-page-titlebar.hm-panel-header { gap: var(--hm-space-3) var(--hm-space-4); }
-:is(.hm-page-titlebar, .hm-section-head) :is(.hm-panel-header-title, .hm-panel-header-sub) { overflow: visible; white-space: normal; }
-.hm-page-back.hm-icon-btn { width: 2rem; height: 2rem; box-shadow: var(--hm-shadow-1); }
-.hm-page-titlebar > .hm-page-titles { flex: 1; min-width: 12rem; }
-.hm-page-titlebar .hm-panel-header-title.hm-page-title { font-family: var(--hm-font-display); font-size: var(--hm-text-2xl); font-weight: var(--hm-display-weight); line-height: 1.2; letter-spacing: var(--hm-tracking-tighter); }
-.hm-page-titlebar .hm-panel-header-sub.hm-page-sub { margin: .375rem 0 0; max-width: 64rem; font-size: var(--hm-text-md); line-height: 1.55; }
-.hm-page-body { display: flex; flex-direction: column; gap: var(--hm-space-5); min-width: 0; }
-.hm-section { display: flex; flex-direction: column; gap: var(--hm-space-3); }
-.hm-section-head.hm-panel-header { align-items: flex-end; gap: var(--hm-space-3); }
-.hm-section-head .hm-panel-header-title.hm-section-title { font-size: var(--hm-text-lg); line-height: inherit; }
-.hm-section-head .hm-panel-header-sub.hm-section-desc { margin: var(--hm-space-1) 0 0; }
-@media (max-width: 900px) { .hm-page { padding: var(--hm-space-5) var(--hm-space-4) var(--hm-space-6); } }
-@media (max-width: 640px) { .hm-page { padding: var(--hm-space-4) var(--hm-space-4) var(--hm-space-6); gap: var(--hm-space-4); } .hm-page-titlebar .hm-panel-header-title.hm-page-title { font-size: var(--hm-text-xl); } }
-.hm-ld { display: grid; grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr); gap: var(--hm-space-4); min-height: 0; }
-.hm-ld-list, .hm-ld-detail { min-width: 0; }
-.hm-ld-back.hm-btn { display: none; margin-bottom: var(--hm-space-2); }
+.m-page-titlebar.m-panel-header, .m-section-head.m-panel-header { min-block-size: 0; padding: 0; flex-wrap: wrap; }
+.m-page-titlebar.m-panel-header { gap: var(--m-space-3) var(--m-space-4); }
+:is(.m-page-titlebar, .m-section-head) :is(.m-panel-header-title, .m-panel-header-sub) { overflow: visible; white-space: normal; }
+.m-page-back.m-icon-btn { width: 2rem; height: 2rem; box-shadow: var(--m-shadow-1); }
+.m-page-titlebar > .m-page-titles { flex: 1; min-width: 12rem; }
+.m-page-titlebar .m-panel-header-title.m-page-title { font-family: var(--m-font-display); font-size: var(--m-text-2xl); font-weight: var(--m-display-weight); line-height: 1.2; letter-spacing: var(--m-tracking-tighter); }
+.m-page-titlebar .m-panel-header-sub.m-page-sub { margin: .375rem 0 0; max-width: 64rem; font-size: var(--m-text-md); line-height: 1.55; }
+.m-page-body { display: flex; flex-direction: column; gap: var(--m-space-5); min-width: 0; }
+.m-section { display: flex; flex-direction: column; gap: var(--m-space-3); }
+.m-section-head.m-panel-header { align-items: flex-end; gap: var(--m-space-3); }
+.m-section-head .m-panel-header-title.m-section-title { font-size: var(--m-text-lg); line-height: inherit; }
+.m-section-head .m-panel-header-sub.m-section-desc { margin: var(--m-space-1) 0 0; }
+@media (max-width: 900px) { .m-page { padding: var(--m-space-5) var(--m-space-4) var(--m-space-6); } }
+@media (max-width: 640px) { .m-page { padding: var(--m-space-4) var(--m-space-4) var(--m-space-6); gap: var(--m-space-4); } .m-page-titlebar .m-panel-header-title.m-page-title { font-size: var(--m-text-xl); } }
+.m-ld { display: grid; grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr); gap: var(--m-space-4); min-height: 0; }
+.m-ld-list, .m-ld-detail { min-width: 0; }
+.m-ld-back.m-btn { display: none; margin-bottom: var(--m-space-2); }
 @media (max-width: 768px) {
-  .hm-ld { grid-template-columns: minmax(0, 1fr); }
-  .hm-ld:not(.hm-ld-has-detail) .hm-ld-detail, .hm-ld.hm-ld-has-detail .hm-ld-list { display: none; }
-  .hm-ld-back.hm-btn { display: inline-flex; }
+  .m-ld { grid-template-columns: minmax(0, 1fr); }
+  .m-ld:not(.m-ld-has-detail) .m-ld-detail, .m-ld.m-ld-has-detail .m-ld-list { display: none; }
+  .m-ld-back.m-btn { display: inline-flex; }
 }

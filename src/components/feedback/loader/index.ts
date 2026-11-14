@@ -21,19 +21,19 @@ export interface LoaderProps {
 export function Loader(props: LoaderProps = {}): Element {
   const own = props.spinner;
   const spinner = own === false ? null
-    : own && own !== true ? h("span", { class: "hm-loader-spinner", "aria-hidden": "true" }, own)
+    : own && own !== true ? h("span", { class: "m-loader-spinner", "aria-hidden": "true" }, own)
     : h(Spinner, { size: "lg", decorative: true, color: props.color });
-  return h("div", { class: () => cx("hm-loader", props.overlay && "hm-loader-overlay", props.fade === false && "is-still", val(props.class)), role: "status", "aria-live": "polite" },
+  return h("div", { class: () => cx("m-loader", props.overlay && "m-loader-overlay", props.fade === false && "is-still", val(props.class)), role: "status", "aria-live": "polite" },
     spinner,
-    h("span", { class: props.text != null ? "hm-loader-text" : "hm-sr-only" }, () => val(props.text) ?? val(props.label) ?? t`Loading`));
+    h("span", { class: props.text != null ? "m-loader-text" : "m-sr-only" }, () => val(props.text) ?? val(props.label) ?? t`Loading`));
 }
 
-/** Boot loader: the app's index.html shows a static `#hm-boot` element; call `bootLoader.done()` once the app rendered. */
+/** Boot loader: the app's index.html shows a static `#m-boot` element; call `bootLoader.done()` once the app rendered. */
 export const bootLoader = {
-  done({ id = "hm-boot", fade = 250 }: { id?: string; fade?: number } = {}): boolean {
+  done({ id = "m-boot", fade = 250 }: { id?: string; fade?: number } = {}): boolean {
     const el = globalThis.document?.getElementById(id);
     if (!el) return false;
-    el.classList.add("hm-boot-done");
+    el.classList.add("m-boot-done");
     el.setAttribute("aria-hidden", "true");
     setTimeout(() => el.remove(), fade);
     return true;

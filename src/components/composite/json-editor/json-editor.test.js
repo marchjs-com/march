@@ -46,10 +46,10 @@ test("JsonEditor: read-only switches at once in the tree view", async () => {
   const host = document.createElement("div"); document.body.appendChild(host);
   const dispose = render(() => h(JsonEditor, { value: { a: true }, mode: "tree", readonly: reactive(() => ro()) }), host);
   // the tree view loads on first use
-  for (let i = 0; i < 50 && !host.querySelector(".hm-tre-actions"); i++) await new Promise((r) => setTimeout(r, 10));
-  assert.ok(host.querySelector(".hm-tre-actions"));
+  for (let i = 0; i < 50 && !host.querySelector(".m-tre-actions"); i++) await new Promise((r) => setTimeout(r, 10));
+  assert.ok(host.querySelector(".m-tre-actions"));
   ro.set(true);
-  assert.equal(host.querySelector(".hm-tre-actions"), null);
+  assert.equal(host.querySelector(".m-tre-actions"), null);
   dispose();
 });
 
@@ -61,14 +61,14 @@ test("JsonEditor: Format button and valid line off, own texts", () => {
     h(JsonEditor, { value: "{ nope", modes: ["text"], labels: { format: "Tidy", invalid: (line, column) => `Check ${line}:${column}` } }),
     h(JsonEditor, { value: { a: 1 }, modes: ["text"], labels: { valid: "All good" } }),
   ], el);
-  const [a, b, c] = el.querySelectorAll(".hm-json-editor");
-  assert.equal(a.querySelector(".hm-json-format"), null);
+  const [a, b, c] = el.querySelectorAll(".m-json-editor");
+  assert.equal(a.querySelector(".m-json-format"), null);
   assert.equal(a.querySelector("[role=status]").textContent, "");
   assert.equal(a.querySelector("[role=tablist]").getAttribute("aria-label"), "Views");
   assert.deepEqual([...a.querySelectorAll("[role=tab]")].map((x) => x.textContent), ["Source", "Outline"]);
-  assert.equal(b.querySelector(".hm-json-format").textContent, "Tidy");
+  assert.equal(b.querySelector(".m-json-format").textContent, "Tidy");
   assert.match(b.querySelector("[role=status]").textContent, /^Check \d+:\d+$/);
   assert.equal(c.querySelector("[role=status]").textContent, "All good");
-  assert.equal(c.querySelector(".hm-json-format").textContent, "Format");
+  assert.equal(c.querySelector(".m-json-format").textContent, "Format");
   dispose();
 });

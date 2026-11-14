@@ -75,6 +75,6 @@ export default function BranchingStoryDemo(props: { values: { trail: boolean; en
       keys={v.keys} transition={v.transition === "own" ? OWN_TURN : v.transition as "turn"}
       labels={v.texts ? { start: "Sabah", restart: "Bir daha oyna", endings: (n: number, total: number) => `${total} sondan ${n} tanesini buldun` } : undefined}
       renderChoice={v.choice === "own" ? (c, i) => <span class="sc-bs-own">{`${"ABC"[i] ?? i + 1}) `}<b>{c.label}</b></span> : undefined} /> }}
-    <p class="hm-muted">{() => `Bir seçenek seçince ${TURNS[props.values.transition]}.`}</p>
+    <p class="m-muted">{() => `Bir seçenek seçince ${TURNS[props.values.transition]}.`}</p>
   </div>
 }

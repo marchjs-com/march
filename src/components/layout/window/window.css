@@ -1,94 +1,94 @@
-/* March — Window. Placed in its area (the nearest positioned ancestor) by --hm-win-x / -y / -w / -h (logical: x from
+/* March — Window. Placed in its area (the nearest positioned ancestor) by --m-win-x / -y / -w / -h (logical: x from
    the inline start). States fill or fold it; the three looks change only the frame. Tokens only. */
-.hm-win {
-  --hm-win-bar-h: 2.25rem;
-  position: absolute; inset-inline-start: var(--hm-win-x, 0); inset-block-start: var(--hm-win-y, 0);
-  inline-size: var(--hm-win-w, 32rem); block-size: var(--hm-win-h, 20rem);
+.m-win {
+  --m-win-bar-h: 2.25rem;
+  position: absolute; inset-inline-start: var(--m-win-x, 0); inset-block-start: var(--m-win-y, 0);
+  inline-size: var(--m-win-w, 32rem); block-size: var(--m-win-h, 20rem);
   display: flex; flex-direction: column; min-inline-size: 0; box-sizing: border-box;
-  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-lg); background: var(--hm-surface); color: var(--hm-text);
-  box-shadow: var(--hm-shadow-3, var(--hm-shadow-2));
-  transition: inset-inline-start var(--hm-dur) var(--hm-ease), inset-block-start var(--hm-dur) var(--hm-ease),
-    inline-size var(--hm-dur) var(--hm-ease), block-size var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease);
+  border: 1px solid var(--m-border); border-radius: var(--m-radius-lg); background: var(--m-surface); color: var(--m-text);
+  box-shadow: var(--m-shadow-3, var(--m-shadow-2));
+  transition: inset-inline-start var(--m-dur) var(--m-ease), inset-block-start var(--m-dur) var(--m-ease),
+    inline-size var(--m-dur) var(--m-ease), block-size var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease);
 }
-.hm-win[hidden] { display: none; }
-.hm-win:focus-within { box-shadow: var(--hm-shadow-4); }
-.hm-win.is-moving, .hm-win.is-static { transition: none; }
+.m-win[hidden] { display: none; }
+.m-win:focus-within { box-shadow: var(--m-shadow-4); }
+.m-win.is-moving, .m-win.is-static { transition: none; }
 
 /* states: fill the area, dock to half of it, or fold to the title bar at the bottom */
-.hm-win.is-maximized { inset-inline-start: 0; inset-block-start: 0; inline-size: 100%; block-size: 100%; border-radius: 0; }
-.hm-win.is-start { inset-inline-start: 0; inset-block-start: 0; inline-size: 50%; block-size: 100%; border-radius: 0; }
-.hm-win.is-end { inset-inline-start: 50%; inset-block-start: 0; inline-size: 50%; block-size: 100%; border-radius: 0; }
-.hm-win.is-bottom { inset-inline-start: 0; inset-block-start: 50%; inline-size: 100%; block-size: 50%; border-radius: 0; }
-.hm-win.is-minimized { inset-block-start: auto; inset-block-end: var(--hm-space-2); block-size: auto; inline-size: min(16rem, var(--hm-win-w, 16rem)); }
-.hm-win.is-minimized .hm-win-bar { border-radius: inherit; border-block-end: 0; }
+.m-win.is-maximized { inset-inline-start: 0; inset-block-start: 0; inline-size: 100%; block-size: 100%; border-radius: 0; }
+.m-win.is-start { inset-inline-start: 0; inset-block-start: 0; inline-size: 50%; block-size: 100%; border-radius: 0; }
+.m-win.is-end { inset-inline-start: 50%; inset-block-start: 0; inline-size: 50%; block-size: 100%; border-radius: 0; }
+.m-win.is-bottom { inset-inline-start: 0; inset-block-start: 50%; inline-size: 100%; block-size: 50%; border-radius: 0; }
+.m-win.is-minimized { inset-block-start: auto; inset-block-end: var(--m-space-2); block-size: auto; inline-size: min(16rem, var(--m-win-w, 16rem)); }
+.m-win.is-minimized .m-win-bar { border-radius: inherit; border-block-end: 0; }
 
 /* title bar: a PanelHeader (drag bar, focus ring, title ellipsis) with the frame's own height and tint */
-.hm-win-bar.hm-panel-header {
-  min-block-size: var(--hm-win-bar-h); padding-block: 0; padding-inline: var(--hm-space-3) var(--hm-space-2);
-  border-block-end: 1px solid var(--hm-border-subtle); border-start-start-radius: inherit; border-start-end-radius: inherit;
-  background: var(--hm-surface-2); cursor: default;
+.m-win-bar.m-panel-header {
+  min-block-size: var(--m-win-bar-h); padding-block: 0; padding-inline: var(--m-space-3) var(--m-space-2);
+  border-block-end: 1px solid var(--m-border-subtle); border-start-start-radius: inherit; border-start-end-radius: inherit;
+  background: var(--m-surface-2); cursor: default;
 }
-.hm-win-title { display: block; }
-.hm-win:not(:focus-within) .hm-win-title { color: var(--hm-muted); }
+.m-win-title { display: block; }
+.m-win:not(:focus-within) .m-win-title { color: var(--m-muted); }
 /* the buttons are IconButtons; each look below sizes and shapes them */
-.hm-win-btn.hm-icon-btn { color: var(--hm-text-2); }
-.hm-win-btn:focus-visible { outline: 2px solid var(--hm-focus, var(--hm-primary)); outline-offset: -2px; }
-.hm-win-glyph { display: inline-flex; }
-.hm-win-btn .hm-win-glyph .hm-svg { inline-size: .875rem; block-size: .875rem; }
-.hm-win-min { order: 1; } .hm-win-max { order: 2; } .hm-win-close { order: 3; }
+.m-win-btn.m-icon-btn { color: var(--m-text-2); }
+.m-win-btn:focus-visible { outline: 2px solid var(--m-focus, var(--m-primary)); outline-offset: -2px; }
+.m-win-glyph { display: inline-flex; }
+.m-win-btn .m-win-glyph .m-svg { inline-size: .875rem; block-size: .875rem; }
+.m-win-min { order: 1; } .m-win-max { order: 2; } .m-win-close { order: 3; }
 
 /* body */
-.hm-win-body { flex: 1; min-block-size: 0; display: flex; flex-direction: column; overflow: auto; background: var(--hm-surface);
+.m-win-body { flex: 1; min-block-size: 0; display: flex; flex-direction: column; overflow: auto; background: var(--m-surface);
   border-end-start-radius: inherit; border-end-end-radius: inherit; }
-.hm-win-body[hidden] { display: none; }
-.hm-win-body > .hm-term { flex: 1; block-size: auto; border: 0; border-radius: 0; }
+.m-win-body[hidden] { display: none; }
+.m-win-body > .m-term { flex: 1; block-size: auto; border: 0; border-radius: 0; }
 
 /* resize grips (ResizeHandle on the edges and corners): only while floating */
-.hm-win:not(.is-normal) .hm-win-rz, .hm-win.is-fixed-size .hm-win-rz { display: none; }
+.m-win:not(.is-normal) .m-win-rz, .m-win.is-fixed-size .m-win-rz { display: none; }
 
 /* where a drop would dock */
-.hm-win-snap { position: absolute; z-index: 3; display: none; pointer-events: none;
-  inset-inline-start: var(--hm-win-sx, 0); inset-block-start: var(--hm-win-sy, 0); inline-size: var(--hm-win-sw, 0); block-size: var(--hm-win-sh, 0);
-  border: 2px solid color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 55%, transparent); border-radius: var(--hm-radius-lg);
-  background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 12%, transparent); }
-.hm-win-snap.is-on { display: block; }
+.m-win-snap { position: absolute; z-index: 3; display: none; pointer-events: none;
+  inset-inline-start: var(--m-win-sx, 0); inset-block-start: var(--m-win-sy, 0); inline-size: var(--m-win-sw, 0); block-size: var(--m-win-sh, 0);
+  border: 2px solid color-mix(in srgb, var(--m-accent, var(--m-primary)) 55%, transparent); border-radius: var(--m-radius-lg);
+  background: color-mix(in srgb, var(--m-accent, var(--m-primary)) 12%, transparent); }
+.m-win-snap.is-on { display: block; }
 
 /* ---------- Windows: title first, square buttons at the end, the close button turns red */
-.hm-win-windows { border-radius: var(--hm-radius-1, .25rem); }
-.hm-win-windows .hm-win-bar.hm-panel-header { padding-inline-end: 0; background: var(--hm-surface); }
-.hm-win-windows .hm-win-buttons { align-self: stretch; gap: 0; }
-.hm-win-windows .hm-win-btn { inline-size: 2.75rem; block-size: auto; align-self: stretch; border-radius: 0; }
-.hm-win-windows .hm-win-btn:hover { background: color-mix(in srgb, var(--hm-text) 9%, transparent); }
-.hm-win-windows .hm-win-btn.hm-win-close:hover { background: var(--hm-danger); color: var(--hm-on-status, var(--hm-on-scrim)); }
-.hm-win-windows .hm-win-close { border-start-end-radius: inherit; }
+.m-win-windows { border-radius: var(--m-radius-1, .25rem); }
+.m-win-windows .m-win-bar.m-panel-header { padding-inline-end: 0; background: var(--m-surface); }
+.m-win-windows .m-win-buttons { align-self: stretch; gap: 0; }
+.m-win-windows .m-win-btn { inline-size: 2.75rem; block-size: auto; align-self: stretch; border-radius: 0; }
+.m-win-windows .m-win-btn:hover { background: color-mix(in srgb, var(--m-text) 9%, transparent); }
+.m-win-windows .m-win-btn.m-win-close:hover { background: var(--m-danger); color: var(--m-on-status, var(--m-on-scrim)); }
+.m-win-windows .m-win-close { border-start-end-radius: inherit; }
 
 /* ---------- Mac: three colored lights at the start, title centered, symbols on hover */
-.hm-win-mac { border-radius: .75rem; }
-.hm-win-mac .hm-win-bar.hm-panel-header { padding-inline: .75rem; }
-.hm-win-mac .hm-win-buttons { order: -1; gap: .5rem; }
-.hm-win-mac .hm-win-icon { display: none; }
-.hm-win-mac .hm-win-title { text-align: center; padding-inline-end: 3.25rem; }
-.hm-win-mac .hm-win-btn.hm-icon-btn { inline-size: .8125rem; block-size: .8125rem; border-radius: 50%; color: color-mix(in srgb, black 60%, transparent);
+.m-win-mac { border-radius: .75rem; }
+.m-win-mac .m-win-bar.m-panel-header { padding-inline: .75rem; }
+.m-win-mac .m-win-buttons { order: -1; gap: .5rem; }
+.m-win-mac .m-win-icon { display: none; }
+.m-win-mac .m-win-title { text-align: center; padding-inline-end: 3.25rem; }
+.m-win-mac .m-win-btn.m-icon-btn { inline-size: .8125rem; block-size: .8125rem; border-radius: 50%; color: color-mix(in srgb, black 60%, transparent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, black 12%, transparent); }
-.hm-win-mac .hm-win-btn.hm-win-close { order: 1; background: var(--hm-danger); }
-.hm-win-mac .hm-win-btn.hm-win-min { order: 2; background: var(--hm-warn); }
-.hm-win-mac .hm-win-btn.hm-win-max { order: 3; background: var(--hm-success); }
-.hm-win-mac .hm-win-glyph { opacity: 0; transition: opacity var(--hm-dur-fast) var(--hm-ease); }
-.hm-win-mac .hm-win-btn .hm-win-glyph .hm-svg { inline-size: .5625rem; block-size: .5625rem; stroke-width: 3.2; }
-.hm-win-mac .hm-win-buttons:hover .hm-win-glyph, .hm-win-mac .hm-win-btn:focus-visible .hm-win-glyph { opacity: 1; }
-.hm-win-mac:not(:focus-within):not(:hover) .hm-win-btn.hm-icon-btn { background: var(--hm-border-strong); }
+.m-win-mac .m-win-btn.m-win-close { order: 1; background: var(--m-danger); }
+.m-win-mac .m-win-btn.m-win-min { order: 2; background: var(--m-warn); }
+.m-win-mac .m-win-btn.m-win-max { order: 3; background: var(--m-success); }
+.m-win-mac .m-win-glyph { opacity: 0; transition: opacity var(--m-dur-fast) var(--m-ease); }
+.m-win-mac .m-win-btn .m-win-glyph .m-svg { inline-size: .5625rem; block-size: .5625rem; stroke-width: 3.2; }
+.m-win-mac .m-win-buttons:hover .m-win-glyph, .m-win-mac .m-win-btn:focus-visible .m-win-glyph { opacity: 1; }
+.m-win-mac:not(:focus-within):not(:hover) .m-win-btn.m-icon-btn { background: var(--m-border-strong); }
 
 /* ---------- HADİ: brand stripe on top, round buttons at the end */
-.hm-win-hadi { overflow: visible; }
-.hm-win-hadi .hm-win-bar.hm-panel-header { position: relative; padding-block-start: 3px; background: var(--hm-surface); }
-.hm-win-hadi .hm-win-bar::before { content: ""; position: absolute; inset-block-start: 0; inset-inline: 0; block-size: 3px; border-start-start-radius: inherit; border-start-end-radius: inherit;
-  background: linear-gradient(90deg, var(--hm-brand-orange, var(--hm-cat-1)), var(--hm-brand-blue, var(--hm-cat-2)), var(--hm-brand-green, var(--hm-cat-3)), var(--hm-brand-purple, var(--hm-cat-5))); }
-.hm-win-hadi .hm-win-icon { color: var(--hm-accent, var(--hm-primary)); }
-.hm-win-hadi .hm-win-btn { inline-size: 1.75rem; block-size: 1.75rem; border-radius: 50%; }
-.hm-win-hadi .hm-win-btn:hover { background: var(--hm-accent-soft, var(--hm-primary-soft, color-mix(in srgb, var(--hm-primary) 14%, transparent))); color: var(--hm-accent-text, var(--hm-primary-text, var(--hm-primary))); }
+.m-win-hadi { overflow: visible; }
+.m-win-hadi .m-win-bar.m-panel-header { position: relative; padding-block-start: 3px; background: var(--m-surface); }
+.m-win-hadi .m-win-bar::before { content: ""; position: absolute; inset-block-start: 0; inset-inline: 0; block-size: 3px; border-start-start-radius: inherit; border-start-end-radius: inherit;
+  background: linear-gradient(90deg, var(--m-brand-orange, var(--m-cat-1)), var(--m-brand-blue, var(--m-cat-2)), var(--m-brand-green, var(--m-cat-3)), var(--m-brand-purple, var(--m-cat-5))); }
+.m-win-hadi .m-win-icon { color: var(--m-accent, var(--m-primary)); }
+.m-win-hadi .m-win-btn { inline-size: 1.75rem; block-size: 1.75rem; border-radius: 50%; }
+.m-win-hadi .m-win-btn:hover { background: var(--m-accent-soft, var(--m-primary-soft, color-mix(in srgb, var(--m-primary) 14%, transparent))); color: var(--m-accent-text, var(--m-primary-text, var(--m-primary))); }
 /* stripe={false} */
-.hm-win-hadi.hm-win-no-stripe .hm-win-bar.hm-panel-header { padding-block-start: 0; }
-.hm-win-hadi.hm-win-no-stripe .hm-win-bar::before { display: none; }
-.hm-win-hadi .hm-win-btn.hm-win-close:hover { background: color-mix(in srgb, var(--hm-danger) 16%, transparent); color: var(--hm-danger); }
+.m-win-hadi.m-win-no-stripe .m-win-bar.m-panel-header { padding-block-start: 0; }
+.m-win-hadi.m-win-no-stripe .m-win-bar::before { display: none; }
+.m-win-hadi .m-win-btn.m-win-close:hover { background: color-mix(in srgb, var(--m-danger) 16%, transparent); color: var(--m-danger); }
 
-@media (prefers-reduced-motion: reduce) { .hm-win { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .m-win { transition: none; } }

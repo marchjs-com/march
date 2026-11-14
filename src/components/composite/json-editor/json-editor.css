@@ -1,4 +1,4 @@
 /* March — JsonEditor (the text view's own rules are in forms/editors.css; the view switcher is Tabs variant="pill"). */
-.hm-json-modes { align-self: flex-end; }
-.hm-json-mode[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
-.hm-json-panel { display: flex; flex-direction: column; gap: var(--hm-space-1); min-width: 0; }
+.m-json-modes { align-self: flex-end; }
+.m-json-mode[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+.m-json-panel { display: flex; flex-direction: column; gap: var(--m-space-1); min-width: 0; }

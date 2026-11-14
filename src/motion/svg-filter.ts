@@ -15,12 +15,12 @@ const make = <K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string
 };
 
 /**
- * A filter (id `hm-f-…`) with the given primitives in its own 0×0 <svg>, placed right after the element (not in
+ * A filter (id `m-f-…`) with the given primitives in its own 0×0 <svg>, placed right after the element (not in
  * <body>: components never append there; absolutely positioned, so it takes no grid or flex slot).
  * `use(el)` points the element's CSS filter at it and returns the cleanup.
  */
 function filter(prims: SVGElement[]): { id: string; node: SVGFilterElement; use(el: Element): () => void } {
-  const id = uid("hm-f");
+  const id = uid("m-f");
   // a generous region: blurs and displacement draw outside the element's box
   const node = make("filter", { id, x: "-20%", y: "-20%", width: "140%", height: "140%", "color-interpolation-filters": "sRGB" });
   node.append(...prims);

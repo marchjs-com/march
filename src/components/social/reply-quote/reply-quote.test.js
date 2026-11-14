@@ -12,15 +12,15 @@ const mount = (view) => { const el = document.createElement("div"); document.bod
 test("ReplyQuote: name and text behind an orange bar, two lines kept", () => {
   const text = signal("See you at 8?");
   const [el, dispose] = mount(() => h(ReplyQuote, { name: "Deniz", text, "data-k": "1" }));
-  const q = el.querySelector(".hm-reply-quote");
-  assert.equal(q.getAttribute("data-hm-color"), "brand-orange");
-  assert.equal(q.querySelector(".hm-reply-quote-name").textContent, "Deniz");
-  assert.equal(q.querySelector(".hm-clamp-text").textContent, "See you at 8?");
-  assert.ok(q.querySelector(".hm-clamp-text.is-clamped"));
+  const q = el.querySelector(".m-reply-quote");
+  assert.equal(q.getAttribute("data-m-color"), "brand-orange");
+  assert.equal(q.querySelector(".m-reply-quote-name").textContent, "Deniz");
+  assert.equal(q.querySelector(".m-clamp-text").textContent, "See you at 8?");
+  assert.ok(q.querySelector(".m-clamp-text.is-clamped"));
   assert.equal(q.querySelector("button"), null);
   assert.equal(q.getAttribute("data-k"), "1");
   text.set("Later");
-  assert.equal(q.querySelector(".hm-clamp-text").textContent, "Later");
+  assert.equal(q.querySelector(".m-clamp-text").textContent, "Later");
   dispose();
 });
 
@@ -31,18 +31,18 @@ test("ReplyQuote: cancel button, own icon and name, click, lines, colour, varian
     h(ReplyQuote, { name: "A", text: "B", onClose: () => {}, close: "✕", closeLabel: "Drop", variant: "inverse", bar: false }),
     h(ReplyQuote, { name: "A", text: "B", onClose: () => {}, close: false }),
   ]);
-  const [a, b, c] = el.querySelectorAll(".hm-reply-quote");
+  const [a, b, c] = el.querySelectorAll(".m-reply-quote");
   assert.ok(a.classList.contains("mine"));
-  assert.equal(a.getAttribute("data-hm-color"), "brand-green");
-  assert.equal(a.querySelector(".hm-clamp-text.is-clamped"), null, "lines={0} shows all");
+  assert.equal(a.getAttribute("data-m-color"), "brand-green");
+  assert.equal(a.querySelector(".m-clamp-text.is-clamped"), null, "lines={0} shows all");
   const [main, close] = a.querySelectorAll("button");
-  assert.ok(main.classList.contains("hm-reply-quote-main"));
+  assert.ok(main.classList.contains("m-reply-quote-main"));
   assert.equal(close.getAttribute("aria-label"), "Cancel reply");
   main.click(); close.click();
   assert.deepEqual(log, ["jump", "close"]);
-  assert.ok(b.classList.contains("hm-reply-quote-inverse") && b.classList.contains("is-barless"));
-  assert.equal(b.querySelector(".hm-reply-quote-close").getAttribute("aria-label"), "Drop");
-  assert.equal(b.querySelector(".hm-reply-quote-close").textContent, "✕");
+  assert.ok(b.classList.contains("m-reply-quote-inverse") && b.classList.contains("is-barless"));
+  assert.equal(b.querySelector(".m-reply-quote-close").getAttribute("aria-label"), "Drop");
+  assert.equal(b.querySelector(".m-reply-quote-close").textContent, "✕");
   assert.equal(c.querySelector("button"), null, "close={false}");
   dispose();
 });

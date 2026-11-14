@@ -13,6 +13,6 @@ export default function KeyValueEditorDemo(props: { values: { numbers: boolean; 
   return <div class="sc-stack">
     {() => <Field label="Kota" group><KeyValueEditor value={$limits} onChange={(v: Limits) => { $limits = v }} numbers={props.values.numbers} readonly={props.values.readonly} keyPlaceholder="Plan" valuePlaceholder="Koltuk"
       addable={props.values.addable} removable={props.values.removable} labels={{ key: "Plan", value: "Koltuk", remove: "Kaldır", add: "Satır ekle", duplicate: "Bu ad zaten var" }} /></Field>}
-    <pre class="hm-muted">{() => JSON.stringify(props.values.numbers ? Object.fromEntries(Object.entries($limits).map(([k, x]) => [k, x !== "" && !isNaN(Number(x)) ? Number(x) : x])) : $limits)}</pre>
+    <pre class="m-muted">{() => JSON.stringify(props.values.numbers ? Object.fromEntries(Object.entries($limits).map(([k, x]) => [k, x !== "" && !isNaN(Number(x)) ? Number(x) : x])) : $limits)}</pre>
   </div>
 }

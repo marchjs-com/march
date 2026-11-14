@@ -66,10 +66,10 @@ test("DataGrid: 100k rows render only the window; sort, group, keyboard cursor, 
   }));
   const grid = m.el.querySelector("[role=grid]");
   assert.equal(grid.getAttribute("aria-rowcount"), "100001");
-  const rendered = m.el.querySelectorAll(".hm-dg-body .hm-dg-row").length;
+  const rendered = m.el.querySelectorAll(".m-dg-body .m-dg-row").length;
   assert.ok(rendered > 5 && rendered < 40, `rendered ${rendered} rows`);
   // totals footer
-  assert.match(m.el.querySelector(".hm-dg-foot").textContent, /5[.,]?050[.,]?000/);
+  assert.match(m.el.querySelector(".m-dg-foot").textContent, /5[.,]?050[.,]?000/);
   // keyboard cursor: Down, End, aria-activedescendant
   key(grid, "ArrowDown");
   key(grid, "End");
@@ -79,40 +79,40 @@ test("DataGrid: 100k rows render only the window; sort, group, keyboard cursor, 
   // Space selects the row; Shift+Down extends
   key(grid, " ");
   key(grid, "ArrowDown", { shiftKey: true });
-  assert.equal(m.el.querySelectorAll(".hm-dg-row.is-selected").length, 2);
-  assert.match(m.el.querySelector(".hm-dg-total").textContent, /2 selected/);
+  assert.equal(m.el.querySelectorAll(".m-dg-row.is-selected").length, 2);
+  assert.match(m.el.querySelector(".m-dg-total").textContent, /2 selected/);
   // edit: Home → name column … type a letter starts editing with that draft, Enter saves
   key(grid, "Home");
   key(grid, "ArrowRight");
   key(grid, "Z");
-  const input = m.el.querySelector(".hm-dg-cell.is-editing input");
+  const input = m.el.querySelector(".m-dg-cell.is-editing input");
   assert.ok(input, "editor open");
   assert.equal(input.value, "Z");
   key(input, "Enter");
   await new Promise((r) => setTimeout(r, 5));
   assert.deepEqual(saved, [[3, "name", "Z"]]);
   // sort by clicking the header (pointerdown → pointerup without movement = click)
-  const th = [...m.el.querySelectorAll(".hm-dg-th")].find((x) => x.dataset.key === "amount");
+  const th = [...m.el.querySelectorAll(".m-dg-th")].find((x) => x.dataset.key === "amount");
   ptr(th, "pointerdown");
   ptr(document, "pointerup");
-  assert.equal([...m.el.querySelectorAll(".hm-dg-th")].find((x) => x.dataset.key === "amount").getAttribute("aria-sort"), "ascending");
+  assert.equal([...m.el.querySelectorAll(".m-dg-th")].find((x) => x.dataset.key === "amount").getAttribute("aria-sort"), "ascending");
   m.dispose();
 });
 
 test("DataGrid: grouping shows group rows with counts and aggregates; collapsing hides rows", () => {
   const rows = big.slice(0, 40);
   const m = mount(() => h(DataGrid, { rows, rowKey: "id", groupBy: ["region"], columns: [{ key: "name" }, { key: "region" }, { key: "amount", aggregate: "sum" }] }));
-  const groups = () => [...m.el.querySelectorAll(".hm-dg-group")];
+  const groups = () => [...m.el.querySelectorAll(".m-dg-group")];
   const grid = m.el.querySelector("[role=grid]");
   assert.equal(grid.getAttribute("aria-rowcount"), String(1 + 4 + 40));
   assert.equal(groups()[0].getAttribute("aria-expanded"), "true");
   assert.match(groups()[0].textContent, /North/);
-  assert.match(groups()[0].querySelector(".hm-dg-count").textContent, /^10$/);
+  assert.match(groups()[0].querySelector(".m-dg-count").textContent, /^10$/);
   key(grid, "Enter"); // cursor on the first group row
   assert.equal(groups()[0].getAttribute("aria-expanded"), "false");
   assert.equal(grid.getAttribute("aria-rowcount"), String(1 + 4 + 30));
   // the chip in the toolbar removes the grouping
-  m.el.querySelector(".hm-dg-groups .hm-chip2-x").click();
+  m.el.querySelector(".m-dg-groups .m-chip2-x").click();
   assert.equal(groups().length, 0);
   m.dispose();
 });
@@ -126,20 +126,20 @@ test("DataGrid: own texts, single tools off, no column menu, empty state off or 
     h(DataGrid, { rows: [], columns, empty: h("i", { class: "own-empty" }, "nothing"), labels: { noRows: "unused" } }),
     h(DataGrid, { rows: [], columns, labels: { noRows: "No orders" } }),
   ]);
-  const [a, b, c, d, e] = m.el.querySelectorAll(".hm-dg");
-  assert.equal(a.querySelector(".hm-dg-search input").getAttribute("placeholder"), "Find");
-  assert.equal(a.querySelector(".hm-dg-total").textContent, "20 orders");
-  assert.match(a.querySelector(".hm-dg-toolbar").textContent, /Export/);
-  assert.equal(a.querySelector(".hm-dg-foot-row b").textContent, "Sum of all");
-  assert.equal(a.querySelector(".hm-dg-head .hm-table-check input").getAttribute("aria-label"), "All of them");
-  assert.ok(a.querySelector(".hm-dg-th-menu"));
+  const [a, b, c, d, e] = m.el.querySelectorAll(".m-dg");
+  assert.equal(a.querySelector(".m-dg-search input").getAttribute("placeholder"), "Find");
+  assert.equal(a.querySelector(".m-dg-total").textContent, "20 orders");
+  assert.match(a.querySelector(".m-dg-toolbar").textContent, /Export/);
+  assert.equal(a.querySelector(".m-dg-foot-row b").textContent, "Sum of all");
+  assert.equal(a.querySelector(".m-dg-head .m-table-check input").getAttribute("aria-label"), "All of them");
+  assert.ok(a.querySelector(".m-dg-th-menu"));
   assert.ok(b.className.includes("mine"));
-  assert.ok(b.querySelector(".hm-dg-search") && b.querySelector(".hm-dg-total"));
-  assert.equal(b.querySelector(".hm-dg-groups"), null);
-  assert.equal(b.querySelectorAll(".hm-dg-toolbar button").length, 0, "no filter and CSV buttons");
-  assert.equal(b.querySelector(".hm-dg-th-menu"), null);
-  assert.equal(c.querySelector(".hm-dg-toolbar, .hm-dg-empty"), null);
-  assert.ok(d.querySelector(".hm-dg-empty .own-empty"));
-  assert.equal(e.querySelector(".hm-dg-empty").textContent, "No orders");
+  assert.ok(b.querySelector(".m-dg-search") && b.querySelector(".m-dg-total"));
+  assert.equal(b.querySelector(".m-dg-groups"), null);
+  assert.equal(b.querySelectorAll(".m-dg-toolbar button").length, 0, "no filter and CSV buttons");
+  assert.equal(b.querySelector(".m-dg-th-menu"), null);
+  assert.equal(c.querySelector(".m-dg-toolbar, .m-dg-empty"), null);
+  assert.ok(d.querySelector(".m-dg-empty .own-empty"));
+  assert.equal(e.querySelector(".m-dg-empty").textContent, "No orders");
   m.dispose();
 });

@@ -37,7 +37,7 @@ mirrored in right-to-left text. Keys 1–9 pick a choice.
 | `keys` | boolean | `true` | number keys 1–9 pick a choice; each choice shows its number |
 | `renderChoice` | `(choice, index) => node` | — | draw the content of a choice button yourself |
 | `transition` | `turn` `slide` `fade` `none` / `(side) => { leave, enter, duration?, easing? }` | `turn` | how the page changes; a function gives keyframes for the leaving and the entering passage (`side`: 1 forward, -1 back) |
-| `class` | string | — | extra class on the root (`.hm-bs`; parts: `.hm-bs-trail` (a Breadcrumbs: steps are `.hm-bc-item`), `.hm-bs-found`, `.hm-bs-passage`, `.hm-bs-choice`, `.hm-bs-key`, `.hm-bs-end`) |
+| `class` | string | — | extra class on the root (`.m-bs`; parts: `.m-bs-trail` (a Breadcrumbs: steps are `.m-bc-item`), `.m-bs-found`, `.m-bs-passage`, `.m-bs-choice`, `.m-bs-key`, `.m-bs-end`) |
 
 A choice is `{ label, to, note? }`. `storyEndings(passages, start)` lists every reachable ending.
 

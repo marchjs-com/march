@@ -27,6 +27,6 @@ export default function StatDemo(props: { values: { variant: string; size: strin
         })}
       </div>
     }}
-    <p class="hm-muted">{() => ($last ? `onClick: ${$last} +1` : props.values.clickable ? "Bir karoya bas: sayı artar." : "Düz karo (div): tıklanmaz.")}</p>
+    <p class="m-muted">{() => ($last ? `onClick: ${$last} +1` : props.values.clickable ? "Bir karoya bas: sayı artar." : "Düz karo (div): tıklanmaz.")}</p>
   </div>
 }

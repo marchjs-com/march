@@ -18,17 +18,17 @@ test("NotForYou: lines toggle, the verdict follows, onCheck gets the indexes", (
   const el = document.createElement("div"); document.body.appendChild(el);
   const items = [{ text: "A", instead: "good A" }, { text: "B", detail: "why" }, { text: "C" }];
   const dispose = render(() => h(NotForYou, { check: true, items, forYou: [{ text: "D" }], onCheck: (m) => seen.push(m) }), el);
-  const boxes = el.querySelectorAll('.hm-nfy-not [role="checkbox"]');
+  const boxes = el.querySelectorAll('.m-nfy-not [role="checkbox"]');
   assert.equal(boxes.length, 3);
-  assert.equal(el.querySelectorAll(".hm-nfy-for [role=checkbox]").length, 0, "the for-you list is not checkable");
+  assert.equal(el.querySelectorAll(".m-nfy-for [role=checkbox]").length, 0, "the for-you list is not checkable");
   const verdict = el.querySelector('[role="status"]');
   assert.match(verdict.textContent, /Strike out/);
-  const instead = boxes[0].querySelector(".hm-nfy-instead");
+  const instead = boxes[0].querySelector(".m-nfy-instead");
   assert.equal(instead.textContent, "good A");
   assert.equal(instead.getAttribute("aria-hidden"), "true", "hidden until struck out");
   boxes[2].click(); boxes[0].click();
   assert.equal(instead.getAttribute("aria-hidden"), "false");
-  assert.ok(boxes[0].querySelector(".hm-nfy-mark.hm-checkmark.is-yes") && boxes[1].querySelector(".hm-nfy-mark.hm-checkmark.is-no"), "a cross that turns into a tick once struck out");
+  assert.ok(boxes[0].querySelector(".m-nfy-mark.m-checkmark.is-yes") && boxes[1].querySelector(".m-nfy-mark.m-checkmark.is-no"), "a cross that turns into a tick once struck out");
   assert.equal(boxes[0].getAttribute("aria-checked"), "true");
   assert.match(boxes[0].textContent, /That's me/);
   assert.match(boxes[0].textContent, /Not you$/);
@@ -48,7 +48,7 @@ test("NotForYou: without check, plain list items and no verdict", () => {
   const dispose = render(() => h(NotForYou, { variant: "list", items: [{ text: "A" }] }), el);
   assert.equal(el.querySelectorAll("[role=checkbox]").length, 0);
   assert.equal(el.querySelector("[role=status]"), null);
-  assert.ok(el.querySelector(".hm-nfy").classList.contains("hm-nfy-v-list"));
+  assert.ok(el.querySelector(".m-nfy").classList.contains("m-nfy-v-list"));
   dispose();
 });
 
@@ -59,19 +59,19 @@ test("NotForYou: own marks, no marks, texts changed or left out, no verdict", ()
     h(NotForYou, { check: true, items, forYou: [{ text: "D" }], mark: (state, it, i) => `${state}:${it.text}${i}`, meLabel: "Me!", hint: "tap", markedHint: "gone", title: "Not", forYouTitle: false }),
     h(NotForYou, { check: true, items, mark: false, meLabel: false, hint: false, markedHint: false, verdict: false, title: false }),
   ], el);
-  const [own, bare] = el.querySelectorAll(".hm-nfy");
+  const [own, bare] = el.querySelectorAll(".m-nfy");
   const box = own.querySelector("[role=checkbox]");
-  assert.equal(box.querySelector(".hm-nfy-mark").textContent, "not:A0");
-  assert.equal(own.querySelector(".hm-nfy-for .hm-nfy-mark").textContent, "for:D0");
-  assert.equal(own.querySelector(".hm-nfy-not .hm-nfy-title").textContent, "Not");
-  assert.equal(own.querySelector(".hm-nfy-for .hm-nfy-title"), null);
+  assert.equal(box.querySelector(".m-nfy-mark").textContent, "not:A0");
+  assert.equal(own.querySelector(".m-nfy-for .m-nfy-mark").textContent, "for:D0");
+  assert.equal(own.querySelector(".m-nfy-not .m-nfy-title").textContent, "Not");
+  assert.equal(own.querySelector(".m-nfy-for .m-nfy-title"), null);
   assert.match(box.textContent, /Me!tap$/);
   box.click();
-  assert.equal([...box.querySelectorAll(".hm-nfy-mark .hm-checkmark-glyph")].pop().textContent, "marked:A0", "the arriving mark (the old one is leaving)");
+  assert.equal([...box.querySelectorAll(".m-nfy-mark .m-checkmark-glyph")].pop().textContent, "marked:A0", "the arriving mark (the old one is leaving)");
   assert.match(box.textContent, /Me!gone$/);
-  assert.equal(bare.querySelector(".hm-nfy-mark"), null);
-  assert.equal(bare.querySelector(".hm-nfy-me"), null);
-  assert.equal(bare.querySelector(".hm-nfy-title"), null);
+  assert.equal(bare.querySelector(".m-nfy-mark"), null);
+  assert.equal(bare.querySelector(".m-nfy-me"), null);
+  assert.equal(bare.querySelector(".m-nfy-title"), null);
   assert.equal(bare.querySelector("[role=status]"), null);
   assert.equal(bare.querySelectorAll("[role=checkbox]").length, 2, "still checkable");
   dispose();

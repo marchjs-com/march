@@ -38,12 +38,12 @@ test("path changes on the click; skeleton after 100 ms inside the kept layout; b
   assert.equal(a.host.querySelector(".pg"), null, "the old page is gone");
   assert.equal(a.host.querySelector(".lay"), lay, "the layout stayed");
   await tick(60);
-  assert.equal(a.host.querySelector(".hm-nav-bar").hidden, false, "progress bar after 150 ms");
+  assert.equal(a.host.querySelector(".m-nav-bar").hidden, false, "progress bar after 150 ms");
   assert.equal(a.host.querySelector(".to-slow").getAttribute("aria-busy"), "true", "spinner on the link being opened");
   await nav; await tick();
   assert.equal(a.host.querySelector(".pg")?.textContent, "slow");
   assert.equal(a.host.querySelector(".own-skel"), null);
-  assert.equal(a.host.querySelector(".hm-nav-bar").hidden, true, "bar hides when done");
+  assert.equal(a.host.querySelector(".m-nav-bar").hidden, true, "bar hides when done");
   assert.equal(a.host.querySelector(".to-slow").getAttribute("aria-busy"), null);
   a.done();
 });

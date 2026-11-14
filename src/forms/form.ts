@@ -116,7 +116,7 @@ export function useForm<S extends SchemaSpec>(spec?: S | null, initial?: Initial
 export function useForm<V = Values>(sch?: Schema<V> | SchemaSpec | null, initial?: Initial<V>, opts?: FormOptions<V>): FormController<V>;
 export function useForm(spec?: Schema | SchemaSpec | null, initial?: Initial<Values>, opts: FormOptions<Values> = {}): FormController {
   const sch: Schema = (spec as Partial<Schema> | null | undefined)?.fields ? (spec as Schema) : makeSchema((spec ?? {}) as SchemaSpec);
-  const fid = uid("hmf");
+  const fid = uid("mf");
   const mode = opts.validateOn ?? "blur";
   const fresh = (v: Initial<Values>): Values => ({ ...sch.defaults(), ...clone((typeof v === "function" ? v() : v) ?? {}) });
   let base = fresh(initial);
@@ -269,7 +269,7 @@ export function renderFields<V>(form: FormController<V>, names?: readonly FieldN
 export function renderFields(form: FormController, names?: readonly string[] | null, { layout = "stack", cols = 2 }: FieldsLayout = {}): Element {
   const sch = form.schema;
   const list = (names ?? sch.names()).filter((n) => { const f = sch.field(n); return f && !f.hidden && f.type !== "hidden"; });
-  return h("div", { class: layout === "grid" ? cx("hm-form-grid", `hm-cols-${cols}`) : "hm-form-stack" }, list.map((n) => {
+  return h("div", { class: layout === "grid" ? cx("m-form-grid", `m-cols-${cols}`) : "m-form-stack" }, list.map((n) => {
     const on = computed(() => sch.isActive(n, form.values));
     return () => (on() ? untrack(() => h(Field, { form, name: n })) : null);
   }));
@@ -295,9 +295,9 @@ export function FormActions<V = Values>(props: FormActionsProps<V>): unknown;
 export function FormActions(props: FormActionsProps): unknown {
   const form = (props.form ?? useFormContext())!;
   const cancel = props.cancel;
-  return h("div", { class: cx("hm-form-actions", props.class) },
-    () => (form.submitError() ? h(Alert, { tone: "danger", class: "hm-form-error" }, form.submitError()) : null),
-    h("div", { class: "hm-form-buttons" },
+  return h("div", { class: cx("m-form-actions", props.class) },
+    () => (form.submitError() ? h(Alert, { tone: "danger", class: "m-form-error" }, form.submitError()) : null),
+    h("div", { class: "m-form-buttons" },
       props.extra ?? null,
       cancel ? h(Button, { disabled: () => form.submitting(), onClick: () => (typeof cancel === "function" ? cancel(form) : form.reset()) }, () => props.cancelLabel ?? t`Cancel`) : null,
       h(Button, { type: "submit", variant: "primary", loading: () => form.submitting(), disabled: () => !!(props.requireDirty && !form.dirty()) },
@@ -366,14 +366,14 @@ export function Form(props: FormProps): unknown {
     const custom = props.children;
     const layout = { layout: props.layout ?? "stack", cols: props.cols ?? 2 };
     const body = custom ?? (props.sections
-      ? props.sections.map((s) => h("fieldset", { class: "hm-section" },
-        s.title ? h("legend", { class: "hm-section-title" }, s.title) : null,
-        s.description ? h("p", { class: "hm-section-desc" }, s.description) : null,
+      ? props.sections.map((s) => h("fieldset", { class: "m-section" },
+        s.title ? h("legend", { class: "m-section-title" }, s.title) : null,
+        s.description ? h("p", { class: "m-section-desc" }, s.description) : null,
         renderFields(form, s.fields, { ...layout, cols: s.cols ?? layout.cols })))
       : renderFields(form, null, layout));
     const noBar = props.actions === false || props.readonly;
-    return h("form", { "data-hm-color": () => colorAttr(props.color),
-      class: cx("hm-form", props.class), novalidate: true, "aria-busy": () => (form.submitting() ? "true" : null),
+    return h("form", { "data-m-color": () => colorAttr(props.color),
+      class: cx("m-form", props.class), novalidate: true, "aria-busy": () => (form.submitting() ? "true" : null),
       onSubmit: (e: Event) => { e.preventDefault(); form.submit(); },
       onKeyDown: noBar ? (e: KeyboardEvent) => { const el = e.target as HTMLInputElement; if (e.key === "Enter" && !e.defaultPrevented && el.tagName === "INPUT" && !["checkbox", "radio", "button", "file"].includes(el.type)) { e.preventDefault(); form.submit(); } } : null,
     }, body, noBar ? null : h(FormActions, { form, cancel: props.cancel, cancelLabel: props.cancelLabel, submitLabel: props.submitLabel, requireDirty: props.requireDirty, extra: props.extraActions }));

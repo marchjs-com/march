@@ -1,14 +1,14 @@
-/* March — LikeButton (the burst: motion/burst.css). The liked color is the local accent (data-hm-color, default brand-pink). */
-.hm-like.hm-btn { gap: .375rem; min-height: 2.25rem; padding: 0 .5rem; font-size: var(--hm-text-sm); font-weight: 800; -webkit-tap-highlight-color: transparent; }
-.hm-like.hm-btn.is-pressed { background: none; }
-.hm-like.hm-btn:hover { background: color-mix(in srgb, var(--hm-accent) 9%, transparent); }
-.hm-like.hm-btn:not(.is-liked) { color: var(--hm-text-2); } .hm-like.hm-btn:not(.is-liked):hover { color: var(--hm-text); }
-.hm-like-hit { position: relative; display: inline-grid; place-items: center; }
-.hm-like-heart { display: inline-grid; place-items: center; transform-origin: 50% 60%; }
-.hm-like .hm-like-heart .hm-svg { width: 1.5rem; height: 1.5rem; fill: transparent; transition: fill var(--hm-dur) var(--hm-ease), stroke var(--hm-dur) var(--hm-ease); }
-.hm-like.is-liked .hm-like-heart .hm-svg { fill: var(--hm-accent); stroke: var(--hm-accent); }
-.hm-like-sm.hm-btn { min-height: 1.75rem; padding: 0 .375rem; font-size: var(--hm-text-xs); gap: .25rem; }
-.hm-like-sm .hm-like-heart .hm-svg { width: 1.0625rem; height: 1.0625rem; }
-.hm-like-lg.hm-btn { min-height: 2.75rem; padding: 0 .75rem; font-size: var(--hm-text-lg); }
-.hm-like-lg .hm-like-heart .hm-svg { width: 1.875rem; height: 1.875rem; }
-.hm-like-count { min-width: 1ch; }
+/* March — LikeButton (the burst: motion/burst.css). The liked color is the local accent (data-m-color, default brand-pink). */
+.m-like.m-btn { gap: .375rem; min-height: 2.25rem; padding: 0 .5rem; font-size: var(--m-text-sm); font-weight: 800; -webkit-tap-highlight-color: transparent; }
+.m-like.m-btn.is-pressed { background: none; }
+.m-like.m-btn:hover { background: color-mix(in srgb, var(--m-accent) 9%, transparent); }
+.m-like.m-btn:not(.is-liked) { color: var(--m-text-2); } .m-like.m-btn:not(.is-liked):hover { color: var(--m-text); }
+.m-like-hit { position: relative; display: inline-grid; place-items: center; }
+.m-like-heart { display: inline-grid; place-items: center; transform-origin: 50% 60%; }
+.m-like .m-like-heart .m-svg { width: 1.5rem; height: 1.5rem; fill: transparent; transition: fill var(--m-dur) var(--m-ease), stroke var(--m-dur) var(--m-ease); }
+.m-like.is-liked .m-like-heart .m-svg { fill: var(--m-accent); stroke: var(--m-accent); }
+.m-like-sm.m-btn { min-height: 1.75rem; padding: 0 .375rem; font-size: var(--m-text-xs); gap: .25rem; }
+.m-like-sm .m-like-heart .m-svg { width: 1.0625rem; height: 1.0625rem; }
+.m-like-lg.m-btn { min-height: 2.75rem; padding: 0 .75rem; font-size: var(--m-text-lg); }
+.m-like-lg .m-like-heart .m-svg { width: 1.875rem; height: 1.875rem; }
+.m-like-count { min-width: 1ch; }

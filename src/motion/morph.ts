@@ -153,11 +153,11 @@ export function shapePolygon(shape: ShapeName, n = 60): string {
 /** Morph an element's outline to a shape (clip-path polygon). The current outline is read from the element. */
 export function shapeMorph(el: Element, to: ShapeName, o: AnimateOptions & { points?: number } = {}): Playback {
   const s = el as HTMLElement, n = o.points ?? 60;
-  const prev = s.getAttribute("data-hm-shape") as ShapeName | null;
+  const prev = s.getAttribute("data-m-shape") as ShapeName | null;
   // interrupted mid-way: go on from the outline on screen (same point count), not from the last shape
   const cur = runs.has(el) ? globalThis.getComputedStyle?.(el)?.clipPath ?? "" : "";
   const from = cur.startsWith("polygon(") && cur.split(",").length === n ? cur : shapePolygon(prev ?? "circle", n), end = shapePolygon(to, n);
-  s.setAttribute("data-hm-shape", to);
+  s.setAttribute("data-m-shape", to);
   stop(el);
   s.style?.setProperty("clip-path", end);
   const p = animate(el, [{ clipPath: from }, { clipPath: end }], { duration: 650, easing: "spring", ...o });

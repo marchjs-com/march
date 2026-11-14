@@ -15,7 +15,7 @@ export default function ChoicePickerDemo(props: { values: { count: number; kind:
     {() => {
       const opts = CITIES.slice(0, props.values.count)
       return [<ChoicePicker value={$city} onChange={(v: unknown) => { $city = String(v ?? "") }} options={opts} kind={props.values.kind as "auto"} aria-label="Şehir" />,
-        <p class="hm-muted">{`Görünüm: ${pickerKind(normOptions(opts), props.values.kind as "auto")} (${props.values.kind === "auto" ? "seçenek sayısına göre kendisi seçti" : `kind="${props.values.kind}" ile zorlandı`})`}</p>]
+        <p class="m-muted">{`Görünüm: ${pickerKind(normOptions(opts), props.values.kind as "auto")} (${props.values.kind === "auto" ? "seçenek sayısına göre kendisi seçti" : `kind="${props.values.kind}" ile zorlandı`})`}</p>]
     }}
   </div>
 }

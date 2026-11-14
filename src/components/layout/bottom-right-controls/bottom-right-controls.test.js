@@ -36,7 +36,7 @@ test("corners: a rendered corner takes over the controls added before, and a con
   addCornerControl("top-start", early);
   const host = document.createElement("div"); document.body.appendChild(host);
   const dispose = render(() => h(CornerControls, { corner: "top-start" }), host);
-  const el = host.querySelector(".hm-corner-top-start");
+  const el = host.querySelector(".m-corner-top-start");
   assert.equal(early.parentElement, el);
   const inner = btn("inner");
   const d2 = render(() => { addCornerControl("top-start", inner); return null; }, document.createElement("div"));
@@ -49,11 +49,11 @@ test("corners: a rendered corner takes over the controls added before, and a con
 test("corners: a rendered corner takes its own label and class", () => {
   const host = document.createElement("div"); document.body.appendChild(host);
   const dispose = render(() => h(BottomRightControls, { label: "Quick actions", class: "mine" }), host);
-  const el = host.querySelector(".hm-corner-bottom-end");
+  const el = host.querySelector(".m-corner-bottom-end");
   assert.equal(el.getAttribute("aria-label"), "Quick actions");
   assert.ok(el.classList.contains("mine"));
   dispose();
   const d2 = render(() => h(CornerControls, { corner: "top-end" }), host);
-  assert.equal(host.querySelector(".hm-corner-top-end").getAttribute("aria-label"), "Page controls");
+  assert.equal(host.querySelector(".m-corner-top-end").getAttribute("aria-label"), "Page controls");
   d2();
 });

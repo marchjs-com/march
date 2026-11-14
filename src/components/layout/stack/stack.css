@@ -1,8 +1,8 @@
 /* March — Toolbar, Divider (Stack's classes are shared utilities in ui/display.css). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
-.hm-toolbar-start { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); flex: 1; min-width: 0; }
-.hm-toolbar-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
-.hm-divider { border: 0; border-top: 1px solid var(--hm-border); margin: var(--hm-space-4) 0; }
-.hm-divider-v { display: inline-block; align-self: stretch; border-top: 0; border-inline-start: 1px solid var(--hm-border); margin: 0 var(--hm-space-2); }
-.hm-divider-label { display: flex; align-items: center; gap: var(--hm-space-3); border: 0; color: var(--hm-faint); font-size: var(--hm-text-xs); font-weight: 500; }
-.hm-divider-label::before, .hm-divider-label::after { content: ""; flex: 1; border-top: 1px solid var(--hm-border); }
+.m-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-2); }
+.m-toolbar-start { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-2); flex: 1; min-width: 0; }
+.m-toolbar-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-2); }
+.m-divider { border: 0; border-top: 1px solid var(--m-border); margin: var(--m-space-4) 0; }
+.m-divider-v { display: inline-block; align-self: stretch; border-top: 0; border-inline-start: 1px solid var(--m-border); margin: 0 var(--m-space-2); }
+.m-divider-label { display: flex; align-items: center; gap: var(--m-space-3); border: 0; color: var(--m-faint); font-size: var(--m-text-xs); font-weight: 500; }
+.m-divider-label::before, .m-divider-label::after { content: ""; flex: 1; border-top: 1px solid var(--m-border); }

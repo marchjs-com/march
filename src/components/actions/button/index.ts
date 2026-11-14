@@ -12,7 +12,7 @@ import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "dark" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
-const SIZES: Record<string, string | undefined> = { sm: "hm-btn-sm", lg: "hm-btn-lg" };
+const SIZES: Record<string, string | undefined> = { sm: "m-btn-sm", lg: "m-btn-lg" };
 /** Size class of a button, shared by IconButton and the Menu / Dropdown trigger: `sm` / `lg` → their class (none for `md`). */
 export const buttonSizeClass = (s: ButtonSize | null | undefined): string | undefined => (s ? SIZES[s] : undefined);
 
@@ -64,15 +64,15 @@ export interface ButtonProps {
  */
 export function Button(props: ButtonProps): unknown {
   const loading = (): boolean => !!val(props.loading);
-  const cls = (): string => cx("hm-btn", `hm-btn-${val(props.variant) ?? "secondary"}`, buttonSizeClass(val(props.size)), val(props.shape) === "pill" && "hm-btn-pill", props.block && "hm-btn-block", loading() && "is-loading", val(props.pressed) && "is-pressed", val(props.class));
+  const cls = (): string => cx("m-btn", `m-btn-${val(props.variant) ?? "secondary"}`, buttonSizeClass(val(props.size)), val(props.shape) === "pill" && "m-btn-pill", props.block && "m-btn-block", loading() && "is-loading", val(props.pressed) && "is-pressed", val(props.class));
   const body = [
     () => (!loading() || props.spinner === false ? icon(val(props.icon))
-      : props.spinner == null || props.spinner === true ? spinnerRing("em", "hm-btn-spin") // the Spinner's ring without its texts and colour lists
-      : h("span", { class: "hm-btn-spin-own", "aria-hidden": "true" }, icon(props.spinner))),
-    props.children != null && h("span", { class: "hm-btn-label" }, props.children),
+      : props.spinner == null || props.spinner === true ? spinnerRing("em", "m-btn-spin") // the Spinner's ring without its texts and colour lists
+      : h("span", { class: "m-btn-spin-own", "aria-hidden": "true" }, icon(props.spinner))),
+    props.children != null && h("span", { class: "m-btn-label" }, props.children),
     props.iconEnd != null && icon(props.iconEnd),
   ];
-  const attrs = { ...rest(props, ["variant", "size", "loading", "spinner", "icon", "iconEnd", "block", "pressed", "shape", "href", "disabled", "type", "color"]), "data-hm-color": () => colorAttr(props.color) };
+  const attrs = { ...rest(props, ["variant", "size", "loading", "spinner", "icon", "iconEnd", "block", "pressed", "shape", "href", "disabled", "type", "color"]), "data-m-color": () => colorAttr(props.color) };
   if (props.href != null) return buttonLink({ ...attrs, class: cls }, props.href as MaybeFn<ButtonHref>, body);
   return h("button", {
     "aria-pressed": () => pressedAttr(props.pressed), // the caller's own aria-pressed (in attrs) wins

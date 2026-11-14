@@ -17,7 +17,7 @@ element that was clicked, so one menu can offer different entries for different 
 | `items` | `(target, point) => MenuItem[]` | — | entries for this opening |
 | `when` | `(target) => boolean` | — | return false to keep the browser menu |
 | `label` | string | — | accessible name of the menu |
-| `menuClass` | ClassProp | — | extra class on the floating menu panel (`.hm-menu`) |
+| `menuClass` | ClassProp | — | extra class on the floating menu panel (`.m-menu`) |
 | `class` | ClassProp | — | extra class on the host around the children (it adds no box: `display: contents`) |
 | `children` | node | — | the area that answers the right-click |
 

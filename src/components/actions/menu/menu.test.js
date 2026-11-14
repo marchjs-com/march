@@ -22,7 +22,7 @@ test("Menu: trigger ARIA, opens on ArrowDown, items, separator, disabled, shortc
   assert.equal(items.length, 2, "hidden item skipped");
   assert.ok(panel.querySelector("[role=separator]"));
   assert.equal(items[1].disabled, true);
-  assert.ok(items[0].querySelector("kbd.hm-menu-kbd"));
+  assert.ok(items[0].querySelector("kbd.m-menu-kbd"));
   items[0].click();
   assert.equal(picked, "row");
   assert.equal(trigger.getAttribute("aria-expanded"), "false");
@@ -48,10 +48,10 @@ test("Menu / Dropdown: the trigger takes a colour token, a class and its own con
     h(Dropdown, { label: "Filters" }, "body"),
   ]);
   const [a, b] = m.el.querySelectorAll("button");
-  assert.equal(a.getAttribute("data-hm-color"), "brand-purple");
-  assert.ok(a.className.includes("hm-btn-primary") && a.className.includes("mine"));
+  assert.equal(a.getAttribute("data-m-color"), "brand-purple");
+  assert.ok(a.className.includes("m-btn-primary") && a.className.includes("mine"));
   assert.equal(a.querySelector("b").textContent, "Me");
-  assert.equal(b.getAttribute("data-hm-color"), null);
+  assert.equal(b.getAttribute("data-m-color"), null);
   m.dispose();
 });
 
@@ -72,12 +72,12 @@ test("Menu: a checked item is a menuitemcheckbox / menuitemradio with aria-check
   assert.equal(radios.length, 2);
   assert.equal(radios[0].getAttribute("aria-checked"), "true");
   assert.equal(radios[1].getAttribute("aria-checked"), "false");
-  assert.equal(radios[0].querySelector(".hm-menu-check").getAttribute("aria-hidden"), "true");
+  assert.equal(radios[0].querySelector(".m-menu-check").getAttribute("aria-hidden"), "true");
   const box = panel.querySelector("[role=menuitemcheckbox]");
   assert.equal(box.getAttribute("aria-checked"), "false");
   const plain = panel.querySelector("[role=menuitem]");
   assert.equal(plain.getAttribute("aria-checked"), null);
-  assert.equal(plain.querySelector(".hm-menu-check"), null);
+  assert.equal(plain.querySelector(".m-menu-check"), null);
   // arrow keys walk over every kind of item
   plain.focus();
   panel.dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));

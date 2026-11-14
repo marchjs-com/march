@@ -53,11 +53,11 @@ test("Combobox: status texts, the chip remove button and its name are yours", as
   const input = a.el.querySelector("input");
   input.focus(); type(input, "zzz");
   await tick(5);
-  assert.equal(document.querySelector(".hm-listbox-status").textContent, "Nothing here");
+  assert.equal(document.querySelector(".m-listbox-status").textContent, "Nothing here");
   a.dispose();
   const v = signal(["Ada", "Bora"]);
   const b = mount(() => h(Combobox, { "bind:value": v, multiple: true, options: ["Ada", "Bora"], removeIcon: () => h("i", { class: "own-x" }, "x"), labels: { remove: (l) => `Drop ${l}` } }));
-  const xs = b.el.querySelectorAll(".hm-chip2-x");
+  const xs = b.el.querySelectorAll(".m-chip2-x");
   assert.equal(xs.length, 2);
   assert.equal(xs[0].getAttribute("aria-label"), "Drop Ada");
   assert.ok(xs[1].querySelector(".own-x"));
@@ -65,7 +65,7 @@ test("Combobox: status texts, the chip remove button and its name are yours", as
   assert.deepEqual(v(), ["Bora"]);
   b.dispose();
   const c = mount(() => h(Combobox, { value: ["Ada"], multiple: true, options: ["Ada", "Bora"], removeIcon: false }));
-  assert.equal(c.el.querySelectorAll(".hm-chip").length, 1);
-  assert.equal(c.el.querySelector(".hm-chip2-x"), null);
+  assert.equal(c.el.querySelectorAll(".m-chip").length, 1);
+  assert.equal(c.el.querySelector(".m-chip2-x"), null);
   c.dispose();
 });

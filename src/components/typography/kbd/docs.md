@@ -15,7 +15,7 @@ A keyboard key. Give it text (`<Kbd>Esc</Kbd>`) or a shortcut string: `keys="mod
 |---|---|---|
 | `keys` | string / accessor | shortcut (`mod`, `shift`, `alt`, `ctrl` + key), formatted with `formatKey` |
 | `children` | node | plain key text when `keys` is not given |
-| `class` | class value | your own class next to `hm-kbd` |
+| `class` | class value | your own class next to `m-kbd` |
 
 ## Accessibility
 

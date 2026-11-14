@@ -31,8 +31,8 @@ export interface LiveStatusProps {
 export function LiveStatus(props: LiveStatusProps): unknown {
   const status = h(props.as ?? "span", {
     ...rest(props, ["text", "children", "visible", "politeness", "as", "help", "helpId", "helpClass"]),
-    class: () => cx("hm-live-status", props.visible === false && "hm-sr-only", val(props.class)), role: "status", "aria-live": props.politeness ?? "polite",
+    class: () => cx("m-live-status", props.visible === false && "m-sr-only", val(props.class)), role: "status", "aria-live": props.politeness ?? "polite",
   }, props.text ?? props.children);
   const help = props.help;
-  return help == null || help === false ? status : [h("p", { class: cx("hm-live-status-help", props.helpClass), id: props.helpId }, help), status];
+  return help == null || help === false ? status : [h("p", { class: cx("m-live-status-help", props.helpClass), id: props.helpId }, help), status];
 }

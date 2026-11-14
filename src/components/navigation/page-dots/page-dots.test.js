@@ -13,10 +13,10 @@ const key = (el, k) => el.dispatchEvent(Object.assign(new Event("keydown", { bub
 test("PageDots: buttons with names, current dot, click", () => {
   const page = signal(1), count = signal(4);
   const [el, dispose] = mount(() => h(PageDots, { count, value: page, onChange: (i) => page.set(i) }));
-  const root = el.querySelector(".hm-page-dots");
+  const root = el.querySelector(".m-page-dots");
   assert.equal(root.getAttribute("role"), "group");
   assert.equal(root.getAttribute("aria-label"), "Pages");
-  let dots = [...root.querySelectorAll("button.hm-page-dot")];
+  let dots = [...root.querySelectorAll("button.m-page-dot")];
   assert.equal(dots.length, 4);
   assert.equal(dots[2].getAttribute("aria-label"), "Page 3");
   assert.ok(dots[1].classList.contains("is-active"));
@@ -33,7 +33,7 @@ test("PageDots: buttons with names, current dot, click", () => {
 test("PageDots: arrow keys, Home, End stay inside the range", () => {
   const page = signal(0);
   const [el, dispose] = mount(() => h(PageDots, { count: 3, value: page, setValue: (i) => page.set(i) }));
-  const root = el.querySelector(".hm-page-dots");
+  const root = el.querySelector(".m-page-dots");
   key(root, "ArrowRight"); assert.equal(page(), 1);
   key(root, "End"); assert.equal(page(), 2);
   key(root, "ArrowRight"); assert.equal(page(), 2);
@@ -53,9 +53,9 @@ test("PageDots: read-only position, decorative, colour, size, look, own dots and
   assert.equal(one.getAttribute("role"), "img");
   assert.equal(one.getAttribute("aria-label"), "Page 3 of 5");
   assert.equal(one.querySelectorAll("button").length, 0);
-  assert.ok(one.querySelectorAll("span.hm-page-dot")[2].classList.contains("is-active"));
-  assert.equal(one.getAttribute("data-hm-color"), "brand-orange");
-  for (const c of ["hm-page-dots-lg", "hm-page-dots-even", "hm-page-dots-vertical"]) assert.ok(one.classList.contains(c), c);
+  assert.ok(one.querySelectorAll("span.m-page-dot")[2].classList.contains("is-active"));
+  assert.equal(one.getAttribute("data-m-color"), "brand-orange");
+  for (const c of ["m-page-dots-lg", "m-page-dots-even", "m-page-dots-vertical"]) assert.ok(one.classList.contains(c), c);
   page.set(0);
   assert.equal(one.getAttribute("aria-label"), "Page 1 of 5");
   assert.equal(two.getAttribute("aria-hidden"), "true");

@@ -1,22 +1,22 @@
-/* PageDots. Theme tokens only, logical properties, durations from --hm-dur tokens, no @keyframes (motion core). */
-.hm-page-dots { --hm-pd-size: 6px; --hm-pd-long: 20px; display: flex; justify-content: center; align-items: center; margin: 0; padding: 0; }
-.hm-page-dots-sm { --hm-pd-size: 4px; --hm-pd-long: 14px; }
-.hm-page-dots-lg { --hm-pd-size: 8px; --hm-pd-long: 26px; }
-.hm-page-dots-vertical { flex-direction: column; }
+/* PageDots. Theme tokens only, logical properties, durations from --m-dur tokens, no @keyframes (motion core). */
+.m-page-dots { --m-pd-size: 6px; --m-pd-long: 20px; display: flex; justify-content: center; align-items: center; margin: 0; padding: 0; }
+.m-page-dots-sm { --m-pd-size: 4px; --m-pd-long: 14px; }
+.m-page-dots-lg { --m-pd-size: 8px; --m-pd-long: 26px; }
+.m-page-dots-vertical { flex-direction: column; }
 /* the dot is the ::before; the element around it is the (larger) target */
-.hm-page-dot { display: inline-flex; align-items: center; justify-content: center; flex: none; padding: calc(var(--hm-pd-size) / 2); border: 0; border-radius: var(--hm-radius-full); background: none; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-xs); line-height: 1.4; }
-button.hm-page-dot { padding-block: var(--hm-pd-size); cursor: pointer; }
-button.hm-page-dot:disabled { cursor: default; opacity: .5; }
-button.hm-page-dot:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: -1px; }
-.hm-page-dots-vertical button.hm-page-dot { padding: calc(var(--hm-pd-size) / 2) var(--hm-pd-size); }
-.hm-page-dot::before { content: ""; display: block; inline-size: var(--hm-pd-size); block-size: var(--hm-pd-size); border-radius: var(--hm-radius-full); background: var(--hm-border-strong);
-  transition: inline-size var(--hm-dur-slow) var(--hm-ease-out), block-size var(--hm-dur-slow) var(--hm-ease-out), background-color var(--hm-dur) var(--hm-ease); }
-button.hm-page-dot:hover:not(:disabled)::before { background: var(--hm-muted); }
-.hm-page-dot.is-active::before, button.hm-page-dot.is-active:hover::before { inline-size: var(--hm-pd-long); background: var(--hm-accent, var(--hm-primary)); }
-.hm-page-dots-vertical .hm-page-dot.is-active::before { inline-size: var(--hm-pd-size); block-size: var(--hm-pd-long); }
-.hm-page-dots-even .hm-page-dot.is-active::before { inline-size: var(--hm-pd-size); block-size: var(--hm-pd-size); }
+.m-page-dot { display: inline-flex; align-items: center; justify-content: center; flex: none; padding: calc(var(--m-pd-size) / 2); border: 0; border-radius: var(--m-radius-full); background: none; color: var(--m-muted); font: inherit; font-size: var(--m-text-xs); line-height: 1.4; }
+button.m-page-dot { padding-block: var(--m-pd-size); cursor: pointer; }
+button.m-page-dot:disabled { cursor: default; opacity: .5; }
+button.m-page-dot:focus-visible { outline: 2px solid var(--m-focus); outline-offset: -1px; }
+.m-page-dots-vertical button.m-page-dot { padding: calc(var(--m-pd-size) / 2) var(--m-pd-size); }
+.m-page-dot::before { content: ""; display: block; inline-size: var(--m-pd-size); block-size: var(--m-pd-size); border-radius: var(--m-radius-full); background: var(--m-border-strong);
+  transition: inline-size var(--m-dur-slow) var(--m-ease-out), block-size var(--m-dur-slow) var(--m-ease-out), background-color var(--m-dur) var(--m-ease); }
+button.m-page-dot:hover:not(:disabled)::before { background: var(--m-muted); }
+.m-page-dot.is-active::before, button.m-page-dot.is-active:hover::before { inline-size: var(--m-pd-long); background: var(--m-accent, var(--m-primary)); }
+.m-page-dots-vertical .m-page-dot.is-active::before { inline-size: var(--m-pd-size); block-size: var(--m-pd-long); }
+.m-page-dots-even .m-page-dot.is-active::before { inline-size: var(--m-pd-size); block-size: var(--m-pd-size); }
 /* own dot content (dot={(i, active) => …}): the dot takes the size of what you draw */
-.hm-page-dot.is-own::before { content: none; }
-.hm-page-dot.is-own { min-inline-size: 1.5rem; padding: .125rem .375rem; }
-.hm-page-dot.is-own.is-active { color: var(--hm-accent-text, var(--hm-primary-text)); font-weight: var(--hm-weight-semibold); }
-@media (prefers-reduced-motion: reduce) { .hm-page-dot::before { transition: none; } }
+.m-page-dot.is-own::before { content: none; }
+.m-page-dot.is-own { min-inline-size: 1.5rem; padding: .125rem .375rem; }
+.m-page-dot.is-own.is-active { color: var(--m-accent-text, var(--m-primary-text)); font-weight: var(--m-weight-semibold); }
+@media (prefers-reduced-motion: reduce) { .m-page-dot::before { transition: none; } }

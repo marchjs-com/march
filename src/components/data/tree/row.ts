@@ -9,7 +9,7 @@ import { moveCursor } from "../../../behaviors/list-nav/index.ts";
 
 /** Parts of a tree row. Everything else in `attrs` goes to the ListRow (class, role, aria-*, data-*, listeners, active, selected, disabled). */
 export interface TreeRowParts {
-  /** Class prefix of the host ("hm-tree", "hm-tv"): the row is `<prefix>-row`, the arrow `<prefix>-chev`, the meta `<prefix>-meta`. */
+  /** Class prefix of the host ("m-tree", "m-tv"): the row is `<prefix>-row`, the arrow `<prefix>-chev`, the meta `<prefix>-meta`. */
   prefix: string;
   /** The arrow: `false` none, a function: the host's own arrow (drawn for the state it is given; it does not turn), else the default Chevron. */
   chevron?: boolean | (() => unknown) | undefined;
@@ -33,7 +33,7 @@ export interface TreeRowParts {
   meta?: unknown;
 }
 
-/** One tree row: `treeRow({ prefix: "hm-tree", kids, open, icon, label, meta }, { tabindex: "-1", onClick })`. */
+/** One tree row: `treeRow({ prefix: "m-tree", kids, open, icon, label, meta }, { tabindex: "-1", onClick })`. */
 export function treeRow(p: TreeRowParts, attrs: Record<string, unknown> = {}): Element {
   const own = typeof p.chevron === "function";
   const arrow = p.chevron === false ? null : h(Chevron, {

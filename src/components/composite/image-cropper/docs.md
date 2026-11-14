@@ -30,7 +30,7 @@ const blob = await cropper.toBlob("image/webp", 0.9, 512)
 | `size` | boolean | `true` | the "640 × 480 px" caption under the preview |
 | `labels` | `{ cropper, area, role, hint, free, aspect, rotateLeft, rotateRight, mirror, reset, zoom, angle, result }` | — | own texts (each falls back to the built-in one) |
 | `readonly`, `disabled` | | | |
-| `class` | class value | — | on the root (`hm-crop`) |
+| `class` | class value | — | on the root (`m-crop`) |
 
 ```tsx
 <ImageCropper src={url} aspect={1} grid={false} hint={false} tools={["mirror", "reset"]} sliders={["zoom"]}

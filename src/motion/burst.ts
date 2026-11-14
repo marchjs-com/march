@@ -21,17 +21,17 @@ export interface BurstOptions {
 export function heartBurst(host: HTMLElement, o: BurstOptions = {}): void {
   if (reducedMotion()) return;
   const n = o.count ?? 10, r = o.radius ?? 26;
-  const layer = h("span", { class: "hm-burst", "aria-hidden": "true" }) as HTMLElement;
+  const layer = h("span", { class: "m-burst", "aria-hidden": "true" }) as HTMLElement;
   host.append(layer);
   const runs: Promise<void>[] = [];
   if (o.ring !== false) {
-    const ring = h("span", { class: "hm-burst-ring" }) as HTMLElement;
+    const ring = h("span", { class: "m-burst-ring" }) as HTMLElement;
     layer.append(ring);
     runs.push(animate(ring, [{ transform: "scale(.2)", opacity: 0.9 }, { transform: "scale(1.6)", opacity: 0 }], { duration: 520, easing: "easeOutCubic", fill: "forwards" }).finished);
   }
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2 - Math.PI / 2 + (i % 2 ? 0.2 : 0), d = r * (i % 2 ? 0.75 : 1);
-    const dot = h("span", { class: cx("hm-burst-dot", o.colors !== "single" && `hm-burst-c${(i % 4) + 1}`, i % 2 && "hm-burst-sm") }) as HTMLElement;
+    const dot = h("span", { class: cx("m-burst-dot", o.colors !== "single" && `m-burst-c${(i % 4) + 1}`, i % 2 && "m-burst-sm") }) as HTMLElement;
     layer.append(dot);
     const x = Math.round(Math.cos(a) * d), y = Math.round(Math.sin(a) * d);
     runs.push(animate(dot, [

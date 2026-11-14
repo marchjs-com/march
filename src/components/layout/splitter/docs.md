@@ -20,7 +20,7 @@ Home / End for the limits and Enter to go back to the initial share. Each pane k
 | `label` | string | "Resize" | accessible name of the handle |
 | `handle` | boolean / node | `true` | `false`: fixed panes with a plain divider; a node: your own grip drawn on the line |
 | `color` | color token | accent | colour of the handle while hovered, focused or dragged |
-| `class` | class | — | added to the root (`.hm-splitter`); parts: `.hm-split-pane`, `.hm-split-handle`, `.hm-split-grip` |
+| `class` | class | — | added to the root (`.m-splitter`); parts: `.m-split-pane`, `.m-split-handle`, `.m-split-grip` |
 
 ```tsx
 <Splitter start={<A />} end={<B />} handle={<Icon of={moreVertical} />} color="brand-orange" />

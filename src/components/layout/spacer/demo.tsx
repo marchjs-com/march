@@ -6,7 +6,7 @@ export const code = `<div class="topbar"><strong>HADİ</strong><Spacer /><button
 
 export default function SpacerDemo(props: { values: { spacer: boolean } }) {
   return <div class="sc-spacer-bar">
-    <strong>HADİ</strong><span class="hm-muted">Taslak</span>
+    <strong>HADİ</strong><span class="m-muted">Taslak</span>
     {() => (props.values.spacer ? <Spacer /> : null)}
     <Button size="sm">Paylaş</Button>
     <Button size="sm" variant="primary">Yayınla</Button>

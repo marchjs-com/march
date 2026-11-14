@@ -1,3 +1,3 @@
 /* March — Select. Imported by its component module; tokens.css provides the variables (shared text-control rules: ui/field.css). */
-.hm-select-field:has(> option:checked[value=""]) { color: var(--hm-faint); }
-.hm-select-field > option { color: var(--hm-text); }
+.m-select-field:has(> option:checked[value=""]) { color: var(--m-faint); }
+.m-select-field > option { color: var(--m-text); }

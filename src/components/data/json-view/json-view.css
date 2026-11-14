@@ -1,9 +1,9 @@
 /* March — JsonView. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-json { font: var(--hm-text-sm)/1.6 var(--hm-font-mono); overflow: auto; }
-.hm-json-list { list-style: none; margin: 0; padding-inline-start: 1.25rem; }
-.hm-json-root { padding: 0; }
-.hm-json-toggle { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: start; }
-.hm-json-toggle > .hm-chevron { color: var(--hm-muted); vertical-align: middle; }
-.hm-json-key { color: var(--hm-primary-text); } .hm-json-string { color: var(--hm-success-text); } .hm-json-number, .hm-json-bigint { color: var(--hm-info-text); }
-.hm-json-boolean { color: var(--hm-warn-text); } .hm-json-null, .hm-json-undefined, .hm-json-more, .hm-json-punct { color: var(--hm-muted); }
-.hm-json-arrow.hm-chevron { inline-size: auto; min-inline-size: 1em; block-size: auto; }
+.m-json { font: var(--m-text-sm)/1.6 var(--m-font-mono); overflow: auto; }
+.m-json-list { list-style: none; margin: 0; padding-inline-start: 1.25rem; }
+.m-json-root { padding: 0; }
+.m-json-toggle { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: start; }
+.m-json-toggle > .m-chevron { color: var(--m-muted); vertical-align: middle; }
+.m-json-key { color: var(--m-primary-text); } .m-json-string { color: var(--m-success-text); } .m-json-number, .m-json-bigint { color: var(--m-info-text); }
+.m-json-boolean { color: var(--m-warn-text); } .m-json-null, .m-json-undefined, .m-json-more, .m-json-punct { color: var(--m-muted); }
+.m-json-arrow.m-chevron { inline-size: auto; min-inline-size: 1em; block-size: auto; }

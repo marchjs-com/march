@@ -10,7 +10,7 @@ const mount = (props) => { const el = document.createElement("div"); document.bo
 
 test("Testimonials grid: figure / blockquote / cite per item", () => {
   const { el, dispose } = mount({ items, variant: "grid" });
-  const figs = el.querySelectorAll("figure.hm-tm-card");
+  const figs = el.querySelectorAll("figure.m-tm-card");
   assert.equal(figs.length, 8);
   assert.equal(figs[0].querySelector("blockquote p").textContent, "Q0");
   assert.equal(figs[0].querySelector("cite").textContent, "N0");
@@ -19,35 +19,35 @@ test("Testimonials grid: figure / blockquote / cite per item", () => {
 
 test("Testimonials wall: Show more toggles aria-expanded; marquee copies are hidden", () => {
   const a = mount({ items, variant: "wall" });
-  const btn = a.el.querySelector(".hm-tm-more button");
+  const btn = a.el.querySelector(".m-tm-more button");
   assert.equal(btn.getAttribute("aria-expanded"), "false");
   btn.click();
   assert.equal(btn.getAttribute("aria-expanded"), "true");
-  assert.ok(!a.el.querySelector(".hm-tm-list").className.includes("is-closed"));
+  assert.ok(!a.el.querySelector(".m-tm-list").className.includes("is-closed"));
   a.dispose();
   const b = mount({ items, variant: "marquee" });
-  assert.equal(b.el.querySelectorAll(".hm-marquee").length, 2);
-  assert.ok(b.el.querySelector('.hm-marquee-unit[aria-hidden="true"] figure'));
+  assert.equal(b.el.querySelectorAll(".m-marquee").length, 2);
+  assert.ok(b.el.querySelector('.m-marquee-unit[aria-hidden="true"] figure'));
   b.dispose();
 });
 
 test("Testimonials: parts off, own texts, star colour, open wall, no entrance", () => {
   const a = mount({ items, variant: "grid", rating: false, avatar: false, quotes: false, reveal: false });
-  assert.equal(a.el.querySelector(".hm-tm-rating"), null);
-  assert.equal(a.el.querySelector(".hm-avatar"), null);
-  assert.ok(a.el.querySelector(".hm-tm").classList.contains("hm-tm-plain"));
-  assert.ok(!a.el.querySelector(".hm-tm-list").classList.contains("hm-reveal"));
+  assert.equal(a.el.querySelector(".m-tm-rating"), null);
+  assert.equal(a.el.querySelector(".m-avatar"), null);
+  assert.ok(a.el.querySelector(".m-tm").classList.contains("m-tm-plain"));
+  assert.ok(!a.el.querySelector(".m-tm-list").classList.contains("m-reveal"));
   a.dispose();
   const b = mount({ items, variant: "wall", ratingColor: "brand-gold", labels: { more: "More stories", less: "Fold", rating: (n) => `${n} stars` } });
-  const btn = b.el.querySelector(".hm-tm-more button");
+  const btn = b.el.querySelector(".m-tm-more button");
   assert.equal(btn.textContent, "More stories");
   btn.click();
   assert.equal(btn.textContent, "Fold");
-  assert.equal(b.el.querySelector(".hm-tm-rating").getAttribute("data-hm-color"), "brand-gold");
-  assert.ok(b.el.querySelector(".hm-tm-rating").outerHTML.includes("5 stars"));
+  assert.equal(b.el.querySelector(".m-tm-rating").getAttribute("data-m-color"), "brand-gold");
+  assert.ok(b.el.querySelector(".m-tm-rating").outerHTML.includes("5 stars"));
   b.dispose();
   const c = mount({ items, variant: "wall", more: false });
-  assert.equal(c.el.querySelector(".hm-tm-more"), null);
-  assert.ok(!c.el.querySelector(".hm-tm-list").className.includes("is-closed"));
+  assert.equal(c.el.querySelector(".m-tm-more"), null);
+  assert.ok(!c.el.querySelector(".m-tm-list").className.includes("is-closed"));
   c.dispose();
 });

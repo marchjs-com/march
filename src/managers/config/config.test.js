@@ -36,9 +36,9 @@ test("validate() reports problems; a failing load rejects and keeps the old laye
   assert.equal(c.get("retries"), 9);
 });
 
-test("environment from <meta name=hm-config>", () => {
+test("environment from <meta name=m-config>", () => {
   const m = document.createElement("meta");
-  m.setAttribute("name", "hm-config"); m.setAttribute("content", '{"feature":{"beta":true}}');
+  m.setAttribute("name", "m-config"); m.setAttribute("content", '{"feature":{"beta":true}}');
   document.head.appendChild(m);
   configureAppConfig({ defaults: {}, env: null, validate: null });
   assert.equal(appConfig().get("feature.beta"), true);

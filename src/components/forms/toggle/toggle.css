@@ -1,13 +1,13 @@
 /* March — Toggle (switch). Imported by its component module; tokens.css provides the variables. The thumb slides
    toward the inline end, so it mirrors in RTL. */
-.hm-switch-wrap { display: inline-flex; align-items: center; gap: var(--hm-space-2); cursor: pointer; }
-.hm-switch { position: relative; width: 2.25rem; height: 1.25rem; padding: 0; border: 0; border-radius: 1rem; background: var(--hm-border-strong); cursor: pointer; transition: background-color var(--hm-dur-slow) var(--hm-ease); flex: none; box-shadow: var(--hm-shadow-inset); }
-.hm-switch[aria-checked="true"] { background: var(--hm-accent, var(--hm-primary)); }
-.hm-switch-thumb { position: absolute; inset-block-start: .125rem; inset-inline-start: .125rem; width: 1rem; height: 1rem; border-radius: 50%; background: var(--hm-on-scrim); box-shadow: var(--hm-shadow-2); transition: transform var(--hm-dur-slow) var(--hm-ease-spring); }
-.hm-switch[aria-checked="true"] .hm-switch-thumb { transform: translateX(1rem); }
-.hm-switch[aria-checked="true"]:dir(rtl) .hm-switch-thumb { transform: translateX(-1rem); }
-.hm-switch:disabled { opacity: .5; cursor: not-allowed; }
-.hm-switch-wrap:has(.hm-switch:disabled) { cursor: not-allowed; }
-.hm-switch:disabled + .hm-check-label { color: var(--hm-muted); }
-.hm-switch:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-focus)); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .hm-switch, .hm-switch-thumb { transition: none; } }
+.m-switch-wrap { display: inline-flex; align-items: center; gap: var(--m-space-2); cursor: pointer; }
+.m-switch { position: relative; width: 2.25rem; height: 1.25rem; padding: 0; border: 0; border-radius: 1rem; background: var(--m-border-strong); cursor: pointer; transition: background-color var(--m-dur-slow) var(--m-ease); flex: none; box-shadow: var(--m-shadow-inset); }
+.m-switch[aria-checked="true"] { background: var(--m-accent, var(--m-primary)); }
+.m-switch-thumb { position: absolute; inset-block-start: .125rem; inset-inline-start: .125rem; width: 1rem; height: 1rem; border-radius: 50%; background: var(--m-on-scrim); box-shadow: var(--m-shadow-2); transition: transform var(--m-dur-slow) var(--m-ease-spring); }
+.m-switch[aria-checked="true"] .m-switch-thumb { transform: translateX(1rem); }
+.m-switch[aria-checked="true"]:dir(rtl) .m-switch-thumb { transform: translateX(-1rem); }
+.m-switch:disabled { opacity: .5; cursor: not-allowed; }
+.m-switch-wrap:has(.m-switch:disabled) { cursor: not-allowed; }
+.m-switch:disabled + .m-check-label { color: var(--m-muted); }
+.m-switch:focus-visible { outline: 2px solid var(--m-accent, var(--m-focus)); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .m-switch, .m-switch-thumb { transition: none; } }

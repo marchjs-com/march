@@ -34,7 +34,7 @@ const type = async (s) => {
     else await key(ch, `Key${ch.toUpperCase()}`, ch.toUpperCase().charCodeAt(0), ch);
   }
 };
-const state = () => ev(`(() => { const lb = document.querySelector(".hm-rte-sug[role=listbox]");
+const state = () => ev(`(() => { const lb = document.querySelector(".m-rte-sug[role=listbox]");
   return { items: lb ? [...lb.querySelectorAll("[role=option]")].map((o) => o.textContent) : null, md: ${card}.querySelector(".sc-ed-out")?.textContent ?? "" }; })()`);
 
 const fails = [];
@@ -57,7 +57,7 @@ for (const block of BLOCKS) {
   await type("selam @"); await sleep(400);
   s = await state();
   expect(s.items?.some((t) => t.includes("Deniz Kaya")), `${block}: "@" opens no people list (${JSON.stringify(s.items)})`);
-  const opt = await ev(`(() => { const o = [...document.querySelectorAll(".hm-rte-sug [role=option]")].find((x) => x.textContent.includes("Deniz Kaya")); if (!o) return null;
+  const opt = await ev(`(() => { const o = [...document.querySelectorAll(".m-rte-sug [role=option]")].find((x) => x.textContent.includes("Deniz Kaya")); if (!o) return null;
     const b = o.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; })()`);
   if (opt) await click(opt);
   await sleep(300);
@@ -73,7 +73,7 @@ for (const block of BLOCKS) {
   await click(at); await key("End", "End", 35);
   await type(" :"); await sleep(400);
   let s = await state();
-  const hint = await ev(`!!document.querySelector(".hm-rte-sug .hm-rte-sug-more")`);
+  const hint = await ev(`!!document.querySelector(".m-rte-sug .m-rte-sug-more")`);
   expect((s.items?.length ?? 0) >= 8 && hint, `lone ":": no list of the common emoji with a hint (${JSON.stringify(s.items)})`);
   await type("ro"); await sleep(400);
   s = await state();
@@ -84,14 +84,14 @@ for (const block of BLOCKS) {
     s = await state();
     expect(s.items === null, `"${word.trim()}" opens a list inside a word`);
   }
-  const btn = await ev(`(() => { const b = (${card}).querySelector(".hm-rte-tool[aria-haspopup=listbox]"); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`);
+  const btn = await ev(`(() => { const b = (${card}).querySelector(".m-rte-tool[aria-haspopup=listbox]"); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`);
   expect(!!btn, "no emoji button in the toolbar");
   if (btn) {
     await key("End", "End", 35);
     await click(btn); await sleep(400);
     s = await state();
     expect((s.items?.length ?? 0) >= 8, `the emoji button opens no list (${JSON.stringify(s.items)})`);
-    const opt = await ev(`(() => { const o = document.querySelector(".hm-rte-sug [role=option]"); if (!o) return null; const b = o.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; })()`);
+    const opt = await ev(`(() => { const o = document.querySelector(".m-rte-sug [role=option]"); if (!o) return null; const b = o.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; })()`);
     if (opt) await click(opt);
     await sleep(300);
     s = await state();

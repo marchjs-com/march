@@ -15,7 +15,7 @@ export default function SkeletonDemo(props: { values: { mode: string; lines: num
     {() => {
       const v = props.values
       const colors = v.colors === "theme" ? undefined : (v.colors as "brand")
-      if (!$loading) return <div class="sc-skel-real"><strong>HADİ</strong><p class="hm-muted">Veri geldi; iskelet aynı düzenin yerini aldı ve hiçbir şey zıplamadı.</p></div>
+      if (!$loading) return <div class="sc-skel-real"><strong>HADİ</strong><p class="m-muted">Veri geldi; iskelet aynı düzenin yerini aldı ve hiçbir şey zıplamadı.</p></div>
       const shimmer = v.shimmer, shortLast = v.shortLast
       if (v.mode === "lines") return <Skeleton lines={v.lines} colors={colors} shimmer={shimmer} shortLast={shortLast} />
       if (v.mode === "profile") return <div class="sc-row"><Skeleton shape="circle" height={v.height as "md"} colors={colors} shimmer={shimmer} /><div class="sc-grow"><Skeleton lines={v.lines} colors={colors} shimmer={shimmer} shortLast={shortLast} /></div></div>

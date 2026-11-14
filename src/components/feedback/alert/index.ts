@@ -51,16 +51,16 @@ export function Alert(props: AlertProps): () => unknown {
   return () => shown() && untrack(() => {
     const tone = val(props.tone) ?? "info";
     const below = props.actionPlacement === "below";
-    const actions = props.action != null && h("div", { class: cx("hm-alert-action", below && "hm-alert-action-below") }, actionsOf(() => props.action));
+    const actions = props.action != null && h("div", { class: cx("m-alert-action", below && "m-alert-action-below") }, actionsOf(() => props.action));
     const part = props.partClass ?? {};
-    return h("div", { class: () => cx("hm-alert", `hm-alert-${val(props.tone) ?? "info"}`, props.variant === "raised" && "hm-alert-raised", val(props.class)), role: props.role ?? (tone === "danger" || tone === "warn" ? "alert" : "status"), "data-hm-color": () => colorAttr(props.color) },
-      icon(props.icon === undefined ? toneIcon(tone) : props.icon, cx("hm-alert-icon", part.icon)),
-      h("div", { class: "hm-alert-main" },
-        props.title != null && h("strong", { class: "hm-alert-title" }, () => val(props.title)),
-        h("div", { class: cx("hm-alert-body", part.body) }, props.body ?? props.children),
+    return h("div", { class: () => cx("m-alert", `m-alert-${val(props.tone) ?? "info"}`, props.variant === "raised" && "m-alert-raised", val(props.class)), role: props.role ?? (tone === "danger" || tone === "warn" ? "alert" : "status"), "data-m-color": () => colorAttr(props.color) },
+      icon(props.icon === undefined ? toneIcon(tone) : props.icon, cx("m-alert-icon", part.icon)),
+      h("div", { class: "m-alert-main" },
+        props.title != null && h("strong", { class: "m-alert-title" }, () => val(props.title)),
+        h("div", { class: cx("m-alert-body", part.body) }, props.body ?? props.children),
         below && actions),
       !below && actions,
-      props.dismissable && h(IconButton, { size: "sm", class: cx("hm-alert-x", part.dismiss), title: false, label: () => val(props.dismissLabel) ?? t`Dismiss`, onClick: () => { shown.set(false); props.onDismiss?.(); }, icon: ownIcon(props.dismissIcon, xIcon, "hm-alert-x-icon") }));
+      props.dismissable && h(IconButton, { size: "sm", class: cx("m-alert-x", part.dismiss), title: false, label: () => val(props.dismissLabel) ?? t`Dismiss`, onClick: () => { shown.set(false); props.onDismiss?.(); }, icon: ownIcon(props.dismissIcon, xIcon, "m-alert-x-icon") }));
   });
 }
 /** Alias of Alert. */

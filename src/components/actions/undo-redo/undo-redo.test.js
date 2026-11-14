@@ -15,10 +15,10 @@ test("UndoRedo: follows an undo stack, names the step and the shortcut", async (
   const history = undoHistory();
   let n = 0;
   const [el, dispose] = mount(() => h(UndoRedo, { history }));
-  const g = el.querySelector(".hm-undo-redo");
+  const g = el.querySelector(".m-undo-redo");
   assert.equal(g.getAttribute("role"), "group");
   assert.equal(g.getAttribute("aria-label"), "History");
-  const [undo, redo] = g.querySelectorAll("button.hm-icon-btn");
+  const [undo, redo] = g.querySelectorAll("button.m-icon-btn");
   assert.equal(undo.disabled, true);
   assert.equal(redo.disabled, true);
   assert.equal(undo.getAttribute("aria-label"), "Undo");
@@ -62,7 +62,7 @@ test("UndoRedo: four props, subset, own names / icons / steps, no shortcut, disa
 test("UndoRedo: partClass adds the host's class to a button", () => {
   const host = document.createElement("div"); document.body.appendChild(host);
   const dispose = render(() => h(UndoRedo, { canUndo: true, canRedo: false, partClass: { undo: "my-undo" } }), host);
-  assert.ok(host.querySelector(".hm-undo-redo-undo.my-undo"));
-  assert.equal(host.querySelector(".hm-undo-redo-redo").className.includes("my-"), false);
+  assert.ok(host.querySelector(".m-undo-redo-undo.my-undo"));
+  assert.equal(host.querySelector(".m-undo-redo-redo").className.includes("my-"), false);
   dispose();
 });

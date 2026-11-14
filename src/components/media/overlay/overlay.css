@@ -1,36 +1,36 @@
 /* March — Overlay. The host gets position + isolation; overlays are absolutely placed by CSS variables and never take
    pointer input (clicks reach the content underneath). Effects are CSS only and themed. */
-.hm-ov-host { position: relative; isolation: isolate; }
-.hm-ov { position: absolute; z-index: var(--hm-ov-z, -1); inset-block-start: var(--hm-ov-top, 0); inset-block-end: var(--hm-ov-bottom, 0);
-  inset-inline-start: var(--hm-ov-start, 0); inset-inline-end: var(--hm-ov-end, 0); overflow: hidden; border-radius: inherit;
-  opacity: var(--hm-ov-opacity, 1); mix-blend-mode: var(--hm-ov-blend, normal); pointer-events: none; user-select: none; -webkit-user-select: none; }
+.m-ov-host { position: relative; isolation: isolate; }
+.m-ov { position: absolute; z-index: var(--m-ov-z, -1); inset-block-start: var(--m-ov-top, 0); inset-block-end: var(--m-ov-bottom, 0);
+  inset-inline-start: var(--m-ov-start, 0); inset-inline-end: var(--m-ov-end, 0); overflow: hidden; border-radius: inherit;
+  opacity: var(--m-ov-opacity, 1); mix-blend-mode: var(--m-ov-blend, normal); pointer-events: none; user-select: none; -webkit-user-select: none; }
 /* physical sides on request: the inset shorthand is top right bottom left */
-.hm-ov-physical { inset: var(--hm-ov-top, 0) var(--hm-ov-right, 0) var(--hm-ov-bottom, 0) var(--hm-ov-left, 0); }
-.hm-ov * { pointer-events: none !important; }
-.hm-ov.is-interactive, .hm-ov.is-interactive * { pointer-events: auto !important; }
-.hm-ov-media { display: block; width: 100%; height: 100%; object-fit: var(--hm-ov-fit, cover); object-position: var(--hm-ov-pos, center); }
-.hm-ov-video .hm-ov-poster { position: absolute; inset: 0; }
+.m-ov-physical { inset: var(--m-ov-top, 0) var(--m-ov-right, 0) var(--m-ov-bottom, 0) var(--m-ov-left, 0); }
+.m-ov * { pointer-events: none !important; }
+.m-ov.is-interactive, .m-ov.is-interactive * { pointer-events: auto !important; }
+.m-ov-media { display: block; width: 100%; height: 100%; object-fit: var(--m-ov-fit, cover); object-position: var(--m-ov-pos, center); }
+.m-ov-video .m-ov-poster { position: absolute; inset: 0; }
 /* color prop: the layer's own variable, so an accent set by an ancestor never recolours an overlay */
-.hm-ov[data-hm-color] { --hm-ov-color: var(--hm-accent); }
-.hm-ov-svg > svg { display: block; width: 100%; height: 100%; color: var(--hm-ov-color, var(--hm-primary)); }
+.m-ov[data-m-color] { --m-ov-color: var(--m-accent); }
+.m-ov-svg > svg { display: block; width: 100%; height: 100%; color: var(--m-ov-color, var(--m-primary)); }
 
 /* effects */
-.hm-ov-fx-glass { background: color-mix(in srgb, var(--hm-surface) 38%, transparent); -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--hm-on-scrim) 45%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--hm-on-scrim) 18%, transparent); }
-.hm-ov-fx-glass::after { content: ""; position: absolute; inset: 0; opacity: .5;
-  background-image: radial-gradient(color-mix(in srgb, var(--hm-on-scrim) 6%, transparent) 1px, transparent 1px), radial-gradient(color-mix(in srgb, var(--hm-scrim) 5%, transparent) 1px, transparent 1px); background-size: 3px 3px, 5px 5px; background-position: 0 0, 1px 2px; }
-.hm-ov-fx-gradient { background: var(--hm-brand-gradient, linear-gradient(120deg, var(--hm-cat-1), var(--hm-cat-2), var(--hm-cat-3), var(--hm-cat-4))); }
-.hm-ov-fx-mesh { background:
-  radial-gradient(at 12% 18%, color-mix(in srgb, var(--hm-cat-1) 70%, transparent) 0, transparent 52%),
-  radial-gradient(at 88% 12%, color-mix(in srgb, var(--hm-cat-2) 65%, transparent) 0, transparent 50%),
-  radial-gradient(at 80% 88%, color-mix(in srgb, var(--hm-cat-3) 60%, transparent) 0, transparent 52%),
-  radial-gradient(at 18% 90%, color-mix(in srgb, var(--hm-cat-4) 60%, transparent) 0, transparent 50%), var(--hm-surface); }
-.hm-ov-fx-noise { background-image: radial-gradient(color-mix(in srgb, var(--hm-scrim) 14%, transparent) 1px, transparent 1px), radial-gradient(color-mix(in srgb, var(--hm-on-scrim) 10%, transparent) 1px, transparent 1px); background-size: 3px 3px, 4px 4px; background-position: 0 0, 2px 1px; mix-blend-mode: var(--hm-ov-blend, overlay); }
-.hm-ov-fx-vignette { background: radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--hm-ov-color, var(--hm-scrim)) 45%, transparent) 100%); }
-.hm-ov-fx-spotlight { background: radial-gradient(420px circle at var(--hm-ov-x, 50%) var(--hm-ov-y, 40%), color-mix(in srgb, var(--hm-ov-color, var(--hm-primary)) 22%, transparent), transparent 60%); }
-.hm-ov-fx-grid { background-image: linear-gradient(var(--hm-border) 1px, transparent 1px), linear-gradient(90deg, var(--hm-border) 1px, transparent 1px); background-size: 24px 24px;
-  -webkit-mask-image: radial-gradient(ellipse at center, var(--hm-scrim) 30%, transparent 80%); mask-image: radial-gradient(ellipse at center, var(--hm-scrim) 30%, transparent 80%); }
-.hm-ov-fx-dots { background-image: radial-gradient(color-mix(in srgb, var(--hm-text) 22%, transparent) 1.2px, transparent 1.2px); background-size: 16px 16px; }
-.hm-ov-fx-dots[data-hm-color] { background-image: radial-gradient(color-mix(in srgb, var(--hm-ov-color) 60%, transparent) 1.2px, transparent 1.2px); }
-.hm-ov-fx-grid[data-hm-color] { background-image: linear-gradient(color-mix(in srgb, var(--hm-ov-color) 45%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--hm-ov-color) 45%, transparent) 1px, transparent 1px); }
-@media (prefers-reduced-motion: reduce) { .hm-ov { transition: none; } }
+.m-ov-fx-glass { background: color-mix(in srgb, var(--m-surface) 38%, transparent); -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--m-on-scrim) 45%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--m-on-scrim) 18%, transparent); }
+.m-ov-fx-glass::after { content: ""; position: absolute; inset: 0; opacity: .5;
+  background-image: radial-gradient(color-mix(in srgb, var(--m-on-scrim) 6%, transparent) 1px, transparent 1px), radial-gradient(color-mix(in srgb, var(--m-scrim) 5%, transparent) 1px, transparent 1px); background-size: 3px 3px, 5px 5px; background-position: 0 0, 1px 2px; }
+.m-ov-fx-gradient { background: var(--m-brand-gradient, linear-gradient(120deg, var(--m-cat-1), var(--m-cat-2), var(--m-cat-3), var(--m-cat-4))); }
+.m-ov-fx-mesh { background:
+  radial-gradient(at 12% 18%, color-mix(in srgb, var(--m-cat-1) 70%, transparent) 0, transparent 52%),
+  radial-gradient(at 88% 12%, color-mix(in srgb, var(--m-cat-2) 65%, transparent) 0, transparent 50%),
+  radial-gradient(at 80% 88%, color-mix(in srgb, var(--m-cat-3) 60%, transparent) 0, transparent 52%),
+  radial-gradient(at 18% 90%, color-mix(in srgb, var(--m-cat-4) 60%, transparent) 0, transparent 50%), var(--m-surface); }
+.m-ov-fx-noise { background-image: radial-gradient(color-mix(in srgb, var(--m-scrim) 14%, transparent) 1px, transparent 1px), radial-gradient(color-mix(in srgb, var(--m-on-scrim) 10%, transparent) 1px, transparent 1px); background-size: 3px 3px, 4px 4px; background-position: 0 0, 2px 1px; mix-blend-mode: var(--m-ov-blend, overlay); }
+.m-ov-fx-vignette { background: radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--m-ov-color, var(--m-scrim)) 45%, transparent) 100%); }
+.m-ov-fx-spotlight { background: radial-gradient(420px circle at var(--m-ov-x, 50%) var(--m-ov-y, 40%), color-mix(in srgb, var(--m-ov-color, var(--m-primary)) 22%, transparent), transparent 60%); }
+.m-ov-fx-grid { background-image: linear-gradient(var(--m-border) 1px, transparent 1px), linear-gradient(90deg, var(--m-border) 1px, transparent 1px); background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(ellipse at center, var(--m-scrim) 30%, transparent 80%); mask-image: radial-gradient(ellipse at center, var(--m-scrim) 30%, transparent 80%); }
+.m-ov-fx-dots { background-image: radial-gradient(color-mix(in srgb, var(--m-text) 22%, transparent) 1.2px, transparent 1.2px); background-size: 16px 16px; }
+.m-ov-fx-dots[data-m-color] { background-image: radial-gradient(color-mix(in srgb, var(--m-ov-color) 60%, transparent) 1.2px, transparent 1.2px); }
+.m-ov-fx-grid[data-m-color] { background-image: linear-gradient(color-mix(in srgb, var(--m-ov-color) 45%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--m-ov-color) 45%, transparent) 1px, transparent 1px); }
+@media (prefers-reduced-motion: reduce) { .m-ov { transition: none; } }

@@ -48,18 +48,18 @@ test("stateMorph: loading is busy and round, success sets the state for the toke
   b.textContent = "Kaydet";
   document.body.append(b);
   M.stateMorph(b, "loading").finish();
-  assert.equal(b.getAttribute("data-hm-state"), "loading");
+  assert.equal(b.getAttribute("data-m-state"), "loading");
   assert.equal(b.getAttribute("aria-busy"), "");
   assert.equal(b.style.getPropertyValue("width"), "40px");
-  assert.ok(b.querySelector(".hm-state-icon circle"), "spinner");
+  assert.ok(b.querySelector(".m-state-icon circle"), "spinner");
   assert.ok(b.querySelector("[aria-live]").textContent.length > 0, "announced");
   M.stateMorph(b, "success").finish();
-  assert.equal(b.getAttribute("data-hm-state"), "success");
+  assert.equal(b.getAttribute("data-m-state"), "success");
   assert.equal(b.hasAttribute("aria-busy"), false);
-  assert.ok(b.querySelector(".hm-state-icon path"), "check");
+  assert.ok(b.querySelector(".m-state-icon path"), "check");
   M.stateMorph(b, "idle").finish();
-  assert.equal(b.hasAttribute("data-hm-state"), false);
-  assert.equal(b.querySelector(".hm-state-icon").children.length, 0);
+  assert.equal(b.hasAttribute("data-m-state"), false);
+  assert.equal(b.querySelector(".m-state-icon").children.length, 0);
   b.remove();
 });
 
@@ -87,19 +87,19 @@ test("ripple: an element made before it is in the document (static position) sti
 
 test("stateMorph: 3 success and 3 error rounds with changing options; after each the button is exactly as it was", () => {
   const b = document.createElement("button");
-  b.className = "hm-btn hm-btn-primary";
+  b.className = "m-btn m-btn-primary";
   b.textContent = "Değişiklikleri kaydet";
   // the box follows the inline width (natural width 160)
   b.getBoundingClientRect = () => { const w = parseFloat(b.style.getPropertyValue("width")) || 160; return { left: 0, top: 0, width: w, height: 40, right: w, bottom: 40 }; };
   document.body.append(b);
-  const snap = () => ({ style: b.getAttribute("style"), cls: b.className, text: b.firstChild.textContent, state: b.getAttribute("data-hm-state"), busy: b.hasAttribute("aria-busy"), disabled: b.hasAttribute("aria-disabled"), width: b.getBoundingClientRect().width, icon: b.querySelector(".hm-state-icon")?.children.length ?? 0, live: b.querySelector("[aria-live]")?.textContent ?? "" });
+  const snap = () => ({ style: b.getAttribute("style"), cls: b.className, text: b.firstChild.textContent, state: b.getAttribute("data-m-state"), busy: b.hasAttribute("aria-busy"), disabled: b.hasAttribute("aria-disabled"), width: b.getBoundingClientRect().width, icon: b.querySelector(".m-state-icon")?.children.length ?? 0, live: b.querySelector("[aria-live]")?.textContent ?? "" });
   const first = snap();
   const rounds = [["success", { duration: 300 }], ["error", { duration: 500 }], ["success", { duration: 200, labels: { success: "Kaydedildi" } }], ["error", {}], ["success", { duration: 600 }], ["error", { duration: 250 }]];
   for (const [result, o] of rounds) {
     M.stateMorph(b, "loading", o).finish();
     assert.equal(b.getBoundingClientRect().width, 40, "loading: a circle");
     const r = M.stateMorph(b, result, o); r.finish();
-    assert.equal(b.getAttribute("data-hm-state"), result);
+    assert.equal(b.getAttribute("data-m-state"), result);
     M.stateMorph(b, "idle", o).finish();
     assert.deepEqual(snap(), first, `after a ${result} round the button is as it was`);
   }

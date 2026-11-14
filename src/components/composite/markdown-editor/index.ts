@@ -69,7 +69,7 @@ const RichView = lazy(() => import("../rich-text-editor/index.ts").then((m) => (
 /** Markdown editor: `<MarkdownEditor bind:value={$md} view="split" />`. */
 export function MarkdownEditor(props: MarkdownEditorProps): unknown {
   const [get, set] = model(props, "");
-  const id = uid("hm-mde");
+  const id = uid("m-mde");
   const views = (): readonly MarkdownView[] => props.views?.length ? props.views : ["write", "preview", "split", "rich"];
   const first = untrack(() => props.view ?? (props.preview === "split" ? "split" : views()[0] ?? "write"));
   const view = signal<MarkdownView>(views().includes(first) ? first : views()[0] ?? "write");
@@ -81,7 +81,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
   const LABEL: Record<MarkdownView, () => string> = { write: () => L().write ?? t`Write`, preview: () => L().preview ?? t`Preview`, split: () => L().split ?? t`Split`, rich: () => L().rich ?? t`Rich text` };
 
   const area = h("textarea", {
-    ...c, class: "hm-input hm-mde-source", rows: () => props.rows ?? 10, placeholder: () => props.placeholder ?? null, spellcheck: "true",
+    ...c, class: "m-input m-mde-source", rows: () => props.rows ?? 10, placeholder: () => props.placeholder ?? null, spellcheck: "true",
     readonly: () => !!props.readonly, "aria-multiline": "true", "aria-label": () => c["aria-label"]() ?? L().source ?? t`Markdown source`,
     onInput: (e: Event) => set((e.target as HTMLTextAreaElement).value),
     onKeyDown: (e: KeyboardEvent) => keydown(e),
@@ -91,7 +91,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
   syncValue(area, get);
 
   const preview = h("div", {
-    id: `${id}-preview`, class: "hm-markdown hm-mde-preview", role: "region", tabindex: "0", "aria-label": () => L().preview ?? t`Preview`,
+    id: `${id}-preview`, class: "m-markdown m-mde-preview", role: "region", tabindex: "0", "aria-label": () => L().preview ?? t`Preview`,
     onScroll: () => sync(preview, area),
   }, () => markdownNodes(get())) as HTMLElement;
 
@@ -163,11 +163,11 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
 
   // the view switcher: the pill tab strip
   const tabs = () => (views().length < 2 ? null : h(TabList, {
-    variant: "pill", class: "hm-mde-views", label: () => L().view ?? t`Editor view`, value: view, controls: `${id}-body`, tabId: (v: string) => `${id}-tab-${v}`,
-    tabs: views().map((v) => ({ id: v, label: LABEL[v] })), tabProps: () => ({ class: "hm-mde-view" }), onSelect: (v: string) => view.set(v as MarkdownView),
+    variant: "pill", class: "m-mde-views", label: () => L().view ?? t`Editor view`, value: view, controls: `${id}-body`, tabId: (v: string) => `${id}-tab-${v}`,
+    tabs: views().map((v) => ({ id: v, label: LABEL[v] })), tabProps: () => ({ class: "m-mde-view" }), onSelect: (v: string) => view.set(v as MarkdownView),
   }));
   const toolbar = () => (props.toolbar === false || view() === "preview" || view() === "rich" ? null : h(FormatToolbar<MarkdownTool>, {
-    tools: Array.isArray(props.toolbar) ? props.toolbar as readonly (MarkdownTool | "|")[] : TOOLS, prefix: "hm-mde", label: () => L().formatting,
+    tools: Array.isArray(props.toolbar) ? props.toolbar as readonly (MarkdownTool | "|")[] : TOOLS, prefix: "m-mde", label: () => L().formatting,
     name: (tool: MarkdownTool) => L().tools?.[tool], icons: props.icons, disabled: ro, onTool: exec,
   }));
   const body = () => {
@@ -175,17 +175,17 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
     return untrack(() => {
       if (v === "write") return area;
       if (v === "preview") return preview;
-      if (v === "split") return h(Splitter, { start: area, end: preview, initial: props.split ?? 0.5, min: 0.2, label: L().resize ?? t`Resize the panes`, class: "hm-mde-split" });
+      if (v === "split") return h(Splitter, { start: area, end: preview, initial: props.split ?? 0.5, min: 0.2, label: L().resize ?? t`Resize the panes`, class: "m-mde-split" });
       return h(RichView, { value: get(), onChange: (x: string) => set(x), readonly: live(() => props.readonly), disabled: live(() => props.disabled), rows: props.rows ?? 10, toolbar: undefined, counter: false });
     });
   };
   const counts = () => md.stats(get());
   return h(EditorFrame, {
-    class: () => cx("hm-mde", `is-${view()}`, val(props.class)), disabled: () => !!props.disabled, "data-hm-color": c["data-hm-color"],
-    head: toolbar, actions: tabs, headProps: { class: "hm-mde-head" }, showFoot: () => props.stats !== false, footProps: { divider: true, class: "hm-mde-foot" },
+    class: () => cx("m-mde", `is-${view()}`, val(props.class)), disabled: () => !!props.disabled, "data-m-color": c["data-m-color"],
+    head: toolbar, actions: tabs, headProps: { class: "m-mde-head" }, showFoot: () => props.stats !== false, footProps: { divider: true, class: "m-mde-foot" },
     foot: [
       h("span", null, () => L().words?.(counts().words) ?? t`${counts().words} words`), h("span", { "aria-hidden": "true" }, "·"), h("span", null, () => L().minutes?.(counts().minutes) ?? t`${counts().minutes} min read`),
-      () => (props.hint === false ? null : h("span", { class: "hm-mde-hint" }, () => (view() === "rich" ? "" : L().hint ?? t`Markdown: **bold**, _italic_, # heading, - list`)))],
-    children: h("div", { id: `${id}-body`, class: "hm-mde-body", role: () => (views().length > 1 ? "tabpanel" : null), "aria-labelledby": () => (views().length > 1 ? `${id}-tab-${view()}` : null) }, body),
+      () => (props.hint === false ? null : h("span", { class: "m-mde-hint" }, () => (view() === "rich" ? "" : L().hint ?? t`Markdown: **bold**, _italic_, # heading, - list`)))],
+    children: h("div", { id: `${id}-body`, class: "m-mde-body", role: () => (views().length > 1 ? "tabpanel" : null), "aria-labelledby": () => (views().length > 1 ? `${id}-tab-${view()}` : null) }, body),
   });
 }

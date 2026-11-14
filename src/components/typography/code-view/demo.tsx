@@ -15,8 +15,8 @@ export function Counter(props: { start?: number }) {
   return <button class="counter" on:click={() => { $n++ }}>Tıklama: {$n}</button>
 }`,
   css: `/* a card that never overflows its column */
-.card { display: flex; flex-direction: column; min-width: 0; padding: var(--hm-space-4); border-radius: var(--hm-radius-3); }
-.card-title { margin: 0; font-size: var(--hm-text-lg); }`,
+.card { display: flex; flex-direction: column; min-width: 0; padding: var(--m-space-4); border-radius: var(--m-radius-3); }
+.card-title { margin: 0; font-size: var(--m-text-lg); }`,
   json: `{
   "name": "hadi-panel",
   "private": true,

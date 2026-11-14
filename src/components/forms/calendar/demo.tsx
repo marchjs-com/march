@@ -27,6 +27,6 @@ export default function CalendarDemo(props: { values: { firstDay: string; window
         renderDay={busy ? (_iso: string, d: number) => (d % 4 === 0 ? <b>{`${d}•`}</b> : d) : undefined} />
       })
     }}
-    <p class="hm-muted">{() => `Seçilen: ${$day} · hafta başı: ${props.values.firstDay === "locale" ? "dilden (firstDay verilmedi)" : `firstDay={${props.values.firstDay}}`}`}</p>
+    <p class="m-muted">{() => `Seçilen: ${$day} · hafta başı: ${props.values.firstDay === "locale" ? "dilden (firstDay verilmedi)" : `firstDay={${props.values.firstDay}}`}`}</p>
   </div>
 }

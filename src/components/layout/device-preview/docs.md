@@ -5,7 +5,7 @@ bar (time, signal, battery), the home indicator, the real screen size in CSS pix
 acts like a finger: the cursor becomes a touch dot, dragging scrolls whatever is under it (with a fling that slows
 down), a long press opens the context menu, a drag never also clicks.
 
-The screen is an `OverlayScope` (drawers, dialogs and menus of the content open inside the device) and the `hm-site`
+The screen is an `OverlayScope` (drawers, dialogs and menus of the content open inside the device) and the `m-site`
 container (the website blocks answer to its width), so a site in it behaves as on the device.
 
 ```tsx
@@ -32,7 +32,7 @@ Devices: `iphone-15`, `iphone-se`, `pixel-8`, `galaxy-s24`, `ipad`, `ipad-pro` (
 | `time` | Clock text of the status bar, e.g. `"9:41"` (default: the time now). |
 | `homeIndicator` | `false` hides the home indicator line (reactive). |
 | `camera` | `false` hides the camera of the device (reactive). |
-| `class` | Class of the device (`.hm-device`); parts: `.hm-device-screen`, `.hm-device-status`, `.hm-device-viewport`, `.hm-device-camera`, `.hm-device-home`, `.hm-device-touch`. |
+| `class` | Class of the device (`.m-device`); parts: `.m-device-screen`, `.m-device-status`, `.m-device-viewport`, `.m-device-camera`, `.m-device-home`, `.m-device-touch`. |
 
 ```tsx
 <DevicePreview device="iphone-15" time="9:41" homeIndicator={false} camera={false} label="Checkout on a phone">…</DevicePreview>

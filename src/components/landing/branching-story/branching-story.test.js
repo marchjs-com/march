@@ -15,7 +15,7 @@ const P = {
   c: { title: "C", body: "end c", ending: "Short" },
   d: { title: "D", body: "end d", ending: "Long" },
 };
-const title = (el) => { const xs = [...el.querySelectorAll(".hm-bs-passage")].filter((x) => !x.classList.contains("is-leaving")); return xs[xs.length - 1].querySelector(".hm-bs-title").textContent; };
+const title = (el) => { const xs = [...el.querySelectorAll(".m-bs-passage")].filter((x) => !x.classList.contains("is-leaving")); return xs[xs.length - 1].querySelector(".m-bs-title").textContent; };
 
 test("storyEndings: every reachable passage without choices", () => {
   assert.deepEqual(storyEndings(P, "a"), ["c", "d"]);
@@ -27,18 +27,18 @@ test("BranchingStory: choose, trail rewinds, endings counted, keys pick", async 
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => h(BranchingStory, { passages: P, start: "a", onChange: (p) => seen.push(p.join(">")) }), el);
   assert.equal(title(el), "A");
-  assert.match(el.querySelector(".hm-bs-found").textContent, /0 \/ 2/);
-  const choices = () => [...el.querySelectorAll(".hm-bs-choice")].filter((b) => !b.closest(".is-leaving"));
+  assert.match(el.querySelector(".m-bs-found").textContent, /0 \/ 2/);
+  const choices = () => [...el.querySelectorAll(".m-bs-choice")].filter((b) => !b.closest(".is-leaving"));
   choices()[0].click();
   await settle();
   assert.equal(title(el), "B");
-  assert.equal(el.querySelector(".hm-bs-trail [aria-current]").textContent, "to B");
+  assert.equal(el.querySelector(".m-bs-trail [aria-current]").textContent, "to B");
   el.querySelector("section").dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "1", bubbles: true }));
   await settle();
   assert.equal(title(el), "D");
-  assert.match(el.querySelector(".hm-bs-found").textContent, /1 \/ 2/);
-  assert.match(el.querySelector(".hm-bs-end").textContent, /Start again/);
-  el.querySelector(".hm-bs-trail button").click();
+  assert.match(el.querySelector(".m-bs-found").textContent, /1 \/ 2/);
+  assert.match(el.querySelector(".m-bs-end").textContent, /Start again/);
+  el.querySelector(".m-bs-trail button").click();
   assert.equal(title(el), "A", "the first trail step rewinds to the start");
   assert.deepEqual(seen, ["a>b", "a>b>d", "a"]);
   dispose();
@@ -53,19 +53,19 @@ test("BranchingStory: own texts, no keys, own choice content, no restart", async
     labels: { path: "Trail", start: "Home", end: "Fin", endings: (n, total) => `${n}|${total}` },
     renderChoice: (c, i) => h("b", { class: "own" }, `${i}:${c.to}`),
   }), el);
-  assert.equal(el.querySelector(".hm-bs-trail").getAttribute("aria-label"), "Trail");
-  assert.equal(el.querySelector(".hm-bs-trail [aria-current]").textContent, "Home");
-  assert.equal(el.querySelector(".hm-bs-found").textContent, "0|2");
-  assert.equal(el.querySelector(".hm-bs-key"), null);
-  assert.deepEqual([...el.querySelectorAll(".hm-bs-choice .own")].map((x) => x.textContent), ["0:b", "1:c"]);
+  assert.equal(el.querySelector(".m-bs-trail").getAttribute("aria-label"), "Trail");
+  assert.equal(el.querySelector(".m-bs-trail [aria-current]").textContent, "Home");
+  assert.equal(el.querySelector(".m-bs-found").textContent, "0|2");
+  assert.equal(el.querySelector(".m-bs-key"), null);
+  assert.deepEqual([...el.querySelectorAll(".m-bs-choice .own")].map((x) => x.textContent), ["0:b", "1:c"]);
   el.querySelector("section").dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "1", bubbles: true }));
   await settle();
   assert.equal(title(el), "A", "number keys are off");
-  el.querySelectorAll(".hm-bs-choice")[1].click();
+  el.querySelectorAll(".m-bs-choice")[1].click();
   assert.equal(title(el), "Fin", "transition none: the passage changes at once");
-  assert.equal(el.querySelectorAll(".hm-bs-passage").length, 1);
-  assert.equal(el.querySelector(".hm-bs-end"), null, "no restart button, no action: no end row");
-  assert.equal(el.querySelector(".hm-bs-found").textContent, "1|2");
+  assert.equal(el.querySelectorAll(".m-bs-passage").length, 1);
+  assert.equal(el.querySelector(".m-bs-end"), null, "no restart button, no action: no end row");
+  assert.equal(el.querySelector(".m-bs-found").textContent, "1|2");
   dispose();
   manualClock(false);
 });
@@ -76,13 +76,13 @@ test("BranchingStory: ready-made and own transitions, restart text", async () =>
   for (const transition of ["slide", "fade", (side) => { sides.push(side); return { leave: { opacity: [1, 0] }, enter: { opacity: [0, 1] }, duration: 100 }; }]) {
     const el = document.createElement("div"); document.body.appendChild(el);
     const dispose = render(() => h(BranchingStory, { passages: P, start: "a", transition, labels: { restart: "Again", endingPrefix: "End: " } }), el);
-    el.querySelectorAll(".hm-bs-choice")[1].click();
+    el.querySelectorAll(".m-bs-choice")[1].click();
     await settle(); await settle();
     assert.equal(title(el), "C");
-    assert.equal(el.querySelectorAll(".hm-bs-passage").length, 1, "the old passage is gone after the transition");
-    assert.equal(el.querySelector(".hm-bs-restart").textContent, "Again");
-    assert.equal(el.querySelector(".hm-bs-ending").textContent, "End: Short");
-    el.querySelector(".hm-bs-restart").click();
+    assert.equal(el.querySelectorAll(".m-bs-passage").length, 1, "the old passage is gone after the transition");
+    assert.equal(el.querySelector(".m-bs-restart").textContent, "Again");
+    assert.equal(el.querySelector(".m-bs-ending").textContent, "End: Short");
+    el.querySelector(".m-bs-restart").click();
     await settle();
     assert.equal(title(el), "A");
     dispose();

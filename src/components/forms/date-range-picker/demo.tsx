@@ -16,6 +16,6 @@ export default function DateRangePickerDemo(props: { values: { presets: boolean;
   return <div class="sc-stack">
     {() => <Field label="Rapor dönemi" group><DateRangePicker value={$range} onChange={(v: Maybe<DateRange>) => { $range = v }} presets={props.values.presets ? undefined : false} custom={props.values.custom}
       separator={props.values.separator === "off" ? false : props.values.separator === "arrow" ? "→" : undefined} labels={{ range: "Tarih aralığı", custom: "Özel", from: "Başlangıç", to: "Bitiş" }} /></Field>}
-    <p class="hm-muted">{() => `Değer: ${$range ? `${$range.from ?? "…"} → ${$range.to ?? "…"}` : "—"}`}</p>
+    <p class="m-muted">{() => `Değer: ${$range ? `${$range.from ?? "…"} → ${$range.to ?? "…"}` : "—"}`}</p>
   </div>
 }

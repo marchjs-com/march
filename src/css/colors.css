@@ -1,28 +1,28 @@
-/* March — color tokens for components: `color="brand-blue"` renders data-hm-color="brand-blue", which sets the local
-   accent (fill, text tone, text on a fill, soft and hover tints). Components read var(--hm-accent, <default>), so the
-   value inherits: <Form color=…> or <CheckboxGroup color=…> colors every control inside. Error states keep --hm-danger. */
-[data-hm-color="primary"] { --hm-accent: var(--hm-primary); --hm-accent-text: var(--hm-primary-text); --hm-on-accent: var(--hm-on-primary-fill); }
-[data-hm-color="info"] { --hm-accent: var(--hm-info); --hm-accent-text: var(--hm-info-text); --hm-on-accent: var(--hm-on-info-fill); }
-[data-hm-color="success"] { --hm-accent: var(--hm-success); --hm-accent-text: var(--hm-success-text); --hm-on-accent: var(--hm-on-success-fill); }
-[data-hm-color="warn"] { --hm-accent: var(--hm-warn); --hm-accent-text: var(--hm-warn-text); --hm-on-accent: var(--hm-on-warn-fill); }
-[data-hm-color="danger"] { --hm-accent: var(--hm-danger); --hm-accent-text: var(--hm-danger-text); --hm-on-accent: var(--hm-on-danger-fill); }
-[data-hm-color="special"] { --hm-accent: var(--hm-special); --hm-accent-text: var(--hm-special-text); --hm-on-accent: var(--hm-on-special-fill); }
-[data-hm-color="warning"] { --hm-accent: var(--hm-warn); --hm-accent-text: var(--hm-warn-text); --hm-on-accent: var(--hm-on-warn-fill); }
-[data-hm-color="neutral"] { --hm-accent: var(--hm-text-2); --hm-accent-text: var(--hm-text); --hm-on-accent: var(--hm-surface); }
-[data-hm-color="brand-orange"] { --hm-accent: var(--hm-brand-orange, var(--hm-cat-1)); --hm-accent-text: var(--hm-brand-orange-text, var(--hm-cat-1-text)); --hm-on-accent: var(--hm-on-brand-orange, var(--hm-on-cat-1)); }
-[data-hm-color="brand-blue"] { --hm-accent: var(--hm-brand-blue, var(--hm-cat-2)); --hm-accent-text: var(--hm-brand-blue-text, var(--hm-cat-2-text)); --hm-on-accent: var(--hm-on-brand-blue, var(--hm-on-cat-2)); }
-[data-hm-color="brand-green"] { --hm-accent: var(--hm-brand-green, var(--hm-cat-3)); --hm-accent-text: var(--hm-brand-green-text, var(--hm-cat-3-text)); --hm-on-accent: var(--hm-on-brand-green, var(--hm-on-cat-3)); }
-[data-hm-color="brand-purple"] { --hm-accent: var(--hm-brand-purple, var(--hm-cat-4)); --hm-accent-text: var(--hm-brand-purple-text, var(--hm-cat-4-text)); --hm-on-accent: var(--hm-on-brand-purple, var(--hm-on-cat-4)); }
-[data-hm-color="gold"] { --hm-accent: var(--hm-brand-gold, var(--hm-cat-6)); --hm-accent-text: var(--hm-brand-gold-text, var(--hm-cat-6-text)); --hm-on-accent: var(--hm-on-brand-gold, var(--hm-on-cat-6)); }
-[data-hm-color="brand-gold"] { --hm-accent: var(--hm-brand-gold, var(--hm-cat-6)); --hm-accent-text: var(--hm-brand-gold-text, var(--hm-cat-6-text)); --hm-on-accent: var(--hm-on-brand-gold, var(--hm-on-cat-6)); }
-[data-hm-color="brand-pink"] { --hm-accent: var(--hm-brand-pink, var(--hm-cat-5)); --hm-accent-text: var(--hm-brand-pink-text, var(--hm-cat-5-text)); --hm-on-accent: var(--hm-on-brand-pink, var(--hm-on-cat-5)); }
-[data-hm-color="cat-1"] { --hm-accent: var(--hm-cat-1); --hm-accent-text: var(--hm-cat-1-text); --hm-on-accent: var(--hm-on-cat-1); }
-[data-hm-color="cat-2"] { --hm-accent: var(--hm-cat-2); --hm-accent-text: var(--hm-cat-2-text); --hm-on-accent: var(--hm-on-cat-2); }
-[data-hm-color="cat-3"] { --hm-accent: var(--hm-cat-3); --hm-accent-text: var(--hm-cat-3-text); --hm-on-accent: var(--hm-on-cat-3); }
-[data-hm-color="cat-4"] { --hm-accent: var(--hm-cat-4); --hm-accent-text: var(--hm-cat-4-text); --hm-on-accent: var(--hm-on-cat-4); }
-[data-hm-color="cat-5"] { --hm-accent: var(--hm-cat-5); --hm-accent-text: var(--hm-cat-5-text); --hm-on-accent: var(--hm-on-cat-5); }
-[data-hm-color="cat-6"] { --hm-accent: var(--hm-cat-6); --hm-accent-text: var(--hm-cat-6-text); --hm-on-accent: var(--hm-on-cat-6); }
-[data-hm-color="cat-7"] { --hm-accent: var(--hm-cat-7); --hm-accent-text: var(--hm-cat-7-text); --hm-on-accent: var(--hm-on-cat-7); }
-[data-hm-color="cat-8"] { --hm-accent: var(--hm-cat-8); --hm-accent-text: var(--hm-cat-8-text); --hm-on-accent: var(--hm-on-cat-8); }
+/* March — color tokens for components: `color="brand-blue"` renders data-m-color="brand-blue", which sets the local
+   accent (fill, text tone, text on a fill, soft and hover tints). Components read var(--m-accent, <default>), so the
+   value inherits: <Form color=…> or <CheckboxGroup color=…> colors every control inside. Error states keep --m-danger. */
+[data-m-color="primary"] { --m-accent: var(--m-primary); --m-accent-text: var(--m-primary-text); --m-on-accent: var(--m-on-primary-fill); }
+[data-m-color="info"] { --m-accent: var(--m-info); --m-accent-text: var(--m-info-text); --m-on-accent: var(--m-on-info-fill); }
+[data-m-color="success"] { --m-accent: var(--m-success); --m-accent-text: var(--m-success-text); --m-on-accent: var(--m-on-success-fill); }
+[data-m-color="warn"] { --m-accent: var(--m-warn); --m-accent-text: var(--m-warn-text); --m-on-accent: var(--m-on-warn-fill); }
+[data-m-color="danger"] { --m-accent: var(--m-danger); --m-accent-text: var(--m-danger-text); --m-on-accent: var(--m-on-danger-fill); }
+[data-m-color="special"] { --m-accent: var(--m-special); --m-accent-text: var(--m-special-text); --m-on-accent: var(--m-on-special-fill); }
+[data-m-color="warning"] { --m-accent: var(--m-warn); --m-accent-text: var(--m-warn-text); --m-on-accent: var(--m-on-warn-fill); }
+[data-m-color="neutral"] { --m-accent: var(--m-text-2); --m-accent-text: var(--m-text); --m-on-accent: var(--m-surface); }
+[data-m-color="brand-orange"] { --m-accent: var(--m-brand-orange, var(--m-cat-1)); --m-accent-text: var(--m-brand-orange-text, var(--m-cat-1-text)); --m-on-accent: var(--m-on-brand-orange, var(--m-on-cat-1)); }
+[data-m-color="brand-blue"] { --m-accent: var(--m-brand-blue, var(--m-cat-2)); --m-accent-text: var(--m-brand-blue-text, var(--m-cat-2-text)); --m-on-accent: var(--m-on-brand-blue, var(--m-on-cat-2)); }
+[data-m-color="brand-green"] { --m-accent: var(--m-brand-green, var(--m-cat-3)); --m-accent-text: var(--m-brand-green-text, var(--m-cat-3-text)); --m-on-accent: var(--m-on-brand-green, var(--m-on-cat-3)); }
+[data-m-color="brand-purple"] { --m-accent: var(--m-brand-purple, var(--m-cat-4)); --m-accent-text: var(--m-brand-purple-text, var(--m-cat-4-text)); --m-on-accent: var(--m-on-brand-purple, var(--m-on-cat-4)); }
+[data-m-color="gold"] { --m-accent: var(--m-brand-gold, var(--m-cat-6)); --m-accent-text: var(--m-brand-gold-text, var(--m-cat-6-text)); --m-on-accent: var(--m-on-brand-gold, var(--m-on-cat-6)); }
+[data-m-color="brand-gold"] { --m-accent: var(--m-brand-gold, var(--m-cat-6)); --m-accent-text: var(--m-brand-gold-text, var(--m-cat-6-text)); --m-on-accent: var(--m-on-brand-gold, var(--m-on-cat-6)); }
+[data-m-color="brand-pink"] { --m-accent: var(--m-brand-pink, var(--m-cat-5)); --m-accent-text: var(--m-brand-pink-text, var(--m-cat-5-text)); --m-on-accent: var(--m-on-brand-pink, var(--m-on-cat-5)); }
+[data-m-color="cat-1"] { --m-accent: var(--m-cat-1); --m-accent-text: var(--m-cat-1-text); --m-on-accent: var(--m-on-cat-1); }
+[data-m-color="cat-2"] { --m-accent: var(--m-cat-2); --m-accent-text: var(--m-cat-2-text); --m-on-accent: var(--m-on-cat-2); }
+[data-m-color="cat-3"] { --m-accent: var(--m-cat-3); --m-accent-text: var(--m-cat-3-text); --m-on-accent: var(--m-on-cat-3); }
+[data-m-color="cat-4"] { --m-accent: var(--m-cat-4); --m-accent-text: var(--m-cat-4-text); --m-on-accent: var(--m-on-cat-4); }
+[data-m-color="cat-5"] { --m-accent: var(--m-cat-5); --m-accent-text: var(--m-cat-5-text); --m-on-accent: var(--m-on-cat-5); }
+[data-m-color="cat-6"] { --m-accent: var(--m-cat-6); --m-accent-text: var(--m-cat-6-text); --m-on-accent: var(--m-on-cat-6); }
+[data-m-color="cat-7"] { --m-accent: var(--m-cat-7); --m-accent-text: var(--m-cat-7-text); --m-on-accent: var(--m-on-cat-7); }
+[data-m-color="cat-8"] { --m-accent: var(--m-cat-8); --m-accent-text: var(--m-cat-8-text); --m-on-accent: var(--m-on-cat-8); }
 /* tints derived where the accent is set */
-[data-hm-color] { --hm-accent-soft: color-mix(in srgb, var(--hm-accent) 12%, var(--hm-surface)); --hm-accent-soft-2: color-mix(in srgb, var(--hm-accent) 20%, var(--hm-surface)); --hm-accent-hover: color-mix(in srgb, var(--hm-accent) 86%, var(--hm-text)); }
+[data-m-color] { --m-accent-soft: color-mix(in srgb, var(--m-accent) 12%, var(--m-surface)); --m-accent-soft-2: color-mix(in srgb, var(--m-accent) 20%, var(--m-surface)); --m-accent-hover: color-mix(in srgb, var(--m-accent) 86%, var(--m-text)); }

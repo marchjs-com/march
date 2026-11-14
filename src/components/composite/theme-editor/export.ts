@@ -46,21 +46,21 @@ export function ExportPanel({ ctx }: Ctx): Element {
     pasted.set("");
   };
   const register = (): void => { registerDraft(ctx.draft.peek()); registered.set(true); };
-  return h("div", { class: "hm-te-export" },
+  return h("div", { class: "m-te-export" },
     h(Stack, { direction: "row", wrap: true },
       h(Segmented, { "aria-label": t`Output`, value: live(() => fmt()), onChange: (v: Format | null) => { if (v) fmt.set(v); }, options: [{ value: "code", label: "defineTheme" }, { value: "css", label: "CSS" }, { value: "json", label: "JSON" }] }),
       h(Button, { size: "sm", variant: "ghost", icon: download, onClick: save }, () => t`Download .${FILE[fmt()][0]}`)),
-    h(CodeView, { class: "hm-te-code", code: live(() => text()), lang: live(() => FILE[fmt()][1]), copy: true, label: () => t`Theme output` }),
-    h(Card, { class: "hm-te-box", title: t`Share link` },
-      h("p", { class: "hm-help hm-te-hint" }, t`Opens this theme in a ThemeEditor; nothing is uploaded, the theme is in the link.`),
-      h(Stack, { direction: "row", class: "hm-te-link" }, h(TextInput, { readonly: true, "aria-label": t`Share link`, value: live(() => link()) }), h(CopyButton, { text: () => link(), label: t`Copy link` }))),
-    h(Card, { class: "hm-te-box", title: t`Import` },
+    h(CodeView, { class: "m-te-code", code: live(() => text()), lang: live(() => FILE[fmt()][1]), copy: true, label: () => t`Theme output` }),
+    h(Card, { class: "m-te-box", title: t`Share link` },
+      h("p", { class: "m-help m-te-hint" }, t`Opens this theme in a ThemeEditor; nothing is uploaded, the theme is in the link.`),
+      h(Stack, { direction: "row", class: "m-te-link" }, h(TextInput, { readonly: true, "aria-label": t`Share link`, value: live(() => link()) }), h(CopyButton, { text: () => link(), label: t`Copy link` }))),
+    h(Card, { class: "m-te-box", title: t`Import` },
       h(Textarea, { rows: 4, autosize: false, "aria-label": t`Theme to import`, placeholder: t`Paste JSON, CSS or a share link`, readonly: live(() => ctx.readonly()), value: live(() => pasted()), onChange: (v: string) => { pasted.set(v); error.set(null); } }),
-      () => (error() ? h(Alert, { class: "hm-te-error", tone: "danger" }, error()) : null),
+      () => (error() ? h(Alert, { class: "m-te-error", tone: "danger" }, error()) : null),
       h(Button, { size: "sm", variant: "secondary", icon: upload, disabled: () => !pasted().trim() || ctx.readonly(), onClick: doImport }, t`Import`)),
-    h(Card, { class: "hm-te-box", title: t`Theme picker` },
-      h("p", { class: "hm-help hm-te-hint" }, t`registerThemes adds the theme to ThemePicker and ThemeMenu; here it runs from the draft, in an app from its stylesheet.`),
+    h(Card, { class: "m-te-box", title: t`Theme picker` },
+      h("p", { class: "m-help m-te-hint" }, t`registerThemes adds the theme to ThemePicker and ThemeMenu; here it runs from the draft, in an app from its stylesheet.`),
       h(Stack, { direction: "row", wrap: true },
         h(Button, { size: "sm", variant: "secondary", icon: palette, onClick: register }, () => (registered() ? t`Update in the theme picker` : t`Add to the theme picker`)),
-        () => (registered() ? h("span", { class: "hm-te-picked", "aria-live": "polite" }, h(ThemeSwatch, { id: ctx.draft().id }), t`In the picker: ${colorThemes().length} themes`) : null))));
+        () => (registered() ? h("span", { class: "m-te-picked", "aria-live": "polite" }, h(ThemeSwatch, { id: ctx.draft().id }), t`In the picker: ${colorThemes().length} themes`) : null))));
 }

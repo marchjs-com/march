@@ -27,7 +27,7 @@ export default function WindowDemo(props: { values: { chrome: string; snap: bool
         </Window>
         <Window title="Sipariş #2041" chrome={chrome} snap={snap} resizable={resizable} color={color} stripe={stripe} icons={icons} x={300} y={110} width={300} height={190}
           open={() => order()} onClose={() => order.set(false)}>
-          <div class="sc-win-pad"><p>HADİ Kahve · 2 ürün</p><p class="hm-muted">Kargoya hazırlanıyor</p></div>
+          <div class="sc-win-pad"><p>HADİ Kahve · 2 ürün</p><p class="m-muted">Kargoya hazırlanıyor</p></div>
         </Window>
       </>
     }}

@@ -31,6 +31,6 @@ export default function TreeDemo(props: { values: { open: string; icons: boolean
       return <Tree label="Dosyalar" nodes={nodes(v.icons, v.meta)} expanded={expanded} color={color}
         chevron={v.chevron === "off" ? false : v.chevron === "own" ? (_n: TreeNode, open: () => boolean) => <b>{() => (open() ? "−" : "+")}</b> : true} selected={() => $file} onSelect={(n: TreeNode) => { $file = n.id }} />
     }}
-    <p class="hm-muted">Seçili: <code>{() => $file}</code></p>
+    <p class="m-muted">Seçili: <code>{() => $file}</code></p>
   </div>
 }

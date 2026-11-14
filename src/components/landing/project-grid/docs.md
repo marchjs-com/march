@@ -31,7 +31,7 @@ transition into ProjectDetail — or, without it, shows the cover in the Lightbo
 <ProjectGrid projects={work} arrow={false} motion={false} reveal={false} filtersLabel="Filter the work" />
 ```
 
-Each cover is marked `data-hm-shared="project-<id>"`; `sharedTransition(name, fromElement, update)` (hadi-march/motion)
+Each cover is marked `data-m-shared="project-<id>"`; `sharedTransition(name, fromElement, update)` (hadi-march/motion)
 morphs it into the element with the same mark in the next view (ProjectDetail's cover), and back.
 
 ## Accessibility

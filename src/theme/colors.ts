@@ -2,7 +2,7 @@
 // theme switch keeps every component consistent. Add names with defineTheme (brand / cat colors).
 export const COLOR_TOKENS = ["primary", "info", "success", "warn", "danger", "special", "warning", "neutral", "brand-orange", "brand-blue", "brand-green", "brand-purple", "brand-gold", "brand-pink", "gold", "cat-1", "cat-2", "cat-3", "cat-4", "cat-5", "cat-6", "cat-7", "cat-8"] as const;
 export type ColorToken = (typeof COLOR_TOKENS)[number];
-/** `data-hm-color` attribute value for a `color` prop (null when unset). */
+/** `data-m-color` attribute value for a `color` prop (null when unset). */
 export const colorAttr = (c: unknown): string | null => (typeof c === "string" && c ? c : null);
 
 /** The four HADİ brand colors in their order (orange, blue, green, purple): the one list every "brand" option uses. */
@@ -10,14 +10,14 @@ export const BRAND_COLORS = ["brand-orange", "brand-blue", "brand-green", "brand
 /** The six brand colors: the four above plus pink and gold. */
 export const BRAND_COLORS_ALL = ["brand-orange", "brand-blue", "brand-green", "brand-purple", "brand-pink", "brand-gold"] as const satisfies readonly ColorToken[];
 const BRAND_CAT: Record<string, number> = { orange: 1, blue: 2, green: 3, purple: 4, pink: 5, gold: 6 };
-/** The CSS color expression of a token (theme variables only), e.g. "brand-blue" → var(--hm-brand-blue, var(--hm-cat-2)). */
+/** The CSS color expression of a token (theme variables only), e.g. "brand-blue" → var(--m-brand-blue, var(--m-cat-2)). */
 export function tokenColor(token: string): string {
-  if (token === "warning") return "var(--hm-warn)";
-  if (token === "neutral") return "var(--hm-text-2)";
-  if (token === "gold") return "var(--hm-brand-gold, var(--hm-cat-6))";
+  if (token === "warning") return "var(--m-warn)";
+  if (token === "neutral") return "var(--m-text-2)";
+  if (token === "gold") return "var(--m-brand-gold, var(--m-cat-6))";
   const b = /^brand-(\w+)$/.exec(token);
-  if (b) return `var(--hm-brand-${b[1]}${BRAND_CAT[b[1] as string] ? `, var(--hm-cat-${BRAND_CAT[b[1] as string]})` : ""})`;
-  return `var(--hm-${token})`;
+  if (b) return `var(--m-brand-${b[1]}${BRAND_CAT[b[1] as string] ? `, var(--m-cat-${BRAND_CAT[b[1] as string]})` : ""})`;
+  return `var(--m-${token})`;
 }
 /** Several colors: "brand" = the four HADİ colors (orange, blue, green, purple), or a list of tokens. */
 export type MultiColors = "single" | "brand" | readonly ColorToken[];

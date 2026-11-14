@@ -8,7 +8,7 @@ locale.set("en");
 const { Popover } = await import("./index.ts");
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
 const tick = () => new Promise((r) => setTimeout(r, 0));
-const panelOf = () => document.querySelector(".hm-popover-panel");
+const panelOf = () => document.querySelector(".m-popover-panel");
 const press = (el) => el.dispatchEvent(new Event("pointerdown", { bubbles: true }));
 const esc = (el) => { const e = new Event("keydown", { bubbles: true, cancelable: true }); Object.assign(e, { key: "Escape" }); el.dispatchEvent(e); return e; };
 
@@ -16,14 +16,14 @@ test("Popover: the trigger opens and closes it; ARIA; focus goes in and comes ba
   const changes = [];
   const m = mount(() => h(Popover, { trigger: h("button", { class: "trg" }, "Filters"), label: "Filters", onOpenChange: (o, why) => changes.push(`${o}:${why}`) },
     h("input", { class: "first" })));
-  const trg = m.el.querySelector(".hm-popover > .trg") ?? m.el.querySelector(".trg");
+  const trg = m.el.querySelector(".m-popover > .trg") ?? m.el.querySelector(".trg");
   assert.equal(trg.getAttribute("aria-haspopup"), "dialog");
   assert.equal(trg.getAttribute("aria-expanded"), "false");
   assert.equal(panelOf(), null);
   trg.click();
   await tick();
   const panel = panelOf();
-  assert.ok(panel.classList.contains("hm-pop") && panel.classList.contains("hm-popover-m-scale"));
+  assert.ok(panel.classList.contains("m-pop") && panel.classList.contains("m-popover-m-scale"));
   assert.equal(panel.getAttribute("role"), "dialog");
   assert.equal(panel.getAttribute("aria-label"), "Filters");
   assert.equal(panel.id, trg.getAttribute("aria-controls"));
@@ -55,19 +55,19 @@ test("Popover: controlled by a signal; title header with a close button; functio
   let closeFn = null;
   const m = mount(() => h(Popover, { open, trigger: "Columns", title: "Columns", closeLabel: "Done", width: "md", motion: "fade", flush: true, panelClass: "mine", color: "brand-orange", footer: h("button", { class: "apply" }, "Apply") },
     (close) => { closeFn = close; return h("p", { class: "body" }, "x"); }));
-  const trg = m.el.querySelector(".hm-popover button");
-  assert.ok(trg.classList.contains("hm-btn"), "text becomes a Button");
+  const trg = m.el.querySelector(".m-popover button");
+  assert.ok(trg.classList.contains("m-btn"), "text becomes a Button");
   open.set(true);
   await tick();
   const panel = panelOf();
-  for (const c of ["hm-popover-w-md", "hm-popover-m-fade", "is-flush", "mine"]) assert.ok(panel.classList.contains(c), c);
-  const title = panel.querySelector(".hm-panel-header-title");
+  for (const c of ["m-popover-w-md", "m-popover-m-fade", "is-flush", "mine"]) assert.ok(panel.classList.contains(c), c);
+  const title = panel.querySelector(".m-panel-header-title");
   assert.equal(title.textContent, "Columns");
   assert.equal(panel.getAttribute("aria-labelledby"), title.id);
-  assert.equal(panel.querySelector(".hm-popover-inner").getAttribute("data-hm-color"), "brand-orange");
+  assert.equal(panel.querySelector(".m-popover-inner").getAttribute("data-m-color"), "brand-orange");
   assert.ok(panel.querySelector("footer .apply"));
-  assert.ok(panel.querySelector(".hm-popover-body .body"));
-  const x = panel.querySelector(".hm-panel-header-close");
+  assert.ok(panel.querySelector(".m-popover-body .body"));
+  const x = panel.querySelector(".m-panel-header-close");
   assert.equal(x.getAttribute("aria-label"), "Done");
   x.click();
   assert.equal(open(), false);
@@ -82,10 +82,10 @@ test("Popover: no trigger, own anchor, dismissal turned off, role and motion non
   const open = signal(true), field = document.createElement("input");
   document.body.appendChild(field);
   const m = mount(() => h(Popover, { open, anchor: () => field, role: "listbox", motion: "none", closeOnOutside: false, closeOnEscape: false, closable: false, autoFocus: false }, "list"));
-  assert.ok(m.el.querySelector(".hm-popover.hm-popover-bare"));
+  assert.ok(m.el.querySelector(".m-popover.m-popover-bare"));
   const panel = panelOf();
   assert.equal(panel.getAttribute("role"), "listbox");
-  assert.ok(panel.classList.contains("hm-popover-m-none"));
+  assert.ok(panel.classList.contains("m-popover-m-none"));
   press(document.body); esc(document.body);
   assert.ok(panelOf(), "stays open: both dismissals are off");
   open.set(false);

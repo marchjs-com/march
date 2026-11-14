@@ -1,20 +1,20 @@
 /* March — Markdown, JsonEditor, MarkdownEditor (ListEditor and KeyValueEditor: their folders). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* json / markdown */
-.hm-json-editor { display: flex; flex-direction: column; gap: var(--hm-space-1); }
-.hm-json-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--hm-space-2); min-height: 1.75rem; }
-.hm-md-editor { display: flex; flex-direction: column; gap: var(--hm-space-2); }
-.hm-md-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-@media (max-width: 40rem) { .hm-md-split { grid-template-columns: minmax(0, 1fr); } }
-.hm-md-preview { min-height: 6rem; padding: var(--hm-space-3); border: 1px solid var(--hm-border); border-radius: var(--hm-radius); background: var(--hm-surface); overflow-wrap: break-word; }
-.hm-markdown > :first-child { margin-top: 0; }
-.hm-markdown > :last-child { margin-bottom: 0; }
-.hm-markdown code { font-family: var(--hm-font-mono); font-size: .9em; background: var(--hm-surface-2); padding: .1em .3em; border-radius: var(--hm-radius-1); }
-.hm-markdown pre { background: var(--hm-surface-2); padding: var(--hm-space-3); border-radius: var(--hm-radius); overflow-x: auto; }
-.hm-markdown pre code { background: none; padding: 0; }
-.hm-markdown blockquote { margin: 0; padding-inline-start: var(--hm-space-3); border-inline-start: 3px solid var(--hm-border-strong); color: var(--hm-muted); }
-.hm-markdown img { max-width: 100%; height: auto; }
-.hm-markdown a { color: var(--hm-accent-text, var(--hm-primary-text)); }
-.hm-task { list-style: none; }
-.hm-editor-tabs { display: flex; gap: var(--hm-space-1); border-bottom: 1px solid var(--hm-border); }
-.hm-editor-tab { border: 0; background: transparent; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-sm); padding: var(--hm-space-2) var(--hm-space-3); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
-.hm-editor-tab[aria-selected="true"] { color: var(--hm-text); border-bottom-color: var(--hm-accent, var(--hm-primary)); font-weight: 500; }
+.m-json-editor { display: flex; flex-direction: column; gap: var(--m-space-1); }
+.m-json-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--m-space-2); min-height: 1.75rem; }
+.m-md-editor { display: flex; flex-direction: column; gap: var(--m-space-2); }
+.m-md-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 40rem) { .m-md-split { grid-template-columns: minmax(0, 1fr); } }
+.m-md-preview { min-height: 6rem; padding: var(--m-space-3); border: 1px solid var(--m-border); border-radius: var(--m-radius); background: var(--m-surface); overflow-wrap: break-word; }
+.m-markdown > :first-child { margin-top: 0; }
+.m-markdown > :last-child { margin-bottom: 0; }
+.m-markdown code { font-family: var(--m-font-mono); font-size: .9em; background: var(--m-surface-2); padding: .1em .3em; border-radius: var(--m-radius-1); }
+.m-markdown pre { background: var(--m-surface-2); padding: var(--m-space-3); border-radius: var(--m-radius); overflow-x: auto; }
+.m-markdown pre code { background: none; padding: 0; }
+.m-markdown blockquote { margin: 0; padding-inline-start: var(--m-space-3); border-inline-start: 3px solid var(--m-border-strong); color: var(--m-muted); }
+.m-markdown img { max-width: 100%; height: auto; }
+.m-markdown a { color: var(--m-accent-text, var(--m-primary-text)); }
+.m-task { list-style: none; }
+.m-editor-tabs { display: flex; gap: var(--m-space-1); border-bottom: 1px solid var(--m-border); }
+.m-editor-tab { border: 0; background: transparent; color: var(--m-muted); font: inherit; font-size: var(--m-text-sm); padding: var(--m-space-2) var(--m-space-3); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+.m-editor-tab[aria-selected="true"] { color: var(--m-text); border-bottom-color: var(--m-accent, var(--m-primary)); font-weight: 500; }

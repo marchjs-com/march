@@ -1,17 +1,17 @@
 /* FormatToolbar: the formatting bar of the editors. Buttons are IconButtons, separators Dividers. */
-.hm-format-toolbar[data-hm-color] { --hm-editor-accent: var(--hm-accent, var(--hm-primary)); }
-.hm-format-toolbar, .hm-format-toolbar .hm-toolbar-start { gap: 2px; }
-.hm-format-sep.hm-divider-v { align-self: center; block-size: 1.125rem; margin-inline: var(--hm-space-1); }
-.hm-format-tool { position: relative; color: var(--hm-text-2); border-radius: var(--hm-radius-2);
-  transition: background-color var(--hm-dur-fast) var(--hm-ease), color var(--hm-dur-fast) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease); }
-.hm-format-tool:active:not(:disabled) { transform: scale(.92); }
+.m-format-toolbar[data-m-color] { --m-editor-accent: var(--m-accent, var(--m-primary)); }
+.m-format-toolbar, .m-format-toolbar .m-toolbar-start { gap: 2px; }
+.m-format-sep.m-divider-v { align-self: center; block-size: 1.125rem; margin-inline: var(--m-space-1); }
+.m-format-tool { position: relative; color: var(--m-text-2); border-radius: var(--m-radius-2);
+  transition: background-color var(--m-dur-fast) var(--m-ease), color var(--m-dur-fast) var(--m-ease), transform var(--m-dur-fast) var(--m-ease); }
+.m-format-tool:active:not(:disabled) { transform: scale(.92); }
 /* a pressed tool (the format at the caret): the shared pressed look plus a small underline */
-.hm-format-tool::after { content: ""; position: absolute; inset-inline: 28%; inset-block-end: 2px; block-size: 2px; border-radius: 2px; background: var(--hm-editor-accent, var(--hm-accent, var(--hm-primary)));
-  transform: scaleX(0); transition: transform var(--hm-dur) var(--hm-ease-spring); }
-.hm-format-tool.is-pressed::after { transform: scaleX(1); }
-.hm-format-tool-h2 .hm-svg, .hm-format-tool-h3 .hm-svg { inline-size: .9rem; }
-.hm-format-tool-h2::before, .hm-format-tool-h3::before { position: absolute; inset-inline-end: 3px; inset-block-end: 3px; font-size: .5625rem; font-weight: 700; line-height: 1; }
-.hm-format-tool-h2::before { content: "2"; }
-.hm-format-tool-h3::before { content: "3"; }
-.hm-format-tool-emoji { font-size: 1.15em; line-height: 1; }
-.hm-format-tool-own { display: inline-grid; place-items: center; font-weight: var(--hm-weight-semibold); line-height: 1; }
+.m-format-tool::after { content: ""; position: absolute; inset-inline: 28%; inset-block-end: 2px; block-size: 2px; border-radius: 2px; background: var(--m-editor-accent, var(--m-accent, var(--m-primary)));
+  transform: scaleX(0); transition: transform var(--m-dur) var(--m-ease-spring); }
+.m-format-tool.is-pressed::after { transform: scaleX(1); }
+.m-format-tool-h2 .m-svg, .m-format-tool-h3 .m-svg { inline-size: .9rem; }
+.m-format-tool-h2::before, .m-format-tool-h3::before { position: absolute; inset-inline-end: 3px; inset-block-end: 3px; font-size: .5625rem; font-weight: 700; line-height: 1; }
+.m-format-tool-h2::before { content: "2"; }
+.m-format-tool-h3::before { content: "3"; }
+.m-format-tool-emoji { font-size: 1.15em; line-height: 1; }
+.m-format-tool-own { display: inline-grid; place-items: center; font-weight: var(--m-weight-semibold); line-height: 1; }

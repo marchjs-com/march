@@ -15,7 +15,7 @@ test("CheckboxGroup: role=group, array value, per-option brand colors", () => {
   const v = signal(["a"]);
   const { el } = mount(() => h(CheckboxGroup, { "bind:value": v, colors: "brand", inline: true, variant: "chip", options: [{ value: "a", label: "A" }, { value: "b", label: "B" }, { value: "c", label: "C", disabled: true }] }));
   const group = el.querySelector("[role=group]");
-  assert.ok(group.className.includes("hm-choices-inline"));
+  assert.ok(group.className.includes("m-choices-inline"));
   const boxes = el.querySelectorAll("input[type=checkbox]");
   assert.equal(boxes[0].checked, true);
   assert.equal(boxes[2].hasAttribute("disabled"), true);
@@ -23,5 +23,5 @@ test("CheckboxGroup: role=group, array value, per-option brand colors", () => {
   assert.deepEqual(v(), ["a", "b"]);
   boxes[0].checked = false; fire(boxes[0], "change");
   assert.deepEqual(v(), ["b"]);
-  assert.equal(el.querySelectorAll("label.hm-check")[1].getAttribute("data-hm-color"), "brand-blue");
+  assert.equal(el.querySelectorAll("label.m-check")[1].getAttribute("data-m-color"), "brand-blue");
 });

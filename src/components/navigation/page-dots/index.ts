@@ -54,10 +54,10 @@ export function PageDots(props: PageDotsProps): Element {
     e.preventDefault();
     go(to, root);
   };
-  const cls = (i: number): string => cx("hm-page-dot", props.dot && "is-own", value() === i && "is-active");
+  const cls = (i: number): string => cx("m-page-dot", props.dot && "is-own", value() === i && "is-active");
   return h("div", {
-    class: () => cx("hm-page-dots", `hm-page-dots-${val(props.size) ?? "md"}`, val(props.variant) === "dot" && "hm-page-dots-even", val(props.orientation) === "vertical" && "hm-page-dots-vertical", val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)),
+    class: () => cx("m-page-dots", `m-page-dots-${val(props.size) ?? "md"}`, val(props.variant) === "dot" && "m-page-dots-even", val(props.orientation) === "vertical" && "m-page-dots-vertical", val(props.class)),
+    "data-m-color": () => colorAttr(val(props.color)),
     role: interactive ? "group" : props.decorative ? null : "img", "aria-hidden": !interactive && props.decorative ? "true" : null,
     "aria-label": () => (interactive ? props.labels?.group ?? t`Pages` : props.decorative ? null : props.labels?.status?.(value() + 1, count()) ?? t`Page ${value() + 1} of ${count()}`),
     onKeyDown: interactive ? onKeyDown : null,

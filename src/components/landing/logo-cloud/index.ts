@@ -36,9 +36,9 @@ export interface LogoCloudProps {
 }
 
 function logoNode(l: Logo): Element {
-  const inner = l.node != null ? h("span", { class: "hm-logo-node" }, l.node)
-    : h(Picture, { src: l.src ?? "", alt: l.name, width: l.width, height: l.height, class: "hm-logo-img" });
-  return l.href ? h("a", { class: "hm-logo", href: l.href, "aria-label": l.node != null ? l.name : null }, inner) as Element : h("span", { class: "hm-logo" }, inner) as Element;
+  const inner = l.node != null ? h("span", { class: "m-logo-node" }, l.node)
+    : h(Picture, { src: l.src ?? "", alt: l.name, width: l.width, height: l.height, class: "m-logo-img" });
+  return l.href ? h("a", { class: "m-logo", href: l.href, "aria-label": l.node != null ? l.name : null }, inner) as Element : h("span", { class: "m-logo" }, inner) as Element;
 }
 
 /** `<LogoCloud title="Trusted by" logos={[{ name: "HADİ", src: "/hadi.svg", width: 120, height: 32 }]} variant="marquee" />` */
@@ -46,11 +46,11 @@ export function LogoCloud(props: LogoCloudProps): Element {
   const variant = props.variant ?? "grid";
   const body = variant === "marquee"
     // Marquee repeats the row until the strip is wider than the screen (the copies are hidden from screen readers)
-    ? h(Marquee, { class: "hm-logos-marquee", speed: props.speed ?? 40, pause: 0, separator: false, duplicate: true }, h("span", { class: "hm-logos-row" }, props.logos.map(logoNode)))
-    : h(Grid, { min: "9rem", gap: 3, class: "hm-logos-cells" }, props.logos.map((l) => h("div", { class: "hm-logos-cell" }, logoNode(l))));
-  const root = h("div", { class: cx("hm-logos", `hm-logos-v-${variant}`, props.mono !== false && "is-mono", val(props.class)) },
-    props.title != null && h("p", { class: "hm-logos-title" }, () => val(props.title)),
+    ? h(Marquee, { class: "m-logos-marquee", speed: props.speed ?? 40, pause: 0, separator: false, duplicate: true }, h("span", { class: "m-logos-row" }, props.logos.map(logoNode)))
+    : h(Grid, { min: "9rem", gap: 3, class: "m-logos-cells" }, props.logos.map((l) => h("div", { class: "m-logos-cell" }, logoNode(l))));
+  const root = h("div", { class: cx("m-logos", `m-logos-v-${variant}`, props.mono !== false && "is-mono", val(props.class)) },
+    props.title != null && h("p", { class: "m-logos-title" }, () => val(props.title)),
     body) as HTMLElement;
-  if (variant === "grid" && props.reveal !== "none") owned(revealOnScroll(root, { effect: props.reveal ?? "fade", select: ".hm-logos-cell", stagger: 50 }));
+  if (variant === "grid" && props.reveal !== "none") owned(revealOnScroll(root, { effect: props.reveal ?? "fade", select: ".m-logos-cell", stagger: 50 }));
   return root;
 }

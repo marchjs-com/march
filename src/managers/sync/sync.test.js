@@ -74,5 +74,5 @@ test("a new instance sends what the previous visit left", async () => {
   await until(() => s.pending() === 0);
   assert.deepEqual(got.map((g) => g[0]), ["left"]);
   disposeSync();
-  configureSync({ net: null, storageKey: "hm.sync" });
+  configureSync({ net: null, storageKey: "m.sync" });
 });

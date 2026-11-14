@@ -31,7 +31,7 @@ export default function SwatchDemo(props: { values: { palette: string; size: str
               selected={() => $picked % list.length === i} onClick={onClick} />
           })}
         </div>
-        <p class="hm-muted">{() => { const [color, label] = list[$picked % list.length]!; return `${label}: ${color}` }}</p>
+        <p class="m-muted">{() => { const [color, label] = list[$picked % list.length]!; return `${label}: ${color}` }}</p>
       </>
     }}
   </div>

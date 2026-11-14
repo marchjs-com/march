@@ -19,10 +19,10 @@ test("SearchBox: ui/layout keeps exporting the same component", () => {
 test("SearchBox: debounced value, Enter searches now, Escape and the clear button empty it", async () => {
   const q = signal(""), seen = [], entered = [];
   const m = mount(() => h(SearchBox, { value: q, debounce: 10, onSearch: (v) => seen.push(v), onEnter: (v) => entered.push(v) }));
-  const input = m.el.querySelector(".hm-search[role=search] input.hm-search-input");
+  const input = m.el.querySelector(".m-search[role=search] input.m-search-input");
   assert.equal(input.getAttribute("type"), "search");
   assert.equal(input.getAttribute("aria-label"), "Search");
-  assert.equal(m.el.querySelector(".hm-search-clear"), null, "no clear button while empty");
+  assert.equal(m.el.querySelector(".m-search-clear"), null, "no clear button while empty");
   type(input, "ada");
   assert.equal(q(), "", "not written before the debounce");
   await sleep(30);
@@ -31,7 +31,7 @@ test("SearchBox: debounced value, Enter searches now, Escape and the clear butto
   key(input, "Enter");
   assert.equal(q(), "adam");
   assert.deepEqual(entered, ["adam"]);
-  const clear = m.el.querySelector("button.hm-search-clear");
+  const clear = m.el.querySelector("button.m-search-clear");
   assert.equal(clear.getAttribute("aria-label"), "Clear search");
   clear.click();
   assert.equal(q(), "");
@@ -53,7 +53,7 @@ test("SearchBox: debounce 0 writes at once; onInput, inputRef and onKeyDown (pre
     onKeyDown: (e) => { keys.push(e.key); if (e.key === "Enter" || e.key === "ArrowDown") e.preventDefault(); } }));
   const input = m.el.querySelector("input");
   assert.equal(ref, input);
-  assert.ok(input.classList.contains("mine-input") && input.classList.contains("hm-search-input"), "inputClass adds to the input's classes");
+  assert.ok(input.classList.contains("mine-input") && input.classList.contains("m-search-input"), "inputClass adds to the input's classes");
   type(input, "a");
   assert.deepEqual(seen, ["a"]);
   assert.deepEqual(typed, ["a"]);
@@ -67,18 +67,18 @@ test("SearchBox: size, plain look, own icon / no icon, own clear / no clear, lab
     h(SearchBox, { size: "sm", variant: "plain", icon: false, clear: false, value: "abc", placeholder: "Find", color: "brand-orange", class: "mine", id: "s1", disabled: true }),
     h(SearchBox, { icon: h("i", { class: "own-icon" }), clear: h("i", { class: "own-clear" }), clearLabel: "Empty it", label: "Search files", value: "abc" }),
   ]);
-  const [a, b] = m.el.querySelectorAll(".hm-search");
-  for (const c of ["hm-search-sm", "hm-search-plain", "hm-search-no-icon", "mine"]) assert.ok(a.classList.contains(c), c);
-  assert.equal(a.getAttribute("data-hm-color"), "brand-orange");
-  assert.equal(a.querySelector(".hm-search-icon"), null);
-  assert.equal(a.querySelector(".hm-search-clear"), null);
+  const [a, b] = m.el.querySelectorAll(".m-search");
+  for (const c of ["m-search-sm", "m-search-plain", "m-search-no-icon", "mine"]) assert.ok(a.classList.contains(c), c);
+  assert.equal(a.getAttribute("data-m-color"), "brand-orange");
+  assert.equal(a.querySelector(".m-search-icon"), null);
+  assert.equal(a.querySelector(".m-search-clear"), null);
   const ia = a.querySelector("input");
   assert.equal(ia.id, "s1");
   assert.equal(ia.getAttribute("aria-label"), "Find");
   assert.equal(ia.disabled, true);
   assert.ok(b.querySelector(".own-icon"));
-  assert.ok(b.querySelector(".hm-search-clear .own-clear"));
-  assert.equal(b.querySelector(".hm-search-clear").getAttribute("aria-label"), "Empty it");
+  assert.ok(b.querySelector(".m-search-clear .own-clear"));
+  assert.equal(b.querySelector(".m-search-clear").getAttribute("aria-label"), "Empty it");
   assert.equal(b.querySelector("input").getAttribute("aria-label"), "Search files");
   m.dispose();
 });
@@ -90,7 +90,7 @@ test("SearchBox: combobox ARIA and the shortcut hint", () => {
     h(SearchBox, { shortcut: true, shortcutHint: false }),
     h(SearchBox, {}),
   ]);
-  const [a, b, c] = m.el.querySelectorAll(".hm-search");
+  const [a, b, c] = m.el.querySelectorAll(".m-search");
   const input = a.querySelector("input");
   assert.equal(input.getAttribute("role"), "combobox");
   assert.equal(input.getAttribute("aria-controls"), "list1");
@@ -100,10 +100,10 @@ test("SearchBox: combobox ARIA and the shortcut hint", () => {
   active.set(null); open.set(false);
   assert.equal(input.getAttribute("aria-activedescendant"), null);
   assert.equal(input.getAttribute("aria-expanded"), "false");
-  const kbd = a.querySelector(".hm-search-kbd[aria-hidden=true] kbd.hm-kbd");
+  const kbd = a.querySelector(".m-search-kbd[aria-hidden=true] kbd.m-kbd");
   assert.match(kbd.textContent, /K/);
-  assert.equal(b.querySelector(".hm-search-kbd"), null, "the key works without a hint");
+  assert.equal(b.querySelector(".m-search-kbd"), null, "the key works without a hint");
   assert.equal(c.querySelector("input").getAttribute("role"), null);
-  assert.equal(c.querySelector(".hm-search-kbd"), null);
+  assert.equal(c.querySelector(".m-search-kbd"), null);
   m.dispose();
 });

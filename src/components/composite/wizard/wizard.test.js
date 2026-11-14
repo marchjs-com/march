@@ -15,18 +15,18 @@ test("Wizard: the stage list is Steps; a later stage opens only when the ones be
     { title: "B", schema: schema({ b: { type: "text" } }) },
     { title: "C", schema: schema({ c: { type: "text" } }) },
   ] }));
-  assert.ok(el.querySelector("ol.hm-steps2.hm-wizard-steps"), "Steps component");
-  const stage = (i) => el.querySelectorAll(".hm-step2-hit")[i];
+  assert.ok(el.querySelector("ol.m-steps2.m-wizard-steps"), "Steps component");
+  const stage = (i) => el.querySelectorAll(".m-step2-hit")[i];
   stage(2).click();
-  assert.match(el.querySelector(".hm-wizard-title").textContent, /A/, "A is required: C stays closed");
+  assert.match(el.querySelector(".m-wizard-title").textContent, /A/, "A is required: C stays closed");
   type(el.querySelector("[name=a]"), "x");
   stage(2).click();
-  assert.match(el.querySelector(".hm-wizard-title").textContent, /C/);
-  assert.equal(el.querySelectorAll(".hm-step2.is-done").length, 2);
+  assert.match(el.querySelector(".m-wizard-title").textContent, /C/);
+  assert.equal(el.querySelectorAll(".m-step2.is-done").length, 2);
   stage(0).click();
-  assert.match(el.querySelector(".hm-wizard-title").textContent, /A/, "going back needs no check");
+  assert.match(el.querySelector(".m-wizard-title").textContent, /A/, "going back needs no check");
   assert.equal(el.querySelector("[name=a]").value, "x", "values survive");
-  assert.equal(el.querySelector(".hm-wizard-progress [role=progressbar]")?.getAttribute("aria-valuenow") ?? "1", "1");
+  assert.equal(el.querySelector(".m-wizard-progress [role=progressbar]")?.getAttribute("aria-valuenow") ?? "1", "1");
 });
 
 test("Wizard: steps, layout and color are live props (the showcase Playground drives them)", async () => {
@@ -34,37 +34,37 @@ test("Wizard: steps, layout and color are live props (the showcase Playground dr
   const n = signal(2), layout = signal("stack"), color = signal("primary");
   const all = ["A", "B", "C", "D"].map((t) => ({ title: t, schema: schema({ [t.toLowerCase()]: { type: "text" }, [t.toLowerCase() + "2"]: { type: "text" } }) }));
   const el = mount(() => h(Wizard, { steps: reactive(() => all.slice(0, n())), layout: reactive(() => layout()), cols: 2, color: reactive(() => color()) }));
-  assert.equal(el.querySelectorAll(".hm-step2").length, 2);
+  assert.equal(el.querySelectorAll(".m-step2").length, 2);
   type(el.querySelector("[name=a]"), "kept");
   n.set(4);
-  assert.equal(el.querySelectorAll(".hm-step2").length, 4, "step count follows");
+  assert.equal(el.querySelectorAll(".m-step2").length, 4, "step count follows");
   assert.equal(el.querySelector("[name=a]").value, "kept", "typed values survive a new step list");
-  assert.ok(el.querySelector(".hm-form-stack"));
+  assert.ok(el.querySelector(".m-form-stack"));
   layout.set("grid");
-  assert.ok(el.querySelector(".hm-form-grid.hm-cols-2"), "layout follows");
+  assert.ok(el.querySelector(".m-form-grid.m-cols-2"), "layout follows");
   assert.equal(el.querySelector("[name=a]").value, "kept");
   color.set("brand-purple");
-  assert.equal(el.querySelector("form.hm-wizard").getAttribute("data-hm-color"), "brand-purple", "color follows");
+  assert.equal(el.querySelector("form.m-wizard").getAttribute("data-m-color"), "brand-purple", "color follows");
 });
 
 test("Wizard: parts can be turned off and the texts replaced", () => {
   const steps = [{ schema: schema({ a: { type: "text" } }) }, { title: "B", schema: schema({ b: { type: "text" } }) }];
   const el = mount(() => h(Wizard, { steps, class: "mine", labels: { back: "Prev", next: "Go on", step: (i) => `Part ${i + 1}`, count: (i, n) => `${i + 1}/${n}` } }));
-  assert.ok(el.querySelector("form.hm-wizard.mine"));
-  assert.equal(el.querySelector(".hm-wizard-title").textContent, "Part 1");
-  assert.equal(el.querySelector(".hm-step2-title").textContent, "Part 1");
-  assert.equal(el.querySelector(".hm-wizard-count").textContent, "1/2");
-  assert.equal(el.querySelector(".hm-wizard-back").textContent, "Prev");
-  assert.equal(el.querySelector(".hm-wizard-next").textContent, "Go on");
+  assert.ok(el.querySelector("form.m-wizard.mine"));
+  assert.equal(el.querySelector(".m-wizard-title").textContent, "Part 1");
+  assert.equal(el.querySelector(".m-step2-title").textContent, "Part 1");
+  assert.equal(el.querySelector(".m-wizard-count").textContent, "1/2");
+  assert.equal(el.querySelector(".m-wizard-back").textContent, "Prev");
+  assert.equal(el.querySelector(".m-wizard-next").textContent, "Go on");
   el.querySelector("form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-  assert.equal(el.querySelector(".hm-wizard-count").textContent, "2/2");
-  assert.equal(el.querySelector(".hm-wizard-next").textContent, "Finish");
+  assert.equal(el.querySelector(".m-wizard-count").textContent, "2/2");
+  assert.equal(el.querySelector(".m-wizard-next").textContent, "Finish");
 
   const bare = mount(() => h(Wizard, { steps, stepper: false, progress: false, count: false, backButton: false }));
-  assert.equal(bare.querySelector(".hm-wizard-steps"), null);
-  assert.equal(bare.querySelector(".hm-wizard-progress"), null);
-  assert.equal(bare.querySelector(".hm-wizard-count"), null);
-  assert.equal(bare.querySelector(".hm-wizard-back"), null);
-  assert.equal(bare.querySelector(".hm-wizard-title").textContent, "Step 1");
-  assert.equal(bare.querySelector(".hm-wizard-next").textContent, "Next");
+  assert.equal(bare.querySelector(".m-wizard-steps"), null);
+  assert.equal(bare.querySelector(".m-wizard-progress"), null);
+  assert.equal(bare.querySelector(".m-wizard-count"), null);
+  assert.equal(bare.querySelector(".m-wizard-back"), null);
+  assert.equal(bare.querySelector(".m-wizard-title").textContent, "Step 1");
+  assert.equal(bare.querySelector(".m-wizard-next").textContent, "Next");
 });

@@ -13,20 +13,20 @@ test("LiveStatus: a polite status with live text; element, politeness, class and
     h(LiveStatus, { text: () => `${n()} selected`, class: "mine", "data-id": "count" }),
     h(LiveStatus, { as: "p", politeness: "assertive" }, "Failed"),
   ]);
-  const [a, b] = el.querySelectorAll(".hm-live-status");
+  const [a, b] = el.querySelectorAll(".m-live-status");
   assert.equal(a.tagName, "SPAN");
   assert.equal(a.getAttribute("role"), "status");
   assert.equal(a.getAttribute("aria-live"), "polite");
   assert.equal(a.textContent, "2 selected");
   n.set(3);
   assert.equal(a.textContent, "3 selected");
-  assert.ok(a.classList.contains("mine") && !a.classList.contains("hm-sr-only"));
+  assert.ok(a.classList.contains("mine") && !a.classList.contains("m-sr-only"));
   assert.equal(a.getAttribute("data-id"), "count");
   assert.equal(a.hasAttribute("text") || a.hasAttribute("visible"), false);
   assert.equal(b.tagName, "P");
   assert.equal(b.getAttribute("aria-live"), "assertive");
   assert.equal(b.textContent, "Failed");
-  assert.equal(el.querySelector(".hm-live-status-help"), null);
+  assert.equal(el.querySelector(".m-live-status-help"), null);
   dispose();
 });
 
@@ -37,7 +37,7 @@ test("LiveStatus: visible={false} is only read; help adds a hint line with an id
     h(LiveStatus, { visible: false, text: said, help: false }),
     h(LiveStatus, { text: "x", help: h("b", { class: "own" }, "own hint") }),
   ]);
-  const helps = el.querySelectorAll(".hm-live-status-help");
+  const helps = el.querySelectorAll(".m-live-status-help");
   assert.equal(helps.length, 2);
   assert.equal(helps[0].tagName, "P");
   assert.equal(helps[0].id, "x-help");
@@ -46,8 +46,8 @@ test("LiveStatus: visible={false} is only read; help adds a hint line with an id
   hint.set("Read only");
   assert.equal(helps[0].textContent, "Read only");
   assert.ok(helps[1].querySelector(".own"));
-  const status = el.querySelector(".hm-live-status");
-  assert.ok(status.classList.contains("hm-sr-only"));
+  const status = el.querySelector(".m-live-status");
+  assert.ok(status.classList.contains("m-sr-only"));
   assert.equal(helps[0].nextElementSibling, status, "the hint comes first");
   said.set("Build: 9 Nov – 13 Nov");
   assert.equal(status.textContent, "Build: 9 Nov – 13 Nov");

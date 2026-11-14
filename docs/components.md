@@ -755,7 +755,7 @@ A small round mark in a corner of a picture, a card or an avatar: the video sign
 
 ```tsx
 <div class="tile"><Picture source={photo} fit="cover" /><CornerMark icon={video} /></div>
-<a class="card hm-corner-host" href={href}>…<CornerMark icon={arrowUpRight} variant="surface" show="hover" /></a>
+<a class="card m-corner-host" href={href}>…<CornerMark icon={arrowUpRight} variant="surface" show="hover" /></a>
 <CornerMark corner="bottom-end" icon={plus} variant="solid" color="brand-orange" size="sm" ring overlap />
 ```
 
@@ -953,7 +953,7 @@ Composed of: [PanelHeader](#panelheader)
 
 ```tsx
 <EditorFrame head={<FormatToolbar onTool={exec} />} actions={<Badge>{$words} words</Badge>} foot={<span>Markdown</span>}>
-  <textarea class="hm-editor-area" bind:value={$text} />
+  <textarea class="m-editor-area" bind:value={$text} />
 </EditorFrame>
 <EditorFrame showHead={() => $tools.length > 0} headProps={{ sticky: true }} footProps={{ divider: true }} color="brand-green" />
 ```
@@ -1463,7 +1463,7 @@ Full page: src/components/feedback/live-status/docs.md
 
 ## Loader
 
-A loading state that fills an area: a large spinner with a line of text under it (or only for screen readers). Inline it takes the place of the content; with `overlay` it covers its positioned container with a translucent scrim. `bootLoader.done()` fades out the static `#hm-boot` screen of `index.html` once the app has rendered.
+A loading state that fills an area: a large spinner with a line of text under it (or only for screen readers). Inline it takes the place of the content; with `overlay` it covers its positioned container with a translucent scrim. `bootLoader.done()` fades out the static `#m-boot` screen of `index.html` once the app has rendered.
 
 Composed of: [Spinner](#spinner)
 
@@ -2546,7 +2546,7 @@ Full page: src/components/forms/textarea/docs.md
 
 ## ThemeEditor
 
-Make a whole theme and watch it live. Start from a built-in theme (HADİ, Classic Cream, Night Blue, Neon, Indigo, Minimal, High Contrast) or from scratch with one accent color; edit every color token for light and dark with a full ColorPicker (accent, surfaces, text, border, status, HADİ brand colors, the categorical palette), pick tones from an automatic tone scale, and fix contrast with the WCAG audit. Type (font families, scale ratio, line heights, weights), shape (radius scale, spacing, density, shadows, border width) and motion (durations, three easing curves) are tokens too. The preview is a small app screen of real components scoped to the editor (`data-hm-theme` + the draft's variables) in light or dark, LTR or RTL, with or without motion; "Apply to the app" switches the whole app to it. Out come the defineTheme module, the stylesheet (themeCss) and JSON; in go pasted JSON, CSS or a share link.
+Make a whole theme and watch it live. Start from a built-in theme (HADİ, Classic Cream, Night Blue, Neon, Indigo, Minimal, High Contrast) or from scratch with one accent color; edit every color token for light and dark with a full ColorPicker (accent, surfaces, text, border, status, HADİ brand colors, the categorical palette), pick tones from an automatic tone scale, and fix contrast with the WCAG audit. Type (font families, scale ratio, line heights, weights), shape (radius scale, spacing, density, shadows, border width) and motion (durations, three easing curves) are tokens too. The preview is a small app screen of real components scoped to the editor (`data-m-theme` + the draft's variables) in light or dark, LTR or RTL, with or without motion; "Apply to the app" switches the whole app to it. Out come the defineTheme module, the stylesheet (themeCss) and JSON; in go pasted JSON, CSS or a share link.
 
 Composed of: [ColorPicker](#colorpicker), [EasingCurveEditor](#easingcurveeditor), [Tabs](#tabs), [Segmented](#segmented), [Slider](#slider), [Select](#select), [TextInput](#textinput), [Textarea](#textarea), [Toggle](#toggle), Field, [Button](#button), [UndoRedo](#undoredo), [CopyButton](#copybutton), [Badge](#badge), [PanelHeader](#panelheader), [SectionLabel](#sectionlabel), [ListRow](#listrow), [Swatch](#swatch), [Stack](#stack), ThemeSwatch, [CodeView](#codeview), [Alert](#alert), [Card](#card), [Checkbox](#checkbox), [Chip](#chip), [Progress](#progress), [Avatar](#avatar)
 

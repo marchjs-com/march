@@ -26,7 +26,7 @@ function iconPackModules() {
  * cache: a folder for compiled modules (keyed by the source, the compiler's own files and the auto-import table), so a
  * cold build reuses what an earlier build compiled; in one process (watch / rebuild) unchanged files are always reused.
  */
-// `() => import("./pages/x.tsx")` → the same loader tagged with its source key (`.hm`), which the router and lazy()
+// `() => import("./pages/x.tsx")` → the same loader tagged with its source key (`.m`), which the router and lazy()
 // look up in the build manifest to preload all of the route's chunks at once (see src/dom/preload.ts).
 const EXTS = ["", ".tsx", ".ts", ".jsx", ".js", "/index.tsx", "/index.ts", "/index.jsx", "/index.js"];
 export function tagLoaders(code, file, cwd) {
@@ -36,7 +36,7 @@ export function tagLoaders(code, file, cwd) {
     const hit = EXTS.map((e) => base + e).find((p) => existsSync(p) && statSync(p).isFile());
     if (!hit) return all;
     const key = relative(cwd, hit).split(sep).join("/");
-    return `Object.assign(${all}, { hm: ${JSON.stringify(key)} })`;
+    return `Object.assign(${all}, { m: ${JSON.stringify(key)} })`;
   });
 }
 
@@ -52,7 +52,7 @@ export function rewriteDynamic(code, list) {
   list.forEach((x, i) => {
     const re = new RegExp(String.raw`import\(\s*(["'])${escRe(x.spec)}\1\s*\)`, "g");
     if (!re.test(code)) return;
-    if (x.mode === "static") { head += `import * as __hmIn${i} from ${JSON.stringify(x.spec)};\n`; code = code.replace(re, `Promise.resolve(__hmIn${i})`); }
+    if (x.mode === "static") { head += `import * as __mIn${i} from ${JSON.stringify(x.spec)};\n`; code = code.replace(re, `Promise.resolve(__mIn${i})`); }
     else code = code.replace(re, `import(${JSON.stringify(`march-group:${x.group}`)}).then((m) => m.${x.name})`);
   });
   return head + code;

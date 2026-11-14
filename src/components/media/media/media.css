@@ -1,8 +1,8 @@
 /* March — Media. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* Media (index.ts) */
-.hm-media-wrap { display: flex; justify-content: center; }
-.hm-media { display: block; max-width: 100%; max-height: 75vh; height: auto; border-radius: var(--hm-radius-2); }
-.hm-media-audio { width: 100%; }
-.hm-media-fallback { color: var(--hm-muted); text-align: center; padding: var(--hm-space-4); }
-.hm-media-sm { max-height: 4rem; max-width: 4rem; object-fit: cover; }
-.hm-media-md { max-height: 12rem; }
+.m-media-wrap { display: flex; justify-content: center; }
+.m-media { display: block; max-width: 100%; max-height: 75vh; height: auto; border-radius: var(--m-radius-2); }
+.m-media-audio { width: 100%; }
+.m-media-fallback { color: var(--m-muted); text-align: center; padding: var(--m-space-4); }
+.m-media-sm { max-height: 4rem; max-width: 4rem; object-fit: cover; }
+.m-media-md { max-height: 12rem; }

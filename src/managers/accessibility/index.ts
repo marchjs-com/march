@@ -6,7 +6,7 @@
 //   a11y.reset()
 //   a11y.audit(document.body)            // [{ rule, message, el }]: missing alt, unnamed buttons, unlabeled fields…
 //
-// Applied as attributes on <html> (data-hm-a11y-contrast, -links, -spacing, -focus) that accessibility.css styles,
+// Applied as attributes on <html> (data-m-a11y-contrast, -links, -spacing, -focus) that accessibility.css styles,
 // a root font-size for text scale (every size is in rem), and the motion engine's reduced-motion override.
 // The settings panel is lazy: hadi-march/managers/accessibility/ui.
 import "./accessibility.css";
@@ -37,7 +37,7 @@ interface KeyStore { getItem(k: string): string | null; setItem(k: string, v: st
 export interface A11yConfig {
   /** Starting preferences (before the user changes anything). */
   defaults: A11yPrefs;
-  /** Storage key. Default "hm.a11y". */
+  /** Storage key. Default "m.a11y". */
   storageKey: string;
   /** Where preferences live. Default localStorage; null keeps them in memory only. */
   storage: KeyStore | null | undefined;
@@ -75,7 +75,7 @@ const storageOf = (c: A11yConfig): KeyStore | null => {
   try { return globalThis.localStorage ?? null; } catch { return null; }
 };
 
-const FLAGS: [keyof A11yPrefs, string][] = [["contrast", "data-hm-a11y-contrast"], ["underlineLinks", "data-hm-a11y-links"], ["textSpacing", "data-hm-a11y-spacing"], ["strongFocus", "data-hm-a11y-focus"]];
+const FLAGS: [keyof A11yPrefs, string][] = [["contrast", "data-m-a11y-contrast"], ["underlineLinks", "data-m-a11y-links"], ["textSpacing", "data-m-a11y-spacing"], ["strongFocus", "data-m-a11y-focus"]];
 
 function create(cfg: A11yConfig): A11y {
   const store = storageOf(cfg);
@@ -159,7 +159,7 @@ export function audit(root: Element | undefined): A11yIssue[] {
   return out;
 }
 
-const manager = defineManager<A11y, A11yConfig>("accessibility", create, { defaults: DEFAULT_PREFS, storageKey: "hm.a11y", storage: undefined, apply: true });
+const manager = defineManager<A11y, A11yConfig>("accessibility", create, { defaults: DEFAULT_PREFS, storageKey: "m.a11y", storage: undefined, apply: true });
 
 /** The accessibility manager. Every method goes to the one instance (created on first use). */
 export const a11y: A11y = {

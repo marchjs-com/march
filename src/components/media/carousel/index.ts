@@ -45,12 +45,12 @@ export function Carousel(props: CarouselProps): Element {
   const last = (): number => count() - (props.perView ?? 1);
   // previous / next: raised round IconButtons at the sides
   const arrow = (dir: "prev" | "next", own: unknown, def: IconDef, name: () => string, off: () => boolean, to: () => number): unknown =>
-    h(IconButton, { variant: "raised", shape: "round", class: `hm-carousel-btn hm-carousel-${dir}`, label: name, title: false, disabled: off, onClick: () => goTo(to()), icon: ownIcon(own, def, "hm-carousel-icon") });
+    h(IconButton, { variant: "raised", shape: "round", class: `m-carousel-btn m-carousel-${dir}`, label: name, title: false, disabled: off, onClick: () => goTo(to()), icon: ownIcon(own, def, "m-carousel-icon") });
   queueMicrotask(update);
-  return h("section", { class: () => cx("hm-carousel", `hm-carousel-${props.perView ?? 1}`, props.smooth === false && "is-instant", val(props.class)), "aria-roledescription": "carousel", "aria-label": () => val(props.label) ?? t`Carousel` },
-    h("div", { class: "hm-carousel-track", ref: (el: HTMLElement) => { track = el; }, onScroll: update, tabindex: "0" }, props.children),
+  return h("section", { class: () => cx("m-carousel", `m-carousel-${props.perView ?? 1}`, props.smooth === false && "is-instant", val(props.class)), "aria-roledescription": "carousel", "aria-label": () => val(props.label) ?? t`Carousel` },
+    h("div", { class: "m-carousel-track", ref: (el: HTMLElement) => { track = el; }, onScroll: update, tabindex: "0" }, props.children),
     props.arrows !== false && arrow("prev", props.prevIcon, chevronLeft, () => props.labels?.previous ?? t`Previous`, () => index() <= 0, () => index() - 1),
     props.arrows !== false && arrow("next", props.nextIcon, chevronRight, () => props.labels?.next ?? t`Next`, () => index() >= last(), () => index() + 1),
-    props.dots !== false && h(PageDots, { class: "hm-carousel-dots", count: () => Math.max(0, last() + 1), value: index, onChange: goTo, color: props.color,
+    props.dots !== false && h(PageDots, { class: "m-carousel-dots", count: () => Math.max(0, last() + 1), value: index, onChange: goTo, color: props.color,
       labels: { page: (n: number) => props.labels?.slide?.(n) ?? t`Slide ${n}` }, ...(ownDot ? { dot: ownDot } : {}) }));
 }

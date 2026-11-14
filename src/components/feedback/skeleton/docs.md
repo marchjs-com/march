@@ -13,7 +13,7 @@ Grey (or brand-tinted) shapes standing in for content that is loading: a few tex
 | `lines` | `number` | `3` | text lines; the last one is shorter |
 | `block` | `boolean` | `false` | one block instead of lines |
 | `height` | `sm` `md` `lg` | `md` | block height, or the size of the circle |
-| `shape` | `circle` | | one round shape (an avatar on its way); `--hm-skel-size` sets another size |
+| `shape` | `circle` | | one round shape (an avatar on its way); `--m-skel-size` sets another size |
 | `colors` | `"brand"` / `"single"` | the theme's | brand: a four-colour shimmer; single: neutral even in a multicolour theme |
 | `shimmer` | `boolean` | `true` | `false`: still shapes, no moving light |
 | `shortLast` | `boolean` | `true` | `false`: every line has the full width |

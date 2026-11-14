@@ -45,7 +45,7 @@ export function Breadcrumbs(props: BreadcrumbsProps): Element {
   let ol: HTMLElement | undefined;
   const fit = overflowFit({
     items: list, enabled: () => props.collapse !== false, reserve: () => 36,
-    measure: () => (ol ? [...ol.querySelectorAll<HTMLElement>(":scope > .hm-bc-li:not(.hm-bc-more)")].map((c) => c.offsetWidth || 0) : null),
+    measure: () => (ol ? [...ol.querySelectorAll<HTMLElement>(":scope > .m-bc-li:not(.m-bc-more)")].map((c) => c.offsetWidth || 0) : null),
     // the last crumb matters most, then the first, then the ones nearer the end
     priority: (i, n) => (i === n - 1 ? 1e6 : i === 0 ? 1e5 : i),
   });
@@ -53,25 +53,25 @@ export function Breadcrumbs(props: BreadcrumbsProps): Element {
   const hidden = computed(() => list().filter((_, i) => !isShown(i)));
 
   const own = props.separator, goTo = props.labels?.goTo;
-  const sep = (): Element | null => (own === false ? null : h("span", { class: "hm-bc-sep", "aria-hidden": "true" }, ownIcon(own ?? undefined, chevronRight, null)));
+  const sep = (): Element | null => (own === false ? null : h("span", { class: "m-bc-sep", "aria-hidden": "true" }, ownIcon(own ?? undefined, chevronRight, null)));
   const crumb = (c: Crumb, last: boolean): unknown => {
-    const body = [icon(c.icon, "hm-bc-icon"), h(OverflowText, { class: "hm-bc-label", fade: false }, () => val(c.label))];
+    const body = [icon(c.icon, "m-bc-icon"), h(OverflowText, { class: "m-bc-label", fade: false }, () => val(c.label))];
     const sib = (): MenuItemSpec[] => (val(c.siblings) ?? []).map((s) => ({ label: s.label, icon: s.icon, onSelect: s.onSelect }));
-    if (c.siblings) return h(Menu, { trigger: body, label: () => (goTo ? goTo(val(c.label)) : t`${val(c.label)}: go to`), items: sib, variant: "ghost", size: "sm", class: cx("hm-bc-item", last && "is-current"), placement: "bottom-start" });
+    if (c.siblings) return h(Menu, { trigger: body, label: () => (goTo ? goTo(val(c.label)) : t`${val(c.label)}: go to`), items: sib, variant: "ghost", size: "sm", class: cx("m-bc-item", last && "is-current"), placement: "bottom-start" });
     // a link or a button crumb: a ghost Button in the crumb's look (the content goes in unwrapped, like a Menu trigger's)
-    if ((c.href || c.onSelect) && !last) return h(Button, { variant: "ghost", size: "sm", class: "hm-bc-item", icon: body, ...(c.href ? { href: c.href } : { onClick: () => void c.onSelect?.() }) });
-    return h("span", { class: cx("hm-bc-item", last && "is-current"), "aria-current": last ? "page" : null }, body);
+    if ((c.href || c.onSelect) && !last) return h(Button, { variant: "ghost", size: "sm", class: "m-bc-item", icon: body, ...(c.href ? { href: c.href } : { onClick: () => void c.onSelect?.() }) });
+    return h("span", { class: cx("m-bc-item", last && "is-current"), "aria-current": last ? "page" : null }, body);
   };
 
-  return h("nav", { class: () => cx("hm-bc", val(props.class)), "aria-label": () => val(props.label) ?? t`Path`, ref: (x: HTMLElement) => { fit.observe(x); } },
-    h("ol", { class: "hm-bc-ol", ref: (x: HTMLElement) => { ol = x; } }, () => {
+  return h("nav", { class: () => cx("m-bc", val(props.class)), "aria-label": () => val(props.label) ?? t`Path`, ref: (x: HTMLElement) => { fit.observe(x); } },
+    h("ol", { class: "m-bc-ol", ref: (x: HTMLElement) => { ol = x; } }, () => {
       const items = list();
       return untrack(() => items.map((c, i) => [
         // the collapsed middle sits right after the first crumb
-        i === 1 ? h("li", { class: "hm-bc-li hm-bc-more", hidden: () => hidden().length === 0 },
-          h(Menu, { trigger: props.ellipsis ?? "…", label: () => val(props.labels?.more) ?? t`Hidden path parts`, variant: "ghost", size: "sm", class: "hm-bc-item",
+        i === 1 ? h("li", { class: "m-bc-li m-bc-more", hidden: () => hidden().length === 0 },
+          h(Menu, { trigger: props.ellipsis ?? "…", label: () => val(props.labels?.more) ?? t`Hidden path parts`, variant: "ghost", size: "sm", class: "m-bc-item",
             items: () => hidden().map((x): MenuItemSpec => ({ label: () => val(x.label), icon: x.icon, onSelect: () => void (x.onSelect?.()), ...(x.href ? { href: x.href } : {}) })) }), sep()) : null,
-        h("li", { class: "hm-bc-li", hidden: () => !isShown(i) }, crumb(c, i === items.length - 1), i < items.length - 1 ? sep() : null),
+        h("li", { class: "m-bc-li", hidden: () => !isShown(i) }, crumb(c, i === items.length - 1), i < items.length - 1 ? sep() : null),
       ]));
     }));
 }

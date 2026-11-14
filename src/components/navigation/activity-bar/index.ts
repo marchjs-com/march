@@ -51,7 +51,7 @@ export interface ActivityBarProps {
 
 /** `<ActivityBar items={[{ id: "files", label: "Files", icon: files }, …]} value={$view} onChange={(v) => $view = v} controls="side" />` */
 export function ActivityBar(props: ActivityBarProps): Element {
-  const base = uid("hm-ab");
+  const base = uid("m-ab");
   // orientation is live: the bar turns, the indicator moves to the other edge and keys follow the new axis
   const horizontal = (): boolean => val(props.orientation) === "horizontal";
   const list = computed(() => val(props.items) ?? []);
@@ -68,7 +68,7 @@ export function ActivityBar(props: ActivityBarProps): Element {
     props.onChange(current() === it.id && props.collapsible !== false ? null : it.id);
   };
   // the indicator glides from the old view to the new one (a turned bar starts it afresh)
-  const ind = props.indicator !== false ? h("span", { class: "hm-ab-ind", "aria-hidden": "true" }) as HTMLElement : null;
+  const ind = props.indicator !== false ? h("span", { class: "m-ab-ind", "aria-hidden": "true" }) as HTMLElement : null;
   if (ind) {
     let slide: ReturnType<typeof slidingIndicator> | undefined;
     effect(() => {
@@ -77,7 +77,7 @@ export function ActivityBar(props: ActivityBarProps): Element {
       queueMicrotask(() => {
         const root = ind.parentElement;
         if (!root) return;
-        slide ??= slidingIndicator(ind, root, { axis: () => (horizontal() ? "x" : "y"), sizeVar: "--hm-ab-size", duration: 260, easing: "easeOutBack", motion: () => motion !== "none" });
+        slide ??= slidingIndicator(ind, root, { axis: () => (horizontal() ? "x" : "y"), sizeVar: "--m-ab-size", duration: 260, easing: "easeOutBack", motion: () => motion !== "none" });
         if (motion === "fade") slide.reset(); // appears in place
         slide.moveTo(id ? root.querySelector<HTMLElement>(`[data-view="${id}"]`) : null);
       });
@@ -86,15 +86,15 @@ export function ActivityBar(props: ActivityBarProps): Element {
 
   const tabs = computed((): TabSpec[] => ordered().map((it) => ({
     id: it.id,
-    label: [icon(it.icon, "hm-ab-icon"), it.badge !== undefined && h("span", { class: "hm-ab-badge" }, h(Badge, { count: () => val(it.badge), tone: "primary", size: "xs" }))],
+    label: [icon(it.icon, "m-ab-icon"), it.badge !== undefined && h("span", { class: "m-ab-badge" }, h(Badge, { count: () => val(it.badge), tone: "primary", size: "xs" }))],
   })));
   // an action is never the selected view
   const selected = (): string | null => { const id = current(); return id != null && !byId(id)?.onSelect ? id : null; };
   return h(TabList, {
     tabs, value: selected, onSelect: (id: string) => choose(byId(id)), orientation: reactive(() => (horizontal() ? "horizontal" : "vertical")) as never,
     activation: "manual", variant: "none", controls: props.controls, tabId: (id: string) => `${base}-${id}`,
-    class: () => cx("hm-ab", horizontal() ? "hm-ab-h" : "hm-ab-v", val(props.class)), label: () => val(props.label) ?? t`Views`, color: reactive(() => props.color) as never,
-    tabProps: (tab: TabSpec) => { const it = byId(tab.id)!; return { class: cx("hm-ab-btn", it.position === "end" && "hm-ab-end"), "data-view": it.id, "aria-label": () => name(it), "aria-keyshortcuts": it.shortcut ?? null }; },
+    class: () => cx("m-ab", horizontal() ? "m-ab-h" : "m-ab-v", val(props.class)), label: () => val(props.label) ?? t`Views`, color: reactive(() => props.color) as never,
+    tabProps: (tab: TabSpec) => { const it = byId(tab.id)!; return { class: cx("m-ab-btn", it.position === "end" && "m-ab-end"), "data-view": it.id, "aria-label": () => name(it), "aria-keyshortcuts": it.shortcut ?? null }; },
     wrap: (btn: Element, tab: TabSpec) => (props.tooltips === false ? btn : h(Tooltip, { text: () => name(byId(tab.id)!), placement: reactive(() => (horizontal() ? "top" : "bottom-start")) as never, children: btn })),
     children: ind,
   }) as Element;

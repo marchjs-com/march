@@ -106,15 +106,15 @@ export function RecordListEditor(props: RecordListEditorProps): unknown {
     return empty && !f.required ? null : sch().validateField(f.name, v, row);
   });
 
-  return h("div", { class: cx("hm-records", props.class), role: "group", "aria-labelledby": labelledBy(props) },
-    h("ol", { class: "hm-records-items" }, h(For, { each: idx, children: (i: Accessor<number>) => h("li", { class: "hm-records-row" },
-      h("div", { class: () => cx("hm-form-grid", `hm-cols-${cols()}`) }, sch().fields.filter((f) => !f.hidden && f.type !== "hidden").map((f) => {
+  return h("div", { class: cx("m-records", props.class), role: "group", "aria-labelledby": labelledBy(props) },
+    h("ol", { class: "m-records-items" }, h(For, { each: idx, children: (i: Accessor<number>) => h("li", { class: "m-records-row" },
+      h("div", { class: () => cx("m-form-grid", `m-cols-${cols()}`) }, sch().fields.filter((f) => !f.hidden && f.type !== "hidden").map((f) => {
         const on = computed(() => !f.when || f.when(list()[i()] ?? {}));
         const err = error(i, f);
         return () => (on() ? untrack(() => h(Field, { label: INLINE_LABEL.has(inputFor(f)!) ? null : f.label, required: f.required, compact: true, error: live(() => err()) }, control(f, i))) : null);
       })),
-      () => (ro() || (props.sortable === false && props.removable === false) ? null : h(RowTools, rowToolsProps(rows, i, { sortable: props.sortable, removable: props.removable, class: "hm-records-tools" })))) })),
-    () => (ro() ? null : h(Button, { class: "hm-records-add", disabled: full, onClick: () => set([...untrack(list), blank()]) }, () => props.addLabel ?? t`Add row`)));
+      () => (ro() || (props.sortable === false && props.removable === false) ? null : h(RowTools, rowToolsProps(rows, i, { sortable: props.sortable, removable: props.removable, class: "m-records-tools" })))) })),
+    () => (ro() ? null : h(Button, { class: "m-records-add", disabled: full, onClick: () => set([...untrack(list), blank()]) }, () => props.addLabel ?? t`Add row`)));
 }
 
 registerInput("records", RecordListEditor);

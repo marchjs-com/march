@@ -39,13 +39,13 @@ export default function ChevronDemo(props: { values: { open: boolean; direction:
         const icon = props.values.icon === "arrow" ? arrowRight : props.values.icon === "text" ? "›" : undefined
         return <Chevron open={open} direction={direction} size={size} motion={motion} color={color} icon={icon} />
       }}
-      <span class="hm-muted">{() => (props.values.open ? "open: ok döndü" : "open={false}")} · {() => MOTION_NOTE[props.values.motion] ?? ""}</span>
+      <span class="m-muted">{() => (props.values.open ? "open: ok döndü" : "open={false}")} · {() => MOTION_NOTE[props.values.motion] ?? ""}</span>
     </div>
     <div class="sc-row">
       <Button variant="ghost" aria-expanded={() => String($mine !== $play)} onClick={() => { $mine = !$mine }}>
         Ayrıntılar <Chevron direction={direction} size={size} motion={motion} color={color} />
       </Button>
-      <span class="hm-muted">{() => ($mine ? "Düğme açık: ok onu izledi (open verilmedi)." : "Düğmeye bas: ok aria-expanded'ı izler.")}</span>
+      <span class="m-muted">{() => ($mine ? "Düğme açık: ok onu izledi (open verilmedi)." : "Düğmeye bas: ok aria-expanded'ı izler.")}</span>
     </div>
   </div>
 }

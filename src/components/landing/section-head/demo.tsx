@@ -20,6 +20,6 @@ export default function SectionHeadDemo(props: { values: Values }) {
         actions={v.actions ? [{ label: "Hemen başla" }, { label: "Belgeler" }] : undefined}
         note={v.note ? "Kart gerekmez · 1 dakikada kurulur" : undefined} />
     }}
-    <p class="sc-demo-call">{() => `<${props.values.level} class="hm-section-head-title">`}</p>
+    <p class="sc-demo-call">{() => `<${props.values.level} class="m-section-head-title">`}</p>
   </div>
 }

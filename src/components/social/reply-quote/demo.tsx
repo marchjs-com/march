@@ -29,6 +29,6 @@ export default function ReplyQuoteDemo(props: { values: { place: string; lines: 
         ? <ChatBubble mine text="Tamam, 7'de oradayım." position="single">{quote()}</ChatBubble>
         : <>{() => ($shown ? quote() : <Button size="sm" on:click={() => { $shown = true; $log = "" }}>Yanıtı yeniden göster</Button>)}</>
     }}
-    <p class="hm-muted" aria-live="polite">{() => $log}</p>
+    <p class="m-muted" aria-live="polite">{() => $log}</p>
   </div>
 }

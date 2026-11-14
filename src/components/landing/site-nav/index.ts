@@ -82,10 +82,10 @@ export function SiteNav(props: SiteNavProps): Element {
   const scrolled = signal(false), hidden = signal(false);
   const links = props.links ?? [];
   const L = props.labels ?? {};
-  const pill = h("span", { class: "hm-snav-pill", "aria-hidden": "true", "data-hm-color": colorAttr(props.pillColor) }) as HTMLElement;
+  const pill = h("span", { class: "m-snav-pill", "aria-hidden": "true", "data-m-color": colorAttr(props.pillColor) }) as HTMLElement;
   const anchors: HTMLElement[] = [];
-  const list = h("ul", { class: "hm-snav-links" }, props.pill === false ? null : pill, links.map((l) => {
-    const a = h("a", { class: "hm-snav-link", href: l.href, "aria-current": () => (val(l.active) ? "page" : null), onClick: (e: Event) => { toSection(e, l.href); props.onNavigate?.(l.href); } }, l.label) as HTMLElement;
+  const list = h("ul", { class: "m-snav-links" }, props.pill === false ? null : pill, links.map((l) => {
+    const a = h("a", { class: "m-snav-link", href: l.href, "aria-current": () => (val(l.active) ? "page" : null), onClick: (e: Event) => { toSection(e, l.href); props.onNavigate?.(l.href); } }, l.label) as HTMLElement;
     anchors.push(a);
     return h("li", {}, a);
   })) as HTMLElement;
@@ -95,16 +95,16 @@ export function SiteNav(props: SiteNavProps): Element {
   const moveTo = (a: HTMLElement | null): void => { if (props.pill !== false) slide.moveTo(a); };
   const current = (): HTMLElement | null => anchors.find((_, i) => val(links[i]?.active)) ?? null;
   const offList = listen(list, {
-    pointerover: (e: PointerEvent) => { const a = (e.target as Element).closest?.(".hm-snav-link") as HTMLElement | null; if (a) moveTo(a); },
+    pointerover: (e: PointerEvent) => { const a = (e.target as Element).closest?.(".m-snav-link") as HTMLElement | null; if (a) moveTo(a); },
     pointerleave: () => moveTo(current()),
-    focusin: (e: FocusEvent) => moveTo((e.target as Element).closest?.(".hm-snav-link") as HTMLElement | null),
+    focusin: (e: FocusEvent) => moveTo((e.target as Element).closest?.(".m-snav-link") as HTMLElement | null),
     focusout: () => moveTo(current()),
   });
 
   const openMenu = (): void => {
-    void openDrawer((close) => h("nav", { class: "hm-snav-drawer", "aria-label": L.main ?? t`Main` },
-      h("ul", {}, links.map((l) => h("li", {}, h("a", { class: "hm-snav-drawer-link", href: l.href, "aria-current": () => (val(l.active) ? "page" : null), onClick: (e: Event) => { close(undefined); toSection(e, l.href); props.onNavigate?.(l.href); } }, l.label)))),
-      props.actions != null && h("div", { class: "hm-snav-drawer-actions" }, props.actions)), { side: props.drawerSide ?? "right", title: L.menu ?? t`Menu` });
+    void openDrawer((close) => h("nav", { class: "m-snav-drawer", "aria-label": L.main ?? t`Main` },
+      h("ul", {}, links.map((l) => h("li", {}, h("a", { class: "m-snav-drawer-link", href: l.href, "aria-current": () => (val(l.active) ? "page" : null), onClick: (e: Event) => { close(undefined); toSection(e, l.href); props.onNavigate?.(l.href); } }, l.label)))),
+      props.actions != null && h("div", { class: "m-snav-drawer-actions" }, props.actions)), { side: props.drawerSide ?? "right", title: L.menu ?? t`Menu` });
   };
 
   const threshold = props.threshold ?? 12;
@@ -123,13 +123,13 @@ export function SiteNav(props: SiteNavProps): Element {
   if (typeof source === "function") queueMicrotask(() => watch(source() ?? null)); else watch(source ?? null);
   const mode = props.mode ?? "solid";
   const nav = h("header", {
-    class: () => cx("hm-snav", `hm-snav-${mode}`, props.sticky !== false && "is-sticky", props.shrink !== false && "hm-snav-shrinks", scrolled() && "is-scrolled", hidden() && "is-hidden", val(props.class)),
+    class: () => cx("m-snav", `m-snav-${mode}`, props.sticky !== false && "is-sticky", props.shrink !== false && "m-snav-shrinks", scrolled() && "is-scrolled", hidden() && "is-hidden", val(props.class)),
   },
-  h("div", { class: "hm-snav-bar" },
-    h("div", { class: "hm-snav-brand" }, brandNode(props.brand)),
-    links.length ? h("nav", { class: "hm-snav-nav", "aria-label": L.main ?? t`Main` }, list) : null,
-    h("div", { class: "hm-snav-actions" }, props.actions ?? null),
-    links.length && props.menu !== false ? h(IconButton, { class: "hm-snav-menu", icon: props.menuIcon ?? menu, label: () => L.openMenu ?? t`Open menu`, onClick: openMenu }) : null)) as HTMLElement;
+  h("div", { class: "m-snav-bar" },
+    h("div", { class: "m-snav-brand" }, brandNode(props.brand)),
+    links.length ? h("nav", { class: "m-snav-nav", "aria-label": L.main ?? t`Main` }, list) : null,
+    h("div", { class: "m-snav-actions" }, props.actions ?? null),
+    links.length && props.menu !== false ? h(IconButton, { class: "m-snav-menu", icon: props.menuIcon ?? menu, label: () => L.openMenu ?? t`Open menu`, onClick: openMenu }) : null)) as HTMLElement;
   // rest on the current link once laid out
   queueMicrotask(() => { if (nav.isConnected) moveTo(current()); });
   owned(() => { gone = true; offList(); offScroll(); });

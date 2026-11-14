@@ -28,10 +28,10 @@ export interface AccordionProps {
 export function Accordion(props: AccordionProps): Element {
   const keyOf = (it: AccordionItem, i: number): string | number => it.id ?? i;
   const open = signal(new Set<string | number>(props.open ?? []));
-  const base = uid("hm-acc");
+  const base = uid("m-acc");
   const toggle = (k: string | number): void => { open.update((s) => { const n = props.multiple ? new Set(s) : new Set<string | number>(); if (s.has(k)) n.delete(k); else n.add(k); return n; }); props.onToggle?.(k, open.peek().has(k)); };
   const nav = (e: KeyboardEvent): void => {
-    const btns = [...((e.currentTarget as HTMLElement).closest(".hm-accordion")?.querySelectorAll<HTMLButtonElement>(".hm-acc-btn:not(:disabled)") ?? [])];
+    const btns = [...((e.currentTarget as HTMLElement).closest(".m-accordion")?.querySelectorAll<HTMLButtonElement>(".m-acc-btn:not(:disabled)") ?? [])];
     if (btns.includes(e.target as HTMLButtonElement)) roving(e, btns); // ↑ ↓ Home End, wrapping (each header stays a Tab stop)
   };
   const chev = (isOpen: () => boolean, it: AccordionItem): unknown => {
@@ -40,17 +40,17 @@ export function Accordion(props: AccordionProps): Element {
     const own = typeof c === "function" ? (c as (open: () => boolean, item: AccordionItem) => unknown)(isOpen, it) : c;
     const mine = own != null && own !== true;
     // follows the header button's aria-expanded; an own mark is drawn as given and turns half way round
-    return h(Chevron, { direction: "down", size: "md", class: cx("hm-acc-chev", mine && "is-own"), motion: props.animated === false ? false : undefined, icon: mine ? own : undefined });
+    return h(Chevron, { direction: "down", size: "md", class: cx("m-acc-chev", mine && "is-own"), motion: props.animated === false ? false : undefined, icon: mine ? own : undefined });
   };
-  return h("div", { class: () => cx("hm-accordion", `hm-accordion-${props.variant ?? "separated"}`, props.animated === false && "is-static", val(props.class)), onKeydown: nav },
+  return h("div", { class: () => cx("m-accordion", `m-accordion-${props.variant ?? "separated"}`, props.animated === false && "is-static", val(props.class)), onKeydown: nav },
     props.items.map((it, i) => {
       const k = keyOf(it, i), isOpen = (): boolean => open().has(k), id = `${base}-${i}`;
-      return h("div", { class: () => cx("hm-acc-item", isOpen() && "is-open") },
-        h("h3", { class: "hm-acc-head", "data-hm-color": colorAttr(props.color) },
+      return h("div", { class: () => cx("m-acc-item", isOpen() && "is-open") },
+        h("h3", { class: "m-acc-head", "data-m-color": colorAttr(props.color) },
           // the header is a ListRow button (the plain one: titles wrap, no scrolling text is loaded)
-          h(PlainListRow, { class: "hm-acc-btn", id: `${id}-b`, "aria-expanded": () => String(isOpen()), "aria-controls": `${id}-p`, disabled: it.disabled, onClick: () => toggle(k), overflow: "wrap",
-            lead: it.icon, title: h("span", { class: "hm-acc-title" }, it.title), sub: it.subtitle, trail: chev(isOpen, it) })),
-        h("div", { class: "hm-acc-panel", id: `${id}-p`, role: "region", "aria-labelledby": `${id}-b`, inert: () => !isOpen() },
-          h("div", { class: "hm-acc-inner" }, h("div", { class: "hm-acc-body" }, it.content))));
+          h(PlainListRow, { class: "m-acc-btn", id: `${id}-b`, "aria-expanded": () => String(isOpen()), "aria-controls": `${id}-p`, disabled: it.disabled, onClick: () => toggle(k), overflow: "wrap",
+            lead: it.icon, title: h("span", { class: "m-acc-title" }, it.title), sub: it.subtitle, trail: chev(isOpen, it) })),
+        h("div", { class: "m-acc-panel", id: `${id}-p`, role: "region", "aria-labelledby": `${id}-b`, inert: () => !isOpen() },
+          h("div", { class: "m-acc-inner" }, h("div", { class: "m-acc-body" }, it.content))));
     }));
 }

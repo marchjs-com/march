@@ -14,7 +14,7 @@ import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export type OverlayEffect = "glass" | "gradient" | "mesh" | "noise" | "vignette" | "spotlight" | "grid" | "dots";
 export type OverlayFit = "cover" | "contain" | "fill" | "none" | "scale-down";
-/** A length: a space step (0–8 → --hm-space-n) or any CSS length ("12px", "10%"). */
+/** A length: a space step (0–8 → --m-space-n) or any CSS length ("12px", "10%"). */
 export type OverlayLength = number | string;
 
 /** What a draw function receives. */
@@ -66,7 +66,7 @@ export interface OverlayProps {
 }
 
 const SVG = /\.svg(\?|#|$)/i;
-const len = (v: OverlayLength | undefined): string | null => (v == null ? null : typeof v === "number" ? `var(--hm-space-${v}, ${v * 4}px)` : v);
+const len = (v: OverlayLength | undefined): string | null => (v == null ? null : typeof v === "number" ? `var(--m-space-${v}, ${v * 4}px)` : v);
 let seq = 0;
 
 /** True when heavy media should not run: save-data, 2G, or reduced motion. */
@@ -87,25 +87,25 @@ export function Overlay(props: OverlayProps): Element {
   // physical sides on request (left / right): part of the class list, so a class change keeps it
   const physical = props.left != null || props.right != null;
   const root = h("div", {
-    class: () => cx("hm-ov", `hm-ov-${kind}`, props.effect && `hm-ov-fx-${props.effect}`, props.front ? "hm-ov-front" : "hm-ov-behind", physical && "hm-ov-physical", props.interactive && "is-interactive", val(props.class)),
-    "aria-hidden": meaningful ? null : "true", inert: props.interactive ? null : "", "data-hm-color": () => colorAttr(props.color),
+    class: () => cx("m-ov", `m-ov-${kind}`, props.effect && `m-ov-fx-${props.effect}`, props.front ? "m-ov-front" : "m-ov-behind", physical && "m-ov-physical", props.interactive && "is-interactive", val(props.class)),
+    "aria-hidden": meaningful ? null : "true", inert: props.interactive ? null : "", "data-m-color": () => colorAttr(props.color),
   }) as HTMLElement;
   // geometry and order: CSS variables (CSSOM)
   const set = (k: string, v: string | null): void => { if (v == null) root.style.removeProperty(k); else root.style.setProperty(k, v); };
   // front / behind and the opacity follow their props (a live prop changes the stacking, not only the class)
-  effect(() => set("--hm-ov-z", String(props.front ? 10 + order : -1000 + order)));
+  effect(() => set("--m-ov-z", String(props.front ? 10 + order : -1000 + order)));
   const all = len(props.inset);
-  set("--hm-ov-top", len(props.top) ?? all); set("--hm-ov-bottom", len(props.bottom) ?? all);
-  set("--hm-ov-start", len(props.start) ?? len(props.left) ?? all); set("--hm-ov-end", len(props.end) ?? len(props.right) ?? all);
-  if (physical) { set("--hm-ov-left", len(props.left) ?? all); set("--hm-ov-right", len(props.right) ?? all); }
-  set("--hm-ov-fit", props.fit ?? "cover"); set("--hm-ov-pos", props.position ?? "center");
-  if (props.blend) set("--hm-ov-blend", props.blend);
-  effect(() => { const o = val(props.opacity); set("--hm-ov-opacity", o == null ? null : String(o)); });
+  set("--m-ov-top", len(props.top) ?? all); set("--m-ov-bottom", len(props.bottom) ?? all);
+  set("--m-ov-start", len(props.start) ?? len(props.left) ?? all); set("--m-ov-end", len(props.end) ?? len(props.right) ?? all);
+  if (physical) { set("--m-ov-left", len(props.left) ?? all); set("--m-ov-right", len(props.right) ?? all); }
+  set("--m-ov-fit", props.fit ?? "cover"); set("--m-ov-pos", props.position ?? "center");
+  if (props.blend) set("--m-ov-blend", props.blend);
+  effect(() => { const o = val(props.opacity); set("--m-ov-opacity", o == null ? null : String(o)); });
 
-  if (kind === "image") root.append(h("img", { class: "hm-ov-media", src: () => val(props.src) ?? "", srcset: props.srcset ?? null, sizes: props.sizes ?? null, alt: props.alt ?? "", loading: "lazy", decoding: "async", draggable: "false" }) as Node);
-  else if (kind === "svg") root.append((props.svg ?? h("img", { class: "hm-ov-media", src: () => val(props.src) ?? "", alt: "", loading: "lazy", decoding: "async" })) as Node);
+  if (kind === "image") root.append(h("img", { class: "m-ov-media", src: () => val(props.src) ?? "", srcset: props.srcset ?? null, sizes: props.sizes ?? null, alt: props.alt ?? "", loading: "lazy", decoding: "async", draggable: "false" }) as Node);
+  else if (kind === "svg") root.append((props.svg ?? h("img", { class: "m-ov-media", src: () => val(props.src) ?? "", alt: "", loading: "lazy", decoding: "async" })) as Node);
   else if (kind === "video") {
-    const poster = props.poster ? h("img", { class: "hm-ov-media hm-ov-poster", src: props.poster, alt: "", decoding: "async" }) as HTMLElement : null;
+    const poster = props.poster ? h("img", { class: "m-ov-media m-ov-poster", src: props.poster, alt: "", decoding: "async" }) as HTMLElement : null;
     if (poster) root.append(poster);
     if (!quietMedia()) void import("./media.ts").then((m) => { if (root.isConnected || !getOwner()) m.mountVideo(root, String(val(props.src) ?? ""), props.poster, poster); });
   } else if (kind === "canvas") {
@@ -118,14 +118,14 @@ export function Overlay(props: OverlayProps): Element {
   const attach = (): void => {
     host = root.parentElement;
     if (!host) return;
-    host.classList.add("hm-ov-host");
+    host.classList.add("m-ov-host");
     if (props.effect === "spotlight" || props.draw) {
       const move = (e: PointerEvent): void => {
         const r = (host as HTMLElement).getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-        pointer.set({ x, y }); set("--hm-ov-x", `${x}px`); set("--hm-ov-y", `${y}px`);
-        (root as HTMLElement & { hmPointer?: unknown }).hmPointer = { x, y };
+        pointer.set({ x, y }); set("--m-ov-x", `${x}px`); set("--m-ov-y", `${y}px`);
+        (root as HTMLElement & { mPointer?: unknown }).mPointer = { x, y };
       };
-      const leave = (): void => { pointer.set(null); (root as HTMLElement & { hmPointer?: unknown }).hmPointer = null; };
+      const leave = (): void => { pointer.set(null); (root as HTMLElement & { mPointer?: unknown }).mPointer = null; };
       listen(host, { pointermove: move, pointerleave: leave });
     }
   };

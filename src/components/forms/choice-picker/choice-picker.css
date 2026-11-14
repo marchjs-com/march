@@ -1,21 +1,21 @@
 /* ChoicePicker: compact preview cards and square tiles for option panels (the card variant made small). */
-.hm-picker { min-width: 0; }
-.hm-picker.hm-picker-cards .hm-choices, .hm-picker.hm-picker-cards .hm-choice-card { grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); grid-auto-rows: auto; gap: var(--hm-space-2); }
-.hm-picker.hm-picker-grid .hm-choices, .hm-picker.hm-picker-grid .hm-choice-card { grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr)); grid-auto-rows: auto; gap: var(--hm-space-2); }
-.hm-picker.hm-picker-cards .hm-check, .hm-picker.hm-picker-grid .hm-check { padding: var(--hm-space-1); padding-inline-end: var(--hm-space-1); }
-.hm-picker.hm-picker-cards .hm-choice-card-body, .hm-picker.hm-picker-grid .hm-choice-card-body { display: flex; flex-direction: column; align-items: stretch; gap: var(--hm-space-1); width: 100%; }
-.hm-picker.hm-picker-cards .hm-choice-card-icon, .hm-picker.hm-picker-grid .hm-choice-card-icon { display: block; position: relative; overflow: hidden; width: 100%; height: auto; margin: 0;
-  aspect-ratio: 16 / 10; border-radius: calc(var(--hm-ch-card-radius) - 4px); background: var(--hm-bg-subtle); }
-.hm-picker.hm-picker-grid .hm-choice-card-icon { aspect-ratio: 1; }
-.hm-picker.hm-picker-cards .hm-choice-card-icon > *, .hm-picker.hm-picker-grid .hm-choice-card-icon > * { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hm-picker.hm-picker-cards .hm-choice-card-title, .hm-picker.hm-picker-grid .hm-choice-card-title { padding-inline: var(--hm-space-1); font-size: var(--hm-text-xs); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hm-picker.hm-picker-cards .hm-check-box, .hm-picker.hm-picker-grid .hm-check-box { inset-block-start: .375rem; inset-inline-end: .375rem; width: 1.125rem; height: 1.125rem; }
+.m-picker { min-width: 0; }
+.m-picker.m-picker-cards .m-choices, .m-picker.m-picker-cards .m-choice-card { grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); grid-auto-rows: auto; gap: var(--m-space-2); }
+.m-picker.m-picker-grid .m-choices, .m-picker.m-picker-grid .m-choice-card { grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr)); grid-auto-rows: auto; gap: var(--m-space-2); }
+.m-picker.m-picker-cards .m-check, .m-picker.m-picker-grid .m-check { padding: var(--m-space-1); padding-inline-end: var(--m-space-1); }
+.m-picker.m-picker-cards .m-choice-card-body, .m-picker.m-picker-grid .m-choice-card-body { display: flex; flex-direction: column; align-items: stretch; gap: var(--m-space-1); width: 100%; }
+.m-picker.m-picker-cards .m-choice-card-icon, .m-picker.m-picker-grid .m-choice-card-icon { display: block; position: relative; overflow: hidden; width: 100%; height: auto; margin: 0;
+  aspect-ratio: 16 / 10; border-radius: calc(var(--m-ch-card-radius) - 4px); background: var(--m-bg-subtle); }
+.m-picker.m-picker-grid .m-choice-card-icon { aspect-ratio: 1; }
+.m-picker.m-picker-cards .m-choice-card-icon > *, .m-picker.m-picker-grid .m-choice-card-icon > * { position: absolute; inset: 0; width: 100%; height: 100%; }
+.m-picker.m-picker-cards .m-choice-card-title, .m-picker.m-picker-grid .m-choice-card-title { padding-inline: var(--m-space-1); font-size: var(--m-text-xs); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-picker.m-picker-cards .m-check-box, .m-picker.m-picker-grid .m-check-box { inset-block-start: .375rem; inset-inline-end: .375rem; width: 1.125rem; height: 1.125rem; }
 /* a card without a preview (a label only): the badge sits at the line end, centred on the block axis, and the label keeps
    room for it on both sides, so it stays centred and is never covered */
-.hm-picker:is(.hm-picker-cards, .hm-picker-grid) .hm-check:not(:has(.hm-choice-card-icon)) { align-items: center; min-block-size: 2rem; }
-.hm-picker:is(.hm-picker-cards, .hm-picker-grid) .hm-check:not(:has(.hm-choice-card-icon)) .hm-check-box { inset-block: 0; margin-block: auto; }
-.hm-picker:is(.hm-picker-cards, .hm-picker-grid) .hm-check:not(:has(.hm-choice-card-icon)) .hm-choice-card-body { padding-inline: calc(1.125rem + var(--hm-space-2)); justify-content: center; text-align: center; }
+.m-picker:is(.m-picker-cards, .m-picker-grid) .m-check:not(:has(.m-choice-card-icon)) { align-items: center; min-block-size: 2rem; }
+.m-picker:is(.m-picker-cards, .m-picker-grid) .m-check:not(:has(.m-choice-card-icon)) .m-check-box { inset-block: 0; margin-block: auto; }
+.m-picker:is(.m-picker-cards, .m-picker-grid) .m-check:not(:has(.m-choice-card-icon)) .m-choice-card-body { padding-inline: calc(1.125rem + var(--m-space-2)); justify-content: center; text-align: center; }
 /* a text-only tile (no preview): the label wraps to fit instead of being cut, and the check mark (which would cover
    it) gives way to the selected tile's own border */
-.hm-picker:is(.hm-picker-cards, .hm-picker-grid) .hm-check:not(:has(.hm-choice-card-icon)) .hm-choice-card-title { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.25; }
-.hm-picker:is(.hm-picker-cards, .hm-picker-grid) .hm-check:not(:has(.hm-choice-card-icon)) .hm-check-box { display: none; }
+.m-picker:is(.m-picker-cards, .m-picker-grid) .m-check:not(:has(.m-choice-card-icon)) .m-choice-card-title { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.25; }
+.m-picker:is(.m-picker-cards, .m-picker-grid) .m-check:not(:has(.m-choice-card-icon)) .m-check-box { display: none; }

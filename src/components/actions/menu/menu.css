@@ -1,19 +1,19 @@
-/* March — Menu and Dropdown (and the .hm-pop panel of every floating() popover). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Menu and Dropdown (and the .m-pop panel of every floating() popover). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- popovers, menus, tooltips */
-.hm-pop { position: fixed; z-index: var(--hm-z-dropdown); background: var(--hm-surface-raised); color: var(--hm-text); border: 1px solid var(--hm-border);
-  border-radius: var(--hm-radius-3); box-shadow: var(--hm-shadow-3); animation: hm-scale-in var(--hm-dur) var(--hm-ease-out); transform-origin: top; }
+.m-pop { position: fixed; z-index: var(--m-z-dropdown); background: var(--m-surface-raised); color: var(--m-text); border: 1px solid var(--m-border);
+  border-radius: var(--m-radius-3); box-shadow: var(--m-shadow-3); animation: m-scale-in var(--m-dur) var(--m-ease-out); transform-origin: top; }
 /* the menu panel is a Popover (flush): its width, height and the gap around the entries */
-.hm-pop.hm-menu { --hm-pop-pad: .3125rem; min-inline-size: 12rem; max-inline-size: min(22rem, calc(100vw - 16px)); max-block-size: 60vh; padding: var(--hm-pop-pad); }
+.m-pop.m-menu { --m-pop-pad: .3125rem; min-inline-size: 12rem; max-inline-size: min(22rem, calc(100vw - 16px)); max-block-size: 60vh; padding: var(--m-pop-pad); }
 /* a Menu entry is a ListRow (size sm): the menu keeps its own padding, corner and text size; the focused entry is filled (arrow keys) */
-.hm-listrow.hm-menu-item { padding: 0 .625rem; border-radius: max(.25rem, calc(var(--hm-radius-3) - var(--hm-pop-pad, .3125rem))); font-size: var(--hm-text-md); }
-.hm-menu-item:focus { background: var(--hm-surface-2); outline: none; }
-.hm-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--hm-focus); outline: none; }
-.hm-listrow.hm-menu-item.is-danger, .hm-menu-item.is-danger .hm-listrow-lead { color: var(--hm-danger-text); }
-.hm-menu-item > .hm-listrow-trail { font-size: inherit; }
-.hm-menu-kbd { margin-inline-start: auto; }
+.m-listrow.m-menu-item { padding: 0 .625rem; border-radius: max(.25rem, calc(var(--m-radius-3) - var(--m-pop-pad, .3125rem))); font-size: var(--m-text-md); }
+.m-menu-item:focus { background: var(--m-surface-2); outline: none; }
+.m-menu-item:focus-visible { box-shadow: inset 0 0 0 2px var(--m-focus); outline: none; }
+.m-listrow.m-menu-item.is-danger, .m-menu-item.is-danger .m-listrow-lead { color: var(--m-danger-text); }
+.m-menu-item > .m-listrow-trail { font-size: inherit; }
+.m-menu-kbd { margin-inline-start: auto; }
 /* a checked choice (menuitemcheckbox / menuitemradio): the mark keeps its place, shown only while checked */
-.hm-checkmark.hm-menu-check { flex: none; color: var(--hm-accent, var(--hm-primary)); visibility: hidden; }
-.hm-menu-check .hm-checkmark-icon { inline-size: 1rem; block-size: 1rem; }
-.hm-menu-item[aria-checked="true"] .hm-menu-check { visibility: visible; }
-.hm-divider.hm-menu-sep { margin: var(--hm-space-1) calc(-1 * var(--hm-space-1)); }
-.hm-pop::-webkit-scrollbar-track { margin-block: var(--hm-radius-2); }
+.m-checkmark.m-menu-check { flex: none; color: var(--m-accent, var(--m-primary)); visibility: hidden; }
+.m-menu-check .m-checkmark-icon { inline-size: 1rem; block-size: 1rem; }
+.m-menu-item[aria-checked="true"] .m-menu-check { visibility: visible; }
+.m-divider.m-menu-sep { margin: var(--m-space-1) calc(-1 * var(--m-space-1)); }
+.m-pop::-webkit-scrollbar-track { margin-block: var(--m-radius-2); }

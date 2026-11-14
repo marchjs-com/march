@@ -181,7 +181,7 @@ function flush(): void {
   }
 }
 
-const REACTIVE = Symbol.for("hm.reactive");
+const REACTIVE = Symbol.for("m.reactive");
 /** True for signals, computeds and compiler thunks (functions that should be treated as live values). */
 export const isReactive = (v: unknown): v is (() => unknown) => typeof v === "function" && (v as unknown as Record<symbol, unknown>)[REACTIVE] === true;
 /** Tag a function as a reactive accessor (compiler output and h() users). */
@@ -337,7 +337,7 @@ export function _enter<T>(owner: Owner | null, value: T): T {
 }
 
 // ------------------------------------------------------------------ errors
-const ERROR = Symbol("hm.error");
+const ERROR = Symbol("m.error");
 let errorHook: ((e: unknown, handled: boolean) => void) | null = null;
 /** Observe every error a boundary handles (handled) or that escapes (hadi-march/errors installs itself here). */
 export function setErrorHook(fn: ((e: unknown, handled: boolean) => void) | null): void { errorHook = fn; }
@@ -364,7 +364,7 @@ export { handleError as reportError };
 export interface Context<T> { id: symbol; defaultValue: T; Provider: (props: { value: T; children?: unknown }) => unknown }
 /** Create a context: provide a value with `<Ctx.Provider value>` and read it below with useContext(Ctx). */
 export function context<T>(defaultValue?: T): Context<T> {
-  const id = Symbol("hm.context");
+  const id = Symbol("m.context");
   const ctx: Context<T> = {
     id, defaultValue: defaultValue as T,
     Provider: (props) => {

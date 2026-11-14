@@ -220,11 +220,11 @@ function stripBase(p: string, base: string): string {
 
 /**
  * History mode, first thing: an address another host or an older version produced becomes the normal one, without a
- * history entry: ?hm-path=/x (written by the 404.html fallback of a static host) and #/x (old hash links).
+ * history entry: ?m-path=/x (written by the 404.html fallback of a static host) and #/x (old hash links).
  */
 function restoreAddress(base: string): void {
   const l = globalThis.location;
-  const to = /^#\//.test(l.hash) ? l.hash.slice(1) : new URLSearchParams(l.search).get("hm-path");
+  const to = /^#\//.test(l.hash) ? l.hash.slice(1) : new URLSearchParams(l.search).get("m-path");
   if (to?.[0] === "/" && to[1] !== "/") globalThis.history.replaceState(globalThis.history.state, "", base + to);
 }
 
@@ -272,13 +272,13 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
   const r = S.router;
   if (!r) return;
   let { p, search, hash } = currentLocation();
-  // modal route: the URL is the modal's, the page behind stays the one it was opened from (history state hmBg)
-  const st = globalThis.history?.state as { hmModal?: boolean; hmBg?: string } | null;
+  // modal route: the URL is the modal's, the page behind stays the one it was opened from (history state mBg)
+  const st = globalThis.history?.state as { mModal?: boolean; mBg?: string } | null;
   let modalTo: string | null = null;
-  if (st?.hmModal && st.hmBg) {
+  if (st?.mModal && st.mBg) {
     // a direct visit / reload of a modal URL shows the page in full (and forgets the modal state)
-    if (initial) globalThis.history.replaceState({ ...st, hmModal: undefined, hmBg: undefined }, "");
-    else { modalTo = `${p}${search}`; const u = new URL(st.hmBg, "http://x"); p = u.pathname; search = u.search; }
+    if (initial) globalThis.history.replaceState({ ...st, mModal: undefined, mBg: undefined }, "");
+    else { modalTo = `${p}${search}`; const u = new URL(st.mBg, "http://x"); p = u.pathname; search = u.search; }
   }
   S.modalTo.set(modalTo);
   // leave confirmation on back/forward: restore the URL when a guard says no
@@ -370,13 +370,13 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
 /** The depth whose content the last navigation replaced (page transitions name only that outlet). */
 let vtDepth = 0;
 const passThrough: Component = (p) => p["children"];
-const notFoundComp: Component = () => untrack(() => call(S.router?.opts.notFound ?? (() => h("p", { class: "hm-empty" }, () => t`Not found`))));
-const forbiddenComp: Component = () => h("p", { class: "hm-empty", role: "alert" }, () => t`Not allowed`);
+const notFoundComp: Component = () => untrack(() => call(S.router?.opts.notFound ?? (() => h("p", { class: "m-empty" }, () => t`Not found`))));
+const forbiddenComp: Component = () => h("p", { class: "m-empty", role: "alert" }, () => t`Not allowed`);
 /** The default error view of a page that failed to load, with a retry button. */
 export function routeError(e: unknown, retry: () => void): Element {
-  return h("div", { class: "hm-error hm-route-error", role: "alert" },
-    h("p", {}, () => t`This page could not be loaded.`), h("p", { class: "hm-muted" }, String((e as { message?: unknown } | null)?.message ?? e)),
-    h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", onClick: retry }, () => t`Try again`));
+  return h("div", { class: "m-error m-route-error", role: "alert" },
+    h("p", {}, () => t`This page could not be loaded.`), h("p", { class: "m-muted" }, String((e as { message?: unknown } | null)?.message ?? e)),
+    h("button", { type: "button", class: "m-btn m-btn-secondary m-btn-sm", onClick: retry }, () => t`Try again`));
 }
 
 const moduleCache = new Map<Loader, Promise<PageModule | null>>();
@@ -437,11 +437,11 @@ async function allowLeave(): Promise<boolean> {
 }
 
 // ------------------------------------------------------------------ scroll
-const SCROLL_KEY = "hm.scroll";
+const SCROLL_KEY = "m.scroll";
 function scrollStore(): Record<string, [number, number]> { try { return JSON.parse(globalThis.sessionStorage?.getItem(SCROLL_KEY) ?? "{}") as Record<string, [number, number]>; } catch { return {}; } }
 function saveScroll(): void {
   try {
-    const k = (globalThis.history?.state as { hmKey?: string } | null)?.hmKey;
+    const k = (globalThis.history?.state as { mKey?: string } | null)?.mKey;
     if (!k) return;
     const s = scrollStore();
     s[k] = [globalThis.scrollX ?? 0, globalThis.scrollY ?? 0];
@@ -449,7 +449,7 @@ function saveScroll(): void {
   } catch { /* storage blocked */ }
 }
 function restoreScroll(pop: boolean): void {
-  const k = (globalThis.history?.state as { hmKey?: string } | null)?.hmKey;
+  const k = (globalThis.history?.state as { mKey?: string } | null)?.mKey;
   const pos = pop && k ? scrollStore()[k] : undefined;
   const go = (): void => globalThis.scrollTo?.(pos?.[0] ?? 0, pos?.[1] ?? 0);
   if (globalThis.requestAnimationFrame) globalThis.requestAnimationFrame(go); else go();
@@ -466,9 +466,9 @@ export async function navigate(to: Href, { replace = false, state = null, force 
   if (!force && !samePage && leaveGuards.size && !(await allowLeave())) return;
   saveScroll();
   // a modal keeps the page it was opened from (or that page's own background, when one modal opens another)
-  const curState = globalThis.history?.state as { hmModal?: boolean; hmBg?: string } | null;
-  const bg = curState?.hmModal && curState.hmBg ? curState.hmBg : `${untrack(() => S.path())}${untrack(() => S.search())}`;
-  const st = { ...(state ?? {}), hmKey: Math.random().toString(36).slice(2), ...(modal ? { hmModal: true, hmBg: bg } : {}) };
+  const curState = globalThis.history?.state as { mModal?: boolean; mBg?: string } | null;
+  const bg = curState?.mModal && curState.mBg ? curState.mBg : `${untrack(() => S.path())}${untrack(() => S.search())}`;
+  const st = { ...(state ?? {}), mKey: Math.random().toString(36).slice(2), ...(modal ? { mModal: true, mBg: bg } : {}) };
   const write = (): void => globalThis.history[replace ? "replaceState" : "pushState"](st, "", r.mode === "hash" ? `#${s}` : r.base + s);
   // a sandbox that refuses only the first real change of address: hash addresses from now on, same routes (a refusal
   // in hash mode throws again)
@@ -480,8 +480,8 @@ export const back = (): void => globalThis.history.back();
 
 /** Close the modal route: back in history when the modal was pushed, else go to the page behind it. */
 export function closeModal(): void {
-  const st = globalThis.history?.state as { hmModal?: boolean; hmBg?: string } | null;
-  if (st?.hmModal) globalThis.history.back(); else if (st?.hmBg) void navigate(st.hmBg as Href, { replace: true });
+  const st = globalThis.history?.state as { mModal?: boolean; mBg?: string } | null;
+  if (st?.mModal) globalThis.history.back(); else if (st?.mBg) void navigate(st.mBg as Href, { replace: true });
 }
 /** Show a path in a named outlet (it becomes part of the URL: ?~name=/path). null closes it. */
 export function openOutlet(name: string, to: string | null, { replace = false }: { replace?: boolean } = {}): Promise<void> {
@@ -512,7 +512,7 @@ function level(r: RouterState, ctx: OutletCtx, loading?: Renderable): Element {
   const { depth } = ctx;
   const key = computed(() => r.view()?.levels[depth]?.key ?? null);
   return h("div", {
-    class: "hm-outlet", "data-depth": String(depth), "aria-busy": () => (S.pendingDepth() === depth && S.pending() ? "true" : null),
+    class: "m-outlet", "data-depth": String(depth), "aria-busy": () => (S.pendingDepth() === depth && S.pending() ? "true" : null),
   }, () => {
     const k = key();
     if (k == null) return depth === 0 && !r.view() && loading !== undefined ? read(loading) : null;
@@ -549,7 +549,7 @@ export function Router(props: { loading?: Renderable; skeleton?: Renderable; fal
   r.loading = props.loading;
   r.skeleton = props.skeleton;
   // the thin progress bar of a navigation slower than 150 ms (router.css)
-  return [h("div", { class: "hm-nav-bar", "aria-hidden": "true", hidden: () => !S.slow() }),
+  return [h("div", { class: "m-nav-bar", "aria-hidden": "true", hidden: () => !S.slow() }),
     level(r, { depth: 0, wrap: props.wrap, notFound: props.notFound, forbidden: props.forbidden }, props.loading)];
 }
 

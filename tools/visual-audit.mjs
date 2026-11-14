@@ -38,7 +38,7 @@ const SCAN = `(() => {
   const out = [];
   const name = (el) => { let s = el.tagName.toLowerCase(); const c = [...el.classList].filter((x) => !/^is-/.test(x)).slice(0, 2).join("."); return c ? s + "." + c : s; };
   const where = (el) => { const p = []; for (let e = el; e && e !== document.body && p.length < 3; e = e.parentElement) p.unshift(name(e)); return p.join(" > "); };
-  const skip = (el) => !!el.closest("svg, canvas, [aria-hidden=true], .hm-sr-only, pre, code, .hm-fx-fill, .hm-overlay[hidden], [data-audit-skip]");
+  const skip = (el) => !!el.closest("svg, canvas, [aria-hidden=true], .m-sr-only, pre, code, .m-fx-fill, .m-overlay[hidden], [data-audit-skip]");
   const shown = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden"; };
   const de = document.documentElement;
   if (de.scrollWidth > de.clientWidth + 1) out.push(["page-overflow", "html", de.scrollWidth + " > " + de.clientWidth]);
@@ -73,7 +73,7 @@ const SCAN = `(() => {
       if (tops.size > 1) { out.push(["broken-word", where(p), m[0]]); break; }
     }
   }
-  for (const g of document.querySelectorAll(".hm-grid")) {
+  for (const g of document.querySelectorAll(".m-grid")) {
     if (skip(g) || !shown(g)) continue;
     const rows = new Map();
     for (const k of g.children) { if (!shown(k)) continue; const r = k.getBoundingClientRect(); const key = Math.round(r.top); (rows.get(key) ?? rows.set(key, []).get(key)).push(r.height); }
@@ -104,8 +104,8 @@ const SCAN = `(() => {
   }
   // choice cards (RadioGroup / CheckboxGroup card variant, ChoicePicker cards and tiles): the tick badge sits inside the
   // card, at the line end, clear of the label; a card that is one line high centres it on the block axis
-  for (const c of document.querySelectorAll(".hm-choice-card .hm-check, .hm-picker-cards .hm-check, .hm-picker-grid .hm-check")) {
-    const b = c.querySelector(".hm-check-box");
+  for (const c of document.querySelectorAll(".m-choice-card .m-check, .m-picker-cards .m-check, .m-picker-grid .m-check")) {
+    const b = c.querySelector(".m-check-box");
     if (!b || skip(c) || !shown(c)) continue;
     const cr = c.getBoundingClientRect(), br = b.getBoundingClientRect();
     if (!br.width) continue;
@@ -113,10 +113,10 @@ const SCAN = `(() => {
     if (inset < 2) { out.push(["badge", where(c), "the badge is " + Math.round(inset) + " px from the card edge"]); continue; }
     const rtl = getComputedStyle(c).direction === "rtl";
     if (rtl ? br.left - cr.left > cr.right - br.right : cr.right - br.right > br.left - cr.left) { out.push(["badge", where(c), "the badge is not at the line end"]); continue; }
-    const label = c.querySelector(".hm-choice-card-title, .hm-choice-card-text, .hm-check-label");
+    const label = c.querySelector(".m-choice-card-title, .m-choice-card-text, .m-check-label");
     const text = label && [...label.querySelectorAll("*"), label].map((e) => { const r = document.createRange(); r.selectNodeContents(e); return r.getBoundingClientRect(); }).find((r) => r.width);
     if (text && text.right > br.left + 1 && text.left < br.right - 1 && text.bottom > br.top + 1 && text.top < br.bottom - 1) { out.push(["badge", where(c), "the badge covers the label"]); continue; }
-    if (!c.querySelector(".hm-choice-card-icon, .hm-choice-card-desc, .hm-choice-card-meta") && Math.abs((br.top + br.bottom) / 2 - (cr.top + cr.bottom) / 2) > 2) out.push(["badge", where(c), "a one-line card: the badge is not centred on the block axis"]);
+    if (!c.querySelector(".m-choice-card-icon, .m-choice-card-desc, .m-choice-card-meta") && Math.abs((br.top + br.bottom) / 2 - (cr.top + cr.bottom) / 2) > 2) out.push(["badge", where(c), "a one-line card: the badge is not centred on the block axis"]);
   }
   return out;
 })()`;
@@ -137,7 +137,7 @@ for (const route of ROUTES) for (const w of WIDTHS) for (const [label, script] o
 // After each step there must be exactly one app shell and one page heading (a second copy of the app would add both).
 {
   await load("/", 1440);
-  const COUNT = "(() => ({ shells: [...document.querySelectorAll('.hm-app-shell, .hm-shell')].filter((e) => !e.parentElement?.closest('.hm-app-shell, .hm-shell')).length, h1: document.querySelectorAll('h1').length, roots: document.querySelectorAll('#app > :not(.hm-nav-bar)').length }))()";
+  const COUNT = "(() => ({ shells: [...document.querySelectorAll('.m-app-shell, .m-shell')].filter((e) => !e.parentElement?.closest('.m-app-shell, .m-shell')).length, h1: document.querySelectorAll('h1').length, roots: document.querySelectorAll('#app > :not(.m-nav-bar)').length }))()";
   const verify = async (step) => {
     const c = await ev(COUNT);
     if (!c || c.shells !== 1 || c.h1 !== 1 || c.roots !== 1) findings.push({ route: step, w: 1440, state: "navigation", kind: "double-mount", at: "#app", detail: JSON.stringify(c) });
@@ -156,18 +156,18 @@ for (const route of ROUTES) for (const w of WIDTHS) for (const [label, script] o
 // (opacity from 0) replayed on screen by the takeover.
 {
   const PROBE = `(() => {
-    const p = window.__hmReload = { mounts: 0, cls: 0, replays: [], pre: false, settled: false };
-    document.addEventListener("DOMContentLoaded", () => { p.pre = !!document.querySelector("#app[data-hm-prerender]"); });
+    const p = window.__mReload = { mounts: 0, cls: 0, replays: [], pre: false, settled: false };
+    document.addEventListener("DOMContentLoaded", () => { p.pre = !!document.querySelector("#app[data-m-prerender]"); });
     new MutationObserver((ms) => { if (document.readyState === "loading") return; for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 && (n.matches("h1") || n.querySelector("h1"))) { p.mounts++; p.at = performance.now(); (p.what = p.what || []).push(Math.round(p.at) + ":" + (n.className || n.tagName).toString().slice(0, 30) + "<" + (m.target.className || m.target.id || m.target.tagName).toString().slice(0, 20)); } }).observe(document, { childList: true, subtree: true });
     new PerformanceObserver((l) => { for (const e of l.getEntries()) if (!e.hadRecentInput) p.cls += e.value; }).observe({ type: "layout-shift", buffered: true });
     const seen = new WeakSet(), t0 = performance.now();
     const iv = setInterval(() => {
       const app = document.getElementById("app");
-      if (p.at && app && !app.hasAttribute("data-hm-prerender") && !document.documentElement.hasAttribute("data-hm-hydrating") && performance.now() - p.at > 1200) { p.settled = true; clearInterval(iv); }
+      if (p.at && app && !app.hasAttribute("data-m-prerender") && !document.documentElement.hasAttribute("data-m-hydrating") && performance.now() - p.at > 1200) { p.settled = true; clearInterval(iv); }
       if (performance.now() - t0 > 15000) { p.settled = true; clearInterval(iv); }
       if (!p.pre || !p.at || performance.now() - p.at > 1200) return;
       for (const a of document.getAnimations()) {
-        const t = a.effect && a.effect.target; if (!t || seen.has(a) || t.closest(".hm-roll")) continue; seen.add(a);
+        const t = a.effect && a.effect.target; if (!t || seen.has(a) || t.closest(".m-roll")) continue; seen.add(a);
         const k = a.effect.getKeyframes()[0] || {}, r = t.getBoundingClientRect();
         if (String(k.opacity) === "0" && r.bottom > 0 && r.top < innerHeight && r.width > 0) p.replays.push((t.className || t.tagName).toString().slice(0, 40));
       }
@@ -176,8 +176,8 @@ for (const route of ROUTES) for (const w of WIDTHS) for (const [label, script] o
   const reg = await send("Page.addScriptToEvaluateOnNewDocument", { source: PROBE });
   const start = ROUTES.includes("/") ? "/" : ROUTES[0];
   await load(start, 1440);
-  for (let i = 0; i < 40 && !(await ev("!!(window.__hmReload && window.__hmReload.settled)")); i++) await sleep(400);
-  const r = await ev("window.__hmReload ? JSON.parse(JSON.stringify(window.__hmReload)) : null");
+  for (let i = 0; i < 40 && !(await ev("!!(window.__mReload && window.__mReload.settled)")); i++) await sleep(400);
+  const r = await ev("window.__mReload ? JSON.parse(JSON.stringify(window.__mReload)) : null");
   await send("Page.removeScriptToEvaluateOnNewDocument", { identifier: reg.result?.identifier });
   if (!r) findings.push({ route: start, w: 1440, state: "reload", kind: "double-mount", at: "#app", detail: "probe did not run" });
   else {

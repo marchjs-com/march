@@ -83,7 +83,7 @@ const Tree = lazy(() => import("../tree-editor/index.ts").then((m) => ({ default
  */
 export function JsonEditor(props: JsonEditorProps): unknown {
   const [get, set] = model<unknown>(props, null);
-  const id = uid("hm-json");
+  const id = uid("m-json");
   const L = (): NonNullable<JsonEditorProps["labels"]> => props.labels ?? {};
   const modes = (): readonly JsonMode[] => (props.modes?.length ? props.modes : ["text", "tree"]);
   const mode = signal<JsonMode>(untrack(() => (props.mode && modes().includes(props.mode) ? props.mode : modes()[0] ?? "text")));
@@ -117,7 +117,7 @@ export function JsonEditor(props: JsonEditorProps): unknown {
   const parsed = (): boolean => "value" in status();
   // the text view is a Textarea (mono, Tab indents); the parse / schema message joins the field's own description
   const area = h(Textarea, {
-    id: c.id, name: props.name, value: text, onChange: emit, class: "hm-json", mono: true, autosize: false, rows: props.rows ?? 8, spellcheck: "false", autocomplete: "off",
+    id: c.id, name: props.name, value: text, onChange: emit, class: "m-json", mono: true, autosize: false, rows: props.rows ?? 8, spellcheck: "false", autocomplete: "off",
     tabIndent: live(() => props.tabIndent !== false), readonly: live(() => props.readonly), disabled: live(() => props.disabled), required: live(() => props.required),
     invalid: live(() => !!status().msg || c["aria-invalid"]() === "true"), describedby: live(() => [status().msg ? msgId : null, c["aria-describedby"]()].filter(Boolean).join(" ") || null),
     "aria-label": live(() => c["aria-label"]()), color: props.color, onBlur: props.onBlur, onFocus: props.onFocus,
@@ -128,14 +128,14 @@ export function JsonEditor(props: JsonEditorProps): unknown {
   // the view switcher: the pill tab strip; the tree tab stays reachable (it explains itself) but does nothing while the text is broken
   const broken = (m: JsonMode): boolean => m === "tree" && !parsed();
   const tabs = () => (modes().length < 2 ? null : h(TabList, {
-    variant: "pill", class: "hm-json-modes", label: () => L().view ?? t`JSON view`, value: mode, controls: `${id}-panel`, tabId: (m: string) => `${id}-tab-${m}`,
+    variant: "pill", class: "m-json-modes", label: () => L().view ?? t`JSON view`, value: mode, controls: `${id}-panel`, tabId: (m: string) => `${id}-tab-${m}`,
     tabs: modes().map((m) => ({ id: m, label: LABEL[m], title: () => (broken(m) ? L().fixFirst ?? t`Fix the JSON to see the tree` : null) })),
-    tabProps: (tab: TabSpec) => ({ class: "hm-json-mode", "aria-disabled": () => (broken(tab.id as JsonMode) ? "true" : null) }),
+    tabProps: (tab: TabSpec) => ({ class: "m-json-mode", "aria-disabled": () => (broken(tab.id as JsonMode) ? "true" : null) }),
     onSelect: (m: string) => { if (!broken(m as JsonMode)) mode.set(m as JsonMode); },
   }));
-  const bar = h("div", { class: "hm-json-bar" },
-    h("span", { id: msgId, class: () => (status().msg ? "hm-field-error" : "hm-help"), role: "status" }, () => status().msg ?? (text().trim() && props.status !== false ? L().valid ?? t`Valid JSON` : "")),
-    () => (props.readonly || props.format === false ? null : h(Button, { size: "sm", class: "hm-json-format", disabled: () => !parsed(), onClick: format }, () => L().format ?? t`Format`)));
+  const bar = h("div", { class: "m-json-bar" },
+    h("span", { id: msgId, class: () => (status().msg ? "m-field-error" : "m-help"), role: "status" }, () => status().msg ?? (text().trim() && props.status !== false ? L().valid ?? t`Valid JSON` : "")),
+    () => (props.readonly || props.format === false ? null : h(Button, { size: "sm", class: "m-json-format", disabled: () => !parsed(), onClick: format }, () => L().format ?? t`Format`)));
   // re-drawn only when the view changes (typing keeps the same textarea and caret)
   const showTree = computed(() => mode() === "tree" && parsed());
   const body = () => {
@@ -147,7 +147,7 @@ export function JsonEditor(props: JsonEditorProps): unknown {
       validate: props.validate ? (v: unknown) => { const m = props.validate!(v); return m ? [{ path: [], message: m }] : []; } : undefined,
     }));
   };
-  return h("div", { class: () => cx("hm-json-editor", `is-${mode()}`, props.class) },
+  return h("div", { class: () => cx("m-json-editor", `is-${mode()}`, props.class) },
     tabs,
-    h("div", { id: `${id}-panel`, class: "hm-json-panel", role: () => (modes().length > 1 ? "tabpanel" : null), "aria-labelledby": () => (modes().length > 1 ? `${id}-tab-${mode()}` : null) }, body));
+    h("div", { id: `${id}-panel`, class: "m-json-panel", role: () => (modes().length > 1 ? "tabpanel" : null), "aria-labelledby": () => (modes().length > 1 ? `${id}-tab-${mode()}` : null) }, body));
 }

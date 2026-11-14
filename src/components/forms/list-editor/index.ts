@@ -53,8 +53,8 @@ export function ListEditor(props: ListEditorProps): unknown {
     onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); const v = draft.value.trim(); if (v) { add([v]); draft.value = ""; } } },
     onPaste: (e: ClipboardEvent) => { const lines = splitLines(e.clipboardData?.getData("text")); if (lines.length > 1) { e.preventDefault(); add(lines); draft.value = ""; } },
   });
-  return h("div", { class: () => cx("hm-list-editor", props.class), role: "group", "aria-labelledby": labelledBy(props) },
-    h("ol", { class: "hm-list-items" }, h(For, { each: idx, children: (i: Accessor<number>) => h("li", { class: "hm-list-row" },
+  return h("div", { class: () => cx("m-list-editor", props.class), role: "group", "aria-labelledby": labelledBy(props) },
+    h("ol", { class: "m-list-items" }, h(For, { each: idx, children: (i: Accessor<number>) => h("li", { class: "m-list-row" },
       outsideField(() => h(TextInput, {
         "aria-label": live(() => props.labels?.item?.(i() + 1) ?? t`Item ${i() + 1}`), readonly: live(ro),
         value: live(() => list()[i()] ?? ""), setValue: (v: string) => { const cur = [...untrack(list)]; cur[i.peek()] = v; set(cur); },
@@ -69,6 +69,6 @@ export function ListEditor(props: ListEditorProps): unknown {
         labels: { up: props.labels?.moveUp, down: props.labels?.moveDown, remove: props.labels?.remove },
         icons: props.icons,
       })))) })),
-    () => (ro() || props.addable === false ? null : h("div", { class: "hm-list-add" }, draftInput,
+    () => (ro() || props.addable === false ? null : h("div", { class: "m-list-add" }, draftInput,
       h(Button, { disabled: full, onClick: () => { const lines = splitLines(draft.value); if (lines.length) { add(lines); draft.value = ""; } draft.focus(); } }, () => props.addLabel ?? t`Add`))));
 }

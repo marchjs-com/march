@@ -18,7 +18,7 @@ const { chunkManifest, htmlManifest, sizeReport, headersFile, swSource } = await
 async function buildApp(files) {
   const esbuild = await import("esbuild");
   const { march } = await import("../compiler/esbuild.js");
-  const dir = mkdtempSync(join(tmpdir(), "hm-perf-"));
+  const dir = mkdtempSync(join(tmpdir(), "m-perf-"));
   for (const [n, src] of Object.entries(files)) writeFileSync(join(dir, n), src);
   const outdir = join(dir, "dist");
   const r = await esbuild.build({
@@ -41,15 +41,15 @@ test("entry has no chart/table code; the manifest lists the lazy route's files; 
   try {
     const m = chunkManifest(app.meta, { cwd: app.dir, outdir: app.outdir, entry: "main.tsx" });
     const entryJs = m.entryFiles.filter((f) => f.endsWith(".js")).map((f) => readFileSync(resolve(app.outdir, f), "utf8")).join("\n");
-    assert.doesNotMatch(entryJs, /hm-chart|hm-table/, "chart and table code stay out of the entry");
-    assert.match(entryJs, /hm:"sales\.tsx"/, "dynamic import tagged with its manifest key");
+    assert.doesNotMatch(entryJs, /m-chart|m-table/, "chart and table code stay out of the entry");
+    assert.match(entryJs, /m:"sales\.tsx"/, "dynamic import tagged with its manifest key");
     for (const k of ["home.tsx", "sales.tsx", "rows.tsx"]) assert.ok(m.manifest[k]?.length, `manifest has ${k}`);
     const sales = m.manifest["sales.tsx"];
     assert.ok(sales[0].startsWith("assets/") && sales[0].endsWith(".js"), "own chunk first");
     assert.ok(sales.some((f) => f.endsWith(".css")), "the route's CSS is listed too");
     assert.ok(!sales.some((f) => m.entryFiles.includes(f)), "files already in the entry are not repeated");
     const salesJs = sales.filter((f) => f.endsWith(".js")).map((f) => readFileSync(resolve(app.outdir, f), "utf8")).join("\n");
-    assert.match(salesJs, /hm-chart/);
+    assert.match(salesJs, /m-chart/);
     const rep = sizeReport(m, app.outdir, { entry: ENTRY_BUDGET, route: 60 * 1024 });
     assert.equal(rep.rows[0].name, "(entry)");
     const gz = m.entryFiles.filter((f) => f.endsWith(".js")).reduce((s, f) => s + gzipSync(readFileSync(resolve(app.outdir, f))).length, 0);
@@ -79,19 +79,19 @@ test("lazy(): reserved slot + skeleton, then the component in place; later rende
   const Hello = L.lazy(() => new Promise((r) => { resolveIt = r; }), { placeholder: "chart", height: "12rem" });
   const el = document.createElement("div");
   render(() => h("section", {}, h(Hello, { name: "Ada" })), el);
-  const slot = el.querySelector(".hm-lazy-slot");
+  const slot = el.querySelector(".m-lazy-slot");
   assert.equal(slot.getAttribute("aria-busy"), "true");
-  assert.ok(slot.classList.contains("hm-lazy-sized") && slot.style.getPropertyValue("--hm-lazy-h") === "12rem", "size reserved (no layout shift)");
-  assert.ok(slot.querySelector(".hm-lazy-skel.hm-lazy-skel-chart"), "chart-shaped skeleton (drawn by CSS)");
+  assert.ok(slot.classList.contains("m-lazy-sized") && slot.style.getPropertyValue("--m-lazy-h") === "12rem", "size reserved (no layout shift)");
+  assert.ok(slot.querySelector(".m-lazy-skel.m-lazy-skel-chart"), "chart-shaped skeleton (drawn by CSS)");
   resolveIt({ default: (p) => h("p", {}, `Merhaba ${p.name}`) });
   await new Promise((r) => setTimeout(r, 0));
   assert.equal(el.querySelector("p")?.textContent, "Merhaba Ada");
-  assert.ok(slot.classList.contains("is-ready") && !slot.querySelector(".hm-lazy-skel"));
+  assert.ok(slot.classList.contains("is-ready") && !slot.querySelector(".m-lazy-skel"));
   assert.equal(Hello.loaded, true);
   const el2 = document.createElement("div");
   render(() => h(Hello, { name: "Can" }), el2);
   assert.equal(el2.querySelector("p")?.textContent, "Merhaba Can", "cached: no slot, no skeleton");
-  assert.equal(el2.querySelector(".hm-lazy-slot"), null);
+  assert.equal(el2.querySelector(".m-lazy-slot"), null);
   const Picked = L.lazy(() => Promise.resolve({ Chart: () => h("b", {}, "c") }), { pick: "Chart" });
   assert.equal(typeof (await Picked.preload()), "function");
 });
@@ -103,7 +103,7 @@ test("lazy(): when=interaction waits for hover/focus; errors show a retry in pla
   render(() => h(Later, {}), el);
   await new Promise((r) => setTimeout(r, 0));
   assert.equal(calls, 0, "nothing loads before an interaction");
-  el.querySelector(".hm-lazy-slot").dispatchEvent(new Event("focusin", { bubbles: true }));
+  el.querySelector(".m-lazy-slot").dispatchEvent(new Event("focusin", { bubbles: true }));
   await new Promise((r) => setTimeout(r, 0));
   assert.equal(calls, 1);
   assert.equal(el.querySelector("i")?.textContent, "x");
@@ -113,7 +113,7 @@ test("lazy(): when=interaction waits for hover/focus; errors show a retry in pla
   const { createRoot } = await import("../src/index.ts");
   createRoot(() => { render(() => h(Flaky, {}), el2); });
   await new Promise((r) => setTimeout(r, 0));
-  const retry = el2.querySelector(".hm-lazy-error button");
+  const retry = el2.querySelector(".m-lazy-error button");
   assert.ok(retry, "a retry button in place of the component");
   fail = false;
   retry.dispatchEvent(new Event("click", { bubbles: true }));
@@ -165,8 +165,8 @@ test("barrel imports compile to the defining module; the entry does not load pag
   try {
     const m = chunkManifest(app.meta, { cwd: app.dir, outdir: app.outdir, entry: "main.tsx" });
     const entryJs = m.entryFiles.filter((f) => f.endsWith(".js")).map((f) => readFileSync(resolve(app.outdir, f), "utf8")).join("\n");
-    assert.match(entryJs, /hm-badge/);
-    const leaked = entryJs.match(/hm-card-head|hm-code-bar|hm-timeline/g);
+    assert.match(entryJs, /m-badge/);
+    const leaked = entryJs.match(/m-card-head|m-code-bar|m-timeline/g);
     assert.equal(leaked, null, `Card, CodeView and Timeline stay with the pages (found ${leaked})`);
   } finally { app.cleanup(); }
 });
@@ -206,7 +206,7 @@ test("mergeEntry: the entry and its static chunks become one file; old chunks re
 test("route prefetch: Link hover / idle and prefetchLinks use the manifest (idle = rel=prefetch); nothing with Save-Data", async () => {
   const R = await import("../src/router/index.ts");
   L.setPreloadManifest({ "a.tsx": ["assets/chunks/a-1.js"], "b.tsx": ["assets/chunks/b-2.js"], "c.tsx": ["assets/chunks/c-3.js"] }, "https://x.test/");
-  const page = (k) => Object.assign(async () => ({ default: () => k }), { hm: `${k}.tsx` });
+  const page = (k) => Object.assign(async () => ({ default: () => k }), { m: `${k}.tsx` });
   R.createRouter({ routes: { "/": { component: () => null }, "/a": page("a"), "/b": page("b"), "/c": page("c") }, prefetch: "none" });
   await new Promise((r) => setTimeout(r, 0));
   const links = () => [...document.head.querySelectorAll("link[data-march-preload]")].map((l) => `${l.getAttribute("rel")} ${l.getAttribute("href").replace("https://x.test/assets/chunks/", "")}`);
@@ -521,7 +521,7 @@ test("index.html lists only the manifest keys some code can look up (tagged load
 test("budget.maxFiles: every file of the output counts (pages, chunks, public files); over the cap is reported", async () => {
   const { countFiles, filesOver } = await import("../cli/perf.js");
   const { mkdirSync } = await import("node:fs");
-  const dir = mkdtempSync(join(tmpdir(), "hm-files-"));
+  const dir = mkdtempSync(join(tmpdir(), "m-files-"));
   try {
     mkdirSync(join(dir, "assets/chunks"), { recursive: true });
     for (const f of ["index.html", "404.html", "assets/main.js", "assets/chunks/a.js", "assets/chunks/b.css"]) writeFileSync(join(dir, f), "x");
@@ -543,8 +543,8 @@ test("lazy(): a failed load is retried on its own while the skeleton stays", asy
   const el = document.createElement("div");
   render(() => h(Shaky, {}), el);
   await new Promise((r) => setTimeout(r, 50));
-  assert.equal(el.querySelector(".hm-lazy-error"), null, "no error while it retries");
-  assert.equal(el.querySelector(".hm-lazy-slot").getAttribute("aria-busy"), "true");
+  assert.equal(el.querySelector(".m-lazy-error"), null, "no error while it retries");
+  assert.equal(el.querySelector(".m-lazy-slot").getAttribute("aria-busy"), "true");
   await new Promise((r) => setTimeout(r, 1800));
   assert.equal(calls, 3);
   assert.equal(el.querySelector("s")?.textContent, "back");

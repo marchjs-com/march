@@ -26,7 +26,7 @@ export interface CtaBandProps {
 }
 
 const BACKDROPS: Record<string, readonly BackdropLayer[]> = {
-  gradient: ["gradient", ["noise", 0.5], ["spotlight", undefined, "hm-cta-light"]],
+  gradient: ["gradient", ["noise", 0.5], ["spotlight", undefined, "m-cta-light"]],
   mesh: ["mesh", "spotlight"],
   glass: [["dots", 0.6], "glass", "spotlight"],
   plain: [["grid", 0.6]],
@@ -36,13 +36,13 @@ const BACKDROPS: Record<string, readonly BackdropLayer[]> = {
 export function CtaBand(props: CtaBandProps): Element {
   const variant = props.variant ?? "gradient";
   const copy = h(SectionHead, {
-    class: "hm-cta-copy", size: "lg", align: props.align ?? "center", title: () => val(props.title),
+    class: "m-cta-copy", size: "lg", align: props.align ?? "center", title: () => val(props.title),
     lead: props.lead != null ? () => val(props.lead) : undefined, actions: props.actions, note: props.note != null ? () => val(props.note) : undefined,
   });
   // the decorative layers of the variant: a recipe for the shared backdrop builder (landing/backdrop.ts)
   const layers = backdrop(props.backdrop === false ? false : BACKDROPS[variant]);
   const panel = variant === "video" && props.video
-    ? h(VideoBackground, { src: props.video.src, poster: props.video.poster, tint: "brand", class: "hm-cta-panel" }, copy)
-    : h("div", { class: "hm-cta-panel" }, ...layers, copy);
-  return h(SiteSection, { space: "sm", class: cx("hm-cta", `hm-cta-${variant}`, val(props.class)) }, props.reveal === "none" ? panel : h(Reveal, { effect: props.reveal ?? "scale", self: true, duration: 900 }, panel)) as Element;
+    ? h(VideoBackground, { src: props.video.src, poster: props.video.poster, tint: "brand", class: "m-cta-panel" }, copy)
+    : h("div", { class: "m-cta-panel" }, ...layers, copy);
+  return h(SiteSection, { space: "sm", class: cx("m-cta", `m-cta-${variant}`, val(props.class)) }, props.reveal === "none" ? panel : h(Reveal, { effect: props.reveal ?? "scale", self: true, duration: 900 }, panel)) as Element;
 }

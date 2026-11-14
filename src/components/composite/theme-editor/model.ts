@@ -20,7 +20,7 @@ export type ColorKey = ColorRole | BrandRole | `cat-${number}`;
 /** The colors of one mode. */
 export interface DraftColors extends Record<ColorRole, string> {
   /** Categorical palette, 8 colors. */ cat: string[];
-  /** Brand colors (`--hm-<name>`); `soft` is kept until the color changes. */ brand: Record<string, { color: string; soft?: string }>;
+  /** Brand colors (`--m-<name>`); `soft` is kept until the color changes. */ brand: Record<string, { color: string; soft?: string }>;
   /** Carried over from the base theme as they are. */ mark: string; onMark?: string; stage: string; glow: string[];
 }
 export interface DraftType {
@@ -190,7 +190,7 @@ export function draftTokens(d: ThemeDraft, all = false): Record<string, string> 
   if (all || s.space !== DEFAULT_SHAPE.space || s.density !== "normal") SPACE_STEPS.forEach((k, i) => { o[`space-${i + 1}`] = rem(s.space * k * dens); });
   if (all || s.density !== "normal") { o["control-h"] = rem(36 * dens); o["control-h-sm"] = rem(30 * dens); o["control-h-lg"] = rem(44 * dens); }
   if (all || s.shadow !== 1) {
-    const sh = (a: number): string => `rgb(var(--hm-shadow-rgb, 16 24 40) / ${+(a * s.shadow).toFixed(3)})`;
+    const sh = (a: number): string => `rgb(var(--m-shadow-rgb, 16 24 40) / ${+(a * s.shadow).toFixed(3)})`;
     const shapes = [["0 1px 2px"], ["0 1px 2px", "0 4px 14px -4px"], ["0 2px 6px", "0 16px 40px -8px"], ["0 4px 10px", "0 28px 70px -12px"]];
     shapes.forEach((g, i) => { o[`shadow-${i + 1}`] = s.shadow <= 0 ? "none" : g.map((geo, j) => `${geo} ${sh(SHADOW_ALPHA[i]![j]!)}`).join(", "); });
   }
@@ -226,7 +226,7 @@ export function draftVars(d: ThemeDraft, mode: DraftMode): Record<string, string
   const css = themeCss(draftToTheme(d, true));
   const blocks = [...css.matchAll(/\{([^{}]*)\}/g)].map((m) => m[1] ?? "");
   const out: Record<string, string> = {};
-  const read = (b: string): void => { for (const m of b.matchAll(/(--hm-[\w-]+|color-scheme):\s*([^;]+);/g)) out[m[1]!] = m[2]!.trim(); };
+  const read = (b: string): void => { for (const m of b.matchAll(/(--m-[\w-]+|color-scheme):\s*([^;]+);/g)) out[m[1]!] = m[2]!.trim(); };
   read(blocks[0] ?? "");
   if (mode === "dark") read(blocks[blocks.length - 1] ?? "");
   return out;

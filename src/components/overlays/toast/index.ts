@@ -82,7 +82,7 @@ export function ToastHost(props: {
 } = {}): Element {
   hosts++;
   onCleanup(() => { hosts--; });
-  return h("div", { class: () => cx("hm-toasts", props.position && props.position !== "bottom-end" && `hm-toasts-${props.position}`, val(props.class)), "aria-live": "polite", "aria-relevant": "additions" },
+  return h("div", { class: () => cx("m-toasts", props.position && props.position !== "bottom-end" && `m-toasts-${props.position}`, val(props.class)), "aria-live": "polite", "aria-relevant": "additions" },
     h(For<ToastItem>, { each: list, key: "id", children: (item) => {
       const x = item.peek();
       const act = x.action;
@@ -90,10 +90,10 @@ export function ToastHost(props: {
       // a toast is a raised Alert: the kind's icon, the message, one action, the close button
       return h(Alert, {
         tone: x.kind, variant: "raised", role: x.kind === "danger" ? "alert" : "status", color: x.color,
-        class: cx(`hm-toast hm-toast-${x.kind}`, x.motion === "fade" && "hm-toast-fade", x.motion === "none" && "hm-toast-still", x.class),
-        partClass: { icon: "hm-toast-icon", body: "hm-toast-msg", dismiss: "hm-toast-close" },
+        class: cx(`m-toast m-toast-${x.kind}`, x.motion === "fade" && "m-toast-fade", x.motion === "none" && "m-toast-still", x.class),
+        partClass: { icon: "m-toast-icon", body: "m-toast-msg", dismiss: "m-toast-close" },
         icon: own === false ? null : own == null || own === true ? undefined : own, body: () => val(x.message),
-        action: act ? h(Button, { variant: "ghost", size: "sm", class: "hm-toast-action",
+        action: act ? h(Button, { variant: "ghost", size: "sm", class: "m-toast-action",
           onClick: async () => { toast.dismiss(x.id); try { await act.run(); } catch (e) { toast((e as { message?: string } | null)?.message || val(act.error) || t`Something went wrong.`, { kind: "danger" }); } } },
           () => val(act.label)) : undefined,
         dismissable: x.closable !== false, dismissLabel: () => val(x.closeLabel) ?? t`Dismiss`, onDismiss: () => toast.dismiss(x.id),

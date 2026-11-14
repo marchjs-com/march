@@ -46,7 +46,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 /** `<Newsletter title="Stay in the loop" onSubmit={(email) => api.subscribe(email)} note="No spam." />` */
 export function Newsletter(props: NewsletterProps): Element {
   const email = signal(""), state = signal<"idle" | "pending" | "done" | "error">("idle"), error = signal("");
-  const id = uid("hm-nl");
+  const id = uid("m-nl");
   const done = computed(() => state() === "done");
   let field: HTMLElement | null = null; // the input: it shakes on an error
   const fail = (msg: string): void => {
@@ -59,26 +59,26 @@ export function Newsletter(props: NewsletterProps): Element {
     if (!EMAIL.test(v)) { fail(props.labels?.invalid ?? t`Enter a valid email address.`); return; }
     state.set("pending"); error.set("");
     try { await props.onSubmit(v); } catch (err) { fail((err as Error)?.message || (props.labels?.error ?? t`Something went wrong. Please try again.`)); return; }
-    const form = root.querySelector(".hm-nl-form") as HTMLElement | null;
+    const form = root.querySelector(".m-nl-form") as HTMLElement | null;
     if (form && props.motion !== false) await animate(form, { opacity: [1, 0], transform: ["scale(1)", "scale(.96)"] }, { duration: 220, easing: "in" }).finished;
     state.set("done");
-    const ok = root.querySelector(".hm-nl-done") as HTMLElement | null;
+    const ok = root.querySelector(".m-nl-done") as HTMLElement | null;
     if (ok && props.motion !== false) animate(ok, { opacity: [0, 1], transform: ["scale(.85)", "scale(1)"] }, { duration: 520, easing: "spring-wobbly" });
   };
-  const root = h("div", { class: () => cx("hm-nl", `hm-nl-${props.layout ?? "inline"}`, `is-${state()}`, val(props.class)) },
+  const root = h("div", { class: () => cx("m-nl", `m-nl-${props.layout ?? "inline"}`, `is-${state()}`, val(props.class)) },
     props.title != null || props.lead != null ? h(SectionHead, {
-      class: "hm-nl-head", size: "sm", align: "start", width: "full", as: "h3", titleId: `${id}-t`,
+      class: "m-nl-head", size: "sm", align: "start", width: "full", as: "h3", titleId: `${id}-t`,
       title: props.title != null ? () => val(props.title) : undefined, lead: props.lead != null ? () => val(props.lead) : undefined,
     }) : null,
     () => (done()
-      ? h("p", { class: "hm-nl-done", role: "status" }, props.doneIcon === false ? null : h(CheckMark, { class: "hm-nl-check", variant: "solid", label: false, icons: { yes: props.doneIcon } }), () => val(props.done) ?? t`Thanks! Check your inbox.`)
-      : h("form", { class: "hm-nl-form", novalidate: true, "aria-labelledby": props.title != null ? `${id}-t` : null, onSubmit: submit },
+      ? h("p", { class: "m-nl-done", role: "status" }, props.doneIcon === false ? null : h(CheckMark, { class: "m-nl-check", variant: "solid", label: false, icons: { yes: props.doneIcon } }), () => val(props.done) ?? t`Thanks! Check your inbox.`)
+      : h("form", { class: "m-nl-form", novalidate: true, "aria-labelledby": props.title != null ? `${id}-t` : null, onSubmit: submit },
         // the message is the input's own error line; its place is kept, so nothing moves when it appears
         h(TextInput, {
-          class: "hm-nl-field", value: email, type: "email", autocomplete: "email", inputmode: "email", required: true, id: `${id}-e`, ref: (el: HTMLInputElement) => { field = el; },
+          class: "m-nl-field", value: email, type: "email", autocomplete: "email", inputmode: "email", required: true, id: `${id}-e`, ref: (el: HTMLInputElement) => { field = el; },
           placeholder: props.placeholder ?? t`you@example.com`, "aria-label": props.labels?.email ?? t`Email address`, error: () => (state() === "error" ? error() : ""), errorSpace: true,
         }),
-        h(Button, { type: "submit", loading: () => state() === "pending", class: "hm-nl-btn" }, () => val(props.button) ?? t`Subscribe`))),
-    props.note != null && h("p", { class: "hm-nl-note" }, () => val(props.note))) as HTMLElement;
+        h(Button, { type: "submit", loading: () => state() === "pending", class: "m-nl-btn" }, () => val(props.button) ?? t`Subscribe`))),
+    props.note != null && h("p", { class: "m-nl-note" }, () => val(props.note))) as HTMLElement;
   return root;
 }

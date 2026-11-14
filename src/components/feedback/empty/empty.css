@@ -1,13 +1,13 @@
 /* March — Empty. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-empty { display: flex; flex-direction: column; align-items: center; }
+.m-empty { display: flex; flex-direction: column; align-items: center; }
 /* the icon is an IconTile (outline); here its distance to the title and the size of an emoji */
-.hm-icon-tile.hm-empty-icon { margin-bottom: var(--hm-space-4); font-size: 1.5rem; color: var(--hm-muted); }
-.hm-empty-title { margin: 0; font-family: var(--hm-font-display); font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); color: var(--hm-text); letter-spacing: var(--hm-tracking-tight); }
-.hm-empty-text { margin-top: var(--hm-space-1); max-width: 28rem; font-size: var(--hm-text-md); line-height: 1.55; }
-.hm-empty-action { margin-top: var(--hm-space-5); display: flex; justify-content: center; flex-wrap: wrap; gap: var(--hm-space-2); }
+.m-icon-tile.m-empty-icon { margin-bottom: var(--m-space-4); font-size: 1.5rem; color: var(--m-muted); }
+.m-empty-title { margin: 0; font-family: var(--m-font-display); font-size: var(--m-text-lg); font-weight: var(--m-weight-semibold); color: var(--m-text); letter-spacing: var(--m-tracking-tight); }
+.m-empty-text { margin-top: var(--m-space-1); max-width: 28rem; font-size: var(--m-text-md); line-height: 1.55; }
+.m-empty-action { margin-top: var(--m-space-5); display: flex; justify-content: center; flex-wrap: wrap; gap: var(--m-space-2); }
 /* sm: the empty state of a panel, a list or a popup (less room, plain type, a flat icon tile) */
-.hm-empty.hm-empty-sm { padding: var(--hm-space-4) var(--hm-space-3); }
-.hm-empty-sm .hm-icon-tile.hm-empty-icon { margin-bottom: var(--hm-space-2); font-size: 1rem; }
-.hm-empty-sm .hm-empty-title { font-family: inherit; font-size: var(--hm-text-sm); font-weight: var(--hm-weight-medium); color: var(--hm-text-2); letter-spacing: normal; }
-.hm-empty-sm .hm-empty-text { max-width: 20rem; font-size: var(--hm-text-sm); line-height: 1.45; }
-.hm-empty-sm .hm-empty-action { margin-top: var(--hm-space-3); }
+.m-empty.m-empty-sm { padding: var(--m-space-4) var(--m-space-3); }
+.m-empty-sm .m-icon-tile.m-empty-icon { margin-bottom: var(--m-space-2); font-size: 1rem; }
+.m-empty-sm .m-empty-title { font-family: inherit; font-size: var(--m-text-sm); font-weight: var(--m-weight-medium); color: var(--m-text-2); letter-spacing: normal; }
+.m-empty-sm .m-empty-text { max-width: 20rem; font-size: var(--m-text-sm); line-height: 1.45; }
+.m-empty-sm .m-empty-action { margin-top: var(--m-space-3); }

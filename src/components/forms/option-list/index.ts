@@ -78,7 +78,7 @@ const ROLES = { radio: ["radiogroup", "radio"], listbox: ["listbox", "option"], 
 
 /** `<OptionList bind:value={$theme} label="Theme" options={[{ value: "light", label: "Light", icon: sun }, { value: "dark", label: "Dark", icon: moon }]} />` */
 export function OptionList<T = string>(props: OptionListProps<T>): Element {
-  const id = props.id ?? uid("hm-ol");
+  const id = props.id ?? uid("m-ol");
   const driven = props.keys === false;
   const byField = driven || props.keysFrom != null;
   const mode = byField ? "listbox" : props.mode ?? (props.multiple ? "listbox" : "radio");
@@ -94,7 +94,7 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
   const isSel = (v: T): boolean => { const c = current(); return props.multiple ? Array.isArray(c) && c.includes(v) : c === v; };
   const active = props.active ?? signal(-1);
   let root: HTMLElement | undefined;
-  const rows = (): HTMLElement[] => Array.from(root?.querySelectorAll<HTMLElement>(".hm-option-list-row") ?? []);
+  const rows = (): HTMLElement[] => Array.from(root?.querySelectorAll<HTMLElement>(".m-option-list-row") ?? []);
 
   const pick = (i: number, e: Event | null): void => {
     const it = untrack(items)[i];
@@ -112,11 +112,11 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
   const row = (it: OptionItem<T>, i: number): Element => {
     const selected = (): boolean => isSel(it.value), isActive = (): boolean => active() === i;
     const tick = props.check === false || !stateful ? null
-      : h("span", { class: "hm-option-list-check", "aria-hidden": "true" }, props.check != null && props.check !== true ? icon(typeof props.check === "function" ? (props.check as () => unknown)() : props.check, "hm-option-list-own-check") : glyph(checkIcon));
+      : h("span", { class: "m-option-list-check", "aria-hidden": "true" }, props.check != null && props.check !== true ? icon(typeof props.check === "function" ? (props.check as () => unknown)() : props.check, "m-option-list-own-check") : glyph(checkIcon));
     const trail = it.trailing != null || tick ? [it.trailing ?? null, tick] : undefined;
     return h(ListRow, {
       as: byField ? "div" : "button", role: rowRole, "data-index": String(i), interactive: true, overflow: props.overflow ?? "ellipsis",
-      class: () => cx("hm-option-list-row", byField && isActive() && "is-active"),
+      class: () => cx("m-option-list-row", byField && isActive() && "is-active"),
       size: () => (val(props.size) === "sm" ? "sm" : "md"), disabled: !!it.disabled, onClick: (e: MouseEvent) => pick(i, e),
       // ListRow says the choice by the role: aria-checked (radio, menuitemradio) or aria-selected (option); a command has no state
       ...(rowRole === "menuitem" ? {} : { selected }),
@@ -134,11 +134,11 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
 
   const content = (): unknown => {
     const list = items();
-    if (!list.length) return props.empty === false ? null : h("div", { class: "hm-option-list-empty", role: "presentation" }, props.empty ?? (() => t`No results`));
+    if (!list.length) return props.empty === false ? null : h("div", { class: "m-option-list-empty", role: "presentation" }, props.empty ?? (() => t`No results`));
     const out: unknown[] = [];
     let group: string | undefined;
     list.forEach((it, i) => {
-      if (it.group !== group) { group = it.group; if (group) out.push(h(SectionLabel, { class: "hm-option-list-group", role: "presentation" }, group)); }
+      if (it.group !== group) { group = it.group; if (group) out.push(h(SectionLabel, { class: "m-option-list-group", role: "presentation" }, group)); }
       out.push(untrack(() => row(it, i)));
     });
     return out;
@@ -147,8 +147,8 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
   const cols = Math.max(1, props.columns ?? 1);
   root = h("div", {
     id, role: listRole, "aria-label": () => val(props.label) ?? null, "aria-multiselectable": props.multiple && listRole === "listbox" ? "true" : null,
-    "aria-orientation": listRole === "menu" || cols > 1 ? null : "vertical", "data-hm-color": colorAttr(props.color),
-    class: () => cx("hm-option-list", val(props.size) === "sm" && "hm-option-list-sm", cols > 1 && "hm-option-list-grid", cols > 1 && `hm-option-list-cols-${Math.min(cols, 6)}`, props.inline && "hm-option-list-inline", val(props.class)),
+    "aria-orientation": listRole === "menu" || cols > 1 ? null : "vertical", "data-m-color": colorAttr(props.color),
+    class: () => cx("m-option-list", val(props.size) === "sm" && "m-option-list-sm", cols > 1 && "m-option-list-grid", cols > 1 && `m-option-list-cols-${Math.min(cols, 6)}`, props.inline && "m-option-list-inline", val(props.class)),
     onKeydown: byField ? null : (e: KeyboardEvent) => {
       // list-nav gives the next index; rows that are disabled are stepped over
       const list = rows(), from = list.indexOf(e.target as HTMLElement);

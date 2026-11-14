@@ -19,24 +19,24 @@ test("ChatThread: log, runs, day separator, typing, keyed updates, reaction pick
   const m = mount(() => h(ChatThread, { messages: msgs, typing, group: true, onReact: (msg, e) => reacts.push([msg.id, e]) }));
   const log = m.el.querySelector("[role=log]");
   assert.equal(log.getAttribute("aria-label"), "Messages");
-  assert.equal(log.querySelector(".hm-chat-day").textContent, "Today");
-  const rows = log.querySelectorAll(".hm-chat-row");
+  assert.equal(log.querySelector(".m-chat-day").textContent, "Today");
+  const rows = log.querySelectorAll(".m-chat-row");
   assert.equal(rows.length, 3);
   assert.ok(rows[0].classList.contains("is-first") && rows[1].classList.contains("is-last") && rows[2].classList.contains("is-single"));
-  assert.equal(rows[0].querySelector(".hm-msg-sender").textContent, "HADİ");
-  assert.equal(rows[1].querySelector(".hm-msg-sender"), null, "sender only on the first of a run");
+  assert.equal(rows[0].querySelector(".m-msg-sender").textContent, "HADİ");
+  assert.equal(rows[1].querySelector(".m-msg-sender"), null, "sender only on the first of a run");
   const third = rows[2];
   msgs.set(msgs().map((x) => (x.id === "3" ? { ...x, status: "read" } : x)));
-  assert.equal(log.querySelectorAll(".hm-chat-row")[2], third, "same key: the row is kept");
-  assert.equal(third.querySelector(".hm-msg-tick").getAttribute("aria-label"), "Read");
+  assert.equal(log.querySelectorAll(".m-chat-row")[2], third, "same key: the row is kept");
+  assert.equal(third.querySelector(".m-msg-tick").getAttribute("aria-label"), "Read");
   typing.set(["HADİ"]);
-  assert.match(log.querySelector(".hm-typing-text").textContent, /HADİ is typing/);
-  rows[0].querySelector(".hm-msg-tool[aria-label=React]").click();
-  const pick = log.querySelector(".hm-chat-pick [role=toolbar]");
+  assert.match(log.querySelector(".m-typing-text").textContent, /HADİ is typing/);
+  rows[0].querySelector(".m-msg-tool[aria-label=React]").click();
+  const pick = log.querySelector(".m-chat-pick [role=toolbar]");
   assert.ok(pick);
   pick.querySelector("button").click();
   assert.deepEqual(reacts, [["1", "❤️"]]);
-  assert.equal(log.querySelector(".hm-chat-pick"), null);
+  assert.equal(log.querySelector(".m-chat-pick"), null);
   assert.equal(dayLabel(new Date(now.getTime() - 86_400_000), now), "Yesterday");
   m.dispose();
 });
@@ -44,12 +44,12 @@ test("ChatThread: log, runs, day separator, typing, keyed updates, reaction pick
 test("ChatThread: day separators off or in own words; class on the log", () => {
   const list = [{ id: "1", senderId: "a", text: "one", time: at(10) }];
   const off = mount(() => h(ChatThread, { messages: list, days: false, class: "mine", motion: false }));
-  assert.ok(off.el.querySelector(".hm-chat").classList.contains("mine"));
-  assert.equal(off.el.querySelector(".hm-chat-day"), null);
-  assert.equal(off.el.querySelectorAll(".hm-chat-row").length, 1);
+  assert.ok(off.el.querySelector(".m-chat").classList.contains("mine"));
+  assert.equal(off.el.querySelector(".m-chat-day"), null);
+  assert.equal(off.el.querySelectorAll(".m-chat-row").length, 1);
   off.dispose();
   const own = mount(() => h(ChatThread, { messages: list, days: (d) => `day ${d.getFullYear()}` }));
-  assert.equal(own.el.querySelector(".hm-chat-day").textContent, `day ${at(10).getFullYear()}`);
+  assert.equal(own.el.querySelector(".m-chat-day").textContent, `day ${at(10).getFullYear()}`);
   own.dispose();
 });
 
@@ -58,7 +58,7 @@ test("ChatThread: the jump button can be replaced, colored or turned off", async
     const msgs = signal([{ id: "1", senderId: "a", text: "one", time: at(10) }]);
     const m = mount(() => h(ChatThread, { messages: msgs, ...extra }));
     await wait(60);
-    const log = m.el.querySelector(".hm-chat");
+    const log = m.el.querySelector(".m-chat");
     // scrolled up: the log is taller than its box
     Object.defineProperty(log, "scrollHeight", { value: 1000, configurable: true });
     Object.defineProperty(log, "clientHeight", { value: 200, configurable: true });
@@ -68,11 +68,11 @@ test("ChatThread: the jump button can be replaced, colored or turned off", async
     return m;
   };
   const a = await run({ jump: (n) => `${n} unread`, jumpColor: "brand-purple" });
-  const btn = a.el.querySelector(".hm-chat-jump");
+  const btn = a.el.querySelector(".m-chat-jump");
   assert.equal(btn.textContent, "1 unread");
-  assert.equal(btn.getAttribute("data-hm-color"), "brand-purple");
+  assert.equal(btn.getAttribute("data-m-color"), "brand-purple");
   a.dispose();
   const b = await run({ jump: false });
-  assert.equal(b.el.querySelector(".hm-chat-jump"), null);
+  assert.equal(b.el.querySelector(".m-chat-jump"), null);
   b.dispose();
 });

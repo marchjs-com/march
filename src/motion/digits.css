@@ -1,4 +1,4 @@
 /* Rolling digits (motion/digits.ts): tabular cells so a rolling number never jitters its neighbours. */
-.hm-roll-slot { position: relative; display: inline-flex; }
-.hm-roll-ghost { position: absolute; inset-inline-start: 0; inset-block-start: 0; }
-.hm-roll-d, .hm-roll-s, .hm-roll-ghost { display: inline-block; }
+.m-roll-slot { position: relative; display: inline-flex; }
+.m-roll-ghost { position: absolute; inset-inline-start: 0; inset-block-start: 0; }
+.m-roll-d, .m-roll-s, .m-roll-ghost { display: inline-block; }

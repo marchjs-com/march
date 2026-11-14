@@ -35,14 +35,14 @@ export function AvatarGroup(props: AvatarGroupProps): Element {
     const n = val(props.names).length, l = props.label;
     return (typeof l === "function" && l.length ? (l as (n: number) => string)(n) : val(l as MaybeFn<string | undefined>)) ?? t`${n} people`;
   };
-  return h("span", { class: () => cx("hm-avatars", val(props.spacing) === "gap" && "hm-avatars-gap", val(props.class)), role: "group", "aria-label": label }, () => {
+  return h("span", { class: () => cx("m-avatars", val(props.spacing) === "gap" && "m-avatars-gap", val(props.class)), role: "group", "aria-label": label }, () => {
     const list = val(props.names), max = val(props.max) ?? 4, shown = list.slice(0, max), rest = list.length - shown.length;
     const size = val(props.size) ?? "sm", color = val(props.color), shape = val(props.shape);
     return untrack(() => [
       ...shown.map((n) => (typeof n === "string" ? h(Avatar, { name: n, size, color, shape }) : h(Avatar, { name: n.name, src: n.src, size, color: n.color ?? color, shape }))),
       rest > 0 && props.more !== false && (typeof props.more === "function"
-        ? h(Avatar, { size, shape, class: "hm-avatar-more", label: `+${rest}` }, props.more(rest))
-        : h(Avatar, { size, shape, class: "hm-avatar-more", text: `+${rest}` })),
+        ? h(Avatar, { size, shape, class: "m-avatar-more", label: `+${rest}` }, props.more(rest))
+        : h(Avatar, { size, shape, class: "m-avatar-more", text: `+${rest}` })),
     ]);
   });
 }

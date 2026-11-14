@@ -1,69 +1,69 @@
 /* March — DockLayout. Imported by its component module; tokens.css provides the variables. */
-.hm-dock { --hm-dock-bar: 2.25rem; position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; height: 100%; min-height: 18rem; min-width: 0;
-  background: var(--hm-surface-2); border-radius: var(--hm-radius-3); container-type: inline-size; isolation: isolate; }
-.hm-dock.is-dragging { user-select: none; cursor: grabbing; }
-.hm-dock-main { display: grid; min-height: 0; min-width: 0; padding: 3px; }
-.hm-dock-main > * { min-height: 0; min-width: 0; }
+.m-dock { --m-dock-bar: 2.25rem; position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; height: 100%; min-height: 18rem; min-width: 0;
+  background: var(--m-surface-2); border-radius: var(--m-radius-3); container-type: inline-size; isolation: isolate; }
+.m-dock.is-dragging { user-select: none; cursor: grabbing; }
+.m-dock-main { display: grid; min-height: 0; min-width: 0; padding: 3px; }
+.m-dock-main > * { min-height: 0; min-width: 0; }
 
 /* splits: the Splitter, borderless, filling its area */
-.hm-dock .hm-dock-split { min-height: 0; height: 100%; border: 0; border-radius: 0; background: transparent; overflow: visible; }
-.hm-dock .hm-dock-split > .hm-split-pane { display: grid; overflow: visible; min-height: 0; min-width: 0; }
-.hm-dock .hm-dock-split > .hm-split-pane > * { min-height: 0; min-width: 0; }
-.hm-dock .hm-dock-split > .hm-split-handle { --hm-rh-rest: transparent; }
+.m-dock .m-dock-split { min-height: 0; height: 100%; border: 0; border-radius: 0; background: transparent; overflow: visible; }
+.m-dock .m-dock-split > .m-split-pane { display: grid; overflow: visible; min-height: 0; min-width: 0; }
+.m-dock .m-dock-split > .m-split-pane > * { min-height: 0; min-width: 0; }
+.m-dock .m-dock-split > .m-split-handle { --m-rh-rest: transparent; }
 
 /* a group: the Tabs, compact, with its actions at the end of the tab bar */
-.hm-dock-group { position: relative; display: grid; min-height: 0; min-width: 0; margin: 2px; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-2);
-  background: var(--hm-surface); overflow: hidden; transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
-.hm-dock-group.is-focused { border-color: color-mix(in srgb, var(--hm-primary) 45%, var(--hm-border)); }
-.hm-dock-tabs { display: grid; grid-template-rows: var(--hm-dock-bar) minmax(0, 1fr); min-height: 0; min-width: 0; }
-.hm-dock-tabs > .hm-tabs-head { min-height: 0; background: var(--hm-surface-2); }
-.hm-dock-tabs .hm-tabs-bar { gap: 0; }
-.hm-dock-tabs > .hm-tabs-bar { background: var(--hm-surface-2); }
-.hm-dock-tabs .hm-tabs-actions { gap: 1px; padding-inline: .25rem; }
-.hm-dock-tabs .hm-tab { gap: .375rem; padding: 0 .5rem 0 .75rem; height: var(--hm-dock-bar); margin: 0; border-radius: 0; font-size: var(--hm-text-sm); user-select: none; touch-action: none;
-  border-inline-end: 1px solid color-mix(in srgb, var(--hm-border) 60%, transparent); }
-.hm-dock-tabs .hm-tab.is-active { background: var(--hm-surface); }
-.hm-dock-tabs .hm-tab::after { inset-inline: 0; top: 0; bottom: auto; height: 2px; border-radius: 0 0 2px 2px; background: var(--hm-primary); }
-.hm-dock-group:not(.is-focused) .hm-dock-tabs .hm-tab::after { background: var(--hm-border-strong); }
-.hm-dock-tabs > .hm-tabs-panel { padding: 0; min-height: 0; overflow: auto; }
-.hm-dock-host { display: block; height: 100%; min-height: 0; }
+.m-dock-group { position: relative; display: grid; min-height: 0; min-width: 0; margin: 2px; border: 1px solid var(--m-border); border-radius: var(--m-radius-2);
+  background: var(--m-surface); overflow: hidden; transition: border-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease); }
+.m-dock-group.is-focused { border-color: color-mix(in srgb, var(--m-primary) 45%, var(--m-border)); }
+.m-dock-tabs { display: grid; grid-template-rows: var(--m-dock-bar) minmax(0, 1fr); min-height: 0; min-width: 0; }
+.m-dock-tabs > .m-tabs-head { min-height: 0; background: var(--m-surface-2); }
+.m-dock-tabs .m-tabs-bar { gap: 0; }
+.m-dock-tabs > .m-tabs-bar { background: var(--m-surface-2); }
+.m-dock-tabs .m-tabs-actions { gap: 1px; padding-inline: .25rem; }
+.m-dock-tabs .m-tab { gap: .375rem; padding: 0 .5rem 0 .75rem; height: var(--m-dock-bar); margin: 0; border-radius: 0; font-size: var(--m-text-sm); user-select: none; touch-action: none;
+  border-inline-end: 1px solid color-mix(in srgb, var(--m-border) 60%, transparent); }
+.m-dock-tabs .m-tab.is-active { background: var(--m-surface); }
+.m-dock-tabs .m-tab::after { inset-inline: 0; top: 0; bottom: auto; height: 2px; border-radius: 0 0 2px 2px; background: var(--m-primary); }
+.m-dock-group:not(.is-focused) .m-dock-tabs .m-tab::after { background: var(--m-border-strong); }
+.m-dock-tabs > .m-tabs-panel { padding: 0; min-height: 0; overflow: auto; }
+.m-dock-host { display: block; height: 100%; min-height: 0; }
 /* the parts Tabs draws (icon, title, close mark), at the size of a compact tab; the ghost shows the same icon */
-.hm-dock-tab-icon, .hm-dock-tabs .hm-tab-icon { display: inline-flex; color: var(--hm-muted); } .hm-dock-tab-icon .hm-svg, .hm-dock-tabs .hm-tab-icon .hm-svg { width: .875rem; height: .875rem; }
-.hm-dock-tabs .hm-tab.is-active .hm-tab-icon { color: var(--hm-primary); }
-.hm-dock-tab-title { max-width: 12rem; }
-.hm-dock-tabs .hm-tab-close { margin-inline-end: 0; }
+.m-dock-tab-icon, .m-dock-tabs .m-tab-icon { display: inline-flex; color: var(--m-muted); } .m-dock-tab-icon .m-svg, .m-dock-tabs .m-tab-icon .m-svg { width: .875rem; height: .875rem; }
+.m-dock-tabs .m-tab.is-active .m-tab-icon { color: var(--m-primary); }
+.m-dock-tab-title { max-width: 12rem; }
+.m-dock-tabs .m-tab-close { margin-inline-end: 0; }
 /* the group buttons: IconButton, a step smaller than xs's neighbour sizes, visible on the bar's surface */
-.hm-dock-btn.hm-icon-btn { width: 1.625rem; height: 1.625rem; }
-.hm-dock-btn.hm-icon-btn:hover { background: color-mix(in srgb, var(--hm-text) 8%, transparent); }
-.hm-dock-btn.hm-icon-btn .hm-svg { width: .875rem; height: .875rem; }
+.m-dock-btn.m-icon-btn { width: 1.625rem; height: 1.625rem; }
+.m-dock-btn.m-icon-btn:hover { background: color-mix(in srgb, var(--m-text) 8%, transparent); }
+.m-dock-btn.m-icon-btn .m-svg { width: .875rem; height: .875rem; }
 /* an own icon (the `icons` prop): text or a node, centred in the button */
-.hm-dock-own { display: inline-grid; place-items: center; font-size: var(--hm-text-sm); line-height: 1; }
+.m-dock-own { display: inline-grid; place-items: center; font-size: var(--m-text-sm); line-height: 1; }
 
 /* maximized: the group covers the layout */
-.hm-dock-group.is-maximized { position: absolute; inset: 3px; z-index: 8; margin: 0; box-shadow: var(--hm-shadow-3); }
+.m-dock-group.is-maximized { position: absolute; inset: 3px; z-index: 8; margin: 0; box-shadow: var(--m-shadow-3); }
 
 /* floating windows */
-.hm-dock-float { position: absolute; z-index: 10; margin: 0; padding-block-start: .875rem; box-shadow: var(--hm-shadow-4); border-radius: var(--hm-radius-3); border-color: var(--hm-border-strong); }
-.hm-dock-grip { position: absolute; inset-block-start: 0; inset-inline: 0; height: .875rem; padding: 0; border: 0; background: var(--hm-surface-2); cursor: move; touch-action: none; }
-.hm-dock-grip::before { content: ""; position: absolute; inset-block-start: .3125rem; inset-inline-start: calc(50% - 1rem); width: 2rem; height: .25rem; border-radius: var(--hm-radius-full); background: var(--hm-border-strong);
-  transition: background-color var(--hm-dur) var(--hm-ease); }
-.hm-dock-grip:hover::before, .hm-dock-grip:focus-visible::before { background: var(--hm-primary); }
-.hm-dock-grip:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: -2px; }
+.m-dock-float { position: absolute; z-index: 10; margin: 0; padding-block-start: .875rem; box-shadow: var(--m-shadow-4); border-radius: var(--m-radius-3); border-color: var(--m-border-strong); }
+.m-dock-grip { position: absolute; inset-block-start: 0; inset-inline: 0; height: .875rem; padding: 0; border: 0; background: var(--m-surface-2); cursor: move; touch-action: none; }
+.m-dock-grip::before { content: ""; position: absolute; inset-block-start: .3125rem; inset-inline-start: calc(50% - 1rem); width: 2rem; height: .25rem; border-radius: var(--m-radius-full); background: var(--m-border-strong);
+  transition: background-color var(--m-dur) var(--m-ease); }
+.m-dock-grip:hover::before, .m-dock-grip:focus-visible::before { background: var(--m-primary); }
+.m-dock-grip:focus-visible { outline: 2px solid var(--m-primary); outline-offset: -2px; }
 /* the corner: ResizeHandle, inside the window's frame */
-.hm-dock-resize.hm-resize-handle { --hm-rh-out: 0px; --hm-rh-rest: var(--hm-border-strong); z-index: 1; }
+.m-dock-resize.m-resize-handle { --m-rh-out: 0px; --m-rh-rest: var(--m-border-strong); z-index: 1; }
 
 /* the minimized tray */
-.hm-dock-tray { gap: .375rem; padding: .375rem .5rem; border-block-start: 1px solid var(--hm-border); }
-.hm-dock-tray-btn.hm-btn { min-height: 1.75rem; max-width: 100%; font-size: var(--hm-text-xs); font-weight: 400; }
+.m-dock-tray { gap: .375rem; padding: .375rem .5rem; border-block-start: 1px solid var(--m-border); }
+.m-dock-tray-btn.m-btn { min-height: 1.75rem; max-width: 100%; font-size: var(--m-text-xs); font-weight: 400; }
 
 /* drop preview (moved by the motion engine: translate + scale of a layout-sized box) and the drag ghost */
-.hm-dock-preview { position: absolute; inset: 0; z-index: 30; pointer-events: none; opacity: 0; transform-origin: 0 0; border-radius: var(--hm-radius-2);
-  background: color-mix(in srgb, var(--hm-primary) 16%, transparent); box-shadow: inset 0 0 0 2px var(--hm-primary); }
-.hm-dock-preview.is-tab { background: var(--hm-primary); box-shadow: none; }
-.hm-dock-ghost { position: fixed; inset: 0 auto auto 0; display: inline-flex; align-items: center; gap: .375rem; padding: .375rem .75rem; pointer-events: none; white-space: nowrap;
-  border-radius: var(--hm-radius-2); background: var(--hm-surface); color: var(--hm-text); font-size: var(--hm-text-sm); box-shadow: var(--hm-shadow-3);
-  border: 1px solid color-mix(in srgb, var(--hm-primary) 50%, var(--hm-border)); }
+.m-dock-preview { position: absolute; inset: 0; z-index: 30; pointer-events: none; opacity: 0; transform-origin: 0 0; border-radius: var(--m-radius-2);
+  background: color-mix(in srgb, var(--m-primary) 16%, transparent); box-shadow: inset 0 0 0 2px var(--m-primary); }
+.m-dock-preview.is-tab { background: var(--m-primary); box-shadow: none; }
+.m-dock-ghost { position: fixed; inset: 0 auto auto 0; display: inline-flex; align-items: center; gap: .375rem; padding: .375rem .75rem; pointer-events: none; white-space: nowrap;
+  border-radius: var(--m-radius-2); background: var(--m-surface); color: var(--m-text); font-size: var(--m-text-sm); box-shadow: var(--m-shadow-3);
+  border: 1px solid color-mix(in srgb, var(--m-primary) 50%, var(--m-border)); }
 
-.hm-dock-empty { display: grid; place-content: center; }
+.m-dock-empty { display: grid; place-content: center; }
 
-@container (max-width: 34rem) { .hm-dock-tab-title { max-width: 7rem; } }
+@container (max-width: 34rem) { .m-dock-tab-title { max-width: 7rem; } }

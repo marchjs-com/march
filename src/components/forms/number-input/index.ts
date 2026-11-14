@@ -49,7 +49,7 @@ export function NumberInput(props: NumberInputProps): unknown {
     el.value = untrack(() => shown(get()));
   };
   el = h("input", {
-    ...base, ...textAttrs(props), type: "text", class: cx("hm-input hm-number", props.prefix == null && props.suffix == null && props.class),
+    ...base, ...textAttrs(props), type: "text", class: cx("m-input m-number", props.prefix == null && props.suffix == null && props.class),
     inputmode: props.inputmode ?? (props.decimals === 0 && (props.min ?? -1) >= 0 ? "numeric" : "decimal"), autocomplete: props.autocomplete ?? "off",
     "aria-invalid": () => (bad() || inv() ? "true" : null),
     onInput: (e: Event) => {

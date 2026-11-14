@@ -39,7 +39,7 @@ export default function App() {
   let $owner = null
   let $range = null
   let $notes = "Write *markdown* here"
-  return <main class="hm-p-5 hm-flex-col hm-gap-6">
+  return <main class="m-p-5 m-flex-col m-gap-6">
     <section>
       <h2>Create your account</h2>
       <Form schema={Signup} layout="grid" cols={2} submitLabel="Create account" confirmLeave
@@ -50,7 +50,7 @@ export default function App() {
       load={api.settings} save={(values, { changed }) => api.saveSettings(changed)} reason={10}
       sections={[{ title: "General", fields: ["name", "timezone", "seats"] }, { title: "Profile", fields: ["links", "about", "meta"] }]} />
 
-    <section class="hm-flex-col hm-gap-4">
+    <section class="m-flex-col m-gap-4">
       <h2>Standalone inputs</h2>
       <Field label="Owner" help="Type to search members">
         <Combobox bind:value={$owner} search={api.members} placeholder="Search people" />

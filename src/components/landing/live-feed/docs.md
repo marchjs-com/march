@@ -36,7 +36,7 @@ lifted out of the flow while it fades and wall cards share one height, so the pa
 | `leave` | preset / `"none"` / `{ keyframes, duration?, easing? }` | `blur` | how the oldest leaves |
 | `glow` | boolean | `true` | accent ring around a new item |
 | `move` | boolean | `true` | the others glide to their new place (FLIP) |
-| `class` | string | — | extra class on the root (`.hm-lf`; parts: `.hm-lf-pause`, `.hm-lf-list`, `.hm-lf-item` (a ListRow: `.hm-listrow-title`, `-sub`, `-trail`), `.hm-lf-avatar`) |
+| `class` | string | — | extra class on the root (`.m-lf`; parts: `.m-lf-pause`, `.m-lf-list`, `.m-lf-item` (a ListRow: `.m-listrow-title`, `-sub`, `-trail`), `.m-lf-avatar`) |
 
 `enter` presets: `flip` (3D swing out of a blur), `slide`, `fade`, `pop` (overshoot), `drop` (falls and bounces),
 `zoom` (from in front), `blur` (sharpens out of a glow), `swing` (hangs and swings), `unfold` (blind), `glide` (from

@@ -36,11 +36,11 @@ interface MenuOptions {
   look: CreateMenuLook; title?: string | false | undefined; handle?: boolean | undefined; motion?: boolean | undefined; onPick: (a: BottomNavAction) => void; onClose: () => void;
 }
 const colorOf = (a: BottomNavAction, i: number): ColorToken => a.color ?? BRAND_COLORS[i % BRAND_COLORS.length]!;
-const disc = (a: BottomNavAction): Element => h("span", { class: "hm-bnav-action-icon", "aria-hidden": "true" }, icon(a.icon, "hm-bnav-glyph")) as Element;
+const disc = (a: BottomNavAction): Element => h("span", { class: "m-bnav-action-icon", "aria-hidden": "true" }, icon(a.icon, "m-bnav-glyph")) as Element;
 /** The count or short text of an action: a Badge (nothing at 0 or without text). */
 const badgeOf = (a: BottomNavAction): unknown => (a.badge === undefined ? null : () => {
   const b = val(a.badge);
-  return b == null || b === 0 || b === "" ? null : typeof b === "number" ? h(Badge, { class: "hm-bnav-action-badge", count: b }) : h(Badge, { class: "hm-bnav-action-badge", tone: "danger" }, b);
+  return b == null || b === 0 || b === "" ? null : typeof b === "number" ? h(Badge, { class: "m-bnav-action-badge", count: b }) : h(Badge, { class: "m-bnav-action-badge", tone: "danger" }, b);
 });
 
 /** Open the Create menu above `button`; returns the function that closes it. */
@@ -71,11 +71,11 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
 
   const item = (a: BottomNavAction, i: number): HTMLElement => {
     const el = h("button", {
-      type: "button", role: "menuitem", class: "hm-bnav-action", "data-hm-color": colorAttr(colorOf(a, i)),
+      type: "button", role: "menuitem", class: "m-bnav-action", "data-m-color": colorAttr(colorOf(a, i)),
       disabled: () => !!val(a.disabled), title: fan ? () => val(a.desc) ?? val(a.label) : null, onClick: () => pick(a),
     },
     disc(a),
-    h("span", { class: "hm-bnav-action-text" }, h("span", { class: "hm-bnav-action-label" }, () => val(a.label))),
+    h("span", { class: "m-bnav-action-text" }, h("span", { class: "m-bnav-action-label" }, () => val(a.label))),
     badgeOf(a)) as HTMLElement;
     if (fan) { const [x, y] = at(i); setStyle(el, { transform: `translate(${x}px, ${y}px)` }); }
     return el;
@@ -84,7 +84,7 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
   const items = list.map(item);
   const enabled = (): HTMLElement[] => items.filter((x) => !(x as HTMLButtonElement).disabled);
   const panel = h("div", {
-    class: cx("hm-bnav-actions", `is-${o.look}`), role: "menu", "aria-label": o.title || t`Create`, "aria-orientation": fan ? "horizontal" : "vertical",
+    class: cx("m-bnav-actions", `is-${o.look}`), role: "menu", "aria-label": o.title || t`Create`, "aria-orientation": fan ? "horizontal" : "vertical",
     onKeyDown: (e: KeyboardEvent) => {
       if (e.key === "Escape") { e.preventDefault(); finish(); button.focus(); return; }
       // the stack grows upward (the first action is nearest to the button), so its arrows run the other way; Tab stays inside
@@ -96,8 +96,8 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
   }, items) as HTMLElement;
   // fan and stack sit above the button
   setStyle(panel, { left: `${cx0}px`, bottom: `${gapFromBottom + (fan ? 8 : 0)}px` });
-  const scrim = h("div", { class: "hm-bnav-scrim", "aria-hidden": "true", onClick: finish }) as HTMLElement;
-  const root = h("div", { class: cx("hm-bnav-menu", `is-${o.look}`) }, scrim, panel) as HTMLElement;
+  const scrim = h("div", { class: "m-bnav-scrim", "aria-hidden": "true", onClick: finish }) as HTMLElement;
+  const root = h("div", { class: cx("m-bnav-menu", `is-${o.look}`) }, scrim, panel) as HTMLElement;
   close = openLayer("menu", root, scope);
 
   if (o.motion === false) { queueMicrotask(() => (enabled()[0] ?? panel).focus()); return finish; }
@@ -120,12 +120,12 @@ function openSheetMenu(list: readonly BottomNavAction[], scope: HTMLElement | nu
   const pick = (a: BottomNavAction): void => { if (val(a.disabled)) return; o.onPick(a); finish(); };
   const first = list.findIndex((a) => !val(a.disabled));
   const rows = list.map((a, i) => h(ListRow, {
-    role: "menuitem", class: "hm-bnav-action", size: "lg", color: colorOf(a, i), "data-autofocus": i === first ? "" : null,
+    role: "menuitem", class: "m-bnav-action", size: "lg", color: colorOf(a, i), "data-autofocus": i === first ? "" : null,
     lead: disc(a), title: () => val(a.label), sub: a.desc != null ? () => val(a.desc) ?? "" : undefined, trail: a.badge !== undefined ? badgeOf(a) : undefined,
     disabled: () => !!val(a.disabled), onClick: () => pick(a),
   }) as HTMLElement);
   const menu = h("div", {
-    class: "hm-bnav-actions is-sheet", role: "menu", "aria-label": o.title || t`Create`, "aria-orientation": "vertical",
+    class: "m-bnav-actions is-sheet", role: "menu", "aria-label": o.title || t`Create`, "aria-orientation": "vertical",
     onKeyDown: (e: KeyboardEvent) => { roving(e, rows.filter((x) => !(x as HTMLButtonElement).disabled)); },
   }, rows);
   // the Drawer (dialog frame, gestures) is loaded with the first sheet, so the bar itself stays light
@@ -135,7 +135,7 @@ function openSheetMenu(list: readonly BottomNavAction[], scope: HTMLElement | nu
       const open = signal(true);
       hide = () => open.set(false);
       const view = Drawer({
-        open, side: "bottom", class: "hm-bnav-sheet", target: scope ?? "page", closeButton: false, motion: o.motion !== false, handle: o.handle,
+        open, side: "bottom", class: "m-bnav-sheet", target: scope ?? "page", closeButton: false, motion: o.motion !== false, handle: o.handle,
         title: o.title === false ? undefined : o.title ?? t`Create`, label: o.title || t`Create`, onClose: finish, children: menu,
       });
       // mounted while the Drawer shows it; once it has left the page the menu is over

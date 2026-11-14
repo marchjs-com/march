@@ -1,19 +1,19 @@
 /* March — Pagination. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- pagination */
-.hm-pagination { display: inline-flex; align-items: center; gap: 2px; flex-wrap: wrap; }
-.hm-page-btn { display: inline-grid; place-items: center; min-width: 2.125rem; height: 2.125rem; padding: 0 .5rem; border: 1px solid transparent; border-radius: var(--hm-radius); background: none;
-  color: var(--hm-text-2); font: inherit; font-size: var(--hm-text-md); font-variant-numeric: tabular-nums; cursor: pointer; transition: background-color var(--hm-dur) var(--hm-ease); }
-.hm-page-btn:hover:not(:disabled) { background: var(--hm-surface-2); color: var(--hm-text); }
-.hm-page-btn.is-active { background: var(--hm-surface); border-color: var(--hm-border-strong); color: var(--hm-text); font-weight: 600; box-shadow: var(--hm-shadow-1); }
-.hm-page-btn:disabled { opacity: .4; cursor: not-allowed; }
+.m-pagination { display: inline-flex; align-items: center; gap: 2px; flex-wrap: wrap; }
+.m-page-btn { display: inline-grid; place-items: center; min-width: 2.125rem; height: 2.125rem; padding: 0 .5rem; border: 1px solid transparent; border-radius: var(--m-radius); background: none;
+  color: var(--m-text-2); font: inherit; font-size: var(--m-text-md); font-variant-numeric: tabular-nums; cursor: pointer; transition: background-color var(--m-dur) var(--m-ease); }
+.m-page-btn:hover:not(:disabled) { background: var(--m-surface-2); color: var(--m-text); }
+.m-page-btn.is-active { background: var(--m-surface); border-color: var(--m-border-strong); color: var(--m-text); font-weight: 600; box-shadow: var(--m-shadow-1); }
+.m-page-btn:disabled { opacity: .4; cursor: not-allowed; }
 /* previous / next: IconButtons in the size of a page button (own text may be wider) */
-.hm-icon-btn.hm-page-nav { width: auto; min-width: 2.125rem; height: 2.125rem; padding: 0 .5rem; color: var(--hm-text-2); font-size: var(--hm-text-md); }
-.hm-icon-btn.hm-page-nav:disabled { opacity: .4; cursor: not-allowed; background: none; }
-.hm-page-gap { display: inline-grid; place-items: center; width: 1.5rem; color: var(--hm-faint); }
-.hm-pagination[data-hm-color] .hm-page-btn.is-active { border-color: var(--hm-accent); color: var(--hm-accent-text, var(--hm-accent)); }
+.m-icon-btn.m-page-nav { width: auto; min-width: 2.125rem; height: 2.125rem; padding: 0 .5rem; color: var(--m-text-2); font-size: var(--m-text-md); }
+.m-icon-btn.m-page-nav:disabled { opacity: .4; cursor: not-allowed; background: none; }
+.m-page-gap { display: inline-grid; place-items: center; width: 1.5rem; color: var(--m-faint); }
+.m-pagination[data-m-color] .m-page-btn.is-active { border-color: var(--m-accent); color: var(--m-accent-text, var(--m-accent)); }
 /* simple: the range text, a rows-per-page select, Previous / Next around the page status */
-.hm-pagination-simple { display: flex; gap: var(--hm-space-3); font-size: var(--hm-text-sm); color: var(--hm-muted); font-variant-numeric: tabular-nums; }
-.hm-page-info { margin-inline-end: auto; }
-.hm-page-info:empty { display: none; }
-.hm-page-steps { display: flex; align-items: center; gap: var(--hm-space-2); }
-.hm-page-sizes { width: auto; min-height: 2rem; padding-block: 0; }
+.m-pagination-simple { display: flex; gap: var(--m-space-3); font-size: var(--m-text-sm); color: var(--m-muted); font-variant-numeric: tabular-nums; }
+.m-page-info { margin-inline-end: auto; }
+.m-page-info:empty { display: none; }
+.m-page-steps { display: flex; align-items: center; gap: var(--m-space-2); }
+.m-page-sizes { width: auto; min-height: 2rem; padding-block: 0; }

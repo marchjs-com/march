@@ -10,12 +10,12 @@ const { TypingIndicator, typingText } = await import("./index.ts");
 test("TypingIndicator: polite status, sentence, hides when nobody types", () => {
   const names = signal(["HADİ"]);
   const m = mount(() => h(TypingIndicator, { names }));
-  const el = m.el.querySelector(".hm-typing");
+  const el = m.el.querySelector(".m-typing");
   assert.equal(el.getAttribute("role"), "status");
-  assert.equal(el.querySelector(".hm-typing-text").textContent, "HADİ is typing…");
-  assert.ok(el.querySelector(".hm-typing-text").classList.contains("hm-sr-only"), "bubble: the sentence is for screen readers");
+  assert.equal(el.querySelector(".m-typing-text").textContent, "HADİ is typing…");
+  assert.ok(el.querySelector(".m-typing-text").classList.contains("m-sr-only"), "bubble: the sentence is for screen readers");
   names.set(["HADİ", "Beta"]);
-  assert.equal(el.querySelector(".hm-typing-text").textContent, "HADİ and Beta are typing…");
+  assert.equal(el.querySelector(".m-typing-text").textContent, "HADİ and Beta are typing…");
   names.set([]);
   assert.ok(el.classList.contains("is-off"));
   assert.equal(typingText(["a", "b", "c"]), "3 people are typing…");
@@ -28,12 +28,12 @@ test("TypingIndicator: own sentence, no dots, own dots, motion none", () => {
     h(TypingIndicator, { names: ["a"], dots: h("b", { class: "own-dots" }), motion: "none" }),
     h(TypingIndicator, { names: ["a"], motion: "none" }),
   ]);
-  const [a, b, c] = m.el.querySelectorAll(".hm-typing");
+  const [a, b, c] = m.el.querySelectorAll(".m-typing");
   assert.ok(a.classList.contains("mine"));
-  assert.equal(a.querySelector(".hm-typing-text").textContent, "2 writing");
-  assert.equal(a.querySelector(".hm-typing-dots"), null);
-  assert.ok(b.querySelector(".hm-typing-dots.is-own .own-dots"));
-  assert.equal(b.querySelectorAll(".hm-typing-dots .hm-status-dot").length, 0);
-  assert.equal(c.querySelectorAll(".hm-typing-dots .hm-status-dot").length, 3);
+  assert.equal(a.querySelector(".m-typing-text").textContent, "2 writing");
+  assert.equal(a.querySelector(".m-typing-dots"), null);
+  assert.ok(b.querySelector(".m-typing-dots.is-own .own-dots"));
+  assert.equal(b.querySelectorAll(".m-typing-dots .m-status-dot").length, 0);
+  assert.equal(c.querySelectorAll(".m-typing-dots .m-status-dot").length, 3);
   m.dispose();
 });

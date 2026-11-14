@@ -1,38 +1,38 @@
 /* Layout. Without regions it adds no box; with regions it is the AppShell frame (app-shell.css) plus aside and footer. */
-.hm-layout:not(.hm-shell) { display: contents; }
-.hm-layout-no-nav { grid-template-columns: minmax(0, 1fr); }
-.hm-layout-row { flex: 1 1 auto; display: flex; min-width: 0; }
-.hm-layout-main { flex: 1 1 auto; }
-.hm-layout-aside { flex: none; inline-size: clamp(14rem, 22vw, 18rem); position: sticky; top: var(--hm-topbar-h, 3.5rem); align-self: flex-start;
-  max-block-size: calc(100dvh - var(--hm-topbar-h, 3.5rem)); overflow: auto; padding: var(--hm-space-5) var(--hm-space-4); border-inline-start: 1px solid var(--hm-border); }
-.hm-layout-footer { border-top: 1px solid var(--hm-border); padding: var(--hm-space-5); color: var(--hm-muted); }
-.hm-layout-footer:empty, .hm-layout-aside:empty { display: none; }
-.hm-layout-ctl { display: contents; }
-.hm-layout-aside-btn { display: none; }
+.m-layout:not(.m-shell) { display: contents; }
+.m-layout-no-nav { grid-template-columns: minmax(0, 1fr); }
+.m-layout-row { flex: 1 1 auto; display: flex; min-width: 0; }
+.m-layout-main { flex: 1 1 auto; }
+.m-layout-aside { flex: none; inline-size: clamp(14rem, 22vw, 18rem); position: sticky; top: var(--m-topbar-h, 3.5rem); align-self: flex-start;
+  max-block-size: calc(100dvh - var(--m-topbar-h, 3.5rem)); overflow: auto; padding: var(--m-space-5) var(--m-space-4); border-inline-start: 1px solid var(--m-border); }
+.m-layout-footer { border-top: 1px solid var(--m-border); padding: var(--m-space-5); color: var(--m-muted); }
+.m-layout-footer:empty, .m-layout-aside:empty { display: none; }
+.m-layout-ctl { display: contents; }
+.m-layout-aside-btn { display: none; }
 /* autoHideHeader */
-.hm-shell-header { transition: transform var(--hm-dur) var(--hm-ease); }
-.hm-shell-header[data-hidden] { transform: translateY(-100%); }
+.m-shell-header { transition: transform var(--m-dur) var(--m-ease); }
+.m-shell-header[data-hidden] { transform: translateY(-100%); }
 /* readingProgress */
-/* the place of the bar (a Progress line inside); --hm-rp-c: a CSS colour given instead of a theme token */
-.hm-reading-progress { position: fixed; inset-block-start: 0; inset-inline: 0; z-index: calc(var(--hm-z-sticky, 40) + 2); --hm-progress-c: var(--hm-rp-c); pointer-events: none; }
+/* the place of the bar (a Progress line inside); --m-rp-c: a CSS colour given instead of a theme token */
+.m-reading-progress { position: fixed; inset-block-start: 0; inset-inline: 0; z-index: calc(var(--m-z-sticky, 40) + 2); --m-progress-c: var(--m-rp-c); pointer-events: none; }
 /* connection: a Badge in a live region */
-.hm-offline > .hm-badge { box-shadow: var(--hm-shadow-2); }
-.hm-offline[hidden] { display: none; }
-.hm-layout-feedback { box-shadow: var(--hm-shadow-2); }
+.m-offline > .m-badge { box-shadow: var(--m-shadow-2); }
+.m-offline[hidden] { display: none; }
+.m-layout-feedback { box-shadow: var(--m-shadow-2); }
 /* devOverlay (Alt+Shift+L) */
-[data-hm-layout-debug] .hm-shell-nav, [data-hm-layout-debug] .hm-shell-header, [data-hm-layout-debug] .hm-layout-main,
-[data-hm-layout-debug] .hm-layout-aside, [data-hm-layout-debug] .hm-layout-footer, [data-hm-layout-debug] .hm-shell-top,
-[data-hm-layout-debug] .hm-corner { outline: 2px dashed var(--hm-primary); outline-offset: -2px; }
-.hm-layout-dev { position: fixed; inset-block-end: var(--hm-space-2); inset-inline-start: 50%; translate: -50% 0; z-index: var(--hm-z-toast);
-  padding: var(--hm-space-1) var(--hm-space-3); border-radius: var(--hm-radius); background: var(--hm-text); color: var(--hm-bg); font: var(--hm-text-sm) / 1.4 var(--hm-font-mono, monospace); }
+[data-m-layout-debug] .m-shell-nav, [data-m-layout-debug] .m-shell-header, [data-m-layout-debug] .m-layout-main,
+[data-m-layout-debug] .m-layout-aside, [data-m-layout-debug] .m-layout-footer, [data-m-layout-debug] .m-shell-top,
+[data-m-layout-debug] .m-corner { outline: 2px dashed var(--m-primary); outline-offset: -2px; }
+.m-layout-dev { position: fixed; inset-block-end: var(--m-space-2); inset-inline-start: 50%; translate: -50% 0; z-index: var(--m-z-toast);
+  padding: var(--m-space-1) var(--m-space-3); border-radius: var(--m-radius); background: var(--m-text); color: var(--m-bg); font: var(--m-text-sm) / 1.4 var(--m-font-mono, monospace); }
 @media (max-width: 1100px) {
-  .hm-layout-row { flex-direction: column; }
+  .m-layout-row { flex-direction: column; }
   /* the aside is a bottom sheet, opened from its corner button */
-  .hm-layout-aside { position: fixed; inset-inline: 0; inset-block-end: 0; inline-size: auto; max-block-size: 70dvh; z-index: var(--hm-z-dropdown);
-    background: var(--hm-surface); border: 0; border-top: 1px solid var(--hm-border); border-start-start-radius: var(--hm-radius-lg); border-start-end-radius: var(--hm-radius-lg);
-    box-shadow: var(--hm-shadow-3); transform: translateY(100%); visibility: hidden; transition: transform var(--hm-dur) var(--hm-ease), visibility var(--hm-dur) step-end; }
-  .hm-layout-aside[data-open] { transform: none; visibility: visible; transition: transform var(--hm-dur) var(--hm-ease), visibility var(--hm-dur) step-start; }
-  .hm-layout-aside-btn { display: inline-flex; box-shadow: var(--hm-shadow-2); }
+  .m-layout-aside { position: fixed; inset-inline: 0; inset-block-end: 0; inline-size: auto; max-block-size: 70dvh; z-index: var(--m-z-dropdown);
+    background: var(--m-surface); border: 0; border-top: 1px solid var(--m-border); border-start-start-radius: var(--m-radius-lg); border-start-end-radius: var(--m-radius-lg);
+    box-shadow: var(--m-shadow-3); transform: translateY(100%); visibility: hidden; transition: transform var(--m-dur) var(--m-ease), visibility var(--m-dur) step-end; }
+  .m-layout-aside[data-open] { transform: none; visibility: visible; transition: transform var(--m-dur) var(--m-ease), visibility var(--m-dur) step-start; }
+  .m-layout-aside-btn { display: inline-flex; box-shadow: var(--m-shadow-2); }
 }
-@media (prefers-reduced-motion: reduce) { .hm-shell-header, .hm-layout-aside { transition: none; } }
-@media print { .hm-reading-progress, .hm-skip, .hm-layout-aside-btn, .hm-layout-dev { display: none; } }
+@media (prefers-reduced-motion: reduce) { .m-shell-header, .m-layout-aside { transition: none; } }
+@media print { .m-reading-progress, .m-skip, .m-layout-aside-btn, .m-layout-dev { display: none; } }

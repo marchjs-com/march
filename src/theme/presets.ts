@@ -24,7 +24,7 @@ export const hadi = defineTheme({
   font: FIGTREE, display: BRICOLAGE, displayWeight: 700, radius: 12,
   light: {
     bg: HADI.mist, surface: "#FFFFFF", text: HADI.ink, muted: ensureContrast(HADI.ink3, "#FFFFFF"), border: HADI.line,
-    // accent = orange (Heyecan), pure for fills, lines and icons; --hm-primary-text is the shade that reads as text
+    // accent = orange (Heyecan), pure for fills, lines and icons; --m-primary-text is the shade that reads as text
     primary: HADI.orange, solid: HADI.orange, onSolid: onBrandFill(HADI.orange),
     danger: HADI.error, success: HADI.green, warn: HADI.gold,
     info: HADI.blue, special: HADI.purple,

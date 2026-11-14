@@ -26,7 +26,7 @@ test("GradientEditor: stops as sliders, keyboard moves and removes, type and ang
   const el = document.createElement("div");
   document.body.appendChild(el);
   const dispose = render(() => h(GradientEditor, { "bind:value": v }), el);
-  const stops = () => el.querySelectorAll(".hm-ge-stop");
+  const stops = () => el.querySelectorAll(".m-ge-stop");
   assert.equal(stops().length, 3);
   assert.equal(stops()[1].getAttribute("aria-valuenow"), "50");
   stops()[1].dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "ArrowRight", shiftKey: true, bubbles: true }));
@@ -38,10 +38,10 @@ test("GradientEditor: stops as sliders, keyboard moves and removes, type and ang
   const dial = el.querySelectorAll("[role=slider]").find((s) => s.getAttribute("aria-label") === "Angle");
   dial.dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
   assert.match(v(), /^linear-gradient\(91deg/);
-  el.querySelectorAll(".hm-ge-types [role=radio]").find((b) => b.textContent === "Conic").click();
+  el.querySelectorAll(".m-ge-types [role=radio]").find((b) => b.textContent === "Conic").click();
   assert.match(v(), /^conic-gradient\(from 91deg/);
-  assert.equal(el.querySelector(".hm-ge-css").textContent, `background: ${v()};`);
-  assert.ok(el.querySelector(".hm-cp"), "the selected stop has a ColorPicker");
+  assert.equal(el.querySelector(".m-ge-css").textContent, `background: ${v()};`);
+  assert.ok(el.querySelector(".m-cp"), "the selected stop has a ColorPicker");
   dispose();
 });
 
@@ -53,20 +53,20 @@ test("GradientEditor: parts off, own angles, own texts", () => {
       labels: { editor: "Fill", stops: "Colors", linear: "Straight", degrees: (a) => `${a} deg`, stop: (n) => `Color ${n}`, copy: "Copy it" } }),
     h(GradientEditor, { value: "linear-gradient(90deg, #f2801f 0%, #a3338c 100%)", dial: false, angles: false, presets: false, labels: { hint: "Click to add" } }),
   ], el);
-  const [a, b] = el.querySelectorAll(".hm-ge");
+  const [a, b] = el.querySelectorAll(".m-ge");
   assert.ok(a.classList.contains("mine"));
   assert.equal(a.getAttribute("aria-label"), "Fill");
-  assert.equal(a.querySelector(".hm-ge-preview"), null);
-  assert.equal(a.querySelector(".hm-ge-hint"), null);
-  assert.equal(a.querySelector(".hm-ge-pos"), null);
-  assert.equal(a.querySelector(".hm-ge-dial"), null);
-  assert.deepEqual([...a.querySelectorAll(".hm-ge-angle-btn")].map((x) => x.getAttribute("aria-label")), ["0 deg", "90 deg"]);
-  assert.equal(a.querySelector(".hm-ge-bar").getAttribute("aria-label"), "Colors");
-  assert.equal(a.querySelector(".hm-ge-stop").getAttribute("aria-label"), "Color 1");
-  assert.match(a.querySelector(".hm-ge-types").textContent, /Straight/);
-  assert.equal(a.querySelector(".hm-ge-copy").getAttribute("aria-label"), "Copy it");
-  assert.ok(b.querySelector(".hm-ge-preview") && b.querySelector(".hm-ge-pos"), "the default parts stay");
-  assert.equal(b.querySelector(".hm-ge-angle"), null, "no dial and no quick angles: no angle block");
-  assert.equal(b.querySelector(".hm-ge-hint").textContent, "Click to add");
+  assert.equal(a.querySelector(".m-ge-preview"), null);
+  assert.equal(a.querySelector(".m-ge-hint"), null);
+  assert.equal(a.querySelector(".m-ge-pos"), null);
+  assert.equal(a.querySelector(".m-ge-dial"), null);
+  assert.deepEqual([...a.querySelectorAll(".m-ge-angle-btn")].map((x) => x.getAttribute("aria-label")), ["0 deg", "90 deg"]);
+  assert.equal(a.querySelector(".m-ge-bar").getAttribute("aria-label"), "Colors");
+  assert.equal(a.querySelector(".m-ge-stop").getAttribute("aria-label"), "Color 1");
+  assert.match(a.querySelector(".m-ge-types").textContent, /Straight/);
+  assert.equal(a.querySelector(".m-ge-copy").getAttribute("aria-label"), "Copy it");
+  assert.ok(b.querySelector(".m-ge-preview") && b.querySelector(".m-ge-pos"), "the default parts stay");
+  assert.equal(b.querySelector(".m-ge-angle"), null, "no dial and no quick angles: no angle block");
+  assert.equal(b.querySelector(".m-ge-hint").textContent, "Click to add");
   dispose();
 });

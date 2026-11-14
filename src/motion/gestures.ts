@@ -32,9 +32,9 @@ export interface DragOptions {
 }
 
 /**
- * While dragging (and until the release animation ends) the element is lifted above everything: it gets `hm-dragging`
- * (+ `hm-dragging-rel` when it is statically positioned), and ancestors that create a stacking context get `hm-drag-lift`,
- * so z-index `--hm-z-drag` wins over sibling cards, sticky bars and dialogs (motion.css). Overflow clipping by an
+ * While dragging (and until the release animation ends) the element is lifted above everything: it gets `m-dragging`
+ * (+ `m-dragging-rel` when it is statically positioned), and ancestors that create a stacking context get `m-drag-lift`,
+ * so z-index `--m-z-drag` wins over sibling cards, sticky bars and dialogs (motion.css). Overflow clipping by an
  * ancestor is not undone: give drag areas room (no overflow: hidden on the way up).
  */
 function lift(el: Element): () => void {
@@ -46,10 +46,10 @@ function lift(el: Element): () => void {
   const done: [Element, string[]][] = [];
   const add = (e: Element, cls: string[]): void => { e.classList.add(...cls); done.push([e, cls]); };
   const own = css(el);
-  add(el, own?.position === "static" ? ["hm-dragging", "hm-dragging-rel"] : ["hm-dragging"]);
+  add(el, own?.position === "static" ? ["m-dragging", "m-dragging-rel"] : ["m-dragging"]);
   for (let p = el.parentElement; p && p !== el.ownerDocument?.body && p !== el.ownerDocument?.documentElement; p = p.parentElement) {
     const c = css(p);
-    if (c && isContext(c)) add(p, c.position === "static" ? ["hm-drag-lift", "hm-dragging-rel"] : ["hm-drag-lift"]);
+    if (c && isContext(c)) add(p, c.position === "static" ? ["m-drag-lift", "m-dragging-rel"] : ["m-drag-lift"]);
   }
   return () => { for (const [e, cls] of done) e.classList.remove(...cls); };
 }
@@ -176,7 +176,7 @@ export function magnet(el: Element, raw?: unknown): () => void {
   return () => { stop(release); off(); };
 }
 
-/** Action: 3D tilt toward the pointer (max degrees), with an optional glare via --hm-tilt-x/--hm-tilt-y custom properties. */
+/** Action: 3D tilt toward the pointer (max degrees), with an optional glare via --m-tilt-x/--m-tilt-y custom properties. */
 export function tilt(el: Element, raw?: unknown): () => void {
   const o = obj<{ max: number; perspective: number }>(raw);
   const max = o.max ?? 8, persp = o.perspective ?? 800;
@@ -188,7 +188,7 @@ export function tilt(el: Element, raw?: unknown): () => void {
     if (!inside) { inside = true; stop(release); }
     const r = el.getBoundingClientRect();
     const px = (e.clientX - r.left) / (r.width || 1) - 0.5, py = (e.clientY - r.top) / (r.height || 1) - 0.5;
-    setStyle(el, { transform: `perspective(${persp}px) rotateX(${(-py * max).toFixed(2)}deg) rotateY(${(px * max).toFixed(2)}deg)`, "--hm-tilt-x": `${((px + 0.5) * 100).toFixed(1)}%`, "--hm-tilt-y": `${((py + 0.5) * 100).toFixed(1)}%` });
+    setStyle(el, { transform: `perspective(${persp}px) rotateX(${(-py * max).toFixed(2)}deg) rotateY(${(px * max).toFixed(2)}deg)`, "--m-tilt-x": `${((px + 0.5) * 100).toFixed(1)}%`, "--m-tilt-y": `${((py + 0.5) * 100).toFixed(1)}%` });
   };
   const leave = (): void => {
     if (!inside) return;

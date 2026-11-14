@@ -30,9 +30,9 @@ export function CodeViewer(input: CodeViewInput, ctx?: WidgetContext<CodeViewInp
   const files: CodeFile[] = [{ name: "", source: input.source, lang: input.lang }, ...(input.files ?? [])];
   const current = signal(0);
   const file = (): CodeFile => files[current()] ?? files[0]!;
-  const switcher = files.length > 1 && h("div", { class: "hm-code-files", role: "group", "aria-label": () => t`Files` },
+  const switcher = files.length > 1 && h("div", { class: "m-code-files", role: "group", "aria-label": () => t`Files` },
     files.map((f, i) => h(Button, { variant: "ghost", size: "sm", pressed: () => current() === i, onClick: () => current.set(i) }, f.name || t`Example`)));
-  return h("div", { class: input.expanded ? "hm-code-widget is-expanded" : "hm-code-widget" },
+  return h("div", { class: input.expanded ? "m-code-widget is-expanded" : "m-code-widget" },
     () => { const f = file(); return h(CodeView, { code: f.source, lang: f.lang ?? input.lang, copy: false, tools: [switcher, ctx?.actions()] }); });
 }
 
@@ -42,7 +42,7 @@ const fullscreen: WidgetProvider<CodeViewInput> = {
   id: "fullscreen", slot: "action", order: 20, when: (input) => !input.expanded,
   render: (input) => h(Button, {
     variant: "ghost", size: "sm", "aria-haspopup": "dialog",
-    onClick: () => { void openDialog(() => h(Widget<CodeViewInput>, { sources: [codeView], input: { ...input, expanded: true } }), { size: "full", title: input.lang.toUpperCase(), class: "hm-code-full" }); },
+    onClick: () => { void openDialog(() => h(Widget<CodeViewInput>, { sources: [codeView], input: { ...input, expanded: true } }), { size: "full", title: input.lang.toUpperCase(), class: "m-code-full" }); },
   }, () => t`Fullscreen`),
 };
 

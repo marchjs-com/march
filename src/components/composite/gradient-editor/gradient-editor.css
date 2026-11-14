@@ -1,53 +1,53 @@
 /* March — GradientEditor. Imported by its component module; tokens.css provides the variables. */
-.hm-ge { --hm-ge-check: var(--hm-surface-3); --hm-checker-a: var(--hm-ge-check); max-width: 100%; }
-.hm-ge > .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-3); padding: var(--hm-space-3); }
-/* the gradient is a layer over the shared checkerboard (.hm-checker) */
-.hm-ge-preview { --hm-checker-size: .75rem; position: relative; block-size: 7.5rem; border-radius: var(--hm-radius-3); }
-.hm-ge-preview::before, .hm-ge-bar::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
-.hm-ge-preview::before { background: var(--hm-ge-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 10%, transparent); }
+.m-ge { --m-ge-check: var(--m-surface-3); --m-checker-a: var(--m-ge-check); max-width: 100%; }
+.m-ge > .m-card-body { display: flex; flex-direction: column; gap: var(--m-space-3); padding: var(--m-space-3); }
+/* the gradient is a layer over the shared checkerboard (.m-checker) */
+.m-ge-preview { --m-checker-size: .75rem; position: relative; block-size: 7.5rem; border-radius: var(--m-radius-3); }
+.m-ge-preview::before, .m-ge-bar::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+.m-ge-preview::before { background: var(--m-ge-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-text) 10%, transparent); }
 
 /* angle: a dial and eight quick angles */
-.hm-ge-angle { display: flex; align-items: center; gap: var(--hm-space-3); }
-.hm-ge-dial { position: relative; flex: none; inline-size: 3.25rem; block-size: 3.25rem; border-radius: 50%; cursor: grab; touch-action: none;
-  background: radial-gradient(circle, var(--hm-surface) 52%, transparent 53%), var(--hm-ge-bar); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 12%, transparent); }
-.hm-ge-dial:active { cursor: grabbing; }
-.hm-ge-dial-knob { position: absolute; inset: 0; border-radius: 50%; outline: none; rotate: var(--hm-ge-angle, 0deg); transition: rotate var(--hm-dur-fast) var(--hm-ease); }
-.hm-ge-dial:active .hm-ge-dial-knob { transition: none; }
-.hm-ge-dial-knob:focus-visible { box-shadow: 0 0 0 3px var(--hm-focus); }
-.hm-ge-dial-hand { position: absolute; inset-block-start: 3px; inset-inline-start: 50%; inline-size: .625rem; block-size: .625rem; margin-inline-start: -.3125rem; border-radius: 50%;
-  background: var(--hm-surface); border: 2px solid var(--hm-text); box-shadow: var(--hm-shadow-1); }
-.hm-ge-dial-value { position: absolute; inset: 0; display: grid; place-items: center; font-size: var(--hm-text-xs); font-weight: var(--hm-weight-semibold); font-variant-numeric: tabular-nums; pointer-events: none; }
-.hm-ge-angles { display: grid; grid-template-columns: repeat(4, 1.5rem); gap: .25rem; }
-.hm-ge-angle-btn.hm-icon-btn { border: 1px solid var(--hm-border); border-radius: var(--hm-radius-1); }
-.hm-ge-angle-btn.hm-icon-btn:hover { border-color: var(--hm-border-strong); }
-.hm-ge-angle-btn.hm-icon-btn.is-pressed { border-color: var(--hm-accent, var(--hm-primary)); }
-.hm-ge-angle-hand { inline-size: 2px; block-size: .7rem; border-radius: 2px; background: currentColor; rotate: var(--hm-ge-a); translate: 0 -2px; transform-origin: 50% 90%; }
+.m-ge-angle { display: flex; align-items: center; gap: var(--m-space-3); }
+.m-ge-dial { position: relative; flex: none; inline-size: 3.25rem; block-size: 3.25rem; border-radius: 50%; cursor: grab; touch-action: none;
+  background: radial-gradient(circle, var(--m-surface) 52%, transparent 53%), var(--m-ge-bar); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-text) 12%, transparent); }
+.m-ge-dial:active { cursor: grabbing; }
+.m-ge-dial-knob { position: absolute; inset: 0; border-radius: 50%; outline: none; rotate: var(--m-ge-angle, 0deg); transition: rotate var(--m-dur-fast) var(--m-ease); }
+.m-ge-dial:active .m-ge-dial-knob { transition: none; }
+.m-ge-dial-knob:focus-visible { box-shadow: 0 0 0 3px var(--m-focus); }
+.m-ge-dial-hand { position: absolute; inset-block-start: 3px; inset-inline-start: 50%; inline-size: .625rem; block-size: .625rem; margin-inline-start: -.3125rem; border-radius: 50%;
+  background: var(--m-surface); border: 2px solid var(--m-text); box-shadow: var(--m-shadow-1); }
+.m-ge-dial-value { position: absolute; inset: 0; display: grid; place-items: center; font-size: var(--m-text-xs); font-weight: var(--m-weight-semibold); font-variant-numeric: tabular-nums; pointer-events: none; }
+.m-ge-angles { display: grid; grid-template-columns: repeat(4, 1.5rem); gap: .25rem; }
+.m-ge-angle-btn.m-icon-btn { border: 1px solid var(--m-border); border-radius: var(--m-radius-1); }
+.m-ge-angle-btn.m-icon-btn:hover { border-color: var(--m-border-strong); }
+.m-ge-angle-btn.m-icon-btn.is-pressed { border-color: var(--m-accent, var(--m-primary)); }
+.m-ge-angle-hand { inline-size: 2px; block-size: .7rem; border-radius: 2px; background: currentColor; rotate: var(--m-ge-a); translate: 0 -2px; transform-origin: 50% 90%; }
 
 /* stop bar: the gradient line runs left to right in every writing direction (it is the CSS gradient's own axis) */
-.hm-ge-stops { display: flex; flex-direction: column; gap: var(--hm-space-1); padding-inline: .75rem; }
-.hm-ge-bar { direction: ltr; position: relative; block-size: 1.5rem; margin-block: .25rem 1.125rem; border-radius: var(--hm-radius-2); cursor: copy; touch-action: none; }
-.hm-ge-bar::before { background: var(--hm-ge-bar); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 12%, transparent); }
-.hm-ge-stop { position: absolute; inset-block-start: 100%; inset-inline-start: var(--hm-ge-at); inline-size: 1.25rem; block-size: 1.5rem; padding: 0; translate: -50% -.375rem; border: 0; background: none; cursor: grab;
-  transition: translate var(--hm-dur) var(--hm-ease-spring), opacity var(--hm-dur) var(--hm-ease), scale var(--hm-dur-fast) var(--hm-ease-spring); }
-.hm-ge-stop::before { content: ""; position: absolute; inset-inline-start: 50%; inset-block-start: -.375rem; inline-size: 2px; block-size: .625rem; margin-inline-start: -1px; background: var(--hm-text); opacity: .55; }
-.hm-ge-stop::after { content: ""; position: absolute; inset: .25rem 0 0; border-radius: .375rem; background: var(--hm-ge-c); border: 3px solid var(--hm-surface); box-shadow: 0 0 0 1px color-mix(in srgb, var(--hm-text) 30%, transparent), var(--hm-shadow-2); }
-.hm-ge-stop:hover { scale: 1.08; }
-.hm-ge-stop:active { cursor: grabbing; }
-.hm-ge-stop.is-selected { z-index: 1; translate: -50% -.125rem; scale: 1.12; }
-.hm-ge-stop.is-selected::after { box-shadow: 0 0 0 2px var(--hm-accent, var(--hm-primary)), var(--hm-shadow-3); }
-.hm-ge-stop:focus-visible { outline: none; }
-.hm-ge-stop:focus-visible::after { box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-focus); }
-.hm-ge-stop.is-removing { opacity: .35; translate: -50% 1rem; scale: .85; }
-.hm-ge-hint { margin: 0; color: var(--hm-faint); font-size: var(--hm-text-xs); }
+.m-ge-stops { display: flex; flex-direction: column; gap: var(--m-space-1); padding-inline: .75rem; }
+.m-ge-bar { direction: ltr; position: relative; block-size: 1.5rem; margin-block: .25rem 1.125rem; border-radius: var(--m-radius-2); cursor: copy; touch-action: none; }
+.m-ge-bar::before { background: var(--m-ge-bar); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-text) 12%, transparent); }
+.m-ge-stop { position: absolute; inset-block-start: 100%; inset-inline-start: var(--m-ge-at); inline-size: 1.25rem; block-size: 1.5rem; padding: 0; translate: -50% -.375rem; border: 0; background: none; cursor: grab;
+  transition: translate var(--m-dur) var(--m-ease-spring), opacity var(--m-dur) var(--m-ease), scale var(--m-dur-fast) var(--m-ease-spring); }
+.m-ge-stop::before { content: ""; position: absolute; inset-inline-start: 50%; inset-block-start: -.375rem; inline-size: 2px; block-size: .625rem; margin-inline-start: -1px; background: var(--m-text); opacity: .55; }
+.m-ge-stop::after { content: ""; position: absolute; inset: .25rem 0 0; border-radius: .375rem; background: var(--m-ge-c); border: 3px solid var(--m-surface); box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-text) 30%, transparent), var(--m-shadow-2); }
+.m-ge-stop:hover { scale: 1.08; }
+.m-ge-stop:active { cursor: grabbing; }
+.m-ge-stop.is-selected { z-index: 1; translate: -50% -.125rem; scale: 1.12; }
+.m-ge-stop.is-selected::after { box-shadow: 0 0 0 2px var(--m-accent, var(--m-primary)), var(--m-shadow-3); }
+.m-ge-stop:focus-visible { outline: none; }
+.m-ge-stop:focus-visible::after { box-shadow: 0 0 0 2px var(--m-surface), 0 0 0 4px var(--m-focus); }
+.m-ge-stop.is-removing { opacity: .35; translate: -50% 1rem; scale: .85; }
+.m-ge-hint { margin: 0; color: var(--m-faint); font-size: var(--m-text-xs); }
 
 /* selected stop */
-.hm-ge-stop-editor { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--hm-space-3); }
-.hm-ge-picker { flex: 1 1 16rem; }
-.hm-ge-pos { flex: none; }
-.hm-ge-pos-input { inline-size: 5.5rem; }
+.m-ge-stop-editor { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--m-space-3); }
+.m-ge-picker { flex: 1 1 16rem; }
+.m-ge-pos { flex: none; }
+.m-ge-pos-input { inline-size: 5.5rem; }
 
 /* presets and output */
-.hm-ge-presets { display: flex; flex-wrap: wrap; gap: var(--hm-space-2); }
-.hm-ge-preset.hm-sample { inline-size: 3rem; block-size: 2rem; }
-.hm-ge-output { display: flex; align-items: center; gap: var(--hm-space-2); padding: var(--hm-space-2) var(--hm-space-2) var(--hm-space-2) var(--hm-space-3); border-radius: var(--hm-radius-2); background: var(--hm-surface-2); }
-.hm-ge-css { flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--hm-font-mono); font-size: var(--hm-text-xs); color: var(--hm-text-2); }
+.m-ge-presets { display: flex; flex-wrap: wrap; gap: var(--m-space-2); }
+.m-ge-preset.m-sample { inline-size: 3rem; block-size: 2rem; }
+.m-ge-output { display: flex; align-items: center; gap: var(--m-space-2); padding: var(--m-space-2) var(--m-space-2) var(--m-space-2) var(--m-space-3); border-radius: var(--m-radius-2); background: var(--m-surface-2); }
+.m-ge-css { flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--m-font-mono); font-size: var(--m-text-xs); color: var(--m-text-2); }

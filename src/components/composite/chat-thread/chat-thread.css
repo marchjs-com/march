@@ -1,19 +1,19 @@
 /* March — ChatThread. Runs sit 2px apart, senders 10px; the day pill and the jump button float on the mist. */
-.hm-chat { position: relative; display: flex; flex-direction: column; gap: 2px; min-height: 0; height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: var(--hm-space-3);
-  box-sizing: border-box; background: var(--hm-bg); scroll-padding-block-end: var(--hm-space-3); }
-.hm-chat:focus-visible { outline: 2px solid var(--hm-brand-blue, var(--hm-primary)); outline-offset: -2px; }
-.hm-chat-row { display: flex; align-items: flex-end; gap: .375rem; min-width: 0; }
-.hm-chat-row.is-mine { justify-content: flex-end; }
-.hm-chat-row.is-first, .hm-chat-row.is-single { margin-block-start: .5rem; }
-.hm-chat-av { flex: none; width: 2rem; display: flex; align-items: flex-end; }
-.hm-chat-main { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-.hm-chat-row.is-mine .hm-chat-main { align-items: flex-end; }
-.hm-chat-main > .hm-msg { width: 100%; }
-.hm-chat-img.hm-picture { max-width: 16rem; aspect-ratio: 4 / 3; object-fit: cover; border-radius: .875rem; margin: -.125rem -.375rem 0; width: calc(100% + .75rem); }
-.hm-chat-pick { display: flex; padding-block: .375rem .125rem; }
-.hm-chat-row.is-mine .hm-chat-pick { justify-content: flex-end; }
-.hm-chat-day { display: flex; justify-content: center; margin-block: .75rem .25rem; position: sticky; inset-block-start: 0; z-index: 1; pointer-events: none; }
-.hm-chat-day span { padding: .25rem .75rem; border-radius: var(--hm-radius-full); background: color-mix(in srgb, var(--hm-surface) 88%, transparent); color: var(--hm-text-2);
-  font-size: var(--hm-text-xs); font-weight: 700; box-shadow: var(--hm-shadow-1); backdrop-filter: blur(8px); }
-.hm-chat-typing { padding-block-start: .5rem; min-height: 0; }
-.hm-chat-jump.hm-btn { position: sticky; inset-block-end: .25rem; align-self: center; margin-block-start: .5rem; font-size: var(--hm-text-sm); font-weight: 800; box-shadow: var(--hm-shadow-3); z-index: 2; }
+.m-chat { position: relative; display: flex; flex-direction: column; gap: 2px; min-height: 0; height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: var(--m-space-3);
+  box-sizing: border-box; background: var(--m-bg); scroll-padding-block-end: var(--m-space-3); }
+.m-chat:focus-visible { outline: 2px solid var(--m-brand-blue, var(--m-primary)); outline-offset: -2px; }
+.m-chat-row { display: flex; align-items: flex-end; gap: .375rem; min-width: 0; }
+.m-chat-row.is-mine { justify-content: flex-end; }
+.m-chat-row.is-first, .m-chat-row.is-single { margin-block-start: .5rem; }
+.m-chat-av { flex: none; width: 2rem; display: flex; align-items: flex-end; }
+.m-chat-main { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.m-chat-row.is-mine .m-chat-main { align-items: flex-end; }
+.m-chat-main > .m-msg { width: 100%; }
+.m-chat-img.m-picture { max-width: 16rem; aspect-ratio: 4 / 3; object-fit: cover; border-radius: .875rem; margin: -.125rem -.375rem 0; width: calc(100% + .75rem); }
+.m-chat-pick { display: flex; padding-block: .375rem .125rem; }
+.m-chat-row.is-mine .m-chat-pick { justify-content: flex-end; }
+.m-chat-day { display: flex; justify-content: center; margin-block: .75rem .25rem; position: sticky; inset-block-start: 0; z-index: 1; pointer-events: none; }
+.m-chat-day span { padding: .25rem .75rem; border-radius: var(--m-radius-full); background: color-mix(in srgb, var(--m-surface) 88%, transparent); color: var(--m-text-2);
+  font-size: var(--m-text-xs); font-weight: 700; box-shadow: var(--m-shadow-1); backdrop-filter: blur(8px); }
+.m-chat-typing { padding-block-start: .5rem; min-height: 0; }
+.m-chat-jump.m-btn { position: sticky; inset-block-end: .25rem; align-self: center; margin-block-start: .5rem; font-size: var(--m-text-sm); font-weight: 800; box-shadow: var(--m-shadow-3); z-index: 2; }

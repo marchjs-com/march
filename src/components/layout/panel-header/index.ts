@@ -67,25 +67,25 @@ export function PanelHeader(props: PanelHeaderProps): Element {
   const foot = props.as === "footer";
   const hasTitles = props.title != null || props.subtitle != null;
   const own = props.close != null && typeof props.close !== "boolean";
-  const pc = (part: "titles" | "title" | "subtitle" | "meta" | "actions"): string => cx(`hm-panel-header-${part === "subtitle" ? "sub" : part}`, props.partClass?.[part]);
+  const pc = (part: "titles" | "title" | "subtitle" | "meta" | "actions"): string => cx(`m-panel-header-${part === "subtitle" ? "sub" : part}`, props.partClass?.[part]);
   const showClose = props.close === false ? false : props.onClose != null || props.close === true || own;
   return h(props.as ?? "header", {
     ...rest(props, USED),
-    class: () => cx("hm-panel-header", `hm-panel-header-${val(props.size) ?? "md"}`, foot && "hm-panel-header-foot", val(props.sticky) && "is-sticky", val(props.divider) && "is-divided",
-      val(props.tone) === "muted" && "hm-panel-header-muted", val(props.drag) && "is-drag", val(props.align) === "start" && "hm-panel-header-top", val(props.class)),
-    "data-hm-color": colorAttr(props.color),
+    class: () => cx("m-panel-header", `m-panel-header-${val(props.size) ?? "md"}`, foot && "m-panel-header-foot", val(props.sticky) && "is-sticky", val(props.divider) && "is-divided",
+      val(props.tone) === "muted" && "m-panel-header-muted", val(props.drag) && "is-drag", val(props.align) === "start" && "m-panel-header-top", val(props.class)),
+    "data-m-color": colorAttr(props.color),
     ref: (el: HTMLElement) => props.ref?.(el),
   },
-  props.lead != null ? h("span", { class: "hm-panel-header-lead" }, props.lead) : null,
-  props.icon != null && props.icon !== false ? icon(props.icon, "hm-panel-header-icon") : null,
+  props.lead != null ? h("span", { class: "m-panel-header-lead" }, props.lead) : null,
+  props.icon != null && props.icon !== false ? icon(props.icon, "m-panel-header-icon") : null,
   hasTitles ? h("div", { class: pc("titles") },
     props.title != null ? h(props.titleAs ?? (foot ? "span" : "h3"), { class: pc("title"), id: props.titleId }, () => val(props.title)) : null,
     props.subtitle != null ? h("p", { class: pc("subtitle") }, () => val(props.subtitle)) : null) : null,
   props.meta != null ? h("span", { class: pc("meta") }, () => val(props.meta)) : null,
-  props.children != null ? h("div", { class: "hm-panel-header-body" }, props.children) : null,
+  props.children != null ? h("div", { class: "m-panel-header-body" }, props.children) : null,
   props.actions != null ? h("div", { class: pc("actions") }, () => val(props.actions)) : null,
   showClose ? h(IconButton, {
-    class: "hm-panel-header-close", size: () => (val(props.size) === "lg" ? undefined : "sm"), icon: own ? props.close : glyph(xIcon), label: () => val(props.closeLabel) ?? t`Close`,
+    class: "m-panel-header-close", size: () => (val(props.size) === "lg" ? undefined : "sm"), icon: own ? props.close : glyph(xIcon), label: () => val(props.closeLabel) ?? t`Close`,
     onClick: (e: MouseEvent) => { e.stopPropagation(); props.onClose?.(e); }, onPointerDown: (e: Event) => e.stopPropagation(),
   }) : null);
 }

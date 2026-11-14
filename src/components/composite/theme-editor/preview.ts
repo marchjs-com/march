@@ -21,16 +21,16 @@ const Rest = lazy(() => import("./preview-table.ts"), { pick: "PreviewTable", pl
 /** The sample screen of the ThemeEditor preview. */
 export function ThemePreview({ ctx }: { ctx: ThemeEditorContext }): Element {
   const tab = signal("overview");
-  return h("div", { class: "hm-te-screen" },
-    h("header", { class: "hm-te-appbar" },
-      h("span", { class: "hm-te-mark", "aria-hidden": "true" }),
-      h("strong", { class: "hm-te-appname" }, "HADİ"),
+  return h("div", { class: "m-te-screen" },
+    h("header", { class: "m-te-appbar" },
+      h("span", { class: "m-te-mark", "aria-hidden": "true" }),
+      h("strong", { class: "m-te-appname" }, "HADİ"),
       h(Tabs, { panel: false, label: t`Sample tabs`, value: live(() => tab()), onChange: (v: string) => tab.set(v), tabs: [{ id: "overview", label: t`Overview` }, { id: "team", label: t`Team`, badge: 3 }, { id: "settings", label: t`Settings` }] }),
       h(Avatar, { name: "Elif Yılmaz", size: "sm" })),
-    h("div", { class: "hm-te-screen-body" },
-      h("h3", { class: "hm-te-display" }, t`Weekly summary`),
-      h("p", { class: "hm-muted hm-te-lead" }, t`Sales rose this week; two tasks are waiting for review.`),
-      h("div", { class: "hm-te-btns" },
+    h("div", { class: "m-te-screen-body" },
+      h("h3", { class: "m-te-display" }, t`Weekly summary`),
+      h("p", { class: "m-muted m-te-lead" }, t`Sales rose this week; two tasks are waiting for review.`),
+      h("div", { class: "m-te-btns" },
         h(Button, { variant: "primary" }, t`Create`), h(Button, {}, t`Share`), h(Button, { variant: "ghost" }, t`Cancel`), h(Button, { variant: "danger", size: "sm" }, t`Delete`)),
       h(Charts, {}),
       h(Rest, { ctx })));

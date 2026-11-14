@@ -1,25 +1,25 @@
-/* Swatch, and the one checkerboard of the library (.hm-checker): the ground that shows through transparent colours.
-   --hm-checker-size sets the square; --hm-checker-a / -b its two colours. Classes are hm-sample-*: hm-swatch is ThemeSwatch. */
-.hm-checker { background: repeating-conic-gradient(var(--hm-checker-a, var(--hm-surface-3)) 0 25%, var(--hm-checker-b, var(--hm-surface)) 0 50%) 0 0 / var(--hm-checker-size, .5rem) var(--hm-checker-size, .5rem); }
-/* the colour sits in its own layer (--hm-sample: a colour or a gradient) above the ground */
-.hm-sample { position: relative; display: inline-grid; place-items: center; flex: none; inline-size: 1.75rem; block-size: 1.75rem; padding: 0; border: 0; border-radius: var(--hm-radius-2); overflow: visible; color: var(--hm-on-scrim); font: inherit; font-size: var(--hm-text-xs); font-weight: 600; line-height: 1; vertical-align: middle;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 12%, transparent); transition: transform var(--hm-dur-fast) var(--hm-ease-spring), box-shadow var(--hm-dur-fast) var(--hm-ease); }
-.hm-sample:not(.hm-checker) { background: var(--hm-surface); }
-.hm-sample-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--hm-sample, var(--hm-accent, transparent)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 12%, transparent); }
-.hm-sample-body, .hm-sample-mark { position: relative; }
-.hm-sample-xs { inline-size: 1rem; block-size: 1rem; border-radius: var(--hm-radius-1); }
-.hm-sample-sm { inline-size: 1.25rem; block-size: 1.25rem; border-radius: var(--hm-radius-1); }
-.hm-sample-lg { inline-size: 2.5rem; block-size: 2.5rem; border-radius: var(--hm-radius-3); }
-.hm-sample-square { border-radius: 0; }
-.hm-sample-circle { border-radius: 50%; }
+/* Swatch, and the one checkerboard of the library (.m-checker): the ground that shows through transparent colours.
+   --m-checker-size sets the square; --m-checker-a / -b its two colours. Classes are m-sample-*: m-swatch is ThemeSwatch. */
+.m-checker { background: repeating-conic-gradient(var(--m-checker-a, var(--m-surface-3)) 0 25%, var(--m-checker-b, var(--m-surface)) 0 50%) 0 0 / var(--m-checker-size, .5rem) var(--m-checker-size, .5rem); }
+/* the colour sits in its own layer (--m-sample: a colour or a gradient) above the ground */
+.m-sample { position: relative; display: inline-grid; place-items: center; flex: none; inline-size: 1.75rem; block-size: 1.75rem; padding: 0; border: 0; border-radius: var(--m-radius-2); overflow: visible; color: var(--m-on-scrim); font: inherit; font-size: var(--m-text-xs); font-weight: 600; line-height: 1; vertical-align: middle;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-text) 12%, transparent); transition: transform var(--m-dur-fast) var(--m-ease-spring), box-shadow var(--m-dur-fast) var(--m-ease); }
+.m-sample:not(.m-checker) { background: var(--m-surface); }
+.m-sample-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--m-sample, var(--m-accent, transparent)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-text) 12%, transparent); }
+.m-sample-body, .m-sample-mark { position: relative; }
+.m-sample-xs { inline-size: 1rem; block-size: 1rem; border-radius: var(--m-radius-1); }
+.m-sample-sm { inline-size: 1.25rem; block-size: 1.25rem; border-radius: var(--m-radius-1); }
+.m-sample-lg { inline-size: 2.5rem; block-size: 2.5rem; border-radius: var(--m-radius-3); }
+.m-sample-square { border-radius: 0; }
+.m-sample-circle { border-radius: 50%; }
 /* selected: a ring in the page surface, then a ring in the text colour (readable around any colour) */
-.hm-sample.is-selected { box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-text); }
-.hm-sample-mark { display: inline-grid; place-items: center; inline-size: 60%; block-size: 60%; max-inline-size: 1.125rem; max-block-size: 1.125rem; border-radius: 50%; background: var(--hm-surface); color: var(--hm-text); }
-.hm-sample-mark .hm-svg { inline-size: 75%; block-size: 75%; }
-.hm-sample-mark-own { display: inline-grid; place-items: center; }
+.m-sample.is-selected { box-shadow: 0 0 0 2px var(--m-surface), 0 0 0 4px var(--m-text); }
+.m-sample-mark { display: inline-grid; place-items: center; inline-size: 60%; block-size: 60%; max-inline-size: 1.125rem; max-block-size: 1.125rem; border-radius: 50%; background: var(--m-surface); color: var(--m-text); }
+.m-sample-mark .m-svg { inline-size: 75%; block-size: 75%; }
+.m-sample-mark-own { display: inline-grid; place-items: center; }
 /* button */
-button.hm-sample { cursor: pointer; }
-button.hm-sample:hover:not(:disabled, .is-selected) { transform: translateY(-2px) scale(1.08); }
-button.hm-sample:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-focus); }
-button.hm-sample:disabled { cursor: not-allowed; opacity: .5; }
-@media (prefers-reduced-motion: reduce) { .hm-sample { transition: none; } button.hm-sample:hover:not(:disabled, .is-selected) { transform: none; } }
+button.m-sample { cursor: pointer; }
+button.m-sample:hover:not(:disabled, .is-selected) { transform: translateY(-2px) scale(1.08); }
+button.m-sample:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--m-surface), 0 0 0 4px var(--m-focus); }
+button.m-sample:disabled { cursor: not-allowed; opacity: .5; }
+@media (prefers-reduced-motion: reduce) { .m-sample { transition: none; } button.m-sample:hover:not(:disabled, .is-selected) { transform: none; } }

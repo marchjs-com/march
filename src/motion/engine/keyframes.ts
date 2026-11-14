@@ -1,5 +1,5 @@
 // Named keyframes and presets: define once, play anywhere (`animate(el, "fadeUp")`, timelines, transitions), and
-// export the same definitions as one CSS file (`keyframesCss()`) for pure-CSS use — `class="hm-anim-fadeUp"`.
+// export the same definitions as one CSS file (`keyframesCss()`) for pure-CSS use — `class="m-anim-fadeUp"`.
 import { normalize, type Frames } from "./tracks.ts";
 import { ease, cssFallback, type EaseInput } from "./ease.ts";
 
@@ -42,11 +42,11 @@ const UNITLESS = /opacity|scale|z-index|^--|flex-grow|order/;
 const val = (k: string, v: unknown): string => (typeof v === "number" && !UNITLESS.test(k) ? `${v}px` : String(v));
 
 /**
- * One CSS file from every registered keyframes (or `names`): `@keyframes hm-<name>` and a `.hm-anim-<name>` class
- * with the default timing. Reduced motion (system or the user setting, `<html data-hm-reduced>`) ends them at once.
+ * One CSS file from every registered keyframes (or `names`): `@keyframes m-<name>` and a `.m-anim-<name>` class
+ * with the default timing. Reduced motion (system or the user setting, `<html data-m-reduced>`) ends them at once.
  * Easings without a CSS form (custom JS functions) fall back to the default curve.
  */
-export function keyframesCss({ names, prefix = "hm-" }: { names?: string[]; prefix?: string } = {}): string {
+export function keyframesCss({ names, prefix = "m-" }: { names?: string[]; prefix?: string } = {}): string {
   const out: string[] = [];
   const list = names ?? keyframeNames();
   for (const name of list) {
@@ -80,7 +80,7 @@ export function keyframesCss({ names, prefix = "hm-" }: { names?: string[]; pref
   }
   if (list.length) {
     const sel = list.map((n) => `.${prefix}anim-${n}`).join(", ");
-    out.push(`:root[data-hm-reduced] :is(${sel}) { animation-duration: 1ms; animation-delay: 0ms; animation-iteration-count: 1; }`);
+    out.push(`:root[data-m-reduced] :is(${sel}) { animation-duration: 1ms; animation-delay: 0ms; animation-iteration-count: 1; }`);
     out.push(`@media (prefers-reduced-motion: reduce) { :is(${sel}) { animation-duration: 1ms; animation-delay: 0ms; animation-iteration-count: 1; } }`);
   }
   return out.join("\n") + "\n";

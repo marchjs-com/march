@@ -15,10 +15,10 @@ test("Checkbox: a real input under a drawn box; Space / click toggles; indetermi
   const v = signal(false);
   const { el } = mount(() => h(Checkbox, { "bind:value": v, label: "Agree", variant: "soft", size: "lg" }));
   const input = el.querySelector("input[type=checkbox]");
-  assert.ok(el.querySelector(".hm-check-box[aria-hidden=true]"));
+  assert.ok(el.querySelector(".m-check-box[aria-hidden=true]"));
   assert.equal(el.querySelector("label").textContent.includes("Agree"), true);
-  const wrap = el.querySelector(".hm-choice");
-  assert.ok(wrap.className.includes("hm-choice-soft") && wrap.className.includes("hm-choice-lg"));
+  const wrap = el.querySelector(".m-choice");
+  assert.ok(wrap.className.includes("m-choice-soft") && wrap.className.includes("m-choice-lg"));
   input.checked = true; fire(input, "change");
   assert.equal(v(), true);
   const m = mount(() => h(Checkbox, { value: true, indeterminate: true, label: "Some" }));
@@ -28,17 +28,17 @@ test("Checkbox: a real input under a drawn box; Space / click toggles; indetermi
 test("Checkbox: onClick gets the click with its modifier keys; without a label only the box is drawn", () => {
   const clicks = [];
   const { el } = mount(() => [h(Checkbox, { "aria-label": "Select row", tabIndex: -1, onClick: (e) => clicks.push(!!e.shiftKey) }), h(Checkbox, { label: "Named" })]);
-  const [bare, named] = el.querySelectorAll(".hm-choice");
+  const [bare, named] = el.querySelectorAll(".m-choice");
   const input = bare.querySelector("input");
-  assert.ok(bare.className.includes("hm-choice-bare"));
-  assert.equal(bare.querySelector(".hm-check-label"), null);
-  assert.ok(bare.querySelector(".hm-check-box"));
+  assert.ok(bare.className.includes("m-choice-bare"));
+  assert.equal(bare.querySelector(".m-check-label"), null);
+  assert.ok(bare.querySelector(".m-check-box"));
   assert.equal(input.getAttribute("aria-label"), "Select row");
   assert.equal(input.getAttribute("tabindex"), "-1");
   fire(input, "click", { shiftKey: true });
   fire(input, "click");
   assert.deepEqual(clicks, [true, false]);
-  assert.equal(named.className.includes("hm-choice-bare"), false);
-  assert.ok(named.querySelector(".hm-check-label"));
+  assert.equal(named.className.includes("m-choice-bare"), false);
+  assert.ok(named.querySelector(".m-check-label"));
   assert.equal(named.querySelector("input").getAttribute("tabindex"), null);
 });

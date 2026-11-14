@@ -31,9 +31,9 @@ test("DatePicker: locale typing, invalid dates, calendar popover picks and close
   btn.click();
   await tick(5);
   assert.equal(btn.getAttribute("aria-expanded"), "true");
-  document.querySelector(`.hm-cal-pop [data-date="2026-03-20"]`).click();
+  document.querySelector(`.m-cal-pop [data-date="2026-03-20"]`).click();
   assert.equal(v(), "2026-03-20");
-  assert.equal(document.querySelector(".hm-cal-pop"), null);
+  assert.equal(document.querySelector(".m-cal-pop"), null);
 });
 
 test("DatePicker: the calendar button can go or be redrawn; names and the calendar are yours", async () => {
@@ -41,7 +41,7 @@ test("DatePicker: the calendar button can go or be redrawn; names and the calend
   assert.equal(off.el.querySelector("button"), null);
   key(off.el.querySelector("input"), "ArrowDown", { altKey: true });
   await tick(5);
-  assert.ok(document.querySelector(".hm-cal-pop"));
+  assert.ok(document.querySelector(".m-cal-pop"));
   off.dispose();
   const own = mount(() => h(DatePicker, { value: "2026-03-14", icon: () => h("b", { class: "own-cal" }, "D"), labels: { choose: "Pick a day", prevMonth: "Back" }, calendar: { renderDay: (_iso, d) => `${d}!`, weekdays: false } }));
   const btn = own.el.querySelector("button");
@@ -50,10 +50,10 @@ test("DatePicker: the calendar button can go or be redrawn; names and the calend
   assert.equal(btn.querySelector("svg"), null);
   btn.click();
   await tick(5);
-  const pop = document.querySelector(".hm-cal-pop");
+  const pop = document.querySelector(".m-cal-pop");
   assert.equal(pop.getAttribute("aria-label"), "Pick a day");
-  assert.equal(pop.querySelector(".hm-cal-nav").getAttribute("aria-label"), "Back");
+  assert.equal(pop.querySelector(".m-cal-nav").getAttribute("aria-label"), "Back");
   assert.equal(pop.querySelector('[data-date="2026-03-14"]').textContent, "14!");
-  assert.equal(pop.querySelector(".hm-cal-head"), null);
+  assert.equal(pop.querySelector(".m-cal-head"), null);
   own.dispose();
 });

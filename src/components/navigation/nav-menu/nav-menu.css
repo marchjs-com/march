@@ -1,60 +1,60 @@
 /* March — NavMenu (also the sidebar container, drawer and rail of NavSidebar). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- navigation menu (sidebar) */
-.hm-nav-wrap { display: contents; }
-.hm-nav { display: flex; flex-direction: column; width: var(--hm-sidebar-w); height: 100%; min-height: 0; background: var(--hm-bg-subtle); border-inline-end: 1px solid var(--hm-border);
-  transition: width var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-nav-brand { display: flex; align-items: center; gap: var(--hm-space-2); min-height: var(--hm-topbar-h); padding: 0 var(--hm-space-2) 0 var(--hm-space-4); font-weight: 650; }
-.hm-nav-brand-main { flex: 1; min-width: 0; display: flex; align-items: center; }
-.hm-nav-rail-btn { color: var(--hm-faint); }
+.m-nav-wrap { display: contents; }
+.m-nav { display: flex; flex-direction: column; width: var(--m-sidebar-w); height: 100%; min-height: 0; background: var(--m-bg-subtle); border-inline-end: 1px solid var(--m-border);
+  transition: width var(--m-dur-slow) var(--m-ease-out); }
+.m-nav-brand { display: flex; align-items: center; gap: var(--m-space-2); min-height: var(--m-topbar-h); padding: 0 var(--m-space-2) 0 var(--m-space-4); font-weight: 650; }
+.m-nav-brand-main { flex: 1; min-width: 0; display: flex; align-items: center; }
+.m-nav-rail-btn { color: var(--m-faint); }
 /* the filter is a SearchBox (sm); here its place and the sidebar's flat field */
-.hm-nav-filter { display: flex; align-items: center; padding: 0 var(--hm-space-3) var(--hm-space-2); }
-.hm-nav-filter .hm-search { flex: 1; min-width: 0; }
-.hm-nav-filter .hm-input { min-height: 2rem; background: var(--hm-surface); border-color: var(--hm-border); box-shadow: none; font-size: var(--hm-text-md); }
-.hm-nav-scroll { flex: 1; overflow: auto; overscroll-behavior: contain; padding: var(--hm-space-1) var(--hm-space-2) var(--hm-space-4); }
-.hm-nav-foot { padding: var(--hm-space-2); border-top: 1px solid var(--hm-border); }
-.hm-nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
-.hm-nav-group { margin-top: var(--hm-space-2); }
+.m-nav-filter { display: flex; align-items: center; padding: 0 var(--m-space-3) var(--m-space-2); }
+.m-nav-filter .m-search { flex: 1; min-width: 0; }
+.m-nav-filter .m-input { min-height: 2rem; background: var(--m-surface); border-color: var(--m-border); box-shadow: none; font-size: var(--m-text-md); }
+.m-nav-scroll { flex: 1; overflow: auto; overscroll-behavior: contain; padding: var(--m-space-1) var(--m-space-2) var(--m-space-4); }
+.m-nav-foot { padding: var(--m-space-2); border-top: 1px solid var(--m-border); }
+.m-nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.m-nav-group { margin-top: var(--m-space-2); }
 /* headings: SectionLabel (Pinned, Recent) and a ListRow button with a Chevron (a group) */
-.hm-section-label.hm-nav-heading { padding: var(--hm-space-2) var(--hm-space-2) var(--hm-space-1); }
-.hm-listrow.hm-nav-gbtn { min-block-size: 1.875rem; padding-block: 0; border-radius: var(--hm-radius-1); color: var(--hm-muted); font-weight: 500; }
-.hm-listrow.hm-nav-gbtn:hover { color: var(--hm-text); }
-.hm-nav-gicon { color: var(--hm-faint); }
-.hm-nav-gicon .hm-svg { width: .9375rem; height: .9375rem; }
-.hm-nav-chev { color: var(--hm-faint); }
-.hm-nav-group > .hm-nav-list { padding-inline-start: var(--hm-space-2); margin-top: 1px; animation: hm-slide-in var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-nav-pinned > .hm-nav-list, .hm-nav-recent > .hm-nav-list { padding-inline-start: 0; }
-.hm-nav-li { position: relative; display: flex; align-items: center; }
+.m-section-label.m-nav-heading { padding: var(--m-space-2) var(--m-space-2) var(--m-space-1); }
+.m-listrow.m-nav-gbtn { min-block-size: 1.875rem; padding-block: 0; border-radius: var(--m-radius-1); color: var(--m-muted); font-weight: 500; }
+.m-listrow.m-nav-gbtn:hover { color: var(--m-text); }
+.m-nav-gicon { color: var(--m-faint); }
+.m-nav-gicon .m-svg { width: .9375rem; height: .9375rem; }
+.m-nav-chev { color: var(--m-faint); }
+.m-nav-group > .m-nav-list { padding-inline-start: var(--m-space-2); margin-top: 1px; animation: m-slide-in var(--m-dur-slow) var(--m-ease-out); }
+.m-nav-pinned > .m-nav-list, .m-nav-recent > .m-nav-list { padding-inline-start: 0; }
+.m-nav-li { position: relative; display: flex; align-items: center; }
 /* a page row is a ListRow (sm) with room for the pin; the current page is a raised card, not a tint */
-.hm-listrow.hm-nav-item { flex: 1; inline-size: auto; gap: .625rem; padding: 0 2rem 0 var(--hm-space-2); border-radius: var(--hm-radius-1); color: var(--hm-text-2); font-size: var(--hm-text-md); }
-.hm-listrow.hm-nav-item:hover { color: var(--hm-text); }
-.hm-listrow.hm-nav-item.is-active { background: var(--hm-surface); color: var(--hm-text); font-weight: var(--hm-weight-medium); box-shadow: var(--hm-shadow-1), inset 0 0 0 1px var(--hm-border); }
-.hm-nav-item.is-active .hm-nav-icon { color: var(--hm-primary); }
-.hm-nav-icon { width: 1rem; color: var(--hm-muted); transition: color var(--hm-dur) var(--hm-ease); }
-.hm-nav-icon .hm-svg { width: 1rem; height: 1rem; }
+.m-listrow.m-nav-item { flex: 1; inline-size: auto; gap: .625rem; padding: 0 2rem 0 var(--m-space-2); border-radius: var(--m-radius-1); color: var(--m-text-2); font-size: var(--m-text-md); }
+.m-listrow.m-nav-item:hover { color: var(--m-text); }
+.m-listrow.m-nav-item.is-active { background: var(--m-surface); color: var(--m-text); font-weight: var(--m-weight-medium); box-shadow: var(--m-shadow-1), inset 0 0 0 1px var(--m-border); }
+.m-nav-item.is-active .m-nav-icon { color: var(--m-primary); }
+.m-nav-icon { width: 1rem; color: var(--m-muted); transition: color var(--m-dur) var(--m-ease); }
+.m-nav-icon .m-svg { width: 1rem; height: 1rem; }
 /* the pin: an IconButton (xs) at the end of the row, shown on hover, focus and while pinned */
-.hm-icon-btn.hm-nav-pin { position: absolute; inset-inline-end: var(--hm-space-1); color: var(--hm-faint); opacity: 0; transition: opacity var(--hm-dur) var(--hm-ease); }
-.hm-nav-li:hover .hm-nav-pin, .hm-nav-pin:focus-visible, .hm-nav-pin.is-pressed { opacity: 1; }
-.hm-icon-btn.hm-nav-pin.is-pressed { background: none; color: var(--hm-warn-solid); }
-.hm-nav-li:hover .hm-nav-item .hm-badge { visibility: hidden; }
+.m-icon-btn.m-nav-pin { position: absolute; inset-inline-end: var(--m-space-1); color: var(--m-faint); opacity: 0; transition: opacity var(--m-dur) var(--m-ease); }
+.m-nav-li:hover .m-nav-pin, .m-nav-pin:focus-visible, .m-nav-pin.is-pressed { opacity: 1; }
+.m-icon-btn.m-nav-pin.is-pressed { background: none; color: var(--m-warn-solid); }
+.m-nav-li:hover .m-nav-item .m-badge { visibility: hidden; }
 /* without pins the item keeps its badge on hover and needs no room for the star; */
-.hm-nav-nopins .hm-nav-item { padding-inline-end: var(--hm-space-2); }
-.hm-nav-nopins .hm-nav-li:hover .hm-nav-item .hm-badge { visibility: visible; }
-.hm-nav-burger { display: none; }
-@media (hover: none) { .hm-nav-pin { opacity: .6; } }
+.m-nav-nopins .m-nav-item { padding-inline-end: var(--m-space-2); }
+.m-nav-nopins .m-nav-li:hover .m-nav-item .m-badge { visibility: visible; }
+.m-nav-burger { display: none; }
+@media (hover: none) { .m-nav-pin { opacity: .6; } }
 /* icon rail */
 @media (min-width: 901px) {
-  .hm-nav-wrap.is-rail .hm-nav { width: var(--hm-sidebar-w-rail); }
-  .hm-nav-wrap.is-rail .hm-nav-brand { flex-direction: column; justify-content: center; padding: var(--hm-space-2) 0; gap: var(--hm-space-1); }
-  .hm-nav-wrap.is-rail .hm-nav-brand-main { flex: none; justify-content: center; }
-  .hm-nav-wrap.is-rail :is(.hm-nav-item .hm-listrow-text, .hm-nav-item .hm-listrow-trail, .hm-nav-gbtn, .hm-nav-heading, .hm-nav-pin, .hm-nav-filter, .hm-nav-item .hm-badge, .hm-rail-hide) { display: none; }
-  .hm-nav-wrap.is-rail .hm-nav-scroll { padding-inline: .625rem; }
-  .hm-nav-wrap.is-rail .hm-nav-group { margin-top: var(--hm-space-1); padding-top: var(--hm-space-1); border-top: 1px solid var(--hm-border-subtle); }
-  .hm-nav-wrap.is-rail .hm-nav-group > .hm-nav-list { padding: 0; animation: none; }
-  .hm-nav-wrap.is-rail .hm-nav-item { justify-content: center; padding: 0; min-height: 2.25rem; }
-  .hm-nav-wrap.is-rail .hm-nav-foot { padding: var(--hm-space-2) .625rem; }
+  .m-nav-wrap.is-rail .m-nav { width: var(--m-sidebar-w-rail); }
+  .m-nav-wrap.is-rail .m-nav-brand { flex-direction: column; justify-content: center; padding: var(--m-space-2) 0; gap: var(--m-space-1); }
+  .m-nav-wrap.is-rail .m-nav-brand-main { flex: none; justify-content: center; }
+  .m-nav-wrap.is-rail :is(.m-nav-item .m-listrow-text, .m-nav-item .m-listrow-trail, .m-nav-gbtn, .m-nav-heading, .m-nav-pin, .m-nav-filter, .m-nav-item .m-badge, .m-rail-hide) { display: none; }
+  .m-nav-wrap.is-rail .m-nav-scroll { padding-inline: .625rem; }
+  .m-nav-wrap.is-rail .m-nav-group { margin-top: var(--m-space-1); padding-top: var(--m-space-1); border-top: 1px solid var(--m-border-subtle); }
+  .m-nav-wrap.is-rail .m-nav-group > .m-nav-list { padding: 0; animation: none; }
+  .m-nav-wrap.is-rail .m-nav-item { justify-content: center; padding: 0; min-height: 2.25rem; }
+  .m-nav-wrap.is-rail .m-nav-foot { padding: var(--m-space-2) .625rem; }
 }
 /* narrow screens: the menu button shows and the menu opens in a Drawer (drawer.ts); here the menu fills that panel */
-@media (max-width: 900px) { .hm-nav-burger { display: inline-flex; } .hm-nav-rail-btn { display: none; } }
-.hm-drawer.hm-nav-sheet { --hm-sheet-size: min(19rem, 86vw); }
-.hm-nav-sheet > .hm-dialog-body { display: flex; padding: 0; }
-.hm-nav-sheet .hm-nav { flex: 1; inline-size: auto; border: 0; background: var(--hm-surface); }
+@media (max-width: 900px) { .m-nav-burger { display: inline-flex; } .m-nav-rail-btn { display: none; } }
+.m-drawer.m-nav-sheet { --m-sheet-size: min(19rem, 86vw); }
+.m-nav-sheet > .m-dialog-body { display: flex; padding: 0; }
+.m-nav-sheet .m-nav { flex: 1; inline-size: auto; border: 0; background: var(--m-surface); }

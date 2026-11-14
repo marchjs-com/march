@@ -9,13 +9,13 @@ test("fx components render without canvas support and without style attribute st
   const el = document.createElement("div");
   const dispose = render(() => [h(fx.Particles, { count: 10 }), h(fx.Aurora, { colors: ["#111", "#222"] }), h(fx.Noise, {}, "x")], el);
   await new Promise((r) => setTimeout(r, 5));
-  assert.ok(el.querySelector("canvas.hm-fx-canvas"));
-  assert.equal(el.querySelectorAll(".hm-aurora-blob").length, 2);
-  assert.equal(el.querySelector(".hm-aurora-blob").style.getPropertyValue("--hm-aurora-color"), "#111");
+  assert.ok(el.querySelector("canvas.m-fx-canvas"));
+  assert.equal(el.querySelectorAll(".m-aurora-blob").length, 2);
+  assert.equal(el.querySelector(".m-aurora-blob").style.getPropertyValue("--m-aurora-color"), "#111");
   assert.ok(el.querySelectorAll("*").every((n) => n.getAttribute("style") === null));
   dispose();
   await fx.confetti({ count: 3 }); // no 2D context in the test DOM: resolves and cleans up
-  assert.equal(document.querySelector(".hm-fx-confetti"), null);
+  assert.equal(document.querySelector(".m-fx-confetti"), null);
 });
 
 test("Particles: placed only once the canvas has a size, spread over all of it; the pointer is read relative to its box", async () => {

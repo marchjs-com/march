@@ -29,7 +29,7 @@ Undo / redo use an UndoManager history of the editor's own (typing merges into o
 | `hint` | boolean | `true` | the "Type @ to mention, : for emoji" hint in the foot |
 | `toolIcons` | `{ [tool]: node }` | built-in glyphs | own icon (node or short text) per toolbar button |
 | `labels` | object | `t` texts | `editor`, `toolbar`, `tools: { bold: "…" }`, `link`, `linkAddress`, `linkHelp`, `apply`, `removeLink`, `suggestions`, `noMatches`, `keepTyping`, `hint`, `count(words, characters)` |
-| `class` | class | — | on the root (`hm-rte`); parts: `hm-rte-bar`, `-toolbar`, `-tool`, `-sep`, `-content`, `-foot`, `-hint`, `-count`, `-link`, `-sug` (the rows are OptionList rows: `.hm-rte-sug .hm-option-list-row`) |
+| `class` | class | — | on the root (`m-rte`); parts: `m-rte-bar`, `-toolbar`, `-tool`, `-sep`, `-content`, `-foot`, `-hint`, `-count`, `-link`, `-sug` (the rows are OptionList rows: `.m-rte-sug .m-option-list-row`) |
 
 ```tsx
 <RichTextEditor bind:value={$md} toolbar={["bold", "italic", "link"]} toolIcons={{ bold: "B", italic: "I" }} hint={false}

@@ -16,8 +16,8 @@ test("KeyValueEditor: rows → object, numbers, duplicate keys flagged", () => {
   const o = signal({ a: "1" });
   const { el } = mount(() => h(KeyValueEditor, { "bind:value": o, numbers: true }));
   assert.ok(el.querySelector("[role=group]"));
-  el.querySelector(".hm-kv-add").click();
-  const inputs = el.querySelectorAll(".hm-kv-row input");
+  el.querySelector(".m-kv-add").click();
+  const inputs = el.querySelectorAll(".m-kv-row input");
   assert.equal(inputs[0].getAttribute("aria-label"), "Key");
   type(inputs[2], "b"); type(inputs[3], "42");
   assert.deepEqual(o(), { a: 1, b: 42 });
@@ -25,23 +25,23 @@ test("KeyValueEditor: rows → object, numbers, duplicate keys flagged", () => {
   assert.equal(inputs[2].getAttribute("aria-invalid"), "true");
   assert.match(el.textContent, /Duplicate key/);
   const ro = mount(() => h(KeyValueEditor, { value: { x: "1" }, readonly: true }));
-  assert.equal(ro.el.querySelector(".hm-kv-add"), null);
+  assert.equal(ro.el.querySelector(".m-kv-add"), null);
 });
 
 test("KeyValueEditor: texts, the remove button and the add button are yours", () => {
   const a = mount(() => h(KeyValueEditor, { value: { a: "1" }, labels: { key: "Name", value: "Content", remove: "Drop", add: "New line" }, removeIcon: "del" }));
-  const [k, v] = a.el.querySelectorAll(".hm-kv-row input");
+  const [k, v] = a.el.querySelectorAll(".m-kv-row input");
   assert.equal(k.getAttribute("aria-label"), "Name");
   assert.equal(k.getAttribute("placeholder"), "Name");
   assert.equal(v.getAttribute("aria-label"), "Content");
-  const x = a.el.querySelector(".hm-kv-row .hm-icon-btn");
+  const x = a.el.querySelector(".m-kv-row .m-icon-btn");
   assert.equal(x.getAttribute("aria-label"), "Drop");
   assert.equal(x.textContent, "del");
-  assert.equal(a.el.querySelector(".hm-kv-add").textContent, "New line");
+  assert.equal(a.el.querySelector(".m-kv-add").textContent, "New line");
   a.dispose();
   const b = mount(() => h(KeyValueEditor, { value: { a: "1" }, removable: false, addable: false }));
-  assert.equal(b.el.querySelector(".hm-icon-btn"), null);
-  assert.equal(b.el.querySelector(".hm-kv-add"), null);
-  assert.equal(b.el.querySelectorAll(".hm-kv-row input").length, 2);
+  assert.equal(b.el.querySelector(".m-icon-btn"), null);
+  assert.equal(b.el.querySelector(".m-kv-add"), null);
+  assert.equal(b.el.querySelectorAll(".m-kv-row input").length, 2);
   b.dispose();
 });

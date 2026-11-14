@@ -74,21 +74,21 @@ export interface HeroProps {
 const BACKDROPS: Partial<Record<HeroVariant, readonly BackdropLayer[]>> = {
   centered: [["grid", 0.7], "spotlight"],
   mesh: ["mesh", ["grid", 0.35], "spotlight", ["noise", 0.5]],
-  product: [["dots", 0.5, "hm-hero-dots"]],
-  split: [["dots", 0.5, "hm-hero-dots"]],
+  product: [["dots", 0.5, "m-hero-dots"]],
+  split: [["dots", 0.5, "m-hero-dots"]],
 };
 
 function titleNode(title: unknown, highlight?: string): unknown {
   if (typeof title !== "string" || !highlight || !title.includes(highlight)) return title;
   const [a, ...b] = title.split(highlight);
-  return [a, h("span", { class: "hm-hero-hl" }, highlight), b.join(highlight)];
+  return [a, h("span", { class: "m-hero-hl" }, highlight), b.join(highlight)];
 }
 
 /** Buttons for a list of actions (the first is primary): `sectionActions` of SectionHead with the hero's size. */
 export const actionButtons = (actions: readonly (HeroAction | Node)[] | undefined, size: "md" | "lg" = "lg"): unknown[] => sectionActions(actions, size);
 
 // hero media is on the first screen: it loads eagerly, with its size reserved
-const mediaNode = (m: HeroImage | Node | undefined, cls: string): unknown => (m ? h("div", { class: cls }, h(Picture, { source: m, loading: "eager", class: "hm-hero-img" })) : null);
+const mediaNode = (m: HeroImage | Node | undefined, cls: string): unknown => (m ? h("div", { class: cls }, h(Picture, { source: m, loading: "eager", class: "m-hero-img" })) : null);
 
 /** `<Hero variant="mesh" eyebrow="New" title="Build faster" highlight="faster" lead="…" actions={[{ label: "Start", href: "/start" }]} />` */
 export function Hero(props: HeroProps): Element {
@@ -96,11 +96,11 @@ export function Hero(props: HeroProps): Element {
   const align = props.align ?? (variant === "split" ? "start" : "center");
   const plain = props.reveal === "none";
   const arrow = props.eyebrowArrow === false ? null
-    : h("span", { class: "hm-hero-eyebrow-arrow", "aria-hidden": "true" }, props.eyebrowArrow && props.eyebrowArrow !== true ? props.eyebrowArrow : "→");
+    : h("span", { class: "m-hero-eyebrow-arrow", "aria-hidden": "true" }, props.eyebrowArrow && props.eyebrowArrow !== true ? props.eyebrowArrow : "→");
   const pill = (): unknown => h(Badge, { tone: "primary" }, () => val(props.eyebrow));
   // the copy is the shared SectionHead at its largest scale; the eyebrow is a Badge pill (with an arrow when linked)
   const copy = h(SectionHead, {
-    class: cx("hm-hero-copy", `hm-hero-copy-${align}`), size: "xl", width: "full", align, as: `h${props.level ?? 1}` as "h1",
+    class: cx("m-hero-copy", `m-hero-copy-${align}`), size: "xl", width: "full", align, as: `h${props.level ?? 1}` as "h1",
     eyebrow: props.eyebrow != null ? (props.eyebrowHref ? [pill(), arrow] : pill()) : undefined, eyebrowHref: props.eyebrowHref,
     title: () => titleNode(val(props.title), props.highlight),
     lead: props.lead != null ? () => val(props.lead) : undefined,
@@ -108,9 +108,9 @@ export function Hero(props: HeroProps): Element {
     reveal: plain ? false : { effect: props.reveal ?? "up", stagger: 90, duration: 900 },
   }, props.children ?? null);
 
-  const cls = cx("hm-hero", `hm-hero-v-${variant}`, `hm-hero-size-${props.size ?? "lg"}`, val(props.class));
-  if (variant === "video" && props.video) return h("section", { class: cls }, h(VideoBackground, { src: props.video.src, poster: props.video.poster, tint: "dark", class: "hm-hero-stage" }, h("div", { class: "hm-hero-inner" }, copy)));
-  if (variant === "parallax") return h("section", { class: cls }, h(Parallax, { layers: props.layers ?? [], pointer: 1, class: "hm-hero-stage", height: "100%" }, h("div", { class: "hm-hero-inner" }, copy)));
+  const cls = cx("m-hero", `m-hero-v-${variant}`, `m-hero-size-${props.size ?? "lg"}`, val(props.class));
+  if (variant === "video" && props.video) return h("section", { class: cls }, h(VideoBackground, { src: props.video.src, poster: props.video.poster, tint: "dark", class: "m-hero-stage" }, h("div", { class: "m-hero-inner" }, copy)));
+  if (variant === "parallax") return h("section", { class: cls }, h(Parallax, { layers: props.layers ?? [], pointer: 1, class: "m-hero-stage", height: "100%" }, h("div", { class: "m-hero-inner" }, copy)));
 
   // the decorative layers of the variant: a recipe for the shared backdrop builder (landing/backdrop.ts)
   const bg = backdrop(props.backdrop === false ? false
@@ -118,14 +118,14 @@ export function Hero(props: HeroProps): Element {
       : BACKDROPS[variant]);
 
   let stage: unknown = null;
-  if (variant === "split") stage = plain ? h("div", { class: "hm-hero-media-wrap" }, mediaNode(props.media, "hm-hero-media"))
-    : h(Reveal, { class: "hm-hero-media-wrap", effect: "scale", self: true, delay: 200, duration: 1000 }, mediaNode(props.media, "hm-hero-media"));
+  if (variant === "split") stage = plain ? h("div", { class: "m-hero-media-wrap" }, mediaNode(props.media, "m-hero-media"))
+    : h(Reveal, { class: "m-hero-media-wrap", effect: "scale", self: true, delay: 200, duration: 1000 }, mediaNode(props.media, "m-hero-media"));
   if (variant === "product") {
-    const frame = h("div", { class: "hm-hero-frame" },
-      h(Overlay, { effect: "glass", front: true, class: "hm-hero-frame-glass" }),
-      props.frameBar === false ? null : h("div", { class: "hm-hero-frame-bar", "aria-hidden": "true" }, h("i", {}), h("i", {}), h("i", {})),
-      mediaNode(props.media, "hm-hero-frame-body")) as HTMLElement;
-    const wrap = h("div", { class: "hm-hero-product" }, frame) as HTMLElement;
+    const frame = h("div", { class: "m-hero-frame" },
+      h(Overlay, { effect: "glass", front: true, class: "m-hero-frame-glass" }),
+      props.frameBar === false ? null : h("div", { class: "m-hero-frame-bar", "aria-hidden": "true" }, h("i", {}), h("i", {}), h("i", {})),
+      mediaNode(props.media, "m-hero-frame-body")) as HTMLElement;
+    const wrap = h("div", { class: "m-hero-product" }, frame) as HTMLElement;
     // tilted at first, flat once the frame is well into the viewport (Linear / Apple style)
     // (the motion core's scrollTimeline seeks the tilt by the frame's passage; reduced motion keeps it flat)
     if (!still(props.tilt)) {
@@ -133,6 +133,6 @@ export function Hero(props: HeroProps): Element {
     }
     stage = wrap;
   }
-  return h("section", { class: cls }, ...bg, h("div", { class: "hm-hero-inner" }, copy, stage));
+  return h("section", { class: cls }, ...bg, h("div", { class: "m-hero-inner" }, copy, stage));
 }
 

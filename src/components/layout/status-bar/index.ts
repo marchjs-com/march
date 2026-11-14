@@ -60,7 +60,7 @@ export function StatusBar(props: StatusBarProps): Element {
   let bar: HTMLElement | undefined, moreEl: HTMLElement | undefined;
   const fit = overflowFit({
     items: ordered, enabled: () => props.overflow !== false, reserve: () => (moreEl?.offsetWidth || 28) + 2,
-    measure: () => (bar ? [...bar.querySelectorAll<HTMLElement>(".hm-sbar-item")].map((c) => (c.offsetWidth || 0) + 2) : null),
+    measure: () => (bar ? [...bar.querySelectorAll<HTMLElement>(".m-sbar-item")].map((c) => (c.offsetWidth || 0) + 2) : null),
     priority: (i) => untrack(ordered)[i]?.priority ?? 0,
   });
   const { isShown } = fit;
@@ -74,16 +74,16 @@ export function StatusBar(props: StatusBarProps): Element {
     const ownDot = typeof props.dot === "function" ? props.dot : null;
     const busy = (): boolean => tone() === "busy" && props.pulse !== false;
     const dot = props.dot === false ? null : !ownDot
-      ? h(StatusDot, { class: "hm-sbar-dot", size: "sm", tone: () => { const v = tone(); return v === "busy" ? "primary" : v; }, pulse: () => (busy() ? "blink" : false) })
-      : h("span", { class: "hm-sbar-dot-own", "aria-hidden": "true", ref: (el: HTMLElement) => {
+      ? h(StatusDot, { class: "m-sbar-dot", size: "sm", tone: () => { const v = tone(); return v === "busy" ? "primary" : v; }, pulse: () => (busy() ? "blink" : false) })
+      : h("span", { class: "m-sbar-dot-own", "aria-hidden": "true", ref: (el: HTMLElement) => {
         let run: { cancel(): void } | null = null;
         effect(() => { run?.cancel(); run = busy() ? animate(el, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0.35, transform: "scale(.6)" }, { opacity: 1, transform: "scale(1)" }], { duration: 1100, iterations: Infinity }) : null; });
         onCleanup(() => run?.cancel());
       } }, ownDot(tone, x));
     if (x.live) { let first = true; effect(() => { const v = text(); if (first) { first = false; return; } untrack(() => said.set(v)); }); }
-    const cls = (): string => cx("hm-sbar-item", `is-${tone()}`, b && "is-button");
+    const cls = (): string => cx("m-sbar-item", `is-${tone()}`, b && "is-button");
     // an item is the smallest ListRow (the plain one): the icon or the tone dot leads, the text is the title; a button when it runs something
-    const row = { size: "xs" as const, class: cls, hidden: () => !isShown(i), lead: () => icon(b ? b.icon() : x.icon, "hm-sbar-icon") ?? dot, title: text };
+    const row = { size: "xs" as const, class: cls, hidden: () => !isShown(i), lead: () => icon(b ? b.icon() : x.icon, "m-sbar-icon") ?? dot, title: text };
     const el = b
       ? h(PlainListRow, { ...row, disabled: () => b.disabled(), "aria-description": () => val(x.title) ?? null, onClick: () => b.run() }) as Element
       : h(PlainListRow, { ...row, as: "span" }) as Element;
@@ -95,10 +95,10 @@ export function StatusBar(props: StatusBarProps): Element {
     disabled: !(x.command || x.onSelect),
   }])));
 
-  return h("div", { class: () => cx("hm-sbar", val(props.class)), role: "region", "aria-label": () => val(props.label) ?? t`Status bar`, ref: (x: HTMLElement) => { bar = x; fit.observe(x); } },
-    h("div", { class: "hm-sbar-side" }, () => ordered().map((x, i) => (x.side === "end" ? null : untrack(() => item(x, i))))),
-    h("div", { class: "hm-sbar-more", hidden: () => overflow().length === 0, ref: (x: HTMLElement) => { moreEl = x; } },
+  return h("div", { class: () => cx("m-sbar", val(props.class)), role: "region", "aria-label": () => val(props.label) ?? t`Status bar`, ref: (x: HTMLElement) => { bar = x; fit.observe(x); } },
+    h("div", { class: "m-sbar-side" }, () => ordered().map((x, i) => (x.side === "end" ? null : untrack(() => item(x, i))))),
+    h("div", { class: "m-sbar-more", hidden: () => overflow().length === 0, ref: (x: HTMLElement) => { moreEl = x; } },
       h(Menu, { label: () => val(props.moreLabel) ?? t`More status`, icon: props.moreIcon ?? more, items: () => overflow(), placement: "top-start" })),
-    h("div", { class: "hm-sbar-side hm-sbar-end" }, () => ordered().map((x, i) => (x.side === "end" ? untrack(() => item(x, i)) : null))),
-    h("span", { class: "hm-sr-only", role: "status", "aria-live": "polite" }, () => said()));
+    h("div", { class: "m-sbar-side m-sbar-end" }, () => ordered().map((x, i) => (x.side === "end" ? untrack(() => item(x, i)) : null))),
+    h("span", { class: "m-sr-only", role: "status", "aria-live": "polite" }, () => said()));
 }

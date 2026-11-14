@@ -25,14 +25,14 @@ export interface TimelineProps {
 export function Timeline(props: TimelineProps): Element {
   const fmt = (v: unknown): unknown => (typeof v === "string" && !toDate(v) ? v : v instanceof Date || typeof v === "number" || toDate(v) ? applyPipe("datetime", v) : v);
   const time = (v: unknown): unknown => (props.formatTime ? props.formatTime(v) : fmt(v));
-  return h("ol", { class: () => cx("hm-timeline", props.line === false && "hm-timeline-no-line", val(props.class)) },
-    () => (val(props.items) ?? []).map((x, i, all) => h("li", { class: cx("hm-tl-item", x.tone && `hm-tl-${x.tone}`, x.class) },
+  return h("ol", { class: () => cx("m-timeline", props.line === false && "m-timeline-no-line", val(props.class)) },
+    () => (val(props.items) ?? []).map((x, i, all) => h("li", { class: cx("m-tl-item", x.tone && `m-tl-${x.tone}`, x.class) },
       // the connecting line: an element of its own (not a pseudo-element), down to the next item; live with `line`
-      i < all.length - 1 ? () => (props.line === false ? null : h("span", { class: "hm-tl-line", "aria-hidden": "true" })) : null,
-      props.dot === false ? null : typeof props.dot === "function" ? h("span", { class: "hm-tl-dot is-own", "aria-hidden": "true" }, props.dot(x, i))
-        : h(StatusDot, { class: "hm-tl-dot", hollow: true, tone: TONES.includes(x.tone as StatusDotTone) ? x.tone as StatusDotTone : "neutral", color: x.color }, icon(x.icon)),
-      h("div", { class: "hm-tl-main" },
-        x.time != null && h("time", { class: "hm-tl-time", datetime: toDate(x.time)?.toISOString?.() ?? null }, () => time(val(x.time))),
-        x.title != null && h("div", { class: "hm-tl-title" }, () => val(x.title)),
-        x.body != null && h("div", { class: "hm-tl-body" }, typeof x.body === "function" && !x.body.length ? (x.body as () => unknown)() : x.body)))));
+      i < all.length - 1 ? () => (props.line === false ? null : h("span", { class: "m-tl-line", "aria-hidden": "true" })) : null,
+      props.dot === false ? null : typeof props.dot === "function" ? h("span", { class: "m-tl-dot is-own", "aria-hidden": "true" }, props.dot(x, i))
+        : h(StatusDot, { class: "m-tl-dot", hollow: true, tone: TONES.includes(x.tone as StatusDotTone) ? x.tone as StatusDotTone : "neutral", color: x.color }, icon(x.icon)),
+      h("div", { class: "m-tl-main" },
+        x.time != null && h("time", { class: "m-tl-time", datetime: toDate(x.time)?.toISOString?.() ?? null }, () => time(val(x.time))),
+        x.title != null && h("div", { class: "m-tl-title" }, () => val(x.title)),
+        x.body != null && h("div", { class: "m-tl-body" }, typeof x.body === "function" && !x.body.length ? (x.body as () => unknown)() : x.body)))));
 }

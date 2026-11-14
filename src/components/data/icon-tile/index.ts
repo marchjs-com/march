@@ -27,8 +27,8 @@ export interface IconTileProps {
 export function IconTile(props: IconTileProps): Element {
   const variant = (): string => val(props.variant) ?? "soft";
   return h("span", {
-    class: () => cx("hm-icon-tile", `hm-tile-${val(props.tone) ?? "primary"}`, `hm-icon-tile-${val(props.size) ?? "md"}`, variant() !== "soft" && `hm-icon-tile-${variant()}`, val(props.shape) === "round" && "hm-icon-tile-round", val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)),
+    class: () => cx("m-icon-tile", `m-tile-${val(props.tone) ?? "primary"}`, `m-icon-tile-${val(props.size) ?? "md"}`, variant() !== "soft" && `m-icon-tile-${variant()}`, val(props.shape) === "round" && "m-icon-tile-round", val(props.class)),
+    "data-m-color": () => colorAttr(val(props.color)),
     role: () => (val(props.label) ? "img" : null), "aria-label": () => val(props.label) ?? null, "aria-hidden": () => (val(props.label) ? null : "true"),
-  }, props.icon != null ? icon(props.icon, "hm-icon") : props.children);
+  }, props.icon != null ? icon(props.icon, "m-icon") : props.children);
 }

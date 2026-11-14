@@ -29,7 +29,7 @@ export interface CornerControlsProps {
 }
 
 function make(corner: Corner, props: CornerControlsProps = {}): HTMLElement {
-  return h("div", { class: () => cx(`hm-corner hm-corner-${corner}`, val(props.class)), "data-corner": corner, role: "group", "aria-label": () => val(props.label) ?? t`Page controls` }) as HTMLElement;
+  return h("div", { class: () => cx(`m-corner m-corner-${corner}`, val(props.class)), "data-corner": corner, role: "group", "aria-label": () => val(props.label) ?? t`Page controls` }) as HTMLElement;
 }
 
 /** The element of a corner: the rendered one, else made and put at the end of <body>. */

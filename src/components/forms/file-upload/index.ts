@@ -81,7 +81,7 @@ export function FileUpload<R = unknown>(props: FileUploadProps<R>): unknown {
   const errors = signal<string[]>([]);
   const over = signal(false);
   const urls = new Set<string>();
-  const inputId = uid("hm-file");
+  const inputId = uid("m-file");
   const c = ctl(props);
   onCleanup(() => { for (const u of urls) globalThis.URL?.revokeObjectURL?.(u); urls.clear(); for (const it of untrack(items)) it.ctrl?.abort(); });
   const revoke = (it: Item) => { if (it.url) { globalThis.URL?.revokeObjectURL?.(it.url); urls.delete(it.url); } };
@@ -132,37 +132,37 @@ export function FileUpload<R = unknown>(props: FileUploadProps<R>): unknown {
   const remove = (it: Item) => { it.ctrl?.abort(); revoke(it); items.set(untrack(items).filter((x) => x !== it)); emit(); };
   let input: HTMLInputElement;
   input = h("input", {
-    type: "file", id: inputId, class: "hm-sr-only", tabindex: "-1", accept: () => props.accept ?? null, multiple: multi,
+    type: "file", id: inputId, class: "m-sr-only", tabindex: "-1", accept: () => props.accept ?? null, multiple: multi,
     disabled: () => !!(props.disabled || props.readonly), "aria-hidden": "true",
     onChange: (e: Event) => { const el = e.target as HTMLInputElement; add([...(el.files ?? [])]); el.value = ""; },
   }) as HTMLInputElement;
   const open = () => { if (!props.disabled && !props.readonly) input.click(); };
   const zone = h("div", {
-    ...c, role: "button", tabindex: () => (props.disabled ? "-1" : "0"), class: "hm-drop", "class:hm-drop-over": over, "aria-disabled": () => (props.disabled ? "true" : null),
+    ...c, role: "button", tabindex: () => (props.disabled ? "-1" : "0"), class: "m-drop", "class:m-drop-over": over, "aria-disabled": () => (props.disabled ? "true" : null),
     onClick: open,
     onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } },
     // drops (counted enter / leave, files only) and pasted files: the dropzone behavior; add() checks accept and size
     ref: (x: HTMLElement) => dropzone(x, { onFiles: add, onOver: (on) => over.set(on), paste: true, disabled: () => !!(props.disabled || props.readonly) }),
-  }, h("span", { class: "hm-drop-text" }, () => props.label ?? (multi ? t`Drop files here or click to choose` : t`Drop a file here or click to choose`)),
+  }, h("span", { class: "m-drop-text" }, () => props.label ?? (multi ? t`Drop files here or click to choose` : t`Drop a file here or click to choose`)),
     () => (props.hint === false || props.hint === null ? null
-      : props.hint !== undefined && props.hint !== true ? h("small", { class: "hm-hint hm-drop-hint" }, ownPart(props.hint, () => null))
-      : props.accept || props.maxSize ? h("small", { class: "hm-hint hm-drop-hint" }, [props.accept, props.maxSize != null ? props.labels?.max?.(String(bytes(props.maxSize))) ?? t`max ${bytes(props.maxSize)}` : null].filter(Boolean).join(" · ")) : null));
+      : props.hint !== undefined && props.hint !== true ? h("small", { class: "m-hint m-drop-hint" }, ownPart(props.hint, () => null))
+      : props.accept || props.maxSize ? h("small", { class: "m-hint m-drop-hint" }, [props.accept, props.maxSize != null ? props.labels?.max?.(String(bytes(props.maxSize))) ?? t`max ${bytes(props.maxSize)}` : null].filter(Boolean).join(" · ")) : null));
   // a file line is a ListRow: preview · name (progress or error under it) · size and state · cancel / remove
-  const removeButton = (label: () => string, onClick: () => void) => h(IconButton, { class: "hm-file-remove", label, icon: () => ownPart(props.removeIcon, () => xIcon), onClick });
+  const removeButton = (label: () => string, onClick: () => void) => h(IconButton, { class: "m-file-remove", label, icon: () => ownPart(props.removeIcon, () => xIcon), onClick });
   const row = (itAcc: Accessor<Item>) => {
     const it = itAcc();
     const pct = () => Math.round(it.progress() * 100);
     const name = it.file.name;
     return h(ListRow, {
-      as: "li", class: () => cx("hm-file", it.status() === "error" && "hm-file-error"),
-      lead: it.url && it.file.type.startsWith("image/") ? h("img", { class: "hm-file-thumb", src: it.url, alt: "" })
-        : it.url && it.file.type.startsWith("audio/") ? h("audio", { class: "hm-file-audio", src: it.url, controls: true }) : undefined,
+      as: "li", class: () => cx("m-file", it.status() === "error" && "m-file-error"),
+      lead: it.url && it.file.type.startsWith("image/") ? h("img", { class: "m-file-thumb", src: it.url, alt: "" })
+        : it.url && it.file.type.startsWith("audio/") ? h("audio", { class: "m-file-audio", src: it.url, controls: true }) : undefined,
       title: name,
-      sub: () => (it.status() === "uploading" ? h(Progress, { class: "hm-file-progress", value: pct, max: 100, size: "sm", label: props.labels?.uploading?.(name) ?? t`Uploading ${name}`, showValue: true })
-        : it.status() === "error" ? h("span", { class: "hm-field-error", role: "alert" }, it.error()) : null),
-      trail: () => [bytes(it.file.size), it.status() === "done" ? h(Badge, { tone: "success", class: "hm-file-ok" }, props.labels?.uploaded ?? t`Uploaded`) : null],
+      sub: () => (it.status() === "uploading" ? h(Progress, { class: "m-file-progress", value: pct, max: 100, size: "sm", label: props.labels?.uploading?.(name) ?? t`Uploading ${name}`, showValue: true })
+        : it.status() === "error" ? h("span", { class: "m-field-error", role: "alert" }, it.error()) : null),
+      trail: () => [bytes(it.file.size), it.status() === "done" ? h(Badge, { tone: "success", class: "m-file-ok" }, props.labels?.uploaded ?? t`Uploaded`) : null],
       actions: props.readonly ? undefined : () => (it.status() === "uploading"
-        ? h(Button, { variant: "ghost", size: "sm", class: "hm-file-cancel", "aria-label": props.labels?.cancelUpload?.(name) ?? t`Cancel upload of ${name}`, onClick: () => remove(it) }, props.labels?.cancel ?? t`Cancel`)
+        ? h(Button, { variant: "ghost", size: "sm", class: "m-file-cancel", "aria-label": props.labels?.cancelUpload?.(name) ?? t`Cancel upload of ${name}`, onClick: () => remove(it) }, props.labels?.cancel ?? t`Cancel`)
         : removeButton(() => props.labels?.remove?.(name) ?? t`Remove ${name}`, () => remove(it))),
     });
   };
@@ -170,16 +170,16 @@ export function FileUpload<R = unknown>(props: FileUploadProps<R>): unknown {
     const v = get();
     if (untrack(items).length || v == null || (Array.isArray(v) && !v.length)) return null;
     const list: unknown[] = Array.isArray(v) ? v : [v];
-    return h("ul", { class: "hm-files" }, list.map((x) => {
+    return h("ul", { class: "m-files" }, list.map((x) => {
       const name = typeof x === "string" ? x : (x as { name?: string } | null)?.name ?? (x as { url?: string } | null)?.url ?? String(x);
       return h(ListRow, {
-        as: "li", class: "hm-file", title: name,
+        as: "li", class: "m-file", title: name,
         actions: props.readonly ? undefined : removeButton(() => props.labels?.remove?.(name) ?? t`Remove`, () => set(multi ? (untrack(get) as unknown[]).filter((y) => y !== x) : null)),
       });
     }));
   };
-  return h("div", { class: () => cx("hm-upload", props.class) }, input, zone,
-    () => (errors().length ? h("ul", { class: "hm-upload-errors", role: "alert" }, errors().map((m) => h("li", { class: "hm-field-error" }, m))) : null),
+  return h("div", { class: () => cx("m-upload", props.class) }, input, zone,
+    () => (errors().length ? h("ul", { class: "m-upload-errors", role: "alert" }, errors().map((m) => h("li", { class: "m-field-error" }, m))) : null),
     existing,
-    h("ul", { class: "hm-files" }, h(For, { each: items, key: "id", children: row })));
+    h("ul", { class: "m-files" }, h(For, { each: items, key: "id", children: row })));
 }

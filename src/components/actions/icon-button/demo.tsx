@@ -30,6 +30,6 @@ export default function IconButtonDemo(props: { values: { size: string; variant:
         <IconButton icon={trash} label="Sil" size={size} variant={variant ?? "danger"} shape={shape} inverse={v.inverse} />
       </div>
     }}
-    <span class="hm-muted">{() => ($liked ? "Beğenildi" : "")}</span>
+    <span class="m-muted">{() => ($liked ? "Beğenildi" : "")}</span>
   </div>
 }

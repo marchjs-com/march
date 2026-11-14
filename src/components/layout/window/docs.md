@@ -39,7 +39,7 @@ import { Window } from "hadi-march/layout";
 | `color` | Color token for the accent of the frame: the title icon and button hover of the "hadi" look, and the dock preview. |
 | `stripe` | `false` removes the brand stripe of the "hadi" look. |
 | `animated` | `false`: place and size change at once (no transition). |
-| `class` | Added to the frame (`.hm-win`); parts: `.hm-win-bar`, `.hm-win-icon`, `.hm-win-title`, `.hm-win-buttons`, `.hm-win-btn` (`.hm-win-close` / `-min` / `-max`), `.hm-win-body`, `.hm-win-snap`. |
+| `class` | Added to the frame (`.m-win`); parts: `.m-win-bar`, `.m-win-icon`, `.m-win-title`, `.m-win-buttons`, `.m-win-btn` (`.m-win-close` / `-min` / `-max`), `.m-win-body`, `.m-win-snap`. |
 
 ```tsx
 <Window title="Notes" labels={{ close: "Close notes", maximize: "Full size" }} icons={{ close: "✕", minimize: chevronDown }} />

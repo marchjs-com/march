@@ -22,15 +22,15 @@ test("Disclosure: native details with a summary; open follows the prop; onToggle
 
 test("Disclosure: marker off or your own node; class accepts a live value", () => {
   const off = mount(() => h(Disclosure, { title: "More", marker: false, class: () => "mine" }, "body"));
-  assert.match(off.host.querySelector("details").getAttribute("class"), /hm-disclosure-no-marker/);
+  assert.match(off.host.querySelector("details").getAttribute("class"), /m-disclosure-no-marker/);
   assert.match(off.host.querySelector("details").getAttribute("class"), / mine$/);
-  assert.equal(off.host.querySelector(".hm-disclosure-marker"), null);
+  assert.equal(off.host.querySelector(".m-disclosure-marker"), null);
   off.dispose();
   const own = mount(() => h(Disclosure, { title: "More", marker: h("i", {}, "+") }, "body"));
-  assert.equal(own.host.querySelector(".hm-disclosure-marker").textContent, "+");
+  assert.equal(own.host.querySelector(".m-disclosure-marker").textContent, "+");
   assert.equal(own.host.querySelector("summary").textContent, "+More");
   own.dispose();
   const def = mount(() => h(Disclosure, { title: "More" }, "body"));
-  assert.equal(def.host.querySelector("details").getAttribute("class"), "hm-disclosure");
+  assert.equal(def.host.querySelector("details").getAttribute("class"), "m-disclosure");
   def.dispose();
 });

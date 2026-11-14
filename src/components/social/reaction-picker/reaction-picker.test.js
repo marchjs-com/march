@@ -12,21 +12,21 @@ test("ReactionPicker: toolbar of pressed buttons, one tab stop, arrow keys, pick
   const m = mount(() => h(ReactionPicker, { selected: "😂", onPick: (e) => picked.push(e), onMore: () => picked.push("+") }));
   const bar = m.el.querySelector("[role=toolbar]");
   assert.equal(bar.getAttribute("aria-label"), "Reactions");
-  const btns = [...bar.querySelectorAll("button.hm-react-e")];
+  const btns = [...bar.querySelectorAll("button.m-react-e")];
   assert.equal(btns.length, 6);
   assert.equal(btns[1].getAttribute("aria-pressed"), "true");
   assert.deepEqual(btns.map((b) => b.getAttribute("tabindex")).filter((x) => x === "0").length, 1);
   btns[1].focus();
   bar.dispatchEvent(Object.assign(new globalThis.Event("keydown", { bubbles: true, cancelable: true }), { key: "ArrowRight" }));
   btns[2].click();
-  bar.querySelector(".hm-react-more").click();
+  bar.querySelector(".m-react-more").click();
   assert.deepEqual(picked, ["😮", "+"]);
   m.dispose();
 });
 
 test("ReactionPicker: grid layout lists the emoji set", () => {
   const m = mount(() => h(ReactionPicker, { layout: "grid", onPick: () => {} }));
-  assert.ok(m.el.querySelectorAll(".hm-react-grid button").length > 20);
+  assert.ok(m.el.querySelectorAll(".m-react-grid button").length > 20);
   m.dispose();
 });
 
@@ -35,13 +35,13 @@ test("ReactionPicker: own names, own + content, color", () => {
     h(ReactionPicker, { onPick: () => {}, onMore: () => {}, pop: false, color: "brand-orange", emojis: ["❤️", "👍"], emojiLabel: (e) => (e === "❤️" ? "Heart" : "Thumb"), moreLabel: "All", moreIcon: h("i", { class: "own-more" }), class: "mine" }),
     h(ReactionPicker, { onPick: () => {}, onMore: () => {}, pop: false }),
   ]);
-  const [a, b] = m.el.querySelectorAll(".hm-react");
+  const [a, b] = m.el.querySelectorAll(".m-react");
   assert.ok(a.classList.contains("mine"));
-  assert.equal(a.getAttribute("data-hm-color"), "brand-orange");
-  assert.deepEqual([...a.querySelectorAll(".hm-react-e")].map((x) => x.getAttribute("aria-label")), ["Heart", "Thumb"]);
-  assert.equal(a.querySelector(".hm-react-more").getAttribute("aria-label"), "All");
-  assert.ok(a.querySelector(".hm-react-more .own-more") && !a.querySelector(".hm-react-more .hm-svg"));
-  assert.equal(b.getAttribute("data-hm-color"), null);
-  assert.equal(b.querySelector(".hm-react-more").getAttribute("aria-label"), "More emoji");
+  assert.equal(a.getAttribute("data-m-color"), "brand-orange");
+  assert.deepEqual([...a.querySelectorAll(".m-react-e")].map((x) => x.getAttribute("aria-label")), ["Heart", "Thumb"]);
+  assert.equal(a.querySelector(".m-react-more").getAttribute("aria-label"), "All");
+  assert.ok(a.querySelector(".m-react-more .own-more") && !a.querySelector(".m-react-more .m-svg"));
+  assert.equal(b.getAttribute("data-m-color"), null);
+  assert.equal(b.querySelector(".m-react-more").getAttribute("aria-label"), "More emoji");
   m.dispose();
 });

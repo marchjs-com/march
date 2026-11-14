@@ -26,7 +26,7 @@ const INK = (sel) => `(() => { const el = document.querySelector(${JSON.stringif
     color: cs.backgroundColor === getComputedStyle(el).color, op: +cs.opacity } })()`;
 
 // 1 · ripple
-for (const [sel, name] of [[".sc-mo-ripple-card", "card"], [".sc-mo-micro .hm-btn-primary", "Kaydet"], [".sc-mo-micro .hm-btn-secondary", "Paylaş"]]) {
+for (const [sel, name] of [[".sc-mo-ripple-card", "card"], [".sc-mo-micro .m-btn-primary", "Kaydet"], [".sc-mo-micro .m-btn-secondary", "Paylaş"]]) {
   const c = await center(sel); await sleep(150);
   const px = c.l + c.w * 0.25, py = c.t + c.h * 0.4;
   await mouse("mousePressed", px, py); await sleep(90);
@@ -89,7 +89,7 @@ const MOVED = (sel) => `[...document.querySelectorAll(${JSON.stringify(sel)})].m
 // 5 · state morph
 const SAVE = `document.querySelector(".sc-mo-save")`;
 const SNAP = `(() => { const el = ${SAVE}, r = el.getBoundingClientRect(), cs = getComputedStyle(el);
-  return { w: Math.round(r.width), h: Math.round(r.height), text: el.innerText.trim(), cls: el.className, style: el.getAttribute("style"), state: el.getAttribute("data-hm-state"),
+  return { w: Math.round(r.width), h: Math.round(r.height), text: el.innerText.trim(), cls: el.className, style: el.getAttribute("style"), state: el.getAttribute("data-m-state"),
     bg: cs.backgroundColor, color: cs.color, shadow: cs.boxShadow, radius: cs.borderRadius, held: el.getAnimations().length, busy: el.hasAttribute("aria-busy") } })()`;
 // the Playground's "Sonuç" choice of this demo
 const RESULT = (label) => `(() => { const demo = ${SAVE}.closest(".sc-motion-demo, section, article") ?? document; const all = [...document.querySelectorAll("button, [role=radio], label, option")]; const el = all.find((x) => x.textContent.trim() === ${JSON.stringify(label)}); if (!el) return false; if (el.tagName === "OPTION") { el.selected = true; el.parentElement.dispatchEvent(new Event("change", { bubbles: true })); } else el.click(); return true })()`;

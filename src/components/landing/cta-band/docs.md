@@ -22,7 +22,7 @@ scales in when it scrolls into view.
 | `align` | `center` `start` | `center` | |
 | `backdrop` | boolean | `true` | the decorative layers of the variant (gradient, mesh, glass, grid, pointer light) |
 | `reveal` | Reveal effect / `{ from, to }` / `none` | `scale` | entrance of the panel |
-| `class` | string | — | extra class on the section (`.hm-cta`; parts: `.hm-cta-panel`, `.hm-cta-copy`: a SectionHead with `.hm-section-head-title`, `-lead`, `-actions`, `-note`) |
+| `class` | string | — | extra class on the section (`.m-cta`; parts: `.m-cta-panel`, `.m-cta-copy`: a SectionHead with `.m-section-head-title`, `-lead`, `-actions`, `-note`) |
 
 ## Accessibility
 

@@ -2,7 +2,7 @@
 // global speed, "pause all", slow motion and reduced motion reach it like any other animation.
 //   pageTransitions({ type: "slide" })                       — once at startup, after createRouter()
 //   { path: "/photos/:id", meta: { transition: "scale" } }   — per route (the route left decides when going back)
-//   <img data-hm-shared={`photo-${id}`}>                      — shared element: moves from the old page to the new one
+//   <img data-m-shared={`photo-${id}`}>                      — shared element: moves from the old page to the new one
 // View Transitions API where supported (the engine animates the ::view-transition-old/new pseudo-elements), else the
 // engine animates the old page out and the new one in. Back reverses the animation; "slide" follows the text
 // direction (RTL mirrors it). Reduced motion or a paused engine: the swap is instant. Named outlets and the modal
@@ -88,8 +88,8 @@ const pseudo = (el: Element, p: string): PseudoTarget => ({ el, pseudo: p, [DRIV
 const ident = (s: string): string => s.replace(/[^a-zA-Z0-9_-]/g, "_");
 function sharedOf(root: ParentNode | null | undefined): Map<string, HTMLElement> {
   const m = new Map<string, HTMLElement>();
-  for (const el of Array.from(root?.querySelectorAll?.<HTMLElement>("[data-hm-shared]") ?? [])) {
-    const id = el.getAttribute("data-hm-shared");
+  for (const el of Array.from(root?.querySelectorAll?.<HTMLElement>("[data-m-shared]") ?? [])) {
+    const id = el.getAttribute("data-m-shared");
     if (id && !m.has(id)) m.set(id, el);
   }
   return m;
@@ -103,18 +103,18 @@ function isRtl(): boolean {
   return !!root && (root.getAttribute?.("dir") || globalThis.getComputedStyle?.(root)?.direction) === "rtl";
 }
 
-// back or forward: every history entry gets its order in history.state.hmIdx the first time a swap sees it (a new
+// back or forward: every history entry gets its order in history.state.mIdx the first time a swap sees it (a new
 // entry is one past the last); a popstate to a lower index is "back". One answer per entry, so a page and an outlet
 // swapping in the same navigation agree. Kept here, not in the router: the router entry stays as small as it was.
 let lastIdx = 0, lastState: unknown, lastDir: Dir = "forward";
 function stamp(idx: number): void {
   const h = globalThis.history;
-  try { h?.replaceState({ ...((h.state as object | null) ?? {}), hmIdx: idx }, ""); } catch { /* sandboxed */ }
+  try { h?.replaceState({ ...((h.state as object | null) ?? {}), mIdx: idx }, ""); } catch { /* sandboxed */ }
 }
 function direction(pop: boolean): Dir {
-  const st = globalThis.history?.state as { hmIdx?: number } | null;
+  const st = globalThis.history?.state as { mIdx?: number } | null;
   if (st && st === lastState) return lastDir;
-  let idx = st?.hmIdx;
+  let idx = st?.mIdx;
   // an entry without an order is one this app just pushed (the entry it started on is stamped at install)
   if (typeof idx !== "number") { idx = lastIdx + 1; stamp(idx); }
   lastDir = pop && idx < lastIdx ? "back" : "forward";
@@ -138,7 +138,7 @@ type StartVT = (cb: () => void) => ViewTransitionLike;
 let swaps = 0;
 /** Turn page transitions on. Returns a function that turns them off. */
 export function pageTransitions(o: PageTransitionOptions = {}): () => void {
-  const i0 = (globalThis.history?.state as { hmIdx?: number } | null)?.hmIdx;
+  const i0 = (globalThis.history?.state as { mIdx?: number } | null)?.mIdx;
   lastIdx = typeof i0 === "number" ? i0 : (stamp(0), 0);
   lastState = globalThis.history?.state;
   setNavigationWrapper(async (run: () => void, { pop }: { pop: boolean }) => {
@@ -157,18 +157,18 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
     const rtl = isRtl();
     const timing = { duration: t.duration, easing: t.easing };
     // only the outlet whose content changes takes part (the shell and the layouts above it stay still)
-    // the part a transition animates: a [data-hm-transition] element inside the page (a demo stage, a content column),
+    // the part a transition animates: a [data-m-transition] element inside the page (a demo stage, a content column),
     // else the page itself; the rest of the page swaps at once
-    const pageEl = (): HTMLElement | undefined => { const p = transitionOutlet()?.firstElementChild as HTMLElement | undefined; return p?.querySelector<HTMLElement>("[data-hm-transition]") ?? p; };
+    const pageEl = (): HTMLElement | undefined => { const p = transitionOutlet()?.firstElementChild as HTMLElement | undefined; return p?.querySelector<HTMLElement>("[data-m-transition]") ?? p; };
 
     if (o.viewTransitions !== false && typeof doc.startViewTransition === "function") {
       const old = pageEl();
-      const scope = old ? "hm-page" : "root";
+      const scope = old ? "m-page" : "root";
       const oldShared = sharedOf(old ?? doc);
       let named: HTMLElement[] = [];
-      if (old) vtName(old, "hm-page");
-      for (const [id, el] of oldShared) { vtName(el, `hm-shared-${ident(id)}`); named.push(el); }
-      root.setAttribute("data-hm-vt", scope);
+      if (old) vtName(old, "m-page");
+      for (const [id, el] of oldShared) { vtName(el, `m-shared-${ident(id)}`); named.push(el); }
+      root.setAttribute("data-m-vt", scope);
       let swapped = false;
       const update = (): void => {
         if (swapped) return;
@@ -177,16 +177,16 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
         vtName(old, null);
         apply();
         const now = pageEl();
-        if (old) vtName(now, "hm-page");
+        if (old) vtName(now, "m-page");
         named = now ? [now] : [];
-        for (const [id, el] of sharedOf(now ?? doc)) if (oldShared.has(id)) { vtName(el, `hm-shared-${ident(id)}`); named.push(el); }
+        for (const [id, el] of sharedOf(now ?? doc)) if (oldShared.has(id)) { vtName(el, `m-shared-${ident(id)}`); named.push(el); }
       };
       const vt = doc.startViewTransition(update) as ViewTransitionLike & { skipTransition?: () => void };
       // a page that does not render (a background tab, a hidden frame) never calls the update: the page changes anyway
       const wait = Math.max(400, t.duration * 2);
       const late = setTimeout(() => { if (!swapped) { vt.skipTransition?.(); update(); } }, wait);
       void Promise.resolve(vt.updateCallbackDone).finally(() => clearTimeout(late)).catch(() => undefined);
-      const done = (): void => { for (const el of named) vtName(el, null); root.removeAttribute("data-hm-vt"); };
+      const done = (): void => { for (const el of named) vtName(el, null); root.removeAttribute("data-m-vt"); };
       // an aborted transition (resize, a second navigation) is not an error: the DOM update still happened
       void Promise.resolve(vt.ready).then(() => {
         animate(pseudo(root, `::view-transition-old(${scope})`), transitionFrames(t.type, "out", nav.dir, rtl, t.distance), timing);
@@ -195,7 +195,7 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
         for (const a of doc.getAnimations?.() ?? []) {
           const fx = a.effect as (KeyframeEffect & { pseudoElement?: string | null }) | null;
           const pe = fx?.pseudoElement ?? "";
-          if (ours.has(a) || !pe.startsWith("::view-transition") || /\((root|hm-page)\)/.test(pe)) continue;
+          if (ours.has(a) || !pe.startsWith("::view-transition") || /\((root|m-page)\)/.test(pe)) continue;
           try { fx!.updateTiming({ duration: t.duration }); a.updatePlaybackRate(rateScale()); } catch { /* already finished */ }
         }
       }, () => undefined);

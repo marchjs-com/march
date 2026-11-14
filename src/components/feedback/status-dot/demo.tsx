@@ -20,7 +20,7 @@ export default function StatusDotDemo(props: { values: { tone: string; color: st
         <div class="sc-row">
           <StatusDot tone={tone} color={color} pulse={pulse} size={size} label={label} />
           <span>Canlı yayın</span>
-          <span class="hm-muted">{note}</span>
+          <span class="m-muted">{note}</span>
         </div>
         <div class="sc-row">
           {STATES.map(([t, text]) => <span class="sc-row"><StatusDot tone={t} size={size} pulse={t === "success" ? pulse : false} />{text}</span>)}

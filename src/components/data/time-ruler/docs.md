@@ -32,7 +32,7 @@ ruler use the same scale with `timePercent(ms, duration)`.
 | `class` | class value | | |
 
 `timeTicks(duration, { step?, major?, minor? })` returns the computed ticks; `timePercent(ms, duration)` a CSS
-percentage on the same scale. The CSS variable `--hm-time-ruler-reach` makes the playhead line run below the ruler,
+percentage on the same scale. The CSS variable `--m-time-ruler-reach` makes the playhead line run below the ruler,
 over the rows of a timeline.
 
 ## Accessibility

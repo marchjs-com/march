@@ -78,12 +78,12 @@ test("errors: ErrorPage and ErrorInline render and close", async () => {
   errors.page.set(new AppError("x", { status: 401 }));
   await tick();
   assert.ok(el.textContent.includes("Please sign in again."));
-  el.querySelector(".hm-error-page button").click();
+  el.querySelector(".m-error-page button").click();
   await tick();
   assert.equal(el.textContent, "content");
   errors.inline("form").set(new AppError("Bad email", { status: 422, context: { fields: { email: "invalid" } } }));
   await tick();
-  assert.ok(el.querySelector(".hm-error-inline li").textContent.includes("email"));
+  assert.ok(el.querySelector(".m-error-inline li").textContent.includes("email"));
   errors.clear();
 });
 

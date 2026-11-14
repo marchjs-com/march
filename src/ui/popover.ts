@@ -16,7 +16,7 @@ export function place(anchor: Element, panel: Element | null | undefined, placem
   const p = panel?.getBoundingClientRect?.() ?? { width: 0, height: 0 };
   // inside an <OverlayScope> (a preview, a panel) the panel is placed by the scope's box: its fixed position is
   // relative to the scope, and it stays inside it
-  const scope = (panel ?? anchor).closest?.(".hm-overlay-scope")?.getBoundingClientRect();
+  const scope = (panel ?? anchor).closest?.(".m-overlay-scope")?.getBoundingClientRect();
   const ox = scope?.left ?? 0, oy = scope?.top ?? 0;
   const vw = scope?.width ?? globalThis.innerWidth ?? 1024, vh = scope?.height ?? globalThis.innerHeight ?? 768;
   const r = anchor.getBoundingClientRect();
@@ -52,7 +52,7 @@ export function floating(o: FloatingOptions): unknown {
   const update = (): void => { if (panel && o.anchor) pos.set(place(o.anchor, panel, o.placement)); };
   // the panel lives in a Portal: carry over the anchor's color token and theme so it looks like its control
   const scoped = (attr: string): string | null => o.anchor?.closest?.(`[${attr}]`)?.getAttribute(attr) ?? null;
-  const el = h("div", { ...(o.attrs ?? {}), class: cx("hm-pop", o.class), role: o.role, id: o.id, "data-hm-color": scoped("data-hm-color"), "data-hm-theme": scoped("data-hm-theme"),
+  const el = h("div", { ...(o.attrs ?? {}), class: cx("m-pop", o.class), role: o.role, id: o.id, "data-m-color": scoped("data-m-color"), "data-m-theme": scoped("data-m-theme"),
     style: () => pos(), ref: (x: HTMLElement) => { panel = x; o.ref?.(x); } }, o.children);
   update();
   const raf = globalThis.requestAnimationFrame?.(update);

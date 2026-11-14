@@ -23,13 +23,13 @@ export { prerenderedFor };
 /** Set on <html> while hydrate() builds the app off-screen: what renders then is already on screen as prerendered HTML,
  *  so entrance animations (motion reveal) skip it and the swap shows no change. A DOM attribute, not an import:
  *  the motion code needs no dependency on this chunk. */
-export const HYDRATING_ATTR = "data-hm-hydrating";
+export const HYDRATING_ATTR = "data-m-hydrating";
 
-/** Take over prerendered HTML (data-hm-prerender) without a flash, or render normally when there is none. */
+/** Take over prerendered HTML (data-m-prerender) without a flash, or render normally when there is none. */
 export function hydrate(fn: () => unknown, el: Element, opts: HydrateOptions = {}): () => void {
-  if (!el.hasAttribute("data-hm-prerender")) return render(fn, el);
+  if (!el.hasAttribute("data-m-prerender")) return render(fn, el);
   const fresh = prerenderedFor(el);
-  el.removeAttribute("data-hm-prerender");
+  el.removeAttribute("data-m-prerender");
   if (!fresh) { el.replaceChildren(); return render(fn, el); }
   const box = el.ownerDocument.createElement("div"), S = _router.S, end = Date.now() + (opts.timeout ?? 4000);
   const html = el.ownerDocument.documentElement;

@@ -103,7 +103,7 @@ function icon(kind: ButtonState): SVGElement {
 /**
  * Morph a button between states: loading narrows it to a circle with a spinner, success and error draw a check or a
  * cross over the success / danger colour (error also shakes), idle restores it. The colours come from the theme tokens
- * through `data-hm-state` (motion.css). Returns the main Playback.
+ * through `data-m-state` (motion.css). Returns the main Playback.
  */
 export function stateMorph(el: Element, state: ButtonState, o: StateMorphOptions = {}): Playback {
   const h = el as HTMLElement;
@@ -114,9 +114,9 @@ export function stateMorph(el: Element, state: ButtonState, o: StateMorphOptions
     if (cs.position === "static") setStyle(h, { position: "relative" });
     const live = globalThis.document.createElement("span");
     live.setAttribute("aria-live", "polite");
-    live.className = "hm-sr-only";
+    live.className = "m-sr-only";
     const svg = globalThis.document.createElementNS(NS, "svg");
-    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("class", "hm-state-icon");
+    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("class", "m-state-icon");
     h.append(live, svg);
     s = { width: h.style.getPropertyValue("width"), radius: h.style.getPropertyValue("border-radius"), live, icon: svg, spin: null, fx: [], state: "idle" };
     saved.set(h, s);
@@ -127,10 +127,10 @@ export function stateMorph(el: Element, state: ButtonState, o: StateMorphOptions
   const look = (): Keyframe => { const c = css(h); return { borderRadius: c.borderRadius || "0px", ...(c.backgroundColor ? { backgroundColor: c.backgroundColor } : {}) }; };
   const from = { width: `${r.width}px`, ...look() };
   // the previous state's effects go before the new end is measured: nothing is held (each one is unfilled, its end is
-  // the inline size and the data-hm-state colours), so idle measures the natural width and colour again
+  // the inline size and the data-m-state colours), so idle measures the natural width and colour again
   for (const p of s.fx.splice(0)) p.cancel();
   s.spin?.cancel(); s.spin = null;
-  if (state === "idle") h.removeAttribute("data-hm-state"); else h.setAttribute("data-hm-state", state);
+  if (state === "idle") h.removeAttribute("data-m-state"); else h.setAttribute("data-m-state", state);
   h.toggleAttribute("aria-busy", state === "loading");
   if (state === "loading") h.setAttribute("aria-disabled", "true"); else h.removeAttribute("aria-disabled");
   const labels = { loading: t("Loading"), success: t("Done"), error: t("Failed"), idle: "", ...o.labels };
@@ -154,7 +154,7 @@ export function stateMorph(el: Element, state: ButtonState, o: StateMorphOptions
   if (state === "error") s.fx.push(animate(h, [{ translate: "0" }, { translate: "-6px" }, { translate: "5px" }, { translate: "-3px" }, { translate: "2px" }, { translate: "0" }], { duration: 420, delay: dur * 0.5, easing: "out", fill: "none" }));
   if (state === "success" && prev !== "success" && o.confetti && !reducedNow()) {
     const b = h.getBoundingClientRect(), root = css(globalThis.document.documentElement);
-    const colors = ["--hm-brand-orange", "--hm-brand-blue", "--hm-brand-green", "--hm-brand-purple"].map((v) => root.getPropertyValue?.(v).trim() ?? "").filter(Boolean);
+    const colors = ["--m-brand-orange", "--m-brand-blue", "--m-brand-green", "--m-brand-purple"].map((v) => root.getPropertyValue?.(v).trim() ?? "").filter(Boolean);
     void import("../fx/index.ts").then((fx) => fx.confetti({ x: b.left + b.width / 2, y: b.top + b.height / 2, count: 90, spread: 55, ...(colors.length ? { colors } : {}) }));
   }
   return main;

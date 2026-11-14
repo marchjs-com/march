@@ -24,7 +24,7 @@ is announced.
 | `labels` | `{ email, invalid, error }` | translated | the field's accessible name, the invalid-address message, the fallback error message |
 | `doneIcon` | boolean / node | `true` | the check mark of the success line, or your own |
 | `motion` | boolean | `true` | the shake on an error and the fold / pop on success |
-| `class` | string | — | extra class on the root (`.hm-nl`; parts: `.hm-nl-head` (a SectionHead), `.hm-nl-form`, `.hm-nl-field`, `.hm-nl-btn`, `.hm-nl-done`, `.hm-nl-note`; the error line is the field's own `.hm-input-error`) |
+| `class` | string | — | extra class on the root (`.m-nl`; parts: `.m-nl-head` (a SectionHead), `.m-nl-form`, `.m-nl-field`, `.m-nl-btn`, `.m-nl-done`, `.m-nl-note`; the error line is the field's own `.m-input-error`) |
 
 ## Accessibility
 

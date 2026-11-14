@@ -39,7 +39,7 @@ export function Chevron(props: ChevronProps): Element {
   const motion = (): string | false => { const m = val(props.motion); return m === false ? "is-still" : m === "spring" && "is-spring"; };
   return h("span", {
     ...rest(props, ["open", "direction", "size", "motion", "icon", "color", "leaf"]),
-    class: () => cx("hm-chevron", `hm-chevron-${val(props.direction) ?? "end"}`, `hm-chevron-${val(props.size) ?? "sm"}`, state(), motion(), val(props.leaf) && "is-leaf", val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)), "aria-hidden": "true",
-  }, () => (val(props.leaf) ? null : ownIcon(props.icon, chevronRight, "hm-chevron-own")));
+    class: () => cx("m-chevron", `m-chevron-${val(props.direction) ?? "end"}`, `m-chevron-${val(props.size) ?? "sm"}`, state(), motion(), val(props.leaf) && "is-leaf", val(props.class)),
+    "data-m-color": () => colorAttr(val(props.color)), "aria-hidden": "true",
+  }, () => (val(props.leaf) ? null : ownIcon(props.icon, chevronRight, "m-chevron-own")));
 }

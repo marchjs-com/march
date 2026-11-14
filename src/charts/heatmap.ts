@@ -1,4 +1,4 @@
-// Heatmap: x × y grid of cells colored by value level (`hm-heat-0..4`), e.g. weekday × hour.
+// Heatmap: x × y grid of cells colored by value level (`m-heat-0..4`), e.g. weekday × hour.
 // `calendar` mode lays out daily values as weeks (columns) × weekdays (rows), e.g. the last 12 weeks.
 import { signal, computed, read } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
@@ -118,13 +118,13 @@ export function Heatmap<D>(props: HeatmapProps<D>): Element {
   };
 
   const body = [
-    h("g", { class: "hm-chart-axis hm-chart-axis-x", "aria-hidden": "true" },
+    h("g", { class: "m-chart-axis m-chart-axis-x", "aria-hidden": "true" },
       each<PosLabel>({ each: xLabels, key: (t) => t.key, children: (t) => h("text", { x: attr(() => t().pos), y: 14, "text-anchor": "middle" }, attr(() => t().label)) })),
-    h("g", { class: "hm-chart-axis hm-chart-axis-y", "aria-hidden": "true" },
+    h("g", { class: "m-chart-axis m-chart-axis-y", "aria-hidden": "true" },
       each<PosLabel>({ each: yLabels, key: (t) => t.key, children: (t) => h("text", { x: () => f1(ml() - 6), y: attr(() => t().pos), dy: "0.32em", "text-anchor": "end" }, attr(() => t().label)) })),
-    h("g", { class: "hm-chart-plot", transform: attr(() => `translate(${f1(box().x)},${box().y})`), onPointerLeave: hide },
+    h("g", { class: "m-chart-plot", transform: attr(() => `translate(${f1(box().x)},${box().y})`), onPointerLeave: hide },
       each<HeatCell>({ each: () => grid().cells, key: (c) => c.key, children: (c, i) => h("rect", {
-        class: attr(() => `hm-heat-cell hm-heat-${heatLevel(c().value, max(), levels())}`), "class:hm-chart-active": () => active() === i(),
+        class: attr(() => `m-heat-cell m-heat-${heatLevel(c().value, max(), levels())}`), "class:m-chart-active": () => active() === i(),
         x: attr(() => f1(c().xi * cell())), y: attr(() => f1(c().yi * cell())), width: attr(() => f1(Math.max(1, cell() - gap()))), height: attr(() => f1(Math.max(1, cell() - gap()))), rx: 2,
         onPointerEnter: () => show(i()), onClick: () => select(i()),
       }) })),

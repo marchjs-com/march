@@ -1,19 +1,19 @@
-/* March — Feed. The PullToRefresh is the scroll area; give .hm-feed a height (or put it in a flex column). */
-.hm-feed { position: relative; display: flex; flex-direction: column; min-height: 0; height: 100%; background: var(--hm-bg); }
-.hm-feed-scroll { flex: 1; min-height: 0; padding: var(--hm-space-3); scroll-padding-block-start: var(--hm-space-3); }
-.hm-feed-flat .hm-feed-scroll { padding-inline: 0; padding-block-start: 0; }
-.hm-feed-flat { background: var(--hm-surface); }
-.hm-feed-list { display: flex; flex-direction: column; gap: .75rem; }
-.hm-feed-pill { position: absolute; inset-block-start: var(--hm-space-3); inset-inline: 0; z-index: 3; display: flex; justify-content: center; pointer-events: none; }
-.hm-feed-new.hm-btn { pointer-events: auto; padding: 0 1rem; font-size: var(--hm-text-sm); font-weight: 800; box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--hm-accent) 60%, transparent); }
-.hm-feed-skel { display: flex; flex-direction: column; gap: var(--hm-space-3); padding: var(--hm-space-3); }
-.hm-feed-skel-head { display: grid; grid-template-columns: 2.5rem 1fr; gap: .625rem; align-items: center; }
-.hm-feed-skel-head .hm-skel-lines { gap: .375rem; }
-.hm-feed-skel-media { border-radius: var(--hm-radius-3); height: 16rem; }
-.hm-feed-skel-text { padding-inline: var(--hm-space-1); }
-.hm-feed-more { padding-block-start: .75rem; }
-.hm-feed-end { display: flex; flex-direction: column; align-items: center; gap: var(--hm-space-2); margin: 0; padding: var(--hm-space-6, 2rem) var(--hm-space-3);
-  color: var(--hm-text-3, var(--hm-muted)); font-size: var(--hm-text-sm); font-weight: 700; text-align: center; }
-.hm-feed-empty.hm-empty { padding-block: var(--hm-space-6, 2rem); }
+/* March — Feed. The PullToRefresh is the scroll area; give .m-feed a height (or put it in a flex column). */
+.m-feed { position: relative; display: flex; flex-direction: column; min-height: 0; height: 100%; background: var(--m-bg); }
+.m-feed-scroll { flex: 1; min-height: 0; padding: var(--m-space-3); scroll-padding-block-start: var(--m-space-3); }
+.m-feed-flat .m-feed-scroll { padding-inline: 0; padding-block-start: 0; }
+.m-feed-flat { background: var(--m-surface); }
+.m-feed-list { display: flex; flex-direction: column; gap: .75rem; }
+.m-feed-pill { position: absolute; inset-block-start: var(--m-space-3); inset-inline: 0; z-index: 3; display: flex; justify-content: center; pointer-events: none; }
+.m-feed-new.m-btn { pointer-events: auto; padding: 0 1rem; font-size: var(--m-text-sm); font-weight: 800; box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--m-accent) 60%, transparent); }
+.m-feed-skel { display: flex; flex-direction: column; gap: var(--m-space-3); padding: var(--m-space-3); }
+.m-feed-skel-head { display: grid; grid-template-columns: 2.5rem 1fr; gap: .625rem; align-items: center; }
+.m-feed-skel-head .m-skel-lines { gap: .375rem; }
+.m-feed-skel-media { border-radius: var(--m-radius-3); height: 16rem; }
+.m-feed-skel-text { padding-inline: var(--m-space-1); }
+.m-feed-more { padding-block-start: .75rem; }
+.m-feed-end { display: flex; flex-direction: column; align-items: center; gap: var(--m-space-2); margin: 0; padding: var(--m-space-6, 2rem) var(--m-space-3);
+  color: var(--m-text-3, var(--m-muted)); font-size: var(--m-text-sm); font-weight: 700; text-align: center; }
+.m-feed-empty.m-empty { padding-block: var(--m-space-6, 2rem); }
 /* the end mark: four StatusDots in the brand colors */
-.hm-feed-end-dots { display: inline-flex; gap: .3rem; }
+.m-feed-end-dots { display: inline-flex; gap: .3rem; }

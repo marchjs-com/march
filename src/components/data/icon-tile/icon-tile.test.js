@@ -11,12 +11,12 @@ const mount = (view) => { const el = document.createElement("div"); document.bod
 test("IconTile: tone, size, decorative by default", () => {
   const tone = signal("success");
   const [el, dispose] = mount(() => h(IconTile, { icon: users, tone, size: "lg" }));
-  const tile = el.querySelector(".hm-icon-tile");
-  assert.ok(tile.classList.contains("hm-tile-success") && tile.classList.contains("hm-icon-tile-lg"));
+  const tile = el.querySelector(".m-icon-tile");
+  assert.ok(tile.classList.contains("m-tile-success") && tile.classList.contains("m-icon-tile-lg"));
   assert.equal(tile.getAttribute("aria-hidden"), "true");
   assert.ok(tile.querySelector("svg"));
   tone.set("danger");
-  assert.ok(tile.classList.contains("hm-tile-danger"));
+  assert.ok(tile.classList.contains("m-tile-danger"));
   dispose();
 });
 
@@ -26,8 +26,8 @@ test("IconTile: color token, variant, shape, label, own content", () => {
     h(IconTile, { class: "two" }, h("b", { class: "own" }, "7")),
   ]);
   const one = el.querySelector(".one");
-  assert.equal(one.getAttribute("data-hm-color"), "brand-orange");
-  assert.ok(one.classList.contains("hm-icon-tile-solid") && one.classList.contains("hm-icon-tile-round"));
+  assert.equal(one.getAttribute("data-m-color"), "brand-orange");
+  assert.ok(one.classList.contains("m-icon-tile-solid") && one.classList.contains("m-icon-tile-round"));
   assert.equal(one.getAttribute("role"), "img");
   assert.equal(one.getAttribute("aria-label"), "Members");
   assert.equal(one.getAttribute("aria-hidden"), null);

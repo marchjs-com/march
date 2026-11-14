@@ -7,5 +7,5 @@ import { val, cx, type MaybeFn } from "../../../ui/util.ts";
  * Without `attrs` it is decorative (`aria-hidden`); give `role` / `aria-label` to name it.
  */
 export function spinnerRing(size?: MaybeFn<string | null | undefined>, cls?: MaybeFn<unknown>, attrs?: Record<string, unknown>): HTMLElement {
-  return h("span", { class: () => { const s = val(size); return cx("hm-loading", s && `hm-spin-${s}`, val(cls)); }, ...(attrs ?? { "aria-hidden": "true" }) }) as HTMLElement;
+  return h("span", { class: () => { const s = val(size); return cx("m-loading", s && `m-spin-${s}`, val(cls)); }, ...(attrs ?? { "aria-hidden": "true" }) }) as HTMLElement;
 }

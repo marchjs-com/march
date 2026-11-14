@@ -65,16 +65,16 @@ export function LiveCounter(props: LiveCounterProps): Element {
   // the number: the odometer Counter, or plain text that a text animation redraws on every change
   let text: HTMLElement | null = null;
   const number = typeof fx === "function" || fx === "none"
-    ? h("span", { class: "hm-lc-plain" }, props.prefix ?? null, text = h("span", { class: "hm-lc-text" }, fmt(untrack(n))) as HTMLElement, props.suffix ?? null)
+    ? h("span", { class: "m-lc-plain" }, props.prefix ?? null, text = h("span", { class: "m-lc-text" }, fmt(untrack(n))) as HTMLElement, props.suffix ?? null)
     : h(Counter, { value: n, mode: "roll", start: "now", format: props.format, prefix: props.prefix, suffix: props.suffix });
   const dot = props.dot === false ? null
-    : props.dot && props.dot !== true ? h("span", { class: "hm-lc-dot-own", "aria-hidden": "true" }, props.dot)
-    : h(StatusDot, { class: "hm-lc-dot", size: "lg", pulse: true, color: props.dotColor });
+    : props.dot && props.dot !== true ? h("span", { class: "m-lc-dot-own", "aria-hidden": "true" }, props.dot)
+    : h(StatusDot, { class: "m-lc-dot", size: "lg", pulse: true, color: props.dotColor });
 
-  const root = h("div", { class: () => cx("hm-lc", val(props.class)) },
+  const root = h("div", { class: () => cx("m-lc", val(props.class)) },
     dot,
-    h("span", { class: "hm-lc-num" }, number, h("span", { class: "hm-lc-bubbles", "aria-hidden": "true" })),
-    props.label != null ? h("span", { class: "hm-lc-label" }, props.label) : null) as HTMLElement;
+    h("span", { class: "m-lc-num" }, number, h("span", { class: "m-lc-bubbles", "aria-hidden": "true" })),
+    props.label != null ? h("span", { class: "m-lc-label" }, props.label) : null) as HTMLElement;
 
   // simulated growth: a step every pause[0]–pause[1] ms of clock time, sized so the average matches `rate` per minute
   if (props.value === undefined && props.rate) {
@@ -107,14 +107,14 @@ export function LiveCounter(props: LiveCounterProps): Element {
         if (typeof fx === "function" && d && !reducedMotion()) anim = fx(text, { start: prev, ...props.effectOptions } as never);
       }
       if (d <= 0 || reducedMotion()) return;
-      const num = root.querySelector<HTMLElement>(".hm-lc-num"), box = root.querySelector(".hm-lc-bubbles");
+      const num = root.querySelector<HTMLElement>(".m-lc-num"), box = root.querySelector(".m-lc-bubbles");
       if (num && box && props.bubble !== false) {
         const label = `+${fmt(d)}`;
         // the default bubble is a Badge; your own content gets a bare box. Each bubble has its own scope (not the
         // effect's: the next change must not dispose a bubble that is still rising)
         createRoot((dispose) => {
-          const b = (typeof props.bubble === "function" ? h("span", { class: "hm-lc-bubble is-own" }, props.bubble(d, label))
-            : h(Badge, { class: "hm-lc-bubble", tone: props.bubbleColor ? "primary" : "success", color: props.bubbleColor }, label)) as HTMLElement;
+          const b = (typeof props.bubble === "function" ? h("span", { class: "m-lc-bubble is-own" }, props.bubble(d, label))
+            : h(Badge, { class: "m-lc-bubble", tone: props.bubbleColor ? "primary" : "success", color: props.bubbleColor }, label)) as HTMLElement;
           box.append(b);
           void animate(b, { opacity: [0, 1, 1, 0], transform: ["translateY(10px) scale(.6)", "translateY(-6px) scale(1.1)", "translateY(-22px) scale(1)", "translateY(-40px) scale(.9)"] }, { duration: 1500, easing: "out" })
             .finished.then(() => { b.remove(); dispose(); });

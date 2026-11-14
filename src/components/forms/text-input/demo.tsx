@@ -23,7 +23,7 @@ export default function TextInputDemo(props: { values: { kind: string; prefix: s
       if (v.kind === "url") return <Field label="Web adresi"><UrlInput {...common} /></Field>
       return <Field label="Ara"><TextInput {...common} placeholder="Üye, sipariş, etiket…" /></Field>
     }}
-    <p class="hm-muted">{() => `Değer: ${JSON.stringify($text)}`}</p>
+    <p class="m-muted">{() => `Değer: ${JSON.stringify($text)}`}</p>
     {() => (props.values.paste ? <p class="sc-demo-call">{`onPaste → ${$pasted ? JSON.stringify($pasted) : "bir metin yapıştır: girdiye yazılmaz, burada görünür"}`}</p> : null)}
   </div>
 }

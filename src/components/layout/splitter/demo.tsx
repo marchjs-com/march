@@ -15,7 +15,7 @@ export default function SplitterDemo(props: { values: { initial: number; min: nu
       const handle = props.values.handle === "off" ? false : props.values.handle === "grip" ? <Icon of={moreVertical} /> : true
       return <Splitter initial={initial} min={min} handle={handle} color={color} label="Liste genişliği"
       start={<ul class="sc-split-list"><li>rapor.pdf</li><li>sunum.key</li><li>bütçe.xlsx</li><li>logo.svg</li></ul>}
-      end={<div class="sc-split-preview"><strong>rapor.pdf</strong><p class="hm-muted">Tutamacı sürükleyin ya da odaklayıp ← → kullanın; Enter başa döndürür.</p>
-        {props.values.handle === "off" ? null : <p class="hm-muted">{`Tutamaç rengi: ${COLORS[props.values.color]} (üstüne gelince, odaklanınca ve sürüklerken görünür).`}</p>}</div>} /> }}
+      end={<div class="sc-split-preview"><strong>rapor.pdf</strong><p class="m-muted">Tutamacı sürükleyin ya da odaklayıp ← → kullanın; Enter başa döndürür.</p>
+        {props.values.handle === "off" ? null : <p class="m-muted">{`Tutamaç rengi: ${COLORS[props.values.color]} (üstüne gelince, odaklanınca ve sürüklerken görünür).`}</p>}</div>} /> }}
   </div>
 }

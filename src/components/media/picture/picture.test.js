@@ -17,7 +17,7 @@ test("isPicture: an object with src, not a node", () => {
 
 test("Picture: a picture object becomes a lazy image with its size", () => {
   const [el, dispose] = mount(() => h(Picture, { source: COVER, fit: "cover", class: "mine", draggable: "false" }));
-  const img = el.querySelector("img.hm-picture");
+  const img = el.querySelector("img.m-picture");
   assert.equal(img.getAttribute("src"), "/a.jpg");
   assert.equal(img.getAttribute("alt"), "Hills");
   assert.equal(img.getAttribute("width"), "1200");
@@ -28,7 +28,7 @@ test("Picture: a picture object becomes a lazy image with its size", () => {
   assert.equal(img.getAttribute("decoding"), "async");
   assert.equal(img.getAttribute("fetchpriority"), null);
   assert.equal(img.getAttribute("draggable"), "false");
-  assert.ok(img.classList.contains("hm-picture-cover") && img.classList.contains("mine"));
+  assert.ok(img.classList.contains("m-picture-cover") && img.classList.contains("mine"));
   dispose();
 });
 
@@ -54,7 +54,7 @@ test("Picture: fallback replaces a failed image; onLoad / onError run", () => {
   img.dispatchEvent(new Event("error"));
   assert.deepEqual(seen, ["load", "error"]);
   assert.equal(el.querySelector("img"), null);
-  const f = el.querySelector(".hm-picture-fallback");
+  const f = el.querySelector(".m-picture-fallback");
   assert.equal(f.textContent, "No picture");
   assert.equal(f.getAttribute("aria-label"), "Hills");
   dispose();

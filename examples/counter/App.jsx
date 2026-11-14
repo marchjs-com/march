@@ -4,7 +4,7 @@ let $step = 1
 
 export default function App() {
   const double = () => $count * 2
-  return <main class="hm-page hm-page-narrow">
+  return <main class="m-page m-page-narrow">
     <h1>Counter</h1>
     <p>Count: <strong>{$count}</strong> · double: {double()}</p>
     <Stack direction="row" gap={2}>

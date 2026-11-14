@@ -43,7 +43,7 @@ export function rest(props: object, used: readonly string[]): Record<string, unk
 
 let seq = 0;
 /** Unique DOM id. */
-export const uid = (p = "hm"): string => `${p}-${(++seq).toString(36)}`;
+export const uid = (p = "m"): string => `${p}-${(++seq).toString(36)}`;
 
 /** localStorage JSON read/write; never throws (private mode, blocked storage, bad JSON). */
 export function load<T>(key: string, fallback: T): T {

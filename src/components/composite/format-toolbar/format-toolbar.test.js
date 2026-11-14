@@ -36,12 +36,12 @@ test("FormatToolbar: own tools, names, icons, keys, hints, pressed, disabled, co
   const bar = el.querySelector("[role=toolbar]");
   assert.equal(bar.getAttribute("aria-label"), "Text style");
   assert.ok(bar.classList.contains("mine") && bar.classList.contains("my-ed-toolbar"));
-  assert.equal(bar.getAttribute("data-hm-color"), "brand-green");
+  assert.equal(bar.getAttribute("data-m-color"), "brand-green");
   color.set(undefined);
-  assert.equal(bar.getAttribute("data-hm-color"), null);
+  assert.equal(bar.getAttribute("data-m-color"), null);
   assert.deepEqual(names(el), ["Strong", "Address", "Undo"]);
   const [b, link, undo] = [...el.querySelectorAll("button")];
-  assert.equal(b.querySelector(".hm-format-tool-own.my-ed-tool-own").textContent, "B");
+  assert.equal(b.querySelector(".m-format-tool-own.my-ed-tool-own").textContent, "B");
   assert.match(b.getAttribute("title"), /^Strong \(.*B\)$/);
   assert.equal(b.getAttribute("aria-pressed"), "false");
   on.set(true);
@@ -53,7 +53,7 @@ test("FormatToolbar: own tools, names, icons, keys, hints, pressed, disabled, co
   assert.equal(link.getAttribute("aria-haspopup"), "dialog");
   assert.equal(undo.disabled, true);
   assert.equal(undo.getAttribute("aria-keyshortcuts"), "Control+Z");
-  assert.ok(el.querySelector(".hm-format-sep.my-ed-sep"));
+  assert.ok(el.querySelector(".m-format-sep.my-ed-sep"));
   dispose();
 });
 

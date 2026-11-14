@@ -86,11 +86,11 @@ test("RichTextEditor: renders Markdown, toolbar, accessible textbox and counter"
   assert.equal(box.getAttribute("contenteditable"), "true");
   assert.equal(box.getAttribute("aria-multiline"), "true");
   assert.equal(html(box).replace(/^<div[^>]*>|<\/div>$/g, ""), "<h2>Hello</h2><p>Some <strong>bold</strong> text</p>");
-  const tools = el.querySelectorAll(".hm-rte-tool");
+  const tools = el.querySelectorAll(".m-rte-tool");
   assert.ok(tools.length >= 12);
   assert.equal(tools.filter((b) => b.getAttribute("tabindex") === "0").length, 1, "one tab stop in the toolbar");
   assert.equal(el.querySelector("[role=toolbar]").getAttribute("aria-label"), "Formatting");
-  assert.match(el.querySelector(".hm-rte-count").textContent, /^4 words · \d+ characters$/);
+  assert.match(el.querySelector(".m-rte-count").textContent, /^4 words · \d+ characters$/);
   assert.equal(api.markdown(), "## Hello\n\nSome **bold** text");
   // a new value from outside replaces the content
   value.set("- one\n- two");
@@ -125,15 +125,15 @@ test("RichTextEditor: own tool icons, own texts, no hint", async () => {
   const dispose = render(() => h(RichTextEditor, { value: "one two", mentions: [{ id: "a", label: "Ada" }], class: "mine", hint: false, toolbar: ["bold", "italic"],
     toolIcons: { bold: "B" }, labels: { editor: "Note", toolbar: "Format", tools: { bold: "Strong" }, count: (w, c) => `${w}w ${c}c` } }), el);
   await new Promise((r) => setTimeout(r, 0));
-  assert.ok(el.querySelector(".hm-rte.mine"));
-  assert.equal(el.querySelector(".hm-rte-content").getAttribute("aria-label"), "Note");
+  assert.ok(el.querySelector(".m-rte.mine"));
+  assert.equal(el.querySelector(".m-rte-content").getAttribute("aria-label"), "Note");
   assert.equal(el.querySelector("[role=toolbar]").getAttribute("aria-label"), "Format");
-  const [b, i] = el.querySelectorAll(".hm-rte-tool");
+  const [b, i] = el.querySelectorAll(".m-rte-tool");
   assert.equal(b.getAttribute("aria-label"), "Strong");
-  assert.equal(b.querySelector(".hm-rte-tool-own").textContent, "B");
+  assert.equal(b.querySelector(".m-rte-tool-own").textContent, "B");
   assert.equal(i.getAttribute("aria-label"), "Italic");
   assert.ok(i.querySelector("svg"), "other tools keep their glyph");
-  assert.equal(el.querySelector(".hm-rte-hint").textContent, "", "hint={false}");
-  assert.equal(el.querySelector(".hm-rte-count").textContent, "2w 7c");
+  assert.equal(el.querySelector(".m-rte-hint").textContent, "", "hint={false}");
+  assert.equal(el.querySelector(".m-rte-count").textContent, "2w 7c");
   dispose();
 });

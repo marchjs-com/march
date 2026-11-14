@@ -21,5 +21,5 @@ test("RadioGroup: radiogroup of native radios with one name; change picks the va
   radios[2].checked = true; fire(radios[2], "change");
   assert.equal(v(), "c");
   const card = mount(() => h(RadioGroup, { value: "x", variant: "card", options: [{ value: "x", label: "X", hint: "hint" }] }));
-  assert.ok(card.el.querySelector(".hm-choice-card-title"));
+  assert.ok(card.el.querySelector(".m-choice-card-title"));
 });

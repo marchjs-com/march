@@ -50,15 +50,15 @@ test("traps stack; focus escaping the active trap is pulled back", () => {
   outer.remove(); inner.remove(); outside.remove();
 });
 
-test("modality: keyboard → visible() and data-hm-focus-visible; pointer clears it", () => {
+test("modality: keyboard → visible() and data-m-focus-visible; pointer clears it", () => {
   disposeFocus();
   assert.equal(focus.visible(), false);
   key(document.body, "Tab");
   assert.equal(focus.visible(), true);
-  assert.equal(document.documentElement.hasAttribute("data-hm-focus-visible"), true);
+  assert.equal(document.documentElement.hasAttribute("data-m-focus-visible"), true);
   document.body.dispatchEvent(new Event("pointerdown", { bubbles: true }));
   assert.equal(focus.modality(), "pointer");
-  assert.equal(document.documentElement.hasAttribute("data-hm-focus-visible"), false);
+  assert.equal(document.documentElement.hasAttribute("data-m-focus-visible"), false);
 });
 
 test("roving: one Tab stop, arrows move and wrap, Home / End", () => {

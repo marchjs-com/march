@@ -83,7 +83,7 @@ export interface FormatToolbarProps<T extends FormatTool = FormatTool> {
   size?: MaybeFn<"xs" | "sm" | "md" | undefined>;
   /** Theme colour token of the pressed mark (default: the accent, or the editor's colour). */
   color?: MaybeFn<ColorToken | undefined>;
-  /** Class prefix of a host that keeps its own class names ("hm-mde"): the bar is also `<prefix>-toolbar`, a button `<prefix>-tool`, a separator `<prefix>-sep`, an own icon `<prefix>-tool-own`. */
+  /** Class prefix of a host that keeps its own class names ("m-mde"): the bar is also `<prefix>-toolbar`, a button `<prefix>-tool`, a separator `<prefix>-sep`, an own icon `<prefix>-tool-own`. */
   prefix?: string | undefined;
   /** Extra attributes of a tool's button (`aria-haspopup`, `aria-expanded`, `class`, `ref` …). */
   attrs?: ((tool: T) => Record<string, unknown>) | undefined;
@@ -97,21 +97,21 @@ export function FormatToolbar<T extends FormatTool = FormatTool>(props: FormatTo
   const face = (tool: T): unknown => {
     const mine = props.icons?.[tool];
     if (mine === false) return null;
-    if (mine != null && mine !== true) return h("span", { class: cx("hm-format-tool-own", own("tool-own")), "aria-hidden": "true" }, isIconDef(mine) ? glyph(mine) : mine);
-    return tool === "emoji" ? h("span", { class: "hm-format-tool-emoji", "aria-hidden": "true" }, "☺") : glyph(ICON[tool as Exclude<FormatTool, "emoji">]);
+    if (mine != null && mine !== true) return h("span", { class: cx("m-format-tool-own", own("tool-own")), "aria-hidden": "true" }, isIconDef(mine) ? glyph(mine) : mine);
+    return tool === "emoji" ? h("span", { class: "m-format-tool-emoji", "aria-hidden": "true" }, "☺") : glyph(ICON[tool as Exclude<FormatTool, "emoji">]);
   };
   const keyOf = (tool: T): string | null => { const k = props.keys?.[tool]; return k === false ? null : k ?? FORMAT_KEYS[tool] ?? null; };
   const nameOf = (tool: T): string => props.name?.(tool) ?? val(props.labels)?.[tool] ?? formatToolName(tool);
   const off = (tool: T): boolean => { const d = props.disabled; return typeof d === "function" ? !!(d as (tool: T) => unknown)(tool) : !!d; };
   const button = (tool: T | "|"): Element => {
-    if (tool === "|") return h(Divider, { vertical: true, class: cx("hm-format-sep", own("sep")) }) as Element;
+    if (tool === "|") return h(Divider, { vertical: true, class: cx("m-format-sep", own("sep")) }) as Element;
     const { class: extra, ...attrs } = props.attrs?.(tool) ?? {};
     const on = props.pressed?.[tool];
     const key = keyOf(tool);
     return h(IconButton, {
       ...attrs, icon: face(tool), label: () => nameOf(tool), size: () => val(props.size) ?? "sm",
       title: () => (val(props.hints) && key ? labelWithKey(nameOf(tool), key.replace(/Control/g, "mod")) : undefined),
-      class: () => cx("hm-format-tool", own("tool"), (tool === "h2" || tool === "h3") && `hm-format-tool-${tool}`, val(extra as MaybeFn<string | false | null | undefined>)),
+      class: () => cx("m-format-tool", own("tool"), (tool === "h2" || tool === "h3") && `m-format-tool-${tool}`, val(extra as MaybeFn<string | false | null | undefined>)),
       ...(on ? { pressed: on } : null), "aria-keyshortcuts": key,
       disabled: () => off(tool),
       // keep the text selection: the button never takes focus on pointer down
@@ -119,10 +119,10 @@ export function FormatToolbar<T extends FormatTool = FormatTool>(props: FormatTo
     }) as Element;
   };
   const bar = h(Toolbar, {
-    label: () => val(props.label) ?? t`Formatting`, class: () => cx("hm-format-toolbar", own("toolbar"), val(props.class)),
+    label: () => val(props.label) ?? t`Formatting`, class: () => cx("m-format-toolbar", own("toolbar"), val(props.class)),
     children: (props.tools ?? (FORMAT_TOOLS as readonly (T | "|")[])).map(button),
   }) as HTMLElement;
-  effect(() => { const c = colorAttr(val(props.color)); if (c) bar.setAttribute("data-hm-color", c); else bar.removeAttribute("data-hm-color"); });
+  effect(() => { const c = colorAttr(val(props.color)); if (c) bar.setAttribute("data-m-color", c); else bar.removeAttribute("data-m-color"); });
   // by tag: the class of a tool is a binding that may not be written yet
   rovingFocus(bar, { orientation: "horizontal", selector: "button" });
   return bar;

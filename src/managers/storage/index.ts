@@ -19,7 +19,7 @@ export type Migration = (value: any, key: string) => unknown;
 export interface SetOptions { /** Expire after ms or "30s" / "5m" / "1d". */ ttl?: number | string }
 
 export interface StorageConfig {
-  /** Prepended to every key. Default "hm.". */
+  /** Prepended to every key. Default "m.". */
   prefix: string;
   /** Current data version. Default 1. */
   version: number;
@@ -214,7 +214,7 @@ function create(cfg: StorageConfig): StorageHub {
   return hub;
 }
 
-const manager = defineManager<StorageHub, StorageConfig>("storage", create, { prefix: "hm.", version: 1, migrations: {}, dbName: null });
+const manager = defineManager<StorageHub, StorageConfig>("storage", create, { prefix: "m.", version: 1, migrations: {}, dbName: null });
 
 /** The storage manager (created on first call). */
 export const storage = (): StorageHub => manager.get();

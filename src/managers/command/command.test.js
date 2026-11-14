@@ -144,7 +144,7 @@ test("menu items, command: props and CommandButton show the same command and sta
   const host = document.createElement("div");
   const off = render(() => [h("button", { id: "plain", "command:doc.save": true }, "Save"), h(CommandButton, { command: "doc.save" })], host);
   const plain = host.querySelector("#plain");
-  const btn = host.querySelector(".hm-btn");
+  const btn = host.querySelector(".m-btn");
   assert.equal(plain.disabled, false);
   assert.equal(plain.getAttribute("aria-keyshortcuts"), "Control+S");
   assert.match(btn.textContent, /Save/);

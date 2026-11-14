@@ -37,7 +37,7 @@ the tooltip. `Marquee` is the endless ticker preset (`trigger="visible"`, `mode=
 ```
 
 With `duplicate` a short content (a row of logos, a few quotes) still fills the box and loops: the content is a
-`.hm-marquee-unit` and its copies follow it (space them with a gap and an end padding on that class). The copies are
+`.m-marquee-unit` and its copies follow it (space them with a gap and an end padding on that class). The copies are
 `aria-hidden` and `inert`, so links and buttons in them are neither read nor focused.
 
 ## Accessibility

@@ -15,7 +15,7 @@ test("Tree: ARIA, expand / collapse with keys and clicks, selection", () => {
   assert.equal(tree.getAttribute("aria-label"), "Files");
   const a = [...tree.children].find((x) => x.getAttribute("role") === "treeitem");
   assert.equal(a.getAttribute("aria-expanded"), "false");
-  const row = a.querySelector(".hm-tree-row");
+  const row = a.querySelector(".m-tree-row");
   key(row, "ArrowRight");
   assert.equal(a.getAttribute("aria-expanded"), "true");
   assert.equal(a.querySelector("[role=group]").hidden, false);
@@ -24,7 +24,7 @@ test("Tree: ARIA, expand / collapse with keys and clicks, selection", () => {
   row.click();
   assert.equal(sel(), "a");
   assert.equal(a.getAttribute("aria-selected"), "true");
-  assert.equal(a.querySelector(".hm-tree-meta").textContent, "3");
+  assert.equal(a.querySelector(".m-tree-meta").textContent, "3");
   assert.equal(a.querySelector("[role=treeitem]").getAttribute("aria-level"), "2");
   m.dispose();
 });
@@ -33,23 +33,23 @@ test("Tree: no chevron, own chevron that follows open, selection colour", () => 
   const nodes = [{ id: "a", label: "a", children: [{ id: "a1", label: "a1" }] }];
   const m = mount(() => [h(Tree, { nodes, chevron: false, color: "brand-purple" }), h(Tree, { nodes, chevron: (_n, open) => h("b", {}, () => (open() ? "-" : "+")) }), h(Tree, { nodes })]);
   const [a, b, c] = m.el.querySelectorAll("[role=tree]");
-  assert.equal(a.querySelector(".hm-tree-chev"), null);
-  assert.equal(a.getAttribute("data-hm-color"), "brand-purple");
-  const own = b.querySelector(".hm-tree-chev.is-own");
+  assert.equal(a.querySelector(".m-tree-chev"), null);
+  assert.equal(a.getAttribute("data-m-color"), "brand-purple");
+  const own = b.querySelector(".m-tree-chev.is-own");
   assert.equal(own.textContent, "+");
-  key(b.querySelector(".hm-tree-row"), "ArrowRight");
+  key(b.querySelector(".m-tree-row"), "ArrowRight");
   assert.equal(own.textContent, "-");
-  assert.ok(c.querySelector(".hm-tree-chev .hm-svg"), "the default arrow stays");
-  assert.equal(c.getAttribute("data-hm-color"), null);
+  assert.ok(c.querySelector(".m-tree-chev .m-svg"), "the default arrow stays");
+  assert.equal(c.getAttribute("data-m-color"), null);
   m.dispose();
 });
 
 test("Tree: rows are ListRows with a Chevron; → enters an open node, ← leaves to the parent", () => {
   const nodes = [{ id: "a", label: "a", children: [{ id: "a1", label: "a1" }] }, { id: "b", label: "b" }];
   const m = mount(() => h(Tree, { nodes, expanded: ["a"] }));
-  const rows = [...m.el.querySelectorAll(".hm-tree-row")];
-  assert.ok(rows[0].classList.contains("hm-listrow") && rows[0].querySelector(".hm-tree-chev.hm-chevron.is-open"));
-  assert.ok(rows[1].querySelector(".hm-tree-chev.is-leaf"), "a leaf keeps the arrow's box");
+  const rows = [...m.el.querySelectorAll(".m-tree-row")];
+  assert.ok(rows[0].classList.contains("m-listrow") && rows[0].querySelector(".m-tree-chev.m-chevron.is-open"));
+  assert.ok(rows[1].querySelector(".m-tree-chev.is-leaf"), "a leaf keeps the arrow's box");
   rows[0].focus(); key(rows[0], "ArrowRight");
   assert.equal(document.activeElement, rows[1], "→ on an open node goes to its first child");
   key(rows[1], "ArrowLeft");
@@ -59,8 +59,8 @@ test("Tree: rows are ListRows with a Chevron; → enters an open node, ← leave
 
 test("treeRow `sub` and treeListKey: a tree drawn as one flat list (TreeEditor)", async () => {
   const { treeRow, treeListKey } = await import("./row.ts");
-  const { el, dispose } = mount(() => treeRow({ prefix: "hm-x", kids: true, open: true, label: "name", sub: "a problem" }, { role: "treeitem" }));
-  assert.equal(el.querySelector(".hm-x-row .hm-listrow-sub").textContent, "a problem");
+  const { el, dispose } = mount(() => treeRow({ prefix: "m-x", kids: true, open: true, label: "name", sub: "a problem" }, { role: "treeitem" }));
+  assert.equal(el.querySelector(".m-x-row .m-listrow-sub").textContent, "a problem");
   dispose();
   const at = { index: 2, count: 5, kids: true, open: false, parent: 0 };
   assert.equal(treeListKey("ArrowDown", at), 3);

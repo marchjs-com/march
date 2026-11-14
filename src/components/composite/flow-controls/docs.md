@@ -23,7 +23,7 @@ await runner.run()        // "done" | "error"; runner.pause() / resume() / step(
 | `status`, `clock`, `count` | boolean | `true` | the state chip, the clock, the "n / m nodes" counter |
 | `icons` | `{ run, pause, step, reset }` | — | own icon for a button (an icon, a string or a node) |
 | `labels` | `{ toolbar, run, pause, resume, step, reset, speed, ready, running, paused, finished, failed, count(done, total) }` | — | own texts (each falls back to the built-in one) |
-| `class` | class value | — | on the root (`hm-flowctl`) |
+| `class` | class value | — | on the root (`m-flowctl`) |
 
 ```tsx
 <FlowControls runner={runner} flow={flow} step={false} speeds={false} clock={false}
@@ -40,7 +40,7 @@ await runner.run()        // "done" | "error"; runner.pause() / resume() / step(
 | `empty` | boolean / node | `true` | what is shown before the first run |
 | `motion` | boolean | `true` | rows fade in, the running bar breathes |
 | `labels` | `{ region, empty, row(start, duration) }` | — | own texts |
-| `class` | class value | — | on the root (`hm-flowtl`) |
+| `class` | class value | — | on the root (`m-flowtl`) |
 
 ## Runner
 

@@ -64,19 +64,19 @@ export function MediaGrid(props: MediaGridProps): Element {
     const label = (): string => (props.tileLabel ? props.tileLabel(i, n, it) : (it.alt ? `${it.alt} · ` : "") + t`Photo ${i + 1} of ${n}`);
     const sk = props.skeleton, mark = props.videoMark, own = props.more;
     return h("button", {
-      type: "button", class: () => cx("hm-mgrid-tile", loaded() && "is-loaded"), "aria-label": label,
+      type: "button", class: () => cx("m-mgrid-tile", loaded() && "is-loaded"), "aria-label": label,
       ref: (x: HTMLElement) => { el = x; },
       onClick: (e: MouseEvent) => tap(i, el, e.detail === 0),
     },
-    () => (loaded() || sk === false ? null : typeof sk === "function" ? h("span", { class: "hm-mgrid-skel hm-mgrid-skel-own" }, sk()) : h(Skeleton, { block: true, class: "hm-mgrid-skel" })),
+    () => (loaded() || sk === false ? null : typeof sk === "function" ? h("span", { class: "m-mgrid-skel m-mgrid-skel-own" }, sk()) : h(Skeleton, { block: true, class: "m-mgrid-skel" })),
     h(Picture, { src: it.src, alt: "", fit: "cover", draggable: "false", onLoad: () => loaded.set(true), onError: () => loaded.set(true) }),
-    it.kind === "video" && mark !== false ? h(CornerMark, { class: "hm-mgrid-kind", icon: typeof mark === "function" ? mark(it) : videoIcon }) : null,
-    more > 0 && own !== false ? h("span", { class: "hm-mgrid-more", "aria-hidden": "true" }, typeof own === "function" ? own(more) : `+${more}`) : null);
+    it.kind === "video" && mark !== false ? h(CornerMark, { class: "m-mgrid-kind", icon: typeof mark === "function" ? mark(it) : videoIcon }) : null,
+    more > 0 && own !== false ? h("span", { class: "m-mgrid-more", "aria-hidden": "true" }, typeof own === "function" ? own(more) : `+${more}`) : null);
   };
   return h("div", {
     class: () => {
       const n = Math.min(val(props.items).length, clamp(val(props.max) ?? 4, 2, 4));
-      return cx("hm-mgrid", `hm-mgrid-n${n}`, `hm-mgrid-${val(props.shape) ?? "auto"}`, `hm-mgrid-gap-${val(props.gap) ?? "thin"}`, val(props.class));
+      return cx("m-mgrid", `m-mgrid-n${n}`, `m-mgrid-${val(props.shape) ?? "auto"}`, `m-mgrid-gap-${val(props.gap) ?? "thin"}`, val(props.class));
     },
     role: "group", "aria-label": () => val(props.label) ?? t`${val(props.items).length} photos`,
   }, () => {
@@ -85,7 +85,7 @@ export function MediaGrid(props: MediaGridProps): Element {
     const first = all[0];
     // the single photo keeps its own shape within 4:5 … 1.91:1 (a CSS variable, no inline style string)
     const ratio = first?.width && first.height ? clamp(first.width / first.height, 0.8, 1.91) : 1;
-    return h("div", { class: "hm-mgrid-in", ref: (x: HTMLElement) => setStyle(x, { "--hm-mgrid-ratio": ratio }) },
+    return h("div", { class: "m-mgrid-in", ref: (x: HTMLElement) => setStyle(x, { "--m-mgrid-ratio": ratio }) },
       shown.map((it, i) => tile(it, i, all.length, i === shown.length - 1 ? rest : 0)));
   });
 }

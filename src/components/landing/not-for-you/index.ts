@@ -78,35 +78,35 @@ export function NotForYou(props: NotForYouProps): Element {
     // the round mark is a CheckMark: a cross on a "not" line, a tick on a "for" line; on a checkable line its own
     // motion turns the cross into a tick once the line is struck out
     const mark = props.mark === false ? undefined : h(CheckMark, {
-      class: "hm-nfy-mark", variant: "soft", label: false, value: checkable ? on : kind === "for", ...(checkable ? { motion: "flip" } : {}),
+      class: "m-nfy-mark", variant: "soft", label: false, value: checkable ? on : kind === "for", ...(checkable ? { motion: "flip" } : {}),
       ...(own ? { icons: { no: () => own("not", it, i), yes: () => own(checkable ? "marked" : "for", it, i) } } : {}),
     });
     const more = [
-      it.detail != null ? h("span", { class: "hm-nfy-detail" }, it.detail) : null,
-      checkable && it.instead != null ? h("span", { class: "hm-nfy-instead", "aria-hidden": () => String(!on()) }, h("span", { class: "hm-nfy-instead-in" }, it.instead)) : null,
+      it.detail != null ? h("span", { class: "m-nfy-detail" }, it.detail) : null,
+      checkable && it.instead != null ? h("span", { class: "m-nfy-instead", "aria-hidden": () => String(!on()) }, h("span", { class: "m-nfy-instead-in" }, it.instead)) : null,
     ].filter(Boolean);
     // the line itself is a ListRow: mark, text with its detail, and (checkable) the "That's me" label at the end
     const row = (extra: Record<string, unknown>): Element => h(ListRow, { align: "start", overflow: "wrap", lead: mark, title: h("strong", null, it.text), sub: more.length ? more : undefined, ...extra }) as Element;
     if (checkable) {
-      const me = props.meLabel === false ? null : h("span", { class: "hm-nfy-me-label" }, () => props.meLabel ?? t`That's me`);
+      const me = props.meLabel === false ? null : h("span", { class: "m-nfy-me-label" }, () => props.meLabel ?? t`That's me`);
       const hint = props.hint === false && props.markedHint === false ? null
-        : h("small", { class: "hm-nfy-me-hint" }, () => { const x = on() ? props.markedHint ?? t`Not you` : props.hint ?? t`Not you? Tap it!`; return x === false ? null : x; });
+        : h("small", { class: "m-nfy-me-hint" }, () => { const x = on() ? props.markedHint ?? t`Not you` : props.hint ?? t`Not you? Tap it!`; return x === false ? null : x; });
       // the whole card is the checkbox
-      return h("li", { class: "hm-nfy-item" },
-        h("button", { type: "button", class: () => cx("hm-nfy-toggle", on() && "is-on"), role: "checkbox", "aria-checked": () => String(on()), onClick: () => toggle(i) },
-          row({ as: "span", trail: me || hint ? h("span", { class: "hm-nfy-me", "aria-hidden": "true" }, me, hint) : undefined })));
+      return h("li", { class: "m-nfy-item" },
+        h("button", { type: "button", class: () => cx("m-nfy-toggle", on() && "is-on"), role: "checkbox", "aria-checked": () => String(on()), onClick: () => toggle(i) },
+          row({ as: "span", trail: me || hint ? h("span", { class: "m-nfy-me", "aria-hidden": "true" }, me, hint) : undefined })));
     }
-    return h("li", { class: "hm-nfy-item" }, row({ class: "hm-nfy-row" }));
+    return h("li", { class: "m-nfy-item" }, row({ class: "m-nfy-row" }));
   };
   const list = (title: unknown, items: NotForYouItem[], kind: "not" | "for"): Element =>
-    h("section", { class: cx("hm-nfy-col", `hm-nfy-${kind}`) },
-      title === false ? null : h("h3", { class: "hm-nfy-title" }, title),
-      h("ul", { class: "hm-nfy-list", role: "list" }, ...items.map((it, i) => line(it, i, kind))));
+    h("section", { class: cx("m-nfy-col", `m-nfy-${kind}`) },
+      title === false ? null : h("h3", { class: "m-nfy-title" }, title),
+      h("ul", { class: "m-nfy-list", role: "list" }, ...items.map((it, i) => line(it, i, kind))));
 
-  return h("div", { class: () => cx("hm-nfy", `hm-nfy-v-${props.variant ?? "cards"}`, props.forYou?.length && "hm-nfy-both", val(props.class)) },
-    h("div", { class: "hm-nfy-cols" },
+  return h("div", { class: () => cx("m-nfy", `m-nfy-v-${props.variant ?? "cards"}`, props.forYou?.length && "m-nfy-both", val(props.class)) },
+    h("div", { class: "m-nfy-cols" },
       list(props.title ?? t`Not for you if…`, props.items, "not"),
       props.forYou?.length ? list(props.forYouTitle ?? t`For you if…`, props.forYou, "for") : null),
-    props.check && props.verdict !== false ? h("p", { class: () => cx("hm-nfy-verdict", count() >= total && "is-in", count() > 0 && count() < total && "is-some"), role: "status", "aria-live": "polite" },
+    props.check && props.verdict !== false ? h("p", { class: () => cx("m-nfy-verdict", count() >= total && "is-in", count() > 0 && count() < total && "is-some"), role: "status", "aria-live": "polite" },
       () => (props.verdict || notForYouVerdict)(count(), total)) : null);
 }

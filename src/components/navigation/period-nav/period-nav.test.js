@@ -17,7 +17,7 @@ test("PeriodNav: previous / today / next, own texts; no today button without onT
   ]);
   const [a, b] = el.querySelectorAll("[role=group]");
   assert.equal(a.getAttribute("aria-label"), "Month");
-  assert.ok(a.classList.contains("hm-period-nav") && a.classList.contains("hm-btn-group-attached"));
+  assert.ok(a.classList.contains("m-period-nav") && a.classList.contains("m-btn-group-attached"));
   const btns = [...a.querySelectorAll("button")];
   assert.deepEqual(btns.map((x) => x.getAttribute("aria-label") ?? x.textContent), ["Back", "Now", "On"]);
   for (const x of btns) x.click();
@@ -35,23 +35,23 @@ test("PeriodNav: a title between the arrows (today follows), today off / own, ar
     h(PeriodNav, { onPrev: () => {}, onNext: () => {}, onToday: () => {}, today: false }),
     h(PeriodNav, { onPrev: () => {}, onNext: () => {}, arrows: false }, "April"),
   ]);
-  const [a, b, c] = el.querySelectorAll(".hm-period-nav");
-  assert.ok(a.classList.contains("is-titled") && a.classList.contains("mine") && !a.classList.contains("hm-btn-group-attached"));
+  const [a, b, c] = el.querySelectorAll(".m-period-nav");
+  assert.ok(a.classList.contains("is-titled") && a.classList.contains("mine") && !a.classList.contains("m-btn-group-attached"));
   assert.deepEqual([...a.children].map((x) => x.className.split(" ").find((k) => k.startsWith("my-"))), ["my-prev", "my-title", "my-next", "my-today"]);
-  assert.equal(a.querySelector(".hm-period-nav-title").textContent, "March 2026");
+  assert.equal(a.querySelector(".m-period-nav-title").textContent, "March 2026");
   month.set("April 2026");
-  assert.equal(a.querySelector(".hm-period-nav-title").textContent, "April 2026");
+  assert.equal(a.querySelector(".m-period-nav-title").textContent, "April 2026");
   assert.equal(a.querySelector(".my-prev").textContent, "<");
   assert.equal(a.querySelector(".my-next b").textContent, ">");
   assert.equal(a.querySelector(".my-today").textContent, "This month");
   assert.equal(a.querySelector(".my-prev").disabled, true);
   atStart.set(false);
   assert.equal(a.querySelector(".my-prev").disabled, false);
-  assert.equal(a.querySelector(".my-next").getAttribute("data-hm-color"), "brand-orange");
-  assert.ok(a.querySelector(".my-prev").classList.contains("hm-btn-sm"));
+  assert.equal(a.querySelector(".my-next").getAttribute("data-m-color"), "brand-orange");
+  assert.ok(a.querySelector(".my-prev").classList.contains("m-btn-sm"));
   assert.equal(b.querySelectorAll("button").length, 2, "today off");
   assert.equal(c.querySelectorAll("button").length, 0, "arrows off");
-  assert.equal(c.querySelector(".hm-period-nav-title").textContent, "April");
+  assert.equal(c.querySelector(".m-period-nav-title").textContent, "April");
   dispose();
 });
 

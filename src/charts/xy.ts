@@ -201,22 +201,22 @@ function xyChart<D>(props: AreaChartProps<D>, kind: "line" | "area"): Element {
     Grid({ dir: "v", ticks: () => (grid() === "both" || grid() === "x" ? xTicks() : []), box }),
     Axis({ side: "left", ticks: yTicks, box }),
     Axis({ side: "bottom", ticks: xTicks, box }),
-    h("g", { class: "hm-chart-plot", transform: attr(() => `translate(${box().x},${box().y})`) },
+    h("g", { class: "m-chart-plot", transform: attr(() => `translate(${box().x},${box().y})`) },
       each<Series<D>>({ each: visible, key: (s) => s.key, children: (s) => {
         const key = s().key, geo = attr(() => layout().get(key));
-        return h("g", { class: () => `hm-chart-series ${seriesClass(s().index)}`, style: () => colorStyle(props.colors, s().index), "data-series": key },
-          kind === "area" ? h("path", { class: "hm-chart-area", d: attr(() => geo()?.area ?? "") }) : null,
-          h("path", { class: "hm-chart-line", d: attr(() => geo()?.line ?? "") }));
+        return h("g", { class: () => `m-chart-series ${seriesClass(s().index)}`, style: () => colorStyle(props.colors, s().index), "data-series": key },
+          kind === "area" ? h("path", { class: "m-chart-area", d: attr(() => geo()?.area ?? "") }) : null,
+          h("path", { class: "m-chart-line", d: attr(() => geo()?.line ?? "") }));
       } })),
-    h("g", { class: "hm-chart-focus", visibility: () => (active() >= 0 ? "visible" : "hidden"), transform: () => `translate(${focusX()},${box().y})` },
-      h("line", { class: "hm-chart-guide", y1: 0, y2: attr(() => box().h) }),
+    h("g", { class: "m-chart-focus", visibility: () => (active() >= 0 ? "visible" : "hidden"), transform: () => `translate(${focusX()},${box().y})` },
+      h("line", { class: "m-chart-guide", y1: 0, y2: attr(() => box().h) }),
       each<Series<D>>({ each: visible, key: (s) => s.key, children: (s) => {
         const cy = attr(() => { const i = active(), v = i < 0 ? null : stack().get(s().key)?.hi[i]; return v == null ? null : f1(ys()(v)); });
-        return h("circle", { class: () => `hm-chart-marker ${seriesClass(s().index)}`, style: () => colorStyle(props.colors, s().index), r: 4, cx: 0, cy, visibility: () => (cy() == null ? "hidden" : "visible") });
+        return h("circle", { class: () => `m-chart-marker ${seriesClass(s().index)}`, style: () => colorStyle(props.colors, s().index), r: 4, cx: 0, cy, visibility: () => (cy() == null ? "hidden" : "visible") });
       } })),
-    h("rect", { class: "hm-chart-brush", visibility: () => (drag() ? "visible" : "hidden"), y: () => box().y, height: () => box().h,
+    h("rect", { class: "m-chart-brush", visibility: () => (drag() ? "visible" : "hidden"), y: () => box().y, height: () => box().h,
       x: () => box().x + Math.min(...(drag() ?? [0])), width: () => { const d = drag(); return d ? Math.abs(d[1] - d[0]) : 0; } }),
-    h("rect", { class: "hm-chart-overlay", x: () => box().x, y: () => box().y, width: () => box().w, height: () => box().h, ...handlers }),
+    h("rect", { class: "m-chart-overlay", x: () => box().x, y: () => box().y, width: () => box().w, height: () => box().h, ...handlers }),
   ];
 
   const xLabel = (): unknown => read(props.xLabel) ?? (typeof props.x === "string" ? props.x : "x");
@@ -231,7 +231,7 @@ function xyChart<D>(props: AreaChartProps<D>, kind: "line" | "area"): Element {
       columns: () => [{ label: xLabel(), value: (_d: D, i: number) => untrack(xFmt)(xRaw.peek()[i]) },
         ...series().map((s) => ({ label: s.label, value: (d: D, i: number) => untrack(yFmt)(num(s.get(d, i))) }))],
     },
-    extra: [h("button", { type: "button", class: "hm-chart-reset", hidden: () => !zoom(), onClick: () => { zoom.set(null); hide(); } }, "Reset zoom")],
+    extra: [h("button", { type: "button", class: "m-chart-reset", hidden: () => !zoom(), onClick: () => { zoom.set(null); hide(); } }, "Reset zoom")],
   });
 }
 

@@ -33,7 +33,7 @@ as plain JSON. Each panel's content is rendered once and moves between groups wi
 | `icons` | `{ close, maximize, restore, float, dock, minimize }` | — | own icons: an icon, a string or `() => node` |
 | `motion` | boolean | `true` | the pop after a drop, the maximize transition, the ghost fade (the drop preview always follows the pointer) |
 | `labels` | object | — | own texts: `workspace`, `panels`, `tray`, `close`, `maximize`, `restore`, `float`, `dock`, `minimize`, `moveWindow`, `resizeWindow`, `unsaved`, `empty`, `reset`, `layoutReset`, `group(title)`, `moved(title, zone)`, `minimized(title)`, `closed(title)` |
-| `class` | class value | — | on the root (`hm-dock`) |
+| `class` | class value | — | on the root (`m-dock`) |
 
 ```tsx
 <DockLayout panels={panels} actions={["maximize"]} tray={false} motion={false}

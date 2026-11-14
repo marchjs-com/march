@@ -61,7 +61,7 @@ export function BeforeAfter(props: BeforeAfterProps): Element {
   effect(() => { const v = val(props.value); if (v != null) untrack(() => set(v, false)); });
 
   const handle = h("div", {
-    class: "hm-ba-handle", role: "slider", tabindex: "0",
+    class: "m-ba-handle", role: "slider", tabindex: "0",
     "aria-label": () => props.label ?? t`Before and after`,
     "aria-orientation": () => (vertical() ? "vertical" : "horizontal"),
     "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": () => String(Math.round(pos())),
@@ -74,24 +74,24 @@ export function BeforeAfter(props: BeforeAfterProps): Element {
       set(st.home ? 0 : st.end ? 100 : p + (vertical() ? st.dy || st.dx : st.dx || -st.dy) * (props.step ?? 1));
     },
   }, props.grip === false ? null
-    : props.grip && props.grip !== true ? h("span", { class: "hm-ba-grip hm-ba-grip-own", "aria-hidden": "true" }, props.grip)
-    : h("span", { class: "hm-ba-grip", "aria-hidden": "true" }, h("i"), h("i")));
+    : props.grip && props.grip !== true ? h("span", { class: "m-ba-grip m-ba-grip-own", "aria-hidden": "true" }, props.grip)
+    : h("span", { class: "m-ba-grip", "aria-hidden": "true" }, h("i"), h("i")));
 
   // a corner label: a Badge that fades out when the divider reaches its side
   const label = (x: unknown, side: "before" | "after"): Element | null =>
-    x == null ? null : h("span", { class: () => cx("hm-ba-label", `hm-ba-label-${side}`, (side === "before" ? pos() < 14 : pos() > 86) && "is-hidden"), "aria-hidden": "true" }, h(Badge, {}, x));
+    x == null ? null : h("span", { class: () => cx("m-ba-label", `m-ba-label-${side}`, (side === "before" ? pos() < 14 : pos() > 86) && "is-hidden"), "aria-hidden": "true" }, h(Badge, {}, x));
 
   const root = h("div", {
-    class: () => cx("hm-ba", vertical() && "hm-ba-vertical", props.follow && "hm-ba-follow", val(props.class)),
+    class: () => cx("m-ba", vertical() && "m-ba-vertical", props.follow && "m-ba-follow", val(props.class)),
     role: "group", "aria-label": () => props.label ?? t`Before and after`,
   },
-    h("div", { class: "hm-ba-layer hm-ba-after" }, props.after),
-    h("div", { class: "hm-ba-layer hm-ba-before" }, props.before),
+    h("div", { class: "m-ba-layer m-ba-after" }, props.after),
+    h("div", { class: "m-ba-layer m-ba-before" }, props.before),
     label(props.beforeLabel, "before"), label(props.afterLabel, "after"),
     handle) as HTMLElement;
 
   if (props.ratio) setStyle(root, { "aspect-ratio": props.ratio });
-  effect(() => setStyle(root, { "--hm-ba-pos": `${pos()}%` }));
+  effect(() => setStyle(root, { "--m-ba-pos": `${pos()}%` }));
 
   const at = (p: { x: number; y: number }): number => (vertical() ? p.y : p.x) * 100;
   track(root, {

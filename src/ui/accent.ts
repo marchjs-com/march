@@ -1,6 +1,6 @@
 // App accent color: one choice that recolors every component that has no `color` of its own (fills, focus rings, links,
-// active navigation, primary buttons). setAccent("brand-green") sets <html data-hm-accent>, which remaps the theme's
-// primary color family (accent.css). The choice is remembered (localStorage "hm.accent"). `<AccentPicker />` is the menu.
+// active navigation, primary buttons). setAccent("brand-green") sets <html data-m-accent>, which remaps the theme's
+// primary color family (accent.css). The choice is remembered (localStorage "m.accent"). `<AccentPicker />` is the menu.
 import "./accent.css";
 import "./theme.css";
 import { signal, untrack } from "../core/reactive.ts";
@@ -14,7 +14,7 @@ import { OptionList } from "../components/forms/option-list/index.ts";
 import { Swatch } from "../components/forms/swatch/index.ts";
 import { ThemeSwatch, colorTheme, restyleInstantly } from "./theme.ts";
 
-const KEY = "hm.accent";
+const KEY = "m.accent";
 /** The current app accent ("primary" = the theme's own). */
 export const accent = signal<ColorToken>((load<string | null>(KEY, null) as ColorToken | null) ?? "primary", { name: "accent" });
 
@@ -24,7 +24,7 @@ export function setAccent(token: ColorToken | null | undefined): ColorToken {
   accent.set(next);
   save(KEY, next === "primary" ? null : next);
   const html = globalThis.document?.documentElement;
-  if (html) restyleInstantly(() => { if (next === "primary") html.removeAttribute("data-hm-accent"); else html.setAttribute("data-hm-accent", next); });
+  if (html) restyleInstantly(() => { if (next === "primary") html.removeAttribute("data-m-accent"); else html.setAttribute("data-m-accent", next); });
   return next;
 }
 // apply the remembered choice as soon as the module loads (no flash)
@@ -40,7 +40,7 @@ export function accentList(choices: readonly ColorToken[] = ACCENT_CHOICES): Ele
   // "primary" = the theme's own colors (a swatch scoped to the theme, untouched by the accent); the others a Swatch of the token
   const dot = (c: ColorToken): unknown => (c === "primary" ? () => h(ThemeSwatch, { id: colorTheme() }) : h(Swatch, { color: c, size: "xs", shape: "circle", checker: false }));
   return h(OptionList<ColorToken>, {
-    class: "hm-accent-list", label: () => t`Accent`, columns: 2, size: "sm", value: () => accent(), onPick: (c: ColorToken) => { setAccent(c); },
+    class: "m-accent-list", label: () => t`Accent`, columns: 2, size: "sm", value: () => accent(), onPick: (c: ColorToken) => { setAccent(c); },
     options: choices.map((c) => ({ value: c, label: () => t(LABELS[c] ?? c), icon: dot(c) })),
   }) as Element;
 }
@@ -48,7 +48,7 @@ export function accentList(choices: readonly ColorToken[] = ACCENT_CHOICES): Ele
 /** Accent menu for a top bar: `<AccentPicker />` next to `<ThemePicker />`. */
 export function AccentPicker(props: AccentPickerProps = {}): unknown {
   return h(Dropdown, {
-    icon: droplet, label: () => val(props.label) ?? t`Accent`, placement: props.placement ?? "bottom-end", class: props.class, panelClass: "hm-theme-panel hm-accent-panel",
+    icon: droplet, label: () => val(props.label) ?? t`Accent`, placement: props.placement ?? "bottom-end", class: props.class, panelClass: "m-theme-panel m-accent-panel",
     children: [accentList(props.choices)],
   });
 }

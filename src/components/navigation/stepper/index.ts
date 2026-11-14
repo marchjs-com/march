@@ -55,12 +55,12 @@ export function Stepper(props: StepperProps): Element {
   const vertical = (): boolean => !!val(props.vertical);
   const morph = (): boolean => val(props.morph) !== false;
   const n = props.steps.length;
-  const panelId = uid("hm-stepper-panel");
+  const panelId = uid("m-stepper-panel");
   let root!: HTMLElement, blob: HTMLElement | undefined, frame: HTMLElement | null = null;
   const rtl = (): boolean => isRtl(root);
   /** The dot of step i, in px relative to the root (physical: measured). */
   const dotBox = (i: number): { x: number; y: number; w: number; h: number } | null => {
-    const dot = root?.querySelectorAll<HTMLElement>(".hm-step2-dot")[i];
+    const dot = root?.querySelectorAll<HTMLElement>(".m-step2-dot")[i];
     if (!dot || typeof dot.getBoundingClientRect !== "function") return null;
     const r = dot.getBoundingClientRect(), o = root.getBoundingClientRect();
     const pad = 6;
@@ -94,7 +94,7 @@ export function Stepper(props: StepperProps): Element {
   const showPanel = (i: number, prev: number): void => {
     if (!frame) return;
     const old = frame.firstElementChild as HTMLElement | null;
-    const next = h("div", { class: "hm-stepper-pane" }, panelOf(i)) as HTMLElement;
+    const next = h("div", { class: "m-stepper-pane" }, panelOf(i)) as HTMLElement;
     if (!old || reducedMotion() || prev < 0 || !morph()) { frame.replaceChildren(next); return; }
     const h0 = frame.offsetHeight;
     setStyle(old, { position: "absolute", "inset-inline": "0", "inset-block-start": "0" });
@@ -111,14 +111,14 @@ export function Stepper(props: StepperProps): Element {
   const withNav = props.nav ?? (!!props.panels && !!props.onSelect);
   const go = (i: number): void => props.onSelect?.(clamp(i, 0, n - 1));
   const counter = props.counter, stepName = props.labels?.step;
-  const el = h("div", { ref: (x: HTMLElement) => { root = x; }, class: () => cx("hm-stepper", vertical() && "hm-stepper-v", val(props.class)), "data-hm-color": () => colorAttr(props.color) },
-    props.highlight !== false && h("span", { class: "hm-stepper-blob", "aria-hidden": "true", ref: (x: HTMLElement) => { blob = x; } }),
+  const el = h("div", { ref: (x: HTMLElement) => { root = x; }, class: () => cx("m-stepper", vertical() && "m-stepper-v", val(props.class)), "data-m-color": () => colorAttr(props.color) },
+    props.highlight !== false && h("span", { class: "m-stepper-blob", "aria-hidden": "true", ref: (x: HTMLElement) => { blob = x; } }),
     h(Steps, { steps: props.steps, current: cur, ...(props.onSelect ? { onSelect: props.onSelect } : {}), vertical: reactive(vertical) as never,
       doneIcon: props.doneIcon, renderDot: props.renderDot, connector: props.connector }),
-    props.panels && h("div", { class: "hm-stepper-frame", id: panelId, role: "region", "aria-live": "polite", "aria-label": () => (stepName ? stepName(cur(), n) : t`Step ${cur() + 1} of ${n}`), ref: (x: HTMLElement) => { frame = x; } }),
-    withNav && h("div", { class: "hm-stepper-nav" },
+    props.panels && h("div", { class: "m-stepper-frame", id: panelId, role: "region", "aria-live": "polite", "aria-label": () => (stepName ? stepName(cur(), n) : t`Step ${cur() + 1} of ${n}`), ref: (x: HTMLElement) => { frame = x; } }),
+    withNav && h("div", { class: "m-stepper-nav" },
       h(Button, { variant: "secondary", disabled: () => cur() === 0, onClick: () => go(cur() - 1), "aria-controls": panelId }, () => val(props.labels?.back) ?? t`Back`),
-      counter !== false && h("span", { class: "hm-stepper-count", "aria-hidden": "true" }, () => (typeof counter === "function" ? counter(cur(), n) : `${cur() + 1} / ${n}`)),
+      counter !== false && h("span", { class: "m-stepper-count", "aria-hidden": "true" }, () => (typeof counter === "function" ? counter(cur(), n) : `${cur() + 1} / ${n}`)),
       h(Button, { variant: "primary", onClick: () => (cur() === n - 1 ? props.onFinish?.() : go(cur() + 1)), "aria-controls": panelId },
         () => (cur() === n - 1 ? val(props.finishLabel) ?? t`Finish` : val(props.labels?.next) ?? t`Next`))),
   ) as Element;

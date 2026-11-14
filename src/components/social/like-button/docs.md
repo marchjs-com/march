@@ -24,7 +24,7 @@ global speed, "pause all" and reduced motion apply (reduced motion keeps only th
 | `pop` | boolean | true | the pop of the icon on toggle |
 | `burstOptions` | `{ count, radius, ring }` | — | shape of the burst |
 | `countFormat` | `compact` `full` | `compact` | text of the count |
-| `class` | string | — | on the button (`hm-like`; parts: `hm-like-hit`, `hm-like-heart`, `hm-like-count`) |
+| `class` | string | — | on the button (`m-like`; parts: `m-like-hit`, `m-like-heart`, `m-like-count`) |
 
 ```tsx
 <LikeButton liked={$on} onToggle={set} icon={<Icon of={star} />} color="brand-gold" label="Favourite"

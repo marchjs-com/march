@@ -18,7 +18,7 @@ export interface FieldCtx {
 }
 
 /** Context set by <Field>: { id, describedby(), invalid() } — controls pick their id / aria attributes from it. */
-export const FieldContext: { id: symbol; defaultValue: FieldCtx | null } = { id: Symbol("hm.field"), defaultValue: null };
+export const FieldContext: { id: symbol; defaultValue: FieldCtx | null } = { id: Symbol("m.field"), defaultValue: null };
 
 /** A class prop: the same as every ui component (strings, arrays, { name: bool }, accessors). */
 export type { ClassProp } from "../core/util.ts";
@@ -132,7 +132,7 @@ export function ctl(props: CommonProps, extra: Record<string, unknown> = {}): Ct
     "aria-invalid": () => (props.invalid ?? fc?.invalid?.() ? "true" : null),
     "aria-describedby": () => props.describedby ?? (fc?.describedby?.() || null),
     "aria-label": () => props["aria-label"] ?? props.ariaLabel ?? null,
-    "data-hm-color": () => colorAttr(props.color),
+    "data-m-color": () => colorAttr(props.color),
     onBlur: props.onBlur,
     onFocus: props.onFocus,
     ...extra,

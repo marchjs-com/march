@@ -20,7 +20,7 @@ test("model: sampling with the engine's easings, CSS variables, engine code", ()
   assert.equal(M.sampleTrack(MODEL.tracks[1], 900), 1, "after the last key: its value");
   assert.equal(M.sampleTrack(MODEL.tracks[2], 0), 1, "before the first key: its value");
   assert.deepEqual(M.sample(MODEL, 500), { logo: { x: 50, opacity: 1 }, title: { scale: 1 } });
-  assert.deepEqual(M.targetVars({ x: 12.3456, opacity: 0.5 }), { "--hm-kt-x": "12.346", "--hm-kt-y": "0", "--hm-kt-s": "1", "--hm-kt-r": "0", "--hm-kt-o": "0.5" });
+  assert.deepEqual(M.targetVars({ x: 12.3456, opacity: 0.5 }), { "--m-kt-x": "12.346", "--m-kt-y": "0", "--m-kt-s": "1", "--m-kt-r": "0", "--m-kt-o": "0.5" });
   assert.match(M.timelineCode(MODEL), /\.add\("#logo", \[\{ translate: "0px 0" \}, \{ translate: "100px 0" \}\], \{ at: 0, duration: 1000, easing: "linear" \}\)/);
 });
 
@@ -29,8 +29,8 @@ test("KeyframeTimeline: lanes with keyframe sliders, keyboard moves and deletes,
   const el = document.createElement("div");
   document.body.appendChild(el);
   const dispose = render(() => h(KeyframeTimeline, { "bind:value": v }), el);
-  assert.equal(el.querySelectorAll(".hm-kt-row").length, 3);
-  const keys = () => el.querySelectorAll(".hm-kt-key");
+  assert.equal(el.querySelectorAll(".m-kt-row").length, 3);
+  const keys = () => el.querySelectorAll(".m-kt-key");
   assert.equal(keys().length, 5);
   assert.equal(keys()[1].getAttribute("aria-label"), "Keyframe 2 of logo x");
   assert.equal(keys()[1].getAttribute("aria-valuenow"), "1000");
@@ -40,13 +40,13 @@ test("KeyframeTimeline: lanes with keyframe sliders, keyboard moves and deletes,
   assert.equal(v().tracks[1].keys.length, 1);
   keys()[3].dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
   assert.equal(v().tracks[2].keys.length, 1, "a track keeps its last keyframe");
-  const head = el.querySelector(".hm-kt-head");
+  const head = el.querySelector(".m-kt-head");
   head.dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "End", bubbles: true }));
   assert.equal(head.getAttribute("aria-valuetext"), "00:01.00");
-  assert.equal(el.querySelector(".hm-kt-time b").textContent, "00:01.00");
-  assert.deepEqual(el.querySelectorAll(".hm-kt-transport button").map((b) => b.getAttribute("aria-label")).filter(Boolean), ["Play", "Back to start", "Loop"]);
-  assert.deepEqual(el.querySelectorAll(".hm-kt-speed [role=radio]").map((b) => b.textContent), ["0.25×", "0.5×", "1×", "2×"]);
-  assert.equal(el.querySelectorAll(".hm-kt-actor").length, 2, "one preview target per target name");
+  assert.equal(el.querySelector(".m-kt-time b").textContent, "00:01.00");
+  assert.deepEqual(el.querySelectorAll(".m-kt-transport button").map((b) => b.getAttribute("aria-label")).filter(Boolean), ["Play", "Back to start", "Loop"]);
+  assert.deepEqual(el.querySelectorAll(".m-kt-speed [role=radio]").map((b) => b.textContent), ["0.25×", "0.5×", "1×", "2×"]);
+  assert.equal(el.querySelectorAll(".m-kt-actor").length, 2, "one preview target per target name");
   dispose();
 });
 
@@ -59,23 +59,23 @@ test("KeyframeTimeline: playback bar in parts or off, no curves, no inspector, o
     h(KeyframeTimeline, { value: structuredClone(MODEL), transport: false, inspector: false }),
     h(KeyframeTimeline, { value: structuredClone(MODEL), hint: false }),
   ], el);
-  const [a, b, c] = el.querySelectorAll(".hm-kt");
+  const [a, b, c] = el.querySelectorAll(".m-kt");
   assert.ok(a.classList.contains("mine"));
   assert.equal(a.getAttribute("aria-label"), "Motion");
-  assert.deepEqual(a.querySelectorAll(".hm-kt-transport button").map((x) => x.getAttribute("aria-label")).filter(Boolean), ["Start"]);
-  assert.equal(a.querySelector(".hm-kt-time"), null);
-  assert.deepEqual(a.querySelectorAll(".hm-kt-speed [role=radio]").map((x) => x.textContent), ["1×", "3×"]);
-  assert.equal(a.querySelector(".hm-kt-spark"), null);
-  assert.equal(a.querySelector(".hm-kt-head").getAttribute("aria-label"), "Needle");
-  assert.equal(a.querySelector(".hm-kt-key").getAttribute("aria-label"), "logo.x #1");
-  assert.equal(a.querySelector(".hm-kt-lane").getAttribute("aria-label"), "logo.x");
-  assert.equal(a.querySelector(".hm-kt-empty").textContent, "Pick a key");
-  assert.equal(b.querySelector(".hm-kt-transport"), null);
-  assert.equal(b.querySelector(".hm-kt-empty"), null);
-  assert.ok(b.querySelector(".hm-kt-spark"), "the default parts stay");
-  b.querySelector(".hm-kt-key").dispatchEvent(new globalThis.Event("focus"));
-  assert.equal(b.querySelector(".hm-kt-inspector"), null);
-  assert.equal(c.querySelector(".hm-kt-empty"), null);
-  assert.equal(c.querySelectorAll(".hm-kt-transport button").length >= 3, true);
+  assert.deepEqual(a.querySelectorAll(".m-kt-transport button").map((x) => x.getAttribute("aria-label")).filter(Boolean), ["Start"]);
+  assert.equal(a.querySelector(".m-kt-time"), null);
+  assert.deepEqual(a.querySelectorAll(".m-kt-speed [role=radio]").map((x) => x.textContent), ["1×", "3×"]);
+  assert.equal(a.querySelector(".m-kt-spark"), null);
+  assert.equal(a.querySelector(".m-kt-head").getAttribute("aria-label"), "Needle");
+  assert.equal(a.querySelector(".m-kt-key").getAttribute("aria-label"), "logo.x #1");
+  assert.equal(a.querySelector(".m-kt-lane").getAttribute("aria-label"), "logo.x");
+  assert.equal(a.querySelector(".m-kt-empty").textContent, "Pick a key");
+  assert.equal(b.querySelector(".m-kt-transport"), null);
+  assert.equal(b.querySelector(".m-kt-empty"), null);
+  assert.ok(b.querySelector(".m-kt-spark"), "the default parts stay");
+  b.querySelector(".m-kt-key").dispatchEvent(new globalThis.Event("focus"));
+  assert.equal(b.querySelector(".m-kt-inspector"), null);
+  assert.equal(c.querySelector(".m-kt-empty"), null);
+  assert.equal(c.querySelectorAll(".m-kt-transport button").length >= 3, true);
   dispose();
 });

@@ -29,7 +29,7 @@ export interface Driver<T = unknown> {
   end?(target: T, props: string[]): void;
 }
 /** Targets can carry their own driver under this key (canvas2d(), webgl(), cssVars() targets do). */
-export const DRIVER: unique symbol = Symbol.for("hm.motion.driver") as never;
+export const DRIVER: unique symbol = Symbol.for("m.motion.driver") as never;
 
 const custom: Driver[] = [];
 /** Register a driver for a new kind of target. Later registrations win over earlier ones and over the built-ins. */

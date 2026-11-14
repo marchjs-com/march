@@ -1,40 +1,40 @@
 /* March — PostCard. Flat card with a soft accent shadow (HADİ feed), header 38px avatar, 26px action icons. */
 /* the frame is a Card (flush; `plain` in the flat look); here its softer border, rounder corners and the accent shadow */
-.hm-post { color: var(--hm-text); }
-.hm-post.hm-card > .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-2); padding-block: var(--hm-space-3); }
-.hm-post-card.hm-card { border-color: var(--hm-border-subtle, var(--hm-border)); border-radius: var(--hm-radius-4);
-  box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 22%, transparent); }
-.hm-post-flat.hm-card { border-block-end: 1px solid var(--hm-border-subtle, var(--hm-border)); }
-.hm-post-head { display: flex; align-items: center; gap: var(--hm-space-2); padding-inline: var(--hm-space-3) var(--hm-space-2); min-width: 0; }
+.m-post { color: var(--m-text); }
+.m-post.m-card > .m-card-body { display: flex; flex-direction: column; gap: var(--m-space-2); padding-block: var(--m-space-3); }
+.m-post-card.m-card { border-color: var(--m-border-subtle, var(--m-border)); border-radius: var(--m-radius-4);
+  box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--m-accent, var(--m-primary)) 22%, transparent); }
+.m-post-flat.m-card { border-block-end: 1px solid var(--m-border-subtle, var(--m-border)); }
+.m-post-head { display: flex; align-items: center; gap: var(--m-space-2); padding-inline: var(--m-space-3) var(--m-space-2); min-width: 0; }
 /* who: a ListRow without its own padding or hover fill */
-.hm-post-who.hm-listrow { flex: 1 1 auto; gap: .625rem; inline-size: auto; min-block-size: 0; padding: 0; color: inherit; }
-.hm-post-who.hm-listrow.is-action:hover { background: none; }
-.hm-post-who.hm-listrow:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-primary)); outline-offset: 2px; }
-.hm-post-who .hm-listrow-text { gap: .0625rem; }
-.hm-post-name { display: inline-flex; align-items: center; gap: .25rem; min-width: 0; font-weight: 800; font-size: var(--hm-text-md); }
-.hm-post-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hm-post-meta { display: flex; align-items: center; gap: .375rem; min-width: 0; color: var(--hm-text-3, var(--hm-muted)); font-size: var(--hm-text-xs); font-weight: 500; white-space: nowrap; overflow: hidden; }
-.hm-post-place { display: inline-flex; align-items: center; gap: .1875rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.hm-post-place::before { content: "·"; margin-inline-end: .1875rem; }
-.hm-post-place .hm-svg { width: .8125rem; height: .8125rem; flex: none; color: var(--hm-brand-orange, var(--hm-primary)); }
-.hm-post-head > :not(.hm-post-who) { flex: none; }
-.hm-post-media { position: relative; margin-inline: var(--hm-space-2); }
-.hm-post-flat .hm-post-media { margin-inline: 0; }
-.hm-post-big { position: absolute; inset-inline-start: 50%; inset-block-start: 50%; width: 6.5rem; height: 6.5rem; margin: -3.25rem; display: grid; place-items: center; pointer-events: none;
-  color: var(--hm-on-scrim); filter: drop-shadow(0 6px 18px color-mix(in srgb, var(--hm-scrim) 45%, transparent)); z-index: 2; }
-.hm-post-big[hidden] { display: none; }
-.hm-post-big .hm-svg { width: 100%; height: 100%; fill: currentColor; stroke: none; }
-.hm-post-media .hm-burst { z-index: 3; }
-.hm-post-actions { display: flex; align-items: center; gap: var(--hm-space-1); padding-inline: var(--hm-space-2); }
+.m-post-who.m-listrow { flex: 1 1 auto; gap: .625rem; inline-size: auto; min-block-size: 0; padding: 0; color: inherit; }
+.m-post-who.m-listrow.is-action:hover { background: none; }
+.m-post-who.m-listrow:focus-visible { outline: 2px solid var(--m-accent, var(--m-primary)); outline-offset: 2px; }
+.m-post-who .m-listrow-text { gap: .0625rem; }
+.m-post-name { display: inline-flex; align-items: center; gap: .25rem; min-width: 0; font-weight: 800; font-size: var(--m-text-md); }
+.m-post-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-post-meta { display: flex; align-items: center; gap: .375rem; min-width: 0; color: var(--m-text-3, var(--m-muted)); font-size: var(--m-text-xs); font-weight: 500; white-space: nowrap; overflow: hidden; }
+.m-post-place { display: inline-flex; align-items: center; gap: .1875rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.m-post-place::before { content: "·"; margin-inline-end: .1875rem; }
+.m-post-place .m-svg { width: .8125rem; height: .8125rem; flex: none; color: var(--m-brand-orange, var(--m-primary)); }
+.m-post-head > :not(.m-post-who) { flex: none; }
+.m-post-media { position: relative; margin-inline: var(--m-space-2); }
+.m-post-flat .m-post-media { margin-inline: 0; }
+.m-post-big { position: absolute; inset-inline-start: 50%; inset-block-start: 50%; width: 6.5rem; height: 6.5rem; margin: -3.25rem; display: grid; place-items: center; pointer-events: none;
+  color: var(--m-on-scrim); filter: drop-shadow(0 6px 18px color-mix(in srgb, var(--m-scrim) 45%, transparent)); z-index: 2; }
+.m-post-big[hidden] { display: none; }
+.m-post-big .m-svg { width: 100%; height: 100%; fill: currentColor; stroke: none; }
+.m-post-media .m-burst { z-index: 3; }
+.m-post-actions { display: flex; align-items: center; gap: var(--m-space-1); padding-inline: var(--m-space-2); }
 /* count buttons: ghost pill Buttons; without a handler the count is only shown */
-.hm-post-act.hm-btn { gap: .375rem; padding: 0 .5rem; font-size: var(--hm-text-sm); font-weight: 800; }
-.hm-post-act.hm-btn:disabled { opacity: 1; cursor: default; background: none; color: var(--hm-text-2); }
-.hm-post-act .hm-icon, .hm-post-big .hm-icon { display: inline-grid; place-items: center; }
-.hm-post-act.hm-btn .hm-svg { width: 1.375rem; height: 1.375rem; }
-.hm-post-body { padding-inline: var(--hm-space-4); min-width: 0; }
-.hm-post-body .hm-clamp-text { font-size: var(--hm-text-md); line-height: 1.45; }
-.hm-post-handle { font-weight: 800; }
+.m-post-act.m-btn { gap: .375rem; padding: 0 .5rem; font-size: var(--m-text-sm); font-weight: 800; }
+.m-post-act.m-btn:disabled { opacity: 1; cursor: default; background: none; color: var(--m-text-2); }
+.m-post-act .m-icon, .m-post-big .m-icon { display: inline-grid; place-items: center; }
+.m-post-act.m-btn .m-svg { width: 1.375rem; height: 1.375rem; }
+.m-post-body { padding-inline: var(--m-space-4); min-width: 0; }
+.m-post-body .m-clamp-text { font-size: var(--m-text-md); line-height: 1.45; }
+.m-post-handle { font-weight: 800; }
 /* "more" and "View all N comments": link Buttons in the quiet text color */
-.hm-post-body .hm-clamp-toggle, .hm-post-all.hm-btn { margin-block-start: 0; font-size: var(--hm-text-sm); font-weight: 700; color: var(--hm-text-3, var(--hm-muted)); }
-.hm-post-all.hm-btn { align-self: flex-start; margin-inline: var(--hm-space-4); }
-.hm-post-body .hm-clamp-toggle:hover, .hm-post-all.hm-btn:hover { color: var(--hm-text); text-decoration: none; }
+.m-post-body .m-clamp-toggle, .m-post-all.m-btn { margin-block-start: 0; font-size: var(--m-text-sm); font-weight: 700; color: var(--m-text-3, var(--m-muted)); }
+.m-post-all.m-btn { align-self: flex-start; margin-inline: var(--m-space-4); }
+.m-post-body .m-clamp-toggle:hover, .m-post-all.m-btn:hover { color: var(--m-text); text-decoration: none; }

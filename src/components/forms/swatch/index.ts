@@ -11,8 +11,8 @@ import { ownIcon } from "../../../ui/parts.ts";
 import { COLOR_TOKENS } from "../../../theme/colors.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 
-/** Class of the shared checkerboard background (shows through transparent colours): `class={CHECKER}`. Tune with `--hm-checker-size`. */
-export const CHECKER = "hm-checker";
+/** Class of the shared checkerboard background (shows through transparent colours): `class={CHECKER}`. Tune with `--m-checker-size`. */
+export const CHECKER = "m-checker";
 
 export interface SwatchProps {
   /** A CSS colour ("#ff7a1a", "oklch(…)", "rgb(0 0 0 / .4)"), a gradient ("linear-gradient(…)") or a theme token ("brand-blue"). */
@@ -55,16 +55,16 @@ export function Swatch(props: SwatchProps): Element {
     "aria-label": label,
     ...(said ? { [said]: () => String(on()) } : {}),
     ...rest(props, ["color", "selected", "label", "size", "shape", "checker", "mark", "onClick", "disabled"]),
-    class: () => cx("hm-sample", `hm-sample-${val(props.size) ?? "md"}`, `hm-sample-${val(props.shape) ?? "round"}`, val(props.checker) !== false && CHECKER, on() && "is-selected", val(props.class)),
+    class: () => cx("m-sample", `m-sample-${val(props.size) ?? "md"}`, `m-sample-${val(props.shape) ?? "round"}`, val(props.checker) !== false && CHECKER, on() && "is-selected", val(props.class)),
   },
-  h("span", { class: "hm-sample-fill", "aria-hidden": "true" }),
-  props.children != null ? h("span", { class: "hm-sample-body" }, props.children) : null,
-  props.mark == null || props.mark === false ? null : () => (on() ? h("span", { class: "hm-sample-mark", "aria-hidden": "true" }, ownIcon(props.mark, check, "hm-sample-mark-own")) : null)) as HTMLElement;
-  // the colour: a theme token through data-hm-color, anything else as a custom property (CSSOM: CSP safe)
+  h("span", { class: "m-sample-fill", "aria-hidden": "true" }),
+  props.children != null ? h("span", { class: "m-sample-body" }, props.children) : null,
+  props.mark == null || props.mark === false ? null : () => (on() ? h("span", { class: "m-sample-mark", "aria-hidden": "true" }, ownIcon(props.mark, check, "m-sample-mark-own")) : null)) as HTMLElement;
+  // the colour: a theme token through data-m-color, anything else as a custom property (CSSOM: CSP safe)
   effect(() => {
     const c = val(props.color) || null, token = !!c && isToken(c);
-    if (token) el.setAttribute("data-hm-color", c as string); else el.removeAttribute("data-hm-color");
-    setStyle(el, { "--hm-sample": token ? null : c });
+    if (token) el.setAttribute("data-m-color", c as string); else el.removeAttribute("data-m-color");
+    setStyle(el, { "--m-sample": token ? null : c });
   });
   return el;
 }

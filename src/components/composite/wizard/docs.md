@@ -33,7 +33,7 @@ A new `steps` list builds the form again from the first step, keeping the values
 | `count` | boolean | `true` | the "Step 2 of 3" text beside the buttons |
 | `backButton` | boolean | `true` | the Back button (`onReady`'s `back()` still works) |
 | `labels` | `{ back, next, step(i), count(i, total) }` | `t` texts | button texts (nodes), the title of an untitled step, the count text; `i` is 0-based |
-| `class` | class | — | on the form (`hm-wizard`); parts: `hm-wizard-steps`, `-progress`, `-step`, `-title`, `-nav`, `-count`, `-back`, `-next` |
+| `class` | class | — | on the form (`m-wizard`); parts: `m-wizard-steps`, `-progress`, `-step`, `-title`, `-nav`, `-count`, `-back`, `-next` |
 
 ```tsx
 <Wizard steps={steps} stepper={false} count={false}

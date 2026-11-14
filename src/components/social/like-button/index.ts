@@ -54,11 +54,11 @@ export function LikeButton(props: LikeButtonProps): Element {
   // a ghost pill Button with a pressed state; the count rolls in its label
   return h(Button, {
     variant: "ghost", shape: "pill", pressed: () => !!val(props.liked), color: live((): ColorToken => props.color ?? "brand-pink"),
-    class: () => cx("hm-like", `hm-like-${val(props.size) ?? "md"}`, val(props.liked) && "is-liked", val(props.class)),
+    class: () => cx("m-like", `m-like-${val(props.size) ?? "md"}`, val(props.liked) && "is-liked", val(props.class)),
     "aria-label": () => val(props.label) ?? t`Like`,
     onClick: toggle,
-    icon: h("span", { class: "hm-like-hit", ref: (x: HTMLElement) => { hit = x; } },
-      h("span", { class: "hm-like-heart", ref: (x: HTMLElement) => { icon = x; } }, typeof own === "function" ? () => own(!!val(props.liked)) : own ?? glyph(heart))),
-    children: props.count !== undefined ? h(CountRoll, { value: () => val(props.count) ?? 0, hideZero: true, format: () => val(props.countFormat), class: "hm-like-count" }) : null,
+    icon: h("span", { class: "m-like-hit", ref: (x: HTMLElement) => { hit = x; } },
+      h("span", { class: "m-like-heart", ref: (x: HTMLElement) => { icon = x; } }, typeof own === "function" ? () => own(!!val(props.liked)) : own ?? glyph(heart))),
+    children: props.count !== undefined ? h(CountRoll, { value: () => val(props.count) ?? 0, hideZero: true, format: () => val(props.countFormat), class: "m-like-count" }) : null,
   }) as Element;
 }

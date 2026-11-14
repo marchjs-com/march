@@ -93,7 +93,7 @@ test("starting a new animation on the same element replaces the old one", () => 
   const a = T.wave(el);
   const b = T.pulse(el);
   assert.equal(a.playback.state, "idle", "the loop was stopped");
-  assert.equal(el.querySelectorAll(".hm-tx").length, 1, "one split at a time");
+  assert.equal(el.querySelectorAll(".m-tx").length, 1, "one split at a time");
   b.stop();
 });
 
@@ -121,7 +121,7 @@ test("content effects: typewriter, scramble, counter, typeLoop, wordCycle", asyn
   run(352);
   const shown = tw.split.parts.filter((p) => p.style.visibility !== "hidden").length;
   assert.ok(shown >= 3 && shown <= 5, `half way: ${shown} of 7 typed`);
-  assert.ok(el.querySelector(".hm-tx-caret"), "caret while typing");
+  assert.ok(el.querySelector(".m-tx-caret"), "caret while typing");
   tw.stop();
   const sc = T.scramble(el, { duration: 1000 });
   run(100);

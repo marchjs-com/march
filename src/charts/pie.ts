@@ -105,14 +105,14 @@ export function PieChart<D>(props: PieChartProps<D>): Element {
   const activeKey = (): string | undefined => slices()[active()]?.key;
 
   const body = [
-    h("g", { class: "hm-chart-plot", onPointerLeave: hide },
+    h("g", { class: "m-chart-plot", onPointerLeave: hide },
       each<Slice<D>>({ each: slices, key: (s) => s.key, children: (s) => h("path", {
-        class: () => `hm-chart-slice ${seriesClass(s().index)}`, "class:hm-chart-active": () => activeKey() === s().key,
+        class: () => `m-chart-slice ${seriesClass(s().index)}`, "class:m-chart-active": () => activeKey() === s().key,
         style: () => colorStyle(props.colors, s().index), d: attr(() => s().d),
         onPointerEnter: () => show(slices().findIndex((x) => x.key === s().key)),
         onClick: () => select(slices().findIndex((x) => x.key === s().key)),
       }) })),
-    () => (geo().r0 > 0 ? h("text", { class: "hm-chart-center", x: () => geo().cx, y: () => geo().cy, "text-anchor": "middle", "dominant-baseline": "middle" },
+    () => (geo().r0 > 0 ? h("text", { class: "m-chart-center", x: () => geo().cx, y: () => geo().cy, "text-anchor": "middle", "dominant-baseline": "middle" },
       () => { const c = read(props.center); return c ?? fmt()(total()); }) : null),
   ];
 

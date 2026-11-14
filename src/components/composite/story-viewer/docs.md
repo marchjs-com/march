@@ -27,7 +27,7 @@ and focus returns to the ring that opened it.
 | `arrows` | boolean | `true` | the previous / next buttons (taps, swipes and ← → still move) |
 | `sentNote` | boolean | `true` | the "Sent" note after a reply |
 | `labels` | object | `t` texts | `dialog`, `play`, `pause`, `close`, `previous`, `next`, `like`, `send`, `sent`, `reply(group)`, `replyPlaceholder(group)`, `status(group, index, total)` |
-| `class` | class | — | on the dialog; parts: `hm-story-stage`, `-top`, `-head`, `-who`, `-time`, `-pause`, `-close`, `-caption`, `-prev`, `-next`, `-bar`, `-input`, `-send`, `-sent` |
+| `class` | class | — | on the dialog; parts: `m-story-stage`, `-top`, `-head`, `-who`, `-time`, `-pause`, `-close`, `-caption`, `-prev`, `-next`, `-bar`, `-input`, `-send`, `-sent` |
 
 ```tsx
 <StoryViewer open={$open} onClose={close} groups={stories} arrows={false} pauseButton={false} time={false}

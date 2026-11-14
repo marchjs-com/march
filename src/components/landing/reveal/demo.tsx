@@ -19,7 +19,7 @@ export default function RevealDemo(props: { values: { effect: string; stagger: n
       $run
       const v = { ...props.values }
       return <Reveal class="sc-reveal-row" effect={v.effect === "own" ? TURN : v.effect as RevealEffect} stagger={v.stagger} scrub={v.scrub}>
-        {["Hızlı", "Erişilebilir", "Temalı", "Küçük"].map((t, i) => <div class="sc-reveal-card"><strong>{t}</strong><span class="hm-muted">Kart {i + 1}</span></div>)}
+        {["Hızlı", "Erişilebilir", "Temalı", "Küçük"].map((t, i) => <div class="sc-reveal-card"><strong>{t}</strong><span class="m-muted">Kart {i + 1}</span></div>)}
       </Reveal>
     }}
   </div>

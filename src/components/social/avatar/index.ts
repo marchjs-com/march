@@ -46,8 +46,8 @@ export function Avatar(props: AvatarProps): Element {
   const failed = signal(false);
   const fixed = (): string | null => colorAttr(val(props.color));
   return h("span", {
-    class: () => cx("hm-avatar", `hm-avatar-${val(props.size) ?? "md"}`, !fixed() && `hm-avatar-c${hue(val(props.name))}`, val(props.shape) === "square" && "hm-avatar-square", val(props.class)),
-    "data-hm-color": fixed,
+    class: () => cx("m-avatar", `m-avatar-${val(props.size) ?? "md"}`, !fixed() && `m-avatar-c${hue(val(props.name))}`, val(props.shape) === "square" && "m-avatar-square", val(props.class)),
+    "data-m-color": fixed,
     role: props.decorative ? null : "img", "aria-hidden": props.decorative ? "true" : null,
     "aria-label": () => (props.decorative ? null : val(props.label) ?? val(props.name) ?? val(props.text) ?? t`Avatar`),
   },
@@ -55,7 +55,7 @@ export function Avatar(props: AvatarProps): Element {
     const src = val(props.src);
     if (src && !failed()) return untrack(() => h("img", { src, alt: "", loading: props.loading ?? "lazy", onError: () => failed.set(true) }));
     const text = val(props.text);
-    if (text == null && props.icon != null) return untrack(() => icon(props.icon, "hm-avatar-icon"));
-    return h("span", { class: "hm-avatar-text", "aria-hidden": "true" }, text ?? initials(val(props.name)));
+    if (text == null && props.icon != null) return untrack(() => icon(props.icon, "m-avatar-icon"));
+    return h("span", { class: "m-avatar-text", "aria-hidden": "true" }, text ?? initials(val(props.name)));
   }));
 }

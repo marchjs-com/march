@@ -27,7 +27,7 @@ const flow = createFlow({ types })
 | `motion` | boolean | `true` | tilt, melt and fly-back of the dragged card |
 | `labels` | `{ region, search, hint, empty }` | — | own texts (each falls back to the built-in one) |
 | `onAdd` | `(id, type) => void` | — | after a node is added |
-| `class` | class value | — | on the root (`hm-flowpal`) |
+| `class` | class value | — | on the root (`m-flowpal`) |
 
 ```tsx
 <FlowPalette flow={flow} grip={false} descriptions={false} categories={false}

@@ -1,28 +1,28 @@
 /* March — StoryRing. The ring is a conic sweep of the four HADİ colors (+ pink) cut to a 3px band by a mask. */
-.hm-sring { --hm-sring-size: 3.625rem; --hm-sring-band: 3px; --hm-sring-gap: 2.5px;
+.m-sring { --m-sring-size: 3.625rem; --m-sring-band: 3px; --m-sring-gap: 2.5px;
   display: inline-flex; flex-direction: column; align-items: center; gap: .375rem; padding: 0; margin: 0; border: 0; background: none; color: inherit; font: inherit; min-width: 0; }
-button.hm-sring { cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: var(--hm-radius-2); }
-button.hm-sring:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-primary)); outline-offset: 3px; }
-.hm-sring-sm { --hm-sring-size: 2.5rem; --hm-sring-band: 2px; --hm-sring-gap: 2px; }
-.hm-sring-lg { --hm-sring-size: 5.5rem; --hm-sring-band: 3.5px; --hm-sring-gap: 3px; }
-.hm-sring-frame { position: relative; display: grid; place-items: center; width: var(--hm-sring-size); height: var(--hm-sring-size); flex: none;
-  transition: transform var(--hm-dur) var(--hm-ease-spring); }
-button.hm-sring:hover .hm-sring-frame { transform: scale(1.04); }
-button.hm-sring:active .hm-sring-frame { transform: scale(.94); }
-.hm-sring-ring { position: absolute; inset: 0; border-radius: 50%;
-  background: conic-gradient(from 210deg, var(--hm-brand-orange, var(--hm-cat-1)), var(--hm-brand-blue, var(--hm-cat-2)), var(--hm-brand-green, var(--hm-cat-3)), var(--hm-brand-purple, var(--hm-cat-4)), var(--hm-brand-pink, var(--hm-cat-5)), var(--hm-brand-orange, var(--hm-cat-1)));
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--hm-sring-band)), var(--hm-scrim) calc(100% - var(--hm-sring-band) + .5px));
-  mask: radial-gradient(farthest-side, transparent calc(100% - var(--hm-sring-band)), var(--hm-scrim) calc(100% - var(--hm-sring-band) + .5px)); }
-.hm-sring.is-seen .hm-sring-ring { background: var(--hm-border-strong, var(--hm-border)); --hm-sring-band: 1.5px; }
-.hm-sring.is-close .hm-sring-ring { background: var(--hm-brand-green, var(--hm-success)); }
-.hm-sring.is-none .hm-sring-ring { display: none; }
-/* own color: data-hm-color sets --hm-accent for the ring of a new / close story */
-.hm-sring[data-hm-color]:is(.is-new, .is-close) .hm-sring-ring { background: var(--hm-accent); }
-.hm-sring-av { display: grid; place-items: center; width: calc(var(--hm-sring-size) - 2 * (var(--hm-sring-band) + var(--hm-sring-gap))); aspect-ratio: 1; border-radius: 50%; overflow: hidden; }
-.hm-sring.is-none .hm-sring-av { width: 100%; }
-.hm-sring-av .hm-avatar { width: 100%; height: 100%; font-size: calc(var(--hm-sring-size) * .3); }
+button.m-sring { cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: var(--m-radius-2); }
+button.m-sring:focus-visible { outline: 2px solid var(--m-accent, var(--m-primary)); outline-offset: 3px; }
+.m-sring-sm { --m-sring-size: 2.5rem; --m-sring-band: 2px; --m-sring-gap: 2px; }
+.m-sring-lg { --m-sring-size: 5.5rem; --m-sring-band: 3.5px; --m-sring-gap: 3px; }
+.m-sring-frame { position: relative; display: grid; place-items: center; width: var(--m-sring-size); height: var(--m-sring-size); flex: none;
+  transition: transform var(--m-dur) var(--m-ease-spring); }
+button.m-sring:hover .m-sring-frame { transform: scale(1.04); }
+button.m-sring:active .m-sring-frame { transform: scale(.94); }
+.m-sring-ring { position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 210deg, var(--m-brand-orange, var(--m-cat-1)), var(--m-brand-blue, var(--m-cat-2)), var(--m-brand-green, var(--m-cat-3)), var(--m-brand-purple, var(--m-cat-4)), var(--m-brand-pink, var(--m-cat-5)), var(--m-brand-orange, var(--m-cat-1)));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--m-sring-band)), var(--m-scrim) calc(100% - var(--m-sring-band) + .5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - var(--m-sring-band)), var(--m-scrim) calc(100% - var(--m-sring-band) + .5px)); }
+.m-sring.is-seen .m-sring-ring { background: var(--m-border-strong, var(--m-border)); --m-sring-band: 1.5px; }
+.m-sring.is-close .m-sring-ring { background: var(--m-brand-green, var(--m-success)); }
+.m-sring.is-none .m-sring-ring { display: none; }
+/* own color: data-m-color sets --m-accent for the ring of a new / close story */
+.m-sring[data-m-color]:is(.is-new, .is-close) .m-sring-ring { background: var(--m-accent); }
+.m-sring-av { display: grid; place-items: center; width: calc(var(--m-sring-size) - 2 * (var(--m-sring-band) + var(--m-sring-gap))); aspect-ratio: 1; border-radius: 50%; overflow: hidden; }
+.m-sring.is-none .m-sring-av { width: 100%; }
+.m-sring-av .m-avatar { width: 100%; height: 100%; font-size: calc(var(--m-sring-size) * .3); }
 /* the + badge is a CornerMark sitting on the frame's corner, ringed in the surface color */
-.hm-sring-add.hm-corner-mark { --hm-cm-inset: 0px; }
-.hm-sring-add.hm-corner-mark .hm-svg { width: 70%; height: 70%; }
-.hm-sring-label { max-width: calc(var(--hm-sring-size) + 1.25rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--hm-text-xs); font-weight: 800; color: var(--hm-text); }
-.hm-sring.is-seen .hm-sring-label { font-weight: 500; color: var(--hm-text-2); }
+.m-sring-add.m-corner-mark { --m-cm-inset: 0px; }
+.m-sring-add.m-corner-mark .m-svg { width: 70%; height: 70%; }
+.m-sring-label { max-width: calc(var(--m-sring-size) + 1.25rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--m-text-xs); font-weight: 800; color: var(--m-text); }
+.m-sring.is-seen .m-sring-label { font-weight: 500; color: var(--m-text-2); }

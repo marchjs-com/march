@@ -34,7 +34,7 @@ export const outletRoute = (name: string): RouteTarget | null => I.slot(name)()?
 
 /** Mark the outlet whose content changes, so a View Transition animates only that part (the shell stays put). */
 export function transitionOutlet(): Element | null {
-  return globalThis.document?.querySelector(`.hm-outlet[data-depth="${I.depth()}"]`) ?? null;
+  return globalThis.document?.querySelector(`.m-outlet[data-depth="${I.depth()}"]`) ?? null;
 }
 
 /** Run `fn` whenever the route changes (cleanup with the owner). */

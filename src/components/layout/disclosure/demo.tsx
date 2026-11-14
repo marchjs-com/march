@@ -16,6 +16,6 @@ export default function DisclosureDemo(props: { values: { open: boolean; marker:
     <Disclosure title="Sık sorulan: verilerim nerede tutulur?">
       <p>Avrupa'daki veri merkezlerinde, şifreli olarak.</p>
     </Disclosure>
-    <p class="hm-muted">{() => `Son değişiklik: ${last()}`}</p>
+    <p class="m-muted">{() => `Son değişiklik: ${last()}`}</p>
   </div>
 }

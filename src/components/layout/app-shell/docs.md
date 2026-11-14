@@ -26,7 +26,7 @@ for the title, search and user menu). Narrow screens: a slim top bar with the me
 | `labels` | `{ skip, panel }` | translated | the skip link text and the aside button text |
 | `skipLink` | boolean | `true` | `false`: no "Skip to content" link |
 | `asideToggle` | boolean | `true` | `false`: no corner button for the aside sheet on narrow screens |
-| `class` | class | — | added to the frame (`.hm-shell`); parts: `.hm-skip`, `.hm-shell-nav`, `.hm-shell-top`, `.hm-shell-header`, `.hm-shell-main` |
+| `class` | class | — | added to the frame (`.m-shell`); parts: `.m-skip`, `.m-shell-nav`, `.m-shell-top`, `.m-shell-header`, `.m-shell-main` |
 
 AppShell is `Layout.extend({ framed: true })`: every Layout prop works, and `AppShell.extend({ … })` derives your own.
 

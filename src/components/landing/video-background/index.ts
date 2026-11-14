@@ -36,10 +36,10 @@ export interface VideoBackgroundProps {
 export function VideoBackground(props: VideoBackgroundProps): Element {
   const paused = signal(false);
   const tint = props.tint ?? "dark";
-  const root = h("div", { class: () => cx("hm-vbg", `hm-vbg-tint-${tint}`, val(props.class)) },
+  const root = h("div", { class: () => cx("m-vbg", `m-vbg-tint-${tint}`, val(props.class)) },
     h(Overlay, { src: props.src, type: "video", poster: props.poster, position: props.position } as OverlayProps),
-    tint !== "none" && h(Overlay, { effect: "vignette", class: "hm-vbg-tint", opacity: props.tintOpacity ?? 0.45 }),
-    h("div", { class: "hm-vbg-content" }, props.children),
+    tint !== "none" && h(Overlay, { effect: "vignette", class: "m-vbg-tint", opacity: props.tintOpacity ?? 0.45 }),
+    h("div", { class: "m-vbg-content" }, props.children),
   ) as HTMLElement;
   if (props.controls !== false && !quietMedia()) {
     const toggle = (): void => {
@@ -48,7 +48,7 @@ export function VideoBackground(props: VideoBackgroundProps): Element {
       if (v.paused) { void v.play().catch(() => undefined); paused.set(false); } else { v.pause(); paused.set(true); }
     };
     root.append(h(IconButton, {
-      class: "hm-vbg-toggle", size: "sm", shape: "round", inverse: true, onClick: toggle,
+      class: "m-vbg-toggle", size: "sm", shape: "round", inverse: true, onClick: toggle,
       icon: () => (paused() ? props.icons?.play ?? play : props.icons?.pause ?? pause),
       label: () => (paused() ? props.labels?.play ?? t`Play background video` : props.labels?.pause ?? t`Pause background video`),
     }) as Node);

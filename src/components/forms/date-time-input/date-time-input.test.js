@@ -16,7 +16,7 @@ test("DateTimeInput: a DatePicker and a TimeInput write one ISO timestamp", () =
   const v = signal(null);
   const { el } = mount(() => h(DateTimeInput, { "bind:value": v, defaultTime: "09:00" }));
   const [date, time] = el.querySelectorAll("input");
-  assert.ok(date.className.includes("hm-date-input"));
+  assert.ok(date.className.includes("m-date-input"));
   assert.equal(time.getAttribute("type"), "time");
   assert.equal(time.getAttribute("aria-label"), "Time");
   date.focus(); type(date, "2026-03-14");

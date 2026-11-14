@@ -52,11 +52,11 @@ export function KeyValueEditor(props: KeyValueEditorProps): unknown {
     id: col === 0 && i.peek() === 0 ? props.id ?? field?.id : undefined, "aria-label": live(name), placeholder: live(placeholder), readonly: live(ro),
     invalid: live(() => col === 0 && dup(i())), value: live(() => rows()[i()]?.[col] ?? ""), setValue: (v: string) => edit(i.peek(), col, v), onBlur: props.onBlur,
   }));
-  return h("div", { class: () => cx("hm-kv-editor", props.class), role: "group", "aria-labelledby": labelledBy(props) },
-    h(For, { each: idx, children: (i: Accessor<number>) => h("div", { class: "hm-kv-row" },
+  return h("div", { class: () => cx("m-kv-editor", props.class), role: "group", "aria-labelledby": labelledBy(props) },
+    h(For, { each: idx, children: (i: Accessor<number>) => h("div", { class: "m-kv-row" },
       cell(i, 0, () => props.labels?.key ?? t`Key`, () => props.keyPlaceholder ?? props.labels?.key ?? t`Key`),
       cell(i, 1, () => props.labels?.value ?? t`Value`, () => props.valuePlaceholder ?? props.labels?.value ?? t`Value`),
       () => (ro() || props.removable === false ? null : h(RowTools, rowToolsProps(list, i, { sortable: false, labels: { remove: props.labels?.remove }, icons: { remove: props.removeIcon } }))),
-      () => (dup(i()) ? h("span", { class: "hm-field-error", role: "alert" }, props.labels?.duplicate ?? t`Duplicate key`) : null)) }),
-    () => (ro() || props.addable === false ? null : h(Button, { class: "hm-kv-add", onClick: () => { rows.set([...rows.peek(), ["", ""]]); } }, props.labels?.add ?? t`Add row`)));
+      () => (dup(i()) ? h("span", { class: "m-field-error", role: "alert" }, props.labels?.duplicate ?? t`Duplicate key`) : null)) }),
+    () => (ro() || props.addable === false ? null : h(Button, { class: "m-kv-add", onClick: () => { rows.set([...rows.peek(), ["", ""]]); } }, props.labels?.add ?? t`Add row`)));
 }

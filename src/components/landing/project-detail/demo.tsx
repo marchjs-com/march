@@ -20,7 +20,7 @@ export default function ProjectDetailDemo(props: { values: { gallery: boolean; n
   let $open: Project | null = null
   // the cover morphs both ways: the card cover and the detail cover share the name project-<id>
   const open = (p: Project, cover: Element) => { void sharedTransition(`project-${p.id}`, cover, () => { $open = p }) }
-  const back = (p: Project) => { void sharedTransition(`project-${p.id}`, document.querySelector(".hm-pd-cover"), () => { $open = null }) }
+  const back = (p: Project) => { void sharedTransition(`project-${p.id}`, document.querySelector(".m-pd-cover"), () => { $open = null }) }
   // both options shape the detail page: changing one while the grid shows opens the first project, so it is seen at once
   let first = true
   effect(() => {

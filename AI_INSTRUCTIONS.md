@@ -113,12 +113,12 @@ shown; the server must enforce permissions.
 - Keep components small; compute with `const $x = …`; pass functions/accessors down, not snapshots.
 - Use `action()` for anything that changes data; `query()` for reads; `schema()` once per record type.
 - Use `t`…`` for user-visible text in libraries and multi-language apps.
-- Use classes, `sx`, design tokens (`--hm-*`). For dynamic geometry use SVG attributes or the `style` **object** prop.
+- Use classes, `sx`, design tokens (`--m-*`). For dynamic geometry use SVG attributes or the `style` **object** prop.
 - Clean up manual subscriptions with `onCleanup`.
 - Test with `node --test` + `hadi-march/testing` (`renderTest`, `installDom`).
 
 **Identifiers in English, user-facing text via i18n**
-- Names in code are English: `$pending`, `CATEGORY_ICONS`, `id: "members"`, `href: "/members"`, `.sc-card`, `--hm-brand-orange`.
+- Names in code are English: `$pending`, `CATEGORY_ICONS`, `id: "members"`, `href: "/members"`, `.sc-card`, `--m-brand-orange`.
 - Text the user reads may be any language, through `t`…`` (`t("Night Blue")` for data such as theme names).
 - `node tools/lint-identifiers.mjs` lists violations; the test suite runs it.
 
@@ -129,7 +129,7 @@ pickers; give a component an explicit `color` only when it must differ from the 
 **Colors**: controls take `color` with a theme token, never a CSS color: `primary` (default), `info`, `success`,
 `warning`, `danger`, `neutral`, `brand-orange|blue|green|purple|gold|pink`, `cat-1..8`. Put it on `<Form>`, `<Field>` or a
 group to color everything inside; a control's own `color` wins. Errors stay `danger`. In CSS read
-`var(--hm-accent, var(--hm-primary))`; fills/lines/icons use `--hm-X`, text uses `--hm-X-text`, text on a fill `--hm-on-X-fill`.
+`var(--m-accent, var(--m-primary))`; fills/lines/icons use `--m-X`, text uses `--m-X-text`, text on a fill `--m-on-X-fill`.
 
 **Selection controls**: `<Checkbox>`, `<CheckboxGroup>`, `<RadioGroup>` take `variant` (`classic` default, `soft`, `chip` for
 compact pickers such as weekdays, `card` for plans/options with `hint` and `icon`, `toggle`; radios also `segmented`),
@@ -284,7 +284,7 @@ back closes it, a direct visit or reload shows the full page. Page transitions a
 `<Link preload="hover|visible|none">`, `beforeLeave(() => !dirty() || confirm(…))` (links, navigate, back/forward, tab close),
 `setMeta({ title, description })` (for full head control use `hadi-march/seo`, §14a), `queryParam("tab")` signal. `navigate()` is async.
 Instant navigation: the path (active links, breadcrumb) changes on the click; a page not here in 100 ms is replaced by
-its skeleton (route `skeleton`, else `<Router skeleton>`, else `loading`); after 150 ms a thin top bar (`.hm-nav-bar`)
+its skeleton (route `skeleton`, else `<Router skeleton>`, else `loading`); after 150 ms a thin top bar (`.m-nav-bar`)
 and a spinner on the clicked link show. A newer click aborts the older navigation: pass `navigationSignal()` to fetches
 a page starts. Give every app a `<Router skeleton>` shaped like its pages (no layout jump).
 
@@ -340,7 +340,7 @@ const $x = spring(() => $target, { stiffness: 200, damping: 20 });
 timeline({ root }).add(".card", fadeUp, { stagger: 60 }).play();
 pageTransitions({ type: "slide" });           // View Transitions with an engine fallback; back reverses, RTL mirrors
 // per route: { path: "/photos/:id", meta: { transition: "scale" } } ("fade" | "slide" | "scale" | "none" | { type, duration });
-// shared element: the same data-hm-shared="photo-3" on the old and the new page moves between them. Named and modal outlets too.
+// shared element: the same data-m-shared="photo-3" on the old and the new page moves between them. Named and modal outlets too.
 ```
 Rules: animate only `transform`/`opacity` (WAAPI or the `style` object); everything honors `prefers-reduced-motion`
 (`reducedMotion()`); never use string styles. fx (`Particles`, `Aurora`, `confetti`) is decorative — keep it off admin
@@ -366,12 +366,12 @@ motion.config({ speed: 0.5, reduce: "system", character: "calm" }); motion.pause
 Rules:
 - DOM: animate only compositor properties (`transform`, `translate`, `scale`, `rotate`, `opacity`, `filter`); the dev
   build warns about others. CSS variables animate natively once registered (`cssVars(el, { "--hue": "<number>" })`).
-- Easing by name or token (`"out"`, `"--hm-ease-expo"`, `"spring"`, `"bounce"`, `"steps(4)"`); springs and bounces become
+- Easing by name or token (`"out"`, `"--m-ease-expo"`, `"spring"`, `"bounce"`, `"steps(4)"`); springs and bounces become
   CSS `linear()` and stay on WAAPI. Add names with `defineEasing` / `defineMotion({ easings, keyframes, presets, characters })`.
 - Colors interpolate in OKLab (give hex / rgb() / oklch()). Vectors (`Float32Array`) are written in place — no per-frame
   allocation for JS targets.
 - Reads and writes: measure in `measure(fn)`, write in `mutate(fn)` (batched per frame, no layout thrashing).
-- Plain CSS animations are fine (`.hm-anim-<name>` from `keyframesCss()` / `tools/gen-motion-css.js`); the engine
+- Plain CSS animations are fine (`.m-anim-<name>` from `keyframesCss()` / `tools/gen-motion-css.js`); the engine
   controls them too (`cssAnimations(root).pause()`, global speed / pause reach them).
 - Reduced motion: non-`essential` animations jump to their end, endless ones stay still; never bypass it.
 - New targets (Three.js, SVG paths…): `defineDriver(name, { supports, apply, read?, flush? })`, not a custom loop.

@@ -19,6 +19,6 @@ export default function NumberInputDemo(props: { values: { kind: string; currenc
       if (v.kind === "int") return <Field label="Adet"><IntInput value={$n} onChange={(x: Maybe<number>) => { $n = x ?? 0 }} min={0} /></Field>
       return <Field label="Miktar"><NumberInput value={$n} onChange={(x: Maybe<number>) => { $n = x ?? 0 }} decimals={v.decimals} minDecimals={v.decimals} grouping /></Field>
     }}
-    <p class="hm-muted">{() => `Saklanan değer: ${props.values.kind === "percent" ? $rate : $n}`}</p>
+    <p class="m-muted">{() => `Saklanan değer: ${props.values.kind === "percent" ? $rate : $n}`}</p>
   </div>
 }

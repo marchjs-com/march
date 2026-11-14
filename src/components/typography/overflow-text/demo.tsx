@@ -31,7 +31,7 @@ const SAMPLES = [
 export default function OverflowTextDemo(props: { values: { duplicate: boolean; trigger: string; mode: string; speed: number; disabled: boolean; ticker: boolean; separator: string } }) {
   return <div class="sc-mq-demo">
     {() => { const trigger = props.values.trigger as MarqueeTrigger, mode = props.values.mode as MarqueeMode, speed = props.values.speed, disabled = props.values.disabled; return <div class="sc-mq-list">
-      <p class="hm-muted">{disabled ? "Kaydırma kapalı: sığmayan metin kırpılmış kalır." : `${HINT[trigger]} İlk satır seçili satır gibi hep kayar (play).`}</p>
+      <p class="m-muted">{disabled ? "Kaydırma kapalı: sığmayan metin kırpılmış kalır." : `${HINT[trigger]} İlk satır seçili satır gibi hep kayar (play).`}</p>
       {SAMPLES.map(([lang, text], i) => <button type="button" class="sc-mq-row"><span class="sc-mq-lang">{lang}</span><OverflowText class="sc-mq-text" text={text} trigger={trigger} mode={mode} speed={speed} disabled={disabled} play={i === 0 ? () => true : undefined} /></button>)}
     </div> }}
     {() => {
@@ -41,7 +41,7 @@ export default function OverflowTextDemo(props: { values: { duplicate: boolean; 
       // a short strip: it fits, so it only loops when `duplicate` repeats it to fill the box
       return [<div class="sc-mq-ticker"><Marquee text="Yeni: koyu tema · daha hızlı arama · tam RTL · dört resmi renk" separator={mark} speed={speed} disabled={disabled} /></div>,
         <div class="sc-mq-ticker"><Marquee duplicate={props.values.duplicate} pause={0} separator={mark} speed={speed} disabled={disabled}><span class="sc-row">{["HADİ", "Globex", "Initech", "Umbrella"].map((n) => <strong>{n}</strong>)}</span></Marquee></div>,
-        <span class="hm-muted">{props.values.duplicate ? "İkinci şerit: dört ad kutuyu doldurana kadar çoğaltılır ve durmadan döner." : "İkinci şerit: içerik sığdığı için kaymaz (duplicate kapalı)."}</span>]
+        <span class="m-muted">{props.values.duplicate ? "İkinci şerit: dört ad kutuyu doldurana kadar çoğaltılır ve durmadan döner." : "İkinci şerit: içerik sığdığı için kaymaz (duplicate kapalı)."}</span>]
     }}
   </div>
 }

@@ -48,11 +48,11 @@ export function Grid(props: GridProps): Element {
   const span = !props.min && !props.balance && (!!props.fill || !!props.equal) && props.cols != null;
   const flex = !span && (!!props.fill || !!props.balance);
   return h("div", { ...rest(props, ["cols", "gap", "min", "fill", "balance", "minCol", "equal"]),
-    class: () => cx("hm-grid", `hm-grid-gap-${props.gap ?? 4}`,
-      span ? ["hm-grid-span", `hm-gc-${cols}`, `hm-gm-${minBucket(props.minCol)}`, props.fill && `hm-grid-fill-${props.fill}`]
-        : flex ? ["hm-grid-flex", props.min ? "hm-grid-flex-min" : `hm-grid-c${cols}`, props.fill && `hm-grid-fill-${props.fill}`, props.balance && "hm-grid-balance"]
-          : props.min ? "hm-grid-auto" : `hm-grid-${cols}`,
-      props.equal && "hm-grid-equal",
+    class: () => cx("m-grid", `m-grid-gap-${props.gap ?? 4}`,
+      span ? ["m-grid-span", `m-gc-${cols}`, `m-gm-${minBucket(props.minCol)}`, props.fill && `m-grid-fill-${props.fill}`]
+        : flex ? ["m-grid-flex", props.min ? "m-grid-flex-min" : `m-grid-c${cols}`, props.fill && `m-grid-fill-${props.fill}`, props.balance && "m-grid-balance"]
+          : props.min ? "m-grid-auto" : `m-grid-${cols}`,
+      props.equal && "m-grid-equal",
       val(props.class)),
-    style: props.min || props.minCol ? { ...(props.min ? { "--hm-grid-min": props.min } : {}), ...(props.minCol ? { "--hm-grid-col-min": props.minCol } : {}) } : undefined }, props.children);
+    style: props.min || props.minCol ? { ...(props.min ? { "--m-grid-min": props.min } : {}), ...(props.minCol ? { "--m-grid-col-min": props.minCol } : {}) } : undefined }, props.children);
 }

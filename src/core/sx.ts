@@ -1,5 +1,5 @@
 // `sx` — design-token shorthands compiled to static utility classes (no inline styles, CSP safe).
-// `sx={{ p: 2, gap: 1, cols: 3 }}` → class "hm-p-2 hm-gap-1 hm-cols-3". The compiler resolves literal objects at build time;
+// `sx={{ p: 2, gap: 1, cols: 3 }}` → class "m-p-2 m-gap-1 m-cols-3". The compiler resolves literal objects at build time;
 // at runtime `sx(obj)` does the same for dynamic cases. Every class exists in css/march.css.
 export const SX = {
   p: [0, 8], px: [0, 8], py: [0, 8], pt: [0, 8], pb: [0, 8],
@@ -26,7 +26,7 @@ export function sx(obj: Sx | Record<string, unknown> | null | undefined): string
       const lo = spec[0], hi = spec[1];
       const ok = typeof lo === "number" ? Number.isInteger(v) && (v as number) >= lo && (v as number) <= (hi as number) : spec.includes((v === true ? lo : v) as string);
       if (!ok) throw new Error(`March: sx ${k}=${JSON.stringify(v)} is out of range (${typeof lo === "number" ? `${lo}–${hi}` : spec.join(", ")}).`);
-      out.push(`hm-${k}-${String(v === true ? lo : v)}`);
+      out.push(`m-${k}-${String(v === true ? lo : v)}`);
     }
   }
   return out.join(" ");

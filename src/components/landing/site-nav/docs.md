@@ -39,7 +39,7 @@ Below 860 px the links move into a Drawer.
 <SiteNav brand={brand} links={links} pill={false} menu={false} />
 ```
 
-Set `--hm-site-nav-top` when the page already has a sticky bar above it. In-page links (`#pricing`) scroll to their section
+Set `--m-site-nav-top` when the page already has a sticky bar above it. In-page links (`#pricing`) scroll to their section
 themselves, so they also work under a hash router; give sections a `scroll-margin-top` for the bar.
 
 ## Accessibility

@@ -15,15 +15,15 @@ test("ProjectGrid: chips per category, filtering hides others, onOpen gets the c
   const opened = [];
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => h(ProjectGrid, { projects, onOpen: (p, cover) => opened.push([p.id, cover.getAttribute("data-project")]) }), el);
-  const chips = el.querySelectorAll(".hm-pg-filters .hm-chip2-hit");
+  const chips = el.querySelectorAll(".m-pg-filters .m-chip2-hit");
   assert.equal(chips.length, 3);
   assert.equal(el.querySelector("img").getAttribute("width"), "800");
   chips[2].click(); // Brand
   await new Promise((r) => setTimeout(r, 400));
-  const cards = el.querySelectorAll(".hm-pg-card");
+  const cards = el.querySelectorAll(".m-pg-card");
   assert.deepEqual([...cards].map((c) => !!c.hidden), [true, false, true]);
   assert.equal(chips[2].getAttribute("aria-pressed"), "true");
-  cards[1].querySelector(".hm-pg-link").click();
+  cards[1].querySelector(".m-pg-link").click();
   assert.deepEqual(opened, [["b", "b"]]);
   dispose();
 });
@@ -35,12 +35,12 @@ test("ProjectGrid: no arrow / own arrow, chip colour, own group name, instant fi
     h(ProjectGrid, { projects, class: "two", arrow: (p) => h("b", { class: "mine" }, p.id) }),
   ], el);
   const one = el.querySelector(".one");
-  assert.equal(one.querySelector(".hm-pg-go"), null);
-  assert.equal(one.querySelector(".hm-pg-filters").getAttribute("aria-label"), "Pick");
-  assert.equal(one.querySelector(".hm-pg-filters .hm-chip2").getAttribute("data-hm-color"), "brand-purple");
-  assert.ok(!one.querySelector(".hm-pg-grid").classList.contains("hm-reveal"));
-  one.querySelectorAll(".hm-pg-filters .hm-chip2-hit")[2].click(); // Brand: no animation, hidden at once
-  assert.deepEqual([...one.querySelectorAll(".hm-pg-card")].map((c) => !!c.hidden), [true, false, true]);
-  assert.deepEqual([...el.querySelectorAll(".two .hm-pg-go.is-own .mine")].map((b) => b.textContent), ["a", "b", "c"]);
+  assert.equal(one.querySelector(".m-pg-go"), null);
+  assert.equal(one.querySelector(".m-pg-filters").getAttribute("aria-label"), "Pick");
+  assert.equal(one.querySelector(".m-pg-filters .m-chip2").getAttribute("data-m-color"), "brand-purple");
+  assert.ok(!one.querySelector(".m-pg-grid").classList.contains("m-reveal"));
+  one.querySelectorAll(".m-pg-filters .m-chip2-hit")[2].click(); // Brand: no animation, hidden at once
+  assert.deepEqual([...one.querySelectorAll(".m-pg-card")].map((c) => !!c.hidden), [true, false, true]);
+  assert.deepEqual([...el.querySelectorAll(".two .m-pg-go.is-own .mine")].map((b) => b.textContent), ["a", "b", "c"]);
   dispose();
 });

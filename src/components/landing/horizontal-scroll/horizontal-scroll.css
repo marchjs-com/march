@@ -1,13 +1,13 @@
 /* HorizontalScroll. Section height = one screen + the track overflow (from JS); the pin is sticky; native mode scrolls itself. */
-.hm-hs { --hm-hs-panel: min(80cqi, 32rem); position: relative; height: calc(100vh - var(--hm-site-nav-top, 0px) + var(--hm-hs-extra, 0px)); }
-.hm-hs-pin { position: sticky; inset-block-start: var(--hm-site-nav-top, 0); height: calc(100vh - var(--hm-site-nav-top, 0px)); display: flex; flex-direction: column; justify-content: center; gap: var(--hm-space-4); overflow: hidden; }
-.hm-hs-view { overflow: hidden; padding-block: var(--hm-space-3); }
-.hm-hs-track { display: flex; gap: var(--hm-space-4); width: max-content; padding-inline: clamp(1rem, 6cqi, 5rem); will-change: transform; }
-.hm-hs-track > * { flex: none; width: var(--hm-hs-panel); min-width: 0; }
-.hm-hs-bar { --hm-progress-c: var(--hm-brand-gradient); margin-inline: clamp(1rem, 6cqi, 5rem); }
+.m-hs { --m-hs-panel: min(80cqi, 32rem); position: relative; height: calc(100vh - var(--m-site-nav-top, 0px) + var(--m-hs-extra, 0px)); }
+.m-hs-pin { position: sticky; inset-block-start: var(--m-site-nav-top, 0); height: calc(100vh - var(--m-site-nav-top, 0px)); display: flex; flex-direction: column; justify-content: center; gap: var(--m-space-4); overflow: hidden; }
+.m-hs-view { overflow: hidden; padding-block: var(--m-space-3); }
+.m-hs-track { display: flex; gap: var(--m-space-4); width: max-content; padding-inline: clamp(1rem, 6cqi, 5rem); will-change: transform; }
+.m-hs-track > * { flex: none; width: var(--m-hs-panel); min-width: 0; }
+.m-hs-bar { --m-progress-c: var(--m-brand-gradient); margin-inline: clamp(1rem, 6cqi, 5rem); }
 /* native: a normal horizontal scroller with snap points */
-.hm-hs.is-native { height: auto; }
-.hm-hs.is-native .hm-hs-pin { position: static; height: auto; }
-.hm-hs.is-native .hm-hs-view { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; }
-.hm-hs.is-native .hm-hs-track > * { scroll-snap-align: start; }
-.hm-hs.is-native .hm-hs-bar { display: none; }
+.m-hs.is-native { height: auto; }
+.m-hs.is-native .m-hs-pin { position: static; height: auto; }
+.m-hs.is-native .m-hs-view { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.m-hs.is-native .m-hs-track > * { scroll-snap-align: start; }
+.m-hs.is-native .m-hs-bar { display: none; }

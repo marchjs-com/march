@@ -29,7 +29,7 @@ animate(card, frames, { duration: 600, easing: "hadi-pop" })
 | `handleColors` | `[ColorToken, ColorToken]` | `brand-orange`, `brand-blue` | colors of the two handles |
 | `color` | ColorToken | accent | curve glow, preview dot, marker, picked preset |
 | `aria-label` | string | "Easing curve editor" | accessible name of the editor |
-| `class` | string | — | on the root (`hm-ec`; parts: `hm-ec-plot`, `hm-ec-handle`, `hm-ec-stage`, `hm-ec-inputs`, `hm-ec-css`, `hm-ec-name`, `hm-ec-presets`) |
+| `class` | string | — | on the root (`m-ec`; parts: `m-ec-plot`, `m-ec-handle`, `m-ec-stage`, `m-ec-inputs`, `m-ec-css`, `m-ec-name`, `m-ec-presets`) |
 
 Only the curve, in your own colors and words:
 

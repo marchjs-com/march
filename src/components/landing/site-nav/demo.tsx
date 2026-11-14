@@ -26,6 +26,6 @@ export default function SiteNavDemo(props: { values: { mode: string; shrink: boo
       </div>
     }}
     </div>
-    <div class="sc-row"><button type="button" class="hm-btn hm-btn-sm hm-btn-secondary" data-audit-try="toggle" on:click={scrollFrame}>{() => ($down ? "Başa dön" : "Kutuyu aşağı kaydır")}</button></div>
+    <div class="sc-row"><button type="button" class="m-btn m-btn-sm m-btn-secondary" data-audit-try="toggle" on:click={scrollFrame}>{() => ($down ? "Başa dön" : "Kutuyu aşağı kaydır")}</button></div>
   </div>
 }

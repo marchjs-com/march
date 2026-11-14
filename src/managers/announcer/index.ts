@@ -58,13 +58,13 @@ function create(cfg: AnnouncerConfig): Announcer {
   const ensure = (): void => {
     if (box || !globalThis.document?.body) return;
     const region = (p: Politeness): HTMLElement => {
-      const el = h("div", { class: `hm-announcer hm-announcer-${p}`, "aria-live": p, "aria-atomic": "true", role: p === "assertive" ? "alert" : "status" }) as HTMLElement;
+      const el = h("div", { class: `m-announcer m-announcer-${p}`, "aria-live": p, "aria-atomic": "true", role: p === "assertive" ? "alert" : "status" }) as HTMLElement;
       for (const [k, v] of HIDDEN) el.style.setProperty(k, v);
       return el;
     };
     els.polite = region("polite");
     els.assertive = region("assertive");
-    box = h("div", { class: "hm-announcers" }, els.polite, els.assertive) as HTMLElement;
+    box = h("div", { class: "m-announcers" }, els.polite, els.assertive) as HTMLElement;
     close = openLayer("fx", box);
   };
 

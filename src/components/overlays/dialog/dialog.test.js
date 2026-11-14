@@ -42,17 +42,17 @@ test("Dialog: no ×, own × with its own name, entrance choice, non-modal", asyn
   ]);
   await tick();
   const a = document.querySelector(".d-a"), b = document.querySelector(".d-b"), c = document.querySelector(".d-c");
-  assert.equal(a.querySelector(".hm-dialog-x"), null);
-  assert.ok(a.classList.contains("hm-motion-none") && a.closest(".hm-overlay").classList.contains("hm-motion-none"));
-  assert.ok(b.querySelector(".hm-dialog-x .own-x"));
-  assert.equal(b.querySelector(".hm-dialog-x").getAttribute("aria-label"), "Back");
-  assert.ok(b.classList.contains("hm-motion-fade"));
+  assert.equal(a.querySelector(".m-dialog-x"), null);
+  assert.ok(a.classList.contains("m-motion-none") && a.closest(".m-overlay").classList.contains("m-motion-none"));
+  assert.ok(b.querySelector(".m-dialog-x .own-x"));
+  assert.equal(b.querySelector(".m-dialog-x").getAttribute("aria-label"), "Back");
+  assert.ok(b.classList.contains("m-motion-fade"));
   assert.equal(b.getAttribute("aria-modal"), null);
-  assert.ok(b.closest(".hm-overlay").classList.contains("is-modeless"));
-  assert.ok(!b.closest(".hm-overlay").parentElement.hasAttribute("inert"), "the page stays usable");
-  assert.equal(c.querySelector(".hm-dialog-x").getAttribute("aria-label"), "Close");
-  assert.ok(c.querySelector(".hm-dialog-x svg"));
-  assert.doesNotMatch(c.getAttribute("class"), /hm-motion-/);
+  assert.ok(b.closest(".m-overlay").classList.contains("is-modeless"));
+  assert.ok(!b.closest(".m-overlay").parentElement.hasAttribute("inert"), "the page stays usable");
+  assert.equal(c.querySelector(".m-dialog-x").getAttribute("aria-label"), "Close");
+  assert.ok(c.querySelector(".m-dialog-x svg"));
+  assert.doesNotMatch(c.getAttribute("class"), /m-motion-/);
   assert.equal(c.getAttribute("aria-modal"), "true");
   open.set(false);
   await tick();
@@ -63,8 +63,8 @@ test("prompt and askReason: every text is replaceable; the counter and the × ca
   const p = prompt({ title: "Name", ok: "Rename", cancel: "Keep", dialog: { closeButton: false, motion: "rise", class: "p-dlg" } });
   await tick();
   const pd = document.querySelector(".p-dlg");
-  assert.ok(pd.classList.contains("hm-motion-rise") && pd.classList.contains("hm-dialog-sm"));
-  assert.equal(pd.querySelector(".hm-dialog-x"), null);
+  assert.ok(pd.classList.contains("m-motion-rise") && pd.classList.contains("m-dialog-sm"));
+  assert.equal(pd.querySelector(".m-dialog-x"), null);
   assert.equal(pd.querySelector("[data-ok]").textContent, "Rename");
   assert.equal(pd.querySelector("[data-cancel]").textContent, "Keep");
   pd.querySelector("[data-cancel]").click();
@@ -73,13 +73,13 @@ test("prompt and askReason: every text is replaceable; the counter and the × ca
     labels: { reason: "Why?", purpose: "Kind", choose: "Pick one", choosePurpose: "Pick a kind first.", tooShort: (n) => `Min ${n}.` } });
   await tick();
   const rd = document.querySelector(".r-dlg");
-  assert.deepEqual([...rd.querySelectorAll(".hm-label")].map((l) => l.textContent), ["Kind", "Why?"]);
+  assert.deepEqual([...rd.querySelectorAll(".m-label")].map((l) => l.textContent), ["Kind", "Why?"]);
   assert.equal(rd.querySelector("option").textContent, "Pick one");
-  assert.equal(rd.querySelector(".hm-field-hint"), null);
+  assert.equal(rd.querySelector(".m-field-hint"), null);
   assert.equal(rd.querySelector("[data-cancel]").textContent, "Back");
   rd.querySelector("[data-ok]").click();
   // each error sits under its own field (the purpose list, then the reason)
-  const errors = () => [...rd.querySelectorAll(".hm-field-error")].map((e) => e.textContent);
+  const errors = () => [...rd.querySelectorAll(".m-field-error")].map((e) => e.textContent);
   assert.deepEqual(errors(), ["Pick a kind first.", ""]);
   const sel = rd.querySelector("select");
   sel.value = "0"; sel.dispatchEvent(new globalThis.Event("change", { bubbles: true })); // <Select>: the option's index

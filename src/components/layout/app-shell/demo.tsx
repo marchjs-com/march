@@ -11,7 +11,7 @@ export default function AppShellDemo(props: { values: { nav: boolean; top: boole
     {() => { const nav = props.values.nav, top = props.values.top; return <AppShell mainId="sc-shell-main"
       nav={nav ? <div class="sc-shell-nav"><strong>HADİ</strong><span>Panel</span><span>Projeler</span><span>Ayarlar</span></div> : null}
       top={top ? <div class="sc-shell-banner">Yeni sürüm hazır: yenileyin.</div> : null}>
-      <div class="sc-shell-page"><h4>Projeler</h4><p class="hm-muted">Sayfa içeriği burada kayar; kenar çubuğu yerinde kalır.</p></div>
+      <div class="sc-shell-page"><h4>Projeler</h4><p class="m-muted">Sayfa içeriği burada kayar; kenar çubuğu yerinde kalır.</p></div>
     </AppShell> }}
   </div>
 }

@@ -18,7 +18,7 @@ const key = (el, k, extra = {}) => el.dispatchEvent(new Event("keydown", { bubbl
 const click = (el, extra = {}) => el.dispatchEvent(new Event("click", { bubbles: true, cancelable: true, ...extra }));
 const input = (el, v, type = "input") => { el.value = v; el.dispatchEvent(new Event(type, { bubbles: true })); };
 /** Open a toolbar / row menu of a table: the floating panel (Popover) loads on first use and is drawn in the overlay layer. */
-const openMenu = async (el, cls) => { click(el.querySelector(`.${cls} button`)); for (let i = 0; i < 20 && !document.querySelector(".hm-table-menu-body"); i++) await tick(5); return document.querySelector(".hm-table-menu-body"); };
+const openMenu = async (el, cls) => { click(el.querySelector(`.${cls} button`)); for (let i = 0; i < 20 && !document.querySelector(".m-table-menu-body"); i++) await tick(5); return document.querySelector(".m-table-menu-body"); };
 const closeMenu = (el, cls) => click(el.querySelector(`.${cls} button`));
 /** Minimal action object (same shape as hadi-march/ui action()). */
 function act(label, fn) {
@@ -183,21 +183,21 @@ test("selection: row checkbox, shift range, select page / all matching, bulk act
   const rows = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, name: `n${i + 1}` }));
   let tb;
   const { el } = mount(() => { tb = T.createTable({ rows, columns: [{ key: "name" }], pageSize: 5 }); return h(T.Table, { table: tb, selectable: true, bulkActions: [del], paging: true }); });
-  const boxes = () => el.querySelectorAll("tbody .hm-table-check input");
+  const boxes = () => el.querySelectorAll("tbody .m-table-check input");
   click(boxes()[0]);
   click(boxes()[3], { shiftKey: true });
   assert.deepEqual(ids(tb.selectedRows()), [1, 2, 3, 4]);
-  assert.equal(el.querySelector(".hm-table-bulk-count").textContent, "4 selected");
+  assert.equal(el.querySelector(".m-table-bulk-count").textContent, "4 selected");
   assert.equal(el.querySelectorAll("tr[aria-selected=true]").length, 4);
-  click(el.querySelector("thead .hm-table-check input"));
+  click(el.querySelector("thead .m-table-check input"));
   assert.equal(tb.selectedCount(), 5);
-  click(el.querySelector(".hm-table-selectall"));
+  click(el.querySelector(".m-table-selectall"));
   assert.equal(tb.selectedCount(), 12);
-  click([...el.querySelectorAll(".hm-table-bulk button")].find((b) => b.textContent === "Delete"));
+  click([...el.querySelectorAll(".m-table-bulk button")].find((b) => b.textContent === "Delete"));
   await tick(); await tick();
   assert.equal(removed.length, 12);
   assert.equal(tb.selectedCount(), 0);
-  assert.equal(el.querySelector(".hm-table-bulk"), null);
+  assert.equal(el.querySelector(".m-table-bulk"), null);
 });
 
 test("inline edit: validation error, Escape cancels, Enter saves", async () => {
@@ -211,11 +211,11 @@ test("inline edit: validation error, Escape cancels, Enter saves", async () => {
   key(cell(), "Enter");
   const inp = cell().querySelector("input");
   assert.ok(inp, "editor opened");
-  assert.ok(inp.classList.contains("hm-number"), "a number column edits in a NumberInput");
+  assert.ok(inp.classList.contains("m-number"), "a number column edits in a NumberInput");
   input(inp, "-3");
   key(inp, "Enter");
   await tick();
-  assert.equal(cell().querySelector(".hm-table-edit .hm-field-error").textContent, "Must be at least 0");
+  assert.equal(cell().querySelector(".m-table-edit .m-field-error").textContent, "Must be at least 0");
   assert.equal(inp.getAttribute("aria-invalid"), "true");
   key(inp, "Escape");
   assert.equal(cell().querySelector("input"), null);
@@ -233,13 +233,13 @@ test("inline edit: validation error, Escape cancels, Enter saves", async () => {
 test("expand row via button and Enter key; row click handler", () => {
   const clicked = [];
   const { el } = mount(() => h(T.Table, { rows: PEOPLE.slice(0, 2), columns: COLS, expand: (r) => h("p", { class: "detail" }, `Details of ${r.name}`) }));
-  el.querySelector(".hm-table-expander").click();
+  el.querySelector(".m-table-expander").click();
   assert.equal(el.querySelector(".detail").textContent, "Details of Zeynep");
-  assert.equal(el.querySelector(".hm-table-expander").getAttribute("aria-expanded"), "true");
+  assert.equal(el.querySelector(".m-table-expander").getAttribute("aria-expanded"), "true");
   const cell = el.querySelectorAll("tr[data-row]")[1].querySelector('td[data-col="name"]');
   key(cell, "Enter");
   assert.equal(el.querySelectorAll(".detail").length, 2);
-  el.querySelector(".hm-table-expander").click();
+  el.querySelector(".m-table-expander").click();
   assert.equal(el.querySelectorAll(".detail").length, 1);
   const m = mount(() => h(T.Table, { rows: PEOPLE.slice(0, 2), columns: COLS, onRowClick: (r) => clicked.push(r.id) }));
   click(m.el.querySelectorAll("tr[data-row]")[1].querySelector("td"));
@@ -306,26 +306,26 @@ test("virtual scrolling renders a window of 100,000 rows and moves on scroll", (
   const rendered = () => el.querySelectorAll("tr[data-row]");
   assert.equal(rendered().length, 16, "10 visible + 1 + 5 overscan");
   assert.equal(rendered()[0].textContent, "row 0");
-  const scroller = el.querySelector(".hm-table-scroll");
+  const scroller = el.querySelector(".m-table-scroll");
   scroller.scrollTop = 40 * 50_000;
   scroller.dispatchEvent(new Event("scroll"));
   const r = rendered();
   assert.equal(r.length, 21);
   assert.equal(r[0].textContent, "row 49995");
   assert.equal(r[0].getAttribute("aria-rowindex"), "49997");
-  const [top, bottom] = el.querySelectorAll(".hm-table-spacer td");
+  const [top, bottom] = el.querySelectorAll(".m-table-spacer td");
   assert.equal(top.style.getPropertyValue("height"), `${49995 * 40}px`);
   assert.equal(bottom.style.getPropertyValue("height"), `${(100_000 - 50_016) * 40}px`);
-  assert.equal(el.querySelector(".hm-table-range").textContent, "100000 rows");
+  assert.equal(el.querySelector(".m-table-range").textContent, "100000 rows");
 });
 
 test("cards layout renders label/value pairs", () => {
   const { el } = mount(() => h(T.Table, { rows: PEOPLE.slice(0, 2), columns: COLS, layout: "cards", selectable: true }));
   assert.equal(el.querySelector("table"), null);
-  const cards = el.querySelectorAll(".hm-table-card");
+  const cards = el.querySelectorAll(".m-table-card");
   assert.equal(cards.length, 2);
   assert.equal(cards[0].getAttribute("role"), "listitem");
-  const f = cards[1].querySelectorAll(".hm-table-card-field");
+  const f = cards[1].querySelectorAll(".m-table-card-field");
   assert.equal(f[0].querySelector("dt").textContent, "Name");
   assert.equal(f[0].querySelector("dd").textContent, "Ali");
   assert.equal(f[4].querySelector("dd").textContent, "No");
@@ -340,14 +340,14 @@ test("columns: hide, reorder, resize (keyboard), pin; header aria-sort; only one
   tb.setHidden("joined", true);
   tb.moveColumn("team", -10);
   assert.deepEqual(heads(), ["team", "name", "city", "age", "active"]);
-  const panel = await openMenu(el, "hm-table-columns");
+  const panel = await openMenu(el, "m-table-columns");
   panel.querySelector('li[data-col="city"] input').dispatchEvent(new Event("change", { bubbles: true }));
   assert.deepEqual(heads(), ["team", "name", "age", "active"]);
   [...panel.querySelectorAll('li[data-col="age"] button')].find((b) => / up$/.test(b.getAttribute("aria-label"))).click();
   assert.deepEqual(heads(), ["team", "age", "name", "active"]);
-  closeMenu(el, "hm-table-columns");
-  assert.equal(document.querySelector(".hm-table-menu-body"), null, "the trigger closes its panel");
-  const handle = el.querySelector('th[data-col="name"] .hm-table-resize');
+  closeMenu(el, "m-table-columns");
+  assert.equal(document.querySelector(".m-table-menu-body"), null, "the trigger closes its panel");
+  const handle = el.querySelector('th[data-col="name"] .m-table-resize');
   key(handle, "ArrowRight");
   assert.equal(tb.widthOf("name"), 170);
   key(handle, "ArrowLeft", { shiftKey: true });
@@ -356,7 +356,7 @@ test("columns: hide, reorder, resize (keyboard), pin; header aria-sort; only one
   assert.equal(handle.getAttribute("aria-valuenow"), "120");
   tb.pin("name", "left");
   assert.deepEqual(heads(), ["name", "team", "age", "active"]);
-  assert.ok(el.querySelector('th[data-col="name"]').classList.contains("hm-table-pin-start"));
+  assert.ok(el.querySelector('th[data-col="name"]').classList.contains("m-table-pin-start"));
   el.querySelector('th[data-col="age"] button').click();
   assert.equal(el.querySelector('th[data-col="age"]').getAttribute("aria-sort"), "ascending");
   // fine-grained update: replace one row object, other rows' nodes are kept
@@ -390,35 +390,35 @@ test("states: loading skeleton, custom empty, filtered empty, server error with 
   const loading = signal(true);
   const rows = signal([]);
   const { el } = mount(() => h(T.Table, { rows, loading, columns: COLS, empty: () => h("b", {}, "Nothing here") }));
-  assert.ok(el.querySelectorAll("tr.hm-table-skeleton").length > 0);
-  assert.equal(el.querySelector(".hm-table").getAttribute("aria-busy"), "true");
+  assert.ok(el.querySelectorAll("tr.m-table-skeleton").length > 0);
+  assert.equal(el.querySelector(".m-table").getAttribute("aria-busy"), "true");
   loading.set(false);
-  assert.equal(el.querySelector(".hm-table-empty b").textContent, "Nothing here");
+  assert.equal(el.querySelector(".m-table-empty b").textContent, "Nothing here");
   rows.set(PEOPLE);
   assert.equal(el.querySelectorAll("tr[data-row]").length, 5);
   let fail = true, calls = 0;
   const m = mount(() => h(T.Table, { source: async () => { calls++; if (fail) throw new Error("Backend down"); return { items: PEOPLE, total: 5 }; }, columns: COLS }));
-  assert.ok(m.el.querySelector("tr.hm-table-skeleton"));
+  assert.ok(m.el.querySelector("tr.m-table-skeleton"));
   await tick();
-  assert.equal(m.el.querySelector(".hm-table-error p").textContent, "Backend down");
+  assert.equal(m.el.querySelector(".m-table-error p").textContent, "Backend down");
   fail = false;
-  [...m.el.querySelectorAll(".hm-table-error button")].find((b) => b.textContent === "Retry").click();
+  [...m.el.querySelectorAll(".m-table-error button")].find((b) => b.textContent === "Retry").click();
   await tick();
   assert.equal(m.el.querySelectorAll("tr[data-row]").length, 5);
   assert.equal(calls, 2);
   const f = mount(() => h(T.Table, { rows: PEOPLE, columns: COLS, search: "nobody" }));
-  assert.equal(f.el.querySelector(".hm-table-empty p").textContent, "No matching rows.");
-  f.el.querySelector(".hm-table-empty button").click();
+  assert.equal(f.el.querySelector(".m-table-empty p").textContent, "No matching rows.");
+  f.el.querySelector(".m-table-empty button").click();
   assert.equal(f.el.querySelectorAll("tr[data-row]").length, 5);
 });
 
 test("filter UI controls and chips drive state", async () => {
   let tb;
   const { el } = mount(() => { tb = T.createTable({ rows: PEOPLE, columns: COLS, searchDelay: 0 }); return h(T.Table, { table: tb, searchDelay: 0 }); });
-  const panel = await openMenu(el, "hm-table-filters");
+  const panel = await openMenu(el, "m-table-filters");
   input(panel.querySelector('fieldset[data-filter="name"] input'), "ali");
   assert.deepEqual(ids(tb.rows()), [2]);
-  const chip = el.querySelector(".hm-table-chip");
+  const chip = el.querySelector(".m-table-chip");
   assert.equal(chip.textContent.startsWith("Name: “ali”"), true);
   chip.querySelector("button").click();
   assert.deepEqual(tb.filters(), {});
@@ -427,11 +427,11 @@ test("filter UI controls and chips drive state", async () => {
   assert.deepEqual(tb.filters(), { team: ["blue"] });
   input(panel.querySelector('fieldset[data-filter="active"] select'), "0", "change"); // the Select's first option: Yes
   assert.deepEqual(ids(tb.rows()), [3]);
-  input(el.querySelector(".hm-table-search input"), "zzz");
+  input(el.querySelector(".m-table-search input"), "zzz");
   assert.equal(tb.search(), "zzz");
-  el.querySelector(".hm-table-clear").click();
+  el.querySelector(".m-table-clear").click();
   assert.equal(tb.rows().length, 5);
-  closeMenu(el, "hm-table-filters");
+  closeMenu(el, "m-table-filters");
   void window;
 });
 
@@ -440,8 +440,8 @@ test("row actions run with the row; kebab menu for more than two", async () => {
   const acts = ["Edit", "Archive", "Delete"].map((n) => act(n, async (r) => log.push(`${n}:${r.id}`)));
   const { el } = mount(() => h(T.Table, { rows: PEOPLE.slice(0, 2), columns: COLS, rowActions: acts }));
   const row = el.querySelectorAll("tr[data-row]")[1];
-  assert.equal(row.querySelector(".hm-table-kebab button").getAttribute("aria-haspopup"), "menu");
-  const menu = await openMenu(row, "hm-table-kebab");
+  assert.equal(row.querySelector(".m-table-kebab button").getAttribute("aria-haspopup"), "menu");
+  const menu = await openMenu(row, "m-table-kebab");
   assert.equal(menu.closest("[role=menu]") != null, true);
   menu.querySelectorAll("[role=menuitem]")[1].click();
   await tick(); await tick();
@@ -458,6 +458,6 @@ test("table alignment: numeric / date columns are end-aligned by default and the
   assert.equal(column({ key: "n", type: "number", align: "center" }).align, "center", "explicit align wins");
   assert.equal(defaultAlign({ type: "text" }), "start");
   const css = readFileSync(new URL("../src/css/table.css", import.meta.url), "utf8");
-  assert.match(css, /\.hm-table-th\.hm-align-end \.hm-table-sort \{ flex-direction: row-reverse; \}/, "sort arrow before the text in end-aligned headers");
-  assert.match(css, /\.hm-align-end \{ text-align: end !important; font-variant-numeric: tabular-nums; \}/);
+  assert.match(css, /\.m-table-th\.m-align-end \.m-table-sort \{ flex-direction: row-reverse; \}/, "sort arrow before the text in end-aligned headers");
+  assert.match(css, /\.m-align-end \{ text-align: end !important; font-variant-numeric: tabular-nums; \}/);
 });

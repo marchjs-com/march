@@ -29,7 +29,7 @@ scrolls into view the divider sways once, so it reads as something to move.
 | `grip` | boolean / node | `true` | the round grip on the divider: off (the line only) or your own content |
 | `step` | number | `1` | keyboard step in percent (Shift and Page keys: 10 steps) |
 | `valueText` | `(value) => string` | "40% before, 60% after" | the slider's value text for screen readers |
-| `class` | string | — | extra class on the root (`.hm-ba`; parts: `.hm-ba-handle`, `.hm-ba-grip`, `.hm-ba-label`) |
+| `class` | string | — | extra class on the root (`.m-ba`; parts: `.m-ba-handle`, `.m-ba-grip`, `.m-ba-label`) |
 
 ## Accessibility
 

@@ -1,8 +1,8 @@
 /* March — KeyValue. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-kv { display: grid; gap: var(--hm-space-4) var(--hm-space-5); margin: 0; }
-.hm-kv-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hm-kv-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .hm-kv-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.m-kv { display: grid; gap: var(--m-space-4) var(--m-space-5); margin: 0; }
+.m-kv-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .m-kv-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .m-kv-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 /* a row is a StatTile (term, text value): label, value and hint come from it */
 /* (KeyValueEditor has rows of the same class name: keep the tile's own layout here) */
-.hm-kv > .hm-kv-row { display: flex; }
-@media (max-width: 1024px) { .hm-kv-cols-3, .hm-kv-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 640px) { .hm-kv[class*="hm-kv-cols-"] { grid-template-columns: minmax(0, 1fr); } }
+.m-kv > .m-kv-row { display: flex; }
+@media (max-width: 1024px) { .m-kv-cols-3, .m-kv-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .m-kv[class*="m-kv-cols-"] { grid-template-columns: minmax(0, 1fr); } }

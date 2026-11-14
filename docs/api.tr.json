@@ -172,7 +172,7 @@
   "Avatar": "`<Avatar name=\"Ada Lovelace\" src={url} size=\"sm|md|lg\" />` — görsel yoksa veya yüklenemezse baş harfler.",
   "AvatarGroup": "\"+N\" ile üst üste binen avatarlar: `<AvatarGroup names={[\"Ada\", \"Linus\", …]} max={4} />`",
   "bezierCss": "\"cubic-bezier(.34, 1.56, .64, 1)\" — bezier eğrisinin CSS karşılığı.",
-  "bootLoader": "Açılış yükleyicisi: uygulamanın index.html'i statik bir `#hm-boot` öğesi gösterir; uygulama çizilince `bootLoader.done()` çağırın.",
+  "bootLoader": "Açılış yükleyicisi: uygulamanın index.html'i statik bir `#m-boot` öğesi gösterir; uygulama çizilince `bootLoader.done()` çağırın.",
   "BottomNav": "`<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />`",
   "bottomRightControls": "Alt-son köşenin öğesi (soldan sağa yazıda sağ alt).",
   "BottomRightControls": "Alt-son köşeyi yerinde çizer; eklenen denetimler buraya gelir.",
@@ -189,7 +189,7 @@
   "ChatComposer": "`<ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />`",
   "ChatThread": "`<ChatThread messages={$messages} typing={$typing} onReact={react} onReply={(m) => $replyTo = m} />`",
   "Checkbox": "Etiketli onay kutusu (`label` prop'u veya alt öğeler): çizilmiş kutu (animasyonlu tik); gerçek input klavye, formlar ve ekran okuyucular için kalır. `variant=\"classic\" | \"soft\" | \"chip\" | \"card\" | \"toggle\"`, `size` vb.",
-  "CHECKER": "Ortak dama zemini sınıfı (saydam renklerin altındaki zemin): `class={CHECKER}`; `--hm-checker-size` ile ayarlanır.",
+  "CHECKER": "Ortak dama zemini sınıfı (saydam renklerin altındaki zemin): `class={CHECKER}`; `--m-checker-size` ile ayarlanır.",
   "CheckMark": "Evet / hayır / kısmen işareti (✓ ✕ –) ve ekran okuyucunun okuduğu metni: `<CheckMark value={row.included} />`, `<CheckMark value=\"partial\" text />`.",
   "Chevron": "Bir şey açılınca dönen ok; `open` verilmezse en yakın `aria-expanded` üst ögesini izler, RTL'de aynalanır: `<Chevron open={$open} direction=\"down\" />`.",
   "CheckboxGroup":"Birkaç onay kutusu; değer, işaretli seçenek değerlerinin dizisidir. Proplar: options, inline, variant, colors…",
@@ -419,7 +419,7 @@
   "Segmented": "Bölmeli denetim (kompakt tekli seçim). Ok tuşları hareket ettirir ve seçer.",
   "Select": "Yerel seçim kutusu. Prop'lar: options ([value] ya da [{value,label,disabled}], canlı olabilir), placeholder. Değerler türünü korur.",
   "setAccent": "Uygulamayı yeniden renklendirir: bir renk belirteci ya da temanın kendi birincil rengi için \"primary\" / null. Ziyaretler arasında hatırlanır.",
-  "setColorTheme": "Renk temasını değiştirir (localStorage \"hm.colorTheme\" altında saklanır); stil sayfası gerektiğinde yüklenir.",
+  "setColorTheme": "Renk temasını değiştirir (localStorage \"m.colorTheme\" altında saklanır); stil sayfası gerektiğinde yüklenir.",
   "setTheme": "Açık, koyu ya da sistem kipini ayarlar.",
   "setThemeBase": "Yerleşik tema stil sayfalarının bulunduğu yer (varsayılan sayfaya göre \"themes/\"; `march build` bunları oraya kopyalar).",
   "shapesFor": "Bir varyant / tür için hangi şekillerin görünür etkisi olduğunu verir (seçiciler diğerlerini devre dışı bırakır).",
@@ -453,7 +453,7 @@
   "theme": "Geçerli tema tercihi (reaktif). `theme.set(\"dark\")` kaydeder ve uygular.",
   "ThemeMenu": "Görünüm, renk teması ve vurgu için tek menü: `<ThemeMenu />` (ya da `<ThemeMenu themes={false} accents={[\"primary\", \"brand-blue\"]} />`).",
   "ThemePicker": "Tema menüsü: renk temaları (canlı örneklerle) ve açık / koyu / sistem. `<ThemePicker />`",
-  "ThemeSwatch": "Temanın kendisi tarafından çizilen küçük tema önizlemesi (data-hm-theme kapsamı; satır içi stil yok).",
+  "ThemeSwatch": "Temanın kendisi tarafından çizilen küçük tema önizlemesi (data-m-theme kapsamı; satır içi stil yok).",
   "ThemeToggle": "Sistem → açık → koyu arasında döner. `<ThemeToggle />`",
   "TimeInput": "Yerel saat girdisi; değer \"HH:MM\". Prop'lar: min, max, step (saniye).",
   "timelineCode": "Bir model için motor zaman çizelgesi kodu (düzenleyicinin oynattığı), örn. Kod görünümü için.",
@@ -522,7 +522,7 @@
   "niceTicks": "Bir tanım aralığını dışa doğru düzgün değerlere yuvarlar. `{ min, max, step, ticks }` döndürür.",
   "PieChart": "Pasta / halka grafiği. Prop'lar için docs/charts.md dosyasına bakın.",
   "pieLayout": "Negatif olmayan değerler için açılar (radyan, saat 12'den saat yönünde). [{start, end, value, share}] döndürür.",
-  "ProgressRing": "0–100 (veya 0–`max`) puan halkası. `thresholds` (varsayılan [50, 80]) ile `hm-ring-low|mid|high` seviye sınıfı verilir.",
+  "ProgressRing": "0–100 (veya 0–`max`) puan halkası. `thresholds` (varsayılan [50, 80]) ile `m-ring-low|mid|high` seviye sınıfı verilir.",
   "scaleBand": "Kategoriler için bant ölçeği. `s(v)` → bant başlangıcı; `s.bandwidth`; `s.step`; `s.center(v)`; `s.invert(px)` → en yakın değer.",
   "scaleLinear": "Doğrusal ölçek. `s(v)` → aralık değeri; `s.invert(px)`; `s.ticks(n)`; `s.nice(n)` → düzgün tanım aralığında yeni ölçek.",
   "scaleTime": "Date veya epoch ms üzerinde zaman ölçeği. `s.invert(px)` bir Date döndürür.",
@@ -602,7 +602,7 @@
   "inView": "Eylem: öğe görünüme kayınca `enter` işlevini çağırır (ve `className` ekler, varsayılan \"is-visible\").",
   "keyframeNames": "Kayıtlı tüm anahtar kare ön ayarlarının adları.",
   "keyframes": "Varsayılan zamanlamalı adlandırılmış anahtar kareleri kaydeder. Tanımı döndürür (doğrudan animate() ile kullanılabilir).",
-  "keyframesCss": "Kayıtlı tüm anahtar karelerden (veya `names`) tek bir CSS dosyası: `@keyframes hm-<name>` ve varsayılan zamanlamalı bir `.hm-anim-<name>` sınıfı. Azaltılmış hareket (sistem veya kullanıcı ayarı, `<html data-hm-reduced>`) bunları sonlandırır.",
+  "keyframesCss": "Kayıtlı tüm anahtar karelerden (veya `names`) tek bir CSS dosyası: `@keyframes m-<name>` ve varsayılan zamanlamalı bir `.m-anim-<name>` sınıfı. Azaltılmış hareket (sistem veya kullanıcı ayarı, `<html data-m-reduced>`) bunları sonlandırır.",
   "magnet": "Eylem: üzerine gelinince öğe işaretçiye doğru çekilir.",
   "measure": "Bir DOM okumasını sonraki karenin okuma aşamasına (yazmalardan önce) toplu ekler.",
   "mixColor": "İki CSS rengini OKLab'da karıştırır (t = 0 → a, 1 → b). Bir oklab() dizesi döndürür; biri renk değilse b.",
@@ -650,7 +650,7 @@
   "steps": "CSS steps(n, position).",
   "supportsLinear": "Tarayıcı CSS linear() yumuşatmalarını çalıştırıyorsa true (yaylar ve sekmeler o zaman yerel kalır).",
   "swipe": "Eylem: mesafe ve hız eşikleriyle kaydırma hareketini (sol/sağ/yukarı/aşağı) algılar.",
-  "tilt": "Eylem: işaretçiye doğru 3B eğim (en çok derece), --hm-tilt-x/--hm-tilt-y özel özellikleriyle isteğe bağlı parlama.",
+  "tilt": "Eylem: işaretçiye doğru 3B eğim (en çok derece), --m-tilt-x/--m-tilt-y özel özellikleriyle isteğe bağlı parlama.",
   "timeline": "Zaman çizelgesi: adımlar ekleyin (`at`, etiketler, stagger), sonra tek parça olarak denetleyin. play() çağrılana dek duraklatılmış.",
   "toD": "Noktalar → `d`.",
   "toLinear": "`fn` işlevini CSS linear() yumuşatmasına örnekler (düz bir çizginin zaten kapsadığı noktalar atılır).",
@@ -673,9 +673,9 @@
   "scrollFraction": "`track` öğesinin `source` kaydırma alanındaki ilerlemesi (0..1); track yoksa kaydırma konumunun kendisi.",
   "scrollIndicator": "Kaydırma ilerleme çubuğu: öğe satır başından (RTL'de sağdan) tam genişliğe ölçeklenir.",
   "scrollTimeline": "Bir Playback'i kaydırmaya bağlar: ilerlemesi kaydırma konumunu izler (her karede konumlanan duraklatılmış animasyon). Anahtar kareler (hedef + kareler) ya da hazır bir Playback / zaman çizelgesi verilir. Durdurma işlevi döndürür.",
-  "sharedTransition": "Sonraki görünümü çizen `update`'i çalıştırır; `from`, yeni görünümde `data-hm-shared={name}` ile işaretli öğeye dönüşür. Geçiş bitince çözülür.",
+  "sharedTransition": "Sonraki görünümü çizen `update`'i çalıştırır; `from`, yeni görünümde `data-m-shared={name}` ile işaretli öğeye dönüşür. Geçiş bitince çözülür.",
   "staggerIn": "Bir öğe kümesini sırayla getirir (hazır anahtar kareler, motor kademesi: doğrusal, merkezden ya da ızgarada).",
-  "stickyReveal": "Yapışkan sahneli uzun bölüm: bölüm kaydıkça adımlar sırayla gelir (her biri belirip yükselir, sonra çıkar). Bölüm kendi üzerine `--hm-scroll` (0..1) yazar. Durdurma işlevi döndürür."
+  "stickyReveal": "Yapışkan sahneli uzun bölüm: bölüm kaydıkça adımlar sırayla gelir (her biri belirip yükselir, sonra çıkar). Bölüm kendi üzerine `--m-scroll` (0..1) yazar. Durdurma işlevi döndürür."
  },
  "hadi-march/motion/text": {
   "blurIn": "Kelimeler netleşir (filter).",
@@ -746,9 +746,9 @@
  "hadi-march/fx": {
   "Aurora": "İçeriğin arkasında animasyonlu, bulanık renk lekeleri. `<Aurora colors={[\"#6d5dfc\", \"#22d3ee\", \"#a3e635\"]} />`",
   "confetti": "Bir noktadan (varsayılan ekran merkezi) konfeti patlaması. Bitince tuvalini kaldırır.",
-  "Noise": "Tanecik katmanı saran bileşen: `<Noise>…</Noise>` (.hm-noise kullanır).",
-  "Particles": "İsteğe bağlı bağlantı çizgileri ve imleç çekimi olan yüzen parçacıklar. `<Particles count={80} links={120} speed={0.3} color=\"var(--hm-primary)\" interactive class=\"hm-fx-fill\" />`",
-  "spotlight": "Bir öğe üzerinde imleci izleyen radyal ışık (--hm-spot-x/--hm-spot-y ayarlar). `use:spotlight`"
+  "Noise": "Tanecik katmanı saran bileşen: `<Noise>…</Noise>` (.m-noise kullanır).",
+  "Particles": "İsteğe bağlı bağlantı çizgileri ve imleç çekimi olan yüzen parçacıklar. `<Particles count={80} links={120} speed={0.3} color=\"var(--m-primary)\" interactive class=\"m-fx-fill\" />`",
+  "spotlight": "Bir öğe üzerinde imleci izleyen radyal ışık (--m-spot-x/--m-spot-y ayarlar). `use:spotlight`"
  },
  "hadi-march/store": {
   "derive": "Türetilmiş değer (computed): `const total = derive(() => app.cart.items.reduce(…))`.",
@@ -832,7 +832,7 @@
   "neon": "Neon: gece kulübü; koyu mor, parlak neon.",
   "night": "Gece Mavisi: her zaman koyu lacivert gece, soğuk mavi.",
   "onBrandFill": "HADİ'nin marka kuralı (kBrandWhiteMinRatio 2.6): beyaz 2.6:1'e ulaşıyorsa marka dolgusu üzerinde beyaz metin, değilse beyaz / koyuya yakın siyahtan daha iyisi.",
-  "themeCss": "Bir tema için CSS: `[data-hm-theme=\"id\"]` açık, koyu (sistem veya data-theme=\"dark\"). `isDefault`, data-hm-theme olmayan <html> öğesini de hedefler.",
+  "themeCss": "Bir tema için CSS: `[data-m-theme=\"id\"]` açık, koyu (sistem veya data-theme=\"dark\"). `isDefault`, data-m-theme olmayan <html> öğesini de hedefler.",
   "THEMES": "Yerleşik temalar, varsayılan ilk sırada."
  },
  "hadi-march/net": {
@@ -1091,7 +1091,7 @@
   "checkHtml": "Tek bir sayfayı denetler. Hatalar: arama motorlarının gereksindiği; uyarılar: çoğu sayfada olması gereken.",
   "formatIssues": "Sorun başına bir satır; uçbirimler ve önizlemeler için.",
   "headTags": "Şu an <head> içine yazılan etiketler (tepkisel): önizlemeler, testler.",
-  "headToHtml": "Etiketleri HTML metni olarak verir (derleme zamanı, önizlemeler). `mark` istemcinin sahiplenmesi için data-hm-head ekler.",
+  "headToHtml": "Etiketleri HTML metni olarak verir (derleme zamanı, önizlemeler). `mark` istemcinin sahiplenmesi için data-m-head ekler.",
   "installSeo": "Rota başlıklarını açar: yönlendirici her gezinmede her rotanın `head` (ve title) değerini buraya verir.",
   "jsonLdText": "Bir <script type=\"application/ld+json\"> gövdesi için JSON: \"</script\" ve \"<!--\" öğeyi asla kapatamaz veya şaşırtamaz.",
   "ld": "JSON-LD oluşturucuları: WebSite, Organization, Article, Product, Breadcrumb, FAQ.",
@@ -1103,8 +1103,8 @@
   "useHead": "Çağıran bileşen yaşadığı sürece başlık etiketleri ekler (onunla birlikte kaldırılır). `input` bir işlev olabilir: izlenir, içinde okunan sinyaller başlığı günceller."
  },
  "hadi-march/seo/hydrate": {
-  "hydrate": "Önceden oluşturulmuş HTML'i (data-hm-prerender) titremeden devralır; yoksa normal çizer.",
-  "prerenderedFor": "URL, `el` içine önceden oluşturulmuş rotayı gösteriyorsa true (data-hm-prerender: karma yönlendirmede \"#/x\", aksi halde \"/x\"). Geçmiş yönlendirmesi yolun sonunu karşılaştırır, böylece her tabanda çalışır; \"/\" yalnız klasör URL'sine uyar.",
+  "hydrate": "Önceden oluşturulmuş HTML'i (data-m-prerender) titremeden devralır; yoksa normal çizer.",
+  "prerenderedFor": "URL, `el` içine önceden oluşturulmuş rotayı gösteriyorsa true (data-m-prerender: karma yönlendirmede \"#/x\", aksi halde \"/x\"). Geçmiş yönlendirmesi yolun sonunu karşılaştırır, böylece her tabanda çalışır; \"/\" yalnız klasör URL'sine uyar.",
   "HYDRATING_ATTR": "hydrate() uygulamayı ekran dışında kurarken <html> üzerinde duran öznitelik: giriş animasyonları ön işlenmiş içeriği yeniden oynatmaz."
  },
  "hadi-march/managers/accessibility/ui": {

@@ -66,19 +66,19 @@ export function Page(props: PageProps): Element {
     onCleanup(() => { globalThis.document.title = before; });
   }
   const crumbs = (): readonly Breadcrumb[] => val(props.breadcrumbs) ?? [];
-  return h("div", { ...rest(props, ["title", "subtitle", "actions", "breadcrumbs", "back", "tabs", "tabsQuery", "narrow", "corners", "features", "layout", "documentTitle"]), class: () => cx("hm-page", props.narrow && "hm-page-narrow", val(props.class)) },
-    h("header", { class: "hm-page-head" },
-      () => crumbs().length > 0 && untrack(() => h(Crumbs, { class: "hm-page-crumbs", separator: "/", label: () => t`Breadcrumb`, items: () => crumbs().map((c, i) => ({ id: String(i), label: c.label, ...(c.href ? { href: c.href } : {}) })) })),
+  return h("div", { ...rest(props, ["title", "subtitle", "actions", "breadcrumbs", "back", "tabs", "tabsQuery", "narrow", "corners", "features", "layout", "documentTitle"]), class: () => cx("m-page", props.narrow && "m-page-narrow", val(props.class)) },
+    h("header", { class: "m-page-head" },
+      () => crumbs().length > 0 && untrack(() => h(Crumbs, { class: "m-page-crumbs", separator: "/", label: () => t`Breadcrumb`, items: () => crumbs().map((c, i) => ({ id: String(i), label: c.label, ...(c.href ? { href: c.href } : {}) })) })),
       h(PanelHeader, {
-        as: "div", class: "hm-page-titlebar", size: "lg", titleAs: "h1", title: () => val(props.title), subtitle: props.subtitle != null ? () => val(props.subtitle) : undefined,
-        partClass: { titles: "hm-page-titles", title: "hm-page-title", subtitle: "hm-page-sub", actions: "hm-page-actions" },
+        as: "div", class: "m-page-titlebar", size: "lg", titleAs: "h1", title: () => val(props.title), subtitle: props.subtitle != null ? () => val(props.subtitle) : undefined,
+        partClass: { titles: "m-page-titles", title: "m-page-title", subtitle: "m-page-sub", actions: "m-page-actions" },
         lead: props.back != null ? h(IconButton, {
-          class: "hm-page-back", variant: "raised", icon: arrowLeft, label: () => t`Back`, title: false,
+          class: "m-page-back", variant: "raised", icon: arrowLeft, label: () => t`Back`, title: false,
           ...(typeof props.back === "string" ? { href: props.back } : { onClick: () => (typeof props.back === "function" ? props.back() : historyBack()) }),
         }) : undefined,
         actions: props.actions != null ? actionsOf(() => props.actions) : undefined,
       })),
-    h("div", { class: "hm-page-body" },
+    h("div", { class: "m-page-body" },
       props.children,
       props.tabs != null && h(Tabs, { tabs: () => val(props.tabs), query: props.tabsQuery, label: () => val(props.title) as string })));
 }
@@ -100,11 +100,11 @@ Page.extend = function extend(defaults: Partial<PageProps>): PageComponent {
 export interface SectionProps { title?: MaybeFn<unknown>; description?: MaybeFn<unknown>; actions?: ActionsProp; class?: ClassProp; children?: unknown }
 /** Titled block inside a page: `<Section title="Security" description="…" actions={[…]}>…</Section>` */
 export function Section(props: SectionProps): Element {
-  return h("section", { class: () => cx("hm-section", val(props.class)) },
+  return h("section", { class: () => cx("m-section", val(props.class)) },
     (props.title != null || props.actions != null) && h(PanelHeader, {
-      as: "div", class: "hm-section-head", titleAs: "h2", title: props.title != null ? () => val(props.title) : undefined,
+      as: "div", class: "m-section-head", titleAs: "h2", title: props.title != null ? () => val(props.title) : undefined,
       subtitle: props.description != null ? () => val(props.description) : undefined,
-      partClass: { title: "hm-section-title", subtitle: "hm-section-desc", actions: "hm-section-actions" },
+      partClass: { title: "m-section-title", subtitle: "m-section-desc", actions: "m-section-actions" },
       actions: props.actions != null ? actionsOf(() => props.actions) : undefined,
     }),
     props.children);
@@ -128,11 +128,11 @@ export interface ListDetailProps {
  */
 export function ListDetail(props: ListDetailProps): Element {
   const has = (): boolean => !!val(props.selected);
-  return h("div", { class: () => cx("hm-ld", has() && "hm-ld-has-detail", val(props.class)) },
-    h("div", { class: "hm-ld-list", "aria-label": () => val(props.listLabel) ?? null }, props.list),
-    h("div", { class: "hm-ld-detail", role: "region", "aria-label": () => val(props.detailLabel) ?? t`Details` },
+  return h("div", { class: () => cx("m-ld", has() && "m-ld-has-detail", val(props.class)) },
+    h("div", { class: "m-ld-list", "aria-label": () => val(props.listLabel) ?? null }, props.list),
+    h("div", { class: "m-ld-detail", role: "region", "aria-label": () => val(props.detailLabel) ?? t`Details` },
       () => (has()
-        ? [props.onBack && h(Button, { variant: "ghost", size: "sm", class: "hm-ld-back", icon: arrowLeft, onClick: () => props.onBack?.() }, () => t`Back`),
+        ? [props.onBack && h(Button, { variant: "ghost", size: "sm", class: "m-ld-back", icon: arrowLeft, onClick: () => props.onBack?.() }, () => t`Back`),
           untrack(() => (typeof props.detail === "function" && !props.detail.length ? (props.detail as () => unknown)() : props.detail))]
         : props.empty ?? h(Empty, { size: "sm", title: () => t`Select an item to see its details.` }))));
 }
@@ -162,10 +162,10 @@ export function Pager(props: PagerProps): Element {
   // the props as they are (getters stay live), as the simple variant, with the old class on the root
   const own: PaginationProps = { variant: "simple" };
   for (const k of Object.keys(props)) if (k !== "class") Object.defineProperty(own, k, Object.getOwnPropertyDescriptor(props, k)!);
-  Object.defineProperty(own, "class", { get: () => cx("hm-pager", val(props.class)), enumerable: true });
+  Object.defineProperty(own, "class", { get: () => cx("m-pager", val(props.class)), enumerable: true });
   const el = Pagination(own);
-  // the hooks apps knew: .hm-pager, .hm-pager-info, [data-prev], [data-next]
-  el.querySelector(".hm-page-info")?.classList.add("hm-pager-info");
+  // the hooks apps knew: .m-pager, .m-pager-info, [data-prev], [data-next]
+  el.querySelector(".m-page-info")?.classList.add("m-pager-info");
   const steps = el.querySelectorAll("button");
   steps[0]?.setAttribute("data-prev", "");
   steps[steps.length - 1]?.setAttribute("data-next", "");

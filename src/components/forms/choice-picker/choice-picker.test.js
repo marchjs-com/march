@@ -24,5 +24,5 @@ test("ChoicePicker: auto look by option count; forced kinds win; a click sets th
   el.querySelectorAll("[role=radio]")[2].click();
   assert.equal(v(), "c");
   const chips = mount(() => h(ChoicePicker, { value: null, options: o(8) }));
-  assert.ok(chips.el.querySelector(".hm-picker-chips .hm-choice-chip"));
+  assert.ok(chips.el.querySelector(".m-picker-chips .m-choice-chip"));
 });

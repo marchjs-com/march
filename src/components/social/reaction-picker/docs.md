@@ -24,7 +24,7 @@ between emoji (mirrored in RTL; up / down move by rows in the grid), Home / End 
 | `moreLabel` | string | "More emoji" | accessible name of the + button |
 | `moreIcon` | node | + | your own content for that button |
 | `color` | ColorToken | `brand-blue` | the picked emoji's circle and the focus ring |
-| `class` | string | — | on the root (`hm-react`; parts: `hm-react-e`, `hm-react-more`) |
+| `class` | string | — | on the root (`m-react`; parts: `m-react-e`, `m-react-more`) |
 
 ```tsx
 <ReactionPicker onPick={react} onMore={openPanel} color="brand-orange" pop={false} label="React to the photo"

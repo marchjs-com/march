@@ -60,7 +60,7 @@ test("applyHead updates static tags in place, restores and removes", () => {
     applyHead([]);
     assert.equal(document.title, "Static");
     // scripts: false leaves JSON-LD blocks of the build alone
-    parseInto(document, document.head, '<script type="application/ld+json" data-hm-head>{"a":1}</script>');
+    parseInto(document, document.head, '<script type="application/ld+json" data-m-head>{"a":1}</script>');
     applyHead(resolveHead([{ title: "C", jsonLd: { b: 2 } }]), { scripts: false });
     assert.deepEqual([...document.head.querySelectorAll("script")].map((x) => x.textContent), ['{"a":1}']);
   } finally { _resetHead(); cleanup(); }
@@ -135,7 +135,7 @@ test("hydrate: renders without prerender, swaps when ready, drops stale content"
   try {
     const el = document.createElement("div");
     document.body.appendChild(el);
-    el.setAttribute("data-hm-prerender", "#/");
+    el.setAttribute("data-m-prerender", "#/");
     el.appendChild(document.createTextNode("old"));
     assert.equal(prerenderedFor(el), false);
     hydrate(() => "new", el, { ready: () => true });
@@ -144,7 +144,7 @@ test("hydrate: renders without prerender, swaps when ready, drops stale content"
     location.hash = "#/";
     const el2 = document.createElement("div");
     document.body.appendChild(el2);
-    el2.setAttribute("data-hm-prerender", "#/");
+    el2.setAttribute("data-m-prerender", "#/");
     el2.appendChild(document.createTextNode("pre"));
     let ok = false;
     hydrate(() => "fresh", el2, { ready: () => ok });
@@ -186,11 +186,11 @@ test("march build with seo.prerender: a page per route, head, sitemap, robots; m
     try { execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe", timeout: 120000 }); } catch (e) { assert.fail(String(e.stderr) + String(e.stdout)); }
     const home = readFileSync(join(dir, "dist/index.html"), "utf8");
     const about = readFileSync(join(dir, "dist/about/index.html"), "utf8");
-    assert.match(home, /<div id="app" data-hm-prerender="\/">.*<h1>Welcome<\/h1>/s);
+    assert.match(home, /<div id="app" data-m-prerender="\/">.*<h1>Welcome<\/h1>/s);
     assert.match(home, /<title>Home · Shop<\/title>/);
-    assert.match(home, /<link data-hm-head rel="canonical" href="https:\/\/shop.example\/">/);
+    assert.match(home, /<link data-m-head rel="canonical" href="https:\/\/shop.example\/">/);
     assert.match(home, /<script type="application\/ld\+json">\{"@context":"https:\/\/schema.org","@type":"WebSite"/);
-    assert.doesNotMatch(home, /id="hm-boot"/, "the boot placeholder is gone");
+    assert.doesNotMatch(home, /id="m-boot"/, "the boot placeholder is gone");
     assert.match(about, /<h1>About us<\/h1>/);
     assert.match(about, /<title>About · Shop<\/title>/);
     assert.match(about, /property="og:url" content="https:\/\/shop.example\/about"/);
@@ -205,7 +205,7 @@ test("march build with seo.prerender: a page per route, head, sitemap, robots; m
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test("hydrate: <html data-hm-hydrating> while the app builds off-screen; reveal skips what is already on screen", async () => {
+test("hydrate: <html data-m-hydrating> while the app builds off-screen; reveal skips what is already on screen", async () => {
   const { document, cleanup } = installDom({ url: "http://localhost/#/" });
   try {
     const { reveal } = await import("../src/motion/scroll.ts");
@@ -214,16 +214,16 @@ test("hydrate: <html data-hm-hydrating> while the app builds off-screen; reveal 
     globalThis.IntersectionObserver = class { observe() {} disconnect() {} };
     const el = document.createElement("div");
     document.body.appendChild(el);
-    el.setAttribute("data-hm-prerender", "#/");
+    el.setAttribute("data-m-prerender", "#/");
     el.appendChild(document.createTextNode("pre"));
     let ok = false, seen = false, card;
-    hydrate(() => { seen = document.documentElement.hasAttribute("data-hm-hydrating"); card = document.createElement("p"); reveal(card); return card; }, el, { ready: () => ok });
+    hydrate(() => { seen = document.documentElement.hasAttribute("data-m-hydrating"); card = document.createElement("p"); reveal(card); return card; }, el, { ready: () => ok });
     assert.equal(seen, true, "set while rendering");
     const hidden = (x) => /opacity/.test(x.getAttribute("style") ?? "") || x.style.getPropertyValue?.("opacity") === "0";
     assert.equal(hidden(card), false, "a revealed element is not hidden during the takeover");
     ok = true;
     await tick(40);
-    assert.equal(document.documentElement.hasAttribute("data-hm-hydrating"), false, "cleared after the swap");
+    assert.equal(document.documentElement.hasAttribute("data-m-hydrating"), false, "cleared after the swap");
     const later = document.createElement("p");
     document.body.appendChild(later);
     reveal(later);

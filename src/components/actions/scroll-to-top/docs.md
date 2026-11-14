@@ -29,7 +29,7 @@ import { ScrollToTop } from "hadi-march/ui";
 | `color` | Color token of the icon and border; default: text colour, the theme's primary on hover. |
 | `motion` | How it appears and leaves: `pop` (default), `fade`, `slide`, `none` / `false`, or `(el, shown) => …` for your own animation. |
 | `smooth` | Scroll back smoothly (default `true`); `false` jumps at once. |
-| `class` | Extra classes on the button (`.hm-to-top`). |
+| `class` | Extra classes on the button (`.m-to-top`). |
 
 ## Accessibility
 

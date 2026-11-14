@@ -49,19 +49,19 @@ export function FeatureGrid(props: FeatureGridProps): Element {
     const row = (as: "article" | "div", cls: string): Element => h(ListRow, {
       as, class: cls, direction: variant === "list" ? "row" : "column", align: "start", overflow: "wrap", titleAs: "h3", subAs: "p",
       lead: it.icon != null ? h(IconTile, { icon: it.icon, tone: it.tone ?? (variant === "plain" || variant === "list" ? "primary" : TONES[i % TONES.length]), size: variant === "list" ? "sm" : "md" }) : undefined,
-      title: it.href ? h("a", { href: it.href, class: "hm-fg-link" }, it.title) : it.title, sub: it.body ?? undefined,
+      title: it.href ? h("a", { href: it.href, class: "m-fg-link" }, it.title) : it.title, sub: it.body ?? undefined,
     }) as Element;
-    const media = variant === "bento" && it.media != null ? h("div", { class: "hm-fg-media" }, it.media) : null;
-    const cls = cx("hm-fg-item", variant === "bento" && `hm-fg-span-${it.span ?? "normal"}`, it.href && "is-link");
-    if (variant === "cards" || variant === "bento") return h(Card, { as: "article", class: cls }, row("div", "hm-fg-row"), media) as Element;
-    return row("article", cx("hm-fg-row", cls));
+    const media = variant === "bento" && it.media != null ? h("div", { class: "m-fg-media" }, it.media) : null;
+    const cls = cx("m-fg-item", variant === "bento" && `m-fg-span-${it.span ?? "normal"}`, it.href && "is-link");
+    if (variant === "cards" || variant === "bento") return h(Card, { as: "article", class: cls }, row("div", "m-fg-row"), media) as Element;
+    return row("article", cx("m-fg-row", cls));
   };
   const grid = variant === "bento"
-    ? h("div", { class: "hm-fg-bento" }, props.items.map(tile))
+    ? h("div", { class: "m-fg-bento" }, props.items.map(tile))
     : h(Grid, { cols: variant === "list" ? 2 : props.cols ?? 3, gap: variant === "plain" ? 6 : 4, equal: variant === "cards" }, props.items.map(tile));
-  const root = h("div", { class: cx("hm-fg", `hm-fg-v-${variant}`, props.spotlight !== false && (variant === "cards" || variant === "bento") && "is-spotlight", val(props.class)) }, grid) as HTMLElement;
+  const root = h("div", { class: cx("m-fg", `m-fg-v-${variant}`, props.spotlight !== false && (variant === "cards" || variant === "bento") && "is-spotlight", val(props.class)) }, grid) as HTMLElement;
 
-  if (props.reveal !== "none") owned(revealOnScroll(root, { effect: props.reveal ?? "up", select: ".hm-fg-item", stagger: 70 }));
+  if (props.reveal !== "none") owned(revealOnScroll(root, { effect: props.reveal ?? "up", select: ".m-fg-item", stagger: 70 }));
   if (props.spotlight !== false && (variant === "cards" || variant === "bento")) {
     // one listener for the grid; every tile gets the pointer position relative to itself (its glow and border light)
     let pending = false, px = 0, py = 0;
@@ -71,8 +71,8 @@ export function FeatureGrid(props: FeatureGridProps): Element {
         if (pending) return;
         pending = true;
         measure(() => {
-          const tiles = [...root.querySelectorAll<HTMLElement>(".hm-fg-item")], rects = tiles.map((t) => t.getBoundingClientRect());
-          mutate(() => { pending = false; tiles.forEach((t, i) => setStyle(t, { "--hm-fg-x": `${px - rects[i]!.left}px`, "--hm-fg-y": `${py - rects[i]!.top}px` })); });
+          const tiles = [...root.querySelectorAll<HTMLElement>(".m-fg-item")], rects = tiles.map((t) => t.getBoundingClientRect());
+          mutate(() => { pending = false; tiles.forEach((t, i) => setStyle(t, { "--m-fg-x": `${px - rects[i]!.left}px`, "--m-fg-y": `${py - rects[i]!.top}px` })); });
         });
       },
     }));

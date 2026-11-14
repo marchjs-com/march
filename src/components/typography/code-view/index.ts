@@ -32,16 +32,16 @@ export function CodeView(props: CodeViewProps): Element {
   const lines = (): Token[][] => tokenLines(String(val(props.code) ?? ""), props.highlight === false ? "" : props.lang ?? "");
   const numbers = props.lineNumbers !== false;
   const lang = props.langLabel === false ? null : props.langLabel ?? props.lang;
-  return h("div", { class: () => cx("hm-code", wrap() && "is-wrapped", val(props.class)) },
+  return h("div", { class: () => cx("m-code", wrap() && "is-wrapped", val(props.class)) },
     props.toolbar !== false && h(PanelHeader, {
-      as: "div", size: "sm", divider: true, class: "hm-code-bar",
-      lead: lang != null && lang !== "" ? h("span", { class: "hm-code-lang" }, lang) : undefined,
+      as: "div", size: "sm", divider: true, class: "m-code-bar",
+      lead: lang != null && lang !== "" ? h("span", { class: "m-code-lang" }, lang) : undefined,
       actions: [
-        props.wrapButton !== false && h(Button, { variant: "ghost", size: "sm", class: "hm-code-wrap", pressed: wrap, onClick: () => wrap.update((x) => !x) }, () => val(props.wrapLabel) ?? t`Wrap`),
+        props.wrapButton !== false && h(Button, { variant: "ghost", size: "sm", class: "m-code-wrap", pressed: wrap, onClick: () => wrap.update((x) => !x) }, () => val(props.wrapLabel) ?? t`Wrap`),
         props.copy !== false && h(CopyButton, { text: () => val(props.code), ...(props.copyLabel != null ? { label: props.copyLabel } : {}) }), props.tools],
     }),
-    h("pre", { class: "hm-code-pre", tabindex: "0", "aria-label": () => val(props.label) ?? t`Code` },
-      h("code", {}, () => lines().map((line, i) => h("span", { class: "hm-code-line" },
-        numbers && h("span", { class: "hm-code-ln", "aria-hidden": "true" }, String(i + 1)),
-        h("span", { class: "hm-code-text" }, line.map(([k, x]) => (k ? h("span", { class: `hm-tok-${k}` }, x) : x))), "\n")))));
+    h("pre", { class: "m-code-pre", tabindex: "0", "aria-label": () => val(props.label) ?? t`Code` },
+      h("code", {}, () => lines().map((line, i) => h("span", { class: "m-code-line" },
+        numbers && h("span", { class: "m-code-ln", "aria-hidden": "true" }, String(i + 1)),
+        h("span", { class: "m-code-text" }, line.map(([k, x]) => (k ? h("span", { class: `m-tok-${k}` }, x) : x))), "\n")))));
 }

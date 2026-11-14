@@ -50,5 +50,5 @@ function draw<T>(props: ChoicePickerProps<T>, opts: Option[], kind: PickerKind):
   const group: RadioGroupProps<T> = extend(props as RadioGroupProps<T>, {
     options: () => mapped, variant: () => (visual ? "card" : "chip"), inline: () => true, size: () => "sm",
   });
-  return h("div", { class: `hm-picker hm-picker-${kind}` }, RadioGroup(group));
+  return h("div", { class: `m-picker m-picker-${kind}` }, RadioGroup(group));
 }

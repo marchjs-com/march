@@ -1,3 +1,3 @@
 /* March — CountRoll. Digits are tabular so a rolling number never jitters its neighbours. */
-.hm-roll { display: inline-flex; font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.2; }
-.hm-roll-vis { display: inline-flex; overflow: hidden; padding-block: .06em; margin-block: -.06em; }
+.m-roll { display: inline-flex; font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.2; }
+.m-roll-vis { display: inline-flex; overflow: hidden; padding-block: .06em; margin-block: -.06em; }

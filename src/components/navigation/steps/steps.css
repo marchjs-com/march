@@ -1,23 +1,23 @@
 /* March — Steps. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- steps */
-.hm-steps2 { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--hm-space-2); counter-reset: none; }
-.hm-step2 { position: relative; flex: 1; min-width: 0; }
-.hm-step2:not(:last-child)::after { content: ""; position: absolute; top: 1rem; inset-inline: calc(2.25rem + var(--hm-space-1)) var(--hm-space-1); height: 2px; border-radius: 2px; background: var(--hm-border); }
-.hm-step2.is-done:not(:last-child)::after { background: var(--hm-accent, var(--hm-primary)); }
-.hm-step2-hit { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: var(--hm-space-2); padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: start; cursor: pointer; }
-span.hm-step2-hit { cursor: default; }
-.hm-step2-dot { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; border: 2px solid var(--hm-border-strong); background: var(--hm-surface); color: var(--hm-muted);
-  font-weight: 700; font-size: var(--hm-text-sm); transition: all var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-step2-dot .hm-svg { width: .9375rem; height: .9375rem; stroke-width: 2.4; }
-.hm-step2-dot .hm-checkmark-icon { inline-size: .9375rem; block-size: .9375rem; }
-.hm-step2.is-done .hm-step2-dot { background: var(--hm-accent, var(--hm-primary)); border-color: var(--hm-accent, var(--hm-primary)); color: var(--hm-on-accent, var(--hm-on-primary-fill)); }
-.hm-step2.is-current .hm-step2-dot { border-color: var(--hm-accent, var(--hm-primary)); color: var(--hm-accent, var(--hm-primary)); box-shadow: 0 0 0 4px var(--hm-accent-soft, var(--hm-primary-soft)); }
-.hm-step2-text { display: flex; flex-direction: column; }
-.hm-step2-title { font-weight: 600; font-size: var(--hm-text-md); color: var(--hm-text-2); }
-.hm-step2.is-current .hm-step2-title { color: var(--hm-text); }
-.hm-step2-desc { color: var(--hm-muted); font-size: var(--hm-text-sm); }
-.hm-steps2-v { flex-direction: column; gap: var(--hm-space-5); }
-.hm-steps2-v .hm-step2-hit { flex-direction: row; align-items: flex-start; }
-.hm-steps2-v .hm-step2:not(:last-child)::after { top: 2.25rem; bottom: calc(-1 * var(--hm-space-5) + .25rem); inset-inline: .9375rem auto; width: 2px; height: auto; }
-@media (max-width: 640px) { .hm-steps2:not(.hm-steps2-v) .hm-step2-desc { display: none; } .hm-steps2:not(.hm-steps2-v) .hm-step2-title { font-size: var(--hm-text-sm); } }
-.hm-steps2.hm-steps2-bare .hm-step2:not(:last-child)::after { display: none; }
+.m-steps2 { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--m-space-2); counter-reset: none; }
+.m-step2 { position: relative; flex: 1; min-width: 0; }
+.m-step2:not(:last-child)::after { content: ""; position: absolute; top: 1rem; inset-inline: calc(2.25rem + var(--m-space-1)) var(--m-space-1); height: 2px; border-radius: 2px; background: var(--m-border); }
+.m-step2.is-done:not(:last-child)::after { background: var(--m-accent, var(--m-primary)); }
+.m-step2-hit { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: var(--m-space-2); padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+span.m-step2-hit { cursor: default; }
+.m-step2-dot { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; border: 2px solid var(--m-border-strong); background: var(--m-surface); color: var(--m-muted);
+  font-weight: 700; font-size: var(--m-text-sm); transition: all var(--m-dur-slow) var(--m-ease-out); }
+.m-step2-dot .m-svg { width: .9375rem; height: .9375rem; stroke-width: 2.4; }
+.m-step2-dot .m-checkmark-icon { inline-size: .9375rem; block-size: .9375rem; }
+.m-step2.is-done .m-step2-dot { background: var(--m-accent, var(--m-primary)); border-color: var(--m-accent, var(--m-primary)); color: var(--m-on-accent, var(--m-on-primary-fill)); }
+.m-step2.is-current .m-step2-dot { border-color: var(--m-accent, var(--m-primary)); color: var(--m-accent, var(--m-primary)); box-shadow: 0 0 0 4px var(--m-accent-soft, var(--m-primary-soft)); }
+.m-step2-text { display: flex; flex-direction: column; }
+.m-step2-title { font-weight: 600; font-size: var(--m-text-md); color: var(--m-text-2); }
+.m-step2.is-current .m-step2-title { color: var(--m-text); }
+.m-step2-desc { color: var(--m-muted); font-size: var(--m-text-sm); }
+.m-steps2-v { flex-direction: column; gap: var(--m-space-5); }
+.m-steps2-v .m-step2-hit { flex-direction: row; align-items: flex-start; }
+.m-steps2-v .m-step2:not(:last-child)::after { top: 2.25rem; bottom: calc(-1 * var(--m-space-5) + .25rem); inset-inline: .9375rem auto; width: 2px; height: auto; }
+@media (max-width: 640px) { .m-steps2:not(.m-steps2-v) .m-step2-desc { display: none; } .m-steps2:not(.m-steps2-v) .m-step2-title { font-size: var(--m-text-sm); } }
+.m-steps2.m-steps2-bare .m-step2:not(:last-child)::after { display: none; }

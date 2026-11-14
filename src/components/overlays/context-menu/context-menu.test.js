@@ -31,11 +31,11 @@ test("ContextMenu: right-click opens items for the target, Escape closes, Shift+
 test("ContextMenu: menuClass lands on the panel, class on the host", async () => {
   const host = document.createElement("div"); document.body.appendChild(host);
   const dispose = render(() => h(ContextMenu, { class: "area", menuClass: "files-menu", items: () => [{ label: "Open", onSelect: () => {} }] }, h("button", { type: "button" }, "A")), host);
-  assert.ok(host.querySelector(".hm-ctxmenu.area"));
+  assert.ok(host.querySelector(".m-ctxmenu.area"));
   host.querySelector("button").dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 5, clientY: 5 }));
   await Promise.resolve();
   const menu = document.querySelector('[role="menu"]');
-  assert.ok(menu.classList.contains("hm-menu") && menu.classList.contains("files-menu"));
+  assert.ok(menu.classList.contains("m-menu") && menu.classList.contains("files-menu"));
   document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
   dispose();
 });

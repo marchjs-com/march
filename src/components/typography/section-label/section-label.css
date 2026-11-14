@@ -1,13 +1,13 @@
 /* SectionLabel. The small faint heading of a group inside a panel: tokens only, logical properties, no keyframes. */
-.hm-section-label { display: flex; align-items: center; gap: var(--hm-space-2); min-inline-size: 0; min-block-size: 1.5rem; margin: 0; padding: 0; border: 0; list-style: none; color: var(--hm-faint, var(--hm-muted));
-  font-size: var(--hm-text-2xs, .6875rem); font-weight: var(--hm-weight-semibold); line-height: 1.3; letter-spacing: var(--hm-tracking-caps, .06em); text-transform: uppercase; }
-.hm-section-label-md { font-size: var(--hm-text-xs); min-block-size: 1.75rem; }
-.hm-section-label.is-plain { letter-spacing: 0; text-transform: none; }
-.hm-section-label[data-hm-color] { color: var(--hm-accent-text, var(--hm-accent, var(--hm-primary-text))); }
-.hm-section-label-icon { display: inline-flex; flex: none; }
-.hm-section-label-icon .hm-svg { inline-size: .875rem; block-size: .875rem; }
-.hm-section-label-text { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hm-section-label-count { flex: none; font-variant-numeric: tabular-nums; letter-spacing: 0; opacity: .8; }
-.hm-section-label-rule { flex: 1 1 auto; min-inline-size: var(--hm-space-3); block-size: 1px; background: var(--hm-border-subtle, var(--hm-border)); }
-.hm-section-label-actions { display: inline-flex; align-items: center; gap: var(--hm-space-1); flex: none; margin-inline-start: auto; letter-spacing: 0; text-transform: none; }
-.hm-section-label-rule + .hm-section-label-actions { margin-inline-start: 0; }
+.m-section-label { display: flex; align-items: center; gap: var(--m-space-2); min-inline-size: 0; min-block-size: 1.5rem; margin: 0; padding: 0; border: 0; list-style: none; color: var(--m-faint, var(--m-muted));
+  font-size: var(--m-text-2xs, .6875rem); font-weight: var(--m-weight-semibold); line-height: 1.3; letter-spacing: var(--m-tracking-caps, .06em); text-transform: uppercase; }
+.m-section-label-md { font-size: var(--m-text-xs); min-block-size: 1.75rem; }
+.m-section-label.is-plain { letter-spacing: 0; text-transform: none; }
+.m-section-label[data-m-color] { color: var(--m-accent-text, var(--m-accent, var(--m-primary-text))); }
+.m-section-label-icon { display: inline-flex; flex: none; }
+.m-section-label-icon .m-svg { inline-size: .875rem; block-size: .875rem; }
+.m-section-label-text { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-section-label-count { flex: none; font-variant-numeric: tabular-nums; letter-spacing: 0; opacity: .8; }
+.m-section-label-rule { flex: 1 1 auto; min-inline-size: var(--m-space-3); block-size: 1px; background: var(--m-border-subtle, var(--m-border)); }
+.m-section-label-actions { display: inline-flex; align-items: center; gap: var(--m-space-1); flex: none; margin-inline-start: auto; letter-spacing: 0; text-transform: none; }
+.m-section-label-rule + .m-section-label-actions { margin-inline-start: 0; }

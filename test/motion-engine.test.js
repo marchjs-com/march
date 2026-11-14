@@ -31,8 +31,8 @@ function fakeWaapi(el) {
 
 test("easing: tokens, cubic-bezier, steps, spring → CSS linear(), bounce, linear() round trip", () => {
   assert.equal(E.ease("out").css, "cubic-bezier(0.33,1,0.68,1)");
-  assert.equal(E.ease("--hm-ease-out"), E.ease("out"), "CSS token names resolve to the same easing");
-  assert.equal(E.ease("var(--hm-ease-expo)"), E.ease("expo"));
+  assert.equal(E.ease("--m-ease-out"), E.ease("out"), "CSS token names resolve to the same easing");
+  assert.equal(E.ease("var(--m-ease-expo)"), E.ease("expo"));
   const cb = E.ease("cubic-bezier(.42,0,.58,1)");
   assert.ok(near(cb(0.5), 0.5) && cb(0.25) < 0.25 && cb(0.75) > 0.75);
   const st = E.steps(4, "end");
@@ -126,7 +126,7 @@ test("one clock: global speed, pause / resume, slow motion — and the setting i
   const o = { v: 0 };
   E.animate(o, { v: [0, 1] }, { duration: 100, easing: "linear" });
   E.motion.config({ speed: 2 });
-  assert.equal(JSON.parse(localStorage.getItem("hm-motion")).speed, 2, "persisted");
+  assert.equal(JSON.parse(localStorage.getItem("m-motion")).speed, 2, "persisted");
   run(25); assert.ok(near(o.v, 0.5, 1e-9), `speed 2: ${o.v}`);
   E.motion.pauseAll(); run(100); assert.ok(near(o.v, 0.5, 1e-9), "frozen while paused");
   assert.equal(E.motion.paused(), true);
@@ -144,7 +144,7 @@ test("one clock: global speed, pause / resume, slow motion — and the setting i
 test("reduced motion: animations jump to their end, essential ones still run, endless ones stay still", () => {
   E.motion.config({ reduce: "reduce" });
   assert.equal(E.reducedMotion(), true);
-  assert.ok(document.documentElement.hasAttribute("data-hm-reduced"));
+  assert.ok(document.documentElement.hasAttribute("data-m-reduced"));
   const a = { v: 0 }, b = { v: 0 }, c = { v: 5 };
   E.animate(a, { v: [0, 1] }, { duration: 1000 });
   assert.equal(a.v, 1);
@@ -153,7 +153,7 @@ test("reduced motion: animations jump to their end, essential ones still run, en
   const loop = E.animate(c, { v: [0, 1] }, { duration: 100, iterations: Infinity });
   run(50); assert.equal(c.v, 0); assert.equal(loop.state, "paused");
   E.motion.config({ reduce: "system" });
-  assert.ok(!document.documentElement.hasAttribute("data-hm-reduced"));
+  assert.ok(!document.documentElement.hasAttribute("data-m-reduced"));
 });
 
 test("DOM: WAAPI first — delay = position in the timeline, time / rate / play state follow the playback, will-change in and out", () => {
@@ -224,11 +224,11 @@ test("keyframes(), presets and keyframesCss(): one CSS file from the registratio
   E.preset("testInSlow", "testIn", { duration: 900 });
   assert.equal(E.getKeyframes("testInSlow").defaults.duration, 900);
   const css = E.keyframesCss({ names: ["testIn", "testInSlow", "spin"] });
-  assert.match(css, /@keyframes hm-testIn \{\n {2}0% \{ opacity: 0; transform: translateY\(8px\); \}\n {2}100% \{ opacity: 1; transform: translateY\(0px\); \}\n\}/);
-  assert.match(css, /\.hm-anim-testIn \{ animation: hm-testIn 250ms cubic-bezier\([^)]*\) 0ms 1 normal both; animation-timing-function: linear\(/);
-  assert.match(css, /\.hm-anim-testInSlow \{ animation: hm-testIn 900ms/);
-  assert.match(css, /\.hm-anim-spin \{ animation: hm-spin 1000ms linear 0ms infinite/);
-  assert.match(css, /:root\[data-hm-reduced\]/);
+  assert.match(css, /@keyframes m-testIn \{\n {2}0% \{ opacity: 0; transform: translateY\(8px\); \}\n {2}100% \{ opacity: 1; transform: translateY\(0px\); \}\n\}/);
+  assert.match(css, /\.m-anim-testIn \{ animation: m-testIn 250ms cubic-bezier\([^)]*\) 0ms 1 normal both; animation-timing-function: linear\(/);
+  assert.match(css, /\.m-anim-testInSlow \{ animation: m-testIn 900ms/);
+  assert.match(css, /\.m-anim-spin \{ animation: m-spin 1000ms linear 0ms infinite/);
+  assert.match(css, /:root\[data-m-reduced\]/);
   const o = { opacity: 0 };
   E.animate(o, "fadeIn", { duration: 100, easing: "linear" });
   run(50); assert.ok(near(o.opacity, 0.5, 0.01));

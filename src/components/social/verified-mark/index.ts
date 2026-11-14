@@ -27,8 +27,8 @@ export function VerifiedMark(props: VerifiedMarkProps): Element {
   const label = (): string | null => { const l = val(props.label); return l === false ? null : l || t`Verified`; };
   return h("span", {
     ...rest(props, ["label", "icon", "color", "size"]),
-    class: () => cx("hm-verified-mark", `hm-verified-mark-${val(props.size) ?? "sm"}`, val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)),
+    class: () => cx("m-verified-mark", `m-verified-mark-${val(props.size) ?? "sm"}`, val(props.class)),
+    "data-m-color": () => colorAttr(val(props.color)),
     role: () => (label() == null ? null : "img"), "aria-label": label, "aria-hidden": () => (label() == null ? "true" : null),
-  }, ownIcon(props.icon ?? undefined, badgeCheck, "hm-verified-mark-own"));
+  }, ownIcon(props.icon ?? undefined, badgeCheck, "m-verified-mark-own"));
 }

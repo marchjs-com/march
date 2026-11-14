@@ -24,9 +24,9 @@ export function ErrorBox(props: ErrorBoxProps): Element {
   };
   // an Alert in the danger tone without the icon: title, the message, Retry below; never dismissed, so the node is drawn once
   return (h(Alert, {
-    tone: "danger", icon: null, actionPlacement: "below", class: () => cx("hm-error", "hm-errorbox", val(props.class)),
-    title: props.title != null ? h("span", { class: "hm-errorbox-title" }, () => val(props.title)) : undefined,
-    body: h("p", { class: "hm-errorbox-text" }, msg),
-    action: props.retry ? h(Button, { variant: "secondary", size: "sm", class: "hm-errorbox-retry", onClick: () => props.retry?.() }, () => val(props.retryLabel) ?? t`Retry`) : undefined,
+    tone: "danger", icon: null, actionPlacement: "below", class: () => cx("m-error", "m-errorbox", val(props.class)),
+    title: props.title != null ? h("span", { class: "m-errorbox-title" }, () => val(props.title)) : undefined,
+    body: h("p", { class: "m-errorbox-text" }, msg),
+    action: props.retry ? h(Button, { variant: "secondary", size: "sm", class: "m-errorbox-retry", onClick: () => props.retry?.() }, () => val(props.retryLabel) ?? t`Retry`) : undefined,
   }) as () => Element)();
 }

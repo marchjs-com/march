@@ -1,12 +1,12 @@
 /* March — FollowButton. A pill Button, 42px: filled Aktivite (follow), outline (following / requested). */
-.hm-follow.hm-btn { gap: .375rem; min-height: 2.625rem; padding: 0 1.125rem; border-width: 1.5px; font-weight: 800; overflow: visible; -webkit-tap-highlight-color: transparent;
-  transition: background-color var(--hm-dur-slow) var(--hm-ease), color var(--hm-dur-slow) var(--hm-ease), border-color var(--hm-dur-slow) var(--hm-ease), transform var(--hm-dur) var(--hm-ease-spring); }
-.hm-follow.is-follow:not([data-hm-color]) { border-color: var(--hm-brand-blue, var(--hm-primary)); background: var(--hm-brand-blue, var(--hm-primary)); color: var(--hm-on-brand-blue, var(--hm-on-primary-fill)); }
-.hm-follow.is-follow:not([data-hm-color]):focus-visible { outline-color: var(--hm-brand-blue, var(--hm-primary)); }
-.hm-follow.hm-btn.is-pressed { background: var(--hm-surface); color: var(--hm-text); }
-.hm-follow.hm-btn.is-following:hover { color: var(--hm-danger-text, var(--hm-danger)); border-color: color-mix(in srgb, var(--hm-danger) 55%, transparent); background: var(--hm-danger-soft); }
-.hm-follow.hm-btn.is-requested { color: var(--hm-text-2); }
-.hm-follow-ico { display: inline-grid; place-items: center; }
-.hm-follow.hm-btn .hm-follow-ico .hm-svg { width: 1.0625rem; height: 1.0625rem; }
-.hm-follow-sm.hm-btn { min-height: 2rem; padding: 0 .875rem; } .hm-follow-sm.hm-btn .hm-follow-ico .hm-svg { width: .9375rem; height: .9375rem; }
-.hm-follow .hm-burst { z-index: 2; }
+.m-follow.m-btn { gap: .375rem; min-height: 2.625rem; padding: 0 1.125rem; border-width: 1.5px; font-weight: 800; overflow: visible; -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--m-dur-slow) var(--m-ease), color var(--m-dur-slow) var(--m-ease), border-color var(--m-dur-slow) var(--m-ease), transform var(--m-dur) var(--m-ease-spring); }
+.m-follow.is-follow:not([data-m-color]) { border-color: var(--m-brand-blue, var(--m-primary)); background: var(--m-brand-blue, var(--m-primary)); color: var(--m-on-brand-blue, var(--m-on-primary-fill)); }
+.m-follow.is-follow:not([data-m-color]):focus-visible { outline-color: var(--m-brand-blue, var(--m-primary)); }
+.m-follow.m-btn.is-pressed { background: var(--m-surface); color: var(--m-text); }
+.m-follow.m-btn.is-following:hover { color: var(--m-danger-text, var(--m-danger)); border-color: color-mix(in srgb, var(--m-danger) 55%, transparent); background: var(--m-danger-soft); }
+.m-follow.m-btn.is-requested { color: var(--m-text-2); }
+.m-follow-ico { display: inline-grid; place-items: center; }
+.m-follow.m-btn .m-follow-ico .m-svg { width: 1.0625rem; height: 1.0625rem; }
+.m-follow-sm.m-btn { min-height: 2rem; padding: 0 .875rem; } .m-follow-sm.m-btn .m-follow-ico .m-svg { width: .9375rem; height: .9375rem; }
+.m-follow .m-burst { z-index: 2; }

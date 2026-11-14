@@ -41,13 +41,13 @@ export function TypingIndicator(props: TypingIndicatorProps): Element {
   const dots: HTMLElement[] = [];
   const runs: { cancel(): void }[] = [];
   const el = h("span", {
-    class: () => cx("hm-typing", `hm-typing-${val(props.variant) ?? "bubble"}`, !names().length && "is-off", val(props.class)),
-    "data-hm-color": () => colorAttr(props.color ?? "brand-blue"), role: "status", "aria-live": "polite",
+    class: () => cx("m-typing", `m-typing-${val(props.variant) ?? "bubble"}`, !names().length && "is-off", val(props.class)),
+    "data-m-color": () => colorAttr(props.color ?? "brand-blue"), role: "status", "aria-live": "polite",
   },
   props.dots === false ? null
-    : props.dots && props.dots !== true ? h("span", { class: "hm-typing-dots is-own", "aria-hidden": "true" }, props.dots)
-    : h("span", { class: "hm-typing-dots", "aria-hidden": "true" }, [0, 1, 2].map(() => h(StatusDot, { tone: "primary", size: "xs", ref: (x: HTMLElement) => { dots.push(x); } }))),
-  h("span", { class: () => cx("hm-typing-text", !(val(props.text) ?? val(props.variant) === "inline") && "hm-sr-only") }, () => { const list = val(props.names) ?? []; return props.label ? props.label(list) : typingText(list); }));
+    : props.dots && props.dots !== true ? h("span", { class: "m-typing-dots is-own", "aria-hidden": "true" }, props.dots)
+    : h("span", { class: "m-typing-dots", "aria-hidden": "true" }, [0, 1, 2].map(() => h(StatusDot, { tone: "primary", size: "xs", ref: (x: HTMLElement) => { dots.push(x); } }))),
+  h("span", { class: () => cx("m-typing-text", !(val(props.text) ?? val(props.variant) === "inline") && "m-sr-only") }, () => { const list = val(props.names) ?? []; return props.label ? props.label(list) : typingText(list); }));
   effect(() => {
     const on = names().length > 0, kind = val(props.motion) ?? "lift";
     untrack(() => {

@@ -1,19 +1,19 @@
 /* March — PullToRefresh (src/components/feedback/pull-to-refresh). The element is the scroll area; the indicator sits above
    the content and follows the pull. Movement comes from the motion engine (no keyframes here). */
-.hm-ptr { position: relative; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
-.hm-ptr.is-pulling { user-select: none; cursor: grabbing; }
-.hm-ptr-content { position: relative; will-change: transform; }
-.hm-ptr-ind { position: absolute; z-index: 1; inset-block-start: -2.75rem; inset-inline-start: 50%; margin-inline-start: -1.25rem; width: 2.5rem; height: 2.5rem;
-  display: grid; place-items: center; border-radius: var(--hm-radius-full); background: var(--hm-surface-raised); color: var(--hm-text-2);
-  border: 1px solid var(--hm-border); box-shadow: var(--hm-shadow-2); opacity: 0; pointer-events: none;
-  transition: color var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease); }
-.hm-ptr-spin { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; }
-.hm-ptr-spin .hm-svg { width: 100%; height: 100%; }
-.hm-ptr-icon { display: grid; place-items: center; width: 100%; height: 100%; }
-.hm-ptr.is-ready .hm-ptr-ind, .hm-ptr.is-refreshing .hm-ptr-ind { color: var(--hm-primary); border-color: var(--hm-primary); }
+.m-ptr { position: relative; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+.m-ptr.is-pulling { user-select: none; cursor: grabbing; }
+.m-ptr-content { position: relative; will-change: transform; }
+.m-ptr-ind { position: absolute; z-index: 1; inset-block-start: -2.75rem; inset-inline-start: 50%; margin-inline-start: -1.25rem; width: 2.5rem; height: 2.5rem;
+  display: grid; place-items: center; border-radius: var(--m-radius-full); background: var(--m-surface-raised); color: var(--m-text-2);
+  border: 1px solid var(--m-border); box-shadow: var(--m-shadow-2); opacity: 0; pointer-events: none;
+  transition: color var(--m-dur) var(--m-ease), border-color var(--m-dur) var(--m-ease); }
+.m-ptr-spin { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; }
+.m-ptr-spin .m-svg { width: 100%; height: 100%; }
+.m-ptr-icon { display: grid; place-items: center; width: 100%; height: 100%; }
+.m-ptr.is-ready .m-ptr-ind, .m-ptr.is-refreshing .m-ptr-ind { color: var(--m-primary); border-color: var(--m-primary); }
 /* color prop: the token sits on the indicator only, so the content keeps its own colours */
-.hm-ptr.is-ready .hm-ptr-ind[data-hm-color], .hm-ptr.is-refreshing .hm-ptr-ind[data-hm-color] { color: var(--hm-accent); border-color: var(--hm-accent); }
+.m-ptr.is-ready .m-ptr-ind[data-m-color], .m-ptr.is-refreshing .m-ptr-ind[data-m-color] { color: var(--m-accent); border-color: var(--m-accent); }
 /* keyboard: a Refresh button that appears only while focused */
-.hm-btn.hm-ptr-kbd { position: absolute; z-index: 2; inset-block-start: var(--hm-space-2); inset-inline-start: 50%; translate: -50% 0; opacity: 0; pointer-events: none; }
-.hm-btn.hm-ptr-kbd:focus-visible { opacity: 1; pointer-events: auto; }
-[dir="rtl"] .hm-ptr-kbd { translate: 50% 0; }
+.m-btn.m-ptr-kbd { position: absolute; z-index: 2; inset-block-start: var(--m-space-2); inset-inline-start: 50%; translate: -50% 0; opacity: 0; pointer-events: none; }
+.m-btn.m-ptr-kbd:focus-visible { opacity: 1; pointer-events: auto; }
+[dir="rtl"] .m-ptr-kbd { translate: 50% 0; }

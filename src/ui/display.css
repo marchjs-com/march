@@ -1,20 +1,20 @@
 /* March — page helpers and layout helpers (Avatar: src/components/social/avatar). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- display */
-.hm-page-actions, .hm-section-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
+.m-page-actions, .m-section-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-2); }
 /* ---------- layout helpers */
-.hm-stack { display: flex; flex-direction: column; min-width: 0; }
-.hm-stack-row { flex-direction: row; align-items: center; }
-.hm-stack-wrap { flex-wrap: wrap; }
-.hm-align-start { align-items: flex-start; } .hm-align-center { align-items: center; } .hm-align-end { align-items: flex-end; } .hm-align-stretch { align-items: stretch; } .hm-align-baseline { align-items: baseline; }
-.hm-justify-start { justify-content: flex-start; } .hm-justify-center { justify-content: center; } .hm-justify-end { justify-content: flex-end; } .hm-justify-between { justify-content: space-between; }
-.hm-grid { display: grid; }
-/* fixed columns: up to --hm-cols, never narrower than --hm-grid-col-min (fewer columns instead of crushed ones) */
-.hm-grid-1 { --hm-cols: 1; } .hm-grid-2 { --hm-cols: 2; } .hm-grid-3 { --hm-cols: 3; } .hm-grid-4 { --hm-cols: 4; } .hm-grid-5 { --hm-cols: 5; } .hm-grid-6 { --hm-cols: 6; }
-:is(.hm-grid-1, .hm-grid-2, .hm-grid-3, .hm-grid-4, .hm-grid-5, .hm-grid-6) {
-  --hm-cols-fx: min(var(--hm-cols), var(--hm-cols-md, 99), var(--hm-cols-sm, 99));
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, max(var(--hm-grid-col-min, 9rem), (100% - (var(--hm-cols-fx) - 1) * var(--hm-grid-gap, var(--hm-space-4))) / var(--hm-cols-fx) - .1px)), 1fr)); }
-.hm-grid-auto { grid-template-columns: repeat(auto-fill, minmax(min(var(--hm-grid-min, 16rem), 100%), 1fr)); }
-.hm-grid-equal { grid-auto-rows: 1fr; }
-@media (max-width: 1024px) { .hm-grid-4, .hm-grid-5, .hm-grid-6 { --hm-cols-md: 2; } }
-@media (max-width: 640px) { .hm-grid-2, .hm-grid-3, .hm-grid-4, .hm-grid-5, .hm-grid-6 { --hm-cols-sm: 1; } }
-@media (prefers-reduced-motion: reduce) { .hm-skel { animation: none; } }
+.m-stack { display: flex; flex-direction: column; min-width: 0; }
+.m-stack-row { flex-direction: row; align-items: center; }
+.m-stack-wrap { flex-wrap: wrap; }
+.m-align-start { align-items: flex-start; } .m-align-center { align-items: center; } .m-align-end { align-items: flex-end; } .m-align-stretch { align-items: stretch; } .m-align-baseline { align-items: baseline; }
+.m-justify-start { justify-content: flex-start; } .m-justify-center { justify-content: center; } .m-justify-end { justify-content: flex-end; } .m-justify-between { justify-content: space-between; }
+.m-grid { display: grid; }
+/* fixed columns: up to --m-cols, never narrower than --m-grid-col-min (fewer columns instead of crushed ones) */
+.m-grid-1 { --m-cols: 1; } .m-grid-2 { --m-cols: 2; } .m-grid-3 { --m-cols: 3; } .m-grid-4 { --m-cols: 4; } .m-grid-5 { --m-cols: 5; } .m-grid-6 { --m-cols: 6; }
+:is(.m-grid-1, .m-grid-2, .m-grid-3, .m-grid-4, .m-grid-5, .m-grid-6) {
+  --m-cols-fx: min(var(--m-cols), var(--m-cols-md, 99), var(--m-cols-sm, 99));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, max(var(--m-grid-col-min, 9rem), (100% - (var(--m-cols-fx) - 1) * var(--m-grid-gap, var(--m-space-4))) / var(--m-cols-fx) - .1px)), 1fr)); }
+.m-grid-auto { grid-template-columns: repeat(auto-fill, minmax(min(var(--m-grid-min, 16rem), 100%), 1fr)); }
+.m-grid-equal { grid-auto-rows: 1fr; }
+@media (max-width: 1024px) { .m-grid-4, .m-grid-5, .m-grid-6 { --m-cols-md: 2; } }
+@media (max-width: 640px) { .m-grid-2, .m-grid-3, .m-grid-4, .m-grid-5, .m-grid-6 { --m-cols-sm: 1; } }
+@media (prefers-reduced-motion: reduce) { .m-skel { animation: none; } }

@@ -105,13 +105,13 @@ export function Sparkline<D>(props: SparklineProps<D>): Element {
     return `${v.length} values, from ${f(v[0])} to ${f(v[v.length - 1])}, min ${f(Math.min(...v))}, max ${f(Math.max(...v))}`;
   };
   return h("svg", {
-    class: () => `hm-sparkline ${seriesClass(num(read(props.color)) ?? 0)}`, style: () => colorStyle(props.colors, 0),
+    class: () => `m-sparkline ${seriesClass(num(read(props.color)) ?? 0)}`, style: () => colorStyle(props.colors, 0),
     role: "img", "aria-label": () => (read(props.title) ? `${read(props.title)}: ${summary()}` : summary()),
     viewBox: () => `0 0 ${w()} ${ht()}`, width: w, height: ht, preserveAspectRatio: "none",
   },
-  () => (read(props.area) ? h("path", { class: "hm-chart-area", d: attr(() => geo().area) }) : null),
-  h("path", { class: "hm-chart-line", d: attr(() => geo().line) }),
-  h("circle", { class: "hm-chart-marker", r: 2.5, visibility: () => (geo().last && read(props.dot) !== false ? "visible" : "hidden"),
+  () => (read(props.area) ? h("path", { class: "m-chart-area", d: attr(() => geo().area) }) : null),
+  h("path", { class: "m-chart-line", d: attr(() => geo().line) }),
+  h("circle", { class: "m-chart-marker", r: 2.5, visibility: () => (geo().last && read(props.dot) !== false ? "visible" : "hidden"),
     cx: attr(() => geo().last?.[0] ?? 0), cy: attr(() => geo().last?.[1] ?? 0) }));
 }
 
@@ -137,23 +137,23 @@ export function Stat<D>(props: StatProps<D>): Element {
     return `${d > 0 ? "+" : d < 0 ? "−" : ""}${f(Math.abs(d))}`;
   };
   const hasSpark = computed(() => !!read(props.spark as MaybeReactive<unknown>));
-  const tone = (): string => { const d = dir(); if (!d || d === "flat") return "hm-stat-neutral"; return (d === "up") !== !!read(props.invert) ? "hm-stat-good" : "hm-stat-bad"; };
-  return h("div", { class: () => ["hm-stat", read(props.class)].filter(Boolean).join(" ") },
+  const tone = (): string => { const d = dir(); if (!d || d === "flat") return "m-stat-neutral"; return (d === "up") !== !!read(props.invert) ? "m-stat-good" : "m-stat-bad"; };
+  return h("div", { class: () => ["m-stat", read(props.class)].filter(Boolean).join(" ") },
     // label over value: the StatTile of hadi-march/data (one drawing of the tile); the delta pill and the sparkline are the chart's own
     h(StatTile, {
-      align: "start", order: "label", partClass: { label: "hm-stat-label", value: "hm-stat-value" },
-      label: [isIconDef(props.icon) ? h("span", { class: "hm-stat-icon", "aria-hidden": "true" }, svgIcon(props.icon)) : null, h("span", {}, () => read(props.label) ?? "")],
+      align: "start", order: "label", partClass: { label: "m-stat-label", value: "m-stat-value" },
+      label: [isIconDef(props.icon) ? h("span", { class: "m-stat-icon", "aria-hidden": "true" }, svgIcon(props.icon)) : null, h("span", {}, () => read(props.label) ?? "")],
       value: () => { const v = read(props.value); return v == null ? (read(props.empty) ?? "—") : fmt()(v); },
     }),
-    () => (dir() ? h("div", { class: () => `hm-stat-delta hm-stat-${dir()} ${tone()}` },
-      h("span", { class: "hm-stat-arrow", "aria-hidden": "true" }, () => ARROWS[dir() as Dir]),
-      h("span", { class: "hm-sr-only" }, () => SAY[dir() as Dir]),
-      h("span", { class: "hm-stat-delta-value" }, deltaText),
-      () => (read(props.hint) ? h("span", { class: "hm-stat-hint" }, ` ${read(props.hint)}`) : null)) : null),
+    () => (dir() ? h("div", { class: () => `m-stat-delta m-stat-${dir()} ${tone()}` },
+      h("span", { class: "m-stat-arrow", "aria-hidden": "true" }, () => ARROWS[dir() as Dir]),
+      h("span", { class: "m-sr-only" }, () => SAY[dir() as Dir]),
+      h("span", { class: "m-stat-delta-value" }, deltaText),
+      () => (read(props.hint) ? h("span", { class: "m-stat-hint" }, ` ${read(props.hint)}`) : null)) : null),
     () => (hasSpark() ? h(Sparkline, { data: reactive(() => read(props.spark as MaybeReactive<Iterable<D> | null | undefined>)), y: props.sparkY, width: 240, height: 40, area: true, title: reactive(() => read(props.label) as string | null | undefined) }) : null));
 }
 
-/** Score ring 0–100 (or 0–`max`). Level class `hm-ring-low|mid|high` from `thresholds` (default [50, 80]). */
+/** Score ring 0–100 (or 0–`max`). Level class `m-ring-low|mid|high` from `thresholds` (default [50, 80]). */
 export function ProgressRing(props: ProgressRingProps): Element {
   const S = computed(() => num(read(props.size)) ?? 64), T = computed(() => num(read(props.thickness)) ?? 8);
   const max = computed(() => num(read(props.max)) ?? 100);
@@ -162,20 +162,20 @@ export function ProgressRing(props: ProgressRingProps): Element {
   const level = computed(() => { const [a, b] = read(props.thresholds) ?? [50, 80], p = (v() / max()) * 100; return p < a ? "low" : p < b ? "mid" : "high"; });
   const text = (): unknown => formatter(read<FormatSpec | null | undefined>(props.format), (x) => String(Math.round(x as number)))(v());
   const list = colorList(props.colors);
-  const svg = h("svg", { "data-hm-color": () => colorAttr(props.color),
-    class: () => `hm-ring hm-ring-${level()}`, role: "img", viewBox: () => `0 0 ${S()} ${S()}`, width: S, height: S,
+  const svg = h("svg", { "data-m-color": () => colorAttr(props.color),
+    class: () => `m-ring m-ring-${level()}`, role: "img", viewBox: () => `0 0 ${S()} ${S()}`, width: S, height: S,
     "aria-label": () => `${read(props.label) ?? "Score"}: ${text()} of ${max()}`,
   },
-  h("circle", { class: "hm-ring-track", cx: () => S() / 2, cy: () => S() / 2, r, "stroke-width": T }),
-  h("circle", { class: "hm-ring-value", cx: () => S() / 2, cy: () => S() / 2, r, "stroke-width": T, transform: () => `rotate(-90 ${S() / 2} ${S() / 2})`,
+  h("circle", { class: "m-ring-track", cx: () => S() / 2, cy: () => S() / 2, r, "stroke-width": T }),
+  h("circle", { class: "m-ring-value", cx: () => S() / 2, cy: () => S() / 2, r, "stroke-width": T, transform: () => `rotate(-90 ${S() / 2} ${S() / 2})`,
     "stroke-dasharray": attr(() => `${f1((C() * v()) / max())} ${f1(C())}`) }),
-  h("text", { class: "hm-ring-text", x: () => S() / 2, y: () => S() / 2, "text-anchor": "middle", "dominant-baseline": "central", "aria-hidden": "true" }, text));
+  h("text", { class: "m-ring-text", x: () => S() / 2, y: () => S() / 2, "text-anchor": "middle", "dominant-baseline": "central", "aria-hidden": "true" }, text));
   if (!list && props.paint !== "cycle") return svg as Element;
   // several colors: SVG strokes cannot take a sweep gradient, so a conic paint is masked to the ring (CSS) and laid over
-  const paint = h("span", { class: cx("hm-ring-paint", props.paint === "cycle" && "is-cycle"), "aria-hidden": "true" }) as HTMLElement;
-  const wrap = h("span", { class: "hm-ring-multi", "data-hm-color": () => colorAttr(props.color), "data-hm-colors": list ? (Array.isArray(props.colors) ? "custom" : String(props.colors)) : null }, svg, paint) as HTMLElement;
-  paint.style.setProperty("--hm-ring-paint", paintOf(list ?? ["cat-1", "cat-2", "cat-3", "cat-4"], props.paint === "segments" ? "segments" : "gradient", "conic", true));
-  effect(() => { wrap.style.setProperty("--hm-ring-s", `${S()}px`); wrap.style.setProperty("--hm-ring-t", `${T()}px`); wrap.style.setProperty("--hm-ring-p", String(props.paint === "cycle" ? 1 : v() / max())); });
+  const paint = h("span", { class: cx("m-ring-paint", props.paint === "cycle" && "is-cycle"), "aria-hidden": "true" }) as HTMLElement;
+  const wrap = h("span", { class: "m-ring-multi", "data-m-color": () => colorAttr(props.color), "data-m-colors": list ? (Array.isArray(props.colors) ? "custom" : String(props.colors)) : null }, svg, paint) as HTMLElement;
+  paint.style.setProperty("--m-ring-paint", paintOf(list ?? ["cat-1", "cat-2", "cat-3", "cat-4"], props.paint === "segments" ? "segments" : "gradient", "conic", true));
+  effect(() => { wrap.style.setProperty("--m-ring-s", `${S()}px`); wrap.style.setProperty("--m-ring-t", `${T()}px`); wrap.style.setProperty("--m-ring-p", String(props.paint === "cycle" ? 1 : v() / max())); });
   return wrap
 }
 
@@ -190,15 +190,15 @@ export function BarList<D>(props: BarListProps<D>): Element {
     return n ? list.slice(0, n) : list;
   });
   const max = computed(() => num(read(props.max)) ?? Math.max(0, ...items().map((i) => i.value)));
-  return h("div", { class: () => ["hm-barlist", read(props.class)].filter(Boolean).join(" "), role: "list", "aria-label": () => read(props.title) ?? null },
-    each<BarListItem<D>>({ each: items, key: (i) => i.key, fallback: () => h("div", { class: "hm-chart-empty" }, read(props.empty) ?? "No data"), children: (it, idx) => {
+  return h("div", { class: () => ["m-barlist", read(props.class)].filter(Boolean).join(" "), role: "list", "aria-label": () => read(props.title) ?? null },
+    each<BarListItem<D>>({ each: items, key: (i) => i.key, fallback: () => h("div", { class: "m-chart-empty" }, read(props.empty) ?? "No data"), children: (it, idx) => {
       const pct = attr(() => `${max() > 0 ? f1((Math.max(0, it().value) / max()) * 100) : 0}%`);
       const sel = props.onSelect;
-      return h("div", { role: "listitem", class: "hm-barlist-item" },
-        h(sel ? "button" : "div", { class: "hm-barlist-row", ...(sel ? { type: "button", onClick: () => sel({ ...it(), rank: idx() + 1 }) } : {}) },
-          h("svg", { class: "hm-barlist-bar", "aria-hidden": "true", width: "100%", height: "100%", preserveAspectRatio: "none" },
-            h("rect", { class: () => `hm-barlist-fill ${seriesClass(num(read(props.color)) ?? 0)}`, style: () => colorStyle(props.colors, 0), x: 0, y: 0, height: "100%", width: pct })),
-          h(OverflowText, { class: "hm-barlist-label" }, () => it().label),
-          h("span", { class: "hm-barlist-value" }, () => fmt()(it().value))));
+      return h("div", { role: "listitem", class: "m-barlist-item" },
+        h(sel ? "button" : "div", { class: "m-barlist-row", ...(sel ? { type: "button", onClick: () => sel({ ...it(), rank: idx() + 1 }) } : {}) },
+          h("svg", { class: "m-barlist-bar", "aria-hidden": "true", width: "100%", height: "100%", preserveAspectRatio: "none" },
+            h("rect", { class: () => `m-barlist-fill ${seriesClass(num(read(props.color)) ?? 0)}`, style: () => colorStyle(props.colors, 0), x: 0, y: 0, height: "100%", width: pct })),
+          h(OverflowText, { class: "m-barlist-label" }, () => it().label),
+          h("span", { class: "m-barlist-value" }, () => fmt()(it().value))));
     } }));
 }

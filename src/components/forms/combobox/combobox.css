@@ -1,9 +1,9 @@
-/* March — Combobox (and MultiSelect, which is a Combobox): input, chips (Chip), list (OptionList in the .hm-pop panel). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+/* March — Combobox (and MultiSelect, which is a Combobox): input, chips (Chip), list (OptionList in the .m-pop panel). Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* combobox, multiselect, listbox */
-.hm-combo { position: relative; width: 100%; }
-.hm-multi { display: flex; flex-wrap: wrap; gap: var(--hm-space-1); align-items: center; padding: 3px; border: 1px solid var(--hm-border-strong); border-radius: var(--hm-radius); background: var(--hm-surface); }
-.hm-multi:focus-within { border-color: var(--hm-accent, var(--hm-focus)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-accent, var(--hm-focus)) 22%, transparent); }
-.hm-multi > .hm-input { border: 0; box-shadow: none; flex: 1 1 8rem; min-height: calc(var(--hm-control-h) - 8px); padding-block: 0; background: transparent; }
-/* the list panel is the shared .hm-pop frame around an OptionList; here only its height */
-.hm-listbox { max-height: 18rem; overflow-y: auto; }
-.hm-listbox-status { text-align: start; }
+.m-combo { position: relative; width: 100%; }
+.m-multi { display: flex; flex-wrap: wrap; gap: var(--m-space-1); align-items: center; padding: 3px; border: 1px solid var(--m-border-strong); border-radius: var(--m-radius); background: var(--m-surface); }
+.m-multi:focus-within { border-color: var(--m-accent, var(--m-focus)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-accent, var(--m-focus)) 22%, transparent); }
+.m-multi > .m-input { border: 0; box-shadow: none; flex: 1 1 8rem; min-height: calc(var(--m-control-h) - 8px); padding-block: 0; background: transparent; }
+/* the list panel is the shared .m-pop frame around an OptionList; here only its height */
+.m-listbox { max-height: 18rem; overflow-y: auto; }
+.m-listbox-status { text-align: start; }

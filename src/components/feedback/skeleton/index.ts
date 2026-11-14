@@ -17,10 +17,10 @@ export interface SkeletonProps {
 }
 /** Placeholder while loading: `<Skeleton lines={3} />`, `<Skeleton block height="lg" />`, `<Skeleton shape="circle" />`. */
 export function Skeleton(props: SkeletonProps): Element {
-  const tint = cx(props.colors === "single" ? "hm-skel-single" : props.colors === "brand" ? "hm-skel-brand" : null, props.shimmer === false && "is-still");
-  if (props.shape === "circle") return h("div", { class: () => cx("hm-skel", "hm-skel-circle", props.height && props.height !== "md" && `hm-skel-circle-${props.height}`, tint, val(props.class)), "aria-hidden": "true" });
-  if (props.block) return h("div", { class: () => cx("hm-skel", "hm-skel-block", `hm-skel-${props.height ?? "md"}`, tint, val(props.class)), "aria-hidden": "true" });
+  const tint = cx(props.colors === "single" ? "m-skel-single" : props.colors === "brand" ? "m-skel-brand" : null, props.shimmer === false && "is-still");
+  if (props.shape === "circle") return h("div", { class: () => cx("m-skel", "m-skel-circle", props.height && props.height !== "md" && `m-skel-circle-${props.height}`, tint, val(props.class)), "aria-hidden": "true" });
+  if (props.block) return h("div", { class: () => cx("m-skel", "m-skel-block", `m-skel-${props.height ?? "md"}`, tint, val(props.class)), "aria-hidden": "true" });
   const n = props.lines ?? 3;
-  return h("div", { class: () => cx("hm-skel-lines", tint, val(props.class)), "aria-busy": "true", "aria-label": () => props.label ?? t`Loading` },
-    Array.from({ length: n }, (_, i) => h("span", { class: cx("hm-skel", "hm-skel-line", i === n - 1 && n > 1 && props.shortLast !== false && "hm-skel-short") })));
+  return h("div", { class: () => cx("m-skel-lines", tint, val(props.class)), "aria-busy": "true", "aria-label": () => props.label ?? t`Loading` },
+    Array.from({ length: n }, (_, i) => h("span", { class: cx("m-skel", "m-skel-line", i === n - 1 && n > 1 && props.shortLast !== false && "m-skel-short") })));
 }

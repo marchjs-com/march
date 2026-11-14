@@ -24,7 +24,7 @@ export interface StepsProps {
 /** Progress through stages: `<Steps steps={[{ title: "Account" }, …]} current={$step} onSelect={(i) => $step = i} />` */
 export function Steps(props: StepsProps): Element {
   const renderDot = props.renderDot;
-  return h("ol", { "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-steps2", props.vertical && "hm-steps2-v", props.connector === false && "hm-steps2-bare", val(props.class)) }, props.steps.map((s, i) => {
+  return h("ol", { "data-m-color": () => colorAttr(props.color), class: () => cx("m-steps2", props.vertical && "m-steps2-v", props.connector === false && "m-steps2-bare", val(props.class)) }, props.steps.map((s, i) => {
     const state = (): "done" | "current" | "todo" => { const c = val(props.current); return i < c ? "done" : i === c ? "current" : "todo"; };
     const dot = (): unknown => {
       const st = state();
@@ -34,10 +34,10 @@ export function Steps(props: StepsProps): Element {
       return s.icon != null ? icon(s.icon) : String(i + 1);
     };
     const inner = [
-      h("span", { class: "hm-step2-dot" }, dot),
-      h("span", { class: "hm-step2-text" }, h("span", { class: "hm-step2-title" }, s.title), s.description != null && h("span", { class: "hm-step2-desc" }, s.description)),
+      h("span", { class: "m-step2-dot" }, dot),
+      h("span", { class: "m-step2-text" }, h("span", { class: "m-step2-title" }, s.title), s.description != null && h("span", { class: "m-step2-desc" }, s.description)),
     ];
-    return h("li", { class: () => cx("hm-step2", `is-${state()}`), "aria-current": () => (state() === "current" ? "step" : null) },
-      props.onSelect ? h("button", { type: "button", class: "hm-step2-hit", onClick: () => props.onSelect?.(i) }, inner) : h("span", { class: "hm-step2-hit" }, inner));
+    return h("li", { class: () => cx("m-step2", `is-${state()}`), "aria-current": () => (state() === "current" ? "step" : null) },
+      props.onSelect ? h("button", { type: "button", class: "m-step2-hit", onClick: () => props.onSelect?.(i) }, inner) : h("span", { class: "m-step2-hit" }, inner));
   }));
 }

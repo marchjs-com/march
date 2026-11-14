@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // One CSS file from motion keyframes registrations: node tools/gen-motion-css.js <module.ts> [out.css] [--presets]
 // The module registers keyframes (keyframes(), defineMotion()); --presets adds the built-in ones (fadeUp, pop, spin…).
-// Then `class="hm-anim-fadeUp"` plays them with pure CSS — under the same global speed / pause control at runtime.
+// Then `class="m-anim-fadeUp"` plays them with pure CSS — under the same global speed / pause control at runtime.
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";

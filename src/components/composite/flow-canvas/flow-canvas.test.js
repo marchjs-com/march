@@ -52,15 +52,15 @@ test("FlowCanvas model: layered layout puts every edge left to right", () => {
 test("FlowCanvas: nodes, named ports, selection and Delete", () => {
   const flow = createFlow({ types: sampleTypes, doc: sampleDoc(), undo: false });
   const m = mount(() => h(FlowCanvas, { flow }));
-  const canvas = m.el.querySelector(".hm-flow");
+  const canvas = m.el.querySelector(".m-flow");
   assert.equal(canvas.getAttribute("role"), "application");
-  assert.equal(m.el.querySelectorAll(".hm-flow-node").length, 8);
+  assert.equal(m.el.querySelectorAll(".m-flow-node").length, 8);
   const port = m.el.querySelector('[data-ref="hook.out"]');
   assert.match(port.getAttribute("aria-label"), /sipariş/);
-  assert.equal(m.el.querySelectorAll(".hm-flow-pill").length, 8);
+  assert.equal(m.el.querySelectorAll(".m-flow-pill").length, 8);
   flow.selection.set(new Set(["save"]));
   canvas.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
-  assert.equal(m.el.querySelectorAll(".hm-flow-node").length, 7);
+  assert.equal(m.el.querySelectorAll(".m-flow-node").length, 7);
   assert.equal(flow.edges.peek().some((e) => e.to === "save.in"), false, "its edges went with it");
   m.dispose();
 });
@@ -77,7 +77,7 @@ test("FlowCanvas: keyboard connect (Enter on two ports) and run state classes", 
   flow.errors.set(new Map([["pay", "Declined"]]));
   const pay = m.el.querySelector('[data-node="pay"]');
   assert.ok(pay.className.includes("is-error"));
-  assert.equal(pay.querySelector(".hm-flow-error").textContent, "Declined");
+  assert.equal(pay.querySelector(".m-flow-error").textContent, "Declined");
   m.dispose();
 });
 
@@ -89,16 +89,16 @@ test("FlowCanvas: zoom bar off or in parts, own texts, own menu, no menu", () =>
     h(FlowCanvas, { flow, class: "b", controls: false, menu: false, motion: false, labels: { minimap: "Map" } }),
     h(FlowCanvas, { flow, class: "c", minimap: false, menu: (items) => { got = items; return [{ label: "Mine", onSelect() {} }]; } }),
   ]);
-  const a = m.el.querySelector(".hm-flow.a"), b = m.el.querySelector(".hm-flow.b"), c = m.el.querySelector(".hm-flow.c");
+  const a = m.el.querySelector(".m-flow.a"), b = m.el.querySelector(".m-flow.b"), c = m.el.querySelector(".m-flow.c");
   assert.equal(a.getAttribute("aria-roledescription"), "diagram");
-  const names = [...a.querySelectorAll(".hm-flow-zoom button")].map((x) => x.getAttribute("aria-label"));
+  const names = [...a.querySelectorAll(".m-flow-zoom button")].map((x) => x.getAttribute("aria-label"));
   assert.equal(names.length, 2, "only − and +");
   assert.ok(names.includes("Closer"));
   assert.match(a.querySelector('[data-ref="customer.in"]').getAttribute("aria-label"), /^In: /);
-  assert.equal(a.querySelector(".hm-flow-node").getAttribute("aria-roledescription"), "step");
-  assert.equal(b.querySelector(".hm-flow-zoom"), null);
-  assert.equal(b.querySelector(".hm-flow-minimap").getAttribute("aria-label"), "Map");
-  assert.equal(c.querySelectorAll(".hm-flow-zoom button").length, 4, "the default bar is whole");
+  assert.equal(a.querySelector(".m-flow-node").getAttribute("aria-roledescription"), "step");
+  assert.equal(b.querySelector(".m-flow-zoom"), null);
+  assert.equal(b.querySelector(".m-flow-minimap").getAttribute("aria-label"), "Map");
+  assert.equal(c.querySelectorAll(".m-flow-zoom button").length, 4, "the default bar is whole");
   c.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 5, clientY: 5 }));
   assert.ok(Array.isArray(got) && got.length > 3, "the own menu function gets the built-in items");
   got = null;
@@ -111,10 +111,10 @@ test("FlowCanvas: what changed is announced through the announcer (no live regio
   const { announcer } = await import("../../../managers/announcer/index.ts");
   const flow = createFlow({ types: sampleTypes, doc: sampleDoc(), undo: false });
   const m = mount(() => h(FlowCanvas, { flow, labels: { deleted: (n) => `Removed ${n}` } }));
-  assert.equal(m.el.querySelector(".hm-sr-only"), null);
-  assert.equal(m.el.querySelector(".hm-flow-zoom").getAttribute("role"), "toolbar");
+  assert.equal(m.el.querySelector(".m-sr-only"), null);
+  assert.equal(m.el.querySelector(".m-flow-zoom").getAttribute("role"), "toolbar");
   flow.selection.set(new Set(["save"]));
-  m.el.querySelector(".hm-flow").dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
+  m.el.querySelector(".m-flow").dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
   await new Promise((r) => setTimeout(r, 5));
   assert.equal(announcer.history()[0].text, "Removed 1");
   m.dispose();

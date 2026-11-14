@@ -16,7 +16,7 @@ export type LayerKind = "popover" | "menu" | "tooltip" | "dialog" | "drawer" | "
 /** Layers that take the page's interaction away while open (everything under them becomes inert). */
 const MODAL = new Set<LayerKind>(["dialog", "drawer", "palette", "lightbox"]);
 /** Bands: most layers stack in the order they open; toasts and effects stay above them. */
-const BAND: Partial<Record<LayerKind, string>> = { toast: "var(--hm-z-toast, 200)", fx: "var(--hm-z-drag, 250)", drag: "var(--hm-z-drag, 250)" };
+const BAND: Partial<Record<LayerKind, string>> = { toast: "var(--m-z-toast, 200)", fx: "var(--m-z-drag, 250)", drag: "var(--m-z-drag, 250)" };
 
 interface Layer { el: HTMLElement; kind: LayerKind; host: HTMLElement }
 const stack: Layer[] = [];
@@ -35,14 +35,14 @@ const stackRev = signal(0, { name: "layers" });
 const contents = (el: HTMLElement, pointer?: "auto"): HTMLElement => { el.style.setProperty("display", "contents"); if (pointer) el.style.setProperty("pointer-events", pointer); return el; };
 function layerRoot(host: HTMLElement): HTMLElement {
   let r = roots.get(host);
-  if (r?.parentNode != host) roots.set(host, (r = host.appendChild(contents(h("div", { class: "hm-layers" }) as HTMLElement))));
+  if (r?.parentNode != host) roots.set(host, (r = host.appendChild(contents(h("div", { class: "m-layers" }) as HTMLElement))));
   return r!;
 }
 
 /** Recompute order (z-index) and inertness after a layer opens or closes. */
 function restack(): void {
   stackRev.update((n) => n + 1);
-  stack.forEach((l, i) => l.el.style.setProperty("z-index", `calc(${BAND[l.kind] ?? "var(--hm-z-dialog, 100)"} + ${i})`));
+  stack.forEach((l, i) => l.el.style.setProperty("z-index", `calc(${BAND[l.kind] ?? "var(--m-z-dialog, 100)"} + ${i})`));
   for (const el of inerted) el.removeAttribute("inert");
   inerted.clear();
   let top = -1;
@@ -57,11 +57,11 @@ function restack(): void {
 
 /** Put a node into a new layer of the stack (in `scope`, an <OverlayScope> element, else the page); returns close. */
 export function openLayer(kind: LayerKind, node: Node, scope?: HTMLElement | null): () => void {
-  const el = h("div", { class: "hm-layer", "data-layer": kind }) as HTMLElement;
+  const el = h("div", { class: "m-layer", "data-layer": kind }) as HTMLElement;
   for (const [k, v] of [["position", "fixed"], ["inset", "0"], ["pointer-events", "none"]] as const) el.style.setProperty(k, v);
   // the content sits in a box that gives pointer events back (a Portal's own box, or a new one around a plain node)
-  const isBox = (node as HTMLElement).classList?.contains?.("hm-portal");
-  const box = isBox ? (node as HTMLElement) : contents(h("div", { class: "hm-portal" }) as HTMLElement, "auto");
+  const isBox = (node as HTMLElement).classList?.contains?.("m-portal");
+  const box = isBox ? (node as HTMLElement) : contents(h("div", { class: "m-portal" }) as HTMLElement, "auto");
   if (!isBox) box.appendChild(node);
   el.appendChild(box);
   const entry: Layer = { el, kind, host: scope || document.body };
@@ -94,7 +94,7 @@ export function PortalTarget(props: PortalTargetProps): Element {
   const { name, as, label } = props;
   const rest: Record<string, unknown> = { ...props };
   for (const k of ["name", "as", "label", "class"]) delete rest[k];
-  const el = h(as ?? "div", { ...rest, class: `hm-portal-target${props.class ? ` ${props.class}` : ""}`, "data-portal-target": name, "aria-label": label ?? null }) as Element;
+  const el = h(as ?? "div", { ...rest, class: `m-portal-target${props.class ? ` ${props.class}` : ""}`, "data-portal-target": name, "aria-label": label ?? null }) as Element;
   const s = targetSig(name);
   const prev = untrack(s);
   s.set(el);
@@ -122,7 +122,7 @@ export interface PortalProps {
 
 /** Render children somewhere else: a layer, a named target or an element. Returns nothing in place. */
 export function Portal(props: PortalProps): null {
-  const box = contents(h("div", { class: "hm-portal", "data-order": props.order ?? 0 }) as HTMLElement, "auto");
+  const box = contents(h("div", { class: "m-portal", "data-order": props.order ?? 0 }) as HTMLElement, "auto");
   insert(box, () => props.children);
   if (props.to) {
     const name = props.to, order = props.order ?? 0;

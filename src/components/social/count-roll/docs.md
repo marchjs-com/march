@@ -21,7 +21,7 @@ The text is compact in the active locale (`1,2 B`, `12K`); `format="full"` group
 | `spoken` | `(n) => string` | — | your own text for screen readers (default: the full grouped number) |
 | `roll` | boolean | true | `false`: digits change at once (as with reduced motion) |
 | `stagger` | ms | 24 | delay between neighbouring digits |
-| `class` | string | — | on the root (`hm-roll`) |
+| `class` | string | — | on the root (`m-roll`) |
 
 ```tsx
 <CountRoll value={$likes} formatter={(n) => `${n} likes`} duration={600} stagger={60} />

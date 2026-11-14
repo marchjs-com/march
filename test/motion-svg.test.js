@@ -83,12 +83,12 @@ test("svg filters: a filter per call, removed when it settles to 0; goo is stati
   const el = document.createElement("div");
   document.body.append(el);
   const pb = M.filterBlur(el, { from: 10, duration: 10 });
-  assert.match(el.style.filter, /^url\(#hm-f-/);
+  assert.match(el.style.filter, /^url\(#m-f-/);
   pb.finish();
   await pb.finished;
   assert.equal(el.style.filter, "");
   const off = M.goo(el, { blur: 8 });
-  assert.match(el.style.filter, /^url\(#hm-f-/);
+  assert.match(el.style.filter, /^url\(#m-f-/);
   off();
   assert.equal(el.style.filter, "");
   el.remove();

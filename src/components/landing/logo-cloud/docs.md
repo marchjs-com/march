@@ -22,7 +22,7 @@ default and show their colour on hover.
 | `mono` | boolean | `true` | one muted tone, colour on hover |
 | `speed` | px/s | `40` | marquee |
 | `reveal` | Reveal effect / `{ from, to }` / `none` | `fade` | grid: entrance of the cells |
-| `class` | string | — | extra class on the root (`.hm-logos`; parts: `.hm-logos-title`, `.hm-logos-cell`, `.hm-logo`, `.hm-logo-img`) |
+| `class` | string | — | extra class on the root (`.m-logos`; parts: `.m-logos-title`, `.m-logos-cell`, `.m-logo`, `.m-logo-img`) |
 
 ## Accessibility
 

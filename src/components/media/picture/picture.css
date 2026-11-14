@@ -1,7 +1,7 @@
 /* Picture. Theme tokens only, logical properties, no @keyframes (motion core). */
-.hm-picture { display: block; max-width: 100%; height: auto; }
+.m-picture { display: block; max-width: 100%; height: auto; }
 /* fit: the parent gives the box, the image fills it */
-.hm-picture-cover, .hm-picture-contain { width: 100%; height: 100%; }
-.hm-picture-cover { object-fit: cover; }
-.hm-picture-contain { object-fit: contain; }
-.hm-picture-fallback { display: grid; place-items: center; min-height: 3rem; padding: var(--hm-space-3); border-radius: var(--hm-radius-2); background: var(--hm-surface-2); color: var(--hm-muted); font-size: var(--hm-text-sm); text-align: center; }
+.m-picture-cover, .m-picture-contain { width: 100%; height: 100%; }
+.m-picture-cover { object-fit: cover; }
+.m-picture-contain { object-fit: contain; }
+.m-picture-fallback { display: grid; place-items: center; min-height: 3rem; padding: var(--m-space-3); border-radius: var(--m-radius-2); background: var(--m-surface-2); color: var(--m-muted); font-size: var(--m-text-sm); text-align: center; }

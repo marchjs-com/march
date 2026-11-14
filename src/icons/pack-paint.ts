@@ -2,10 +2,10 @@
 // shapes. Kept out of the start-up code: it loads with the first pack icon.
 //   grid      vb: "0 0 256 256" (Phosphor), "0 -960 960 960" (Material Symbols)…; default 24×24
 //   stroke    sw: the set's own stroke width (Lucide 2, Heroicons 1.5…) on each shape (it wins over the inherited
-//             --hm-icon-stroke and goes away with the shapes when the <svg> is repainted)
-//   fill      fill: true (on the icon itself) → .hm-svg-fill: currentColor fill, no stroke
+//             --m-icon-stroke and goes away with the shapes when the <svg> is repainted)
+//   fill      fill: true (on the icon itself) → .m-svg-fill: currentColor fill, no stroke
 //   even-odd  eo: indexes of the shapes filled even-odd
-//   RTL       rtl: true → .hm-svg-rtl, mirrored in right-to-left text (arrows, back / forward, undo / redo…)
+//   RTL       rtl: true → .m-svg-rtl, mirrored in right-to-left text (arrows, back / forward, undo / redo…)
 import type { IconDef } from "./svg.ts";
 
 /** What a pack icon adds to an icon definition. */
@@ -20,7 +20,7 @@ export interface PackIconDef extends IconDef {
 export function packPaint(svg: SVGSVGElement, def: IconDef): void {
   const d = def as PackIconDef, c = svg.classList;
   if (d.vb) svg.setAttribute("viewBox", d.vb);
-  if (d.rtl) c.add("hm-svg-rtl");
+  if (d.rtl) c.add("m-svg-rtl");
   if (d.sw) for (const s of svg.children) s.setAttribute("stroke-width", String(d.sw));
   if (d.eo) for (const i of d.eo) svg.children[i]?.setAttribute("fill-rule", "evenodd");
 }

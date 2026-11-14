@@ -31,14 +31,14 @@ export interface LinkCardProps {
 export function LinkCard(props: LinkCardProps): Element {
   return h(Link, {
     ...rest(props, ["href", "title", "description", "icon", "tone", "color", "lead", "meta", "arrow", "class"]),
-    href: props.href, class: () => cx("hm-link-card", val(props.class)),
+    href: props.href, class: () => cx("m-link-card", val(props.class)),
     children: [
-      props.lead != null ? h("span", { class: "hm-link-card-lead" }, props.lead) : props.icon != null && h(IconTile, { icon: props.icon, tone: props.tone, color: props.color }),
-      h("span", { class: "hm-link-card-text" },
-        h(OverflowText, { class: "hm-link-card-title" }, () => val(props.title)),
-        props.description != null && h("span", { class: "hm-link-card-desc" }, () => val(props.description))),
-      props.meta != null && h("span", { class: "hm-link-card-meta" }, () => val(props.meta)),
-      props.arrow === false ? null : h("span", { class: "hm-link-card-arrow", "aria-hidden": "true" }, props.arrow && props.arrow !== true ? props.arrow : glyph(arrowUpRight)),
+      props.lead != null ? h("span", { class: "m-link-card-lead" }, props.lead) : props.icon != null && h(IconTile, { icon: props.icon, tone: props.tone, color: props.color }),
+      h("span", { class: "m-link-card-text" },
+        h(OverflowText, { class: "m-link-card-title" }, () => val(props.title)),
+        props.description != null && h("span", { class: "m-link-card-desc" }, () => val(props.description))),
+      props.meta != null && h("span", { class: "m-link-card-meta" }, () => val(props.meta)),
+      props.arrow === false ? null : h("span", { class: "m-link-card-arrow", "aria-hidden": "true" }, props.arrow && props.arrow !== true ? props.arrow : glyph(arrowUpRight)),
     ],
   }) as Element;
 }

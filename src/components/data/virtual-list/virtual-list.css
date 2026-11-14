@@ -1,5 +1,5 @@
 /* March — VirtualList. The window's block padding stands in for the rows that are not in the DOM. */
-.hm-vlist { position: relative; min-width: 0; }
-.hm-vlist-self { overflow-y: auto; overscroll-behavior: contain; height: 100%; }
-.hm-vlist-win { display: flex; flex-direction: column; min-width: 0; box-sizing: border-box; }
-.hm-vlist-row { min-width: 0; contain: layout; }
+.m-vlist { position: relative; min-width: 0; }
+.m-vlist-self { overflow-y: auto; overscroll-behavior: contain; height: 100%; }
+.m-vlist-win { display: flex; flex-direction: column; min-width: 0; box-sizing: border-box; }
+.m-vlist-row { min-width: 0; contain: layout; }

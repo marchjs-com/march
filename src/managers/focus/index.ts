@@ -4,7 +4,7 @@
 //   import { focus } from "hadi-march/managers/focus";
 //   const release = focus.trap(panel)            // Tab stays inside; release() gives focus back to where it was
 //   const back = focus.remember(); …; back()     // restore later
-//   focus.visible()                              // reactive: the user is moving with the keyboard (data-hm-focus-visible on <html>)
+//   focus.visible()                              // reactive: the user is moving with the keyboard (data-m-focus-visible on <html>)
 //   focus.roving(toolbar, { orientation: "horizontal" })   // one Tab stop, arrow keys inside
 //   <div focus:trap>…</div>   <div focus:roving="horizontal">…</div>
 //
@@ -31,7 +31,7 @@ export interface TrapOptions {
 export type { RovingOptions };
 
 export interface FocusConfig {
-  /** Write data-hm-focus-visible on <html> while the keyboard is in use (default true). */
+  /** Write data-m-focus-visible on <html> while the keyboard is in use (default true). */
   markRoot: boolean;
 }
 
@@ -71,7 +71,7 @@ function create(cfg: FocusConfig): Focus {
   const setModality = (m: Modality): void => {
     if (untrack(modality) === m) return;
     modality.set(m);
-    if (cfg.markRoot) { const r = doc?.documentElement; if (m === "keyboard") r?.setAttribute("data-hm-focus-visible", ""); else r?.removeAttribute("data-hm-focus-visible"); }
+    if (cfg.markRoot) { const r = doc?.documentElement; if (m === "keyboard") r?.setAttribute("data-m-focus-visible", ""); else r?.removeAttribute("data-m-focus-visible"); }
     emit("focus", "modality", { modality: m });
   };
   on(doc, "keydown", (e) => { const k = e as KeyboardEvent; if (!k.metaKey && !k.ctrlKey && !k.altKey) setModality("keyboard"); });
@@ -132,7 +132,7 @@ function create(cfg: FocusConfig): Focus {
     dispose() {
       for (const off of offs.splice(0)) off();
       traps.set([]);
-      doc?.documentElement?.removeAttribute("data-hm-focus-visible");
+      doc?.documentElement?.removeAttribute("data-m-focus-visible");
     },
   };
 }

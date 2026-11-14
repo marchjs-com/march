@@ -34,7 +34,7 @@ export interface ViewportConfig {
 /** A container's size class (from container()). */
 export interface ContainerSize {
   width: Accessor<number>;
-  /** Current breakpoint name of the container. Also written to the element as data-hm-bp. */
+  /** Current breakpoint name of the container. Also written to the element as data-m-bp. */
   name: Accessor<string>;
   up(bp: string): boolean;
 }
@@ -198,7 +198,7 @@ function create(cfg: ViewportConfig): Viewport {
         if (getOwner()) onCleanup(() => ro.disconnect());
       }
       const name = computed(() => pick(list, w()));
-      effect(() => el.setAttribute("data-hm-bp", name()));
+      effect(() => el.setAttribute("data-m-bp", name()));
       const at = (bp: string): number => { const v = list.find((x) => x[0] === bp)?.[1]; if (v === undefined) throw new Error(`March viewport: unknown container breakpoint "${bp}".`); return v; };
       return { width: w, name, up: (bp) => w() >= at(bp) };
     },

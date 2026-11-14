@@ -36,7 +36,7 @@ export default function NewsletterDemo(props: { values: { layout: string; outcom
         labels={texts ? { email: "E-posta adresin", invalid: "Bu bir e-posta adresine benzemiyor." } : undefined}
         onSubmit={() => new Promise((ok, no) => setTimeout(() => { quick = false; if (props.values.outcome === "ok") { $sent = true; ok(true) } else no(new Error("Bu adres zaten kayıtlı.")) }, quick ? 120 : 900))} />
     }}
-    <div class="sc-row"><button type="button" class="hm-btn hm-btn-sm hm-btn-secondary" data-audit-try="toggle" on:click={sample}>{() => ($sent ? "Formu yeniden göster" : "Örnek adresle gönder")}</button></div>
+    <div class="sc-row"><button type="button" class="m-btn m-btn-sm m-btn-secondary" data-audit-try="toggle" on:click={sample}>{() => ($sent ? "Formu yeniden göster" : "Örnek adresle gönder")}</button></div>
     <p class="sc-demo-call">{() => (props.values.outcome === "ok" ? "Gönderince: onSubmit çözülür → form kapanır, onay belirir" : "Gönderince: onSubmit reddedilir → alan sallanır, \"Bu adres zaten kayıtlı.\" okunur") + (props.values.motion ? "" : " (hareketsiz: durum anında değişir)")}</p>
   </div>
 }

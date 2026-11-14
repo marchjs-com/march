@@ -32,18 +32,18 @@ test("ColorPicker: sliders with values, text input in the chosen format, palette
   assert.deepEqual(sliders.map((s) => s.getAttribute("aria-label")), ["Saturation and brightness", "Hue", "Opacity"]);
   assert.equal(sliders[1].value, "199");
   assert.equal(sliders[1].getAttribute("aria-valuetext"), "199 degrees");
-  const text = el.querySelector(".hm-cp-text");
+  const text = el.querySelector(".m-cp-text");
   assert.equal(text.value, "#1d9ad6");
   text.value = "rgb(120 190 58)";
   text.dispatchEvent(new globalThis.Event("input", { bubbles: true }));
   assert.equal(v(), "#78be3a");
   // HSL format through the switcher
-  el.querySelectorAll(".hm-cp-formats [role=radio]").find((b) => b.textContent === "HSL").click();
+  el.querySelectorAll(".m-cp-formats [role=radio]").find((b) => b.textContent === "HSL").click();
   assert.match(v(), /^hsl\(92 53% 49%\)$/);
-  const groups = el.querySelectorAll(".hm-cp-palette").map((g) => g.getAttribute("aria-label"));
+  const groups = el.querySelectorAll(".m-cp-palette").map((g) => g.getAttribute("aria-label"));
   assert.deepEqual(groups, ["HADİ colors", "Theme"]);
-  assert.equal(el.querySelectorAll(".hm-cp-palette")[0].querySelectorAll("button")[0].getAttribute("aria-label"), "Excitement orange");
-  assert.match(el.querySelector(".hm-cp-contrasts").textContent, /on white \d\.\d\d .*on black \d+\.\d\d/);
+  assert.equal(el.querySelectorAll(".m-cp-palette")[0].querySelectorAll("button")[0].getAttribute("aria-label"), "Excitement orange");
+  assert.match(el.querySelector(".m-cp-contrasts").textContent, /on white \d\.\d\d .*on black \d+\.\d\d/);
   dispose();
 });
 
@@ -57,26 +57,26 @@ test("ColorPicker: the hue slider changes the value, no alpha when alpha={false}
   assert.equal(hue.value, "10");
   assert.match(v(), /^#ff2[ab]00$/, "hue 10 of a pure red");
   assert.equal(el.querySelectorAll("[role=slider], input[type=range]").length, 2);
-  assert.equal(el.querySelector(".hm-cp-palette"), null);
+  assert.equal(el.querySelector(".m-cp-palette"), null);
   dispose();
 });
 
 test("ColorPicker: preview, format switcher and text field can be turned off; own texts and class", () => {
   const host = document.createElement("div"); document.body.appendChild(host);
   const off = render(() => h(ColorPicker, { value: "#1d9ad6", preview: false, formats: false, input: false, class: "mine", labels: { picker: "Paint", hue: "Tone", theme: "Ours" } }), host);
-  const root = host.querySelector(".hm-cp");
+  const root = host.querySelector(".m-cp");
   assert.ok(root.classList.contains("mine"));
   assert.equal(root.getAttribute("aria-label"), "Paint");
-  assert.equal(root.querySelector(".hm-cp-preview"), null);
-  assert.equal(root.querySelector(".hm-cp-formats"), null);
-  assert.equal(root.querySelector(".hm-cp-text"), null);
-  assert.equal(root.querySelector(".hm-cp-input-row"), null);
-  assert.equal(root.querySelector(".hm-cp-slider-hue input").getAttribute("aria-label"), "Tone");
-  assert.ok([...root.querySelectorAll(".hm-cp-palette-label")].some((x) => x.textContent === "Ours"));
+  assert.equal(root.querySelector(".m-cp-preview"), null);
+  assert.equal(root.querySelector(".m-cp-formats"), null);
+  assert.equal(root.querySelector(".m-cp-text"), null);
+  assert.equal(root.querySelector(".m-cp-input-row"), null);
+  assert.equal(root.querySelector(".m-cp-slider-hue input").getAttribute("aria-label"), "Tone");
+  assert.ok([...root.querySelectorAll(".m-cp-palette-label")].some((x) => x.textContent === "Ours"));
   off(); host.remove();
   const host2 = document.createElement("div"); document.body.appendChild(host2);
   const on = render(() => h(ColorPicker, { value: "#1d9ad6", formats: false }), host2);
-  assert.ok(host2.querySelector(".hm-cp-preview") && host2.querySelector(".hm-cp-text"));
-  assert.equal(host2.querySelector(".hm-cp-formats"), null);
+  assert.ok(host2.querySelector(".m-cp-preview") && host2.querySelector(".m-cp-text"));
+  assert.equal(host2.querySelector(".m-cp-formats"), null);
   on(); host2.remove();
 });

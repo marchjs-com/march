@@ -133,12 +133,12 @@ export function BarChart<D>(props: BarChartProps<D>): Element {
     Grid({ dir: hz ? "v" : "h", ticks: () => (read(props.grid) ?? true ? valTicks() : []), box }),
     Axis({ side: hz ? "bottom" : "left", ticks: valTicks, box }),
     Axis({ side: hz ? "left" : "bottom", ticks: catTicks, box }),
-    h("g", { class: "hm-chart-plot", transform: attr(() => `translate(${box().x},${box().y})`), onPointerLeave: hide },
-      h("rect", { class: "hm-chart-band", visibility: () => (active() >= 0 ? "visible" : "hidden"),
+    h("g", { class: "m-chart-plot", transform: attr(() => `translate(${box().x},${box().y})`), onPointerLeave: hide },
+      h("rect", { class: "m-chart-band", visibility: () => (active() >= 0 ? "visible" : "hidden"),
         ...(hz ? { x: 0, width: () => box().w, y: () => f1(band().center(Math.max(0, active())) - band().step / 2), height: () => f1(band().step) }
           : { y: 0, height: () => box().h, x: () => f1(band().center(Math.max(0, active())) - band().step / 2), width: () => f1(band().step) }) }),
       each<Bar>({ each: bars, key: (b) => b.key, children: (b) => h("rect", {
-        class: () => `hm-chart-bar ${seriesClass(b().si)}`, "class:hm-chart-active": () => active() === b().index,
+        class: () => `m-chart-bar ${seriesClass(b().si)}`, "class:m-chart-active": () => active() === b().index,
         style: () => colorStyle(props.colors, b().si),
         x: attr(() => f1(b().x)), y: attr(() => f1(b().y)), width: attr(() => f1(b().width)), height: attr(() => f1(b().height)),
         onPointerEnter: () => show(b().index), onPointerMove: () => { if (active.peek() !== b().index) show(b().index); }, onClick: () => select(b().index),

@@ -108,39 +108,39 @@ export function ChatBubble(props: ChatBubbleProps): Element {
     if (!s || props.ticks === false) return null;
     const label = L(s, s === "sending" ? t`Sending` : s === "sent" ? t`Sent` : s === "delivered" ? t`Delivered` : s === "read" ? t`Read` : t`Not sent`);
     const icon = typeof props.ticks === "function" ? props.ticks(s)
-      : s === "sending" ? glyph(clock) : s === "failed" ? glyph(alertCircle) : s === "sent" ? glyph(check) : h("span", { class: "hm-msg-2tick" }, glyph(check), glyph(check));
-    return h("span", { class: cx("hm-msg-tick", `is-${s}`), role: "img", "aria-label": label }, icon);
+      : s === "sending" ? glyph(clock) : s === "failed" ? glyph(alertCircle) : s === "sent" ? glyph(check) : h("span", { class: "m-msg-2tick" }, glyph(check), glyph(check));
+    return h("span", { class: cx("m-msg-tick", `is-${s}`), role: "img", "aria-label": label }, icon);
   };
   const text = (): string => val(props.text) ?? "";
   const big = (): boolean => EMOJI_ONLY.test(text().trim()) && !val(props.reply);
   row = h("div", {
-    class: () => cx("hm-msg", mine() ? "hm-msg-mine" : "hm-msg-theirs", `hm-msg-${val(props.position) ?? "single"}`, big() && "is-emoji", armed() && "is-armed", val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)),
+    class: () => cx("m-msg", mine() ? "m-msg-mine" : "m-msg-theirs", `m-msg-${val(props.position) ?? "single"}`, big() && "is-emoji", armed() && "is-armed", val(props.class)),
+    "data-m-color": () => colorAttr(val(props.color)),
     ref: (x: HTMLElement) => gesture(x),
   },
   props.replyHint === false ? null
-    : h("span", { class: cx("hm-msg-hint", props.replyHint && props.replyHint !== true && "is-own"), "aria-hidden": "true", ref: (x: HTMLElement) => { hint = x; } }, props.replyHint && props.replyHint !== true ? props.replyHint : glyph(arrowLeft)),
-  h("div", { class: "hm-msg-col" },
-    h("div", { class: "hm-msg-bubble", ref: (x: HTMLElement) => { bub = x; } },
-      () => { const s = val(props.sender); return s && !mine() ? h("span", { class: `hm-msg-sender hm-msg-c${((val(props.senderColor) ?? 0) % 4) + 1}` }, s) : null; },
-      () => { const r = val(props.reply); return r ? h(ReplyQuote, { class: "hm-msg-quote", name: r.name, text: r.text, variant: () => (mine() ? "inverse" : "soft") }) : null; },
+    : h("span", { class: cx("m-msg-hint", props.replyHint && props.replyHint !== true && "is-own"), "aria-hidden": "true", ref: (x: HTMLElement) => { hint = x; } }, props.replyHint && props.replyHint !== true ? props.replyHint : glyph(arrowLeft)),
+  h("div", { class: "m-msg-col" },
+    h("div", { class: "m-msg-bubble", ref: (x: HTMLElement) => { bub = x; } },
+      () => { const s = val(props.sender); return s && !mine() ? h("span", { class: `m-msg-sender m-msg-c${((val(props.senderColor) ?? 0) % 4) + 1}` }, s) : null; },
+      () => { const r = val(props.reply); return r ? h(ReplyQuote, { class: "m-msg-quote", name: r.name, text: r.text, variant: () => (mine() ? "inverse" : "soft") }) : null; },
       props.children ?? null,
-      () => (text() ? h("span", { class: "hm-msg-text" }, text()) : null),
-      h("span", { class: "hm-msg-meta" },
-        () => (val(props.edited) ? h("span", { class: "hm-msg-edited" }, L("edited", t`edited`)) : null),
+      () => (text() ? h("span", { class: "m-msg-text" }, text()) : null),
+      h("span", { class: "m-msg-meta" },
+        () => (val(props.edited) ? h("span", { class: "m-msg-edited" }, L("edited", t`edited`)) : null),
         () => { const tm = val(props.time); return tm ? h("time", { dateTime: new Date(tm).toISOString() }, props.formatTime ? props.formatTime(new Date(tm)) : applyPipe("time", tm)) : null; },
         ticks)),
     () => {
       const rs = val(props.reactions);
       if (!rs?.length) return null;
-      return h("div", { class: "hm-msg-reacts" }, rs.map((r) => h(Button, {
-        shape: "pill", size: "sm", pressed: !!r.mine, class: cx("hm-msg-react", r.mine && "is-mine"),
+      return h("div", { class: "m-msg-reacts" }, rs.map((r) => h(Button, {
+        shape: "pill", size: "sm", pressed: !!r.mine, class: cx("m-msg-react", r.mine && "is-mine"),
         "aria-label": t`${r.emoji} ${r.count}`, onClick: () => props.onReact?.(r.emoji),
-      }, h("span", { "aria-hidden": "true" }, r.emoji), r.count > 1 ? h("span", { class: "hm-msg-react-n", "aria-hidden": "true" }, String(r.count)) : null)));
+      }, h("span", { "aria-hidden": "true" }, r.emoji), r.count > 1 ? h("span", { class: "m-msg-react-n", "aria-hidden": "true" }, String(r.count)) : null)));
     },
-    () => (val(props.status) === "failed" && props.onRetry ? h(Button, { variant: "link", class: "hm-msg-retry", onClick: () => props.onRetry?.() }, L("retry", t`Not sent · Retry`)) : null)),
-  props.tools === false ? null : h("div", { class: "hm-msg-tools" },
-    props.onReactMenu ? h(IconButton, { class: "hm-msg-tool hm-msg-tool-react", size: "sm", shape: "round", icon: props.reactIcon ?? smile, label: () => L("react", t`React`), onClick: (e: MouseEvent) => props.onReactMenu?.(e.currentTarget as HTMLElement) }) : null,
-    props.onReply ? h(IconButton, { class: "hm-msg-tool hm-msg-tool-reply", size: "sm", shape: "round", icon: props.replyIcon ?? arrowLeft, label: () => L("reply", t`Reply`), onClick: () => props.onReply?.() }) : null)) as HTMLElement;
+    () => (val(props.status) === "failed" && props.onRetry ? h(Button, { variant: "link", class: "m-msg-retry", onClick: () => props.onRetry?.() }, L("retry", t`Not sent · Retry`)) : null)),
+  props.tools === false ? null : h("div", { class: "m-msg-tools" },
+    props.onReactMenu ? h(IconButton, { class: "m-msg-tool m-msg-tool-react", size: "sm", shape: "round", icon: props.reactIcon ?? smile, label: () => L("react", t`React`), onClick: (e: MouseEvent) => props.onReactMenu?.(e.currentTarget as HTMLElement) }) : null,
+    props.onReply ? h(IconButton, { class: "m-msg-tool m-msg-tool-reply", size: "sm", shape: "round", icon: props.replyIcon ?? arrowLeft, label: () => L("reply", t`Reply`), onClick: () => props.onReply?.() }) : null)) as HTMLElement;
   return row;
 }

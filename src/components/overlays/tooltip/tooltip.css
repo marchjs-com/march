@@ -1,7 +1,7 @@
 /* March — Tooltip. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-tip-anchor { display: inline-flex; }
-.hm-tooltip { pointer-events: none; padding: .3rem .5rem; max-width: 18rem; font-size: var(--hm-text-xs); font-weight: 500; background: var(--hm-inverse-bg); color: var(--hm-inverse-text);
-  border: 0; border-radius: var(--hm-radius-1); box-shadow: var(--hm-shadow-2); }
-.hm-tooltip.hm-tooltip-colored { background: var(--hm-accent, var(--hm-primary)); color: var(--hm-on-accent, var(--hm-on-primary-fill)); }
-.hm-tooltip.hm-tooltip-fade { animation-name: hm-fade-in; }
-.hm-tooltip.hm-tooltip-still { animation: none; }
+.m-tip-anchor { display: inline-flex; }
+.m-tooltip { pointer-events: none; padding: .3rem .5rem; max-width: 18rem; font-size: var(--m-text-xs); font-weight: 500; background: var(--m-inverse-bg); color: var(--m-inverse-text);
+  border: 0; border-radius: var(--m-radius-1); box-shadow: var(--m-shadow-2); }
+.m-tooltip.m-tooltip-colored { background: var(--m-accent, var(--m-primary)); color: var(--m-on-accent, var(--m-on-primary-fill)); }
+.m-tooltip.m-tooltip-fade { animation-name: m-fade-in; }
+.m-tooltip.m-tooltip-still { animation: none; }

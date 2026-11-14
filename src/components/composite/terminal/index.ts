@@ -85,7 +85,7 @@ export interface TerminalProps {
   prompt?: MaybeFn<string>;
   /** Lines printed first (a string or a list). */
   welcome?: string | readonly string[];
-  /** Keep the history in localStorage under "hm.term.<persist>". */
+  /** Keep the history in localStorage under "m.term.<persist>". */
   persist?: string;
   /** "auto" (default): a very dark charcoal tinted by the theme color; "surface": the page's own surfaces (light in a
    *  light theme); "dark" / "light": fixed schemes; or your own colors. Live: changing it restyles the terminal. */
@@ -136,7 +136,7 @@ export function Terminal(props: TerminalProps): Element {
   const blink = props.blink !== false;
   const searchText = (): string => props.labels?.historySearch ?? t`history search`;
   const max = props.maxLines ?? 2000;
-  const key = props.persist ? `hm.term.${props.persist}` : "";
+  const key = props.persist ? `m.term.${props.persist}` : "";
   let hist: string[] = [];
   if (key) hist = load<string[]>(key, []);
   let at = hist.length, draft = "";
@@ -144,14 +144,14 @@ export function Terminal(props: TerminalProps): Element {
   let ctl: AbortController | null = null;
   let search: { q: string; hit: number } | null = null;
 
-  const out = h("div", { class: "hm-term-out", role: "log", "aria-live": "polite", "aria-label": () => props.label ?? t`Terminal output` }) as HTMLElement;
-  const input = h("input", { class: "hm-term-input", type: "text", spellcheck: "false", autocomplete: "off", autocapitalize: "off", "aria-label": () => props.labels?.command ?? t`Command` }) as HTMLInputElement;
-  const promptEl = h("span", { class: "hm-term-prompt", "aria-hidden": "true" }, () => (search ? `(${searchText()}) ` : val(props.prompt) ?? "$ ")) as HTMLElement;
+  const out = h("div", { class: "m-term-out", role: "log", "aria-live": "polite", "aria-label": () => props.label ?? t`Terminal output` }) as HTMLElement;
+  const input = h("input", { class: "m-term-input", type: "text", spellcheck: "false", autocomplete: "off", autocapitalize: "off", "aria-label": () => props.labels?.command ?? t`Command` }) as HTMLInputElement;
+  const promptEl = h("span", { class: "m-term-prompt", "aria-hidden": "true" }, () => (search ? `(${searchText()}) ` : val(props.prompt) ?? "$ ")) as HTMLElement;
   // our own cursor: the browser's caret shows only while the input has focus; this one blinks always (solid while typing)
-  const measure = h("span", { class: "hm-term-measure", "aria-hidden": "true" }) as HTMLElement;
-  const caret = h("span", { class: cx("hm-term-caret", blink && "is-blinking"), "aria-hidden": "true" }) as HTMLElement;
-  const field = h("span", { class: "hm-term-field" }, input, measure, caret) as HTMLElement;
-  const line = h("div", { class: "hm-term-line", "data-busy": () => (busy() ? "" : null) }, promptEl, field) as HTMLElement;
+  const measure = h("span", { class: "m-term-measure", "aria-hidden": "true" }) as HTMLElement;
+  const caret = h("span", { class: cx("m-term-caret", blink && "is-blinking"), "aria-hidden": "true" }) as HTMLElement;
+  const field = h("span", { class: "m-term-field" }, input, measure, caret) as HTMLElement;
+  const line = h("div", { class: "m-term-line", "data-busy": () => (busy() ? "" : null) }, promptEl, field) as HTMLElement;
   let caretTimer: ReturnType<typeof setTimeout> | undefined;
   // after the key's own effect (a keydown runs before the character lands)
   const syncCaret = (): void => {
@@ -167,14 +167,14 @@ export function Terminal(props: TerminalProps): Element {
   };
   for (const ev of ["keydown", "keyup", "input", "pointerup", "focus", "blur", "select", "scroll"]) input.addEventListener(ev, syncCaret);
   onCleanup(() => clearTimeout(caretTimer));
-  const scroller = h("div", { class: "hm-term-scroll", onClick: (e: MouseEvent) => { if (!globalThis.getSelection?.()?.toString() && e.target !== input) input.focus(); } }, out, line) as HTMLElement;
+  const scroller = h("div", { class: "m-term-scroll", onClick: (e: MouseEvent) => { if (!globalThis.getSelection?.()?.toString() && e.target !== input) input.focus(); } }, out, line) as HTMLElement;
 
   // pinned to the bottom: every answer (also one that grows later — a table, a progress bar, a JSON tree) keeps the
   // last line in view; scrolling up to read unpins it until the reader comes back down or runs a command
   const stick = stickToBottom(scroller, { follow: out });
   const scrollDown = (): void => stick.toBottom();
   const append = (node: Node, cls = ""): HTMLElement => {
-    const row = h("div", { class: cx("hm-term-row", cls) }) as HTMLElement;
+    const row = h("div", { class: cx("m-term-row", cls) }) as HTMLElement;
     row.appendChild(node);
     out.appendChild(row);
     while (out.childElementCount > max) out.firstElementChild!.remove();
@@ -187,7 +187,7 @@ export function Terminal(props: TerminalProps): Element {
     const tagged = opts.tone && TONE[opts.tone] ? `[${TONE[opts.tone]}] ${s}` : s;
     const frag = renderLine(tagged);
     if (opts.color == null && !opts.bold && opts.tone !== "muted") return frag;
-    return h("span", { class: cx(opts.color != null && `hm-term-fg-${opts.color}`, opts.bold && "hm-term-b", opts.tone === "muted" && "hm-term-dim") }, frag) as Node;
+    return h("span", { class: cx(opts.color != null && `m-term-fg-${opts.color}`, opts.bold && "m-term-b", opts.tone === "muted" && "m-term-dim") }, frag) as Node;
   };
   const print = (v: unknown, opts?: PrintOptions): void => {
     if (typeof v === "string" && v.includes("\n")) { for (const l of v.split("\n")) append(textNode(l, opts)); return; }
@@ -197,29 +197,29 @@ export function Terminal(props: TerminalProps): Element {
   const ioFor = (signal: AbortSignal): TerminalIO => ({
     print, signal, term: api,
     success: (s) => print(s, { tone: "success" }), warn: (s) => print(s, { tone: "warn" }), error: (s) => print(s, { tone: "error" }), info: (s) => print(s, { tone: "info" }),
-    link: (text, href) => append(h("a", { class: "hm-term-link", href, target: "_blank", rel: "noopener noreferrer" }, text) as Node),
+    link: (text, href) => append(h("a", { class: "m-term-link", href, target: "_blank", rel: "noopener noreferrer" }, text) as Node),
     table: (rows, columns) => {
       const objs = rows.length && !Array.isArray(rows[0]);
       const cols = columns ?? (objs ? [...new Set((rows as Record<string, unknown>[]).flatMap((r) => Object.keys(r)))] : []);
       const cells = (r: unknown): unknown[] => (Array.isArray(r) ? r : cols.map((c) => (r as Record<string, unknown>)[c]));
-      append(h("table", { class: "hm-term-table" },
+      append(h("table", { class: "m-term-table" },
         cols.length ? h("thead", {}, h("tr", {}, cols.map((c) => h("th", {}, c)))) : null,
         h("tbody", {}, rows.map((r) => h("tr", {}, cells(r).map((c) => h("td", {}, textNode(c))))))) as Node);
     },
     json: (value, open = 1) => {
-      const slot = append(h("span", { class: "hm-term-dim" }, "…") as Node);
+      const slot = append(h("span", { class: "m-term-dim" }, "…") as Node);
       void import("../../data/json-view/index.ts").then((m) => slot.replaceChildren(m.JsonView({ value, open }) as Node));
     },
     progress: (label) => {
       // the bar is decoration: the percent text beside it is what the log reads out
       const part = fraction();
-      const pct = h("span", { class: "hm-term-dim" }, " 0%") as HTMLElement;
-      const row = append(h("span", {}, `${label} `, h(Progress, { class: "hm-term-bar", value: part, max: 1, decorative: true }), pct) as Node);
+      const pct = h("span", { class: "m-term-dim" }, " 0%") as HTMLElement;
+      const row = append(h("span", {}, `${label} `, h(Progress, { class: "m-term-bar", value: part, max: 1, decorative: true }), pct) as Node);
       const set = (f: number): void => { const p = clamp(f, 0, 1); part.set(p); pct.textContent = ` ${Math.round(p * 100)}%`; };
       return { set, done: (s) => { set(1); row.replaceChildren(textNode(s ?? label, { tone: "success" })); }, fail: (s) => { row.replaceChildren(textNode(s ?? label, { tone: "error" })); } };
     },
     spinner: (label) => {
-      const row = append(h("span", {}, h(Spinner, { class: "hm-term-spin", size: "em", decorative: true }), ` ${label}`) as Node);
+      const row = append(h("span", {}, h(Spinner, { class: "m-term-spin", size: "em", decorative: true }), ` ${label}`) as Node);
       return { done: (s) => row.replaceChildren(textNode(s ?? label, { tone: "success" })), fail: (s) => row.replaceChildren(textNode(s ?? label, { tone: "error" })) };
     },
     clear: () => out.replaceChildren(),
@@ -237,7 +237,7 @@ export function Terminal(props: TerminalProps): Element {
 
   const exec = async (raw: string): Promise<void> => {
     const lineText = raw.trim();
-    append(h("span", {}, h("span", { class: "hm-term-prompt" }, val(props.prompt) ?? "$ "), lineText) as Node, "hm-term-echo");
+    append(h("span", {}, h("span", { class: "m-term-prompt" }, val(props.prompt) ?? "$ "), lineText) as Node, "m-term-echo");
     if (!lineText) return;
     if (hist[hist.length - 1] !== lineText) { hist.push(lineText); if (hist.length > 500) hist = hist.slice(-500); if (key) save(key, hist); }
     at = hist.length;
@@ -283,7 +283,7 @@ export function Terminal(props: TerminalProps): Element {
       if (e.ctrlKey && e.key === "r") { e.preventDefault(); const i = findHistory(search.q, search.hit - 1); if (i >= 0) { search.hit = i; input.value = hist[i]!; } return; }
       if (e.key === "Enter") { search = null; promptEl.textContent = val(props.prompt) ?? "$ "; }
     }
-    if (e.ctrlKey && e.key === "c") { if (ctl) { e.preventDefault(); ctl.abort(); } else if (!globalThis.getSelection?.()?.toString()) { e.preventDefault(); append(h("span", {}, h("span", { class: "hm-term-prompt" }, val(props.prompt) ?? "$ "), input.value, "^C") as Node, "hm-term-echo"); input.value = ""; } return; }
+    if (e.ctrlKey && e.key === "c") { if (ctl) { e.preventDefault(); ctl.abort(); } else if (!globalThis.getSelection?.()?.toString()) { e.preventDefault(); append(h("span", {}, h("span", { class: "m-term-prompt" }, val(props.prompt) ?? "$ "), input.value, "^C") as Node, "m-term-echo"); input.value = ""; } return; }
     if (e.ctrlKey && e.key === "l") { e.preventDefault(); out.replaceChildren(); return; }
     if (e.ctrlKey && e.key === "u") { e.preventDefault(); input.value = ""; return; }
     if (e.ctrlKey && e.key === "r") { e.preventDefault(); draft = input.value; search = { q: "", hit: hist.length }; promptEl.textContent = `(${searchText()}) `; input.value = ""; return; }
@@ -309,7 +309,7 @@ export function Terminal(props: TerminalProps): Element {
   Object.defineProperty(api, "_all", { value: all });
 
   const schemeOf = (): ColorScheme => val(props.scheme) ?? "auto";
-  const root = h("div", { class: () => { const sc = schemeOf(); return cx("hm-term", `hm-term-${typeof sc === "string" ? sc : "custom"}`, `hm-term-cursor-${props.cursor ?? "bar"}`, val(props.class)); }, dir: "ltr" }, scroller) as HTMLElement;
+  const root = h("div", { class: () => { const sc = schemeOf(); return cx("m-term", `m-term-${typeof sc === "string" ? sc : "custom"}`, `m-term-cursor-${props.cursor ?? "bar"}`, val(props.class)); }, dir: "ltr" }, scroller) as HTMLElement;
   // the look is live: a new scheme or background replaces the variables the previous one set
   let set: string[] = [];
   effect(() => {
@@ -317,16 +317,16 @@ export function Terminal(props: TerminalProps): Element {
     const look = typeof sc === "object" ? sc : sc === "dark" || sc === "light" ? TERMINAL_SCHEMES[sc] : null;
     const style: Record<string, string> = {};
     if (look) {
-      if (look.bg) style["--hm-term-bg"] = look.bg;
-      if (look.fg) style["--hm-term-fg"] = look.fg;
-      if (look.cursor) style["--hm-term-cursor"] = look.cursor;
-      if (look.selection) style["--hm-term-sel"] = look.selection;
-      look.colors?.forEach((c, i) => { style[`--hm-term-c${i}`] = c; });
+      if (look.bg) style["--m-term-bg"] = look.bg;
+      if (look.fg) style["--m-term-fg"] = look.fg;
+      if (look.cursor) style["--m-term-cursor"] = look.cursor;
+      if (look.selection) style["--m-term-sel"] = look.selection;
+      look.colors?.forEach((c, i) => { style[`--m-term-c${i}`] = c; });
     }
     const bg = val(props.background);
-    if (bg) { style["--hm-term-bg"] = bg; delete style["--hm-term-fg"]; }
-    if (props.font) style["--hm-term-font"] = props.font;
-    if (props.height) style["--hm-term-h"] = props.height;
+    if (bg) { style["--m-term-bg"] = bg; delete style["--m-term-fg"]; }
+    if (props.font) style["--m-term-font"] = props.font;
+    if (props.height) style["--m-term-h"] = props.height;
     for (const k of set) if (!(k in style)) root.style.removeProperty(k);
     for (const [k, v] of Object.entries(style)) root.style.setProperty(k, v);
     set = Object.keys(style);
@@ -366,7 +366,7 @@ export function TerminalWindow(props: TerminalWindowProps): unknown {
     x: props.x, y: props.y, width: props.width ?? 560, height: props.windowHeight ?? 340, minWidth: props.minWidth ?? 280, minHeight: props.minHeight,
     state: reactive(() => val(props.state)), onStateChange: props.onStateChange, open: props.open == null ? undefined : reactive(() => val(props.open)), onClose: props.onClose,
     minimizable: props.minimizable, maximizable: props.maximizable, closable: props.closable, movable: props.movable, resizable: props.resizable, snap: props.snap,
-    persist: props.persist ? `term.${props.persist}` : undefined, class: reactive(() => cx("hm-term-window", val(props.class))),
+    persist: props.persist ? `term.${props.persist}` : undefined, class: reactive(() => cx("m-term-window", val(props.class))),
   }, h(Terminal, Object.defineProperty(term, "height", { value: "100%", enumerable: true }) as TerminalProps));
 }
 

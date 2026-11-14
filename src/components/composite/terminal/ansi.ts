@@ -50,11 +50,11 @@ export function renderLine(text: string): DocumentFragment {
   const tag = /^\[(ok|success|warn|err|error|info)\]\s?/i.exec(text);
   if (tag) {
     const tg = TAGS[tag[1]!.toLowerCase()]!;
-    frag.append(h("span", { class: `hm-term-tag hm-term-fg-${tg.fg}` }, tg.label()) as Node, " ");
+    frag.append(h("span", { class: `m-term-tag m-term-fg-${tg.fg}` }, tg.label()) as Node, " ");
     text = text.slice(tag[0].length);
   }
   for (const s of parseAnsi(text)) {
-    const cls = [s.fg != null && `hm-term-fg-${s.fg}`, s.bg != null && `hm-term-bg-${s.bg}`, s.bold && "hm-term-b", s.dim && "hm-term-dim", s.italic && "hm-term-i", s.underline && "hm-term-u"].filter(Boolean).join(" ");
+    const cls = [s.fg != null && `m-term-fg-${s.fg}`, s.bg != null && `m-term-bg-${s.bg}`, s.bold && "m-term-b", s.dim && "m-term-dim", s.italic && "m-term-i", s.underline && "m-term-u"].filter(Boolean).join(" ");
     frag.append(cls ? (h("span", { class: cls }, s.text) as Node) : globalThis.document.createTextNode(s.text));
   }
   return frag;

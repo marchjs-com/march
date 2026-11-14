@@ -1,56 +1,56 @@
 /* March — ColorPicker. Imported by its component module; tokens.css provides the variables.
    The saturation / brightness area and the hue track are color math, not theme colors: they need pure white, black and
    the full hue circle (keywords and hsl() below), whatever the theme. */
-.hm-cp { --hm-cp-accent: var(--hm-accent, var(--hm-primary));
-  display: flex; flex-direction: column; gap: var(--hm-space-3); inline-size: min(100%, 20rem); padding: var(--hm-space-3);
-  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
-.hm-cp.is-disabled { opacity: .6; }
+.m-cp { --m-cp-accent: var(--m-accent, var(--m-primary));
+  display: flex; flex-direction: column; gap: var(--m-space-3); inline-size: min(100%, 20rem); padding: var(--m-space-3);
+  border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface); }
+.m-cp.is-disabled { opacity: .6; }
 
 /* the 2D area: hue underneath, white to the side, black down */
-.hm-cp-area { position: relative; aspect-ratio: 4 / 3; border-radius: var(--hm-radius-2); cursor: crosshair; touch-action: none;
-  background: linear-gradient(to top, black, transparent), linear-gradient(to var(--hm-cp-end, right), white, transparent), var(--hm-cp-hue, hsl(24 100% 50%));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 10%, transparent); }
-:dir(rtl) .hm-cp-area { --hm-cp-end: left; }
-.hm-cp-thumb { position: absolute; inline-size: 1.125rem; block-size: 1.125rem; border-radius: 50%; translate: -50% -50%; outline: none;
-  border: 3px solid var(--hm-surface); background: var(--hm-cp-solid); box-shadow: 0 0 0 1px color-mix(in srgb, var(--hm-text) 25%, transparent), var(--hm-shadow-2);
-  transition: scale var(--hm-dur-fast) var(--hm-ease-spring), box-shadow var(--hm-dur-fast) var(--hm-ease); }
-:dir(rtl) .hm-cp-thumb { translate: 50% -50%; }
-.hm-cp-thumb:hover { scale: 1.12; }
-.hm-cp-thumb:focus-visible { scale: 1.18; box-shadow: 0 0 0 2px var(--hm-surface), 0 0 0 4px var(--hm-focus), var(--hm-shadow-2); }
-.hm-cp-area-thumb { inset-inline-start: var(--hm-cp-x, 87%); inset-block-start: var(--hm-cp-y, 5%); }
+.m-cp-area { position: relative; aspect-ratio: 4 / 3; border-radius: var(--m-radius-2); cursor: crosshair; touch-action: none;
+  background: linear-gradient(to top, black, transparent), linear-gradient(to var(--m-cp-end, right), white, transparent), var(--m-cp-hue, hsl(24 100% 50%));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-text) 10%, transparent); }
+:dir(rtl) .m-cp-area { --m-cp-end: left; }
+.m-cp-thumb { position: absolute; inline-size: 1.125rem; block-size: 1.125rem; border-radius: 50%; translate: -50% -50%; outline: none;
+  border: 3px solid var(--m-surface); background: var(--m-cp-solid); box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-text) 25%, transparent), var(--m-shadow-2);
+  transition: scale var(--m-dur-fast) var(--m-ease-spring), box-shadow var(--m-dur-fast) var(--m-ease); }
+:dir(rtl) .m-cp-thumb { translate: 50% -50%; }
+.m-cp-thumb:hover { scale: 1.12; }
+.m-cp-thumb:focus-visible { scale: 1.18; box-shadow: 0 0 0 2px var(--m-surface), 0 0 0 4px var(--m-focus), var(--m-shadow-2); }
+.m-cp-area-thumb { inset-inline-start: var(--m-cp-x, 87%); inset-block-start: var(--m-cp-y, 5%); }
 
 /* preview, sliders, eyedropper */
-.hm-cp-row { display: flex; align-items: center; gap: var(--hm-space-3); min-width: 0; }
-.hm-cp-sliders { display: flex; flex-direction: column; gap: var(--hm-space-2); flex: 1; min-width: 0; }
+.m-cp-row { display: flex; align-items: center; gap: var(--m-space-3); min-width: 0; }
+.m-cp-sliders { display: flex; flex-direction: column; gap: var(--m-space-2); flex: 1; min-width: 0; }
 /* Sliders over their own track: the hue circle, and the color fading in over the shared checkerboard */
-.hm-cp-slider .hm-slider-track { block-size: .75rem; }
-.hm-cp-slider-hue { --hm-slider-thumb: var(--hm-cp-hue); }
-.hm-cp-slider-alpha { --hm-slider-thumb: var(--hm-cp-color); }
-.hm-cp-hue { background: linear-gradient(to var(--hm-cp-end, right), hsl(0 100% 50%), hsl(60 100% 50%), hsl(120 100% 50%), hsl(180 100% 50%), hsl(240 100% 50%), hsl(300 100% 50%), hsl(360 100% 50%)); }
-:dir(rtl) .hm-cp-hue, :dir(rtl) .hm-cp-alpha { --hm-cp-end: left; }
-.hm-cp-alpha::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to var(--hm-cp-end, right), transparent, var(--hm-cp-solid)); }
+.m-cp-slider .m-slider-track { block-size: .75rem; }
+.m-cp-slider-hue { --m-slider-thumb: var(--m-cp-hue); }
+.m-cp-slider-alpha { --m-slider-thumb: var(--m-cp-color); }
+.m-cp-hue { background: linear-gradient(to var(--m-cp-end, right), hsl(0 100% 50%), hsl(60 100% 50%), hsl(120 100% 50%), hsl(180 100% 50%), hsl(240 100% 50%), hsl(300 100% 50%), hsl(360 100% 50%)); }
+:dir(rtl) .m-cp-hue, :dir(rtl) .m-cp-alpha { --m-cp-end: left; }
+.m-cp-alpha::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to var(--m-cp-end, right), transparent, var(--m-cp-solid)); }
 
 /* old / new preview: two halves of a circle over the shared checkerboard; the old half restores the starting color */
-.hm-cp-preview { position: relative; flex: none; display: grid; grid-template-columns: 1fr 1fr; inline-size: 2.75rem; block-size: 2.75rem; overflow: hidden; border-radius: 50%;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-text) 12%, transparent); }
-.hm-cp-preview-old { border: 0; padding: 0; background: var(--hm-cp-old, var(--hm-cp-color)); cursor: pointer; }
-.hm-cp-preview-new { background: var(--hm-cp-color); transition: background-color var(--hm-dur-fast) var(--hm-ease); }
-.hm-cp-dropper { flex: none; }
+.m-cp-preview { position: relative; flex: none; display: grid; grid-template-columns: 1fr 1fr; inline-size: 2.75rem; block-size: 2.75rem; overflow: hidden; border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-text) 12%, transparent); }
+.m-cp-preview-old { border: 0; padding: 0; background: var(--m-cp-old, var(--m-cp-color)); cursor: pointer; }
+.m-cp-preview-new { background: var(--m-cp-color); transition: background-color var(--m-dur-fast) var(--m-ease); }
+.m-cp-dropper { flex: none; }
 
 /* text and formats */
-.hm-cp-input-row { gap: var(--hm-space-2); }
-.hm-cp-formats { flex: none; }
-.hm-cp-text { flex: 1; min-width: 0; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); }
+.m-cp-input-row { gap: var(--m-space-2); }
+.m-cp-formats { flex: none; }
+.m-cp-text { flex: 1; min-width: 0; font-family: var(--m-font-mono); font-size: var(--m-text-sm); }
 
 /* contrast: a neutral Badge whose mark is the color written on a white / black Swatch */
-.hm-cp-contrasts { display: flex; flex-wrap: wrap; gap: var(--hm-space-2); }
-.hm-cp-contrast.hm-badge { gap: .375rem; padding: .125rem .5rem .125rem .1875rem; }
-.hm-cp-contrast b { font-weight: var(--hm-weight-bold); }
-.hm-cp-contrast.is-pass b { color: var(--hm-success-text, var(--hm-success)); }
-.hm-cp-contrast.is-large b { color: var(--hm-warn-text, var(--hm-warn)); }
-.hm-cp-contrast.is-fail b { color: var(--hm-danger-text, var(--hm-danger)); }
-.hm-cp-contrast-chip.hm-sample { color: var(--hm-cp-solid); font-weight: 800; font-size: .6875rem; }
+.m-cp-contrasts { display: flex; flex-wrap: wrap; gap: var(--m-space-2); }
+.m-cp-contrast.m-badge { gap: .375rem; padding: .125rem .5rem .125rem .1875rem; }
+.m-cp-contrast b { font-weight: var(--m-weight-bold); }
+.m-cp-contrast.is-pass b { color: var(--m-success-text, var(--m-success)); }
+.m-cp-contrast.is-large b { color: var(--m-warn-text, var(--m-warn)); }
+.m-cp-contrast.is-fail b { color: var(--m-danger-text, var(--m-danger)); }
+.m-cp-contrast-chip.m-sample { color: var(--m-cp-solid); font-weight: 800; font-size: .6875rem; }
 
 /* palettes: a SectionLabel over a row of Swatches */
-.hm-cp-palette { display: flex; flex-direction: column; gap: var(--hm-space-1); }
-.hm-cp-swatches { display: flex; flex-wrap: wrap; gap: .375rem; }
+.m-cp-palette { display: flex; flex-direction: column; gap: var(--m-space-1); }
+.m-cp-swatches { display: flex; flex-wrap: wrap; gap: .375rem; }

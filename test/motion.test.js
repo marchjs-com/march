@@ -181,14 +181,14 @@ test("drag lifts the element above everything until the spring-back ends, on eve
   el.animate = (frames, opts) => ({ frames, opts, finished: new Promise((r) => { finish = r; }), cancel() {}, play() {}, pause() {}, reverse() {} });
   M.drag(el, { snapBack: true });
   for (let i = 0; i < 3; i++) {
-    assert.equal(el.classList.contains("hm-dragging"), false, `drag ${i}: not lifted at rest`);
+    assert.equal(el.classList.contains("m-dragging"), false, `drag ${i}: not lifted at rest`);
     el.dispatchEvent(pe("pointerdown", 0, 0, i * 100));
     el.dispatchEvent(pe("pointermove", 40, 0, i * 100 + 16));
-    assert.ok(el.classList.contains("hm-dragging"), `drag ${i}: lifted while dragging`);
+    assert.ok(el.classList.contains("m-dragging"), `drag ${i}: lifted while dragging`);
     el.dispatchEvent(pe("pointerup", 40, 0, i * 100 + 32));
-    assert.ok(el.classList.contains("hm-dragging"), `drag ${i}: still on top while springing back`);
+    assert.ok(el.classList.contains("m-dragging"), `drag ${i}: still on top while springing back`);
     finish(); await new Promise((r) => setTimeout(r, 0));
-    assert.equal(el.classList.contains("hm-dragging"), false, `drag ${i}: back to normal after the spring-back`);
+    assert.equal(el.classList.contains("m-dragging"), false, `drag ${i}: back to normal after the spring-back`);
   }
   el.remove();
 });

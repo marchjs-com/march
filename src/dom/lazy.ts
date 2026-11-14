@@ -36,7 +36,7 @@ export interface LazyOptions<P> {
 
 
 /** A skeleton of a given kind: one element, the shape (lines, rows, bars, fields) is drawn by CSS (lazy.css). */
-export const skeleton = (kind: LazyPlaceholder = "block"): Element => h("div", { class: `hm-lazy-skel hm-lazy-skel-${kind}`, "aria-hidden": "true" });
+export const skeleton = (kind: LazyPlaceholder = "block"): Element => h("div", { class: `m-lazy-skel m-lazy-skel-${kind}`, "aria-hidden": "true" });
 
 /**
  * `const Map = lazy(() => import("./Map.tsx"), { when: "visible", placeholder: "card", height: "20rem" })` then `<Map … />`.
@@ -59,7 +59,7 @@ export function lazy<P = Record<string, unknown>>(load: () => Promise<Loaded<P>>
       pending = attempt(0).catch((e: unknown) => {
         pending = null;
         // still failing: reload once to pick up a new build (a chunk of the old one is gone); never twice in 30 s
-        try { const k = "hm-lazy-reload"; if (tries && Date.now() - +(sessionStorage.getItem(k) ?? 0) > 3e4) { sessionStorage.setItem(k, `${Date.now()}`); location.reload(); return new Promise<Comp<P>>(() => {}); } } catch { /* no storage */ }
+        try { const k = "m-lazy-reload"; if (tries && Date.now() - +(sessionStorage.getItem(k) ?? 0) > 3e4) { sessionStorage.setItem(k, `${Date.now()}`); location.reload(); return new Promise<Comp<P>>(() => {}); } } catch { /* no storage */ }
         throw e;
       });
     }
@@ -75,13 +75,13 @@ export function lazy<P = Record<string, unknown>>(load: () => Promise<Loaded<P>>
     const ph = opts.placeholder ?? (opts.fallback ? opts.fallback : "block");
     const fb = typeof ph === "function" ? untrack(() => (ph as (p: P) => unknown)(props)) : ph === "none" ? null : skeleton(ph);
     // built while hydrate() takes over a prerendered page (hadi-march/seo): its content is already on screen, no fade-in
-    const still = !!globalThis.document?.documentElement.hasAttribute("data-hm-hydrating");
+    const still = !!globalThis.document?.documentElement.hasAttribute("data-m-hydrating");
     const slot = h("div", {
-      class: () => `hm-lazy-slot is-${state()}${opts.height || opts.aspect ? " hm-lazy-sized" : ""}${still ? " hm-lazy-still" : ""}`, "aria-busy": () => (state() === "wait" ? "true" : null),
-    }, () => (state() === "ready" ? view() : state() === "error" ? h("div", { class: "hm-lazy-error", role: "alert" },
-      h("span", {}, () => t`Could not load this part.`), h("button", { type: "button", class: "hm-btn hm-btn-secondary hm-btn-sm", onClick: () => { state.set("wait"); start(); } }, () => t`Try again`)) : fb)) as HTMLElement;
-    if (opts.height) slot.style.setProperty("--hm-lazy-h", opts.height);
-    if (opts.aspect) slot.style.setProperty("--hm-lazy-aspect", opts.aspect);
+      class: () => `m-lazy-slot is-${state()}${opts.height || opts.aspect ? " m-lazy-sized" : ""}${still ? " m-lazy-still" : ""}`, "aria-busy": () => (state() === "wait" ? "true" : null),
+    }, () => (state() === "ready" ? view() : state() === "error" ? h("div", { class: "m-lazy-error", role: "alert" },
+      h("span", {}, () => t`Could not load this part.`), h("button", { type: "button", class: "m-btn m-btn-secondary m-btn-sm", onClick: () => { state.set("wait"); start(); } }, () => t`Try again`)) : fb)) as HTMLElement;
+    if (opts.height) slot.style.setProperty("--m-lazy-h", opts.height);
+    if (opts.aspect) slot.style.setProperty("--m-lazy-aspect", opts.aspect);
     const start = (): void => {
       void preload().then(
         (c) => { if (alive) runWithOwner(owner, () => { view.set(untrack(() => c(props))); state.set("ready"); }); },

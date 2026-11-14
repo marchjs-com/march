@@ -48,7 +48,7 @@ export interface Scroll {
   dispose(): void;
 }
 
-const DEFAULTS: ScrollConfig = { storageKey: "hm.scroll", offset: 64, keep: 50 };
+const DEFAULTS: ScrollConfig = { storageKey: "m.scroll", offset: 64, keep: 50 };
 
 function create(cfg: ScrollConfig): Scroll {
   const win = globalThis as unknown as Window;

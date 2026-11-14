@@ -57,14 +57,14 @@ test("hrefOf: links are relative to the current address (right under any base, a
   a.done();
 });
 
-test("old hash links (#/motion) and the 404 hand-over (?hm-path=) become the normal address, no extra history entry", async () => {
+test("old hash links (#/motion) and the 404 hand-over (?m-path=) become the normal address, no extra history entry", async () => {
   let a = await boot("http://h.test/march/#/motion/svg", { script: "./assets/main.js" });
   assert.equal(location.pathname, "/march/motion/svg");
   assert.equal(location.hash, "");
   assert.equal(a.R.path(), "/motion/svg");
   assert.equal(history._stack.length, 1);
   a.done();
-  a = await boot(`http://h.test/march/?hm-path=${encodeURIComponent("/users/9?tab=b#top")}`, { script: "./assets/main.js" });
+  a = await boot(`http://h.test/march/?m-path=${encodeURIComponent("/users/9?tab=b#top")}`, { script: "./assets/main.js" });
   assert.equal(`${location.pathname}${location.search}${location.hash}`, "/march/users/9?tab=b#top");
   assert.equal(a.R.params().id, "9");
   a.done();

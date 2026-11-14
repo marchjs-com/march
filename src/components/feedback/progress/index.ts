@@ -73,9 +73,9 @@ export function Progress(props: ProgressProps): Element {
   const count = (): number => Math.max(1, Math.round(val(props.segments) ?? 1));
   const max = (): number => props.max ?? (parts ? count() : 100);
   const pct = computed(() => { const v = val(props.value); return v == null ? null : clamp((v / max()) * 100, 0, 100); });
-  const fill = parts ? null : h("span", { class: "hm-progress2-fill" }) as HTMLElement;
+  const fill = parts ? null : h("span", { class: "m-progress2-fill" }) as HTMLElement;
   const bar = h("span", {
-    class: cx("hm-progress2-track", parts && "hm-progress2-segs"),
+    class: cx("m-progress2-track", parts && "m-progress2-segs"),
     ...(props.decorative ? { "aria-hidden": "true" } : {
       role: "progressbar", "aria-valuemin": "0", "aria-valuemax": () => String(max()),
       "aria-valuenow": () => { const v = val(props.value); return v == null ? null : String(v); }, "aria-label": () => val(props.label) ?? val(props.ariaLabel) ?? t`Progress`,
@@ -86,19 +86,19 @@ export function Progress(props: ProgressProps): Element {
   const valueText = (): unknown => { const p = pct(); return p == null ? "" : typeof show === "function" ? show(Math.round(p), val(props.value) as number) : `${Math.round(p)}%`; };
   const size = props.size;
   const root = h("div", {
-    "data-hm-color": () => colorAttr(props.color),
-    class: () => cx("hm-progress2", `hm-progress2-${typeof size === "string" ? size : "md"}`, `hm-progress2-${val(props.tone) ?? "primary"}`,
-      props.variant === "line" && "hm-progress2-line", vertical && "hm-progress2-vertical", props.track === false && "hm-progress2-bare", props.inverse && "hm-progress2-inverse",
+    "data-m-color": () => colorAttr(props.color),
+    class: () => cx("m-progress2", `m-progress2-${typeof size === "string" ? size : "md"}`, `m-progress2-${val(props.tone) ?? "primary"}`,
+      props.variant === "line" && "m-progress2-line", vertical && "m-progress2-vertical", props.track === false && "m-progress2-bare", props.inverse && "m-progress2-inverse",
       (props.smooth === false || props.duration != null) && "is-instant", !parts && !driven && pct() == null && "is-indeterminate",
-      props.colors === "single" && "hm-paint-single", props.paint === "cycle" && "hm-paint-cycle", val(props.class)),
+      props.colors === "single" && "m-paint-single", props.paint === "cycle" && "m-paint-cycle", val(props.class)),
   },
-    (props.label != null || show) && h("div", { class: "hm-progress2-head" },
-      h("span", { class: "hm-progress2-label" }, () => val(props.label) ?? ""),
-      show && h("span", { class: "hm-progress2-value" }, valueText)),
+    (props.label != null || show) && h("div", { class: "m-progress2-head" },
+      h("span", { class: "m-progress2-label" }, () => val(props.label) ?? ""),
+      show && h("span", { class: "m-progress2-value" }, valueText)),
     bar);
-  if (typeof size === "number") setStyle(root, { "--hm-progress-h": `${size}px` });
+  if (typeof size === "number") setStyle(root, { "--m-progress-h": `${size}px` });
   if (fill) {
-    effect(() => { const p = pct(); setStyle(fill, { "--hm-progress": p == null ? "0" : String(p / 100) }); });
+    effect(() => { const p = pct(); setStyle(fill, { "--m-progress": p == null ? "0" : String(p / 100) }); });
     props.fillRef?.(fill);
   } else {
     // parts: full before the value, empty after it; with `duration` the current one fills on the motion engine
@@ -110,10 +110,10 @@ export function Progress(props: ProgressProps): Element {
         const mine = ++turn;
         play?.cancel(); play = null;
         const segs = [...bar.children] as HTMLElement[];
-        while (segs.length < n) { const s = h("span", { class: "hm-progress2-seg" }, h("span", { class: "hm-progress2-seg-fill" })) as HTMLElement; bar.append(s); segs.push(s); }
+        while (segs.length < n) { const s = h("span", { class: "m-progress2-seg" }, h("span", { class: "m-progress2-seg-fill" })) as HTMLElement; bar.append(s); segs.push(s); }
         while (segs.length > n) segs.pop()?.remove();
         const now = Math.floor(at);
-        segs.forEach((s, k) => { const f = clamp(at - k, 0, 1); s.classList.toggle("is-done", f >= 1); s.classList.toggle("is-now", k === now); setStyle(s.firstElementChild as HTMLElement, { "--hm-progress": String(f) }); });
+        segs.forEach((s, k) => { const f = clamp(at - k, 0, 1); s.classList.toggle("is-done", f >= 1); s.classList.toggle("is-now", k === now); setStyle(s.firstElementChild as HTMLElement, { "--m-progress": String(f) }); });
         const cur = segs[now]?.firstElementChild as HTMLElement | undefined;
         if (dur == null || !cur) return;
         // the engine loads only for a timed fill; a newer turn (value, run, cleanup) drops this one
@@ -133,8 +133,8 @@ export function Progress(props: ProgressProps): Element {
     if (getOwner()) onCleanup(() => { turn++; play?.cancel(); });
   }
   const list = colorList(props.colors);
-  if (list) root.setAttribute("data-hm-colors", Array.isArray(props.colors) ? "custom" : String(props.colors));
-  if (list && props.paint === "cycle") setStyle(root, { "--hm-progress-cycle": paintOf(list, "gradient", "linear", true) });
-  else if (list) setStyle(root, { "--hm-progress-c": paintOf(list, props.paint === "segments" ? "segments" : "gradient", "linear") });
+  if (list) root.setAttribute("data-m-colors", Array.isArray(props.colors) ? "custom" : String(props.colors));
+  if (list && props.paint === "cycle") setStyle(root, { "--m-progress-cycle": paintOf(list, "gradient", "linear", true) });
+  else if (list) setStyle(root, { "--m-progress-c": paintOf(list, props.paint === "segments" ? "segments" : "gradient", "linear") });
   return root;
 }

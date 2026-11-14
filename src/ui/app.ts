@@ -25,12 +25,12 @@ export interface BrandProps {
 /** Logo lockup: `<Brand mark={logo} name="HADİ" sub="Admin" href="/" />` */
 export function Brand(props: BrandProps): Element {
   const inner = [
-    props.mark != null && h("span", { class: "hm-brand-mark" }, icon(props.mark, "hm-brand-glyph")),
-    h("span", { class: "hm-brand-text" },
-      h("span", { class: "hm-brand-name" }, () => val(props.name)),
-      props.sub != null && h("span", { class: "hm-brand-sub" }, () => val(props.sub))),
+    props.mark != null && h("span", { class: "m-brand-mark" }, icon(props.mark, "m-brand-glyph")),
+    h("span", { class: "m-brand-text" },
+      h("span", { class: "m-brand-name" }, () => val(props.name)),
+      props.sub != null && h("span", { class: "m-brand-sub" }, () => val(props.sub))),
   ];
-  const cls = (): string => cx("hm-brand", props.size === "lg" && "hm-brand-lg", val(props.class));
+  const cls = (): string => cx("m-brand", props.size === "lg" && "m-brand-lg", val(props.class));
   return props.href ? h(Link, { href: props.href, class: cls, children: inner }) as Element : h("span", { class: cls }, ...inner);
 }
 
@@ -50,27 +50,27 @@ export interface AuthLayoutProps {
  */
 export function AuthLayout(props: AuthLayoutProps): Element {
   const a = props.aside;
-  return h("main", { class: () => cx("hm-auth", a && "hm-auth-split", val(props.class)) },
-    a && h("aside", { class: "hm-auth-aside", "aria-hidden": "false" },
-      h("div", { class: "hm-auth-mesh", "aria-hidden": "true" }),
-      h("div", { class: "hm-auth-grid", "aria-hidden": "true" }),
-      h("div", { class: "hm-auth-aside-inner" },
-        props.brand != null && h("div", { class: "hm-auth-aside-brand" }, props.brand),
-        h("div", { class: "hm-auth-pitch" },
-          a.headline != null && h("h2", { class: "hm-auth-headline" }, a.headline),
-          a.text != null && h("p", { class: "hm-auth-text" }, a.text),
-          a.points?.length ? h("ul", { class: "hm-auth-points" }, a.points.map((p) => h("li", { class: "hm-auth-point" },
-            p.icon != null && h("span", { class: "hm-auth-point-icon" }, icon(p.icon)),
-            h("span", {}, h("strong", {}, p.title), p.text != null && h("span", { class: "hm-auth-point-text" }, p.text))))) : null),
-        a.foot != null && h("div", { class: "hm-auth-aside-foot" }, a.foot))),
-    h("section", { class: "hm-auth-main" },
-      h("div", { class: "hm-auth-panel" },
-        props.brand != null && h("div", { class: "hm-auth-brand" }, props.brand),
-        (props.title != null || props.subtitle != null) && h("header", { class: "hm-auth-head" },
-          props.title != null && h("h1", { class: "hm-auth-title" }, () => val(props.title)),
-          props.subtitle != null && h("p", { class: "hm-auth-sub" }, () => val(props.subtitle))),
-        h("div", { class: "hm-auth-body" }, props.children),
-        props.footer != null && h("footer", { class: "hm-auth-foot" }, props.footer))));
+  return h("main", { class: () => cx("m-auth", a && "m-auth-split", val(props.class)) },
+    a && h("aside", { class: "m-auth-aside", "aria-hidden": "false" },
+      h("div", { class: "m-auth-mesh", "aria-hidden": "true" }),
+      h("div", { class: "m-auth-grid", "aria-hidden": "true" }),
+      h("div", { class: "m-auth-aside-inner" },
+        props.brand != null && h("div", { class: "m-auth-aside-brand" }, props.brand),
+        h("div", { class: "m-auth-pitch" },
+          a.headline != null && h("h2", { class: "m-auth-headline" }, a.headline),
+          a.text != null && h("p", { class: "m-auth-text" }, a.text),
+          a.points?.length ? h("ul", { class: "m-auth-points" }, a.points.map((p) => h("li", { class: "m-auth-point" },
+            p.icon != null && h("span", { class: "m-auth-point-icon" }, icon(p.icon)),
+            h("span", {}, h("strong", {}, p.title), p.text != null && h("span", { class: "m-auth-point-text" }, p.text))))) : null),
+        a.foot != null && h("div", { class: "m-auth-aside-foot" }, a.foot))),
+    h("section", { class: "m-auth-main" },
+      h("div", { class: "m-auth-panel" },
+        props.brand != null && h("div", { class: "m-auth-brand" }, props.brand),
+        (props.title != null || props.subtitle != null) && h("header", { class: "m-auth-head" },
+          props.title != null && h("h1", { class: "m-auth-title" }, () => val(props.title)),
+          props.subtitle != null && h("p", { class: "m-auth-sub" }, () => val(props.subtitle))),
+        h("div", { class: "m-auth-body" }, props.children),
+        props.footer != null && h("footer", { class: "m-auth-foot" }, props.footer))));
 }
 
 export interface UserMenuProps {
@@ -87,13 +87,13 @@ export interface UserMenuProps {
 export function UserMenu(props: UserMenuProps): unknown {
   return h(Menu, {
     label: () => val(props.name) ?? t`Account`, variant: "ghost", placement: props.placement ?? "top-start", items: props.items,
-    class: () => cx("hm-user-btn", props.compact && "hm-user-btn-compact", val(props.class)),
+    class: () => cx("m-user-btn", props.compact && "m-user-btn-compact", val(props.class)),
     trigger: [
       h(Avatar, { name: () => val(props.name) ?? "", src: props.avatar, size: "sm" }),
-      !props.compact && h("span", { class: "hm-user-text hm-rail-hide" },
-        h(OverflowText, { class: "hm-user-name" }, () => val(props.name) ?? ""),
-        props.detail != null && h(OverflowText, { class: "hm-user-detail" }, () => val(props.detail) ?? "")),
-      !props.compact && h("span", { class: "hm-user-chev hm-rail-hide", "aria-hidden": "true" }, glyph(chevronsUpDown)),
+      !props.compact && h("span", { class: "m-user-text m-rail-hide" },
+        h(OverflowText, { class: "m-user-name" }, () => val(props.name) ?? ""),
+        props.detail != null && h(OverflowText, { class: "m-user-detail" }, () => val(props.detail) ?? "")),
+      !props.compact && h("span", { class: "m-user-chev m-rail-hide", "aria-hidden": "true" }, glyph(chevronsUpDown)),
     ],
   });
 }

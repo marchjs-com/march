@@ -13,16 +13,16 @@ test("SiteNav: brand, labelled nav, aria-current follows active, menu button, mo
     links: [{ label: "A", href: "#a", active: () => on() === "#a" }, { label: "B", href: "#b", active: () => on() === "#b" }],
     actions: h("button", {}, "Go"),
   }), el);
-  const nav = el.querySelector("header.hm-snav");
-  assert.ok(nav.className.includes("hm-snav-transparent") && nav.className.includes("is-sticky"));
+  const nav = el.querySelector("header.m-snav");
+  assert.ok(nav.className.includes("m-snav-transparent") && nav.className.includes("is-sticky"));
   assert.equal(nav.querySelector("nav").getAttribute("aria-label"), "Main");
-  assert.ok(nav.querySelector(".hm-brand"));
-  const [a, b] = nav.querySelectorAll(".hm-snav-link");
+  assert.ok(nav.querySelector(".m-brand"));
+  const [a, b] = nav.querySelectorAll(".m-snav-link");
   assert.equal(a.getAttribute("aria-current"), "page");
   on.set("#b");
   assert.equal(a.getAttribute("aria-current"), null);
   assert.equal(b.getAttribute("aria-current"), "page");
-  assert.equal(nav.querySelector(".hm-snav-menu").getAttribute("aria-label"), "Open menu");
+  assert.equal(nav.querySelector(".m-snav-menu").getAttribute("aria-label"), "Open menu");
   dispose();
 });
 
@@ -34,20 +34,20 @@ test("SiteNav: no pill / coloured pill, own menu icon and names, no menu button"
     h(SiteNav, { brand: { name: "B" }, links, class: "two", pillColor: "brand-orange", menuIcon: h("i", { class: "mine" }), labels: { main: "Site", openMenu: "Show menu" } }),
   ], el);
   const one = el.querySelector(".one");
-  assert.equal(one.querySelector(".hm-snav-pill"), null);
-  assert.equal(one.querySelector(".hm-snav-menu"), null);
+  assert.equal(one.querySelector(".m-snav-pill"), null);
+  assert.equal(one.querySelector(".m-snav-menu"), null);
   const two = el.querySelector(".two");
-  assert.equal(two.querySelector(".hm-snav-pill").getAttribute("data-hm-color"), "brand-orange");
+  assert.equal(two.querySelector(".m-snav-pill").getAttribute("data-m-color"), "brand-orange");
   assert.equal(two.querySelector("nav").getAttribute("aria-label"), "Site");
-  assert.equal(two.querySelector(".hm-snav-menu").getAttribute("aria-label"), "Show menu");
-  assert.ok(two.querySelector(".hm-snav-menu .mine"));
+  assert.equal(two.querySelector(".m-snav-menu").getAttribute("aria-label"), "Show menu");
+  assert.ok(two.querySelector(".m-snav-menu .mine"));
   dispose();
 });
 
 test("SiteNav: source — shrink and hide follow the given scroll container, not the page", async () => {
   const box = document.createElement("div"); document.body.appendChild(box);
   const dispose = render(() => h(SiteNav, { brand: { name: "A" }, hide: true, source: () => box }), box);
-  const nav = box.querySelector("header.hm-snav");
+  const nav = box.querySelector("header.m-snav");
   await new Promise((r) => setTimeout(r, 30));
   assert.ok(!nav.className.includes("is-scrolled"));
   box.scrollTop = 240; box.dispatchEvent(new Event("scroll"));

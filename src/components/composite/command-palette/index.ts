@@ -121,8 +121,8 @@ export interface PaletteButtonProps {
 }
 /** A search-field-looking button that opens the command palette: `<PaletteButton label="Search…" />` (shows Ctrl+K / ⌘K). */
 export function PaletteButton(props: PaletteButtonProps = {}): Element {
-  return h("button", { type: "button", class: cx("hm-pal-trigger", props.class), onClick: openPalette, onPointerenter: () => void preloadPalette(), onFocus: () => void preloadPalette(), "aria-keyshortcuts": "Control+K Meta+K" },
-    props.icon === false ? null : props.icon == null ? glyph(searchIcon, "hm-svg hm-pal-trigger-icon") : isIconDef(props.icon) ? glyph(props.icon, "hm-svg hm-pal-trigger-icon") : icon(props.icon, "hm-icon hm-pal-trigger-icon"),
-    h(OverflowText, { class: "hm-pal-trigger-label" }, () => val(props.label) ?? t`Search…`),
-    props.kbd === false ? null : h("span", { class: "hm-pal-trigger-kbd", "aria-hidden": "true" }, h(Kbd, { keys: props.shortcut ?? "mod+k" })));
+  return h("button", { type: "button", class: cx("m-pal-trigger", props.class), onClick: openPalette, onPointerenter: () => void preloadPalette(), onFocus: () => void preloadPalette(), "aria-keyshortcuts": "Control+K Meta+K" },
+    props.icon === false ? null : props.icon == null ? glyph(searchIcon, "m-svg m-pal-trigger-icon") : isIconDef(props.icon) ? glyph(props.icon, "m-svg m-pal-trigger-icon") : icon(props.icon, "m-icon m-pal-trigger-icon"),
+    h(OverflowText, { class: "m-pal-trigger-label" }, () => val(props.label) ?? t`Search…`),
+    props.kbd === false ? null : h("span", { class: "m-pal-trigger-kbd", "aria-hidden": "true" }, h(Kbd, { keys: props.shortcut ?? "mod+k" })));
 }

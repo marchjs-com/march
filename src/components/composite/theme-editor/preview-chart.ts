@@ -20,12 +20,12 @@ const SALES = [{ m: "Jan", a: 32, b: 18 }, { m: "Feb", a: 41, b: 24 }, { m: "Mar
 export function PreviewCharts(): Element {
   const notify = signal(true);
   const level = signal(60);
-  const nameId = uid("hm-te-p"), teamId = uid("hm-te-p");
-  return h("div", { class: "hm-te-cards" },
+  const nameId = uid("m-te-p"), teamId = uid("m-te-p");
+  return h("div", { class: "m-te-cards" },
     h(Card, { title: t`Sales`, subtitle: t`Last five months` },
       h(BarChart, { data: SALES, x: "m", y: ["a", "b"], series: [t`Online`, t`Store`], height: 150, grid: true, legend: "bottom" as const })),
     h(Card, { title: t`New project` },
-      h("div", { class: "hm-te-form-demo" },
+      h("div", { class: "m-te-form-demo" },
         h(Field, { id: nameId, label: t`Project name` }, h(TextInput, { id: nameId, value: "HADİ", placeholder: t`Name` })),
         h(Field, { id: teamId, label: t`Team` }, h(Select, { id: teamId, value: "design", options: [{ value: "design", label: t`Design` }, { value: "product", label: t`Product` }] })),
         h(Checkbox, { value: true, label: t`Private project` }),

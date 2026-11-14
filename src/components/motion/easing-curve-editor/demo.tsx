@@ -15,6 +15,6 @@ export default function EasingCurveEditorDemo(props: { values: { preview: string
     {() => <EasingCurveEditor value={untrack(() => $e)} onChange={(v: string) => { $e = v }} name="hadi-pop" preview={props.values.preview as "move"} duration={props.values.duration}
       presets={props.values.presets ? undefined : false} readonly={props.values.readonly}
       inputs={props.values.inputs} cssLine={props.values.cssLine} nameNote={props.values.cssLine} grid={props.values.grid} handleColors={HANDLES[props.values.handles]} />}
-    <div class="sc-ec-try">{card}<button type="button" class="hm-btn hm-btn-primary" onClick={run}>"hadi-pop" ile oynat</button></div>
+    <div class="sc-ec-try">{card}<button type="button" class="m-btn m-btn-primary" onClick={run}>"hadi-pop" ile oynat</button></div>
   </div>
 }

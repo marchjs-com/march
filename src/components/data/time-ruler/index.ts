@@ -81,9 +81,9 @@ export function TimeRuler(props: TimeRulerProps): Element {
   const seekable = !!props.onSeek;
   const seek = (ms: number): void => props.onSeek?.(clamp(ms, 0, untrack(D)));
 
-  const rail = h("div", { class: "hm-time-ruler-rail", "aria-hidden": "true" }, () => {
+  const rail = h("div", { class: "m-time-ruler-rail", "aria-hidden": "true" }, () => {
     const d = D();
-    return ticks().map((k) => h("span", { class: cx("hm-time-ruler-tick", k.major && "is-major"), style: { "--hm-time-ruler-at": timePercent(k.at, d) } },
+    return ticks().map((k) => h("span", { class: cx("m-time-ruler-tick", k.major && "is-major"), style: { "--m-time-ruler-at": timePercent(k.at, d) } },
       k.label !== undefined ? k.label : k.major ? fmt(k.at) : null));
   }) as HTMLElement;
   // the head is built once per appearance: a moving value only moves it (it keeps focus and its drag)
@@ -92,7 +92,7 @@ export function TimeRuler(props: TimeRulerProps): Element {
     if (!shown()) return null;
     return untrack(() => {
       const el = h("div", {
-        class: cx("hm-time-ruler-head", props.headClass), style: () => ({ "--hm-time-ruler-at": timePercent(now() ?? 0, D()) }),
+        class: cx("m-time-ruler-head", props.headClass), style: () => ({ "--m-time-ruler-at": timePercent(now() ?? 0, D()) }),
         ...(seekable ? {
           role: "slider", tabindex: "0", "aria-label": () => props.labels?.playhead ?? t`Playhead`, "aria-valuemin": "0", "aria-valuemax": () => String(Math.round(D())),
           "aria-valuenow": () => String(Math.round(now() ?? 0)), "aria-valuetext": () => (props.valueText ? props.valueText(now() ?? 0) : `${((now() ?? 0) / 1000).toFixed(2)} s`),
@@ -104,13 +104,13 @@ export function TimeRuler(props: TimeRulerProps): Element {
             seek(st.home ? 0 : st.end ? untrack(D) : (untrack(now) ?? 0) + (st.dx || -st.dy) * (props.keyStep ?? 100));
           },
         } : { "aria-hidden": "true" }),
-      }, props.head && props.head !== true ? props.head : h("span", { class: "hm-time-ruler-grip", "aria-hidden": "true" })) as HTMLElement;
+      }, props.head && props.head !== true ? props.head : h("span", { class: "m-time-ruler-grip", "aria-hidden": "true" })) as HTMLElement;
       if (seekable) drag(el);
       return el;
     });
   };
   const root = h("div", {
-    class: () => cx("hm-time-ruler", seekable && "is-seekable", val(props.class)), "data-hm-color": () => colorAttr(val(props.color)),
+    class: () => cx("m-time-ruler", seekable && "is-seekable", val(props.class)), "data-m-color": () => colorAttr(val(props.color)),
     role: seekable ? "group" : null, "aria-label": seekable ? () => props.labels?.ruler ?? t`Time ruler` : null, "aria-hidden": seekable ? null : "true",
   }, rail, head) as HTMLElement;
   // a press anywhere on the rail jumps there; dragging the rail or the head scrubs

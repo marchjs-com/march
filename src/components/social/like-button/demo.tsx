@@ -25,7 +25,7 @@ export default function LikeButtonDemo(props: { values: Values }) {
     if (played) untrack(play)
     played = true
   })
-  return <div class="sc-row sc-social-like" data-hm-color={props.values.color}>
+  return <div class="sc-row sc-social-like" data-m-color={props.values.color}>
     {() => {
       // the icon is read once by the button: a new icon choice builds it again (the other props stay live)
       const icon = iconOf()

@@ -19,7 +19,7 @@ export default function VerifiedMarkDemo(props: { values: { size: string; color:
       return <>
         <strong>HADİ Koşu Kulübü</strong>
         <VerifiedMark size={v.size as "md"} color={color} icon={icon} label={label} />
-        <span class="hm-muted">{note}</span>
+        <span class="m-muted">{note}</span>
       </>
     }}
   </div>

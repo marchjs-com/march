@@ -92,7 +92,7 @@ export interface StickyRevealOptions extends ScrollSource {
 
 /**
  * A tall section with a sticky stage: as the section scrolls by, the steps come in one after another (each fades and
- * rises in, then out). The section sets `--hm-scroll` (0..1) on itself for CSS extras. Returns a stop function.
+ * rises in, then out). The section sets `--m-scroll` (0..1) on itself for CSS extras. Returns a stop function.
  */
 export function stickyReveal(section: HTMLElement, o: StickyRevealOptions = {}): () => void {
   const steps = Array.from(section.querySelectorAll<HTMLElement>(o.steps ?? "[data-step]"));
@@ -108,7 +108,7 @@ export function stickyReveal(section: HTMLElement, o: StickyRevealOptions = {}):
   const stop = onScrollProgress({ ...o, track: null }, () => {
     const r = section.getBoundingClientRect(), port = o.source?.getBoundingClientRect() ?? { top: 0, height: globalThis.innerHeight || 1 };
     const p = clamp((port.top - r.top) / ((r.height - port.height) || 1), 0, 1);
-    section.style.setProperty("--hm-scroll", p.toFixed(4));
+    section.style.setProperty("--m-scroll", p.toFixed(4));
     if (!pausedNow()) tl.seek(reducedNow() ? Math.round(p * (n - 1)) * seg + seg * 0.5 : p * 1000);
     const i = Math.min(n - 1, Math.floor(p * n));
     if (i !== last) { last = i; o.onStep?.(i); }

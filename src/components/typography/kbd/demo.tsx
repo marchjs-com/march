@@ -8,6 +8,6 @@ export const code = `<Kbd keys="mod+k" />          // Ctrl+K, or ⌘K on macOS
 export default function KbdDemo(props: { values: { combo: string } }) {
   return <div class="sc-row">
     {() => (props.values.combo ? <Kbd keys={props.values.combo} /> : <Kbd>Esc</Kbd>)}
-    <span class="hm-muted">{() => (props.values.combo ? `keys="${props.values.combo}"` : "düz metin")}</span>
+    <span class="m-muted">{() => (props.values.combo ? `keys="${props.values.combo}"` : "düz metin")}</span>
   </div>
 }

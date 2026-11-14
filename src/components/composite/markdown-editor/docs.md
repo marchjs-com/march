@@ -28,7 +28,7 @@ core.
 | `split` | 0–1 | `.5` | source pane share |
 | `stats` | boolean | `true` | words and reading time |
 | `rows`, `placeholder`, `readonly`, `disabled` | | | |
-| `class` | class value | — | on the root (`hm-mde`) |
+| `class` | class value | — | on the root (`m-mde`) |
 
 ```tsx
 <MarkdownEditor bind:value={$md} toolbar={["bold", "italic", "|", "link"]} hint={false}

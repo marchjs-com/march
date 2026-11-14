@@ -41,14 +41,14 @@ const ev = async (e) => (await send("Runtime.evaluate", { expression: e, awaitPr
 await send("Page.enable"); await send("Runtime.enable");
 await send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
 await send("Page.navigate", { url: `${base}/` }); await sleep(400);
-await ev(`localStorage.setItem("hm.colorTheme", "hadi"); localStorage.setItem("hm.accent", JSON.stringify("brand-green")); true`);
+await ev(`localStorage.setItem("m.colorTheme", "hadi"); localStorage.setItem("m.accent", JSON.stringify("brand-green")); true`);
 
 const SCAN = `(() => {
   const ORANGE = "rgb(242, 128, 31)";
-  const INTERACTIVE = "button, a[href], input, select, textarea, label, [role=tab], [role=radio], [role=switch], [role=checkbox], [role=option], [role=radiogroup], [role=progressbar], .hm-check-box, .hm-switch, .hm-progress2, .hm-loading, .hm-ring-multi, .hm-sb-item, .hm-tab, .hm-segment, .hm-slider, .hm-otp, .hm-steps2, .hm-cal";
-  // allowed on purpose: explicit orange, explicit multicolor (data-hm-colors), the brand mark, theme previews / swatches,
+  const INTERACTIVE = "button, a[href], input, select, textarea, label, [role=tab], [role=radio], [role=switch], [role=checkbox], [role=option], [role=radiogroup], [role=progressbar], .m-check-box, .m-switch, .m-progress2, .m-loading, .m-ring-multi, .m-sb-item, .m-tab, .m-segment, .m-slider, .m-otp, .m-steps2, .m-cal";
+  // allowed on purpose: explicit orange, explicit multicolor (data-m-colors), the brand mark, theme previews / swatches,
   // brand color samples, charts
-  const ALLOWED = '[data-hm-color="brand-orange"], [data-hm-color="cat-1"], [data-hm-colors], [data-hm-theme], .hm-swatch, .hm-brand-mark, .sc-brand, .sc-brands, .sc-ribbon, .hm-chart, .sc-cats, .sc-cat, svg.hm-ring';
+  const ALLOWED = '[data-m-color="brand-orange"], [data-m-color="cat-1"], [data-m-colors], [data-m-theme], .m-swatch, .m-brand-mark, .sc-brand, .sc-brands, .sc-ribbon, .m-chart, .sc-cats, .sc-cat, svg.m-ring';
   const hits = [];
   // the element and everything inside it (a star's inner span, an icon's SVG path): color, fills, strokes, borders, gradients
   const props = ["backgroundColor", "borderTopColor", "borderBottomColor", "color", "accentColor", "outlineColor", "caretColor", "fill", "stroke", "backgroundImage", "boxShadow"];
@@ -70,7 +70,7 @@ const SCAN = `(() => {
 let total = 0;
 for (const route of ROUTES) {
   await send("Page.navigate", { url: `${base}/#${route}` }); await sleep(250); await send("Page.reload"); await sleep(2200);
-  const accentOn = await ev(`document.documentElement.getAttribute("data-hm-accent")`);
+  const accentOn = await ev(`document.documentElement.getAttribute("data-m-accent")`);
   const hits = await ev(SCAN);
   total += hits.length;
   console.log(`${hits.length ? "✖" : "✔"} ${route} (accent ${accentOn})${hits.length ? `\n   ${hits.join("\n   ")}` : ""}`);

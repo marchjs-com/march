@@ -42,11 +42,11 @@ export function ClampText(props: ClampTextProps): Element {
   const open = (): boolean => val(props.open) ?? own();
   const lines = (): number => Math.max(0, val(props.lines) ?? 3);
   const overflows = signal(props.expandable === "always");
-  const id = uid("hm-clamp");
+  const id = uid("m-clamp");
   const toggle = (): void => { const next = !untrack(open); own.set(next); props.onOpenChange?.(next); };
   const text = h(props.as ?? "p", {
-    id, class: () => cx("hm-clamp-text", lines() > 0 && !open() && "is-clamped"),
-    style: () => ({ "--hm-clamp-lines": String(lines() || "none") }),
+    id, class: () => cx("m-clamp-text", lines() > 0 && !open() && "is-clamped"),
+    style: () => ({ "--m-clamp-lines": String(lines() || "none") }),
   }, props.text !== undefined ? () => val(props.text) : props.children) as HTMLElement;
 
   // the switch shows only while the folded text really cuts something (measured after layout and when the box resizes)
@@ -60,13 +60,13 @@ export function ClampText(props: ClampTextProps): Element {
       if (getOwner()) onCleanup(() => ro.disconnect());
     }
   }
-  return h("div", { class: () => cx("hm-clamp", val(props.class)), "data-hm-color": () => colorAttr(val(props.color)) },
+  return h("div", { class: () => cx("m-clamp", val(props.class)), "data-m-color": () => colorAttr(val(props.color)) },
     text,
     () => {
       if (props.expandable === false || !lines() || !overflows()) return null;
       const isOpen = open();
       if (isOpen && props.collapsible === false) return null;
-      return untrack(() => h(Button, { variant: "link", class: "hm-clamp-toggle", "aria-expanded": String(isOpen), "aria-controls": id, onClick: toggle },
+      return untrack(() => h(Button, { variant: "link", class: "m-clamp-toggle", "aria-expanded": String(isOpen), "aria-controls": id, onClick: toggle },
         isOpen ? props.labels?.less ?? t`less` : props.labels?.more ?? t`more`));
     });
 }

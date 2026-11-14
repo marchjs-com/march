@@ -40,7 +40,7 @@ export function DateTimeInput(props: DateTimeInputProps): unknown {
     set(new Date(y, m - 1, dd, hh || 0, mm || 0).toISOString());
   };
   const field = useField();
-  return h("span", { class: () => cx("hm-datetime", props.class) },
+  return h("span", { class: () => cx("m-datetime", props.class) },
     h(DatePicker, { color: props.color, ...props.picker, id: props.id ?? field?.id, value: live(() => date()), setValue: (v) => { date.set(v); emit(); }, min: props.min, max: props.max, disabled: live(() => props.disabled), readonly: live(() => props.readonly), onBlur: props.onBlur, firstDay: props.firstDay }),
-    h(TimeInput, { id: uid("hm-time"), "aria-label": live(() => props.timeLabel ?? t`Time`), color: props.color, value: live(() => time()), setValue: (v) => { time.set(v); emit(); }, disabled: live(() => props.disabled), readonly: live(() => props.readonly) }));
+    h(TimeInput, { id: uid("m-time"), "aria-label": live(() => props.timeLabel ?? t`Time`), color: props.color, value: live(() => time()), setValue: (v) => { time.set(v); emit(); }, disabled: live(() => props.disabled), readonly: live(() => props.readonly) }));
 }

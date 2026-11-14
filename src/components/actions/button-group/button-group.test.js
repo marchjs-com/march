@@ -10,10 +10,10 @@ const { Button } = await import("../button/index.ts");
 
 test("ButtonGroup: labelled group, attached strip", () => {
   const m = mount(() => h(ButtonGroup, { attached: true, label: "Align" }, h(Button, {}, "A"), h(Button, {}, "B")));
-  const g = m.el.querySelector(".hm-btn-group");
+  const g = m.el.querySelector(".m-btn-group");
   assert.equal(g.getAttribute("role"), "group");
   assert.equal(g.getAttribute("aria-label"), "Align");
-  assert.ok(g.className.includes("hm-btn-group-attached"));
+  assert.ok(g.className.includes("m-btn-group-attached"));
   assert.equal(g.querySelectorAll("button").length, 2);
   m.dispose();
 });

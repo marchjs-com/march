@@ -50,7 +50,7 @@ export default function MarkdownEditorDemo(props: { values: { view: string; tool
   let host: HTMLElement | undefined
   // scrolls the source to its end (or back to the top): with synced scrolling the preview follows, without it stays
   const scrollSource = () => {
-    const source = host?.querySelector<HTMLTextAreaElement>(".hm-mde-source")
+    const source = host?.querySelector<HTMLTextAreaElement>(".m-mde-source")
     if (source) source.scrollTop = source.scrollTop > 0 ? 0 : source.scrollHeight
   }
   return <div class="sc-ed-one" ref={(x: Element) => { host = x as HTMLElement }}>

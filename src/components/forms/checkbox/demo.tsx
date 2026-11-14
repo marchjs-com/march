@@ -24,7 +24,7 @@ export default function CheckboxDemo(props: { values: { variant: string; size: s
   return <div class="sc-stack">{() => {
     const v = { ...props.values }
     if (v.grid) return <div>
-      <p class="hm-muted"><Checkbox size={v.size as "md"} value={picked().length === ROWS.length} indeterminate={picked().length > 0 && picked().length < ROWS.length} aria-label="Tümünü seç"
+      <p class="m-muted"><Checkbox size={v.size as "md"} value={picked().length === ROWS.length} indeterminate={picked().length > 0 && picked().length < ROWS.length} aria-label="Tümünü seç"
         onChange={(on: boolean) => picked.set(on ? ROWS.map((_, k) => k) : [])} /> {() => `${picked().length} / ${ROWS.length} seçili · Shift ile tıklayınca aradakiler de seçilir`}</p>
       {ROWS.map((name, i) => <p><Checkbox size={v.size as "md"} value={picked().includes(i)} aria-label={`${name}: seç`} onClick={(e: MouseEvent) => toggle(i, e.shiftKey)} /> {name}</p>)}
     </div>
@@ -32,7 +32,7 @@ export default function CheckboxDemo(props: { values: { variant: string; size: s
     return <div class="sc-col">
       <Checkbox value={$agree} onChange={(x: boolean) => { $agree = x }} variant={v.variant as "classic"} size={v.size as "md"} indeterminate={v.indeterminate}
         label={v.variant === "card" ? "Ekip planı" : "Bildirimleri al"} hint={v.variant === "card" ? "10 kişiye kadar, paylaşılan alanlar" : undefined} icon={v.variant === "card" ? users : undefined} />
-      <p class="hm-muted">{() => (partial ? "Kısmi: kutuda işaret yerine çizgi durur (alt öğelerin bir bölümü seçili)." : $agree ? "Seçili" : "Seçili değil")}</p>
+      <p class="m-muted">{() => (partial ? "Kısmi: kutuda işaret yerine çizgi durur (alt öğelerin bir bölümü seçili)." : $agree ? "Seçili" : "Seçili değil")}</p>
     </div>
   }}</div>
 }

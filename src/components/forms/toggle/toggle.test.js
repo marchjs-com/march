@@ -16,7 +16,7 @@ test("Toggle: role=switch, aria-checked follows the value, disabled blocks click
   const { el } = mount(() => h(Toggle, { "bind:value": v, label: "Wi-Fi", color: "brand-blue" }));
   const sw = el.querySelector("[role=switch]");
   assert.equal(sw.getAttribute("aria-checked"), "false");
-  assert.equal(el.querySelector(".hm-check-label").textContent, "Wi-Fi");
+  assert.equal(el.querySelector(".m-check-label").textContent, "Wi-Fi");
   sw.click();
   assert.equal(v(), true);
   assert.equal(sw.getAttribute("aria-checked"), "true");

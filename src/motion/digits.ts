@@ -16,7 +16,7 @@ export interface RollOptions {
   stagger?: number;
 }
 
-const cell = (ch: string): HTMLElement => h("span", { class: /\d/.test(ch) ? "hm-roll-d" : "hm-roll-s" }, ch) as HTMLElement;
+const cell = (ch: string): HTMLElement => h("span", { class: /\d/.test(ch) ? "m-roll-d" : "m-roll-s" }, ch) as HTMLElement;
 
 /** Draw `text` into `box` without motion (first paint, reduced motion). */
 export function drawDigits(box: HTMLElement, text: string): void {
@@ -31,10 +31,10 @@ export function rollDigits(box: HTMLElement, from: string, to: string, o: RollOp
     const old = same ? a[i] : undefined;
     const el = cell(ch);
     if (old === ch) return el;
-    const slot = h("span", { class: "hm-roll-slot" }, el) as HTMLElement;
+    const slot = h("span", { class: "m-roll-slot" }, el) as HTMLElement;
     const delay = (b.length - 1 - i) * each;
     if (old !== undefined) {
-      const ghost = h("span", { class: "hm-roll-ghost" }, old) as HTMLElement;
+      const ghost = h("span", { class: "m-roll-ghost" }, old) as HTMLElement;
       slot.append(ghost);
       const out = animate(ghost, [{ transform: "translateY(0)", opacity: 1 }, { transform: `translateY(${up ? -100 : 100}%)`, opacity: 0 }], { duration: dur, easing: "out", fill: "forwards", delay });
       void out.finished.then(() => ghost.remove(), () => ghost.remove());

@@ -11,7 +11,7 @@ export const templates = {
   <!--march-->
 </head>
 <body>
-  <div id="hm-boot" class="hm-boot" role="status" aria-label="Loading"><span class="hm-loading"></span></div>
+  <div id="m-boot" class="m-boot" role="status" aria-label="Loading"><span class="m-loading"></span></div>
   <div id="app"></div>
 </body>
 </html>

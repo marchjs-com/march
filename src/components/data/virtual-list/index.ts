@@ -59,7 +59,7 @@ export function VirtualList<T>(props: VirtualListProps<T>): Element {
   const ro = typeof ResizeObserver === "function" ? new ResizeObserver((entries) => {
     let anchor = 0;
     for (const e of entries) {
-      const el = e.target as HTMLElement, k = (el as unknown as { hmKey?: string | number }).hmKey;
+      const el = e.target as HTMLElement, k = (el as unknown as { mKey?: string | number }).mKey;
       if (k === undefined) continue; // the scroll area itself: only a new viewport size
       const hgt = el.offsetHeight, was = heights.get(k) ?? estimate;
       if (hgt === was) continue;
@@ -112,10 +112,10 @@ export function VirtualList<T>(props: VirtualListProps<T>): Element {
       if (!r) {
         r = createRoot((dispose) => {
           const item = signal(it), index = signal(i);
-          const el = h("div", { class: "hm-vlist-row", role: "listitem" }, props.render(() => item(), i)) as HTMLElement;
+          const el = h("div", { class: "m-vlist-row", role: "listitem" }, props.render(() => item(), i)) as HTMLElement;
           return { el, item, index, dispose };
         });
-        (r.el as unknown as { hmKey: string | number }).hmKey = k;
+        (r.el as unknown as { mKey: string | number }).mKey = k;
         rows.set(k, r);
         ro?.observe(r.el);
       } else { r.item.set(it); r.index.set(i); }
@@ -131,9 +131,9 @@ export function VirtualList<T>(props: VirtualListProps<T>): Element {
   };
 
   root = h("div", {
-    class: () => cx("hm-vlist", props.scroll === "parent" ? "hm-vlist-parent" : "hm-vlist-self", val(props.class)),
+    class: () => cx("m-vlist", props.scroll === "parent" ? "m-vlist-parent" : "m-vlist-self", val(props.class)),
     role: "list", "aria-label": () => val(props.label) ?? null,
-  }, props.header ?? null, h("div", { class: "hm-vlist-win", ref: (x: HTMLElement) => { win = x; } }), props.footer ?? null) as HTMLElement;
+  }, props.header ?? null, h("div", { class: "m-vlist-win", ref: (x: HTMLElement) => { win = x; } }), props.footer ?? null) as HTMLElement;
   // the root is a list for its rows only: header and footer sit outside it
   root.removeAttribute("role");
   win.setAttribute("role", "list");

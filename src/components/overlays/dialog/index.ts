@@ -72,36 +72,36 @@ export interface FrameOptions {
 export function frame(o: FrameOptions): HTMLElement {
   installKeys();
   const d = globalThis.document;
-  const titleId = uid("hm-dlg");
+  const titleId = uid("m-dlg");
   const restore = d.activeElement as HTMLElement | null;
   const dismissable = (): boolean => val(o.dismissable) !== false;
   const modal = o.modal !== false;
   const entry: StackEntry = { dismissable, close: () => o.onClose(), modal };
   stack.push(entry);
-  if (modal) d.documentElement.classList.add("hm-scroll-lock");
+  if (modal) d.documentElement.classList.add("m-scroll-lock");
   let panel: HTMLElement | undefined, body: HTMLElement | undefined, down: boolean | null = null;
   const drawer = o.kind === "drawer";
   const overlay = h("div", {
-    class: cx("hm-overlay", drawer && "hm-overlay-drawer", !modal && "is-modeless", o.motion === "none" && "hm-motion-none"),
+    class: cx("m-overlay", drawer && "m-overlay-drawer", !modal && "is-modeless", o.motion === "none" && "m-motion-none"),
     onPointerdown: (e: Event) => { down = e.target === overlay; },
     onClick: (e: Event) => { if (e.target === overlay && down !== false && dismissable()) o.onClose(); down = null; },
   },
   h("div", {
     ref: (x: HTMLElement) => { panel = x; },
-    class: cx(drawer ? "hm-drawer" : `hm-dialog hm-dialog-${val(o.size) ?? "md"}`, o.motion && o.motion !== "scale" && `hm-motion-${o.motion}`, o.class),
+    class: cx(drawer ? "m-drawer" : `m-dialog m-dialog-${val(o.size) ?? "md"}`, o.motion && o.motion !== "scale" && `m-motion-${o.motion}`, o.class),
     role: o.role ?? "dialog", "aria-modal": modal ? "true" : null, tabindex: "-1",
     "aria-labelledby": o.title != null ? titleId : null, "aria-label": o.title == null ? o.label ?? null : null,
     onKeydown: (e: KeyboardEvent) => { if (panel && modal) trapTab(panel)(e); },
   },
   o.title != null && h(PanelHeader, {
-    class: "hm-dialog-head", size: "lg", title: () => val(o.title), titleAs: "h2", titleId,
+    class: "m-dialog-head", size: "lg", title: () => val(o.title), titleAs: "h2", titleId,
     // the × follows `dismissable` (it may change while open), so it sits in the actions slot
     actions: () => dismissable() && o.closeButton !== false && h(IconButton, {
-      class: "hm-dialog-x", icon: o.closeButton == null || o.closeButton === true ? xIcon : o.closeButton, label: () => val(o.closeLabel) ?? t`Close`, title: false, onClick: () => o.onClose(),
+      class: "m-dialog-x", icon: o.closeButton == null || o.closeButton === true ? xIcon : o.closeButton, label: () => val(o.closeLabel) ?? t`Close`, title: false, onClick: () => o.onClose(),
     }),
   }),
-  h("div", { class: "hm-dialog-body", ref: (x: HTMLElement) => { body = x; } }, o.children),
-  o.footer != null && h(PanelHeader, { as: "footer", class: "hm-dialog-foot" }, o.footer))) as HTMLElement;
+  h("div", { class: "m-dialog-body", ref: (x: HTMLElement) => { body = x; } }, o.children),
+  o.footer != null && h(PanelHeader, { as: "footer", class: "m-dialog-foot" }, o.footer))) as HTMLElement;
   queueMicrotask(() => {
     if (!panel?.isConnected) return;
     (panel.querySelector<HTMLElement>("[data-autofocus]") ?? (body && focusables(body)[0]) ?? focusables(panel)[0] ?? panel).focus();
@@ -109,7 +109,7 @@ export function frame(o: FrameOptions): HTMLElement {
   onCleanup(() => {
     const i = stack.indexOf(entry);
     if (i >= 0) stack.splice(i, 1);
-    if (!stack.some((s) => s.modal)) d.documentElement.classList.remove("hm-scroll-lock");
+    if (!stack.some((s) => s.modal)) d.documentElement.classList.remove("m-scroll-lock");
     if (restore && restore !== d.body && restore.isConnected) restore.focus?.();
   });
   return overlay;
@@ -180,7 +180,7 @@ export interface ConfirmOptions {
 }
 /** Ask a yes/no question. Resolves true (ok) or false (cancel, Escape, overlay). */
 export function confirm({ title, message, danger = false, ok, cancel, dialog }: ConfirmOptions = {}): Promise<boolean> {
-  return openDialog<boolean>(() => message != null && h("p", { class: "hm-dialog-msg" }, () => val(message)), {
+  return openDialog<boolean>(() => message != null && h("p", { class: "m-dialog-msg" }, () => val(message)), {
     size: "sm", ...dialog, title: title ?? (() => t`Are you sure?`), role: "alertdialog", dismissValue: false,
     footer: (close) => [
       btn(cancel ?? (() => t`Cancel`), "secondary", () => close(false), { "data-cancel": "", "data-autofocus": danger ? "" : null }),
@@ -224,8 +224,8 @@ export function prompt({ title, message, label, value = "", placeholder, validat
   let submit = (): void => {};
   return openDialog<string | null>((close) => {
     submit = () => { const v = text.peek(); const err = validate?.(v) ?? null; error.set(err); if (!err) close(v); };
-    return [message != null && h("p", { class: "hm-dialog-msg" }, () => val(message)),
-      field({ id: uid("hm-prompt"), label, value: text.peek(), multiline, placeholder, error, onInput: (v) => { text.set(v); error.set(null); }, onEnter: () => submit() })];
+    return [message != null && h("p", { class: "m-dialog-msg" }, () => val(message)),
+      field({ id: uid("m-prompt"), label, value: text.peek(), multiline, placeholder, error, onInput: (v) => { text.set(v); error.set(null); }, onEnter: () => submit() })];
   }, {
     size: "sm", ...dialog, title: title ?? (() => t`Enter a value`), dismissValue: null,
     footer: (close) => [btn(cancel ?? (() => t`Cancel`), "secondary", () => close(null), { "data-cancel": "" }), btn(ok ?? (() => t`OK`), "primary", () => submit(), { "data-ok": "" })],
@@ -272,15 +272,15 @@ export function askReason({ title, message, min = 10, danger = false, ok, purpos
       if (v.length < min) { error.set(labels?.tooShort ? labels.tooShort(min) : t`Please write at least ${min} characters.`); return; }
       close(purposes?.length ? { category: cat.peek(), text: v } : v);
     };
-    const selId = uid("hm-purpose");
-    return [message != null && h("p", { class: "hm-dialog-msg" }, () => val(message)),
+    const selId = uid("m-purpose");
+    return [message != null && h("p", { class: "m-dialog-msg" }, () => val(message)),
       purposes?.length && h(Field, { id: selId, label: live(() => (labels?.purpose != null ? val(labels.purpose) : t`Purpose`)), error: live(catError) },
         lazyChildren(() => h(Select<string>, {
           options: live(() => purposes.map((p) => ({ value: p.value, label: val(p.label) }))),
           placeholder: live(() => (labels?.choose != null ? val(labels.choose) : t`Choose…`)),
           onChange: (v: string | null) => { cat.set(v ?? ""); catError.set(null); },
         }))),
-      field({ id: uid("hm-reason"), label: () => (labels?.reason != null ? val(labels.reason) : t`Reason`), value: "", multiline: true, error, onInput: (v) => { text.set(v); error.set(null); }, onEnter: () => submit(),
+      field({ id: uid("m-reason"), label: () => (labels?.reason != null ? val(labels.reason) : t`Reason`), value: "", multiline: true, error, onInput: (v) => { text.set(v); error.set(null); }, onEnter: () => submit(),
         help: counter !== false ? () => `${text().trim().length} / ${min}` : undefined })];
   }, {
     size: "sm", ...dialog, title: title ?? (() => t`Reason`), dismissValue: null,

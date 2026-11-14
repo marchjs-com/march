@@ -45,12 +45,12 @@ test("ownIcon: default glyph, nothing, own IconDef / text / node / function, bar
   assert.equal(ownIcon(true, check).tagName.toLowerCase(), "svg");
   assert.equal(ownIcon(false, check), null);
   assert.equal(ownIcon(null, check), null);
-  const own = ownIcon(xIcon, check, "hm-copy-icon");
+  const own = ownIcon(xIcon, check, "m-copy-icon");
   assert.equal(own.tagName, "SPAN");
-  assert.equal(own.className, "hm-copy-icon");
+  assert.equal(own.className, "m-copy-icon");
   assert.equal(own.getAttribute("aria-hidden"), "true");
   assert.equal(ownIcon("★", check).textContent, "★");
-  assert.equal(ownIcon("★", check).className, "hm-icon");
+  assert.equal(ownIcon("★", check).className, "m-icon");
   const node = document.createElement("i");
   assert.equal(ownIcon(node, check), node);
   assert.equal(ownIcon(() => "★", check, "k").className, "k");
@@ -315,10 +315,10 @@ test("slidingIndicator: final place and size are set at once; hides on null; axi
   assert.ok(!pill.classList.contains("is-on"));
 
   const bar = div();
-  const vert = slidingIndicator(bar, list, { axis: () => "y", sizeVar: "--hm-ab-size", onClass: "is-shown" });
+  const vert = slidingIndicator(bar, list, { axis: () => "y", sizeVar: "--m-ab-size", onClass: "is-shown" });
   vert.moveTo(a);
   assert.equal(bar.style.getPropertyValue("transform"), "translateY(4px)");
-  assert.equal(bar.style.getPropertyValue("--hm-ab-size"), "32px");
+  assert.equal(bar.style.getPropertyValue("--m-ab-size"), "32px");
   assert.equal(bar.style.getPropertyValue("height"), "");
   assert.ok(bar.classList.contains("is-shown"));
 

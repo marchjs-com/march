@@ -1,20 +1,20 @@
 /* IconTile. Theme tokens only, logical properties, no @keyframes (motion core). */
-.hm-icon-tile { display: inline-grid; place-items: center; flex: none; width: 2.25rem; height: 2.25rem; border-radius: var(--hm-radius-2); color: var(--hm-tile-fg); background: var(--hm-tile-bg);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-tile-fg) 16%, transparent); }
-.hm-icon-tile .hm-svg { width: 1.0625rem; height: 1.0625rem; }
-.hm-icon-tile-sm { width: 1.75rem; height: 1.75rem; border-radius: .5rem; } .hm-icon-tile-sm .hm-svg { width: .875rem; height: .875rem; }
-.hm-icon-tile-lg { width: 3rem; height: 3rem; border-radius: .875rem; } .hm-icon-tile-lg .hm-svg { width: 1.375rem; height: 1.375rem; }
-.hm-tile-primary { --hm-tile-fg: var(--hm-primary); --hm-tile-bg: var(--hm-primary-soft); }
-.hm-tile-neutral { --hm-tile-fg: var(--hm-text-2); --hm-tile-bg: var(--hm-surface-2); }
-.hm-tile-success { --hm-tile-fg: var(--hm-success); --hm-tile-bg: var(--hm-success-soft); }
-.hm-tile-warn { --hm-tile-fg: var(--hm-warn); --hm-tile-bg: var(--hm-warn-soft); }
-.hm-tile-danger { --hm-tile-fg: var(--hm-danger); --hm-tile-bg: var(--hm-danger-soft); }
-.hm-tile-info { --hm-tile-fg: var(--hm-info); --hm-tile-bg: var(--hm-info-soft); }
-.hm-tile-violet { --hm-tile-fg: var(--hm-cat-4); --hm-tile-bg: color-mix(in srgb, var(--hm-cat-4) 13%, var(--hm-surface)); }
-.hm-tile-pink { --hm-tile-fg: var(--hm-cat-5); --hm-tile-bg: color-mix(in srgb, var(--hm-cat-5) 13%, var(--hm-surface)); }
-.hm-tile-teal { --hm-tile-fg: var(--hm-cat-8); --hm-tile-bg: color-mix(in srgb, var(--hm-cat-8) 13%, var(--hm-surface)); }
+.m-icon-tile { display: inline-grid; place-items: center; flex: none; width: 2.25rem; height: 2.25rem; border-radius: var(--m-radius-2); color: var(--m-tile-fg); background: var(--m-tile-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-tile-fg) 16%, transparent); }
+.m-icon-tile .m-svg { width: 1.0625rem; height: 1.0625rem; }
+.m-icon-tile-sm { width: 1.75rem; height: 1.75rem; border-radius: .5rem; } .m-icon-tile-sm .m-svg { width: .875rem; height: .875rem; }
+.m-icon-tile-lg { width: 3rem; height: 3rem; border-radius: .875rem; } .m-icon-tile-lg .m-svg { width: 1.375rem; height: 1.375rem; }
+.m-tile-primary { --m-tile-fg: var(--m-primary); --m-tile-bg: var(--m-primary-soft); }
+.m-tile-neutral { --m-tile-fg: var(--m-text-2); --m-tile-bg: var(--m-surface-2); }
+.m-tile-success { --m-tile-fg: var(--m-success); --m-tile-bg: var(--m-success-soft); }
+.m-tile-warn { --m-tile-fg: var(--m-warn); --m-tile-bg: var(--m-warn-soft); }
+.m-tile-danger { --m-tile-fg: var(--m-danger); --m-tile-bg: var(--m-danger-soft); }
+.m-tile-info { --m-tile-fg: var(--m-info); --m-tile-bg: var(--m-info-soft); }
+.m-tile-violet { --m-tile-fg: var(--m-cat-4); --m-tile-bg: color-mix(in srgb, var(--m-cat-4) 13%, var(--m-surface)); }
+.m-tile-pink { --m-tile-fg: var(--m-cat-5); --m-tile-bg: color-mix(in srgb, var(--m-cat-5) 13%, var(--m-surface)); }
+.m-tile-teal { --m-tile-fg: var(--m-cat-8); --m-tile-bg: color-mix(in srgb, var(--m-cat-8) 13%, var(--m-surface)); }
 /* color prop: any theme colour token (wins over the tone) */
-.hm-icon-tile[data-hm-color] { --hm-tile-fg: var(--hm-accent); --hm-tile-bg: color-mix(in srgb, var(--hm-accent) 13%, var(--hm-surface)); --hm-tile-on: var(--hm-on-accent); }
-.hm-icon-tile-round { border-radius: 50%; }
-.hm-icon-tile-outline { background: var(--hm-surface); box-shadow: inset 0 0 0 1px var(--hm-border), var(--hm-shadow-1); }
-.hm-icon-tile-solid { background: var(--hm-tile-fg); color: var(--hm-tile-on, var(--hm-surface)); box-shadow: none; }
+.m-icon-tile[data-m-color] { --m-tile-fg: var(--m-accent); --m-tile-bg: color-mix(in srgb, var(--m-accent) 13%, var(--m-surface)); --m-tile-on: var(--m-on-accent); }
+.m-icon-tile-round { border-radius: 50%; }
+.m-icon-tile-outline { background: var(--m-surface); box-shadow: inset 0 0 0 1px var(--m-border), var(--m-shadow-1); }
+.m-icon-tile-solid { background: var(--m-tile-fg); color: var(--m-tile-on, var(--m-surface)); box-shadow: none; }

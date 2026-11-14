@@ -20,15 +20,15 @@ export function PasswordInput(props: PasswordInputProps): unknown {
   const [get, set] = model(props, "");
   const show = signal(false);
   const el = h("input", {
-    ...ctl(props), ...textAttrs(props), class: "hm-input", type: () => (show() ? "text" : "password"),
+    ...ctl(props), ...textAttrs(props), class: "m-input", type: () => (show() ? "text" : "password"),
     autocomplete: props.autocomplete ?? "current-password", spellcheck: "false", onInput: (e: Event) => set(inputOf(e).value),
   }) as HTMLInputElement;
   syncValue(el, get);
   const draw = typeof props.toggle === "function" ? props.toggle : null;
-  return h("span", { class: () => cx("hm-affix hm-password", props.class) }, el,
+  return h("span", { class: () => cx("m-affix m-password", props.class) }, el,
     // a quiet text button ("Show" / "Hide"), or your own drawing as its icon
     props.toggle === false ? null : h(Button, {
-      variant: "ghost", size: "sm", class: cx("hm-password-toggle", draw && "is-own"), "aria-pressed": () => String(show()),
+      variant: "ghost", size: "sm", class: cx("m-password-toggle", draw && "is-own"), "aria-pressed": () => String(show()),
       "aria-label": () => (show() ? props.labels?.hidePassword ?? t`Hide password` : props.labels?.showPassword ?? t`Show password`),
       disabled: () => !!props.disabled, onClick: () => show.set(!show.peek()),
       ...(draw ? { icon: () => draw(show()) } : { children: () => (show() ? props.labels?.hide ?? t`Hide` : props.labels?.show ?? t`Show`) }),

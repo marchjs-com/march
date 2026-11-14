@@ -24,7 +24,7 @@ waits 230 ms, so a double tap (like) never also opens the photo.
 | `skeleton` | boolean / `() => node` | `true` | the loading placeholder: off, or your own |
 | `videoMark` | boolean / `(item) => node` | `true` | the mark on a video tile |
 | `more` | boolean / `(rest) => node` | `true` | "+N" on the last tile: off, or your own content |
-| `class` | string | — | on the root (`hm-mgrid`; parts: `hm-mgrid-tile`, `hm-mgrid-kind`, `hm-mgrid-more`, `hm-mgrid-skel`) |
+| `class` | string | — | on the root (`m-mgrid`; parts: `m-mgrid-tile`, `m-mgrid-kind`, `m-mgrid-more`, `m-mgrid-skel`) |
 
 ```tsx
 <MediaGrid items={post.media} label="Trip photos" tileLabel={(i, n, it) => `${it.alt}, ${i + 1}/${n}`}

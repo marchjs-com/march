@@ -1,4 +1,4 @@
-// Search hit highlighting: the text with each folded match of the query wrapped in <mark class="hm-mark">.
+// Search hit highlighting: the text with each folded match of the query wrapped in <mark class="m-mark">.
 // Shared by TreeView, FileManager and any list with a search box (text nodes only, never innerHTML).
 import "./mark.css";
 import { h } from "../dom/h.ts";
@@ -12,7 +12,7 @@ export function markText(text: string, query: string | null | undefined): (strin
   let at = 0;
   for (const [a, b] of ranges) {
     if (a > at) out.push(text.slice(at, a));
-    out.push(h("mark", { class: "hm-mark" }, text.slice(a, b)) as Element);
+    out.push(h("mark", { class: "m-mark" }, text.slice(a, b)) as Element);
     at = b;
   }
   if (at < text.length) out.push(text.slice(at));

@@ -5,10 +5,10 @@ let overlay = null;
 function show(errors) {
   hide();
   overlay = document.createElement("div");
-  overlay.className = "hm-dev-overlay";
+  overlay.className = "m-dev-overlay";
   overlay.setAttribute("role", "alert");
   const box = document.createElement("div");
-  box.className = "hm-dev-overlay-box";
+  box.className = "m-dev-overlay-box";
   const h = document.createElement("h2");
   h.textContent = `Build failed (${errors.length})`;
   box.append(h);

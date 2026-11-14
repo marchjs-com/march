@@ -25,6 +25,6 @@ export default function DatePickerDemo(props: { values: { locale: string; disabl
       return untrack(() => <Field label="Tarih"><DatePicker value={$date} onChange={(v: Maybe<string>) => { $date = v }} locale={pick(props.values.locale)} disabled={props.values.disabled}
         icon={kind === "off" ? false : kind === "own" ? () => <Icon of={clock} /> : undefined} labels={{ choose: "Gün seç", prevMonth: "Önceki ay", nextMonth: "Sonraki ay" }} /></Field>)
     }}
-    <p class="hm-muted">{() => `Değer (ISO): ${$date ?? "—"} · ${props.values.locale ? `locale="${props.values.locale}"` : "locale verilmedi: uygulamanın dili"}`}</p>
+    <p class="m-muted">{() => `Değer (ISO): ${$date ?? "—"} · ${props.values.locale ? `locale="${props.values.locale}"` : "locale verilmedi: uygulamanın dili"}`}</p>
   </div>
 }

@@ -143,7 +143,7 @@ test("dispose removes every listener", () => {
   assert.equal(viewportManager.alive(), false);
 });
 
-test("container(): size classes from a ResizeObserver, written to data-hm-bp", () => {
+test("container(): size classes from a ResizeObserver, written to data-m-bp", () => {
   disposeViewport();
   let cb = null, disconnected = false;
   globalThis.ResizeObserver = class { constructor(f) { cb = f; } observe() {} disconnect() { disconnected = true; } };
@@ -154,7 +154,7 @@ test("container(): size classes from a ResizeObserver, written to data-hm-bp", (
   assert.equal(size.name(), "xs");
   cb([{ contentRect: { width: 600 } }]);
   assert.equal(size.name(), "md");
-  assert.equal(el.getAttribute("data-hm-bp"), "md");
+  assert.equal(el.getAttribute("data-m-bp"), "md");
   assert.ok(size.up("sm") && !size.up("lg"));
   off();
   assert.ok(disconnected, "observer stops with its owner");

@@ -62,7 +62,7 @@ test("shapePolygon: same point count for every shape; shapeMorph remembers the c
   for (const s of ["circle", "square", "triangle", "diamond", "hexagon", "star", "blob", "flower"]) assert.equal(n(M.shapePolygon(s, 40)), 40, s);
   const el = document.createElement("div");
   const pb = M.shapeMorph(el, "star", { duration: 10 });
-  assert.equal(el.getAttribute("data-hm-shape"), "star");
+  assert.equal(el.getAttribute("data-m-shape"), "star");
   pb.finish();
   assert.equal(el.style.getPropertyValue("clip-path"), M.shapePolygon("star", 60));
 });

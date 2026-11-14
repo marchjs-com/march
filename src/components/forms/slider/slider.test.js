@@ -35,17 +35,17 @@ test("Slider: track (ramp, own class, own node) draws a decorative track under t
     h(Slider, { value: 10, track: true, color: "brand-blue" }), h(Slider, { value: 10, track: "my-hue" }),
     h(Slider, { value: 10, track: h("i", { class: "own" }) }), h(Slider, { value: 10 }),
   ]);
-  const [ramp, cls, node, plain] = el.querySelectorAll(".hm-slider-wrap");
-  assert.match(ramp.querySelector(".hm-slider-track").getAttribute("class"), /hm-slider-ramp/);
-  assert.equal(ramp.querySelector(".hm-slider-rail").getAttribute("data-hm-color"), "brand-blue");
-  assert.equal(ramp.querySelector(".hm-slider-track").getAttribute("aria-hidden"), "true");
-  assert.match(ramp.querySelector("input").getAttribute("class"), /hm-slider-own/);
+  const [ramp, cls, node, plain] = el.querySelectorAll(".m-slider-wrap");
+  assert.match(ramp.querySelector(".m-slider-track").getAttribute("class"), /m-slider-ramp/);
+  assert.equal(ramp.querySelector(".m-slider-rail").getAttribute("data-m-color"), "brand-blue");
+  assert.equal(ramp.querySelector(".m-slider-track").getAttribute("aria-hidden"), "true");
+  assert.match(ramp.querySelector("input").getAttribute("class"), /m-slider-own/);
   assert.equal(ramp.querySelector("input").getAttribute("type"), "range");
-  assert.match(cls.querySelector(".hm-slider-track").getAttribute("class"), /my-hue/);
-  assert.doesNotMatch(cls.querySelector(".hm-slider-track").getAttribute("class"), /hm-slider-ramp/);
-  assert.ok(node.querySelector(".hm-slider-track .own"));
-  assert.equal(plain.querySelector(".hm-slider-rail"), null);
-  assert.doesNotMatch(plain.querySelector("input").getAttribute("class"), /hm-slider-own/);
+  assert.match(cls.querySelector(".m-slider-track").getAttribute("class"), /my-hue/);
+  assert.doesNotMatch(cls.querySelector(".m-slider-track").getAttribute("class"), /m-slider-ramp/);
+  assert.ok(node.querySelector(".m-slider-track .own"));
+  assert.equal(plain.querySelector(".m-slider-rail"), null);
+  assert.doesNotMatch(plain.querySelector("input").getAttribute("class"), /m-slider-own/);
 });
 
 test("Slider: valueText is spoken, onCommit runs when the change is finished", () => {

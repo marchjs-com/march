@@ -14,10 +14,10 @@ export const reducedNow = (): boolean => override.peek() ?? system.peek();
 /** true / false forces reduced motion on or off; null follows the system again. */
 export function setReducedOverride(on: boolean | null): void { override.set(on); mark(); }
 
-/** `<html data-hm-reduced>` while reduced: generated keyframe CSS and motion.css follow the user setting too. */
+/** `<html data-m-reduced>` while reduced: generated keyframe CSS and motion.css follow the user setting too. */
 function mark(): void {
   const root = globalThis.document?.documentElement;
   if (!root?.setAttribute) return;
-  if (reducedNow()) root.setAttribute("data-hm-reduced", ""); else root.removeAttribute("data-hm-reduced");
+  if (reducedNow()) root.setAttribute("data-m-reduced", ""); else root.removeAttribute("data-m-reduced");
 }
 mark();

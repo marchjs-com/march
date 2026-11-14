@@ -79,23 +79,23 @@ export function FlowControls(props: FlowControlsProps): Element {
   })[s];
   const on = (v: MaybeFn<boolean | undefined>): boolean => hasPart(v);
 
-  return h("div", { class: () => cx("hm-flowctl", val(props.class)) },
-    h(Toolbar, { class: "hm-flowctl-bar", label: () => L().toolbar ?? t`Run controls` },
+  return h("div", { class: () => cx("m-flowctl", val(props.class)) },
+    h(Toolbar, { class: "m-flowctl-bar", label: () => L().toolbar ?? t`Run controls` },
       h(Button, {
-        variant: "primary", class: "hm-flowctl-run", icon: () => (busy() ? ic("pause", pause) : ic("run", play)), onClick: primary,
+        variant: "primary", class: "m-flowctl-run", icon: () => (busy() ? ic("pause", pause) : ic("run", play)), onClick: primary,
         "aria-keyshortcuts": "Space",
       }, () => (busy() ? L().pause ?? t`Pause` : r.state() === "paused" ? L().resume ?? t`Resume` : L().run ?? t`Run`)),
-      () => (on(props.step) ? h(IconButton, { icon: ic("step", stepForward), class: "hm-flowctl-step", label: () => L().step ?? t`Step`, onClick: () => r.step(), disabled: () => r.state() === "running" }) : null),
-      () => (on(props.reset) ? h(IconButton, { icon: ic("reset", refresh), class: "hm-flowctl-reset", label: () => L().reset ?? t`Reset`, onClick: () => r.reset(), disabled: () => r.state() === "idle" }) : null),
-      () => { const speeds = props.speeds; return speeds === false ? null : h("span", { class: "hm-flowctl-speed" },
+      () => (on(props.step) ? h(IconButton, { icon: ic("step", stepForward), class: "m-flowctl-step", label: () => L().step ?? t`Step`, onClick: () => r.step(), disabled: () => r.state() === "running" }) : null),
+      () => (on(props.reset) ? h(IconButton, { icon: ic("reset", refresh), class: "m-flowctl-reset", label: () => L().reset ?? t`Reset`, onClick: () => r.reset(), disabled: () => r.state() === "idle" }) : null),
+      () => { const speeds = props.speeds; return speeds === false ? null : h("span", { class: "m-flowctl-speed" },
         h(Segmented, {
           "aria-label": L().speed ?? t`Speed`, options: (speeds ?? [0.5, 1, 2, 4]).map((v) => ({ value: v, label: `${v}×` })),
           value: r.speed, onChange: (v: number | null) => r.speed.set(v ?? 1),
         })); },
-      h("span", { class: "hm-flowctl-status", role: "status" },
+      h("span", { class: "m-flowctl-status", role: "status" },
         () => (on(props.status) ? h(Chip, { tone: stateTone(r.state()), size: "sm" }, stateText(r.state())) : null),
-        () => (on(props.clock) ? h("span", { class: "hm-flowctl-clock" }, () => seconds(r.elapsed())) : null),
-        () => (props.flow && on(props.count) ? h("span", { class: "hm-flowctl-count" }, () => L().count?.(done(), props.flow!.nodes().length) ?? t`${done()} / ${props.flow!.nodes().length} nodes`) : null))),
+        () => (on(props.clock) ? h("span", { class: "m-flowctl-clock" }, () => seconds(r.elapsed())) : null),
+        () => (props.flow && on(props.count) ? h("span", { class: "m-flowctl-count" }, () => L().count?.(done(), props.flow!.nodes().length) ?? t`${done()} / ${props.flow!.nodes().length} nodes`) : null))),
     () => (val(props.timeline) ? h(FlowTimeline, { runner: r, ...(props.flow ? { flow: props.flow } : {}) }) : null),
   ) as Element;
 }
@@ -134,17 +134,17 @@ export function FlowTimeline(props: FlowTimelineProps): Element {
     const e = (): TimelineEntry => entry();
     const end = (): number => e().end ?? r.elapsed();
     let bar!: HTMLElement;
-    const el = h("li", { class: () => cx("hm-flowtl-row", `is-${e().status}`) },
+    const el = h("li", { class: () => cx("m-flowtl-row", `is-${e().status}`) },
       h(ListRow, {
-        class: "hm-flowtl-label", size: "sm", disabled: !props.flow,
+        class: "m-flowtl-label", size: "sm", disabled: !props.flow,
         "aria-label": () => `${e().label}: ${props.labels?.row?.(seconds(e().start), seconds(end() - e().start)) ?? t`${seconds(e().start)} start, ${seconds(end() - e().start)}`}${e().error ? ` · ${e().error}` : ""}`,
         onClick: () => props.flow?.view.peek()?.focusNode(e().node),
-        lead: h(Badge, { class: "hm-flowtl-idx", tone: () => idxTone(e().status) }, () => String(index() + 1)), title: () => e().label,
-        trail: h("span", { class: "hm-flowtl-dur" }, () => (e().status === "skipped" ? "—" : seconds(end() - e().start))),
+        lead: h(Badge, { class: "m-flowtl-idx", tone: () => idxTone(e().status) }, () => String(index() + 1)), title: () => e().label,
+        trail: h("span", { class: "m-flowtl-dur" }, () => (e().status === "skipped" ? "—" : seconds(end() - e().start))),
       }),
-      h("span", { class: "hm-flowtl-track", "aria-hidden": "true" },
+      h("span", { class: "m-flowtl-track", "aria-hidden": "true" },
         h("span", {
-          class: "hm-flowtl-bar", ref: (x: HTMLElement) => { bar = x; },
+          class: "m-flowtl-bar", ref: (x: HTMLElement) => { bar = x; },
           style: () => ({ "inset-inline-start": pct(e().start), "inline-size": `max(4px, calc(${pct(end())} - ${pct(e().start)}))` }),
         })) ) as HTMLElement;
     if (!still()) animate(el, [{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "out" });
@@ -157,14 +157,14 @@ export function FlowTimeline(props: FlowTimelineProps): Element {
     onCleanup(() => breath?.cancel());
     return el;
   };
-  return h(Card, { as: "div", class: () => cx("hm-flowtl", val(props.class)), role: "region", "aria-label": () => props.labels?.region ?? t`Run timeline` },
-    () => (val(props.axis) === false ? null : h("div", { class: "hm-flowtl-axis", "aria-hidden": "true" },
+  return h(Card, { as: "div", class: () => cx("m-flowtl", val(props.class)), role: "region", "aria-label": () => props.labels?.region ?? t`Run timeline` },
+    () => (val(props.axis) === false ? null : h("div", { class: "m-flowtl-axis", "aria-hidden": "true" },
       h("span"),
-      h(TimeRuler, { class: "hm-flowtl-ticks", duration: span, value: () => (r.state() === "idle" ? null : r.elapsed()), ticks, color: "brand-orange" }))),
+      h(TimeRuler, { class: "m-flowtl-ticks", duration: span, value: () => (r.state() === "idle" ? null : r.elapsed()), ticks, color: "brand-orange" }))),
     () => (r.timeline().length
-      ? h("ol", { class: "hm-flowtl-rows" }, h(For, { each: r.timeline, key: (x: TimelineEntry) => `${x.node}`, children: row }))
+      ? h("ol", { class: "m-flowtl-rows" }, h(For, { each: r.timeline, key: (x: TimelineEntry) => `${x.node}`, children: row }))
       : props.empty === false ? null
-      : props.empty && props.empty !== true ? h(Empty, { size: "sm", class: "hm-flowtl-empty", title: false }, props.empty)
-      : h(Empty, { size: "sm", class: "hm-flowtl-empty", title: () => props.labels?.empty ?? t`Run the flow to record its timeline.` })),
+      : props.empty && props.empty !== true ? h(Empty, { size: "sm", class: "m-flowtl-empty", title: false }, props.empty)
+      : h(Empty, { size: "sm", class: "m-flowtl-empty", title: () => props.labels?.empty ?? t`Run the flow to record its timeline.` })),
   ) as Element;
 }

@@ -13,7 +13,7 @@ export default function App() {
   return <main>
     <button on:click={() => $id++}>Next page</button>
     <If when={list.loading()}>Loading…<Else><p>{list()?.length ?? 0} users</p></Else></If>
-    <Try loading={<span class="hm-loading" />} fallback={(e, retry) => <p role="alert">{e.message} <button on:click={retry}>Retry</button></p>}>
+    <Try loading={<span class="m-loading" />} fallback={(e, retry) => <p role="alert">{e.message} <button on:click={retry}>Retry</button></p>}>
       <User id={$id} />
     </Try>
   </main>

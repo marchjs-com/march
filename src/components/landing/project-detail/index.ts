@@ -75,24 +75,24 @@ export function ProjectDetail(props: ProjectDetailProps): Element {
   const box = (cls: string, opts: RevealOptions, ...kids: unknown[]): unknown =>
     (props.reveal === false ? h("div", { class: cls }, kids) : h(Reveal, { class: cls, ...opts, ...props.reveal }, kids));
   const nextIcon = ownIcon(props.nextIcon, arrowRight);
-  const nextCover = props.next ? h("div", { class: "hm-pd-next-cover", "data-hm-shared": `project-${props.next.project.id}` }, coverNode(props.next.project.cover)) as HTMLElement : null;
-  return h("article", { class: cx("hm-pd", val(props.class)), "data-hm-color": colorAttr(props.color) },
-    props.onBack ? h(Button, { variant: "ghost", size: "sm", class: "hm-pd-back", icon: props.backIcon === false ? undefined : props.backIcon ?? arrowLeft, onClick: () => props.onBack?.() }, L.back ?? t`All projects`) : null,
+  const nextCover = props.next ? h("div", { class: "m-pd-next-cover", "data-m-shared": `project-${props.next.project.id}` }, coverNode(props.next.project.cover)) as HTMLElement : null;
+  return h("article", { class: cx("m-pd", val(props.class)), "data-m-color": colorAttr(props.color) },
+    props.onBack ? h(Button, { variant: "ghost", size: "sm", class: "m-pd-back", icon: props.backIcon === false ? undefined : props.backIcon ?? arrowLeft, onClick: () => props.onBack?.() }, L.back ?? t`All projects`) : null,
     h(SectionHead, {
-      class: "hm-pd-head", size: "xl", align: "start", as: "h1", eyebrow: p.category != null && props.eyebrow !== false ? p.category : undefined,
+      class: "m-pd-head", size: "xl", align: "start", as: "h1", eyebrow: p.category != null && props.eyebrow !== false ? p.category : undefined,
       title: p.title, lead: p.summary ?? undefined, reveal: props.reveal === false ? false : { effect: "up", stagger: 80, ...props.reveal },
     }),
-    h("div", { class: "hm-pd-cover", "data-hm-shared": props.shared ?? `project-${p.id}` }, coverNode(p.cover, true)),
-    h("div", { class: "hm-pd-grid" },
-      h("aside", { class: "hm-pd-facts" },
+    h("div", { class: "m-pd-cover", "data-m-shared": props.shared ?? `project-${p.id}` }, coverNode(p.cover, true)),
+    h("div", { class: "m-pd-grid" },
+      h("aside", { class: "m-pd-facts" },
         facts.length ? h(KeyValue, { items: facts }) : null,
-        p.services?.length ? h("div", { class: "hm-pd-services", "aria-label": L.services ?? t`Services`, role: "list" }, p.services.map((s) => h("span", { role: "listitem" }, h(Chip, { size: "sm" }, s)))) : null,
-        p.links?.length ? h("div", { class: "hm-pd-links" }, p.links.map((l) => h(Button, { variant: "secondary", size: "sm", href: l.href as never, iconEnd: arrowRight }, l.label))) : null),
-      p.body != null ? box("hm-pd-body", { effect: "up" }, p.body) : null),
-    p.gallery?.length ? h("div", { class: "hm-pd-gallery" }, p.gallery.map((g, i) => isPicture(g)
-      ? h("button", { type: "button", class: "hm-pd-shot", "aria-label": () => (L.openImage ? L.openImage(i + 1) : t`Open image ${i + 1}`), onClick: () => void openMedia(g.src, { alt: g.alt ?? "" }) }, coverNode(g))
-      : h("div", { class: "hm-pd-shot" }, g))) : null,
-    props.next ? h("a", { class: "hm-pd-next", href: props.next.project.href ?? `#${props.next.project.id}`, onClick: (e: Event) => { e.preventDefault(); props.next?.onOpen(props.next.project, nextCover as Element); } },
-      h("span", { class: "hm-pd-next-text" }, h("span", { class: "hm-pd-next-label" }, L.next ?? t`Next project`), h("span", { class: "hm-pd-next-title" }, props.next.project.title, " ", nextIcon)),
+        p.services?.length ? h("div", { class: "m-pd-services", "aria-label": L.services ?? t`Services`, role: "list" }, p.services.map((s) => h("span", { role: "listitem" }, h(Chip, { size: "sm" }, s)))) : null,
+        p.links?.length ? h("div", { class: "m-pd-links" }, p.links.map((l) => h(Button, { variant: "secondary", size: "sm", href: l.href as never, iconEnd: arrowRight }, l.label))) : null),
+      p.body != null ? box("m-pd-body", { effect: "up" }, p.body) : null),
+    p.gallery?.length ? h("div", { class: "m-pd-gallery" }, p.gallery.map((g, i) => isPicture(g)
+      ? h("button", { type: "button", class: "m-pd-shot", "aria-label": () => (L.openImage ? L.openImage(i + 1) : t`Open image ${i + 1}`), onClick: () => void openMedia(g.src, { alt: g.alt ?? "" }) }, coverNode(g))
+      : h("div", { class: "m-pd-shot" }, g))) : null,
+    props.next ? h("a", { class: "m-pd-next", href: props.next.project.href ?? `#${props.next.project.id}`, onClick: (e: Event) => { e.preventDefault(); props.next?.onOpen(props.next.project, nextCover as Element); } },
+      h("span", { class: "m-pd-next-text" }, h("span", { class: "m-pd-next-label" }, L.next ?? t`Next project`), h("span", { class: "m-pd-next-title" }, props.next.project.title, " ", nextIcon)),
       nextCover) : null) as Element;
 }

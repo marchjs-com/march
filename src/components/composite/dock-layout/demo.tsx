@@ -18,7 +18,7 @@ const PRESETS: Record<string, DockSpec> = {
   single: ["editor", "files", "console", "props", "notes"],
 }
 
-const pane = (title: string, lines: string[]) => <div class="sc-dock-pane"><strong>{title}</strong>{lines.map((l) => <p class="hm-muted">{l}</p>)}</div>
+const pane = (title: string, lines: string[]) => <div class="sc-dock-pane"><strong>{title}</strong>{lines.map((l) => <p class="m-muted">{l}</p>)}</div>
 
 const ACTIONS: Record<string, boolean | ("maximize" | "float" | "minimize")[]> = { all: true, max: ["maximize"], none: false }
 

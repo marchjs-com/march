@@ -45,12 +45,12 @@ export default function CheckMarkDemo(props: { values: Values }) {
       return <>
         <div class="sc-row">
           <CheckMark value={VALUES[props.values.value] ?? true} {...shared} />
-          <span class="hm-muted">{`ekran okuyucu: "${LABELS[props.values.value as "yes"] ?? "Evet"}"`}</span>
+          <span class="m-muted">{`ekran okuyucu: "${LABELS[props.values.value as "yes"] ?? "Evet"}"`}</span>
         </div>
         <div class="sc-row">
           <CheckMark value={$flag} {...shared} variant="soft" />
           <Button size="sm" variant="secondary" on:click={() => $flag = !$flag}>Değiştir (✕ ↔ ✓)</Button>
-          <span class="hm-muted">{`motion="${v.motion}"`}</span>
+          <span class="m-muted">{`motion="${v.motion}"`}</span>
         </div>
         {ROWS.map(([name, value]) => <div class="sc-row"><CheckMark value={value} {...shared} /><span>{name}</span></div>)}
       </>

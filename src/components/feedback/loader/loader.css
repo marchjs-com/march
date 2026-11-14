@@ -1,8 +1,8 @@
 /* March — Loader. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--hm-space-3); min-height: 14rem; width: 100%; color: var(--hm-muted); font-size: var(--hm-text-sm);
-  animation: hm-fade-in var(--hm-dur-slow) var(--hm-ease) var(--hm-dur) both; }
-.hm-loader.is-still { animation: none; }
-.hm-loader-spinner { display: inline-flex; }
-.hm-loader-overlay { position: absolute; inset: 0; z-index: 1; background: color-mix(in srgb, var(--hm-surface) 70%, transparent); min-height: 0; }
-#hm-boot { transition: opacity var(--hm-dur-slow) var(--hm-ease); }
-#hm-boot.hm-boot-done { opacity: 0; pointer-events: none; }
+.m-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--m-space-3); min-height: 14rem; width: 100%; color: var(--m-muted); font-size: var(--m-text-sm);
+  animation: m-fade-in var(--m-dur-slow) var(--m-ease) var(--m-dur) both; }
+.m-loader.is-still { animation: none; }
+.m-loader-spinner { display: inline-flex; }
+.m-loader-overlay { position: absolute; inset: 0; z-index: 1; background: color-mix(in srgb, var(--m-surface) 70%, transparent); min-height: 0; }
+#m-boot { transition: opacity var(--m-dur-slow) var(--m-ease); }
+#m-boot.m-boot-done { opacity: 0; pointer-events: none; }

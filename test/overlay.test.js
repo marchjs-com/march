@@ -18,30 +18,30 @@ test("Overlay: order, front/behind, inset and fit as CSS variables, decorative a
     h(U.Overlay, { src: "b.jpg", alt: "A team photo" }),
     h("p", {}, "content")), el);
   await new Promise((r) => setTimeout(r, 0));
-  const [a, b, c, d] = el.querySelectorAll(".hm-ov");
-  const z = (x) => Number(x.style.getPropertyValue("--hm-ov-z"));
+  const [a, b, c, d] = el.querySelectorAll(".m-ov");
+  const z = (x) => Number(x.style.getPropertyValue("--m-ov-z"));
   assert.ok(z(a) < z(b), "added first = lower");
   assert.ok(z(b) < 0 && z(c) > 0, "behind under the content, front above it");
-  assert.equal(a.style.getPropertyValue("--hm-ov-top"), "var(--hm-space-4, 16px)");
-  assert.equal(a.style.getPropertyValue("--hm-ov-fit"), "contain");
-  assert.equal(a.style.getPropertyValue("--hm-ov-pos"), "50% 20%");
-  assert.equal(a.style.getPropertyValue("--hm-ov-opacity"), "0.5");
-  assert.equal(b.style.getPropertyValue("--hm-ov-top"), "10px");
-  assert.equal(b.style.getPropertyValue("--hm-ov-start"), "var(--hm-space-2, 8px)");
-  assert.equal(a.getAttribute("style")?.includes("--hm-ov") ?? true, true, "values set through CSSOM (style object)");
+  assert.equal(a.style.getPropertyValue("--m-ov-top"), "var(--m-space-4, 16px)");
+  assert.equal(a.style.getPropertyValue("--m-ov-fit"), "contain");
+  assert.equal(a.style.getPropertyValue("--m-ov-pos"), "50% 20%");
+  assert.equal(a.style.getPropertyValue("--m-ov-opacity"), "0.5");
+  assert.equal(b.style.getPropertyValue("--m-ov-top"), "10px");
+  assert.equal(b.style.getPropertyValue("--m-ov-start"), "var(--m-space-2, 8px)");
+  assert.equal(a.getAttribute("style")?.includes("--m-ov") ?? true, true, "values set through CSSOM (style object)");
   for (const o of [a, b, c]) { assert.equal(o.getAttribute("aria-hidden"), "true"); assert.ok(o.hasAttribute("inert")); }
   assert.equal(d.getAttribute("aria-hidden"), null, "an image with a meaningful alt stays visible to screen readers");
   assert.equal(a.querySelector("img").getAttribute("loading"), "lazy");
-  assert.ok(el.querySelector(".card").classList.contains("hm-ov-host"), "the container becomes the positioned, isolated host");
-  assert.match(b.className, /hm-ov-fx-glass/);
+  assert.ok(el.querySelector(".card").classList.contains("m-ov-host"), "the container becomes the positioned, isolated host");
+  assert.match(b.className, /m-ov-fx-glass/);
 });
 
 test("Overlay CSS: never takes pointer input (unless interactive), logical insets, isolation", () => {
-  assert.match(css, /\.hm-ov \{[^}]*pointer-events: none;/);
-  assert.match(css, /\.hm-ov \* \{ pointer-events: none !important; \}/);
-  assert.match(css, /\.hm-ov\.is-interactive, \.hm-ov\.is-interactive \* \{ pointer-events: auto !important; \}/);
-  assert.match(css, /\.hm-ov-host \{ position: relative; isolation: isolate; \}/);
-  assert.match(css, /inset-inline-start: var\(--hm-ov-start, 0\)/);
+  assert.match(css, /\.m-ov \{[^}]*pointer-events: none;/);
+  assert.match(css, /\.m-ov \* \{ pointer-events: none !important; \}/);
+  assert.match(css, /\.m-ov\.is-interactive, \.m-ov\.is-interactive \* \{ pointer-events: auto !important; \}/);
+  assert.match(css, /\.m-ov-host \{ position: relative; isolation: isolate; \}/);
+  assert.match(css, /inset-inline-start: var\(--m-ov-start, 0\)/);
   const media = readFileSync(new URL("../src/components/media/overlay/media.ts", import.meta.url), "utf8");
   for (const a of ["muted", "loop", "playsinline", "disablepictureinpicture"]) assert.ok(media.includes(`"${a}"`), a);
   assert.match(media, /else v\.pause\(\)/, "video pauses when not visible");

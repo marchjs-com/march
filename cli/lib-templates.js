@@ -1,7 +1,7 @@
 // `march gen component <name>` inside the hadi-march repository: one folder with every file the checklist asks for.
 /** @returns {Record<string, string>} file name → content */
 export function libComponent(folder, Name, category = "layout", composedOf = []) {
-  const cls = `hm-${folder}`;
+  const cls = `m-${folder}`;
   return {
     "index.ts": `// ${Name} (hadi-march/ui). Draws only: state comes from shared engines and behaviors.
 import "./${folder}.css";
@@ -19,10 +19,10 @@ export function ${Name}(props: ${Name}Props): Element {
   return h("div", { class: () => cx("${cls}", \`${cls}-\${val(props.size) ?? "md"}\`, val(props.class)) }, props.children);
 }
 `,
-    [`${folder}.css`]: `/* ${Name}. Theme tokens only, logical properties, durations from --hm-dur tokens, no @keyframes (motion core). */
-.${cls} { display: block; padding: var(--hm-space-3); border-radius: var(--hm-radius-3); }
-.${cls}-sm { padding: var(--hm-space-2); }
-.${cls}-lg { padding: var(--hm-space-4); }
+    [`${folder}.css`]: `/* ${Name}. Theme tokens only, logical properties, durations from --m-dur tokens, no @keyframes (motion core). */
+.${cls} { display: block; padding: var(--m-space-3); border-radius: var(--m-radius-3); }
+.${cls}-sm { padding: var(--m-space-2); }
+.${cls}-lg { padding: var(--m-space-4); }
 `,
     [`${folder}.test.js`]: `import { test } from "node:test";
 import assert from "node:assert/strict";

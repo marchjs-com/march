@@ -70,7 +70,7 @@ test("<ShortcutHints /> draws badges in an fx layer while visible and opens the 
   assert.equal(layers().length, n);
   shortcutHints.openHelp();
   await tick();
-  assert.ok(document.querySelector(".hm-shortcut-help"), "help list rendered in a dialog");
+  assert.ok(document.querySelector(".m-shortcut-help"), "help list rendered in a dialog");
   dispose();
   host.remove();
 });

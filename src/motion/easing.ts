@@ -1,4 +1,4 @@
-// Easing functions (t in 0..1 → progress). Names match the CSS `--hm-ease-*` tokens.
+// Easing functions (t in 0..1 → progress). Names match the CSS `--m-ease-*` tokens.
 export type Easing = (t: number) => number;
 
 export const linear: Easing = (t) => t;

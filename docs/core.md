@@ -54,7 +54,7 @@ Token utilities: `p px py pt pb m mx my mt mb gap` (0–8), `cols span` (1–12)
 
 ## Styles
 Import `hadi-march/css/tokens.css` and `hadi-march/css/sx.css` (plus module CSS: `ui.css`, `forms.css`, `table.css`,
-`charts/charts.css`). Theme with `--hm-*` custom properties; dark mode follows the system unless `data-theme` is set.
+`charts/charts.css`). Theme with `--m-*` custom properties; dark mode follows the system unless `data-theme` is set.
 
 ## TypeScript
 March is written in TypeScript (erasable syntax only, so Node and esbuild run the sources directly) and its public types

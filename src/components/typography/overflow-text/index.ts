@@ -33,7 +33,7 @@ export interface OverflowTextProps {
   /**
    * An endless strip (logos, quotes): the content is repeated so the strip is wider than its box and always loops.
    * `true`: as many copies as fill the width (at least one); a number: that many copies. Copies are hidden from
-   * assistive technology and inert; each unit is a `.hm-marquee-unit`.
+   * assistive technology and inert; each unit is a `.m-marquee-unit`.
    */
   duplicate?: boolean | number;
   /** Never scroll (the text stays clipped with its fade or ellipsis): `disabled={() => !settings.motion}`. */
@@ -66,8 +66,8 @@ export function OverflowText(props: OverflowTextProps): Element {
   const content = props.text != null ? () => val(props.text) ?? "" : props.children;
   // duplicate: the content sits in a unit and its copies follow it inside the item (a fixed count, or enough to fill the width)
   const fill = props.duplicate === true, fixed = fill ? 0 : Math.max(0, Math.floor(Number(props.duplicate) || 0));
-  const unit = fill || fixed ? h("span", { class: "hm-marquee-unit" }, content) as HTMLElement : null;
-  const item = h("span", { class: "hm-marquee-item" }, unit ?? content) as HTMLElement;
+  const unit = fill || fixed ? h("span", { class: "m-marquee-unit" }, content) as HTMLElement : null;
+  const item = h("span", { class: "m-marquee-item" }, unit ?? content) as HTMLElement;
   const twins: HTMLElement[] = [];
   const rev = signal(0); // bumped when the copies are rebuilt: a running loop starts over with the new content
   const twin = (n: number): void => {
@@ -76,11 +76,11 @@ export function OverflowText(props: OverflowTextProps): Element {
     while (twins.length < n) { const c = unit.cloneNode(true) as HTMLElement; c.setAttribute("aria-hidden", "true"); c.setAttribute("inert", ""); item.append(c); twins.push(c); }
   };
   twin(fill ? 1 : fixed);
-  const track = h("span", { class: "hm-marquee-track" }, item) as HTMLElement;
+  const track = h("span", { class: "m-marquee-track" }, item) as HTMLElement;
   const { text: _t, children: _c, trigger: _tr, mode: _m, speed: _s, pause: _p, delay: _d, separator: _sep, fade: _f, host: _h, play: _pl, class: _cl, easing: _e, disabled: _dis, duplicate: _dup, ...attrs } = props;
   const root = h("span", {
     dir: "auto", ...attrs,
-    class: () => cx("hm-marquee", props.fade === false ? "hm-marquee-ellipsis" : "hm-marquee-fade", dist() > 0 && "is-overflow", running() && "is-running", val(props.class)),
+    class: () => cx("m-marquee", props.fade === false ? "m-marquee-ellipsis" : "m-marquee-fade", dist() > 0 && "is-overflow", running() && "is-running", val(props.class)),
     // the full text as a tooltip when it cannot scroll (reduced motion) and is clipped
     title: () => (dist() > 0 && reducedMotion() ? label() : null),
   }, track) as HTMLElement;
@@ -115,14 +115,14 @@ export function OverflowText(props: OverflowTextProps): Element {
     // The fade follows the text: only the side that hides text fades. Before moving only the end fades (the first letter is
     // whole), while moving both, at the end of a bounce only the start (the last letter is whole). Two registered custom
     // properties (marquee.css @property) carry the widths; this animation runs on the root with the same timing.
-    const F = "var(--hm-marquee-fade, 14px)";
-    const fadeFrames = (stops: Array<[number, boolean, boolean]>): Keyframe[] => stops.map(([offset, s, e]) => ({ offset, "--hm-mq-fs": s ? F : "0px", "--hm-mq-fe": e ? F : "0px" } as Keyframe));
+    const F = "var(--m-marquee-fade, 14px)";
+    const fadeFrames = (stops: Array<[number, boolean, boolean]>): Keyframe[] => stops.map(([offset, s, e]) => ({ offset, "--m-mq-fs": s ? F : "0px", "--m-mq-fe": e ? F : "0px" } as Keyframe));
     const fade = (frames: Keyframe[], o: KeyframeAnimationOptions): void => {
       const r = root as HTMLElement & { animate?: (k: Keyframe[], o: KeyframeAnimationOptions) => Anim };
       if (props.fade !== false && typeof r.animate === "function") { try { fadeAnim = animateEl(r, frames, o); } catch { fadeAnim = null; } }
     };
     if (mode === "loop") {
-      const sep = props.separator === false ? null : h("span", { class: "hm-marquee-sep", "aria-hidden": "true" }, props.separator ?? "•");
+      const sep = props.separator === false ? null : h("span", { class: "m-marquee-sep", "aria-hidden": "true" }, props.separator ?? "•");
       const copy = item.cloneNode(true) as HTMLElement;
       copy.setAttribute("aria-hidden", "true");
       copy.setAttribute("inert", "");

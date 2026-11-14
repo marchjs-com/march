@@ -109,15 +109,15 @@ export function PullToRefresh(props: PullToRefreshProps): Element {
     return p === "pull" ? l?.pull ?? t`Pull to refresh` : p === "ready" ? l?.release ?? t`Release to refresh` : p === "refreshing" ? l?.refreshing ?? t`Refreshing…` : "";
   };
   return h("div", {
-    class: () => cx("hm-ptr", (phase() === "pull" || phase() === "ready") && "is-pulling", phase() === "refreshing" && "is-refreshing", phase() === "ready" && "is-ready", val(props.class)),
+    class: () => cx("m-ptr", (phase() === "pull" || phase() === "ready") && "is-pulling", phase() === "refreshing" && "is-refreshing", phase() === "ready" && "is-ready", val(props.class)),
     "aria-busy": () => (phase() === "refreshing" ? "true" : null),
     ref: (x: HTMLElement) => { root = x; gesture(x); queueMicrotask(touchPolicy); },
     onScroll: touchPolicy,
   },
-  props.indicator !== false && h("div", { class: cx("hm-ptr-ind", own && "is-own"), "aria-hidden": "true", "data-hm-color": colorAttr(props.color), ref: (x: HTMLElement) => { ind = x; } },
+  props.indicator !== false && h("div", { class: cx("m-ptr-ind", own && "is-own"), "aria-hidden": "true", "data-m-color": colorAttr(props.color), ref: (x: HTMLElement) => { ind = x; } },
     own ? () => own(phase())
-      : h("span", { class: "hm-ptr-spin", ref: (x: HTMLElement) => { spin = x; } }, ownIcon(props.icon, refreshIcon, "hm-ptr-icon"))),
-  props.refreshButton !== false && h(Button, { size: "sm", shape: "pill", class: "hm-ptr-kbd", disabled: () => !!val(props.disabled) || phase() === "refreshing", onClick: () => { void run(); } }, () => props.labels?.refresh ?? t`Refresh`),
-  h("div", { class: "hm-sr-only", role: "status", "aria-live": "polite" }, status),
-  h("div", { class: "hm-ptr-content", ref: (x: HTMLElement) => { content = x; } }, props.children));
+      : h("span", { class: "m-ptr-spin", ref: (x: HTMLElement) => { spin = x; } }, ownIcon(props.icon, refreshIcon, "m-ptr-icon"))),
+  props.refreshButton !== false && h(Button, { size: "sm", shape: "pill", class: "m-ptr-kbd", disabled: () => !!val(props.disabled) || phase() === "refreshing", onClick: () => { void run(); } }, () => props.labels?.refresh ?? t`Refresh`),
+  h("div", { class: "m-sr-only", role: "status", "aria-live": "polite" }, status),
+  h("div", { class: "m-ptr-content", ref: (x: HTMLElement) => { content = x; } }, props.children));
 }

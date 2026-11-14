@@ -1,2 +1,2 @@
 /* OverlayScope: its own stacking context, so the layers inside it never mix with the page's. */
-.hm-overlay-scope { isolation: isolate; }
+.m-overlay-scope { isolation: isolate; }

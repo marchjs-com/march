@@ -18,12 +18,12 @@ export interface CheckboxGroupProps<T = unknown> extends ControlProps<T[]>, Choi
 export function CheckboxGroup<T = unknown>(props: CheckboxGroupProps<T>): unknown {
   const [get, set] = model<T[]>(props, []);
   const field = useField();
-  const baseId = props.id ?? field?.id ?? uid("hm-cbg");
+  const baseId = props.id ?? field?.id ?? uid("m-cbg");
   const c = ctl(props);
-  return h("div", { "data-hm-color": () => colorAttr(props.color), role: "group", class: () => groupClass(props, "checkbox"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
-    () => normOptions(props.options).map((o, i) => h("label", { class: "hm-check", "data-hm-color": () => itemColor(props.colors, i) },
+  return h("div", { "data-m-color": () => colorAttr(props.color), role: "group", class: () => groupClass(props, "checkbox"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
+    () => normOptions(props.options).map((o, i) => h("label", { class: "m-check", "data-m-color": () => itemColor(props.colors, i) },
       h("input", {
-        type: "checkbox", class: "hm-check-input", id: i ? `${baseId}-${i}` : baseId, name: props.name, onBlur: props.onBlur,
+        type: "checkbox", class: "m-check-input", id: i ? `${baseId}-${i}` : baseId, name: props.name, onBlur: props.onBlur,
         checked: () => (get() ?? []).some((x) => same(x, o.value)), disabled: () => !!(props.disabled || props.readonly || o.disabled),
         onChange: (e: Event) => { const cur = (untrack(get) ?? []).filter((x) => !same(x, o.value)); set(inputOf(e).checked ? [...cur, o.value as T] : cur); },
       }),

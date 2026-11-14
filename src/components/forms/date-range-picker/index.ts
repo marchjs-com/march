@@ -59,16 +59,16 @@ export function DateRangePicker(props: DateRangePickerProps): unknown {
   });
   const field = useField();
   const range = (k: keyof DateRange, v: IsoDate | null) => { const cur = untrack(get) ?? { from: null, to: null }; set({ ...cur, [k]: v }); };
-  return h("div", { class: () => cx("hm-daterange", props.class), role: "group", "aria-labelledby": field?.labelId ?? props.labelledby ?? null },
+  return h("div", { class: () => cx("m-daterange", props.class), role: "group", "aria-labelledby": field?.labelId ?? props.labelledby ?? null },
     () => (presets().length ? h(Segmented, {
       id: props.id ?? field?.id, "aria-label": live(() => props.labels?.range ?? t`Date range`), color: live(() => props.color),
       options: live(() => [...presets().map((p) => ({ value: p.id, label: p.label })), ...(props.custom === false ? [] : [{ value: "custom", label: props.labels?.custom ?? t`Custom` }])]),
       value: live(() => active()), disabled: live(() => props.disabled || props.readonly),
       setValue: (id: string | null) => { if (id === "custom") { custom.set(true); return; } custom.set(false); set({ ...presets.peek().find((p) => p.id === id)!.range }); },
     }) : null),
-    () => (active() === "custom" || !presets().length ? h("div", { class: "hm-daterange-custom" },
+    () => (active() === "custom" || !presets().length ? h("div", { class: "m-daterange-custom" },
       h(DatePicker, { color: props.color, ...props.picker, "aria-label": live(() => props.labels?.from ?? t`From`), value: live(() => get()?.from ?? null), setValue: (v) => range("from", v), min: live(() => props.min), max: live(() => get()?.to ?? props.max), disabled: live(() => props.disabled), firstDay: props.firstDay }),
       // live: the sign can change (or go) while the pair is shown
-      () => (props.separator === false || props.separator === null ? null : h("span", { class: "hm-daterange-sep", "aria-hidden": "true" }, ownPart(props.separator, () => "–"))),
+      () => (props.separator === false || props.separator === null ? null : h("span", { class: "m-daterange-sep", "aria-hidden": "true" }, ownPart(props.separator, () => "–"))),
       h(DatePicker, { color: props.color, ...props.picker, "aria-label": live(() => props.labels?.to ?? t`To`), value: live(() => get()?.to ?? null), setValue: (v) => range("to", v), min: live(() => get()?.from ?? props.min), max: live(() => props.max), disabled: live(() => props.disabled), firstDay: props.firstDay })) : null));
 }

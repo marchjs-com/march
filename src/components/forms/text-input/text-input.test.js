@@ -20,8 +20,8 @@ test("TextInput: bind:value both ways, transform, prefix / suffix, autofocus", (
   assert.equal(v(), "XY");
   v.set("q");
   assert.equal(input.value, "q");
-  assert.equal(el.querySelector(".hm-affix-prefix").textContent, "@");
-  assert.equal(el.querySelector(".hm-affix-suffix").textContent, ".com");
+  assert.equal(el.querySelector(".m-affix-prefix").textContent, "@");
+  assert.equal(el.querySelector(".m-affix-suffix").textContent, ".com");
   assert.equal(input.hasAttribute("autofocus"), true);
   assert.equal(typeof affix, "function");
 });
@@ -51,8 +51,8 @@ test("TextInput: error marks the input invalid and shows a linked alert; without
   const err = signal("");
   const { el } = mount(() => [h(TextInput, { id: "mail", error: err, describedby: "note" }), h(TextInput, { id: "plain" })]);
   const [input, plain] = el.querySelectorAll("input");
-  const msg = el.querySelector(".hm-input-error");
-  assert.equal(el.querySelectorAll(".hm-input-error").length, 1);
+  const msg = el.querySelector(".m-input-error");
+  assert.equal(el.querySelectorAll(".m-input-error").length, 1);
   assert.equal(msg.id, "mail-err");
   assert.equal(msg.getAttribute("role"), "alert");
   assert.equal(msg.hidden, true);
@@ -72,7 +72,7 @@ test("TextInput: error marks the input invalid and shows a linked alert; without
 test("TextInput: errorSpace keeps the error line in place while there is no error", () => {
   const err = signal("");
   const { el } = mount(() => h(TextInput, { id: "kept", error: err, errorSpace: true }));
-  const msg = el.querySelector(".hm-input-error");
+  const msg = el.querySelector(".m-input-error");
   assert.ok(msg.classList.contains("is-kept"));
   assert.equal(msg.hidden, false);
   assert.equal(msg.textContent, "");

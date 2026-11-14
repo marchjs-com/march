@@ -24,15 +24,15 @@ export function ColorInput(props: ColorInputProps): unknown {
   const [get, set] = model(props, "");
   const both = props.swatch !== false && props.text !== false;
   // with the text field off, the swatch is the control (id, name, aria wiring)
-  const swatch = h("input", { ...(props.text === false ? ctl(props) : {}), type: "color", class: "hm-color-swatch", "aria-label": () => props.swatchLabel ?? props["aria-label"] ?? props.ariaLabel ?? t`Pick a color`, disabled: () => !!(props.disabled || props.readonly), onInput: (e: Event) => set(inputOf(e).value.toLowerCase()) }) as HTMLInputElement;
+  const swatch = h("input", { ...(props.text === false ? ctl(props) : {}), type: "color", class: "m-color-swatch", "aria-label": () => props.swatchLabel ?? props["aria-label"] ?? props.ariaLabel ?? t`Pick a color`, disabled: () => !!(props.disabled || props.readonly), onInput: (e: Event) => set(inputOf(e).value.toLowerCase()) }) as HTMLInputElement;
   const hex = () => (/^#[0-9a-f]{6}$/i.test(get() ?? "") ? get().toLowerCase() : "#000000");
   syncValue(swatch, hex);
   // the colour is drawn by a Swatch; the native picker lies over it, invisible, and takes the click and the keyboard
-  const sample = () => h(Swatch, { class: "hm-color-sample", color: hex, checker: false }, swatch);
+  const sample = () => h(Swatch, { class: "m-color-sample", color: hex, checker: false }, swatch);
   // the text field is a TextInput bound to the same value (called directly: the live props stay getters)
   const text = () => TextInput(extend(props as TextInputProps, {
-    class: () => "hm-color-text", value: get, setValue: () => set, onChange: () => undefined, maxLength: () => 7, spellcheck: () => "false", autocomplete: () => "off",
+    class: () => "m-color-text", value: get, setValue: () => set, onChange: () => undefined, maxLength: () => 7, spellcheck: () => "false", autocomplete: () => "off",
     placeholder: () => props.placeholder ?? "#RRGGBB", transform: () => (v: string) => v.trim().toLowerCase(),
   }));
-  return h("span", { class: () => cx("hm-color", props.class) }, both || props.text === false ? sample() : null, both || props.swatch === false ? text() : null);
+  return h("span", { class: () => cx("m-color", props.class) }, both || props.text === false ? sample() : null, both || props.swatch === false ? text() : null);
 }

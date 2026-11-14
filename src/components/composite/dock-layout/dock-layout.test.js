@@ -51,9 +51,9 @@ test("DockLayout: groups from Tabs + Splitter, content kept across moves, keyboa
   const panels = ["files", "editor", "console"].map((id) => ({ id, title: id.toUpperCase(), content: () => { const n = h("div", { class: `c-${id}` }, id); made.push(id); return n; } }));
   const m = mount(() => h(DockLayout, { panels, layout: { row: [["files"], ["editor", "console"]], share: 0.25 }, commands: "t1", api: (a) => { api = a; } }));
   await tick();
-  const root = m.el.querySelector(".hm-dock");
+  const root = m.el.querySelector(".m-dock");
   assert.equal(root.querySelectorAll("[data-dock-group]").length, 2);
-  assert.ok(root.querySelector(".hm-splitter [role=separator]"));
+  assert.ok(root.querySelector(".m-splitter [role=separator]"));
   const tabs = [...root.querySelectorAll("[role=tab]")].map((x) => x.dataset.tab);
   assert.deepEqual(tabs, ["files", "editor", "console"]);
   const editorNode = root.querySelector(".c-editor");
@@ -95,26 +95,26 @@ test("DockLayout: minimize to the tray, float, maximize, persist to a storage", 
   const panels = [{ id: "a", title: "A", content: () => "a" }, { id: "b", title: "B", content: () => "b", closable: false }];
   const m = mount(() => h(DockLayout, { panels, layout: { row: [["a"], ["b"]] }, persist: "lay", storage, commands: false, api: (x) => { api = x; } }));
   await tick();
-  const root = m.el.querySelector(".hm-dock");
+  const root = m.el.querySelector(".m-dock");
   api.minimize("a");
   await tick(); await tick();
-  const tray = root.querySelector(".hm-dock-tray");
+  const tray = root.querySelector(".m-dock-tray");
   assert.equal(tray.getAttribute("role"), "toolbar");
   assert.equal(tray.querySelectorAll("button").length, 1);
   tray.querySelector("button").click();
   await tick(); await tick();
-  assert.ok(!root.querySelector(".hm-dock-tray"));
+  assert.ok(!root.querySelector(".m-dock-tray"));
   api.float("a");
   await tick(); await tick();
-  const win = root.querySelector(".hm-dock-float");
-  assert.ok(win && win.querySelector(".hm-dock-grip") && win.querySelector(".hm-dock-resize"));
+  const win = root.querySelector(".m-dock-float");
+  assert.ok(win && win.querySelector(".m-dock-grip") && win.querySelector(".m-dock-resize"));
   api.toggleMaximize("b");
   await tick();
   assert.ok(root.querySelector('[data-dock-group].is-maximized [data-tab="b"]'));
-  assert.equal(root.querySelector(".is-maximized .hm-dock-btn").getAttribute("aria-pressed"), "true");
+  assert.equal(root.querySelector(".is-maximized .m-dock-btn").getAttribute("aria-pressed"), "true");
   // b is not closable: no × and Delete does nothing
   const b = root.querySelector('[role=tab][data-tab="b"]');
-  assert.ok(!b.querySelector(".hm-tab-close"));
+  assert.ok(!b.querySelector(".m-tab-close"));
   b.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
   await tick();
   assert.ok(root.querySelector('[role=tab][data-tab="b"]'));
@@ -126,7 +126,7 @@ test("DockLayout: minimize to the tray, float, maximize, persist to a storage", 
   // a new layout with the same key loads it
   const m2 = mount(() => h(DockLayout, { panels, persist: "lay", storage, commands: false }));
   await tick();
-  assert.ok(m2.el.querySelector(".hm-dock-float"));
+  assert.ok(m2.el.querySelector(".m-dock-float"));
   m2.dispose();
 });
 
@@ -152,28 +152,28 @@ test("DockLayout: group buttons off or chosen, own icons and texts, no tray, own
       empty: (reset) => h("button", { class: "own-empty", onClick: reset }, "Back") }),
     h(DockLayout, { panels: mk(), commands: false, class: "three", empty: false, api: (a) => apis.push(a), labels: { tray: "Parked", restore: "Wake" } }),
   ], host);
-  const one = host.querySelector(".hm-dock.one"), two = host.querySelector(".hm-dock.two"), three = host.querySelector(".hm-dock.three");
+  const one = host.querySelector(".m-dock.one"), two = host.querySelector(".m-dock.two"), three = host.querySelector(".m-dock.three");
   assert.equal(one.getAttribute("aria-roledescription"), "desk");
-  assert.deepEqual([...one.querySelectorAll(".hm-dock-btn")].map((x) => x.getAttribute("aria-label")), ["Full size"]);
-  assert.ok(one.querySelector(".hm-dock-btn .own-max"));
-  assert.equal(one.querySelector(".hm-tab-close").getAttribute("title"), "Shut");
-  assert.equal(one.querySelector(".hm-tab-close").textContent, "×");
+  assert.deepEqual([...one.querySelectorAll(".m-dock-btn")].map((x) => x.getAttribute("aria-label")), ["Full size"]);
+  assert.ok(one.querySelector(".m-dock-btn .own-max"));
+  assert.equal(one.querySelector(".m-tab-close").getAttribute("title"), "Shut");
+  assert.equal(one.querySelector(".m-tab-close").textContent, "×");
   assert.equal(one.querySelector("[data-dock-group]").getAttribute("aria-label"), "Group A");
   assert.equal(one.querySelector("[role=tablist]").getAttribute("aria-label"), "Tabs");
-  assert.equal(two.querySelector(".hm-dock-actions"), null);
-  assert.equal(three.querySelectorAll(".hm-dock-btn").length, 3, "the default buttons stay");
+  assert.equal(two.querySelector(".m-dock-actions"), null);
+  assert.equal(three.querySelectorAll(".m-dock-btn").length, 3, "the default buttons stay");
   const [api2, api3] = apis;
   api2.minimize("a");
   api3.minimize("a");
   await tick();
-  assert.equal(two.querySelector(".hm-dock-tray"), null, "tray={false}: no tray");
-  assert.equal(three.querySelector(".hm-dock-tray").getAttribute("aria-label"), "Parked");
-  assert.equal(three.querySelector(".hm-dock-tray-btn").getAttribute("title"), "Wake");
+  assert.equal(two.querySelector(".m-dock-tray"), null, "tray={false}: no tray");
+  assert.equal(three.querySelector(".m-dock-tray").getAttribute("aria-label"), "Parked");
+  assert.equal(three.querySelector(".m-dock-tray-btn").getAttribute("title"), "Wake");
   api2.minimize("b");
   api3.minimize("b");
   await tick();
-  assert.ok(two.querySelector(".hm-dock-empty .own-empty"), "own empty state");
-  assert.equal(three.querySelector(".hm-dock-empty").textContent, "", "empty={false}: nothing");
+  assert.ok(two.querySelector(".m-dock-empty .own-empty"), "own empty state");
+  assert.equal(three.querySelector(".m-dock-empty").textContent, "", "empty={false}: nothing");
   two.querySelector(".own-empty").click();
   await tick();
   assert.equal(two.querySelectorAll("[role=tab]").length, 2, "the own node's reset brings the panels back");

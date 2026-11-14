@@ -42,7 +42,7 @@ export interface ChartBaseProps {
 
 /** One decimal place (SVG coordinates). */
 export const f1 = (v: number): number => Math.round(v * 10) / 10;
-export const nextId = (p = "hm-chart"): string => uid(p);
+export const nextId = (p = "m-chart"): string => uid(p);
 
 /** Data prop: array, signal, getter or any function returning an array. */
 export const rowsOf = <D>(v: DataProp<D>): D[] => {
@@ -84,12 +84,12 @@ export function seriesOf<D>(y: SeriesSpec<D> | readonly SeriesSpec<D>[] | null |
   });
 }
 
-/** Class for the n-th series color (`hm-chart-series-0..7`). */
-export const seriesClass = (i: number): string => `hm-chart-series-${((i % 8) + 8) % 8}`;
+/** Class for the n-th series color (`m-chart-series-0..7`). */
+export const seriesClass = (i: number): string => `m-chart-series-${((i % 8) + 8) % 8}`;
 /** Style object (CSSOM, CSP safe) for a `colors` override, or undefined. */
-export const colorStyle = (colors: ChartBaseProps["colors"], i: number): { "--hm-c": string } | undefined => {
+export const colorStyle = (colors: ChartBaseProps["colors"], i: number): { "--m-c": string } | undefined => {
   const c = read(colors)?.[i];
-  return c ? { "--hm-c": String(c) } : undefined;
+  return c ? { "--m-c": String(c) } : undefined;
 };
 
 export type XKind = "time" | "linear" | "band";

@@ -49,7 +49,7 @@ export default function SchedulerDemo(props: { values: { view: string; step: str
         renderEvent={own ? (e: SchedulerEvent, info: { time: string }) => <span><b>{e.title}</b>{e.location ? ` · ${e.location}` : ""}<br /><small>{info.time}</small></span> : undefined}
         onChange={(e: SchedulerEvent) => { events.set(events().map((x) => (x.id === e.id ? e : x))); last.set(`“${e.title}” taşındı`) }} onCreate={create} onSelect={(e: SchedulerEvent) => last.set(`Seçildi: ${e.title}`)} />)
     }}
-    <p class="hm-muted">{() => (props.values.animate
+    <p class="m-muted">{() => (props.values.animate
       ? "Hareket açık: ileri ya da geri gidince günler kayarak, görünüm değişince hafifçe büyüyerek gelir."
       : "Hareket kapalı: tarih ve görünüm değişimi anında olur.")}</p>
     <p role="status">{last}</p>

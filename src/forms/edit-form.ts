@@ -119,11 +119,11 @@ export function EditForm(props: EditFormProps): unknown {
     provide(FormContext, form);
     load();
     // one label line + one input block per field (at most six)
-    const skeleton = () => h("div", { class: "hm-form-skeleton", role: "status", "aria-label": t`Loading` },
-      Array.from({ length: Math.min(6, form.schema.fields.length || 3) }, () => h("div", { class: "hm-skeleton-field" }, h(Skeleton, { block: true, class: "hm-skeleton-label" }), h(Skeleton, { block: true, class: "hm-skeleton-input" }))));
-    return h("section", { class: cx("hm-edit-form", props.class), "aria-busy": () => (state() === "loading" ? "true" : null) },
+    const skeleton = () => h("div", { class: "m-form-skeleton", role: "status", "aria-label": t`Loading` },
+      Array.from({ length: Math.min(6, form.schema.fields.length || 3) }, () => h("div", { class: "m-skeleton-field" }, h(Skeleton, { block: true, class: "m-skeleton-label" }), h(Skeleton, { block: true, class: "m-skeleton-input" }))));
+    return h("section", { class: cx("m-edit-form", props.class), "aria-busy": () => (state() === "loading" ? "true" : null) },
       props.title || props.description || !!props.load ? h(PanelHeader, {
-        class: "hm-edit-head", size: "lg", align: "start", title: props.title || undefined, titleAs: "h2", subtitle: props.description || undefined,
+        class: "m-edit-head", size: "lg", align: "start", title: props.title || undefined, titleAs: "h2", subtitle: props.description || undefined,
         actions: [
           () => (state() === "ready" && form.dirty() ? h(Badge, { tone: "warn" }, t`Unsaved changes`) : null),
           h(Button, { size: "sm", disabled: () => state() === "loading" || form.submitting(), onClick: () => load() }, t`Reload`),

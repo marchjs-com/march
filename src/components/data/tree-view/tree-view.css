@@ -1,41 +1,41 @@
 /* March — TreeView. Imported by its component module; tokens.css provides the variables. Logical properties only (RTL). */
-.hm-tv { position: relative; overflow: auto; overscroll-behavior: contain; max-width: 100%; padding-block: var(--hm-space-1); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3);
-  background: var(--hm-surface); box-shadow: var(--hm-shadow-1); font-size: var(--hm-text-sm); outline: none; }
-.hm-tv:focus-visible { border-color: var(--hm-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-focus) 22%, transparent); }
-.hm-tv-canvas { position: relative; }
+.m-tv { position: relative; overflow: auto; overscroll-behavior: contain; max-width: 100%; padding-block: var(--m-space-1); border: 1px solid var(--m-border); border-radius: var(--m-radius-3);
+  background: var(--m-surface); box-shadow: var(--m-shadow-1); font-size: var(--m-text-sm); outline: none; }
+.m-tv:focus-visible { border-color: var(--m-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-focus) 22%, transparent); }
+.m-tv-canvas { position: relative; }
 /* a row is a ListRow, placed by the virtual window: absolute, indented by its depth, at the tree's measure */
-.hm-tv .hm-tv-row.hm-listrow { position: absolute; inset-block-start: 0; inset-inline: 0; inline-size: auto; gap: .375rem; min-block-size: 0;
-  padding-block: 0; padding-inline: calc(.5rem + var(--hm-tv-depth, 0) * 1.25rem) .75rem; margin-inline: var(--hm-space-1); font-size: inherit; cursor: default; user-select: none;
-  transition: background-color var(--hm-dur-fast) var(--hm-ease), box-shadow var(--hm-dur-fast) var(--hm-ease), opacity var(--hm-dur) var(--hm-ease); }
-.hm-tv-row > .hm-listrow-lead { display: inline-flex; align-items: center; gap: .375rem; }
+.m-tv .m-tv-row.m-listrow { position: absolute; inset-block-start: 0; inset-inline: 0; inline-size: auto; gap: .375rem; min-block-size: 0;
+  padding-block: 0; padding-inline: calc(.5rem + var(--m-tv-depth, 0) * 1.25rem) .75rem; margin-inline: var(--m-space-1); font-size: inherit; cursor: default; user-select: none;
+  transition: background-color var(--m-dur-fast) var(--m-ease), box-shadow var(--m-dur-fast) var(--m-ease), opacity var(--m-dur) var(--m-ease); }
+.m-tv-row > .m-listrow-lead { display: inline-flex; align-items: center; gap: .375rem; }
 /* indent guides: one hairline per level */
-.hm-tv-row::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: .5rem; width: calc(var(--hm-tv-depth, 0) * 1.25rem); pointer-events: none;
-  background-image: repeating-linear-gradient(to var(--hm-tv-guide-to, right), transparent 0 .5rem, var(--hm-border-subtle) .5rem calc(.5rem + 1px), transparent calc(.5rem + 1px) 1.25rem); }
-[dir="rtl"] .hm-tv-row::before { --hm-tv-guide-to: left; }
-.hm-tv .hm-tv-row.hm-listrow.is-selected { background: var(--hm-accent-soft, var(--hm-primary-soft)); color: var(--hm-accent-text, var(--hm-primary-text, var(--hm-text))); font-weight: inherit; }
-.hm-tv-row.is-selected .hm-tv-icon.is-folder { color: var(--hm-accent, var(--hm-primary)); }
-.hm-tv:focus-visible .hm-tv-row.is-cursor, .hm-tv:focus .hm-tv-row.is-cursor { box-shadow: inset 0 0 0 2px var(--hm-focus); }
-.hm-tv-row.is-dragging { opacity: .4; }
-.hm-tv .hm-tv-row.hm-listrow.is-drop-inside { background: var(--hm-primary-soft); box-shadow: inset 0 0 0 2px var(--hm-primary); }
-.hm-tv .hm-tv-row.hm-listrow.is-drop-bad { box-shadow: inset 0 0 0 2px var(--hm-danger-solid); cursor: no-drop; }
+.m-tv-row::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: .5rem; width: calc(var(--m-tv-depth, 0) * 1.25rem); pointer-events: none;
+  background-image: repeating-linear-gradient(to var(--m-tv-guide-to, right), transparent 0 .5rem, var(--m-border-subtle) .5rem calc(.5rem + 1px), transparent calc(.5rem + 1px) 1.25rem); }
+[dir="rtl"] .m-tv-row::before { --m-tv-guide-to: left; }
+.m-tv .m-tv-row.m-listrow.is-selected { background: var(--m-accent-soft, var(--m-primary-soft)); color: var(--m-accent-text, var(--m-primary-text, var(--m-text))); font-weight: inherit; }
+.m-tv-row.is-selected .m-tv-icon.is-folder { color: var(--m-accent, var(--m-primary)); }
+.m-tv:focus-visible .m-tv-row.is-cursor, .m-tv:focus .m-tv-row.is-cursor { box-shadow: inset 0 0 0 2px var(--m-focus); }
+.m-tv-row.is-dragging { opacity: .4; }
+.m-tv .m-tv-row.m-listrow.is-drop-inside { background: var(--m-primary-soft); box-shadow: inset 0 0 0 2px var(--m-primary); }
+.m-tv .m-tv-row.m-listrow.is-drop-bad { box-shadow: inset 0 0 0 2px var(--m-danger-solid); cursor: no-drop; }
 /* the arrow is a Chevron grown to a 1.25rem pointer target */
-.hm-tv-chev.hm-chevron { box-sizing: content-box; padding: .1875rem; border-radius: var(--hm-radius-1); color: var(--hm-text-2); cursor: pointer; }
-.hm-tv-chev:hover { background: var(--hm-surface-3); }
-.hm-tv-icon { display: inline-flex; flex: none; color: var(--hm-text-2); }
-.hm-tv-icon.is-folder { color: var(--hm-warn); }
-.hm-tv-icon .hm-svg, .hm-tv-icon.hm-icon { width: 1rem; height: 1rem; }
-.hm-tv-meta { color: var(--hm-faint); font-variant-numeric: tabular-nums; }
-.hm-tv-retry.hm-btn { min-height: 1.5rem; }
+.m-tv-chev.m-chevron { box-sizing: content-box; padding: .1875rem; border-radius: var(--m-radius-1); color: var(--m-text-2); cursor: pointer; }
+.m-tv-chev:hover { background: var(--m-surface-3); }
+.m-tv-icon { display: inline-flex; flex: none; color: var(--m-text-2); }
+.m-tv-icon.is-folder { color: var(--m-warn); }
+.m-tv-icon .m-svg, .m-tv-icon.m-icon { width: 1rem; height: 1rem; }
+.m-tv-meta { color: var(--m-faint); font-variant-numeric: tabular-nums; }
+.m-tv-retry.m-btn { min-height: 1.5rem; }
 /* drop line: slides between rows (transform), indented to the target level, with a dot at its start */
-.hm-tv-drop { position: absolute; inset-block-start: var(--hm-space-1); inset-inline: calc(1.75rem + var(--hm-tv-depth, 0) * 1.25rem) var(--hm-space-2); height: 2px; border-radius: 2px; background: var(--hm-primary);
-  opacity: 0; pointer-events: none; z-index: 2; transition: transform var(--hm-dur-fast) var(--hm-ease), opacity var(--hm-dur-fast) var(--hm-ease), inset-inline-start var(--hm-dur-fast) var(--hm-ease); }
-.hm-tv-drop::before { content: ""; position: absolute; inset-inline-start: -4px; inset-block-start: -3px; width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--hm-primary); background: var(--hm-surface); box-sizing: border-box; }
+.m-tv-drop { position: absolute; inset-block-start: var(--m-space-1); inset-inline: calc(1.75rem + var(--m-tv-depth, 0) * 1.25rem) var(--m-space-2); height: 2px; border-radius: 2px; background: var(--m-primary);
+  opacity: 0; pointer-events: none; z-index: 2; transition: transform var(--m-dur-fast) var(--m-ease), opacity var(--m-dur-fast) var(--m-ease), inset-inline-start var(--m-dur-fast) var(--m-ease); }
+.m-tv-drop::before { content: ""; position: absolute; inset-inline-start: -4px; inset-block-start: -3px; width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--m-primary); background: var(--m-surface); box-sizing: border-box; }
 /* the drag ghost lives in the drag layer (fixed, pointer-events none); dragGhost places it at the pointer (viewport px) */
-.hm-tv-ghost { position: fixed; display: inline-flex; align-items: center; gap: .5rem; max-width: 16rem; padding: .375rem .75rem; border-radius: var(--hm-radius-2);
-  background: var(--hm-surface); color: var(--hm-text); box-shadow: var(--hm-shadow-3); border: 1px solid var(--hm-border); font-size: var(--hm-text-sm); pointer-events: none; }
-.hm-tv-ghost-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-tv-ghost { position: fixed; display: inline-flex; align-items: center; gap: .5rem; max-width: 16rem; padding: .375rem .75rem; border-radius: var(--m-radius-2);
+  background: var(--m-surface); color: var(--m-text); box-shadow: var(--m-shadow-3); border: 1px solid var(--m-border); font-size: var(--m-text-sm); pointer-events: none; }
+.m-tv-ghost-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* rows that can be dragged say so (grab cursor) */
-.hm-tv.is-draggable .hm-tv-row.hm-listrow:not(.is-disabled) { cursor: grab; }
-.hm-tv.is-draggable .hm-tv-row.hm-listrow.is-dragging { cursor: grabbing; }
+.m-tv.is-draggable .m-tv-row.m-listrow:not(.is-disabled) { cursor: grab; }
+.m-tv.is-draggable .m-tv-row.m-listrow.is-dragging { cursor: grabbing; }
 /* an own arrow is drawn for the open state it gets: as wide as its content */
-.hm-tv-chev.is-own { inline-size: auto; min-inline-size: .875rem; block-size: auto; }
+.m-tv-chev.is-own { inline-size: auto; min-inline-size: .875rem; block-size: auto; }

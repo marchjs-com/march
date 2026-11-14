@@ -52,13 +52,13 @@ export function ResizeHandle(props: ResizeHandleProps): Element {
   const el = h("span", {
     "aria-hidden": keys ? null : "true",
     ...rest(props, USED),
-    class: () => cx("hm-resize-handle", `hm-resize-handle-${edge}`, axis === "block" && "hm-resize-handle-block", corner && "hm-resize-handle-corner",
-      `hm-resize-handle-line-${val(props.line) ?? "hover"}`, val(props.disabled) && "is-disabled", val(props.class)),
-    "data-hm-color": colorAttr(props.color),
+    class: () => cx("m-resize-handle", `m-resize-handle-${edge}`, axis === "block" && "m-resize-handle-block", corner && "m-resize-handle-corner",
+      `m-resize-handle-line-${val(props.line) ?? "hover"}`, val(props.disabled) && "is-disabled", val(props.class)),
+    "data-m-color": colorAttr(props.color),
     "aria-label": keys ? () => val(props.label) ?? t`Resize` : null,
     tabindex: keys ? () => (val(props.disabled) ? "-1" : (props.tabindex as string | undefined) ?? "0") : (props.tabindex as string | undefined) ?? null,
   },
-  props.grip ? h("span", { class: cx("hm-resize-handle-grip", props.grip !== true && "is-own"), "aria-hidden": "true" }, props.grip === true ? null : props.grip) : null) as HTMLElement;
+  props.grip ? h("span", { class: cx("m-resize-handle-grip", props.grip !== true && "is-own"), "aria-hidden": "true" }, props.grip === true ? null : props.grip) : null) as HTMLElement;
 
   if (full) {
     const stop = resizeHandle(el, {

@@ -15,7 +15,7 @@ export interface TimeInputProps extends ControlProps<string> {
 export function TimeInput(props: TimeInputProps): unknown {
   const [get, set] = model(props, "");
   const el = h("input", {
-    ...ctl(props), type: "time", class: cx("hm-input hm-time", props.class), min: () => props.min ?? null, max: () => props.max ?? null,
+    ...ctl(props), type: "time", class: cx("m-input m-time", props.class), min: () => props.min ?? null, max: () => props.max ?? null,
     step: () => props.step ?? null, readonly: () => !!props.readonly, onInput: (e: Event) => set((e.target as HTMLInputElement).value),
   }) as HTMLInputElement;
   syncValue(el, get);

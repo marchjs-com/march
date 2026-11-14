@@ -135,8 +135,8 @@ export function renderTest(fn: () => unknown, opts: RenderTestOptions = {}): Tes
       await s.flush();
     },
     async submit(sel = "form") { (root().querySelector(sel) as Element).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })); await s.flush(); },
-    async confirm() { const d = lastDialog(); if (!d) throw new Error("March testing: no open dialog"); const b = d.querySelector("[data-hm-ok],.hm-btn-primary,.hm-btn-danger,button[type=submit]") as HTMLElement; b.click(); await s.flush(); },
-    async cancel() { const d = lastDialog(); if (!d) throw new Error("March testing: no open dialog"); const b = (d.querySelector("[data-hm-cancel]") ?? Array.from(d.querySelectorAll("button")).find((x) => /cancel|vazgeç|iptal|abbrechen|annuler/i.test(x.textContent ?? ""))) as HTMLElement; b.click(); await s.flush(); },
+    async confirm() { const d = lastDialog(); if (!d) throw new Error("March testing: no open dialog"); const b = d.querySelector("[data-m-ok],.m-btn-primary,.m-btn-danger,button[type=submit]") as HTMLElement; b.click(); await s.flush(); },
+    async cancel() { const d = lastDialog(); if (!d) throw new Error("March testing: no open dialog"); const b = (d.querySelector("[data-m-cancel]") ?? Array.from(d.querySelectorAll("button")).find((x) => /cancel|vazgeç|iptal|abbrechen|annuler/i.test(x.textContent ?? ""))) as HTMLElement; b.click(); await s.flush(); },
     fetchCalls: () => fetchMock?.calls ?? [],
     dispose() { dispose(); fetchMock?.restore(); container.remove(); },
   };

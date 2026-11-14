@@ -45,7 +45,7 @@ export default function Product(props) {
   routing never gets an automatic canonical: every route is the same document.
 - **Not found:** gets `robots: noindex` (`noindexNotFound: false` to turn off).
 - **DOM:** tags are updated in place. A tag that was in the static HTML is restored when nothing sets it any more;
-  tags added by March (`data-hm-head`) are removed. No `innerHTML`: elements are built with `createElement`,
+  tags added by March (`data-m-head`) are removed. No `innerHTML`: elements are built with `createElement`,
   JSON-LD with a text node, and a JSON-LD block already in the HTML (prerendered) is reused when its text is the same.
 - **Trusted Types:** under `require-trusted-types-for 'script'` the browser blocks (and reports) script text written at
   run time, JSON-LD included. Use `installSeo({ jsonLd: false })` there and put structured data in at build time
@@ -93,7 +93,7 @@ hydrate(() => <Router />, document.getElementById("app"));
 March builds DOM with fine-grained bindings rather than patching markup, so hydration is a swap: the app renders
 off-screen while the prerendered page stays visible, and once the router shows its page (nothing loading) the new
 nodes replace the old ones in one step (`ready`, `timeout` options). The container carries
-`data-hm-prerender="/about"`; when the URL shows another route (an SPA fallback serving the root page, or a hash route
+`data-m-prerender="/about"`; when the URL shows another route (an SPA fallback serving the root page, or a hash route
 such as `#/charts` on a page prerendered for `#/`) the stale content is dropped at once, so it never flashes.
 `hydrate()` without prerendered content is `render()`.
 

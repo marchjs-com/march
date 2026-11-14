@@ -61,7 +61,7 @@ export interface WindowProps {
   resizable?: boolean | undefined;
   /** Dock when dragged to an edge (default true). */
   snap?: boolean | undefined;
-  /** Keep place, size and state in localStorage under "hm.win.<persist>". */
+  /** Keep place, size and state in localStorage under "m.win.<persist>". */
   persist?: string | undefined;
   /** Texts of the buttons and the title bar (the defaults are translated). */
   labels?: { close?: string; minimize?: string; restore?: string; maximize?: string; move?: string; moveHint?: string } | undefined;
@@ -86,8 +86,8 @@ let front = 1;
 
 /** A window in its area: move, resize, dock to an edge, minimize, fill, close; Windows, Mac or HADİ look. */
 export function Window(props: WindowProps): unknown {
-  const id = uid("hm-win");
-  const key = props.persist ? `hm.win.${props.persist}` : "";
+  const id = uid("m-win");
+  const key = props.persist ? `m.win.${props.persist}` : "";
   const saved = key ? load<{ geo?: Geo; state?: WindowState } | null>(key, null) : null;
   const geo = signal<Geo | null>(saved?.geo ?? null);
   const state = signal<WindowState>(saved?.state ?? untrack(() => val(props.state)) ?? "normal");
@@ -141,7 +141,7 @@ export function Window(props: WindowProps): unknown {
     track(el, {
       clamp: false, area,
       onStart: (p) => {
-        if (props.movable === false || (p.event.target as Element).closest(".hm-win-btn")) return false;
+        if (props.movable === false || (p.event.target as Element).closest(".m-win-btn")) return false;
         raise();
         const g = geo.peek()!;
         // dragging a filled or docked window puts it back to its own size, under the pointer where it was grabbed
@@ -173,7 +173,7 @@ export function Window(props: WindowProps): unknown {
   const grip = (edge: Edge): unknown => {
     let from: Geo = { x: 0, y: 0, w: 0, h: 0 };
     // the bare grip of ResizeHandle (the frame's own border is the line); the window runs the two-axis gesture
-    return h(ResizeHandle, { edge, line: "none", class: "hm-win-rz", ref: (el: HTMLElement) => track(el, {
+    return h(ResizeHandle, { edge, line: "none", class: "m-win-rz", ref: (el: HTMLElement) => track(el, {
       clamp: false, area,
       onStart: () => { raise(); from = geo.peek()!; moving.set(true); },
       onMove: (p) => {
@@ -208,22 +208,22 @@ export function Window(props: WindowProps): unknown {
   const chrome = (): WindowChrome => val(props.chrome) ?? "hadi";
   type IconKey = "close" | "minimize" | "maximize" | "restore";
   // a given icon (icon, text or node) replaces the built-in glyph
-  const pic = (k: IconKey, def: IconDef): unknown => ownIcon(props.icons?.[k] ?? undefined, def, "hm-win-glyph-own");
+  const pic = (k: IconKey, def: IconDef): unknown => ownIcon(props.icons?.[k] ?? undefined, def, "m-win-glyph-own");
   const restoreText = (): string => props.labels?.restore ?? t`Restore`;
   // the chrome's CSS sizes and shapes the buttons (square, traffic lights, round)
   const btn = (cls: string, label: () => string, icon: () => unknown, onClick: () => void): unknown =>
-    h(IconButton, { class: `hm-win-btn ${cls}`, label, icon: h("span", { class: "hm-win-glyph", "aria-hidden": "true" }, icon), onClick: (e: MouseEvent) => { e.stopPropagation(); onClick(); } });
+    h(IconButton, { class: `m-win-btn ${cls}`, label, icon: h("span", { class: "m-win-glyph", "aria-hidden": "true" }, icon), onClick: (e: MouseEvent) => { e.stopPropagation(); onClick(); } });
   bar = h(PanelHeader, {
-    as: "div", size: "sm", drag: true, class: "hm-win-bar", tabindex: "0", role: "toolbar", "aria-label": () => props.labels?.move ?? t`Move window`, color: props.color,
+    as: "div", size: "sm", drag: true, class: "m-win-bar", tabindex: "0", role: "toolbar", "aria-label": () => props.labels?.move ?? t`Move window`, color: props.color,
     "aria-description": () => props.labels?.moveHint ?? t`Arrows move the window, Shift and arrows resize it, Enter fills the area`,
-    onDblClick: (e: MouseEvent) => { if (!(e.target as Element).closest(".hm-win-btn") && props.maximizable !== false) toggleMax(); },
+    onDblClick: (e: MouseEvent) => { if (!(e.target as Element).closest(".m-win-btn") && props.maximizable !== false) toggleMax(); },
     onKeyDown: onKey, ref: (el: HTMLElement) => moveTitle(el),
-    icon: props.icon != null ? h("span", { class: "hm-panel-header-icon hm-win-icon", "aria-hidden": "true" }, props.icon) : null,
-    title: () => val(props.title) ?? "", titleAs: "span", titleId: `${id}-title`, partClass: { title: "hm-win-title", actions: "hm-win-buttons" },
+    icon: props.icon != null ? h("span", { class: "m-panel-header-icon m-win-icon", "aria-hidden": "true" }, props.icon) : null,
+    title: () => val(props.title) ?? "", titleAs: "span", titleId: `${id}-title`, partClass: { title: "m-win-title", actions: "m-win-buttons" },
     actions: [
-      props.closable === false ? null : btn("hm-win-close", () => props.labels?.close ?? t`Close`, () => pic("close", xIcon), close),
-      props.minimizable === false ? null : btn("hm-win-min", () => (state() === "minimized" ? restoreText() : props.labels?.minimize ?? t`Minimize`), () => pic("minimize", minus), () => setState(state.peek() === "minimized" ? "normal" : "minimized")),
-      props.maximizable === false ? null : btn("hm-win-max", () => (state() === "normal" ? props.labels?.maximize ?? t`Fill the area` : restoreText()), () => (state() === "normal" || state() === "minimized" ? pic("maximize", maximize) : pic("restore", copy)), toggleMax),
+      props.closable === false ? null : btn("m-win-close", () => props.labels?.close ?? t`Close`, () => pic("close", xIcon), close),
+      props.minimizable === false ? null : btn("m-win-min", () => (state() === "minimized" ? restoreText() : props.labels?.minimize ?? t`Minimize`), () => pic("minimize", minus), () => setState(state.peek() === "minimized" ? "normal" : "minimized")),
+      props.maximizable === false ? null : btn("m-win-max", () => (state() === "normal" ? props.labels?.maximize ?? t`Fill the area` : restoreText()), () => (state() === "normal" || state() === "minimized" ? pic("maximize", maximize) : pic("restore", copy)), toggleMax),
     ],
   }) as HTMLElement;
 
@@ -231,20 +231,20 @@ export function Window(props: WindowProps): unknown {
   const snapRect = (s: WindowState, b: { w: number; h: number }): Geo =>
     s === "start" ? { x: 0, y: 0, w: b.w / 2, h: b.h } : s === "end" ? { x: b.w / 2, y: 0, w: b.w / 2, h: b.h } : s === "bottom" ? { x: 0, y: b.h / 2, w: b.w, h: b.h / 2 } : { x: 0, y: 0, w: b.w, h: b.h };
   const snapPreview = h("div", {
-    class: () => cx("hm-win-snap", snapTo() && "is-on"), "aria-hidden": "true", "data-hm-color": colorAttr(props.color),
-    style: () => { const s = snapTo(), g = geo(); if (!s || !g) return {}; const r = snapRect(s, box()); return { "--hm-win-sx": `${r.x - g.x}px`, "--hm-win-sy": `${r.y - g.y}px`, "--hm-win-sw": `${r.w}px`, "--hm-win-sh": `${r.h}px` }; },
+    class: () => cx("m-win-snap", snapTo() && "is-on"), "aria-hidden": "true", "data-m-color": colorAttr(props.color),
+    style: () => { const s = snapTo(), g = geo(); if (!s || !g) return {}; const r = snapRect(s, box()); return { "--m-win-sx": `${r.x - g.x}px`, "--m-win-sy": `${r.y - g.y}px`, "--m-win-sw": `${r.w}px`, "--m-win-sh": `${r.h}px` }; },
   }) as HTMLElement;
   const shown = (): boolean => (props.open != null ? !!val(props.open) : !closed());
 
   const frame = h("section", {
-    class: () => cx("hm-win", `hm-win-${chrome()}`, `is-${state()}`, moving() && "is-moving", props.resizable === false && "is-fixed-size", props.stripe === false && "hm-win-no-stripe", props.animated === false && "is-static", val(props.class)),
+    class: () => cx("m-win", `m-win-${chrome()}`, `is-${state()}`, moving() && "is-moving", props.resizable === false && "is-fixed-size", props.stripe === false && "m-win-no-stripe", props.animated === false && "is-static", val(props.class)),
     "aria-labelledby": `${id}-title`, hidden: () => (shown() ? null : ""),
-    style: () => { const g = geo(); return g ? { "--hm-win-x": `${g.x}px`, "--hm-win-y": `${g.y}px`, "--hm-win-w": `${g.w}px`, "--hm-win-h": `${g.h}px`, "z-index": String(z()), visibility: "visible" } : { "z-index": String(z()), visibility: "hidden" }; },
+    style: () => { const g = geo(); return g ? { "--m-win-x": `${g.x}px`, "--m-win-y": `${g.y}px`, "--m-win-w": `${g.w}px`, "--m-win-h": `${g.h}px`, "z-index": String(z()), visibility: "visible" } : { "z-index": String(z()), visibility: "hidden" }; },
     onPointerDown: raise, onFocusIn: raise,
     ref: (el: HTMLElement) => { root = el; },
   },
   bar,
-  h("div", { class: "hm-win-body", hidden: () => (state() === "minimized" ? "" : null) }, props.children),
+  h("div", { class: "m-win-body", hidden: () => (state() === "minimized" ? "" : null) }, props.children),
   props.resizable === false ? null : EDGES.map(grip),
   snapPreview) as HTMLElement;
 

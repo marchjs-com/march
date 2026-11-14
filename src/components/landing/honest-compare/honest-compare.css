@@ -1,21 +1,21 @@
 /* HonestCompare. The product's column is tinted; behind rows get a warm edge and keep their note visible. */
-.hm-hc { display: grid; gap: var(--hm-space-4); }
-.hm-hc-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--hm-space-3); }
-.hm-hc-counts { margin: 0; color: var(--hm-muted); }
-.hm-hc-scroll:focus-visible { outline: 2px solid var(--hm-primary); outline-offset: 2px; }
-.hm-hc-scroll { overflow-x: auto; border: 1px solid var(--hm-border); border-radius: var(--hm-radius-4); background: var(--hm-surface); }
-.hm-hc-table { inline-size: 100%; min-inline-size: 34rem; border-collapse: collapse; font-size: var(--hm-text-sm); }
-.hm-hc-caption { caption-side: top; padding: var(--hm-space-3) var(--hm-space-4); text-align: start; font-weight: var(--hm-weight-semibold); }
-.hm-hc-table th, .hm-hc-table td { padding: var(--hm-space-3) var(--hm-space-4); border-block-end: 1px solid var(--hm-border); text-align: center; vertical-align: middle; }
-.hm-hc-head { font-size: var(--hm-text-md); font-weight: var(--hm-weight-semibold); }
-.hm-hc-corner, .hm-hc-label { position: sticky; inset-inline-start: 0; z-index: 1; background: var(--hm-surface); }
-.hm-hc-label { text-align: start !important; font-weight: var(--hm-weight-medium, 500); }
-.hm-hc-label > span:first-child { margin-inline-end: var(--hm-space-2); }
-.hm-hc-us { background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 8%, transparent); }
-.hm-hc-head.hm-hc-us { color: var(--hm-accent-text, var(--hm-primary)); box-shadow: inset 0 3px 0 var(--hm-accent, var(--hm-primary)); }
-.hm-hc-none { color: var(--hm-muted); }
-.hm-hc-row.is-behind .hm-hc-label { box-shadow: inset 3px 0 0 var(--hm-warn); }
-.hm-hc-row:has(+ .hm-hc-note-row) > * { border-block-end: 0; }
-.hm-hc-note { text-align: start !important; padding-block-start: 0 !important; color: var(--hm-muted); font-size: var(--hm-text-xs); line-height: 1.5; }
-.hm-hc-note-row.is-behind .hm-hc-note { color: var(--hm-text); box-shadow: inset 3px 0 0 var(--hm-warn); }
-.hm-hc-table tbody tr:last-child > * { border-block-end: 0; }
+.m-hc { display: grid; gap: var(--m-space-4); }
+.m-hc-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--m-space-3); }
+.m-hc-counts { margin: 0; color: var(--m-muted); }
+.m-hc-scroll:focus-visible { outline: 2px solid var(--m-primary); outline-offset: 2px; }
+.m-hc-scroll { overflow-x: auto; border: 1px solid var(--m-border); border-radius: var(--m-radius-4); background: var(--m-surface); }
+.m-hc-table { inline-size: 100%; min-inline-size: 34rem; border-collapse: collapse; font-size: var(--m-text-sm); }
+.m-hc-caption { caption-side: top; padding: var(--m-space-3) var(--m-space-4); text-align: start; font-weight: var(--m-weight-semibold); }
+.m-hc-table th, .m-hc-table td { padding: var(--m-space-3) var(--m-space-4); border-block-end: 1px solid var(--m-border); text-align: center; vertical-align: middle; }
+.m-hc-head { font-size: var(--m-text-md); font-weight: var(--m-weight-semibold); }
+.m-hc-corner, .m-hc-label { position: sticky; inset-inline-start: 0; z-index: 1; background: var(--m-surface); }
+.m-hc-label { text-align: start !important; font-weight: var(--m-weight-medium, 500); }
+.m-hc-label > span:first-child { margin-inline-end: var(--m-space-2); }
+.m-hc-us { background: color-mix(in srgb, var(--m-accent, var(--m-primary)) 8%, transparent); }
+.m-hc-head.m-hc-us { color: var(--m-accent-text, var(--m-primary)); box-shadow: inset 0 3px 0 var(--m-accent, var(--m-primary)); }
+.m-hc-none { color: var(--m-muted); }
+.m-hc-row.is-behind .m-hc-label { box-shadow: inset 3px 0 0 var(--m-warn); }
+.m-hc-row:has(+ .m-hc-note-row) > * { border-block-end: 0; }
+.m-hc-note { text-align: start !important; padding-block-start: 0 !important; color: var(--m-muted); font-size: var(--m-text-xs); line-height: 1.5; }
+.m-hc-note-row.is-behind .m-hc-note { color: var(--m-text); box-shadow: inset 3px 0 0 var(--m-warn); }
+.m-hc-table tbody tr:last-child > * { border-block-end: 0; }

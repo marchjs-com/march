@@ -44,6 +44,6 @@ export default function MenuDemo(props: { values: { checks: string; kind: string
         "-", remove,
       ]} />
     }}
-    <span class="hm-muted">{() => (props.values.kind === "dropdown" ? `Süzgeç: ${[...$filters].join(", ") || "yok"}` : $last ? `Seçilen: ${$last}` : "")}</span>
+    <span class="m-muted">{() => (props.values.kind === "dropdown" ? `Süzgeç: ${[...$filters].join(", ") || "yok"}` : $last ? `Seçilen: ${$last}` : "")}</span>
   </div>
 }

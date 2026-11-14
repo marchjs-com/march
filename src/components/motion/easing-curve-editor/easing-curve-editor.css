@@ -1,78 +1,78 @@
 /* March — EasingCurveEditor. Imported by its component module; tokens.css provides the variables. */
-.hm-ec { --hm-ec-accent: var(--hm-accent, var(--hm-primary)); --hm-ec-h1: var(--hm-brand-orange, var(--hm-cat-1)); --hm-ec-h2: var(--hm-brand-blue, var(--hm-cat-2));
+.m-ec { --m-ec-accent: var(--m-accent, var(--m-primary)); --m-ec-h1: var(--m-brand-orange, var(--m-cat-1)); --m-ec-h2: var(--m-brand-blue, var(--m-cat-2));
   max-width: 100%; }
-.hm-ec > .hm-card-body { display: flex; flex-direction: column; gap: var(--hm-space-3); padding: var(--hm-space-3); }
+.m-ec > .m-card-body { display: flex; flex-direction: column; gap: var(--m-space-3); padding: var(--m-space-3); }
 /* the plot fills its cell: it shows only the value range the curve uses and stretches to the box; lines and handles
    keep their pixel size (non-scaling strokes; a handle is a zero-length round-capped line) */
-.hm-ec-main { display: grid; grid-template-columns: minmax(8rem, 2fr) minmax(0, 3fr); gap: var(--hm-space-4); align-items: stretch; }
-@container (max-width: 30rem) { .hm-ec-main { grid-template-columns: minmax(0, 1fr); } }
-.hm-ec { container-type: inline-size; }
+.m-ec-main { display: grid; grid-template-columns: minmax(8rem, 2fr) minmax(0, 3fr); gap: var(--m-space-4); align-items: stretch; }
+@container (max-width: 30rem) { .m-ec-main { grid-template-columns: minmax(0, 1fr); } }
+.m-ec { container-type: inline-size; }
 
 /* plot and lane: time runs left to right in every writing direction */
-.hm-ec-plot, .hm-ec-lane { direction: ltr; }
-.hm-ec-plot { display: block; inline-size: 100%; block-size: 100%; min-block-size: 11rem; max-block-size: 18rem; overflow: visible; touch-action: none; cursor: crosshair; user-select: none; }
-.hm-ec-plot :is(line, path) { vector-effect: non-scaling-stroke; }
-.hm-ec-zone { fill: var(--hm-bg-subtle); stroke: none; }
-.hm-ec-grid { stroke: var(--hm-border-subtle); stroke-width: 1px; }
-.hm-ec-axis { stroke: var(--hm-border-strong); stroke-width: 1px; }
-.hm-ec-diag { stroke: var(--hm-border); stroke-width: 1px; stroke-dasharray: 4 4; }
-.hm-ec-curve { fill: none; stroke: var(--hm-text); stroke-width: 2.5px; stroke-linecap: round; }
-.hm-ec-curve-glow { fill: none; stroke: var(--hm-ec-accent); stroke-width: 8px; stroke-linecap: round; opacity: .18; }
-.hm-ec-arm { stroke-width: 1.5px; }
-.hm-ec-h1 .hm-ec-arm { stroke: var(--hm-ec-h1); }
-.hm-ec-h2 .hm-ec-arm { stroke: var(--hm-ec-h2); }
-.hm-ec-ring, .hm-ec-knob, .hm-ec-marker { stroke-linecap: round; transition: stroke-width var(--hm-dur-fast) var(--hm-ease-spring); }
-.hm-ec-ring { stroke: var(--hm-surface); stroke-width: 15px; pointer-events: none; }
-.hm-ec-knob { stroke-width: 11px; cursor: grab; outline: none; }
-.hm-ec-h1 .hm-ec-knob { stroke: var(--hm-ec-h1); }
-.hm-ec-h2 .hm-ec-knob { stroke: var(--hm-ec-h2); }
-.hm-ec-handle:hover .hm-ec-knob, .hm-ec-handle.is-active .hm-ec-knob { stroke-width: 14px; }
-.hm-ec-handle:hover .hm-ec-ring, .hm-ec-handle.is-active .hm-ec-ring { stroke-width: 18px; }
-.hm-ec-handle:has(.hm-ec-knob:focus-visible) .hm-ec-ring { stroke: var(--hm-focus); stroke-width: 20px; }
-.hm-ec-marker { stroke: var(--hm-ec-accent); stroke-width: 7px; }
+.m-ec-plot, .m-ec-lane { direction: ltr; }
+.m-ec-plot { display: block; inline-size: 100%; block-size: 100%; min-block-size: 11rem; max-block-size: 18rem; overflow: visible; touch-action: none; cursor: crosshair; user-select: none; }
+.m-ec-plot :is(line, path) { vector-effect: non-scaling-stroke; }
+.m-ec-zone { fill: var(--m-bg-subtle); stroke: none; }
+.m-ec-grid { stroke: var(--m-border-subtle); stroke-width: 1px; }
+.m-ec-axis { stroke: var(--m-border-strong); stroke-width: 1px; }
+.m-ec-diag { stroke: var(--m-border); stroke-width: 1px; stroke-dasharray: 4 4; }
+.m-ec-curve { fill: none; stroke: var(--m-text); stroke-width: 2.5px; stroke-linecap: round; }
+.m-ec-curve-glow { fill: none; stroke: var(--m-ec-accent); stroke-width: 8px; stroke-linecap: round; opacity: .18; }
+.m-ec-arm { stroke-width: 1.5px; }
+.m-ec-h1 .m-ec-arm { stroke: var(--m-ec-h1); }
+.m-ec-h2 .m-ec-arm { stroke: var(--m-ec-h2); }
+.m-ec-ring, .m-ec-knob, .m-ec-marker { stroke-linecap: round; transition: stroke-width var(--m-dur-fast) var(--m-ease-spring); }
+.m-ec-ring { stroke: var(--m-surface); stroke-width: 15px; pointer-events: none; }
+.m-ec-knob { stroke-width: 11px; cursor: grab; outline: none; }
+.m-ec-h1 .m-ec-knob { stroke: var(--m-ec-h1); }
+.m-ec-h2 .m-ec-knob { stroke: var(--m-ec-h2); }
+.m-ec-handle:hover .m-ec-knob, .m-ec-handle.is-active .m-ec-knob { stroke-width: 14px; }
+.m-ec-handle:hover .m-ec-ring, .m-ec-handle.is-active .m-ec-ring { stroke-width: 18px; }
+.m-ec-handle:has(.m-ec-knob:focus-visible) .m-ec-ring { stroke: var(--m-focus); stroke-width: 20px; }
+.m-ec-marker { stroke: var(--m-ec-accent); stroke-width: 7px; }
 
 /* preview: a ball eased along the lane, a faint linear one beside it */
-.hm-ec-side { display: flex; flex-direction: column; gap: var(--hm-space-3); min-width: 0; }
-.hm-ec-stage { padding: var(--hm-space-3); border-radius: var(--hm-radius-2); background: var(--hm-bg-subtle); }
-.hm-ec-lane { position: relative; block-size: 2.25rem; }
-.hm-ec-lane::before { content: ""; position: absolute; inset-inline: .5rem; inset-block-start: 50%; block-size: 2px; border-radius: 2px; background: var(--hm-border); }
-.hm-ec-ball { position: absolute; inset-block-start: 50%; inset-inline-start: 0; inline-size: 1.5rem; block-size: 1.5rem; margin-block-start: -.75rem; border-radius: 50%;
-  background: var(--hm-ec-accent); box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--hm-ec-accent) 70%, transparent);
-  translate: calc(var(--hm-ec-p, 0) * (var(--hm-ec-w, 14rem) - 1.5rem)) 0; }
-.hm-ec-ghost { background: var(--hm-border-strong); box-shadow: none; opacity: .45; inline-size: .75rem; block-size: .75rem; margin-block-start: -.375rem; translate: calc(var(--hm-ec-t, 0) * (var(--hm-ec-w, 14rem) - .75rem)) 0; }
-.hm-ec-lane { --hm-ec-w: 100%; container-type: inline-size; }
-.hm-ec-stage .hm-ec-ball { translate: calc(var(--hm-ec-p, 0) * (100cqi - 1.5rem)) 0; }
-.hm-ec-stage .hm-ec-ghost { translate: calc(var(--hm-ec-t, 0) * (100cqi - .75rem)) 0; }
-.hm-ec-stage.is-scale .hm-ec-ball { inset-inline-start: calc(50% - .75rem); translate: none; scale: calc(.2 + var(--hm-ec-p, 0) * 1.1); }
-.hm-ec-stage.is-fade .hm-ec-ball { inset-inline-start: calc(50% - .75rem); translate: none; opacity: var(--hm-ec-p, 0); }
-.hm-ec-stage.is-scale .hm-ec-ghost, .hm-ec-stage.is-fade .hm-ec-ghost { display: none; }
+.m-ec-side { display: flex; flex-direction: column; gap: var(--m-space-3); min-width: 0; }
+.m-ec-stage { padding: var(--m-space-3); border-radius: var(--m-radius-2); background: var(--m-bg-subtle); }
+.m-ec-lane { position: relative; block-size: 2.25rem; }
+.m-ec-lane::before { content: ""; position: absolute; inset-inline: .5rem; inset-block-start: 50%; block-size: 2px; border-radius: 2px; background: var(--m-border); }
+.m-ec-ball { position: absolute; inset-block-start: 50%; inset-inline-start: 0; inline-size: 1.5rem; block-size: 1.5rem; margin-block-start: -.75rem; border-radius: 50%;
+  background: var(--m-ec-accent); box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--m-ec-accent) 70%, transparent);
+  translate: calc(var(--m-ec-p, 0) * (var(--m-ec-w, 14rem) - 1.5rem)) 0; }
+.m-ec-ghost { background: var(--m-border-strong); box-shadow: none; opacity: .45; inline-size: .75rem; block-size: .75rem; margin-block-start: -.375rem; translate: calc(var(--m-ec-t, 0) * (var(--m-ec-w, 14rem) - .75rem)) 0; }
+.m-ec-lane { --m-ec-w: 100%; container-type: inline-size; }
+.m-ec-stage .m-ec-ball { translate: calc(var(--m-ec-p, 0) * (100cqi - 1.5rem)) 0; }
+.m-ec-stage .m-ec-ghost { translate: calc(var(--m-ec-t, 0) * (100cqi - .75rem)) 0; }
+.m-ec-stage.is-scale .m-ec-ball { inset-inline-start: calc(50% - .75rem); translate: none; scale: calc(.2 + var(--m-ec-p, 0) * 1.1); }
+.m-ec-stage.is-fade .m-ec-ball { inset-inline-start: calc(50% - .75rem); translate: none; opacity: var(--m-ec-p, 0); }
+.m-ec-stage.is-scale .m-ec-ghost, .m-ec-stage.is-fade .m-ec-ghost { display: none; }
 
 /* numbers, output, presets */
-.hm-ec-inputs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--hm-space-2); }
-.hm-ec-field .hm-label { color: var(--hm-faint); font: var(--hm-text-xs) var(--hm-font-mono); }
-.hm-ec-num { min-width: 0; padding-inline: .375rem; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); }
-.hm-ec-css { padding: var(--hm-space-2) var(--hm-space-3); border-radius: var(--hm-radius-2); background: var(--hm-surface-2); font-family: var(--hm-font-mono); font-size: var(--hm-text-xs); overflow-wrap: anywhere; }
-.hm-ec-name { margin: 0; color: var(--hm-text-2); font-size: var(--hm-text-xs); }
-.hm-ec-presets { display: flex; flex-wrap: wrap; gap: var(--hm-space-2); }
+.m-ec-inputs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--m-space-2); }
+.m-ec-field .m-label { color: var(--m-faint); font: var(--m-text-xs) var(--m-font-mono); }
+.m-ec-num { min-width: 0; padding-inline: .375rem; font-family: var(--m-font-mono); font-size: var(--m-text-sm); }
+.m-ec-css { padding: var(--m-space-2) var(--m-space-3); border-radius: var(--m-radius-2); background: var(--m-surface-2); font-family: var(--m-font-mono); font-size: var(--m-text-xs); overflow-wrap: anywhere; }
+.m-ec-name { margin: 0; color: var(--m-text-2); font-size: var(--m-text-xs); }
+.m-ec-presets { display: flex; flex-wrap: wrap; gap: var(--m-space-2); }
 /* a preset is a Button with its curve above its name */
-.hm-ec-preset.hm-btn { flex-direction: column; gap: .125rem; block-size: auto; min-block-size: 0; padding: .375rem .5rem .25rem; border-color: var(--hm-border); border-radius: var(--hm-radius-2); box-shadow: none; color: var(--hm-text-2); font-size: .6875rem; }
-.hm-ec-preset.hm-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--hm-border-strong); }
-.hm-ec-preset.hm-btn.is-pressed { border-color: var(--hm-ec-accent); color: var(--hm-accent-text, var(--hm-primary-text)); }
-.hm-ec-thumb { inline-size: 2.25rem; block-size: 2.25rem; }
-.hm-ec-thumb path { fill: none; stroke: currentColor; stroke-width: 8; stroke-linecap: round; }
-.hm-ec-stage.is-none { display: none; }
+.m-ec-preset.m-btn { flex-direction: column; gap: .125rem; block-size: auto; min-block-size: 0; padding: .375rem .5rem .25rem; border-color: var(--m-border); border-radius: var(--m-radius-2); box-shadow: none; color: var(--m-text-2); font-size: .6875rem; }
+.m-ec-preset.m-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--m-border-strong); }
+.m-ec-preset.m-btn.is-pressed { border-color: var(--m-ec-accent); color: var(--m-accent-text, var(--m-primary-text)); }
+.m-ec-thumb { inline-size: 2.25rem; block-size: 2.25rem; }
+.m-ec-thumb path { fill: none; stroke: currentColor; stroke-width: 8; stroke-linecap: round; }
+.m-ec-stage.is-none { display: none; }
 
 /* compact (an inspector): a small curve beside the numbers, presets in one scrolling row */
-.hm-ec-compact > .hm-card-body { gap: var(--hm-space-2); padding: var(--hm-space-2); }
-.hm-ec-compact .hm-ec-main { gap: var(--hm-space-3); grid-template-columns: minmax(0, 1fr) auto; }
+.m-ec-compact > .m-card-body { gap: var(--m-space-2); padding: var(--m-space-2); }
+.m-ec-compact .m-ec-main { gap: var(--m-space-3); grid-template-columns: minmax(0, 1fr) auto; }
 /* the curve takes all the room the numbers leave */
-.hm-ec-compact .hm-ec-plot { min-block-size: 10rem; max-block-size: 14rem; }
-.hm-ec-compact .hm-ec-css { display: none; }
-.hm-ec-compact .hm-ec-inputs { grid-template-columns: repeat(2, auto); }
+.m-ec-compact .m-ec-plot { min-block-size: 10rem; max-block-size: 14rem; }
+.m-ec-compact .m-ec-css { display: none; }
+.m-ec-compact .m-ec-inputs { grid-template-columns: repeat(2, auto); }
 /* number boxes about 7 characters wide plus the stepper ("-0.354" fits) */
-.hm-ec-compact .hm-ec-num { inline-size: calc(7ch + 2rem + 2px); }
-.hm-ec-compact .hm-ec-presets { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; padding-block-end: 2px; }
-.hm-ec-compact .hm-ec-preset.hm-btn { flex: none; padding: .25rem .375rem .125rem; }
-.hm-ec-compact .hm-ec-thumb { inline-size: 1.75rem; block-size: 1.75rem; }
+.m-ec-compact .m-ec-num { inline-size: calc(7ch + 2rem + 2px); }
+.m-ec-compact .m-ec-presets { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; padding-block-end: 2px; }
+.m-ec-compact .m-ec-preset.m-btn { flex: none; padding: .25rem .375rem .125rem; }
+.m-ec-compact .m-ec-thumb { inline-size: 1.75rem; block-size: 1.75rem; }
 /* narrow (a phone): the curve above the numbers */
-@container (max-width: 22rem) { .hm-ec-compact .hm-ec-main { grid-template-columns: minmax(0, 1fr); } .hm-ec-compact .hm-ec-side { justify-self: center; } .hm-ec-compact .hm-ec-plot { block-size: 10rem; } }
+@container (max-width: 22rem) { .m-ec-compact .m-ec-main { grid-template-columns: minmax(0, 1fr); } .m-ec-compact .m-ec-side { justify-self: center; } .m-ec-compact .m-ec-plot { block-size: 10rem; } }

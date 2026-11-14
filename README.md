@@ -102,10 +102,10 @@ import "hadi-march/css/font.css";      // self-hosted Inter, Figtree, Bricolage 
 import "hadi-march/css/tokens.css";     // tokens + every built-in theme
 import { setColorTheme, setTheme, ThemePicker } from "hadi-march/ui";
 
-setColorTheme("neon");                 // <html data-hm-theme="neon">, remembered in localStorage
+setColorTheme("neon");                 // <html data-m-theme="neon">, remembered in localStorage
 setTheme("dark");                      // light | dark | system
 <ThemePicker />                        // theme list with live swatches + appearance switch
-<section data-hm-theme="night">…</section>   // scope a theme to part of the page
+<section data-m-theme="night">…</section>   // scope a theme to part of the page
 ```
 
 Write your own: `defineTheme({ id, name, font, display, radius, light: {...}, dark: {...} })` from `hadi-march/theme`,

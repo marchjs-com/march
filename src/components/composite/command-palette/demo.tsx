@@ -39,6 +39,6 @@ export default function CommandPaletteDemo(props: { values: { group: string; lab
       const icon = iconOf(), kbd = kbdOf()
       return <PaletteButton label={() => props.values.label} kbd={kbd} icon={icon === "off" ? false : icon === "own" ? command : undefined} />
     }}
-    <span class="hm-muted">Açın ve "{() => (props.values.group === "team" ? "davet" : "pdf")}" yazın</span>
+    <span class="m-muted">Açın ve "{() => (props.values.group === "team" ? "davet" : "pdf")}" yazın</span>
   </div>
 }

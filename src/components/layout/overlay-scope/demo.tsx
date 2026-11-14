@@ -15,6 +15,6 @@ export default function OverlayScopeDemo(props: { values: { target: string } }) 
       <Button size="sm" data-audit-try onClick={() => void openDrawer(() => <ul class="sc-scope-list"><li>Özet</li><li>Raporlar</li><li>Ayarlar</li></ul>, { title: "Menü", side: "end", target: target() })}>Çekmece</Button>
       <Button size="sm" variant="primary" onClick={() => void openDialog(() => <p>Bu pencere yalnız bu kutuyu örter; sayfanın geri kalanı çalışmaya devam eder.</p>, { title: "Kutu içi pencere", target: target() })}>Pencere</Button>
     </div>
-    <p class="hm-muted sc-scope-body">Çekmece ve pencere bu kutunun içinde açılır; "sayfada" seçilirse bütün sayfayı örter.</p>
+    <p class="m-muted sc-scope-body">Çekmece ve pencere bu kutunun içinde açılır; "sayfada" seçilirse bütün sayfayı örter.</p>
   </OverlayScope>
 }

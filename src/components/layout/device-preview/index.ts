@@ -1,7 +1,7 @@
 // DevicePreview (hadi-march/layout): shows content as on a real phone or tablet — a device body with its notch or
 // camera, status bar and home indicator, the real screen size, portrait or landscape — and makes the mouse act like a
 // finger: the cursor becomes a touch dot, dragging scrolls (with a fling), a long press opens the context menu, and
-// pointer events say "touch". The screen is an <OverlayScope> (drawers and dialogs open inside it) and the hm-site
+// pointer events say "touch". The screen is an <OverlayScope> (drawers and dialogs open inside it) and the m-site
 // container (blocks answer to its width), so a site in it behaves as on the device.
 //
 //   <DevicePreview device="iphone-15" landscape={false} touch><MySite /></DevicePreview>
@@ -96,28 +96,28 @@ export function DevicePreview(props: DevicePreviewProps): Element {
   const spec = (): DeviceSpec => specOf(val(props.device));
   const land = (): boolean => !!val(props.landscape);
   const label = (): string => val(props.label) ?? t`${spec().name} preview`;
-  const frame = props.src != null ? previewFrame(props.src, label, "hm-device-frame") : null;
+  const frame = props.src != null ? previewFrame(props.src, label, "m-device-frame") : null;
   const sb = props.statusBar, ownBar = sb != null && typeof sb === "object";
-  const viewport = h("div", { class: () => cx("hm-device-viewport", frame && "is-framed") }, frame ?? props.children) as HTMLElement;
-  const dot = h("div", { class: "hm-device-touch", "aria-hidden": "true" }) as HTMLElement;
-  const screen = h(OverlayScope, { class: "hm-device-screen", children: [
-    ownBar ? h("div", { class: "hm-device-status is-own" }, sb)
-      : h("div", { class: "hm-device-status", "aria-hidden": "true", hidden: () => val(sb as MaybeFn<boolean | undefined>) === false },
-        h("span", { class: "hm-device-time" }, () => val(props.time) ?? time()),
-        h("span", { class: "hm-device-icons" }, h("i", { class: "hm-device-signal" }), h("i", { class: "hm-device-wifi" }), h("i", { class: "hm-device-battery" }))),
+  const viewport = h("div", { class: () => cx("m-device-viewport", frame && "is-framed") }, frame ?? props.children) as HTMLElement;
+  const dot = h("div", { class: "m-device-touch", "aria-hidden": "true" }) as HTMLElement;
+  const screen = h(OverlayScope, { class: "m-device-screen", children: [
+    ownBar ? h("div", { class: "m-device-status is-own" }, sb)
+      : h("div", { class: "m-device-status", "aria-hidden": "true", hidden: () => val(sb as MaybeFn<boolean | undefined>) === false },
+        h("span", { class: "m-device-time" }, () => val(props.time) ?? time()),
+        h("span", { class: "m-device-icons" }, h("i", { class: "m-device-signal" }), h("i", { class: "m-device-wifi" }), h("i", { class: "m-device-battery" }))),
     viewport,
-    h("div", { class: "hm-device-home", "aria-hidden": "true", hidden: () => val(props.homeIndicator) === false }),
+    h("div", { class: "m-device-home", "aria-hidden": "true", hidden: () => val(props.homeIndicator) === false }),
     dot,
   ] }) as HTMLElement;
   const body = h("div", {
-    class: () => cx("hm-device", `hm-device-${spec().kind ?? "phone"}`, `hm-device-cam-${val(props.camera) === false ? "none" : spec().camera ?? "none"}`, land() && "is-landscape", val(props.touch) !== false && "is-touch", val(props.class)),
+    class: () => cx("m-device", `m-device-${spec().kind ?? "phone"}`, `m-device-cam-${val(props.camera) === false ? "none" : spec().camera ?? "none"}`, land() && "is-landscape", val(props.touch) !== false && "is-touch", val(props.class)),
     role: "group", "aria-label": label,
     style: () => {
       const s = spec(), w = land() ? s.height : s.width, hh = land() ? s.width : s.height;
-      return { "--hm-dev-w": `${w}px`, "--hm-dev-h": `${hh}px`, "--hm-dev-r": `${s.radius ?? 24}px`, "--hm-dev-scale": String(scale()) };
+      return { "--m-dev-w": `${w}px`, "--m-dev-h": `${hh}px`, "--m-dev-r": `${s.radius ?? 24}px`, "--m-dev-scale": String(scale()) };
     },
-  }, h("div", { class: "hm-device-camera", "aria-hidden": "true" }), screen) as HTMLElement;
-  const outer = h("div", { class: "hm-device-stage" }, body) as HTMLElement;
+  }, h("div", { class: "m-device-camera", "aria-hidden": "true" }), screen) as HTMLElement;
+  const outer = h("div", { class: "m-device-stage" }, body) as HTMLElement;
 
   // fit: scale the device down to the width (and a sensible height) of its place
   if (props.fit !== false) {
@@ -192,9 +192,9 @@ export function DevicePreview(props: DevicePreviewProps): Element {
       const doc = frame.contentDocument;
       if (!doc) return;
       const st = doc.createElement("style");
-      st.textContent = "html.hm-touch-sim, html.hm-touch-sim * { cursor: none !important; } html.hm-touch-sim { -webkit-user-select: none; user-select: none; } html.hm-touch-sim :is(input, textarea, select, [contenteditable=true]) { user-select: text; } html.hm-touch-sim ::-webkit-scrollbar { display: none; } html.hm-touch-sim { scrollbar-width: none; }";
+      st.textContent = "html.m-touch-sim, html.m-touch-sim * { cursor: none !important; } html.m-touch-sim { -webkit-user-select: none; user-select: none; } html.m-touch-sim :is(input, textarea, select, [contenteditable=true]) { user-select: text; } html.m-touch-sim ::-webkit-scrollbar { display: none; } html.m-touch-sim { scrollbar-width: none; }";
       doc.head?.appendChild(st);
-      doc.documentElement.classList.toggle("hm-touch-sim", on());
+      doc.documentElement.classList.toggle("m-touch-sim", on());
       unbind = bind(doc, () => (doc.scrollingElement ?? doc.documentElement) as HTMLElement, () => ({ x: frame.offsetLeft, y: frame.offsetTop + viewport.offsetTop }), false);
     };
     frame.addEventListener("load", attach);

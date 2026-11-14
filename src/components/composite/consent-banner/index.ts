@@ -67,11 +67,11 @@ export function hideConsentBanner(): void { forced.set(false); closedFor.set(unt
 
 const policyLink = (p: ConsentTexts): unknown => {
   const href = consent.policyHref();
-  return href ? h("a", { class: "hm-consent-link", href, target: "_blank", rel: "noopener" }, () => txt(p.policyLabel, "Privacy policy")) : null;
+  return href ? h("a", { class: "m-consent-link", href, target: "_blank", rel: "noopener" }, () => txt(p.policyLabel, "Privacy policy")) : null;
 };
 
 /** A row of buttons that wraps and sits at the end (the banner, the panel footer, the placeholder). */
-const ACTIONS = { class: "hm-consent-actions", direction: "row", wrap: true, gap: 2, justify: "end" } as const;
+const ACTIONS = { class: "m-consent-actions", direction: "row", wrap: true, gap: 2, justify: "end" } as const;
 
 /** The three equal choices: refusing is as easy as accepting. */
 function choices(after: () => void, more?: (() => void) | null, l?: ConsentLabels): Element {
@@ -83,21 +83,21 @@ function choices(after: () => void, more?: (() => void) | null, l?: ConsentLabel
 
 /** Bottom banner, shown while there is no valid decision for the current policy version. */
 export function ConsentBanner(props: ConsentBannerProps = {}): unknown {
-  const body = (): Element => h("section", { class: () => cx("hm-consent", val(props.class)), role: "region", "aria-label": () => txt(props.title, "Cookies and privacy") },
-    h("div", { class: "hm-consent-text" },
-      h("h2", { class: "hm-consent-title" }, () => txt(props.title, "Cookies and privacy")),
+  const body = (): Element => h("section", { class: () => cx("m-consent", val(props.class)), role: "region", "aria-label": () => txt(props.title, "Cookies and privacy") },
+    h("div", { class: "m-consent-text" },
+      h("h2", { class: "m-consent-title" }, () => txt(props.title, "Cookies and privacy")),
       h("p", {}, () => txt(props.text, "We use cookies that are needed for the site to work and, with your permission, others for preferences, statistics, marketing and third-party content. You can change your choice at any time."), " ", policyLink(props))),
     choices(hideConsentBanner, props.customize === false ? null : () => { void openConsentPreferences(props).then((saved) => { if (saved) hideConsentBanner(); }); }, props.labels));
   const show = (): boolean => forced() || (closedFor() !== consent.record() && (!!props.always || !consent.decided()));
-  return () => (show() ? (props.inline ? h("div", { class: "hm-consent-inline" }, body()) : h(Portal, { layer: "toast" }, body())) : null);
+  return () => (show() ? (props.inline ? h("div", { class: "m-consent-inline" }, body()) : h(Portal, { layer: "toast" }, body())) : null);
 }
 
 /** One category: Card with the description and a Toggle (required ones are on and locked). */
 function categoryCard(c: CategoryInfo, value: () => boolean, set: (v: boolean) => void, l?: ConsentLabels): unknown {
   return h(Card, {
-    class: "hm-consent-cat", title: () => t(c.title),
+    class: "m-consent-cat", title: () => t(c.title),
     actions: [h(Toggle, { value: live(value), setValue: set, disabled: !!c.required, "aria-label": t(c.title) })],
-  }, h("p", { class: "hm-consent-desc" }, () => t(c.description)), c.required ? h("p", { class: "hm-consent-always" }, () => txt(l?.alwaysOn, "Always on")) : null);
+  }, h("p", { class: "m-consent-desc" }, () => t(c.description)), c.required ? h("p", { class: "m-consent-always" }, () => txt(l?.alwaysOn, "Always on")) : null);
 }
 
 /** The detailed panel. Resolves to true when the user saved a choice, false when dismissed. */
@@ -109,11 +109,11 @@ export async function openConsentPreferences(p: ConsentTexts = {}): Promise<bool
   const l = p.labels;
   return openDialog<boolean>((close) => {
     const rec = untrack(() => consent.record());
-    return h("div", { class: "hm-consent-panel" },
-      h("p", { class: "hm-consent-lead" }, () => txt(l?.lead, "Choose which cookies and data uses you allow. Strictly necessary ones are always on."), " ", policyLink(p)),
+    return h("div", { class: "m-consent-panel" },
+      h("p", { class: "m-consent-lead" }, () => txt(l?.lead, "Choose which cookies and data uses you allow. Strictly necessary ones are always on."), " ", policyLink(p)),
       untrack(() => consent.categories()).map((c) => categoryCard(c, () => !!c.required || !!draft()[c.id], (v) => draft.update((d) => ({ ...d, [c.id]: v })), l)),
-      rec ? h("p", { class: "hm-consent-meta" }, () => l?.saved?.(new Date(rec.date).toLocaleString(), String(rec.version)) ?? t("Saved on {0} (policy version {1}).", { 0: new Date(rec.date).toLocaleString(), 1: rec.version }), " ",
-        h(Button, { variant: "link", color: "danger", class: "hm-consent-withdraw", onClick: () => { consent.withdraw(); close(true); } }, () => txt(l?.withdraw, "Withdraw consent"))) : null);
+      rec ? h("p", { class: "m-consent-meta" }, () => l?.saved?.(new Date(rec.date).toLocaleString(), String(rec.version)) ?? t("Saved on {0} (policy version {1}).", { 0: new Date(rec.date).toLocaleString(), 1: rec.version }), " ",
+        h(Button, { variant: "link", color: "danger", class: "m-consent-withdraw", onClick: () => { consent.withdraw(); close(true); } }, () => txt(l?.withdraw, "Withdraw consent"))) : null);
   }, {
     title: () => txt(p.title, "Privacy preferences"), size: "md", dismissValue: false,
     ...(mobile ? { kind: "drawer" as const, side: "bottom" as const } : {}),
@@ -140,7 +140,7 @@ export interface ConsentGateProps {
 export function ConsentGate(props: ConsentGateProps): unknown {
   return () => (consent.has(props.category)
     ? props.children
-    : h("div", { class: () => cx("hm-consent-gate", val(props.class)), role: "note" },
+    : h("div", { class: () => cx("m-consent-gate", val(props.class)), role: "note" },
       h(Empty, { size: "sm", title: false, action: [
         h(Button, { size: "sm", variant: "primary", "on:click": () => consent.save({ ...untrack(() => consent.choices()), [props.category]: true }) }, () => txt(props.labels?.allow, "Allow")),
         props.preferences === false ? null : h(Button, { size: "sm", variant: "ghost", "on:click": () => { void openConsentPreferences({ labels: props.labels }); } }, () => txt(props.labels?.preferences, "Preferences"))],

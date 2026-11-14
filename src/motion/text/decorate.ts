@@ -22,7 +22,7 @@ function mark(el: El, o: MarkOptions, y: string, h: string, color: string): Text
 }
 
 /** A marker pen highlights each line. */
-export const highlight = (el: El, o: MarkOptions = {}): TextAnimation => mark(el, o, "85%", "45%", "color-mix(in oklab, var(--hm-warning, #facc15) 55%, transparent)");
+export const highlight = (el: El, o: MarkOptions = {}): TextAnimation => mark(el, o, "85%", "45%", "color-mix(in oklab, var(--m-warning, #facc15) 55%, transparent)");
 /** An underline draws itself under each line. */
 export const underline = (el: El, o: MarkOptions = {}): TextAnimation => mark(el, o, "100%", "0.08em", "currentColor");
 /** A line strikes through the text. */
@@ -30,7 +30,7 @@ export const strike = (el: El, o: MarkOptions = {}): TextAnimation => mark(el, o
 
 /** A band of color sweeps once across the text (gradient text), leaving it as it was. */
 export const gradientSweep = (el: El, o: MarkOptions = {}): TextAnimation => {
-  const c = colorOf(el), a = o.color ?? "var(--hm-primary, #6366f1)", rtl = isRtl(el);
+  const c = colorOf(el), a = o.color ?? "var(--m-primary, #6366f1)", rtl = isRtl(el);
   return run(el, o, { by: "line", duration: 1400, easing: "in-out" }, (s, tl, r) => {
     s.parts.forEach((p, i) => {
       css(p, { "background-image": `linear-gradient(90deg, ${c} 0%, ${c} 33%, ${a} 45%, color-mix(in oklab, ${a}, #ec4899) 55%, ${c} 67%, ${c} 100%)`, "background-size": "300% 100%", "-webkit-background-clip": "text", "background-clip": "text", color: "transparent" });

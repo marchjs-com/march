@@ -15,13 +15,13 @@ void tick; void type; void key; void signal;
 test("MultiSelect: chips, Enter adds, Backspace and × remove", () => {
   const tags = signal(["a"]);
   const { el } = mount(() => h(MultiSelect, { "bind:value": tags, options: [{ value: "a", label: "Alpha" }, { value: "b", label: "Beta" }] }));
-  assert.equal(el.querySelector(".hm-chip2-label").textContent, "Alpha");
-  assert.equal(el.querySelector(".hm-chip2-x").getAttribute("aria-label"), "Remove Alpha");
+  assert.equal(el.querySelector(".m-chip2-label").textContent, "Alpha");
+  assert.equal(el.querySelector(".m-chip2-x").getAttribute("aria-label"), "Remove Alpha");
   const input = el.querySelector("input");
   type(input, "be"); key(input, "Enter");
   assert.deepEqual(tags(), ["a", "b"]);
   key(input, "Backspace");
   assert.deepEqual(tags(), ["a"]);
-  el.querySelector(".hm-chip2-x").click();
+  el.querySelector(".m-chip2-x").click();
   assert.deepEqual(tags(), []);
 });

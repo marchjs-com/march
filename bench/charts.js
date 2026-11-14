@@ -22,7 +22,7 @@ export async function run({ installDom }) {
       t = performance.now();
       data.set(next);
       const updateMs = performance.now() - t;
-      const drawn = el.querySelector("path.hm-chart-line").getAttribute("d").split(/[ML]/).length - 1;
+      const drawn = el.querySelector("path.m-chart-line").getAttribute("d").split(/[ML]/).length - 1;
       out.push({ points: n, render: +renderMs.toFixed(1), update: +updateMs.toFixed(1), drawn });
       dispose();
       el.remove();

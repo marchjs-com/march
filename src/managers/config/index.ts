@@ -8,7 +8,7 @@
 //   await c.load(() => net.get("/config.json"))   // remote layer
 //   c.set("ui.density", "compact")  // override layer;  c.reset("ui.density")
 //   c.source("api.baseUrl")         // "default" | "env" | "remote" | "override"
-// The environment layer reads <meta name="hm-config" content='{"api":{"baseUrl":"…"}}'> (CSP friendly, no inline script).
+// The environment layer reads <meta name="m-config" content='{"api":{"baseUrl":"…"}}'> (CSP friendly, no inline script).
 import { signal, computed, type Accessor } from "../../core/reactive.ts";
 import { defineManager } from "../manager.ts";
 import { publisher } from "../publish.ts";
@@ -18,7 +18,7 @@ export type ConfigTree = Record<string, unknown>;
 
 export interface AppConfigOptions {
   defaults: ConfigTree;
-  /** Environment layer. Default: JSON in <meta name="hm-config">. */
+  /** Environment layer. Default: JSON in <meta name="m-config">. */
   env: ConfigTree | (() => ConfigTree) | null;
   /** Check the merged config; return error messages (shown by errors(), the layer is still applied). */
   validate: ((cfg: ConfigTree) => string[]) | null;
@@ -67,7 +67,7 @@ function leaves(tree: ConfigTree, pre = ""): string[] {
 }
 function readMeta(): ConfigTree {
   try {
-    const m = globalThis.document?.querySelector('meta[name="hm-config"]')?.getAttribute("content");
+    const m = globalThis.document?.querySelector('meta[name="m-config"]')?.getAttribute("content");
     return m ? JSON.parse(m) as ConfigTree : {};
   } catch { return {}; }
 }

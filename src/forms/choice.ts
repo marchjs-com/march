@@ -40,7 +40,7 @@ const defaultShape = (v: ChoiceVariant | undefined): ChoiceShape => (v === "chip
  * rounded; a card is never round). Radio boxes are always round.
  */
 export const lookClass = (l: ChoiceLook, kind: "checkbox" | "radio"): string =>
-  cx("hm-choice", `hm-choice-${l.variant ?? "classic"}`, `hm-choice-${l.size ?? "md"}`, `hm-shape-${l.shape ?? defaultShape(l.variant)}`, kind === "radio" && "hm-choice-radio", l.animate === false && "hm-choice-still");
+  cx("m-choice", `m-choice-${l.variant ?? "classic"}`, `m-choice-${l.size ?? "md"}`, `m-shape-${l.shape ?? defaultShape(l.variant)}`, kind === "radio" && "m-choice-radio", l.animate === false && "m-choice-still");
 
 /** Which shapes have a visible effect for a variant / kind (pickers disable the others). */
 export function shapesFor(variant: ChoiceVariant | undefined, kind: "checkbox" | "radio"): ChoiceShape[] {
@@ -52,23 +52,23 @@ export function shapesFor(variant: ChoiceVariant | undefined, kind: "checkbox" |
 /** The decorative box drawn next to an input. */
 export function choiceBox(kind: "checkbox" | "radio", l: ChoiceLook): Element {
   // a card shows a tick badge for radios too (no dot)
-  if (kind === "radio" && l.variant !== "card") return h("span", { class: "hm-check-box", "aria-hidden": "true" }, h("span", { class: "hm-radio-dot" }));
-  const mark = l.icon ? glyph(l.icon, "hm-svg hm-check-icon") : svgIcon(TICK, "hm-check-mark");
-  return h("span", { class: "hm-check-box", "aria-hidden": "true" }, mark, svgIcon(DASH, "hm-check-dash"));
+  if (kind === "radio" && l.variant !== "card") return h("span", { class: "m-check-box", "aria-hidden": "true" }, h("span", { class: "m-radio-dot" }));
+  const mark = l.icon ? glyph(l.icon, "m-svg m-check-icon") : svgIcon(TICK, "m-check-mark");
+  return h("span", { class: "m-check-box", "aria-hidden": "true" }, mark, svgIcon(DASH, "m-check-dash"));
 }
 
 /** Label part: plain text, or title + description (+ icon) in the card variant. */
 export function choiceText(label: unknown, hint: unknown, icon: unknown, variant: ChoiceVariant | undefined, meta?: unknown): unknown {
   if (variant === "card") {
     // icon | title + description | meta (a price or a badge)
-    return h("span", { class: "hm-check-label hm-choice-card-body" },
-      icon ? h("span", { class: "hm-choice-card-icon", "aria-hidden": "true" }, typeof icon === "object" && !(icon as Partial<Node>).nodeType && !Array.isArray(icon) ? glyph(icon as IconDef) : icon) : null,
-      h("span", { class: "hm-choice-card-text" },
-        h("span", { class: "hm-choice-card-title" }, label as MaybeFn<unknown>),
-        hint != null ? h("span", { class: "hm-choice-card-desc" }, hint as MaybeFn<unknown>) : null),
-      meta != null ? h("span", { class: "hm-choice-card-meta" }, meta as MaybeFn<unknown>) : null);
+    return h("span", { class: "m-check-label m-choice-card-body" },
+      icon ? h("span", { class: "m-choice-card-icon", "aria-hidden": "true" }, typeof icon === "object" && !(icon as Partial<Node>).nodeType && !Array.isArray(icon) ? glyph(icon as IconDef) : icon) : null,
+      h("span", { class: "m-choice-card-text" },
+        h("span", { class: "m-choice-card-title" }, label as MaybeFn<unknown>),
+        hint != null ? h("span", { class: "m-choice-card-desc" }, hint as MaybeFn<unknown>) : null),
+      meta != null ? h("span", { class: "m-choice-card-meta" }, meta as MaybeFn<unknown>) : null);
   }
-  return h("span", { class: "hm-check-label" }, label as MaybeFn<unknown>, hint != null ? h("small", { class: "hm-hint" }, hint as MaybeFn<unknown>) : null);
+  return h("span", { class: "m-check-label" }, label as MaybeFn<unknown>, hint != null ? h("small", { class: "m-hint" }, hint as MaybeFn<unknown>) : null);
 }
 
 export { itemColor };
@@ -81,4 +81,4 @@ export interface ChoiceGroupLook extends ChoiceLook {
 
 /** Classes of a CheckboxGroup / RadioGroup wrapper. */
 export const groupClass = (props: ChoiceGroupLook & { inline?: boolean | undefined; class?: unknown }, kind: "checkbox" | "radio"): string =>
-  cx("hm-choices", lookClass(props, kind), props.inline && "hm-choices-inline", props.class as string);
+  cx("m-choices", lookClass(props, kind), props.inline && "m-choices-inline", props.class as string);

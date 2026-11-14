@@ -37,8 +37,8 @@ export function StatusDot(props: StatusDotProps): Element {
   const pulse = (): string | false => { const p = val(props.pulse); return p === true ? "ring" : p || false; };
   return h("span", {
     ...rest(props, ["tone", "color", "pulse", "size", "label", "hollow"]),
-    class: () => cx("hm-status-dot", `hm-status-dot-${val(props.size) ?? "md"}`, `is-${val(props.tone) ?? "success"}`, pulse() && `is-pulse-${pulse()}`, val(props.hollow) && "hm-status-dot-hollow", val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)),
+    class: () => cx("m-status-dot", `m-status-dot-${val(props.size) ?? "md"}`, `is-${val(props.tone) ?? "success"}`, pulse() && `is-pulse-${pulse()}`, val(props.hollow) && "m-status-dot-hollow", val(props.class)),
+    "data-m-color": () => colorAttr(val(props.color)),
     role: () => (label() ? "img" : null), "aria-label": label, "aria-hidden": () => (label() ? null : "true"),
   }, props.children);
 }

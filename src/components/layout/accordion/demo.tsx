@@ -28,6 +28,6 @@ export default function AccordionDemo(props: { values: { multiple: boolean; vari
       // with several allowed, two start open (the difference shows at once)
       return <Accordion items={list} multiple={multiple} open={multiple ? [0, 1] : [0]} variant={variant} chevron={chevron} animated={animated} color={color} />
     }}
-    <p class="hm-muted">{() => (props.values.animated ? "Bölümler yüksekliği kayarak açılır ve kapanır" : "Bölümler hareketsiz, anında açılır ve kapanır")}: bir başlığa basınca görünür.</p>
+    <p class="m-muted">{() => (props.values.animated ? "Bölümler yüksekliği kayarak açılır ve kapanır" : "Bölümler hareketsiz, anında açılır ve kapanır")}: bir başlığa basınca görünür.</p>
   </div>
 }

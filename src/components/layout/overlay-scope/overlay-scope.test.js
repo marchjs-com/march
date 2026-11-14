@@ -12,9 +12,9 @@ test("OverlayScope: a layer opened inside it opens in it; a modal makes only the
   const outside = document.createElement("p"); document.body.appendChild(outside);
   let scope;
   const dispose = render(() => h(OverlayScope, { class: "box" }, h("span", { class: "inner" }, "in"), () => { scope = overlayScopeFor(); return h(Portal, { layer: "dialog" }, h("b", { class: "dlg" }, "D")); }), host);
-  const box = host.querySelector(".hm-overlay-scope");
+  const box = host.querySelector(".m-overlay-scope");
   assert.equal(scope, box, "the scope is found from the component");
-  assert.ok(box.querySelector(".hm-layers .dlg"), "the layer is inside the scope");
+  assert.ok(box.querySelector(".m-layers .dlg"), "the layer is inside the scope");
   assert.equal(box.style.getPropertyValue("contain"), "layout", "the scope is the containing block of fixed overlays");
   assert.ok(box.querySelector(".inner").hasAttribute("inert"), "inside the scope: inert under the modal");
   assert.equal(outside.hasAttribute("inert"), false, "the page outside keeps working");
@@ -26,7 +26,7 @@ test("OverlayScope: a layer opened inside it opens in it; a modal makes only the
 test("openDialog: target page opens on the page even from inside a scope; the focused element finds the scope", async () => {
   const host = document.createElement("div"); document.body.appendChild(host);
   const dispose = render(() => h(OverlayScope, {}, h("button", { class: "opener" }, "x")), host);
-  const box = host.querySelector(".hm-overlay-scope");
+  const box = host.querySelector(".m-overlay-scope");
   const opener = host.querySelector(".opener");
   opener.focus();
   assert.equal(overlayScopeFor(), box, "a click handler runs outside components: the focus tells the scope");
@@ -40,11 +40,11 @@ test("openDialog: target page opens on the page even from inside a scope; the fo
   let close;
   void openDialog((c) => { close = c; return "hi"; });
   await tick();
-  assert.equal(layers().at(-1).el.closest(".hm-overlay-scope"), box);
+  assert.equal(layers().at(-1).el.closest(".m-overlay-scope"), box);
   close(); await tick();
   void openDialog((c) => { close = c; return "page"; }, { target: "page" });
   await tick();
-  assert.equal(layers().at(-1).el.closest(".hm-overlay-scope"), null, "target page");
+  assert.equal(layers().at(-1).el.closest(".m-overlay-scope"), null, "target page");
   close(); await tick();
   dispose();
 });

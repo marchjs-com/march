@@ -37,9 +37,9 @@ export function CountRoll(props: CountRollProps): Element {
   let box!: HTMLElement;
   let prev: number | null = null, shown = "";
   const text = (n: number): string => (n === 0 && val(props.hideZero) ? "" : props.formatter ? props.formatter(n) : formatCount(n, val(props.format) ?? "compact"));
-  const root = h("span", { class: () => cx("hm-roll", val(props.class)) },
-    h("span", { class: "hm-roll-vis", "aria-hidden": "true", ref: (x: HTMLElement) => { box = x; } }),
-    h("span", { class: "hm-sr-only" }, () => { const n = val(props.value); return n == null || (n === 0 && val(props.hideZero)) ? "" : props.spoken ? props.spoken(n) : formatCount(n, "full"); })) as HTMLElement;
+  const root = h("span", { class: () => cx("m-roll", val(props.class)) },
+    h("span", { class: "m-roll-vis", "aria-hidden": "true", ref: (x: HTMLElement) => { box = x; } }),
+    h("span", { class: "m-sr-only" }, () => { const n = val(props.value); return n == null || (n === 0 && val(props.hideZero)) ? "" : props.spoken ? props.spoken(n) : formatCount(n, "full"); })) as HTMLElement;
   effect(() => {
     const n = Number(val(props.value) ?? 0);
     val(props.format); val(props.hideZero); locale(); // a new format or language redraws the same value

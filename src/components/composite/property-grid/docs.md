@@ -34,7 +34,7 @@ one. The footer counts the changes and offers Revert and Save.
 | `changeMarks` | boolean | `true` | the dot on a changed row and the changed count of a group |
 | `footer` | boolean | `true` | the change count with Revert and Save (`api.save()` / `api.revert()` stay) |
 | `labels` | object | `t` texts | `search`, `general`, `empty`, `noMatch(query)`, `changed`, `changedCount(n)`, `unsaved(n)`, `noChanges`, `revert`, `save`, `undo`, `redo`, `reset(label)`, `resetTitle` |
-| `class` | class | — | on the section (`hm-pg`); parts: `hm-pg-head`, `-search`, `-history`, `-group`, `-row`, `-name`, `-dot`, `-desc`, `-editor`, `-error`, `-reset`, `-empty`, `-foot`, `-changes`, `-revert`, `-save` |
+| `class` | class | — | on the section (`m-pg`); parts: `m-pg-head`, `-search`, `-history`, `-group`, `-row`, `-name`, `-dot`, `-desc`, `-editor`, `-error`, `-reset`, `-empty`, `-foot`, `-changes`, `-revert`, `-save` |
 
 ```tsx
 <PropertyGrid properties={specs} bind:value={$card} search={false} historyButtons={false} resetButtons={false} footer={false} />

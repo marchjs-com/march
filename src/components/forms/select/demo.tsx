@@ -12,6 +12,6 @@ export default function SelectDemo(props: { values: { disabled: boolean } }) {
   let $city = "İzmir"
   return <div class="sc-stack">
     {() => <Field label="Şehir"><Select value={$city} onChange={(v: Maybe<string>) => { $city = v ?? "" }} options={CITIES} placeholder="Seç…" disabled={props.values.disabled} /></Field>}
-    <p class="hm-muted">{() => `Seçilen: ${$city || "—"}`}</p>
+    <p class="m-muted">{() => `Seçilen: ${$city || "—"}`}</p>
   </div>
 }

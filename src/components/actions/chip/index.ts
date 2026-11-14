@@ -32,14 +32,14 @@ export interface ChipProps {
 /** `<Chip icon={tag}>Design</Chip>`, filter chips `<Chip selected={$on} onClick={…}>`, removable `<Chip onRemove={…}>`. */
 export function Chip(props: ChipProps): Element {
   const toggle = props.selected !== undefined || props.onClick != null;
-  const cls = (): string => cx("hm-chip2", `hm-chip2-${val(props.tone) ?? "neutral"}`, props.size === "sm" && "hm-chip2-sm", toggle && "hm-chip2-btn", val(props.selected) && "is-selected", val(props.class));
+  const cls = (): string => cx("m-chip2", `m-chip2-${val(props.tone) ?? "neutral"}`, props.size === "sm" && "m-chip2-sm", toggle && "m-chip2-btn", val(props.selected) && "is-selected", val(props.class));
   const body = [
-    () => (!toggle || !val(props.selected) || props.selectedIcon === false ? icon(props.icon, "hm-chip2-icon")
-      : h("span", { class: "hm-chip2-icon", "aria-hidden": "true" }, ownIcon(props.selectedIcon ?? undefined, check, "hm-chip2-own"))),
-    h(OverflowText, { class: "hm-chip2-label" }, props.children),
+    () => (!toggle || !val(props.selected) || props.selectedIcon === false ? icon(props.icon, "m-chip2-icon")
+      : h("span", { class: "m-chip2-icon", "aria-hidden": "true" }, ownIcon(props.selectedIcon ?? undefined, check, "m-chip2-own"))),
+    h(OverflowText, { class: "m-chip2-label" }, props.children),
   ];
-  const remove = props.onRemove && h(IconButton, { size: "xs", shape: "round", class: "hm-chip2-x", title: false, label: () => val(props.removeLabel) ?? t`Remove`, onClick: (e: Event) => { e.stopPropagation(); props.onRemove?.(); },
-    icon: ownIcon(props.removeIcon ?? undefined, xIcon, "hm-chip2-own") });
-  if (toggle) return h("span", { "data-hm-color": () => colorAttr(props.color), class: cls }, h("button", { type: "button", class: "hm-chip2-hit", "aria-pressed": () => (props.selected !== undefined ? String(!!val(props.selected)) : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, body), remove);
-  return h("span", { "data-hm-color": () => colorAttr(props.color), class: cls }, body, remove);
+  const remove = props.onRemove && h(IconButton, { size: "xs", shape: "round", class: "m-chip2-x", title: false, label: () => val(props.removeLabel) ?? t`Remove`, onClick: (e: Event) => { e.stopPropagation(); props.onRemove?.(); },
+    icon: ownIcon(props.removeIcon ?? undefined, xIcon, "m-chip2-own") });
+  if (toggle) return h("span", { "data-m-color": () => colorAttr(props.color), class: cls }, h("button", { type: "button", class: "m-chip2-hit", "aria-pressed": () => (props.selected !== undefined ? String(!!val(props.selected)) : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, body), remove);
+  return h("span", { "data-m-color": () => colorAttr(props.color), class: cls }, body, remove);
 }

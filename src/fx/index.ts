@@ -21,10 +21,10 @@ interface P { x: number; y: number; vx: number; vy: number; r: number }
 
 /**
  * Floating particles with optional connecting lines and pointer attraction.
- * `<Particles count={80} links={120} speed={0.3} color="var(--hm-primary)" interactive class="hm-fx-fill" />`
+ * `<Particles count={80} links={120} speed={0.3} color="var(--m-primary)" interactive class="m-fx-fill" />`
  */
 export function Particles(props: Props): HTMLCanvasElement {
-  const canvas = h("canvas", { class: ["hm-fx-canvas", props["class"]], "aria-hidden": "true", role: "presentation" }) as HTMLCanvasElement;
+  const canvas = h("canvas", { class: ["m-fx-canvas", props["class"]], "aria-hidden": "true", role: "presentation" }) as HTMLCanvasElement;
   const ctx = canvas.getContext?.("2d") ?? null;
   const count = num(props["count"], 70), speed = num(props["speed"], 0.35), linkDist = num(props["links"], 110);
   let w = 0, hgt = 0, dpr = 1, color = "#7c97ff";
@@ -45,7 +45,7 @@ export function Particles(props: Props): HTMLCanvasElement {
     canvas.width = Math.round(w * dpr); canvas.height = Math.round(hgt * dpr);
     if (!parts.length) parts = Array.from({ length: count }, () => ({ x: Math.random() * w, y: Math.random() * hgt, vx: (Math.random() - 0.5) * speed, vy: (Math.random() - 0.5) * speed, r: 1 + Math.random() * 1.8 }));
     else if (ow > 0 && oh > 0 && (ow !== w || oh !== hgt)) for (const p of parts) { p.x *= w / ow; p.y *= hgt / oh; }
-    color = resolveColor(str(props["color"], "var(--hm-primary)"));
+    color = resolveColor(str(props["color"], "var(--m-primary)"));
     draw();
   };
   const resolveColor = (c: string): string => { const m = /^var\((--[\w-]+)\)$/.exec(c); return m?.[1] ? cssVar(m[1], "#7c97ff") : c; };
@@ -105,18 +105,18 @@ export function Particles(props: Props): HTMLCanvasElement {
 /** Animated, blurred color blobs behind content. `<Aurora colors={["#6d5dfc", "#22d3ee", "#a3e635"]} />` */
 export function Aurora(props: Props): HTMLElement {
   const colors = Array.isArray(props["colors"]) ? (props["colors"] as unknown[]).map(String) : ["#6d5dfc", "#22d3ee", "#a3e635"];
-  const el = h("div", { class: ["hm-aurora", props["class"]], "aria-hidden": "true" },
-    ...colors.slice(0, 4).map((c, i) => { const b = h("span", { class: `hm-aurora-blob hm-aurora-blob-${i + 1}` }) as HTMLElement; setStyle(b, { "--hm-aurora-color": c }); return b; })) as HTMLElement;
+  const el = h("div", { class: ["m-aurora", props["class"]], "aria-hidden": "true" },
+    ...colors.slice(0, 4).map((c, i) => { const b = h("span", { class: `m-aurora-blob m-aurora-blob-${i + 1}` }) as HTMLElement; setStyle(b, { "--m-aurora-color": c }); return b; })) as HTMLElement;
   return el;
 }
 
-/** Pointer-following radial light on an element (sets --hm-spot-x/--hm-spot-y). `use:spotlight` */
+/** Pointer-following radial light on an element (sets --m-spot-x/--m-spot-y). `use:spotlight` */
 export function spotlight(el: Element): () => void {
   const h2 = el as HTMLElement;
-  el.classList.add("hm-spotlight");
+  el.classList.add("m-spotlight");
   const move = (e: PointerEvent): void => {
     const r = el.getBoundingClientRect();
-    setStyle(el, { "--hm-spot-x": `${e.clientX - r.left}px`, "--hm-spot-y": `${e.clientY - r.top}px` });
+    setStyle(el, { "--m-spot-x": `${e.clientX - r.left}px`, "--m-spot-y": `${e.clientY - r.top}px` });
   };
   return listen(h2, { pointermove: move });
 }
@@ -125,7 +125,7 @@ export function spotlight(el: Element): () => void {
 export function confetti({ x, y, count = 120, colors = ["#6d5dfc", "#3b82f6", "#22d3ee", "#a3e635", "#f59e0b", "#ef4444"], spread = 70 }: { x?: number; y?: number; count?: number; colors?: string[]; spread?: number } = {}): Promise<void> {
   const doc = globalThis.document;
   if (!doc || reducedMotion()) return Promise.resolve();
-  const canvas = h("canvas", { class: "hm-fx-confetti", "aria-hidden": "true" }) as HTMLCanvasElement;
+  const canvas = h("canvas", { class: "m-fx-confetti", "aria-hidden": "true" }) as HTMLCanvasElement;
   const close = openLayer("fx", canvas);
   const ctx = canvas.getContext?.("2d") ?? null;
   const W = globalThis.innerWidth || 800, H = globalThis.innerHeight || 600;
@@ -151,7 +151,7 @@ export function confetti({ x, y, count = 120, colors = ["#6d5dfc", "#3b82f6", "#
   });
 }
 
-/** Grain overlay wrapper: `<Noise>…</Noise>` (uses .hm-noise). */
+/** Grain overlay wrapper: `<Noise>…</Noise>` (uses .m-noise). */
 export function Noise(props: Props): HTMLElement {
-  return h("div", { class: ["hm-noise", props["class"]] }, () => props["children"]) as HTMLElement;
+  return h("div", { class: ["m-noise", props["class"]] }, () => props["children"]) as HTMLElement;
 }

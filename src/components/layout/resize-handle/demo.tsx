@@ -23,7 +23,7 @@ export default function ResizeHandleDemo(props: { values: Values }) {
   return <div class="sc-a6-rz-stage" class:sc-a6-rz-stage-end={props.values.edge === "start"}>
     <div class="sc-a6-rz" style={{ "inline-size": `${$w}px`, "block-size": `${$h}px` }}>
       <strong>Panel</strong>
-      <p class="hm-muted">Tutamacı sürükle ya da odaklayıp ok tuşlarını kullan; Enter başa döndürür.</p>
+      <p class="m-muted">Tutamacı sürükle ya da odaklayıp ok tuşlarını kullan; Enter başa döndürür.</p>
       <p class="sc-demo-call">{() => `${Math.round($w)} × ${Math.round($h)} px`}</p>
       {() => {
         const v = { ...props.values }

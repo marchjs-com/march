@@ -62,13 +62,13 @@ export function NamedOutlet(props: { name: string; empty?: unknown; children?: u
   const cur = I.slot(name);
   const key = computed(() => cur()?.key ?? null);
   const close = (): void => { if (name === "modal") closeModal(); else void openOutlet(name, null); };
-  return h("div", { class: "hm-outlet", "data-outlet": name }, () => {
+  return h("div", { class: "m-outlet", "data-outlet": name }, () => {
     if (key() == null) return props.empty !== undefined ? untrack(() => (typeof props.empty === "function" ? (props.empty as () => unknown)() : props.empty)) : null;
     return untrack(() => {
       const sl = cur.peek();
       if (!sl) return null;
-      // the page sits in its own box so a transition can move it (hm-outlet-page)
-      const page = (): unknown => h("div", { class: "hm-outlet-page", "data-outlet-page": name }, () => h(Try, { fallback: (e: unknown) => I.routeError(e, close) }, () => h(sl.comp, { params: sl.to.params, query: sl.to.query, meta: sl.to.meta, close })));
+      // the page sits in its own box so a transition can move it (m-outlet-page)
+      const page = (): unknown => h("div", { class: "m-outlet-page", "data-outlet-page": name }, () => h(Try, { fallback: (e: unknown) => I.routeError(e, close) }, () => h(sl.comp, { params: sl.to.params, query: sl.to.query, meta: sl.to.meta, close })));
       return typeof props.children === "function" ? (props.children as (page: () => unknown, close: () => void, to: RouteTarget) => unknown)(page, close, sl.to) : page();
     });
   }) as Element;

@@ -67,7 +67,7 @@ export function CodeInput(props: CodeInputProps): unknown {
   let completed: string | null = null;
   const boxes: HTMLInputElement[] = [];
   const field = useField();
-  const baseId = props.id ?? field?.id ?? uid("hm-code");
+  const baseId = props.id ?? field?.id ?? uid("m-code");
   const c = ctl(props);
   const write = (arr: string[]) => {
     cells.set(arr);
@@ -97,8 +97,8 @@ export function CodeInput(props: CodeInputProps): unknown {
   const colorOf = (i: number): string | null => itemColor(props.colors === "palette" ? PALETTE : props.colors === "brand" || Array.isArray(props.colors) ? props.colors : null, i);
   for (let i = 0; i < n; i++) {
     const el = h("input", {
-      type: () => (masked() ? "password" : "text"), class: () => cx("hm-otp-box", `hm-otp-b${(i % 4) + 1}`, cells()[i] && "is-filled"), id: i ? `${baseId}-${i}` : baseId,
-      "data-hm-color": colorOf(i), inputmode: kind === "numeric" ? "numeric" : "text", pattern: kind === "numeric" ? "[0-9]*" : null, maxlength: 2,
+      type: () => (masked() ? "password" : "text"), class: () => cx("m-otp-box", `m-otp-b${(i % 4) + 1}`, cells()[i] && "is-filled"), id: i ? `${baseId}-${i}` : baseId,
+      "data-m-color": colorOf(i), inputmode: kind === "numeric" ? "numeric" : "text", pattern: kind === "numeric" ? "[0-9]*" : null, maxlength: 2,
       autocapitalize: upper ? "characters" : "off", spellcheck: "false",
       autocomplete: i === 0 ? "one-time-code" : "off", "aria-label": () => props.boxLabel?.(i + 1, n) ?? t`Character ${i + 1} of ${n}`, "aria-invalid": c["aria-invalid"],
       disabled: () => !!props.disabled, readonly: () => !!props.readonly, onBlur: props.onBlur, autofocus: i === 0 && props.autofocus ? true : null,
@@ -130,16 +130,16 @@ export function CodeInput(props: CodeInputProps): unknown {
   const sizes = props.groups?.length ? props.groups : [n];
   let k = 0;
   sizes.forEach((g, gi) => {
-    if (gi && props.separator !== false && props.separator !== null) parts.push(props.separator === undefined || props.separator === true ? h("span", { class: "hm-otp-sep", "aria-hidden": "true" })
-      : h("span", { class: "hm-otp-sep-own", "aria-hidden": "true" }, ownPart(props.separator, () => null)));
+    if (gi && props.separator !== false && props.separator !== null) parts.push(props.separator === undefined || props.separator === true ? h("span", { class: "m-otp-sep", "aria-hidden": "true" })
+      : h("span", { class: "m-otp-sep-own", "aria-hidden": "true" }, ownPart(props.separator, () => null)));
     for (let x = 0; x < g && k < n; x++) parts.push(boxes[k++]);
   });
   while (k < n) parts.push(boxes[k++]);
   onCleanup(() => { boxes.length = 0; });
   // codes read left to right in every language
   return h("div", {
-    "data-hm-color": () => colorAttr(props.color), "data-hm-colors": props.colors && props.colors !== "single" ? (Array.isArray(props.colors) ? "custom" : props.colors) : null, role: "group", dir: "ltr",
-    class: () => cx("hm-otp", `hm-otp-${props.size ?? "md"}`, `hm-otp-${props.variant ?? "outline"}`, props.font && `hm-otp-font-${props.font}`, props.colors === "single" && "hm-otp-single", props.class),
+    "data-m-color": () => colorAttr(props.color), "data-m-colors": props.colors && props.colors !== "single" ? (Array.isArray(props.colors) ? "custom" : props.colors) : null, role: "group", dir: "ltr",
+    class: () => cx("m-otp", `m-otp-${props.size ?? "md"}`, `m-otp-${props.variant ?? "outline"}`, props.font && `m-otp-font-${props.font}`, props.colors === "single" && "m-otp-single", props.class),
     "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"],
   }, parts);
 }

@@ -1,65 +1,65 @@
 /* March — ChatBubble. Radius 20 with a 6px tail corner on the last bubble of a run; mine is an Aktivite gradient. */
-.hm-msg { --hm-msg-r: 1.25rem; --hm-msg-tail: .375rem; --hm-msg-blue: var(--hm-brand-blue, var(--hm-info));
+.m-msg { --m-msg-r: 1.25rem; --m-msg-tail: .375rem; --m-msg-blue: var(--m-brand-blue, var(--m-info));
   position: relative; display: flex; align-items: flex-end; gap: .25rem; min-width: 0; touch-action: pan-y; }
-.hm-msg-mine { flex-direction: row-reverse; }
-.hm-msg-col { display: flex; flex-direction: column; min-width: 0; max-width: min(78%, 37.5rem); }
-.hm-msg-mine .hm-msg-col { align-items: flex-end; }
-.hm-msg-bubble { position: relative; display: flex; flex-direction: column; gap: .25rem; min-width: 3.5rem; padding: .5rem .75rem .375rem; border-radius: var(--hm-msg-r);
-  font-size: var(--hm-text-md); line-height: 1.35; overflow-wrap: anywhere; box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--hm-text) 18%, transparent); }
-.hm-msg-theirs .hm-msg-bubble { background: var(--hm-surface); color: var(--hm-text); border: 1px solid var(--hm-border-subtle, var(--hm-border)); }
-.hm-msg-mine .hm-msg-bubble { color: var(--hm-on-brand-blue, var(--hm-on-info-fill));
-  background: linear-gradient(135deg, var(--hm-msg-blue), color-mix(in srgb, var(--hm-msg-blue) 76%, var(--hm-scrim))); }
+.m-msg-mine { flex-direction: row-reverse; }
+.m-msg-col { display: flex; flex-direction: column; min-width: 0; max-width: min(78%, 37.5rem); }
+.m-msg-mine .m-msg-col { align-items: flex-end; }
+.m-msg-bubble { position: relative; display: flex; flex-direction: column; gap: .25rem; min-width: 3.5rem; padding: .5rem .75rem .375rem; border-radius: var(--m-msg-r);
+  font-size: var(--m-text-md); line-height: 1.35; overflow-wrap: anywhere; box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--m-text) 18%, transparent); }
+.m-msg-theirs .m-msg-bubble { background: var(--m-surface); color: var(--m-text); border: 1px solid var(--m-border-subtle, var(--m-border)); }
+.m-msg-mine .m-msg-bubble { color: var(--m-on-brand-blue, var(--m-on-info-fill));
+  background: linear-gradient(135deg, var(--m-msg-blue), color-mix(in srgb, var(--m-msg-blue) 76%, var(--m-scrim))); }
 /* runs: inner corners tighten, the last bubble keeps the tail */
-.hm-msg-theirs.hm-msg-first .hm-msg-bubble { border-end-start-radius: var(--hm-msg-tail); }
-.hm-msg-theirs.hm-msg-middle .hm-msg-bubble { border-start-start-radius: var(--hm-msg-tail); border-end-start-radius: var(--hm-msg-tail); }
-.hm-msg-theirs.hm-msg-last .hm-msg-bubble, .hm-msg-theirs.hm-msg-single .hm-msg-bubble { border-end-start-radius: var(--hm-msg-tail); }
-.hm-msg-theirs.hm-msg-last .hm-msg-bubble { border-start-start-radius: var(--hm-msg-tail); }
-.hm-msg-mine.hm-msg-first .hm-msg-bubble { border-end-end-radius: var(--hm-msg-tail); }
-.hm-msg-mine.hm-msg-middle .hm-msg-bubble { border-start-end-radius: var(--hm-msg-tail); border-end-end-radius: var(--hm-msg-tail); }
-.hm-msg-mine.hm-msg-last .hm-msg-bubble, .hm-msg-mine.hm-msg-single .hm-msg-bubble { border-end-end-radius: var(--hm-msg-tail); }
-.hm-msg-mine.hm-msg-last .hm-msg-bubble { border-start-end-radius: var(--hm-msg-tail); }
-.hm-msg-text { white-space: pre-wrap; }
-.hm-msg.is-emoji .hm-msg-bubble { background: none; border: 0; box-shadow: none; padding-inline: 0; color: var(--hm-text); }
-.hm-msg.is-emoji .hm-msg-text { font-size: 2.75rem; line-height: 1.1; }
-.hm-msg-sender { font-size: var(--hm-text-sm); font-weight: 800; }
-.hm-msg-c1 { color: var(--hm-brand-orange-text, var(--hm-cat-1-text)); } .hm-msg-c2 { color: var(--hm-brand-blue-text, var(--hm-cat-2-text)); }
-.hm-msg-c3 { color: var(--hm-brand-green-text, var(--hm-cat-3-text)); } .hm-msg-c4 { color: var(--hm-brand-purple-text, var(--hm-cat-4-text)); }
+.m-msg-theirs.m-msg-first .m-msg-bubble { border-end-start-radius: var(--m-msg-tail); }
+.m-msg-theirs.m-msg-middle .m-msg-bubble { border-start-start-radius: var(--m-msg-tail); border-end-start-radius: var(--m-msg-tail); }
+.m-msg-theirs.m-msg-last .m-msg-bubble, .m-msg-theirs.m-msg-single .m-msg-bubble { border-end-start-radius: var(--m-msg-tail); }
+.m-msg-theirs.m-msg-last .m-msg-bubble { border-start-start-radius: var(--m-msg-tail); }
+.m-msg-mine.m-msg-first .m-msg-bubble { border-end-end-radius: var(--m-msg-tail); }
+.m-msg-mine.m-msg-middle .m-msg-bubble { border-start-end-radius: var(--m-msg-tail); border-end-end-radius: var(--m-msg-tail); }
+.m-msg-mine.m-msg-last .m-msg-bubble, .m-msg-mine.m-msg-single .m-msg-bubble { border-end-end-radius: var(--m-msg-tail); }
+.m-msg-mine.m-msg-last .m-msg-bubble { border-start-end-radius: var(--m-msg-tail); }
+.m-msg-text { white-space: pre-wrap; }
+.m-msg.is-emoji .m-msg-bubble { background: none; border: 0; box-shadow: none; padding-inline: 0; color: var(--m-text); }
+.m-msg.is-emoji .m-msg-text { font-size: 2.75rem; line-height: 1.1; }
+.m-msg-sender { font-size: var(--m-text-sm); font-weight: 800; }
+.m-msg-c1 { color: var(--m-brand-orange-text, var(--m-cat-1-text)); } .m-msg-c2 { color: var(--m-brand-blue-text, var(--m-cat-2-text)); }
+.m-msg-c3 { color: var(--m-brand-green-text, var(--m-cat-3-text)); } .m-msg-c4 { color: var(--m-brand-purple-text, var(--m-cat-4-text)); }
 
-.hm-msg-meta { display: inline-flex; align-items: center; justify-content: flex-end; gap: .25rem; align-self: flex-end; margin-block-start: -.125rem; font-size: var(--hm-text-2xs); font-weight: 600;
-  color: var(--hm-text-3, var(--hm-muted)); white-space: nowrap; }
-.hm-msg-mine .hm-msg-meta { color: color-mix(in srgb, currentColor 80%, transparent); }
-.hm-msg.is-emoji .hm-msg-meta { color: var(--hm-text-3, var(--hm-muted)); }
-.hm-msg-tick { display: inline-grid; place-items: center; }
-.hm-msg-tick .hm-svg { width: .9375rem; height: .9375rem; }
-.hm-msg-2tick { display: inline-flex; } .hm-msg-2tick .hm-svg + .hm-svg { margin-inline-start: -.5625rem; }
-.hm-msg-tick.is-read { color: color-mix(in srgb, var(--hm-on-brand-blue, var(--hm-on-info-fill)) 30%, var(--hm-brand-green, var(--hm-success))); }
-.hm-msg.is-emoji .hm-msg-tick.is-read { color: var(--hm-brand-blue, var(--hm-info)); }
-.hm-msg-tick.is-failed { color: var(--hm-danger); }
-.hm-msg-reacts { display: flex; flex-wrap: wrap; gap: .25rem; margin-block-start: -.375rem; padding-inline: .5rem; position: relative; z-index: 1; }
+.m-msg-meta { display: inline-flex; align-items: center; justify-content: flex-end; gap: .25rem; align-self: flex-end; margin-block-start: -.125rem; font-size: var(--m-text-2xs); font-weight: 600;
+  color: var(--m-text-3, var(--m-muted)); white-space: nowrap; }
+.m-msg-mine .m-msg-meta { color: color-mix(in srgb, currentColor 80%, transparent); }
+.m-msg.is-emoji .m-msg-meta { color: var(--m-text-3, var(--m-muted)); }
+.m-msg-tick { display: inline-grid; place-items: center; }
+.m-msg-tick .m-svg { width: .9375rem; height: .9375rem; }
+.m-msg-2tick { display: inline-flex; } .m-msg-2tick .m-svg + .m-svg { margin-inline-start: -.5625rem; }
+.m-msg-tick.is-read { color: color-mix(in srgb, var(--m-on-brand-blue, var(--m-on-info-fill)) 30%, var(--m-brand-green, var(--m-success))); }
+.m-msg.is-emoji .m-msg-tick.is-read { color: var(--m-brand-blue, var(--m-info)); }
+.m-msg-tick.is-failed { color: var(--m-danger); }
+.m-msg-reacts { display: flex; flex-wrap: wrap; gap: .25rem; margin-block-start: -.375rem; padding-inline: .5rem; position: relative; z-index: 1; }
 /* reaction chips: small pill Buttons (pressed = mine) · retry: a link Button */
-.hm-msg-react.hm-btn { min-height: 0; padding: .125rem .4375rem; border-color: var(--hm-border-subtle, var(--hm-border)); background: var(--hm-surface); color: var(--hm-text); font-weight: inherit;
-  box-shadow: 0 2px 6px -3px color-mix(in srgb, var(--hm-text) 20%, transparent); transition: transform var(--hm-dur) var(--hm-ease-spring); }
-.hm-msg-react .hm-btn-label { display: inline-flex; align-items: center; gap: .1875rem; }
-.hm-msg-react.hm-btn:hover { transform: scale(1.08); }
-.hm-msg-react.hm-btn.is-mine { background: var(--hm-brand-blue-soft, var(--hm-info-soft)); border: 1.4px solid var(--hm-brand-blue, var(--hm-info)); color: var(--hm-text); }
-.hm-msg-react-n { font-size: var(--hm-text-xs); font-weight: 800; }
-.hm-msg-react:focus-visible, .hm-msg-tool:focus-visible, .hm-msg-retry:focus-visible { outline: 2px solid var(--hm-brand-blue, var(--hm-primary)); outline-offset: 1px; }
-.hm-msg-retry.hm-btn { align-self: flex-end; margin-block-start: .25rem; color: var(--hm-danger-text, var(--hm-danger)); font-size: var(--hm-text-xs); font-weight: 700; }
-.hm-msg-tools { display: flex; gap: .125rem; align-self: center; opacity: 0; transition: opacity var(--hm-dur) var(--hm-ease); }
-.hm-msg:hover .hm-msg-tools, .hm-msg:focus-within .hm-msg-tools { opacity: 1; }
-@media (hover: none) { .hm-msg-tools:not(:focus-within) { opacity: 0; } }
-.hm-msg-tool.hm-icon-btn { inline-size: 1.75rem; block-size: 1.75rem; background: var(--hm-surface-2); color: var(--hm-text-2); }
-.hm-msg-tool.hm-icon-btn .hm-svg { width: 1rem; height: 1rem; }
-.hm-msg-mine .hm-msg-tool .hm-svg, .hm-msg-hint .hm-svg { transform: scaleX(-1); }
-:dir(rtl) .hm-msg-tool .hm-svg { transform: scaleX(-1); } :dir(rtl) .hm-msg-mine .hm-msg-tool .hm-svg { transform: none; }
-.hm-msg-hint { position: absolute; inset-block-end: .5rem; inset-inline-start: .25rem; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%;
-  background: var(--hm-surface-2); color: var(--hm-text-2); opacity: 0; pointer-events: none; }
-.hm-msg-mine .hm-msg-hint { inset-inline-start: auto; inset-inline-end: .25rem; }
-.hm-msg.is-armed .hm-msg-hint { background: var(--hm-brand-blue, var(--hm-info)); color: var(--hm-on-brand-blue, var(--hm-on-info-fill)); }
-.hm-msg-bubble { transition: none; }
-/* own color: data-hm-color sets --hm-accent for my bubble and the armed arrow */
-.hm-msg[data-hm-color] { --hm-msg-blue: var(--hm-accent); }
-.hm-msg[data-hm-color].is-armed .hm-msg-hint { background: var(--hm-accent); }
-.hm-msg[data-hm-color] .hm-msg-react.hm-btn.is-mine { border-color: var(--hm-accent); background: color-mix(in srgb, var(--hm-accent) 14%, var(--hm-surface)); }
-.hm-msg-mine[data-hm-color]:not(.is-emoji) .hm-msg-bubble, .hm-msg[data-hm-color].is-armed .hm-msg-hint { color: var(--hm-on-accent); }
-.hm-msg-hint.is-own .hm-svg { transform: none; }
+.m-msg-react.m-btn { min-height: 0; padding: .125rem .4375rem; border-color: var(--m-border-subtle, var(--m-border)); background: var(--m-surface); color: var(--m-text); font-weight: inherit;
+  box-shadow: 0 2px 6px -3px color-mix(in srgb, var(--m-text) 20%, transparent); transition: transform var(--m-dur) var(--m-ease-spring); }
+.m-msg-react .m-btn-label { display: inline-flex; align-items: center; gap: .1875rem; }
+.m-msg-react.m-btn:hover { transform: scale(1.08); }
+.m-msg-react.m-btn.is-mine { background: var(--m-brand-blue-soft, var(--m-info-soft)); border: 1.4px solid var(--m-brand-blue, var(--m-info)); color: var(--m-text); }
+.m-msg-react-n { font-size: var(--m-text-xs); font-weight: 800; }
+.m-msg-react:focus-visible, .m-msg-tool:focus-visible, .m-msg-retry:focus-visible { outline: 2px solid var(--m-brand-blue, var(--m-primary)); outline-offset: 1px; }
+.m-msg-retry.m-btn { align-self: flex-end; margin-block-start: .25rem; color: var(--m-danger-text, var(--m-danger)); font-size: var(--m-text-xs); font-weight: 700; }
+.m-msg-tools { display: flex; gap: .125rem; align-self: center; opacity: 0; transition: opacity var(--m-dur) var(--m-ease); }
+.m-msg:hover .m-msg-tools, .m-msg:focus-within .m-msg-tools { opacity: 1; }
+@media (hover: none) { .m-msg-tools:not(:focus-within) { opacity: 0; } }
+.m-msg-tool.m-icon-btn { inline-size: 1.75rem; block-size: 1.75rem; background: var(--m-surface-2); color: var(--m-text-2); }
+.m-msg-tool.m-icon-btn .m-svg { width: 1rem; height: 1rem; }
+.m-msg-mine .m-msg-tool .m-svg, .m-msg-hint .m-svg { transform: scaleX(-1); }
+:dir(rtl) .m-msg-tool .m-svg { transform: scaleX(-1); } :dir(rtl) .m-msg-mine .m-msg-tool .m-svg { transform: none; }
+.m-msg-hint { position: absolute; inset-block-end: .5rem; inset-inline-start: .25rem; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%;
+  background: var(--m-surface-2); color: var(--m-text-2); opacity: 0; pointer-events: none; }
+.m-msg-mine .m-msg-hint { inset-inline-start: auto; inset-inline-end: .25rem; }
+.m-msg.is-armed .m-msg-hint { background: var(--m-brand-blue, var(--m-info)); color: var(--m-on-brand-blue, var(--m-on-info-fill)); }
+.m-msg-bubble { transition: none; }
+/* own color: data-m-color sets --m-accent for my bubble and the armed arrow */
+.m-msg[data-m-color] { --m-msg-blue: var(--m-accent); }
+.m-msg[data-m-color].is-armed .m-msg-hint { background: var(--m-accent); }
+.m-msg[data-m-color] .m-msg-react.m-btn.is-mine { border-color: var(--m-accent); background: color-mix(in srgb, var(--m-accent) 14%, var(--m-surface)); }
+.m-msg-mine[data-m-color]:not(.is-emoji) .m-msg-bubble, .m-msg[data-m-color].is-armed .m-msg-hint { color: var(--m-on-accent); }
+.m-msg-hint.is-own .m-svg { transform: none; }

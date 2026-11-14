@@ -19,7 +19,7 @@ off()                                                                           
 |---|---|
 | `corner` (CornerControls) | Which corner; default `bottom-end`. |
 | `label` | Accessible name of the corner group (string or accessor); default "Page controls" (translated). |
-| `class` | Added to the corner element (`.hm-corner`, `.hm-corner-<corner>`). |
+| `class` | Added to the corner element (`.m-corner`, `.m-corner-<corner>`). |
 
 ```tsx
 <BottomRightControls label="Quick actions" class="my-corner" />

@@ -49,7 +49,7 @@ export function StatTile(props: StatTileProps): Element {
   const kind = props.href != null ? "a" : props.onClick ? "button" : "div";
   const term = kind === "div" && !!props.term;
   const part = (tag: string, name: string, v: MaybeFn<unknown>, more?: unknown): Element | null =>
-    (v == null ? null : h(tag, { class: cx(`hm-stat-tile-${name}`, props.partClass?.[name as "value" | "label" | "hint"]) }, () => val(v), more) as Element);
+    (v == null ? null : h(tag, { class: cx(`m-stat-tile-${name}`, props.partClass?.[name as "value" | "label" | "hint"]) }, () => val(v), more) as Element);
   const inValue = props.hintIn === "value" && props.value != null;
   const value = part(term ? "dd" : "span", "value", props.value, inValue ? part("span", "hint", props.hint) : null), label = part(term ? "dt" : "span", "label", props.label);
   // a <dl> needs the term first; the look (value above the label) comes from CSS order either way
@@ -57,9 +57,9 @@ export function StatTile(props: StatTileProps): Element {
   const off = (): boolean => !!val(props.disabled);
   const attrs = {
     ...rest(props, ["value", "label", "hint", "color", "align", "size", "variant", "order", "onClick", "href", "disabled", "term", "partClass", "hintIn", "emphasis"]),
-    class: () => cx("hm-stat-tile", `hm-stat-tile-${val(props.variant) ?? "plain"}`, `hm-stat-tile-${val(props.size) ?? "md"}`, `is-${val(props.align) ?? "center"}`,
+    class: () => cx("m-stat-tile", `m-stat-tile-${val(props.variant) ?? "plain"}`, `m-stat-tile-${val(props.size) ?? "md"}`, `is-${val(props.align) ?? "center"}`,
       val(props.order) === "label" && "is-label-first", props.emphasis === "text" && "is-text", kind !== "div" && "is-action", off() && "is-disabled", val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)),
+    "data-m-color": () => colorAttr(val(props.color)),
   };
   if (kind === "button") return h("button", { ...attrs, type: "button", disabled: off, onClick: props.onClick }, body) as Element;
   if (kind === "a") {

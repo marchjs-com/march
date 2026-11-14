@@ -23,14 +23,14 @@ function track(): void {
   if (tracking || !globalThis.addEventListener) return;
   tracking = true;
   globalThis.addEventListener("pointerdown", (e: PointerEvent) => {
-    const hit = (e.target as Element | null)?.closest?.("a, button, [data-hm-morph]") ?? null;
+    const hit = (e.target as Element | null)?.closest?.("a, button, [data-m-morph]") ?? null;
     press = { x: e.clientX, y: e.clientY, rect: hit?.getBoundingClientRect() ?? null };
   }, { capture: true, passive: true });
 }
 function pageRect(): DOMRect | null {
-  // the part that animates (a [data-hm-transition] stage, else the page)
+  // the part that animates (a [data-m-transition] stage, else the page)
   const page = transitionOutlet()?.firstElementChild;
-  const el = (page?.querySelector("[data-hm-transition]") ?? page ?? globalThis.document?.documentElement) as Element | null;
+  const el = (page?.querySelector("[data-m-transition]") ?? page ?? globalThis.document?.documentElement) as Element | null;
   return el?.getBoundingClientRect?.() ?? null;
 }
 const rel = (x: number, y: number): { x: number; y: number } => {

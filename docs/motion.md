@@ -30,13 +30,13 @@ CSS animations, found with `getAnimations()`).
 ## Reduced motion
 
 `reduce: "system"` follows `prefers-reduced-motion`; `"reduce"` / `"full"` override it. While reduced, non-`essential`
-playbacks jump to their end, endless ones stay still, finite CSS animations finish at once, and `<html data-hm-reduced>`
+playbacks jump to their end, endless ones stay still, finite CSS animations finish at once, and `<html data-m-reduced>`
 lets CSS (motion.css, generated keyframes) follow the user setting too.
 
 ## CSS output
 
-`keyframesCss({ names })` (or `node tools/gen-motion-css.js <module> out.css --presets`) writes `@keyframes hm-<name>` and
-`.hm-anim-<name>` classes from the registrations: springs as `linear()` with a cubic-bezier before it for older browsers,
+`keyframesCss({ names })` (or `node tools/gen-motion-css.js <module> out.css --presets`) writes `@keyframes m-<name>` and
+`.m-anim-<name>` classes from the registrations: springs as `linear()` with a cubic-bezier before it for older browsers,
 and reduced-motion rules.
 
 ## Performance
@@ -104,7 +104,7 @@ clip-path cells, one polygon), `morphPage` ("morph": grows out of the pressed li
 `usePageTransitions(circle, cube)`; `PAGE_VARIANTS` lists all. Going back, the old page plays the reverse on top
 (`zIndex`); wipe, stack, cube and flip mirror in RTL. With View Transitions the engine animates the pseudo-elements,
 otherwise the page elements themselves. The snapshot layers are clipped to the box of the part that changes, so a scaled, blurred
-or turning page never covers the menu. Mark an element inside the page with `data-hm-transition` (a demo stage, a content
+or turning page never covers the menu. Mark an element inside the page with `data-m-transition` (a demo stage, a content
 column) and only that part animates; the rest of the page swaps at once. "Stop all" during a variant transition ends
 it at once (its layer animations are removed), and a newer navigation replaces a running one, so no layer stays.
 
@@ -114,14 +114,14 @@ it at once (its layer animations are removed), and a newer navigation replaces a
   tilt; leaving springs them back (`spring-wobbly`).
 - `use:press={{ scale, easing }}` — the release can be a spring (`"spring-wobbly"` brings its own duration).
 - `stateMorph(button, "loading" | "success" | "error" | "idle", { confetti, labels })` — narrows to a circle with a
-  spinner, draws a check or a cross (error shakes), colours from the tokens via `data-hm-state` (motion.css), announces
+  spinner, draws a check or a cross (error shakes), colours from the tokens via `data-m-state` (motion.css), announces
   the state in a polite live region, `aria-busy` while loading; `confetti: true` loads hadi-march/fx on demand.
 
 ### Scroll (src/motion/scroll-fx.ts)
 A paused Playback is seeked by scroll progress (read phase, once per frame), so keyframes, timelines and easings are the
 same as for time. `source` is a scroll box (default the page), `track` the element whose passage counts, `range` a
 window of it. `scrollTimeline(target, frames | null, o)`, `parallaxLayers(container, { strength })` (`data-depth`,
-still with reduced motion), `stickyReveal(section, { steps, onStep })` (sets `--hm-scroll`), `scrollIndicator(bar)`
+still with reduced motion), `stickyReveal(section, { steps, onStep })` (sets `--m-scroll`), `scrollIndicator(bar)`
 (grows from the inline start, RTL mirrored, essential), `scrollFraction(o)`, `onScrollProgress(o, fn)`. "Pause all"
 freezes them.
 

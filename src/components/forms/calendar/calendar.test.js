@@ -20,7 +20,7 @@ test("Calendar: grid keyboard, min / max clamping, aria states", () => {
   assert.equal(focused(), "2026-03-14");
   assert.equal(el.querySelector(`[data-date="2026-03-09"]`).getAttribute("aria-disabled"), "true");
   assert.equal(el.querySelector(`[data-date="2026-03-14"]`).getAttribute("aria-selected"), "true");
-  assert.equal(el.querySelector(".hm-cal-wd").textContent, "Mon");
+  assert.equal(el.querySelector(".m-cal-wd").textContent, "Mon");
   key(grid, "ArrowRight"); assert.equal(focused(), "2026-03-15");
   key(grid, "ArrowDown"); assert.equal(focused(), "2026-03-22");
   key(grid, "Home"); assert.equal(focused(), "2026-03-16");
@@ -32,18 +32,18 @@ test("Calendar: grid keyboard, min / max clamping, aria states", () => {
 
 test("Calendar: month buttons, weekday row, labels, icons, day content and color are yours", () => {
   const { el, dispose } = mount(() => h(Calendar, { value: "2026-03-14", labels: { prevMonth: "Back", nextMonth: "Forward" }, prevIcon: "<", nextIcon: () => h("b", {}, ">"), weekdays: false, renderDay: (_iso, d) => `${d}.`, color: "brand-orange" }));
-  const [p, n] = el.querySelectorAll(".hm-cal-nav");
+  const [p, n] = el.querySelectorAll(".m-cal-nav");
   assert.equal(p.getAttribute("aria-label"), "Back");
   assert.equal(n.getAttribute("aria-label"), "Forward");
   assert.equal(p.textContent, "<");
   assert.equal(n.querySelector("b").textContent, ">");
-  assert.equal(el.querySelector(".hm-cal-head"), null);
+  assert.equal(el.querySelector(".m-cal-head"), null);
   assert.equal(el.querySelector('[data-date="2026-03-14"]').textContent, "14.");
-  assert.equal(el.querySelector(".hm-cal").getAttribute("data-hm-color"), "brand-orange");
+  assert.equal(el.querySelector(".m-cal").getAttribute("data-m-color"), "brand-orange");
   dispose();
   const m = mount(() => h(Calendar, { value: "2026-03-14", nav: false }));
-  assert.equal(m.el.querySelector(".hm-cal-nav"), null);
-  assert.ok(m.el.querySelector(".hm-cal-head"));
+  assert.equal(m.el.querySelector(".m-cal-nav"), null);
+  assert.ok(m.el.querySelector(".m-cal-head"));
   assert.equal(m.el.querySelector('[data-date="2026-03-14"]').textContent, "14");
   m.dispose();
 });
@@ -64,10 +64,10 @@ test("dayGridKey: the day a key moves to in a grid of days (shared with other da
 
 test("Calendar: the month buttons are IconButtons with their names", () => {
   const { el, dispose } = mount(() => h(Calendar, { value: "2026-03-14", labels: { prevMonth: "Back" } }));
-  const [prev, next] = el.querySelectorAll(".hm-cal-nav.hm-icon-btn");
+  const [prev, next] = el.querySelectorAll(".m-cal-nav.m-icon-btn");
   assert.equal(prev.getAttribute("aria-label"), "Back");
-  assert.ok(next.classList.contains("hm-cal-next"));
+  assert.ok(next.classList.contains("m-cal-next"));
   next.click();
-  assert.match(el.querySelector(".hm-cal-title").textContent, /2026/);
+  assert.match(el.querySelector(".m-cal-title").textContent, /2026/);
   dispose();
 });

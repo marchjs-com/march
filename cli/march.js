@@ -518,7 +518,7 @@ async function seo() {
   for (const f of files) {
     const html = readFileSync(f, "utf8");
     // hash routing: every route is the same document, a canonical link is optional
-    const canonical = flag("--no-canonical") === true ? false : !/data-hm-prerender="#/.test(html) && !!cfg.seo?.site;
+    const canonical = flag("--no-canonical") === true ? false : !/data-m-prerender="#/.test(html) && !!cfg.seo?.site;
     const issues = checkHtml(html, { canonical });
     errors += issues.filter((i) => i.level === "error").length;
     warns += issues.filter((i) => i.level === "warn").length;

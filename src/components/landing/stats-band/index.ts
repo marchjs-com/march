@@ -33,12 +33,12 @@ export interface StatsBandProps {
 /** `<StatsBand items={[{ value: 12000, label: "teams", format: { notation: "compact" } }, { value: 99.9, decimals: 1, suffix: "%", label: "uptime" }]} />` */
 export function StatsBand(props: StatsBandProps): Element {
   const mode = props.mode;
-  return h(Reveal, { class: cx("hm-stats", `hm-stats-${props.variant ?? "divided"}`, val(props.class)), "data-hm-color": colorAttr(props.color), effect: "up", stagger: 90, ...(props.reveal === false ? { effect: "none" } : props.reveal), as: "dl" },
+  return h(Reveal, { class: cx("m-stats", `m-stats-${props.variant ?? "divided"}`, val(props.class)), "data-m-color": colorAttr(props.color), effect: "up", stagger: 90, ...(props.reveal === false ? { effect: "none" } : props.reveal), as: "dl" },
     // each item is a StatTile (dt / dd inside the dl): the figure is a Counter, or plain text with mode "none"
     props.items.map((s) => h(StatTile, {
-      term: true, size: "xl", variant: props.variant === "cards" ? "card" : "plain", class: "hm-stats-item", label: s.label, hint: s.note ?? undefined,
+      term: true, size: "xl", variant: props.variant === "cards" ? "card" : "plain", class: "m-stats-item", label: s.label, hint: s.note ?? undefined,
       value: mode === "none"
-        ? h("span", { class: "hm-stats-plain" }, s.prefix ?? null, () => formatCount(s.value, s, locale()), s.suffix ?? null)
+        ? h("span", { class: "m-stats-plain" }, s.prefix ?? null, () => formatCount(s.value, s, locale()), s.suffix ?? null)
         : h(Counter, { value: s.value, format: s.format, decimals: s.decimals, prefix: s.prefix, suffix: s.suffix, mode }),
     }))) as Element;
 }

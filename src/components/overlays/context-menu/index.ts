@@ -14,7 +14,7 @@ export interface ContextMenuProps {
   label?: MaybeFn<string | undefined>;
   /** Called before opening; return false to keep the browser menu. */
   when?: (target: Element) => boolean;
-  /** Extra class on the floating menu panel (`.hm-menu`); `class` goes to the host around the children. */
+  /** Extra class on the floating menu panel (`.m-menu`); `class` goes to the host around the children. */
   menuClass?: ClassProp;
   class?: ClassProp;
   children?: unknown;
@@ -23,10 +23,10 @@ export interface ContextMenuProps {
 /** `<ContextMenu items={(target) => [{ label: "Copy", onSelect: copy }, "-", remove]}>{area}</ContextMenu>` */
 export function ContextMenu(props: ContextMenuProps): Element {
   const open = signal<{ x: number; y: number; target: Element } | null>(null);
-  const id = uid("hm-ctx");
+  const id = uid("m-ctx");
   let panel: HTMLElement | undefined, returnTo: HTMLElement | null = null;
   // a zero-size fixed point the panel is placed against (the shared positioning engine needs an element)
-  const anchor = h("span", { class: "hm-ctxmenu-point", "aria-hidden": "true" }) as HTMLElement;
+  const anchor = h("span", { class: "m-ctxmenu-point", "aria-hidden": "true" }) as HTMLElement;
   const show = (x: number, y: number, target: Element): void => {
     if (props.when && !props.when(target)) return;
     returnTo = (globalThis.document?.activeElement as HTMLElement | null) ?? null;
@@ -36,7 +36,7 @@ export function ContextMenu(props: ContextMenuProps): Element {
   };
   const close = (refocus?: boolean): void => { open.set(null); if (refocus) returnTo?.focus?.(); };
   return h("div", {
-    class: () => cx("hm-ctxmenu", val(props.class)),
+    class: () => cx("m-ctxmenu", val(props.class)),
     onContextmenu: (e: MouseEvent) => {
       if (props.when && !props.when(e.target as Element)) return;
       e.preventDefault();

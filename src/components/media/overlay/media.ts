@@ -5,7 +5,7 @@ import { frameLoop } from "../../../motion/env.ts";
 /** Muted, looping, inline, control-less video that plays only while visible. */
 export function mountVideo(root: HTMLElement, src: string, poster: string | undefined, posterEl: HTMLElement | null): void {
   const v = document.createElement("video");
-  v.className = "hm-ov-media";
+  v.className = "m-ov-media";
   v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true; v.autoplay = false; v.controls = false;
   v.preload = "metadata";
   for (const a of ["muted", "loop", "playsinline", "disablepictureinpicture", "disableremoteplayback"]) v.setAttribute(a, "");
@@ -27,13 +27,13 @@ export function mountVideo(root: HTMLElement, src: string, poster: string | unde
 const themeColors = (el: Element): { primary: string; text: string; surface: string; bg: string; cat: string[] } => {
   const cs = getComputedStyle(el);
   const v = (n: string): string => cs.getPropertyValue(n).trim();
-  return { primary: v("--hm-primary"), text: v("--hm-text"), surface: v("--hm-surface"), bg: v("--hm-bg"), cat: [1, 2, 3, 4, 5, 6, 7, 8].map((i) => v(`--hm-cat-${i}`)) };
+  return { primary: v("--m-primary"), text: v("--m-text"), surface: v("--m-surface"), bg: v("--m-bg"), cat: [1, 2, 3, 4, 5, 6, 7, 8].map((i) => v(`--m-cat-${i}`)) };
 };
 
 /** A canvas sized to the overlay (devicePixelRatio), redrawn on resize, every frame while visible when `animate`. */
 export function mountCanvas(root: HTMLElement, draw: DrawFn, animate: boolean): void {
   const c = document.createElement("canvas");
-  c.className = "hm-ov-media";
+  c.className = "m-ov-media";
   root.append(c);
   const ctx = c.getContext("2d");
   if (!ctx) return;
@@ -42,7 +42,7 @@ export function mountCanvas(root: HTMLElement, draw: DrawFn, animate: boolean): 
   const paint = (): void => {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
-    draw(ctx, { width: w, height: h, dpr, time, theme: themeColors(root), pointer: (root as HTMLElement & { hmPointer?: { x: number; y: number } | null }).hmPointer ?? null });
+    draw(ctx, { width: w, height: h, dpr, time, theme: themeColors(root), pointer: (root as HTMLElement & { mPointer?: { x: number; y: number } | null }).mPointer ?? null });
   };
   const run = (): void => {
     if (stop || !animate || !visible || !root.isConnected) return;

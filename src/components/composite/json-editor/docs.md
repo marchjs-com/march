@@ -26,7 +26,7 @@ lists the first problem with its path, the tree marks every invalid row.
 | `status` | boolean | `true` | the "Valid JSON" confirmation (problems are shown either way) |
 | `labels` | `{ text, tree, view, treeName, fixFirst, valid, format, invalid(line, column, message), more(count) }` | — | own texts (each falls back to the built-in one) |
 | `rows`, `readonly`, `disabled` | | | |
-| `class` | class value | — | on the root (`hm-json-editor`) |
+| `class` | class value | — | on the root (`m-json-editor`) |
 
 ```tsx
 <JsonEditor bind:value={$config} format={false} status={false}

@@ -32,28 +32,28 @@ export function Tree(props: TreeProps): Element {
     const isOpen = (): boolean => open().has(node.id);
     const act = (): void => { if (has) toggle(node.id); props.onSelect?.(node); };
     const own = props.chevron;
-    return h("li", { role: "treeitem", class: "hm-tree-li", "aria-expanded": () => (has ? String(isOpen()) : null), "aria-selected": () => String(val(props.selected) === node.id), "aria-level": String(level) },
+    return h("li", { role: "treeitem", class: "m-tree-li", "aria-expanded": () => (has ? String(isOpen()) : null), "aria-selected": () => String(val(props.selected) === node.id), "aria-level": String(level) },
       treeRow({
-        prefix: "hm-tree", kids: has, open: isOpen, chevron: typeof own === "function" ? () => own(node, isOpen) : own,
-        icon: icon(node.icon, "hm-tree-icon"), label: h(OverflowText, { class: "hm-tree-label" }, node.label), meta: node.meta,
+        prefix: "m-tree", kids: has, open: isOpen, chevron: typeof own === "function" ? () => own(node, isOpen) : own,
+        icon: icon(node.icon, "m-tree-icon"), label: h(OverflowText, { class: "m-tree-label" }, node.label), meta: node.meta,
       }, {
         interactive: true, active: () => val(props.selected) === node.id, tabindex: "-1", "data-level": String(level), onClick: act,
         onKeydown: (e: KeyboardEvent) => {
           const at = e.currentTarget as HTMLElement;
-          const rows = [...(at.closest(".hm-tree")?.querySelectorAll<HTMLElement>(".hm-tree-row") ?? [])].filter((r) => r.offsetParent !== null || !r.closest("[hidden]"));
+          const rows = [...(at.closest(".m-tree")?.querySelectorAll<HTMLElement>(".m-tree-row") ?? [])].filter((r) => r.offsetParent !== null || !r.closest("[hidden]"));
           if (roving(e, rows, { wrap: false })) return; // ↑ ↓ Home End among the visible rows
           const k = treeKey(e.key, { kids: has, open: has && isOpen() }, isRtl(at));
           if (!k) return;
           e.preventDefault();
           if (k === "open" || k === "close") toggle(node.id, k === "open");
           else if (k === "child") rows[rows.indexOf(at) + 1]?.focus();
-          else if (k === "parent") at.closest(".hm-tree-group")?.closest(".hm-tree-li")?.querySelector<HTMLElement>(".hm-tree-row")?.focus();
+          else if (k === "parent") at.closest(".m-tree-group")?.closest(".m-tree-li")?.querySelector<HTMLElement>(".m-tree-row")?.focus();
           else act();
         },
       }),
-      has && h("ul", { role: "group", class: "hm-tree-group", hidden: () => !isOpen() }, node.children?.map((c) => row(c, level + 1))));
+      has && h("ul", { role: "group", class: "m-tree-group", hidden: () => !isOpen() }, node.children?.map((c) => row(c, level + 1))));
   };
-  const root = h("ul", { role: "tree", class: () => cx("hm-tree", val(props.class)), "aria-label": props.label ?? t`Tree`, "data-hm-color": () => colorAttr(props.color) }, props.nodes.map((n) => row(n, 1)));
-  queueMicrotask(() => { const first = (root as HTMLElement).querySelector<HTMLElement>(".hm-tree-row"); if (first) first.tabIndex = 0; });
+  const root = h("ul", { role: "tree", class: () => cx("m-tree", val(props.class)), "aria-label": props.label ?? t`Tree`, "data-m-color": () => colorAttr(props.color) }, props.nodes.map((n) => row(n, 1)));
+  queueMicrotask(() => { const first = (root as HTMLElement).querySelector<HTMLElement>(".m-tree-row"); if (first) first.tabIndex = 0; });
   return root;
 }

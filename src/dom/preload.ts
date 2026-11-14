@@ -71,7 +71,7 @@ export function preloadChunks(key: string | undefined | null, low = false): bool
 export function prefetchCommon(): boolean { return !saveData() && preloadChunks("march:common", true); }
 
 /** The manifest key the compiler attached to a loader (`() => import("./x.tsx")`), if any. */
-export const loaderKey = (fn: unknown): string | undefined => (fn as { hm?: string } | null)?.hm;
+export const loaderKey = (fn: unknown): string | undefined => (fn as { m?: string } | null)?.m;
 
 let delayMs = 0;
 /** Demo / testing: add an artificial delay (ms) before every lazy component and route chunk loads ("slow 3G"). */

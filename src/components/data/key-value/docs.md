@@ -17,7 +17,7 @@ nodes or accessors; an empty value shows a placeholder.
 | `empty` | node | `—` | shown for null / empty values |
 | `class` | class | — | extra class on the list |
 
-Parts carry stable classes: `hm-kv-row`, `hm-kv-label`, `hm-kv-value`, `hm-kv-hint`.
+Parts carry stable classes: `m-kv-row`, `m-kv-label`, `m-kv-value`, `m-kv-hint`.
 
 ## Accessibility
 

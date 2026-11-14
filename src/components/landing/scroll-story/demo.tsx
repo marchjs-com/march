@@ -27,7 +27,7 @@ const TRANSITIONS: Record<string, string> = { rise: "yükselerek gelir", fade: "
 
 export default function ScrollStoryDemo(props: { values: { side: string; theme: boolean; dots: boolean; numbers: string; transition: string } }) {
   return <div>
-    <p class="hm-muted">{() => `Sayfayı kaydır: adım değişince görsel ${TRANSITIONS[props.values.transition]}.`}</p>
+    <p class="m-muted">{() => `Sayfayı kaydır: adım değişince görsel ${TRANSITIONS[props.values.transition]}.`}</p>
     {() => {
       const v = { ...props.values }
       return <ScrollStory steps={STORY} side={v.side as "end"} theme={v.theme} dots={v.dots}

@@ -260,7 +260,7 @@ export class ManagedSocket<In = unknown, Out = unknown> {
 
   // ---- one connection for every tab
   private share(): void {
-    const bc = (this.bc = new BroadcastChannel(`hm-ws:${this.url}`));
+    const bc = (this.bc = new BroadcastChannel(`m-ws:${this.url}`));
     this.leader.set(false);
     bc.onmessage = (e: MessageEvent<{ k: string; msg?: unknown; data?: string; state?: SocketState }>) => {
       const d = e.data;
@@ -271,7 +271,7 @@ export class ManagedSocket<In = unknown, Out = unknown> {
     const locks = (globalThis.navigator as { locks?: { request(n: string, f: () => Promise<void>): Promise<void> } } | undefined)?.locks;
     if (!locks) { this.leader.set(true); if (!this.o.lazy) this.connect(); return; }
     bc.postMessage({ k: "hello" });
-    void locks.request(`hm-ws:${this.url}`, () => new Promise<void>((release) => {
+    void locks.request(`m-ws:${this.url}`, () => new Promise<void>((release) => {
       if (this.closed) { release(); return; }
       this.releaseLock = release;
       this.leader.set(true);

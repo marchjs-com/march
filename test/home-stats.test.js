@@ -47,7 +47,7 @@ export function shownDigits(src) {
     const v = m[2];
     if (!/\d/.test(v)) continue;
     if (/^(hadi-march|\.\.?\/)/.test(v)) continue; // import
-    if (/^[\w-]+(\s+[\w-]+)*$/.test(v) && /-|^[a-z]/.test(v) && !/\s\d|^\d/.test(v)) continue; // class / token names (sc-h2, hm-grid-3)
+    if (/^[\w-]+(\s+[\w-]+)*$/.test(v) && /-|^[a-z]/.test(v) && !/\s\d|^\d/.test(v)) continue; // class / token names (sc-h2, m-grid-3)
     if (/^-?[\d.]+(px|rem|em|ms|s|%|deg|fr|vh|vw)?(\s+-?[\d.]+(px|rem|em|ms|s|%|deg|fr|vh|vw)?)*$/.test(v)) continue; // CSS value
     if (!/\d/.test(v.replace(/\$\{[^}]*\}/g, ""))) continue; // `${n} KB`, `Tema ${i} / ${n}`: every digit is a live value
     if (/^(\s*[a-zA-Z-]+\([^()]*\))+\s*$/.test(v)) continue; // CSS function values: "translate(0, 0) scale(1)"

@@ -84,41 +84,41 @@ export function HonestCompare(props: HonestCompareProps): Element {
     if (mine !== undefined) return mine;
     // yes / no / partly: the shared CheckMark (the text is read by screen readers; "partly" also shows it)
     if (v === true || v === false || v === "partial") return h(CheckMark, {
-      value: v, size: "lg", text: v === "partial", class: v === true ? "hm-hc-yes" : v === false ? "hm-hc-no" : "hm-hc-part",
+      value: v, size: "lg", text: v === "partial", class: v === true ? "m-hc-yes" : v === false ? "m-hc-no" : "m-hc-part",
       label: (v === true ? L.yes ?? t`Yes` : v === false ? L.no ?? t`No` : L.partly ?? t`Partly`) as string,
     });
-    return v == null ? h("span", { class: "hm-hc-none" }, "—") : v;
+    return v == null ? h("span", { class: "m-hc-none" }, "—") : v;
   };
   const tag = (v: 1 | 0 | -1 | null): unknown =>
     props.tags === false ? null
-      : v === -1 ? h(Badge, { tone: "warn", class: "hm-hc-tag is-behind" }, L.behind ?? t`Behind`) : v === 1 ? h(Badge, { tone: "success", class: "hm-hc-tag is-ahead" }, L.ahead ?? t`Ahead`) : null;
+      : v === -1 ? h(Badge, { tone: "warn", class: "m-hc-tag is-behind" }, L.behind ?? t`Behind`) : v === 1 ? h(Badge, { tone: "success", class: "m-hc-tag is-ahead" }, L.ahead ?? t`Ahead`) : null;
 
   const body = h("tbody", null, ...props.rows.flatMap((r, i) => {
     const v = verdicts[i]!;
     const hidden = (): boolean => onlyBehind() && v !== -1;
-    const line = h("tr", { class: () => cx("hm-hc-row", v === -1 && "is-behind", v === 1 && "is-ahead", hidden() && "is-hidden"), hidden: hidden },
-      h("th", { scope: "row", class: "hm-hc-label" }, h("span", null, r.label), tag(v)),
-      ...props.columns.map((c) => h("td", { class: cx("hm-hc-cell", c.id === us && "hm-hc-us") }, cell(r.values[c.id], r, c, v))));
+    const line = h("tr", { class: () => cx("m-hc-row", v === -1 && "is-behind", v === 1 && "is-ahead", hidden() && "is-hidden"), hidden: hidden },
+      h("th", { scope: "row", class: "m-hc-label" }, h("span", null, r.label), tag(v)),
+      ...props.columns.map((c) => h("td", { class: cx("m-hc-cell", c.id === us && "m-hc-us") }, cell(r.values[c.id], r, c, v))));
     const note = r.note != null
-      ? h("tr", { class: () => cx("hm-hc-note-row", v === -1 && "is-behind"), hidden: hidden },
-        h("td", { colspan: String(props.columns.length + 1), class: "hm-hc-note" }, r.note))
+      ? h("tr", { class: () => cx("m-hc-note-row", v === -1 && "is-behind"), hidden: hidden },
+        h("td", { colspan: String(props.columns.length + 1), class: "m-hc-note" }, r.note))
       : null;
     return note ? [line, note] : [line];
   }));
 
-  const table = h("table", { class: "hm-hc-table" },
-    h("caption", { class: props.showCaption ? "hm-hc-caption" : "hm-sr-only" }, props.caption ?? t`Comparison`),
+  const table = h("table", { class: "m-hc-table" },
+    h("caption", { class: props.showCaption ? "m-hc-caption" : "m-sr-only" }, props.caption ?? t`Comparison`),
     h("thead", null, h("tr", null,
-      h("td", { class: "hm-hc-corner" }),
-      ...props.columns.map((c) => h("th", { scope: "col", class: cx("hm-hc-head", c.id === us && "hm-hc-us") }, c.name)))),
+      h("td", { class: "m-hc-corner" }),
+      ...props.columns.map((c) => h("th", { scope: "col", class: cx("m-hc-head", c.id === us && "m-hc-us") }, c.name)))),
     body);
 
-  const summary = props.summary === false ? null : h("div", { class: "hm-hc-summary" },
-    h("p", { class: "hm-hc-counts" },
+  const summary = props.summary === false ? null : h("div", { class: "m-hc-summary" },
+    h("p", { class: "m-hc-counts" },
       () => (L.counts ? L.counts(counts()) : t`Ahead in ${counts().ahead}, even in ${counts().even}, behind in ${counts().behind}.`)),
     counts().behind && props.filter !== false ? h(Button, {
-      class: "hm-hc-filter", size: "sm", shape: "pill", color: "warn", pressed: () => onlyBehind(), onClick: () => onlyBehind.set(!onlyBehind.peek()),
+      class: "m-hc-filter", size: "sm", shape: "pill", color: "warn", pressed: () => onlyBehind(), onClick: () => onlyBehind.set(!onlyBehind.peek()),
     }, () => (onlyBehind() ? L.showAll ?? t`Show all rows` : L.onlyBehind ?? t`Only where we are behind`)) : null);
 
-  return h("div", { class: () => cx("hm-hc", val(props.class)), "data-hm-color": colorAttr(props.color) }, summary, h("div", { class: "hm-hc-scroll", tabindex: "0", role: "region", "aria-label": () => L.region ?? t`Comparison table` }, table));
+  return h("div", { class: () => cx("m-hc", val(props.class)), "data-m-color": colorAttr(props.color) }, summary, h("div", { class: "m-hc-scroll", tabindex: "0", role: "region", "aria-label": () => L.region ?? t`Comparison table` }, table));
 }

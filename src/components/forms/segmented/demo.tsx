@@ -26,6 +26,6 @@ export default function SegmentedDemo(props: { values: { count: number; color: s
       }))
       return <Segmented value={$view} onChange={(x: Maybe<string>) => { $view = x ?? "day" }} options={options} indicator={v.indicator as "fill"} color={pick(v.color) as Opt<ColorToken>} aria-label="Dönem" />
     }}
-    <p class="hm-muted">{() => `Seçilen: ${ALL.find((o) => o.value === $view)?.label ?? "—"}`}</p>
+    <p class="m-muted">{() => `Seçilen: ${ALL.find((o) => o.value === $view)?.label ?? "—"}`}</p>
   </div>
 }

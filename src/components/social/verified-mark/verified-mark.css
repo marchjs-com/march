@@ -1,7 +1,7 @@
-/* VerifiedMark. The badge beside a name; data-hm-color (which sets --hm-accent) replaces the brand blue. */
-.hm-verified-mark { display: inline-grid; place-items: center; flex: none; inline-size: 1rem; block-size: 1rem; line-height: 1; vertical-align: middle; color: var(--hm-brand-blue, var(--hm-info)); }
-.hm-verified-mark[data-hm-color] { color: var(--hm-accent); }
-.hm-verified-mark-md { inline-size: 1.25rem; block-size: 1.25rem; }
-.hm-verified-mark-lg { inline-size: 1.5rem; block-size: 1.5rem; }
-.hm-verified-mark .hm-svg { inline-size: 100%; block-size: 100%; }
-.hm-verified-mark-own { display: inline-grid; place-items: center; }
+/* VerifiedMark. The badge beside a name; data-m-color (which sets --m-accent) replaces the brand blue. */
+.m-verified-mark { display: inline-grid; place-items: center; flex: none; inline-size: 1rem; block-size: 1rem; line-height: 1; vertical-align: middle; color: var(--m-brand-blue, var(--m-info)); }
+.m-verified-mark[data-m-color] { color: var(--m-accent); }
+.m-verified-mark-md { inline-size: 1.25rem; block-size: 1.25rem; }
+.m-verified-mark-lg { inline-size: 1.5rem; block-size: 1.5rem; }
+.m-verified-mark .m-svg { inline-size: 100%; block-size: 100%; }
+.m-verified-mark-own { display: inline-grid; place-items: center; }

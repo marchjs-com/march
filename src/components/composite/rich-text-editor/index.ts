@@ -100,7 +100,7 @@ const fragOf = (nodes: readonly Node[]): DocumentFragment => { const f = globalT
 const mdFragment = (md: string): DocumentFragment => {
   const nodes = markdownNodes(md, { images: false, newTab: false });
   // task items keep their state as data-task (the checkbox input is not editor content)
-  for (const n of nodes) for (const li of Array.from(n.querySelectorAll?.("li.hm-task") ?? [])) {
+  for (const n of nodes) for (const li of Array.from(n.querySelectorAll?.("li.m-task") ?? [])) {
     const box = li.querySelector("input");
     li.setAttribute("data-task", box && (box as HTMLInputElement).checked ? "x" : " ");
     box?.remove();
@@ -122,7 +122,7 @@ export function htmlToMarkdown(html: string): string {
 export function RichTextEditor(props: RichTextEditorProps): unknown {
   const [get, set] = model<string>(props, "");
   const history = props.history ?? undoHistory();
-  const id = uid("hm-rte");
+  const id = uid("m-rte");
   const marks = signal<Record<string, boolean>>({});
   const block = signal<ops.BlockType>("p");
   const isEmpty = signal(true);
@@ -143,7 +143,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   let sugSeq = 0;
 
   const root = h("div", {
-    id: c.id, class: () => cx("hm-rte-content", isEmpty() && "is-empty"), role: "textbox", "aria-multiline": "true",
+    id: c.id, class: () => cx("m-rte-content", isEmpty() && "is-empty"), role: "textbox", "aria-multiline": "true",
     contenteditable: () => (ro() ? "false" : "true"), spellcheck: "true", translate: "no", tabindex: () => (props.disabled ? "-1" : "0"),
     "aria-label": () => c["aria-label"]() ?? L().editor ?? t`Rich text editor`, "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"],
     "aria-readonly": () => (props.readonly ? "true" : null), "aria-disabled": () => (props.disabled ? "true" : null),
@@ -448,7 +448,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   const bar = () => {
     const list = tools();
     return !list.length ? null : h(FormatToolbar<Tool>, {
-      tools: list, prefix: "hm-rte", label: () => L().toolbar, name: (tool: Tool) => L().tools?.[tool], icons: props.toolIcons, onTool: exec, pressed: toggles, keys: KEYS, attrs: toolAttrs,
+      tools: list, prefix: "m-rte", label: () => L().toolbar, name: (tool: Tool) => L().tools?.[tool], icons: props.toolIcons, onTool: exec, pressed: toggles, keys: KEYS, attrs: toolAttrs,
       disabled: (tool: Tool) => ro() || (tool === "undo" && !history.canUndo()) || (tool === "redo" && !history.canRedo()),
     });
   };
@@ -459,31 +459,31 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   const linkHelp = (): string => L().linkHelp ?? t`Only http(s), mailto, tel and relative links`;
   const hrefId = `${id}-href`;
   const linkPanel = h(Popover, {
-    anchor: () => selAnchor, open: linkOpen, label: () => L().link ?? t`Link`, panelClass: "hm-rte-link", autoFocus: false,
+    anchor: () => selAnchor, open: linkOpen, label: () => L().link ?? t`Link`, panelClass: "m-rte-link", autoFocus: false,
     // Escape returns to the text with its selection; a press outside leaves focus where it went
     onOpenChange: (open: boolean, why: string) => { if (!open && why === "escape") { root.focus({ preventScroll: true }); ops.restoreSel(root, lastSel); } },
     children: (_close: unknown) => h(Field, { id: hrefId, label: live(() => L().linkAddress ?? t`Link address`), help: live(() => (badLink() ? null : linkHelp())), error: live(() => (badLink() ? linkHelp() : null)) },
-      h("div", { class: "hm-rte-link-row" },
+      h("div", { class: "m-rte-link-row" },
         h(UrlInput, {
-          id: hrefId, value: linkText, class: "hm-rte-link-input", autocomplete: "off", spellcheck: "false", invalid: live(badLink), describedby: live(() => `${hrefId}-${badLink() ? "error" : "help"}`),
+          id: hrefId, value: linkText, class: "m-rte-link-input", autocomplete: "off", spellcheck: "false", invalid: live(badLink), describedby: live(() => `${hrefId}-${badLink() ? "error" : "help"}`),
           ref: (el: HTMLInputElement) => queueMicrotask(() => { el.focus(); el.select?.(); }),
           onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); applyLink(); } },
         }),
-        h(IconButton, { icon: glyph(check), label: () => L().apply ?? t`Apply`, size: "sm", class: "hm-rte-link-ok", disabled: () => !linkText().trim() || badLink(), onClick: applyLink }),
+        h(IconButton, { icon: glyph(check), label: () => L().apply ?? t`Apply`, size: "sm", class: "m-rte-link-ok", disabled: () => !linkText().trim() || badLink(), onClick: applyLink }),
         () => (marks().a ? h(IconButton, { icon: glyph(trash), label: () => L().removeLink ?? t`Remove link`, size: "sm", variant: "danger", onClick: unlink }) : null))),
   });
 
   // suggestions: a list under the caret; the keys stay in the text (OptionList `keysFrom`)
   const sugOpen = computed(() => !!sug());
   const suggestPanel = h(Popover, {
-    anchor: () => caretAnchor, open: () => sugOpen(), onOpenChange: (open: boolean) => { if (!open) sug.set(null); }, role: null, flush: true, autoFocus: false, panelClass: "hm-rte-sug",
+    anchor: () => caretAnchor, open: () => sugOpen(), onOpenChange: (open: boolean) => { if (!open) sug.set(null); }, role: null, flush: true, autoFocus: false, panelClass: "m-rte-sug",
     children: (_close: unknown) => [
       h(OptionList<number>, {
-        id: `${id}-sug`, keysFrom: root, active: sugActive, inline: true, check: false, label: () => L().suggestions ?? t`Suggestions`, class: () => sug()?.kind === ":" && "hm-rte-sug-emoji",
+        id: `${id}-sug`, keysFrom: root, active: sugActive, inline: true, check: false, label: () => L().suggestions ?? t`Suggestions`, class: () => sug()?.kind === ":" && "m-rte-sug-emoji",
         options: () => { const st = sug(); return (st?.items ?? []).map((it, i) => (st!.kind === "@" ? { value: i, label: it.label, hint: it.hint, icon: h(Avatar, { name: it.label, src: it.avatar ?? null, size: "sm" }) } : { value: i, label: it.hint, icon: it.label })); },
         empty: () => L().noMatches ?? t`No matches`, onPick: (i: number) => pick(i),
       }),
-      () => { const st = sug(); return st && st.kind === ":" && !st.query && !st.button && st.items.length ? h("div", { class: "hm-rte-sug-more", "aria-hidden": "true" }, () => L().keepTyping ?? t`Keep typing to search`) : null; },
+      () => { const st = sug(); return st && st.kind === ":" && !st.query && !st.button && st.items.length ? h("div", { class: "m-rte-sug-more", "aria-hidden": "true" }, () => L().keepTyping ?? t`Keep typing to search`) : null; },
     ],
   });
 
@@ -507,13 +507,13 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
 
   const rows = (): number => Math.max(2, props.rows ?? 6);
   return h(EditorFrame, {
-    class: () => cx("hm-rte", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly, "data-hm-color": c["data-hm-color"],
-    style: () => ({ "--hm-rte-rows": String(rows()) }),
-    head: bar, showHead: () => tools().length > 0, headProps: { sticky: true, class: "hm-rte-bar" },
-    showFoot: () => props.counter !== false, footProps: { class: "hm-rte-foot", "aria-live": "off" },
+    class: () => cx("m-rte", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly, "data-m-color": c["data-m-color"],
+    style: () => ({ "--m-rte-rows": String(rows()) }),
+    head: bar, showHead: () => tools().length > 0, headProps: { sticky: true, class: "m-rte-bar" },
+    showFoot: () => props.counter !== false, footProps: { class: "m-rte-foot", "aria-live": "off" },
     foot: [
-      h("span", { class: "hm-rte-hint" }, () => (props.hint === false ? "" : L().hint != null ? L().hint : props.mentions && props.emoji !== false ? t`Type @ to mention, : for emoji` : props.mentions ? t`Type @ to mention` : props.emoji !== false ? t`Type : for emoji` : "")),
-      h("span", { class: "hm-rte-count" }, () => L().count?.(stats()[0], stats()[1]) ?? `${t`${stats()[0]} words`} · ${t`${stats()[1]} characters`}`)],
+      h("span", { class: "m-rte-hint" }, () => (props.hint === false ? "" : L().hint != null ? L().hint : props.mentions && props.emoji !== false ? t`Type @ to mention, : for emoji` : props.mentions ? t`Type @ to mention` : props.emoji !== false ? t`Type : for emoji` : "")),
+      h("span", { class: "m-rte-count" }, () => L().count?.(stats()[0], stats()[1]) ?? `${t`${stats()[0]} words`} · ${t`${stats()[1]} characters`}`)],
     children: [root, linkPanel, suggestPanel],
   });
 }

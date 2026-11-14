@@ -38,7 +38,7 @@ const Preview = lazy(() => import("./preview.ts"), { pick: "ThemePreview", place
 /** Theme editor: `<ThemeEditor />`, `<ThemeEditor bind:value={$draft} base="night" storageKey={false} />`. */
 export function ThemeEditor(props: ThemeEditorProps): Element {
   const [get, set] = model<M.ThemeDraft | null>(props, null);
-  const id = uid("hm-te");
+  const id = uid("m-te");
   const key = props.storageKey === false ? null : props.storageKey ?? "theme-editor";
   const start = untrack((): M.ThemeDraft => {
     const v = get();
@@ -94,33 +94,33 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
   const ctx: ThemeEditorContext = { draft, change, mode, dir: pdir, reduced, readonly: ro };
 
   // ------------------------------------------------------------------ top bar: name, history, save, apply
-  const title = props.nameField === false ? null : h("div", { class: "hm-te-title" },
+  const title = props.nameField === false ? null : h("div", { class: "m-te-title" },
     h(TextInput, {
-      class: "hm-te-name", "aria-label": L().name ?? t`Theme name`, readonly: live(() => ro()),
+      class: "m-te-name", "aria-label": L().name ?? t`Theme name`, readonly: live(() => ro()),
       value: live(() => draft().name),
       onChange: (v: string) => change(t`Rename`, (d) => ({ ...d, name: v, id: M.slug(v || "theme") }), "name"),
     }),
-    h("code", { class: "hm-te-id", "aria-label": () => t`Theme id: ${draft().id}` }, () => `data-hm-theme="${draft().id}"`));
+    h("code", { class: "m-te-id", "aria-label": () => t`Theme id: ${draft().id}` }, () => `data-m-theme="${draft().id}"`));
   const bar = h(PanelHeader, {
-    as: "div", class: "hm-te-bar", partClass: { actions: "hm-te-actions" }, ...(title ? { children: title } : {}),
+    as: "div", class: "m-te-bar", partClass: { actions: "m-te-actions" }, ...(title ? { children: title } : {}),
     actions: [
-      props.historyButtons === false ? null : h(UndoRedo, { history: hist, labels: { undo: () => L().undo, redo: () => L().redo }, partClass: { undo: "hm-te-undo", redo: "hm-te-redo" } }),
+      props.historyButtons === false ? null : h(UndoRedo, { history: hist, labels: { undo: () => L().undo, redo: () => L().redo }, partClass: { undo: "m-te-undo", redo: "m-te-redo" } }),
       () => (dirty() ? h(Badge, { tone: "warn", dot: true }, L().unsaved ?? t`Unsaved`) : savedAt() ? h(Badge, { tone: "success", dot: true }, L().saved ?? t`Saved`) : null),
-      key ? h(Button, { class: "hm-te-save", variant: "secondary", size: "sm", disabled: () => !dirty() || ro(), onClick: save }, L().save ?? t`Save`) : null,
-      props.applyButton === false ? null : h(Button, { class: "hm-te-apply", variant: () => (applied() ? "secondary" : "primary"), size: "sm", icon: () => (applied() ? check : null), pressed: applied, onClick: toggleApply },
+      key ? h(Button, { class: "m-te-save", variant: "secondary", size: "sm", disabled: () => !dirty() || ro(), onClick: save }, L().save ?? t`Save`) : null,
+      props.applyButton === false ? null : h(Button, { class: "m-te-apply", variant: () => (applied() ? "secondary" : "primary"), size: "sm", icon: () => (applied() ? check : null), pressed: applied, onClick: toggleApply },
         () => (applied() ? L().applied ?? t`Applied to the app` : L().apply ?? t`Apply to the app`)),
     ],
   });
 
   // ------------------------------------------------------------------ base presets
-  const bases = props.presets === false ? null : h("div", { class: "hm-te-bases", role: "group", "aria-label": L().startFrom ?? t`Start from` },
-    h(SectionLabel, { as: "span", size: "md", class: "hm-te-bases-label" }, L().startFrom ?? t`Start from`),
+  const bases = props.presets === false ? null : h("div", { class: "m-te-bases", role: "group", "aria-label": L().startFrom ?? t`Start from` },
+    h(SectionLabel, { as: "span", size: "md", class: "m-te-bases-label" }, L().startFrom ?? t`Start from`),
     PRESETS.map((p) => h(Button, {
-      class: "hm-te-base", size: "sm", shape: "pill", icon: h(ThemeSwatch, { id: p.id }), pressed: () => draft().base === p.id, disabled: ro,
+      class: "m-te-base", size: "sm", shape: "pill", icon: h(ThemeSwatch, { id: p.id }), pressed: () => draft().base === p.id, disabled: ro,
       onClick: () => change(t`Base: ${t(p.name)}`, (d) => { const n = presetCopy(p.id); return d.base === null || d.name === t`${t(presetDraft(d.base ?? "hadi").name)} (copy)` ? n : { ...n, id: d.id, name: d.name }; }),
     }, () => t(p.name))),
     h(Button, {
-      class: "hm-te-base hm-te-scratch", size: "sm", shape: "pill", icon: sparkles, pressed: () => draft().base === null, disabled: ro,
+      class: "m-te-base m-te-scratch", size: "sm", shape: "pill", icon: sparkles, pressed: () => draft().base === null, disabled: ro,
       onClick: () => change(t`From scratch`, (d) => ({ ...M.draftFromColor(d.light.primary, d.name), id: d.id })),
     }, L().scratch ?? t`From scratch`));
 
@@ -136,19 +136,19 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
 
   // ------------------------------------------------------------------ preview stage (the draft's variables, scoped)
   const scope = h("div", {
-    class: () => cx("hm-te-scope", reduced() && "is-reduced"), "data-hm-theme": () => draft().id, dir: pdir,
+    class: () => cx("m-te-scope", reduced() && "is-reduced"), "data-m-theme": () => draft().id, dir: pdir,
     role: "region", "aria-label": L().preview ?? t`Theme preview`,
   }, h(Preview, { ctx })) as HTMLElement;
   let shown: string[] = [];
   effect(() => {
     const vars = M.draftVars(draft(), mode());
-    if (reduced()) Object.assign(vars, { "--hm-dur-fast": "0ms", "--hm-dur": "0ms", "--hm-dur-slow": "0ms" });
+    if (reduced()) Object.assign(vars, { "--m-dur-fast": "0ms", "--m-dur": "0ms", "--m-dur-slow": "0ms" });
     setStyle(scope, Object.fromEntries(shown.filter((k) => !(k in vars)).map((k) => [k, null])));
     setStyle(scope, vars);
     shown = Object.keys(vars);
   });
-  const stage = props.preview === false ? null : h("div", { class: "hm-te-stage" },
-    props.previewControls === false ? null : h("div", { class: "hm-te-stage-bar" },
+  const stage = props.preview === false ? null : h("div", { class: "m-te-stage" },
+    props.previewControls === false ? null : h("div", { class: "m-te-stage-bar" },
       h(Segmented, { "aria-label": L().previewMode ?? t`Preview mode`, value: live(() => mode()), onChange: (v: M.DraftMode | null) => { if (v) mode.set(v); }, options: [{ value: "light", label: L().light ?? t`Light` }, { value: "dark", label: L().dark ?? t`Dark` }] }),
       h(Segmented, { "aria-label": L().previewDirection ?? t`Preview direction`, value: live(() => pdir()), onChange: (v: "ltr" | "rtl" | null) => { if (v) pdir.set(v); }, options: [{ value: "ltr", label: "LTR" }, { value: "rtl", label: "RTL" }] }),
       h(Toggle, { value: live(() => reduced()), onChange: (v: boolean) => reduced.set(v), label: L().reducedMotion ?? t`Reduced motion` })),
@@ -159,9 +159,9 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
     if ((e.target as HTMLElement).closest("input[type=text], input:not([type]), textarea, [contenteditable]")) return;
     undoKeys(e, hist);
   };
-  return h("div", { class: () => cx("hm-te", props.preview === false && "hm-te-solo", props.class), role: "group", "aria-label": L().editor ?? t`Theme editor`, onKeyDown },
+  return h("div", { class: () => cx("m-te", props.preview === false && "m-te-solo", props.class), role: "group", "aria-label": L().editor ?? t`Theme editor`, onKeyDown },
     bar, bases,
-    h("div", { class: "hm-te-body" },
-      h("div", { class: "hm-te-panel" }, h(Tabs, { tabs, label: L().sections ?? t`Theme sections`, value: live(() => tab()), onChange: (v: string) => tab.set(v) })),
+    h("div", { class: "m-te-body" },
+      h("div", { class: "m-te-panel" }, h(Tabs, { tabs, label: L().sections ?? t`Theme sections`, value: live(() => tab()), onChange: (v: string) => tab.set(v) })),
       stage)) as Element;
 }

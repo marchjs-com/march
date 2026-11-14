@@ -37,12 +37,12 @@ const USED = ["label", "as", "icon", "count", "actions", "upper", "size", "rule"
 export function SectionLabel(props: SectionLabelProps): Element {
   return h(props.as ?? "div", {
     ...rest(props, USED),
-    class: () => cx("hm-section-label", `hm-section-label-${val(props.size) ?? "sm"}`, val(props.upper) === false && "is-plain", val(props.class)),
-    "data-hm-color": colorAttr(props.color),
+    class: () => cx("m-section-label", `m-section-label-${val(props.size) ?? "sm"}`, val(props.upper) === false && "is-plain", val(props.class)),
+    "data-m-color": colorAttr(props.color),
   },
-  props.icon != null && props.icon !== false ? icon(props.icon, "hm-section-label-icon") : null,
-  h("span", { class: "hm-section-label-text" }, props.label != null ? () => val(props.label) : props.children),
-  props.count != null ? h("span", { class: "hm-section-label-count" }, () => val(props.count)) : null,
-  () => (val(props.rule) ? h("span", { class: "hm-section-label-rule", "aria-hidden": "true" }) : null),
-  props.actions != null ? h("span", { class: "hm-section-label-actions" }, () => val(props.actions)) : null);
+  props.icon != null && props.icon !== false ? icon(props.icon, "m-section-label-icon") : null,
+  h("span", { class: "m-section-label-text" }, props.label != null ? () => val(props.label) : props.children),
+  props.count != null ? h("span", { class: "m-section-label-count" }, () => val(props.count)) : null,
+  () => (val(props.rule) ? h("span", { class: "m-section-label-rule", "aria-hidden": "true" }) : null),
+  props.actions != null ? h("span", { class: "m-section-label-actions" }, () => val(props.actions)) : null);
 }

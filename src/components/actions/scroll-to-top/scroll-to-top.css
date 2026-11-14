@@ -1,6 +1,6 @@
 /* Back-to-top button: a round raised button; hidden (and out of the tab order) until the page is scrolled down. */
-.hm-icon-btn.hm-to-top { box-shadow: var(--hm-shadow-3); }
-.hm-icon-btn.hm-to-top[data-hm-color] { color: var(--hm-accent-text, var(--hm-accent)); border-color: color-mix(in srgb, var(--hm-accent) 45%, var(--hm-border)); }
-.hm-icon-btn.hm-to-top:hover { color: var(--hm-accent, var(--hm-primary)); border-color: var(--hm-accent, var(--hm-primary)); }
-.hm-to-top[data-shown="false"] { opacity: 0; pointer-events: none; }
-.hm-icon-btn.hm-btn-lg.hm-to-top .hm-svg { width: 1.0625rem; height: 1.0625rem; }
+.m-icon-btn.m-to-top { box-shadow: var(--m-shadow-3); }
+.m-icon-btn.m-to-top[data-m-color] { color: var(--m-accent-text, var(--m-accent)); border-color: color-mix(in srgb, var(--m-accent) 45%, var(--m-border)); }
+.m-icon-btn.m-to-top:hover { color: var(--m-accent, var(--m-primary)); border-color: var(--m-accent, var(--m-primary)); }
+.m-to-top[data-shown="false"] { opacity: 0; pointer-events: none; }
+.m-icon-btn.m-btn-lg.m-to-top .m-svg { width: 1.0625rem; height: 1.0625rem; }

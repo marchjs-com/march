@@ -11,6 +11,6 @@ export default function TimeInputDemo(props: { values: { seconds: boolean; disab
   effect(() => { const s = props.values.seconds, t = untrack(() => $time); if (t) $time = s ? (t.length === 5 ? `${t}:00` : t) : t.slice(0, 5) })
   return <div class="sc-stack">
     {() => <Field label="Başlangıç"><TimeInput value={$time} onChange={(v: string) => { $time = v }} step={props.values.seconds ? 1 : undefined} disabled={props.values.disabled} /></Field>}
-    <p class="hm-muted">{() => `Değer: ${$time || "—"} (${props.values.seconds ? "saat:dakika:saniye" : "saat:dakika"})`}</p>
+    <p class="m-muted">{() => `Değer: ${$time || "—"} (${props.values.seconds ? "saat:dakika:saniye" : "saat:dakika"})`}</p>
   </div>
 }

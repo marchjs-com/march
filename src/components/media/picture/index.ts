@@ -49,7 +49,7 @@ export function Picture(props: PictureProps): Node | null {
   const eager = (props.loading ?? s?.loading) === "eager";
   const img = h("img", {
     ...rest(props, ["source", "src", "alt", "width", "height", "srcset", "sizes", "loading", "fit", "fallback", "onLoad", "onError"]),
-    class: () => cx("hm-picture", val(props.fit) && `hm-picture-${val(props.fit)}`, val(props.class)),
+    class: () => cx("m-picture", val(props.fit) && `m-picture-${val(props.fit)}`, val(props.class)),
     src: () => val(props.src) ?? s?.src ?? null, alt: () => val(props.alt) ?? s?.alt ?? "",
     width: props.width ?? s?.width ?? null, height: props.height ?? s?.height ?? null,
     srcset: props.srcset ?? s?.srcset ?? null, sizes: props.sizes ?? s?.sizes ?? null,
@@ -59,7 +59,7 @@ export function Picture(props: PictureProps): Node | null {
       props.onError?.(e);
       const f = props.fallback;
       if (f == null || f === false) return;
-      img.replaceWith(h("span", { class: cx("hm-picture-fallback", val(props.class)), role: "img", "aria-label": val(props.alt) ?? s?.alt ?? null }, f) as Node);
+      img.replaceWith(h("span", { class: cx("m-picture-fallback", val(props.class)), role: "img", "aria-label": val(props.alt) ?? s?.alt ?? null }, f) as Node);
     },
   }) as HTMLImageElement;
   return img;

@@ -69,7 +69,7 @@ export interface BottomNavProps {
 }
 
 /** The four HADİ colors: Heyecan, Aktivite, Dostluk, İletişim (a theme that defines its brand tokens wins). */
-export const HADI_RING: readonly string[] = ["var(--hm-brand-orange, #F2801F)", "var(--hm-brand-blue, #1D9AD6)", "var(--hm-brand-green, #78BE3A)", "var(--hm-brand-purple, #A3338C)"];
+export const HADI_RING: readonly string[] = ["var(--m-brand-orange, #F2801F)", "var(--m-brand-blue, #1D9AD6)", "var(--m-brand-green, #78BE3A)", "var(--m-brand-purple, #A3338C)"];
 
 /** `<BottomNav items={tabs} value={$tab} onChange={(id) => $tab = id} onCreate={compose} />` */
 export function BottomNav(props: BottomNavProps): Element {
@@ -90,8 +90,8 @@ export function BottomNav(props: BottomNavProps): Element {
   const tab = (it: BottomNavItem, i: number): Element => {
     const on = (): boolean => val(props.value) === it.id;
     const attrs = {
-      class: () => cx("hm-bnav-item", on() && "is-active"),
-      "data-hm-color": () => (brand() ? colorAttr(colorOf(it, i)) : null),
+      class: () => cx("m-bnav-item", on() && "is-active"),
+      "data-m-color": () => (brand() ? colorAttr(colorOf(it, i)) : null),
       "aria-current": () => (on() ? "page" : null),
       "aria-label": () => val(it.label),
       onClick: (e: MouseEvent) => {
@@ -101,11 +101,11 @@ export function BottomNav(props: BottomNavProps): Element {
       },
     };
     const body = [
-      h("span", { class: "hm-bnav-icon", ref: (x: HTMLElement) => { icons[i] = x; } },
-        () => icon(on() && it.activeIcon != null ? it.activeIcon : it.icon, "hm-bnav-glyph"),
-        it.badge !== undefined && h(Badge, { count: it.badge, class: "hm-bnav-badge" }),
-        it.dot !== undefined && (() => val(it.dot) && h(Badge, { dot: true, tone: "danger", class: "hm-bnav-dot" }))),
-      () => labels() && h(OverflowText, { class: "hm-bnav-label", "aria-hidden": "true" }, () => val(it.label)),
+      h("span", { class: "m-bnav-icon", ref: (x: HTMLElement) => { icons[i] = x; } },
+        () => icon(on() && it.activeIcon != null ? it.activeIcon : it.icon, "m-bnav-glyph"),
+        it.badge !== undefined && h(Badge, { count: it.badge, class: "m-bnav-badge" }),
+        it.dot !== undefined && (() => val(it.dot) && h(Badge, { dot: true, tone: "danger", class: "m-bnav-dot" }))),
+      () => labels() && h(OverflowText, { class: "m-bnav-label", "aria-hidden": "true" }, () => val(it.label)),
     ];
     return it.href ? h("a", { ...attrs, href: it.href }, body) : h("button", { ...attrs, type: "button" }, body);
   };
@@ -144,27 +144,27 @@ export function BottomNav(props: BottomNavProps): Element {
   };
   const release = (): void => clearTimeout(timer);
   onCleanup(() => { clearTimeout(timer); closeMenu?.(); });
-  const createSlot = create && h("div", { class: "hm-bnav-create-slot" },
+  const createSlot = create && h("div", { class: "m-bnav-create-slot" },
     h("button", {
-      type: "button", class: () => cx("hm-bnav-create", menuOpen() && "is-open"), "aria-label": () => val(props.createLabel) ?? t`Create`, onClick: press,
+      type: "button", class: () => cx("m-bnav-create", menuOpen() && "is-open"), "aria-label": () => val(props.createLabel) ?? t`Create`, onClick: press,
       "aria-haspopup": () => (actions().length ? "menu" : null), "aria-expanded": () => (actions().length ? String(menuOpen()) : null),
       onPointerDown: hold, onPointerUp: release, onPointerLeave: release, onPointerCancel: release,
       onContextMenu: (e: Event) => { if (actions().length && props.onCreate) e.preventDefault(); },
     },
-      ringOn && h("span", { class: "hm-bnav-ring", "aria-hidden": "true", ref: (x: HTMLElement) => { ring = x; setStyle(x, { "--hm-bnav-ring": `conic-gradient(${[...ringColors, ringColors[0]].join(", ")})` }); } }),
-      h("span", { class: "hm-bnav-core", ref: (x: HTMLElement) => { core = x; } }, props.createIcon != null ? icon(props.createIcon, "hm-bnav-glyph") : glyph(plus, "hm-svg hm-bnav-glyph"))));
+      ringOn && h("span", { class: "m-bnav-ring", "aria-hidden": "true", ref: (x: HTMLElement) => { ring = x; setStyle(x, { "--m-bnav-ring": `conic-gradient(${[...ringColors, ringColors[0]].join(", ")})` }); } }),
+      h("span", { class: "m-bnav-core", ref: (x: HTMLElement) => { core = x; } }, props.createIcon != null ? icon(props.createIcon, "m-bnav-glyph") : glyph(plus, "m-svg m-bnav-glyph"))));
 
   const cells: unknown[] = items.map(tab);
   if (createSlot) cells.splice(createAt, 0, createSlot);
 
   const root = h("nav", {
-    class: () => cx("hm-bnav", `hm-bnav-${val(props.variant) ?? "floating"}`, !labels() && "hm-bnav-nolabels", !bubbleOn() && "hm-bnav-nobubble", val(props.class)),
+    class: () => cx("m-bnav", `m-bnav-${val(props.variant) ?? "floating"}`, !labels() && "m-bnav-nolabels", !bubbleOn() && "m-bnav-nobubble", val(props.class)),
     "aria-label": () => val(props.label) ?? t`Main`,
   },
-  h("div", { class: "hm-bnav-bar", ref: (x: HTMLElement) => { setStyle(x, { "--hm-bnav-n": String(slots) }); } },
+  h("div", { class: "m-bnav-bar", ref: (x: HTMLElement) => { setStyle(x, { "--m-bnav-n": String(slots) }); } },
     h("span", {
-      class: () => cx("hm-bnav-bubble", (activeIndex() < 0 || !bubbleOn()) && "is-hidden"), "aria-hidden": "true",
-      "data-hm-color": () => { const i = activeIndex(); return brand() && i >= 0 ? colorAttr(colorOf(items[i]!, i)) : null; },
+      class: () => cx("m-bnav-bubble", (activeIndex() < 0 || !bubbleOn()) && "is-hidden"), "aria-hidden": "true",
+      "data-m-color": () => { const i = activeIndex(); return brand() && i >= 0 ? colorAttr(colorOf(items[i]!, i)) : null; },
       ref: (x: HTMLElement) => { bubble = x; },
     }),
     cells)) as HTMLElement;
@@ -176,7 +176,7 @@ export function BottomNav(props: BottomNavProps): Element {
     untrack(() => {
       if (i < 0) { prev = -1; return; }
       const before = prev >= 0 && bubble.isConnected ? bubble.getBoundingClientRect().left : null;
-      setStyle(bubble, { "--hm-bnav-i": String(slotOf(i)) });
+      setStyle(bubble, { "--m-bnav-i": String(slotOf(i)) });
       if (before != null && prev !== i && moves()) {
         const dx = before - bubble.getBoundingClientRect().left;
         if (dx) animate(bubble, [{ transform: `translate3d(${dx}px, 0, 0)` }, { transform: "translate3d(0, 0, 0)" }], { duration: 420, easing: "easeOutBack", fill: "none" });

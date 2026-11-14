@@ -6,7 +6,7 @@ export const code = `<ScrollProgress />                                        /
 
 export default function ScrollProgressDemo(props: { values: { paint: string; size: number; color: string } }) {
   return <div class="sc-web-col">
-    <p class="hm-muted">Sayfayı kaydır: çubuk bu sayfanın ne kadarının okunduğunu gösterir.</p>
+    <p class="m-muted">Sayfayı kaydır: çubuk bu sayfanın ne kadarının okunduğunu gösterir.</p>
     {() => { const v = { ...props.values }; return <ScrollProgress position="inline" paint={v.paint as "gradient"} size={v.size} color={v.color === "default" ? undefined : v.color as "brand-orange"} class="sc-sprog-demo" /> }}
   </div>
 }

@@ -99,7 +99,7 @@ const NAME_W = 220;
 
 /** `<Gantt tasks={$tasks} scale="week" onChange={(task) => save(task)} />` */
 export function Gantt(props: GanttProps): Element {
-  const id = uid("hm-gantt");
+  const id = uid("m-gantt");
   const tasks = signal<readonly GanttTask[]>(untrack(() => val(props.tasks)) ?? []);
   if (typeof props.tasks === "function") effect(() => { const x = val(props.tasks); untrack(() => tasks.set(x ?? [])); });
   const rowH = props.rowHeight ?? 36;
@@ -137,22 +137,22 @@ export function Gantt(props: GanttProps): Element {
     let i = 0;
     while (i < days) { // months
       const d = addDays(from, i), next = Math.min(days, diffDays(from, startOfMonth(addMonths(d, 1))));
-      const el = h("div", { class: "hm-gantt-hcell hm-gantt-month" }, h("span", {}, dateFormat(L, { month: s === "month" ? "short" : "long", year: "numeric" }).format(utcDate(d)))) as HTMLElement;
+      const el = h("div", { class: "m-gantt-hcell m-gantt-month" }, h("span", {}, dateFormat(L, { month: s === "month" ? "short" : "long", year: "numeric" }).format(utcDate(d)))) as HTMLElement;
       setStyle(el, { "inset-inline-start": `${i * p}px`, width: `${(next - i) * p}px` });
       top.push(el); i = next;
     }
     if (s === "day") for (let k = 0; k < days; k++) {
       const d = addDays(from, k), wd = utcDate(d).getUTCDay();
-      const el = h("div", { class: cx("hm-gantt-hcell hm-gantt-day", (wd === 0 || wd === 6) && "is-weekend", d === today && "is-today") }, h("small", {}, dateFormat(L, { weekday: "narrow" }).format(utcDate(d))), String(Number(d.slice(8)))) as HTMLElement;
+      const el = h("div", { class: cx("m-gantt-hcell m-gantt-day", (wd === 0 || wd === 6) && "is-weekend", d === today && "is-today") }, h("small", {}, dateFormat(L, { weekday: "narrow" }).format(utcDate(d))), String(Number(d.slice(8)))) as HTMLElement;
       setStyle(el, { "inset-inline-start": `${k * p}px`, width: `${p}px` });
       bottom.push(el);
     } else if (s === "week") for (let k = 0; k < days; k += 7) {
       const d = addDays(from, k);
-      const el = h("div", { class: "hm-gantt-hcell hm-gantt-week" }, dateFormat(L, { day: "numeric", month: "short" }).format(utcDate(d))) as HTMLElement;
+      const el = h("div", { class: "m-gantt-hcell m-gantt-week" }, dateFormat(L, { day: "numeric", month: "short" }).format(utcDate(d))) as HTMLElement;
       setStyle(el, { "inset-inline-start": `${k * p}px`, width: `${7 * p}px` });
       bottom.push(el);
     }
-    return h("div", { class: "hm-gantt-head", "aria-hidden": "true" }, h("div", { class: "hm-gantt-hrow" }, top), bottom.length ? h("div", { class: "hm-gantt-hrow" }, bottom) : null);
+    return h("div", { class: "m-gantt-head", "aria-hidden": "true" }, h("div", { class: "m-gantt-hrow" }, top), bottom.length ? h("div", { class: "m-gantt-hrow" }, bottom) : null);
   };
 
   // ------------------------------------------------------------------ changes (+ cascade to successors)
@@ -245,24 +245,24 @@ export function Gantt(props: GanttProps): Element {
   const bar = (task: GanttTask, row: number): Element => {
     const live = (): GanttTask => view(task);
     const el = h("button", {
-      type: "button", class: () => cx("hm-gantt-bar", task.milestone && "is-milestone", (live().progress ?? 0) >= 1 && "is-done", hot() === task.id && "is-hot"),
-      "data-task": task.id, "data-hm-color": colorAttr(task.color ?? "primary"), "aria-label": () => barLabel(live()), title: () => barLabel(live()),
+      type: "button", class: () => cx("m-gantt-bar", task.milestone && "is-milestone", (live().progress ?? 0) >= 1 && "is-done", hot() === task.id && "is-hot"),
+      "data-task": task.id, "data-m-color": colorAttr(task.color ?? "primary"), "aria-label": () => barLabel(live()), title: () => barLabel(live()),
       tabindex: row === 0 ? "0" : "-1",
       onKeydown: barKeys(task), onClick: () => { if (!dragging) props.onSelect?.(task); },
       onPointerdown: (e: PointerEvent) => barDrag(e, task, ((e.target as Element).closest<HTMLElement>("[data-handle]")?.dataset["handle"] as "start" | "end" | "progress" | undefined) ?? "move", el),
       onPointerenter: () => hot.set(task.id), onPointerleave: () => hot.set(null), onFocus: () => hot.set(task.id), onBlur: () => hot.set(null),
     },
-    task.milestone ? null : h("span", { class: "hm-gantt-fill", "aria-hidden": "true" }),
-    h("span", { class: "hm-gantt-bar-label" }, task.milestone ? null : props.barLabel ? props.barLabel(task) : task.name),
+    task.milestone ? null : h("span", { class: "m-gantt-fill", "aria-hidden": "true" }),
+    h("span", { class: "m-gantt-bar-label" }, task.milestone ? null : props.barLabel ? props.barLabel(task) : task.name),
     task.milestone || !editable() ? null : [
       // the ends are bare ResizeHandle grips: the bar runs the gesture (pointer) and the keys (Alt+Shift+arrows)
-      h(ResizeHandle, { edge: "start", class: "hm-gantt-handle hm-gantt-handle-start", "data-handle": "start" }),
-      h(ResizeHandle, { edge: "end", class: "hm-gantt-handle hm-gantt-handle-end", "data-handle": "end" }),
-      h("span", { class: "hm-gantt-knob", "data-handle": "progress", "aria-hidden": "true" }),
+      h(ResizeHandle, { edge: "start", class: "m-gantt-handle m-gantt-handle-start", "data-handle": "start" }),
+      h(ResizeHandle, { edge: "end", class: "m-gantt-handle m-gantt-handle-end", "data-handle": "end" }),
+      h("span", { class: "m-gantt-knob", "data-handle": "progress", "aria-hidden": "true" }),
     ]) as HTMLElement;
     effect(() => {
       const x = live(), p = px(), w = task.milestone ? rowH * 0.5 : (diffDays(x.start, x.end) + 1) * p;
-      setStyle(el, { "inset-inline-start": `${xOf(x.start) + (task.milestone ? p / 2 - w / 2 : 0)}px`, width: `${w}px`, top: `${row * rowH + (task.milestone ? rowH * 0.25 : 7)}px`, "--hm-gantt-p": `${Math.round((x.progress ?? 0) * 100)}%` });
+      setStyle(el, { "inset-inline-start": `${xOf(x.start) + (task.milestone ? p / 2 - w / 2 : 0)}px`, width: `${w}px`, top: `${row * rowH + (task.milestone ? rowH * 0.25 : 7)}px`, "--m-gantt-p": `${Math.round((x.progress ?? 0) * 100)}%` });
     });
     return el;
   };
@@ -272,12 +272,12 @@ export function Gantt(props: GanttProps): Element {
   const arrows = (): Element => {
     const svgNs = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNs, "svg");
-    svg.setAttribute("class", "hm-gantt-arrows");
+    svg.setAttribute("class", "m-gantt-arrows");
     svg.setAttribute("aria-hidden", "true");
     const defs = document.createElementNS(svgNs, "defs"), marker = document.createElementNS(svgNs, "marker"), tip = document.createElementNS(svgNs, "path");
     marker.setAttribute("id", `${id}-tip`); marker.setAttribute("viewBox", "0 0 8 8"); marker.setAttribute("refX", "7"); marker.setAttribute("refY", "4");
     marker.setAttribute("markerWidth", "7"); marker.setAttribute("markerHeight", "7"); marker.setAttribute("orient", "auto-start-reverse");
-    tip.setAttribute("d", "M0,0 L8,4 L0,8 z"); tip.setAttribute("class", "hm-gantt-tip");
+    tip.setAttribute("d", "M0,0 L8,4 L0,8 z"); tip.setAttribute("class", "m-gantt-tip");
     marker.append(tip); defs.append(marker); svg.append(defs);
     const fresh: SVGPathElement[] = [];
     for (const task of tasks()) for (const dep of task.deps ?? []) {
@@ -295,7 +295,7 @@ export function Gantt(props: GanttProps): Element {
           : `M${x1},${y1} H${x1 + gap} V${mid} H${x2 - gap} V${y2} H${x2 - 1}`;
         path.setAttribute("d", d);
         const isHot = hot() === task.id || hot() === pre.id, late = a.end >= b.start;
-        path.setAttribute("class", cx("hm-gantt-link", isHot && "is-hot", late && "is-late"));
+        path.setAttribute("class", cx("m-gantt-link", isHot && "is-hot", late && "is-late"));
       });
       svg.append(path);
       fresh.push(path);
@@ -307,24 +307,24 @@ export function Gantt(props: GanttProps): Element {
   };
 
   // ------------------------------------------------------------------ frame
-  const names = h("div", { class: "hm-gantt-names", role: "rowgroup" },
+  const names = h("div", { class: "m-gantt-names", role: "rowgroup" },
     () => tasks().map((task, i) => untrack(() => h(ListRow, {
-      role: "row", class: () => cx("hm-gantt-name", hot() === task.id && "is-hot"), "aria-rowindex": String(i + 1), overflow: "ellipsis",
-      title: h("span", { role: "rowheader", class: "hm-gantt-name-text", title: task.name }, task.name),
-      trail: h("span", { class: "hm-gantt-name-meta" }, () => { const x = view(task); return lb("days")(diffDays(x.start, x.end) + 1); }),
+      role: "row", class: () => cx("m-gantt-name", hot() === task.id && "is-hot"), "aria-rowindex": String(i + 1), overflow: "ellipsis",
+      title: h("span", { role: "rowheader", class: "m-gantt-name-text", title: task.name }, task.name),
+      trail: h("span", { class: "m-gantt-name-meta" }, () => { const x = view(task); return lb("days")(diffDays(x.start, x.end) + 1); }),
     }))));
-  const canvas = h("div", { class: "hm-gantt-canvas" },
+  const canvas = h("div", { class: "m-gantt-canvas" },
     () => header(),
-    h("div", { class: "hm-gantt-rows" },
-      () => { const n = tasks().length; return Array.from({ length: n }, (_, i) => { const r = h("div", { class: "hm-gantt-row" }) as HTMLElement; setStyle(r, { top: `${i * rowH}px`, height: `${rowH}px` }); return r; }); },
-      () => { if (val(props.todayLine) === false) return null; const x = xOf(today); const el = h("div", { class: "hm-gantt-today" }, h(Badge, { size: "xs", tone: "primary" }, lb("today"))) as HTMLElement; setStyle(el, { "inset-inline-start": `${x + px() / 2}px` }); return el; },
+    h("div", { class: "m-gantt-rows" },
+      () => { const n = tasks().length; return Array.from({ length: n }, (_, i) => { const r = h("div", { class: "m-gantt-row" }) as HTMLElement; setStyle(r, { top: `${i * rowH}px`, height: `${rowH}px` }); return r; }); },
+      () => { if (val(props.todayLine) === false) return null; const x = xOf(today); const el = h("div", { class: "m-gantt-today" }, h(Badge, { size: "xs", tone: "primary" }, lb("today"))) as HTMLElement; setStyle(el, { "inset-inline-start": `${x + px() / 2}px` }); return el; },
       () => (val(props.arrows) ?? true ? arrows() : null),
       () => tasks().map((task, i) => bar(task, i)))) as HTMLElement;
-  effect(() => { setStyle(canvas, { width: `${width()}px`, "--hm-gantt-rows": `${tasks().length * rowH}px`, "--hm-gantt-row": `${rowH}px`, "--hm-gantt-px": `${px()}px` }); });
-  const side = props.names === false ? null : h("div", { class: "hm-gantt-side" }, h("div", { class: "hm-gantt-side-head" }, () => lb("task")), names) as HTMLElement;
-  const scroller = h("div", { class: "hm-gantt-scroll", role: "grid", "aria-label": () => val(props.label) ?? t`Project timeline`, "aria-describedby": props.help === false ? null : `${id}-help` },
+  effect(() => { setStyle(canvas, { width: `${width()}px`, "--m-gantt-rows": `${tasks().length * rowH}px`, "--m-gantt-row": `${rowH}px`, "--m-gantt-px": `${px()}px` }); });
+  const side = props.names === false ? null : h("div", { class: "m-gantt-side" }, h("div", { class: "m-gantt-side-head" }, () => lb("task")), names) as HTMLElement;
+  const scroller = h("div", { class: "m-gantt-scroll", role: "grid", "aria-label": () => val(props.label) ?? t`Project timeline`, "aria-describedby": props.help === false ? null : `${id}-help` },
     side, canvas) as HTMLElement;
-  setStyle(scroller, { height: `${props.height ?? 420}px`, "--hm-gantt-name-w": `${side ? NAME_W : 0}px` });
+  setStyle(scroller, { height: `${props.height ?? 420}px`, "--m-gantt-name-w": `${side ? NAME_W : 0}px` });
   // scroll so today sits near the start; a scale change fades the canvas in
   let first = true;
   effect(() => {
@@ -343,7 +343,7 @@ export function Gantt(props: GanttProps): Element {
       first = false;
     }, 0);
   });
-  return h("div", { class: () => cx("hm-gantt", val(props.class)) }, scroller,
+  return h("div", { class: () => cx("m-gantt", val(props.class)) }, scroller,
     // the hint under the chart and the (hidden) live region its changes are said in
-    h(LiveStatus, { class: "hm-gantt-status", visible: false, as: "div", text: status, helpId: `${id}-help`, helpClass: "hm-gantt-help", help: props.help == null || props.help === true ? () => (editable() ? lb("help") : lb("helpReadonly")) : props.help }));
+    h(LiveStatus, { class: "m-gantt-status", visible: false, as: "div", text: status, helpId: `${id}-help`, helpClass: "m-gantt-help", help: props.help == null || props.help === true ? () => (editable() ? lb("help") : lb("helpReadonly")) : props.help }));
 }

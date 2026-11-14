@@ -48,24 +48,24 @@ export function Faq(props: FaqProps): Element {
     return s ? rank(s, props.items, (x) => ({ title: x.q, keywords: [x.keywords ?? "", typeof x.a === "string" ? x.a : ""] })).map((r) => r.item) : props.items;
   });
   const L = props.labels ?? {};
-  const list = h("div", { class: "hm-faq-list" },
-    props.search ? h("div", { class: "hm-faq-search" },
+  const list = h("div", { class: "m-faq-list" },
+    props.search ? h("div", { class: "m-faq-search" },
       h(SearchBox, { value: q, debounce: 120, placeholder: L.search ?? t`Search questions`, "aria-label": L.search ?? t`Search questions` }),
-      props.count === false ? null : h("p", { class: "hm-faq-count", "aria-live": "polite" },
+      props.count === false ? null : h("p", { class: "m-faq-count", "aria-live": "polite" },
         () => (q().trim() ? (L.count ? L.count(shown().length, props.items.length) : t`${shown().length} of ${props.items.length} questions`) : ""))) : null,
     () => {
       const items = shown();
-      if (!items.length) return h(Empty, { size: "sm", title: false, class: "hm-faq-empty" }, L.empty ?? t`No question matches. Try other words.`);
+      if (!items.length) return h(Empty, { size: "sm", title: false, class: "m-faq-empty" }, L.empty ?? t`No question matches. Try other words.`);
       return h(Accordion, { variant: "separated", multiple: !!props.multiple, items: items.map((x) => ({ id: x.q, title: x.q, content: x.a })) });
     });
   const split = props.layout === "split";
   // split: the heading column is a SectionHead (start aligned) with the contact line under it
   const aside = !split ? null : h(SectionHead, {
-    class: "hm-faq-aside", align: "start", width: "full",
+    class: "m-faq-aside", align: "start", width: "full",
     title: props.title != null ? () => val(props.title) : undefined, lead: props.lead != null ? () => val(props.lead) : undefined,
     reveal: props.reveal === "none" ? false : { effect: props.reveal ?? "up", stagger: 80 },
-  }, props.contact != null ? h("div", { class: "hm-faq-contact" }, props.contact) : null);
-  return h("div", { class: cx("hm-faq", split && "hm-faq-split", val(props.class)) },
+  }, props.contact != null ? h("div", { class: "m-faq-contact" }, props.contact) : null);
+  return h("div", { class: cx("m-faq", split && "m-faq-split", val(props.class)) },
     aside,
     list) as Element;
 }

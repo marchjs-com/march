@@ -9,7 +9,7 @@ const { Kbd } = await import("./index.ts");
 test("Kbd: plain text and formatted shortcut", () => {
   const combo = signal("shift+enter");
   const m = mount(() => [h(Kbd, {}, "Esc"), h(Kbd, { keys: combo })]);
-  const [a, b] = m.el.querySelectorAll("kbd.hm-kbd");
+  const [a, b] = m.el.querySelectorAll("kbd.m-kbd");
   assert.equal(a.textContent, "Esc");
   assert.match(b.textContent, /Shift|⇧/);
   assert.match(b.textContent, /Enter|↵|⏎/);
@@ -20,7 +20,7 @@ test("Kbd: plain text and formatted shortcut", () => {
 
 test("Kbd: own class on both forms", () => {
   const m = mount(() => [h(Kbd, { class: "mine" }, "Esc"), h(Kbd, { keys: "mod+k", class: () => "live" })]);
-  const [a, b] = m.el.querySelectorAll("kbd.hm-kbd");
+  const [a, b] = m.el.querySelectorAll("kbd.m-kbd");
   assert.ok(a.classList.contains("mine"));
   assert.ok(b.classList.contains("live"));
   m.dispose();

@@ -33,16 +33,16 @@ test("core date: grids, weeks, date-times roll over, Intl names", () => {
 test("Scheduler week view: day columns, overlapping blocks share the width, all-day bar spans days", () => {
   locale.set("en-GB");
   const m = mount(() => h(Scheduler, { events: evs(), date: "2026-11-12", view: "week" }));
-  const cols = m.el.querySelectorAll(".hm-sch-col");
+  const cols = m.el.querySelectorAll(".m-sch-col");
   assert.equal(cols.length, 7);
   assert.equal(cols[0].dataset.day, "2026-11-09"); // en-GB weeks start on Monday
-  const blocks = [...m.el.querySelectorAll(".hm-sch-block")];
+  const blocks = [...m.el.querySelectorAll(".m-sch-block")];
   assert.equal(blocks.length, 2);
   assert.ok(blocks.every((b) => b.style.getPropertyValue("width").includes("50%")), "two overlapping events → half width each");
-  const bar = m.el.querySelector(".hm-sch-allday-grid .hm-sch-bar");
+  const bar = m.el.querySelector(".m-sch-allday-grid .m-sch-bar");
   assert.equal(bar.style.getPropertyValue("grid-column").replace(/\s/g, ""), "3/6");
   assert.match(bar.getAttribute("aria-label"), /Offsite/);
-  assert.match(m.el.querySelector(".hm-sch-title").textContent, /November/);
+  assert.match(m.el.querySelector(".m-sch-title").textContent, /November/);
   m.dispose();
 });
 
@@ -50,7 +50,7 @@ test("Scheduler: keyboard move / resize snaps to step and reports onChange; Next
   locale.set("en-GB");
   const changes = [];
   const m = mount(() => h(Scheduler, { events: evs(), date: "2026-11-12", view: "week", step: 30, onChange: (e, r) => changes.push([e.id, r.start, r.end]) }));
-  const a = () => [...m.el.querySelectorAll(".hm-sch-ev")].find((x) => x.dataset.ev === "a");
+  const a = () => [...m.el.querySelectorAll(".m-sch-ev")].find((x) => x.dataset.ev === "a");
   key(a(), "ArrowDown", { altKey: true });
   assert.deepEqual(changes.at(-1), ["a", "2026-11-10T09:30", "2026-11-10T11:00"]);
   key(a(), "ArrowRight", { altKey: true });
@@ -58,14 +58,14 @@ test("Scheduler: keyboard move / resize snaps to step and reports onChange; Next
   key(a(), "ArrowDown", { altKey: true, shiftKey: true });
   assert.deepEqual(changes.at(-1), ["a", "2026-11-11T09:30", "2026-11-11T11:30"]);
   // all-day: Alt+→ shifts the whole range by a day
-  const c = [...m.el.querySelectorAll(".hm-sch-ev")].find((x) => x.dataset.ev === "c");
+  const c = [...m.el.querySelectorAll(".m-sch-ev")].find((x) => x.dataset.ev === "c");
   key(c, "ArrowRight", { altKey: true });
   assert.deepEqual(changes.at(-1), ["c", "2026-11-12", "2026-11-14"]);
   // next week, then month view
   [...m.el.querySelectorAll("button")].find((b) => b.getAttribute("aria-label") === "Next").click();
-  assert.equal(m.el.querySelector(".hm-sch-col").dataset.day, "2026-11-16");
-  [...m.el.querySelectorAll(".hm-segment")].find((b) => b.textContent === "Month").click();
-  assert.equal(m.el.querySelectorAll(".hm-sch-day").length, 42);
+  assert.equal(m.el.querySelector(".m-sch-col").dataset.day, "2026-11-16");
+  [...m.el.querySelectorAll(".m-segment")].find((b) => b.textContent === "Month").click();
+  assert.equal(m.el.querySelectorAll(".m-sch-day").length, 42);
   m.dispose();
 });
 
@@ -74,11 +74,11 @@ test("Scheduler month view: bars in lanes, +N more, arrow keys move the day focu
   const many = Array.from({ length: 5 }, (_, i) => ({ id: `m${i}`, title: `Item ${i}`, start: "2026-11-04T09:00", end: "2026-11-04T10:00" }));
   const m = mount(() => h(Scheduler, { events: [...evs(), ...many], date: "2026-11-12", view: "month" }));
   const day = m.el.querySelector('[data-day="2026-11-04"]');
-  assert.match(day.querySelector(".hm-sch-more").textContent, /\+2/);
-  const focus = m.el.querySelector('.hm-sch-daynum[tabindex="0"]');
+  assert.match(day.querySelector(".m-sch-more").textContent, /\+2/);
+  const focus = m.el.querySelector('.m-sch-daynum[tabindex="0"]');
   assert.equal(focus.dataset.focus, "2026-11-12");
   key(focus, "ArrowRight");
-  assert.equal(m.el.querySelector('.hm-sch-daynum[tabindex="0"]').dataset.focus, "2026-11-13");
+  assert.equal(m.el.querySelector('.m-sch-daynum[tabindex="0"]').dataset.focus, "2026-11-13");
   m.dispose();
 });
 
@@ -91,20 +91,20 @@ test("Scheduler: own texts, parts off (toolbar, today, views, now line, hint), o
     h(Scheduler, { ...base, toolbar: false, class: "mine" }),
     h(Scheduler, { ...base, views: false }),
   ]);
-  const [a, b, c, d] = m.el.querySelectorAll(".hm-sch");
+  const [a, b, c, d] = m.el.querySelectorAll(".m-sch");
   const texts = (el, sel) => [...el.querySelectorAll(sel)].map((x) => x.textContent);
-  assert.equal(a.querySelector(".hm-sch-allday-label").textContent, "Whole day");
-  assert.ok(texts(a, ".hm-sch-toolbar button").includes("Now"));
-  assert.ok(texts(a, ".hm-segment").includes("7 days"));
-  assert.match(a.querySelector(".hm-sch-block .own-ev").textContent, /Planning @ /);
-  assert.equal(a.querySelector(".hm-sch-ev-title"), null);
-  assert.equal(a.querySelector(".hm-sch-help").textContent, "hint!");
-  assert.ok(!texts(b, ".hm-sch-toolbar button").includes("Today"));
-  assert.deepEqual(texts(b, ".hm-segment"), ["Week", "Day"]);
-  assert.equal(b.querySelector(".hm-sch-help"), null);
+  assert.equal(a.querySelector(".m-sch-allday-label").textContent, "Whole day");
+  assert.ok(texts(a, ".m-sch-toolbar button").includes("Now"));
+  assert.ok(texts(a, ".m-segment").includes("7 days"));
+  assert.match(a.querySelector(".m-sch-block .own-ev").textContent, /Planning @ /);
+  assert.equal(a.querySelector(".m-sch-ev-title"), null);
+  assert.equal(a.querySelector(".m-sch-help").textContent, "hint!");
+  assert.ok(!texts(b, ".m-sch-toolbar button").includes("Today"));
+  assert.deepEqual(texts(b, ".m-segment"), ["Week", "Day"]);
+  assert.equal(b.querySelector(".m-sch-help"), null);
   assert.equal(b.getAttribute("aria-describedby"), null);
-  assert.equal(c.querySelector(".hm-sch-toolbar"), null);
+  assert.equal(c.querySelector(".m-sch-toolbar"), null);
   assert.ok(c.className.includes("mine"));
-  assert.ok(d.querySelector(".hm-sch-toolbar") && !d.querySelector(".hm-segment"));
+  assert.ok(d.querySelector(".m-sch-toolbar") && !d.querySelector(".m-segment"));
   m.dispose();
 });

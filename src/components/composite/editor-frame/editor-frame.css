@@ -1,13 +1,13 @@
 /* EditorFrame: the frame of the editors (MarkdownEditor, RichTextEditor, TreeEditor): border, focus ring, and the look
    of the head and foot bars (PanelHeader). One definition; the editors add only what is their own. */
-.hm-editor-frame { --hm-editor-accent: var(--hm-accent, var(--hm-primary)); display: flex; flex-direction: column; min-inline-size: 0; max-inline-size: 100%;
-  border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); color: var(--hm-text);
-  transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
-.hm-editor-frame:focus-within { border-color: var(--hm-editor-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-editor-accent) 16%, transparent); }
-.hm-editor-frame.is-plain:focus-within { border-color: var(--hm-border); box-shadow: none; }
-.hm-editor-frame.is-disabled { opacity: .6; }
-.hm-panel-header.hm-editor-head { --hm-ph-pad: var(--hm-space-2); flex-wrap: wrap; border-start-start-radius: inherit; border-start-end-radius: inherit; }
-.hm-panel-header.hm-editor-foot { --hm-ph-pad: var(--hm-space-4); min-block-size: 0; padding-block: var(--hm-space-1) var(--hm-space-2); color: var(--hm-faint); font-size: var(--hm-text-xs); font-variant-numeric: tabular-nums; }
-.hm-editor-foot > .hm-panel-header-body { flex-wrap: wrap; gap: var(--hm-space-1) var(--hm-space-2); }
+.m-editor-frame { --m-editor-accent: var(--m-accent, var(--m-primary)); display: flex; flex-direction: column; min-inline-size: 0; max-inline-size: 100%;
+  border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface); color: var(--m-text);
+  transition: border-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease); }
+.m-editor-frame:focus-within { border-color: var(--m-editor-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-editor-accent) 16%, transparent); }
+.m-editor-frame.is-plain:focus-within { border-color: var(--m-border); box-shadow: none; }
+.m-editor-frame.is-disabled { opacity: .6; }
+.m-panel-header.m-editor-head { --m-ph-pad: var(--m-space-2); flex-wrap: wrap; border-start-start-radius: inherit; border-start-end-radius: inherit; }
+.m-panel-header.m-editor-foot { --m-ph-pad: var(--m-space-4); min-block-size: 0; padding-block: var(--m-space-1) var(--m-space-2); color: var(--m-faint); font-size: var(--m-text-xs); font-variant-numeric: tabular-nums; }
+.m-editor-foot > .m-panel-header-body { flex-wrap: wrap; gap: var(--m-space-1) var(--m-space-2); }
 /* a plain editing area inside the frame (a textarea, a contenteditable): no border of its own, the frame shows focus */
-.hm-editor-area { display: block; box-sizing: border-box; inline-size: 100%; min-block-size: 6rem; margin: 0; padding: var(--hm-space-3) var(--hm-space-4); border: 0; background: none; color: inherit; font: inherit; line-height: 1.6; outline: none; resize: vertical; }
+.m-editor-area { display: block; box-sizing: border-box; inline-size: 100%; min-block-size: 6rem; margin: 0; padding: var(--m-space-3) var(--m-space-4); border: 0; background: none; color: inherit; font: inherit; line-height: 1.6; outline: none; resize: vertical; }

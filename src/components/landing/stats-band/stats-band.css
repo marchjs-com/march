@@ -1,14 +1,14 @@
 /* StatsBand. Each item is a StatTile (value first, the label follows); columns fold on narrow screens. */
-.hm-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--hm-space-4); margin: 0; }
-.hm-stats > .hm-stats-item { padding: var(--hm-space-3); }
-.hm-stats .hm-stat-tile-label { color: var(--hm-muted); white-space: normal; }
+.m-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--m-space-4); margin: 0; }
+.m-stats > .m-stats-item { padding: var(--m-space-3); }
+.m-stats .m-stat-tile-label { color: var(--m-muted); white-space: normal; }
 /* the figure: fluid size, a soft vertical gradient of the text colour */
-.hm-stats .hm-stat-tile-value { font-size: clamp(2.25rem, 1.6rem + 2.4cqi, 3.5rem);
-  background: linear-gradient(180deg, var(--hm-text), color-mix(in srgb, var(--hm-text) 62%, transparent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.hm-stats-divided .hm-stats-item + .hm-stats-item { border-inline-start: 1px solid var(--hm-border); }
-.hm-stats-cards > .hm-stats-item { padding: var(--hm-space-5); box-shadow: var(--hm-shadow-1); }
-@media (max-width: 640px) { .hm-stats-divided .hm-stats-item + .hm-stats-item { border-inline-start: 0; border-block-start: 1px solid var(--hm-border); } }
-@container hm-site (max-width: 640px) { .hm-stats-divided .hm-stats-item + .hm-stats-item { border-inline-start: 0; border-block-start: 1px solid var(--hm-border); } }
-/* own colour (data-hm-color sets --hm-accent): the numbers take it */
-.hm-stats[data-hm-color] .hm-stat-tile-value { background-image: linear-gradient(180deg, var(--hm-accent), color-mix(in srgb, var(--hm-accent) 62%, transparent)); color: transparent; }
-.hm-stats-plain { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.m-stats .m-stat-tile-value { font-size: clamp(2.25rem, 1.6rem + 2.4cqi, 3.5rem);
+  background: linear-gradient(180deg, var(--m-text), color-mix(in srgb, var(--m-text) 62%, transparent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.m-stats-divided .m-stats-item + .m-stats-item { border-inline-start: 1px solid var(--m-border); }
+.m-stats-cards > .m-stats-item { padding: var(--m-space-5); box-shadow: var(--m-shadow-1); }
+@media (max-width: 640px) { .m-stats-divided .m-stats-item + .m-stats-item { border-inline-start: 0; border-block-start: 1px solid var(--m-border); } }
+@container m-site (max-width: 640px) { .m-stats-divided .m-stats-item + .m-stats-item { border-inline-start: 0; border-block-start: 1px solid var(--m-border); } }
+/* own colour (data-m-color sets --m-accent): the numbers take it */
+.m-stats[data-m-color] .m-stat-tile-value { background-image: linear-gradient(180deg, var(--m-accent), color-mix(in srgb, var(--m-accent) 62%, transparent)); color: transparent; }
+.m-stats-plain { font-variant-numeric: tabular-nums; white-space: nowrap; }

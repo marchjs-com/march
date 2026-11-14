@@ -25,7 +25,7 @@ digit like an odometer (only the digits that change move). Formatting follows th
 | `duration` | ms | `1600` / `900` | |
 | `easing` | easing name | `expo` | easing of the count (`out`, `spring`, `bounce`, `linear` …) |
 | `start` | `visible` `now` | `visible` | |
-| `class` | string | — | extra class on the root (`.hm-counter`; parts: `.hm-counter-view`, `.hm-counter-affix`) |
+| `class` | string | — | extra class on the root (`.m-counter`; parts: `.m-counter-view`, `.m-counter-affix`) |
 
 `formatCount(n, { format, decimals })` formats like the counter.
 

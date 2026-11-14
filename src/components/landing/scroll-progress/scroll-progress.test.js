@@ -11,10 +11,10 @@ test("ScrollProgress: a named progressbar with a fill, classes by position and p
   const bar = el.querySelector('[role="progressbar"]');
   assert.equal(bar.getAttribute("aria-label"), "Reading progress");
   assert.equal(bar.getAttribute("aria-valuemax"), "100");
-  const root = el.querySelector(".hm-scroll-progress");
-  assert.ok(root.className.includes("hm-scroll-progress-inline") && root.className.includes("hm-scroll-progress-accent") && root.className.includes("hm-progress2-line"));
-  assert.equal(root.style.getPropertyValue("--hm-progress-h"), "6px");
-  assert.ok(bar.querySelector(".hm-progress2-fill"));
+  const root = el.querySelector(".m-scroll-progress");
+  assert.ok(root.className.includes("m-scroll-progress-inline") && root.className.includes("m-scroll-progress-accent") && root.className.includes("m-progress2-line"));
+  assert.equal(root.style.getPropertyValue("--m-progress-h"), "6px");
+  assert.ok(bar.querySelector(".m-progress2-fill"));
   dispose();
 });
 
@@ -22,8 +22,8 @@ test("ScrollProgress: own colour and own name", () => {
   const el = document.createElement("div"); document.body.appendChild(el);
   const dispose = render(() => h(ScrollProgress, { position: "inline", color: "brand-orange", label: "Read so far", class: "mine" }), el);
   const bar = el.querySelector('[role="progressbar"]');
-  const root = el.querySelector(".hm-scroll-progress");
-  assert.equal(root.getAttribute("data-hm-color"), "brand-orange");
+  const root = el.querySelector(".m-scroll-progress");
+  assert.equal(root.getAttribute("data-m-color"), "brand-orange");
   assert.equal(bar.getAttribute("aria-label"), "Read so far");
   assert.ok(root.classList.contains("mine"));
   dispose();

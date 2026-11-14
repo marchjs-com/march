@@ -24,7 +24,7 @@ one menu or the separate pickers and they always match. Choices are remembered.
 | `headings` | boolean | `true` | the section headings |
 | `labels` | `{ theme, accent }` | `Theme`, `Accent` | heading texts (strings or accessors) |
 | `class` | class | — | on the button |
-| `panelClass` | string | — | on the opened panel (`hm-theme-menu`) |
+| `panelClass` | string | — | on the opened panel (`m-theme-menu`) |
 
 ## Accessibility
 

@@ -9,7 +9,7 @@ export type Child = Node | string | number | bigint | boolean | null | undefined
 /** A component: called once with its props. May be async. */
 export type Component<P = Record<string, unknown>> = (props: P) => unknown;
 type Props = Record<string, unknown>;
-type MarchEl = Element & { [LEAVE]?: (() => Promise<void>) | null; __hmClass?: string; __hmUser?: unknown; style?: CSSStyleDeclaration };
+type MarchEl = Element & { [LEAVE]?: (() => Promise<void>) | null; __mClass?: string; __mUser?: unknown; style?: CSSStyleDeclaration };
 interface ErrorWithComponent { marchComponent?: string }
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -20,13 +20,13 @@ const URL_ATTRS = new Set(["href", "src", "action", "formaction", "xlink:href", 
 const PROPS = new Set(["value", "checked", "selected", "indeterminate", "muted"]);
 const FORBIDDEN_TAGS = new Set(["script", "iframe", "object", "embed", "base", "meta"]);
 const FORBIDDEN_PROPS = new Set(["innerHTML", "outerHTML", "dangerouslySetInnerHTML", "srcdoc"]);
-export const LEAVE: unique symbol = Symbol("hm.leave");
+export const LEAVE: unique symbol = Symbol("m.leave");
 /** >0 while a detached subtree is disposed (a <For> row whose top nodes are removed whole): cleanups skip DOM work
  * on nodes that go away with it. */
 let detaching = 0;
 /** Dispose `fn` while its DOM leaves as a whole (no per-node removal inside). */
 export function disposeDetached(fn: () => void): void { detaching++; try { fn(); } finally { detaching--; } }
-const CHILDREN = Symbol("hm.children");
+const CHILDREN = Symbol("m.children");
 
 /** Allow only safe URL schemes (relative URLs are fine). */
 export function safeUrl(v: unknown, tag?: string): string {
@@ -121,10 +121,10 @@ function createComponent(Comp: Component<Props>, raw: Props, children: unknown[]
 }
 
 // ------------------------------------------------------------------ async components
-export const LoadingContext: { id: symbol; defaultValue: (() => unknown) | null } = { id: Symbol("hm.loading"), defaultValue: null };
+export const LoadingContext: { id: symbol; defaultValue: (() => unknown) | null } = { id: Symbol("m.loading"), defaultValue: null };
 function defaultLoading(): Element {
   const s = doc().createElement("span");
-  s.className = "hm-loading";
+  s.className = "m-loading";
   s.setAttribute("role", "status");
   s.setAttribute("aria-live", "polite");
   s.setAttribute("aria-label", "Loading");
@@ -183,7 +183,7 @@ function setProp(el: MarchEl, tag: string, key: string, value: unknown): void {
   if (ns) return ns(el, key.slice(key.indexOf(":") + 1), value);
   if (key === "class" || key === "className") return bindValue(value, (v) => setClass(el, v));
   // sx: the compiler turns it into classes (a literal at build time, anything else through sxValue()); h() by hand: sx(obj)
-  if (key === "sx") return bindValue(value, (v) => { if (v != null && typeof v !== "string") throw new TypeError("March: sx needs the compiler or sx({...})"); const user = el.__hmClass === undefined ? el.getAttribute("class") ?? "" : el.__hmUser ?? ""; el.__hmClass = v ?? ""; setClass(el, user); });
+  if (key === "sx") return bindValue(value, (v) => { if (v != null && typeof v !== "string") throw new TypeError("March: sx needs the compiler or sx({...})"); const user = el.__mClass === undefined ? el.getAttribute("class") ?? "" : el.__mUser ?? ""; el.__mClass = v ?? ""; setClass(el, user); });
   if (key === "style") {
     if (typeof value === "string") throw new Error("March: string styles are not supported (CSP); use classes, sx or an object.");
     return bindValue(value, (v) => {
@@ -206,17 +206,17 @@ function bindValue(value: unknown, apply: (v: unknown) => void): void {
 
 function setClass(el: MarchEl, v: unknown): void {
   // fast path: a class string on an element without sx (no expando, no joining)
-  if (typeof v === "string" && el.__hmClass === undefined) {
+  if (typeof v === "string" && el.__mClass === undefined) {
     if (typeof (el as HTMLElement).className === "string") (el as HTMLElement).className = v; else el.setAttribute("class", v);
     return;
   }
-  el.__hmUser = v;
+  el.__mUser = v;
   // one pass, no intermediate arrays: array entries / object keys whose value is truthy, then the sx classes
   let s = "";
   if (Array.isArray(v)) { for (const x of v) if (x) s += ` ${x}`; }
   else if (v && typeof v === "object") { for (const k in v) if ((v as Record<string, unknown>)[k]) s += ` ${k}`; }
   else if (v != null) s = ` ${v}`;
-  if (el.__hmClass) s += ` ${el.__hmClass}`;
+  if (el.__mClass) s += ` ${el.__mClass}`;
   el.setAttribute("class", s.trim());
 }
 
@@ -226,10 +226,10 @@ function setClass(el: MarchEl, v: unknown): void {
 // `on:click` (the colon form, with or without modifiers) always adds a direct listener.
 const DELEGATED = new Set(["click", "dblclick", "input", "keydown", "keyup"]);
 /** The document a render() tree delegates its events to (null: direct listeners). */
-export const DelegateRoot: { id: symbol; defaultValue: Document | null } = { id: Symbol("hm.delegate"), defaultValue: null };
+export const DelegateRoot: { id: symbol; defaultValue: Document | null } = { id: Symbol("m.delegate"), defaultValue: null };
 function dispatch(e: Event): void {
   // a March-only key: other libraries on the same page (Solid) keep their own delegated handlers under `$$click`
-  const key = `$hm${e.type}`;
+  const key = `$m${e.type}`;
   let n = (e.composedPath?.()[0] ?? e.target) as (Node & Record<string, unknown> & { host?: Node }) | null;
   try {
     while (n && n.nodeType !== 9) {
@@ -258,8 +258,8 @@ function listen(el: Element, key: string, handler: unknown): void {
   if (key[2] !== ":" && DELEGATED.has(name)) {
     const d = useContext(DelegateRoot);
     if (d) {
-      (el as unknown as Record<string, unknown>)[`$hm${name}`] = handler;
-      const on = ((d as unknown as { $hm?: Set<string> }).$hm ??= new Set());
+      (el as unknown as Record<string, unknown>)[`$m${name}`] = handler;
+      const on = ((d as unknown as { $m?: Set<string> }).$m ??= new Set());
       if (!on.has(name)) { on.add(name); d.addEventListener(name, dispatch); }
       return;
     }
@@ -299,7 +299,7 @@ function bindProp(el: Element, what: string, value: unknown): void {
 }
 
 // ------------------------------------------------------------------ transitions
-const TRANSITIONS: Record<string, string> = { fade: "hm-t-fade", slide: "hm-t-slide", scale: "hm-t-scale" };
+const TRANSITIONS: Record<string, string> = { fade: "m-t-fade", slide: "m-t-slide", scale: "m-t-scale" };
 export type TransitionFn = (el: Element, opts: unknown, dir: "in" | "out") => Promise<void> | void;
 const JS_TRANSITIONS = new Map<string, TransitionFn>();
 /** Register a JS transition (used by hadi-march/motion). */

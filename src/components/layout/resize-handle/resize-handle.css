@@ -1,45 +1,45 @@
 /* ResizeHandle. One look for every resize grip: a 9px hit strip on an edge with a 2px line. Tokens, logical properties, no keyframes. */
-.hm-resize-handle { --hm-rh-hit: 9px; --hm-rh-out: -4px; position: absolute; z-index: 2; display: block; touch-action: none; outline: none; -webkit-tap-highlight-color: transparent; }
-.hm-resize-handle-end, .hm-resize-handle-start { inset-block: 0; inline-size: var(--hm-rh-hit); cursor: col-resize; }
-.hm-resize-handle-end { inset-inline-end: var(--hm-rh-out); }
-.hm-resize-handle-start { inset-inline-start: var(--hm-rh-out); }
-.hm-resize-handle-top, .hm-resize-handle-bottom { inset-inline: 0; block-size: var(--hm-rh-hit); cursor: row-resize; }
-.hm-resize-handle-top { inset-block-start: var(--hm-rh-out); }
-.hm-resize-handle-bottom { inset-block-end: var(--hm-rh-out); }
+.m-resize-handle { --m-rh-hit: 9px; --m-rh-out: -4px; position: absolute; z-index: 2; display: block; touch-action: none; outline: none; -webkit-tap-highlight-color: transparent; }
+.m-resize-handle-end, .m-resize-handle-start { inset-block: 0; inline-size: var(--m-rh-hit); cursor: col-resize; }
+.m-resize-handle-end { inset-inline-end: var(--m-rh-out); }
+.m-resize-handle-start { inset-inline-start: var(--m-rh-out); }
+.m-resize-handle-top, .m-resize-handle-bottom { inset-inline: 0; block-size: var(--m-rh-hit); cursor: row-resize; }
+.m-resize-handle-top { inset-block-start: var(--m-rh-out); }
+.m-resize-handle-bottom { inset-block-end: var(--m-rh-out); }
 /* in the flow, between two flex items (the look of a splitter) */
-.hm-resize-handle-between { position: relative; z-index: 1; flex: none; align-self: stretch; inline-size: var(--hm-rh-hit); margin-inline: var(--hm-rh-out); cursor: col-resize; }
-.hm-resize-handle-between.hm-resize-handle-block { inline-size: auto; block-size: var(--hm-rh-hit); margin-inline: 0; margin-block: var(--hm-rh-out); cursor: row-resize; }
+.m-resize-handle-between { position: relative; z-index: 1; flex: none; align-self: stretch; inline-size: var(--m-rh-hit); margin-inline: var(--m-rh-out); cursor: col-resize; }
+.m-resize-handle-between.m-resize-handle-block { inline-size: auto; block-size: var(--m-rh-hit); margin-inline: 0; margin-block: var(--m-rh-out); cursor: row-resize; }
 /* the line */
-.hm-resize-handle::after { content: ""; position: absolute; inset-block: 0; inset-inline-start: calc(50% - 1px); inline-size: 2px; border-radius: 2px; background: var(--hm-rh-rest, transparent); transition: background-color var(--hm-dur) var(--hm-ease); }
-.hm-resize-handle-block::after, .hm-resize-handle-top::after, .hm-resize-handle-bottom::after { inset-block: auto; inset-inline: 0; inset-block-start: calc(50% - 1px); inline-size: auto; block-size: 2px; }
-.hm-resize-handle-line-always { --hm-rh-rest: var(--hm-border); }
-.hm-resize-handle-line-always[data-hm-color] { --hm-rh-rest: color-mix(in srgb, var(--hm-accent) 45%, var(--hm-border)); }
-.hm-resize-handle[data-hm-color] { --hm-rh-grip: color-mix(in srgb, var(--hm-accent) 50%, var(--hm-border)); }
-.hm-resize-handle:hover::after, .hm-resize-handle.is-dragging::after { background: var(--hm-accent, var(--hm-primary)); }
-.hm-resize-handle:focus-visible::after { background: var(--hm-focus, var(--hm-accent, var(--hm-primary))); box-shadow: 0 0 0 1px var(--hm-focus, var(--hm-accent, var(--hm-primary))); }
-.hm-resize-handle-line-none:not(:focus-visible)::after { background: transparent; }
+.m-resize-handle::after { content: ""; position: absolute; inset-block: 0; inset-inline-start: calc(50% - 1px); inline-size: 2px; border-radius: 2px; background: var(--m-rh-rest, transparent); transition: background-color var(--m-dur) var(--m-ease); }
+.m-resize-handle-block::after, .m-resize-handle-top::after, .m-resize-handle-bottom::after { inset-block: auto; inset-inline: 0; inset-block-start: calc(50% - 1px); inline-size: auto; block-size: 2px; }
+.m-resize-handle-line-always { --m-rh-rest: var(--m-border); }
+.m-resize-handle-line-always[data-m-color] { --m-rh-rest: color-mix(in srgb, var(--m-accent) 45%, var(--m-border)); }
+.m-resize-handle[data-m-color] { --m-rh-grip: color-mix(in srgb, var(--m-accent) 50%, var(--m-border)); }
+.m-resize-handle:hover::after, .m-resize-handle.is-dragging::after { background: var(--m-accent, var(--m-primary)); }
+.m-resize-handle:focus-visible::after { background: var(--m-focus, var(--m-accent, var(--m-primary))); box-shadow: 0 0 0 1px var(--m-focus, var(--m-accent, var(--m-primary))); }
+.m-resize-handle-line-none:not(:focus-visible)::after { background: transparent; }
 /* corners: a small square with an L mark */
-.hm-resize-handle-corner { inline-size: 14px; block-size: 14px; }
-.hm-resize-handle-top-start { inset-block-start: var(--hm-rh-out); inset-inline-start: var(--hm-rh-out); cursor: nwse-resize; }
-.hm-resize-handle-top-end { inset-block-start: var(--hm-rh-out); inset-inline-end: var(--hm-rh-out); cursor: nesw-resize; }
-.hm-resize-handle-bottom-start { inset-block-end: var(--hm-rh-out); inset-inline-start: var(--hm-rh-out); cursor: nesw-resize; }
-.hm-resize-handle-bottom-end { inset-block-end: var(--hm-rh-out); inset-inline-end: var(--hm-rh-out); cursor: nwse-resize; }
-.hm-resize-handle-top-start:dir(rtl), .hm-resize-handle-bottom-end:dir(rtl) { cursor: nesw-resize; }
-.hm-resize-handle-top-end:dir(rtl), .hm-resize-handle-bottom-start:dir(rtl) { cursor: nwse-resize; }
-.hm-resize-handle-corner::after { inset: 3px; inline-size: auto; block-size: auto; border-radius: 0; background: none; border: 0 solid var(--hm-rh-rest, transparent); transition: border-color var(--hm-dur) var(--hm-ease); }
-.hm-resize-handle-top-start::after { border-block-start-width: 2px; border-inline-start-width: 2px; border-start-start-radius: 3px; }
-.hm-resize-handle-top-end::after { border-block-start-width: 2px; border-inline-end-width: 2px; border-start-end-radius: 3px; }
-.hm-resize-handle-bottom-start::after { border-block-end-width: 2px; border-inline-start-width: 2px; border-end-start-radius: 3px; }
-.hm-resize-handle-bottom-end::after { border-block-end-width: 2px; border-inline-end-width: 2px; border-end-end-radius: 3px; }
-.hm-resize-handle-corner:hover::after, .hm-resize-handle-corner.is-dragging::after { background: none; border-color: var(--hm-accent, var(--hm-primary)); }
-.hm-resize-handle-corner:focus-visible::after { background: none; box-shadow: none; border-color: var(--hm-focus, var(--hm-accent, var(--hm-primary))); }
-.hm-resize-handle-corner.hm-resize-handle-line-none:not(:focus-visible)::after { border-color: transparent; }
+.m-resize-handle-corner { inline-size: 14px; block-size: 14px; }
+.m-resize-handle-top-start { inset-block-start: var(--m-rh-out); inset-inline-start: var(--m-rh-out); cursor: nwse-resize; }
+.m-resize-handle-top-end { inset-block-start: var(--m-rh-out); inset-inline-end: var(--m-rh-out); cursor: nesw-resize; }
+.m-resize-handle-bottom-start { inset-block-end: var(--m-rh-out); inset-inline-start: var(--m-rh-out); cursor: nesw-resize; }
+.m-resize-handle-bottom-end { inset-block-end: var(--m-rh-out); inset-inline-end: var(--m-rh-out); cursor: nwse-resize; }
+.m-resize-handle-top-start:dir(rtl), .m-resize-handle-bottom-end:dir(rtl) { cursor: nesw-resize; }
+.m-resize-handle-top-end:dir(rtl), .m-resize-handle-bottom-start:dir(rtl) { cursor: nwse-resize; }
+.m-resize-handle-corner::after { inset: 3px; inline-size: auto; block-size: auto; border-radius: 0; background: none; border: 0 solid var(--m-rh-rest, transparent); transition: border-color var(--m-dur) var(--m-ease); }
+.m-resize-handle-top-start::after { border-block-start-width: 2px; border-inline-start-width: 2px; border-start-start-radius: 3px; }
+.m-resize-handle-top-end::after { border-block-start-width: 2px; border-inline-end-width: 2px; border-start-end-radius: 3px; }
+.m-resize-handle-bottom-start::after { border-block-end-width: 2px; border-inline-start-width: 2px; border-end-start-radius: 3px; }
+.m-resize-handle-bottom-end::after { border-block-end-width: 2px; border-inline-end-width: 2px; border-end-end-radius: 3px; }
+.m-resize-handle-corner:hover::after, .m-resize-handle-corner.is-dragging::after { background: none; border-color: var(--m-accent, var(--m-primary)); }
+.m-resize-handle-corner:focus-visible::after { background: none; box-shadow: none; border-color: var(--m-focus, var(--m-accent, var(--m-primary))); }
+.m-resize-handle-corner.m-resize-handle-line-none:not(:focus-visible)::after { border-color: transparent; }
 /* the grip in the middle */
-.hm-resize-handle-grip { position: absolute; z-index: 1; inset: 0; margin: auto; inline-size: 4px; block-size: 1.5rem; max-block-size: 60%; border-radius: var(--hm-radius-full); background: var(--hm-rh-grip, var(--hm-border-strong, var(--hm-border))); transition: background-color var(--hm-dur) var(--hm-ease); }
-.hm-resize-handle-block > .hm-resize-handle-grip, .hm-resize-handle-top > .hm-resize-handle-grip, .hm-resize-handle-bottom > .hm-resize-handle-grip { inline-size: 1.5rem; max-inline-size: 60%; block-size: 4px; max-block-size: none; }
-.hm-resize-handle-grip.is-own { display: grid; place-items: center; inline-size: auto; block-size: auto; max-inline-size: none; max-block-size: none; background: none; color: var(--hm-rh-grip, var(--hm-faint, var(--hm-muted))); overflow: visible; }
-.hm-resize-handle:hover > .hm-resize-handle-grip, .hm-resize-handle.is-dragging > .hm-resize-handle-grip, .hm-resize-handle:focus-visible > .hm-resize-handle-grip { background: var(--hm-accent, var(--hm-primary)); }
-.hm-resize-handle:hover > .hm-resize-handle-grip.is-own, .hm-resize-handle.is-dragging > .hm-resize-handle-grip.is-own, .hm-resize-handle:focus-visible > .hm-resize-handle-grip.is-own { background: none; color: var(--hm-accent, var(--hm-primary)); }
-.hm-resize-handle.is-disabled { pointer-events: none; cursor: default; }
-.hm-resize-handle.is-disabled::after, .hm-resize-handle.is-disabled > .hm-resize-handle-grip { opacity: .5; }
-@media (pointer: coarse) { .hm-resize-handle { --hm-rh-hit: 17px; --hm-rh-out: -8px; } }
+.m-resize-handle-grip { position: absolute; z-index: 1; inset: 0; margin: auto; inline-size: 4px; block-size: 1.5rem; max-block-size: 60%; border-radius: var(--m-radius-full); background: var(--m-rh-grip, var(--m-border-strong, var(--m-border))); transition: background-color var(--m-dur) var(--m-ease); }
+.m-resize-handle-block > .m-resize-handle-grip, .m-resize-handle-top > .m-resize-handle-grip, .m-resize-handle-bottom > .m-resize-handle-grip { inline-size: 1.5rem; max-inline-size: 60%; block-size: 4px; max-block-size: none; }
+.m-resize-handle-grip.is-own { display: grid; place-items: center; inline-size: auto; block-size: auto; max-inline-size: none; max-block-size: none; background: none; color: var(--m-rh-grip, var(--m-faint, var(--m-muted))); overflow: visible; }
+.m-resize-handle:hover > .m-resize-handle-grip, .m-resize-handle.is-dragging > .m-resize-handle-grip, .m-resize-handle:focus-visible > .m-resize-handle-grip { background: var(--m-accent, var(--m-primary)); }
+.m-resize-handle:hover > .m-resize-handle-grip.is-own, .m-resize-handle.is-dragging > .m-resize-handle-grip.is-own, .m-resize-handle:focus-visible > .m-resize-handle-grip.is-own { background: none; color: var(--m-accent, var(--m-primary)); }
+.m-resize-handle.is-disabled { pointer-events: none; cursor: default; }
+.m-resize-handle.is-disabled::after, .m-resize-handle.is-disabled > .m-resize-handle-grip { opacity: .5; }
+@media (pointer: coarse) { .m-resize-handle { --m-rh-hit: 17px; --m-rh-out: -8px; } }

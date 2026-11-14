@@ -23,7 +23,7 @@ contrastAudit(d.light)          // [{ fg: "muted", bg: "surface", ratio: 4.9, mi
 toneScale(d.light.primary)      // 50 … 900;  typeScale(d.type) → 2xs … 5xl in px
 draftToTheme(d)                 // ThemeDef (defineTheme) with tokens: draftTokens(d)
 draftCode(d)  draftCss(d)  draftJson(d)   // defineTheme module, themeCss stylesheet, JSON
-draftVars(d, "dark")            // { "--hm-bg": "#…", … } for a scoped element
+draftVars(d, "dark")            // { "--m-bg": "#…", … } for a scoped element
 importTheme(pasted)             // JSON, defineTheme JSON, CSS or a share link → draft (normalizeDraft fills gaps)
 shareUrl(d)  sharedDraft(location.href)  encodeDraft(d)  decodeDraft(code)
 PRESETS.map((p) => p.name)`

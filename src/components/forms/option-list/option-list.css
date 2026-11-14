@@ -1,26 +1,26 @@
 /* OptionList. Rows of choices inside a panel: tokens only, logical properties, no keyframes. */
-.hm-option-list { --hm-ol-pad: var(--hm-space-1); display: flex; flex-direction: column; gap: 1px; min-inline-size: 0; padding: var(--hm-ol-pad); }
-.hm-option-list-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--hm-space-1); }
-.hm-option-list-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.hm-option-list-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.hm-option-list-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-.hm-option-list-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.m-option-list { --m-ol-pad: var(--m-space-1); display: flex; flex-direction: column; gap: 1px; min-inline-size: 0; padding: var(--m-ol-pad); }
+.m-option-list-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--m-space-1); }
+.m-option-list-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.m-option-list-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.m-option-list-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.m-option-list-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 /* a row is a ListRow: here its size inside the list and the looks of the list's own states (the highlight of the
    field's keys is neutral, the chosen row is tinted, never bold) */
-.hm-option-list .hm-option-list-row { min-block-size: 2.25rem; padding: var(--hm-space-1) var(--hm-space-2); border-radius: max(.25rem, calc(var(--hm-radius-3) - var(--hm-ol-pad))); }
-.hm-option-list-sm .hm-option-list-row { min-block-size: 1.875rem; }
-.hm-option-list .hm-option-list-row.is-active { background: var(--hm-surface-2); color: var(--hm-text); }
-.hm-option-list .hm-option-list-row.is-selected { background: var(--hm-accent-soft, var(--hm-primary-soft)); font-weight: inherit; }
-.hm-option-list[data-hm-color] .hm-option-list-row.is-selected { background: color-mix(in srgb, var(--hm-accent) 14%, var(--hm-surface)); }
-.hm-option-list .hm-option-list-row.is-selected.is-active { background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 20%, var(--hm-surface)); }
-.hm-option-list .hm-option-list-row.is-disabled { background: none; }
-.hm-option-list-row:is(.is-active, .is-selected) .hm-listrow-lead { color: var(--hm-muted); }
-.hm-option-list-inline .hm-listrow-text { flex-direction: row; align-items: baseline; gap: var(--hm-space-2); }
-.hm-option-list-inline .hm-listrow-title { flex: none; }
-.hm-option-list-row .hm-listrow-trail { font-size: var(--hm-text-sm); }
-.hm-option-list-check { display: inline-flex; flex: none; color: var(--hm-accent, var(--hm-primary)); opacity: 0; }
-.hm-option-list-check .hm-svg { inline-size: 1rem; block-size: 1rem; }
-.hm-option-list-row.is-selected .hm-option-list-check { opacity: 1; }
-.hm-option-list-group { padding: var(--hm-space-2) var(--hm-space-2) var(--hm-space-1); }
-.hm-option-list-grid > .hm-option-list-group, .hm-option-list-grid > .hm-option-list-empty { grid-column: 1 / -1; }
-.hm-option-list-empty { padding: var(--hm-space-3) var(--hm-space-2); color: var(--hm-muted); font-size: var(--hm-text-sm); text-align: center; }
+.m-option-list .m-option-list-row { min-block-size: 2.25rem; padding: var(--m-space-1) var(--m-space-2); border-radius: max(.25rem, calc(var(--m-radius-3) - var(--m-ol-pad))); }
+.m-option-list-sm .m-option-list-row { min-block-size: 1.875rem; }
+.m-option-list .m-option-list-row.is-active { background: var(--m-surface-2); color: var(--m-text); }
+.m-option-list .m-option-list-row.is-selected { background: var(--m-accent-soft, var(--m-primary-soft)); font-weight: inherit; }
+.m-option-list[data-m-color] .m-option-list-row.is-selected { background: color-mix(in srgb, var(--m-accent) 14%, var(--m-surface)); }
+.m-option-list .m-option-list-row.is-selected.is-active { background: color-mix(in srgb, var(--m-accent, var(--m-primary)) 20%, var(--m-surface)); }
+.m-option-list .m-option-list-row.is-disabled { background: none; }
+.m-option-list-row:is(.is-active, .is-selected) .m-listrow-lead { color: var(--m-muted); }
+.m-option-list-inline .m-listrow-text { flex-direction: row; align-items: baseline; gap: var(--m-space-2); }
+.m-option-list-inline .m-listrow-title { flex: none; }
+.m-option-list-row .m-listrow-trail { font-size: var(--m-text-sm); }
+.m-option-list-check { display: inline-flex; flex: none; color: var(--m-accent, var(--m-primary)); opacity: 0; }
+.m-option-list-check .m-svg { inline-size: 1rem; block-size: 1rem; }
+.m-option-list-row.is-selected .m-option-list-check { opacity: 1; }
+.m-option-list-group { padding: var(--m-space-2) var(--m-space-2) var(--m-space-1); }
+.m-option-list-grid > .m-option-list-group, .m-option-list-grid > .m-option-list-empty { grid-column: 1 / -1; }
+.m-option-list-empty { padding: var(--m-space-3) var(--m-space-2); color: var(--m-muted); font-size: var(--m-text-sm); text-align: center; }

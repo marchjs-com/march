@@ -59,11 +59,11 @@ const specOf = (it: Action, args: unknown[]): MenuItemSpec => ({
 
 /** Draw one menu entry: a separator (Divider) or a ListRow (a router link with `href`, a button otherwise). ContextMenu reuses it. */
 export function renderItem(it: MenuItem, args: unknown[], close: (refocus: boolean) => void): unknown {
-  if (isSep(it)) { const sep = h(Divider, { class: "hm-menu-sep" }) as Element; sep.setAttribute("role", "separator"); return sep; }
+  if (isSep(it)) { const sep = h(Divider, { class: "m-menu-sep" }) as Element; sep.setAttribute("role", "separator"); return sep; }
   const x = isAction(it) ? specOf(it, args) : it;
   const choice = x.checked !== undefined;
-  const trail = choice || x.shortcut ? [choice && h(CheckMark, { variant: "bare", label: false, class: "hm-menu-check" }), x.shortcut && h(Kbd, { keys: x.shortcut, class: "hm-menu-kbd" })] : undefined;
-  const row = { size: "sm" as const, overflow: "wrap" as const, tabindex: "-1", class: cx("hm-menu-item", x.danger && "is-danger"), lead: x.icon, title: () => val(x.label), trail };
+  const trail = choice || x.shortcut ? [choice && h(CheckMark, { variant: "bare", label: false, class: "m-menu-check" }), x.shortcut && h(Kbd, { keys: x.shortcut, class: "m-menu-kbd" })] : undefined;
+  const row = { size: "sm" as const, overflow: "wrap" as const, tabindex: "-1", class: cx("m-menu-item", x.danger && "is-danger"), lead: x.icon, title: () => val(x.label), trail };
   if (x.href) return h(PlainListRow, { ...row, href: x.href, role: "menuitem", "on:click": () => close(false) });
   return h(PlainListRow, {
     ...row, role: choice ? (x.radio ? "menuitemradio" : "menuitemcheckbox") : "menuitem", "aria-checked": choice ? () => String(!!val(x.checked)) : null,
@@ -113,7 +113,7 @@ export function menuPanel(o: MenuPanelOptions): unknown {
   let panel: HTMLElement | undefined;
   return h(PopoverPanel, {
     anchor: o.anchor, open: o.open, onOpenChange: (on: boolean, why: string) => { if (!on) o.close(why === "escape"); },
-    role: "menu", ...(o.id ? { id: o.id } : {}), label: () => val(o.label) ?? undefined, placement: o.placement, flush: true, autoFocus: false, panelClass: cx("hm-menu", o.class),
+    role: "menu", ...(o.id ? { id: o.id } : {}), label: () => val(o.label) ?? undefined, placement: o.placement, flush: true, autoFocus: false, panelClass: cx("m-menu", o.class),
     panelProps: { ref: (x: HTMLElement) => { panel = x; o.ref?.(x); }, onKeydown: (e: KeyboardEvent) => { if (e.key === "Tab") o.close(false); else roving(e, menuItems(panel)); } },
     children: () => { const args = o.args?.() ?? []; const items = o.items(); return untrack(() => items.map((it) => renderItem(it, args, (refocus) => o.close(refocus)))); },
   });
@@ -122,7 +122,7 @@ export function menuPanel(o: MenuPanelOptions): unknown {
 // Shared trigger (Button / IconButton) of Menu and Dropdown: the ARIA of a popup button; `panel` draws what it opens.
 function popButton(props: PopoverButtonProps, role: "menu" | "dialog", panel: (p: { anchor: () => HTMLElement | undefined; open: () => boolean; close: (refocus?: boolean) => void; id: string; ref: (x: HTMLElement) => void }) => unknown): unknown[] {
   const open = signal(false);
-  const id = uid("hm-pop");
+  const id = uid("m-pop");
   let trigger: HTMLElement | undefined, panelEl: HTMLElement | undefined;
   const close = (refocus?: boolean): void => { open.set(false); if (refocus) trigger?.focus(); };
   const focusIn = (i: number): void => queueMicrotask(() => { const els = role === "menu" ? menuItems(panelEl) : []; (i < 0 ? els[els.length - 1] : els[i])?.focus(); });
@@ -168,7 +168,7 @@ export interface DropdownProps extends PopoverButtonProps { children?: unknown }
 export function Dropdown(props: DropdownProps): unknown[] {
   return popButton(props, "dialog", (p) => h(PopoverPanel, {
     anchor: p.anchor, open: p.open, onOpenChange: (on: boolean, why: string) => { if (!on) p.close(why === "escape"); },
-    role: null, id: p.id, placement: props.placement, autoFocus: false, panelClass: cx("hm-dropdown", props.panelClass), panelProps: { ref: p.ref },
+    role: null, id: p.id, placement: props.placement, autoFocus: false, panelClass: cx("m-dropdown", props.panelClass), panelProps: { ref: p.ref },
     children: () => (typeof props.children === "function" && props.children.length ? (props.children as (close: (refocus?: boolean) => void) => unknown)(p.close) : props.children),
   }));
 }

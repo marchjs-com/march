@@ -18,7 +18,7 @@ test("PhoneInput: digits only, country prefix shown and prepended", () => {
   const { el } = mount(() => h(PhoneInput, { "bind:value": v, country: "+44" }));
   const input = el.querySelector("input");
   assert.equal(input.getAttribute("type"), "tel");
-  assert.equal(el.querySelector(".hm-affix-prefix").textContent, "+44");
+  assert.equal(el.querySelector(".m-affix-prefix").textContent, "+44");
   type(input, "07700 900123");
   assert.equal(v(), "+447700900123");
   assert.equal(input.value, "7700900123");
@@ -29,7 +29,7 @@ test("PhoneInput: class reaches the input without a country, the wrapper with on
   assert.ok(a.el.querySelector("input").className.includes("mine"));
   a.dispose();
   const b = mount(() => h(PhoneInput, { value: "", class: "mine", country: "+90" }));
-  assert.ok(b.el.querySelector(".hm-affix").className.includes("mine"));
+  assert.ok(b.el.querySelector(".m-affix").className.includes("mine"));
   assert.ok(!b.el.querySelector("input").className.includes("mine"));
   b.dispose();
 });

@@ -56,17 +56,17 @@ export function ReactionPicker(props: ReactionPickerProps): Element {
     list[j]?.focus();
   };
   root = h("div", {
-    class: () => cx("hm-react", `hm-react-${val(props.layout) ?? "row"}`, val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)),
+    class: () => cx("m-react", `m-react-${val(props.layout) ?? "row"}`, val(props.class)),
+    "data-m-color": () => colorAttr(val(props.color)),
     role: "toolbar", "aria-label": () => val(props.label) ?? t`Reactions`, onKeydown: key,
   }, () => {
     const list = val(props.emojis) ?? (val(props.layout) === "grid" ? EMOJI_SET : QUICK_REACTIONS);
     const sel = val(props.selected);
     const btns = list.map((e, i) => h("button", {
-      type: "button", class: cx("hm-react-e", sel === e && "is-on"), "aria-pressed": sel === e ? "true" : "false", "aria-label": props.emojiLabel ? props.emojiLabel(e) : e,
+      type: "button", class: cx("m-react-e", sel === e && "is-on"), "aria-pressed": sel === e ? "true" : "false", "aria-label": props.emojiLabel ? props.emojiLabel(e) : e,
       tabindex: i === Math.max(0, list.indexOf(sel ?? "")) ? "0" : "-1", onClick: () => props.onPick(e),
     }, h("span", { "aria-hidden": "true" }, e)));
-    if (props.onMore && val(props.layout) !== "grid") btns.push(h(IconButton, { class: "hm-react-more", size: "sm", shape: "round", tabindex: "-1", icon: props.moreIcon ?? plus, label: () => val(props.moreLabel) ?? t`More emoji`, onClick: () => props.onMore?.() }) as HTMLButtonElement);
+    if (props.onMore && val(props.layout) !== "grid") btns.push(h(IconButton, { class: "m-react-more", size: "sm", shape: "round", tabindex: "-1", icon: props.moreIcon ?? plus, label: () => val(props.moreLabel) ?? t`More emoji`, onClick: () => props.onMore?.() }) as HTMLButtonElement);
     return btns;
   }) as HTMLElement;
   if (props.pop !== false) queueMicrotask(() => {

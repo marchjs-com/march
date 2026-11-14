@@ -45,8 +45,8 @@ A progress bar with a label and the percentage, or an indeterminate one while th
 ```
 
 A line is driven from outside in two ways: a `value` (a signal that follows the scroll, the slide, the step) or
-`fillRef`, which hands the fill element to a driver that writes its transform itself. `--hm-progress-gap` is the space
-between parts and `--hm-progress-track` the track colour.
+`fillRef`, which hands the fill element to a driver that writes its transform itself. `--m-progress-gap` is the space
+between parts and `--m-progress-track` the track colour.
 
 ## Accessibility
 

@@ -1,7 +1,7 @@
 // Tiny syntax colouring for read-only code: one pass, tokens only (the caller builds text nodes; never innerHTML).
 // Languages: js / ts / jsx / tsx, css, html, json, sh. Anything else stays plain.
 
-/** Token kinds (CSS class `hm-tok-<kind>`); "" is plain text. */
+/** Token kinds (CSS class `m-tok-<kind>`); "" is plain text. */
 export type TokenKind = "" | "com" | "str" | "num" | "kw" | "lit" | "tag" | "attr" | "fn" | "punct";
 export type Token = [kind: TokenKind, text: string];
 

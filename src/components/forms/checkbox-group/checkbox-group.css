@@ -1,3 +1,3 @@
 /* March — CheckboxGroup. Imported by its component module; tokens.css provides the variables (shared text-control rules: ui/field.css). */
-.hm-choices[role="group"][aria-invalid="true"]:is(.hm-choice-chip, .hm-choice-card) .hm-check { border-color: var(--hm-danger); }
-.hm-choices[role="group"][aria-invalid="true"]:is(.hm-choice-toggle, .hm-choice-segmented) { border-color: var(--hm-danger); }
+.m-choices[role="group"][aria-invalid="true"]:is(.m-choice-chip, .m-choice-card) .m-check { border-color: var(--m-danger); }
+.m-choices[role="group"][aria-invalid="true"]:is(.m-choice-toggle, .m-choice-segmented) { border-color: var(--m-danger); }

@@ -67,7 +67,7 @@ const targets = (el: Element, self?: boolean, select?: string): HTMLElement[] =>
 export function revealOnScroll(el: Element, raw?: unknown): () => void {
   const o: RevealOptions = raw && typeof raw === "object" ? (raw as RevealOptions) : {};
   const effect = o.effect ?? "up", dist = o.distance ?? 28;
-  el.classList.add("hm-reveal");
+  el.classList.add("m-reveal");
   // no effect: nothing is hidden, nothing moves
   if (effect === "none") { el.classList.add("is-revealed"); return () => {}; }
   const framesOf = (): ReturnType<typeof revealFrames> => (typeof effect === "object" ? effect : revealFrames(effect, dist, rtl(el)));
@@ -84,7 +84,7 @@ export function revealOnScroll(el: Element, raw?: unknown): () => void {
   }
   el.classList.add("is-pending");
   // descendants picked by a selector are hidden by their own class until the reveal
-  if (o.select) for (const t of targets(el, false, o.select)) t.classList.add("hm-reveal-item");
+  if (o.select) for (const t of targets(el, false, o.select)) t.classList.add("m-reveal-item");
   const go = (): void => {
     const list = targets(el, o.self, o.select);
     const { from, to } = framesOf();
@@ -102,7 +102,7 @@ export function revealOnScroll(el: Element, raw?: unknown): () => void {
 /** `<Reveal effect="up" stagger={80}><Card/><Card/><Card/></Reveal>` */
 export function Reveal(props: RevealProps): Element {
   const { as, class: c, children, effect, easing, stagger, delay, duration, distance, scrub, self, select, ...attrs } = props;
-  const el = h(as ?? "div", { ...attrs, class: cx("hm-reveal-box", val(c as MaybeFn<unknown>)) }, children) as HTMLElement;
+  const el = h(as ?? "div", { ...attrs, class: cx("m-reveal-box", val(c as MaybeFn<unknown>)) }, children) as HTMLElement;
   const opts: RevealOptions = { effect, easing, stagger, delay, duration, distance, scrub, self, select } as RevealOptions;
   owned(revealOnScroll(el, opts));
   return el;

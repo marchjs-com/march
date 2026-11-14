@@ -12,6 +12,6 @@ export default function DateTimeInputDemo(props: { values: { disabled: boolean }
   let $at = START_AT
   return <div class="sc-stack">
     {() => <Field label="Başlangıç"><DateTimeInput value={$at} onChange={(v: Maybe<string>) => { $at = v }} defaultTime="09:00" disabled={props.values.disabled} /></Field>}
-    <p class="hm-muted">{() => `Değer (UTC): ${$at ?? "—"}`}</p>
+    <p class="m-muted">{() => `Değer (UTC): ${$at ?? "—"}`}</p>
   </div>
 }

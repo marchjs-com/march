@@ -31,7 +31,7 @@ export default function PanelHeaderDemo(props: { values: Values }) {
         close={v.close === "off" ? false : v.close === "own" ? <Icon of={minus} /> : true}
         closeLabel={v.close === "own" ? "Küçült" : undefined}
         onClose={() => $closed++} />
-      const body = <div class="sc-a6-panel-body"><p class="hm-muted">Panelin içeriği. Başlık çubuğunun her parçası seçeneklerden açılıp kapanır.</p>
+      const body = <div class="sc-a6-panel-body"><p class="m-muted">Panelin içeriği. Başlık çubuğunun her parçası seçeneklerden açılıp kapanır.</p>
         <p class="sc-demo-call">{() => `onClose: ${$closed} kez`}</p></div>
       return foot ? <>{body}{bar}</> : <>{bar}{body}</>
     }}

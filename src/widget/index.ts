@@ -79,7 +79,7 @@ export function Widget<P>(props: WidgetProps<P>): Element {
   const input = computed(() => props.input);
   const main: Accessor<WidgetProvider<P> | undefined> = computed(() => pickMain(props.sources, input()));
   const actions = computed(() => actionsOf(props.sources, input()));
-  return h("div", { class: props.class ? `hm-widget ${props.class}` : "hm-widget", "data-widget": () => main()?.id ?? "" },
+  return h("div", { class: props.class ? `m-widget ${props.class}` : "m-widget", "data-widget": () => main()?.id ?? "" },
     () => {
       const m = main(), now = input();
       if (!m) return null;

@@ -17,7 +17,7 @@ const toggle = (key: "contrast" | "underlineLinks" | "textSpacing" | "strongFocu
 
 /** Every preference, applied as it changes. */
 export function AccessibilitySettings(): unknown {
-  return h("div", { class: "hm-a11y-settings" },
+  return h("div", { class: "m-a11y-settings" },
     h(Field, { label: () => t("Motion") }, h(Segmented, {
       get value() { return a11y.prefs().motion; }, setValue: (v: MotionPref | null) => { if (v) a11y.set({ motion: v }); },
       get options() { return [{ value: "system", label: t("System") }, { value: "reduce", label: t("Reduce") }, { value: "full", label: t("Full") }]; },
@@ -30,7 +30,7 @@ export function AccessibilitySettings(): unknown {
     toggle("underlineLinks", "Underline links"),
     toggle("textSpacing", "Text spacing"),
     toggle("strongFocus", "Strong focus ring"),
-    h("p", { class: "hm-muted" }, () => t("Settings are saved on this device and apply to the whole app.")));
+    h("p", { class: "m-muted" }, () => t("Settings are saved on this device and apply to the whole app.")));
 }
 
 /** The settings in a dialog. */

@@ -42,7 +42,7 @@ export default function FormatToolbarDemo(props: { values: { tools: string; hint
       if ($strike) line = <s>{line}</s>
       return line
     }}</p>
-    <p class="hm-muted">İpuçları (düğmenin üstüne gelince): {() => $tips}</p>
-    <p class="hm-muted" aria-live="polite">{() => ($last ? `Son araç: ${$last}` : "Bir araca basın: kalın, italik ve üstü çizili örnek satırı değiştirir.")}</p>
+    <p class="m-muted">İpuçları (düğmenin üstüne gelince): {() => $tips}</p>
+    <p class="m-muted" aria-live="polite">{() => ($last ? `Son araç: ${$last}` : "Bir araca basın: kalın, italik ve üstü çizili örnek satırı değiştirir.")}</p>
   </div>
 }

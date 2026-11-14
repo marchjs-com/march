@@ -45,6 +45,6 @@ export default function NavMenuDemo(props: { values: { filter: boolean; groupsCo
         pins={pins} icons={chevron === "plus" ? { chevron: plus } : chevron === "off" ? { chevron: false } : undefined}
         labels={texts ? { filterPlaceholder: "Sayfa bul…", filter: "Sayfalarda ara", noMatches: "Böyle bir sayfa yok", pinned: "Sık kullandıklarım", recent: "Son baktıklarım" } : undefined} />
     }}
-    <div class="sc-navmenu-main hm-muted">Sayfa içeriği</div>
+    <div class="sc-navmenu-main m-muted">Sayfa içeriği</div>
   </div>
 }

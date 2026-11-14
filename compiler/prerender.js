@@ -7,7 +7,7 @@
 // History routing: every route without params gets its own <route>/index.html (asset paths relative to that depth, or
 // under an absolute base), so a static host without rewrites opens each page directly; a route the build could not
 // render gets the plain app shell there. Routes with params (/users/:id) are covered by 404.html: it sends the
-// address to the app's root (?hm-path=/users/7) and the router restores it on start (docs/hosting.md).
+// address to the app's root (?m-path=/users/7) and the router restores it on start (docs/hosting.md).
 //
 //   seo: {
 //     site: "https://shop.example",        // absolute origin (+ base) — sitemap, robots Sitemap line, canonical
@@ -181,12 +181,12 @@ export async function prerender({ cwd, cfg, esbuild, out, importSeo, log = conso
       if (mode === "history") patterns = S.router.routes.map((r) => r.pattern);
       if (route !== list[i]) { i--; continue; }
       // March's boot placeholder (templates, showcase) has nothing to wait for on a prerendered page
-      document.getElementById("hm-boot")?.remove();
+      document.getElementById("m-boot")?.remove();
       document.head.querySelector("meta[data-march-prerender]")?.remove();
       const app = document.getElementById(cfg.appId ?? "app");
       if (!app) throw new Error(`no #${cfg.appId ?? "app"} element in index.html`);
       if (errors.length) throw errors[0];
-      app.setAttribute("data-hm-prerender", mode === "hash" ? `#${route}` : route);
+      app.setAttribute("data-m-prerender", mode === "hash" ? `#${route}` : route);
       const depth = mode === "hash" || route === "/" ? 0 : route.split("/").filter(Boolean).length;
       // preloads the router added (chunk JS + CSS): the CSS becomes a stylesheet so the page is styled before JS runs
       for (const l of document.head.querySelectorAll("link[data-march-preload]")) {
@@ -266,13 +266,13 @@ export function siteRoot(site, absBase) {
   return absBase && absBase !== "/" && !/^[a-z]+:\/\/[^/]+\/./i.test(u) ? `${u}${absBase.replace(/\/$/, "")}` : u;
 }
 
-/** The script 404.html runs: back to the app's root with the address in ?hm-path= (the router restores it). */
+/** The script 404.html runs: back to the app's root with the address in ?m-path= (the router restores it). */
 export const NOT_FOUND_JS = `// March 404 fallback: the host had no file for this address (a route with params, such as /users/7). The app's root
 // is where this file lives; go there with the address, the router puts it back without a history entry.
 const root = new URL("./", import.meta.url), l = location;
-if (!globalThis.__march404 && l.pathname.startsWith(root.pathname) && !/[?&]hm-path=/.test(l.search)) {
+if (!globalThis.__march404 && l.pathname.startsWith(root.pathname) && !/[?&]m-path=/.test(l.search)) {
   globalThis.__march404 = 1;
-  l.replace(root.href + "?hm-path=" + encodeURIComponent("/" + l.pathname.slice(root.pathname.length) + l.search + l.hash));
+  l.replace(root.href + "?m-path=" + encodeURIComponent("/" + l.pathname.slice(root.pathname.length) + l.search + l.hash));
 }
 `;
 

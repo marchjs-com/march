@@ -1,18 +1,18 @@
 /* March — Kanban. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- kanban */
-.hm-kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(15rem, 1fr); gap: var(--hm-space-3); overflow-x: auto; padding-bottom: var(--hm-space-2); }
-.hm-kanban-col { display: flex; flex-direction: column; gap: var(--hm-space-2); min-height: 12rem; padding: var(--hm-space-3); border-radius: var(--hm-radius-3); background: var(--hm-bg-subtle);
-  border: 1px dashed transparent; transition: border-color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease); }
-.hm-kanban-col.is-over { border-color: var(--hm-primary); background: var(--hm-primary-soft); }
+.m-kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(15rem, 1fr); gap: var(--m-space-3); overflow-x: auto; padding-bottom: var(--m-space-2); }
+.m-kanban-col { display: flex; flex-direction: column; gap: var(--m-space-2); min-height: 12rem; padding: var(--m-space-3); border-radius: var(--m-radius-3); background: var(--m-bg-subtle);
+  border: 1px dashed transparent; transition: border-color var(--m-dur) var(--m-ease), background-color var(--m-dur) var(--m-ease); }
+.m-kanban-col.is-over { border-color: var(--m-primary); background: var(--m-primary-soft); }
 /* the column head is a PanelHeader; the board keeps its tight measure */
-.hm-kanban-head.hm-panel-header { min-block-size: 0; padding: 0 .25rem var(--hm-space-1); }
-.hm-kanban-list { display: flex; flex-direction: column; gap: var(--hm-space-2); }
-.hm-kanban-card { padding: var(--hm-space-3); border: 1px solid var(--hm-border); border-radius: var(--hm-radius-2); background: var(--hm-surface); box-shadow: var(--hm-shadow-1); cursor: grab;
-  transition: box-shadow var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease), opacity var(--hm-dur) var(--hm-ease); animation: hm-scale-in var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-kanban-card:hover { box-shadow: var(--hm-shadow-2); transform: translateY(-1px); }
-.hm-kanban-card { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-.hm-kanban-card.is-dragging { opacity: .45; }
+.m-kanban-head.m-panel-header { min-block-size: 0; padding: 0 .25rem var(--m-space-1); }
+.m-kanban-list { display: flex; flex-direction: column; gap: var(--m-space-2); }
+.m-kanban-card { padding: var(--m-space-3); border: 1px solid var(--m-border); border-radius: var(--m-radius-2); background: var(--m-surface); box-shadow: var(--m-shadow-1); cursor: grab;
+  transition: box-shadow var(--m-dur) var(--m-ease), transform var(--m-dur) var(--m-ease), opacity var(--m-dur) var(--m-ease); animation: m-scale-in var(--m-dur-slow) var(--m-ease-out); }
+.m-kanban-card:hover { box-shadow: var(--m-shadow-2); transform: translateY(-1px); }
+.m-kanban-card { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.m-kanban-card.is-dragging { opacity: .45; }
 /* the copy that follows the pointer (drag layer) */
-.hm-kanban-ghost { position: fixed; inset: 0 auto auto 0; margin: 0; pointer-events: none; cursor: grabbing; box-shadow: var(--hm-shadow-3); rotate: -1.5deg; animation: none; }
-.hm-kanban-dot-own { display: inline-flex; flex: none; }
-.hm-kanban.is-still .hm-kanban-card { animation: none; }
+.m-kanban-ghost { position: fixed; inset: 0 auto auto 0; margin: 0; pointer-events: none; cursor: grabbing; box-shadow: var(--m-shadow-3); rotate: -1.5deg; animation: none; }
+.m-kanban-dot-own { display: inline-flex; flex: none; }
+.m-kanban.is-still .m-kanban-card { animation: none; }

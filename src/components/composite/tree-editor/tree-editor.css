@@ -1,62 +1,62 @@
 /* March — TreeEditor. Imported by its component module; tokens.css provides the variables. */
-.hm-tre-wrap { --hm-tre-step: 1.25rem; }
+.m-tre-wrap { --m-tre-step: 1.25rem; }
 
 /* bar: search, status, history */
-.hm-panel-header.hm-tre-bar { padding-block: var(--hm-space-2); }
-.hm-tre-search { flex: 1 1 12rem; min-inline-size: 0; }
-.hm-tre-history { gap: 2px; }
+.m-panel-header.m-tre-bar { padding-block: var(--m-space-2); }
+.m-tre-search { flex: 1 1 12rem; min-inline-size: 0; }
+.m-tre-history { gap: 2px; }
 
 /* tree */
-.hm-tre { max-height: 28rem; overflow: auto; padding: var(--hm-space-1) 0; font-size: var(--hm-text-sm); }
+.m-tre { max-height: 28rem; overflow: auto; padding: var(--m-space-1) 0; font-size: var(--m-text-sm); }
 /* a row is the shared tree row (data/tree/row.ts: a ListRow); here: the indent by depth, the editor's measures and focus look */
-.hm-listrow.hm-tre-row { inline-size: auto; gap: .375rem; min-block-size: 2.125rem; margin-inline: var(--hm-space-1);
-  padding-block: .1875rem; padding-inline: calc(var(--hm-tre-depth, 0) * var(--hm-tre-step) + .25rem) .25rem; outline: 2px solid transparent; outline-offset: -2px; font-size: inherit; line-height: inherit;
-  transition: background-color var(--hm-dur-fast) var(--hm-ease), outline-color var(--hm-dur) var(--hm-ease); }
-.hm-tre-row > .hm-listrow-lead { color: inherit; }
-.hm-tre-row .hm-listrow-title { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; }
-.hm-tre-row > .hm-listrow-trail { font-size: inherit; }
-.hm-tre-row:hover { background: var(--hm-surface-2); }
-.hm-listrow.hm-tre-row:focus { outline-color: transparent; }
-.hm-tre-row:focus-visible, .hm-tre-row.is-current:focus-within { background: var(--hm-accent-soft, var(--hm-primary-soft)); }
-.hm-listrow.hm-tre-row:focus-visible { outline-color: var(--hm-editor-accent); }
-.hm-tre-row.is-invalid { background: color-mix(in srgb, var(--hm-danger) 6%, transparent); }
-.hm-tre-row.is-invalid::before { content: ""; position: absolute; inset-inline-start: 0; inset-block: 4px; width: 3px; border-radius: 3px; background: var(--hm-danger); }
-.hm-listrow.hm-tre-row.is-flash { outline-color: var(--hm-danger); }
-.hm-tre-guides { position: absolute; inset-block: 0; inset-inline-start: .25rem; width: calc(var(--hm-tre-depth, 0) * var(--hm-tre-step)); pointer-events: none;
-  background-image: repeating-linear-gradient(to right, transparent 0 calc(var(--hm-tre-step) / 2 + .1rem), var(--hm-border-subtle) calc(var(--hm-tre-step) / 2 + .1rem) calc(var(--hm-tre-step) / 2 + .1rem + 1px), transparent calc(var(--hm-tre-step) / 2 + .1rem + 1px) var(--hm-tre-step)); }
-:dir(rtl) .hm-tre-guides { transform: scaleX(-1); }
-.hm-chevron.hm-tre-chev { box-sizing: border-box; inline-size: 1.25rem; block-size: 1.25rem; padding: .175rem; border-radius: var(--hm-radius-1); color: var(--hm-faint); cursor: pointer; }
-.hm-tre-chev:hover { color: var(--hm-text); }
+.m-listrow.m-tre-row { inline-size: auto; gap: .375rem; min-block-size: 2.125rem; margin-inline: var(--m-space-1);
+  padding-block: .1875rem; padding-inline: calc(var(--m-tre-depth, 0) * var(--m-tre-step) + .25rem) .25rem; outline: 2px solid transparent; outline-offset: -2px; font-size: inherit; line-height: inherit;
+  transition: background-color var(--m-dur-fast) var(--m-ease), outline-color var(--m-dur) var(--m-ease); }
+.m-tre-row > .m-listrow-lead { color: inherit; }
+.m-tre-row .m-listrow-title { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; }
+.m-tre-row > .m-listrow-trail { font-size: inherit; }
+.m-tre-row:hover { background: var(--m-surface-2); }
+.m-listrow.m-tre-row:focus { outline-color: transparent; }
+.m-tre-row:focus-visible, .m-tre-row.is-current:focus-within { background: var(--m-accent-soft, var(--m-primary-soft)); }
+.m-listrow.m-tre-row:focus-visible { outline-color: var(--m-editor-accent); }
+.m-tre-row.is-invalid { background: color-mix(in srgb, var(--m-danger) 6%, transparent); }
+.m-tre-row.is-invalid::before { content: ""; position: absolute; inset-inline-start: 0; inset-block: 4px; width: 3px; border-radius: 3px; background: var(--m-danger); }
+.m-listrow.m-tre-row.is-flash { outline-color: var(--m-danger); }
+.m-tre-guides { position: absolute; inset-block: 0; inset-inline-start: .25rem; width: calc(var(--m-tre-depth, 0) * var(--m-tre-step)); pointer-events: none;
+  background-image: repeating-linear-gradient(to right, transparent 0 calc(var(--m-tre-step) / 2 + .1rem), var(--m-border-subtle) calc(var(--m-tre-step) / 2 + .1rem) calc(var(--m-tre-step) / 2 + .1rem + 1px), transparent calc(var(--m-tre-step) / 2 + .1rem + 1px) var(--m-tre-step)); }
+:dir(rtl) .m-tre-guides { transform: scaleX(-1); }
+.m-chevron.m-tre-chev { box-sizing: border-box; inline-size: 1.25rem; block-size: 1.25rem; padding: .175rem; border-radius: var(--m-radius-1); color: var(--m-faint); cursor: pointer; }
+.m-tre-chev:hover { color: var(--m-text); }
 
-.hm-tre-key { font-weight: var(--hm-weight-semibold); color: var(--hm-text); overflow-wrap: anywhere; cursor: text; }
-.hm-tre-key::after { content: ":"; color: var(--hm-faint); font-weight: 400; }
-.hm-tre-root { cursor: default; color: var(--hm-text-2); }
-.hm-tre-root::after { content: none; }
-.hm-tre-index { font-family: var(--hm-font-mono); font-size: var(--hm-text-xs); font-weight: 500; color: var(--hm-faint); cursor: default; }
+.m-tre-key { font-weight: var(--m-weight-semibold); color: var(--m-text); overflow-wrap: anywhere; cursor: text; }
+.m-tre-key::after { content: ":"; color: var(--m-faint); font-weight: 400; }
+.m-tre-root { cursor: default; color: var(--m-text-2); }
+.m-tre-root::after { content: none; }
+.m-tre-index { font-family: var(--m-font-mono); font-size: var(--m-text-xs); font-weight: 500; color: var(--m-faint); cursor: default; }
 
 /* type badge (a clickable Badge that opens the type menu) */
-.hm-tre-type { flex: none; transition: transform var(--hm-dur-fast) var(--hm-ease-spring); }
-.hm-tre-type:hover:not(:disabled) { transform: translateY(-1px) scale(1.06); }
-.hm-tre-type:disabled { opacity: 1; }
-.hm-tre-badge { font-family: var(--hm-font-mono); font-size: .6875rem; letter-spacing: -.02em; min-width: 2.25rem; justify-content: center; }
-.hm-tre-menu { min-inline-size: 11rem; }
+.m-tre-type { flex: none; transition: transform var(--m-dur-fast) var(--m-ease-spring); }
+.m-tre-type:hover:not(:disabled) { transform: translateY(-1px) scale(1.06); }
+.m-tre-type:disabled { opacity: 1; }
+.m-tre-badge { font-family: var(--m-font-mono); font-size: .6875rem; letter-spacing: -.02em; min-width: 2.25rem; justify-content: center; }
+.m-tre-menu { min-inline-size: 11rem; }
 
 /* values */
-.hm-tre-value { min-width: 0; max-width: 100%; overflow-wrap: anywhere; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); cursor: text; padding: 0 .25rem; border-radius: var(--hm-radius-1); }
-.hm-tre-value:hover { background: var(--hm-surface-3); }
-.hm-tre-string { color: color-mix(in srgb, var(--hm-brand-green, var(--hm-cat-3)) 62%, var(--hm-text)); }
-.hm-tre-string::before, .hm-tre-string::after { content: "\""; color: var(--hm-faint); }
-.hm-tre-number { color: color-mix(in srgb, var(--hm-brand-blue, var(--hm-cat-2)) 70%, var(--hm-text)); }
-.hm-tre-null { color: var(--hm-faint); font-style: italic; cursor: default; }
-.hm-tre-null:hover { background: none; }
-.hm-tre-empty { color: var(--hm-faint); font-family: var(--hm-font-body, inherit); font-style: italic; }
-.hm-tre-summary { color: var(--hm-faint); font-size: var(--hm-text-xs); }
-.hm-tre-input { min-height: 1.75rem; height: 1.75rem; padding: 0 .5rem; width: auto; min-width: 6rem; max-width: 100%; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); }
-.hm-tre-input-key { min-width: 5rem; font-family: inherit; font-weight: var(--hm-weight-semibold); }
-.hm-tre-error { color: var(--hm-danger-text, var(--hm-danger)); }
+.m-tre-value { min-width: 0; max-width: 100%; overflow-wrap: anywhere; font-family: var(--m-font-mono); font-size: var(--m-text-sm); cursor: text; padding: 0 .25rem; border-radius: var(--m-radius-1); }
+.m-tre-value:hover { background: var(--m-surface-3); }
+.m-tre-string { color: color-mix(in srgb, var(--m-brand-green, var(--m-cat-3)) 62%, var(--m-text)); }
+.m-tre-string::before, .m-tre-string::after { content: "\""; color: var(--m-faint); }
+.m-tre-number { color: color-mix(in srgb, var(--m-brand-blue, var(--m-cat-2)) 70%, var(--m-text)); }
+.m-tre-null { color: var(--m-faint); font-style: italic; cursor: default; }
+.m-tre-null:hover { background: none; }
+.m-tre-empty { color: var(--m-faint); font-family: var(--m-font-body, inherit); font-style: italic; }
+.m-tre-summary { color: var(--m-faint); font-size: var(--m-text-xs); }
+.m-tre-input { min-height: 1.75rem; height: 1.75rem; padding: 0 .5rem; width: auto; min-width: 6rem; max-width: 100%; font-family: var(--m-font-mono); font-size: var(--m-text-sm); }
+.m-tre-input-key { min-width: 5rem; font-family: inherit; font-weight: var(--m-weight-semibold); }
+.m-tre-error { color: var(--m-danger-text, var(--m-danger)); }
 
 /* row actions: shown on hover / focus */
-.hm-tre-actions { display: inline-flex; gap: 1px; opacity: 0; transition: opacity var(--hm-dur-fast) var(--hm-ease); }
-.hm-tre-row:hover .hm-tre-actions, .hm-tre-row:focus-within .hm-tre-actions, .hm-tre-row.is-current .hm-tre-actions { opacity: 1; }
-@media (hover: none) { .hm-tre-actions { opacity: 1; } }
-.hm-tre-wrap.is-readonly .hm-tre-key, .hm-tre-wrap.is-readonly .hm-tre-value { cursor: default; }
+.m-tre-actions { display: inline-flex; gap: 1px; opacity: 0; transition: opacity var(--m-dur-fast) var(--m-ease); }
+.m-tre-row:hover .m-tre-actions, .m-tre-row:focus-within .m-tre-actions, .m-tre-row.is-current .m-tre-actions { opacity: 1; }
+@media (hover: none) { .m-tre-actions { opacity: 1; } }
+.m-tre-wrap.is-readonly .m-tre-key, .m-tre-wrap.is-readonly .m-tre-value { cursor: default; }

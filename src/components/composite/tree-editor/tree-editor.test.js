@@ -56,7 +56,7 @@ test("TreeEditor: rows, type badges, add / duplicate / delete as undoable steps,
   assert.equal(port.getAttribute("aria-invalid"), "true");
   assert.match(port.textContent, /At least 1024/);
   assert.match(el.querySelector("[role=status]").textContent, /1 problems/);
-  assert.deepEqual(rows().map((r) => r.querySelector(".hm-tre-badge")?.textContent), ["{ }", "abc", "123", "0/1", "[ ]", "abc", "abc", "∅"]);
+  assert.deepEqual(rows().map((r) => r.querySelector(".m-tre-badge")?.textContent), ["{ }", "abc", "123", "0/1", "[ ]", "abc", "abc", "∅"]);
   assert.equal(rows().find((r) => r.getAttribute("data-ptr") === "/debug").querySelector("[role=switch]").getAttribute("aria-checked"), "false");
   // add inside the list, duplicate a field, delete one
   rows().find((r) => r.getAttribute("data-ptr") === "/tags").querySelectorAll("button").find((b) => b.getAttribute("aria-label") === "Add inside").click();
@@ -80,7 +80,7 @@ test("TreeEditor: search keeps matches and their parents, readonly hides actions
   input.value = "needle";
   input.dispatchEvent(new (globalThis.Event)("input", { bubbles: true }));
   assert.deepEqual(el.querySelectorAll("[role=treeitem]").map((r) => r.getAttribute("data-ptr")), ["", "/a", "/a/deep"]);
-  assert.equal(el.querySelector(".hm-tre-actions"), null);
+  assert.equal(el.querySelector(".m-tre-actions"), null);
   assert.equal(el.querySelector("[role=tree]").getAttribute("aria-readonly"), "true");
   dispose();
 });
@@ -95,38 +95,38 @@ test("TreeEditor: a switch flips in place (same row element, no redraw); read-on
   assert.equal(row(), before, "the row is kept");
   assert.equal(row().querySelector("[role=switch]").getAttribute("aria-checked"), "false");
   assert.equal(el.querySelectorAll("[role=treeitem]").find((r) => r.getAttribute("data-ptr") === "/b"), other, "untouched rows are kept");
-  assert.ok(el.querySelector(".hm-tre-actions"));
+  assert.ok(el.querySelector(".m-tre-actions"));
   ro.set(true);
-  assert.equal(el.querySelector(".hm-tre-actions"), null, "read-only takes effect at once");
-  assert.match(el.querySelector(".hm-tre-wrap").getAttribute("class"), /is-readonly/);
+  assert.equal(el.querySelector(".m-tre-actions"), null, "read-only takes effect at once");
+  assert.match(el.querySelector(".m-tre-wrap").getAttribute("class"), /is-readonly/);
   dispose();
 });
 
 test("TreeEditor: status, type badges and row actions can be turned off; texts are yours", async () => {
   const bare = mount(() => h(TreeEditor, { value: signal({ a: 1, list: [1, 2] }), class: "mine", status: false, typeBadges: false, actions: ["add"] }));
   await tick();
-  assert.ok(bare.el.querySelector(".hm-tre-wrap.mine"));
-  assert.equal(bare.el.querySelector(".hm-tre-status"), null, "status={false}");
-  assert.equal(bare.el.querySelector(".hm-tre-type"), null, "typeBadges={false}");
-  assert.ok(bare.el.querySelector(".hm-tre-add"));
-  assert.equal(bare.el.querySelector(".hm-tre-dup, .hm-tre-del"), null, "only the listed actions");
+  assert.ok(bare.el.querySelector(".m-tre-wrap.mine"));
+  assert.equal(bare.el.querySelector(".m-tre-status"), null, "status={false}");
+  assert.equal(bare.el.querySelector(".m-tre-type"), null, "typeBadges={false}");
+  assert.ok(bare.el.querySelector(".m-tre-add"));
+  assert.equal(bare.el.querySelector(".m-tre-dup, .m-tre-del"), null, "only the listed actions");
   bare.dispose();
 
   const none = mount(() => h(TreeEditor, { value: signal({ a: 1 }), actions: false, search: false, status: false, history: false }));
   await tick();
-  assert.equal(none.el.querySelector(".hm-tre-actions"), null, "actions={false}");
-  assert.equal(none.el.querySelector(".hm-tre-bar"), null, "nothing left for the bar");
+  assert.equal(none.el.querySelector(".m-tre-actions"), null, "actions={false}");
+  assert.equal(none.el.querySelector(".m-tre-bar"), null, "nothing left for the bar");
   none.dispose();
 
   const own = mount(() => h(TreeEditor, { value: signal({ a: "", list: [1, 2] }), schema: { type: "object", properties: { a: { type: "number" } } },
     labels: { root: "settings", search: "Find", problems: (n) => `${n} to fix`, items: (n) => `${n} rows`, emptyText: "blank", duplicate: "Clone", kinds: { string: "words" } } }));
   await tick();
-  assert.equal(own.el.querySelector(".hm-tre-root").textContent, "settings");
-  assert.equal(own.el.querySelector(".hm-tre-search-input").getAttribute("placeholder"), "Find");
-  assert.equal(own.el.querySelector(".hm-tre-status").textContent, "1 to fix");
-  assert.equal(own.el.querySelector(".hm-tre-row.is-array .hm-tre-summary").textContent, "2 rows");
-  assert.equal(own.el.querySelector(".hm-tre-empty").textContent, "blank");
-  assert.equal(own.el.querySelector(".hm-tre-dup").getAttribute("aria-label"), "Clone");
-  assert.match(own.el.querySelector(".hm-tre-row.is-string .hm-tre-type").getAttribute("aria-label"), /words/);
+  assert.equal(own.el.querySelector(".m-tre-root").textContent, "settings");
+  assert.equal(own.el.querySelector(".m-tre-search-input").getAttribute("placeholder"), "Find");
+  assert.equal(own.el.querySelector(".m-tre-status").textContent, "1 to fix");
+  assert.equal(own.el.querySelector(".m-tre-row.is-array .m-tre-summary").textContent, "2 rows");
+  assert.equal(own.el.querySelector(".m-tre-empty").textContent, "blank");
+  assert.equal(own.el.querySelector(".m-tre-dup").getAttribute("aria-label"), "Clone");
+  assert.match(own.el.querySelector(".m-tre-row.is-string .m-tre-type").getAttribute("aria-label"), /words/);
   own.dispose();
 });

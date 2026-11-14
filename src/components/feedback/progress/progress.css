@@ -1,50 +1,50 @@
 /* March — Progress. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- progress */
-.hm-progress2 { --hm-progress-cycle-dur: 2.4s; --hm-progress-indet-dur: 1.3s; display: flex; flex-direction: column; gap: .375rem; min-width: 0; }
-.hm-progress2-head { display: flex; justify-content: space-between; gap: var(--hm-space-2); font-size: var(--hm-text-sm); }
-.hm-progress2-label { color: var(--hm-text-2); font-weight: 500; }
-.hm-progress2-value { color: var(--hm-muted); font-variant-numeric: tabular-nums; }
-.hm-progress2-track { position: relative; display: block; height: var(--hm-progress-h, .5rem); border-radius: var(--hm-radius-full); background: var(--hm-surface-3); overflow: hidden; }
-.hm-progress2-sm .hm-progress2-track { height: .3125rem; } .hm-progress2-lg .hm-progress2-track { height: .75rem; }
+.m-progress2 { --m-progress-cycle-dur: 2.4s; --m-progress-indet-dur: 1.3s; display: flex; flex-direction: column; gap: .375rem; min-width: 0; }
+.m-progress2-head { display: flex; justify-content: space-between; gap: var(--m-space-2); font-size: var(--m-text-sm); }
+.m-progress2-label { color: var(--m-text-2); font-weight: 500; }
+.m-progress2-value { color: var(--m-muted); font-variant-numeric: tabular-nums; }
+.m-progress2-track { position: relative; display: block; height: var(--m-progress-h, .5rem); border-radius: var(--m-radius-full); background: var(--m-surface-3); overflow: hidden; }
+.m-progress2-sm .m-progress2-track { height: .3125rem; } .m-progress2-lg .m-progress2-track { height: .75rem; }
 /* the fill is clipped, not scaled: a multicolor paint stays put along the track (orange at the start, purple at the end) */
-.hm-progress2-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--hm-progress-c, var(--hm-accent, var(--hm-progress-fill, var(--hm-primary))));
-  clip-path: inset(0 calc((1 - var(--hm-progress, 0)) * 100%) 0 0 round 999px); transition: clip-path var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-progress2-fill:dir(rtl) { clip-path: inset(0 0 0 calc((1 - var(--hm-progress, 0)) * 100%) round 999px); }
+.m-progress2-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--m-progress-c, var(--m-accent, var(--m-progress-fill, var(--m-primary))));
+  clip-path: inset(0 calc((1 - var(--m-progress, 0)) * 100%) 0 0 round 999px); transition: clip-path var(--m-dur-slow) var(--m-ease-out); }
+.m-progress2-fill:dir(rtl) { clip-path: inset(0 0 0 calc((1 - var(--m-progress, 0)) * 100%) round 999px); }
 /* single color requested over a multicolor theme */
-.hm-paint-single .hm-progress2-fill { background: var(--hm-progress-c, var(--hm-accent, var(--hm-primary))); }
+.m-paint-single .m-progress2-fill { background: var(--m-progress-c, var(--m-accent, var(--m-primary))); }
 /* cycle: the colors flow along the bar (determinate or not) */
-.hm-paint-cycle .hm-progress2-fill { overflow: hidden; background: none; }
-.hm-paint-cycle .hm-progress2-fill::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 200%; background: var(--hm-progress-cycle, linear-gradient(90deg, var(--hm-cat-1), var(--hm-cat-2), var(--hm-cat-3), var(--hm-cat-4), var(--hm-cat-1))) 0 0 / 50% 100% repeat-x; animation: hm-cycle var(--hm-progress-cycle-dur) linear infinite; }
-.hm-progress2-success { --hm-progress-c: var(--hm-success-solid); } .hm-progress2-warn { --hm-progress-c: var(--hm-warn-solid); }
-.hm-progress2-danger { --hm-progress-c: var(--hm-danger-solid); } .hm-progress2-info { --hm-progress-c: var(--hm-info-solid); }
-.hm-progress2.is-indeterminate .hm-progress2-fill { inset-inline-end: auto; width: 40%; clip-path: none; animation: hm-indet var(--hm-progress-indet-dur) var(--hm-ease) infinite; }
-.hm-progress2.is-indeterminate .hm-progress2-fill:dir(rtl) { animation-name: hm-indet-rtl; }
-.hm-progress2.is-indeterminate.hm-paint-cycle .hm-progress2-fill { width: auto; inset: 0; animation: none; }
-@media (prefers-reduced-motion: reduce) { .hm-paint-cycle .hm-progress2-fill::before, .hm-progress2.is-indeterminate .hm-progress2-fill { animation: none; } }
+.m-paint-cycle .m-progress2-fill { overflow: hidden; background: none; }
+.m-paint-cycle .m-progress2-fill::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 200%; background: var(--m-progress-cycle, linear-gradient(90deg, var(--m-cat-1), var(--m-cat-2), var(--m-cat-3), var(--m-cat-4), var(--m-cat-1))) 0 0 / 50% 100% repeat-x; animation: m-cycle var(--m-progress-cycle-dur) linear infinite; }
+.m-progress2-success { --m-progress-c: var(--m-success-solid); } .m-progress2-warn { --m-progress-c: var(--m-warn-solid); }
+.m-progress2-danger { --m-progress-c: var(--m-danger-solid); } .m-progress2-info { --m-progress-c: var(--m-info-solid); }
+.m-progress2.is-indeterminate .m-progress2-fill { inset-inline-end: auto; width: 40%; clip-path: none; animation: m-indet var(--m-progress-indet-dur) var(--m-ease) infinite; }
+.m-progress2.is-indeterminate .m-progress2-fill:dir(rtl) { animation-name: m-indet-rtl; }
+.m-progress2.is-indeterminate.m-paint-cycle .m-progress2-fill { width: auto; inset: 0; animation: none; }
+@media (prefers-reduced-motion: reduce) { .m-paint-cycle .m-progress2-fill::before, .m-progress2.is-indeterminate .m-progress2-fill { animation: none; } }
 /* bare: no track behind the fill · inverse: white on a translucent track, over media (`color` still paints the fill) */
-.hm-progress2-bare .hm-progress2-track, .hm-progress2-bare .hm-progress2-seg { background: none; }
-.hm-progress2-inverse { --hm-progress-track: color-mix(in srgb, var(--hm-on-scrim) 32%, transparent); }
-.hm-progress2-inverse:not([data-hm-color]) { --hm-progress-c: var(--hm-on-scrim); }
-.hm-progress2-inverse .hm-progress2-track { background: var(--hm-progress-track); }
+.m-progress2-bare .m-progress2-track, .m-progress2-bare .m-progress2-seg { background: none; }
+.m-progress2-inverse { --m-progress-track: color-mix(in srgb, var(--m-on-scrim) 32%, transparent); }
+.m-progress2-inverse:not([data-m-color]) { --m-progress-c: var(--m-on-scrim); }
+.m-progress2-inverse .m-progress2-track { background: var(--m-progress-track); }
 /* line: a thin track; the fill is scaled from the start edge, so an outside driver (scroll, animation) can write its transform */
-.hm-progress2-line .hm-progress2-track { height: var(--hm-progress-h, 3px); background: var(--hm-progress-track, var(--hm-border)); }
-.hm-progress2-line.hm-progress2-sm { --hm-progress-h: 2px; } .hm-progress2-line.hm-progress2-lg { --hm-progress-h: 4px; }
-.hm-progress2-line .hm-progress2-fill { clip-path: none; border-radius: 0; transform: scaleX(var(--hm-progress, 0)); transform-origin: 0 50%; transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-progress2-line .hm-progress2-fill:dir(rtl) { clip-path: none; transform-origin: 100% 50%; }
-.hm-progress2-line.is-indeterminate .hm-progress2-fill { transition: none; }
+.m-progress2-line .m-progress2-track { height: var(--m-progress-h, 3px); background: var(--m-progress-track, var(--m-border)); }
+.m-progress2-line.m-progress2-sm { --m-progress-h: 2px; } .m-progress2-line.m-progress2-lg { --m-progress-h: 4px; }
+.m-progress2-line .m-progress2-fill { clip-path: none; border-radius: 0; transform: scaleX(var(--m-progress, 0)); transform-origin: 0 50%; transition: transform var(--m-dur-slow) var(--m-ease-out); }
+.m-progress2-line .m-progress2-fill:dir(rtl) { clip-path: none; transform-origin: 100% 50%; }
+.m-progress2-line.is-indeterminate .m-progress2-fill { transition: none; }
 /* vertical: the track stands and fills from the top */
-.hm-progress2-vertical { block-size: 100%; inline-size: var(--hm-progress-h, .5rem); } .hm-progress2-vertical.hm-progress2-line { inline-size: var(--hm-progress-h, 3px); }
-.hm-progress2-vertical .hm-progress2-track { flex: 1; height: auto; }
-.hm-progress2-vertical .hm-progress2-fill, .hm-progress2-vertical .hm-progress2-fill:dir(rtl) { clip-path: inset(0 0 calc((1 - var(--hm-progress, 0)) * 100%) 0 round 999px); }
-.hm-progress2-vertical.hm-progress2-line .hm-progress2-fill, .hm-progress2-vertical.hm-progress2-line .hm-progress2-fill:dir(rtl) { clip-path: none; transform: scaleY(var(--hm-progress, 0)); transform-origin: 50% 0; }
+.m-progress2-vertical { block-size: 100%; inline-size: var(--m-progress-h, .5rem); } .m-progress2-vertical.m-progress2-line { inline-size: var(--m-progress-h, 3px); }
+.m-progress2-vertical .m-progress2-track { flex: 1; height: auto; }
+.m-progress2-vertical .m-progress2-fill, .m-progress2-vertical .m-progress2-fill:dir(rtl) { clip-path: inset(0 0 calc((1 - var(--m-progress, 0)) * 100%) 0 round 999px); }
+.m-progress2-vertical.m-progress2-line .m-progress2-fill, .m-progress2-vertical.m-progress2-line .m-progress2-fill:dir(rtl) { clip-path: none; transform: scaleY(var(--m-progress, 0)); transform-origin: 50% 0; }
 /* segments: equal parts, each with its own scaled fill */
-.hm-progress2 .hm-progress2-segs { display: flex; gap: var(--hm-progress-gap, 2px); background: none; overflow: visible; border-radius: 0; }
-.hm-progress2-vertical .hm-progress2-segs { flex-direction: column; }
-.hm-progress2-seg { position: relative; flex: 1; border-radius: var(--hm-radius-full); overflow: hidden; background: var(--hm-progress-track, var(--hm-surface-3)); }
-.hm-progress2-line .hm-progress2-seg { background: var(--hm-progress-track, var(--hm-border)); }
-.hm-progress2-seg-fill { position: absolute; inset: 0; background: var(--hm-progress-c, var(--hm-accent, var(--hm-progress-fill, var(--hm-primary)))); transform: scaleX(var(--hm-progress, 0)); transform-origin: 0 50%; transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-progress2-seg-fill:dir(rtl) { transform-origin: 100% 50%; }
-.hm-progress2-vertical .hm-progress2-seg-fill, .hm-progress2-vertical .hm-progress2-seg-fill:dir(rtl) { transform: scaleY(var(--hm-progress, 0)); transform-origin: 50% 0; }
+.m-progress2 .m-progress2-segs { display: flex; gap: var(--m-progress-gap, 2px); background: none; overflow: visible; border-radius: 0; }
+.m-progress2-vertical .m-progress2-segs { flex-direction: column; }
+.m-progress2-seg { position: relative; flex: 1; border-radius: var(--m-radius-full); overflow: hidden; background: var(--m-progress-track, var(--m-surface-3)); }
+.m-progress2-line .m-progress2-seg { background: var(--m-progress-track, var(--m-border)); }
+.m-progress2-seg-fill { position: absolute; inset: 0; background: var(--m-progress-c, var(--m-accent, var(--m-progress-fill, var(--m-primary)))); transform: scaleX(var(--m-progress, 0)); transform-origin: 0 50%; transition: transform var(--m-dur-slow) var(--m-ease-out); }
+.m-progress2-seg-fill:dir(rtl) { transform-origin: 100% 50%; }
+.m-progress2-vertical .m-progress2-seg-fill, .m-progress2-vertical .m-progress2-seg-fill:dir(rtl) { transform: scaleY(var(--m-progress, 0)); transform-origin: 50% 0; }
 /* instant: the value is followed at once (driven every frame, or a timed fill owns the transform) */
-.hm-progress2.is-instant .hm-progress2-fill, .hm-progress2.is-instant .hm-progress2-seg-fill { transition: none; }
-@media (prefers-reduced-motion: reduce) { .hm-progress2-line .hm-progress2-fill, .hm-progress2-seg-fill { transition: none; } }
+.m-progress2.is-instant .m-progress2-fill, .m-progress2.is-instant .m-progress2-seg-fill { transition: none; }
+@media (prefers-reduced-motion: reduce) { .m-progress2-line .m-progress2-fill, .m-progress2-seg-fill { transition: none; } }

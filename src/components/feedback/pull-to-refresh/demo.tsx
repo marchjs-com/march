@@ -22,7 +22,7 @@ export default function PullToRefreshDemo(props: { values: { threshold: number; 
   const items = () => Array.from({ length: 14 }, (_, i) => `${NAMES[(i + $round) % NAMES.length]} · ${$round ? `${$round}. yenileme` : "ilk liste"}`)
   let wrap: HTMLElement | undefined
   // a refresh without pulling (the component's own keyboard button): the indicator, its icon and color show while it spins
-  const refreshNow = (): void => { wrap?.querySelector<HTMLButtonElement>(".hm-ptr-kbd")?.click() }
+  const refreshNow = (): void => { wrap?.querySelector<HTMLButtonElement>(".m-ptr-kbd")?.click() }
   return <div class="sc-ptr-wrap" ref={(x: Element) => { wrap = x as HTMLElement }}>
     <span class="sc-strip-label" aria-live="polite">{() => `Durum: ${props.values.disabled ? "kapalı, çekmek yenilemez" : PHASES[$phase]} · eşik ${props.values.threshold}px · yenileme ${props.values.delay} ms · ${props.values.settle ? "bırakınca yaylanarak döner" : "bırakınca anında döner"}`}</span>
     <div class="sc-row"><Button size="sm" data-audit-try disabled={() => props.values.disabled || $phase === "refreshing"} on:click={refreshNow}>Çekmeden yenile</Button></div>

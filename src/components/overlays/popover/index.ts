@@ -72,7 +72,7 @@ const isSignal = (v: unknown): v is Signal<boolean> => typeof v === "function" &
 /** `<Popover trigger={<Button>Filters</Button>} title="Filters" placement="bottom-end">{(close) => <FilterForm onDone={close} />}</Popover>` */
 export function Popover(props: PopoverProps): Element {
   const p = popover(props);
-  const root = h("span", { class: () => cx("hm-popover", p.trigger == null && "hm-popover-bare", untrack(p.isOpen) && "is-open", val(props.class)) }, p.trigger, p.region) as HTMLElement;
+  const root = h("span", { class: () => cx("m-popover", p.trigger == null && "m-popover-bare", untrack(p.isOpen) && "is-open", val(props.class)) }, p.trigger, p.region) as HTMLElement;
   p.host(root);
   return root;
 }
@@ -87,7 +87,7 @@ export function PopoverPanel(props: Omit<PopoverProps, "trigger" | "class">): ()
 
 // State, trigger wiring and the panel of a popover; `host(el)` names the wrapper (fallback anchor, `is-open` class).
 function popover(props: PopoverProps): { trigger: unknown; region: () => unknown; isOpen: () => boolean; host(el: HTMLElement): void } {
-  const id = props.id ?? uid("hm-popover");
+  const id = props.id ?? uid("m-popover");
   const sig = isSignal(props.open) ? props.open : null;
   const controlled = props.open !== undefined;
   const own = signal(!!props.defaultOpen);
@@ -132,16 +132,16 @@ function popover(props: PopoverProps): { trigger: unknown; region: () => unknown
     const { ref: panelRef, ...panelProps } = (props.panelProps ?? {}) as { ref?: (el: HTMLElement) => void };
     const el = floating({
       anchor: anchor(), placement: props.placement ?? "bottom-start", id, role: props.role === undefined ? "dialog" : props.role,
-      class: cx("hm-popover-panel", `hm-popover-m-${props.motion ?? "scale"}`, props.width && props.width !== "auto" && `hm-popover-w-${props.width}`, props.flush && "is-flush", props.panelClass),
+      class: cx("m-popover-panel", `m-popover-m-${props.motion ?? "scale"}`, props.width && props.width !== "auto" && `m-popover-w-${props.width}`, props.flush && "is-flush", props.panelClass),
       attrs: { ...panelProps, tabindex: "-1", "aria-labelledby": props.title != null ? titleId : null, "aria-label": props.title == null ? () => val(props.label) ?? null : null },
       ref: (x) => { panel = x; panelRef?.(x); },
       onClose: (refocus) => {
         if (refocus ? props.closeOnEscape === false : props.closeOnOutside === false) return;
         close(refocus, refocus ? "escape" : "outside");
       },
-      children: h("div", { class: "hm-popover-inner", "data-hm-color": colorAttr(props.color) },
+      children: h("div", { class: "m-popover-inner", "data-m-color": colorAttr(props.color) },
         props.title != null ? h(PanelHeader, { size: "sm", divider: true, title: props.title, titleAs: "h2", titleId, closeLabel: props.closeLabel, close: props.closable ?? true, onClose: () => close(true, "close") }) : null,
-        h("div", { class: "hm-popover-body" }, body()),
+        h("div", { class: "m-popover-body" }, body()),
         props.footer != null ? h(PanelHeader, { as: "footer", size: "sm", divider: true, actions: props.footer }) : null),
     });
     if (props.autoFocus !== false) queueMicrotask(() => { if (panel && !panel.contains(globalThis.document?.activeElement ?? null)) focusFirst(panel); });

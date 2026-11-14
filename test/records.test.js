@@ -17,11 +17,11 @@ test("RecordListEditor: add, edit, move and remove rows", async () => {
   const v = signal([{ id: "a", name: "A", url: "" }]);
   const { el, dispose } = mount(() => h(F.RecordListEditor, { value: v, fields, addLabel: "Add carrier" }));
   await tick();
-  assert.equal(el.querySelectorAll(".hm-records-row").length, 1);
+  assert.equal(el.querySelectorAll(".m-records-row").length, 1);
   const add = el.querySelectorAll("button").find((b) => b.textContent === "Add carrier");
   add.click(); await tick();
   assert.equal(v().length, 2);
-  const inputs = el.querySelectorAll(".hm-records-row")[1].querySelectorAll("input");
+  const inputs = el.querySelectorAll(".m-records-row")[1].querySelectorAll("input");
   type(inputs[0], "B"); await tick();
   assert.deepEqual(v()[1], { name: "B", url: "" });
   assert.equal(v()[0].id, "a", "extra keys are kept");
@@ -46,7 +46,7 @@ test("records field renders inside a Form via inputFor", async () => {
   let form;
   const { el, dispose } = mount(() => h(F.Form, { schema: s, initial: { rows: [{ n: 1 }] }, onReady: (f) => { form = f; } }));
   await tick();
-  assert.equal(el.querySelectorAll(".hm-records-row").length, 1);
+  assert.equal(el.querySelectorAll(".m-records-row").length, 1);
   el.querySelectorAll("button").find((b) => b.textContent === "More").click(); await tick();
   assert.equal(form.values.rows.length, 2);
   assert.equal(form.dirty(), true);

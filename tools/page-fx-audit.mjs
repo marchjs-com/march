@@ -19,7 +19,7 @@ await b.ev(`(async () => { for (let i = 0; i < 40 && !document.querySelector(".s
 await sleep(600);
 
 const click = (v) => b.ev(`[...document.querySelectorAll(".sc-mo-variant")].find((a) => a.getAttribute("href").endsWith("/${v}"))?.click()`);
-const LEFT = `({ vt: !!document.activeViewTransition, mark: document.documentElement.getAttribute("data-hm-vt"),
+const LEFT = `({ vt: !!document.activeViewTransition, mark: document.documentElement.getAttribute("data-m-vt"),
   layers: document.getAnimations().filter((a) => a.effect?.pseudoElement?.startsWith("::view-transition") && a.playState !== "finished").length,
   named: [...document.querySelectorAll("*")].filter((e) => e.style.viewTransitionName).length,
   styled: [...document.querySelectorAll("main *")].filter((e) => e.style.clipPath || e.style.transform).length,
@@ -32,7 +32,7 @@ const clean = async (what, last) => {
 // pixels of a region (png of the same pixels = the same bytes)
 const shot = async (x, y, w, h) => (await b.send("Page.captureScreenshot", { format: "png", clip: { x, y, width: w, height: h, scale: 1 } })).result.data;
 const outside = async () => {
-  const r = await b.ev(`(() => { const s = document.querySelector(".sc-mo-scene").getBoundingClientRect(), n = document.querySelector("nav.hm-sidebar, .hm-nav-wrap, aside")?.getBoundingClientRect(); return { top: s.top, menuW: n ? n.right : 260 } })()`);
+  const r = await b.ev(`(() => { const s = document.querySelector(".sc-mo-scene").getBoundingClientRect(), n = document.querySelector("nav.m-sidebar, .m-nav-wrap, aside")?.getBoundingClientRect(); return { top: s.top, menuW: n ? n.right : 260 } })()`);
   // the side menu and the top bar (the page below the bar re-renders with its own entrance animation)
   return [await shot(0, 0, Math.max(40, r.menuW - 4), 880), await shot(r.menuW + 8, 0, 1280 - r.menuW - 16, 52)];
 };

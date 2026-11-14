@@ -17,7 +17,7 @@ const MOTIONS: Record<string, string> = { scale: "büyüyerek", fade: "belirerek
 export default function TooltipDemo(props: { values: { target: string; color: string; delay: number; motion: string } }) {
   let row!: HTMLElement
   let last: number | null = null
-  const fire = (type: string): void => { row.querySelector(".hm-tip-anchor")?.dispatchEvent(new Event(type, { bubbles: true })) }
+  const fire = (type: string): void => { row.querySelector(".m-tip-anchor")?.dispatchEvent(new Event(type, { bubbles: true })) }
   return <div class="sc-row" ref={(x: Element) => { row = x as HTMLElement }}>
     {() => {
       const color = (props.values.color || undefined) as ColorToken, delay = props.values.delay, motion = props.values.motion as "scale"

@@ -42,14 +42,14 @@ export interface SlideProps {
 }
 /** One slide: `<Slide layout="title" notes="Welcome everyone">…</Slide>` */
 export function Slide(props: SlideProps): Element {
-  return h("section", { class: cx("hm-slide", `hm-slide-${props.layout ?? "content"}`, `hm-slide-tone-${props.tone ?? "plain"}`, val(props.class)), "data-notes": props.notes ?? null },
-    props.background != null ? h("div", { class: "hm-slide-bg" }, props.background) : null,
-    h("div", { class: "hm-slide-body" }, props.children)) as Element;
+  return h("section", { class: cx("m-slide", `m-slide-${props.layout ?? "content"}`, `m-slide-tone-${props.tone ?? "plain"}`, val(props.class)), "data-notes": props.notes ?? null },
+    props.background != null ? h("div", { class: "m-slide-bg" }, props.background) : null,
+    h("div", { class: "m-slide-body" }, props.children)) as Element;
 }
 
 /** Fragments: every child appears on its own step. `<Appear><li>One</li><li>Two</li></Appear>` (renders a list); `effect="none"` shows a step without movement. */
 export function Appear(props: { as?: string | undefined; effect?: "up" | "fade" | "scale" | "none" | undefined; class?: ClassProp | undefined; children?: unknown }): Element {
-  return h(props.as ?? "ul", { class: cx("hm-appear", `hm-appear-${props.effect ?? "up"}`, val(props.class)) }, props.children) as Element;
+  return h(props.as ?? "ul", { class: cx("m-appear", `m-appear-${props.effect ?? "up"}`, val(props.class)) }, props.children) as Element;
 }
 
 export interface PresentationProps {
@@ -99,9 +99,9 @@ interface Pos { i: number; s: number }
 
 /** `<Presentation bind:index={$slide} transition="slide"><Slide layout="title">…</Slide><Slide>…</Slide></Presentation>` */
 export function Presentation(props: PresentationProps): Element {
-  const stage = h("div", { class: "hm-deck-stage" }, props.children) as HTMLElement;
-  const slides = (): HTMLElement[] => ([...stage.children] as HTMLElement[]).filter((c) => c.classList.contains("hm-slide"));
-  const steps = (el: HTMLElement | undefined): HTMLElement[] => (el ? [...el.querySelectorAll<HTMLElement>(".hm-appear")].flatMap((a) => [...a.children] as HTMLElement[]) : []);
+  const stage = h("div", { class: "m-deck-stage" }, props.children) as HTMLElement;
+  const slides = (): HTMLElement[] => ([...stage.children] as HTMLElement[]).filter((c) => c.classList.contains("m-slide"));
+  const steps = (el: HTMLElement | undefined): HTMLElement[] => (el ? [...el.querySelectorAll<HTMLElement>(".m-appear")].flatMap((a) => [...a.children] as HTMLElement[]) : []);
   const list = slides();
   const n = list.length;
 
@@ -111,7 +111,7 @@ export function Presentation(props: PresentationProps): Element {
   const step = signal(0);
   const pos = computed<Pos>(() => ({ i: index(), s: step() }));
 
-  const sync = props.sync === false ? null : channel<Pos>(`hm.deck.${props.sync ?? "deck"}`, { crossTab: true });
+  const sync = props.sync === false ? null : channel<Pos>(`m.deck.${props.sync ?? "deck"}`, { crossTab: true });
   let remote = false;
   const go = (p: Pos): void => {
     const i = clamp(p.i, 0, n - 1), s = clamp(p.s, 0, steps(list[i]).length);
@@ -136,7 +136,7 @@ export function Presentation(props: PresentationProps): Element {
         if (vis && !el.classList.contains("is-shown") && shown === i && !still()) {
           // the step enters the way its <Appear effect> says
           const fx = el.parentElement?.classList;
-          if (!fx?.contains("hm-appear-none")) animate(el, fx?.contains("hm-appear-fade") ? { opacity: [0, 1] } : fx?.contains("hm-appear-scale") ? { opacity: [0, 1], transform: ["scale(.8)", "scale(1)"] } : { opacity: [0, 1], transform: ["translate3d(0, .6em, 0)", "translate3d(0, 0, 0)"] }, { duration: 420, easing: "expo" });
+          if (!fx?.contains("m-appear-none")) animate(el, fx?.contains("m-appear-fade") ? { opacity: [0, 1] } : fx?.contains("m-appear-scale") ? { opacity: [0, 1], transform: ["scale(.8)", "scale(1)"] } : { opacity: [0, 1], transform: ["translate3d(0, .6em, 0)", "translate3d(0, 0, 0)"] }, { duration: 420, easing: "expo" });
         }
         el.classList.toggle("is-shown", vis);
       });
@@ -154,14 +154,14 @@ export function Presentation(props: PresentationProps): Element {
     if (d.fullscreenElement) void d.exitFullscreen?.().catch(() => undefined);
     else void root?.requestFullscreen?.().catch(() => undefined);
   };
-  const openSpeaker = (): void => { if (props.presenterUrl) globalThis.open?.(props.presenterUrl, "hm-deck-speaker", "popup,width=1100,height=720"); };
+  const openSpeaker = (): void => { if (props.presenterUrl) globalThis.open?.(props.presenterUrl, "m-deck-speaker", "popup,width=1100,height=720"); };
 
   const ownCount = typeof props.counter === "function" ? props.counter : null;
   const counter = props.counter === false ? null
-    : h("span", { class: "hm-deck-count", "aria-live": "polite" }, () => (ownCount ? ownCount(index(), n) : L.counter ? L.counter(index(), n) : t`Slide ${index() + 1} of ${n}`));
+    : h("span", { class: "m-deck-count", "aria-live": "polite" }, () => (ownCount ? ownCount(index(), n) : L.counter ? L.counter(index(), n) : t`Slide ${index() + 1} of ${n}`));
   // previous / counter / next: the simple Pagination, stepping through fragments too (cursor mode: hasPrev / hasNext)
   const pager = h(Pagination, {
-    variant: "simple", class: "hm-deck-pages", label: () => L.pages ?? t`Slides`, page: () => index() + 1, pages: n, info: false,
+    variant: "simple", class: "m-deck-pages", label: () => L.pages ?? t`Slides`, page: () => index() + 1, pages: n, info: false,
     status: counter ? () => counter : false,
     hasPrev: () => !(pos().i === 0 && pos().s === 0), hasNext: () => !(pos().i === n - 1 && pos().s >= steps(list[n - 1]).length), onPrev: prev, onNext: next,
     labels: { previous: () => L.previous ?? t`Previous slide`, next: () => L.next ?? t`Next slide` },
@@ -170,10 +170,10 @@ export function Presentation(props: PresentationProps): Element {
   const btn = (cls: string, own: unknown, def: unknown, label: () => string, onClick: () => void, disabled?: () => boolean): unknown =>
     h(IconButton, { class: cls, size: "sm", icon: own ?? def, label, onClick, ...(disabled ? { disabled } : {}) });
   const controls = props.controls === false ? null : h(Toolbar, {
-    class: "hm-deck-controls",
+    class: "m-deck-controls",
     end: [
-      props.presenterUrl && !props.presenter ? btn("hm-deck-speaker-btn", props.icons?.speaker, monitor, () => L.speaker ?? t`Open speaker view`, openSpeaker) : null,
-      props.fullscreen !== false ? btn("hm-deck-full", props.icons?.fullscreen, maximize, () => L.fullscreen ?? t`Full screen`, fullscreen) : null],
+      props.presenterUrl && !props.presenter ? btn("m-deck-speaker-btn", props.icons?.speaker, monitor, () => L.speaker ?? t`Open speaker view`, openSpeaker) : null,
+      props.fullscreen !== false ? btn("m-deck-full", props.icons?.fullscreen, maximize, () => L.fullscreen ?? t`Full screen`, fullscreen) : null],
   },
   pager);
 
@@ -186,23 +186,23 @@ export function Presentation(props: PresentationProps): Element {
     const timer = timed ? setInterval(() => clock.set(Date.now() - started), 1000) as unknown as { unref?: () => void } : null;
     timer?.unref?.(); // never keeps a test process (or a server render) alive
     if (timer) owned(() => clearInterval(timer as never));
-    speaker = h("aside", { class: "hm-deck-speaker", "aria-label": L.speakerView ?? t`Speaker view` },
-      h("div", { class: "hm-deck-next" }, h("p", { class: "hm-deck-cap" }, L.upNext ?? t`Next`), () => {
+    speaker = h("aside", { class: "m-deck-speaker", "aria-label": L.speakerView ?? t`Speaker view` },
+      h("div", { class: "m-deck-next" }, h("p", { class: "m-deck-cap" }, L.upNext ?? t`Next`), () => {
         const nx = list[index() + 1];
-        if (!nx) return h("p", { class: "hm-deck-end" }, L.end ?? t`End of the deck`);
+        if (!nx) return h("p", { class: "m-deck-end" }, L.end ?? t`End of the deck`);
         const c = nx.cloneNode(true) as HTMLElement;
         c.classList.add("is-current", "is-preview"); c.removeAttribute("inert"); c.setAttribute("aria-hidden", "true");
         for (const x of steps(c)) x.classList.add("is-shown");
-        return h("div", { class: "hm-deck-preview", inert: "" }, c);
+        return h("div", { class: "m-deck-preview", inert: "" }, c);
       }),
-      h("div", { class: "hm-deck-notes" }, h("p", { class: "hm-deck-cap" }, L.notes ?? t`Notes`), h("p", { class: "hm-deck-note" }, () => list[index()]?.getAttribute("data-notes") || (L.noNotes ?? t`No notes for this slide.`))),
-      timed ? h("p", { class: "hm-deck-timer", role: "timer", "aria-label": L.elapsed ?? t`Elapsed time` }, () => formatDuration(clock(), { pad: true })) : null);
+      h("div", { class: "m-deck-notes" }, h("p", { class: "m-deck-cap" }, L.notes ?? t`Notes`), h("p", { class: "m-deck-note" }, () => list[index()]?.getAttribute("data-notes") || (L.noNotes ?? t`No notes for this slide.`))),
+      timed ? h("p", { class: "m-deck-timer", role: "timer", "aria-label": L.elapsed ?? t`Elapsed time` }, () => formatDuration(clock(), { pad: true })) : null);
   }
 
   root = h("div", {
-    class: cx("hm-deck", props.presenter && "is-presenter", val(props.class)), tabindex: "0", role: "region",
+    class: cx("m-deck", props.presenter && "is-presenter", val(props.class)), tabindex: "0", role: "region",
     "aria-roledescription": L.deck ?? t`slide deck`, "aria-label": props.label ?? t`Presentation`,
-  }, h("div", { class: "hm-deck-main" }, stage, props.progress !== false ? h(Progress, { variant: "line", decorative: true, class: "hm-deck-bar", color: props.progressColor, max: 1, value: () => (n > 1 ? index() / (n - 1) : 1) }) : null, controls), speaker) as HTMLElement;
+  }, h("div", { class: "m-deck-main" }, stage, props.progress !== false ? h(Progress, { variant: "line", decorative: true, class: "m-deck-bar", color: props.progressColor, max: 1, value: () => (n > 1 ? index() / (n - 1) : 1) }) : null, controls), speaker) as HTMLElement;
   const deck = root;
 
   // keyboard (on the deck, and on the page while it is full screen), wheel, swipe

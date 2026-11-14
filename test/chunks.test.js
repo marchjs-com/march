@@ -14,10 +14,10 @@ import { smallFiles } from "../compiler/min-chunks.js";
 const CLI = fileURLToPath(new URL("../cli/march.js", import.meta.url));
 
 test("rewriteDynamic: a static import for a parent, a group import for the entry; other imports untouched", () => {
-  const out = rewriteDynamic(`const a = lazy(() => import("./x.ts"));\nconst b = Object.assign(() => import('./y.tsx'), { hm: "k" });\nconst c = () => import("./z.ts");`,
+  const out = rewriteDynamic(`const a = lazy(() => import("./x.ts"));\nconst b = Object.assign(() => import('./y.tsx'), { m: "k" });\nconst c = () => import("./z.ts");`,
     [{ spec: "./x.ts", mode: "static" }, { spec: "./y.tsx", mode: "group", group: "g0", name: "n1" }]);
-  assert.match(out, /^import \* as __hmIn0 from "\.\/x\.ts";/);
-  assert.match(out, /lazy\(\(\) => Promise\.resolve\(__hmIn0\)\)/);
+  assert.match(out, /^import \* as __mIn0 from "\.\/x\.ts";/);
+  assert.match(out, /lazy\(\(\) => Promise\.resolve\(__mIn0\)\)/);
   assert.match(out, /import\("march-group:g0"\)\.then\(\(m\) => m\.n1\)/);
   assert.match(out, /import\("\.\/z\.ts"\)/, "not planned: left alone");
 });
@@ -118,7 +118,7 @@ test("min-chunks: a group taken apart twice is not planned again (the passes set
 test("tagLoaders tags bare loaders only: () => import(x).then(…) stays a function returning a promise", () => {
   const root = fileURLToPath(new URL("..", import.meta.url));
   const file = join(root, "src/components/actions/chip/demo.tsx");
-  assert.equal(tagLoaders(`f(() => import("./index.ts"))`, file, root), `f(Object.assign(() => import("./index.ts"), { hm: "src/components/actions/chip/index.ts" }))`);
+  assert.equal(tagLoaders(`f(() => import("./index.ts"))`, file, root), `f(Object.assign(() => import("./index.ts"), { m: "src/components/actions/chip/index.ts" }))`);
   const chained = `lazy(() => import("./index.ts").then((m) => ({ default: m.Chip })))`;
   assert.equal(tagLoaders(chained, file, root), chained);
 });

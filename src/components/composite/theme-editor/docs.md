@@ -5,7 +5,7 @@ Minimal, High Contrast) or from scratch with one accent color; edit every color 
 ColorPicker (accent, surfaces, text, border, status, HADİ brand colors, the categorical palette), pick tones from an
 automatic tone scale, and fix contrast with the WCAG audit. Type (font families, scale ratio, line heights, weights),
 shape (radius scale, spacing, density, shadows, border width) and motion (durations, three easing curves) are tokens
-too. The preview is a small app screen of real components scoped to the editor (`data-hm-theme` + the draft's
+too. The preview is a small app screen of real components scoped to the editor (`data-m-theme` + the draft's
 variables) in light or dark, LTR or RTL, with or without motion; "Apply to the app" switches the whole app to it. Out
 come the defineTheme module, the stylesheet (themeCss) and JSON; in go pasted JSON, CSS or a share link.
 
@@ -36,7 +36,7 @@ barrel). The Colors tab, the preview, saving and the other tabs (one chunk) load
 | `applyButton` | boolean | `true` | the "Apply to the app" button |
 | `previewControls` | boolean | `true` | the light / dark, LTR / RTL and reduced-motion switches above the preview |
 | `labels` | object | `t` texts | texts of the frame: `editor`, `name`, `undo`, `redo`, `unsaved`, `saved`, `save`, `apply`, `applied`, `startFrom`, `scratch`, `sections`, `tabs: { colors, type, shape, motion, export }`, `preview`, `previewMode`, `light`, `dark`, `previewDirection`, `reducedMotion` |
-| `class` | class | — | on the root (`hm-te`); parts: `hm-te-bar`, `-title`, `-name`, `-actions`, `-undo`, `-redo`, `-save`, `-apply`, `-bases`, `-base`, `-body`, `-panel`, `-stage`, `-stage-bar`, `-scope` |
+| `class` | class | — | on the root (`m-te`); parts: `m-te-bar`, `-title`, `-name`, `-actions`, `-undo`, `-redo`, `-save`, `-apply`, `-bases`, `-base`, `-body`, `-panel`, `-stage`, `-stage-bar`, `-scope` |
 
 ```tsx
 <ThemeEditor tabs={["colors", "shape"]} presets={false} applyButton={false} previewControls={false} storageKey={false} />
@@ -49,9 +49,9 @@ The texts inside the tabs and the preview are ordinary `t` texts: the locale pac
 ## Theme draft and tokens
 
 A `ThemeDraft` holds `light` and `dark` colors (the `ThemeColors` roles, `cat`, `brand`), `type`, `shape` and `motion`.
-`draftToTheme(d)` makes the `ThemeDef` — colors, fonts, radius and `tokens` (new in `defineTheme`: extra `--hm-*`
+`draftToTheme(d)` makes the `ThemeDef` — colors, fonts, radius and `tokens` (new in `defineTheme`: extra `--m-*`
 tokens for both modes, such as `text-md`, `space-4`, `radius-3`, `shadow-2`, `border-w`, `dur`, `ease-out`,
-`primary-500`). Tokens equal to the built-in values are left out, so a theme stays small. `--hm-border-w` sets the
+`primary-500`). Tokens equal to the built-in values are left out, so a theme stays small. `--m-border-w` sets the
 border of buttons, inputs and cards (default 1px).
 
 | Helper | |

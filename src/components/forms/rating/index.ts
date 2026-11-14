@@ -42,19 +42,19 @@ export function Rating(props: RatingProps): Element {
     const n = i + 1;
     const filled = (): boolean => shown() >= n - 0.25;
     return h("button", {
-      type: "button", role: "radio", class: () => cx("hm-rating-star", filled() && "is-on", !filled() && shown() > n - 1 && "is-half"),
+      type: "button", role: "radio", class: () => cx("m-rating-star", filled() && "is-on", !filled() && shown() > n - 1 && "is-half"),
       "aria-checked": () => String(Math.round(Number(val(props.value) ?? 0)) === n), "aria-label": () => props.starLabel?.(n, max) ?? t`${n} of ${max}`,
       tabindex: () => (Math.max(1, Math.round(Number(val(props.value) ?? 0))) === n ? "0" : "-1"), disabled: () => !!props.readonly,
       onClick: () => set(n), onMouseenter: () => !props.readonly && hover.set(n),
-    }, h("span", { class: "hm-rating-off" }, mark(props.icon, star, n)), h("span", { class: "hm-rating-on" }, mark(props.iconOn ?? props.icon, starFilled, n)));
+    }, h("span", { class: "m-rating-off" }, mark(props.icon, star, n)), h("span", { class: "m-rating-on" }, mark(props.iconOn ?? props.icon, starFilled, n)));
   });
-  return h("span", { "data-hm-color": () => colorAttr(props.color),
-    class: () => cx("hm-rating", `hm-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", props.animate === false && "is-still", hover() != null && "is-hovering", val(props.class)), role: "radiogroup",
+  return h("span", { "data-m-color": () => colorAttr(props.color),
+    class: () => cx("m-rating", `m-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", props.animate === false && "is-still", hover() != null && "is-hovering", val(props.class)), role: "radiogroup",
     "aria-label": () => val(props.label) ?? t`Rating`, onMouseleave: () => hover.set(null),
     // radio group keys: arrows (RTL mirrored), Home / End, no wrap; the value follows focus
     onKeydown: (e: KeyboardEvent) => {
       if (props.readonly) return;
-      const g = e.currentTarget as HTMLElement, stars = [...g.querySelectorAll<HTMLElement>(".hm-rating-star")];
+      const g = e.currentTarget as HTMLElement, stars = [...g.querySelectorAll<HTMLElement>(".m-rating-star")];
       const to = roving(e, stars, { horizontal: e.key === "ArrowLeft" || e.key === "ArrowRight", wrap: false, rtl: isRtl(g) });
       if (to) set(stars.indexOf(to) + 1);
     },

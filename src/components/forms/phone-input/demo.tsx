@@ -8,6 +8,6 @@ export default function PhoneInputDemo(props: { values: { country: string } }) {
   let $phone = ""
   return <div class="sc-stack">
     {() => <Field label="Telefon"><PhoneInput value={$phone} onChange={(v: string) => { $phone = v }} country={props.values.country || undefined} placeholder="532 111 22 33" /></Field>}
-    <p class="hm-muted">{() => `Kaydedilen: ${$phone || "—"}`}</p>
+    <p class="m-muted">{() => `Kaydedilen: ${$phone || "—"}`}</p>
   </div>
 }

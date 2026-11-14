@@ -34,8 +34,8 @@ test("Tooltip: color, class and motion on the bubble; disabled never shows; own 
   await tick(); await tick();
   const tip = document.getElementById(a.getAttribute("aria-describedby"));
   assert.ok(tip, "delay 0: shown on the next tick");
-  assert.equal(tip.getAttribute("data-hm-color"), "success");
-  for (const c of ["hm-tooltip", "hm-tooltip-colored", "hm-tooltip-still", "mine"]) assert.ok(tip.classList.contains(c), c);
+  assert.equal(tip.getAttribute("data-m-color"), "success");
+  for (const c of ["m-tooltip", "m-tooltip-colored", "m-tooltip-still", "mine"]) assert.ok(tip.classList.contains(c), c);
   b.dispatchEvent(new globalThis.FocusEvent("focusin", { bubbles: true }));
   await tick();
   assert.equal(b.getAttribute("aria-describedby"), null, "disabled");

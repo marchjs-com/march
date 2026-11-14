@@ -1,24 +1,24 @@
-/* CheckMark (classes hm-checkmark-*: hm-check-mark is the tick of Checkbox). The value sets three colours (line, text, soft fill); data-hm-color (which sets --hm-accent) replaces them. */
-.hm-checkmark { --hm-checkmark-c: var(--hm-success); --hm-checkmark-t: var(--hm-success-text); --hm-checkmark-soft: var(--hm-success-soft, var(--hm-surface-2));
-  display: inline-flex; align-items: center; gap: .3em; vertical-align: middle; color: var(--hm-checkmark-t); }
-.hm-checkmark.is-no { --hm-checkmark-c: var(--hm-danger); --hm-checkmark-t: var(--hm-danger-text); --hm-checkmark-soft: var(--hm-danger-soft, var(--hm-surface-2)); }
-.hm-checkmark.is-partial { --hm-checkmark-c: var(--hm-warn); --hm-checkmark-t: var(--hm-warn-text); --hm-checkmark-soft: var(--hm-warn-soft, var(--hm-surface-2)); }
-.hm-checkmark[data-hm-color] { --hm-checkmark-c: var(--hm-accent); --hm-checkmark-t: var(--hm-accent-text, var(--hm-accent)); --hm-checkmark-soft: var(--hm-accent-soft, color-mix(in srgb, var(--hm-accent) 16%, var(--hm-bg))); }
-.hm-checkmark-icon { display: inline-grid; place-items: center; flex: none; inline-size: 1rem; block-size: 1rem; line-height: 1; }
-.hm-checkmark-icon .hm-svg { inline-size: 100%; block-size: 100%; }
-.hm-checkmark-own { display: inline-grid; place-items: center; }
+/* CheckMark (classes m-checkmark-*: m-check-mark is the tick of Checkbox). The value sets three colours (line, text, soft fill); data-m-color (which sets --m-accent) replaces them. */
+.m-checkmark { --m-checkmark-c: var(--m-success); --m-checkmark-t: var(--m-success-text); --m-checkmark-soft: var(--m-success-soft, var(--m-surface-2));
+  display: inline-flex; align-items: center; gap: .3em; vertical-align: middle; color: var(--m-checkmark-t); }
+.m-checkmark.is-no { --m-checkmark-c: var(--m-danger); --m-checkmark-t: var(--m-danger-text); --m-checkmark-soft: var(--m-danger-soft, var(--m-surface-2)); }
+.m-checkmark.is-partial { --m-checkmark-c: var(--m-warn); --m-checkmark-t: var(--m-warn-text); --m-checkmark-soft: var(--m-warn-soft, var(--m-surface-2)); }
+.m-checkmark[data-m-color] { --m-checkmark-c: var(--m-accent); --m-checkmark-t: var(--m-accent-text, var(--m-accent)); --m-checkmark-soft: var(--m-accent-soft, color-mix(in srgb, var(--m-accent) 16%, var(--m-bg))); }
+.m-checkmark-icon { display: inline-grid; place-items: center; flex: none; inline-size: 1rem; block-size: 1rem; line-height: 1; }
+.m-checkmark-icon .m-svg { inline-size: 100%; block-size: 100%; }
+.m-checkmark-own { display: inline-grid; place-items: center; }
 /* the glyph fills the icon box; during a transition (motion) the leaving and the arriving glyph share the one cell */
-.hm-checkmark-glyph { grid-area: 1 / 1; display: grid; place-items: center; inline-size: 100%; block-size: 100%; }
-.hm-checkmark-glyph.is-arriving { opacity: 0; }
-.hm-checkmark-moves, .hm-checkmark-moves .hm-checkmark-icon { transition: color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease); }
-@media (prefers-reduced-motion: reduce) { .hm-checkmark-moves, .hm-checkmark-moves .hm-checkmark-icon { transition: none; } }
-.hm-checkmark-sm .hm-checkmark-icon { inline-size: .875rem; block-size: .875rem; }
-.hm-checkmark-lg .hm-checkmark-icon { inline-size: 1.25rem; block-size: 1.25rem; }
-.hm-checkmark-text { font-size: var(--hm-text-xs); }
+.m-checkmark-glyph { grid-area: 1 / 1; display: grid; place-items: center; inline-size: 100%; block-size: 100%; }
+.m-checkmark-glyph.is-arriving { opacity: 0; }
+.m-checkmark-moves, .m-checkmark-moves .m-checkmark-icon { transition: color var(--m-dur) var(--m-ease), background-color var(--m-dur) var(--m-ease); }
+@media (prefers-reduced-motion: reduce) { .m-checkmark-moves, .m-checkmark-moves .m-checkmark-icon { transition: none; } }
+.m-checkmark-sm .m-checkmark-icon { inline-size: .875rem; block-size: .875rem; }
+.m-checkmark-lg .m-checkmark-icon { inline-size: 1.25rem; block-size: 1.25rem; }
+.m-checkmark-text { font-size: var(--m-text-xs); }
 /* bare: the mark of another component (a step dot): its colour and its text size */
-.hm-checkmark-bare { color: inherit; }
-.hm-checkmark-bare .hm-checkmark-icon { inline-size: 1em; block-size: 1em; }
+.m-checkmark-bare { color: inherit; }
+.m-checkmark-bare .m-checkmark-icon { inline-size: 1em; block-size: 1em; }
 /* discs: the glyph keeps its size, the disc adds room around it */
-.hm-checkmark-soft .hm-checkmark-icon, .hm-checkmark-solid .hm-checkmark-icon { box-sizing: content-box; padding: .375rem; border-radius: var(--hm-radius-full); background: var(--hm-checkmark-soft); }
-.hm-checkmark-solid .hm-checkmark-icon { background: var(--hm-checkmark-c); color: var(--hm-on-status, var(--hm-on-scrim)); }
-.hm-checkmark-sm:is(.hm-checkmark-soft, .hm-checkmark-solid) .hm-checkmark-icon { padding: .25rem; }
+.m-checkmark-soft .m-checkmark-icon, .m-checkmark-solid .m-checkmark-icon { box-sizing: content-box; padding: .375rem; border-radius: var(--m-radius-full); background: var(--m-checkmark-soft); }
+.m-checkmark-solid .m-checkmark-icon { background: var(--m-checkmark-c); color: var(--m-on-status, var(--m-on-scrim)); }
+.m-checkmark-sm:is(.m-checkmark-soft, .m-checkmark-solid) .m-checkmark-icon { padding: .25rem; }

@@ -49,7 +49,7 @@ const SettingsPage = Page.extend({ narrow: true, tabsQuery: "tab" })
 | `labels` | Texts the frame writes itself: `{ skip, panel }` — the skip link and the button that opens the aside on narrow screens (string or accessor each; the defaults are translated). |
 | `skipLink` | `false`: no "Skip to content" link. |
 | `asideToggle` | `false`: no corner button for the aside sheet on narrow screens (open it yourself: `data-open` on the aside). |
-| `class` | Class of the frame (`.hm-layout`); parts: `.hm-skip`, `.hm-shell-nav`, `.hm-shell-top`, `.hm-shell-header`, `.hm-layout-main`, `.hm-layout-aside`, `.hm-layout-footer`, `.hm-layout-aside-btn`. |
+| `class` | Class of the frame (`.m-layout`); parts: `.m-skip`, `.m-shell-nav`, `.m-shell-top`, `.m-shell-header`, `.m-layout-main`, `.m-layout-aside`, `.m-layout-footer`, `.m-layout-aside-btn`. |
 
 ```tsx
 <Layout nav={<SideNav/>} aside={<Toc/>} labels={{ skip: "Jump to the article", panel: "Contents" }}>…</Layout>

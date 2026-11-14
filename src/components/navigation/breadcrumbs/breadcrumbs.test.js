@@ -17,15 +17,15 @@ test("Breadcrumbs: nav + ordered list, current page, buttons, sibling menus, sep
   await tick(); await tick();
   const nav = m.el.querySelector("nav");
   assert.equal(nav.getAttribute("aria-label"), "File path");
-  const lis = [...nav.querySelectorAll("li")].filter((l) => !l.className.includes("hm-bc-more"));
+  const lis = [...nav.querySelectorAll("li")].filter((l) => !l.className.includes("m-bc-more"));
   assert.equal(lis.length, 3);
   assert.equal(lis[2].querySelector('[aria-current="page"]').textContent, "app.ts");
   lis[0].querySelector("button").click();
   assert.equal(went, 1);
   const menuBtn = lis[1].querySelector('button[aria-haspopup="menu"]');
   assert.ok(menuBtn, "a crumb with siblings opens a menu");
-  assert.equal(nav.querySelectorAll(".hm-bc-sep").length, 3);
-  assert.ok(nav.querySelector(".hm-bc-more").hidden, "nothing collapsed while it fits");
+  assert.equal(nav.querySelectorAll(".m-bc-sep").length, 3);
+  assert.ok(nav.querySelector(".m-bc-more").hidden, "nothing collapsed while it fits");
   m.dispose();
 });
 
@@ -38,11 +38,11 @@ test("Breadcrumbs: own separator, no separator, own ellipsis and menu names", as
   ]);
   await tick(); await tick();
   const [own, bare, fn] = m.el.querySelectorAll("nav");
-  assert.deepEqual([...own.querySelectorAll(".hm-bc-sep")].map((s) => s.textContent), ["/", "/", "/"]);
-  assert.equal(own.querySelector(".hm-bc-more button").textContent, "more");
-  assert.equal(own.querySelector(".hm-bc-more button").getAttribute("aria-label"), "In between");
+  assert.deepEqual([...own.querySelectorAll(".m-bc-sep")].map((s) => s.textContent), ["/", "/", "/"]);
+  assert.equal(own.querySelector(".m-bc-more button").textContent, "more");
+  assert.equal(own.querySelector(".m-bc-more button").getAttribute("aria-label"), "In between");
   assert.equal(own.querySelectorAll('button[aria-haspopup="menu"]')[1].getAttribute("aria-label"), "Next to b");
-  assert.equal(bare.querySelectorAll(".hm-bc-sep").length, 0);
-  assert.equal(fn.querySelectorAll(".hm-bc-sep .own-sep").length, 3);
+  assert.equal(bare.querySelectorAll(".m-bc-sep").length, 0);
+  assert.equal(fn.querySelectorAll(".m-bc-sep .own-sep").length, 3);
   m.dispose();
 });

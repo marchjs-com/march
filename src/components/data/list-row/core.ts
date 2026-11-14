@@ -78,7 +78,7 @@ export function listRow(props: ListRowProps, scroll?: ScrollLine): Element {
   // one text line: plain text scrolls when clipped (or is cut / wrapped); a node is placed as it is
   const line = (name: string, v: MaybeFn<unknown>, as?: string): unknown => {
     if (v == null) return null;
-    const cls = `hm-listrow-${name}`;
+    const cls = `m-listrow-${name}`;
     return scroll && isText(untrack(() => val(v))) && mode === "scroll" && !as
       ? scroll(cls, () => String(val(v) ?? ""), () => on("active") || on("selected"))
       : h(as ?? "span", { class: cls }, () => val(v));
@@ -87,13 +87,13 @@ export function listRow(props: ListRowProps, scroll?: ScrollLine): Element {
   const blocks = (props.titleAs ?? "span") !== "span" || (props.subAs ?? "span") !== "span"; // a heading / paragraph needs a block parent
   const slot = (name: string, v: MaybeFn<unknown>): unknown => () => {
     const x = val(v);
-    return x == null || x === false ? null : h("span", { class: `hm-listrow-${name}` }, name === "lead" ? icon(x, "hm-icon hm-listrow-icon") : x);
+    return x == null || x === false ? null : h("span", { class: `m-listrow-${name}` }, name === "lead" ? icon(x, "m-icon m-listrow-icon") : x);
   };
   const title = props.title ?? props.children;
   const nested = kind === "a" || kind === "button"; // controls may not sit inside a link or a button
   const body = [
     slot("lead", props.lead),
-    title == null && props.sub == null ? null : h(blocks ? "div" : "span", { class: "hm-listrow-text" }, line("title", title, props.titleAs), line("sub", props.sub, props.subAs)),
+    title == null && props.sub == null ? null : h(blocks ? "div" : "span", { class: "m-listrow-text" }, line("title", title, props.titleAs), line("sub", props.sub, props.subAs)),
     slot("trail", props.trail),
     nested ? null : slot("actions", props.actions),
   ];
@@ -106,11 +106,11 @@ export function listRow(props: ListRowProps, scroll?: ScrollLine): Element {
     ...(kind === "a" ? { "aria-current": () => (on("active") ? "page" : null) } : {}),
     ...(kind === "button" ? { type: "button", disabled: () => on("disabled") } : { "aria-disabled": () => (on("disabled") ? "true" : null) }),
     ...rest(props, USED),
-    class: () => cx("hm-listrow", `hm-listrow-${val(props.size) ?? "md"}`, mode !== "scroll" && `is-${mode}`, val(props.align) === "start" && "is-top",
+    class: () => cx("m-listrow", `m-listrow-${val(props.size) ?? "md"}`, mode !== "scroll" && `is-${mode}`, val(props.align) === "start" && "is-top",
       column() && "is-column", column() && val(props.align) === "center" && "is-centered",
       (nested || !!props.onClick || val(props.interactive)) && "is-action", on("active") && "is-active", on("selected") && "is-selected", on("disabled") && "is-disabled",
       val(props.indicator) && "is-barred", val(props.class)),
-    "data-hm-color": () => colorAttr(val(props.color)),
+    "data-m-color": () => colorAttr(val(props.color)),
     onClick: props.onClick ? (e: MouseEvent) => { if (on("disabled")) { e.preventDefault(); return; } props.onClick?.(e); } : undefined,
   };
   let row: Element;
@@ -120,7 +120,7 @@ export function listRow(props: ListRowProps, scroll?: ScrollLine): Element {
     row = (L ? h(L, { ...link, children: body }) : h("a", link, body)) as Element;
   } else row = h(kind, attrs, body) as Element;
   return nested && props.actions != null
-    ? h("div", { class: "hm-listrow-wrap" }, row, slot("actions", props.actions)) as Element
+    ? h("div", { class: "m-listrow-wrap" }, row, slot("actions", props.actions)) as Element
     : row;
 }
 

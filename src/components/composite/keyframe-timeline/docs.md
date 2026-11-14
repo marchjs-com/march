@@ -28,7 +28,7 @@ speed, "Stop all" and reduced motion apply; `timelineCode(model)` writes the sam
 | `curves` | boolean | `true` | the value curve drawn in every lane |
 | `labels` | object | — | own texts: `timeline`, `playback`, `play`, `pause`, `start`, `loop`, `speed`, `playhead`, `hint`, `time`, `value`, `remove`, `easing`, `keyframe(number, target, prop)`, `lane(target, prop)` |
 | `readonly`, `disabled` | | | |
-| `class` | class value | — | on the root (`hm-kt`) |
+| `class` | class value | — | on the root (`m-kt`) |
 
 ```tsx
 <KeyframeTimeline bind:value={$timeline} transport={["play", "time"]} curves={false} hint={false}

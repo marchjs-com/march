@@ -78,7 +78,7 @@ test("pipes", () => {
 });
 
 test("sx literal resolves at build time; invalid sx fails the build", () => {
-  assert.match(body("const e = <div sx={{ p: 2, cols: 3 }} />", NOTPL), /sx: "hm-p-2 hm-cols-3"/);
+  assert.match(body("const e = <div sx={{ p: 2, cols: 3 }} />", NOTPL), /sx: "m-p-2 m-cols-3"/);
   assert.throws(() => c("const e = <div sx={{ p: 42 }} />"), /out of range/);
   assert.match(body("const e = <div sx={dyn} />", NOTPL), /sx: _\$r\(\(\) => \(_\$sx\(dyn\)\)\)/);
 });

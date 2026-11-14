@@ -35,20 +35,20 @@ export function Segmented<T = unknown>(props: SegmentedProps<T>): unknown {
   const baseId = props.id ?? field?.id;
   const c = ctl(props);
   const slide = props.indicator === "slide";
-  const thumb = slide ? h("span", { class: "hm-segment-thumb", "aria-hidden": "true" }) as HTMLElement : null;
+  const thumb = slide ? h("span", { class: "m-segment-thumb", "aria-hidden": "true" }) as HTMLElement : null;
   let root: HTMLElement;
   const onKeyDown = (e: KeyboardEvent) => { const target = roving(e, [...root.querySelectorAll("button")].filter((b) => !b.disabled), { horizontal: true }); if (target) target.click(); };
-  root = h("div", { "data-hm-color": () => colorAttr(props.color), role: "radiogroup", class: cx("hm-segmented", slide && "hm-segmented-slide", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
+  root = h("div", { "data-m-color": () => colorAttr(props.color), role: "radiogroup", class: cx("m-segmented", slide && "m-segmented-slide", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
     thumb,
     () => {
       const opts = normOptions(props.options);
       return opts.map((o, i) => h("button", {
-        type: "button", role: "radio", class: cx("hm-segment", o["icon"] != null && "hm-segment-has-icon"), id: i === 0 ? baseId : undefined, onBlur: props.onBlur,
+        type: "button", role: "radio", class: cx("m-segment", o["icon"] != null && "m-segment-has-icon"), id: i === 0 ? baseId : undefined, onBlur: props.onBlur,
         title: (o["title"] as string | undefined) ?? null, "aria-label": o.label === "" ? (o["title"] as string | undefined) ?? null : null,
         "aria-checked": () => String(same(get(), o.value)),
         tabindex: () => (same(get(), o.value) || (i === 0 && !opts.some((x) => same(x.value, get()))) ? "0" : "-1"),
         disabled: () => !!(props.disabled || props.readonly || o.disabled), onClick: () => set(o.value as T),
-      }, icon(o["icon"], "hm-segment-icon"), o.label));
+      }, icon(o["icon"], "m-segment-icon"), o.label));
     }) as HTMLElement;
   if (thumb) {
     // the shared sliding indicator glides the thumb along the row; its line (segments may wrap) and height are set here

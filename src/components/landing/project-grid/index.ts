@@ -62,24 +62,24 @@ export function ProjectGrid(props: ProjectGridProps): Element {
   const cats = [...new Set(props.projects.map((p) => p.category).filter((c): c is string => !!c))];
   const filter = signal<string | null>(null);
   const cards = props.projects.map((p) => {
-    const cover = h("div", { class: "hm-pg-cover", "data-project": p.id, "data-hm-shared": `project-${p.id}` },
+    const cover = h("div", { class: "m-pg-cover", "data-project": p.id, "data-m-shared": `project-${p.id}` },
       h(Picture, { source: p.cover }),
       props.arrow === false ? null : typeof props.arrow === "function"
-        ? h(CornerMark, { class: "hm-pg-go is-own", size: "lg", variant: "surface", show: "hover" }, props.arrow(p))
-        : h(CornerMark, { class: "hm-pg-go", size: "lg", variant: "surface", show: "hover", icon: arrowUpRight })) as HTMLElement;
+        ? h(CornerMark, { class: "m-pg-go is-own", size: "lg", variant: "surface", show: "hover" }, props.arrow(p))
+        : h(CornerMark, { class: "m-pg-go", size: "lg", variant: "surface", show: "hover", icon: arrowUpRight })) as HTMLElement;
     const open = (e: Event): void => {
       if (props.onOpen) { e.preventDefault(); props.onOpen(p, cover); return; }
       if (props.lightbox !== false && isPicture(p.cover) && !p.href) { e.preventDefault(); void openMedia(p.cover.src, typeof p.title === "string" ? { alt: p.cover.alt, title: p.title } : { alt: p.cover.alt }); }
     };
-    const card = h(Card, { as: "article", flush: true, class: "hm-pg-card hm-corner-host", "data-category": p.category ?? null },
+    const card = h(Card, { as: "article", flush: true, class: "m-pg-card m-corner-host", "data-category": p.category ?? null },
       cover,
-      h("div", { class: "hm-pg-text" },
-        h("h3", { class: "hm-pg-title" }, h("a", { href: p.href ?? `#${p.id}`, class: "hm-pg-link", onClick: open }, p.title)),
-        h("p", { class: "hm-pg-meta" }, p.category ?? null, p.category && p.year != null ? " · " : null, p.year ?? null),
-        p.summary != null ? h("p", { class: "hm-pg-sum" }, p.summary) : null)) as HTMLElement;
+      h("div", { class: "m-pg-text" },
+        h("h3", { class: "m-pg-title" }, h("a", { href: p.href ?? `#${p.id}`, class: "m-pg-link", onClick: open }, p.title)),
+        h("p", { class: "m-pg-meta" }, p.category ?? null, p.category && p.year != null ? " · " : null, p.year ?? null),
+        p.summary != null ? h("p", { class: "m-pg-sum" }, p.summary) : null)) as HTMLElement;
     return { p, card };
   });
-  const grid = h("div", { class: cx("hm-pg-grid", `hm-pg-cols-${props.cols ?? 3}`), "aria-live": "polite" }, cards.map((c) => c.card)) as HTMLElement;
+  const grid = h("div", { class: cx("m-pg-grid", `m-pg-cols-${props.cols ?? 3}`), "aria-live": "polite" }, cards.map((c) => c.card)) as HTMLElement;
 
   const choose = (c: string | null): void => {
     if (filter.peek() === c) return;
@@ -95,10 +95,10 @@ export function ProjectGrid(props: ProjectGridProps): Element {
     void out.finished.then(() => { apply(); out.cancel(); });
   };
   const chips = props.filters !== false && cats.length > 1
-    ? h("div", { class: "hm-pg-filters", role: "group", "aria-label": props.filtersLabel ?? t`Filter projects` },
+    ? h("div", { class: "m-pg-filters", role: "group", "aria-label": props.filtersLabel ?? t`Filter projects` },
       h(Chip, { color: props.color, selected: () => filter() === null, onClick: () => choose(null) }, () => val(props.allLabel) ?? t`All`),
       cats.map((c) => h(Chip, { color: props.color, selected: () => filter() === c, onClick: () => choose(c) }, c)))
     : null;
-  if (props.reveal !== false) owned(revealOnScroll(grid, { effect: "up", stagger: 70, ...props.reveal, select: ".hm-pg-card" }));
-  return h("div", { class: cx("hm-pg", val(props.class)), "data-hm-color": colorAttr(props.color) }, chips, grid) as Element;
+  if (props.reveal !== false) owned(revealOnScroll(grid, { effect: "up", stagger: 70, ...props.reveal, select: ".m-pg-card" }));
+  return h("div", { class: cx("m-pg", val(props.class)), "data-m-color": colorAttr(props.color) }, chips, grid) as Element;
 }

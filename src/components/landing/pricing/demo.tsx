@@ -19,7 +19,7 @@ export default function PricingDemo(props: { values: { plans: number; currency: 
       const plans = v.plans === 1 ? [PLANS[1]!] : PLANS
       return <Pricing plans={plans} currency={v.currency} saving={v.saving ? "4 ay bedava" : undefined}
         color={v.color === "default" ? undefined : v.color as "brand-purple"} priceEffect={v.priceEffect as "roll"}
-        featureIcon={v.featureIcon === "off" ? false : v.featureIcon === "own" ? (on: boolean) => <span class="hm-muted">{on ? "+" : "–"}</span> : true} />
+        featureIcon={v.featureIcon === "off" ? false : v.featureIcon === "own" ? (on: boolean) => <span class="m-muted">{on ? "+" : "–"}</span> : true} />
     }}
   </div>
 }

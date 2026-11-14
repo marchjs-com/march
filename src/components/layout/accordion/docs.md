@@ -23,7 +23,7 @@ icon and a subtitle; `variant="contained"` draws one framed list instead of sepa
 | `animated` | boolean | `true` | `false`: panels open at once and the arrow does not turn |
 | `color` | color token | accent | colour of the header icons |
 | `onToggle` | `(key, open) => void` | — | a section opened or closed (key: its `id`, else its index) |
-| `class` | class | — | added to the root (`.hm-accordion`); parts: `.hm-acc-item`, `.hm-acc-btn`, `.hm-acc-icon`, `.hm-acc-title`, `.hm-acc-sub`, `.hm-acc-chev`, `.hm-acc-body` |
+| `class` | class | — | added to the root (`.m-accordion`); parts: `.m-acc-item`, `.m-acc-btn`, `.m-acc-icon`, `.m-acc-title`, `.m-acc-sub`, `.m-acc-chev`, `.m-acc-body` |
 
 ```tsx
 <Accordion items={faq} chevron={false} />                                   // no arrow

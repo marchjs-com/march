@@ -1,6 +1,6 @@
 // Parts of a component the app may switch off, replace or pick from a list: one rule for every component.
 //   ownPart(props.separator, () => "–")        undefined / true → default · false / null → nothing · own value
-//   ownIcon(props.icon, check, "hm-copy-icon")  the same rule for an icon (IconDef, text, node)
+//   ownIcon(props.icon, check, "m-copy-icon")  the same rule for an icon (IconDef, text, node)
 //   hasPart(props.actions, "float")             `boolean | list` option: is this part shown?
 import { icon, glyph, val, type MaybeFn } from "./util.ts";
 import { isIconDef, type IconDef } from "../icons/svg.ts";
@@ -21,7 +21,7 @@ export const ownPart = (p: unknown, def: () => unknown): unknown =>
  * result, an IconDef / text / node → rendered by icon() with class `cls`. `cls: null` draws an own IconDef bare, like
  * the default glyph (no wrapping span).
  */
-export function ownIcon(x: unknown, def: IconDef, cls: string | null = "hm-icon"): unknown {
+export function ownIcon(x: unknown, def: IconDef, cls: string | null = "m-icon"): unknown {
   if (x === undefined || x === true) return glyph(def);
   if (x === false || x == null) return null;
   if (typeof x === "function") return ownIcon((x as () => unknown)() ?? null, def, cls);

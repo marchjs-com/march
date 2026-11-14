@@ -89,7 +89,7 @@ export interface TabListProps extends TabListLook {
  * `<Tabs>` is this plus the panel; use it directly for a strip that drives something else.
  */
 export function TabList(props: TabListProps): Element {
-  const base = uid("hm-tab");
+  const base = uid("m-tab");
   const idOf = props.tabId ?? ((id: string) => `${base}-${id}`);
   const list = computed(() => (val(props.tabs) ?? []).filter((x) => x && !val(x.hidden)));
   const vertical = (): boolean => val(props.orientation) === "vertical";
@@ -98,8 +98,8 @@ export function TabList(props: TabListProps): Element {
   type TabButton = HTMLButtonElement;
   const tabEls = (): TabButton[] => (bar ? Array.from(bar.querySelectorAll<TabButton>('[role="tab"]')).filter((x) => !x.disabled) : []);
   const closes = (x: TabSpec | undefined): boolean => !!x && !!val(x.closable) && !val(x.disabled);
-  return h("div", { "data-hm-color": () => colorAttr(props.color),
-    class: () => cx(look() && "hm-tabs-bar", val(props.variant) === "pill" && "hm-tabs-bar-pill", val(props.class)), role: "tablist",
+  return h("div", { "data-m-color": () => colorAttr(props.color),
+    class: () => cx(look() && "m-tabs-bar", val(props.variant) === "pill" && "m-tabs-bar-pill", val(props.class)), role: "tablist",
     "aria-orientation": () => (vertical() ? "vertical" : props.orientation !== undefined ? "horizontal" : null), "aria-label": () => val(props.label) ?? null, ref: (x: HTMLElement) => { bar = x; },
     onKeydown: (e: KeyboardEvent) => {
       const id = (e.target as HTMLElement).dataset?.["tab"];
@@ -116,13 +116,13 @@ export function TabList(props: TabListProps): Element {
       ...attrs, type: "button", role: "tab", id: idOf(x.id), "data-tab": x.id, "aria-controls": props.controls ?? null,
       "aria-selected": () => String(on()), tabindex: () => (stop() ? "0" : "-1"), disabled: () => !!val(x.disabled), title: () => val(x.title) ?? null,
       "aria-keyshortcuts": () => (closes(x) ? "Delete" : (attrs["aria-keyshortcuts"] as string | null | undefined) ?? null),
-      class: () => cx(look() && "hm-tab", on() && "is-active", val(own as ClassProp)), onClick: () => props.onSelect(x.id),
-    }, icon(x.icon, "hm-tab-icon"), () => val(x.label), x.badge !== undefined && h(Badge, { count: () => val(x.badge), tone: "neutral" }),
-    x.dirty !== undefined && (() => (val(x.dirty) ? h(StatusDot, { class: "hm-tab-dirty", tone: "primary", size: "sm", label: () => val(props.labels?.dirty) ?? t`unsaved changes` }) : null)),
+      class: () => cx(look() && "m-tab", on() && "is-active", val(own as ClassProp)), onClick: () => props.onSelect(x.id),
+    }, icon(x.icon, "m-tab-icon"), () => val(x.label), x.badge !== undefined && h(Badge, { count: () => val(x.badge), tone: "neutral" }),
+    x.dirty !== undefined && (() => (val(x.dirty) ? h(StatusDot, { class: "m-tab-dirty", tone: "primary", size: "sm", label: () => val(props.labels?.dirty) ?? t`unsaved changes` }) : null)),
     x.closable !== undefined && (() => (closes(x) ? h("span", {
-      class: "hm-tab-close", "aria-hidden": "true", title: () => val(props.labels?.close) ?? t`Close`,
+      class: "m-tab-close", "aria-hidden": "true", title: () => val(props.labels?.close) ?? t`Close`,
       onPointerdown: (e: Event) => e.stopPropagation(), onClick: (e: Event) => { e.stopPropagation(); props.onClose?.(x.id); },
-    }, ownIcon(props.closeIcon ?? undefined, xIcon, "hm-tab-close-own")) : null)));
+    }, ownIcon(props.closeIcon ?? undefined, xIcon, "m-tab-close-own")) : null)));
     return props.wrap ? props.wrap(btn, x) : btn;
   })));
 }
@@ -157,7 +157,7 @@ const live = reactive as <T>(fn: () => T) => T;
 
 /** `value` + `onChange` make it controlled (`bind:value` works). */
 export function Tabs(props: TabsProps): Element {
-  const base = uid("hm-tabs");
+  const base = uid("m-tabs");
   const list = computed(() => {
     const src = props.tabs !== undefined ? val(props.tabs) : ([] as unknown[]).concat(props.children ?? []).flat() as TabSpec[];
     return (src ?? []).filter((x) => x && ((x as Partial<TabDescriptor>).__tab || x.id != null) && !val(x.hidden));
@@ -181,7 +181,7 @@ export function Tabs(props: TabsProps): Element {
     activation: props.activation, onClose: (id: string) => props.onClose?.(id), closeIcon: props.closeIcon, tabProps: props.tabProps,
   });
   // Only the active panel exists; switching disposes the old one.
-  const panel = h("div", { class: "hm-tabs-panel", role: "tabpanel", id: `${base}-p`, tabindex: "0", "aria-labelledby": () => `${base}-t-${current()}` },
+  const panel = h("div", { class: "m-tabs-panel", role: "tabpanel", id: `${base}-p`, tabindex: "0", "aria-labelledby": () => `${base}-t-${current()}` },
     () => {
       const id = current();
       const tab = untrack(list).find((x) => x.id === id);
@@ -203,6 +203,6 @@ export function Tabs(props: TabsProps): Element {
       });
     });
   }
-  return h("div", { class: () => cx("hm-tabs", props.indicator === false && "hm-tabs-plain", motion && "hm-tabs-still", val(props.class)) },
-    props.actions == null || props.actions === false ? nav : h("div", { class: "hm-tabs-head" }, nav, h("div", { class: "hm-tabs-actions" }, props.actions)), props.panel === false ? null : panel);
+  return h("div", { class: () => cx("m-tabs", props.indicator === false && "m-tabs-plain", motion && "m-tabs-still", val(props.class)) },
+    props.actions == null || props.actions === false ? nav : h("div", { class: "m-tabs-head" }, nav, h("div", { class: "m-tabs-actions" }, props.actions)), props.panel === false ? null : panel);
 }

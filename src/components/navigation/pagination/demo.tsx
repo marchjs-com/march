@@ -16,7 +16,7 @@ export default function PaginationDemo(props: { values: { variant: string; pages
   const batch = signal(2)
   const clamp = (): number => Math.min(page(), props.values.pages)
   return <div class="sc-page-demo">
-    <p class="hm-muted">{() => (props.values.variant === "cursor" ? `Akış: ${batch()}. yığın (toplam bilinmiyor)` : `Sonuçlar ${(clamp() - 1) * size() + 1}–${clamp() * size()} · sayfa ${clamp()} / ${props.values.pages}`)}</p>
+    <p class="m-muted">{() => (props.values.variant === "cursor" ? `Akış: ${batch()}. yığın (toplam bilinmiyor)` : `Sonuçlar ${(clamp() - 1) * size() + 1}–${clamp() * size()} · sayfa ${clamp()} / ${props.values.pages}`)}</p>
     {() => {
       const v = { ...props.values }, c = v.controls, g = v.gap, color = (v.color || undefined) as ColorToken
       const prev = c === "text" ? "‹ Geri" : undefined, next = c === "text" ? "İleri ›" : undefined

@@ -62,7 +62,7 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
   // scrolling main area (an app shell); a box scrolling inside the page is not the page and is left alone
   const doc = globalThis.document;
   const isPage = (tg: EventTarget | null | undefined): boolean =>
-    tg === doc || tg === doc?.documentElement || tg === doc?.body || (tg instanceof Element && tg.matches("main, .hm-shell-main, [data-hm-scroll-root]"));
+    tg === doc || tg === doc?.documentElement || tg === doc?.body || (tg instanceof Element && tg.matches("main, .m-shell-main, [data-m-scroll-root]"));
   const read = (e?: Event): void => {
     const tg = e?.target;
     if (props.target) { if (tg && tg !== props.target && !(props.target === win && isPage(tg))) return; }
@@ -80,7 +80,7 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
     s.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const btn = h(IconButton, { class: () => cx("hm-to-top", val(props.class)), variant: "raised", shape: "round", size: "lg", color: props.color, label: () => val(props.label) ?? t`Back to top`, onClick: toTop,
+  const btn = h(IconButton, { class: () => cx("m-to-top", val(props.class)), variant: "raised", shape: "round", size: "lg", color: props.color, label: () => val(props.label) ?? t`Back to top`, onClick: toTop,
     icon: ownIcon(props.icon === false || props.icon == null ? undefined : props.icon, arrowUp) }) as HTMLElement;
   btn.setAttribute("data-shown", "false");
   btn.inert = true;

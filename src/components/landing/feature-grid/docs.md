@@ -24,7 +24,7 @@ media). Items enter one after another; tiles in a row share one height; on phone
 | `cols` | 2 3 4 | 3 | cards / plain |
 | `spotlight` | boolean | `true` | pointer light (cards, bento) |
 | `reveal` | Reveal effect / `{ from, to }` / `none` | `up` | entrance of the tiles |
-| `class` | string | — | extra class on the root (`.hm-fg`; parts: `.hm-fg-item`, the ListRow parts `.hm-listrow-title` and `.hm-listrow-sub`, `.hm-fg-media`) |
+| `class` | string | — | extra class on the root (`.m-fg`; parts: `.m-fg-item`, the ListRow parts `.m-listrow-title` and `.m-listrow-sub`, `.m-fg-media`) |
 
 ## Accessibility
 

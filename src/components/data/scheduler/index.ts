@@ -127,7 +127,7 @@ const LANES = 3;
 
 /** `<Scheduler events={$events} view="week" onChange={(ev, r) => save(ev.id, r)} onCreate={(r) => add(r)} />` */
 export function Scheduler(props: SchedulerProps): Element {
-  const id = uid("hm-sch");
+  const id = uid("m-sch");
   const events = signal<readonly SchedulerEvent[]>(untrack(() => val(props.events)) ?? []);
   if (typeof props.events === "function") effect(() => { const e = val(props.events); untrack(() => events.set(e ?? [])); });
   const view = signal<SchedulerView>(untrack(() => val(props.view)) ?? "week");
@@ -237,18 +237,18 @@ export function Scheduler(props: SchedulerProps): Element {
   // ------------------------------------------------------------------ an event element (bar in month / all-day lanes, block in the time grid)
   const handleOf = (e: Event): "start" | "end" | undefined => (e.target as Element).closest<HTMLElement>("[data-handle]")?.dataset["handle"] as "start" | "end" | undefined;
   const evEl = (n: Norm, cls: string, extra: Record<string, unknown> = {}, handles = true): HTMLElement => {
-    const block = cls === "hm-sch-block";
+    const block = cls === "m-sch-block";
     const el = h("button", {
-      type: "button", class: cx("hm-sch-ev", cls, n.allDay && "is-allday"), "data-hm-color": colorAttr(n.ev.color ?? "primary"), "data-ev": n.ev.id,
+      type: "button", class: cx("m-sch-ev", cls, n.allDay && "is-allday"), "data-m-color": colorAttr(n.ev.color ?? "primary"), "data-ev": n.ev.id,
       "aria-label": evLabel(n), title: evLabel(n), onKeydown: evKeys(n), ...extra,
     },
-    ...(props.renderEvent ? [h("span", { class: "hm-sch-ev-own" }, props.renderEvent(n.ev, { view: untrack(view), time: timeText(n) }))] : [
-      h("span", { class: "hm-sch-ev-title" }, n.ev.title),
-      !n.allDay && cls === "hm-sch-block" ? h("span", { class: "hm-sch-ev-time" }, timeText(n)) : null,
-      n.ev.location && cls === "hm-sch-block" ? h("span", { class: "hm-sch-ev-loc" }, n.ev.location) : null]),
+    ...(props.renderEvent ? [h("span", { class: "m-sch-ev-own" }, props.renderEvent(n.ev, { view: untrack(view), time: timeText(n) }))] : [
+      h("span", { class: "m-sch-ev-title" }, n.ev.title),
+      !n.allDay && cls === "m-sch-block" ? h("span", { class: "m-sch-ev-time" }, timeText(n)) : null,
+      n.ev.location && cls === "m-sch-block" ? h("span", { class: "m-sch-ev-loc" }, n.ev.location) : null]),
     // the ends are bare ResizeHandle grips: the event runs the gesture (pointer) and the keys (Alt+Shift+arrows)
-    handles && editable() ? h(ResizeHandle, { edge: block ? "bottom" : "end", class: "hm-sch-handle hm-sch-handle-end", "data-handle": "end", line: "none", grip: true }) : null,
-    handles && editable() && block ? h(ResizeHandle, { edge: "top", class: "hm-sch-handle hm-sch-handle-start", "data-handle": "start", line: "none", grip: true }) : null) as HTMLElement;
+    handles && editable() ? h(ResizeHandle, { edge: block ? "bottom" : "end", class: "m-sch-handle m-sch-handle-end", "data-handle": "end", line: "none", grip: true }) : null,
+    handles && editable() && block ? h(ResizeHandle, { edge: "top", class: "m-sch-handle m-sch-handle-start", "data-handle": "start", line: "none", grip: true }) : null) as HTMLElement;
     el.addEventListener("click", () => { if (!dragged) props.onSelect?.(n.ev); });
     return el;
   };
@@ -302,16 +302,16 @@ export function Scheduler(props: SchedulerProps): Element {
   const focusDay = signal<IsoDate | null>(null);
   const Month = (): Element => {
     const ds = days(), list = norm(), td = today(), month = cur().slice(0, 7), fdOn = focusDay() ?? cur();
-    const grid = h("div", { class: "hm-sch-month-grid" }) as HTMLElement;
+    const grid = h("div", { class: "m-sch-month-grid" }) as HTMLElement;
     const weeks = Array.from({ length: 6 }, (_, w) => ds.slice(w * 7, w * 7 + 7));
     weeks.forEach((wk, w) => {
       const segs = lanes(wk, list);
-      const row = h("div", { role: "row", class: "hm-sch-week" }) as HTMLElement;
+      const row = h("div", { role: "row", class: "m-sch-week" }) as HTMLElement;
       wk.forEach((d, i) => {
         const more = segs.filter((s) => s.lane >= LANES && s.from <= i && s.to >= i).length;
-        const cell = h("div", { role: "gridcell", class: cx("hm-sch-day", d.slice(0, 7) !== month && "is-out", d === td && "is-today", isWeekend(d) && "is-weekend"), "data-day": d, "aria-selected": String(d === cur()) },
+        const cell = h("div", { role: "gridcell", class: cx("m-sch-day", d.slice(0, 7) !== month && "is-out", d === td && "is-today", isWeekend(d) && "is-weekend"), "data-day": d, "aria-selected": String(d === cur()) },
           h("button", {
-            type: "button", class: "hm-sch-daynum", tabindex: d === fdOn ? "0" : "-1", "data-focus": d, "aria-label": dayText(d),
+            type: "button", class: "m-sch-daynum", tabindex: d === fdOn ? "0" : "-1", "data-focus": d, "aria-label": dayText(d),
             onClick: () => setView("day", d),
             onKeydown: (e: KeyboardEvent) => {
               // arrows, Home / End: the day-grid keys Calendar uses (PageUp / PageDown change the period at the root)
@@ -323,13 +323,13 @@ export function Scheduler(props: SchedulerProps): Element {
               later(() => body?.querySelector<HTMLElement>(`[data-focus="${nd}"]`)?.focus(), 0);
             },
           }, String(Number(d.slice(8)))),
-          more ? h(Button, { variant: "link", class: "hm-sch-more", onClick: () => setView("day", d) }, lb("more")(more)) : null);
+          more ? h(Button, { variant: "link", class: "m-sch-more", onClick: () => setView("day", d) }, lb("more")(more)) : null);
         if (editable() && props.onCreate) cell.addEventListener("dblclick", (e) => { if (e.target === cell) props.onCreate?.({ start: d, end: d, allDay: true }); });
         setStyle(cell as HTMLElement, { "grid-column": String(i + 1) });
         row.append(cell);
       });
       for (const s of segs.filter((x) => x.lane < LANES)) {
-        const el = evEl(s.n, "hm-sch-bar", {}, !s.cutEnd);
+        const el = evEl(s.n, "m-sch-bar", {}, !s.cutEnd);
         el.classList.toggle("is-cut-start", s.cutStart); el.classList.toggle("is-cut-end", s.cutEnd);
         setStyle(el, { "grid-column": `${s.from + 1} / ${s.to + 2}`, "grid-row": String(s.lane + 2) });
         if (editable()) el.addEventListener("pointerdown", (e) => { if (e.button) return; dayDrag(e, s.n, grid, 7, () => ds, handleOf(e) ?? "move"); });
@@ -338,8 +338,8 @@ export function Scheduler(props: SchedulerProps): Element {
       setStyle(row, { "grid-row": String(w + 2) });
       grid.append(row);
     });
-    return h("div", { class: "hm-sch-month", role: "grid", "aria-label": title() },
-      h("div", { role: "row", class: "hm-sch-weekdays" }, weekdayShort().map((n, i) => h("div", { role: "columnheader", class: "hm-sch-wd" }, h("span", { class: "hm-sch-wd-long" }, n), h("span", { class: "hm-sch-wd-narrow", "aria-hidden": "true" }, weekdayNarrow()[i])))),
+    return h("div", { class: "m-sch-month", role: "grid", "aria-label": title() },
+      h("div", { role: "row", class: "m-sch-weekdays" }, weekdayShort().map((n, i) => h("div", { role: "columnheader", class: "m-sch-wd" }, h("span", { class: "m-sch-wd-long" }, n), h("span", { class: "m-sch-wd-narrow", "aria-hidden": "true" }, weekdayNarrow()[i])))),
       grid);
   };
 
@@ -366,51 +366,51 @@ export function Scheduler(props: SchedulerProps): Element {
     const ds = days(), list = norm(), td = today(), H = hourH(), st = step(), n = ds.length;
     const colW = (): number => (cols.getBoundingClientRect().width || 1) / n;
     // header + all-day lane (sticky inside the scroller, so columns line up with the body)
-    const head = h("div", { class: "hm-sch-tg-head", role: "row" },
-      h("div", { class: "hm-sch-corner", "aria-hidden": "true" }),
-      ds.map((d) => h("div", { role: "columnheader", class: cx("hm-sch-colhead", d === td && "is-today") },
-        h("button", { type: "button", class: "hm-sch-colhead-btn", "aria-label": dayText(d), onClick: () => setView("day", d) },
-          h("span", { class: "hm-sch-colhead-wd" }, dateFormat(loc(), { weekday: "short" }).format(utcDate(d))),
-          h("span", { class: "hm-sch-colhead-n" }, String(Number(d.slice(8))))))));
+    const head = h("div", { class: "m-sch-tg-head", role: "row" },
+      h("div", { class: "m-sch-corner", "aria-hidden": "true" }),
+      ds.map((d) => h("div", { role: "columnheader", class: cx("m-sch-colhead", d === td && "is-today") },
+        h("button", { type: "button", class: "m-sch-colhead-btn", "aria-label": dayText(d), onClick: () => setView("day", d) },
+          h("span", { class: "m-sch-colhead-wd" }, dateFormat(loc(), { weekday: "short" }).format(utcDate(d))),
+          h("span", { class: "m-sch-colhead-n" }, String(Number(d.slice(8))))))));
     const allSegs = lanes(ds, list.filter(multiDay));
     const laneCount = Math.max(1, Math.min(LANES, Math.max(0, ...allSegs.map((s) => s.lane + 1))));
-    const alldayGrid = h("div", { class: "hm-sch-allday-grid" }) as HTMLElement;
-    setStyle(alldayGrid, { "--hm-sch-cols": String(n), "--hm-sch-lanes": String(laneCount) });
-    ds.forEach((d, i) => { const c = h("div", { class: "hm-sch-allday-cell", "data-day": d }) as HTMLElement; setStyle(c, { "grid-column": String(i + 1), "grid-row": `1 / ${laneCount + 2}` }); alldayGrid.append(c); });
+    const alldayGrid = h("div", { class: "m-sch-allday-grid" }) as HTMLElement;
+    setStyle(alldayGrid, { "--m-sch-cols": String(n), "--m-sch-lanes": String(laneCount) });
+    ds.forEach((d, i) => { const c = h("div", { class: "m-sch-allday-cell", "data-day": d }) as HTMLElement; setStyle(c, { "grid-column": String(i + 1), "grid-row": `1 / ${laneCount + 2}` }); alldayGrid.append(c); });
     for (const s of allSegs.filter((x) => x.lane < LANES)) {
-      const el = evEl(s.n, "hm-sch-bar", {}, !s.cutEnd);
+      const el = evEl(s.n, "m-sch-bar", {}, !s.cutEnd);
       el.classList.toggle("is-cut-start", s.cutStart); el.classList.toggle("is-cut-end", s.cutEnd);
       setStyle(el, { "grid-column": `${s.from + 1} / ${s.to + 2}`, "grid-row": String(s.lane + 1) });
       if (editable()) el.addEventListener("pointerdown", (e) => { if (e.button) return; dayDrag(e, s.n, alldayGrid, n, () => ds, handleOf(e) ?? "move"); });
       alldayGrid.append(el);
     }
-    const allday = h("div", { class: "hm-sch-allday", role: "row" }, h("div", { class: "hm-sch-corner hm-sch-allday-label" }, lb("allDay")), alldayGrid);
+    const allday = h("div", { class: "m-sch-allday", role: "row" }, h("div", { class: "m-sch-corner m-sch-allday-label" }, lb("allDay")), alldayGrid);
 
     // body: hour gutter + day columns
-    const hours = h("div", { class: cx("hm-sch-hours", editable() && "is-editable"), "aria-hidden": "true" }, Array.from({ length: 24 }, (_, hr) => h("div", { class: "hm-sch-hour" }, hr ? h("span", {}, formatMinutes(hr * 60, loc(), { hour: "numeric" })) : null)));
+    const hours = h("div", { class: cx("m-sch-hours", editable() && "is-editable"), "aria-hidden": "true" }, Array.from({ length: 24 }, (_, hr) => h("div", { class: "m-sch-hour" }, hr ? h("span", {}, formatMinutes(hr * 60, loc(), { hour: "numeric" })) : null)));
     // editable: the gutter shows the snap step as ruler ticks (a drag or resize lands on them)
-    setStyle(hours, { "--hm-sch-step": `${(H * st) / 60}px` });
-    const cols = h("div", { class: "hm-sch-cols" }) as HTMLElement;
-    setStyle(cols, { "--hm-sch-cols": String(n), height: `${24 * H}px`, "--hm-sch-hour": `${H}px` });
+    setStyle(hours, { "--m-sch-step": `${(H * st) / 60}px` });
+    const cols = h("div", { class: "m-sch-cols" }) as HTMLElement;
+    setStyle(cols, { "--m-sch-cols": String(n), height: `${24 * H}px`, "--m-sch-hour": `${H}px` });
     ds.forEach((d, ci) => {
-      const col = h("div", { class: cx("hm-sch-col", d === td && "is-today", isWeekend(d) && "is-weekend"), "data-day": d, role: "gridcell", "aria-label": dayText(d) }) as HTMLElement;
+      const col = h("div", { class: cx("m-sch-col", d === td && "is-today", isWeekend(d) && "is-weekend"), "data-day": d, role: "gridcell", "aria-label": dayText(d) }) as HTMLElement;
       const timed = list.filter((x) => !multiDay(x) && x.sd === d);
       const lay = columnsOf(timed);
       for (const x of timed) {
         const { col: c, cols: k } = lay.get(x) as { col: number; cols: number };
-        const el = evEl(x, "hm-sch-block");
+        const el = evEl(x, "m-sch-block");
         const short = (x.em - x.sm) < 45;
         el.classList.toggle("is-short", short);
         setStyle(el, { top: `${(x.sm / 60) * H}px`, height: `${Math.max(18, ((x.em - x.sm) / 60) * H - 2)}px`, "inset-inline-start": `calc(${(c / k) * 100}% + 2px)`, width: `calc(${100 / k}% - 4px)` });
         if (editable()) el.addEventListener("pointerdown", (e) => timeDrag(e, x, el, colW, ci, ds));
         col.append(el);
       }
-      if (d === td && props.nowLine !== false) { const now = h("div", { class: "hm-sch-now", "aria-hidden": "true" }) as HTMLElement; effect(() => setStyle(now, { top: `${(nowMin() / 60) * H}px` })); col.append(now); }
+      if (d === td && props.nowLine !== false) { const now = h("div", { class: "m-sch-now", "aria-hidden": "true" }) as HTMLElement; effect(() => setStyle(now, { top: `${(nowMin() / 60) * H}px` })); col.append(now); }
       if (editable() && props.onCreate) col.addEventListener("pointerdown", (e) => { if (e.target === col && !e.button) createDrag(e, col, d); });
       cols.append(col);
     });
-    const scroll = h("div", { class: "hm-sch-tg-scroll" }, h("div", { class: "hm-sch-tg-top" }, head, allday), h("div", { class: "hm-sch-tg-body" }, hours, cols)) as HTMLElement;
-    setStyle(scroll, { height: `${props.height ?? 600}px`, "--hm-sch-cols": String(n) });
+    const scroll = h("div", { class: "m-sch-tg-scroll" }, h("div", { class: "m-sch-tg-top" }, head, allday), h("div", { class: "m-sch-tg-body" }, hours, cols)) as HTMLElement;
+    setStyle(scroll, { height: `${props.height ?? 600}px`, "--m-sch-cols": String(n) });
     scrollBox = scroll;
     later(() => {
       if (scrolledOnce) return;
@@ -418,7 +418,7 @@ export function Scheduler(props: SchedulerProps): Element {
       const hr = ds.includes(td) ? Math.max(0, untrack(nowMin) / 60 - 1.5) : props.startHour ?? 8;
       scroll.scrollTop = hr * H;
     }, 0);
-    return h("div", { class: "hm-sch-tg", role: "grid", "aria-label": title() }, scroll);
+    return h("div", { class: "m-sch-tg", role: "grid", "aria-label": title() }, scroll);
   };
 
   // move / resize a timed block: minutes snap to `step`, columns are days (mirrored in RTL)
@@ -427,7 +427,7 @@ export function Scheduler(props: SchedulerProps): Element {
     const which = handleOf(e) ?? "move";
     const H = hourH(), st = step();
     let dd = 0, dm = 0;
-    const label = el.querySelector<HTMLElement>(".hm-sch-ev-time");
+    const label = el.querySelector<HTMLElement>(".m-sch-ev-time");
     const top0 = parseFloat(el.style.top), h0 = parseFloat(el.style.height);
     pointerDrag(e, {
       scroll: scrollBox,
@@ -454,7 +454,7 @@ export function Scheduler(props: SchedulerProps): Element {
     const H = hourH(), st = step(), box = col.getBoundingClientRect();
     const m0 = clamp(Math.floor((((e.clientY - box.top) / H) * 60) / st) * st, 0, 1440 - st);
     let a = m0, b = m0 + st * 2;
-    const draft = h("div", { class: "hm-sch-draft", "aria-hidden": "true" }, h("span", {})) as HTMLElement;
+    const draft = h("div", { class: "m-sch-draft", "aria-hidden": "true" }, h("span", {})) as HTMLElement;
     const draw = (): void => { setStyle(draft, { top: `${(a / 60) * H}px`, height: `${((b - a) / 60) * H - 2}px` }); (draft.firstChild as HTMLElement).textContent = `${formatMinutes(a, loc())} – ${formatMinutes(b, loc())}`; };
     pointerDrag(e, {
       threshold: 2, scroll: scrollBox,
@@ -473,22 +473,22 @@ export function Scheduler(props: SchedulerProps): Element {
   const viewList = props.views === false ? [] : props.views ?? VIEWS;
   // the bar: a PanelHeader with the period buttons in front, the title, and the view switch at the end
   const toolbar = props.toolbar === false ? null : h(PanelHeader, {
-    as: "div", class: "hm-sch-toolbar", size: "lg", title, titleId: `${id}-title`, partClass: { title: "hm-sch-title" },
+    as: "div", class: "m-sch-toolbar", size: "lg", title, titleId: `${id}-title`, partClass: { title: "m-sch-title" },
     lead: h(PeriodNav, {
       rtl, onPrev: () => shift(-1), onNext: () => shift(1), onToday: props.todayButton === false ? undefined : () => go(today(), cur() < today() ? 1 : -1),
       labels: { group: () => lb("period"), previous: () => lb("previous"), today: () => lb("today"), next: () => lb("next") },
     }),
-    actions: viewList.length < 2 ? undefined : h(Segmented, { class: "hm-sch-views", "aria-label": lb("view"), value: view, onChange: (v: unknown) => setView(v as SchedulerView), options: () => viewList.map((v) => ({ value: v, label: lb(v) })) }),
+    actions: viewList.length < 2 ? undefined : h(Segmented, { class: "m-sch-views", "aria-label": lb("view"), value: view, onChange: (v: unknown) => setView(v as SchedulerView), options: () => viewList.map((v) => ({ value: v, label: lb(v) })) }),
   });
-  body = h("div", { class: "hm-sch-body" }, () => (view() === "month" ? Month() : TimeGrid())) as HTMLElement;
+  body = h("div", { class: "m-sch-body" }, () => (view() === "month" ? Month() : TimeGrid())) as HTMLElement;
   const root = h("section", {
-    class: () => cx("hm-sch", val(props.class)), lang: () => val(props.locale) ?? null, dir: () => (val(props.locale) ? (rtl() ? "rtl" : "ltr") : null), "aria-label": () => val(props.label) ?? t`Calendar`, "aria-describedby": props.help === false ? null : `${id}-help`,
+    class: () => cx("m-sch", val(props.class)), lang: () => val(props.locale) ?? null, dir: () => (val(props.locale) ? (rtl() ? "rtl" : "ltr") : null), "aria-label": () => val(props.label) ?? t`Calendar`, "aria-describedby": props.help === false ? null : `${id}-help`,
     onKeydown: (e: KeyboardEvent) => {
-      if ((e.target as Element).closest(".hm-sch-ev")) return;
+      if ((e.target as Element).closest(".m-sch-ev")) return;
       if (e.key === "PageUp" || e.key === "PageDown") { e.preventDefault(); shift(e.key === "PageUp" ? -1 : 1); }
     },
   }, toolbar, body, // the hint under the calendar and the (hidden) live region its changes are said in
-    h(LiveStatus, { class: "hm-sch-status", visible: false, as: "div", text: status, helpId: `${id}-help`, helpClass: "hm-sch-help", help: props.help == null || props.help === true ? () => (editable() ? lb("help") : "") : props.help })) as HTMLElement;
+    h(LiveStatus, { class: "m-sch-status", visible: false, as: "div", text: status, helpId: `${id}-help`, helpClass: "m-sch-help", help: props.help == null || props.help === true ? () => (editable() ? lb("help") : "") : props.help })) as HTMLElement;
   onCleanup(() => { scrollBox = null; });
   return root;
 }

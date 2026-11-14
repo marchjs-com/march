@@ -36,7 +36,7 @@ export function motionPreset(name: MotionPresetName | (string & {}), from: Motio
 export interface SlidingIndicatorOptions {
   /** The axis it moves along: "x" (default, mirrored in RTL) or "y". */
   axis?: MaybeFn<"x" | "y" | undefined>;
-  /** Write the item's size to this custom property (`--hm-ab-size`) instead of `width` / `height`. */
+  /** Write the item's size to this custom property (`--m-ab-size`) instead of `width` / `height`. */
   sizeVar?: string | undefined;
   /** Stretch from the old size while it glides (default true; off when `sizeVar` is set). */
   stretch?: boolean | undefined;

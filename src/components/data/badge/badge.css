@@ -1,32 +1,32 @@
 /* March — Badge. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-badge { display: inline-flex; align-items: center; gap: .3125rem; padding: 0 .4375rem; min-height: 1.25rem; border-radius: var(--hm-radius-full); font-size: var(--hm-text-xs);
-  font-weight: var(--hm-weight-medium); line-height: 1.6; white-space: nowrap; border: 1px solid transparent; font-variant-numeric: tabular-nums; }
-.hm-badge-neutral { background: var(--hm-surface-2); color: var(--hm-text-2); border-color: var(--hm-border); }
-.hm-badge-info { background: var(--hm-info-soft); color: var(--hm-info-text); border-color: color-mix(in srgb, var(--hm-info) 18%, transparent); }
-.hm-badge-success { background: var(--hm-success-soft); color: var(--hm-success-text); border-color: color-mix(in srgb, var(--hm-success) 18%, transparent); }
-.hm-badge-warn { background: var(--hm-warn-soft); color: var(--hm-warn-text); border-color: color-mix(in srgb, var(--hm-warn) 20%, transparent); }
-.hm-badge-danger { background: var(--hm-danger-soft); color: var(--hm-danger-text); border-color: color-mix(in srgb, var(--hm-danger) 18%, transparent); }
-.hm-badge-primary { background: var(--hm-accent-soft, var(--hm-primary-soft)); color: var(--hm-accent-text, var(--hm-primary-text)); border-color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 18%, transparent); }
-.hm-badge-count { min-width: 1.25rem; justify-content: center; padding: 0 .3125rem; font-weight: 600; }
-.hm-badge-count.hm-badge-danger { background: var(--hm-danger-solid); color: var(--hm-on-status, var(--hm-on-scrim)); border-color: transparent; }
+.m-badge { display: inline-flex; align-items: center; gap: .3125rem; padding: 0 .4375rem; min-height: 1.25rem; border-radius: var(--m-radius-full); font-size: var(--m-text-xs);
+  font-weight: var(--m-weight-medium); line-height: 1.6; white-space: nowrap; border: 1px solid transparent; font-variant-numeric: tabular-nums; }
+.m-badge-neutral { background: var(--m-surface-2); color: var(--m-text-2); border-color: var(--m-border); }
+.m-badge-info { background: var(--m-info-soft); color: var(--m-info-text); border-color: color-mix(in srgb, var(--m-info) 18%, transparent); }
+.m-badge-success { background: var(--m-success-soft); color: var(--m-success-text); border-color: color-mix(in srgb, var(--m-success) 18%, transparent); }
+.m-badge-warn { background: var(--m-warn-soft); color: var(--m-warn-text); border-color: color-mix(in srgb, var(--m-warn) 20%, transparent); }
+.m-badge-danger { background: var(--m-danger-soft); color: var(--m-danger-text); border-color: color-mix(in srgb, var(--m-danger) 18%, transparent); }
+.m-badge-primary { background: var(--m-accent-soft, var(--m-primary-soft)); color: var(--m-accent-text, var(--m-primary-text)); border-color: color-mix(in srgb, var(--m-accent, var(--m-primary)) 18%, transparent); }
+.m-badge-count { min-width: 1.25rem; justify-content: center; padding: 0 .3125rem; font-weight: 600; }
+.m-badge-count.m-badge-danger { background: var(--m-danger-solid); color: var(--m-on-status, var(--m-on-scrim)); border-color: transparent; }
 /* solid: the tone's full colour with the text on it */
-.hm-badge-solid { --hm-badge-fill: var(--hm-text-2); --hm-badge-on: var(--hm-surface); background: var(--hm-badge-fill); color: var(--hm-badge-on); border-color: transparent; font-weight: 700; }
-.hm-badge-solid.hm-badge-primary { --hm-badge-fill: var(--hm-accent, var(--hm-primary)); --hm-badge-on: var(--hm-on-accent, var(--hm-on-primary-fill)); }
-.hm-badge-solid.hm-badge-info { --hm-badge-fill: var(--hm-info); --hm-badge-on: var(--hm-on-info-fill); }
-.hm-badge-solid.hm-badge-success { --hm-badge-fill: var(--hm-success); --hm-badge-on: var(--hm-on-success-fill); }
-.hm-badge-solid.hm-badge-warn { --hm-badge-fill: var(--hm-warn); --hm-badge-on: var(--hm-on-warn-fill); }
-.hm-badge-solid.hm-badge-danger { --hm-badge-fill: var(--hm-danger-solid); --hm-badge-on: var(--hm-on-status, var(--hm-on-scrim)); }
-.hm-badge-dot-own { display: inline-flex; flex: none; }
+.m-badge-solid { --m-badge-fill: var(--m-text-2); --m-badge-on: var(--m-surface); background: var(--m-badge-fill); color: var(--m-badge-on); border-color: transparent; font-weight: 700; }
+.m-badge-solid.m-badge-primary { --m-badge-fill: var(--m-accent, var(--m-primary)); --m-badge-on: var(--m-on-accent, var(--m-on-primary-fill)); }
+.m-badge-solid.m-badge-info { --m-badge-fill: var(--m-info); --m-badge-on: var(--m-on-info-fill); }
+.m-badge-solid.m-badge-success { --m-badge-fill: var(--m-success); --m-badge-on: var(--m-on-success-fill); }
+.m-badge-solid.m-badge-warn { --m-badge-fill: var(--m-warn); --m-badge-on: var(--m-on-warn-fill); }
+.m-badge-solid.m-badge-danger { --m-badge-fill: var(--m-danger-solid); --m-badge-on: var(--m-on-status, var(--m-on-scrim)); }
+.m-badge-dot-own { display: inline-flex; flex: none; }
 /* xs: the mini badge on the corner of an icon button, a tab, a rail item */
-.hm-badge-xs { gap: .1875rem; min-height: 1rem; padding: 0 .25rem; font-size: .625rem; line-height: 1rem; }
-.hm-badge-xs.hm-badge-count { min-width: 1rem; padding: 0 .25rem; }
+.m-badge-xs { gap: .1875rem; min-height: 1rem; padding: 0 .25rem; font-size: .625rem; line-height: 1rem; }
+.m-badge-xs.m-badge-count { min-width: 1rem; padding: 0 .25rem; }
 /* the built-in dot (a StatusDot) takes the badge's text colour unless `dotColor` names one */
-.hm-badge > .hm-status-dot:not([data-hm-color]) { --hm-status-dot-c: currentColor; }
-.hm-badge .hm-badge-dot-pulse.is-pulse-ring { margin-inline: .125rem; }
+.m-badge > .m-status-dot:not([data-m-color]) { --m-status-dot-c: currentColor; }
+.m-badge .m-badge-dot-pulse.is-pulse-ring { margin-inline: .125rem; }
 /* clickable: a button with the badge look */
-.hm-badge-btn { margin: 0; font-family: inherit; cursor: pointer; appearance: none; transition: border-color var(--hm-dur-fast) var(--hm-ease), box-shadow var(--hm-dur-fast) var(--hm-ease); }
-.hm-badge-btn:hover:not(:disabled) { border-color: currentColor; }
-.hm-badge-btn:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: 2px; }
-.hm-badge-btn.is-pressed { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
-.hm-badge-btn:disabled { cursor: default; opacity: .6; }
-@media (prefers-reduced-motion: reduce) { .hm-badge-btn { transition: none; } }
+.m-badge-btn { margin: 0; font-family: inherit; cursor: pointer; appearance: none; transition: border-color var(--m-dur-fast) var(--m-ease), box-shadow var(--m-dur-fast) var(--m-ease); }
+.m-badge-btn:hover:not(:disabled) { border-color: currentColor; }
+.m-badge-btn:focus-visible { outline: 2px solid var(--m-focus); outline-offset: 2px; }
+.m-badge-btn.is-pressed { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+.m-badge-btn:disabled { cursor: default; opacity: .6; }
+@media (prefers-reduced-motion: reduce) { .m-badge-btn { transition: none; } }

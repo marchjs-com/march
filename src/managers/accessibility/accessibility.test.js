@@ -11,17 +11,17 @@ const root = () => document.documentElement;
 
 test("set applies to <html>, saves, and a new instance loads it", () => {
   disposeA11y();
-  localStorage.removeItem("hm.a11y");
+  localStorage.removeItem("m.a11y");
   assert.deepEqual(a11y.prefs(), DEFAULT_PREFS);
   a11y.set({ contrast: true, underlineLinks: true, fontScale: 1.25 });
-  assert.equal(root().hasAttribute("data-hm-a11y-contrast"), true);
-  assert.equal(root().hasAttribute("data-hm-a11y-links"), true);
-  assert.equal(root().hasAttribute("data-hm-a11y-spacing"), false);
+  assert.equal(root().hasAttribute("data-m-a11y-contrast"), true);
+  assert.equal(root().hasAttribute("data-m-a11y-links"), true);
+  assert.equal(root().hasAttribute("data-m-a11y-spacing"), false);
   assert.equal(root().style.getPropertyValue("font-size"), "125%");
   disposeA11y();
-  assert.equal(root().hasAttribute("data-hm-a11y-contrast"), false, "dispose takes it off");
+  assert.equal(root().hasAttribute("data-m-a11y-contrast"), false, "dispose takes it off");
   assert.equal(a11y.prefs().contrast, true, "loaded from storage");
-  assert.equal(root().hasAttribute("data-hm-a11y-contrast"), true);
+  assert.equal(root().hasAttribute("data-m-a11y-contrast"), true);
 });
 
 test("motion drives the engine's reduced-motion override; fontScale is clamped; bad values are ignored", () => {
@@ -40,11 +40,11 @@ test("motion drives the engine's reduced-motion override; fontScale is clamped; 
 });
 
 test("storage null keeps preferences in memory only", () => {
-  configureA11y({ storage: null, storageKey: "hm.a11y.mem" });
+  configureA11y({ storage: null, storageKey: "m.a11y.mem" });
   a11y.set({ strongFocus: true });
-  assert.equal(localStorage.getItem("hm.a11y.mem"), null);
+  assert.equal(localStorage.getItem("m.a11y.mem"), null);
   a11y.reset();
-  configureA11y({ storage: undefined, storageKey: "hm.a11y" });
+  configureA11y({ storage: undefined, storageKey: "m.a11y" });
 });
 
 test("audit finds the common problems and skips hidden content", () => {

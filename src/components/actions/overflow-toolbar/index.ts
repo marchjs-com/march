@@ -94,22 +94,22 @@ export function OverflowToolbar(props: OverflowToolbarProps): Element {
   });
   const { shown, isShown } = fit;
 
-  const SEL = ".hm-otb-btn, .hm-otb-more > button";
+  const SEL = ".m-otb-btn, .m-otb-more > button";
   const button = (it: ToolbarItem, b: CommandBinding): unknown => {
     const tip = (): string => labelWithKey(b.label(), b.shortcut());
     const iconOnly = !!b.icon() && !it.showLabel;
     const shared = {
-      class: () => cx("hm-otb-btn", iconOnly && "is-icon", it.danger && "is-danger", b.busy() && "is-busy"),
+      class: () => cx("m-otb-btn", iconOnly && "is-icon", it.danger && "is-danger", b.busy() && "is-busy"),
       tabindex: "-1", ...(it.pressed !== undefined ? { pressed: () => !!val(it.pressed) } : null),
       "aria-keyshortcuts": () => b.shortcut() ?? null, disabled: () => b.disabled(), onClick: () => b.run(),
-      icon: () => icon(b.icon(), "hm-otb-icon"),
+      icon: () => icon(b.icon(), "m-otb-icon"),
     };
     const btn = iconOnly ? h(IconButton, { ...shared, size: props.size === "md" ? "md" : "sm", label: tip, title: false })
       : h(Button, { ...shared, variant: "ghost", size: props.size === "md" ? "md" : "sm" }, () => b.label());
     return iconOnly && props.tooltips !== false ? h(Tooltip, { text: tip, placement: "bottom", children: btn }) : btn;
   };
-  const items = (): unknown => present().map((x, i) => untrack(() => h("div", { class: "hm-otb-item", hidden: () => !isShown(i) },
-    x.it.separator ? h(Divider, { vertical: true, class: "hm-otb-sep" }) : button(x.it, x.b!))));
+  const items = (): unknown => present().map((x, i) => untrack(() => h("div", { class: "m-otb-item", hidden: () => !isShown(i) },
+    x.it.separator ? h(Divider, { vertical: true, class: "m-otb-sep" }) : button(x.it, x.b!))));
   const overflow = computed((): MenuItem[] => present().flatMap((x, i): MenuItem[] => {
     if (isShown(i)) return [];
     if (x.it.separator) return ["-"];
@@ -125,10 +125,10 @@ export function OverflowToolbar(props: OverflowToolbarProps): Element {
   // one tab stop: the first enabled button (the roving-focus behavior moves it with the arrow keys and on focus)
   effect(() => { shown(); present(); queueMicrotask(() => { const bs = buttons(); if (bs.length && !bs.some((b) => b.tabIndex === 0)) bs[0]!.tabIndex = 0; }); });
 
-  return h("div", { class: () => cx("hm-otb", props.size === "md" ? "hm-otb-md" : "hm-otb-sm", val(props.class)), role: "toolbar", "aria-label": () => val(props.label), "data-hm-color": () => colorAttr(props.color),
+  return h("div", { class: () => cx("m-otb", props.size === "md" ? "m-otb-md" : "m-otb-sm", val(props.class)), role: "toolbar", "aria-label": () => val(props.label), "data-m-color": () => colorAttr(props.color),
     ref: (x: HTMLElement) => { onCleanup(rovingFocus(x, { orientation: "horizontal", selector: SEL })); } },
-    h("div", { class: "hm-otb-items", ref: (x: HTMLElement) => { row = x; fit.observe(x); } }, items),
-    h("div", { class: "hm-otb-more", hidden: () => overflow().length === 0, ref: (x: HTMLElement) => { moreEl = x; } },
+    h("div", { class: "m-otb-items", ref: (x: HTMLElement) => { row = x; fit.observe(x); } }, items),
+    h("div", { class: "m-otb-more", hidden: () => overflow().length === 0, ref: (x: HTMLElement) => { moreEl = x; } },
       h(Menu, { label: () => val(props.moreLabel) ?? t`More actions`, icon: ownIcon(props.moreIcon === false ? undefined : props.moreIcon ?? undefined, more), items: () => overflow(), size: "sm", variant: "ghost", placement: "bottom-end" })),
-    props.end != null && h("div", { class: "hm-otb-end" }, props.end));
+    props.end != null && h("div", { class: "m-otb-end" }, props.end));
 }

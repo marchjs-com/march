@@ -39,13 +39,13 @@ export interface IconButtonProps {
  */
 export function IconButton(props: IconButtonProps): Element {
   if (props.label == null && props["aria-label"] == null) throw new Error("March: <IconButton> needs a label (accessible name).");
-  const size = (): string | undefined => { const s = val(props.size); return s === "xs" ? "hm-btn-xs" : buttonSizeClass(s); };
-  const variant = (): string | false => { const v = val(props.variant); return !!v && `hm-icon-btn-${v}`; };
+  const size = (): string | undefined => { const s = val(props.size); return s === "xs" ? "m-btn-xs" : buttonSizeClass(s); };
+  const variant = (): string | false => { const v = val(props.variant); return !!v && `m-icon-btn-${v}`; };
   const attrs = {
     ...rest(props, ["icon", "label", "variant", "size", "shape", "pressed", "inverse", "href", "title", "color"]),
-    class: () => cx("hm-icon-btn", variant(), size(), val(props.shape) === "round" && "hm-icon-btn-round", val(props.inverse) && "hm-icon-btn-inverse", val(props.pressed) && "is-pressed", val(props.class)),
+    class: () => cx("m-icon-btn", variant(), size(), val(props.shape) === "round" && "m-icon-btn-round", val(props.inverse) && "m-icon-btn-inverse", val(props.pressed) && "is-pressed", val(props.class)),
     "aria-label": () => val(props.label) ?? val(props["aria-label"]), title: () => (props.title === false ? null : val(props.title) ?? val(props.label)),
-    "data-hm-color": () => colorAttr(props.color),
+    "data-m-color": () => colorAttr(props.color),
   };
   const body = [() => icon(val(props.icon)), props.children];
   if (props.href != null) return buttonLink(attrs, props.href as MaybeFn<ButtonHref>, body) as Element;

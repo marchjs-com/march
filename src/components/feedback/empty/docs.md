@@ -25,7 +25,7 @@ What a list, table or page shows when it has nothing yet: an icon in a raised ti
 ## Accessibility
 
 Plain content: the title is a paragraph in the reading order, the icon is decorative, the actions are ordinary buttons
-reachable with Tab. Tables and the router use the same `hm-empty` look for their own empty states.
+reachable with Tab. Tables and the router use the same `m-empty` look for their own empty states.
 
 ## Composed of
 

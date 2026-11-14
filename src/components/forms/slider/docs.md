@@ -30,7 +30,7 @@ percentage, a label).
 ```
 
 With `track` the input stays a native range (keyboard, forms, screen readers); only its track is cleared and the thumb
-drawn. `--hm-slider-thumb` on the control (or an ancestor) fills the thumb, e.g. with the picked colour.
+drawn. `--m-slider-thumb` on the control (or an ancestor) fills the thumb, e.g. with the picked colour.
 
 ## Accessibility
 

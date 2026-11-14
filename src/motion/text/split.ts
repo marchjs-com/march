@@ -24,7 +24,7 @@ export interface SplitText {
   revert(): void;
 }
 
-const K = Symbol.for("hm.textSplit");
+const K = Symbol.for("m.textSplit");
 const JOINING = /[؀-ࣿऀ-෿᠀-᢯ﭐ-﷿ﹰ-﻿]/;
 let seg: { segment(s: string): Iterable<{ segment: string }> } | null | undefined;
 /** Grapheme clusters of a string (Intl.Segmenter; code points where it is missing). */
@@ -59,20 +59,20 @@ export function splitText(el: HTMLElement, by: SplitBy = "char"): SplitText {
   const text = el.textContent ?? "";
   const unit: SplitBy = by === "char" && JOINING.test(text) ? "word" : by;
   const parts: HTMLElement[] = [];
-  const sr = span(doc, "hm-tx-sr");
+  const sr = span(doc, "m-tx-sr");
   css(sr, HIDDEN);
   sr.textContent = text;
-  const visual = span(doc, "hm-tx");
+  const visual = span(doc, "m-tx");
   visual.setAttribute("aria-hidden", "true");
 
   const words = (s: string, into: Node): void => {
     for (const piece of s.split(/(\s+)/)) {
       if (!piece) continue;
       if (/^\s+$/.test(piece)) { into.appendChild(doc.createTextNode(piece)); continue; }
-      const w = span(doc, "hm-tx-word");
+      const w = span(doc, "m-tx-word");
       css(w, { display: "inline-block", "white-space": "nowrap" });
       if (unit === "char") {
-        for (const g of graphemes(piece)) { const c = span(doc, "hm-tx-char"); css(c, { display: "inline-block" }); c.textContent = g; w.appendChild(c); parts.push(c); }
+        for (const g of graphemes(piece)) { const c = span(doc, "m-tx-char"); css(c, { display: "inline-block" }); c.textContent = g; w.appendChild(c); parts.push(c); }
       } else { w.textContent = piece; parts.push(w); }
       into.appendChild(w);
     }
@@ -97,7 +97,7 @@ export function splitText(el: HTMLElement, by: SplitBy = "char"): SplitText {
       const t = tops[wi++];
       if (!line || t !== top) {
         if (line) visual.appendChild(doc.createTextNode(" "));
-        line = span(doc, "hm-tx-line");
+        line = span(doc, "m-tx-line");
         css(line, { display: "inline-block", "white-space": "nowrap" });
         visual.appendChild(line);
         parts.push(line);

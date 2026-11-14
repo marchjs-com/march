@@ -14,7 +14,7 @@ import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 /** The overlay scope around this code (an <OverlayScope>). */
 export const OverlayScopeContext = context<HTMLElement | null>(null);
 
-const scopeAround = (el: unknown): HTMLElement | null => ((el as Element | null | undefined)?.closest?.(".hm-overlay-scope") as HTMLElement | null | undefined) ?? null;
+const scopeAround = (el: unknown): HTMLElement | null => ((el as Element | null | undefined)?.closest?.(".m-overlay-scope") as HTMLElement | null | undefined) ?? null;
 
 /** The scope a layer opened now belongs in: the <OverlayScope> around the calling component, else the one around
  *  `from`; without `from` (a click handler runs outside any component) the one around the element the event being
@@ -32,7 +32,7 @@ export interface OverlayScopeProps { class?: MaybeFn<ClassProp>; children?: unkn
 
 /** A box that keeps the layers opened inside it (drawers, dialogs, menus, toasts) inside it. */
 export function OverlayScope(props: OverlayScopeProps): Element {
-  const el = h("div", { class: () => cx("hm-overlay-scope", val(props.class)) }) as HTMLElement;
+  const el = h("div", { class: () => cx("m-overlay-scope", val(props.class)) }) as HTMLElement;
   // CSSOM (CSP-safe): positioned, and the containing block of its fixed descendants
   el.style.setProperty("position", "relative");
   el.style.setProperty("contain", "layout");

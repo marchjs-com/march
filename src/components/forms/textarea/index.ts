@@ -35,7 +35,7 @@ export function Textarea(props: TextareaProps): unknown {
     }
     leave = e.key === "Escape";
   };
-  const el = h("textarea", { ...ctl(props), ...textAttrs(props), rows: props.rows ?? 3, class: cx("hm-input hm-textarea", props.mono && "hm-mono", props.autosize !== false && "hm-textarea-grow", props.class), onKeyDown, onInput: (e: Event) => { set((e.target as HTMLTextAreaElement).value); fit(); } }) as HTMLTextAreaElement;
+  const el = h("textarea", { ...ctl(props), ...textAttrs(props), rows: props.rows ?? 3, class: cx("m-input m-textarea", props.mono && "m-mono", props.autosize !== false && "m-textarea-grow", props.class), onKeyDown, onInput: (e: Event) => { set((e.target as HTMLTextAreaElement).value); fit(); } }) as HTMLTextAreaElement;
   const fit = () => {
     if (props.autosize === false || !el.scrollHeight) return;
     el.style.setProperty("height", "auto");

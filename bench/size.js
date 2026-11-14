@@ -39,7 +39,7 @@ export async function sizes(names = Object.keys(ENTRIES)) {
 export async function buildApp(source) {
   const esbuild = await import("esbuild");
   const { march } = await import("../compiler/esbuild.js");
-  const dir = mkdtempSync(join(tmpdir(), "hm-size-"));
+  const dir = mkdtempSync(join(tmpdir(), "m-size-"));
   try {
     writeFileSync(join(dir, "main.tsx"), source);
     const r = await esbuild.build({ entryPoints: [join(dir, "main.tsx")], absWorkingDir: dir, bundle: true, minify: true, format: "esm", write: false,

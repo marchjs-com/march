@@ -25,7 +25,7 @@ const vp = viewport();
 vp.breakpoint()   vp.up("lg")   vp.down("md")   vp.mobile()   vp.tablet()   vp.desktop()   vp.width()   vp.height()
 vp.dark()   vp.reducedMotion()   vp.reducedData()   vp.highContrast()   vp.touch()   vp.pointer()   vp.hover()
 vp.online()   vp.visible()   vp.orientation()   vp.safeArea()   vp.media("(min-aspect-ratio: 16/9)")
-const box = vp.container(el, { sm: 360, md: 560 }); box.name(); box.up("md")   // also sets data-hm-bp on el
+const box = vp.container(el, { sm: 360, md: 560 }); box.name(); box.up("md")   // also sets data-m-bp on el
 <aside when:desktop>…</aside>   <video when:reducedData={false} />   <p when:offline>Offline</p>   <div when:lg>…</div>
 configureViewport({ breakpoints: { xs: 0, md: 768, lg: 1024 }, mobile: "md", desktop: "lg", dark: () => resolvedTheme() === "dark" })
 ```
@@ -36,7 +36,7 @@ online, offline, visible, portrait, landscape, or a breakpoint name (at least th
 ## ConsentManager — `hadi-march/managers/consent` (+ `/ui`)
 
 Categories `necessary` (always on), `preferences`, `analytics`, `marketing`, `thirdParty` (or your own). The record
-`{ version, date, choices, method }` is kept in localStorage (`hm.consent`), checked against the policy `version` and
+`{ version, date, choices, method }` is kept in localStorage (`m.consent`), checked against the policy `version` and
 `maxAgeDays` (default 365), and synced across tabs.
 
 ```tsx

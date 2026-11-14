@@ -51,7 +51,7 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
   const multi = !!props.multiple;
   const [get, set] = model<unknown>(props, multi ? [] : null);
   const getList = () => get() as unknown[] | null;
-  const listId = uid("hm-lb");
+  const listId = uid("m-lb");
   const open = signal(false), q = signal(""), active = signal(-1), loading = signal(false), error = signal<string | null>(null), remote = signal<Option[] | null>(null);
   const seen = signal<Option[]>([], { equals: false }); // options picked from search results (for labels)
   const statics = computed(() => normOptions(props.options));
@@ -111,7 +111,7 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
   const removeAt = (v: unknown) => set((untrack(getList) ?? []).filter((x) => !same(x, v)));
   const nav = listNav({ count: () => items.peek().length, active, onPick: pick, onOpen: openList, isOpen: () => open.peek() });
   input = h("input", {
-    ...ctl(props), type: "text", role: "combobox", class: "hm-input hm-combo-input", autocomplete: "off", spellcheck: "false",
+    ...ctl(props), type: "text", role: "combobox", class: "m-input m-combo-input", autocomplete: "off", spellcheck: "false",
     "aria-autocomplete": "list", "aria-expanded": () => String(open()), "aria-controls": listId,
     "aria-activedescendant": () => (open() && active() >= 0 && items()[active()] ? `${listId}-${active()}` : null),
     placeholder: () => props.placeholder ?? null, readonly: () => !!props.readonly,
@@ -142,7 +142,7 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
   // loading, empty and error states: the list's "empty" part, said as a status
   const status = (): unknown => {
     const lb = props.labels;
-    return h("div", { class: "hm-listbox-status", role: "status" },
+    return h("div", { class: "m-listbox-status", role: "status" },
       error() ? (lb?.searchFailed ? lb.searchFailed(error()!) : t`Search failed: ${error()}`)
         : loading() ? lb?.searching ?? t`Searching…`
           : props.search && remote() == null ? lb?.typeToSearch ?? t`Type to search` : lb?.noResults ?? t`No results`);
@@ -151,19 +151,19 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
   const chosen = computed(() => { const on = items().filter((o) => isSel(o.value)); return multi ? on : on[0] ?? null; });
   // the options are an OptionList driven from here: focus stays in the input, `active` is the highlight
   const panel = () => floating({
-    anchor: wrap, class: "hm-listbox", role: null, onClose: () => { close(); restore(); },
+    anchor: wrap, class: "m-listbox", role: null, onClose: () => { close(); restore(); },
     children: h(OptionList<Option>, {
       id: listId, keys: false, active, multiple: multi, check: false, overflow: "wrap", label: () => props["aria-label"] ?? undefined,
       options: rows, value: chosen, empty: status, onPick: (o) => pick(items.peek().indexOf(o)),
       ...(props.renderOption ? { renderOption: (it: OptionItem<Option>) => props.renderOption!(it.value) } : null),
     }),
   });
-  wrap = h("div", { class: () => cx("hm-combo", multi && "hm-multi", props.class), "class:hm-disabled": () => !!props.disabled, onClick: (e: MouseEvent) => { if (e.target === wrap) input.focus(); } },
+  wrap = h("div", { class: () => cx("m-combo", multi && "m-multi", props.class), "class:m-disabled": () => !!props.disabled, onClick: (e: MouseEvent) => { if (e.target === wrap) input.focus(); } },
     multi ? () => (getList() ?? []).map((v) => {
       const label = labelOf(v);
       const fixed = props.readonly || props.disabled || props.removeIcon === false;
       return h(Chip, {
-        class: "hm-chip", removeLabel: props.labels?.remove?.(label) ?? t`Remove ${label}`, removeIcon: ownPart(props.removeIcon, () => undefined),
+        class: "m-chip", removeLabel: props.labels?.remove?.(label) ?? t`Remove ${label}`, removeIcon: ownPart(props.removeIcon, () => undefined),
         ...(fixed ? null : { onRemove: () => { removeAt(v); input.focus(); } }),
       }, label);
     }) : null,

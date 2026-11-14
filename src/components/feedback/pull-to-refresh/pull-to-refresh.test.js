@@ -12,7 +12,7 @@ test("PullToRefresh: pull past the threshold runs the async refresh, spins, then
   const phases = [];
   let resolve, calls = 0;
   const m = mount(() => h(PullToRefresh, { threshold: 40, onPhase: (p) => phases.push(p), onRefresh: () => { calls++; return new Promise((r) => { resolve = r; }); } }, h("p", null, "feed")));
-  const root = m.el.querySelector(".hm-ptr");
+  const root = m.el.querySelector(".m-ptr");
   const item = root.querySelector("p");
   item.dispatchEvent(ev("pointerdown", 10, 0));
   item.dispatchEvent(ev("pointermove", 10, 30));
@@ -34,8 +34,8 @@ test("PullToRefresh: pull past the threshold runs the async refresh, spins, then
 test("PullToRefresh: a short pull springs back without refreshing; the click after a pull is swallowed", async () => {
   let calls = 0, clicks = 0;
   const m = mount(() => h(PullToRefresh, { threshold: 80, onRefresh: () => { calls++; } }, h("button", { onClick: () => clicks++ }, "row")));
-  const root = m.el.querySelector(".hm-ptr");
-  const row = root.querySelector(".hm-ptr-content button");
+  const root = m.el.querySelector(".m-ptr");
+  const row = root.querySelector(".m-ptr-content button");
   row.dispatchEvent(ev("pointerdown", 10, 0));
   row.dispatchEvent(ev("pointermove", 10, 40));
   row.dispatchEvent(ev("pointerup", 10, 40));
@@ -50,8 +50,8 @@ test("PullToRefresh: a short pull springs back without refreshing; the click aft
 test("PullToRefresh: keyboard button refreshes; disabled ignores pulls", async () => {
   let calls = 0;
   const m = mount(() => [h(PullToRefresh, { onRefresh: () => { calls++; } }, "a"), h(PullToRefresh, { disabled: true, onRefresh: () => { calls++; } }, "b")]);
-  const [a, b] = m.el.querySelectorAll(".hm-ptr");
-  const kbd = a.querySelector(".hm-ptr-kbd");
+  const [a, b] = m.el.querySelectorAll(".m-ptr");
+  const kbd = a.querySelector(".m-ptr-kbd");
   assert.equal(kbd.textContent, "Refresh");
   kbd.click();
   assert.equal(calls, 1);
@@ -60,7 +60,7 @@ test("PullToRefresh: keyboard button refreshes; disabled ignores pulls", async (
   b.dispatchEvent(ev("pointermove", 0, 300));
   b.dispatchEvent(ev("pointerup", 0, 300));
   assert.equal(calls, 1);
-  assert.ok(b.querySelector(".hm-ptr-kbd").disabled);
+  assert.ok(b.querySelector(".m-ptr-kbd").disabled);
   m.dispose();
 });
 
@@ -71,25 +71,25 @@ test("PullToRefresh: own labels, icon and colour; an own indicator; no indicator
     h(PullToRefresh, { onRefresh: () => {}, indicator: (p) => { seen.push(p); return h("b", { class: "own" }, p); } }, "b"),
     h(PullToRefresh, { threshold: 40, onRefresh: () => {}, indicator: false, refreshButton: false, settle: false }, h("p", null, "c")),
   ]);
-  const [a, b, c] = m.el.querySelectorAll(".hm-ptr");
-  assert.equal(a.querySelector(".hm-ptr-kbd").textContent, "Reload");
-  assert.ok(a.querySelector(".hm-ptr-spin .mine"));
-  assert.equal(a.querySelector(".hm-ptr-spin svg"), null);
-  assert.equal(a.querySelector(".hm-ptr-ind").getAttribute("data-hm-color"), "brand-orange");
+  const [a, b, c] = m.el.querySelectorAll(".m-ptr");
+  assert.equal(a.querySelector(".m-ptr-kbd").textContent, "Reload");
+  assert.ok(a.querySelector(".m-ptr-spin .mine"));
+  assert.equal(a.querySelector(".m-ptr-spin svg"), null);
+  assert.equal(a.querySelector(".m-ptr-ind").getAttribute("data-m-color"), "brand-orange");
   const p = a.querySelector("p");
   p.dispatchEvent(ev("pointerdown", 10, 0));
   p.dispatchEvent(ev("pointermove", 10, 140));
   assert.equal(a.querySelector("[role=status]").textContent, "Let go");
   p.dispatchEvent(ev("pointerup", 10, 140));
   await tick(); await tick();
-  assert.ok(b.querySelector(".hm-ptr-ind.is-own .own"));
-  assert.equal(b.querySelector(".hm-ptr-spin"), null);
-  b.querySelector(".hm-ptr-kbd").click();
+  assert.ok(b.querySelector(".m-ptr-ind.is-own .own"));
+  assert.equal(b.querySelector(".m-ptr-spin"), null);
+  b.querySelector(".m-ptr-kbd").click();
   assert.equal(b.querySelector(".own").textContent, "refreshing");
   await tick(); await tick();
   assert.deepEqual(seen, ["idle", "refreshing", "idle"]);
-  assert.equal(c.querySelector(".hm-ptr-ind"), null);
-  assert.equal(c.querySelector(".hm-ptr-kbd"), null);
+  assert.equal(c.querySelector(".m-ptr-ind"), null);
+  assert.equal(c.querySelector(".m-ptr-kbd"), null);
   const q = c.querySelector("p");
   q.dispatchEvent(ev("pointerdown", 10, 0));
   q.dispatchEvent(ev("pointermove", 10, 140));

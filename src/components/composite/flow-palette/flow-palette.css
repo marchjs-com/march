@@ -1,20 +1,20 @@
-/* March — FlowPalette. A card is a ListRow button that carries its node type's colour (data-hm-color → --hm-accent). */
-.hm-flowpal { display: grid; align-content: start; gap: .75rem; min-inline-size: 0; }
-.hm-flowpal-cat { display: grid; gap: .375rem; min-inline-size: 0; }
-.hm-flowpal-cattitle.hm-section-label { min-block-size: 0; }
-.hm-flowpal-list { display: grid; gap: .375rem; margin: 0; padding: 0; list-style: none; }
-.hm-flowpal-item { min-inline-size: 0; }
-.hm-flowpal-card.hm-listrow { gap: .625rem; padding: .5rem .625rem; border: 1px solid var(--hm-border); background: var(--hm-surface); cursor: grab; touch-action: none; overflow: hidden;
-  transition: border-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease), transform var(--hm-dur-fast) var(--hm-ease); }
-.hm-flowpal-card::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 3px; background: var(--hm-accent, var(--hm-primary)); }
-.hm-flowpal-card.hm-listrow:hover { border-color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 50%, var(--hm-border)); background: var(--hm-surface); box-shadow: var(--hm-shadow-2); transform: translateY(-1px); }
-.hm-flowpal-card.hm-listrow:focus-visible { outline: 3px solid var(--hm-focus); outline-offset: 2px; }
-.hm-flowpal-card.is-dragging { opacity: .45; }
-.hm-flowpal-icon.hm-icon-tile { inline-size: 2rem; block-size: 2rem; border-radius: .5rem; }
-.hm-flowpal-name { font-size: var(--hm-text-sm); font-weight: 600; }
-.hm-flowpal-desc { color: var(--hm-text-2); }
-.hm-flowpal-grip { inline-size: .5rem; block-size: 1rem; opacity: .45; color: var(--hm-text);
+/* March — FlowPalette. A card is a ListRow button that carries its node type's colour (data-m-color → --m-accent). */
+.m-flowpal { display: grid; align-content: start; gap: .75rem; min-inline-size: 0; }
+.m-flowpal-cat { display: grid; gap: .375rem; min-inline-size: 0; }
+.m-flowpal-cattitle.m-section-label { min-block-size: 0; }
+.m-flowpal-list { display: grid; gap: .375rem; margin: 0; padding: 0; list-style: none; }
+.m-flowpal-item { min-inline-size: 0; }
+.m-flowpal-card.m-listrow { gap: .625rem; padding: .5rem .625rem; border: 1px solid var(--m-border); background: var(--m-surface); cursor: grab; touch-action: none; overflow: hidden;
+  transition: border-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease), transform var(--m-dur-fast) var(--m-ease); }
+.m-flowpal-card::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 3px; background: var(--m-accent, var(--m-primary)); }
+.m-flowpal-card.m-listrow:hover { border-color: color-mix(in srgb, var(--m-accent, var(--m-primary)) 50%, var(--m-border)); background: var(--m-surface); box-shadow: var(--m-shadow-2); transform: translateY(-1px); }
+.m-flowpal-card.m-listrow:focus-visible { outline: 3px solid var(--m-focus); outline-offset: 2px; }
+.m-flowpal-card.is-dragging { opacity: .45; }
+.m-flowpal-icon.m-icon-tile { inline-size: 2rem; block-size: 2rem; border-radius: .5rem; }
+.m-flowpal-name { font-size: var(--m-text-sm); font-weight: 600; }
+.m-flowpal-desc { color: var(--m-text-2); }
+.m-flowpal-grip { inline-size: .5rem; block-size: 1rem; opacity: .45; color: var(--m-text);
   background-image: radial-gradient(circle, currentColor 1px, transparent 1.4px); background-size: 4px 4px; }
-.hm-flowpal-ghost.hm-listrow { position: fixed; inset-block-start: 0; inset-inline-start: 0; margin: 0; box-shadow: var(--hm-shadow-4); cursor: grabbing; pointer-events: none; }
-.hm-flowpal-ghost.is-over { border-color: var(--hm-accent, var(--hm-primary)); }
-@media (prefers-reduced-motion: reduce) { .hm-flowpal-card.hm-listrow { transition: none; } }
+.m-flowpal-ghost.m-listrow { position: fixed; inset-block-start: 0; inset-inline-start: 0; margin: 0; box-shadow: var(--m-shadow-4); cursor: grabbing; pointer-events: none; }
+.m-flowpal-ghost.is-over { border-color: var(--m-accent, var(--m-primary)); }
+@media (prefers-reduced-motion: reduce) { .m-flowpal-card.m-listrow { transition: none; } }

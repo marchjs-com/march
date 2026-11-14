@@ -13,17 +13,17 @@ test("CommandPalette: the old ui path is the same module; the button opens it; a
   assert.equal(Old.openPalette, P.openPalette, "src/ui/palette.ts re-exports the folder");
   const m = mount(() => [h(P.CommandPalette, { shortcut: false }), h(P.PaletteButton, { label: "Ara" })]);
   const off = P.registerCommands([{ id: "t.hello", title: "Merhaba komutu", run: () => {} }]);
-  m.el.querySelector(".hm-pal-trigger").click();
+  m.el.querySelector(".m-pal-trigger").click();
   assert.equal(P.paletteOpen(), true);
   await P.preloadPalette(); await tick();
-  const input = document.querySelector(".hm-pal-input");
+  const input = document.querySelector(".m-pal-input");
   input.value = "merhba"; input.dispatchEvent(new globalThis.Event("input", { bubbles: true })); await tick(20);
-  assert.match(document.querySelector(".hm-pal-list").textContent, /Merhaba komutu/, "typo-tolerant");
+  assert.match(document.querySelector(".m-pal-list").textContent, /Merhaba komutu/, "typo-tolerant");
   P.closePalette(); off(); await tick();
   P.openPalette(); await tick();
-  const inp = document.querySelector(".hm-pal-input");
+  const inp = document.querySelector(".m-pal-input");
   inp.value = "merhaba"; inp.dispatchEvent(new globalThis.Event("input", { bubbles: true })); await tick(20);
-  assert.doesNotMatch(document.querySelector(".hm-pal-list")?.textContent ?? "", /Merhaba komutu/, "unregistered");
+  assert.doesNotMatch(document.querySelector(".m-pal-list")?.textContent ?? "", /Merhaba komutu/, "unregistered");
   P.closePalette(); m.dispose();
 });
 
@@ -33,18 +33,18 @@ test("CommandPalette: own texts, empty state and hint; the button's icon and sho
     h(P.PaletteButton, { label: "Ara", icon: false, kbd: false }),
     h(P.PaletteButton, { label: "Ara", icon: "🔎" }),
   ]);
-  const [bare, own] = m.el.querySelectorAll(".hm-pal-trigger");
-  assert.equal(bare.querySelector(".hm-pal-trigger-icon"), null);
+  const [bare, own] = m.el.querySelectorAll(".m-pal-trigger");
+  assert.equal(bare.querySelector(".m-pal-trigger-icon"), null);
   assert.equal(bare.querySelector("kbd"), null);
-  assert.equal(own.querySelector(".hm-pal-trigger-icon").textContent, "🔎");
+  assert.equal(own.querySelector(".m-pal-trigger-icon").textContent, "🔎");
   assert.ok(own.querySelector("kbd"));
   bare.click();
   await P.preloadPalette(); await tick();
-  const input = document.querySelector(".hm-pal-input");
+  const input = document.querySelector(".m-pal-input");
   assert.equal(input.getAttribute("aria-label"), "Type here");
-  assert.ok(document.querySelector(".hm-palette.mine"));
-  assert.equal(document.querySelector(".hm-pal-hint"), null);
+  assert.ok(document.querySelector(".m-palette.mine"));
+  assert.equal(document.querySelector(".m-pal-hint"), null);
   input.value = "zzzzqqqq"; input.dispatchEvent(new globalThis.Event("input", { bubbles: true })); await tick(20);
-  assert.equal(document.querySelector(".hm-pal-empty").textContent, "Nothing");
+  assert.equal(document.querySelector(".m-pal-empty").textContent, "Nothing");
   P.closePalette(); m.dispose();
 });

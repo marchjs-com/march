@@ -96,19 +96,19 @@ export function LiveFeed(props: LiveFeedProps): Element {
   const gone = (el: HTMLElement): void => { el.remove(); scopes.get(el)?.(); };
   const card = (it: FeedItem): HTMLElement => createRoot((dispose) => {
     const el = (render
-      ? h("li", { class: "hm-lf-item hm-lf-own", "data-hm-color": colorAttr(it.color) }, render(it))
+      ? h("li", { class: "m-lf-item m-lf-own", "data-m-color": colorAttr(it.color) }, render(it))
       : h(ListRow, {
-        as: "li", class: "hm-lf-item", color: it.color, overflow: "ellipsis", title: it.title, sub: it.body ?? undefined, trail: it.meta ?? undefined,
+        as: "li", class: "m-lf-item", color: it.color, overflow: "ellipsis", title: it.title, sub: it.body ?? undefined, trail: it.meta ?? undefined,
         lead: it.avatar != null
-          ? h(Avatar, { class: "hm-lf-avatar", decorative: true, color: it.color ?? "primary", ...(typeof it.avatar === "string" ? { text: it.avatar } : {}) }, typeof it.avatar === "string" ? undefined : it.avatar)
-          : h(StatusDot, { class: "hm-lf-dot", size: "lg", tone: "primary", color: it.color }),
+          ? h(Avatar, { class: "m-lf-avatar", decorative: true, color: it.color ?? "primary", ...(typeof it.avatar === "string" ? { text: it.avatar } : {}) }, typeof it.avatar === "string" ? undefined : it.avatar)
+          : h(StatusDot, { class: "m-lf-dot", size: "lg", tone: "primary", color: it.color }),
       })) as HTMLElement;
-    el.append(h("span", { class: "hm-lf-glow", "aria-hidden": "true" }) as Node);
+    el.append(h("span", { class: "m-lf-glow", "aria-hidden": "true" }) as Node);
     scopes.set(el, dispose);
     return el;
   }, owner);
 
-  const list = h("ul", { class: "hm-lf-list", role: "list", "aria-live": () => (props.live === "polite" && !paused() ? "polite" : "off"), "aria-relevant": "additions" }) as HTMLElement;
+  const list = h("ul", { class: "m-lf-list", role: "list", "aria-live": () => (props.live === "polite" && !paused() ? "polite" : "off"), "aria-relevant": "additions" }) as HTMLElement;
 
   // one item arrives at the top with the `enter` motion (default: it swings down in 3D out of a blur), a ring of the accent
   // colour glows around it and fades, its avatar springs in; the others glide one place on (FLIP); the oldest beyond
@@ -137,7 +137,7 @@ export function LiveFeed(props: LiveFeedProps): Element {
     if (props.move === false) mutate(); else flip(staying, mutate, { enter: false, duration: 680, easing: "expo" });
     flip([el], () => {}, { enter: false });
     const ctx = { wall: wall(), rtl: untrack(dir) === "rtl" };
-    const glow = el.querySelector(".hm-lf-glow"), avatar = el.querySelector(".hm-lf-avatar, .hm-lf-dot");
+    const glow = el.querySelector(".m-lf-glow"), avatar = el.querySelector(".m-lf-avatar, .m-lf-dot");
     if (props.enter !== "none") {
       const inn = feedMotion(FEED_ENTER, props.enter, "flip", ctx);
       animate(el, inn.keyframes as never, { duration: inn.duration ?? 700, easing: inn.easing ?? "out" });
@@ -185,11 +185,11 @@ export function LiveFeed(props: LiveFeedProps): Element {
 
   // the pause toggle: a pill Button whose dot pulses while the feed is live
   const pause = props.pausable === false ? null : h(Button, {
-    class: "hm-lf-pause", size: "sm", shape: "pill", pressed: () => paused(), onClick: () => paused.set(!paused.peek()),
-    icon: props.pulse === false ? undefined : h(StatusDot, { class: "hm-lf-pulse", tone: () => (paused() ? "neutral" : "success"), pulse: () => !paused() }),
+    class: "m-lf-pause", size: "sm", shape: "pill", pressed: () => paused(), onClick: () => paused.set(!paused.peek()),
+    icon: props.pulse === false ? undefined : h(StatusDot, { class: "m-lf-pulse", tone: () => (paused() ? "neutral" : "success"), pulse: () => !paused() }),
   }, () => (paused() ? props.resumeLabel ?? t`Paused · resume` : props.pauseLabel ?? t`Live · pause`));
 
-  const root = h("section", { class: () => cx("hm-lf", wall() ? "hm-lf-wall" : "hm-lf-rows", val(props.class)), "aria-label": () => props.label ?? t`Live activity` },
+  const root = h("section", { class: () => cx("m-lf", wall() ? "m-lf-wall" : "m-lf-rows", val(props.class)), "aria-label": () => props.label ?? t`Live activity` },
     pause, list) as HTMLElement;
 
   if (props.pauseOnHover !== false) pauseOnHover(root, (held) => hovering.set(held));

@@ -26,23 +26,23 @@ test("timeTicks / timePercent: steps picked for the duration, or given", () => {
 test("TimeRuler: read-only ticks, labels and a head that follows the value", () => {
   const now = signal(500), duration = signal(2000);
   const [el, dispose] = mount(() => h(TimeRuler, { duration, value: now, step: 500, major: 1000, color: "brand-orange" }));
-  const root = el.querySelector(".hm-time-ruler");
+  const root = el.querySelector(".m-time-ruler");
   assert.equal(root.getAttribute("aria-hidden"), "true");
-  assert.equal(root.getAttribute("data-hm-color"), "brand-orange");
-  const ticks = [...root.querySelectorAll(".hm-time-ruler-tick")];
+  assert.equal(root.getAttribute("data-m-color"), "brand-orange");
+  const ticks = [...root.querySelectorAll(".m-time-ruler-tick")];
   assert.equal(ticks.length, 5);
   assert.deepEqual(ticks.filter((k) => k.classList.contains("is-major")).map((k) => k.textContent), ["0s", "1s", "2s"]);
-  assert.equal(ticks[1].style.getPropertyValue("--hm-time-ruler-at"), "25%");
-  const head = root.querySelector(".hm-time-ruler-head");
+  assert.equal(ticks[1].style.getPropertyValue("--m-time-ruler-at"), "25%");
+  const head = root.querySelector(".m-time-ruler-head");
   assert.equal(head.getAttribute("role"), null);
-  assert.equal(head.style.getPropertyValue("--hm-time-ruler-at"), "25%");
+  assert.equal(head.style.getPropertyValue("--m-time-ruler-at"), "25%");
   now.set(1000);
-  assert.equal(root.querySelector(".hm-time-ruler-head"), head, "the head is moved, not rebuilt");
-  assert.equal(head.style.getPropertyValue("--hm-time-ruler-at"), "50%");
+  assert.equal(root.querySelector(".m-time-ruler-head"), head, "the head is moved, not rebuilt");
+  assert.equal(head.style.getPropertyValue("--m-time-ruler-at"), "50%");
   duration.set(4000);
-  assert.equal(root.querySelectorAll(".hm-time-ruler-tick").length, 9);
+  assert.equal(root.querySelectorAll(".m-time-ruler-tick").length, 9);
   now.set(null);
-  assert.equal(root.querySelector(".hm-time-ruler-head"), null);
+  assert.equal(root.querySelector(".m-time-ruler-head"), null);
   dispose();
 });
 
@@ -54,7 +54,7 @@ test("TimeRuler: seekable: a slider head with keys; own format, ticks, head and 
     h(TimeRuler, { class: "three", duration: 1000, value: 0, head: false }),
     h(TimeRuler, { class: "four", duration: 1000, value: 0, headClass: "my-head" }),
   ]);
-  const one = el.querySelector(".one"), head = one.querySelector(".hm-time-ruler-head");
+  const one = el.querySelector(".one"), head = one.querySelector(".m-time-ruler-head");
   assert.equal(one.getAttribute("role"), "group");
   assert.equal(one.getAttribute("aria-label"), "Time ruler");
   assert.ok(one.classList.contains("is-seekable"));
@@ -71,11 +71,11 @@ test("TimeRuler: seekable: a slider head with keys; own format, ticks, head and 
   assert.equal(seen.filter((x) => x === "start").length, 5);
   assert.equal(head.getAttribute("aria-valuenow"), "0");
   const two = el.querySelector(".two");
-  assert.deepEqual([...two.querySelectorAll(".hm-time-ruler-tick")].map((k) => k.textContent), ["start", "1000ms"]);
-  assert.ok(two.querySelector(".hm-time-ruler-head .own"));
-  assert.ok(el.querySelector(".four .hm-time-ruler-head.my-head"), "headClass: an extra class on the playhead");
+  assert.deepEqual([...two.querySelectorAll(".m-time-ruler-tick")].map((k) => k.textContent), ["start", "1000ms"]);
+  assert.ok(two.querySelector(".m-time-ruler-head .own"));
+  assert.ok(el.querySelector(".four .m-time-ruler-head.my-head"), "headClass: an extra class on the playhead");
   assert.equal(two.getAttribute("aria-label"), "Scrub");
-  assert.equal(two.querySelector(".hm-time-ruler-head").getAttribute("aria-label"), "Now");
-  assert.equal(el.querySelector(".three .hm-time-ruler-head"), null);
+  assert.equal(two.querySelector(".m-time-ruler-head").getAttribute("aria-label"), "Now");
+  assert.equal(el.querySelector(".three .m-time-ruler-head"), null);
   dispose();
 });

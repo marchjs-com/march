@@ -13,19 +13,19 @@ type Curve = "ease" | "easeOut" | "easeSpring";
 export function MotionPanel({ ctx }: Ctx): Element {
   const ms = (v: number): string => `${v} ms`;
   const curve = signal<Curve>("easeOut");
-  const names: Record<Curve, string> = { ease: "--hm-ease", easeOut: "--hm-ease-out", easeSpring: "--hm-ease-spring" };
-  return h("div", { class: "hm-te-split" },
-    h("div", { class: "hm-te-form" },
+  const names: Record<Curve, string> = { ease: "--m-ease", easeOut: "--m-ease-out", easeSpring: "--m-ease-spring" };
+  return h("div", { class: "m-te-split" },
+    h("div", { class: "m-te-form" },
       num(ctx, "motion", "fast", () => t`Fast duration`, { min: 0, max: 400, step: 10, format: ms }),
       num(ctx, "motion", "base", () => t`Base duration`, { min: 0, max: 600, step: 10, format: ms }),
       num(ctx, "motion", "slow", () => t`Slow duration`, { min: 0, max: 1000, step: 10, format: ms }),
-      h("p", { class: "hm-help hm-te-hint" }, () => (ctx.reduced() ? t`Reduced motion is on in the preview: every duration is 0 there.` : t`Turn on reduced motion above the preview to check the theme without movement.`))),
-    h("div", { class: "hm-te-curve" },
+      h("p", { class: "m-help m-te-hint" }, () => (ctx.reduced() ? t`Reduced motion is on in the preview: every duration is 0 there.` : t`Turn on reduced motion above the preview to check the theme without movement.`))),
+    h("div", { class: "m-te-curve" },
       h(Segmented, {
         "aria-label": t`Easing token`, value: live(() => curve()), onChange: (v: Curve | null) => { if (v) curve.set(v); },
         options: [{ value: "ease", label: t`Standard` }, { value: "easeOut", label: t`Entrance` }, { value: "easeSpring", label: t`Spring` }],
       }),
-      h("code", { class: "hm-te-curve-name" }, () => names[curve()]),
+      h("code", { class: "m-te-curve-name" }, () => names[curve()]),
       h(EasingCurveEditor, {
         readonly: live(() => ctx.readonly()), presets: false, duration: live(() => ctx.reduced() ? 0 : ctx.draft().motion.slow * 3),
         value: live(() => ctx.draft().motion[curve()]),

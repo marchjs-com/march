@@ -1,38 +1,38 @@
-/* ListRow (classes hm-listrow-*: hm-list-row is a ListEditor line). lead · text (title + sub) · trail; --hm-listrow-c is the tint of the active / selected row (data-hm-color sets --hm-accent). */
-.hm-listrow { --hm-listrow-c: var(--hm-accent, var(--hm-primary)); position: relative; display: flex; align-items: center; gap: var(--hm-space-3); box-sizing: border-box; inline-size: 100%; min-inline-size: 0; min-block-size: 2.5rem; margin: 0; padding: .375rem var(--hm-space-3);
-  border: 0; border-radius: var(--hm-radius-2); background: none; color: var(--hm-text); font: inherit; font-size: var(--hm-text-md); line-height: 1.3; text-align: start; text-decoration: none; list-style: none; }
-.hm-listrow.is-top { align-items: flex-start; }
-.hm-listrow-lead { display: inline-grid; place-items: center; flex: none; color: var(--hm-muted); }
-.hm-listrow-text { display: flex; flex-direction: column; flex: 1; min-inline-size: 0; }
-.hm-listrow-title { min-inline-size: 0; max-inline-size: 100%; }
-.hm-listrow-sub { min-inline-size: 0; max-inline-size: 100%; color: var(--hm-muted); font-size: var(--hm-text-xs); }
-.hm-listrow.is-ellipsis :is(.hm-listrow-title, .hm-listrow-sub) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hm-listrow.is-wrap :is(.hm-listrow-title, .hm-listrow-sub) { overflow-wrap: anywhere; }
-.hm-listrow-trail, .hm-listrow-actions { display: inline-flex; align-items: center; gap: var(--hm-space-2); flex: none; margin-inline-start: auto; color: var(--hm-muted); font-size: var(--hm-text-xs); }
-.hm-listrow-trail + .hm-listrow-actions { margin-inline-start: 0; }
+/* ListRow (classes m-listrow-*: m-list-row is a ListEditor line). lead · text (title + sub) · trail; --m-listrow-c is the tint of the active / selected row (data-m-color sets --m-accent). */
+.m-listrow { --m-listrow-c: var(--m-accent, var(--m-primary)); position: relative; display: flex; align-items: center; gap: var(--m-space-3); box-sizing: border-box; inline-size: 100%; min-inline-size: 0; min-block-size: 2.5rem; margin: 0; padding: .375rem var(--m-space-3);
+  border: 0; border-radius: var(--m-radius-2); background: none; color: var(--m-text); font: inherit; font-size: var(--m-text-md); line-height: 1.3; text-align: start; text-decoration: none; list-style: none; }
+.m-listrow.is-top { align-items: flex-start; }
+.m-listrow-lead { display: inline-grid; place-items: center; flex: none; color: var(--m-muted); }
+.m-listrow-text { display: flex; flex-direction: column; flex: 1; min-inline-size: 0; }
+.m-listrow-title { min-inline-size: 0; max-inline-size: 100%; }
+.m-listrow-sub { min-inline-size: 0; max-inline-size: 100%; color: var(--m-muted); font-size: var(--m-text-xs); }
+.m-listrow.is-ellipsis :is(.m-listrow-title, .m-listrow-sub) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-listrow.is-wrap :is(.m-listrow-title, .m-listrow-sub) { overflow-wrap: anywhere; }
+.m-listrow-trail, .m-listrow-actions { display: inline-flex; align-items: center; gap: var(--m-space-2); flex: none; margin-inline-start: auto; color: var(--m-muted); font-size: var(--m-text-xs); }
+.m-listrow-trail + .m-listrow-actions { margin-inline-start: 0; }
 /* a tile: lead above the text, the trail under it */
-.hm-listrow.is-column { flex-direction: column; align-items: flex-start; }
-.hm-listrow.is-column.is-centered { align-items: center; text-align: center; }
-.hm-listrow.is-column > .hm-listrow-text { flex: 0 1 auto; max-inline-size: 100%; }
-.hm-listrow.is-column > :is(.hm-listrow-trail, .hm-listrow-actions) { margin-inline-start: 0; }
-:is(h2, h3, h4, h5, h6, p).hm-listrow-title, p.hm-listrow-sub { margin: 0; }
+.m-listrow.is-column { flex-direction: column; align-items: flex-start; }
+.m-listrow.is-column.is-centered { align-items: center; text-align: center; }
+.m-listrow.is-column > .m-listrow-text { flex: 0 1 auto; max-inline-size: 100%; }
+.m-listrow.is-column > :is(.m-listrow-trail, .m-listrow-actions) { margin-inline-start: 0; }
+:is(h2, h3, h4, h5, h6, p).m-listrow-title, p.m-listrow-sub { margin: 0; }
 /* sizes */
-.hm-listrow-xs { gap: .3125rem; min-block-size: 1.375rem; padding: 0 .5rem; border-radius: var(--hm-radius-1); font-size: var(--hm-text-xs); }
-.hm-listrow-sm { gap: var(--hm-space-2); min-block-size: 2rem; padding: .25rem var(--hm-space-2); font-size: var(--hm-text-sm); }
-.hm-listrow-lg { min-block-size: 3.25rem; padding: .625rem var(--hm-space-4); }
+.m-listrow-xs { gap: .3125rem; min-block-size: 1.375rem; padding: 0 .5rem; border-radius: var(--m-radius-1); font-size: var(--m-text-xs); }
+.m-listrow-sm { gap: var(--m-space-2); min-block-size: 2rem; padding: .25rem var(--m-space-2); font-size: var(--m-text-sm); }
+.m-listrow-lg { min-block-size: 3.25rem; padding: .625rem var(--m-space-4); }
 /* link, button, or a plain row whose host handles the click */
-.hm-listrow.is-action { cursor: pointer; transition: background-color var(--hm-dur-fast) var(--hm-ease), color var(--hm-dur-fast) var(--hm-ease); }
-.hm-listrow.is-action:hover { background: var(--hm-surface-2); }
-.hm-listrow:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: -2px; }
-.hm-listrow.is-selected { background: color-mix(in srgb, var(--hm-listrow-c) 10%, transparent); font-weight: 600; }
-.hm-listrow.is-active { background: var(--hm-accent-soft, var(--hm-primary-soft)); color: var(--hm-accent-text, var(--hm-primary-text)); }
-.hm-listrow:is(.is-active, .is-selected) .hm-listrow-lead { color: var(--hm-listrow-c); }
-.hm-listrow.is-active .hm-listrow-sub { color: inherit; opacity: .8; }
-.hm-listrow.is-barred.is-active::before { content: ""; position: absolute; inset-inline-start: .125rem; inset-block: 25%; inline-size: 3px; border-radius: 3px; background: var(--hm-listrow-c); }
-.hm-listrow.is-disabled { opacity: .5; cursor: not-allowed; }
-.hm-listrow.is-disabled.is-action:hover { background: none; }
+.m-listrow.is-action { cursor: pointer; transition: background-color var(--m-dur-fast) var(--m-ease), color var(--m-dur-fast) var(--m-ease); }
+.m-listrow.is-action:hover { background: var(--m-surface-2); }
+.m-listrow:focus-visible { outline: 2px solid var(--m-focus); outline-offset: -2px; }
+.m-listrow.is-selected { background: color-mix(in srgb, var(--m-listrow-c) 10%, transparent); font-weight: 600; }
+.m-listrow.is-active { background: var(--m-accent-soft, var(--m-primary-soft)); color: var(--m-accent-text, var(--m-primary-text)); }
+.m-listrow:is(.is-active, .is-selected) .m-listrow-lead { color: var(--m-listrow-c); }
+.m-listrow.is-active .m-listrow-sub { color: inherit; opacity: .8; }
+.m-listrow.is-barred.is-active::before { content: ""; position: absolute; inset-inline-start: .125rem; inset-block: 25%; inline-size: 3px; border-radius: 3px; background: var(--m-listrow-c); }
+.m-listrow.is-disabled { opacity: .5; cursor: not-allowed; }
+.m-listrow.is-disabled.is-action:hover { background: none; }
 /* a link / button row with controls beside it */
-.hm-listrow-wrap { display: flex; align-items: center; gap: var(--hm-space-1); min-inline-size: 0; }
-.hm-listrow-wrap > .hm-listrow { flex: 1; inline-size: auto; }
-.hm-listrow-wrap > .hm-listrow-actions { margin-inline-start: 0; }
-@media (prefers-reduced-motion: reduce) { .hm-listrow.is-action { transition: none; } }
+.m-listrow-wrap { display: flex; align-items: center; gap: var(--m-space-1); min-inline-size: 0; }
+.m-listrow-wrap > .m-listrow { flex: 1; inline-size: auto; }
+.m-listrow-wrap > .m-listrow-actions { margin-inline-start: 0; }
+@media (prefers-reduced-motion: reduce) { .m-listrow.is-action { transition: none; } }

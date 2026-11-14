@@ -26,27 +26,27 @@ test("NavSidebar: categories with counts, auto-open active category, recent list
     featured: [{ id: "support", label: "Destek talepleri", sub: () => (awaiting() ? `${awaiting()} yanıt bekliyor` : "Yanıt bekleyen talep yok"), href: "/support", badge: awaiting }] };
   let m = mount(() => h(U.NavSidebar, props));
   await tick();
-  const groups = () => [...m.el.querySelectorAll(".hm-sb-gbtn")].map((b) => [b.dataset.group, b.querySelector(".hm-sb-count").textContent, b.getAttribute("aria-expanded")]);
+  const groups = () => [...m.el.querySelectorAll(".m-sb-gbtn")].map((b) => [b.dataset.group, b.querySelector(".m-sb-count").textContent, b.getAttribute("aria-expanded")]);
   assert.deepEqual(groups(), [["Ekonomi", "3", "false"], ["Üyeler ve roller", "2", "false"]]);
-  assert.equal(m.el.querySelector(".hm-sb-featured .hm-sb-badge").textContent, "3");
+  assert.equal(m.el.querySelector(".m-sb-featured .m-sb-badge").textContent, "3");
   awaiting.set(0); await tick();
-  assert.equal(m.el.querySelector(".hm-sb-featured .hm-sb-badge"), null);
-  assert.ok(m.el.querySelector(".hm-sb-featured").textContent.includes("Yanıt bekleyen talep yok"));
+  assert.equal(m.el.querySelector(".m-sb-featured .m-sb-badge"), null);
+  assert.ok(m.el.querySelector(".m-sb-featured").textContent.includes("Yanıt bekleyen talep yok"));
 
   R.navigate("/refunds"); await tick();
   assert.deepEqual(groups()[0], ["Ekonomi", "3", "true"], "the category of the current page opens");
-  assert.ok(m.el.querySelector('.hm-sb-group.is-active-group [data-id="refunds"]').classList.contains("is-active"));
+  assert.ok(m.el.querySelector('.m-sb-group.is-active-group [data-id="refunds"]').classList.contains("is-active"));
   R.navigate("/members"); await tick();
-  const recent = [...m.el.querySelectorAll('[data-where="recent"]')].map((a) => [a.dataset.id, a.querySelector(".hm-listrow-sub").textContent]);
+  const recent = [...m.el.querySelectorAll('[data-where="recent"]')].map((a) => [a.dataset.id, a.querySelector(".m-listrow-sub").textContent]);
   assert.deepEqual(recent, [["members", "Üyeler ve roller"], ["refunds", "Ekonomi"]]);
 
   // both categories were opened by the visits above, so the link reads "Collapse all"
-  assert.equal(m.el.querySelector(".hm-sb-all").textContent, "Collapse all");
-  m.el.querySelector(".hm-sb-all").click(); await tick();
+  assert.equal(m.el.querySelector(".m-sb-all").textContent, "Collapse all");
+  m.el.querySelector(".m-sb-all").click(); await tick();
   assert.ok(groups().every((g) => g[2] === "false"), "collapse all");
-  m.el.querySelector(".hm-sb-all").click(); await tick();
+  m.el.querySelector(".m-sb-all").click(); await tick();
   assert.ok(groups().every((g) => g[2] === "true"), "expand all");
-  m.el.querySelector(".hm-sb-all").click(); await tick();
+  m.el.querySelector(".m-sb-all").click(); await tick();
   m.el.querySelector('[data-group="Ekonomi"]').click(); await tick();
   m.dispose();
   m = mount(() => h(U.NavSidebar, props)); await tick();
@@ -60,11 +60,11 @@ test("NavSidebar: typing filters across categories; keyboard moves, opens and cl
   R.navigate("/"); await tick();
   const m = mount(() => h(U.NavSidebar, { items: ITEMS, storageKey: "t.sb2", hotkey: false, recent: 0 }));
   await tick();
-  const input = m.el.querySelector(".hm-sb-input");
+  const input = m.el.querySelector(".m-sb-input");
   input.value = "iade"; input.dispatchEvent(new Event("input", { bubbles: true })); await tick();
   const hits = [...m.el.querySelectorAll('[data-where="search"]')];
   assert.deepEqual(hits.map((a) => a.dataset.id), ["refunds"]);
-  assert.equal(hits[0].querySelector(".hm-listrow-sub").textContent, "Ekonomi");
+  assert.equal(hits[0].querySelector(".m-listrow-sub").textContent, "Ekonomi");
   key(input, "Escape"); await tick();
   assert.equal(m.el.querySelectorAll('[data-where="search"]').length, 0);
 
@@ -91,34 +91,34 @@ test("NavSidebar resizable: grip with separator ARIA, keyboard widths within min
   const props = { items: ITEMS, storageKey: "t.sb.rs", hotkey: false, resizable: true, width: 300, minWidth: 220, maxWidth: 420, onResize: (w) => sizes.push(w) };
   let m = mount(() => h(U.NavSidebar, props));
   await tick();
-  const wrap = () => m.el.querySelector(".hm-sb-wrap");
-  const grip = () => m.el.querySelector(".hm-sb-resize");
-  assert.equal(wrap().style.getPropertyValue("--hm-sb-w"), "300px", "width prop → CSS variable (no style attribute string)");
+  const wrap = () => m.el.querySelector(".m-sb-wrap");
+  const grip = () => m.el.querySelector(".m-sb-resize");
+  assert.equal(wrap().style.getPropertyValue("--m-sb-w"), "300px", "width prop → CSS variable (no style attribute string)");
   assert.equal(grip().getAttribute("role"), "separator");
   assert.equal(grip().getAttribute("aria-orientation"), "vertical");
   assert.equal(grip().getAttribute("aria-valuemin"), "220");
   assert.equal(grip().getAttribute("aria-valuemax"), "420");
   assert.equal(grip().getAttribute("tabindex"), "0");
   key(grip(), "End"); await tick();
-  assert.equal(wrap().style.getPropertyValue("--hm-sb-w"), "420px");
+  assert.equal(wrap().style.getPropertyValue("--m-sb-w"), "420px");
   assert.equal(grip().getAttribute("aria-valuenow"), "420");
   key(grip(), "ArrowLeft"); await tick();
-  assert.equal(wrap().style.getPropertyValue("--hm-sb-w"), "404px", "← narrows by 16px");
+  assert.equal(wrap().style.getPropertyValue("--m-sb-w"), "404px", "← narrows by 16px");
   key(grip(), "ArrowLeft", { shiftKey: true }); await tick();
-  assert.equal(wrap().style.getPropertyValue("--hm-sb-w"), "340px", "Shift+← by 64px");
+  assert.equal(wrap().style.getPropertyValue("--m-sb-w"), "340px", "Shift+← by 64px");
   key(grip(), "Home"); await tick();
-  assert.equal(wrap().style.getPropertyValue("--hm-sb-w"), "220px");
+  assert.equal(wrap().style.getPropertyValue("--m-sb-w"), "220px");
   assert.deepEqual(sizes, [420, 404, 340, 220]);
   m.dispose(); m.el.remove();
   m = mount(() => h(U.NavSidebar, props));
   await tick();
-  assert.equal(wrap().style.getPropertyValue("--hm-sb-w"), "220px", "width persists");
+  assert.equal(wrap().style.getPropertyValue("--m-sb-w"), "220px", "width persists");
   grip().dispatchEvent(new Event("dblclick", { bubbles: true })); await tick();
-  assert.equal(wrap().style.getPropertyValue("--hm-sb-w"), "300px", "double click → starting width");
+  assert.equal(wrap().style.getPropertyValue("--m-sb-w"), "300px", "double click → starting width");
   m.dispose(); m.el.remove();
   const off = mount(() => h(U.NavSidebar, { items: ITEMS, storageKey: "t.sb.rs2", hotkey: false }));
   await tick();
-  assert.equal(off.el.querySelector(".hm-sb-resize"), null, "not resizable by default");
+  assert.equal(off.el.querySelector(".m-sb-resize"), null, "not resizable by default");
   off.dispose();
 });
 
@@ -131,8 +131,8 @@ test("NavSidebar: navigating keeps the menu (same nodes, one mount, scroll posit
   const m = mount(() => h(Counted, { items: ITEMS, storageKey: "t.sb-keep", hotkey: false, defaultOpen: "all",
     featured: [{ id: "support", label: "Destek", href: "/support" }] }));
   await tick();
-  const scroller = m.el.querySelector(".hm-sb-scroll");
-  const cats = m.el.querySelector(".hm-sb-cats"), featured = m.el.querySelector(".hm-sb-featured");
+  const scroller = m.el.querySelector(".m-sb-scroll");
+  const cats = m.el.querySelector(".m-sb-cats"), featured = m.el.querySelector(".m-sb-featured");
   const refunds = m.el.querySelector('[data-where="group"][data-id="refunds"]');
   scroller.scrollTop = 300; // the user scrolled the menu
   const scrolls = [];
@@ -140,15 +140,15 @@ test("NavSidebar: navigating keeps the menu (same nodes, one mount, scroll posit
 
   for (const p of ["/refunds", "/members", "/payments", "/support", "/refunds"]) {
     R.navigate(p); await tick();
-    assert.equal(m.el.querySelector(".hm-sb-scroll"), scroller, `${p}: the scroll container is kept`);
-    assert.equal(m.el.querySelector(".hm-sb-cats"), cats, `${p}: the categories are not rebuilt`);
-    assert.equal(m.el.querySelector(".hm-sb-featured"), featured, `${p}: the featured list is not rebuilt`);
+    assert.equal(m.el.querySelector(".m-sb-scroll"), scroller, `${p}: the scroll container is kept`);
+    assert.equal(m.el.querySelector(".m-sb-cats"), cats, `${p}: the categories are not rebuilt`);
+    assert.equal(m.el.querySelector(".m-sb-featured"), featured, `${p}: the featured list is not rebuilt`);
     assert.equal(scroller.scrollTop, 300, `${p}: the scroll position is kept`);
   }
   assert.equal(mounts, 1, "NavSidebar mounted once");
   assert.equal(m.el.querySelector('[data-where="group"][data-id="refunds"]'), refunds, "rows are the same nodes");
   assert.ok(refunds.classList.contains("is-active") && refunds.getAttribute("aria-current") === "page", "only the active state moves");
-  assert.equal([...m.el.querySelectorAll(".hm-sb-item.is-active")].filter((r) => r.dataset.where !== "recent").length, 1);
+  assert.equal([...m.el.querySelectorAll(".m-sb-item.is-active")].filter((r) => r.dataset.where !== "recent").length, 1);
   assert.deepEqual(scrolls, [], "a row already in view does not scroll the menu");
 
   // an active row below the visible area is brought into view (nearest edge), the menu alone scrolls
@@ -169,17 +169,17 @@ test("NavSidebar: nested items sit under their parent, fold with it, open by the
     { id: "/forms", label: "Forms", href: "/forms", group: "Forms" },
   ];
   const m = mount(() => h(U.NavSidebar, { items, storageKey: "t.nest", palette: false, hotkey: false, defaultOpen: "all", recent: 0 }));
-  const parent = m.el.querySelector(".hm-sb-li.is-parent");
+  const parent = m.el.querySelector(".m-sb-li.is-parent");
   assert.ok(parent, "the parent row has a fold");
-  assert.equal(parent.querySelector(".hm-sb-row").getAttribute("data-id"), "/editors");
-  assert.deepEqual(parent.querySelectorAll(".hm-sb-sublist .hm-sb-row").map((r) => r.getAttribute("data-id")), ["/editors/terminal", "/editors/json"]);
-  assert.equal(m.el.querySelector(".hm-sb-count").textContent, "2", "the group counts top-level items");
-  const btn = parent.querySelector(".hm-sb-kids-btn");
+  assert.equal(parent.querySelector(".m-sb-row").getAttribute("data-id"), "/editors");
+  assert.deepEqual(parent.querySelectorAll(".m-sb-sublist .m-sb-row").map((r) => r.getAttribute("data-id")), ["/editors/terminal", "/editors/json"]);
+  assert.equal(m.el.querySelector(".m-sb-count").textContent, "2", "the group counts top-level items");
+  const btn = parent.querySelector(".m-sb-kids-btn");
   assert.equal(btn.getAttribute("aria-expanded"), "false");
-  assert.equal(parent.querySelector(".hm-sb-kids").hasAttribute("inert"), true, "a closed fold is out of the tab order");
+  assert.equal(parent.querySelector(".m-sb-kids").hasAttribute("inert"), true, "a closed fold is out of the tab order");
   btn.click();
   assert.equal(btn.getAttribute("aria-expanded"), "true");
-  key(parent.querySelector(".hm-sb-row"), "ArrowLeft");
+  key(parent.querySelector(".m-sb-row"), "ArrowLeft");
   assert.equal(btn.getAttribute("aria-expanded"), "false", "← closes the fold");
   m.dispose();
 });
@@ -193,7 +193,7 @@ test("NavSidebar: the parent of the current page is marked too", async () => {
   ];
   const m = mount(() => h(U.NavSidebar, { items, storageKey: "t.nest2", palette: false, hotkey: false, defaultOpen: "all", recent: 0 }));
   await tick(10);
-  const row = (id) => m.el.querySelector(`.hm-sb-row[data-id="${id}"]`);
+  const row = (id) => m.el.querySelector(`.m-sb-row[data-id="${id}"]`);
   if (row("/editors/terminal").getAttribute("class").includes("is-active")) assert.match(row("/editors").getAttribute("class"), /is-active-parent/);
   m.dispose();
 });
@@ -209,12 +209,12 @@ test("NavSidebar: nesting goes deeper than one level; ancestors of the current p
   ];
   const m = mount(() => h(U.NavSidebar, { items, storageKey: "t.nest3", palette: false, hotkey: false, defaultOpen: "all", recent: 0 }));
   await tick(10);
-  const mid = m.el.querySelector('.hm-sb-row[data-id="/sites/landing"]');
+  const mid = m.el.querySelector('.m-sb-row[data-id="/sites/landing"]');
   assert.ok(mid, "the middle level is listed");
   const midLi = mid.parentElement;
   assert.ok(midLi.classList.contains("is-parent"), "the middle level has its own fold");
-  assert.deepEqual(midLi.querySelector(".hm-sb-kids").querySelectorAll(".hm-sb-row").map((r) => r.getAttribute("data-id")), ["/sites/story", "/sites/live"]);
-  const row = (id) => m.el.querySelector(`.hm-sb-row[data-id="${id}"]`);
+  assert.deepEqual(midLi.querySelector(".m-sb-kids").querySelectorAll(".m-sb-row").map((r) => r.getAttribute("data-id")), ["/sites/story", "/sites/live"]);
+  const row = (id) => m.el.querySelector(`.m-sb-row[data-id="${id}"]`);
   if (row("/sites/story").getAttribute("class").includes("is-active")) {
     assert.match(row("/sites").getAttribute("class"), /is-active-parent/, "a grandparent is marked too");
     assert.ok(row("/sites").parentElement.classList.contains("is-kids-open"), "and opens");
@@ -226,24 +226,24 @@ test("NavSidebar: search, headings, expand-all and counts can be turned off; tex
   localStorage.clear();
   const bare = mount(() => h(U.NavSidebar, { items: ITEMS, storageKey: "t.sb.bare", palette: false, search: false, headings: false, groupCounts: false, class: "mine" }));
   await tick();
-  assert.ok(bare.el.querySelector(".hm-sb-wrap.mine"));
-  assert.equal(bare.el.querySelector(".hm-sb-search"), null, "search={false}");
-  assert.equal(bare.el.querySelector(".hm-sb-section"), null, "headings={false}");
-  assert.equal(bare.el.querySelector(".hm-sb-all"), null);
-  assert.equal(bare.el.querySelector(".hm-sb-count"), null, "groupCounts={false}");
-  assert.equal(bare.el.querySelectorAll(".hm-sb-gbtn").length, 2, "the categories stay");
+  assert.ok(bare.el.querySelector(".m-sb-wrap.mine"));
+  assert.equal(bare.el.querySelector(".m-sb-search"), null, "search={false}");
+  assert.equal(bare.el.querySelector(".m-sb-section"), null, "headings={false}");
+  assert.equal(bare.el.querySelector(".m-sb-all"), null);
+  assert.equal(bare.el.querySelector(".m-sb-count"), null, "groupCounts={false}");
+  assert.equal(bare.el.querySelectorAll(".m-sb-gbtn").length, 2, "the categories stay");
   bare.dispose();
 
   const own = mount(() => h(U.NavSidebar, { items: ITEMS, storageKey: "t.sb.own", palette: false, hotkey: false, collapsible: true, expandAll: false,
     labels: { categories: "Sections", search: "Find a page", noMatches: () => "Nothing here", menu: "Open menu", collapseSidebar: "Fold" } }));
   await tick();
-  assert.ok([...own.el.querySelectorAll(".hm-sb-section .hm-section-label-text")].some((x) => x.textContent === "Sections"));
-  assert.equal(own.el.querySelector(".hm-sb-all"), null, "expandAll={false}");
-  assert.equal(own.el.querySelector(".hm-sb-input").getAttribute("aria-label"), "Find a page");
-  assert.equal(own.el.querySelector(".hm-nav-burger").getAttribute("aria-label"), "Open menu");
-  assert.equal(own.el.querySelector(".hm-nav-rail-btn").getAttribute("aria-label"), "Fold");
-  const input = own.el.querySelector(".hm-sb-input");
+  assert.ok([...own.el.querySelectorAll(".m-sb-section .m-section-label-text")].some((x) => x.textContent === "Sections"));
+  assert.equal(own.el.querySelector(".m-sb-all"), null, "expandAll={false}");
+  assert.equal(own.el.querySelector(".m-sb-input").getAttribute("aria-label"), "Find a page");
+  assert.equal(own.el.querySelector(".m-nav-burger").getAttribute("aria-label"), "Open menu");
+  assert.equal(own.el.querySelector(".m-nav-rail-btn").getAttribute("aria-label"), "Fold");
+  const input = own.el.querySelector(".m-sb-input");
   input.value = "zzzz"; input.dispatchEvent(new Event("input", { bubbles: true })); await tick();
-  assert.equal(own.el.querySelector(".hm-sb-none").textContent, "Nothing here");
+  assert.equal(own.el.querySelector(".m-sb-none").textContent, "Nothing here");
   own.dispose();
 });

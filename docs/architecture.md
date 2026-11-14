@@ -7,12 +7,12 @@
   └ <Outlet />                  level 1  ─ section layout (optional)    kept while its routes change
       └ <Outlet />              level 2  ─ page                         rebuilt when route or params change
 <Outlet name="aside" />         named outlet  ─ URL ?~aside=/path       its own route table (createRouter outlets)
-<Outlet name="modal" />         modal route   ─ history state (hmBg)    back closes; reload = full page
+<Outlet name="modal" />         modal route   ─ history state (mBg)    back closes; reload = full page
 ```
 
 - Every level has a key (`layout:<loader id>`, `page:<pattern>:<params>`). A navigation computes the new keys; levels
   whose key is unchanged keep their DOM, state and effects. The first changed level is marked busy (`aria-busy`) while
-  its chunks load, and is the only part named for View Transitions (`view-transition-name: hm-page`).
+  its chunks load, and is the only part named for View Transitions (`view-transition-name: m-page`).
 - Each level renders inside its own `Try` boundary: a failing chunk shows a message with "Try again" at that level.
 - First paint: layouts resolve before the page; they render at once with the `loading` placeholder in their outlet.
 - Named outlets and the modal outlet live in `router/outlets.ts`, a lazy part (the entry stays small).
@@ -29,11 +29,11 @@ A hashed file name always means the same bytes, so immutable caching can never m
 ```
 body
  ├ #app                      inert while a modal layer is open
- └ .hm-layers                one stack (dom/portal.ts)
-    ├ .hm-layer popover      z = dialog band + 0
-    ├ .hm-layer dialog       z = dialog band + 1   (modal: everything below it inert)
-    ├ .hm-layer menu         z = dialog band + 2   (opened from the dialog: usable)
-    └ .hm-layer toast        z = toast band + 3    (always usable)
+ └ .m-layers                one stack (dom/portal.ts)
+    ├ .m-layer popover      z = dialog band + 0
+    ├ .m-layer dialog       z = dialog band + 1   (modal: everything below it inert)
+    ├ .m-layer menu         z = dialog band + 2   (opened from the dialog: usable)
+    └ .m-layer toast        z = toast band + 3    (always usable)
 ```
 
 Named targets (`PortalTarget`) are a registry of signals: a `Portal to` follows its target, moves in when it appears,
@@ -83,7 +83,7 @@ src/net/  src/errors/  src/channel/  src/motion/   (modules)
 - Moved so far (old path kept as a one-line re-export): `src/ui/chip.ts` → `src/components/actions/chip/`.
   Checklist: docs/component-checklist.md.
 - A folder imports other units only through their `index.ts`; core (`src/core`, `src/dom`) never imports a unit.
-- CSS stays next to its component (css-split follows the code); names keep the `hm-` prefix.
+- CSS stays next to its component (css-split follows the code); names keep the `m-` prefix.
 - `march check component <name>` checks theme/accent, RTL, i18n, ARIA, keyboard, reduced motion, overflow.
 
 ## Managers: one instance, lazy, configured globally

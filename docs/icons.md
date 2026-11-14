@@ -48,10 +48,10 @@ an `i` (`1st` → `i1st`), a reserved word gets `Icon` (`delete` → `deleteIcon
 
 A shared drawing layer handles the differences (`packPaint`, the `paint` hook every pack icon carries; it loads with
 the first pack icon and adds nothing to start-up code): the set's grid (`vb`: Phosphor 256, Material Symbols 960,
-Bootstrap 16…), its stroke width (`sw`, set on each shape, so it wins over the theme's `--hm-icon-stroke`) or `fill`,
+Bootstrap 16…), its stroke width (`sw`, set on each shape, so it wins over the theme's `--m-icon-stroke`) or `fill`,
 shapes filled even-odd (`eo`), and `currentColor` for both. Icons that point along the reading direction (left / right
 arrows, chevrons, back / forward, undo / redo, reply, send, log in / out, indent) carry `rtl` and mirror in
-right-to-left text (`.hm-svg-rtl:dir(rtl)`); up / down, left-right pairs and text alignment stay as drawn. The HADI
+right-to-left text (`.m-svg-rtl:dir(rtl)`); up / down, left-right pairs and text alignment stay as drawn. The HADI
 March set does not mirror by itself: components that use its arrows flip them where needed.
 
 ### Icons by name

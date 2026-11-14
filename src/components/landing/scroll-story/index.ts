@@ -42,23 +42,23 @@ export interface ScrollStoryProps {
 export function ScrollStory(props: ScrollStoryProps): Element {
   const active = signal(0);
   const stacked = signal(false);
-  const media = props.steps.map((s, i) => h("div", { class: () => cx("hm-story-media", active() === i && "is-active"), "aria-hidden": () => (stacked() || active() === i ? null : "true") }, s.media) as HTMLElement);
-  const slots = props.steps.map(() => h("div", { class: "hm-story-inline" }) as HTMLElement);
-  const steps = props.steps.map((s, i) => h("article", { class: () => cx("hm-story-step", active() === i && "is-active") },
+  const media = props.steps.map((s, i) => h("div", { class: () => cx("m-story-media", active() === i && "is-active"), "aria-hidden": () => (stacked() || active() === i ? null : "true") }, s.media) as HTMLElement);
+  const slots = props.steps.map(() => h("div", { class: "m-story-inline" }) as HTMLElement);
+  const steps = props.steps.map((s, i) => h("article", { class: () => cx("m-story-step", active() === i && "is-active") },
     slots[i],
-    props.numbers === false ? null : h("span", { class: "hm-story-num", "aria-hidden": "true" }, typeof props.numbers === "function" ? props.numbers(i) : String(i + 1).padStart(2, "0")),
-    h("h3", { class: "hm-story-title" }, s.title),
-    s.body != null ? h("p", { class: "hm-story-body" }, s.body) : null) as HTMLElement);
-  const dots = props.dots === false ? null : h(PageDots, { class: "hm-story-dots", count: props.steps.length, value: active, decorative: true });
+    props.numbers === false ? null : h("span", { class: "m-story-num", "aria-hidden": "true" }, typeof props.numbers === "function" ? props.numbers(i) : String(i + 1).padStart(2, "0")),
+    h("h3", { class: "m-story-title" }, s.title),
+    s.body != null ? h("p", { class: "m-story-body" }, s.body) : null) as HTMLElement);
+  const dots = props.dots === false ? null : h(PageDots, { class: "m-story-dots", count: props.steps.length, value: active, decorative: true });
   const root = h("section", {
-    class: cx("hm-story", props.side === "start" && "hm-story-media-start", props.theme !== false && "is-themed", val(props.class)),
-    "data-hm-color": () => (props.theme !== false ? colorAttr(props.steps[active()]?.color) : null),
+    class: cx("m-story", props.side === "start" && "m-story-media-start", props.theme !== false && "is-themed", val(props.class)),
+    "data-m-color": () => (props.theme !== false ? colorAttr(props.steps[active()]?.color) : null),
   },
-  h("div", { class: "hm-story-pin" }, h("div", { class: "hm-story-stage" }, media), dots),
-  h("div", { class: "hm-story-steps" }, steps)) as HTMLElement;
+  h("div", { class: "m-story-pin" }, h("div", { class: "m-story-stage" }, media), dots),
+  h("div", { class: "m-story-steps" }, steps)) as HTMLElement;
 
   // narrow (by the section's own width): each picture moves into its step card; wide: back into the pinned stage
-  const stage = root.querySelector(".hm-story-stage") as HTMLElement;
+  const stage = root.querySelector(".m-story-stage") as HTMLElement;
   observeSize(root, () => { const n = root.clientWidth > 0 && root.clientWidth < 820; if (n !== stacked.peek()) stacked.set(n); });
   effect(() => {
     const n = stacked();

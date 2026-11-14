@@ -1,14 +1,14 @@
 /* March — Skeleton. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-skel { --hm-skel-dur: 1.6s; display: block; background: var(--hm-skel-paint, linear-gradient(90deg, var(--hm-surface-2) 0%, var(--hm-surface-3) 50%, var(--hm-surface-2) 100%)); background-size: 200% 100%;
-  border-radius: var(--hm-radius-1); animation: hm-skel var(--hm-skel-dur) ease-in-out infinite; }
-.hm-skel-lines { display: flex; flex-direction: column; gap: .625rem; }
-.hm-skel-line { height: .75rem; } .hm-skel-short { width: 60%; }
-.hm-skel-sm { height: 3rem; } .hm-skel-md { height: 7rem; } .hm-skel-lg { height: 14rem; }
-.hm-skel-single .hm-skel, .hm-skel.hm-skel-single { --hm-skel-paint: linear-gradient(90deg, var(--hm-surface-2) 0%, var(--hm-surface-3) 50%, var(--hm-surface-2) 100%); }
-.hm-skel { --hm-skel-brand: linear-gradient(90deg, var(--hm-surface-2) 0%, color-mix(in srgb, var(--hm-cat-1) 10%, var(--hm-surface-2)) 30%, color-mix(in srgb, var(--hm-cat-2) 10%, var(--hm-surface-2)) 45%, color-mix(in srgb, var(--hm-cat-3) 10%, var(--hm-surface-2)) 60%, color-mix(in srgb, var(--hm-cat-4) 10%, var(--hm-surface-2)) 75%, var(--hm-surface-2) 100%); }
-.hm-skel-brand .hm-skel, .hm-skel.hm-skel-brand { --hm-skel-paint: var(--hm-skel-brand); }
-/* circle: a round shape (an avatar); --hm-skel-size is its width and height */
-.hm-skel-circle { flex: none; width: var(--hm-skel-size, 2.5rem); height: var(--hm-skel-size, 2.5rem); border-radius: 50%; }
-.hm-skel-circle-sm { --hm-skel-size: 2rem; } .hm-skel-circle-lg { --hm-skel-size: 3.5rem; }
-.is-still > .hm-skel, .hm-skel.is-still { animation: none; }
-@media (prefers-reduced-motion: reduce) { .hm-skel { animation: none; } }
+.m-skel { --m-skel-dur: 1.6s; display: block; background: var(--m-skel-paint, linear-gradient(90deg, var(--m-surface-2) 0%, var(--m-surface-3) 50%, var(--m-surface-2) 100%)); background-size: 200% 100%;
+  border-radius: var(--m-radius-1); animation: m-skel var(--m-skel-dur) ease-in-out infinite; }
+.m-skel-lines { display: flex; flex-direction: column; gap: .625rem; }
+.m-skel-line { height: .75rem; } .m-skel-short { width: 60%; }
+.m-skel-sm { height: 3rem; } .m-skel-md { height: 7rem; } .m-skel-lg { height: 14rem; }
+.m-skel-single .m-skel, .m-skel.m-skel-single { --m-skel-paint: linear-gradient(90deg, var(--m-surface-2) 0%, var(--m-surface-3) 50%, var(--m-surface-2) 100%); }
+.m-skel { --m-skel-brand: linear-gradient(90deg, var(--m-surface-2) 0%, color-mix(in srgb, var(--m-cat-1) 10%, var(--m-surface-2)) 30%, color-mix(in srgb, var(--m-cat-2) 10%, var(--m-surface-2)) 45%, color-mix(in srgb, var(--m-cat-3) 10%, var(--m-surface-2)) 60%, color-mix(in srgb, var(--m-cat-4) 10%, var(--m-surface-2)) 75%, var(--m-surface-2) 100%); }
+.m-skel-brand .m-skel, .m-skel.m-skel-brand { --m-skel-paint: var(--m-skel-brand); }
+/* circle: a round shape (an avatar); --m-skel-size is its width and height */
+.m-skel-circle { flex: none; width: var(--m-skel-size, 2.5rem); height: var(--m-skel-size, 2.5rem); border-radius: 50%; }
+.m-skel-circle-sm { --m-skel-size: 2rem; } .m-skel-circle-lg { --m-skel-size: 3.5rem; }
+.is-still > .m-skel, .m-skel.is-still { animation: none; }
+@media (prefers-reduced-motion: reduce) { .m-skel { animation: none; } }

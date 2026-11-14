@@ -1,12 +1,12 @@
 /* CtaBand. A rounded panel; gradient and video looks use light text, the rest follow the theme. */
-.hm-cta-panel { position: relative; isolation: isolate; overflow: hidden; border-radius: clamp(var(--hm-radius-4), 3cqi, 2rem); padding: clamp(2.5rem, 7cqi, 5rem) clamp(1.25rem, 5cqi, 4rem);
-  background: var(--hm-surface); border: 1px solid var(--hm-border); box-shadow: var(--hm-shadow-3); }
+.m-cta-panel { position: relative; isolation: isolate; overflow: hidden; border-radius: clamp(var(--m-radius-4), 3cqi, 2rem); padding: clamp(2.5rem, 7cqi, 5rem) clamp(1.25rem, 5cqi, 4rem);
+  background: var(--m-surface); border: 1px solid var(--m-border); box-shadow: var(--m-shadow-3); }
 /* the copy is a SectionHead (lg) above the decorative layers */
-.hm-cta-copy.hm-section-head { position: relative; z-index: 1; gap: var(--hm-space-4); max-inline-size: 44rem; }
-.hm-cta-copy .hm-section-head-lead { max-inline-size: none; }
-.hm-cta-copy .hm-section-head-actions { margin-block-start: 0; }
-.hm-cta-gradient .hm-cta-panel { border-color: transparent; color: var(--hm-on-primary-fill, var(--hm-inverse-text)); --hm-muted: color-mix(in srgb, currentColor 82%, transparent); }
-.hm-cta-gradient .hm-cta-light { mix-blend-mode: soft-light; }
-.hm-cta-gradient .hm-btn-primary { background: var(--hm-inverse-text); color: var(--hm-inverse-bg); border-color: transparent; }
-.hm-cta-gradient .hm-btn-secondary { background: transparent; color: inherit; border-color: color-mix(in srgb, currentColor 45%, transparent); }
-.hm-cta-video .hm-cta-panel { border: 0; }
+.m-cta-copy.m-section-head { position: relative; z-index: 1; gap: var(--m-space-4); max-inline-size: 44rem; }
+.m-cta-copy .m-section-head-lead { max-inline-size: none; }
+.m-cta-copy .m-section-head-actions { margin-block-start: 0; }
+.m-cta-gradient .m-cta-panel { border-color: transparent; color: var(--m-on-primary-fill, var(--m-inverse-text)); --m-muted: color-mix(in srgb, currentColor 82%, transparent); }
+.m-cta-gradient .m-cta-light { mix-blend-mode: soft-light; }
+.m-cta-gradient .m-btn-primary { background: var(--m-inverse-text); color: var(--m-inverse-bg); border-color: transparent; }
+.m-cta-gradient .m-btn-secondary { background: transparent; color: inherit; border-color: color-mix(in srgb, currentColor 45%, transparent); }
+.m-cta-video .m-cta-panel { border: 0; }

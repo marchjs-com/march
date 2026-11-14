@@ -48,7 +48,7 @@ export interface FlowPaletteProps {
 export function FlowPalette(props: FlowPaletteProps): Element {
   const flow = props.flow;
   const q = signal("");
-  const hint = uid("hm-flowpal-hint");
+  const hint = uid("m-flowpal-hint");
   const types = (): readonly FlowNodeType[] => props.types ?? flow.types;
   const shown = computed(() => {
     const query = q().trim();
@@ -80,7 +80,7 @@ export function FlowPalette(props: FlowPaletteProps): Element {
       onMove: (q) => {
         if (!ghost) {
           const copy = card.cloneNode(true) as HTMLElement;
-          copy.classList.add("hm-flowpal-ghost");
+          copy.classList.add("m-flowpal-ghost");
           setStyle(copy, { width: `${r.width}px` });
           ghost = dragGhost(copy, { offset: { x: -dx, y: -dy }, motion: () => props.motion,
             enter: [{ transform: "scale(1) rotate(0deg)" }, { transform: "scale(1.04) rotate(-2deg)" }], timing: { duration: 160, easing: "out", fill: "forwards" } });
@@ -105,33 +105,33 @@ export function FlowPalette(props: FlowPaletteProps): Element {
   // the card is a ListRow that is a button: type icon, name + description, grip
   const card = (ty: FlowNodeType): Element => {
     let el!: HTMLElement;
-    return h("li", { class: "hm-flowpal-item" }, h(ListRow, {
-      as: "button", class: "hm-flowpal-card", color: ty.color, ref: (x: HTMLElement) => { el = x; },
+    return h("li", { class: "m-flowpal-item" }, h(ListRow, {
+      as: "button", class: "m-flowpal-card", color: ty.color, ref: (x: HTMLElement) => { el = x; },
       "aria-label": () => `${val(ty.label)}${ty.description ? `. ${val(ty.description)}` : ""}`,
       "aria-describedby": hint,
       onPointerdown: (e: PointerEvent) => { e.preventDefault(); el.focus(); drag(e, ty, el); },
       onKeydown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); add(ty); } },
-      ...(props.renderCard ? { title: h("span", { class: "hm-flowpal-own" }, props.renderCard(ty)) } : {
-        lead: h(IconTile, { class: "hm-flowpal-icon", icon: ty.icon, color: ty.color }),
-        title: h(OverflowText, { class: "hm-flowpal-name" }, () => val(ty.label)),
-        sub: ty.description != null && val(props.descriptions) !== false ? h(OverflowText, { class: "hm-flowpal-desc" }, () => val(ty.description)) : undefined,
+      ...(props.renderCard ? { title: h("span", { class: "m-flowpal-own" }, props.renderCard(ty)) } : {
+        lead: h(IconTile, { class: "m-flowpal-icon", icon: ty.icon, color: ty.color }),
+        title: h(OverflowText, { class: "m-flowpal-name" }, () => val(ty.label)),
+        sub: ty.description != null && val(props.descriptions) !== false ? h(OverflowText, { class: "m-flowpal-desc" }, () => val(ty.description)) : undefined,
       }),
-      trail: val(props.grip) === false ? undefined : h("span", { class: "hm-flowpal-grip", "aria-hidden": "true" }),
+      trail: val(props.grip) === false ? undefined : h("span", { class: "m-flowpal-grip", "aria-hidden": "true" }),
     }));
   };
 
-  return h("div", { class: () => cx("hm-flowpal", val(props.class)), role: "region", "aria-label": () => props.labels?.region ?? t`Node types` },
+  return h("div", { class: () => cx("m-flowpal", val(props.class)), role: "region", "aria-label": () => props.labels?.region ?? t`Node types` },
     () => ((val(props.search) ?? true) ? h(SearchBox, { value: q, debounce: 0, placeholder: () => props.labels?.search ?? t`Search nodes`, label: () => props.labels?.search ?? t`Search nodes` }) : null),
-    h("p", { class: "hm-sr-only", id: hint }, () => props.labels?.hint ?? t`Drag onto the canvas, or press Enter to add it in the middle.`),
+    h("p", { class: "m-sr-only", id: hint }, () => props.labels?.hint ?? t`Drag onto the canvas, or press Enter to add it in the middle.`),
     () => {
       const groups = shown();
       if (!groups.length) {
         if (props.empty === false) return null;
         const own = props.empty && props.empty !== true ? props.empty : null;
-        return h(Empty, { size: "sm", class: "hm-flowpal-empty", title: own ? false : props.labels?.empty ?? t`No node type matches.` }, own);
+        return h(Empty, { size: "sm", class: "m-flowpal-empty", title: own ? false : props.labels?.empty ?? t`No node type matches.` }, own);
       }
-      return groups.map(([cat, list]) => h("section", { class: "hm-flowpal-cat" },
-        cat && val(props.categories) !== false && h(SectionLabel, { as: "h3", size: "md", class: "hm-flowpal-cattitle" }, cat),
-        h("ul", { class: "hm-flowpal-list" }, list.map(card))));
+      return groups.map(([cat, list]) => h("section", { class: "m-flowpal-cat" },
+        cat && val(props.categories) !== false && h(SectionLabel, { as: "h3", size: "md", class: "m-flowpal-cattitle" }, cat),
+        h("ul", { class: "m-flowpal-list" }, list.map(card))));
     });
 }

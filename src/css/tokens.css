@@ -1,7 +1,7 @@
 /* March — design tokens and base styles.
    Layers: a THEME (themes.css, generated from src/theme/presets.ts) sets ~25 base colors per mode, fonts and a radius;
    this file derives everything else (surfaces, hover and soft tints, borders, shadows, radii) with color-mix(), so a theme
-   switch is one attribute: <html data-hm-theme="hadi|cream|night|neon|indigo|minimal|contrast">. Light / dark: automatic
+   switch is one attribute: <html data-m-theme="hadi|cream|night|neon|indigo|minimal|contrast">. Light / dark: automatic
    (prefers-color-scheme) unless [data-theme="light"|"dark"] is set on <html>. Components read only these tokens.
    Self-hosted fonts: import "hadi-march/css/font.css". No inline styles are ever needed (CSP: style-src 'self'). */
 @import "./themes/hadi.css";
@@ -9,135 +9,135 @@
 
 :root {
   /* ---- type */
-  --hm-font-mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
-  --hm-font-features: normal;
-  --hm-text-2xs: .6875rem; --hm-text-xs: .75rem; --hm-text-sm: .8125rem; --hm-text-md: .875rem; --hm-text-lg: 1rem;
-  --hm-text-xl: 1.25rem; --hm-text-2xl: 1.5rem; --hm-text-3xl: 2rem; --hm-text-4xl: 2.75rem; --hm-text-5xl: 3.75rem;
-  --hm-leading: 1.5; --hm-leading-tight: 1.2; --hm-tracking-tight: -.015em; --hm-tracking-tighter: -.025em; --hm-tracking-caps: .06em;
-  --hm-weight-medium: 500; --hm-weight-semibold: 600; --hm-weight-bold: 700;
+  --m-font-mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+  --m-font-features: normal;
+  --m-text-2xs: .6875rem; --m-text-xs: .75rem; --m-text-sm: .8125rem; --m-text-md: .875rem; --m-text-lg: 1rem;
+  --m-text-xl: 1.25rem; --m-text-2xl: 1.5rem; --m-text-3xl: 2rem; --m-text-4xl: 2.75rem; --m-text-5xl: 3.75rem;
+  --m-leading: 1.5; --m-leading-tight: 1.2; --m-tracking-tight: -.015em; --m-tracking-tighter: -.025em; --m-tracking-caps: .06em;
+  --m-weight-medium: 500; --m-weight-semibold: 600; --m-weight-bold: 700;
 
-  /* ---- space, size, radius (radius scale follows the theme's --hm-r) */
-  --hm-space-0: 0; --hm-space-px: 1px; --hm-space-1: .25rem; --hm-space-2: .5rem; --hm-space-3: .75rem; --hm-space-4: 1rem; --hm-space-5: 1.5rem;
-  --hm-space-6: 2rem; --hm-space-7: 3rem; --hm-space-8: 4rem;
-  --hm-radius-0: 0; --hm-radius-1: calc(var(--hm-r, 8px) * .75); --hm-radius-2: var(--hm-r, 8px); --hm-radius-3: calc(var(--hm-r, 8px) * 1.4);
-  --hm-radius-4: calc(var(--hm-r, 8px) * 1.9); --hm-radius-full: 999px; --hm-radius: var(--hm-radius-2);
-  --hm-control-h: 2.25rem; --hm-control-h-sm: 1.875rem; --hm-control-h-lg: 2.75rem;
-  --hm-sidebar-w: 16.5rem; --hm-sidebar-w-rail: 3.75rem; --hm-topbar-h: 3.5rem;
+  /* ---- space, size, radius (radius scale follows the theme's --m-r) */
+  --m-space-0: 0; --m-space-px: 1px; --m-space-1: .25rem; --m-space-2: .5rem; --m-space-3: .75rem; --m-space-4: 1rem; --m-space-5: 1.5rem;
+  --m-space-6: 2rem; --m-space-7: 3rem; --m-space-8: 4rem;
+  --m-radius-0: 0; --m-radius-1: calc(var(--m-r, 8px) * .75); --m-radius-2: var(--m-r, 8px); --m-radius-3: calc(var(--m-r, 8px) * 1.4);
+  --m-radius-4: calc(var(--m-r, 8px) * 1.9); --m-radius-full: 999px; --m-radius: var(--m-radius-2);
+  --m-control-h: 2.25rem; --m-control-h-sm: 1.875rem; --m-control-h-lg: 2.75rem;
+  --m-sidebar-w: 16.5rem; --m-sidebar-w-rail: 3.75rem; --m-topbar-h: 3.5rem;
 
   /* ---- motion */
-  --hm-ease: cubic-bezier(.2, .8, .2, 1); --hm-ease-out: cubic-bezier(.16, 1, .3, 1); --hm-ease-spring: cubic-bezier(.34, 1.36, .64, 1);
-  --hm-dur-fast: 100ms; --hm-dur: 150ms; --hm-dur-slow: 240ms;
+  --m-ease: cubic-bezier(.2, .8, .2, 1); --m-ease-out: cubic-bezier(.16, 1, .3, 1); --m-ease-spring: cubic-bezier(.34, 1.36, .64, 1);
+  --m-dur-fast: 100ms; --m-dur: 150ms; --m-dur-slow: 240ms;
 
   /* ---- layers (low → high): sticky bars 20 · menus/popovers 50 · dialogs/drawers 100 · toasts 200
      · dragged element 250 (above dialogs and toasts while held) · boot loader 300 */
-  --hm-z-sticky: 20; --hm-z-dropdown: 50; --hm-z-dialog: 100; --hm-z-toast: 200; --hm-z-drag: 250; --hm-z-loader: 300;
+  --m-z-sticky: 20; --m-z-dropdown: 50; --m-z-dialog: 100; --m-z-toast: 200; --m-z-drag: 250; --m-z-loader: 300;
 
   /* ---- fixed status fills (white text ≥ 4.5:1); themes may override */
-  --hm-danger-solid: #D0343A; --hm-success-solid: #1E8E3E; --hm-warn-solid: #E08A00; --hm-info-solid: #0B84C2;
+  --m-danger-solid: #D0343A; --m-success-solid: #1E8E3E; --m-warn-solid: #E08A00; --m-info-solid: #0B84C2;
 
   /* ---- light shadows (dark ones come from the theme's dark block) */
-  --hm-shadow-1: 0 1px 2px rgb(var(--hm-shadow-rgb, 16 24 40) / .06);
-  --hm-shadow-2: 0 1px 2px rgb(var(--hm-shadow-rgb, 16 24 40) / .05), 0 4px 14px -4px rgb(var(--hm-shadow-rgb, 16 24 40) / .12);
-  --hm-shadow-3: 0 2px 6px rgb(var(--hm-shadow-rgb, 16 24 40) / .06), 0 16px 40px -8px rgb(var(--hm-shadow-rgb, 16 24 40) / .2);
-  --hm-shadow-4: 0 4px 10px rgb(var(--hm-shadow-rgb, 16 24 40) / .07), 0 28px 70px -12px rgb(var(--hm-shadow-rgb, 16 24 40) / .32);
-  --hm-shadow-inset: inset 0 1px 1px rgb(var(--hm-shadow-rgb, 16 24 40) / .05);
+  --m-shadow-1: 0 1px 2px rgb(var(--m-shadow-rgb, 16 24 40) / .06);
+  --m-shadow-2: 0 1px 2px rgb(var(--m-shadow-rgb, 16 24 40) / .05), 0 4px 14px -4px rgb(var(--m-shadow-rgb, 16 24 40) / .12);
+  --m-shadow-3: 0 2px 6px rgb(var(--m-shadow-rgb, 16 24 40) / .06), 0 16px 40px -8px rgb(var(--m-shadow-rgb, 16 24 40) / .2);
+  --m-shadow-4: 0 4px 10px rgb(var(--m-shadow-rgb, 16 24 40) / .07), 0 28px 70px -12px rgb(var(--m-shadow-rgb, 16 24 40) / .32);
+  --m-shadow-inset: inset 0 1px 1px rgb(var(--m-shadow-rgb, 16 24 40) / .05);
   /* media chrome: controls drawn over photos and video (story, lightbox, media grid) stay light-on-dark in every theme */
-  --hm-scrim: #000; --hm-on-scrim: #fff;
-  --hm-highlight: inset 0 1px 0 rgb(255 255 255 / .9);
-  --hm-mix-surface: 4%;
+  --m-scrim: #000; --m-on-scrim: #fff;
+  --m-highlight: inset 0 1px 0 rgb(255 255 255 / .9);
+  --m-mix-surface: 4%;
 }
 
 /* ---- derived colors (same formulas for every theme and mode; recomputed when the base colors change) */
-:root, [data-hm-theme] {
-  --hm-bg-subtle: color-mix(in srgb, var(--hm-text) 3%, var(--hm-bg));
-  --hm-surface-2: color-mix(in srgb, var(--hm-text) var(--hm-mix-surface), var(--hm-surface));
-  --hm-surface-3: color-mix(in srgb, var(--hm-text) calc(var(--hm-mix-surface) * 2), var(--hm-surface));
-  --hm-text-2: color-mix(in srgb, var(--hm-text) 70%, var(--hm-muted));
-  --hm-faint: color-mix(in srgb, var(--hm-muted) 72%, var(--hm-surface));
-  --hm-border-strong: color-mix(in srgb, var(--hm-text) 16%, var(--hm-border));
-  --hm-border-subtle: color-mix(in srgb, var(--hm-border) 60%, var(--hm-surface));
-  --hm-primary-hover: color-mix(in srgb, var(--hm-primary) 82%, var(--hm-text));
-  --hm-primary-soft: color-mix(in srgb, var(--hm-primary) 11%, var(--hm-surface));
-  --hm-primary-soft-2: color-mix(in srgb, var(--hm-primary) 19%, var(--hm-surface));
-  --hm-primary-solid-hover: color-mix(in srgb, var(--hm-primary-solid) 86%, var(--hm-text));
-  --hm-focus: var(--hm-primary);
-  --hm-danger-soft: color-mix(in srgb, var(--hm-danger) 10%, var(--hm-surface));
-  --hm-success-soft: color-mix(in srgb, var(--hm-success) 10%, var(--hm-surface));
-  --hm-warn-soft: color-mix(in srgb, var(--hm-warn) 11%, var(--hm-surface));
-  --hm-info-soft: color-mix(in srgb, var(--hm-info) 10%, var(--hm-surface));
-  --hm-inverse-bg: var(--hm-text); --hm-inverse-text: var(--hm-surface);
-  --hm-scrollbar: var(--hm-border-strong);
-  --hm-brand-gradient: linear-gradient(120deg, var(--hm-cat-1), var(--hm-cat-2) 35%, var(--hm-cat-3) 65%, var(--hm-cat-4));
-  --hm-special-soft: color-mix(in srgb, var(--hm-special, var(--hm-cat-4)) 11%, var(--hm-surface));
+:root, [data-m-theme] {
+  --m-bg-subtle: color-mix(in srgb, var(--m-text) 3%, var(--m-bg));
+  --m-surface-2: color-mix(in srgb, var(--m-text) var(--m-mix-surface), var(--m-surface));
+  --m-surface-3: color-mix(in srgb, var(--m-text) calc(var(--m-mix-surface) * 2), var(--m-surface));
+  --m-text-2: color-mix(in srgb, var(--m-text) 70%, var(--m-muted));
+  --m-faint: color-mix(in srgb, var(--m-muted) 72%, var(--m-surface));
+  --m-border-strong: color-mix(in srgb, var(--m-text) 16%, var(--m-border));
+  --m-border-subtle: color-mix(in srgb, var(--m-border) 60%, var(--m-surface));
+  --m-primary-hover: color-mix(in srgb, var(--m-primary) 82%, var(--m-text));
+  --m-primary-soft: color-mix(in srgb, var(--m-primary) 11%, var(--m-surface));
+  --m-primary-soft-2: color-mix(in srgb, var(--m-primary) 19%, var(--m-surface));
+  --m-primary-solid-hover: color-mix(in srgb, var(--m-primary-solid) 86%, var(--m-text));
+  --m-focus: var(--m-primary);
+  --m-danger-soft: color-mix(in srgb, var(--m-danger) 10%, var(--m-surface));
+  --m-success-soft: color-mix(in srgb, var(--m-success) 10%, var(--m-surface));
+  --m-warn-soft: color-mix(in srgb, var(--m-warn) 11%, var(--m-surface));
+  --m-info-soft: color-mix(in srgb, var(--m-info) 10%, var(--m-surface));
+  --m-inverse-bg: var(--m-text); --m-inverse-text: var(--m-surface);
+  --m-scrollbar: var(--m-border-strong);
+  --m-brand-gradient: linear-gradient(120deg, var(--m-cat-1), var(--m-cat-2) 35%, var(--m-cat-3) 65%, var(--m-cat-4));
+  --m-special-soft: color-mix(in srgb, var(--m-special, var(--m-cat-4)) 11%, var(--m-surface));
 }
 
 
 /* ---- base */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: var(--hm-bg); color: var(--hm-text); font: 400 var(--hm-text-md)/var(--hm-leading) var(--hm-font);
-  font-feature-settings: var(--hm-font-features); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
-h1, h2, h3, h4 { letter-spacing: var(--hm-tracking-tight); line-height: var(--hm-leading-tight); }
-a { color: var(--hm-primary-text); text-underline-offset: .2em; text-decoration-thickness: 1px; }
-::selection { background: color-mix(in srgb, var(--hm-primary) 26%, transparent); }
-:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: 2px; }
+body { margin: 0; background: var(--m-bg); color: var(--m-text); font: 400 var(--m-text-md)/var(--m-leading) var(--m-font);
+  font-feature-settings: var(--m-font-features); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+h1, h2, h3, h4 { letter-spacing: var(--m-tracking-tight); line-height: var(--m-leading-tight); }
+a { color: var(--m-primary-text); text-underline-offset: .2em; text-decoration-thickness: 1px; }
+::selection { background: color-mix(in srgb, var(--m-primary) 26%, transparent); }
+:focus-visible { outline: 2px solid var(--m-focus); outline-offset: 2px; }
 /* scrollbars: thin, themed and inset from the edges (rounded containers never show a thumb in their corners).
    Blink/WebKit draw ::-webkit-scrollbar only when scrollbar-color/width are unset, so the standard properties go to the
-   other engines. A rounded scroll container can add class hm-scroll (track margins follow its radius). */
-@supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: var(--hm-scrollbar) transparent; } }
+   other engines. A rounded scroll container can add class m-scroll (track margins follow its radius). */
+@supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: var(--m-scrollbar) transparent; } }
 ::-webkit-scrollbar { width: 12px; height: 12px; }
 ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
-::-webkit-scrollbar-thumb { min-height: 32px; border: 3px solid transparent; border-radius: 999px; background: var(--hm-scrollbar) padding-box; }
-::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--hm-scrollbar) 70%, var(--hm-text)); }
-.hm-scroll::-webkit-scrollbar-track { margin-block: var(--hm-radius-2); }
+::-webkit-scrollbar-thumb { min-height: 32px; border: 3px solid transparent; border-radius: 999px; background: var(--m-scrollbar) padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--m-scrollbar) 70%, var(--m-text)); }
+.m-scroll::-webkit-scrollbar-track { margin-block: var(--m-radius-2); }
 [hidden] { display: none !important; }
-.hm-sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.hm-tnum { font-variant-numeric: tabular-nums; }
-.hm-icon { display: inline-flex; align-items: center; justify-content: center; min-width: 1em; line-height: 1; }
-.hm-muted { color: var(--hm-muted); } .hm-faint { color: var(--hm-faint); }
+.m-sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.m-tnum { font-variant-numeric: tabular-nums; }
+.m-icon { display: inline-flex; align-items: center; justify-content: center; min-width: 1em; line-height: 1; }
+.m-muted { color: var(--m-muted); } .m-faint { color: var(--m-faint); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; } }
 
 /* ---- icons (hadi-march/icons) */
-.hm-svg { display: inline-block; flex: none; width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: var(--hm-icon-stroke, 1.75);
+.m-svg { display: inline-block; flex: none; width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: var(--m-icon-stroke, 1.75);
   stroke-linecap: round; stroke-linejoin: round; vertical-align: -.15em; }
-.hm-svg-fill { fill: currentColor; stroke: none; } .hm-svg-rtl:dir(rtl) { scale: -1 1; }
-.hm-svg-xs { width: .75rem; height: .75rem; } .hm-svg-sm { width: .875rem; height: .875rem; } .hm-svg-md { width: 1rem; height: 1rem; }
-.hm-svg-lg { width: 1.25rem; height: 1.25rem; } .hm-svg-xl { width: 1.5rem; height: 1.5rem; } .hm-svg-em { width: 1.15em; height: 1.15em; }
+.m-svg-fill { fill: currentColor; stroke: none; } .m-svg-rtl:dir(rtl) { scale: -1 1; }
+.m-svg-xs { width: .75rem; height: .75rem; } .m-svg-sm { width: .875rem; height: .875rem; } .m-svg-md { width: 1rem; height: 1rem; }
+.m-svg-lg { width: 1.25rem; height: 1.25rem; } .m-svg-xl { width: 1.5rem; height: 1.5rem; } .m-svg-em { width: 1.15em; height: 1.15em; }
 
 /* ---- loading / empty / error primitives used by core (async components, <Try>) */
-.hm-loading { display: inline-block; flex: none; width: 1.125rem; height: 1.125rem; border: 2px solid var(--hm-spinner-track, color-mix(in srgb, currentColor 18%, transparent));
-  border-top-color: var(--hm-spinner-head, var(--hm-accent, var(--hm-primary))); background: var(--hm-spinner-paint, none) border-box;
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); border-radius: 50%; animation: hm-spin .7s linear infinite; vertical-align: middle; }
-@keyframes hm-spin { to { transform: rotate(360deg); } }
+.m-loading { display: inline-block; flex: none; width: 1.125rem; height: 1.125rem; border: 2px solid var(--m-spinner-track, color-mix(in srgb, currentColor 18%, transparent));
+  border-top-color: var(--m-spinner-head, var(--m-accent, var(--m-primary))); background: var(--m-spinner-paint, none) border-box;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); border-radius: 50%; animation: m-spin .7s linear infinite; vertical-align: middle; }
+@keyframes m-spin { to { transform: rotate(360deg); } }
 /* em: a spinner inside a control (button) or a line of text, sized and coloured by it */
-.hm-spin-em { width: 1em; height: 1em; --hm-spinner-paint: none; --hm-spinner-track: color-mix(in srgb, currentColor 22%, transparent); --hm-spinner-head: currentColor; }
-.hm-empty { color: var(--hm-muted); text-align: center; padding: var(--hm-space-7) var(--hm-space-4); }
-.hm-error { color: var(--hm-danger-text); background: var(--hm-danger-soft); border-radius: var(--hm-radius); padding: var(--hm-space-3) var(--hm-space-4); }
+.m-spin-em { width: 1em; height: 1em; --m-spinner-paint: none; --m-spinner-track: color-mix(in srgb, currentColor 22%, transparent); --m-spinner-head: currentColor; }
+.m-empty { color: var(--m-muted); text-align: center; padding: var(--m-space-7) var(--m-space-4); }
+.m-error { color: var(--m-danger-text); background: var(--m-danger-soft); border-radius: var(--m-radius); padding: var(--m-space-3) var(--m-space-4); }
 
 /* ---- transitions used by transition:fade|slide|scale */
-.hm-t-fade-in { animation: hm-fade-in var(--hm-dur) var(--hm-ease) both; }
-.hm-t-fade-out { animation: hm-fade-in var(--hm-dur) var(--hm-ease) reverse both; }
-.hm-t-slide-in { animation: hm-slide-in var(--hm-dur-slow) var(--hm-ease-out) both; }
-.hm-t-slide-out { animation: hm-slide-in var(--hm-dur) var(--hm-ease) reverse both; }
-.hm-t-scale-in { animation: hm-scale-in var(--hm-dur-slow) var(--hm-ease-out) both; }
-.hm-t-scale-out { animation: hm-scale-in var(--hm-dur) var(--hm-ease) reverse both; }
-@keyframes hm-fade-in { from { opacity: 0; } }
-@keyframes hm-slide-in { from { opacity: 0; transform: translateY(-6px); } }
-@keyframes hm-rise-in { from { opacity: 0; transform: translateY(6px); } }
-@keyframes hm-scale-in { from { opacity: 0; transform: scale(.97) translateY(4px); } }
+.m-t-fade-in { animation: m-fade-in var(--m-dur) var(--m-ease) both; }
+.m-t-fade-out { animation: m-fade-in var(--m-dur) var(--m-ease) reverse both; }
+.m-t-slide-in { animation: m-slide-in var(--m-dur-slow) var(--m-ease-out) both; }
+.m-t-slide-out { animation: m-slide-in var(--m-dur) var(--m-ease) reverse both; }
+.m-t-scale-in { animation: m-scale-in var(--m-dur-slow) var(--m-ease-out) both; }
+.m-t-scale-out { animation: m-scale-in var(--m-dur) var(--m-ease) reverse both; }
+@keyframes m-fade-in { from { opacity: 0; } }
+@keyframes m-slide-in { from { opacity: 0; transform: translateY(-6px); } }
+@keyframes m-rise-in { from { opacity: 0; transform: translateY(6px); } }
+@keyframes m-scale-in { from { opacity: 0; transform: scale(.97) translateY(4px); } }
 /* component keyframes (feedback and overlays): one place, component stylesheets only name them */
-@keyframes hm-skel { from { background-position: 100% 0; } to { background-position: -100% 0; } }
-@keyframes hm-cycle { to { transform: translateX(-50%); } }
-@keyframes hm-indet { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
-@keyframes hm-indet-rtl { from { transform: translateX(100%); } to { transform: translateX(-250%); } }
-@keyframes hm-toast-in { from { opacity: 0; transform: translateY(10px) scale(.97); } }
-@keyframes hm-drawer-in { from { transform: translateX(100%); } }
-@keyframes hm-drawer-in-left { from { transform: translateX(-100%); } }
-@keyframes hm-drawer-in-bottom { from { transform: translateY(100%); } }
+@keyframes m-skel { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@keyframes m-cycle { to { transform: translateX(-50%); } }
+@keyframes m-indet { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+@keyframes m-indet-rtl { from { transform: translateX(100%); } to { transform: translateX(-250%); } }
+@keyframes m-toast-in { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+@keyframes m-drawer-in { from { transform: translateX(100%); } }
+@keyframes m-drawer-in-left { from { transform: translateX(-100%); } }
+@keyframes m-drawer-in-bottom { from { transform: translateY(100%); } }
 
 /* ---- dev error overlay (march dev only) */
-.hm-dev-overlay { position: fixed; inset: 0; z-index: 2147483647; background: var(--hm-overlay); display: grid; place-items: center; padding: var(--hm-space-4); }
-.hm-dev-overlay-box { background: var(--hm-surface); color: var(--hm-text); max-width: 60rem; width: 100%; max-height: 90vh; overflow: auto; border-radius: var(--hm-radius-3); padding: var(--hm-space-5); box-shadow: var(--hm-shadow-4); border-top: 3px solid var(--hm-danger-solid); }
-.hm-dev-overlay-box pre { white-space: pre-wrap; font: var(--hm-text-sm)/1.45 var(--hm-font-mono); background: var(--hm-surface-2); padding: var(--hm-space-3); border-radius: var(--hm-radius); }
-.hm-boot { position: fixed; inset: 0; display: grid; place-items: center; background: var(--hm-bg); z-index: var(--hm-z-loader); transition: opacity .25s var(--hm-ease); }
-.hm-boot.hm-boot-done { opacity: 0; pointer-events: none; }
+.m-dev-overlay { position: fixed; inset: 0; z-index: 2147483647; background: var(--m-overlay); display: grid; place-items: center; padding: var(--m-space-4); }
+.m-dev-overlay-box { background: var(--m-surface); color: var(--m-text); max-width: 60rem; width: 100%; max-height: 90vh; overflow: auto; border-radius: var(--m-radius-3); padding: var(--m-space-5); box-shadow: var(--m-shadow-4); border-top: 3px solid var(--m-danger-solid); }
+.m-dev-overlay-box pre { white-space: pre-wrap; font: var(--m-text-sm)/1.45 var(--m-font-mono); background: var(--m-surface-2); padding: var(--m-space-3); border-radius: var(--m-radius); }
+.m-boot { position: fixed; inset: 0; display: grid; place-items: center; background: var(--m-bg); z-index: var(--m-z-loader); transition: opacity .25s var(--m-ease); }
+.m-boot.m-boot-done { opacity: 0; pointer-events: none; }

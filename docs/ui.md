@@ -145,7 +145,7 @@ Sidebar for big apps. `items: [{ id, title, href, icon?, group?, badge?: () => n
 
 | Prop | Meaning |
 |---|---|
-| `storageKey = "hm.nav"` | localStorage key for collapsed groups, pins and recent items (`{ collapsed, pins, recent }`) |
+| `storageKey = "m.nav"` | localStorage key for collapsed groups, pins and recent items (`{ collapsed, pins, recent }`) |
 | `maxPinned = 8`, `maxRecent = 5` | list sizes (0 disables recent) |
 | `sort` | `"alpha"` (default: `compareText` with the active locale), `"none"`, or `(a, b) => number`; applies to groups and items |
 | `brand`, `footer`, `label`, `filter = true`, `palette = true` (register pages for the command palette) | |
@@ -176,7 +176,7 @@ Shift 64 px), Home (narrowest) and End (widest). `role="separator"` with `aria-v
 | `persist` | `true` | remember the width (in `storageKey`), or pass a localStorage key; `false` = forget |
 | `collapseBelow` | | px: dragging narrower switches to the icon rail, wider restores the labels |
 
-The width is the `--hm-sb-w` CSS variable on the wrapper (set through CSSOM: no inline style attribute, CSP safe).
+The width is the `--m-sb-w` CSS variable on the wrapper (set through CSSOM: no inline style attribute, CSP safe).
 
 ```jsx
 <NavSidebar items={items} resizable width="18rem" minWidth={220} maxWidth={420} collapseBelow={150} />
@@ -213,8 +213,8 @@ key("mod+s", save, { description: "Save", inInputs: true })
 
 ## Loader, theme, locale, updates
 
-- `bootLoader.done()` fades out and removes the static `#hm-boot` element of index.html. `<Loader text overlay />` is a full-area spinner.
-- `theme()` is `"system" | "light" | "dark"`, persisted in localStorage `hm.theme` and applied as `data-theme` on `<html>`;
+- `bootLoader.done()` fades out and removes the static `#m-boot` element of index.html. `<Loader text overlay />` is a full-area spinner.
+- `theme()` is `"system" | "light" | "dark"`, persisted in localStorage `m.theme` and applied as `data-theme` on `<html>`;
   `theme.set(v)` / `setTheme(v)`, `resolvedTheme()`. `<ThemeToggle />` cycles the three.
 - `<LocaleSelect options={[{ value: "en", label: "English" }, "tr"]} />` is bound to `locale` / `setLocale`.
 - `<UpdateBanner url="/build.txt" every={5} text reloadText onReload />` polls the URL (and on tab focus) and offers a

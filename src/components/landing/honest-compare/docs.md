@@ -33,7 +33,7 @@ and a toggle shows only the rows where the product loses.
 | `labels` | `{ yes, no, partly, ahead, behind, region, counts, onlyBehind, showAll }` | translated | every text the table writes; `counts`: `({ ahead, even, behind }) => node` |
 | `renderCell` | `(value, { row, column, us, verdict }) => node` | — | draw a cell yourself; `undefined` keeps the default mark |
 | `color` | color token | accent | colour of the product's own column |
-| `class` | string | — | extra class on the root (`.hm-hc`; parts: `.hm-hc-summary`, `.hm-hc-filter`, `.hm-hc-table`, `.hm-hc-us`, `.hm-hc-tag`, `.hm-hc-note`) |
+| `class` | string | — | extra class on the root (`.m-hc`; parts: `.m-hc-summary`, `.m-hc-filter`, `.m-hc-table`, `.m-hc-us`, `.m-hc-tag`, `.m-hc-note`) |
 
 `compareRow(row, us)` returns 1 (ahead), 0 (even), -1 (behind) or null (not scored).
 

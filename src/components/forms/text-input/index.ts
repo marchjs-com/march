@@ -28,10 +28,10 @@ export function TextInput(props: TextInputProps): unknown {
   const [get, set] = model(props, "");
   const c = ctl(props);
   // the error part exists only when the prop was given (an input in a <Field> gets its error from the field)
-  const errId = "error" in props ? `${c.id ?? uid("hm-input")}-err` : null;
+  const errId = "error" in props ? `${c.id ?? uid("m-input")}-err` : null;
   const error = (): string => (errId ? val(props.error) || "" : "");
   const el = h("input", {
-    ...c, ...textAttrs(props), type: props.type ?? "text", class: cx("hm-input", props.prefix == null && props.suffix == null && props.class),
+    ...c, ...textAttrs(props), type: props.type ?? "text", class: cx("m-input", props.prefix == null && props.suffix == null && props.class),
     ...(errId ? { "aria-invalid": () => (error() ? "true" : c["aria-invalid"]()), "aria-describedby": () => [c["aria-describedby"](), error() ? errId : null].filter(Boolean).join(" ") || null } : null),
     onInput: (e: Event) => set(props.transform ? props.transform(inputOf(e).value) : inputOf(e).value),
     onKeyDown: props.onKeyDown, onPaste: props.onPaste,
@@ -39,7 +39,7 @@ export function TextInput(props: TextInputProps): unknown {
   syncValue(el, get);
   props.ref?.(el);
   const control = affix(props, el);
-  return errId ? [control, h("div", { class: cx("hm-field-error hm-input-error", props.errorSpace && "is-kept"), id: errId, role: "alert", hidden: props.errorSpace ? null : () => !error() }, error)] : control;
+  return errId ? [control, h("div", { class: cx("m-field-error m-input-error", props.errorSpace && "is-kept"), id: errId, role: "alert", hidden: props.errorSpace ? null : () => !error() }, error)] : control;
 }
 
 /** Text input for an e-mail address (email keyboard, trimmed, lower-cased). */

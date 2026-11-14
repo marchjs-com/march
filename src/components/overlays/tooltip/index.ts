@@ -26,13 +26,13 @@ export interface TooltipProps {
 /** `<Tooltip text="Copy link" placement="top"><button>…</button></Tooltip>` — on hover and keyboard focus. */
 export function Tooltip(props: TooltipProps): unknown[] {
   const show = signal(false);
-  const id = uid("hm-tip");
+  const id = uid("m-tip");
   let anchor: HTMLElement | undefined;
   const off = (): boolean => !!val(props.disabled);
   const open = debounce(() => { if (!off()) show.set(true); }, props.delay ?? 300);
   const hide = (): void => { open.cancel(); show.set(false); };
   const wrap = h("span", {
-    class: "hm-tip-anchor", ref: (x: HTMLElement) => { anchor = x; },
+    class: "m-tip-anchor", ref: (x: HTMLElement) => { anchor = x; },
     onMouseenter: open, onMouseleave: hide, onFocusin: () => { if (!off()) show.set(true); }, onFocusout: hide,
     onKeydown: (e: KeyboardEvent) => { if (e.key === "Escape") hide(); },
   }, props.children);
@@ -44,9 +44,9 @@ export function Tooltip(props: TooltipProps): unknown[] {
       const color = colorAttr(props.color), motion = props.motion;
       return floating({
         anchor, placement: props.placement ?? "top", role: "tooltip", id, onClose: hide, children: () => val(props.text),
-        class: cx("hm-tooltip", color && "hm-tooltip-colored", motion === "fade" && "hm-tooltip-fade", motion === "none" && "hm-tooltip-still", val(props.class)),
+        class: cx("m-tooltip", color && "m-tooltip-colored", motion === "fade" && "m-tooltip-fade", motion === "none" && "m-tooltip-still", val(props.class)),
         // the bubble's own color (the panel otherwise takes the color scope of its anchor)
-        ...(color ? { ref: (x: HTMLElement) => x.setAttribute("data-hm-color", color) } : {}),
+        ...(color ? { ref: (x: HTMLElement) => x.setAttribute("data-m-color", color) } : {}),
       });
     });
   }];

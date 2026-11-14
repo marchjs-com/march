@@ -38,7 +38,7 @@ test("relative build: a page per route with paths for its depth, the shell where
     assert.match(home, /<script type="module" src="\.\/assets\/main-[\w-]+\.js">/);
     assert.match(about, /<script type="module" src="\.\.\/assets\/main-[\w-]+\.js">/);
     assert.match(intro, /<script type="module" src="\.\.\/\.\.\/assets\/main-[\w-]+\.js">/);
-    assert.match(about, /data-hm-prerender="\/about"/);
+    assert.match(about, /data-m-prerender="\/about"/);
     assert.match(about, /<img [^>]*src="\.\.\/media\/a\.png"/, "a public file under the root, from the page's folder (any attribute order)");
     assert.match(about, /<a href="\.\.\/docs\/intro"/, "links relative to the page's own address");
     assert.match(intro, /<a href="\.\.\/\.\.\/"/);
@@ -48,7 +48,7 @@ test("relative build: a page per route with paths for its depth, the shell where
       assert.doesNotMatch(html, /march-base/, "a relative build carries no base");
     }
     const broken = a.read("broken/index.html");
-    assert.doesNotMatch(broken, /data-hm-prerender/, "the plain shell");
+    assert.doesNotMatch(broken, /data-m-prerender/, "the plain shell");
     assert.match(broken, /src="\.\.\/assets\/main-/);
     assert.ok(!a.has("users"), "a route with params has no folder");
     const nf = a.read("404.html");
@@ -75,7 +75,7 @@ test("absolute base: written into index.html, absolute paths, one 404 script, _r
   } finally { a.done(); }
 });
 
-test("march-404.js: back to the app's root with the address in ?hm-path= (once; not outside the root)", async () => {
+test("march-404.js: back to the app's root with the address in ?m-path= (once; not outside the root)", async () => {
   const { NOT_FOUND_JS } = await import("../compiler/prerender.js");
   const dir = mkdtempSync(join(tmpdir(), "march-404-"));
   try {
@@ -92,8 +92,8 @@ test("march-404.js: back to the app's root with the address in ?hm-path= (once; 
     };
     const to = await run(`${root}users/7`, "?tab=a", "#top");
     assert.equal(new URL(to).pathname, root);
-    assert.equal(new URL(to).searchParams.get("hm-path"), "/users/7?tab=a#top");
+    assert.equal(new URL(to).searchParams.get("m-path"), "/users/7?tab=a#top");
     assert.equal(await run("/elsewhere/users/7"), null, "an address outside the root is left alone");
-    assert.equal(await run(`${root}users/7`, "?hm-path=%2Fx"), null, "no loop when the root itself is missing");
+    assert.equal(await run(`${root}users/7`, "?m-path=%2Fx"), null, "no loop when the root itself is missing");
   } finally { rmSync(dir, { recursive: true, force: true }); delete globalThis.__march404; }
 });

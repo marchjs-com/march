@@ -30,9 +30,9 @@ export function FilterControl<R>(table: TableState<R>, col: TableColumn<R>): Ele
   const key = col.key as string;
   const cur = (): unknown => table.filters()[key];
   const set = (v: unknown): void => table.setFilter(key, v);
-  const legendId = uid("hm-table-filter");
+  const legendId = uid("m-table-filter");
   const pair = (a: string, b: string, date: boolean): unknown[] => {
-    const part = (k: string, label: string): unknown => h(Field, { label, compact: true, class: "hm-table-filter-field" }, lazyChildren(() => h(date ? DatePicker : NumberInput, {
+    const part = (k: string, label: string): unknown => h(Field, { label, compact: true, class: "m-table-filter-field" }, lazyChildren(() => h(date ? DatePicker : NumberInput, {
       value: live(() => ((cur() as Rec | null | undefined)?.[k] as never) ?? null),
       onChange: (v: unknown) => set({ ...((untrack(cur) as Rec | null | undefined) ?? {}), [k]: v ?? null }),
     })));
@@ -53,23 +53,23 @@ export function FilterControl<R>(table: TableState<R>, col: TableColumn<R>): Ele
         const opts = table.filterOptions(key);
         return untrack(() => (col.filterMultiple === false
           ? h(Select, { "aria-label": col.label, placeholder: t`All`, options: opts, value: live(() => list(cur() ?? [])[0] ?? null), onChange: (v: unknown) => set(v == null ? null : [v]) })
-          : h(CheckboxGroup, { class: "hm-table-options", labelledby: legendId, options: opts, value: live(() => list(cur() ?? [])), onChange: set })));
+          : h(CheckboxGroup, { class: "m-table-options", labelledby: legendId, options: opts, value: live(() => list(cur() ?? [])), onChange: set })));
       };
       break;
     }
     default:
       body = h(TextInput, { type: "search", "aria-label": col.label, value: live(() => String(cur() ?? "")), onChange: set });
   }
-  return h("fieldset", { class: ["hm-table-filter", `hm-table-filter--${col.filter}`], "data-filter": col.key },
+  return h("fieldset", { class: ["m-table-filter", `m-table-filter--${col.filter}`], "data-filter": col.key },
     h("legend", { id: legendId }, col.label), body);
 }
 
 /** The sort arrow of a column header, with the column's place in a sort by several columns. One part for <Table> and DataGrid. */
 export function SortMark<R>(table: TableState<R>, key: string): Element {
   const dir = (): string | null => table.sortDir(key);
-  return h("span", { class: () => ["hm-sort-mark", dir() === "desc" && "is-desc", !dir() && "is-none"], "aria-hidden": "true" },
+  return h("span", { class: () => ["m-sort-mark", dir() === "desc" && "is-desc", !dir() && "is-none"], "aria-hidden": "true" },
     svgIcon(arrowUp),
-    () => (dir() && table.sort().length > 1 ? untrack(() => h("small", { class: "hm-sort-mark-n" }, () => String(table.sortIndex(key) + 1))) : null));
+    () => (dir() && table.sort().length > 1 ? untrack(() => h("small", { class: "m-sort-mark-n" }, () => String(table.sortIndex(key) + 1))) : null));
 }
 /** `aria-sort` of a column header. */
 export const ariaSort = <R>(table: TableState<R>, key: string): "ascending" | "descending" | "none" => { const d = table.sortDir(key); return d === "asc" ? "ascending" : d === "desc" ? "descending" : "none"; };
@@ -95,7 +95,7 @@ export function CellEditor<R>(table: TableState<R>, col: TableColumn<R>, row: R,
     if (e.key === "Enter") { e.preventDefault(); void table.commitEdit(); }
     else if (e.key === "Escape") { e.preventDefault(); table.cancelEdit(); }
   };
-  const common = { class: "hm-table-editor", "aria-label": t`Edit ${col.label}`, disabled: live(() => !!table.editing()?.saving), onChange: (v: unknown) => table.setDraft(v) };
+  const common = { class: "m-table-editor", "aria-label": t`Edit ${col.label}`, disabled: live(() => !!table.editing()?.saving), onChange: (v: unknown) => table.setDraft(v) };
   const control = (): unknown => {
     if (col.options) return h(Select, { ...common, options: table.filterOptions(key), value: draft });
     if (type === "bool") return h(Checkbox, { ...common, value: !!draft });
@@ -108,7 +108,7 @@ export function CellEditor<R>(table: TableState<R>, col: TableColumn<R>, row: R,
   };
   // the Field gives the control its id, the invalid state and the link to the message
   return h("div", {
-    class: "hm-table-edit", "data-no-row-click": "", onKeyDown: keys,
+    class: "m-table-edit", "data-no-row-click": "", onKeyDown: keys,
     ref: (el: HTMLElement) => setTimeout(() => el.isConnected && el.querySelector<HTMLElement>("input, select")?.focus(), 0),
   }, h(Field, { id, compact: true, error: live(() => table.editing()?.error ?? null) }, lazyChildren(control)));
 }

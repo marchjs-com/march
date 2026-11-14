@@ -30,13 +30,13 @@ const LINK = "\u0001", HEART = "\u0002";
 
 /** `<MadeWithMarch />`, `<MadeWithMarch variant="badge" />`. The sentence is one i18n message, so word order follows the language. */
 export function MadeWithMarch(props: MadeWithMarchProps): Element {
-  const link = (): Element => h("a", { class: "hm-madewith-link", href: props.href ?? MARCH_URL, target: "_blank", rel: "noopener" }, props.link ?? "March") as Element;
+  const link = (): Element => h("a", { class: "m-madewith-link", href: props.href ?? MARCH_URL, target: "_blank", rel: "noopener" }, props.link ?? "March") as Element;
   const heart = (): Element | null => (props.heart === false ? null
-    : h("span", { class: "hm-madewith-heart", role: "img", "aria-label": () => val(props.heartLabel) ?? t`Love` }, props.heart == null || props.heart === true ? "💗" : props.heart) as Element);
+    : h("span", { class: "m-madewith-heart", role: "img", "aria-label": () => val(props.heartLabel) ?? t`Love` }, props.heart == null || props.heart === true ? "💗" : props.heart) as Element);
   const parts = (): unknown => {
     if (props.text) return props.text(link(), heart());
     const sentence = props.heart === false ? t`Developed with ${LINK}` : t`Developed with ${LINK} and ${HEART}`;
     return sentence.split(/([\u0001\u0002])/).map((s) => (s === LINK ? link() : s === HEART ? heart() : s));
   };
-  return h("p", { class: () => cx("hm-madewith", `hm-madewith-${val(props.variant) ?? "text"}`, val(props.class)) }, parts);
+  return h("p", { class: () => cx("m-madewith", `m-madewith-${val(props.variant) ?? "text"}`, val(props.class)) }, parts);
 }

@@ -1,7 +1,7 @@
 /* March — Wizard (composite). Imported by its component module; the stage list and the bar bring their own CSS (Steps, Progress). */
-.hm-wizard-progress { flex-basis: auto; }
-.hm-wizard-title { margin: 0 0 var(--hm-space-2); font-size: var(--hm-text-lg); }
-.hm-wizard-title:focus { outline: none; }
-.hm-wizard-count { margin-inline-end: auto; color: var(--hm-muted); font-size: var(--hm-text-sm); }
+.m-wizard-progress { flex-basis: auto; }
+.m-wizard-title { margin: 0 0 var(--m-space-2); font-size: var(--m-text-lg); }
+.m-wizard-title:focus { outline: none; }
+.m-wizard-count { margin-inline-end: auto; color: var(--m-muted); font-size: var(--m-text-sm); }
 /* without the count text the buttons still sit at the end */
-.hm-wizard-nav > .hm-btn:first-child { margin-inline-start: auto; }
+.m-wizard-nav > .m-btn:first-child { margin-inline-start: auto; }

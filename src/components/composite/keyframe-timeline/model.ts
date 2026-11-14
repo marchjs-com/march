@@ -35,7 +35,7 @@ export function sample(model: TimelineModel, t: number): Record<string, Partial<
 /** CSS variables for a target's sampled values (x/y px, scale, rotate deg, opacity). */
 export function targetVars(v: Partial<Record<TimelineProp, number>>): Record<string, string> {
   const n = (x: number | undefined, d: number): string => String(Math.round((x ?? d) * 1000) / 1000);
-  return { "--hm-kt-x": n(v.x, 0), "--hm-kt-y": n(v.y, 0), "--hm-kt-s": n(v.scale, 1), "--hm-kt-r": n(v.rotate, 0), "--hm-kt-o": n(v.opacity, 1) };
+  return { "--m-kt-x": n(v.x, 0), "--m-kt-y": n(v.y, 0), "--m-kt-s": n(v.scale, 1), "--m-kt-r": n(v.rotate, 0), "--m-kt-o": n(v.opacity, 1) };
 }
 
 /** Engine timeline code for a model (what the editor plays), e.g. for the Code view. */

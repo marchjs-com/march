@@ -23,7 +23,7 @@ Without either, it says "Something went wrong." (translated); `message` replaces
 <ErrorBox message="We could not reach the server." retry={reconnect} retryLabel="Reconnect" />
 ```
 
-Parts carry `hm-errorbox-title`, `hm-errorbox-text` and `hm-errorbox-retry` for your own styles.
+Parts carry `m-errorbox-title`, `m-errorbox-text` and `m-errorbox-retry` for your own styles.
 
 ## Accessibility
 

@@ -22,7 +22,7 @@ export interface TypeOptions extends TextOptions {
 }
 function caretEl(s: SplitText): HTMLElement {
   const c = s.el.ownerDocument.createElement("span");
-  c.className = "hm-tx-caret";
+  c.className = "m-tx-caret";
   css(c, { display: "inline-block", width: "0.08em", height: "1em", "margin-inline": "0.04em", "vertical-align": "-0.12em", background: "currentColor" });
   return c;
 }

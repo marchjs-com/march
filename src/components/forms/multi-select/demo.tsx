@@ -15,6 +15,6 @@ export default function MultiSelectDemo(props: { values: { readonly: boolean; re
   return <div class="sc-stack">
     {() => <Field label="Diller"><MultiSelect value={$langs} onChange={(v: unknown) => { $langs = v as string[] }} options={LANGS} readonly={props.values.readonly} placeholder="Dil ekle"
       removeIcon={props.values.remove === "off" ? false : props.values.remove === "icon" ? () => <Icon of={trash} /> : undefined} labels={{ noResults: "Sonuç yok", remove: (l: string) => `${l} dilini kaldır` }} /></Field>}
-    <p class="hm-muted">{() => `Değer: [${$langs.join(", ")}]`}</p>
+    <p class="m-muted">{() => `Değer: [${$langs.join(", ")}]`}</p>
   </div>
 }

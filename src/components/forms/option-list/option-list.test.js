@@ -14,18 +14,18 @@ const THEMES = [{ value: "light", label: "Light", hint: "Bright" }, { value: "da
 test("OptionList: radio rows, value signal, click picks, arrows move focus over a disabled row", () => {
   const v = signal("dark"), picked = [];
   const m = mount(() => h(OptionList, { value: v, options: THEMES, label: "Theme", onPick: (x) => picked.push(x) }));
-  const root = m.el.querySelector(".hm-option-list");
+  const root = m.el.querySelector(".m-option-list");
   assert.equal(root.getAttribute("role"), "radiogroup");
   assert.equal(root.getAttribute("aria-label"), "Theme");
-  const rows = [...root.querySelectorAll("button.hm-option-list-row")];
+  const rows = [...root.querySelectorAll("button.m-option-list-row")];
   assert.equal(rows.length, 4);
   assert.deepEqual(rows.map((r) => r.getAttribute("role")), ["radio", "radio", "radio", "radio"]);
   assert.deepEqual(rows.map((r) => r.getAttribute("aria-checked")), ["false", "true", "false", "false"]);
   assert.deepEqual(rows.map((r) => r.getAttribute("tabindex")), ["-1", "0", "-1", "-1"], "the chosen row is the Tab stop");
   assert.ok(rows[1].classList.contains("is-selected"));
-  assert.equal(rows[0].querySelector(".hm-listrow-sub").textContent, "Bright");
-  assert.ok(rows[1].querySelector(".hm-listrow-lead"));
-  assert.equal(rows[3].querySelector(".hm-listrow-trail").textContent, "new");
+  assert.equal(rows[0].querySelector(".m-listrow-sub").textContent, "Bright");
+  assert.ok(rows[1].querySelector(".m-listrow-lead"));
+  assert.equal(rows[3].querySelector(".m-listrow-trail").textContent, "new");
   assert.equal(rows[2].disabled, true);
   rows[0].click();
   assert.equal(v(), "light");
@@ -47,17 +47,17 @@ test("OptionList: own state without a value; multiple listbox toggles; check off
     h(OptionList, { options: [{ value: 1, label: "One" }, { value: 2, label: "Two" }], check: false }),
     h(OptionList, { multiple: true, value: multi, options: [{ value: "a", label: "A" }, { value: "b", label: "B" }], check: () => h("i", { class: "own-tick" }) }),
   ]);
-  const [a, b] = m.el.querySelectorAll(".hm-option-list");
-  const ra = a.querySelectorAll(".hm-option-list-row");
-  assert.equal(a.querySelector(".hm-option-list-check"), null);
+  const [a, b] = m.el.querySelectorAll(".m-option-list");
+  const ra = a.querySelectorAll(".m-option-list-row");
+  assert.equal(a.querySelector(".m-option-list-check"), null);
   ra[1].click();
   assert.equal(ra[1].getAttribute("aria-checked"), "true");
   assert.equal(b.getAttribute("role"), "listbox");
   assert.equal(b.getAttribute("aria-multiselectable"), "true");
-  const rb = b.querySelectorAll(".hm-option-list-row");
+  const rb = b.querySelectorAll(".m-option-list-row");
   assert.equal(rb[0].getAttribute("role"), "option");
   assert.equal(rb[0].getAttribute("aria-selected"), "true");
-  assert.ok(rb[0].querySelector(".hm-option-list-check .own-tick"));
+  assert.ok(rb[0].querySelector(".m-option-list-check .own-tick"));
   rb[1].click();
   assert.deepEqual(multi(), ["a", "b"]);
   rb[0].click();
@@ -74,23 +74,23 @@ test("OptionList: menu of commands, groups with a SectionLabel, grid, empty text
     h(OptionList, { options: [], empty: false }),
     h(OptionList, { options: [{ value: "x", label: "X" }], renderOption: (it, s) => h("b", { class: "own-row" }, `${it.label}#${s.index}`) }),
   ]);
-  const [menu, empty, none, own] = m.el.querySelectorAll(".hm-option-list");
+  const [menu, empty, none, own] = m.el.querySelectorAll(".m-option-list");
   assert.equal(menu.getAttribute("role"), "menu");
-  for (const c of ["hm-option-list-grid", "hm-option-list-cols-2", "hm-option-list-sm", "mine"]) assert.ok(menu.classList.contains(c), c);
-  assert.equal(menu.getAttribute("data-hm-color"), "brand-orange");
-  const rows = menu.querySelectorAll(".hm-option-list-row");
+  for (const c of ["m-option-list-grid", "m-option-list-cols-2", "m-option-list-sm", "mine"]) assert.ok(menu.classList.contains(c), c);
+  assert.equal(menu.getAttribute("data-m-color"), "brand-orange");
+  const rows = menu.querySelectorAll(".m-option-list-row");
   assert.equal(rows[0].getAttribute("role"), "menuitem");
   assert.equal(rows[0].getAttribute("aria-checked"), null);
-  assert.equal(menu.querySelector(".hm-option-list-check"), null, "commands have no tick");
-  assert.deepEqual([...menu.querySelectorAll(".hm-section-label.hm-option-list-group")].map((x) => x.textContent), ["Blocks", "Media"]);
+  assert.equal(menu.querySelector(".m-option-list-check"), null, "commands have no tick");
+  assert.deepEqual([...menu.querySelectorAll(".m-section-label.m-option-list-group")].map((x) => x.textContent), ["Blocks", "Media"]);
   rows[2].click();
   assert.deepEqual(ran, ["img"]);
   assert.ok(!rows[2].classList.contains("is-selected"));
   opts.set([{ value: "q", label: "Quote" }]);
-  assert.equal(menu.querySelectorAll(".hm-option-list-row").length, 1);
-  assert.equal(empty.querySelector(".hm-option-list-empty").textContent, "Nothing here");
+  assert.equal(menu.querySelectorAll(".m-option-list-row").length, 1);
+  assert.equal(empty.querySelector(".m-option-list-empty").textContent, "Nothing here");
   assert.equal(none.children.length, 0);
-  assert.equal(own.querySelector(".hm-option-list-row .own-row").textContent, "X#0");
+  assert.equal(own.querySelector(".m-option-list-row .own-row").textContent, "X#0");
   m.dispose();
 });
 
@@ -103,7 +103,7 @@ test("OptionList: keysFrom — the field's keys move the highlight (aria-actived
   const root = m.el.querySelector("#sug");
   assert.equal(root.getAttribute("role"), "listbox");
   assert.equal(input.getAttribute("aria-controls"), "sug");
-  const rows = root.querySelectorAll("div.hm-option-list-row");
+  const rows = root.querySelectorAll("div.m-option-list-row");
   assert.equal(rows[0].getAttribute("role"), "option");
   assert.equal(rows[1].id, "sug-1");
   assert.equal(input.getAttribute("aria-activedescendant"), null);
@@ -130,7 +130,7 @@ test("OptionList: keys={false} — the owner drives the highlight, no listener, 
   const m = mount(() => h(OptionList, { id: "own", keys: false, active, overflow: "wrap", options: [{ value: "a", label: "A" }, { value: "b", label: "B" }], onPick: (v) => picked.push(v) }));
   const root = m.el.querySelector("#own");
   assert.equal(root.getAttribute("role"), "listbox");
-  const rows = root.querySelectorAll("div.hm-option-list-row");
+  const rows = root.querySelectorAll("div.m-option-list-row");
   assert.deepEqual(rows.map((r) => r.id), ["own-0", "own-1"]);
   assert.equal(rows[0].getAttribute("tabindex"), null, "rows are not focusable");
   assert.ok(rows[1].classList.contains("is-active") && !rows[0].classList.contains("is-active"));

@@ -41,10 +41,10 @@ test("Tabs: indicator off, motion none, own motion gets the panel and the direct
     h(Tabs, { tabs, value: cur, motion: (panel, dir) => calls.push([panel.getAttribute("role"), dir]) }),
     h(Tabs, { tabs }),
   ]);
-  const [plain, own, std] = host.querySelectorAll(".hm-tabs");
-  assert.match(plain.getAttribute("class"), /hm-tabs-plain/);
-  assert.match(plain.getAttribute("class"), /hm-tabs-still/);
-  assert.doesNotMatch(std.getAttribute("class"), /hm-tabs-plain|hm-tabs-still/);
+  const [plain, own, std] = host.querySelectorAll(".m-tabs");
+  assert.match(plain.getAttribute("class"), /m-tabs-plain/);
+  assert.match(plain.getAttribute("class"), /m-tabs-still/);
+  assert.doesNotMatch(std.getAttribute("class"), /m-tabs-plain|m-tabs-still/);
   assert.deepEqual(calls, [], "no motion for the first panel");
   cur.set("b");
   cur.set("a");
@@ -62,19 +62,19 @@ test("Tabs: icon, dirty dot, closable (mark and Delete key), actions slot, pill 
     tabs: [{ id: "a", label: "A", icon: "★", closable: true, dirty, title: "First", content: "one" }, { id: "b", label: "B", closable: false, content: "two" }],
   }));
   const [a, b] = host.querySelectorAll('[role="tab"]');
-  assert.match(host.querySelector('[role="tablist"]').getAttribute("class"), /hm-tabs-bar-pill/);
-  assert.equal(a.querySelector(".hm-tab-icon").textContent, "★");
+  assert.match(host.querySelector('[role="tablist"]').getAttribute("class"), /m-tabs-bar-pill/);
+  assert.equal(a.querySelector(".m-tab-icon").textContent, "★");
   assert.equal(a.getAttribute("title"), "First");
-  assert.match(a.getAttribute("class"), /hm-tab\b.*own/);
+  assert.match(a.getAttribute("class"), /m-tab\b.*own/);
   assert.equal(a.getAttribute("data-kind"), "doc");
-  assert.equal(a.querySelector(".hm-tab-dirty"), null);
+  assert.equal(a.querySelector(".m-tab-dirty"), null);
   dirty.set(true);
-  assert.equal(a.querySelector(".hm-tab-dirty").getAttribute("aria-label"), "Changed");
-  const x = a.querySelector(".hm-tab-close");
+  assert.equal(a.querySelector(".m-tab-dirty").getAttribute("aria-label"), "Changed");
+  const x = a.querySelector(".m-tab-close");
   assert.equal(x.getAttribute("title"), "Shut");
   assert.equal(x.getAttribute("aria-hidden"), "true");
   assert.equal(a.getAttribute("aria-keyshortcuts"), "Delete");
-  assert.equal(b.querySelector(".hm-tab-close"), null);
+  assert.equal(b.querySelector(".m-tab-close"), null);
   b.click();
   x.click();
   assert.deepEqual(closed, ["a"]);
@@ -85,8 +85,8 @@ test("Tabs: icon, dirty dot, closable (mark and Delete key), actions slot, pill 
   assert.deepEqual(closed, ["a", "a"], "Delete closes a closable tab only");
   a.dispatchEvent(new Event("pointerdown", { bubbles: true }));
   assert.deepEqual(downs, ["a"]);
-  const head = host.querySelector(".hm-tabs-head");
-  assert.ok(head.querySelector(".hm-tabs-actions .act"));
+  const head = host.querySelector(".m-tabs-head");
+  assert.ok(head.querySelector(".m-tabs-actions .act"));
   assert.equal(host.querySelector('[role="tablist"] .act'), null, "actions stay outside the tab list");
   dispose();
 });
@@ -101,7 +101,7 @@ test("TabList: the strip alone, vertical, manual activation, wrap, no look", () 
   const bar = host.querySelector('[role="tablist"]');
   assert.equal(bar.getAttribute("aria-orientation"), "vertical");
   assert.equal(bar.getAttribute("aria-label"), "Views");
-  assert.doesNotMatch(bar.getAttribute("class") ?? "", /hm-tabs-bar/);
+  assert.doesNotMatch(bar.getAttribute("class") ?? "", /m-tabs-bar/);
   const [a, b] = host.querySelectorAll('[role="tab"]');
   assert.equal(host.querySelectorAll('[role="tab"]').length, 2);
   assert.equal(a.id, "v-a");
@@ -125,10 +125,10 @@ test("Tabs: color, label and variant stay live", () => {
   const variant = signal("line"), label = signal("One");
   const { host, dispose } = mount(() => h(Tabs, { variant, label, color: "brand-blue", tabs: [{ id: "a", label: "A" }] }));
   const bar = host.querySelector('[role="tablist"]');
-  assert.equal(bar.getAttribute("data-hm-color"), "brand-blue");
+  assert.equal(bar.getAttribute("data-m-color"), "brand-blue");
   assert.equal(bar.getAttribute("aria-label"), "One");
   variant.set("pill"); label.set("Two");
-  assert.match(bar.getAttribute("class"), /hm-tabs-bar-pill/);
+  assert.match(bar.getAttribute("class"), /m-tabs-bar-pill/);
   assert.equal(bar.getAttribute("aria-label"), "Two");
   dispose();
 });

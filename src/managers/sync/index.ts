@@ -65,7 +65,7 @@ export interface Sync {
   dispose(): void;
 }
 
-const DEFAULTS: SyncConfig = { net: null, storageKey: "hm.sync", retry: { delay: 1000, factor: 2, max: 60_000, count: 8 }, timeout: 15_000 };
+const DEFAULTS: SyncConfig = { net: null, storageKey: "m.sync", retry: { delay: 1000, factor: 2, max: 60_000, count: 8 }, timeout: 15_000 };
 
 /** 4xx (but not 408 / 429) means the server refused this write: retrying will not help. */
 const permanent = (e: unknown): boolean => { const s = (e as AppError)?.status; return typeof s === "number" && s >= 400 && s < 500 && s !== 408 && s !== 429; };

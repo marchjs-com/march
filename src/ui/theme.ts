@@ -1,4 +1,4 @@
-// Theme ("system" | "light" | "dark", persisted under localStorage "hm.theme", applied as data-theme on <html>),
+// Theme ("system" | "light" | "dark", persisted under localStorage "m.theme", applied as data-theme on <html>),
 // ThemeToggle, LocaleSelect and UpdateBanner (new deploy detection).
 import "./theme.css";
 import "./theme-swatches.css";
@@ -27,7 +27,7 @@ const stored = (key: string): string | null => { try { return globalThis.localSt
 const store = (key: string, v: string): void => { try { globalThis.localStorage?.setItem(key, v); } catch { /* storage blocked */ } };
 
 export type ThemeMode = "system" | "light" | "dark";
-const THEME_KEY = "hm.theme";
+const THEME_KEY = "m.theme";
 const MODES: readonly ThemeMode[] = ["system", "light", "dark"];
 const isMode = (v: unknown): v is ThemeMode => MODES.includes(v as ThemeMode);
 const readTheme = (): ThemeMode => { const v = stored(THEME_KEY); return isMode(v) ? v : "system"; };
@@ -41,10 +41,10 @@ const mode = signal<ThemeMode>(readTheme(), { name: "theme" });
 export function restyleInstantly(change: () => void): void {
   const root = globalThis.document?.documentElement;
   if (!root) { change(); return; }
-  root.setAttribute("data-hm-restyling", "");
+  root.setAttribute("data-m-restyling", "");
   change();
   globalThis.getComputedStyle?.(root).getPropertyValue("color"); // the new values land while transitions are off
-  setTimeout(() => root.removeAttribute("data-hm-restyling"), 0);
+  setTimeout(() => root.removeAttribute("data-m-restyling"), 0);
 }
 
 function apply(v: ThemeMode): void {
@@ -91,7 +91,7 @@ export interface ThemeInfo {
   /** A theme made at run time (ThemeEditor): applies itself instead of loading a stylesheet; true when ready. */
   load?: () => boolean | Promise<boolean>;
 }
-const THEME_NAME_KEY = "hm.colorTheme";
+const THEME_NAME_KEY = "m.colorTheme";
 const infos = signal<readonly ThemeInfo[]>(THEME_NAMES.map((x) => ({ ...x })));
 const themeName = signal<string>(stored(THEME_NAME_KEY) || DEFAULT_THEME, { name: "colorTheme" });
 let themeBase: string | null = null;
@@ -107,25 +107,25 @@ export function loadTheme(id: string): Promise<boolean> {
   if (!d || id === DEFAULT_THEME) return Promise.resolve(true);
   const own = infos.peek().find((x) => x.id === id)?.load;
   if (own) return Promise.resolve(own());
-  const existing = d.querySelector<HTMLLinkElement>(`link[data-hm-theme-css="${id}"]`);
-  if (existing) return (existing as HTMLLinkElement & { _hmReady?: Promise<boolean> })._hmReady ?? Promise.resolve(true);
-  const l = d.createElement("link") as HTMLLinkElement & { _hmReady?: Promise<boolean> };
-  l.rel = "stylesheet"; l.href = hrefOf(id); l.setAttribute("data-hm-theme-css", id);
-  l._hmReady = new Promise<boolean>((r) => { l.onload = () => r(true); l.onerror = () => r(false); });
+  const existing = d.querySelector<HTMLLinkElement>(`link[data-m-theme-css="${id}"]`);
+  if (existing) return (existing as HTMLLinkElement & { _mReady?: Promise<boolean> })._mReady ?? Promise.resolve(true);
+  const l = d.createElement("link") as HTMLLinkElement & { _mReady?: Promise<boolean> };
+  l.rel = "stylesheet"; l.href = hrefOf(id); l.setAttribute("data-m-theme-css", id);
+  l._mReady = new Promise<boolean>((r) => { l.onload = () => r(true); l.onerror = () => r(false); });
   d.head.appendChild(l);
-  return l._hmReady;
+  return l._mReady;
 }
 function applyName(id: string): void {
   const root = globalThis.document?.documentElement;
   if (!root) return;
-  if (id === DEFAULT_THEME) { restyleInstantly(() => root.removeAttribute("data-hm-theme")); return; }
+  if (id === DEFAULT_THEME) { restyleInstantly(() => root.removeAttribute("data-m-theme")); return; }
   // switch only once the stylesheet is in: no flash of half-themed UI
-  void loadTheme(id).then((ok) => { if (themeName.peek() !== id) return; if (ok) restyleInstantly(() => root.setAttribute("data-hm-theme", id)); else console.warn(`March: theme "${id}" could not be loaded (${hrefOf(id)})`); });
+  void loadTheme(id).then((ok) => { if (themeName.peek() !== id) return; if (ok) restyleInstantly(() => root.setAttribute("data-m-theme", id)); else console.warn(`March: theme "${id}" could not be loaded (${hrefOf(id)})`); });
 }
 applyName(themeName.peek());
 /** The active color theme id (reactive). */
 export const colorTheme = (): string => themeName();
-/** Switch the color theme (persisted under localStorage "hm.colorTheme"); its stylesheet is loaded on demand. */
+/** Switch the color theme (persisted under localStorage "m.colorTheme"); its stylesheet is loaded on demand. */
 export function setColorTheme(id: string): string {
   themeName.set(id);
   store(THEME_NAME_KEY, id);
@@ -137,17 +137,17 @@ export const colorThemes = (): readonly ThemeInfo[] => infos();
 /** Offer extra themes: `registerThemes([{ id: "hadi-marka", name: "HADİ", href: "themes/hadi-marka.css" }])` (CSS made with themeCss()). */
 export function registerThemes(list: readonly ThemeInfo[]): void { infos.update((l) => [...l.filter((x) => !list.some((y) => y.id === x.id)), ...list]); }
 
-/** Small preview of a theme drawn by the theme itself (data-hm-theme scope; no inline styles). */
+/** Small preview of a theme drawn by the theme itself (data-m-theme scope; no inline styles). */
 export function ThemeSwatch(props: { id: string; class?: ClassProp }): Element {
-  return h("span", { class: () => cx("hm-swatch", val(props.class)), "data-hm-theme": props.id, "aria-hidden": "true" },
-    h("span", { class: "hm-swatch-a" }), h("span", { class: "hm-swatch-b" }), h("span", { class: "hm-swatch-c" }), h("span", { class: "hm-swatch-d" }));
+  return h("span", { class: () => cx("m-swatch", val(props.class)), "data-m-theme": props.id, "aria-hidden": "true" },
+    h("span", { class: "m-swatch-a" }), h("span", { class: "m-swatch-b" }), h("span", { class: "m-swatch-c" }), h("span", { class: "m-swatch-d" }));
 }
 
 export interface ThemePickerProps { label?: MaybeFn<string | undefined>; class?: ClassProp; placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end" }
 /** The light / dark / system choice of a theme menu (ThemePicker, ThemeMenu): a Segmented with icons. */
 export function themeModes(): Element {
   return h(Segmented<ThemeMode>, {
-    class: "hm-theme-modes", ariaLabel: live(() => t`Appearance`), value: live(() => mode()), onChange: (m: ThemeMode | null) => { if (m) theme.set(m); },
+    class: "m-theme-modes", ariaLabel: live(() => t`Appearance`), value: live(() => mode()), onChange: (m: ThemeMode | null) => { if (m) theme.set(m); },
     options: live(() => [{ value: "light", label: t`Light`, icon: sun }, { value: "dark", label: t`Dark`, icon: moon }, { value: "system", label: t`System`, icon: monitor }]),
   }) as Element;
 }
@@ -155,7 +155,7 @@ export function themeModes(): Element {
 /** The color theme choices (live swatches) of a theme menu (ThemePicker, ThemeMenu): an OptionList. */
 export function themeList(): Element {
   return h(OptionList<string>, {
-    class: "hm-theme-list", label: () => t`Theme`, value: () => themeName(), onPick: (id: string) => { setColorTheme(id); },
+    class: "m-theme-list", label: () => t`Theme`, value: () => themeName(), onPick: (id: string) => { setColorTheme(id); },
     // theme names and descriptions are English in code; the locale pack translates them
     options: () => infos().map((x) => ({ value: x.id, label: () => t(x.name), hint: x.description ? () => t(x.description ?? "") : undefined, icon: h(ThemeSwatch, { id: x.id }) })),
   }) as Element;
@@ -164,7 +164,7 @@ export function themeList(): Element {
 /** Theme menu: color themes (with live swatches) and light / dark / system. `<ThemePicker />` */
 export function ThemePicker(props: ThemePickerProps = {}): unknown {
   return h(Dropdown, {
-    icon: paletteIcon, label: () => val(props.label) ?? t`Theme`, placement: props.placement ?? "bottom-end", class: props.class, panelClass: "hm-theme-panel",
+    icon: paletteIcon, label: () => val(props.label) ?? t`Theme`, placement: props.placement ?? "bottom-end", class: props.class, panelClass: "m-theme-panel",
     children: [themeModes(), themeList()],
   });
 }
@@ -175,7 +175,7 @@ export function ThemeToggle(props: ThemeToggleProps = {}): Element {
   const labels: Record<ThemeMode, () => string> = { system: () => t`System theme`, light: () => t`Light theme`, dark: () => t`Dark theme` };
   const icons = { system: monitor, light: sun, dark: moon } as const;
   return h(IconButton, {
-    class: () => cx("hm-theme-toggle", val(props.class)), label: () => `${labels[mode()]()} — ${t`change theme`}`, title: () => labels[mode()](), icon: () => icons[mode()],
+    class: () => cx("m-theme-toggle", val(props.class)), label: () => `${labels[mode()]()} — ${t`change theme`}`, title: () => labels[mode()](), icon: () => icons[mode()],
     onClick: () => theme.set(MODES[(MODES.indexOf(mode.peek()) + 1) % MODES.length] as ThemeMode),
   }) as Element;
 }
@@ -192,7 +192,7 @@ export interface LocaleSelectProps {
 export function LocaleSelect(props: LocaleSelectProps): Element {
   const opts = (): LocaleOption[] => (val(props.options) ?? []).map((o) => (typeof o === "string" ? { value: o, label: o } : o));
   return h(Select<string>, {
-    class: live(() => cx("hm-select-sm", val(props.class))), ariaLabel: live(() => val(props.label) ?? t`Language`), placeholder: false,
+    class: live(() => cx("m-select-sm", val(props.class))), ariaLabel: live(() => val(props.label) ?? t`Language`), placeholder: false,
     options: live(opts), value: live(() => locale()), onChange: (v: string | null) => { if (v == null) return; void setLocale(v); props.onChange?.(v); },
   }) as Element;
 }
@@ -233,7 +233,7 @@ export function UpdateBanner(props: UpdateBannerProps = {}): () => unknown {
   const show = computed(() => stale() && !hidden());
   // an Alert with its action and dismiss button, drawn as the floating pill (theme.css)
   return () => show() && untrack(() => h(Alert, {
-    tone: "neutral", icon: false, class: () => cx("hm-update", val(props.class)), dismissable: true, onDismiss: () => hidden.set(true),
+    tone: "neutral", icon: false, class: () => cx("m-update", val(props.class)), dismissable: true, onDismiss: () => hidden.set(true),
     action: h(Button, { variant: "primary", size: "sm", onClick: () => (props.onReload ?? (() => globalThis.location.reload()))() }, () => val(props.reloadText) ?? t`Reload`),
   }, () => val(props.text) ?? t`A new version is available`));
 }

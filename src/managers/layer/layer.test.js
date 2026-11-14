@@ -71,7 +71,7 @@ test("scroll lock: modal kinds lock by default, locks are counted, the old overf
   unlock(); unlock();
   assert.equal(layer.scrollLocked(), false);
   assert.equal(root.style.getPropertyValue("overflow"), "auto");
-  assert.equal(root.hasAttribute("data-hm-scroll-locked"), false);
+  assert.equal(root.hasAttribute("data-m-scroll-locked"), false);
   pop.close();
   root.style.removeProperty("overflow");
 });

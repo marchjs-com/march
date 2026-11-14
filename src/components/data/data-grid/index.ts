@@ -166,7 +166,7 @@ interface Painted { el: HTMLElement; sig: string; dispose: () => void }
 
 /** `<DataGrid rows={rows} columns={[{ key: "amount", aggregate: "sum" }]} groupBy={["region"]} selectable />` */
 export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
-  const id = uid("hm-dg");
+  const id = uid("m-dg");
   const table: TableState<R> = props.table ?? createTable<R>({
     rows: props.rows, columns: props.columns as TableOptions<R>["columns"], rowKey: props.rowKey,
     paging: false, virtual: true, onEdit: props.onEdit, filename: props.filename,
@@ -251,7 +251,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   const flash = (r: number, c: number): void => {
     const cell = scroller?.querySelector<HTMLElement>(`#${cellId(r, c)}`);
     if (!cell || !motion) return;
-    const f = h("span", { class: "hm-dg-flash", "aria-hidden": "true" }) as HTMLElement;
+    const f = h("span", { class: "m-dg-flash", "aria-hidden": "true" }) as HTMLElement;
     cell.appendChild(f);
     void animate(f, [{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: "ease-out" }).finished.then(() => f.remove());
   };
@@ -283,14 +283,14 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
       { label: () => lb("hide"), onSelect: () => table.setHidden(key, true) },
     ];
     const el = h("div", {
-      role: "columnheader", class: cx("hm-dg-cell", "hm-dg-th", `hm-align-${col.align}`, col.sortable && "is-sortable", table.sortDir(key) && "is-sorted"),
+      role: "columnheader", class: cx("m-dg-cell", "m-dg-th", `m-align-${col.align}`, col.sortable && "is-sortable", table.sortDir(key) && "is-sorted"),
       "aria-colindex": String(c + 1 + (props.selectable ? 1 : 0)), "aria-sort": table.sortDir(key) ? ariaSort(table, key) : null, "data-key": key, "data-c": String(c),
     },
-    h("span", { class: "hm-dg-th-label", title: col.label }, col.label), SortMark(table, key),
-    props.columnMenu === false ? null : h("span", { class: "hm-dg-th-menu", "data-no-drag": "" }, h(Menu, { label: () => lb("columnMenu")(col.label), icon: moreVertical, size: "sm", variant: "ghost", items })),
+    h("span", { class: "m-dg-th-label", title: col.label }, col.label), SortMark(table, key),
+    props.columnMenu === false ? null : h("span", { class: "m-dg-th-menu", "data-no-drag": "" }, h(Menu, { label: () => lb("columnMenu")(col.label), icon: moreVertical, size: "sm", variant: "ghost", items })),
     // drag / arrows (RTL mirrored) / double click autosizes: the resize handle
     col.resizable === false ? null : h(ResizeHandle, {
-      class: "hm-dg-resize", tabindex: "-1", label: lb("resize")(col.label), "data-no-drag": "",
+      class: "m-dg-resize", tabindex: "-1", label: lb("resize")(col.label), "data-no-drag": "",
       value: () => widthOf(col), set: (w: number) => table.setWidth(key, w), min: col.minWidth, reset: () => autosize(col),
     })) as HTMLElement;
     setStyle(el, { width: `${widthOf(col)}px` });
@@ -304,7 +304,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     const key = String(col.key), group = (pin: string | null): TableColumn<R>[] => (pin === "left" ? cols().start : pin === "right" ? cols().end : cols().middle);
     const list = group(table.pinOf(key));
     let target: string | null = null;
-    const marker = h("span", { class: "hm-dg-drop", "aria-hidden": "true" }) as HTMLElement;
+    const marker = h("span", { class: "m-dg-drop", "aria-hidden": "true" }) as HTMLElement;
     // the headers of this pin group and their boxes, measured once when the drag starts (before the dragged header
     // moves): a move compares numbers instead of querying and measuring every header (a layout read per header per
     // pointer event). Auto-scroll shifts every header alike: the boxes are corrected by the scroll since the start.
@@ -317,7 +317,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
       onClick: (ev) => { if (col.sortable) table.toggleSort(key, ev.shiftKey); },
       onStart: () => {
         heads = [];
-        for (const x of el.parentElement?.parentElement?.querySelectorAll<HTMLElement>(".hm-dg-th") ?? []) {
+        for (const x of el.parentElement?.parentElement?.querySelectorAll<HTMLElement>(".m-dg-th") ?? []) {
           const k = x.dataset["key"] ?? "", i = at.get(k);
           if (i === undefined) continue;
           const r = x.getBoundingClientRect();
@@ -351,16 +351,16 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   // FLIP: remember each visible column's x, change the order, slide every cell from its old x
   const flipColumns = (change: () => void): void => {
     const xs = new Map<string, number>();
-    for (const x of scroller.querySelectorAll<HTMLElement>(".hm-dg-th")) xs.set(x.dataset["key"] as string, x.getBoundingClientRect().left);
+    for (const x of scroller.querySelectorAll<HTMLElement>(".m-dg-th")) xs.set(x.dataset["key"] as string, x.getBoundingClientRect().left);
     change();
     paint();
     // each column's shift measured once on its header (not once per cell: a layout read per cell per header before)
     const shift = new Map<string, number>();
-    for (const x of scroller.querySelectorAll<HTMLElement>(".hm-dg-th")) {
+    for (const x of scroller.querySelectorAll<HTMLElement>(".m-dg-th")) {
       const k = x.dataset["key"] as string, old = xs.get(k);
       if (old != null && !shift.has(k)) shift.set(k, old - x.getBoundingClientRect().left);
     }
-    for (const cell of scroller.querySelectorAll<HTMLElement>(".hm-dg-head .hm-dg-th, .hm-dg-body .hm-dg-cell[data-key]")) {
+    for (const cell of scroller.querySelectorAll<HTMLElement>(".m-dg-head .m-dg-th, .m-dg-body .m-dg-cell[data-key]")) {
       const d = shift.get(cell.dataset["key"] as string);
       if (d == null) continue;
       if (Math.abs(d) > 1 && motion) void animate(cell, [{ transform: `translateX(${d}px)` }, { transform: "none" }], { duration: 260, easing: "easeOutCubic" });
@@ -381,7 +381,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     const ed = table.editing();
     const isEditing = !!ed && ed.id === table.idOf(it.row) && ed.key === key;
     const el = h("div", {
-      role: "gridcell", id: cellId(r, c), class: cx("hm-dg-cell", `hm-align-${col.align}`, editableCol(col) && "is-editable", isEditing && "is-editing", col.cellClass as string),
+      role: "gridcell", id: cellId(r, c), class: cx("m-dg-cell", `m-align-${col.align}`, editableCol(col) && "is-editable", isEditing && "is-editing", col.cellClass as string),
       "aria-colindex": String(c + 1 + (props.selectable ? 1 : 0)), "data-key": key, "data-c": String(c),
     }) as HTMLElement;
     setStyle(el, { width: `${widthOf(col)}px` });
@@ -395,12 +395,12 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   const groupBar = (it: GroupHeader<R>, r: number): HTMLElement => {
     const lvl = table.column(it.level);
     const bar = h("div", {
-      role: "gridcell", id: cellId(r, 0), class: "hm-dg-cell hm-dg-group-label", "data-c": "0", "aria-colindex": "1", "aria-colspan": String(cols().nav.length + (props.selectable ? 1 : 0)),
+      role: "gridcell", id: cellId(r, 0), class: "m-dg-cell m-dg-group-label", "data-c": "0", "aria-colindex": "1", "aria-colspan": String(cols().nav.length + (props.selectable ? 1 : 0)),
     },
-    h(Chevron, { class: "hm-dg-chev", open: it.open, motion: "spring" }),
-    h("span", { class: "hm-dg-group-name" }, `${lvl?.label ?? it.level}: `, h("b", {}, String(lvl ? formatValue(it.rows[0] as R, lvl) : it.value ?? "") || lb("emptyGroup"))),
-    h(Badge, { class: "hm-dg-count", tone: "primary" }, num(it.count)),
-    h("span", { class: "hm-dg-group-aggs" }, aggList().map((a) => { const col = table.column(a.key) as TableColumn<R>; return h("span", { class: "hm-dg-group-agg" }, h("small", {}, col.label), aggText(col, it.aggregates[a.key])); }))) as HTMLElement;
+    h(Chevron, { class: "m-dg-chev", open: it.open, motion: "spring" }),
+    h("span", { class: "m-dg-group-name" }, `${lvl?.label ?? it.level}: `, h("b", {}, String(lvl ? formatValue(it.rows[0] as R, lvl) : it.value ?? "") || lb("emptyGroup"))),
+    h(Badge, { class: "m-dg-count", tone: "primary" }, num(it.count)),
+    h("span", { class: "m-dg-group-aggs" }, aggList().map((a) => { const col = table.column(a.key) as TableColumn<R>; return h("span", { class: "m-dg-group-agg" }, h("small", {}, col.label), aggText(col, it.aggregates[a.key])); }))) as HTMLElement;
     setStyle(bar, { width: `${Math.max(240, vp.width() - 2)}px` });
     return bar;
   };
@@ -408,7 +408,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     const kind = aggOf(String(col.key));
     const shown = v == null ? "" : typeof v === "number" && kind !== "count" && kind !== "distinct" && col.format ? formatValue({ v }, col.format === undefined ? { key: "v" } : { key: "v", format: col.format as Column<{ v: unknown }>["format"] & {} }) : typeof v === "number" ? num(v) : String(v);
     const sym: Record<string, string> = { sum: "Σ", avg: "x̄", min: "↓", max: "↑", count: "#", distinct: "≠" };
-    return h("span", { class: "hm-dg-agg", title: typeof kind === "string" ? aggLabel(kind) : "" }, typeof kind === "string" ? h("small", { "aria-hidden": "true" }, sym[kind] ?? "") : null, String(shown)) as Node;
+    return h("span", { class: "m-dg-agg", title: typeof kind === "string" ? aggLabel(kind) : "" }, typeof kind === "string" ? h("small", { "aria-hidden": "true" }, sym[kind] ?? "") : null, String(shown)) as Node;
   };
   const aggLabel = (k: string): string => ({ sum: lb("sum"), avg: lb("average"), min: lb("minimum"), max: lb("maximum"), count: lb("count"), distinct: lb("distinct") } as Record<string, string>)[k] ?? k;
   const editorKey = (e: KeyboardEvent): void => {
@@ -421,20 +421,20 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   const rowShell = (make: (col: TableColumn<R>, c: number, pin: string | null) => HTMLElement, lead: HTMLElement | null): DocumentFragment => {
     const { start, middle, end } = cols(), range = vp.cols(), s = start.length;
     const frag = document.createDocumentFragment();
-    const ps = h("div", { class: "hm-dg-pin hm-dg-pin-start" }) as HTMLElement;
+    const ps = h("div", { class: "m-dg-pin m-dg-pin-start" }) as HTMLElement;
     if (lead) ps.append(lead);
     start.forEach((col, i) => ps.append(make(col, i, "left")));
     setStyle(ps, { width: `${startW()}px` });
     frag.append(ps);
-    const pre = h("div", { class: "hm-dg-gap" }) as HTMLElement;
+    const pre = h("div", { class: "m-dg-gap" }) as HTMLElement;
     setStyle(pre, { width: `${range.top}px` });
     frag.append(pre);
     for (let i = range.start; i < range.end; i++) frag.append(make(middle[i] as TableColumn<R>, s + i, null));
-    const post = h("div", { class: "hm-dg-gap" }) as HTMLElement;
+    const post = h("div", { class: "m-dg-gap" }) as HTMLElement;
     setStyle(post, { width: `${range.bottom}px` });
     frag.append(post);
     if (end.length) {
-      const pe = h("div", { class: "hm-dg-pin hm-dg-pin-end" }) as HTMLElement;
+      const pe = h("div", { class: "m-dg-pin m-dg-pin-end" }) as HTMLElement;
       end.forEach((col, i) => pe.append(make(col, s + middle.length + i, "right")));
       setStyle(pe, { width: `${endW()}px` });
       frag.append(pe);
@@ -442,29 +442,29 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     return frag;
   };
   const checkCell = (checked: boolean | "mixed", label: string, onToggle: (e: MouseEvent) => void, role = "gridcell"): HTMLElement => {
-    const box = h(Checkbox, { class: "hm-table-check", tabIndex: -1, "aria-label": label, value: checked === true, indeterminate: checked === "mixed", onClick: (e: MouseEvent) => { e.stopPropagation(); onToggle(e); } });
-    const cell = h("div", { role, class: "hm-dg-cell hm-dg-check", "aria-colindex": "1" }, box) as HTMLElement;
+    const box = h(Checkbox, { class: "m-table-check", tabIndex: -1, "aria-label": label, value: checked === true, indeterminate: checked === "mixed", onClick: (e: MouseEvent) => { e.stopPropagation(); onToggle(e); } });
+    const cell = h("div", { role, class: "m-dg-cell m-dg-check", "aria-colindex": "1" }, box) as HTMLElement;
     setStyle(cell, { width: `${SEL_W}px` });
     return cell;
   };
 
   // ------------------------------------------------------------------ DOM
-  const headRow = h("div", { role: "row", class: "hm-dg-row hm-dg-head-row", "aria-rowindex": "1" }) as HTMLElement;
-  const head = h("div", { role: "rowgroup", class: "hm-dg-head" }, headRow, () => (filtersOpen() ? filterRow() : null)) as HTMLElement;
-  const rowsEl = h("div", { role: "rowgroup", class: "hm-dg-body" }) as HTMLElement;
-  const footRow = h("div", { role: "row", class: "hm-dg-row hm-dg-foot-row" }) as HTMLElement;
-  const foot = h("div", { role: "rowgroup", class: "hm-dg-foot", hidden: () => !showFooter() }, footRow) as HTMLElement;
-  const canvas = h("div", { class: "hm-dg-canvas" }, head, rowsEl, foot) as HTMLElement;
-  const empty = props.empty === false ? null : h("div", { class: "hm-dg-empty", hidden: () => count() > 0 || table.loading() },
+  const headRow = h("div", { role: "row", class: "m-dg-row m-dg-head-row", "aria-rowindex": "1" }) as HTMLElement;
+  const head = h("div", { role: "rowgroup", class: "m-dg-head" }, headRow, () => (filtersOpen() ? filterRow() : null)) as HTMLElement;
+  const rowsEl = h("div", { role: "rowgroup", class: "m-dg-body" }) as HTMLElement;
+  const footRow = h("div", { role: "row", class: "m-dg-row m-dg-foot-row" }) as HTMLElement;
+  const foot = h("div", { role: "rowgroup", class: "m-dg-foot", hidden: () => !showFooter() }, footRow) as HTMLElement;
+  const canvas = h("div", { class: "m-dg-canvas" }, head, rowsEl, foot) as HTMLElement;
+  const empty = props.empty === false ? null : h("div", { class: "m-dg-empty", hidden: () => count() > 0 || table.loading() },
     props.empty != null && props.empty !== true ? props.empty : h(Empty, { size: "sm", title: () => (table.activeFilters().length || table.search() ? lb("noMatch") : lb("noRows")) })) as HTMLElement;
 
   const filterRow = (): Element => {
-    const r = h("div", { role: "row", class: "hm-dg-row hm-dg-filter-row" }) as HTMLElement;
-    const lead = props.selectable ? h("div", { class: "hm-dg-cell hm-dg-check", role: "gridcell" }) as HTMLElement : null;
+    const r = h("div", { role: "row", class: "m-dg-row m-dg-filter-row" }) as HTMLElement;
+    const lead = props.selectable ? h("div", { class: "m-dg-cell m-dg-check", role: "gridcell" }) as HTMLElement : null;
     if (lead) setStyle(lead, { width: `${SEL_W}px` });
     effect(() => {
       r.replaceChildren(rowShell((col) => {
-        const cell = h("div", { role: "gridcell", class: "hm-dg-cell hm-dg-filter", "data-key": String(col.key) }) as HTMLElement;
+        const cell = h("div", { role: "gridcell", class: "m-dg-cell m-dg-filter", "data-key": String(col.key) }) as HTMLElement;
         setStyle(cell, { width: `${widthOf(col)}px` });
         if (col.filter) untrack(() => cell.append(FilterControl(table, col) as Node));
         return cell;
@@ -513,14 +513,14 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
       p?.dispose(); p?.el.remove();
       const el = createRoot((dispose) => {
         const row = h("div", {
-          role: "row", class: cx("hm-dg-row", it.kind === "group" ? "hm-dg-group" : "hm-dg-data", isSel && "is-selected", r % 2 && "is-odd"),
+          role: "row", class: cx("m-dg-row", it.kind === "group" ? "m-dg-group" : "m-dg-data", isSel && "is-selected", r % 2 && "is-odd"),
           "aria-rowindex": String(r + 2), "aria-selected": props.selectable && it.kind === "row" ? String(isSel) : null,
           "aria-expanded": it.kind === "group" ? String(it.open) : null, "aria-level": it.kind === "group" ? String(it.depth + 1) : null, "data-r": String(r),
         }) as HTMLElement;
-        const lead = props.selectable ? (it.kind === "row" ? checkCell(isSel, lb("selectRow"), (e) => { go(r, untrack(cursor).c); table.toggle(it.row, { range: e.shiftKey }); }) : (() => { const x = h("div", { role: "gridcell", class: "hm-dg-cell hm-dg-check" }) as HTMLElement; setStyle(x, { width: `${SEL_W}px` }); return x; })()) : null;
+        const lead = props.selectable ? (it.kind === "row" ? checkCell(isSel, lb("selectRow"), (e) => { go(r, untrack(cursor).c); table.toggle(it.row, { range: e.shiftKey }); }) : (() => { const x = h("div", { role: "gridcell", class: "m-dg-cell m-dg-check" }) as HTMLElement; setStyle(x, { width: `${SEL_W}px` }); return x; })()) : null;
         if (it.kind === "group") row.append(groupBar(it, r));
         else row.append(rowShell((col, i) => bodyCell(it, r, col, i), lead));
-        setStyle(row, { width: `${totalW()}px`, height: `${h0}px`, transform: `translateY(${r * h0}px)`, "--hm-dg-depth": String(it.depth) });
+        setStyle(row, { width: `${totalW()}px`, height: `${h0}px`, transform: `translateY(${r * h0}px)`, "--m-dg-depth": String(it.depth) });
         (row as unknown as { _row?: unknown })._row = rowObj;
         painted.set(k, { el: row, sig, dispose });
         return row;
@@ -538,13 +538,13 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     // footer totals
     if (showFooter()) {
       footRow.replaceChildren(rowShell((col, i) => {
-        const cell = h("div", { role: "gridcell", class: cx("hm-dg-cell", `hm-align-${col.align}`), "data-key": String(col.key) }) as HTMLElement;
+        const cell = h("div", { role: "gridcell", class: cx("m-dg-cell", `m-align-${col.align}`), "data-key": String(col.key) }) as HTMLElement;
         setStyle(cell, { width: `${widthOf(col)}px` });
         const key = String(col.key);
         if (key in totals()) cell.append(aggText(col, totals()[key]));
         else if (i === 0) cell.append(h("b", {}, lb("total")) as Node);
         return cell;
-      }, props.selectable ? (() => { const x = h("div", { class: "hm-dg-cell hm-dg-check", role: "gridcell" }) as HTMLElement; setStyle(x, { width: `${SEL_W}px` }); return x; })() : null));
+      }, props.selectable ? (() => { const x = h("div", { class: "m-dg-cell m-dg-check", role: "gridcell" }) as HTMLElement; setStyle(x, { width: `${SEL_W}px` }); return x; })() : null));
       setStyle(footRow, { width: `${totalW()}px`, height: `${h0}px` });
     }
     // entrance: rows after a sort / group / filter change and rows revealed by opening a group
@@ -604,12 +604,12 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     try { await globalThis.navigator?.clipboard?.writeText(text); } catch { /* clipboard blocked */ }
   };
   const cellAt = (e: Event): { r: number; c: number } | null => {
-    const cell = (e.target as Element).closest<HTMLElement>(".hm-dg-cell[data-c]"), row = (e.target as Element).closest<HTMLElement>("[data-r]");
+    const cell = (e.target as Element).closest<HTMLElement>(".m-dg-cell[data-c]"), row = (e.target as Element).closest<HTMLElement>("[data-r]");
     return cell && row ? { r: Number(row.dataset["r"]), c: Number(cell.dataset["c"]) } : null;
   };
 
   scroller = h("div", {
-    class: "hm-dg-scroll", role: "grid", tabindex: "0", id: `${id}-grid`,
+    class: "m-dg-scroll", role: "grid", tabindex: "0", id: `${id}-grid`,
     "aria-label": () => val(props.label) ?? t`Data grid`, "aria-rowcount": () => String(count() + 1), "aria-colcount": () => String(cols().nav.length + (props.selectable ? 1 : 0)),
     "aria-multiselectable": props.selectable ? "true" : null,
     onKeydown: onKey,
@@ -629,22 +629,22 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
 
   const toolbar = props.toolbar === false ? null : Toolbar();
   function Toolbar(): Element {
-    return h("div", { class: "hm-dg-toolbar", role: "toolbar", "aria-label": () => lb("tools") },
-      tool("search") ? h(SearchBox, { class: "hm-dg-search", debounce: 0, value: () => table.search(), onSearch: (q: string) => table.setSearch(q), placeholder: () => lb("search"), label: () => lb("search") }) : null,
-      tool("groups") ? h("div", { class: "hm-dg-groups", "aria-label": () => lb("grouping") },
-        h("span", { class: "hm-dg-groups-icon", "aria-hidden": "true" }, glyph(layers)),
+    return h("div", { class: "m-dg-toolbar", role: "toolbar", "aria-label": () => lb("tools") },
+      tool("search") ? h(SearchBox, { class: "m-dg-search", debounce: 0, value: () => table.search(), onSearch: (q: string) => table.setSearch(q), placeholder: () => lb("search"), label: () => lb("search") }) : null,
+      tool("groups") ? h("div", { class: "m-dg-groups", "aria-label": () => lb("grouping") },
+        h("span", { class: "m-dg-groups-icon", "aria-hidden": "true" }, glyph(layers)),
         () => (groupKeys().length
           ? groupKeys().map((k) => h(Chip, { size: "sm", tone: "primary", onRemove: () => setGroups(groupKeys().filter((x) => x !== k)) }, table.column(k)?.label ?? k))
-          : h("span", { class: "hm-dg-hint" }, lb("groupHint")))) : null,
-      h("span", { class: "hm-dg-spacer" }),
+          : h("span", { class: "m-dg-hint" }, lb("groupHint")))) : null,
+      h("span", { class: "m-dg-spacer" }),
       () => (table.visibleColumns().length < table.allColumns().length ? h(Button, { variant: "ghost", size: "sm", onClick: () => { for (const c of table.allColumns()) table.setHidden(String(c.key), false); } }, lb("showAll")) : null),
       tool("filters") ? h(Button, { size: "sm", variant: () => (filtersOpen() ? "primary" : "secondary"), icon: filterIcon, "aria-pressed": () => String(filtersOpen()), onClick: () => filtersOpen.set(!filtersOpen()) },
         () => (table.activeFilters().length ? lb("filtersActive")(table.activeFilters().length) : lb("filters"))) : null,
       tool("csv") ? h(Button, { size: "sm", icon: download, onClick: () => void table.exportCSV({ download: true, filename: `${props.filename ?? "data"}.csv` }) }, lb("csv")) : null,
-      tool("count") ? h(LiveStatus, { class: "hm-dg-total" }, () => lb("rows")(num(table.rows().length)), () => (table.selectedCount() ? h("b", {}, ` · ${lb("selected")(num(table.selectedCount()))}`) : null)) : null);
+      tool("count") ? h(LiveStatus, { class: "m-dg-total" }, () => lb("rows")(num(table.rows().length)), () => (table.selectedCount() ? h("b", {}, ` · ${lb("selected")(num(table.selectedCount()))}`) : null)) : null);
   }
 
-  const root = h("div", { class: () => cx("hm-dg", val(props.class)) }, toolbar, scroller) as HTMLElement;
+  const root = h("div", { class: () => cx("m-dg", val(props.class)) }, toolbar, scroller) as HTMLElement;
   vp.bind(scroller);
   // repaint on any change the window depends on (scroll only repaints when the rendered range changes)
   effect(() => paint());

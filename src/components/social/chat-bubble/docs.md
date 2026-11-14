@@ -37,7 +37,7 @@ you let go while the bubble springs back on the motion engine.
 | `swipe` | boolean | `true` | drag-to-reply; `false` keeps only the Reply button |
 | `tools` | boolean | `true` | the React / Reply buttons on hover and focus |
 | `reactIcon`, `replyIcon` | node | smile / arrow | your own icons for those buttons |
-| `class` | string | — | on the row (`hm-msg`) |
+| `class` | string | — | on the row (`m-msg`) |
 
 Every part is yours:
 
@@ -47,8 +47,8 @@ Every part is yours:
   replyHint={false} tools={false} />
 ```
 
-Stable classes: `hm-msg-bubble`, `hm-msg-sender`, `hm-msg-quote`, `hm-msg-text`, `hm-msg-meta`, `hm-msg-edited`,
-`hm-msg-tick`, `hm-msg-reacts`, `hm-msg-react`, `hm-msg-retry`, `hm-msg-tools`, `hm-msg-tool-react`, `hm-msg-tool-reply`, `hm-msg-hint`.
+Stable classes: `m-msg-bubble`, `m-msg-sender`, `m-msg-quote`, `m-msg-text`, `m-msg-meta`, `m-msg-edited`,
+`m-msg-tick`, `m-msg-reacts`, `m-msg-react`, `m-msg-retry`, `m-msg-tools`, `m-msg-tool-react`, `m-msg-tool-reply`, `m-msg-hint`.
 
 ## Accessibility
 

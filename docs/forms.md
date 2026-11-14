@@ -5,7 +5,7 @@ Schema-driven forms, a field wrapper with correct ARIA wiring, and a complete se
 
 ```js
 import "hadi-march/css/tokens.css"
-import "hadi-march/css/forms.css"   // buttons (.hm-btn) come from ui.css
+import "hadi-march/css/forms.css"   // buttons (.m-btn) come from ui.css
 ```
 
 Rules shared by every control:
@@ -96,7 +96,7 @@ Without children it renders every active schema field (`hidden` fields and `type
 
 ```jsx
 <Form schema={S} onSubmit={save}>
-  <div class="hm-cols-2">
+  <div class="m-cols-2">
     <Field name="first" />
     <Field name="last" />
   </div>
@@ -339,7 +339,7 @@ loaded values; Save is disabled until something changed. Server `fieldErrors` ma
 Every control takes `color` (a theme token): focus ring and border, caret, selected text, checked state, slider,
 selected option and day, chips, active step and the drop zone use it. `<Form color="brand-blue">`, `<Field color=…>` and
 groups (`<CheckboxGroup>`, `<RadioGroup>`, `<Segmented>`) pass it to everything inside (CSS inheritance of
-`data-hm-color`); a control's own `color` overrides it. Invalid fields always show `danger`. Floating panels (Select,
+`data-m-color`); a control's own `color` overrides it. Invalid fields always show `danger`. Floating panels (Select,
 DatePicker) take the color of their control.
 
 Tokens: `primary`, `info`, `success`, `warning`, `danger`, `neutral`, `special`, `brand-orange`, `brand-blue`,

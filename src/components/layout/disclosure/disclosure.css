@@ -1,12 +1,12 @@
 /* March — Disclosure. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- disclosure */
-.hm-disclosure { border: 1px solid var(--hm-border); border-radius: var(--hm-radius-3); background: var(--hm-surface); }
-.hm-disclosure-summary { cursor: pointer; padding: var(--hm-space-3) var(--hm-space-4); font-weight: var(--hm-weight-medium); list-style: none; display: flex; align-items: center; gap: var(--hm-space-2);
-  border-radius: inherit; transition: background-color var(--hm-dur) var(--hm-ease); }
-.hm-disclosure-summary:hover { background: var(--hm-surface-2); }
-.hm-disclosure-summary::-webkit-details-marker { display: none; }
+.m-disclosure { border: 1px solid var(--m-border); border-radius: var(--m-radius-3); background: var(--m-surface); }
+.m-disclosure-summary { cursor: pointer; padding: var(--m-space-3) var(--m-space-4); font-weight: var(--m-weight-medium); list-style: none; display: flex; align-items: center; gap: var(--m-space-2);
+  border-radius: inherit; transition: background-color var(--m-dur) var(--m-ease); }
+.m-disclosure-summary:hover { background: var(--m-surface-2); }
+.m-disclosure-summary::-webkit-details-marker { display: none; }
 /* the turning arrow is a Chevron: it follows details[open] and mirrors in right-to-left pages */
-.hm-disclosure-chev { color: var(--hm-muted); }
-.hm-disclosure-body { padding: 0 var(--hm-space-4) var(--hm-space-4); }
+.m-disclosure-chev { color: var(--m-muted); }
+.m-disclosure-body { padding: 0 var(--m-space-4) var(--m-space-4); }
 /* marker={your own node}: drawn as given, in place of the arrow */
-.hm-disclosure-marker { display: inline-flex; color: var(--hm-muted); }
+.m-disclosure-marker { display: inline-flex; color: var(--m-muted); }

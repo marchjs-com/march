@@ -28,12 +28,12 @@ const native = (): boolean => reducedMotion() || !!globalThis.matchMedia?.("(hov
 
 /** `<HorizontalScroll label="Case studies"><Card/><Card/><Card/></HorizontalScroll>` */
 export function HorizontalScroll(props: HorizontalScrollProps): Element {
-  const track = h("div", { class: "hm-hs-track" }, props.children) as HTMLElement;
+  const track = h("div", { class: "m-hs-track" }, props.children) as HTMLElement;
   const done = signal(0); // 0..1 of the pinned passage: the Progress line under the panels shows it
-  const pin = h("div", { class: "hm-hs-pin" }, h("div", { class: "hm-hs-view" }, track),
-    props.progress === false ? null : h(Progress, { variant: "line", decorative: true, smooth: false, value: done, max: 1, class: "hm-hs-bar" })) as HTMLElement;
-  const root = h("section", { class: cx("hm-hs", val(props.class)), "aria-label": props.label ?? null, role: props.label ? "region" : null }, pin) as HTMLElement;
-  if (props.panel) setStyle(root, { "--hm-hs-panel": props.panel });
+  const pin = h("div", { class: "m-hs-pin" }, h("div", { class: "m-hs-view" }, track),
+    props.progress === false ? null : h(Progress, { variant: "line", decorative: true, smooth: false, value: done, max: 1, class: "m-hs-bar" })) as HTMLElement;
+  const root = h("section", { class: cx("m-hs", val(props.class)), "aria-label": props.label ?? null, role: props.label ? "region" : null }, pin) as HTMLElement;
+  if (props.panel) setStyle(root, { "--m-hs-panel": props.panel });
 
   let overflow = 0;
   const size = (): void => {
@@ -41,7 +41,7 @@ export function HorizontalScroll(props: HorizontalScrollProps): Element {
     root.classList.toggle("is-native", nat);
     overflow = nat ? 0 : Math.max(0, track.scrollWidth - pin.clientWidth);
     // the section is as tall as the sideways distance plus one screen
-    setStyle(root, { "--hm-hs-extra": `${overflow}px` });
+    setStyle(root, { "--m-hs-extra": `${overflow}px` });
   };
   if (globalThis.ResizeObserver) { observeSize(track, size); observeSize(pin, size); }
   queueMicrotask(size);

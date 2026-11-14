@@ -89,7 +89,7 @@ function build(props: WizardProps, steps: readonly WizardStep[], carried: Values
     provide(FormContext, form);
     const index = signal(0);
     const stepError = signal<string | null>(null);
-    const id = uid("hm-wiz");
+    const id = uid("m-wiz");
     const namesOf = (s: WizardStep) => s.fields ?? s.schema?.names() ?? [];
     const last = () => index() === steps.length - 1;
     /** Validate one step; returns true when it may be left. */
@@ -115,29 +115,29 @@ function build(props: WizardProps, steps: readonly WizardStep[], carried: Values
     const current = computed(() => index());
     const titleOf = (s: WizardStep, i: number): string => s.title ?? props.labels?.step?.(i) ?? t`Step ${i + 1}`;
     const countText = (): string => props.labels?.count?.(index(), steps.length) ?? t`Step ${index() + 1} of ${steps.length}`;
-    return h("form", { "data-hm-color": () => colorAttr(props.color),
-      class: cx("hm-wizard", props.class), novalidate: true, "aria-busy": () => (form.submitting() ? "true" : null),
+    return h("form", { "data-m-color": () => colorAttr(props.color),
+      class: cx("m-wizard", props.class), novalidate: true, "aria-busy": () => (form.submitting() ? "true" : null),
       onSubmit: (e: Event) => { e.preventDefault(); next(); },
     },
     // the stage list is the Steps component: a later step is reachable once every step before it validates
-    props.stepper === false ? null : h(Steps, { class: "hm-wizard-steps", steps: steps.map((s, i) => ({ title: titleOf(s, i) })), current: () => index(), onSelect: (i: number) => api.go(i) }),
-    // the Progress component (its own CSS travels with it; the old .hm-progress markup was only styled by file.css)
-    props.progress === false ? null : h(Progress, { class: "hm-wizard-progress", value: () => index() + 1, max: steps.length, size: "sm", label: countText }),
+    props.stepper === false ? null : h(Steps, { class: "m-wizard-steps", steps: steps.map((s, i) => ({ title: titleOf(s, i) })), current: () => index(), onSelect: (i: number) => api.go(i) }),
+    // the Progress component (its own CSS travels with it; the old .m-progress markup was only styled by file.css)
+    props.progress === false ? null : h(Progress, { class: "m-wizard-progress", value: () => index() + 1, max: steps.length, size: "sm", label: countText }),
     // layout and cols are live too: the step's fields are laid out again (values stay in the form)
     () => {
       const i = current();
       const s = steps[i]!;
       const layout = props.layout, cols = props.cols;
-      return untrack(() => h("section", { class: "hm-wizard-step", "aria-labelledby": `${id}-title` },
-        h("h3", { class: "hm-wizard-title", id: `${id}-title`, tabindex: "-1" }, titleOf(s, i)),
-        s.description ? h("p", { class: "hm-section-desc" }, s.description) : null,
+      return untrack(() => h("section", { class: "m-wizard-step", "aria-labelledby": `${id}-title` },
+        h("h3", { class: "m-wizard-title", id: `${id}-title`, tabindex: "-1" }, titleOf(s, i)),
+        s.description ? h("p", { class: "m-section-desc" }, s.description) : null,
         s.render ? s.render(form) : renderFields(form, namesOf(s), { layout, cols })));
     },
-    () => (stepError() ? h(Alert, { tone: "danger", class: "hm-form-error" }, stepError()) : null),
-    () => (form.submitError() ? h(Alert, { tone: "danger", class: "hm-form-error" }, form.submitError()) : null),
-    h("div", { class: "hm-form-buttons hm-wizard-nav" },
-      props.count === false ? null : h("span", { class: "hm-wizard-count" }, countText),
-      props.backButton === false ? null : h(Button, { class: "hm-wizard-back", disabled: () => index() === 0 || form.submitting(), onClick: back }, () => props.labels?.back ?? t`Back`),
-      h(Button, { type: "submit", variant: "primary", class: "hm-wizard-next", loading: () => form.submitting() }, () => (last() ? props.submitLabel ?? t`Finish` : props.labels?.next ?? t`Next`))));
+    () => (stepError() ? h(Alert, { tone: "danger", class: "m-form-error" }, stepError()) : null),
+    () => (form.submitError() ? h(Alert, { tone: "danger", class: "m-form-error" }, form.submitError()) : null),
+    h("div", { class: "m-form-buttons m-wizard-nav" },
+      props.count === false ? null : h("span", { class: "m-wizard-count" }, countText),
+      props.backButton === false ? null : h(Button, { class: "m-wizard-back", disabled: () => index() === 0 || form.submitting(), onClick: back }, () => props.labels?.back ?? t`Back`),
+      h(Button, { type: "submit", variant: "primary", class: "m-wizard-next", loading: () => form.submitting() }, () => (last() ? props.submitLabel ?? t`Finish` : props.labels?.next ?? t`Next`))));
   });
 }

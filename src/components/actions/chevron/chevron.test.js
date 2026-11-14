@@ -11,9 +11,9 @@ const mount = (view) => { const el = document.createElement("div"); document.bod
 test("Chevron: decorative, follows `open`, automatic without it", () => {
   const open = signal(false);
   const [el, dispose] = mount(() => [h(Chevron, { open }), h(Chevron, { "data-k": "1" })]);
-  const [a, b] = el.querySelectorAll(".hm-chevron");
+  const [a, b] = el.querySelectorAll(".m-chevron");
   assert.equal(a.getAttribute("aria-hidden"), "true");
-  assert.ok(a.classList.contains("is-closed") && a.classList.contains("hm-chevron-end") && a.classList.contains("hm-chevron-sm"));
+  assert.ok(a.classList.contains("is-closed") && a.classList.contains("m-chevron-end") && a.classList.contains("m-chevron-sm"));
   assert.ok(a.querySelector("svg"), "the built-in glyph");
   open.set(true);
   assert.ok(a.classList.contains("is-open") && !a.classList.contains("is-closed"));
@@ -29,12 +29,12 @@ test("Chevron: direction, size, motion, colour, own icon, leaf", () => {
     h(Chevron, { motion: false, icon: "›" }),
     h(Chevron, { icon: arrowRight }),
   ]);
-  const [a, b, c] = el.querySelectorAll(".hm-chevron");
-  for (const k of ["hm-chevron-down", "hm-chevron-lg", "is-spring", "mine"]) assert.ok(a.classList.contains(k), k);
-  assert.equal(a.getAttribute("data-hm-color"), "primary");
+  const [a, b, c] = el.querySelectorAll(".m-chevron");
+  for (const k of ["m-chevron-down", "m-chevron-lg", "is-spring", "mine"]) assert.ok(a.classList.contains(k), k);
+  assert.equal(a.getAttribute("data-m-color"), "primary");
   assert.ok(b.classList.contains("is-still"));
   assert.equal(b.textContent, "›", "own text mark");
-  assert.ok(c.querySelector(".hm-chevron-own svg"), "own icon");
+  assert.ok(c.querySelector(".m-chevron-own svg"), "own icon");
   leaf.set(true);
   assert.ok(a.classList.contains("is-leaf"));
   assert.equal(a.querySelector("svg"), null, "a leaf keeps the box only");

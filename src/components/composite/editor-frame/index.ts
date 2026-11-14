@@ -45,12 +45,12 @@ export function EditorFrame(props: EditorFrameProps): Element {
   const bar = (as: "div" | "footer", cls: string, more: Partial<PanelHeaderProps> | undefined, own: Partial<PanelHeaderProps>): Element =>
     h(PanelHeader, { as, size: "sm", ...own, ...more, class: () => cx(cls, val(more?.class)) }) as Element;
   const head = (): unknown => (val(props.showHead) === false || (props.head == null && props.actions == null && props.showHead == null) ? null
-    : bar("div", "hm-editor-head", props.headProps, { tone: "muted", divider: true, children: props.head, actions: props.actions }));
+    : bar("div", "m-editor-head", props.headProps, { tone: "muted", divider: true, children: props.head, actions: props.actions }));
   const foot = (): unknown => (val(props.showFoot) === false || (props.foot == null && props.showFoot == null) ? null
-    : bar("footer", "hm-editor-foot", props.footProps, { children: props.foot }));
+    : bar("footer", "m-editor-foot", props.footProps, { children: props.foot }));
   return h("div", {
-    "data-hm-color": () => colorAttr(val(props.color)),
+    "data-m-color": () => colorAttr(val(props.color)),
     ...rest(props, USED),
-    class: () => cx("hm-editor-frame", val(props.disabled) && "is-disabled", val(props.readonly) && "is-readonly", val(props.ring) === false && "is-plain", val(props.class)),
+    class: () => cx("m-editor-frame", val(props.disabled) && "is-disabled", val(props.readonly) && "is-readonly", val(props.ring) === false && "is-plain", val(props.class)),
   }, head, props.children, foot);
 }

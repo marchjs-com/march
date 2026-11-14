@@ -56,21 +56,21 @@ export function sectionActions(actions: readonly (SectionAction | Node)[] | Node
 /** `<SectionHead eyebrow="Features" title="Everything you need" lead="…" actions={[{ label: "Start", href: "/start" }]} note="No card needed" />` */
 export function SectionHead(props: SectionHeadProps): Element {
   const size = (): string => val(props.size) ?? "md";
-  const cls = (): string => cx("hm-section-head", `hm-section-head-${size()}`, `hm-section-head-${val(props.align) ?? "center"}`, val(props.width) === "full" && "hm-section-head-full", val(props.class));
+  const cls = (): string => cx("m-section-head", `m-section-head-${size()}`, `m-section-head-${val(props.align) ?? "center"}`, val(props.width) === "full" && "m-section-head-full", val(props.class));
   const eyebrow = (): unknown => {
     const e = val(props.eyebrow);
-    return typeof e === "string" || typeof e === "number" ? h("span", { class: "hm-section-head-caps" }, e) : e;
+    return typeof e === "string" || typeof e === "number" ? h("span", { class: "m-section-head-caps" }, e) : e;
   };
   const s0 = untrack(size); // buttons are built once, for the size the head starts with
   const acts = sectionActions(props.actions, s0 === "lg" || s0 === "xl" ? "lg" : s0 === "sm" ? "sm" : "md");
   const parts = [
-    props.eyebrow != null ? h(props.eyebrowHref ? "a" : "p", { class: "hm-section-head-eyebrow", href: props.eyebrowHref ?? null }, eyebrow) : null,
-    props.title != null ? h(props.as ?? "h2", { class: "hm-section-head-title", id: props.titleId }, () => val(props.title)) : null,
-    props.lead != null ? h("p", { class: "hm-section-head-lead" }, () => val(props.lead)) : null,
-    acts.length ? h("div", { class: "hm-section-head-actions" }, acts) : null,
-    props.note != null ? h("p", { class: "hm-section-head-note" }, () => val(props.note)) : null,
+    props.eyebrow != null ? h(props.eyebrowHref ? "a" : "p", { class: "m-section-head-eyebrow", href: props.eyebrowHref ?? null }, eyebrow) : null,
+    props.title != null ? h(props.as ?? "h2", { class: "m-section-head-title", id: props.titleId }, () => val(props.title)) : null,
+    props.lead != null ? h("p", { class: "m-section-head-lead" }, () => val(props.lead)) : null,
+    acts.length ? h("div", { class: "m-section-head-actions" }, acts) : null,
+    props.note != null ? h("p", { class: "m-section-head-note" }, () => val(props.note)) : null,
     props.children ?? null];
-  const attrs = { class: cls, "data-hm-color": colorAttr(props.color) };
+  const attrs = { class: cls, "data-m-color": colorAttr(props.color) };
   if (!props.reveal) return h("div", attrs, parts);
   return h(Reveal, { ...attrs, effect: "up", stagger: 90, ...(props.reveal === true ? {} : props.reveal) }, parts) as Element;
 }

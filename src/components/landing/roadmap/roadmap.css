@@ -1,15 +1,15 @@
 /* Roadmap. A rail over the Timeline's own line; the fill scales from the top; passed dots light up, the current one pulses. */
-.hm-rm { position: relative; min-width: 0; }
-.hm-rm .hm-rm-rail { --hm-progress-c: var(--hm-brand-gradient); position: absolute; inset-inline-start: calc(.5rem - 1px); inset-block: .5rem 1.5rem; block-size: auto; }
-.hm-rm-tl .hm-tl-item { padding-block-end: var(--hm-space-6); }
-.hm-rm-tl .hm-tl-dot { position: relative; z-index: 1; background: var(--hm-bg); border: 2px solid var(--hm-border-strong); transition: border-color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), transform var(--hm-dur) var(--hm-ease-spring, var(--hm-ease)); }
-.hm-rm-tl .hm-tl-item.is-passed .hm-tl-dot { border-color: var(--hm-accent, var(--hm-primary)); background: var(--hm-accent, var(--hm-primary)); transform: scale(1.15); }
-.hm-rm-tl .hm-tl-item.is-now .hm-tl-dot { box-shadow: 0 0 0 0 color-mix(in srgb, var(--hm-info) 60%, transparent); }
-.hm-rm-tl .hm-tl-item.is-now.is-passed .hm-tl-dot { box-shadow: 0 0 0 6px color-mix(in srgb, var(--hm-info) 22%, transparent); }
-.hm-rm-tl .hm-tl-title { font-size: var(--hm-text-lg); font-weight: var(--hm-weight-semibold); }
-.hm-rm-tl .hm-tl-body { font-size: var(--hm-text-md); line-height: 1.6; margin-block-start: var(--hm-space-1); }
-.hm-rm-title { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--hm-space-2); }
-.hm-rm-tl .hm-tl-item.is-next .hm-tl-title { color: var(--hm-muted); }
-@media (prefers-reduced-motion: reduce) { .hm-rm-tl .hm-tl-dot { transition: none; } }
-/* own colour (data-hm-color sets --hm-accent): the fill takes it; passed dots already follow the accent */
-.hm-rm[data-hm-color] .hm-rm .hm-rm-rail { --hm-progress-c: var(--hm-accent); }
+.m-rm { position: relative; min-width: 0; }
+.m-rm .m-rm-rail { --m-progress-c: var(--m-brand-gradient); position: absolute; inset-inline-start: calc(.5rem - 1px); inset-block: .5rem 1.5rem; block-size: auto; }
+.m-rm-tl .m-tl-item { padding-block-end: var(--m-space-6); }
+.m-rm-tl .m-tl-dot { position: relative; z-index: 1; background: var(--m-bg); border: 2px solid var(--m-border-strong); transition: border-color var(--m-dur) var(--m-ease), background-color var(--m-dur) var(--m-ease), transform var(--m-dur) var(--m-ease-spring, var(--m-ease)); }
+.m-rm-tl .m-tl-item.is-passed .m-tl-dot { border-color: var(--m-accent, var(--m-primary)); background: var(--m-accent, var(--m-primary)); transform: scale(1.15); }
+.m-rm-tl .m-tl-item.is-now .m-tl-dot { box-shadow: 0 0 0 0 color-mix(in srgb, var(--m-info) 60%, transparent); }
+.m-rm-tl .m-tl-item.is-now.is-passed .m-tl-dot { box-shadow: 0 0 0 6px color-mix(in srgb, var(--m-info) 22%, transparent); }
+.m-rm-tl .m-tl-title { font-size: var(--m-text-lg); font-weight: var(--m-weight-semibold); }
+.m-rm-tl .m-tl-body { font-size: var(--m-text-md); line-height: 1.6; margin-block-start: var(--m-space-1); }
+.m-rm-title { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-2); }
+.m-rm-tl .m-tl-item.is-next .m-tl-title { color: var(--m-muted); }
+@media (prefers-reduced-motion: reduce) { .m-rm-tl .m-tl-dot { transition: none; } }
+/* own colour (data-m-color sets --m-accent): the fill takes it; passed dots already follow the accent */
+.m-rm[data-m-color] .m-rm .m-rm-rail { --m-progress-c: var(--m-accent); }

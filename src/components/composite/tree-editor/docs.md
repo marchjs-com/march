@@ -27,7 +27,7 @@ change is one step of the editor's own undo history.
 | `actions` | boolean or `("add" \| "duplicate" \| "delete")[]` | `true` | row actions; `false` hides them all, a list keeps those (the + / Insert and Delete keys follow) |
 | `labels` | object | `t` texts | `root`, `search`, `valid`, `problems(n)`, `noMatches`, `undo`, `redo`, `key`, `valueName(key)`, `emptyText`, `items(n)`, `fields(n)`, `addInside`, `addAfter`, `duplicate`, `delete`, `changeType`, `typeOf(kind)`, `kinds: { string, number, boolean, null, object, array }` |
 | `label`, `readonly`, `disabled` | | | accessible name (and the root row's name) |
-| `class` | class | — | on the wrapper (`hm-tre-wrap`); parts: `hm-tre-bar`, `-search`, `-status`, `-history`, `-row`, `-key`, `-type`, `-badge`, `-value`, `-summary`, `-error`, `-actions`, `-add`, `-dup`, `-del` |
+| `class` | class | — | on the wrapper (`m-tre-wrap`); parts: `m-tre-bar`, `-search`, `-status`, `-history`, `-row`, `-key`, `-type`, `-badge`, `-value`, `-summary`, `-error`, `-actions`, `-add`, `-dup`, `-del` |
 
 ```tsx
 <TreeEditor bind:value={$config} typeBadges={false} actions={["add", "delete"]} status={false} />

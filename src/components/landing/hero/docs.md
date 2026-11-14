@@ -38,7 +38,7 @@ and spotlight), `split` (media at the end), `video` (VideoBackground), `mesh` (g
 | `reveal` | Reveal effect / `{ from, to }` / `none` | `up` | entrance of the copy (and of the split media; `none` switches both off) |
 | `frameBar` | boolean | `true` | product: the window bar with three dots |
 | `tilt` | boolean | `true` | product: the frame starts tilted and flattens with the scroll |
-| `class` | string | — | extra class on the section (`.hm-hero`; parts: `.hm-hero-copy` (a SectionHead: `.hm-section-head-eyebrow`, `-title`, `-lead`, `-actions`, `-note`), `.hm-hero-hl`, `.hm-hero-frame`) |
+| `class` | string | — | extra class on the section (`.m-hero`; parts: `.m-hero-copy` (a SectionHead: `.m-section-head-eyebrow`, `-title`, `-lead`, `-actions`, `-note`), `.m-hero-hl`, `.m-hero-frame`) |
 | children | node | — | extra content under the note |
 
 ## Accessibility

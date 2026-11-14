@@ -23,13 +23,13 @@ export default function BadgeDemo(props: { values: { mode: string; tone: string;
         const size = v.size as "md"
         const click = v.clickable ? () => { $clicks++; $on = !$on } : undefined
         const pressed = v.clickable ? () => $on : undefined
-        if (v.mode === "count") return [<span class="hm-muted">Gelen kutusu</span>, <Badge count={v.count} tone={v.tone} size={size} showZero={v.showZero} label="okunmamış" onClick={click} pressed={pressed} format={v.format === "own" ? (n: number) => `${n} yeni` : undefined} />]
+        if (v.mode === "count") return [<span class="m-muted">Gelen kutusu</span>, <Badge count={v.count} tone={v.tone} size={size} showZero={v.showZero} label="okunmamış" onClick={click} pressed={pressed} format={v.format === "own" ? (n: number) => `${n} yeni` : undefined} />]
         const dot = () => (v.mode !== "dot" ? false : v.dot === "own" ? <Icon of={heart} /> as Node : true)
         const dotColor = v.dot === "tone" || v.dot === "own" ? undefined : v.dot as "brand-orange"
         const pulse = v.mode === "dot" && v.dot !== "own" && v.pulse !== "off" ? (v.pulse as "ring") : undefined
         return ["HADİ", "Globex", "Initech"].map((n) => <span class="sc-row">{n}<Badge tone={v.tone} size={size} dot={dot()} dotColor={dotColor} pulse={pulse} onClick={click} pressed={pressed}>{LABEL[v.tone]}</Badge></span>)
       }}
     </div>
-    {() => (props.values.clickable ? <span class="hm-muted">{`Rozet bir düğme: Tab ile gelin, Enter ile basın. Basıldı: ${$clicks} · ${$on ? "basılı" : "basılı değil"}`}</span> : null)}
+    {() => (props.values.clickable ? <span class="m-muted">{`Rozet bir düğme: Tab ile gelin, Enter ile basın. Basıldı: ${$clicks} · ${$on ? "basılı" : "basılı değil"}`}</span> : null)}
   </div>
 }

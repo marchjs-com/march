@@ -35,11 +35,11 @@ export interface SiteSectionProps {
 /** `<SiteSection eyebrow="Features" title="Everything you need" lead="…">…</SiteSection>` */
 export function SiteSection(props: SiteSectionProps): Element {
   const { eyebrow, title, lead, align, tone, width, space, level, color, reveal, class: c, children, ...attrs } = props;
-  const hid = title != null ? uid("hm-ss") : null;
+  const hid = title != null ? uid("m-ss") : null;
   // the heading group is the shared SectionHead (it enters with Reveal; `reveal={false}` keeps it still)
   const head = title != null || eyebrow != null || lead != null
-    ? h(SectionHead, { class: "hm-ss-head", eyebrow, title, as: `h${level ?? 2}` as "h2", titleId: hid ?? undefined, lead, align: align ?? "center", reveal: reveal === false ? { effect: "none" } : reveal ?? true })
+    ? h(SectionHead, { class: "m-ss-head", eyebrow, title, as: `h${level ?? 2}` as "h2", titleId: hid ?? undefined, lead, align: align ?? "center", reveal: reveal === false ? { effect: "none" } : reveal ?? true })
     : null;
-  return h("section", { ...attrs, "aria-labelledby": hid, "data-hm-color": colorAttr(color), class: () => cx("hm-ss", `hm-ss-${tone ?? "plain"}`, `hm-ss-w-${width ?? "default"}`, `hm-ss-s-${space ?? "md"}`, val(c)) },
-    h("div", { class: "hm-ss-inner" }, head, children));
+  return h("section", { ...attrs, "aria-labelledby": hid, "data-m-color": colorAttr(color), class: () => cx("m-ss", `m-ss-${tone ?? "plain"}`, `m-ss-w-${width ?? "default"}`, `m-ss-s-${space ?? "md"}`, val(c)) },
+    h("div", { class: "m-ss-inner" }, head, children));
 }

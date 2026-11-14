@@ -6,12 +6,12 @@ gets the same look.
 
 ```tsx
 <EditorFrame head={<FormatToolbar onTool={exec} />} actions={<Badge>{$words} words</Badge>} foot={<span>Markdown</span>}>
-  <textarea class="hm-editor-area" bind:value={$text} />
+  <textarea class="m-editor-area" bind:value={$text} />
 </EditorFrame>
 <EditorFrame showHead={() => $tools.length > 0} headProps={{ sticky: true }} footProps={{ divider: true }} color="brand-green" />
 ```
 
-`hm-editor-area` is a ready class for a plain editing area inside the frame (a textarea, a contenteditable): no border
+`m-editor-area` is a ready class for a plain editing area inside the frame (a textarea, a contenteditable): no border
 of its own, the frame shows the focus.
 
 ## Props

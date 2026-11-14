@@ -10,10 +10,10 @@ const mount = (fn) => { const el = document.createElement("div"); document.body.
 test("Rating: a radio group; click and ArrowRight set the value; read-only shows a half star", async () => {
   const v = signal(2);
   const el = mount(() => [h(Rating, { value: v, setValue: (n) => v.set(n), label: "Service" }), h(Rating, { value: 3.5, readonly: true })]);
-  const [a, b] = el.querySelectorAll(".hm-rating");
+  const [a, b] = el.querySelectorAll(".m-rating");
   assert.equal(a.getAttribute("role"), "radiogroup");
   assert.equal(a.getAttribute("aria-label"), "Service");
-  const stars = a.querySelectorAll(".hm-rating-star");
+  const stars = a.querySelectorAll(".m-rating-star");
   assert.equal(stars.length, 5);
   assert.equal(stars[1].getAttribute("aria-checked"), "true");
   stars[3].click();
@@ -23,7 +23,7 @@ test("Rating: a radio group; click and ArrowRight set the value; read-only shows
   stars[3].dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true, cancelable: true }));
   await tick();
   assert.equal(v(), 5);
-  const half = b.querySelectorAll(".hm-rating-star")[3];
+  const half = b.querySelectorAll(".m-rating-star")[3];
   assert.ok(half.classList.contains("is-half"));
   assert.ok(half.disabled);
 });
@@ -35,13 +35,13 @@ test("Rating: the marks, their names and the motion are yours", () => {
     h(Rating, { value: 1, max: 2, icon: (n) => h("b", { class: "own-off" }, String(n)), iconOn: (n) => h("b", { class: "own-on" }, String(n)) }),
     h(Rating, { value: 1, max: 2 }),
   ]);
-  const [a, b, c] = el.querySelectorAll(".hm-rating");
+  const [a, b, c] = el.querySelectorAll(".m-rating");
   assert.ok(a.className.includes("is-still"));
-  assert.equal(a.querySelectorAll(".hm-rating-star")[1].getAttribute("aria-label"), "2 hearts of 3");
+  assert.equal(a.querySelectorAll(".m-rating-star")[1].getAttribute("aria-label"), "2 hearts of 3");
   assert.equal(a.querySelectorAll("svg").length, 6);
   assert.equal(b.querySelectorAll("svg").length, 0);
   assert.deepEqual(b.querySelectorAll(".own-on").map((x) => x.textContent), ["1", "2"]);
   assert.equal(b.querySelectorAll(".own-off").length, 2);
   assert.ok(!c.className.includes("is-still"));
-  assert.equal(c.querySelector(".hm-rating-star").getAttribute("aria-label"), "1 of 2");
+  assert.equal(c.querySelector(".m-rating-star").getAttribute("aria-label"), "1 of 2");
 });

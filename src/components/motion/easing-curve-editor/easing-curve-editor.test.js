@@ -27,10 +27,10 @@ test("EasingCurveEditor: handles as sliders, keyboard edits, presets, registers 
   knobs[0].dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "ArrowUp", shiftKey: true, bubbles: true }));
   assert.equal(v(), "cubic-bezier(.33, 1.1, .68, 1)");
   assert.equal(ease("test-curve").css, "cubic-bezier(0.33,1.1,0.68,1)", "registered in the engine by name");
-  el.querySelectorAll(".hm-ec-preset").find((b) => b.textContent === "linear").click();
+  el.querySelectorAll(".m-ec-preset").find((b) => b.textContent === "linear").click();
   assert.equal(v(), "cubic-bezier(0, 0, 1, 1)");
-  assert.equal(el.querySelectorAll(".hm-ec-preset").find((b) => b.textContent === "linear").getAttribute("aria-pressed"), "true");
-  assert.equal(el.querySelector(".hm-ec-css").textContent, "cubic-bezier(0, 0, 1, 1)");
+  assert.equal(el.querySelectorAll(".m-ec-preset").find((b) => b.textContent === "linear").getAttribute("aria-pressed"), "true");
+  assert.equal(el.querySelector(".m-ec-css").textContent, "cubic-bezier(0, 0, 1, 1)");
   dispose();
 });
 
@@ -39,7 +39,7 @@ test("name: both placeholders filled, even inside literal braces", async () => {
   assert.equal(format('a "{0}" { b: "{1}" }', { 0: "x", 1: "y" }), 'a "x" { b: "y" }');
   const host = document.createElement("div");
   const dispose = render(() => h(EasingCurveEditor, { value: "ease-out", name: "snap" }), host);
-  const p = host.querySelector(".hm-ec-name");
+  const p = host.querySelector(".m-ec-name");
   assert.ok(p && !p.textContent.includes("{1}"), p?.textContent);
   assert.match(p.textContent, /easing: "snap"/);
   dispose();
@@ -53,24 +53,24 @@ test("EasingCurveEditor: own texts, parts off, handle colors", () => {
       labels: { firstHandle: "Start", secondHandle: "End", presets: "Ready", curve: (c) => `Curve ${c}`, handleValue: (a, b) => `${a}/${b}`, controlPoint: (l) => `P ${l}`, registered: (n) => `Saved as ${n}` } }),
     h(EasingCurveEditor, { value: "out", name: "mine2", preview: "none", inputs: false, cssLine: false, nameNote: false, grid: false, presets: false }),
   ], host);
-  const [a, b] = host.querySelectorAll(".hm-ec");
+  const [a, b] = host.querySelectorAll(".m-ec");
   assert.ok(a.classList.contains("own"));
   const knobs = a.querySelectorAll("[role=slider]");
   assert.deepEqual([knobs[0].getAttribute("aria-label"), knobs[1].getAttribute("aria-label")], ["Start", "End"]);
   assert.equal(knobs[0].getAttribute("aria-valuetext"), ".33/1");
-  assert.equal(a.querySelector(".hm-ec-presets").getAttribute("aria-label"), "Ready");
-  assert.equal(a.querySelector(".hm-ec-plot").getAttribute("aria-label"), "Curve cubic-bezier(.33, 1, .68, 1)");
-  assert.equal(a.querySelector(".hm-ec-num").getAttribute("aria-label"), "P x1");
-  assert.equal(a.querySelector(".hm-ec-name").textContent, "Saved as mine");
-  assert.match(a.style.getPropertyValue("--hm-ec-h1"), /brand-purple/);
-  assert.match(a.style.getPropertyValue("--hm-ec-h2"), /brand-green/);
-  assert.equal(a.querySelectorAll(".hm-ec-grid").length, 6);
-  assert.equal(b.querySelector(".hm-ec-inputs"), null);
-  assert.equal(b.querySelector(".hm-ec-css"), null);
-  assert.equal(b.querySelector(".hm-ec-name"), null);
-  assert.equal(b.querySelector(".hm-ec-presets"), null);
-  assert.equal(b.querySelectorAll(".hm-ec-grid").length, 0);
-  assert.equal(b.querySelectorAll(".hm-ec-axis").length, 4);
-  assert.equal(b.style.getPropertyValue("--hm-ec-h1"), "");
+  assert.equal(a.querySelector(".m-ec-presets").getAttribute("aria-label"), "Ready");
+  assert.equal(a.querySelector(".m-ec-plot").getAttribute("aria-label"), "Curve cubic-bezier(.33, 1, .68, 1)");
+  assert.equal(a.querySelector(".m-ec-num").getAttribute("aria-label"), "P x1");
+  assert.equal(a.querySelector(".m-ec-name").textContent, "Saved as mine");
+  assert.match(a.style.getPropertyValue("--m-ec-h1"), /brand-purple/);
+  assert.match(a.style.getPropertyValue("--m-ec-h2"), /brand-green/);
+  assert.equal(a.querySelectorAll(".m-ec-grid").length, 6);
+  assert.equal(b.querySelector(".m-ec-inputs"), null);
+  assert.equal(b.querySelector(".m-ec-css"), null);
+  assert.equal(b.querySelector(".m-ec-name"), null);
+  assert.equal(b.querySelector(".m-ec-presets"), null);
+  assert.equal(b.querySelectorAll(".m-ec-grid").length, 0);
+  assert.equal(b.querySelectorAll(".m-ec-axis").length, 4);
+  assert.equal(b.style.getPropertyValue("--m-ec-h1"), "");
   dispose();
 });

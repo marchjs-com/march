@@ -34,7 +34,7 @@ export function ScrollProgress(props: ScrollProgressProps): Element {
   const root = h(Progress, {
     variant: "line", smooth: false, track: props.position === "inline", value: pct, ariaLabel: props.label ?? t`Reading progress`,
     color: props.color, ...(props.size ? { size: props.size } : {}), fillRef: (x: HTMLElement) => { fill = x; },
-    class: cx("hm-scroll-progress", `hm-scroll-progress-${props.position ?? "fixed"}`, `hm-scroll-progress-${props.paint ?? "gradient"}`, val(props.class)),
+    class: cx("m-scroll-progress", `m-scroll-progress-${props.position ?? "fixed"}`, `m-scroll-progress-${props.paint ?? "gradient"}`, val(props.class)),
   }) as HTMLElement;
   let el: Element | null = null;
   const owner = getOwner();

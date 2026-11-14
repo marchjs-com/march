@@ -1,13 +1,13 @@
 /* SiteSection. Fluid spacing and type (clamp), theme tones, logical properties. */
-.hm-ss { position: relative; padding-inline: clamp(1rem, 4cqi, 2.5rem); color: var(--hm-text); scroll-margin-block-start: calc(var(--hm-site-nav-top, 0px) + 4.5rem); }
-.hm-ss-s-none { padding-block: 0; } .hm-ss-s-sm { padding-block: clamp(2rem, 5cqi, 3.5rem); }
-.hm-ss-s-md { padding-block: clamp(3rem, 8cqi, 6rem); } .hm-ss-s-lg { padding-block: clamp(4rem, 11cqi, 8.5rem); }
-.hm-ss-inner { position: relative; margin-inline: auto; max-width: 72rem; min-width: 0; }
-.hm-ss-w-narrow > .hm-ss-inner { max-width: 46rem; } .hm-ss-w-wide > .hm-ss-inner { max-width: 84rem; } .hm-ss-w-full > .hm-ss-inner { max-width: none; }
-.hm-ss-muted { background: var(--hm-surface-2); }
-.hm-ss-inverse { background: var(--hm-inverse-bg); color: var(--hm-inverse-text); --hm-text: var(--hm-inverse-text); --hm-muted: color-mix(in srgb, var(--hm-inverse-text) 68%, transparent); --hm-border: color-mix(in srgb, var(--hm-inverse-text) 16%, transparent); }
-.hm-ss-brand { background: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 9%, var(--hm-bg)); }
+.m-ss { position: relative; padding-inline: clamp(1rem, 4cqi, 2.5rem); color: var(--m-text); scroll-margin-block-start: calc(var(--m-site-nav-top, 0px) + 4.5rem); }
+.m-ss-s-none { padding-block: 0; } .m-ss-s-sm { padding-block: clamp(2rem, 5cqi, 3.5rem); }
+.m-ss-s-md { padding-block: clamp(3rem, 8cqi, 6rem); } .m-ss-s-lg { padding-block: clamp(4rem, 11cqi, 8.5rem); }
+.m-ss-inner { position: relative; margin-inline: auto; max-width: 72rem; min-width: 0; }
+.m-ss-w-narrow > .m-ss-inner { max-width: 46rem; } .m-ss-w-wide > .m-ss-inner { max-width: 84rem; } .m-ss-w-full > .m-ss-inner { max-width: none; }
+.m-ss-muted { background: var(--m-surface-2); }
+.m-ss-inverse { background: var(--m-inverse-bg); color: var(--m-inverse-text); --m-text: var(--m-inverse-text); --m-muted: color-mix(in srgb, var(--m-inverse-text) 68%, transparent); --m-border: color-mix(in srgb, var(--m-inverse-text) 16%, transparent); }
+.m-ss-brand { background: color-mix(in srgb, var(--m-accent, var(--m-primary)) 9%, var(--m-bg)); }
 /* the heading group is a SectionHead: only the room under it and the inverse eyebrow are set here */
-.hm-ss-head { margin-block-end: clamp(2rem, 5cqi, 3.5rem); }
-.hm-ss-head .hm-section-head-lead { max-inline-size: none; }
-.hm-ss-inverse .hm-section-head-caps { color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 70%, var(--hm-inverse-text)); }
+.m-ss-head { margin-block-end: clamp(2rem, 5cqi, 3.5rem); }
+.m-ss-head .m-section-head-lead { max-inline-size: none; }
+.m-ss-inverse .m-section-head-caps { color: color-mix(in srgb, var(--m-accent, var(--m-primary)) 70%, var(--m-inverse-text)); }

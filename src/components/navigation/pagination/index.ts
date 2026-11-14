@@ -78,33 +78,33 @@ export function Pagination(props: PaginationProps): Element {
   const back = (): void => (props.onPrev ? props.onPrev() : go(page() - 1)), forth = (): void => (props.onNext ? props.onNext() : go(page() + 1));
   const prevName = (): string => val(props.labels?.previous) ?? t`Previous`, nextName = (): string => val(props.labels?.next) ?? t`Next`;
   const controls = props.controls !== false, pageName = props.labels?.page;
-  const own = (x: unknown, fallback: IconDef): unknown => ownIcon(x ?? undefined, fallback, "hm-page-own");
+  const own = (x: unknown, fallback: IconDef): unknown => ownIcon(x ?? undefined, fallback, "m-page-own");
   const arrow = (dir: "prev" | "next", content: unknown, fallback: IconDef, off: () => boolean, name: () => string, act: () => void): unknown =>
-    h(IconButton, { class: `hm-page-nav hm-page-${dir}`, label: name, title: false, disabled: off, onClick: act, icon: own(content, fallback) });
-  const attrs = { class: () => cx("hm-pagination", props.variant === "simple" && "hm-pagination-simple", val(props.class)), "aria-label": () => val(props.label) ?? t`Pagination`, "data-hm-color": () => colorAttr(props.color) };
+    h(IconButton, { class: `m-page-nav m-page-${dir}`, label: name, title: false, disabled: off, onClick: act, icon: own(content, fallback) });
+  const attrs = { class: () => cx("m-pagination", props.variant === "simple" && "m-pagination-simple", val(props.class)), "aria-label": () => val(props.label) ?? t`Pagination`, "data-m-color": () => colorAttr(props.color) };
 
   if (props.variant === "simple") {
     const nf = (n: number): string => n.toLocaleString();
     const info = props.info, status = props.status;
     const step = (dir: "prev" | "next", content: unknown, off: () => boolean, name: () => string, act: () => void): unknown => h(Button, {
-      variant: "secondary", size: "sm", class: `hm-page-nav hm-page-${dir}`, disabled: off, onClick: act,
+      variant: "secondary", size: "sm", class: `m-page-nav m-page-${dir}`, disabled: off, onClick: act,
       // the default content already says "Previous" / "Next"; your own content gets the accessible name
       "aria-label": () => (content == null || content === true ? null : name()),
-    }, content == null || content === true ? (dir === "prev" ? [glyph(chevronLeft), name] : [name, glyph(chevronRight)]) : icon(content, "hm-page-own"));
+    }, content == null || content === true ? (dir === "prev" ? [glyph(chevronLeft), name] : [name, glyph(chevronRight)]) : icon(content, "m-page-own"));
     return h("nav", attrs,
-      info !== false && h("span", { class: "hm-page-info", "aria-live": "polite" }, () => {
+      info !== false && h("span", { class: "m-page-info", "aria-live": "polite" }, () => {
         const n = total();
         if (n == null) return null;
         const range: PageRange = { from: n ? (page() - 1) * size() + 1 : 0, to: Math.min(n, page() * size()), total: n };
         if (typeof info === "function") return info(range);
         return n ? t`${nf(range.from)}–${nf(range.to)} of ${nf(n)}` : t`No results`;
       }),
-      props.sizes && h(Select, { class: "hm-select-sm hm-page-sizes", options: props.sizes, value: live(size), onChange: (v: number | null) => { if (v != null) props.onSize?.(v); }, "aria-label": live(() => val(props.labels?.sizes) ?? t`Rows per page`) }),
-      h("div", { class: "hm-page-steps" },
+      props.sizes && h(Select, { class: "m-select-sm m-page-sizes", options: props.sizes, value: live(size), onChange: (v: number | null) => { if (v != null) props.onSize?.(v); }, "aria-label": live(() => val(props.labels?.sizes) ?? t`Rows per page`) }),
+      h("div", { class: "m-page-steps" },
         controls && step("prev", props.prev, noPrev, prevName, back),
         status !== false && (() => {
           const n = pages();
-          return n == null ? null : h("span", { class: "hm-page-status" }, typeof status === "function" ? status(page(), n) : t`Page ${page()} of ${n}`);
+          return n == null ? null : h("span", { class: "m-page-status" }, typeof status === "function" ? status(page(), n) : t`Page ${page()} of ${n}`);
         }),
         controls && step("next", props.next, noNext, nextName, forth)));
   }
@@ -121,8 +121,8 @@ export function Pagination(props: PaginationProps): Element {
   return h("nav", attrs,
     controls && arrow("prev", props.prev, chevronLeft, noPrev, prevName, back),
     () => items().map((it) => untrack(() => (it === "…"
-      ? props.gap !== false && h("span", { class: "hm-page-gap", "aria-hidden": "true" }, own(props.gap, more))
-      : h("button", { type: "button", class: () => cx("hm-page-btn", page() === it && "is-active"), "aria-current": () => (page() === it ? "page" : null),
+      ? props.gap !== false && h("span", { class: "m-page-gap", "aria-hidden": "true" }, own(props.gap, more))
+      : h("button", { type: "button", class: () => cx("m-page-btn", page() === it && "is-active"), "aria-current": () => (page() === it ? "page" : null),
         "aria-label": pageName ? pageName(it) : null, onClick: () => go(it) }, String(it))))),
     controls && arrow("next", props.next, chevronRight, noNext, nextName, forth));
 }

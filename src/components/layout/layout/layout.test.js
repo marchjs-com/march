@@ -12,18 +12,18 @@ const until = async (ok) => { for (let i = 0; i < 200 && !ok(); i++) await new P
 
 test("Layout: without regions it adds no frame; with regions it draws header, nav, main, aside, footer", () => {
   const a = mount(() => h(Layout, { features: [] }, "PAGE"));
-  assert.equal(a.host.querySelector(".hm-shell"), null);
+  assert.equal(a.host.querySelector(".m-shell"), null);
   assert.equal(a.host.textContent, "PAGE");
   a.dispose();
   const b = mount(() => h(Layout, { features: [], header: "H", nav: "N", aside: "A", footer: "F", mainId: "m" }, "PAGE"));
   const q = (s) => b.host.querySelector(s);
-  assert.equal(q("header.hm-shell-header").textContent, "H");
-  assert.equal(q("aside.hm-shell-nav").textContent, "N");
-  assert.equal(q("aside.hm-layout-aside").textContent, "A");
-  assert.equal(q("footer.hm-layout-footer").textContent, "F");
+  assert.equal(q("header.m-shell-header").textContent, "H");
+  assert.equal(q("aside.m-shell-nav").textContent, "N");
+  assert.equal(q("aside.m-layout-aside").textContent, "A");
+  assert.equal(q("footer.m-layout-footer").textContent, "F");
   assert.equal(q("main#m").textContent, "PAGE");
-  assert.equal(q(".hm-skip").getAttribute("href"), "#m");
-  assert.match(q(".hm-shell").getAttribute("class"), /hm-layout-has-aside/);
+  assert.equal(q(".m-skip").getAttribute("href"), "#m");
+  assert.match(q(".m-shell").getAttribute("class"), /m-layout-has-aside/);
   b.dispose();
 });
 
@@ -66,11 +66,11 @@ test("Layout API: corners, slot content swapped while a part is shown, features 
   const Part = () => { const a = useLayout(); a.set("aside", "FILTERS"); a.add("bottom-start", Object.assign(document.createElement("i"), { textContent: "c" })); return "part"; };
   const m = mount(() => h(Layout, { features: [], aside: "TOC", corners: { "top-end": Object.assign(document.createElement("b"), { textContent: "S" }) } },
     () => { api = useLayout(); return show() ? h(Part, {}) : "none"; }));
-  const aside = m.host.querySelector(".hm-layout-aside");
+  const aside = m.host.querySelector(".m-layout-aside");
   assert.equal(aside.textContent, "FILTERS");
   assert.equal(cornerControls("top-end").textContent, "S");
   assert.ok(cornerControls("bottom-start").querySelector("i"), "the part's corner control");
-  assert.ok(await until(() => cornerControls("bottom-start").querySelector(".hm-layout-aside-btn")), "an aside brings its narrow-screen sheet button");
+  assert.ok(await until(() => cornerControls("bottom-start").querySelector(".m-layout-aside-btn")), "an aside brings its narrow-screen sheet button");
   show.set(false);
   assert.equal(aside.textContent, "TOC", "restored when the part goes away");
   assert.equal(cornerControls("bottom-start").querySelector("i"), null);
@@ -94,10 +94,10 @@ test("Layout: the default has back-to-top and route focus; Page under it writes 
   assert.doesNotMatch(cornerControls("bottom-end").textContent, /P/);
   const Narrow = Page.extend({ narrow: true });
   const n = mount(() => h(Base, {}, h(Narrow, { title: "Ayarlar" }, "b")));
-  assert.match(n.host.querySelector(".hm-page").getAttribute("class"), /hm-page-narrow/);
+  assert.match(n.host.querySelector(".m-page").getAttribute("class"), /m-page-narrow/);
   n.dispose();
   const solo = mount(() => h(Page, { title: "Tek", features: [] }, "b"));
-  assert.ok(solo.host.querySelector(".hm-layout"), "a Page on its own brings a Layout");
+  assert.ok(solo.host.querySelector(".m-layout"), "a Page on its own brings a Layout");
   solo.dispose();
 });
 
@@ -116,23 +116,23 @@ test("Layout features: connection badge while offline, aside sheet toggles, dev 
   const desc = Object.getOwnPropertyDescriptor(nav, "onLine");
   Object.defineProperty(nav, "onLine", { configurable: true, get: () => false });
   const m = mount(() => h(Layout, { features: [connection(), devOverlay(), feedback({ label: "Görüş" })], aside: "TOC" }, "x"));
-  const badge = cornerControls("top-end").querySelector(".hm-offline");
+  const badge = cornerControls("top-end").querySelector(".m-offline");
   assert.ok(badge && !badge.hasAttribute("hidden"), "offline badge shown");
   assert.equal(badge.getAttribute("role"), "status");
-  assert.ok(await until(() => badge.querySelector(".hm-badge.hm-badge-warn")), "the badge is a Badge");
-  const btn = await until(() => cornerControls("bottom-start").querySelector("button.hm-layout-aside-btn"));
-  const aside = m.host.querySelector(".hm-layout-aside");
+  assert.ok(await until(() => badge.querySelector(".m-badge.m-badge-warn")), "the badge is a Badge");
+  const btn = await until(() => cornerControls("bottom-start").querySelector("button.m-layout-aside-btn"));
+  const aside = m.host.querySelector(".m-layout-aside");
   btn.click();
   assert.ok(aside.hasAttribute("data-open"));
   assert.equal(btn.getAttribute("aria-expanded"), "true");
   globalThis.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
   assert.ok(!aside.hasAttribute("data-open"), "Esc closes the sheet");
   globalThis.dispatchEvent(new KeyboardEvent("keydown", { key: "L", altKey: true, shiftKey: true }));
-  assert.ok(document.documentElement.hasAttribute("data-hm-layout-debug"));
-  assert.match(document.querySelector(".hm-layout-dev").textContent, /connection/);
-  assert.ok(await until(() => [...cornerControls("bottom-end").querySelectorAll("button.hm-layout-feedback")].some((b) => b.textContent === "Görüş")));
+  assert.ok(document.documentElement.hasAttribute("data-m-layout-debug"));
+  assert.match(document.querySelector(".m-layout-dev").textContent, /connection/);
+  assert.ok(await until(() => [...cornerControls("bottom-end").querySelectorAll("button.m-layout-feedback")].some((b) => b.textContent === "Görüş")));
   m.dispose();
-  assert.ok(!document.documentElement.hasAttribute("data-hm-layout-debug"));
+  assert.ok(!document.documentElement.hasAttribute("data-m-layout-debug"));
   if (desc) Object.defineProperty(nav, "onLine", desc); else delete nav.onLine;
 });
 
@@ -143,25 +143,25 @@ test("Layout: its own texts and parts — labels, skip link off, aside button of
   Object.defineProperty(nav, "onLine", { configurable: true, get: () => false });
   const m = mount(() => h(Layout, { features: [connection({ label: "No connection" }), readingProgress({ color: "brand-orange", label: "Article progress" })],
     aside: "TOC", labels: { skip: "Jump", panel: () => "Contents" } }, "x"));
-  assert.equal(m.host.querySelector(".hm-skip").textContent, "Jump");
-  assert.equal((await until(() => cornerControls("bottom-start").querySelector(".hm-layout-aside-btn"))).textContent, "Contents");
-  assert.ok(await until(() => cornerControls("top-end").querySelector(".hm-offline").textContent === "No connection"));
-  const bar = document.querySelector(".hm-reading-progress");
-  assert.equal((await until(() => bar.querySelector(".hm-progress2-line [role=progressbar]"))).getAttribute("aria-label"), "Article progress");
-  assert.equal(bar.getAttribute("data-hm-color"), "brand-orange");
-  assert.equal(bar.style.getPropertyValue("--hm-rp-c"), "");
+  assert.equal(m.host.querySelector(".m-skip").textContent, "Jump");
+  assert.equal((await until(() => cornerControls("bottom-start").querySelector(".m-layout-aside-btn"))).textContent, "Contents");
+  assert.ok(await until(() => cornerControls("top-end").querySelector(".m-offline").textContent === "No connection"));
+  const bar = document.querySelector(".m-reading-progress");
+  assert.equal((await until(() => bar.querySelector(".m-progress2-line [role=progressbar]"))).getAttribute("aria-label"), "Article progress");
+  assert.equal(bar.getAttribute("data-m-color"), "brand-orange");
+  assert.equal(bar.style.getPropertyValue("--m-rp-c"), "");
   m.dispose();
   const raw = mount(() => h(Layout, { features: [readingProgress({ color: "rebeccapurple" })] }, "x"));
-  const b2 = document.querySelector(".hm-reading-progress");
-  assert.equal(b2.style.getPropertyValue("--hm-rp-c"), "rebeccapurple", "a CSS color still works");
-  assert.equal(b2.hasAttribute("data-hm-color"), false);
+  const b2 = document.querySelector(".m-reading-progress");
+  assert.equal(b2.style.getPropertyValue("--m-rp-c"), "rebeccapurple", "a CSS color still works");
+  assert.equal(b2.hasAttribute("data-m-color"), false);
   raw.dispose();
   const Quiet = Layout.extend({ skipLink: false, asideToggle: false });
   const q = mount(() => h(Quiet, { features: [], aside: "TOC" }, "x"));
   await new Promise((r) => setTimeout(r, 20));
-  assert.equal(q.host.querySelector(".hm-skip"), null);
-  assert.equal(cornerControls("bottom-start").querySelector(".hm-layout-aside-btn"), null);
-  assert.ok(q.host.querySelector(".hm-layout-aside"));
+  assert.equal(q.host.querySelector(".m-skip"), null);
+  assert.equal(cornerControls("bottom-start").querySelector(".m-layout-aside-btn"), null);
+  assert.ok(q.host.querySelector(".m-layout-aside"));
   q.dispose();
   if (desc) Object.defineProperty(nav, "onLine", desc); else delete nav.onLine;
 });

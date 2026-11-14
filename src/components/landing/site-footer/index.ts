@@ -39,20 +39,20 @@ export function SiteFooter(props: SiteFooterProps): Element {
   const isNode = (props.brand as Node).nodeType != null;
   const name = isNode ? "" : String(val((props.brand as BrandProps).name) ?? "");
   const year = new Date().getFullYear();
-  return h("footer", { class: cx("hm-sfoot", val(props.class)) },
-    h("div", { class: "hm-sfoot-inner" },
-      h("div", { class: "hm-sfoot-top" },
-        h("div", { class: "hm-sfoot-about" },
+  return h("footer", { class: cx("m-sfoot", val(props.class)) },
+    h("div", { class: "m-sfoot-inner" },
+      h("div", { class: "m-sfoot-top" },
+        h("div", { class: "m-sfoot-about" },
           isNode ? props.brand : h(Brand, props.brand as BrandProps),
-          props.about != null && h("p", { class: "hm-sfoot-text" }, () => val(props.about)),
-          props.social?.length ? h("ul", { class: "hm-sfoot-social" }, props.social.map((s) => h("li", {}, h(IconButton, { href: s.href as never, label: s.label, icon: s.icon, shape: "round", class: "hm-sfoot-social-link", rel: "noopener" })))) : null),
-        (props.columns ?? []).map((c) => h("nav", { class: "hm-sfoot-col", "aria-label": typeof c.title === "string" ? c.title : null },
-          h("h3", { class: "hm-sfoot-col-title" }, c.title),
-          h("ul", {}, c.links.map((l) => h("li", {}, h("a", { href: l.href, class: "hm-sfoot-link" }, l.label)))))),
-        props.newsletter ? h("div", { class: "hm-sfoot-news" }, h(Newsletter, { layout: "stacked", ...props.newsletter })) : null),
-      h("div", { class: "hm-sfoot-bottom" },
-        props.copyright !== false && h("p", { class: "hm-sfoot-copy" }, () => val(props.copyright) ?? `© ${year} ${name}`.trim()),
-        props.legal?.length ? h("ul", { class: "hm-sfoot-legal" }, props.legal.map((l) => h("li", {}, h("a", { href: l.href, class: "hm-sfoot-link" }, l.label)))) : null,
-        props.toTop !== false && h(IconButton, { class: "hm-sfoot-top-btn", size: "sm", icon: props.toTopIcon ?? arrowUp, label: () => props.toTopLabel ?? t`Back to top`, onClick: () => globalThis.scrollTo?.({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" }) })),
-      props.wordmark ? h("p", { class: "hm-sfoot-mark", "aria-hidden": "true" }, props.wordmark) : null));
+          props.about != null && h("p", { class: "m-sfoot-text" }, () => val(props.about)),
+          props.social?.length ? h("ul", { class: "m-sfoot-social" }, props.social.map((s) => h("li", {}, h(IconButton, { href: s.href as never, label: s.label, icon: s.icon, shape: "round", class: "m-sfoot-social-link", rel: "noopener" })))) : null),
+        (props.columns ?? []).map((c) => h("nav", { class: "m-sfoot-col", "aria-label": typeof c.title === "string" ? c.title : null },
+          h("h3", { class: "m-sfoot-col-title" }, c.title),
+          h("ul", {}, c.links.map((l) => h("li", {}, h("a", { href: l.href, class: "m-sfoot-link" }, l.label)))))),
+        props.newsletter ? h("div", { class: "m-sfoot-news" }, h(Newsletter, { layout: "stacked", ...props.newsletter })) : null),
+      h("div", { class: "m-sfoot-bottom" },
+        props.copyright !== false && h("p", { class: "m-sfoot-copy" }, () => val(props.copyright) ?? `© ${year} ${name}`.trim()),
+        props.legal?.length ? h("ul", { class: "m-sfoot-legal" }, props.legal.map((l) => h("li", {}, h("a", { href: l.href, class: "m-sfoot-link" }, l.label)))) : null,
+        props.toTop !== false && h(IconButton, { class: "m-sfoot-top-btn", size: "sm", icon: props.toTopIcon ?? arrowUp, label: () => props.toTopLabel ?? t`Back to top`, onClick: () => globalThis.scrollTo?.({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" }) })),
+      props.wordmark ? h("p", { class: "m-sfoot-mark", "aria-hidden": "true" }, props.wordmark) : null));
 }

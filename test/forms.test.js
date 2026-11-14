@@ -63,11 +63,11 @@ test("useForm: submit coerces with schema.parse, focuses first invalid, maps ser
   formEl.requestSubmit();
   await tick();
   assert.match(el.textContent, /Already taken/);
-  assert.match(el.querySelector(".hm-form-error").textContent, /Server says no/);
+  assert.match(el.querySelector(".m-form-error").textContent, /Server says no/);
   fail = new Error("Network down");
   formEl.requestSubmit();
   await tick();
-  assert.match(el.querySelector(".hm-form-error").textContent, /Network down/);
+  assert.match(el.querySelector(".m-form-error").textContent, /Network down/);
 });
 
 test("Form auto-renders active schema fields and honours when / hidden / required", async () => {
@@ -135,7 +135,7 @@ test("MoneyInput: currency symbol side, 2 decimals, grouping on blur; PercentInp
   const v = signal(null);
   const { el } = mount(() => h(F.MoneyInput, { "bind:value": v, currency: "EUR", locale: "de" }));
   const input = el.querySelector("input");
-  assert.match(el.querySelector(".hm-affix-suffix").textContent, /€/);
+  assert.match(el.querySelector(".m-affix-suffix").textContent, /€/);
   input.focus();
   type(input, "1234,5");
   assert.equal(v(), 1234.5);
@@ -144,7 +144,7 @@ test("MoneyInput: currency symbol side, 2 decimals, grouping on blur; PercentInp
   input.focus(); type(input, "12,345"); input.blur();
   assert.equal(v(), 12.35);
   const usd = mount(() => h(F.MoneyInput, { value: 3, currency: "USD", locale: "en" }));
-  assert.equal(usd.el.querySelector(".hm-affix-prefix").textContent, "$");
+  assert.equal(usd.el.querySelector(".m-affix-prefix").textContent, "$");
   assert.equal(usd.el.querySelector("input").value, "3.00");
   const p = signal(0.125);
   const pm = mount(() => h(F.PercentInput, { "bind:value": p, locale: "en" }));
@@ -221,13 +221,13 @@ test("Combobox static filtering and MultiSelect chips", () => {
   assert.equal(v(), "Berlin");
   const tags = signal(["a"]);
   const m = mount(() => h(F.MultiSelect, { "bind:value": tags, options: [{ value: "a", label: "Alpha" }, { value: "b", label: "Beta" }] }));
-  assert.equal(m.el.querySelector(".hm-chip2-label").textContent, "Alpha");
+  assert.equal(m.el.querySelector(".m-chip2-label").textContent, "Alpha");
   const mi = m.el.querySelector("input");
   type(mi, "be"); key(mi, "Enter");
   assert.deepEqual(tags(), ["a", "b"]);
   key(mi, "Backspace");
   assert.deepEqual(tags(), ["a"]);
-  m.el.querySelector(".hm-chip2-x").click();
+  m.el.querySelector(".m-chip2-x").click();
   assert.deepEqual(tags(), []);
 });
 
@@ -239,14 +239,14 @@ test("Calendar keyboard navigation with min / max", () => {
   assert.equal(focused(), "2026-03-14");
   assert.equal(el.querySelector(`[data-date="2026-03-09"]`).getAttribute("aria-disabled"), "true");
   assert.equal(el.querySelector(`[data-date="2026-03-14"]`).getAttribute("aria-selected"), "true");
-  assert.equal(el.querySelector(".hm-cal-wd").textContent, "Mon");
+  assert.equal(el.querySelector(".m-cal-wd").textContent, "Mon");
   key(grid, "ArrowRight"); assert.equal(focused(), "2026-03-15");
   assert.equal(document.activeElement.getAttribute("data-date"), "2026-03-15");
   key(grid, "ArrowDown"); assert.equal(focused(), "2026-03-22");
   key(grid, "Home"); assert.equal(focused(), "2026-03-16", "week starts Monday");
   key(grid, "End"); assert.equal(focused(), "2026-03-22");
   key(grid, "PageDown"); assert.equal(focused(), "2026-04-20", "clamped to max");
-  assert.match(el.querySelector(".hm-cal-title").textContent, /April 2026/);
+  assert.match(el.querySelector(".m-cal-title").textContent, /April 2026/);
   key(grid, "PageUp"); key(grid, "PageUp"); assert.equal(focused(), "2026-03-10", "clamped to min");
   key(grid, "ArrowLeft"); assert.equal(focused(), "2026-03-10");
   key(grid, "Enter");
@@ -266,12 +266,12 @@ test("DatePicker parses locale input and opens a calendar", async () => {
   assert.equal(F.parseDate("31.02.2026", "de"), undefined);
   el.querySelector("button").click();
   await tick(5);
-  const day = document.querySelector(`.hm-cal-pop [data-date="2026-03-20"]`);
+  const day = document.querySelector(`.m-cal-pop [data-date="2026-03-20"]`);
   assert.ok(day);
   assert.equal(document.activeElement.getAttribute("data-date"), "2026-03-14");
   day.click();
   assert.equal(v(), "2026-03-20");
-  assert.equal(document.querySelector(".hm-cal-pop"), null, "popover closed");
+  assert.equal(document.querySelector(".m-cal-pop"), null, "popover closed");
 });
 
 test("DateRangePicker presets", () => {
@@ -285,9 +285,9 @@ test("DateRangePicker presets", () => {
   btn("Last 30 days").click();
   assert.deepEqual(v(), { from: "2026-02-13", to: "2026-03-14" });
   assert.equal(btn("Last 30 days").getAttribute("aria-checked"), "true");
-  assert.equal(el.querySelectorAll(".hm-date-input").length, 0);
+  assert.equal(el.querySelectorAll(".m-date-input").length, 0);
   btn("Custom").click();
-  assert.equal(el.querySelectorAll(".hm-date-input").length, 2);
+  assert.equal(el.querySelectorAll(".m-date-input").length, 2);
 });
 
 test("FileUpload: maxSize and accept errors, progress and cancel via upload()", async () => {
@@ -295,22 +295,22 @@ test("FileUpload: maxSize and accept errors, progress and cancel via upload()", 
   const big = new File(["x".repeat(2000)], "big.png", { type: "image/png" });
   const txt = new File(["hi"], "a.txt", { type: "text/plain" });
   const m1 = mount(() => h(F.FileUpload, { "bind:value": v, maxSize: 1000, accept: "image/*" }));
-  const zone = m1.el.querySelector(".hm-drop");
+  const zone = m1.el.querySelector(".m-drop");
   fire(zone, "drop", { dataTransfer: { files: [big] } });
-  assert.match(m1.el.querySelector(".hm-upload-errors").textContent, /big\.png is too large \(max 1,000 B\)|big\.png is too large/);
+  assert.match(m1.el.querySelector(".m-upload-errors").textContent, /big\.png is too large \(max 1,000 B\)|big\.png is too large/);
   assert.equal(v(), null);
   fire(zone, "drop", { dataTransfer: { files: [txt] } });
   assert.match(m1.el.textContent, /not allowed/);
   const ok = new File(["ok"], "ok.png", { type: "image/png" });
   fire(zone, "drop", { dataTransfer: { files: [ok] } });
   assert.equal(v(), ok);
-  assert.ok(m1.el.querySelector("img.hm-file-thumb").getAttribute("src").startsWith("blob:"));
+  assert.ok(m1.el.querySelector("img.m-file-thumb").getAttribute("src").startsWith("blob:"));
 
   const uploads = [];
   const upload = (file, { onProgress, signal: sig }) => new Promise((resolve, reject) => { uploads.push({ file, onProgress, resolve, sig }); sig.addEventListener("abort", () => reject(new Error("aborted"))); });
   const r = signal([]);
   const m2 = mount(() => h(F.FileUpload, { "bind:value": r, upload, multiple: true }));
-  fire(m2.el.querySelector(".hm-drop"), "drop", { dataTransfer: { files: [new File(["1"], "one.pdf"), new File(["2"], "two.pdf")] } });
+  fire(m2.el.querySelector(".m-drop"), "drop", { dataTransfer: { files: [new File(["1"], "one.pdf"), new File(["2"], "two.pdf")] } });
   await tick();
   assert.equal(uploads.length, 2);
   uploads[0].onProgress(0.5);
@@ -323,7 +323,7 @@ test("FileUpload: maxSize and accept errors, progress and cancel via upload()", 
   const cancel = m2.el.querySelectorAll("button").find((b) => b.textContent === "Cancel");
   cancel.click();
   assert.equal(uploads[1].sig.aborted, true);
-  assert.equal(m2.el.querySelectorAll(".hm-file").length, 1);
+  assert.equal(m2.el.querySelectorAll(".m-file").length, 1);
   m2.dispose();
 });
 
@@ -380,15 +380,15 @@ test("MarkdownEditor switches between write and preview", () => {
 test("ListEditor: paste lines, edit, reorder, remove; KeyValueEditor", () => {
   const v = signal(["a"]);
   const { el } = mount(() => h(F.ListEditor, { "bind:value": v }));
-  const draft = el.querySelector(".hm-list-add input");
+  const draft = el.querySelector(".m-list-add input");
   fire(draft, "paste", { clipboardData: { getData: () => "b\n c \n\na" } });
   assert.deepEqual(v(), ["a", "b", "c"], "one item per line, trimmed, unique");
-  const rows = () => el.querySelectorAll(".hm-list-row input");
+  const rows = () => el.querySelectorAll(".m-list-row input");
   type(rows()[1], "B");
   assert.deepEqual(v(), ["a", "B", "c"]);
-  el.querySelectorAll(".hm-list-row")[2].querySelectorAll(".hm-icon-btn")[0].click();
+  el.querySelectorAll(".m-list-row")[2].querySelectorAll(".m-icon-btn")[0].click();
   assert.deepEqual(v(), ["a", "c", "B"]);
-  el.querySelectorAll(".hm-list-row")[0].querySelectorAll(".hm-icon-btn")[2].click();
+  el.querySelectorAll(".m-list-row")[0].querySelectorAll(".m-icon-btn")[2].click();
   assert.deepEqual(v(), ["c", "B"]);
   assert.equal(rows()[0].value, "c");
   type(draft, "d"); key(draft, "Enter");
@@ -396,8 +396,8 @@ test("ListEditor: paste lines, edit, reorder, remove; KeyValueEditor", () => {
 
   const o = signal({ a: "1" });
   const kv = mount(() => h(F.KeyValueEditor, { "bind:value": o, numbers: true }));
-  kv.el.querySelector(".hm-kv-add").click();
-  const inputs = kv.el.querySelectorAll(".hm-kv-row input");
+  kv.el.querySelector(".m-kv-add").click();
+  const inputs = kv.el.querySelectorAll(".m-kv-row input");
   type(inputs[2], "b"); type(inputs[3], "42");
   assert.deepEqual(o(), { a: 1, b: 42 });
   type(inputs[2], "a");
@@ -413,13 +413,13 @@ test("Wizard validates each step before moving on and submits at the end", async
     onSubmit: (v) => { done = v; },
   }));
   const formEl = el.querySelector("form");
-  assert.match(el.querySelector(".hm-wizard-title").textContent, /You/);
+  assert.match(el.querySelector(".m-wizard-title").textContent, /You/);
   formEl.requestSubmit();
   assert.match(el.textContent, /required/);
-  assert.match(el.querySelector(".hm-wizard-title").textContent, /You/);
+  assert.match(el.querySelector(".m-wizard-title").textContent, /You/);
   type(el.querySelector("[name=name]"), "Ada");
   formEl.requestSubmit();
-  assert.match(el.querySelector(".hm-wizard-title").textContent, /Account/);
+  assert.match(el.querySelector(".m-wizard-title").textContent, /Account/);
   assert.equal(el.querySelector("[aria-current=step]").textContent, "2Account");
   type(el.querySelector("[name=email]"), "ada@lab.org");
   const sel = el.querySelector("select[name=plan]"); sel.value = "1"; fire(sel, "change");
@@ -431,7 +431,7 @@ test("Wizard validates each step before moving on and submits at the end", async
   await tick();
   assert.deepEqual(done, { name: "Ada", email: "ada@lab.com", plan: "pro" });
   el.querySelectorAll("button").find((b) => b.textContent === "Back").click();
-  assert.match(el.querySelector(".hm-wizard-title").textContent, /You/);
+  assert.match(el.querySelector(".m-wizard-title").textContent, /You/);
 });
 
 test("EditForm: load, dirty, reason, changed fields, toast, reload, fieldErrors", async () => {
@@ -446,7 +446,7 @@ test("EditForm: load, dirty, reason, changed fields, toast, reload, fieldErrors"
     ask: async (o) => { asked.push(o); return "fix typo in email"; },
     notify: (m, o) => toasts.push([m, o.kind]),
   }));
-  assert.ok(el.querySelector(".hm-form-skeleton"));
+  assert.ok(el.querySelector(".m-form-skeleton"));
   await tick();
   assert.equal(loads, 1);
   const email = el.querySelector("[name=email]");
@@ -492,7 +492,7 @@ test("inputFor / registerInput map schema types to controls", () => {
   const s = schema({ size: { type: "pick", options: ["S", "M", "L"], control: "segmented" }, on: { type: "bool", control: "switch" } });
   const { el } = mount(() => h(F.Form, { schema: s }));
   assert.equal(el.querySelectorAll("[role=radio]").length, 3);
-  assert.equal(el.querySelector("[role=radiogroup]").getAttribute("aria-labelledby"), el.querySelector(".hm-label").id);
+  assert.equal(el.querySelector("[role=radiogroup]").getAttribute("aria-labelledby"), el.querySelector(".m-label").id);
   el.querySelector("[role=switch]").click();
   assert.equal(el.querySelector("[role=switch]").getAttribute("aria-checked"), "true");
   void reactive;
@@ -504,5 +504,5 @@ test("TextInput autofocus and CodeInput masked boxes", async () => {
   const el = document.createElement("div");
   render(() => [h(TextInput, { autofocus: true }), h(CodeInput, { length: 4, masked: true })], el);
   assert.equal(el.querySelector("input").hasAttribute("autofocus"), true);
-  assert.equal(el.querySelectorAll(".hm-otp-box").every((b) => b.getAttribute("type") === "password"), true);
+  assert.equal(el.querySelectorAll(".m-otp-box").every((b) => b.getAttribute("type") === "password"), true);
 });

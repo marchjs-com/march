@@ -10,10 +10,10 @@ test("StoryRing: button named with its state, label, add badge, loading", () => 
   const state = signal("new"), loading = signal(false);
   let clicks = 0;
   const m = mount(() => h(StoryRing, { name: "HADİ", state, loading, label: "hadi", add: true, onClick: () => clicks++ }));
-  const b = m.el.querySelector("button.hm-sring");
+  const b = m.el.querySelector("button.m-sring");
   assert.equal(b.getAttribute("aria-label"), "HADİ, new story");
-  assert.equal(b.querySelector(".hm-sring-label").textContent, "hadi");
-  assert.ok(b.querySelector(".hm-sring-add"));
+  assert.equal(b.querySelector(".m-sring-label").textContent, "hadi");
+  assert.ok(b.querySelector(".m-sring-add"));
   state.set("seen");
   assert.equal(b.getAttribute("aria-label"), "HADİ, story seen");
   assert.ok(b.classList.contains("is-seen"));
@@ -26,7 +26,7 @@ test("StoryRing: button named with its state, label, add badge, loading", () => 
 
 test("StoryRing: without onClick it is an image", () => {
   const m = mount(() => h(StoryRing, { name: "HADİ", state: "none" }));
-  const r = m.el.querySelector(".hm-sring");
+  const r = m.el.querySelector(".m-sring");
   assert.equal(r.tagName, "SPAN");
   assert.equal(r.getAttribute("role"), "img");
   assert.equal(r.getAttribute("aria-label"), "HADİ");
@@ -38,14 +38,14 @@ test("StoryRing: own name, ring color, own badge content, own avatar node", () =
     h(StoryRing, { name: "HADİ", ariaLabel: "3 new stories", color: "brand-purple", add: true, addIcon: h("i", { class: "own-add" }), avatar: h("b", { class: "own-av" }), class: "mine" }),
     h(StoryRing, { name: "HADİ", add: true }),
   ]);
-  const [a, b] = m.el.querySelectorAll(".hm-sring");
+  const [a, b] = m.el.querySelectorAll(".m-sring");
   assert.ok(a.classList.contains("mine"));
   assert.equal(a.getAttribute("aria-label"), "3 new stories");
-  assert.equal(a.getAttribute("data-hm-color"), "brand-purple");
-  assert.ok(a.querySelector(".hm-sring-add .own-add") && !a.querySelector(".hm-sring-add .hm-svg"));
-  assert.ok(a.querySelector(".hm-sring-av .own-av") && !a.querySelector(".hm-avatar"));
-  assert.equal(b.getAttribute("data-hm-color"), null);
+  assert.equal(a.getAttribute("data-m-color"), "brand-purple");
+  assert.ok(a.querySelector(".m-sring-add .own-add") && !a.querySelector(".m-sring-add .m-svg"));
+  assert.ok(a.querySelector(".m-sring-av .own-av") && !a.querySelector(".m-avatar"));
+  assert.equal(b.getAttribute("data-m-color"), null);
   assert.equal(b.getAttribute("aria-label"), "HADİ, new story");
-  assert.ok(b.querySelector(".hm-sring-add .hm-svg") && b.querySelector(".hm-avatar"));
+  assert.ok(b.querySelector(".m-sring-add .m-svg") && b.querySelector(".m-avatar"));
   m.dispose();
 });

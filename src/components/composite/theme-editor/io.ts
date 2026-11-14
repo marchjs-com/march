@@ -21,7 +21,7 @@ export const ${v} = defineTheme(${ident(JSON.stringify(def, null, 2))})
 registerThemes([{ id: "${d.id}", name: ${JSON.stringify(d.name)} }])
 `;
 }
-const MARK = "hm-theme-editor";
+const MARK = "m-theme-editor";
 /** The stylesheet of a draft (themeCss), with the draft encoded in a comment so the CSS can be imported back. */
 export const draftCss = (d: ThemeDraft): string => `/* ${MARK} ${encodeDraft(d)} */\n${themeCss(draftToTheme(d))}`;
 /** The draft as JSON. */
@@ -83,7 +83,7 @@ const VAR_ROLE: Record<string, ColorRole> = {
 };
 /** Colors, fonts and radius read back from a theme stylesheet (first block = light, last block = dark). */
 function draftFromCss(css: string): ThemeDraft | null {
-  const blocks = [...css.matchAll(/\{([^{}]*)\}/g)].map((m) => Object.fromEntries([...(m[1] ?? "").matchAll(/--hm-([\w-]+):\s*([^;]+);/g)].map((x) => [x[1]!, x[2]!.trim()])));
+  const blocks = [...css.matchAll(/\{([^{}]*)\}/g)].map((m) => Object.fromEntries([...(m[1] ?? "").matchAll(/--m-([\w-]+):\s*([^;]+);/g)].map((x) => [x[1]!, x[2]!.trim()])));
   const first = blocks[0];
   if (!first || !Object.keys(first).some((k) => k in VAR_ROLE)) return null;
   const d = draftFromColor("#f2801f");

@@ -1,47 +1,47 @@
 /* March — Tabs. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
 /* ---------- tabs */
-.hm-tabs-bar { position: relative; display: flex; gap: var(--hm-space-1); border-bottom: 1px solid var(--hm-border); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
-.hm-tabs-bar::-webkit-scrollbar { display: none; }
-.hm-tab { position: relative; display: inline-flex; align-items: center; gap: var(--hm-space-2); padding: .625rem .75rem; border: 0; margin-bottom: -1px;
-  background: none; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-md); font-weight: var(--hm-weight-medium); white-space: nowrap; cursor: pointer;
-  border-radius: var(--hm-radius-1) var(--hm-radius-1) 0 0; transition: color var(--hm-dur) var(--hm-ease); }
-.hm-tab::after { content: ""; position: absolute; inset-inline: .5rem; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--hm-accent, var(--hm-text)); transform: scaleX(0); transition: transform var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-tab:hover { color: var(--hm-text); }
-.hm-tab.is-active { color: var(--hm-text); }
-.hm-tab.is-active::after { transform: scaleX(1); }
-.hm-tab:focus-visible { outline-offset: -2px; }
-.hm-tab:disabled { opacity: .5; cursor: not-allowed; }
-.hm-tab .hm-badge { font-weight: 600; }
-.hm-tabs-panel { padding-top: var(--hm-space-5); outline: none; animation: hm-rise-in var(--hm-dur-slow) var(--hm-ease-out); }
-.hm-tabs-plain .hm-tab::after { display: none; }
-.hm-tabs-still > .hm-tabs-panel { animation: none; }
+.m-tabs-bar { position: relative; display: flex; gap: var(--m-space-1); border-bottom: 1px solid var(--m-border); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.m-tabs-bar::-webkit-scrollbar { display: none; }
+.m-tab { position: relative; display: inline-flex; align-items: center; gap: var(--m-space-2); padding: .625rem .75rem; border: 0; margin-bottom: -1px;
+  background: none; color: var(--m-muted); font: inherit; font-size: var(--m-text-md); font-weight: var(--m-weight-medium); white-space: nowrap; cursor: pointer;
+  border-radius: var(--m-radius-1) var(--m-radius-1) 0 0; transition: color var(--m-dur) var(--m-ease); }
+.m-tab::after { content: ""; position: absolute; inset-inline: .5rem; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--m-accent, var(--m-text)); transform: scaleX(0); transition: transform var(--m-dur-slow) var(--m-ease-out); }
+.m-tab:hover { color: var(--m-text); }
+.m-tab.is-active { color: var(--m-text); }
+.m-tab.is-active::after { transform: scaleX(1); }
+.m-tab:focus-visible { outline-offset: -2px; }
+.m-tab:disabled { opacity: .5; cursor: not-allowed; }
+.m-tab .m-badge { font-weight: 600; }
+.m-tabs-panel { padding-top: var(--m-space-5); outline: none; animation: m-rise-in var(--m-dur-slow) var(--m-ease-out); }
+.m-tabs-plain .m-tab::after { display: none; }
+.m-tabs-still > .m-tabs-panel { animation: none; }
 /* parts of a tab: icon, the "changed" dot, the close mark (shown on hover, focus and the active tab) */
-.hm-tab-icon { display: inline-flex; flex: none; }
-.hm-tab-icon .hm-svg { width: 1em; height: 1em; }
-.hm-tab-close { display: inline-grid; place-items: center; flex: none; width: 1.125rem; height: 1.125rem; margin-inline-end: -.25rem; border-radius: var(--hm-radius-1); color: var(--hm-muted); opacity: 0;
-  transition: opacity var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease); }
-.hm-tab-close .hm-svg { width: .75rem; height: .75rem; }
-.hm-tab:hover .hm-tab-close, .hm-tab.is-active .hm-tab-close, .hm-tab:focus-visible .hm-tab-close { opacity: 1; }
-.hm-tab-close:hover { background: color-mix(in srgb, currentColor 14%, transparent); color: var(--hm-text); }
-@media (hover: none) { .hm-tab-close { opacity: 1; } }
+.m-tab-icon { display: inline-flex; flex: none; }
+.m-tab-icon .m-svg { width: 1em; height: 1em; }
+.m-tab-close { display: inline-grid; place-items: center; flex: none; width: 1.125rem; height: 1.125rem; margin-inline-end: -.25rem; border-radius: var(--m-radius-1); color: var(--m-muted); opacity: 0;
+  transition: opacity var(--m-dur) var(--m-ease), background-color var(--m-dur) var(--m-ease); }
+.m-tab-close .m-svg { width: .75rem; height: .75rem; }
+.m-tab:hover .m-tab-close, .m-tab.is-active .m-tab-close, .m-tab:focus-visible .m-tab-close { opacity: 1; }
+.m-tab-close:hover { background: color-mix(in srgb, currentColor 14%, transparent); color: var(--m-text); }
+@media (hover: none) { .m-tab-close { opacity: 1; } }
 /* actions at the end of the bar: outside the tab list, the line runs under both */
-.hm-tabs-head { display: flex; align-items: stretch; min-width: 0; }
-.hm-tabs-head > .hm-tabs-bar { flex: 1; min-width: 0; }
-.hm-tabs-actions { display: flex; flex: none; align-items: center; gap: var(--hm-space-1); padding-inline-start: var(--hm-space-2); border-bottom: 1px solid var(--hm-border); }
+.m-tabs-head { display: flex; align-items: stretch; min-width: 0; }
+.m-tabs-head > .m-tabs-bar { flex: 1; min-width: 0; }
+.m-tabs-actions { display: flex; flex: none; align-items: center; gap: var(--m-space-1); padding-inline-start: var(--m-space-2); border-bottom: 1px solid var(--m-border); }
 /* pill: a rounded switch, the active tab raised */
-.hm-tabs-bar-pill { width: fit-content; max-width: 100%; gap: 2px; padding: 2px; border-bottom: 0; border-radius: var(--hm-radius-full); background: var(--hm-surface-3); }
-.hm-tabs-bar-pill .hm-tab { min-height: 1.75rem; margin: 0; padding: 0 .85rem; border-radius: var(--hm-radius-full); color: var(--hm-text-2); font-size: var(--hm-text-sm);
-  transition: background-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
-.hm-tabs-bar-pill .hm-tab::after { display: none; }
-.hm-tabs-bar-pill .hm-tab:hover { color: var(--hm-text); }
-.hm-tabs-bar-pill .hm-tab.is-active { background: var(--hm-surface); color: var(--hm-accent-text, var(--hm-primary-text)); box-shadow: var(--hm-shadow-1); }
-.hm-tabs-bar-pill .hm-tab:focus-visible { outline-offset: 1px; }
-.hm-tabs-head > .hm-tabs-bar-pill { flex: 0 1 auto; }
-.hm-tabs-bar-pill + .hm-tabs-actions { margin-inline-start: auto; border-bottom: 0; }
+.m-tabs-bar-pill { width: fit-content; max-width: 100%; gap: 2px; padding: 2px; border-bottom: 0; border-radius: var(--m-radius-full); background: var(--m-surface-3); }
+.m-tabs-bar-pill .m-tab { min-height: 1.75rem; margin: 0; padding: 0 .85rem; border-radius: var(--m-radius-full); color: var(--m-text-2); font-size: var(--m-text-sm);
+  transition: background-color var(--m-dur) var(--m-ease), color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease); }
+.m-tabs-bar-pill .m-tab::after { display: none; }
+.m-tabs-bar-pill .m-tab:hover { color: var(--m-text); }
+.m-tabs-bar-pill .m-tab.is-active { background: var(--m-surface); color: var(--m-accent-text, var(--m-primary-text)); box-shadow: var(--m-shadow-1); }
+.m-tabs-bar-pill .m-tab:focus-visible { outline-offset: 1px; }
+.m-tabs-head > .m-tabs-bar-pill { flex: 0 1 auto; }
+.m-tabs-bar-pill + .m-tabs-actions { margin-inline-start: auto; border-bottom: 0; }
 /* a vertical strip (TabList): tabs stacked, the mark on the inline-end edge */
-.hm-tabs-bar[aria-orientation="vertical"] { flex-direction: column; align-items: stretch; border-bottom: 0; overflow: visible; }
-.hm-tabs-bar[aria-orientation="vertical"] .hm-tab { margin: 0; border-radius: var(--hm-radius-1); }
-.hm-tabs-bar[aria-orientation="vertical"] .hm-tab::after { inset-inline: auto 0; inset-block: .375rem; width: 2px; height: auto; transform: scaleY(0); }
-.hm-tabs-bar[aria-orientation="vertical"] .hm-tab.is-active::after { transform: scaleY(1); }
-.hm-tabs-bar-pill[aria-orientation="vertical"] { border-radius: var(--hm-radius-2); }
-.hm-tabs-bar-pill[aria-orientation="vertical"] .hm-tab { border-radius: var(--hm-radius); }
+.m-tabs-bar[aria-orientation="vertical"] { flex-direction: column; align-items: stretch; border-bottom: 0; overflow: visible; }
+.m-tabs-bar[aria-orientation="vertical"] .m-tab { margin: 0; border-radius: var(--m-radius-1); }
+.m-tabs-bar[aria-orientation="vertical"] .m-tab::after { inset-inline: auto 0; inset-block: .375rem; width: 2px; height: auto; transform: scaleY(0); }
+.m-tabs-bar[aria-orientation="vertical"] .m-tab.is-active::after { transform: scaleY(1); }
+.m-tabs-bar-pill[aria-orientation="vertical"] { border-radius: var(--m-radius-2); }
+.m-tabs-bar-pill[aria-orientation="vertical"] .m-tab { border-radius: var(--m-radius); }

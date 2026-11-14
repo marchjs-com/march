@@ -61,7 +61,7 @@ export default function TerminalDemo(props: { values: { window: string; scheme: 
             open={() => open()} onClose={() => open.set(false)}
             scheme={() => SCHEMES[v.scheme] ?? "auto"} background={() => v.background || undefined} cursor={v.cursor as "bar"} prompt={v.prompt}
             persist="showcase" commands={COMMANDS} welcome={welcome} ref={showChange} {...parts()} />
-          {() => (open() ? null : <button type="button" class="hm-btn hm-btn-sm sc-term-reopen" onClick={() => open.set(true)}>Terminali yeniden aç</button>)}
+          {() => (open() ? null : <button type="button" class="m-btn m-btn-sm sc-term-reopen" onClick={() => open.set(true)}>Terminali yeniden aç</button>)}
         </div>) }}
   </div>
 }

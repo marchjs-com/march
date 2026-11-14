@@ -19,12 +19,12 @@ test("pickerKind: 2–6 short → segmented, 7–9 → chips, preview → cards,
 
 test("ChoicePicker never draws a <select>; previews render as nodes; a click sets the value", () => {
   const v = signal("v0");
-  for (const [n, extra, sel] of [[3, {}, ".hm-segmented"], [8, {}, ".hm-picker-chips"], [5, { kind: "grid" }, ".hm-picker-grid"], [12, {}, "[role=combobox]"]]) {
+  for (const [n, extra, sel] of [[3, {}, ".m-segmented"], [8, {}, ".m-picker-chips"], [5, { kind: "grid" }, ".m-picker-grid"], [12, {}, "[role=combobox]"]]) {
     const m = mount(() => h(U.ChoicePicker, { value: v, options: opts(n).map((o) => (extra.kind ? { ...o, preview: () => h("i", { class: "pv" }) } : o)), ...extra }));
     assert.equal(m.el.querySelector("select"), null);
     assert.ok(m.el.querySelector(sel), `${n} options → ${sel}`);
     if (extra.kind) {
-      assert.equal(m.el.querySelectorAll(".hm-choice-card-icon .pv").length, 5);
+      assert.equal(m.el.querySelectorAll(".m-choice-card-icon .pv").length, 5);
       const r = m.el.querySelectorAll("input[type=radio]")[2]; r.checked = true; r.dispatchEvent(new Event("change", { bubbles: true }));
       assert.equal(v(), "v2");
     }

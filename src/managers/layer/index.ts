@@ -77,13 +77,13 @@ function create(cfg: LayerConfig): Layers {
       saved = { overflow: root.style.getPropertyValue("overflow"), pad: root.style.getPropertyValue("padding-inline-end") };
       root.style.setProperty("overflow", "hidden");
       if (gutter) root.style.setProperty("padding-inline-end", `${gutter}px`);
-      root.setAttribute("data-hm-scroll-locked", "");
+      root.setAttribute("data-m-scroll-locked", "");
     } else if (!on && saved) {
       const s = saved;
       saved = null;
       if (s.overflow) root.style.setProperty("overflow", s.overflow); else root.style.removeProperty("overflow");
       if (s.pad) root.style.setProperty("padding-inline-end", s.pad); else root.style.removeProperty("padding-inline-end");
-      root.removeAttribute("data-hm-scroll-locked");
+      root.removeAttribute("data-m-scroll-locked");
     }
   };
   const lockScroll = (): (() => void) => {

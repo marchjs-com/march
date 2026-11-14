@@ -1,32 +1,32 @@
-/* BeforeAfter. Both layers share one grid cell; the before layer is clipped at --hm-ba-pos (from the inline start,
+/* BeforeAfter. Both layers share one grid cell; the before layer is clipped at --m-ba-pos (from the inline start,
    mirrored in RTL; from the top when vertical). The handle sits on the divider. */
-.hm-ba { --hm-ba-pos: 50%; position: relative; display: grid; overflow: hidden; border-radius: var(--hm-radius-4); background: var(--hm-surface-2); touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: ew-resize; isolation: isolate; }
-.hm-ba-vertical { touch-action: pan-x; cursor: ns-resize; }
-.hm-ba-follow { cursor: none; }
-.hm-ba-layer { grid-area: 1 / 1; min-width: 0; min-height: 0; }
-.hm-ba-layer > img, .hm-ba-layer > video, .hm-ba-layer > svg { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
-.hm-ba-before { clip-path: inset(0 calc(100% - var(--hm-ba-pos)) 0 0); }
-.hm-ba:dir(rtl) .hm-ba-before { clip-path: inset(0 0 0 calc(100% - var(--hm-ba-pos))); }
-.hm-ba-vertical .hm-ba-before, .hm-ba-vertical:dir(rtl) .hm-ba-before { clip-path: inset(0 0 calc(100% - var(--hm-ba-pos)) 0); }
+.m-ba { --m-ba-pos: 50%; position: relative; display: grid; overflow: hidden; border-radius: var(--m-radius-4); background: var(--m-surface-2); touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: ew-resize; isolation: isolate; }
+.m-ba-vertical { touch-action: pan-x; cursor: ns-resize; }
+.m-ba-follow { cursor: none; }
+.m-ba-layer { grid-area: 1 / 1; min-width: 0; min-height: 0; }
+.m-ba-layer > img, .m-ba-layer > video, .m-ba-layer > svg { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
+.m-ba-before { clip-path: inset(0 calc(100% - var(--m-ba-pos)) 0 0); }
+.m-ba:dir(rtl) .m-ba-before { clip-path: inset(0 0 0 calc(100% - var(--m-ba-pos))); }
+.m-ba-vertical .m-ba-before, .m-ba-vertical:dir(rtl) .m-ba-before { clip-path: inset(0 0 calc(100% - var(--m-ba-pos)) 0); }
 
-.hm-ba-handle { position: absolute; inset-block: 0; inset-inline-start: var(--hm-ba-pos); inline-size: 2px; margin-inline-start: -1px; background: var(--hm-bg); box-shadow: var(--hm-shadow-2); z-index: 2; outline: none; }
-.hm-ba-vertical .hm-ba-handle { inset-block: auto; inset-inline: 0; inset-block-start: var(--hm-ba-pos); inline-size: auto; block-size: 2px; margin-inline-start: 0; margin-block-start: -1px; }
-.hm-ba-grip { position: absolute; inset-block-start: 50%; inset-inline-start: 50%; display: flex; align-items: center; justify-content: center; gap: 3px; inline-size: 2.75rem; block-size: 2.75rem; translate: -50% -50%; border-radius: var(--hm-radius-full); background: var(--hm-bg); color: var(--hm-text); box-shadow: var(--hm-shadow-3); transition: scale var(--hm-dur) var(--hm-ease-spring), box-shadow var(--hm-dur) var(--hm-ease); }
-.hm-ba:dir(rtl) .hm-ba-grip { translate: 50% -50%; }
-.hm-ba-grip i { inline-size: 0; block-size: 0; border-block: .32rem solid transparent; border-inline-end: .42rem solid currentColor; }
-.hm-ba-grip i + i { border-inline-end: 0; border-inline-start: .42rem solid currentColor; }
-.hm-ba-grip-own .hm-svg { inline-size: 1.15rem; block-size: 1.15rem; }
-.hm-ba-vertical .hm-ba-grip { flex-direction: column; }
-.hm-ba-vertical .hm-ba-grip i { border-block: 0; border-inline: .32rem solid transparent; border-block-end: .42rem solid currentColor; }
-.hm-ba-vertical .hm-ba-grip i + i { border-block-end: 0; border-block-start: .42rem solid currentColor; }
-.hm-ba-handle:focus-visible .hm-ba-grip { box-shadow: var(--hm-shadow-3), 0 0 0 3px var(--hm-primary); }
-.hm-ba.is-dragging .hm-ba-grip, .hm-ba-handle:hover .hm-ba-grip { scale: 1.08; }
-.hm-ba-follow .hm-ba-grip { inline-size: 2.25rem; block-size: 2.25rem; }
+.m-ba-handle { position: absolute; inset-block: 0; inset-inline-start: var(--m-ba-pos); inline-size: 2px; margin-inline-start: -1px; background: var(--m-bg); box-shadow: var(--m-shadow-2); z-index: 2; outline: none; }
+.m-ba-vertical .m-ba-handle { inset-block: auto; inset-inline: 0; inset-block-start: var(--m-ba-pos); inline-size: auto; block-size: 2px; margin-inline-start: 0; margin-block-start: -1px; }
+.m-ba-grip { position: absolute; inset-block-start: 50%; inset-inline-start: 50%; display: flex; align-items: center; justify-content: center; gap: 3px; inline-size: 2.75rem; block-size: 2.75rem; translate: -50% -50%; border-radius: var(--m-radius-full); background: var(--m-bg); color: var(--m-text); box-shadow: var(--m-shadow-3); transition: scale var(--m-dur) var(--m-ease-spring), box-shadow var(--m-dur) var(--m-ease); }
+.m-ba:dir(rtl) .m-ba-grip { translate: 50% -50%; }
+.m-ba-grip i { inline-size: 0; block-size: 0; border-block: .32rem solid transparent; border-inline-end: .42rem solid currentColor; }
+.m-ba-grip i + i { border-inline-end: 0; border-inline-start: .42rem solid currentColor; }
+.m-ba-grip-own .m-svg { inline-size: 1.15rem; block-size: 1.15rem; }
+.m-ba-vertical .m-ba-grip { flex-direction: column; }
+.m-ba-vertical .m-ba-grip i { border-block: 0; border-inline: .32rem solid transparent; border-block-end: .42rem solid currentColor; }
+.m-ba-vertical .m-ba-grip i + i { border-block-end: 0; border-block-start: .42rem solid currentColor; }
+.m-ba-handle:focus-visible .m-ba-grip { box-shadow: var(--m-shadow-3), 0 0 0 3px var(--m-primary); }
+.m-ba.is-dragging .m-ba-grip, .m-ba-handle:hover .m-ba-grip { scale: 1.08; }
+.m-ba-follow .m-ba-grip { inline-size: 2.25rem; block-size: 2.25rem; }
 
-.hm-ba-label { position: absolute; inset-block-start: var(--hm-space-3); z-index: 1; display: inline-flex; pointer-events: none; transition: opacity var(--hm-dur) var(--hm-ease); }
-.hm-ba-label .hm-badge { background: var(--hm-bg); color: var(--hm-text); font-size: var(--hm-text-sm); font-weight: var(--hm-weight-semibold); box-shadow: var(--hm-shadow-1); }
-.hm-ba-label-before { inset-inline-start: var(--hm-space-3); }
-.hm-ba-label-after { inset-inline-end: var(--hm-space-3); }
-.hm-ba-vertical .hm-ba-label-after { inset-block-start: auto; inset-block-end: var(--hm-space-3); inset-inline-end: auto; inset-inline-start: var(--hm-space-3); }
-.hm-ba-label.is-hidden { opacity: 0; }
-@media (prefers-reduced-motion: reduce) { .hm-ba-grip, .hm-ba-label { transition: none; } }
+.m-ba-label { position: absolute; inset-block-start: var(--m-space-3); z-index: 1; display: inline-flex; pointer-events: none; transition: opacity var(--m-dur) var(--m-ease); }
+.m-ba-label .m-badge { background: var(--m-bg); color: var(--m-text); font-size: var(--m-text-sm); font-weight: var(--m-weight-semibold); box-shadow: var(--m-shadow-1); }
+.m-ba-label-before { inset-inline-start: var(--m-space-3); }
+.m-ba-label-after { inset-inline-end: var(--m-space-3); }
+.m-ba-vertical .m-ba-label-after { inset-block-start: auto; inset-block-end: var(--m-space-3); inset-inline-end: auto; inset-inline-start: var(--m-space-3); }
+.m-ba-label.is-hidden { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .m-ba-grip, .m-ba-label { transition: none; } }

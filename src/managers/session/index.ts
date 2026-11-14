@@ -45,7 +45,7 @@ export interface Session {
   dispose(): void;
 }
 
-const DEFAULTS: SessionConfig = { duration: 30 * 60_000, warnBefore: 2 * 60_000, extendOnActivity: true, extendEvery: 30_000, storageKey: "hm.session", onExpire: null };
+const DEFAULTS: SessionConfig = { duration: 30 * 60_000, warnBefore: 2 * 60_000, extendOnActivity: true, extendEvery: 30_000, storageKey: "m.session", onExpire: null };
 
 type Stored = { exp: number | null; dur: number };
 

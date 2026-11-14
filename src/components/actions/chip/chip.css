@@ -1,20 +1,20 @@
 /* March — Chip. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
-.hm-chip2 { display: inline-flex; align-items: center; gap: .3125rem; min-height: 1.75rem; max-width: 100%; padding: 0 .625rem; border-radius: var(--hm-radius-full); border: 1px solid var(--hm-border);
-  background: var(--hm-surface); color: var(--hm-text-2); font-size: var(--hm-text-sm); font-weight: 500; white-space: nowrap; transition: background-color var(--hm-dur) var(--hm-ease), border-color var(--hm-dur) var(--hm-ease), color var(--hm-dur) var(--hm-ease); }
-.hm-chip2-sm { min-height: 1.375rem; padding: 0 .5rem; font-size: var(--hm-text-xs); }
-.hm-chip2-icon { display: inline-flex; } .hm-chip2-icon .hm-svg { width: .8125rem; height: .8125rem; }
-.hm-chip2-own { display: inline-flex; }
-.hm-chip2-label { overflow: hidden; text-overflow: ellipsis; }
-.hm-chip2-primary { --hm-chip-c: var(--hm-accent, var(--hm-primary)); } .hm-chip2-success { --hm-chip-c: var(--hm-success); } .hm-chip2-warn { --hm-chip-c: var(--hm-warn); }
-.hm-chip2-danger { --hm-chip-c: var(--hm-danger); } .hm-chip2-info { --hm-chip-c: var(--hm-info); }
-.hm-chip2-primary, .hm-chip2-success, .hm-chip2-warn, .hm-chip2-danger, .hm-chip2-info {
-  color: var(--hm-chip-c); background: color-mix(in srgb, var(--hm-chip-c) 10%, var(--hm-surface)); border-color: color-mix(in srgb, var(--hm-chip-c) 25%, transparent); }
-.hm-chip2-btn { padding: 0; }
-.hm-chip2-hit { display: inline-flex; align-items: center; gap: .3125rem; min-height: inherit; padding: 0 .625rem; border: 0; border-radius: inherit; background: none; color: inherit; font: inherit; cursor: pointer; }
-.hm-chip2-btn:hover { border-color: var(--hm-border-strong); background: var(--hm-surface-2); }
-.hm-chip2-btn.is-selected { background: var(--hm-accent-soft, var(--hm-primary-soft)); border-color: color-mix(in srgb, var(--hm-accent, var(--hm-primary)) 40%, transparent); color: var(--hm-accent-text, var(--hm-primary-text)); }
-.hm-chip2-btn:has(.hm-chip2-x) .hm-chip2-hit { padding-inline-end: .25rem; }
+.m-chip2 { display: inline-flex; align-items: center; gap: .3125rem; min-height: 1.75rem; max-width: 100%; padding: 0 .625rem; border-radius: var(--m-radius-full); border: 1px solid var(--m-border);
+  background: var(--m-surface); color: var(--m-text-2); font-size: var(--m-text-sm); font-weight: 500; white-space: nowrap; transition: background-color var(--m-dur) var(--m-ease), border-color var(--m-dur) var(--m-ease), color var(--m-dur) var(--m-ease); }
+.m-chip2-sm { min-height: 1.375rem; padding: 0 .5rem; font-size: var(--m-text-xs); }
+.m-chip2-icon { display: inline-flex; } .m-chip2-icon .m-svg { width: .8125rem; height: .8125rem; }
+.m-chip2-own { display: inline-flex; }
+.m-chip2-label { overflow: hidden; text-overflow: ellipsis; }
+.m-chip2-primary { --m-chip-c: var(--m-accent, var(--m-primary)); } .m-chip2-success { --m-chip-c: var(--m-success); } .m-chip2-warn { --m-chip-c: var(--m-warn); }
+.m-chip2-danger { --m-chip-c: var(--m-danger); } .m-chip2-info { --m-chip-c: var(--m-info); }
+.m-chip2-primary, .m-chip2-success, .m-chip2-warn, .m-chip2-danger, .m-chip2-info {
+  color: var(--m-chip-c); background: color-mix(in srgb, var(--m-chip-c) 10%, var(--m-surface)); border-color: color-mix(in srgb, var(--m-chip-c) 25%, transparent); }
+.m-chip2-btn { padding: 0; }
+.m-chip2-hit { display: inline-flex; align-items: center; gap: .3125rem; min-height: inherit; padding: 0 .625rem; border: 0; border-radius: inherit; background: none; color: inherit; font: inherit; cursor: pointer; }
+.m-chip2-btn:hover { border-color: var(--m-border-strong); background: var(--m-surface-2); }
+.m-chip2-btn.is-selected { background: var(--m-accent-soft, var(--m-primary-soft)); border-color: color-mix(in srgb, var(--m-accent, var(--m-primary)) 40%, transparent); color: var(--m-accent-text, var(--m-primary-text)); }
+.m-chip2-btn:has(.m-chip2-x) .m-chip2-hit { padding-inline-end: .25rem; }
 /* remove: the smallest IconButton, in the chip's own colour */
-.hm-chip2 .hm-icon-btn.hm-chip2-x { width: 1.125rem; height: 1.125rem; margin-inline: -.125rem -.25rem; color: inherit; opacity: .7; }
-.hm-chip2 .hm-icon-btn.hm-chip2-x:hover { opacity: 1; background: color-mix(in srgb, currentColor 14%, transparent); }
-.hm-chip2 .hm-icon-btn.hm-chip2-x .hm-svg { width: .6875rem; height: .6875rem; }
+.m-chip2 .m-icon-btn.m-chip2-x { width: 1.125rem; height: 1.125rem; margin-inline: -.125rem -.25rem; color: inherit; opacity: .7; }
+.m-chip2 .m-icon-btn.m-chip2-x:hover { opacity: 1; background: color-mix(in srgb, currentColor 14%, transparent); }
+.m-chip2 .m-icon-btn.m-chip2-x .m-svg { width: .6875rem; height: .6875rem; }

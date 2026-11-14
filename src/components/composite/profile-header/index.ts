@@ -80,31 +80,31 @@ export function ProfileHeader(props: ProfileHeaderProps): Element {
   const followers = (): number => (u().followers ?? 0) + (val(props.follow) === "following" ? 1 : 0);
   // a soft StatTile whose figure rolls; a button when the list behind it can be opened
   const stat = (which: Stat, n: () => number, label: () => string): Element =>
-    h(StatTile, { class: "hm-prof-stat", variant: "tile", value: h(CountRoll, { value: n }), label, onClick: props.onStat && (() => props.onStat?.(which)) }) as Element;
+    h(StatTile, { class: "m-prof-stat", variant: "tile", value: h(CountRoll, { value: n }), label, onClick: props.onStat && (() => props.onStat?.(which)) }) as Element;
   // the frame is a Card (a section, no body padding)
-  return h(Card, { flush: true, class: () => cx("hm-prof", `hm-prof-cover-${val(props.cover) ?? "md"}`, val(props.class)), "aria-label": () => L().profile?.(u().name) ?? t`Profile of ${u().name}` },
-    () => (val(props.cover) === "none" ? null : h("div", { class: "hm-prof-cover", "aria-hidden": "true" },
-      () => { const c = u().cover; return c ? h(Picture, { src: c, alt: "", fit: "cover", loading: "eager" }) : h("span", { class: "hm-prof-cover-art" }, h("i"), h("i"), h("i"), h("i")); })),
-    h("div", { class: "hm-prof-top" },
-      h(StoryRing, { name: () => u().name, src: () => u().avatar, size: "lg", state: () => u().story ?? "none", onClick: props.onAvatar, class: "hm-prof-avatar" }),
-      h("div", { class: "hm-prof-actions" },
+  return h(Card, { flush: true, class: () => cx("m-prof", `m-prof-cover-${val(props.cover) ?? "md"}`, val(props.class)), "aria-label": () => L().profile?.(u().name) ?? t`Profile of ${u().name}` },
+    () => (val(props.cover) === "none" ? null : h("div", { class: "m-prof-cover", "aria-hidden": "true" },
+      () => { const c = u().cover; return c ? h(Picture, { src: c, alt: "", fit: "cover", loading: "eager" }) : h("span", { class: "m-prof-cover-art" }, h("i"), h("i"), h("i"), h("i")); })),
+    h("div", { class: "m-prof-top" },
+      h(StoryRing, { name: () => u().name, src: () => u().avatar, size: "lg", state: () => u().story ?? "none", onClick: props.onAvatar, class: "m-prof-avatar" }),
+      h("div", { class: "m-prof-actions" },
         () => (val(props.self)
           ? (props.onEdit ? h(Button, { variant: "secondary", onClick: () => props.onEdit?.() }, () => L().edit ?? t`Edit profile`) : null)
           : [
             props.onFollow ? h(FollowButton, { state: () => val(props.follow) ?? "follow", name: () => u().name, private: () => !!u().private, onChange: (s: FollowState) => props.onFollow?.(s) }) : null,
-            props.onMessage ? h(Button, { class: "hm-prof-msg", variant: props.messageColor ? "primary" : "secondary", color: props.messageColor, icon: ownIcon(props.messageIcon, message, null), onClick: () => props.onMessage?.() },
+            props.onMessage ? h(Button, { class: "m-prof-msg", variant: props.messageColor ? "primary" : "secondary", color: props.messageColor, icon: ownIcon(props.messageIcon, message, null), onClick: () => props.onMessage?.() },
               () => L().message ?? t`Message`) : null,
           ]),
-        props.menu?.length ? h(Menu, { icon: props.menuIcon ?? moreVertical, label: () => L().more ?? t`More`, variant: "ghost", items: props.menu, class: "hm-prof-more" }) : null)),
-    h("div", { class: "hm-prof-id" },
-      h("h2", { class: "hm-prof-name" }, h("span", null, () => u().name),
-        () => (u().verified && props.verifiedIcon !== false ? h(VerifiedMark, { class: "hm-prof-verified", size: "md", label: () => L().verified ?? t`Verified`, icon: props.verifiedIcon }) : null)),
-      () => (u().handle ? h("span", { class: "hm-prof-handle" }, `@${u().handle}`) : null),
-      () => (u().bio ? h("p", { class: "hm-prof-bio" }, u().bio) : null)),
+        props.menu?.length ? h(Menu, { icon: props.menuIcon ?? moreVertical, label: () => L().more ?? t`More`, variant: "ghost", items: props.menu, class: "m-prof-more" }) : null)),
+    h("div", { class: "m-prof-id" },
+      h("h2", { class: "m-prof-name" }, h("span", null, () => u().name),
+        () => (u().verified && props.verifiedIcon !== false ? h(VerifiedMark, { class: "m-prof-verified", size: "md", label: () => L().verified ?? t`Verified`, icon: props.verifiedIcon }) : null)),
+      () => (u().handle ? h("span", { class: "m-prof-handle" }, `@${u().handle}`) : null),
+      () => (u().bio ? h("p", { class: "m-prof-bio" }, u().bio) : null)),
     () => {
       const list = shown();
       if (!list.length) return null;
-      return h("div", { class: "hm-prof-stats", "data-n": String(list.length) }, list.map((w) => (w === "posts" ? stat(w, () => u().posts ?? 0, () => L().posts ?? t`Posts`)
+      return h("div", { class: "m-prof-stats", "data-n": String(list.length) }, list.map((w) => (w === "posts" ? stat(w, () => u().posts ?? 0, () => L().posts ?? t`Posts`)
         : w === "followers" ? stat(w, followers, () => L().followers ?? t`Followers`)
         : stat(w, () => u().following ?? 0, () => L().following ?? t`Following`))));
     }) as Element;

@@ -23,7 +23,7 @@ export default function ProgressDemo(props: { values: { variant: string; parts: 
       if (v.parts > 0) {
         const n = v.parts
         if (v.timed) return [<Progress variant={variant} size={size} tone={tone} colors={colors} segments={n} value={() => $part % n} duration={1800} onDone={() => { $part++ }} ariaLabel="Hikâye" valueText={(i: number, m: number) => `${i + 1} / ${m}`} />,
-          <span class="hm-muted">{() => `Parça ${($part % n) + 1} / ${n} doluyor; dolunca sıradaki başlar.`}</span>]
+          <span class="m-muted">{() => `Parça ${($part % n) + 1} / ${n} doluyor; dolunca sıradaki başlar.`}</span>]
         return <Progress variant={variant} size={size} tone={tone} colors={colors} segments={n} value={(v.value / 100) * n} label="Adımlar" />
       }
       const show = v.showValue && !v.indeterminate

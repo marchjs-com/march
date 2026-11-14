@@ -52,18 +52,18 @@ export function Badge(props: BadgeProps): unknown {
   const pressed = (): boolean | null => { const p = val(props.pressed); return p == null ? null : !!p; };
   const tag = click ? "button" : "span";
   const own = click ? { type: "button", onClick: click, disabled: () => !!val(props.disabled), "aria-pressed": () => { const p = pressed(); return p == null ? null : String(p); } } : {};
-  const extra = (): string => cx(props.size === "xs" && "hm-badge-xs", props.variant === "solid" && "hm-badge-solid", click && "hm-badge-btn", click && pressed() && "is-pressed", val(props.class));
+  const extra = (): string => cx(props.size === "xs" && "m-badge-xs", props.variant === "solid" && "m-badge-solid", click && "m-badge-btn", click && pressed() && "is-pressed", val(props.class));
   if (props.count !== undefined) {
     return () => {
       const n = Number(val(props.count)) || 0;
       if (!n && !props.showZero) return null;
-      return h(tag, { ...own, "data-hm-color": () => colorAttr(props.color), class: () => cx("hm-badge", "hm-badge-count", `hm-badge-${val(props.tone) ?? "danger"}`, extra()), "aria-label": val(props.ariaLabel) ?? (props.label ? `${n} ${val(props.label)}` : null) }, props.format ? props.format(n, props.max ?? 99) : countLabel(n, props.max ?? 99));
+      return h(tag, { ...own, "data-m-color": () => colorAttr(props.color), class: () => cx("m-badge", "m-badge-count", `m-badge-${val(props.tone) ?? "danger"}`, extra()), "aria-label": val(props.ariaLabel) ?? (props.label ? `${n} ${val(props.label)}` : null) }, props.format ? props.format(n, props.max ?? 99) : countLabel(n, props.max ?? 99));
     };
   }
   // the dot: the built-in one (a StatusDot in the text colour or `dotColor`, still or pulsing) or the caller's node
   const node = props.dot && props.dot !== true, pulse = !node && props.pulse ? props.pulse : false, builtIn = props.dot === true || !!pulse, mark = builtIn && !pulse && !!props.dotColor;
-  return h(tag, { ...own, "data-hm-color": () => colorAttr(props.color), "aria-label": () => val(props.ariaLabel) ?? null, class: () => cx("hm-badge", `hm-badge-${val(props.tone) ?? "neutral"}`, builtIn && !mark && !pulse && "hm-badge-dot", extra()) },
-    node ? h("span", { class: "hm-badge-dot-own", "aria-hidden": "true" }, props.dot)
-      : builtIn ? h(StatusDot, { size: "xs", pulse, color: props.dotColor, class: pulse ? "hm-badge-dot-pulse" : mark ? "hm-badge-dot-mark" : null }) : null,
+  return h(tag, { ...own, "data-m-color": () => colorAttr(props.color), "aria-label": () => val(props.ariaLabel) ?? null, class: () => cx("m-badge", `m-badge-${val(props.tone) ?? "neutral"}`, builtIn && !mark && !pulse && "m-badge-dot", extra()) },
+    node ? h("span", { class: "m-badge-dot-own", "aria-hidden": "true" }, props.dot)
+      : builtIn ? h(StatusDot, { size: "xs", pulse, color: props.dotColor, class: pulse ? "m-badge-dot-pulse" : mark ? "m-badge-dot-mark" : null }) : null,
     props.children);
 }

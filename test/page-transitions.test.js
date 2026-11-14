@@ -70,7 +70,7 @@ test("View Transitions: the engine animates the old and new page pseudo-elements
   let named = null;
   const orig = document.startViewTransition;
   document.startViewTransition = (cb) => {
-    named = root.getAttribute("data-hm-vt");
+    named = root.getAttribute("data-m-vt");
     cb();
     return { updateCallbackDone: Promise.resolve(), ready: Promise.resolve(), finished: new Promise((r) => setTimeout(r, 5)) };
   };
@@ -79,10 +79,10 @@ test("View Transitions: the engine animates the old and new page pseudo-elements
   await tick();
   await R.navigate("/a"); await tick();
   assert.equal(a.host.querySelector(".pg").textContent, "a");
-  assert.equal(named, "hm-page");
-  assert.deepEqual(calls.map((c) => c[0]), ["::view-transition-old(hm-page)", "::view-transition-new(hm-page)"]);
+  assert.equal(named, "m-page");
+  assert.deepEqual(calls.map((c) => c[0]), ["::view-transition-old(m-page)", "::view-transition-new(m-page)"]);
   assert.equal(calls[1][1][0].transform, "translateX(32px)");
-  assert.equal(root.getAttribute("data-hm-vt"), null, "cleaned up after the transition");
+  assert.equal(root.getAttribute("data-m-vt"), null, "cleaned up after the transition");
   assert.equal(a.host.querySelector(".pg").style.getPropertyValue("view-transition-name"), "");
   document.startViewTransition = orig; root.animate = origAnimate;
   stop(); a.done();
@@ -114,8 +114,8 @@ test("fallback without View Transitions: the old page leaves, the new one enters
   document.startViewTransition = undefined;
   const stop = M.pageTransitions({ type: "slide", duration: 40 });
   const a = app({
-    "/": { component: () => h("section", { class: "pg" }, h("img", { "data-hm-shared": "p1", alt: "" })) },
-    "/a": { component: () => h("section", { class: "pg" }, "a", h("img", { "data-hm-shared": "p1", alt: "" })) },
+    "/": { component: () => h("section", { class: "pg" }, h("img", { "data-m-shared": "p1", alt: "" })) },
+    "/a": { component: () => h("section", { class: "pg" }, "a", h("img", { "data-m-shared": "p1", alt: "" })) },
   });
   await tick();
   await R.navigate("/a"); await tick(60);
@@ -185,7 +185,7 @@ test("page transition variants: \"Stop all\" during a swap removes its layer ani
   M.motion.resumeAll();
   assert.equal(log.cancelled, 2, "both layer animations were removed: the browser ends the transition");
   log.vts[0].skipTransition(); await tick();
-  assert.equal(root.getAttribute("data-hm-vt"), null);
+  assert.equal(root.getAttribute("data-m-vt"), null);
   document.startViewTransition = orig; root.animate = origA; document.getAnimations = origG;
   stop(); a.done();
 });
@@ -204,18 +204,18 @@ test("View Transitions: a newer navigation ends the running one first; rapid swa
   await tick(700);
   assert.equal(a.host.querySelector(".pg").textContent, "morph");
   assert.ok(log.skipped >= 1, "a running transition was ended by the next one");
-  assert.equal(root.getAttribute("data-hm-vt"), null, "no mark left");
+  assert.equal(root.getAttribute("data-m-vt"), null, "no mark left");
   assert.equal([...document.querySelectorAll("*")].filter((e) => e.style?.getPropertyValue?.("view-transition-name")).length, 0, "no element keeps a transition name");
   document.startViewTransition = orig; root.animate = origA;
   stop(); a.done();
 });
 
-test("a [data-hm-transition] part of the page is what a transition animates (the rest swaps at once)", async () => {
+test("a [data-m-transition] part of the page is what a transition animates (the rest swaps at once)", async () => {
   const root = document.documentElement, log = { skipped: 0, cancelled: 0, vts: [], anims: [] };
   const origA = root.animate, orig = document.startViewTransition;
   root.animate = fakeAnimate(log); document.startViewTransition = fakeVT(log, 20);
   const stop = M.pageTransitions({ type: "fade", duration: 20 });
-  const stage = (k) => ({ component: () => h("section", { class: "pg" }, h("h1", {}, "title"), h("div", { class: "stage", "data-hm-transition": "" }, k)) });
+  const stage = (k) => ({ component: () => h("section", { class: "pg" }, h("h1", {}, "title"), h("div", { class: "stage", "data-m-transition": "" }, k)) });
   const a = app({ "/": stage("one"), "/a": stage("two") });
   await tick();
   await R.navigate("/a"); await tick(100);

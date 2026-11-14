@@ -11,9 +11,9 @@ const mount = (fn) => { const el = document.createElement("div"); document.body.
 
 test("MadeWithMarch: sentence, link from the constant, accessible heart, variants", () => {
   const m = mount(() => [h(MadeWithMarch, {}), h(MadeWithMarch, { variant: "badge" }), h(MadeWithMarch, { variant: "small" })]);
-  const [a, b, c] = m.el.querySelectorAll(".hm-madewith");
+  const [a, b, c] = m.el.querySelectorAll(".m-madewith");
   assert.equal(a.textContent, "Developed with March and 💗");
-  assert.ok(a.className.includes("hm-madewith-text") && b.className.includes("hm-madewith-badge") && c.className.includes("hm-madewith-small"));
+  assert.ok(a.className.includes("m-madewith-text") && b.className.includes("m-madewith-badge") && c.className.includes("m-madewith-small"));
   const link = a.querySelector("a");
   assert.equal(link.getAttribute("href"), MARCH_URL);
   assert.equal(link.textContent, "March");
@@ -32,7 +32,7 @@ test("MadeWithMarch: the heart, the link and the sentence are yours", async () =
     h(MadeWithMarch, { text: (link, heart) => ["Built on ", link, " ", heart] }),
     h(MadeWithMarch, { heart: false, text: (link, heart) => [link, String(heart)] }),
   ]);
-  const [a, b, c, d] = m.el.querySelectorAll(".hm-madewith");
+  const [a, b, c, d] = m.el.querySelectorAll(".m-madewith");
   assert.equal(a.textContent, "Developed with March");
   assert.equal(a.querySelector("[role=img]"), null);
   assert.equal(b.textContent, "Developed with March UI and ☕");
@@ -47,11 +47,11 @@ test("MadeWithMarch: Turkish word order", async () => {
   messages("tr", tr);
   await setLocale("tr");
   const m = mount(() => h(MadeWithMarch, {}));
-  assert.equal(m.el.querySelector(".hm-madewith").textContent, "March ve 💗 ile geliştirildi");
+  assert.equal(m.el.querySelector(".m-madewith").textContent, "March ve 💗 ile geliştirildi");
   assert.equal(m.el.querySelector("[role=img]").getAttribute("aria-label"), "Sevgi");
   m.dispose();
   const n = mount(() => h(MadeWithMarch, { heart: false }));
-  assert.equal(n.el.querySelector(".hm-madewith").textContent, "March ile geliştirildi");
+  assert.equal(n.el.querySelector(".m-madewith").textContent, "March ile geliştirildi");
   n.dispose();
   await setLocale("en");
 });

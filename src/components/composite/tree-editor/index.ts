@@ -78,7 +78,7 @@ const COLOR: Record<Kind, "brand-orange" | "brand-blue" | "brand-green" | "brand
 /** JSON tree editor: `<TreeEditor bind:value={$data} schema={schema} />`. */
 export function TreeEditor(props: TreeEditorProps): unknown {
   const [get, set] = model<unknown>(props, null);
-  const id = uid("hm-tre");
+  const id = uid("m-tre");
   const c = ctl(props);
   const ro = (): boolean => !!(props.readonly || props.disabled);
   const L = (): NonNullable<TreeEditorProps["labels"]> => props.labels ?? {};
@@ -246,7 +246,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
       else focusRow(r.ptr);
     };
     return h(TextInput, {
-      class: cx("hm-tre-input", which === "key" ? "hm-tre-input-key" : `hm-tre-input-${r.kind}`), value: initial,
+      class: cx("m-tre-input", which === "key" ? "m-tre-input-key" : `m-tre-input-${r.kind}`), value: initial,
       inputmode: r.kind === "number" && which === "value" ? "decimal" : undefined, spellcheck: "false", autocomplete: "off",
       "aria-label": which === "key" ? L().key ?? t`Key` : valueName(r),
       ref: (el: HTMLInputElement) => queueMicrotask(() => { el.focus(); el.select?.(); }),
@@ -255,26 +255,26 @@ export function TreeEditor(props: TreeEditorProps): unknown {
     });
   };
   const keyCell = (r: Row): unknown => {
-    if (r.key == null) return h("span", { class: "hm-tre-key hm-tre-root" }, rootName);
-    if (r.parentKind === "array") return h("span", { class: "hm-tre-key hm-tre-index" }, String(r.key));
+    if (r.key == null) return h("span", { class: "m-tre-key m-tre-root" }, rootName);
+    if (r.parentKind === "array") return h("span", { class: "m-tre-key m-tre-index" }, String(r.key));
     return () => (editing()?.ptr === r.ptr && editing()?.field === "key" ? field(r, "key")
-      : h("span", { class: "hm-tre-key", onDblClick: () => { if (!ro()) editing.set({ ptr: r.ptr, field: "key" }); } }, String(r.key)));
+      : h("span", { class: "m-tre-key", onDblClick: () => { if (!ro()) editing.set({ ptr: r.ptr, field: "key" }); } }, String(r.key)));
   };
   const valueCell = (r: Row, cur: () => Row): unknown => {
-    if (r.kind === "object" || r.kind === "array") return h("span", { class: "hm-tre-summary" }, r.kind === "array" ? L().items?.(r.size) ?? t`${r.size} items` : L().fields?.(r.size) ?? t`${r.size} fields`);
-    if (r.kind === "boolean") return h(Toggle, { value: live(() => cur().value as boolean), disabled: ro(), "aria-label": valueName(r), class: "hm-tre-switch", onChange: (v: boolean) => change(t`Edit value`, J.updateAt(untrack(get), r.path, () => v), r.ptr) });
-    if (r.kind === "null") return h("span", { class: "hm-tre-value hm-tre-null" }, "null");
+    if (r.kind === "object" || r.kind === "array") return h("span", { class: "m-tre-summary" }, r.kind === "array" ? L().items?.(r.size) ?? t`${r.size} items` : L().fields?.(r.size) ?? t`${r.size} fields`);
+    if (r.kind === "boolean") return h(Toggle, { value: live(() => cur().value as boolean), disabled: ro(), "aria-label": valueName(r), class: "m-tre-switch", onChange: (v: boolean) => change(t`Edit value`, J.updateAt(untrack(get), r.path, () => v), r.ptr) });
+    if (r.kind === "null") return h("span", { class: "m-tre-value m-tre-null" }, "null");
     const sch = J.schemaAt(props.schema, r.path);
     return () => (editing()?.ptr === r.ptr && editing()?.field === "value" ? field(r, "value")
-      : h("span", { class: cx("hm-tre-value", `hm-tre-${r.kind}`), title: sch?.description ?? null, onDblClick: () => { if (!ro()) editing.set({ ptr: r.ptr, field: "value" }); } },
-        r.kind === "string" ? (r.value as string) || h("span", { class: "hm-tre-empty" }, () => L().emptyText ?? t`empty text`) : String(r.value)));
+      : h("span", { class: cx("m-tre-value", `m-tre-${r.kind}`), title: sch?.description ?? null, onDblClick: () => { if (!ro()) editing.set({ ptr: r.ptr, field: "value" }); } },
+        r.kind === "string" ? (r.value as string) || h("span", { class: "m-tre-empty" }, () => L().emptyText ?? t`empty text`) : String(r.value)));
   };
-  const kindBadge = (k: Kind, more?: Record<string, unknown>): unknown => h(Badge, { ...more, color: COLOR[k], tone: COLOR[k] ? "primary" : "neutral", class: cx("hm-tre-badge", more && `hm-tre-type hm-tre-type-${k}`) }, GLYPH[k]);
+  const kindBadge = (k: Kind, more?: Record<string, unknown>): unknown => h(Badge, { ...more, color: COLOR[k], tone: COLOR[k] ? "primary" : "neutral", class: cx("m-tre-badge", more && `m-tre-type m-tre-type-${k}`) }, GLYPH[k]);
   // the type of a row: a clickable badge that opens the type menu (also the T key). Without badges the menu opens by the row.
   const typeMenuOf = (r: Row): unknown => {
     const badge = props.typeBadges === false ? null : kindBadge(r.kind, { disabled: ro(), ariaLabel: L().typeOf?.(kindName(r.kind)) ?? t`Type: ${kindName(r.kind)}. Change`, onClick: (e: MouseEvent) => e.stopPropagation() }) as HTMLElement;
     const pop = h(Popover, {
-      trigger: badge ?? undefined, anchor: badge ? undefined : () => rowEl(r.ptr), open: () => typeMenu() === r.ptr, role: null, flush: true, autoFocus: false, panelClass: "hm-tre-menu",
+      trigger: badge ?? undefined, anchor: badge ? undefined : () => rowEl(r.ptr), open: () => typeMenu() === r.ptr, role: null, flush: true, autoFocus: false, panelClass: "m-tre-menu",
       setOpen: (open: boolean) => typeMenu.set(open ? r.ptr : null), onOpenChange: (open: boolean, why: string) => { if (!open && why === "escape") focusRow(r.ptr); },
       children: (_close: unknown) => {
         const list = h(OptionList<Kind>, {
@@ -296,42 +296,42 @@ export function TreeEditor(props: TreeEditorProps): unknown {
     // the row every tree is made of (data/tree/row.ts): arrow in the lead, key + type + value as the label, the
     // problem as the second line, the row actions in the trail
     return treeRow({
-      prefix: "hm-tre", kids: container, open: r.open, turn: "spring", chevronSize: "sm", chevronAttrs: { onClick: container ? () => toggleOpen(r) : null },
-      icon: h("span", { class: "hm-tre-guides", "aria-hidden": "true" }),
+      prefix: "m-tre", kids: container, open: r.open, turn: "spring", chevronSize: "sm", chevronAttrs: { onClick: container ? () => toggleOpen(r) : null },
+      icon: h("span", { class: "m-tre-guides", "aria-hidden": "true" }),
       label: [keyCell(r), typeMenuOf(r), valueCell(r, cur)],
-      sub: () => (err() ? h("span", { class: "hm-tre-error", id: `${id}-e${r.ptr}` }, err()) : null),
-      tools: ro() || !hasPart(props.actions) ? null : h("span", { class: "hm-tre-actions" },
-        can("add") ? h(IconButton, { icon: glyph(plus), size: "sm", tabindex: "-1", class: "hm-tre-add", label: container ? L().addInside ?? t`Add inside` : L().addAfter ?? t`Add after`, onClick: () => add(r) }) : null,
-        r.path.length && can("duplicate") ? h(IconButton, { icon: glyph(copy), size: "sm", tabindex: "-1", class: "hm-tre-dup", label: L().duplicate ?? t`Duplicate`, onClick: () => duplicate(r) }) : null,
-        r.path.length && can("delete") ? h(IconButton, { icon: glyph(trash), size: "sm", tabindex: "-1", class: "hm-tre-del", label: L().delete ?? t`Delete`, variant: "danger", onClick: () => remove(r) }) : null),
+      sub: () => (err() ? h("span", { class: "m-tre-error", id: `${id}-e${r.ptr}` }, err()) : null),
+      tools: ro() || !hasPart(props.actions) ? null : h("span", { class: "m-tre-actions" },
+        can("add") ? h(IconButton, { icon: glyph(plus), size: "sm", tabindex: "-1", class: "m-tre-add", label: container ? L().addInside ?? t`Add inside` : L().addAfter ?? t`Add after`, onClick: () => add(r) }) : null,
+        r.path.length && can("duplicate") ? h(IconButton, { icon: glyph(copy), size: "sm", tabindex: "-1", class: "m-tre-dup", label: L().duplicate ?? t`Duplicate`, onClick: () => duplicate(r) }) : null,
+        r.path.length && can("delete") ? h(IconButton, { icon: glyph(trash), size: "sm", tabindex: "-1", class: "m-tre-del", label: L().delete ?? t`Delete`, variant: "danger", onClick: () => remove(r) }) : null),
     }, {
-      role: "treeitem", size: "sm", overflow: "wrap", class: () => cx("hm-tre-row", `is-${r.kind}`, err() && "is-invalid", flash() === r.ptr && "is-flash", active() === r.ptr && "is-current"),
+      role: "treeitem", size: "sm", overflow: "wrap", class: () => cx("m-tre-row", `is-${r.kind}`, err() && "is-invalid", flash() === r.ptr && "is-flash", active() === r.ptr && "is-current"),
       "data-ptr": r.ptr, "aria-level": String(r.depth + 1), "aria-expanded": container ? String(r.open) : null, "aria-selected": () => String(active() === r.ptr),
       "aria-invalid": () => (err() ? "true" : null), "aria-describedby": () => (err() ? `${id}-e${r.ptr}` : null),
-      tabindex: () => (active() === r.ptr || (!active() && !r.path.length) ? "0" : "-1"), style: { "--hm-tre-depth": String(r.depth) },
+      tabindex: () => (active() === r.ptr || (!active() && !r.path.length) ? "0" : "-1"), style: { "--m-tre-depth": String(r.depth) },
       onKeyDown: (e: KeyboardEvent) => keydown(e, r), onFocus: () => active.set(r.ptr),
     });
   };
   const kindName = (k: Kind): string => L().kinds?.[k] ?? ({ string: t`text`, number: t`number`, boolean: t`true / false`, null: t`empty`, object: t`object`, array: t`list` })[k];
 
   return h(EditorFrame, {
-    class: () => cx("hm-tre-wrap", val(props.class)), readonly: ro, "data-hm-color": c["data-hm-color"],
-    showHead: () => !(props.search === false && (!stack || (props.status === false && ro()))), headProps: { class: "hm-tre-bar" },
-    head: props.search === false ? undefined : h(SearchBox, { value: query, debounce: 0, size: "sm", class: "hm-tre-search", inputClass: "hm-tre-search-input", placeholder: () => L().search ?? t`Search keys and values` }),
+    class: () => cx("m-tre-wrap", val(props.class)), readonly: ro, "data-m-color": c["data-m-color"],
+    showHead: () => !(props.search === false && (!stack || (props.status === false && ro()))), headProps: { class: "m-tre-bar" },
+    head: props.search === false ? undefined : h(SearchBox, { value: query, debounce: 0, size: "sm", class: "m-tre-search", inputClass: "m-tre-search-input", placeholder: () => L().search ?? t`Search keys and values` }),
     actions: [
       props.status === false ? null : h("span", { role: "status" }, () => {
         const n = errors().length;
-        return h(Badge, { tone: n ? "danger" : "success", dot: true, class: cx("hm-tre-status", n ? "is-error" : "is-ok") }, n ? L().problems?.(n) ?? t`${n} problems` : L().valid ?? t`Valid`);
+        return h(Badge, { tone: n ? "danger" : "success", dot: true, class: cx("m-tre-status", n ? "is-error" : "is-ok") }, n ? L().problems?.(n) ?? t`${n} problems` : L().valid ?? t`Valid`);
       }),
-      () => (stack && !ro() ? h(UndoRedo, { history: stack, size: "sm", steps: false, class: "hm-tre-history", labels: { undo: () => L().undo, redo: () => L().redo } }) : null)],
+      () => (stack && !ro() ? h(UndoRedo, { history: stack, size: "sm", steps: false, class: "m-tre-history", labels: { undo: () => L().undo, redo: () => L().redo } }) : null)],
   },
     h("div", {
-      id: `${id}-tree`, role: "tree", class: "hm-tre", "aria-label": () => c["aria-label"]() ?? props.label ?? t`JSON tree`, "aria-describedby": c["aria-describedby"],
+      id: `${id}-tree`, role: "tree", class: "m-tre", "aria-label": () => c["aria-label"]() ?? props.label ?? t`JSON tree`, "aria-describedby": c["aria-describedby"],
       "aria-readonly": () => (ro() ? "true" : null), ref: (el: HTMLElement) => { tree = el; },
     },
     // keyed rows: a change redraws only the rows it touched (a switch flips in place, no flash of the whole tree);
     // a true/false row keeps its element when its value changes, read-only redraws all
-    () => { ro(); return h(For, { each: rows, key: rowKey, fallback: h(Empty, { size: "sm", class: "hm-tre-none", title: () => L().noMatches ?? t`No matches` }), children: (item: () => Row) => row(untrack(item), item) }); }));
+    () => { ro(); return h(For, { each: rows, key: rowKey, fallback: h(Empty, { size: "sm", class: "m-tre-none", title: () => L().noMatches ?? t`No matches` }), children: (item: () => Row) => row(untrack(item), item) }); }));
 }
 
 /** What a row shows, except a true/false value (its switch follows the value itself). */

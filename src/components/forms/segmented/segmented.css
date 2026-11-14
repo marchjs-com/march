@@ -1,23 +1,23 @@
 /* March — Segmented. Imported by its component module; tokens.css provides the variables. */
-.hm-segmented { display: inline-flex; align-self: flex-start; flex-wrap: wrap; max-width: 100%; padding: 3px; gap: 2px; background: var(--hm-surface-2); border: 1px solid var(--hm-border); border-radius: calc(var(--hm-radius) + 2px); }
-.hm-segment { flex: none; white-space: nowrap; border: 0; background: transparent; color: var(--hm-muted); font: inherit; font-size: var(--hm-text-md); font-weight: 500; min-height: 1.75rem; padding: 0 .75rem; border-radius: calc(var(--hm-radius) - 1px); cursor: pointer; transition: color var(--hm-dur) var(--hm-ease), background-color var(--hm-dur) var(--hm-ease), box-shadow var(--hm-dur) var(--hm-ease); }
-.hm-segment:hover { color: var(--hm-text); }
-.hm-segment[aria-checked="true"] { background: var(--hm-surface); color: var(--hm-text); box-shadow: var(--hm-shadow-1), 0 0 0 1px var(--hm-border); }
-.hm-segment:disabled { opacity: .5; cursor: not-allowed; }
-.hm-segment:focus-visible { outline: 2px solid var(--hm-accent, var(--hm-focus)); outline-offset: 1px; }
-/* a color token (data-hm-color on the control or an ancestor): the selected segment follows it */
-[data-hm-color] .hm-segment[aria-checked="true"], .hm-segmented[data-hm-color] .hm-segment[aria-checked="true"] { background: var(--hm-accent-soft); color: var(--hm-accent-text); }
+.m-segmented { display: inline-flex; align-self: flex-start; flex-wrap: wrap; max-width: 100%; padding: 3px; gap: 2px; background: var(--m-surface-2); border: 1px solid var(--m-border); border-radius: calc(var(--m-radius) + 2px); }
+.m-segment { flex: none; white-space: nowrap; border: 0; background: transparent; color: var(--m-muted); font: inherit; font-size: var(--m-text-md); font-weight: 500; min-height: 1.75rem; padding: 0 .75rem; border-radius: calc(var(--m-radius) - 1px); cursor: pointer; transition: color var(--m-dur) var(--m-ease), background-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease); }
+.m-segment:hover { color: var(--m-text); }
+.m-segment[aria-checked="true"] { background: var(--m-surface); color: var(--m-text); box-shadow: var(--m-shadow-1), 0 0 0 1px var(--m-border); }
+.m-segment:disabled { opacity: .5; cursor: not-allowed; }
+.m-segment:focus-visible { outline: 2px solid var(--m-accent, var(--m-focus)); outline-offset: 1px; }
+/* a color token (data-m-color on the control or an ancestor): the selected segment follows it */
+[data-m-color] .m-segment[aria-checked="true"], .m-segmented[data-m-color] .m-segment[aria-checked="true"] { background: var(--m-accent-soft); color: var(--m-accent-text); }
 /* an option with an icon: icon and text in a row (an icon-only segment stays square-ish) */
-.hm-segment-has-icon { display: inline-flex; align-items: center; justify-content: center; gap: .375rem; }
-.hm-segment-icon { display: inline-flex; flex: none; }
-.hm-segment-icon .hm-svg { width: 1em; height: 1em; }
+.m-segment-has-icon { display: inline-flex; align-items: center; justify-content: center; gap: .375rem; }
+.m-segment-icon { display: inline-flex; flex: none; }
+.m-segment-icon .m-svg { width: 1em; height: 1em; }
 /* indicator="slide": one thumb under the segments, placed on the chosen one by the shared sliding indicator (it glides there;
    measured from the border edge of the control, so the thumb starts one border width before the padding edge) */
-.hm-segmented-slide { position: relative; }
-.hm-segmented-slide .hm-segment { position: relative; z-index: 1; }
-.hm-segmented.hm-segmented-slide .hm-segment[aria-checked="true"] { background: transparent; box-shadow: none; }
-.hm-segment-thumb { position: absolute; z-index: 0; inset-block-start: 0; inset-inline-start: -1px; width: 0; border-radius: calc(var(--hm-radius) - 1px); background: var(--hm-surface);
-  box-shadow: var(--hm-shadow-1), 0 0 0 1px var(--hm-border); transform-origin: 0 50%; opacity: 0; pointer-events: none; }
-.hm-segment-thumb.is-on { opacity: 1; }
-:dir(rtl) .hm-segment-thumb { transform-origin: 100% 50%; }
-[data-hm-color] .hm-segment-thumb { background: var(--hm-accent-soft); box-shadow: none; }
+.m-segmented-slide { position: relative; }
+.m-segmented-slide .m-segment { position: relative; z-index: 1; }
+.m-segmented.m-segmented-slide .m-segment[aria-checked="true"] { background: transparent; box-shadow: none; }
+.m-segment-thumb { position: absolute; z-index: 0; inset-block-start: 0; inset-inline-start: -1px; width: 0; border-radius: calc(var(--m-radius) - 1px); background: var(--m-surface);
+  box-shadow: var(--m-shadow-1), 0 0 0 1px var(--m-border); transform-origin: 0 50%; opacity: 0; pointer-events: none; }
+.m-segment-thumb.is-on { opacity: 1; }
+:dir(rtl) .m-segment-thumb { transform-origin: 100% 50%; }
+[data-m-color] .m-segment-thumb { background: var(--m-accent-soft); box-shadow: none; }

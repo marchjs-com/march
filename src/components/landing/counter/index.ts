@@ -49,13 +49,13 @@ export function Counter(props: CounterProps): Element {
   const live = signal(current);
   const text = globalThis.document.createTextNode(fmt(current));
   const shown = rolls
-    ? h(CountRoll, { class: "hm-counter-view", value: live, formatter: fmt, spoken: () => final(), duration: props.duration ?? 520, stagger: 45 }) as HTMLElement
-    : h("span", { class: "hm-counter-view", "aria-hidden": "true" }, text) as HTMLElement;
-  const root = h("span", { class: () => cx("hm-counter", rolls && "hm-counter-roll", val(props.class)) },
-    props.prefix != null ? h("span", { class: "hm-counter-affix" }, props.prefix) : null,
+    ? h(CountRoll, { class: "m-counter-view", value: live, formatter: fmt, spoken: () => final(), duration: props.duration ?? 520, stagger: 45 }) as HTMLElement
+    : h("span", { class: "m-counter-view", "aria-hidden": "true" }, text) as HTMLElement;
+  const root = h("span", { class: () => cx("m-counter", rolls && "m-counter-roll", val(props.class)) },
+    props.prefix != null ? h("span", { class: "m-counter-affix" }, props.prefix) : null,
     shown,
-    rolls ? null : h("span", { class: "hm-sr-only" }, () => final()),
-    props.suffix != null ? h("span", { class: "hm-counter-affix" }, props.suffix) : null) as HTMLElement;
+    rolls ? null : h("span", { class: "m-sr-only" }, () => final()),
+    props.suffix != null ? h("span", { class: "m-counter-affix" }, props.suffix) : null) as HTMLElement;
 
   const go = (to: number): void => {
     final.set(fmt(to));

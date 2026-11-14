@@ -29,7 +29,7 @@ export interface ThemeMenuProps {
   headings?: boolean | undefined;
   /** Section heading texts (defaults "Theme", "Accent"). */
   labels?: { theme?: MaybeFn<string | undefined>; accent?: MaybeFn<string | undefined> } | undefined;
-  /** Class of the opened panel (next to `hm-theme-menu`). */
+  /** Class of the opened panel (next to `m-theme-menu`). */
   panelClass?: string | undefined;
   class?: ClassProp;
 }
@@ -38,10 +38,10 @@ export interface ThemeMenuProps {
 /** One menu for appearance, color theme and accent: `<ThemeMenu />` (or `<ThemeMenu themes={false} accents={["primary", "brand-blue"]} />`). */
 export function ThemeMenu(props: ThemeMenuProps = {}): unknown {
   const heading = (text: () => string): Element | null => props.headings === false ? null
-    : h(SectionLabel, { as: "p", class: "hm-theme-menu-heading", "aria-hidden": "true", label: text }) as Element;
+    : h(SectionLabel, { as: "p", class: "m-theme-menu-heading", "aria-hidden": "true", label: text }) as Element;
   return h(Dropdown, {
     icon: props.icon === false ? undefined : props.icon ?? paletteIcon, label: () => val(props.label) ?? t`Appearance`, placement: props.placement ?? "bottom-end", class: props.class,
-    panelClass: cx("hm-theme-panel hm-theme-menu", props.panelClass),
+    panelClass: cx("m-theme-panel m-theme-menu", props.panelClass),
     children: [
       props.modes === false ? null : themeModes(),
       props.themes === false ? null : [heading(() => val(props.labels?.theme) ?? t`Theme`), themeList()],

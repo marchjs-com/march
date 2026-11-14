@@ -24,7 +24,7 @@ ring turns on the motion engine. A `+` badge marks your own ring (add a story); 
 | `color` | ColorToken | — | one color for the ring of a new / close story instead of the sweep |
 | `addIcon` | node | + | your own content for the badge |
 | `avatar` | node | Avatar | your own node inside the ring |
-| `class` | string | — | on the root (`hm-sring`; parts: `hm-sring-ring`, `hm-sring-av`, `hm-sring-add`, `hm-sring-label`) |
+| `class` | string | — | on the root (`m-sring`; parts: `m-sring-ring`, `m-sring-av`, `m-sring-add`, `m-sring-label`) |
 
 ```tsx
 <StoryRing name="HADİ" color="brand-purple" ariaLabel="HADİ has 3 new stories" add addIcon={<Icon of={camera} />}

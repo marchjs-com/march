@@ -124,25 +124,25 @@ export function BranchingStory(props: BranchingStoryProps): Element {
   // the trail: one step per choice made, labelled with the choice; a step rewinds the story to it
   const L = props.labels ?? {};
   // (Breadcrumbs in a pill look: the current step filled, an earlier one a button; a long path folds into its "…" menu)
-  const trail = props.trail === false ? null : h("div", { class: "hm-bs-top" },
+  const trail = props.trail === false ? null : h("div", { class: "m-bs-top" },
     h(Breadcrumbs, {
-      class: "hm-bs-trail", label: () => L.path ?? t`Your path`,
+      class: "m-bs-trail", label: () => L.path ?? t`Your path`,
       items: () => path().map((id, i, p): Crumb => {
         const prev = i ? props.passages[p[i - 1]!] : null;
         const via = prev?.choices?.find((c) => c.to === id)?.label ?? L.start ?? t`Start`;
         return { id: `${i}:${id}`, label: via as string, onSelect: () => go(p.slice(0, i + 1)) };
       }),
     }),
-    props.endings === false || !all.length ? null : h("span", { class: "hm-bs-found" }, () => (L.endings ? L.endings(found().size, all.length) : t`Endings found: ${found().size} / ${all.length}`)));
+    props.endings === false || !all.length ? null : h("span", { class: "m-bs-found" }, () => (L.endings ? L.endings(found().size, all.length) : t`Endings found: ${found().size} / ${all.length}`)));
 
-  const stage = h("div", { class: "hm-bs-stage" }) as HTMLElement;
-  setStyle(stage, { "--hm-bs-min": props.minHeight ?? "20rem" });
+  const stage = h("div", { class: "m-bs-stage" }) as HTMLElement;
+  setStyle(stage, { "--m-bs-min": props.minHeight ?? "20rem" });
 
   const pick = (btn: HTMLElement, to: string): void => {
     const done = (): void => go([...path.peek(), to]);
     if (still(props.transition)) { done(); return; }
     btn.classList.add("is-picked");
-    btn.closest(".hm-bs-choices")?.classList.add("is-deciding");
+    btn.closest(".m-bs-choices")?.classList.add("is-deciding");
     void animate(btn, { transform: ["scale(1)", "scale(1.04)", "scale(1)"] }, { duration: 320, easing: "out" }).finished.then(done);
   };
 
@@ -154,26 +154,26 @@ export function BranchingStory(props: BranchingStoryProps): Element {
   const passage = (id: string): HTMLElement => createRoot((dispose) => {
     const p = props.passages[id] ?? { body: L.missing ?? t`This part of the story is missing.` };
     const choices = p.choices ?? [];
-    const heading = h("h3", { class: "hm-bs-title", tabindex: "-1" }, p.title ?? (choices.length ? "" : p.ending ?? L.end ?? t`The end`));
-    const el = h("article", { class: cx("hm-bs-passage", !choices.length && "is-ending"), "data-hm-color": colorAttr(p.color) },
-      p.media != null ? h("div", { class: "hm-bs-media" }, p.media) : null,
-      h("div", { class: "hm-bs-copy" },
-        !choices.length && p.ending != null && p.title != null ? h(Badge, { tone: "primary", class: "hm-bs-ending" }, L.endingPrefix ?? t`Ending: `, p.ending) : null,
+    const heading = h("h3", { class: "m-bs-title", tabindex: "-1" }, p.title ?? (choices.length ? "" : p.ending ?? L.end ?? t`The end`));
+    const el = h("article", { class: cx("m-bs-passage", !choices.length && "is-ending"), "data-m-color": colorAttr(p.color) },
+      p.media != null ? h("div", { class: "m-bs-media" }, p.media) : null,
+      h("div", { class: "m-bs-copy" },
+        !choices.length && p.ending != null && p.title != null ? h(Badge, { tone: "primary", class: "m-bs-ending" }, L.endingPrefix ?? t`Ending: `, p.ending) : null,
         heading,
-        h("div", { class: "hm-bs-body" }, p.body),
+        h("div", { class: "m-bs-body" }, p.body),
         choices.length
           // a choice is a button around a ListRow: its number key, the label and a small note
-          ? h("ol", { class: "hm-bs-choices" }, ...choices.map((c, i) => h("li", null, h("button", {
-            type: "button", class: "hm-bs-choice", "data-key": String(i + 1),
+          ? h("ol", { class: "m-bs-choices" }, ...choices.map((c, i) => h("li", null, h("button", {
+            type: "button", class: "m-bs-choice", "data-key": String(i + 1),
             onClick: (e: MouseEvent) => pick(e.currentTarget as HTMLElement, c.to),
           }, h(ListRow, {
             as: "span", overflow: "wrap",
-            lead: props.keys === false ? undefined : h("span", { "aria-hidden": "true" }, h(Kbd, { class: "hm-bs-key" }, String(i + 1))),
-            title: props.renderChoice ? h("span", { class: "hm-bs-choice-own" }, props.renderChoice(c, i)) : c.label,
+            lead: props.keys === false ? undefined : h("span", { "aria-hidden": "true" }, h(Kbd, { class: "m-bs-key" }, String(i + 1))),
+            title: props.renderChoice ? h("span", { class: "m-bs-choice-own" }, props.renderChoice(c, i)) : c.label,
             sub: props.renderChoice ? undefined : c.note ?? undefined,
           })))))
-          : props.restart === false && props.action == null ? null : h("div", { class: "hm-bs-end" },
-            props.restart === false ? null : h(Button, { class: "hm-bs-restart", onClick: () => go([props.start]) }, () => L.restart ?? t`Start again`),
+          : props.restart === false && props.action == null ? null : h("div", { class: "m-bs-end" },
+            props.restart === false ? null : h(Button, { class: "m-bs-restart", onClick: () => go([props.start]) }, () => L.restart ?? t`Start again`),
             props.action ?? null))) as HTMLElement;
     scopes.set(el, dispose);
     return el;
@@ -188,7 +188,7 @@ export function BranchingStory(props: BranchingStoryProps): Element {
       shown = next;
       stage.append(next);
       const kind = props.transition ?? "turn";
-      if (!first) next.querySelector<HTMLElement>(".hm-bs-title")?.focus({ preventScroll: true });
+      if (!first) next.querySelector<HTMLElement>(".m-bs-title")?.focus({ preventScroll: true });
       const moves = !first && !still(kind);
       first = false;
       if (!old) return;
@@ -199,17 +199,17 @@ export function BranchingStory(props: BranchingStoryProps): Element {
       const how = own ?? ENTER[kind as "turn"] ?? ENTER.turn;
       void swapTransition(next, old, own ? { enter: own.enter, leave: own.leave } : kind as "turn" | "none", { dir: side, rtl, delay: 120, duration: how.duration ?? 760, easing: (how.easing ?? "expo") as "expo", leaveDuration: 420, leaveEasing: "in" })
         .then(() => drop(old));
-      const items = next.querySelectorAll(".hm-bs-choices > li");
+      const items = next.querySelectorAll(".m-bs-choices > li");
       items.forEach((li, i) => animate(li, { opacity: [0, 1], transform: ["translateY(14px)", "translateY(0px)"] }, { duration: 460, delay: 380 + i * 90, easing: "out" }));
     });
   });
 
-  const root = h("section", { class: () => cx("hm-bs", val(props.class)), "aria-label": () => props.label ?? t`Story` }, trail, stage) as HTMLElement;
+  const root = h("section", { class: () => cx("m-bs", val(props.class)), "aria-label": () => props.label ?? t`Story` }, trail, stage) as HTMLElement;
   // keys 1–9 pick a choice of the current passage (not while typing)
   if (props.keys !== false) listen(root, {
     keydown: (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey || !/^[1-9]$/.test(e.key)) return;
-      const btn = shown?.querySelector<HTMLElement>(`.hm-bs-choice[data-key="${e.key}"]`);
+      const btn = shown?.querySelector<HTMLElement>(`.m-bs-choice[data-key="${e.key}"]`);
       if (btn) { e.preventDefault(); btn.click(); }
     },
   });

@@ -46,7 +46,7 @@ export default function FeedDemo(props: { values: { variant: string; delay: numb
   // options whose effect shows only in a certain state bring that state: a new delay loads the first page again, a new
   // end mark goes to the end of the last page, a new pill color queues a post so the pill is there
   const onChange = (read: () => unknown, run: () => void): void => { const value = computed(read); let on = false; effect(() => { value(); if (on) untrack(run); on = true }) }
-  const toEnd = (): void => { const sc = phone.querySelector(".hm-feed-scroll"); if (sc) sc.scrollTop = sc.scrollHeight }
+  const toEnd = (): void => { const sc = phone.querySelector(".m-feed-scroll"); if (sc) sc.scrollTop = sc.scrollHeight }
   onChange(() => props.values.delay, reload)
   onChange(() => props.values.end, () => { $page = props.values.pages; later(toEnd, 60); later(toEnd, 400) })
   onChange(() => props.values.newColor, () => { if (!$waiting.length) $waiting = make(1) })

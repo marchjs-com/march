@@ -66,7 +66,7 @@ export function DatePicker(props: DatePickerProps): unknown {
   const inv = base["aria-invalid"];
   let wrap: Element;
   const input = h("input", {
-    ...base, type: "text", class: "hm-input hm-date-input", autocomplete: "off", inputmode: "numeric",
+    ...base, type: "text", class: "m-input m-date-input", autocomplete: "off", inputmode: "numeric",
     placeholder: () => props.placeholder ?? datePlaceholder(loc()), readonly: () => !!props.readonly,
     "aria-invalid": () => (bad() || inv() ? "true" : null),
     onInput: (e: Event) => {
@@ -83,13 +83,13 @@ export function DatePicker(props: DatePickerProps): unknown {
   const close = (refocus?: boolean) => { open.set(false); if (refocus) input.focus(); };
   const choose = () => props.labels?.choose ?? t`Choose date`;
   const btn = props.icon === false ? null : h(IconButton, {
-    class: "hm-date-btn", label: choose, icon: () => ownPart(props.icon, () => calendarIcon), "aria-haspopup": "dialog", "aria-expanded": () => String(open()),
+    class: "m-date-btn", label: choose, icon: () => ownPart(props.icon, () => calendarIcon), "aria-haspopup": "dialog", "aria-expanded": () => String(open()),
     disabled: () => !!(props.disabled || props.readonly), onClick: () => toggle(),
   });
   // the calendar opens in a Popover anchored to the whole control; Escape returns focus to the input
-  wrap = h("span", { class: () => cx("hm-affix hm-date", props.class) }, input, btn,
+  wrap = h("span", { class: () => cx("m-affix m-date", props.class) }, input, btn,
     h(Popover, {
-      anchor: () => wrap, open, label: choose, panelClass: "hm-cal-pop", autoFocus: false,
+      anchor: () => wrap, open, label: choose, panelClass: "m-cal-pop", autoFocus: false,
       onOpenChange: (on: boolean, why: string) => { if (!on && why === "escape") input.focus(); },
       children: () => h(Calendar, {
         color: props.color, labels: props.labels, ...props.calendar,

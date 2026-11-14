@@ -25,7 +25,7 @@ to a "…" menu. Items marked `live` are announced when their text changes ("Sav
 | `overflow` | boolean | `true` | `false`: no "…" menu, every item stays in the bar |
 | `dot` | boolean / `(tone, item) => node` | `true` | the tone dot of items without an icon: off, or your own mark (`tone()` is live) |
 | `pulse` | boolean | `true` | `false`: the dot of a busy item stays still |
-| `class` | class | — | added to the root (`.hm-sbar`); parts: `.hm-sbar-side`, `.hm-sbar-item`, `.hm-sbar-icon`, `.hm-sbar-dot`, `.hm-sbar-text`, `.hm-sbar-more` |
+| `class` | class | — | added to the root (`.m-sbar`); parts: `.m-sbar-side`, `.m-sbar-item`, `.m-sbar-icon`, `.m-sbar-dot`, `.m-sbar-text`, `.m-sbar-more` |
 
 ```tsx
 <StatusBar items={items} dot={false} />                                         // text and icons only

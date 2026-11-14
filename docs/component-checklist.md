@@ -18,7 +18,7 @@ march check component <category>/<name>
 | File | What |
 |---|---|
 | `index.ts` | the component; draws only — state from shared engines (positioning, collection, field, variants …) and behaviors (`src/behaviors`) |
-| `<name>.css` | `hm-` classes, theme tokens, logical properties, durations from `--hm-dur*`, no `@keyframes` (motion core) |
+| `<name>.css` | `m-` classes, theme tokens, logical properties, durations from `--m-dur*`, no `@keyframes` (motion core) |
 | `<name>.test.js` | behaviour, ARIA, keyboard |
 | `docs.md` | first paragraph + first code block feed the catalogues; `## Props`, `## Accessibility`, `## Composed of` |
 | `demo.tsx` | showcase stage: `default (props: { values })` draws it for the Playground values. A thunk that rebuilds the component reads the values itself (`{() => { const v = { ...props.values }; return <X tone={v.tone} /> }}`): a value only passed on as a prop becomes a live getter the component reads once, untracked, and the option changes nothing. An option that acts on the next interaction shows its effect at once (a `sc-demo-call` line, or the state it shapes opened) |

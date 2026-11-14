@@ -55,7 +55,7 @@ export default function DataGridDemo(props: { values: { rows: string; group: str
         rowHeight={() => Number(props.values.density)}
         onEdit={(row: Order, key: string, value: unknown) => { data.set(data().map((r) => (r.id === row.id ? { ...r, [key]: value, amount: key === "qty" ? Number(value) * (r.amount / r.qty) : r.amount } : r))) }} />
     }}
-    <p class="hm-muted">{() => (props.values.animate
+    <p class="m-muted">{() => (props.values.animate
       ? "Hareket açık: bir başlığa tıklayıp sıralayınca, süzünce ya da bir grubu açınca satırlar kayarak gelir; taşınan sütun yerine kayar."
       : "Hareket kapalı: sıralama, süzme ve grup açma anında olur.")}</p>
   </div>

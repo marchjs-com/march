@@ -1,4 +1,4 @@
-/* March — popover, menu and tooltip classes (.hm-pop, .hm-menu*, .hm-dropdown, .hm-tooltip) for modules that draw
+/* March — popover, menu and tooltip classes (.m-pop, .m-menu*, .m-dropdown, .m-tooltip) for modules that draw
    their own menus. The rules live with Menu (src/components/actions/menu/) and Tooltip (src/components/overlays/tooltip/). */
 @import "../components/actions/menu/menu.css";
 @import "../components/overlays/tooltip/tooltip.css";

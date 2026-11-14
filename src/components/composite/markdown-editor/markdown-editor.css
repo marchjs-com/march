@@ -1,26 +1,26 @@
 /* March — MarkdownEditor. Imported by its component module; tokens.css provides the variables. */
-.hm-mde { container-type: inline-size; }
-.hm-panel-header.hm-mde-head { min-block-size: 2.75rem; }
-.hm-mde-views { margin-inline-start: auto; }
+.m-mde { container-type: inline-size; }
+.m-panel-header.m-mde-head { min-block-size: 2.75rem; }
+.m-mde-views { margin-inline-start: auto; }
 
 /* body */
-.hm-mde-body { display: grid; min-height: 0; }
-.hm-mde-source { display: block; inline-size: 100%; min-block-size: 14rem; margin: 0; padding: var(--hm-space-3) var(--hm-space-4); border: 0; border-radius: 0; background: transparent;
-  box-shadow: none; resize: vertical; font-family: var(--hm-font-mono); font-size: var(--hm-text-sm); line-height: 1.7; tab-size: 2; caret-color: var(--hm-editor-accent); }
-.hm-mde-source:focus { outline: none; box-shadow: none; }
-.hm-mde-preview { min-block-size: 14rem; max-block-size: 36rem; overflow: auto; padding: var(--hm-space-3) var(--hm-space-4); line-height: 1.65; overflow-wrap: anywhere; }
-.hm-mde-preview:focus-visible { outline: 2px solid var(--hm-focus); outline-offset: -2px; }
-.hm-mde-preview li::marker { color: var(--hm-editor-accent); }
-.hm-mde-preview blockquote { border-inline-start-color: var(--hm-editor-accent); }
-.is-write .hm-mde-source, .is-split .hm-mde-source { max-block-size: 36rem; }
-.hm-mde-split { min-height: 14rem; border: 0; border-radius: 0; background: transparent; }
-.hm-mde-split .hm-split-pane { display: grid; }
-.hm-mde-split .hm-mde-preview { background: var(--hm-bg-subtle); }
-.hm-mde.is-rich .hm-mde-body { padding: var(--hm-space-2); }
-.hm-mde.is-rich .hm-rte { border-color: var(--hm-border-subtle); }
+.m-mde-body { display: grid; min-height: 0; }
+.m-mde-source { display: block; inline-size: 100%; min-block-size: 14rem; margin: 0; padding: var(--m-space-3) var(--m-space-4); border: 0; border-radius: 0; background: transparent;
+  box-shadow: none; resize: vertical; font-family: var(--m-font-mono); font-size: var(--m-text-sm); line-height: 1.7; tab-size: 2; caret-color: var(--m-editor-accent); }
+.m-mde-source:focus { outline: none; box-shadow: none; }
+.m-mde-preview { min-block-size: 14rem; max-block-size: 36rem; overflow: auto; padding: var(--m-space-3) var(--m-space-4); line-height: 1.65; overflow-wrap: anywhere; }
+.m-mde-preview:focus-visible { outline: 2px solid var(--m-focus); outline-offset: -2px; }
+.m-mde-preview li::marker { color: var(--m-editor-accent); }
+.m-mde-preview blockquote { border-inline-start-color: var(--m-editor-accent); }
+.is-write .m-mde-source, .is-split .m-mde-source { max-block-size: 36rem; }
+.m-mde-split { min-height: 14rem; border: 0; border-radius: 0; background: transparent; }
+.m-mde-split .m-split-pane { display: grid; }
+.m-mde-split .m-mde-preview { background: var(--m-bg-subtle); }
+.m-mde.is-rich .m-mde-body { padding: var(--m-space-2); }
+.m-mde.is-rich .m-rte { border-color: var(--m-border-subtle); }
 
 /* footer */
-.hm-mde-hint { margin-inline-start: auto; font-family: var(--hm-font-mono); }
+.m-mde-hint { margin-inline-start: auto; font-family: var(--m-font-mono); }
 
 /* narrow: the split stacks (source over preview) */
-@container (max-width: 36rem) { .hm-mde-split { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; } .hm-mde-split .hm-split-handle { display: none; } }
+@container (max-width: 36rem) { .m-mde-split { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; } .m-mde-split .m-split-handle { display: none; } }

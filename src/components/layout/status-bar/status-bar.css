@@ -1,22 +1,22 @@
 /* March — StatusBar. Imported by its component module; tokens.css provides the variables. */
-.hm-sbar { display: flex; align-items: center; gap: 2px; min-width: 0; min-height: 1.625rem; padding-inline: .25rem; background: var(--hm-surface-2); border-block-start: 1px solid var(--hm-border);
-  color: var(--hm-text-2); font-size: var(--hm-text-xs); overflow: hidden; }
-.hm-sbar-side { display: flex; align-items: center; gap: 2px; min-width: 0; }
-.hm-sbar-end { margin-inline-start: auto; }
-.hm-sbar-more { display: flex; flex: none; } .hm-sbar-more[hidden] { display: none; }
-.hm-sbar-more .hm-icon-btn { width: 1.5rem; height: 1.375rem; }
+.m-sbar { display: flex; align-items: center; gap: 2px; min-width: 0; min-height: 1.625rem; padding-inline: .25rem; background: var(--m-surface-2); border-block-start: 1px solid var(--m-border);
+  color: var(--m-text-2); font-size: var(--m-text-xs); overflow: hidden; }
+.m-sbar-side { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.m-sbar-end { margin-inline-start: auto; }
+.m-sbar-more { display: flex; flex: none; } .m-sbar-more[hidden] { display: none; }
+.m-sbar-more .m-icon-btn { width: 1.5rem; height: 1.375rem; }
 /* an item is a ListRow (xs): as wide as its text, never wrapping; a button item has the bar's own quiet hover */
-.hm-listrow.hm-sbar-item { flex: none; inline-size: auto; block-size: 1.375rem; color: inherit; white-space: nowrap; }
-.hm-listrow.hm-sbar-item[hidden] { display: none; }
-.hm-listrow.hm-sbar-item.is-action:hover:not(:disabled) { background: color-mix(in srgb, var(--hm-text) 9%, transparent); color: var(--hm-text); }
-.hm-sbar-item > .hm-listrow-lead { color: inherit; }
-.hm-sbar-icon { display: inline-flex; } .hm-sbar-icon .hm-svg { width: .8125rem; height: .8125rem; }
+.m-listrow.m-sbar-item { flex: none; inline-size: auto; block-size: 1.375rem; color: inherit; white-space: nowrap; }
+.m-listrow.m-sbar-item[hidden] { display: none; }
+.m-listrow.m-sbar-item.is-action:hover:not(:disabled) { background: color-mix(in srgb, var(--m-text) 9%, transparent); color: var(--m-text); }
+.m-sbar-item > .m-listrow-lead { color: inherit; }
+.m-sbar-icon { display: inline-flex; } .m-sbar-icon .m-svg { width: .8125rem; height: .8125rem; }
 /* the tone dot is a StatusDot; a neutral item shows none (only its icon leads) */
-.hm-sbar-item.is-neutral > .hm-listrow-lead:not(:has(.hm-sbar-icon)) { display: none; }
-.hm-sbar-item.is-info, .hm-sbar-item.is-success, .hm-sbar-item.is-warn, .hm-sbar-item.is-danger, .hm-sbar-item.is-busy { --hm-sbar-c: var(--hm-info); }
-.hm-sbar-item.is-success { --hm-sbar-c: var(--hm-success); } .hm-sbar-item.is-warn { --hm-sbar-c: var(--hm-warn); }
-.hm-sbar-item.is-danger { --hm-sbar-c: var(--hm-danger); } .hm-sbar-item.is-busy { --hm-sbar-c: var(--hm-primary); }
-.hm-sbar-item:is(.is-info, .is-success, .is-warn, .is-danger, .is-busy) .hm-sbar-icon { color: var(--hm-sbar-c); }
-.hm-sbar-item.is-danger { color: var(--hm-danger-text, var(--hm-danger)); }
+.m-sbar-item.is-neutral > .m-listrow-lead:not(:has(.m-sbar-icon)) { display: none; }
+.m-sbar-item.is-info, .m-sbar-item.is-success, .m-sbar-item.is-warn, .m-sbar-item.is-danger, .m-sbar-item.is-busy { --m-sbar-c: var(--m-info); }
+.m-sbar-item.is-success { --m-sbar-c: var(--m-success); } .m-sbar-item.is-warn { --m-sbar-c: var(--m-warn); }
+.m-sbar-item.is-danger { --m-sbar-c: var(--m-danger); } .m-sbar-item.is-busy { --m-sbar-c: var(--m-primary); }
+.m-sbar-item:is(.is-info, .is-success, .is-warn, .is-danger, .is-busy) .m-sbar-icon { color: var(--m-sbar-c); }
+.m-sbar-item.is-danger { color: var(--m-danger-text, var(--m-danger)); }
 /* dot={(tone, item) => node}: your own mark, shown (in the tone colour) where the dot would be */
-.hm-sbar-dot-own { display: inline-flex; color: var(--hm-sbar-c); }
+.m-sbar-dot-own { display: inline-flex; color: var(--m-sbar-c); }

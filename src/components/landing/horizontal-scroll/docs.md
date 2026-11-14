@@ -20,7 +20,7 @@ screens and with reduced motion it is a native horizontal scroller with snap poi
 | `label` | string | — | names the region |
 | `progress` | boolean | `true` | the progress line under the panels |
 | `pinned` | boolean | `true` | pin and move with the page scroll; `false`: always the native sideways scroller |
-| `class` | string | — | extra class on the section (`.hm-hs`; parts: `.hm-hs-track`, `.hm-hs-bar` (a Progress line)) |
+| `class` | string | — | extra class on the section (`.m-hs`; parts: `.m-hs-track`, `.m-hs-bar` (a Progress line)) |
 | children | nodes | — | the panels |
 
 ## Accessibility
