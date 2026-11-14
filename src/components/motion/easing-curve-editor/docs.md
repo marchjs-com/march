@@ -21,6 +21,22 @@ animate(card, frames, { duration: 600, easing: "hadi-pop" })
 | `compact` | boolean | `false` | small curve beside the numbers, presets in one scrolling row, no CSS line (an inspector: KeyframeTimeline) |
 | `duration` | ms | `900` | preview duration |
 | `readonly`, `disabled` | | | |
+| `labels` | `{ firstHandle, secondHandle, presets, curve(css), handleValue(time, progress), controlPoint(axis), registered(name) }` | built-in texts | your own words; any subset |
+| `inputs` | boolean | `true` | the four number fields |
+| `cssLine` | boolean | `true` | the line with the CSS value |
+| `nameNote` | boolean | `true` | the "Registered as …" note shown with `name` |
+| `grid` | boolean | `true` | the quarter lines of the plot |
+| `handleColors` | `[ColorToken, ColorToken]` | `brand-orange`, `brand-blue` | colors of the two handles |
+| `color` | ColorToken | accent | curve glow, preview dot, marker, picked preset |
+| `aria-label` | string | "Easing curve editor" | accessible name of the editor |
+| `class` | string | — | on the root (`hm-ec`; parts: `hm-ec-plot`, `hm-ec-handle`, `hm-ec-stage`, `hm-ec-inputs`, `hm-ec-css`, `hm-ec-name`, `hm-ec-presets`) |
+
+Only the curve, in your own colors and words:
+
+```tsx
+<EasingCurveEditor bind:value={$easing} inputs={false} cssLine={false} presets={false} preview="none" grid={false}
+  handleColors={["brand-purple", "brand-green"]} color="brand-purple" labels={{ firstHandle: "Start", secondHandle: "End" }} />
+```
 
 Helpers: `bezierCss`, `parseBezier`, `EASING_PRESETS`. The x of a handle stays within 0–1 (time); y may overshoot
 (−0.6–1.6) for anticipation and bounce. Shift while dragging snaps y to 0.05.

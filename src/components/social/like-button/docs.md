@@ -20,6 +20,16 @@ global speed, "pause all" and reduced motion apply (reduced motion keeps only th
 | `burst` | boolean | true | particles on like |
 | `colors` | `brand` `single` | `brand` | particle colors |
 | `label` | string | "Like" | accessible name |
+| `icon` | node / `(liked) => node` | heart | your own icon (a March glyph fills with the color while liked) |
+| `pop` | boolean | true | the pop of the icon on toggle |
+| `burstOptions` | `{ count, radius, ring }` | — | shape of the burst |
+| `countFormat` | `compact` `full` | `compact` | text of the count |
+| `class` | string | — | on the button (`hm-like`; parts: `hm-like-hit`, `hm-like-heart`, `hm-like-count`) |
+
+```tsx
+<LikeButton liked={$on} onToggle={set} icon={<Icon of={star} />} color="brand-gold" label="Favourite"
+  pop={false} burstOptions={{ count: 16, ring: false }} countFormat="full" />
+```
 
 `heartBurst(el, { count, radius, colors, ring })` and `heartPop(el, on)` are the same effects for any element: a
 double-tap on a photo (PostCard), a comment, a story.

@@ -19,7 +19,17 @@ between emoji (mirrored in RTL; up / down move by rows in the grid), Home / End 
 | `layout` | `row` `grid` | `row` | |
 | `onMore` | `() => void` | — | a + at the end of a row |
 | `pop` | boolean | true | pop-in animation |
-| `label` | string | "Reactions" | |
+| `label` | string | "Reactions" | accessible name of the toolbar |
+| `emojiLabel` | `(emoji) => string` | the emoji | accessible name of an emoji button |
+| `moreLabel` | string | "More emoji" | accessible name of the + button |
+| `moreIcon` | node | + | your own content for that button |
+| `color` | ColorToken | `brand-blue` | the picked emoji's circle and the focus ring |
+| `class` | string | — | on the root (`hm-react`; parts: `hm-react-e`, `hm-react-more`) |
+
+```tsx
+<ReactionPicker onPick={react} onMore={openPanel} color="brand-orange" pop={false} label="React to the photo"
+  emojiLabel={(e) => NAMES[e] ?? e} moreLabel="All emoji" moreIcon={<Icon of={smile} />} />
+```
 
 ## Accessibility
 

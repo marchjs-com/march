@@ -17,6 +17,15 @@ The text is compact in the active locale (`1,2 B`, `12K`); `format="full"` group
 | `format` | `compact` `full` | `compact` | below 1000 both are the plain number |
 | `hideZero` | boolean | false | nothing at 0 (a count next to an icon) |
 | `duration` | ms | 320 | roll time |
+| `formatter` | `(n) => string` | — | your own visible text (wins over `format`) |
+| `roll` | boolean | true | `false`: digits change at once |
+| `stagger` | ms | 24 | delay between neighbouring digits |
+| `class` | string | — | on the root (`hm-roll`) |
+
+```tsx
+<CountRoll value={$likes} formatter={(n) => `${n} likes`} duration={600} stagger={60} />
+<CountRoll value={$likes} roll={false} />
+```
 
 `formatCount(n, format)` returns the same text without the element.
 

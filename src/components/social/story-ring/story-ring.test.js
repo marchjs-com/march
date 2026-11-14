@@ -32,3 +32,20 @@ test("StoryRing: without onClick it is an image", () => {
   assert.equal(r.getAttribute("aria-label"), "HADİ");
   m.dispose();
 });
+
+test("StoryRing: own name, ring color, own badge content, own avatar node", () => {
+  const m = mount(() => [
+    h(StoryRing, { name: "HADİ", ariaLabel: "3 new stories", color: "brand-purple", add: true, addIcon: h("i", { class: "own-add" }), avatar: h("b", { class: "own-av" }), class: "mine" }),
+    h(StoryRing, { name: "HADİ", add: true }),
+  ]);
+  const [a, b] = m.el.querySelectorAll(".hm-sring");
+  assert.ok(a.classList.contains("mine"));
+  assert.equal(a.getAttribute("aria-label"), "3 new stories");
+  assert.equal(a.getAttribute("data-hm-color"), "brand-purple");
+  assert.ok(a.querySelector(".hm-sring-add .own-add") && !a.querySelector(".hm-sring-add .hm-svg"));
+  assert.ok(a.querySelector(".hm-sring-av .own-av") && !a.querySelector(".hm-avatar"));
+  assert.equal(b.getAttribute("data-hm-color"), null);
+  assert.equal(b.getAttribute("aria-label"), "HADİ, new story");
+  assert.ok(b.querySelector(".hm-sring-add .hm-svg") && b.querySelector(".hm-avatar"));
+  m.dispose();
+});

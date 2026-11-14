@@ -61,3 +61,9 @@
 .hm-msg-mine .hm-msg-hint { inset-inline-start: auto; inset-inline-end: .25rem; }
 .hm-msg.is-armed .hm-msg-hint { background: var(--hm-brand-blue, var(--hm-info)); color: var(--hm-on-brand-blue, var(--hm-on-info-fill)); }
 .hm-msg-bubble { transition: none; }
+/* own color: data-hm-color sets --hm-accent for my bubble and the armed arrow */
+.hm-msg[data-hm-color] { --hm-msg-blue: var(--hm-accent); }
+.hm-msg[data-hm-color].is-armed .hm-msg-hint { background: var(--hm-accent); }
+.hm-msg[data-hm-color] .hm-msg-react.is-mine { border-color: var(--hm-accent); background: color-mix(in srgb, var(--hm-accent) 14%, var(--hm-surface)); }
+.hm-msg-mine[data-hm-color]:not(.is-emoji) .hm-msg-bubble, .hm-msg[data-hm-color].is-armed .hm-msg-hint { color: var(--hm-on-accent); }
+.hm-msg-hint.is-own .hm-svg { transform: none; }

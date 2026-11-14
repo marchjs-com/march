@@ -19,6 +19,17 @@ waits 230 ms, so a double tap (like) never also opens the photo.
 | `gap` | `none` `thin` `gap` | `thin` | |
 | `onOpen` | `(index, el) => void` | — | tap, Enter or Space |
 | `onDoubleTap` | `(index, el) => void` | — | double tap with a pointer |
+| `label` | string | "N photos" | accessible name of the group |
+| `tileLabel` | `(index, total, item) => string` | alt + "Photo i of n" | accessible name of a tile |
+| `skeleton` | boolean / `() => node` | `true` | the loading placeholder: off, or your own |
+| `videoMark` | boolean / `(item) => node` | `true` | the mark on a video tile |
+| `more` | boolean / `(rest) => node` | `true` | "+N" on the last tile: off, or your own content |
+| `class` | string | — | on the root (`hm-mgrid`; parts: `hm-mgrid-tile`, `hm-mgrid-kind`, `hm-mgrid-more`, `hm-mgrid-skel`) |
+
+```tsx
+<MediaGrid items={post.media} label="Trip photos" tileLabel={(i, n, it) => `${it.alt}, ${i + 1}/${n}`}
+  more={(rest) => <span>{rest} more</span>} videoMark={false} skeleton={() => <Spinner />} />
+```
 
 ## Accessibility
 

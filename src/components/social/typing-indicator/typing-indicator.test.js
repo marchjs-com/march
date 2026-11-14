@@ -21,3 +21,19 @@ test("TypingIndicator: polite status, sentence, hides when nobody types", () => 
   assert.equal(typingText(["a", "b", "c"]), "3 people are typing…");
   m.dispose();
 });
+
+test("TypingIndicator: own sentence, no dots, own dots, motion none", () => {
+  const m = mount(() => [
+    h(TypingIndicator, { names: ["a", "b"], label: (n) => `${n.length} writing`, dots: false, text: true, class: "mine" }),
+    h(TypingIndicator, { names: ["a"], dots: h("b", { class: "own-dots" }), motion: "none" }),
+    h(TypingIndicator, { names: ["a"], motion: "none" }),
+  ]);
+  const [a, b, c] = m.el.querySelectorAll(".hm-typing");
+  assert.ok(a.classList.contains("mine"));
+  assert.equal(a.querySelector(".hm-typing-text").textContent, "2 writing");
+  assert.equal(a.querySelector(".hm-typing-dots"), null);
+  assert.ok(b.querySelector(".hm-typing-dots.is-own .own-dots"));
+  assert.equal(b.querySelectorAll(".hm-typing-dots i").length, 0);
+  assert.equal(c.querySelectorAll(".hm-typing-dots i").length, 3);
+  m.dispose();
+});

@@ -32,3 +32,26 @@ test("ChatBubble: mine/theirs, run position, ticks, reply quote, reaction chips,
   assert.ok(b.querySelector(".hm-msg-sender").classList.contains("hm-msg-c3"));
   m.dispose();
 });
+
+test("ChatBubble: own texts, color, ticks off / own, time format, no hint, no tools, own icons", () => {
+  const m = mount(() => [
+    h(ChatBubble, { mine: true, text: "Hi", status: "read", edited: true, color: "brand-purple", time: new Date(2026, 0, 1, 9, 5), formatTime: (d) => `at ${d.getHours()}`,
+      labels: { read: "Seen", edited: "changed", reply: "Answer" }, ticks: (s) => h("b", { class: "own-tick" }, s), replyIcon: h("i", { class: "own-reply" }), onReply: () => {} }),
+    h(ChatBubble, { mine: true, text: "Yo", status: "failed", ticks: false, replyHint: false, tools: false, labels: { retry: "Again" }, onReply: () => {}, onRetry: () => {} }),
+  ]);
+  const [a, b] = m.el.querySelectorAll(".hm-msg");
+  assert.equal(a.getAttribute("data-hm-color"), "brand-purple");
+  assert.equal(a.querySelector(".hm-msg-tick").getAttribute("aria-label"), "Seen");
+  assert.equal(a.querySelector(".hm-msg-tick .own-tick").textContent, "read");
+  assert.equal(a.querySelector(".hm-msg-edited").textContent, "changed");
+  assert.equal(a.querySelector("time").textContent, "at 9");
+  assert.equal(a.querySelector(".hm-msg-tool-reply").getAttribute("aria-label"), "Answer");
+  assert.ok(a.querySelector(".hm-msg-tool-reply .own-reply"));
+  assert.ok(a.querySelector(".hm-msg-hint"));
+  assert.equal(b.getAttribute("data-hm-color"), null);
+  assert.equal(b.querySelector(".hm-msg-tick"), null);
+  assert.equal(b.querySelector(".hm-msg-hint"), null);
+  assert.equal(b.querySelector(".hm-msg-tools"), null);
+  assert.equal(b.querySelector(".hm-msg-retry").textContent, "Again");
+  m.dispose();
+});

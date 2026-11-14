@@ -8,6 +8,7 @@ import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.t
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { Avatar } from "../../../ui/avatar.ts";
 import { animate } from "../../../motion/animate.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import "./story-ring.css";
 
 export type StoryRingState = "new" | "seen" | "close" | "none";
@@ -26,6 +27,14 @@ export interface StoryRingProps {
   loading?: MaybeFn<boolean | undefined>;
   /** Makes it a button. */
   onClick?: ((e: MouseEvent) => void) | undefined;
+  /** Your own accessible name. Default: "HADİ, new story" / "HADİ, story seen" / the name. */
+  ariaLabel?: MaybeFn<string | undefined>;
+  /** One color for the ring of a new / close story instead of the sweep. */
+  color?: MaybeFn<ColorToken | undefined>;
+  /** Your own content for the + badge. */
+  addIcon?: unknown;
+  /** Your own node instead of the Avatar (a logo, an image). */
+  avatar?: unknown;
   class?: ClassProp;
 }
 
@@ -37,8 +46,8 @@ export function StoryRing(props: StoryRingProps): Element {
   const inner = [
     h("span", { class: "hm-sring-frame" },
       h("span", { class: "hm-sring-ring", "aria-hidden": "true", ref: (x: HTMLElement) => { ring = x; } }),
-      h("span", { class: "hm-sring-av" }, h(Avatar, { name: props.name, src: props.src, size: () => (val(props.size) === "sm" ? "sm" : "lg") })),
-      () => (val(props.add) ? h("span", { class: "hm-sring-add", "aria-hidden": "true" }, glyph(plus)) : null)),
+      h("span", { class: "hm-sring-av" }, props.avatar ?? h(Avatar, { name: props.name, src: props.src, size: () => (val(props.size) === "sm" ? "sm" : "lg") })),
+      () => (val(props.add) ? h("span", { class: "hm-sring-add", "aria-hidden": "true" }, props.addIcon ?? glyph(plus)) : null)),
     () => { const l = val(props.label); return l ? h("span", { class: "hm-sring-label" }, l) : null; },
   ];
   effect(() => {
@@ -50,7 +59,8 @@ export function StoryRing(props: StoryRingProps): Element {
   });
   onCleanup(() => spin?.cancel());
   const cls = (): string => cx("hm-sring", `hm-sring-${val(props.size) ?? "md"}`, `is-${state()}`, val(props.loading) && "is-loading", val(props.class));
-  const name = (): string => { const s = state(); const n = val(props.name); return s === "new" || s === "close" ? t`${n}, new story` : s === "seen" ? t`${n}, story seen` : n; };
-  if (props.onClick) return h("button", { type: "button", class: cls, "aria-label": name, "aria-busy": () => (val(props.loading) ? "true" : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, inner);
-  return h("span", { class: cls, role: "img", "aria-label": name }, inner);
+  const name = (): string => { const own = val(props.ariaLabel); if (own != null) return own; const s = state(); const n = val(props.name); return s === "new" || s === "close" ? t`${n}, new story` : s === "seen" ? t`${n}, story seen` : n; };
+  const color = (): string | null => colorAttr(val(props.color));
+  if (props.onClick) return h("button", { type: "button", class: cls, "data-hm-color": color, "aria-label": name, "aria-busy": () => (val(props.loading) ? "true" : null), onClick: (e: MouseEvent) => props.onClick?.(e) }, inner);
+  return h("span", { class: cls, "data-hm-color": color, role: "img", "aria-label": name }, inner);
 }

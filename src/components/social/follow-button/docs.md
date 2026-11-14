@@ -19,6 +19,19 @@ Hovering "Following" turns it red before you unfollow.
 | `name` | string | — | accessible name: "Follow HADİ" |
 | `size` | `sm` `md` | `md` | 32 / 42 px |
 | `block` | boolean | false | full width (no width morph) |
+| `labels` | `{ follow, following, requested }` | built-in texts | your own button texts; any subset |
+| `ariaLabel` | `(state, name) => string` | built-in sentences | your own accessible name |
+| `icon` | boolean / `(state) => node` | `true` | the + / tick / clock: off, or your own |
+| `color` | ColorToken | `brand-blue` | fill of "Follow" and the focus ring |
+| `burst` | boolean | true | the dots on a new follow |
+| `morph` | boolean | true | the width spring and the icon turn |
+| `class` | string | — | on the button (`hm-follow`; parts: `hm-follow-ico`, `hm-follow-text`) |
+
+```tsx
+<FollowButton state={$s} onChange={set} labels={{ follow: "Join", following: "Member" }} color="brand-green"
+  icon={(s) => (s === "follow" ? <Icon of={star} /> : null)} burst={false} morph={false}
+  ariaLabel={(s, name) => (s === "follow" ? `Join ${name}` : `Leave ${name}`)} />
+```
 
 ## Accessibility
 

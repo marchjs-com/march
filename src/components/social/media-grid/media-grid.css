@@ -21,6 +21,7 @@
 .hm-mgrid-tile:active img { transform: scale(.985); }
 .hm-mgrid-tile:focus-visible { outline: 3px solid var(--hm-accent, var(--hm-primary)); outline-offset: -3px; z-index: 1; }
 .hm-mgrid-skel { position: absolute; inset: 0; height: 100%; border-radius: 0; }
+.hm-mgrid-skel-own { display: grid; place-items: center; }
 .hm-mgrid-kind { position: absolute; inset-block-start: .5rem; inset-inline-end: .5rem; display: inline-grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%;
   background: color-mix(in srgb, var(--hm-scrim) 54%, transparent); color: var(--hm-on-scrim); }
 .hm-mgrid-kind .hm-svg { width: 1rem; height: 1rem; }

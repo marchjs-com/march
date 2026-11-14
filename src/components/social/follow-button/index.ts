@@ -9,6 +9,7 @@ import { plus } from "../../../icons/glyphs/plus.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { clock } from "../../../icons/glyphs/clock.ts";
 import { animate } from "../../../motion/animate.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { heartBurst } from "../like-button/index.ts";
 import "./follow-button.css";
 
@@ -25,14 +26,27 @@ export interface FollowButtonProps {
   size?: MaybeFn<"sm" | "md" | undefined>;
   /** Stretch to the container. */
   block?: MaybeFn<boolean | undefined>;
+  /** Your own button texts: `{ follow: "Join", following: "Member", requested: "Waiting" }` (any subset). */
+  labels?: MaybeFn<Partial<Record<FollowState, string>> | undefined>;
+  /** Your own accessible name: `(state, name) => "…"`. Default: "Follow HADİ", "Following HADİ, press to unfollow"… */
+  ariaLabel?: ((state: FollowState, name: string | undefined) => string) | undefined;
+  /** The + / tick / clock icon: true (default), false, or `(state) => node`. */
+  icon?: boolean | ((state: FollowState) => unknown) | undefined;
+  /** Fill color of "Follow". Default brand-blue. */
+  color?: MaybeFn<ColorToken | undefined>;
+  /** The burst of dots on a new follow. Default true. */
+  burst?: MaybeFn<boolean | undefined>;
+  /** The width spring and the icon turn between states. Default true. */
+  morph?: MaybeFn<boolean | undefined>;
   class?: ClassProp;
 }
 
 /** `<FollowButton state={$state} name={user.name} onChange={(s) => $state = s} />` */
 export function FollowButton(props: FollowButtonProps): Element {
-  let btn!: HTMLElement, ico!: HTMLElement;
+  let btn!: HTMLElement, ico: HTMLElement | null = null;
   const state = (): FollowState => val(props.state) ?? "follow";
-  const label = (s: FollowState): string => (s === "follow" ? t`Follow` : s === "following" ? t`Following` : t`Requested`);
+  const label = (s: FollowState): string => val(props.labels)?.[s] ?? (s === "follow" ? t`Follow` : s === "following" ? t`Following` : t`Requested`);
+  const icon = props.icon;
   const click = (): void => {
     const from = state(), next: FollowState = from === "follow" ? (val(props.private) ? "requested" : "following") : "follow";
     const w0 = btn.offsetWidth;
@@ -40,19 +54,23 @@ export function FollowButton(props: FollowButtonProps): Element {
     // after the label changed: spring the width from the old one, turn the icon in
     queueMicrotask(() => {
       const w1 = btn.offsetWidth;
-      if (w0 && w1 && w0 !== w1 && !val(props.block)) animate(btn, [{ width: `${w0}px` }, { width: `${w1}px` }], { duration: 380, easing: "easeOutBack" });
-      animate(ico, [{ transform: "rotate(-90deg) scale(.4)", opacity: 0 }, { transform: "rotate(0deg) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutBack" });
-      if (next === "following") heartBurst(btn, { count: 8, radius: Math.max(28, w1 * 0.55), ring: false });
+      if (val(props.morph) !== false) {
+        if (w0 && w1 && w0 !== w1 && !val(props.block)) animate(btn, [{ width: `${w0}px` }, { width: `${w1}px` }], { duration: 380, easing: "easeOutBack" });
+        if (ico) animate(ico, [{ transform: "rotate(-90deg) scale(.4)", opacity: 0 }, { transform: "rotate(0deg) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutBack" });
+      }
+      if (next === "following" && val(props.burst) !== false) heartBurst(btn, { count: 8, radius: Math.max(28, w1 * 0.55), ring: false });
     });
   };
   return h("button", {
     type: "button",
     class: () => cx("hm-follow", `hm-follow-${val(props.size) ?? "md"}`, `is-${state()}`, val(props.block) && "hm-follow-block", val(props.class)),
+    "data-hm-color": () => colorAttr(val(props.color)),
     "aria-pressed": () => String(state() !== "follow"),
-    "aria-label": () => { const n = val(props.name); const s = state(); return n ? (s === "follow" ? t`Follow ${n}` : s === "following" ? t`Following ${n}, press to unfollow` : t`Follow request sent to ${n}, press to cancel`) : label(s); },
+    "aria-label": () => { const n = val(props.name); const s = state(); return props.ariaLabel ? props.ariaLabel(s, n) : n ? (s === "follow" ? t`Follow ${n}` : s === "following" ? t`Following ${n}, press to unfollow` : t`Follow request sent to ${n}, press to cancel`) : label(s); },
     ref: (x: HTMLElement) => { btn = x; },
     onClick: click,
   },
-  h("span", { class: "hm-follow-ico", "aria-hidden": "true", ref: (x: HTMLElement) => { ico = x; } }, () => glyph(state() === "follow" ? plus : state() === "following" ? check : clock)),
+  icon === false ? null : h("span", { class: "hm-follow-ico", "aria-hidden": "true", ref: (x: HTMLElement) => { ico = x; } },
+    () => (typeof icon === "function" ? icon(state()) : glyph(state() === "follow" ? plus : state() === "following" ? check : clock))),
   h("span", { class: "hm-follow-text" }, () => label(state())));
 }

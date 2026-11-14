@@ -31,6 +31,16 @@ export interface MediaGridProps {
   onOpen?: ((index: number, el: HTMLElement) => void) | undefined;
   /** Double tap on a tile (like). Single taps then wait 230 ms. */
   onDoubleTap?: ((index: number, el: HTMLElement) => void) | undefined;
+  /** Accessible name of the group. Default "N photos". */
+  label?: MaybeFn<string | undefined>;
+  /** Accessible name of a tile: `(index, total, item) => "…"`. Default: the alt text and "Photo 2 of 5". */
+  tileLabel?: ((index: number, total: number, item: MediaItem) => string) | undefined;
+  /** The loading placeholder: true (a Skeleton, default), false, or `() => node`. */
+  skeleton?: boolean | (() => unknown) | undefined;
+  /** The mark on a video tile: true (default), false, or `(item) => node`. */
+  videoMark?: boolean | ((item: MediaItem) => unknown) | undefined;
+  /** "+N" on the last tile: true (default), false, or `(rest) => content`. */
+  more?: boolean | ((rest: number) => unknown) | undefined;
   class?: ClassProp;
 }
 
@@ -49,23 +59,24 @@ export function MediaGrid(props: MediaGridProps): Element {
   const tile = (it: MediaItem, i: number, n: number, more: number): Element => {
     const loaded = signal(false);
     let el!: HTMLElement;
-    const label = (): string => (it.alt ? `${it.alt} · ` : "") + t`Photo ${i + 1} of ${n}`;
+    const label = (): string => (props.tileLabel ? props.tileLabel(i, n, it) : (it.alt ? `${it.alt} · ` : "") + t`Photo ${i + 1} of ${n}`);
+    const sk = props.skeleton, mark = props.videoMark, own = props.more;
     return h("button", {
       type: "button", class: () => cx("hm-mgrid-tile", loaded() && "is-loaded"), "aria-label": label,
       ref: (x: HTMLElement) => { el = x; },
       onClick: (e: MouseEvent) => tap(i, el, e.detail === 0),
     },
-    () => (loaded() ? null : h(Skeleton, { block: true, class: "hm-mgrid-skel" })),
+    () => (loaded() || sk === false ? null : typeof sk === "function" ? h("span", { class: "hm-mgrid-skel hm-mgrid-skel-own" }, sk()) : h(Skeleton, { block: true, class: "hm-mgrid-skel" })),
     h("img", { src: it.src, alt: "", loading: "lazy", decoding: "async", draggable: "false", onLoad: () => loaded.set(true), onError: () => loaded.set(true) }),
-    it.kind === "video" ? h("span", { class: "hm-mgrid-kind", "aria-hidden": "true" }, glyph(videoIcon)) : null,
-    more > 0 ? h("span", { class: "hm-mgrid-more", "aria-hidden": "true" }, `+${more}`) : null);
+    it.kind === "video" && mark !== false ? h("span", { class: "hm-mgrid-kind", "aria-hidden": "true" }, typeof mark === "function" ? mark(it) : glyph(videoIcon)) : null,
+    more > 0 && own !== false ? h("span", { class: "hm-mgrid-more", "aria-hidden": "true" }, typeof own === "function" ? own(more) : `+${more}`) : null);
   };
   return h("div", {
     class: () => {
       const n = Math.min(val(props.items).length, clamp(val(props.max) ?? 4, 2, 4));
       return cx("hm-mgrid", `hm-mgrid-n${n}`, `hm-mgrid-${val(props.shape) ?? "auto"}`, `hm-mgrid-gap-${val(props.gap) ?? "thin"}`, val(props.class));
     },
-    role: "group", "aria-label": () => t`${val(props.items).length} photos`,
+    role: "group", "aria-label": () => val(props.label) ?? t`${val(props.items).length} photos`,
   }, () => {
     const all = val(props.items), cap = clamp(val(props.max) ?? 4, 2, 4);
     const shown = all.slice(0, cap), rest = all.length - shown.length;

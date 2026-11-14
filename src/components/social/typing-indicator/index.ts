@@ -17,6 +17,12 @@ export interface TypingIndicatorProps {
   text?: MaybeFn<boolean | undefined>;
   /** Dot color. Default brand-blue. */
   color?: ColorToken | undefined;
+  /** Your own sentence: `(names) => "…"`. Default: typingText ("HADİ is typing…"). */
+  label?: ((names: readonly string[]) => string) | undefined;
+  /** The three dots: true (default), false (text only), or your own node in their place. */
+  dots?: boolean | Node | undefined;
+  /** How the dots move: lift (default) · fade (no movement, they only light up in turn) · none (still). */
+  motion?: MaybeFn<"lift" | "fade" | "none" | undefined>;
   class?: ClassProp;
 }
 
@@ -37,14 +43,17 @@ export function TypingIndicator(props: TypingIndicatorProps): Element {
     class: () => cx("hm-typing", `hm-typing-${val(props.variant) ?? "bubble"}`, !names().length && "is-off", val(props.class)),
     "data-hm-color": () => colorAttr(props.color ?? "brand-blue"), role: "status", "aria-live": "polite",
   },
-  h("span", { class: "hm-typing-dots", "aria-hidden": "true" }, [0, 1, 2].map(() => h("i", { ref: (x: HTMLElement) => { dots.push(x); } }))),
-  h("span", { class: () => cx("hm-typing-text", !(val(props.text) ?? val(props.variant) === "inline") && "hm-sr-only") }, () => typingText(val(props.names) ?? [])));
+  props.dots === false ? null
+    : props.dots && props.dots !== true ? h("span", { class: "hm-typing-dots is-own", "aria-hidden": "true" }, props.dots)
+    : h("span", { class: "hm-typing-dots", "aria-hidden": "true" }, [0, 1, 2].map(() => h("i", { ref: (x: HTMLElement) => { dots.push(x); } }))),
+  h("span", { class: () => cx("hm-typing-text", !(val(props.text) ?? val(props.variant) === "inline") && "hm-sr-only") }, () => { const list = val(props.names) ?? []; return props.label ? props.label(list) : typingText(list); }));
   effect(() => {
-    const on = names().length > 0;
+    const on = names().length > 0, kind = val(props.motion) ?? "lift";
     untrack(() => {
       for (const r of runs.splice(0)) r.cancel();
-      if (on) dots.forEach((d, i) => runs.push(animate(d, [
-        { transform: "translateY(0)", opacity: 0.45 }, { transform: "translateY(-3px)", opacity: 1, offset: 0.25 }, { transform: "translateY(0)", opacity: 0.45, offset: 0.5 }, { transform: "translateY(0)", opacity: 0.45 },
+      const up = kind === "fade" ? "translateY(0)" : "translateY(-3px)";
+      if (on && kind !== "none") dots.forEach((d, i) => runs.push(animate(d, [
+        { transform: "translateY(0)", opacity: 0.45 }, { transform: up, opacity: 1, offset: 0.25 }, { transform: "translateY(0)", opacity: 0.45, offset: 0.5 }, { transform: "translateY(0)", opacity: 0.45 },
       ], { duration: 1100, delay: i * 150, iterations: Infinity, easing: "easeInOutCubic" })));
     });
   });

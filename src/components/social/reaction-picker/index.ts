@@ -7,6 +7,7 @@ import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.t
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { roving } from "../../../ui/focus.ts";
 import { animate } from "../../../motion/animate.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import "./reaction-picker.css";
 import { isRtl } from "../../../core/util.ts";
 
@@ -27,6 +28,14 @@ export interface ReactionPickerProps {
   /** Pop-in animation when it appears. Default true. */
   pop?: boolean | undefined;
   label?: MaybeFn<string | undefined>;
+  /** Accessible name of an emoji button: `(emoji) => "Heart"`. Default: the emoji itself. */
+  emojiLabel?: ((emoji: string) => string) | undefined;
+  /** Accessible name of the "+" button. Default "More emoji". */
+  moreLabel?: MaybeFn<string | undefined>;
+  /** Your own content for the "+" button. */
+  moreIcon?: unknown;
+  /** Color of the picked emoji's circle and the focus ring. Default brand-blue. */
+  color?: MaybeFn<ColorToken | undefined>;
   class?: ClassProp;
 }
 
@@ -49,15 +58,16 @@ export function ReactionPicker(props: ReactionPickerProps): Element {
   };
   root = h("div", {
     class: () => cx("hm-react", `hm-react-${val(props.layout) ?? "row"}`, val(props.class)),
+    "data-hm-color": () => colorAttr(val(props.color)),
     role: "toolbar", "aria-label": () => val(props.label) ?? t`Reactions`, onKeydown: key,
   }, () => {
     const list = val(props.emojis) ?? (val(props.layout) === "grid" ? EMOJI_SET : QUICK_REACTIONS);
     const sel = val(props.selected);
     const btns = list.map((e, i) => h("button", {
-      type: "button", class: cx("hm-react-e", sel === e && "is-on"), "aria-pressed": sel === e ? "true" : "false", "aria-label": e,
+      type: "button", class: cx("hm-react-e", sel === e && "is-on"), "aria-pressed": sel === e ? "true" : "false", "aria-label": props.emojiLabel ? props.emojiLabel(e) : e,
       tabindex: i === Math.max(0, list.indexOf(sel ?? "")) ? "0" : "-1", onClick: () => props.onPick(e),
     }, h("span", { "aria-hidden": "true" }, e)));
-    if (props.onMore && val(props.layout) !== "grid") btns.push(h("button", { type: "button", class: "hm-react-more", tabindex: "-1", "aria-label": () => t`More emoji`, onClick: () => props.onMore?.() }, glyph(plus)));
+    if (props.onMore && val(props.layout) !== "grid") btns.push(h("button", { type: "button", class: "hm-react-more", tabindex: "-1", "aria-label": () => val(props.moreLabel) ?? t`More emoji`, onClick: () => props.onMore?.() }, props.moreIcon ?? glyph(plus)));
     return btns;
   }) as HTMLElement;
   if (props.pop !== false) queueMicrotask(() => {

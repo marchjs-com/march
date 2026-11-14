@@ -17,6 +17,12 @@ export interface CountRollProps {
   hideZero?: MaybeFn<boolean | undefined>;
   /** Roll duration (ms). Default 320. */
   duration?: number | undefined;
+  /** Your own visible text for a value: `(n) => "1.2k likes"` (screen readers still get the full number). */
+  formatter?: ((n: number) => string) | undefined;
+  /** Roll on change. Default true; false swaps the digits at once. */
+  roll?: MaybeFn<boolean | undefined>;
+  /** Delay between neighbouring digits (ms). Default 24. */
+  stagger?: number | undefined;
   class?: ClassProp;
 }
 
@@ -28,8 +34,8 @@ export function formatCount(n: number, format: "compact" | "full" = "compact"): 
 /** `<CountRoll value={$likes} />` */
 export function CountRoll(props: CountRollProps): Element {
   let box!: HTMLElement;
-  let prev: number | null = null;
-  const text = (n: number): string => (n === 0 && val(props.hideZero) ? "" : formatCount(n, val(props.format) ?? "compact"));
+  let prev: number | null = null, shown = "";
+  const text = (n: number): string => (n === 0 && val(props.hideZero) ? "" : props.formatter ? props.formatter(n) : formatCount(n, val(props.format) ?? "compact"));
   const root = h("span", { class: () => cx("hm-roll", val(props.class)) },
     h("span", { class: "hm-roll-vis", "aria-hidden": "true", ref: (x: HTMLElement) => { box = x; } }),
     h("span", { class: "hm-sr-only" }, () => { const n = val(props.value); return n == null || (n === 0 && val(props.hideZero)) ? "" : formatCount(n, "full"); })) as HTMLElement;
@@ -38,9 +44,10 @@ export function CountRoll(props: CountRollProps): Element {
     val(props.format); val(props.hideZero);
     untrack(() => {
       const next = text(n);
-      if (prev === null || !box.isConnected) drawDigits(box, next);
-      else { const was = text(prev); if (was !== next) rollDigits(box, was, next, { up: n >= prev, duration: props.duration ?? 320 }); }
-      prev = n;
+      // first paint, a detached box, `roll={false}` or a new format of the same value: draw; a new value: roll
+      if (prev === null || !box.isConnected || val(props.roll) === false || n === prev) { if (prev === null || shown !== next) drawDigits(box, next); }
+      else if (shown !== next) rollDigits(box, shown, next, { up: n >= prev, duration: props.duration ?? 320, ...(props.stagger != null ? { stagger: props.stagger } : {}) });
+      prev = n; shown = next;
     });
   });
   return root;

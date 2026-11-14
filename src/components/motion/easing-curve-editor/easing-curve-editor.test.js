@@ -44,3 +44,33 @@ test("name: both placeholders filled, even inside literal braces", async () => {
   assert.match(p.textContent, /easing: "snap"/);
   dispose();
 });
+
+test("EasingCurveEditor: own texts, parts off, handle colors", () => {
+  const host = document.createElement("div");
+  document.body.appendChild(host);
+  const dispose = render(() => [
+    h(EasingCurveEditor, { value: "out", name: "mine", preview: "none", class: "own", handleColors: ["brand-purple", "brand-green"],
+      labels: { firstHandle: "Start", secondHandle: "End", presets: "Ready", curve: (c) => `Curve ${c}`, handleValue: (a, b) => `${a}/${b}`, controlPoint: (l) => `P ${l}`, registered: (n) => `Saved as ${n}` } }),
+    h(EasingCurveEditor, { value: "out", name: "mine2", preview: "none", inputs: false, cssLine: false, nameNote: false, grid: false, presets: false }),
+  ], host);
+  const [a, b] = host.querySelectorAll(".hm-ec");
+  assert.ok(a.classList.contains("own"));
+  const knobs = a.querySelectorAll("[role=slider]");
+  assert.deepEqual([knobs[0].getAttribute("aria-label"), knobs[1].getAttribute("aria-label")], ["Start", "End"]);
+  assert.equal(knobs[0].getAttribute("aria-valuetext"), ".33/1");
+  assert.equal(a.querySelector(".hm-ec-presets").getAttribute("aria-label"), "Ready");
+  assert.equal(a.querySelector(".hm-ec-plot").getAttribute("aria-label"), "Curve cubic-bezier(.33, 1, .68, 1)");
+  assert.equal(a.querySelector(".hm-ec-num").getAttribute("aria-label"), "P x1");
+  assert.equal(a.querySelector(".hm-ec-name").textContent, "Saved as mine");
+  assert.match(a.style.getPropertyValue("--hm-ec-h1"), /brand-purple/);
+  assert.match(a.style.getPropertyValue("--hm-ec-h2"), /brand-green/);
+  assert.equal(a.querySelectorAll(".hm-ec-grid").length, 6);
+  assert.equal(b.querySelector(".hm-ec-inputs"), null);
+  assert.equal(b.querySelector(".hm-ec-css"), null);
+  assert.equal(b.querySelector(".hm-ec-name"), null);
+  assert.equal(b.querySelector(".hm-ec-presets"), null);
+  assert.equal(b.querySelectorAll(".hm-ec-grid").length, 0);
+  assert.equal(b.querySelectorAll(".hm-ec-axis").length, 4);
+  assert.equal(b.style.getPropertyValue("--hm-ec-h1"), "");
+  dispose();
+});

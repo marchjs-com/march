@@ -29,3 +29,19 @@ test("ReactionPicker: grid layout lists the emoji set", () => {
   assert.ok(m.el.querySelectorAll(".hm-react-grid button").length > 20);
   m.dispose();
 });
+
+test("ReactionPicker: own names, own + content, color", () => {
+  const m = mount(() => [
+    h(ReactionPicker, { onPick: () => {}, onMore: () => {}, pop: false, color: "brand-orange", emojis: ["❤️", "👍"], emojiLabel: (e) => (e === "❤️" ? "Heart" : "Thumb"), moreLabel: "All", moreIcon: h("i", { class: "own-more" }), class: "mine" }),
+    h(ReactionPicker, { onPick: () => {}, onMore: () => {}, pop: false }),
+  ]);
+  const [a, b] = m.el.querySelectorAll(".hm-react");
+  assert.ok(a.classList.contains("mine"));
+  assert.equal(a.getAttribute("data-hm-color"), "brand-orange");
+  assert.deepEqual([...a.querySelectorAll(".hm-react-e")].map((x) => x.getAttribute("aria-label")), ["Heart", "Thumb"]);
+  assert.equal(a.querySelector(".hm-react-more").getAttribute("aria-label"), "All");
+  assert.ok(a.querySelector(".hm-react-more .own-more") && !a.querySelector(".hm-react-more .hm-svg"));
+  assert.equal(b.getAttribute("data-hm-color"), null);
+  assert.equal(b.querySelector(".hm-react-more").getAttribute("aria-label"), "More emoji");
+  m.dispose();
+});

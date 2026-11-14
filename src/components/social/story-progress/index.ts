@@ -6,6 +6,7 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { animate } from "../../../motion/animate.ts";
+import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import "./story-progress.css";
 
 export interface StoryProgressProps {
@@ -18,6 +19,10 @@ export interface StoryProgressProps {
   /** Restarts the current fill when it changes (the story id): the same index in another group starts over. */
   run?: MaybeFn<unknown>;
   onDone?: (() => void) | undefined;
+  /** Your own screen-reader text: `(index, count) => "…"` (index 0-based). Default "Story 2 of 5". */
+  label?: ((index: number, count: number) => string) | undefined;
+  /** Fill color. Default: white on the photo. */
+  color?: MaybeFn<ColorToken | undefined>;
   class?: ClassProp;
 }
 
@@ -28,7 +33,8 @@ export function StoryProgress(props: StoryProgressProps): Element {
   const el = h("div", {
     class: () => cx("hm-sprog", val(props.class)), role: "progressbar",
     "aria-valuemin": "1", "aria-valuemax": () => String(val(props.count)), "aria-valuenow": () => String(val(props.index) + 1),
-    "aria-valuetext": () => t`Story ${val(props.index) + 1} of ${val(props.count)}`,
+    "aria-valuetext": () => (props.label ? props.label(val(props.index), val(props.count)) : t`Story ${val(props.index) + 1} of ${val(props.count)}`),
+    "data-hm-color": () => colorAttr(val(props.color)),
     ref: (x: HTMLElement) => { bars = x; },
   });
   effect(() => {

@@ -26,6 +26,14 @@ export interface LikeButtonProps {
   colors?: MaybeFn<"brand" | "single" | undefined>;
   /** Accessible name. Default "Like". */
   label?: MaybeFn<string | undefined>;
+  /** Your own icon instead of the heart: a node, or `(liked) => node`. */
+  icon?: Node | ((liked: boolean) => unknown) | undefined;
+  /** The pop of the icon on every toggle. Default true. */
+  pop?: MaybeFn<boolean | undefined>;
+  /** Shape of the burst: `{ count, radius, ring }` (`ring: false` drops the ring). */
+  burstOptions?: BurstOptions | undefined;
+  /** Text of the count: compact (1,2 B, default) or full (1.234). */
+  countFormat?: MaybeFn<"compact" | "full" | undefined>;
   class?: ClassProp;
 }
 
@@ -77,10 +85,11 @@ export function LikeButton(props: LikeButtonProps): Element {
   const toggle = (): void => {
     const next = !val(props.liked);
     props.onToggle(next);
-    heartPop(icon, next);
+    if (val(props.pop) !== false) heartPop(icon, next);
     const size = val(props.size);
-    if (next && val(props.burst) !== false) heartBurst(hit, { colors: val(props.colors) ?? "brand", radius: size === "lg" ? 34 : size === "sm" ? 20 : 26 });
+    if (next && val(props.burst) !== false) heartBurst(hit, { colors: val(props.colors) ?? "brand", radius: size === "lg" ? 34 : size === "sm" ? 20 : 26, ...props.burstOptions });
   };
+  const own = props.icon;
   return h("button", {
     type: "button",
     class: () => cx("hm-like", `hm-like-${val(props.size) ?? "md"}`, val(props.liked) && "is-liked", val(props.class)),
@@ -90,6 +99,6 @@ export function LikeButton(props: LikeButtonProps): Element {
     onClick: toggle,
   },
   h("span", { class: "hm-like-hit", ref: (x: HTMLElement) => { hit = x; } },
-    h("span", { class: "hm-like-heart", ref: (x: HTMLElement) => { icon = x; } }, glyph(heart))),
-  props.count !== undefined ? h(CountRoll, { value: () => val(props.count) ?? 0, hideZero: true, class: "hm-like-count" }) : null);
+    h("span", { class: "hm-like-heart", ref: (x: HTMLElement) => { icon = x; } }, typeof own === "function" ? () => own(!!val(props.liked)) : own ?? glyph(heart))),
+  props.count !== undefined ? h(CountRoll, { value: () => val(props.count) ?? 0, hideZero: true, format: () => val(props.countFormat), class: "hm-like-count" }) : null);
 }

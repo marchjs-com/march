@@ -12,3 +12,6 @@
 .hm-react-e:focus-visible, .hm-react-more:focus-visible { outline: 2px solid var(--hm-brand-blue, var(--hm-primary)); outline-offset: 0; }
 .hm-react-more { width: 2rem; height: 2rem; margin-inline-start: .125rem; background: var(--hm-surface-2); color: var(--hm-text-2); font-size: 1rem; }
 .hm-react-more .hm-svg { width: 1rem; height: 1rem; }
+/* own color: data-hm-color sets --hm-accent for the picked circle and the focus ring */
+.hm-react[data-hm-color] .hm-react-e.is-on { background: color-mix(in srgb, var(--hm-accent) 18%, transparent); }
+.hm-react[data-hm-color] :is(.hm-react-e, .hm-react-more):focus-visible { outline-color: var(--hm-accent); }

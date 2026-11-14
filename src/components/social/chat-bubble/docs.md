@@ -29,6 +29,26 @@ you let go while the bubble springs back on the motion engine.
 | `onReply` | `() => void` | — | Reply button and drag-to-reply |
 | `onRetry` | `() => void` | — | on a failed message |
 | `children` | node | — | an image or a voice note above the text |
+| `labels` | `{ sending, sent, delivered, read, failed, edited, retry, react, reply }` | built-in texts | your own words; any subset |
+| `color` | ColorToken | `brand-blue` | my bubble, the armed reply arrow, my reaction chips |
+| `ticks` | boolean / `(status) => node` | `true` | delivery ticks: off, or your own mark |
+| `formatTime` | `(date) => string` | locale short time | the time text |
+| `replyHint` | boolean / node | `true` | the arrow shown while dragging |
+| `swipe` | boolean | `true` | drag-to-reply; `false` keeps only the Reply button |
+| `tools` | boolean | `true` | the React / Reply buttons on hover and focus |
+| `reactIcon`, `replyIcon` | node | smile / arrow | your own icons for those buttons |
+| `class` | string | — | on the row (`hm-msg`) |
+
+Every part is yours:
+
+```tsx
+<ChatBubble mine text="Done" status="read" color="brand-purple" labels={{ read: "Seen", edited: "changed", retry: "Try again" }}
+  ticks={(s) => <b>{s === "read" ? "✓✓" : "✓"}</b>} formatTime={(d) => d.toLocaleTimeString("en", { hour: "numeric" })}
+  replyHint={false} tools={false} />
+```
+
+Stable classes: `hm-msg-bubble`, `hm-msg-sender`, `hm-msg-quote`, `hm-msg-text`, `hm-msg-meta`, `hm-msg-edited`,
+`hm-msg-tick`, `hm-msg-reacts`, `hm-msg-react`, `hm-msg-retry`, `hm-msg-tools`, `hm-msg-tool-react`, `hm-msg-tool-reply`, `hm-msg-hint`.
 
 ## Accessibility
 

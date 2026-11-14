@@ -13,3 +13,6 @@
 .hm-follow-sm { min-height: 2rem; padding: 0 .875rem; font-size: var(--hm-text-sm); } .hm-follow-sm .hm-follow-ico .hm-svg { width: .9375rem; height: .9375rem; }
 .hm-follow-block { display: flex; width: 100%; }
 .hm-follow .hm-burst { z-index: 2; }
+/* own color: data-hm-color sets --hm-accent for the filled "Follow" and the focus ring */
+.hm-follow.is-follow[data-hm-color] { border-color: var(--hm-accent); background: var(--hm-accent); color: var(--hm-on-accent); }
+.hm-follow[data-hm-color]:focus-visible { outline-color: var(--hm-accent); }

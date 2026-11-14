@@ -35,3 +35,23 @@ test("MediaGrid: single tap opens after the double-tap window; a double tap does
   assert.deepEqual(opened, [1]);
   m.dispose();
 });
+
+test("MediaGrid: own names, +N off / own, video mark off / own, skeleton off / own", () => {
+  const vids = [{ src: "a.svg", alt: "a", kind: "video" }, ...items(5)];
+  const m = mount(() => [
+    h(MediaGrid, { items: vids, label: "Trip", tileLabel: (i, n, it) => `${it.alt} ${i + 1}/${n}`, more: (rest) => h("b", { class: "own-more" }, `${rest} more`), videoMark: () => h("i", { class: "own-mark" }), skeleton: () => h("u", { class: "own-skel" }), class: "mine" }),
+    h(MediaGrid, { items: vids, more: false, videoMark: false, skeleton: false }),
+  ]);
+  const [a, b] = m.el.querySelectorAll(".hm-mgrid");
+  assert.ok(a.classList.contains("mine"));
+  assert.equal(a.getAttribute("aria-label"), "Trip");
+  assert.equal(a.querySelector(".hm-mgrid-tile").getAttribute("aria-label"), "a 1/6");
+  assert.equal(a.querySelector(".hm-mgrid-more .own-more").textContent, "2 more");
+  assert.ok(a.querySelector(".hm-mgrid-kind .own-mark"));
+  assert.ok(a.querySelector(".hm-mgrid-skel-own .own-skel"));
+  assert.equal(b.getAttribute("aria-label"), "6 photos");
+  assert.equal(b.querySelector(".hm-mgrid-more"), null);
+  assert.equal(b.querySelector(".hm-mgrid-kind"), null);
+  assert.equal(b.querySelector(".hm-mgrid-skel"), null);
+  m.dispose();
+});

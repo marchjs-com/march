@@ -21,3 +21,15 @@ test("StoryProgress: segments, done / current classes, progressbar values", () =
   assert.equal(bar.querySelectorAll(".hm-sprog-seg").length, 2);
   m.dispose();
 });
+
+test("StoryProgress: own screen-reader text, fill color", () => {
+  const color = signal(undefined);
+  const m = mount(() => h(StoryProgress, { count: 3, index: 1, duration: 50, color, label: (i, n) => `Slide ${i + 1}/${n}`, class: "mine" }));
+  const bar = m.el.querySelector(".hm-sprog");
+  assert.ok(bar.classList.contains("mine"));
+  assert.equal(bar.getAttribute("aria-valuetext"), "Slide 2/3");
+  assert.equal(bar.getAttribute("data-hm-color"), null);
+  color.set("brand-orange");
+  assert.equal(bar.getAttribute("data-hm-color"), "brand-orange");
+  m.dispose();
+});

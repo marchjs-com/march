@@ -30,3 +30,22 @@ test("heartBurst: adds a decorative layer to the host", () => {
   assert.equal(layer.getAttribute("aria-hidden"), "true");
   assert.equal(layer.querySelectorAll(".hm-burst-dot").length, 6);
 });
+
+test("LikeButton: own icon (node / by state), no pop, burst options", () => {
+  const liked = signal(false);
+  const m = mount(() => [
+    h(LikeButton, { liked, onToggle: (on) => liked.set(on), icon: (on) => h("i", { class: on ? "own-on" : "own-off" }), pop: false, burstOptions: { count: 4, ring: false }, class: "mine" }),
+    h(LikeButton, { liked: false, onToggle: () => {}, icon: h("b", { class: "own-node" }), burst: false }),
+  ]);
+  const [a, b] = m.el.querySelectorAll("button.hm-like");
+  assert.ok(a.classList.contains("mine"));
+  assert.ok(a.querySelector(".hm-like-heart .own-off") && !a.querySelector(".hm-svg"));
+  a.click();
+  assert.ok(a.querySelector(".hm-like-heart .own-on"));
+  assert.equal(a.querySelectorAll(".hm-burst-dot").length, 4);
+  assert.equal(a.querySelector(".hm-burst-ring"), null);
+  assert.ok(b.querySelector(".hm-like-heart .own-node"));
+  b.click();
+  assert.equal(b.querySelector(".hm-burst"), null);
+  m.dispose();
+});

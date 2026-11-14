@@ -16,6 +16,8 @@ button.hm-sring:active .hm-sring-frame { transform: scale(.94); }
 .hm-sring.is-seen .hm-sring-ring { background: var(--hm-border-strong, var(--hm-border)); --hm-sring-band: 1.5px; }
 .hm-sring.is-close .hm-sring-ring { background: var(--hm-brand-green, var(--hm-success)); }
 .hm-sring.is-none .hm-sring-ring { display: none; }
+/* own color: data-hm-color sets --hm-accent for the ring of a new / close story */
+.hm-sring[data-hm-color]:is(.is-new, .is-close) .hm-sring-ring { background: var(--hm-accent); }
 .hm-sring-av { display: grid; place-items: center; width: calc(var(--hm-sring-size) - 2 * (var(--hm-sring-band) + var(--hm-sring-gap))); aspect-ratio: 1; border-radius: 50%; overflow: hidden; }
 .hm-sring.is-none .hm-sring-av { width: 100%; }
 .hm-sring-av .hm-avatar { width: 100%; height: 100%; font-size: calc(var(--hm-sring-size) * .3); }
