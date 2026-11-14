@@ -30,7 +30,12 @@ export function allShowcaseRoutes() {
   const read = (f) => { const p = join(ROOT, "examples/showcase/src", f); return existsSync(p) ? readFileSync(p, "utf8") : ""; };
   const sub = read("nav-meta.ts").match(/SUB_PAGES[^=]*=\s*\[([\s\S]*?)\n\]/)?.[1] ?? "";
   const extra = read("routes.ts").includes('"/navigation/router"') ? ["/navigation/router"] : [];
-  return [...new Set([...showcaseRoutes(), ...[...sub.matchAll(/path: "([^"]+)"/g)].map((m) => m[1]), ...extra])];
+  // one page per topic of a section (topics.ts HUBS: "/web": [{ slug: "hero", … }]) — where the component demos live
+  const topics = [];
+  for (const m of read("topics.ts").matchAll(/^\s*"(\/[\w-]+)": \[([\s\S]*?)^\s*\],?$/gm)) {
+    for (const t of m[2].matchAll(/slug: "([^"]+)"/g)) topics.push(`${m[1]}/${t[1]}`);
+  }
+  return [...new Set([...showcaseRoutes(), ...[...sub.matchAll(/path: "([^"]+)"/g)].map((m) => m[1]), ...topics, ...extra])];
 }
 
 /** The built showcase (MARCH_SHOWCASE_DIST: another built copy, so an audit can run while the showcase is built again). */
