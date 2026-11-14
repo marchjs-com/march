@@ -133,7 +133,12 @@ export async function generate(root = ROOT) {
   // The Code-tab snippets are their own lazy module (cards-code.gen.ts), loaded on the first click on a Code tab. A grouped
   // demo module is one loader shared by its cards (L(group, index)); a folder of its own keeps its two imports.
   const groups = [...new Set([...groupOf.values()].map((g) => g.file))];
-  const pick = (c) => ({ f: c.folder, n: nameOf(c), s: c.meta?.summary ?? "", ...(c.meta?.composedOf?.length ? { p: c.meta.composedOf } : {}), ...(c.meta?.showcase ? { w: c.meta.showcase } : {}) });
+  // w: the component's own page: the showcase page that draws its <ComponentDemo> (sections.gen.ts, read from the
+  // page sources, so a moved demo moves the link), else the page named in meta.showcase
+  const secFile = join(root, "examples/showcase/src/sections.gen.ts");
+  const sections = existsSync(secFile) ? JSON.parse(/SECTIONS: Section\[\] = (\[.*\]);/s.exec(readFileSync(secFile, "utf8"))?.[1] ?? "[]") : [];
+  const ownPage = (c) => sections.find((x) => x.id === `c-${c.folder.split("/").join("-")}`)?.path ?? c.meta?.showcase;
+  const pick = (c) => ({ f: c.folder, n: nameOf(c), s: c.meta?.summary ?? "", ...(c.meta?.composedOf?.length ? { p: c.meta.composedOf } : {}), ...(ownPage(c) ? { w: ownPage(c) } : {}) });
   const load = (c) => {
     if (c.meta?.entry) return `...E`;
     const g = groupOf.get(c.folder);
