@@ -39,3 +39,15 @@ test("internal planning documents are not packaged", () => {
   assert.ok(!pkg.files.some((f) => f.startsWith("docs")), "docs/ is not in package files");
   assert.ok(!existsSync(join(ROOT, "docs/parallel.md")) && !existsSync(join(ROOT, "docs/roadmap.md")));
 });
+
+// A showcase description speaks to the reader about the component, never about how the showcase is built
+// (which folder a demo comes from, which file holds its options).
+test("showcase descriptions describe the component, not the showcase's files", () => {
+  const src = join(ROOT, "examples/showcase/src");
+  const INTERNAL = /(desc|description|lead)\s*[=:]\s*["'`][^"'`]*(playground\.ts|docs\.md|demo\.tsx|meta\.ts|Bileşen klasöründen|bileşen klasöründen|gelen demo)/;
+  const hits = [];
+  for (const f of walk(src).filter((x) => /\.(ts|tsx)$/.test(x) && !/\.gen\.ts$/.test(x))) {
+    readFileSync(f, "utf8").split(String.fromCharCode(10)).forEach((line, i) => { if (INTERNAL.test(line)) hits.push(`${relative(ROOT, f)}:${i + 1}: ${line.trim().slice(0, 120)}`); });
+  }
+  assert.deepEqual(hits, []);
+});

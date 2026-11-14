@@ -26,6 +26,7 @@ const flag = (k, d) => argFlag(argv, k, d);
 const ROUTES = flag("--routes", null)?.split(",") ?? allShowcaseRoutes();
 const WIDTH = Number(flag("--width", "1440"));
 const VERBOSE = argv.includes("--verbose");
+const STREAM = argv.includes("--stream");
 /** Upper bound of controls tried on one page (a page that keeps adding controls must not run forever). */
 const MAX_PER_PAGE = 400;
 
@@ -195,7 +196,10 @@ for (const route of ROUTES) {
   if (n >= MAX_PER_PAGE) findings.push({ route, kind: "limit", at: "", detail: `more than ${MAX_PER_PAGE} controls: the page keeps adding them` });
   for (const e of new Set(errs)) findings.push({ route, kind: "console", at: "", detail: e });
   errs.length = 0;
-  process.stdout.write(findings.some((f) => f.route === route) ? "✖" : "·");
+  // --stream: a page's findings are printed as soon as the page is done (a long run can be acted on while it goes on)
+  if (STREAM) for (const f of findings.filter((x) => x.route === route)) console.log(`✖ ${f.route}  ${f.kind}  ${f.at ? `[${f.at}] ` : ""}${f.detail}`);
+  if (STREAM) console.log(`· ${route} done`);
+  else process.stdout.write(findings.some((f) => f.route === route) ? "✖" : "·");
 }
 await close();
 console.log("");
