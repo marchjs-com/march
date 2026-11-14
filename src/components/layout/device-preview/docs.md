@@ -26,6 +26,7 @@ Devices: `iphone-15`, `iphone-se`, `pixel-8`, `galaxy-s24`, `ipad`, `ipad-pro` (
 | `landscape` | Rotate (reactive). |
 | `touch` | Mouse acts as a finger (default true). |
 | `fit` | Scale down to fit its place (default true). |
+| `fitHeight` | The most height the fitted device may take, in px (default: the window's height − 160, at least 480): a device inside a small stage. |
 | `src` | A same-origin address shown in an iframe instead of children (reactive). |
 | `label` | Accessible name of the device; default "<device> preview" (translated). |
 | `statusBar` | The status bar: `true` (default), `false` (reactive), or your own node in its place. |
