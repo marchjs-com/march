@@ -10,10 +10,13 @@ export const code = `<FileUpload multiple accept="image/*" maxSize={5_000_000} l
 <FileUpload multiple hint="PNG ya da JPG, en çok 5 MB" preview={false} removeIcon={() => <Icon of={trash} />}
   labels={{ uploaded: "Yüklendi", cancel: "Vazgeç", tooLarge: (name, max) => \`\${name} çok büyük (en çok \${max})\` }} />`
 
-// a pretend upload: progress in steps, cancellable through the signal
+// a pretend upload: progress in steps, cancellable through the signal. The steps are short right after the remove
+// button was changed, so the finished row (where that button is) shows at once
+let stepMs = 250
+
 const fake: UploadFn<string> = (file, { onProgress, signal }) => new Promise((resolve, reject) => {
   let p = 0
-  const id = setInterval(() => { p += 0.1; onProgress(Math.min(p, 1)); if (p >= 1) { clearInterval(id); resolve(`https://cdn.hadisosyal.com/${file.name}`) } }, 250)
+  const id = setInterval(() => { p += 0.1; onProgress(Math.min(p, 1)); if (p >= 1) { clearInterval(id); resolve(`https://cdn.hadisosyal.com/${file.name}`) } }, stepMs)
   signal.addEventListener("abort", () => { clearInterval(id); reject(new Error("aborted")) })
 })
 
@@ -24,6 +27,7 @@ const sample = (accept: string): File => (accept === ".pdf" ? new File(["%PDF-1.
 
 export default function FileUploadDemo(props: { values: { multiple: boolean; accept: string; upload: boolean; hint: string; preview: boolean; remove: string } }) {
   let host: HTMLElement | undefined
+  let lastRemove: string | undefined
   // the same path as a real drop: the zone checks type and size, lists the file and starts the upload
   const addSample = () => {
     const zone = host?.querySelector(".hm-drop")
@@ -38,6 +42,7 @@ export default function FileUploadDemo(props: { values: { multiple: boolean; acc
   return <div class="sc-stack" ref={(x: Element) => { host = x as HTMLElement }}>
     {() => {
       once()
+      const removeNow = untrack(() => props.values.remove); stepMs = lastRemove !== undefined && removeNow !== lastRemove ? 20 : 250; lastRemove = removeNow
       queueMicrotask(addSample)
       return untrack(() => {
         const multiple = props.values.multiple, upload = props.values.upload, preview = props.values.preview, remove = props.values.remove

@@ -9,7 +9,8 @@ export default definePlayground<Values>({
     { key: "readonly", label: "Salt okunur", default: false },
     { key: "switcher", label: "Görünüm sekmeleri", default: true },
     { key: "format", label: "Biçimlendir düğmesi (metin görünümü)", default: true, visibleWhen: (v) => !v.readonly },
-    { key: "status", label: "\"Geçerli JSON\" satırı (metin görünümü)", default: true },
+    // the "valid" line shows only while there is no problem to report: with the schema on, the sample has one
+    { key: "status", label: "\"Geçerli JSON\" satırı (metin görünümü, sorun yokken)", default: true, visibleWhen: (v) => !v.schema },
     { key: "labels", label: "Kendi metinlerim", default: false },
   ],
 });
