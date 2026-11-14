@@ -5,6 +5,7 @@ export * from "./app-shell/index.ts";
 export * from "./bottom-right-controls/index.ts";
 export * from "./device-preview/index.ts";
 export * from "./disclosure/index.ts";
+export * from "./exploded-view/index.ts";
 export * from "./grid/index.ts";
 export * from "./layout/index.ts";
 export * from "./overlay-scope/index.ts";

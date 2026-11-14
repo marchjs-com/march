@@ -33,6 +33,9 @@ export interface ComponentMeta {
    * graph of every page that imports the barrel). Import it from `hadi-march/components/<folder>`.
    */
   barrel?: boolean;
+  /** The class of the root element ("m-btn") when it is not the first class the folder's stylesheet styles: tools
+   *  find the component in a page by it (the showcase's exploded view). */
+  root?: string;
   /** Deprecated: what to use instead. */
   replacedBy?: string;
 }

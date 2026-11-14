@@ -603,6 +603,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | BottomRightControls | stable | One fixed page corner (bottom, end side; mirrors in RTL) that page-wide controls put themselves into, in order, instead of overlapping. | — |
 | DevicePreview | experimental | Content as on a real phone or tablet: device body, notch, status bar, home indicator, real screen size, rotation; the mouse acts as a finger (drag to scroll, fling, long press). | OverlayScope |
 | Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | Chevron |
+| ExplodedView | experimental | Takes its content apart like an exploded drawing and puts it back: the same elements tilt and rise as plates with name tags (chosen parts), or one element opens into its shadow, surface, content and focus ring. | — |
 | Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
 | Layout | stable | The frame all pages of an app share: content plus the page corner (BottomRightControls) with its back-to-top button; Page builds on it. | Button, Badge, Progress, ScrollToTop |
 | OverlayScope | stable | A box that keeps the layers opened inside it (drawers, dialogs, menus, toasts) inside it: previews, device frames, panels, demos. | — |

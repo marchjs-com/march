@@ -12,6 +12,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | BottomRightControls | stable | One fixed page corner (bottom, end side; mirrors in RTL) that page-wide controls put themselves into, in order, instead of overlapping. | — |
 | DevicePreview | experimental | Content as on a real phone or tablet: device body, notch, status bar, home indicator, real screen size, rotation; the mouse acts as a finger (drag to scroll, fling, long press). | [OverlayScope](#overlayscope) |
 | Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | [Chevron](#chevron) |
+| ExplodedView | experimental | Takes its content apart like an exploded drawing and puts it back: the same elements tilt and rise as plates with name tags (chosen parts), or one element opens into its shadow, surface, content and focus ring. | — |
 | Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
 | Layout | stable | The frame all pages of an app share: content plus the page corner (BottomRightControls) with its back-to-top button; Page builds on it. | [Button](#button), [Badge](#badge), [Progress](#progress), [ScrollToTop](#scrolltotop) |
 | OverlayScope | stable | A box that keeps the layers opened inside it (drawers, dialogs, menus, toasts) inside it: previews, device frames, panels, demos. | — |
@@ -1007,6 +1008,23 @@ Composed of: [Alert](#alert), [Button](#button)
 ```
 
 Full page: src/components/feedback/error-box/docs.md
+
+## ExplodedView
+
+Takes what it holds apart, like an exploded drawing, and puts it back. Nothing is drawn again: the **same** elements tilt and rise (their state, focus and listeners stay), so what comes apart is exactly what was on screen.
+
+```tsx
+import { ExplodedView } from "hadi-march/ui";
+
+<ExplodedView bind:open={$apart} onPick={(id) => $picked = id} active={$picked}
+  parts={[{ selector: ".m-avatar", label: "Avatar" }, { selector: ".m-like", label: "LikeButton", level: 2 }]}>
+  <PostCard post={post} />
+</ExplodedView>
+<ExplodedView open={$apart}><Button icon={plus}>New project</Button></ExplodedView>     // the layers of the button
+<ExplodedView open layers={{ ring: false, surface: "Background" }} gap={32} tilt={{ x: 46, z: -24 }} motion="spring" tags={false} fit={false} />
+```
+
+Full page: src/components/layout/exploded-view/docs.md
 
 ## Faq
 
