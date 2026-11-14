@@ -174,13 +174,18 @@ export function collect(root = ROOT) {
 function componentMeta(root) {
   const out = new Map();
   const base = join(root, "src/components");
+  const secFile = join(root, "examples/showcase/src/sections.gen.ts");
+  const sections = existsSync(secFile) ? JSON.parse(/SECTIONS: Section\[\] = (\[.*\]);/s.exec(readFileSync(secFile, "utf8"))?.[1] ?? "[]") : [];
   for (const cat of readdirSync(base, { withFileTypes: true }).filter((d) => d.isDirectory())) {
     for (const d of readdirSync(join(base, cat.name), { withFileTypes: true }).filter((x) => x.isDirectory())) {
       const p = join(base, cat.name, d.name, "meta.ts");
       if (!existsSync(p)) continue;
       const s = readFileSync(p, "utf8");
       const g = (k) => new RegExp(`${k}:\\s*"([^"]*)"`).exec(s)?.[1] ?? "";
-      out.set(g("name"), { status: g("status"), since: g("since"), showcase: g("showcase") });
+      // the page that draws the component's own demo (sections.gen.ts, from the page sources) with its anchor
+      const id = `c-${cat.name}-${d.name}`;
+      const own = sections.find((x) => x.id === id);
+      out.set(g("name"), { status: g("status"), since: g("since"), showcase: own ? `${own.path}#${id}` : g("showcase") });
     }
   }
   return out;

@@ -31,7 +31,7 @@ export const GENERATORS = [
   // reads every package export's JSDoc: the whole src/ tree and package.json (which the registry writes)
   { name: "api", script: "tools/api-coverage.js", inputs: ["src", "package.json", "docs/api.tr.json"], outputs: [] },
   // the API page data (public/api/*.json): JSDoc, Turkish summaries, long-form docs and the examples' demo links
-  { name: "api-docs", script: "tools/api-docs.js", inputs: ["src", "package.json", "docs/api.tr.json", "docs/api", "examples/showcase/src/api-examples"], outputs: ["examples/showcase/public/api/index.en.json"] },
+  { name: "api-docs", script: "tools/api-docs.js", inputs: ["src", "package.json", "docs/api.tr.json", "docs/api", "examples/showcase/src/api-examples", "examples/showcase/src/sections.gen.ts"], outputs: ["examples/showcase/public/api/index.en.json"] },
 ];
 
 const SKIP_DIR = new Set(["node_modules", ".git", "dist"]);
