@@ -9,18 +9,18 @@ const M = await import("../src/motion/index.ts");
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 const root = document.documentElement;
 
-test("setRestyleTransition: wraps setTheme / setColorTheme / setAccent; apply runs once; off() removes it", () => {
+test("setRestyleTransition: wraps setTheme / setColorTheme (an accent lands at once, outside it); apply runs once; off() removes it", () => {
   const calls = [];
   const off = U.setRestyleTransition((apply) => { calls.push(root.getAttribute("data-theme")); apply(); apply(); });
   U.setTheme("dark");
   assert.deepEqual(calls, [null], "the transition ran before the new look was written");
   assert.equal(root.getAttribute("data-theme"), "dark");
   U.setAccent("brand-blue");
-  assert.equal(calls.length, 2);
+  assert.equal(calls.length, 1, "an accent is not wrapped");
   assert.equal(root.getAttribute("data-m-accent"), "brand-blue");
   off();
   U.setTheme("light");
-  assert.equal(calls.length, 2, "removed: the restyle lands directly");
+  assert.equal(calls.length, 1, "removed: the restyle lands directly");
   assert.equal(root.getAttribute("data-theme"), "light");
   // a transition that throws must not lose the change
   const off2 = U.setRestyleTransition(() => { throw new Error("no transition"); });
@@ -38,10 +38,10 @@ test("setRestyleTransition prepare: runs before a setter changes anything (the o
   U.setTheme("dark");
   assert.equal(seen.length, 1, "the same value again: nothing to prepare");
   U.setAccent("brand-blue");
-  assert.equal(seen.length, 2);
+  assert.equal(seen.length, 1, "an accent needs no picture of the old look");
   off();
   U.setTheme("system"); U.setAccent("primary");
-  assert.equal(seen.length, 2, "removed with its transition");
+  assert.equal(seen.length, 1, "removed with its transition");
 });
 
 test("themeWave: without View Transitions the change lands at once; with them it runs inside one, marked on <html>", async () => {

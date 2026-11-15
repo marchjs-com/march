@@ -18,6 +18,7 @@ import { IconButton } from "../components/actions/icon-button/index.ts";
 import { Segmented } from "../components/forms/segmented/index.ts";
 import { Select } from "../components/forms/select/index.ts";
 import { OptionList } from "../components/forms/option-list/index.ts";
+import { OverflowText } from "../components/typography/overflow-text/index.ts";
 import { Alert } from "../components/feedback/alert/index.ts";
 import { restyleInstantly, restyleAhead } from "./restyle.ts";
 
@@ -164,7 +165,9 @@ export function themeList(view: "list" | "cards" = "list"): Element {
     ...(cards ? {
       columns: 3, check: false,
       renderOption: (it: { value: string; label: unknown; hint?: unknown }) => h("span", { class: "m-theme-card" },
-        h(ThemePreview, { id: it.value }), h("span", { class: "m-theme-card-name" }, it.label), it.hint ? h("span", { class: "m-theme-card-desc" }, it.hint) : null),
+        // a name or description that does not fit scrolls while the card is hovered or focused (OverflowText)
+        h(ThemePreview, { id: it.value }), h(OverflowText, { class: "m-theme-card-name", trigger: ["hover", "focus"], mode: "loop" }, it.label),
+        it.hint ? h(OverflowText, { class: "m-theme-card-desc", trigger: ["hover", "focus"], mode: "loop" }, it.hint) : null),
     } : {}),
   }) as Element;
 }

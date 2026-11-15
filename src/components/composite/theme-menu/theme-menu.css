@@ -1,5 +1,5 @@
 /* ThemeMenu: the ThemePicker / AccentPicker sections in one panel (their own CSS comes with theme.css and accent.css). */
-.m-theme-menu { max-height: min(36rem, calc(100dvh - var(--m-space-6))); overflow: auto; }
+.m-theme-menu { max-height: min(36rem, calc(100dvh - var(--m-space-6))); overflow: hidden auto; }
 .m-theme-menu-heading.m-section-label { margin-block-start: var(--m-space-2); padding-inline: var(--m-space-2); }
 .m-theme-menu .m-theme-list { max-height: none; overflow: visible; }
 /* view="cards": a wider panel for the grid of preview cards */

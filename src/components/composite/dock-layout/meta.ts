@@ -5,9 +5,9 @@ export default defineMeta({
   status: "experimental",
   category: "composite",
   since: "0.1.0",
-  summary: "IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL.",
-  composedOf: ["Splitter", "Tabs", "IconButton", "Button", "Empty", "Toolbar", "ResizeHandle", "OverflowText", "Portal"],
-  behaviors: ["drag (pointerDrag, dragGhost, arrowStep)", "announcer", "motion engine", "command manager", "storage (get / set)"],
+  summary: "IDE workspace (the dock of march-app-ui): tab groups in rows and columns; drag tabs to a side, centre, between tabs or the outer edge; closing collapses a group to a strip and keeps its size; maximize, presets, saved layouts, focus mode, narrow mode.",
+  composedOf: ["Tabs", "IconButton", "Button", "ResizeHandle", "Menu"],
+  behaviors: ["drag (dragGhost)", "command manager", "storage (get / set)"],
   hubs: [],
   showcase: "/ide",
 });

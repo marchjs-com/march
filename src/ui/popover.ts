@@ -20,7 +20,9 @@ export function place(anchor: Element, panel: Element | null | undefined, placem
   // relative to the scope, and it stays inside it
   const scope = (panel ?? anchor).closest?.(".m-overlay-scope")?.getBoundingClientRect();
   const ox = scope?.left ?? 0, oy = scope?.top ?? 0;
-  const vw = scope?.width ?? globalThis.innerWidth ?? 1024, vh = scope?.height ?? globalThis.innerHeight ?? 768;
+  // the page's visible box, without a classic scrollbar (innerWidth counts it: a panel at the end edge would sit under it)
+  const de = globalThis.document?.documentElement;
+  const vw = scope?.width ?? (de?.clientWidth || globalThis.innerWidth || 1024), vh = scope?.height ?? (de?.clientHeight || globalThis.innerHeight || 768);
   const r = anchor.getBoundingClientRect();
   const a = { top: r.top - oy, bottom: r.bottom - oy, left: r.left - ox, right: r.right - ox, width: r.width };
   const parts = placement.split("-");

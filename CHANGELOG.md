@@ -4,13 +4,19 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
-### march-app-ui: the core of March IDE (later in 0.1.0)
-- New `hadi-march/app-ui`: `AppUI`, a workspace of dockable panels after HADİ Studio Kit. Drag a tab to a side of a
-  group (a new split), its centre or between tabs (a tab), or the outer edge; closing collapses a group to a strip
-  (vertical in a row, horizontal in a column) and keeps its size for the way back; maximize, ready-made layouts
-  (`presets`, written with `row`, `col`, `tabs`), saved layouts, focus mode, narrow (one tab group) under 768 px,
-  keyboard on tabs and splitters. Panels never move in the DOM (iframes and editors keep their state).
-- `hadi-march/app-ui/layout`: the layout tree with no DOM (move, collapse, restore, geometry, hit test, save/restore).
+### march-app-ui: the core of March IDE; DockLayout on its model (later in 0.1.0)
+- New `AppUI` (`hadi-march/app-ui`, also `hadi-march/ui`): the core of March IDE and the base of an IDE shell, after HADİ
+  Studio Kit. A top bar (title, `tools`, the Layout menu: presets, saved layouts, the panel list), a `side` slot (an
+  ActivityBar), the DockLayout workspace and a `status` slot (a StatusBar). Built from DockLayout and Menu; colours from
+  the page's theme and accent. The showcase's mini editor (IDE kabuğu: canlı demo) now stands on it.
+- **Breaking:** `DockLayout` has a new model (Studio Kit's): rows and columns of tab groups with weights; closing
+  collapses a group to a strip (vertical in a row, horizontal in a column) and keeps its size for the way back; presets
+  (`presets` written with `row`, `col`, `tabs`), saved layouts, focus mode, `place` for panels the layout does not know,
+  one tab group under `narrow` px. Floating windows, the tray and `DockSpec` / `DockState` are gone (`layout` is now a
+  tree, the state a `DockTree`); `api.minimize` → `api.collapse`, `api.open(id)` shows a panel. Built from TabList
+  (Tabs), IconButton, Button, ResizeHandle (every splitter) and Menu's panel; panels never move in the DOM.
+- `hadi-march/app-ui` also exports the layout tree with no DOM (move, collapse, restore, geometry, hit test,
+  save / restore).
 - New built-in theme `studio` (Studio): navy panels, orange active tab, sky-blue focus, Bricolage, compact.
 
 ### Common props: m:color, m:theme, m:dir, m:lang, m:tip, m:reveal, m:can, m:test (later in 0.1.0)

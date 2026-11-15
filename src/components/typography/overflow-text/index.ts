@@ -164,8 +164,17 @@ export function OverflowText(props: OverflowTextProps): Element {
   // wire up once the element is in the document
   const offs: Array<() => void> = [];
   let tries = 0;
+  let wired = false;
   const connect = (): void => {
-    if (!root.isConnected) { if (++tries < 120) offs.push(frame(connect)); return; }
+    if (wired) return;
+    if (!root.isConnected) {
+      if (++tries < 120) { offs.push(frame(connect)); return; }
+      // built long before it is shown (a menu's content made ahead): wire up when it is first laid out
+      const RO0 = globalThis.ResizeObserver;
+      if (RO0) { const ro0 = new RO0(() => { if (root.isConnected) { ro0.disconnect(); connect(); } }); ro0.observe(root); offs.push(() => ro0.disconnect()); }
+      return;
+    }
+    wired = true;
     const host = (typeof props.host === "function" ? props.host() : props.host) ?? root.parentElement?.closest(HOST) ?? root;
     if (triggers.has("hover")) offs.push(on(host, "pointerenter", () => hovered.set(true)), on(host, "pointerleave", () => hovered.set(false)));
     if (triggers.has("focus")) offs.push(on(host, "focusin", () => focused.set(true)), on(host, "focusout", () => focused.set(false)));

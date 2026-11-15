@@ -1,69 +1,67 @@
-/* March — DockLayout. Imported by its component module; tokens.css provides the variables. */
-.m-dock { --m-dock-bar: 2.25rem; position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; height: 100%; min-height: 18rem; min-width: 0;
-  background: var(--m-surface-2); border-radius: var(--m-radius-3); container-type: inline-size; isolation: isolate; }
-.m-dock.is-dragging { user-select: none; cursor: grabbing; }
-.m-dock-main { display: grid; min-height: 0; min-width: 0; padding: 3px; }
-.m-dock-main > * { min-height: 0; min-width: 0; }
+/* March — DockLayout (index.ts). Panels sit flat under .m-dock; position and size come from CSSOM. Paint order is DOM
+   order: frames (.m-dock-under), panels, the top layer (.m-dock-over). Panels get no z-index, so a tooltip inside one
+   (position: fixed) can still cover its neighbour. Every colour is a theme token: the page's theme and accent. */
+.m-dock { --m-dock-head: 32px; --m-dock-tint: color-mix(in srgb, var(--m-border) 30%, var(--m-surface));
+  position: relative; block-size: 100%; min-block-size: 18rem; min-inline-size: 0; overflow: hidden; background: var(--m-bg); color: var(--m-text); }
+.m-dock.is-pending > * { visibility: hidden; }
+.m-dock-under, .m-dock-over, .m-dock-zones { display: contents; }
 
-/* splits: the Splitter, borderless, filling its area */
-.m-dock .m-dock-split { min-height: 0; height: 100%; border: 0; border-radius: 0; background: transparent; overflow: visible; }
-.m-dock .m-dock-split > .m-split-pane { display: grid; overflow: visible; min-height: 0; min-width: 0; }
-.m-dock .m-dock-split > .m-split-pane > * { min-height: 0; min-width: 0; }
-.m-dock .m-dock-split > .m-split-handle { --m-rh-rest: transparent; }
+/* panels: hidden ones keep their size (visibility); nothing inside may punch through */
+.m-dock-panel { position: absolute; box-sizing: border-box; min-block-size: 0; min-inline-size: 0; overflow: hidden; border-end-start-radius: calc(var(--m-radius) - 1px); border-end-end-radius: calc(var(--m-radius) - 1px); }
+.m-dock-panel.is-hidden, .m-dock-panel.is-hidden * { visibility: hidden !important; pointer-events: none !important; }
 
-/* a group: the Tabs, compact, with its actions at the end of the tab bar */
-.m-dock-group { position: relative; display: grid; min-height: 0; min-width: 0; margin: 2px; border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-2);
-  background: var(--m-surface); overflow: hidden; transition: border-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease); }
-.m-dock-group.is-focused { border-color: color-mix(in srgb, var(--m-primary) 45%, var(--m-border)); }
-.m-dock-tabs { display: grid; grid-template-rows: var(--m-dock-bar) minmax(0, 1fr); min-height: 0; min-width: 0; }
-.m-dock-tabs > .m-tabs-head { min-height: 0; background: var(--m-surface-2); }
-.m-dock-tabs .m-tabs-bar { gap: 0; }
-.m-dock-tabs > .m-tabs-bar { background: var(--m-surface-2); }
-.m-dock-tabs .m-tabs-actions { gap: 1px; padding-inline: .25rem; }
-.m-dock-tabs .m-tab { gap: .375rem; padding: 0 .5rem 0 .75rem; height: var(--m-dock-bar); margin: 0; border-radius: 0; font-size: var(--m-text-sm); user-select: none; touch-action: none;
-  border-inline-end: 1px solid color-mix(in srgb, var(--m-border) 60%, transparent); }
-.m-dock-tabs .m-tab.is-active { background: var(--m-surface); }
-.m-dock-tabs .m-tab::after { inset-inline: 0; top: 0; bottom: auto; height: 2px; border-radius: 0 0 2px 2px; background: var(--m-primary); }
-.m-dock-group:not(.is-focused) .m-dock-tabs .m-tab::after { background: var(--m-border-strong); }
-.m-dock-tabs > .m-tabs-panel { padding: 0; min-height: 0; overflow: auto; }
-.m-dock-host { display: block; height: 100%; min-height: 0; }
-/* the parts Tabs draws (icon, title, close mark), at the size of a compact tab; the ghost shows the same icon */
-.m-dock-tab-icon, .m-dock-tabs .m-tab-icon { display: inline-flex; color: var(--m-muted); } .m-dock-tab-icon .m-svg, .m-dock-tabs .m-tab-icon .m-svg { width: .875rem; height: .875rem; }
-.m-dock-tabs .m-tab.is-active .m-tab-icon { color: var(--m-primary); }
-.m-dock-tab-title { max-width: 12rem; }
-.m-dock-tabs .m-tab-close { margin-inline-end: 0; }
-/* the group buttons: IconButton, a step smaller than xs's neighbour sizes, visible on the bar's surface */
-.m-dock-btn.m-icon-btn { width: 1.625rem; height: 1.625rem; }
-.m-dock-btn.m-icon-btn:hover { background: color-mix(in srgb, var(--m-text) 8%, transparent); }
-.m-dock-btn.m-icon-btn .m-svg { width: .875rem; height: .875rem; }
-/* an own icon (the `icons` prop): text or a node, centred in the button */
-.m-dock-own { display: inline-grid; place-items: center; font-size: var(--m-text-sm); line-height: 1; }
+/* group frame and header */
+.m-dock-frame { position: absolute; box-sizing: border-box; display: flex; flex-direction: column; background: var(--m-surface); border: 1px solid var(--m-border); border-radius: var(--m-radius); overflow: hidden; }
+.m-dock-frame[hidden], .m-dock-strip[hidden], .m-dock-sep[hidden], .m-dock-preview[hidden], .m-dock-zones[hidden], .m-dock-insert[hidden] { display: none; }
+.m-dock-head { flex: 0 0 var(--m-dock-head); block-size: var(--m-dock-head); box-sizing: border-box; display: flex; align-items: center; gap: 1px; padding-inline-end: 3px; border-block-end: 1px solid var(--m-border); background: var(--m-dock-tint); user-select: none; -webkit-user-select: none; cursor: grab; touch-action: none; }
+.m-dock-tabs { flex: 1 1 auto; align-self: stretch; min-inline-size: 0; display: flex; align-items: stretch; overflow: hidden; }
+.m-dock-tab { flex: 0 1 auto; min-inline-size: 2.6rem; max-inline-size: 14rem; display: inline-flex; align-items: center; gap: var(--m-space-1); padding-inline: var(--m-space-3); border: 0; border-inline-end: 1px solid var(--m-border); background: transparent; color: var(--m-muted); font: 700 var(--m-text-xs) var(--m-font); white-space: nowrap; overflow: hidden; cursor: pointer; touch-action: none; }
+.m-dock-tab:hover { color: var(--m-text); }
+.m-dock-tab[aria-selected="true"] { color: var(--m-text); background: var(--m-surface); box-shadow: inset 0 2px 0 var(--m-primary); }
+.m-dock-tab .m-tab-icon, .m-dock-stab .m-icon { inline-size: 14px; block-size: 14px; flex: none; }
+.m-dock-tab .m-tab-close { display: inline-grid; place-items: center; inline-size: 16px; block-size: 16px; border-radius: var(--m-radius-1); opacity: .6; }
+.m-dock-tab .m-tab-close:hover { opacity: 1; background: color-mix(in srgb, var(--m-primary) 16%, transparent); }
+.m-dock-tab .m-tab-close .m-icon { inline-size: 12px; block-size: 12px; }
+.m-dock-hb.m-icon-btn { flex: none; inline-size: 26px; block-size: 26px; min-block-size: 0; color: var(--m-muted); }
+.m-dock-hb.m-icon-btn:hover:not(:disabled) { color: var(--m-text); }
+.m-dock-hb .m-icon { inline-size: 14px; block-size: 14px; }
 
-/* maximized: the group covers the layout */
-.m-dock-group.is-maximized { position: absolute; inset: 3px; z-index: 8; margin: 0; box-shadow: var(--m-shadow-3); }
+/* collapsed strip: horizontal keeps the title level, vertical turns it -90° (reads bottom to top) */
+.m-dock-strip { position: absolute; box-sizing: border-box; display: flex; overflow: hidden; background: var(--m-dock-tint); border: 1px solid var(--m-border); border-radius: calc(var(--m-radius) * .75); }
+.m-dock-strip[data-mode="horizontal"] { flex-direction: row; align-items: stretch; }
+.m-dock-strip[data-mode="vertical"] { flex-direction: column; align-items: stretch; }
+.m-dock-stab.m-btn { flex: 0 1 auto; min-inline-size: 0; min-block-size: 0; block-size: auto; border-radius: 0; color: var(--m-muted); font-size: var(--m-text-xs); touch-action: none; user-select: none; -webkit-user-select: none; }
+.m-dock-stab.m-btn:hover { color: var(--m-text); }
+.m-dock-stab + .m-dock-stab { border-inline-start: 1px solid var(--m-border); }
+.m-dock-stl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-dock-strip[data-mode="vertical"] .m-dock-stab { flex-direction: column; padding-block: var(--m-space-3); padding-inline: 0; }
+.m-dock-strip[data-mode="vertical"] .m-dock-stab + .m-dock-stab { border-inline-start: 0; border-block-start: 1px solid var(--m-border); }
+.m-dock-strip[data-mode="vertical"] .m-dock-stl { writing-mode: vertical-rl; transform: rotate(180deg); }
 
-/* floating windows */
-.m-dock-float { position: absolute; z-index: 10; margin: 0; padding-block-start: .875rem; box-shadow: var(--m-shadow-4); border-radius: var(--m-radius-3); border-color: var(--m-border-strong); }
-.m-dock-grip { position: absolute; inset-block-start: 0; inset-inline: 0; height: .875rem; padding: 0; border: 0; background: var(--m-surface-2); cursor: move; touch-action: none; }
-.m-dock-grip::before { content: ""; position: absolute; inset-block-start: .3125rem; inset-inline-start: calc(50% - 1rem); width: 2rem; height: .25rem; border-radius: var(--m-radius-full); background: var(--m-border-strong);
-  transition: background-color var(--m-dur) var(--m-ease); }
-.m-dock-grip:hover::before, .m-dock-grip:focus-visible::before { background: var(--m-primary); }
-.m-dock-grip:focus-visible { outline: 2px solid var(--m-primary); outline-offset: -2px; }
-/* the corner: ResizeHandle, inside the window's frame */
-.m-dock-resize.m-resize-handle { --m-rh-out: 0px; --m-rh-rest: var(--m-border-strong); z-index: 1; }
+/* splitter: a ResizeHandle sized to the gap */
+.m-dock-sep.m-resize-handle { border-radius: 3px; }
 
-/* the minimized tray */
-.m-dock-tray { gap: .375rem; padding: .375rem .5rem; border-block-start: var(--m-border-w, 1px) solid var(--m-border); }
-.m-dock-tray-btn.m-btn { min-height: 1.75rem; max-width: 100%; font-size: var(--m-text-xs); font-weight: 400; }
+/* dragging */
+.m-dock.is-dragging { user-select: none; -webkit-user-select: none; }
+.m-dock.is-dragging iframe { pointer-events: none; }
+.m-dock-shield { position: fixed; inset: 0; z-index: 70; background: transparent; touch-action: none; }
+.m-dock-ghost { padding-block: var(--m-space-1); padding-inline: var(--m-space-3); border-radius: var(--m-radius-1); background: var(--m-surface); color: var(--m-text); border: 1px solid var(--m-primary); font: 700 var(--m-text-xs) var(--m-font); box-shadow: var(--m-shadow-3); white-space: nowrap; }
+.m-dock-preview { position: absolute; z-index: 60; box-sizing: border-box; pointer-events: none; border-radius: var(--m-radius); background: color-mix(in srgb, var(--m-primary) 22%, transparent); border: 2px solid var(--m-primary); }
+.m-dock-zone { position: absolute; z-index: 59; box-sizing: border-box; pointer-events: none; border: 1px dashed color-mix(in srgb, var(--m-primary) 55%, transparent); border-radius: var(--m-radius-1); }
+.m-dock-zone.is-on { background: color-mix(in srgb, var(--m-primary) 12%, transparent); }
+.m-dock-insert { position: absolute; z-index: 61; pointer-events: none; background: var(--m-primary); border-radius: 2px; }
 
-/* drop preview (moved by the motion engine: translate + scale of a layout-sized box) and the drag ghost */
-.m-dock-preview { position: absolute; inset: 0; z-index: 30; pointer-events: none; opacity: 0; transform-origin: 0 0; border-radius: var(--m-radius-2);
-  background: color-mix(in srgb, var(--m-primary) 16%, transparent); box-shadow: inset 0 0 0 2px var(--m-primary); }
-.m-dock-preview.is-tab { background: var(--m-primary); box-shadow: none; }
-.m-dock-ghost { position: fixed; inset: 0 auto auto 0; display: inline-flex; align-items: center; gap: .375rem; padding: .375rem .75rem; pointer-events: none; white-space: nowrap;
-  border-radius: var(--m-radius-2); background: var(--m-surface); color: var(--m-text); font-size: var(--m-text-sm); box-shadow: var(--m-shadow-3);
-  border: 1px solid color-mix(in srgb, var(--m-primary) 50%, var(--m-border)); }
-
-.m-dock-empty { display: grid; place-content: center; }
-
-@container (max-width: 34rem) { .m-dock-tab-title { max-width: 7rem; } }
+/* a short slide; none with reduced motion or motion={false} */
+.m-dock.is-anim .m-dock-frame:not(.is-snap), .m-dock.is-anim .m-dock-panel:not(.is-snap), .m-dock.is-anim .m-dock-sep, .m-dock.is-anim .m-dock-strip { transition: left var(--m-dur-fast) var(--m-ease), top var(--m-dur-fast) var(--m-ease), width var(--m-dur-fast) var(--m-ease), height var(--m-dur-fast) var(--m-ease); }
+.m-dock.is-still * { transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .m-dock.is-anim .m-dock-frame, .m-dock.is-anim .m-dock-panel, .m-dock.is-anim .m-dock-sep, .m-dock.is-anim .m-dock-strip { transition: none !important; }
+}
+/* touch: wider buttons */
+@media (pointer: coarse) { .m-dock-hb.m-icon-btn { inline-size: 34px; } }
+/* narrow: one tab group, scrolling tabs, no drag and no collapse */
+.m-dock.is-narrow .m-dock-head { cursor: default; touch-action: pan-x; }
+.m-dock.is-narrow .m-dock-tabs { overflow-x: auto; scrollbar-width: none; }
+.m-dock.is-narrow .m-dock-tab { flex: none; touch-action: manipulation; }
+.m-dock.is-narrow .m-dock-hb { display: none; }
+.m-menu.m-dock-menu { min-inline-size: 15rem !important; inline-size: max-content; overflow-x: hidden; max-inline-size: min(24rem, 92vw); }

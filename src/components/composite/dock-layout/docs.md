@@ -1,79 +1,63 @@
 # DockLayout
 
-An IDE workspace: split areas holding tab groups. Drag a tab to a **side** of a group (a new split), onto its **centre**
-or **between two tabs** (a tab there), to an **edge** of the whole layout, or **out** of it (a floating window). An
-animated preview shows where it will land. Groups maximize, panels minimize to a tray, and the layout is saved and loaded
-as plain JSON. Each panel's content is rendered once and moves between groups without being rebuilt.
+An IDE workspace, the dock of march-app-ui (after HADİ Studio Kit): tab groups in rows and columns. Drag a tab to a
+**side** of a group (a new split), onto its **centre** or **between two tabs** (a tab there), or to the **outer edge** of
+the whole layout. Closing never deletes: the group **collapses to a strip** (vertical in a row, horizontal in a column)
+and gets its size back when opened. Groups fill the whole area, layouts come from presets and are saved as plain JSON.
+Panels never move in the DOM: an iframe keeps running, an editor keeps its state.
 
 ```tsx
 <DockLayout panels={[
-  { id: "files", title: "Files", icon: folder, content: () => <FileTree /> },
+  { id: "files", title: "Files", icon: folder, min: [150, 120], content: () => <FileTree /> },
   { id: "editor", title: "main.ts", icon: fileText, content: () => <Editor />, dirty: () => $dirty },
   { id: "console", title: "Console", icon: terminal, content: () => <Console /> },
-]} layout={{ row: [["files"], { column: [["editor"], ["console"]], share: .68 }], share: .26 }}
-   persist="ide.layout" storage={storage().local} api={(a) => dock = a} />
+]} presets={{ main: { title: "Main", tree: () => row([.26, tabs("files")], [.74, col([.68, tabs("editor")], [.32, tabs("console")])]) } }}
+   persist="ide.layout" api={(a) => dock = a} />
 ```
 
 ## Props
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `panels` | `DockPanel[]` / accessor | — | `{ id, title, icon, content, closable, badge, dirty }`; a panel removed from the list leaves the layout |
-| `layout` | `DockSpec` | every panel in one group | `["a", "b"]` a group; `{ row: [x, y], share }` / `{ column: [x, y], share }` a split |
-| `persist` | string | — | save the layout under this key and load it on start |
-| `storage` | `{ get, set }` | localStorage | sync or async; the Storage manager's areas (`storage().local`, `.idb`) fit |
-| `commands` | string / `false` | `"dock"` | command id prefix: Reset layout, Focus next group, Maximize, Float, Minimize, Close, Show panel: … (palette, menus, toolbars) |
-| `api` | `(api: DockApi) => void` | — | `state()`, `load`, `reset`, `open(panel, near?)`, `close`, `focus`, `move(panel, target, zone, index?)`, `float`, `dock`, `minimize`, `restore`, `toggleMaximize`, `active()` |
-| `onChange` | `(state) => void` | — | after every change (also share and window moves) |
-| `onClose` | `(panel) => boolean \| Promise` | — | return `false` to keep the panel (ask about unsaved changes) |
+| `panels` | `DockPanel[]` / accessor | — | `{ id, title, icon, content, min: [w, h], place, closable, badge, dirty, onShow }`; the list may change (a new panel goes to its `place`, a removed one leaves the tree) |
+| `presets` | `{ [name]: { title, tree } }` | — | ready-made layouts written with `row([weight, child], …)`, `col(…)`, `tabs(ids, { collapsed })`; the first is the default |
+| `preset` | string | first | the default preset |
+| `layout` | tree | first panel, others at their `place` | the default without presets |
+| `persist` | string | — | keep the layout and saved layouts under this key |
+| `storage` | `{ get, set }` | localStorage | sync or async (the Storage manager's areas fit) |
+| `commands` | string / `false` | `"dock"` | palette commands: Reset layout, Open all panels, Layout: (each preset) |
+| `api` | `(api: DockApi) => void` | — | `layout()`, `open`, `focus`, `collapse`, `close`, `toggleMaximize`, `focusMode` / `unfocus`, `preset`, `reset`, `expandAll`, `isOpen`, `load`, `layoutMenu()` |
+| `onChange` | `(layout) => void` | — | after every change |
+| `onClose` | `(panel) => boolean \| Promise` | — | a closable tab's close mark: remove the panel from `panels`; `false` keeps it |
+| `actions` | boolean / `("menu" \| "maximize" \| "collapse")[]` | `true` | the buttons of a group (keyboard, menus and `api` stay) |
+| `narrow` | number | `560` | below this width: one tab group, no drag |
+| `motion` | boolean | `true` | the short slide when the layout changes |
+| `icons` | `{ menu, maximize, restore, collapse }` | — | own icons |
+| `labels` | `{ menu, maximize, restore, collapse, panels, strip }` | — | own texts |
 | `label` | string | "Workspace" | accessible name |
-| `actions` | boolean / `("maximize" \| "float" \| "minimize")[]` | `true` | the buttons of a group, or only the listed ones (keyboard and `api` stay) |
-| `tray` | boolean | `true` | the tray of minimized panels; with `false` bring them back with `api.restore(panel)` |
-| `empty` | boolean / `(reset) => node` | `true` | what a layout without panels shows |
-| `icons` | `{ close, maximize, restore, float, dock, minimize }` | — | own icons: an icon, a string or `() => node` |
-| `motion` | boolean | `true` | the pop after a drop, the maximize transition, the ghost fade (the drop preview always follows the pointer) |
-| `labels` | object | — | own texts: `workspace`, `panels`, `tray`, `close`, `maximize`, `restore`, `float`, `dock`, `minimize`, `moveWindow`, `resizeWindow`, `unsaved`, `empty`, `reset`, `layoutReset`, `group(title)`, `moved(title, zone)`, `minimized(title)`, `closed(title)` |
 | `class` | class value | — | on the root (`m-dock`) |
 
-```tsx
-<DockLayout panels={panels} actions={["maximize"]} tray={false} motion={false}
-  icons={{ close: "×", minimize: () => <MyIcon /> }}
-  labels={{ maximize: "Full size", closed: (title) => `${title} is gone` }}
-  empty={(reset) => <Button onClick={reset}>Bring the panels back</Button>} />
-```
-
-The command titles of the palette come from the command manager's texts; `commands={false}` registers none. A tab's
-icon, title, badge, dirty dot and close button are set per panel (`icon`, `title`, `badge`, `dirty`, `closable`).
-
-`DockState` is `{ version: 1, root, floating, minimized, maximized }`: save it with `api.state()` and give it back with
-`api.load(state)`; unknown panels are dropped when loading.
+`place` says where a panel the layout does not know goes: `{ near: "editor", zone: "left" | "right" | "top" | "bottom" |
+"center", size: .3, collapsed }`. A saved layout drops unknown panels and adds missing ones at their place.
 
 ## Keyboard
 
 | Key | |
 |---|---|
-| ← → (on the tab bar) | previous / next tab (Tabs; mirrored in RTL) |
-| F6 / Shift+F6 | next / previous group |
-| Alt+Shift+← → ↑ ↓ | dock the focused tab to that side of its group (a lone tab joins the neighbouring group) |
-| Alt+Shift+Enter | maximize / restore the group |
-| Alt+Shift+F | float / dock |
-| Alt+Shift+M | minimize to the tray |
-| Delete | close the tab |
-| arrows on a window's grip / corner | move / resize a floating window (Shift: 40 px) |
+| ← → Home End (tab bar) | previous / next tab (TabList) |
+| Ctrl+Shift+← → | move the tab in its group |
+| Delete | close a closable tab |
+| Shift+F10 / Menu key | the panel menu: move, dock to an edge, join another group, collapse, fill, reset |
+| arrows on a splitter | resize (Shift: 4 steps); Enter / double click: equal sizes |
 
 ## Accessibility
 
-A region with its own name; every group is a `section` named after its active panel and holds a Tabs tablist. Every
-pointer action has a keyboard path (table above) and the group buttons have names and `aria-keyshortcuts`. Moves,
-minimizing and closing are announced through the announcer (polite). Start and end follow the writing direction: in RTL the
-start side is on the right, the arrows and the drop zones are mirrored. Narrow layouts stack side-by-side splits.
+A group named "Workspace"; every group holds a TabList and its panels are `tabpanel`s named by their tab. Splitters
+are separators with a value and a name ("Splitter: Files / Editor"). Strips are buttons that open their panel. Every
+pointer action has a keyboard or menu path.
 
 ## Composed of
 
-Splitter (every split; horizontal or vertical, RTL aware), Tabs (every group: the tab icon, title, badge, "changed" dot
-and close mark, the Delete key, and the group buttons in its `actions` slot), IconButton (group buttons; maximize is a
-`pressed` toggle), OverflowText (a long tab title), ResizeHandle (the corner of a floating window), Toolbar + Button
-(the tray), Empty + Button (the empty state), Portal (each panel's content lives in a Portal and moves between
-PortalTargets). The drag behavior runs every pointer gesture (`pointerDrag`, `dragGhost` in the drag layer,
-`arrowStep`), the announcer speaks the changes, the motion engine plays the drop preview, the drop and the maximize
-FLIP, and the command manager feeds the palette.
+TabList (every group's tabs: icon, title, badge, "changed" dot, close mark, roving focus), IconButton (the group's menu,
+maximize — a `pressed` toggle — and collapse), Button (the entries of a strip), ResizeHandle (every splitter: pointer,
+arrows, Enter), the shared menu panel of Menu (panel and layout menus) and dragGhost (the drag layer).

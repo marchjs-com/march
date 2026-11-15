@@ -11,7 +11,7 @@
 //   splat  patches burst out from the pressed point, specks flying ahead
 import { animateEl } from "./env.ts";
 import { onFrame } from "./engine/clock.ts";
-import { clamp, uid } from "../core/util.ts";
+import { clamp } from "../core/util.ts";
 
 export type PaintShape = "drip" | "spray" | "sweep" | "splat";
 export interface PaintOptions { shape: PaintShape; origin?: { x: number; y: number } | null | undefined; duration?: number | undefined }
@@ -254,32 +254,6 @@ function liquidPaths(s: DripState, inside: boolean, dx = 0, dy = 0): string[] {
 export function liquidFrames(s: DripState, inside: boolean, dx = 0, dy = 0): Keyframe[] {
   return liquidPaths(s, inside, dx, dy).map((p, i) => ({ offset: i / STEPS_LIQUID, clipPath: inside ? `path("${p}")` : `path(evenodd, "${p}")` } as Keyframe));
 }
-/** Keyframes of an SVG path's outline (its `d`), for the shine and the shadow drawn along the paint's edge. */
-export function liquidOutline(s: DripState, inside: boolean, dx = 0, dy = 0): Keyframe[] {
-  return liquidPaths(s, inside, dx, dy).map((p, i) => ({ offset: i / STEPS_LIQUID, d: `path("${p}")` } as Keyframe));
-}
-
-/**
- * The drip's body, one SVG over the page: a shine along the paint's edge (strokes clipped to the inside of the
- * paint). Cheap: a few stroked paths, their outlines tweened by the browser.
- */
-function liquidBody(doc: Document, st: DripState, runs: [Element, Keyframe[]][]): Element {
-  const NS = "http://www.w3.org/2000/svg";
-  const el = (tag: string, attrs: Record<string, string>, parent: Element): Element => { const e = doc.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); parent.appendChild(e); return e; };
-  const id = uid("m-wave");
-  const svg = doc.createElementNS(NS, "svg");
-  svg.setAttribute("class", "m-wave-gloss");
-  svg.setAttribute("aria-hidden", "true");
-  const defs = el("defs", {}, svg);
-  const inner = el("clipPath", { id: `${id}-in` }, defs);
-  runs.push([el("path", {}, inner), liquidOutline(st, true)]);
-  // the shine: a bright line just inside the edge, and a softer wider one under it
-  for (const [width, alpha] of [[10, 0.12], [4, 0.4]] as const) {
-    runs.push([el("path", { fill: "none", stroke: `rgb(255 255 255 / ${alpha})`, "stroke-width": String(width), "clip-path": `url(#${id}-in)` }, svg), liquidOutline(st, true, 1.5, -1.5)]);
-  }
-  return svg;
-}
-
 /** The layers of a shape. */
 export function paintLayers(shape: Exclude<PaintShape, "drip">, w: number, h: number, origin?: { x: number; y: number } | null, rnd: Rnd = Math.random): Layer[] {
   const spots = shape === "spray" ? spraySpots(w, h, rnd) : shape === "sweep" ? sweepSpots(w, h, rnd) : splatSpots(w, h, origin?.x ?? w / 2, origin?.y ?? 0, rnd);
@@ -392,12 +366,19 @@ export async function paintWave(doc: Document, change: () => void, o: PaintOptio
   if (!cap) { change(); return; }
   const { veil: v, w, h } = cap;
   const runs: [Element, Keyframe[]][] = [];
-  let gloss: Element | null = null;
+  let shade: HTMLElement | null = null;
   if (o.shape === "drip") {
-    // the paint as one outline: the veil keeps everything but the paint; an SVG above draws the shine along its edge
+    // the paint as one outline: the veil keeps everything but the paint (no line drawn along its edge)
     const st = dripState(w, h);
     runs.push([v, liquidFrames(st, false)]);
-    gloss = liquidBody(doc, st, runs);
+    // a wide, soft shadow under the paint's edge, cast on the old look (as if the new one were draped over it):
+    // the paint's shape a little lower, blurred, shown only outside the paint
+    shade = doc.createElement("div");
+    shade.className = "m-wave-shade";
+    const blur = doc.createElement("div"), shape = doc.createElement("div");
+    blur.className = "m-wave-shade-blur"; shape.className = "m-wave-shade-shape";
+    blur.append(shape); shade.append(blur);
+    runs.push([shade, liquidFrames(st, false)], [shape, liquidFrames(st, true, 0, 18)]);
   } else if (o.shape === "spray" && sprayOn) {
     // the worklet sprays from a random place in the middle of the screen: a dense core, a mist of specks thinning out,
     // splats, drips (spray-worklet.js); only its progress is animated
@@ -409,7 +390,7 @@ export async function paintWave(doc: Document, change: () => void, o: PaintOptio
     masked(v, layers, true);
     runs.push([v, paintFrames(layers)]);
   }
-  if (gloss) doc.documentElement.append(gloss);
+  if (shade) doc.documentElement.append(shade);
   // the page takes the new look under the veil at once; what the change itself does to the page in its first moments
   // stays off the copy, which follows the page from then on
   change();
@@ -420,7 +401,7 @@ export async function paintWave(doc: Document, change: () => void, o: PaintOptio
   const anims = runs.map(([el, frames]) => animateEl(el, frames, timing));
   const done = cap;
   return new Promise<void>((resolve) => {
-    const end = (): void => { done.stop(); gloss?.remove(); resolve(); };
+    const end = (): void => { done.stop(); shade?.remove(); resolve(); };
     const lead = anims[0];
     if (lead) { lead.addEventListener("finish", end); lead.addEventListener("cancel", end); } else end();
   });

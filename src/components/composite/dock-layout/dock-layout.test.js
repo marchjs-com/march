@@ -1,183 +1,160 @@
+// DockLayout (the dock of march-app-ui) and AppUI: the layout tree (pure operations, geometry, hit test, save / restore)
+// and the workspace in the DOM.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
+
 const { document } = installDom({ url: "http://localhost/" });
+const C = await import("./model.ts");
+const { row, col, tabs } = C;
+const DEFS = [
+  { id: "files", min: [150, 160], place: { near: "editor", zone: "left", size: 0.2 } },
+  { id: "editor", min: [260, 180] },
+  { id: "preview", min: [220, 180], place: { near: "editor", zone: "right", size: 0.45 } },
+  { id: "console", min: [180, 90], place: { near: "preview", zone: "bottom", size: 0.36 } },
+  { id: "debug", place: { near: "console", zone: "center" } },
+];
+const PRESET = { title: "Default", tree: () => row([0.2, tabs("files")], [0.45, tabs("editor")], [0.35, col([0.6, tabs("preview")], [0.4, tabs(["console", "debug"])])]) };
+const AREA = { x: 0, y: 0, w: 1200, h: 800 };
+const base = () => C.presetLayout(PRESET, DEFS);
+
+test("presets get ids, weights sum to 1, nested splits of one direction flatten", () => {
+  const L = base();
+  assert.equal(L.root.t, "row");
+  assert.equal(L.root.kids.length, 3);
+  assert.ok(Math.abs(L.root.sizes.reduce((a, b) => a + b, 0) - 1) < 1e-9);
+  assert.deepEqual(C.allPanels(L.root).sort(), ["console", "debug", "editor", "files", "preview"]);
+  const flat = C.fromTree(row([0.5, tabs("a")], [0.5, row([0.5, tabs("b")], [0.5, tabs("c")])]));
+  assert.equal(flat.root.kids.length, 3);
+});
+
+test("collapse narrows by the parent split, keeps one group open, restore gives the size back", () => {
+  let L = base();
+  const files = C.groupOf(L, "files").id;
+  assert.equal(C.collapseMode(L.root, files), "vertical");
+  assert.equal(C.collapseMode(L.root, C.groupOf(L, "console").id), "horizontal");
+  const before = C.computeRects(L, AREA).groups[files].w;
+  L = C.collapseGroup(L, files, { area: AREA });
+  const R = C.computeRects(L, AREA);
+  assert.equal(R.groups[files], undefined);
+  assert.equal(R.strips.length, 1);
+  assert.equal(R.strips[0].mode, "vertical");
+  assert.equal(R.strips[0].rect.w, C.METRICS.strip);
+  L = C.restoreGroup(L, files, "files", { area: AREA });
+  assert.equal(C.computeRects(L, AREA).groups[files].w, before);
+  // the last open group cannot collapse
+  let M = C.fromTree(tabs("a"));
+  assert.equal(C.canCollapse(M, M.root.id), false);
+  M = C.fromTree(col([0.5, tabs("a")], [0.5, tabs("b")]));
+  M = C.collapseGroup(M, C.groupOf(M, "a").id);
+  assert.equal(C.collapseGroup(M, C.groupOf(M, "b").id), M);
+});
+
+test("move: to a side makes a split, to the centre a tab, to the root edge a new column", () => {
+  let L = base();
+  L = C.movePanel(L, "console", C.groupOf(L, "editor").id, "bottom");
+  const ed = C.groupOf(L, "editor"), con = C.groupOf(L, "console");
+  assert.notEqual(ed.id, con.id);
+  L = C.movePanel(L, "files", C.groupOf(L, "editor").id, "center", 0);
+  assert.deepEqual(C.groupOf(L, "editor").panels, ["files", "editor"]);
+  assert.equal(C.groupOf(L, "files").active, "files");
+  L = C.movePanel(L, "debug", C.ROOT, "right");
+  assert.equal(L.root.t, "row");
+  assert.deepEqual(L.root.kids.at(-1).panels, ["debug"]);
+  L = C.moveTab(L, "editor", 0);
+  assert.deepEqual(C.groupOf(L, "editor").panels, ["editor", "files"]);
+});
+
+test("geometry: minimums kept, splitters between open neighbours, resize and equalize", () => {
+  const L = base(), R = C.computeRects(L, AREA, { mins: Object.fromEntries(DEFS.map((d) => [d.id, d.min ?? [120, 80]])) });
+  assert.equal(Object.keys(R.groups).length, 4);
+  assert.equal(R.splitters.length, 3);
+  const s = R.splitters[0], info = R.splits[s.split];
+  const L2 = C.resizeSplit(L, s.split, s.a, s.b, -1000, R);
+  const R2 = C.computeRects(L2, AREA, { mins: { files: [150, 160] } });
+  assert.equal(R2.splits[s.split].px[s.a], Math.min(info.min[s.a], info.px[s.a]));
+  const E = C.equalize(L2, s.split);
+  assert.ok(Math.abs(E.root.sizes[0] - E.root.sizes[1]) < 1e-9);
+  assert.deepEqual(C.allot(100, [1, 1, 1], [0, 0, 0]).reduce((a, b) => a + b, 0), 100);
+});
+
+test("hit test: outer edge, tab header, the five zones", () => {
+  const L = base(), R = C.computeRects(L, { x: 8, y: 8, w: 1184, h: 784 });
+  assert.equal(C.hitTest(R, 10, 400).target, C.ROOT);
+  const g = R.groups[C.groupOf(L, "editor").id];
+  assert.equal(C.hitTest(R, g.x + g.w / 2, g.y + 10).onTabs, true);
+  assert.equal(C.hitTest(R, g.x + 5, g.y + g.h / 2).zone, "left");
+  assert.equal(C.hitTest(R, g.x + g.w / 2, g.y + g.h - 5).zone, "bottom");
+  assert.equal(C.hitTest(R, g.x + g.w / 2, g.y + g.h / 2).zone, "center");
+});
+
+test("save and restore: unknown and repeated panels drop, missing ones go to their place, broken input is null", () => {
+  const L = base(), raw = C.serialize(L);
+  assert.deepEqual(C.restoreLayout(JSON.parse(JSON.stringify(raw)), DEFS).root.t, "row");
+  assert.equal(C.restoreLayout({ v: 99, root: {} }, DEFS), null);
+  assert.equal(C.restoreLayout("x", DEFS), null);
+  const R = C.restoreLayout({ v: 1, seq: 1, max: null, root: { t: "tabs", id: "g1", panels: ["editor", "ghost", "editor"], active: "editor" } }, DEFS);
+  assert.deepEqual(C.allPanels(R.root).sort(), ["console", "debug", "editor", "files", "preview"]);
+  assert.ok(!C.allPanels(R.root).includes("ghost"));
+  assert.deepEqual(C.groupOf(R, "debug").panels, ["console", "debug"]);
+});
+
+test("maximize, reveal, focus mode, reset panel", () => {
+  let L = base();
+  const ed = C.groupOf(L, "editor").id;
+  L = C.maximize(L, ed);
+  assert.equal(L.max, ed);
+  L = C.reveal(L, "debug");
+  assert.equal(L.max, null);
+  assert.equal(C.groupOf(L, "debug").active, "debug");
+  const F = C.focusOnly(L, "preview");
+  assert.deepEqual(C.groups(F.root).filter((g) => !g.collapsed).map((g) => g.panels[0]), ["preview"]);
+  const moved = C.movePanel(L, "files", C.groupOf(L, "editor").id, "center");
+  const back = C.resetPanel(moved, DEFS[0], DEFS);
+  assert.deepEqual(C.groupOf(back, "files").panels, ["files"]);
+});
+
 const { h, render, signal } = await import("../../../index.ts");
 const { DockLayout } = await import("./index.ts");
-const M = await import("./model.ts");
-const { commands } = await import("../../../managers/command/index.ts");
-const { announcer } = await import("../../../managers/announcer/index.ts");
 const tick = () => new Promise((r) => setTimeout(r, 0));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
+const panelsOf = (list) => list.map((d) => ({ ...d, title: d.id.toUpperCase(), content: () => h("p", { class: `body-${d.id}` }, d.id) }));
 
-test("model: split, tab insert, collapse, float, minimize / restore, sanitize", () => {
-  let s = M.fromSpec({ row: [["files"], ["a", "b"]], share: 0.3 });
-  assert.equal(s.root.type, "split");
-  const right = s.root.b.id;
-  s = M.insertPanel(s, "files", right, "center", 1); // files joins the right group between a and b; the left group goes
-  assert.equal(s.root.type, "group");
-  assert.deepEqual(s.root.panels, ["a", "files", "b"]);
-  assert.equal(s.root.active, "files");
-  s = M.insertPanel(s, "b", s.root.id, "bottom");
-  assert.equal(s.root.type, "split");
-  assert.equal(s.root.dir, "column");
-  assert.deepEqual(s.root.b.panels, ["b"]);
-  s = M.insertPanel(s, "a", "@root", "start");
-  assert.equal(s.root.dir, "row");
-  assert.deepEqual(s.root.a.panels, ["a"]);
-  // a lone panel dropped on a side of its own group: no change
-  assert.equal(M.insertPanel(s, "a", s.root.a.id, "end"), s);
-  s = M.floatPanel(s, "b", { x: 10, y: 20, w: 300, h: 200 });
-  assert.equal(s.floating.length, 1);
-  assert.ok(M.isFloating(s, M.groupOf(s, "b").id));
-  const from = M.groupOf(s, "files").id;
-  s = M.minimizePanel(s, "files");
-  assert.deepEqual(s.minimized, [{ panel: "files", from }]);
-  assert.ok(!M.groupOf(s, "files"));
-  s = M.restorePanel(s, "files");
-  assert.ok(M.groupOf(s, "files"));
-  assert.deepEqual(s.minimized, []);
-  // saved layouts: unknown and duplicate panels go, the rest stays valid
-  const saved = JSON.parse(JSON.stringify(s));
-  M.groups(saved)[0].panels.push("gone", "a");
-  const clean = M.sanitize(saved, (id) => id !== "gone");
-  assert.deepEqual(M.placed(clean).sort(), ["a", "b", "files"]);
-  assert.equal(M.sanitize({ version: 9 }, () => true), null);
-});
-
-test("DockLayout: groups from Tabs + Splitter, content kept across moves, keyboard docking, close", async () => {
+test("DockLayout: panels built once, a TabList per group, collapse / reveal / reset through the api, kept in storage", async () => {
+  const kept = new Map();
+  const storage = { get: (k) => kept.get(k) ?? null, set: (k, v) => kept.set(k, v) };
   let api;
-  const made = [];
-  const panels = ["files", "editor", "console"].map((id) => ({ id, title: id.toUpperCase(), content: () => { const n = h("div", { class: `c-${id}` }, id); made.push(id); return n; } }));
-  const m = mount(() => h(DockLayout, { panels, layout: { row: [["files"], ["editor", "console"]], share: 0.25 }, commands: "t1", api: (a) => { api = a; } }));
-  await tick();
-  const root = m.el.querySelector(".m-dock");
-  assert.equal(root.querySelectorAll("[data-dock-group]").length, 2);
-  assert.ok(root.querySelector(".m-splitter [role=separator]"));
-  const tabs = [...root.querySelectorAll("[role=tab]")].map((x) => x.dataset.tab);
-  assert.deepEqual(tabs, ["files", "editor", "console"]);
-  const editorNode = root.querySelector(".c-editor");
-  assert.ok(editorNode, "active panels render their content");
-  assert.ok(!root.querySelector(".c-console"), "inactive panels wait until shown");
-  // Alt+Shift+→ on a tab docks it to that side: a new split
-  const ed = root.querySelector('[role=tab][data-tab="editor"]');
-  ed.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", altKey: true, shiftKey: true, bubbles: true }));
-  await tick(); await tick();
-  assert.equal(root.querySelectorAll("[data-dock-group]").length, 3);
-  assert.equal(root.querySelector(".c-editor"), editorNode, "the editor's content moved, not rebuilt");
-  assert.equal(made.filter((x) => x === "editor").length, 1);
-  // commands for the palette
-  assert.ok(commands.get("t1.reset") && commands.get("t1.show.console"));
-  // Delete closes; the layout collapses
-  const fl = root.querySelector('[role=tab][data-tab="files"]');
-  fl.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
-  await tick(); await tick();
-  assert.ok(!root.querySelector('[role=tab][data-tab="files"]'));
-  assert.equal(root.querySelectorAll("[data-dock-group]").length, 2);
-  // what happened is announced through the announcer (no live region of its own)
-  assert.match(announcer.history()[0].text, /^FILES /);
-  assert.equal(root.querySelector("[aria-live]"), null);
-  // open() puts it back, reset() returns to the layout prop
+  const { el, dispose } = mount(() => h(DockLayout, { panels: panelsOf(DEFS), presets: { main: PRESET }, persist: "t", storage, commands: false, api: (a) => { api = a; } }));
+  const root = el.querySelector(".m-dock");
+  assert.equal(root.querySelectorAll(".m-dock-panel").length, 5);
+  assert.equal(root.querySelectorAll(".body-editor").length, 1);
+  assert.equal(api.isOpen("files"), true);
+  api.collapse("files");
+  assert.equal(api.isOpen("files"), false);
+  assert.ok(C.groupOf(api.layout(), "files").collapsed);
   api.open("files");
-  await tick(); await tick();
-  assert.ok(root.querySelector('[role=tab][data-tab="files"]'));
-  api.reset();
-  await tick(); await tick();
-  assert.equal(root.querySelectorAll("[data-dock-group]").length, 2);
-  m.dispose();
-  assert.ok(!commands.get("t1.reset"), "commands leave with the layout");
-});
-
-test("DockLayout: minimize to the tray, float, maximize, persist to a storage", async () => {
-  const store = new Map();
-  const storage = { get: (k) => store.get(k), set: (k, v) => { store.set(k, JSON.parse(JSON.stringify(v))); } };
-  let api;
-  const panels = [{ id: "a", title: "A", content: () => "a" }, { id: "b", title: "B", content: () => "b", closable: false }];
-  const m = mount(() => h(DockLayout, { panels, layout: { row: [["a"], ["b"]] }, persist: "lay", storage, commands: false, api: (x) => { api = x; } }));
-  await tick();
-  const root = m.el.querySelector(".m-dock");
-  api.minimize("a");
-  await tick(); await tick();
-  const tray = root.querySelector(".m-dock-tray");
-  assert.equal(tray.getAttribute("role"), "toolbar");
-  assert.equal(tray.querySelectorAll("button").length, 1);
-  tray.querySelector("button").click();
-  await tick(); await tick();
-  assert.ok(!root.querySelector(".m-dock-tray"));
-  api.float("a");
-  await tick(); await tick();
-  const win = root.querySelector(".m-dock-float");
-  assert.ok(win && win.querySelector(".m-dock-grip") && win.querySelector(".m-dock-resize"));
-  api.toggleMaximize("b");
-  await tick();
-  assert.ok(root.querySelector('[data-dock-group].is-maximized [data-tab="b"]'));
-  assert.equal(root.querySelector(".is-maximized .m-dock-btn").getAttribute("aria-pressed"), "true");
-  // b is not closable: no × and Delete does nothing
-  const b = root.querySelector('[role=tab][data-tab="b"]');
-  assert.ok(!b.querySelector(".m-tab-close"));
-  b.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
-  await tick();
-  assert.ok(root.querySelector('[role=tab][data-tab="b"]'));
+  assert.equal(api.isOpen("files"), true);
+  api.open("debug");
+  assert.equal(C.groupOf(api.layout(), "debug").active, "debug");
   await new Promise((r) => setTimeout(r, 300));
-  const saved = store.get("lay");
-  assert.equal(saved.version, 1);
-  assert.equal(saved.floating.length, 1);
-  m.dispose();
-  // a new layout with the same key loads it
-  const m2 = mount(() => h(DockLayout, { panels, persist: "lay", storage, commands: false }));
-  await tick();
-  assert.ok(m2.el.querySelector(".m-dock-float"));
-  m2.dispose();
-});
-
-test("DockLayout: panels removed from the list leave the layout", async () => {
-  const list = signal([{ id: "a", title: "A", content: () => "a" }, { id: "b", title: "B", content: () => "b" }]);
-  const m = mount(() => h(DockLayout, { panels: list, commands: false }));
-  await tick();
-  assert.equal(m.el.querySelectorAll("[role=tab]").length, 2);
-  list.set([list.peek()[0]]);
-  await tick(); await tick();
-  assert.equal(m.el.querySelectorAll("[role=tab]").length, 1);
-  m.dispose();
-});
-
-test("DockLayout: group buttons off or chosen, own icons and texts, no tray, own empty state", async () => {
-  const mk = () => ["a", "b"].map((id) => ({ id, title: id.toUpperCase(), content: () => h("p", {}, id) }));
-  const host = document.createElement("div"); document.body.appendChild(host);
-  const apis = [];
-  const dispose = render(() => [
-    h(DockLayout, { panels: mk(), commands: false, class: "one", actions: ["maximize"], icons: { close: "×", maximize: () => h("i", { class: "own-max" }) },
-      labels: { workspace: "desk", maximize: "Full size", close: "Shut", panels: "Tabs", group: (title) => `Group ${title}` } }),
-    h(DockLayout, { panels: mk(), commands: false, class: "two", actions: false, tray: false, motion: false, api: (a) => apis.push(a),
-      empty: (reset) => h("button", { class: "own-empty", onClick: reset }, "Back") }),
-    h(DockLayout, { panels: mk(), commands: false, class: "three", empty: false, api: (a) => apis.push(a), labels: { tray: "Parked", restore: "Wake" } }),
-  ], host);
-  const one = host.querySelector(".m-dock.one"), two = host.querySelector(".m-dock.two"), three = host.querySelector(".m-dock.three");
-  assert.equal(one.getAttribute("aria-roledescription"), "desk");
-  assert.deepEqual([...one.querySelectorAll(".m-dock-btn")].map((x) => x.getAttribute("aria-label")), ["Full size"]);
-  assert.ok(one.querySelector(".m-dock-btn .own-max"));
-  assert.equal(one.querySelector(".m-tab-close").getAttribute("title"), "Shut");
-  assert.equal(one.querySelector(".m-tab-close").textContent, "×");
-  assert.equal(one.querySelector("[data-dock-group]").getAttribute("aria-label"), "Group A");
-  assert.equal(one.querySelector("[role=tablist]").getAttribute("aria-label"), "Tabs");
-  assert.equal(two.querySelector(".m-dock-actions"), null);
-  assert.equal(three.querySelectorAll(".m-dock-btn").length, 3, "the default buttons stay");
-  const [api2, api3] = apis;
-  api2.minimize("a");
-  api3.minimize("a");
-  await tick();
-  assert.equal(two.querySelector(".m-dock-tray"), null, "tray={false}: no tray");
-  assert.equal(three.querySelector(".m-dock-tray").getAttribute("aria-label"), "Parked");
-  assert.equal(three.querySelector(".m-dock-tray-btn").getAttribute("title"), "Wake");
-  api2.minimize("b");
-  api3.minimize("b");
-  await tick();
-  assert.ok(two.querySelector(".m-dock-empty .own-empty"), "own empty state");
-  assert.equal(three.querySelector(".m-dock-empty").textContent, "", "empty={false}: nothing");
-  two.querySelector(".own-empty").click();
-  await tick();
-  assert.equal(two.querySelectorAll("[role=tab]").length, 2, "the own node's reset brings the panels back");
+  assert.ok(kept.get("t:layout"), "the layout is saved");
+  api.reset();
+  assert.equal(C.groupOf(api.layout(), "debug").active, "console");
   dispose();
 });
 
-test("DockLayout: the announcer is released", () => { announcer.dispose(); });
+test("DockLayout: the panel list may change (an editor opens next to its place, a closed one leaves the tree)", async () => {
+  const list = signal(panelsOf(DEFS.slice(0, 3)));
+  let api;
+  const { el, dispose } = mount(() => h(DockLayout, { panels: list, presets: { main: { title: "M", tree: () => row([0.3, tabs("files")], [0.7, tabs("editor")]) } }, commands: false, api: (a) => { api = a; } }));
+  list.set([...list(), ...panelsOf([{ id: "notes", place: { near: "editor", zone: "center" } }])]);
+  await tick();
+  assert.deepEqual(C.groupOf(api.layout(), "notes").panels, ["editor", "notes"]);
+  assert.ok(el.querySelector(".body-notes"));
+  list.set(list().filter((p) => p.id !== "notes"));
+  await tick();
+  assert.equal(C.groupOf(api.layout(), "notes"), null);
+  assert.equal(el.querySelector(".body-notes"), null);
+  dispose();
+});
+

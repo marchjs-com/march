@@ -28,9 +28,10 @@ export function restyleAhead(): void {
 /**
  * Apply a page-wide restyle (color theme, light/dark, accent) in one step. Without this every element with a color or
  * shadow transition starts its own transition at once — hundreds on a real page — and the browser stalls for a few
- * hundred ms. Transitions are off for the one style pass that takes the new values, then back on.
+ * hundred ms. Transitions are off for the one style pass that takes the new values, then back on. `o.transition: false`:
+ * no page transition around it either (an accent change lands at once).
  */
-export function restyleInstantly(change: () => void): void {
+export function restyleInstantly(change: () => void, o: { transition?: boolean } = {}): void {
   const root = globalThis.document?.documentElement;
   if (!root) { change(); return; }
   const apply = (): void => {
@@ -39,7 +40,7 @@ export function restyleInstantly(change: () => void): void {
     globalThis.getComputedStyle?.(root).getPropertyValue("color"); // the new values land while transitions are off
     setTimeout(() => root.removeAttribute("data-m-restyling"), 0);
   };
-  if (!around) { apply(); return; }
+  if (!around || o.transition === false) { apply(); return; }
   // a transition that fails to run the change must not lose it
   let done = false;
   const once = (): void => { if (!done) { done = true; apply(); } };

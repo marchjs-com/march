@@ -5,6 +5,7 @@ export const roots: Record<string, string> = {
   "ActivityBar": "m-ab",
   "Alert": "m-alert",
   "AppShell": "m-skip",
+  "AppUI": "m-app",
   "Avatar": "m-avatar",
   "AvatarGroup": "m-avatars",
   "Badge": "m-badge",

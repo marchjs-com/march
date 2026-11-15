@@ -402,6 +402,7 @@ const tr: Record<string, string> = {
   "Voyage": "Yolculuk",
   "Flat navy, vivid accents, no shadows": "Düz lacivert, canlı vurgular, gölgesiz",
   "Graphite": "Grafit",
+  "For IDE-like apps: navy panels, orange focus, compact": "IDE benzeri uygulamalar için: lacivert paneller, turuncu vurgu, sıkı",
   "Neutral grey, compact, for desktop apps": "Nötr gri, sıkı; masaüstü uygulamaları için",
   "Paper": "Kâğıt",
   "Editorial: paper tone, serif headings, frames": "Editoryal: kâğıt tonu, serif başlık, çerçeve",

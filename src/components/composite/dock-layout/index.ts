@@ -1,545 +1,591 @@
-// DockLayout (hadi-march/ui): an IDE workspace. Split areas holding tab groups; drag a tab to a side of a group (a new
-// split), onto its centre or between tabs (a tab), to an edge of the whole layout, or out of it (a floating window).
-// Groups can be maximized, panels minimized to the tray, the layout saved and loaded (any storage with get / set: the
-// Storage manager's areas fit). Keyboard: F6 between groups, Alt+Shift+arrows dock the focused tab to a side,
-// Alt+Shift+Enter maximize, Alt+Shift+F float, Alt+Shift+M minimize, Delete close. Right-to-left aware throughout.
+// DockLayout (hadi-march/ui): an IDE workspace, the dock of march-app-ui (after HADİ Studio Kit). Tab groups in rows and
+// columns; drag a tab to a side of a group (a new split), onto its centre or between tabs (a tab), or to the outer edge.
+// Closing never deletes, it collapses the group to a strip (vertical in a row, horizontal in a column) and keeps its size
+// for the way back. Groups fill the whole area, layouts come from presets, are saved and loaded (plain JSON).
+// Under `narrow` px it is one tab group. The tree logic is model.ts (no DOM).
 //
-// Built from Splitter (every split), Tabs (every group: icon, title, badge, "changed" dot, close mark, actions),
-// IconButton, ResizeHandle, Toolbar, Button, Empty, the drag behavior (pointerDrag, dragGhost, arrowStep) and Portal: each panel's content renders once into a Portal
-// and moves between groups without being rebuilt, so editors keep their state while the layout changes.
+// Built from TabList (the strip of Tabs, for every group's tabs: icon, title, badge, "changed" dot, close mark), IconButton (menu, maximize,
+// collapse), Button (strip entries), ResizeHandle (every splitter: pointer, arrows, Shift, Enter / double click to
+// equalize), the shared menu panel (panel and layout menus) and dragGhost. Panels never move in the DOM: each panel's
+// content is built once and only gets a position and a size, so iframes and editors keep their state. A hidden panel
+// (collapsed, a tab in the back, another group maximized) keeps its last size and is hidden with visibility.
 import "./dock-layout.css";
-import { signal, computed, effect, untrack, createRoot, getOwner, onCleanup, reactive } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, createRoot, getOwner, onCleanup, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { Portal, PortalTarget } from "../../../dom/portal.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { val, cx, uid, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { clamp, setStyle, debounce, load, save, doc } from "../../../core/util.ts";
-import { ownIcon, hasPart } from "../../../ui/parts.ts";
+import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { load, save } from "../../../core/util.ts";
 import { observeSize } from "../../../ui/observe.ts";
-import { isRtl } from "../../../ui/focus.ts";
-import { Splitter } from "../../../ui/splitter.ts";
-import { Tabs, type TabSpec, type TabsProps } from "../../navigation/tabs/index.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import { TabList, type TabSpec } from "../../navigation/tabs/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { Button } from "../../actions/button/index.ts";
-import { Empty } from "../../feedback/empty/index.ts";
-import { Toolbar } from "../../layout/stack/index.ts";
+import { menuPanel, type MenuItem } from "../../actions/menu/index.ts";
 import { ResizeHandle } from "../../layout/resize-handle/index.ts";
-import { OverflowText } from "../../typography/overflow-text/index.ts";
-import { pointerDrag, arrowStep } from "../../../behaviors/drag/index.ts";
 import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
-import { announce } from "../../../managers/announcer/index.ts";
-import { animate } from "../../../motion/animate.ts";
-import { still as motionOff } from "../../../motion/engine/parts.ts";
-import type { IconDef } from "../../../icons/svg.ts";
 import { command } from "../../../managers/command/index.ts";
+import { more } from "../../../icons/glyphs/more.ts";
 import { maximize as maxIcon } from "../../../icons/glyphs/maximize.ts";
 import { minimize as restoreIcon } from "../../../icons/glyphs/minimize.ts";
 import { minus } from "../../../icons/glyphs/minus.ts";
-import { appWindow } from "../../../icons/glyphs/appWindow.ts";
-import { layers } from "../../../icons/glyphs/layers.ts";
-import {
-  type DockState, type DockNode, type DockGroupNode, type DockZone, type DockSide, type DockSpec,
-  groups, findGroup, groupOf, isFloating, placed, removePanel, insertPanel, floatPanel, minimizePanel, restorePanel,
-  activate, sanitize, fromSpec, emptyState,
-} from "./model.ts";
+import * as C from "./model.ts";
+import type { DockTree, Preset, PanelDef, Rects, Rect, Zone, Hit, TreeSpec } from "./model.ts";
 import tr from "./tr.ts";
 
 messages("tr", tr);
-export type { DockState, DockNode, DockGroupNode, DockSplitNode, DockFloating, DockMinimized, DockZone, DockSide, DockSpec } from "./model.ts";
+// preset helpers and types here; every tree operation is exported from hadi-march/app-ui
+export { row, col, tabs } from "./model.ts";
+export type { DockTree, LayoutNode, TabsNode, SplitNode, Preset, PanelDef, PanelPlace, TreeSpec, Zone, Side, Rect } from "./model.ts";
 
-/** A panel the layout can show. `content` runs once, the first time the panel is shown, and is kept while it moves. */
-export interface DockPanel {
-  id: string;
+/** A panel of the workspace. `content` runs once; the panel keeps it while it moves, collapses or hides. */
+export interface DockPanel extends PanelDef {
   title: MaybeFn<string>;
   icon?: unknown;
   content: () => unknown;
-  /** Show the close button / allow Delete (default true). */
-  closable?: boolean;
+  /** A close mark on the tab (the panel leaves through `onClose`). */
+  closable?: MaybeFn<boolean | undefined>;
   badge?: MaybeFn<number | null | undefined>;
   /** Unsaved changes: a dot on the tab. */
   dirty?: MaybeFn<boolean | null | undefined>;
+  /** Runs when the panel becomes visible. */
+  onShow?: () => void;
 }
-/** Where a layout is saved: any object with get / set (sync or async). The Storage manager's areas fit. */
+/** Where layouts are kept: any get / set (sync or async). The Storage manager's areas fit. */
 export interface DockStorage { get(key: string): unknown; set(key: string, value: unknown): unknown }
+/** The buttons of a group. */
+export type DockAction = "menu" | "maximize" | "collapse";
 
-/** Imperative control (`api={(a) => dock = a}`). Panel ids address panels; `target` may also be a group id or "@root". */
+/** Imperative control (`api={(a) => dock = a}`). */
 export interface DockApi {
-  /** The current layout (reactive); save it as JSON. */
-  state: () => DockState;
-  load(state: DockState | DockSpec): void;
-  /** Back to the `layout` prop. */
+  /** The layout on screen (reactive). */
+  layout: () => DockTree | null;
+  /** Shows a panel: opens its strip, brings its tab to the front, ends another group's maximize. */
+  open(id: string): void;
+  /** Focuses a panel's tab (after showing it). */
+  focus(id: string): void;
+  /** Collapses the panel's group to a strip. */
+  collapse(id: string): void;
+  /** Closes a closable panel (asks `onClose`). */
+  close(id: string): void;
+  /** The panel's group fills the area (again: back). */
+  toggleMaximize(id: string): void;
+  /** Focus mode: every other group goes to a strip until `unfocus`. */
+  focusMode(id: string): void;
+  unfocus(): void;
+  preset(name: string): void;
   reset(): void;
-  /** Show a panel: activate it, restore it from the tray, or add it next to `near` (a panel id) / to the first group. */
-  open(panel: string, near?: string): void;
-  close(panel: string): void;
-  focus(panel: string): void;
-  move(panel: string, target: string, zone: DockZone, index?: number): void;
-  float(panel: string): void;
-  dock(panel: string): void;
-  minimize(panel: string): void;
-  restore(panel: string): void;
-  toggleMaximize(panel?: string): void;
-  /** The active panel of the focused group (reactive). */
-  active: () => string | null;
+  expandAll(): void;
+  isOpen(id: string): boolean;
+  /** A saved or built layout. */
+  load(layout: DockTree | TreeSpec): void;
+  /** The layout menu: presets, saved layouts, the panel list (for a toolbar's Menu). */
+  layoutMenu(): MenuItem[];
 }
 
 export interface DockLayoutProps {
   panels: MaybeFn<readonly DockPanel[]>;
-  /** Initial layout: `["a", "b"]` one group, `{ row: [["files"], { column: [["editor"], ["console"]], share: .7 }], share: .25 }`. Default: every panel in one group. */
-  layout?: DockSpec;
-  /** Save the layout under this key (and load it on start). */
-  persist?: string;
-  /** Where to save it (default localStorage). `storage().local` from the Storage manager works. */
-  storage?: DockStorage;
+  /** Ready-made layouts by name (`row`, `col`, `tabs`); the first (or `preset`) is the default. */
+  presets?: Readonly<Record<string, Preset>> | undefined;
+  preset?: string | undefined;
+  /** The default layout without presets (default: the first panel, the others at their `place`). */
+  layout?: TreeSpec | undefined;
+  /** Keep the layout and saved layouts under this key. */
+  persist?: string | undefined;
+  /** Where (default localStorage); sync or async. */
+  storage?: DockStorage | undefined;
   /** Accessible name of the workspace. */
   label?: MaybeFn<string | undefined>;
-  /** Command id prefix for the palette (default "dock"); false: register no commands. */
-  commands?: string | false;
-  api?: (api: DockApi) => void;
-  onChange?: (state: DockState) => void;
-  /** Return false to keep the panel (e.g. after asking about unsaved changes). */
-  onClose?: (panel: string) => boolean | void | Promise<boolean | void>;
-  /** The buttons of a group: true (default), false, or the ones to keep. The keyboard paths and `api` stay. */
-  actions?: boolean | readonly ("maximize" | "float" | "minimize")[] | undefined;
-  /** The tray of minimized panels (default true). With false, bring panels back yourself: `api.restore(panel)`. */
-  tray?: boolean | undefined;
-  /** What a layout without panels shows: true (default: a text and Reset layout), false, or `(reset) => node`. */
-  empty?: boolean | ((reset: () => void) => unknown) | undefined;
-  /** Own icons: an icon, a string, or `() => node` (called for every button it is drawn in) each. */
-  icons?: { close?: unknown; maximize?: unknown; restore?: unknown; float?: unknown; dock?: unknown; minimize?: unknown } | undefined;
-  /** The pop of a group after a drop, the maximize transition and the fade-in of the drag ghost (default true). */
-  motion?: boolean | undefined;
-  /**
-   * Own texts; each falls back to the built-in one: `workspace` (role description), `panels` (a group's tab list),
-   * `tray`, the buttons (`close`, `maximize`, `restore`, `float`, `dock`, `minimize`, `moveWindow`, `resizeWindow`),
-   * `unsaved`, the empty state (`empty`, `reset`), `group(title)` and what is announced: `moved(title, zone)`,
-   * `minimized(title)`, `closed(title)`, `layoutReset`.
-   */
-  labels?: {
-    workspace?: string; panels?: string; tray?: string; close?: string; maximize?: string; restore?: string; float?: string; dock?: string;
-    minimize?: string; moveWindow?: string; resizeWindow?: string; unsaved?: string; empty?: string; reset?: string; layoutReset?: string;
-    group?: (title: string) => string;
-    moved?: (title: string, zone: DockZone | "float") => string;
-    minimized?: (title: string) => string;
-    closed?: (title: string) => string;
-  } | undefined;
+  /** Command id prefix for the palette (default "dock"); false: none. */
+  commands?: string | false | undefined;
+  api?: ((api: DockApi) => void) | undefined;
+  onChange?: ((layout: DockTree) => void) | undefined;
+  /** A closable tab's close mark: remove the panel from `panels` here; return false to keep it. */
+  onClose?: ((panel: string) => boolean | void | Promise<boolean | void>) | undefined;
+  /** The buttons of a group: true (default), false, or the ones to keep. Keyboard and `api` stay. */
+  actions?: boolean | readonly DockAction[] | undefined;
+  /** Below this width (px) the workspace is one tab group, no drag (default 560). */
+  narrow?: number | undefined;
+  /** The short slide when the layout changes (default true; none with reduced motion). */
+  motion?: MaybeFn<boolean | undefined>;
+  /** Own icons of the group buttons. */
+  icons?: { menu?: unknown; maximize?: unknown; restore?: unknown; collapse?: unknown } | undefined;
+  /** Own texts; each falls back to the built-in one. */
+  labels?: { menu?: string; maximize?: string; restore?: string; collapse?: string; panels?: string; strip?: string } | undefined;
+  /** id of the root (an ActivityBar's `controls`). */
+  id?: string | undefined;
   class?: ClassProp;
 }
 
-interface Drop { target: string; zone: DockZone | "float"; index?: number; rect: { x: number; y: number; w: number; h: number } }
-const EDGE = 20;
+const INSET = 8;
+const same = (a: unknown, b: unknown): boolean => JSON.stringify(a) === JSON.stringify(b);
+const coarse = (): boolean => typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
+const geoOpts = (): Partial<C.Metrics> => (coarse() ? { strip: 36, gap: 10 } : {});
+function place(e: HTMLElement, r: Rect): void { const s = e.style; s.left = `${r.x}px`; s.top = `${r.y}px`; s.width = `${r.w}px`; s.height = `${r.h}px`; }
+const div = (cls: string, attrs: Record<string, unknown> = {}, ...kids: unknown[]): HTMLElement => h("div", { class: cls, ...attrs }, ...kids) as HTMLElement;
+const localStore: DockStorage = { get: (k) => load<unknown>(k, null), set: (k, v) => save(k, v) };
 
-/** `<DockLayout panels={panels} layout={{ row: [["files"], ["editor"]], share: .25 }} persist="ide" />` */
+interface PanelView { def: DockPanel; el: HTMLElement; stab: HTMLElement; shown: boolean; dispose: () => void }
+interface Frame { group: string; placed: boolean; el: HTMLElement; tabs: Signal<TabSpec[]>; active: Signal<string | null>; max: Signal<boolean>; canClose: Signal<boolean>; bar: HTMLElement | undefined; dispose: () => void }
+interface Sep { key: string; info: Signal<C.SplitterRect>; el: HTMLElement; dispose: () => void }
+
+/** `<DockLayout panels={panels} presets={{ main: { title: "Main", tree: () => row([.25, tabs("files")], [.75, tabs("editor")]) } }} persist="ide" />` */
 export function DockLayout(props: DockLayoutProps): Element {
   const base = uid("m-dock");
-  const prefix = props.commands === false ? null : (props.commands ?? "dock");
-  const panelList = computed(() => val(props.panels) ?? []);
-  const panelMap = computed(() => new Map(panelList().map((p) => [p.id, p])));
-  const panel = (id: string): DockPanel | undefined => untrack(panelMap).get(id);
-  const known = (id: string): boolean => untrack(panelMap).has(id);
-  const initial = (): DockState => {
-    const spec = props.layout ?? untrack(panelList).map((p) => p.id);
-    return sanitize(fromSpec(spec), known) ?? emptyState();
-  };
-  const state = signal<DockState>(initial(), { name: "dock.state", equals: false });
-  // the tree is rebuilt only when its shape changes (not for the active tab, a split share or a window position)
-  const shapeOf = (s: DockState): string => {
-    const n = (x: DockNode | null): string => !x ? "" : x.type === "group" ? `${x.id}[${x.panels.join(",")}]` : `${x.dir}(${n(x.a)}|${n(x.b)})`;
-    return `${n(s.root)}#${s.floating.map((f) => `${f.group.id}[${f.group.panels.join(",")}]`).sort().join(";")}#${s.minimized.map((m) => m.panel).join(",")}`;
-  };
-  const shape = computed(() => shapeOf(state()));
-  const focused = signal<string | null>(null);
-  // narrow (a phone): side-by-side splits stack, so nothing is squeezed
-  const narrow = signal(false);
-  let root: HTMLElement | undefined;
   const owner = getOwner();
-  const L = (): NonNullable<DockLayoutProps["labels"]> => props.labels ?? {};
-  const still = (): boolean => motionOff(() => props.motion);
-  const shows = (k: "maximize" | "float" | "minimize"): boolean => hasPart(props.actions, k);
-  type IconKey = keyof NonNullable<DockLayoutProps["icons"]>;
-  const ico = (k: IconKey, def: IconDef): unknown => ownIcon(props.icons?.[k], def, "m-dock-own");
-
-  // ---------------------------------------------------------------- persistence
-  const storage: DockStorage | null = props.persist ? (props.storage ?? { get: (k) => load<unknown>(k, null), set: (k, v) => save(k, v) }) : null;
-  const persist = debounce(() => { if (storage && props.persist) void storage.set(props.persist, untrack(state)); }, 250);
-  if (storage && props.persist) {
-    const apply = (v: unknown): void => { const s = sanitize(v, known); if (s && (s.root || s.floating.length)) state.set(s); };
-    const got = storage.get(props.persist);
-    if (got && typeof (got as Promise<unknown>).then === "function") void (got as Promise<unknown>).then(apply, () => {}); else apply(got);
-  }
-  const commit = (next: DockState): void => { if (next === untrack(state)) return; state.set(next); persist(); props.onChange?.(next); };
-  const touch = (): void => { persist(); props.onChange?.(untrack(state)); };
-
-  // ---------------------------------------------------------------- panel contents (one Portal each, made on first show)
-  const hosts = new Map<string, () => void>();
-  const target = (pid: string): string => `${base}-${pid}`;
-  const ensureHost = (pid: string): void => {
-    if (hosts.has(pid)) return;
-    const p = panel(pid);
-    if (!p) return;
-    createRoot((dispose) => { hosts.set(pid, dispose); h(Portal, { to: target(pid), children: untrack(() => p.content()) }); }, owner);
+  const defs: DockPanel[] = [];
+  const panels = new Map<string, PanelView>(), frames = new Map<string, Frame>(), strips = new Map<string, HTMLElement>(), seps = new Map<string, Sep>();
+  const presets = props.presets ?? {}, presetNames = Object.keys(presets);
+  const store = props.persist ? (props.storage ?? localStore) : null;
+  const key = (k: string): string => `${props.persist}:${k}`;
+  const NARROW = props.narrow ?? 560;
+  const acts = props.actions ?? true;
+  const has = (a: DockAction): boolean => acts === true || (Array.isArray(acts) && acts.includes(a));
+  const L$ = signal<DockTree | null>(null);
+  let L: DockTree | null = null, phone: DockTree | null = null, rects: Rects | null = null, narrow = false, dragged = false;
+  let saveT: ReturnType<typeof setTimeout> | undefined, animT: ReturnType<typeof setTimeout> | undefined, focusSaved: DockTree | null = null, started = false;
+  let saved: Record<string, DockTree> = {};
+  const view = (): DockTree | null => (narrow ? phone : L);
+  const titleOf = (id: string): string => { const p = panels.get(id); return p ? val(p.def.title) : id; };
+  const mins = (): Record<string, readonly [number, number]> => Object.fromEntries(defs.map((d) => [d.id, d.min ?? [120, 80]] as const));
+  const fit = (): C.Geo | undefined => (rects ? { area: rects.area, opts: { mins: mins(), ...geoOpts() } } : undefined);
+  const base0 = (): DockTree | null => {
+    if (!defs.length) return null;
+    const p = presets[props.preset ?? presetNames[0] ?? ""];
+    return C.presetLayout(p, defs) ?? (props.layout ? C.restoreLayout(C.fromTree(props.layout), defs) : null) ?? C.addMissing(C.singleLayout([]), defs);
   };
-  // a panel removed from `panels` goes with its content
-  effect(() => { const ids = new Set(panelList().map((p) => p.id)); untrack(() => { for (const [id, off] of hosts) if (!ids.has(id)) { off(); hosts.delete(id); } }); });
-  onCleanup(() => { for (const off of hosts.values()) off(); hosts.clear(); });
 
-  // ---------------------------------------------------------------- operations
-  const groupEl = (gid: string): HTMLElement | null => root?.querySelector<HTMLElement>(`[data-dock-group="${gid}"]`) ?? null;
-  const tabEl = (pid: string): HTMLElement | null => root?.querySelector<HTMLElement>(`[data-dock-group] [role="tab"][data-tab="${globalThis.CSS?.escape?.(pid) ?? pid}"]`) ?? null;
-  const say = (msg: string): void => announce(msg);
-  const titleOf = (pid: string): string => val(panel(pid)?.title) ?? pid;
-  const afterRender = (fn: () => void): void => { queueMicrotask(() => queueMicrotask(fn)); };
-  const pop = (pid: string, focus = false): void => afterRender(() => {
-    const el = tabEl(pid)?.closest<HTMLElement>("[data-dock-group]");
-    if (el && !still()) animate(el, [{ opacity: 0.4, transform: "scale(.97)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "easeOutCubic" });
-    if (focus) tabEl(pid)?.focus();
+  // ---------------------------------------------------------------- DOM
+  const under = div("m-dock-under"), over = div("m-dock-over");
+  const menuOpen = signal(false), menuList = signal<readonly MenuItem[]>([]);
+  let menuAnchor: HTMLElement | undefined;
+  const menu = menuPanel({
+    anchor: () => menuAnchor, open: menuOpen, items: () => menuList(), label: () => t`Panel menu`, class: "m-dock-menu", placement: "bottom-start",
+    close: (refocus) => { menuOpen.set(false); if (refocus) menuAnchor?.focus(); },
   });
-  const sideName = (z: DockZone | "float"): string => ({ start: t`start`, end: t`end`, top: t`top`, bottom: t`bottom`, center: t`tab`, float: t`floating` })[z];
+  const root = div("", {
+    id: props.id ?? null, class: () => cx("m-dock", val(props.motion) === false && "is-still", val(props.class)), role: "group",
+    "aria-roledescription": () => t`workspace`, "aria-label": () => val(props.label) ?? t`Workspace`,
+  }, under, over, menu);
+  const openMenu = (anchor: HTMLElement, items: MenuItem[]): void => { menuAnchor = anchor; menuList.set(items); menuOpen.set(true); };
 
-  const move = (pid: string, tgt: string, zone: DockZone, index?: number, focus = false): void => {
-    const s = untrack(state);
-    const g = findGroup(s, tgt) ?? groupOf(s, tgt);
-    commit(insertPanel(s, pid, tgt === "@root" ? "@root" : g?.id ?? "@root", zone, index));
-    say(L().moved?.(titleOf(pid), zone) ?? t`${titleOf(pid)} moved: ${sideName(zone)}`);
-    pop(pid, focus);
-  };
-  const defaultRect = (): { x: number; y: number; w: number; h: number } => {
-    const r = root?.getBoundingClientRect();
-    const w = Math.min(360, (r?.width ?? 600) * 0.6), hh = Math.min(260, (r?.height ?? 400) * 0.6);
-    const n = untrack(state).floating.length;
-    return { x: Math.max(8, ((r?.width ?? 600) - w) / 2 + n * 24), y: Math.max(8, ((r?.height ?? 400) - hh) / 2 + n * 24), w, h: hh };
-  };
-  const float = (pid: string, rect = defaultRect()): void => { commit(floatPanel(untrack(state), pid, clampRect(rect))); say(L().moved?.(titleOf(pid), "float") ?? t`${titleOf(pid)} moved: ${sideName("float")}`); pop(pid, true); };
-  const dockBack = (pid: string): void => move(pid, "@root", "end", undefined, true);
-  const minimize = (pid: string): void => { commit(minimizePanel(untrack(state), pid)); say(L().minimized?.(titleOf(pid)) ?? t`${titleOf(pid)} minimized`); };
-  const restore = (pid: string): void => { commit(restorePanel(untrack(state), pid)); pop(pid, true); };
-  const focusPanel = (pid: string): void => { commit(activate(untrack(state), pid)); afterRender(() => tabEl(pid)?.focus()); };
-  const open = (pid: string, near?: string): void => {
-    const s = untrack(state);
-    if (s.minimized.some((m) => m.panel === pid)) return restore(pid);
-    if (groupOf(s, pid)) return focusPanel(pid);
-    const g = (near && groupOf(s, near)) || (focused.peek() && findGroup(s, focused.peek()!)) || groups(s)[0];
-    commit(insertPanel(s, pid, g?.id ?? "@root", "center"));
-    pop(pid, false);
-  };
-  const close = async (pid: string): Promise<void> => {
-    if (panel(pid)?.closable === false) return;
-    if ((await props.onClose?.(pid)) === false) return;
-    const g = groupOf(untrack(state), pid);
-    commit(removePanel(untrack(state), pid));
-    say(L().closed?.(titleOf(pid)) ?? t`${titleOf(pid)} closed`);
-    const next = g && findGroup(untrack(state), g.id)?.active;
-    if (next) afterRender(() => tabEl(next)?.focus());
-  };
-  const toggleMaximize = (pid?: string): void => {
-    const s = untrack(state);
-    const gid = pid ? groupOf(s, pid)?.id : focused.peek() ?? groups(s)[0]?.id;
-    if (!gid || isFloating(s, gid)) return;
-    const el = groupEl(gid);
-    const first = el?.getBoundingClientRect();
-    commit({ ...s, maximized: s.maximized === gid ? null : gid });
-    // FLIP: grow from where the group was (or shrink back into place)
-    if (el && first && !still()) {
-      const last = el.getBoundingClientRect();
-      if (last.width && last.height) {
-        const rtl = isRtl(el);
-        const dx = rtl ? first.right - last.right : first.left - last.left, dy = first.top - last.top;
-        setStyle(el, { "transform-origin": rtl ? "top right" : "top left" });
-        animate(el, [{ transform: `translate(${dx}px, ${dy}px) scale(${first.width / last.width}, ${first.height / last.height})` }, { transform: "none" }], { duration: 280, easing: "easeOutCubic" });
-      }
-    }
-  };
-  const current = computed((): string | null => { const s = state(); const g = (focused() && findGroup(s, focused()!)) || groups(s)[0]; return g?.active ?? null; });
-  const reset = (): void => { commit(initial()); say(L().layoutReset ?? t`Layout reset`); };
-
-  // ---------------------------------------------------------------- floating windows
-  function clampRect(r: { x: number; y: number; w: number; h: number }): { x: number; y: number; w: number; h: number } {
-    const box = root?.getBoundingClientRect();
-    if (!box || !box.width) return r;
-    const w = clamp(r.w, 180, Math.max(180, box.width - 8)), hh = clamp(r.h, 120, Math.max(120, box.height - 8));
-    return { x: clamp(r.x, 0, Math.max(0, box.width - w)), y: clamp(r.y, 0, Math.max(0, box.height - hh)), w, h: hh };
+  // ---------------------------------------------------------------- drawing
+  function setShown(p: PanelView, on: boolean): void {
+    if (on && !p.shown) queueMicrotask(() => p.def.onShow?.());
+    p.el.classList.toggle("is-snap", !on || !p.shown); // a panel that just opened does not slide from its old place
+    p.el.classList.toggle("is-hidden", !on);
+    p.el.inert = !on;
+    p.shown = on;
   }
-  const floatOf = (gid: string): { x: number; y: number; w: number; h: number } | undefined => state().floating.find((f) => f.group.id === gid);
-  const raise = (gid: string): void => {
-    const s = untrack(state), i = s.floating.findIndex((f) => f.group.id === gid);
-    if (i < 0 || i === s.floating.length - 1) return;
-    const f = s.floating.splice(i, 1)[0]!; s.floating.push(f); state.set(s);
-  };
-  // move or resize a floating window: pointer, or the arrow keys on its grip / corner (10 px, Shift: 40 px)
-  type Rect = { x: number; y: number; w: number; h: number };
-  const setRect = (gid: string, next: (r: Rect) => Rect, from?: Rect): void => {
-    const f = untrack(state).floating.find((x) => x.group.id === gid);
-    if (!f) return;
-    Object.assign(f, clampRect(next(from ?? { x: f.x, y: f.y, w: f.w, h: f.h })));
-    state.set(untrack(state));
-  };
-  const nudge = (mode: "move" | "size", dx: number, dy: number) => (r: Rect): Rect =>
-    (mode === "move" ? { ...r, x: r.x + dx, y: r.y + dy } : { ...r, w: r.w + dx, h: r.h + dy });
-  const winDrag = (gid: string, mode: "move" | "size") => (e: PointerEvent): void => {
-    if (e.button !== 0) return;
-    e.preventDefault();
-    const f = untrack(state).floating.find((x) => x.group.id === gid);
-    if (!f) return;
-    raise(gid);
-    const start: Rect = { x: f.x, y: f.y, w: f.w, h: f.h };
-    pointerDrag(e, { threshold: 0, onMove: (p) => setRect(gid, nudge(mode, p.di, p.dy), start), onEnd: touch });
-  };
-  const winStep = (gid: string, mode: "move" | "size", dx: number, dy: number): void => { setRect(gid, nudge(mode, dx, dy)); touch(); };
-  const winKey = (gid: string) => (e: KeyboardEvent): void => {
-    // arrowStep is mirrored in RTL like the window's inline axis; it gives 1 (10 with Shift): 10 px, 40 px
-    const a = e.key.startsWith("Arrow") ? arrowStep(e, isRtl(root)) : null;
-    if (!a) return;
-    e.preventDefault(); e.stopPropagation();
-    const k = e.shiftKey ? 4 : 10;
-    winStep(gid, "move", a.dx * k, a.dy * k);
-  };
-
-  // ---------------------------------------------------------------- drag a tab
-  let preview: HTMLElement | undefined;
-  let previewAt = "";
-  let previewRun: { cancel(): void } | null = null;
-  const showPreview = (d: Drop | null): void => {
-    if (!preview || !root) return;
-    const box = root.getBoundingClientRect();
-    const key = d ? `${d.target}|${d.zone}|${d.index ?? ""}` : "";
-    if (key === previewAt) return;
-    const tf = d ? `translate(${d.rect.x}px, ${d.rect.y}px) scale(${Math.max(d.rect.w, 1) / box.width}, ${Math.max(d.rect.h, 1) / box.height})` : null;
-    const was = previewAt;
-    previewAt = key;
-    previewRun?.cancel();
-    preview.classList.toggle("is-tab", d?.zone === "center" && d.index != null);
-    if (!tf) { previewRun = animate(preview, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: "forwards" }); return; }
-    const from = was ? (preview.dataset["tf"] ?? tf) : tf;
-    preview.dataset["tf"] = tf;
-    previewRun = animate(preview, [{ transform: from, opacity: was ? 1 : 0 }, { transform: tf, opacity: 1 }], { duration: 170, easing: "easeOutCubic", fill: "forwards" });
-  };
-  const hit = (x: number, y: number): Drop | null => {
-    if (!root) return null;
-    const box = root.getBoundingClientRect();
-    const rel = (r: { left: number; top: number; width: number; height: number }): Drop["rect"] => ({ x: r.left - box.left, y: r.top - box.top, w: r.width, h: r.height });
-    const inside = x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
-    if (!inside) return { target: "@float", zone: "float", rect: { x: clamp(x - box.left - 60, 0, box.width - 160), y: clamp(y - box.top - 14, 0, box.height - 120), w: 160, h: 120 } };
-    const rtl = isRtl(root);
-    const phys = (left: boolean): DockSide => (left !== rtl ? "start" : "end");
-    const w = box.width, hh = box.height;
-    // the whole layout's edges
-    if (x - box.left < EDGE) return { target: "@root", zone: phys(true), rect: { x: 0, y: 0, w: w * 0.28, h: hh } };
-    if (box.right - x < EDGE) return { target: "@root", zone: phys(false), rect: { x: w * 0.72, y: 0, w: w * 0.28, h: hh } };
-    if (y - box.top < EDGE) return { target: "@root", zone: "top", rect: { x: 0, y: 0, w, h: hh * 0.28 } };
-    if (box.bottom - y < EDGE) return { target: "@root", zone: "bottom", rect: { x: 0, y: hh * 0.72, w, h: hh * 0.28 } };
-    const under = doc().elementFromPoint(x, y);
-    const gEl = under?.closest<HTMLElement>("[data-dock-group]");
-    if (!gEl || !root.contains(gEl)) return null;
-    const gid = gEl.dataset["dockGroup"]!;
-    const bar = under?.closest<HTMLElement>(".m-tabs-bar");
-    if (bar && gEl.contains(bar)) { // between two tabs
-      const tabs = [...bar.querySelectorAll<HTMLElement>('[role="tab"]')];
-      let index = tabs.length, at = rtl ? bar.getBoundingClientRect().left : bar.getBoundingClientRect().right;
-      for (let i = 0; i < tabs.length; i++) {
-        const r = tabs[i]!.getBoundingClientRect();
-        if (rtl ? x > r.left + r.width / 2 : x < r.left + r.width / 2) { index = i; at = rtl ? r.right : r.left; break; }
-        at = rtl ? r.left : r.right;
+  function render(anim = false): void {
+    const V = view();
+    if (!V) { for (const p of panels.values()) setShown(p, false); for (const f of frames.values()) f.el.hidden = true; return; }
+    const A = { x: INSET, y: INSET, w: Math.max(0, root.clientWidth - 2 * INSET), h: Math.max(0, root.clientHeight - 2 * INSET) };
+    rects = C.computeRects(V, A, { mins: mins(), ...geoOpts() });
+    const maxId = V.max, head = C.METRICS.header;
+    clearTimeout(animT);
+    root.classList.toggle("is-anim", anim);
+    if (anim) animT = setTimeout(() => root.classList.remove("is-anim"), 240);
+    const liveF = new Set<string>(), liveS = new Set<string>(), liveK = new Set<string>();
+    const bodyOf = (r: Rect): Rect => ({ x: r.x + 1, y: r.y + head, w: Math.max(0, r.w - 2), h: Math.max(0, r.h - head - 1) });
+    for (const g of C.groups(V.root)) {
+      const r = rects.groups[g.id];
+      if (!r) { for (const id of g.panels) { const p = panels.get(id); if (p) setShown(p, false); } continue; } // collapsed: hidden at its last size
+      const visible = !maxId || maxId === g.id, box = maxId === g.id ? A : r;
+      liveF.add(g.id);
+      const f = frames.get(g.id) ?? makeFrame(g.id);
+      f.el.hidden = !visible;
+      f.el.classList.toggle("is-snap", !f.placed);
+      place(f.el, box); f.placed = true;
+      paintFrame(f, g, maxId === g.id, V);
+      for (const id of g.panels) {
+        const p = panels.get(id);
+        if (!p) continue;
+        setShown(p, visible && id === g.active);
+        place(p.el, bodyOf(visible ? box : r));
       }
-      const br = bar.getBoundingClientRect();
-      return { target: gid, zone: "center", index, rect: { x: clamp(at - box.left - 2, 0, w - 4), y: br.top - box.top + 4, w: 4, h: br.height - 8 } };
     }
-    const r = gEl.getBoundingClientRect();
-    const fx = (x - r.left) / r.width, fy = (y - r.top) / r.height;
-    const d = Math.min(fx, 1 - fx, fy, 1 - fy);
-    if (d > 0.28) return { target: gid, zone: "center", rect: rel(r) };
-    if (d === fx) return { target: gid, zone: phys(true), rect: { ...rel(r), w: r.width / 2 } };
-    if (d === 1 - fx) return { target: gid, zone: phys(false), rect: { ...rel(r), x: r.left - box.left + r.width / 2, w: r.width / 2 } };
-    if (d === fy) return { target: gid, zone: "top", rect: { ...rel(r), h: r.height / 2 } };
-    return { target: gid, zone: "bottom", rect: { ...rel(r), y: r.top - box.top + r.height / 2, h: r.height / 2 } };
-  };
-  const startDrag = (e: PointerEvent, pid: string): void => {
-    let ghost: DragGhost | null = null, drop: Drop | null = null;
-    pointerDrag(e, {
-      threshold: 6,
-      onStart: () => {
-        ghost = dragGhost(h("div", { class: "m-dock-ghost" }, icon(panel(pid)?.icon, "m-dock-tab-icon"), h("span", {}, titleOf(pid))) as HTMLElement, { motion: () => props.motion });
-        root?.classList.add("is-dragging");
-      },
-      onMove: (p) => { ghost?.move(p.clientX, p.clientY); drop = hit(p.clientX, p.clientY); showPreview(drop); },
-      onEnd: (_p, cancelled) => {
-        root?.classList.remove("is-dragging");
-        ghost?.close();
-        showPreview(null);
-        if (cancelled || !drop) return;
-        const s = untrack(state);
-        if (drop.zone === "float") {
-          const box = root!.getBoundingClientRect();
-          float(pid, { x: isRtl(root) ? box.width - drop.rect.x - 320 : drop.rect.x, y: drop.rect.y, w: 320, h: 220 });
-          return;
-        }
-        let index = drop.index;
-        const from = groupOf(s, pid);
-        if (index != null && from?.id === drop.target && from.panels.indexOf(pid) < index) index--;
-        move(pid, drop.target, drop.zone, index, true);
-      },
-    });
-  };
+    for (const [id, f] of frames) if (!liveF.has(id)) { f.el.remove(); f.dispose(); frames.delete(id); }
+    for (const s of rects.strips) {
+      liveS.add(s.id);
+      let box = strips.get(s.id);
+      if (!box) { box = div("m-dock-strip", { role: "group", "aria-label": () => props.labels?.strip ?? t`Collapsed panels` }); over.append(box); strips.set(s.id, box); }
+      box.dataset["mode"] = s.mode; box.hidden = !!maxId;
+      place(box, s.rect);
+      const list = s.panels.map((x) => panels.get(x.panel)?.stab).filter((b): b is HTMLElement => !!b);
+      if (list.length !== box.children.length || list.some((b, i) => box!.children[i] !== b)) box.replaceChildren(...list);
+    }
+    for (const [id, b] of strips) if (!liveS.has(id)) { b.remove(); strips.delete(id); }
+    for (const s of rects.splitters) {
+      liveK.add(s.key);
+      const e = seps.get(s.key);
+      if (e) e.info.set(s); else makeSep(s);
+      const el = (seps.get(s.key) as Sep).el;
+      el.hidden = !!maxId;
+      place(el, s.rect);
+    }
+    for (const [k, e] of seps) if (!liveK.has(k)) { e.el.remove(); e.dispose(); seps.delete(k); }
+  }
+  function commit(next: DockTree | null, o: { anim?: boolean; save?: boolean } = {}): boolean {
+    const cur = view();
+    if (!next || next === cur || same(next, cur)) return false;
+    if (narrow) phone = next; else { L = next; if (o.save !== false) persist(); props.onChange?.(next); }
+    L$.set(view());
+    render(!!o.anim);
+    return true;
+  }
 
-  // ---------------------------------------------------------------- keyboard
-  const onKeydown = (e: KeyboardEvent): void => {
-    if (e.key === "F6") { // between groups
-      const ids = groups(untrack(state)).map((g) => g.id);
-      if (!ids.length) return;
-      e.preventDefault();
-      const i = ids.indexOf(focused.peek() ?? "");
-      const next = ids[(i + (e.shiftKey ? -1 : 1) + ids.length) % ids.length]!;
-      const g = findGroup(untrack(state), next);
-      if (g?.active) tabEl(g.active)?.focus();
+  // ---------------------------------------------------------------- a group: TabList and its buttons
+  function paintFrame(f: Frame, g: C.TabsNode, isMax: boolean, V: DockTree): void {
+    f.group = g.id;
+    const specs = g.panels.map((id) => panels.get(id)?.def).filter((d): d is DockPanel => !!d);
+    const cur = untrack(f.tabs);
+    if (specs.length !== cur.length || specs.some((d, i) => cur[i]?.id !== d.id)) f.tabs.set(specs.map(tabSpec));
+    f.active.set(g.active);
+    f.max.set(isMax);
+    f.canClose.set(C.canCollapse(V, g.id));
+  }
+  const tabSpec = (d: DockPanel): TabSpec => ({ id: d.id, label: () => val(d.title), icon: d.icon, badge: d.badge, dirty: d.dirty === undefined ? undefined : () => !!val(d.dirty), closable: d.closable ?? undefined });
+  function makeFrame(id: string): Frame {
+    return createRoot((dispose) => {
+      const f = { group: id, placed: false, dispose, tabs: signal<TabSpec[]>([]), active: signal<string | null>(null), max: signal(false), canClose: signal(true), bar: undefined } as unknown as Frame;
+      const gid = (): string => f.group;
+      const menuBtn: HTMLElement = h(IconButton, {
+        icon: ownIcon(props.icons?.menu, more), label: () => props.labels?.menu ?? t`Panel menu`, size: "sm", class: "m-dock-hb", "aria-haspopup": "menu",
+        onClick: () => { const g = C.findNode(view() as DockTree, gid()) as C.TabsNode | null; if (g?.active) openMenu(menuBtn, panelMenu(g.active)); },
+      }) as HTMLElement;
+      const head = div("m-dock-head", {
+        onPointerdown: (e: PointerEvent) => {
+          const tg = e.target as HTMLElement;
+          if (e.button !== 0 || narrow || view()?.max || tg.closest(".m-dock-hb, .m-tab-close")) return;
+          const tab = tg.closest<HTMLElement>("[data-tab]");
+          const g = C.findNode(view() as DockTree, gid()) as C.TabsNode | null;
+          const pid = tab?.dataset["tab"] ?? g?.active;
+          if (pid) armDrag(e, pid, head);
+        },
+        onDblclick: (e: MouseEvent) => { if (!(e.target as HTMLElement).closest(".m-dock-hb") && !narrow && has("maximize")) toggleMax(gid()); },
+      },
+      h(TabList, {
+        tabs: f.tabs, value: f.active, onSelect: (pid: string) => { if (!dragged) activate(pid); }, variant: "none", class: "m-dock-tabs",
+        label: () => props.labels?.panels ?? t`Panel tabs`, tabId: (pid: string) => `${base}-t-${pid}`, onClose: (pid: string) => { void closePanel(pid); },
+        tabProps: (x: TabSpec) => ({
+          class: "m-dock-tab", "aria-controls": `${base}-p-${x.id}`,
+          onKeydown: (k: KeyboardEvent) => tabKey(k, x.id),
+          onContextmenu: (c: MouseEvent) => { if (narrow) return; c.preventDefault(); openMenu(c.currentTarget as HTMLElement, panelMenu(x.id)); },
+        }),
+      }),
+      has("menu") ? menuBtn : null,
+      has("maximize") ? h(IconButton, {
+        icon: () => (f.max() ? ownIcon(props.icons?.restore, restoreIcon) : ownIcon(props.icons?.maximize, maxIcon)), size: "sm", class: "m-dock-hb", pressed: f.max,
+        label: () => (f.max() ? props.labels?.restore ?? t`Back to its size` : props.labels?.maximize ?? t`Fill the whole area`), onClick: () => toggleMax(gid()),
+      }) : null,
+      has("collapse") ? h(IconButton, {
+        icon: ownIcon(props.icons?.collapse, minus), size: "sm", class: "m-dock-hb", disabled: () => !f.canClose(),
+        label: () => props.labels?.collapse ?? t`Collapse to a strip`, onClick: () => collapse(gid()),
+      }) : null);
+      f.el = div("m-dock-frame", {}, head);
+      under.append(f.el);
+      frames.set(id, f);
+      return f;
+    }, owner);
+  }
+  const focusTab = (id: string): void => { (root.querySelector(`#${CSS.escape(`${base}-t-${id}`)}`) as HTMLElement | null)?.focus(); };
+  const focusStrip = (id: string): void => panels.get(id)?.stab.focus();
+  const activate = (id: string): void => { const V = view(); if (V) commit(C.setActive(V, id)); };
+  function collapse(gid: string): void {
+    const V = view();
+    if (!V) return;
+    const n = C.findNode(V, gid) as C.TabsNode | null;
+    if (!n || !C.canCollapse(V, gid)) return;
+    commit(C.collapseGroup(V, gid, fit()), { anim: true });
+    if (n.active) focusStrip(n.active);
+  }
+  function restore(id: string): void {
+    const V = view(), g = V && C.groupOf(V, id);
+    if (!g) return;
+    commit(C.restoreGroup(V as DockTree, g.id, id, fit()), { anim: true });
+    focusTab(id);
+  }
+  const toggleMax = (gid: string): void => { const V = view(); if (V) commit(C.maximize(V, gid), { anim: true }); };
+  const moveWithFocus = (next: DockTree, id: string): void => { commit(next, { anim: true }); queueMicrotask(() => focusTab(id)); };
+  async function closePanel(id: string): Promise<void> {
+    if (await props.onClose?.(id) === false) return;
+    // the owner removes it from `panels`; a panel it keeps (no onClose) goes to a strip instead
+    if (!props.onClose) { const g = view() && C.groupOf(view() as DockTree, id); if (g) collapse(g.id); }
+  }
+  function tabKey(e: KeyboardEvent, id: string): void {
+    const V = view();
+    const g = V && C.groupOf(V, id);
+    if (!V || !g) return;
+    const i = g.panels.indexOf(id), last = g.panels.length - 1;
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+      e.preventDefault(); e.stopPropagation();
+      const j = e.key === "ArrowLeft" ? i - 1 : i + 1;
+      if (j >= 0 && j <= last) moveWithFocus(C.moveTab(V, id, j), id);
       return;
     }
-    const tab = (e.target as HTMLElement).closest?.<HTMLElement>('[role="tab"]');
-    const pid = tab?.dataset["tab"];
-    if (!tab || !pid || !root?.contains(tab)) return;
-    if (!(e.altKey && e.shiftKey)) return;
-    const rtl = isRtl(root);
-    const side = ({ ArrowLeft: rtl ? "end" : "start", ArrowRight: rtl ? "start" : "end", ArrowUp: "top", ArrowDown: "bottom" } as Record<string, DockSide>)[e.key];
-    const k = e.key.toLowerCase();
-    if (side) {
-      e.preventDefault();
-      const s = untrack(state), g = groupOf(s, pid);
-      if (!g) return;
-      if (g.panels.length > 1) return move(pid, g.id, side, undefined, true);
-      const near = neighbour(g.id, side); // alone in its group: join the neighbour on that side
-      if (near) move(pid, near, "center", undefined, true);
-    } else if (e.key === "Enter") { e.preventDefault(); toggleMaximize(pid); }
-    else if (k === "f") { e.preventDefault(); isFloating(untrack(state), groupOf(untrack(state), pid)?.id ?? "") ? dockBack(pid) : float(pid); }
-    else if (k === "m") { e.preventDefault(); minimize(pid); }
-  };
-  const neighbour = (gid: string, side: DockSide): string | null => {
-    const a = groupEl(gid)?.getBoundingClientRect();
-    if (!a || !root) return null;
-    const rtl = isRtl(root);
-    const want = side === "top" || side === "bottom" ? side : (side === "start") !== rtl ? "left" : "right";
-    let best: string | null = null, bestD = Infinity;
-    for (const el of root.querySelectorAll<HTMLElement>("[data-dock-group]")) {
-      const id = el.dataset["dockGroup"]!;
-      if (id === gid) continue;
-      const b = el.getBoundingClientRect();
-      const ok = want === "left" ? b.right <= a.left + 2 : want === "right" ? b.left >= a.right - 2 : want === "top" ? b.bottom <= a.top + 2 : b.top >= a.bottom - 2;
-      if (!ok) continue;
-      const d = Math.hypot(b.left + b.width / 2 - (a.left + a.width / 2), b.top + b.height / 2 - (a.top + a.height / 2));
-      if (d < bestD) { bestD = d; best = id; }
-    }
-    return best;
-  };
-
-  // ---------------------------------------------------------------- rendering
-  // a tab: Tabs draws the icon, the badge, the "changed" dot and the close mark (Delete closes too)
-  const tabOf = (pid: string): TabSpec => {
-    const p = panel(pid);
-    return {
-      id: pid, icon: p?.icon, label: h(OverflowText, { class: "m-dock-tab-title", text: () => val(p?.title) ?? pid, fade: false }),
-      closable: p?.closable !== false, ...(p?.badge !== undefined ? { badge: p.badge } : null), ...(p?.dirty !== undefined ? { dirty: () => !!val(p.dirty) } : null),
-      content: () => { ensureHost(pid); return h(PortalTarget, { name: target(pid), class: "m-dock-host" }); },
-    };
-  };
-  const iconBtn = (label: () => string, ic: () => unknown, onClick: () => void, extra: Record<string, unknown> = {}): Element =>
-    h(IconButton, { class: "m-dock-btn", size: "xs", label, icon: ic, onClick, ...extra }) as Element;
-
-  const renderGroup = (g: DockGroupNode, floating: boolean): Element => {
-    const gid = g.id;
-    const liveGroup = (): DockGroupNode | undefined => findGroup(state(), gid);
-    const maxed = (): boolean => state().maximized === gid;
-    const act = (): string | null => liveGroup()?.active ?? null;
-    const actions = !hasPart(props.actions) ? null : [
-      floating || !shows("maximize") ? null : iconBtn(() => (maxed() ? L().restore ?? t`Restore` : L().maximize ?? t`Maximize`), () => (maxed() ? ico("restore", restoreIcon) : ico("maximize", maxIcon)), () => toggleMaximize(act() ?? undefined), { pressed: maxed, "aria-keyshortcuts": "Alt+Shift+Enter" }),
-      shows("float") ? iconBtn(() => (floating ? L().dock ?? t`Dock` : L().float ?? t`Float`), () => (floating ? ico("dock", layers) : ico("float", appWindow)), () => { const a = act(); if (a) (floating ? dockBack(a) : float(a)); }, { "aria-keyshortcuts": "Alt+Shift+F" }) : null,
-      shows("minimize") ? iconBtn(() => L().minimize ?? t`Minimize`, () => ico("minimize", minus), () => { const a = act(); if (a) minimize(a); }, { "aria-keyshortcuts": "Alt+Shift+M" }) : null];
-    const tabLabels = reactive(() => ({ close: L().close, dirty: L().unsaved })) as unknown as TabsProps["labels"];
-    const el = h("section", {
-      class: () => cx("m-dock-group", floating && "m-dock-float", maxed() && "is-maximized", focused() === gid && "is-focused"),
-      "data-dock-group": gid, "aria-label": () => { const title = act() ? titleOf(act()!) : ""; return L().group?.(title) ?? t`Panel group: ${title}`; },
-      onFocusin: () => focused.set(gid),
-      onPointerdown: () => { if (floating) raise(gid); },
-    },
-    h(Tabs, {
-      tabs: g.panels.map(tabOf), value: act, onChange: (id: string) => commit(activate(untrack(state), id)), label: () => L().panels ?? t`Panels`, class: "m-dock-tabs",
-      actions, onClose: (id: string) => void close(id), closeIcon: props.icons?.close, labels: tabLabels,
-      tabProps: (tab: TabSpec) => ({ onPointerdown: (e: PointerEvent) => { if (e.button === 0) startDrag(e, tab.id); } }),
-    }),
-    floating && h("button", { type: "button", class: "m-dock-grip", "aria-label": () => L().moveWindow ?? t`Move window`, title: () => L().moveWindow ?? t`Move window`, onPointerdown: winDrag(gid, "move"), onKeydown: winKey(gid) }),
-    floating && h(ResizeHandle, { edge: "bottom-end", line: "always", class: "m-dock-resize", step: 10, label: () => L().resizeWindow ?? t`Resize window`, title: () => L().resizeWindow ?? t`Resize window`,
-      onPointerdown: winDrag(gid, "size"), onStep: (dx: number, dy: number) => winStep(gid, "size", dx, dy) }));
-    return el;
-  };
-
-  const renderNode = (n: DockNode, path: string): unknown => {
-    if (n.type === "group") return renderGroup(n, false);
-    const node = (): DockNode | null => { let x: DockNode | null = untrack(state).root; for (const c of path) x = x && x.type === "split" ? (c === "a" ? x.a : x.b) : null; return x; };
-    return h(Splitter, {
-      orientation: n.dir === "row" && !narrow() ? "horizontal" : "vertical", class: "m-dock-split", min: 0.08,
-      value: () => { state(); const x = node(); return x?.type === "split" ? x.share : undefined; },
-      onChange: (v: number) => { const x = node(); if (x?.type === "split") { x.share = v; touch(); } },
-      start: renderNode(n.a, `${path}a`), end: renderNode(n.b, `${path}b`),
-    });
-  };
-
-  const tree = (): unknown => {
-    shape(); narrow();
-    return untrack(() => {
-      const s = state();
-      const own = props.empty;
-      const docked = s.root ? renderNode(s.root, "") : h("div", { class: "m-dock-empty" }, own === false ? null : typeof own === "function" ? own(reset)
-        : h(Empty, { size: "sm", title: L().empty ?? t`No panels open`, action: h(Button, { variant: "secondary", size: "sm", onClick: reset }, L().reset ?? t`Reset layout`) }));
-      const floats = s.floating.map((f) => {
-        const gid = f.group.id;
-        const el = renderGroup(f.group, true) as HTMLElement;
-        effect(() => {
-          const r = floatOf(gid); if (!r) return;
-          const z = untrack(state).floating.findIndex((x) => x.group.id === gid);
-          setStyle(el, { "inset-inline-start": `${r.x}px`, "inset-block-start": `${r.y}px`, width: `${r.w}px`, height: `${r.h}px`, "z-index": String(10 + z) });
-        });
-        return el;
-      });
-      return [docked, floats];
-    });
-  };
-  const tray = (): unknown => {
-    const m = state().minimized;
-    if (!m.length || props.tray === false) return null;
-    return untrack(() => h(Toolbar, { class: "m-dock-tray", label: L().tray ?? t`Minimized panels`,
-      children: m.map((x) => h(Button, { class: "m-dock-tray-btn", variant: "secondary", size: "sm", shape: "pill", icon: panel(x.panel)?.icon, onClick: () => restore(x.panel), title: L().restore ?? t`Restore` },
-        () => titleOf(x.panel))) }));
-  };
-
-  // ---------------------------------------------------------------- commands (palette, menus, toolbars)
-  if (prefix) {
-    const group = (): string => t`Layout`;
-    const has = (): boolean => current() != null;
-    command({ id: `${prefix}.reset`, title: () => t`Reset layout`, group: group(), run: reset });
-    command({ id: `${prefix}.nextGroup`, title: () => t`Focus next panel group`, group: group(), keywords: "F6", run: () => { const ids = groups(untrack(state)).map((g) => g.id); const i = ids.indexOf(focused.peek() ?? ""); const g = findGroup(untrack(state), ids[(i + 1) % ids.length] ?? ""); if (g?.active) focusPanel(g.active); } });
-    command({ id: `${prefix}.maximize`, title: () => t`Maximize / restore panel`, group: group(), when: has, run: () => toggleMaximize(current() ?? undefined) });
-    command({ id: `${prefix}.float`, title: () => t`Float / dock panel`, group: group(), when: has, run: () => { const p = current(); if (p) isFloating(untrack(state), groupOf(untrack(state), p)?.id ?? "") ? dockBack(p) : float(p); } });
-    command({ id: `${prefix}.minimize`, title: () => t`Minimize panel`, group: group(), when: has, run: () => { const p = current(); if (p) minimize(p); } });
-    command({ id: `${prefix}.close`, title: () => t`Close panel`, group: group(), when: has, run: () => { const p = current(); if (p) void close(p); } });
-    // "Show panel: …" for every panel, even closed ones
-    effect(() => { for (const p of panelList()) untrack(() => command({ id: `${prefix}.show.${p.id}`, title: () => t`Show panel: ${val(p.title)}`, group: t`Panels`, icon: p.icon, run: () => open(p.id) })); });
+    if (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10")) { e.preventDefault(); openMenu(e.currentTarget as HTMLElement, panelMenu(id)); }
   }
 
-  // a panel added to `panels` later is placed by open(); one removed leaves the layout
-  effect(() => { const ids = panelMap(); untrack(() => { const s = state.peek(); const gone = placed(s).filter((id) => !ids.has(id)); if (gone.length) commit(gone.reduce(removePanel, s)); }); });
+  // ---------------------------------------------------------------- splitters (ResizeHandle)
+  function makeSep(s0: C.SplitterRect): void {
+    createRoot((dispose) => {
+      const info = signal(s0);
+      const px = (): { pa: number; pb: number } => { const i = rects?.splits[info().split]; return { pa: i?.px[info().a] ?? 0, pb: i?.px[info().b] ?? 0 }; };
+      let start: DockTree | null = null, startR: Rects | null = null, from = 0;
+      const el = h(ResizeHandle, {
+        class: "m-dock-sep", edge: s0.axis === "row" ? "end" : "bottom", axis: s0.axis === "row" ? "inline" : "block", "data-axis": s0.axis, label: () => sepLabel(info()),
+        value: () => px().pa, min: 0, max: 1e6,
+        set: (v: number, done: boolean) => {
+          if (!start) { start = L; startR = rects; from = px().pa; }
+          if (start && startR) { const n = C.resizeSplit(start, info().split, info().a, info().b, v - from, startR); if (n !== L) { L = n; L$.set(L); render(); } }
+          if (done) { start = null; startR = null; persist(); }
+        },
+        reset: () => { if (L) commit(C.equalize(L, info().split), { anim: true }); },
+        onStart: () => { shield(true, info().axis === "row" ? "col-resize" : "row-resize"); },
+        onEnd: () => { shield(false); start = null; startR = null; persist(); },
+      }) as HTMLElement;
+      over.append(el);
+      seps.set(s0.key, { key: s0.key, info, el, dispose });
+    }, owner);
+  }
+  function sepLabel(s: C.SplitterRect): string {
+    const V = view(), node = V && (C.findNode(V, s.split) as C.SplitNode | null);
+    if (!node) return t`Splitter`;
+    const nm = (k: C.LayoutNode | undefined): string => (k ? titleOf((C.groups(k)[0] as C.TabsNode | undefined)?.active ?? "") : "");
+    return `${t`Splitter`}: ${nm(node.kids[s.a])} / ${nm(node.kids[s.b])}`;
+  }
+
+  // ---------------------------------------------------------------- drag and drop
+  let shieldEl: HTMLElement | null = null;
+  /** A clear shield while dragging, so iframes do not swallow the pointer. */
+  function shield(on: boolean, cursor = ""): void {
+    root.classList.toggle("is-dragging", on);
+    if (on) { shieldEl ??= div("m-dock-shield"); shieldEl.style.cursor = cursor; root.append(shieldEl); } else shieldEl?.remove();
+  }
+  function armDrag(e: PointerEvent, id: string, source: HTMLElement): void {
+    if (narrow || !id) return;
+    const sx = e.clientX, sy = e.clientY, pid = e.pointerId;
+    let on = false, hit: Hit | null = null, idx: number | null = null, ghost: DragGhost | null = null;
+    const preview = div("m-dock-preview"), zones = div("m-dock-zones"), mark = div("m-dock-insert");
+    for (const z of ["left", "right", "top", "bottom", "center"]) zones.append(div("m-dock-zone", { "data-z": z }));
+    const paint = (x: number, y: number): void => {
+      ghost?.move(x, y);
+      const b = root.getBoundingClientRect();
+      hit = rects ? C.hitTest(rects, x - b.left, y - b.top, geoOpts()) : null;
+      preview.hidden = !hit; zones.hidden = true; mark.hidden = true; idx = null;
+      if (!hit || !rects) return;
+      place(preview, hit.rect);
+      const box = rects.groups[hit.target];
+      if (hit.onTabs) {
+        const kids = Array.from(frames.get(hit.target)?.el.querySelectorAll<HTMLElement>("[data-tab]") ?? []);
+        if (!kids.length) return;
+        const at = kids.findIndex((k) => { const r = k.getBoundingClientRect(); return x < r.left + r.width / 2; });
+        idx = at < 0 ? kids.length : at;
+        const r = (kids[at] ?? kids[kids.length - 1] as HTMLElement).getBoundingClientRect();
+        mark.hidden = false; place(mark, { x: (at < 0 ? r.right : r.left) - b.left - 1, y: r.top - b.top, w: 3, h: r.height });
+      } else if (box) {
+        zones.hidden = false;
+        const zr = C.zoneRects(box);
+        for (const c of Array.from(zones.children) as HTMLElement[]) { const z = c.dataset["z"] as Zone; place(c, zr[z]); c.classList.toggle("is-on", z === (hit as Hit).zone); }
+      }
+    };
+    const move = (m: PointerEvent): void => {
+      if (!on) {
+        if (Math.hypot(m.clientX - sx, m.clientY - sy) < 6) return;
+        on = true; dragged = true;
+        menuOpen.set(false);
+        try { source.setPointerCapture(pid); } catch { /* the pointer is gone */ }
+        shield(true, "grabbing");
+        ghost = runIn(() => dragGhost(div("m-dock-ghost", {}, titleOf(id)), { motion: () => val(props.motion) !== false }));
+        over.append(zones, preview, mark);
+      }
+      paint(m.clientX, m.clientY);
+    };
+    const stop = (drop: boolean): void => {
+      removeEventListener("pointermove", move); removeEventListener("pointerup", up); removeEventListener("pointercancel", cancel); removeEventListener("keydown", key, true);
+      if (!on) return;
+      shield(false); ghost?.close(); zones.remove(); preview.remove(); mark.remove();
+      setTimeout(() => { dragged = false; }, 0);
+      const h0 = hit as Hit | null;
+      if (drop && h0 && L) {
+        let at: number | undefined = h0.onTabs && idx !== null ? idx : undefined;
+        const src = C.groupOf(L, id);
+        if (at !== undefined && src && src.id === h0.target && src.panels.indexOf(id) < at) at--;
+        commit(C.movePanel(L, id, h0.target, h0.zone, at), { anim: true });
+      }
+    };
+    const up = (): void => stop(true), cancel = (): void => stop(false);
+    const key = (k: KeyboardEvent): void => { if (k.key === "Escape") { k.preventDefault(); k.stopPropagation(); stop(false); } };
+    addEventListener("pointermove", move); addEventListener("pointerup", up); addEventListener("pointercancel", cancel); addEventListener("keydown", key, true);
+  }
+  const runIn = <T>(fn: () => T): T => createRoot(() => fn(), owner);
+
+  // ---------------------------------------------------------------- menus (the shared menu panel)
+  function panelMenu(id: string): MenuItem[] {
+    const V = view() as DockTree, g = C.groupOf(V, id) as C.TabsNode | null;
+    if (!g) return [];
+    if (narrow) return defs.map((d) => ({ label: titleOf(d.id), checked: g.active === d.id, onSelect: () => openPanel(d.id) }));
+    const i = g.panels.indexOf(id), items: MenuItem[] = [];
+    if (g.panels.length > 1) {
+      items.push({ label: () => t`Move tab left`, disabled: i === 0, onSelect: () => moveWithFocus(C.moveTab(V, id, i - 1), id) });
+      items.push({ label: () => t`Move tab right`, disabled: i === g.panels.length - 1, onSelect: () => moveWithFocus(C.moveTab(V, id, i + 1), id) });
+      items.push("-");
+    }
+    const edge: [C.Side, () => string][] = [["left", () => t`Dock to the left edge`], ["right", () => t`Dock to the right edge`], ["top", () => t`Dock to the top edge`], ["bottom", () => t`Dock to the bottom edge`]];
+    for (const [z, label] of edge) items.push({ label, onSelect: () => L && moveWithFocus(C.movePanel(L, id, C.ROOT, z), id) });
+    for (const o of C.groups(V.root)) if (o.id !== g.id) items.push({ label: () => t`Join as a tab: ${o.panels.map(titleOf).join(" · ")}`, onSelect: () => L && moveWithFocus(C.movePanel(L, id, o.id, "center"), id) });
+    items.push("-");
+    items.push({ label: () => t`Collapse to a strip`, disabled: !C.canCollapse(V, g.id), onSelect: () => collapse(g.id) });
+    items.push({ label: () => (V.max === g.id ? t`Back to its size` : t`Fill the whole area`), onSelect: () => toggleMax(g.id) });
+    items.push({ label: () => t`Reset this panel`, onSelect: () => { const p = panels.get(id); if (p && L) commit(C.resetPanel(L, p.def, defs), { anim: true }); } });
+    items.push({ label: () => t`Reset layout`, onSelect: () => commit(base0(), { anim: true }) });
+    return items;
+  }
+  function layoutMenu(): MenuItem[] {
+    const V = view();
+    const isOpen = (id: string): boolean => { const g = V && C.groupOf(V, id); return !!g && !g.collapsed && g.active === id; };
+    const panelItems: MenuItem[] = defs.map((d) => ({ label: titleOf(d.id), icon: d.icon, checked: isOpen(d.id), onSelect: () => togglePanel(d.id) }));
+    if (narrow) return panelItems;
+    const names = Object.keys(saved).sort((a, b) => a.localeCompare(b));
+    return [
+      ...presetNames.map((k): MenuItem => ({ label: (presets[k] as Preset).title, onSelect: () => commit(C.presetLayout(presets[k], defs), { anim: true }) })),
+      ...(presetNames.length ? ["-" as const] : []),
+      ...names.map((n): MenuItem => ({ label: n, sub: () => t`saved layout`, onSelect: () => commit(C.restoreLayout(saved[n], defs) ?? base0(), { anim: true }) })),
+      ...(store ? [{ label: () => t`Save this layout`, onSelect: saveAs } as MenuItem] : []),
+      ...(names.length ? [{ label: () => t`Delete saved layouts`, danger: true, onSelect: () => { saved = {}; writeSaved(); } } as MenuItem] : []),
+      "-",
+      ...panelItems,
+      "-",
+      { label: () => t`Open all panels`, onSelect: () => { if (L) commit(C.expandAll(L), { anim: true }); } },
+      { label: () => t`Reset to default`, onSelect: () => commit(base0(), { anim: true }) },
+    ];
+  }
+  function togglePanel(id: string): void {
+    const V = view(), g = V && C.groupOf(V, id);
+    if (!g) return;
+    if (narrow || g.collapsed || g.active !== id) { openPanel(id); focusTab(id); } else collapse(g.id);
+  }
+  function saveAs(): void {
+    if (!L) return;
+    let n = 1;
+    while (saved[t`Layout ${n}`]) n++;
+    saved[t`Layout ${n}`] = C.serialize(L);
+    writeSaved();
+  }
+  function openPanel(id: string): void {
+    const V = view();
+    if (!panels.has(id) || !V) return;
+    commit(narrow ? C.setActive(V, id) : C.reveal(L as DockTree, id, fit()), { anim: !narrow });
+  }
+
+  // ---------------------------------------------------------------- persistence
+  const writeSaved = (): void => { if (store) void Promise.resolve(store.set(key("saved"), saved)).catch(() => undefined); };
+  function persist(now = false): void {
+    clearTimeout(saveT);
+    const write = (): void => { if (L && store && !focusSaved) void Promise.resolve(store.set(key("layout"), C.serialize(L))).catch(() => undefined); };
+    if (now) write(); else saveT = setTimeout(write, 250);
+  }
+
+  // ---------------------------------------------------------------- panels (the list may change: editors open and close)
+  function addPanel(def: DockPanel): void {
+    defs.push(def);
+    createRoot((dispose) => {
+      const body = div("m-dock-panel is-hidden is-snap", { id: `${base}-p-${def.id}`, role: "tabpanel", "aria-labelledby": `${base}-t-${def.id}` }, def.content());
+      const stab: HTMLElement = h(Button, {
+        variant: "ghost", size: "sm", class: "m-dock-stab", icon: def.icon, "aria-expanded": "false", title: () => `${val(def.title)} · ${t`Open panel`}`,
+        onClick: () => { if (!dragged) restore(def.id); },
+        onPointerdown: (p: PointerEvent) => { if (p.button === 0) armDrag(p, def.id, stab); },
+        onContextmenu: (c: MouseEvent) => { c.preventDefault(); openMenu(stab, panelMenu(def.id)); },
+      }, h("span", { class: "m-dock-stl" }, () => val(def.title))) as HTMLElement;
+      over.before(body);
+      panels.set(def.id, { def, el: body, stab, shown: false, dispose });
+    }, owner);
+  }
+  function dropPanel(id: string): void {
+    const p = panels.get(id);
+    if (!p) return;
+    panels.delete(id);
+    defs.splice(defs.findIndex((d) => d.id === id), 1);
+    p.stab.remove(); p.el.remove(); p.dispose();
+  }
+  effect(() => {
+    const list = val(props.panels) ?? [];
+    untrack(() => {
+      const ids = new Set(list.map((p) => p.id));
+      const gone = [...panels.keys()].filter((id) => !ids.has(id)), fresh = list.filter((p) => !panels.has(p.id));
+      if (!gone.length && !fresh.length) return;
+      for (const id of gone) dropPanel(id);
+      for (const p of fresh) addPanel(p);
+      if (!started) return;
+      // new panels go to their `place` (or next to the panel `place.near` names), gone ones leave the tree
+      L = L ? (C.restoreLayout(C.serialize(L), defs) ?? base0()) : base0();
+      for (const p of fresh) if (L) L = C.reveal(L, p.id, fit());
+      if (narrow) phone = C.singleLayout(defs, fresh[0]?.id ?? (phone?.root.t === "tabs" ? phone.root.active : null));
+      L$.set(view());
+      if (L) { persist(); props.onChange?.(L); }
+      render(true);
+    });
+  });
+  function syncNarrow(): void {
+    const n = root.clientWidth > 0 && root.clientWidth < NARROW;
+    if (n === narrow) return;
+    menuOpen.set(false);
+    narrow = n;
+    root.classList.toggle("is-narrow", n);
+    if (n && L) { const open = C.groups(L.root).find((g) => !g.collapsed); phone = C.singleLayout(defs, open?.active); }
+    L$.set(view());
+  }
+
+  // ---------------------------------------------------------------- start
+  started = true;
+  L = base0();
+  L$.set(L);
+  root.classList.add("is-pending");
+  void (async () => {
+    try {
+      const raw = store ? await store.get(key("layout")) : null;
+      const got = raw ? C.restoreLayout(raw, defs) : null;
+      if (got) { L = got; if (!narrow) L$.set(L); render(); }
+      saved = ((store ? await store.get(key("saved")) : null) as Record<string, DockTree> | null) ?? {};
+    } catch { /* no storage: the default stays */ }
+    root.classList.remove("is-pending");
+  })();
+  const stopSize = observeSize(root, () => { syncNarrow(); render(); });
+  const onHide = (): void => { if (saveT) persist(true); };
+  addEventListener("pagehide", onHide);
+  onCleanup(() => { stopSize(); shield(false); removeEventListener("pagehide", onHide); onHide(); });
+
+  const prefix = props.commands === false ? null : (props.commands ?? "dock");
+  if (prefix) {
+    const cmds = [
+      command({ id: `${prefix}.reset`, title: () => t`Reset layout`, group: t`Layout`, run: () => { commit(base0(), { anim: true }); } }),
+      command({ id: `${prefix}.expandAll`, title: () => t`Open all panels`, group: t`Layout`, run: () => { if (L) commit(C.expandAll(L), { anim: true }); } }),
+      ...presetNames.map((k) => command({ id: `${prefix}.preset.${k}`, title: () => `${t`Layout`}: ${(presets[k] as Preset).title}`, group: t`Layout`, run: () => { commit(C.presetLayout(presets[k], defs), { anim: true }); } })),
+    ];
+    onCleanup(() => cmds.forEach((c) => c.dispose()));
+  }
 
   props.api?.({
-    state: () => state(), load: (v) => { const s = Array.isArray(v) || !("version" in (v as object)) ? fromSpec(v as DockSpec) : sanitize(v, known); if (s) commit(s); },
-    reset, open, close: (p) => void close(p), focus: focusPanel, move: (p, tg, z, i) => move(p, tg, z, i), float: (p) => float(p), dock: dockBack,
-    minimize, restore, toggleMaximize, active: current,
+    layout: () => L$(),
+    open: openPanel,
+    focus: (id) => { openPanel(id); queueMicrotask(() => focusTab(id)); },
+    collapse: (id) => { const g = view() && C.groupOf(view() as DockTree, id); if (g) collapse(g.id); },
+    close: (id) => { void closePanel(id); },
+    toggleMaximize: (id) => { const g = view() && C.groupOf(view() as DockTree, id); if (g) toggleMax(g.id); },
+    focusMode: (id) => {
+      if (!panels.has(id)) return;
+      if (narrow) { openPanel(id); return; }
+      if (focusSaved || !L) return;
+      focusSaved = L;
+      commit(C.focusOnly(L, id, fit()), { anim: true, save: false });
+    },
+    unfocus: () => { if (!focusSaved) return; const back = focusSaved; focusSaved = null; commit(C.normalize(back), { anim: true }); },
+    preset: (name) => { commit(C.presetLayout(presets[name], defs) ?? base0(), { anim: true }); },
+    reset: () => { commit(base0(), { anim: true }); },
+    expandAll: () => { if (L) commit(C.expandAll(L), { anim: true }); },
+    isOpen: (id) => { const g = view() && C.groupOf(view() as DockTree, id); return !!g && !g.collapsed; },
+    load: (x) => { commit("t" in x ? C.restoreLayout(C.fromTree(x), defs) : C.restoreLayout(x, defs), { anim: true }); },
+    layoutMenu,
   });
-
-  return h("div", {
-    class: () => cx("m-dock", state().maximized && "has-maximized", val(props.class)), role: "region",
-    "aria-roledescription": () => L().workspace ?? t`workspace`, "aria-label": () => val(props.label) ?? t`Workspace`,
-    ref: (x: HTMLElement) => {
-      root = x;
-      observeSize(x, () => narrow.set(x.clientWidth > 0 && x.clientWidth < 544));
-    }, onKeydown,
-  },
-  h("div", { class: "m-dock-main" }, tree),
-  tray,
-  h("div", { class: "m-dock-preview", "aria-hidden": "true", ref: (x: HTMLElement) => { preview = x; } }));
+  return root;
 }
-

@@ -3,6 +3,7 @@ export * from "./layout/accordion/index.ts";
 export * from "./navigation/activity-bar/index.ts";
 export * from "./feedback/alert/index.ts";
 export * from "./layout/app-shell/index.ts";
+export * from "./composite/app-ui/index.ts";
 export * from "./social/avatar/index.ts";
 export * from "./social/avatar-group/index.ts";
 export * from "./data/badge/index.ts";

@@ -29,6 +29,7 @@ export const parts: Record<string, () => Promise<unknown>> = {
   DatePicker: () => import("./forms/date-picker/index.ts").then((m) => (m as Record<string, unknown>)["DatePicker"]),
   Dialog: () => import("./overlays/dialog/index.ts").then((m) => (m as Record<string, unknown>)["Dialog"]),
   Disclosure: () => import("./layout/disclosure/index.ts").then((m) => (m as Record<string, unknown>)["Disclosure"]),
+  DockLayout: () => import("./composite/dock-layout/index.ts").then((m) => (m as Record<string, unknown>)["DockLayout"]),
   Drawer: () => import("./overlays/drawer/index.ts").then((m) => (m as Record<string, unknown>)["Drawer"]),
   EasingCurveEditor: () => import("./motion/easing-curve-editor/index.ts").then((m) => (m as Record<string, unknown>)["EasingCurveEditor"]),
   EditorFrame: () => import("./composite/editor-frame/index.ts").then((m) => (m as Record<string, unknown>)["EditorFrame"]),

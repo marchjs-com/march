@@ -186,6 +186,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout. | [DockLayout](#docklayout), [Menu](#menu) |
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | [Badge](#badge), [OverflowText](#overflowtext), [ListRow](#listrow), [Drawer](#drawer) |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | [Menu](#menu), [Textarea](#textarea), [ReactionPicker](#reactionpicker), [IconButton](#iconbutton), [StatusDot](#statusdot), [ReplyQuote](#replyquote) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), [Avatar](#avatar), [Button](#button), [Picture](#picture) |
@@ -193,7 +194,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | [IconButton](#iconbutton), [Segmented](#segmented), [Badge](#badge), [SectionLabel](#sectionlabel), [Slider](#slider), [Swatch](#swatch), [TextInput](#textinput) |
 | CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | [Dialog](#dialog), [SearchBox](#searchbox), [ListRow](#listrow), [SectionLabel](#sectionlabel), [Empty](#empty), [Kbd](#kbd), [OverflowText](#overflowtext) |
 | ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | [Button](#button), [Card](#card), [Dialog](#dialog), [Toggle](#toggle), [Stack](#stack), [Empty](#empty) |
-| DockLayout | experimental | IDE workspace: split areas of tab groups; drag tabs to a side, centre, between tabs or out (floating); maximize, minimize to a tray, save / load, keyboard docking, RTL. | [Splitter](#splitter), [Tabs](#tabs), [IconButton](#iconbutton), [Button](#button), [Empty](#empty), Toolbar, [ResizeHandle](#resizehandle), [OverflowText](#overflowtext), Portal |
+| DockLayout | experimental | IDE workspace (the dock of march-app-ui): tab groups in rows and columns; drag tabs to a side, centre, between tabs or the outer edge; closing collapses a group to a strip and keeps its size; maximize, presets, saved layouts, focus mode, narrow mode. | [Tabs](#tabs), [IconButton](#iconbutton), [Button](#button), [ResizeHandle](#resizehandle), [Menu](#menu) |
 | EditorFrame | experimental | The frame of an editor: border and focus ring around a head bar (toolbar, search, tabs), the editing area and a foot bar (counts, hints); each bar optional, colour and states yours. | [PanelHeader](#panelheader) |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), [Skeleton](#skeleton), [Button](#button), [Empty](#empty), [StatusDot](#statusdot) |
 | FlowCanvas | experimental | Node editor: endless canvas (pan, zoom, snap), ports and bezier edges with flowing dots, selection, copy/paste, undo, minimap, auto layout, groups, context menu, JSON schema. | [ContextMenu](#contextmenu), [IconButton](#iconbutton), Toolbar, [OverflowText](#overflowtext), [IconTile](#icontile), [StatusDot](#statusdot), [CheckMark](#checkmark), [Alert](#alert), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Select](#select), [Toggle](#toggle), [Button](#button), [CopyButton](#copybutton), [UndoRedo](#undoredo), [JsonEditor](#jsoneditor), [FlowControls](#flowcontrols), [FlowPalette](#flowpalette), [Tabs](#tabs) |
@@ -309,6 +310,21 @@ Composed of: [Layout](#layout)
 ```
 
 Full page: src/components/layout/app-shell/docs.md
+
+## AppUI
+
+march-app-ui, the core of March IDE and the base of an IDE shell: a top bar (a title, your tools and the **Layout** menu), a side slot (an ActivityBar), the [DockLayout](#docklayout) workspace and a status slot (a StatusBar). The Layout menu lists the presets, the saved layouts ("Save this layout"), every panel (checked when it is open; choosing one opens or collapses it), "Open all panels" and "Reset to default". Colours come from the page's theme and accent. Activity bars, status bars and editors are built on top of it.
+
+Composed of: [DockLayout](#docklayout), [Menu](#menu)
+
+```tsx
+<AppUI title="march-app-ui" panels={panels} presets={{
+  default: { title: "Default", tree: () => row([.24, tabs("files")], [.76, col([.7, tabs("editor")], [.3, tabs("console")])]) },
+  code: { title: "Code", tree: () => row([.2, tabs("files", { collapsed: true })], [.8, tabs(["editor", "console"])]) },
+}} persist="my-ide" tools={<Button>Run</Button>} />
+```
+
+Full page: src/components/composite/app-ui/docs.md
 
 ## Avatar
 
@@ -930,17 +946,17 @@ Full page: src/components/layout/disclosure/docs.md
 
 ## DockLayout
 
-An IDE workspace: split areas holding tab groups. Drag a tab to a **side** of a group (a new split), onto its **centre** or **between two tabs** (a tab there), to an **edge** of the whole layout, or **out** of it (a floating window). An animated preview shows where it will land. Groups maximize, panels minimize to a tray, and the layout is saved and loaded as plain JSON. Each panel's content is rendered once and moves between groups without being rebuilt.
+An IDE workspace, the dock of march-app-ui (after HADİ Studio Kit): tab groups in rows and columns. Drag a tab to a **side** of a group (a new split), onto its **centre** or **between two tabs** (a tab there), or to the **outer edge** of the whole layout. Closing never deletes: the group **collapses to a strip** (vertical in a row, horizontal in a column) and gets its size back when opened. Groups fill the whole area, layouts come from presets and are saved as plain JSON. Panels never move in the DOM: an iframe keeps running, an editor keeps its state.
 
-Composed of: [Splitter](#splitter), [Tabs](#tabs), [IconButton](#iconbutton), [Button](#button), [Empty](#empty), Toolbar, [ResizeHandle](#resizehandle), [OverflowText](#overflowtext), Portal
+Composed of: [Tabs](#tabs), [IconButton](#iconbutton), [Button](#button), [ResizeHandle](#resizehandle), [Menu](#menu)
 
 ```tsx
 <DockLayout panels={[
-  { id: "files", title: "Files", icon: folder, content: () => <FileTree /> },
+  { id: "files", title: "Files", icon: folder, min: [150, 120], content: () => <FileTree /> },
   { id: "editor", title: "main.ts", icon: fileText, content: () => <Editor />, dirty: () => $dirty },
   { id: "console", title: "Console", icon: terminal, content: () => <Console /> },
-]} layout={{ row: [["files"], { column: [["editor"], ["console"]], share: .68 }], share: .26 }}
-   persist="ide.layout" storage={storage().local} api={(a) => dock = a} />
+]} presets={{ main: { title: "Main", tree: () => row([.26, tabs("files")], [.74, col([.68, tabs("editor")], [.32, tabs("console")])]) } }}
+   persist="ide.layout" api={(a) => dock = a} />
 ```
 
 Full page: src/components/composite/dock-layout/docs.md
