@@ -13,18 +13,27 @@ import { mediaKind, type MediaKind } from "./kind.ts";
 export { mediaKind, type MediaKind };
 
 export interface MediaProps {
+  /** Address of the media; when empty, "No media" is shown. @tr Medyanın adresi; boşsa "No media" gösterilir. */
   src: MaybeFn<string | null | undefined>;
+  /** image (default), video, audio or auto (from the extension, `mediaKind(src)`). @tr image (varsayılan), video, audio ya da auto (uzantıdan, `mediaKind(src)`). */
   kind?: MaybeFn<MediaKind | "auto" | undefined>;
+  /** Alternative text of an image (default ""). @tr Görselin alternatif metni (varsayılan ""). */
   alt?: MaybeFn<string | undefined>;
+  /** Image shown before a video plays. @tr Video oynatılmadan önce gösterilen görselin adresi. */
   poster?: MaybeFn<string | undefined>;
+  /** Player controls for video and audio (default true). @tr Video ve ses için oynatıcı denetimleri (varsayılan true). */
   controls?: boolean;
+  /** Video or audio starts by itself (default false). @tr Video ya da ses kendiliğinden başlar (varsayılan false). */
   autoplay?: boolean | undefined;
+  /** Video or audio plays again from the start (default false). @tr Video ya da ses başa dönüp tekrar çalar (varsayılan false). */
   loop?: boolean;
+  /** Video or audio starts muted (default false). @tr Video ya da ses sessiz başlar (varsayılan false). */
   muted?: boolean;
-  /** "sm" thumbnail, "md". */
+  /** "sm": a square thumbnail, "md". @tr "sm" kare küçük resim, "md". */
   size?: MaybeFn<"sm" | "md" | undefined>;
-  /** Shown when loading fails or there is no `src`: text or a node (defaults "Could not load media" / "No media", translated). */
+  /** Shown when loading fails or there is no `src`: text or a node (defaults "Could not load media" / "No media", translated). @tr Yükleme başarısız olunca ya da `src` yokken gösterilir: metin ya da düğüm (varsayılanlar "Could not load media" / "No media", çevrilir). */
   fallback?: MaybeFn<unknown>;
+  /** Extra class on the media element. @tr Medya öğesine eklenen sınıf. */
   class?: ClassProp;
 }
 

@@ -14,18 +14,25 @@ import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { withColor } from "../../../theme/colors.ts";
 
 export interface CarouselProps {
-  label?: MaybeFn<string | undefined>; /** Slides per view on wide screens. */ perView?: 1 | 2 | 3 | 4; class?: ClassProp; children?: unknown;
-  /** Accessible names of the buttons and dots (defaults are translated): `{ previous, next, slide: (n) => "Photo " + n }`. */
+  /** Accessible name of the carousel (default "Carousel", translated). @tr Atlıkarıncanın erişilebilir adı (varsayılan "Carousel", çevrilir). */
+  label?: MaybeFn<string | undefined>;
+  /** Slides per view on wide screens. @tr Geniş ekranlarda görünümdeki slayt sayısı (varsayılan 1). */
+  perView?: 1 | 2 | 3 | 4;
+  /** Extra class on the carousel. @tr Atlıkarıncaya eklenen sınıf. */
+  class?: ClassProp;
+  /** The slides. @tr Slaytlar. */
+  children?: unknown;
+  /** Accessible names of the buttons and dots (defaults are translated): `{ previous, next, slide: (n) => "Photo " + n }`. @tr Düğmelerin ve noktaların erişilebilir adları (varsayılanlar çevrilir): `{ previous, next, slide: (n) => "Photo " + n }`. */
   labels?: { previous?: string; next?: string; slide?: (n: number) => string } | undefined;
-  /** The previous / next buttons (default true). */
+  /** The previous / next buttons (default true). @tr Önceki / sonraki düğmeleri (varsayılan true). */
   arrows?: boolean | undefined;
-  /** Glyph or node of the previous button (default: a chevron). */
+  /** Glyph or node of the previous button (default: a chevron). @tr Önceki düğmesinin glifi ya da düğümü (varsayılan: bir ok). */
   prevIcon?: unknown;
-  /** Glyph or node of the next button (default: a chevron). */
+  /** Glyph or node of the next button (default: a chevron). @tr Sonraki düğmesinin glifi ya da düğümü (varsayılan: bir ok). */
   nextIcon?: unknown;
-  /** The dots: true (default), false, or `(index, active) => content` drawn inside each dot button. */
+  /** The dots: true (default), false, or `(index, active) => content` drawn inside each dot button. @tr Noktalar: true (varsayılan), false ya da her nokta düğmesinin içine çizilen `(index, active) => content`. */
   dots?: boolean | ((index: number, active: () => boolean) => unknown) | undefined;
-  /** Buttons and dots scroll smoothly (default true); false jumps. */
+  /** Buttons and dots scroll smoothly (default true); false jumps. @tr Düğmeler ve noktalar yumuşak kaydırır (varsayılan true); false ile atlar. */
   smooth?: boolean | undefined;
 }
 /** Scroll-snap carousel with buttons and dots (swipe on touch): `<Carousel perView={3}>{slides}</Carousel>` */

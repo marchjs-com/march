@@ -30,36 +30,55 @@ export interface DrawContext {
 export type DrawFn = (ctx: CanvasRenderingContext2D, info: DrawContext) => void;
 
 export interface OverlayProps {
-  /** Image or video URL (type from the extension, or `type`). */
+  /** Image or video URL (type from the extension, or `type`). @tr Görsel ya da video adresi (tür uzantıdan ya da `type`'tan). */
   src?: MaybeFn<string | undefined>;
+  /** Layer kind: image, video or svg (without it, from the `src` extension). @tr Katman türü: image, video ya da svg (verilmezse `src` uzantısından). */
   type?: "image" | "video" | "svg";
-  srcset?: string; sizes?: string;
-  /** Video poster (also shown instead of the video on save-data / reduced motion). */
+  /** Responsive sources of the image (with `sizes`). @tr Görselin duyarlı kaynakları (`sizes` ile birlikte). */
+  srcset?: string;
+  /** Display widths for `srcset` (img sizes). @tr `srcset` için görüntülenme genişlikleri (img sizes). */
+  sizes?: string;
+  /** Video poster (also shown instead of the video on save-data / reduced motion). @tr Video afişi (save-data ya da azaltılmış harekette videonun yerine de gösterilir). */
   poster?: string;
-  /** A meaningful description; without it the overlay is decorative (aria-hidden). */
+  /** A meaningful description; without it the overlay is decorative (aria-hidden). @tr Anlamlı bir açıklama; verilmezse katman süs sayılır (aria-hidden). */
   alt?: string;
-  /** Inline SVG (an element or a component result). */
+  /** Inline SVG (an element or a component result). @tr Satır içi SVG (bir öğe ya da bileşen sonucu). */
   svg?: unknown;
-  /** Draw on a canvas sized to the container (devicePixelRatio aware). */
+  /** Draw on a canvas sized to the container (devicePixelRatio aware). @tr Kapsayıcı boyutunda bir canvas'a çizer (devicePixelRatio'yu hesaba katar). */
   draw?: DrawFn;
-  /** Redraw every frame (paused while not visible and with reduced motion). */
+  /** Redraw every frame (paused while not visible and with reduced motion). @tr Her karede yeniden çizer (görünmezken ve azaltılmış harekette durur). */
   animate?: boolean;
+  /** A ready CSS effect: glass, gradient, mesh, noise, vignette, spotlight, grid or dots. @tr Hazır CSS efekti: glass, gradient, mesh, noise, vignette, spotlight, grid ya da dots. */
   effect?: OverlayEffect;
+  /** object-fit of the image or video (default cover). @tr Görsel ya da videonun object-fit değeri (varsayılan cover). */
   fit?: OverlayFit;
-  /** object-position ("center", "50% 20%"). */
+  /** object-position ("center", "50% 20%"). @tr object-position ("center", "50% 20%"). */
   position?: string;
-  inset?: OverlayLength; top?: OverlayLength; right?: OverlayLength; bottom?: OverlayLength; left?: OverlayLength;
-  /** Logical edges (RTL aware). */
-  start?: OverlayLength; end?: OverlayLength;
+  /** Distance from all four edges: a space step (0–8) or a CSS length (default 0); `top` / `right` / `bottom` / `left` set one edge. @tr Dört kenarın uzaklığı: boşluk adımı (0–8) ya da CSS uzunluğu (varsayılan 0); `top` / `right` / `bottom` / `left` tek kenar içindir. */
+  inset?: OverlayLength;
+  /** Distance from the top edge: a space step (0–8) or a CSS length. @tr Üst kenara uzaklık: boşluk adımı (0–8) ya da CSS uzunluğu. */
+  top?: OverlayLength;
+  /** Distance from the right edge: a space step (0–8) or a CSS length. @tr Sağ kenara uzaklık: boşluk adımı (0–8) ya da CSS uzunluğu. */
+  right?: OverlayLength;
+  /** Distance from the bottom edge: a space step (0–8) or a CSS length. @tr Alt kenara uzaklık: boşluk adımı (0–8) ya da CSS uzunluğu. */
+  bottom?: OverlayLength;
+  /** Distance from the left edge: a space step (0–8) or a CSS length. @tr Sol kenara uzaklık: boşluk adımı (0–8) ya da CSS uzunluğu. */
+  left?: OverlayLength;
+  /** Distance from the logical start edge (left in left-to-right text, RTL aware). @tr Mantıksal başlangıç kenarına uzaklık (soldan sağa metinde sol; RTL'ye uyar). */
+  start?: OverlayLength;
+  /** Distance from the logical end edge (right in left-to-right text, RTL aware). @tr Mantıksal bitiş kenarına uzaklık (soldan sağa metinde sağ; RTL'ye uyar). */
+  end?: OverlayLength;
+  /** Opacity of the layer, 0–1 (default 1). @tr Katmanın saydamlığı, 0–1 (varsayılan 1). */
   opacity?: MaybeFn<number | undefined>;
-  /** mix-blend-mode */
+  /** mix-blend-mode (default normal). @tr mix-blend-mode (varsayılan normal). */
   blend?: string;
-  /** Above the container's content (glass, foreground effects). Default: behind it. */
+  /** Above the container's content (glass, foreground effects). Default: behind it. @tr Kapsayıcının içeriğinin üstünde (cam, ön plan efektleri). Varsayılan: arkasında. */
   front?: boolean;
-  /** Explicit order instead of insertion order. */
+  /** Explicit order instead of insertion order. @tr Ekleme sırası yerine açık bir sıra. */
   layer?: number;
-  /** Rarely needed: let the overlay take pointer input. */
+  /** Rarely needed: let the overlay take pointer input. @tr Nadiren gerekir: katmanın işaretçi girdisi almasına izin verir. */
   interactive?: boolean;
+  /** Extra class on the layer. @tr Katmana eklenen sınıf. */
   class?: ClassProp;
 }
 

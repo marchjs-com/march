@@ -12,19 +12,25 @@ import { IconTile, type IconTone } from "../../data/icon-tile/index.ts";
 import { withColor } from "../../../theme/colors.ts";
 
 export interface LinkCardProps {
+  /** The whole card links here (router `Link`: prefetch, active state). @tr Kartın tamamı bu bağlantıdır (router `Link`: önceden yükleme, etkin durum). */
   href: Href;
+  /** The title: one line; it scrolls on hover when it does not fit. @tr Başlık: tek satır; sığmazsa üzerine gelince kayar. */
   title: MaybeFn<unknown>;
+  /** Description text or node under the title. @tr Başlığın altındaki açıklama metni ya da düğümü. */
   description?: MaybeFn<unknown>;
+  /** Icon drawn in an IconTile. @tr IconTile içinde çizilen ikon. */
   icon?: unknown;
+  /** IconTile tone of the icon tile (default primary). @tr İkon kutusunun IconTile tonu (varsayılan primary). */
   tone?: MaybeFn<IconTone | undefined>;
-  /** Theme colour token of the icon tile (wins over `tone`). */
+  /** Theme colour token of the icon tile (wins over `tone`). @tr İkon kutusunun tema renk belirteci (`tone`'a baskın gelir). */
   color?: MaybeFn<ColorToken | undefined>;
-  /** Own node at the start instead of the icon tile (an Avatar, a picture). */
+  /** Own node at the start instead of the icon tile (an Avatar, a picture). @tr İkon kutusu yerine başta kendi düğümün (bir Avatar, bir resim). */
   lead?: unknown;
-  /** Small text on the right (a count, a status). */
+  /** Small text on the right (a count, a status). @tr Sağda küçük metin (bir sayı, bir durum). */
   meta?: MaybeFn<unknown>;
-  /** The arrow shown on hover and focus: true (default), false, or your own node. */
+  /** The arrow shown on hover and focus: true (default), false, or your own node. @tr Üzerine gelince ve odakta görünen ok: true (varsayılan), false ya da kendi düğümün. */
   arrow?: boolean | Node | undefined;
+  /** Extra class on the card. @tr Karta eklenen sınıf. */
   class?: ClassProp;
   [attr: string]: unknown;
 }

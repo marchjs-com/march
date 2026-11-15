@@ -7,16 +7,21 @@ import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface StepItem { title: unknown; description?: unknown; icon?: unknown }
 export interface StepsProps {
+  /** The steps: `{ title, description?, icon? }`. @tr Adımlar: `{ title, description?, icon? }`. */
   steps: readonly StepItem[];
+  /** Current step (0-based). @tr Geçerli adım (0'dan başlar). */
   current: MaybeFn<number>;
+  /** Called with a step's index; when given, each step is a button. @tr Bir adımın dizinini alarak çağrılır; verilince her adım bir düğme olur. */
   onSelect?: (i: number) => void;
+  /** Steps as a vertical list (default false). @tr Adımlar dikey bir liste (varsayılan false). */
   vertical?: boolean;
-  /** Mark of a done step: the check (default), your own icon (an IconDef or a short string), or false to keep the number / step icon. */
+  /** Mark of a done step: the check (default), your own icon (an IconDef or a short string), or false to keep the number / step icon. @tr Tamamlanan adımın işareti: onay (varsayılan), kendi ikonun (IconDef ya da kısa metin) ya da numarayı / adım ikonunu korumak için false. */
   doneIcon?: unknown;
-  /** Your own dot content: `(i, state, step) => node` (replaces the number, the step icon and the check). */
+  /** Your own dot content: `(i, state, step) => node` (replaces the number, the step icon and the check). @tr Kendi nokta içeriğin: `(i, state, step) => node` (numaranın, adım ikonunun ve onay işaretinin yerine geçer). */
   renderDot?: ((i: number, state: "done" | "current" | "todo", step: StepItem) => unknown) | undefined;
-  /** The line between the steps (default true). */
+  /** The line between the steps (default true). @tr Adımlar arasındaki çizgi (varsayılan true). */
   connector?: boolean | undefined;
+  /** Extra class on the list. @tr Listeye eklenen sınıf. */
   class?: ClassProp;
 }
 /** Progress through stages: `<Steps steps={[{ title: "Account" }, …]} current={$step} onSelect={(i) => $step = i} />` */

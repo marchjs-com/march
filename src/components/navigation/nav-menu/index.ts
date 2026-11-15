@@ -41,38 +41,47 @@ export interface NavItem {
 export type NavSort = "alpha" | "none" | false | ((a: { title: MaybeFn<string> }, b: { title: MaybeFn<string> }) => number);
 
 export interface NavMenuProps {
+  /** The pages: `{ id, title, href, icon?, group?, badge?, keywords?, can?, hidden? }` (an array or an accessor). @tr Sayfalar: `{ id, title, href, icon?, group?, badge?, keywords?, can?, hidden? }` (dizi ya da erişimci). */
   items: MaybeFn<readonly (NavItem | null | undefined | false)[] | null | undefined>;
-  /** localStorage key for pins, recents and collapsed groups (default "m.nav"). */
+  /** localStorage key for pins, recents and collapsed groups (default "m.nav"). @tr Sabitlenenler, son açılanlar ve katlanmış gruplar için localStorage anahtarı (varsayılan "m.nav"). */
   storageKey?: string;
+  /** Most items in the Pinned block (default 8). @tr Sabitlenenler bloğunda en çok kaç öğe olur (varsayılan 8). */
   maxPinned?: number;
+  /** Most items in the Recent block (default 5); 0: no Recent block. @tr Son açılanlar bloğunda en çok kaç öğe olur (varsayılan 5); 0 ile blok yok. */
   maxRecent?: number;
+  /** Item order within a group: "alpha" (default), "none" / false or a compare function. @tr Grup içindeki öğe sırası: "alpha" (varsayılan), "none" / false ya da bir karşılaştırma fonksiyonu. */
   sort?: NavSort;
+  /** The top slot (logo, product name). @tr Üstteki yuva (logo, ürün adı). */
   brand?: unknown;
+  /** The bottom slot. @tr Alttaki yuva. */
   footer?: unknown;
+  /** Accessible name of the nav (default "Main", translated). @tr nav öğesinin erişilebilir adı (varsayılan "Main", çevrilir). */
   label?: MaybeFn<string | undefined>;
-  /** false: no filter box. */
+  /** false: no filter box. @tr false: süzme kutusu yok. */
   filter?: boolean;
-  /** false: do not register the pages with the command palette. */
+  /** false: do not register the pages with the command palette. @tr false: sayfalar komut paletine kaydedilmez. */
   palette?: boolean;
-  /** Show a button that collapses the sidebar to an icon rail (state persists). */
+  /** Show a button that collapses the sidebar to an icon rail (state persists). @tr Kenar çubuğunu bir ikon rayına katlayan bir düğme gösterir (durum saklanır). */
   collapsible?: boolean;
-  /** Groups start collapsed; the group of the active page opens itself. */
+  /** Groups start collapsed; the group of the active page opens itself. @tr Gruplar katlanmış başlar; etkin sayfanın grubu kendiliğinden açılır. */
   groupsCollapsed?: boolean;
-  /** Icons for group headings (also the default icon of the group's items): `{ "Billing": wallet }`. */
+  /** Icons for group headings (also the default icon of the group's items): `{ "Billing": wallet }`. @tr Grup başlıklarının ikonları (grubun öğelerinin varsayılan ikonu da): `{ "Billing": wallet }`. */
   groupIcons?: Readonly<Record<string, unknown>>;
-  /** The pin (star) button of every item and the Pinned block (default true). */
+  /** The pin (star) button of every item and the Pinned block (default true). @tr Her öğenin sabitleme (yıldız) düğmesi ve Sabitlenenler bloğu (varsayılan true). */
   pins?: boolean | undefined;
   /**
    * Own icons for the built-in parts (an IconDef, a short string or a node): the menu button, the pin star (off / on),
    * the group chevron, the filter's search icon and the rail button. `chevron: false` / `search: false` drop that mark.
+   * @tr Yerleşik parçaların kendi ikonları (IconDef, kısa metin ya da düğüm): menü düğmesi, yıldız (kapalı / açık), grup oku, süzgecin arama ikonu ve ray düğmesi. `chevron: false` / `search: false` o işareti kaldırır.
    */
   icons?: { menu?: unknown; pin?: unknown; pinned?: unknown; chevron?: unknown; search?: unknown; rail?: unknown } | undefined;
-  /** Own texts (strings or accessors); defaults are the translated ones. `pin` / `unpin` name an item's pin button. */
+  /** Own texts (strings or accessors); defaults are the translated ones. `pin` / `unpin` name an item's pin button. @tr Kendi metinlerin (metin ya da erişimci); varsayılanlar çevrilmiş olanlardır. `pin` / `unpin` öğenin sabitleme düğmesini adlandırır. */
   labels?: {
     filter?: MaybeFn<string>; filterPlaceholder?: MaybeFn<string>; noMatches?: MaybeFn<string>; pinned?: MaybeFn<string>; recent?: MaybeFn<string>;
     menu?: MaybeFn<string>; expandSidebar?: MaybeFn<string>; collapseSidebar?: MaybeFn<string>;
     pin?: (title: string) => string; unpin?: (title: string) => string;
   } | undefined;
+  /** Extra class on the wrapper. @tr Sarmalayıcıya eklenen sınıf. */
   class?: ClassProp;
 }
 

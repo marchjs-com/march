@@ -30,24 +30,29 @@ export interface ActivityItem {
   onSelect?: () => unknown;
 }
 export interface ActivityBarProps {
+  /** The views: `{ id, label, short, icon, badge, position, shortcut, onSelect }` (an array or an accessor). @tr Görünümler: `{ id, label, short, icon, badge, position, shortcut, onSelect }` (dizi ya da erişimci). */
   items: MaybeFn<readonly ActivityItem[]>;
-  /** The active view id, or null when the side view is collapsed. */
+  /** The active view id, or null when the side view is collapsed. @tr Etkin görünümün id'si; yan görünüm kapalıyken null. */
   value: MaybeFn<string | null | undefined>;
+  /** Called with the new id when a view is chosen (null when it collapses). @tr Bir görünüm seçilince yeni id ile (kapanınca null ile) çağrılır. */
   onChange: (id: string | null) => void;
-  /** Choosing the active view again collapses it (default true). */
+  /** Choosing the active view again collapses it (default true). @tr Etkin görünümü yeniden seçmek onu kapatır (varsayılan true). */
   collapsible?: boolean;
+  /** vertical (default) or horizontal; live: the bar turns, the indicator moves to the other edge and keys follow the axis. @tr vertical (varsayılan) ya da horizontal; canlıdır: çubuk döner, gösterge öbür kenara geçer, tuşlar yeni ekseni izler. */
   orientation?: MaybeFn<"vertical" | "horizontal">;
-  /** id of the element the views are shown in (aria-controls). */
+  /** id of the element the views are shown in (aria-controls). @tr Görünümlerin gösterildiği öğenin id'si (aria-controls). */
   controls?: string;
+  /** Accessible name of the bar (default "Views", translated). @tr Çubuğun erişilebilir adı (varsayılan "Views", çevrilir). */
   label?: MaybeFn<string | undefined>;
-  /** The line that marks the active view (default true). */
+  /** The line that marks the active view (default true). @tr Etkin görünümü işaretleyen çizgi (varsayılan true). */
   indicator?: boolean | undefined;
-  /** How the indicator moves to a new view: "glide" (default), "fade" (it appears in place) or "none". */
+  /** How the indicator moves to a new view: "glide" (default), "fade" (it appears in place) or "none". @tr Göstergenin yeni görünüme geçişi: "glide" (varsayılan), "fade" (yerinde belirir) ya da "none". */
   motion?: "glide" | "fade" | "none" | undefined;
-  /** Name tooltips on hover and focus (default true; the accessible name stays either way). */
+  /** Name tooltips on hover and focus (default true; the accessible name stays either way). @tr Üzerine gelince ve odakta ad ipuçları (varsayılan true; erişilebilir ad her durumda kalır). */
   tooltips?: boolean | undefined;
-  /** The name under each icon (an item's `short`, else its `label`): a wider bar, as a section rail or a phone tab bar (default false). */
+  /** The name under each icon (an item's `short`, else its `label`): a wider bar, as a section rail or a phone tab bar (default false). @tr Her ikonun altında ad (öğenin `short`'u, yoksa `label`'ı): bölüm rayı ya da telefon sekme çubuğu gibi daha geniş bir çubuk (varsayılan false). */
   showLabels?: boolean | undefined;
+  /** Extra class on the bar. @tr Çubuğa eklenen sınıf. */
   class?: ClassProp;
 }
 

@@ -10,22 +10,25 @@ import type { Corner } from "../../layout/bottom-right-controls/index.ts";
 // one definition of the corner names (shared with the corner controls), re-exported under the same name
 export type { Corner } from "../../layout/bottom-right-controls/index.ts";
 export interface CornerMarkProps {
-  /** Which corner (logical: "end" is the right side in left-to-right text). Default "top-end". */
+  /** Which corner (logical: "end" is the right side in left-to-right text). Default "top-end". @tr Hangi köşe (mantıksal: soldan sağa metinde "end" sağ taraftır). Varsayılan "top-end". */
   corner?: MaybeFn<Corner | undefined>;
-  /** The icon (an icon, text or a node); children work too. */
+  /** The icon (an icon, text or a node); children work too. @tr İkon (bir ikon, metin ya da düğüm); children da olur. */
   icon?: unknown;
+  /** Size: sm, md (default) or lg. @tr Boyut: sm, md (varsayılan) ya da lg. */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
-  /** "scrim" (default: dark glass, for photos), "surface" (card colour with a shadow) or "solid" (filled with the colour). */
+  /** "scrim" (default: dark glass, for photos), "surface" (card colour with a shadow) or "solid" (filled with the colour). @tr "scrim" (varsayılan: fotoğraflar için koyu cam), "surface" (gölgeli kart rengi) ya da "solid" (renkle dolu). */
   variant?: MaybeFn<"scrim" | "surface" | "solid" | undefined>;
-  /** A ring in the surface colour around the mark (cuts it out of an avatar). */
+  /** A ring in the surface colour around the mark (cuts it out of an avatar). @tr İşaretin çevresinde yüzey renginde bir halka (onu bir avatardan oyar). */
   ring?: MaybeFn<boolean | undefined>;
-  /** "always" (default) or "hover": shown while an ancestor with class `m-corner-host` is hovered or has focus inside. */
+  /** "always" (default) or "hover": shown while an ancestor with class `m-corner-host` is hovered or has focus inside. @tr "always" (varsayılan) ya da "hover": `m-corner-host` sınıflı bir üst öğenin üzerine gelindiğinde ya da içinde odak varken görünür. */
   show?: MaybeFn<"always" | "hover" | undefined>;
-  /** Sits half outside the corner (a badge on an avatar) instead of inside it. */
+  /** Sits half outside the corner (a badge on an avatar) instead of inside it. @tr Köşenin içinde değil, yarısı dışarıda durur (avatardaki bir rozet gibi). */
   overlap?: MaybeFn<boolean | undefined>;
-  /** Accessible name; without it the mark is decorative. */
+  /** Accessible name; without it the mark is decorative. @tr Erişilebilir ad; verilmezse işaret süs sayılır. */
   label?: MaybeFn<string | undefined>;
+  /** Extra class on the mark. @tr İşarete eklenen sınıf. */
   class?: ClassProp;
+  /** Content of the mark (instead of `icon`). @tr İşaretin içeriği (`icon` yerine). */
   children?: unknown;
 }
 

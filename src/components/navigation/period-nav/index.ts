@@ -23,33 +23,39 @@ export interface PeriodNavLabels {
   next?: MaybeFn<string | undefined>;
 }
 export interface PeriodNavProps {
+  /** Called on the previous arrow. @tr Önceki ok düğmesinde çağrılır. */
   onPrev: () => void;
+  /** Called on the next arrow. @tr Sonraki ok düğmesinde çağrılır. */
   onNext: () => void;
-  /** Runs on the middle button ("Today"); the button is shown when this is given. */
+  /** Runs on the middle button ("Today"); the button is shown when this is given. @tr Ortadaki düğmede ("Today") çağrılır; verilince düğme gösterilir. */
   onToday?: (() => void) | undefined;
-  /** The today button: `false` removes it; a text, a node or `() => node` is its content (default: the `today` label). */
+  /** The today button: `false` removes it; a text, a node or `() => node` is its content (default: the `today` label). @tr Bugün düğmesi: `false` onu kaldırır; metin, düğüm ya da `() => node` içeriği olur (varsayılan: `today` etiketi). */
   today?: unknown;
-  /** Between the arrows: the name of the period (a text, a node or an accessor). The today button then follows the next arrow. */
+  /** Between the arrows: the name of the period (a text, a node or an accessor). The today button then follows the next arrow. @tr Oklar arasında: dönemin adı (metin, düğüm ya da erişimci). Bugün düğmesi o zaman sonraki okun ardına geçer. */
   title?: MaybeFn<unknown>;
-  /** Same as `title`. */
+  /** Same as `title`. @tr `title` ile aynı. */
   children?: unknown;
+  /** Texts and accessible names: `{ group, previous, today, next }`, each a string or an accessor (defaults are translated). @tr Metinler ve erişilebilir adlar: `{ group, previous, today, next }`, her biri metin ya da erişimci (varsayılanlar çevrilir). */
   labels?: PeriodNavLabels | undefined;
-  /** Content of the previous / next button instead of the chevron: an icon, a text, a node or `() => node` (drawn as given: no swap in right-to-left). */
+  /** Content of the previous / next button instead of the chevron: an icon, a text, a node or `() => node` (drawn as given: no swap in right-to-left). @tr Ok yerine önceki / sonraki düğmesinin içeriği: ikon, metin, düğüm ya da `() => node` (verildiği gibi çizilir: sağdan sola yazıda yer değiştirmez). */
   prevIcon?: unknown;
+  /** Content of the next button instead of the chevron: an icon, a text, a node or `() => node` (no swap in right-to-left). @tr Ok yerine sonraki düğmesinin içeriği: ikon, metin, düğüm ya da `() => node` (sağdan sola yazıda yer değiştirmez). */
   nextIcon?: unknown;
-  /** `false`: no arrows (the title and the today button stay; keys of the host still move the period). */
+  /** `false`: no arrows (the title and the today button stay; keys of the host still move the period). @tr `false`: ok yok (başlık ve bugün düğmesi kalır; ana bileşenin tuşları dönemi yine değiştirir). */
   arrows?: boolean | undefined;
-  /** The previous / next button is off (the first / last period). */
+  /** The previous / next button is off (the first / last period). @tr Önceki / sonraki düğmesi kapalı (ilk / son dönem). */
   prevDisabled?: MaybeFn<boolean | undefined>;
+  /** The next button is off (the last period). @tr Sonraki düğmesi kapalı (son dönem). */
   nextDisabled?: MaybeFn<boolean | undefined>;
-  /** Right-to-left: the arrows swap (default: the direction of the app). */
+  /** Right-to-left: the arrows swap (default: the direction of the app). @tr Sağdan sola: oklar yer değiştirir (varsayılan: uygulamanın yönü). */
   rtl?: MaybeFn<boolean | undefined>;
-  /** Buttons joined into one control (default: true without a title, false with one). */
+  /** Buttons joined into one control (default: true without a title, false with one). @tr Düğmeler tek bir denetimde birleşir (varsayılan: başlık yokken true, varken false). */
   attached?: boolean | undefined;
-  /** Size of the arrows: sm · md (default). */
+  /** Size of the arrows: sm · md (default). @tr Okların boyutu: sm · md (varsayılan). */
   size?: "sm" | "md" | undefined;
-  /** An extra class on a part, for a host that keeps its own class names: `{ prev, next, today, title }`. */
+  /** An extra class on a part, for a host that keeps its own class names: `{ prev, next, today, title }`. @tr Kendi sınıf adlarını koruyan bir ana bileşen için bir parçaya ek sınıf: `{ prev, next, today, title }`. */
   partClass?: Partial<Record<"prev" | "next" | "today" | "title", string>> | undefined;
+  /** Extra class on the root. @tr Kök öğeye eklenen sınıf. */
   class?: ClassProp;
 }
 

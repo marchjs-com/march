@@ -20,24 +20,32 @@ import { isRtl } from "../../../core/util.ts";
 
 /** A tab: `content` is a node or a function rendering the panel (called when the tab becomes active). */
 export interface TabSpec {
+  /** Unique id of the tab (`value` matches it). @tr Sekmenin benzersiz id'si (`value` bununla eşleşir). */
   id: string;
+  /** The tab's label (a text, a node or an accessor). @tr Sekmenin etiketi (metin, düğüm ya da erişimci). */
   label: MaybeFn<unknown>;
+  /** A count badge beside the label; null hides it. @tr Etiketin yanında sayı rozeti; null ile gizlenir. */
   badge?: MaybeFn<number | null | undefined>;
+  /** The tab is disabled: it cannot be selected or focused. @tr Sekme devre dışı: seçilemez, odak almaz. */
   disabled?: MaybeFn<boolean | undefined>;
+  /** The tab is left out of the list. @tr Sekme listeden çıkarılır. */
   hidden?: MaybeFn<boolean | undefined>;
-  /** An icon before the label (an icon definition, a short text or a node). */
+  /** An icon before the label (an icon definition, a short text or a node). @tr Etiketten önce bir ikon (ikon tanımı, kısa metin ya da düğüm). */
   icon?: unknown;
-  /** Tooltip of the tab (e.g. why it is disabled). */
+  /** Tooltip of the tab (e.g. why it is disabled). @tr Sekmenin ipucu (örneğin neden devre dışı olduğu). */
   title?: MaybeFn<string | null | undefined>;
-  /** A close mark on the tab; the Delete key closes too. Both call `onClose(id)`. */
+  /** A close mark on the tab; the Delete key closes too. Both call `onClose(id)`. @tr Sekmede kapatma işareti; Delete tuşu da kapatır. İkisi de `onClose(id)` çağırır. */
   closable?: MaybeFn<boolean | undefined>;
-  /** The "changed" dot (unsaved work). */
+  /** The "changed" dot (unsaved work). @tr "Değişti" noktası (kaydedilmemiş iş). */
   dirty?: MaybeFn<boolean | undefined>;
   content?: unknown;
 }
 /** What <Tab> returns (a descriptor read by <Tabs>). */
 export interface TabDescriptor extends TabSpec { readonly __tab: true; content: () => unknown }
-export interface TabProps extends Omit<TabSpec, "content"> { children?: unknown }
+export interface TabProps extends Omit<TabSpec, "content"> {
+  /** The panel content, rendered when the tab becomes active. @tr Panelin içeriği; sekme etkin olunca çizilir. */
+  children?: unknown;
+}
 
 /** Tab descriptor for `<Tabs>` children. */
 export function Tab(props: TabProps): TabDescriptor {
@@ -49,36 +57,40 @@ export function Tab(props: TabProps): TabDescriptor {
 
 /** What the tab strip and `<Tabs>` share. */
 export interface TabListLook {
-  /** Accessible name of the tab list. */
+  /** Accessible name of the tab list. @tr Sekme listesinin erişilebilir adı. */
   label?: MaybeFn<string | undefined>;
-  /** "line" (default): underlined tabs; "pill": a rounded switch; "none" (TabList): no look, your own classes through `tabProps`. */
+  /** "line" (default): underlined tabs; "pill": a rounded switch; "none" (TabList): no look, your own classes through `tabProps`. @tr "line" (varsayılan): altı çizili sekmeler; "pill": yuvarlak bir anahtar; "none" (TabList): görünüm yok, `tabProps` ile kendi sınıfların. */
   variant?: MaybeFn<"line" | "pill" | "none" | undefined>;
-  /** "auto" (default): the arrow keys select; "manual": they only move focus (Enter / Space select). */
+  /** "auto" (default): the arrow keys select; "manual": they only move focus (Enter / Space select). @tr "auto" (varsayılan): ok tuşları seçer; "manual": yalnız odağı taşır (Enter / Space seçer). */
   activation?: "auto" | "manual" | undefined;
-  /** Called by the close mark of a `closable` tab and by the Delete key. */
+  /** Called by the close mark of a `closable` tab and by the Delete key. @tr `closable` bir sekmenin kapatma işareti ve Delete tuşu tarafından çağrılır. */
   onClose?: ((id: string) => void) | undefined;
-  /** Your own close mark (an icon or a short text). */
+  /** Your own close mark (an icon or a short text). @tr Kendi kapatma işaretin (bir ikon ya da kısa metin). */
   closeIcon?: unknown;
-  /** Texts: tooltip of the close mark, accessible name of the "changed" dot. */
+  /** Texts: tooltip of the close mark, accessible name of the "changed" dot. @tr Metinler: kapatma işaretinin ipucu, "değişti" noktasının erişilebilir adı. */
   labels?: { close?: MaybeFn<string | undefined>; dirty?: MaybeFn<string | undefined> } | undefined;
-  /** Extra attributes and events of a tab's button (`onPointerdown` for dragging, `onContextmenu`, `class`, `aria-*` …). */
+  /** Extra attributes and events of a tab's button (`onPointerdown` for dragging, `onContextmenu`, `class`, `aria-*` …). @tr Bir sekme düğmesinin ek öznitelikleri ve olayları (sürükleme için `onPointerdown`, `onContextmenu`, `class`, `aria-*` …). */
   tabProps?: ((tab: TabSpec) => Record<string, unknown>) | undefined;
 }
 
 export interface TabListProps extends TabListLook {
+  /** The tabs: `{ id, label, badge, disabled, hidden, icon, title, closable, dirty }` (an array or an accessor). @tr Sekmeler: `{ id, label, badge, disabled, hidden, icon, title, closable, dirty }` (dizi ya da erişimci). */
   tabs: MaybeFn<readonly TabSpec[] | null | undefined>;
-  /** The active tab id (a value or an accessor). */
+  /** The active tab id (a value or an accessor). @tr Etkin sekmenin id'si (değer ya da erişimci). */
   value: MaybeFn<string | null | undefined>;
+  /** Called with a tab's id when it is chosen (click or keys). @tr Bir sekme seçilince (tıklama ya da tuşlar) onun id'siyle çağrılır. */
   onSelect: (id: string) => void;
+  /** horizontal (default) or vertical; sets the axis of the arrow keys. @tr horizontal (varsayılan) ya da vertical; ok tuşlarının eksenini belirler. */
   orientation?: MaybeFn<"horizontal" | "vertical" | undefined>;
-  /** DOM id of a tab's button (default: generated). */
+  /** DOM id of a tab's button (default: generated). @tr Bir sekme düğmesinin DOM id'si (varsayılan: üretilir). */
   tabId?: ((id: string) => string) | undefined;
-  /** id of the panel the tabs control (`aria-controls`). */
+  /** id of the panel the tabs control (`aria-controls`). @tr Sekmelerin denetlediği panelin id'si (`aria-controls`). */
   controls?: string | undefined;
-  /** Wrap a tab's button (e.g. in a Tooltip). */
+  /** Wrap a tab's button (e.g. in a Tooltip). @tr Bir sekme düğmesini sarar (örneğin bir Tooltip içine). */
   wrap?: ((button: Element, tab: TabSpec) => unknown) | undefined;
-  /** Extra content inside the strip, before the tabs (a sliding indicator). */
+  /** Extra content inside the strip, before the tabs (a sliding indicator). @tr Şeridin içinde, sekmelerden önce ek içerik (kayan bir gösterge). */
   children?: unknown;
+  /** Extra class on the tab strip. @tr Sekme şeridine eklenen sınıf. */
   class?: ClassProp;
 }
 
@@ -126,26 +138,31 @@ export function TabList(props: TabListProps): Element {
 }
 
 export interface TabsProps extends TabListLook {
+  /** The tabs (an array or an accessor); without it, the <Tab> children are used. @tr Sekmeler (dizi ya da erişimci); verilmezse <Tab> children kullanılır. */
   tabs?: MaybeFn<readonly TabSpec[] | null | undefined>;
-  /** Controlled active id (`bind:value` works). */
+  /** Controlled active id (`bind:value` works). @tr Denetimli etkin id (`bind:value` çalışır). */
   value?: MaybeFn<string | null | undefined>;
+  /** Called with the new id when the active tab changes. @tr Etkin sekme değişince yeni id ile çağrılır. */
   onChange?: (id: string) => void;
+  /** Called with the new id like `onChange` (`bind:value` uses it). @tr `onChange` gibi yeni id ile çağrılır (`bind:value` bunu kullanır). */
   setValue?: (id: string) => void;
-  /** Keep the active tab in this query parameter. */
+  /** Keep the active tab in this query parameter. @tr Etkin sekmeyi bu sorgu parametresinde tutar. */
   query?: string | undefined;
+  /** Extra class on the root. @tr Kök öğeye eklenen sınıf. */
   class?: ClassProp;
-  /** <Tab> children (when `tabs` is not given). */
+  /** <Tab> children (when `tabs` is not given). @tr <Tab> children (`tabs` verilmediğinde). */
   children?: unknown;
-  /** false: render only the tab bar. */
+  /** false: render only the tab bar. @tr false: yalnız sekme çubuğunu çizer. */
   panel?: boolean;
-  /** Content at the end of the tab bar (buttons, a menu): outside the tab list, stays put while the tabs scroll. */
+  /** Content at the end of the tab bar (buttons, a menu): outside the tab list, stays put while the tabs scroll. @tr Sekme çubuğunun sonunda içerik (düğmeler, bir menü): sekme listesinin dışında, sekmeler kayarken yerinde kalır. */
   actions?: unknown;
-  /** The underline of the active tab (default true). */
+  /** The underline of the active tab (default true). @tr Etkin sekmenin alt çizgisi (varsayılan true). */
   indicator?: boolean | undefined;
   /**
    * Panel motion. Default: the panel rises in once, when it first appears. "none": no motion. "fade", "rise", "slide"
    * (from the side of the new tab, mirrored in RTL) play on every switch; or your own `(panel, dir) => void`
    * (dir 1: a later tab, -1: an earlier one).
+   * @tr Panel hareketi. Varsayılan: panel ilk göründüğünde bir kez yükselir. "none": hareket yok. "fade", "rise", "slide" (yeni sekmenin yanından, RTL'de yansır) her geçişte oynar; ya da kendi `(panel, dir) => void`'in (dir 1: sonraki bir sekme, -1: önceki).
    */
   motion?: "none" | "fade" | "rise" | "slide" | ((panel: HTMLElement, dir: 1 | -1) => void) | undefined;
 }

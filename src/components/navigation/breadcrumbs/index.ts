@@ -38,16 +38,19 @@ export interface CrumbSibling {
   current?: boolean | undefined;
 }
 export interface BreadcrumbsProps {
+  /** The crumbs: `{ id, label, icon, href, onSelect, siblings }` (an array or an accessor). @tr Kırıntılar: `{ id, label, icon, href, onSelect, siblings }` (dizi ya da erişimci). */
   items: MaybeFn<readonly Crumb[]>;
+  /** Accessible name of the nav (default "Path", translated). @tr nav öğesinin erişilebilir adı (varsayılan "Path", çevrilir). */
   label?: MaybeFn<string | undefined>;
-  /** Between the crumbs: the chevron (default), your own icon, short text ("/") or `() => node`, or false for none. */
+  /** Between the crumbs: the chevron (default), your own icon, short text ("/") or `() => node`, or false for none. @tr Kırıntılar arasında: ok (varsayılan), kendi ikonun, kısa metin ("/") ya da `() => node`; false ile hiçbir şey. */
   separator?: unknown;
-  /** Collapse the middle into a "…" menu when the path does not fit (default true); false: the path is clipped instead. */
+  /** Collapse the middle into a "…" menu when the path does not fit (default true); false: the path is clipped instead. @tr Yol sığmazsa ortası "…" menüsüne katlanır (varsayılan true); false: yol kırpılır. */
   collapse?: boolean | undefined;
-  /** Content of the collapsed-crumbs trigger (default "…"). */
+  /** Content of the collapsed-crumbs trigger (default "…"). @tr Katlanmış kırıntılar düğmesinin içeriği (varsayılan "…"). */
   ellipsis?: unknown;
-  /** Accessible names: the "…" menu, and `goTo(name)` for the menu of a crumb with siblings. */
+  /** Accessible names: the "…" menu, and `goTo(name)` for the menu of a crumb with siblings. @tr Erişilebilir adlar: "…" menüsü ve kardeşleri olan bir kırıntının menüsü için `goTo(name)`. */
   labels?: { more?: MaybeFn<string | undefined>; goTo?: ((name: string) => string) | undefined } | undefined;
+  /** Extra class on the nav. @tr nav öğesine eklenen sınıf. */
   class?: ClassProp;
 }
 

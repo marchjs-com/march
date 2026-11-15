@@ -21,23 +21,31 @@ export interface PictureSource {
 export const isPicture = (x: unknown): x is PictureSource => !!x && typeof x === "object" && !(x as Node).nodeType && typeof (x as PictureSource).src === "string";
 
 export interface PictureProps {
-  /** A picture object or a ready node (a node is returned as it is). */
+  /** A picture object or a ready node (a node is returned as it is). @tr Bir resim nesnesi ya da hazır bir düğüm (düğüm olduğu gibi döner). */
   source?: PictureSource | Node | null | undefined;
+  /** Address of the image. @tr Görselin adresi. */
   src?: MaybeFn<string | undefined>;
-  /** Alternative text ("" marks a decorative image). */
+  /** Alternative text ("" marks a decorative image). @tr Alternatif metin ("" görseli süs olarak işaretler). */
   alt?: MaybeFn<string | undefined>;
+  /** Intrinsic width in pixels; reserves the space (no layout shift). @tr Doğal genişlik, piksel; yeri ayırır (yerleşim kayması olmaz). */
   width?: number | undefined;
+  /** Intrinsic height in pixels; reserves the space (no layout shift). @tr Doğal yükseklik, piksel; yeri ayırır (yerleşim kayması olmaz). */
   height?: number | undefined;
+  /** Responsive sources (img srcset). @tr Duyarlı kaynaklar (img srcset). */
   srcset?: string | undefined;
+  /** Display widths for `srcset` (img sizes). @tr `srcset` için görüntülenme genişlikleri (img sizes). */
   sizes?: string | undefined;
-  /** "lazy" (default) or "eager": loads at once with high priority (the first screen). */
+  /** "lazy" (default) or "eager": loads at once with high priority (the first screen). @tr "lazy" (varsayılan) ya da "eager": hemen ve yüksek öncelikle yüklenir (ilk ekran). */
   loading?: "lazy" | "eager" | undefined;
-  /** How the image fills its box when it is sized by the parent: "cover", "contain". Default: its natural size, never wider than the box. */
+  /** How the image fills its box when it is sized by the parent: "cover", "contain". Default: its natural size, never wider than the box. @tr Boyutu üst öğeden geldiğinde görselin kutusunu nasıl doldurduğu: "cover", "contain". Varsayılan: doğal boyutu, kutudan asla geniş değil. */
   fit?: MaybeFn<"cover" | "contain" | undefined>;
-  /** Shown instead of the image when it fails to load: text or a node. */
+  /** Shown instead of the image when it fails to load: text or a node. @tr Görsel yüklenemezse yerine gösterilir: metin ya da düğüm. */
   fallback?: unknown;
+  /** Called when the image has loaded. @tr Görsel yüklenince çağrılır. */
   onLoad?: ((e: Event) => void) | undefined;
+  /** Called when the image fails to load. @tr Görsel yüklenemeyince çağrılır. */
   onError?: ((e: Event) => void) | undefined;
+  /** Extra class on the image. @tr Görsele eklenen sınıf. */
   class?: ClassProp;
   [attr: string]: unknown;
 }

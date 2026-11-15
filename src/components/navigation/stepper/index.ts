@@ -16,34 +16,37 @@ import { nextFrame } from "../../../motion/engine/index.ts";
 import { isRtl } from "../../../core/util.ts";
 
 export interface StepperProps {
+  /** The steps: `{ title, description?, icon? }` (the Steps items). @tr Adımlar: `{ title, description?, icon? }` (Steps öğeleri). */
   steps: readonly StepItem[];
-  /** Current step (0-based). */
+  /** Current step (0-based). @tr Geçerli adım (0'dan başlar). */
   current: MaybeFn<number>;
-  /** Called with the step to go to (a step click, Back / Next). */
+  /** Called with the step to go to (a step click, Back / Next). @tr Gidilecek adımla çağrılır (adıma tıklama, Back / Next). */
   onSelect?: ((i: number) => void) | undefined;
-  /** Content per step: a list, or a function of the index. */
+  /** Content per step: a list, or a function of the index. @tr Adım başına içerik: bir liste ya da dizinin fonksiyonu. */
   panels?: readonly unknown[] | ((i: number) => unknown) | undefined;
-  /** Show Back / Next buttons under the panel. Default: when there are panels and onSelect. */
+  /** Show Back / Next buttons under the panel. Default: when there are panels and onSelect. @tr Panelin altında Back / Next düğmeleri gösterir. Varsayılan: panel ve onSelect varken. */
   nav?: boolean | undefined;
-  /** Label of the last step's button. Default "Finish". */
+  /** Label of the last step's button. Default "Finish". @tr Son adımın düğme etiketi. Varsayılan "Finish". */
   finishLabel?: MaybeFn<string | undefined>;
+  /** Called on the last step's button. @tr Son adımın düğmesinde çağrılır. */
   onFinish?: (() => void) | undefined;
-  /** Steps in a column beside the panel (live: the same stepper turns). */
+  /** Steps in a column beside the panel (live: the same stepper turns). @tr Adımlar panelin yanında bir sütunda (canlı: aynı stepper döner). */
   vertical?: MaybeFn<boolean | undefined>;
-  /** Morph between steps (default true): the highlight stretches and the panels blur into each other; false = at once. */
+  /** Morph between steps (default true): the highlight stretches and the panels blur into each other; false = at once. @tr Adımlar arasında biçim değişimi (varsayılan true): vurgu uzar, paneller birbirine bulanarak geçer; false = anında. */
   morph?: MaybeFn<boolean | undefined>;
-  /** The liquid highlight around the current step (default true). */
+  /** The liquid highlight around the current step (default true). @tr Geçerli adımın çevresindeki sıvı vurgu (varsayılan true). */
   highlight?: boolean | undefined;
-  /** The "2 / 4" counter between Back and Next: true (default), false, or `(i, n) => content` (i is 0-based). */
+  /** The "2 / 4" counter between Back and Next: true (default), false, or `(i, n) => content` (i is 0-based). @tr Back ile Next arasındaki "2 / 4" sayacı: true (varsayılan), false ya da `(i, n) => content` (i 0'dan başlar). */
   counter?: boolean | ((i: number, n: number) => unknown) | undefined;
-  /** Texts: the Back and Next buttons and the panel's accessible name (`step(i, n)`, i is 0-based). */
+  /** Texts: the Back and Next buttons and the panel's accessible name (`step(i, n)`, i is 0-based). @tr Metinler: Back ve Next düğmeleri ve panelin erişilebilir adı (`step(i, n)`, i 0'dan başlar). */
   labels?: { back?: MaybeFn<string | undefined>; next?: MaybeFn<string | undefined>; step?: ((i: number, n: number) => string) | undefined } | undefined;
-  /** Passed to Steps: the mark of a done step (icon, string, or false to keep the number). */
+  /** Passed to Steps: the mark of a done step (icon, string, or false to keep the number). @tr Steps'e geçer: tamamlanan adımın işareti (ikon, metin ya da numarayı korumak için false). */
   doneIcon?: unknown;
-  /** Passed to Steps: your own dot content. */
+  /** Passed to Steps: your own dot content. @tr Steps'e geçer: kendi nokta içeriğin. */
   renderDot?: ((i: number, state: "done" | "current" | "todo", step: StepItem) => unknown) | undefined;
-  /** Passed to Steps: the line between the steps (default true). */
+  /** Passed to Steps: the line between the steps (default true). @tr Steps'e geçer: adımlar arasındaki çizgi (varsayılan true). */
   connector?: boolean | undefined;
+  /** Extra class on the root. @tr Kök öğeye eklenen sınıf. */
   class?: ClassProp;
 }
 

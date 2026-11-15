@@ -21,44 +21,51 @@ const live = reactive as <T>(fn: () => T) => T;
 export interface PageRange { from: number; to: number; total: number }
 
 export interface PaginationProps {
-  /** Current page, 1-based (not needed in cursor mode). */
+  /** Current page, 1-based (not needed in cursor mode). @tr Geçerli sayfa, 1'den başlar (imleç modunda gerekmez). */
   page?: MaybeFn<number | null | undefined>;
-  /** Page count; or give `total` (+ `size`) and it is worked out. */
+  /** Page count; or give `total` (+ `size`) and it is worked out. @tr Sayfa sayısı; ya da `total` (+ `size`) ver, hesaplanır. */
   pages?: MaybeFn<number | null | undefined>;
+  /** Called with the chosen page. @tr Seçilen sayfayla çağrılır. */
   onPage?: (p: number) => void;
+  /** Called with the chosen page like `onPage` (`bind:page` uses it). @tr `onPage` gibi seçilen sayfayla çağrılır (`bind:page` bunu kullanır). */
   setPage?: (p: number) => void;
+  /** Pages shown on each side of the current one (default 1). @tr Geçerli sayfanın her iki yanında gösterilen sayfa sayısı (varsayılan 1). */
   siblings?: number;
-  /** "numbers" (default): numbered pages with ellipses; "simple": Previous / Next only (the page count may be unknown). */
+  /** "numbers" (default): numbered pages with ellipses; "simple": Previous / Next only (the page count may be unknown). @tr "numbers" (varsayılan): üç noktalı numaralı sayfalar; "simple": yalnız Previous / Next (sayfa sayısı bilinmeyebilir). */
   variant?: "numbers" | "simple" | undefined;
-  /** Row count: gives the page count (with `size`) and the "1–20 of 134" text of the simple variant. */
+  /** Row count: gives the page count (with `size`) and the "1–20 of 134" text of the simple variant. @tr Satır sayısı: sayfa sayısını (`size` ile) ve simple görünümün "1–20 of 134" metnini verir. */
   total?: MaybeFn<number | null | undefined>;
-  /** Rows per page (default 20). */
+  /** Rows per page (default 20). @tr Sayfa başına satır (varsayılan 20). */
   size?: MaybeFn<number | null | undefined>;
-  /** Simple variant: the choices of a "rows per page" select. */
+  /** Simple variant: the choices of a "rows per page" select. @tr Simple görünüm: "sayfa başına satır" seçicisinin seçenekleri. */
   sizes?: readonly number[] | undefined;
+  /** Called with the new size from the rows-per-page select. @tr Sayfa başına satır seçicisinde yeni boyutla çağrılır. */
   onSize?: ((size: number) => void) | undefined;
-  /** Cursor mode (simple variant, no page count): whether there is a previous / next page. */
+  /** Cursor mode (simple variant, no page count): whether there is a previous / next page. @tr İmleç modu (simple görünüm, sayfa sayısı yok): önceki sayfa var mı. */
   hasPrev?: MaybeFn<boolean | null | undefined>;
+  /** Cursor mode: whether there is a next page. @tr İmleç modu: sonraki sayfa var mı. */
   hasNext?: MaybeFn<boolean | null | undefined>;
-  /** Cursor mode: called instead of `onPage`. */
+  /** Cursor mode: called instead of `onPage`. @tr İmleç modu: `onPage` yerine çağrılır (önceki sayfa). */
   onPrev?: (() => void) | undefined;
+  /** Cursor mode: called instead of `onPage` for the next page. @tr İmleç modu: sonraki sayfa için `onPage` yerine çağrılır. */
   onNext?: (() => void) | undefined;
-  /** Simple variant: the "1–20 of 134" text (shown when `total` is given). false: none; a function: your own text. */
+  /** Simple variant: the "1–20 of 134" text (shown when `total` is given). false: none; a function: your own text. @tr Simple görünüm: "1–20 of 134" metni (`total` verilince gösterilir). false: yok; fonksiyon: kendi metnin. */
   info?: boolean | ((range: PageRange) => unknown) | undefined;
-  /** Simple variant: the "Page 2 of 7" text between the buttons (shown when the page count is known). false: none; a function: your own text. */
+  /** Simple variant: the "Page 2 of 7" text between the buttons (shown when the page count is known). false: none; a function: your own text. @tr Simple görünüm: düğmeler arasındaki "Page 2 of 7" metni (sayfa sayısı biliniyorsa gösterilir). false: yok; fonksiyon: kendi metnin. */
   status?: boolean | ((page: number, pages: number) => unknown) | undefined;
-  /** Accessible name of the nav (default "Pagination"). */
+  /** Accessible name of the nav (default "Pagination"). @tr nav öğesinin erişilebilir adı (varsayılan "Pagination"). */
   label?: MaybeFn<string | undefined>;
-  /** Accessible names: the Previous / Next buttons, `page(n)` for a page button (default: the number), the rows-per-page select. */
+  /** Accessible names: the Previous / Next buttons, `page(n)` for a page button (default: the number), the rows-per-page select. @tr Erişilebilir adlar: Previous / Next düğmeleri, sayfa düğmesi için `page(n)` (varsayılan: sayı), sayfa başına satır seçicisi. */
   labels?: { previous?: MaybeFn<string | undefined>; next?: MaybeFn<string | undefined>; page?: ((n: number) => string) | undefined; sizes?: MaybeFn<string | undefined> } | undefined;
-  /** The Previous / Next buttons (default true). */
+  /** The Previous / Next buttons (default true). @tr Previous / Next düğmeleri (varsayılan true). */
   controls?: boolean | undefined;
-  /** Content of the Previous button: an icon or a short text (default: a chevron; simple: a chevron and "Previous"). */
+  /** Content of the Previous button: an icon or a short text (default: a chevron; simple: a chevron and "Previous"). @tr Previous düğmesinin içeriği: ikon ya da kısa metin (varsayılan: bir ok; simple: ok ve "Previous"). */
   prev?: unknown;
-  /** Content of the Next button: an icon or a short text (default: a chevron; simple: "Next" and a chevron). */
+  /** Content of the Next button: an icon or a short text (default: a chevron; simple: "Next" and a chevron). @tr Next düğmesinin içeriği: ikon ya da kısa metin (varsayılan: bir ok; simple: "Next" ve ok). */
   next?: unknown;
-  /** The mark where pages are left out: the dots (default), your own icon or short text, or false for none. */
+  /** The mark where pages are left out: the dots (default), your own icon or short text, or false for none. @tr Atlanan sayfaların işareti: noktalar (varsayılan), kendi ikonun ya da kısa metin, ya da hiçbiri için false. */
   gap?: unknown;
+  /** Extra class on the nav. @tr nav öğesine eklenen sınıf. */
   class?: ClassProp;
 }
 /**
