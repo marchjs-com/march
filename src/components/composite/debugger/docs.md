@@ -29,6 +29,26 @@ const session = createDebugSession({ persist: "my-ide.debug" });   // evaluate: 
   The session keeps `maxSteps` steps (default 20000).
 - In march-app-ui, `debuggerPlugin()` puts the panel, the editor's gutter and the commands together.
 
+## Trying it in the playground
+
+The showcase playground lends its TypeScript worker to the preview: `instrument` writes the debugger's calls into
+files and `run` runs them (each a module from a blob: URL, no eval). Set breakpoints in the editor's gutter, then Start:
+
+```tsx
+import { Debugger, CodeEditor, createDebugSession } from "hadi-march/ui"
+import { instrument, run } from "hadi-march/playground"   // the playground only
+
+const session = createDebugSession({ persist: "my-ide.debug" })
+const $code = `let sum = 0
+for (const n of [1, 2, 3]) sum += n
+console.log("sum", sum)`
+<CodeEditor lineNumbers bind:value={$code} lineMarks={() => session.breakpoints().map((b) => ({ line: b.line }))}
+  activeLine={() => session.litLine("app.ts")} onGutter={(line) => session.toggleBreakpoint("app.ts", line)} />
+<Debugger session={session} onStart={async () => { const r = await instrument({ "app.ts": $code }); session.begin(r.metas); await run(r.files) }} />
+```
+
+While it runs (Continue past the last stop) the output shows every line written; paused, the lines up to the step shown.
+
 ## Props
 
 | Prop | |

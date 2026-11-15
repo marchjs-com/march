@@ -180,3 +180,19 @@ test("Debugger layout: watch | scope and breakpoints | stack side by side, outpu
   assert.equal(el2.querySelectorAll(".m-dbg-sec").length, 3, "a section the layout leaves out still gets a row");
   dispose2();
 });
+
+test("session: running past the last stop, the output is all of it (the code's console.log after the breakpoint)", async () => {
+  const s = createDebugSession({ evaluate });
+  s.setBreakpoint("cart.js", 4);
+  s.begin([META]);
+  const d = globalThis.__marchDebug;
+  run();
+  d.s(0, 4, () => []); console.log("after the loop");
+  await settle();
+  assert.equal(s.state(), "paused");
+  assert.ok(!s.output().some((l) => /after the loop/.test(l.text)), "paused in the loop: not written yet");
+  s.removeBreakpoint(s.breakpoints()[0].id);
+  s.resume(); await settle(); s.resume(); await settle();
+  assert.ok(s.output().some((l) => /after the loop/.test(l.text)), "running: every line");
+  s.end();
+});

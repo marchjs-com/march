@@ -359,7 +359,8 @@ export function createDebugSession(o: DebugSessionOptions = {}): DebugSession {
     updateWatch(id, expr) { watches.set(watches.peek().map((w) => (w.id === id ? { ...w, expr } : w))); },
     removeWatch(id) { watches.set(watches.peek().filter((w) => w.id !== id)); },
     watchValue: (id) => watchValues()[id] ?? { pending: true },
-    output: computed(() => { version(); const n = index(); return n < 0 ? [...logs] : logs.filter((l) => l.at <= n); }, { equals: (a, b) => !!a && !!b && a.length === b.length && a[a.length - 1] === b[b.length - 1] }),
+    // paused: what was written up to the step shown; running (Continue went past the last stop): all of it, live
+    output: computed(() => { version(); const n = state() === "running" ? -1 : index(); return n < 0 ? [...logs] : logs.filter((l) => l.at <= n); }, { equals: (a, b) => !!a && !!b && a.length === b.length && a[a.length - 1] === b[b.length - 1] }),
     pauseOnExceptions, stopOnEntry, breakpointsActive,
     begin(next) {
       session.end();
