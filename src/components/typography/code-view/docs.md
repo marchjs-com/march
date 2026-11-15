@@ -26,6 +26,7 @@ draws it through the `code-view` widget point.
 | `wrapButton` | boolean | `true` | the Wrap toggle |
 | `wrapLabel` | string / accessor | "Wrap" (translated) | text of the Wrap button |
 | `copyLabel` | string / accessor | "Copy" (translated) | text of the copy button |
+| `buttons` | `"text"` / `"icon"` | `"text"` | the toolbar's buttons as text, or as icon buttons (their text is the tooltip and the accessible name) |
 | `class` | class value | — | |
 
 ```tsx

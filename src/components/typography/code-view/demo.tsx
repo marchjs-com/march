@@ -30,14 +30,14 @@ npx march dev --port 5173`,
 
 const FILES: Record<string, string> = { tsx: "Counter.tsx", css: "card.css", json: "package.json", sh: "kurulum.sh" }
 
-export default function CodeViewDemo(props: { values: { lang: string; toolbar: boolean; langLabel: string; lineNumbers: boolean; wrap: boolean; wrapButton: boolean; copy: boolean } }) {
+export default function CodeViewDemo(props: { values: { lang: string; toolbar: boolean; langLabel: string; lineNumbers: boolean; wrap: boolean; wrapButton: boolean; copy: boolean; buttons: string } }) {
   return <div class="sc-col">
     {() => {
       // read the values here: CodeView takes them when it is built, so the stage rebuilds it when one changes
       const v = props.values, lang = v.lang, lineNumbers = v.lineNumbers, wrap = v.wrap, copy = v.copy
-      const toolbar = v.toolbar, wrapButton = v.wrapButton
+      const toolbar = v.toolbar, wrapButton = v.wrapButton, buttons = v.buttons as "text" | "icon"
       const langLabel = v.langLabel === "off" ? false : v.langLabel === "own" ? FILES[lang] : undefined
-      return <CodeView code={SAMPLE[lang]} lang={lang} lineNumbers={lineNumbers} wrap={wrap} copy={copy} toolbar={toolbar} wrapButton={wrapButton} langLabel={langLabel} />
+      return <CodeView code={SAMPLE[lang]} lang={lang} lineNumbers={lineNumbers} wrap={wrap} copy={copy} toolbar={toolbar} wrapButton={wrapButton} buttons={buttons} langLabel={langLabel} />
     }}
   </div>
 }

@@ -5,6 +5,11 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { CopyButton } from "../../actions/copy-button/index.ts";
 import { Button } from "../../actions/button/index.ts";
+import { IconButton } from "../../actions/icon-button/index.ts";
+import { defineIcon } from "../../../icons/svg.ts";
+
+/** The wrap toggle's icon: lines that turn back under themselves. */
+const wrapIcon = defineIcon("wrap-text", ["M3 6h18", "M3 12h15a3 3 0 1 1 0 6h-4", "m16 16-2 2 2 2", "M3 18h7"]);
 import { PanelHeader } from "../../layout/panel-header/index.ts";
 import { tokenLines, type Token } from "../../../ui/highlight.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -38,6 +43,8 @@ export interface CodeViewProps {
   wrapLabel?: MaybeFn<string | undefined>;
   /** Text of the copy button (default "Copy", translated). @tr Kopyala düğmesinin metni (varsayılan "Copy", çevrilir). */
   copyLabel?: MaybeFn<string> | undefined;
+  /** The toolbar's buttons as "text" (default) or "icon": icon buttons whose text is their tooltip and accessible name. @tr Araç çubuğu düğmeleri "text" (varsayılan) ya da "icon": metni ipucu ve erişilebilir adı olan simge düğmeler. */
+  buttons?: "text" | "icon" | undefined;
 }
 /** Read-only code block with line numbers: `<CodeView code={src} lang="js" wrap={false} copy />` */
 export function CodeView(props: CodeViewProps): Element {
@@ -50,8 +57,10 @@ export function CodeView(props: CodeViewProps): Element {
       as: "div", size: "sm", divider: true, class: "m-code-bar",
       lead: lang != null && lang !== "" ? h("span", { class: "m-code-lang" }, lang) : undefined,
       actions: [
-        props.wrapButton !== false && h(Button, { variant: "ghost", size: "sm", class: "m-code-wrap", pressed: wrap, onClick: () => wrap.update((x) => !x) }, () => val(props.wrapLabel) ?? t`Wrap`),
-        props.copy !== false && h(CopyButton, { text: () => val(props.code), ...(props.copyLabel != null ? { label: props.copyLabel } : {}) }), props.tools],
+        props.wrapButton !== false && (props.buttons === "icon"
+          ? h(IconButton, { variant: "ghost", size: "sm", class: "m-code-wrap", icon: wrapIcon, pressed: wrap, label: () => val(props.wrapLabel) ?? t`Wrap`, onClick: () => wrap.update((x) => !x) })
+          : h(Button, { variant: "ghost", size: "sm", class: "m-code-wrap", pressed: wrap, onClick: () => wrap.update((x) => !x) }, () => val(props.wrapLabel) ?? t`Wrap`)),
+        props.copy !== false && h(CopyButton, { text: () => val(props.code), ...(props.buttons === "icon" ? { iconOnly: true } : {}), ...(props.copyLabel != null ? { label: props.copyLabel } : {}) }), props.tools],
     }),
     h("pre", { class: "m-code-pre", tabindex: "0", "aria-label": () => val(props.label) ?? t`Code` },
       h("code", {}, () => lines().map((line, i) => h("span", { class: "m-code-line" },

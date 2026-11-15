@@ -24,6 +24,11 @@
 .m-app-pv { block-size: 100%; display: flex; flex-direction: column; }
 .m-app-pv > .m-app-pv-bar, .m-app-pv > .m-app-pv-foot { flex: none; }
 .m-app-pv > .m-app-pv-stage { flex: 1 1 auto; }
+/* full screen: the preview alone on the page's surface */
+/* in full screen only the preview: the footer (the component's code) steps aside */
+.m-app-pv.is-full > .m-app-pv-foot { display: none; }
+.m-app-pv.is-cover { position: fixed; inset: 0; z-index: 2147483000; block-size: auto; background: var(--m-bg, var(--m-surface)); overflow: auto; }
+.m-app-pv:fullscreen { inline-size: 100%; block-size: 100%; background: var(--m-bg, var(--m-surface)); overflow: auto; }
 .m-app-pv-foot { max-block-size: 40%; overflow: auto; }
 .m-app-pv-bar { display: flex; align-items: center; gap: var(--m-space-1); padding: 3px var(--m-space-2); }
 .m-app-pv-fill { flex: 1; }

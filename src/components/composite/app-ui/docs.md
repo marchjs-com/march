@@ -64,7 +64,7 @@ middle. Every picker is off until asked for (`toolbar={{ theme: true, mode: true
 picker added later stays hidden. The bar shows only while at least one picker (or your `tools`) does. `theme`, `accent`
 and `mode` take signals to keep the choices; `footer` sits under the stage (the shown component's code); the bar, the
 stage and the footer are one piece (Joined). The theme picker's first entry is "Page theme" (the default: `""`, the page's
-theme). `toolbar={{ language: true }}` adds a language menu: `languages` (`[{ value, label }]`, `""` the default texts)
+theme). `toolbar={{ fullscreen: true }}` adds a full-screen button: the preview alone fills the screen (the footer steps aside), Esc or the button brings it back; where the browser refuses full screen (an embedded view) the preview covers the page instead. `toolbar={{ language: true }}` adds a language menu: `languages` (`[{ value, label }]`, `""` the default texts)
 and `language` (a signal) keep the choice; what it means for the stage is the owner's (the playground translates the
 drawn texts).
 
