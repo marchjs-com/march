@@ -11,21 +11,25 @@ import type { ColorToken } from "../../../theme/colors.ts";
 import { withColor } from "../../../theme/colors.ts";
 
 export interface SplitterProps {
+  /** The first pane (start or top). @tr İlk bölme (baş ya da üst). */
   start: unknown;
+  /** The second pane (end or bottom). @tr İkinci bölme (son ya da alt). */
   end: unknown;
-  /** Initial share of the first pane, 0..1. */
+  /** Initial share of the first pane, 0..1. @tr İlk bölmenin başlangıç payı, 0..1. */
   initial?: number;
-  /** Controlled share of the first pane (0..1); with `onChange` the parent owns it. */
+  /** Controlled share of the first pane (0..1); with `onChange` the parent owns it. @tr İlk bölmenin denetimli payı (0..1); `onChange` ile değeri üst bileşen tutar. */
   value?: MaybeFn<number | undefined>;
-  /** Called with the new share while dragging or on the keyboard. */
+  /** Called with the new share while dragging or on the keyboard. @tr Sürüklerken ya da klavyede yeni payla çağrılır. */
   onChange?: (share: number) => void;
-  /** "horizontal": panes side by side (default); "vertical": stacked. */
+  /** "horizontal": panes side by side (default); "vertical": stacked. @tr "horizontal": bölmeler yan yana (varsayılan); "vertical": alt alta. */
   orientation?: "horizontal" | "vertical";
-  /** Smallest share of either pane (default 0.15). */
+  /** Smallest share of either pane (default 0.15). @tr Her iki bölmenin en küçük payı (varsayılan 0.15). */
   min?: number;
+  /** Accessible name of the handle (default "Resize"). @tr Tutamacın erişilebilir adı (varsayılan "Boyutlandır"). */
   label?: string;
-  /** The handle: true (default, a line), false (fixed panes with a plain divider), or your own grip drawn on the line. */
+  /** The handle: true (default, a line), false (fixed panes with a plain divider), or your own grip drawn on the line. @tr Tutamaç: true (varsayılan, bir çizgi), false (sabit bölmeler, düz bir ayırıcı) ya da çizginin üstüne çizilen kendi tutamacınız. */
   handle?: boolean | unknown;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
 }
 /** Two resizable panes (drag the handle, or the arrow keys / Home / End on it; Enter resets). */

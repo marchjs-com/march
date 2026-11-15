@@ -37,18 +37,21 @@ export interface StatusItem {
   live?: boolean;
 }
 export interface StatusBarProps {
+  /** The items of the bar (live). @tr Çubuğun öğeleri (canlı). */
   items: MaybeFn<readonly StatusItem[]>;
+  /** Accessible name of the bar (default "Status bar"). @tr Çubuğun erişilebilir adı (varsayılan "Durum çubuğu"). */
   label?: MaybeFn<string | undefined>;
-  /** Accessible name of the "…" menu (default "More status"). */
+  /** Accessible name of the "…" menu (default "More status"). @tr "…" menüsünün erişilebilir adı (varsayılan "Diğer durumlar"). */
   moreLabel?: MaybeFn<string | undefined>;
-  /** Icon of the "…" menu button. */
+  /** Icon of the "…" menu button. @tr "…" menü düğmesinin ikonu. */
   moreIcon?: unknown;
-  /** false: no "…" menu; every item stays in the bar (default true). */
+  /** false: no "…" menu; every item stays in the bar (default true). @tr false: "…" menüsü yok; her öğe çubukta kalır (varsayılan true). */
   overflow?: boolean;
-  /** The tone dot of items without an icon: true (default), false, or `(tone, item) => node` (tone is live). */
+  /** The tone dot of items without an icon: true (default), false, or `(tone, item) => node` (tone is live). @tr İkonsuz öğelerin ton noktası: true (varsayılan), false ya da `(tone, item) => node` (tone canlıdır). */
   dot?: boolean | ((tone: () => StatusTone, item: StatusItem) => unknown);
-  /** false: the dot of a busy item stays still (default true). */
+  /** false: the dot of a busy item stays still (default true). @tr false: meşgul bir öğenin noktası kıpırdamaz (varsayılan true). */
   pulse?: boolean;
+  /** Extra class on the bar. @tr Çubuğa eklenen sınıf. */
   class?: ClassProp;
 }
 

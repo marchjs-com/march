@@ -16,22 +16,23 @@ export type ResizeEdge = "end" | "start" | "top" | "bottom" | "top-start" | "top
 
 /** Props of <ResizeHandle>. The behavior options (`value`, `set`, `min`, `max`, `step`, `scale`, `reset`…) are those of resizeHandle(). Other props go to the element. */
 export interface ResizeHandleProps extends Partial<Omit<ResizeHandleOptions, "value">> {
-  /** The current size: a number (a live JSX value) or an accessor. With `set` the handle is a full separator. */
+  /** The current size: a number (a live JSX value) or an accessor. With `set` the handle is a full separator. @tr Şu anki boyut: bir sayı (canlı JSX değeri) ya da bir erişimci. `set` ile tutamaç tam bir ayırıcı olur. */
   value?: number | (() => number) | undefined;
-  /** Edge or corner of the parent (default "end"). start / top grow the thing toward the start (`invert`). */
+  /** Edge or corner of the parent (default "end"). start / top grow the thing toward the start (`invert`). @tr Üst öğenin kenarı ya da köşesi (varsayılan "end"). start / top öğeyi başa doğru büyütür (`invert`). */
   edge?: ResizeEdge | undefined;
-  /** Accessible name (default "Resize"). */
+  /** Accessible name (default "Resize"). @tr Erişilebilir ad (varsayılan "Boyutlandır"). */
   label?: MaybeFn<string | undefined>;
-  /** The line: "hover" (default: on hover, focus and drag), "always", or "none". */
+  /** The line: "hover" (default: on hover, focus and drag), "always", or "none". @tr Çizgi: "hover" (varsayılan: üzerine gelince, odakta ve sürüklerken), "always" ya da "none". */
   line?: MaybeFn<"hover" | "always" | "none" | undefined>;
-  /** A visible grip in the middle: true (a short bar), or your own node. */
+  /** A visible grip in the middle: true (a short bar), or your own node. @tr Ortada görünür bir tutamaç: true (kısa bir çubuk) ya da kendi düğümünüz. */
   grip?: boolean | Node | undefined;
-  /** No pointer, no focus. */
+  /** No pointer, no focus. @tr İşaretçi yok, odak yok. */
   disabled?: MaybeFn<boolean | undefined>;
-  /** Without `value` + `set`: arrow keys call this with a step in px along x (RTL mirrored) and y; Shift = 4 steps. */
+  /** Without `value` + `set`: arrow keys call this with a step in px along x (RTL mirrored) and y; Shift = 4 steps. @tr `value` + `set` yokken: ok tuşları bunu x (RTL'de aynalanır) ve y boyunca px adımla çağırır; Shift = 4 adım. */
   onStep?: ((dx: number, dy: number, e: KeyboardEvent) => void) | undefined;
-  /** Called with the element. */
+  /** Called with the element. @tr Öğeyle çağrılır. */
   ref?: ((el: HTMLElement) => void) | undefined;
+  /** Extra class on the handle. @tr Tutamaca eklenen sınıf. */
   class?: ClassProp | undefined;
   [attr: string]: unknown;
 }

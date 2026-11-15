@@ -15,26 +15,27 @@ import tr from "./tr.ts";
 messages("tr", tr);
 
 export interface ReplyQuoteProps {
-  /** The first line: who is quoted ("Deniz"), or your own line ("Replying to Deniz"). */
+  /** The first line: who is quoted ("Deniz"), or your own line ("Replying to Deniz"). @tr İlk satır: alıntılanan kişi ("Deniz") ya da kendi satırınız ("Deniz'e yanıt"). */
   name?: MaybeFn<unknown>;
-  /** The quoted text. */
+  /** The quoted text. @tr Alıntılanan metin. */
   text?: MaybeFn<unknown>;
-  /** Lines of the text kept (default 2; 1 for a preview above a field; 0 shows all). */
+  /** Lines of the text kept (default 2; 1 for a preview above a field; 0 shows all). @tr Metinden tutulan satır sayısı (varsayılan 2; alan üstündeki önizleme için 1; 0 hepsini gösterir). */
   lines?: MaybeFn<number | undefined>;
-  /** "soft" (default: a tinted box) or "inverse" (inside a coloured bubble: darker box, bar and name in the text colour). */
+  /** "soft" (default: a tinted box) or "inverse" (inside a coloured bubble: darker box, bar and name in the text colour). @tr "soft" (varsayılan: renkli bir kutu) ya da "inverse" (renkli bir balonun içinde: daha koyu kutu, çubuk ve ad metin renginde). */
   variant?: MaybeFn<"soft" | "inverse" | undefined>;
-  /** The bar at the start edge (default true). */
+  /** The bar at the start edge (default true). @tr Baş kenardaki çubuk (varsayılan true). */
   bar?: MaybeFn<boolean | undefined>;
-  /** Shows the cancel button and runs on it. */
+  /** Shows the cancel button and runs on it. @tr Vazgeç düğmesini gösterir ve ona basılınca çağrılır. */
   onClose?: (() => void) | undefined;
-  /** The cancel button: shown when `onClose` is given (default), false for none, or your own icon for it. */
+  /** The cancel button: shown when `onClose` is given (default), false for none, or your own icon for it. @tr Vazgeç düğmesi: `onClose` verilince gösterilir (varsayılan), false ile hiç, ya da onun için kendi ikonunuz. */
   close?: boolean | unknown | undefined;
-  /** Accessible name of the cancel button (default "Cancel reply"). */
+  /** Accessible name of the cancel button (default "Cancel reply"). @tr Vazgeç düğmesinin erişilebilir adı (varsayılan "Yanıtı iptal et"). */
   closeLabel?: MaybeFn<string | undefined>;
-  /** After the text, before the cancel button: a thumbnail of a quoted photo, your own control. */
+  /** After the text, before the cancel button: a thumbnail of a quoted photo, your own control. @tr Metinden sonra, vazgeç düğmesinden önce: alıntılanan fotoğrafın küçük resmi, kendi denetiminiz. */
   trail?: unknown;
-  /** Makes the quote a button (jump to the quoted message). */
+  /** Makes the quote a button (jump to the quoted message). @tr Alıntıyı bir düğme yapar (alıntılanan mesaja gitmek için). */
   onClick?: ((e: MouseEvent) => void) | undefined;
+  /** Extra class on the box. @tr Kutuya eklenen sınıf. */
   class?: ClassProp;
   /** Other attributes (`id`, `data-*`, `ref`, `aria-*`) go to the box. */
   [attr: string]: unknown;

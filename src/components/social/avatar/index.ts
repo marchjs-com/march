@@ -20,25 +20,29 @@ const hue = (s: unknown): number => hashString(s) % 8;
 
 export type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
 export interface AvatarProps {
+  /** The person's name: gives the initials, the colour and the accessible name. @tr Kişinin adı: baş harfleri, rengi ve erişilebilir adı buradan gelir. */
   name?: MaybeFn<string | null | undefined>;
+  /** Image address; the initials show while it loads or if it fails. @tr Resim adresi; yüklenirken ya da yüklenemezse baş harfler görünür. */
   src?: MaybeFn<string | null | undefined>;
+  /** Size: xs, sm, md (default), lg or xl. @tr Boyut: xs, sm, md (varsayılan), lg ya da xl. */
   size?: MaybeFn<AvatarSize | undefined>;
-  /** Ready text instead of the initials ("+3", "?"). */
+  /** Ready text instead of the initials ("+3", "?"). @tr Baş harfler yerine hazır metin ("+3", "?"). */
   text?: MaybeFn<string | null | undefined>;
-  /** An icon (or node) instead of the initials when there is no image. */
+  /** An icon (or node) instead of the initials when there is no image. @tr Resim yokken baş harfler yerine bir ikon (ya da düğüm). */
   icon?: unknown;
-  /** A fixed theme colour instead of the colour taken from the name. */
+  /** A fixed theme colour instead of the colour taken from the name. @tr Addan alınan renk yerine sabit bir tema rengi. */
   color?: MaybeFn<ColorToken | undefined>;
-  /** "circle" (default) or "square" (rounded). */
+  /** "circle" (default) or "square" (rounded). @tr "circle" (varsayılan) ya da "square" (yuvarlatılmış köşeli). */
   shape?: MaybeFn<"circle" | "square" | undefined>;
-  /** Accessible name (default: the name, or "Avatar"). */
+  /** Accessible name (default: the name, or "Avatar"). @tr Erişilebilir ad (varsayılan: ad ya da "Avatar"). */
   label?: MaybeFn<string | undefined>;
-  /** Hidden from screen readers (the name is written next to it). */
+  /** Hidden from screen readers (the name is written next to it). @tr Ekran okuyuculardan gizlenir (ad zaten yanında yazılıdır). */
   decorative?: boolean | undefined;
-  /** How the image loads (default "lazy"). */
+  /** How the image loads (default "lazy"). @tr Resmin nasıl yükleneceği (varsayılan "lazy"). */
   loading?: "lazy" | "eager" | undefined;
+  /** Extra class on the root (`.m-avatar`). @tr Köke (`.m-avatar`) eklenen sınıf. */
   class?: ClassProp;
-  /** Own content instead of the image / initials. */
+  /** Own content instead of the image / initials. @tr Resim / baş harfler yerine kendi içeriğiniz. */
   children?: unknown;
 }
 /** `<Avatar name="Ada Lovelace" src={url} size="sm|md|lg" />` — initials when there is no image or it fails. */

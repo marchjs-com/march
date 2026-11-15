@@ -6,15 +6,17 @@ import { rest, val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts
 /** Corner radius of the whole: a token step (0 square … 4, the theme's radius scale) or "full". */
 export type JoinedRadius = 0 | 1 | 2 | 3 | 4 | "full";
 export interface JoinedProps {
-  /** "vertical" (default: one under the other) or "horizontal" (side by side). */
+  /** "vertical" (default: one under the other) or "horizontal" (side by side). @tr "vertical" (varsayılan: alt alta) ya da "horizontal" (yan yana). */
   direction?: MaybeFn<"vertical" | "horizontal" | undefined>;
-  /** Corner radius of the whole (default: the theme's radius, step 2); the parts have none of their own. */
+  /** Corner radius of the whole (default: the theme's radius, step 2); the parts have none of their own. @tr Bütünün köşe yarıçapı (varsayılan: temanın yarıçapı, adım 2); parçaların kendi yarıçapı olmaz. */
   radius?: MaybeFn<JoinedRadius | undefined>;
-  /** The frame around the whole (default true). */
+  /** The frame around the whole (default true). @tr Bütünün çevresindeki çerçeve (varsayılan true). */
   border?: MaybeFn<boolean | undefined>;
-  /** A line between the parts (default true). */
+  /** A line between the parts (default true). @tr Parçalar arasında bir çizgi (varsayılan true). */
   dividers?: MaybeFn<boolean | undefined>;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
+  /** The joined parts. @tr Birleştirilen parçalar. */
   children?: unknown;
   /** Other attributes (role, aria-*, data-*) go to the element. */
   [attr: string]: unknown;

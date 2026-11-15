@@ -40,41 +40,61 @@ export interface WindowApi {
 }
 
 export interface WindowProps {
+  /** Title text in the bar (live); also names the window. @tr Çubuktaki başlık metni (canlı); pencerenin adı da olur. */
   title?: MaybeFn<string> | undefined;
-  /** An icon node before the title. */
+  /** An icon node before the title. @tr Başlıktan önce bir ikon düğümü. */
   icon?: unknown;
-  /** Look of the frame (default "hadi"). */
+  /** Look of the frame (default "hadi"). @tr Çerçevenin görünümü (varsayılan "hadi"). */
   chrome?: MaybeFn<WindowChrome | undefined> | undefined;
-  /** Start place and size in px (default: 32 × 20 rem, centered). */
-  x?: number | undefined; y?: number | undefined; width?: number | undefined; height?: number | undefined;
-  minWidth?: number | undefined; minHeight?: number | undefined;
-  /** Start state, or a live one with onStateChange. */
+  /** Start place and size in px (default: 32 × 20 rem, centered). @tr Px cinsinden başlangıç yeri ve boyutu (varsayılan: 32 × 20 rem, ortada). */
+  x?: number | undefined;
+  /** Start top position, px (default: centered). @tr Başlangıçtaki üst konum, px (varsayılan: ortada). */
+  y?: number | undefined;
+  /** Start width, px (default 32 rem). @tr Başlangıç genişliği, px (varsayılan 32 rem). */
+  width?: number | undefined;
+  /** Start height, px (default 20 rem). @tr Başlangıç yüksekliği, px (varsayılan 20 rem). */
+  height?: number | undefined;
+  /** Smallest width while resizing, px (default 220). @tr Boyutlandırırken en küçük genişlik, px (varsayılan 220). */
+  minWidth?: number | undefined;
+  /** Smallest height while resizing, px (default 120). @tr Boyutlandırırken en küçük yükseklik, px (varsayılan 120). */
+  minHeight?: number | undefined;
+  /** Start state, or a live one with onStateChange. @tr Başlangıç durumu ya da onStateChange ile canlı bir durum. */
   state?: MaybeFn<WindowState | undefined> | undefined;
+  /** Called with the new state: normal, minimized, maximized, start, end or bottom. @tr Yeni durumla çağrılır: normal, minimized, maximized, start, end ya da bottom. */
   onStateChange?: ((s: WindowState) => void) | undefined;
-  /** Shown while true (live); without it the close button removes the window until it is rendered again. */
+  /** Shown while true (live); without it the close button removes the window until it is rendered again. @tr true iken gösterilir (canlı); yoksa kapat düğmesi pencereyi yeniden çizilene dek kaldırır. */
   open?: MaybeFn<boolean | undefined> | undefined;
+  /** Called when the close button is pressed. @tr Kapat düğmesine basılınca çağrılır. */
   onClose?: (() => void) | undefined;
-  /** Buttons to show (default all three). */
-  minimizable?: boolean | undefined; maximizable?: boolean | undefined; closable?: boolean | undefined;
-  /** false: fixed in place (the buttons still work). */
+  /** false hides the minimize button (default true). @tr false küçültme düğmesini gizler (varsayılan true). */
+  minimizable?: boolean | undefined;
+  /** false hides the maximize button; a double click on the bar no longer fills (default true). @tr false büyütme düğmesini gizler; çubuğa çift tıklama artık doldurmaz (varsayılan true). */
+  maximizable?: boolean | undefined;
+  /** false hides the close button (default true). @tr false kapat düğmesini gizler (varsayılan true). */
+  closable?: boolean | undefined;
+  /** false: fixed in place (the buttons still work). @tr false: yerinde sabit (düğmeler yine çalışır). */
   movable?: boolean | undefined;
+  /** false: the size is fixed (default true). @tr false: boyut sabittir (varsayılan true). */
   resizable?: boolean | undefined;
-  /** Dock when dragged to an edge (default true). */
+  /** Dock when dragged to an edge (default true). @tr Kenara sürüklenince yanaşır (varsayılan true). */
   snap?: boolean | undefined;
-  /** Keep place, size and state in localStorage under "m.win.<persist>". */
+  /** Keep place, size and state in localStorage under "m.win.<persist>". @tr Yeri, boyutu ve durumu localStorage'da "m.win.<persist>" altında saklar. */
   persist?: string | undefined;
-  /** Texts of the buttons and the title bar (the defaults are translated). */
+  /** Texts of the buttons and the title bar (the defaults are translated). @tr Düğmelerin ve başlık çubuğunun metinleri (varsayılanlar çevrilir). */
   labels?: { close?: string; minimize?: string; restore?: string; maximize?: string; move?: string; moveHint?: string } | undefined;
-  /** Your own button icons: an icon, a text or a node each. */
+  /** Your own button icons: an icon, a text or a node each. @tr Kendi düğme ikonlarınız: her biri bir ikon, bir metin ya da bir düğüm. */
   icons?: { close?: unknown; minimize?: unknown; maximize?: unknown; restore?: unknown } | undefined;
-  /** Accent of the frame: the title icon, the button hover and the dock preview (default: the accent). */
+  /** Accent of the frame: the title icon, the button hover and the dock preview (default: the accent). @tr Çerçevenin vurgusu: başlık ikonu, düğme üzerine gelme ve yanaşma önizlemesi (varsayılan: vurgu rengi). */
   color?: ColorToken | undefined;
-  /** The brand stripe of the "hadi" look (default true). */
+  /** The brand stripe of the "hadi" look (default true). @tr "hadi" görünümünün marka şeridi (varsayılan true). */
   stripe?: boolean | undefined;
-  /** false: place and size change at once, without a transition (default true). */
+  /** false: place and size change at once, without a transition (default true). @tr false: yer ve boyut geçişsiz, hemen değişir (varsayılan true). */
   animated?: boolean | undefined;
+  /** Extra class on the frame (`.m-win`). @tr Çerçeveye (`.m-win`) eklenen sınıf. */
   class?: ClassProp | undefined;
+  /** Receives the window's API: `{ state, set, restore, close, focus }`. @tr Pencerenin API'sini alır: `{ state, set, restore, close, focus }`. */
   ref?: ((api: WindowApi) => void) | undefined;
+  /** The window's content. @tr Pencerenin içeriği. */
   children?: unknown;
 }
 

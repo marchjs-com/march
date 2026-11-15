@@ -7,26 +7,31 @@ import { rest, val, cx, type ClassProp } from "../../../ui/util.ts";
 import { clamp } from "../../../core/util.ts";
 
 export interface GridProps {
-  /** Columns 1–6 (default 2); collapses to 2 on tablets (4+ columns) and 1 on phones. */
+  /** Columns 1–6 (default 2); collapses to 2 on tablets (4+ columns) and 1 on phones. @tr Sütun sayısı 1–6 (varsayılan 2); tablette 2'ye (4+ sütunda), telefonda 1'e iner. */
   cols?: number;
+  /** Space between cells: token step 0–8 (default 4). @tr Hücreler arası boşluk: belirteç adımı 0–8 (varsayılan 4). */
   gap?: number;
-  /** Auto columns of at least this width ("16rem") instead of a fixed count. */
+  /** Auto columns of at least this width ("16rem") instead of a fixed count. @tr Sabit sayı yerine en az bu genişlikte ("16rem") otomatik sütunlar. */
   min?: string;
   /**
    * Last row: "stretch" — its items share the row's remaining space equally; "last" — only the last item grows into it
    * (with `cols`). Default: aligned columns with a gap at the end.
+   * @tr Son satır: "stretch" — öğeler kalan yeri eşit paylaşır; "last" — yalnız son öğe büyür (`cols` ile). Varsayılan: hizalı sütunlar, sonda boşluk.
    */
   fill?: "stretch" | "last";
-  /** Pick the column count that spreads items evenly over the rows (5 in 4 columns → 3 + 2, not 4 + 1). CSS only. */
+  /** Pick the column count that spreads items evenly over the rows (5 in 4 columns → 3 + 2, not 4 + 1). CSS only. @tr Öğeleri satırlara eşit dağıtan sütun sayısını seçer (4 sütunda 5 öğe → 4 + 1 değil, 3 + 2). Yalnız CSS. */
   balance?: boolean;
-  /** Narrowest column (default "9rem"): when the box is too narrow for `cols` of this width, fewer columns are used. */
+  /** Narrowest column (default "9rem"): when the box is too narrow for `cols` of this width, fewer columns are used. @tr En dar sütun (varsayılan "9rem"): kutu bu genişlikte `cols` sütuna yetmezse daha az sütun kullanılır. */
   minCol?: string;
   /**
    * Every row as tall as the tallest, across the whole grid. With `cols` it combines with `fill` (span mode: the last
    * row is filled AND all rows are equal). Cards in one row are always equal height.
+   * @tr Bütün ızgarada her satır en uzunu kadar uzun. `cols` ile `fill` ile birleşir (son satır doldurulur VE tüm satırlar eşit olur). Bir satırdaki kartlar her zaman eşit boydadır.
    */
   equal?: boolean;
+  /** Extra class on the root (`.m-grid`). @tr Köke (`.m-grid`) eklenen sınıf. */
   class?: ClassProp;
+  /** The cells. @tr Hücreler. */
   children?: unknown;
   [attr: string]: unknown;
 }

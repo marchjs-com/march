@@ -9,12 +9,13 @@ import { type ColorToken } from "../../../theme/colors.ts";
 import { badgeCheck } from "../../../icons/glyphs/badgeCheck.ts";
 
 export interface VerifiedMarkProps {
-  /** Accessible name (default "Verified"); `false`: decorative (the text beside it says it). */
+  /** Accessible name (default "Verified"); `false`: decorative (the text beside it says it). @tr Erişilebilir ad (varsayılan "Doğrulanmış"); `false`: süs amaçlı (yanındaki metin zaten söyler). */
   label?: MaybeFn<string | false | undefined>;
-  /** Own icon (an icon of hadi-march/icons, text or a node). */
+  /** Own icon (an icon of hadi-march/icons, text or a node). @tr Kendi ikonunuz (hadi-march/icons'tan bir ikon, metin ya da düğüm). */
   icon?: unknown;
-  /** sm (beside body text, default) · md (beside a heading) · lg. */
+  /** sm (beside body text, default) · md (beside a heading) · lg. @tr sm (gövde metninin yanında, varsayılan) · md (başlığın yanında) · lg. */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
+  /** Extra class on the mark. @tr İşarete eklenen sınıf. */
   class?: ClassProp;
   /** Other attributes (`data-*`, `title`, `id`) go to the mark. */
   [attr: string]: unknown;

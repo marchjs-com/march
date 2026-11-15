@@ -11,19 +11,23 @@ import { Progress } from "../../feedback/progress/index.ts";
 import "./story-progress.css";
 
 export interface StoryProgressProps {
+  /** Number of segments (stories). @tr Parça (hikâye) sayısı. */
   count: MaybeFn<number>;
-  /** Current segment (0-based). */
+  /** Current segment (0-based). @tr Şu anki parça (0'dan başlar). */
   index: MaybeFn<number>;
-  /** Fill time of the current segment (ms). Default 6000. */
+  /** Fill time of the current segment (ms). Default 6000. @tr Şu anki parçanın dolma süresi (ms). Varsayılan 6000. */
   duration?: MaybeFn<number | undefined>;
+  /** Stops the fill (held finger, open menu). @tr Dolmayı durdurur (basılı parmak, açık menü). */
   paused?: MaybeFn<boolean | undefined>;
-  /** Restarts the current fill when it changes (the story id): the same index in another group starts over. */
+  /** Restarts the current fill when it changes (the story id): the same index in another group starts over. @tr Değişince şu anki dolmayı yeniden başlatır (hikâye id'si): başka bir gruptaki aynı sıra baştan başlar. */
   run?: MaybeFn<unknown>;
+  /** Called when the current segment is full. @tr Şu anki parça dolunca çağrılır. */
   onDone?: (() => void) | undefined;
-  /** Your own screen-reader text: `(index, count) => "…"` (index 0-based). Default "Story 2 of 5". */
+  /** Your own screen-reader text: `(index, count) => "…"` (index 0-based). Default "Story 2 of 5". @tr Kendi ekran okuyucu metniniz: `(index, count) => "…"` (index 0'dan başlar). Varsayılan "Hikâye 2 / 5". */
   label?: ((index: number, count: number) => string) | undefined;
-  /** Fill color. Default: white on the photo. */
+  /** Fill color. Default: white on the photo. @tr Dolgu rengi. Varsayılan: fotoğraf üstünde beyaz. */
   color?: MaybeFn<ColorToken | undefined>;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
 }
 

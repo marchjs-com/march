@@ -58,8 +58,9 @@ export interface LayoutProps {
   nav?: unknown;
   aside?: unknown;
   footer?: unknown;
-  /** Content for the page corners, e.g. `{ "top-end": <Status/> }` (a node or a list each). */
+  /** Content for the page corners, e.g. `{ "top-end": <Status/> }` (a node or a list each). @tr Sayfa köşeleri için içerik, ör. `{ "top-end": <Status/> }` (her biri bir düğüm ya da liste). */
   corners?: Partial<Record<Corner, unknown>> | undefined;
+  /** Page-wide behaviours for this page: `{ name: true | false | options }`, a list, or a function over the layout's list. @tr Bu sayfaya özel davranışlar: `{ ad: true | false | seçenekler }`, bir liste ya da düzenin listesini alan bir işlev. */
   features?: FeaturesProp | undefined;
   /** Document title pattern for pages ("%s · March"). */
   titleTemplate?: string | undefined;

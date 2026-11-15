@@ -23,26 +23,29 @@ export interface MediaItem {
 }
 
 export interface MediaGridProps {
+  /** The photos and videos (live). @tr Fotoğraflar ve videolar (canlı). */
   items: MaybeFn<readonly MediaItem[]>;
-  /** Tiles shown before "+N". Default 4 (2…4). */
+  /** Tiles shown before "+N". Default 4 (2…4). @tr "+N" öncesinde gösterilen kutu sayısı. Varsayılan 4 (2…4). */
   max?: MaybeFn<number | undefined>;
-  /** auto: the single photo keeps its shape · square · portrait (4:5). Default auto. */
+  /** auto: the single photo keeps its shape · square · portrait (4:5). Default auto. @tr auto: tek fotoğraf kendi biçimini korur · square · portrait (4:5). Varsayılan auto. */
   shape?: MaybeFn<"auto" | "square" | "portrait" | undefined>;
-  /** Space between tiles: none · thin (2px) · gap. Default thin. */
+  /** Space between tiles: none · thin (2px) · gap. Default thin. @tr Kutular arası boşluk: none · thin (2px) · gap. Varsayılan thin. */
   gap?: MaybeFn<"none" | "thin" | "gap" | undefined>;
+  /** A tile was pressed (open a lightbox at that index). @tr Bir kutuya basıldı (o sıradan bir ışık kutusu açın). */
   onOpen?: ((index: number, el: HTMLElement) => void) | undefined;
-  /** Double tap on a tile (like). Single taps then wait 230 ms. */
+  /** Double tap on a tile (like). Single taps then wait 230 ms. @tr Bir kutuya çift dokunma (beğeni). Tek dokunuşlar o zaman 230 ms bekler. */
   onDoubleTap?: ((index: number, el: HTMLElement) => void) | undefined;
-  /** Accessible name of the group. Default "N photos". */
+  /** Accessible name of the group. Default "N photos". @tr Grubun erişilebilir adı. Varsayılan "N fotoğraf". */
   label?: MaybeFn<string | undefined>;
-  /** Accessible name of a tile: `(index, total, item) => "…"`. Default: the alt text and "Photo 2 of 5". */
+  /** Accessible name of a tile: `(index, total, item) => "…"`. Default: the alt text and "Photo 2 of 5". @tr Bir kutunun erişilebilir adı: `(index, total, item) => "…"`. Varsayılan: alt metin ve "Fotoğraf 2 / 5". */
   tileLabel?: ((index: number, total: number, item: MediaItem) => string) | undefined;
-  /** The loading placeholder: true (a Skeleton, default), false, or `() => node`. */
+  /** The loading placeholder: true (a Skeleton, default), false, or `() => node`. @tr Yüklenme yer tutucusu: true (bir Skeleton, varsayılan), false ya da `() => node`. */
   skeleton?: boolean | (() => unknown) | undefined;
-  /** The mark on a video tile: true (default), false, or `(item) => node`. */
+  /** The mark on a video tile: true (default), false, or `(item) => node`. @tr Video kutusundaki işaret: true (varsayılan), false ya da `(item) => node`. */
   videoMark?: boolean | ((item: MediaItem) => unknown) | undefined;
-  /** "+N" on the last tile: true (default), false, or `(rest) => content`. */
+  /** "+N" on the last tile: true (default), false, or `(rest) => content`. @tr Son kutudaki "+N": true (varsayılan), false ya da `(rest) => içerik`. */
   more?: boolean | ((rest: number) => unknown) | undefined;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
 }
 

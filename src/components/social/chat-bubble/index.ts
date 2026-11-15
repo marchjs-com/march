@@ -26,44 +26,53 @@ export type MessageStatus = "sending" | "sent" | "delivered" | "read" | "failed"
 export interface Reaction { emoji: string; count: number; mine?: boolean | undefined }
 
 export interface ChatBubbleProps {
+  /** The message text; a few emoji alone are drawn large. @tr Mesaj metni; yalnız birkaç emojiden oluşursa büyük çizilir. */
   text?: MaybeFn<string | undefined>;
+  /** Your own message: sits at the end side, in the accent colour. @tr Kendi mesajınız: sonda, vurgu renginde durur. */
   mine?: MaybeFn<boolean | undefined>;
-  /** Place in a run of one sender's messages: the tail corner is on the last. Default single. */
+  /** Place in a run of one sender's messages: the tail corner is on the last. Default single. @tr Aynı kişinin ardışık mesajları içindeki yeri: kuyruk köşesi sonuncudadır. Varsayılan single. */
   position?: MaybeFn<"single" | "first" | "middle" | "last" | undefined>;
+  /** When it was sent (a Date, string or timestamp); shown as a short time. @tr Gönderilme zamanı (Date, metin ya da zaman damgası); kısa saat olarak gösterilir. */
   time?: MaybeFn<Date | string | number | undefined>;
+  /** Delivery state of your message: sending, sent, delivered, read or failed (drawn as ticks). @tr Mesajınızın iletim durumu: sending, sent, delivered, read ya da failed (tiklerle çizilir). */
   status?: MaybeFn<MessageStatus | undefined>;
-  /** Group chats: shown on the first bubble of a run, colored by `senderColor` (0–3: the HADİ colors). */
+  /** Group chats: shown on the first bubble of a run, colored by `senderColor` (0–3: the HADİ colors). @tr Grup sohbetleri: bir dizinin ilk balonunda gösterilir, rengi `senderColor` ile seçilir (0–3: HADİ renkleri). */
   sender?: MaybeFn<string | undefined>;
+  /** Colour of the sender name: 0–3, the four HADİ colours (default 0). @tr Gönderen adının rengi: 0–3, dört HADİ rengi (varsayılan 0). */
   senderColor?: MaybeFn<number | undefined>;
+  /** The quoted message above the text: `{ name, text }`. @tr Metnin üstünde alıntılanan mesaj: `{ name, text }`. */
   reply?: MaybeFn<{ name: string; text: string } | null | undefined>;
+  /** Reaction chips under the bubble: `{ emoji, count, mine? }` each. @tr Balonun altındaki tepki çipleri: her biri `{ emoji, count, mine? }`. */
   reactions?: MaybeFn<readonly Reaction[] | undefined>;
+  /** Adds the "edited" note next to the time. @tr Saatin yanına "düzenlendi" notunu ekler. */
   edited?: MaybeFn<boolean | undefined>;
-  /** A reaction chip was pressed (toggle yours). */
+  /** A reaction chip was pressed (toggle yours). @tr Bir tepki çipine basıldı (kendi tepkinizi aç/kapat). */
   onReact?: ((emoji: string) => void) | undefined;
-  /** Shows the React button (opens your picker). */
+  /** Shows the React button (opens your picker). @tr Tepki düğmesini gösterir (kendi seçicinizi açar). */
   onReactMenu?: ((anchor: HTMLElement) => void) | undefined;
-  /** Shows the Reply button and enables drag-to-reply. */
+  /** Shows the Reply button and enables drag-to-reply. @tr Yanıtla düğmesini gösterir ve sürükleyerek yanıtlamayı açar. */
   onReply?: (() => void) | undefined;
-  /** Retry a failed message. */
+  /** Retry a failed message. @tr Gönderilemeyen mesajı yeniden dener. */
   onRetry?: (() => void) | undefined;
-  /** Your own words for the texts the bubble writes: the tick names, "edited", the retry line, the React / Reply buttons. */
+  /** Your own words for the texts the bubble writes: the tick names, "edited", the retry line, the React / Reply buttons. @tr Balonun yazdığı metinler için kendi sözleriniz: tik adları, "edited", yeniden deneme satırı, Tepki / Yanıtla düğmeleri. */
   labels?: MaybeFn<Partial<Record<MessageStatus | "edited" | "retry" | "react" | "reply", string>> | undefined>;
-  /** Delivery ticks: true (default), false, or `(status) => node` for your own mark. */
+  /** Delivery ticks: true (default), false, or `(status) => node` for your own mark. @tr İletim tikleri: true (varsayılan), false ya da kendi işaretiniz için `(status) => node`. */
   ticks?: boolean | ((status: MessageStatus) => unknown) | undefined;
-  /** The time text: `(date) => "09:05"`. Default: the short time of the active locale. */
+  /** The time text: `(date) => "09:05"`. Default: the short time of the active locale. @tr Saat metni: `(date) => "09:05"`. Varsayılan: etkin dilin kısa saat biçimi. */
   formatTime?: ((at: Date) => string) | undefined;
-  /** The arrow that appears while dragging: true (default), false, or your own node. */
+  /** The arrow that appears while dragging: true (default), false, or your own node. @tr Sürüklerken beliren ok: true (varsayılan), false ya da kendi düğümünüz. */
   replyHint?: boolean | Node | undefined;
-  /** Drag-to-reply (needs `onReply`). Default true; false keeps only the Reply button. */
+  /** Drag-to-reply (needs `onReply`). Default true; false keeps only the Reply button. @tr Sürükleyerek yanıtlama (`onReply` gerekir). Varsayılan true; false yalnız Yanıtla düğmesini bırakır. */
   swipe?: MaybeFn<boolean | undefined>;
-  /** The React / Reply buttons shown on hover and focus. Default true. */
+  /** The React / Reply buttons shown on hover and focus. Default true. @tr Üzerine gelince ve odakta görünen Tepki / Yanıtla düğmeleri. Varsayılan true. */
   tools?: boolean | undefined;
-  /** Your own icon for the React button. */
+  /** Your own icon for the React button. @tr Tepki düğmesi için kendi ikonunuz. */
   reactIcon?: unknown;
-  /** Your own icon for the Reply button. */
+  /** Your own icon for the Reply button. @tr Yanıtla düğmesi için kendi ikonunuz. */
   replyIcon?: unknown;
-  /** Extra content (an image, a voice note) above the text. */
+  /** Extra content (an image, a voice note) above the text. @tr Metnin üstünde ek içerik (bir resim, bir sesli not). */
   children?: unknown;
+  /** Extra class on the bubble. @tr Balona eklenen sınıf. */
   class?: ClassProp;
 }
 

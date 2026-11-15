@@ -15,25 +15,29 @@ import "./story-ring.css";
 export type StoryRingState = "new" | "seen" | "close" | "none";
 
 export interface StoryRingProps {
+  /** The person's name (avatar initials and accessible name). @tr Kişinin adı (avatar baş harfleri ve erişilebilir ad). */
   name: MaybeFn<string>;
+  /** Avatar image address. @tr Avatar resminin adresi. */
   src?: MaybeFn<string | null | undefined>;
+  /** new (default: the four HADİ colours) · seen (a quiet line) · close (friends-only green) · none (no ring). @tr new (varsayılan: dört HADİ rengi) · seen (sakin bir çizgi) · close (yalnız yakın arkadaşlar, yeşil) · none (halka yok). */
   state?: MaybeFn<StoryRingState | undefined>;
-  /** sm 40 · md 58 · lg 88 px. Default md. */
+  /** sm 40 · md 58 · lg 88 px. Default md. @tr sm 40 · md 58 · lg 88 px. Varsayılan md. */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
-  /** Text under the ring (story tray). */
+  /** Text under the ring (story tray). @tr Halkanın altındaki metin (hikâye şeridi). */
   label?: MaybeFn<string | undefined>;
-  /** A small + badge (your own story: add one). */
+  /** A small + badge (your own story: add one). @tr Küçük bir + rozeti (kendi hikâyeniz: ekleyin). */
   add?: MaybeFn<boolean | undefined>;
-  /** Turns the ring (stories are loading). */
+  /** Turns the ring (stories are loading). @tr Halkayı döndürür (hikâyeler yükleniyor). */
   loading?: MaybeFn<boolean | undefined>;
-  /** Makes it a button. */
+  /** Makes it a button. @tr Onu bir düğme yapar. */
   onClick?: ((e: MouseEvent) => void) | undefined;
-  /** Your own accessible name. Default: "HADİ, new story" / "HADİ, story seen" / the name. */
+  /** Your own accessible name. Default: "HADİ, new story" / "HADİ, story seen" / the name. @tr Kendi erişilebilir adınız. Varsayılan: "HADİ, yeni hikâye" / "HADİ, hikâye görüldü" / ad. */
   ariaLabel?: MaybeFn<string | undefined>;
-  /** Your own content for the + badge. */
+  /** Your own content for the + badge. @tr + rozeti için kendi içeriğiniz. */
   addIcon?: unknown;
-  /** Your own node instead of the Avatar (a logo, an image). */
+  /** Your own node instead of the Avatar (a logo, an image). @tr Avatar yerine kendi düğümünüz (bir logo, bir resim). */
   avatar?: unknown;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
 }
 

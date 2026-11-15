@@ -28,7 +28,12 @@ export function overlayScopeFor(from?: Element | null): HTMLElement | null {
 // <Portal layer> and the layer stack ask this when a layer opens
 _setScopeOf(() => overlayScopeFor());
 
-export interface OverlayScopeProps { class?: MaybeFn<ClassProp>; children?: unknown }
+export interface OverlayScopeProps {
+  /** Extra class on the box. @tr Kutuya eklenen sınıf. */
+  class?: MaybeFn<ClassProp>;
+  /** The content; layers opened inside it stay in the box. @tr İçerik; içinde açılan katmanlar kutunun içinde kalır. */
+  children?: unknown;
+}
 
 /** A box that keeps the layers opened inside it (drawers, dialogs, menus, toasts) inside it. */
 export function OverlayScope(props: OverlayScopeProps): Element {

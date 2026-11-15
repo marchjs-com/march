@@ -22,9 +22,11 @@ const orders = new WeakMap<Node, number>();
 
 /** What a rendered corner accepts. */
 export interface CornerControlsProps {
+  /** Which page corner: "bottom-end" (default), "bottom-start", "top-start" or "top-end". @tr Sayfanın hangi köşesi: "bottom-end" (varsayılan), "bottom-start", "top-start" ya da "top-end". */
   corner?: Corner;
-  /** Accessible name of the corner group (default "Page controls"). */
+  /** Accessible name of the corner group (default "Page controls"). @tr Köşe grubunun erişilebilir adı (varsayılan "Sayfa denetimleri"). */
   label?: MaybeFn<string | undefined>;
+  /** Extra class on the corner group. @tr Köşe grubuna eklenen sınıf. */
   class?: ClassProp;
 }
 

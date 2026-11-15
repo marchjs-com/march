@@ -10,16 +10,21 @@ import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface AccordionItem { id?: string; title: unknown; subtitle?: unknown; icon?: unknown; content: unknown; disabled?: boolean }
 export interface AccordionProps {
+  /** The sections: `{ id?, title, subtitle?, icon?, content, disabled? }` each. @tr Bölümler: her biri `{ id?, title, subtitle?, icon?, content, disabled? }`. */
   items: readonly AccordionItem[];
+  /** Several sections may be open at once (default false). @tr Aynı anda birden çok bölüm açık olabilir (varsayılan false). */
   multiple?: boolean;
+  /** Sections open at first, by `id` or index (default none). @tr Başta açık olan bölümler, `id` ya da sıra numarasıyla (varsayılan: hiçbiri). */
   open?: readonly (string | number)[];
+  /** The look: "separated" (default) or "contained". @tr Görünüm: "separated" (varsayılan) ya da "contained". */
   variant?: "separated" | "contained";
-  /** The arrow at the end of a header: true (default), false, an icon / text, or `(open, item) => node` (open is live). */
+  /** The arrow at the end of a header: true (default), false, an icon / text, or `(open, item) => node` (open is live). @tr Başlığın sonundaki ok: true (varsayılan), false, bir ikon / metin ya da `(open, item) => node` (open canlıdır). */
   chevron?: boolean | unknown | ((open: () => boolean, item: AccordionItem) => unknown);
-  /** false: panels open and close at once, the arrow does not turn (default true). */
+  /** false: panels open and close at once, the arrow does not turn (default true). @tr false: bölümler hemen açılıp kapanır, ok dönmez (varsayılan true). */
   animated?: boolean;
-  /** Called when a section opens or closes. */
+  /** Called when a section opens or closes. @tr Bir bölüm açıldığında ya da kapandığında çağrılır. */
   onToggle?: (key: string | number, open: boolean) => void;
+  /** Extra class on the root (`.m-accordion`). @tr Köke (`.m-accordion`) eklenen sınıf. */
   class?: ClassProp;
 }
 /** `<Accordion items={[{ title: "Shipping", content: … }]} multiple />` — animated height, ↑ ↓ Home End between headers. */

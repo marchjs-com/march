@@ -31,32 +31,35 @@ export interface ExplodedPart {
 export type ExplodedLayer = "shadow" | "surface" | "content" | "ring";
 
 export interface ExplodedViewProps {
-  /** Apart or together: a signal, a value / accessor, or `bind:open`. */
+  /** Apart or together: a signal, a value / accessor, or `bind:open`. @tr Ayrık mı, birleşik mi: bir sinyal, bir değer / erişimci ya da `bind:open`. */
   open?: MaybeFn<boolean | undefined>;
+  /** Called with the new state (with `bind:open` it is set for you). @tr Yeni durumla çağrılır (`bind:open` ile sizin yerinize verilir). */
   setOpen?: ((v: boolean) => void) | undefined;
-  /** Elements that rise as plates (reactive). Without it: the layers of one element. */
+  /** Elements that rise as plates (reactive). Without it: the layers of one element. @tr Plaka olarak yükselen öğeler (reaktif). Yoksa: tek bir öğenin katmanları. */
   parts?: MaybeFn<readonly ExplodedPart[] | undefined>;
-  /** Layers mode: the element taken apart, a selector inside the content (default: the first element). */
+  /** Layers mode: the element taken apart, a selector inside the content (default: the first element). @tr Katman modu: ayrılan öğe, içerikte bir seçici (varsayılan: ilk öğe). */
   target?: MaybeFn<string | undefined>;
-  /** Layers mode: the name of a layer, or false to leave that layer out (defaults: Shadow, Surface, Content, Focus ring; translated). */
+  /** Layers mode: the name of a layer, or false to leave that layer out (defaults: Shadow, Surface, Content, Focus ring; translated). @tr Katman modu: bir katmanın adı ya da o katmanı dışarıda bırakmak için false (varsayılanlar: Gölge, Yüzey, İçerik, Odak halkası; çevrilir). */
   layers?: Partial<Record<ExplodedLayer, string | false>> | undefined;
-  /** The name tags (default true). */
+  /** The name tags (default true). @tr Ad etiketleri (varsayılan true). */
   tags?: MaybeFn<boolean | undefined>;
-  /** Distance between two plates, px (default 26). */
+  /** Distance between two plates, px (default 26). @tr İki plaka arasındaki mesafe, px (varsayılan 26). */
   gap?: MaybeFn<number | undefined>;
-  /** The tilt, degrees: `x` leans it back (default 52), `z` turns it (default -30; mirrored in RTL). */
+  /** The tilt, degrees: `x` leans it back (default 52), `z` turns it (default -30; mirrored in RTL). @tr Eğim, derece: `x` geriye yatırır (varsayılan 52), `z` döndürür (varsayılan -30; RTL'de aynalanır). */
   tilt?: { x?: number; z?: number } | undefined;
-  /** The content is scaled down so its longer side is at most this many px when apart (default 420); false: never scaled. */
+  /** The content is scaled down so its longer side is at most this many px when apart (default 420); false: never scaled. @tr Ayrıkken içerik, uzun kenarı en çok bu kadar px olacak şekilde küçülür (varsayılan 420); false: hiç küçülmez. */
   fit?: number | false | undefined;
-  /** How it moves: "smooth" (default), "spring" or "none" / false. */
+  /** How it moves: "smooth" (default), "spring" or "none" / false. @tr Hareket biçimi: "smooth" (varsayılan), "spring" ya da "none" / false. */
   motion?: "smooth" | "spring" | "none" | false | undefined;
-  /** A plate was pressed while apart (the press does not reach the content). */
+  /** A plate was pressed while apart (the press does not reach the content). @tr Ayrıkken bir plakaya basıldı (basış içeriğe ulaşmaz). */
   onPick?: ((id: string, el: Element) => void) | undefined;
-  /** The plate shown as chosen (reactive): an `id`. */
+  /** The plate shown as chosen (reactive): an `id`. @tr Seçili gösterilen plaka (reaktif): bir `id`. */
   active?: MaybeFn<string | null | undefined>;
-  /** Accessible name of the group while apart (default "Exploded view", translated). */
+  /** Accessible name of the group while apart (default "Exploded view", translated). @tr Ayrıkken grubun erişilebilir adı (varsayılan "Exploded view", çevrilir). */
   label?: MaybeFn<string | undefined>;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
+  /** The content taken apart. @tr Ayrıştırılan içerik. */
   children?: unknown;
 }
 

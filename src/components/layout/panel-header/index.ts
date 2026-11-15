@@ -13,47 +13,49 @@ import { x as xIcon } from "../../../icons/glyphs/x.ts";
 
 /** Props of <PanelHeader>. Unknown props (events, aria, role, tabindex, id) go to the root element. */
 export interface PanelHeaderProps {
-  /** Root element: "header" (default), "footer" (the bar under a panel: rule above, sticks to the bottom) or "div". */
+  /** Root element: "header" (default), "footer" (the bar under a panel: rule above, sticks to the bottom) or "div". @tr Kök öğe: "header" (varsayılan), "footer" (panelin altındaki çubuk: üstte çizgi, alta yapışır) ya da "div". */
   as?: "header" | "footer" | "div" | undefined;
-  /** Before everything: a back button, a status dot, a drag grip. */
+  /** Before everything: a back button, a status dot, a drag grip. @tr Her şeyden önce: bir geri düğmesi, bir durum noktası, bir sürükleme tutamacı. */
   lead?: unknown | undefined;
-  /** An icon (IconDef, emoji, node) before the title. */
+  /** An icon (IconDef, emoji, node) before the title. @tr Başlıktan önce bir ikon (IconDef, emoji, düğüm). */
   icon?: unknown | undefined;
+  /** The title text or node. @tr Başlık metni ya da düğümü. */
   title?: MaybeFn<unknown> | undefined;
-  /** Element of the title (default "h3"; "span" in a footer). */
+  /** Element of the title (default "h3"; "span" in a footer). @tr Başlığın öğesi (varsayılan "h3"; footer içinde "span"). */
   titleAs?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span" | "div" | "p" | undefined;
-  /** Id of the title element (aria-labelledby of the panel). */
+  /** Id of the title element (aria-labelledby of the panel). @tr Başlık öğesinin id'si (panelin aria-labelledby değeri). */
   titleId?: string | undefined;
-  /** Second line under the title. */
+  /** Second line under the title. @tr Başlığın altındaki ikinci satır. */
   subtitle?: MaybeFn<unknown> | undefined;
-  /** Right after the title: a count, a badge, a status. */
+  /** Right after the title: a count, a badge, a status. @tr Başlığın hemen ardından: bir sayı, bir rozet, bir durum. */
   meta?: MaybeFn<unknown> | undefined;
-  /** The end side: buttons, menus (nodes or an accessor). */
+  /** The end side: buttons, menus (nodes or an accessor). @tr Son taraf: düğmeler, menüler (düğümler ya da bir erişimci). */
   actions?: MaybeFn<unknown> | undefined;
-  /** Shows the close button and runs on it. */
+  /** Shows the close button and runs on it. @tr Kapat düğmesini gösterir ve ona basılınca çağrılır. */
   onClose?: ((e: MouseEvent) => void) | undefined;
-  /** The close button: shown when `onClose` is given (default), false for none, or your own icon for it. */
+  /** The close button: shown when `onClose` is given (default), false for none, or your own icon for it. @tr Kapat düğmesi: `onClose` verilince gösterilir (varsayılan), false ile hiç, ya da onun için kendi ikonunuz. */
   close?: boolean | unknown | undefined;
-  /** Accessible name and tooltip of the close button (default "Close"). */
+  /** Accessible name and tooltip of the close button (default "Close"). @tr Kapat düğmesinin erişilebilir adı ve ipucu (varsayılan "Kapat"). */
   closeLabel?: MaybeFn<string | undefined>;
-  /** Height and type size (default md). */
+  /** Height and type size (default md). @tr Yükseklik ve yazı boyutu (varsayılan md). */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
-  /** Stays at the top (the bottom for a footer) of the scrolling panel. */
+  /** Stays at the top (the bottom for a footer) of the scrolling panel. @tr Kayan panelin üstünde (footer için altında) sabit kalır. */
   sticky?: MaybeFn<boolean | undefined>;
-  /** A rule between the bar and the content. */
+  /** A rule between the bar and the content. @tr Çubuk ile içerik arasında bir çizgi. */
   divider?: MaybeFn<boolean | undefined>;
-  /** "muted": the tinted bar of editors and code blocks. */
+  /** "muted": the tinted bar of editors and code blocks. @tr "muted": düzenleyicilerin ve kod bloklarının renkli çubuğu. */
   tone?: MaybeFn<"plain" | "muted" | undefined>;
-  /** The bar is a drag handle: no text selection, touch gestures go to your handlers. */
+  /** The bar is a drag handle: no text selection, touch gestures go to your handlers. @tr Çubuk bir sürükleme tutamacıdır: metin seçilmez, dokunma hareketleri sizin işleyicilerinize gider. */
   drag?: MaybeFn<boolean | undefined>;
-  /** Titles at the top of a tall bar (default: centred). */
+  /** Titles at the top of a tall bar (default: centred). @tr Yüksek bir çubukta başlıklar üstte (varsayılan: ortada). */
   align?: MaybeFn<"center" | "start" | undefined>;
-  /** Called with the root element (drag behaviors attach here). */
+  /** Called with the root element (drag behaviors attach here). @tr Kök öğeyle çağrılır (sürükleme davranışları buraya bağlanır). */
   ref?: ((el: HTMLElement) => void) | undefined;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp | undefined;
-  /** An extra class on a part, for a host that keeps its own class names: `{ titles, title, subtitle, meta, actions }`. */
+  /** An extra class on a part, for a host that keeps its own class names: `{ titles, title, subtitle, meta, actions }`. @tr Kendi sınıf adlarını koruyan bir ana bileşen için bir parçaya ek sınıf: `{ titles, title, subtitle, meta, actions }`. */
   partClass?: Partial<Record<"titles" | "title" | "subtitle" | "meta" | "actions", string>> | undefined;
-  /** Free content between the titles and the actions (tabs, a search box). */
+  /** Free content between the titles and the actions (tabs, a search box). @tr Başlıklar ile eylemler arasında serbest içerik (sekmeler, bir arama kutusu). */
   children?: unknown | undefined;
   [attr: string]: unknown;
 }

@@ -38,27 +38,31 @@ export const DEVICES: Record<string, DeviceSpec> = {
 };
 
 export interface DevicePreviewProps {
+  /** The device: a preset name (default "iphone-15") or your own `DeviceSpec`. @tr Cihaz: hazır bir ad (varsayılan "iphone-15") ya da kendi `DeviceSpec` nesneniz. */
   device?: MaybeFn<string | DeviceSpec>;
+  /** Turns the device sideways. @tr Cihazı yan çevirir. */
   landscape?: MaybeFn<boolean | undefined>;
-  /** Mouse acts as a finger (touch dot, drag to scroll, fling, long press). Default true. */
+  /** Mouse acts as a finger (touch dot, drag to scroll, fling, long press). Default true. @tr Fare parmak gibi davranır (dokunma noktası, sürükleyerek kaydırma, fırlatma, uzun basma). Varsayılan true. */
   touch?: MaybeFn<boolean | undefined>;
-  /** Scale down to fit the width of its place (default true). */
+  /** Scale down to fit the width of its place (default true). @tr Bulunduğu yerin genişliğine sığacak kadar küçülür (varsayılan true). */
   fit?: boolean;
-  /** The most height the fitted device may take, in px (default: the window's height − 160, at least 480). */
+  /** The most height the fitted device may take, in px (default: the window's height − 160, at least 480). @tr Sığdırılan cihazın alabileceği en büyük yükseklik, px (varsayılan: pencere yüksekliği − 160, en az 480). */
   fitHeight?: MaybeFn<number | undefined>;
-  /** Show this address in the device (an iframe: real viewport, real scrolling, real media queries) instead of children. */
+  /** Show this address in the device (an iframe: real viewport, real scrolling, real media queries) instead of children. @tr Alt öğeler yerine bu adresi cihazda gösterir (bir iframe: gerçek görüntü alanı, gerçek kaydırma, gerçek medya sorguları). */
   src?: MaybeFn<string | undefined>;
-  /** Accessible name of the device (default "<device> preview"). */
+  /** Accessible name of the device (default "<device> preview"). @tr Cihazın erişilebilir adı (varsayılan "<cihaz> önizlemesi"). */
   label?: MaybeFn<string | undefined>;
-  /** The status bar: true (default), false, or your own node in its place. */
+  /** The status bar: true (default), false, or your own node in its place. @tr Durum çubuğu: true (varsayılan), false ya da yerine kendi düğümünüz. */
   statusBar?: MaybeFn<boolean | undefined> | Node;
-  /** The clock text of the status bar (default: the time now), e.g. "9:41". */
+  /** The clock text of the status bar (default: the time now), e.g. "9:41". @tr Durum çubuğundaki saat metni (varsayılan: şimdiki saat), ör. "9:41". */
   time?: MaybeFn<string | undefined>;
-  /** The home indicator line (default true). */
+  /** The home indicator line (default true). @tr Ana ekran göstergesi çizgisi (varsayılan true). */
   homeIndicator?: MaybeFn<boolean | undefined>;
-  /** false hides the camera (island, punch hole or notch) of the device (default true). */
+  /** false hides the camera (island, punch hole or notch) of the device (default true). @tr false cihazın kamerasını (ada, delik ya da çentik) gizler (varsayılan true). */
   camera?: MaybeFn<boolean | undefined>;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
+  /** The page shown inside the screen (when there is no `src`). @tr Ekranın içinde gösterilen sayfa (`src` yokken). */
   children?: unknown;
 }
 

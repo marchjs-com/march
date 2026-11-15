@@ -19,23 +19,27 @@ export const QUICK_REACTIONS: readonly string[] = ["❤️", "😂", "😮", "�
 export const EMOJI_SET: readonly string[] = ["😀", "😂", "🥹", "😍", "🤩", "😎", "🤔", "😴", "😮", "😢", "😡", "🥳", "👍", "👏", "🙏", "💪", "🤝", "👋", "❤️", "🧡", "💙", "💚", "💜", "🔥", "✨", "🎉", "☕", "🍕", "⚽", "🚴", "🏃", "📸", "🎶", "📚", "🌊", "🌲"];
 
 export interface ReactionPickerProps {
+  /** Called with the chosen emoji. @tr Seçilen emojiyle çağrılır. */
   onPick: (emoji: string) => void;
+  /** The emoji offered (default: quick reactions in a row, a larger set in a grid). @tr Sunulan emojiler (varsayılan: satırda hızlı tepkiler, ızgarada daha geniş bir küme). */
   emojis?: MaybeFn<readonly string[] | undefined>;
-  /** The current reaction (pressed). */
+  /** The current reaction (pressed). @tr Şu anki tepki (basılı görünür). */
   selected?: MaybeFn<string | null | undefined>;
-  /** row: a pill (reactions) · grid: a panel (emoji keyboard). Default row. */
+  /** row: a pill (reactions) · grid: a panel (emoji keyboard). Default row. @tr row: bir hap (tepkiler) · grid: bir panel (emoji klavyesi). Varsayılan row. */
   layout?: MaybeFn<"row" | "grid" | undefined>;
-  /** A "+" at the end of a row (more emoji). */
+  /** A "+" at the end of a row (more emoji). @tr Satırın sonunda bir "+" (daha fazla emoji). */
   onMore?: (() => void) | undefined;
-  /** Pop-in animation when it appears. Default true. */
+  /** Pop-in animation when it appears. Default true. @tr Belirirken açılma animasyonu. Varsayılan true. */
   pop?: boolean | undefined;
+  /** Accessible name of the picker (default "Reactions"). @tr Seçicinin erişilebilir adı (varsayılan "Tepkiler"). */
   label?: MaybeFn<string | undefined>;
-  /** Accessible name of an emoji button: `(emoji) => "Heart"`. Default: the emoji itself. */
+  /** Accessible name of an emoji button: `(emoji) => "Heart"`. Default: the emoji itself. @tr Bir emoji düğmesinin erişilebilir adı: `(emoji) => "Kalp"`. Varsayılan: emojinin kendisi. */
   emojiLabel?: ((emoji: string) => string) | undefined;
-  /** Accessible name of the "+" button. Default "More emoji". */
+  /** Accessible name of the "+" button. Default "More emoji". @tr "+" düğmesinin erişilebilir adı. Varsayılan "Daha fazla emoji". */
   moreLabel?: MaybeFn<string | undefined>;
-  /** Your own content for the "+" button. */
+  /** Your own content for the "+" button. @tr "+" düğmesi için kendi içeriğiniz. */
   moreIcon?: unknown;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
 }
 

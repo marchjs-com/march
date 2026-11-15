@@ -18,26 +18,29 @@ import "./follow-button.css";
 export type FollowState = "follow" | "following" | "requested";
 
 export interface FollowButtonProps {
+  /** Current state: follow (default), following or requested. @tr Şu anki durum: follow (varsayılan), following ya da requested. */
   state: MaybeFn<FollowState | undefined>;
-  /** Called with the next state (follow → following, or requested when `private`; back to follow). */
+  /** Called with the next state (follow → following, or requested when `private`; back to follow). @tr Sonraki durumla çağrılır (follow → following, `private` ise requested; sonra yine follow). */
   onChange: (next: FollowState) => void;
-  /** A private account: following asks first. */
+  /** A private account: following asks first. @tr Gizli hesap: takip önce istek olarak gider. */
   private?: MaybeFn<boolean | undefined>;
-  /** Whom (accessible name: "Follow HADİ"). */
+  /** Whom (accessible name: "Follow HADİ"). @tr Kimin takip edildiği (erişilebilir ad: "HADİ'yi takip et"). */
   name?: MaybeFn<string | undefined>;
+  /** Size: sm or md (default). @tr Boyut: sm ya da md (varsayılan). */
   size?: MaybeFn<"sm" | "md" | undefined>;
-  /** Stretch to the container. */
+  /** Stretch to the container. @tr Kapsayıcının genişliğine yayılır. */
   block?: MaybeFn<boolean | undefined>;
-  /** Your own button texts: `{ follow: "Join", following: "Member", requested: "Waiting" }` (any subset). */
+  /** Your own button texts: `{ follow: "Join", following: "Member", requested: "Waiting" }` (any subset). @tr Kendi düğme metinleriniz: `{ follow: "Katıl", following: "Üye", requested: "Bekliyor" }` (istediğiniz kadarı). */
   labels?: MaybeFn<Partial<Record<FollowState, string>> | undefined>;
-  /** Your own accessible name: `(state, name) => "…"`. Default: "Follow HADİ", "Following HADİ, press to unfollow"… */
+  /** Your own accessible name: `(state, name) => "…"`. Default: "Follow HADİ", "Following HADİ, press to unfollow"… @tr Kendi erişilebilir adınız: `(state, name) => "…"`. Varsayılan: "HADİ'yi takip et", "HADİ takip ediliyor, bırakmak için basın"… */
   ariaLabel?: ((state: FollowState, name: string | undefined) => string) | undefined;
-  /** The + / tick / clock icon: true (default), false, or `(state) => node`. */
+  /** The + / tick / clock icon: true (default), false, or `(state) => node`. @tr + / tik / saat ikonu: true (varsayılan), false ya da `(state) => node`. */
   icon?: boolean | ((state: FollowState) => unknown) | undefined;
-  /** The burst of dots on a new follow. Default true. */
+  /** The burst of dots on a new follow. Default true. @tr Yeni takipte saçılan noktalar. Varsayılan true. */
   burst?: MaybeFn<boolean | undefined>;
-  /** The width spring and the icon turn between states. Default true. */
+  /** The width spring and the icon turn between states. Default true. @tr Durumlar arasında genişlik yayı ve ikon dönüşü. Varsayılan true. */
   morph?: MaybeFn<boolean | undefined>;
+  /** Extra class on the button. @tr Düğmeye eklenen sınıf. */
   class?: ClassProp;
 }
 

@@ -10,18 +10,19 @@ import { StatusDot } from "../../feedback/status-dot/index.ts";
 import "./typing-indicator.css";
 
 export interface TypingIndicatorProps {
-  /** Who is typing (names). Empty: the indicator hides. */
+  /** Who is typing (names). Empty: the indicator hides. @tr Kimlerin yazdığı (adlar). Boşsa gösterge gizlenir. */
   names?: MaybeFn<readonly string[] | undefined>;
-  /** bubble: dots in a chat bubble · inline: dots and text in a line. Default bubble. */
+  /** bubble: dots in a chat bubble · inline: dots and text in a line. Default bubble. @tr bubble: sohbet balonunda noktalar · inline: bir satırda noktalar ve metin. Varsayılan bubble. */
   variant?: MaybeFn<"bubble" | "inline" | undefined>;
-  /** Show the "… is typing" text. Default true for inline, false for bubble (still announced). */
+  /** Show the "… is typing" text. Default true for inline, false for bubble (still announced). @tr "… yazıyor" metnini gösterir. Varsayılan inline için true, bubble için false (yine de duyurulur). */
   text?: MaybeFn<boolean | undefined>;
-  /** Your own sentence: `(names) => "…"`. Default: typingText ("HADİ is typing…"). */
+  /** Your own sentence: `(names) => "…"`. Default: typingText ("HADİ is typing…"). @tr Kendi cümleniz: `(names) => "…"`. Varsayılan: typingText ("HADİ yazıyor…"). */
   label?: ((names: readonly string[]) => string) | undefined;
-  /** The three dots: true (default), false (text only), or your own node in their place. */
+  /** The three dots: true (default), false (text only), or your own node in their place. @tr Üç nokta: true (varsayılan), false (yalnız metin) ya da yerlerine kendi düğümünüz. */
   dots?: boolean | Node | undefined;
-  /** How the dots move: lift (default) · fade (no movement, they only light up in turn) · none (still). */
+  /** How the dots move: lift (default) · fade (no movement, they only light up in turn) · none (still). @tr Noktaların hareketi: lift (varsayılan) · fade (hareket yok, sırayla yanarlar) · none (durgun). */
   motion?: MaybeFn<"lift" | "fade" | "none" | undefined>;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
 }
 

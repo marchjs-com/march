@@ -12,21 +12,23 @@ import { drawDigits, rollDigits } from "../../../motion/digits.ts";
 import "./count-roll.css";
 
 export interface CountRollProps {
+  /** The number shown; digits roll when it changes. @tr Gösterilen sayı; değişince rakamlar yuvarlanır. */
   value: MaybeFn<number | null | undefined>;
-  /** compact: 1,2 B · full: 1.234 (grouped). Default compact. */
+  /** compact: 1,2 B · full: 1.234 (grouped). Default compact. @tr compact: 1,2 B · full: 1.234 (gruplu). Varsayılan compact. */
   format?: MaybeFn<"compact" | "full" | undefined>;
-  /** Hide at 0 (an empty count next to an icon). */
+  /** Hide at 0 (an empty count next to an icon). @tr 0 iken gizlenir (bir ikonun yanındaki boş sayaç). */
   hideZero?: MaybeFn<boolean | undefined>;
-  /** Roll duration (ms). Default 320. */
+  /** Roll duration (ms). Default 320. @tr Yuvarlanma süresi (ms). Varsayılan 320. */
   duration?: number | undefined;
-  /** Your own visible text for a value: `(n) => "1.2k likes"` (screen readers still get the full number). */
+  /** Your own visible text for a value: `(n) => "1.2k likes"` (screen readers still get the full number). @tr Bir değer için kendi görünen metniniz: `(n) => "1.2k beğeni"` (ekran okuyucular yine tam sayıyı alır). */
   formatter?: ((n: number) => string) | undefined;
-  /** Your own text for screen readers: `(n) => "1,234 likes"` (default: the full grouped number). */
+  /** Your own text for screen readers: `(n) => "1,234 likes"` (default: the full grouped number). @tr Ekran okuyucular için kendi metniniz: `(n) => "1.234 beğeni"` (varsayılan: tam, gruplu sayı). */
   spoken?: ((n: number) => string) | undefined;
-  /** Roll on change. Default true; false swaps the digits at once (as reduced motion does). */
+  /** Roll on change. Default true; false swaps the digits at once (as reduced motion does). @tr Değişince yuvarlanır. Varsayılan true; false rakamları hemen değiştirir (azaltılmış harekette olduğu gibi). */
   roll?: MaybeFn<boolean | undefined>;
-  /** Delay between neighbouring digits (ms). Default 24. */
+  /** Delay between neighbouring digits (ms). Default 24. @tr Komşu rakamlar arasındaki gecikme (ms). Varsayılan 24. */
   stagger?: number | undefined;
+  /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
 }
 

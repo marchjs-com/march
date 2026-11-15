@@ -16,25 +16,29 @@ import "./like-button.css";
 export { heartBurst, heartPop, type BurstOptions } from "../../../motion/burst.ts";
 
 export interface LikeButtonProps {
+  /** Liked or not (live). @tr Beğenildi mi (canlı). */
   liked: MaybeFn<boolean | null | undefined>;
-  /** Called with the next state; the owner updates `liked` (and the count). */
+  /** Called with the next state; the owner updates `liked` (and the count). @tr Sonraki durumla çağrılır; `liked` değerini (ve sayıyı) sahibi günceller. */
   onToggle: (next: boolean) => void;
+  /** The count next to the heart (hidden at 0); leave it out for no count. @tr Kalbin yanındaki sayı (0 iken gizlenir); sayı istemezseniz vermeyin. */
   count?: MaybeFn<number | null | undefined>;
+  /** Size: sm, md (default) or lg. @tr Boyut: sm, md (varsayılan) ya da lg. */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
-  /** Particle burst on like. Default true. */
+  /** Particle burst on like. Default true. @tr Beğenide parçacık patlaması. Varsayılan true. */
   burst?: MaybeFn<boolean | undefined>;
-  /** brand: particles in the four HADİ colors · single: the heart color. Default brand. */
+  /** brand: particles in the four HADİ colors · single: the heart color. Default brand. @tr brand: dört HADİ renginde parçacıklar · single: kalbin rengi. Varsayılan brand. */
   colors?: MaybeFn<"brand" | "single" | undefined>;
-  /** Accessible name. Default "Like". */
+  /** Accessible name. Default "Like". @tr Erişilebilir ad. Varsayılan "Beğen". */
   label?: MaybeFn<string | undefined>;
-  /** Your own icon instead of the heart: a node, or `(liked) => node`. */
+  /** Your own icon instead of the heart: a node, or `(liked) => node`. @tr Kalp yerine kendi ikonunuz: bir düğüm ya da `(liked) => node`. */
   icon?: Node | ((liked: boolean) => unknown) | undefined;
-  /** The pop of the icon on every toggle. Default true. */
+  /** The pop of the icon on every toggle. Default true. @tr Her geçişte ikonun zıplaması. Varsayılan true. */
   pop?: MaybeFn<boolean | undefined>;
-  /** Shape of the burst: `{ count, radius, ring }` (`ring: false` drops the ring). */
+  /** Shape of the burst: `{ count, radius, ring }` (`ring: false` drops the ring). @tr Patlamanın biçimi: `{ count, radius, ring }` (`ring: false` halkayı kaldırır). */
   burstOptions?: BurstOptions | undefined;
-  /** Text of the count: compact (1,2 B, default) or full (1.234). */
+  /** Text of the count: compact (1,2 B, default) or full (1.234). @tr Sayının metni: compact (1,2 B, varsayılan) ya da full (1.234). */
   countFormat?: MaybeFn<"compact" | "full" | undefined>;
+  /** Extra class on the button. @tr Düğmeye eklenen sınıf. */
   class?: ClassProp;
 }
 
