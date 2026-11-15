@@ -41,7 +41,10 @@ export function safeUrl(v: unknown, tag?: string): string {
 const doc = (): Document => globalThis.document;
 
 /** Fragment: returns its children as an array. */
-export const Fragment = (props: { children?: unknown }): unknown => props.children;
+export const Fragment = (props: {
+  /** The nodes rendered without a wrapper element. @tr Sarmalayıcı öğe olmadan çizilen düğümler. */
+  children?: unknown;
+}): unknown => props.children;
 
 /** Create an element (string tag) or render a component. */
 export function h<P extends object>(type: Component<P>, props: P | null, ...children: unknown[]): unknown;

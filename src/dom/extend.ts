@@ -322,7 +322,12 @@ export function withExtensions<T>(use: UseList | (() => UseList | null | undefin
   return getOwner() ? computed(() => untrack(run))() : run();
 }
 /** `<Extensions use={[track, smallButtons]}>…</Extensions>`: withExtensions as a component. */
-export function Extensions(props: { use: UseList | (() => UseList); children?: unknown }): unknown {
+export function Extensions(props: {
+  /** The extensions active inside this scope (a list, or an accessor of one). @tr Bu kapsamın içinde etkin eklentiler (bir liste ya da onu veren bir fonksiyon). */
+  use: UseList | (() => UseList);
+  /** The content the extensions apply to. @tr Eklentilerin uygulandığı içerik. */
+  children?: unknown;
+}): unknown {
   return withExtensions(() => props.use as UseList, () => { const c = props.children; return typeof c === "function" && !isReactive(c) && !c.length ? (c as () => unknown)() : c; });
 }
 
