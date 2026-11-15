@@ -41,6 +41,9 @@
 .m-dock-strip[data-mode="vertical"] .m-dock-stab { flex-direction: column; padding-block: var(--m-space-3); padding-inline: 0; }
 .m-dock-strip[data-mode="vertical"] .m-dock-stab + .m-dock-stab { border-inline-start: 0; border-block-start: 1px solid var(--m-border); }
 .m-dock-strip[data-mode="vertical"] .m-dock-stl { writing-mode: vertical-rl; transform: rotate(180deg); }
+/* the Button's label is trimmed to a level line's height (text-box, to sit on the icon's middle); a turned title is
+   taller: the label takes its own height again, so the titles do not run over the next tab */
+.m-dock-strip[data-mode="vertical"] .m-dock-stab .m-btn-label { text-box: normal; block-size: auto; display: flex; }
 
 /* splitter: a ResizeHandle sized to the gap */
 .m-dock-sep.m-resize-handle { border-radius: 3px; }
