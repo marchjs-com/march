@@ -78,7 +78,7 @@ test("ThemeEditor: tokens, color edit, undo / redo, audit fix, scoped preview va
   for (let i = 0; i < 100 && !(el.querySelector(".m-te-token") && el.querySelector(".m-te-cards .m-card") && el.querySelector(".m-te-table")); i++) await new Promise((r) => setTimeout(r, 10));
   assert.ok(el.querySelector(".m-te-cards .m-card") && el.querySelector(".m-te-table"), "both preview parts arrive");
   assert.equal(el.querySelector(".m-te").getAttribute("aria-label"), "Theme editor");
-  assert.equal(el.querySelectorAll(".m-te-base").length, 16, "fifteen presets and from scratch");
+  assert.equal(el.querySelectorAll(".m-te-base").length, 17, "sixteen presets and from scratch");
   const tokens = el.querySelectorAll(".m-te-token");
   assert.equal(tokens.length, 4 + 3 + 3 + 4 + 4 + 8);
   assert.equal(tokens[0].getAttribute("aria-pressed"), "true");

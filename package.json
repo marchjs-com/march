@@ -35,6 +35,7 @@
     "./fx/fx.css": "./src/fx/fx.css",
     "./store": "./src/store/index.ts",
     "./props": "./src/props/index.ts",
+    "./app-ui": "./src/app-ui/index.ts",
     "./channel": "./src/channel/index.ts",
     "./behaviors/drag": "./src/behaviors/drag/index.ts",
     "./behaviors/roving-focus": "./src/behaviors/roving-focus/index.ts",

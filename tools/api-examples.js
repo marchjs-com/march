@@ -39,6 +39,8 @@ const INDEX = "examples/showcase/src/api-examples.gen.ts";
 export const PENDING = new Set([
   "hadi-march/base", "hadi-march/icons", "hadi-march/icons/packs", "hadi-march/landing", "hadi-march/motion",
   "hadi-march/router", "hadi-march/seo/hydrate", "hadi-march/ui",
+  // march-app-ui: the core is in, its pages come step by step
+  "hadi-march/app-ui",
   // large components outside their category barrel (hadi-march/components/<category>/<name>)
   "hadi-march/components/composite/theme-editor", "hadi-march/components/data/data-grid",
   "hadi-march/components/data/gantt", "hadi-march/components/data/scheduler", "hadi-march/components/data/tree-view",

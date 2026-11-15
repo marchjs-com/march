@@ -75,5 +75,10 @@ export const THEME_NAMES: readonly { id: string; name: string; description?: str
     "id": "candy",
     "name": "Candy",
     "description": "Playful pastel with gradient buttons"
+  },
+  {
+    "id": "studio",
+    "name": "Studio",
+    "description": "For IDE-like apps: navy panels, orange focus, compact"
   }
 ];

@@ -252,6 +252,30 @@ export const graphite = defineTheme({
   style: { density: "compact", iconStroke: 1.5, tracking: 0 },
 });
 
+/**
+ * Studio — for march-app-ui (IDE-like apps), after HADİ Studio: navy night panels with hairline frames, orange for the
+ * active tab and the drop mark, sky blue for focus, drag zones and splitters; Bricolage throughout, compact.
+ */
+export const studio = defineTheme({
+  id: "studio", name: "Studio", description: "For IDE-like apps: navy panels, orange focus, compact",
+  font: BRICOLAGE, display: BRICOLAGE, displayWeight: 800, radius: 12,
+  light: {
+    bg: "#F6F8FB", surface: "#FFFFFF", text: "#24384C", muted: "#5B6F82", border: "#E3E9F0", primary: "#B4560A", solid: HADI.orange, onSolid: onBrandFill(HADI.orange),
+    danger: "#B42318", success: "#3F7A14", warn: "#8A5A00", info: "#0F6D9C", special: "#8F2A7A",
+    cat: [HADI.orange, HADI.blue, HADI.green, HADI.purple, HADI.pink, HADI.gold, "#24384C", "#0E9F8E"],
+    mark: HADI_RIBBON_GRADIENT, stage: HADI.night, glow: HADI_GLOW,
+  },
+  dark: {
+    bg: "#0A1929", surface: HADI.nightCard, raised: "#1A3653", text: HADI.nightText, muted: HADI.nightMuted, border: HADI.nightLine,
+    primary: "#FF9A45", solid: HADI.orange, onSolid: onBrandFill(HADI.orange),
+    danger: "#FF7B7B", success: "#95D65A", warn: "#F5B041", info: "#45B6EA", special: "#DC7CCB",
+    cat: ["#FF9A45", "#45B6EA", "#95D65A", "#DC7CCB", "#F07FA6", "#E7C35A", "#B9D3EA", "#2EC4B2"],
+    mark: HADI_RIBBON_GRADIENT, stage: "#07131F", glow: HADI_GLOW,
+  },
+  tokens: { "font-mono": `ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace` },
+  style: { density: "compact", tracking: 0 },
+});
+
 /** Paper — editorial: a paper tone, serif headings, framed surfaces, no shadows. */
 export const paper = defineTheme({
   id: "paper", name: "Paper", description: "Editorial: paper tone, serif headings, frames",
@@ -310,6 +334,6 @@ export const candy = defineTheme({
 });
 
 /** Built-in themes, default first. */
-export const THEMES: readonly ThemeDef[] = [hadi, cream, night, neon, indigo, minimal, contrastTheme, aurora, noirGold, ember, voyage, graphite, paper, mint, candy];
+export const THEMES: readonly ThemeDef[] = [hadi, cream, night, neon, indigo, minimal, contrastTheme, aurora, noirGold, ember, voyage, graphite, paper, mint, candy, studio];
 /** Name of the default theme ("hadi"). */
 export const DEFAULT_THEME = "hadi";

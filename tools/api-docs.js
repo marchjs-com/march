@@ -18,7 +18,7 @@ export const DOCS = "docs/api";
 /** Subpaths whose long-form docs (docs/api/<slug>/<name>.md) are still being written, in groups; the test fails for a
  *  missing doc of any other subpath, and when a listed subpath is already complete. */
 export const MD_PENDING = new Set([
-  "hadi-march", "hadi-march/base", "hadi-march/icons/packs", "hadi-march/landing", "hadi-march/seo/hydrate", "hadi-march/router", "hadi-march/data", "hadi-march/schema", "hadi-march/ui",
+  "hadi-march", "hadi-march/app-ui", "hadi-march/base", "hadi-march/icons/packs", "hadi-march/landing", "hadi-march/seo/hydrate", "hadi-march/router", "hadi-march/data", "hadi-march/schema", "hadi-march/ui",
   "hadi-march/components/registry.gen.ts", "hadi-march/table", "hadi-march/charts", "hadi-march/crud",
   "hadi-march/lazy", "hadi-march/sw", "hadi-march/motion", "hadi-march/motion/text", "hadi-march/motion/text/meta",
   "hadi-march/fx", "hadi-march/store", "hadi-march/props", "hadi-march/channel", "hadi-march/behaviors/drag",

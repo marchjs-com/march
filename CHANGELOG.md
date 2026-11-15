@@ -4,6 +4,15 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
+### march-app-ui: the core of March IDE (later in 0.1.0)
+- New `hadi-march/app-ui`: `AppUI`, a workspace of dockable panels after HADİ Studio Kit. Drag a tab to a side of a
+  group (a new split), its centre or between tabs (a tab), or the outer edge; closing collapses a group to a strip
+  (vertical in a row, horizontal in a column) and keeps its size for the way back; maximize, ready-made layouts
+  (`presets`, written with `row`, `col`, `tabs`), saved layouts, focus mode, narrow (one tab group) under 768 px,
+  keyboard on tabs and splitters. Panels never move in the DOM (iframes and editors keep their state).
+- `hadi-march/app-ui/layout`: the layout tree with no DOM (move, collapse, restore, geometry, hit test, save/restore).
+- New built-in theme `studio` (Studio): navy panels, orange active tab, sky-blue focus, Bricolage, compact.
+
 ### Common props: m:color, m:theme, m:dir, m:lang, m:tip, m:reveal, m:can, m:test (later in 0.1.0)
 - New common props (`hadi-march/props`, every element and component): `m:color` (colour scope), `m:theme` (a subtree
   in another colour theme), `m:dir`, `m:lang`, `m:tip` (a hint without a Tooltip wrapper), `m:reveal` (entrance once
