@@ -23,36 +23,39 @@ import { withColor } from "../../../theme/colors.ts";
 export type LiveCounterEffect = (el: HTMLElement, options?: never) => { stop(): void };
 
 export interface LiveCounterProps {
-  /** The live value (a signal or accessor fed by your data). */
+  /** The live value (a signal or accessor fed by your data). @tr Canlı değer (verinizle beslenen bir sinyal ya da erişimci). */
   value?: MaybeFn<number> | undefined;
-  /** First value when the counter simulates growth with `rate`. */
+  /** First value when the counter simulates growth with `rate`. @tr Sayaç `rate` ile büyüme taklit ederken ilk değer. */
   from?: number | undefined;
-  /** Average increase per minute (simulated growth when no `value` is given). */
+  /** Average increase per minute (simulated growth when no `value` is given). @tr Dakika başına ortalama artış (`value` verilmediğinde taklit edilen büyüme). */
   rate?: number | undefined;
-  /** Shortest and longest pause between simulated steps, ms (default [1500, 4500]). */
+  /** Shortest and longest pause between simulated steps, ms (default [1500, 4500]). @tr Taklit edilen adımlar arasındaki en kısa ve en uzun bekleme, ms (varsayılan [1500, 4500]). */
   pause?: [number, number] | undefined;
-  /** What is counted: "people online". */
+  /** What is counted: "people online". @tr Sayılan şey: "çevrimiçi kişi". */
   label?: unknown | undefined;
+  /** Node before the number. @tr Sayının önündeki düğüm. */
   prefix?: unknown | undefined;
+  /** Node after the number. @tr Sayının arkasındaki düğüm. */
   suffix?: unknown | undefined;
-  /** Intl.NumberFormat options. */
+  /** Intl.NumberFormat options. @tr Intl.NumberFormat seçenekleri. */
   format?: Intl.NumberFormatOptions | undefined;
-  /** How the digits change: "roll" (odometer, default), "none", or a text animation (`effect={scramble}`). */
+  /** How the digits change: "roll" (odometer, default), "none", or a text animation (`effect={scramble}`). @tr Basamakların nasıl değiştiği: "roll" (kilometre sayacı, varsayılan), "none" ya da bir metin animasyonu (`effect={scramble}`). */
   effect?: "roll" | "none" | LiveCounterEffect | undefined;
-  /** Options for the text animation (`{ duration: 800 }`); a counting one also gets `start`: the previous value. */
+  /** Options for the text animation (`{ duration: 800 }`); a counting one also gets `start`: the previous value. @tr Metin animasyonunun seçenekleri (`{ duration: 800 }`); sayan bir animasyon ayrıca `start` olarak önceki değeri alır. */
   effectOptions?: Record<string, unknown> | undefined;
-  /** The live dot: true (default), false, or your own node. */
+  /** The live dot: true (default), false, or your own node. @tr Canlı nokta: true (varsayılan), false ya da kendi düğümünüz. */
   dot?: boolean | Node | undefined;
-  /** Colour of the dot and its pulse (default: success). */
+  /** Colour of the dot and its pulse (default: success). @tr Noktanın ve nabzının rengi (varsayılan: success). */
   dotColor?: ColorToken | undefined;
-  /** The "+N" bubble on every increase: true (default), false, or `(diff, text) => content`. */
+  /** The "+N" bubble on every increase: true (default), false, or `(diff, text) => content`. @tr Her artışta "+N" baloncuğu: true (varsayılan), false ya da `(diff, text) => content`. */
   bubble?: boolean | ((diff: number, text: string) => unknown) | undefined;
-  /** Colour of the bubble (default: success). */
+  /** Colour of the bubble (default: success). @tr Baloncuğun rengi (varsayılan: success). */
   bubbleColor?: ColorToken | undefined;
-  /** The number beats once on every increase (default true). */
+  /** The number beats once on every increase (default true). @tr Sayı her artışta bir kez atar (varsayılan true). */
   beat?: boolean | undefined;
-  /** Random source for the simulated steps (tests). */
+  /** Random source for the simulated steps (tests). @tr Taklit edilen adımlar için rastgele sayı kaynağı (testler). */
   random?: (() => number) | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

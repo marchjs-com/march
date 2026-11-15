@@ -36,27 +36,29 @@ export interface PricingPlan {
   badge?: unknown;
 }
 export interface PricingProps {
+  /** The plans: `{ name, description?, price, features?, cta?, featured?, badge? }`. @tr Planlar: `{ name, description?, price, features?, cta?, featured?, badge? }`. */
   plans: readonly PricingPlan[];
-  /** Current period (default monthly); with `setPeriod` it is controlled (`bind:period`). */
+  /** Current period (default monthly); with `setPeriod` it is controlled (`bind:period`). @tr Geçerli dönem (varsayılan monthly); `setPeriod` ile birlikte denetimli olur (`bind:period`). */
   period?: MaybeFn<BillingPeriod | undefined>;
+  /** Called with the new period when the switch changes; makes `period` controlled. @tr Düğme değişince yeni dönemle çağrılır; `period` değerini denetimli yapar. */
   setPeriod?: ((p: BillingPeriod) => void) | undefined;
-  /** Hide the switch (one period only). */
+  /** The monthly / yearly switch (default true); false hides it (one period only). @tr Aylık / yıllık düğmesi (varsayılan true); false onu gizler (tek dönem). */
   toggle?: boolean | undefined;
-  /** ISO currency (default EUR). */
+  /** ISO currency (default EUR). @tr ISO para birimi (varsayılan EUR). */
   currency?: string | undefined;
-  /** Next to "Yearly" ("2 months free"). */
+  /** Next to "Yearly" ("2 months free"). @tr "Yearly" yanında gösterilir ("2 ay bedava"). */
   saving?: MaybeFn<unknown> | undefined;
-  /** The mark in front of a feature: true (default: a tick or a dash), false, or `(included) => node`. */
+  /** The mark in front of a feature: true (default: a tick or a dash), false, or `(included) => node`. @tr Bir özelliğin önündeki işaret: true (varsayılan: tik ya da çizgi), false ya da `(included) => node`. */
   featureIcon?: boolean | ((included: boolean) => unknown) | undefined;
-  /** Colour of the tick of an included feature (default: success). */
+  /** Colour of the tick of an included feature (default: success). @tr Dahil olan bir özelliğin tik rengi (varsayılan: success). */
   featureColor?: ColorToken | undefined;
-  /** The "/ month · billed yearly" lines next to the price (default true). */
+  /** The "/ month · billed yearly" lines next to the price (default true). @tr Fiyatın yanındaki "/ month · billed yearly" satırları (varsayılan true). */
   per?: boolean | undefined;
-  /** How a price changes with the period: "roll" (odometer, default), "count", or "none" (plain text). */
+  /** How a price changes with the period: "roll" (odometer, default), "count", or "none" (plain text). @tr Fiyatın dönemle nasıl değiştiği: "roll" (kilometre sayacı, varsayılan), "count" ya da "none" (düz metin). */
   priceEffect?: "roll" | "count" | "none" | undefined;
-  /** Entrance of the cards: Reveal options, or false for none (default: up, one after another). */
+  /** Entrance of the cards: Reveal options, or false for none (default: up, one after another). @tr Kartların girişi: Reveal seçenekleri ya da hiç giriş olmaması için false (varsayılan: up, art arda). */
   reveal?: RevealOptions | false | undefined;
-  /** Own texts; every one defaults to the built-in translated text. */
+  /** Own texts; every one defaults to the built-in translated text. @tr Kendi metinleriniz; her biri varsayılan olarak yerleşik çevrilmiş metni kullanır. */
   labels?: {
     monthly?: unknown; yearly?: unknown; perMonth?: unknown; billedMonthly?: unknown; billedYearly?: unknown; custom?: unknown;
     /** Accessible name of the switch. */
@@ -64,6 +66,7 @@ export interface PricingProps {
     /** Read by screen readers after a feature that is not included. */
     notIncluded?: string | undefined;
   } | undefined;
+  /** Extra CSS class on the root (`.m-pricing`). @tr Köke (`.m-pricing`) eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

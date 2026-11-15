@@ -29,14 +29,17 @@ export interface FeatureItem {
   media?: unknown | undefined;
 }
 export interface FeatureGridProps {
+  /** The features: `{ icon?, title, body?, href?, tone?, span?, media? }`. @tr Özellikler: `{ icon?, title, body?, href?, tone?, span?, media? }`. */
   items: readonly FeatureItem[];
+  /** Look: cards (default), plain, list or bento. @tr Görünüm: cards (varsayılan), plain, list ya da bento. */
   variant?: "cards" | "plain" | "list" | "bento" | undefined;
-  /** Columns (cards / plain: 2–4, default 3). */
+  /** Columns (cards / plain: 2–4, default 3). @tr Sütun sayısı (cards / plain: 2–4, varsayılan 3). */
   cols?: 2 | 3 | 4 | undefined;
-  /** Pointer light on cards and bento tiles (default true). */
+  /** Pointer light on cards and bento tiles (default true). @tr Kartlarda ve bento karolarında işaretçi ışığı (varsayılan true). */
   spotlight?: boolean | undefined;
-  /** Entrance (default "up"): a Reveal effect, your own `{ from, to }`, or "none" to switch it off. */
+  /** Entrance (default "up"): a Reveal effect, your own `{ from, to }`, or "none" to switch it off. @tr Giriş (varsayılan "up"): bir Reveal efekti, kendi `{ from, to }` değeriniz ya da kapatmak için "none". */
   reveal?: RevealOptions["effect"];
+  /** Extra CSS class on the root (`.m-fg`). @tr Köke (`.m-fg`) eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

@@ -15,22 +15,29 @@ export interface FooterLink { label: unknown; href: string }
 export interface FooterColumn { title: unknown; links: readonly FooterLink[] }
 export interface FooterSocial { label: string; href: string; icon: unknown }
 export interface SiteFooterProps {
+  /** The brand: Brand props or your own node. @tr Marka: Brand özellikleri ya da kendi düğümünüz. */
   brand: BrandProps | Node;
+  /** Short line under the brand. @tr Markanın altındaki kısa satır. */
   about?: MaybeFn<unknown> | undefined;
+  /** Link columns: `{ title, links: { label, href }[] }`. @tr Bağlantı sütunları: `{ title, links: { label, href }[] }`. */
   columns?: readonly FooterColumn[] | undefined;
+  /** Icon links `{ label, href, icon }`; the label is the accessible name. @tr İkon bağlantıları `{ label, href, icon }`; label erişilebilir addır. */
   social?: readonly FooterSocial[] | undefined;
+  /** Newsletter props; adds the sign-up form. @tr Newsletter özellikleri; kayıt formunu ekler. */
   newsletter?: NewsletterProps | undefined;
-  /** Bottom start (default "© <year> <brand name>"); false for none. */
+  /** Bottom start (default "© <year> <brand name>"); false for none. @tr Alt başlangıç (varsayılan "© <yıl> <marka adı>"); hiçbiri için false. */
   copyright?: MaybeFn<unknown> | false | undefined;
+  /** Bottom links `{ label, href }` (privacy, terms…). @tr Alttaki bağlantılar `{ label, href }` (gizlilik, koşullar…). */
   legal?: readonly FooterLink[] | undefined;
-  /** A large wordmark across the bottom (text or your own node). */
+  /** A large wordmark across the bottom (text or your own node). @tr Altta boydan boya büyük bir yazı (metin ya da kendi düğümünüz). */
   wordmark?: unknown | undefined;
-  /** "Back to top" button (default true). */
+  /** "Back to top" button (default true). @tr "Back to top" düğmesi (varsayılan true). */
   toTop?: boolean | undefined;
-  /** Icon of the "back to top" button (default: an arrow up). */
+  /** Icon of the "back to top" button (default: an arrow up). @tr "Back to top" düğmesinin ikonu (varsayılan: yukarı ok). */
   toTopIcon?: unknown | undefined;
-  /** Accessible name of the "back to top" button (default "Back to top"). */
+  /** Accessible name of the "back to top" button (default "Back to top"). @tr "Back to top" düğmesinin erişilebilir adı (varsayılan "Back to top"). */
   toTopLabel?: string | undefined;
+  /** Extra CSS class on the footer. @tr Alt bilgiye eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

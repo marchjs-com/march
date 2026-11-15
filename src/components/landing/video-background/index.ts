@@ -12,23 +12,25 @@ import { play } from "../../../icons/glyphs/play.ts";
 import { pause } from "../../../icons/glyphs/pause.ts";
 
 export interface VideoBackgroundProps {
-  /** Video URL (mp4 / webm). */
+  /** Video URL (mp4 / webm). @tr Video URL'si (mp4 / webm). */
   src: MaybeFn<string>;
-  /** Poster image: shown first, and instead of the video on save-data / reduced motion. */
+  /** Poster image: shown first, and instead of the video on save-data / reduced motion. @tr Afiş görseli: önce gösterilir; veri tasarrufu / azaltılmış harekette videonun yerine geçer. */
   poster?: string | undefined;
-  /** Text readability layer: dark (default), light, brand, none. */
+  /** Text readability layer: dark (default), light, brand, none. @tr Metnin okunmasını kolaylaştıran katman: dark (varsayılan), light, brand, none. */
   tint?: "dark" | "light" | "brand" | "none" | undefined;
-  /** Tint strength 0–1 (default .45). */
+  /** Tint strength 0–1 (default .45). @tr Katmanın gücü 0–1 (varsayılan .45). */
   tintOpacity?: number | undefined;
-  /** object-position of the video ("center", "50% 30%"). */
+  /** object-position of the video ("center", "50% 30%"). @tr Videonun object-position değeri ("center", "50% 30%"). */
   position?: string | undefined;
-  /** Show the pause button (default true). */
+  /** Show the pause button (default true). @tr Duraklatma düğmesini gösterir (varsayılan true). */
   controls?: boolean | undefined;
-  /** Own icons of the pause button (an icon or a node each). */
+  /** Own icons of the pause button (an icon or a node each). @tr Duraklatma düğmesinin kendi ikonları (her biri bir ikon ya da düğüm). */
   icons?: { play?: unknown; pause?: unknown } | undefined;
-  /** Accessible names of the pause button (defaults: "Play background video", "Pause background video"). */
+  /** Accessible names of the pause button (defaults: "Play background video", "Pause background video"). @tr Duraklatma düğmesinin erişilebilir adları (varsayılanlar: "Play background video", "Pause background video"). */
   labels?: { play?: string | undefined; pause?: string | undefined } | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
+  /** Content over the video. @tr Videonun üstündeki içerik. */
   children?: unknown | undefined;
 }
 

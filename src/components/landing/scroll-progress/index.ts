@@ -11,18 +11,19 @@ import type { ColorToken } from "../../../theme/colors.ts";
 import { Progress } from "../../feedback/progress/index.ts";
 
 export interface ScrollProgressProps {
-  /** Measure this element (an article) instead of the whole page. */
+  /** Measure this element (an article) instead of the whole page. @tr Bütün sayfa yerine bu öğeyi (bir makale) ölçer. */
   target?: (() => Element | null) | undefined;
-  /** fixed (top of the viewport, default) or inline. */
+  /** fixed (top of the viewport, default) or inline. @tr fixed (görüntü alanının üstü, varsayılan) ya da inline. */
   position?: "fixed" | "inline" | undefined;
-  /** gradient (brand colours, default) or accent. */
+  /** gradient (brand colours, default) or accent. @tr gradient (marka renkleri, varsayılan) ya da accent. */
   paint?: "gradient" | "accent" | undefined;
-  /** Bar height in px (default 3). */
+  /** Bar height in px (default 3). @tr Çubuk yüksekliği, px (varsayılan 3). */
   size?: number | undefined;
-  /** Colour of the fill (a theme token); wins over `paint`. */
+  /** Colour of the fill (a theme token); wins over `paint`. @tr Dolgunun rengi (bir tema token'ı); `paint` değerinin önüne geçer. */
   color?: ColorToken | undefined;
-  /** Accessible name (default "Reading progress"). */
+  /** Accessible name (default "Reading progress"). @tr Erişilebilir ad (varsayılan "Reading progress"). */
   label?: string | undefined;
+  /** Extra CSS class on the bar. @tr Çubuğa eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

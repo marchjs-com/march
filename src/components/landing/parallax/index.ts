@@ -25,12 +25,15 @@ export interface ParallaxLayer {
   class?: ClassProp | undefined;
 }
 export interface ParallaxProps {
+  /** The layers, first = farthest: `{ src?, alt?, content?, speed?, depth?, bleed?, opacity?, blend? }`; each moves at its own `speed`. @tr Katmanlar, ilki en uzaktaki: `{ src?, alt?, content?, speed?, depth?, bleed?, opacity?, blend? }`; her biri kendi `speed` hızıyla kayar. */
   layers: readonly ParallaxLayer[];
-  /** Follow the mouse too (strength multiplier, default 0 = off). */
+  /** Follow the mouse too (strength multiplier, default 0 = off). @tr Fareyi de izler (güç çarpanı, varsayılan 0 = kapalı). */
   pointer?: number | undefined;
-  /** Minimum height (CSS length, default 26rem). */
+  /** Minimum height (CSS length, default 26rem). @tr En küçük yükseklik (CSS uzunluğu, varsayılan 26rem). */
   height?: string | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
+  /** Content over the layers. @tr Katmanların üstündeki içerik. */
   children?: unknown | undefined;
 }
 

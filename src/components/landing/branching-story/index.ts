@@ -39,24 +39,25 @@ export interface StoryPassage {
   color?: ColorToken | undefined;
 }
 export interface BranchingStoryProps {
-  /** Passages by id. */
+  /** Passages by id. @tr Kimliğe göre pasajlar. */
   passages: Record<string, StoryPassage>;
-  /** Id of the first passage. */
+  /** Id of the first passage. @tr İlk pasajın kimliği. */
   start: string;
-  /** The path (passage ids from the start), to restore or drive it from outside. */
+  /** The path (passage ids from the start), to restore or drive it from outside. @tr Yol (baştan itibaren pasaj kimlikleri); dışarıdan geri yüklemek ya da yönetmek için. */
   path?: MaybeFn<string[]> | undefined;
+  /** Called with the new path after every choice or rewind. @tr Her seçimden ya da geri sarmadan sonra yeni yolla çağrılır. */
   onChange?: ((path: string[]) => void) | undefined;
-  /** Show the trail of choices (default true). */
+  /** Show the trail of choices (default true). @tr Seçimlerin izini gösterir (varsayılan true). */
   trail?: boolean | undefined;
-  /** Count the endings found (default true). */
+  /** Count the endings found (default true). @tr Bulunan sonları sayar (varsayılan true). */
   endings?: boolean | undefined;
-  /** Shown at an ending, next to "Start again" (a call to action). */
+  /** Shown at an ending, next to "Start again" (a call to action). @tr Bir sonda, "Start again" düğmesinin yanında gösterilir (bir eylem çağrısı). */
   action?: unknown | undefined;
-  /** Minimum stage height (CSS length, default "20rem"): passages of different length do not move the page. */
+  /** Minimum stage height (CSS length, default "20rem"): passages of different length do not move the page. @tr En küçük sahne yüksekliği (CSS uzunluğu, varsayılan "20rem"): farklı uzunluktaki pasajlar sayfayı oynatmaz. */
   minHeight?: string | undefined;
-  /** Accessible name (default "Story"). */
+  /** Accessible name (default "Story"). @tr Erişilebilir ad (varsayılan "Story"). */
   label?: string | undefined;
-  /** Every text the story writes itself; the defaults are translated. `endings` gets the found and the total count. */
+  /** Every text the story writes itself; the defaults are translated. `endings` gets the found and the total count. @tr Hikâyenin kendi yazdığı her metin; varsayılanlar çevrilmiştir. `endings` bulunan ve toplam sayıyı alır. */
   labels?: {
     /** Accessible name of the trail (default "Your path"). */
     path?: string;
@@ -72,18 +73,20 @@ export interface BranchingStoryProps {
     /** The button at an ending (default "Start again"). */
     restart?: unknown;
   } | undefined;
-  /** The "Start again" button at an ending (default true). */
+  /** The "Start again" button at an ending (default true). @tr Bir sondaki "Start again" düğmesi (varsayılan true). */
   restart?: boolean | undefined;
-  /** Number keys 1–9 pick a choice, and each choice shows its number (default true). */
+  /** Number keys 1–9 pick a choice, and each choice shows its number (default true). @tr 1–9 sayı tuşları bir seçeneği seçer ve her seçenek kendi numarasını gösterir (varsayılan true). */
   keys?: boolean | undefined;
-  /** Draw the content of a choice button yourself (the button, its key and its motion stay). */
+  /** Draw the content of a choice button yourself (the button, its key and its motion stay). @tr Bir seçenek düğmesinin içeriğini kendiniz çizin (düğme, tuşu ve hareketi kalır). */
   renderChoice?: ((choice: StoryChoice, index: number) => unknown) | undefined;
   /**
    * How the page changes: "turn" (default: a 3D page turn), "slide", "fade", "none", or your own keyframes for the
    * leaving and the entering passage; `side` is 1 forward and -1 back (already mirrored in RTL).
+   * @tr Sayfanın nasıl değiştiği: "turn" (varsayılan: 3B sayfa çevirme), "slide", "fade", "none" ya da çıkan ve giren pasaj için kendi keyframe'leriniz; `side` ileri için 1, geri için -1'dir (RTL'de zaten aynalanmış).
    */
   transition?: "turn" | "slide" | "fade" | "none"
     | ((side: 1 | -1) => { leave: Record<string, unknown[]>; enter: Record<string, unknown[]>; duration?: number; easing?: string }) | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

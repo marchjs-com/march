@@ -22,16 +22,19 @@ export interface Logo {
   href?: string | undefined;
 }
 export interface LogoCloudProps {
+  /** The logos: `{ src, alt, width?, height?, href? }` or `{ node }`. @tr Logolar: `{ src, alt, width?, height?, href? }` ya da `{ node }`. */
   logos: readonly Logo[];
+  /** grid (default): a row of cells · marquee: an endless scrolling strip. @tr grid (varsayılan): hücrelerden bir sıra · marquee: sonsuz kayan bir şerit. */
   variant?: "grid" | "marquee" | undefined;
-  /** Small heading above ("Trusted by teams at"). */
+  /** Small heading above ("Trusted by teams at"). @tr Üstteki küçük başlık ("Trusted by teams at"). */
   title?: MaybeFn<unknown> | undefined;
-  /** One muted tone, full colour on hover (default true). */
+  /** One muted tone, full colour on hover (default true). @tr Tek soluk ton, üzerine gelince tam renk (varsayılan true). */
   mono?: boolean | undefined;
-  /** Marquee speed, px/s (default 40). */
+  /** Marquee speed, px/s (default 40). @tr Marquee hızı, px/s (varsayılan 40). */
   speed?: number | undefined;
-  /** grid: entrance of the cells (default "fade"): a Reveal effect, your own `{ from, to }`, or "none". */
+  /** grid: entrance of the cells (default "fade"): a Reveal effect, your own `{ from, to }`, or "none". @tr grid: hücrelerin girişi (varsayılan "fade"): bir Reveal efekti, kendi `{ from, to }` değeriniz ya da "none". */
   reveal?: RevealOptions["effect"];
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

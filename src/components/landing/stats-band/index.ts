@@ -19,12 +19,15 @@ export interface StatItem {
   suffix?: unknown;
 }
 export interface StatsBandProps {
+  /** The figures: `{ value, label, note?, format?, decimals?, prefix?, suffix? }`. @tr Rakamlar: `{ value, label, note?, format?, decimals?, prefix?, suffix? }`. */
   items: readonly StatItem[];
+  /** Look: plain, divided (default) or cards. @tr Görünüm: plain, divided (varsayılan) ya da cards. */
   variant?: "plain" | "divided" | "cards" | undefined;
-  /** Counter style (default count); "none" writes the number without counting. */
+  /** Counter style (default count); "none" writes the number without counting. @tr Sayaç biçimi (varsayılan count); "none" sayıyı saymadan yazar. */
   mode?: "count" | "roll" | "none" | undefined;
-  /** Entrance of the items: Reveal options, or false for none (default: up, one after another). */
+  /** Entrance of the items: Reveal options, or false for none (default: up, one after another). @tr Öğelerin girişi: Reveal seçenekleri ya da hiç giriş olmaması için false (varsayılan: up, art arda). */
   reveal?: RevealOptions | false | undefined;
+  /** Extra CSS class on the list. @tr Listeye eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

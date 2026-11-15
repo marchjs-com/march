@@ -40,42 +40,43 @@ export interface FeedItem {
   color?: ColorToken | undefined;
 }
 export interface LiveFeedProps {
-  /** The items, newest first (reactive: a new first item slides in). */
+  /** The items, newest first (reactive: a new first item slides in). @tr Öğeler, en yenisi başta (reaktif: yeni bir ilk öğe kayarak girer). */
   items?: MaybeFn<FeedItem[]> | undefined;
-  /** Pull one new item; called every `every` ms while the feed is visible and not paused. */
+  /** Pull one new item; called every `every` ms while the feed is visible and not paused. @tr Yeni bir öğe çeker; akış görünür ve duraklatılmamışken her `every` ms'de bir çağrılır. */
   next?: (() => FeedItem | null | undefined) | undefined;
-  /** ms between `next()` calls (default 2400). */
+  /** ms between `next()` calls (default 2400). @tr `next()` çağrıları arasındaki ms (varsayılan 2400). */
   every?: number | undefined;
-  /** ms before the first `next()` call (default: `every`); a short one shows the motion at once. */
+  /** ms before the first `next()` call (default: `every`); a short one shows the motion at once. @tr İlk `next()` çağrısından önceki ms (varsayılan: `every`); kısa bir değer hareketi hemen gösterir. */
   first?: number | undefined;
-  /** Items kept on screen (default 5). */
+  /** Items kept on screen (default 5). @tr Ekranda tutulan öğe sayısı (varsayılan 5). */
   max?: number | undefined;
-  /** `list` (default): rows, newest on top · `wall`: a grid of cards. */
+  /** `list` (default): rows, newest on top · `wall`: a grid of cards. @tr `list` (varsayılan): satırlar, en yenisi üstte · `wall`: kartlardan bir ızgara. */
   variant?: "list" | "wall" | undefined;
-  /** Accessible name of the feed (default "Live activity"). */
+  /** Accessible name of the feed (default "Live activity"). @tr Akışın erişilebilir adı (varsayılan "Live activity"). */
   label?: string | undefined;
-  /** Announce new items to screen readers (default "off"). */
+  /** Announce new items to screen readers (default "off"). @tr Yeni öğeleri ekran okuyuculara duyurur (varsayılan "off"). */
   live?: "off" | "polite" | undefined;
-  /** Show the pause button (default true). */
+  /** Show the pause button (default true). @tr Duraklatma düğmesini gösterir (varsayılan true). */
   pausable?: boolean | undefined;
-  /** Text of the pause button while the feed runs (default "Live · pause"). */
+  /** Text of the pause button while the feed runs (default "Live · pause"). @tr Akış çalışırken duraklatma düğmesinin metni (varsayılan "Live · pause"). */
   pauseLabel?: unknown | undefined;
-  /** Text of the pause button while the feed is paused (default "Paused · resume"). */
+  /** Text of the pause button while the feed is paused (default "Paused · resume"). @tr Akış duraklatılmışken düğmenin metni (varsayılan "Paused · resume"). */
   resumeLabel?: unknown | undefined;
-  /** The pulsing dot in the pause button (default true). */
+  /** The pulsing dot in the pause button (default true). @tr Duraklatma düğmesindeki atan nokta (varsayılan true). */
   pulse?: boolean | undefined;
-  /** Pause while the pointer or keyboard focus is inside the feed (default true). */
+  /** Pause while the pointer or keyboard focus is inside the feed (default true). @tr İşaretçi ya da klavye odağı akışın içindeyken duraklar (varsayılan true). */
   pauseOnHover?: boolean | undefined;
-  /** Draw an item yourself: the content of its row / card (the feed keeps the list item, its motion and the glow). */
+  /** Draw an item yourself: the content of its row / card (the feed keeps the list item, its motion and the glow). @tr Bir öğeyi kendiniz çizin: satırının / kartının içeriği (akış liste öğesini, hareketini ve parıltıyı korur). */
   renderItem?: ((item: FeedItem) => unknown) | undefined;
-  /** How a new item arrives: flip (default), slide, fade, pop, drop, zoom, blur, swing, unfold, glide, spin, "none", or your own keyframes. */
+  /** How a new item arrives: flip (default), slide, fade, pop, drop, zoom, blur, swing, unfold, glide, spin, "none", or your own keyframes. @tr Yeni bir öğenin nasıl geldiği: flip (varsayılan), slide, fade, pop, drop, zoom, blur, swing, unfold, glide, spin, "none" ya da kendi keyframe'leriniz. */
   enter?: FeedEnter | "none" | FeedMotion | undefined;
-  /** How the oldest item leaves: blur (default), fade, shrink, fall, slide, dissolve, fold, "none", or your own keyframes. */
+  /** How the oldest item leaves: blur (default), fade, shrink, fall, slide, dissolve, fold, "none", or your own keyframes. @tr En eski öğenin nasıl ayrıldığı: blur (varsayılan), fade, shrink, fall, slide, dissolve, fold, "none" ya da kendi keyframe'leriniz. */
   leave?: FeedLeave | "none" | FeedMotion | undefined;
-  /** Accent ring that glows around a new item and fades (default true). */
+  /** Accent ring that glows around a new item and fades (default true). @tr Yeni bir öğenin çevresinde parlayıp sönen vurgu halkası (varsayılan true). */
   glow?: boolean | undefined;
-  /** The others glide to their new place (default true); false: they jump. */
+  /** The others glide to their new place (default true); false: they jump. @tr Diğerleri yeni yerlerine kayar (varsayılan true); false: atlarlar. */
   move?: boolean | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

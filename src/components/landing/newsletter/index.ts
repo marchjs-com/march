@@ -13,19 +13,23 @@ import { SectionHead } from "../section-head/index.ts";
 import { animate } from "../../../motion/engine/playback.ts";
 
 export interface NewsletterProps {
-  /** Save the address; throw (or reject) to show an error. */
+  /** Save the address; throw (or reject) to show an error. @tr Adresi kaydeder; hata göstermek için hata fırlatın (ya da reddedin). */
   onSubmit: (email: string) => unknown | Promise<unknown>;
+  /** Heading above the form. @tr Formun üstündeki başlık. */
   title?: MaybeFn<unknown> | undefined;
+  /** Text under the title. @tr Başlığın altındaki metin. */
   lead?: MaybeFn<unknown> | undefined;
+  /** Placeholder of the email field. @tr E-posta alanının yer tutucu metni. */
   placeholder?: string | undefined;
-  /** Button text (default "Subscribe"). */
+  /** Button text (default "Subscribe"). @tr Düğme metni (varsayılan "Subscribe"). */
   button?: MaybeFn<unknown> | undefined;
-  /** Small print under the form (privacy note). */
+  /** Small print under the form (privacy note). @tr Formun altındaki küçük yazı (gizlilik notu). */
   note?: MaybeFn<unknown> | undefined;
-  /** Shown after success (default "Thanks! Check your inbox."). */
+  /** Shown after success (default "Thanks! Check your inbox."). @tr Başarıdan sonra gösterilir (varsayılan "Thanks! Check your inbox."). */
   done?: MaybeFn<unknown> | undefined;
+  /** inline (default): field and button in one row · stacked: one under the other. @tr inline (varsayılan): alan ve düğme tek satırda · stacked: alt alta. */
   layout?: "inline" | "stacked" | undefined;
-  /** The other texts the form writes itself; the defaults are translated. */
+  /** The other texts the form writes itself; the defaults are translated. @tr Formun kendi yazdığı diğer metinler; varsayılanlar çevrilmiştir. */
   labels?: {
     /** Accessible name of the field (default "Email address"). */
     email?: string;
@@ -34,10 +38,11 @@ export interface NewsletterProps {
     /** Message when `onSubmit` fails without a message of its own. */
     error?: string;
   } | undefined;
-  /** The check mark of the success line: true (default), false, or your own node. */
+  /** The check mark of the success line: true (default), false, or your own node. @tr Başarı satırındaki onay işareti: true (varsayılan), false ya da kendi düğümünüz. */
   doneIcon?: boolean | Node | undefined;
-  /** The shake on an error and the fold / pop on success (default true); false: the states just change. */
+  /** The shake on an error and the fold / pop on success (default true); false: the states just change. @tr Hatada sarsılma, başarıda katlanma / belirme (varsayılan true); false: durumlar yalnızca değişir. */
   motion?: boolean | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

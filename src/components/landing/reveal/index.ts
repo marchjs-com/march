@@ -13,26 +13,31 @@ import { scrollTimeline } from "../../../motion/scroll-fx.ts";
 export type RevealEffect = "fade" | "up" | "down" | "start" | "end" | "scale" | "blur" | "flip";
 
 export interface RevealOptions {
-  /** A ready effect, "none" (the content is simply there), or your own start and end state: `{ from: { opacity: 0, transform: "rotate(-8deg)" }, to: { opacity: 1, transform: "rotate(0deg)" } }`. */
+  /** A ready effect, "none" (the content is simply there), or your own start and end state: `{ from: { opacity: 0, transform: "rotate(-8deg)" }, to: { opacity: 1, transform: "rotate(0deg)" } }`. @tr Hazır bir efekt, "none" (içerik doğrudan orada olur) ya da kendi başlangıç ve bitiş durumunuz: `{ from: { opacity: 0, transform: "rotate(-8deg)" }, to: { opacity: 1, transform: "rotate(0deg)" } }`. */
   effect?: RevealEffect | "none" | { from: Record<string, string | number>; to: Record<string, string | number> } | undefined;
-  /** Easing of the entrance (a motion engine easing name or a CSS easing; default "expo"). */
+  /** Easing of the entrance (a motion engine easing name or a CSS easing; default "expo"). @tr Girişin yumuşatması (bir hareket motoru easing adı ya da CSS easing; varsayılan "expo"). */
   easing?: string | undefined;
-  /** Delay between children, ms (0 = the whole block at once). Default 70. */
+  /** Delay between children, ms (0 = the whole block at once). Default 70. @tr Çocuklar arasındaki gecikme, ms (0 = bütün blok bir anda). Varsayılan 70. */
   stagger?: number | undefined;
+  /** Delay before the entrance starts, ms (default 0). @tr Giriş başlamadan önceki gecikme, ms (varsayılan 0). */
   delay?: number | undefined;
+  /** Length of the entrance, ms (default 720). @tr Girişin süresi, ms (varsayılan 720). */
   duration?: number | undefined;
-  /** Distance for up / down / start / end, px (default 28). */
+  /** Distance for up / down / start / end, px (default 28). @tr up / down / start / end için uzaklık, px (varsayılan 28). */
   distance?: number | undefined;
-  /** Follow the scroll (0 → 1 while the block enters the viewport) instead of playing once. */
+  /** Follow the scroll (0 → 1 while the block enters the viewport) instead of playing once. @tr Bir kez oynamak yerine kaydırmayı izler (blok görüntü alanına girerken 0 → 1). */
   scrub?: boolean | undefined;
-  /** Animate the element itself instead of its children. */
+  /** Animate the element itself instead of its children. @tr Çocukları yerine öğenin kendisini canlandırır. */
   self?: boolean | undefined;
-  /** Animate the descendants matching this selector instead of the direct children (cards inside a grid). */
+  /** Animate the descendants matching this selector instead of the direct children (cards inside a grid). @tr Doğrudan çocuklar yerine bu seçiciye uyan alt öğeleri canlandırır (bir ızgaradaki kartlar). */
   select?: string | undefined;
 }
 export interface RevealProps extends RevealOptions {
+  /** Tag of the wrapper (default div). @tr Sarmalayıcının etiketi (varsayılan div). */
   as?: string | undefined;
+  /** Extra CSS class on the wrapper. @tr Sarmalayıcıya eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
+  /** The content that enters. @tr Giren içerik. */
   children?: unknown | undefined;
   [attr: string]: unknown;
 }

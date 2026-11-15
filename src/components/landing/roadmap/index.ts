@@ -17,17 +17,19 @@ import { type ColorToken } from "../../../theme/colors.ts";
 export type RoadmapStatus = "done" | "now" | "next";
 export interface RoadmapItem { time?: unknown; title: unknown; body?: unknown; status?: RoadmapStatus | undefined; icon?: unknown }
 export interface RoadmapProps {
+  /** The entries: `{ time?, title, body?, status?, icon? }`; status is done, now or next. @tr Girdiler: `{ time?, title, body?, status?, icon? }`; status done, now ya da next olur. */
   items: readonly RoadmapItem[];
-  /** The status badge next to each title: true (default), false, or `(status, text) => node`. */
+  /** The status badge next to each title: true (default), false, or `(status, text) => node`. @tr Her başlığın yanındaki durum rozeti: true (varsayılan), false ya da `(status, text) => node`. */
   badges?: boolean | ((status: RoadmapStatus, text: unknown) => unknown) | undefined;
-  /** Fill the line with the scroll (default true). */
+  /** Fill the line with the scroll (default true). @tr Çizgiyi kaydırmayla doldurur (varsayılan true). */
   scroll?: boolean | undefined;
-  /** The line with its fill (default true); false leaves the dots only. */
+  /** The line with its fill (default true); false leaves the dots only. @tr Dolgusuyla birlikte çizgi (varsayılan true); false yalnız noktaları bırakır. */
   rail?: boolean | undefined;
-  /** Texts of the statuses (defaults: "Done", "In progress", "Planned"). */
+  /** Texts of the statuses (defaults: "Done", "In progress", "Planned"). @tr Durumların metinleri (varsayılanlar: "Done", "In progress", "Planned"). */
   labels?: Partial<Record<RoadmapStatus, unknown>> | undefined;
-  /** Entrance of the entries: Reveal options, or false for none (default: from the start, one after another). */
+  /** Entrance of the entries: Reveal options, or false for none (default: from the start, one after another). @tr Girdilerin girişi: Reveal seçenekleri ya da hiç giriş olmaması için false (varsayılan: baştan, art arda). */
   reveal?: RevealOptions | false | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

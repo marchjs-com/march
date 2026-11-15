@@ -28,24 +28,25 @@ export interface ProjectDetails extends Project {
   links?: readonly { label: unknown; href: string }[] | undefined;
 }
 export interface ProjectDetailProps {
+  /** The project to show: title, cover, facts (role, client, year, services), `body`, `gallery` and `links`. @tr Gösterilecek proje: başlık, kapak, bilgiler (rol, müşteri, yıl, hizmetler), `body`, `gallery` ve `links`. */
   project: ProjectDetails;
-  /** Back to the list (shows the back button). */
+  /** Back to the list (shows the back button). @tr Listeye döner (geri düğmesini gösterir). */
   onBack?: (() => void) | undefined;
-  /** The next project (a card at the end). */
+  /** The next project (a card at the end). @tr Sonraki proje (sonda bir kart). */
   next?: { project: Project; onOpen: (p: Project, cover: Element) => void } | undefined;
-  /** Shared element name of the cover (default `project-<id>`, the name ProjectGrid gives its covers). */
+  /** Shared element name of the cover (default `project-<id>`, the name ProjectGrid gives its covers). @tr Kapağın paylaşılan öğe adı (varsayılan `project-<id>`, ProjectGrid'in kapaklarına verdiği ad). */
   shared?: string | undefined;
-  /** The category line above the title (default true). */
+  /** The category line above the title (default true). @tr Başlığın üstündeki kategori satırı (varsayılan true). */
   eyebrow?: boolean | undefined;
-  /** The facts list (role, client, year, category; default true). */
+  /** The facts list (role, client, year, category; default true). @tr Bilgi listesi (rol, müşteri, yıl, kategori; varsayılan true). */
   facts?: boolean | undefined;
-  /** Icon of the back button: an icon, or false for none (default: an arrow). */
+  /** Icon of the back button: an icon, or false for none (default: an arrow). @tr Geri düğmesinin ikonu: bir ikon ya da hiç ikon olmaması için false (varsayılan: bir ok). */
   backIcon?: unknown | undefined;
-  /** Icon after the next project's title: an icon or a node, or false for none (default: an arrow). */
+  /** Icon after the next project's title: an icon or a node, or false for none (default: an arrow). @tr Sonraki projenin başlığından sonraki ikon: bir ikon ya da düğüm, ya da hiç olmaması için false (varsayılan: bir ok). */
   nextIcon?: unknown | undefined;
-  /** Entrance of the heading and the story: Reveal options, or false for none. */
+  /** Entrance of the heading and the story: Reveal options, or false for none. @tr Başlığın ve hikâyenin girişi: Reveal seçenekleri ya da hiç giriş olmaması için false. */
   reveal?: RevealOptions | false | undefined;
-  /** Own texts; every one defaults to the built-in translated text. */
+  /** Own texts; every one defaults to the built-in translated text. @tr Kendi metinleriniz; her biri varsayılan olarak yerleşik çevrilmiş metni kullanır. */
   labels?: {
     back?: unknown; next?: unknown; role?: unknown; client?: unknown; year?: unknown; category?: unknown;
     /** Accessible name of the services list. */
@@ -53,6 +54,7 @@ export interface ProjectDetailProps {
     /** Accessible name of a gallery image (n starts at 1). */
     openImage?: ((n: number) => string) | undefined;
   } | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

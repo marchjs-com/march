@@ -20,37 +20,39 @@ import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface SiteNavLink { label: unknown; href: string; active?: MaybeFn<boolean | undefined> }
 export interface SiteNavProps {
-  /** A Brand (props) or any node. */
+  /** A Brand (props) or any node. @tr Bir Brand (özellikler) ya da herhangi bir düğüm. */
   brand: BrandProps | Node;
+  /** The links: `{ label, href, active? }`; `active` marks the current page (`aria-current`). @tr Bağlantılar: `{ label, href, active? }`; `active` geçerli sayfayı işaretler (`aria-current`). */
   links?: readonly SiteNavLink[] | undefined;
-  /** Buttons at the end (sign in, primary call to action). Also shown in the mobile drawer. */
+  /** Buttons at the end (sign in, primary call to action). Also shown in the mobile drawer. @tr Sondaki düğmeler (giriş yap, birincil eylem çağrısı). Mobil çekmecede de gösterilir. */
   actions?: unknown | undefined;
-  /** solid (default) · transparent until scrolled · floating glass pill. */
+  /** solid (default) · transparent until scrolled · floating glass pill. @tr solid (varsayılan) · kaydırılana kadar transparent · floating cam hap. */
   mode?: "solid" | "transparent" | "floating" | undefined;
-  /** Lower bar once scrolled (default true). */
+  /** Lower bar once scrolled (default true). @tr Kaydırılınca çubuk alçalır (varsayılan true). */
   shrink?: boolean | undefined;
-  /** Slide away while scrolling down (default false). */
+  /** Slide away while scrolling down (default false). @tr Aşağı kaydırırken kayarak gizlenir (varsayılan false). */
   hide?: boolean | undefined;
-  /** Pixels of scroll before it counts as scrolled (default 12). */
+  /** Pixels of scroll before it counts as scrolled (default 12). @tr Kaydırılmış sayılmadan önceki kaydırma, piksel (varsayılan 12). */
   threshold?: number | undefined;
-  /** The scrolling element that shrink / hide / transparent follow (default: the page). A function is read once mounted. */
+  /** The scrolling element that shrink / hide / transparent follow (default: the page). A function is read once mounted. @tr shrink / hide / transparent'ın izlediği kayan öğe (varsayılan: sayfa). Bir işlev, yerleştikten sonra bir kez okunur. */
   source?: Element | (() => Element | null | undefined) | null | undefined;
-  /** Sticky (default) or static. */
+  /** Sticky (default) or static. @tr Yapışkan (varsayılan) ya da sabit değil (static). */
   sticky?: boolean | undefined;
-  /** Called when a link is chosen (desktop or drawer). */
+  /** Called when a link is chosen (desktop or drawer). @tr Bir bağlantı seçilince çağrılır (masaüstü ya da çekmece). */
   onNavigate?: (href: string) => void | undefined;
-  /** The pill that slides under the hovered link and rests on the current one (default true). */
+  /** The pill that slides under the hovered link and rests on the current one (default true). @tr Üzerine gelinen bağlantının altına kayan ve geçerli olanın altında duran hap (varsayılan true). */
   pill?: boolean | undefined;
-  /** Colour of the pill (default: a soft neutral). */
+  /** Colour of the pill (default: a soft neutral). @tr Hapın rengi (varsayılan: yumuşak bir nötr). */
   pillColor?: ColorToken | undefined;
-  /** The menu button of narrow screens (default true); false when you open your own menu. */
+  /** The menu button of narrow screens (default true); false when you open your own menu. @tr Dar ekranların menü düğmesi (varsayılan true); kendi menünüzü açıyorsanız false. */
   menu?: boolean | undefined;
-  /** Icon of the menu button (default: three lines). */
+  /** Icon of the menu button (default: three lines). @tr Menü düğmesinin ikonu (varsayılan: üç çizgi). */
   menuIcon?: unknown | undefined;
-  /** Side the drawer opens from (default "right"). */
+  /** Side the drawer opens from (default "right"). @tr Çekmecenin açıldığı taraf (varsayılan "right"). */
   drawerSide?: "left" | "right" | undefined;
-  /** Own texts: accessible name of the navigation ("Main"), name of the menu button ("Open menu"), title of the drawer ("Menu"). */
+  /** Own texts: accessible name of the navigation ("Main"), name of the menu button ("Open menu"), title of the drawer ("Menu"). @tr Kendi metinleriniz: gezinmenin erişilebilir adı ("Main"), menü düğmesinin adı ("Open menu"), çekmecenin başlığı ("Menu"). */
   labels?: { main?: string | undefined; openMenu?: string | undefined; menu?: string | undefined } | undefined;
+  /** Extra CSS class on the header. @tr Üst bilgiye eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

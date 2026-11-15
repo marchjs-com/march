@@ -17,31 +17,35 @@ import tr from "./tr.ts";
 messages("tr", tr);
 
 export interface BeforeAfterProps {
-  /** The first layer (start / top side): an image, a mock, any node. */
+  /** The first layer (start / top side): an image, a mock, any node. @tr İlk katman (başlangıç / üst taraf): bir görsel, bir taslak, herhangi bir düğüm. */
   before: unknown;
-  /** The second layer (end / bottom side). */
+  /** The second layer (end / bottom side). @tr İkinci katman (bitiş / alt taraf). */
   after: unknown;
+  /** Corner chip on the first layer; it fades when the divider covers it. @tr İlk katmanın köşesindeki etiket; ayırıcı üstünü kapatınca solar. */
   beforeLabel?: unknown | undefined;
+  /** Corner chip on the second layer; it fades when the divider covers it. @tr İkinci katmanın köşesindeki etiket; ayırıcı üstünü kapatınca solar. */
   afterLabel?: unknown | undefined;
-  /** Divider position, 0–100 from the start (default 50). */
+  /** Divider position, 0–100 from the start (default 50). @tr Ayırıcının konumu, baştan itibaren 0–100 (varsayılan 50). */
   value?: MaybeFn<number> | undefined;
+  /** Called with the new position after a drag or key press. @tr Sürükleme ya da tuşa basma sonrasında yeni konumla çağrılır. */
   onChange?: ((v: number) => void) | undefined;
-  /** `horizontal`: the divider is vertical and moves across (default) · `vertical`: it moves down. */
+  /** `horizontal`: the divider is vertical and moves across (default) · `vertical`: it moves down. @tr `horizontal`: ayırıcı dikeydir ve yatayda kayar (varsayılan) · `vertical`: aşağı doğru kayar. */
   orientation?: "horizontal" | "vertical" | undefined;
-  /** The divider follows the pointer while it is over the area (no press needed). */
+  /** The divider follows the pointer while it is over the area (no press needed). @tr Ayırıcı, işaretçi alanın üzerindeyken onu izler (basmak gerekmez). */
   follow?: boolean | undefined;
-  /** Sway once when first visible (default true). */
+  /** Sway once when first visible (default true). @tr İlk görününce bir kez sallanır (varsayılan true). */
   hint?: boolean | undefined;
-  /** CSS aspect-ratio of the area, e.g. "16 / 9" (default: the layers' own height). */
+  /** CSS aspect-ratio of the area, e.g. "16 / 9" (default: the layers' own height). @tr Alanın CSS aspect-ratio değeri, örneğin "16 / 9" (varsayılan: katmanların kendi yüksekliği). */
   ratio?: string | undefined;
-  /** Accessible name of the handle (default "Before and after"). */
+  /** Accessible name of the handle (default "Before and after"). @tr Tutamacın erişilebilir adı (varsayılan "Before and after"). */
   label?: string | undefined;
-  /** The round grip on the divider: true (default, two arrows), false (the line only), or your own node. */
+  /** The round grip on the divider: true (default, two arrows), false (the line only), or your own node. @tr Ayırıcıdaki yuvarlak tutamak: true (varsayılan, iki ok), false (yalnız çizgi) ya da kendi düğümünüz. */
   grip?: boolean | Node | undefined;
-  /** Keyboard step of the arrow keys, in percent (default 1; Shift and Page keys move 10 steps). */
+  /** Keyboard step of the arrow keys, in percent (default 1; Shift and Page keys move 10 steps). @tr Ok tuşlarının adımı, yüzde olarak (varsayılan 1; Shift ve Page tuşları 10 adım kaydırır). */
   step?: number | undefined;
-  /** The handle's value text for screen readers (default "40% before, 60% after"). */
+  /** The handle's value text for screen readers (default "40% before, 60% after"). @tr Ekran okuyucular için tutamacın değer metni (varsayılan "40% before, 60% after"). */
   valueText?: ((value: number) => string) | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

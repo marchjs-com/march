@@ -22,33 +22,35 @@ export interface NotForYouItem {
   instead?: unknown | undefined;
 }
 export interface NotForYouProps {
-  /** Who it is not for. */
+  /** Who it is not for. @tr Kimin için olmadığı. */
   items: NotForYouItem[];
-  /** Who it is for (shown beside, with check marks). */
+  /** Who it is for (shown beside, with check marks). @tr Kimin için olduğu (yanda, onay işaretleriyle gösterilir). */
   forYou?: NotForYouItem[] | undefined;
-  /** Heading of the "not for you" list (default "Not for you if…"); false: no heading. */
+  /** Heading of the "not for you" list (default "Not for you if…"); false: no heading. @tr "Not for you" listesinin başlığı (varsayılan "Not for you if…"); false: başlık yok. */
   title?: unknown | undefined;
-  /** Heading of the "for you" list (default "For you if…"); false: no heading. */
+  /** Heading of the "for you" list (default "For you if…"); false: no heading. @tr "For you" listesinin başlığı (varsayılan "For you if…"); false: başlık yok. */
   forYouTitle?: unknown | undefined;
-  /** Let the visitor strike out the lines that are not them, and show a verdict. */
+  /** Let the visitor strike out the lines that are not them, and show a verdict. @tr Ziyaretçi kendisine uymayan satırların üstünü çizebilir ve bir sonuç gösterilir. */
   check?: boolean | undefined;
-  /** The verdict text for `n` struck-out lines of `total` (default: a prompt, then how many still apply); false: no verdict line. */
+  /** The verdict text for `n` struck-out lines of `total` (default: a prompt, then how many still apply); false: no verdict line. @tr `total` satırdan `n` tanesinin üstü çizildiğinde sonuç metni (varsayılan: önce bir yönlendirme, sonra kaç tanesinin hâlâ geçerli olduğu); false: sonuç satırı yok. */
   verdict?: ((n: number, total: number) => unknown) | false | undefined;
-  /** `cards` (default) · `list`: plain lines with a rule between them. */
+  /** `cards` (default) · `list`: plain lines with a rule between them. @tr `cards` (varsayılan) · `list`: aralarında çizgi olan yalın satırlar. */
   variant?: "cards" | "list" | undefined;
-  /** Called with the indexes of the struck-out lines. */
+  /** Called with the indexes of the struck-out lines. @tr Üstü çizilen satırların sıralarıyla çağrılır. */
   onCheck?: ((marked: number[]) => void) | undefined;
-  /** The label on every checkable card (default "That's me"); false: no label. */
+  /** The label on every checkable card (default "That's me"); false: no label. @tr İşaretlenebilir her karttaki etiket (varsayılan "That's me"); false: etiket yok. */
   meLabel?: unknown | undefined;
-  /** Small text under the label before a tap (default "Not you? Tap it!"); false: none. */
+  /** Small text under the label before a tap (default "Not you? Tap it!"); false: none. @tr Dokunmadan önce etiketin altındaki küçük metin (varsayılan "Not you? Tap it!"); false: yok. */
   hint?: unknown | undefined;
-  /** Small text under the label after a tap (default "Not you"): e.g. "You belong here"; false: none. */
+  /** Small text under the label after a tap (default "Not you"): e.g. "You belong here"; false: none. @tr Dokunduktan sonra etiketin altındaki küçük metin (varsayılan "Not you"): örneğin "You belong here"; false: yok. */
   markedHint?: unknown | undefined;
   /**
    * The round marks: true (default: a cross, a tick on the "for you" lines and on a struck-out line), false (none), or
    * `(state, item, index) => content` with state "not" (applies), "marked" (struck out) or "for" (the for-you list).
+   * @tr Yuvarlak işaretler: true (varsayılan: çarpı; "for you" satırlarında ve üstü çizilen satırda tik), false (yok) ya da `(state, item, index) => content`; state "not" (geçerli), "marked" (üstü çizili) ya da "for" (for-you listesi).
    */
   mark?: boolean | ((state: "not" | "marked" | "for", item: NotForYouItem, index: number) => unknown) | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

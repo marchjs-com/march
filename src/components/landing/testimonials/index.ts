@@ -24,25 +24,27 @@ import { withColor } from "../../../theme/colors.ts";
 
 export interface Testimonial { quote: unknown; name: string; role?: unknown; avatar?: string | undefined; rating?: number | undefined }
 export interface TestimonialsProps {
+  /** The quotes: `{ quote, name, role?, avatar?, rating? }`. @tr Alıntılar: `{ quote, name, role?, avatar?, rating? }`. */
   items: readonly Testimonial[];
+  /** Layout: grid (default), marquee, wall or slider. @tr Düzen: grid (varsayılan), marquee, wall ya da slider. */
   variant?: "grid" | "marquee" | "wall" | "slider" | undefined;
-  /** Grid / slider columns (default 3). */
+  /** Grid / slider columns (default 3). @tr Grid / slider sütun sayısı (varsayılan 3). */
   cols?: 1 | 2 | 3 | undefined;
-  /** The star rating of a card (default true). */
+  /** The star rating of a card (default true). @tr Bir kartın yıldız puanı (varsayılan true). */
   rating?: boolean | undefined;
-  /** Colour of the stars (default: the accent). */
+  /** Colour of the stars (default: the accent). @tr Yıldızların rengi (varsayılan: vurgu rengi). */
   ratingColor?: ColorToken | undefined;
-  /** The avatar next to the name (default true). */
+  /** The avatar next to the name (default true). @tr İsmin yanındaki avatar (varsayılan true). */
   avatar?: boolean | undefined;
-  /** The quotation marks around the quote (default true). */
+  /** The quotation marks around the quote (default true). @tr Alıntının çevresindeki tırnak işaretleri (varsayılan true). */
   quotes?: boolean | undefined;
-  /** wall: the "Show more" button (default true); false shows the whole wall. */
+  /** wall: the "Show more" button (default true); false shows the whole wall. @tr wall: "Show more" düğmesi (varsayılan true); false bütün duvarı gösterir. */
   more?: boolean | undefined;
-  /** marquee: speed of the two rows, px per second (default [28, 20]). */
+  /** marquee: speed of the two rows, px per second (default [28, 20]). @tr marquee: iki sıranın hızı, saniyede px (varsayılan [28, 20]). */
   speed?: [number, number] | undefined;
-  /** Entrance of the cards (grid, wall): Reveal options, or false for none. */
+  /** Entrance of the cards (grid, wall): Reveal options, or false for none. @tr Kartların girişi (grid, wall): Reveal seçenekleri ya da hiç giriş olmaması için false. */
   reveal?: RevealOptions | false | undefined;
-  /** Own texts; every one defaults to the built-in translated text. */
+  /** Own texts; every one defaults to the built-in translated text. @tr Kendi metinleriniz; her biri varsayılan olarak yerleşik çevrilmiş metni kullanır. */
   labels?: {
     more?: unknown; less?: unknown;
     /** Accessible name of the slider. */
@@ -50,6 +52,7 @@ export interface TestimonialsProps {
     /** Accessible name of a rating. */
     rating?: ((value: number) => string) | undefined;
   } | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

@@ -22,19 +22,21 @@ export interface StoryStep {
   color?: ColorToken | undefined;
 }
 export interface ScrollStoryProps {
+  /** The steps: text plus the `media` pinned beside it while the step is active, and an optional `color`. @tr Adımlar: metin, adım etkinken yanında sabitlenen `media` ve isteğe bağlı bir `color`. */
   steps: readonly StoryStep[];
-  /** Media column side (default end). */
+  /** Media column side (default end). @tr Medya sütununun tarafı (varsayılan end). */
   side?: "start" | "end" | undefined;
-  /** Tint the section with the active step's colour (default true). */
+  /** Tint the section with the active step's colour (default true). @tr Bölümü etkin adımın rengiyle boyar (varsayılan true). */
   theme?: boolean | undefined;
-  /** Called when the active step changes. */
+  /** Called when the active step changes. @tr Etkin adım değişince çağrılır. */
   onStep?: ((index: number) => void) | undefined;
-  /** The dots under the pinned picture (default true). */
+  /** The dots under the pinned picture (default true). @tr Sabitlenmiş görselin altındaki noktalar (varsayılan true). */
   dots?: boolean | undefined;
-  /** The step number above each title: true (default: "01"), false, or `(index) => node`. */
+  /** The step number above each title: true (default: "01"), false, or `(index) => node`. @tr Her başlığın üstündeki adım numarası: true (varsayılan: "01"), false ya da `(index) => node`. */
   numbers?: boolean | ((index: number) => unknown) | undefined;
-  /** How the pinned picture changes: "rise" (default), "fade", "none", or your own `(incoming, outgoing, direction) => void` (direction 1 = scrolling down). */
+  /** How the pinned picture changes: "rise" (default), "fade", "none", or your own `(incoming, outgoing, direction) => void` (direction 1 = scrolling down). @tr Sabitlenmiş görselin nasıl değiştiği: "rise" (varsayılan), "fade", "none" ya da kendi `(incoming, outgoing, direction) => void` işleviniz (direction 1 = aşağı kaydırma). */
   transition?: "rise" | "fade" | "none" | ((incoming: HTMLElement, outgoing: HTMLElement | undefined, direction: 1 | -1) => void) | undefined;
+  /** Extra CSS class on the section. @tr Bölüme eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

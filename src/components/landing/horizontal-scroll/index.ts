@@ -12,15 +12,17 @@ import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
 
 export interface HorizontalScrollProps {
-  /** Panel width (CSS length, default min(80vw, 32rem)). */
+  /** Panel width (CSS length, default min(80vw, 32rem)). @tr Panel genişliği (CSS uzunluğu, varsayılan min(80vw, 32rem)). */
   panel?: string | undefined;
-  /** Accessible name of the region. */
+  /** Accessible name of the region. @tr Bölgenin erişilebilir adı. */
   label?: string | undefined;
-  /** The progress line under the panels (default true). */
+  /** The progress line under the panels (default true). @tr Panellerin altındaki ilerleme çizgisi (varsayılan true). */
   progress?: boolean | undefined;
-  /** Pin the section and move the panels with the page scroll (default true); false: always a native sideways scroller with snap points. */
+  /** Pin the section and move the panels with the page scroll (default true); false: always a native sideways scroller with snap points. @tr Bölümü sabitler ve panelleri sayfa kaydırmasıyla kaydırır (varsayılan true); false: her zaman tutunma noktalı yerel yatay kaydırıcı. */
   pinned?: boolean | undefined;
+  /** Extra CSS class on the section (`.m-hs`). @tr Bölüme (`.m-hs`) eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
+  /** The panels. @tr Paneller. */
   children?: unknown;
 }
 

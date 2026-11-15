@@ -27,21 +27,23 @@ export interface CompareRow {
   note?: unknown | undefined;
 }
 export interface HonestCompareProps {
-  /** Columns; the one with id `us` is highlighted and scored against the others. */
+  /** Columns; the one with id `us` is highlighted and scored against the others. @tr Sütunlar; kimliği `us` olan vurgulanır ve diğerlerine karşı puanlanır. */
   columns: CompareColumn[];
+  /** The rows: `{ label, values, note? }`; `values` has one entry per column id. @tr Satırlar: `{ label, values, note? }`; `values` her sütun kimliği için bir değer içerir. */
   rows: CompareRow[];
-  /** Id of the product's own column (default "us"). */
+  /** Id of the product's own column (default "us"). @tr Ürünün kendi sütununun kimliği (varsayılan "us"). */
   us?: string | undefined;
-  /** Table caption (screen readers; shown when `showCaption`). */
+  /** Table caption (screen readers; shown when `showCaption`). @tr Tablo başlığı (ekran okuyucular için; `showCaption` ile görünür). */
   caption?: unknown | undefined;
+  /** Show the caption on screen (default false: screen readers only). @tr Tablo başlığını ekranda gösterir (varsayılan false: yalnız ekran okuyucular). */
   showCaption?: boolean | undefined;
-  /** Show the ahead / even / behind summary and the "only where we are behind" toggle (default true). */
+  /** Show the ahead / even / behind summary and the "only where we are behind" toggle (default true). @tr Önde / eşit / geride özetini ve "only where we are behind" düğmesini gösterir (varsayılan true). */
   summary?: boolean | undefined;
-  /** The "only where we are behind" toggle in the summary (default true). */
+  /** The "only where we are behind" toggle in the summary (default true). @tr Özetteki "only where we are behind" düğmesi (varsayılan true). */
   filter?: boolean | undefined;
-  /** The "Ahead" / "Behind" tags beside the row labels (default true). */
+  /** The "Ahead" / "Behind" tags beside the row labels (default true). @tr Satır etiketlerinin yanındaki "Ahead" / "Behind" etiketleri (varsayılan true). */
   tags?: boolean | undefined;
-  /** Every text the table writes itself; the defaults are translated. `counts` gets the three numbers. */
+  /** Every text the table writes itself; the defaults are translated. `counts` gets the three numbers. @tr Tablonun kendi yazdığı her metin; varsayılanlar çevrilmiştir. `counts` üç sayıyı alır. */
   labels?: {
     yes?: unknown; no?: unknown; partly?: unknown; ahead?: unknown; behind?: unknown;
     /** Accessible name of the scrolling region (default "Comparison table"). */
@@ -52,8 +54,10 @@ export interface HonestCompareProps {
   /**
    * Draw a cell yourself: return content, or undefined to keep the default mark. `info.us`: the product's own column;
    * `info.verdict`: how the row scores (1 ahead, 0 even, -1 behind, null not scored).
+   * @tr Bir hücreyi kendiniz çizin: içerik döndürün ya da varsayılan işareti korumak için undefined. `info.us`: ürünün kendi sütunu; `info.verdict`: satırın puanı (1 önde, 0 eşit, -1 geride, null puanlanmamış).
    */
   renderCell?: ((value: CompareValue, info: { row: CompareRow; column: CompareColumn; us: boolean; verdict: 1 | 0 | -1 | null }) => unknown) | undefined;
+  /** Extra CSS class on the root (`.m-hc`). @tr Köke (`.m-hc`) eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

@@ -13,31 +13,33 @@ import { Reveal, type RevealOptions } from "../reveal/index.ts";
 export interface SectionAction { label: unknown; href?: string | undefined; onClick?: ((e: MouseEvent) => void) | undefined; variant?: ButtonVariant | undefined; icon?: unknown | undefined; iconEnd?: unknown | undefined }
 
 export interface SectionHeadProps {
-  /** Small line above the title: text (uppercase, accent colour) or your own node (a Badge, a pill). */
+  /** Small line above the title: text (uppercase, accent colour) or your own node (a Badge, a pill). @tr Başlığın üstündeki küçük satır: metin (büyük harf, vurgu rengi) ya da kendi düğümünüz (bir Badge, bir hap). */
   eyebrow?: MaybeFn<unknown> | undefined;
-  /** Makes the eyebrow a link. */
+  /** Makes the eyebrow a link. @tr Üst satırı bir bağlantı yapar. */
   eyebrowHref?: string | undefined;
+  /** The heading. @tr Başlık. */
   title?: MaybeFn<unknown> | undefined;
-  /** Heading element of the title (default "h2"). */
+  /** Heading element of the title (default "h2"). @tr Başlığın HTML öğesi (varsayılan "h2"). */
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | undefined;
-  /** Id of the title (aria-labelledby of the section). */
+  /** Id of the title (aria-labelledby of the section). @tr Başlığın kimliği (bölümün aria-labelledby değeri). */
   titleId?: string | undefined;
-  /** Paragraph under the title. */
+  /** Paragraph under the title. @tr Başlığın altındaki paragraf. */
   lead?: MaybeFn<unknown> | undefined;
-  /** Buttons under the lead: action objects (`{ label, href }`), your own nodes, or both. */
+  /** Buttons under the lead: action objects (`{ label, href }`), your own nodes, or both. @tr Alt başlığın altındaki düğmeler: eylem nesneleri (`{ label, href }`), kendi düğümleriniz ya da ikisi birden. */
   actions?: readonly (SectionAction | Node)[] | Node | undefined;
-  /** Small text under the actions ("No card needed"). */
+  /** Small text under the actions ("No card needed"). @tr Eylemlerin altındaki küçük metin ("Kart gerekmez"). */
   note?: MaybeFn<unknown> | undefined;
-  /** start · center (default) · end. */
+  /** start · center (default) · end. @tr start · center (varsayılan) · end. */
   align?: MaybeFn<"start" | "center" | "end" | undefined>;
-  /** Scale of the title: sm (a card, a form) · md (a section, default) · lg (a call to action) · xl (a hero). */
+  /** Scale of the title: sm (a card, a form) · md (a section, default) · lg (a call to action) · xl (a hero). @tr Başlığın ölçeği: sm (bir kart, bir form) · md (bir bölüm, varsayılan) · lg (bir eylem çağrısı) · xl (bir hero). */
   size?: MaybeFn<"sm" | "md" | "lg" | "xl" | undefined>;
-  /** Width of the block: "text" (a readable measure, default) or "full". */
+  /** Width of the block: "text" (a readable measure, default) or "full". @tr Bloğun genişliği: "text" (okunaklı bir satır uzunluğu, varsayılan) ya da "full". */
   width?: MaybeFn<"text" | "full" | undefined>;
-  /** Entrance when the block scrolls into view: true (parts rise one after another), Reveal options, or false (default). */
+  /** Entrance when the block scrolls into view: true (parts rise one after another), Reveal options, or false (default). @tr Blok görünüme kaydığında giriş: true (parçalar art arda yükselir), Reveal seçenekleri ya da false (varsayılan). */
   reveal?: boolean | RevealOptions | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
-  /** More content under the note. */
+  /** More content under the note. @tr Notun altındaki ek içerik. */
   children?: unknown | undefined;
 }
 

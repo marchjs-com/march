@@ -29,15 +29,17 @@ import { swipe } from "../../../motion/gestures.ts";
 messages("tr", { "Slides": "Slaytlar" });
 
 export interface SlideProps {
-  /** Speaker notes (shown in the speaker view). */
+  /** Speaker notes (shown in the speaker view). @tr Konuşmacı notları (konuşmacı görünümünde gösterilir). */
   notes?: string | undefined;
-  /** title (centred, large) · content (heading + body, default) · split (two columns) · center · image (full-bleed media). */
+  /** title (centred, large) · content (heading + body, default) · split (two columns) · center · image (full-bleed media). @tr title (ortalı, büyük) · content (başlık + gövde, varsayılan) · split (iki sütun) · center · image (kenardan kenara medya). */
   layout?: "title" | "content" | "split" | "center" | "image" | undefined;
-  /** plain · inverse · brand (gradient) */
+  /** plain · inverse · brand (gradient) @tr plain · inverse · brand (renk geçişli) */
   tone?: "plain" | "inverse" | "brand" | undefined;
-  /** A decorative layer behind the slide (an Overlay, a VideoBackground…). */
+  /** A decorative layer behind the slide (an Overlay, a VideoBackground…). @tr Slaydın arkasındaki süs katmanı (bir Overlay, bir VideoBackground…). */
   background?: unknown;
+  /** Extra CSS class on the slide. @tr Slayda eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
+  /** Slide content. @tr Slayt içeriği. */
   children?: unknown;
 }
 /** One slide: `<Slide layout="title" notes="Welcome everyone">…</Slide>` */
@@ -48,39 +50,49 @@ export function Slide(props: SlideProps): Element {
 }
 
 /** Fragments: every child appears on its own step. `<Appear><li>One</li><li>Two</li></Appear>` (renders a list); `effect="none"` shows a step without movement. */
-export function Appear(props: { as?: string | undefined; effect?: "up" | "fade" | "scale" | "none" | undefined; class?: ClassProp | undefined; children?: unknown }): Element {
+export function Appear(props: {
+  /** Tag of the wrapper: ul (default), ol, div… @tr Sarmalayıcının etiketi: ul (varsayılan), ol, div… */
+  as?: string | undefined;
+  /** How each step enters: up (default), fade, scale or none. @tr Her adımın nasıl girdiği: up (varsayılan), fade, scale ya da none. */
+  effect?: "up" | "fade" | "scale" | "none" | undefined;
+  /** Extra CSS class on the wrapper. @tr Sarmalayıcıya eklenen ek CSS sınıfı. */
+  class?: ClassProp | undefined;
+  /** The steps; every child appears on its own step. @tr Adımlar; her çocuk öğe kendi adımında görünür. */
+  children?: unknown;
+}): Element {
   return h(props.as ?? "ul", { class: cx("m-appear", `m-appear-${props.effect ?? "up"}`, val(props.class)) }, props.children) as Element;
 }
 
 export interface PresentationProps {
-  /** Current slide, 0-based. With `setIndex` it is controlled (`bind:index`, e.g. a URL query parameter). */
+  /** Current slide, 0-based. With `setIndex` it is controlled (`bind:index`, e.g. a URL query parameter). @tr Geçerli slayt, 0'dan başlar. `setIndex` ile birlikte denetimli olur (`bind:index`, örneğin bir URL sorgu parametresi). */
   index?: MaybeFn<number | undefined>;
+  /** Called with the new slide index; makes `index` controlled. @tr Yeni slayt sırasıyla çağrılır; `index` değerini denetimli yapar. */
   setIndex?: ((i: number) => void) | undefined;
-  /** How slides change: a ready one, "none", or your own `(incoming, outgoing, direction) => void` (direction 1 = forward; RTL already applied). */
+  /** How slides change: a ready one, "none", or your own `(incoming, outgoing, direction) => void` (direction 1 = forward; RTL already applied). @tr Slaytların nasıl değiştiği: hazır bir geçiş, "none" ya da kendi `(incoming, outgoing, direction) => void` işleviniz (direction 1 = ileri; RTL zaten uygulanmış). */
   transition?: "slide" | "fade" | "zoom" | "none" | ((incoming: HTMLElement, outgoing: HTMLElement | undefined, direction: 1 | -1) => void) | undefined;
-  /** Show the speaker view (current, next, notes, timer). */
+  /** Show the speaker view (current, next, notes, timer). @tr Konuşmacı görünümünü gösterir (geçerli, sıradaki, notlar, süre). */
   presenter?: boolean | undefined;
-  /** Keep windows of this deck in step (the speaker window and the audience). Default "deck". */
+  /** Keep windows of this deck in step (the speaker window and the audience). Default "deck". @tr Bu sunumun pencerelerini (konuşmacı penceresi ve izleyici) eşit adımda tutar. Varsayılan "deck". */
   sync?: string | false | undefined;
-  /** URL the speaker button opens in a new window (a page rendering this deck with `presenter`). */
+  /** URL the speaker button opens in a new window (a page rendering this deck with `presenter`). @tr Konuşmacı düğmesinin yeni pencerede açtığı URL (bu sunumu `presenter` ile gösteren bir sayfa). */
   presenterUrl?: string | undefined;
-  /** Accessible name of the deck. */
+  /** Accessible name of the deck. @tr Sunumun erişilebilir adı. */
   label?: string | undefined;
-  /** The control row under the stage (default true). */
+  /** The control row under the stage (default true). @tr Sahnenin altındaki denetim satırı (varsayılan true). */
   controls?: boolean | undefined;
-  /** The "Slide 3 of 12" counter: true (default), false, or `(index, total) => content` (index is 0-based). */
+  /** The "Slide 3 of 12" counter: true (default), false, or `(index, total) => content` (index is 0-based). @tr "Slayt 3 / 12" sayacı: true (varsayılan), false ya da `(index, total) => content` (index 0'dan başlar). */
   counter?: boolean | ((index: number, total: number) => unknown) | undefined;
-  /** The progress line under the stage (default true). */
+  /** The progress line under the stage (default true). @tr Sahnenin altındaki ilerleme çizgisi (varsayılan true). */
   progress?: boolean | undefined;
-  /** Colour of the progress line (default: the brand gradient). */
+  /** Colour of the progress line (default: the brand gradient). @tr İlerleme çizgisinin rengi (varsayılan: marka geçişli rengi). */
   progressColor?: ColorToken | undefined;
-  /** The full screen button and the `F` key (default true). */
+  /** The full screen button and the `F` key (default true). @tr Tam ekran düğmesi ve `F` tuşu (varsayılan true). */
   fullscreen?: boolean | undefined;
-  /** The timer of the speaker view (default true). */
+  /** The timer of the speaker view (default true). @tr Konuşmacı görünümündeki süre sayacı (varsayılan true). */
   timer?: boolean | undefined;
-  /** Own icons for the buttons (an icon definition or a node). */
+  /** Own icons for the buttons (an icon definition or a node). @tr Düğmeler için kendi ikonlarınız (bir ikon tanımı ya da düğüm). */
   icons?: { previous?: unknown; next?: unknown; speaker?: unknown; fullscreen?: unknown } | undefined;
-  /** Own texts; every one defaults to the built-in translated text. */
+  /** Own texts; every one defaults to the built-in translated text. @tr Kendi metinleriniz; her biri varsayılan olarak yerleşik çevrilmiş metni kullanır. */
   labels?: {
     previous?: string | undefined; next?: string | undefined; speaker?: string | undefined; fullscreen?: string | undefined;
     /** Accessible name of the previous / counter / next group (default "Slides"). */
@@ -91,7 +103,9 @@ export interface PresentationProps {
     deck?: string | undefined;
     speakerView?: string | undefined; upNext?: string | undefined; end?: string | undefined; notes?: string | undefined; noNotes?: string | undefined; elapsed?: string | undefined;
   } | undefined;
+  /** Extra CSS class on the deck. @tr Sunuma eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
+  /** The slides (`Slide` elements). @tr Slaytlar (`Slide` öğeleri). */
   children?: unknown;
 }
 

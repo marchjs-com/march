@@ -10,22 +10,29 @@ import { type ColorToken } from "../../../theme/colors.ts";
 
 export type SectionTone = "plain" | "muted" | "inverse" | "brand";
 export interface SiteSectionProps {
+  /** Small line above the title. @tr Başlığın üstündeki küçük satır. */
   eyebrow?: MaybeFn<unknown> | undefined;
+  /** Heading of the section. @tr Bölümün başlığı. */
   title?: MaybeFn<unknown> | undefined;
+  /** Text under the title. @tr Başlığın altındaki metin. */
   lead?: MaybeFn<unknown> | undefined;
-  /** Heading alignment (default center). */
+  /** Heading alignment (default center). @tr Başlığın hizası (varsayılan center). */
   align?: "center" | "start" | undefined;
+  /** Background: plain (default), muted, inverse or brand. @tr Arka plan: plain (varsayılan), muted, inverse ya da brand. */
   tone?: SectionTone | undefined;
-  /** Content width: narrow 46rem · default 72rem · wide 84rem · full (edge to edge). */
+  /** Content width: narrow 46rem · default 72rem · wide 84rem · full (edge to edge). @tr İçerik genişliği: narrow 46rem · default 72rem · wide 84rem · full (kenardan kenara). */
   width?: "narrow" | "default" | "wide" | "full" | undefined;
-  /** Vertical padding (default md). */
+  /** Vertical padding (default md). @tr Dikey iç boşluk (varsayılan md). */
   space?: "none" | "sm" | "md" | "lg" | undefined;
-  /** Heading level for the title (default 2). */
+  /** Heading level for the title (default 2). @tr Başlığın düzeyi (varsayılan 2). */
   level?: 1 | 2 | 3 | undefined;
-  /** Entrance of the heading group: Reveal options, or false for none (default: up, one after another). */
+  /** Entrance of the heading group: Reveal options, or false for none (default: up, one after another). @tr Başlık grubunun girişi: Reveal seçenekleri ya da hiç giriş olmaması için false (varsayılan: up, art arda). */
   reveal?: RevealOptions | false | undefined;
+  /** Id of the section (for anchor links). @tr Bölümün kimliği (çapa bağlantıları için). */
   id?: string | undefined;
+  /** Extra CSS class on the section. @tr Bölüme eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
+  /** Content of the section. @tr Bölümün içeriği. */
   children?: unknown | undefined;
   [attr: string]: unknown;
 }

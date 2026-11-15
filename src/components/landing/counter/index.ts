@@ -15,23 +15,27 @@ import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { CountRoll } from "../../social/count-roll/index.ts";
 
 export interface CounterProps {
+  /** Target number (or an accessor); a new value glides to it. @tr Hedef sayı (ya da bir erişimci); yeni bir değere kayarak geçer. */
   value: MaybeFn<number>;
-  /** First value counted from (default 0). */
+  /** First value counted from (default 0). @tr Saymaya başlanan ilk değer (varsayılan 0). */
   from?: number | undefined;
-  /** Intl.NumberFormat options (currency, percent, compact notation …), e.g. a currency format with "EUR". */
+  /** Intl.NumberFormat options (currency, percent, compact notation …), e.g. a currency format with "EUR". @tr Intl.NumberFormat seçenekleri (para birimi, yüzde, kısa gösterim …), örneğin "EUR" ile bir para birimi biçimi. */
   format?: Intl.NumberFormatOptions | undefined;
-  /** Fixed decimals (shortcut for minimum/maximumFractionDigits). */
+  /** Fixed decimals (shortcut for minimum/maximumFractionDigits). @tr Sabit ondalık basamak sayısı (minimum/maximumFractionDigits için kısayol). */
   decimals?: number | undefined;
+  /** Node before the number (e.g. "$" or "+"). @tr Sayının önündeki düğüm (örneğin "$" ya da "+"). */
   prefix?: unknown | undefined;
+  /** Node after the number (e.g. "%" or " users"). @tr Sayının arkasındaki düğüm (örneğin "%" ya da " kullanıcı"). */
   suffix?: unknown | undefined;
-  /** `count`: the number counts (default) · `roll`: each digit rolls like an odometer · `none`: the value just changes. */
+  /** `count`: the number counts (default) · `roll`: each digit rolls like an odometer · `none`: the value just changes. @tr `count`: sayı sayar (varsayılan) · `roll`: her basamak kilometre sayacı gibi döner · `none`: değer yalnızca değişir. */
   mode?: "count" | "roll" | "none" | undefined;
-  /** ms (default 1600 for count, 900 for roll). */
+  /** ms (default 1600 for count, 900 for roll). @tr Süre, ms cinsinden (count için varsayılan 1600, roll için 900). */
   duration?: number | undefined;
-  /** Easing of the count (a motion easing name or token, default "expo"). */
+  /** Easing of the count (a motion easing name or token, default "expo"). @tr Sayımın yumuşatması (bir hareket easing adı ya da token'ı, varsayılan "expo"). */
   easing?: string | undefined;
-  /** Start when visible (default) or at once. */
+  /** Start when visible (default) or at once. @tr Görününce (varsayılan) ya da hemen başlar. */
   start?: "visible" | "now" | undefined;
+  /** Extra CSS class on the root (`.m-counter`). @tr Köke (`.m-counter`) eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

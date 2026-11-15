@@ -63,7 +63,8 @@ $items.peek()                            // read without tracking (explicit API 
   `intercept(Button, { name, props: (p) => ({ size: p.size ?? "sm" }), on: { onClick: (next, e, p) => … }, render:
   (next, p) => … })` changes props (live), callbacks (`next` calls the original) and output (wrap or replace) of named
   components. Only inside a part of the page: `<Extensions use={[ext, [Button, ext2]]}>`; one instance opts out with
-  `m:extend={false}` (or `={["name"]}`). Each returns a remover; a throwing extension is skipped, not fatal. Types:
+  `m:extend={false}` (or `={["name"]}`). Only where it stands: `inside(Card, Badge)` (any depth), `partOf(Button,
+  Spinner)` (Button's own part), as the target. Each returns a remover; a throwing extension is skipped, not fatal. Types:
   `declare module "hadi-march" { interface ExtensionProps extends ExtensionPropsOf<typeof ext> {} }`. Debug:
   `extensions.list()`, `extensions.of(el)`.
 - Async component: `async function Page() { const data = await api(); return <View data={data} /> }` — wrap in

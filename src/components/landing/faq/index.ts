@@ -15,17 +15,21 @@ import { SectionHead } from "../section-head/index.ts";
 
 export interface FaqItem { q: string; a: unknown; /** Extra words for search. */ keywords?: string | undefined }
 export interface FaqProps {
+  /** The questions: `{ q, a, keywords? }`; `keywords` are extra words for search. @tr Sorular: `{ q, a, keywords? }`; `keywords` arama için ek kelimelerdir. */
   items: readonly FaqItem[];
+  /** center (default): one column · split: heading beside the questions. @tr center (varsayılan): tek sütun · split: başlık soruların yanında. */
   layout?: "center" | "split" | undefined;
-  /** split: heading, lead and a contact line beside the questions. */
+  /** split: heading, lead and a contact line beside the questions. @tr split: soruların yanında başlık, alt başlık ve bir iletişim satırı. */
   title?: MaybeFn<unknown> | undefined;
+  /** Text under the title (split layout). @tr Başlığın altındaki metin (split düzeni). */
   lead?: MaybeFn<unknown> | undefined;
+  /** Contact line under the lead (split layout). @tr Alt başlığın altındaki iletişim satırı (split düzeni). */
   contact?: unknown;
-  /** Search box above the questions. */
+  /** Search box above the questions. @tr Soruların üstünde arama kutusu. */
   search?: boolean | undefined;
-  /** Several open at once (default false). */
+  /** Several open at once (default false). @tr Aynı anda birden çok soru açık olabilir (varsayılan false). */
   multiple?: boolean | undefined;
-  /** Every text the block writes itself; the defaults are translated. `count` gets the shown and the total number. */
+  /** Every text the block writes itself; the defaults are translated. `count` gets the shown and the total number. @tr Bloğun kendi yazdığı her metin; varsayılanlar çevrilmiştir. `count` gösterilen ve toplam sayıyı alır. */
   labels?: {
     /** Placeholder and accessible name of the search box (default "Search questions"). */
     search?: string;
@@ -33,10 +37,11 @@ export interface FaqProps {
     /** Shown when no question matches. */
     empty?: unknown;
   } | undefined;
-  /** The "3 of 12 questions" line under the search box (default true). */
+  /** The "3 of 12 questions" line under the search box (default true). @tr Arama kutusunun altındaki "3 of 12 questions" satırı (varsayılan true). */
   count?: boolean | undefined;
-  /** split: entrance of the heading column (default "up"): a Reveal effect, your own `{ from, to }`, or "none". */
+  /** split: entrance of the heading column (default "up"): a Reveal effect, your own `{ from, to }`, or "none". @tr split: başlık sütununun girişi (varsayılan "up"): bir Reveal efekti, kendi `{ from, to }` değeriniz ya da "none". */
   reveal?: RevealOptions["effect"];
+  /** Extra CSS class on the root (`.m-faq`). @tr Köke (`.m-faq`) eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 

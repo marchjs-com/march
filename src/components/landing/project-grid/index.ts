@@ -33,25 +33,27 @@ export interface Project {
   href?: string | undefined;
 }
 export interface ProjectGridProps {
+  /** The projects: `{ id, title, category?, year?, summary?, cover, href? }`; `cover` is an image or a node. @tr Projeler: `{ id, title, category?, year?, summary?, cover, href? }`; `cover` bir görsel ya da düğümdür. */
   projects: readonly Project[];
-  /** Filter chips from the categories (default true when there are two or more). */
+  /** Filter chips from the categories (default true when there are two or more). @tr Kategorilerden süzgeç çipleri (iki ya da daha fazla kategori varsa varsayılan true). */
   filters?: boolean | undefined;
-  /** Columns on wide screens (default 3). */
+  /** Columns on wide screens (default 3). @tr Geniş ekranlarda sütun sayısı (varsayılan 3). */
   cols?: 2 | 3 | undefined;
-  /** Open a project: receives the cover element (start of a shared element transition). */
+  /** Open a project: receives the cover element (start of a shared element transition). @tr Bir projeyi açar: kapak öğesini alır (paylaşılan öğe geçişinin başlangıcı). */
   onOpen?: ((p: Project, cover: Element) => void) | undefined;
-  /** Without onOpen: show the cover in the Lightbox (default true). */
+  /** Without onOpen: show the cover in the Lightbox (default true). @tr onOpen yoksa kapağı Lightbox içinde gösterir (varsayılan true). */
   lightbox?: boolean | undefined;
-  /** Text of the "all" chip (default "All"). */
+  /** Text of the "all" chip (default "All"). @tr "Tümü" çipinin metni (varsayılan "All"). */
   allLabel?: MaybeFn<string> | undefined;
-  /** Accessible name of the filter group (default "Filter projects"). */
+  /** Accessible name of the filter group (default "Filter projects"). @tr Süzgeç grubunun erişilebilir adı (varsayılan "Filter projects"). */
   filtersLabel?: string | undefined;
-  /** The arrow badge on a cover: true (default), false, or `(project) => node`. */
+  /** The arrow badge on a cover: true (default), false, or `(project) => node`. @tr Kapaktaki ok rozeti: true (varsayılan), false ya da `(project) => node`. */
   arrow?: boolean | ((p: Project) => unknown) | undefined;
-  /** Animate the filter change (fade out, glide, default true); false swaps the cards at once. */
+  /** Animate the filter change (fade out, glide, default true); false swaps the cards at once. @tr Süzgeç değişimini canlandırır (solma, kayma; varsayılan true); false kartları hemen değiştirir. */
   motion?: boolean | undefined;
-  /** Entrance of the cards: Reveal options, or false for none (default: up, one after another). */
+  /** Entrance of the cards: Reveal options, or false for none (default: up, one after another). @tr Kartların girişi: Reveal seçenekleri ya da hiç giriş olmaması için false (varsayılan: up, art arda). */
   reveal?: RevealOptions | false | undefined;
+  /** Extra CSS class on the root. @tr Köke eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
 }
 
