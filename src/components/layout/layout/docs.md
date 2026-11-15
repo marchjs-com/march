@@ -43,7 +43,7 @@ const SettingsPage = Page.extend({ narrow: true, tabsQuery: "tab" })
 | `top`, `header`, `nav`, `aside`, `footer` | Region content. Any region turns the frame on. |
 | `corners` | Content for the page corners, `{ "top-end": node \| node[] }`. |
 | `features` | By name (`{ scrollToTop: false, readingProgress: true }`: on, off, options), a list (replaces the defaults) or `(defaults) => list`. Default: `scrollToTop`, `routeFocus`. |
-| `titleTemplate` | Document title pattern for pages, `"%s · March"`. |
+| `titleTemplate` | Document title pattern for pages, `"%s · MarchJS"`. |
 | `framed` | Always draw the frame (skip link, main), also without regions. |
 | `mainId` | id of the main element (skip-link target), default `main`. |
 | `labels` | Texts the frame writes itself: `{ skip, panel }` — the skip link and the button that opens the aside on narrow screens (string or accessor each; the defaults are translated). |

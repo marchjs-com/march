@@ -1,4 +1,4 @@
-// MadeWithMarch (march/ui): an optional "Developed with March and 💗" line. Folder: src/components/made-with-march/.
+// MadeWithMarch (march/ui): an optional "Developed with MarchJS and 💗" line. Folder: src/components/made-with-march/.
 import "./made-with-march.css";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
@@ -7,7 +7,7 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 messages("tr", { "Developed with {0}": "{0} ile geliştirildi" });
 
 import { MARCH_URL } from "../../../brand.js";
-/** Where "March" links point: one constant in src/brand.js (shared with the console banner). */
+/** Where "MarchJS" links point: one constant in src/brand.js (shared with the console banner). */
 export { MARCH_URL };
 
 export interface MadeWithMarchProps {
@@ -17,7 +17,7 @@ export interface MadeWithMarchProps {
   heart?: unknown;
   /** Accessible name of the heart (default: "Love", translated). @tr Kalbin erişilebilir adı (varsayılan: "Love", çevrilir). */
   heartLabel?: MaybeFn<string | undefined>;
-  /** Text of the link (default: "March"). @tr Bağlantının metni (varsayılan: "March"). */
+  /** Text of the link (default: "MarchJS"). @tr Bağlantının metni (varsayılan: "MarchJS"). */
   link?: unknown;
   /** Where the link points (default: MARCH_URL). @tr Bağlantının adresi (varsayılan: MARCH_URL). */
   href?: string | undefined;
@@ -31,7 +31,7 @@ const LINK = "\u0001", HEART = "\u0002";
 
 /** `<MadeWithMarch />`, `<MadeWithMarch variant="badge" />`. The sentence is one i18n message, so word order follows the language. */
 export function MadeWithMarch(props: MadeWithMarchProps): Element {
-  const link = (): Element => h("a", { class: "m-madewith-link", href: props.href ?? MARCH_URL, target: "_blank", rel: "noopener" }, props.link ?? "March") as Element;
+  const link = (): Element => h("a", { class: "m-madewith-link", href: props.href ?? MARCH_URL, target: "_blank", rel: "noopener" }, props.link ?? "MarchJS") as Element;
   const heart = (): Element | null => (props.heart === false ? null
     : h("span", { class: "m-madewith-heart", role: "img", "aria-label": () => val(props.heartLabel) ?? t`Love` }, props.heart == null || props.heart === true ? "💗" : props.heart) as Element);
   const parts = (): unknown => {

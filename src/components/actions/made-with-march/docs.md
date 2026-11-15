@@ -1,6 +1,6 @@
 # MadeWithMarch
 
-An optional credit line: "Developed with March and 💗", with "March" as a link. Using it is a request, not a
+An optional credit line: "Developed with MarchJS and 💗", with "MarchJS" as a link. Using it is a request, not a
 requirement: the licence stays MIT and nothing here is needed to use March.
 
 ```tsx
@@ -8,7 +8,7 @@ requirement: the licence stays MIT and nothing here is needed to use March.
 <MadeWithMarch variant="badge" />
 <MadeWithMarch variant="small" />
 <MadeWithMarch heart="☕" heartLabel="Coffee" />              // your own mark
-<MadeWithMarch heart={false} />                              // "Developed with March"
+<MadeWithMarch heart={false} />                              // "Developed with MarchJS"
 <MadeWithMarch text={(link, heart) => <>Built on {link} {heart}</>} link="March UI" />
 ```
 
@@ -19,7 +19,7 @@ requirement: the licence stays MIT and nothing here is needed to use March.
 | `variant` | `text` `badge` `small` | `text` | plain line, bordered pill, compact muted line |
 | `heart` | boolean / node | `true` (💗) | the heart: `false` ends the sentence at the link, a node or text replaces it |
 | `heartLabel` | string / accessor | "Love" | accessible name of the heart |
-| `link` | node | "March" | text of the link |
+| `link` | node | "MarchJS" | text of the link |
 | `href` | string | `MARCH_URL` | where the link points |
 | `text` | `(link, heart) => node` | — | your own sentence around the two parts |
 | `class` | class | — | extra classes |
@@ -37,4 +37,4 @@ properties, so dark themes and RTL need nothing extra. The link opens in a new t
 
 ## Without a component
 
-`march.config.js` has `credit: true`: the built `index.html` then carries `<!-- Built with March -->`. Off by default. It also prints the console banner in production (a separate tiny `credit.js`); in `march dev` the banner is on unless `banner: false`.
+`march.config.js` has `credit: true`: the built `index.html` then carries `<!-- Built with MarchJS -->`. Off by default. It also prints the console banner in production (a separate tiny `credit.js`); in `march dev` the banner is on unless `banner: false`.

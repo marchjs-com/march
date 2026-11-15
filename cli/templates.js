@@ -7,7 +7,7 @@ export const templates = {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>March app</title>
+  <title>MarchJS app</title>
   <!--march-->
 </head>
 <body>

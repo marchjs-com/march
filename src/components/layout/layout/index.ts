@@ -62,7 +62,7 @@ export interface LayoutProps {
   corners?: Partial<Record<Corner, unknown>> | undefined;
   /** Page-wide behaviours for this page: `{ name: true | false | options }`, a list, or a function over the layout's list. @tr Bu sayfaya özel davranışlar: `{ ad: true | false | seçenekler }`, bir liste ya da düzenin listesini alan bir işlev. */
   features?: FeaturesProp | undefined;
-  /** Document title pattern for pages ("%s · March"). */
+  /** Document title pattern for pages ("%s · MarchJS"). */
   titleTemplate?: string | undefined;
   /** Always draw the frame (skip link, main), also without regions (AppShell). */
   framed?: boolean | undefined;

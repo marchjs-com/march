@@ -19,7 +19,7 @@
 //   Cloudflare Pages / Netlify, absolute base only), fallback404: false (no 404.html), stableNames: true (or --stable-names:
 //   main.js, chunks/home.js… with ?v=<version> in every reference; deploys overwrite the same paths), packChunks: false,
 //   budget: { entry, route, part, css, routes: { "/x": bytes }, fail } (gzip bytes; false = off), sw: true (offline service worker), headers: false (no _headers),
-//   credit: true (adds <!-- Built with March --> to the built index.html and prints the one-line console banner in production too; off by default),
+//   credit: true (adds <!-- Built with MarchJS --> to the built index.html and prints the one-line console banner in production too; off by default),
 //   banner: false (no console banner in `march dev`; production never prints one unless credit is on) }.
 //   seo: { site, prerender: true | ["/a"], sitemap, robots, head } (compiler/prerender.js: static HTML per route + sitemap.xml/robots.txt) }.
 import { createServer } from "node:http";
@@ -116,7 +116,7 @@ function writeHtml(cfg, meta, { dev }, manifest = null, entryFiles = null) {
   // an absolute base ("/app/") is written down for the router and appUrl() (march/base); a relative build ("./")
   // finds its root from the entry script instead
   const baseTag = base.startsWith("/") ? `<meta name="march-base" content="${base.replace(/\/?$/, "/")}">` : "";
-  const tags = `${cfg.credit === true ? "<!-- Built with March -->" : ""}${baseTag}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
+  const tags = `${cfg.credit === true ? "<!-- Built with MarchJS -->" : ""}${baseTag}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
   const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
   writeFileSync(join(out, "index.html"), html);
   if (!dev && cfg.credit === true) writeFileSync(join(out, "credit.js"), bannerSource(marchVersion()));

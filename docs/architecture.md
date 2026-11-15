@@ -1,4 +1,4 @@
-# March architecture
+# MarchJS architecture
 
 ## Router: the outlet tree
 

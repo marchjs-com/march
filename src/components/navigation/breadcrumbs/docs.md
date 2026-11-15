@@ -35,7 +35,7 @@ a button. `current: true` marks the sibling the path goes through (tinted; the l
 
 ```tsx
 <Breadcrumbs separator="/" items={[
-  { id: "home", label: "March", href: "/" },
+  { id: "home", label: "MarchJS", href: "/" },
   { id: "forms", label: "Forms", siblings: sections.map((s) => ({ id: s.path, label: s.title, sub: s.desc, icon: s.icon, href: s.path, current: s.path === "/forms" })) },
   { id: "select", label: "Select", siblings: pagesOf("/forms").map((p) => ({ id: p.path, label: p.title, href: p.path, current: p.path === here })) },
 ]} />

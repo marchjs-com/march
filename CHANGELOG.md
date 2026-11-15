@@ -4,6 +4,11 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
+### The name is MarchJS
+- The product is called **MarchJS** where it is shown: page titles, the showcase's trail, the READMEs, the console
+  banner (`🧡 MarchJS v…`), the MadeWithMarch link ("Developed with MarchJS and 💗"), `<!-- Built with MarchJS -->`,
+  a new app's `<title>`. The domain is marchjs.com (the site and cdn.marchjs.com come later).
+
 ### The package is `march` (was `hadi-march`)
 - **Breaking:** imports are `march`, `march/ui`, `march/app-ui`, `march/icons`… (the product's name; the repository
   stays tlghn/hadimarch). The March compiler's esbuild plugin and the playground still resolve `hadi-march/…` to the

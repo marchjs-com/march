@@ -1,4 +1,4 @@
-# March
+# MarchJS
 > Tiny fine-grained reactive TypeScript framework: components run once, signals bind directly to DOM nodes, no virtual DOM, zero runtime dependencies, JSX compiled by an esbuild plugin, CSP/Trusted Types safe.
 
 - [AI instructions](AI_INSTRUCTIONS.md): concepts, syntax, data, actions, schema/forms/tables, routing, do/don't, mistakes

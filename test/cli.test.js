@@ -149,17 +149,17 @@ test("march build: base \"./\" writes only relative asset URLs (the app works fr
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test("march build: credit: true adds the Built with March comment; off by default", () => {
+test("march build: credit: true adds the Built with MarchJS comment; off by default", () => {
   const dir = mkdtempSync(join(tmpdir(), "march-credit-"));
   try {
     mkdirSync(join(dir, "src"), { recursive: true });
     writeFileSync(join(dir, "src/main.jsx"), "render(() => <p>hi</p>, document.getElementById('app'))\n");
     writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
     execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
-    assert.doesNotMatch(readFileSync(join(dir, "dist/index.html"), "utf8"), /Built with March/);
+    assert.doesNotMatch(readFileSync(join(dir, "dist/index.html"), "utf8"), /Built with MarchJS/);
     writeFileSync(join(dir, "march.config.js"), "export default { credit: true }\n");
     execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
-    assert.match(readFileSync(join(dir, "dist/index.html"), "utf8"), /<!-- Built with March -->/);
+    assert.match(readFileSync(join(dir, "dist/index.html"), "utf8"), /<!-- Built with MarchJS -->/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
@@ -207,7 +207,7 @@ test("console banner: dev client prints one line once per page; banner: false re
   const src = bannerSource("0.1.0", "a tip");
   runInNewContext(src, sandbox); runInNewContext(src, sandbox);
   assert.equal(logs.length, 2, "banner line + tip line, once");
-  assert.match(logs[0][0], /^%c🧡 March v0\.1 · /);
+  assert.match(logs[0][0], /^%c🧡 MarchJS v0\.1 · /);
   assert.ok(logs[0][0].includes(MARCH_URL), "same constant as the badge");
   assert.match(logs[0][1], /color/);
   assert.equal(logs[1][0], "a tip");

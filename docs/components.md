@@ -45,7 +45,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Chip | stable | Label pill: static, toggle (filter, aria-pressed) or removable; long labels scroll with OverflowText. | [OverflowText](#overflowtext), [IconButton](#iconbutton) |
 | CopyButton | stable | Copies text to the clipboard: a text or icon-only button that confirms (Copied) for a moment and reports failure with a toast. | [Button](#button), [IconButton](#iconbutton) |
 | IconButton | stable | Icon-only button: the label is required and becomes its accessible name and title; four sizes, danger / solid / raised variants, round shape, a pressed toggle state, an inverse look for dark media, and href to draw a link. | — |
-| MadeWithMarch | stable | Optional credit line "Developed with March and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
+| MadeWithMarch | stable | Optional credit line "Developed with MarchJS and 💗": text, badge or small; the link is one constant (MARCH_URL). | — |
 | Menu | stable | Trigger button with a floating menu of items, links and action()s (separators, shortcuts, danger, permissions) and the full menu keyboard model; Dropdown floats any content. | [Button](#button), [IconButton](#iconbutton), [Popover](#popover), [ListRow](#listrow), [CheckMark](#checkmark), [Kbd](#kbd), Divider |
 | OverflowToolbar | experimental | Toolbar whose items that do not fit go to a More menu (lowest priority first); command ids from the Command manager, toggles, separators, roving focus. | [Button](#button), [IconButton](#iconbutton), Divider, [Menu](#menu), [Tooltip](#tooltip) |
 | ScrollToTop | stable | Back-to-top button: shows after the page is scrolled down, scrolls back on the motion engine; puts itself into BottomRightControls. | [IconButton](#iconbutton), [BottomRightControls](#bottomrightcontrols) |
@@ -1606,14 +1606,14 @@ Full page: src/components/landing/logo-cloud/docs.md
 
 ## MadeWithMarch
 
-An optional credit line: "Developed with March and 💗", with "March" as a link. Using it is a request, not a requirement: the licence stays MIT and nothing here is needed to use March.
+An optional credit line: "Developed with MarchJS and 💗", with "MarchJS" as a link. Using it is a request, not a requirement: the licence stays MIT and nothing here is needed to use March.
 
 ```tsx
 <MadeWithMarch />
 <MadeWithMarch variant="badge" />
 <MadeWithMarch variant="small" />
 <MadeWithMarch heart="☕" heartLabel="Coffee" />              // your own mark
-<MadeWithMarch heart={false} />                              // "Developed with March"
+<MadeWithMarch heart={false} />                              // "Developed with MarchJS"
 <MadeWithMarch text={(link, heart) => <>Built on {link} {heart}</>} link="March UI" />
 ```
 

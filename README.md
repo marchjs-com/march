@@ -1,4 +1,4 @@
-# March
+# MarchJS
 
 **Run once, then march.** A small, fast framework for TypeScript and JavaScript where components run a single time and
 only the DOM that depends on a changed value updates — no virtual DOM, no re-renders, no runtime dependencies.
@@ -197,8 +197,8 @@ If you made something with March, we would be glad if you added this line to you
 ```tsx
 import { MadeWithMarch } from "march/ui";
 
-<MadeWithMarch />                      // Developed with March and 💗
+<MadeWithMarch />                      // Developed with MarchJS and 💗
 <MadeWithMarch variant="badge" />      // or "small"
 ```
 
-Prefer no visible text? `credit: true` in `march.config.js` only adds the comment `<!-- Built with March -->` to the built `index.html`. The comment is off by default; with it on, production also prints one console line. `march dev` prints a banner once per page (`banner: false` turns it off); production bundles never contain it.
+Prefer no visible text? `credit: true` in `march.config.js` only adds the comment `<!-- Built with MarchJS -->` to the built `index.html`. The comment is off by default; with it on, production also prints one console line. `march dev` prints a banner once per page (`banner: false` turns it off); production bundles never contain it.
