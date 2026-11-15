@@ -143,3 +143,22 @@ test("Debugger: the controls follow the state, the sections show the stop; secti
   assert.equal(s.state(), "idle");
   dispose();
 });
+
+test("Debugger: the timeline slider stays the same element while it is moved (the drag and the focus are kept)", async () => {
+  const s = createDebugSession({ evaluate });
+  s.setBreakpoint("cart.js", 4);
+  s.begin([META]); run(); await settle();
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(Debugger, { session: s }), el);
+  const range = () => el.querySelector(".m-dbg-time input[type=range]");
+  const first = range();
+  assert.ok(first, "a timeline while paused");
+  for (const to of [0, 1, 2]) {
+    first.value = String(to);
+    first.dispatchEvent(new Event("input", { bubbles: true }));
+    await tick();
+    assert.equal(s.index(), to);
+    assert.equal(range(), first, `still the same slider after step ${to}`);
+  }
+  dispose(); s.end();
+});

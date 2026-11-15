@@ -150,11 +150,14 @@ export function Debugger(props: DebuggerProps): Element {
     h("span", { class: "m-dbg-why" }, why),
     () => { const c = s.current(); return c && paused() ? h("button", { type: "button", class: "m-dbg-place", onClick: () => props.onReveal?.(c.file, c.line) }, `${c.fn} · ${c.file}:${c.line}`) : null; },
     () => { const c = s.current(); return c?.kind === "exception" && paused() ? h("span", { class: "m-dbg-error" }, text(c.error)) : null; });
+  // the slider is made again only when its ends change: moving it (goTo) bumps the session's version, and a slider
+  // made anew under the pointer would lose the drag and the focus after one step
+  const ends = computed(() => s.range(), { equals: (x, y) => !!x && !!y && x[0] === y[0] && x[1] === y[1] });
   const timeline = (): unknown => (val(props.timeline) === false ? null : () => {
-    const [a, b] = s.range();
-    return b > a ? h("div", { class: "m-dbg-time" },
+    const [a, b] = ends();
+    return untrack(() => b > a ? h("div", { class: "m-dbg-time" },
       h(Slider, { min: a, max: b, step: 1, get value() { return Math.max(a, s.index()); }, onChange: (n: number) => s.goTo(n), "aria-label": L("timeline"), valueText: (n: number) => `${L("step")} ${n + 1} / ${b + 1}` }),
-      h("span", { class: "m-dbg-count" }, () => `${L("step")} ${s.index() + 1} / ${b + 1}`)) : null;
+      h("span", { class: "m-dbg-count" }, () => `${L("step")} ${s.index() + 1} / ${b + 1}`)) : null);
   });
 
   // ---- the sections
