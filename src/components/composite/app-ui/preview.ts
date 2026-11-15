@@ -67,6 +67,18 @@ export function AppPreview(props: AppPreviewProps): Element {
   const doc = globalThis.document as Document | undefined;
   // where the browser refuses it (an embedded view, a frame without allow="fullscreen") the preview covers the page instead
   const cover = signal(false);
+  // in full screen the toolbar floats over the top and slides away; the pointer at the top edge (or the keyboard in
+  // it) brings it back. Touch screens keep it in place (CSS: only where a fine pointer hovers)
+  const barShown = signal(false);
+  let barTimer: ReturnType<typeof setTimeout> | undefined;
+  const hideBarSoon = (ms = 1600): void => { clearTimeout(barTimer); barTimer = setTimeout(() => barShown.set(false), ms); };
+  const onMove = (e: PointerEvent): void => {
+    if (!full.peek() || !root) return;
+    const top = root.getBoundingClientRect().top, over = (e.target as Element | null)?.closest?.(".m-app-pv-bar");
+    if (e.clientY - top < 40 || over) { barShown.set(true); clearTimeout(barTimer); } else if (barShown.peek()) hideBarSoon(500);
+  };
+  effect(() => { if (full()) { barShown.set(true); hideBarSoon(); } else { clearTimeout(barTimer); barShown.set(false); } });
+  onCleanup(() => clearTimeout(barTimer));
   const follow = (): void => full.set(!!root && doc?.fullscreenElement === root);
   const onKey = (e: KeyboardEvent): void => { if (e.key === "Escape" && cover.peek()) { cover.set(false); full.set(false); } };
   doc?.addEventListener("fullscreenchange", follow);
@@ -105,7 +117,7 @@ export function AppPreview(props: AppPreviewProps): Element {
     h("div", { class: "m-app-pv-accent", "data-m-accent": () => (accent() === "primary" ? null : accent()) }, props.children));
   // one piece (Joined): the bar, the stage and the footer read as header, body and footer; what the footer holds (a code
   // view) loses its own frame and corners too
-  root = h(Joined, { class: () => cx("m-app-pv", full() && "is-full", cover() && "is-cover", val(props.class)), radius: 0, border: false },
+  root = h(Joined, { class: () => cx("m-app-pv", full() && "is-full", cover() && "is-cover", barShown() && "is-bar-shown", val(props.class)), radius: 0, border: false, onPointermove: onMove },
     bar, stage, props.footer != null ? h(Joined, { class: "m-app-pv-foot", radius: 0, border: false }, props.footer) : null) as HTMLElement;
   return root;
 }
