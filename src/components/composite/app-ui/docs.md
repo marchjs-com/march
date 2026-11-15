@@ -91,6 +91,10 @@ underlined in the code editor (red, amber) and counted under it with the first o
 demand from `lib`). Under a CSP with Trusted Types the worker starts through the `march-worker` policy (same-origin `.js`
 only): the CSP must list `trusted-types march-worker`.
 
+`view: (path, text) => ({ text, inserts })` lets the service read what the host builds instead of the file as typed
+(a playground that turns top-level elements into exports): `inserts` are the places text was added (`[at, length]` in
+the file's text), and problems, suggestions and hovers are mapped back to the file.
+
 ## Debugger
 
 `debuggerPlugin({ run, reveal, evaluate, untrack, persist })` (after HADİ Studio Kit's debugger, rewritten on March) adds

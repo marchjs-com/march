@@ -31,7 +31,21 @@ export interface TypeScriptPluginOptions {
   lib: string;
   /** Wait this long after typing before asking for problems (default 300 ms). */
   delay?: number;
+  /**
+   * The text the language service reads instead of the file's own (what the host builds from it), with the places text
+   * was inserted ([at, length] in the file's text): problems, suggestions and hovers are mapped back to the file.
+   */
+  view?: ((path: string, text: string) => { text: string; inserts: readonly (readonly [number, number])[] }) | undefined;
 }
+type Inserts = readonly (readonly [number, number])[];
+/** A position of the file in the view (an insert at the position comes before it). */
+const toView = (ins: Inserts, pos: number): number => { let shift = 0; for (const [at, len] of ins) if (at <= pos) shift += len; return pos + shift; };
+/** A position of the view in the file (inside an insert: where it stands). */
+const toFile = (ins: Inserts, pos: number): number => {
+  let shift = 0;
+  for (const [at, len] of ins) { const v = at + shift; if (pos < v) break; if (pos < v + len) return at; shift += len; }
+  return pos - shift;
+};
 
 type Policy = { createScriptURL(u: string): unknown };
 let policy: Policy | null | undefined;
@@ -74,6 +88,9 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
         .then((r) => { version.set(r.version); ctx.emit("typescript:ready", r.version); return true; })
         .catch((err) => { console.error("march-app-ui: TypeScript did not start", err); return false; });
       const texts = new Map<string, string>();
+      // the file as the service reads it (the host's view, or itself)
+      const lastInserts = new Map<string, Inserts>();
+      const viewOf = (path: string, text: string): { text: string; inserts: Inserts } => { const v = o.view ? o.view(path, text) : { text, inserts: [] }; lastInserts.set(path, v.inserts); return v; };
       const send = async (path: string, text: string): Promise<void> => {
         if (texts.get(path) === text) return;
         texts.set(path, text);
@@ -83,8 +100,10 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
         version,
         async complete(path, c) {
           if (!(await ready)) return null;
-          await send(path, c.value);
-          return call<CodeCompletion | null>("complete", { path, pos: c.caret });
+          const v = viewOf(path, c.value);
+          await send(path, v.text);
+          const r = await call<CodeCompletion | null>("complete", { path, pos: toView(v.inserts, c.caret) });
+          return r && v.inserts.length ? { ...r, from: toFile(v.inserts, r.from), ...(r.to != null ? { to: toFile(v.inserts, r.to) } : {}) } : r;
         },
         async instrument(files) {
           if (!(await ready)) throw new Error("TypeScript did not start");
@@ -92,7 +111,7 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
         },
         async hover(path, pos) {
           if (!(await ready)) return null;
-          return call("hover", { path, pos });
+          return call("hover", { path, pos: toView(lastInserts.get(path) ?? [], pos) });
         },
         track(file) {
           const problems: Signal<readonly CodeProblem[]> = signal([]);
@@ -104,9 +123,10 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
               const k = ++n;
               void ready.then(async (ok) => {
                 if (!ok) return;
-                await send(file.path, text);
+                const v = viewOf(file.path, text);
+                await send(file.path, v.text);
                 const list = await call<CodeProblem[]>("diagnostics", { path: file.path });
-                if (k === n) problems.set(list);
+                if (k === n) problems.set(v.inserts.length ? list.map((p) => ({ ...p, from: toFile(v.inserts, p.from), to: toFile(v.inserts, p.to) })) : list);
               }).catch(() => undefined);
             }, o.delay ?? 300);
           });
