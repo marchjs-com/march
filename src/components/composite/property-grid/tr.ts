@@ -15,5 +15,6 @@ const tr: Record<string, string> = {
   "Revert {0}": "{0}: değişiklikleri geri çevir",
   "Revert": "Geri çevir",
   "Search properties": "Özellik ara",
+  "Open all": "Tümünü aç", "Close all": "Tümünü kapat", "Sections": "Bölümler",
 };
 export default tr;

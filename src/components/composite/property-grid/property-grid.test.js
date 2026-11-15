@@ -158,3 +158,25 @@ test("PropertyGrid: a kept row stays whole when the body is drawn again (a new p
   assert.equal(label("extra"), "Extra");
   dispose();
 });
+
+test("PropertyGrid group tools: a chip per group (lit while open) toggles it; open / close all; groupTools={false} hides them", async () => {
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+  const properties = [{ key: "a", label: "A", group: "One" }, { key: "b", label: "B", group: "Two" }, { key: "c", label: "C", group: "Three" }];
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const dispose = render(() => h(PropertyGrid, { properties, value: { a: "", b: "", c: "" }, search: false, history: false, footer: false }), host);
+  const chips = () => [...host.querySelectorAll(".m-pg-tools .m-chip2 button")];
+  const opened = () => [...host.querySelectorAll("details.m-pg-group")].map((d) => d.open);
+  assert.equal(chips().length, 3);
+  assert.deepEqual(opened(), [true, true, true]);
+  chips()[1].click(); await tick();
+  assert.deepEqual(opened(), [true, false, true], "the chip closes its group");
+  host.querySelector(".m-pg-all").click(); await tick();
+  assert.deepEqual(opened(), [true, true, true], "not all open: open all");
+  host.querySelector(".m-pg-all").click(); await tick();
+  assert.deepEqual(opened(), [false, false, false], "all open: close all");
+  dispose();
+  const host2 = document.createElement("div"); document.body.appendChild(host2);
+  const d2 = render(() => h(PropertyGrid, { properties, value: {}, search: false, groupTools: false }), host2);
+  assert.equal(host2.querySelector(".m-pg-tools"), null);
+  d2();
+});

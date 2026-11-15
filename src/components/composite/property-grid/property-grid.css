@@ -43,3 +43,5 @@
   .m-pg-row { grid-template-columns: minmax(0, 1fr) 1.75rem; }
   .m-pg-label { grid-column: 1 / -1; }
 }
+/* the group tools: open / close all, and a chip per group (lit while it is open) */
+.m-pg-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-1); min-inline-size: 0; }

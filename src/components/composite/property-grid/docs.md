@@ -26,6 +26,7 @@ one. The footer counts the changes and offers Revert and Save.
 | `dirty` | `DirtyState` / `false` | `dirtyState()` | where unsaved changes are registered (`id`, `label`) |
 | `groups` | string[] | order of appearance | group order |
 | `search` | boolean | `true` | the search field (label, key, group, keywords, description; Turkish-aware folding) |
+| `groupTools` | boolean | `true` | with more than one group, a row of tools at the top: open / close every group and a chip per group (lit while it is open; a press opens or closes it); a search opens them all while it lasts |
 | `layout` | `auto` `stacked` | `auto` | label beside the editor (stacked in narrow panels) or always above |
 | `api` | `(api) => void` | — | `changes()`, `save()`, `revert()`, `markSaved()`, `focus(key)` |
 | `label` | string / accessor | `Properties` | accessible name, DirtyState and undo label |

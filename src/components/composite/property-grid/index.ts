@@ -4,7 +4,7 @@
 // registered with the DirtyState manager (leave warning, saveAll). Rows show what differs from the saved values and can
 // be reset one by one.
 import "./property-grid.css";
-import { signal, computed, untrack, onCleanup, getOwner, runWithOwner, type Signal } from "../../../core/reactive.ts";
+import { signal, computed, untrack, onCleanup, getOwner, runWithOwner, reactive, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -22,6 +22,8 @@ import { UndoRedo } from "../../actions/undo-redo/index.ts";
 import { Badge } from "../../data/badge/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
+import { Chip } from "../../actions/chip/index.ts";
+import { chevronsUpDown } from "../../../icons/glyphs/chevronsUpDown.ts";
 import { Tooltip } from "../../overlays/tooltip/index.ts";
 import { SearchBox } from "../../forms/search-box/index.ts";
 import { PanelHeader } from "../../layout/panel-header/index.ts";
@@ -116,10 +118,15 @@ export interface PropertyGridProps {
   /** The footer with the change count, Revert and Save (default true). @tr Değişiklik sayısı, Revert ve Save içeren alt bilgi (varsayılan true). */
   footer?: boolean | undefined;
   /** Own texts; defaults are the translated ones. @tr Kendi metinlerin; varsayılanlar çevrilmiş olanlar. */
+  /** With more than one group: a row of tools at the top — open / close every group, and a chip per group (lit while it
+   * is open; a press opens or closes it). Default true. @tr Birden çok grupta üstte bir araç satırı: bütün grupları
+   * aç / kapat ve her grup için bir çip (açıkken seçili; basınca açar ya da kapatır). Varsayılan true. */
+  groupTools?: boolean | undefined;
   labels?: {
     search?: string; general?: string; empty?: string; noMatch?: (query: string) => string;
     changed?: string; changedCount?: (n: number) => string; unsaved?: (n: number) => string; noChanges?: string;
     revert?: unknown; save?: unknown; undo?: string; redo?: string; reset?: (label: string) => string; resetTitle?: string;
+    openAll?: string; closeAll?: string; sections?: string;
   } | undefined;
   /** Extra classes on the section (`m-pg`). @tr Bölüme (`m-pg`) eklenen ek sınıflar. */
   class?: ClassProp;
@@ -220,6 +227,22 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     for (const p of list()) { const g = p.group ?? ""; if (!order.includes(g)) order.push(g); }
     return order.map((g) => ({ name: g, items: list().filter((p) => (p.group ?? "") === g) })).filter((x) => x.items.length);
   });
+  // the groups closed by hand (a search opens them all while it lasts)
+  const closed = signal<ReadonlySet<string>>(new Set());
+  const setOpen = (name: string, open: boolean): void => {
+    const now = closed.peek();
+    if (open !== now.has(name)) return;
+    const next = new Set(now);
+    if (open) next.delete(name); else next.add(name);
+    closed.set(next);
+  };
+  const isOpen = (name: string): boolean => !!query() || !closed().has(name);
+  const groupName = (g: { name: string }): string => g.name || (L().general ?? t`General`);
+  const allOpen = (): boolean => grouped().every((g) => isOpen(g.name));
+  const tools = (): unknown => (props.groupTools === false || grouped().length < 2 ? null : h("div", { class: "m-pg-tools", role: "group", "aria-label": () => L().sections ?? t`Sections` },
+    h(IconButton, { class: "m-pg-all", icon: chevronsUpDown, size: "xs", variant: "ghost", label: () => (allOpen() ? L().closeAll ?? t`Close all` : L().openAll ?? t`Open all`),
+      onClick: () => closed.set(allOpen() ? new Set(grouped().map((g) => g.name)) : new Set()) }),
+    () => grouped().map((g) => untrack(() => h(Chip, { size: "sm", selected: () => isOpen(g.name), onClick: () => setOpen(g.name, !isOpen(g.name)) }, groupName(g))))));
   const body = (): unknown => grouped().map((g) => untrack(() => {
     const items = g.items.map((p) => { const el = rowOf(p); return () => (matches().has(p.key) ? el : null); });
     const shown = computed((): boolean => g.items.some((p) => matches().has(p.key)));
@@ -228,7 +251,7 @@ export function PropertyGrid(props: PropertyGridProps): Element {
       props.changeMarks === false ? null : () => (changedIn() ? h(Badge, { class: "m-pg-count", size: "xs", tone: "primary", variant: "solid", count: changedIn(), ariaLabel: L().changedCount?.(changedIn()) ?? t`${changedIn()} changed` }) : null)];
     const content = h("div", { class: "m-pg-rows" }, items);
     // the group box is built once (body runs again when the groups change): rows are never moved while they are used
-    const box = g.name || grouped().length > 1 ? h(Disclosure, { title: head, open: () => { query(); return true; }, class: "m-pg-group", children: content }) : content;
+    const box = g.name || grouped().length > 1 ? h(Disclosure, { title: head, open: reactive(() => isOpen(g.name)), onToggle: (o: boolean) => { if (!query()) setOpen(g.name, o); }, class: "m-pg-group", children: content }) : content;
     return () => (shown() ? box : null);
   }));
 
@@ -237,8 +260,8 @@ export function PropertyGrid(props: PropertyGridProps): Element {
   return h("section", { class: () => cx("m-pg", props.layout === "stacked" && "m-pg-stacked", val(props.class)), "aria-label": title },
     h(PanelHeader, { as: "div", size: "sm", divider: true, class: "m-pg-head",
       actions: history && props.historyButtons !== false ? h(UndoRedo, { class: "m-pg-history", history, size: "sm", shortcuts: false, labels: { undo: () => L().undo, redo: () => L().redo } }) : undefined,
-      children: props.search === false ? undefined : h(SearchBox, { class: "m-pg-search", inputClass: "m-pg-search-input", size: "sm", debounce: 0, value: query,
-        label: () => L().search ?? t`Search properties`, placeholder: () => L().search ?? t`Search properties` }) }),
+      children: [props.search === false ? null : h(SearchBox, { class: "m-pg-search", inputClass: "m-pg-search-input", size: "sm", debounce: 0, value: query,
+        label: () => L().search ?? t`Search properties`, placeholder: () => L().search ?? t`Search properties` }), tools] }),
     h("div", { class: "m-pg-body" }, body,
       () => (matches().size ? null : h("div", { class: "m-pg-empty", role: "status" }, h(Empty, { size: "sm", title: () => (query() ? L().noMatch?.(query()) ?? t`No property matches “${query()}”` : L().empty ?? t`No properties`) })))),
     // the footer: while something changed, or always when there is a Save (disabled with nothing to save)
