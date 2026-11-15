@@ -108,7 +108,36 @@ const handlers = {
   },
   hover({ path, pos }) {
     const q = LS.getQuickInfoAtPosition(norm(path), pos);
-    return q ? { text: flat(q.displayParts), doc: flat(q.documentation) } : null;
+    return q ? { kind: q.kind, text: flat(q.displayParts), doc: flat(q.documentation) } : null;
+  },
+  // the messages in the page's language: the typescript package's lib/<locale>/diagnosticMessages.generated.json
+  // (tr, de, fr…; served beside the lib files); English needs none
+  locale({ locale }) {
+    const name = String(locale || "en").toLowerCase();
+    if (name === "en" || !/^[a-z]{2}(-[a-z]{2})?$/.test(name)) { ts.setLocalizedDiagnosticMessages(undefined); for (const f of files.values()) f.version++; return false; }
+    let text;
+    try { const x = new XMLHttpRequest(); x.open("GET", `${libUrl}${name}/diagnosticMessages.generated.json`, false); x.send(); text = x.status === 200 ? x.responseText : undefined; } catch { text = undefined; }
+    ts.setLocalizedDiagnosticMessages(text ? JSON.parse(text) : undefined);
+    // a new program (the checker keeps the messages it made in the old language)
+    for (const f of files.values()) f.version++;
+    return !!text;
+  },
+  // F12: where the name at a place is defined, when it is in the same file
+  definition({ path, pos }) {
+    const p = norm(path), own = (LS.getDefinitionAtPosition(p, pos) ?? []).find((d) => d.fileName === p);
+    return own ? { from: own.textSpan.start, to: own.textSpan.start + own.textSpan.length } : null;
+  },
+  // F2: the name's range and every place it is written in the file (or why it cannot be renamed)
+  rename({ path, pos }) {
+    const p = norm(path), info = LS.getRenameInfo(p, pos, {});
+    if (!info.canRename) return { error: info.localizedErrorMessage };
+    const locations = (LS.findRenameLocations(p, pos, false, false, {}) ?? []).filter((l) => l.fileName === p).map((l) => ({ from: l.textSpan.start, to: l.textSpan.start + l.textSpan.length }));
+    return { from: info.triggerSpan.start, to: info.triggerSpan.start + info.triggerSpan.length, locations };
+  },
+  // Shift+Alt+F: the edits that format the file
+  format({ path, tabSize }) {
+    const settings = { ...ts.getDefaultFormatCodeSettings("\n"), indentSize: tabSize ?? 2, tabSize: tabSize ?? 2, convertTabsToSpaces: true };
+    return LS.getFormattingEditsForDocument(norm(path), settings).map((e) => ({ from: e.span.start, to: e.span.start + e.span.length, text: e.newText }));
   },
   // a suggestion's definition (the row shown in the list): its kind, its signature ("(method) Console.table(…): void")
   // and its documentation

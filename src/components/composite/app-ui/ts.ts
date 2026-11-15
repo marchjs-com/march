@@ -4,7 +4,8 @@
 // the worker's URL comes from the "march-worker" policy (same origin, .js only): the CSP must list
 // `trusted-types march-worker`.
 import { signal, effect, onCleanup, type Signal } from "../../../core/reactive.ts";
-import type { CodeCompleteContext, CodeCompletion, CodeDoc, CodeSignature } from "../code-editor/index.ts";
+import type { CodeCompleteContext, CodeCompletion, CodeDoc, CodeSignature, CodeRange, CodeRename, CodeEdit } from "../code-editor/index.ts";
+import { locale } from "../../../core/i18n.ts";
 import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
 import type { DebugMeta } from "../debugger/session.ts";
 
@@ -15,8 +16,14 @@ export interface TypeScriptService {
   complete(path: string, ctx: CodeCompleteContext): Promise<CodeCompletion | null>;
   /** Follow a file: its text goes to the service as it changes; `problems` are its errors and warnings. */
   track(file: AppFile): { problems: () => readonly CodeProblem[]; stop(): void };
-  /** The type and the documentation at a place. */
-  hover(path: string, pos: number): Promise<{ text: string; doc: string } | null>;
+  /** The type and the documentation at a place (`value`: the file's text, sent first when given). */
+  hover(path: string, pos: number, value?: string): Promise<{ kind?: string; text: string; doc: string } | null>;
+  /** Where the name at a place is defined, when it is in the same file. */
+  definition(path: string, value: string, pos: number): Promise<CodeRange | null>;
+  /** The name at a place and every place of the file it is written (or why it cannot be renamed). */
+  rename(path: string, value: string, pos: number): Promise<CodeRename | null>;
+  /** The edits that format the file. */
+  format(path: string, value: string, tabSize?: number): Promise<CodeEdit[] | null>;
   /** A suggestion's definition (its kind, signature, documentation), asked at the place it was offered. */
   details(path: string, value: string, pos: number, name: string): Promise<CodeDoc | null>;
   /** Inside a call's parentheses: its signatures and the argument at the caret. */
@@ -90,6 +97,8 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
       const version = signal("");
       const ready = call<{ version: string }>("init", { tsUrl: new URL(o.typescript, globalThis.location.href).href, lib: new URL(o.lib, globalThis.location.href).href })
         .then((r) => { version.set(r.version); ctx.emit("typescript:ready", r.version); return true; })
+        // the errors in the page's language (tr: TypeScript's own Turkish messages); followed when it changes
+        .then(async (ok) => { if (ok) await call("locale", { locale: locale.peek() }).catch(() => undefined); return ok; })
         .catch((err) => { console.error("march-app-ui: TypeScript did not start", err); return false; });
       const texts = new Map<string, string>();
       // the file as the service reads it (the host's view, or itself)
@@ -100,6 +109,10 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
         texts.set(path, text);
         await call("update", { path, text });
       };
+      // the page's language changes: the messages follow (the problems are asked again)
+      const lang = signal(locale.peek());
+      effect(() => { const l = locale(); if (l === lang.peek()) return; void ready.then((ok) => (ok ? call("locale", { locale: l }) : null)).then(() => lang.set(l), () => undefined); });
+      const range = (ins: Inserts, r: CodeRange): CodeRange => ({ from: toFile(ins, r.from), to: toFile(ins, r.to) });
       const svc: TypeScriptService = {
         version,
         async complete(path, c) {
@@ -126,15 +139,40 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
           const r = await call<CodeSignature | null>("signature", { path, pos: toView(v.inserts, pos) });
           return r && v.inserts.length ? { ...r, start: toFile(v.inserts, r.start) } : r;
         },
-        async hover(path, pos) {
+        async hover(path, pos, value) {
           if (!(await ready)) return null;
+          if (value != null) { const v = viewOf(path, value); await send(path, v.text); }
           return call("hover", { path, pos: toView(lastInserts.get(path) ?? [], pos) });
+        },
+        async definition(path, value, pos) {
+          if (!(await ready)) return null;
+          const v = viewOf(path, value);
+          await send(path, v.text);
+          const r = await call<CodeRange | null>("definition", { path, pos: toView(v.inserts, pos) });
+          return r ? range(v.inserts, r) : null;
+        },
+        async rename(path, value, pos) {
+          if (!(await ready)) return null;
+          const v = viewOf(path, value);
+          await send(path, v.text);
+          const r = await call<CodeRename | null>("rename", { path, pos: toView(v.inserts, pos) });
+          // places inside what the host inserted (not written in the file) are left out
+          return r && !("error" in r) ? { ...range(v.inserts, r), locations: r.locations.map((l) => range(v.inserts, l)).filter((l) => l.to > l.from) } : r;
+        },
+        async format(path, value, tabSize) {
+          if (!(await ready)) return null;
+          const v = viewOf(path, value);
+          // the host's view is not the file: formatting it would move the inserted text; only a plain file is formatted
+          if (v.inserts.length) return null;
+          await send(path, v.text);
+          return call<CodeEdit[]>("format", { path, tabSize });
         },
         track(file) {
           const problems: Signal<readonly CodeProblem[]> = signal([]);
           let timer: ReturnType<typeof setTimeout> | undefined, n = 0;
           const stop = effect(() => {
             const text = file.text();
+            lang(); // the messages' language
             clearTimeout(timer);
             timer = setTimeout(() => {
               const k = ++n;

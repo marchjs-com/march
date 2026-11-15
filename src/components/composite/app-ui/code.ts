@@ -46,6 +46,10 @@ const SOURCES = [{ value: "file", label: "Dosya" }, { value: "march", label: "Ma
 const SOURCE_KEY = "march.code.source.v2";
 const readSource = (): string => { try { return localStorage.getItem(SOURCE_KEY) ?? "all"; } catch { return "all"; } };
 const source = signal(readSource());
+// the text size (Ctrl + = / - / 0), the same in every code file and kept across visits
+const SIZE_KEY = "march.code.size";
+const readSize = (): number | undefined => { try { const n = Number(localStorage.getItem(SIZE_KEY)); return n > 0 ? n : undefined; } catch { return undefined; } };
+const fontSize = signal<number | undefined>(readSize());
 // the app's keys (the debugger's F5…, the palette's) under the editor's in its shortcuts menu
 const appKeys = () => hotkeys.list().filter((k) => k.active && k.description).map((k) => ({ keys: k.label, label: t(k.description), group: k.group ? t(k.group) : t`App` }));
 // TypeScript's own words and types are "ts"; the rest of what it offers (the JS and DOM API, the file's names) "js"
@@ -110,7 +114,17 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
                 return d ? { ...d, kind: kindLabel(d.kind) } : null;
               },
               signature: (at: { value: string; caret: number }) => ts.signature(file.path, at.value, at.caret).catch(() => null),
+              // F12 / Ctrl + click, F2, Shift + Alt + F and the pointer's rest: TypeScript's answers
+              definition: (at: { value: string; at: number }) => ts.definition(file.path, at.value, at.at).catch(() => null),
+              rename: (at: { value: string; at: number }) => ts.rename(file.path, at.value, at.at).catch(() => null),
+              format: (value: string) => ts.format(file.path, value, 2).catch(() => null),
+              hover: async (at: { value: string; at: number }): Promise<CodeDoc | null> => {
+                const q = await ts.hover(file.path, at.at, at.value).catch(() => null);
+                return q && (q.text || q.doc) ? { kind: kindLabel(q.kind), signature: q.text, doc: q.doc } : null;
+              },
             } : {}),
+            get fontSize() { return fontSize(); },
+            onFontSizeChange: (px: number | undefined) => { fontSize.set(px); try { if (px) localStorage.setItem(SIZE_KEY, String(px)); else localStorage.removeItem(SIZE_KEY); } catch { /* private mode */ } },
             onSave: () => (o.save ? o.save(file) : toast(t`Saved`, { kind: "success", timeout: 1200 })),
             ...(gutter ? { lineNumbers: true, lineMarks: () => gutter.marks(file.path), activeLine: () => gutter.active(file.path), onGutter: (line: number) => gutter.click(file.path, line) } : {}),
             sources: SOURCES, get source() { return source(); }, onSourceChange: (v: string) => { source.set(v); try { localStorage.setItem(SOURCE_KEY, v); } catch { /* private mode */ } },
