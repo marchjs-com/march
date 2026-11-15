@@ -24,7 +24,7 @@
 .m-ced-ghost { position: absolute; inset-inline-start: 0; inset-block-start: 0; white-space: pre; color: var(--m-muted); opacity: .75; pointer-events: none; }
 .m-ced-sources { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-1); padding: var(--m-space-1) var(--m-space-2); border-block-start: var(--m-border-w, 1px) solid var(--m-border); font-family: var(--m-font); }
 .m-ced-none { color: var(--m-muted); font-size: var(--m-text-xs); }
-.m-ced-list { min-inline-size: 14rem; max-inline-size: min(26rem, 90vw); font-family: var(--m-font-mono); }
+.m-ced-list { inline-size: min(26rem, calc(100vw - 16px)); font-family: var(--m-font-mono); }
 /* lineNumbers: a gutter at the start; each line's number (and its mark) sits at its line's start, the lit line's bar
    lies behind the text; the press area over the gutter takes the clicks (the text field keeps the rest) */
 .m-ced.is-gutter { --m-ced-gutter: 3.4em; }
@@ -54,3 +54,17 @@
 .m-ced-key:hover { background: var(--m-surface-2, var(--m-hover)); }
 .m-ced-key-keys { display: inline-flex; align-items: center; gap: 2px; flex: none; color: var(--m-muted); font-size: var(--m-text-xs); }
 .m-ced-key-or { margin-inline: 2px; }
+/* the definition of the row picked out, under the list; the signature over the caret inside a call */
+.m-ced-doc { display: grid; gap: 2px; padding: var(--m-space-1) var(--m-space-2); border-block-start: var(--m-border-w, 1px) solid var(--m-border); font-size: var(--m-text-xs); box-sizing: border-box; }
+.m-ced-doc-head { display: flex; align-items: baseline; gap: var(--m-space-2); min-inline-size: 0; }
+.m-ced-doc-kind { flex: none; padding: 0 5px; border-radius: var(--m-radius-1); background: color-mix(in srgb, var(--m-primary) 14%, transparent); color: var(--m-primary-text); font-weight: 600; }
+.m-ced-doc-sig { font-family: var(--m-font-mono); overflow-wrap: anywhere; white-space: pre-wrap; }
+.m-ced-doc > * { min-inline-size: 0; }
+.m-ced-doc-text { margin: 0; color: var(--m-muted); white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--m-font-sans, inherit); }
+.m-ced-sig-panel { max-inline-size: min(36rem, calc(100vw - 16px)); }
+.m-ced-sig { display: grid; gap: 3px; padding: var(--m-space-1) var(--m-space-2); font-size: var(--m-text-xs); }
+.m-ced-sig-line { font-family: var(--m-font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.m-ced-sig-count { margin-inline-end: var(--m-space-1); color: var(--m-muted); }
+.m-ced-sig-param.is-on { font-weight: 700; color: var(--m-primary-text); text-decoration: underline; text-underline-offset: 3px; }
+.m-ced-sig-doc, .m-ced-sig-about { margin: 0; color: var(--m-muted); white-space: pre-wrap; }
+.m-ced-sig-doc b { color: var(--m-text); font-family: var(--m-font-mono); }

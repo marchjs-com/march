@@ -270,3 +270,27 @@ test("CodeEditor ranking: the shortest same-case start first (con → console), 
   assert.equal(rows().length, 0, "shorter again: the list closes");
   dispose();
 });
+
+test("CodeEditor: the row picked out shows its definition; ( and , show the signature with the parameter being written lit", async () => {
+  const code = signal("");
+  const items = [{ label: "table", hint: "method" }, { label: "time", hint: "method", doc: { kind: "method", signature: "time(label?: string): void" } }];
+  const SIG = { active: 0, start: 14, items: [{ prefix: "table(", separator: ", ", suffix: "): void", doc: "Shows a table", params: [{ label: "data: any", doc: "the rows" }, { label: "columns?: string[]", doc: "which columns" }] }] };
+  const asked = [];
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code,
+    complete: (c) => ({ from: c.caret - (/\w*$/.exec(c.before)?.[0].length ?? 0), items, all: true }),
+    describe: async (it) => (it.label === "table" ? { kind: "method", signature: "table(data: any, columns?: string[]): void", doc: "Shows a table" } : null),
+    signature: ({ value }) => { asked.push(value); const arg = (value.slice(value.indexOf("(")).match(/,/g) ?? []).length; return value.includes("(") && !value.includes(")") ? { ...SIG, arg } : null; } }));
+  const input = el.querySelector("textarea");
+  type(input, "console.t", 9, "t"); await tick(); await tick();
+  assert.match(document.querySelector(".m-ced-list .m-ced-doc")?.textContent ?? "", /time\(label/, "the first row (the shortest: time) brings its own definition");
+  key(input, "ArrowDown"); await tick(); await tick();
+  assert.match(document.querySelector(".m-ced-list .m-ced-doc")?.textContent ?? "", /table\(data: any/, "the next row's definition is asked");
+  type(input, "console.table(", 14, "("); await tick();
+  assert.match(document.querySelector(".m-ced-sig .is-on")?.textContent ?? "", /^data/);
+  assert.match(document.querySelector(".m-ced-sig-doc")?.textContent ?? "", /the rows/);
+  type(input, "console.table(x, ", 17, " "); await tick();
+  assert.match(document.querySelector(".m-ced-sig .is-on")?.textContent ?? "", /^columns/, "a comma: the next parameter");
+  type(input, "console.table(x, y)", 19, ")"); await tick();
+  assert.equal(document.querySelector(".m-ced-sig"), null, ") ends the call");
+  dispose();
+});

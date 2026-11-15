@@ -5,7 +5,7 @@
 // (red, amber) and counted under it with the first one's line and text.
 import { computed, signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { CodeEditor, type CodeCompleteContext, type CodeCompletion, type CodeMark, type CodeSuggestion } from "../code-editor/index.ts";
+import { CodeEditor, type CodeCompleteContext, type CodeCompletion, type CodeMark, type CodeSuggestion, type CodeDoc } from "../code-editor/index.ts";
 import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
 import type { TypeScriptService, CodeProblem } from "./ts.ts";
 import type { GutterService } from "./debug.ts";
@@ -36,7 +36,9 @@ export function codeLang(path: string): string {
 const lineCol = (text: string, at: number): string => { const before = text.slice(0, at).split("\n"); return `${before.length}:${(before[before.length - 1]?.length ?? 0) + 1}`; };
 
 // the suggestion sources (chips under the list), in the order rows are ranked; the choice is kept across visits
-messages("tr", { "Saved": "Kaydedildi", "App": "Uygulama", "Methods": "Metotlar", "Properties": "Özellikler", "Classes": "Sınıflar", "Types": "Türler", "Modules": "Modüller", "Other": "Diğer" });
+messages("tr", { "method": "metot", "function": "fonksiyon", "constructor": "yapıcı", "property": "özellik", "getter": "getter (okunur)", "setter": "setter (yazılır)",
+  "variable": "değişken", "constant": "sabit", "parameter": "parametre", "Class": "sınıf", "interface": "arayüz", "type": "tür", "enum": "enum", "enum member": "enum üyesi",
+  "module": "modül", "keyword": "anahtar sözcük", "attribute": "öznitelik", "Saved": "Kaydedildi", "App": "Uygulama", "Methods": "Metotlar", "Properties": "Özellikler", "Classes": "Sınıflar", "Types": "Türler", "Modules": "Modüller", "Other": "Diğer" });
 
 const SOURCES = [{ value: "march", label: "March" }, { value: "ts", label: "TS" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
 // "all" at first: every row, March's first (the editor ranks by the chips' order); a chip narrows to its source
@@ -55,6 +57,13 @@ const byKind = (items: readonly CodeSuggestion[]): CodeSuggestion[] => {
   const named = items.map((it) => ({ ...it, group: KIND_GROUP[it.hint ?? ""] ?? "Other" }));
   return GROUP_ORDER.flatMap((g) => named.filter((it) => it.group === g)).map((it) => ({ ...it, group: t(it.group) }));
 };
+// TypeScript's kinds as the list says them (the row's hint and its definition's badge)
+const KIND_LABEL: Record<string, string> = {
+  method: "method", function: "function", "local function": "function", constructor: "constructor", property: "property", getter: "getter", setter: "setter",
+  var: "variable", "local var": "variable", let: "variable", const: "constant", parameter: "parameter", class: "Class", interface: "interface", type: "type",
+  alias: "type", enum: "enum", "enum member": "enum member", module: "module", keyword: "keyword", "JSX attribute": "attribute",
+};
+const kindLabel = (kind: string | undefined): string | undefined => (kind ? (KIND_LABEL[kind] ? t(KIND_LABEL[kind]!) : kind) : undefined);
 const sourceOf = (it: CodeSuggestion): string => (TS_KINDS.has(it.hint ?? "") || (it.hint === "keyword" && TS_WORDS.has(it.label)) ? "ts" : "js");
 
 /** `<AppUI plugins={[codeEditorPlugin()]} …>`: code files open in a code editor. */
@@ -86,12 +95,21 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
             const rest = (fromTs?.items ?? []).filter((it) => !names.has(it.label)).map((it) => ({ ...it, source: it.source ?? sourceOf(it) }));
             const all = [...march, ...rest];
             // after a dot: the members, by kind, whatever source chip is chosen
-            const items = member ? byKind(all) : all;
+            // TypeScript's rows say their kind in the list's language (metot, getter…); March's keep theirs
+            const items = (member ? byKind(all) : all).map((it) => (it.source === "march" ? it : { ...it, hint: kindLabel(it.hint) ?? "" }));
             return items.length ? { ...(member ? { all: true } : {}), from: march.length && own ? own.from : fromTs?.from ?? c.caret, to: march.length && own ? own.to ?? c.caret : fromTs?.to ?? c.caret, items } : null;
           };
           return h(CodeEditor, {
             class: "m-app-code", get value() { return file.text(); }, onChange: (text: string) => file.set?.(text), readonly: !file.set,
             lang: codeLang(file.path), label: file.path, multiline: true, complete, suggest: "ghost", moreShortcuts: appKeys,
+            // the row picked out: TypeScript's definition (March's rows bring their own); in a call: its signature
+            ...(ts ? {
+              describe: async (it: CodeSuggestion, at: { value: string; at: number }): Promise<CodeDoc | null> => {
+                const d = await ts.details(file.path, at.value, at.at, it.label).catch(() => null);
+                return d ? { ...d, kind: kindLabel(d.kind) } : null;
+              },
+              signature: (at: { value: string; caret: number }) => ts.signature(file.path, at.value, at.caret).catch(() => null),
+            } : {}),
             onSave: () => (o.save ? o.save(file) : toast(t`Saved`, { kind: "success", timeout: 1200 })),
             ...(gutter ? { lineNumbers: true, lineMarks: () => gutter.marks(file.path), activeLine: () => gutter.active(file.path), onGutter: (line: number) => gutter.click(file.path, line) } : {}),
             sources: SOURCES, get source() { return source(); }, onSourceChange: (v: string) => { source.set(v); try { localStorage.setItem(SOURCE_KEY, v); } catch { /* private mode */ } },

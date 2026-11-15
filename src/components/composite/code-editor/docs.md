@@ -42,6 +42,8 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `shortcuts` | boolean | `true` | the shortcuts button (a menu of every key) in the foot line |
 | `moreShortcuts` | `{ keys, label, group? }[]` / accessor | — | the app's keys, listed under the editor's |
 | `shortcutsLabel` | string / accessor | "Keyboard shortcuts" | name of the button and the menu |
+| `describe` | `(row, { value, at }) => CodeDoc \| Promise` | — | the definition of the row picked out in the list (`{ kind, signature, doc }`), shown under it; a row's own `doc` comes first |
+| `signature` | `({ value, caret }) => CodeSignature \| Promise` | — | inside a call's parentheses: asked on `(` and `,` and while the caret moves in the call; the overload that fits, the parameter being written lit, its documentation; `)` or Escape closes it |
 | `listAfter` | number | `3` | with `suggest="ghost"`: the list opens too once the word is this long; 0: only on Ctrl+Space / `listOn` |
 | `listOn` | string | `"."` | characters that open the list even with `suggest="ghost"` (a member list) |
 | `copy` | boolean | `true` | the copy button (an icon button) |

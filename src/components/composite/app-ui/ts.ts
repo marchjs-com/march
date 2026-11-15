@@ -4,7 +4,7 @@
 // the worker's URL comes from the "march-worker" policy (same origin, .js only): the CSP must list
 // `trusted-types march-worker`.
 import { signal, effect, onCleanup, type Signal } from "../../../core/reactive.ts";
-import type { CodeCompleteContext, CodeCompletion } from "../code-editor/index.ts";
+import type { CodeCompleteContext, CodeCompletion, CodeDoc, CodeSignature } from "../code-editor/index.ts";
 import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
 import type { DebugMeta } from "../debugger/session.ts";
 
@@ -17,6 +17,10 @@ export interface TypeScriptService {
   track(file: AppFile): { problems: () => readonly CodeProblem[]; stop(): void };
   /** The type and the documentation at a place. */
   hover(path: string, pos: number): Promise<{ text: string; doc: string } | null>;
+  /** A suggestion's definition (its kind, signature, documentation), asked at the place it was offered. */
+  details(path: string, value: string, pos: number, name: string): Promise<CodeDoc | null>;
+  /** Inside a call's parentheses: its signatures and the argument at the caret. */
+  signature(path: string, value: string, pos: number): Promise<CodeSignature | null>;
   /** The TypeScript version once it runs. */
   version: () => string;
   /** The files with the debugger's calls written in (instrument.js; debuggerPlugin): their code and what each call is. */
@@ -108,6 +112,19 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
         async instrument(files) {
           if (!(await ready)) throw new Error("TypeScript did not start");
           return call("instrument", { files });
+        },
+        async details(path, value, pos, name) {
+          if (!(await ready)) return null;
+          const v = viewOf(path, value);
+          await send(path, v.text);
+          return call<CodeDoc | null>("details", { path, pos: toView(v.inserts, pos), name });
+        },
+        async signature(path, value, pos) {
+          if (!(await ready)) return null;
+          const v = viewOf(path, value);
+          await send(path, v.text);
+          const r = await call<CodeSignature | null>("signature", { path, pos: toView(v.inserts, pos) });
+          return r && v.inserts.length ? { ...r, start: toFile(v.inserts, r.start) } : r;
         },
         async hover(path, pos) {
           if (!(await ready)) return null;

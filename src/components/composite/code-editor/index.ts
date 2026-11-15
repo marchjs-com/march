@@ -57,6 +57,21 @@ export interface CodeSuggestion {
   head?: string;
   /** A heading the row is listed under ("Methods", "Properties"); rows of a group follow one another. */
   group?: string;
+  /** Its definition, shown under the list while the row is picked out (else `describe` is asked). */
+  doc?: CodeDoc;
+}
+/** A row's definition, shown under the list for the row picked out: its kind, its signature, what it does. */
+export interface CodeDoc { kind?: string | undefined; signature?: string | undefined; doc?: string | undefined }
+/** A parameter of a signature: its text ("data: any[]") and what it is. */
+export interface CodeParam { label: string; doc?: string | undefined }
+/**
+ * Inside a call's parentheses: the signatures (overloads) — `prefix` ("table(" with the name), the parameters joined by
+ * `separator`, `suffix` ("): void") — the one that fits (`active`), the argument the caret is at (`arg`) and where the
+ * call's arguments start (`start`).
+ */
+export interface CodeSignature {
+  items: readonly { prefix: string; params: readonly CodeParam[]; separator: string; suffix: string; doc?: string | undefined }[];
+  active: number; arg: number; start: number;
 }
 /** A chip under the suggestion list: rows whose `source` is `value` ("all": every row). */
 export interface CodeSource { value: string; label: string }
@@ -93,6 +108,13 @@ export interface CodeEditorProps extends ControlProps<string> {
   /** Suggestions for the caret's place: called after typing and on Ctrl + Space; null / no items: no list. A promise
    * (a language service in a worker) opens the list when it resolves, if the text and the caret did not move. */
   complete?: ((ctx: CodeCompleteContext) => CodeCompletion | null | undefined | Promise<CodeCompletion | null | undefined>) | undefined;
+  /** The definition of the row picked out in the list (its kind, signature, documentation), shown under the list. */
+  describe?: ((item: CodeSuggestion, ctx: { value: string; at: number }) => CodeDoc | null | undefined | Promise<CodeDoc | null | undefined>) | undefined;
+  /**
+   * Inside a call's parentheses: its signature over the caret, the parameter being written lit, with its documentation.
+   * Asked when "(" or "," is typed and while the caret moves inside the call; ")" or Escape closes it.
+   */
+  signature?: ((ctx: { value: string; caret: number }) => CodeSignature | null | undefined | Promise<CodeSignature | null | undefined>) | undefined;
   /** Marked ranges (reactive). */
   marks?: MaybeFn<readonly CodeMark[] | undefined>;
   /** The foot line: what the owner says about the code (a text or a node; reactive). `false`: no foot bar. */
@@ -271,9 +293,10 @@ export function CodeEditor(props: CodeEditorProps): Element {
   };
   const ask = (forced: boolean, typed = ""): void => {
     if (!props.complete || ro()) return;
-    // what opens the list for good: asked for, or a member is next (".")
-    if (forced || (!!typed && (props.listOn ?? ".").includes(typed.slice(-1)))) sticky = true;
     const caret = input.selectionStart ?? input.value.length;
+    // what opens the list for good: asked for, or the word follows a `listOn` character (console. / console.ta: a member)
+    const opener = props.listOn ?? ".", before = input.value.slice(0, caret).replace(/[\w$]*$/, "");
+    if (forced || (!!opener && !!before && opener.includes(before.slice(-1)))) sticky = true;
     const r = props.complete({ value: input.value, caret, before: input.value.slice(0, caret), forced, typed });
     const show = (c: CodeCompletion | null | undefined): void => {
       const word = c ? input.value.slice(c.from, caret) : "";
@@ -336,9 +359,10 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (item.again) ask(true);
   };
   /** The caret's place on screen: the same character in the coloured copy. */
-  const caretRect = (): DOMRect | null => {
-    const d = done.peek();
-    let left = d ? d.from : input.selectionStart ?? 0;
+  const caretRect = (): DOMRect | null => { const d = done.peek(); return rectAt(d ? d.from : input.selectionStart ?? 0); };
+  /** A place of the text on screen (the same character in the coloured copy). */
+  const rectAt = (at: number): DOMRect | null => {
+    let left = at;
     const walker = globalThis.document.createTreeWalker?.(code, 4 /* text */);
     if (!walker) return null;
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
@@ -440,6 +464,18 @@ export function CodeEditor(props: CodeEditorProps): Element {
   };
   // Tab is the editor's until Escape: then Tab and Shift+Tab move the focus on (a keyboard way out)
   let free = false;
+  // ---- the signature over the caret inside a call's parentheses
+  const sig = signal<CodeSignature | null>(null);
+  let sigAsked = 0;
+  const askSignature = (): void => {
+    if (!props.signature || ro()) return;
+    const caret = input.selectionStart ?? input.value.length, value = input.value, n = ++sigAsked;
+    const take = (r: CodeSignature | null | undefined): void => { if (n === sigAsked && input.value === value && (input.selectionStart ?? -1) === caret) sig.set(r && r.items.length ? r : null); };
+    const r = props.signature({ value, caret });
+    if (r && typeof (r as Promise<unknown>).then === "function") void (r as Promise<CodeSignature | null | undefined>).then(take, () => undefined);
+    else take(r as CodeSignature | null | undefined);
+  };
+  const closeSignature = (): void => { sigAsked++; if (sig.peek()) sig.set(null); };
   const onKeyDown = (e: KeyboardEvent): void => {
     const mod = e.ctrlKey || e.metaKey;
     if (ghost.peek()) {
@@ -457,6 +493,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       if (e.key === "Tab") { e.preventDefault(); pick(active.peek()); return; }
       if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(); return; }
     }
+    if (e.key === "Escape" && sig.peek()) { e.preventDefault(); e.stopPropagation(); closeSignature(); return; }
     if (e.key === "Escape" && on("release")) { free = true; return; }
     if (e.key === "Tab" && free) { free = false; return; }
     free = false;
@@ -491,22 +528,66 @@ export function CodeEditor(props: CodeEditorProps): Element {
     readonly: () => !!props.readonly, disabled: () => !!props.disabled, "aria-label": () => val(props.label) ?? t`Code`,
     "aria-describedby": () => (props.message === false ? null : `${id}-msg`),
     onKeyDown,
-    onInput: (e: Event) => { if (editing) return; ghost.set(null); set(input.value); const ie = e as InputEvent; ask(false, ie.inputType === "insertText" ? ie.data ?? "" : ""); },
-    onClick: () => { close(); ghost.set(null); },
-    onBlur: (e: FocusEvent) => { close(); ghost.set(null); props.onBlur?.(e); },
+    onInput: (e: Event) => {
+      if (editing) return;
+      ghost.set(null); set(input.value);
+      const ie = e as InputEvent, typed = ie.inputType === "insertText" ? ie.data ?? "" : "";
+      ask(false, typed);
+      // the signature: opened by ( and , ; followed while it is open (the argument moves, ")" ends the call)
+      if (/[(,]$/.test(typed) || sig.peek()) askSignature();
+    },
+    onKeyUp: (e: KeyboardEvent) => { if (sig.peek() && /^(Arrow|Home|End|Page)/.test(e.key)) askSignature(); },
+    onClick: () => { close(); ghost.set(null); if (sig.peek()) askSignature(); },
+    onBlur: (e: FocusEvent) => { close(); ghost.set(null); closeSignature(); props.onBlur?.(e); },
   }) as HTMLTextAreaElement;
   syncValue(input, get);
   props.inputRef?.(input);
 
   const anchor = virtualAnchor(caretRect, () => input);
   const open = computed(() => !!done());
+  // the row picked out: its definition under the list (its own `doc`, or `describe` asked once per row)
+  const detail = signal<{ key: string; doc: CodeDoc | null } | null>(null);
+  effect(() => {
+    const d = done(), it = shown()[active()];
+    if (!d || !it) { detail.set(null); return; }
+    const key = `${d.from}:${it.source ?? ""}:${it.label}`;
+    if (untrack(detail)?.key === key) return;
+    if (it.doc) { detail.set({ key, doc: it.doc }); return; }
+    if (!props.describe) { detail.set(null); return; }
+    const r = props.describe(it, { value: input.value, at: d.to });
+    if (r && typeof (r as Promise<unknown>).then === "function") {
+      detail.set({ key, doc: null });
+      void (r as Promise<CodeDoc | null | undefined>).then((doc) => { if (detail.peek()?.key === key) detail.set({ key, doc: doc ?? null }); }, () => undefined);
+    } else detail.set({ key, doc: (r as CodeDoc | null | undefined) ?? null });
+  });
+  const docView = (doc: CodeDoc, cls: string): unknown => h("div", { class: cx("m-ced-doc", cls) },
+    doc.kind || doc.signature ? h("div", { class: "m-ced-doc-head" }, doc.kind ? h("span", { class: "m-ced-doc-kind" }, doc.kind) : null, doc.signature ? h("code", { class: "m-ced-doc-sig" }, doc.signature) : null) : null,
+    doc.doc ? h("p", { class: "m-ced-doc-text" }, doc.doc) : null);
+  const detailPane = (): unknown => { const doc = detail()?.doc; return doc && (doc.signature || doc.doc) ? docView(doc, "is-row") : null; };
+  // the signature: the overload that fits, its parameters with the one being written lit, then that parameter's text
+  const sigAnchor = virtualAnchor(() => rectAt(input.selectionStart ?? 0), () => input);
+  const sigView = (): unknown => {
+    const r = sig();
+    if (!r) return null;
+    const it = r.items[Math.min(Math.max(r.active, 0), r.items.length - 1)]!, arg = r.arg, param = it.params[arg];
+    return h("div", { class: "m-ced-sig", role: "status", "aria-live": "polite" },
+      h("code", { class: "m-ced-sig-line" },
+        r.items.length > 1 ? h("span", { class: "m-ced-sig-count" }, `${r.active + 1}/${r.items.length}`) : null,
+        it.prefix, it.params.map((p, i) => [i ? it.separator : null, h("span", { class: cx("m-ced-sig-param", i === arg && "is-on") }, p.label)]), it.suffix),
+      param?.doc ? h("p", { class: "m-ced-sig-doc" }, h("b", {}, param.label.split(/[?:]/)[0] ?? ""), " — ", param.doc) : null,
+      it.doc ? h("p", { class: "m-ced-sig-about" }, it.doc) : null);
+  };
+  const sigPop = h(Popover, {
+    anchor: () => sigAnchor, open: () => !!sig(), onOpenChange: (o: boolean) => { if (!o) closeSignature(); }, role: null, flush: true, autoFocus: false, placement: "top-start", panelClass: "m-ced-sig-panel",
+    children: () => [sigView],
+  });
   const list = h(Popover, {
     anchor: () => anchor, open: () => open(), onOpenChange: (o: boolean) => { if (!o) close(); }, role: null, flush: true, autoFocus: false, placement: "bottom-start", panelClass: "m-ced-list",
     children: (_close: unknown) => [h(OptionList<number>, {
       id: `${id}-list`, keysFrom: input, active, inline: true, check: false, size: "sm", label: () => val(props.suggestionsLabel) ?? t`Suggestions`, empty: false,
       options: () => shown().map((it, i) => ({ value: i, label: it.label, hint: it.hint, group: it.group })),
       onPick: (i: number) => { pick(i); input.focus(); },
-    }), props.sources?.length ? () => (done()?.all ? null : sourceBar()) : null],
+    }), detailPane, props.sources?.length ? () => (done()?.all ? null : sourceBar()) : null],
   });
   // the chips under the list; a press keeps the focus in the text (the list stays open)
   const sourceBar = (): unknown => h("div", { class: "m-ced-sources", role: "group", "aria-label": t`Suggestion source`, onPointerdown: (e: Event) => e.preventDefault() },
@@ -553,5 +634,5 @@ export function CodeEditor(props: CodeEditorProps): Element {
     class: () => cx("m-ced", gutter() && "is-gutter", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly,
     foot, showFoot: props.message !== false,
     footProps: { class: "m-ced-foot", divider: true, actions: [hint, keysButton, props.copy !== false && h(CopyButton, { text: get, iconOnly: true, class: "m-ced-copy", ...(props.copyLabel != null ? { label: props.copyLabel } : {}) })] },
-    children: [h("div", { class: "m-ced-area" }, pre, input, () => (gutter() ? hit : null)), list] }) as Element;
+    children: [h("div", { class: "m-ced-area" }, pre, input, () => (gutter() ? hit : null)), list, sigPop] }) as Element;
 }

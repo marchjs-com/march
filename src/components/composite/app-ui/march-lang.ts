@@ -18,6 +18,8 @@ export interface MarchLanguageOptions {
   limit?: number;
 }
 
+/** A March row with its definition: its kind, where it comes from, what it does (the API reference's summary). */
+const described = (r: CodeSuggestion, x: { name: string; kind: string; doc: string; sub: string }): CodeSuggestion => ({ ...r, doc: { kind: x.kind, signature: `import { ${x.name} } from "${x.sub}"`, ...(x.doc ? { doc: x.doc } : {}) } });
 const word = (before: string): string => /[\w$]*$/.exec(before)?.[0] ?? "";
 const fits = (name: string, w: string): boolean => !w || name.toLowerCase().startsWith(w.toLowerCase());
 // the main subpaths come first in the list (a component is offered from hadi-march/ui before its own deep path)
@@ -64,24 +66,24 @@ export function marchLanguagePlugin(o: MarchLanguageOptions): AppPlugin {
     if (/^\s*import\s+(type\s+)?\{[^}]*$/.test(line)) {
       const sub = /from\s+["']([^"']+)["']/.exec(rest)?.[1];
       const pool = sub ? (c.subpaths.find((s) => s.subpath === sub)?.items ?? []).map(([name, kind, doc]) => ({ name, kind, doc: doc ?? "", sub })) : all;
-      return done(caret, w, pool.filter((x) => !x.name.startsWith("_") && fits(x.name, w)).map((x) => row(x.name, `${x.kind} · ${x.sub}`)));
+      return done(caret, w, pool.filter((x) => !x.name.startsWith("_") && fits(x.name, w)).map((x) => described(row(x.name, `${x.kind} · ${x.sub}`), x)));
     }
     // import Bu|  (right after the keyword): the whole import is written
     if (/^\s*import\s+[\w$]*$/.test(line)) {
-      return done(caret, w, all.filter((x) => fits(x.name, w)).map((x) => row(x.name, `${x.kind} · ${x.sub}`, `{ ${x.name} } from "${x.sub}"`)));
+      return done(caret, w, all.filter((x) => fits(x.name, w)).map((x) => described(row(x.name, `${x.kind} · ${x.sub}`, `{ ${x.name} } from "${x.sub}"`), x)));
     }
     // <Bu|  in JSX: the components
     if (/<[\w$]*$/.test(before) && /^[A-Z]/.test(w || "A")) {
       const has = (n: string): boolean => new RegExp(`import\s+(?:type\s+)?\{[^}]*\b${n}\b[^}]*\}`).test(value);
-      return done(caret, w, all.filter((x) => x.kind === "component" && fits(x.name, w)).map((x) => (has(x.name) ? row(x.name, x.sub) : { ...row(x.name, `${x.sub} · + import`), head: `import { ${x.name} } from "${x.sub}"` })));
+      return done(caret, w, all.filter((x) => x.kind === "component" && fits(x.name, w)).map((x) => described(has(x.name) ? row(x.name, x.sub) : { ...row(x.name, `${x.sub} · + import`), head: `import { ${x.name} } from "${x.sub}"` }, x)));
     }
     // elsewhere: the March names this file imports, then every other export (picking one writes its import at the top)
     if (w.length >= 1 || ctx.forced) {
       const imported = new Set<string>();
       for (const m of value.matchAll(/import\s+(?:type\s+)?\{([^}]*)\}\s*from\s*["']hadi-march[^"']*["']/g)) for (const n of (m[1] ?? "").split(",")) { const id = n.trim().replace(/^type\s+/, "").split(/\s+as\s+/).pop(); if (id) imported.add(id); }
-      const mine = all.filter((x) => imported.has(x.name) && fits(x.name, w)).map((x) => row(x.name, `${x.kind} · ${x.sub}`));
+      const mine = all.filter((x) => imported.has(x.name) && fits(x.name, w)).map((x) => described(row(x.name, `${x.kind} · ${x.sub}`), x));
       const more = w.length < 2 && !ctx.forced ? [] : all.filter((x) => !imported.has(x.name) && fits(x.name, w))
-        .map((x) => ({ ...row(x.name, `${x.kind} · ${x.sub} · + import`), head: `import { ${x.name} } from "${x.sub}"` }));
+        .map((x) => described({ ...row(x.name, `${x.kind} · ${x.sub} · + import`), head: `import { ${x.name} } from "${x.sub}"` }, x));
       return done(caret, w, [...mine, ...more]);
     }
     return null;

@@ -91,6 +91,10 @@ underlined in the code editor (red, amber) and counted under it with the first o
 demand from `lib`). Under a CSP with Trusted Types the worker starts through the `march-worker` policy (same-origin `.js`
 only): the CSP must list `trusted-types march-worker`.
 
+The service also answers the code editor's `describe` (a suggestion's kind, signature and documentation, under the list)
+and `signature` (inside a call: the signature with the parameter being written lit); the rows say their kind (method,
+getter, setter, function…) in the page's language, and March's rows bring the API reference's summary.
+
 `view: (path, text) => ({ text, inserts })` lets the service read what the host builds instead of the file as typed
 (a playground that turns top-level elements into exports): `inserts` are the places text was added (`[at, length]` in
 the file's text), and problems, suggestions and hovers are mapped back to the file.

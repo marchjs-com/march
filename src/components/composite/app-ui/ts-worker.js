@@ -107,6 +107,25 @@ const handlers = {
     const q = LS.getQuickInfoAtPosition(norm(path), pos);
     return q ? { text: flat(q.displayParts), doc: flat(q.documentation) } : null;
   },
+  // a suggestion's definition (the row shown in the list): its kind, its signature ("(method) Console.table(…): void")
+  // and its documentation
+  details({ path, pos, name }) {
+    const d = LS.getCompletionEntryDetails(norm(path), pos, name, {}, undefined, {}, undefined);
+    return d ? { kind: d.kind, signature: flat(d.displayParts), doc: flat(d.documentation) } : null;
+  },
+  // inside a call's parentheses: its signatures, the one that fits, the argument the caret is at; each parameter with
+  // its text and documentation
+  signature({ path, pos }) {
+    const h = LS.getSignatureHelpItems(norm(path), pos, {});
+    if (!h) return null;
+    return {
+      active: h.selectedItemIndex, arg: h.argumentIndex, start: h.applicableSpan.start,
+      items: h.items.map((it) => ({
+        prefix: flat(it.prefixDisplayParts), suffix: flat(it.suffixDisplayParts), separator: flat(it.separatorDisplayParts), doc: flat(it.documentation),
+        params: it.parameters.map((p) => ({ label: flat(p.displayParts), doc: flat(p.documentation) })),
+      })),
+    };
+  },
 };
 
 self.onmessage = (e) => {
