@@ -22,6 +22,7 @@ import { UndoRedo } from "../../actions/undo-redo/index.ts";
 import { Badge } from "../../data/badge/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
+import { Tooltip } from "../../overlays/tooltip/index.ts";
 import { SearchBox } from "../../forms/search-box/index.ts";
 import { PanelHeader } from "../../layout/panel-header/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
@@ -42,8 +43,11 @@ export interface PropertySpec {
   type?: PropertyType;
   control?: PropertyControl;
   group?: string;
-  /** Shown under the label and read by screen readers. */
+  /** Shown under the label (quiet, brighter on the row's hover) and read by screen readers; in full in the label's
+   * tooltip. */
   description?: string;
+  /** The property's own name (the prop: "size"), shown in the tooltip after the label ("Size: size"). */
+  name?: string | undefined;
   options?: OptionsProp;
   min?: number;
   max?: number;
@@ -184,11 +188,14 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     Object.defineProperty(cp, "describedby", { get: () => [p.description ? descId : "", errors()[p.key] ? errId : ""].filter(Boolean).join(" ") || null, enumerable: true });
     cp["setValue"] = (v: unknown) => change(p, v);
     const control = untrack(() => Comp(cp));
+    const label = h("div", { class: "m-pg-label" },
+      h("label", { id: labelId, for: id, class: "m-pg-name", title: () => (p.description ? null : labelOf(p)) }, () => labelOf(p)),
+      props.changeMarks === false ? null : () => (changed() ? h(StatusDot, { class: "m-pg-dot", tone: "primary", size: "xs", title: L().changed ?? t`Changed`, label: L().changed ?? t`changed` }) : null),
+      p.description && h("span", { id: descId, class: "m-pg-desc" }, p.description));
+    // a described property: its label and name, then the whole text, in a tooltip over the label
+    const tip = (): string => { const l = labelOf(p), n = p.name && p.name !== l ? `: ${p.name}` : ""; return `${l}${n}\n${p.description}`; };
     return h("div", { class: () => cx("m-pg-row", changed() && "is-changed", errors()[p.key] && "is-invalid"), "data-key": p.key },
-      h("div", { class: "m-pg-label" },
-        h("label", { id: labelId, for: id, class: "m-pg-name", title: () => labelOf(p) }, () => labelOf(p)),
-        props.changeMarks === false ? null : () => (changed() ? h(StatusDot, { class: "m-pg-dot", tone: "primary", size: "xs", title: L().changed ?? t`Changed`, label: L().changed ?? t`changed` }) : null),
-        p.description && h("span", { id: descId, class: "m-pg-desc", title: p.description }, p.description)),
+      p.description ? h(Tooltip, { text: tip, placement: "top", delay: 400, class: "m-pg-tip", children: label }) : label,
       h("div", { class: "m-pg-editor" }, control,
         () => (errors()[p.key] ? h("span", { id: errId, class: "m-pg-error", role: "alert" }, errors()[p.key]) : null)),
       props.resetButtons === false ? null : h(IconButton, {
