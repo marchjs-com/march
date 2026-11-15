@@ -27,6 +27,8 @@ one menu or the separate pickers and they always match. Choices are remembered.
 | `headings` | boolean | `true` | the section headings |
 | `labels` | `{ theme, accent }` | `Theme`, `Accent` | heading texts (strings or accessors) |
 | `class` | class | — | on the button |
+| `value` / `onChange` | string / `(id) => void` | — | a theme of its own (a preview drawn with `m:theme`): the menu shows `value`, calls `onChange`, the page keeps its theme |
+| `size` | `"sm"` / `"md"` | `"md"` | the button; `"sm"` for a slim toolbar |
 | `panelClass` | string | — | on the opened panel (`m-theme-menu`) |
 
 ## Accessibility

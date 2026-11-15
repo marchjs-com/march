@@ -7,7 +7,7 @@ import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
 
 /** What a language service plugin provides (service "language"). */
 export interface LanguageService {
-  complete?(path: string, ctx: CodeCompleteContext): CodeCompletion | null | undefined;
+  complete?(path: string, ctx: CodeCompleteContext): CodeCompletion | null | undefined | Promise<CodeCompletion | null | undefined>;
 }
 export interface CodeEditorPluginOptions {
   /** Suggestions when no language service is there. */

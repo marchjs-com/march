@@ -38,6 +38,7 @@ defineTerminalCommands({ ping: (_a, io) => io.print(ansi.green("pong")) })   // 
 |---|---|
 | `commands` | `Record<name, Command>` |
 | `prompt` | Prompt text (reactive), default `"$ "`. |
+| `readonly` | A log the app writes to with `print` (build output): no prompt, no input line. |
 | `welcome` | Lines printed first. |
 | `persist` | Keep history in localStorage under `m.term.<persist>`. |
 | `scheme` | `"auto"` (default: very dark charcoal tinted by the theme color), `"surface"` (the page's surfaces), `"dark"`, `"light"` or `{ bg, fg, cursor, selection, colors[16] }`. Live. |

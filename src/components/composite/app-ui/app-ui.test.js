@@ -69,3 +69,39 @@ test("AppUI: typing in a file's editor keeps the editor (and its focus): the tex
   assert.equal(el.querySelector(".m-ced-input"), area, "the same text field");
   dispose();
 });
+
+test("AppPreview: the stage takes its own theme, mode and accent; the toolbar and each picker can be turned off", async () => {
+  const { AppPreview } = await import("./index.ts");
+  const { signal } = await import("../../../index.ts");
+  const theme = signal("neon"), mode = signal("light"), accent = signal("brand-green"), bar = signal(true);
+  const { el, dispose } = mount(() => h(AppPreview, { theme, mode, accent, toolbar: bar }, h("p", { class: "shown" }, "x")));
+  const stage = el.querySelector(".m-app-pv-stage");
+  assert.equal(stage.getAttribute("data-m-theme"), "neon");
+  assert.equal(stage.getAttribute("data-theme"), "light");
+  assert.equal(el.querySelector(".m-app-pv-accent").getAttribute("data-m-accent"), "brand-green");
+  assert.ok(el.querySelector(".m-app-pv-stage .shown"));
+  assert.ok(el.querySelector(".m-app-pv-bar .m-theme-toggle"));
+  mode.set("system");
+  assert.equal(stage.getAttribute("data-theme"), null, "system: the page's mode");
+  bar.set({ mode: false });
+  assert.equal(el.querySelector(".m-app-pv-bar .m-theme-toggle"), null);
+  bar.set(false);
+  assert.equal(el.querySelector(".m-app-pv-bar"), null);
+  dispose();
+});
+
+test("marchLanguagePlugin: after import every export, picking writes the whole import; from \"…\" the subpaths", async () => {
+  const { marchLanguagePlugin } = await import("./index.ts");
+  const { createAppKit } = await import("./kit.ts");
+  const catalog = { subpaths: [{ subpath: "hadi-march", items: [["signal", "function"]] }, { subpath: "hadi-march/ui", items: [["Button", "component"], ["ButtonGroup", "component"]] }] };
+  const kit = createAppKit([marchLanguagePlugin({ catalog })]);
+  const lang = kit.service("language");
+  const ask = (value) => lang.complete("a.tsx", { value, caret: value.length, before: value, forced: true, typed: "" });
+  const a = await ask("import Bu");
+  assert.deepEqual(a.items.map((x) => x.insert), ['{ Button } from "hadi-march/ui"', '{ ButtonGroup } from "hadi-march/ui"']);
+  const b = await ask('import { Button } from "hadi-march/');
+  assert.deepEqual(b.items.map((x) => x.label), ["hadi-march/ui"]);
+  const c = await ask('import { signal } from "hadi-march"\nconst a = sig');
+  assert.deepEqual(c.items.map((x) => x.label), ["signal"], "elsewhere: the imported names");
+  kit.dispose();
+});

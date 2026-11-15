@@ -211,3 +211,8 @@ test("auto import of project components: named or default export", () => {
   assert.match(out, /import \{ Named \} from "\.\/Named\.jsx";/);
   assert.match(out, /import Def from "\.\/Def\.jsx";/);
 });
+
+test("texts: the words people read (JSX text and text attributes) are collected for the locale file", () => {
+  const r = compile(`export default () => <Button title="Kaydet" placeholder="Ara…" data-id="x1" onClick={go}>Tıklandı: {n} <b> </b>42</Button>`, { filename: "a.tsx" });
+  assert.deepEqual([...r.texts].sort(), ["Ara…", "Kaydet", "Tıklandı:"], "letters only: no numbers, spaces or data attributes");
+});

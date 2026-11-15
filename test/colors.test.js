@@ -86,7 +86,7 @@ test("app accent: setAccent remaps the primary family on <html>, is remembered, 
   assert.equal(document.documentElement.getAttribute("data-m-accent"), null);
   assert.equal(A.setAccent("not-a-token"), "primary", "unknown names fall back to the theme");
   const css = read("ui/accent.css");
-  assert.match(css, /:root\[data-m-accent="brand-green"\]\[data-m-accent\] \{ --m-primary: var\(--m-brand-green, var\(--m-cat-3\)\); --m-primary-solid: /);
+  assert.match(css, /:root\[data-m-accent="brand-green"\]\[data-m-accent\], \[data-m-accent="brand-green"\] \{ --m-primary: var\(--m-brand-green, var\(--m-cat-3\)\); --m-primary-solid: /);
   assert.match(css, /--m-progress-fill: var\(--m-brand-green, var\(--m-cat-3\)\); --m-spinner-paint: none;/, "an accent replaces the multicolor defaults");
   assert.doesNotMatch(css, /data-m-accent="primary"/);
   assert.match(read("css/colors.css"), /\[data-m-color="primary"\] \{ --m-accent: var\(--m-primary\);/, "primary = the current (possibly remapped) primary");

@@ -27,5 +27,8 @@ const tr: Record<string, string> = {
   "Workspace": "Çalışma alanı",
   "saved layout": "kayıtlı düzen",
   "workspace": "çalışma alanı",
+  "Preview tools": "Önizleme araçları",
+  "Preview theme": "Önizleme teması",
+  "Preview accent": "Önizleme vurgu rengi",
 };
 export default tr;

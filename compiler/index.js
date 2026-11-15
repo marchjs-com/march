@@ -3,7 +3,8 @@
 //   - `$` variables → signals (`let $n = 0`, `$n++`, `const $double = $n * 2` → computed)
 //   - directives on:/bind:/class:/use:/transition:, shorthand attributes `<Row {user} />`, `{x | date}` pipes, `sx={{…}}`
 //   - async functions keep their owner across `await` (cleanups/context/boundaries work in async components)
-//   - auto imports for runtime names and project components; `css`…`` extraction; t`…` key collection
+//   - auto imports for runtime names and project components; `css`…`` extraction; t`…` key collection; the texts
+//     people read (JSX text and text attributes) collected for the locale file
 // It is a careful scanner, not a full parser: write normal, semicolon-or-newline separated JavaScript.
 import { isIdStart, isIdPart, exprAllowed, identKind, skipString, skipComment, skipRegex, syntax, jsxText, lineCol } from "./lexer.js";
 import { importTs } from "./load-ts.js";
@@ -11,6 +12,8 @@ import { importTs } from "./load-ts.js";
 // sx is shared with the runtime; importTs also works when March is installed under node_modules
 const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.meta.url));
 
+/** Attributes whose string value people read (collected into `texts` with the JSX text). */
+const TEXT_ATTRS = new Set(["title", "placeholder", "label", "alt", "aria-label", "aria-description", "description", "hint", "message"]);
 const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins" };
 const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert" };
 // Templates: a native element subtree is built once (DOM calls, no HTML strings) and cloned; only its dynamic parts
@@ -83,7 +86,7 @@ export function compile(source, opts = {}) {
   try {
     let code = t.parse(source.length, false);
     const head = t.imports(code);
-    return { code: head + code, css: t.css.join("\n"), keys: [...t.keys], warnings: t.warnings };
+    return { code: head + code, css: t.css.join("\n"), keys: [...t.keys], texts: [...t.texts], warnings: t.warnings };
   } catch (e) {
     if (e instanceof SyntaxError || e.marchCompile) {
       const where = e.line ? `${opts.filename ?? "input"}:${e.line}:${e.column}` : opts.filename ?? "input";
@@ -142,6 +145,8 @@ class Transformer {
     this.helpers = new Set();
     this.css = [];
     this.keys = new Set();
+    // the words people read (JSX text, title / placeholder / label / alt / aria-label…): what a locale file lists
+    this.texts = new Set();
     this.warnings = [];
     this.asyncFrames = 0;
   }
@@ -575,6 +580,7 @@ class Transformer {
       const e = skipString(src, this.pos);
       const v = src.slice(this.pos + 1, e - 1).replace(/&quot;/g, '"').replace(/&amp;/g, "&");
       this.pos = e;
+      if (TEXT_ATTRS.has(name) && /\p{L}/u.test(v)) this.texts.add(v.trim());
       return { name, code: JSON.stringify(v), dynamic: false, literal: v };
     }
     if (c === "{") {
@@ -646,7 +652,7 @@ class Transformer {
     const src = this.src;
     const kids = [];
     let text = "";
-    const flush = () => { const s = jsxText(text); if (s) kids.push({ code: JSON.stringify(s), dynamic: false, text: true }); text = ""; };
+    const flush = () => { const s = jsxText(text); if (s) { kids.push({ code: JSON.stringify(s), dynamic: false, text: true }); if (/\p{L}/u.test(s)) this.texts.add(s.trim()); } text = ""; };
     for (;;) {
       if (this.pos >= src.length) throw fail(src, this.pos, `missing closing tag </${tag}>`);
       const c = src[this.pos];

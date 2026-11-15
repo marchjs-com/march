@@ -27,7 +27,7 @@
   --m-progress-fill: linear-gradient(90deg, #4CC9F0, #FF6B6B, #FFD166, #06D6A0); --m-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, #4CC9F0 20%, #FF6B6B 45%, #FFD166 70%, #06D6A0); --m-spinner-track: transparent; --m-spinner-head: transparent; --m-skel-paint: var(--m-skel-brand); --m-otp-1: #4CC9F0; --m-otp-2: #FF6B6B; --m-otp-3: #FFD166; --m-otp-4: #06D6A0; --m-otp-font: var(--m-font-display);
 }
 @media (prefers-color-scheme: dark) {
-  :root[data-m-theme="voyage"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-m-theme="voyage"] {
+  :root[data-m-theme="voyage"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-m-theme="voyage"]:not([data-theme="light"]) {
   color-scheme: dark;
   --m-bg: #0C1626; --m-surface: #122036; --m-surface-raised: #17283F;
   --m-text: #EAF1FA; --m-muted: #9FB2C8; --m-border: #243955;
@@ -53,7 +53,7 @@
   --m-progress-fill: linear-gradient(90deg, #4CC9F0, #FF6B6B, #FFD166, #06D6A0); --m-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, #4CC9F0 20%, #FF6B6B 45%, #FFD166 70%, #06D6A0); --m-spinner-track: transparent; --m-spinner-head: transparent; --m-skel-paint: var(--m-skel-brand); --m-otp-1: #4CC9F0; --m-otp-2: #FF6B6B; --m-otp-3: #FFD166; --m-otp-4: #06D6A0; --m-otp-font: var(--m-font-display);
   }
 }
-:root[data-m-theme="voyage"][data-theme="dark"], :root[data-theme="dark"] [data-m-theme="voyage"] {
+:root[data-m-theme="voyage"][data-theme="dark"], :root[data-theme="dark"] [data-m-theme="voyage"]:not([data-theme="light"]), [data-m-theme="voyage"][data-theme="dark"] {
   color-scheme: dark;
   --m-bg: #0C1626; --m-surface: #122036; --m-surface-raised: #17283F;
   --m-text: #EAF1FA; --m-muted: #9FB2C8; --m-border: #243955;

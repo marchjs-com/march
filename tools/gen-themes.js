@@ -19,8 +19,9 @@ function swatchCss() {
   for (const t of THEMES) {
     const s = `.m-swatch[data-m-theme="${t.id}"]`;
     out.push(`${s} { ${vars(t.alwaysDark ? t.dark : t.light, t)} }`);
-    out.push(`@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) ${s} { ${vars(t.dark, t)} } }`);
-    out.push(`:root[data-theme="dark"] ${s} { ${vars(t.dark, t)} }`);
+    // a swatch can show a mode of its own (a preview's theme picker): data-theme on the swatch
+    out.push(`@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) ${s}:not([data-theme="light"]) { ${vars(t.dark, t)} } }`);
+    out.push(`:root[data-theme="dark"] ${s}:not([data-theme="light"]), ${s}[data-theme="dark"] { ${vars(t.dark, t)} }`);
   }
   return HEAD("theme previews for ThemePicker / ThemeSwatch") + out.join("\n") + "\n";
 }

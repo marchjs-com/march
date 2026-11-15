@@ -27,7 +27,7 @@
   --m-progress-fill: initial; --m-spinner-paint: initial; --m-spinner-track: initial; --m-spinner-head: initial; --m-skel-paint: initial; --m-otp-1: initial; --m-otp-2: initial; --m-otp-3: initial; --m-otp-4: initial; --m-otp-font: initial;
 }
 @media (prefers-color-scheme: dark) {
-  :root[data-m-theme="ember"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-m-theme="ember"] {
+  :root[data-m-theme="ember"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-m-theme="ember"]:not([data-theme="light"]) {
   color-scheme: dark;
   --m-bg: #14100D; --m-surface: #1E1814; --m-surface-raised: #261F1A;
   --m-text: #F7EFE8; --m-muted: #BCAFA3; --m-border: #3A2F27;
@@ -53,7 +53,7 @@
   --m-progress-fill: initial; --m-spinner-paint: initial; --m-spinner-track: initial; --m-spinner-head: initial; --m-skel-paint: initial; --m-otp-1: initial; --m-otp-2: initial; --m-otp-3: initial; --m-otp-4: initial; --m-otp-font: initial;
   }
 }
-:root[data-m-theme="ember"][data-theme="dark"], :root[data-theme="dark"] [data-m-theme="ember"] {
+:root[data-m-theme="ember"][data-theme="dark"], :root[data-theme="dark"] [data-m-theme="ember"]:not([data-theme="light"]), [data-m-theme="ember"][data-theme="dark"] {
   color-scheme: dark;
   --m-bg: #14100D; --m-surface: #1E1814; --m-surface-raised: #261F1A;
   --m-text: #F7EFE8; --m-muted: #BCAFA3; --m-border: #3A2F27;

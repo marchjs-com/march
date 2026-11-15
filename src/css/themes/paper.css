@@ -25,7 +25,7 @@
   --m-progress-fill: initial; --m-spinner-paint: initial; --m-spinner-track: initial; --m-spinner-head: initial; --m-skel-paint: initial; --m-otp-1: initial; --m-otp-2: initial; --m-otp-3: initial; --m-otp-4: initial; --m-otp-font: initial;
 }
 @media (prefers-color-scheme: dark) {
-  :root[data-m-theme="paper"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-m-theme="paper"] {
+  :root[data-m-theme="paper"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-m-theme="paper"]:not([data-theme="light"]) {
   color-scheme: dark;
   --m-bg: #171512; --m-surface: #1F1C18; --m-surface-raised: #26231E;
   --m-text: #EFE8DA; --m-muted: #B3AA98; --m-border: #3B362D;
@@ -52,7 +52,7 @@
   --m-progress-fill: initial; --m-spinner-paint: initial; --m-spinner-track: initial; --m-spinner-head: initial; --m-skel-paint: initial; --m-otp-1: initial; --m-otp-2: initial; --m-otp-3: initial; --m-otp-4: initial; --m-otp-font: initial;
   }
 }
-:root[data-m-theme="paper"][data-theme="dark"], :root[data-theme="dark"] [data-m-theme="paper"] {
+:root[data-m-theme="paper"][data-theme="dark"], :root[data-theme="dark"] [data-m-theme="paper"]:not([data-theme="light"]), [data-m-theme="paper"][data-theme="dark"] {
   color-scheme: dark;
   --m-bg: #171512; --m-surface: #1F1C18; --m-surface-raised: #26231E;
   --m-text: #EFE8DA; --m-muted: #B3AA98; --m-border: #3B362D;

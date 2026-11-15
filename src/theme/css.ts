@@ -214,8 +214,9 @@ export function themeCss(def: ThemeDef, isDefault = false): string {
   // A theme applies to <html data-m-theme> and to any element with data-m-theme (scoped previews, nested themes).
   const id = `[data-m-theme="${def.id}"]`;
   const light = [`:root${id}`, id, ...(isDefault ? [":root:not([data-m-theme])"] : [])].join(", ");
-  const darkSys = [`:root${id}:not([data-theme="light"])`, `:root:not([data-theme="light"]) ${id}`, ...(isDefault ? [':root:not([data-m-theme]):not([data-theme="light"])'] : [])].join(", ");
-  const darkSet = [`:root${id}[data-theme="dark"]`, `:root[data-theme="dark"] ${id}`, ...(isDefault ? [':root:not([data-m-theme])[data-theme="dark"]'] : [])].join(", ");
+  // a themed element can pick its own mode too (a preview drawn light on a dark page): data-theme on the element
+  const darkSys = [`:root${id}:not([data-theme="light"])`, `:root:not([data-theme="light"]) ${id}:not([data-theme="light"])`, ...(isDefault ? [':root:not([data-m-theme]):not([data-theme="light"])'] : [])].join(", ");
+  const darkSet = [`:root${id}[data-theme="dark"]`, `:root[data-theme="dark"] ${id}:not([data-theme="light"])`, `${id}[data-theme="dark"]`, ...(isDefault ? [':root:not([data-m-theme])[data-theme="dark"]'] : [])].join(", ");
   const base = `--m-font: ${def.font}, ${SANS}; --m-font-display: ${def.display}, ${def.font}, ${SANS}; --m-display-weight: ${def.displayWeight ?? 700}; --m-r: ${def.radius}px;${Object.entries(def.tokens ?? {}).map(([k, v]) => ` --m-${k}: ${v};`).join("")}${styleBase(def.style)}`;
   // a theme without the multicolor defaults resets them (see STYLE_TOKENS)
   const multi = (c: ThemeColors): string => `\n  ${def.multicolor ? multiVars(c) : resetUnset([], ["progress-fill", "spinner-paint", "spinner-track", "spinner-head", "skel-paint", "otp-1", "otp-2", "otp-3", "otp-4", "otp-font"])}`;

@@ -83,6 +83,8 @@ export type ColorScheme = "auto" | "surface" | "dark" | "light" | { bg?: string;
 export interface TerminalProps {
   commands?: Record<string, Command>;
   prompt?: MaybeFn<string>;
+  /** A log the app writes to with `print` (build output, a server's lines): no prompt and no input line. */
+  readonly?: boolean | undefined;
   /** Lines printed first (a string or a list). */
   welcome?: string | readonly string[];
   /** Keep the history in localStorage under "m.term.<persist>". */
@@ -167,7 +169,8 @@ export function Terminal(props: TerminalProps): Element {
   };
   for (const ev of ["keydown", "keyup", "input", "pointerup", "focus", "blur", "select", "scroll"]) input.addEventListener(ev, syncCaret);
   onCleanup(() => clearTimeout(caretTimer));
-  const scroller = h("div", { class: "m-term-scroll", onClick: (e: MouseEvent) => { if (!globalThis.getSelection?.()?.toString() && e.target !== input) input.focus(); } }, out, line) as HTMLElement;
+  // readonly: a log the app writes to (print); no prompt, no input line, nothing to focus
+  const scroller = h("div", { class: "m-term-scroll", onClick: (e: MouseEvent) => { if (!props.readonly && !globalThis.getSelection?.()?.toString() && e.target !== input) input.focus(); } }, out, props.readonly ? null : line) as HTMLElement;
 
   // pinned to the bottom: every answer (also one that grows later — a table, a progress bar, a JSON tree) keeps the
   // last line in view; scrolling up to read unpins it until the reader comes back down or runs a command

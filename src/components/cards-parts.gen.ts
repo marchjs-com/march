@@ -95,6 +95,7 @@ export const parts: Record<string, () => Promise<unknown>> = {
   Tabs: () => import("./navigation/tabs/index.ts").then((m) => (m as Record<string, unknown>)["Tabs"]),
   TextInput: () => import("./forms/text-input/index.ts").then((m) => (m as Record<string, unknown>)["TextInput"]),
   Textarea: () => import("./forms/textarea/index.ts").then((m) => (m as Record<string, unknown>)["Textarea"]),
+  ThemeMenu: () => import("./composite/theme-menu/index.ts").then((m) => (m as Record<string, unknown>)["ThemeMenu"]),
   TimeInput: () => import("./forms/time-input/index.ts").then((m) => (m as Record<string, unknown>)["TimeInput"]),
   TimeRuler: () => import("./data/time-ruler/index.ts").then((m) => (m as Record<string, unknown>)["TimeRuler"]),
   Timeline: () => import("./data/timeline/index.ts").then((m) => (m as Record<string, unknown>)["Timeline"]),

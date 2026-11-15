@@ -139,6 +139,8 @@
   "TYPES": "Alan türleri ve temel davranışları. `fieldType(name, def)` ile genişletilir."
  },
  "hadi-march/ui": {
+  "AppPreview": "IDE kabuğunun önizleme paneli: araç çubuğunda önizlemenin kendi teması, vurgu rengi ve açık / koyu kipi (yalnız önizleme etkilenir), ortada gösterilen içerik; araç çubuğu ve her seçici kapatılabilir.",
+  "marchLanguagePlugin": "March kodu için öneriler: import sonrası hadi-march bileşenleri ve işlevleri (seçince içe aktarma satırı tamamlanır), from sonrası alt yollar, JSX içinde bileşenler.",
   "codeEditorPlugin": "march-app-ui eklentisi: kod dosyalarını (.ts, .tsx, .js, .css, .json…) March'ın CodeEditor'ında açar; öneriler bir dil servisi eklentisinden gelebilir.",
   "definePlugin": "march-app-ui eklentisi tanımlar: kimlik, önce gereken eklentiler ve activate(ctx); dosya türü, panel, komut ve servis ekler, hepsi eklentiyle birlikte kalkar.",
   "AppUI": "march-app-ui, March IDE'nin çekirdeği ve IDE kabuğunun tabanı: üst çubuk (başlık, araçlar, Yerleşim menüsü), yan yuva, DockLayout çalışma alanı ve alt yuva.",

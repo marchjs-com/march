@@ -131,15 +131,15 @@ export const colorThemes = (): readonly ThemeInfo[] => infos();
 export function registerThemes(list: readonly ThemeInfo[]): void { infos.update((l) => [...l.filter((x) => !list.some((y) => y.id === x.id)), ...list]); }
 
 /** Small preview of a theme drawn by the theme itself (data-m-theme scope; no inline styles). */
-export function ThemeSwatch(props: { id: string; class?: ClassProp }): Element {
-  return h("span", { class: () => cx("m-swatch", val(props.class)), "data-m-theme": props.id, "aria-hidden": "true" },
+export function ThemeSwatch(props: { id: string; class?: ClassProp; /** Light or dark of its own (default the page's). */ mode?: MaybeFn<"light" | "dark" | null | undefined> }): Element {
+  return h("span", { class: () => cx("m-swatch", val(props.class)), "data-m-theme": props.id, "data-theme": () => val(props.mode) ?? null, "aria-hidden": "true" },
     h("span", { class: "m-swatch-a" }), h("span", { class: "m-swatch-b" }), h("span", { class: "m-swatch-c" }), h("span", { class: "m-swatch-d" }));
 }
 
 /** A small page drawn by a theme itself (ground, two surfaces, an accent bar, its text colour and corner): the picture of a theme card. */
-export function ThemePreview(props: { id: string; class?: ClassProp }): Element {
+export function ThemePreview(props: { id: string; class?: ClassProp; /** Light or dark of its own (default the page's). */ mode?: MaybeFn<"light" | "dark" | null | undefined> }): Element {
   const bar = (): Element => h("span", { class: "m-theme-preview-bar" }) as Element;
-  return h("span", { class: () => cx("m-swatch", "m-theme-preview", val(props.class)), "data-m-theme": props.id, "aria-hidden": "true" },
+  return h("span", { class: () => cx("m-swatch", "m-theme-preview", val(props.class)), "data-m-theme": props.id, "data-theme": () => val(props.mode) ?? null, "aria-hidden": "true" },
     h("span", { class: "m-theme-preview-text" }, "Aa"), bar(), bar());
 }
 
@@ -154,19 +154,21 @@ export function themeModes(): Element {
 
 /**
  * The color theme choices of a theme menu (ThemePicker, ThemeMenu): an OptionList. "list" (default): rows with a live
- * swatch; "cards": a grid of preview cards, each a small page drawn by the theme (ThemePreview) over its name.
+ * swatch; "cards": a grid of preview cards, each a small page drawn by the theme (ThemePreview) over its name. `own`:
+ * the list shows and changes another value (a preview's theme) instead of the page's.
  */
-export function themeList(view: "list" | "cards" = "list"): Element {
+export function themeList(view: "list" | "cards" = "list", own?: { value: () => string; onPick: (id: string) => void; mode?: (() => "light" | "dark" | null) | undefined }): Element {
   const cards = view === "cards";
+  // `own`: the choice is someone else's (a preview's theme): the page's theme is not touched
   return h(OptionList<string>, {
-    class: cx("m-theme-list", cards && "m-theme-cards"), label: () => t`Theme`, value: () => themeName(), onPick: (id: string) => { setColorTheme(id); },
+    class: cx("m-theme-list", cards && "m-theme-cards"), label: () => t`Theme`, value: () => (own ? own.value() : themeName()), onPick: (id: string) => { if (own) own.onPick(id); else setColorTheme(id); },
     // theme names and descriptions are English in code; the locale pack translates them
-    options: () => infos().map((x) => ({ value: x.id, label: () => t(x.name), hint: x.description ? () => t(x.description ?? "") : undefined, icon: cards ? undefined : h(ThemeSwatch, { id: x.id }) })),
+    options: () => infos().map((x) => ({ value: x.id, label: () => t(x.name), hint: x.description ? () => t(x.description ?? "") : undefined, icon: cards ? undefined : h(ThemeSwatch, { id: x.id, mode: own?.mode }) })),
     ...(cards ? {
       columns: 3, check: false,
       renderOption: (it: { value: string; label: unknown; hint?: unknown }) => h("span", { class: "m-theme-card" },
         // a name or description that does not fit scrolls while the card is hovered or focused (OverflowText)
-        h(ThemePreview, { id: it.value }), h(OverflowText, { class: "m-theme-card-name", trigger: ["hover", "focus"], mode: "loop" }, it.label),
+        h(ThemePreview, { id: it.value, mode: own?.mode }), h(OverflowText, { class: "m-theme-card-name", trigger: ["hover", "focus"], mode: "loop" }, it.label),
         it.hint ? h(OverflowText, { class: "m-theme-card-desc", trigger: ["hover", "focus"], mode: "loop" }, it.hint) : null),
     } : {}),
   }) as Element;
@@ -180,14 +182,20 @@ export function ThemePicker(props: ThemePickerProps = {}): unknown {
   });
 }
 
-export interface ThemeToggleProps { class?: ClassProp }
+export interface ThemeToggleProps {
+  /** A mode of its own instead of the page's (a preview drawn light or dark): shows `value`, calls `onChange`. */
+  value?: MaybeFn<ThemeMode | undefined>;
+  onChange?: ((mode: ThemeMode) => void) | undefined;
+  class?: ClassProp;
+}
 /** Cycles system → light → dark. `<ThemeToggle />` */
 export function ThemeToggle(props: ThemeToggleProps = {}): Element {
   const labels: Record<ThemeMode, () => string> = { system: () => t`System theme`, light: () => t`Light theme`, dark: () => t`Dark theme` };
   const icons = { system: monitor, light: sun, dark: moon } as const;
+  const cur = (): ThemeMode => (props.onChange ? val(props.value) ?? "system" : mode());
   return h(IconButton, {
-    class: () => cx("m-theme-toggle", val(props.class)), label: () => `${labels[mode()]()} — ${t`change theme`}`, title: () => labels[mode()](), icon: () => icons[mode()],
-    onClick: () => theme.set(MODES[(MODES.indexOf(mode.peek()) + 1) % MODES.length] as ThemeMode),
+    class: () => cx("m-theme-toggle", val(props.class)), label: () => `${labels[cur()]()} — ${t`change theme`}`, title: () => labels[cur()](), icon: () => icons[cur()],
+    onClick: () => { const next = MODES[(MODES.indexOf(untrack(cur)) + 1) % MODES.length] as ThemeMode; if (props.onChange) props.onChange(next); else theme.set(next); },
   }) as Element;
 }
 

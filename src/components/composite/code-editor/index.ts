@@ -60,8 +60,9 @@ export interface CodeMark { from: number; to: number; kind?: "flash" | "error" }
 export interface CodeEditorProps extends ControlProps<string> {
   /** Colours: js / ts / jsx / tsx (default "tsx"), css, html, json, sh; "" for none. */
   lang?: string | undefined;
-  /** Suggestions for the caret's place: called after typing and on Ctrl + Space; null / no items: no list. */
-  complete?: ((ctx: CodeCompleteContext) => CodeCompletion | null | undefined) | undefined;
+  /** Suggestions for the caret's place: called after typing and on Ctrl + Space; null / no items: no list. A promise
+   * (a language service in a worker) opens the list when it resolves, if the text and the caret did not move. */
+  complete?: ((ctx: CodeCompleteContext) => CodeCompletion | null | undefined | Promise<CodeCompletion | null | undefined>) | undefined;
   /** Marked ranges (reactive). */
   marks?: MaybeFn<readonly CodeMark[] | undefined>;
   /** The foot line: what the owner says about the code (a text or a node; reactive). `false`: no foot bar. */
@@ -141,9 +142,17 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const ask = (forced: boolean, typed = ""): void => {
     if (!props.complete || ro()) return;
     const caret = input.selectionStart ?? input.value.length;
-    const c = props.complete({ value: input.value, caret, before: input.value.slice(0, caret), forced, typed });
-    batch(() => { active.set(0); done.set(c && c.items.length ? { from: c.from, to: c.to ?? caret, items: c.items } : null); });
+    const r = props.complete({ value: input.value, caret, before: input.value.slice(0, caret), forced, typed });
+    const show = (c: CodeCompletion | null | undefined): void => batch(() => { active.set(0); done.set(c && c.items.length ? { from: c.from, to: c.to ?? caret, items: c.items } : null); });
+    // a language service answers later: the list opens only when the text and the caret are still where they were
+    if (r && typeof (r as Promise<unknown>).then === "function") {
+      const value = input.value, n = ++asked;
+      void (r as Promise<CodeCompletion | null | undefined>).then((c) => { if (n === asked && input.value === value && (input.selectionStart ?? -1) === caret) show(c); }, () => undefined);
+      return;
+    }
+    show(r as CodeCompletion | null | undefined);
   };
+  let asked = 0;
   const close = (): void => { if (done.peek()) done.set(null); };
   const pick = (i: number): void => {
     const d = done.peek(), item = d?.items[i];

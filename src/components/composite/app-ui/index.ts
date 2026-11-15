@@ -18,6 +18,10 @@ export { definePlugin } from "./kit.ts";
 export type { AppPlugin, AppFile, FileType, PluginContext, AppKit } from "./kit.ts";
 export { codeEditorPlugin } from "./code.ts";
 export type { LanguageService, CodeEditorPluginOptions } from "./code.ts";
+export { marchLanguagePlugin } from "./march-lang.ts";
+export { AppPreview } from "./preview.ts";
+export type { AppPreviewProps, AppPreviewToolbar } from "./preview.ts";
+export type { MarchCatalog, MarchExport, MarchLanguageOptions } from "./march-lang.ts";
 
 /** A panel of an AppUI: a DockPanel, or one that shows a file (drawn by the file type that opens its path). */
 export type AppPanel = (Omit<DockPanel, "content"> & { content: () => unknown; file?: undefined }) | (Omit<DockPanel, "content"> & { file: AppFile; content?: undefined });

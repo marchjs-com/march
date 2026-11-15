@@ -53,10 +53,31 @@ A plugin's context: `fileType`, `panel`, `command` (the command manager: the pal
 `on` / `emit` (events between plugins) and `onDispose`; each returns a remover, and everything a plugin added goes away
 with it. `requires` starts it after the plugins it needs; removing one removes the plugins that need it first.
 
+## Preview
+
+`AppPreview` is the preview panel of an IDE shell: a toolbar (your `tools` at the start; the preview's own color
+theme, accent and light / dark at the end: only the preview takes them) over a stage that shows the children in its
+middle. `toolbar={false}` hides the bar, `toolbar={{ accent: false }}` one picker; `theme`, `accent` and `mode` take
+signals to keep the choices.
+
+```tsx
+<AppPreview theme={$theme} toolbar={{ mode: false }} tools={<Button size="sm">Yenile</Button>}>
+  <MyComponent />
+</AppPreview>
+```
+
+## Suggestions for March code
+
+`marchLanguagePlugin({ catalog })` gives the code editor suggestions that know March's exports: after `import` every
+component and function (picking one writes `import { Button } from "hadi-march/ui"`), inside `{ … }` the names of the
+subpath after `from`, after `from "` the subpaths, after `<` the components, elsewhere the names already imported.
+`catalog` is `{ subpaths: [{ subpath, items: [[name, kind, summary]] }] }` (the API reference's index) or a function
+that fetches it.
+
 ## Accessibility
 
 The Layout menu is a Menu (a menu button, arrow keys among the entries, Escape closes); the workspace is a DockLayout.
 
 ## Composed of
 
-DockLayout (the workspace), Menu (the Layout menu) and CodeEditor (the code editor plugin).
+DockLayout (the workspace), Menu (the Layout menu), CodeEditor (the code editor plugin) and ThemeMenu (the preview's theme).

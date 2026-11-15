@@ -59,7 +59,9 @@ registerMProp("test", attr("data-testid"));
 // m:theme="night": the subtree drawn in another colour theme (its stylesheet is loaded on first use)
 registerMProp("theme", (el, v) => {
   attr("data-m-theme")(el, v);
-  if (typeof v === "string" && v) void import("../ui/theme.ts").then((m) => m.loadTheme(v));
+  const load = (id: unknown): void => { if (typeof id === "string" && id) void import("../ui/theme.ts").then((m) => m.loadTheme(id)); };
+  // a live value (a theme picker): each new theme's stylesheet is loaded when it is chosen
+  if (typeof v === "function") effect(() => load((v as () => unknown)())); else load(v);
 });
 
 // ------------------------------------------------------------------ m:can

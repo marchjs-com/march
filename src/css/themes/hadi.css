@@ -29,7 +29,7 @@
   --m-progress-fill: linear-gradient(90deg, #F2801F, #1D9AD6, #78BE3A, #A3338C); --m-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, #F2801F 20%, #1D9AD6 45%, #78BE3A 70%, #A3338C); --m-spinner-track: transparent; --m-spinner-head: transparent; --m-skel-paint: var(--m-skel-brand); --m-otp-1: #F2801F; --m-otp-2: #1D9AD6; --m-otp-3: #78BE3A; --m-otp-4: #A3338C; --m-otp-font: var(--m-font-display);
 }
 @media (prefers-color-scheme: dark) {
-  :root[data-m-theme="hadi"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-m-theme="hadi"], :root:not([data-m-theme]):not([data-theme="light"]) {
+  :root[data-m-theme="hadi"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-m-theme="hadi"]:not([data-theme="light"]), :root:not([data-m-theme]):not([data-theme="light"]) {
   color-scheme: dark;
   --m-bg: #0B1B2B; --m-surface: #0D2033; --m-surface-raised: #152D45;
   --m-text: #E8EFF5; --m-muted: #9DB0C2; --m-border: #244460;
@@ -60,7 +60,7 @@
   --m-progress-fill: linear-gradient(90deg, #F2801F, #1D9AD6, #78BE3A, #C95BB5); --m-spinner-paint: conic-gradient(from 0deg, transparent 0 8%, #F2801F 20%, #1D9AD6 45%, #78BE3A 70%, #C95BB5); --m-spinner-track: transparent; --m-spinner-head: transparent; --m-skel-paint: var(--m-skel-brand); --m-otp-1: #F2801F; --m-otp-2: #1D9AD6; --m-otp-3: #78BE3A; --m-otp-4: #C95BB5; --m-otp-font: var(--m-font-display);
   }
 }
-:root[data-m-theme="hadi"][data-theme="dark"], :root[data-theme="dark"] [data-m-theme="hadi"], :root:not([data-m-theme])[data-theme="dark"] {
+:root[data-m-theme="hadi"][data-theme="dark"], :root[data-theme="dark"] [data-m-theme="hadi"]:not([data-theme="light"]), [data-m-theme="hadi"][data-theme="dark"], :root:not([data-m-theme])[data-theme="dark"] {
   color-scheme: dark;
   --m-bg: #0B1B2B; --m-surface: #0D2033; --m-surface-raised: #152D45;
   --m-text: #E8EFF5; --m-muted: #9DB0C2; --m-border: #244460;

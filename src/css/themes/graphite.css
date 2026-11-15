@@ -22,7 +22,7 @@
   --m-progress-fill: initial; --m-spinner-paint: initial; --m-spinner-track: initial; --m-spinner-head: initial; --m-skel-paint: initial; --m-otp-1: initial; --m-otp-2: initial; --m-otp-3: initial; --m-otp-4: initial; --m-otp-font: initial;
 }
 @media (prefers-color-scheme: dark) {
-  :root[data-m-theme="graphite"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-m-theme="graphite"] {
+  :root[data-m-theme="graphite"]:not([data-theme="light"]), :root:not([data-theme="light"]) [data-m-theme="graphite"]:not([data-theme="light"]) {
   color-scheme: dark;
   --m-bg: #202020; --m-surface: #2B2B2B; --m-surface-raised: #323232;
   --m-text: #F2F2F2; --m-muted: #B8B8B8; --m-border: #404040;
@@ -46,7 +46,7 @@
   --m-progress-fill: initial; --m-spinner-paint: initial; --m-spinner-track: initial; --m-spinner-head: initial; --m-skel-paint: initial; --m-otp-1: initial; --m-otp-2: initial; --m-otp-3: initial; --m-otp-4: initial; --m-otp-font: initial;
   }
 }
-:root[data-m-theme="graphite"][data-theme="dark"], :root[data-theme="dark"] [data-m-theme="graphite"] {
+:root[data-m-theme="graphite"][data-theme="dark"], :root[data-theme="dark"] [data-m-theme="graphite"]:not([data-theme="light"]), [data-m-theme="graphite"][data-theme="dark"] {
   color-scheme: dark;
   --m-bg: #202020; --m-surface: #2B2B2B; --m-surface-raised: #323232;
   --m-text: #F2F2F2; --m-muted: #B8B8B8; --m-border: #404040;

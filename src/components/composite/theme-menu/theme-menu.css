@@ -8,3 +8,5 @@
 .m-btn.m-theme-menu-btn { gap: var(--m-space-2); padding-inline: .375rem .75rem; border-radius: var(--m-radius-full); font-weight: 650; }
 .m-swatch.m-theme-menu-swatch { width: 1.5rem; height: 1.5rem; padding: 3px; border-radius: 50%; overflow: hidden; }
 .m-theme-menu-name { overflow: hidden; max-inline-size: 9rem; text-overflow: ellipsis; white-space: nowrap; }
+.m-btn.m-theme-menu-btn.is-sm { gap: var(--m-space-1); padding-inline: .25rem .5rem; font-size: var(--m-text-xs); }
+.m-theme-menu-btn.is-sm .m-swatch.m-theme-menu-swatch { width: 1.125rem; height: 1.125rem; padding: 2px; }
