@@ -40,7 +40,8 @@ messages("tr", { "method": "metot", "function": "fonksiyon", "constructor": "yap
   "variable": "değişken", "constant": "sabit", "parameter": "parametre", "Class": "sınıf", "interface": "arayüz", "type": "tür", "enum": "enum", "enum member": "enum üyesi",
   "module": "modül", "keyword": "anahtar sözcük", "attribute": "öznitelik", "Saved": "Kaydedildi", "App": "Uygulama", "Methods": "Metotlar", "Properties": "Özellikler", "Classes": "Sınıflar", "Types": "Türler", "Modules": "Modüller", "Other": "Diğer" });
 
-const SOURCES = [{ value: "march", label: "March" }, { value: "ts", label: "TS" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
+// the file's own names (its variables, functions…) before March's, then TypeScript's and the JS / DOM API
+const SOURCES = [{ value: "file", label: "Dosya" }, { value: "march", label: "March" }, { value: "ts", label: "TS" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
 // "all" at first: every row, March's first (the editor ranks by the chips' order); a chip narrows to its source
 const SOURCE_KEY = "march.code.source.v2";
 const readSource = (): string => { try { return localStorage.getItem(SOURCE_KEY) ?? "all"; } catch { return "all"; } };
@@ -92,7 +93,7 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
             const member = /\.[\w$]*$/.test(c.before);
             const march = member ? [] : (own?.items ?? []).map((it) => ({ ...it, source: it.source ?? "march" }));
             const names = new Set(march.map((it) => it.label));
-            const rest = (fromTs?.items ?? []).filter((it) => !names.has(it.label)).map((it) => ({ ...it, source: it.source ?? sourceOf(it) }));
+            const rest = (fromTs?.items ?? []).filter((it) => !names.has(it.label)).map((it) => ({ ...it, source: it.source ?? ((it as { local?: boolean }).local ? "file" : sourceOf(it)) }));
             const all = [...march, ...rest];
             // after a dot: the members, by kind, whatever source chip is chosen
             // TypeScript's rows say their kind in the list's language (metot, getter…); March's keep theirs

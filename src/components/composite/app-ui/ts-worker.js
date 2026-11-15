@@ -52,6 +52,8 @@ function start() {
 
 const flat = (parts) => (parts ?? []).map((x) => x.text).join("");
 
+// the kinds a name of the file has (its own variables, functions, classes, parameters); a library's carry "declare"
+const LOCAL_KINDS = new Set(["var", "let", "const", "local var", "function", "local function", "class", "local class", "parameter", "interface", "type", "enum", "property"]);
 const handlers = {
   init({ tsUrl, lib }) {
     libUrl = lib;
@@ -85,7 +87,8 @@ const handlers = {
       .filter((e) => !word || e.name.toLowerCase().startsWith(word))
       .sort((a, b) => (a.sortText < b.sortText ? -1 : a.sortText > b.sortText ? 1 : a.name.localeCompare(b.name)))
       .slice(0, 80)
-      .map((e) => ({ label: e.name, hint: e.kind, insert: e.insertText ?? e.name })); // the page translates the kind
+      // the page translates the kind; `local`: a name of the file itself (not declared by a library, not imported, no keyword)
+      .map((e) => ({ label: e.name, hint: e.kind, insert: e.insertText ?? e.name, ...(LOCAL_KINDS.has(e.kind) && !/declare/.test(e.kindModifiers ?? "") && !e.source ? { local: true } : {}) }));
     return { from, to: pos, items };
   },
   diagnostics({ path }) {

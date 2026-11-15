@@ -294,3 +294,13 @@ test("CodeEditor: the row picked out shows its definition; ( and , show the sign
   assert.equal(document.querySelector(".m-ced-sig"), null, ") ends the call");
   dispose();
 });
+
+test("CodeEditor ranking: the file's own names come before March's (chips' order), the best row still first", async () => {
+  const code = signal("");
+  const items = [{ label: "context", source: "march" }, { label: "connection", source: "file" }, { label: "conn", source: "file" }, { label: "console", source: "js" }];
+  const sources = [{ value: "file", label: "File" }, { value: "march", label: "March" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, suggest: "ghost", sources, source: "all", complete: (c) => ({ from: c.caret - (/\w*$/.exec(c.before)?.[0].length ?? 0), items }) }));
+  type(el.querySelector("textarea"), "con", 3, "n"); await tick();
+  assert.deepEqual([...document.querySelectorAll(".m-ced-list [role=option]")].map((o) => o.textContent), ["conn", "connection", "context", "console"]);
+  dispose();
+});
