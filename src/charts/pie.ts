@@ -12,16 +12,27 @@ type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 /** Point passed to `tooltip(point)` and `onSelect(point)` of a pie chart. */
 export interface PiePoint<D> { index: number; datum: D; label: string; x: string; y: number; value: number; share: number }
 export interface PieChartProps<D = unknown> extends ChartBaseProps {
+  /** Rows: an array (or signal / function returning one) of objects. @tr Satırlar: nesnelerden oluşan bir dizi (ya da onu döndüren sinyal / fonksiyon). */
   data?: DataProp<D>;
+  /** Slice label: a key or getter (default "label"). @tr Dilim etiketi: bir anahtar ya da getter (varsayılan "label"). */
   x?: Field<D> | undefined;
+  /** Slice value: a key or getter (default "value"); negative values count as 0. @tr Dilim değeri: bir anahtar ya da getter (varsayılan "value"); negatif değerler 0 sayılır. */
   y?: Field<D> | readonly Field<D>[] | undefined;
+  /** Value format for axis, tooltip and table: a pipe name, `[pipe, ...args]` or a function (default "number"). @tr Eksen, araç ipucu ve tablo için değer biçimi: pipe adı, `[pipe, ...args]` ya da fonksiyon (varsayılan "number"). */
   format?: Opt<FormatSpec>;
+  /** `true` for a ring (inner radius 60 %) or an inner radius ratio 0..0.95. @tr Halka için `true` (iç yarıçap %60) ya da 0..0.95 arası bir iç yarıçap oranı. */
   donut?: Opt<boolean | number>;
+  /** Gap between slices in radians (default 0.01). @tr Dilimler arasındaki boşluk, radyan cinsinden (varsayılan 0.01). */
   padAngle?: Opt<number>;
+  /** Content in the donut hole (default the formatted total). @tr Halkanın ortasındaki içerik (varsayılan biçimlenmiş toplam). */
   center?: Opt<unknown>;
+  /** Header of the label column in the data table (default "Label"). @tr Veri tablosundaki etiket sütununun başlığı (varsayılan "Label"). */
   xLabel?: Opt<string>;
+  /** Header of the value column in the data table (default "Value"). @tr Veri tablosundaki değer sütununun başlığı (varsayılan "Value"). */
   yLabel?: Opt<string>;
+  /** `true` (default), `false`, or `(point) => content` for custom tooltip content. @tr `true` (varsayılan), `false` ya da özel araç ipucu içeriği için `(point) => content`. */
   tooltip?: TooltipProp<PiePoint<D>>;
+  /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
   onSelect?: ((p: PiePoint<D>) => void) | undefined;
 }
 /** One slice of `pieLayout`. */

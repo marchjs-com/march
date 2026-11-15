@@ -11,11 +11,13 @@ export type { IconDef } from "./svg.ts";
 export * from "./all.ts";
 
 export interface IconProps {
+  /** The icon to draw (e.g. `users` from hadi-march/icons). @tr Çizilecek ikon (ör. hadi-march/icons'tan `users`). */
   of: IconDef;
-  /** "xs" 12px · "sm" 14px · "md" 16px (default) · "lg" 20px · "xl" 24px — or inherit with "em". */
+  /** "xs" 12px · "sm" 14px · "md" 16px (default) · "lg" 20px · "xl" 24px — or inherit with "em". @tr "xs" 12px · "sm" 14px · "md" 16px (varsayılan) · "lg" 20px · "xl" 24px — ya da "em" ile yazı boyutunu alır. */
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "em";
-  /** Accessible name; without it the icon is decorative. */
+  /** Accessible name; without it the icon is decorative. @tr Erişilebilir ad; verilmezse ikon süs amaçlı sayılır. */
   label?: string;
+  /** Extra CSS classes on the <svg>. @tr <svg>'ye eklenen ek CSS sınıfları. */
   class?: string;
 }
 

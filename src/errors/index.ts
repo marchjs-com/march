@@ -179,7 +179,10 @@ export const errors = {
 };
 
 /** Full-page error view for rule "page" (put it where the page content goes, e.g. above <Outlet/>). */
-export function ErrorPage(props: { children?: unknown }): unknown {
+export function ErrorPage(props: {
+  /** The page content, shown while there is no page error. @tr Sayfa içeriği; sayfa hatası yokken gösterilir. */
+  children?: unknown;
+}): unknown {
   return () => {
     const e = errors.page();
     if (!e) return props.children ?? null;
@@ -194,7 +197,10 @@ export function ErrorPage(props: { children?: unknown }): unknown {
 }
 
 /** Inline error for a target (rule "inline"): form section, card, list. */
-export function ErrorInline(props: { target: string }): unknown {
+export function ErrorInline(props: {
+  /** The target whose inline errors show here (a form section, card, list). @tr Satır içi hataları burada gösterilen hedef (form bölümü, kart, liste). */
+  target: string;
+}): unknown {
   const s = errors.inline(props.target);
   return () => {
     const e = s();

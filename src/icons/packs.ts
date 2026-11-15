@@ -89,8 +89,9 @@ export function loadIcon(ref: string): Promise<IconDef | undefined> {
 }
 
 export interface NamedIconProps extends Omit<IconProps, "of"> {
+  /** The icon to draw; `name` is used when it is not given. @tr Çizilecek ikon; verilmezse `name` kullanılır. */
   of?: IconDef | undefined;
-  /** "user" (March) or "pack:name" ("lucide:user"), from a registered pack. */
+  /** "user" (March) or "pack:name" ("lucide:user"), from a registered pack. @tr "user" (March) ya da kayıtlı bir paketten "pack:name" ("lucide:user"). */
   name?: string | undefined;
 }
 

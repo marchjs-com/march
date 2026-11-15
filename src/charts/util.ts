@@ -30,13 +30,21 @@ export interface Box { x: number; y: number; w: number; h: number }
 export interface Size { width: Accessor<number>; height: Accessor<number>; responsive: Accessor<boolean>; observe: (el: Element) => void }
 /** Props shared by every framed chart. */
 export interface ChartBaseProps {
+  /** Accessible name: the SVG <title> and the table caption (default "Chart"). @tr Erişilebilir ad: SVG <title> ve tablo başlığı (varsayılan "Chart"). */
   title?: MaybeReactive<string | null | undefined> | undefined;
+  /** Longer description, rendered as the SVG <desc>. @tr Daha uzun açıklama; SVG <desc> olarak yazılır. */
   description?: MaybeReactive<string | null | undefined> | undefined;
+  /** Shown when there is no data (default "No data"). @tr Veri yokken gösterilir (varsayılan "No data"). */
   empty?: MaybeReactive<unknown> | undefined;
+  /** `true`, `false`, "bottom" or "right"; shown by default when there is more than one series. Items toggle series. @tr `true`, `false`, "bottom" ya da "right"; varsayılan olarak birden çok seri varsa gösterilir. Öğeleri serileri açıp kapatır. */
   legend?: MaybeReactive<boolean | "right" | "bottom" | null | undefined> | undefined;
+  /** Extra CSS class on the wrapper. @tr Sarmalayıcıya eklenen ek CSS sınıfı. */
   class?: MaybeReactive<string | null | undefined> | undefined;
+  /** Per-series colors overriding the palette (set as `--m-c`). @tr Paleti geçersiz kılan seri başına renkler (`--m-c` olarak verilir). */
   colors?: MaybeReactive<readonly string[] | null | undefined> | undefined;
+  /** Width in px; without it the chart fills its container and follows its size. @tr px cinsinden genişlik; verilmezse grafik kabını doldurur ve boyutunu izler. */
   width?: MaybeReactive<number | string | null | undefined> | undefined;
+  /** Height in px (default 240; bar charts 260). @tr px cinsinden yükseklik (varsayılan 240; çubuk grafiklerde 260). */
   height?: MaybeReactive<number | string | null | undefined> | undefined;
 }
 

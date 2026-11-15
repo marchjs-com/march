@@ -88,7 +88,17 @@ export const isModalLayer = (kind: LayerKind): boolean => MODAL.has(kind);
 const targets = new Map<string, Signal<Element | null>>();
 const targetSig = (name: string): Signal<Element | null> => { let s = targets.get(name); if (!s) targets.set(name, (s = signal<Element | null>(null))); return s; };
 
-export interface PortalTargetProps { name: string; class?: string; as?: string; label?: string; [attr: string]: unknown }
+export interface PortalTargetProps {
+  /** The target's name; `<Portal to={name}>` renders into it. @tr Hedefin adı; `<Portal to={name}>` içeriğini buraya koyar. */
+  name: string;
+  /** Extra CSS classes on the target element. @tr Hedef öğeye eklenen ek CSS sınıfları. */
+  class?: string;
+  /** The element's tag (default "div"). @tr Öğenin etiketi (varsayılan "div"). */
+  as?: string;
+  /** aria-label of the target element. @tr Hedef öğenin aria-label'ı. */
+  label?: string;
+  [attr: string]: unknown;
+}
 /** A named place that portals render into. Several can exist over time; the latest mounted one is used. */
 export function PortalTarget(props: PortalTargetProps): Element {
   const { name, as, label } = props;
@@ -105,16 +115,17 @@ export function PortalTarget(props: PortalTargetProps): Element {
 export const portalTarget = (name: string): Element | null => targetSig(name)();
 
 export interface PortalProps {
-  /** A named target (<PortalTarget name>). */
+  /** A named target (<PortalTarget name>). @tr Adlandırılmış bir hedef (<PortalTarget name>). */
   to?: string;
-  /** Order among the sources of one target (ascending; equal = mount order). */
+  /** Order among the sources of one target (ascending; equal = mount order). @tr Aynı hedefin kaynakları arasındaki sıra (artan; eşitse yerleşme sırası). */
   order?: number;
-  /** A layer of the stack (default "popover" when neither `to` nor `mount` is given). */
+  /** A layer of the stack (default "popover" when neither `to` nor `mount` is given). @tr Katman yığınındaki bir katman (`to` da `mount` da verilmezse varsayılan "popover"). */
   layer?: LayerKind;
-  /** A specific element. */
+  /** A specific element. @tr Belirli bir öğe. */
   mount?: Element | DocumentFragment;
-  /** Where a layer opens: the nearest <OverlayScope> (default), the whole page ("page") or a scope element. */
+  /** Where a layer opens: the nearest <OverlayScope> (default), the whole page ("page") or a scope element. @tr Katmanın açıldığı yer: en yakın <OverlayScope> (varsayılan), tüm sayfa ("page") ya da bir kapsam öğesi. */
   target?: "nearest" | "page" | HTMLElement;
+  /** The content to move there. @tr Oraya taşınacak içerik. */
   children?: unknown;
 }
 

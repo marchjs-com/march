@@ -13,15 +13,19 @@ import { openDialog } from "../components/overlays/dialog/index.ts";
 export interface CodeFile { name: string; source: string; lang?: string }
 /** Input of the code-view point. */
 export interface CodeViewInput {
+  /** The code to show (the main file). @tr Gösterilecek kod (ana dosya). */
   source: string;
+  /** Language for highlighting (e.g. "tsx", "css"). @tr Renklendirme dili (ör. "tsx", "css"). */
   lang: string;
+  /** More files of a multi-file example; a file switcher appears. @tr Çok dosyalı bir örneğin diğer dosyaları; bir dosya seçici görünür. */
   files?: readonly CodeFile[];
-  /** Live editors call this with the edited source (the demo re-runs it). */
+  /** Live editors call this with the edited source (the demo re-runs it). @tr Canlı editörler bunu düzenlenen kaynakla çağırır (demo yeniden çalışır). */
   apply?(src: string): void;
-  /** Back to the original source. */
+  /** Back to the original source. @tr Özgün kaynağa geri döner. */
   reset?(): void;
+  /** Asks a live editor not to allow edits. @tr Canlı editörden düzenlemeye izin vermemesini ister. */
   readOnly?: boolean;
-  /** Set when drawn inside the fullscreen dialog (the Fullscreen action hides itself). */
+  /** Set when drawn inside the fullscreen dialog (the Fullscreen action hides itself). @tr Tam ekran diyaloğunun içinde çizilirken verilir (Tam ekran eylemi kendini gizler). */
   expanded?: boolean;
 }
 

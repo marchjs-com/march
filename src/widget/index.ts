@@ -70,7 +70,14 @@ function actionsOf<P>(sources: readonly WidgetPoint<P>[], input: P): WidgetProvi
   return out.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
-export interface WidgetProps<P> { sources: readonly WidgetPoint<P>[]; input: P; class?: string }
+export interface WidgetProps<P> {
+  /** The widget points to draw from; their providers draw the main part and the actions. @tr Çizimin alınacağı widget noktaları; sağlayıcıları ana parçayı ve eylemleri çizer. */
+  sources: readonly WidgetPoint<P>[];
+  /** The input handed to the providers; when it changes they draw again. @tr Sağlayıcılara verilen girdi; değişince yeniden çizerler. */
+  input: P;
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
+  class?: string;
+}
 /**
  * Draw a widget point: `<Widget sources={[codeView]} input={{ source, lang: "tsx" }} />`. The input is live: when it
  * changes (`input={{ source: $code }}`), the provider draws again for the new input.

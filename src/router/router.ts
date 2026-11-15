@@ -543,7 +543,20 @@ function level(r: RouterState, ctx: OutletCtx, loading?: Renderable): Element {
  * Props: `loading` (first load), `skeleton` (a page that is not here 100 ms after a click; a route's own `skeleton`
  * wins), `notFound`, `forbidden`, `wrap(page, to)` — a wrapper around every page.
  */
-export function Router(props: { loading?: Renderable; skeleton?: Renderable; fallback?: unknown; notFound?: Renderable; forbidden?: Renderable; wrap?: (page: () => unknown, to: RouteTarget) => unknown }): unknown {
+export function Router(props: {
+  /** Shown during the first load, before the first page is ready. @tr İlk yüklemede, ilk sayfa hazır olana dek gösterilir. */
+  loading?: Renderable;
+  /** Shown when a page is not here 100 ms after a click (a route's own `skeleton` wins). @tr Tıklamadan 100 ms sonra sayfa hâlâ gelmemişse gösterilir (rotanın kendi `skeleton`'ı önceliklidir). */
+  skeleton?: Renderable;
+  /** Not used by Router; kept so older code still type-checks. @tr Router kullanmaz; eski kod tür denetiminden geçsin diye duruyor. */
+  fallback?: unknown;
+  /** The page shown when no route matches. @tr Hiçbir rota eşleşmeyince gösterilen sayfa. */
+  notFound?: Renderable;
+  /** The page shown when a route's access check fails. @tr Rotanın erişim denetimi geçmeyince gösterilen sayfa. */
+  forbidden?: Renderable;
+  /** A wrapper around every page: `(page, to) => content`. @tr Her sayfanın çevresine bir sarmalayıcı: `(page, to) => content`. */
+  wrap?: (page: () => unknown, to: RouteTarget) => unknown;
+}): unknown {
   const r = S.router;
   if (!r) throw new Error(NO_ROUTER);
   r.loading = props.loading;
@@ -558,7 +571,14 @@ export function Router(props: { loading?: Renderable; skeleton?: Renderable; fal
  * URL ?~name=/path) or the modal route (`name="modal"`); `children` can wrap it: `{(page, close) => <Dialog …>{page()}</Dialog>}`.
  * `empty` renders when a named outlet shows nothing.
  */
-export function Outlet(props: { name?: string; empty?: Renderable; children?: unknown }): unknown {
+export function Outlet(props: {
+  /** A named outlet (URL ?~name=/path) or "modal" for the modal route; without it the next route level. @tr Adlandırılmış bir outlet (URL ?~name=/path) ya da modal rota için "modal"; verilmezse bir sonraki rota düzeyi. */
+  name?: string;
+  /** Rendered when a named outlet shows nothing. @tr Adlandırılmış outlet bir şey göstermiyorken gösterilir. */
+  empty?: Renderable;
+  /** Wraps a named outlet: `(page, close) => content`. @tr Adlandırılmış outlet'i sarar: `(page, close) => content`. */
+  children?: unknown;
+}): unknown {
   const r = S.router;
   if (!r) throw new Error(NO_ROUTER);
   if (!props.name) {
@@ -575,7 +595,27 @@ const NamedOutlet = lazy(() => import("./outlets.ts"), { pick: "NamedOutlet", pl
 export const _router = { S, slot, matchRoute, loadRoute, pageKey, notFoundComp, forbiddenComp, routeError, leaveGuards, stripBase, matchTo, depth: (): number => vtDepth };
 
 /** `<Link href="/users" exact prefetch="hover">Users</Link>` — client-side navigation, aria-current, preloading. */
-export function Link(props: { href: Href | (() => Href); exact?: boolean; replace?: boolean; modal?: boolean; outlet?: string; preload?: "hover" | "visible" | "idle" | "none"; prefetch?: "hover" | "visible" | "idle" | "none"; target?: string; children?: unknown; [k: string]: unknown }): unknown {
+export function Link(props: {
+  /** The target path (or a function returning it); navigates on the client and sets aria-current when active. @tr Hedef yol (ya da onu döndüren fonksiyon); istemcide gezinir, etkinken aria-current verir. */
+  href: Href | (() => Href);
+  /** Active only on exactly this path (by default also on its sub-paths). @tr Yalnız tam bu yolda etkin olur (varsayılan olarak alt yollarında da). */
+  exact?: boolean;
+  /** Replace the current history entry instead of adding one. @tr Yeni geçmiş kaydı eklemek yerine geçerli kaydı değiştirir. */
+  replace?: boolean;
+  /** Open the target as the modal route over the current page. @tr Hedefi geçerli sayfanın üstünde modal rota olarak açar. */
+  modal?: boolean;
+  /** Open the target in this named outlet instead of the page. @tr Hedefi sayfa yerine bu adlandırılmış outlet'te açar. */
+  outlet?: string;
+  /** Older name of `prefetch`. @tr `prefetch`'in eski adı. */
+  preload?: "hover" | "visible" | "idle" | "none";
+  /** When to download the target page ahead: "hover" (default, also focus), "visible", "idle" or "none". @tr Hedef sayfanın önceden ne zaman indirileceği: "hover" (varsayılan, odakta da), "visible", "idle" ya da "none". */
+  prefetch?: "hover" | "visible" | "idle" | "none";
+  /** The link target; "_blank" opens normally in a new tab. @tr Bağlantı hedefi; "_blank" yeni sekmede olağan biçimde açar. */
+  target?: string;
+  /** The link content. @tr Bağlantı içeriği. */
+  children?: unknown;
+  [k: string]: unknown;
+}): unknown {
   // a fixed href is read and split once; a live one once per change (not once per binding)
   const live = typeof props.href === "function";
   const fixed = live ? "" : String(props.href);

@@ -13,13 +13,17 @@ import { arrowUpRight } from "../icons/glyphs/arrowUpRight.ts";
 import { OverflowText } from "./marquee.ts";
 
 export interface BrandProps {
-  /** The mark: an icon (hadi-march/icons, e.g. one made with defineIcon), text or a node. */
+  /** The mark: an icon (hadi-march/icons, e.g. one made with defineIcon), text or a node. @tr İşaret: bir ikon (hadi-march/icons, ör. defineIcon ile yapılmış), metin ya da bir düğüm. */
   mark?: unknown;
+  /** The product name shown next to the mark. @tr İşaretin yanında gösterilen ürün adı. */
   name: MaybeFn<unknown>;
-  /** Small second line (product / environment). */
+  /** Small second line (product / environment). @tr Küçük ikinci satır (ürün / ortam). */
   sub?: MaybeFn<unknown>;
+  /** Makes the lockup a link to this path. @tr Logoyu bu yola giden bir bağlantı yapar. */
   href?: Href;
+  /** Size: md (default) or lg. @tr Boyut: md (varsayılan) ya da lg. */
   size?: "md" | "lg";
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }
 /** Logo lockup: `<Brand mark={logo} name="HADİ" sub="Admin" href="/" />` */
@@ -35,13 +39,19 @@ export function Brand(props: BrandProps): Element {
 }
 
 export interface AuthLayoutProps {
+  /** The brand (usually a `<Brand>`), shown above the form and on the showcase side. @tr Marka (genelde bir `<Brand>`); formun üstünde ve vitrin tarafında gösterilir. */
   brand?: unknown;
+  /** The form column's heading. @tr Form sütununun başlığı. */
   title?: MaybeFn<unknown>;
+  /** A short line under the title. @tr Başlığın altındaki kısa satır. */
   subtitle?: MaybeFn<unknown>;
-  /** Showcase side (wide screens): a headline, a short pitch and highlight rows. */
+  /** Showcase side (wide screens): a headline, a short pitch and highlight rows. @tr Vitrin tarafı (geniş ekranlarda): bir manşet, kısa bir tanıtım ve öne çıkan satırlar. */
   aside?: { headline?: unknown; text?: unknown; points?: readonly { icon?: unknown; title: unknown; text?: unknown }[]; foot?: unknown };
+  /** Content under the form (links, legal text). @tr Formun altındaki içerik (bağlantılar, yasal metin). */
   footer?: unknown;
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
   class?: ClassProp;
+  /** The form. @tr Form. */
   children?: unknown;
 }
 /**
@@ -74,13 +84,19 @@ export function AuthLayout(props: AuthLayoutProps): Element {
 }
 
 export interface UserMenuProps {
+  /** The user's name: the button text, the avatar's initials and the menu label (default "Account"). @tr Kullanıcının adı: düğme metni, avatarın baş harfleri ve menü etiketi (varsayılan "Account"). */
   name: MaybeFn<string | null | undefined>;
+  /** A second line under the name (e.g. the email). @tr Adın altındaki ikinci satır (ör. e-posta). */
   detail?: MaybeFn<string | null | undefined>;
+  /** Avatar image URL; without it the initials show. @tr Avatar görselinin URL'si; verilmezse baş harfler gösterilir. */
   avatar?: MaybeFn<string | null | undefined>;
+  /** The menu items ("-" for a separator). @tr Menü öğeleri (ayırıcı için "-"). */
   items: MaybeFn<readonly MenuItem[] | null | undefined>;
-  /** Only the avatar (narrow places such as an icon rail or a top bar). */
+  /** Only the avatar (narrow places such as an icon rail or a top bar). @tr Yalnız avatar (ikon rayı ya da üst çubuk gibi dar yerler için). */
   compact?: boolean;
+  /** Where the menu opens (default top-start). @tr Menünün açıldığı yön (varsayılan top-start). */
   placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end";
+  /** Extra CSS classes on the button. @tr Düğmeye eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }
 /** Account button with a menu: `<UserMenu name="Ada" detail="ada@x.com" items={[profile, "-", signOut]} />` */

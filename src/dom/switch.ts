@@ -4,7 +4,12 @@ import { val, call, type MaybeFn } from "./flow.ts";
 
 /** Descriptor produced by `<Match>`. */
 export interface MatchDescriptor { readonly __match: true; readonly when: unknown; readonly children: () => unknown }
-export interface SwitchProps { fallback?: unknown; children?: unknown }
+export interface SwitchProps {
+  /** Rendered when no `<Match>` is truthy. @tr Hiçbir `<Match>` doğru (truthy) değilse gösterilir. */
+  fallback?: unknown;
+  /** The `<Match>` branches. @tr `<Match>` dalları. */
+  children?: unknown;
+}
 /** `<Switch fallback={…}><Match when={a}>…</Match>…</Switch>` — first truthy Match wins. */
 export function Switch(props: SwitchProps): () => unknown {
   const matches = computed(() => {
@@ -23,7 +28,12 @@ export function Switch(props: SwitchProps): () => unknown {
     return untrack(() => call(m.children, val(m.when)));
   };
 }
-export interface MatchProps<T = unknown> { when: MaybeFn<T>; children?: unknown }
+export interface MatchProps<T = unknown> {
+  /** The condition; the first truthy `<Match>` in its `<Switch>` renders. @tr Koşul; `<Switch>` içinde ilk doğru (truthy) `<Match>` gösterilir. */
+  when: MaybeFn<T>;
+  /** Content, or `(value) => content` receiving the truthy value. @tr İçerik ya da doğru (truthy) değeri alan `(value) => content`. */
+  children?: unknown;
+}
 /** Descriptor used by `<Switch>`; its children stay lazy. */
 export function Match<T>(props: MatchProps<T>): MatchDescriptor {
   const d = { __match: true };

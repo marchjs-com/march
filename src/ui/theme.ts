@@ -131,19 +131,40 @@ export const colorThemes = (): readonly ThemeInfo[] => infos();
 export function registerThemes(list: readonly ThemeInfo[]): void { infos.update((l) => [...l.filter((x) => !list.some((y) => y.id === x.id)), ...list]); }
 
 /** Small preview of a theme drawn by the theme itself (data-m-theme scope; no inline styles). */
-export function ThemeSwatch(props: { id: string; class?: ClassProp; /** Light or dark of its own (default the page's). */ mode?: MaybeFn<"light" | "dark" | null | undefined> }): Element {
+export function ThemeSwatch(props: {
+  /** The theme id to draw (data-m-theme). @tr Çizilecek temanın id'si (data-m-theme). */
+  id: string;
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
+  class?: ClassProp;
+  /** Light or dark of its own (default the page's). @tr Kendine ait açık ya da koyu hal (varsayılan sayfanınki). */
+  mode?: MaybeFn<"light" | "dark" | null | undefined>;
+}): Element {
   return h("span", { class: () => cx("m-swatch", val(props.class)), "data-m-theme": props.id, "data-theme": () => val(props.mode) ?? null, "aria-hidden": "true" },
     h("span", { class: "m-swatch-a" }), h("span", { class: "m-swatch-b" }), h("span", { class: "m-swatch-c" }), h("span", { class: "m-swatch-d" }));
 }
 
 /** A small page drawn by a theme itself (ground, two surfaces, an accent bar, its text colour and corner): the picture of a theme card. */
-export function ThemePreview(props: { id: string; class?: ClassProp; /** Light or dark of its own (default the page's). */ mode?: MaybeFn<"light" | "dark" | null | undefined> }): Element {
+export function ThemePreview(props: {
+  /** The theme id to draw (data-m-theme). @tr Çizilecek temanın id'si (data-m-theme). */
+  id: string;
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
+  class?: ClassProp;
+  /** Light or dark of its own (default the page's). @tr Kendine ait açık ya da koyu hal (varsayılan sayfanınki). */
+  mode?: MaybeFn<"light" | "dark" | null | undefined>;
+}): Element {
   const bar = (): Element => h("span", { class: "m-theme-preview-bar" }) as Element;
   return h("span", { class: () => cx("m-swatch", "m-theme-preview", val(props.class)), "data-m-theme": props.id, "data-theme": () => val(props.mode) ?? null, "aria-hidden": "true" },
     h("span", { class: "m-theme-preview-text" }, "Aa"), bar(), bar());
 }
 
-export interface ThemePickerProps { label?: MaybeFn<string | undefined>; class?: ClassProp; placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end" }
+export interface ThemePickerProps {
+  /** The menu button's text (default "Theme"). @tr Menü düğmesinin metni (varsayılan "Theme"). */
+  label?: MaybeFn<string | undefined>;
+  /** Extra CSS classes on the menu button. @tr Menü düğmesine eklenen ek CSS sınıfları. */
+  class?: ClassProp;
+  /** Where the menu opens (default bottom-end). @tr Menünün açıldığı yön (varsayılan bottom-end). */
+  placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end";
+}
 /** The light / dark / system choice of a theme menu (ThemePicker, ThemeMenu): a Segmented with icons. */
 export function themeModes(): Element {
   return h(Segmented<ThemeMode>, {
@@ -187,9 +208,11 @@ export function ThemePicker(props: ThemePickerProps = {}): unknown {
 }
 
 export interface ThemeToggleProps {
-  /** A mode of its own instead of the page's (a preview drawn light or dark): shows `value`, calls `onChange`. */
+  /** A mode of its own instead of the page's (a preview drawn light or dark): shows `value`, calls `onChange`. @tr Sayfanınki yerine kendine ait bir mod (açık ya da koyu çizilen bir önizleme): `value` gösterilir, `onChange` çağrılır. */
   value?: MaybeFn<ThemeMode | undefined>;
+  /** Called with the next mode (system → light → dark); when given, the page's mode is left alone. @tr Sıradaki modla çağrılır (system → light → dark); verilirse sayfanın moduna dokunulmaz. */
   onChange?: ((mode: ThemeMode) => void) | undefined;
+  /** Extra CSS classes on the button. @tr Düğmeye eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }
 /** Cycles system → light → dark. `<ThemeToggle />` */
@@ -205,10 +228,13 @@ export function ThemeToggle(props: ThemeToggleProps = {}): Element {
 
 export interface LocaleOption { value: string; label: string }
 export interface LocaleSelectProps {
-  /** Locales: `{ value, label }` or plain strings. */
+  /** Locales: `{ value, label }` or plain strings. @tr Diller: `{ value, label }` ya da düz metinler. */
   options: MaybeFn<readonly (LocaleOption | string)[] | null | undefined>;
+  /** aria-label of the select (default "Language"). @tr Seçim kutusunun aria-label'ı (varsayılan "Language"). */
   label?: MaybeFn<string | undefined>;
+  /** Called with the picked locale after it is set. @tr Seçilen dil ayarlandıktan sonra onunla çağrılır. */
   onChange?: (locale: string) => void;
+  /** Extra CSS classes on the select. @tr Seçim kutusuna eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }
 /** `<LocaleSelect options={[{ value: "en", label: "English" }, { value: "tr", label: "Türkçe" }]} />` (strings allowed) */
@@ -221,13 +247,17 @@ export function LocaleSelect(props: LocaleSelectProps): Element {
 }
 
 export interface UpdateBannerProps {
-  /** Build id URL (default "/build.txt"). */
+  /** Build id URL (default "/build.txt"). @tr Derleme kimliğinin URL'si (varsayılan "/build.txt"). */
   url?: string;
-  /** Poll interval in minutes (default 5). */
+  /** Poll interval in minutes (default 5). @tr Dakika cinsinden yoklama aralığı (varsayılan 5). */
   every?: number;
+  /** The banner text (default "A new version is available"). @tr Bant metni (varsayılan "A new version is available"). */
   text?: MaybeFn<string | undefined>;
+  /** The reload button's text (default "Reload"). @tr Yenile düğmesinin metni (varsayılan "Reload"). */
   reloadText?: MaybeFn<string | undefined>;
+  /** Called by the reload button instead of reloading the page. @tr Sayfayı yenilemek yerine yenile düğmesi bunu çağırır. */
   onReload?: () => void;
+  /** Extra CSS classes on the banner. @tr Banda eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }
 /**

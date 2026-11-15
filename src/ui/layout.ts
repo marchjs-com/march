@@ -26,21 +26,29 @@ const Crumbs = /* @__PURE__ */ lazy<BreadcrumbsProps>(() => import("../component
 /** A breadcrumb; the last one is the current page. */
 export interface Breadcrumb { label: MaybeFn<string>; href?: Href }
 export interface PageProps extends Pick<LayoutProps, "corners" | "features"> {
+  /** The page heading (an h1); also written to the document title. @tr Sayfa başlığı (bir h1); belge başlığına da yazılır. */
   title: MaybeFn<unknown>;
-  /** Region content of the surrounding Layout while this page is shown, e.g. `{ aside: <Filters/> }`. */
+  /** Region content of the surrounding Layout while this page is shown, e.g. `{ aside: <Filters/> }`. @tr Bu sayfa gösterilirken çevreleyen Layout'un bölge içeriği, ör. `{ aside: <Filters/> }`. */
   layout?: Partial<Pick<LayoutProps, "top" | "header" | "nav" | "aside" | "footer">> | undefined;
-  /** Write the title to the document (through the Layout's titleTemplate). Default true. */
+  /** Write the title to the document (through the Layout's titleTemplate). Default true. @tr Başlığı belgeye yazar (Layout'un titleTemplate'i ile). Varsayılan true. */
   documentTitle?: boolean | undefined;
+  /** A short line under the title. @tr Başlığın altındaki kısa satır. */
   subtitle?: MaybeFn<unknown>;
+  /** Buttons at the right of the title bar (hidden when not allowed). @tr Başlık çubuğunun sağındaki düğmeler (izin yoksa gizlenir). */
   actions?: ActionsProp;
+  /** The trail above the title; the last one is the current page. @tr Başlığın üstündeki iz; sonuncusu geçerli sayfadır. */
   breadcrumbs?: MaybeFn<readonly Breadcrumb[] | null | undefined>;
-  /** A path (Link), `true` (history back) or a function. */
+  /** A path (Link), `true` (history back) or a function. @tr Bir yol (Link), `true` (geçmişte geri) ya da bir fonksiyon. */
   back?: Href | true | (() => unknown);
+  /** Tabs under the content. @tr İçeriğin altındaki sekmeler. */
   tabs?: MaybeFn<readonly TabSpec[] | null | undefined>;
-  /** Keep the active tab in this query parameter. */
+  /** Keep the active tab in this query parameter. @tr Etkin sekmeyi bu sorgu parametresinde tutar. */
   tabsQuery?: string;
+  /** A narrower, centred content column (forms, settings). @tr Daha dar, ortalanmış içerik sütunu (formlar, ayarlar). */
   narrow?: boolean;
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
   class?: ClassProp;
+  /** The page content. @tr Sayfa içeriği. */
   children?: unknown;
   [attr: string]: unknown;
 }
@@ -97,7 +105,18 @@ Page.extend = function extend(defaults: Partial<PageProps>): PageComponent {
   return P;
 };
 
-export interface SectionProps { title?: MaybeFn<unknown>; description?: MaybeFn<unknown>; actions?: ActionsProp; class?: ClassProp; children?: unknown }
+export interface SectionProps {
+  /** The section heading (an h2). @tr Bölüm başlığı (bir h2). */
+  title?: MaybeFn<unknown>;
+  /** A short line under the title. @tr Başlığın altındaki kısa satır. */
+  description?: MaybeFn<unknown>;
+  /** Buttons at the right of the heading (hidden when not allowed). @tr Başlığın sağındaki düğmeler (izin yoksa gizlenir). */
+  actions?: ActionsProp;
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
+  class?: ClassProp;
+  /** The section content. @tr Bölüm içeriği. */
+  children?: unknown;
+}
 /** Titled block inside a page: `<Section title="Security" description="…" actions={[…]}>…</Section>` */
 export function Section(props: SectionProps): Element {
   return h("section", { class: () => cx("m-section", val(props.class)) },
@@ -111,15 +130,21 @@ export function Section(props: SectionProps): Element {
 }
 
 export interface ListDetailProps {
+  /** The list pane. @tr Liste bölmesi. */
   list: unknown;
-  /** The detail pane (a zero-arg function is called when shown). */
+  /** The detail pane (a zero-arg function is called when shown). @tr Ayrıntı bölmesi (argümansız bir fonksiyon gösterilirken çağrılır). */
   detail: unknown;
-  /** Truthy when an item is selected (narrow screens then show the detail). */
+  /** Truthy when an item is selected (narrow screens then show the detail). @tr Bir öğe seçiliyken doğru (truthy) olur (dar ekranlar o zaman ayrıntıyı gösterir). */
   selected: MaybeFn<unknown>;
+  /** Called by the Back button of the detail pane; without it there is no Back button. @tr Ayrıntı bölmesindeki Geri düğmesi bunu çağırır; verilmezse Geri düğmesi olmaz. */
   onBack?: () => void;
+  /** Shown in the detail pane when nothing is selected. @tr Hiçbir şey seçili değilken ayrıntı bölmesinde gösterilir. */
   empty?: unknown;
+  /** aria-label of the list pane. @tr Liste bölmesinin aria-label'ı. */
   listLabel?: MaybeFn<string>;
+  /** aria-label of the detail pane (default "Details"). @tr Ayrıntı bölmesinin aria-label'ı (varsayılan "Details"). */
   detailLabel?: MaybeFn<string>;
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }
 /**
@@ -138,20 +163,29 @@ export function ListDetail(props: ListDetailProps): Element {
 }
 
 export interface PagerProps {
-  /** Offset mode: 1-based page. */
+  /** Offset mode: 1-based page. @tr Sayfa numarası modu: 1'den başlayan sayfa. */
   page?: MaybeFn<number | null | undefined>;
+  /** Total number of items (offset mode). @tr Toplam öğe sayısı (sayfa numarası modu). */
   total?: MaybeFn<number | null | undefined>;
+  /** Items per page. @tr Sayfa başına öğe sayısı. */
   size?: MaybeFn<number | null | undefined>;
+  /** Called with the new page (1-based). @tr Yeni sayfa numarasıyla (1'den başlar) çağrılır. */
   onPage?: (page: number) => void;
-  /** Set by `bind:page`. */
+  /** Set by `bind:page`. @tr `bind:page` tarafından verilir. */
   setPage?: (page: number) => void;
+  /** Page size choices; a size picker appears when given. @tr Sayfa boyutu seçenekleri; verilirse bir boyut seçici görünür. */
   sizes?: readonly number[];
+  /** Called with the picked page size. @tr Seçilen sayfa boyutuyla çağrılır. */
   onSize?: (size: number) => void;
-  /** Cursor mode. */
+  /** Cursor mode. @tr İmleç modu. */
   hasPrev?: MaybeFn<boolean>;
+  /** Cursor mode: whether a next page exists. @tr İmleç modu: sonraki sayfa var mı. */
   hasNext?: MaybeFn<boolean>;
+  /** Cursor mode: called by the previous button. @tr İmleç modu: önceki düğmesi çağırır. */
   onPrev?: () => void;
+  /** Cursor mode: called by the next button. @tr İmleç modu: sonraki düğmesi çağırır. */
   onNext?: () => void;
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }
 /**

@@ -10,13 +10,15 @@ let flipHook: FlipHook | null = null;
 export function setFlipHook(fn: FlipHook | null): void { flipHook = fn; }
 
 export interface ForProps<T> {
-  /** Array (or signal / function returning one); null/undefined renders as empty. */
+  /** Array (or signal / function returning one); null/undefined renders as empty. @tr Dizi (ya da onu döndüren sinyal / fonksiyon); null/undefined boş liste sayılır. */
   each: unknown;
-  /** Property name or key function; default: the item itself. */
+  /** Property name or key function; default: the item itself. @tr Özellik adı ya da anahtar fonksiyonu; varsayılan: öğenin kendisi. */
   key?: string | ((x: T) => unknown);
+  /** Row function `(item, index) => content`; both are accessors. @tr Satır fonksiyonu `(item, index) => content`; ikisi de erişimcidir. */
   children: (item: Accessor<T>, index: Accessor<number>) => unknown;
+  /** Rendered while the list is empty. @tr Liste boşken gösterilir. */
   fallback?: unknown;
-  /** FLIP-animate moves, enter and leave (needs hadi-march/motion). */
+  /** FLIP-animate moves, enter and leave (needs hadi-march/motion). @tr Yer değiştirme, giriş ve çıkışı FLIP ile canlandırır (hadi-march/motion gerekir). */
   animate?: unknown;
 }
 interface Row<T> { nodes: Node[]; item: Cell<T>; index: Cell<number> | null; o: Owner; /** key */ k: unknown; /** position in the previous order */ at: number }

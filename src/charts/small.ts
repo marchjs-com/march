@@ -13,68 +13,114 @@ import { clamp } from "../core/util.ts";
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
 export interface SparklineProps<D = unknown> {
+  /** Numbers, or objects read through `y`; an array, signal or function. @tr Sayılar ya da `y` ile okunan nesneler; dizi, sinyal veya fonksiyon. */
   data?: DataProp<D>;
+  /** The value of an object row: a key or getter. @tr Nesne satırının değeri: bir anahtar ya da getter. */
   y?: Field<D> | undefined;
+  /** Width in px (default 120). @tr px cinsinden genişlik (varsayılan 120). */
   width?: Opt<number | string>;
+  /** Height in px (default 32). @tr px cinsinden yükseklik (varsayılan 32). */
   height?: Opt<number | string>;
+  /** Value format used in the accessible summary. @tr Erişilebilir özette kullanılan değer biçimi. */
   format?: Opt<FormatSpec>;
+  /** Include 0 in the value range. @tr Değer aralığına 0'ı katar. */
   zero?: Opt<boolean>;
+  /** Fill the area under the line. @tr Çizginin altını doldurur. */
   area?: Opt<boolean>;
+  /** Marker on the last point (default true; `false` hides it). @tr Son noktadaki işaret (varsayılan true; `false` gizler). */
   dot?: Opt<boolean>;
+  /** Palette slot of the series color (0-based, default 0). @tr Seri renginin palet sırası (0'dan başlar, varsayılan 0). */
   color?: Opt<number>;
+  /** Colors overriding the palette (the first one is used). @tr Paleti geçersiz kılan renkler (ilki kullanılır). */
   colors?: ChartBaseProps["colors"];
+  /** Accessible name, read before the summary. @tr Özetten önce okunan erişilebilir ad. */
   title?: Opt<string>;
+  /** Accessible text when there is no data (default "No data"). @tr Veri yokken erişilebilir metin (varsayılan "No data"). */
   empty?: Opt<string>;
 }
 export interface StatProps<D = unknown> {
+  /** The label over the value. @tr Değerin üstündeki etiket. */
   label?: Opt<unknown>;
+  /** The value, formatted with `format`. @tr `format` ile biçimlenen değer. */
   value?: Opt<unknown>;
+  /** The previous value; computes `delta = (value − previous) / |previous|` when `delta` is not given. @tr Önceki değer; `delta` verilmezse `delta = (value − previous) / |previous|` hesaplanır. */
   previous?: Opt<number>;
+  /** Change as a fraction (0.12 → +12%), shown with an arrow. @tr Kesir olarak değişim (0.12 → +%12), okla gösterilir. */
   delta?: Opt<number>;
+  /** Value format: a pipe name, `[pipe, ...args]` or a function (default "number"). @tr Değer biçimi: pipe adı, `[pipe, ...args]` ya da fonksiyon (varsayılan "number"). */
   format?: Opt<FormatSpec>;
+  /** Format of |delta| (default `["percent", 1]`). @tr |delta| biçimi (varsayılan `["percent", 1]`). */
   deltaFormat?: Opt<FormatSpec>;
+  /** A decrease is good (costs, latency). @tr Azalma iyidir (maliyet, gecikme). */
   invert?: Opt<boolean>;
+  /** Text after the delta, e.g. "vs last week". @tr Değişimden sonraki metin, ör. "geçen haftaya göre". */
   hint?: Opt<unknown>;
+  /** Shown when there is no value (default "—"). @tr Değer yokken gösterilir (varsayılan "—"). */
   empty?: Opt<unknown>;
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
   class?: Opt<string>;
+  /** Data for an inline sparkline under the value. @tr Değerin altındaki küçük eğilim çizgisinin verisi. */
   spark?: DataProp<D>;
+  /** The value of a sparkline row: a key or getter. @tr Eğilim çizgisi satırının değeri: bir anahtar ya da getter. */
   sparkY?: Field<D> | undefined;
-  /** An icon (hadi-march/icons) shown next to the label. */
+  /** An icon (hadi-march/icons) shown next to the label. @tr Etiketin yanında gösterilen ikon (hadi-march/icons). */
   icon?: unknown;
 }
 export interface ProgressRingProps {
   /**
    * Several colors: "brand" (the four HADİ colors, the HADİ theme's default), a list of color tokens, or "single" (one
    * color even in a multicolor theme).
+   * @tr Birden çok renk: "brand" (dört HADİ rengi, HADİ temasının varsayılanı), bir renk belirteci listesi ya da "single"
+   * (çok renkli bir temada bile tek renk).
    */
   colors?: MultiColors | undefined;
-  /** How several colors are laid out: "gradient" (default), "segments" (equal parts) or "cycle" (colors flow). */
+  /** How several colors are laid out: "gradient" (default), "segments" (equal parts) or "cycle" (colors flow). @tr Birden çok renk nasıl dizilir: "gradient" (varsayılan), "segments" (eşit parçalar) ya da "cycle" (renkler akar). */
   paint?: "gradient" | "segments" | "cycle" | undefined;
-  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. */
+  /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. @tr Tema renk belirteci (bkz. ColorToken): "brand-blue", "success", "cat-3"… Varsayılan: temanın primary rengi. */
   color?: ColorToken | undefined;
+  /** The score, clamped to 0…max. @tr Puan; 0…max aralığına sıkıştırılır. */
   value?: Opt<number>;
+  /** The full score (default 100). @tr Tam puan (varsayılan 100). */
   max?: Opt<number>;
+  /** Diameter in px (default 64). @tr px cinsinden çap (varsayılan 64). */
   size?: Opt<number>;
+  /** Ring thickness in px (default 8). @tr px cinsinden halka kalınlığı (varsayılan 8). */
   thickness?: Opt<number>;
+  /** Percent limits of the low / mid / high levels (default [50, 80]). @tr Düşük / orta / yüksek düzeylerin yüzde sınırları (varsayılan [50, 80]). */
   thresholds?: Opt<readonly [number, number]>;
+  /** Format of the number in the middle (default rounded). @tr Ortadaki sayının biçimi (varsayılan yuvarlanmış). */
   format?: Opt<FormatSpec>;
+  /** Accessible name (default "Score"). @tr Erişilebilir ad (varsayılan "Score"). */
   label?: Opt<string>;
 }
 /** BarList row as passed to `onSelect`. */
 export interface BarListItem<D = unknown> { key: string; label: string; value: number; datum: D; index: number }
 export interface BarListProps<D = unknown> {
+  /** Rows: an array (or signal / function returning one). @tr Satırlar: bir dizi (ya da onu döndüren sinyal / fonksiyon). */
   data?: DataProp<D>;
+  /** Row label: a key or getter (default "label"). @tr Satır etiketi: bir anahtar ya da getter (varsayılan "label"). */
   x?: Field<D> | undefined;
+  /** Row value: a key or getter (default "value"; with a list, the first). @tr Satır değeri: bir anahtar ya da getter (varsayılan "value"; liste verilirse ilki). */
   y?: Field<D> | readonly Field<D>[] | undefined;
+  /** Value format: a pipe name, `[pipe, ...args]` or a function (default "number"). @tr Değer biçimi: pipe adı, `[pipe, ...args]` ya da fonksiyon (varsayılan "number"). */
   format?: Opt<FormatSpec>;
+  /** Sort by value, largest first (default true). @tr Değere göre, büyükten küçüğe sıralar (varsayılan true). */
   sort?: Opt<boolean>;
+  /** Show only the first N rows. @tr Yalnız ilk N satırı gösterir. */
   limit?: Opt<number>;
+  /** Value of a full bar (default the largest value). @tr Dolu bir çubuğun değeri (varsayılan en büyük değer). */
   max?: Opt<number>;
+  /** Palette slot of the series color (0-based, default 0). @tr Seri renginin palet sırası (0'dan başlar, varsayılan 0). */
   color?: Opt<number>;
+  /** Colors overriding the palette (the first one is used). @tr Paleti geçersiz kılan renkler (ilki kullanılır). */
   colors?: ChartBaseProps["colors"];
+  /** aria-label of the list. @tr Listenin aria-label'ı. */
   title?: Opt<string>;
+  /** Shown when there is no data (default "No data"). @tr Veri yokken gösterilir (varsayılan "No data"). */
   empty?: Opt<unknown>;
+  /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
   class?: Opt<string>;
+  /** Makes rows buttons; called with the clicked row and its rank. @tr Satırları düğme yapar; tıklanan satır ve sırasıyla çağrılır. */
   onSelect?: ((item: BarListItem<D> & { rank: number }) => void) | undefined;
 }
 

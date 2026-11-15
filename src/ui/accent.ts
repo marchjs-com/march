@@ -36,13 +36,21 @@ export const ACCENT_CHOICES: readonly ColorToken[] = ["primary", "brand-orange",
 const LABELS: Record<string, string> = { primary: "Theme", "brand-orange": "Orange", "brand-blue": "Blue", "brand-green": "Green", "brand-purple": "Purple", "brand-pink": "Pink", "brand-gold": "Gold", info: "Info", success: "Success", danger: "Danger", neutral: "Neutral" };
 
 export interface AccentPickerProps {
-  label?: MaybeFn<string | undefined>; choices?: readonly ColorToken[]; class?: ClassProp; placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end";
-  /** An accent of its own instead of the page's (a preview, with data-m-accent on it): shows `value`, calls `onChange`. */
+  /** The menu button's text (default "Accent"). @tr Menü düğmesinin metni (varsayılan "Accent"). */
+  label?: MaybeFn<string | undefined>;
+  /** The colors offered (default ACCENT_CHOICES: the theme's primary, the HADİ colors and the semantic colors). @tr Sunulan renkler (varsayılan ACCENT_CHOICES: temanın primary rengi, HADİ renkleri ve anlamsal renkler). */
+  choices?: readonly ColorToken[];
+  /** Extra CSS classes on the menu button. @tr Menü düğmesine eklenen ek CSS sınıfları. */
+  class?: ClassProp;
+  /** Where the menu opens (default bottom-end). @tr Menünün açıldığı yön (varsayılan bottom-end). */
+  placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end";
+  /** An accent of its own instead of the page's (a preview, with data-m-accent on it): shows `value`, calls `onChange`. @tr Sayfanınki yerine kendine ait bir vurgu rengi (data-m-accent taşıyan bir önizleme): `value` gösterilir, `onChange` çağrılır. */
   value?: MaybeFn<ColorToken | undefined>;
+  /** Called with the picked color; when given, the picker leaves the page's accent alone. @tr Seçilen renkle çağrılır; verilirse seçici sayfanın vurgu rengine dokunmaz. */
   onChange?: ((c: ColorToken) => void) | undefined;
-  /** The theme the "theme's own" swatch shows (default the page's). */
+  /** The theme the "theme's own" swatch shows (default the page's). @tr "Temanın kendi" örneğinin gösterdiği tema (varsayılan sayfanınki). */
   theme?: MaybeFn<string | undefined>;
-  /** Light or dark of that swatch (default the page's). */
+  /** Light or dark of that swatch (default the page's). @tr O örneğin açık ya da koyu hali (varsayılan sayfanınki). */
   mode?: MaybeFn<"light" | "dark" | null | undefined>;
 }
 /** What an own-value accent list shows and calls. */

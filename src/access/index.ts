@@ -80,14 +80,26 @@ export function denied(req: Requirement = {}): Denial | null {
 }
 
 const val = (v: unknown): unknown => (typeof v === "function" && !v.length ? (v as () => unknown)() : v);
-export interface CanProps { perm?: PermCheck; role?: Requirement["role"]; method?: Requirement["method"]; fallback?: unknown; children?: unknown }
+export interface CanProps {
+  /** The permission needed (a name, any of several, or a check); children show only when it is granted. @tr Gereken izin (bir ad, birkaçından biri ya da bir denetim); yalnız izin varsa children gösterilir. */
+  perm?: PermCheck;
+  /** The role needed (one, or any of several). @tr Gereken rol (bir tane ya da birkaçından biri). */
+  role?: Requirement["role"];
+  /** The sign-in method needed (one, or any of several). @tr Gereken oturum açma yöntemi (bir tane ya da birkaçından biri). */
+  method?: Requirement["method"];
+  /** Shown instead of the children when not allowed. @tr İzin yokken children yerine gösterilir. */
+  fallback?: unknown;
+  /** Content shown when allowed. @tr İzin varken gösterilen içerik. */
+  children?: unknown;
+}
 /** Render children only when allowed. Props: perm, role, method, fallback. */
 export function Can(props: CanProps): () => unknown {
   return () => (denied({ perm: props.perm, role: props.role, method: props.method }) ? val(props.fallback) ?? null : props.children);
 }
 export interface GateProps extends CanProps {
+  /** `true` requires a signed-in user; `false` skips the sign-in check. @tr `true` oturum açmış kullanıcı ister; `false` oturum denetimini atlar. */
   auth?: boolean;
-  /** Content, or `(reason, requirement) => content`. */
+  /** Content, or `(reason, requirement) => content`. @tr İçerik ya da `(reason, requirement) => content`. */
   fallback?: unknown;
 }
 /**

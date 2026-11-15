@@ -33,13 +33,17 @@ export function commandItems(pick: CommandPick, args: unknown[] = []): () => Men
 }
 
 export interface CommandButtonProps {
-  /** Command id. */
+  /** Command id. @tr Komut id'si. */
   command: string;
+  /** Arguments passed to the command's run and enabled checks. @tr Komutun çalıştırma ve etkinlik denetimlerine verilen argümanlar. */
   args?: unknown[];
+  /** The button look; default danger for a danger command, else the Button default. @tr Düğme görünümü; tehlikeli komutta varsayılan danger, değilse Button'un varsayılanı. */
   variant?: "primary" | "secondary" | "ghost" | "danger" | "dark";
+  /** Button size: sm, md or lg. @tr Düğme boyutu: sm, md ya da lg. */
   size?: "sm" | "md" | "lg";
-  /** Icon only (the title becomes the label and tooltip). */
+  /** Icon only (the title becomes the label and tooltip). @tr Yalnız ikon (başlık etiket ve araç ipucu olur). */
   iconOnly?: boolean;
+  /** The button text (default the command's title). @tr Düğme metni (varsayılan komutun başlığı). */
   children?: unknown;
 }
 
@@ -65,7 +69,16 @@ export function CommandButton(props: CommandButtonProps): unknown {
   };
 }
 
-export interface CommandToolbarProps { pick: CommandPick; label?: string; iconOnly?: boolean; size?: "sm" | "md" | "lg" }
+export interface CommandToolbarProps {
+  /** Which commands: a list of ids, `{ group }` or a filter function (only permitted ones show). @tr Hangi komutlar: id listesi, `{ group }` ya da bir filtre fonksiyonu (yalnız izin verilenler gösterilir). */
+  pick: CommandPick;
+  /** aria-label of the toolbar (default "Toolbar"). @tr Araç çubuğunun aria-label'ı (varsayılan "Toolbar"). */
+  label?: string;
+  /** Buttons show only their icons. @tr Düğmeler yalnız ikonlarını gösterir. */
+  iconOnly?: boolean;
+  /** Button size (default sm). @tr Düğme boyutu (varsayılan sm). */
+  size?: "sm" | "md" | "lg";
+}
 
 /** A toolbar (button group) filled from the registry. */
 export function CommandToolbar(props: CommandToolbarProps): unknown {

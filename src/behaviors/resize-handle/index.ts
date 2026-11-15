@@ -11,24 +11,29 @@ import { pointerDrag } from "../drag/drag.ts";
 
 /** Options of resizeHandle(). */
 export interface ResizeHandleOptions {
-  /** The current size (any unit: px, percent…). */
+  /** The current size (any unit: px, percent…). @tr Geçerli boyut (herhangi bir birim: px, yüzde…). */
   value: () => number;
-  /** Apply a size, already clamped to min / max; `done` is true when a gesture ends (save it then). */
+  /** Apply a size, already clamped to min / max; `done` is true when a gesture ends (save it then). @tr Bir boyut uygular, min / max aralığına sıkıştırılmış olarak; hareket bitince `done` true olur (o zaman kaydedin). */
   set: (v: number, done: boolean) => void;
+  /** The smallest size (also aria-valuemin; Home goes here). @tr En küçük boyut (aynı zamanda aria-valuemin; Home buraya gider). */
   min?: number | undefined;
+  /** The largest size (also aria-valuemax; End goes here). @tr En büyük boyut (aynı zamanda aria-valuemax; End buraya gider). */
   max?: number | undefined;
-  /** Keyboard step (default 16); Shift and Page keys move `bigStep` (default 4 × step). */
+  /** Keyboard step (default 16); Shift and Page keys move `bigStep` (default 4 × step). @tr Klavye adımı (varsayılan 16); Shift ve Page tuşları `bigStep` kadar taşır (varsayılan 4 × step). */
   step?: number | undefined;
+  /** The step of Shift + arrow and Page Up / Down (default 4 × step). @tr Shift + ok ve Page Up / Down adımı (varsayılan 4 × step). */
   bigStep?: number | undefined;
-  /** Size units per pointer pixel (default 1); a percent split passes `() => 100 / container width`. */
+  /** Size units per pointer pixel (default 1); a percent split passes `() => 100 / container width`. @tr İşaretçi pikseli başına boyut birimi (varsayılan 1); yüzdelik bir bölme `() => 100 / container width` verir. */
   scale?: (() => number) | undefined;
-  /** "inline" (default): the handle moves left / right and grows toward the inline end; "block": up / down. */
+  /** "inline" (default): the handle moves left / right and grows toward the inline end; "block": up / down. @tr "inline" (varsayılan): tutamaç sola / sağa hareket eder ve satır sonuna doğru büyür; "block": yukarı / aşağı. */
   axis?: "inline" | "block" | undefined;
-  /** The thing grows toward the inline start / block start (a panel on the end edge). */
+  /** The thing grows toward the inline start / block start (a panel on the end edge). @tr Öğe satır başına / blok başına doğru büyür (bitiş kenarındaki bir panel). */
   invert?: boolean | undefined;
-  /** Enter and double click (default: none). */
+  /** Enter and double click (default: none). @tr Enter ve çift tıklama (varsayılan: yok). */
   reset?: (() => void) | undefined;
+  /** Called when a drag starts. @tr Sürükleme başlayınca çağrılır. */
   onStart?: (() => void) | undefined;
+  /** Called when a drag ends; `cancelled` is true after Escape. @tr Sürükleme bitince çağrılır; Escape ile bitince `cancelled` true olur. */
   onEnd?: ((cancelled: boolean) => void) | undefined;
 }
 

@@ -12,20 +12,35 @@ import { clamp } from "../core/util.ts";
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
 export interface BarChartProps<D = unknown> extends ChartBaseProps {
+  /** Rows: an array (or signal / function returning one) of objects. @tr Satırlar: nesnelerden oluşan bir dizi (ya da onu döndüren sinyal / fonksiyon). */
   data?: DataProp<D>;
+  /** The category: a key or `(row, i) => value` (default the index). @tr Kategori: bir anahtar ya da `(row, i) => value` (varsayılan sıra numarası). */
   x?: Field<D> | undefined;
+  /** Value series: a key, a getter, or a list of them (one series each; default "y"). @tr Değer serileri: bir anahtar, bir getter ya da bunların listesi (her biri bir seri; varsayılan "y"). */
   y?: SeriesSpec<D> | readonly SeriesSpec<D>[] | undefined;
+  /** Series labels for legend, tooltip and table: aligned with `y`, keyed by series key, or one label. @tr Gösterge, araç ipucu ve tablo için seri etiketleri: `y` ile sıralı, seri anahtarına göre ya da tek bir etiket. */
   series?: SeriesLabels | undefined;
+  /** Categories on the y axis, bars grow to the right. @tr Kategoriler y ekseninde, çubuklar sağa doğru uzar. */
   horizontal?: Opt<boolean>;
+  /** "vertical" (default) or "horizontal"; same as `horizontal`. @tr "vertical" (varsayılan) ya da "horizontal"; `horizontal` ile aynı. */
   orientation?: Opt<"vertical" | "horizontal">;
+  /** Stack the series in one bar (negative values stack downwards). @tr Serileri tek çubukta üst üste koyar (negatif değerler aşağı doğru yığılır). */
   stacked?: Opt<boolean>;
+  /** Format of the x labels: a pipe name, `[pipe, ...args]` or a function; time axes pick one by default. @tr x etiketlerinin biçimi: pipe adı, `[pipe, ...args]` ya da fonksiyon; zaman eksenleri varsayılanı kendisi seçer. */
   xFormat?: Opt<FormatSpec>;
+  /** Value format for axis, tooltip and table: a pipe name, `[pipe, ...args]` or a function (default "number"). @tr Eksen, araç ipucu ve tablo için değer biçimi: pipe adı, `[pipe, ...args]` ya da fonksiyon (varsayılan "number"). */
   format?: Opt<FormatSpec>;
+  /** Fixes the low end of the value axis (still rounded to nice ticks). @tr Değer ekseninin alt ucunu sabitler (yine de düzgün çentiklere yuvarlanır). */
   yMin?: Opt<number>;
+  /** Fixes the high end of the value axis (still rounded to nice ticks). @tr Değer ekseninin üst ucunu sabitler (yine de düzgün çentiklere yuvarlanır). */
   yMax?: Opt<number>;
+  /** Grid lines along the value axis (default true). @tr Değer ekseni boyunca ızgara çizgileri (varsayılan true). */
   grid?: Opt<boolean>;
+  /** Header of the x column in the data table (default the x key). @tr Veri tablosundaki x sütununun başlığı (varsayılan x anahtarı). */
   xLabel?: Opt<string>;
+  /** `true` (default), `false`, or `(point) => content` for custom tooltip content. @tr `true` (varsayılan), `false` ya da özel araç ipucu içeriği için `(point) => content`. */
   tooltip?: TooltipProp<ChartPoint<D>>;
+  /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
   onSelect?: ((p: ChartPoint<D>) => void) | undefined;
 }
 interface Bar { key: string; index: number; si: number; x: number; y: number; width: number; height: number }

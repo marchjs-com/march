@@ -11,11 +11,11 @@ export { isSafeLink };
 
 /** Options of markdownNodes(). */
 export interface MarkdownOptions {
-  /** Render https images (default true). */
+  /** Render https images (default true). @tr https görsellerini gösterir (varsayılan true). */
   images?: boolean | undefined;
-  /** Open http(s) links in a new tab (default true). */
+  /** Open http(s) links in a new tab (default true). @tr http(s) bağlantılarını yeni sekmede açar (varsayılan true). */
   newTab?: boolean | undefined;
-  /** Added to heading levels (max h6). */
+  /** Added to heading levels (max h6). @tr Başlık düzeylerine eklenir (en çok h6). */
   headingOffset?: number | undefined;
 }
 

@@ -13,10 +13,13 @@ export const val = <T>(v: MaybeFn<T>): T => (typeof v === "function" ? (v as () 
 export const call = (c: unknown, ...a: unknown[]): unknown => (typeof c === "function" && !isReactive(c) ? (c as (...x: unknown[]) => unknown)(...a) : c);
 
 export interface IfProps<T = unknown> {
+  /** The condition (value, signal or function); children render while it is truthy. @tr Koşul (değer, sinyal ya da fonksiyon); doğru (truthy) olduğu sürece children gösterilir. */
   when: MaybeFn<T>;
+  /** Rendered while `when` is falsy. @tr `when` yanlış (falsy) olduğunda gösterilir. */
   else?: unknown;
+  /** Same as `else` (used when `else` is not given). @tr `else` ile aynı (`else` verilmezse kullanılır). */
   fallback?: unknown;
-  /** Content, or `(value) => content` receiving the truthy value. */
+  /** Content, or `(value) => content` receiving the truthy value. @tr İçerik ya da doğru (truthy) değeri alan `(value) => content`. */
   children?: unknown;
 }
 /** `<If when={cond} else={…}>…<Else>…</Else></If>` — children may be `(value) => …` to receive the truthy value. */
@@ -26,17 +29,21 @@ export function If<T>(props: IfProps<T>): () => unknown {
   return () => (on() ? untrack(() => call(props.children, cond.peek())) : call(props.else ?? props.fallback));
 }
 /** Marker used by the compiler; at runtime `<Else>` outside `<If>` renders its children. */
-export function Else(props: { children?: unknown }): unknown { return props.children; }
+export function Else(props: {
+  /** Content shown when the `<If>` condition is falsy. @tr `<If>` koşulu yanlış (falsy) olduğunda gösterilen içerik. */
+  children?: unknown;
+}): unknown { return props.children; }
 
 // <For> lives in dom/for.ts (not re-exported here: a page that only needs If/Try must not pull it into its chunk).
 
 export interface TryProps {
-  /** Rendered on error: content or `(error, reset) => content`. */
+  /** Rendered on error: content or `(error, reset) => content`. @tr Hata olunca gösterilir: içerik ya da `(error, reset) => content`. */
   fallback?: unknown;
-  /** Rendered while async children are pending. */
+  /** Rendered while async children are pending. @tr Async children beklenirken gösterilir. */
   loading?: unknown;
-  /** `false` disables console.error logging. */
+  /** `false` disables console.error logging. @tr `false` console.error kaydını kapatır. */
   log?: boolean;
+  /** The guarded content. @tr Korunan içerik. */
   children?: unknown;
 }
 /**

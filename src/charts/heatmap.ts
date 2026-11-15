@@ -16,22 +16,39 @@ export interface HeatCell { key: string; xi: number; yi: number; value: number |
 /** Point passed to `tooltip(point)` and `onSelect(point)` of a heatmap. */
 export interface HeatPoint { index: number; x: unknown; y: unknown; value: number | null; label: unknown; datum: HeatCell }
 export interface HeatmapProps<D = unknown> extends ChartBaseProps {
+  /** Rows: an array (or signal / function returning one) of objects. @tr Satırlar: nesnelerden oluşan bir dizi (ya da onu döndüren sinyal / fonksiyon). */
   data?: DataProp<D>;
+  /** Column key or getter (default "x"); a date in calendar mode. @tr Sütun anahtarı ya da getter (varsayılan "x"); takvim modunda bir tarih. */
   x?: Field<D> | undefined;
+  /** Row key or getter (default "y"). @tr Satır anahtarı ya da getter (varsayılan "y"). */
   y?: Field<D> | undefined;
+  /** Cell value key or getter (default "value"); duplicates are summed. @tr Hücre değeri anahtarı ya da getter (varsayılan "value"); tekrar edenler toplanır. */
   value?: Field<D> | undefined;
+  /** `true` or `{ weeks }` (default 12): columns are weeks, rows Monday…Sunday. @tr `true` ya da `{ weeks }` (varsayılan 12): sütunlar haftalar, satırlar Pazartesi…Pazar. */
   calendar?: Opt<boolean | { weeks?: number }>;
+  /** Last day of the calendar (default the latest date in the data). @tr Takvimin son günü (varsayılan verideki en son tarih). */
   end?: Opt<unknown>;
+  /** Format of the column labels (default String). @tr Sütun etiketlerinin biçimi (varsayılan String). */
   xFormat?: Opt<FormatSpec>;
+  /** Format of the row labels (default String). @tr Satır etiketlerinin biçimi (varsayılan String). */
   yFormat?: Opt<FormatSpec>;
+  /** Order (and completeness) of the columns (default data order). @tr Sütunların sırası (ve eksiksizliği) (varsayılan veri sırası). */
   xDomain?: Opt<readonly unknown[]>;
+  /** Order (and completeness) of the rows (default data order). @tr Satırların sırası (ve eksiksizliği) (varsayılan veri sırası). */
   yDomain?: Opt<readonly unknown[]>;
+  /** Format of the cell values in tooltip and table. @tr Araç ipucu ve tablodaki hücre değerlerinin biçimi. */
   format?: Opt<FormatSpec>;
+  /** Number of color levels (default 5; level 0 = empty or ≤ 0). @tr Renk düzeyi sayısı (varsayılan 5; 0. düzey = boş ya da ≤ 0). */
   levels?: Opt<number>;
+  /** Value of the top level (default the data maximum). @tr En üst düzeyin değeri (varsayılan verideki en büyük değer). */
   max?: Opt<number>;
+  /** Fixed cell size in px (default fits the width, at most 32). @tr px cinsinden sabit hücre boyutu (varsayılan genişliğe sığar, en çok 32). */
   cell?: Opt<number>;
+  /** Label of the value row in the tooltip (default "Value"). @tr Araç ipucundaki değer satırının etiketi (varsayılan "Value"). */
   valueLabel?: Opt<string>;
+  /** `true` (default), `false`, or `(point) => content` for custom tooltip content. @tr `true` (varsayılan), `false` ya da özel araç ipucu içeriği için `(point) => content`. */
   tooltip?: TooltipProp<HeatPoint>;
+  /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
   onSelect?: ((p: HeatPoint) => void) | undefined;
 }
 interface Label { key: string; label: unknown }

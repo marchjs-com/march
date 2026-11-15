@@ -14,25 +14,44 @@ import { clamp } from "../core/util.ts";
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
 export interface XYChartProps<D = unknown> extends ChartBaseProps {
+  /** Rows: an array (or signal / function returning one) of objects. @tr Satırlar: nesnelerden oluşan bir dizi (ya da onu döndüren sinyal / fonksiyon). */
   data?: DataProp<D>;
+  /** The x value: a key or `(row, i) => value` (default the index). Dates → time axis, numbers → linear, else categories. @tr x değeri: bir anahtar ya da `(row, i) => value` (varsayılan sıra numarası). Tarihler → zaman ekseni, sayılar → doğrusal, diğerleri → kategoriler. */
   x?: Field<D> | undefined;
+  /** Value series: a key, a getter, or a list of them (one series each; default "y"). @tr Değer serileri: bir anahtar, bir getter ya da bunların listesi (her biri bir seri; varsayılan "y"). */
   y?: SeriesSpec<D> | readonly SeriesSpec<D>[] | undefined;
+  /** Series labels for legend, tooltip and table: aligned with `y`, keyed by series key, or one label. @tr Gösterge, araç ipucu ve tablo için seri etiketleri: `y` ile sıralı, seri anahtarına göre ya da tek bir etiket. */
   series?: SeriesLabels | undefined;
+  /** Forces the x scale: "time", "linear" or "band" (default detected from the data). @tr x ölçeğini zorlar: "time", "linear" ya da "band" (varsayılan veriden anlaşılır). */
   xType?: Opt<XKind>;
+  /** Format of the x labels: a pipe name, `[pipe, ...args]` or a function; time axes pick one by default. @tr x etiketlerinin biçimi: pipe adı, `[pipe, ...args]` ya da fonksiyon; zaman eksenleri varsayılanı kendisi seçer. */
   xFormat?: Opt<FormatSpec>;
+  /** Value format for axis, tooltip and table: a pipe name, `[pipe, ...args]` or a function (default "number"). @tr Eksen, araç ipucu ve tablo için değer biçimi: pipe adı, `[pipe, ...args]` ya da fonksiyon (varsayılan "number"). */
   format?: Opt<FormatSpec>;
+  /** Fixes the low end of the value axis (still rounded to nice ticks). @tr Değer ekseninin alt ucunu sabitler (yine de düzgün çentiklere yuvarlanır). */
   yMin?: Opt<number>;
+  /** Fixes the high end of the value axis (still rounded to nice ticks). @tr Değer ekseninin üst ucunu sabitler (yine de düzgün çentiklere yuvarlanır). */
   yMax?: Opt<number>;
+  /** Include 0 in the value axis (area charts always do). @tr Değer eksenine 0'ı katar (alan grafikleri her zaman katar). */
   zero?: Opt<boolean>;
+  /** Grid lines: `true` (default, horizontal), `false`, "x" or "both" (adds vertical ones). @tr Izgara çizgileri: `true` (varsayılan, yatay), `false`, "x" ya da "both" (dikeyleri de ekler). */
   grid?: Opt<boolean | "x" | "both">;
+  /** Above this many points a series is downsampled with LTTB (default 2 × plot width). @tr Bir seri bu kadar noktayı aşınca LTTB ile seyreltilir (varsayılan 2 × çizim genişliği). */
   maxPoints?: Opt<number>;
+  /** Drag across the plot to zoom into an x range; double click, Escape or "Reset zoom" resets. @tr Bir x aralığına yakınlaşmak için çizim üzerinde sürükleyin; çift tıklama, Escape ya da "Reset zoom" sıfırlar. */
   zoom?: Opt<boolean>;
+  /** Header of the x column in the data table (default the x key). @tr Veri tablosundaki x sütununun başlığı (varsayılan x anahtarı). */
   xLabel?: Opt<string>;
+  /** `true` (default), `false`, or `(point) => content` for custom tooltip content. @tr `true` (varsayılan), `false` ya da özel araç ipucu içeriği için `(point) => content`. */
   tooltip?: TooltipProp<ChartPoint<D>>;
+  /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
   onSelect?: ((p: ChartPoint<D>) => void) | undefined;
 }
 export type LineChartProps<D = unknown> = XYChartProps<D>;
-export interface AreaChartProps<D = unknown> extends XYChartProps<D> { stacked?: Opt<boolean> }
+export interface AreaChartProps<D = unknown> extends XYChartProps<D> {
+  /** Stack the visible series. @tr Görünen serileri üst üste yığar. */
+  stacked?: Opt<boolean>;
+}
 type Stack = Map<string, { lo: number[] | null; hi: (number | null)[] }>;
 
 /** Line chart. See docs/charts.md for props. */

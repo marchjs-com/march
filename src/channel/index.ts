@@ -132,7 +132,12 @@ const BUS = context<Bus | null>(null);
  */
 export function channelScope(label?: string): void { provide(BUS, new Bus(label ?? `scope ${++scopes}`)); }
 /** `<ChannelScope>…</ChannelScope>`: channelScope() for a subtree. */
-export function ChannelScope(props: { label?: string; children?: unknown }): unknown {
+export function ChannelScope(props: {
+  /** A name for the scope (shown in devtools; default "scope N"). @tr Kapsamın adı (devtools'ta gösterilir; varsayılan "scope N"). */
+  label?: string;
+  /** Content, or a zero-arg function returning it, that uses the scope. @tr Kapsamı kullanan içerik ya da onu döndüren argümansız fonksiyon. */
+  children?: unknown;
+}): unknown {
   channelScope(props.label);
   const c = props.children;
   return typeof c === "function" && !c.length ? (c as () => unknown)() : c;
