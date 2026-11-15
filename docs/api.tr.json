@@ -139,6 +139,8 @@
   "TYPES": "Alan türleri ve temel davranışları. `fieldType(name, def)` ile genişletilir."
  },
  "hadi-march/ui": {
+  "IconPicker": "Simge seçici: seçili simgeyi ve adını gösteren düğme; açılan panelde arama, süzgeç çipleri ve bütün simgelerin ızgarası (inline ile düğmesiz).",
+  "ICON_GROUPS": "IconPicker süzgeç çiplerinin hazır listesi: oklar, dosya, medya, iletişim, kişi, düzen, dolu.",
   "typeScriptPlugin": "TypeScript dil servisi eklentisi: bir worker içinde çalışır; bütün JavaScript / TypeScript / DOM API tamamlaması, hata ve uyarıların yerleri. CSP Trusted Types ile çalışıyorsa trusted-types march-worker gerekir.",
   "AppPreview": "IDE kabuğunun önizleme paneli: araç çubuğunda önizlemenin kendi teması, vurgu rengi ve açık / koyu kipi (yalnız önizleme etkilenir), ortada gösterilen içerik; araç çubuğu ve her seçici kapatılabilir.",
   "marchLanguagePlugin": "March kodu için öneriler: import sonrası hadi-march bileşenleri ve işlevleri (seçince içe aktarma satırı tamamlanır), from sonrası alt yollar, JSX içinde bileşenler.",

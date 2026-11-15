@@ -57,11 +57,12 @@ with it. `requires` starts it after the plugins it needs; removing one removes t
 
 `AppPreview` is the preview panel of an IDE shell: a toolbar (your `tools` at the start; the preview's own color
 theme, accent and light / dark at the end: only the preview takes them) over a stage that shows the children in its
-middle. `toolbar={false}` hides the bar, `toolbar={{ accent: false }}` one picker; `theme`, `accent` and `mode` take
-signals to keep the choices.
+middle. Every picker is off until asked for (`toolbar={{ theme: true, mode: true }}`, or `toolbar` for all of them): a
+picker added later stays hidden. The bar shows only while at least one picker (or your `tools`) does. `theme`, `accent`
+and `mode` take signals to keep the choices.
 
 ```tsx
-<AppPreview theme={$theme} toolbar={{ mode: false }} tools={<Button size="sm">Yenile</Button>}>
+<AppPreview theme={$theme} toolbar={{ theme: true, accent: true }} tools={<Button size="sm">Yenile</Button>}>
   <MyComponent />
 </AppPreview>
 ```

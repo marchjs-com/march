@@ -10,6 +10,7 @@ export * from "./forms/date-picker/index.ts";
 export * from "./forms/date-range-picker/index.ts";
 export * from "./forms/date-time-input/index.ts";
 export * from "./forms/file-upload/index.ts";
+export * from "./forms/icon-picker/index.ts";
 export * from "./forms/key-value-editor/index.ts";
 export * from "./forms/list-editor/index.ts";
 export * from "./forms/multi-select/index.ts";

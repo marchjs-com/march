@@ -65,6 +65,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | DateRangePicker | stable | Date range { from, to } with presets (Segmented) and a custom pair of DatePickers. | [Segmented](#segmented), [DatePicker](#datepicker) |
 | DateTimeInput | stable | A DatePicker and a TimeInput editing one ISO timestamp in local time. | [DatePicker](#datepicker), [TimeInput](#timeinput) |
 | FileUpload | stable | Drop zone or click; accept / size checks, image and audio previews, upload progress and cancel. | [Progress](#progress), [ListRow](#listrow), [IconButton](#iconbutton), [Button](#button), [Badge](#badge) |
+| IconPicker | experimental | Choose an icon: a button with the chosen icon and its name opens a panel with a search, filter chips and a grid of every icon. | Dropdown, [SearchBox](#searchbox), [Chip](#chip), [IconButton](#iconbutton), [Empty](#empty) |
 | KeyValueEditor | stable | Edit key → value rows as an object; order kept, duplicate keys flagged, numbers on request. | [TextInput](#textinput), [RowTools](#rowtools), [Button](#button) |
 | ListEditor | stable | Edit a list of strings: add, edit, reorder, remove; pasted lines become items. | [TextInput](#textinput), [RowTools](#rowtools), [Button](#button) |
 | MultiSelect | stable | Several values as removable chips: a Combobox with multiple (static options or async search). | [Combobox](#combobox) |
@@ -1296,6 +1297,20 @@ A button that shows only an icon. `label` is required: it becomes the accessible
 ```
 
 Full page: src/components/actions/icon-button/docs.md
+
+## IconPicker
+
+Choose an icon. A button shows the chosen icon and its name; it opens a panel with a search (by name), filter chips (arrows, files, media, messages, people, layout, filled) and a grid of every built-in icon. The value is the icon's export name (`"plus"`); `ICONS[name]` (hadi-march/icons/catalog) gives the icon itself.
+
+Composed of: Dropdown, [SearchBox](#searchbox), [Chip](#chip), [IconButton](#iconbutton), [Empty](#empty)
+
+```tsx
+let $icon = "plus"
+<IconPicker value={$icon} onChange={(n) => $icon = n} />
+<IconPicker inline groups={false} value={$icon} onChange={(n) => $icon = n} />
+```
+
+Full page: src/components/forms/icon-picker/docs.md
 
 ## IconTile
 

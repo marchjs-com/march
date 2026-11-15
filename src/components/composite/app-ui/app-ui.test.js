@@ -70,7 +70,7 @@ test("AppUI: typing in a file's editor keeps the editor (and its focus): the tex
   dispose();
 });
 
-test("AppPreview: the stage takes its own theme, mode and accent; the toolbar and each picker can be turned off", async () => {
+test("AppPreview: the stage takes its own theme, mode and accent; each picker is off unless asked for, the bar only shows with one", async () => {
   const { AppPreview } = await import("./index.ts");
   const { signal } = await import("../../../index.ts");
   const theme = signal("neon"), mode = signal("light"), accent = signal("brand-green"), bar = signal(true);
@@ -83,11 +83,17 @@ test("AppPreview: the stage takes its own theme, mode and accent; the toolbar an
   assert.ok(el.querySelector(".m-app-pv-bar .m-theme-toggle"));
   mode.set("system");
   assert.equal(stage.getAttribute("data-theme"), null, "system: the page's mode");
-  bar.set({ mode: false });
-  assert.equal(el.querySelector(".m-app-pv-bar .m-theme-toggle"), null);
+  bar.set({ mode: true });
+  assert.ok(el.querySelector(".m-app-pv-bar .m-theme-toggle"));
+  assert.equal(el.querySelector(".m-app-pv-bar .m-theme-menu-btn"), null, "a picker not named stays hidden");
+  bar.set({});
+  assert.equal(el.querySelector(".m-app-pv-bar"), null, "nothing to show: no bar");
   bar.set(false);
   assert.equal(el.querySelector(".m-app-pv-bar"), null);
   dispose();
+  const plain = mount(() => h(AppPreview, {}, "x"));
+  assert.equal(plain.el.querySelector(".m-app-pv-bar"), null, "by default the bar is hidden");
+  plain.dispose();
 });
 
 test("marchLanguagePlugin: after import every export, picking writes the whole import; from \"…\" the subpaths", async () => {

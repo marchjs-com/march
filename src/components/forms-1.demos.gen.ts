@@ -4,4 +4,6 @@ import * as d0 from "./forms/calendar/demo.tsx";
 import * as p0 from "./forms/calendar/playground.ts";
 import * as d1 from "./forms/checkbox/demo.tsx";
 import * as p1 from "./forms/checkbox/playground.ts";
-export { d0, p0, d1, p1 };
+import * as d2 from "./forms/checkbox-group/demo.tsx";
+import * as p2 from "./forms/checkbox-group/playground.ts";
+export { d0, p0, d1, p1, d2, p2 };

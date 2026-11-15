@@ -1,6 +1,6 @@
 // AppPreview (march-app-ui): the preview panel of an IDE shell. A toolbar (your tools on the start side; the preview's
 // own color theme, accent and light / dark on the end side: only the preview takes them, the page keeps its look) over
-// a stage that shows the children in its middle. The toolbar and each of its pickers can be turned off.
+// a stage that shows the children in its middle. Each picker is off until asked for; the bar shows only while one is.
 import "./app-ui.css";
 import { signal, effect, untrack, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
@@ -14,7 +14,10 @@ import type { ColorToken } from "../../../theme/colors.ts";
 
 messages("tr", tr);
 
-/** Which parts of the preview toolbar show: false hides the whole bar. */
+/**
+ * The tools of the preview toolbar to show: each is off unless named (a tool added later stays hidden until asked
+ * for); true: every tool. The bar itself shows only while at least one of them (or your `tools`) does.
+ */
 export type AppPreviewToolbar = boolean | { theme?: boolean; accent?: boolean; mode?: boolean };
 export interface AppPreviewProps {
   /** The preview's color theme (a signal keeps it; default "hadi"). */
@@ -23,7 +26,7 @@ export interface AppPreviewProps {
   accent?: Signal<ColorToken> | undefined;
   /** Light / dark ("system": the page's). */
   mode?: Signal<ThemeMode> | undefined;
-  /** The toolbar and its pickers (default all). */
+  /** The toolbar's pickers to show (default none: the bar is hidden while it has nothing to show). */
   toolbar?: MaybeFn<AppPreviewToolbar | undefined>;
   /** Your items at the start of the toolbar. */
   tools?: unknown;
@@ -38,9 +41,10 @@ export interface AppPreviewProps {
 export function AppPreview(props: AppPreviewProps): Element {
   const theme = props.theme ?? signal("hadi"), accent = props.accent ?? signal<ColorToken>("primary"), mode = props.mode ?? signal<ThemeMode>("system");
   const look = (): "light" | "dark" | null => (mode() === "system" ? null : (mode() as "light" | "dark"));
-  const on = (k: "theme" | "accent" | "mode"): boolean => { const b = val(props.toolbar); return b === undefined || b === true || (typeof b === "object" && b[k] !== false); };
+  const on = (k: "theme" | "accent" | "mode"): boolean => { const b = val(props.toolbar); return b === true || (typeof b === "object" && b[k] === true); };
+  const anything = (): boolean => props.tools != null || on("theme") || on("accent") || on("mode");
   // each picker is built once (untracked): only turning it on or off draws it again
-  const bar = (): unknown => (val(props.toolbar) === false ? null : h("div", { class: "m-app-pv-bar", role: "toolbar", "aria-label": () => val(props.label) ?? t`Preview tools` },
+  const bar = (): unknown => (!anything() ? null : h("div", { class: "m-app-pv-bar", role: "toolbar", "aria-label": () => val(props.label) ?? t`Preview tools` },
     props.tools ?? null,
     h("span", { class: "m-app-pv-fill" }),
     () => (on("theme") ? untrack(() => ThemeMenu({ current: true, size: "sm", view: "cards", modes: false, accents: false, headings: false, label: () => t`Preview theme`, placement: "bottom-end", value: theme, mode, onChange: (id: string) => theme.set(id) })) : null),

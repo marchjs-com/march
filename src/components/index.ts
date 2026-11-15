@@ -56,6 +56,7 @@ export * from "./composite/format-toolbar/index.ts";
 export * from "./composite/gradient-editor/index.ts";
 export * from "./layout/grid/index.ts";
 export * from "./actions/icon-button/index.ts";
+export * from "./forms/icon-picker/index.ts";
 export * from "./data/icon-tile/index.ts";
 export * from "./composite/image-cropper/index.ts";
 export * from "./composite/json-editor/index.ts";

@@ -74,6 +74,7 @@ export const roots: Record<string, string> = {
   "HonestCompare": "m-hc",
   "HorizontalScroll": "m-hs",
   "IconButton": "m-icon-btn",
+  "IconPicker": "m-btn",
   "IconTile": "m-icon-tile",
   "ImageCropper": "m-crop",
   "JsonEditor": "m-json-modes",

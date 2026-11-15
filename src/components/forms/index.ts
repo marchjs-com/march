@@ -11,6 +11,7 @@ export * from "./date-picker/index.ts";
 export * from "./date-range-picker/index.ts";
 export * from "./date-time-input/index.ts";
 export * from "./file-upload/index.ts";
+export * from "./icon-picker/index.ts";
 export * from "./key-value-editor/index.ts";
 export * from "./list-editor/index.ts";
 export * from "./multi-select/index.ts";

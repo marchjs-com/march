@@ -1,0 +1,12 @@
+/* March — IconPicker: the button (the chosen icon and its name) and its panel (search, filter chips, the grid). */
+.m-btn.m-ipk-btn { gap: var(--m-space-1); max-inline-size: 100%; }
+.m-ipk-cur { inline-size: 1.05rem; block-size: 1.05rem; flex: none; }
+.m-ipk-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-ipk-none { display: inline-block; inline-size: 1rem; block-size: 1rem; border: 1.5px dashed var(--m-border); border-radius: var(--m-radius-1); flex: none; }
+.m-ipk-panel { inline-size: min(22rem, calc(100vw - 16px)); }
+.m-ipk { display: grid; gap: var(--m-space-2); padding: var(--m-space-2); }
+.m-ipk-groups { display: flex; flex-wrap: wrap; gap: var(--m-space-1); }
+.m-ipk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr)); gap: 2px; max-block-size: 15rem; overflow: hidden auto; }
+.m-icon-btn.m-ipk-item { inline-size: 100%; aspect-ratio: 1; }
+.m-ipk-count { margin: 0; color: var(--m-muted); font-size: var(--m-text-xs); }
+.m-ipk.m-ipk-inline { inline-size: min(22rem, 100%); border: 1px solid var(--m-border); border-radius: var(--m-radius); background: var(--m-surface); }

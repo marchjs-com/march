@@ -666,6 +666,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | DateRangePicker | stable | Date range { from, to } with presets (Segmented) and a custom pair of DatePickers. | Segmented, DatePicker |
 | DateTimeInput | stable | A DatePicker and a TimeInput editing one ISO timestamp in local time. | DatePicker, TimeInput |
 | FileUpload | stable | Drop zone or click; accept / size checks, image and audio previews, upload progress and cancel. | Progress, ListRow, IconButton, Button, Badge |
+| IconPicker | experimental | Choose an icon: a button with the chosen icon and its name opens a panel with a search, filter chips and a grid of every icon. | Dropdown, SearchBox, Chip, IconButton, Empty |
 | KeyValueEditor | stable | Edit key → value rows as an object; order kept, duplicate keys flagged, numbers on request. | TextInput, RowTools, Button |
 | ListEditor | stable | Edit a list of strings: add, edit, reorder, remove; pasted lines become items. | TextInput, RowTools, Button |
 | MultiSelect | stable | Several values as removable chips: a Combobox with multiple (static options or async search). | Combobox |
