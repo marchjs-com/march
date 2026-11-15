@@ -4,7 +4,7 @@
 // services: a panel that shows a `file` is drawn by the file type that opens its path (codeEditorPlugin: code files in
 // a code editor), else as plain text. Colours come from the page's theme and accent.
 import "./app-ui.css";
-import { computed, onCleanup } from "../../../core/reactive.ts";
+import { computed, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -49,7 +49,8 @@ export interface AppUIProps extends Omit<DockLayoutProps, "panels"> {
 function fileView(kit: AppKit, file: AppFile): () => unknown {
   return () => {
     const type = kit.typeOf(file.path);
-    return type ? type.mount(file) : h("pre", { class: "m-app-plain" }, () => file.text());
+    // only a change of the file type draws it again: what the view reads while it is built (the text) must not
+    return untrack(() => (type ? type.mount(file) : h("pre", { class: "m-app-plain" }, () => file.text())));
   };
 }
 

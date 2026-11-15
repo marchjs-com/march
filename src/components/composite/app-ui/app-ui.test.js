@@ -57,3 +57,15 @@ test("AppUI: a panel with a file is drawn by the code editor plugin; without a t
   assert.equal(el.querySelector(".m-app-plain").textContent, "plain");
   dispose();
 });
+
+test("AppUI: typing in a file's editor keeps the editor (and its focus): the text change does not rebuild it", async () => {
+  const { codeEditorPlugin } = await import("./index.ts");
+  const { signal } = await import("../../../index.ts");
+  const text = signal("let a = 1");
+  const panels = [{ id: "code", title: "a.tsx", file: { path: "a.tsx", text, set: (v) => text.set(v) } }];
+  const { el, dispose } = mount(() => h(AppUI, { panels, plugins: [codeEditorPlugin()], commands: false }));
+  const area = el.querySelector(".m-ced-input");
+  text.set("let a = 12");
+  assert.equal(el.querySelector(".m-ced-input"), area, "the same text field");
+  dispose();
+});
