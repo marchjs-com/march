@@ -74,6 +74,15 @@ subpath after `from`, after `from "` the subpaths, after `<` the components, els
 `catalog` is `{ subpaths: [{ subpath, items: [[name, kind, summary]] }] }` (the API reference's index) or a function
 that fetches it.
 
+## TypeScript
+
+`typeScriptPlugin({ worker, typescript, lib })` runs the TypeScript language service in a worker: suggestions for the
+whole JavaScript / TypeScript / DOM API (after the March plugin's own), and every script file's errors and warnings
+underlined in the code editor (red, amber) and counted under it with the first one's line. The app serves three things:
+`ts-worker.js` (from this folder), the typescript package's `lib/typescript.js` and its `lib/lib.*.d.ts` files (read on
+demand from `lib`). Under a CSP with Trusted Types the worker starts through the `march-worker` policy (same-origin `.js`
+only): the CSP must list `trusted-types march-worker`.
+
 ## Accessibility
 
 The Layout menu is a Menu (a menu button, arrow keys among the entries, Escape closes); the workspace is a DockLayout.

@@ -53,7 +53,16 @@ function start() {
 const flat = (parts) => (parts ?? []).map((x) => x.text).join("");
 
 const handlers = {
-  init({ tsUrl, lib }) { libUrl = lib; importScripts(tsUrl); start(); return { version: ts.version }; },
+  init({ tsUrl, lib }) {
+    libUrl = lib;
+    // under the page's Trusted Types (CSP trusted-types march-worker) importScripts takes only a policy's URL: same
+    // origin, .js
+    const tt = self.trustedTypes;
+    const policy = tt ? tt.createPolicy("march-worker", { createScriptURL: (u) => { const x = new URL(u, self.location.href); if (x.origin !== self.location.origin || !/\.js$/.test(x.pathname)) throw new Error(`not a script of this site: ${u}`); return x.href; } }) : null;
+    importScripts(policy ? policy.createScriptURL(tsUrl) : tsUrl);
+    start();
+    return { version: ts.version };
+  },
   files({ files: list }) {
     const seen = new Set();
     for (const [p0, text] of Object.entries(list)) {

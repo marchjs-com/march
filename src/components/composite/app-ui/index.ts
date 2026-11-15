@@ -20,6 +20,8 @@ export { codeEditorPlugin } from "./code.ts";
 export type { LanguageService, CodeEditorPluginOptions } from "./code.ts";
 export { marchLanguagePlugin } from "./march-lang.ts";
 export { AppPreview } from "./preview.ts";
+export { typeScriptPlugin } from "./ts.ts";
+export type { TypeScriptService, TypeScriptPluginOptions, CodeProblem } from "./ts.ts";
 export type { AppPreviewProps, AppPreviewToolbar } from "./preview.ts";
 export type { MarchCatalog, MarchExport, MarchLanguageOptions } from "./march-lang.ts";
 

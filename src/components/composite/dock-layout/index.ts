@@ -50,6 +50,8 @@ export interface DockPanel extends PanelDef {
   dirty?: MaybeFn<boolean | null | undefined>;
   /** Runs when the panel becomes visible. */
   onShow?: () => void;
+  /** The tab cannot be chosen (and its content is not shown while it is). */
+  disabled?: MaybeFn<boolean | undefined>;
 }
 /** Where layouts are kept: any get / set (sync or async). The Storage manager's areas fit. */
 export interface DockStorage { get(key: string): unknown; set(key: string, value: unknown): unknown }
@@ -247,7 +249,7 @@ export function DockLayout(props: DockLayoutProps): Element {
     f.max.set(isMax);
     f.canClose.set(C.canCollapse(V, g.id));
   }
-  const tabSpec = (d: DockPanel): TabSpec => ({ id: d.id, label: panels.get(d.id)?.label ?? (() => val(d.title)), icon: d.icon, badge: d.badge, dirty: d.dirty === undefined ? undefined : () => !!val(d.dirty), closable: d.closable ?? undefined });
+  const tabSpec = (d: DockPanel): TabSpec => ({ id: d.id, label: panels.get(d.id)?.label ?? (() => val(d.title)), icon: d.icon, badge: d.badge, dirty: d.dirty === undefined ? undefined : () => !!val(d.dirty), closable: d.closable ?? undefined, disabled: d.disabled === undefined ? undefined : () => !!val(d.disabled) });
   function makeFrame(id: string): Frame {
     return createRoot((dispose) => {
       const f = { group: id, placed: false, dispose, tabs: signal<TabSpec[]>([]), active: signal<string | null>(null), max: signal(false), canClose: signal(true), bar: undefined } as unknown as Frame;

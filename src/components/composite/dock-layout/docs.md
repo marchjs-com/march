@@ -19,7 +19,7 @@ Panels never move in the DOM: an iframe keeps running, an editor keeps its state
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `panels` | `DockPanel[]` / accessor | — | `{ id, title, icon, content, min: [w, h], place, closable, badge, dirty, onShow }`; the list may change (a new panel goes to its `place`, a removed one leaves the tree) |
+| `panels` | `DockPanel[]` / accessor | — | `{ id, title, icon, content, min: [w, h], place, closable, badge, dirty, disabled, onShow }`; the list may change (a new panel goes to its `place`, a removed one leaves the tree) |
 | `presets` | `{ [name]: { title, tree } }` | — | ready-made layouts written with `row([weight, child], …)`, `col(…)`, `tabs(ids, { collapsed })`; the first is the default |
 | `preset` | string | first | the default preset |
 | `layout` | tree | first panel, others at their `place` | the default without presets |

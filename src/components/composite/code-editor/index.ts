@@ -54,8 +54,8 @@ export interface CodeCompleteContext {
   /** The character just typed ("" when asked by a key). */
   typed: string;
 }
-/** A marked range of the text: "flash" lights up once, "error" stays underlined. */
-export interface CodeMark { from: number; to: number; kind?: "flash" | "error" }
+/** A marked range of the text: "flash" lights up once, "error" and "warning" stay underlined (red, amber). */
+export interface CodeMark { from: number; to: number; kind?: "flash" | "error" | "warning"; /** Shown as the mark's tooltip (the problem). */ title?: string }
 
 export interface CodeEditorProps extends ControlProps<string> {
   /** Colours: js / ts / jsx / tsx (default "tsx"), css, html, json, sh; "" for none. */
@@ -110,7 +110,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       if (!mark) { out.push(node); return; }
       const key = `${mark.kind ?? "flash"}:${mark.from}:${mark.to}:${src.slice(mark.from, mark.to)}`;
       const flash = (mark.kind ?? "flash") === "flash";
-      const el = h("mark", { class: flash ? "m-ced-mark is-flash" : "m-ced-mark is-error" }, node, flash && props.flash !== "none" && props.flash !== false && !seen.has(key) ? h("i", { class: "m-ced-glow", "data-k": key }) : null);
+      const el = h("mark", { class: flash ? "m-ced-mark is-flash" : `m-ced-mark is-${mark.kind === "warning" ? "warning" : "error"}`, title: mark.title ?? null }, node, flash && props.flash !== "none" && props.flash !== false && !seen.has(key) ? h("i", { class: "m-ced-glow", "data-k": key }) : null);
       now.add(key);
       out.push(el);
     };

@@ -11,6 +11,7 @@
 /* marks: a flash lights up once (the glow fades on the motion engine), an error stays underlined */
 .m-ced-mark { position: relative; background: none; color: inherit; border-radius: var(--m-radius-1); }
 .m-ced-mark.is-error { text-decoration: underline wavy var(--m-danger); text-underline-offset: .25em; }
+.m-ced-mark.is-warning { text-decoration: underline wavy var(--m-warn); text-underline-offset: .25em; }
 .m-ced-glow { position: absolute; inset: -1px -2px; border-radius: inherit; background: color-mix(in srgb, var(--m-editor-accent) 32%, transparent); opacity: 0; pointer-events: none; }
 /* the foot line: what the owner says, the shortcut hint, the copy button */
 .m-panel-header.m-ced-foot { align-items: center; padding-block: var(--m-space-1); }
