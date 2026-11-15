@@ -1,11 +1,48 @@
 /* CodeEditor: a transparent text field over its coloured copy (same font, same wrapping), inside an EditorFrame.
    The colours are the CodeView tokens (.m-tok-*). */
 .m-ced { --m-ced-pad: var(--m-space-3) var(--m-space-4); }
-.m-ced-area { position: relative; display: grid; min-inline-size: 0; font: var(--m-text-sm) / 1.7 var(--m-font-mono); }
-.m-ced-paint, .m-ced-input { grid-area: 1 / 1; box-sizing: border-box; margin: 0; padding: var(--m-ced-pad); border: 0; background: none; font: inherit; letter-spacing: 0; tab-size: 2; white-space: pre-wrap; overflow-wrap: anywhere; }
-.m-ced-paint { pointer-events: none; color: var(--m-text); min-inline-size: 0; }
-.m-ced-paint > code { font: inherit; }
-.m-ced-input { inline-size: 100%; block-size: 100%; color: transparent; caret-color: var(--m-text); resize: none; outline: none; overflow: hidden; }
+.m-ced-body { position: relative; display: flex; flex-direction: column; min-inline-size: 0; }
+.m-ced-body > .m-ced-area { flex: 1 1 auto; }
+.m-ced-area { position: relative; display: grid; min-inline-size: 0; font: var(--m-ced-size, var(--m-text-sm)) / var(--m-ced-lh, 1.7) var(--m-font-mono); font-variant-ligatures: contextual; }
+.m-ced-paint, .m-ced-deco, .m-ced-input { grid-area: 1 / 1; box-sizing: border-box; margin: 0; padding: var(--m-ced-pad); border: 0; background: none; font: inherit; letter-spacing: 0; tab-size: 2; white-space: pre-wrap; overflow-wrap: anywhere; }
+.m-ced-paint { position: relative; z-index: 1; pointer-events: none; color: var(--m-text); min-inline-size: 0; }
+.m-ced-paint > code, .m-ced-deco > code { font: inherit; }
+/* the hover probe reads the coloured copy under the pointer */
+.m-ced-area.is-probe .m-ced-input { pointer-events: none; }
+.m-ced-area.is-probe .m-ced-paint { pointer-events: auto; }
+/* the decoration layer: the same text, unseen; only its marks show (under the colours) */
+.m-ced-deco { position: relative; z-index: 0; pointer-events: none; color: transparent; min-inline-size: 0; }
+.m-ced-guide { display: inline-block; block-size: 1lh; vertical-align: top; box-shadow: inset 1px 0 0 color-mix(in srgb, var(--m-text) 13%, transparent); }
+.m-ced-cur { position: absolute; z-index: -1; inset-inline: 0; block-size: 1lh; background: color-mix(in srgb, var(--m-text) 4.5%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-text) 5%, transparent); }
+.m-ced-occ { border-radius: 2px; background: color-mix(in srgb, var(--m-editor-accent) 16%, transparent); }
+.m-ced-bm { border-radius: 2px; background: color-mix(in srgb, var(--m-editor-accent) 18%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-editor-accent) 55%, transparent); }
+.m-ced-found { border-radius: 2px; background: color-mix(in srgb, var(--m-warn) 28%, transparent); }
+.m-ced-found.is-current { background: color-mix(in srgb, var(--m-warn) 55%, transparent); box-shadow: 0 0 0 1px var(--m-warn); }
+.m-ced-at { display: inline-block; inline-size: 0; block-size: 1lh; vertical-align: top; scroll-margin: 3lh 2em; }
+/* the IDE palette (palette="ide", default): the theme's category colours, safe on its background in light and dark */
+.m-ced.is-ide {
+  --m-syn-kw: var(--m-cat-4-text, var(--m-special-text)); --m-syn-str: var(--m-cat-1-text, var(--m-success-text)); --m-syn-num: var(--m-cat-3-text, var(--m-warn-text));
+  --m-syn-fn: var(--m-cat-6-text, var(--m-danger-text)); --m-syn-type: var(--m-cat-8-text, var(--m-info-text)); --m-syn-prop: var(--m-cat-2-text, var(--m-primary-text));
+  --m-syn-tag: var(--m-cat-2-text, var(--m-info-text)); --m-syn-attr: var(--m-cat-8-text, var(--m-primary-text)); --m-syn-com: var(--m-muted); --m-syn-punct: var(--m-muted);
+}
+.m-ced.is-ide .m-ced-paint { --m-tok-kw-w: 500; }
+.m-ced.is-ide .m-tok-kw { color: var(--m-syn-kw); font-weight: var(--m-tok-kw-w); }
+.m-ced.is-ide .m-tok-str { color: var(--m-syn-str); }
+.m-ced.is-ide :is(.m-tok-num, .m-tok-lit) { color: var(--m-syn-num); }
+.m-ced.is-ide .m-tok-fn { color: var(--m-syn-fn); }
+.m-ced.is-ide .m-tok-type { color: var(--m-syn-type); }
+.m-ced.is-ide .m-tok-prop { color: var(--m-syn-prop); }
+.m-ced.is-ide .m-tok-tag { color: var(--m-syn-tag); }
+.m-ced.is-ide .m-tok-attr { color: var(--m-syn-attr); }
+.m-ced.is-ide .m-tok-com { color: var(--m-syn-com); font-style: italic; }
+.m-ced.is-ide .m-tok-punct { color: var(--m-syn-punct); }
+/* brackets by depth (bracketColors); one with no mate is red */
+.m-ced { --m-syn-br0: var(--m-cat-6-text, var(--m-warn-text)); --m-syn-br1: var(--m-cat-4-text, var(--m-special-text)); --m-syn-br2: var(--m-cat-2-text, var(--m-info-text)); }
+.m-ced .m-tok-br0 { color: var(--m-syn-br0); }
+.m-ced .m-tok-br1 { color: var(--m-syn-br1); }
+.m-ced .m-tok-br2 { color: var(--m-syn-br2); }
+.m-ced .m-tok-br-bad { color: var(--m-danger-text); text-decoration: underline wavy var(--m-danger); text-underline-offset: .25em; }
+.m-ced-input { position: relative; z-index: 2; inline-size: 100%; block-size: 100%; color: transparent; caret-color: var(--m-text); resize: none; outline: none; overflow: hidden; }
 .m-ced-input::selection { background: color-mix(in srgb, var(--m-editor-accent) 30%, transparent); }
 .m-ced.is-disabled .m-ced-input { cursor: not-allowed; }
 /* marks: a flash lights up once (the glow fades on the motion engine), an error stays underlined */
@@ -28,10 +65,10 @@
 /* lineNumbers: a gutter at the start; each line's number (and its mark) sits at its line's start, the lit line's bar
    lies behind the text; the press area over the gutter takes the clicks (the text field keeps the rest) */
 .m-ced.is-gutter { --m-ced-gutter: 3.4em; }
-.m-ced.is-gutter :is(.m-ced-paint, .m-ced-input) { padding-inline-start: calc(var(--m-ced-gutter) + var(--m-space-3)); }
-.m-ced.is-gutter .m-ced-paint { position: relative; z-index: 0; }
+.m-ced.is-gutter :is(.m-ced-paint, .m-ced-deco, .m-ced-input) { padding-inline-start: calc(var(--m-ced-gutter) + var(--m-space-3)); }
+
 .m-ced.is-gutter .m-ced-area::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: var(--m-ced-gutter); border-inline-end: var(--m-border-w, 1px) solid var(--m-border); background: color-mix(in srgb, var(--m-text) 3%, transparent); pointer-events: none; }
-.m-ced-ln { position: absolute; inset-inline-start: 0; inline-size: var(--m-ced-gutter); padding-inline-end: .7em; box-sizing: border-box; text-align: end; color: var(--m-muted); opacity: .7; font-size: .85em; line-height: calc(1.7em / .85); }
+.m-ced-ln { position: absolute; inset-inline-start: 0; inline-size: var(--m-ced-gutter); padding-inline-end: .7em; box-sizing: border-box; text-align: end; color: var(--m-muted); opacity: .7; font-size: .85em; line-height: calc(var(--m-ced-lh, 1.7) * 1em / .85); }
 .m-ced-ln::before { content: attr(data-line); }
 .m-ced-ln::after { content: ""; position: absolute; inset-inline-start: .45em; inset-block-start: 50%; inline-size: .8em; block-size: .8em; translate: 0 -50%; border-radius: 50%; opacity: 0; transition: opacity var(--m-dur-fast) var(--m-ease); }
 .m-ced-ln.is-hover::after { opacity: .35; background: var(--m-danger); }
@@ -44,7 +81,7 @@
 .m-ced-lit { position: absolute; z-index: -1; inset-inline: 0; block-size: 1lh; background: color-mix(in srgb, var(--m-warn) 22%, transparent); box-shadow: inset 3px 0 0 var(--m-warn); }
 .m-ced-lit.is-exception { background: color-mix(in srgb, var(--m-danger) 20%, transparent); box-shadow: inset 3px 0 0 var(--m-danger); }
 .m-ced-lit.is-frame { background: color-mix(in srgb, var(--m-success) 16%, transparent); box-shadow: inset 3px 0 0 var(--m-success); }
-.m-ced-gutter { position: absolute; z-index: 1; inset-block: 0; inset-inline-start: 0; inline-size: var(--m-ced-gutter); cursor: pointer; }
+.m-ced-gutter { position: absolute; z-index: 3; inset-block: 0; inset-inline-start: 0; inline-size: var(--m-ced-gutter); cursor: pointer; }
 /* the shortcuts menu: what each key does, its keys on the right; grouped (the editor's, then the app's) */
 .m-ced-keys-panel { inline-size: min(24rem, calc(100vw - 16px)); max-block-size: min(28rem, 70vh); overflow: auto; }
 .m-ced-keys { display: grid; gap: var(--m-space-2); padding: var(--m-space-2); }
@@ -68,3 +105,20 @@
 .m-ced-sig-param.is-on { font-weight: 700; color: var(--m-primary-text); text-decoration: underline; text-underline-offset: 3px; }
 .m-ced-sig-doc, .m-ced-sig-about { margin: 0; color: var(--m-muted); white-space: pre-wrap; }
 .m-ced-sig-doc b { color: var(--m-text); font-family: var(--m-font-mono); }
+/* the find bar (Ctrl+F, Ctrl+H) and go to line (Ctrl+G): over the code's top right corner */
+.m-ced-find { position: absolute; z-index: 4; inset-block-start: var(--m-space-1); inset-inline-end: var(--m-space-3); display: grid; gap: 4px; padding: 4px; max-inline-size: calc(100% - var(--m-space-4));
+  border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-2); background: var(--m-surface); box-shadow: var(--m-shadow-2); font-family: var(--m-font); }
+.m-ced-find-row { display: flex; align-items: center; gap: 2px; min-inline-size: 0; }
+.m-ced-find-row.is-replace { padding-inline-start: 26px; }
+.m-ced-find-row[hidden] { display: none; }
+.m-ced-find .m-input.m-ced-find-field { inline-size: 13rem; min-inline-size: 6rem; flex: 1 1 auto; block-size: 28px; padding-block: 0; font-family: var(--m-font-mono); font-size: var(--m-text-xs); }
+.m-ced-find-opt .m-icon { font-family: var(--m-font-mono); font-size: 11px; font-weight: 700; letter-spacing: -.02em; }
+.m-ced-find-count { min-inline-size: 4.5em; padding-inline: 4px; color: var(--m-muted); font-size: var(--m-text-xs); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.m-ced-find-count.is-none { color: var(--m-danger-text); }
+/* the hover's definition and the short note over a word; the rename field under the name */
+.m-ced-tip-panel { max-inline-size: min(32rem, calc(100vw - 16px)); }
+.m-ced-doc.is-tip { border-block-start: 0; padding: var(--m-space-1) var(--m-space-2); max-block-size: 16rem; overflow: auto; }
+.m-ced-area.is-hovering .m-ced-input { cursor: help; }
+.m-ced-rename { display: grid; gap: 3px; padding: 4px; }
+.m-ced-rename .m-input.m-ced-rename-field { inline-size: 14rem; block-size: 28px; font-family: var(--m-font-mono); font-size: var(--m-text-sm); }
+.m-ced-rename-hint { color: var(--m-muted); font-size: var(--m-text-2xs, 11px); padding-inline: 2px; }

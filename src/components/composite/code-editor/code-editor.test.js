@@ -304,3 +304,109 @@ test("CodeEditor ranking: the file's own names come before March's (chips' order
   assert.deepEqual([...document.querySelectorAll(".m-ced-list [role=option]")].map((o) => o.textContent), ["conn", "connection", "context", "console"]);
   dispose();
 });
+
+test("CodeEditor code style: brackets coloured by depth, indent guides, the word's other places; each turns off", async () => {
+  const code = signal("f(a[1])\n  x + x");
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, lang: "ts" }));
+  const paint = el.querySelector(".m-ced-paint"), deco = el.querySelector(".m-ced-deco");
+  assert.ok(el.querySelector(".m-ced").classList.contains("is-ide"), "the IDE palette by default");
+  assert.deepEqual([...paint.querySelectorAll("[class^=m-tok-br]")].map((s) => s.className), ["m-tok-br0", "m-tok-br1", "m-tok-br1", "m-tok-br0"]);
+  assert.equal(deco.getAttribute("aria-hidden"), "true");
+  assert.equal(deco.textContent.replace("​", ""), code(), "the marks' layer holds the same text");
+  assert.equal(deco.querySelectorAll(".m-ced-guide").length, 1, "one indent step");
+  const input = caretOf(el.querySelector("textarea"));
+  input.dispatchEvent(new Event("focus")); input.setSelectionRange(11, 11); key(input, "ArrowLeft"); input.dispatchEvent(new Event("keyup"));
+  await tick();
+  assert.equal(deco.querySelectorAll(".m-ced-occ").length, 2, "x and its other place");
+  dispose();
+  const [el2, dispose2] = mount(() => h(CodeEditor, { value: code, lang: "ts", palette: "theme", bracketColors: false, guides: false }));
+  assert.ok(!el2.querySelector(".m-ced").classList.contains("is-ide"));
+  assert.equal(el2.querySelector("[class^=m-tok-br]"), null);
+  assert.equal(el2.querySelector(".m-ced-guide"), null);
+  dispose2();
+});
+
+test("CodeEditor typing aids: ( writes its pair, the closer is stepped over, Backspace takes both, > closes a tag; autoClose={false} writes one", () => {
+  const code = signal("f");
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, lang: "tsx" }));
+  const input = caretOf(el.querySelector("textarea"));
+  input.setSelectionRange(1, 1);
+  assert.ok(key(input, "(").defaultPrevented);
+  assert.equal(code(), "f()");
+  assert.equal(input.selectionStart, 2, "the caret between");
+  assert.ok(key(input, ")").defaultPrevented);
+  assert.equal(code(), "f()", "the closer is stepped over");
+  input.setSelectionRange(2, 2); key(input, "Backspace");
+  assert.equal(code(), "f", "both go");
+  code.set("<div"); input.setSelectionRange(4, 4); key(input, ">");
+  assert.equal(code(), "<div></div>");
+  dispose();
+  const [el2, dispose2] = mount(() => h(CodeEditor, { value: code, autoClose: false }));
+  const in2 = caretOf(el2.querySelector("textarea"));
+  code.set("f"); in2.setSelectionRange(1, 1);
+  assert.ok(!key(in2, "(").defaultPrevented, "the browser writes it alone");
+  dispose2();
+});
+
+test("CodeEditor find: Ctrl+F opens the bar with the word at the caret, counts and lights the matches, Replace all is one edit, Esc closes; Ctrl+G goes to a line", async () => {
+  const code = signal("let a = 1\na = a + 2");
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, lang: "ts" }));
+  const input = caretOf(el.querySelector("textarea"));
+  input.setSelectionRange(4, 4);
+  assert.ok(key(input, "f", { ctrlKey: true, code: "KeyF" }).defaultPrevented);
+  await tick();
+  const bar = el.querySelector(".m-ced-find");
+  assert.ok(bar, "the bar is open");
+  assert.equal(bar.querySelector(".m-ced-find-field").value, "a", "the word at the caret");
+  assert.equal(el.querySelectorAll(".m-ced-deco .m-ced-found").length, 3);
+  assert.match(bar.querySelector(".m-ced-find-count").textContent, /\/3$/);
+  key(input, "h", { ctrlKey: true, code: "KeyH" });
+  await tick();
+  const [, withField] = bar.querySelectorAll(".m-ced-find-field");
+  withField.value = "b"; withField.dispatchEvent(new Event("input", { bubbles: true }));
+  [...bar.querySelectorAll("button")].find((b) => /Tümü|All/.test(b.textContent)).click();
+  assert.equal(code(), "let b = 1\nb = b + 2");
+  key(input, "Escape");
+  await tick();
+  assert.equal(el.querySelector(".m-ced-find"), null, "Esc closes it");
+  key(input, "g", { ctrlKey: true, code: "KeyG" });
+  await tick();
+  const line = [...el.querySelectorAll(".m-ced-find-field")].find((f) => /line|Satır/i.test(f.getAttribute("aria-label")));
+  line.value = "2:3"; line.dispatchEvent(new Event("input", { bubbles: true }));
+  key(line, "Enter");
+  assert.equal(input.selectionStart, 12, "line 2, column 3");
+  dispose();
+  const [el2, dispose2] = mount(() => h(CodeEditor, { value: code, keys: { find: false } }));
+  assert.ok(!key(caretOf(el2.querySelector("textarea")), "f", { ctrlKey: true, code: "KeyF" }).defaultPrevented, "keys={{ find: false }}: the browser's own find");
+  dispose2();
+});
+
+test("CodeEditor: F12 selects the definition, F2 renames every place, Shift+Alt+F applies the format edits, Ctrl+= makes the text bigger", async () => {
+  const code = signal("const ab = 1\nab + ab");
+  const sizes = [];
+  const [el, dispose] = mount(() => h(CodeEditor, {
+    value: code, lang: "ts", onFontSizeChange: (px) => sizes.push(px),
+    definition: ({ value, at }) => ({ from: value.indexOf("ab"), to: value.indexOf("ab") + 2, at }),
+    rename: ({ value }) => ({ from: 6, to: 8, locations: [...value.matchAll(/ab/g)].map((m) => ({ from: m.index, to: m.index + 2 })) }),
+    format: async () => [{ from: 13, to: 13, text: "  " }],
+  }));
+  const input = caretOf(el.querySelector("textarea"));
+  input.setSelectionRange(14, 14);
+  key(input, "F12"); await tick(); await tick();
+  assert.equal(input.selectionStart, 6, "the definition's place");
+  key(input, "F2"); await tick(); await tick();
+  const field = document.querySelector(".m-ced-rename-field");
+  assert.ok(field, "the rename field");
+  assert.equal(field.value, "ab");
+  field.value = "total"; field.dispatchEvent(new Event("input", { bubbles: true }));
+  key(field, "Enter");
+  assert.equal(code(), "const total = 1\ntotal + total");
+  code.set("const ab = 1\nab+ab");
+  key(input, "F", { shiftKey: true, altKey: true, code: "KeyF" }); await tick(); await tick();
+  assert.equal(code(), "const ab = 1\n  ab+ab");
+  assert.ok(key(input, "=", { ctrlKey: true, code: "Equal" }).defaultPrevented);
+  assert.equal(sizes.length, 1);
+  key(input, "0", { ctrlKey: true, code: "Digit0" });
+  assert.equal(sizes[1], undefined, "Ctrl+0: the default size");
+  dispose();
+});

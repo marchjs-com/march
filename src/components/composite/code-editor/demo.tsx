@@ -21,8 +21,16 @@ const PROPS = [
   { name: "title", hint: "ipucu yazısı", value: '=""' },
 ]
 
-export default function CodeEditorDemo(props: { values: { lineNumbers: boolean; complete: boolean; multiline: boolean; message: boolean; keys: boolean; shortcuts: boolean; tabSize: number; copy: boolean; flash: boolean; color: string; state: string } }) {
-  let $code = `<Button variant="ghost" size="lg">Kaydet</Button>`
+type Values = {
+  lineNumbers: boolean; complete: boolean; multiline: boolean; message: boolean; keys: boolean; shortcuts: boolean; tabSize: number; copy: boolean; flash: boolean; color: string; state: string;
+  palette: string; bracketColors: boolean; matchBrackets: boolean; guides: boolean; currentLine: boolean; occurrences: boolean; autoClose: boolean; pasteIndent: boolean; find: boolean; fontSize: number; lineHeight: number;
+}
+
+export default function CodeEditorDemo(props: { values: Values }) {
+  // a few lines with nested brackets: the guides, the bracket colours and the caret's line show at once
+  let $code = `<Button variant="ghost" size="lg" title={["Kaydet", "Gönder"][0]}>
+  Kaydet
+</Button>`
   let $marks: CodeMark[] = []
   // what the code says, read with two small patterns (the editor itself never runs the code)
   const read = (name: string, list: readonly string[], def: string): { value: string; bad: string } => {
@@ -30,7 +38,7 @@ export default function CodeEditorDemo(props: { values: { lineNumbers: boolean; 
     return !m ? { value: def, bad: "" } : list.includes(m[1]!) ? { value: m[1]!, bad: "" } : { value: def, bad: `${name}: "${m[1]!}" yok → ${list.join(", ")}` }
   }
   const variant = () => read("variant", VARIANTS, "primary"), size = () => read("size", SIZES, "md")
-  const text = () => />([^<]*)</.exec($code)?.[1] ?? "Kaydet"
+  const text = () => />([^<]*)</.exec($code)?.[1]?.trim() || "Kaydet"
   const bad = () => variant().bad || size().bad
   const note = () => bad() || "Kod okundu: düğme ona uydu."
   // lineNumbers: a click on a number marks the line (a breakpoint's dot), again: unmarks it
@@ -52,7 +60,10 @@ export default function CodeEditorDemo(props: { values: { lineNumbers: boolean; 
       return <CodeEditor value={$code} onChange={change} lang="tsx" multiline={v.multiline} copy={v.copy} flash={v.flash ? "glow" : "none"}
         m:color={color} readonly={v.state === "readonly"} disabled={v.state === "disabled"}
         complete={v.complete ? jsxCompleter({ tag: "Button", props: PROPS }) : undefined}
-        keys={v.keys ? undefined : false} tabSize={v.tabSize} shortcuts={v.shortcuts} onSave={() => toast("Kaydedildi (Ctrl+S)")}
+        keys={v.keys ? (v.find ? undefined : { find: false, replace: false, goToLine: false }) : false} tabSize={v.tabSize}
+        palette={v.palette === "theme" ? "theme" : "ide"} bracketColors={v.bracketColors} matchBrackets={v.matchBrackets} guides={v.guides}
+        currentLine={v.currentLine} occurrences={v.occurrences} autoClose={v.autoClose} pasteIndent={v.pasteIndent}
+        fontSize={v.fontSize || undefined} lineHeight={v.lineHeight} shortcuts={v.shortcuts} onSave={() => toast("Kaydedildi (Ctrl+S)")}
         message={v.message ? note : false} status={() => (bad() ? "error" : "ok")}
         marks={() => $marks} label="Button kodu"
         lineNumbers={v.lineNumbers} lineMarks={() => [...$pins].map((line) => ({ line, kind: "breakpoint", title: `${line}. satır işaretli` }))}
@@ -60,7 +71,7 @@ export default function CodeEditorDemo(props: { values: { lineNumbers: boolean; 
     }}
     <div class="sc-row">
       <Button variant={() => variant().value as "primary"} size={() => size().value as "md"} disabled={() => /\sdisabled\b/.test($code)}>{text}</Button>
-      <span class="m-muted">Dene: bir boşluk bırak ya da Ctrl + Boşluk'a bas.</span>
+      <span class="m-muted">Dene: ( ya da " yaz (kendiliğinden kapanır), Ctrl + F ile ara, Ctrl + = ile büyüt, Ctrl + Boşluk: öneriler.</span>
     </div>
   </div>
 }

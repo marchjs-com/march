@@ -19,6 +19,7 @@
 .m-tok-attr { color: var(--m-primary-text); }
 .m-tok-fn { color: var(--m-danger-text); }
 .m-tok-punct { color: var(--m-muted); }
+.m-tok-type { color: var(--m-cat-8-text, var(--m-info-text)); }
 .m-code-files { display: flex; gap: var(--m-space-1); margin-inline-end: auto; overflow-x: auto; }
 .m-code-files + .m-code-lang { margin-inline-end: 0; }
 .m-widget { min-width: 0; }

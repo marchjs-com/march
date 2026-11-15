@@ -61,6 +61,20 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `lineMarks` | `{ line, kind?, title? }[]` / accessor | — | marks beside the numbers: `breakpoint` (red dot), `conditional` (amber), `log` (diamond), `off` (hollow); any other kind is a class `is-<kind>` to style |
 | `activeLine` | number / `{ line, kind? }` / accessor | — | a line lit across the editor (a debugger's paused line; kinds `current`, `exception`, `frame`), scrolled into view |
 | `onGutter` | `(line, e) => void` | — | a press on the gutter, or F9 at the caret's line (toggle a breakpoint) |
+| `palette` | `ide` `theme` / accessor | `ide` | syntax colours: an IDE's palette from the theme's category colours (keywords, types, functions, members, strings, numbers, tags, attributes each their own; light and dark), or the CodeView colours |
+| `bracketColors` | boolean / accessor | `true` | brackets coloured by depth (three colours); one with no mate is red, underlined |
+| `matchBrackets` | boolean / accessor | `true` | the bracket beside the caret and its mate are boxed |
+| `guides` | boolean / accessor | `true` | a thin line at each indent step |
+| `currentLine` | boolean / accessor | `true` | the caret's line is lit while the editor has the focus |
+| `occurrences` | boolean / accessor | `true` | the other places of the selected text (one line), or of the word at the caret, are lit |
+| `autoClose` | boolean / accessor | `true` | brackets and quotes write their closer (only before a space, a closer or the line's end; no pairs inside strings and comments), a selection is wrapped, typing the closer steps over it, Backspace in an empty pair removes both; `>` after `<div …` writes `</div>` (jsx, tsx, html) |
+| `pasteIndent` | boolean / accessor | `true` | pasted lines move to the indent of the line they land on, their inner indent kept |
+| `fontSize` / `onFontSizeChange` | px / accessor, `(px) => void` | the theme's small text | Ctrl + = / Ctrl + - / Ctrl + 0 change it (9–32 px); the owner keeps it |
+| `lineHeight` | number / accessor | `1.7` | the lines' height |
+| `definition` | `({ value, at }) => { from, to } \| Promise` | — | F12 or Ctrl + click: where the name is defined in the text; the range is selected and scrolled to ("No definition found" otherwise) |
+| `rename` | `({ value, at }) => { from, to, locations } \| { error } \| Promise` | — | F2: a small field under the name asks the new one; Enter writes it at every place (one undo step) |
+| `format` | `(value) => { from, to, text }[] \| Promise` | — | Shift + Alt + F: the edits are applied at once (one undo step) |
+| `hover` | `({ value, at }) => CodeDoc \| Promise` | — | the pointer rests on a word: its kind, signature and documentation over it |
 | `id`, `name`, `class` | | | |
 
 A suggestion: `{ label, hint?, insert?, back?, again?, source?, head? }`: `insert` replaces the word being written (default: the
@@ -82,11 +96,32 @@ by, `head` a line written at the top of the text with the pick when it is not th
 | Ctrl+S | `onSave` (`save`) |
 | Esc, then Tab | leave the editor (`release`): Tab is the editor's until Escape |
 | F9 | `onGutter` at the caret's line |
+| Ctrl+F / Ctrl+H | find / find and replace: a bar over the top right corner; the selection or the word at the caret is the query; Enter / Shift+Enter next / previous, Alt+C case, Alt+W whole word, Alt+R regular expression (`$1` in the replacement), Enter in the replacement replaces one, Ctrl+Enter all (one undo step); Esc closes (`find`, `replace`) |
+| F3 / Shift+F3 | next / previous match (`find`) |
+| Ctrl+G | go to line: `12` or `12:5` (`goToLine`) |
+| F12, Ctrl+click | go to definition (`definition`, with the prop) |
+| F2 | rename the name everywhere (`rename`, with the prop) |
+| Shift+Alt+F | format the text (`format`, with the prop) |
+| Ctrl+= / Ctrl+- / Ctrl+0 | bigger / smaller / default text (`zoom`) |
 
 Edits go through the browser's own undo (Ctrl+Z). Rows are ranked for the word typed: first the shortest name that
 starts with it in the same case (`con` → `console` before `consoleTransport`), then by source in the chips' order
 (March first), how well they fit and length; the ghost shows the first row. A row with a `group` is listed under its heading; a completion with
 `all: true` shows every row whatever source chip is chosen (a member list after a dot: `console.` → Methods, Properties).
+
+## Code style
+
+The text is drawn three times in the same place: a layer of marks at the back (indent guides, the caret's line, the
+bracket pair at the caret, the other places of the word, the find matches), the coloured copy, and the text field on
+top (its text is transparent; the caret and the selection are its own). Only the marks follow the caret, so moving it
+does not colour the code again. Every colour is a theme token (`--m-syn-kw`, `--m-syn-str`, `--m-syn-num`,
+`--m-syn-fn`, `--m-syn-type`, `--m-syn-prop`, `--m-syn-tag`, `--m-syn-attr`, `--m-syn-com`, `--m-syn-punct`,
+`--m-syn-br0…2` on `.m-ced`): set them to make your own palette.
+
+**Not here, on purpose.** Folding and several carets need an editor that draws its own text: a `<textarea>` always
+holds the whole text and has one selection, so lines cannot be hidden in it and a second caret cannot be typed into.
+The editor keeps the textarea (the browser's own typing, IME, spell and screen reader support, undo); folding and
+multiple carets are left out rather than imitated.
 
 ## Accessibility
 
@@ -99,4 +134,5 @@ and is skipped with reduced motion.
 ## Composed of
 
 EditorFrame (border, focus ring, foot bar), Popover + OptionList (the suggestions; list-nav keys from the field),
-CopyButton (icon only), Dropdown + Kbd (the shortcuts menu), StatusDot (the status). Colours come from `tokenize` (the CodeView highlighter).
+CopyButton (icon only), Dropdown + Kbd (the shortcuts menu), StatusDot (the status), TextInput + IconButton + Button
+(the find bar, the rename field), Popover (the hover's definition, the signature). Colours come from `tokenize` (the CodeView highlighter).

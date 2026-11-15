@@ -1,8 +1,8 @@
 // Tiny syntax colouring for read-only code: one pass, tokens only (the caller builds text nodes; never innerHTML).
 // Languages: js / ts / jsx / tsx, css, html, json, sh. Anything else stays plain.
 
-/** Token kinds (CSS class `m-tok-<kind>`); "" is plain text. */
-export type TokenKind = "" | "com" | "str" | "num" | "kw" | "lit" | "tag" | "attr" | "fn" | "punct";
+/** Token kinds (CSS class `m-tok-<kind>`); "" is plain text. "type": a type or class name, "prop": a member after a dot. */
+export type TokenKind = "" | "com" | "str" | "num" | "kw" | "lit" | "tag" | "attr" | "fn" | "punct" | "type" | "prop";
 export type Token = [kind: TokenKind, text: string];
 
 const JS_KW = new Set(("import export from as default const let var function return if else for while do switch case break continue new " +
@@ -55,7 +55,10 @@ export function tokenize(src: string, lang = ""): Token[] {
       else if (css) kind = m[0] === "@" ? "kw" : /^\s*:[^{\n]*(?:[;}\n]|$)/.test(src.slice(i + m.length, i + m.length + 120)) ? "attr" : "";
       else if (LIT.has(m)) kind = "lit";
       else if (js && JS_KW.has(m)) kind = "kw";
-      else if (js && rest[0] === "(") kind = "fn";
+      else if (js && rest[0] === "(") kind = /^[A-Z]/.test(m) && src.slice(Math.max(0, i - 4), i) === "new " ? "type" : "fn";
+      // a type or class (Promise, HTMLElement; not an ALL_CAPS constant), a member after a dot (console.log → log)
+      else if (js && /^[A-Z]/.test(m) && /[a-z]/.test(m)) kind = "type";
+      else if (js && src[i - 1] === "." && src[i - 2] !== ".") kind = "prop";
       push(kind, m); i += m.length; continue;
     }
     if ((m = at(PUNCT, src, i))) { push("punct", m); i += m.length; continue; }
