@@ -45,3 +45,12 @@
 .m-ced-lit.is-exception { background: color-mix(in srgb, var(--m-danger) 20%, transparent); box-shadow: inset 3px 0 0 var(--m-danger); }
 .m-ced-lit.is-frame { background: color-mix(in srgb, var(--m-success) 16%, transparent); box-shadow: inset 3px 0 0 var(--m-success); }
 .m-ced-gutter { position: absolute; z-index: 1; inset-block: 0; inset-inline-start: 0; inline-size: var(--m-ced-gutter); cursor: pointer; }
+/* the shortcuts menu: what each key does, its keys on the right; grouped (the editor's, then the app's) */
+.m-ced-keys-panel { inline-size: min(24rem, calc(100vw - 16px)); max-block-size: min(28rem, 70vh); overflow: auto; }
+.m-ced-keys { display: grid; gap: var(--m-space-2); padding: var(--m-space-2); }
+.m-ced-keys-head { margin: 0 0 var(--m-space-1); font-size: var(--m-text-xs); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--m-muted); }
+.m-ced-keys-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.m-ced-key { display: flex; align-items: center; justify-content: space-between; gap: var(--m-space-3); padding: 3px var(--m-space-1); border-radius: var(--m-radius-1); font-size: var(--m-text-sm); }
+.m-ced-key:hover { background: var(--m-surface-2, var(--m-hover)); }
+.m-ced-key-keys { display: inline-flex; align-items: center; gap: 2px; flex: none; color: var(--m-muted); font-size: var(--m-text-xs); }
+.m-ced-key-or { margin-inline: 2px; }

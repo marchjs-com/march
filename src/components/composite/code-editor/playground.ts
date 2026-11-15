@@ -1,13 +1,15 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { lineNumbers: boolean; complete: boolean; multiline: boolean; message: boolean; hint: boolean; copy: boolean; flash: boolean; color: string; state: string }
+interface Values { lineNumbers: boolean; complete: boolean; multiline: boolean; message: boolean; keys: boolean; shortcuts: boolean; tabSize: number; copy: boolean; flash: boolean; color: string; state: string }
 
 export default definePlayground<Values>({
   options: [
     { key: "complete", label: "Öneri listesi", default: true },
     { key: "lineNumbers", label: "Satır numaraları (tıkla: işaret)", default: false },
     { key: "message", label: "Alt satır (durum)", default: true },
-    { key: "hint", label: "Kısayol ipucu", default: true, visibleWhen: (v) => v.complete && v.message },
+    { key: "keys", label: "IDE tuşları (Tab, Ctrl+/, Alt+↑↓…)", default: true },
+    { key: "tabSize", label: "Girinti (boşluk)", default: 2, options: [{ value: 2, label: "2" }, { value: 4, label: "4" }], visibleWhen: (v) => v.keys },
+    { key: "shortcuts", label: "Kısayollar menüsü", default: true, visibleWhen: (v) => v.message },
     { key: "copy", label: "Kopyala düğmesi", default: true, visibleWhen: (v) => v.message },
     { key: "flash", label: "Değişen yer parlar", default: true },
     { key: "multiline", label: "Enter yeni satır açar", default: true },

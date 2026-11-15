@@ -35,9 +35,16 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `flash` | `glow` `none` / `false` | `glow` | how a flash mark shows |
 | `message` | text / node / accessor / `false` | — | the foot line; `false`: no foot bar |
 | `status` | `ok` `error` / `false` / accessor | `ok` | the dot before the message; `false`: no dot |
-| `hint` | node / `false` | Ctrl Space + "suggestions" | end of the foot line (shown with `complete`) |
-| `copy` | boolean | `true` | the copy button |
-| `copyLabel` | string / accessor | "Copy" | its text |
+| `hint` | node | — | your own node at the end of the foot line |
+| `keys` | `false` / `{ [command]: boolean }` | all on | the IDE keys (below); `false`: none, Tab moves the focus |
+| `tabSize` | number | `2` | spaces of one indent |
+| `onSave` | `(value) => void` | — | Ctrl+S (⌘S); the browser's "save page" does not open |
+| `shortcuts` | boolean | `true` | the shortcuts button (a menu of every key) in the foot line |
+| `moreShortcuts` | `{ keys, label, group? }[]` / accessor | — | the app's keys, listed under the editor's |
+| `shortcutsLabel` | string / accessor | "Keyboard shortcuts" | name of the button and the menu |
+| `listOn` | string | `"."` | characters that open the list even with `suggest="ghost"` (a member list) |
+| `copy` | boolean | `true` | the copy button (an icon button) |
+| `copyLabel` | string / accessor | "Copy" | its accessible name and tooltip |
 | `label` | string / accessor | "Code" | accessible name of the field |
 | `suggestionsLabel` | string / accessor | "Suggestions" | accessible name of the list |
 | `suggest` | `list` `ghost` | `list` | while typing: the list opens, or the likeliest row (same case first) is written faintly after the caret and Tab takes it; Ctrl + Space opens the list either way |
@@ -58,6 +65,24 @@ label), `back` moves the caret back into what was inserted (`variant=""` → ins
 suggestions right after the pick (the values of the prop just written), `source` is what the `sources` chips filter
 by, `head` a line written at the top of the text with the pick when it is not there yet (the row's import).
 
+## Keys
+
+| Keys | Command (`keys` name) |
+|---|---|
+| Tab / Shift+Tab | indent / outdent the caret's line or every selected line (`indent`, `outdent`); Tab takes a ghost or picks in the list |
+| Enter | new line with the line's indent, one more after `{ ( [`; the closer moves a line down (`newline`) |
+| Ctrl+/ | comment / uncomment the lines (`//`, `#` for sh) (`comment`) |
+| Alt+↑ / Alt+↓ | move the lines (`moveUp`, `moveDown`) |
+| Shift+Alt+↑ / ↓ | copy the lines up / down (`copyUp`, `copyDown`) |
+| Ctrl+Shift+K | delete the lines (`deleteLine`) |
+| Ctrl+Space | the suggestion list (`suggest`) |
+| Ctrl+S | `onSave` (`save`) |
+| Esc, then Tab | leave the editor (`release`): Tab is the editor's until Escape |
+| F9 | `onGutter` at the caret's line |
+
+Edits go through the browser's own undo (Ctrl+Z). A row with a `group` is listed under its heading; a completion with
+`all: true` shows every row whatever source chip is chosen (a member list after a dot: `console.` → Methods, Properties).
+
 ## Accessibility
 
 The field is a native `<textarea>` with a name (`label`), described by the foot line (a polite live region: a new
@@ -69,4 +94,4 @@ and is skipped with reduced motion.
 ## Composed of
 
 EditorFrame (border, focus ring, foot bar), Popover + OptionList (the suggestions; list-nav keys from the field),
-CopyButton, Kbd (the shortcut hint), StatusDot (the status). Colours come from `tokenize` (the CodeView highlighter).
+CopyButton (icon only), Dropdown + Kbd (the shortcuts menu), StatusDot (the status). Colours come from `tokenize` (the CodeView highlighter).

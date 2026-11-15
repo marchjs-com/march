@@ -72,7 +72,8 @@ test("CodeEditor: the list opens while typing, Tab picks, the caret lands inside
   const code = signal("<Button>Ok</Button>");
   const [el, dispose] = mount(() => h(CodeEditor, { value: code, complete: jsxCompleter({ tag: "Button", props: PROPS }) }));
   const input = caretOf(el.querySelector("textarea"));
-  assert.ok(el.querySelector(".m-ced-hint"), "the shortcut hint shows with `complete`");
+  assert.ok(el.querySelector(".m-ced-keys-btn"), "the shortcuts menu button");
+  assert.equal(el.querySelector(".m-ced-hint"), null, "no Ctrl Space hint in the foot line");
   type(input, "<Button >Ok</Button>", 8, " ");
   await tick();
   const rows = () => [...document.querySelectorAll(".m-ced-list [role=option], .m-ced-list .m-list-row")];
@@ -86,7 +87,8 @@ test("CodeEditor: the list opens while typing, Tab picks, the caret lands inside
   const esc = key(input, "Escape");
   assert.ok(esc.defaultPrevented);
   await tick();
-  assert.ok(!key(input, "Tab").defaultPrevented, "no list: Tab leaves the field");
+  key(input, "Escape");
+  assert.ok(!key(input, "Tab").defaultPrevented, "no list, after Esc: Tab leaves the field");
   // Ctrl + Space asks by hand
   input.setSelectionRange(`<Button variant="`.length, `<Button variant="`.length);
   assert.ok(key(input, " ", { ctrlKey: true, code: "Space" }).defaultPrevented);
@@ -108,7 +110,7 @@ test("CodeEditor: every part can be turned off or replaced", () => {
   assert.equal(a.querySelector(".m-ced-input").getAttribute("aria-describedby"), null);
   assert.ok(b.querySelector(".m-ced-msg").classList.contains("is-error"));
   assert.ok(b.querySelector(".own-hint"), "own hint");
-  assert.ok(b.querySelector(".m-ced-foot").textContent.includes("Al"), "own copy text");
+  assert.ok((b.querySelector(".m-ced-copy")?.getAttribute("aria-label") ?? "").includes("Al"), "own copy text (an icon button's name)");
   assert.ok(b.querySelector("textarea").hasAttribute("readonly"));
   assert.equal(b.querySelector(".m-ced-paint .m-tok-tag"), null, 'lang="": no colours');
   assert.ok(key(b.querySelector("textarea"), "Enter").defaultPrevented, "multiline={false}: Enter writes nothing");
@@ -182,5 +184,68 @@ test("CodeEditor: lineNumbers draw a number per line with its mark, the active l
   input.dispatchEvent(new KeyboardEvent("keydown", { key: "F9", bubbles: true }));
   assert.deepEqual(pressed, [2], "F9: the caret's line");
   assert.ok(el.querySelector(".m-ced.is-gutter .m-ced-gutter"), "the gutter's press area");
+  dispose();
+});
+
+test("CodeEditor keys: Tab / Shift+Tab indent, Enter keeps the indent, Ctrl+/ comments, Alt+↓ moves, Ctrl+S saves, Esc then Tab leaves", () => {
+  const code = signal("if (a) {\n  b()\n}");
+  const saved = [];
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, lang: "ts", onSave: (v) => saved.push(v) }));
+  const input = caretOf(el.querySelector("textarea"));
+  const at = (n) => input.setSelectionRange(n, n);
+  at(0); assert.ok(key(input, "Tab").defaultPrevented, "Tab stays in the editor");
+  assert.equal(code(), "  if (a) {\n  b()\n}");
+  at(2); key(input, "Tab", { shiftKey: true });
+  assert.equal(code(), "if (a) {\n  b()\n}", "Shift+Tab takes the indent back");
+  at(8); key(input, "Enter");
+  assert.equal(code(), "if (a) {\n  \n  b()\n}", "after { one indent more");
+  code.set("  x = 1"); at(7); key(input, "Enter");
+  assert.equal(code(), "  x = 1\n  ", "the line's indent is kept");
+  code.set("a()\nb()"); at(1); key(input, "/", { ctrlKey: true, code: "Slash" });
+  assert.equal(code(), "// a()\nb()");
+  at(1); key(input, "/", { ctrlKey: true, code: "Slash" });
+  assert.equal(code(), "a()\nb()", "again: the comment goes");
+  at(1); key(input, "ArrowDown", { altKey: true });
+  assert.equal(code(), "b()\na()", "Alt+↓ moves the line down");
+  at(1); key(input, "ArrowDown", { altKey: true, shiftKey: true });
+  assert.equal(code(), "b()\nb()\na()", "Shift+Alt+↓ copies it");
+  at(1); key(input, "K", { ctrlKey: true, shiftKey: true });
+  assert.equal(code(), "b()\na()", "Ctrl+Shift+K deletes it");
+  assert.ok(key(input, "s", { ctrlKey: true }).defaultPrevented);
+  assert.deepEqual(saved, ["b()\na()"]);
+  key(input, "Escape");
+  assert.ok(!key(input, "Tab").defaultPrevented, "after Esc, Tab moves the focus on");
+  // the shortcuts menu lists the keys that are on
+  el.querySelector(".m-ced-keys-btn").click();
+  const menu = document.querySelector(".m-ced-keys");
+  assert.ok(menu && /Ctrl\+?\/?/.test(menu.textContent) && menu.querySelectorAll(".m-ced-key").length >= 8);
+  dispose();
+});
+
+test("CodeEditor keys: keys={false} leaves Tab to the page; single keys turn off", () => {
+  const code = signal("a");
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, keys: false }));
+  const input = caretOf(el.querySelector("textarea"));
+  assert.ok(!key(input, "Tab").defaultPrevented);
+  dispose();
+  const [el2, dispose2] = mount(() => h(CodeEditor, { value: code, keys: { indent: false } }));
+  assert.ok(!key(caretOf(el2.querySelector("textarea")), "Tab").defaultPrevented);
+  dispose2();
+});
+
+test("CodeEditor: a dot opens the list even with suggest=\"ghost\"; rows keep their groups and narrow as typed", async () => {
+  const code = signal("console");
+  const items = [{ label: "log", hint: "method", group: "Methods" }, { label: "error", hint: "method", group: "Methods" }, { label: "memory", hint: "property", group: "Properties" }];
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, suggest: "ghost", sources: [{ value: "march", label: "March" }], complete: (c) => ({ from: c.caret - (/\w*$/.exec(c.before)?.[0].length ?? 0), items, all: true }) }));
+  const input = el.querySelector("textarea");
+  type(input, "console.", 8, ".");
+  await tick();
+  const rows = () => [...document.querySelectorAll(".m-ced-list [role=option]")].map((o) => o.textContent);
+  assert.equal(rows().length, 3, "every member, whatever source chip");
+  assert.ok(document.querySelector(".m-ced-list .m-option-list-group"), "group headings");
+  type(input, "console.lo", 10, "o");
+  await tick();
+  assert.equal(rows().length, 1);
+  assert.match(rows()[0], /log/);
   dispose();
 });

@@ -1,5 +1,5 @@
 // The code editor plugin of march-app-ui: every code file (.ts, .tsx, .js, .jsx, .css, .html, .json, .sh) opens in
-// March's CodeEditor (colours, suggestions with Ctrl + Space, copy). Suggestions come from the "language" service (the
+// March's CodeEditor (colours, suggestions, an IDE's keys and their menu, copy; Ctrl+S calls `save`). Suggestions come from the "language" service (the
 // March language plugin: March's exports) and, when it has none for the place, from the "typescript" service (the
 // whole JavaScript / TypeScript / DOM API); the TypeScript plugin's errors and warnings are underlined in the code
 // (red, amber) and counted under it with the first one's line and text.
@@ -9,6 +9,9 @@ import { CodeEditor, type CodeCompleteContext, type CodeCompletion, type CodeMar
 import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
 import type { TypeScriptService, CodeProblem } from "./ts.ts";
 import type { GutterService } from "./debug.ts";
+import { hotkeys } from "../../../managers/hotkey/index.ts";
+import { t, messages } from "../../../core/i18n.ts";
+import { toast } from "../../overlays/toast/index.ts";
 
 /** What a language service plugin provides (service "language"). */
 export interface LanguageService {
@@ -17,6 +20,8 @@ export interface LanguageService {
 export interface CodeEditorPluginOptions {
   /** Suggestions when no language service is there. */
   complete?: ((path: string, ctx: CodeCompleteContext) => CodeCompletion | null | undefined) | undefined;
+  /** Ctrl+S in a file (default: a short "Saved" note; the files are kept as they are typed). */
+  save?: ((file: AppFile) => void) | undefined;
   /** The paths it opens (default: the code extensions above). */
   match?: RegExp | undefined;
 }
@@ -31,13 +36,24 @@ export function codeLang(path: string): string {
 const lineCol = (text: string, at: number): string => { const before = text.slice(0, at).split("\n"); return `${before.length}:${(before[before.length - 1]?.length ?? 0) + 1}`; };
 
 // the suggestion sources (chips under the list): March first and by default; the choice is kept across visits
+messages("tr", { "Saved": "Kaydedildi", "App": "Uygulama", "Methods": "Metotlar", "Properties": "Özellikler", "Classes": "Sınıflar", "Types": "Türler", "Modules": "Modüller", "Other": "Diğer" });
+
 const SOURCES = [{ value: "march", label: "March" }, { value: "ts", label: "TS" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
 const SOURCE_KEY = "march.code.source";
 const readSource = (): string => { try { return localStorage.getItem(SOURCE_KEY) ?? "march"; } catch { return "march"; } };
 const source = signal(readSource());
+// the app's keys (the debugger's F5…, the palette's) under the editor's in its shortcuts menu
+const appKeys = () => hotkeys.list().filter((k) => k.active && k.description).map((k) => ({ keys: k.label, label: t(k.description), group: k.group ? t(k.group) : t`App` }));
 // TypeScript's own words and types are "ts"; the rest of what it offers (the JS and DOM API, the file's names) "js"
 const TS_KINDS = new Set(["interface", "type", "enum", "alias", "type parameter", "module"]);
 const TS_WORDS = new Set(["abstract", "any", "as", "asserts", "declare", "enum", "implements", "infer", "interface", "is", "keyof", "namespace", "never", "private", "protected", "public", "readonly", "satisfies", "type", "unique", "unknown", "override", "boolean", "number", "string", "symbol", "bigint", "object"]);
+// a member list (after a dot: console.): its rows under their kind, methods first
+const KIND_GROUP: Record<string, string> = { method: "Methods", function: "Methods", constructor: "Methods", property: "Properties", getter: "Properties", setter: "Properties", var: "Properties", let: "Properties", const: "Properties", "enum member": "Properties", class: "Classes", interface: "Types", type: "Types", alias: "Types", enum: "Types", module: "Modules" };
+const GROUP_ORDER = ["Methods", "Properties", "Classes", "Types", "Modules", "Other"];
+const byKind = (items: readonly CodeSuggestion[]): CodeSuggestion[] => {
+  const named = items.map((it) => ({ ...it, group: KIND_GROUP[it.hint ?? ""] ?? "Other" }));
+  return GROUP_ORDER.flatMap((g) => named.filter((it) => it.group === g)).map((it) => ({ ...it, group: t(it.group) }));
+};
 const sourceOf = (it: CodeSuggestion): string => (TS_KINDS.has(it.hint ?? "") || (it.hint === "keyword" && TS_WORDS.has(it.label)) ? "ts" : "js");
 
 /** `<AppUI plugins={[codeEditorPlugin()]} …>`: code files open in a code editor. */
@@ -62,15 +78,20 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
               Promise.resolve(ctx.service<LanguageService>("language")?.complete?.(file.path, c)).catch(() => null),
               ts ? ts.complete(file.path, c).catch(() => null) : Promise.resolve(o.complete?.(file.path, c) ?? null),
             ]);
-            const march = (own?.items ?? []).map((it) => ({ ...it, source: it.source ?? "march" }));
+            // after a dot only the value's members (TypeScript's): March's names are no member of anything
+            const member = /\.[\w$]*$/.test(c.before);
+            const march = member ? [] : (own?.items ?? []).map((it) => ({ ...it, source: it.source ?? "march" }));
             const names = new Set(march.map((it) => it.label));
             const rest = (fromTs?.items ?? []).filter((it) => !names.has(it.label)).map((it) => ({ ...it, source: it.source ?? sourceOf(it) }));
-            const items = [...march, ...rest];
-            return items.length ? { from: own?.items.length ? own.from : fromTs?.from ?? c.caret, to: own?.items.length ? own.to ?? c.caret : fromTs?.to ?? c.caret, items } : null;
+            const all = [...march, ...rest];
+            // after a dot: the members, by kind, whatever source chip is chosen
+            const items = member ? byKind(all) : all;
+            return items.length ? { ...(member ? { all: true } : {}), from: march.length && own ? own.from : fromTs?.from ?? c.caret, to: march.length && own ? own.to ?? c.caret : fromTs?.to ?? c.caret, items } : null;
           };
           return h(CodeEditor, {
             class: "m-app-code", get value() { return file.text(); }, onChange: (text: string) => file.set?.(text), readonly: !file.set,
-            lang: codeLang(file.path), label: file.path, multiline: true, complete, suggest: "ghost",
+            lang: codeLang(file.path), label: file.path, multiline: true, complete, suggest: "ghost", moreShortcuts: appKeys,
+            onSave: () => (o.save ? o.save(file) : toast(t`Saved`, { kind: "success", timeout: 1200 })),
             ...(gutter ? { lineNumbers: true, lineMarks: () => gutter.marks(file.path), activeLine: () => gutter.active(file.path), onGutter: (line: number) => gutter.click(file.path, line) } : {}),
             sources: SOURCES, get source() { return source(); }, onSourceChange: (v: string) => { source.set(v); try { localStorage.setItem(SOURCE_KEY, v); } catch { /* private mode */ } },
             marks: (): CodeMark[] => problems().map((p) => ({ from: p.from, to: Math.max(p.to, p.from + 1), kind: p.error ? "error" : "warning", title: p.message })),

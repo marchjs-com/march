@@ -2,6 +2,7 @@
 // button under the editor follows the valid part (variant, size, the text).
 import { CodeEditor, jsxCompleter, type CodeMark } from "./index.ts";
 import { Button } from "../../actions/button/index.ts";
+import { toast } from "../../overlays/toast/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<CodeEditor bind:value={$code} lang="tsx" message={$note} status={$bad ? "error" : "ok"}
@@ -20,7 +21,7 @@ const PROPS = [
   { name: "title", hint: "ipucu yazısı", value: '=""' },
 ]
 
-export default function CodeEditorDemo(props: { values: { lineNumbers: boolean; complete: boolean; multiline: boolean; message: boolean; hint: boolean; copy: boolean; flash: boolean; color: string; state: string } }) {
+export default function CodeEditorDemo(props: { values: { lineNumbers: boolean; complete: boolean; multiline: boolean; message: boolean; keys: boolean; shortcuts: boolean; tabSize: number; copy: boolean; flash: boolean; color: string; state: string } }) {
   let $code = `<Button variant="ghost" size="lg">Kaydet</Button>`
   let $marks: CodeMark[] = []
   // what the code says, read with two small patterns (the editor itself never runs the code)
@@ -51,7 +52,7 @@ export default function CodeEditorDemo(props: { values: { lineNumbers: boolean; 
       return <CodeEditor value={$code} onChange={change} lang="tsx" multiline={v.multiline} copy={v.copy} flash={v.flash ? "glow" : "none"}
         m:color={color} readonly={v.state === "readonly"} disabled={v.state === "disabled"}
         complete={v.complete ? jsxCompleter({ tag: "Button", props: PROPS }) : undefined}
-        hint={v.hint ? undefined : false}
+        keys={v.keys ? undefined : false} tabSize={v.tabSize} shortcuts={v.shortcuts} onSave={() => toast("Kaydedildi (Ctrl+S)")}
         message={v.message ? note : false} status={() => (bad() ? "error" : "ok")}
         marks={() => $marks} label="Button kodu"
         lineNumbers={v.lineNumbers} lineMarks={() => [...$pins].map((line) => ({ line, kind: "breakpoint", title: `${line}. satır işaretli` }))}
