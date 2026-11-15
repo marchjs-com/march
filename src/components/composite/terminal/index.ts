@@ -81,36 +81,45 @@ export interface TerminalApi {
 export type ColorScheme = "auto" | "surface" | "dark" | "light" | { bg?: string; fg?: string; cursor?: string; selection?: string; colors?: readonly string[] };
 
 export interface TerminalProps {
+  /** Your commands by name; each runs with the arguments and the terminal's io. @tr Ada göre komutların; her biri argümanlarla ve terminalin io'suyla çalışır. */
   commands?: Record<string, Command>;
+  /** Prompt text (reactive; default "$ "). @tr İstem metni (reaktif; varsayılan "$ "). */
   prompt?: MaybeFn<string>;
-  /** A log the app writes to with `print` (build output, a server's lines): no prompt and no input line. */
+  /** A log the app writes to with `print` (build output, a server's lines): no prompt and no input line. @tr Uygulamanın `print` ile yazdığı bir kayıt (derleme çıktısı, bir sunucunun satırları): istem ve giriş satırı yok. */
   readonly?: boolean | undefined;
-  /** Lines printed first (a string or a list). */
+  /** Lines printed first (a string or a list). @tr İlk yazdırılan satırlar (bir metin ya da liste). */
   welcome?: string | readonly string[];
-  /** Keep the history in localStorage under "m.term.<persist>". */
+  /** Keep the history in localStorage under "m.term.<persist>". @tr Geçmişi localStorage'da "m.term.<persist>" altında saklar. */
   persist?: string;
   /** "auto" (default): a very dark charcoal tinted by the theme color; "surface": the page's own surfaces (light in a
-   *  light theme); "dark" / "light": fixed schemes; or your own colors. Live: changing it restyles the terminal. */
+   *  light theme); "dark" / "light": fixed schemes; or your own colors. Live: changing it restyles the terminal.
+   * @tr "auto" (varsayılan): tema rengiyle tonlanmış çok koyu bir kömür; "surface": sayfanın kendi yüzeyleri (açık temada açık); "dark" / "light": sabit şemalar; ya da kendi renklerin. Canlı: değiştirmek terminalin görünümünü yeniler. */
   scheme?: MaybeFn<ColorScheme | undefined>;
-  /** Background color (any CSS color); the text color follows it for contrast. Live. */
+  /** Background color (any CSS color); the text color follows it for contrast. Live. @tr Arka plan rengi (herhangi bir CSS rengi); metin rengi karşıtlık için ona uyar. Canlı. */
   background?: MaybeFn<string | undefined>;
+  /** Cursor shape: bar (default), block or underline. @tr İmleç biçimi: bar (varsayılan), block ya da underline. */
   cursor?: "bar" | "block" | "underline";
+  /** Font family of the terminal (CSS). @tr Terminalin yazı tipi ailesi (CSS). */
   font?: string;
-  /** Oldest lines are dropped past this many (default 2000). */
+  /** Oldest lines are dropped past this many (default 2000). @tr Bu sayıyı aşınca en eski satırlar atılır (varsayılan 2000). */
   maxLines?: number;
-  /** Height of the terminal (CSS length, default 22rem). */
+  /** Height of the terminal (CSS length, default 22rem). @tr Terminalin yüksekliği (CSS uzunluğu, varsayılan 22rem). */
   height?: string;
+  /** Accessible name of the output log. @tr Çıktı kaydının erişilebilir adı. */
   label?: string;
-  /** The cursor blinks (default true); false keeps it lit. */
+  /** The cursor blinks (default true); false keeps it lit. @tr İmleç yanıp söner (varsayılan true); false sürekli yanık tutar. */
   blink?: boolean;
-  /** The built-in `help`, `clear` and `history` commands (default true); false leaves only yours (same names in `commands` replace them one by one). */
+  /** The built-in `help`, `clear` and `history` commands (default true); false leaves only yours (same names in `commands` replace them one by one). @tr Yerleşik `help`, `clear` ve `history` komutları (varsayılan true); false yalnız seninkileri bırakır (`commands` içindeki aynı adlar onları tek tek değiştirir). */
   builtins?: boolean;
   /** A line that names no command runs here instead of the "command not found" line (a REPL: evaluate it as code).
-   *  Like a command: async, aborted by Ctrl+C (io.signal), its error printed. */
+   *  Like a command: async, aborted by Ctrl+C (io.signal), its error printed.
+   * @tr Hiçbir komutu adlandırmayan bir satır "command not found" satırı yerine burada çalışır (bir REPL: kod olarak değerlendir). Komut gibi: async, Ctrl+C ile iptal edilir (io.signal), hatası yazdırılır. */
   fallback?: ((line: string, io: TerminalIO) => unknown) | undefined;
-  /** Own texts: the input's accessible name, the Ctrl+R prompt and the "command not found" line. */
+  /** Own texts: the input's accessible name, the Ctrl+R prompt and the "command not found" line. @tr Kendi metinlerin: girişin erişilebilir adı, Ctrl+R istemi ve "command not found" satırı. */
   labels?: { command?: string; historySearch?: string; notFound?: (name: string) => string } | undefined;
+  /** Extra classes on the root (`m-term`). @tr Köke (`m-term`) eklenen ek sınıflar. */
   class?: ClassProp;
+  /** Receives the terminal API. @tr Terminal API'sini alır. */
   ref?: (api: TerminalApi) => void;
 }
 
@@ -355,7 +364,7 @@ export function Terminal(props: TerminalProps): Element {
 /** Window props a TerminalWindow passes to its window (the rest go to the terminal; `persist` keys both). */
 export type TerminalWindowProps = TerminalProps & Pick<WindowProps, "title" | "icon" | "chrome" | "x" | "y" | "width" | "minWidth" | "minHeight" | "state" | "onStateChange"
   | "open" | "onClose" | "minimizable" | "maximizable" | "closable" | "movable" | "resizable" | "snap"> & {
-  /** Window height in px (the terminal fills it). */
+  /** Window height in px (the terminal fills it). @tr Pencere yüksekliği, px (terminal onu doldurur). */
   windowHeight?: number;
 };
 

@@ -59,39 +59,49 @@ export interface PostCardLabels {
 }
 
 export interface PostCardProps {
+  /** The post: author, time, place, text, media and counts (or an accessor). @tr Gönderi: yazar, zaman, yer, metin, medya ve sayılar (ya da bir erişimci). */
   post: MaybeFn<Post>;
-  /** Called with the next like state; update the post (optimistic). */
+  /** Called with the next like state; update the post (optimistic). @tr Yeni beğeni durumuyla çağrılır; gönderiyi güncelle (iyimser). */
   onLike?: ((next: boolean, post: Post) => void) | undefined;
+  /** Called by the comment button and the "View all N comments" line. @tr Yorum düğmesi ve "View all N comments" satırı tarafından çağrılır. */
   onComment?: ((post: Post) => void) | undefined;
+  /** Called by the share button. @tr Paylaş düğmesi tarafından çağrılır. */
   onShare?: ((post: Post) => void) | undefined;
+  /** Called when a photo is opened, with its index and tile (open a MediaLightbox from it). @tr Bir fotoğraf açıldığında sırası ve karosuyla çağrılır (oradan bir MediaLightbox aç). */
   onOpenMedia?: ((index: number, el: HTMLElement, post: Post) => void) | undefined;
+  /** Makes the author a button (to the profile); called with the post. @tr Yazarı bir düğme yapar (profile gider); gönderiyle çağrılır. */
   onAuthor?: ((post: Post) => void) | undefined;
-  /** ⋯ menu items (args: [post]). */
+  /** ⋯ menu items (args: [post]). @tr ⋯ menüsünün öğeleri (argümanlar: [post]). */
   menu?: readonly MenuItem[] | undefined;
-  /** card: framed · flat: no frame (a feed with dividers). Default card. */
+  /** card: framed · flat: no frame (a feed with dividers). Default card. @tr card: çerçeveli · flat: çerçevesiz (ayırıcılı bir akış). Varsayılan card. */
   variant?: MaybeFn<"card" | "flat" | undefined>;
-  /** Lines before "more". Default 3; 0 never folds. */
+  /** Lines before "more". Default 3; 0 never folds. @tr "more" öncesindeki satır sayısı. Varsayılan 3; 0 hiç katlamaz. */
   clamp?: MaybeFn<number | undefined>;
-  /** Double tap on the photos likes. Default true. */
+  /** Double tap on the photos likes. Default true. @tr Fotoğraflara çift dokunuş beğenir. Varsayılan true. */
   doubleTapLike?: MaybeFn<boolean | undefined>;
-  /** Own texts (names of the article and the buttons, "more", "View all N comments"). */
+  /** Own texts (names of the article and the buttons, "more", "View all N comments"). @tr Kendi metinlerin (makalenin ve düğmelerin adları, "more", "View all N comments"). */
   labels?: MaybeFn<PostCardLabels | undefined>;
-  /** The author's avatar. Default true. */
+  /** The author's avatar. Default true. @tr Yazarın avatarı. Varsayılan true. */
   avatar?: boolean | undefined;
-  /** The time in the header: true (default, relative), false, or `(time) => content`. */
+  /** The time in the header: true (default, relative), false, or `(time) => content`. @tr Başlıktaki zaman: true (varsayılan, göreli), false ya da `(time) => içerik`. */
   time?: boolean | ((time: Post["time"]) => unknown) | undefined;
-  /** Own icons (an icon of hadi-march/icons, text or a node); `false` hides the verified mark, the place pin or the large heart. */
+  /** Own icons (an icon of hadi-march/icons, text or a node); `false` hides the verified mark, the place pin or the large heart. @tr Kendi ikonların (hadi-march/icons ikonu, metin ya da düğüm); `false` onay işaretini, yer iğnesini ya da büyük kalbi gizler. */
   verifiedIcon?: unknown;
+  /** The place pin before the location (icon, text or node); `false` hides it. @tr Konumun önündeki yer iğnesi (ikon, metin ya da düğüm); `false` gizler. */
   placeIcon?: unknown;
+  /** Own icon of the comment button (icon, text or node). @tr Yorum düğmesinin kendi ikonu (ikon, metin ya da düğüm). */
   commentIcon?: unknown;
+  /** Own icon of the share button (icon, text or node). @tr Paylaş düğmesinin kendi ikonu (ikon, metin ya da düğüm). */
   shareIcon?: unknown;
+  /** Own icon of the ⋯ menu button (icon, text or node). @tr ⋯ menü düğmesinin kendi ikonu (ikon, metin ya da düğüm). */
   menuIcon?: unknown;
-  /** The large heart of a double tap: default, `false` (the post is liked without it) or your own node. */
+  /** The large heart of a double tap: default, `false` (the post is liked without it) or your own node. @tr Çift dokunuştaki büyük kalp: varsayılan, `false` (gönderi onsuz beğenilir) ya da kendi düğümün. */
   bigHeart?: unknown;
-  /** Heart color while liked (default: brand-pink). */
+  /** Heart color while liked (default: brand-pink). @tr Beğenildiğinde kalbin rengi (varsayılan: brand-pink). */
   likeColor?: ColorToken | undefined;
-  /** The "View all N comments" line. Default true. */
+  /** The "View all N comments" line. Default true. @tr "View all N comments" satırı. Varsayılan true. */
   viewAll?: boolean | undefined;
+  /** Extra classes on the article. @tr Makaleye (article) eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

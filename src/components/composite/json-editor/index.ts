@@ -43,29 +43,31 @@ export function parseJson(text: string): JsonParseResult {
 }
 
 export interface JsonEditorProps extends ControlProps<unknown> {
+  /** Height of the text view in lines (default 8). @tr Metin görünümünün satır cinsinden yüksekliği (varsayılan 8). */
   rows?: number | undefined;
-  /** Extra check of the parsed value → message or null. */
+  /** Extra check of the parsed value → message or null. @tr Ayrıştırılmış değerin ek denetimi → ileti ya da null. */
   validate?: ((value: unknown) => string | null | undefined) | undefined;
-  /** JSON Schema subset (see TreeEditor): problems are listed in the text view and marked on the tree rows. */
+  /** JSON Schema subset (see TreeEditor): problems are listed in the text view and marked on the tree rows. @tr JSON Schema alt kümesi (bkz. TreeEditor): sorunlar metin görünümünde listelenir, ağaç satırlarında işaretlenir. */
   schema?: JsonSchema | undefined;
-  /** Format indent (2). */
+  /** Format indent (2). @tr Biçimlendirme girintisi (2). */
   indent?: number | undefined;
-  /** Tab inserts two spaces (default true). */
+  /** Tab inserts two spaces (default true). @tr Tab iki boşluk ekler (varsayılan true). */
   tabIndent?: boolean | undefined;
-  /** First view (default "text"). */
+  /** First view (default "text"). @tr İlk görünüm (varsayılan "text"). */
   mode?: JsonMode | undefined;
-  /** Views offered (default text and tree); one hides the switcher. */
+  /** Views offered (default text and tree); one hides the switcher. @tr Sunulan görünümler (varsayılan text ve tree); tek görünüm seçiciyi gizler. */
   modes?: readonly JsonMode[] | undefined;
-  /** Tree levels open at start (default 2). */
+  /** Tree levels open at start (default 2). @tr Başta açık olan ağaç düzeyleri (varsayılan 2). */
   expand?: number | undefined;
-  /** The Format button under the text (default true). */
+  /** The Format button under the text (default true). @tr Metnin altındaki Format düğmesi (varsayılan true). */
   format?: boolean | undefined;
-  /** The "Valid JSON" confirmation under the text (default true). Problems are shown either way. */
+  /** The "Valid JSON" confirmation under the text (default true). Problems are shown either way. @tr Metnin altındaki "Valid JSON" onayı (varsayılan true). Sorunlar her durumda gösterilir. */
   status?: boolean | undefined;
   /**
    * Own texts; each falls back to the built-in one: the two views (`text`, `tree`), the switcher's name (`view`), the
    * tree's name (`treeName`), the tooltip of the tree tab while the text is broken (`fixFirst`), `valid`, `format`,
    * `invalid(line, column, message)` and `more(count)` ("+2 more" after the first schema problem).
+   * @tr Kendi metinlerin; her biri yerleşik olana döner: iki görünüm (`text`, `tree`), seçicinin adı (`view`), ağacın adı (`treeName`), metin bozukken ağaç sekmesinin ipucu (`fixFirst`), `valid`, `format`, `invalid(line, column, message)` ve `more(count)` (ilk şema sorunundan sonra "+2 more").
    */
   labels?: {
     text?: string; tree?: string; view?: string; treeName?: string; fixFirst?: string; valid?: string; format?: string;

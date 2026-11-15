@@ -33,33 +33,43 @@ export interface WizardApi { index: () => number; next: () => void; back: () => 
 
 /** Props of <Wizard>. */
 export interface WizardProps<V = Values> {
+  /** The steps: `title`, `description`, `fields` or `schema`, `validate(values)`, `render(form)`. Live: a new list rebuilds from the first step, keeping the values. @tr Adımlar: `title`, `description`, `fields` ya da `schema`, `validate(values)`, `render(form)`. Canlı: yeni bir liste değerleri koruyarak ilk adımdan yeniden kurar. */
   steps: readonly WizardStep<V>[];
-  /** Optional when every step has its own schema. */
+  /** Optional when every step has its own schema. @tr Her adımın kendi şeması varsa isteğe bağlıdır. */
   schema?: Schema<V> | undefined;
+  /** Starting values (an object or a function). @tr Başlangıç değerleri (bir nesne ya da işlev). */
   initial?: Partial<V> | (() => Partial<V>) | undefined;
+  /** Runs after the last step validates, with the values and the form. @tr Son adım doğrulandıktan sonra değerler ve formla çalışır. */
   onSubmit?: ((values: V, form: FormController<V>) => unknown) | undefined;
+  /** Label of the last step's button (default "Finish"). @tr Son adımın düğmesinin etiketi (varsayılan "Finish"). */
   submitLabel?: unknown;
+  /** How a step's fields are laid out: "stack" (default) or "grid". @tr Bir adımın alanlarının yerleşimi: "stack" (varsayılan) ya da "grid". */
   layout?: "stack" | "grid" | undefined;
+  /** Number of columns in the "grid" layout. @tr "grid" yerleşiminde sütun sayısı. */
   cols?: number | undefined;
+  /** When a field shows its error: "blur" (default), "change" or "submit". @tr Bir alanın hatasını ne zaman gösterdiği: "blur" (varsayılan), "change" ya da "submit". */
   validateOn?: ValidateOn | undefined;
+  /** Called with the new step index (0-based) when the step changes. @tr Adım değişince yeni adımın sırasıyla (0'dan başlar) çağrılır. */
   onStep?: ((index: number) => void) | undefined;
+  /** Called once with the form and the navigation `{ index, next, back, go }`. @tr Form ve gezinme `{ index, next, back, go }` ile bir kez çağrılır. */
   onReady?: ((form: FormController<V>, api: WizardApi) => void) | undefined;
-  /** An existing useForm() controller. */
+  /** An existing useForm() controller. @tr Var olan bir useForm() denetleyicisi. */
   form?: FormController<V> | undefined;
-  /** The stage list on top (Steps): default true. */
+  /** The stage list on top (Steps): default true. @tr Üstteki aşama listesi (Steps): varsayılan true. */
   stepper?: boolean | undefined;
-  /** The progress bar under the stage list: default true. */
+  /** The progress bar under the stage list: default true. @tr Aşama listesinin altındaki ilerleme çubuğu: varsayılan true. */
   progress?: boolean | undefined;
-  /** The "Step 2 of 3" text beside the buttons: default true. */
+  /** The "Step 2 of 3" text beside the buttons: default true. @tr Düğmelerin yanındaki "Step 2 of 3" metni: varsayılan true. */
   count?: boolean | undefined;
-  /** The Back button: default true. */
+  /** The Back button: default true. @tr Back düğmesi: varsayılan true. */
   backButton?: boolean | undefined;
-  /** Own texts: the buttons, the title of a step without one, and the "Step 2 of 3" text (index is 0-based). */
+  /** Own texts: the buttons, the title of a step without one, and the "Step 2 of 3" text (index is 0-based). @tr Kendi metinlerin: düğmeler, başlıksız bir adımın başlığı ve "Step 2 of 3" metni (index 0'dan başlar). */
   labels?: {
     back?: unknown; next?: unknown;
     step?: ((index: number) => string) | undefined;
     count?: ((index: number, total: number) => string) | undefined;
   } | undefined;
+  /** Extra classes on the form (`m-wizard`). @tr Forma (`m-wizard`) eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

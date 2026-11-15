@@ -27,26 +27,27 @@ export * from "./gradient.ts";
 
 export interface GradientPreset { label: string; value: string | readonly string[] }
 export interface GradientEditorProps extends ControlProps<string> {
-  /** Types offered (default linear, radial, conic). */
+  /** Types offered (default linear, radial, conic). @tr Sunulan türler (varsayılan linear, radial, conic). */
   types?: readonly G.GradientType[] | undefined;
-  /** Preset gradients: a CSS gradient or a list of colors / theme tokens. Default: HADİ and theme gradients; false hides them. */
+  /** Preset gradients: a CSS gradient or a list of colors / theme tokens. Default: HADİ and theme gradients; false hides them. @tr Hazır gradyanlar: bir CSS gradyanı ya da renk / tema token listesi. Varsayılan: HADİ ve tema gradyanları; false gizler. */
   presets?: readonly GradientPreset[] | false | undefined;
-  /** The CSS output with a copy button (default true). */
+  /** The CSS output with a copy button (default true). @tr Kopyala düğmeli CSS çıktısı (varsayılan true). */
   output?: boolean | undefined;
-  /** The large preview on top (default true). */
+  /** The large preview on top (default true). @tr Üstteki büyük önizleme (varsayılan true). */
   preview?: boolean | undefined;
-  /** The angle dial (default true). */
+  /** The angle dial (default true). @tr Açı kadranı (varsayılan true). */
   dial?: boolean | undefined;
-  /** Quick angle buttons: default 0 to 315 in steps of 45; your own list; false hides them. */
+  /** Quick angle buttons: default 0 to 315 in steps of 45; your own list; false hides them. @tr Hızlı açı düğmeleri: varsayılan 45'lik adımlarla 0'dan 315'e; kendi listen; false gizler. */
   angles?: readonly number[] | false | undefined;
-  /** The hint under the stop bar (default true). */
+  /** The hint under the stop bar (default true). @tr Durak çubuğunun altındaki ipucu (varsayılan true). */
   hint?: boolean | undefined;
-  /** The position field beside the color picker of the selected stop (default true). */
+  /** The position field beside the color picker of the selected stop (default true). @tr Seçili durağın renk seçicisinin yanındaki konum alanı (varsayılan true). */
   position?: boolean | undefined;
   /**
    * Own texts; each falls back to the built-in one: `editor`, `preview(css)`, `type`, `linear`, `radial`, `conic`,
    * `angle`, `degrees(n)`, `quickAngles`, `stops`, `stop(number, color)`, `hint`, `position`, `presets`,
    * `preset(name)`, `copy`, `copied`.
+   * @tr Kendi metinlerin; her biri yerleşik olana döner: `editor`, `preview(css)`, `type`, `linear`, `radial`, `conic`, `angle`, `degrees(n)`, `quickAngles`, `stops`, `stop(number, color)`, `hint`, `position`, `presets`, `preset(name)`, `copy`, `copied`.
    */
   labels?: {
     editor?: string; type?: string; linear?: string; radial?: string; conic?: string; angle?: string; quickAngles?: string;
@@ -54,6 +55,7 @@ export interface GradientEditorProps extends ControlProps<string> {
     preview?: ((css: string) => string) | undefined; degrees?: ((angle: number) => string) | undefined;
     stop?: ((number: number, color: string) => string) | undefined; preset?: ((name: string) => string) | undefined;
   } | undefined;
+  /** Extra classes on the editor's card. @tr Düzenleyicinin kartına eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

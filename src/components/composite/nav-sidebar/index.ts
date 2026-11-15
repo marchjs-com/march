@@ -54,82 +54,93 @@ export interface NavSidebarItem {
 }
 
 export interface NavSidebarProps {
+  /** The menu items (reactive): `id`, `label`, `href` or `onSelect`, `group`, `icon`, `sub`, `badge`, `can`, `keywords`. @tr Menü öğeleri (reaktif): `id`, `label`, `href` ya da `onSelect`, `group`, `icon`, `sub`, `badge`, `can`, `keywords`. */
   items: MaybeFn<readonly (NavSidebarItem | null | undefined | false)[] | null | undefined>;
-  /** App name (bold) or any node; optional second line. */
+  /** App name (bold) or any node; optional second line. @tr Uygulama adı (kalın) ya da herhangi bir düğüm; isteğe bağlı ikinci satır. */
   title?: unknown;
+  /** Second line under the title (text or node). @tr Başlığın altındaki ikinci satır (metin ya da düğüm). */
   subtitle?: unknown;
-  /** Highlighted items at the top (e.g. a support inbox with a live count). */
+  /** Highlighted items at the top (e.g. a support inbox with a live count). @tr Üstte öne çıkan öğeler (ör. canlı sayılı bir destek kutusu). */
   featured?: MaybeFn<readonly NavSidebarItem[] | null | undefined>;
-  /** How many recent visits to show (default 5, 0 = off). */
+  /** How many recent visits to show (default 5, 0 = off). @tr Gösterilecek son ziyaret sayısı (varsayılan 5, 0 = kapalı). */
   recent?: number;
-  /** Category order: "alpha" (default, locale collation), "none" (as given) or explicit names first. */
+  /** Category order: "alpha" (default, locale collation), "none" (as given) or explicit names first. @tr Kategori sırası: "alpha" (varsayılan, dile göre sıralama), "none" (verildiği gibi) ya da önce açıkça verilen adlar. */
   groupOrder?: "alpha" | "none" | readonly string[];
-  /** Item order inside a category: "alpha" (default) or "none". */
+  /** Item order inside a category: "alpha" (default) or "none". @tr Bir kategori içindeki öğe sırası: "alpha" (varsayılan) ya da "none". */
   itemOrder?: "alpha" | "none";
-  /** Icons next to category names (and the default icon of their items). */
+  /** Icons next to category names (and the default icon of their items). @tr Kategori adlarının yanındaki ikonlar (ve öğelerinin varsayılan ikonu). */
   groupIcons?: Readonly<Record<string, unknown>>;
-  /** Categories open on first visit: "active" (only the one with the current page, default), "all" or "none". */
+  /** Categories open on first visit: "active" (only the one with the current page, default), "all" or "none". @tr İlk ziyarette açık kategoriler: "active" (yalnız geçerli sayfanınki, varsayılan), "all" ya da "none". */
   defaultOpen?: "active" | "all" | "none";
+  /** Placeholder of the search box (default: the translated text). @tr Arama kutusunun yer tutucusu (varsayılan: çevrilmiş metin). */
   placeholder?: MaybeFn<string | undefined>;
   /** Ctrl+K: focuses this search box ("focus", default) or belongs to a <CommandPalette> on the page ("palette": only the hint is
-   *  shown here, the palette opens); false = no shortcut and no hint. */
+   *  shown here, the palette opens); false = no shortcut and no hint.
+   * @tr Ctrl+K: bu arama kutusuna odaklanır ("focus", varsayılan) ya da sayfadaki bir <CommandPalette>'e aittir ("palette": burada yalnız ipucu gösterilir, palet açılır); false = kısayol ve ipucu yok. */
   hotkey?: "focus" | "palette" | false;
+  /** The search shortcut (default "mod+k"). @tr Arama kısayolu (varsayılan "mod+k"). */
   shortcut?: string;
-  /** Collapse to an icon rail (button in the header; state persists). */
+  /** Collapse to an icon rail (button in the header; state persists). @tr Bir ikon şeridine daraltılır (başlıkta düğme; durum saklanır). */
   collapsible?: boolean;
+  /** Footer content at the bottom (text or node). @tr Alttaki alt bilgi içeriği (metin ya da düğüm). */
   footer?: unknown;
-  /** localStorage key (default "m.sidebar"). */
+  /** localStorage key (default "m.sidebar"). @tr localStorage anahtarı (varsayılan "m.sidebar"). */
   storageKey?: string;
-  /** Starting width: px (number) or a CSS length ("18rem"). Default 17.5rem. */
+  /** Starting width: px (number) or a CSS length ("18rem"). Default 17.5rem. @tr Başlangıç genişliği: px (sayı) ya da bir CSS uzunluğu ("18rem"). Varsayılan 17.5rem. */
   width?: number | string;
-  /** A grip on the inner edge changes the width (drag, touch, ← → Home End on the focused grip, double click resets). */
+  /** A grip on the inner edge changes the width (drag, touch, ← → Home End on the focused grip, double click resets). @tr İç kenardaki bir tutamak genişliği değiştirir (sürükleme, dokunma, odaktaki tutamakta ← → Home End, çift tıklama sıfırlar). */
   resizable?: boolean;
-  /** Narrowest / widest width the grip allows, px (default 200 / 480). */
+  /** Narrowest / widest width the grip allows, px (default 200 / 480). @tr Tutamağın izin verdiği en dar / en geniş genişlik, px (varsayılan 200 / 480). */
   minWidth?: number;
+  /** Widest width the grip allows, px (default 480). @tr Tutamağın izin verdiği en geniş genişlik, px (varsayılan 480). */
   maxWidth?: number;
-  /** Called with the new width in px while resizing (and once it ends). */
+  /** Called with the new width in px while resizing (and once it ends). @tr Boyutlandırma sırasında (ve bitince bir kez) yeni px genişliğiyle çağrılır. */
   onResize?: (width: number) => void;
-  /** Remember the width (default true when resizable): in the sidebar's storage, or under this localStorage key. */
+  /** Remember the width (default true when resizable): in the sidebar's storage, or under this localStorage key. @tr Genişliği hatırlar (resizable iken varsayılan true): kenar çubuğunun deposunda ya da bu localStorage anahtarı altında. */
   persist?: boolean | string;
-  /** Dragging narrower than this (px) switches to the icon rail; dragging wider again restores the labels. */
+  /** Dragging narrower than this (px) switches to the icon rail; dragging wider again restores the labels. @tr Bundan (px) daha dara sürüklemek ikon şeridine geçirir; yeniden genişletmek etiketleri geri getirir. */
   collapseBelow?: number;
-  /** false: do not register the items with the command palette. */
+  /** false: do not register the items with the command palette. @tr false: öğeleri komut paletine kaydetme. */
   palette?: boolean;
+  /** Accessible name of the navigation landmark (default: the translated text). @tr Gezinme bölgesinin erişilebilir adı (varsayılan: çevrilmiş metin). */
   label?: MaybeFn<string | undefined>;
-  /** The search box (default true); false also drops its shortcut. */
+  /** The search box (default true); false also drops its shortcut. @tr Arama kutusu (varsayılan true); false kısayolunu da kaldırır. */
   search?: boolean;
-  /** The "Recent" and "Categories" headings (default true); false also drops the expand / collapse all button. */
+  /** The "Recent" and "Categories" headings (default true); false also drops the expand / collapse all button. @tr "Recent" ve "Categories" başlıkları (varsayılan true); false tümünü aç / kapat düğmesini de kaldırır. */
   headings?: boolean;
-  /** The "Expand all" / "Collapse all" button beside the Categories heading (default true). */
+  /** The "Expand all" / "Collapse all" button beside the Categories heading (default true). @tr Categories başlığının yanındaki "Expand all" / "Collapse all" düğmesi (varsayılan true). */
   expandAll?: boolean;
-  /** The item count beside each category name (default true). */
+  /** The item count beside each category name (default true). @tr Her kategori adının yanındaki öğe sayısı (varsayılan true). */
   groupCounts?: boolean;
   /** The category rows (default true). false: a two-level menu: the items of every listed category form one list, in
    *  category order (`groupOrder`), without the category names; "Expand all / Collapse all" then opens and closes the
-   *  items that have pages under them. */
+   *  items that have pages under them.
+   * @tr Kategori satırları (varsayılan true). false: iki düzeyli menü: listelenen her kategorinin öğeleri kategori adları olmadan, kategori sırasında (`groupOrder`) tek liste olur; "Expand all / Collapse all" o zaman altında sayfa olan öğeleri açıp kapatır. */
   groupHeads?: boolean;
-  /** Nested items (a page under a page) also show their `sub` line (default false: only the label). */
+  /** Nested items (a page under a page) also show their `sub` line (default false: only the label). @tr İç içe öğeler (sayfa altındaki sayfa) de `sub` satırını gösterir (varsayılan false: yalnız etiket). */
   nestedSubs?: boolean;
-  /** Only these categories are listed (a section of a large menu; reactive). The other items stay in the search, the recent list and the palette. */
+  /** Only these categories are listed (a section of a large menu; reactive). The other items stay in the search, the recent list and the palette. @tr Yalnız bu kategoriler listelenir (büyük bir menünün bir bölümü; reaktif). Diğer öğeler aramada, son ziyaretlerde ve palette kalır. */
   visibleGroups?: MaybeFn<readonly string[] | null | undefined>;
-  /** Top-level rows: "md" (default) or "lg": equal, roomy rows (height `--m-sb-item-h`, 3.625rem) with the icon in a tinted tile, one line of description and the number of pages under them. */
+  /** Top-level rows: "md" (default) or "lg": equal, roomy rows (height `--m-sb-item-h`, 3.625rem) with the icon in a tinted tile, one line of description and the number of pages under them. @tr Üst düzey satırlar: "md" (varsayılan) ya da "lg": eşit, ferah satırlar (yükseklik `--m-sb-item-h`, 3.625rem); ikon renkli bir karoda, tek satır açıklama ve altındaki sayfa sayısıyla. */
   itemSize?: "md" | "lg";
-  /** A row's text that does not fit: "scroll" (default: loops with a rest, on hover / focus and on the current row), "marquee" (flows one way without a rest while the row is hovered, focused, current or open) or "ellipsis" (cut). */
+  /** A row's text that does not fit: "scroll" (default: loops with a rest, on hover / focus and on the current row), "marquee" (flows one way without a rest while the row is hovered, focused, current or open) or "ellipsis" (cut). @tr Sığmayan satır metni: "scroll" (varsayılan: üzerine gelince / odakta ve geçerli satırda duraklayarak döner), "marquee" (satır üzerindeyken, odaktayken, geçerliyken ya da açıkken duraksamadan tek yöne akar) ya da "ellipsis" (kesilir). */
   subOverflow?: "scroll" | "marquee" | "ellipsis";
-  /** Narrow screens: the edge the drawer of the menu comes from (default "start"; "bottom" = a bottom sheet). */
+  /** Narrow screens: the edge the drawer of the menu comes from (default "start"; "bottom" = a bottom sheet). @tr Dar ekranlar: menü çekmecesinin geldiği kenar (varsayılan "start"; "bottom" = alt sayfa). */
   sheetSide?: "start" | "end" | "bottom";
-  /** The menu button of narrow screens (default true); false: open the drawer yourself with `open`. */
+  /** The menu button of narrow screens (default true); false: open the drawer yourself with `open`. @tr Dar ekranların menü düğmesi (varsayılan true); false: çekmeceyi `open` ile kendin aç. */
   menuButton?: boolean;
-  /** Narrow screens: whether the drawer is open (controlled; with `onOpenChange`). */
+  /** Narrow screens: whether the drawer is open (controlled; with `onOpenChange`). @tr Dar ekranlar: çekmece açık mı (denetimli; `onOpenChange` ile). */
   open?: MaybeFn<boolean | undefined>;
+  /** Called with the drawer's new open state (narrow screens). @tr Çekmecenin yeni açık durumuyla çağrılır (dar ekranlar). */
   onOpenChange?: (open: boolean) => void;
-  /** Own texts (strings or accessors); defaults are the translated ones. `showUnder` / `hideUnder` name the fold button of a parent item. */
+  /** Own texts (strings or accessors); defaults are the translated ones. `showUnder` / `hideUnder` name the fold button of a parent item. @tr Kendi metinlerin (metin ya da erişimci); varsayılanlar çevrilmiş olanlar. `showUnder` / `hideUnder` bir üst öğenin katlama düğmesini adlandırır. */
   labels?: {
     search?: MaybeFn<string>; clearSearch?: MaybeFn<string>; noMatches?: MaybeFn<string>; results?: MaybeFn<string>;
     recent?: MaybeFn<string>; categories?: MaybeFn<string>; expandAll?: MaybeFn<string>; collapseAll?: MaybeFn<string>;
     menu?: MaybeFn<string>; expandSidebar?: MaybeFn<string>; collapseSidebar?: MaybeFn<string>; resize?: MaybeFn<string>;
     showUnder?: (label: string) => string; hideUnder?: (label: string) => string;
   } | undefined;
+  /** Extra classes on the wrapper (`m-sb-wrap`). @tr Sarmalayıcıya (`m-sb-wrap`) eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

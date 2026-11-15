@@ -60,31 +60,33 @@ export function formatShortcut(e: KeyboardEvent): FormatTool | undefined {
 export const FORMAT_TOOLS: readonly (FormatTool | "|")[] = ["bold", "italic", "strike", "code", "link", "|", "ul", "ol", "quote", "|", "undo", "redo"];
 
 export interface FormatToolbarProps<T extends FormatTool = FormatTool> {
-  /** Tools in order; "|" draws a separator (default FORMAT_TOOLS). Read once: re-create the bar for another list. */
+  /** Tools in order; "|" draws a separator (default FORMAT_TOOLS). Read once: re-create the bar for another list. @tr Sırasıyla araçlar; "|" ayırıcı çizer (varsayılan FORMAT_TOOLS). Bir kez okunur: başka liste için çubuğu yeniden oluştur. */
   tools?: readonly (T | "|")[] | undefined;
-  /** Runs a tool (your editor applies the format). */
+  /** Runs a tool (your editor applies the format). @tr Bir aracı çalıştırır (biçimi senin düzenleyicin uygular). */
   onTool: (tool: T) => void;
-  /** Accessible name of the toolbar (default "Formatting"). */
+  /** Accessible name of the toolbar (default "Formatting"). @tr Araç çubuğunun erişilebilir adı (varsayılan "Formatting"). */
   label?: MaybeFn<string | undefined>;
-  /** Own names: a text per tool (`{ bold: "Strong" }`); the translated one otherwise. */
+  /** Own names: a text per tool (`{ bold: "Strong" }`); the translated one otherwise. @tr Kendi adların: araç başına bir metin (`{ bold: "Strong" }`); yoksa çevrilmiş ad. */
   labels?: MaybeFn<Partial<Record<T, string>> | undefined>;
-  /** Own name of a tool as a function (read live); wins over `labels`. */
+  /** Own name of a tool as a function (read live); wins over `labels`. @tr Bir aracın kendi adı, işlev olarak (canlı okunur); `labels`'ın önüne geçer. */
   name?: ((tool: T) => string | undefined) | undefined;
-  /** Own icons: an icon, a text or a node each; `false` draws none. */
+  /** Own icons: an icon, a text or a node each; `false` draws none. @tr Kendi ikonların: her biri ikon, metin ya da düğüm; `false` hiç çizmez. */
   icons?: Partial<Record<T, unknown>> | undefined;
+  /** Disables the whole bar (boolean or accessor) or, as `(tool) => boolean`, single tools. @tr Tüm çubuğu (boolean ya da erişimci) ya da `(tool) => boolean` olarak tek tek araçları devre dışı bırakır. */
   disabled?: MaybeFn<boolean | undefined> | ((tool: T) => boolean);
-  /** Toggle tools: an accessor per tool that can be "on" (sets `aria-pressed` and the pressed look). */
+  /** Toggle tools: an accessor per tool that can be "on" (sets `aria-pressed` and the pressed look). @tr Aç/kapa araçları: "açık" olabilen her araç için bir erişimci (`aria-pressed` ve basılı görünümü ayarlar). */
   pressed?: Partial<Record<T, () => boolean>> | undefined;
-  /** Shortcuts for `aria-keyshortcuts` ("Control+B"); FORMAT_KEYS are there already, `false` removes one. */
+  /** Shortcuts for `aria-keyshortcuts` ("Control+B"); FORMAT_KEYS are there already, `false` removes one. @tr `aria-keyshortcuts` kısayolları ("Control+B"); FORMAT_KEYS zaten var, `false` birini kaldırır. */
   keys?: Partial<Record<T, string | false>> | undefined;
-  /** The shortcut in the tooltip too: "Bold (Ctrl+B)" (default false: the name alone). */
+  /** The shortcut in the tooltip too: "Bold (Ctrl+B)" (default false: the name alone). @tr Kısayol ipucunda da görünür: "Bold (Ctrl+B)" (varsayılan false: yalnız ad). */
   hints?: MaybeFn<boolean | undefined>;
-  /** Size of the buttons (default "sm"). */
+  /** Size of the buttons (default "sm"). @tr Düğmelerin boyutu (varsayılan "sm"). */
   size?: MaybeFn<"xs" | "sm" | "md" | undefined>;
-  /** Class prefix of a host that keeps its own class names ("m-mde"): the bar is also `<prefix>-toolbar`, a button `<prefix>-tool`, a separator `<prefix>-sep`, an own icon `<prefix>-tool-own`. */
+  /** Class prefix of a host that keeps its own class names ("m-mde"): the bar is also `<prefix>-toolbar`, a button `<prefix>-tool`, a separator `<prefix>-sep`, an own icon `<prefix>-tool-own`. @tr Kendi sınıf adlarını koruyan bir sahibin sınıf öneki ("m-mde"): çubuk ayrıca `<prefix>-toolbar`, düğme `<prefix>-tool`, ayırıcı `<prefix>-sep`, kendi ikon `<prefix>-tool-own` olur. */
   prefix?: string | undefined;
-  /** Extra attributes of a tool's button (`aria-haspopup`, `aria-expanded`, `class`, `ref` …). */
+  /** Extra attributes of a tool's button (`aria-haspopup`, `aria-expanded`, `class`, `ref` …). @tr Bir aracın düğmesine ek öznitelikler (`aria-haspopup`, `aria-expanded`, `class`, `ref` …). */
   attrs?: ((tool: T) => Record<string, unknown>) | undefined;
+  /** Extra classes on the toolbar. @tr Araç çubuğuna eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

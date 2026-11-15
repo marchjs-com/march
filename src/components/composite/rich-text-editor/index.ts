@@ -61,34 +61,36 @@ export interface RichTextApi {
 }
 
 export interface RichTextEditorProps extends ControlProps<string> {
+  /** Placeholder of the empty writing area. @tr Boş yazı alanının yer tutucusu. */
   placeholder?: string | undefined;
-  /** Toolbar items (default DEFAULT_TOOLS); false hides the toolbar (shortcuts still work). */
+  /** Toolbar items (default DEFAULT_TOOLS); false hides the toolbar (shortcuts still work). @tr Araç çubuğu öğeleri (varsayılan DEFAULT_TOOLS); false araç çubuğunu gizler (kısayollar yine çalışır). */
   toolbar?: boolean | readonly ToolName[] | undefined;
-  /** People for @mentions: a list, or a lookup (may be async) called with the typed query. */
+  /** People to mention (after typing "@"): a list, or a lookup (may be async) called with the typed query. @tr Bahsedilecek kişiler ("@" yazınca): bir liste ya da yazılan sorguyla çağrılan bir arama (async olabilir). */
   mentions?: readonly Mention[] | ((query: string) => readonly Mention[] | Promise<readonly Mention[]>) | undefined;
-  /** :emoji suggestions (default true; a list replaces the built-in set). */
+  /** :emoji suggestions (default true; a list replaces the built-in set). @tr :emoji önerileri (varsayılan true; bir liste yerleşik kümenin yerini alır). */
   emoji?: boolean | readonly EmojiEntry[] | undefined;
-  /** Markdown shortcuts while typing (default true). */
+  /** Markdown shortcuts while typing (default true). @tr Yazarken Markdown kısayolları (varsayılan true). */
   shortcuts?: boolean | undefined;
-  /** Undo history to record into (default: the editor's own; pass undoStack() to share the app's). */
+  /** Undo history to record into (default: the editor's own; pass undoStack() to share the app's). @tr Kaydedilecek geri alma geçmişi (varsayılan: düzenleyicinin kendi geçmişi; uygulamanınkini paylaşmak için undoStack() ver). */
   history?: UndoStack | undefined;
-  /** Minimum height of the writing area in lines (default 6). */
+  /** Minimum height of the writing area in lines (default 6). @tr Yazı alanının satır cinsinden en küçük yüksekliği (varsayılan 6). */
   rows?: number | undefined;
-  /** Word / character counter under the text (default true). */
+  /** Word / character counter under the text (default true). @tr Metnin altındaki sözcük / karakter sayacı (varsayılan true). */
   counter?: boolean | undefined;
-  /** Receives the editor API once mounted. */
+  /** Receives the editor API once mounted. @tr Takılınca düzenleyici API'sini alır. */
   api?: ((api: RichTextApi) => void) | undefined;
-  /** The "Type @ to mention, : for emoji" hint under the text (default true; `counter={false}` removes the whole foot). */
+  /** The "Type @ to mention, : for emoji" hint under the text (default true; `counter={false}` removes the whole foot). @tr Metnin altındaki "Type @ to mention, : for emoji" ipucu (varsayılan true; `counter={false}` tüm alt kısmı kaldırır). */
   hint?: boolean | undefined;
-  /** Own icon (any node or text) for a toolbar button: `{ bold: "B", link: <Icon of={chain} /> }`. */
+  /** Own icon (any node or text) for a toolbar button: `{ bold: "B", link: <Icon of={chain} /> }`. @tr Bir araç çubuğu düğmesi için kendi ikonun (herhangi bir düğüm ya da metin): `{ bold: "B", link: <Icon of={chain} /> }`. */
   toolIcons?: Partial<Record<Exclude<ToolName, "|">, unknown>> | undefined;
-  /** Own texts; defaults are the translated ones. `tools` names the toolbar buttons, `count` writes the counter. */
+  /** Own texts; defaults are the translated ones. `tools` names the toolbar buttons, `count` writes the counter. @tr Kendi metinlerin; varsayılanlar çevrilmiş olanlar. `tools` araç çubuğu düğmelerini adlandırır, `count` sayacı yazar. */
   labels?: {
     editor?: string; toolbar?: string; tools?: Partial<Record<Exclude<ToolName, "|">, string>>;
     link?: string; linkAddress?: string; linkHelp?: string; apply?: string; removeLink?: string;
     suggestions?: string; noMatches?: string; keepTyping?: string; hint?: string;
     count?: (words: number, characters: number) => string;
   } | undefined;
+  /** Extra classes on the editor (`m-rte`). @tr Düzenleyiciye (`m-rte`) eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

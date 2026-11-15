@@ -75,43 +75,49 @@ export interface PropertyGridApi {
 }
 
 export interface PropertyGridProps {
+  /** The property specs: key, label, type, control, group, description, options, limits, validate … (or an accessor). @tr Özellik tanımları: key, label, type, control, group, description, options, sınırlar, validate … (ya da bir erişimci). */
   properties: MaybeFn<readonly PropertySpec[]>;
-  /** The edited object: a signal, a live value with onChange / setValue, or `bind:value`. */
+  /** The edited object: a signal, a live value with onChange / setValue, or `bind:value`. @tr Düzenlenen nesne: bir sinyal, onChange / setValue ile canlı bir değer ya da `bind:value`. */
   value?: Values | Signal<Values> | null;
+  /** Called with the new object on every edit (pairs with `value`). @tr Her düzenlemede yeni nesneyle çağrılır (`value` ile birlikte). */
   setValue?: (v: Values) => void;
+  /** Called with the new object on every edit. @tr Her düzenlemede yeni nesneyle çağrılır. */
   onChange?: (v: Values) => void;
-  /** Saved values to compare with (default: the value at start, then whatever onSave saved). */
+  /** Saved values to compare with (default: the value at start, then whatever onSave saved). @tr Karşılaştırılacak kayıtlı değerler (varsayılan: başlangıçtaki değer, sonra onSave'in kaydettiği). */
   saved?: MaybeFn<Values | undefined>;
+  /** Saves the values; shows the Save button, and DirtyState's `saveAll()` runs it too. @tr Değerleri kaydeder; Save düğmesini gösterir, DirtyState'in `saveAll()`'ı da onu çalıştırır. */
   onSave?: ((values: Values) => unknown) | undefined;
-  /** Accessible name and the DirtyState / undo label ("Button properties"). */
+  /** Accessible name and the DirtyState / undo label ("Button properties"). @tr Erişilebilir ad ve DirtyState / geri alma etiketi ("Button properties"). */
   label?: MaybeFn<string | undefined>;
-  /** Undo history (default: the app's undoStack()); false: none. */
+  /** Undo history (default: the app's undoStack()); false: none. @tr Geri alma geçmişi (varsayılan: uygulamanın undoStack()'i); false: yok. */
   history?: UndoStack | false;
-  /** Unsaved-changes registry (default: the app's dirtyState()); false: none. */
+  /** Unsaved-changes registry (default: the app's dirtyState()); false: none. @tr Kaydedilmemiş değişiklik kaydı (varsayılan: uygulamanın dirtyState()'i); false: yok. */
   dirty?: DirtyState | false;
-  /** DirtyState id (default: generated). */
+  /** DirtyState id (default: generated). @tr DirtyState kimliği (varsayılan: üretilir). */
   id?: string;
-  /** Group order (others follow in the order they appear). */
+  /** Group order (others follow in the order they appear). @tr Grup sırası (diğerleri göründükleri sırayla gelir). */
   groups?: readonly string[];
-  /** Show the search field (default true). */
+  /** Show the search field (default true). @tr Arama alanını gösterir (varsayılan true). */
   search?: boolean | undefined;
-  /** "auto" (default): label beside the editor, stacked when narrow; "stacked": always above. */
+  /** "auto" (default): label beside the editor, stacked when narrow; "stacked": always above. @tr "auto" (varsayılan): etiket düzenleyicinin yanında, dar alanda üst üste; "stacked": hep üstte. */
   layout?: "auto" | "stacked" | undefined;
+  /** Receives the grid API: `changes()`, `save()`, `revert()`, `markSaved()`, `focus(key)`. @tr Izgara API'sini alır: `changes()`, `save()`, `revert()`, `markSaved()`, `focus(key)`. */
   api?: (api: PropertyGridApi) => void;
-  /** The Undo / Redo buttons in the header (default true; the history itself is `history`). */
+  /** The Undo / Redo buttons in the header (default true; the history itself is `history`). @tr Başlıktaki Undo / Redo düğmeleri (varsayılan true; geçmişin kendisi `history`). */
   historyButtons?: boolean | undefined;
-  /** The "reset to saved" button of each row (default true). */
+  /** The "reset to saved" button of each row (default true). @tr Her satırın "kayıtlıya sıfırla" düğmesi (varsayılan true). */
   resetButtons?: boolean | undefined;
-  /** The dot beside a changed row's name and the changed count of a group (default true). */
+  /** The dot beside a changed row's name and the changed count of a group (default true). @tr Değişen satırın adının yanındaki nokta ve bir grubun değişiklik sayısı (varsayılan true). */
   changeMarks?: boolean | undefined;
-  /** The footer with the change count, Revert and Save (default true). */
+  /** The footer with the change count, Revert and Save (default true). @tr Değişiklik sayısı, Revert ve Save içeren alt bilgi (varsayılan true). */
   footer?: boolean | undefined;
-  /** Own texts; defaults are the translated ones. */
+  /** Own texts; defaults are the translated ones. @tr Kendi metinlerin; varsayılanlar çevrilmiş olanlar. */
   labels?: {
     search?: string; general?: string; empty?: string; noMatch?: (query: string) => string;
     changed?: string; changedCount?: (n: number) => string; unsaved?: (n: number) => string; noChanges?: string;
     revert?: unknown; save?: unknown; undo?: string; redo?: string; reset?: (label: string) => string; resetTitle?: string;
   } | undefined;
+  /** Extra classes on the section (`m-pg`). @tr Bölüme (`m-pg`) eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

@@ -29,42 +29,46 @@ export interface StoryItem { id: string; src: string; alt?: string | undefined; 
 export interface StoryGroup { id: string; name: string; avatar?: string | undefined; items: readonly StoryItem[] }
 
 export interface StoryViewerProps {
+  /** Whether the viewer is open (boolean or accessor). @tr Görüntüleyici açık mı (boolean ya da erişimci). */
   open: MaybeFn<boolean | null | undefined>;
+  /** Called to close the viewer (close button, Esc, dragging down, the end of the last story). @tr Görüntüleyiciyi kapatmak için çağrılır (kapat düğmesi, Esc, aşağı sürükleme, son hikâyenin sonu). */
   onClose: () => void;
+  /** The story groups: one per person, each with its items (or an accessor). @tr Hikâye grupları: kişi başına bir grup, her biri öğeleriyle (ya da bir erişimci). */
   groups: MaybeFn<readonly StoryGroup[]>;
-  /** Group to start with (index or id). Default 0. */
+  /** Group to start with (index or id). Default 0. @tr Başlanacak grup (sıra ya da id). Varsayılan 0. */
   start?: MaybeFn<number | string | undefined>;
-  /** Default time per story (ms). Default 6000. */
+  /** Default time per story (ms). Default 6000. @tr Hikâye başına varsayılan süre (ms). Varsayılan 6000. */
   duration?: MaybeFn<number | undefined>;
+  /** Called when a story is shown, with its group and item (mark it seen). @tr Bir hikâye gösterildiğinde grubu ve öğesiyle çağrılır (görüldü olarak işaretle). */
   onSeen?: ((group: StoryGroup, item: StoryItem) => void) | undefined;
-  /** Shows the reply field. */
+  /** Shows the reply field. @tr Yanıt alanını gösterir. */
   onReply?: ((group: StoryGroup, item: StoryItem, text: string) => void) | undefined;
-  /** Shows the heart. */
+  /** Shows the heart. @tr Kalbi gösterir. */
   onLike?: ((group: StoryGroup, item: StoryItem, liked: boolean) => void) | undefined;
-  /** Liked state of a story. */
+  /** Liked state of a story. @tr Bir hikâyenin beğenilme durumu. */
   liked?: ((group: StoryGroup, item: StoryItem) => boolean) | undefined;
-  /** The progress bars on top: default true. */
+  /** The progress bars on top: default true. @tr Üstteki ilerleme çubukları: varsayılan true. */
   progress?: boolean | undefined;
-  /** The person's avatar in the header: default true. */
+  /** The person's avatar in the header: default true. @tr Başlıktaki kişinin avatarı: varsayılan true. */
   avatar?: boolean | undefined;
-  /** The story's relative time in the header: default true. */
+  /** The story's relative time in the header: default true. @tr Başlıktaki hikâyenin göreli zamanı: varsayılan true. */
   time?: boolean | undefined;
-  /** The pause / play button: default true (Space and press-and-hold still pause). */
+  /** The pause / play button: default true (Space and press-and-hold still pause). @tr Duraklat / oynat düğmesi: varsayılan true (Boşluk ve basılı tutmak yine duraklatır). */
   pauseButton?: boolean | undefined;
-  /** The close button: default true (Esc and dragging down still close). */
+  /** The close button: default true (Esc and dragging down still close). @tr Kapat düğmesi: varsayılan true (Esc ve aşağı sürüklemek yine kapatır). */
   closeButton?: boolean | undefined;
-  /** The previous / next arrow buttons: default true (taps, swipes and ← → still move). */
+  /** The previous / next arrow buttons: default true (taps, swipes and ← → still move). @tr Önceki / sonraki ok düğmeleri: varsayılan true (dokunuşlar, kaydırmalar ve ← → yine geçer). */
   arrows?: boolean | undefined;
-  /** The "Sent" note after a reply: default true. */
+  /** The "Sent" note after a reply: default true. @tr Yanıttan sonraki "Sent" notu: varsayılan true. */
   sentNote?: boolean | undefined;
-  /** Own texts (defaults are the translated ones). `status` is what screen readers hear on every story (index is 0-based). */
+  /** Own texts (defaults are the translated ones). `status` is what screen readers hear on every story (index is 0-based). @tr Kendi metinlerin (varsayılanlar çevrilmiş olanlar). `status` ekran okuyucuların her hikâyede duyduğu metindir (index 0'dan başlar). */
   labels?: {
     dialog?: string; play?: string; pause?: string; close?: string; previous?: string; next?: string; like?: string; send?: string; sent?: string;
     reply?: (group: StoryGroup) => string;
     replyPlaceholder?: (group: StoryGroup) => string;
     status?: (group: StoryGroup, index: number, total: number) => string;
   } | undefined;
-  /** Class on the dialog (`m-story-dlg`). */
+  /** Class on the dialog (`m-story-dlg`). @tr Diyaloğa (`m-story-dlg`) eklenen sınıf. */
   class?: ClassProp;
 }
 

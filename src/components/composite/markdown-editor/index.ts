@@ -29,36 +29,40 @@ export type MarkdownView = "write" | "preview" | "split" | "rich";
 export type MarkdownTool = "h2" | "h3" | "bold" | "italic" | "strike" | "code" | "link" | "ul" | "ol" | "task" | "quote" | "codeblock";
 
 export interface MarkdownEditorProps extends ControlProps<string> {
+  /** Height of the source in lines (default 10). @tr Kaynağın satır cinsinden yüksekliği (varsayılan 10). */
   rows?: number | undefined;
+  /** Placeholder of the empty source. @tr Boş kaynağın yer tutucusu. */
   placeholder?: string | undefined;
-  /** First view (default "write"; "split" when `preview="split"`). */
+  /** First view (default "write"; "split" when `preview="split"`). @tr İlk görünüm (varsayılan "write"; `preview="split"` iken "split"). */
   view?: MarkdownView | undefined;
-  /** Views offered, in order (default write, preview, split, rich). One view hides the switcher. */
+  /** Views offered, in order (default write, preview, split, rich). One view hides the switcher. @tr Sırasıyla sunulan görünümler (varsayılan write, preview, split, rich). Tek görünüm seçiciyi gizler. */
   views?: readonly MarkdownView[] | undefined;
-  /** Older form of `view`: "tab" (write / preview tabs) or "split". */
+  /** Older form of `view`: "tab" (write / preview tabs) or "split". @tr `view`'ın eski biçimi: "tab" (yaz / önizle sekmeleri) ya da "split". */
   preview?: "tab" | "split" | undefined;
-  /** Formatting toolbar over the source: true (default), false, or the tools to show in order ("|" is a separator). */
+  /** Formatting toolbar over the source: true (default), false, or the tools to show in order ("|" is a separator). @tr Kaynağın üstündeki biçim araç çubuğu: true (varsayılan), false ya da sırasıyla gösterilecek araçlar ("|" ayırıcıdır). */
   toolbar?: boolean | readonly (MarkdownTool | "|")[] | undefined;
-  /** Own icons for tools: an icon, a string or a node each. */
+  /** Own icons for tools: an icon, a string or a node each. @tr Araçlar için kendi ikonların: her biri ikon, metin ya da düğüm. */
   icons?: Partial<Record<MarkdownTool, unknown>> | undefined;
-  /** The Markdown syntax reminder at the end of the footer (default true). */
+  /** The Markdown syntax reminder at the end of the footer (default true). @tr Alt bilginin sonundaki Markdown söz dizimi hatırlatması (varsayılan true). */
   hint?: boolean | undefined;
   /**
    * Own texts; each falls back to the built-in one: the views (`write`, `preview`, `split`, `rich`), the switcher's
    * name (`view`), the toolbar's name (`formatting`), `tools` (a name per tool), `source`, `resize`, `hint`,
    * `words(count)` and `minutes(count)`.
+   * @tr Kendi metinlerin; her biri yerleşik olana döner: görünümler (`write`, `preview`, `split`, `rich`), seçicinin adı (`view`), araç çubuğunun adı (`formatting`), `tools` (araç başına bir ad), `source`, `resize`, `hint`, `words(count)` ve `minutes(count)`.
    */
   labels?: {
     write?: string; preview?: string; split?: string; rich?: string; view?: string; formatting?: string; source?: string; resize?: string; hint?: string;
     tools?: Partial<Record<MarkdownTool, string>> | undefined;
     words?: ((count: number) => string) | undefined; minutes?: ((count: number) => string) | undefined;
   } | undefined;
-  /** Source and preview scroll together in the split view (default true). */
+  /** Source and preview scroll together in the split view (default true). @tr Bölünmüş görünümde kaynak ve önizleme birlikte kayar (varsayılan true). */
   syncScroll?: boolean | undefined;
-  /** Words and reading time under the editor (default true). */
+  /** Words and reading time under the editor (default true). @tr Düzenleyicinin altında sözcük sayısı ve okuma süresi (varsayılan true). */
   stats?: boolean | undefined;
-  /** Split share of the source pane, 0–1 (default .5). */
+  /** Split share of the source pane, 0–1 (default .5). @tr Bölünmüş görünümde kaynak bölmesinin payı, 0–1 (varsayılan .5). */
   split?: number | undefined;
+  /** Extra classes on the root element. @tr Kök öğeye eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

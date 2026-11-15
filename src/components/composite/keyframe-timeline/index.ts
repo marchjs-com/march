@@ -38,29 +38,30 @@ messages("tr", tr);
 export * from "./model.ts";
 
 export interface KeyframeTimelineProps extends ControlProps<M.TimelineModel> {
-  /** Draws a preview target (default: a labelled pill in the track's color). */
+  /** Draws a preview target (default: a labelled pill in the track's color). @tr Önizleme hedefini çizer (varsayılan: izin renginde etiketli bir hap). */
   renderTarget?: ((name: string) => Element) | undefined;
-  /** Snap step in ms (default 50; 0 turns snapping off). */
+  /** Snap step in ms (default 50; 0 turns snapping off). @tr ms cinsinden yapışma adımı (varsayılan 50; 0 yapışmayı kapatır). */
   snap?: number | undefined;
-  /** Start playing when shown (default false). */
+  /** Start playing when shown (default false). @tr Gösterilince oynatmaya başlar (varsayılan false). */
   autoplay?: boolean | undefined;
-  /** Loop (default true). */
+  /** Loop (default true). @tr Döngü (varsayılan true). */
   loop?: boolean | undefined;
-  /** Preview stage over the lanes (default true). */
+  /** Preview stage over the lanes (default true). @tr Şeritlerin üstündeki önizleme sahnesi (varsayılan true). */
   stage?: boolean | undefined;
-  /** The playback bar: true (default), false, or the parts to keep. Space still plays and pauses. */
+  /** The playback bar: true (default), false, or the parts to keep. Space still plays and pauses. @tr Oynatma çubuğu: true (varsayılan), false ya da tutulacak parçalar. Boşluk tuşu yine oynatır ve duraklatır. */
   transport?: boolean | readonly ("play" | "start" | "loop" | "time" | "speed")[] | undefined;
-  /** Speed choices (default 0.25, 0.5, 1, 2). */
+  /** Speed choices (default 0.25, 0.5, 1, 2). @tr Hız seçenekleri (varsayılan 0.25, 0.5, 1, 2). */
   speeds?: readonly number[] | undefined;
-  /** The keyframe inspector under the lanes: time, value, delete, easing (default true). */
+  /** The keyframe inspector under the lanes: time, value, delete, easing (default true). @tr Şeritlerin altındaki anahtar kare denetçisi: zaman, değer, silme, yumuşatma (varsayılan true). */
   inspector?: boolean | undefined;
-  /** The text shown in the inspector's place while no keyframe is selected (default true). */
+  /** The text shown in the inspector's place while no keyframe is selected (default true). @tr Hiç anahtar kare seçili değilken denetçinin yerinde gösterilen metin (varsayılan true). */
   hint?: boolean | undefined;
-  /** The value curve drawn in every lane (default true). */
+  /** The value curve drawn in every lane (default true). @tr Her şeritte çizilen değer eğrisi (varsayılan true). */
   curves?: boolean | undefined;
   /**
    * Own texts; each falls back to the built-in one: `timeline`, `playback`, `play`, `pause`, `start`, `loop`, `speed`,
    * `playhead`, `hint`, `time`, `value`, `remove`, `easing`, `keyframe(number, target, prop)`, `lane(target, prop)`.
+   * @tr Kendi metinlerin; her biri yerleşik olana döner: `timeline`, `playback`, `play`, `pause`, `start`, `loop`, `speed`, `playhead`, `hint`, `time`, `value`, `remove`, `easing`, `keyframe(number, target, prop)`, `lane(target, prop)`.
    */
   labels?: {
     timeline?: string; playback?: string; play?: string; pause?: string; start?: string; loop?: string; speed?: string; playhead?: string;
@@ -68,6 +69,7 @@ export interface KeyframeTimelineProps extends ControlProps<M.TimelineModel> {
     keyframe?: ((number: number, target: string, prop: string) => string) | undefined;
     lane?: ((target: string, prop: string) => string) | undefined;
   } | undefined;
+  /** Extra classes on the root element. @tr Kök öğeye eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

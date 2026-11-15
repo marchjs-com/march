@@ -45,28 +45,39 @@ export interface ProfileHeaderLabels {
 type Stat = "posts" | "followers" | "following";
 
 export interface ProfileHeaderProps {
+  /** The profile: name, handle, avatar, cover, bio, verified, story, counts, private (or an accessor). @tr Profil: ad, kullanıcı adı, avatar, kapak, biyografi, onay, hikâye, sayılar, gizlilik (ya da bir erişimci). */
   user: MaybeFn<ProfileUser>;
-  /** Your own profile: no follow / message, an Edit button instead (onEdit). */
+  /** Your own profile: no follow / message, an Edit button instead (onEdit). @tr Senin kendi profilin: takip / mesaj yok, yerine bir Edit düğmesi (onEdit). */
   self?: MaybeFn<boolean | undefined>;
+  /** The follow state for the FollowButton (default "follow"); following adds one to the followers. @tr FollowButton'ın takip durumu (varsayılan "follow"); "following" takipçilere bir ekler. */
   follow?: MaybeFn<FollowState | undefined>;
+  /** Called with the next follow state; without it there is no follow button. @tr Yeni takip durumuyla çağrılır; verilmezse takip düğmesi olmaz. */
   onFollow?: ((next: FollowState) => void) | undefined;
+  /** Called by the Message button; without it there is no Message button. @tr Message düğmesi tarafından çağrılır; verilmezse Message düğmesi olmaz. */
   onMessage?: (() => void) | undefined;
+  /** Called by the Edit profile button of your own profile (`self`). @tr Kendi profilindeki (`self`) Edit profile düğmesi tarafından çağrılır. */
   onEdit?: (() => void) | undefined;
+  /** Makes the stats buttons; called with posts, followers or following. @tr İstatistikleri düğme yapar; posts, followers ya da following ile çağrılır. */
   onStat?: ((which: "posts" | "followers" | "following") => void) | undefined;
+  /** Makes the avatar a button (its story ring opens the stories). @tr Avatarı bir düğme yapar (hikâye halkası hikâyeleri açar). */
   onAvatar?: (() => void) | undefined;
+  /** ⋯ menu items. @tr ⋯ menüsünün öğeleri. */
   menu?: readonly MenuItem[] | undefined;
-  /** Cover height: sm 120 · md 168 · lg 216 px. Default md. */
+  /** Cover height: sm 120 · md 168 · lg 216 px. Default md. @tr Kapak yüksekliği: sm 120 · md 168 · lg 216 px. Varsayılan md. */
   cover?: MaybeFn<"sm" | "md" | "lg" | "none" | undefined>;
-  /** Own texts (section name, Edit profile, Message, the stat names …). */
+  /** Own texts (section name, Edit profile, Message, the stat names …). @tr Kendi metinlerin (bölüm adı, Edit profile, Message, istatistik adları …). */
   labels?: MaybeFn<ProfileHeaderLabels | undefined>;
-  /** The stats row: true (default: all three), false, or the ones to show in order (`["followers", "following"]`). */
+  /** The stats row: true (default: all three), false, or the ones to show in order (`["followers", "following"]`). @tr İstatistik satırı: true (varsayılan: üçü de), false ya da sırasıyla gösterilecekler (`["followers", "following"]`). */
   stats?: MaybeFn<boolean | readonly ("posts" | "followers" | "following")[] | undefined>;
-  /** Own icons (an icon of hadi-march/icons, text or a node); `false` hides the verified mark or the Message icon. */
+  /** Own icons (an icon of hadi-march/icons, text or a node); `false` hides the verified mark or the Message icon. @tr Kendi ikonların (hadi-march/icons ikonu, metin ya da düğüm); `false` onay işaretini ya da Message ikonunu gizler. */
   verifiedIcon?: unknown;
+  /** Own icon of the Message button (icon, text or node); `false` hides it. @tr Message düğmesinin kendi ikonu (ikon, metin ya da düğüm); `false` gizler. */
   messageIcon?: unknown;
+  /** Own icon of the ⋯ menu button (icon, text or node). @tr ⋯ menü düğmesinin kendi ikonu (ikon, metin ya da düğüm). */
   menuIcon?: unknown;
-  /** Color of the Message button (default: a neutral surface). */
+  /** Color of the Message button (default: a neutral surface). @tr Message düğmesinin rengi (varsayılan: nötr bir yüzey). */
   messageColor?: ColorToken | undefined;
+  /** Extra classes on the section. @tr Bölüme (section) eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

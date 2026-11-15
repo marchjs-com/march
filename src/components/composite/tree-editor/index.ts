@@ -35,27 +35,27 @@ import { withColor } from "../../../theme/colors.ts";
 export * from "./json-path.ts";
 
 export interface TreeEditorProps extends ControlProps<unknown> {
-  /** JSON Schema subset: types, properties, required, items, enum, ranges, lengths, pattern, format. */
+  /** JSON Schema subset: types, properties, required, items, enum, ranges, lengths, pattern, format. @tr JSON Schema alt kümesi: türler, özellikler, required, items, enum, aralıklar, uzunluklar, pattern, format. */
   schema?: J.JsonSchema | undefined;
-  /** Extra checks → problems with their paths. */
+  /** Extra checks → problems with their paths. @tr Ek denetimler → yollarıyla birlikte sorunlar. */
   validate?: ((value: unknown) => readonly J.JsonError[]) | undefined;
-  /** Levels open at start (default 2). */
+  /** Levels open at start (default 2). @tr Başta açık olan düzeyler (varsayılan 2). */
   expand?: number | undefined;
-  /** Search box over the tree (default true). */
+  /** Search box over the tree (default true). @tr Ağacın üstündeki arama kutusu (varsayılan true). */
   search?: boolean | undefined;
-  /** Undo / redo buttons and Ctrl+Z (default true). */
+  /** Undo / redo buttons and Ctrl+Z (default true). @tr Geri al / yinele düğmeleri ve Ctrl+Z (varsayılan true). */
   history?: boolean | UndoStack | undefined;
-  /** Accessible name of the tree. */
+  /** Accessible name of the tree. @tr Ağacın erişilebilir adı. */
   label?: string | undefined;
-  /** Called with every validation result. */
+  /** Called with every validation result. @tr Her doğrulama sonucuyla çağrılır. */
   onValidate?: ((errors: readonly J.JsonError[]) => void) | undefined;
-  /** The "Valid" / "N problems" status in the bar (default true). */
+  /** The "Valid" / "N problems" status in the bar (default true). @tr Çubuktaki "Valid" / "N problems" durumu (varsayılan true). */
   status?: boolean | undefined;
-  /** The type badge of each row (default true; T on a row still opens the type menu). */
+  /** The type badge of each row (default true; T on a row still opens the type menu). @tr Her satırın tür rozeti (varsayılan true; bir satırda T yine tür menüsünü açar). */
   typeBadges?: boolean | undefined;
-  /** Row actions: true (default: add, duplicate, delete), false, or the ones to keep. The keys (+, Delete) follow it. */
+  /** Row actions: true (default: add, duplicate, delete), false, or the ones to keep. The keys (+, Delete) follow it. @tr Satır eylemleri: true (varsayılan: ekle, çoğalt, sil), false ya da tutulacak olanlar. Tuşlar (+, Delete) buna uyar. */
   actions?: boolean | readonly ("add" | "duplicate" | "delete")[] | undefined;
-  /** Own texts; defaults are the translated ones. `kinds` names the types ("text", "number"…). */
+  /** Own texts; defaults are the translated ones. `kinds` names the types ("text", "number"…). @tr Kendi metinlerin; varsayılanlar çevrilmiş olanlar. `kinds` türleri adlandırır ("text", "number"…). */
   labels?: {
     root?: string; search?: string; valid?: string; problems?: (n: number) => string; noMatches?: string;
     undo?: string; redo?: string; key?: string; valueName?: (key: string) => string; emptyText?: string;
@@ -64,6 +64,7 @@ export interface TreeEditorProps extends ControlProps<unknown> {
     typeOf?: (kind: string) => string;
     kinds?: Partial<Record<"string" | "number" | "boolean" | "null" | "object" | "array", string>>;
   } | undefined;
+  /** Extra classes on the root element. @tr Kök öğeye eklenen ek sınıflar. */
   class?: ClassProp;
 }
 

@@ -37,35 +37,36 @@ export interface ImageCropperApi {
   reset(): void;
 }
 export interface ImageCropperProps extends ControlProps<G.CropState> {
-  /** Image URL (same origin, data: or blob:, so the canvas can read it). */
+  /** Image URL (same origin, data: or blob:, so the canvas can read it). @tr Görsel URL'si (aynı köken, data: ya da blob:, ki tuval okuyabilsin). */
   src: string;
-  /** Accessible description of the image. */
+  /** Accessible description of the image. @tr Görselin erişilebilir açıklaması. */
   alt?: string | undefined;
-  /** Fixed aspect (width / height); omitted: the aspect choices decide. */
+  /** Fixed aspect (width / height); omitted: the aspect choices decide. @tr Sabit oran (genişlik / yükseklik); verilmezse oran seçenekleri belirler. */
   aspect?: number | null | undefined;
-  /** Aspect choices (default free, 1:1, 4:3, 16:9, 3:4, 9:16); false hides them. */
+  /** Aspect choices (default free, 1:1, 4:3, 16:9, 3:4, 9:16); false hides them. @tr Oran seçenekleri (varsayılan free, 1:1, 4:3, 16:9, 3:4, 9:16); false gizler. */
   aspects?: readonly AspectOption[] | false | undefined;
-  /** Highest zoom (default 4). */
+  /** Highest zoom (default 4). @tr En yüksek yakınlaştırma (varsayılan 4). */
   maxZoom?: number | undefined;
-  /** A live preview of the result (default true). */
+  /** A live preview of the result (default true). @tr Sonucun canlı önizlemesi (varsayılan true). */
   preview?: boolean | undefined;
-  /** Receives the cropper API. */
+  /** Receives the cropper API. @tr Kırpıcı API'sini alır. */
   api?: ((api: ImageCropperApi) => void) | undefined;
-  /** The rule-of-thirds grid inside the frame (default true). */
+  /** The rule-of-thirds grid inside the frame (default true). @tr Çerçevenin içindeki üçte bir ızgarası (varsayılan true). */
   grid?: boolean | undefined;
-  /** The key hint under the crop area (default true); when false it stays readable for screen readers. */
+  /** The key hint under the crop area (default true); when false it stays readable for screen readers. @tr Kırpma alanının altındaki tuş ipucu (varsayılan true); false iken ekran okuyucular için okunur kalır. */
   hint?: boolean | undefined;
-  /** The buttons: true (default), false, or the ones to keep. */
+  /** The buttons: true (default), false, or the ones to keep. @tr Düğmeler: true (varsayılan), false ya da tutulacak olanlar. */
   tools?: boolean | readonly ("rotateLeft" | "rotateRight" | "mirror" | "reset")[] | undefined;
-  /** The sliders: true (default), false, or the ones to keep. */
+  /** The sliders: true (default), false, or the ones to keep. @tr Kaydırıcılar: true (varsayılan), false ya da tutulacak olanlar. */
   sliders?: boolean | readonly ("zoom" | "angle")[] | undefined;
-  /** The "640 × 480 px" caption under the preview (default true). */
+  /** The "640 × 480 px" caption under the preview (default true). @tr Önizlemenin altındaki "640 × 480 px" yazısı (varsayılan true). */
   size?: boolean | undefined;
-  /** Own texts; each falls back to the built-in one. `role` is the crop area's role description, `hint` the key hint. */
+  /** Own texts; each falls back to the built-in one. `role` is the crop area's role description, `hint` the key hint. @tr Kendi metinlerin; her biri yerleşik olana döner. `role` kırpma alanının rol açıklaması, `hint` tuş ipucu. */
   labels?: {
     cropper?: string; area?: string; role?: string; hint?: string; free?: string; aspect?: string;
     rotateLeft?: string; rotateRight?: string; mirror?: string; reset?: string; zoom?: string; angle?: string; result?: string;
   } | undefined;
+  /** Extra classes on the root element. @tr Kök öğeye eklenen ek sınıflar. */
   class?: ClassProp;
 }
 
