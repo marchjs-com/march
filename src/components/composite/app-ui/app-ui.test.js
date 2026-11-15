@@ -154,3 +154,18 @@ test("debuggerPlugin: the debugger and gutter services, the panel; prepare instr
   assert.equal(ran, 2, "built again without the calls");
   kit.dispose();
 });
+
+test("AppUI: a reactive panel list (a computed) is live: a file opened later gets its tab, a closed one leaves", async () => {
+  const { signal, computed } = await import("../../../index.ts");
+  const open = signal(["a"]);
+  const panels = computed(() => [{ id: "files", title: "F", content: () => h("p", null, "f") },
+    ...open().map((p) => ({ id: `f:${p}`, title: p, place: { near: "f:a", zone: "center" }, file: { path: `${p}.js`, text: () => p } }))]);
+  const { el, dispose } = mount(() => h(AppUI, { panels, presets: { main: { title: "M", tree: () => row([0.3, tabs("files")], [0.7, tabs("f:a")]) } }, commands: false }));
+  const ids = () => [...el.querySelectorAll(".m-dock-panel")].map((e) => e.id.replace(/^.*-p-/, ""));
+  assert.deepEqual(ids(), ["files", "f:a"]);
+  open.set(["a", "b"]);
+  assert.deepEqual(ids(), ["files", "f:a", "f:b"]);
+  open.set(["b"]);
+  assert.deepEqual(ids(), ["files", "f:b"]);
+  dispose();
+});

@@ -15,6 +15,7 @@ from the page's theme and accent. Activity bars, status bars and editors are bui
 ## Props
 
 Every DockLayout prop (`panels`, `presets`, `preset`, `persist`, `storage`, `api`, `onClose`, `actions`, `narrow`…), and:
+`panels` may be a signal or a computed list: a file opened later gets its tab (at its `place`), one taken out leaves.
 
 | Prop | Type | Default | |
 |---|---|---|---|

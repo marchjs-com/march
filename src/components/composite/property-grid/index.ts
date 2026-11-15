@@ -118,7 +118,6 @@ export interface PropertyGridProps {
   changeMarks?: boolean | undefined;
   /** The footer with the change count, Revert and Save (default true). @tr Değişiklik sayısı, Revert ve Save içeren alt bilgi (varsayılan true). */
   footer?: boolean | undefined;
-  /** Own texts; defaults are the translated ones. @tr Kendi metinlerin; varsayılanlar çevrilmiş olanlar. */
   /** With more than one group: a row of tools at the top — open / close every group, and a chip per group (lit while it
    * is open; a press opens or closes it). Default true. @tr Birden çok grupta üstte bir araç satırı: bütün grupları
    * aç / kapat ve her grup için bir çip (açıkken seçili; basınca açar ya da kapatır). Varsayılan true. */
@@ -127,6 +126,7 @@ export interface PropertyGridProps {
   persist?: string | undefined;
   /** The groups open at first (the others closed) until the user opens or closes one; default: every group. @tr Başta açık gruplar (diğerleri kapalı), kullanıcı birini açıp kapatana kadar; varsayılan: hepsi. */
   openGroups?: readonly string[] | undefined;
+  /** Own texts; defaults are the translated ones. @tr Kendi metinlerin; varsayılanlar çevrilmiş olanlar. */
   labels?: {
     search?: string; general?: string; empty?: string; noMatch?: (query: string) => string;
     changed?: string; changedCount?: (n: number) => string; unsaved?: (n: number) => string; noChanges?: string;

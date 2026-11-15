@@ -74,14 +74,15 @@ function fileView(kit: AppKit, file: AppFile): () => unknown {
 export function AppUI(props: AppUIProps): Element {
   let dock: DockApi | undefined;
   // title and description are read from props when drawn (live: a getter prop follows its value)
-  const { title: _title, description: _description, layoutMenu: _layoutMenu, descriptionMark, tools, side, status, bar, layoutLabel, layoutIcon, class: cls, api, plugins, kit: onKit, panels, ...rest } = props;
+  const { title: _title, description: _description, layoutMenu: _layoutMenu, descriptionMark, tools, side, status, bar, layoutLabel, layoutIcon, class: cls, api, plugins, kit: onKit, panels: _panels, ...rest } = props;
   const kit = createAppKit(plugins ?? []);
   onCleanup(() => kit.dispose());
   onKit?.(kit);
   // the file panels keep their content function: a panel is built once (DockLayout), the view inside follows the types
   const views = new Map<string, () => unknown>();
   const all = computed((): DockPanel[] => [
-    ...(val(panels) ?? []).map((p): DockPanel => {
+    // read from props each time: a reactive list (a signal, a computed) is a live getter prop
+    ...(val(props.panels) ?? []).map((p): DockPanel => {
       if (!p.file) return p as DockPanel;
       const f = p.file;
       let view = views.get(p.id);
