@@ -138,6 +138,8 @@ export interface CodeEditorProps extends ControlProps<string> {
   suggest?: "list" | "ghost" | undefined;
   /** Characters that open the list even with suggest="ghost" (default "."): `console.` lists its members. */
   listOn?: string | undefined;
+  /** With suggest="ghost": the list opens too once the word is this long (default 3); 0: only with Ctrl+Space or `listOn`. */
+  listAfter?: number | undefined;
   /** The chosen chip (default: the first); `onSourceChange` tells the owner (to keep it). */
   source?: MaybeFn<string | undefined>;
   onSourceChange?: ((value: string) => void) | undefined;
@@ -241,22 +243,48 @@ export function CodeEditor(props: CodeEditorProps): Element {
   });
 
   // ---- suggestions
+  // a list asked for (Ctrl+Space) or opened by a member (".") stays while typing narrows it; one opened by the word's
+  // length (listAfter, with the ghost) closes again when the word gets shorter
+  let sticky = false;
+  /** A row's source in the chips' order (March first); rows of no chip after them. */
+  const sourceRank = (it: CodeSuggestion): number => { const i = props.sources?.findIndex((x) => x.value === it.source) ?? -1; return i < 0 ? 99 : i; };
+  /**
+   * The rows for the word typed: first the best one (the shortest name that starts with it in the same case: con →
+   * console before consoleTransport), then by source (the chips' order: March, then the others), how well they fit
+   * (same-case start, any-case start, holding it) and length. Rows under headings keep their groups' order.
+   */
+  const rank = (items: readonly CodeSuggestion[], typed: string): CodeSuggestion[] => {
+    if (!typed) return [...items];
+    const lw = typed.toLowerCase();
+    const fit = (it: CodeSuggestion): number => (it.label.startsWith(typed) ? 0 : it.label.toLowerCase().startsWith(lw) ? 1 : it.label.toLowerCase().includes(lw) ? 2 : 3);
+    const kept = items.filter((it) => fit(it) < 3);
+    const by = (a: CodeSuggestion, b: CodeSuggestion): number => sourceRank(a) - sourceRank(b) || fit(a) - fit(b) || a.label.length - b.label.length || a.label.localeCompare(b.label);
+    const best = kept.filter((it) => fit(it) === 0).sort((a, b) => a.label.length - b.label.length || sourceRank(a) - sourceRank(b))[0];
+    const groups = [...new Set(kept.map((it) => it.group ?? ""))];
+    return groups.flatMap((g) => {
+      const rows = kept.filter((it) => (it.group ?? "") === g).sort(by);
+      // the best row heads the list (or its group, when the rows have headings)
+      const i = best ? rows.indexOf(best) : -1;
+      if (i > 0) { rows.splice(i, 1); rows.unshift(best!); }
+      return rows;
+    });
+  };
   const ask = (forced: boolean, typed = ""): void => {
-    // the list (not the ghost): asked for, already open (typing on narrows it), or a member is next (".")
-    const list = forced || !!done.peek() || (!!typed && (props.listOn ?? ".").includes(typed.slice(-1)));
     if (!props.complete || ro()) return;
+    // what opens the list for good: asked for, or a member is next (".")
+    if (forced || (!!typed && (props.listOn ?? ".").includes(typed.slice(-1)))) sticky = true;
     const caret = input.selectionStart ?? input.value.length;
     const r = props.complete({ value: input.value, caret, before: input.value.slice(0, caret), forced, typed });
     const show = (c: CodeCompletion | null | undefined): void => {
-      if (!list && props.suggest === "ghost") { ghost.set(likeliest(c, caret)); return; }
-      ghost.set(null);
-      // the rows that fit what is typed since the list's start (console.lo → log): starting with it first, then holding it
-      const word = c ? input.value.slice(c.from, caret).toLowerCase() : "";
-      const items = !c || !word ? c?.items ?? [] : [
-        ...c.items.filter((it) => it.label.toLowerCase().startsWith(word)),
-        ...c.items.filter((it) => !it.label.toLowerCase().startsWith(word) && it.label.toLowerCase().includes(word)),
-      ];
-      batch(() => { active.set(0); done.set(c && items.length ? { from: c.from, to: c.to ?? caret, items, ...(c.all ? { all: true } : {}) } : null); });
+      const word = c ? input.value.slice(c.from, caret) : "";
+      const items = c ? rank(c.items, word) : [];
+      const ghosting = props.suggest === "ghost";
+      // the ghost (the best row's rest at the caret) and, below, the list: both while typing
+      ghost.set(ghosting && !forced && c ? likeliest({ ...c, items }, caret) : null);
+      const min = props.listAfter ?? 3;
+      const open = !ghosting || sticky || (min > 0 && word.length >= min);
+      batch(() => { active.set(0); done.set(open && c && items.length ? { from: c.from, to: c.to ?? caret, items, ...(c.all ? { all: true } : {}) } : null); });
+      if (!done.peek()) sticky = false;
     };
     // a language service answers later: the list opens only when the text and the caret are still where they were
     if (r && typeof (r as Promise<unknown>).then === "function") {
@@ -267,7 +295,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     show(r as CodeCompletion | null | undefined);
   };
   let asked = 0;
-  /** The row the ghost shows: the word written so far, completed; a row of the same case first, then any case. */
+  /** The row the ghost shows (the rows come ranked): the first that completes the word in its case, then in any case. */
   const likeliest = (c: CodeCompletion | null | undefined, caret: number): { from: number; at: number; rest: string; item: CodeSuggestion } | null => {
     if (!c || !c.items.length) return null;
     const typed = input.value.slice(c.from, caret);
@@ -283,6 +311,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     const g = ghost.peek();
     if (!g) return;
     ghost.set(null);
+    close();
     const text = g.item.insert ?? g.item.label;
     input.setRangeText(text, g.from, g.at, "end");
     let caret = g.from + text.length - (g.item.back ?? 0);
@@ -290,10 +319,11 @@ export function CodeEditor(props: CodeEditorProps): Element {
     input.setSelectionRange(caret, caret);
     set(input.value);
   };
-  const close = (): void => { if (done.peek()) done.set(null); };
+  const close = (): void => { sticky = false; if (done.peek()) done.set(null); };
   const pick = (i: number): void => {
     const d = done.peek(), item = shown.peek()[i];
     if (!d || !item) return;
+    ghost.set(null);
     const text = item.insert ?? item.label;
     input.setRangeText(text, d.from, d.to, "end");
     let caret = d.from + text.length - (item.back ?? 0);
@@ -301,7 +331,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (item.head && !input.value.includes(item.head)) { input.setRangeText(`${item.head}\n`, 0, 0, "preserve"); caret += item.head.length + 1; }
     input.setSelectionRange(caret, caret);
     // `again`: the list stays open and takes the next rows (closing and opening it again would mount a second list)
-    if (!item.again) done.set(null);
+    if (!item.again) { sticky = false; done.set(null); }
     set(input.value);
     if (item.again) ask(true);
   };
@@ -414,7 +444,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     const mod = e.ctrlKey || e.metaKey;
     if (ghost.peek()) {
       if (e.key === "Tab" && !e.shiftKey) { e.preventDefault(); takeGhost(); return; }
-      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); ghost.set(null); return; }
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); ghost.set(null); close(); return; }
       if (!mod && e.key.length > 1) ghost.set(null); // the caret moves: the ghost goes
     }
     if (mod && e.code === "Space" && on("suggest")) { e.preventDefault(); ask(true); return; }

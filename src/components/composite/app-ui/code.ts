@@ -35,12 +35,13 @@ export function codeLang(path: string): string {
 }
 const lineCol = (text: string, at: number): string => { const before = text.slice(0, at).split("\n"); return `${before.length}:${(before[before.length - 1]?.length ?? 0) + 1}`; };
 
-// the suggestion sources (chips under the list): March first and by default; the choice is kept across visits
+// the suggestion sources (chips under the list), in the order rows are ranked; the choice is kept across visits
 messages("tr", { "Saved": "Kaydedildi", "App": "Uygulama", "Methods": "Metotlar", "Properties": "Özellikler", "Classes": "Sınıflar", "Types": "Türler", "Modules": "Modüller", "Other": "Diğer" });
 
 const SOURCES = [{ value: "march", label: "March" }, { value: "ts", label: "TS" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
-const SOURCE_KEY = "march.code.source";
-const readSource = (): string => { try { return localStorage.getItem(SOURCE_KEY) ?? "march"; } catch { return "march"; } };
+// "all" at first: every row, March's first (the editor ranks by the chips' order); a chip narrows to its source
+const SOURCE_KEY = "march.code.source.v2";
+const readSource = (): string => { try { return localStorage.getItem(SOURCE_KEY) ?? "all"; } catch { return "all"; } };
 const source = signal(readSource());
 // the app's keys (the debugger's F5…, the palette's) under the editor's in its shortcuts menu
 const appKeys = () => hotkeys.list().filter((k) => k.active && k.description).map((k) => ({ keys: k.label, label: t(k.description), group: k.group ? t(k.group) : t`App` }));

@@ -249,3 +249,24 @@ test("CodeEditor: a dot opens the list even with suggest=\"ghost\"; rows keep th
   assert.match(rows()[0], /log/);
   dispose();
 });
+
+test("CodeEditor ranking: the shortest same-case start first (con → console), then March's rows, then the others; with the ghost the list opens from 3 letters", async () => {
+  const code = signal("");
+  const items = [
+    { label: "consoleTransport", source: "march" }, { label: "Contrast", source: "march" }, { label: "constructor", source: "js" },
+    { label: "console", source: "js" }, { label: "decode", source: "js" },
+  ];
+  const sources = [{ value: "march", label: "March" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, suggest: "ghost", sources, source: "all", complete: (c) => ({ from: c.caret - (/\w*$/.exec(c.before)?.[0].length ?? 0), items }) }));
+  const input = el.querySelector("textarea");
+  const rows = () => [...document.querySelectorAll(".m-ced-list [role=option]")].map((o) => o.textContent);
+  type(input, "co", 2, "o"); await tick();
+  assert.equal(rows().length, 0, "two letters: the ghost only");
+  assert.equal(el.querySelector(".m-ced-ghost").textContent, "nsole", "the ghost is the best row already");
+  type(input, "con", 3, "n"); await tick();
+  assert.deepEqual(rows().map((r) => r.replace(/\s.*$/, "")), ["console", "consoleTransport", "Contrast", "constructor"]);
+  assert.equal(el.querySelector(".m-ced-ghost").textContent, "sole", "ghost and list together");
+  type(input, "co", 2, ""); await tick();
+  assert.equal(rows().length, 0, "shorter again: the list closes");
+  dispose();
+});

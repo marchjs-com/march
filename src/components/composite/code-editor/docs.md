@@ -42,6 +42,7 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `shortcuts` | boolean | `true` | the shortcuts button (a menu of every key) in the foot line |
 | `moreShortcuts` | `{ keys, label, group? }[]` / accessor | — | the app's keys, listed under the editor's |
 | `shortcutsLabel` | string / accessor | "Keyboard shortcuts" | name of the button and the menu |
+| `listAfter` | number | `3` | with `suggest="ghost"`: the list opens too once the word is this long; 0: only on Ctrl+Space / `listOn` |
 | `listOn` | string | `"."` | characters that open the list even with `suggest="ghost"` (a member list) |
 | `copy` | boolean | `true` | the copy button (an icon button) |
 | `copyLabel` | string / accessor | "Copy" | its accessible name and tooltip |
@@ -80,7 +81,9 @@ by, `head` a line written at the top of the text with the pick when it is not th
 | Esc, then Tab | leave the editor (`release`): Tab is the editor's until Escape |
 | F9 | `onGutter` at the caret's line |
 
-Edits go through the browser's own undo (Ctrl+Z). A row with a `group` is listed under its heading; a completion with
+Edits go through the browser's own undo (Ctrl+Z). Rows are ranked for the word typed: first the shortest name that
+starts with it in the same case (`con` → `console` before `consoleTransport`), then by source in the chips' order
+(March first), how well they fit and length; the ghost shows the first row. A row with a `group` is listed under its heading; a completion with
 `all: true` shows every row whatever source chip is chosen (a member list after a dot: `console.` → Methods, Properties).
 
 ## Accessibility
