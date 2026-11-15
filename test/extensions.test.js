@@ -246,3 +246,63 @@ test("extensions.name: components named by their export names (minified builds),
   assert.equal(extensions.list().find((r) => r.name === "by-export").target, "test");
   dispose(); off();
 });
+
+test("partial targets: partOf(Button, Spinner) reaches Button's own Spinner; inside(Button, Spinner) also the one in a Card inside it; a Spinner outside is never touched", () => {
+  const { lazyChildren, inside, partOf } = M;
+  function Spinner(p) { return h("i", { class: "spin", "data-size": () => p.size ?? "md" }); }
+  function PButton(p) { return h("button", { class: "pb" }, h(Spinner, {}), () => p.children); }
+  function PCard(p) { return h("div", { class: "pc" }, () => p.children); }
+  const show = signal(false);
+  const tree = () => [
+    h("section", { id: "own" }, h(PButton, {})),
+    h("section", { id: "deep" }, h(PButton, {}, lazyChildren(() => [h(PCard, {}, lazyChildren(() => [h(Spinner, {})]))]))),
+    h("section", { id: "late" }, h(PButton, {}, lazyChildren(() => [h(PCard, {}, lazyChildren(() => [() => (show() ? h(Spinner, {}) : null)]))]))),
+    h("section", { id: "out" }, h(Spinner, {}), h(PCard, {}, lazyChildren(() => [h(Spinner, {})]))),
+  ];
+  const sizes = (host, id) => [...host.querySelectorAll(`#${id} .spin`)].map((x) => x.getAttribute("data-size"));
+
+  let off = intercept(partOf(PButton, Spinner), { name: "own-spinner", props: () => ({ size: "em" }) });
+  let r = mount(tree);
+  assert.deepEqual(sizes(r.host, "own"), ["em"], "Button's own Spinner");
+  assert.deepEqual(sizes(r.host, "deep"), ["em", "md"], "the Spinner in a Card inside the Button is not its own part");
+  assert.deepEqual(sizes(r.host, "out"), ["md", "md"], "outside: untouched");
+  r.dispose(); off();
+
+  off = intercept(inside(PButton, Spinner), { name: "any-spinner", props: () => ({ size: "xs" }) });
+  r = mount(tree);
+  assert.deepEqual(sizes(r.host, "deep"), ["xs", "xs"], "any depth inside the Button");
+  assert.deepEqual(sizes(r.host, "out"), ["md", "md"]);
+  show.set(true);
+  assert.deepEqual(sizes(r.host, "late"), ["xs", "xs"], "a Spinner drawn later inside is reached too");
+  assert.equal(extensions.list().find((x) => x.name === "any-spinner").target, "inside(PButton, Spinner)");
+  r.dispose(); off(); show.set(false);
+
+  // a chain, lists, "*", m:extend, a test that reads the path, a scope; cleanup with the instance
+  const log = [];
+  const offs = [
+    intercept(inside(PButton, PCard, Spinner), { name: "chain", props: () => ({ size: "chain" }) }),
+    extend(partOf([PCard, PButton], "*"), { name: "star", setup: ({ onCleanup }) => { log.push("up"); onCleanup(() => log.push("down")); } }),
+  ];
+  r = mount(tree);
+  assert.deepEqual(sizes(r.host, "own"), ["md"]);
+  assert.deepEqual(sizes(r.host, "deep"), ["md", "chain"]);
+  assert.deepEqual(sizes(r.host, "out"), ["md", "md"], "a Card outside a Button is not the chain");
+  const ups = log.length;
+  assert.ok(ups >= 4, `parts of a Card or a Button: ${ups}`);
+  r.dispose();
+  assert.equal(log.filter((x) => x === "down").length, ups, "every setup cleaned up with its instance");
+  for (const o of offs) o();
+
+  const seen = [];
+  const offT = intercept({ test: (c, info, path) => { if (c === Spinner) seen.push(path.map((x) => x.name).join(">")); return false; } }, { name: "peek" });
+  r = mount(tree);
+  assert.ok(seen.includes("PButton>PCard"), seen.join(" | "));
+  assert.ok(seen.includes(""), "a Spinner at the top has an empty path");
+  r.dispose(); offT();
+
+  r = mount(() => withExtensions([[partOf(PButton, Spinner), defineExtension({ name: "scoped", props: () => ({ size: "sc" }) })]], () => [h(PButton, {}), h(Spinner, {})]));
+  assert.deepEqual([...r.host.querySelectorAll(".spin")].map((x) => x.getAttribute("data-size")), ["sc", "md"]);
+  r.dispose();
+  assert.throws(() => intercept(inside(PButton, "*"), { name: "x", render: (n) => n() }), /only adds props/);
+  assert.throws(() => inside(PButton), /two steps/);
+});

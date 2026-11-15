@@ -138,6 +138,16 @@ intercept(Card, { name: "badge", render: (next, p) => (p.isNew ? <div>{next()}<B
     it. A callback the caller did not pass can be added.
   - `render(next, p, ctx)`: `next(p?)` renders the component; return its output, a wrapped one, or anything else
     (not calling `next` replaces the component entirely: it does not run).
+- Partial targets: `inside(A, B)` is every `B` drawn anywhere inside an `A` (any depth); `partOf(A, B)` only `A`'s
+  own `B` (its nearest component is `A`; `<If>`, `<For>` and other control flow do not count). Both chain
+  (`inside(Toolbar, Button, Icon)`), take lists (`[Card, Dialog]`) and `"*"` at any step, and work for `extend`,
+  `intercept`, scopes and `m:extend`. The path is the chain of components that created the instance (not the DOM: a
+  part moved into a portal is still inside). A test target gets it too: `{ test: (c, info, path) => … }`. It is only
+  kept while a registration needs it (each instance then runs under an owner of its own).
+  ```tsx
+  intercept(partOf(Button, Spinner), { name: "small-spinner", props: () => ({ size: "em" }) })
+  extend(inside(Card, Badge), track)
+  ```
 - Order: registration order, or `order` (lower runs outer: first for props, around the others for callbacks and
   render). `m:parts` is a built-in that runs innermost, so it wins over interceptors.
 - Scope: `<Extensions use>` / `withExtensions(list, render)` reach every component created inside (now or later)

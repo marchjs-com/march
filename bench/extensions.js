@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Extension pipeline cost (node, tiny DOM — relative numbers): create N components with nothing registered (the fast
-// path: createComponent as before), then with 1, 5 and 20 extensions that match, and 20 that target other components.
+// path: createComponent as before), then with 1, 5 and 20 extensions that match, 20 that target other components, and
+// one partial target (inside) that matches none of them (the cost of keeping the component path).
 // Usage: node bench/extensions.js [--n 10000] [--runs 5]
 import { installDom } from "../src/testing/dom.ts";
 
@@ -9,7 +10,7 @@ const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? Number
 /** Median ms to create `n` components per case. */
 export async function extensionBench(n = 10000, runs = 5) {
   if (!globalThis.document) installDom();
-  const { h, render, extend, intercept } = await import("../src/index.ts");
+  const { h, render, extend, intercept, inside } = await import("../src/index.ts");
   function Item(p) { return h("i", { class: p.cls }, p.label); }
   function Other() { return null; }
   const time = () => {
@@ -23,6 +24,7 @@ export async function extensionBench(n = 10000, runs = 5) {
     }
     return out.sort((a, b) => a - b)[runs >> 1];
   };
+  time(); // warm up
   const result = { none: time() };
   const cases = [["one", 1, Item], ["five", 5, Item], ["twenty", 20, Item], ["twentyOther", 20, Other]];
   for (const [name, count, target] of cases) {
@@ -35,6 +37,10 @@ export async function extensionBench(n = 10000, runs = 5) {
     result[name] = time();
     for (const o of offs) o();
   }
+  // a partial target anywhere: every instance keeps its component path (an owner of its own)
+  const offPath = intercept(inside(Other, Item), { name: "path", props: () => ({ cls: "p" }) });
+  result.pathOther = time();
+  offPath();
   result.after = time();
   return result;
 }

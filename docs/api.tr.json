@@ -1,6 +1,8 @@
 {
  "hadi-march": {
   "extend": "Bileşenlere sarmalayıcı olmadan yeni özellik kazandırır: `extend([Button, Link], track)`, `extend(\"*\", testIds)`; hedef bir bileşen, liste, `\"*\"` ya da `{ test }`. Kaldıran bir fonksiyon döner.",
+  "inside": "Kısmi hedef: bir bileşenin içinde (her derinlikte) çizilen her B: `extend(inside(Button, Spinner), ext)`; zincir (`inside(Toolbar, Button, Icon)`), liste ve `\"*\"` alır. Yol DOM'dan değil bileşen sahipliğinden gelir.",
+  "partOf": "Kısmi hedef: yalnız A'nın kendi B parçası (B'nin en yakın bileşen atası A): `intercept(partOf(Button, Spinner), …)`; <If>, <For> gibi akış bileşenleri araya girmez.",
   "intercept": "Adı verilen bileşenlerin aldığını ve verdiğini değiştirir: `props` (özellikler, canlı), `on` (onClick gibi geri çağrılar; `next` asıl olanı çağırır), `render` (çıktıyı sarar ya da tamamen değiştirir). Kaldıran bir fonksiyon döner.",
   "defineExtension": "Yeniden kullanılır bir eklenti tanımlar (kaydetmez): eklediği özellikler (türleriyle), `setup`, `props` / `on` / `render` araya girenleri, `order`; `extend()` ya da `<Extensions use>` ile uygulanır.",
   "withExtensions": "Eklentileri yalnız içeride çizilen bileşenlere uygular (şimdi ya da sonra): `withExtensions([track], () => …)`; genel olanlara ve dış kapsama eklenir.",

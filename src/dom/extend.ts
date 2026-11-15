@@ -5,17 +5,42 @@
 // as before (no hook installed). Once something is registered, each component goes through one ordered pipeline:
 //   raw props ─► m:extend filter ─► props interceptors (outer → inner) ─► built-ins (m:parts) ─► callbacks (on)
 //            ─► render interceptors around Comp(props) ─► output ─► setup (after render, with the root elements)
-import { computed, untrack, getOwner, runWithOwner, isReactive, reactive, provide, useContext, signal, DEV, onCleanup } from "../core/reactive.ts";
-import { _componentHook, insert, type Component } from "./h.ts";
+import { computed, untrack, getOwner, runWithOwner, isReactive, reactive, provide, useContext, signal, DEV, onCleanup, _owner, type Owner } from "../core/reactive.ts";
+import { _componentHook, insert, Fragment, type Component } from "./h.ts";
+import { If, Else, Try } from "./flow.ts";
+import { For } from "./for.ts";
+import { Switch, Match } from "./switch.ts";
+import { Await } from "./await.ts";
+import { Dynamic } from "./dynamic.ts";
+import { Portal } from "./portal.ts";
 
 type Props = Record<string, unknown>;
 type AnyComp = Component<never>;
 /** Facts about a component a test target can look at. */
 export interface ComponentInfo { name: string; [key: string]: unknown }
-/** What an extension applies to: a component, a list of them, `"*"` (every component) or `{ test }`. */
-export type ExtensionTarget = AnyComp | readonly AnyComp[] | "*" | { test: (component: AnyComp, info: ComponentInfo) => boolean };
+/** A test target: `path` is the chain of components that created the instance (nearest last). */
+export type ExtensionTest = (component: AnyComp, info: ComponentInfo, path: readonly AnyComp[]) => boolean;
+/** One step of a partial target: a component, a list (either) or `"*"` (any). */
+export type PathStep = AnyComp | readonly AnyComp[] | "*";
+/** A partial target (inside / partOf): a component only where it stands. */
+export interface PathTarget { readonly steps: readonly PathStep[]; readonly direct: boolean }
+/** What an extension applies to: a component, a list of them, `"*"` (every component), `{ test }` or a path. */
+export type ExtensionTarget = AnyComp | readonly AnyComp[] | "*" | { test: ExtensionTest } | PathTarget;
 /** A target after registration: a test is a marked function. */
-type Target = AnyComp | readonly AnyComp[] | "*";
+type Target = AnyComp | readonly AnyComp[] | "*" | PathTarget;
+const isPath = (t: unknown): t is PathTarget => !!t && typeof t === "object" && !Array.isArray(t) && Array.isArray((t as PathTarget).steps);
+const pathOf = (steps: PathStep[], direct: boolean): PathTarget => {
+  if (steps.length < 2) throw new TypeError("March: inside() / partOf() take at least two steps: inside(Button, Spinner).");
+  return { steps, direct };
+};
+/**
+ * A partial target: every `B` drawn anywhere inside an `A` (any depth): `extend(inside(Button, Spinner), ext)`.
+ * Steps chain (`inside(Toolbar, Button, Icon)`), and each may be a list (either) or `"*"`. The path is the chain of
+ * components that created the instance, not the DOM (a part moved into a portal is still inside).
+ */
+export const inside = (...steps: PathStep[]): PathTarget => pathOf(steps, false);
+/** A partial target: only `A`'s own `B` (B's nearest component is A): `intercept(partOf(Button, Spinner), …)`. */
+export const partOf = (...steps: PathStep[]): PathTarget => pathOf(steps, true);
 
 /** One added prop: its type (for tools), default and text. */
 export interface ExtensionPropSpec<T = unknown> {
@@ -103,6 +128,8 @@ export function defineExtension<P extends Props = Props>(def: ExtensionDef<P>): 
 const entries: Entry[] = [];
 let seq = 0;
 let scopes = false;
+/** Some registration needs the component path (inside / partOf / a test that reads it): it is kept. */
+let tracking = false, scopedPaths = false;
 /** Matching global entries per component (cleared when the registry changes). */
 let cache = new WeakMap<AnyComp, Entry[]>();
 const version = signal(0);
@@ -111,8 +138,10 @@ const scopedSeen = new Set<Extension>();
 const declared = (ext: ExtensionDef): Set<string> | undefined =>
   ext.props && typeof ext.props === "object" ? new Set(Object.keys(ext.props)) : undefined;
 
+const wantsPath = (t: Target): boolean => isPath(t) || (isTest(t) && ((t as unknown as Record<symbol, number>)[TEST_LEN] ?? 0) >= 3);
 function changed(): void {
   cache = new WeakMap();
+  tracking = scopedPaths || entries.some((e) => wantsPath(e.target));
   _componentHook(entries.length || scopes ? pipeline : undefined);
   version.update((v) => v + 1);
 }
@@ -134,17 +163,24 @@ function add(target: Target, ext: Extension, builtin?: Builtin): () => void {
   return () => { if (!on) return; on = false; const i = entries.indexOf(entry); if (i >= 0) entries.splice(i, 1); changed(); };
 }
 const byOrder = (a: Entry, b: Entry): number => (a.ext.order ?? 0) - (b.ext.order ?? 0) || a.seq - b.seq;
-const list = (t: Target): readonly unknown[] | null => (Array.isArray(t) ? t : typeof t === "function" && !isTest(t) ? [t] : null);
+const stepList = (s: PathStep): readonly unknown[] | null => (s === "*" ? null : Array.isArray(s) ? s : [s]);
+const list = (t: Target): readonly unknown[] | null => (isPath(t) ? stepList(t.steps[t.steps.length - 1]!) : Array.isArray(t) ? t : typeof t === "function" && !isTest(t) ? [t] : null);
 function overlaps(a: Target, b: Target): boolean {
   const la = list(a), lb = list(b);
   return !la || !lb || la.some((x) => lb.includes(x));
 }
 /** A test target takes (component, info); a component takes one props object. Tests are marked when registered. */
 const TEST = Symbol("m.extTest");
+const TEST_LEN = Symbol("m.extTestLen");
 const isTest = (t: unknown): boolean => typeof t === "function" && (t as unknown as Record<symbol, unknown>)[TEST] === true;
 
 function checkTarget(t: ExtensionTarget, ext: ExtensionDef, star: boolean): Target {
   const target = asTarget(t);
+  if (isPath(target)) {
+    for (const s of target.steps) if (s !== "*" && !(Array.isArray(s) ? s.every((c) => typeof c === "function") : typeof s === "function")) throw new TypeError(`March: extension "${ext.name}": a path step is a component, a list or "*".`);
+    if (target.steps[target.steps.length - 1] === "*") checkTarget("*", ext, star);
+    return target;
+  }
   if (target === "*") {
     if (!star || ext.render || ext.on || typeof ext.props === "function") throw new TypeError(`March: extension "${ext.name}": "*" (every component) only adds props and setup; intercept() takes named components.`);
     return target;
@@ -166,15 +202,16 @@ export function extend<P extends Props>(target: ExtensionTarget, ext: Extension<
  * Change what named components get and give: `intercept(Button, { name, props: (p) => ({ size: p.size ?? "sm" }) })`,
  * `{ on: { onClick: (next, e, p) => … } }`, `{ render: (next, p) => … }`. Returns a function that removes it.
  */
-export function intercept<P extends Props>(target: AnyComp | readonly AnyComp[] | { test: (component: AnyComp, info: ComponentInfo) => boolean }, def: ExtensionDef<P> | Extension<P>): () => void {
+export function intercept<P extends Props>(target: AnyComp | readonly AnyComp[] | { test: ExtensionTest } | PathTarget, def: ExtensionDef<P> | Extension<P>): () => void {
   const e = ("__ext" in def ? def : defineExtension(def)) as Extension;
   return add(checkTarget(target, e, false), e);
 }
 function asTarget(t: ExtensionTarget): Target {
   if (t && typeof t === "object" && !Array.isArray(t) && typeof (t as { test?: unknown }).test === "function") {
-    const fn = (t as { test: (c: AnyComp, i: ComponentInfo) => boolean }).test;
-    const m = (c: AnyComp, i: ComponentInfo): boolean => fn(c, i);
+    const fn = (t as { test: ExtensionTest }).test;
+    const m = (c: AnyComp, i: ComponentInfo, path: readonly AnyComp[]): boolean => fn(c, i, path);
     (m as unknown as Record<symbol, unknown>)[TEST] = true;
+    (m as unknown as Record<symbol, unknown>)[TEST_LEN] = fn.length;
     return m as unknown as AnyComp;
   }
   return t as Target;
@@ -195,12 +232,47 @@ function infoOf(c: AnyComp): ComponentInfo {
   }
   return i;
 }
-function matches(e: Entry, c: AnyComp): boolean {
+const stepHas = (s: PathStep, c: AnyComp): boolean => s === "*" || (Array.isArray(s) ? s.includes(c) : s === c);
+/** Whether `e` applies to component `c`; `path` (the instance's component ancestors, nearest last) when known. A path
+ * target or a test that reads the path is checked per instance (`path` given); without it, by the last step only. */
+function matches(e: Entry, c: AnyComp, path?: readonly AnyComp[]): boolean {
   const t = e.target;
   if (t === "*") return true;
   if (Array.isArray(t)) return t.includes(c);
-  if (isTest(t)) { try { return !!(t as unknown as (c: AnyComp, i: ComponentInfo) => boolean)(c, infoOf(c)); } catch (err) { fail(e, c, err); return false; } }
+  if (isPath(t)) {
+    const st = t.steps;
+    if (!stepHas(st[st.length - 1]!, c)) return false;
+    if (!path) return true;
+    let j = path.length - 1;
+    for (let i = st.length - 2; i >= 0; i--) {
+      if (t.direct) { if (j < 0 || !stepHas(st[i]!, path[j]!)) return false; j--; continue; }
+      while (j >= 0 && !stepHas(st[i]!, path[j]!)) j--;
+      if (j < 0) return false;
+      j--;
+    }
+    return true;
+  }
+  if (isTest(t)) {
+    if (!path && wantsPath(t)) return true;
+    try { return !!(t as unknown as ExtensionTest)(c, infoOf(c), path ?? []); } catch (err) { fail(e, c, err); return false; }
+  }
   return t === c;
+}
+/** Checked per instance: the path decides. */
+const perInstance = (e: Entry): boolean => wantsPath(e.target);
+
+// ------------------------------------------------------------------ the component path (only while tracking)
+const PathCtx: { id: symbol; defaultValue: readonly AnyComp[] } = { id: Symbol("m.extPath"), defaultValue: [] };
+/** Control flow and plumbing are not parts: partOf(Button, Spinner) sees through <If>, <For>… */
+const CLEAR = new Set<unknown>([Fragment, If, Else, Try, For, Switch, Match, Await, Dynamic, Portal]);
+/** Run a component under an owner of its own that carries its path (disposed with the owner it was created in). */
+function underPath(fn: Component<Props>, path: readonly AnyComp[]): Component<Props> {
+  return (p) => {
+    const parent = getOwner(), o = _owner(parent) as Owner & { owned: Owner[] | null; context: Map<symbol, unknown> | null };
+    if (parent) ((parent as typeof o).owned ??= []).push(o);
+    o.context = new Map([[PathCtx.id, path]]);
+    return runWithOwner(o, () => untrack(() => fn(p)));
+  };
 }
 
 // ------------------------------------------------------------------ scope
@@ -227,13 +299,16 @@ export function withExtensions<T>(use: UseList | (() => UseList | null | undefin
         const [t, x] = Array.isArray(item) && item.length === 2 && typeof item[1] === "object" && !Array.isArray(item[1]) ? (item as readonly [ExtensionTarget, Extension]) : [(item as Extension).target ?? "*", item as Extension];
         const ext = ("__ext" in x ? x : defineExtension(x)) as Extension;
         scopedSeen.add(ext);
-        return { ext, target: checkTarget(t, ext, true), seq: seq++, scope: true, keys: declared(ext) };
+        const target = checkTarget(t, ext, true);
+        if (wantsPath(target) && !scopedPaths) { scopedPaths = true; changed(); }
+        return { ext, target, seq: seq++, scope: true, keys: declared(ext) };
       });
       version.update((v) => v + 1);
     }
     return made;
   };
   const run = (): T => {
+    untrack(own); // read now: a path target in the list turns path keeping on before anything inside is created
     const outer = useContext(ScopeCtx);
     provide(ScopeCtx, { list: () => (outer ? [...outer.list(), ...own()] : own()) });
     const r = render();
@@ -288,6 +363,16 @@ function rootsOf(v: unknown, into: Element[] = []): Element[] {
 const snap = (p: Props): Props => { const o: Props = {}; for (const k of Object.keys(p)) if (k !== "children") { const v = p[k]; o[k] = isReactive(v) && !ON.test(k) ? untrack(v) : v; } return o; };
 
 function pipeline(Comp: Component<Props>, raw0: Props): [Component<Props>, Props] {
+  if (!tracking) return runPipeline(Comp, raw0);
+  // a path target is registered: every instance runs under an owner of its own that knows its component ancestors
+  const parent = useContext(PathCtx);
+  const r = runPipeline(Comp, raw0, parent);
+  if (CLEAR.has(Comp)) return r;
+  const fn = underPath(r[0], [...parent, Comp as AnyComp]);
+  Object.defineProperty(fn, "name", { value: Comp.name });
+  return [fn, r[1]];
+}
+function runPipeline(Comp: Component<Props>, raw0: Props, path?: readonly AnyComp[]): [Component<Props>, Props] {
   const c = Comp as AnyComp;
   let global = cache.get(c);
   if (!global) { global = entries.filter((e) => matches(e, c)); cache.set(c, global); }
@@ -299,6 +384,7 @@ function pipeline(Comp: Component<Props>, raw0: Props): [Component<Props>, Props
   // keep: a "*" entry with declared props runs only on instances given one of them; m:extend filters user entries
   const active: Entry[] = [];
   for (const e of all) {
+    if (path && perInstance(e) && !matches(e, c, path)) continue;
     if (e.target === "*" && e.keys) { let hit = false; for (const k in raw0) if (e.keys.has(k)) { hit = true; break; } if (!hit) continue; }
     if (!e.builtin && pick != null && pick !== true && (pick === false || !pick.includes(e.ext.name))) continue;
     active.push(e);
@@ -479,6 +565,7 @@ export const extensions = {
 };
 function targetName(t: Target): string {
   if (t === "*") return "*";
+  if (isPath(t)) return `${t.direct ? "partOf" : "inside"}(${t.steps.map((s) => (s === "*" ? "*" : Array.isArray(s) ? `[${s.map((c) => infoOf(c).name).join(", ")}]` : infoOf(s as AnyComp).name)).join(", ")})`;
   if (Array.isArray(t)) return t.map((c) => infoOf(c).name).join(", ");
   return isTest(t) ? "test" : infoOf(t as AnyComp).name;
 }
