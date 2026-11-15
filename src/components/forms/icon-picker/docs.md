@@ -10,6 +10,15 @@ let $icon = "plus"
 <IconPicker inline groups={false} value={$icon} onChange={(n) => $icon = n} />
 ```
 
+**More icon sets.** `packs` adds sets (Lucide, Tabler, Phosphor…) to a list above the grid. A set is loaded only when it
+is first chosen (or when the value names it), once for the page; a value from it is `"id:name"` (`"lucide:arrow-left"`).
+The grid draws `pageSize` icons (240) and the next page as it is scrolled to its end, so thousands of icons stay quick.
+
+```tsx
+const packs = [{ id: "lucide", label: "Lucide", count: 2356, load: () => import("hadi-march/icons/lucide").then((m) => Object.fromEntries(Object.values(m).map((d) => [d.name, d]))) }]
+<IconPicker packs={packs} value={$icon} onChange={(n) => $icon = n} />
+```
+
 ## Props
 
 | Prop | Type | Default | |
@@ -17,6 +26,9 @@ let $icon = "plus"
 | `value` | string / signal / accessor | — | the chosen icon's name; `null`: none |
 | `onChange` | `(name \| null) => void` | — | after a choice (a signal `value` is set too) |
 | `icons` | `{ [name]: IconDef }` | every built-in icon | the icons to choose from |
+| `packs` | `IconPickerPack[]` | — | more sets: `{ id, label, count?, load: () => Promise<{ [name]: IconDef }> }`, loaded when chosen |
+| `setLabel` | string | "March" | the name of `icons` in the set list |
+| `pageSize` | number | `240` | icons drawn at once; scrolling to the end draws as many more |
 | `groups` | `IconGroup[]` / `false` | `ICON_GROUPS` | the filter chips: `{ id, label, match: RegExp \| (name, def) => boolean }` |
 | `none` | boolean | `true` | a "No icon" choice |
 | `inline` | boolean | `false` | the panel right in the page, without the button |
@@ -37,4 +49,5 @@ chosen one; the number of icons shown is announced (polite) while searching.
 
 ## Composed of
 
-Dropdown (the button and its panel), SearchBox (the search), Chip (the filters), IconButton (every icon), Empty (no match).
+Dropdown (the button and its panel), Select (the icon set), SearchBox (the search), Chip (the filters), IconButton
+(every icon), Spinner (a set loading), Empty (no match).

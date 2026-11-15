@@ -8,5 +8,6 @@
 .m-ipk-groups { display: flex; flex-wrap: wrap; gap: var(--m-space-1); }
 .m-ipk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr)); gap: 2px; max-block-size: 15rem; overflow: hidden auto; }
 .m-icon-btn.m-ipk-item { inline-size: 100%; aspect-ratio: 1; }
+.m-ipk-loading { display: grid; place-items: center; min-block-size: 6rem; }
 .m-ipk-count { margin: 0; color: var(--m-muted); font-size: var(--m-text-xs); }
 .m-ipk.m-ipk-inline { inline-size: min(22rem, 100%); border: 1px solid var(--m-border); border-radius: var(--m-radius); background: var(--m-surface); }

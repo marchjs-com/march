@@ -35,3 +35,31 @@ test("IconPicker: groups={false} and none={false} leave the chips and the empty 
   assert.equal(el.querySelector(".m-ipk-off"), null);
   dispose();
 });
+
+test("IconPicker packs: a set loads when chosen, its value is id:name; the grid draws a page at a time", async () => {
+  let loads = 0;
+  const many = Object.fromEntries(Array.from({ length: 30 }, (_, i) => [`dot-${i}`, { name: `dot-${i}`, d: ["M1 1"] }]));
+  const packs = [{ id: "dots", label: "Dots", count: 30, load: async () => { loads++; return many; } }];
+  const value = signal(null);
+  const { el, dispose } = mount(() => h(IconPicker, { inline: true, groups: false, none: false, pageSize: 10, icons: { plus: { name: "plus", d: [] } }, packs, value }));
+  const items = () => [...el.querySelectorAll(".m-ipk-item")];
+  assert.equal(items().length, 1, "the base set first");
+  assert.equal(loads, 0, "nothing loads before the set is chosen");
+  const select = el.querySelector(".m-ipk-set select") ?? el.querySelector("select");
+  select.value = "1";
+  select.dispatchEvent(new Event("change", { bubbles: true }));
+  await tick(); await tick();
+  assert.equal(loads, 1);
+  assert.equal(items().length, 10, "first page");
+  const grid = el.querySelector(".m-ipk-grid");
+  Object.defineProperty(grid, "scrollHeight", { value: 100, configurable: true });
+  Object.defineProperty(grid, "clientHeight", { value: 100, configurable: true });
+  Object.defineProperty(grid, "scrollTop", { value: 0, configurable: true });
+  grid.dispatchEvent(new Event("scroll"));
+  await tick();
+  assert.equal(items().length, 20, "next page on scroll to the end");
+  items()[3].click();
+  assert.equal(value(), "dots:dot-3");
+  assert.match(el.querySelector(".m-ipk-count").textContent, /30/);
+  dispose();
+});
