@@ -31,5 +31,7 @@ const tr: Record<string, string> = {
   "Preview theme": "Önizleme teması",
   "Page theme": "Sayfa teması",
   "Preview accent": "Önizleme vurgu rengi",
+  "Preview language": "Önizleme dili",
+  "Default": "Varsayılan",
 };
 export default tr;

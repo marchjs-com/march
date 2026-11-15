@@ -23,5 +23,7 @@
 .m-app-pv-foot { max-block-size: 40%; overflow: auto; }
 .m-app-pv-bar { display: flex; align-items: center; gap: var(--m-space-1); padding: 3px var(--m-space-2); }
 .m-app-pv-fill { flex: 1; }
+.m-app-pv-lang-icon { display: inline-flex; }
+.m-app-pv-lang-icon .m-svg { inline-size: 1rem; block-size: 1rem; }
 .m-app-pv-stage { min-block-size: 0; overflow: auto; display: grid; background: var(--m-bg); color: var(--m-text); font-family: var(--m-font); }
 .m-app-pv-accent { display: grid; place-items: center; min-block-size: 100%; padding: var(--m-space-4); box-sizing: border-box; }

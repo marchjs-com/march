@@ -59,7 +59,11 @@ with it. `requires` starts it after the plugins it needs; removing one removes t
 theme, accent and light / dark at the end: only the preview takes them) over a stage that shows the children in its
 middle. Every picker is off until asked for (`toolbar={{ theme: true, mode: true }}`, or `toolbar` for all of them): a
 picker added later stays hidden. The bar shows only while at least one picker (or your `tools`) does. `theme`, `accent`
-and `mode` take signals to keep the choices; `footer` sits under the stage (the shown component's code).
+and `mode` take signals to keep the choices; `footer` sits under the stage (the shown component's code); the bar, the
+stage and the footer are one piece (Joined). The theme picker's first entry is "Page theme" (the default: `""`, the page's
+theme). `toolbar={{ language: true }}` adds a language menu: `languages` (`[{ value, label }]`, `""` the default texts)
+and `language` (a signal) keep the choice; what it means for the stage is the owner's (the playground translates the
+drawn texts).
 
 ```tsx
 <AppPreview theme={$theme} toolbar={{ theme: true, accent: true }} tools={<Button size="sm">Yenile</Button>}>
