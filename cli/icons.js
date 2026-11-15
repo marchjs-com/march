@@ -186,7 +186,7 @@ function readMarch(packsDir) {
   const f = join(packsDir, "..", "catalog.ts");
   if (!existsSync(f)) return null;
   const icons = [...readFileSync(f, "utf8").matchAll(/^ {2}(\w+): \{ name: ("[^"]*"), d: (\[.*\])(, fill: true)? \},$/gm)].map((m) => [JSON.parse(m[2]), m[1], JSON.parse(m[3]), ...(m[4] ? [2] : [])]);
-  return { info: { id: "march", name: "March", license: "MIT", home: "https://github.com/marchjs/march", count: icons.length, viewBox: "0 0 24 24", mode: "stroke" }, P: { vb: "0 0 24 24" }, icons };
+  return { info: { id: "march", name: "March", license: "MIT", home: "https://github.com/marchjs-com/march", count: icons.length, viewBox: "0 0 24 24", mode: "stroke" }, P: { vb: "0 0 24 24" }, icons };
 }
 
 /**

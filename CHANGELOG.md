@@ -4,8 +4,8 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
-### The repository is github.com/marchjs/march
-- Moved from tlghn/hadimarch with its whole history. Install with `npm i github:marchjs/march#<commit-sha>`; the
+### The repository is github.com/marchjs-com/march
+- Moved from tlghn/hadimarch with its whole history. Install with `npm i github:marchjs-com/march#<commit-sha>`; the
   MadeWithMarch link and the console banner point there; `package.json` has `homepage`, `repository` and `bugs`.
 
 ### cdn.marchjs.com

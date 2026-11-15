@@ -5,7 +5,7 @@ import type { ColorToken } from "../../../theme/colors.ts";
 import { link } from "../../../icons/glyphs/link.ts";
 import { heart } from "../../../icons/glyphs/heart.ts";
 
-export const code = `<CopyButton text="npm i github:marchjs/march" />
+export const code = `<CopyButton text="npm i github:marchjs-com/march" />
 <CopyButton text={() => token} iconOnly label="Anahtarı kopyala" />
 <CopyButton text={url} icon={link} copiedIcon={heart} copiedLabel="Panoda!" copiedColor="brand-blue" />`
 
@@ -21,11 +21,11 @@ export default function CopyButtonDemo(props: { values: { iconOnly: boolean; ico
     return `Kopyalayınca: ${parts.join(", ")}`
   }
   return <div class="sc-row">
-    <code>npm i github:marchjs/march</code>
+    <code>npm i github:marchjs-com/march</code>
     {() => {
       // CopyButton reads its props once: every choice builds the button again (the copy count lives here)
       const v = { ...props.values }
-      const button = (<CopyButton text="npm i github:marchjs/march" iconOnly={v.iconOnly} label="Komutu kopyala" onCopy={() => { $copies++ }}
+      const button = (<CopyButton text="npm i github:marchjs-com/march" iconOnly={v.iconOnly} label="Komutu kopyala" onCopy={() => { $copies++ }}
         icon={v.icon === "own" ? link : undefined} copiedIcon={v.copiedIcon === "off" ? false : v.copiedIcon === "own" ? heart : undefined}
         copiedLabel={v.copiedLabel === "own" ? "Panoda!" : undefined} copiedColor={(v.copiedColor || undefined) as never} />) as Element
       button.setAttribute("data-audit-try", "")

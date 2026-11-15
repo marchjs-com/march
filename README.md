@@ -34,7 +34,7 @@ export function Counter(props: { label: string }) {
 The only build tool is [esbuild](https://esbuild.github.io/) (TypeScript is optional, for `march check`).
 
 ```bash
-npm i github:marchjs/march#<commit-sha>   # pin a commit; not on the npm registry yet
+npm i github:marchjs-com/march#<commit-sha>   # pin a commit; not on the npm registry yet
 npm i -D esbuild typescript
 node node_modules/march/cli/march.js dev      # index.html + src/main.tsx, live reload, error overlay
 node node_modules/march/cli/march.js build    # dist/: release build (chunk planning, budgets, prerender)
