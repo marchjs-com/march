@@ -4,6 +4,7 @@ import { row, col, tabs, type DockPanel, type Preset } from "../dock-layout/inde
 import { fileText } from "../../../icons/glyphs/fileText.ts";
 import { terminal } from "../../../icons/glyphs/terminal.ts";
 import { folder } from "../../../icons/glyphs/folder.ts";
+import { grid } from "../../../icons/glyphs/grid.ts";
 
 export const code = `<AppUI title="march-app-ui" panels={panels} presets={{
   default: { title: "Varsayılan", tree: () => row([.24, tabs("files")], [.76, col([.7, tabs("editor")], [.3, tabs("console")])]) },
@@ -17,7 +18,7 @@ const PRESETS: Record<string, Preset> = {
 }
 const pane = (title: string, text: string) => <div class="sc-dock-pane"><strong>{title}</strong><p class="m-muted">{text}</p></div>
 
-export default function AppUIDemo(props: { values: { title: string; bar: boolean; preset: string; layoutLabel: string } }) {
+export default function AppUIDemo(props: { values: { title: string; bar: boolean; preset: string; ownIcon: boolean } }) {
   const panels: DockPanel[] = [
     { id: "files", title: "Dosyalar", icon: folder, min: [140, 100], content: () => pane("Dosyalar", "Sekmeyi sürükleyip başka bir grubun kenarına bırak.") },
     { id: "editor", title: "Düzenleyici", icon: fileText, content: () => pane("Düzenleyici", "Yerleşim menüsünden hazır bir düzen seç.") },
@@ -26,7 +27,7 @@ export default function AppUIDemo(props: { values: { title: string; bar: boolean
   return <div class="sc-dock-stage">
     {() => {
       const v = props.values
-      return <AppUI title={v.title} bar={v.bar} layoutLabel={v.layoutLabel} panels={panels} presets={PRESETS} preset={v.preset} commands={false} label="Örnek uygulama" />
+      return <AppUI title={v.title} bar={v.bar} layoutIcon={v.ownIcon ? grid : undefined} panels={panels} presets={PRESETS} preset={v.preset} commands={false} label="Örnek uygulama" />
     }}
   </div>
 }

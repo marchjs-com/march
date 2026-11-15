@@ -6,6 +6,8 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Menu } from "../../actions/menu/index.ts";
+import { ownIcon } from "../../../ui/parts.ts";
+import { columns } from "../../../icons/glyphs/columns.ts";
 import { DockLayout, type DockLayoutProps, type DockApi } from "../dock-layout/index.ts";
 
 export interface AppUIProps extends DockLayoutProps {
@@ -19,17 +21,19 @@ export interface AppUIProps extends DockLayoutProps {
   status?: unknown;
   /** The top bar (default true); false: only the workspace (open the layout menu yourself: `api.layoutMenu()`). */
   bar?: MaybeFn<boolean | undefined>;
-  /** Text of the Layout menu button (default "Layout"); false: no button. */
+  /** Name (tooltip) of the Layout menu button, an icon button (default "Layout"); false: no button. */
   layoutLabel?: MaybeFn<string | undefined> | false;
+  /** Own icon of the Layout menu button. */
+  layoutIcon?: unknown;
   class?: ClassProp;
 }
 
 /** `<AppUI title="My IDE" panels={panels} presets={PRESETS} persist="ide" tools={<RunButton />} />` */
 export function AppUI(props: AppUIProps): Element {
   let dock: DockApi | undefined;
-  const { title, tools, side, status, bar, layoutLabel, class: cls, api, ...rest } = props;
+  const { title, tools, side, status, bar, layoutLabel, layoutIcon, class: cls, api, ...rest } = props;
   const menu = layoutLabel === false ? null : h(Menu, {
-    label: () => val(layoutLabel as MaybeFn<string | undefined>) || t`Layout`, variant: "secondary", size: "sm", class: "m-app-layout", panelClass: "m-app-menu", placement: "bottom-end",
+    label: () => val(layoutLabel as MaybeFn<string | undefined>) || t`Layout`, icon: ownIcon(layoutIcon, columns), size: "sm", class: "m-app-layout", panelClass: "m-app-menu", placement: "bottom-end",
     items: () => dock?.layoutMenu() ?? [],
   });
   return h("div", { class: () => cx("m-app", val(cls)) },

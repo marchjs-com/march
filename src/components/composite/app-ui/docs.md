@@ -23,7 +23,8 @@ Every DockLayout prop (`panels`, `presets`, `preset`, `persist`, `storage`, `api
 | `side` | node | — | beside the workspace at the start (an ActivityBar) |
 | `status` | node | — | under the workspace (a StatusBar) |
 | `bar` | boolean | `true` | the top bar; without it open the menu yourself (`api.layoutMenu()` gives its items) |
-| `layoutLabel` | string / `false` | "Layout" | text of the Layout menu button; `false`: no button |
+| `layoutLabel` | string / `false` | "Layout" | name (tooltip) of the Layout menu button, an icon button; `false`: no button |
+| `layoutIcon` | icon | columns | own icon of the Layout menu button |
 | `class` | class value | — | on the root (`m-app`) |
 
 ## Accessibility
