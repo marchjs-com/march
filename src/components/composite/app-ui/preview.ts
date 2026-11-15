@@ -83,7 +83,7 @@ export function AppPreview(props: AppPreviewProps): Element {
   };
   effect(() => { if (full()) { barShown.set(true); hideBarSoon(); } else { clearTimeout(barTimer); barShown.set(false); } });
   onCleanup(() => clearTimeout(barTimer));
-  const follow = (): void => full.set(!!root && doc?.fullscreenElement === root);
+  const follow = (): void => { full.set(!!root && doc?.fullscreenElement === root); };
   // Esc leaves the cover, unless a menu, a list or a dialog is open (that one closes first)
   const onKey = (e: KeyboardEvent): void => { if (e.key === "Escape" && cover.peek() && !e.defaultPrevented && !doc?.querySelector(".m-layer :is(.m-pop, [role=dialog], [role=menu], [role=listbox])")) { cover.set(false); full.set(false); } };
   doc?.addEventListener("fullscreenchange", follow);
