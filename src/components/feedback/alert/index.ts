@@ -16,27 +16,35 @@ import { actionsOf, type ActionsProp, type Tone } from "../../../ui/display-base
 import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface AlertProps {
+  /** Meaning, colours and icon: info (default), success, warn, danger or neutral. @tr Anlam, renk ve ikon: info (varsayılan), success, warn, danger ya da neutral. */
   tone?: MaybeFn<Tone | undefined>;
+  /** A bold first line. @tr Kalın ilk satır. */
   title?: unknown;
+  /** The icon (a node or a glyph); default the tone's icon, `null` hides it. @tr İkon (düğüm ya da glif); varsayılan tonun ikonu, `null` gizler. */
   icon?: unknown;
+  /** The message (children work too). @tr Mesaj (children da olur). */
   body?: unknown;
-  /** The next step: a node, a list of nodes or `action()` objects (drawn as small buttons). */
+  /** The next step: a node, a list of nodes or `action()` objects (drawn as small buttons). @tr Sonraki adım: bir düğüm, düğüm listesi ya da `action()` nesneleri (küçük düğmeler olarak çizilir). */
   action?: ActionsProp;
-  /** Where the actions sit: "end" (default: beside the text, before the dismiss button) or "below" the text. */
+  /** Where the actions sit: "end" (default: beside the text, before the dismiss button) or "below" the text. @tr Eylemlerin yeri: "end" (varsayılan: metnin yanında, kapatma düğmesinden önce) ya da metnin altında "below". */
   actionPlacement?: "end" | "below" | undefined;
+  /** Adds a × button that hides the alert (default false). @tr Uyarıyı gizleyen bir × düğmesi ekler (varsayılan false). */
   dismissable?: boolean;
-  /** Accessible name of the dismiss button (default "Dismiss", translated). */
+  /** Accessible name of the dismiss button (default "Dismiss", translated). @tr Kapatma düğmesinin erişilebilir adı (varsayılan "Dismiss", çevrilir). */
   dismissLabel?: MaybeFn<string | undefined>;
-  /** Glyph or node inside the dismiss button (default: the × glyph). */
+  /** Glyph or node inside the dismiss button (default: the × glyph). @tr Kapatma düğmesindeki glif ya da düğüm (varsayılan: × glifi). */
   dismissIcon?: unknown;
+  /** Called after the alert is dismissed. @tr Uyarı kapatıldıktan sonra çağrılır. */
   onDismiss?: () => void;
-  /** "soft" (default: the tone's tinted fill) or "raised": a floating message (a toast) on the surface of a layer with a shadow; the tone colours the icon alone. */
+  /** "soft" (default: the tone's tinted fill) or "raised": a floating message (a toast) on the surface of a layer with a shadow; the tone colours the icon alone. @tr "soft" (varsayılan: tonun renkli dolgusu) ya da "raised": bir katmanın yüzeyinde gölgeli, yüzen mesaj (bildirim); ton yalnız ikonu renklendirir. */
   variant?: "soft" | "raised" | undefined;
-  /** The ARIA role instead of the tone's ("alert" for danger and warn, "status" otherwise). */
+  /** The ARIA role instead of the tone's ("alert" for danger and warn, "status" otherwise). @tr Tonunki yerine ARIA rolü (danger ve warn için "alert", diğerlerinde "status"). */
   role?: string | undefined;
-  /** Extra classes of the parts (the host's own hooks): the icon, the body, the dismiss button. */
+  /** Extra classes of the parts (the host's own hooks): the icon, the body, the dismiss button. @tr Parçalara eklenen sınıflar (ev sahibinin kendi kancaları): ikon, gövde, kapatma düğmesi. */
   partClass?: { icon?: string; body?: string; dismiss?: string } | undefined;
+  /** Extra classes on the alert. @tr Uyarıya eklenen sınıflar. */
   class?: ClassProp;
+  /** The message. @tr Mesaj. */
   children?: unknown;
 }
 const TONE_ICON: Record<string, IconDef> = { info, success: checkCircle, warn: alertTriangle, danger: alertCircle, neutral: info };

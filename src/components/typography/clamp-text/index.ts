@@ -13,24 +13,27 @@ import tr from "./tr.ts";
 messages("tr", tr);
 
 export interface ClampTextProps {
-  /** Lines shown while folded (default 3); 0 never folds. */
+  /** Lines shown while folded (default 3); 0 never folds. @tr Katlıyken gösterilen satır sayısı (varsayılan 3); 0 hiç katlamaz. */
   lines?: MaybeFn<number | undefined>;
-  /** The text (children work too). */
+  /** The text (children work too). @tr Metin (children da olur). */
   text?: MaybeFn<unknown>;
-  /** The "more" switch: true (default: shown when the text does not fit), false (fold only), "always" (shown without measuring). */
+  /** The "more" switch: true (default: shown when the text does not fit), false (fold only), "always" (shown without measuring). @tr "Daha fazla" düğmesi: true (varsayılan: metin sığmayınca görünür), false (yalnız katlar), "always" (ölçmeden görünür). */
   expandable?: boolean | "always" | undefined;
-  /** Once open, a "less" switch folds it again (default true). */
+  /** Once open, a "less" switch folds it again (default true). @tr Açıldıktan sonra "daha az" düğmesi metni yeniden katlar (varsayılan true). */
   collapsible?: boolean | undefined;
-  /** Controlled state: true shows the whole text. */
+  /** Controlled state: true shows the whole text. @tr Denetimli durum: true metnin tamamını gösterir. */
   open?: MaybeFn<boolean | undefined>;
-  /** First state when uncontrolled (default false). */
+  /** First state when uncontrolled (default false). @tr Denetimsizken ilk durum (varsayılan false). */
   defaultOpen?: boolean | undefined;
+  /** Called when the text opens or folds. @tr Metin açılınca ya da katlanınca çağrılır. */
   onOpenChange?: ((open: boolean) => void) | undefined;
-  /** Own texts of the switch (default "more" / "less", translated); a node works too. */
+  /** Own texts of the switch (default "more" / "less", translated); a node works too. @tr Düğmenin kendi metinleri (varsayılan "more" / "less", çevrilir); düğüm de olur. */
   labels?: { more?: unknown; less?: unknown } | undefined;
-  /** Element of the text: "p" (default), "div" or "span". */
+  /** Element of the text: "p" (default), "div" or "span". @tr Metnin öğesi: "p" (varsayılan), "div" ya da "span". */
   as?: "p" | "div" | "span" | undefined;
+  /** Extra classes on the wrapper. @tr Sarmalayıcıya eklenen sınıflar. */
   class?: ClassProp;
+  /** The text, when `text` is not given. @tr `text` verilmediğinde metin. */
   children?: unknown;
 }
 

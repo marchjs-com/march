@@ -19,51 +19,55 @@ export type PopoverReason = "trigger" | "outside" | "escape" | "close" | "api";
 export interface PopoverApi { open(): void; close(refocus?: boolean): void; toggle(): void; isOpen(): boolean }
 
 export interface PopoverProps {
-  /** What opens it: a node (a Button, an IconButton — it gets the click and the ARIA), text (becomes a Button), or `(api) => node` when you wire it yourself. */
+  /** What opens it: a node (a Button, an IconButton — it gets the click and the ARIA), text (becomes a Button), or `(api) => node` when you wire it yourself. @tr Onu ne açar: bir düğüm (Button, IconButton — tıklamayı ve ARIA'yı o alır), metin (Button olur) ya da kendin bağlarsan `(api) => node`. */
   trigger?: unknown | ((api: PopoverApi) => unknown) | undefined;
-  /** Place the panel by this element instead of the trigger (a field, a virtual caret rectangle). */
+  /** Place the panel by this element instead of the trigger (a field, a virtual caret rectangle). @tr Paneli tetikleyici yerine bu öğeye göre yerleştirir (bir alan, sanal bir imleç dikdörtgeni). */
   anchor?: Element | (() => Element | null | undefined) | undefined;
-  /** Controlled open state: a signal (two-way), a value / accessor, or `bind:open`. Without it the popover keeps its own. */
+  /** Controlled open state: a signal (two-way), a value / accessor, or `bind:open`. Without it the popover keeps its own. @tr Denetimli açık durumu: sinyal (iki yönlü), değer / erişimci ya da `bind:open`. Verilmezse açılır pencere kendi durumunu tutar. */
   open?: Signal<boolean> | MaybeFn<boolean | undefined>;
+  /** Receives the new open state (the setter half of a controlled `open`). @tr Yeni açık durumunu alır (denetimli `open`'ın yazan yarısı). */
   setOpen?: ((v: boolean) => void) | undefined;
-  /** Own state: open at first. */
+  /** Own state: open at first. @tr Kendi durumu: başta açık. */
   defaultOpen?: boolean | undefined;
+  /** Called when it opens or closes, with why: trigger, outside, escape, close or api. @tr Açılınca ya da kapanınca nedeniyle çağrılır: trigger, outside, escape, close ya da api. */
   onOpenChange?: ((open: boolean, why: PopoverReason) => void) | undefined;
+  /** Side of the panel (default bottom-start); it flips when there is no room. @tr Panelin yönü (varsayılan bottom-start); yer yoksa ters yöne geçer. */
   placement?: Placement | undefined;
-  /** A small header in the panel (PanelHeader). */
+  /** A small header in the panel (PanelHeader). @tr Panelde küçük bir başlık (PanelHeader). */
   title?: MaybeFn<unknown> | undefined;
-  /** A close button in the header (default: with a title). */
+  /** A close button in the header (default: with a title). @tr Başlıkta kapatma düğmesi (varsayılan: başlık varsa). */
   closable?: boolean | undefined;
+  /** Accessible name of the close button (default "Close"). @tr Kapatma düğmesinin erişilebilir adı (varsayılan "Close"). */
   closeLabel?: MaybeFn<string | undefined>;
-  /** Accessible name of the panel when it has no title. */
+  /** Accessible name of the panel when it has no title. @tr Başlığı yokken panelin erişilebilir adı. */
   label?: MaybeFn<string | undefined>;
-  /** Role of the panel (default "dialog"); "menu" / "listbox" when the content is one; null for none. */
+  /** Role of the panel (default "dialog"); "menu" / "listbox" when the content is one; null for none. @tr Panelin rolü (varsayılan "dialog"); içerik öyleyse "menu" / "listbox"; hiçbiri için null. */
   role?: "dialog" | "menu" | "listbox" | "tooltip" | null | undefined;
-  /** Entrance: "scale" (default), "fade", "rise", or "none". */
+  /** Entrance: "scale" (default), "fade", "rise", or "none". @tr Giriş: "scale" (varsayılan), "fade", "rise" ya da "none". */
   motion?: "scale" | "fade" | "rise" | "none" | undefined;
-  /** Width of the panel: "auto" (its content, default), "sm", "md", "lg". */
+  /** Width of the panel: "auto" (its content, default), "sm", "md", "lg". @tr Panelin genişliği: "auto" (içeriği kadar, varsayılan), "sm", "md", "lg". */
   width?: "auto" | "sm" | "md" | "lg" | undefined;
-  /** No padding around the content (a list that fills the panel). */
+  /** No padding around the content (a list that fills the panel). @tr İçeriğin çevresinde iç boşluk yok (paneli dolduran bir liste). */
   flush?: boolean | undefined;
-  /** Under the content: buttons. */
+  /** Under the content: buttons. @tr İçeriğin altında: düğmeler. */
   footer?: unknown | undefined;
-  /** A press outside closes (default true). */
+  /** A press outside closes (default true). @tr Dışarıya basmak kapatır (varsayılan true). */
   closeOnOutside?: boolean | undefined;
-  /** Escape closes (default true). */
+  /** Escape closes (default true). @tr Escape kapatır (varsayılan true). */
   closeOnEscape?: boolean | undefined;
-  /** On open, focus the first control in the panel (default true); false leaves focus where it is (a field that keeps typing). */
+  /** On open, focus the first control in the panel (default true); false leaves focus where it is (a field that keeps typing). @tr Açılınca paneldeki ilk denetime odaklanır (varsayılan true); false odağı yerinde bırakır (yazmaya devam eden bir alan). */
   autoFocus?: boolean | undefined;
-  /** Theme colour inside the panel. */
+  /** Theme colour inside the panel. @tr Panelin içindeki tema rengi. */
   color?: ColorToken | undefined;
-  /** Class of the wrapper around the trigger. */
+  /** Class of the wrapper around the trigger. @tr Tetikleyicinin çevresindeki sarmalayıcının sınıfı. */
   class?: ClassProp | undefined;
-  /** Class of the floating panel. */
+  /** Class of the floating panel. @tr Yüzen panelin sınıfı. */
   panelClass?: string | undefined;
-  /** Id of the panel (default: generated), e.g. for your own trigger's `aria-controls`. */
+  /** Id of the panel (default: generated), e.g. for your own trigger's `aria-controls`. @tr Panelin id'si (varsayılan: üretilir), ör. kendi tetikleyicinin `aria-controls`'ü için. */
   id?: string | undefined;
-  /** More attributes and listeners of the panel (`onKeydown`, `ref`, `data-*`): a menu's arrow keys. */
+  /** More attributes and listeners of the panel (`onKeydown`, `ref`, `data-*`): a menu's arrow keys. @tr Panelin diğer öznitelikleri ve dinleyicileri (`onKeydown`, `ref`, `data-*`): bir menünün ok tuşları. */
   panelProps?: Record<string, unknown> | undefined;
-  /** The panel content, or `(close, api) => content`. */
+  /** The panel content, or `(close, api) => content`. @tr Panel içeriği ya da `(close, api) => içerik`. */
   children?: unknown | ((close: (refocus?: boolean) => void, api: PopoverApi) => unknown) | undefined;
 }
 

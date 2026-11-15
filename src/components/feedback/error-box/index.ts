@@ -7,12 +7,17 @@ import { Alert } from "../alert/index.ts";
 import { Button } from "../../actions/button/index.ts";
 
 export interface ErrorBoxProps {
+  /** The error: its `message` is shown, or the value as text. @tr Hata: `message` alanı, yoksa değerin kendisi metin olarak gösterilir. */
   error?: MaybeFn<unknown>;
+  /** The text when there is no `error` (default "Something went wrong.", translated). @tr `error` yokken gösterilen metin (varsayılan "Something went wrong.", çevrilir). */
   message?: MaybeFn<unknown>;
+  /** A bold first line. @tr Kalın ilk satır. */
   title?: unknown;
+  /** Adds a retry button that calls it. @tr Bunu çağıran bir yeniden dene düğmesi ekler. */
   retry?: (() => unknown) | undefined;
-  /** Content of the retry button: text or a node (default "Retry", translated). */
+  /** Content of the retry button: text or a node (default "Retry", translated). @tr Yeniden dene düğmesinin içeriği: metin ya da düğüm (varsayılan "Retry", çevrilir). */
   retryLabel?: unknown;
+  /** Extra classes on the box. @tr Kutuya eklenen sınıflar. */
   class?: ClassProp;
 }
 /** `<ErrorBox error={err} retry={() => refetch()} title="Could not load" />` */

@@ -6,13 +6,17 @@ import { spinnerRing } from "./core.ts";
 import { colorAttr, colorList, tokenColor, type ColorToken, type MultiColors } from "../../../theme/colors.ts";
 
 export interface SpinnerProps {
-  /** "sm" | "md" | "lg", or "em": the size and the colour of the text around it (inside a button, a line of text). */
-  size?: "sm" | "md" | "lg" | "em"; label?: MaybeFn<string | undefined>; class?: ClassProp;
-  /** Hidden from assistive technology: no role, no label (a text or a live region next to it already says it). */
+  /** "sm" | "md" | "lg", or "em": the size and the colour of the text around it (inside a button, a line of text). @tr "sm" | "md" | "lg" ya da "em": çevresindeki metnin boyutu ve rengi (bir düğmenin, bir metin satırının içinde). */
+  size?: "sm" | "md" | "lg" | "em";
+  /** The accessible name (default "Loading", translated). @tr Erişilebilir ad (varsayılan "Loading", çevrilir). */
+  label?: MaybeFn<string | undefined>;
+  /** Extra classes on the spinner. @tr Dönen göstergeye eklenen sınıflar. */
+  class?: ClassProp;
+  /** Hidden from assistive technology: no role, no label (a text or a live region next to it already says it). @tr Yardımcı teknolojiden gizli: rol yok, etiket yok (yanındaki metin ya da canlı bölge zaten söylüyor). */
   decorative?: boolean | undefined;
-  /** "brand", a list of color tokens, or "single" (one color in a multicolor theme). */
+  /** "brand", a list of color tokens, or "single" (one color in a multicolor theme). @tr "brand", renk belirteçleri listesi ya da "single" (çok renkli temada tek renk). */
   colors?: MultiColors | undefined;
-  /** One theme color token ("brand-orange", "success"…): a one-colour ring in that colour. */
+  /** One theme color token ("brand-orange", "success"…): a one-colour ring in that colour. @tr Tek bir tema renk belirteci ("brand-orange", "success"…): o renkte tek renkli halka. */
   color?: ColorToken | undefined;
 }
 /** `<Spinner size="sm" label="Loading users" />`, `<Spinner decorative size="em" />` (inside a control that names the state itself). */

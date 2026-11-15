@@ -30,25 +30,33 @@ export interface UndoRedoHistory {
 export type UndoRedoAction = "undo" | "redo";
 
 export interface UndoRedoProps {
-  /** An undo stack: replaces canUndo / canRedo / onUndo / onRedo and names the steps. */
+  /** An undo stack: replaces canUndo / canRedo / onUndo / onRedo and names the steps. @tr Bir geri alma yığını: canUndo / canRedo / onUndo / onRedo yerine geçer ve adımları adlandırır. */
   history?: UndoRedoHistory | null | undefined;
+  /** Whether Undo is possible (default: from `history`). @tr Geri alınabilir mi (varsayılan: `history`'den). */
   canUndo?: MaybeFn<boolean | undefined>;
+  /** Whether Redo is possible (default: from `history`). @tr Yinelenebilir mi (varsayılan: `history`'den). */
   canRedo?: MaybeFn<boolean | undefined>;
+  /** Called by the Undo button (default: `history.undo`). @tr Geri al düğmesi çağırır (varsayılan: `history.undo`). */
   onUndo?: (() => void) | undefined;
+  /** Called by the Redo button (default: `history.redo`). @tr Yinele düğmesi çağırır (varsayılan: `history.redo`). */
   onRedo?: (() => void) | undefined;
-  /** Which buttons, in this order (default: undo, redo). */
+  /** Which buttons, in this order (default: undo, redo). @tr Hangi düğmeler, bu sırayla (varsayılan: undo, redo). */
   actions?: readonly UndoRedoAction[] | undefined;
-  /** Own names (default "Undo", "Redo", group "History"; translated). */
+  /** Own names (default "Undo", "Redo", group "History"; translated). @tr Kendi adların (varsayılan "Undo", "Redo", grup "History"; çevrilir). */
   labels?: Partial<Record<UndoRedoAction | "group", MaybeFn<string | undefined>>> | undefined;
-  /** Name of the step each button would act on ("Undo: Rename"); default: from `history.past` / `future`. false: never. */
+  /** Name of the step each button would act on ("Undo: Rename"); default: from `history.past` / `future`. false: never. @tr Her düğmenin etkileyeceği adımın adı ("Undo: Rename"); varsayılan: `history.past` / `future`'dan. false: hiç. */
   steps?: Partial<Record<UndoRedoAction, MaybeFn<string | null | undefined>>> | false | undefined;
-  /** Shortcut shown in the tooltip: true (default: mod+z, mod+shift+z), false, or your own combos. */
+  /** Shortcut shown in the tooltip: true (default: mod+z, mod+shift+z), false, or your own combos. @tr İpucunda gösterilen kısayol: true (varsayılan: mod+z, mod+shift+z), false ya da kendi tuş birleşimlerin. */
   shortcuts?: boolean | Partial<Record<UndoRedoAction, string>> | undefined;
+  /** Your own icons: `{ undo, redo }`. @tr Kendi ikonların: `{ undo, redo }`. */
   icons?: Partial<Record<UndoRedoAction, unknown>> | undefined;
-  /** An extra class on a button, for a host that keeps its own class names: `{ undo, redo }`. */
+  /** An extra class on a button, for a host that keeps its own class names: `{ undo, redo }`. @tr Bir düğmeye ek sınıf, kendi sınıf adlarını kullanan bir ev sahibi için: `{ undo, redo }`. */
   partClass?: Partial<Record<UndoRedoAction, string>> | undefined;
+  /** Button size: xs, sm, md or lg (default: IconButton's). @tr Düğme boyutu: xs, sm, md ya da lg (varsayılan: IconButton'unki). */
   size?: MaybeFn<IconButtonSize | undefined>;
+  /** Both buttons off (a read-only editor). @tr İki düğme de kapalı (yalnız okunur düzenleyici). */
   disabled?: MaybeFn<boolean | undefined>;
+  /** Extra classes on the group. @tr Gruba eklenen sınıflar. */
   class?: ClassProp;
 }
 

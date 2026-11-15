@@ -78,17 +78,23 @@ export function renderItem(it: MenuItem, args: unknown[], close: (refocus: boole
 
 /** Props shared by <Menu> and <Dropdown> (the trigger button and its panel). */
 export interface PopoverButtonProps {
-  /** Trigger text and accessible name. */
+  /** Trigger text and accessible name. @tr Tetikleyici metni ve erişilebilir ad. */
   label?: MaybeFn<string>;
-  /** Icon-only trigger. */
+  /** Icon-only trigger. @tr Yalnız ikonlu tetikleyici. */
   icon?: unknown;
-  /** Custom trigger content. */
+  /** Custom trigger content. @tr Tetikleyicinin kendi içeriği. */
   trigger?: unknown;
+  /** The trigger's look (see Button); default secondary. @tr Tetikleyicinin görünümü (bkz. Button); varsayılan secondary. */
   variant?: MaybeFn<ButtonVariant | undefined>;
+  /** The trigger's size: sm, md (default) or lg. @tr Tetikleyicinin boyutu: sm, md (varsayılan) ya da lg. */
   size?: MaybeFn<ButtonSize | undefined>;
+  /** Extra classes on the trigger. @tr Tetikleyiciye eklenen sınıflar. */
   class?: ClassProp;
+  /** Class on the floating panel. @tr Yüzen panelin sınıfı. */
   panelClass?: string;
+  /** Side of the panel (default bottom-start); it flips when there is no room. @tr Panelin yönü (varsayılan bottom-start); yer yoksa ters yöne geçer. */
   placement?: Placement;
+  /** The trigger cannot be pressed. @tr Tetikleyiciye basılamaz. */
   disabled?: MaybeFn<boolean | null | undefined>;
 }
 
@@ -150,7 +156,9 @@ function popButton(props: PopoverButtonProps, role: "menu" | "dialog", panel: (p
 
 /** Props of <Menu>. `args` are passed to actions and `onSelect`. */
 export interface MenuProps extends PopoverButtonProps {
+  /** The entries: `{ label, onSelect, icon, href, … }`, `action()` objects or "-" (a separator). @tr Girdiler: `{ label, onSelect, icon, href, … }`, `action()` nesneleri ya da "-" (ayraç). */
   items: MaybeFn<readonly MenuItem[] | null | undefined>;
+  /** Arguments passed to actions and `onSelect` (a list or an accessor). @tr Eylemlere ve `onSelect`'e verilen argümanlar (liste ya da erişimci). */
   args?: Args<unknown[]>;
 }
 /**
@@ -166,7 +174,10 @@ export function Menu(props: MenuProps): unknown[] {
 }
 
 /** Props of <Dropdown>: children may be a function of `close`. */
-export interface DropdownProps extends PopoverButtonProps { children?: unknown }
+export interface DropdownProps extends PopoverButtonProps {
+  /** The panel content, or `(close) => content`. @tr Panel içeriği ya da `(close) => içerik`. */
+  children?: unknown;
+}
 /** Trigger with arbitrary floating content (a Popover on a button): `<Dropdown label="Filters">{(close) => …}</Dropdown>` */
 export function Dropdown(props: DropdownProps): unknown[] {
   return popButton(props, "dialog", (p) => h(PopoverPanel, {

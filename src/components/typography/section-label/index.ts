@@ -8,23 +8,25 @@ import { type ColorToken } from "../../../theme/colors.ts";
 
 /** Props of <SectionLabel>. Unknown props (`id`, `role`, `aria-*`, events) go to the root element. */
 export interface SectionLabelProps {
-  /** The text (or pass children). */
+  /** The text (or pass children). @tr Metin (ya da children ver). */
   label?: MaybeFn<unknown> | undefined;
-  /** Root element (default "div"): a heading level, "p", "legend", "li", "span". */
+  /** Root element (default "div"): a heading level, "p", "legend", "li", "span". @tr Kök öğe (varsayılan "div"): bir başlık düzeyi, "p", "legend", "li", "span". */
   as?: "div" | "p" | "span" | "legend" | "li" | "h2" | "h3" | "h4" | "h5" | "h6" | undefined;
-  /** An icon (IconDef, emoji, node) before the text. */
+  /** An icon (IconDef, emoji, node) before the text. @tr Metinden önce bir ikon (IconDef, emoji, düğüm). */
   icon?: unknown | undefined;
-  /** A number (or any node) after the text: how many items the group has. */
+  /** A number (or any node) after the text: how many items the group has. @tr Metinden sonra bir sayı (ya da herhangi bir düğüm): grubun kaç öğesi olduğu. */
   count?: MaybeFn<unknown> | undefined;
-  /** The end side: a small button, a link. */
+  /** The end side: a small button, a link. @tr Son taraf: küçük bir düğme, bir bağlantı. */
   actions?: MaybeFn<unknown> | undefined;
-  /** Uppercase with wide tracking (default true); false keeps the text as written. */
+  /** Uppercase with wide tracking (default true); false keeps the text as written. @tr Geniş harf aralıklı büyük harf (varsayılan true); false metni yazıldığı gibi bırakır. */
   upper?: MaybeFn<boolean | undefined>;
-  /** sm: inside menus and dense panels (default); md: a little larger. */
+  /** sm: inside menus and dense panels (default); md: a little larger. @tr sm: menülerde ve sık panellerde (varsayılan); md: biraz daha büyük. */
   size?: MaybeFn<"sm" | "md" | undefined>;
-  /** A thin rule after the text that fills the row. */
+  /** A thin rule after the text that fills the row. @tr Metinden sonra satırı dolduran ince bir çizgi. */
   rule?: MaybeFn<boolean | undefined>;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp | undefined;
+  /** The text, when `label` is not given. @tr `label` verilmediğinde metin. */
   children?: unknown | undefined;
   [attr: string]: unknown;
 }

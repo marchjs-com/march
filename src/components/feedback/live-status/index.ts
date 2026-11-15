@@ -7,21 +7,23 @@ import { h } from "../../../dom/h.ts";
 import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 
 export interface LiveStatusProps {
-  /** What is said: a text, a node or an accessor (children work too). */
+  /** What is said: a text, a node or an accessor (children work too). @tr Söylenen: metin, düğüm ya da erişimci (children da olur). */
   text?: MaybeFn<unknown>;
+  /** What is said, when `text` is not given. @tr `text` verilmediğinde söylenen. */
   children?: unknown;
-  /** `false`: only screen readers get it (visually hidden). Default true. */
+  /** `false`: only screen readers get it (visually hidden). Default true. @tr `false`: yalnız ekran okuyucular duyar (görsel olarak gizli). Varsayılan true. */
   visible?: boolean | undefined;
-  /** "polite" (default) waits for the reader to finish; "assertive" interrupts. */
+  /** "polite" (default) waits for the reader to finish; "assertive" interrupts. @tr "polite" (varsayılan) okuyucunun bitirmesini bekler; "assertive" araya girer. */
   politeness?: "polite" | "assertive" | undefined;
-  /** The element: span (default), div or p. */
+  /** The element: span (default), div or p. @tr Öğe: span (varsayılan), div ya da p. */
   as?: "span" | "div" | "p" | undefined;
-  /** A hint line before the status: a text, a node or an accessor; `false` / unset: none. */
+  /** A hint line before the status: a text, a node or an accessor; `false` / unset: none. @tr Durumdan önce bir ipucu satırı: metin, düğüm ya da erişimci; `false` / boş: yok. */
   help?: unknown;
-  /** Id of the hint line (for the host's `aria-describedby`). */
+  /** Id of the hint line (for the host's `aria-describedby`). @tr İpucu satırının id'si (ev sahibinin `aria-describedby`'ı için). */
   helpId?: string | undefined;
-  /** An extra class on the hint line, for a host that keeps its own class names. */
+  /** An extra class on the hint line, for a host that keeps its own class names. @tr İpucu satırına ek sınıf, kendi sınıf adlarını kullanan bir ev sahibi için. */
   helpClass?: string | undefined;
+  /** Extra classes on the status element. @tr Durum öğesine eklenen sınıflar. */
   class?: ClassProp;
   /** Other attributes (`id`, `data-*`) go to the status element. */
   [attr: string]: unknown;

@@ -47,17 +47,17 @@ export function parseBezier(v: string): Bezier | null {
 }
 
 export interface EasingCurveEditorProps extends ControlProps<string> {
-  /** Register the curve in the motion engine under this name (defineEasing) on every change. */
+  /** Register the curve in the motion engine under this name (defineEasing) on every change. @tr Eğriyi her değişimde bu adla hareket motoruna kaydeder (defineEasing). */
   name?: string | undefined;
-  /** Presets (default: the engine's named curves). */
+  /** Presets (default: the engine's named curves). @tr Hazır eğriler (varsayılan: motorun adlı eğrileri). */
   presets?: readonly EasingPreset[] | false | undefined;
-  /** Preview duration in ms (default 900). */
+  /** Preview duration in ms (default 900). @tr Önizleme süresi, ms (varsayılan 900). */
   duration?: number | undefined;
-  /** Live preview: "move" (default), "scale", "fade" or "none". */
+  /** Live preview: "move" (default), "scale", "fade" or "none". @tr Canlı önizleme: "move" (varsayılan), "scale", "fade" ya da "none". */
   preview?: "move" | "scale" | "fade" | "none" | undefined;
-  /** A small curve, presets in one scrolling row, no CSS line: for an inspector (KeyframeTimeline uses it). */
+  /** A small curve, presets in one scrolling row, no CSS line: for an inspector (KeyframeTimeline uses it). @tr Küçük eğri, tek kayan satırda hazır eğriler, CSS satırı yok: bir denetçi için (KeyframeTimeline kullanır). */
   compact?: boolean | undefined;
-  /** Your own words for the texts the editor writes (any subset). */
+  /** Your own words for the texts the editor writes (any subset). @tr Düzenleyicinin yazdığı metinler için kendi sözlerin (istediğin kadarı). */
   labels?: {
     firstHandle?: string; secondHandle?: string; presets?: string;
     /** Name of the plot: `(css) => "Curve cubic-bezier(…)"`. */
@@ -69,16 +69,17 @@ export interface EasingCurveEditorProps extends ControlProps<string> {
     /** The note shown with `name`: `(name) => "Saved as …"`. */
     registered?: (name: string) => string;
   } | undefined;
-  /** The four number fields. Default true. */
+  /** The four number fields. Default true. @tr Dört sayı alanı. Varsayılan true. */
   inputs?: boolean | undefined;
-  /** The line with the CSS value. Default true. */
+  /** The line with the CSS value. Default true. @tr CSS değerini gösteren satır. Varsayılan true. */
   cssLine?: boolean | undefined;
-  /** The "Registered as …" note shown with `name`. Default true. */
+  /** The "Registered as …" note shown with `name`. Default true. @tr `name` ile gösterilen "Registered as …" notu. Varsayılan true. */
   nameNote?: boolean | undefined;
-  /** The quarter lines of the plot (the 0 and 1 axes stay). Default true. */
+  /** The quarter lines of the plot (the 0 and 1 axes stay). Default true. @tr Grafiğin çeyrek çizgileri (0 ve 1 eksenleri kalır). Varsayılan true. */
   grid?: boolean | undefined;
-  /** Colors of the first and the second handle. Default brand-orange and brand-blue. */
+  /** Colors of the first and the second handle. Default brand-orange and brand-blue. @tr Birinci ve ikinci tutamacın renkleri. Varsayılan brand-orange ve brand-blue. */
   handleColors?: readonly [ColorToken, ColorToken] | undefined;
+  /** Extra classes on the editor. @tr Düzenleyiciye eklenen sınıflar. */
   class?: ClassProp;
 }
 

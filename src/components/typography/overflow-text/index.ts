@@ -13,37 +13,40 @@ export type MarqueeTrigger = "hover" | "focus" | "always" | "visible";
 export type MarqueeMode = "bounce" | "loop" | "once";
 
 export interface OverflowTextProps {
-  /** The text (or pass children). */
+  /** The text (or pass children). @tr Metin (ya da children ver). */
   text?: MaybeFn<string | undefined>;
+  /** The content, when `text` is not given. @tr `text` verilmediğinde içerik. */
   children?: unknown;
-  /** When to scroll (default hover + focus). "hover"/"focus" listen on the nearest link, button or list item. */
+  /** When to scroll (default hover + focus). "hover"/"focus" listen on the nearest link, button or list item. @tr Ne zaman kayar (varsayılan hover + focus). "hover"/"focus" en yakın bağlantıyı, düğmeyi ya da liste öğesini dinler. */
   trigger?: MarqueeTrigger | readonly MarqueeTrigger[];
-  /** bounce: to the end and back (default) · loop: endless ticker with a separator · once: to the end and back, one time. */
+  /** bounce: to the end and back (default) · loop: endless ticker with a separator · once: to the end and back, one time. @tr bounce: sona gidip döner (varsayılan) · loop: ayraçlı sonsuz kayan yazı · once: sona gidip döner, bir kez. */
   mode?: MarqueeMode;
-  /** Pixels per second (default 40). */
+  /** Pixels per second (default 40). @tr Saniyede piksel (varsayılan 40). */
   speed?: number;
-  /** Hold at each end, ms (default 1000). */
+  /** Hold at each end, ms (default 1000). @tr Her uçta bekleme, ms (varsayılan 1000). */
   pause?: number;
-  /** Wait before starting after the trigger, ms (default 250). */
+  /** Wait before starting after the trigger, ms (default 250). @tr Tetiklendikten sonra başlamadan önce bekleme, ms (varsayılan 250). */
   delay?: number;
-  /** Loop separator: text or a node (default "•"); false puts nothing between the copies. */
+  /** Loop separator: text or a node (default "•"); false puts nothing between the copies. @tr Döngü ayracı: metin ya da düğüm (varsayılan "•"); false kopyalar arasına bir şey koymaz. */
   separator?: unknown;
-  /** Easing of each travel in bounce / once (default "ease-in-out"); the loop is always linear. */
+  /** Easing of each travel in bounce / once (default "ease-in-out"); the loop is always linear. @tr bounce / once içinde her gidişin eğrisi (varsayılan "ease-in-out"); döngü hep doğrusaldır. */
   easing?: string;
   /**
    * An endless strip (logos, quotes): the content is repeated so the strip is wider than its box and always loops.
    * `true`: as many copies as fill the width (at least one); a number: that many copies. Copies are hidden from
    * assistive technology and inert; each unit is a `.m-marquee-unit`.
+   * @tr Sonsuz şerit (logolar, alıntılar): içerik, şerit kutusundan geniş olacak ve hep dönecek kadar tekrarlanır. `true`: genişliği dolduracak kadar kopya (en az bir); sayı: o kadar kopya. Kopyalar yardımcı teknolojiden gizli ve etkisizdir; her birim bir `.m-marquee-unit`.
    */
   duplicate?: boolean | number;
-  /** Never scroll (the text stays clipped with its fade or ellipsis): `disabled={() => !settings.motion}`. */
+  /** Never scroll (the text stays clipped with its fade or ellipsis): `disabled={() => !settings.motion}`. @tr Hiç kaymaz (metin solma ya da üç noktayla kırpık kalır): `disabled={() => !settings.motion}`. */
   disabled?: MaybeFn<boolean | undefined>;
-  /** Fade the clipped edges (default true); false shows an ellipsis instead. */
+  /** Fade the clipped edges (default true); false shows an ellipsis instead. @tr Kırpılan kenarları soldurur (varsayılan true); false yerine üç nokta gösterir. */
   fade?: boolean;
-  /** Extra condition that keeps it scrolling (e.g. the selected item of a menu): `play={() => isActive()}`. */
+  /** Extra condition that keeps it scrolling (e.g. the selected item of a menu): `play={() => isActive()}`. @tr Kaymayı sürdüren ek koşul (ör. menünün seçili öğesi): `play={() => isActive()}`. */
   play?: MaybeFn<boolean | undefined>;
-  /** Element whose hover/focus starts it (default: closest a, button, li, label, [tabindex] — or itself). */
+  /** Element whose hover/focus starts it (default: closest a, button, li, label, [tabindex] — or itself). @tr Üzerine gelme / odağı kaymayı başlatan öğe (varsayılan: en yakın a, button, li, label, [tabindex] — ya da kendisi). */
   host?: Element | (() => Element | null);
+  /** Extra classes on the text box. @tr Metin kutusuna eklenen sınıflar. */
   class?: ClassProp;
   [attr: string]: unknown;
 }

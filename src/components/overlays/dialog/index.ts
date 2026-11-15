@@ -291,26 +291,33 @@ export function askReason({ title, message, min = 10, danger = false, ok, purpos
 
 /** Props of <Dialog> and <Drawer>. */
 export interface DialogProps {
+  /** Shown while true. @tr Doğruyken görünür. */
   open: MaybeFn<boolean | null | undefined>;
+  /** Called when it asks to close: Escape, the scrim or × (when dismissable). @tr Kapanmak istediğinde çağrılır: Escape, örtü ya da × (dismissable iken). */
   onClose?: () => void;
+  /** The heading; it also names the dialog. @tr Başlık; pencereyi de adlandırır. */
   title?: unknown;
+  /** sm, md (default), lg or full. @tr sm, md (varsayılan), lg ya da full. */
   size?: MaybeFn<DialogSize>;
-  /** false: Escape, the overlay and × do not close it. */
+  /** false: Escape, the overlay and × do not close it. @tr false: Escape, örtü ve × kapatmaz. */
   dismissable?: boolean;
+  /** Extra classes on the panel. @tr Panele eklenen sınıflar. */
   class?: string;
-  /** Accessible name when there is no title. */
+  /** Accessible name when there is no title. @tr Başlık yokken erişilebilir ad. */
   label?: string;
+  /** The bottom bar (buttons). @tr Alt çubuk (düğmeler). */
   footer?: unknown;
+  /** The content. @tr İçerik. */
   children?: unknown;
-  /** Drawer only. */
+  /** Drawer only. @tr Yalnız Drawer için. */
   side?: DrawerSide;
-  /** false: a non-modal panel (no scrim, no scroll lock, no focus trap; the page stays usable). Default true. */
+  /** false: a non-modal panel (no scrim, no scroll lock, no focus trap; the page stays usable). Default true. @tr false: kipsiz panel (örtü yok, kaydırma kilidi yok, odak tuzağı yok; sayfa kullanılabilir kalır). Varsayılan true. */
   modal?: boolean | undefined;
-  /** The × button in the head: true (default), false (Escape and the scrim still close), or your own icon / node. */
+  /** The × button in the head: true (default), false (Escape and the scrim still close), or your own icon / node. @tr Başlıktaki × düğmesi: true (varsayılan), false (Escape ve örtü yine kapatır) ya da kendi ikonun / düğümün. */
   closeButton?: unknown;
-  /** Accessible name of the × button (default "Close"). */
+  /** Accessible name of the × button (default "Close"). @tr × düğmesinin erişilebilir adı (varsayılan "Close"). */
   closeLabel?: MaybeFn<string | undefined>;
-  /** Entrance of the panel: "scale" (default), "fade", "rise" or "none". */
+  /** Entrance of the panel: "scale" (default), "fade", "rise" or "none". @tr Panelin girişi: "scale" (varsayılan), "fade", "rise" ya da "none". */
   motion?: DialogMotion | undefined;
 }
 

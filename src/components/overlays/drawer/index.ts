@@ -17,29 +17,31 @@ import "./drawer.css";
 export type DrawerPlacement = "start" | "end" | "top" | "bottom" | "left" | "right";
 
 export interface DrawerProps extends Omit<DialogProps, "side" | "size" | "motion"> {
-  /** Edge (read when it opens). Default "end". */
+  /** Edge (read when it opens). Default "end". @tr Kenar (açılırken okunur). Varsayılan "end". */
   side?: MaybeFn<DrawerPlacement | undefined>;
-  /** Width (start / end) or height (top / bottom): sm, md, lg, full. Ignored with snapPoints. */
+  /** Width (start / end) or height (top / bottom): sm, md, lg, full. Ignored with snapPoints. @tr Genişlik (start / end) ya da yükseklik (top / bottom): sm, md, lg, full. snapPoints ile yok sayılır. */
   size?: MaybeFn<"sm" | "md" | "lg" | "full" | undefined>;
-  /** false: no scrim, the page stays usable, focus is not trapped. Default true. */
+  /** false: no scrim, the page stays usable, focus is not trapped. Default true. @tr false: örtü yok, sayfa kullanılabilir kalır, odak hapsedilmez. Varsayılan true. */
   modal?: boolean | undefined;
-  /** Drag the panel toward its edge to close it. Default true (needs `dismissable`). */
+  /** Drag the panel toward its edge to close it. Default true (needs `dismissable`). @tr Paneli kenarına doğru sürükleyince kapanır. Varsayılan true (`dismissable` gerekir). */
   dragToClose?: boolean | undefined;
-  /** Resting sizes: fractions of the viewport (0.4) or pixels (320). The largest sets the panel size. */
+  /** Resting sizes: fractions of the viewport (0.4) or pixels (320). The largest sets the panel size. @tr Durma boyutları: görüntü alanının kesri (0.4) ya da piksel (320). En büyüğü panelin boyutunu belirler. */
   snapPoints?: readonly number[] | undefined;
-  /** Index into snapPoints (controlled). Default 0: it opens at the first listed point. */
+  /** Index into snapPoints (controlled). Default 0: it opens at the first listed point. @tr snapPoints içindeki sıra (denetimli). Varsayılan 0: listedeki ilk noktada açılır. */
   snap?: MaybeFn<number | undefined>;
+  /** Called with the index of the snap point the panel settles at. @tr Panelin durduğu durma noktasının sırasıyla çağrılır. */
   onSnap?: ((index: number) => void) | undefined;
-  /** The grab handle (default true: on top / bottom sheets and with snap points). Dragging the head still works without it. */
+  /** The grab handle (default true: on top / bottom sheets and with snap points). Dragging the head still works without it. @tr Tutma çubuğu (varsayılan true: üst / alt sayfalarda ve durma noktalarıyla). Onsuz da başlıktan sürüklenir. */
   handle?: boolean | undefined;
-  /** Accessible name of the handle button of a sheet with snap points (default "Resize panel"). */
+  /** Accessible name of the handle button of a sheet with snap points (default "Resize panel"). @tr Durma noktalı bir sayfanın tutma düğmesinin erişilebilir adı (varsayılan "Resize panel"). */
   handleLabel?: MaybeFn<string | undefined>;
   /**
    * Movement: true (default), false (it appears and leaves at once), or your own timing
    * `{ duration, exit, easing }` (ms; easing: a motion engine easing such as "easeOutBack").
+   * @tr Hareket: true (varsayılan), false (hemen görünür ve gider) ya da kendi zamanlaman `{ duration, exit, easing }` (ms; easing: "easeOutBack" gibi bir hareket motoru eğrisi).
    */
   motion?: boolean | { duration?: number | undefined; exit?: number | undefined; easing?: string | undefined } | undefined;
-  /** Where it opens: the nearest <OverlayScope> (default), the whole page ("page") or a scope element. */
+  /** Where it opens: the nearest <OverlayScope> (default), the whole page ("page") or a scope element. @tr Nerede açılır: en yakın <OverlayScope> (varsayılan), tüm sayfa ("page") ya da bir kapsam öğesi. */
   target?: PortalProps["target"];
 }
 

@@ -11,18 +11,19 @@ import { MARCH_URL } from "../../../brand.js";
 export { MARCH_URL };
 
 export interface MadeWithMarchProps {
-  /** `text` (plain line, default), `badge` (bordered pill), `small` (compact, muted). */
+  /** `text` (plain line, default), `badge` (bordered pill), `small` (compact, muted). @tr `text` (düz satır, varsayılan), `badge` (kenarlıklı hap), `small` (sıkışık, soluk). */
   variant?: MaybeFn<"text" | "badge" | "small" | undefined>;
-  /** The heart: true (default 💗), false (the sentence ends at the link), or your own node / text. */
+  /** The heart: true (default 💗), false (the sentence ends at the link), or your own node / text. @tr Kalp: true (varsayılan 💗), false (cümle bağlantıda biter) ya da kendi düğümün / metnin. */
   heart?: unknown;
-  /** Accessible name of the heart (default: "Love", translated). */
+  /** Accessible name of the heart (default: "Love", translated). @tr Kalbin erişilebilir adı (varsayılan: "Love", çevrilir). */
   heartLabel?: MaybeFn<string | undefined>;
-  /** Text of the link (default: "March"). */
+  /** Text of the link (default: "March"). @tr Bağlantının metni (varsayılan: "March"). */
   link?: unknown;
-  /** Where the link points (default: MARCH_URL). */
+  /** Where the link points (default: MARCH_URL). @tr Bağlantının adresi (varsayılan: MARCH_URL). */
   href?: string | undefined;
-  /** Your own sentence around the two parts: `(link, heart) => content` (heart is null when turned off). */
+  /** Your own sentence around the two parts: `(link, heart) => content` (heart is null when turned off). @tr İki parçanın çevresindeki kendi cümlen: `(link, heart) => içerik` (kalp kapalıysa heart null). */
   text?: ((link: Element, heart: Element | null) => unknown) | undefined;
+  /** Extra classes on the line. @tr Satıra eklenen sınıflar. */
   class?: ClassProp;
 }
 

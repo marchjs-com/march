@@ -9,18 +9,21 @@ import { val, uid, cx, debounce, type MaybeFn, type ClassProp } from "../../../u
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface TooltipProps {
+  /** The hint text. @tr İpucu metni. */
   text: MaybeFn<string>;
+  /** Preferred side (default top). @tr Tercih edilen yön (varsayılan top). */
   placement?: Placement;
-  /** Hover delay before it shows, ms (default 300; keyboard focus shows it at once). */
+  /** Hover delay before it shows, ms (default 300; keyboard focus shows it at once). @tr Görünmeden önce üzerine gelme gecikmesi, ms (varsayılan 300; klavye odağı hemen gösterir). */
   delay?: number | undefined;
-  /** true: it never shows (the wrapped element works as before). */
+  /** true: it never shows (the wrapped element works as before). @tr true: hiç görünmez (sarılan öğe eskisi gibi çalışır). */
   disabled?: MaybeFn<boolean | undefined>;
-  /** Entrance motion: "scale" (default), "fade" or "none". */
+  /** Entrance motion: "scale" (default), "fade" or "none". @tr Giriş hareketi: "scale" (varsayılan), "fade" ya da "none". */
   motion?: "scale" | "fade" | "none" | undefined;
-  /** Theme color token of the bubble (default: the inverse surface). */
+  /** Theme color token of the bubble (default: the inverse surface). @tr Balonun tema renk belirteci (varsayılan: ters yüzey). */
   color?: ColorToken | undefined;
-  /** Extra class on the bubble. */
+  /** Extra class on the bubble. @tr Balona eklenen sınıf. */
   class?: ClassProp;
+  /** The element the hint belongs to. @tr İpucunun ait olduğu öğe. */
   children?: unknown;
 }
 /** `<Tooltip text="Copy link" placement="top"><button>…</button></Tooltip>` — on hover and keyboard focus. */

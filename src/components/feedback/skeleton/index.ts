@@ -5,14 +5,23 @@ import { t } from "../../../core/i18n.ts";
 import { cx, val, type ClassProp } from "../../../ui/util.ts";
 
 export interface SkeletonProps {
-  lines?: number; block?: boolean; height?: "sm" | "md" | "lg";
-  /** "circle": one round shape (an avatar on its way); `height` picks its size (sm 2rem, md 2.5rem, lg 3.5rem). */
-  shape?: "circle" | undefined; class?: ClassProp; /** "single": a neutral shimmer even in a multicolor theme. */ colors?: "single" | "brand" | undefined;
-  /** The moving shimmer (default true); false keeps the shapes still. */
+  /** Number of text lines (default 3). @tr Metin satırı sayısı (varsayılan 3). */
+  lines?: number;
+  /** One block instead of lines (default false). @tr Satırlar yerine tek blok (varsayılan false). */
+  block?: boolean;
+  /** Height of the block, or the size of the circle: sm, md (default) or lg. @tr Bloğun yüksekliği ya da dairenin boyutu: sm, md (varsayılan) ya da lg. */
+  height?: "sm" | "md" | "lg";
+  /** "circle": one round shape (an avatar on its way); `height` picks its size (sm 2rem, md 2.5rem, lg 3.5rem). @tr "circle": tek yuvarlak şekil (yolda olan bir avatar); boyutunu `height` seçer (sm 2rem, md 2.5rem, lg 3.5rem). */
+  shape?: "circle" | undefined;
+  /** Extra classes on the skeleton. @tr İskelete eklenen sınıflar. */
+  class?: ClassProp;
+  /** "single": a neutral shimmer even in a multicolor theme; "brand": a four-colour shimmer. @tr "single": çok renkli temada bile nötr parıltı; "brand": dört renkli parıltı. */
+  colors?: "single" | "brand" | undefined;
+  /** The moving shimmer (default true); false keeps the shapes still. @tr Hareketli parıltı (varsayılan true); false şekilleri durgun bırakır. */
   shimmer?: boolean | undefined;
-  /** The last of several lines is shorter (default true). */
+  /** The last of several lines is shorter (default true). @tr Birden çok satırın sonuncusu daha kısa (varsayılan true). */
   shortLast?: boolean | undefined;
-  /** Accessible name of the lines (default "Loading", translated). */
+  /** Accessible name of the lines (default "Loading", translated). @tr Satırların erişilebilir adı (varsayılan "Loading", çevrilir). */
   label?: string | undefined;
 }
 /** Placeholder while loading: `<Skeleton lines={3} />`, `<Skeleton block height="lg" />`, `<Skeleton shape="circle" />`. */

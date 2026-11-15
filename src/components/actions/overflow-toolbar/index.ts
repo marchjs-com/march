@@ -44,20 +44,23 @@ export interface ToolbarItem {
 }
 
 export interface OverflowToolbarProps {
+  /** The buttons: `{ id, label, icon, onSelect, pressed, disabled, priority, … }`; those that do not fit go to the More menu. @tr Düğmeler: `{ id, label, icon, onSelect, pressed, disabled, priority, … }`; sığmayanlar More menüsüne geçer. */
   items: MaybeFn<readonly ToolbarItem[]>;
-  /** Accessible name. */
+  /** Accessible name. @tr Erişilebilir ad. */
   label: MaybeFn<string>;
+  /** sm (default) or md. @tr sm (varsayılan) ya da md. */
   size?: "sm" | "md";
-  /** Content after the items that never overflows (a search field, a status). */
+  /** Content after the items that never overflows (a search field, a status). @tr Öğelerden sonra gelen, hiç taşmayan içerik (arama alanı, durum). */
   end?: unknown;
-  /** Accessible name of the More button and its menu (default: "More actions", translated). */
+  /** Accessible name of the More button and its menu (default: "More actions", translated). @tr More düğmesinin ve menüsünün erişilebilir adı (varsayılan: "More actions", çevrilir). */
   moreLabel?: MaybeFn<string | undefined>;
-  /** Icon of the More button (default: three dots): your own node / icon. */
+  /** Icon of the More button (default: three dots): your own node / icon. @tr More düğmesinin ikonu (varsayılan: üç nokta): kendi düğümün / ikonun. */
   moreIcon?: unknown;
-  /** Tooltips of icon-only buttons (default true); false: none (the buttons keep their accessible names). */
+  /** Tooltips of icon-only buttons (default true); false: none (the buttons keep their accessible names). @tr Yalnız ikonlu düğmelerin ipuçları (varsayılan true); false: yok (düğmeler erişilebilir adlarını korur). */
   tooltips?: boolean | undefined;
-  /** How an item comes back from the More menu: "pop" (default), "fade", "none" / false, or `(el) => …` (your own animation). */
+  /** How an item comes back from the More menu: "pop" (default), "fade", "none" / false, or `(el) => …` (your own animation). @tr Bir öğe More menüsünden nasıl geri gelir: "pop" (varsayılan), "fade", "none" / false ya da `(el) => …` (kendi animasyonun). */
   motion?: "pop" | "fade" | "none" | false | ((el: Element) => unknown) | undefined;
+  /** Extra classes on the toolbar. @tr Araç çubuğuna eklenen sınıflar. */
   class?: ClassProp;
 }
 

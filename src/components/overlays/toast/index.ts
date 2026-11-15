@@ -76,8 +76,9 @@ export const toast: Toast = Object.assign((message: unknown, opts: ToastOptions 
 
 /** Renders the toast stack. Place once near the root of the app (optional): `<ToastHost position="top-center" />`. */
 export function ToastHost(props: {
-  /** Corner (or centre) of the screen the stack sits in (default "bottom-end"; start / end follow the writing direction). */
+  /** Corner (or centre) of the screen the stack sits in (default "bottom-end"; start / end follow the writing direction). @tr Yığının durduğu ekran köşesi (ya da ortası) (varsayılan "bottom-end"; start / end yazı yönünü izler). */
   position?: "bottom-end" | "bottom-start" | "bottom-center" | "top-end" | "top-start" | "top-center" | undefined;
+  /** Extra classes on the toast stack. @tr Bildirim yığınına eklenen sınıflar. */
   class?: ClassProp;
 } = {}): Element {
   hosts++;

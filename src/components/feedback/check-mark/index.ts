@@ -29,25 +29,27 @@ export type CheckMarkMotion = "flip" | "fade" | "pop" | "draw";
 export type CheckMarkMotionFn = (next: HTMLElement, prev: HTMLElement, change: { from: CheckMarkValue; to: CheckMarkValue }) => unknown;
 
 export interface CheckMarkProps {
-  /** `true` (✓), `false` (✕) or "partial" (–). Default `true`. */
+  /** `true` (✓), `false` (✕) or "partial" (–). Default `true`. @tr `true` (✓), `false` (✕) ya da "partial" (–). Varsayılan `true`. */
   value?: MaybeFn<CheckMarkValue | undefined>;
-  /** Texts per value (defaults: Yes / No / Partly). */
+  /** Texts per value (defaults: Yes / No / Partly). @tr Her değerin metni (varsayılanlar: Yes / No / Partly). */
   labels?: MaybeFn<CheckMarkLabels | undefined>;
-  /** The text for the current value (wins over `labels`); `false`: no text, the mark is decorative. */
+  /** The text for the current value (wins over `labels`); `false`: no text, the mark is decorative. @tr Geçerli değerin metni (`labels`'tan önce gelir); `false`: metin yok, işaret süs amaçlıdır. */
   label?: MaybeFn<string | false | undefined>;
-  /** Show the text beside the mark instead of hiding it visually (default false). */
+  /** Show the text beside the mark instead of hiding it visually (default false). @tr Metni görsel olarak gizlemek yerine işaretin yanında gösterir (varsayılan false). */
   text?: MaybeFn<boolean | undefined>;
-  /** Own glyphs per value. */
+  /** Own glyphs per value. @tr Her değer için kendi glifleri. */
   icons?: CheckMarkIcons | undefined;
-  /** plain (default: the glyph alone) · soft (a tinted disc) · solid (a filled disc) · bare (the glyph alone in the colour and at the text size of what it sits in: a step dot, a button). */
+  /** plain (default: the glyph alone) · soft (a tinted disc) · solid (a filled disc) · bare (the glyph alone in the colour and at the text size of what it sits in: a step dot, a button). @tr plain (varsayılan: yalnız glif) · soft (renkli disk) · solid (dolu disk) · bare (içinde durduğu öğenin renginde ve yazı boyutunda yalnız glif: adım noktası, düğme). */
   variant?: MaybeFn<"plain" | "soft" | "solid" | "bare" | undefined>;
-  /** sm · md (default) · lg. */
+  /** sm · md (default) · lg. @tr sm · md (varsayılan) · lg. */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
   /**
    * The transition when the value changes: "flip" (the glyphs turn into each other), "fade", "pop", "draw" (the new
    * stroke is drawn), your own `(next, prev, change) => …`, or "none" / `false` (default: the glyph changes at once).
+   * @tr Değer değişince geçiş: "flip" (glifler birbirine döner), "fade", "pop", "draw" (yeni çizgi çizilir), kendi `(next, prev, change) => …` fonksiyonun ya da "none" / `false` (varsayılan: glif hemen değişir).
    */
   motion?: CheckMarkMotion | "none" | false | CheckMarkMotionFn | undefined;
+  /** Extra classes on the mark. @tr İşarete eklenen sınıflar. */
   class?: ClassProp;
   /** Other attributes (`data-*`, `title`, `id`) go to the root. */
   [attr: string]: unknown;

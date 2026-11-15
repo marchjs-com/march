@@ -13,24 +13,29 @@ import { check } from "../../../icons/glyphs/check.ts";
 import { copy as copyIcon } from "../../../icons/glyphs/copy.ts";
 
 export interface CopyButtonProps {
+  /** What is copied (read at click time). @tr Kopyalanan değer (tıklama anında okunur). */
   text: MaybeFn<string | number | null | undefined>;
+  /** Button text, or the accessible name when icon-only (default "Copy", translated). @tr Düğme metni ya da yalnız ikonken erişilebilir ad (varsayılan "Copy", çevrilir). */
   label?: MaybeFn<string>;
-  /** Text (or accessible name when icon-only) shown after a copy. Default: "Copied" (translated). */
+  /** Text (or accessible name when icon-only) shown after a copy. Default: "Copied" (translated). @tr Kopyalamadan sonra gösterilen metin (yalnız ikonken erişilebilir ad). Varsayılan: "Copied" (çevrilir). */
   copiedLabel?: MaybeFn<string | undefined>;
+  /** An icon button without visible text (default false). @tr Görünür metni olmayan ikon düğmesi (varsayılan false). */
   iconOnly?: boolean;
-  /** The copy icon: your own node / icon. A text button has no icon unless one is given (`true`: the default one). */
+  /** The copy icon: your own node / icon. A text button has no icon unless one is given (`true`: the default one). @tr Kopyala ikonu: kendi düğümün / ikonun. Metinli düğmede ikon yalnız verilirse olur (`true`: varsayılan ikon). */
   icon?: unknown;
-  /** The icon after a copy (default: a tick): your own node / icon, or false to keep the copy icon. */
+  /** The icon after a copy (default: a tick): your own node / icon, or false to keep the copy icon. @tr Kopyalamadan sonraki ikon (varsayılan: tik): kendi düğümün / ikonun ya da kopyala ikonunu korumak için false. */
   copiedIcon?: unknown;
-  /** Colour of the button after a copy (default: success). */
+  /** Colour of the button after a copy (default: success). @tr Kopyalamadan sonra düğmenin rengi (varsayılan: success). */
   copiedColor?: ColorToken | undefined;
-  /** How long the "Copied" state stays, ms (default 1500). */
+  /** How long the "Copied" state stays, ms (default 1500). @tr "Copied" durumunun ne kadar kaldığı, ms (varsayılan 1500). */
   duration?: number | undefined;
-  /** Text of the failure toast; false: no toast (use `onError`). */
+  /** Text of the failure toast; false: no toast (use `onError`). @tr Hata bildiriminin metni; false: bildirim yok (`onError` kullan). */
   errorText?: MaybeFn<string | undefined> | false;
+  /** Extra classes on the button. @tr Düğmeye eklenen sınıflar. */
   class?: ClassProp;
+  /** Called after a successful copy. @tr Başarılı bir kopyalamadan sonra çağrılır. */
   onCopy?: () => void;
-  /** The clipboard refused (no permission, insecure page). */
+  /** The clipboard refused (no permission, insecure page). @tr Pano reddetti (izin yok, güvensiz sayfa). */
   onError?: (error: unknown) => void;
 }
 // a live prop for h(Component, …): it becomes a getter

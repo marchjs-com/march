@@ -22,23 +22,25 @@ import { motionPreset } from "../../../motion/engine/parts.ts";
 import { addBottomRightControl } from "../../layout/bottom-right-controls/index.ts";
 
 export interface ScrollToTopProps {
-  /** Scrolled distance (px) after which the button shows. Default 320. */
+  /** Scrolled distance (px) after which the button shows. Default 320. @tr Düğmenin göründüğü kaydırma mesafesi (px). Varsayılan 320. */
   threshold?: number | undefined;
-  /** Place in the page corner (lower = nearer the edge). Default 0. */
+  /** Place in the page corner (lower = nearer the edge). Default 0. @tr Sayfa köşesindeki sırası (küçük = kenara daha yakın). Varsayılan 0. */
   order?: number | undefined;
-  /** Render in place instead of in the page corner. */
+  /** Render in place instead of in the page corner. @tr Sayfa köşesi yerine bulunduğu yerde çizilir. */
   inline?: boolean | undefined;
   /** What to follow and scroll; default: the page — the window, or the app's main area when that is what scrolls.
-   *  Boxes that scroll inside the page (a demo, a list, a code block) are never taken over. */
+   *  Boxes that scroll inside the page (a demo, a list, a code block) are never taken over.
+   * @tr İzlenen ve kaydırılan; varsayılan: sayfa — pencere ya da kayan alan oysa uygulamanın ana alanı. Sayfa içinde kayan kutular (bir demo, liste, kod bloğu) hiç ele alınmaz. */
   target?: Element | Window | undefined;
-  /** Accessible name and tooltip (default: "Back to top", translated). */
+  /** Accessible name and tooltip (default: "Back to top", translated). @tr Erişilebilir ad ve ipucu (varsayılan: "Back to top", çevrilir). */
   label?: MaybeFn<string | undefined>;
-  /** The icon (default: an up arrow): your own node / icon. */
+  /** The icon (default: an up arrow): your own node / icon. @tr İkon (varsayılan: yukarı ok): kendi düğümün / ikonun. */
   icon?: unknown;
-  /** How the button appears and leaves: "pop" (default), "fade", "slide", "none" / false, or `(el, shown) => …` (your own animation). */
+  /** How the button appears and leaves: "pop" (default), "fade", "slide", "none" / false, or `(el, shown) => …` (your own animation). @tr Düğme nasıl belirir ve gider: "pop" (varsayılan), "fade", "slide", "none" / false ya da `(el, shown) => …` (kendi animasyonun). */
   motion?: "pop" | "fade" | "slide" | "none" | false | ((el: HTMLElement, shown: boolean) => unknown) | undefined;
-  /** Scroll back smoothly (default true); false jumps at once. */
+  /** Scroll back smoothly (default true); false jumps at once. @tr Yukarı yumuşakça kayar (varsayılan true); false hemen sıçrar. */
   smooth?: boolean | undefined;
+  /** Extra classes on the button. @tr Düğmeye eklenen sınıflar. */
   class?: ClassProp;
 }
 

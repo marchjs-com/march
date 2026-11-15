@@ -12,18 +12,19 @@ export type StatusDotTone = "neutral" | "primary" | "info" | "success" | "warn" 
 export type StatusDotPulse = boolean | "ring" | "blink";
 
 export interface StatusDotProps {
-  /** Meaning: neutral, primary, info, success (default), warn, danger. */
+  /** Meaning: neutral, primary, info, success (default), warn, danger. @tr Anlam: neutral, primary, info, success (varsayılan), warn, danger. */
   tone?: MaybeFn<StatusDotTone | undefined>;
-  /** Motion: `true` / "ring" (a breathing ring), "blink" (the dot fades), `false` (default, still). */
+  /** Motion: `true` / "ring" (a breathing ring), "blink" (the dot fades), `false` (default, still). @tr Hareket: `true` / "ring" (soluyan halka), "blink" (nokta solar), `false` (varsayılan, durgun). */
   pulse?: MaybeFn<StatusDotPulse | undefined>;
-  /** xs · sm · md (default) · lg. */
+  /** xs · sm · md (default) · lg. @tr xs · sm · md (varsayılan) · lg. */
   size?: MaybeFn<"xs" | "sm" | "md" | "lg" | undefined>;
-  /** Accessible name ("Online"). Without it the dot is decorative. */
+  /** Accessible name ("Online"). Without it the dot is decorative. @tr Erişilebilir ad ("Online"). Verilmezse nokta süs amaçlıdır. */
   label?: MaybeFn<string | null | undefined>;
-  /** A ring instead of a filled dot (the point of a timeline entry): the ground shows through; children (an icon) sit inside. */
+  /** A ring instead of a filled dot (the point of a timeline entry): the ground shows through; children (an icon) sit inside. @tr Dolu nokta yerine halka (bir zaman çizelgesi girdisinin noktası): zemin görünür; children (bir ikon) içine oturur. */
   hollow?: MaybeFn<boolean | undefined>;
+  /** Extra classes on the dot. @tr Noktaya eklenen sınıflar. */
   class?: ClassProp;
-  /** With `hollow`: a small mark inside the ring. */
+  /** With `hollow`: a small mark inside the ring. @tr `hollow` ile: halkanın içinde küçük bir işaret. */
   children?: unknown;
   /** Other attributes (`data-*`, `title`, `id`) go to the dot. */
   [attr: string]: unknown;

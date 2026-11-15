@@ -14,18 +14,19 @@ import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 export type ChevronDirection = "end" | "start" | "down" | "up";
 
 export interface ChevronProps {
-  /** Open state. Omit it and the arrow follows the nearest `aria-expanded` ancestor (or an open `<details>` summary). */
+  /** Open state. Omit it and the arrow follows the nearest `aria-expanded` ancestor (or an open `<details>` summary). @tr Açık durumu. Verilmezse ok en yakın `aria-expanded` atasını (ya da açık bir `<details>` özetini) izler. */
   open?: MaybeFn<boolean | undefined>;
-  /** Where it points while closed: "end" (default; turns down), "start" (turns down), "down" (turns up), "up" (turns down). */
+  /** Where it points while closed: "end" (default; turns down), "start" (turns down), "down" (turns up), "up" (turns down). @tr Kapalıyken baktığı yön: "end" (varsayılan; aşağı döner), "start" (aşağı döner), "down" (yukarı döner), "up" (aşağı döner). */
   direction?: MaybeFn<ChevronDirection | undefined>;
-  /** xs · sm (default) · md · lg. */
+  /** xs · sm (default) · md · lg. @tr xs · sm (varsayılan) · md · lg. */
   size?: MaybeFn<"xs" | "sm" | "md" | "lg" | undefined>;
-  /** The turn: "smooth" (default), "spring", or `false` (jumps). */
+  /** The turn: "smooth" (default), "spring", or `false` (jumps). @tr Dönüş: "smooth" (varsayılan), "spring" ya da `false` (sıçrar). */
   motion?: MaybeFn<"smooth" | "spring" | false | undefined>;
-  /** Own icon drawn pointing to the inline end (an icon of hadi-march/icons, text or a node); it turns the same way. */
+  /** Own icon drawn pointing to the inline end (an icon of hadi-march/icons, text or a node); it turns the same way. @tr Satır sonuna bakacak şekilde çizilen kendi ikonun (hadi-march/icons ikonu, metin ya da düğüm); aynı şekilde döner. */
   icon?: unknown;
-  /** Keeps the box but draws nothing (a tree leaf lines up with its siblings). */
+  /** Keeps the box but draws nothing (a tree leaf lines up with its siblings). @tr Kutuyu korur ama hiçbir şey çizmez (ağaç yaprağı kardeşleriyle hizalanır). */
   leaf?: MaybeFn<boolean | undefined>;
+  /** Extra classes on the arrow. @tr Oka eklenen sınıflar. */
   class?: ClassProp;
   /** Other attributes (`data-*`, `id`) go to the arrow. */
   [attr: string]: unknown;

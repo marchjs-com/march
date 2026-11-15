@@ -11,23 +11,29 @@ export type IconButtonVariant = "danger" | "solid" | "raised";
 
 /** Props of <IconButton>. `label` (or aria-label) is required. */
 export interface IconButtonProps {
+  /** The icon (an icon or a node). @tr İkon (ikon ya da düğüm). */
   icon?: unknown;
+  /** Accessible name and tooltip (required, or `aria-label`). @tr Erişilebilir ad ve ipucu (zorunlu, ya da `aria-label`). */
   label?: MaybeFn<string>;
+  /** The name when no `label` is given (no tooltip then). @tr `label` verilmediğinde ad (o zaman ipucu çıkmaz). */
   "aria-label"?: MaybeFn<string>;
-  /** The native tooltip: the label by default, your own text, or false for none. */
+  /** The native tooltip: the label by default, your own text, or false for none. @tr Yerel ipucu: varsayılan etiket, kendi metnin ya da hiç olmaması için false. */
   title?: MaybeFn<string | undefined> | false;
+  /** danger (red icon), solid (filled with the accent) or raised (surface, border and shadow); unset: plain. @tr danger (kırmızı ikon), solid (vurgu rengiyle dolu) ya da raised (yüzey, kenarlık ve gölge); boşsa düz. */
   variant?: MaybeFn<IconButtonVariant | (string & {}) | undefined>;
+  /** xs, sm, md (default) or lg. @tr xs, sm, md (varsayılan) ya da lg. */
   size?: MaybeFn<IconButtonSize | undefined>;
-  /** `round`: a circle. */
+  /** `round`: a circle. @tr `round`: daire. */
   shape?: MaybeFn<"round" | undefined>;
-  /** A toggle button: sets `aria-pressed` and the shared pressed look (`is-pressed`). Leave unset for a plain button. */
+  /** A toggle button: sets `aria-pressed` and the shared pressed look (`is-pressed`). Leave unset for a plain button. @tr Aç / kapa düğmesi: `aria-pressed` ve ortak basılı görünüm (`is-pressed`). Düz düğme için boş bırak. */
   pressed?: MaybeFn<boolean | null | undefined>;
-  /** On dark media (a photo, a video, a scrim): light icon, light hover and focus ring. */
+  /** On dark media (a photo, a video, a scrim): light icon, light hover and focus ring. @tr Koyu medya üzerinde (fotoğraf, video, örtü): açık ikon, açık üzerine gelme ve odak halkası. */
   inverse?: MaybeFn<boolean | null | undefined>;
-  /** Renders a link that looks like the button: the router's Link inside the app, a plain `<a>` for an external address. */
+  /** Renders a link that looks like the button: the router's Link inside the app, a plain `<a>` for an external address. @tr Düğmeye benzeyen bir bağlantı çizer: uygulama içinde yönlendiricinin Link'i, dış adres için düz `<a>`. */
   href?: MaybeFn<ButtonHref>;
+  /** Extra classes on the button. @tr Düğmeye eklenen sınıflar. */
   class?: ClassProp;
-  /** Shown after the icon (alone when there is no icon): e.g. a count Badge, which sits on the corner. */
+  /** Shown after the icon (alone when there is no icon): e.g. a count Badge, which sits on the corner. @tr İkondan sonra gösterilir (ikon yoksa tek başına): ör. köşeye oturan bir sayı Badge'i. */
   children?: unknown;
   [attr: string]: unknown;
 }

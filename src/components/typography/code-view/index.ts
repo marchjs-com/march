@@ -10,20 +10,33 @@ import { tokenLines, type Token } from "../../../ui/highlight.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 
 export interface CodeViewProps {
-  code: MaybeFn<string | null | undefined>; lang?: string; wrap?: boolean; copy?: boolean; lineNumbers?: boolean; label?: MaybeFn<string>; class?: ClassProp;
-  /** Colour tokens (default: on when `lang` is known: js/ts/jsx/tsx, css, html, json, sh). */
+  /** The source code. @tr Kaynak kod. */
+  code: MaybeFn<string | null | undefined>;
+  /** The language: its label in the toolbar and its colours. @tr Dil: araç çubuğundaki etiketi ve renkleri. */
+  lang?: string;
+  /** Initial wrap state; the Wrap button toggles it (default false). @tr Başlangıçta satır kaydırma; Wrap düğmesi değiştirir (varsayılan false). */
+  wrap?: boolean;
+  /** The copy button (default true). @tr Kopyala düğmesi (varsayılan true). */
+  copy?: boolean;
+  /** Line numbers (default true). @tr Satır numaraları (varsayılan true). */
+  lineNumbers?: boolean;
+  /** Accessible name of the scroll area (default "Code"). @tr Kaydırma alanının erişilebilir adı (varsayılan "Code"). */
+  label?: MaybeFn<string>;
+  /** Extra classes on the block. @tr Bloğa eklenen sınıflar. */
+  class?: ClassProp;
+  /** Colour tokens (default: on when `lang` is known: js/ts/jsx/tsx, css, html, json, sh). @tr Renk belirteçleri (varsayılan: `lang` biliniyorsa açık: js/ts/jsx/tsx, css, html, json, sh). */
   highlight?: boolean;
-  /** Extra toolbar controls (widget actions), placed after Wrap. */
+  /** Extra toolbar controls (widget actions), placed after Wrap. @tr Araç çubuğuna eklenen denetimler (bileşen eylemleri), Wrap'tan sonra yer alır. */
   tools?: unknown;
-  /** The whole toolbar (default true); false leaves only the code. */
+  /** The whole toolbar (default true); false leaves only the code. @tr Araç çubuğunun tamamı (varsayılan true); false yalnız kodu bırakır. */
   toolbar?: boolean | undefined;
-  /** The language label in the toolbar: your own text or node, or false to hide it (default: `lang`). */
+  /** The language label in the toolbar: your own text or node, or false to hide it (default: `lang`). @tr Araç çubuğundaki dil etiketi: kendi metnin ya da düğümün, gizlemek için false (varsayılan: `lang`). */
   langLabel?: unknown;
-  /** The Wrap toggle button (default true). */
+  /** The Wrap toggle button (default true). @tr Wrap aç / kapa düğmesi (varsayılan true). */
   wrapButton?: boolean | undefined;
-  /** Text of the Wrap button (default "Wrap", translated). */
+  /** Text of the Wrap button (default "Wrap", translated). @tr Wrap düğmesinin metni (varsayılan "Wrap", çevrilir). */
   wrapLabel?: MaybeFn<string | undefined>;
-  /** Text of the copy button (default "Copy", translated). */
+  /** Text of the copy button (default "Copy", translated). @tr Kopyala düğmesinin metni (varsayılan "Copy", çevrilir). */
   copyLabel?: MaybeFn<string> | undefined;
 }
 /** Read-only code block with line numbers: `<CodeView code={src} lang="js" wrap={false} copy />` */

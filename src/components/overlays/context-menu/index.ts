@@ -8,15 +8,17 @@ import "./context-menu.css";
 import { cx, uid, setStyle, val, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 
 export interface ContextMenuProps {
-  /** Items for this opening; `target` is the element that was right-clicked (or focused for the keyboard). */
+  /** Items for this opening; `target` is the element that was right-clicked (or focused for the keyboard). @tr Bu açılışın öğeleri; `target` sağ tıklanan (ya da klavyede odaklı) öğedir. */
   items: (target: Element, point: { x: number; y: number }) => readonly MenuItem[];
-  /** Accessible name of the menu. */
+  /** Accessible name of the menu. @tr Menünün erişilebilir adı. */
   label?: MaybeFn<string | undefined>;
-  /** Called before opening; return false to keep the browser menu. */
+  /** Called before opening; return false to keep the browser menu. @tr Açılmadan önce çağrılır; tarayıcı menüsünü korumak için false döndür. */
   when?: (target: Element) => boolean;
-  /** Extra class on the floating menu panel (`.m-menu`); `class` goes to the host around the children. */
+  /** Extra class on the floating menu panel (`.m-menu`); `class` goes to the host around the children. @tr Yüzen menü paneline (`.m-menu`) ek sınıf; `class` children'ın çevresindeki ev sahibine gider. */
   menuClass?: ClassProp;
+  /** Extra classes on the host around the children. @tr Children'ın çevresindeki ev sahibine eklenen sınıflar. */
   class?: ClassProp;
+  /** The area where a right-click (or the keyboard) opens the menu. @tr Sağ tıklamanın (ya da klavyenin) menüyü açtığı alan. */
   children?: unknown;
 }
 
